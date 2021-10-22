@@ -1,5 +1,5 @@
 import { domainHash, KnownDomain } from '@celo/identity/lib/odis/domains'
-import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { DB_TIMEOUT, ErrorMessage, KnownDomainState } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
@@ -10,14 +10,10 @@ function domainsStates() {
   return getDatabase()<DomainState>(DOMAINS_STATES_TABLE)
 }
 
-export function domainsStatesTransaction() {
-  return getDatabase().transaction()
-}
-
 export async function setDomainDisabled(domain: KnownDomain, logger: Logger): Promise<void> {
   const disableDomainMeter = Histograms.dbOpsInstrumentation.labels('disableDomain').startTimer()
   const hash = domainHash(domain).toString('hex')
-  logger.debug('Disabling domain', { domain, hash })
+  logger.debug('Disabling domain', { hash, domain })
   try {
     await domainsStates()
       .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
@@ -41,7 +37,7 @@ export async function getDomainState(
 ): Promise<DomainState | null> {
   const getDomainStateMeter = Histograms.dbOpsInstrumentation.labels('getDomainState').startTimer()
   const hash = domainHash(domain).toString('hex')
-  logger.debug('Getting domain state from db', { domain, hash })
+  logger.debug('Getting domain state from db', { hash, domain })
   try {
     const result = await domainsStates()
       .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
@@ -69,7 +65,7 @@ export async function getDomainStateWithLock(
     .labels('getDomainStateWithLock')
     .startTimer()
   const hash = domainHash(domain).toString('hex')
-  logger.debug('Getting domain state from db with lock', { domain, hash })
+  logger.debug('Getting domain state from db with lock', { hash, domain })
   try {
     const result = await domainsStates()
       .transacting(trx)
@@ -92,16 +88,15 @@ export async function getDomainStateWithLock(
 
 export async function updateDomainState(
   domain: KnownDomain,
+  domainState: KnownDomainState,
   trx: Transaction<DomainState>,
-  counter: number,
-  timer: number,
   logger: Logger
 ): Promise<void> {
   const updateDomainStateMeter = Histograms.dbOpsInstrumentation
     .labels('updateDomainState')
     .startTimer()
   const hash = domainHash(domain).toString('hex')
-  logger.debug('Update domain state', { domain, hash, timer, counter })
+  logger.debug('Update domain state', { hash, domain, domainState })
   try {
     const result = await domainsStates()
       .transacting(trx)
@@ -110,12 +105,12 @@ export async function updateDomainState(
       .timeout(DB_TIMEOUT)
 
     if (!result) {
-      await insertRecord(new DomainState(hash, counter, timer), trx)
+      await insertDomainState(domainState, trx, logger)
     } else {
       await domainsStates()
         .transacting(trx)
         .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
-        .update({ timer, counter })
+        .update(domainState)
         .timeout(DB_TIMEOUT)
     }
     updateDomainStateMeter()
@@ -130,6 +125,28 @@ export async function updateDomainState(
   }
 }
 
-async function insertRecord(data: DomainState, trx: Transaction<DomainState>) {
-  return domainsStates().transacting(trx).insert(data).timeout(DB_TIMEOUT)
+export async function insertDomainState(
+  domainState: DomainState,
+  trx: Transaction<DomainState>,
+  logger: Logger
+): Promise<DomainState> {
+  const insertDomainStateMeter = Histograms.dbOpsInstrumentation
+    .labels('insertDomainState')
+    .startTimer()
+  logger.debug('Insert domain state', { domainState })
+  try {
+    await domainsStates().transacting(trx).insert(domainState).timeout(DB_TIMEOUT)
+
+    insertDomainStateMeter()
+
+    return domainState
+  } catch (err) {
+    Counters.databaseErrors.labels(Labels.insert).inc()
+    logger.error(ErrorMessage.DATABASE_INSERT_FAILURE)
+    logger.error(err)
+    insertDomainStateMeter()
+    throw err
+  } finally {
+    insertDomainStateMeter()
+  }
 }

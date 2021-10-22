@@ -1,52 +1,51 @@
 import { isSequentialDelayDomain, KnownDomain } from '@celo/identity/lib/odis/domains'
+import { ErrorMessage, SequentialDelayDomainState } from '@celo/phone-number-privacy-common'
 import { checkSequentialDelay } from '@celo/phone-number-privacy-common/lib/domains/sequential-delay'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { toSequentialDelayDomainState } from '../../common/domain/domainState.mapper'
-import { DomainState } from '../../database/models/domainState'
+import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
 import { updateDomainState } from '../../database/wrappers/domainState'
-import { UnsupportedDomainError } from '../unsupportedDomain.error'
 import { IDomainQuotaService } from './domainQuota.interface'
 
 export class DomainQuotaService implements IDomainQuotaService {
   constructor(private logger: Logger) {}
 
-  public async doesHaveRemainingQuota(
-    domain: KnownDomain,
-    domainState: DomainState
-  ): Promise<boolean> {
-    if (isSequentialDelayDomain(domain)) {
-      return checkSequentialDelay(domain, Date.now(), toSequentialDelayDomainState(domainState))
-        .accepted
-    } else {
-      throw new UnsupportedDomainError()
-    }
-  }
-
-  public async increaseQuotaCount(
+  public async checkAndUpdateQuota(
     domain: KnownDomain,
     domainState: DomainState,
     trx: Transaction<DomainState>
-  ): Promise<boolean> {
+  ): Promise<{ sufficient: boolean; newState: DomainState }> {
     if (isSequentialDelayDomain(domain)) {
-      const result = checkSequentialDelay(
-        domain,
-        Date.now(),
-        toSequentialDelayDomainState(domainState)
-      )
-      if (!result.state) {
-        return false
-      }
-
-      return updateDomainState(
-        domain,
-        trx,
-        result.state.counter!,
-        result.state.timer!,
-        this.logger
-      ).then(() => true)
+      return this.handleSequentialDelayDomain(domain, domainState, trx)
     } else {
-      throw new UnsupportedDomainError()
+      throw new Error(ErrorMessage.UNSUPPORTED_DOMAIN)
+    }
+  }
+
+  private async handleSequentialDelayDomain(
+    domain: KnownDomain,
+    domainState: DomainState,
+    trx: Transaction<DomainState>
+  ) {
+    const result = checkSequentialDelay(
+      domain,
+      Date.now(),
+      toSequentialDelayDomainState(domainState)
+    )
+    if (!result.accepted || !result.state) {
+      return { sufficient: false, newState: domainState }
+    }
+    const newState: SequentialDelayDomainState = {
+      timer: result.state.timer,
+      counter: result.state.counter,
+      domainHash: domainState[DOMAINS_STATES_COLUMNS.domainHash],
+      disabled: domainState[DOMAINS_STATES_COLUMNS.disabled],
+    }
+    await updateDomainState(domain, newState, trx, this.logger)
+    return {
+      sufficient: true,
+      newState,
     }
   }
 }

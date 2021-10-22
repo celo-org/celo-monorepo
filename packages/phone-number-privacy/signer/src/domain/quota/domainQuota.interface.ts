@@ -3,10 +3,9 @@ import { Transaction } from 'knex'
 import { DomainState } from '../../database/models/domainState'
 
 export interface IDomainQuotaService {
-  doesHaveRemainingQuota: (domain: KnownDomain, domainState: DomainState) => Promise<boolean>
-  increaseQuotaCount: (
+  checkAndUpdateQuota: (
     domain: KnownDomain,
     domainState: DomainState,
     trx: Transaction<DomainState>
-  ) => Promise<boolean>
+  ) => Promise<{ sufficient: boolean; newState: DomainState }>
 }

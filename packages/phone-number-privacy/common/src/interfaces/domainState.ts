@@ -4,8 +4,3 @@ export type SequentialDelayDomainState = {
   timer: number
   disabled: boolean
 }
-
-/**
- * Union type of domains states which are currently implemented and standardized for use with ODIS.
- */
-export type KnownDomainState = SequentialDelayDomainState
