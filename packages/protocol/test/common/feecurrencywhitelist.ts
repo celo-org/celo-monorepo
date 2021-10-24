@@ -18,13 +18,11 @@ const MockStableToken: MockStableTokenContract = artifacts.require('MockStableTo
 contract('FeeCurrencyWhitelist', (accounts: string[]) => {
   let feeCurrencyWhitelist: FeeCurrencyWhitelistInstance
   let registry: RegistryInstance
-  let mockStableToken: MockStableTokenInstance
   let mockSortedOracles: MockSortedOraclesInstance
 
   const nonOwner = accounts[1]
 
   before(async () => {
-    mockStableToken = await MockStableToken.new()
     mockSortedOracles = await MockSortedOracles.new()
 
     registry = await getDeployedProxiedContract('Registry', artifacts)
@@ -50,6 +48,12 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
   })
 
   describe('#addToken()', () => {
+    let mockStableToken: MockStableTokenInstance
+
+    before(async () => {
+      mockStableToken = await MockStableToken.new()
+    })
+
     it('should revert when token has no oracle price', async () => {
       await assertRevert(feeCurrencyWhitelist.addToken(mockStableToken.address))
     })

@@ -492,12 +492,15 @@ export async function assumeOwnership(contractsToOwn: string[], to: string) {
     { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
   )
 
-  const proposalId = proposeResponse.receipt.events.ProposalQueued.returnValues.proposalId
+  const getEvent = (txResponse: Truffle.TransactionResponse, eventName: string) =>
+    txResponse.logs.find((log) => log.event === eventName)
+
+  const proposalId = getEvent(proposeResponse, 'ProposalQueued').args.proposalId
 
   const getDequeueIndex = async (
     txResponse: Truffle.TransactionResponse
   ): Promise<number | undefined> => {
-    if (!txResponse.receipt.events.ProposalDequeued) {
+    if (!getEvent(txResponse, 'ProposalDequeued')) {
       return undefined
     }
     let index = 0
