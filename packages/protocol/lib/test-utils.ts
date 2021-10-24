@@ -495,7 +495,7 @@ export async function assumeOwnership(contractsToOwn: string[], to: string) {
   const getEvent = (txResponse: Truffle.TransactionResponse, eventName: string) =>
     txResponse.logs.find((log) => log.event === eventName)
 
-  const proposalId = getEvent(proposeResponse, 'ProposalQueued').args.proposalId
+  const proposalId = parseInt(getEvent(proposeResponse, 'ProposalQueued').args.proposalId, 10)
 
   const getDequeueIndex = async (
     txResponse: Truffle.TransactionResponse
