@@ -5,6 +5,7 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
+  assertRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
@@ -495,6 +496,7 @@ contract('LockedGold', (accounts: string[]) => {
       await lockedGold.lock({ value })
       await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
       await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
+      await accountsInstance.createAccount({ from: reporter })
     })
 
     describe('when the account is slashed for all of its locked gold', () => {
@@ -665,6 +667,25 @@ contract('LockedGold', (accounts: string[]) => {
           assert.equal(await web3.eth.getBalance(mockGovernance.address), value - reward)
         })
       })
+    })
+
+    it('cannot be invoked by non-account reporters', async () => {
+      const penalty = value
+      const reward = value / 2
+
+      await assertRevertWithReason(
+        lockedGold.slash(
+          account,
+          penalty,
+          accounts[4],
+          reward,
+          [NULL_ADDRESS],
+          [NULL_ADDRESS],
+          [0],
+          { from: accounts[2] }
+        ),
+        'reporter must be an account'
+      )
     })
   })
 })
