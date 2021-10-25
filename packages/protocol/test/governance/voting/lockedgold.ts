@@ -529,7 +529,7 @@ contract('LockedGold', (accounts: string[]) => {
       })
     })
 
-    describe('when the account is removed from `isSlasher`', () => {
+    describe('when the slashing contract is removed from `isSlasher`', () => {
       const penalty = value
       const reward = value / 2
       beforeEach(async () => {
