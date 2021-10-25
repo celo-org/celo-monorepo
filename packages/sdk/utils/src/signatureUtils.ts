@@ -134,13 +134,12 @@ export function parseSignatureWithoutPrefix(
   throw new Error(`Unable to parse signature (expected signer ${signer})`)
 }
 
-export function recoverEIP712TypedDataSigner(
+export function recoverEIP712TypedDataSigners(
   typedData: EIP712TypedData,
-  signature: string,
-  signer: string
-): string {
+  signature: string
+): string[] {
   const dataBuff = generateTypedDataHash(typedData)
-
+  let possibleSigners: string[] = []
   for (const parse of [parseSignatureAsVrs, parseSignatureAsRsv]) {
     try {
       const { r, s, v } = parse(signature.slice(2))
@@ -150,16 +149,16 @@ export function recoverEIP712TypedDataSigner(
         ethjsutil.toBuffer(r),
         ethjsutil.toBuffer(s)
       )
-      const recoveredSigner = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
-      if (eqAddress(recoveredSigner, signer)) {
-        return recoveredSigner
-      }
+      // const recoveredSigner = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
+      possibleSigners.push(ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey)))
     } catch (e) {
       // try both serialization formats before throwing
     }
   }
-
-  throw new Error('Unable to recover signature')
+  if (possibleSigners.length) {
+    return possibleSigners
+  }
+  throw new Error('Unable to recover signatures')
 }
 
 export function verifyEIP712TypedDataSigner(
@@ -168,8 +167,9 @@ export function verifyEIP712TypedDataSigner(
   signer: string
 ) {
   try {
-    recoverEIP712TypedDataSigner(typedData, signature, signer)
-    return true
+    return recoverEIP712TypedDataSigners(typedData, signature).some((addr) =>
+      eqAddress(addr, signer)
+    )
   } catch (error) {
     return false
   }
@@ -230,6 +230,6 @@ export const SignatureUtils = {
   parseSignature,
   parseSignatureWithoutPrefix,
   serializeSignature,
-  recoverEIP712TypedDataSigner,
+  recoverEIP712TypedDataSigners,
   verifyEIP712TypedDataSigner,
 }
