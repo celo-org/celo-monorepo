@@ -20,21 +20,24 @@ describe('Domain service tests', () => {
 
   const domainService = new DomainService(authService, quotaService)
 
+  beforeAll(() => {
+    response.locals = { logger: { warn: jest.fn(), error: jest.fn(), info: jest.fn() } }
+  })
+
   beforeEach(() => {
     reset(authServiceMock)
     reset(quotaServiceMock)
     reset(responseMock)
     reset(requestMock)
-
-    when(response.locals.logger).thenReturn({})
   })
 
   it('Should respond with 403 on failed auth', async () => {
     when(authServiceMock.authCheck()).thenReturn(false)
-    when(requestMock.body.domain).thenReturn({})
+    when(responseMock.status(403)).thenReturn(response)
+    request.body = { domain: 'domain' }
 
     await domainService.handleDisableDomain(request, response)
 
-    verify(response.status(403)).called()
+    verify(responseMock.status(403)).once()
   })
 })
