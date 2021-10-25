@@ -5,7 +5,7 @@ import { ClaimTypes } from '@celo/contractkit/lib/identity/claims/types'
 import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity/metadata'
 import { publicKeyToAddress } from '@celo/utils/lib/address'
 import { ensureUncompressed } from '@celo/utils/lib/ecdh'
-import { recoverEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+import { recoverEIP712TypedDataSigners } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import * as t from 'io-ts'
@@ -166,35 +166,43 @@ class StorageRoot {
 
     const toParse = type ? JSON.parse(body.toString()) : body
     const typedData = await buildEIP712TypedData(this.wrapper, dataPath, toParse, type)
-    const guessedSigner = recoverEIP712TypedDataSigner(typedData, signature)
-    if (eqAddress(guessedSigner, this.account)) {
-      return Ok(body)
-    }
-
-    const accounts = await this.wrapper.kit.contracts.getAccounts()
-    if (await accounts.isAccount(this.account)) {
-      const keys = await Promise.all([
-        accounts.getVoteSigner(this.account),
-        accounts.getValidatorSigner(this.account),
-        accounts.getAttestationSigner(this.account),
-        accounts.getDataEncryptionKey(this.account),
-      ])
-
-      const dekAddress = keys[3] ? publicKeyToAddress(ensureUncompressed(keys[3])) : '0x0'
-      const signers = [keys[0], keys[1], keys[2], dekAddress]
-
-      if (signers.some((signer) => eqAddress(signer, guessedSigner))) {
-        return Ok(body)
+    const guessedSigners = recoverEIP712TypedDataSigners(typedData, signature)
+    if (guessedSigners.length) {
+      for (const guessedSigner of guessedSigners) {
+        if (eqAddress(guessedSigner, this.account)) {
+          return Ok(body)
+        }
       }
 
-      if (checkOffchainSigners) {
-        const authorizedSignerAccessor = new AuthorizedSignerAccessor(this.wrapper)
-        const authorizedSigner = await authorizedSignerAccessor.readAsResult(
-          this.account,
-          guessedSigner
-        )
-        if (authorizedSigner.ok) {
-          return Ok(body)
+      const accounts = await this.wrapper.kit.contracts.getAccounts()
+      if (await accounts.isAccount(this.account)) {
+        const keys = await Promise.all([
+          accounts.getVoteSigner(this.account),
+          accounts.getValidatorSigner(this.account),
+          accounts.getAttestationSigner(this.account),
+          accounts.getDataEncryptionKey(this.account),
+        ])
+
+        const dekAddress = keys[3] ? publicKeyToAddress(ensureUncompressed(keys[3])) : '0x0'
+        const signers = [keys[0], keys[1], keys[2], dekAddress]
+
+        for (const guessedSigner of guessedSigners) {
+          if (signers.some((signer) => eqAddress(signer, guessedSigner))) {
+            return Ok(body)
+          }
+        }
+
+        if (checkOffchainSigners) {
+          const authorizedSignerAccessor = new AuthorizedSignerAccessor(this.wrapper)
+          for (const guessedSigner of guessedSigners) {
+            const authorizedSigner = await authorizedSignerAccessor.readAsResult(
+              this.account,
+              guessedSigner
+            )
+            if (authorizedSigner.ok) {
+              return Ok(body)
+            }
+          }
         }
       }
     }
