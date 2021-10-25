@@ -136,11 +136,12 @@ export function parseSignatureWithoutPrefix(
 
 export function recoverEIP712TypedDataSigner(
   typedData: EIP712TypedData,
-  signature: string
+  signature: string,
+  signer: string
 ): string {
   const dataBuff = generateTypedDataHash(typedData)
 
-  for (const parse of [parseSignatureAsRsv, parseSignatureAsVrs]) {
+  for (const parse of [parseSignatureAsVrs, parseSignatureAsRsv]) {
     try {
       const { r, s, v } = parse(signature.slice(2))
       const publicKey = ethjsutil.ecrecover(
@@ -149,7 +150,10 @@ export function recoverEIP712TypedDataSigner(
         ethjsutil.toBuffer(r),
         ethjsutil.toBuffer(s)
       )
-      return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
+      const recoveredSigner = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
+      if (eqAddress(recoveredSigner, signer)) {
+        return recoveredSigner
+      }
     } catch (e) {
       // try both serialization formats before throwing
     }
@@ -163,8 +167,12 @@ export function verifyEIP712TypedDataSigner(
   signature: string,
   signer: string
 ) {
-  const recoveredSigner = recoverEIP712TypedDataSigner(typedData, signature)
-  return eqAddress(signer, recoveredSigner)
+  try {
+    recoverEIP712TypedDataSigner(typedData, signature, signer)
+    return true
+  } catch (error) {
+    return false
+  }
 }
 
 export function guessSigner(message: string, signature: string): string {
