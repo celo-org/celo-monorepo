@@ -1,3 +1,4 @@
+import { concurrentMap } from '@celo/base'
 import { range } from 'lodash'
 import { execCmd } from '../cmd-utils'
 import { deleteIPAddress, registerIPAddress, retrieveIPAddress } from '../helm_deploy'
@@ -22,13 +23,10 @@ export class GCPFullNodeDeployer extends BaseFullNodeDeployer {
   }
 
   async allocateStaticIPs() {
-    const allocateIPPromises = range(this.deploymentConfig.replicas).map((index: number) =>
-      registerIPAddress(this.getIPAddressName(index), this.deploymentConfig.clusterConfig.zone)
+    await concurrentMap(5, range(this.deploymentConfig.replicas), (i) =>
+      registerIPAddress(this.getIPAddressName(i), this.deploymentConfig.clusterConfig.zone)
     )
-    await Promise.all([
-      ...allocateIPPromises,
-      this.deallocateIPsWithNames(await this.ipAddressNamesToDeallocate()),
-    ])
+    await Promise.all([this.deallocateIPsWithNames(await this.ipAddressNamesToDeallocate())])
     return Promise.all(
       range(this.deploymentConfig.replicas).map((index: number) => this.getFullNodeIP(index))
     )
