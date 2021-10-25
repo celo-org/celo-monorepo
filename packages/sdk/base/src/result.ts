@@ -88,3 +88,15 @@ export function parseJsonAsResult(data: string) {
     return Err(new JSONParseError(error))
   }
 }
+
+export function isOk<TResult, TError extends Error>(
+  result: Result<TResult, TError>
+): result is OkResult<TResult> {
+  return result.ok
+}
+
+export function isErr<TResult, TError extends Error>(
+  result: Result<TResult, TError>
+): result is ErrorResult<TError> {
+  return !result.ok
+}
