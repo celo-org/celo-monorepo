@@ -22,11 +22,10 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
     releaseOwner = accounts[0]
     newBeneficiary = accounts[2]
     otherAccount = accounts[3]
-    const contractCanValidate = false
     contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
       web3,
-      contractCanValidate
+      { index: 1 } // canValidate = false
     )
     kit = newKitFromWeb3(web3)
     releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))

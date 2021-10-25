@@ -1,4 +1,5 @@
-import { SequentialDelayDomain, SequentialDelayStage } from '../interfaces'
+import { SequentialDelayDomain, SequentialDelayStage } from '@celo/identity/lib/odis/domains'
+
 export interface SequentialDelayResult {
   accepted: boolean
   state?: SequentialDelayState
@@ -31,7 +32,7 @@ export const checkSequentialDelay = (
     return { accepted: false, state }
   }
 
-  const resetTimer = stage.resetTimer ?? true
+  const resetTimer = stage.resetTimer.defined ? stage.resetTimer.value : true
   const delay = getDelay(stage, counter)
   const notBefore = timer + delay
 
@@ -54,27 +55,28 @@ const getIndexedStage = (
   counter: number
 ): IndexedSequentialDelayStage | undefined => {
   let attemptsInStage = 0
-  let stage = 0
-  let i = 0
-  while (i <= counter) {
-    if (stage >= domain.stages.length) {
+  let index = 0
+  let start = 0
+  while (start <= counter) {
+    if (index >= domain.stages.length) {
       return undefined
     }
-    const repetitions = domain.stages[stage].repetitions ?? 1
-    const batchSize = domain.stages[stage].batchSize ?? 1
+    const stage = domain.stages[index]
+    const repetitions = stage.repetitions.defined ? stage.repetitions.value : 1
+    const batchSize = stage.batchSize.defined ? stage.batchSize.value : 1
     attemptsInStage = repetitions * batchSize
-    i += attemptsInStage
-    stage++
+    start += attemptsInStage
+    index++
   }
 
-  i -= attemptsInStage
-  stage--
+  start -= attemptsInStage
+  index--
 
-  return { ...domain.stages[stage], start: i }
+  return { ...domain.stages[index], start }
 }
 
 const getDelay = (stage: IndexedSequentialDelayStage, counter: number): number => {
-  const batchSize = stage.batchSize ?? 1
+  const batchSize = stage.batchSize.defined ? stage.batchSize.value : 1
   if ((counter - stage.start) % batchSize === 0) {
     return stage.delay
   }
