@@ -3,7 +3,6 @@ import {
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetQuotaRequest,
-  OdisRequest,
 } from '../../src/interfaces'
 import { REASONABLE_BODY_CHAR_LIMIT } from '../../src/utils/constants'
 
@@ -103,7 +102,7 @@ describe('Input Validation test suite', () => {
 
   describe('hasValidAccountParam utility', () => {
     it('Should return true for proper address', () => {
-      const sampleData: OdisRequest = {
+      const sampleData = {
         account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
       }
 
@@ -113,7 +112,7 @@ describe('Input Validation test suite', () => {
     })
 
     it('Should return false for nonsense address', () => {
-      const sampleData: OdisRequest = {
+      const sampleData = {
         account: '0xAA',
       }
 
@@ -123,7 +122,7 @@ describe('Input Validation test suite', () => {
     })
 
     it('Should return false with missing address', () => {
-      const sampleData: OdisRequest = {
+      const sampleData = {
         account: '',
       }
 
