@@ -62,6 +62,15 @@ const DefaultConstitution = {
     setSpread: 0.8,
     setReserveFraction: 0.8,
   },
+    ExchangeBRL: {
+    default: 0.8,
+    setRegistry: 0.9,
+    setUpdateFrequency: 0.8,
+    setMinimumReports: 0.8,
+    setStableToken: 0.8,
+    setSpread: 0.8,
+    setReserveFraction: 0.8,
+  },
   FeeCurrencyWhitelist: {
     default: 0.8,
     addToken: 0.8,
@@ -164,6 +173,14 @@ const DefaultConstitution = {
     approve: 0.6,
   },
   StableTokenEUR: {
+    default: 0.8,
+    setRegistry: 0.9,
+    setInflationParameters: 0.9,
+    transfer: 0.6,
+    transferWithComment: 0.6,
+    approve: 0.6,
+  },
+  StableTokenBRL: {
     default: 0.8,
     setRegistry: 0.9,
     setInflationParameters: 0.9,
