@@ -208,7 +208,6 @@ rule viewFunctionsDoNotRevert(method f) filtered { f ->
 
   // These require an account to exist
 	&& f.selector != getOffchainStorageRoots(address).selector
-	&& f.selector != batchGetOffchainStorageRoots(address[]).selector
 	&& f.selector != offchainStorageRoots(address,uint256).selector
 } {
 	env e;
