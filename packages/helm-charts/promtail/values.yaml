@@ -14,6 +14,11 @@ config:
       - docker: {}
 
     extraRelabelConfigs:
+    # Do not ingest logs for fluentd.
+    - action: drop
+      source_labels:
+        - app
+      regex: fluentd-log-agent
     # Keep Kubernetes pod labels.
     - action: labelmap
       regex: __meta_kubernetes_pod_label_(.+)
@@ -23,7 +28,7 @@ config:
         - namespace
       # TODO: reconsider what should be kept from the default namespace
       # eg: ingress controller
-      regex: (alfajores|baklava|default|rc1|walletconnect)
+      regex: (alfajores|baklava|default|komenci|rc1|walletconnect)
 
 serviceAccount:
   # add a iam.gke.io/gcp-service-account, see
