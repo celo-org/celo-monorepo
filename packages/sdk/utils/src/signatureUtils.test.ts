@@ -70,5 +70,21 @@ describe('signatures', () => {
       )
       expect(signer.toLowerCase()).toEqual(recoveredSigner.toLowerCase())
     })
+    it('should verify signer from sig of EIP712 typed data', () => {
+      // generated via contractKit's signTypedData
+      const vrsSignature =
+        '0x1c106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a100'
+      expect(
+        SignatureUtils.verifyEIP712TypedDataSigner(typedData, vrsSignature, signer)
+      ).toBeTruthy()
+    })
+    it('should not verify signer from invalid sig of EIP712 typed data', () => {
+      // Modified 'v' from 1c -> 1b (28 -> 27)
+      const invalidSignature =
+        '0x1b106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a100'
+      expect(
+        SignatureUtils.verifyEIP712TypedDataSigner(typedData, invalidSignature, signer)
+      ).toBeFalsy()
+    })
   })
 })
