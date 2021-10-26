@@ -4,12 +4,6 @@ module.exports = {
   preset: 'ts-jest',
   ...nodeFlakeTracking,
   testMatch: ['<rootDir>/src/**/?(*.)+(spec|test).ts?(x)'],
-  setupFilesAfterEnv: [
-    '@celo/dev-utils/lib/matchers',
-    '<rootDir>/jestSetup.ts',
-    ...nodeFlakeTracking.setupFilesAfterEnv,
-  ],
-  globalSetup: '<rootDir>/src/test-utils/setup.global.ts',
-  globalTeardown: '<rootDir>/src/test-utils/teardown.global.ts',
+  setupFilesAfterEnv: ['@celo/dev-utils/lib/matchers', ...nodeFlakeTracking.setupFilesAfterEnv],
   verbose: true,
 }
