@@ -923,56 +923,6 @@ contract Accounts is
   }
 
   /**
-   * @notice Getter for the storage roots of multiple accounts.
-   * @param accountsToQuery The addresses of the accounts to get the storage roots for.
-   * @return (
-   *          data - all strings concatenated
-   *          rootLengths[] - the length of each string in `data` in bytes
-   *          accountRootNumbers[] - the number of storage roots per account
-   *         )
-   */
-
-  function batchGetOffchainStorageRoots(address[] calldata accountsToQuery)
-    external
-    view
-    returns (bytes memory, uint256[] memory, uint256[] memory)
-  {
-    uint256[] memory accountRootNumbers = new uint256[](accountsToQuery.length);
-    uint256 totalRoots = 0;
-    for (uint256 i = 0; i < accountsToQuery.length; i++) {
-      require(isAccount(accountsToQuery[i]), "Unknown account");
-      accountRootNumbers[i] = offchainStorageRoots[accountsToQuery[i]].length;
-      totalRoots += accountRootNumbers[i];
-    }
-
-    uint256[] memory rootLengths = new uint256[](totalRoots);
-    uint256 totalLength = 0;
-    uint256 current = 0;
-
-    for (uint256 i = 0; i < accountsToQuery.length; i++) {
-      for (uint256 j = 0; j < accountRootNumbers[i]; j++) {
-        rootLengths[current] = offchainStorageRoots[accountsToQuery[i]][j].length;
-        totalLength += rootLengths[current];
-        current++;
-      }
-    }
-
-    bytes memory concatenated = new bytes(totalLength);
-    current = 0;
-    for (uint256 i = 0; i < accountsToQuery.length; i++) {
-      for (uint256 j = 0; j < accountRootNumbers[i]; j++) {
-        bytes storage root = offchainStorageRoots[accountsToQuery[i]][j];
-        for (uint256 k = 0; k < root.length; k++) {
-          concatenated[current] = root[k];
-          current++;
-        }
-      }
-    }
-
-    return (concatenated, rootLengths, accountRootNumbers);
-  }
-
-  /**
    * @notice Getter for the data encryption key and version.
    * @param account The address of the account to get the key for
    * @return dataEncryptionKey secp256k1 public key for data encryption. Preferably compressed.
