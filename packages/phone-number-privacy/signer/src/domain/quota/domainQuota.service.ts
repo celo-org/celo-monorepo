@@ -1,12 +1,12 @@
 import { isSequentialDelayDomain, KnownDomain } from '@celo/identity/lib/odis/domains'
 import { ErrorMessage, SequentialDelayDomainState } from '@celo/phone-number-privacy-common'
 import { checkSequentialDelay } from '@celo/phone-number-privacy-common/lib/domains/sequential-delay'
+import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { toSequentialDelayDomainState } from '../../common/domain/domainState.mapper'
 import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
 import { updateDomainState } from '../../database/wrappers/domainState'
 import { IDomainQuotaService } from './domainQuota.interface'
-import Logger from 'bunyan'
 
 export class DomainQuotaService implements IDomainQuotaService {
   public async checkAndUpdateQuota(

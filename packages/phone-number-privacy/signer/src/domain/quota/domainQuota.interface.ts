@@ -1,7 +1,7 @@
 import { KnownDomain } from '@celo/identity/lib/odis/domains'
+import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { DomainState } from '../../database/models/domainState'
-import Logger from 'bunyan'
 
 export interface IDomainQuotaService {
   checkAndUpdateQuota: (

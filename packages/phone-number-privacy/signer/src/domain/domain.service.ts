@@ -1,10 +1,4 @@
-import {
-  Domain,
-  domainHash,
-  isKnownDomain,
-  isSequentialDelayDomain,
-  KnownDomain,
-} from '@celo/identity/lib/odis/domains'
+import { Domain, domainHash, isKnownDomain, KnownDomain } from '@celo/identity/lib/odis/domains'
 import {
   DisableDomainRequest,
   DomainQuotaStatusRequest,
@@ -18,6 +12,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
+import { Counters } from '../common/metrics'
 import { getVersion } from '../config'
 import { getTransaction } from '../database/database'
 import { DOMAINS_STATES_COLUMNS, DomainState } from '../database/models/domainState'
@@ -34,19 +29,6 @@ import { IDomainService } from './domain.interface'
 import { IDomainQuotaService } from './quota/domainQuota.interface'
 
 export class DomainService implements IDomainService {
-  private static createEmptyDomainState(domain: Domain): DomainState {
-    if (isSequentialDelayDomain(domain)) {
-      return {
-        [DOMAINS_STATES_COLUMNS.domainHash]: domainHash(domain).toString('hex'),
-        [DOMAINS_STATES_COLUMNS.counter]: 0,
-        [DOMAINS_STATES_COLUMNS.timer]: 0,
-        [DOMAINS_STATES_COLUMNS.disabled]: false,
-      }
-    }
-
-    throw new Error(WarningMessage.UNKNOWN_DOMAIN)
-  }
-
   public constructor(
     private authService: IDomainAuthService,
     private quotaService: IDomainQuotaService
@@ -56,6 +38,8 @@ export class DomainService implements IDomainService {
     request: Request<{}, {}, DisableDomainRequest>,
     response: Response
   ): Promise<void> {
+    Counters.requests.labels(Endpoints.DISABLE_DOMAIN).inc()
+
     const logger = response.locals.logger
     const domain = request.body.domain
     if (!this.inputValidation(domain, response, Endpoints.DISABLE_DOMAIN, logger)) {
@@ -72,7 +56,7 @@ export class DomainService implements IDomainService {
       const domainState = await getDomainStateWithLock(domain, trx, logger)
       if (!domainState) {
         // If the domain is not currently recorded in the state database, add it now.
-        await insertDomainState(DomainService.createEmptyDomainState(domain), trx, logger)
+        await insertDomainState(DomainState.createEmptyDomainState(domain), trx, logger)
         await trx.commit()
       } else if (domainState.disabled) {
         // If the domain is already disabled, nothing needs to be done. Return 200 OK.
@@ -95,6 +79,8 @@ export class DomainService implements IDomainService {
     request: Request<{}, {}, DomainQuotaStatusRequest>,
     response: Response
   ): Promise<void> {
+    Counters.requests.labels(Endpoints.DOMAIN_QUOTA_STATUS).inc()
+
     const logger = response.locals.logger
     const domain = request.body.domain
     if (!this.inputValidation(domain, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
@@ -112,9 +98,9 @@ export class DomainService implements IDomainService {
       if (domainState) {
         resultResponse = {
           domain,
-          counter: domainState[DOMAINS_STATES_COLUMNS.counter]!,
-          disabled: domainState[DOMAINS_STATES_COLUMNS.disabled]!,
-          timer: domainState[DOMAINS_STATES_COLUMNS.timer]!,
+          counter: domainState[DOMAINS_STATES_COLUMNS.counter] ?? 0,
+          disabled: domainState[DOMAINS_STATES_COLUMNS.disabled],
+          timer: domainState[DOMAINS_STATES_COLUMNS.timer] ?? 0,
         }
       } else {
         resultResponse = {
@@ -140,6 +126,8 @@ export class DomainService implements IDomainService {
     request: Request<{}, {}, DomainRestrictedSignatureRequest>,
     response: Response
   ): Promise<void> {
+    Counters.requests.labels(Endpoints.DOMAIN_SIGN).inc()
+
     const logger = response.locals.logger
     const domain = request.body.domain
     if (!this.inputValidation(domain, response, Endpoints.DOMAIN_SIGN, logger)) {
@@ -151,49 +139,60 @@ export class DomainService implements IDomainService {
       hash: domainHash(domain),
     })
 
-    const trx = await getTransaction()
-    let domainState = await getDomainStateWithLock(domain, trx, logger)
-    if (!domainState) {
-      domainState = await insertDomainState(
-        DomainService.createEmptyDomainState(domain),
+    try {
+      const trx = await getTransaction()
+      let domainState = await getDomainStateWithLock(domain, trx, logger)
+      if (!domainState) {
+        domainState = await insertDomainState(
+          DomainState.createEmptyDomainState(domain),
+          trx,
+          logger
+        )
+      }
+
+      const quotaState = await this.quotaService.checkAndUpdateQuota(
+        domain,
+        domainState,
         trx,
         logger
       )
-    }
 
-    const quotaState = await this.quotaService.checkAndUpdateQuota(domain, domainState, trx, logger)
-
-    if (!quotaState.sufficient) {
-      trx.rollback()
-      logger.warn(`Exceeded quota`, {
-        name: domain.name,
-        version: domain.version,
-      })
-      respondWithError(Endpoints.DOMAIN_SIGN, response, 403, WarningMessage.EXCEEDED_QUOTA)
-      return
-    }
-
-    let signature: string
-    try {
-      const keyProvider = getKeyProvider()
-      const privateKey = keyProvider.getPrivateKey()
-      signature = computeBlindedSignature(request.body.blindedMessage, privateKey, logger)
-    } catch (err) {
-      trx.rollback()
-      throw err
-    }
-
-    try {
-      trx.commit()
-      const signMessageResponseSuccess: SignMessageResponseSuccess = {
-        success: true,
-        signature,
-        version: getVersion(),
+      if (!quotaState.sufficient) {
+        trx.rollback()
+        logger.warn(`Exceeded quota`, {
+          name: domain.name,
+          version: domain.version,
+        })
+        respondWithError(Endpoints.DOMAIN_SIGN, response, 403, WarningMessage.EXCEEDED_QUOTA)
+        return
       }
-      response.json(signMessageResponseSuccess)
+
+      let signature: string
+      try {
+        const keyProvider = getKeyProvider()
+        const privateKey = keyProvider.getPrivateKey()
+        signature = computeBlindedSignature(request.body.blindedMessage, privateKey, logger)
+      } catch (err) {
+        trx.rollback()
+        throw err
+      }
+
+      try {
+        trx.commit()
+        const signMessageResponseSuccess: SignMessageResponseSuccess = {
+          success: true,
+          signature,
+          version: getVersion(),
+        }
+        response.json(signMessageResponseSuccess)
+      } catch (err) {
+        trx.rollback()
+        throw err
+      }
     } catch (err) {
-      trx.rollback()
-      throw err
+      logger.error('Failed to get signature for a domain')
+      logger.error(err)
+      respondWithError(Endpoints.DOMAIN_SIGN, response, 500, ErrorMessage.UNKNOWN_ERROR)
     }
   }
 

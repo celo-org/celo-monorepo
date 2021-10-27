@@ -40,4 +40,14 @@ describe('Domain service tests', () => {
 
     verify(responseMock.status(403)).once()
   })
+
+  it('Should respond with 404 on unknown domain', async () => {
+    when(authServiceMock.authCheck()).thenReturn(true)
+    when(responseMock.status(404)).thenReturn(response)
+    request.body = { domain: 'Some unknown domain' }
+
+    await domainService.handleDisableDomain(request, response)
+
+    verify(responseMock.status(404)).once()
+  })
 })

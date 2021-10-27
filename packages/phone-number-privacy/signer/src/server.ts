@@ -7,11 +7,11 @@ import https from 'https'
 import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
 import config, { getVersion } from './config'
+import { DomainAuthService } from './domain/auth/domainAuth.service'
 import { DomainService } from './domain/domain.service'
+import { DomainQuotaService } from './domain/quota/domainQuota.service'
 import { handleGetBlindedMessagePartialSig } from './signing/get-partial-signature'
 import { handleGetQuota } from './signing/query-quota'
-import { DomainAuthService } from './domain/auth/domainAuth.service'
-import { DomainQuotaService } from './domain/quota/domainQuota.service'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -56,9 +56,7 @@ export function createServer() {
   addMeteredEndpoint(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, handleGetBlindedMessagePartialSig)
   addMeteredEndpoint(Endpoints.GET_QUOTA, handleGetQuota)
   addMeteredEndpoint(Endpoints.DOMAIN_QUOTA_STATUS, domainService.handleGetDomainQuotaStatus)
-  addMeteredEndpoint(Endpoints.DOMAIN_SIGN, async (_, res) => {
-    res.sendStatus(501)
-  })
+  addMeteredEndpoint(Endpoints.DOMAIN_SIGN, domainService.handleGetDomainRestrictedSignature)
   addMeteredEndpoint(Endpoints.DISABLE_DOMAIN, domainService.handleDisableDomain)
 
   const sslOptions = getSslOptions()
