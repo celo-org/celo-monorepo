@@ -1,4 +1,4 @@
-import { Domain } from '@celo/identity/lib/odis/domains'
+//import { Domain } from '@celo/identity/lib/odis/domains'
 import * as crypto from 'crypto'
 
 export interface Backup {
@@ -12,6 +12,7 @@ export interface Backup {
   nonce: Buffer
 
   // ODIS Domain instance to be included in the query to ODIS for password hardening,
+  /* DO NOT MERGE: Reintroduce these fields.
   odisDomain?: Domain
 
   // RSA-OAEP-256 encryption of a randomly chosen 128-bit value, the fuse key.
@@ -19,6 +20,7 @@ export interface Backup {
   // under the public key of the circuit breaker service. In order to get the fuseKey the client
   // will send this ciphertext to the circuit breaker service for decryption.
   encryptedFuseKey?: Buffer
+  */
 
   // Version number for the backup feature. Used to facilitate backwards
   // compatibility in future backup feature upgrades.
@@ -79,16 +81,4 @@ export function openBackup(backup: Backup, password: Buffer): Buffer {
   const data = Buffer.concat([decipher.update(ciphertextData), decipher.final()])
 
   return data
-}
-
-export function serializeBackup(backup: Backup): string {
-  return JSON.stringify(
-    {
-      ...backup,
-      encryptedData: backup.encryptedData.toString('base64'),
-      nonce: backup.nonce.toString('base64'),
-    },
-    undefined,
-    2
-  )
 }
