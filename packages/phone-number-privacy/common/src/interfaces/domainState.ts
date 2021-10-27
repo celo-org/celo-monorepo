@@ -1,4 +1,4 @@
-export type SequentialDelayDomainState = {
+export interface SequentialDelayDomainState {
   domainHash: string
   counter: number
   timer: number
