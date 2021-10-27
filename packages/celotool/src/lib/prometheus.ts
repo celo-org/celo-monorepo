@@ -214,6 +214,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       'kube_pod_[^cs].+',
       'workqueue_.+',
       'kube_secret_.+',
+      'phoenix_.+',
     ]
     params.push(
       `--set remote_write.url='${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}'`,
