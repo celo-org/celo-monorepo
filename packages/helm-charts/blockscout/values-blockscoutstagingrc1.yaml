@@ -16,8 +16,8 @@ blockscout:
       enabled: true
   api:
     autoscaling:
-      maxReplicas: 10
-      minReplicas: 2
+      maxReplicas: 2
+      minReplicas: 1
       target:
         cpu: 70
     db:
@@ -34,8 +34,8 @@ blockscout:
   web:
     host: blockscoutstagingrc1-blockscout3.celo-testnet.org
     autoscaling:
-      maxReplicas: 10
-      minReplicas: 2
+      maxReplicas: 2
+      minReplicas: 1
       target:
         cpu: 70
     db:
