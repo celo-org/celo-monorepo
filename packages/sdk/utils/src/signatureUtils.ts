@@ -1,4 +1,4 @@
-import { NativeSigner, serializeSignature, Signer } from '@celo/base/lib/signatureUtils'
+import { NativeSigner, serializeSignature, Signature, Signer } from '@celo/base/lib/signatureUtils'
 import * as Web3Utils from 'web3-utils'
 import { ensureLeading0x, eqAddress, privateKeyToAddress } from './address'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
@@ -134,45 +134,70 @@ export function parseSignatureWithoutPrefix(
   throw new Error(`Unable to parse signature (expected signer ${signer})`)
 }
 
-export function recoverEIP712TypedDataSigner(
+function recoverEIP712TypedDataSigner(
   typedData: EIP712TypedData,
   signature: string,
-  signer: string
+  parseFunction: (signature: string) => Signature
 ): string {
   const dataBuff = generateTypedDataHash(typedData)
-
-  for (const parse of [parseSignatureAsVrs, parseSignatureAsRsv]) {
-    try {
-      const { r, s, v } = parse(signature.slice(2))
-      const publicKey = ethjsutil.ecrecover(
-        ethjsutil.toBuffer(dataBuff),
-        v,
-        ethjsutil.toBuffer(r),
-        ethjsutil.toBuffer(s)
-      )
-      const recoveredSigner = ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
-      if (eqAddress(recoveredSigner, signer)) {
-        return recoveredSigner
-      }
-    } catch (e) {
-      // try both serialization formats before throwing
-    }
-  }
-
-  throw new Error('Unable to recover signature')
+  const { r, s, v } = parseFunction(signature.slice(2))
+  const publicKey = ethjsutil.ecrecover(
+    ethjsutil.toBuffer(dataBuff),
+    v,
+    ethjsutil.toBuffer(r),
+    ethjsutil.toBuffer(s)
+  )
+  // TODO test error handling on this
+  return ethjsutil.bufferToHex(ethjsutil.pubToAddress(publicKey))
 }
 
+/**
+ * Recover signer from RSV-serialized signature over signed typed data.
+ * @param typedData EIP712 typed data
+ * @param signature RSV signature of signed type data by signer
+ * @returns string signer, or throws error if parsing fails
+ */
+export function recoverEIP712TypedDataSignerRsv(
+  typedData: EIP712TypedData,
+  signature: string
+): string {
+  return recoverEIP712TypedDataSigner(typedData, signature, parseSignatureAsRsv)
+}
+
+/**
+ * Recover signer from VRS-serialized signature over signed typed data.
+ * @param typedData EIP712 typed data
+ * @param signature VRS signature of signed type data by signer
+ * @returns string signer, or throws error if parsing fails
+ */
+export function recoverEIP712TypedDataSignerVrs(
+  typedData: EIP712TypedData,
+  signature: string
+): string {
+  return recoverEIP712TypedDataSigner(typedData, signature, parseSignatureAsVrs)
+}
+
+/**
+ * @param typedData EIP712 typed data
+ * @param signature VRS or SRV signature of `typedData` by `signer`
+ * @param signer address to verify signed the `typedData`
+ * @returns boolean, true if `signer` is a possible signer of `signature`
+ */
 export function verifyEIP712TypedDataSigner(
   typedData: EIP712TypedData,
   signature: string,
   signer: string
 ) {
-  try {
-    recoverEIP712TypedDataSigner(typedData, signature, signer)
-    return true
-  } catch (error) {
-    return false
+  for (const recover of [recoverEIP712TypedDataSignerVrs, recoverEIP712TypedDataSignerRsv]) {
+    try {
+      if (eqAddress(recover(typedData, signature), signer)) {
+        return true
+      }
+    } catch (e) {
+      // try both serialization formats before failing to verify
+    }
   }
+  return false
 }
 
 export function guessSigner(message: string, signature: string): string {
@@ -230,6 +255,7 @@ export const SignatureUtils = {
   parseSignature,
   parseSignatureWithoutPrefix,
   serializeSignature,
-  recoverEIP712TypedDataSigner,
+  recoverEIP712TypedDataSignerRsv,
+  recoverEIP712TypedDataSignerVrs,
   verifyEIP712TypedDataSigner,
 }

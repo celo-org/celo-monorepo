@@ -33,57 +33,54 @@ describe('signatures', () => {
     const pKey = '0xac8ca7aeb0f57f1ed1ce98a695dabcb0278faf03d68e1bae08c9095355a28b06'
     const signer = privateKeyToAddress(pKey)
     const typedData = attestationSecurityCode('1000023')
+    // generated via LocalWallet's signTypedData
+    const rsvSignature =
+      '0x106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a10001'
+    // generated via contractKit's signTypedData
+    const vrsSignature =
+      '0x1c106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a100'
+    const signature = {
+      v: 28,
+      r: '0x106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b',
+      s: '0x39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a100',
+    }
+    // Modified 'v' from 1c -> 1b (28 -> 27)
+    const invalidVrsSignature =
+      '0x1b106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a100'
 
     it('should recover signer from RSV-serialized sig of EIP712 typed data ', () => {
-      // generated via LocalWallet's signTypedData
-      const rsvSignature =
-        '0x106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a10001'
-      const recoveredSigner = SignatureUtils.recoverEIP712TypedDataSigner(
+      const recoveredSigner = SignatureUtils.recoverEIP712TypedDataSignerRsv(
         typedData,
-        rsvSignature,
-        signer
+        rsvSignature
       )
       expect(signer.toLowerCase()).toEqual(recoveredSigner.toLowerCase())
     })
     it('should recover signer from VSR-serialized sig of EIP712 typed data', () => {
-      // generated via contractKit's signTypedData
-      const vrsSignature =
-        '0x1c106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a100'
-      const recoveredSigner = SignatureUtils.recoverEIP712TypedDataSigner(
+      const recoveredSigner = SignatureUtils.recoverEIP712TypedDataSignerVrs(
         typedData,
-        vrsSignature,
-        signer
+        vrsSignature
       )
       expect(signer.toLowerCase()).toEqual(recoveredSigner.toLowerCase())
     })
-    it('should recover signer from serializeSignature output', () => {
-      const signature = {
-        v: 28,
-        r: '0x106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b',
-        s: '0x39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a100',
-      }
-      const serializedSig = SignatureUtils.serializeSignature(signature)
-      const recoveredSigner = SignatureUtils.recoverEIP712TypedDataSigner(
-        typedData,
-        serializedSig,
-        signer
-      )
-      expect(signer.toLowerCase()).toEqual(recoveredSigner.toLowerCase())
+    it('should verify signer from RSV-serialized sig of EIP712 typed data', () => {
+      expect(
+        SignatureUtils.verifyEIP712TypedDataSigner(typedData, rsvSignature, signer)
+      ).toBeTruthy()
     })
-    it('should verify signer from sig of EIP712 typed data', () => {
-      // generated via contractKit's signTypedData
-      const vrsSignature =
-        '0x1c106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a100'
+    it('should verify signer from VSR-serialized sig of EIP712 typed data', () => {
       expect(
         SignatureUtils.verifyEIP712TypedDataSigner(typedData, vrsSignature, signer)
       ).toBeTruthy()
     })
-    it('should not verify signer from invalid sig of EIP712 typed data', () => {
-      // Modified 'v' from 1c -> 1b (28 -> 27)
-      const invalidSignature =
-        '0x1b106c6f892c5667c298dddc023161b58657c47fb03348fa0ec9b3b515841df47b39985d448104683fcef8d81f2cdcf8bce83c97f8dfb130438f7d26c6e3b2a100'
+    it('should verify signer from serializeSignature output', () => {
+      const serializedSig = SignatureUtils.serializeSignature(signature)
       expect(
-        SignatureUtils.verifyEIP712TypedDataSigner(typedData, invalidSignature, signer)
+        SignatureUtils.verifyEIP712TypedDataSigner(typedData, serializedSig, signer)
+      ).toBeTruthy()
+    })
+    it('should not verify signer from invalid sig of EIP712 typed data', () => {
+      expect(
+        SignatureUtils.verifyEIP712TypedDataSigner(typedData, invalidVrsSignature, signer)
       ).toBeFalsy()
     })
   })
