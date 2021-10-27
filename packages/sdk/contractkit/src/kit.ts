@@ -129,6 +129,7 @@ export class ContractKit {
       CeloContract.Validators,
       CeloContract.DowntimeSlasher,
       CeloContract.BlockchainParameters,
+      CeloContract.EpochRewards,
       CeloContract.GrandaMento,
     ]
 
