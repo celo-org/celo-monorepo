@@ -1,28 +1,28 @@
 import fs from 'fs'
-import { createNamespaceIfNotExists } from 'src/lib/cluster'
-import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
+import { createNamespaceIfNotExists } from './cluster'
+import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import {
   DynamicEnvVar,
   envVar,
   fetchEnv,
   fetchEnvOrFallback,
   getDynamicEnvVarValue,
-} from 'src/lib/env-utils'
+} from './env-utils'
 import {
   installGenericHelmChart,
   isCelotoolHelmDryRun,
   removeGenericHelmChart,
   setHelmArray,
   upgradeGenericHelmChart,
-} from 'src/lib/helm_deploy'
-import { BaseClusterConfig, CloudProvider } from 'src/lib/k8s-cluster/base'
-import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
+} from './helm_deploy'
+import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
+import { GCPClusterConfig } from './k8s-cluster/gcp'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
   getServiceAccountKey,
   setupGKEWorkloadIdentities,
-} from 'src/lib/service-account-utils'
+} from './service-account-utils'
 import { outputIncludes, switchToGCPProject } from './utils'
 const yaml = require('js-yaml')
 
