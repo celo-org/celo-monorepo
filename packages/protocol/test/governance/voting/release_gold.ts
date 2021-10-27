@@ -295,13 +295,41 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should transfer stable token from the release gold instance', async () => {
+      await releaseGoldInstance.transfer(receiver, transferAmount, { from: beneficiary })
+      const contractBalance = await mockStableToken.balanceOf(releaseGoldInstance.address)
+      const recipientBalance = await mockStableToken.balanceOf(receiver)
+      assertEqualBN(contractBalance, 0)
+      assertEqualBN(recipientBalance, transferAmount)
+    })
+  })
+
+  describe('#genericTransfer', () => {
+    const receiver = accounts[5]
+    const transferAmount = 10
+
+    beforeEach(async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
+      await mockStableToken.mint(releaseGoldInstance.address, transferAmount)
+    })
+
+    it('should transfer stable token from the release gold instance', async () => {
       const startBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
       const startBalanceTo = await mockStableToken.balanceOf(receiver)
-      await releaseGoldInstance.transfer(receiver, transferAmount, { from: beneficiary })
+      await releaseGoldInstance.genericTransfer(mockStableToken.address, receiver, transferAmount, {
+        from: beneficiary,
+      })
       const endBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
       const endBalanceTo = await mockStableToken.balanceOf(receiver)
       assertEqualBN(endBalanceFrom, startBalanceFrom.minus(transferAmount))
       assertEqualBN(endBalanceTo, startBalanceTo.plus(transferAmount))
+    })
+
+    it('should revert when attempting transfer of goldtoken from the release gold instance', async () => {
+      await assertRevert(
+        releaseGoldInstance.genericTransfer(goldTokenInstance.address, receiver, transferAmount, {
+          from: beneficiary,
+        })
+      )
     })
   })
 

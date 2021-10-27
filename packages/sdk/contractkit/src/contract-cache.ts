@@ -8,6 +8,7 @@ import { BlockchainParametersWrapper } from './wrappers/BlockchainParameters'
 import { DoubleSigningSlasherWrapper } from './wrappers/DoubleSigningSlasher'
 import { DowntimeSlasherWrapper } from './wrappers/DowntimeSlasher'
 import { ElectionWrapper } from './wrappers/Election'
+import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { Erc20Wrapper } from './wrappers/Erc20Wrapper'
 // import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { EscrowWrapper } from './wrappers/Escrow'
@@ -33,7 +34,7 @@ const WrapperFactories = {
   [CeloContract.DoubleSigningSlasher]: DoubleSigningSlasherWrapper,
   [CeloContract.DowntimeSlasher]: DowntimeSlasherWrapper,
   [CeloContract.Election]: ElectionWrapper,
-  // [CeloContract.EpochRewards]?: EpochRewardsWrapper,
+  [CeloContract.EpochRewards]: EpochRewardsWrapper,
   [CeloContract.ERC20]: Erc20Wrapper,
   [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
@@ -67,7 +68,7 @@ interface WrapperCacheMap {
   [CeloContract.DoubleSigningSlasher]?: DoubleSigningSlasherWrapper
   [CeloContract.DowntimeSlasher]?: DowntimeSlasherWrapper
   [CeloContract.Election]?: ElectionWrapper
-  // [CeloContract.EpochRewards]?: EpochRewardsWrapper
+  [CeloContract.EpochRewards]?: EpochRewardsWrapper
   [CeloContract.ERC20]?: Erc20Wrapper<Ierc20>
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
@@ -119,9 +120,9 @@ export class WrapperCache {
   getElection() {
     return this.getContract(CeloContract.Election)
   }
-  // getEpochRewards() {
-  //   return this.getContract(CeloContract.EpochRewards)
-  // }
+  getEpochRewards() {
+    return this.getContract(CeloContract.EpochRewards)
+  }
   getErc20(address: string) {
     return this.getContract(CeloContract.ERC20, address)
   }
