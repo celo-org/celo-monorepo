@@ -41,24 +41,37 @@ function deriveKey(password: Buffer, nonce: Buffer): Buffer {
   return crypto.pbkdf2Sync(Buffer.concat([info, password]), nonce, 1, 16, 'sha256')
 }
 
+/**
+ * AES-128-GCM encrypt the given data with the given 16-byte key.
+ * Encode the ciphertext as { iv || data || auth tag }
+ */
+function encrypt(key: Buffer, data: Buffer): Buffer {
+  const iv = crypto.randomBytes(16)
+  const cipher = crypto.createCipheriv('aes-128-gcm', key, iv)
+  return Buffer.concat([iv, cipher.update(data), cipher.final(), cipher.getAuthTag()])
+}
+
+/**
+ * AES-128-GCM decrypt the given data with the given 16-byte key.
+ * Ciphertext should be encoded as { iv || data || auth tag }.
+ */
+function decrypt(key: Buffer, ciphertext: Buffer): Buffer {
+  const len = ciphertext.length
+  const iv = ciphertext.slice(0, 16)
+  const ciphertextData = ciphertext.slice(16, len - 16)
+  const auth = ciphertext.slice(len - 16, len)
+  const decipher = crypto.createDecipheriv('aes-128-gcm', key, iv)
+  decipher.setAuthTag(auth)
+  return Buffer.concat([decipher.update(ciphertextData), decipher.final()])
+}
+
 export function createBackup(data: Buffer, password: Buffer): Backup {
   const nonce = crypto.randomBytes(16)
   const key = deriveKey(password, nonce)
 
-  // Using the derived key, encrypt the given backup data.
-  // Encode the ciphertext as { iv || data || auth tag }
-  const iv = crypto.randomBytes(16)
-  const cipher = crypto.createCipheriv('aes-128-gcm', key, iv)
-  const encryptedData = Buffer.concat([
-    iv,
-    cipher.update(data),
-    cipher.final(),
-    cipher.getAuthTag(),
-  ])
-
-  // Collect and return the contents of the Backup structure.
+  // Encrypted and wrap the data in a Backup structure.
   return {
-    encryptedData,
+    encryptedData: encrypt(key, data),
     nonce,
     version: '0.0.1',
     metadata: {},
@@ -68,17 +81,5 @@ export function createBackup(data: Buffer, password: Buffer): Backup {
 
 export function openBackup(backup: Backup, password: Buffer): Buffer {
   const key = deriveKey(password, backup.nonce)
-
-  // Using the derived key, decrypt the given backup data.
-  // Ciphertext is encoded as { iv || data || auth tag }
-  const len = backup.encryptedData.length
-  const iv = backup.encryptedData.slice(0, 16)
-  const ciphertextData = backup.encryptedData.slice(16, len - 16)
-  const auth = backup.encryptedData.slice(len - 16, len)
-  const decipher = crypto.createDecipheriv('aes-128-gcm', key, iv)
-
-  decipher.setAuthTag(auth)
-  const data = Buffer.concat([decipher.update(ciphertextData), decipher.final()])
-
-  return data
+  return decrypt(key, backup.encryptedData)
 }
