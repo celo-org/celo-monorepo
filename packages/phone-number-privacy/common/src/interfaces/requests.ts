@@ -122,6 +122,15 @@ export type DisableDomainRequest<
   'options'
 >
 
+/** Union type of Domain API requests */
+export type DomainRequest<
+  D extends Domain = Domain,
+  O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
+> =
+  | DomainRestrictedSignatureRequest<D, O>
+  | DomainQuotaStatusRequest<D, O>
+  | DisableDomainRequest<D, O>
+
 export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
   request: DomainRestrictedSignatureRequest<D>
 ): EIP712TypedData {
@@ -151,40 +160,6 @@ export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
     },
     message: request,
   }
-}
-
-// TODO(victor): When/if more authenticated domains with the same signature scheme are added,
-// generalize this funciton to handle those domains and options as well.
-export function verifyDomainRestrictedSignatureRequestSignature(
-  request: DomainRestrictedSignatureRequest<SequentialDelayDomain>
-): boolean {
-  // If the address field is undefined, then this domain is unauthenticated.
-  // Return true as the signature does not need to be checked.
-  if (!request.domain.address.defined) {
-    return true
-  }
-  const signer = request.domain.address.value
-
-  // If not signature is provided, return false.
-  if (!request.options.signature.defined) {
-    return false
-  }
-  const signature = request.options.signature.value
-
-  // Requests are signed over the message excluding the signature. CIP-40 specifies that the
-  // signature in the signed message should be the zero value. When the signature type is
-  // EIP712Optional<string>, this is { defined: false, value: "" } (i.e. `noString`)
-  const message: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
-    ...request,
-    options: {
-      ...request.options,
-      signature: noString,
-    },
-  }
-
-  // Build the typed data then return the result of signature verification.
-  const typedData = domainRestrictedSignatureRequestEIP712(message)
-  return verifyEIP712TypedDataSigner(typedData, signature, signer)
 }
 
 export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
@@ -245,6 +220,67 @@ export function disableDomainRequestEIP712<D extends KnownDomain>(
     },
     message: request,
   }
+}
+
+/**
+ * Generic function to verify the signature on a Domain API request.
+ *
+ * @remarks Passing in the builder allows the caller to handle the differences of EIP-712 types
+ * between request types. Requests cannot be fully differentiated at runtime. In particular,
+ * DomainQuotaStatusRequest and DisableDomainRequest are indistinguishable at runtime.
+ *
+ * @privateRemarks Function is currently defined explicitly in terms of SequentialDelayDomain. It
+ * should be generalized to other authenticated domain types as they are standardized.
+ */
+function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
+  typedDataBuilder: (request: R) => EIP712TypedData,
+  request: R
+): boolean {
+  // If the address field is undefined, then this domain is unauthenticated.
+  // Return true as the signature does not need to be checked.
+  if (!request.domain.address.defined) {
+    return true
+  }
+  const signer = request.domain.address.value
+
+  // If not signature is provided, return false.
+  if (!request.options.signature.defined) {
+    return false
+  }
+  const signature = request.options.signature.value
+
+  // Requests are signed over the message excluding the signature. CIP-40 specifies that the
+  // signature in the signed message should be the zero value. When the signature type is
+  // EIP712Optional<string>, this is { defined: false, value: "" } (i.e. `noString`)
+  const message: R = {
+    ...request,
+    options: {
+      ...request.options,
+      signature: noString,
+    },
+  }
+
+  // Build the typed data then return the result of signature verification.
+  const typedData = typedDataBuilder(message)
+  return verifyEIP712TypedDataSigner(typedData, signature, signer)
+}
+
+export function verifyDomainRestrictedSignatureRequestSignature(
+  request: DomainRestrictedSignatureRequest<SequentialDelayDomain>
+): boolean {
+  return verifyRequestSignature(domainRestrictedSignatureRequestEIP712, request)
+}
+
+export function verifyDomainQuotaStatusRequestSignature(
+  request: DomainQuotaStatusRequest<SequentialDelayDomain>
+): boolean {
+  return verifyRequestSignature(domainQuotaStatusRequestEIP712, request)
+}
+
+export function verifyDisableDomainRequestSignature(
+  request: DisableDomainRequest<SequentialDelayDomain>
+): boolean {
+  return verifyRequestSignature(disableDomainRequestEIP712, request)
 }
 
 // Use distributive conditional types to extract from the keys of T, keys with value type != never.
