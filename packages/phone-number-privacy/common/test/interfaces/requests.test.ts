@@ -4,6 +4,7 @@ import {
   generateTypedDataHash,
   noBool,
   noString,
+  noNumber,
 } from '@celo/utils/lib/sign-typed-data-utils'
 import { Domain, DomainOptions, SequentialDelayDomain } from '@celo/identity/lib/odis/domains'
 import { LocalWallet } from '@celo/wallet-local'
@@ -142,6 +143,35 @@ describe('verifyDomainRestrictedSignatureRequestSignature()', () => {
     expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(true)
   })
 
+  it('should report a manipulated message as unverified', async () => {
+    const wallet = new LocalWallet()
+    wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
+    const address = wallet.getAccounts()[0]!
+
+    const request: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
+      domain: {
+        name: 'ODIS Sequential Delay Domain',
+        version: '1',
+        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+        address: defined(address),
+        salt: noString,
+      },
+      options: {
+        signature: noString,
+        nonce: defined(0),
+      },
+      blindedMessage: '<blinded message>',
+      sessionID: noString,
+    }
+    const typedData = domainRestrictedSignatureRequestEIP712(request)
+    const signature = await wallet.signTypedData(address, typedData)
+    request.options.signature = defined(signature)
+    expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(true)
+
+    request.domain.stages[0]!.batchSize = defined(100)
+    expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(false)
+  })
+
   it('should report an incorrectly signed request as unverified', async () => {
     const wallet = new LocalWallet()
     wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
@@ -169,5 +199,24 @@ describe('verifyDomainRestrictedSignatureRequestSignature()', () => {
     request.options.signature = defined(signature)
 
     expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(false)
+  })
+
+  it('should report requests against unauthenticated domains to be verified', async () => {
+    const request: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
+      domain: {
+        name: 'ODIS Sequential Delay Domain',
+        version: '1',
+        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+        address: noString,
+        salt: noString,
+      },
+      options: {
+        signature: noString,
+        nonce: noNumber,
+      },
+      blindedMessage: '<blinded message>',
+      sessionID: noString,
+    }
+    expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(true)
   })
 })
