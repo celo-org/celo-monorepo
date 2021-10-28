@@ -131,6 +131,7 @@ export type DomainRequest<
   | DomainQuotaStatusRequest<D, O>
   | DisableDomainRequest<D, O>
 
+/** Wraps the signature request as an EIP-712 typed data structure for hashing and signing */
 export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
   request: DomainRestrictedSignatureRequest<D>
 ): EIP712TypedData {
@@ -162,6 +163,7 @@ export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
   }
 }
 
+/** Wraps the domain quota request as an EIP-712 typed data structure for hashing and signing */
 export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
   request: DomainQuotaStatusRequest<D>
 ): EIP712TypedData {
@@ -192,6 +194,7 @@ export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
   }
 }
 
+/** Wraps the disable domain request as an EIP-712 typed data structure for hashing and signing */
 export function disableDomainRequestEIP712<D extends KnownDomain>(
   request: DisableDomainRequest<D>
 ): EIP712TypedData {
@@ -265,18 +268,42 @@ function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
   return verifyEIP712TypedDataSigner(typedData, signature, signer)
 }
 
+/**
+ * Verifies the signature over a signature request for authenticated domains.
+ * If the domain is unauthenticated, this function returns true.
+ *
+ * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
+ * typed data with the signature field in the domain options set to its zero value (i.e. It is set
+ * to the undefined value for type EIP712Optional<string>).
+ */
 export function verifyDomainRestrictedSignatureRequestSignature(
   request: DomainRestrictedSignatureRequest<SequentialDelayDomain>
 ): boolean {
   return verifyRequestSignature(domainRestrictedSignatureRequestEIP712, request)
 }
 
+/**
+ * Verifies the signature over a domain quota status request for authenticated domains.
+ * If the domain is unauthenticated, this function returns true.
+ *
+ * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
+ * typed data with the signature field in the domain options set to its zero value (i.e. It is set
+ * to the undefined value for type EIP712Optional<string>).
+ */
 export function verifyDomainQuotaStatusRequestSignature(
   request: DomainQuotaStatusRequest<SequentialDelayDomain>
 ): boolean {
   return verifyRequestSignature(domainQuotaStatusRequestEIP712, request)
 }
 
+/**
+ * Verifies the signature over a disable domain request for authenticated domains.
+ * If the domain is unauthenticated, this function returns true.
+ *
+ * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
+ * typed data with the signature field in the domain options set to its zero value (i.e. It is set
+ * to the undefined value for type EIP712Optional<string>).
+ */
 export function verifyDisableDomainRequestSignature(
   request: DisableDomainRequest<SequentialDelayDomain>
 ): boolean {
