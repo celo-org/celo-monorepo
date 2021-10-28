@@ -5,12 +5,15 @@ import {
   domainOptionsEIP712Types,
   KnownDomain,
   KnownDomainOptions,
+  SequentialDelayDomain,
 } from '@celo/identity/lib/odis/domains'
 import {
   EIP712Optional,
   eip712OptionalType,
   EIP712TypedData,
+  noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
+import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */
@@ -39,7 +42,7 @@ export interface GetQuotaRequest {
 }
 
 /**
- * Domain resitricted signature request to get a pOPRF evaluation on the given message in a given
+ * Domain restricted signature request to get a pOPRF evaluation on the given message in a given
  * domain, as specified by CIP-40.
  *
  * @remarks Concrete request types are created by specifying the type parameters for Domain and
@@ -67,6 +70,17 @@ export type DomainRestrictedSignatureRequest<
   'options'
 >
 
+/**
+ * Request to get the quota status of the given domain. ODIS will respond with the current state
+ * relevant to calculating quota under the associated rate limiting rules.
+ *
+ * Options may be provided for authentication in case the quota state is non-public information.
+ * E.g. Quota state may reveal whether or not a user has attempted to recover a given account.
+ *
+ * @remarks Concrete request types are created by specifying the type parameters for Domain and
+ * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
+ * required. If not, it must not be provided.
+ */
 export type DomainQuotaStatusRequest<
   D extends Domain = Domain,
   O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
@@ -82,6 +96,17 @@ export type DomainQuotaStatusRequest<
   'options'
 >
 
+/**
+ * Request to disable a domain such that not further requests for signatures in the given domain
+ * will be served. Available for domains which need to option to prevent further requests for
+ * security.
+ *
+ * Options may be provided for authentication to prevent unintended parties from disabling a domain.
+ *
+ * @remarks Concrete request types are created by specifying the type parameters for Domain and
+ * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
+ * required. If not, it must not be provided.
+ */
 export type DisableDomainRequest<
   D extends Domain = Domain,
   O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
@@ -98,7 +123,7 @@ export type DisableDomainRequest<
 >
 
 export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
-  request: DomainRestrictedSignatureRequest<D, KnownDomainOptions<D>>
+  request: DomainRestrictedSignatureRequest<D>
 ): EIP712TypedData {
   const domainTypes = domainEIP712Types(request.domain)
   const optionsTypes = domainOptionsEIP712Types(request.domain)
@@ -128,8 +153,42 @@ export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
   }
 }
 
+// TODO(victor): When/if more authenticated domains with the same signature scheme are added,
+// generalize this funciton to handle those domains and options as well.
+export function verifyDomainRestrictedSignatureRequestSignature(
+  request: DomainRestrictedSignatureRequest<SequentialDelayDomain>
+): boolean {
+  // If the address field is undefined, then this domain is unauthenticated.
+  // Return true as the signature does not need to be checked.
+  if (!request.domain.address.defined) {
+    return true
+  }
+  const signer = request.domain.address.value
+
+  // If not signature is provided, return false.
+  if (!request.options.signature.defined) {
+    return false
+  }
+  const signature = request.options.signature.value
+
+  // Requests are signed over the message excluding the signature. CIP-40 specifies that the
+  // signature in the signed message should be the zero value. When the signature type is
+  // EIP712Optional<string>, this is { defined: false, value: "" } (i.e. `noString`)
+  const message: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
+    ...request,
+    options: {
+      ...request.options,
+      signature: noString,
+    },
+  }
+
+  // Build the typed data then return the result of signature verification.
+  const typedData = domainRestrictedSignatureRequestEIP712(message)
+  return verifyEIP712TypedDataSigner(typedData, signature, signer)
+}
+
 export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
-  request: DomainQuotaStatusRequest<D, KnownDomainOptions<D>>
+  request: DomainQuotaStatusRequest<D>
 ): EIP712TypedData {
   const domainTypes = domainEIP712Types(request.domain)
   const optionsTypes = domainOptionsEIP712Types(request.domain)
@@ -159,7 +218,7 @@ export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
 }
 
 export function disableDomainRequestEIP712<D extends KnownDomain>(
-  request: DisableDomainRequest<D, KnownDomainOptions<D>>
+  request: DisableDomainRequest<D>
 ): EIP712TypedData {
   const domainTypes = domainEIP712Types(request.domain)
   const optionsTypes = domainOptionsEIP712Types(request.domain)

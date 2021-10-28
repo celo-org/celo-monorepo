@@ -6,6 +6,7 @@ import {
   noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
 import { Domain, DomainOptions, SequentialDelayDomain } from '@celo/identity/lib/odis/domains'
+import { LocalWallet } from '@celo/wallet-local'
 import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
@@ -13,6 +14,7 @@ import {
   domainQuotaStatusRequestEIP712,
   DisableDomainRequest,
   disableDomainRequestEIP712,
+  verifyDomainRestrictedSignatureRequestSignature,
 } from '../../src/interfaces/requests'
 
 // Compile-time check that DomainRestrictedSignatureRequest can be cast to type EIP712Object.
@@ -109,5 +111,63 @@ describe('disableDomainRequestEIP712()', () => {
     const typedData = disableDomainRequestEIP712(request)
     console.debug(JSON.stringify(typedData, null, 2))
     expect(generateTypedDataHash(typedData).toString('hex')).toEqual(expectedHash)
+  })
+})
+
+describe('verifyDomainRestrictedSignatureRequestSignature()', () => {
+  it('should report a correctly signed request as verified', async () => {
+    const wallet = new LocalWallet()
+    wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
+    const address = wallet.getAccounts()[0]!
+
+    const request: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
+      domain: {
+        name: 'ODIS Sequential Delay Domain',
+        version: '1',
+        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+        address: defined(address),
+        salt: noString,
+      },
+      options: {
+        signature: noString,
+        nonce: defined(0),
+      },
+      blindedMessage: '<blinded message>',
+      sessionID: noString,
+    }
+    const typedData = domainRestrictedSignatureRequestEIP712(request)
+    const signature = await wallet.signTypedData(address, typedData)
+    request.options.signature = defined(signature)
+
+    expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(true)
+  })
+
+  it('should report an incorrectly signed request as unverified', async () => {
+    const wallet = new LocalWallet()
+    wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
+    wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000bad516e9')
+    const address = wallet.getAccounts()[0]!
+    const badAddress = wallet.getAccounts()[1]!
+
+    const request: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
+      domain: {
+        name: 'ODIS Sequential Delay Domain',
+        version: '1',
+        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+        address: defined(address),
+        salt: noString,
+      },
+      options: {
+        signature: noString,
+        nonce: defined(0),
+      },
+      blindedMessage: '<blinded message>',
+      sessionID: noString,
+    }
+    const typedData = domainRestrictedSignatureRequestEIP712(request)
+    const signature = await wallet.signTypedData(badAddress, typedData)
+    request.options.signature = defined(signature)
+
+    expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(false)
   })
 })
