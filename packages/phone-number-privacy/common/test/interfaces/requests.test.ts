@@ -15,6 +15,8 @@ import {
   domainQuotaStatusRequestEIP712,
   DisableDomainRequest,
   disableDomainRequestEIP712,
+  verifyDisableDomainRequestSignature,
+  verifyDomainQuotaStatusRequestSignature,
   verifyDomainRestrictedSignatureRequestSignature,
 } from '../../src/interfaces/requests'
 
@@ -115,108 +117,148 @@ describe('disableDomainRequestEIP712()', () => {
   })
 })
 
-describe('verifyDomainRestrictedSignatureRequestSignature()', () => {
-  it('should report a correctly signed request as verified', async () => {
-    const wallet = new LocalWallet()
-    wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
-    const address = wallet.getAccounts()[0]!
+const wallet = new LocalWallet()
+wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
+wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000bad516e9')
+const walletAddress = wallet.getAccounts()[0]!
+const badAddress = wallet.getAccounts()[1]!
 
-    const request: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
-      domain: {
-        name: 'ODIS Sequential Delay Domain',
-        version: '1',
-        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
-        address: defined(address),
-        salt: noString,
-      },
+const authenticatedDomain: SequentialDelayDomain = {
+  name: 'ODIS Sequential Delay Domain',
+  version: '1',
+  stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+  address: defined(walletAddress),
+  salt: noString,
+}
+
+const unauthenticatedDomain: SequentialDelayDomain = {
+  name: 'ODIS Sequential Delay Domain',
+  version: '1',
+  stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+  address: noString,
+  salt: noString,
+}
+
+const manipulatedDomain: SequentialDelayDomain = {
+  name: 'ODIS Sequential Delay Domain',
+  version: '1',
+  stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(100), repetitions: defined(10) }],
+  address: defined(walletAddress),
+  salt: noString,
+}
+
+const cases = [
+  {
+    request: {
+      domain: authenticatedDomain,
       options: {
         signature: noString,
         nonce: defined(0),
       },
       blindedMessage: '<blinded message>',
       sessionID: noString,
-    }
-    const typedData = domainRestrictedSignatureRequestEIP712(request)
-    const signature = await wallet.signTypedData(address, typedData)
-    request.options.signature = defined(signature)
-
-    expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(true)
-  })
-
-  it('should report a manipulated message as unverified', async () => {
-    const wallet = new LocalWallet()
-    wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
-    const address = wallet.getAccounts()[0]!
-
-    const request: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
-      domain: {
-        name: 'ODIS Sequential Delay Domain',
-        version: '1',
-        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
-        address: defined(address),
-        salt: noString,
-      },
+    } as DomainRestrictedSignatureRequest<SequentialDelayDomain>,
+    typedDataBuilder: domainRestrictedSignatureRequestEIP712,
+    verifier: verifyDomainRestrictedSignatureRequestSignature,
+    name: 'verifyDomainRestrictedSignatureRequestSignature()',
+  },
+  {
+    request: {
+      domain: authenticatedDomain,
       options: {
         signature: noString,
         nonce: defined(0),
       },
-      blindedMessage: '<blinded message>',
       sessionID: noString,
-    }
-    const typedData = domainRestrictedSignatureRequestEIP712(request)
-    const signature = await wallet.signTypedData(address, typedData)
-    request.options.signature = defined(signature)
-    expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(true)
-
-    request.domain.stages[0]!.batchSize = defined(100)
-    expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(false)
-  })
-
-  it('should report an incorrectly signed request as unverified', async () => {
-    const wallet = new LocalWallet()
-    wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
-    wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000bad516e9')
-    const address = wallet.getAccounts()[0]!
-    const badAddress = wallet.getAccounts()[1]!
-
-    const request: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
-      domain: {
-        name: 'ODIS Sequential Delay Domain',
-        version: '1',
-        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
-        address: defined(address),
-        salt: noString,
-      },
+    } as DomainQuotaStatusRequest<SequentialDelayDomain>,
+    typedDataBuilder: domainQuotaStatusRequestEIP712,
+    verifier: verifyDomainQuotaStatusRequestSignature,
+    name: 'verifyDomainQuotaStatusRequestSignature()',
+  },
+  {
+    request: {
+      domain: authenticatedDomain,
       options: {
         signature: noString,
         nonce: defined(0),
       },
-      blindedMessage: '<blinded message>',
       sessionID: noString,
-    }
-    const typedData = domainRestrictedSignatureRequestEIP712(request)
-    const signature = await wallet.signTypedData(badAddress, typedData)
-    request.options.signature = defined(signature)
+    } as DisableDomainRequest<SequentialDelayDomain>,
+    typedDataBuilder: disableDomainRequestEIP712,
+    verifier: verifyDisableDomainRequestSignature,
+    name: 'verifyDisableDomainRequestSignature()',
+  },
+]
 
-    expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(false)
-  })
+for (const { request, verifier, typedDataBuilder, name } of cases) {
+  describe(name, () => {
+    it('should report a correctly signed request as verified', async () => {
+      //@ts-ignore type checking does not correctly infer types.
+      const typedData = typedDataBuilder(request)
+      const signature = await wallet.signTypedData(walletAddress, typedData)
+      const signed = {
+        ...request,
+        options: {
+          ...request.options,
+          signature: defined(signature),
+        },
+      }
 
-  it('should report requests against unauthenticated domains to be verified', async () => {
-    const request: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
-      domain: {
-        name: 'ODIS Sequential Delay Domain',
-        version: '1',
-        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
-        address: noString,
-        salt: noString,
-      },
-      options: {
-        signature: noString,
-        nonce: noNumber,
-      },
-      blindedMessage: '<blinded message>',
-      sessionID: noString,
-    }
-    expect(verifyDomainRestrictedSignatureRequestSignature(request)).toBe(true)
+      //@ts-ignore type checking does not correctly infer types.
+      expect(verifier(signed)).toBe(true)
+    })
+
+    it('should report an unsigned message as unverified', async () => {
+      //@ts-ignore type checking does not correctly infer types.
+      expect(verifier(request)).toBe(false)
+    })
+
+    it('should report a manipulated message as unverified', async () => {
+      //@ts-ignore type checking does not correctly infer types.
+      const typedData = typedDataBuilder(request)
+      const signature = await wallet.signTypedData(walletAddress, typedData)
+      const signed = {
+        ...request,
+        options: {
+          ...request.options,
+          signature: defined(signature),
+        },
+      }
+      //@ts-ignore type checking does not correctly infer types.
+      expect(verifier(signed)).toBe(true)
+
+      const manipulated = { ...request, domain: manipulatedDomain }
+      //@ts-ignore type checking does not correctly infer types.
+      expect(verifier(manipulated)).toBe(false)
+    })
+
+    it('should report an incorrectly signed request as unverified', async () => {
+      //@ts-ignore type checking does not correctly infer types.
+      const typedData = typedDataBuilder(request)
+      const signature = await wallet.signTypedData(badAddress, typedData)
+      const signed = {
+        ...request,
+        options: {
+          ...request.options,
+          signature: defined(signature),
+        },
+      }
+
+      //@ts-ignore type checking does not correctly infer types.
+      expect(verifier(signed)).toBe(false)
+    })
+
+    it('should report requests against unauthenticated domains to be verified', async () => {
+      const unauthenticatedRequest = {
+        ...request,
+        domain: unauthenticatedDomain,
+        options: {
+          signature: noString,
+          nonce: noNumber,
+        },
+      }
+      //@ts-ignore type checking does not correctly infer types.
+      expect(verifier(unauthenticatedRequest)).toBe(true)
+    })
   })
-})
+}
