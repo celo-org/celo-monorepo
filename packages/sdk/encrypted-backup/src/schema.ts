@@ -1,4 +1,5 @@
 import { Err, Ok, parseJsonAsResult, Result } from '@celo/base/lib/result'
+import { KnownDomain, KnownDomainSchema } from '@celo/identity/lib/odis/domains'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { chain, isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
@@ -26,19 +27,30 @@ export const BufferFromBase64 = new t.Type<Buffer, string, unknown>(
 )
 
 /** io-ts codec used to encode and decode backups from JSON objects */
-export const BackupSchema: t.Type<Backup, object> = t.type({
-  encryptedData: BufferFromBase64,
-  nonce: BufferFromBase64,
-  version: t.string,
-  metadata: t.type({}),
-  environment: t.type({}),
-})
+export const BackupSchema: t.Type<Backup<KnownDomain | undefined>, object> = t.intersection([
+  // Required fields
+  t.type({
+    encryptedData: BufferFromBase64,
+    nonce: BufferFromBase64,
+    version: t.string,
+    metadata: t.type({}),
+    environment: t.type({}),
+  }),
+  // Optional fields
+  // https://github.com/gcanti/io-ts/blob/master/index.md#mixing-required-and-optional-props
+  t.partial({
+    odisDomain: KnownDomainSchema,
+    encryptedFuseKey: BufferFromBase64,
+  }),
+])
 
-export function serializeBackup(backup: Backup): string {
+export function serializeBackup(backup: Backup<KnownDomain | undefined>): string {
   return JSON.stringify(BackupSchema.encode(backup))
 }
 
-export function deserializeBackup(data: string): Result<Backup, BackupError> {
+export function deserializeBackup(
+  data: string
+): Result<Backup<KnownDomain | undefined>, BackupError> {
   const jsonDecode = parseJsonAsResult(data)
   if (!jsonDecode.ok) {
     // TODO(victor): Include the underlying error here.
