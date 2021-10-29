@@ -1,11 +1,15 @@
-import { Address, ensureLeading0x, eqAddress } from '@celo/base/lib/address'
+import { Address, ensureLeading0x } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes } from '@celo/contractkit/lib/identity/claims/types'
 import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity/metadata'
 import { publicKeyToAddress } from '@celo/utils/lib/address'
 import { ensureUncompressed } from '@celo/utils/lib/ecdh'
-import { recoverEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+import {
+  recoverEIP712TypedDataSignerRsv,
+  recoverEIP712TypedDataSignerVrs,
+  verifyEIP712TypedDataSigner,
+} from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import * as t from 'io-ts'
@@ -167,8 +171,8 @@ class StorageRoot {
 
     const toParse = type ? JSON.parse(body.toString()) : body
     const typedData = await buildEIP712TypedData(this.wrapper, dataPath, toParse, type)
-    const guessedSigner = recoverEIP712TypedDataSigner(typedData, signature)
-    if (eqAddress(guessedSigner, this.account)) {
+
+    if (verifyEIP712TypedDataSigner(typedData, signature, this.account)) {
       return Ok(body)
     }
 
@@ -184,11 +188,17 @@ class StorageRoot {
       const dekAddress = keys[3] ? publicKeyToAddress(ensureUncompressed(keys[3])) : '0x0'
       const signers = [keys[0], keys[1], keys[2], dekAddress]
 
-      if (signers.some((signer) => eqAddress(signer, guessedSigner))) {
+      if (signers.some((signer) => verifyEIP712TypedDataSigner(typedData, signature, signer))) {
         return Ok(body)
       }
 
       if (checkOffchainSigners) {
+        let guessedSigner: string
+        try {
+          guessedSigner = recoverEIP712TypedDataSignerRsv(typedData, signature)
+        } catch (error) {
+          guessedSigner = recoverEIP712TypedDataSignerVrs(typedData, signature)
+        }
         const authorizedSignerAccessor = new AuthorizedSignerAccessor(this.wrapper)
         const authorizedSigner = await authorizedSignerAccessor.readAsResult(
           this.account,
