@@ -1,6 +1,6 @@
 import { NativeSigner, serializeSignature, Signature, Signer } from '@celo/base/lib/signatureUtils'
 import * as Web3Utils from 'web3-utils'
-import { ensureLeading0x, eqAddress, privateKeyToAddress } from './address'
+import { ensureLeading0x, eqAddress, privateKeyToAddress, trimLeading0x } from './address'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 
 // Exports moved to @celo/base, forwarding them
@@ -140,7 +140,7 @@ function recoverEIP712TypedDataSigner(
   parseFunction: (signature: string) => Signature
 ): string {
   const dataBuff = generateTypedDataHash(typedData)
-  const { r, s, v } = parseFunction(signature.slice(2))
+  const { r, s, v } = parseFunction(trimLeading0x(signature))
   const publicKey = ethjsutil.ecrecover(
     ethjsutil.toBuffer(dataBuff),
     v,
