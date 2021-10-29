@@ -9,6 +9,7 @@ import {
 import {
   Domain,
   domainEIP712,
+  DomainIdentifiers,
   DomainOptions,
   KnownDomain,
   KnownDomainOptions,
@@ -36,7 +37,7 @@ TEST_KNOWN_DOMAIN_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS = ({} as unknown) as KnownDo
 describe('domainEIP712()', () => {
   it('should generate the correct type data for SequentialDelayDomain instance', () => {
     const domain: SequentialDelayDomain = {
-      name: 'ODIS Sequential Delay Domain',
+      name: DomainIdentifiers.SequentialDelay,
       version: '1',
       stages: [
         { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: noNumber },

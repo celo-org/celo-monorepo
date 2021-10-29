@@ -3,10 +3,12 @@ import {
   EIP712ObjectValue,
   EIP712Optional,
   eip712OptionalType,
+  eip712OptionalSchema,
   EIP712TypedData,
   EIP712TypesWithPrimary,
   generateTypedDataHash,
 } from '@celo/utils/lib/sign-typed-data-utils'
+import * as t from 'io-ts'
 
 // Concrete Domain subtypes are only assignable to Domain and EIP712Object when using type instead
 // of interface. Otherwise the compiler complains about a missing index signature.
@@ -33,6 +35,11 @@ export interface Domain {
  */
 export type DomainOptions = EIP712Object
 
+/** Enum of identifiers (i.e. names) for all standardized domains */
+export enum DomainIdentifiers {
+  SequentialDelay = 'ODIS Sequential Delay Domain',
+}
+
 export type SequentialDelayStage = {
   // How many seconds each batch of attempts in this stage is delayed with
   // respect to the timer.
@@ -49,7 +56,7 @@ export type SequentialDelayStage = {
 }
 
 export type SequentialDelayDomain = {
-  name: 'ODIS Sequential Delay Domain'
+  name: DomainIdentifiers.SequentialDelay
   version: '1'
   stages: SequentialDelayStage[]
   // Optional Celo address against which signed requests must be authenticated.
@@ -69,8 +76,31 @@ export type SequentialDelayDomainOptions = {
   nonce: EIP712Optional<number>
 }
 
+/** io-ts schema for encoding and decoding SequentialDelayStage structs */
+export const SequentialDelayStageSchema: t.Type<SequentialDelayStage> = t.type({
+  delay: t.number,
+  resetTimer: eip712OptionalSchema(t.boolean),
+  batchSize: eip712OptionalSchema(t.number),
+  repetitions: eip712OptionalSchema(t.number),
+})
+
+/** io-ts schema for encoding and decoding SequentialDelayDomain structs */
+export const SequentialDelayDomainSchema: t.Type<SequentialDelayDomain> = t.type({
+  name: t.literal(DomainIdentifiers.SequentialDelay),
+  version: t.literal('1'),
+  stages: t.array(SequentialDelayStageSchema),
+  address: eip712OptionalSchema(t.string),
+  salt: eip712OptionalSchema(t.string),
+})
+
+/** io-ts schema for encoding and decoding SequentialDelayDomainOptions structs */
+export const SequentialDelayDomainOptionsSchema: t.Type<SequentialDelayDomainOptions> = t.type({
+  signature: eip712OptionalSchema(t.string),
+  nonce: eip712OptionalSchema(t.number),
+})
+
 export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDelayDomain =>
-  domain.name === 'ODIS Sequential Delay Domain' && domain.version === '1'
+  domain.name === DomainIdentifiers.SequentialDelay && domain.version === '1'
 
 export const sequentialDelayDomainEIP712Types: EIP712TypesWithPrimary = {
   types: {
@@ -114,6 +144,9 @@ export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
  * @remarks Additional domain types should be added to this type union as the are standardized.
  */
 export type KnownDomain = SequentialDelayDomain
+
+/** io-ts schema for encoding and decoding domains of any standardized type */
+export const KnownDomainSchema: t.Type<KnownDomain> = SequentialDelayDomainSchema
 
 export function isKnownDomain(domain: Domain): domain is KnownDomain {
   return isSequentialDelayDomain(domain)
