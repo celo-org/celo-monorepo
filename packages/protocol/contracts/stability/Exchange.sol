@@ -54,6 +54,8 @@ contract Exchange is
   uint256 public updateFrequency;
   uint256 public minimumReports;
 
+  bytes32 public stableTokenRegistryId;
+
   modifier updateBucketsIfNecessary() {
     _updateBucketsIfNecessary();
     _;
@@ -76,7 +78,6 @@ contract Exchange is
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
-   * @param stableToken Address of the stable token
    * @param _spread Spread charged on exchanges
    * @param _reserveFraction Fraction to commit to the gold bucket
    * @param _updateFrequency The time period that needs to elapse between bucket
@@ -84,10 +85,11 @@ contract Exchange is
    * @param _minimumReports The minimum number of fresh reports that need to be
    * present in the oracle to update buckets
    * commit to the gold bucket
+   * @param stableTokenIdentifier String identifier of stabletoken in registry
    */
   function initialize(
     address registryAddress,
-    address stableToken,
+    string calldata stableTokenIdentifier,
     uint256 _spread,
     uint256 _reserveFraction,
     uint256 _updateFrequency,
@@ -95,11 +97,20 @@ contract Exchange is
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    setStableToken(stableToken);
+    stableTokenRegistryId = keccak256(abi.encodePacked(stableTokenIdentifier));
     setSpread(_spread);
     setReserveFraction(_reserveFraction);
     setUpdateFrequency(_updateFrequency);
     setMinimumReports(_minimumReports);
+  }
+
+  /**
+   * @notice Ensures stable token address is set in storage and initializes buckets.
+   * @dev Will revert if stable token is not registered or does not have oracle reports.
+   */
+  function activateStable() external {
+    require(stable == address(0), "StableToken address already activated");
+    setStableToken(registry.getAddressForOrDie(stableTokenRegistryId));
     _updateBucketsIfNecessary();
   }
 
