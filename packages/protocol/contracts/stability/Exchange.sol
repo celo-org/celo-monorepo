@@ -110,6 +110,7 @@ contract Exchange is
    */
   function activateStable() external {
     require(stable == address(0), "StableToken address already activated");
+    // onlyOwner
     setStableToken(registry.getAddressForOrDie(stableTokenRegistryId));
     _updateBucketsIfNecessary();
   }

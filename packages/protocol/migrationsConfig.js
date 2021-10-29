@@ -84,7 +84,7 @@ const DefaultConfig = {
   exchange: {
     spread: 5 / 1000,
     reserveFraction: 1 / 100,
-    updateFrequency: 60 * MINUTE,
+    updateFrequency: 5 * MINUTE,
     minimumReports: 1,
     frozen: false,
   },
@@ -136,7 +136,7 @@ const DefaultConfig = {
     unlockingPeriod: 3 * DAY,
   },
   oracles: {
-    reportExpiry: 15 * MINUTE,
+    reportExpiry: 5 * MINUTE,
   },
   random: {
     randomnessBlockRetentionWindow: HOUR / 5, // 1 hour to match attestationExpiryBlocks
