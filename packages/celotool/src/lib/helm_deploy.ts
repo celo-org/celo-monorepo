@@ -247,7 +247,7 @@ export async function installCertManagerAndNginx(
     const valueFilePath = `/tmp/${celoEnv}-nginx-testnet-values.yaml`
     await nginxHelmParameters(valueFilePath, celoEnv, clusterConfig)
 
-    await helmUpdateNginxRepo()
+    await helmAddAndUpdateRepos()
     await execCmdWithExitOnFailure(`helm install \
       -n ${nginxChartNamespace} \
       --version ${nginxChartVersion} \
@@ -319,11 +319,12 @@ async function getOrCreateNginxStaticIp(celoEnv: string, clusterConfig?: BaseClu
   return staticIpAddress
 }
 
-export async function helmUpdateNginxRepo() {
+export async function helmAddAndUpdateRepos() {
   await execCmdWithExitOnFailure(
     `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
   )
   await execCmdWithExitOnFailure(`helm repo add stable https://charts.helm.sh/stable`)
+  await execCmdWithExitOnFailure(`helm repo add grafana https://grafana.github.io/helm-charts`)
   await execCmdWithExitOnFailure(`helm repo update`)
 }
 
@@ -493,7 +494,7 @@ export async function createStaticIPs(celoEnv: string) {
   console.info(`Creating static IPs for ${celoEnv}`)
 
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
-  await Promise.all(range(numTxNodes).map((i) => registerIPAddress(`${celoEnv}-tx-nodes-${i}`)))
+  await concurrentMap(5, range(numTxNodes), (i) => registerIPAddress(`${celoEnv}-tx-nodes-${i}`))
 
   if (useStaticIPsForGethNodes()) {
     await registerIPAddress(`${celoEnv}-bootnode`)
@@ -518,8 +519,8 @@ export async function createStaticIPs(celoEnv: string) {
 
     // Create IPs for the private tx nodes
     const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
-    await Promise.all(
-      range(numPrivateTxNodes).map((i) => registerIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+    await concurrentMap(5, range(numPrivateTxNodes), (i) =>
+      registerIPAddress(`${celoEnv}-tx-nodes-private-${i}`)
     )
   }
 }
@@ -637,12 +638,12 @@ export async function deleteStaticIPs(celoEnv: string) {
   console.info(`Deleting static IPs for ${celoEnv}`)
 
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
-  await Promise.all(range(numTxNodes).map((i) => deleteIPAddress(`${celoEnv}-tx-nodes-${i}`)))
+  await concurrentMap(5, range(numTxNodes), (i) => deleteIPAddress(`${celoEnv}-tx-nodes-${i}`))
 
   await deleteIPAddress(`${celoEnv}-bootnode`)
 
   const numValidators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-  await Promise.all(range(numValidators).map((i) => deleteIPAddress(`${celoEnv}-validators-${i}`)))
+  await concurrentMap(5, range(numValidators), (i) => deleteIPAddress(`${celoEnv}-validators-${i}`))
 
   const proxiesPerValidator = getProxiesPerValidator()
   for (let valIndex = 0; valIndex < numValidators; valIndex++) {
@@ -652,8 +653,8 @@ export async function deleteStaticIPs(celoEnv: string) {
   }
 
   const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
-  await Promise.all(
-    range(numPrivateTxNodes).map((i) => deleteIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+  await concurrentMap(5, range(numPrivateTxNodes), (i) =>
+    deleteIPAddress(`${celoEnv}-tx-nodes-private-${i}`)
   )
 }
 
@@ -745,8 +746,8 @@ async function helmIPParameters(celoEnv: string) {
     ipAddressParameters.push(...proxyIpAddressesParams)
 
     const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
-    const privateTxAddresses = await Promise.all(
-      range(numPrivateTxNodes).map((i) => retrieveIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+    const privateTxAddresses = await concurrentMap(5, range(numPrivateTxNodes), (i) =>
+      retrieveIPAddress(`${celoEnv}-tx-nodes-private-${i}`)
     )
     const privateTxAddressParameters = privateTxAddresses.map(
       (address, i) => `--set geth.private_tx_nodes_${i}IpAddress=${address}`
@@ -855,7 +856,7 @@ function buildHelmChartDependencies(chartDir: string) {
   return helmCommand(`helm dep build ${chartDir}`)
 }
 
-async function installHelmDiffPlugin() {
+export async function installHelmDiffPlugin() {
   try {
     await execCmd(`helm diff version`, {}, false)
   } catch (error) {
