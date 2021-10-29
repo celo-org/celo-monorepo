@@ -32,6 +32,7 @@ const maxDeliveryAttempts = parseInt(
 // Time within which we allow forcing a retry of completed (or any state) attestations
 const allowRetryWithinCompletedMs =
   1000 * 60 * parseInt(fetchEnvOrDefault('MAX_REREQUEST_MINS', '55'), 10)
+const maxErrorLength = 255
 
 const smsProviders: SmsProvider[] = []
 const smsProvidersByType: any = {}
@@ -439,7 +440,7 @@ async function doSendSms(
     return false
   } catch (error) {
     attestation.status = AttestationStatus.NotSent
-    const errorMsg = `${error.message ?? error}`
+    const errorMsg = `${error.message ?? error}`.slice(0, maxErrorLength)
     attestation.recordError(errorMsg)
     attestation.ongoingDeliveryId = null
     attestation.attempt += 1

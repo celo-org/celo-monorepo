@@ -58,7 +58,8 @@ if (DEV_MODE) {
       ssl: false,
     },
     odisServices: {
-      signers: '[{"url": "http://localhost:3000"}]',
+      signers:
+        '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
       timeoutMilliSeconds: 5 * 1000,
     },
     thresholdSignature: {

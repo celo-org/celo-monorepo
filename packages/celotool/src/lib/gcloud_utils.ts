@@ -1,3 +1,4 @@
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 import { execCmd } from './cmd-utils'
 import { DynamicEnvVar, envVar, fetchEnv, getDynamicEnvVarValue } from './env-utils'
 
@@ -123,5 +124,28 @@ export async function removeKubectlAnnotateKSA(celoEnv: string, context: string)
           envVar.TESTNET_PROJECT_NAME
         )}.iam.gserviceaccount.com-`
     )
+  }
+}
+
+export async function accessSecretVersion(
+  projectId: string,
+  secretName: string,
+  secretVersion: string
+) {
+  try {
+    const client = new SecretManagerServiceClient()
+    const [version] = await client.accessSecretVersion({
+      name: `projects/${projectId}/secrets/${secretName}/versions/${secretVersion}`,
+    })
+
+    const privateKey = version?.payload?.data?.toString()!
+
+    if (!privateKey) {
+      throw new Error('Key is empty or undefined')
+    }
+
+    return privateKey
+  } catch (error) {
+    console.info('Error retrieving key')
   }
 }

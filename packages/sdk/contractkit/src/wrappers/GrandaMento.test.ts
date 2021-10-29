@@ -1,9 +1,11 @@
 import { Address } from '@celo/base/lib/address'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
+import { toFixed } from '@celo/utils/src/fixidity'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { StableToken } from '../celo-tokens'
 import { newKitFromWeb3 } from '../kit'
+import { setGrandaMentoLimits } from '../test-utils/grandaMento'
 import { assumeOwnership } from '../test-utils/transferownership'
 import { GoldTokenWrapper } from './GoldTokenWrapper'
 import { ExchangeProposalState, GrandaMentoWrapper } from './GrandaMento'
@@ -40,9 +42,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     min: BigNumber = newLimitMin,
     max: BigNumber = newLimitMax
   ) => {
-    await grandaMento
-      .setStableTokenExchangeLimits(registryId, min.toString(), max.toString())
-      .sendAndWaitForReceipt()
+    await setGrandaMentoLimits(grandaMento, min, max, registryId)
   }
 
   describe('No limits sets', () => {
@@ -92,9 +92,7 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     describe('Has a proposal', () => {
       beforeEach(async () => {
         sellAmount = new BigNumber('100000000')
-        await (
-          await celoToken.increaseAllowance(grandaMento.address, sellAmount)
-        ).sendAndWaitForReceipt()
+        await celoToken.increaseAllowance(grandaMento.address, sellAmount).sendAndWaitForReceipt()
 
         await (
           await grandaMento.createExchangeProposal(
@@ -118,24 +116,36 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
         expect(proposal.state).toEqual(ExchangeProposalState.Proposed)
         expect(proposal.sellCelo).toEqual(true)
 
-        await (
-          await grandaMento.approveExchangeProposal(activeProposals[0])
-        ).sendAndWaitForReceipt()
+        await grandaMento.approveExchangeProposal(activeProposals[0]).sendAndWaitForReceipt()
 
         proposal = await grandaMento.getExchangeProposal(activeProposals[0])
 
         expect(proposal.state).toEqual(ExchangeProposalState.Approved)
         await timeTravel(expConfig.vetoPeriodSeconds, web3)
-        await (
-          await grandaMento.executeExchangeProposal(activeProposals[0])
-        ).sendAndWaitForReceipt()
+        await grandaMento.executeExchangeProposal(activeProposals[0]).sendAndWaitForReceipt()
 
         proposal = await grandaMento.getExchangeProposal(activeProposals[0])
         expect(proposal.state).toEqual(ExchangeProposalState.Executed)
       })
 
+      it('displays human format correctly', async () => {
+        const activeProposals = await grandaMento.getActiveProposalIds()
+
+        const proposal = await grandaMento.getHumanReadableExchangeProposal(activeProposals[0])
+        expect(proposal.exchanger).toEqual(accounts[0])
+        expect(proposal.stableToken).toEqual(
+          'Celo Dollar (cUSD) at 0x10A736A7b223f1FE1050264249d1aBb975741E75'
+        )
+        expect(proposal.sellAmount).toEqBigNumber(sellAmount)
+        expect(proposal.buyAmount).toEqBigNumber(new BigNumber('99000000'))
+        expect(proposal.approvalTimestamp).toEqual(new BigNumber(0))
+        expect(proposal.state).toEqual('Proposed')
+        expect(proposal.sellCelo).toEqual(true)
+        expect(proposal.implictPricePerCelo).toEqBigNumber(new BigNumber('0.99'))
+      })
+
       it('cancels proposal', async () => {
-        await (await grandaMento.cancelExchangeProposal(1)).sendAndWaitForReceipt()
+        await grandaMento.cancelExchangeProposal(1).sendAndWaitForReceipt()
 
         const proposal = await grandaMento.getExchangeProposal('1')
         expect(proposal.state).toEqual(ExchangeProposalState.Cancelled)
@@ -145,8 +155,11 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
 
   it('#getConfig', async () => {
     const config = await grandaMento.getConfig()
-    // expect(config.approver).toBe(expConfig.approver) // TODO FIX this tests, for some reason `expConfig.approver` is 0x0000...0 even it's writen on the migrations-override.json
+    expect(config.approver).toBe(expConfig.approver)
     expect(config.spread).toEqBigNumber(expConfig.spread)
+    expect(config.maxApprovalExchangeRateChange).toEqBigNumber(
+      expConfig.maxApprovalExchangeRateChange
+    )
     expect(config.vetoPeriodSeconds).toEqBigNumber(expConfig.vetoPeriodSeconds)
     expect(
       config.exchangeLimits.get(kit.celoTokens.getContract(StableToken.cUSD))?.minExchangeAmount
@@ -160,5 +173,19 @@ testWithGanache('GrandaMento Wrapper', (web3: Web3) => {
     expect(
       config.exchangeLimits.get(kit.celoTokens.getContract(StableToken.cEUR))?.maxExchangeAmount
     ).toEqBigNumber(new BigNumber(0))
+  })
+
+  describe('#getBuyAmount', () => {
+    it('gets the buy amount', async () => {
+      const oracleRate = 1
+      const hypotheticalSellAmount = toFixed(1)
+      expect(
+        await grandaMento.getBuyAmount(toFixed(oracleRate), hypotheticalSellAmount, true)
+      ).toEqBigNumber(
+        hypotheticalSellAmount
+          .times(oracleRate)
+          .times(new BigNumber(1).minus(await grandaMento.spread()))
+      )
+    })
   })
 })
