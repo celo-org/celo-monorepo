@@ -27,6 +27,8 @@ export enum SmsProviderType {
   NEXMO = 'nexmo',
   UNKNOWN = 'unknown',
   TWILIO = 'twilio',
+  TWILIO_MESSAGING = 'twiliomessaging',
+  TWILIO_VERIFY = 'twilioverify',
   MESSAGEBIRD = 'messagebird',
   TELEKOM = 'telekom',
 }

@@ -1,5 +1,6 @@
 /**
- * Script for testing TwilioSmsProvider.sendSms using the real twilio API.
+ * Script for testing TwilioSmsProvider.sendSms
+ * (Verify & Messaging Services) using the real twilio API.
  * Uses `.env.development` file for sensitive info; set your phone number
  * as TEST_SMS_RECIPIENT to receive the messages and check against
  * expected output (logged in console).
@@ -10,6 +11,8 @@ import { fetchEnv, fetchEnvOrDefault } from '../src/env'
 import { SmsFields } from '../src/models/attestation'
 import { readUnsupportedRegionsFromEnv } from '../src/sms/base'
 import { TwilioSmsProvider } from '../src/sms/twilio'
+import { TwilioMessagingProvider } from '../src/sms/twilioMessaging'
+import { TwilioVerifyProvider } from '../src/sms/twilioVerify'
 ;(async function main() {
   const twilioSid = fetchEnv('TWILIO_ACCOUNT_SID')
   const messagingServiceSid = fetchEnv('TWILIO_MESSAGING_SERVICE_SID')
@@ -20,9 +23,7 @@ import { TwilioSmsProvider } from '../src/sms/twilio'
     'TWILIO_BLACKLIST'
   )
   const testPhoneNumber = fetchEnv('TEST_SMS_RECIPIENT')
-
-  const verifyDisabledRegionCodes = ['US']
-  const notVerifyDisabledRegion = 'DE'
+  const countryCode = 'DE'
 
   enum SendMethod {
     MESSAGE_SERVICE = 'message service',
@@ -31,69 +32,69 @@ import { TwilioSmsProvider } from '../src/sms/twilio'
 
   type TestCase = {
     id: string
-    verifyServiceSid: string
-    countryCode: string
     expectedSendMethod: SendMethod
   }
 
   const testCases: TestCase[] = [
     {
       id: '000000',
-      verifyServiceSid,
-      countryCode: verifyDisabledRegionCodes[0],
       expectedSendMethod: SendMethod.MESSAGE_SERVICE,
     },
     {
       id: '111111',
-      verifyServiceSid,
-      countryCode: notVerifyDisabledRegion,
       expectedSendMethod: SendMethod.VERIFY,
-    },
-    {
-      id: '222222',
-      verifyServiceSid: '',
-      countryCode: notVerifyDisabledRegion,
-      expectedSendMethod: SendMethod.MESSAGE_SERVICE,
     },
   ]
 
   testCases.map(async (testCase: TestCase) => {
-    const twilioSmsProvider = new TwilioSmsProvider(
-      twilioSid,
-      messagingServiceSid,
-      testCase.verifyServiceSid,
-      verifyDisabledRegionCodes,
-      twilioAuthToken,
-      unsupportedRegionCodes
-    )
-
-    const expectedMsg =
-      testCase.expectedSendMethod == SendMethod.MESSAGE_SERVICE
-        ? 'via-message:' + testCase.id
-        : 'Your Celo verification code is: ' + testCase.id
-
     const attestation: SmsFields = {
       account: '0x123',
       identifier: '0x456',
       issuer: '0x789',
-      countryCode: testCase.countryCode,
+      countryCode: countryCode,
       phoneNumber: testPhoneNumber,
-      message: testCase.expectedSendMethod == SendMethod.MESSAGE_SERVICE ? expectedMsg : '',
-      securityCode: testCase.expectedSendMethod == SendMethod.VERIFY ? testCase.id : '',
+      message: '',
+      securityCode: '',
       attestationCode: '123',
       appSignature: undefined,
       language: 'en',
     }
+
+    let twilioSmsProvider: TwilioSmsProvider
+    let expectedMsg: string
+    let expectedSidStart: string
+
+    switch (testCase.expectedSendMethod) {
+      case SendMethod.MESSAGE_SERVICE:
+        twilioSmsProvider = new TwilioMessagingProvider(
+          twilioSid,
+          twilioAuthToken,
+          unsupportedRegionCodes,
+          messagingServiceSid
+        )
+        expectedMsg = attestation.message = 'via-message:' + testCase.id
+        expectedSidStart = 'SM'
+        break
+      case SendMethod.VERIFY:
+        twilioSmsProvider = new TwilioVerifyProvider(
+          twilioSid,
+          twilioAuthToken,
+          unsupportedRegionCodes,
+          verifyServiceSid
+        )
+        expectedMsg = 'Your Celo verification code is: ' + testCase.id
+        attestation.securityCode = testCase.id
+        expectedSidStart = 'VE'
+        break
+    }
+
     try {
       await twilioSmsProvider.initialize()
       const messageSID = await twilioSmsProvider.sendSms(attestation)
       const messageSIDStart = messageSID.substring(0, 2)
       console.log(`Message SID for id ${testCase.id}: ${messageSID}`)
       console.log(`SMS should match: ${expectedMsg}`)
-      if (
-        (testCase.expectedSendMethod == SendMethod.MESSAGE_SERVICE && messageSIDStart !== 'SM') ||
-        (testCase.expectedSendMethod == SendMethod.VERIFY && messageSIDStart !== 'VE')
-      ) {
+      if (messageSIDStart !== expectedSidStart) {
         throw new Error(`Returned message SID did not match expected starting letters`)
       }
     } catch (e) {
