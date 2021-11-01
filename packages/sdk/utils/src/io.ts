@@ -91,7 +91,6 @@ export const AttestationServiceStatusResponseType = t.type({
   maxDeliveryAttempts: t.number,
   maxRerequestMins: t.number,
   twilioVerifySidProvided: t.boolean,
-  twilioVerifyDisabledRegions: t.string,
 })
 
 export const AttestationServiceTestRequestType = t.type({
