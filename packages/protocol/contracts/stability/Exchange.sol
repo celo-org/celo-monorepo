@@ -108,10 +108,9 @@ contract Exchange is
    * @notice Ensures stable token address is set in storage and initializes buckets.
    * @dev Will revert if stable token is not registered or does not have oracle reports.
    */
-  function activateStable() external {
+  function activateStable() external onlyOwner {
     require(stable == address(0), "StableToken address already activated");
-    // onlyOwner
-    setStableToken(registry.getAddressForOrDie(stableTokenRegistryId));
+    _setStableToken(registry.getAddressForOrDie(stableTokenRegistryId));
     _updateBucketsIfNecessary();
   }
 
@@ -288,8 +287,7 @@ contract Exchange is
     * @param newStableToken The new address for Stable Token
     */
   function setStableToken(address newStableToken) public onlyOwner {
-    stable = newStableToken;
-    emit StableTokenSet(newStableToken);
+    _setStableToken(newStableToken);
   }
 
   /**
@@ -309,6 +307,11 @@ contract Exchange is
     reserveFraction = FixidityLib.wrap(newReserveFraction);
     require(reserveFraction.lt(FixidityLib.fixed1()), "reserve fraction must be smaller than 1");
     emit ReserveFractionSet(newReserveFraction);
+  }
+
+  function _setStableToken(address newStableToken) internal {
+    stable = newStableToken;
+    emit StableTokenSet(newStableToken);
   }
 
   /**
