@@ -961,7 +961,7 @@ export async function removeGenericHelmChart(releaseName: string, namespace: str
 
 function getExtraValuesFile(celoEnv: string) {
   const extraValuesFile = fs.existsSync(`${TESTNET_CHART_DIR}/values-${celoEnv}.yaml`)
-    ? `${TESTNET_CHART_DIR}/values-${celoEnv}.yaml`
+    ? `values-${celoEnv}.yaml`
     : undefined
   return extraValuesFile
 }
