@@ -70,13 +70,16 @@ function phoneNumberTypeToString(t: PhoneNumberType): string {
 }
 
 function providerNamesToList(providers: string) {
-  return providers
-    .replace(
-      new RegExp(`\\b(${SmsProviderType.TWILIO})\\b`, 'g'),
-      `${SmsProviderType.TWILIO_VERIFY},${SmsProviderType.TWILIO_MESSAGING}`
-    )
-    .split(',')
-    .filter((t) => t != null && t !== '')
+  return (
+    providers
+      // Backwards compatibility: 'twilio' as syntactic sugar for 'twilioverify,twiliomessaging'
+      .replace(
+        new RegExp(`\\b(${SmsProviderType.TWILIO})\\b`, 'g'),
+        `${SmsProviderType.TWILIO_VERIFY},${SmsProviderType.TWILIO_MESSAGING}`
+      )
+      .split(',')
+      .filter((t) => t != null && t !== '')
+  )
 }
 
 export async function initializeSmsProviders(

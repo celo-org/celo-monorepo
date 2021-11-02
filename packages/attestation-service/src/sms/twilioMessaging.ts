@@ -28,9 +28,9 @@ export class TwilioMessagingProvider extends TwilioSmsProvider {
   }
 
   async initialize(deliveryStatusURL?: string) {
-    // Ensure the messaging service exists
     super.initialize(deliveryStatusURL)
     try {
+      // Ensure the messaging service exists
       await this.client.messaging.services.get(this.messagingServiceSid).fetch()
     } catch (error) {
       throw new Error(`Twilio Messaging Service could not be fetched: ${error}`)

@@ -9,9 +9,6 @@ export class TwilioVerifyProvider extends TwilioSmsProvider {
       fetchEnv('TWILIO_ACCOUNT_SID'),
       fetchEnv('TWILIO_AUTH_TOKEN'),
       readUnsupportedRegionsFromEnv('TWILIO_UNSUPPORTED_REGIONS', 'TWILIO_BLACKLIST'),
-      // TODO double check that switching this to fetchEnv doesn't break backwards compatibility
-      // i.e. that this still works with no service ID
-      // fetchEnvOrDefault('TWILIO_VERIFY_SERVICE_SID', ''),
       fetchEnv('TWILIO_VERIFY_SERVICE_SID')
     )
   }
