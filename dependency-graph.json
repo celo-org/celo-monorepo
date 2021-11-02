@@ -111,7 +111,8 @@
       "@celo/base",
       "@celo/contractkit",
       "@celo/identity",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-local"
     ]
   },
   "@celo/phone-number-privacy-monitor": {
