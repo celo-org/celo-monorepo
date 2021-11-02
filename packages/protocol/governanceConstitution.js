@@ -62,7 +62,7 @@ const DefaultConstitution = {
     setSpread: 0.8,
     setReserveFraction: 0.8,
   },
-    ExchangeBRL: {
+  ExchangeBRL: {
     default: 0.8,
     setRegistry: 0.9,
     setUpdateFrequency: 0.8,
