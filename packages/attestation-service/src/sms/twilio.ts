@@ -26,7 +26,7 @@ export class TwilioSmsProvider extends SmsProvider {
     this.unsupportedRegionCodes = unsupportedRegionCodes
   }
 
-  async initialize(deliveryStatusURL?: string) {
+  initialize(deliveryStatusURL?: string) {
     this.deliveryStatusURL = deliveryStatusURL
   }
 
