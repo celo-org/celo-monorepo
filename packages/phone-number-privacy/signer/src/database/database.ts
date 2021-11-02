@@ -91,3 +91,11 @@ export function getDatabase() {
 
   return db
 }
+
+export function getTransaction() {
+  if (!db) {
+    throw new Error('Database not yet initialized')
+  }
+
+  return db.transaction()
+}
