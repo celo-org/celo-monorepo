@@ -1168,7 +1168,10 @@ async function generateMyCeloGenesis(): Promise<string> {
   // Clean up the tmp dir
   await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
   fs.mkdirSync(celoBlockchainDir)
-  const gethTag = fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)
+  const gethTag =
+    fetchEnvOrFallback(envVar.GETH_MYCELO_COMMIT, '') !== ''
+      ? fetchEnv(envVar.GETH_MYCELO_COMMIT)
+      : fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)
   const celoBlockchainVersion = gethTag.includes('.') ? `v${gethTag}` : gethTag
   await checkoutGethRepo(celoBlockchainVersion, celoBlockchainDir)
   await buildGethAll(celoBlockchainDir)
