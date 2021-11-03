@@ -74,15 +74,21 @@ export function createBackup<D extends KnownDomain = never>(
   const nonce = crypto.randomBytes(16)
   let key = deriveKey(password, nonce)
 
+  // TODO: Replace this with ODIS.
   if (domain !== undefined) {
     key = deriveKey(key, domainHash(domain))
   }
+
+  // TODO: Replace this with a proper circuit breaker impl.
+  const fuseKey = crypto.randomBytes(16)
+  key = deriveKey(key, fuseKey)
 
   // Encrypted and wrap the data in a Backup structure.
   return {
     encryptedData: encrypt(key, data),
     nonce,
     odisDomain: domain,
+    encryptedFuseKey: fuseKey,
     version: '0.0.1',
     metadata: {},
     environment: {},
@@ -92,12 +98,18 @@ export function createBackup<D extends KnownDomain = never>(
 export function openBackup(backup: Backup, password: Buffer): Result<Buffer, BackupError> {
   let key = deriveKey(password, backup.nonce)
 
+  // TODO: Replace this with ODIS.
   if (backup.odisDomain !== undefined) {
     if (!isKnownDomain(backup.odisDomain)) {
       return Err(new InvalidBackupError())
     }
 
     key = deriveKey(key, domainHash(backup.odisDomain))
+  }
+
+  // TODO: Replace this with a proper circuit breaker impl.
+  if (backup.encryptedFuseKey !== undefined) {
+    key = deriveKey(key, backup.encryptedFuseKey)
   }
 
   return Ok(decrypt(key, backup.encryptedData))
