@@ -4,7 +4,7 @@ import { pipe } from 'fp-ts/lib/pipeable'
 import { chain, isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { Backup } from './backup'
-import { BackupError, DecodeError } from './errors'
+import { DecodeError } from './errors'
 
 const BASE64_REGEXP = /^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
 
@@ -27,7 +27,7 @@ export const BufferFromBase64 = new t.Type<Buffer, string, unknown>(
 )
 
 /** io-ts codec used to encode and decode backups from JSON objects */
-export const BackupSchema: t.Type<Backup<KnownDomain | undefined>, object> = t.intersection([
+export const BackupSchema: t.Type<Backup<KnownDomain>, object> = t.intersection([
   // Required fields
   t.type({
     encryptedData: BufferFromBase64,
@@ -44,22 +44,18 @@ export const BackupSchema: t.Type<Backup<KnownDomain | undefined>, object> = t.i
   }),
 ])
 
-export function serializeBackup(backup: Backup<KnownDomain | undefined>): string {
+export function serializeBackup(backup: Backup<KnownDomain>): string {
   return JSON.stringify(BackupSchema.encode(backup))
 }
 
-export function deserializeBackup(
-  data: string
-): Result<Backup<KnownDomain | undefined>, BackupError> {
+export function deserializeBackup(data: string): Result<Backup<KnownDomain>, DecodeError> {
   const jsonDecode = parseJsonAsResult(data)
   if (!jsonDecode.ok) {
-    // TODO(victor): Include the underlying error here.
-    return Err(new DecodeError())
+    return Err(new DecodeError(jsonDecode.error))
   }
 
   const backup = BackupSchema.decode(jsonDecode.result)
   if (isLeft(backup)) {
-    // TODO(victor): Include the underlying error here.
     return Err(new DecodeError())
   }
 

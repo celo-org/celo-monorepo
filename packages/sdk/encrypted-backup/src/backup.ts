@@ -1,7 +1,10 @@
-import { Domain } from '@celo/identity/lib/odis/domains'
+import { Domain, domainHash, isKnownDomain, KnownDomain } from '@celo/identity/lib/odis/domains'
+import { Err, Ok, Result } from '@celo/base/lib/result'
 import * as crypto from 'crypto'
+import { BackupError, InvalidBackupError } from './errors'
 
-export interface Backup<D extends Domain | undefined = Domain | undefined> {
+// TODO: Change this to KnownDomain?
+export interface Backup<D extends Domain = Domain> {
   // AES-128-GCM encryption of the user's secret backup data.
   encryptedData: Buffer
 
@@ -63,26 +66,39 @@ function decrypt(key: Buffer, ciphertext: Buffer): Buffer {
   return Buffer.concat([decipher.update(ciphertextData), decipher.final()])
 }
 
-export function createBackup<D extends Domain | undefined = undefined>(
+export function createBackup<D extends KnownDomain = never>(
   data: Buffer,
   password: Buffer,
   domain?: D
 ): Backup<D> {
   const nonce = crypto.randomBytes(16)
-  const key = deriveKey(password, nonce)
+  let key = deriveKey(password, nonce)
+
+  if (domain !== undefined) {
+    key = deriveKey(key, domainHash(domain))
+  }
 
   // Encrypted and wrap the data in a Backup structure.
   return {
     encryptedData: encrypt(key, data),
     nonce,
-    ...(domain ? { domain } : {}),
+    odisDomain: domain,
     version: '0.0.1',
     metadata: {},
     environment: {},
   }
 }
 
-export function openBackup(backup: Backup, password: Buffer): Buffer {
-  const key = deriveKey(password, backup.nonce)
-  return decrypt(key, backup.encryptedData)
+export function openBackup(backup: Backup, password: Buffer): Result<Buffer, BackupError> {
+  let key = deriveKey(password, backup.nonce)
+
+  if (backup.odisDomain !== undefined) {
+    if (!isKnownDomain(backup.odisDomain)) {
+      return Err(new InvalidBackupError())
+    }
+
+    key = deriveKey(key, domainHash(backup.odisDomain))
+  }
+
+  return Ok(decrypt(key, backup.encryptedData))
 }
