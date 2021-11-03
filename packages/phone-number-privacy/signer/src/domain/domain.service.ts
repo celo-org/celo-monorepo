@@ -51,14 +51,15 @@ export class DomainService implements IDomainService {
       version: domain.version,
       hash: domainHash(domain),
     })
+    const trx = await getTransaction()
     try {
-      const trx = await getTransaction()
       const domainState = await getDomainStateWithLock(domain, trx, logger)
       if (!domainState) {
         // If the domain is not currently recorded in the state database, add it now.
         await insertDomainState(DomainState.createEmptyDomainState(domain), trx, logger)
         await trx.commit()
       } else if (domainState.disabled) {
+        await trx.commit()
         response.sendStatus(200)
         // If the domain is already disabled, nothing needs to be done. Return 200 OK.
         return
@@ -74,6 +75,7 @@ export class DomainService implements IDomainService {
         500,
         ErrorMessage.DATABASE_UPDATE_FAILURE
       )
+      trx.rollback(error)
     }
   }
 
@@ -141,8 +143,8 @@ export class DomainService implements IDomainService {
       hash: domainHash(domain),
     })
 
+    const trx = await getTransaction()
     try {
-      const trx = await getTransaction()
       let domainState = await getDomainStateWithLock(domain, trx, logger)
       if (!domainState) {
         domainState = await insertDomainState(
@@ -195,6 +197,7 @@ export class DomainService implements IDomainService {
       logger.error('Failed to get signature for a domain')
       logger.error(err)
       respondWithError(Endpoints.DOMAIN_SIGN, response, 500, ErrorMessage.UNKNOWN_ERROR)
+      trx.rollback(err)
     }
   }
 

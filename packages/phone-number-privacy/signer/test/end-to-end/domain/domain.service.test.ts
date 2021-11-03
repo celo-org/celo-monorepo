@@ -33,6 +33,21 @@ describe('Domain Service tests', () => {
       expect(response.status).toBe(200)
     })
 
+    it('Should answer 200 for multiple requests', async () => {
+      const authenticatedDomain: SequentialDelayDomain = {
+        name: 'ODIS Sequential Delay Domain',
+        version: '1',
+        stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+        address: defined(walletAddress),
+        salt: noString,
+      }
+      const response = await postDisableMessage(authenticatedDomain)
+      expect(response.status).toBe(200)
+
+      const response2 = await postDisableMessage(authenticatedDomain)
+      expect(response2.status).toBe(200)
+    })
+
     async function postDisableMessage(domain: Domain): Promise<Response> {
       const body = JSON.stringify({
         domain,
