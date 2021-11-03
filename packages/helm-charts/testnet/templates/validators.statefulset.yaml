@@ -199,7 +199,7 @@ spec:
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
           fi
 
-{{ include  "common.bootnode-flag-script" . | indent 10 }}
+          {{ include  "common.bootnode-flag-script" . | indent 10 }}
 
           {{- if .metrics | default true }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
@@ -207,6 +207,9 @@ spec:
           {{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
           {{- end }}
+
+          {{ .Values.geth.validatorExtraSnippet | indent 10 }}
+
           exec geth \
             $BOOTNODE_FLAG \
             --datadir /root/.celo \
