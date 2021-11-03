@@ -84,7 +84,7 @@ export class JSONParseError extends RootError<string> {
 export function parseJsonAsResult(data: string) {
   try {
     return Ok(JSON.parse(data))
-  } catch (error) {
+  } catch (error: any) {
     return Err(new JSONParseError(error))
   }
 }

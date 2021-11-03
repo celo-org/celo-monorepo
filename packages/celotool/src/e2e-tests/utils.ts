@@ -193,7 +193,7 @@ export async function assertRevert(promise: any, errorMessage: string = ''): Pro
   try {
     await promise
     assert.fail('Expected revert not received')
-  } catch (error) {
+  } catch (error: any) {
     const revertFound = error.message.search('revert') >= 0
     if (errorMessage === '') {
       assert(revertFound, `Expected "revert", got ${error} instead`)

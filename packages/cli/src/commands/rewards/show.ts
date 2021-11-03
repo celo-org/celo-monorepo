@@ -106,7 +106,7 @@ export default class Show extends BaseCommand {
                 })
               )
             )
-          } catch (error) {
+          } catch (error: any) {
             if (error.message.includes('missing trie node')) {
               throw new Error(
                 'Exact voter information is avaiable only for 1024 blocks after each epoch.\n' +
