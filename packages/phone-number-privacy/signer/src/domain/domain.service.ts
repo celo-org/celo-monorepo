@@ -171,28 +171,16 @@ export class DomainService implements IDomainService {
         return
       }
 
-      let signature: string
-      try {
-        const keyProvider = getKeyProvider()
-        const privateKey = keyProvider.getPrivateKey()
-        signature = computeBlindedSignature(request.body.blindedMessage, privateKey, logger)
-      } catch (err) {
-        trx.rollback()
-        throw err
+      const keyProvider = getKeyProvider()
+      const privateKey = keyProvider.getPrivateKey()
+      const signature = computeBlindedSignature(request.body.blindedMessage, privateKey, logger)
+      trx.commit()
+      const signMessageResponseSuccess: SignMessageResponseSuccess = {
+        success: true,
+        signature,
+        version: getVersion(),
       }
-
-      try {
-        trx.commit()
-        const signMessageResponseSuccess: SignMessageResponseSuccess = {
-          success: true,
-          signature,
-          version: getVersion(),
-        }
-        response.json(signMessageResponseSuccess)
-      } catch (err) {
-        trx.rollback()
-        throw err
-      }
+      response.json(signMessageResponseSuccess)
     } catch (err) {
       logger.error('Failed to get signature for a domain')
       logger.error(err)
