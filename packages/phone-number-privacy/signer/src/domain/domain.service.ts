@@ -59,11 +59,13 @@ export class DomainService implements IDomainService {
         await insertDomainState(DomainState.createEmptyDomainState(domain), trx, logger)
         await trx.commit()
       } else if (domainState.disabled) {
+        response.sendStatus(200)
         // If the domain is already disabled, nothing needs to be done. Return 200 OK.
         return
       }
 
-      return setDomainDisabled(domain, logger)
+      await setDomainDisabled(domain, logger)
+      response.sendStatus(200)
     } catch (error) {
       logger.error('Error while disabling domain', error)
       respondWithError(
