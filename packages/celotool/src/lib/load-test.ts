@@ -111,6 +111,7 @@ async function helmParameters(
     `--set replicas=${replicas}`,
     `--set threads=${threads}`,
     `--set genesis.useGenesisFileBase64=false`,
+    `--set genesis.network=${celoEnv}`,
     `--set reuse_light_clients=true`,
   ]
 }

@@ -1149,6 +1149,13 @@ staticnodes:
 genesis:
   genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
 `
+  } else {
+    valueFileContent =
+      valueFileContent +
+      `
+genesis:
+  genesisFileBase64: ''
+`
   }
   fs.writeFileSync(valueFilePath, valueFileContent)
 }
