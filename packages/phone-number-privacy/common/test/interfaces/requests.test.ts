@@ -6,8 +6,8 @@ import {
   noString,
   noNumber,
 } from '@celo/utils/lib/sign-typed-data-utils'
-import { Domain, DomainOptions, SequentialDelayDomain } from '@celo/identity/lib/odis/domains'
 import { LocalWallet } from '@celo/wallet-local'
+import { Domain, DomainOptions, SequentialDelayDomain } from '../../src/domains'
 import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,

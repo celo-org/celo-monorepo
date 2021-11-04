@@ -3,7 +3,6 @@ import Logger from 'bunyan'
 
 import * as auth from '../../src/utils/authentication'
 import { ContractKit } from '@celo/contractkit'
-import { AuthenticationMethod } from '@celo/identity/lib/odis/query'
 
 describe('Authentication test suite', () => {
   const logger = Logger.createLogger({
@@ -43,7 +42,7 @@ describe('Authentication test suite', () => {
         get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
         body: {
           account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
-          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+          authenticationMethod: auth.AuthenticationMethod.ENCRYPTION_KEY,
         },
       } as Request
       const mockContractKit = {} as ContractKit
@@ -58,7 +57,7 @@ describe('Authentication test suite', () => {
         get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
         body: {
           account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
-          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+          authenticationMethod: auth.AuthenticationMethod.ENCRYPTION_KEY,
         },
       } as Request
       const mockContractKit = {
@@ -83,7 +82,7 @@ describe('Authentication test suite', () => {
         get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
         body: {
           account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
-          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+          authenticationMethod: auth.AuthenticationMethod.ENCRYPTION_KEY,
         },
       } as Request
       const mockContractKit = {

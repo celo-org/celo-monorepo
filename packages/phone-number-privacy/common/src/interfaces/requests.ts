@@ -1,4 +1,11 @@
 import {
+  EIP712Optional,
+  eip712OptionalType,
+  EIP712TypedData,
+  noString,
+} from '@celo/utils/lib/sign-typed-data-utils'
+import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+import {
   Domain,
   domainEIP712Types,
   DomainOptions,
@@ -6,14 +13,7 @@ import {
   KnownDomain,
   KnownDomainOptions,
   SequentialDelayDomain,
-} from '@celo/identity/lib/odis/domains'
-import {
-  EIP712Optional,
-  eip712OptionalType,
-  EIP712TypedData,
-  noString,
-} from '@celo/utils/lib/sign-typed-data-utils'
-import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+} from '../../src/domains'
 
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */

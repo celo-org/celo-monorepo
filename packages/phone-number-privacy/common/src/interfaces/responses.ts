@@ -1,4 +1,4 @@
-import { Domain } from '@celo/identity/lib/odis/domains'
+import { Domain } from '../../src/domains'
 
 export interface SignMessageResponse {
   success: boolean

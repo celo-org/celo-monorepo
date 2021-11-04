@@ -2,7 +2,6 @@ import { retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
-import { AuthenticationMethod } from '@celo/identity/lib/odis/query'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Logger from 'bunyan'
@@ -12,6 +11,12 @@ import { ErrorMessage } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
 const ec = new EC('secp256k1')
+
+export enum AuthenticationMethod {
+  WALLET_KEY = 'wallet_key',
+  ENCRYPTION_KEY = 'encryption_key',
+  CUSTOM_SIGNER = 'custom_signer',
+}
 
 /*
  * Confirms that user is who they say they are and throws error on failure to confirm.

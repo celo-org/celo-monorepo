@@ -1,6 +1,9 @@
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
-import { checkSequentialDelay, SequentialDelayResult } from '../../src/domains/sequential-delay'
-import { SequentialDelayDomain } from '@celo/identity/lib/odis/domains'
+import {
+  checkSequentialDelay,
+  SequentialDelayDomain,
+  SequentialDelayResult,
+} from '../../src/domains'
 
 type TestAttempt = {
   timestamp: number
