@@ -1,4 +1,3 @@
-import bodyParser from 'body-parser'
 import Logger from 'bunyan'
 import express from 'express'
 import twilio, { Twilio } from 'twilio'
@@ -50,7 +49,7 @@ export abstract class TwilioSmsProvider extends SmsProvider {
 
   deliveryStatusHandlers() {
     return [
-      bodyParser.urlencoded({ extended: false }),
+      express.urlencoded({ extended: false }),
       twilio.webhook({ url: this.deliveryStatusURL! }),
     ]
   }

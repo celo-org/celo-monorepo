@@ -64,7 +64,7 @@ export async function handleTestAttestationRequest(
     )
 
     respondWithAttestation(res, attestation, false, salt)
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error)
     respondWithError(res, 500, `${error.message ?? error}`)
   }

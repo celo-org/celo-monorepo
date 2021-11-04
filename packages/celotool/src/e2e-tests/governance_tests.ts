@@ -470,9 +470,9 @@ describe('governance tests', () => {
             // 2. Rotate keys for validator 2 by authorizing a new validating key.
             await memberSwapper.swap()
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error(e)
-          errorWhileChangingValidatorSet = e
+          errorWhileChangingValidatorSet = e.toString()
         }
       }
 
@@ -1042,9 +1042,9 @@ describe('governance tests', () => {
             lastRotated = header.number
             await keyRotator.rotate()
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error(e)
-          errorWhileChangingValidatorSet = e
+          errorWhileChangingValidatorSet = e.toString()
         }
       }
 

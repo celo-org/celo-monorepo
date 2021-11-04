@@ -740,7 +740,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       }
 
       attestationServiceURL = attestationServiceURLClaim.url
-    } catch (error) {
+    } catch (error: any) {
       ret.state =
         error.type === 'system'
           ? AttestationServiceStatusState.MetadataTimeout
@@ -803,7 +803,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         // No version implies 1.0.0
         ret.version = '1.0.0'
       }
-    } catch (error) {
+    } catch (error: any) {
       ret.state = AttestationServiceStatusState.UnreachableAttestationService
       ret.error = error
     }
