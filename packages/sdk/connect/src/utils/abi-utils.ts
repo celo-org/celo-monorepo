@@ -6,8 +6,10 @@ export const getAbiByName = (abi: AbiItem[], methodName: string) =>
 
 export const parseDecodedParams = (params: DecodedParamsObject) => {
   const args = new Array(params.__length__)
-  delete params.__length__
   Object.keys(params).forEach((key) => {
+    if (key === '__length__') {
+      return
+    }
     const argIndex = parseInt(key, 10)
     if (argIndex >= 0) {
       args[argIndex] = params[key]

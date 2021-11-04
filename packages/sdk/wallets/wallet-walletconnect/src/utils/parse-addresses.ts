@@ -51,7 +51,7 @@ export function parseAddress(addressLike: string): AddressWithNetwork {
   for (const parse of [parseCaip10Address, parseCaip50Address, parseShortNameAddress]) {
     try {
       return parse(addressLike)
-    } catch (e) {
+    } catch (e: any) {
       lastError = e
     }
   }

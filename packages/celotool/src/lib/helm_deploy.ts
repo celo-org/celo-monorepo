@@ -91,7 +91,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
     console.warn(
       `A Cloud SQL instance named ${instanceName} already exists, so in all likelihood you cannot deploy initial with ${instanceName}`
     )
-  } catch (error) {
+  } catch (error: any) {
     if (
       error.message.trim() !==
       `Command failed: gcloud sql instances describe ${instanceName}\nERROR: (gcloud.sql.instances.describe) HTTPError 404: The Cloud SQL instance does not exist.`
@@ -109,7 +109,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
         envVar.KUBERNETES_CLUSTER_ZONE
       )} --database-version POSTGRES_9_6 --cpu 1 --memory 4G`
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error(error.message.trim())
   }
 
@@ -121,7 +121,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
           envVar.KUBERNETES_CLUSTER_ZONE
         )}`
       )
-    } catch (error) {
+    } catch (error: any) {
       console.error(error.message.trim())
     }
   }
@@ -439,7 +439,7 @@ export async function registerIPAddress(name: string, zone?: string) {
     await execCmd(
       `gcloud compute addresses create ${name} --region ${getKubernetesClusterRegion(zone)}`
     )
-  } catch (error) {
+  } catch (error: any) {
     if (!error.toString().includes('already exists')) {
       console.error(error)
       process.exit(1)
@@ -453,7 +453,7 @@ export async function deleteIPAddress(name: string, zone?: string) {
     await execCmd(
       `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
     )
-  } catch (error) {
+  } catch (error: any) {
     if (!error.toString().includes('was not found')) {
       console.error(error)
       process.exit(1)
@@ -677,7 +677,7 @@ export async function deletePersistentVolumeClaimsCustomLabels(
       `kubectl delete pvc --selector='${label}=${value}' --namespace ${namespace}`
     )
     console.info(output)
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
     if (!error.toString().includes('not found')) {
       process.exit(1)
