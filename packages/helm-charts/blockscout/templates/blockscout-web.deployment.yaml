@@ -96,6 +96,20 @@ spec:
           value: {{ .Values.blockscout.web.sourcify.repoUrl | quote }}
         - name: CHAIN_ID
           value: {{ .Values.blockscout.networkID | quote }}
+        - name: APPS_MENU
+          value: {{ .Values.blockscout.web.appsMenu.enabled | quote }}
+        - name: EXTERNAL_APPS
+          value: {{ .Values.blockscout.web.appsMenu.externalApps | quote }}
+        - name: BRIDGES
+          value: {{ .Values.blockscout.web.appsMenu.bridges | quote }}
+        - name: OTHER_BRIDGES
+          value: {{ .Values.blockscout.web.appsMenu.otherBridges | quote }}
+        - name: BRIDGES_ALM
+          value: {{ .Values.blockscout.web.appsMenu.bridgesAlm | quote }}
+        - name: DEFI_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.defiList | quote }}
+        - name: NFT_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.nftList | quote }}
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
