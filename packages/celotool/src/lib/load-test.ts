@@ -91,7 +91,7 @@ async function helmParameters(
   const staticNodesJsonB64 = Buffer.from(JSON.stringify(enodes)).toString('base64')
   // Uses the genesis file from google storage to ensure it's the correct genesis for the network
   const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
-  await saveHelmValuesFile(celoEnv, valueFilePath, true)
+  await saveHelmValuesFile(celoEnv, valueFilePath, true, true)
 
   return [
     `-f ${valueFilePath}`,
@@ -110,7 +110,7 @@ async function helmParameters(
     `--set mnemonic="${fetchEnv(envVar.MNEMONIC)}"`,
     `--set replicas=${replicas}`,
     `--set threads=${threads}`,
-    `--set genesis.useGenesisFileBase64=true`,
+    `--set genesis.useGenesisFileBase64=false`,
     `--set reuse_light_clients=true`,
   ]
 }

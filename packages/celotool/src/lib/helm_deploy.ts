@@ -763,7 +763,7 @@ async function helmIPParameters(celoEnv: string) {
 
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
   const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
-  await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis)
+  await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis, false)
 
   const gethMetricsOverrides =
     fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === 'true'
@@ -1129,7 +1129,8 @@ function rollingUpdateHelmVariables() {
 export async function saveHelmValuesFile(
   celoEnv: string,
   valueFilePath: string,
-  useExistingGenesis: boolean
+  useExistingGenesis: boolean,
+  skipGenesisContent: boolean
 ) {
   const genesisContent = useExistingGenesis
     ? await getGenesisBlockFromGoogleStorage(celoEnv)
@@ -1137,12 +1138,18 @@ export async function saveHelmValuesFile(
 
   const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
 
-  const valueFileContent = `
-genesis:
-  genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+  let valueFileContent = `
 staticnodes:
   staticnodesBase64: ${Buffer.from(JSON.stringify(enodes)).toString('base64')}
 `
+  if (!skipGenesisContent) {
+    valueFileContent =
+      valueFileContent +
+      `
+genesis:
+  genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+`
+  }
   fs.writeFileSync(valueFilePath, valueFileContent)
 }
 
@@ -1216,8 +1223,8 @@ async function generateMyCeloGenesis(): Promise<string> {
   })
   const genesisPath = path.join(celoBlockchainDir, 'genesis.json')
   const genesisContent = fs.readFileSync(genesisPath).toString()
-  return genesisContent
 
   // Clean up the tmp dir as it's no longer needed
   await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
+  return genesisContent
 }
