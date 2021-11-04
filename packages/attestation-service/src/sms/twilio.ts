@@ -2,20 +2,11 @@ import bodyParser from 'body-parser'
 import Logger from 'bunyan'
 import express from 'express'
 import twilio, { Twilio } from 'twilio'
-import { fetchEnv } from '../env'
 import { AttestationStatus, SmsFields } from '../models/attestation'
-import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
+import { SmsProvider, SmsProviderType } from './base'
 import { receivedDeliveryReport } from './index'
 
-export class TwilioSmsProvider extends SmsProvider {
-  static fromEnv() {
-    return new TwilioSmsProvider(
-      fetchEnv('TWILIO_ACCOUNT_SID'),
-      fetchEnv('TWILIO_AUTH_TOKEN'),
-      readUnsupportedRegionsFromEnv('TWILIO_UNSUPPORTED_REGIONS', 'TWILIO_BLACKLIST')
-    )
-  }
-
+export abstract class TwilioSmsProvider extends SmsProvider {
   client: Twilio
   type = SmsProviderType.TWILIO
   deliveryStatusURL: string | undefined

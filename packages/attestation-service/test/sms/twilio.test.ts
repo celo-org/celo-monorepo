@@ -1,8 +1,4 @@
-import {
-  TwilioMessagingProvider,
-  TwilioSmsProvider,
-  TwilioVerifyProvider,
-} from '../../src/sms/twilio'
+import { TwilioMessagingProvider, TwilioVerifyProvider } from '../../src/sms/twilio'
 import { mockMessagesCreate, mockVerifyCreate } from '../__mocks__/twilio'
 
 jest.mock('../__mocks__/twilio')
@@ -31,14 +27,6 @@ describe('TwilioSmsProvider tests', () => {
       jest.clearAllMocks()
     })
 
-    it('should initialize TwilioSmsProvider', async () => {
-      const twilioSmsProvider = new TwilioSmsProvider(
-        twilioSid,
-        twilioAuthToken,
-        unsupportedRegionCodes
-      )
-      await twilioSmsProvider.initialize('fake-delivery-status-url')
-    })
     it('should initialize and send SMS via TwilioVerifyProvider', async () => {
       const twilioVerifyProvider = new TwilioVerifyProvider(
         twilioSid,
