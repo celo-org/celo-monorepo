@@ -7,10 +7,10 @@ import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthenticationMethod,
   AuthSigner,
+  CombinerSignMessageResponse,
   queryOdis,
   ServiceContext,
   SignMessageRequest,
-  CombinerSignMessageResponse,
 } from './query'
 
 // ODIS minimum dollar balance for sig retrieval

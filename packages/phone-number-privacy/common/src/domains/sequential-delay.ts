@@ -1,11 +1,15 @@
 import {
   EIP712Optional,
-  eip712OptionalType,
   eip712OptionalSchema,
+  eip712OptionalType,
   EIP712TypesWithPrimary,
 } from '@celo/utils/lib/sign-typed-data-utils'
 import * as t from 'io-ts'
 import { Domain, DomainIdentifiers } from './domains'
+
+// Concrete Domain subtypes are only assignable to Domain and EIP712Object when using type instead
+// of interface. Otherwise the compiler complains about a missing index signature.
+// tslint:disable:interface-over-type-literal
 
 export type SequentialDelayStage = {
   /**
