@@ -115,7 +115,10 @@ export class TwilioVerifyProvider extends TwilioSmsProvider {
       return m.sid
     } catch (e) {
       // Verify landlines using voice
-      if (e.message.includes('SMS is not supported by landline phone number')) {
+      if (
+        e instanceof Error &&
+        e.message.includes('SMS is not supported by landline phone number')
+      ) {
         requestParams.appHash = undefined
         requestParams.channel = 'call'
         const m = await this.client.verify
