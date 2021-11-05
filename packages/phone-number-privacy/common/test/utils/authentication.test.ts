@@ -1,6 +1,7 @@
 import { Request } from 'express'
 import Logger from 'bunyan'
 
+import { AuthenticationMethod } from '../../src/interfaces/requests'
 import * as auth from '../../src/utils/authentication'
 import { ContractKit } from '@celo/contractkit'
 
@@ -42,7 +43,7 @@ describe('Authentication test suite', () => {
         get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
         body: {
           account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
-          authenticationMethod: auth.AuthenticationMethod.ENCRYPTION_KEY,
+          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
         },
       } as Request
       const mockContractKit = {} as ContractKit
@@ -57,7 +58,7 @@ describe('Authentication test suite', () => {
         get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
         body: {
           account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
-          authenticationMethod: auth.AuthenticationMethod.ENCRYPTION_KEY,
+          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
         },
       } as Request
       const mockContractKit = {
@@ -82,7 +83,7 @@ describe('Authentication test suite', () => {
         get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
         body: {
           account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
-          authenticationMethod: auth.AuthenticationMethod.ENCRYPTION_KEY,
+          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
         },
       } as Request
       const mockContractKit = {

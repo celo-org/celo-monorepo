@@ -25,6 +25,14 @@ export interface GetQuotaResponse {
   totalQuota: number
 }
 
+export interface GetContactMatchesResponse {
+  success: boolean
+  matchedContacts: Array<{
+    phoneNumber: string
+  }>
+  version: string
+}
+
 export interface DomainStatusResponse {
   domain: Domain
   counter: number

@@ -3,16 +3,19 @@
 import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { ContractKit } from '@celo/contractkit'
-import { AuthenticationMethod } from '@celo/phone-number-privacy-common'
+import {
+  AuthenticationMethod,
+  GetBlindedMessageSigRequest,
+  GetContactMatchesRequest,
+  GetContactMatchesResponse,
+  PhoneNumberPrivacyRequest,
+} from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 
 const debug = debugFactory('kit:odis:query')
 const ec = new EC('secp256k1')
-
-// Re-export AuthenticationMethod to maintain backwards compatibility with versions <= 1.3.0
-export { AuthenticationMethod }
 
 export interface WalletKeySigner {
   authenticationMethod: AuthenticationMethod.WALLET_KEY
@@ -32,38 +35,20 @@ export interface CustomSigner {
 // Support signing with the DEK or with the
 export type AuthSigner = WalletKeySigner | EncryptionKeySigner | CustomSigner
 
-// TODO(victor) Requests here are duplicated in. They should be deduplicated.
-// https://github.com/celo-org/celo-monorepo/blob/d5a275b56ca62360d1da9d00d38870888c9dbada/packages/phone-number-privacy/common/src/interfaces/requests.ts#L4
-export interface PhoneNumberPrivacyRequest {
-  account: string
-  authenticationMethod: AuthenticationMethod
-  version?: string
-  sessionID?: string
-}
+// Re-export types and aliases to maintain backwards compatibility.
+export { AuthenticationMethod, PhoneNumberPrivacyRequest }
+export type SignMessageRequest = GetBlindedMessageSigRequest
+export type MatchmakingRequest = GetContactMatchesRequest
+export type MatchmakingResponse = GetContactMatchesResponse
 
-export interface SignMessageRequest extends PhoneNumberPrivacyRequest {
-  blindedQueryPhoneNumber: string
-  hashedPhoneNumber?: string
-}
-
-export interface MatchmakingRequest extends PhoneNumberPrivacyRequest {
-  userPhoneNumber: string
-  contactPhoneNumbers: string[]
-  hashedPhoneNumber: string
-  signedUserPhoneNumber?: string
-}
-
-export interface SignMessageResponse {
+// Combiner returns a response inconsistent with the SignMessageResponse defined in
+// @celo/phone-number-privacy-common. Combiner response type is defined here as a result.
+export interface CombinerSignMessageResponse {
   success: boolean
   combinedSignature: string
 }
-
-export interface MatchmakingResponse {
-  success: boolean
-  matchedContacts: Array<{
-    phoneNumber: string
-  }>
-}
+// CombinerSignMessageResponse is exported as SignMessageResponse for backwards compatibility.
+export type SignMessageResponse = CombinerSignMessageResponse
 
 export enum ErrorMessages {
   ODIS_QUOTA_ERROR = 'odisQuotaError',

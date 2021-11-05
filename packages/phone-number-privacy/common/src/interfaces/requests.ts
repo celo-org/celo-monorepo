@@ -15,31 +15,54 @@ import {
   SequentialDelayDomain,
 } from '../../src/domains'
 
+export enum AuthenticationMethod {
+  WALLET_KEY = 'wallet_key',
+  ENCRYPTION_KEY = 'encryption_key',
+  CUSTOM_SIGNER = 'custom_signer',
+}
+
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */
   account: string
+  /** Authentication method to use for verifying the signature in the Authorization header */
+  authenticationMethod: AuthenticationMethod
   /** Query message. A blinded elliptic curve point encoded in base64. */
   blindedQueryPhoneNumber: string
   /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
   hashedPhoneNumber?: string
   /** Client-specified session ID for the request. */
   sessionID?: string
+  /** Client-specified version string */
+  version?: string
 }
 
 export interface GetContactMatchesRequest {
   account: string
+  /** Authentication method to use for verifying the signature in the Authorization header */
+  authenticationMethod: AuthenticationMethod
   userPhoneNumber: string // obfuscated with deterministic salt
   contactPhoneNumbers: string[] // obfuscated with deterministic salt
   hashedPhoneNumber: string // on-chain identifier
   signedUserPhoneNumber?: string // signed with DEK
   sessionID?: string
+  /** Client-specified version string */
+  version?: string
 }
 
 export interface GetQuotaRequest {
   account: string
+  /** Authentication method to use for verifying the signature in the Authorization header */
+  authenticationMethod: AuthenticationMethod
   hashedPhoneNumber?: string // on-chain identifier
   sessionID?: string
+  /** Client-specified version string */
+  version?: string
 }
+
+export type PhoneNumberPrivacyRequest =
+  | GetBlindedMessageSigRequest
+  | GetContactMatchesRequest
+  | GetQuotaRequest
 
 /**
  * Domain restricted signature request to get a pOPRF evaluation on the given message in a given
