@@ -34,17 +34,25 @@ export interface Domain {
 export type DomainOptions = EIP712Object
 
 export type SequentialDelayStage = {
-  // How many seconds each batch of attempts in this stage is delayed with
-  // respect to the timer.
+  /**
+   * How many seconds each batch of attempts in this stage is delayed with
+   * respect to the timer.
+   */
   delay: number
-  // Whether the timer should be reset between attempts during this stage.
-  // Defaults to true.
+  /**
+   * Whether the timer should be reset between attempts during this stage.
+   * Defaults to true.
+   */
   resetTimer: EIP712Optional<boolean>
-  // The number of continuous attempts a user gets before the next delay
-  // in each repetition of this stage. Defaults to 1.
+  /**
+   * The number of continuous attempts a user gets before the next delay
+   * in each repetition of this stage. Defaults to 1.
+   */
   batchSize: EIP712Optional<number>
-  // The number of times this stage repeats before continuing to the next stage
-  // in the RateLimit array. Defaults to 1.
+  /**
+   * The number of times this stage repeats before continuing to the next stage
+   * in the RateLimit array. Defaults to 1.
+   */
   repetitions: EIP712Optional<number>
 }
 
@@ -52,20 +60,32 @@ export type SequentialDelayDomain = {
   name: 'ODIS Sequential Delay Domain'
   version: '1'
   stages: SequentialDelayStage[]
-  // Optional Celo address against which signed requests must be authenticated.
-  // In the case of Cloud Backup, this will be derived from a one-time key stored with the ciphertext.
+  /**
+   * Optional Celo address against which signed requests must be authenticated.
+   * In the case of Cloud Backup, this will be derived from a one-time key stored with the ciphertext.
+   * Encoded as a checksummed address with leading "0x".
+   */
   address: EIP712Optional<string>
-  // Optional string to distinguish the output of this domain instance from
-  // other SequentialDelayDomain instances
+  /**
+   * Optional string to distinguish the output of this domain instance from
+   * other SequentialDelayDomain instances
+   */
   salt: EIP712Optional<string>
 }
 
 export type SequentialDelayDomainOptions = {
-  // EIP-712 signature over the entire request by the address specified in the domain.
-  // Required if `address` is defined in the domain instance. If `address` is
-  // not defined in the domain instance, then a signature must not be provided.
+  /**
+   * EIP-712 signature over the entire request by the address specified in the domain.
+   * Required if `address` is defined in the domain instance. If `address` is
+   * not defined in the domain instance, then a signature must not be provided.
+   * Encoded as a hex string with leading 0x.
+   */
   signature: EIP712Optional<string>
-  // Used to prevent replay attacks. Required if a signature is provided.
+  /**
+   * Used to prevent replay attacks. Required if a signature is provided.
+   * Code verifying the signature for rate limiting should check this nonce against a counter of
+   * applied requests. E.g. Ensure the nonce is 0 on the first request and 2 on the third.
+   */
   nonce: EIP712Optional<number>
 }
 

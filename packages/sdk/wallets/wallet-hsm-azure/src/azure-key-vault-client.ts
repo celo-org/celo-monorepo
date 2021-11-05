@@ -123,7 +123,7 @@ export class AzureKeyVaultClient {
   public async hasKey(keyName: string): Promise<boolean> {
     try {
       await this.keyClient.getKey(keyName)
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('this is not a valid private key')) {
         return false
       }
@@ -153,7 +153,7 @@ export class AzureKeyVaultClient {
       }
 
       return signingKey
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('Key not found')) {
         throw new Error(`Key ${keyName} not found in KeyVault ${this.vaultName}`)
       }

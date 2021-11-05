@@ -365,7 +365,7 @@ export class Connection {
       )
       debugGasEstimation('estimatedGasWithInflationFactor: %s', gas)
       return gas
-    } catch (e) {
+    } catch (e: any) {
       throw new Error(e)
     }
   }

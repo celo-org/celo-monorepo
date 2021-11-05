@@ -158,7 +158,7 @@ describe('AwsHsmWallet class', () => {
     try {
       await wallet.getAddressFromKeyId('invalid')
       throw new Error('expected error to have been thrown')
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('Invalid keyId invalid')
     }
   })
@@ -189,7 +189,7 @@ describe('AwsHsmWallet class', () => {
         try {
           await wallet.getAddressFromKeyId(unknownKey)
           throw new Error('Expected exception to be thrown')
-        } catch (e) {
+        } catch (e: any) {
           expect(e.message).toMatch(
             new RegExp(`Key 'arn:aws:kms:.*:key/${unknownKey}' does not exist`)
           )
@@ -200,7 +200,7 @@ describe('AwsHsmWallet class', () => {
         try {
           await wallet.signTransaction(celoTransaction)
           throw new Error('Expected exception to be thrown')
-        } catch (e) {
+        } catch (e: any) {
           expect(e.message).toBe(`Could not find address ${unknownAddress}`)
         }
       })
@@ -210,7 +210,7 @@ describe('AwsHsmWallet class', () => {
         try {
           await wallet.signPersonalMessage(unknownAddress, hexStr)
           throw new Error('Expected exception to be thrown')
-        } catch (e) {
+        } catch (e: any) {
           expect(e.message).toBe(`Could not find address ${unknownAddress}`)
         }
       })
@@ -219,7 +219,7 @@ describe('AwsHsmWallet class', () => {
         try {
           await wallet.signTypedData(unknownAddress, TYPED_DATA)
           throw new Error('Expected exception to be thrown')
-        } catch (e) {
+        } catch (e: any) {
           expect(e.message).toBe(`Could not find address ${unknownAddress}`)
         }
       })

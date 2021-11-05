@@ -137,7 +137,7 @@ export async function handleGetAttestationRequest(
     await handler.withAttestationAndSecurityCodeChecked((attestation, attestationCode) => {
       respondWithAttestation(res, attestation, true, undefined, attestationCode)
     })
-  } catch (error) {
+  } catch (error: any) {
     if (!error.responseCode) {
       res.locals.logger.error({ error })
     } else {
