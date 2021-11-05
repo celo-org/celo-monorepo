@@ -1,4 +1,4 @@
-export * from './domains/sequential-delay'
+export * from './domains'
 export * from './interfaces'
 export { ErrorMessage, WarningMessage } from './interfaces/error-utils'
 export {

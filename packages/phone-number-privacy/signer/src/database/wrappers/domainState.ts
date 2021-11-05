@@ -1,4 +1,4 @@
-import { domainHash, KnownDomain } from '@celo/identity/lib/odis/domains'
+import { domainHash, KnownDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'

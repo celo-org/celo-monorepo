@@ -1,5 +1,5 @@
 import { Err, Ok, parseJsonAsResult, Result } from '@celo/base/lib/result'
-import { KnownDomain, KnownDomainSchema } from '@celo/identity/lib/odis/domains'
+import { KnownDomain, KnownDomainSchema } from '@celo/phone-number-privacy-common/lib/domains'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { chain, isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'

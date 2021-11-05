@@ -1,4 +1,9 @@
-import { Domain, domainHash, isKnownDomain, KnownDomain } from '@celo/identity/lib/odis/domains'
+import {
+  Domain,
+  domainHash,
+  isKnownDomain,
+  KnownDomain,
+} from '@celo/phone-number-privacy-common/lib/domains'
 import {
   DisableDomainRequest,
   DomainQuotaStatusRequest,

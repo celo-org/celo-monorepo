@@ -1,4 +1,9 @@
-import { Domain, domainHash, isKnownDomain, KnownDomain } from '@celo/identity/lib/odis/domains'
+import {
+  Domain,
+  domainHash,
+  isKnownDomain,
+  KnownDomain,
+} from '@celo/phone-number-privacy-common/lib/domains'
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import * as crypto from 'crypto'
 import { BackupError, InvalidBackupError } from './errors'
@@ -74,6 +79,7 @@ export function createBackup<D extends KnownDomain = never>(
   const nonce = crypto.randomBytes(16)
   let key = deriveKey(password, nonce)
 
+  // Generate a fuse key and mix it into the entropy of the key
   // TODO: Replace this with a proper circuit breaker impl.
   const fuseKey = crypto.randomBytes(16)
   key = deriveKey(key, fuseKey)

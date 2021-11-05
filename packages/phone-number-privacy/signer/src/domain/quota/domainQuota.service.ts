@@ -1,4 +1,4 @@
-import { isSequentialDelayDomain, KnownDomain } from '@celo/identity/lib/odis/domains'
+import { isSequentialDelayDomain, KnownDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import { ErrorMessage, SequentialDelayDomainState } from '@celo/phone-number-privacy-common'
 import { checkSequentialDelay } from '@celo/phone-number-privacy-common/lib/domains/sequential-delay'
 import Logger from 'bunyan'

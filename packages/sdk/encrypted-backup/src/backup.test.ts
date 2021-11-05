@@ -1,4 +1,7 @@
-import { DomainIdentifiers, SequentialDelayDomain } from '@celo/identity/lib/odis/domains'
+import {
+  DomainIdentifiers,
+  SequentialDelayDomain,
+} from '@celo/phone-number-privacy-common/lib/domains'
 import { defined, noBool, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import debugFactory from 'debug'
 import { createBackup, openBackup } from './backup'

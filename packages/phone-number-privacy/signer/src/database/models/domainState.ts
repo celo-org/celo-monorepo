@@ -1,4 +1,8 @@
-import { Domain, domainHash, isSequentialDelayDomain } from '@celo/identity/lib/odis/domains'
+import {
+  Domain,
+  domainHash,
+  isSequentialDelayDomain,
+} from '@celo/phone-number-privacy-common/lib/domains'
 import { SequentialDelayDomainState, WarningMessage } from '@celo/phone-number-privacy-common'
 
 export const DOMAINS_STATES_TABLE = 'domainsStates'

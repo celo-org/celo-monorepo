@@ -3,12 +3,16 @@
 import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { ContractKit } from '@celo/contractkit'
+import { AuthenticationMethod } from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import { ec as EC } from 'elliptic'
 
 const debug = debugFactory('kit:odis:query')
 const ec = new EC('secp256k1')
+
+// Re-export AuthenticationMethod to maintain backwards compatibility with versions <= 1.3.0
+export { AuthenticationMethod }
 
 export interface WalletKeySigner {
   authenticationMethod: AuthenticationMethod.WALLET_KEY
@@ -27,12 +31,6 @@ export interface CustomSigner {
 
 // Support signing with the DEK or with the
 export type AuthSigner = WalletKeySigner | EncryptionKeySigner | CustomSigner
-
-export enum AuthenticationMethod {
-  WALLET_KEY = 'wallet_key',
-  ENCRYPTION_KEY = 'encryption_key',
-  CUSTOM_SIGNER = 'custom_signer',
-}
 
 // TODO(victor) Requests here are duplicated in. They should be deduplicated.
 // https://github.com/celo-org/celo-monorepo/blob/d5a275b56ca62360d1da9d00d38870888c9dbada/packages/phone-number-privacy/common/src/interfaces/requests.ts#L4
