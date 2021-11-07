@@ -6,7 +6,7 @@ import {
 } from '../lib/compatibility/verify-bytecode'
 import { ProposalTx } from './truffle/make-release'
 
-const makeRelease3Changes = (releaseProposal: ProposalTx[]) => {
+const makeRelease6Changes = (releaseProposal: ProposalTx[]) => {
   const stableTokenBRLaddr = getProposedProxyAddress('StableTokenBRL', releaseProposal)
   const exchangeInitIndex = releaseProposal.findIndex((tx) =>
     isProxyRepointAndInitForIdTransaction(tx, 'ExchangeBRLProxy')
@@ -26,7 +26,7 @@ try {
     string: ['input_proposal', 'output_proposal'],
   })
   const releaseProposal: ProposalTx[] = readJsonSync(argv.input_proposal)
-  writeJsonSync(argv.output_proposal, makeRelease3Changes(releaseProposal), { spaces: 2 })
+  writeJsonSync(argv.output_proposal, makeRelease6Changes(releaseProposal), { spaces: 2 })
   // tslint:disable-next-line: no-console
   console.log(`Modifications made sucessfully; written to ${argv.output_proposal}`)
 } catch (e) {
