@@ -10,6 +10,7 @@ import { newElection } from './generated/Election'
 import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
+import { newExchangeBrl } from './generated/ExchangeBRL'
 import { newExchangeEur } from './generated/ExchangeEUR'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newFreezer } from './generated/Freezer'
@@ -45,6 +46,7 @@ export const ContractFactories = {
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.ExchangeEUR]: newExchangeEur,
+  [CeloContract.ExchangeBRL]: newExchangeBrl,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
@@ -60,6 +62,7 @@ export const ContractFactories = {
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
   [CeloContract.StableTokenEUR]: newStableToken,
+  [CeloContract.StableTokenBRL]: newStableToken,
   [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
 }
