@@ -370,13 +370,12 @@ contract LockedGold is
   ) external onlySlasher {
     uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
     require(maxSlash >= reward, "reward cannot exceed penalty.");
-    // `reporter` receives the reward in locked CELO, so must be an account
+    // `reporter` receives the reward in locked CELO, so it must be given to an account
     // There is no reward for slashing via the GovernanceSlasher, and `reporter`
     // is set to 0x0.
-    require(
-      getAccounts().isAccount(reporter) || reporter == address(0),
-      "reporter must be an account"
-    );
+    if (reporter != address(0)) {
+      reporter = getAccounts().signerToAccount(reporter);
+    }
     // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
     {
       uint256 nonvotingBalance = balances[account].nonvoting;

@@ -684,8 +684,31 @@ contract('LockedGold', (accounts: string[]) => {
           [0],
           { from: accounts[2] }
         ),
-        'reporter must be an account'
+        'Not an account'
       )
+    })
+
+    it('can be invoked by an account signer on behalf of the account', async () => {
+      const signerReporter = accounts[4]
+      const role = '0x0000000000000000000000000000000000000000000000000000000000001337'
+      await accountsInstance.authorizeSigner(signerReporter, role, { from: reporter })
+      await accountsInstance.completeSignerAuthorization(reporter, role, { from: signerReporter })
+      const penalty = value
+      const reward = value / 2
+
+      await lockedGold.slash(
+        account,
+        penalty,
+        signerReporter,
+        reward,
+        [NULL_ADDRESS],
+        [NULL_ADDRESS],
+        [0],
+        { from: accounts[2] }
+      )
+
+      assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward)
+      assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
     })
   })
 })
