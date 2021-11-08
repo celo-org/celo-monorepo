@@ -459,7 +459,7 @@ describe('Transfer tests', function (this: any) {
         })
         await res.waitReceipt()
         assert.fail('no error was thrown')
-      } catch (error) {
+      } catch (error: any) {
         assert.include(error.toString(), expectedError)
       }
     })
@@ -636,7 +636,7 @@ describe('Transfer tests', function (this: any) {
                               )
                               await res.waitReceipt()
                               assert.fail('no error was thrown')
-                            } catch (error) {
+                            } catch (error: any) {
                               assert.include(error.toString(), `Error: no suitable peers available`)
                             }
                           })
@@ -684,7 +684,7 @@ describe('Transfer tests', function (this: any) {
                     })
                     await res.getHash()
                     assert.fail('no error was thrown')
-                  } catch (error) {
+                  } catch (error: any) {
                     assert.include(error.toString(), 'Error: intrinsic gas too low')
                   }
                 })

@@ -151,7 +151,7 @@ export async function getAgeOfLatestBlockFromKit(k: ContractKit) {
         try {
           // Differentiate between errors with getBlock and timeouts
           latestBlock = await k!.connection.getBlock('latest')
-        } catch (error) {
+        } catch (error: any) {
           throw new Error(`Error fetching latest block: ${error.message}`)
         }
         const ageOfLatestBlock = Date.now() / 1000 - Number(latestBlock.timestamp)
@@ -164,7 +164,7 @@ export async function getAgeOfLatestBlockFromKit(k: ContractKit) {
       getBlockTimeout,
       new Error(`Timeout fetching block after ${getBlockTimeout} ms`)
     )
-  } catch (error) {
+  } catch (error: any) {
     rootLogger.warn(error.message)
     // On failure return values that should always be comparatively out-of-date
     return {
@@ -241,7 +241,7 @@ export async function initializeKits(force: boolean = false) {
     keystoreWalletWrapper = new KeystoreWalletWrapper(new FileKeystore(keystoreDirpath))
     try {
       await keystoreWalletWrapper.unlockAccount(signerAddress, keystorePassphrase)
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(
         `Unlocking keystore file for account ${signerAddress} failed: ` + error.message
       )
@@ -288,7 +288,7 @@ export async function startPeriodicKitsCheck() {
       // Only attempt to reinitialize undefined kits
       try {
         await initializeKits(false)
-      } catch (error) {
+      } catch (error: any) {
         rootLogger.error(`Periodic kits check failed: ${error.message}`)
       }
     }
