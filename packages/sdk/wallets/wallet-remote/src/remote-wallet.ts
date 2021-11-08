@@ -53,7 +53,7 @@ export abstract class RemoteWallet<TSigner extends Signer>
   /**
    * Discover accounts and store mapping in accountSigners
    */
-  protected abstract async loadAccountSigners(): Promise<Map<Address, TSigner>>
+  protected abstract loadAccountSigners(): Promise<Map<Address, TSigner>>
 
   /**
    * Get a list of accounts in the remote wallet

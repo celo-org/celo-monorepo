@@ -134,7 +134,7 @@ export async function isVerified(
       1.5,
       FULL_NODE_TIMEOUT_IN_MS
     )
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Failed to get verification status: ' + error.message)
     logger.warn('Assuming user is verified')
     return true

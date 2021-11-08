@@ -264,7 +264,7 @@ class TestEnv {
           const receipt = await (await this.kit.connection.sendSignedTransaction(tx)).waitReceipt()
           minedTx = await this.kit.web3.eth.getTransaction(receipt.transactionHash)
           error = null
-        } catch (err) {
+        } catch (err: any) {
           error = err.message
         }
       })
@@ -370,7 +370,7 @@ class TestEnv {
 
           minedTx = await k.web3.eth.getTransaction(txHash)
           error = null
-        } catch (err) {
+        } catch (err: any) {
           error = err.message
         }
       })
