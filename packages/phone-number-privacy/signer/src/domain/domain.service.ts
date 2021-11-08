@@ -2,6 +2,7 @@ import { Domain, domainHash, isKnownDomain, KnownDomain } from '@celo/identity/l
 import {
   DisableDomainRequest,
   DomainQuotaStatusRequest,
+  DomainRequest,
   DomainRestrictedSignatureRequest,
   DomainStatusResponse,
   ErrorMessage,
@@ -42,7 +43,7 @@ export class DomainService implements IDomainService {
 
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, response, Endpoints.DISABLE_DOMAIN, logger)) {
+    if (!this.inputValidation(domain, request, response, Endpoints.DISABLE_DOMAIN, logger)) {
       return
     }
 
@@ -87,7 +88,7 @@ export class DomainService implements IDomainService {
 
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
+    if (!this.inputValidation(domain, request, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
       return
     }
 
@@ -134,7 +135,7 @@ export class DomainService implements IDomainService {
 
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, response, Endpoints.DOMAIN_SIGN, logger)) {
+    if (!this.inputValidation(domain, request, response, Endpoints.DOMAIN_SIGN, logger)) {
       return
     }
     logger.info('Processing request to get domain signature ', {
@@ -191,11 +192,12 @@ export class DomainService implements IDomainService {
 
   private inputValidation(
     domain: Domain,
+    request: Request<{}, {}, DomainRequest>,
     response: Response,
     endpoint: Endpoints,
     logger: Logger
   ): domain is KnownDomain {
-    if (!this.authService.authCheck()) {
+    if (!this.authService.authCheck(request.body, endpoint)) {
       logger.warn(`Received unauthorized request to ${endpoint} `, {
         name: domain.name,
         version: domain.version,

@@ -1,3 +1,6 @@
+import { DomainRequest } from '@celo/phone-number-privacy-common'
+import { Endpoints } from '../../server'
+
 export interface IDomainAuthService {
-  authCheck(): boolean // TODO Add params
+  authCheck(domainRequest: DomainRequest, endpoint: Endpoints): boolean
 }

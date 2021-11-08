@@ -5,7 +5,6 @@ import {
   domainOptionsEIP712Types,
   KnownDomain,
   KnownDomainOptions,
-  SequentialDelayDomain,
 } from '@celo/identity/lib/odis/domains'
 import {
   EIP712Optional,
@@ -235,7 +234,7 @@ export function disableDomainRequestEIP712<D extends KnownDomain>(
  * @privateRemarks Function is currently defined explicitly in terms of SequentialDelayDomain. It
  * should be generalized to other authenticated domain types as they are standardized.
  */
-function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
+function verifyRequestSignature<R extends DomainRequest<KnownDomain>>(
   typedDataBuilder: (request: R) => EIP712TypedData,
   request: R
 ): boolean {
@@ -277,7 +276,7 @@ function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
  * to the undefined value for type EIP712Optional<string>).
  */
 export function verifyDomainRestrictedSignatureRequestSignature(
-  request: DomainRestrictedSignatureRequest<SequentialDelayDomain>
+  request: DomainRestrictedSignatureRequest<KnownDomain>
 ): boolean {
   return verifyRequestSignature(domainRestrictedSignatureRequestEIP712, request)
 }
@@ -291,7 +290,7 @@ export function verifyDomainRestrictedSignatureRequestSignature(
  * to the undefined value for type EIP712Optional<string>).
  */
 export function verifyDomainQuotaStatusRequestSignature(
-  request: DomainQuotaStatusRequest<SequentialDelayDomain>
+  request: DomainQuotaStatusRequest<KnownDomain>
 ): boolean {
   return verifyRequestSignature(domainQuotaStatusRequestEIP712, request)
 }
@@ -305,7 +304,7 @@ export function verifyDomainQuotaStatusRequestSignature(
  * to the undefined value for type EIP712Optional<string>).
  */
 export function verifyDisableDomainRequestSignature(
-  request: DisableDomainRequest<SequentialDelayDomain>
+  request: DisableDomainRequest<KnownDomain>
 ): boolean {
   return verifyRequestSignature(disableDomainRequestEIP712, request)
 }
