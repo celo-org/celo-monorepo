@@ -156,6 +156,14 @@ blockscout:
         memory: 250M
         cpu: 500m
     erlangNodeName: blockscout-web
+    appsMenu:
+      enabled: true
+      externalApps: '[{"url":"https://ubeswap.org/", "title":"Ubeswap"}, {"url":"https://moola.market/", "title":"Moola"}, {"url":"https://celoterminal.com/", "title":"Celo Terminal"}, {"url":"https://celovote.com/", "title":"Celo Vote"}, {"url":"https://celowallet.app/", "title":"Celo Wallet"}]'
+      bridges: '[{"url":"https://optics.xyz/", "title":"Optics"},{"url":"https://bridge.mobius.money/#/", "title": "Mobius"}]'
+      otherBridges: '[]'
+      bridgesAlm: '[]'
+      defiList: '[{"url":"https://docs.celo.org/", "title":"Celo Docs"}, {"url":"https://forum.celo.org/", "title":"Celo Forum"}, {"url":"https://thecelo.com/", "title":"The Celo"}, {"url":"https://stats.celo.org/", "title":"Celo Stats"}, {"url":"https://celoreserve.org/", "title":"Celo Reserve"}, {"url":"https://celo.org/validators/explore", "title":"Validators"}, {"url":"https://learn.figment.io/protocols/celo", "title":"Learn Celo"}]'
+      nftList: '[{"url":"https://unifty.io/celo/market.html ", "title":"Unifty"}]'
   image:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo
