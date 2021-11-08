@@ -14,8 +14,18 @@ USAGE
   $ celocli governance:build-proposal
 
 OPTIONS
-  --globalHelp     View all available global flags
-  --output=output  (required) Path to output
+  --afterExecutingID=afterExecutingID              Governance proposal identifier which
+                                                   will be executed prior to proposal
+                                                   being built
+
+  --afterExecutingProposal=afterExecutingProposal  Path to proposal which will be
+                                                   executed prior to proposal being
+                                                   built
+
+  --globalHelp                                     View all available global flags
+
+  --output=output                                  [default: proposalTransactions.json]
+                                                   Path to output
 
 EXAMPLE
   build-proposal --output ./transactions.json
@@ -183,6 +193,13 @@ USAGE
   $ celocli governance:propose
 
 OPTIONS
+  --afterExecutingID=afterExecutingID                Governance proposal identifier
+                                                     which will be executed prior to
+                                                     proposal
+
+  --afterExecutingProposal=afterExecutingProposal    Path to proposal which will be
+                                                     executed prior to proposal
+
   --deposit=deposit                                  (required) Amount of Gold to attach
                                                      to proposal
 
@@ -238,23 +255,32 @@ USAGE
   $ celocli governance:show
 
 OPTIONS
-  --account=account                    Address of account or voter
-  --globalHelp                         View all available global flags
-  --hotfix=hotfix                      Hash of hotfix proposal
-  --jsonTransactions=jsonTransactions  Output proposal JSON to provided file
+  --account=account                                Address of account or voter
 
-  --nonwhitelisters                    If set, displays validators that have not
-                                       whitelisted the hotfix.
+  --afterExecutingID=afterExecutingID              Governance proposal identifier which
+                                                   will be executed prior to proposal
 
-  --notwhitelisted                     List validators who have not whitelisted the
-                                       specified hotfix
+  --afterExecutingProposal=afterExecutingProposal  Path to proposal which will be
+                                                   executed prior to proposal
 
-  --proposalID=proposalID              UUID of proposal to view
+  --globalHelp                                     View all available global flags
 
-  --raw                                Display proposal in raw bytes format
+  --hotfix=hotfix                                  Hash of hotfix proposal
 
-  --whitelisters                       If set, displays validators that have whitelisted
-                                       the hotfix.
+  --jsonTransactions=jsonTransactions              Output proposal JSON to provided file
+
+  --nonwhitelisters                                If set, displays validators that have
+                                                   not whitelisted the hotfix.
+
+  --notwhitelisted                                 List validators who have not
+                                                   whitelisted the specified hotfix
+
+  --proposalID=proposalID                          UUID of proposal to view
+
+  --raw                                            Display proposal in raw bytes format
+
+  --whitelisters                                   If set, displays validators that have
+                                                   whitelisted the hotfix.
 
 ALIASES
   $ celocli governance:show

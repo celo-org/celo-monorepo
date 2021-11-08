@@ -117,8 +117,8 @@ class GitHub {
   }
 
   async fetchKnownFlakesToSkip() {
-    const flakeIssues = await this.fetchFlakeIssues()
-    const mandatoryTests = await this.fetchMandatoryTestsForPR()
+    const flakeIssues = await this.fetchFlakeIssues().catch(() => [])
+    const mandatoryTests = await this.fetchMandatoryTestsForPR().catch(() => [])
     const knownFlakesToSkip = flakeIssues.filter(
       // We filter out issues that have been referenced in the PR body or that correspond to
       // setup/teardown steps rather than actual tests.

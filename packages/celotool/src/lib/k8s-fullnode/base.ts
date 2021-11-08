@@ -7,6 +7,7 @@ import { generatePrivateKeyWithDerivations, privateKeyToPublicKey } from '../gen
 import {
   deletePersistentVolumeClaims,
   installGenericHelmChart,
+  isCelotoolHelmDryRun,
   removeGenericHelmChart,
   upgradeGenericHelmChart,
 } from '../helm_deploy'
@@ -63,24 +64,33 @@ export abstract class BaseFullNodeDeployer {
   // If the node key is generated, then a promise containing the enodes is returned.
   // Otherwise, the enode cannot be calculated deterministically so a Promise<void> is returned.
   async upgradeChart(context: string, reset: boolean): Promise<string[] | void> {
-    if (reset) {
-      await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, 0)
-      await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
+    if (isCelotoolHelmDryRun()) {
+      await upgradeGenericHelmChart(
+        this.kubeNamespace,
+        this.releaseName,
+        helmChartPath,
+        await this.helmParameters(context)
+      )
+    } else {
+      if (reset) {
+        await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, 0)
+        await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
+      }
+
+      await upgradeGenericHelmChart(
+        this.kubeNamespace,
+        this.releaseName,
+        helmChartPath,
+        await this.helmParameters(context)
+      )
+
+      await scaleResource(
+        this.celoEnv,
+        'StatefulSet',
+        `${this.celoEnv}-fullnodes`,
+        this._deploymentConfig.replicas
+      )
     }
-
-    await upgradeGenericHelmChart(
-      this.kubeNamespace,
-      this.releaseName,
-      helmChartPath,
-      await this.helmParameters(context)
-    )
-
-    await scaleResource(
-      this.celoEnv,
-      'StatefulSet',
-      `${this.celoEnv}-fullnodes`,
-      this._deploymentConfig.replicas
-    )
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
       return this.getEnodes()
     }
@@ -158,9 +168,9 @@ export abstract class BaseFullNodeDeployer {
     )
   }
 
-  abstract async additionalHelmParameters(): Promise<string[]>
-  abstract async deallocateAllIPs(): Promise<void>
-  abstract async getFullNodeIP(index: number): Promise<string>
+  abstract additionalHelmParameters(): Promise<string[]>
+  abstract deallocateAllIPs(): Promise<void>
+  abstract getFullNodeIP(index: number): Promise<string>
 
   get releaseName() {
     return `${this.celoEnv}-fullnodes`

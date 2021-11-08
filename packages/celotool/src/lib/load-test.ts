@@ -112,6 +112,7 @@ async function helmParameters(
     `--set threads=${threads}`,
     `--set genesis.useGenesisFileBase64=false`,
     `--set genesis.network=${celoEnv}`,
+    `--set use_random_recipient=${fetchEnv(envVar.LOAD_TEST_USE_RANDOM_RECIPIENT)}`,
     `--set reuse_light_clients=true`,
   ]
 }

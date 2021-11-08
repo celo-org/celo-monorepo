@@ -28,6 +28,7 @@ type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
 interface SignerService {
   url: string
+  fallbackUrl?: string
 }
 
 interface SignMsgRespWithStatus {
@@ -36,10 +37,7 @@ interface SignMsgRespWithStatus {
   status: number
 }
 
-export async function handleGetBlindedMessageSig(
-  request: Request<{}, {}, GetBlindedMessageSigRequest>,
-  response: Response
-) {
+export async function handleGetBlindedMessageSig(request: Request, response: Response) {
   const logger: Logger = response.locals.logger
 
   try {
@@ -310,8 +308,24 @@ function requestSignature(
   controller: AbortController,
   logger: Logger
 ): Promise<FetchResponse> {
-  logger.debug({ signer: service.url }, `Requesting partial sig`)
-  const url = service.url + PARTIAL_SIGN_MESSAGE_ENDPOINT
+  return parameterizedSignatureRequest(service.url, request, controller, logger).catch((e) => {
+    logger.error(`Signer failed with primary url ${service.url}`, e)
+    if (service.fallbackUrl) {
+      logger.warn(`Using fallback url to call signer ${service.fallbackUrl!}`)
+      return parameterizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
+    }
+    throw e
+  })
+}
+
+function parameterizedSignatureRequest(
+  baseUrl: string,
+  request: Request,
+  controller: AbortController,
+  logger: Logger
+): Promise<FetchResponse> {
+  logger.debug({ signer: baseUrl }, `Requesting partial sig`)
+  const url = baseUrl + PARTIAL_SIGN_MESSAGE_ENDPOINT
   return fetch(url, {
     method: 'POST',
     headers: {
