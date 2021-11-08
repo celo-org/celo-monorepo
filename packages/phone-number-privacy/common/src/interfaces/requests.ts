@@ -263,9 +263,9 @@ function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
   request: R
 ): boolean {
   // If the address field is undefined, then this domain is unauthenticated.
-  // Return true as the signature does not need to be checked.
+  // Return false as the signature cannot need to be checked.
   if (!request.domain.address.defined) {
-    return true
+    return false
   }
   const signer = request.domain.address.value
 
@@ -293,7 +293,7 @@ function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
 
 /**
  * Verifies the signature over a signature request for authenticated domains.
- * If the domain is unauthenticated, this function returns true.
+ * If the domain is unauthenticated, this function returns false.
  *
  * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
@@ -307,7 +307,7 @@ export function verifyDomainRestrictedSignatureRequestSignature(
 
 /**
  * Verifies the signature over a domain quota status request for authenticated domains.
- * If the domain is unauthenticated, this function returns true.
+ * If the domain is unauthenticated, this function returns false.
  *
  * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
@@ -321,7 +321,7 @@ export function verifyDomainQuotaStatusRequestSignature(
 
 /**
  * Verifies the signature over a disable domain request for authenticated domains.
- * If the domain is unauthenticated, this function returns true.
+ * If the domain is unauthenticated, this function returns false.
  *
  * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
