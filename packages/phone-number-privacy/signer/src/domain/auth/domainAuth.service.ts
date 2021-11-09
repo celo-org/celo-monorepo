@@ -9,6 +9,7 @@ import {
   verifyDomainRestrictedSignatureRequestSignature,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
+import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
 import { Endpoints } from '../../server'
 import { IDomainAuthService } from './domainAuth.interface'
 
@@ -33,6 +34,21 @@ export class DomainAuthService implements IDomainAuthService {
     } catch (e) {
       logger.error('Error during authentication', e)
       return false
+    }
+  }
+
+  public nonceCheck(
+    domainRequest: DomainRequest<KnownDomain>,
+    domainState: DomainState,
+    logger: Logger
+  ): boolean {
+    const nonce = domainRequest?.options?.nonce
+    const currentNonce = domainState[DOMAINS_STATES_COLUMNS.counter]
+    if (currentNonce) {
+      return nonce.defined && nonce.value === currentNonce
+    } else {
+      logger.info('Counter is undefined')
+      return true
     }
   }
 }

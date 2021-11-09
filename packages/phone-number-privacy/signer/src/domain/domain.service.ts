@@ -55,6 +55,10 @@ export class DomainService implements IDomainService {
     const trx = await getTransaction()
     try {
       const domainState = await getDomainStateWithLock(domain, trx, logger)
+      if (!this.nonceCheck(request, domainState, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
+        return
+      }
+
       if (!domainState) {
         // If the domain is not currently recorded in the state database, add it now.
         await insertDomainState(DomainState.createEmptyDomainState(domain), trx, logger)
@@ -99,6 +103,10 @@ export class DomainService implements IDomainService {
     })
     try {
       const domainState = await getDomainState(domain, logger)
+      if (!this.nonceCheck(request, domainState, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
+        return
+      }
+
       let resultResponse: DomainStatusResponse
       if (domainState) {
         resultResponse = {
@@ -147,6 +155,10 @@ export class DomainService implements IDomainService {
     const trx = await getTransaction()
     try {
       let domainState = await getDomainStateWithLock(domain, trx, logger)
+      if (!this.nonceCheck(request, domainState, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
+        return
+      }
+
       if (!domainState) {
         domainState = await insertDomainState(
           DomainState.createEmptyDomainState(domain),
@@ -215,6 +227,20 @@ export class DomainService implements IDomainService {
       return false
     }
 
+    return true
+  }
+
+  private nonceCheck(
+    request: Request<{}, {}, DomainRequest>,
+    domainState: DomainState | null,
+    response: Response,
+    endpoint: Endpoints,
+    logger: Logger
+  ): boolean {
+    if (domainState && !this.authService.nonceCheck(request.body, domainState, logger)) {
+      respondWithError(endpoint, response, 403, WarningMessage.UNAUTHENTICATED_USER)
+      return false
+    }
     return true
   }
 }

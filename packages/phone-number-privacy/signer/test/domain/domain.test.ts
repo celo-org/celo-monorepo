@@ -32,7 +32,7 @@ describe('Domain service tests', () => {
   })
 
   it('Should respond with 403 on failed auth', async () => {
-    when(authServiceMock.authCheck(anything(), anything())).thenReturn(false)
+    when(authServiceMock.authCheck(anything(), anything(), anything())).thenReturn(false)
     when(responseMock.status(403)).thenReturn(response)
     request.body = { domain: 'domain' }
 
@@ -42,7 +42,7 @@ describe('Domain service tests', () => {
   })
 
   it('Should respond with 404 on unknown domain', async () => {
-    when(authServiceMock.authCheck(anything(), anything())).thenReturn(true)
+    when(authServiceMock.authCheck(anything(), anything(), anything())).thenReturn(true)
     when(responseMock.status(404)).thenReturn(response)
     request.body = { domain: 'Some unknown domain' }
 
