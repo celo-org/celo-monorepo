@@ -1,5 +1,7 @@
 import GetAttestations from './get-attestations'
 
+process.env.NO_SYNCCHECK = 'true'
+
 describe('identity:get-attetstations', () => {
   describe('input validation correctly outputs errors', () => {
     const consoleOutput: string[] = []

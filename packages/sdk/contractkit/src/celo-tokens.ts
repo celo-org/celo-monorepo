@@ -227,6 +227,8 @@ export class CeloTokens {
    * @return an promise resolving to the wrapper for the token
    */
   getWrapper(token: StableToken): Promise<StableTokenWrapper>
+  getWrapper(token: Token): Promise<GoldTokenWrapper>
+  getWrapper(token: CeloTokenType): Promise<CeloTokenWrapper>
   getWrapper(token: CeloTokenType): Promise<CeloTokenWrapper> {
     return this.kit.contracts.getContract(celoTokenInfos[token].contract)
   }
@@ -255,13 +257,8 @@ export class CeloTokens {
    * @param token the token to get the (proxy) contract address for
    * @return A promise resolving to the address of the token's contract
    */
-  getAddress(token: CeloTokenType) {
-    try {
-      return this.kit.registry.addressFor(celoTokenInfos[token].contract)
-    } catch {
-      throw new Error(`${token} token not deployed yet in the chain`)
-    }
-  }
+  getAddress = (token: CeloTokenType) =>
+    this.kit.registry.addressFor(celoTokenInfos[token].contract)
 
   /**
    * Gets the address to use as the feeCurrency when paying for gas with the
