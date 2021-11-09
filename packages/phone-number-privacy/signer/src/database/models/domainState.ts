@@ -31,10 +31,10 @@ export class DomainState {
   [DOMAINS_STATES_COLUMNS.timer]: number | undefined;
   [DOMAINS_STATES_COLUMNS.disabled]: boolean
 
-  constructor(domainState: SequentialDelayDomainState) {
-    this[DOMAINS_STATES_COLUMNS.domainHash] = domainState[DOMAINS_STATES_COLUMNS.domainHash]
-    this[DOMAINS_STATES_COLUMNS.counter] = domainState[DOMAINS_STATES_COLUMNS.counter]
-    this[DOMAINS_STATES_COLUMNS.timer] = domainState[DOMAINS_STATES_COLUMNS.timer]
-    this[DOMAINS_STATES_COLUMNS.disabled] = domainState[DOMAINS_STATES_COLUMNS.disabled]
+  constructor(domainHash: string, domainState: SequentialDelayDomainState) {
+    this[DOMAINS_STATES_COLUMNS.domainHash] = domainHash
+    this[DOMAINS_STATES_COLUMNS.counter] = domainState.counter
+    this[DOMAINS_STATES_COLUMNS.timer] = domainState.timer
+    this[DOMAINS_STATES_COLUMNS.disabled] = domainState.disabled
   }
 }

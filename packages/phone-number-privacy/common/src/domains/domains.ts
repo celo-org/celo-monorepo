@@ -13,6 +13,7 @@ import {
   SequentialDelayDomainOptions,
   sequentialDelayDomainOptionsEIP712Types,
   SequentialDelayDomainSchema,
+  SequentialDelayDomainState,
 } from './sequential-delay'
 
 // Concrete Domain subtypes are only assignable to Domain and EIP712Object when using type instead
@@ -68,6 +69,15 @@ export function isKnownDomain(domain: Domain): domain is KnownDomain {
 export type KnownDomainOptions<
   D extends KnownDomain = KnownDomain
 > = D extends SequentialDelayDomain ? SequentialDelayDomainOptions : never
+
+/**
+ * Parameterized union type of currently implemented and standarized domain state structs. If the
+ * type parameter is specified to be a concrete Domain subtype, then only its associated
+ * Domain state type is selected and assignable to the parameterized type.
+ */
+export type KnownDomainState<D extends KnownDomain = KnownDomain> = D extends SequentialDelayDomain
+  ? SequentialDelayDomainState
+  : never
 
 export function domainEIP712Types(domain: KnownDomain): EIP712TypesWithPrimary {
   if (isSequentialDelayDomain(domain)) {

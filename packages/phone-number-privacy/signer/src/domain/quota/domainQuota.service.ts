@@ -1,5 +1,5 @@
 import { isSequentialDelayDomain, KnownDomain } from '@celo/phone-number-privacy-common/lib/domains'
-import { ErrorMessage, SequentialDelayDomainState } from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import { checkSequentialDelay } from '@celo/phone-number-privacy-common/lib/domains/sequential-delay'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'
@@ -36,7 +36,7 @@ export class DomainQuotaService implements IDomainQuotaService {
     if (!result.accepted || !result.state) {
       return { sufficient: false, newState: domainState }
     }
-    const newState: SequentialDelayDomainState = {
+    const newState: DomainState = {
       timer: result.state.timer,
       counter: result.state.counter,
       domainHash: domainState[DOMAINS_STATES_COLUMNS.domainHash],

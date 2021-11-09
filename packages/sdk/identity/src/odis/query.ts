@@ -9,6 +9,8 @@ import {
   GetContactMatchesRequest,
   GetContactMatchesResponse,
   PhoneNumberPrivacyRequest,
+  DomainRequest,
+  KnownDomain,
 } from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
@@ -16,6 +18,10 @@ import { ec as EC } from 'elliptic'
 
 const debug = debugFactory('kit:odis:query')
 const ec = new EC('secp256k1')
+
+export interface NoSigner {
+  authenticationMethod: AuthenticationMethod.NONE
+}
 
 export interface WalletKeySigner {
   authenticationMethod: AuthenticationMethod.WALLET_KEY
@@ -33,7 +39,7 @@ export interface CustomSigner {
 }
 
 // Support signing with the DEK or with the
-export type AuthSigner = WalletKeySigner | EncryptionKeySigner | CustomSigner
+export type AuthSigner = WalletKeySigner | EncryptionKeySigner | CustomSigner | NoSigner
 
 // Re-export types and aliases to maintain backwards compatibility.
 export { AuthenticationMethod, PhoneNumberPrivacyRequest }
@@ -47,7 +53,7 @@ export interface CombinerSignMessageResponse {
   success: boolean
   combinedSignature: string
 }
-// CombinerSignMessageResponse is exported as SignMessageResponse for backwards compatibility.
+/** @deprecated Exported as SignMessageResponse for backwards compatibility. */
 export type SignMessageResponse = CombinerSignMessageResponse
 
 export enum ErrorMessages {
@@ -112,23 +118,25 @@ export function signWithDEK(message: string, signer: EncryptionKeySigner) {
  */
 export async function queryOdis<ResponseType>(
   signer: AuthSigner,
-  body: PhoneNumberPrivacyRequest,
+  body: PhoneNumberPrivacyRequest | DomainRequest<KnownDomain>,
   context: ServiceContext,
   endpoint: string
-) {
+): Promise<ResponseType> {
   debug(`Posting to ${endpoint}`)
 
   // Sign payload using account privkey
   const bodyString = JSON.stringify(body)
 
-  let authHeader = ''
+  let signature: string | undefined
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    authHeader = signWithDEK(bodyString, signer as EncryptionKeySigner)
+    signature = signWithDEK(bodyString, signer as EncryptionKeySigner)
   } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
-    authHeader = await signer.contractKit.connection.sign(bodyString, body.account)
-  } else {
-    authHeader = await signer.customSigner(bodyString)
+    const account = (body as PhoneNumberPrivacyRequest).account
+    signature = await signer.contractKit.connection.sign(bodyString, account)
+  } else if (signer.authenticationMethod === AuthenticationMethod.CUSTOM_SIGNER) {
+    signature = await signer.customSigner(bodyString)
   }
+  const authHeader = signature !== undefined ? { Authorization: signature } : undefined
 
   const { odisUrl } = context
 
@@ -146,7 +154,7 @@ export async function queryOdis<ResponseType>(
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
-          Authorization: authHeader,
+          ...authHeader,
         },
         body: bodyString,
       })

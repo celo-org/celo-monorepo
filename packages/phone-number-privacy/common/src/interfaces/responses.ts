@@ -1,4 +1,4 @@
-import { Domain } from '../../src/domains'
+import { KnownDomainState } from '../../src/domains'
 
 export interface SignMessageResponse {
   success: boolean
@@ -33,9 +33,47 @@ export interface GetContactMatchesResponse {
   version: string
 }
 
-export interface DomainStatusResponse {
-  domain: Domain
-  counter: number
-  disabled: boolean
-  timer: number
+export interface DomainRestrictedSignatureResponseSuccess {
+  success: true
+  version: string
+  signature: string
 }
+
+export interface DomainRestrictedSignatureResponseFailure {
+  success: false
+  version: string
+  error: string
+}
+
+export type DomainRestrictedSignatureResponse =
+  | DomainRestrictedSignatureResponseSuccess
+  | DomainRestrictedSignatureResponseFailure
+
+export interface DomainQuotaStatusResponseSuccess {
+  success: true
+  version: string
+  status: KnownDomainState
+}
+
+export interface DomainQuotaStatusResponseFailure {
+  success: false
+  version: string
+  error: string
+}
+
+export type DomainQuotaStatusResponse =
+  | DomainQuotaStatusResponseSuccess
+  | DomainQuotaStatusResponseFailure
+
+export interface DisableDomainResponseSuccess {
+  success: true
+  version: string
+}
+
+export interface DisableDomainResponseFailure {
+  success: false
+  version: string
+  error: string
+}
+
+export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure

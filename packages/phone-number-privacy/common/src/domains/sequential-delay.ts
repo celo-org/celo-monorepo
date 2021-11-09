@@ -128,16 +128,18 @@ export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
   primaryType: 'SequentialDelayDomainOptions',
 }
 
-export interface SequentialDelayResult {
-  accepted: boolean
-  state?: SequentialDelayState
+export interface SequentialDelayDomainState {
+  /** Timestamp used for deciding when the next request will be accepted. */
+  timer: number
+  /** Number of queries that have been accepted for the SequentialDelayDomain instance. */
+  counter: number
+  /** Whether or not the domain has been disabled. If disabled, no more queries will be served */
+  disabled: boolean
 }
 
-export interface SequentialDelayState {
-  // Timestamp used for deciding when the next request will be accepted.
-  timer: number
-  // Number of queries that have been accepted for the SequentialDelayDomain instance.
-  counter: number
+export interface SequentialDelayResult {
+  accepted: boolean
+  state: SequentialDelayDomainState | undefined
 }
 
 interface IndexedSequentialDelayStage extends SequentialDelayStage {
@@ -156,8 +158,13 @@ interface IndexedSequentialDelayStage extends SequentialDelayStage {
 export const checkSequentialDelay = (
   domain: SequentialDelayDomain,
   attemptTime: number,
-  state?: SequentialDelayState
+  state?: SequentialDelayDomainState
 ): SequentialDelayResult => {
+  // If the domain has been disabled, all queries are to be rejected.
+  if (state?.disabled ?? false) {
+    return { accepted: false, state }
+  }
+
   // If no state is available (i.e. this is the first request against the domain) use the initial state.
   const counter = state?.counter ?? 0
   const timer = state?.timer ?? 0
@@ -182,6 +189,7 @@ export const checkSequentialDelay = (
     state: {
       counter: counter + 1,
       timer: resetTimer ? attemptTime : notBefore,
+      disabled: state?.disabled ?? false,
     },
   }
 }

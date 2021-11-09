@@ -1,6 +1,7 @@
 import {
   authenticateUser,
   ErrorMessage,
+  GetBlindedMessageSigRequest,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
@@ -25,13 +26,7 @@ import { getRemainingQueryCount } from './query-quota'
 
 allSettled.shim()
 
-export interface GetBlindedMessagePartialSigRequest {
-  account: string
-  blindedQueryPhoneNumber: string
-  hashedPhoneNumber?: string
-  timestamp?: number
-  sessionID?: string
-}
+export type GetBlindedMessagePartialSigRequest = GetBlindedMessageSigRequest
 
 export async function handleGetBlindedMessagePartialSig(
   request: Request<{}, {}, GetBlindedMessagePartialSigRequest>,

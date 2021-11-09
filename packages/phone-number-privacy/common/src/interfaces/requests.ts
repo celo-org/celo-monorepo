@@ -16,6 +16,7 @@ import {
 } from '../../src/domains'
 
 export enum AuthenticationMethod {
+  NONE = 'none',
   WALLET_KEY = 'wallet_key',
   ENCRYPTION_KEY = 'encryption_key',
   CUSTOM_SIGNER = 'custom_signer',
