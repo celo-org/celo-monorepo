@@ -108,11 +108,12 @@ export class TwilioVerifyProvider extends TwilioSmsProvider {
         requestParams.locale = locale
       }
     }
+    let deliveryId: string
     try {
       const m = await this.client.verify
         .services(this.verifyServiceSid)
         .verifications.create(requestParams)
-      return m.sid
+      deliveryId = m.sid
     } catch (e) {
       // Verify landlines using voice
       if (
@@ -124,10 +125,24 @@ export class TwilioVerifyProvider extends TwilioSmsProvider {
         const m = await this.client.verify
           .services(this.verifyServiceSid)
           .verifications.create(requestParams)
-        return m.sid
+        deliveryId = m.sid
       } else {
         throw e
       }
+    }
+    try {
+      // Change status of verification to ensure unique delivery IDs are created
+      await this.client.verify
+        .services(this.verifyServiceSid)
+        .verifications(deliveryId)
+        .update({ status: 'canceled' })
+    } catch {
+      // This shouldn't throw a hard error though as this is to prevent a tiny edge case:
+      // >5 Verify requests to the same phone number in <10 min.
+      // At this point, the text has been sent; .
+      // throw new Error(`Canceling Verify SID ${deliveryId} failed with message ${e}`)
+    } finally {
+      return deliveryId
     }
   }
 }
