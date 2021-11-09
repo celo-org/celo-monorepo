@@ -67,6 +67,39 @@ yarn run upload-artifacts -n NAME
 
 By default, `NAME` will be set as `RELEASE_NAME`, `NAMESPACE_NAME`, `TESTNET_NAME` which you should have used with the same name in prior instructions. If you used separate names for the above, you can customize the run with the `-r -n -t` flags respectively.
 
+### Console
+
+To start a truffle console run:
+```
+yarn console -f -n rc1
+```
+
+Options:
+- "-f" for Forno mode, otherwise there needs to be a node running at localhost:8585
+- "-n <network>" possible values are: "rc1", "alfajores", "baklava"
+
+All compiled assets from `build/contracts` are injected in scope so for example you can do:
+
+```
+truffle(rc1)> let exchange = await ExchangeEUR.at("0xE383394B913d7302c49F794C7d3243c429d53D1d")
+```
+To instantiate a contract at a known address, and then interact with it:
+
+```
+truffle(rc1)> exchange.getBuyAndSellBuckets(true)
+Result {
+  '0': <BN: 744b931719b5411d57c3>,
+  '1': <BN: 17105bfef1e6943fd144> }
+
+```
+
+Or you can use ContractKit:
+
+```
+truffle(rc1)> let kit = require('@celo/contractkit').newKitFromWeb3(web3)
+truffle(rc1)> let exchange = await kit.contracts.getExchange()
+```
+
 ### Testing
 
 To test the smart contracts, run:
@@ -76,3 +109,28 @@ yarn run test
 ```
 
 Adding the optional `--gas` flag will print out a report of contract gas usage.
+
+
+To test a single smart contract, run:
+```bash
+yarn run test ${contract name}
+```
+Adding the optional `--gas` flag will print out a report of contract gas usage.
+
+For quick test iterations run:
+```bash
+yarn run quicktest
+```
+
+or for a single contract:
+```bash
+yarn run quicktest ${contract name}
+```
+
+For `quicktest` to work correctly a contract's migration dependencies have to be uncommented in `scripts/bash/backupmigrations.sh`.
+
+Compared to the normal test command, quicktest will:
+1. Not run the pretest script of building solidity (will still be run as part of truffle test) and compiling typescript. This works because truffle can run typescript "natively".
+2. Only migrate selected migrations as set in `backupmigrations.sh` (you'll likely need at least one compilation step since truffle seems to only run compiled migrations)
+
+

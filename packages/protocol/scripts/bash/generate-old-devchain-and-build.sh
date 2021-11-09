@@ -30,7 +30,7 @@ done
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
 echo "- Checkout source code at $BRANCH"
-git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*' 2>>$LOG_FILE >> $LOG_FILE
+git fetch origin +'refs/tags/core-contracts.*:refs/tags/core-contracts.*' 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build contract artifacts"
@@ -48,3 +48,5 @@ fi
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
+
+git checkout -

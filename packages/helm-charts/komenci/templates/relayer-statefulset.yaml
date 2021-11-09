@@ -104,7 +104,7 @@ spec:
             ADDRESSES={{- range $index, $identity := .Values.relayer.identities -}}{{ $identity.address }},{{- end }}
             export WALLET_ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
             
-            node dist/apps/relayer/main.js
+            node packages/apps/relayer/dist/main.js
         env:
         - name: REPLICA_NAME
           valueFrom:
@@ -122,6 +122,7 @@ spec:
 {{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.environment "value_name" "network") | indent 8 }}
 {{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.relayer "value_name" "walletType") | indent 8 }}
 {{ include "common.env-var" (dict "name" "GAS_PRICE_UPDATE_INTERVAL_MS" "dict" .Values.relayer "value_name" "gasPriceUpdateIntervalMs") | indent 8 }}
+{{ include "common.env-var" (dict "name" "GAS_PRICE_MULTIPLIER" "dict" .Values.relayer "value_name" "gasPriceMultiplier") | indent 8 }}
         readinessProbe:
           tcpSocket:
             port: 3000
@@ -132,11 +133,3 @@ spec:
             port: 3000
           initialDelaySeconds: 15
           periodSeconds: 20
-        volumeMounts:
-        - name: private-key-volume
-          readOnly: true
-          mountPath: "/private-keys"
-      volumes:
-        - name: private-key-volume
-          secret:
-            secretName: pkey-secret

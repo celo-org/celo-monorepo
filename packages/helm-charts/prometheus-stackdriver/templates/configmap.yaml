@@ -24,42 +24,47 @@ data:
     global:
       scrape_interval: 60s
       evaluation_interval: 5s
+      # Label the metrics with a custom label if using multiple prometheus for same environments
+      external_labels:
+        cluster_name: {{ .Values.cluster }}
+
+    {{- if .Values.remote_write }}
+    remote_write:
+      - basic_auth:
+          password: {{ .Values.remote_write.basic_auth.password }}
+          username: {{ .Values.remote_write.basic_auth.username }}
+        url: {{ .Values.remote_write.url }}
+        write_relabel_configs:
+        - action: {{ .Values.remote_write.write_relabel_configs.action }}
+          regex: {{ .Values.remote_write.write_relabel_configs.regex }}
+          source_labels: {{ .Values.remote_write.write_relabel_configs.source_labels }}
+    {{- end }}
 
     scrape_configs:
       - job_name: 'prometheus'
         scrape_interval: 20s
         static_configs:
           - targets: ['localhost:9090']
-      - job_name: 'kubernetes-apiservers'
 
+      - job_name: 'kubernetes-apiservers'
         kubernetes_sd_configs:
         - role: endpoints
         scheme: https
-
         tls_config:
           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
         relabel_configs:
         - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
           action: keep
           regex: default;kubernetes;https
-        - source_labels: [__name__]
-          regex: .*
-          replacement: '{{ .Values.cluster }}'
-          target_label: cluster_name
 
       - job_name: 'kubernetes-nodes'
-
         scheme: https
-
         tls_config:
           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
         kubernetes_sd_configs:
         - role: node
-
         relabel_configs:
         - action: labelmap
           regex: __meta_kubernetes_node_label_(.+)
@@ -69,17 +74,10 @@ data:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/${1}/proxy/metrics
-        - source_labels: [__name__]
-          regex: .*
-          replacement: '{{ .Values.cluster }}'
-          target_label: cluster_name
-
 
       - job_name: 'kubernetes-pods'
-
         kubernetes_sd_configs:
         - role: pod
-
         relabel_configs:
         - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
           action: keep
@@ -101,22 +99,14 @@ data:
         - source_labels: [__meta_kubernetes_pod_name]
           action: replace
           target_label: kubernetes_pod_name
-        - source_labels: [__name__]
-          regex: .*
-          replacement: '{{ .Values.cluster }}'
-          target_label: cluster_name
 
       - job_name: 'kubernetes-cadvisor'
-
         scheme: https
-
         tls_config:
           ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
         kubernetes_sd_configs:
         - role: node
-
         relabel_configs:
         - action: labelmap
           regex: __meta_kubernetes_node_label_(.+)
@@ -126,16 +116,10 @@ data:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
-        - source_labels: [__name__]
-          regex: .*
-          replacement: '{{ .Values.cluster }}'
-          target_label: cluster_name
 
       - job_name: 'kubernetes-service-endpoints'
-
         kubernetes_sd_configs:
         - role: endpoints
-
         relabel_configs:
         - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
           action: keep
@@ -161,10 +145,6 @@ data:
         - source_labels: [__meta_kubernetes_service_name]
           action: replace
           target_label: kubernetes_name
-        - source_labels: [__name__]
-          regex: .*
-          replacement: '{{ .Values.cluster }}'
-          target_label: cluster_name
 {{- range .Values.gcloud.gceScrapeZones }}
       - job_name: 'gce-instances-{{ . }}'
 

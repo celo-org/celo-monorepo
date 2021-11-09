@@ -7,6 +7,7 @@
     "location": "packages/attestation-service",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/keystores",
       "@celo/utils"
     ]
   },
@@ -48,10 +49,6 @@
   },
   "@celo/dev-utils": {
     "location": "packages/dev-utils",
-    "dependencies": []
-  },
-  "docs": {
-    "location": "packages/docs",
     "dependencies": []
   },
   "@celo/env-tests": {
@@ -114,7 +111,8 @@
       "@celo/base",
       "@celo/contractkit",
       "@celo/identity",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-local"
     ]
   },
   "@celo/phone-number-privacy-monitor": {
@@ -178,7 +176,8 @@
     "dependencies": [
       "@celo/base",
       "@celo/connect",
-      "@celo/contractkit"
+      "@celo/contractkit",
+      "@celo/utils"
     ]
   },
   "@celo/governance": {
@@ -198,6 +197,13 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
+      "@celo/utils",
+      "@celo/wallet-local"
+    ]
+  },
+  "@celo/keystores": {
+    "location": "packages/sdk/keystores",
+    "dependencies": [
       "@celo/utils",
       "@celo/wallet-local"
     ]

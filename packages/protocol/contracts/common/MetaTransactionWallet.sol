@@ -6,13 +6,13 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMetaTransactionWallet.sol";
 import "./ExternalCall.sol";
-import "./InitializableV2.sol";
+import "./Initializable.sol";
 import "./Signatures.sol";
 
 contract MetaTransactionWallet is
   IMetaTransactionWallet,
   ICeloVersionedContract,
-  InitializableV2,
+  Initializable,
   Ownable
 {
   using SafeMath for uint256;
@@ -59,7 +59,7 @@ contract MetaTransactionWallet is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @dev Fallback function allows to deposit ether.
@@ -73,7 +73,7 @@ contract MetaTransactionWallet is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 1, 1);
   }
 
   /**

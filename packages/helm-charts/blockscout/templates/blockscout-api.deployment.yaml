@@ -21,6 +21,12 @@ spec:
       component: blockscout-api
   template:
     metadata:
+      {{- if .Values.blockscout.metrics.enabled}}
+      annotations:
+        prometheus.io/path: /metrics/web
+        prometheus.io/port: "4000"
+        prometheus.io/scrape: "true"
+      {{- end}}
       labels:
         app: blockscout
         release: {{ .Release.Name }}
@@ -43,7 +49,7 @@ spec:
         - -c
         args:
         - |
-           exec mix cmd --app block_scout_web "iex -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix phx.server"
+           exec mix cmd --app block_scout_web "iex  --name {{ .Values.blockscout.api.erlangNodeName}}@0.0.0.0 -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix do deps.loadpaths --no-deps-check, phx.server --no-compile"
         ports:
         - name: http
           containerPort: {{ .Values.blockscout.api.port }}
@@ -79,6 +85,8 @@ spec:
         - name: DISABLE_WRITE_API
           value: "true"
         - name: DISABLE_INDEXER
+          value: "true"
+        - name: DISABLE_EXCHANGE_RATES
           value: "true"
         - name: POOL_SIZE
           value: {{ .Values.blockscout.api.pool_size | quote }}

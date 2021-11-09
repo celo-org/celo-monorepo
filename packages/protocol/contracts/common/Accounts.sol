@@ -35,11 +35,16 @@ contract Accounts is
     address attestation;
   }
 
+  struct SignerAuthorization {
+    bool started;
+    bool completed;
+  }
+
   struct Account {
     bool exists;
-    // Each account may authorize signing keys to use for voting, valdiating or attestation.
-    // These keys may not be keys of other accounts, and may not be authorized by any other
-    // account for any purpose.
+    // [Deprecated] Each account may authorize signing keys to use for voting,
+    // validating or attestation. These keys may not be keys of other accounts,
+    // and may not be authorized by any other account for any purpose.
     Signers signers;
     // The address at which the account expects to receive transfers. If it's empty/0x0, the
     // account indicates that an address exchange should be initiated with the dataEncryptionKey
@@ -55,25 +60,60 @@ contract Accounts is
   mapping(address => Account) internal accounts;
   // Maps authorized signers to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
+  // Default signers by account (replaces the legacy Signers struct on Account)
+  mapping(address => mapping(bytes32 => address)) defaultSigners;
+  // All signers and their roles for a given account
+  // solhint-disable-next-line max-line-length
+  mapping(address => mapping(bytes32 => mapping(address => SignerAuthorization))) signerAuthorizations;
+
+  bytes32 public constant EIP712_AUTHORIZE_SIGNER_TYPEHASH = keccak256(
+    "AuthorizeSigner(address account,address signer,bytes32 role)"
+  );
+  bytes32 public eip712DomainSeparator;
+
+  // A per-account list of CIP8 storage roots, bypassing CIP3.
+  mapping(address => bytes[]) public offchainStorageRoots;
+
+  bytes32 constant ValidatorSigner = keccak256(abi.encodePacked("celo.org/core/validator"));
+  bytes32 constant AttestationSigner = keccak256(abi.encodePacked("celo.org/core/attestation"));
+  bytes32 constant VoteSigner = keccak256(abi.encodePacked("celo.org/core/vote"));
 
   event AttestationSignerAuthorized(address indexed account, address signer);
   event VoteSignerAuthorized(address indexed account, address signer);
   event ValidatorSignerAuthorized(address indexed account, address signer);
+  event SignerAuthorized(address indexed account, address signer, bytes32 indexed role);
+  event SignerAuthorizationStarted(address indexed account, address signer, bytes32 indexed role);
+  event SignerAuthorizationCompleted(address indexed account, address signer, bytes32 indexed role);
   event AttestationSignerRemoved(address indexed account, address oldSigner);
   event VoteSignerRemoved(address indexed account, address oldSigner);
   event ValidatorSignerRemoved(address indexed account, address oldSigner);
+  event IndexedSignerSet(address indexed account, address signer, bytes32 role);
+  event IndexedSignerRemoved(address indexed account, address oldSigner, bytes32 role);
+  event DefaultSignerSet(address indexed account, address signer, bytes32 role);
+  event DefaultSignerRemoved(address indexed account, address oldSigner, bytes32 role);
+  event LegacySignerSet(address indexed account, address signer, bytes32 role);
+  event LegacySignerRemoved(address indexed account, address oldSigner, bytes32 role);
+  event SignerRemoved(address indexed account, address oldSigner, bytes32 indexed role);
   event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
   event AccountNameSet(address indexed account, string name);
   event AccountMetadataURLSet(address indexed account, string metadataURL);
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
+  event OffchainStorageRootAdded(address indexed account, bytes url);
+  event OffchainStorageRootRemoved(address indexed account, bytes url, uint256 index);
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 1, 3, 0);
   }
 
   /**
@@ -83,6 +123,29 @@ contract Accounts is
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+    setEip712DomainSeparator();
+  }
+
+  /**
+   * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
+   */
+  function setEip712DomainSeparator() public {
+    uint256 chainId;
+    assembly {
+      chainId := chainid
+    }
+
+    eip712DomainSeparator = keccak256(
+      abi.encode(
+        keccak256(
+          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        ),
+        keccak256(bytes("Celo Core Contracts")),
+        keccak256("1.0"),
+        chainId,
+        address(this)
+      )
+    );
   }
 
   /**
@@ -181,6 +244,136 @@ contract Accounts is
   }
 
   /**
+   * @notice Adds a new CIP8 storage root.
+   * @param url The URL pointing to the offchain storage root.
+   */
+  function addStorageRoot(bytes calldata url) external {
+    require(isAccount(msg.sender), "Unknown account");
+    offchainStorageRoots[msg.sender].push(url);
+    emit OffchainStorageRootAdded(msg.sender, url);
+  }
+
+  /**
+   * @notice Removes a CIP8 storage root.
+   * @param index The index of the storage root to be removed in the account's
+   * list of storage roots.
+   * @dev The order of storage roots may change after this operation (the last
+   * storage root will be moved to `index`), be aware of this if removing
+   * multiple storage roots at a time.
+   */
+  function removeStorageRoot(uint256 index) external {
+    require(isAccount(msg.sender), "Unknown account");
+    require(index < offchainStorageRoots[msg.sender].length);
+    uint256 lastIndex = offchainStorageRoots[msg.sender].length - 1;
+    bytes memory url = offchainStorageRoots[msg.sender][index];
+    offchainStorageRoots[msg.sender][index] = offchainStorageRoots[msg.sender][lastIndex];
+    offchainStorageRoots[msg.sender].length--;
+    emit OffchainStorageRootRemoved(msg.sender, url, index);
+  }
+
+  /**
+   * @notice Returns the full list of offchain storage roots for an account.
+   * @param account The account whose storage roots to return.
+   * @return List of storage root URLs.
+   */
+  function getOffchainStorageRoots(address account)
+    external
+    view
+    returns (bytes memory, uint256[] memory)
+  {
+    require(isAccount(account), "Unknown account");
+    uint256 numberRoots = offchainStorageRoots[account].length;
+    uint256 totalLength = 0;
+    for (uint256 i = 0; i < numberRoots; i++) {
+      totalLength += offchainStorageRoots[account][i].length;
+    }
+
+    bytes memory concatenated = new bytes(totalLength);
+    uint256 lastIndex = 0;
+    uint256[] memory lengths = new uint256[](numberRoots);
+    for (uint256 i = 0; i < numberRoots; i++) {
+      bytes storage root = offchainStorageRoots[account][i];
+      lengths[i] = root.length;
+      for (uint256 j = 0; j < lengths[i]; j++) {
+        concatenated[lastIndex] = root[j];
+        lastIndex++;
+      }
+    }
+
+    return (concatenated, lengths);
+  }
+
+  /**
+   * @notice Set the indexed signer for a specific role
+   * @param signer the address to set as default
+   * @param role the role to register a default signer for
+   */
+  function setIndexedSigner(address signer, bytes32 role) public {
+    require(isAccount(msg.sender), "Not an account");
+    require(isNotAccount(signer), "Cannot authorize account as signer");
+    require(
+      isNotAuthorizedSignerForAnotherAccount(msg.sender, signer),
+      "Not a signer for this account"
+    );
+    require(isSigner(msg.sender, signer, role), "Must authorize signer before setting as default");
+
+    Account storage account = accounts[msg.sender];
+    if (isLegacyRole(role)) {
+      if (role == VoteSigner) {
+        account.signers.vote = signer;
+      } else if (role == AttestationSigner) {
+        account.signers.attestation = signer;
+      } else if (role == ValidatorSigner) {
+        account.signers.validator = signer;
+      }
+      emit LegacySignerSet(msg.sender, signer, role);
+    } else {
+      defaultSigners[msg.sender][role] = signer;
+      emit DefaultSignerSet(msg.sender, signer, role);
+    }
+
+    emit IndexedSignerSet(msg.sender, signer, role);
+  }
+
+  /**
+   * @notice Authorizes an address to act as a signer, for `role`, on behalf of the account.
+   * @param signer The address of the signing key to authorize.
+   * @param role The role to authorize signing for.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev v, r, s constitute `signer`'s EIP712 signature over `role`, `msg.sender`  
+   *      and `signer`.
+   */
+  function authorizeSignerWithSignature(address signer, bytes32 role, uint8 v, bytes32 r, bytes32 s)
+    public
+  {
+    authorizeAddressWithRole(signer, role, v, r, s);
+    signerAuthorizations[msg.sender][role][signer] = SignerAuthorization({
+      started: true,
+      completed: true
+    });
+
+    emit SignerAuthorized(msg.sender, signer, role);
+  }
+
+  function legacyAuthorizeSignerWithSignature(
+    address signer,
+    bytes32 role,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) private {
+    authorizeAddress(signer, v, r, s);
+    signerAuthorizations[msg.sender][role][signer] = SignerAuthorization({
+      started: true,
+      completed: true
+    });
+
+    emit SignerAuthorized(msg.sender, signer, role);
+  }
+
+  /**
    * @notice Authorizes an address to sign votes on behalf of the account.
    * @param signer The address of the signing key to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
@@ -192,9 +385,9 @@ contract Accounts is
     external
     nonReentrant
   {
-    Account storage account = accounts[msg.sender];
-    authorize(signer, v, r, s);
-    account.signers.vote = signer;
+    legacyAuthorizeSignerWithSignature(signer, VoteSigner, v, r, s);
+    setIndexedSigner(signer, VoteSigner);
+
     emit VoteSignerAuthorized(msg.sender, signer);
   }
 
@@ -210,9 +403,9 @@ contract Accounts is
     external
     nonReentrant
   {
-    Account storage account = accounts[msg.sender];
-    authorize(signer, v, r, s);
-    account.signers.validator = signer;
+    legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
+    setIndexedSigner(signer, ValidatorSigner);
+
     require(!getValidators().isValidator(msg.sender), "Cannot authorize validator signer");
     emit ValidatorSignerAuthorized(msg.sender, signer);
   }
@@ -233,9 +426,9 @@ contract Accounts is
     bytes32 s,
     bytes calldata ecdsaPublicKey
   ) external nonReentrant {
-    Account storage account = accounts[msg.sender];
-    authorize(signer, v, r, s);
-    account.signers.validator = signer;
+    legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
+    setIndexedSigner(signer, ValidatorSigner);
+
     require(
       getValidators().updateEcdsaPublicKey(msg.sender, signer, ecdsaPublicKey),
       "Failed to update ECDSA public key"
@@ -265,9 +458,9 @@ contract Accounts is
     bytes calldata blsPublicKey,
     bytes calldata blsPop
   ) external nonReentrant {
-    Account storage account = accounts[msg.sender];
-    authorize(signer, v, r, s);
-    account.signers.validator = signer;
+    legacyAuthorizeSignerWithSignature(signer, ValidatorSigner, v, r, s);
+    setIndexedSigner(signer, ValidatorSigner);
+
     require(
       getValidators().updatePublicKeys(msg.sender, signer, ecdsaPublicKey, blsPublicKey, blsPop),
       "Failed to update validator keys"
@@ -284,10 +477,176 @@ contract Accounts is
    * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
    */
   function authorizeAttestationSigner(address signer, uint8 v, bytes32 r, bytes32 s) public {
-    Account storage account = accounts[msg.sender];
-    authorize(signer, v, r, s);
-    account.signers.attestation = signer;
+    legacyAuthorizeSignerWithSignature(signer, AttestationSigner, v, r, s);
+    setIndexedSigner(signer, AttestationSigner);
+
     emit AttestationSignerAuthorized(msg.sender, signer);
+  }
+
+  /**
+   * @notice Begin the process of authorizing an address to sign on behalf of the account
+   * @param signer The address of the signing key to authorize.
+   * @param role The role to authorize signing for.
+   */
+  function authorizeSigner(address signer, bytes32 role) public {
+    require(isAccount(msg.sender), "Unknown account");
+    require(
+      isNotAccount(signer) && isNotAuthorizedSignerForAnotherAccount(msg.sender, signer),
+      "Cannot re-authorize address signer"
+    );
+
+    signerAuthorizations[msg.sender][role][signer] = SignerAuthorization({
+      started: true,
+      completed: false
+    });
+    emit SignerAuthorizationStarted(msg.sender, signer, role);
+  }
+
+  /**
+   * @notice Finish the process of authorizing an address to sign on behalf of the account. 
+   * @param account The address of account that authorized signing.
+   * @param role The role to finish authorizing for.
+   */
+  function completeSignerAuthorization(address account, bytes32 role) public {
+    require(isAccount(account), "Unknown account");
+    require(
+      isNotAccount(msg.sender) && isNotAuthorizedSignerForAnotherAccount(account, msg.sender),
+      "Cannot re-authorize address signer"
+    );
+    require(
+      signerAuthorizations[account][role][msg.sender].started == true,
+      "Signer authorization not started"
+    );
+
+    authorizedBy[msg.sender] = account;
+    signerAuthorizations[account][role][msg.sender].completed = true;
+    emit SignerAuthorizationCompleted(account, msg.sender, role);
+  }
+
+  /**
+   * @notice Whether or not the signer has been registered as the legacy signer for role
+   * @param _account The address of account that authorized signing.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
+  function isLegacySigner(address _account, address signer, bytes32 role)
+    public
+    view
+    returns (bool)
+  {
+    Account storage account = accounts[_account];
+    if (role == ValidatorSigner && account.signers.validator == signer) {
+      return true;
+    } else if (role == AttestationSigner && account.signers.attestation == signer) {
+      return true;
+    } else if (role == VoteSigner && account.signers.vote == signer) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * @notice Whether or not the signer has been registered as the default signer for role
+   * @param account The address of account that authorized signing.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
+  function isDefaultSigner(address account, address signer, bytes32 role)
+    public
+    view
+    returns (bool)
+  {
+    return defaultSigners[account][role] == signer;
+  }
+
+  /**
+   * @notice Whether or not the signer has been registered as an indexed signer for role
+   * @param account The address of account that authorized signing.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
+  function isIndexedSigner(address account, address signer, bytes32 role)
+    public
+    view
+    returns (bool)
+  {
+    return
+      isLegacyRole(role)
+        ? isLegacySigner(account, signer, role)
+        : isDefaultSigner(account, signer, role);
+  }
+
+  /**
+   * @notice Whether or not the signer has been registered as a signer for role
+   * @param account The address of account that authorized signing.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
+  function isSigner(address account, address signer, bytes32 role) public view returns (bool) {
+    return
+      isLegacySigner(account, signer, role) ||
+      (signerAuthorizations[account][role][signer].completed && authorizedBy[signer] == account);
+  }
+
+  /**
+   * @notice Removes the signer for a default role.
+   * @param role The role that has been authorized.
+   */
+  function removeDefaultSigner(bytes32 role) public {
+    address signer = defaultSigners[msg.sender][role];
+    defaultSigners[msg.sender][role] = address(0);
+    emit DefaultSignerRemoved(msg.sender, signer, role);
+  }
+
+  /**
+   * @notice Remove one of the Validator, Attestation or 
+   * Vote signers from an account. Should only be called from
+   * methods that check the role is a legacy signer.
+   * @param role The role that has been authorized.
+   */
+  function removeLegacySigner(bytes32 role) private {
+    Account storage account = accounts[msg.sender];
+
+    address signer;
+    if (role == ValidatorSigner) {
+      signer = account.signers.validator;
+      account.signers.validator = address(0);
+    } else if (role == AttestationSigner) {
+      signer = account.signers.attestation;
+      account.signers.attestation = address(0);
+    } else if (role == VoteSigner) {
+      signer = account.signers.vote;
+      account.signers.vote = address(0);
+    }
+    emit LegacySignerRemoved(msg.sender, signer, role);
+  }
+
+  /**
+   * @notice Removes the currently authorized and indexed signer 
+   * for a specific role
+   * @param role The role of the signer.
+   */
+  function removeIndexedSigner(bytes32 role) public {
+    address oldSigner = getIndexedSigner(msg.sender, role);
+    isLegacyRole(role) ? removeLegacySigner(role) : removeDefaultSigner(role);
+
+    emit IndexedSignerRemoved(msg.sender, oldSigner, role);
+  }
+
+  /**
+   * @notice Removes the currently authorized signer for a specific role and 
+   * if the signer is indexed, remove that as well.
+   * @param signer The address of the signer.
+   * @param role The role that has been authorized.
+   */
+  function removeSigner(address signer, bytes32 role) public {
+    if (isIndexedSigner(msg.sender, signer, role)) {
+      removeIndexedSigner(role);
+    }
+
+    delete signerAuthorizations[msg.sender][role][signer];
+    emit SignerRemoved(msg.sender, signer, role);
   }
 
   /**
@@ -295,9 +654,9 @@ contract Accounts is
    * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeVoteSigner() public {
-    Account storage account = accounts[msg.sender];
-    emit VoteSignerRemoved(msg.sender, account.signers.vote);
-    account.signers.vote = address(0);
+    address signer = getLegacySigner(msg.sender, VoteSigner);
+    removeSigner(signer, VoteSigner);
+    emit VoteSignerRemoved(msg.sender, signer);
   }
 
   /**
@@ -305,9 +664,9 @@ contract Accounts is
    * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeValidatorSigner() public {
-    Account storage account = accounts[msg.sender];
-    emit ValidatorSignerRemoved(msg.sender, account.signers.validator);
-    account.signers.validator = address(0);
+    address signer = getLegacySigner(msg.sender, ValidatorSigner);
+    removeSigner(signer, ValidatorSigner);
+    emit ValidatorSignerRemoved(msg.sender, signer);
   }
 
   /**
@@ -315,9 +674,20 @@ contract Accounts is
    * Note that the signers cannot be reauthorized after they have been removed.
    */
   function removeAttestationSigner() public {
-    Account storage account = accounts[msg.sender];
-    emit AttestationSignerRemoved(msg.sender, account.signers.attestation);
-    account.signers.attestation = address(0);
+    address signer = getLegacySigner(msg.sender, AttestationSigner);
+    removeSigner(signer, AttestationSigner);
+    emit AttestationSignerRemoved(msg.sender, signer);
+  }
+
+  function signerToAccountWithRole(address signer, bytes32 role) internal view returns (address) {
+    address account = authorizedBy[signer];
+    if (account != address(0)) {
+      require(isSigner(account, signer, role), "not active authorized signer for role");
+      return account;
+    }
+
+    require(isAccount(signer), "not an account");
+    return signer;
   }
 
   /**
@@ -327,17 +697,7 @@ contract Accounts is
    * @return The associated account.
    */
   function attestationSignerToAccount(address signer) external view returns (address) {
-    address authorizingAccount = authorizedBy[signer];
-    if (authorizingAccount != address(0)) {
-      require(
-        accounts[authorizingAccount].signers.attestation == signer,
-        "not active authorized attestation signer"
-      );
-      return authorizingAccount;
-    } else {
-      require(isAccount(signer), "not an account");
-      return signer;
-    }
+    return signerToAccountWithRole(signer, AttestationSigner);
   }
 
   /**
@@ -347,17 +707,7 @@ contract Accounts is
    * @return The associated account.
    */
   function validatorSignerToAccount(address signer) public view returns (address) {
-    address authorizingAccount = authorizedBy[signer];
-    if (authorizingAccount != address(0)) {
-      require(
-        accounts[authorizingAccount].signers.validator == signer,
-        "not active authorized validator signer"
-      );
-      return authorizingAccount;
-    } else {
-      require(isAccount(signer), "not an account");
-      return signer;
-    }
+    return signerToAccountWithRole(signer, ValidatorSigner);
   }
 
   /**
@@ -367,17 +717,7 @@ contract Accounts is
    * @return The associated account.
    */
   function voteSignerToAccount(address signer) external view returns (address) {
-    address authorizingAccount = authorizedBy[signer];
-    if (authorizingAccount != address(0)) {
-      require(
-        accounts[authorizingAccount].signers.vote == signer,
-        "not active authorized vote signer"
-      );
-      return authorizingAccount;
-    } else {
-      require(isAccount(signer), "not an account");
-      return signer;
-    }
+    return signerToAccountWithRole(signer, VoteSigner);
   }
 
   /**
@@ -397,14 +737,63 @@ contract Accounts is
   }
 
   /**
+   * @notice Checks whether the role is one of Vote, Validator or Attestation
+   * @param role The role to check
+   */
+  function isLegacyRole(bytes32 role) public pure returns (bool) {
+    return role == VoteSigner || role == ValidatorSigner || role == AttestationSigner;
+  }
+
+  /**
+   * @notice Returns the legacy signer for the specified account and 
+   * role. If no signer has been specified it will return the account itself.
+   * @param _account The address of the account.
+   * @param role The role of the signer.
+   */
+  function getLegacySigner(address _account, bytes32 role) public view returns (address) {
+    require(isLegacyRole(role), "Role is not a legacy signer");
+
+    Account storage account = accounts[_account];
+    address signer;
+    if (role == ValidatorSigner) {
+      signer = account.signers.validator;
+    } else if (role == AttestationSigner) {
+      signer = account.signers.attestation;
+    } else if (role == VoteSigner) {
+      signer = account.signers.vote;
+    }
+
+    return signer == address(0) ? _account : signer;
+  }
+
+  /**
+   * @notice Returns the default signer for the specified account and 
+   * role. If no signer has been specified it will return the account itself.
+   * @param account The address of the account.
+   * @param role The role of the signer.
+   */
+  function getDefaultSigner(address account, bytes32 role) public view returns (address) {
+    address defaultSigner = defaultSigners[account][role];
+    return defaultSigner == address(0) ? account : defaultSigner;
+  }
+
+  /**
+   * @notice Returns the indexed signer for the specified account and role. 
+   * If no signer has been specified it will return the account itself.
+   * @param account The address of the account.
+   * @param role The role of the signer.
+   */
+  function getIndexedSigner(address account, bytes32 role) public view returns (address) {
+    return isLegacyRole(role) ? getLegacySigner(account, role) : getDefaultSigner(account, role);
+  }
+
+  /**
    * @notice Returns the vote signer for the specified account.
    * @param account The address of the account.
    * @return The address with which the account can sign votes.
    */
   function getVoteSigner(address account) public view returns (address) {
-    require(isAccount(account), "Unknown account");
-    address signer = accounts[account].signers.vote;
-    return signer == address(0) ? account : signer;
+    return getLegacySigner(account, VoteSigner);
   }
 
   /**
@@ -413,9 +802,7 @@ contract Accounts is
    * @return The address with which the account can register a validator or group.
    */
   function getValidatorSigner(address account) public view returns (address) {
-    require(isAccount(account), "Unknown account");
-    address signer = accounts[account].signers.validator;
-    return signer == address(0) ? account : signer;
+    return getLegacySigner(account, ValidatorSigner);
   }
 
   /**
@@ -424,9 +811,40 @@ contract Accounts is
    * @return The address with which the account can sign attestations.
    */
   function getAttestationSigner(address account) public view returns (address) {
-    require(isAccount(account), "Unknown account");
-    address signer = accounts[account].signers.attestation;
-    return signer == address(0) ? account : signer;
+    return getLegacySigner(account, AttestationSigner);
+  }
+
+  /**
+   * @notice Checks whether or not the account has an indexed signer
+   * registered for one of the legacy roles
+   */
+  function hasLegacySigner(address account, bytes32 role) public view returns (bool) {
+    return getLegacySigner(account, role) != account;
+  }
+
+  /**
+   * @notice Checks whether or not the account has an indexed signer
+   * registered for a role
+   */
+  function hasDefaultSigner(address account, bytes32 role) public view returns (bool) {
+    return getDefaultSigner(account, role) != account;
+  }
+
+  /**
+   * @notice Checks whether or not the account has an indexed signer
+   * registered for the role
+   */
+  function hasIndexedSigner(address account, bytes32 role) public view returns (bool) {
+    return isLegacyRole(role) ? hasLegacySigner(account, role) : hasDefaultSigner(account, role);
+  }
+
+  /**
+   * @notice Checks whether or not the account has a signer
+   * registered for the plaintext role.
+   * @dev See `hasIndexedSigner` for more gas efficient call.
+   */
+  function hasAuthorizedSigner(address account, string calldata role) external view returns (bool) {
+    return hasIndexedSigner(account, keccak256(abi.encodePacked(role)));
   }
 
   /**
@@ -435,9 +853,7 @@ contract Accounts is
    * @return Whether the account has specified a dedicated vote signer.
    */
   function hasAuthorizedVoteSigner(address account) external view returns (bool) {
-    require(isAccount(account));
-    address signer = accounts[account].signers.vote;
-    return signer != address(0);
+    return hasLegacySigner(account, VoteSigner);
   }
 
   /**
@@ -446,9 +862,7 @@ contract Accounts is
    * @return Whether the account has specified a dedicated validator signer.
    */
   function hasAuthorizedValidatorSigner(address account) external view returns (bool) {
-    require(isAccount(account));
-    address signer = accounts[account].signers.validator;
-    return signer != address(0);
+    return hasLegacySigner(account, ValidatorSigner);
   }
 
   /**
@@ -457,9 +871,7 @@ contract Accounts is
    * @return Whether the account has specified a dedicated attestation signer.
    */
   function hasAuthorizedAttestationSigner(address account) external view returns (bool) {
-    require(isAccount(account));
-    address signer = accounts[account].signers.attestation;
-    return signer != address(0);
+    return hasLegacySigner(account, AttestationSigner);
   }
 
   /**
@@ -556,7 +968,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Check if an address has been an authorized signer for an account.
+   * @notice Check if an address has not been an authorized signer for an account.
    * @param signer The possibly authorized address.
    * @return Returns `false` if authorized. Returns `true` otherwise.
    */
@@ -565,24 +977,92 @@ contract Accounts is
   }
 
   /**
+   * @notice Check if `signer` has not been authorized, and if it has been previously
+   *         authorized that it was authorized by `account`.
+   * @param account The authorizing account address.
+   * @param signer The possibly authorized address.
+   * @return Returns `false` if authorized. Returns `true` otherwise.
+   */
+  function isNotAuthorizedSignerForAnotherAccount(address account, address signer)
+    internal
+    view
+    returns (bool)
+  {
+    return (authorizedBy[signer] == address(0) || authorizedBy[signer] == account);
+  }
+
+  /**
    * @notice Authorizes some role of `msg.sender`'s account to another address.
    * @param authorized The address to authorize.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev Fails if the address is already authorized or is an account.
+   * @dev Fails if the address is already authorized to another account or is an account itself.
    * @dev Note that once an address is authorized, it may never be authorized again.
-   * @dev v, r, s constitute `current`'s signature on `msg.sender`.
+   * @dev v, r, s constitute `authorized`'s signature on `msg.sender`.
    */
-  function authorize(address authorized, uint8 v, bytes32 r, bytes32 s) private {
-    require(isAccount(msg.sender), "Unknown account");
-    require(
-      isNotAccount(authorized) && isNotAuthorizedSigner(authorized),
-      "Cannot re-authorize address or locked gold account."
-    );
-
+  function authorizeAddress(address authorized, uint8 v, bytes32 r, bytes32 s) private {
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
     require(signer == authorized, "Invalid signature");
+
+    authorize(authorized);
+  }
+
+  /**
+   * @notice Returns the address that signed the provided role authorization.
+   * @param account The `account` property signed over in the EIP712 signature
+   * @param signer The `signer` property signed over in the EIP712 signature
+   * @param role The `role` property signed over in the EIP712 signature
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @return The address that signed the provided role authorization.
+   */
+  function getRoleAuthorizationSigner(
+    address account,
+    address signer,
+    bytes32 role,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public view returns (address) {
+    bytes32 structHash = keccak256(
+      abi.encode(EIP712_AUTHORIZE_SIGNER_TYPEHASH, account, signer, role)
+    );
+    return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
+  }
+
+  /**
+   * @notice Authorizes a role of `msg.sender`'s account to another address (`authorized`).
+   * @param authorized The address to authorize.
+   * @param role The role to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev Fails if the address is already authorized to another account or is an account itself.
+   * @dev Note that this signature is EIP712 compliant over the authorizing `account` 
+   * (`msg.sender`), `signer` (`authorized`) and `role`.
+   */
+  function authorizeAddressWithRole(address authorized, bytes32 role, uint8 v, bytes32 r, bytes32 s)
+    private
+  {
+    address signer = getRoleAuthorizationSigner(msg.sender, authorized, role, v, r, s);
+    require(signer == authorized, "Invalid signature");
+
+    authorize(authorized);
+  }
+
+  /**
+   * @notice Authorizes an address to `msg.sender`'s account
+   * @param authorized The address to authorize.
+   * @dev Fails if the address is already authorized for another account or is an account itself.
+   */
+  function authorize(address authorized) private {
+    require(isAccount(msg.sender), "Unknown account");
+    require(
+      isNotAccount(authorized) && isNotAuthorizedSignerForAnotherAccount(msg.sender, authorized),
+      "Cannot re-authorize address or locked gold account for another account"
+    );
 
     authorizedBy[authorized] = msg.sender;
   }

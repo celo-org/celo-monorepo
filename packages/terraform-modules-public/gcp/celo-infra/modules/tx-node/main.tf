@@ -101,6 +101,6 @@ resource "google_compute_disk" "txnode" {
   #type = "pd-ssd"
   type = "pd-standard"      #disk I/O doesn't yet warrant SSD backed validators/proxies
   # in GB
-  size                      = 20
+  size                      = 10
   physical_block_size_bytes = 4096
 }

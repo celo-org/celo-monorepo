@@ -96,7 +96,7 @@ spec:
 
           # Generate a fee recipient address if available
           if celotooljs.sh generate address-from-env --help | grep tx_fee_recipient >/dev/null; then
-            celotooljs.sh generate account-address --mnemonic "$MNEMONIC" --accountType tx_fee_recipient --index 0 > /root/.celo/feeRecipientAddress
+            celotooljs.sh generate account-address --mnemonic "$MNEMONIC" --accountType tx_fee_recipient --index $RID > /root/.celo/feeRecipientAddress
           fi
 
           # If this validator is meant to be proxied
@@ -207,6 +207,7 @@ spec:
           {{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
           {{- end }}
+{{ .Values.geth.validatorExtraSnippet | indent  10 }}
           exec geth \
             $BOOTNODE_FLAG \
             --datadir /root/.celo \
@@ -277,7 +278,7 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
-      terminationGracePeriodSeconds: 120 # 2 mins
+      terminationGracePeriodSeconds: {{ .Values.geth.terminationGracePeriodSeconds | default 300 }}
       volumes:
       - name: data
         emptyDir: {}

@@ -50,17 +50,17 @@ export PATH=$PATH:$GOPATH/bin
 
 #### Install Node
 
+Currently Node.js v12.x is required in order to work with this repo.
+
 Install `nvm` (allows you to manage multiple versions of Node) by following the instructions here: [https://github.com/nvm-sh/nvm].
 
 Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions that [celo-monorepo] will need:
 
 ```bash
 # restart the terminal after installing nvm
-nvm install 8
-nvm install 10
-nvm alias default 10
+nvm install 12
+nvm alias default 12
 ```
-*Note: attestation-proxy, phone-number-privacy and faucet packages explicitly define 'node 10' in the engines section of their package.json, this means we need to use node 10 for building the project.* 
 
 ### MacOS
 
@@ -179,7 +179,7 @@ yarn build --ignore docs
 
 ## Running the mobile wallet
 
-To build and run the mobile wallet on your iOS or Android devices see the guide in the [mobile](packages/mobile) directory.
+To build and run the mobile wallet on your iOS or Android devices see the guide in the [mobile](https://github.com/celo-org/wallet/tree/main/packages/mobile) directory.
 
 
 [celo-monorepo]: https://github.com/celo-org/celo-monorepo

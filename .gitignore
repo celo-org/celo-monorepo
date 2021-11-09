@@ -81,6 +81,7 @@ lerna-debug.log
 !.env.mnemonic*.enc
 
 .terraform/
+.terraform.lock.hcl
 tsconfig.tsbuildinfo
 
 # git mergetool
@@ -99,3 +100,6 @@ packages/mobile/*
 packages/moonpay-auth/*
 packages/notification-service/*
 packages/react-components/*
+
+# temp json file for deploy-sdks script
+scripts/failedSDKs.json

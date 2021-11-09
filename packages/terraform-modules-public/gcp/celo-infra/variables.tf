@@ -234,7 +234,13 @@ variable attestation_service_twilio_account_sid {
 
 variable attestation_service_twilio_messaging_service_sid {
   type        = string
-  description = "Twilio account messagin service SID (check twilio documentation)"
+  description = "Twilio account messaging service SID (check twilio documentation)"
+  default     = ""
+}
+
+variable attestation_service_twilio_verify_service_sid {
+  type        = string
+  description = "Twilio account verify service SID (check twilio documentation)"
   default     = ""
 }
 
@@ -253,6 +259,18 @@ variable attestation_service_twilio_blacklist {
 variable attestation_service_twilio_unsupported_regions {
   type        = string
   description = "Twilio unsupported country codes, separated by comma  (check twilio documentation)"
+  default     = ""
+}
+
+variable attestation_service_messagebird_api_key {
+  type        = string
+  description = "Messagebird API key"
+  default     = ""
+}
+
+variable attestation_service_messagebird_unsupported_regions {
+  type        = string
+  description = "Messagebird unsupported country codes, separated by comma  (check Messagebird documentation)"
   default     = ""
 }
 

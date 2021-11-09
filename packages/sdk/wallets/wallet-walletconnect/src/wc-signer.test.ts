@@ -138,7 +138,7 @@ describe('WalletConnectWallet tests', () => {
       try {
         await wallet.signPersonalMessage(unknownAddress, hexString)
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         assertInvalidAddress(e)
       }
     })
@@ -147,7 +147,7 @@ describe('WalletConnectWallet tests', () => {
       try {
         await wallet.signTypedData(unknownAddress, TYPED_DATA)
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         assertInvalidAddress(e)
       }
     })
@@ -159,7 +159,7 @@ describe('WalletConnectWallet tests', () => {
           from: unknownAddress,
         })
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         assertInvalidAddress(e)
       }
     })
@@ -173,7 +173,7 @@ describe('WalletConnectWallet tests', () => {
       try {
         await wallet.decrypt(unknownAddress, encrypted)
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         assertInvalidAddress(e)
       }
     })
@@ -185,7 +185,7 @@ describe('WalletConnectWallet tests', () => {
       try {
         await wallet.computeSharedSecret(unknownAddress, otherPubKey)
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         assertInvalidAddress(e)
       }
     })
