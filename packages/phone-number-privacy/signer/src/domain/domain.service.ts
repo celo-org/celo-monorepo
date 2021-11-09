@@ -197,7 +197,7 @@ export class DomainService implements IDomainService {
     endpoint: Endpoints,
     logger: Logger
   ): domain is KnownDomain {
-    if (!this.authService.authCheck(request.body, endpoint)) {
+    if (!this.authService.authCheck(request.body, endpoint, logger)) {
       logger.warn(`Received unauthorized request to ${endpoint} `, {
         name: domain.name,
         version: domain.version,

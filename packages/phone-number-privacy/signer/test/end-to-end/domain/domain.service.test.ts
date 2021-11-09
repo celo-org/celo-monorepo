@@ -58,7 +58,7 @@ describe('Domain Service tests', () => {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
-          Authorization: 'ignore', //TODO: Changed once auth is added to domains
+          Authorization: 'ignore',
         },
         body,
       })
