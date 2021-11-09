@@ -2,15 +2,35 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import compareVersions from 'compare-versions'
 import fs from 'fs'
 import { entries, range } from 'lodash'
+import os from 'os'
+import path from 'path'
 import sleep from 'sleep-promise'
 import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
 import stringHash from 'string-hash'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
-import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
+import {
+  execCmd,
+  execCmdWithExitOnFailure,
+  outputIncludes,
+  spawnCmd,
+  spawnCmdWithExitOnFailure,
+} from './cmd-utils'
+import {
+  EnvTypes,
+  envVar,
+  fetchEnv,
+  fetchEnvOrFallback,
+  isProduction,
+  monorepoRoot,
+} from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { getEnodesWithExternalIPAddresses, retrieveBootnodeIPAddress } from './geth'
+import {
+  buildGethAll,
+  checkoutGethRepo,
+  getEnodesWithExternalIPAddresses,
+  retrieveBootnodeIPAddress,
+} from './geth'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
@@ -18,6 +38,7 @@ import {
   getGenesisBlockFromGoogleStorage,
   getProxiesPerValidator,
   getProxyName,
+  uploadGenesisBlockToGoogleStorage,
 } from './testnet-utils'
 import { stringToBoolean } from './utils'
 
