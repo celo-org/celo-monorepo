@@ -1,5 +1,5 @@
 import { Err, Ok, parseJsonAsResult, Result } from '@celo/base/lib/result'
-import { KnownDomain, KnownDomainSchema } from '@celo/phone-number-privacy-common/lib/domains'
+import { SequentialDelayDomainSchema } from '@celo/phone-number-privacy-common/lib/domains'
 import { pipe } from 'fp-ts/lib/pipeable'
 import { chain, isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
@@ -27,7 +27,7 @@ export const BufferFromBase64 = new t.Type<Buffer, string, unknown>(
 )
 
 /** io-ts codec used to encode and decode backups from JSON objects */
-export const BackupSchema: t.Type<Backup<KnownDomain>, object> = t.intersection([
+export const BackupSchema: t.Type<Backup, object> = t.intersection([
   // Required fields
   t.type({
     encryptedData: BufferFromBase64,
@@ -39,16 +39,16 @@ export const BackupSchema: t.Type<Backup<KnownDomain>, object> = t.intersection(
   // Optional fields
   // https://github.com/gcanti/io-ts/blob/master/index.md#mixing-required-and-optional-props
   t.partial({
-    odisDomain: KnownDomainSchema,
+    odisDomain: SequentialDelayDomainSchema,
     encryptedFuseKey: BufferFromBase64,
   }),
 ])
 
-export function serializeBackup(backup: Backup<KnownDomain>): string {
+export function serializeBackup(backup: Backup): string {
   return JSON.stringify(BackupSchema.encode(backup))
 }
 
-export function deserializeBackup(data: string): Result<Backup<KnownDomain>, DecodeError> {
+export function deserializeBackup(data: string): Result<Backup, DecodeError> {
   const jsonDecode = parseJsonAsResult(data)
   if (!jsonDecode.ok) {
     return Err(new DecodeError(jsonDecode.error))

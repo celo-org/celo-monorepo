@@ -124,9 +124,12 @@ export async function queryOdis<ResponseType>(
 ): Promise<ResponseType> {
   debug(`Posting to ${endpoint}`)
 
-  // Sign payload using account privkey
   const bodyString = JSON.stringify(body)
 
+  // Sign payload using provided account and authentication method.
+  // NOTE: Signing and verifying signatures over JSON encoded blobs relies on both the serializer
+  // (e.g. this client) and the verifier (e.g. ODIS) to have the same deterministic JSON
+  // implementation. This is maintained for backwards compatibility, but not recommended.
   let signature: string | undefined
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     signature = signWithDEK(bodyString, signer as EncryptionKeySigner)

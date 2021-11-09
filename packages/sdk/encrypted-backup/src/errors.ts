@@ -4,6 +4,7 @@ export enum BackupErrorTypes {
   DecodeError = 'DecodeError',
   DecryptionError = 'DecryptionError',
   InvalidBackupError = 'InvalidBackupError',
+  InvalidBackupError = 'ImplementationError',
 }
 
 export class DecodeError extends RootError<BackupErrorTypes.DecodeError> {
@@ -24,4 +25,10 @@ export class InvalidBackupError extends RootError<BackupErrorTypes.InvalidBackup
   }
 }
 
-export type BackupError = DecodeError | DecryptionError | InvalidBackupError
+export class ImplementationError extends RootError<BackupErrorTypes.ImplementationError> {
+  constructor(readonly error?: Error) {
+    super(BackupErrorTypes.ImplementationError)
+  }
+}
+
+export type BackupError = DecodeError | DecryptionError | InvalidBackupError | ImplementationError
