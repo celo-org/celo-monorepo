@@ -1,23 +1,20 @@
-import { Domain, SequentialDelayDomain } from '@celo/identity/lib/odis/domains'
+import { Domain, DomainOptions, SequentialDelayDomain } from '@celo/identity/lib/odis/domains'
 import { Endpoints } from '../../../src/server'
 import 'isomorphic-fetch'
-import { LocalWallet } from '@celo/wallet-local'
 import { defined, noBool, noString } from '@celo/utils/lib/sign-typed-data-utils'
+import { ACCOUNT_ADDRESS2 } from '@celo/wallet-rpc/lib/rpc-wallet.test'
+import { contractKit } from '../../../../combiner/test/end-to-end/resources'
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 describe('Domain Service tests', () => {
-  const wallet = new LocalWallet()
-  wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
-  wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000bad516e9')
-  const walletAddress = wallet.getAccounts()[0]!
-
   describe('Disable domain tests', () => {
     it('Should answer 404 for unknown domain', async () => {
       const seqDomain: Domain = {
         name: 'wrong domain',
         version: '1',
       }
-      const response = await postDisableMessage(seqDomain)
+      const options: DomainOptions = {}
+      const response = await postDisableMessage(seqDomain, options)
       expect(response.status).toBe(404)
     })
 
@@ -26,10 +23,18 @@ describe('Domain Service tests', () => {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
         stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
-        address: defined(walletAddress),
+        address: defined(ACCOUNT_ADDRESS2),
         salt: noString,
       }
-      const response = await postDisableMessage(authenticatedDomain)
+      const signature = await contractKit.connection.sign(
+        JSON.stringify(authenticatedDomain),
+        ACCOUNT_ADDRESS2
+      )
+      const options = {
+        signature: defined(signature),
+        nonce: defined(0),
+      }
+      const response = await postDisableMessage(authenticatedDomain, options)
       expect(response.status).toBe(200)
     })
 
@@ -38,19 +43,28 @@ describe('Domain Service tests', () => {
         name: 'ODIS Sequential Delay Domain',
         version: '1',
         stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
-        address: defined(walletAddress),
+        address: defined(ACCOUNT_ADDRESS2),
         salt: noString,
       }
-      const response = await postDisableMessage(authenticatedDomain)
+      const signature = await contractKit.connection.sign(
+        JSON.stringify(authenticatedDomain),
+        ACCOUNT_ADDRESS2
+      )
+      const options = {
+        signature: defined(signature),
+        nonce: defined(0),
+      }
+      const response = await postDisableMessage(authenticatedDomain, options)
       expect(response.status).toBe(200)
 
-      const response2 = await postDisableMessage(authenticatedDomain)
+      const response2 = await postDisableMessage(authenticatedDomain, options)
       expect(response2.status).toBe(200)
     })
 
-    async function postDisableMessage(domain: Domain): Promise<Response> {
+    async function postDisableMessage(domain: Domain, options: DomainOptions): Promise<Response> {
       const body = JSON.stringify({
         domain,
+        options,
       })
 
       const res = await fetch(ODIS_SIGNER + Endpoints.DISABLE_DOMAIN, {
