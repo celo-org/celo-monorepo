@@ -25,6 +25,11 @@ testWithGanache('StableToken Wrapper', async (web3) => {
       name: 'Celo Euro',
       symbol: 'cEUR',
     },
+    [StableToken.cREAL]: {
+      stableToken: StableToken.cREAL,
+      name: 'Celo Brazilian Rean',
+      symbol: 'cREAL',
+    },
   }
 
   for (const stableTokenInfo of Object.values(stableTokenInfos)) {

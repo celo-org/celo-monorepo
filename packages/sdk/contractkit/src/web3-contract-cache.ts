@@ -171,7 +171,8 @@ export class Web3ContractCache {
         try {
           address = await this.kit.registry.addressFor(contract)
         } catch (e) {
-          throw new Error(`${contract} not yet deployed for this chain`)
+          console.log(console.trace())
+          throw new Error(`${contract} not yet deployed for this chain2`)
         }
       }
       debug('Initiating contract %s', contract)

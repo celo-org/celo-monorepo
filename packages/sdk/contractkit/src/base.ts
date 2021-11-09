@@ -31,9 +31,15 @@ export enum CeloContract {
   Validators = 'Validators',
 }
 
-export type StableTokenContract = CeloContract.StableToken | CeloContract.StableTokenEUR
+export type StableTokenContract =
+  | CeloContract.StableToken
+  | CeloContract.StableTokenEUR
+  | CeloContract.StableTokenBRL
 
-export type ExchangeContract = CeloContract.Exchange | CeloContract.ExchangeEUR
+export type ExchangeContract =
+  | CeloContract.Exchange
+  | CeloContract.ExchangeEUR
+  | CeloContract.ExchangeBRL
 
 export type CeloTokenContract = StableTokenContract | CeloContract.GoldToken
 /**
