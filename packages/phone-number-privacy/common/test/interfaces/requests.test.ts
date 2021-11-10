@@ -248,7 +248,7 @@ for (const { request, verifier, typedDataBuilder, name } of cases) {
       expect(verifier(signed)).toBe(false)
     })
 
-    it('should report requests against unauthenticated domains to be verified', async () => {
+    it('should report requests against unauthenticated domains to be unverified', async () => {
       const unauthenticatedRequest = {
         ...request,
         domain: unauthenticatedDomain,
@@ -258,7 +258,7 @@ for (const { request, verifier, typedDataBuilder, name } of cases) {
         },
       }
       //@ts-ignore type checking does not correctly infer types.
-      expect(verifier(unauthenticatedRequest)).toBe(true)
+      expect(verifier(unauthenticatedRequest)).toBe(false)
     })
   })
 }
