@@ -32,7 +32,6 @@ const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile'],
-  boolean: ['before_release_1'],
 })
 
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
