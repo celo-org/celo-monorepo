@@ -30,4 +30,5 @@ export enum WarningMessage {
   CANCELLED_REQUEST_TO_SIGNER = 'CELO_ODIS_WARN_09 SIGNER Cancelled request to signer',
   INVALID_USER_PHONE_NUMBER_SIGNATURE = 'CELO_ODIS_WARN_10 BAD_INPUT User phone number signature is invalid',
   UNKNOWN_DOMAIN = 'CELO_ODIS_WARN_11 BAD_INPUT Provided domain name and version is not recognized',
+  DISABLED_DOMAIN = 'CELO_ODIS_WARN_12 BAD_INPUT Provided domain is disabled',
 }

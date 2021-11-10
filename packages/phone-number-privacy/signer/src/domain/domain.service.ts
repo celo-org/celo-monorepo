@@ -55,9 +55,6 @@ export class DomainService implements IDomainService {
     const trx = await getTransaction()
     try {
       const domainState = await getDomainStateWithLock(domain, trx, logger)
-      if (!this.nonceCheck(request, domainState, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
-        return
-      }
 
       if (!domainState) {
         // If the domain is not currently recorded in the state database, add it now.
@@ -71,6 +68,7 @@ export class DomainService implements IDomainService {
       }
 
       await setDomainDisabled(domain, logger)
+      await trx.commit()
       response.sendStatus(200)
     } catch (error) {
       logger.error('Error while disabling domain', error)
@@ -103,9 +101,6 @@ export class DomainService implements IDomainService {
     })
     try {
       const domainState = await getDomainState(domain, logger)
-      if (!this.nonceCheck(request, domainState, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
-        return
-      }
 
       let resultResponse: DomainStatusResponse
       if (domainState) {
@@ -165,6 +160,14 @@ export class DomainService implements IDomainService {
           trx,
           logger
         )
+      }
+      if (domainState[DOMAINS_STATES_COLUMNS.disabled]) {
+        logger.warn(`Domain is disabled`, {
+          name: domain.name,
+          version: domain.version,
+        })
+        respondWithError(Endpoints.DOMAIN_SIGN, response, 400, WarningMessage.DISABLED_DOMAIN)
+        return
       }
 
       const quotaState = await this.quotaService.checkAndUpdateQuota(
