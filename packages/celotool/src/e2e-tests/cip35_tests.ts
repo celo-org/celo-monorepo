@@ -156,7 +156,7 @@ function getGethRunConfig(withDonut: boolean): GethRunConfig {
  * @param a (Buffer|Uint8Array)
  * @return (Buffer|Uint8Array)
  */
-const stripZeros = function (a: any): Buffer | Uint8Array {
+function stripZeros(a: any): Buffer | Uint8Array {
   let first = a[0]
   while (a.length > 0 && first.toString() === '0') {
     a = a.slice(1)
