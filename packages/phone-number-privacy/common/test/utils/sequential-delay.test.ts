@@ -1,6 +1,6 @@
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import {
-  checkSequentialDelay,
+  checkSequentialDelayRateLimit,
   SequentialDelayDomain,
   SequentialDelayResult,
 } from '../../src/domains'
@@ -16,12 +16,12 @@ describe('Sequential Delay Test Suite', () => {
     for (const attempt of attempts) {
       console.log(result)
       console.log(`t + ${attempt.timestamp - t}`)
-      result = checkSequentialDelay(domain, attempt.timestamp, result?.state)
+      result = checkSequentialDelayRateLimit(domain, attempt.timestamp, result?.state)
       expect(result).toEqual(attempt.expectedResult)
     }
   }
 
-  describe('checkSequentialDelay', () => {
+  describe('checkSequentialDelayRateLimit', () => {
     it('should not accept attempts until initial delay', () => {
       const t = 0 // initial delay
 

@@ -1,5 +1,6 @@
 import {
   authenticateUser,
+  Endpoints,
   ErrorMessage,
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
@@ -20,7 +21,6 @@ import config, { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
-import { Endpoints } from '../server'
 import { getBlockNumber, getContractKit } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 

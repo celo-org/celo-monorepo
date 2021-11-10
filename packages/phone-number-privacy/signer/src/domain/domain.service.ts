@@ -13,6 +13,7 @@ import {
   DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseSuccess,
+  Endpoints,
   ErrorMessage,
   KnownDomainState,
   WarningMessage,
@@ -32,7 +33,6 @@ import {
   setDomainDisabled,
 } from '../database/wrappers/domainState'
 import { getKeyProvider } from '../key-management/key-provider'
-import { Endpoints } from '../server'
 import { IDomainAuthService } from './auth/domainAuth.interface'
 import { IDomainService } from './domain.interface'
 import { IDomainQuotaService } from './quota/domainQuota.interface'

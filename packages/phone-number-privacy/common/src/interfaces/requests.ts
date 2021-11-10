@@ -15,6 +15,17 @@ import {
   SequentialDelayDomain,
 } from '../../src/domains'
 
+export enum Endpoints {
+  STATUS = '/status',
+  METRICS = '/metrics',
+  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
+  GET_QUOTA = '/getQuota',
+
+  DISABLE_DOMAIN = '/domain/disable',
+  DOMAIN_SIGN = '/domain/sign/',
+  DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
+}
+
 export enum AuthenticationMethod {
   NONE = 'none',
   WALLET_KEY = 'wallet_key',

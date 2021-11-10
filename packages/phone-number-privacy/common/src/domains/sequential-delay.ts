@@ -129,7 +129,7 @@ export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
 }
 
 export interface SequentialDelayDomainState {
-  /** Timestamp used for deciding when the next request will be accepted. */
+  /** Timestamp in seconds since the Unix Epoch determining when a new request will be accepted. */
   timer: number
   /** Number of queries that have been accepted for the SequentialDelayDomain instance. */
   counter: number
@@ -137,8 +137,16 @@ export interface SequentialDelayDomainState {
   disabled: boolean
 }
 
+/** Result values of the sequential delay domain rate limiting function */
 export interface SequentialDelayResult {
+  /** Whether or not a request will be accepted at the given time */
   accepted: boolean
+  /**
+   * Earliest time a request will be accepted at the current stage.
+   * May be in the past. Undefined if a request will never be accepted.
+   */
+  notBefore?: number
+  /** State after applying adding a query to the quota. Unchnaged is accepted is false */
   state: SequentialDelayDomainState | undefined
 }
 
@@ -155,7 +163,7 @@ interface IndexedSequentialDelayStage extends SequentialDelayStage {
  * @param attemptTime The Unix timestamp in seconds when the request was received.
  * @param state The current state of the domain, endoing the used quota and timeer value.
  */
-export const checkSequentialDelay = (
+export const checkSequentialDelayRateLimit = (
   domain: SequentialDelayDomain,
   attemptTime: number,
   state?: SequentialDelayDomainState
@@ -180,12 +188,13 @@ export const checkSequentialDelay = (
   const notBefore = timer + delay
 
   if (attemptTime < notBefore) {
-    return { accepted: false, state }
+    return { accepted: false, notBefore, state }
   }
 
   // Request is accepted. Update the state.
   return {
     accepted: true,
+    notBefore,
     state: {
       counter: counter + 1,
       timer: resetTimer ? attemptTime : notBefore,
