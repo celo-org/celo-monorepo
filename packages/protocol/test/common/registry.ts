@@ -13,7 +13,7 @@ contract('Registry', (accounts: any) => {
   const hash: string = soliditySha3(anIdentifier)
 
   beforeEach(async () => {
-    registry = await Registry.new({ from: owner })
+    registry = await Registry.new(true, { from: owner })
     await registry.initialize()
   })
 

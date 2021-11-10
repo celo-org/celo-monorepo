@@ -8,6 +8,6 @@
   "ignoreCompilerErrors": true,
   "hideGenerator": "true",
   "theme": "gitbook",
-  "out": "../../../docs/developer-resources/keystores/reference",
+  "out": "../../docs/developer-resources/keystores/reference",
   "gitRevision": "master"
 }

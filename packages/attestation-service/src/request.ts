@@ -28,8 +28,8 @@ export function asyncHandler<T>(handler: (req: express.Request, res: Response) =
       handler(req, res)
         .then(() => res.locals.logger.info({ res }))
         .catch(handleUnknownError)
-    } catch (error) {
-      handleUnknownError(error)
+    } catch (error: any) {
+      handleUnknownError(error instanceof Error ? error : new Error(error))
     }
   }
 }

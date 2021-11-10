@@ -9,8 +9,9 @@ import requestIdMiddleware from 'express-request-id'
 import * as PromClient from 'prom-client'
 import {
   initializeDB,
-  initializeKit,
+  initializeKits,
   startPeriodicHealthCheck,
+  startPeriodicKitsCheck,
   verifyConfigurationAndGetURL,
 } from './db'
 import { fetchEnv, fetchEnvOrDefault, isDevMode, isYes } from './env'
@@ -26,7 +27,7 @@ import { initializeSmsProviders, smsProvidersWithDeliveryStatus } from './sms'
 
 async function init() {
   await initializeDB()
-  await initializeKit()
+  await initializeKits()
 
   let externalURL: string
 
@@ -44,6 +45,7 @@ async function init() {
   await initializeSmsProviders(deliveryStatusURLForProviderType)
 
   await startPeriodicHealthCheck()
+  await startPeriodicKitsCheck()
 
   const rateLimitReqsPerMin = parseInt(fetchEnvOrDefault('RATE_LIMIT_REQS_PER_MIN', '100'), 10)
   const rateLimiter = rateLimit({
