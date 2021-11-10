@@ -39,6 +39,9 @@ geth:
   fullnodeCheckBlockAge: true
   ws_port: 8546
   validatorExtraSnippet: ""
+  proxyExtraSnippet: ""
+  txNodeExtraSnippet: ""
+  txNodePrivateExtraSnippet: ""
 
 # UpdateStrategy for statefulsets only. Partition=0 is default rollingUpdate behaviour.
 updateStrategy:
