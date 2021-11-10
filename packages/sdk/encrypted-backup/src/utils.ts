@@ -3,6 +3,9 @@ import * as crypto from 'crypto'
 // NOTE: This modeule is intended for use within the @celo/encrypted-backup package and so is not
 // exported in the index.ts file.
 
+/** Pared down ReadOnlyWallet type that supports the required functions of EIP-712 signing. */
+export type EIP712Wallet = Pick<ReadOnlyWallet, 'getAccounts' | 'hasAccount' | 'signTypedData'>
+
 /** Info strings to sperate distinct usages of the key derivation function */
 export enum KDFInfo {
   PASSWORD = 'Celo Backup Password and Nonce',
