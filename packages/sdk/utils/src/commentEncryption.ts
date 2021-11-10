@@ -106,7 +106,7 @@ export function decryptComment(comment: string, key: Buffer, sender: boolean): E
     const buf = Buffer.from(comment, 'base64')
     const data = decryptData(buf, key, sender).toString('ucs2')
     return { success: true, comment: data }
-  } catch (error) {
+  } catch (error: any) {
     console.info(`${TAG}/Could not decrypt: ${error.message}`)
     return { success: false, comment }
   }

@@ -14,9 +14,24 @@ import {
   RegistryContract,
 } from 'types'
 import { keccak256 } from 'web3-utils'
+
+import BigNumber from 'bignumber.js'
+
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Registry: RegistryContract = artifacts.require('Registry')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
+
+const assertStorageRoots = (rootsHex: string, lengths: BigNumber[], expectedRoots: string[]) => {
+  assert.equal(lengths.length, expectedRoots.length)
+  const roots = web3.utils.hexToUtf8(rootsHex)
+  let currentIndex = 0
+  expectedRoots.forEach((expectedRoot: string, i: number) => {
+    const root = roots.slice(currentIndex, currentIndex + lengths[i].toNumber())
+    currentIndex += lengths[i].toNumber()
+    assert.equal(root, expectedRoot)
+  })
+  assert.equal(roots.length, currentIndex)
+}
 
 contract('Accounts', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
@@ -26,6 +41,9 @@ contract('Accounts', (accounts: string[]) => {
 
   const name = 'Account'
   const metadataURL = 'https://www.celo.org'
+  const otherMetadataURL = 'https://clabs.co'
+  const storageRoot = web3.utils.utf8ToHex(metadataURL)
+  const otherStorageRoot = web3.utils.utf8ToHex(otherMetadataURL)
   const dataEncryptionKey = '0x02f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111'
   const longDataEncryptionKey =
     '0x04f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e01611111111' +
@@ -36,7 +54,7 @@ contract('Accounts', (accounts: string[]) => {
   beforeEach(async () => {
     accountsInstance = await Accounts.new(true, { from: account })
     mockValidators = await MockValidators.new()
-    const registry = await Registry.new()
+    const registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await accountsInstance.initialize(registry.address)
@@ -349,6 +367,92 @@ contract('Accounts', (accounts: string[]) => {
       for (let i = 0; i < accounts.length; i++) {
         assert.equal(strings[i], randomStrings[i])
       }
+    })
+  })
+
+  describe('#addStorageRoot', () => {
+    describe('when the account has not been created', () => {
+      it('should revert', async () => {
+        await assertRevert(accountsInstance.addStorageRoot(storageRoot))
+      })
+    })
+
+    describe('when the account has been created', () => {
+      beforeEach(async () => {
+        await accountsInstance.createAccount()
+      })
+
+      it('adds a new storage root', async () => {
+        await accountsInstance.addStorageRoot(storageRoot)
+        const [rootsHex, lengths] = await accountsInstance.getOffchainStorageRoots(accounts[0])
+        assertStorageRoots(rootsHex, lengths, [metadataURL])
+      })
+
+      it('should emit the OffchainStorageRootAdded event', async () => {
+        const response = await accountsInstance.addStorageRoot(storageRoot)
+        assert.lengthOf(response.logs, 1)
+        const event = response.logs[0]
+        assertLogMatches2(event, {
+          event: 'OffchainStorageRootAdded',
+          args: { account: caller, url: storageRoot },
+        })
+      })
+
+      it('can add multiple storage roots', async () => {
+        await accountsInstance.addStorageRoot(storageRoot)
+        await accountsInstance.addStorageRoot(otherStorageRoot)
+        const [rootsHex, lengths] = await accountsInstance.getOffchainStorageRoots(accounts[0])
+        assertStorageRoots(rootsHex, lengths, [metadataURL, otherMetadataURL])
+      })
+    })
+  })
+
+  describe('#removeStorageRoot', () => {
+    describe('when the account has not been created', () => {
+      it('should revert', async () => {
+        await assertRevert(accountsInstance.removeStorageRoot(0))
+      })
+    })
+
+    describe('when the account has been created', () => {
+      beforeEach(async () => {
+        await accountsInstance.createAccount()
+      })
+
+      describe('when there are no storage roots', async () => {
+        it('should revert', async () => {
+          await assertRevert(accountsInstance.removeStorageRoot(0))
+        })
+      })
+
+      describe('when there are storage roots', async () => {
+        beforeEach(async () => {
+          await accountsInstance.addStorageRoot(storageRoot)
+          await accountsInstance.addStorageRoot(otherStorageRoot)
+        })
+
+        it('should remove one of the storage roots', async () => {
+          await accountsInstance.removeStorageRoot(0)
+          const [rootsHex, lengths] = await accountsInstance.getOffchainStorageRoots(accounts[0])
+          assertStorageRoots(rootsHex, lengths, [otherMetadataURL])
+        })
+
+        it('should remove a different storage root', async () => {
+          await accountsInstance.removeStorageRoot(1)
+          const [rootsHex, lengths] = await accountsInstance.getOffchainStorageRoots(accounts[0])
+          assertStorageRoots(rootsHex, lengths, [metadataURL])
+        })
+
+        it('should emit the OffchainStorageRootRemoved event', async () => {
+          const response = await accountsInstance.removeStorageRoot(0)
+          assert.lengthOf(response.logs, 1)
+          const event = response.logs[0]
+          assertLogMatches2(event, {
+            event: 'OffchainStorageRootRemoved',
+            args: { account: caller, url: storageRoot, index: 0 },
+          })
+        })
+      })
     })
   })
 
@@ -705,8 +809,8 @@ contract('Accounts', (accounts: string[]) => {
           it(`should emit the right event`, async () => {
             const resp = await testInstance.fn(authorized, sig.v, sig.r, sig.s)
 
-            assert.equal(resp.logs.length, genericWrite ? 2 : 3)
-            const log = resp.logs[genericWrite ? 0 : 2]
+            assert.equal(resp.logs.length, genericWrite ? 3 : 4)
+            const log = resp.logs[genericWrite ? 0 : 3]
             assertLogMatches(
               log,
               testInstance.eventName,

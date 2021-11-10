@@ -26,8 +26,8 @@ contract('GasPriceMinimum', (accounts: string[]) => {
   const adjustmentSpeed = toFixed(1 / 2)
 
   beforeEach(async () => {
-    registry = await Registry.new()
-    gasPriceMinimum = await GasPriceMinimum.new()
+    registry = await Registry.new(true)
+    gasPriceMinimum = await GasPriceMinimum.new(true)
 
     await gasPriceMinimum.initialize(
       registry.address,
