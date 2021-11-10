@@ -306,6 +306,7 @@ data:
       # To allow proxies to scale up easily without conflicting with keys of
       # proxies associated with other validators
       KEY_INDEX=$(( ({{ .validator_index }} * 10000) + $RID ))
+      echo {{ .validator_index }} > /root/.celo/validator_index
       {{ else }}
       KEY_INDEX=$RID
       {{ end }}
