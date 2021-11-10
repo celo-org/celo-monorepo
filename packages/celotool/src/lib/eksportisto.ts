@@ -19,10 +19,19 @@ const yaml = require('js-yaml')
 const chartDirForVersion: Record<number, string> = {
   1: '../helm-charts/eksportisto_11',
   2: '../helm-charts/eksportisto-2.0',
+  3: '../helm-charts/eksportisto',
+}
+
+function baseName(suffix: string) {
+  if (suffix.length > 0) {
+    return `eksportisto-${suffix}`
+  } else {
+    return 'eksportisto'
+  }
 }
 
 function releaseName(celoEnv: string, suffix: string) {
-  return `${celoEnv}-eksportisto-${suffix}`
+  return `${celoEnv}-${baseName(suffix)}`
 }
 
 interface Context {
@@ -35,10 +44,10 @@ interface Context {
 
 function buildContext(celoEnv: string): Context {
   const chartVersion = parseInt(fetchEnv(envVar.EKSPORTISTO_CHART_VERSION), 10)
-  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
+  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '')
   const chartDir = chartDirForVersion[chartVersion]
   if (chartDir === undefined) {
-    throw new Error('version has to be 1 or 2')
+    throw new Error('version has to be 1, 2 or 3')
   }
 
   return {
@@ -75,12 +84,12 @@ export async function upgradeHelmChart(celoEnv: string) {
 }
 
 export async function removeHelmRelease(celoEnv: string) {
-  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
+  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '')
   await removeGenericHelmChart(releaseName(celoEnv, suffix), celoEnv)
 }
 
 async function getServiceAccountKeyBase64FromHelm(celoEnv: string) {
-  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
+  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '')
   const relName = releaseName(celoEnv, suffix)
   const installedCharts = await execCmdAndParseJson(`helm list --short -o json -n ${celoEnv}`)
   const chartInstalled = installedCharts.includes(relName)
@@ -92,8 +101,8 @@ async function getServiceAccountKeyBase64FromHelm(celoEnv: string) {
 }
 
 function getServiceAccountName(celoEnv: string) {
-  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
-  return `${celoEnv}-eksportisto-${suffix}`
+  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '')
+  return releaseName(celoEnv, suffix)
 }
 
 async function getServiceAccountKeyBase64(celoEnv: string) {
@@ -197,8 +206,8 @@ export async function getInternalTxNodeIps(context: Context): Promise<CeloNodes>
     )
   ).filter((node) => node.status === 'RUNNING')
 
-  const tipNodeLabel = `eksportisto-${context.suffix}-tip`
-  const backfillNodeLabel = `eksportisto-${context.suffix}-backfill`
+  const tipNodeLabel = `${baseName(context.suffix)}-tip`
+  const backfillNodeLabel = `${baseName(context.suffix)}-backfill`
 
   return {
     tip: runningNodes.find((node) => node.labels[tipNodeLabel] === 'true'),
@@ -208,7 +217,7 @@ export async function getInternalTxNodeIps(context: Context): Promise<CeloNodes>
 
 async function helmParameters(context: Context) {
   const { celoEnv } = context
-  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '1')
+  const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '')
   const params = [
     `--namespace ${celoEnv}`,
     `--set environment="${celoEnv}"`,
@@ -225,9 +234,19 @@ async function helmParameters(context: Context) {
       `--set bigquery.dataset=${celoEnv}_eksportisto_${suffix}`,
       `--set serviceAccountBase64="${serviceAccountKeyBase64}"`
     )
+  } else if (context.chartVersion === 3) {
+    const serviceAccountKeyBase64 = await getServiceAccountKeyBase64(celoEnv)
+    const serviceAccountEmail = await getServiceAccountEmail(getServiceAccountName(celoEnv))
+    await allowServiceAccountToWriteToBigquery(serviceAccountEmail)
+    params.push(
+      `--set bigquery.dataset=${celoEnv}_eksportisto`,
+      `--set serviceAccountBase64="${serviceAccountKeyBase64}"`
+    )
   }
 
-  if (isVmBased()) {
+  // These node parameters are not used by the latest eksportisto release.
+  // TODO(pedro-clabs): remove once eksportisto 11 is decomissioned.
+  if (isVmBased() && context.chartVersion < 3) {
     const nodes = await getInternalTxNodeIps(context)
     if (nodes.tip === undefined) {
       throw new Error(`No nodes in the VM group ar labeled as "eksportisto-${context.suffix}-tip"`)
