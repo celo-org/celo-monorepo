@@ -11,15 +11,20 @@ import { ProxyInstance, RegistryInstance } from 'types'
  * proposal description.
  *
  * Expects the following flags:
- *   --build_directory: The directory in which smart contract build artifacts
- *   can be found (defaults to ./build/contracts/)
+ *   --build_artifacts: The directory in which smart contract build artifacts
+ *   can be found (default: "./build/contracts/")
  *   --proposal: The JSON file containing a Governance proposal that
  *   repoints the Registry to newly deployed Proxies and/or repoints existing
  *   Proxies to new implementation addresses.
+ *   --initialize_data: The JSON file containing, for each newly deployed Proxy,
+ *   the calldata to its logic contract's `initialize` function.
+ *   --network: The name of the network to verify (default: "development").
+ *   --librariesFile: The file to which linked library addresses will be
+ *   written (default: "libraries.json").
  *
  * Run using truffle exec, e.g.:
  * truffle exec scripts/truffle/verify-bytecode \
- *   --network alfajores --build_directory build/alfajores/contracts --proposal proposal.json
+ *   --network alfajores --build_artifacts build/alfajores/contracts --proposal proposal.json
  */
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
