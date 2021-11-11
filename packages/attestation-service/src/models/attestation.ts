@@ -15,6 +15,7 @@ export interface SmsFields {
   attestationCode: string | null
   appSignature: string | undefined
   language: string | undefined
+  attempt: number
 }
 
 export interface AttestationModel extends Model, SmsFields {
@@ -22,7 +23,6 @@ export interface AttestationModel extends Model, SmsFields {
   securityCodeAttempt: number
   ongoingDeliveryId: string | null
   providers: string
-  attempt: number
   status: AttestationStatus
   errors: string | null
   createdAt: Date
