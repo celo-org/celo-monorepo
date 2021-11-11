@@ -182,7 +182,7 @@ fi
 
 {{ include  "common.bootnode-flag-script" . | indent 4 }}
 
-{{ .extra_setup | indent 4 }}
+{{ default "" .extra_setup | indent 4 }}
 
     exec geth \
       --port $PORT  \

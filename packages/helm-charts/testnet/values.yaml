@@ -38,10 +38,14 @@ geth:
     #   cpu: "4"
   fullnodeCheckBlockAge: true
   ws_port: 8546
-  validatorExtraSnippet: ""
-  proxyExtraSnippet: ""
-  txNodeExtraSnippet: ""
-  txNodePrivateExtraSnippet: ""
+  validatorExtraSnippet: |
+    echo "Validator"
+  proxyExtraSnippet: |
+    echo "Proxy"
+  txNodeExtraSnippet: |
+    echo "txnode"
+  txNodePrivateExtraSnippet: |
+    echo "txnode-private"
 
 # UpdateStrategy for statefulsets only. Partition=0 is default rollingUpdate behaviour.
 updateStrategy:
