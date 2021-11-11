@@ -157,6 +157,14 @@ spec:
       containers:
 {{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "rpc_apis" .rpc_apis "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "ws_port" (default .Values.geth.ws_port .ws_port) "pprof" (or (.Values.metrics) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" .Values.metrics "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
       terminationGracePeriodSeconds:  {{ .Values.geth.terminationGracePeriodSeconds | default 300 }}
+      {{- if .node_selector }}
+      nodeSelector:
+{{ toYaml .node_selector | indent 8 }}
+      {{- end }}
+      {{- if .tolerations }}
+      tolerations:
+{{ toYaml .tolerations | indent 8 }}
+      {{- end }}
       volumes:
       - name: data
         emptyDir: {}
