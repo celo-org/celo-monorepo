@@ -4,10 +4,9 @@ export enum BackupErrorTypes {
   AuthorizationError = 'AuthorizationError',
   DecodeError = 'DecodeError',
   DecryptionError = 'DecryptionError',
-  ImplementationError = 'ImplementationError',
   InvalidBackupError = 'InvalidBackupError',
-  OdisError = 'OdisError',
-  RateLimitingError = 'RateLimitingError',
+  OdisServiceError = 'OdisServiceError',
+  OdisRateLimitingError = 'OdisRateLimitingError',
 }
 
 // TODO(victor) Error definitions could either be improved or made more conscise. There is no need
@@ -32,27 +31,21 @@ export class DecryptionError extends RootError<BackupErrorTypes.DecryptionError>
   }
 }
 
-export class ImplementationError extends RootError<BackupErrorTypes.ImplementationError> {
-  constructor(readonly error?: Error) {
-    super(BackupErrorTypes.ImplementationError)
-  }
-}
-
 export class InvalidBackupError extends RootError<BackupErrorTypes.InvalidBackupError> {
   constructor(readonly error?: Error) {
     super(BackupErrorTypes.InvalidBackupError)
   }
 }
 
-export class OdisError extends RootError<BackupErrorTypes.OdisError> {
+export class OdisServiceError extends RootError<BackupErrorTypes.OdisServiceError> {
   constructor(readonly error?: Error, readonly version?: string) {
-    super(BackupErrorTypes.OdisError)
+    super(BackupErrorTypes.OdisServiceError)
   }
 }
 
-export class RateLimitingError extends RootError<BackupErrorTypes.RateLimitingError> {
+export class OdisRateLimitingError extends RootError<BackupErrorTypes.OdisRateLimitingError> {
   constructor(readonly notBefore?: number) {
-    super(BackupErrorTypes.RateLimitingError)
+    super(BackupErrorTypes.OdisRateLimitingError)
   }
 }
 
@@ -60,7 +53,6 @@ export type BackupError =
   | AuthorizationError
   | DecodeError
   | DecryptionError
-  | ImplementationErrors
   | InvalidBackupError
-  | OdisError
-  | RateLimitingError
+  | OdisServiceError
+  | OdisRateLimitingError

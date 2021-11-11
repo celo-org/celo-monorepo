@@ -34,7 +34,10 @@ export const BackupSchema: t.Type<Backup, object> = t.intersection([
     nonce: BufferFromBase64,
     version: t.string,
     metadata: t.type({}),
-    environment: t.type({}),
+    environment: t.type({
+      odisUrl: t.string,
+      odisPubKey: t.string,
+    }),
   }),
   // Optional fields
   // https://github.com/gcanti/io-ts/blob/master/index.md#mixing-required-and-optional-props

@@ -1,3 +1,4 @@
+import { ReadOnlyWallet } from '@celo/connect'
 import * as crypto from 'crypto'
 
 // NOTE: This modeule is intended for use within the @celo/encrypted-backup package and so is not
@@ -28,7 +29,7 @@ export function deriveKey(info: KDFInfo, sources: Buffer[], length: number = 16)
     return hash.digest()
   })
 
-  return crypto.pbkdf2Sync(Buffer.concat(chunks), nonce, 1, length, 'sha256')
+  return crypto.pbkdf2Sync(Buffer.concat(chunks), Buffer.alloc(0), 1, length, 'sha256')
 }
 
 /**

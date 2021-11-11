@@ -1,12 +1,11 @@
-import {
-  Domain,
-  domainHash,
-  isKnownDomain,
-  SequentialDelayDomain,
-} from '@celo/phone-number-privacy-common/lib/domains'
+import { eqAddress } from '@celo/base/lib/address'
 import { Err, Ok, Result } from '@celo/base/lib/result'
+import { ServiceContext as OdisEnvironment } from '@celo/identity/lib/odis/query'
+import { SequentialDelayDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import * as crypto from 'crypto'
+import { HardeningConfig } from './config'
 import { BackupError, InvalidBackupError } from './errors'
+import { buildOdisDomain, odisQueryAuthorizer, odisHardenKey } from './odis'
 import { deriveKey, decrypt, encrypt, KDFInfo } from './utils'
 
 export interface Backup {
@@ -46,43 +45,69 @@ export interface Backup {
   metadata: {}
 
   // TODO(victor): Fill in environment.
-  environment: {}
+  environment: OdisEnvironment & {}
 }
 
-export function createBackup(
-  data: Buffer,
-  password: Buffer,
-  domain?: SequentialDelayDomain
-): Backup<SequentialDelayDomain> {
+// TODO(victor): Add io-ts types for these and embed the value in th Backup struct.
+export interface CreateBackupArgs {
+  data: Buffer
+  password: Buffer
+  hardening: HardeningConfig
+  odisEnvironment: OdisEnvironment
+}
+
+// TODO(victor): Add createPinEncryptedBackup function as a helpful wrapper.
+
+export async function createBackup({
+  data,
+  password,
+  hardening,
+  odisEnvironment,
+}: CreateBackupArgs): Promise<Result<Backup, BackupError>> {
   const nonce = crypto.randomBytes(16)
   let key = deriveKey(KDFInfo.PASSWORD, [password, nonce])
+
+  // Derive the query authorizer wallet and address from the nonce, then build the ODIS domain.
+  // This domain acts as a binding rate limit configuration for ODIS, enforcing that the client must
+  // know the backup nonce, and can only make the given number of queries.
+  const authorizer = odisQueryAuthorizer(nonce)
+  const domain = buildOdisDomain(hardening, authorizer.address)
 
   // Generate a fuse key and mix it into the entropy of the key
   // TODO: Replace this with a proper circuit breaker impl.
   const fuseKey = crypto.randomBytes(16)
   key = deriveKey(KDFInfo.FUSE_KEY, [key, fuseKey])
 
-  // TODO: Replace this with ODIS.
+  // Harden the key with the output of a rate limited ODIS POPRF function.
   if (domain !== undefined) {
-    key = deriveKey(KDFInfo.ODIS_KEY_HARDENING, [key, domainHash(domain)])
+    const odisHardenedKey = await odisHardenKey(key, domain, odisEnvironment, authorizer.wallet)
+    if (!odisHardenedKey.ok) {
+      return odisHardenedKey
+    }
+    key = odisHardenedKey.result
   }
 
   // Encrypted and wrap the data in a Backup structure.
-  return {
+  return Ok({
     encryptedData: encrypt(key, data),
     nonce,
     odisDomain: domain,
     encryptedFuseKey: fuseKey,
     version: '0.0.1',
     metadata: {},
-    environment: {},
-  }
+    environment: odisEnvironment,
+  })
 }
 
-export function openBackup(
-  backup: Backup<SequentialDelayDomain>,
+export interface OpenBackupArgs {
+  backup: Backup
   password: Buffer
-): Result<Buffer, BackupError> {
+}
+
+export async function openBackup({
+  backup,
+  password,
+}: OpenBackupArgs): Promise<Result<Buffer, BackupError>> {
   let key = deriveKey(KDFInfo.PASSWORD, [password, backup.nonce])
 
   // TODO: Replace this with a proper circuit breaker impl.
@@ -90,13 +115,22 @@ export function openBackup(
     key = deriveKey(KDFInfo.FUSE_KEY, [key, backup.encryptedFuseKey])
   }
 
-  // TODO: Replace this with ODIS.
+  // Harden the key with the output of a rate limited ODIS POPRF function.
   if (backup.odisDomain !== undefined) {
-    if (!isKnownDomain(backup.odisDomain)) {
+    const domain = backup.odisDomain
+
+    // Derive the query authorizer wallet and address from the nonce.
+    // If the ODIS domain is authenticated, the authorizer address should match the domain.
+    const authorizer = odisQueryAuthorizer(backup.nonce)
+    if (domain.address.defined && !eqAddress(authorizer.address, domain.address.value)) {
       return Err(new InvalidBackupError())
     }
 
-    key = deriveKey(KDFInfo.ODIS_KEY_HARDENING, [key, domainHash(backup.odisDomain)])
+    const odisHardenedKey = await odisHardenKey(key, domain, backup.environment, authorizer.wallet)
+    if (!odisHardenedKey.ok) {
+      return odisHardenedKey
+    }
+    key = odisHardenedKey.result
   }
 
   return Ok(decrypt(key, backup.encryptedData))
