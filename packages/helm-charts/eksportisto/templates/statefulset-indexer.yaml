@@ -24,7 +24,7 @@ metadata:
 spec:
   serviceName: eksportisto-indexer
   podManagementPolicy: Parallel
-  replicas: 1
+  replicas: 32
   selector:
     matchLabels:
       app: eksportisto
@@ -60,8 +60,8 @@ spec:
               fieldPath: metadata.name
         resources:
           requests:
-            memory: 200Mi
-            cpu: 500m
+            memory: 100Mi
+            cpu: 100m
         ports:
         - name: prometheus
           containerPort: 8080
