@@ -109,30 +109,6 @@ export class TwilioVerifyProvider extends TwilioSmsProvider {
       }
     }
 
-    // If there's a previous verification
-    // if (attestation.attempt) {
-    // console.log('hellooooo')
-    // const y = new Date()
-    // try {
-    //   // const x = await this.client.verify
-    //   await this.client.verify
-    //     .services(this.verifyServiceSid)
-    //     .verifications(attestation.phoneNumber)
-    //     .update({ status: 'canceled' })
-    //   // console.log(x)
-    // } catch (e) {
-    //   // let errorMsg = 'no error message'
-    //   // if (e instanceof Error) {
-    //   //   errorMsg = e.message
-    //   // }
-    //   // throw new Error(`Unable to cancel previous verification: ${errorMsg}`)
-    // }
-    // const z = new Date()
-    // console.log('total time: ', z.getTime() - y.getTime())
-    // // }
-
-    let deliveryId: string
-
     // Note: SID returned by Verify API is not unique for a phone number (within a 10 min interval)
     // i.e. re-requests to the same phone number in <10 min will return an exisiting SID
 
@@ -140,7 +116,7 @@ export class TwilioVerifyProvider extends TwilioSmsProvider {
       const m = await this.client.verify
         .services(this.verifyServiceSid)
         .verifications.create(requestParams)
-      deliveryId = m.sid
+      return m.sid
     } catch (e) {
       // Verify landlines using voice
       if (
@@ -152,23 +128,10 @@ export class TwilioVerifyProvider extends TwilioSmsProvider {
         const m = await this.client.verify
           .services(this.verifyServiceSid)
           .verifications.create(requestParams)
-        deliveryId = m.sid
+        return m.sid
       } else {
         throw e
       }
-    }
-    try {
-      // Change status of verification to ensure unique delivery IDs are created
-      await this.client.verify
-        .services(this.verifyServiceSid)
-        .verifications(deliveryId)
-        .update({ status: 'canceled' })
-    } catch {
-      // This shouldn't throw a hard error though as this is to prevent a tiny edge case:
-      // 2 Verify requests for the same issuer + phone number in <10 min.
-      // At this point, the text has already been sent.
-    } finally {
-      return deliveryId
     }
   }
 }

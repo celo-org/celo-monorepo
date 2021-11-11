@@ -320,10 +320,15 @@ export async function findAttestationByDeliveryId(
   ongoingDeliveryId: string,
   options: FindOptions = {}
 ): Promise<AttestationModel | null> {
-  return (await getAttestationTable()).findOne({
+  // For testing only, delete
+  const val = (await getAttestationTable()).findOne({
     where: { ongoingDeliveryId },
+    // Ensure deterministic result, since deliveryId uniqueness is not enforced
+    order: ['createdAt', 'desc'],
     ...options,
   })
+  rootLogger.warn(`In findAttestationByDeliveryId, deliveryId: ${ongoingDeliveryId}, val: ${val} `)
+  return val
 }
 
 export async function findOrCreateAttestation(

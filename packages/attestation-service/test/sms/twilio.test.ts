@@ -1,6 +1,6 @@
 import { SmsFields } from '../../src/models/attestation'
 import { TwilioMessagingProvider, TwilioVerifyProvider } from '../../src/sms/twilio'
-import { mockMessagesCreate, mockVerifyCreate, mockVerifyUpdate } from '../__mocks__/twilio'
+import { mockMessagesCreate, mockVerifyCreate } from '../__mocks__/twilio'
 
 jest.mock('../__mocks__/twilio')
 
@@ -25,48 +25,30 @@ describe('TwilioSmsProvider tests', () => {
       attestationCode: '56789',
       appSignature: undefined,
       language: 'en',
-      attempt: 0,
     }
   })
-  describe('TwilioVerifyProvider tests', () => {
-    it('should initialize and send SMS', async () => {
-      const twilioVerifyProvider = new TwilioVerifyProvider(
-        twilioSid,
-        twilioAuthToken,
-        unsupportedRegionCodes,
-        verifyServiceSid
-      )
-      await twilioVerifyProvider.initialize('fake-delivery-status-url')
-      await twilioVerifyProvider.sendSms(attestation)
-      expect(mockVerifyCreate).toBeCalledTimes(1)
-      expect(mockMessagesCreate).not.toBeCalled()
-    })
-    it('should create new SID on second attempt', async () => {
-      const twilioVerifyProvider = new TwilioVerifyProvider(
-        twilioSid,
-        twilioAuthToken,
-        unsupportedRegionCodes,
-        verifyServiceSid
-      )
-      await twilioVerifyProvider.initialize('fake-delivery-status-url')
-      await twilioVerifyProvider.sendSms(attestation)
-      expect(mockVerifyCreate).toBeCalledTimes(1)
-      expect(mockVerifyUpdate).toBeCalledTimes(1)
-      expect(mockMessagesCreate).not.toBeCalled()
-    })
+  it('should initialize and send SMS via TwilioVerifyProvider', async () => {
+    const twilioVerifyProvider = new TwilioVerifyProvider(
+      twilioSid,
+      twilioAuthToken,
+      unsupportedRegionCodes,
+      verifyServiceSid
+    )
+    await twilioVerifyProvider.initialize('fake-delivery-status-url')
+    await twilioVerifyProvider.sendSms(attestation)
+    expect(mockVerifyCreate).toBeCalledTimes(1)
+    expect(mockMessagesCreate).not.toBeCalled()
   })
-  describe('TwilioMessagingProvider tests', () => {
-    it('should initialize and send SMS', async () => {
-      const twilioMessagingProvider = new TwilioMessagingProvider(
-        twilioSid,
-        twilioAuthToken,
-        unsupportedRegionCodes,
-        messagingServiceSid
-      )
-      await twilioMessagingProvider.initialize('fake-delivery-status-url')
-      await twilioMessagingProvider.sendSms(attestation)
-      expect(mockMessagesCreate).toBeCalledTimes(1)
-      expect(mockVerifyCreate).not.toBeCalled()
-    })
+  it('should initialize and send SMS via TwilioMessagingProvider', async () => {
+    const twilioMessagingProvider = new TwilioMessagingProvider(
+      twilioSid,
+      twilioAuthToken,
+      unsupportedRegionCodes,
+      messagingServiceSid
+    )
+    await twilioMessagingProvider.initialize('fake-delivery-status-url')
+    await twilioMessagingProvider.sendSms(attestation)
+    expect(mockMessagesCreate).toBeCalledTimes(1)
+    expect(mockVerifyCreate).not.toBeCalled()
   })
 })
