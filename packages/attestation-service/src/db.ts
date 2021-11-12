@@ -324,7 +324,7 @@ export async function findAttestationByDeliveryId(
   const val = (await getAttestationTable()).findOne({
     where: { ongoingDeliveryId },
     // Ensure deterministic result, since deliveryId uniqueness is not enforced
-    order: ['createdAt', 'desc'],
+    order: [['createdAt', 'DESC']],
     ...options,
   })
   rootLogger.warn(`In findAttestationByDeliveryId, deliveryId: ${ongoingDeliveryId}, val: ${val} `)
