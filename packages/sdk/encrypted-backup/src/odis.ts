@@ -99,6 +99,7 @@ export async function odisHardenKey(
   // Unblind the signature response received from ODIS to get the POPRF output.
   let odisOutput: Buffer
   try {
+    // TODO(victor): Once the pOPRF implementation is available, use that instead.
     const odisOutputBase64 = await blindingClient.unblindAndVerifyMessage(
       signatureResp.result.signature
     )
