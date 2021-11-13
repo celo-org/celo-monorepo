@@ -5,7 +5,8 @@ import {
   EIP712TypesWithPrimary,
 } from '@celo/utils/lib/sign-typed-data-utils'
 import * as t from 'io-ts'
-import { Domain, DomainIdentifiers } from './domains'
+import { DomainIdentifiers } from './constants'
+import { Domain } from './domains'
 
 // Concrete Domain subtypes are only assignable to Domain and EIP712Object when using type instead
 // of interface. Otherwise the compiler complains about a missing index signature.

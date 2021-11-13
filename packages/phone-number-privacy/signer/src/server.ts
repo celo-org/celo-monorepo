@@ -22,7 +22,7 @@ require('events').EventEmitter.defaultMaxListeners = 15
 export function createServer() {
   const domainService = new DomainService(new DomainAuthService(), new DomainQuotaService())
 
-  logger.info('Creating express server')
+  logger().info('Creating express server')
   const app = express()
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware)
 
@@ -83,12 +83,12 @@ function getSslOptions() {
   const { sslKeyPath, sslCertPath } = config.server
 
   if (!sslKeyPath || !sslCertPath) {
-    logger.info('No SSL configs specified')
+    logger().info('No SSL configs specified')
     return null
   }
 
   if (!fs.existsSync(sslKeyPath) || !fs.existsSync(sslCertPath)) {
-    logger.error('SSL cert files not found')
+    logger().error('SSL cert files not found')
     return null
   }
 

@@ -41,11 +41,6 @@ export interface Domain {
  */
 export type DomainOptions = EIP712Object
 
-/** Enum of identifiers (i.e. names) for all standardized domains */
-export enum DomainIdentifiers {
-  SequentialDelay = 'ODIS Sequential Delay Domain',
-}
-
 /**
  * Union type of domains which are currently implmented and standardized for use with ODIS.
  * Domains should be added to the union type as they are implemented.

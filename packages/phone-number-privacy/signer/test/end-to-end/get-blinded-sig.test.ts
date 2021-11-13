@@ -188,7 +188,7 @@ describe('Running against a deployed service', () => {
 
     it('Check that accounts are set up correctly', async () => {
       expect(await getQuota(ACCOUNT_ADDRESS2, IDENTIFIER)).toBeLessThan(initialQuota)
-      expect(await getWalletAddress(logger, ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
+      expect(await getWalletAddress(logger(), ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
     })
 
     it('Returns sig when querying succeeds with unused request', async () => {

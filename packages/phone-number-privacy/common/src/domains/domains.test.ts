@@ -6,14 +6,8 @@ import {
   noNumber,
   noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
-import {
-  Domain,
-  domainEIP712,
-  DomainIdentifiers,
-  DomainOptions,
-  KnownDomain,
-  KnownDomainOptions,
-} from './domains'
+import { DomainIdentifiers } from './constants'
+import { Domain, domainEIP712, DomainOptions, KnownDomain, KnownDomainOptions } from './domains'
 import { SequentialDelayDomain, SequentialDelayDomainOptions } from './sequential-delay'
 
 // Compile-time check that Domain can be cast to type EIP712Object
