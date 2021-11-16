@@ -1,5 +1,5 @@
 import { KeyName } from '@celo/phone-number-privacy-common'
-import { config } from '../config'
+import config from '../config'
 export interface Key {
   name: KeyName
   version: number
@@ -35,7 +35,7 @@ export abstract class KeyProviderBase implements KeyProvider {
     }
   }
 
-  public abstract async fetchPrivateKeyFromStore(key: Key): Promise<void>
+  public abstract fetchPrivateKeyFromStore(key: Key): Promise<void>
 
   protected setPrivateKey(key: Key, privateKey: string) {
     privateKey = privateKey ? privateKey.trim() : ''
