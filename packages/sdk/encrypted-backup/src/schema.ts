@@ -33,17 +33,17 @@ export const BackupSchema: t.Type<Backup, object> = t.intersection([
     encryptedData: BufferFromBase64,
     nonce: BufferFromBase64,
     version: t.string,
-    metadata: t.type({}),
-    environment: t.type({
-      odisUrl: t.string,
-      odisPubKey: t.string,
-    }),
   }),
   // Optional fields
   // https://github.com/gcanti/io-ts/blob/master/index.md#mixing-required-and-optional-props
   t.partial({
     odisDomain: SequentialDelayDomainSchema,
+    metadata: t.UnknownRecord,
     encryptedFuseKey: BufferFromBase64,
+    environment: t.type({
+      odisUrl: t.string,
+      odisPubKey: t.string,
+    }),
   }),
 ])
 

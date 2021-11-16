@@ -18,11 +18,11 @@ import {
   genSessionID,
 } from '@celo/phone-number-privacy-common'
 import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
-import { queryOdis, ServiceContext as OdisEnvironment } from '@celo/identity/lib/odis/query'
+import { queryOdis, ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/query'
 import { defined, noString, noNumber } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import * as crypto from 'crypto'
-import { HardeningConfig } from './config'
+import { OdisHardeningConfig } from './config'
 import { AuthorizationError, BackupError, OdisServiceError, OdisRateLimitingError } from './errors'
 import { deriveKey, EIP712Wallet, KDFInfo } from './utils'
 
@@ -33,14 +33,14 @@ import { deriveKey, EIP712Wallet, KDFInfo } from './utils'
  * @returns A SequentialDelayDomain with a recommended rate limiting configuration.
  */
 export function buildOdisDomain(
-  hardening: HardeningConfig,
+  config: OdisHardeningConfig,
   authorizer: Address,
   salt?: string
 ): SequentialDelayDomain {
   return {
     name: DomainIdentifiers.SequentialDelay,
     version: '1',
-    stages: hardening.rateLimit,
+    stages: config.rateLimit,
     address: defined(authorizer),
     salt: salt ? defined(salt) : noString,
   }
@@ -49,7 +49,7 @@ export function buildOdisDomain(
 export async function odisHardenKey(
   key: Buffer,
   domain: SequentialDelayDomain,
-  environment: OdisEnvironment,
+  environment: OdisServiceContext,
   wallet?: EIP712Wallet
 ): Promise<Result<Buffer, BackupError>> {
   // Session ID for logging requsests.
@@ -135,7 +135,7 @@ export function odisQueryAuthorizer(nonce: Buffer): { address: Address; wallet: 
 
 async function requestOdisQuotaStatus(
   domain: SequentialDelayDomain,
-  environment: OdisEnvironment,
+  environment: OdisServiceContext,
   sessionID: string,
   wallet?: EIP712Wallet
 ): Promise<Result<DomainQuotaStatusResponseSuccess, BackupError>> {
@@ -181,7 +181,7 @@ async function requestOdisDomainSignature(
   blindedMessage: string,
   counter: number,
   domain: SequentialDelayDomain,
-  environment: OdisEnvironment,
+  environment: OdisServiceContext,
   sessionID: string,
   wallet?: EIP712Wallet
 ): Promise<Result<DomainRestrictedSignatureResponseSuccess, BackupError>> {

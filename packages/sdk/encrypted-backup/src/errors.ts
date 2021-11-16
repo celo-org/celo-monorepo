@@ -1,51 +1,51 @@
 import { RootError } from '@celo/base/lib/result'
 
 export enum BackupErrorTypes {
-  AuthorizationError = 'AuthorizationError',
-  DecodeError = 'DecodeError',
-  DecryptionError = 'DecryptionError',
-  InvalidBackupError = 'InvalidBackupError',
-  OdisServiceError = 'OdisServiceError',
-  OdisRateLimitingError = 'OdisRateLimitingError',
+  AUTHORIZATION_ERROR = 'AUTHORIZATION_ERROR',
+  DECODE_ERROR = 'DECODE_ERROR',
+  DECRYPTION_ERROR = 'DECRYPTION_ERROR',
+  INVALID_BACKUP_ERROR = 'INVALID_BACKUP_ERROR',
+  ODIS_SERVICE_ERROR = 'ODIS_SERVICE_ERROR',
+  ODIS_RATE_LIMITING_ERROR = 'ODIS_RATE_LIMITING_ERROR',
 }
 
 // TODO(victor) Error definitions could either be improved or made more conscise. There is no need
 // to define the errors this way if they all have the same fields except their tag, It would also be
 // nice to be able to accept a string argument as an error message.
 
-export class AuthorizationError extends RootError<BackupErrorTypes.AuthorizationError> {
+export class AuthorizationError extends RootError<BackupErrorTypes.AUTHORIZATION_ERROR> {
   constructor(readonly error?: Error) {
-    super(BackupErrorTypes.AuthorizationError)
+    super(BackupErrorTypes.AUTHORIZATION_ERROR)
   }
 }
 
-export class DecodeError extends RootError<BackupErrorTypes.DecodeError> {
+export class DecodeError extends RootError<BackupErrorTypes.DECODE_ERROR> {
   constructor(readonly error?: Error) {
-    super(BackupErrorTypes.DecodeError)
+    super(BackupErrorTypes.DECODE_ERROR)
   }
 }
 
-export class DecryptionError extends RootError<BackupErrorTypes.DecryptionError> {
+export class DecryptionError extends RootError<BackupErrorTypes.DECRYPTION_ERROR> {
   constructor(readonly error?: Error) {
-    super(BackupErrorTypes.DecryptionError)
+    super(BackupErrorTypes.DECRYPTION_ERROR)
   }
 }
 
-export class InvalidBackupError extends RootError<BackupErrorTypes.InvalidBackupError> {
+export class InvalidBackupError extends RootError<BackupErrorTypes.INVALID_BACKUP_ERROR> {
   constructor(readonly error?: Error) {
-    super(BackupErrorTypes.InvalidBackupError)
+    super(BackupErrorTypes.INVALID_BACKUP_ERROR)
   }
 }
 
-export class OdisServiceError extends RootError<BackupErrorTypes.OdisServiceError> {
+export class OdisServiceError extends RootError<BackupErrorTypes.ODIS_SERVICE_ERROR> {
   constructor(readonly error?: Error, readonly version?: string) {
-    super(BackupErrorTypes.OdisServiceError)
+    super(BackupErrorTypes.ODIS_SERVICE_ERROR)
   }
 }
 
-export class OdisRateLimitingError extends RootError<BackupErrorTypes.OdisRateLimitingError> {
+export class OdisRateLimitingError extends RootError<BackupErrorTypes.ODIS_RATE_LIMITING_ERROR> {
   constructor(readonly notBefore?: number) {
-    super(BackupErrorTypes.OdisRateLimitingError)
+    super(BackupErrorTypes.ODIS_RATE_LIMITING_ERROR)
   }
 }
 

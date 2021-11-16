@@ -3,7 +3,7 @@
 const fetchMock = require('fetch-mock').sandbox()
 jest.mock('cross-fetch', () => fetchMock)
 
-import { ServiceContext as OdisEnvironment } from '@celo/identity/lib/odis/query'
+import { ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/query'
 import {
   checkSequentialDelayRateLimit,
   domainHash,
@@ -23,6 +23,8 @@ import { createBackup, openBackup } from './backup'
 import { HardeningConfig } from './config'
 import { deserializeBackup, serializeBackup } from './schema'
 
+// TODO(victor): Create a more complete set of tests, including a number of error conditions.
+
 // Mock out the BLS blinding client. Verification of the result is not possible without using the
 // real BLS OPRF implementation and a set of BLS keys.
 jest.mock('@celo/identity/lib/odis/bls-blinding-client', () => {
@@ -38,14 +40,17 @@ jest.mock('@celo/identity/lib/odis/bls-blinding-client', () => {
 
 const debug = debugFactory('kit:encrypted-backup:backup:test')
 
-const TEST_HARDENING_CONFIG: HardeningConfig = {
-  rateLimit: [{ delay: 0, resetTimer: noBool, batchSize: defined(3), repetitions: defined(1) }],
-}
-
-const TEST_ODIS_ENVIRONMENT: OdisEnvironment = {
+const TEST_ODIS_ENVIRONMENT: OdisServiceContext = {
   odisUrl: 'https://mockodis.com',
   odisPubKey:
     '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
+}
+
+const TEST_HARDENING_CONFIG: HardeningConfig = {
+  odis: {
+    rateLimit: [{ delay: 0, resetTimer: noBool, batchSize: defined(3), repetitions: defined(1) }],
+    environment: TEST_ODIS_ENVIRONMENT,
+  },
 }
 
 class MockOdis {
@@ -171,18 +176,23 @@ describe('end-to-end', () => {
   it('should be able to create, serialize, deserialize, and open a backup', async () => {
     const testData = Buffer.from('backup test data', 'utf8')
     const testPassword = Buffer.from('backup test password', 'utf8')
+    const testMetadata = {
+      name: 'test backup',
+      timestamp: Date.now(),
+    }
 
     const backup = await createBackup({
       data: testData,
       password: testPassword,
       hardening: TEST_HARDENING_CONFIG,
-      odisEnvironment: TEST_ODIS_ENVIRONMENT,
+      metadata: testMetadata,
     })
     debug('Created backup result', backup)
     expect(backup.ok).toBe(true)
     if (!backup.ok) {
       return
     }
+    expect(backup.result.metadata).toEqual(testMetadata)
 
     // Attempt to open the backup before passing it through the serialize function.
     const opened = await openBackup({ backup: backup.result, password: testPassword })
@@ -205,6 +215,7 @@ describe('end-to-end', () => {
       return
     }
     expect(deserialized.result).toEqual(backup.result)
+    expect(deserialized.result.metadata).toEqual(testMetadata)
 
     // Open the backup and check that that the expect data is recovered.
     const reopened = await openBackup({ backup: deserialized.result, password: testPassword })

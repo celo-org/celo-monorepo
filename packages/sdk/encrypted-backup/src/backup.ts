@@ -1,6 +1,6 @@
 import { eqAddress } from '@celo/base/lib/address'
 import { Err, Ok, Result } from '@celo/base/lib/result'
-import { ServiceContext as OdisEnvironment } from '@celo/identity/lib/odis/query'
+import { ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/query'
 import { SequentialDelayDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import * as crypto from 'crypto'
 import { HardeningConfig } from './config'
@@ -8,15 +8,22 @@ import { BackupError, InvalidBackupError } from './errors'
 import { buildOdisDomain, odisQueryAuthorizer, odisHardenKey } from './odis'
 import { deriveKey, decrypt, encrypt, KDFInfo } from './utils'
 
+// TODO(victor): Add links to the docs when that PR is merged. github.com/celo-org/docs/pull/150
 export interface Backup {
-  /** AES-128-GCM encryption of the user's secret backup data. */
+  /**
+   * AES-128-GCM encryption of the user's secret backup data.
+   *
+   * @remarks The backup key is derived from the user's password or PIN hardened with input from the
+   * ODIS rate-limited hashing service and optionally a circuit breaker service.
+   */
   encryptedData: Buffer
 
   /**
    * A randomly chosen 128-bit value. Ensures uniqueness of the password derived encryption key.
-   * The nonce value is appended to the password for local key derivation. It is also used to derive
-   * an authentication key to include in the ODIS Domain for domain seperation and to ensure quota
-   * cannot be consumed by parties without access to the backup.
+   *
+   * @remarks The nonce value is appended to the password for local key derivation. It is also used
+   * to derive an authentication key to include in the ODIS Domain for domain seperation and to
+   * ensure quota cannot be consumed by parties without access to the backup.
    */
   nonce: Buffer
 
@@ -28,32 +35,47 @@ export interface Backup {
    */
   odisDomain?: SequentialDelayDomain
 
-  /** RSA-OAEP-256 encryption of a randomly chosen 128-bit value, the fuse key.
-   * The fuse key, if provided, is combined with the password in local key derivation. Encryption is
-   * under the public key of the circuit breaker service. In order to get the fuseKey the client
-   * will send this ciphertext to the circuit breaker service for decryption.
+  /**
+   * RSA-OAEP-256 encryption of a randomly chosen 128-bit value, the fuse key.
+   *
+   * @remarks The fuse key, if provided, is combined with the password in local key derivation.
+   * Encryption is under the public key of the circuit breaker service. In order to get the fuseKey
+   * the client will send this ciphertext to the circuit breaker service for decryption.
    */
   encryptedFuseKey?: Buffer
 
-  /**
-   * Version number for the backup feature. Used to facilitate backwards
-   * compatibility in future backup feature upgrades.
-   */
+  /** Version number for the backup feature. Used to facilitate backwards compatibility. */
   version: string
 
-  // TODO(victor): Fill in metadata.
-  metadata: {}
+  /**
+   * Data provided by the backup creator to identify the backup and its context
+   *
+   * @remarks Metadata is provided by, and only meaningful to, the SDK user. The intention is for
+   * this metadata to be used for identifying the backup and providing any context needed in the
+   * application
+   *
+   * @example
+   * ```typescript
+   * {
+   *   // Address of the primary account stored a backup of an account key. Used to display the
+   *   // balance and latest transaction information for a given backup.
+   *   accountAddress: string
+   *   // Unix timestamp used to indicate when the backup was created.
+   *   timestamp: number
+   * }
+   * ```
+   */
+  metadata?: { [key: string]: unknown }
 
-  // TODO(victor): Fill in environment.
-  environment: OdisEnvironment & {}
+  /** Information including the URL and public keys of the ODIS and circuit breaker services. */
+  environment?: OdisServiceContext & {}
 }
 
-// TODO(victor): Add io-ts types for these and embed the value in th Backup struct.
 export interface CreateBackupArgs {
   data: Buffer
   password: Buffer
   hardening: HardeningConfig
-  odisEnvironment: OdisEnvironment
+  metadata?: { [key: string]: unknown }
 }
 
 // TODO(victor): Add createPinEncryptedBackup function as a helpful wrapper.
@@ -62,16 +84,10 @@ export async function createBackup({
   data,
   password,
   hardening,
-  odisEnvironment,
+  metadata,
 }: CreateBackupArgs): Promise<Result<Backup, BackupError>> {
   const nonce = crypto.randomBytes(16)
   let key = deriveKey(KDFInfo.PASSWORD, [password, nonce])
-
-  // Derive the query authorizer wallet and address from the nonce, then build the ODIS domain.
-  // This domain acts as a binding rate limit configuration for ODIS, enforcing that the client must
-  // know the backup nonce, and can only make the given number of queries.
-  const authorizer = odisQueryAuthorizer(nonce)
-  const domain = buildOdisDomain(hardening, authorizer.address)
 
   // Generate a fuse key and mix it into the entropy of the key
   // TODO: Replace this with a proper circuit breaker impl.
@@ -79,8 +95,20 @@ export async function createBackup({
   key = deriveKey(KDFInfo.FUSE_KEY, [key, fuseKey])
 
   // Harden the key with the output of a rate limited ODIS POPRF function.
-  if (domain !== undefined) {
-    const odisHardenedKey = await odisHardenKey(key, domain, odisEnvironment, authorizer.wallet)
+  let domain: SequentialDelayDomain | undefined
+  if (hardening.odis !== undefined) {
+    // Derive the query authorizer wallet and address from the nonce, then build the ODIS domain.
+    // This domain acts as a binding rate limit configuration for ODIS, enforcing that the client must
+    // know the backup nonce, and can only make the given number of queries.
+    const authorizer = odisQueryAuthorizer(nonce)
+    domain = buildOdisDomain(hardening.odis, authorizer.address)
+
+    const odisHardenedKey = await odisHardenKey(
+      key,
+      domain,
+      hardening.odis.environment,
+      authorizer.wallet
+    )
     if (!odisHardenedKey.ok) {
       return odisHardenedKey
     }
@@ -94,8 +122,8 @@ export async function createBackup({
     odisDomain: domain,
     encryptedFuseKey: fuseKey,
     version: '0.0.1',
-    metadata: {},
-    environment: odisEnvironment,
+    metadata,
+    environment: hardening.odis?.environment,
   })
 }
 
@@ -123,6 +151,10 @@ export async function openBackup({
     // If the ODIS domain is authenticated, the authorizer address should match the domain.
     const authorizer = odisQueryAuthorizer(backup.nonce)
     if (domain.address.defined && !eqAddress(authorizer.address, domain.address.value)) {
+      // TODO(victor): Include more detail in error messages.
+      return Err(new InvalidBackupError())
+    }
+    if (backup.environment === undefined) {
       return Err(new InvalidBackupError())
     }
 
