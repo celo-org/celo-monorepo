@@ -38,7 +38,7 @@ XF5Lg2AAM2xJ/SS+h+si4f70eZey4vo9pWB3Q+VKbtRZu2pCjlR1A1nIqigJxdlc
 1jHX+4GiW+t0w8Q=
 -----END PRIVATE KEY-----`
 
-const TEST_CIRCUIT_BREAKER_ENVIRONMENT: CircuitBreakerServiceContext = {
+const MOCK_CIRCUIT_BREAKER_ENVIRONMENT: CircuitBreakerServiceContext = {
   url: 'https://mockcircuitbreaker.com/',
   publicKey: MOCK_CIRCUIT_BREAKER_PUBLIC_KEY,
 }
@@ -48,6 +48,10 @@ const TEST_CIRCUIT_BREAKER_ENVIRONMENT: CircuitBreakerServiceContext = {
  * github.com/valora-inc/wallet/tree/main/packages/cloud-functions/src/circuitBreaker/circuitBreaker.ts
  */
 export class MockCircuitBreaker {
+  static readonly publicKey = MOCK_CIRCUIT_BREAKER_PUBLIC_KEY
+  static readonly privateKey = MOCK_CIRCUIT_BREAKER_PRIVATE_KEY
+  static readonly environment = MOCK_CIRCUIT_BREAKER_ENVIRONMENT
+
   public keyStatus: CircuitBreakerKeyStatus = CircuitBreakerKeyStatus.ENABLED
 
   status(): { status: number; body: CircuitBreakerStatusResponse } {
@@ -99,21 +103,44 @@ export class MockCircuitBreaker {
       body: { plaintext: plaintext.toString('base64') },
     }
   }
+
+  installStatusEndpoint(mock: typeof fetchMock, override?: any) {
+    mock.mock(
+      {
+        url: new URL(CircuitBreakerEndpoints.STATUS, MockCircuitBreaker.environment.url).href,
+        method: 'GET',
+      },
+      override ??
+        ((url: string, req: unknown) => {
+          debug('Mocking request', { url, req })
+          return this.status()
+        })
+    )
+  }
+
+  installUnwrapKeyEndpoint(mock: typeof fetchMock, override?: any) {
+    mock.mock(
+      {
+        url: new URL(CircuitBreakerEndpoints.UNWRAP_KEY, MockCircuitBreaker.environment.url).href,
+        method: 'POST',
+      },
+      override ??
+        ((url: string, req: { body: string }) => {
+          debug('Mocking request', { url, req })
+          return this.unwrapKey(JSON.parse(req.body) as CircuitBreakerUnwrapKeyRequest)
+        })
+    )
+  }
+
+  install(mock: typeof fetchMock) {
+    this.installStatusEndpoint(mock)
+    this.installUnwrapKeyEndpoint(mock)
+  }
 }
 
 describe('CircuitBreakerClient', () => {
-  const client = new CircuitBreakerClient(TEST_CIRCUIT_BREAKER_ENVIRONMENT)
+  const client = new CircuitBreakerClient(MockCircuitBreaker.environment)
   let mockService: MockCircuitBreaker | undefined
-
-  const mockStatusEndpoint = {
-    url: new URL(CircuitBreakerEndpoints.STATUS, TEST_CIRCUIT_BREAKER_ENVIRONMENT.url).href,
-    method: 'GET',
-  }
-
-  const mockUnwrapKeyEndpoint = {
-    url: new URL(CircuitBreakerEndpoints.UNWRAP_KEY, TEST_CIRCUIT_BREAKER_ENVIRONMENT.url).href,
-    method: 'POST',
-  }
 
   beforeEach(() => {
     fetchMock.reset()
@@ -121,15 +148,7 @@ describe('CircuitBreakerClient', () => {
 
     // Mock the circuit breaker service using the mock implementation defined above.
     mockService = new MockCircuitBreaker()
-    fetchMock.mock(mockStatusEndpoint, (url: string, req: unknown) => {
-      debug('Mocking request', { url, req })
-      return mockService!.status()
-    })
-
-    fetchMock.mock(mockUnwrapKeyEndpoint, (url: string, req: { body: string }) => {
-      debug('Mocking request', { url, req })
-      return mockService!.unwrapKey(JSON.parse(req.body) as CircuitBreakerUnwrapKeyRequest)
-    })
+    mockService.install(fetchMock)
   })
 
   afterEach(() => {
@@ -150,7 +169,7 @@ describe('CircuitBreakerClient', () => {
     })
 
     it('should return an error if fetch throws', async () => {
-      fetchMock.mock(mockStatusEndpoint, { throws: new Error('fetch error') })
+      mockService!.installStatusEndpoint(fetchMock, { throws: new Error('fetch error') })
       const result = await client.status()
       expect(result.ok).toBe(false)
       if (result.ok) {
@@ -160,7 +179,7 @@ describe('CircuitBreakerClient', () => {
     })
 
     it('should return an error if the fetch returns an HTTP error status', async () => {
-      fetchMock.mock(mockStatusEndpoint, { status: 501 })
+      mockService!.installStatusEndpoint(fetchMock, { status: 501 })
       const result = await client.status()
       expect(result.ok).toBe(false)
       if (result.ok) {
@@ -170,7 +189,7 @@ describe('CircuitBreakerClient', () => {
     })
 
     it('should return an error if fetch results in invalid json', async () => {
-      fetchMock.mock(mockStatusEndpoint, { status: 200, body: '<invalid json>' })
+      mockService!.installStatusEndpoint(fetchMock, { status: 200, body: '<invalid json>' })
       const result = await client.status()
       expect(result.ok).toBe(false)
       if (result.ok) {
@@ -180,7 +199,10 @@ describe('CircuitBreakerClient', () => {
     })
 
     it('should return an error if fetch results in an invalid status', async () => {
-      fetchMock.mock(mockStatusEndpoint, { status: 200, body: { status: 'invalid status' } })
+      mockService!.installStatusEndpoint(fetchMock, {
+        status: 200,
+        body: { status: 'invalid status' },
+      })
       const result = await client.status()
       expect(result.ok).toBe(false)
       if (result.ok) {
@@ -242,7 +264,7 @@ describe('CircuitBreakerClient', () => {
     })
 
     it('should return an error if fetch throws', async () => {
-      fetchMock.mock(mockUnwrapKeyEndpoint, { throws: new Error('fetch error') })
+      mockService!.installUnwrapKeyEndpoint(fetchMock, { throws: new Error('fetch error') })
       const result = await client.unwrapKey(testCiphertext)
       expect(result.ok).toBe(false)
       if (result.ok) {
@@ -252,7 +274,7 @@ describe('CircuitBreakerClient', () => {
     })
 
     it('should return an error if the fetch returns an HTTP error status', async () => {
-      fetchMock.mock(mockUnwrapKeyEndpoint, { status: 501 })
+      mockService!.installUnwrapKeyEndpoint(fetchMock, { status: 501 })
       const result = await client.unwrapKey(testCiphertext)
       expect(result.ok).toBe(false)
       if (result.ok) {
@@ -262,7 +284,7 @@ describe('CircuitBreakerClient', () => {
     })
 
     it('should return an error if fetch results in invalid json', async () => {
-      fetchMock.mock(mockUnwrapKeyEndpoint, { status: 200, body: '<invalid json>' })
+      mockService!.installUnwrapKeyEndpoint(fetchMock, { status: 200, body: '<invalid json>' })
       const result = await client.unwrapKey(testCiphertext)
       expect(result.ok).toBe(false)
       if (result.ok) {
@@ -272,7 +294,7 @@ describe('CircuitBreakerClient', () => {
     })
 
     it('should return an error if fetch results in an invalid plaintext', async () => {
-      fetchMock.mock(mockUnwrapKeyEndpoint, {
+      mockService!.installUnwrapKeyEndpoint(fetchMock, {
         status: 200,
         body: { plaintext: '<invalid base64>' },
       })
