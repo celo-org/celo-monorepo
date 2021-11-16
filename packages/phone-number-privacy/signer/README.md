@@ -40,10 +40,17 @@ This could be a node with RPC set up. Preferably this would be an node dedicated
 
 ### Keystores
 
-Currently, the service retrieving keys from Azure Key Vault (AKV), Google Secret Manager and AWS Secrets Manager.
-You must specify the type, and then the keystore configs for that type.
+Currently, the service supports Azure Key Vault (AKV), Google Secret Manager and AWS Secrets Manager.
+You must specify the type, and then the keystore configs for that type as follows.
 
 - `KEYSTORE_TYPE` - `AzureKeyVault`, `GoogleSecretManager` or `AWSSecretManager`
+
+In addition, you must name your keys in your keystore according to the pattern `<keyName>-<keyVersion>` where
+
+- `keyName` is configurable via the env variables `PHONE_NUMBER_PRIVACY_KEY_NAME_BASE` and `DOMAINS_KEY_NAME_BASE` which default to `phoneNumberPrivacy` and `domains` respectively.
+- `keyVersion` is an integer corresponding to the iteration of the given key share. The variables `PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION` and `DOMAINS_LATEST_KEY_VERSION` should specify the latest version of the appropriate key share. This version will be fetched when the signer starts up.
+
+For example, the first iteration of the key share used for phone number privacy should be stored as `phoneNumberPrivacy-1` and the second iteration (after resharing) should be stored as `phoneNumberPrivacy-2` unless you specify a `PHONE_NUMBER_PRIVACY_KEY_NAME_BASE` env variable, in which case `phoneNumberPrivacy` should be replaced with that value. The version numbers and `-` delimeter are mandatory and not configurable.
 
 #### Azure Key Vault
 
@@ -98,6 +105,17 @@ Then check on the service to make sure its running:
 `docker container ls`
 
 `docker logs -f {CONTAINER_ID_HERE}`
+
+#### Key rotations
+
+After a key resharing, signers should rotate their key shares as follows:
+
+1. Store the new key share in the keystore according to the naming convention specified in the [Keystores](#keystores) section above.
+2. Notify the combiner operator that your signer is ready for the key rotation.
+3. The combiner operator will update the combiner to request the new key share version via a custom request header field once all signers are ready.
+4. The signers will fetch the new key shares from their keystores upon receiving these requests.
+5. When the combiner operator sees that all signers are signing with the new key share and confirms that the system is healthy, signers will be instructed to delete their old key shares.
+6. After deleting their old key shares, signers should increment `PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION` or `DOMAINS_LATEST_KEY_VERSION` accordingly. This will instruct the signer to prefetch this key version the next time it starts up.
 
 ### Logs
 
