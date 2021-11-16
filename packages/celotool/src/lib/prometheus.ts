@@ -1,5 +1,4 @@
 import fs from 'fs'
-import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
 import { createNamespaceIfNotExists } from './cluster'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
 import {
@@ -17,10 +16,12 @@ import {
   upgradeGenericHelmChart,
 } from './helm_deploy'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
+import { GCPClusterConfig } from './k8s-cluster/gcp'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
   getServiceAccountKey,
+  setupGKEWorkloadIdentities,
 } from './service-account-utils'
 import { outputIncludes, switchToGCPProject } from './utils'
 const yaml = require('js-yaml')
@@ -213,6 +214,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       'kube_pod_[^cs].+',
       'workqueue_.+',
       'kube_secret_.+',
+      'phoenix_.+',
     ]
     params.push(
       `--set remote_write.url='${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}'`,
@@ -335,8 +337,18 @@ async function createPrometheusGcloudServiceAccount(
     await execCmdWithExitOnFailure(
       `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/monitoring.metricWriter --member serviceAccount:${serviceAccountEmail}`
     )
+    // Prometheus needs roles/compute.viewer to discover the VMs asking GCE API
+    await execCmdWithExitOnFailure(
+      `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/compute.viewer --member serviceAccount:${serviceAccountEmail}`
+    )
+
     // Setup workload identity IAM permissions
-    await setupWorkloadIdentities(serviceAccountName, gcloudProjectName)
+    await setupGKEWorkloadIdentities(
+      serviceAccountName,
+      gcloudProjectName,
+      kubeNamespace,
+      kubeServiceAccountName
+    )
   }
 }
 
@@ -560,26 +572,4 @@ export async function removeGKEWorkloadMetrics() {
     console.info('Removing gke-workload-metrics')
     await removeGenericHelmChart(GKEWorkloadMetricsReleaseName, kubeNamespace)
   }
-}
-
-async function setupWorkloadIdentities(serviceAccountName: string, gcloudProjectName: string) {
-  // https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-  // Only grant access to GCE API to Prometheus SA deployed in GKE
-  if (!serviceAccountName.includes('gcp')) {
-    return
-  }
-
-  // Prometheus needs roles/compute.viewer to discover the VMs asking GCE API
-  const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-  await execCmdWithExitOnFailure(
-    `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/compute.viewer --member serviceAccount:${serviceAccountEmail}`
-  )
-
-  // Allow the Kubernetes service account to impersonate the Google service account
-  await execCmdWithExitOnFailure(
-    `gcloud iam --project ${gcloudProjectName} service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:${gcloudProjectName}.svc.id.goog[${kubeNamespace}/${kubeServiceAccountName}]" \
-    ${serviceAccountEmail}`
-  )
 }

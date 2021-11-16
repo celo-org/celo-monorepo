@@ -44,7 +44,7 @@ export async function displaySendTx<A>(
           printValueMap(params, chalk.magenta)
         })
     }
-  } catch (e) {
+  } catch (e: any) {
     cli.action.stop(`failed: ${e.message}`)
     throw e
   }

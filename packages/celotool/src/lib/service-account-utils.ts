@@ -1,9 +1,14 @@
 import { execCmdAndParseJson, execCmdWithExitOnFailure } from './cmd-utils'
+import { isCelotoolHelmDryRun } from './helm_deploy'
 import { switchToGCPProject, switchToProjectFromEnv } from './utils'
 
 // createServiceAccountIfNotExists creates a service account with the given name
 // if it does not exist. Returns if the account was created.
-export async function createServiceAccountIfNotExists(name: string, gcloudProject?: string) {
+export async function createServiceAccountIfNotExists(
+  name: string,
+  gcloudProject?: string,
+  description?: string
+) {
   if (gcloudProject !== undefined) {
     await switchToGCPProject(gcloudProject)
   } else {
@@ -15,9 +20,15 @@ export async function createServiceAccountIfNotExists(name: string, gcloudProjec
   )
   const serviceAccountExists = serviceAccounts.some((account: any) => account.displayName === name)
   if (!serviceAccountExists) {
-    await execCmdWithExitOnFailure(
-      `gcloud iam service-accounts create ${name} --display-name="${name}"`
-    )
+    let cmd = `gcloud iam service-accounts create ${name} --display-name="${name}" `
+    if (description) {
+      cmd = cmd.concat(`--description="${description}"`)
+    }
+    if (isCelotoolHelmDryRun()) {
+      console.info(`This would run the following command:\n${cmd}\n`)
+    } else {
+      await execCmdWithExitOnFailure(cmd)
+    }
   }
   return !serviceAccountExists
 }
@@ -35,4 +46,32 @@ export function getServiceAccountKey(serviceAccountEmail: string, keyPath: strin
   return execCmdWithExitOnFailure(
     `gcloud iam service-accounts keys create ${keyPath} --iam-account ${serviceAccountEmail}`
   )
+}
+
+// Used for Prometheus and Promtail/Loki
+// https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+export async function setupGKEWorkloadIdentities(
+  serviceAccountName: string,
+  gcloudProjectName: string,
+  kubeNamespace: string,
+  kubeServiceAccountName: string
+) {
+  // Only grant access to GCE API to Prometheus or Promtail SA deployed in GKE
+  if (!serviceAccountName.includes('gcp')) {
+    return
+  }
+
+  const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+
+  // Allow the Kubernetes service account to impersonate the Google service account
+  const roleIamWorkloadIdentityUserCmd = `gcloud iam --project ${gcloudProjectName} service-accounts add-iam-policy-binding \
+  --role roles/iam.workloadIdentityUser \
+  --member "serviceAccount:${gcloudProjectName}.svc.id.goog[${kubeNamespace}/${kubeServiceAccountName}]" \
+  ${serviceAccountEmail}`
+
+  if (isCelotoolHelmDryRun()) {
+    console.info(`This would run the following: ${roleIamWorkloadIdentityUserCmd}\n`)
+  } else {
+    await execCmdWithExitOnFailure(roleIamWorkloadIdentityUserCmd)
+  }
 }

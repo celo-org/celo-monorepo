@@ -227,6 +227,8 @@ spec:
             secretKeyRef:
               name: {{ .Values.environment }}-load-test
               key: accountSecret
+        - name: LOAD_TEST_USE_RANDOM_RECIPIENT
+          value: "true"
         volumeMounts:
         - name: data
           mountPath: /root/.celo
