@@ -5,6 +5,7 @@ import {
   DomainRestrictedSignatureRequest,
   DomainStatusResponse,
   ErrorMessage,
+  KeyName,
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -13,9 +14,9 @@ import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { Counters } from '../common/metrics'
-import { getVersion } from '../config'
+import config, { getVersion } from '../config'
 import { getTransaction } from '../database/database'
-import { DOMAINS_STATES_COLUMNS, DomainState } from '../database/models/domainState'
+import { DomainState, DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
 import {
   getDomainState,
   getDomainStateWithLock,
@@ -23,6 +24,7 @@ import {
   setDomainDisabled,
 } from '../database/wrappers/domainState'
 import { getKeyProvider } from '../key-management/key-provider'
+import { Key } from '../key-management/key-provider-base'
 import { Endpoints } from '../server'
 import { IDomainAuthService } from './auth/domainAuth.interface'
 import { IDomainService } from './domain.interface'
@@ -139,6 +141,11 @@ export class DomainService implements IDomainService {
       hash: domainHash(domain),
     })
 
+    const key: Key = {
+      name: KeyName.domains,
+      version: Number(request.headers.keyVersion) || config.keystore.keys.domains.latest,
+    }
+
     try {
       const trx = await getTransaction()
       let domainState = await getDomainStateWithLock(domain, trx, logger)
@@ -170,7 +177,7 @@ export class DomainService implements IDomainService {
       let signature: string
       try {
         const keyProvider = getKeyProvider()
-        const privateKey = keyProvider.getPrivateKey()
+        const privateKey = await keyProvider.getPrivateKeyOrFetchFromStore(key)
         signature = computeBlindedSignature(request.body.blindedMessage, privateKey, logger)
       } catch (err) {
         trx.rollback()

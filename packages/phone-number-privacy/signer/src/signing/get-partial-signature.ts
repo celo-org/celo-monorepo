@@ -5,6 +5,7 @@ import {
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
+  KeyName,
   SignMessageResponse,
   SignMessageResponseFailure,
   WarningMessage,
@@ -19,6 +20,7 @@ import config, { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
+import { Key } from '../key-management/key-provider-base'
 import { Endpoints } from '../server'
 import { getBlockNumber, getContractKit } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
@@ -31,6 +33,7 @@ export interface GetBlindedMessagePartialSigRequest {
   hashedPhoneNumber?: string
   timestamp?: number
   sessionID?: string
+  keyVersion?: number
 }
 
 export async function handleGetBlindedMessagePartialSig(
@@ -42,6 +45,11 @@ export async function handleGetBlindedMessagePartialSig(
   const logger: Logger = response.locals.logger
   logger.info({ request: request.body }, 'Request received')
   logger.debug('Begin handleGetBlindedMessagePartialSig')
+
+  const key: Key = {
+    name: KeyName.phoneNumberPrivacy,
+    version: Number(request.headers.keyVersion) || config.keystore.keys.phoneNumberPrivacy.latest,
+  }
 
   try {
     if (!isValidGetSignatureInput(request.body)) {
@@ -134,7 +142,7 @@ export async function handleGetBlindedMessagePartialSig(
     let signature
     try {
       keyProvider = getKeyProvider()
-      privateKey = keyProvider.getPrivateKey()
+      privateKey = await keyProvider.getPrivateKeyOrFetchFromStore(key)
       signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey, logger)
     } catch (err) {
       meterGenerateSignature()
