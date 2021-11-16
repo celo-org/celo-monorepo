@@ -40,6 +40,10 @@ interface Config {
     threshold: number
     polynomial: string
   }
+  keyVersions: {
+    phoneNumberPrivacy: number
+    domains: number
+  }
 }
 
 let config: Config
@@ -66,6 +70,10 @@ if (DEV_MODE) {
       threshold: 1,
       polynomial: DEV_POLYNOMIAL,
     },
+    keyVersions: {
+      phoneNumberPrivacy: 1,
+      domains: 1,
+    },
   }
 } else {
   const functionConfig = functions.config()
@@ -87,6 +95,10 @@ if (DEV_MODE) {
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,
       polynomial: functionConfig.threshold_signature.threshold_polynomial,
+    },
+    keyVersions: {
+      phoneNumberPrivacy: functionConfig.keyVersions.phoneNumberPrivacy,
+      domains: functionConfig.keyVersions.domains,
     },
   }
 }

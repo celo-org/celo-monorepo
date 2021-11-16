@@ -73,6 +73,8 @@ async function requestSignatures(request: Request, response: Response) {
   })
   obs.observe({ entryTypes: ['measure'], buffered: true })
 
+  request.headers.keyVersion = config.keyVersions.phoneNumberPrivacy.toString()
+
   const signers = JSON.parse(config.odisServices.signers) as SignerService[]
   let timedOut = false
   const controller = new AbortController()
