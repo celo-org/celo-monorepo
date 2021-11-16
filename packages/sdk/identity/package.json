@@ -47,6 +47,6 @@
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da"
   },
   "engines": {
-    "node": ">=8.13.0"
+    "node": ">=12.9.0"
   }
 }
