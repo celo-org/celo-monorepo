@@ -1,12 +1,23 @@
-import { rootLogger as logger } from '@celo/phone-number-privacy-common'
+import { KeyName, rootLogger as logger } from '@celo/phone-number-privacy-common'
 import config, { SupportedKeystore } from '../config'
 import { AWSKeyProvider } from './aws-key-provider'
 import { AzureKeyProvider } from './azure-key-provider'
 import { GoogleKeyProvider } from './google-key-provider'
-import { KeyProvider } from './key-provider-base'
+import { Key, KeyProvider } from './key-provider-base'
 import { MockKeyProvider } from './mock-key-provider'
 
 let keyProvider: KeyProvider
+
+export const keysToPrefetch: Key[] = [
+  {
+    name: KeyName.phoneNumberPrivacy,
+    version: config.keystore.keys.phoneNumberPrivacy.latest,
+  },
+  {
+    name: KeyName.domains,
+    version: config.keystore.keys.domains.latest,
+  },
+]
 
 export async function initKeyProvider() {
   logger.info('Initializing keystore')
@@ -26,8 +37,8 @@ export async function initKeyProvider() {
   } else {
     throw new Error('Valid keystore type must be provided')
   }
-  logger.info('Fetching key')
-  await keyProvider.fetchPrivateKeyFromStore()
+  logger.info(`Fetching keys: ${JSON.stringify(keysToPrefetch)}`)
+  await Promise.all(keysToPrefetch.map(keyProvider.fetchPrivateKeyFromStore))
   logger.info('Done fetching key. Key provider initialized successfully.')
 }
 
