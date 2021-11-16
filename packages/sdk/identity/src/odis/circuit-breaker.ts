@@ -1,4 +1,5 @@
 import { Err, Ok, Result, RootError } from '@celo/base/lib/result'
+import fetch from 'cross-fetch'
 import * as crypto from 'crypto'
 
 const BASE64_REGEXP = /^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
@@ -9,33 +10,29 @@ export interface CircuitBreakerServiceContext {
 }
 
 export const VALORA_ALFAJORES_CIRCUIT_BREAKER_ENVIRONMENT: CircuitBreakerServiceContext = {
-  url: 'https://us-central1-celo-mobile-alfajores.cloudfunctions.net/circuitBreaker',
-  publicKey: `
-    -----BEGIN PUBLIC KEY-----
-    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi+9UKUsVY5UGYwHFN2M2
-    90RlNputQeJmSi1phRtQgpXP2RvZK/IFkIygiigXPcFlm7FK35A5qi1HqNTL/2sy
-    EH+9KnfS5zaUYX0sb2tBiEfzuIh+xLf/MXo1r8fC3MqiIUOZpEDK1XJTxt5XaKC8
-    +gg1WUyuMw5Qj7ngaEwWaQGCijsJno3aDMuyvt4GceFYCzhj43LnaA3mhili7ghV
-    uOyKMIHCFd6wvMiSGUfIZRZ7md+zvlAZaWFHFMzbbSYvUIMRtkgfm2phRcXetoha
-    FCP4PD70/ogeKQswFCiOJo4JKYr3SHujFHq8HgKT3GqJ0JXu3Ry2J/qU29kge6R+
-    wwIDAQAB
-    -----END PUBLIC KEY-----
-  `,
+  url: 'https://us-central1-celo-mobile-alfajores.cloudfunctions.net/circuitBreaker/',
+  publicKey: `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi+9UKUsVY5UGYwHFN2M2
+90RlNputQeJmSi1phRtQgpXP2RvZK/IFkIygiigXPcFlm7FK35A5qi1HqNTL/2sy
+EH+9KnfS5zaUYX0sb2tBiEfzuIh+xLf/MXo1r8fC3MqiIUOZpEDK1XJTxt5XaKC8
++gg1WUyuMw5Qj7ngaEwWaQGCijsJno3aDMuyvt4GceFYCzhj43LnaA3mhili7ghV
+uOyKMIHCFd6wvMiSGUfIZRZ7md+zvlAZaWFHFMzbbSYvUIMRtkgfm2phRcXetoha
+FCP4PD70/ogeKQswFCiOJo4JKYr3SHujFHq8HgKT3GqJ0JXu3Ry2J/qU29kge6R+
+wwIDAQAB
+-----END PUBLIC KEY-----`,
 }
 
 export const VALORA_MAINNET_CIRCUIT_BREAKER_ENVIRONMENT: CircuitBreakerServiceContext = {
-  url: 'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/circuitBreaker',
-  publicKey: `
-    -----BEGIN PUBLIC KEY-----
-    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsMd1OIdYfTcnYkIXPeym
-    KSiQmNCEn2DC2mUichrRpJFeb9VO65PeLjMXTIjKyp4TZ3PhXJyK9kEEF27E1wj8
-    C1WqLIwSP97t1479UHaI7NzAV4nvqvziuP9Zq5fmbxourkMYoXMpZEYNK9OEwEvx
-    hSQXA1XvYqMALJwRx/8S6taAcJEYenraKiRvxteWqXB6R8HSTxyaOR9qfakZFp1f
-    d8B9/c3KDiue80yPng1W4AV5GnltoHCcwe97j5gabqztQl8K0yty73wmAFjDB3Ni
-    cOY/855BxdoOT2XQLs99ytPJJG5uoHKEZbHVzy7d/bagnD08w1/vaeTxyRYuGgfb
-    mQIDAQAB
-    -----END PUBLIC KEY-----
-  `,
+  url: 'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/circuitBreaker/',
+  publicKey: `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsMd1OIdYfTcnYkIXPeym
+KSiQmNCEn2DC2mUichrRpJFeb9VO65PeLjMXTIjKyp4TZ3PhXJyK9kEEF27E1wj8
+C1WqLIwSP97t1479UHaI7NzAV4nvqvziuP9Zq5fmbxourkMYoXMpZEYNK9OEwEvx
+hSQXA1XvYqMALJwRx/8S6taAcJEYenraKiRvxteWqXB6R8HSTxyaOR9qfakZFp1f
+d8B9/c3KDiue80yPng1W4AV5GnltoHCcwe97j5gabqztQl8K0yty73wmAFjDB3Ni
+cOY/855BxdoOT2XQLs99ytPJJG5uoHKEZbHVzy7d/bagnD08w1/vaeTxyRYuGgfb
+mQIDAQAB
+-----END PUBLIC KEY-----`,
 }
 
 export enum CircuitBreakerKeyStatus {
@@ -98,10 +95,21 @@ export class FetchError extends RootError<CircuitBreakerErrorTypes.FETCH_ERROR> 
 
 export type CircuitBreakerError = CircuitBreakerServiceError | EncryptionError | FetchError
 
+// TODO(victor): Write up some docs on the circuit breaker and link them here.
+/**
+ * Client for interacting with a circuit breaker service, such as the one deployed by Valora.
+ *
+ * @remarks A circuit breaker is a service supporting a public decryption function backed by an HSM
+ * key. It is intended for use in key derivation when with ODIS as a key hardening service, and
+ * allows the circuit breaker operator to shut down access to the decryption key in the event that
+ * ODIS is conpromised. This acts as a safety measure to allow wallets to prvent attackers from
+ * being able to brute force their users cryptographic keys in the event that ODIS is compromised,
+ * and thus is protection is no longer available.
+ */
 export class CircuitBreakerClient {
   constructor(readonly environment: CircuitBreakerServiceContext) {}
 
-  private url(endpoint: CircuitBreakerEndpoints): string {
+  protected url(endpoint: CircuitBreakerEndpoints): string {
     // Note that if the result of this is an invalid URL, the URL constructor will throw. This is
     // caught and reported as a fetch error, as a request could not be made.
     return new URL(endpoint, this.environment.url).href
@@ -170,8 +178,8 @@ export class CircuitBreakerClient {
 
     let response: Response
     try {
-      response = await fetch(this.url(CircuitBreakerEndpoints.STATUS), {
-        method: 'GET',
+      response = await fetch(this.url(CircuitBreakerEndpoints.UNWRAP_KEY), {
+        method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
