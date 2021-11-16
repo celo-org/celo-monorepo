@@ -1,6 +1,12 @@
 import { AzureKeyProvider } from '../../src/key-management/azure-key-provider'
+import { Key } from '../../src/key-management/key-provider-base'
 
 const mockKey = '030303030303030303030303030303030303030303030303030303030303030303030303'
+
+const key: Key = {
+  name: 'phoneNumberPrivacy',
+  version: 1,
+}
 
 jest.mock('../../src/config', () => ({
   keystore: {
@@ -25,8 +31,8 @@ describe('AzureKeyProvider', () => {
     getSecret.mockResolvedValue(mockKey)
 
     const provider = new AzureKeyProvider()
-    await provider.fetchPrivateKeyFromStore()
-    expect(provider.getPrivateKey()).toBe(mockKey)
+    await provider.fetchPrivateKeyFromStore(key)
+    expect(provider.getPrivateKey(key)).toBe(mockKey)
   })
 
   it('handles exceptions correctly', async () => {
@@ -34,6 +40,6 @@ describe('AzureKeyProvider', () => {
 
     const provider = new AzureKeyProvider()
     expect.assertions(1)
-    await expect(provider.fetchPrivateKeyFromStore()).rejects.toThrow()
+    await expect(provider.fetchPrivateKeyFromStore(key)).rejects.toThrow()
   })
 })

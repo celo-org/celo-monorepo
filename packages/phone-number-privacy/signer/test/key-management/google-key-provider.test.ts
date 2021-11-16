@@ -1,9 +1,14 @@
 import { GoogleKeyProvider } from '../../src/key-management/google-key-provider'
+import { Key } from '../../src/key-management/key-provider-base'
 
 const mockKey = '020202020202020202020202020202020202020202020202020202020202020202020202'
 const mockResponse = [{ payload: { data: `${mockKey}` } }]
 const emptyMockResponse = [{ payload: {} }]
 const invalidMockResponse = [{ payload: { data: '123' } }]
+const key: Key = {
+  name: 'phoneNumberPrivacy',
+  version: 1,
+}
 
 jest.mock('../../src/config', () => ({
   keystore: {
@@ -26,8 +31,8 @@ describe('GoogleKeyProvider', () => {
     accessSecretVersion.mockResolvedValue(mockResponse)
 
     const provider = new GoogleKeyProvider()
-    await provider.fetchPrivateKeyFromStore()
-    expect(provider.getPrivateKey()).toBe(mockKey)
+    await provider.fetchPrivateKeyFromStore(key)
+    expect(provider.getPrivateKey(key)).toBe(mockKey)
   })
 
   it('handles errors correctly', async () => {
@@ -35,7 +40,7 @@ describe('GoogleKeyProvider', () => {
 
     const provider = new GoogleKeyProvider()
     expect.assertions(1)
-    await expect(provider.fetchPrivateKeyFromStore()).rejects.toThrow()
+    await expect(provider.fetchPrivateKeyFromStore(key)).rejects.toThrow()
   })
 
   it('unitialized provider throws', () => {
@@ -43,7 +48,7 @@ describe('GoogleKeyProvider', () => {
 
     const provider = new GoogleKeyProvider()
     expect.assertions(1)
-    expect(() => provider.getPrivateKey()).toThrow()
+    expect(() => provider.getPrivateKey(key)).toThrow()
   })
 
   it('set invalid private key throws', async () => {
@@ -51,6 +56,6 @@ describe('GoogleKeyProvider', () => {
 
     const provider = new GoogleKeyProvider()
     expect.assertions(1)
-    await expect(provider.fetchPrivateKeyFromStore()).rejects.toThrow()
+    await expect(provider.fetchPrivateKeyFromStore(key)).rejects.toThrow()
   })
 })
