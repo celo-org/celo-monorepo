@@ -2,7 +2,7 @@ import { Err, Ok, Result, RootError } from '@celo/base/lib/result'
 import fetch from 'cross-fetch'
 import * as crypto from 'crypto'
 
-const BASE64_REGEXP = /^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
+export const BASE64_REGEXP = /^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
 
 export interface CircuitBreakerServiceContext {
   url: string
@@ -115,6 +115,10 @@ export class CircuitBreakerClient {
     return new URL(endpoint, this.environment.url).href
   }
 
+  /**
+   * Check the current status of the circuit breaker service. Result will reflect whether or not
+   * the circuit breaker keys are currently available.
+   */
   async status(): Promise<Result<CircuitBreakerKeyStatus, CircuitBreakerError>> {
     let response: Response
     try {
@@ -153,6 +157,12 @@ export class CircuitBreakerClient {
     return Ok(obj.status as CircuitBreakerKeyStatus)
   }
 
+  /**
+   * RSA-OAEP-256 Encrypt the provided key value against the public key of the circuit breaker.
+   *
+   * @remarks Note that this is an entirely local procedure and does not require interaction with
+   * the circuit breaker service. Encryption occurs only against the service public key.
+   */
   wrapKey(plaintext: Buffer): Result<Buffer, EncryptionError> {
     let ciphertext: Buffer
     try {
@@ -171,6 +181,7 @@ export class CircuitBreakerClient {
     return Ok(ciphertext)
   }
 
+  /** Request the circuit breaker service to decrypt the provided encrypted key value */
   async unwrapKey(ciphertext: Buffer): Promise<Result<Buffer, CircuitBreakerError>> {
     const request: CircuitBreakerUnwrapKeyRequest = {
       ciphertext: ciphertext.toString('base64'),

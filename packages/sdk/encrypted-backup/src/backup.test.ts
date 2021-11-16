@@ -56,9 +56,9 @@ const TEST_HARDENING_CONFIG: HardeningConfig = {
 class MockOdis {
   state: Record<string, SequentialDelayDomainState> = {}
 
-  async quota(
+  quota(
     req: DomainQuotaStatusRequest<SequentialDelayDomain>
-  ): Promise<{ status: number; body: DomainQuotaStatusResponse }> {
+  ): { status: number; body: DomainQuotaStatusResponse } {
     const authorized = verifyDomainQuotaStatusRequestSignature(req)
     if (!authorized) {
       return {
@@ -83,9 +83,9 @@ class MockOdis {
     }
   }
 
-  async sign(
+  sign(
     req: DomainRestrictedSignatureRequest<SequentialDelayDomain>
-  ): Promise<{ status: number; body: DomainRestrictedSignatureResponse }> {
+  ): { status: number; body: DomainRestrictedSignatureResponse } {
     const authorized = verifyDomainRestrictedSignatureRequestSignature(req)
     if (!authorized) {
       return {
