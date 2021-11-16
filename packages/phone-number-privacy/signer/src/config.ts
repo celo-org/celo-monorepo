@@ -60,21 +60,27 @@ interface Config {
   }
   keystore: {
     type: SupportedKeystore
+    keys: {
+      phoneNumberPrivacy: {
+        name: string
+        latest: number
+      }
+      domains: {
+        name: string
+        latest: number
+      }
+    }
     azure: {
       clientID: string
       clientSecret: string
       tenant: string
       vaultName: string
-      secretName: string
     }
     google: {
       projectId: string
-      secretName: string
-      secretVersion: string
     }
     aws: {
       region: string
-      secretName: string
       secretKey: string
     }
   }
@@ -118,25 +124,31 @@ const config: Config = {
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
+    keys: {
+      phoneNumberPrivacy: {
+        name: env.PHONE_NUMBER_PRIVACY_KEY_NAME_BASE,
+        latest: toNum(env.PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION) || 2,
+      },
+      domains: {
+        name: env.DOMAINS_KEY_NAME_BASE,
+        latest: toNum(env.DOMAINS_LATEST_KEY_VERSION) || 1,
+      },
+    },
     azure: {
       clientID: env.KEYSTORE_AZURE_CLIENT_ID,
       clientSecret: env.KEYSTORE_AZURE_CLIENT_SECRET,
       tenant: env.KEYSTORE_AZURE_TENANT,
       vaultName: env.KEYSTORE_AZURE_VAULT_NAME,
-      secretName: env.KEYSTORE_AZURE_SECRET_NAME,
     },
     google: {
       projectId: env.KEYSTORE_GOOGLE_PROJECT_ID,
-      secretName: env.KEYSTORE_GOOGLE_SECRET_NAME,
-      secretVersion: env.KEYSTORE_GOOGLE_SECRET_VERSION || 'latest',
     },
     aws: {
       region: env.KEYSTORE_AWS_REGION,
-      secretName: env.KEYSTORE_AWS_SECRET_NAME,
       secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
-  timeout: env.ODIS_SIGNER_TIMEOUT || 5000,
+  timeout: toNum(env.ODIS_SIGNER_TIMEOUT) || 5000,
   test_quota_bypass_percentage: toNum(env.TEST_QUOTA_BYPASS_PERCENTAGE) || 0,
 }
 export default config
