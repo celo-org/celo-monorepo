@@ -194,7 +194,7 @@ export async function handleGetBlindedMessagePartialSig(
     }
     Counters.responses.labels(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, '200').inc()
     logger.info({ response: signMessageResponse }, 'Signature retrieval success')
-    response.json(signMessageResponse)
+    response.set('keyVersion', key.version.toString()).json(signMessageResponse)
   } catch (err) {
     logger.error('Failed to get signature')
     logger.error(err)

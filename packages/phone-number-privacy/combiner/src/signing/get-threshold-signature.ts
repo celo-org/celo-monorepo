@@ -184,6 +184,8 @@ async function handleSuccessResponse(
   controller: AbortController
 ) {
   const logger: Logger = response.locals.logger
+  const keyVersion: number = Number(response.header('keyVersion'))
+  logger.info({ keyVersion }, 'Signer responded with keyVersion')
   const signResponse = JSON.parse(data) as SignerResponse
   if (!signResponse.success) {
     // Continue on failure as long as signature is present to unblock user
