@@ -20,7 +20,7 @@ import config, { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
-import { Key } from '../key-management/key-provider-base'
+import { Key, KeyProvider } from '../key-management/key-provider-base'
 import { Endpoints } from '../server'
 import { getBlockNumber, getContractKit } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
@@ -137,12 +137,10 @@ export async function handleGetBlindedMessagePartialSig(
     const meterGenerateSignature = Histograms.getBlindedSigInstrumentation
       .labels('generateSignature')
       .startTimer()
-    let keyProvider
-    let privateKey
-    let signature
+    let signature: string
     try {
-      keyProvider = getKeyProvider()
-      privateKey = await keyProvider.getPrivateKeyOrFetchFromStore(key)
+      const keyProvider: KeyProvider = getKeyProvider()
+      const privateKey: string = await keyProvider.getPrivateKeyOrFetchFromStore(key)
       signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey, logger)
     } catch (err) {
       meterGenerateSignature()

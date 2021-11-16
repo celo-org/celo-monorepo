@@ -11,12 +11,21 @@ const key: Key = {
 
 jest.mock('../../src/config', () => ({
   keystore: {
+    keys: {
+      phoneNumberPrivacy: {
+        name: 'phoneNumberPrivacy',
+        latest: 1,
+      },
+      domains: {
+        name: 'domains',
+        latest: 1,
+      },
+    },
     azure: {
       clientID: 'mockClientID',
       clientSecret: 'mockClientSecret',
       tenant: 'mockTenant',
       vaultName: 'mockVaultName',
-      secretName: 'mockSecretName',
     },
   },
 }))

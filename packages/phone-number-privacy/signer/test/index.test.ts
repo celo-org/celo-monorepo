@@ -66,7 +66,10 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
     )
     mockGetContractKit.mockImplementation(() => mockContractKit)
     mockAuthenticateUser.mockResolvedValue(true)
-    mockGetKeyProvider.mockReturnValue({ getPrivateKey: jest.fn(() => DEV_PRIVATE_KEY) })
+    mockGetKeyProvider.mockReturnValue({
+      getPrivateKey: jest.fn(() => DEV_PRIVATE_KEY),
+      getPrivateKeyOrFetchFromStore: jest.fn(() => DEV_PRIVATE_KEY),
+    })
     mockComputeBlindedSignature.mockReturnValue(BLS_SIGNATURE)
     mockIncrementQueryCount.mockReturnValue(true)
     mockStoreRequest.mockReturnValue(true)
