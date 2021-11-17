@@ -1,4 +1,5 @@
 import { RootError } from '@celo/base/lib/result'
+import { CircuitBreakerError } from '@celo/identity/lib/odis/circuit-breaker'
 
 export enum BackupErrorTypes {
   AUTHORIZATION_ERROR = 'AUTHORIZATION_ERROR',
@@ -51,6 +52,7 @@ export class OdisRateLimitingError extends RootError<BackupErrorTypes.ODIS_RATE_
 
 export type BackupError =
   | AuthorizationError
+  | CircuitBreakerError
   | DecodeError
   | DecryptionError
   | InvalidBackupError

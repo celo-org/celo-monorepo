@@ -3,6 +3,7 @@
 const fetchMock = require('fetch-mock').sandbox()
 jest.mock('cross-fetch', () => fetchMock)
 
+import { MockCircuitBreaker } from '@celo/identity/lib/odis/circuit-breaker.mock'
 import { ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/query'
 import {
   checkSequentialDelayRateLimit,
@@ -50,6 +51,9 @@ const TEST_HARDENING_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: [{ delay: 0, resetTimer: noBool, batchSize: defined(3), repetitions: defined(1) }],
     environment: TEST_ODIS_ENVIRONMENT,
+  },
+  circuitBreaker: {
+    environment: MockCircuitBreaker.environment,
   },
 }
 
@@ -141,7 +145,7 @@ describe('end-to-end', () => {
     fetchMock.reset()
 
     // Mock ODIS using the mock implementation defined above.
-    const service = new MockOdis()
+    const mockOdis = new MockOdis()
     fetchMock.mock(
       {
         url: new URL(Endpoints.DOMAIN_QUOTA_STATUS, TEST_ODIS_ENVIRONMENT.odisUrl).href,
@@ -149,7 +153,7 @@ describe('end-to-end', () => {
       },
       (url: string, req: { body: string }) => {
         debug('Mocking request', { url, req })
-        return service.quota(
+        return mockOdis.quota(
           JSON.parse(req.body) as DomainQuotaStatusRequest<SequentialDelayDomain>
         )
       }
@@ -162,11 +166,15 @@ describe('end-to-end', () => {
       },
       (url: string, req: { body: string }) => {
         debug('Mocking request', { url, req })
-        return service.sign(
+        return mockOdis.sign(
           JSON.parse(req.body) as DomainRestrictedSignatureRequest<SequentialDelayDomain>
         )
       }
     )
+
+    // Mock the circuit breaker service using the implementation from the identity library.
+    const mockCircuitBreaker = new MockCircuitBreaker()
+    mockCircuitBreaker.install(fetchMock)
   })
 
   afterEach(() => {

@@ -72,12 +72,19 @@ export interface CircuitBreakerUnwrapKeyResponse {
 export enum CircuitBreakerErrorTypes {
   FETCH_ERROR = 'FETCH_ERROR',
   SERVICE_ERROR = 'CIRCUIT_BREAKER_SERVICE_ERROR',
+  UNAVAILABLE_ERROR = 'CIRCUIT_BREAKER_UNAVAILABLE_ERROR',
   ENCRYPTION_ERROR = 'ENCRYPTION_ERROR',
 }
 
 export class CircuitBreakerServiceError extends RootError<CircuitBreakerErrorTypes.SERVICE_ERROR> {
   constructor(readonly status: number, readonly error?: Error) {
     super(CircuitBreakerErrorTypes.SERVICE_ERROR)
+  }
+}
+
+export class CircuitBreakerUnavailableError extends RootError<CircuitBreakerErrorTypes.UNAVAILABLE_ERROR> {
+  constructor(readonly status: CircuitBreakerKeyStatus) {
+    super(CircuitBreakerErrorTypes.UNAVAILABLE_ERROR)
   }
 }
 
@@ -93,7 +100,11 @@ export class FetchError extends RootError<CircuitBreakerErrorTypes.FETCH_ERROR> 
   }
 }
 
-export type CircuitBreakerError = CircuitBreakerServiceError | EncryptionError | FetchError
+export type CircuitBreakerError =
+  | CircuitBreakerServiceError
+  | CircuitBreakerUnavailableError
+  | EncryptionError
+  | FetchError
 
 // TODO(victor): Write up some docs on the circuit breaker and link them here.
 /**
@@ -211,11 +222,11 @@ export class CircuitBreakerClient {
     // If the response was an error code, return an error to the user after trying to parse the
     // error from the service response. Either an error message or a status value may be returned.
     if (!response.ok) {
-      const error =
-        obj.error || obj.status
-          ? new Error(obj.error ?? `circuit breaker has an unavailable status: ${obj.status}`)
-          : undefined
-      return Err(new CircuitBreakerServiceError(response.status, error))
+      if (obj.error !== undefined || obj.status === undefined) {
+        return Err(new CircuitBreakerServiceError(response.status, obj.error))
+      } else {
+        return Err(new CircuitBreakerUnavailableError(obj.status))
+      }
     }
 
     const plaintext = obj.plaintext

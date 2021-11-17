@@ -1,5 +1,11 @@
 import { eqAddress } from '@celo/base/lib/address'
 import { Err, Ok, Result } from '@celo/base/lib/result'
+import {
+  CircuitBreakerClient,
+  CircuitBreakerKeyStatus,
+  CircuitBreakerServiceContext,
+  CircuitBreakerUnavailableError,
+} from '@celo/identity/lib/odis/circuit-breaker'
 import { ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/query'
 import { SequentialDelayDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import * as crypto from 'crypto'
@@ -68,7 +74,10 @@ export interface Backup {
   metadata?: { [key: string]: unknown }
 
   /** Information including the URL and public keys of the ODIS and circuit breaker services. */
-  environment?: OdisServiceContext & {}
+  environment?: {
+    odis?: OdisServiceContext
+    circuitBreaker?: CircuitBreakerServiceContext
+  }
 }
 
 export interface CreateBackupArgs {
@@ -90,9 +99,34 @@ export async function createBackup({
   let key = deriveKey(KDFInfo.PASSWORD, [password, nonce])
 
   // Generate a fuse key and mix it into the entropy of the key
-  // TODO: Replace this with a proper circuit breaker impl.
-  const fuseKey = crypto.randomBytes(16)
-  key = deriveKey(KDFInfo.FUSE_KEY, [key, fuseKey])
+  let encryptedFuseKey: Buffer | undefined
+  if (hardening.circuitBreaker !== undefined) {
+    const circuitBreakerClient = new CircuitBreakerClient(hardening.circuitBreaker.environment)
+
+    // Check that the circuit breaker is online. Although we do not need to interact with the
+    // service to create the backup, we should ensure its keys are not disabled or destroyed,
+    // otherwise we may not be able to open the backup that we create.
+    const serviceStatus = await circuitBreakerClient.status()
+    if (!serviceStatus.ok) {
+      return Err(serviceStatus.error)
+    }
+    if (serviceStatus.result !== CircuitBreakerKeyStatus.ENABLED) {
+      return Err(new CircuitBreakerUnavailableError(serviceStatus.result))
+    }
+
+    // Generate a fuse key and encrypt it against the circuit breaker public key.
+    const fuseKey = crypto.randomBytes(16)
+    const wrap = circuitBreakerClient.wrapKey(fuseKey)
+    if (!wrap.ok) {
+      return Err(wrap.error)
+    }
+    encryptedFuseKey = wrap.result
+
+    // Mix the fuse key into the ongoing key hardening. Note that mixing in the circuit breaker key
+    // occurs before the request to ODIS. This means an attacker would need to aquire the fuse key
+    // _before_ they can make any attempts to guess the user's secret.
+    key = deriveKey(KDFInfo.FUSE_KEY, [key, fuseKey])
+  }
 
   // Harden the key with the output of a rate limited ODIS POPRF function.
   let domain: SequentialDelayDomain | undefined
@@ -120,10 +154,13 @@ export async function createBackup({
     encryptedData: encrypt(key, data),
     nonce,
     odisDomain: domain,
-    encryptedFuseKey: fuseKey,
+    encryptedFuseKey: encryptedFuseKey,
     version: '0.0.1',
     metadata,
-    environment: hardening.odis?.environment,
+    environment: {
+      odis: hardening.odis?.environment,
+      circuitBreaker: hardening.circuitBreaker?.environment,
+    },
   })
 }
 
@@ -138,12 +175,25 @@ export async function openBackup({
 }: OpenBackupArgs): Promise<Result<Buffer, BackupError>> {
   let key = deriveKey(KDFInfo.PASSWORD, [password, backup.nonce])
 
-  // TODO: Replace this with a proper circuit breaker impl.
+  // If a circuit breaker is in use, request a decryption of the fuse key and mix it in.
   if (backup.encryptedFuseKey !== undefined) {
-    key = deriveKey(KDFInfo.FUSE_KEY, [key, backup.encryptedFuseKey])
+    if (backup.environment?.circuitBreaker === undefined) {
+      return Err(new InvalidBackupError())
+    }
+    const circuitBreakerClient = new CircuitBreakerClient(backup.environment.circuitBreaker)
+
+    const unwrap = await circuitBreakerClient.unwrapKey(backup.encryptedFuseKey)
+    if (!unwrap.ok) {
+      return Err(unwrap.error)
+    }
+
+    // Mix the fuse key into the ongoing key hardening. Note that mixing in the circuit breaker key
+    // occurs before the request to ODIS. This means an attacker would need to aquire the fuse key
+    // _before_ they can make any attempts to guess the user's secret.
+    key = deriveKey(KDFInfo.FUSE_KEY, [key, unwrap.result])
   }
 
-  // Harden the key with the output of a rate limited ODIS POPRF function.
+  // If ODIS is in use, harden the key with the output of a rate limited ODIS POPRF function.
   if (backup.odisDomain !== undefined) {
     const domain = backup.odisDomain
 
@@ -154,11 +204,16 @@ export async function openBackup({
       // TODO(victor): Include more detail in error messages.
       return Err(new InvalidBackupError())
     }
-    if (backup.environment === undefined) {
+    if (backup.environment?.odis === undefined) {
       return Err(new InvalidBackupError())
     }
 
-    const odisHardenedKey = await odisHardenKey(key, domain, backup.environment, authorizer.wallet)
+    const odisHardenedKey = await odisHardenKey(
+      key,
+      domain,
+      backup.environment.odis,
+      authorizer.wallet
+    )
     if (!odisHardenedKey.ok) {
       return odisHardenedKey
     }

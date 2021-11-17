@@ -40,9 +40,15 @@ export const BackupSchema: t.Type<Backup, object> = t.intersection([
     odisDomain: SequentialDelayDomainSchema,
     metadata: t.UnknownRecord,
     encryptedFuseKey: BufferFromBase64,
-    environment: t.type({
-      odisUrl: t.string,
-      odisPubKey: t.string,
+    environment: t.partial({
+      odis: t.type({
+        odisUrl: t.string,
+        odisPubKey: t.string,
+      }),
+      circuitBreaker: t.type({
+        url: t.string,
+        publicKey: t.string,
+      }),
     }),
   }),
 ])
