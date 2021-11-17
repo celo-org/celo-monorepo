@@ -6,6 +6,7 @@ import {
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
+  KEY_VERSION_HEADER,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   SignMessageResponse,
   SignMessageResponseFailure,
@@ -73,7 +74,7 @@ async function requestSignatures(request: Request, response: Response) {
   })
   obs.observe({ entryTypes: ['measure'], buffered: true })
 
-  request.headers.keyVersion = config.keyVersions.phoneNumberPrivacy.toString()
+  request.headers[KEY_VERSION_HEADER] = config.keyVersions.phoneNumberPrivacy.toString()
 
   const signers = JSON.parse(config.odisServices.signers) as SignerService[]
   let timedOut = false
@@ -184,8 +185,8 @@ async function handleSuccessResponse(
   controller: AbortController
 ) {
   const logger: Logger = response.locals.logger
-  const keyVersion: number = Number(response.header('keyVersion'))
-  logger.info({ keyVersion }, 'Signer responded with keyVersion')
+  const keyVersion: number = Number(response.header(KEY_VERSION_HEADER))
+  logger.info({ keyVersion }, 'Signer responded with key version')
   const signResponse = JSON.parse(data) as SignerResponse
   if (!signResponse.success) {
     // Continue on failure as long as signature is present to unblock user

@@ -24,7 +24,7 @@ export abstract class KeyProviderBase implements KeyProvider {
   }
 
   public async getPrivateKeyOrFetchFromStore(key: Key): Promise<string> {
-    if (key.version < 1 || key.version > 10) {
+    if (key.version < 1) {
       throw new Error('Invalid private key version')
     }
     try {

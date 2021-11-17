@@ -5,6 +5,7 @@ import {
   DomainRestrictedSignatureRequest,
   DomainStatusResponse,
   ErrorMessage,
+  KEY_VERSION_HEADER,
   KeyName,
   SignMessageResponseSuccess,
   WarningMessage,
@@ -143,7 +144,7 @@ export class DomainService implements IDomainService {
 
     const key: Key = {
       name: KeyName.domains,
-      version: Number(request.headers.keyVersion) || config.keystore.keys.domains.latest,
+      version: Number(request.headers[KEY_VERSION_HEADER]) || config.keystore.keys.domains.latest,
     }
 
     try {

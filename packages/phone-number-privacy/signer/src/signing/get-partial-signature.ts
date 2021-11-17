@@ -5,6 +5,7 @@ import {
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
+  KEY_VERSION_HEADER,
   KeyName,
   SignMessageResponse,
   SignMessageResponseFailure,
@@ -33,7 +34,6 @@ export interface GetBlindedMessagePartialSigRequest {
   hashedPhoneNumber?: string
   timestamp?: number
   sessionID?: string
-  keyVersion?: number
 }
 
 export async function handleGetBlindedMessagePartialSig(
@@ -48,7 +48,8 @@ export async function handleGetBlindedMessagePartialSig(
 
   const key: Key = {
     name: KeyName.phoneNumberPrivacy,
-    version: Number(request.headers.keyVersion) || config.keystore.keys.phoneNumberPrivacy.latest,
+    version:
+      Number(request.headers[KEY_VERSION_HEADER]) || config.keystore.keys.phoneNumberPrivacy.latest,
   }
 
   try {
@@ -192,7 +193,7 @@ export async function handleGetBlindedMessagePartialSig(
     }
     Counters.responses.labels(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, '200').inc()
     logger.info({ response: signMessageResponse }, 'Signature retrieval success')
-    response.set('keyVersion', key.version.toString()).json(signMessageResponse)
+    response.set(KEY_VERSION_HEADER, key.version.toString()).json(signMessageResponse)
   } catch (err) {
     logger.error('Failed to get signature')
     logger.error(err)
