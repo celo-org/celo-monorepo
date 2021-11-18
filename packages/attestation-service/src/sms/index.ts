@@ -1,6 +1,6 @@
+import { E164Number } from '@celo/phone-utils/lib/io'
 import { sleep } from '@celo/utils/lib/async'
 import { intersection } from '@celo/utils/lib/collections'
-import { E164Number } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { PhoneNumberType, PhoneNumberUtil } from 'google-libphonenumber'
 import { shuffle } from 'lodash'

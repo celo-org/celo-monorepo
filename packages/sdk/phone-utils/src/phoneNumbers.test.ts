@@ -1,14 +1,16 @@
+import { isE164Number } from '@celo/base/lib/phoneNumbers'
 import {
   getCountryCode,
   getDisplayPhoneNumber,
   getE164Number,
   getExampleNumber,
-  getPhoneHash,
   getRegionCode,
   getRegionCodeFromCountryCode,
-  isE164Number,
   parsePhoneNumber,
+  PhoneNumberUtils,
 } from './phoneNumbers'
+
+const getPhoneHash = PhoneNumberUtils.getPhoneHash
 
 const COUNTRY_CODES = {
   US: '+1',

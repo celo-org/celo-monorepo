@@ -1,4 +1,5 @@
-import { AttestationServiceStatusResponseType, SignatureType } from '@celo/utils/lib/io'
+import { AttestationServiceStatusResponseType } from '@celo/phone-utils/lib/io'
+import { SignatureType } from '@celo/utils/lib/io'
 import express from 'express'
 import * as t from 'io-ts'
 import { getAgeOfLatestBlock, isNodeSyncing, useKit } from '../db'

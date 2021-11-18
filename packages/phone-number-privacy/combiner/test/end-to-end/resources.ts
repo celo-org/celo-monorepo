@@ -5,7 +5,7 @@ import {
   ServiceContext,
   WalletKeySigner,
 } from '@celo/identity/lib/odis/query'
-import { PhoneNumberUtils } from '@celo/utils'
+import { PhoneNumberUtils } from '@celo/phone-utils'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,

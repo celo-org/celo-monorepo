@@ -1,6 +1,7 @@
 import { ensureLeading0x, eqAddress } from '@celo/base/lib/address'
 import { Address } from '@celo/connect'
-import { AttestationServiceStatusResponseType, UrlType } from '@celo/utils/lib/io'
+import { AttestationServiceStatusResponseType } from '@celo/phone-utils/lib/io'
+import { UrlType } from '@celo/utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import { randomBytes } from 'crypto'
