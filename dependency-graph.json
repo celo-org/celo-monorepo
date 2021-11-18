@@ -261,6 +261,16 @@
       "@celo/wallet-remote"
     ]
   },
+  "@celo/wallet-hsm-gcp": {
+    "location": "packages/sdk/wallets/wallet-hsm-gcp",
+    "dependencies": [
+      "@celo/connect",
+      "@celo/utils",
+      "@celo/wallet-base",
+      "@celo/wallet-hsm",
+      "@celo/wallet-remote"
+    ]
+  },
   "@celo/wallet-hsm": {
     "location": "packages/sdk/wallets/wallet-hsm",
     "dependencies": [
