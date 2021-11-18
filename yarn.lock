@@ -2360,6 +2360,13 @@
     google-gax "^2.24.1"
     protobufjs "^6.8.6"
 
+"@google-cloud/kms@~2.9.0":
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/kms/-/kms-2.9.0.tgz#3f7e51a3e30795a69ded4ea4f96609a59b503001"
+  integrity sha512-AWzkMdpQewBMhsdu3Os5UNvYsgJU8y6uSDtXFK36llmk7DeZbqRFpDviGkSImOIOOJgz1Spu1WN61veKZW9yTQ==
+  dependencies:
+    google-gax "^2.24.1"
+
 "@google-cloud/logging@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@google-cloud/logging/-/logging-7.1.0.tgz#79af14fe911c622eb60422bfdd3636d9bba46efc"
