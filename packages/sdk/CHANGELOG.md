@@ -1,10 +1,17 @@
 # Changelog
-All notable changes to the [Celo SDK](https://docs.celo.org/developer-guide/sdk-code-reference) will be documented in this file. 
+All notable changes to the [Celo SDK](https://docs.celo.org/developer-guide/sdk-code-reference) will be documented in this file.
 
 This package will follow the release process outlined [here](https://docs.celo.org/community/release-process).
 
-
 ## Development (not published yet)
+
+### **[2.0.0--dev]**
+Features
+  - Extract out heavy phone-utils into new package [#](https://github.com/celo-org/celo-monorepo/pull/8987)
+
+### **[1.3.1--dev]**
+<!-- Missing -->
+
 ### **[1.2.3--dev]**
 Features
 -  one-line summary - [#](link PR)
