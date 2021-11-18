@@ -8,6 +8,7 @@
     "dependencies": [
       "@celo/contractkit",
       "@celo/keystores",
+      "@celo/phone-utils",
       "@celo/utils"
     ]
   },
@@ -197,6 +198,7 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
+      "@celo/phone-utils",
       "@celo/utils",
       "@celo/wallet-local"
     ]
@@ -213,6 +215,14 @@
     "dependencies": [
       "@celo/dev-utils",
       "@celo/flake-tracker"
+    ]
+  },
+  "@celo/phone-utils": {
+    "location": "packages/sdk/phone-utils",
+    "dependencies": [
+      "@celo/base",
+      "@celo/flake-tracker",
+      "@celo/typescript"
     ]
   },
   "@celo/transactions-uri": {
