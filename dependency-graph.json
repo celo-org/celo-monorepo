@@ -67,6 +67,7 @@
     "dependencies": [
       "@celo/connect",
       "@celo/contractkit",
+      "@celo/phone-utils",
       "@celo/utils"
     ]
   },
