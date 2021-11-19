@@ -56,12 +56,14 @@ export class BLSCryptographyClient {
       )
     }
     // Optimistically attempt to combine unverified signatures
-    // If combination fails, iterate through each signature and remove invalid ones
+    // If combination or verification fails, iterate through each signature and remove invalid ones
     // We do this since partial signature verification incurs higher latencies
     try {
       const result = threshold_bls.combine(threshold, this.allSignatures)
-      // TODO(Alec): confirm this works if message is still blinded and document to avoid confusion
-      threshold_bls.verify(
+      // TODO(Alec): Confirm and address bad documentation in threshold-bls lib.
+      // Documentation should not specify that verifyBlindSignature verifies the
+      // signature after it has been unblinded.
+      threshold_bls.verifyBlindSignature(
         Buffer.from(config.thresholdSignature.pubKey, 'base64'),
         Buffer.from(blindedMessage, 'base64'),
         result
