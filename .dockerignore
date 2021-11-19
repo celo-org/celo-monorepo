@@ -15,7 +15,6 @@ dockerfiles
 packages/blockchain-api
 packages/docs
 packages/faucet
-packages/helm-charts
 packages/mobile
 packages/react-components
 packages/dappkit
