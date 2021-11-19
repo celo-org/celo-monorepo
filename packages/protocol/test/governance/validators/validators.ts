@@ -2202,6 +2202,9 @@ contract('Validators', (accounts: string[]) => {
   describe('#distributeEpochPaymentsFromSigner', () => {
     const validator = accounts[0]
     const group = accounts[1]
+    const delegatee = accounts[2]
+    const delegatedFraction = toFixed(0.1)
+
     const maxPayment = new BigNumber(20122394876)
     let mockStableToken: MockStableTokenInstance
     beforeEach(async () => {
@@ -2211,6 +2214,8 @@ contract('Validators', (accounts: string[]) => {
       // Fast-forward to the next epoch, so that the getMembershipInLastEpoch(validator) == group
       await mineToNextEpoch(web3)
       await mockLockedGold.addSlasher(accounts[2])
+
+      await accountsInstance.setPaymentDelegation(delegatee, delegatedFraction)
     })
 
     describe('when the validator score is non-zero', () => {
@@ -2219,6 +2224,7 @@ contract('Validators', (accounts: string[]) => {
       let expectedTotalPayment: BigNumber
       let expectedGroupPayment: BigNumber
       let expectedValidatorPayment: BigNumber
+      let expectedDelegatedPayment: BigNumber
 
       beforeEach(async () => {
         const uptime = new BigNumber(0.99)
@@ -2231,7 +2237,11 @@ contract('Validators', (accounts: string[]) => {
         expectedGroupPayment = expectedTotalPayment
           .times(fromFixed(commission))
           .dp(0, BigNumber.ROUND_FLOOR)
-        expectedValidatorPayment = expectedTotalPayment.minus(expectedGroupPayment)
+        const remainingPayment = expectedTotalPayment.minus(expectedGroupPayment)
+        expectedDelegatedPayment = remainingPayment
+          .times(fromFixed(delegatedFraction))
+          .dp(0, BigNumber.ROUND_FLOOR)
+        expectedValidatorPayment = remainingPayment.minus(expectedDelegatedPayment)
 
         await validators.updateValidatorScoreFromSigner(validator, toFixed(uptime))
       })
@@ -2250,6 +2260,10 @@ contract('Validators', (accounts: string[]) => {
           assertEqualBN(await mockStableToken.balanceOf(group), expectedGroupPayment)
         })
 
+        it('should pay the delegatee', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(delegatee), expectedDelegatedPayment)
+        })
+
         it('should return the expected total payment', async () => {
           assertEqualBN(ret, expectedTotalPayment)
         })
@@ -2259,6 +2273,7 @@ contract('Validators', (accounts: string[]) => {
         let halfExpectedTotalPayment: BigNumber
         let halfExpectedGroupPayment: BigNumber
         let halfExpectedValidatorPayment: BigNumber
+        let halfExpectedDelegatedPayment: BigNumber
 
         beforeEach(async () => {
           halfExpectedTotalPayment = expectedScore
@@ -2268,7 +2283,11 @@ contract('Validators', (accounts: string[]) => {
           halfExpectedGroupPayment = halfExpectedTotalPayment
             .times(fromFixed(commission))
             .dp(0, BigNumber.ROUND_FLOOR)
-          halfExpectedValidatorPayment = halfExpectedTotalPayment.minus(halfExpectedGroupPayment)
+          const remainingPayment = halfExpectedTotalPayment.minus(halfExpectedGroupPayment)
+          halfExpectedDelegatedPayment = remainingPayment
+            .times(fromFixed(delegatedFraction))
+            .dp(0, BigNumber.ROUND_FLOOR)
+          halfExpectedValidatorPayment = remainingPayment.minus(halfExpectedDelegatedPayment)
 
           await validators.halveSlashingMultiplier(group, { from: accounts[2] })
           ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
@@ -2281,6 +2300,10 @@ contract('Validators', (accounts: string[]) => {
 
         it('should pay the group only half', async () => {
           assertEqualBN(await mockStableToken.balanceOf(group), halfExpectedGroupPayment)
+        })
+
+        it('should pay the delegatee only half', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(delegatee), halfExpectedDelegatedPayment)
         })
 
         it('should return the expected total payment', async () => {
@@ -2306,6 +2329,10 @@ contract('Validators', (accounts: string[]) => {
           assertEqualBN(await mockStableToken.balanceOf(group), 0)
         })
 
+        it('should not pay the delegatee', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(delegatee), 0)
+        })
+
         it('should return zero', async () => {
           assertEqualBN(ret, 0)
         })
@@ -2327,6 +2354,10 @@ contract('Validators', (accounts: string[]) => {
 
         it('should not pay the group', async () => {
           assertEqualBN(await mockStableToken.balanceOf(group), 0)
+        })
+
+        it('should not pay the delegatee', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(delegatee), 0)
         })
 
         it('should return zero', async () => {

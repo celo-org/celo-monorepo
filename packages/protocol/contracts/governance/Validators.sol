@@ -515,10 +515,16 @@ contract Validators is
         .multiply(validators[account].score)
         .multiply(groups[group].slashInfo.multiplier);
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
-      uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
+      FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
+        totalPayment.fromFixed().sub(groupPayment)
+      );
+      (address beneficiary, uint256 fraction) = getAccounts().getPaymentDelegation(account);
+      uint256 delegatedPayment = remainingPayment.multiply(FixidityLib.wrap(fraction)).fromFixed();
+      uint256 validatorPayment = remainingPayment.fromFixed().sub(delegatedPayment);
       IStableToken stableToken = getStableToken();
       require(stableToken.mint(group, groupPayment), "mint failed to validator group");
       require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
+      require(stableToken.mint(beneficiary, delegatedPayment), "mint failed to delegatee");
       emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
