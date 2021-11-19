@@ -322,6 +322,8 @@ export async function findAttestationByDeliveryId(
 ): Promise<AttestationModel | null> {
   return (await getAttestationTable()).findOne({
     where: { ongoingDeliveryId },
+    // Ensure deterministic result, since deliveryId uniqueness is not enforced
+    order: [['createdAt', 'DESC']],
     ...options,
   })
 }

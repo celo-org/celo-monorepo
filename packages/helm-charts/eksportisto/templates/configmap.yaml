@@ -4,6 +4,12 @@ metadata:
   name: eksportisto-config
 data:
   service-account.json: {{ .Values.serviceAccountBase64 | b64dec | quote }}
+  config_monitor.yaml: |
+    monitoring:
+      port: 8080
+      address: 0.0.0.0
+      requestTimeoutSeconds: 25
+
   config.yaml: |
     monitoring:
       port: 8080
@@ -24,6 +30,7 @@ data:
         sleepIntervalMilliseconds: 2000
       chainTip:
         enabled: true
+        queue: backfill
 
     indexer:
       concurrency: 10

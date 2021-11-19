@@ -16,7 +16,7 @@ export abstract class KeyProviderBase implements KeyProvider {
     return this.privateKey
   }
 
-  public abstract async fetchPrivateKeyFromStore(): Promise<void>
+  public abstract fetchPrivateKeyFromStore(): Promise<void>
 
   protected setPrivateKey(key: string) {
     key = key ? key.trim() : ''
