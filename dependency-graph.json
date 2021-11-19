@@ -223,7 +223,8 @@
     "dependencies": [
       "@celo/base",
       "@celo/flake-tracker",
-      "@celo/typescript"
+      "@celo/typescript",
+      "@celo/utils"
     ]
   },
   "@celo/transactions-uri": {
