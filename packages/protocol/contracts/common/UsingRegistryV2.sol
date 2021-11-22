@@ -90,6 +90,10 @@ contract UsingRegistryV2 {
     return IExchange(registry.getAddressForOrDie(EXCHANGE_EURO_REGISTRY_ID));
   }
 
+  function getExchangeREAL() internal view returns (IExchange) {
+    return IExchange(registry.getAddressForOrDie(EXCHANGE_REAL_REGISTRY_ID));
+  }
+
   function getFeeCurrencyWhitelistRegistry() internal view returns (IFeeCurrencyWhitelist) {
     return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
   }
@@ -132,6 +136,10 @@ contract UsingRegistryV2 {
 
   function getStableEuroToken() internal view returns (IStableToken) {
     return IStableToken(registry.getAddressForOrDie(STABLE_EURO_TOKEN_REGISTRY_ID));
+  }
+
+  function getStableRealToken() internal view returns (IStableToken) {
+    return IStableToken(registry.getAddressForOrDie(STABLE_REAL_TOKEN_REGISTRY_ID));
   }
 
   function getValidators() internal view returns (IValidators) {
