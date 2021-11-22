@@ -107,35 +107,33 @@ export async function isVerified(
   contractKit: ContractKit,
   logger: Logger
 ): Promise<boolean> {
-  try {
-    return retryAsyncWithBackOffAndTimeout(
-      async () => {
-        const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
-        const {
-          isVerified: _isVerified,
-          completed,
-          numAttestationsRemaining,
-          total,
-        } = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
+  return retryAsyncWithBackOffAndTimeout(
+    async () => {
+      const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
+      const {
+        isVerified: _isVerified,
+        completed,
+        numAttestationsRemaining,
+        total,
+      } = await attestationsWrapper.getVerifiedStatus(hashedPhoneNumber, account)
 
-        logger.debug({
-          account,
-          isVerified: _isVerified,
-          completedAttestations: completed,
-          remainingAttestations: numAttestationsRemaining,
-          totalAttestationsRequested: total,
-        })
-        return _isVerified
-      },
-      RETRY_COUNT,
-      [],
-      RETRY_DELAY_IN_MS,
-      1.5,
-      FULL_NODE_TIMEOUT_IN_MS
-    )
-  } catch (error: any) {
+      logger.debug({
+        account,
+        isVerified: _isVerified,
+        completedAttestations: completed,
+        remainingAttestations: numAttestationsRemaining,
+        totalAttestationsRequested: total,
+      })
+      return _isVerified
+    },
+    RETRY_COUNT,
+    [],
+    RETRY_DELAY_IN_MS,
+    1.5,
+    FULL_NODE_TIMEOUT_IN_MS
+  ).catch((error) => {
     logger.error('Failed to get verification status: ' + error.message)
     logger.warn('Assuming user is verified')
     return true
-  }
+  })
 }
