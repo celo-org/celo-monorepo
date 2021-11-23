@@ -1,4 +1,4 @@
-import { Address, ensureLeading0x, NULL_ADDRESS } from '@celo/base/lib/address'
+import { Address, ensureLeading0x } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { assertLogMatches, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
@@ -6,6 +6,7 @@ import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { generateTypedDataHash } from '@celo/utils/src/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/src/signatureUtils'
+import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
@@ -14,8 +15,6 @@ import {
   RegistryContract,
 } from 'types'
 import { keccak256 } from 'web3-utils'
-
-import BigNumber from 'bignumber.js'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -139,13 +138,14 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       it('emits the AccountNameSet event', async () => {
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
         const resp = await accountsInstance.setAccount(
           name,
           dataEncryptionKey,
-          caller,
-          '0x0',
-          '0x0',
-          '0x0'
+          walletAddress,
+          sig.v,
+          sig.r,
+          sig.s
         )
         assertLogMatches2(resp.logs[0], {
           event: 'AccountNameSet',
@@ -154,13 +154,14 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       it('emits the AccountDataEncryptionKeySet event', async () => {
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
         const resp = await accountsInstance.setAccount(
           name,
           dataEncryptionKey,
-          caller,
-          '0x0',
-          '0x0',
-          '0x0'
+          walletAddress,
+          sig.v,
+          sig.r,
+          sig.s
         )
         assertLogMatches2(resp.logs[1], {
           event: 'AccountDataEncryptionKeySet',
@@ -178,7 +179,7 @@ contract('Accounts', (accounts: string[]) => {
           sig.r,
           sig.s
         )
-        assertLogMatches2(resp.logs[4], {
+        assertLogMatches2(resp.logs[5], {
           event: 'AccountWalletAddressSet',
           args: { account, walletAddress },
         })
@@ -207,13 +208,14 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       it('emits the AccountCreated event', async () => {
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
         const resp = await accountsInstance.setAccount(
           name,
           dataEncryptionKey,
-          caller,
-          '0x0',
-          '0x0',
-          '0x0'
+          walletAddress,
+          sig.v,
+          sig.r,
+          sig.s
         )
         assertLogMatches2(resp.logs[0], {
           event: 'AccountCreated',
@@ -222,13 +224,14 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       it('emits the AccountNameSet event', async () => {
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
         const resp = await accountsInstance.setAccount(
           name,
           dataEncryptionKey,
-          caller,
-          '0x0',
-          '0x0',
-          '0x0'
+          walletAddress,
+          sig.v,
+          sig.r,
+          sig.s
         )
         assertLogMatches2(resp.logs[1], {
           event: 'AccountNameSet',
@@ -237,13 +240,14 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       it('emits the AccountDataEncryptionKeySet event', async () => {
+        const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
         const resp = await accountsInstance.setAccount(
           name,
           dataEncryptionKey,
-          caller,
-          '0x0',
-          '0x0',
-          '0x0'
+          walletAddress,
+          sig.v,
+          sig.r,
+          sig.s
         )
         assertLogMatches2(resp.logs[2], {
           event: 'AccountDataEncryptionKeySet',
@@ -261,7 +265,7 @@ contract('Accounts', (accounts: string[]) => {
           sig.r,
           sig.s
         )
-        assertLogMatches2(resp.logs[5], {
+        assertLogMatches2(resp.logs[6], {
           event: 'AccountWalletAddressSet',
           args: { account, walletAddress },
         })
@@ -295,18 +299,11 @@ contract('Accounts', (accounts: string[]) => {
         assert.equal(result, walletAddress)
       })
 
-      it('should set the NULL_ADDRESS', async () => {
-        const sig = await getParsedSignatureOfAddress(web3, account, NULL_ADDRESS)
-        await accountsInstance.setWalletAddress(NULL_ADDRESS, sig.v, sig.r, sig.s)
-        const result = await accountsInstance.getWalletAddress(account)
-        assert.equal(result, NULL_ADDRESS)
-      })
-
       it('should emit the AccountWalletAddressSet event', async () => {
         const sig = await getParsedSignatureOfAddress(web3, account, walletAddress)
         const response = await accountsInstance.setWalletAddress(walletAddress, sig.v, sig.r, sig.s)
-        assert.lengthOf(response.logs, 3)
-        const event = response.logs[2]
+        assert.lengthOf(response.logs, 4)
+        const event = response.logs[3]
         assertLogMatches2(event, {
           event: 'AccountWalletAddressSet',
           args: { account, walletAddress },

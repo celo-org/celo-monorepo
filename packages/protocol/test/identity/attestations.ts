@@ -71,8 +71,11 @@ contract('Attestations', (accounts: string[]) => {
   const maxAttestations = 20
   const attestationFee = new BigNumber(web3.utils.toWei('.05', 'ether').toString())
 
+  const walletAccount = web3.eth.accounts.create()
   async function setAccountWalletAddress() {
-    return accountsInstance.setWalletAddress(caller, '0x0', '0x0', '0x0')
+    const addressHash = web3.utils.soliditySha3({ type: 'address', value: caller })
+    const sig = walletAccount.sign(addressHash)
+    return accountsInstance.setWalletAddress(walletAccount.address, sig.v, sig.r, sig.s)
   }
 
   const getNonIssuer = async () => {
@@ -800,8 +803,6 @@ contract('Attestations', (accounts: string[]) => {
       })
 
       describe('when the account has a walletAddress mapped', () => {
-        beforeEach(setAccountWalletAddress)
-
         it('should allow a user to lookup the attested account of a phone number', async () => {
           const attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
           assert.deepEqual(attestedAccounts, [caller])
@@ -821,7 +822,6 @@ contract('Attestations', (accounts: string[]) => {
     describe('when an account has a claim and is mapped with a walletAddress', () => {
       beforeEach(async () => {
         await requestAttestations()
-        await setAccountWalletAddress()
       })
 
       it("does not return the user's account", async () => {
@@ -860,13 +860,14 @@ contract('Attestations', (accounts: string[]) => {
           assert.lengthOf(total, 1)
 
           assert.equal(matches[0].toNumber(), 1)
-          assert.equal(addresses[0], caller)
+          assert.equal(addresses[0], walletAccount.address)
           assert.equal(completed[0].toNumber(), 1)
           assert.equal(total[0].toNumber(), 3)
         })
 
         describe('and another account also has an attestation to the same phone number', () => {
           let other
+          const walletAccount2 = web3.eth.accounts.create()
           beforeEach(async () => {
             other = accounts[1]
             await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address, {
@@ -884,7 +885,11 @@ contract('Attestations', (accounts: string[]) => {
               accounts
             )
             await attestations.complete(phoneHash, v, r, s, { from: other })
-            await accountsInstance.setWalletAddress(other, '0x0', '0x0', '0x0', { from: other })
+            const addressHash = web3.utils.soliditySha3({ type: 'address', value: other })
+            const sig = walletAccount2.sign(addressHash)
+            await accountsInstance.setWalletAddress(walletAccount2.address, sig.v, sig.r, sig.s, {
+              from: other,
+            })
           })
 
           it('should return multiple attested accounts', async () => {
@@ -902,8 +907,8 @@ contract('Attestations', (accounts: string[]) => {
             assert.lengthOf(total, 2)
 
             assert.equal(matches[0].toNumber(), 2)
-            assert.equal(addresses[0], caller)
-            assert.equal(addresses[1], other)
+            assert.equal(addresses[0], walletAccount.address)
+            assert.equal(addresses[1], walletAccount2.address)
             assert.equal(completed[0].toNumber(), 1)
             assert.equal(total[0].toNumber(), 3)
             assert.equal(completed[1].toNumber(), 1)
