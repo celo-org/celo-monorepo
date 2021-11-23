@@ -18,7 +18,11 @@ import {
   genSessionID,
 } from '@celo/phone-number-privacy-common'
 import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
-import { queryOdis, ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/query'
+import {
+  ErrorMessages,
+  queryOdis,
+  ServiceContext as OdisServiceContext,
+} from '@celo/identity/lib/odis/query'
 import { defined, noString, noNumber } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import * as crypto from 'crypto'
@@ -177,6 +181,9 @@ async function requestOdisQuotaStatus(
       Endpoints.DOMAIN_QUOTA_STATUS
     )
   } catch (error) {
+    if ((error as Error).message === ErrorMessages.ODIS_RATE_LIMIT_ERROR) {
+      return Err(new OdisRateLimitingError(undefined, error as Error))
+    }
     return Err(new OdisServiceError(error as Error))
   }
   if (!quotaResp.success) {
@@ -228,6 +235,9 @@ async function requestOdisDomainSignature(
       Endpoints.DOMAIN_SIGN
     )
   } catch (error) {
+    if ((error as Error).message === ErrorMessages.ODIS_RATE_LIMIT_ERROR) {
+      return Err(new OdisRateLimitingError(undefined, error as Error))
+    }
     return Err(new OdisServiceError(error as Error))
   }
   if (!signatureResp.success) {

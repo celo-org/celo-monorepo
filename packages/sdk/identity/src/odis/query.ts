@@ -58,6 +58,7 @@ export type SignMessageResponse = CombinerSignMessageResponse
 
 export enum ErrorMessages {
   ODIS_QUOTA_ERROR = 'odisQuotaError',
+  ODIS_RATE_LIMIT_ERROR = 'odisRateLimitError',
   ODIS_INPUT_ERROR = 'odisBadInputError',
   ODIS_AUTH_ERROR = 'odisAuthError',
   ODIS_CLIENT_ERROR = 'Unknown Client Error',
@@ -145,6 +146,7 @@ export async function queryOdis<ResponseType>(
 
   const dontRetry = [
     ErrorMessages.ODIS_QUOTA_ERROR,
+    ErrorMessages.ODIS_RATE_LIMIT_ERROR,
     ErrorMessages.ODIS_AUTH_ERROR,
     ErrorMessages.ODIS_INPUT_ERROR,
     ErrorMessages.ODIS_CLIENT_ERROR,
@@ -173,6 +175,8 @@ export async function queryOdis<ResponseType>(
       switch (res.status) {
         case 403:
           throw new Error(ErrorMessages.ODIS_QUOTA_ERROR)
+        case 429:
+          throw new Error(ErrorMessages.ODIS_RATE_LIMIT_ERROR)
         case 400:
           throw new Error(ErrorMessages.ODIS_INPUT_ERROR)
         case 401:

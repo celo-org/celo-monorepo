@@ -22,6 +22,7 @@ import { defined, noBool } from '@celo/utils/lib/sign-typed-data-utils'
 import debugFactory from 'debug'
 import { createBackup, openBackup } from './backup'
 import { HardeningConfig } from './config'
+import { BackupErrorTypes } from './errors'
 import { deserializeBackup, serializeBackup } from './schema'
 
 // DO NOT MERGE(victor): Create a more complete set of tests, including a number of error conditions.
@@ -246,5 +247,82 @@ describe('end-to-end', () => {
       return
     }
     expect(reopened.result).toEqual(testData)
+  })
+})
+
+describe('createBackup', () => {
+  let mockOdis: MockOdis | undefined
+  let mockCircuitBreaker: MockCircuitBreaker | undefined
+
+  const testData = Buffer.from('backup test data', 'utf8')
+  const testPassword = Buffer.from('backup test password', 'utf8')
+
+  beforeEach(() => {
+    fetchMock.reset()
+    fetchMock.config.overwriteRoutes = true
+
+    // Mock ODIS using the mock implementation defined above.
+    mockOdis = new MockOdis()
+    mockOdis.install(fetchMock)
+
+    // Mock the circuit breaker service using the implementation from the identity library.
+    mockCircuitBreaker = new MockCircuitBreaker()
+    mockCircuitBreaker.install(fetchMock)
+  })
+
+  afterEach(() => {
+    fetchMock.reset()
+  })
+
+  it('should return a service error when request to ODIS fails', async () => {
+    mockOdis!.installSignEndpoint(fetchMock, { throws: new Error('fetch failed') })
+    const result = await createBackup({
+      data: testData,
+      password: testPassword,
+      hardening: TEST_HARDENING_CONFIG,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.ODIS_SERVICE_ERROR)
+  })
+
+  it('should return a service error when ODIS returns an error status', async () => {
+    mockOdis!.installSignEndpoint(fetchMock, { status: 501 })
+    const result = await createBackup({
+      data: testData,
+      password: testPassword,
+      hardening: TEST_HARDENING_CONFIG,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.ODIS_SERVICE_ERROR)
+  })
+
+  it('should return a rate limit error when ODIS returns a rate limiting status', async () => {
+    mockOdis!.installSignEndpoint(fetchMock, { status: 429, headers: { 'Retry-After': '60' } })
+    const result = await createBackup({
+      data: testData,
+      password: testPassword,
+      hardening: TEST_HARDENING_CONFIG,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.ODIS_RATE_LIMITING_ERROR)
+  })
+
+  it('should not rely on ODIS when not included in the configuration', async () => {
+    mockOdis!.installSignEndpoint(fetchMock, { status: 501 })
+    const result = await createBackup({
+      data: testData,
+      password: testPassword,
+      hardening: { ...TEST_HARDENING_CONFIG, odis: undefined },
+    })
+    expect(result.ok).toBe(true)
   })
 })
