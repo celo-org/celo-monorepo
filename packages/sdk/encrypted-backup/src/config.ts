@@ -1,13 +1,23 @@
-import { CircuitBreakerServiceContext } from '@celo/identity/lib/odis/circuit-breaker'
-import { ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/query'
+import {
+  VALORA_ALFAJORES_CIRCUIT_BREAKER_ENVIRONMENT,
+  VALORA_MAINNET_CIRCUIT_BREAKER_ENVIRONMENT,
+  CircuitBreakerServiceContext,
+} from '@celo/identity/lib/odis/circuit-breaker'
+import {
+  ODIS_ALFAJORES_CONTEXT,
+  ODIS_MAINNET_CONTEXT,
+  ServiceContext as OdisServiceContext,
+} from '@celo/identity/lib/odis/query'
 import { SequentialDelayStage } from '@celo/phone-number-privacy-common'
 import { defined, noNumber } from '@celo/utils/lib/sign-typed-data-utils'
 
 export interface HardeningConfig {
-  /** If provided, ODIS will be used with the given config to harden the backup key */
+  /** If provided, ODIS will be used with the given configuration to harden the backup key */
   odis?: OdisHardeningConfig
 
-  /** If provided, a circuit breaker will be used with the given config to protect the backup key */
+  /**
+   * If provided, a circuit breaker will be used with the given configuration to protect the backup key
+   */
   circuitBreaker?: CircuitBreakerConfig
 }
 
@@ -32,6 +42,16 @@ export interface CircuitBreakerConfig {
   environment: CircuitBreakerServiceContext
 }
 
+/**
+ * ODIS SequentialDelayDomain rate limit configured to be appropriate for hardening a 6-digit PIN.
+ *
+ * @remarks Because PINs have very little entropy, the total number of guesses is very restricted.
+ *   * On the first day, the client has 10 attempts. 5 within 10s. 5 more over roughly 45 minutes.
+ *   * On the second day, the client has 5 attempts over roughly 2 minutes.
+ *   * On the third day, the client has 3 attempts over roughly 40 seconds.
+ *   * On the fourth day, the client has 2 attempts over roughly 10 seconds.
+ *   * Overall, the client has 20 attempts over 4 days. All further attempts will be denied.
+ */
 const PIN_HARDENING_RATE_LIMIT: SequentialDelayStage[] = [
   // First stage is setup, as the user will need to make a single query to create their backup.
   {
@@ -83,7 +103,7 @@ const PIN_HARDENING_RATE_LIMIT: SequentialDelayStage[] = [
     batchSize: defined(1),
     repetitions: noNumber,
   },
-  // On seconds day, the client has 5 attempts over roughly 2 minutes.
+  // On the second day, the client has 5 attempts over roughly 2 minutes.
   {
     delay: 86400,
     resetTimer: defined(true),
@@ -108,7 +128,7 @@ const PIN_HARDENING_RATE_LIMIT: SequentialDelayStage[] = [
     batchSize: defined(1),
     repetitions: noNumber,
   },
-  // On third day, the client has 3 attempts over roughly 40 seconds.
+  // On the third day, the client has 3 attempts over roughly 40 seconds.
   {
     delay: 86400,
     resetTimer: defined(true),
@@ -127,7 +147,7 @@ const PIN_HARDENING_RATE_LIMIT: SequentialDelayStage[] = [
     batchSize: defined(1),
     repetitions: noNumber,
   },
-  // On fourth day, the client has 2 attempts over roughly 10 seconds.
+  // On the fourth day, the client has 2 attempts over roughly 10 seconds.
   {
     delay: 86400,
     resetTimer: defined(true),
@@ -142,6 +162,27 @@ const PIN_HARDENING_RATE_LIMIT: SequentialDelayStage[] = [
   },
 ]
 
-export const PIN_HARDENING_CONFIG = {
-  rateLimit: PIN_HARDENING_RATE_LIMIT,
+export enum EnvironmentIdentifier {
+  MAINNET = 'MAINNET',
+  ALFAJORES = 'ALFAJORES',
+}
+
+export const PIN_HARDENING_MAINNET_CONFIG: HardeningConfig = {
+  odis: {
+    rateLimit: PIN_HARDENING_RATE_LIMIT,
+    environment: ODIS_MAINNET_CONTEXT,
+  },
+  circuitBreaker: {
+    environment: VALORA_MAINNET_CIRCUIT_BREAKER_ENVIRONMENT,
+  },
+}
+
+export const PIN_HARDENING_ALFAJORES_CONFIG: HardeningConfig = {
+  odis: {
+    rateLimit: PIN_HARDENING_RATE_LIMIT,
+    environment: ODIS_ALFAJORES_CONTEXT,
+  },
+  circuitBreaker: {
+    environment: VALORA_ALFAJORES_CIRCUIT_BREAKER_ENVIRONMENT,
+  },
 }

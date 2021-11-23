@@ -10,7 +10,12 @@ import { ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/qu
 import { SequentialDelayDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import * as crypto from 'crypto'
 import debugFactory from 'debug'
-import { HardeningConfig } from './config'
+import {
+  EnvironmentIdentifier,
+  HardeningConfig,
+  PIN_HARDENING_ALFAJORES_CONFIG,
+  PIN_HARDENING_MAINNET_CONFIG,
+} from './config'
 import { BackupError, DecryptionError, EncryptionError, InvalidBackupError } from './errors'
 import { buildOdisDomain, odisQueryAuthorizer, odisHardenKey } from './odis'
 import { deriveKey, decrypt, encrypt, KDFInfo } from './utils'
@@ -83,10 +88,63 @@ export interface Backup {
   }
 }
 
-export async function createPinEncryptedBackup(
-  data: Buffer,
+export interface CreatePinEncryptedBackupArgs {
+  data: Buffer
   pin: string
-): Promise<Result<Backup, BackupError>> {}
+  environment?: EnvironmentIdentifier
+  metadata?: { [key: string]: unknown }
+}
+
+/**
+ * Create a data backup, encrypting it with a hardened key derived from the given PIN.
+ *
+ * @remarks Using a 4 or 6 digit PIN for encryption requires an extremely restrictive rate limit for
+ * attempts to guess the PIN. This is enforced by ODIS through the SequentialDelayDomain with
+ * settings to allow the user (or an attacker) only a fixed number of attempts to guess their PIN.
+ *
+ * Because PINs have very little entropy, the total number of guesses is very restricted.
+ *   * On the first day, the client has 10 attempts. 5 within 10s. 5 more over roughly 45 minutes.
+ *   * On the second day, the client has 5 attempts over roughly 2 minutes.
+ *   * On the third day, the client has 3 attempts over roughly 40 seconds.
+ *   * On the fourth day, the client has 2 attempts over roughly 10 seconds.
+ *   * Overall, the client has 20 attempts over 4 days. All further attempts will be denied.
+ *
+ * It is strongly recommended that the calling application implement a PIN blocklist to prevent the
+ * user from selecting a number of the most common PIN codes (e.g. blocking the top 25k PINs by
+ * frequency of appearance in the HIBP Passwords dataset). An example implementation can be seen in
+ * the Valora wallet.
+ * https://github.com/valora-inc/wallet/blob/3940661c40d08e4c5db952bd0abeaabb0030fc7a/packages/mobile/src/pincode/authentication.ts#L56-L108
+ *
+ * In order to handle the event of an ODIS service compromise, this configuration additionally
+ * includes a circuit breaker service run by Valora. In the event of an ODIS compromise, the Valora
+ * team will take their service offline, preventing backups using the circuit breaker from being
+ * opened. This ensures that an attacker who has compromised ODIS cannot leverage their attack to
+ * forcibly open backups created with this function.
+ *
+ * @param data The secret data (e.g. BIP-39 mnemonic phrase) to be included in the encrypted backup.
+ * @param password Password, PIN, or other user secret to use in deriving the encryption key.
+ * @param hardening Configuration for how the password should be hardened in deriving the key.
+ * @param metadata Arbitrary key-value data to include in the backup to identify it.
+ */
+export async function createPinEncryptedBackup({
+  data,
+  pin,
+  environment,
+  metadata,
+}: CreatePinEncryptedBackupArgs): Promise<Result<Backup, BackupError>> {
+  // Select the hardening configuration based on the environment selector.
+  let hardening: HardeningConfig | undefined
+  if (environment === EnvironmentIdentifier.ALFAJORES) {
+    hardening = PIN_HARDENING_ALFAJORES_CONFIG
+  } else if (environment === EnvironmentIdentifier.MAINNET || environment === undefined) {
+    hardening = PIN_HARDENING_MAINNET_CONFIG
+  }
+  if (hardening === undefined) {
+    throw new Error('Implementation error: unhandled environment identifier')
+  }
+
+  return createBackup({ data, password: Buffer.from(pin, 'utf8'), hardening, metadata })
+}
 
 export interface CreateBackupArgs {
   data: Buffer
