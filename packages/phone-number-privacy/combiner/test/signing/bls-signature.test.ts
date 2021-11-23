@@ -166,7 +166,7 @@ describe(`BLS service computes signature`, () => {
       },
       {
         url: 'url2',
-        signature: 'X',
+        signature: 'X', // This input causes signature combination to fail
       },
       {
         url: 'url3',
@@ -232,8 +232,9 @@ describe(`BLS service computes signature`, () => {
       },
       {
         url: 'url3',
-        // Signature generated with wrong key version. Combination will succeed but verification of the combined signature will fail.
-        signature: 'TODO', // TODO(Alec): get appropriate signature
+        // Invalid partial signature. Combination will succeed but verification of the combined signature will fail.
+        signature:
+          'MAAAAAAAAACanrA73tApLu+j569ICcXrEBRLi4czWJtInJPSUpoZUOVDc1667hvMq1ESncFzlgEHAAAA',
       },
       {
         url: 'url4',
