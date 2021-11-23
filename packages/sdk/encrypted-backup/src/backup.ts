@@ -83,6 +83,11 @@ export interface Backup {
   }
 }
 
+export async function createPinEncryptedBackup(
+  data: Buffer,
+  pin: string
+): Promise<Result<Backup, BackupError>> {}
+
 export interface CreateBackupArgs {
   data: Buffer
   password: Buffer
@@ -90,8 +95,14 @@ export interface CreateBackupArgs {
   metadata?: { [key: string]: unknown }
 }
 
-// DO NOT MERGE(victor): Add createPinEncryptedBackup function as a helpful wrapper.
-
+/**
+ * Create a data backup, encrypting it with a hardened key derived from the given password or PIN.
+ *
+ * @param data The secret data (e.g. BIP-39 mnemonic phrase) to be included in the encrypted backup.
+ * @param password Password, PIN, or other user secret to use in deriving the encryption key.
+ * @param hardening Configuration for how the password should be hardened in deriving the key.
+ * @param metadata Arbitrary key-value data to include in the backup to identify it.
+ */
 export async function createBackup({
   data,
   password,
@@ -193,6 +204,12 @@ export interface OpenBackupArgs {
   password: Buffer
 }
 
+/**
+ * Open an encrypted backup file, using the provided password or PIN to derive the decryption key.
+ *
+ * @param backup Backup structure including the ciphertext and key derivation information.
+ * @param password Password, PIN, or other user secret to use in deriving the encryption key.
+ */
 export async function openBackup({
   backup,
   password,

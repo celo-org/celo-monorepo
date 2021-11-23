@@ -24,6 +24,7 @@ import { createBackup, openBackup } from './backup'
 import { HardeningConfig } from './config'
 import { deserializeBackup, serializeBackup } from './schema'
 
+// DO NOT MERGE(victor): Add a "don't mock" option
 // DO NOT MERGE(victor): Create a more complete set of tests, including a number of error conditions.
 
 const debug = debugFactory('kit:encrypted-backup:backup:test')

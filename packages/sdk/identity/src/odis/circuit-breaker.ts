@@ -106,7 +106,7 @@ export type CircuitBreakerError =
   | EncryptionError
   | FetchError
 
-// TODO(victor): Write up some docs on the circuit breaker and link them here.
+// DO NOT MERGE(victor): Write up some docs on the circuit breaker and link them here.
 /**
  * Client for interacting with a circuit breaker service, such as the one deployed by Valora.
  *
