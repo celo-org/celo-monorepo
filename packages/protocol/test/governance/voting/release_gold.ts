@@ -102,7 +102,7 @@ const UNLOCKING_PERIOD = 3 * DAY
 contract('ReleaseGold', (accounts: string[]) => {
   const owner = accounts[0]
   const beneficiary = accounts[1]
-  const walletAddress = beneficiary
+  const walletAddress = accounts[7]
 
   const releaseOwner = accounts[2]
   const refundAddress = accounts[3]
@@ -515,12 +515,12 @@ contract('ReleaseGold', (accounts: string[]) => {
       proofOfWalletOwnership = await getParsedSignatureOfAddress(
         web3,
         releaseGoldInstance.address,
-        beneficiary
+        walletAddress
       )
     })
 
     describe('when unrevoked', () => {
-      it('sets the account by beneficiary', async () => {
+      it.only('sets the account by beneficiary', async () => {
         let isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
         await releaseGoldInstance.setAccount(
@@ -556,7 +556,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         )
       })
 
-      it('should set the name, dataEncryptionKey and walletAddress of the account by beneficiary', async () => {
+      it.only('should set the name, dataEncryptionKey and walletAddress of the account by beneficiary', async () => {
         let isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
         await releaseGoldInstance.setAccount(
@@ -697,7 +697,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       proofOfWalletOwnership = await getParsedSignatureOfAddress(
         web3,
         releaseGoldInstance.address,
-        beneficiary
+        walletAddress
       )
     })
 
@@ -721,7 +721,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       })
 
       describe('when unrevoked', () => {
-        it('beneficiary should set the walletAddress', async () => {
+        it.only('beneficiary should set the walletAddress', async () => {
           await releaseGoldInstance.setAccountWalletAddress(
             walletAddress,
             proofOfWalletOwnership.v,
