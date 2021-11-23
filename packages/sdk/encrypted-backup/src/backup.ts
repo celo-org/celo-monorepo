@@ -107,7 +107,7 @@ export interface CreatePinEncryptedBackupArgs {
  *   * On the second day, the client has 5 attempts over roughly 2 minutes.
  *   * On the third day, the client has 3 attempts over roughly 40 seconds.
  *   * On the fourth day, the client has 2 attempts over roughly 10 seconds.
- *   * Overall, the client has 20 attempts over 4 days. All further attempts will be denied.
+ *   * Overall, the client has 25 attempts over 4 days. All further attempts will be denied.
  *
  * It is strongly recommended that the calling application implement a PIN blocklist to prevent the
  * user from selecting a number of the most common PIN codes (e.g. blocking the top 25k PINs by

@@ -24,7 +24,6 @@ import { createBackup, openBackup } from './backup'
 import { HardeningConfig } from './config'
 import { deserializeBackup, serializeBackup } from './schema'
 
-// DO NOT MERGE(victor): Add a "don't mock" option
 // DO NOT MERGE(victor): Create a more complete set of tests, including a number of error conditions.
 
 const debug = debugFactory('kit:encrypted-backup:backup:test')
@@ -42,23 +41,15 @@ jest.mock('@celo/identity/lib/odis/bls-blinding-client', () => {
   }
 })
 
-const TEST_ODIS_ENVIRONMENT: OdisServiceContext = {
+const MOCK_ODIS_ENVIRONMENT: OdisServiceContext = {
   odisUrl: 'https://mockodis.com',
   odisPubKey:
     '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
 }
 
-const TEST_HARDENING_CONFIG: HardeningConfig = {
-  odis: {
-    rateLimit: [{ delay: 0, resetTimer: noBool, batchSize: defined(3), repetitions: defined(1) }],
-    environment: TEST_ODIS_ENVIRONMENT,
-  },
-  circuitBreaker: {
-    environment: MockCircuitBreaker.environment,
-  },
-}
-
 class MockOdis {
+  static readonly environment = MOCK_ODIS_ENVIRONMENT
+
   state: Record<string, SequentialDelayDomainState> = {}
 
   quota(
@@ -139,6 +130,51 @@ class MockOdis {
       },
     }
   }
+
+  installQuotaEndpoint(mock: typeof fetchMock, override?: any) {
+    mock.mock(
+      {
+        url: new URL(Endpoints.DOMAIN_QUOTA_STATUS, MockOdis.environment.odisUrl).href,
+        method: 'POST',
+      },
+      override ??
+        ((url: string, req: { body: string }) => {
+          debug('Mocking request', { url, req })
+          return this.quota(JSON.parse(req.body) as DomainQuotaStatusRequest<SequentialDelayDomain>)
+        })
+    )
+  }
+
+  installSignEndpoint(mock: typeof fetchMock, override?: any) {
+    mock.mock(
+      {
+        url: new URL(Endpoints.DOMAIN_SIGN, MockOdis.environment.odisUrl).href,
+        method: 'POST',
+      },
+      override ??
+        ((url: string, req: { body: string }) => {
+          debug('Mocking request', { url, req })
+          return this.sign(
+            JSON.parse(req.body) as DomainRestrictedSignatureRequest<SequentialDelayDomain>
+          )
+        })
+    )
+  }
+
+  install(mock: typeof fetchMock) {
+    this.installQuotaEndpoint(mock)
+    this.installSignEndpoint(mock)
+  }
+}
+
+const TEST_HARDENING_CONFIG: HardeningConfig = {
+  odis: {
+    rateLimit: [{ delay: 0, resetTimer: noBool, batchSize: defined(3), repetitions: defined(1) }],
+    environment: MockOdis.environment,
+  },
+  circuitBreaker: {
+    environment: MockCircuitBreaker.environment,
+  },
 }
 
 describe('end-to-end', () => {
@@ -147,31 +183,7 @@ describe('end-to-end', () => {
 
     // Mock ODIS using the mock implementation defined above.
     const mockOdis = new MockOdis()
-    fetchMock.mock(
-      {
-        url: new URL(Endpoints.DOMAIN_QUOTA_STATUS, TEST_ODIS_ENVIRONMENT.odisUrl).href,
-        method: 'POST',
-      },
-      (url: string, req: { body: string }) => {
-        debug('Mocking request', { url, req })
-        return mockOdis.quota(
-          JSON.parse(req.body) as DomainQuotaStatusRequest<SequentialDelayDomain>
-        )
-      }
-    )
-
-    fetchMock.mock(
-      {
-        url: new URL(Endpoints.DOMAIN_SIGN, TEST_ODIS_ENVIRONMENT.odisUrl).href,
-        method: 'POST',
-      },
-      (url: string, req: { body: string }) => {
-        debug('Mocking request', { url, req })
-        return mockOdis.sign(
-          JSON.parse(req.body) as DomainRestrictedSignatureRequest<SequentialDelayDomain>
-        )
-      }
-    )
+    mockOdis.install(fetchMock)
 
     // Mock the circuit breaker service using the implementation from the identity library.
     const mockCircuitBreaker = new MockCircuitBreaker()
