@@ -100,9 +100,14 @@ describe('Running against a deployed service', () => {
       }
       // Query twice to test reusing the request
       for (let i = 0; i < 2; i++) {
-        await expect(
-          OdisUtils.Query.queryOdis(walletAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
-        ).resolves.toMatchObject({ success: true })
+        const result = OdisUtils.Query.queryOdis(
+          walletAuthSigner,
+          body,
+          SERVICE_CONTEXT,
+          SIGN_MESSAGE_ENDPOINT
+        )
+        console.log(result)
+        await expect(result).resolves.toMatchObject({ success: true })
       }
     })
   })

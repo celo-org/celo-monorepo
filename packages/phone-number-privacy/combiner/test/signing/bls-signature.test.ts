@@ -5,13 +5,17 @@ import {
 } from '../../src/bls/bls-cryptography-client'
 import config from '../../src/config'
 
+// From Alfajores
 const PUBLIC_KEY =
-  '813a7deecc0f058cc804358efbcd83f84dfeddcaec0a0b601e73b74d7dead680b8b1d7b65769026512b8c7438c95a401c3ce218d454222948e782656ef5b37aabbe78ace335731afe5213cb07d26eebb093741ebde38296206893a2c217e4601'
+  'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA'
+const PUBLIC_POLYNOMIAL =
+  '020000000000000090fa11c56744759fcd777b909e9dc5245b39e33ba24be92caaf3a6f71f2f63a2873c6f23adfab2b2f211534c2da98b01280ed2a00b0808c06ff02fc56f66690ceaa14aabebfec65b6681e641fbdbaabcdbb4320fbd422b1e0452d3274908cb00f3d2ba1d64ddc12f387ef5c6fb98265cee27afa66626edf91b9839d49f23890d75a550a49a2e7a75b06b3b49734a160035558eb2079c41926388ac560e75f1962dada39e5c30ba35bef59eb84ff4329432cdc10383b4dea40f5ad8fabbb09a81'
+const SIGNATURES = ['TODO', 'TODO', 'TODO', 'TODO']
+const COMBINED_SIGNATURE = 'TODO'
 
 config.thresholdSignature = {
   threshold: 3,
-  polynomial:
-    '0300000000000000813a7deecc0f058cc804358efbcd83f84dfeddcaec0a0b601e73b74d7dead680b8b1d7b65769026512b8c7438c95a401c3ce218d454222948e782656ef5b37aabbe78ace335731afe5213cb07d26eebb093741ebde38296206893a2c217e4601951925ca9e2ce2938accdad680cdd77e6b533433c6b37dd0d63f67088468a8924d0b138a2a3457067bb0395658cb1001998aa2e4f954b7895ff15ea7c2b46bf582a0d1e3bdc971f3c294e1aebd4064194cf2efa01650f0066e1d49d57c330101c0e3923a3d394a4b3a6084d18e6bf404d3a9373aac5376cc9548634a368e9a6bc0f8669546873a079ce38a03541c9201b6308ac34b704cb14c306c90f692ede068e130295f789f5a1ca08223d7c7ff0b9edff0e2b5e36918087f8059d018a100',
+  polynomial: PUBLIC_POLYNOMIAL,
   pubKey: PUBLIC_KEY,
 }
 
@@ -20,23 +24,19 @@ describe(`BLS service computes signature`, () => {
     const signatures: ServicePartialSignature[] = [
       {
         url: 'url1',
-        signature:
-          'MAAAAAAAAABMnIduYMm1JmaOWWgybOTc6rB7+eunT9h21RL2oTId3KSOH1OjAglgOpI6cjizLQEAAAAA',
+        signature: SIGNATURES[0],
       },
       {
         url: 'url2',
-        signature:
-          'MAAAAAAAAAAl0tkxryWcl83IV1I7DoMIoI/oSz2ogIy7LW5G3tg0ksifa5rdgxFfv4Y9GbQsBoEBAAAA',
+        signature: SIGNATURES[1],
       },
       {
         url: 'url3',
-        signature:
-          'MAAAAAAAAAD60iBC0rpJd9A+FjDzVix/xjdD5Rq8+euqX/pTJuwzooTXu/9+KBztQruAAAYWtAACAAAA',
+        signature: SIGNATURES[2],
       },
       {
         url: 'url4',
-        signature:
-          'MAAAAAAAAADNYzSf29At1wxuqPXcvNYsYObrxZTmPXgg0KBH+BZm1lLczhv8NpedtgkPjX+GvwADAAAA',
+        signature: SIGNATURES[3],
       },
     ]
 
@@ -60,7 +60,7 @@ describe(`BLS service computes signature`, () => {
     }
 
     const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
-    expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
+    expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
       Buffer.from(actual, 'base64'),
@@ -73,8 +73,7 @@ describe(`BLS service computes signature`, () => {
     const signatures: ServicePartialSignature[] = [
       {
         url: 'url1',
-        signature:
-          'MAAAAAAAAABMnIduYMm1JmaOWWgybOTc6rB7+eunT9h21RL2oTId3KSOH1OjAglgOpI6cjizLQEAAAAA',
+        signature: SIGNATURES[0],
       },
       {
         url: 'url2',
@@ -82,13 +81,11 @@ describe(`BLS service computes signature`, () => {
       },
       {
         url: 'url3',
-        signature:
-          'MAAAAAAAAAD60iBC0rpJd9A+FjDzVix/xjdD5Rq8+euqX/pTJuwzooTXu/9+KBztQruAAAYWtAACAAAA',
+        signature: SIGNATURES[2],
       },
       {
         url: 'url4',
-        signature:
-          'MAAAAAAAAADNYzSf29At1wxuqPXcvNYsYObrxZTmPXgg0KBH+BZm1lLczhv8NpedtgkPjX+GvwADAAAA',
+        signature: SIGNATURES[3],
       },
     ]
 
@@ -106,7 +103,7 @@ describe(`BLS service computes signature`, () => {
       await blsCryptoClient.addSignature(signature)
     })
     const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
-    expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
+    expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
       Buffer.from(actual, 'base64'),
@@ -119,8 +116,7 @@ describe(`BLS service computes signature`, () => {
     const signatures: ServicePartialSignature[] = [
       {
         url: 'url1',
-        signature:
-          'MAAAAAAAAABMnIduYMm1JmaOWWgybOTc6rB7+eunT9h21RL2oTId3KSOH1OjAglgOpI6cjizLQEAAAAA',
+        signature: SIGNATURES[0],
       },
       {
         url: 'url2',
@@ -132,8 +128,7 @@ describe(`BLS service computes signature`, () => {
       },
       {
         url: 'url4',
-        signature:
-          'MAAAAAAAAADNYzSf29At1wxuqPXcvNYsYObrxZTmPXgg0KBH+BZm1lLczhv8NpedtgkPjX+GvwADAAAA',
+        signature: SIGNATURES[3],
       },
     ]
 
@@ -153,7 +148,7 @@ describe(`BLS service computes signature`, () => {
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
       throw new Error('Expected failure with missing signatures')
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
   })
@@ -161,8 +156,7 @@ describe(`BLS service computes signature`, () => {
     const signatures: ServicePartialSignature[] = [
       {
         url: 'url1',
-        signature:
-          'MAAAAAAAAABMnIduYMm1JmaOWWgybOTc6rB7+eunT9h21RL2oTId3KSOH1OjAglgOpI6cjizLQEAAAAA',
+        signature: SIGNATURES[0],
       },
       {
         url: 'url2',
@@ -170,13 +164,11 @@ describe(`BLS service computes signature`, () => {
       },
       {
         url: 'url3',
-        signature:
-          'MAAAAAAAAAD60iBC0rpJd9A+FjDzVix/xjdD5Rq8+euqX/pTJuwzooTXu/9+KBztQruAAAYWtAACAAAA',
+        signature: SIGNATURES[2],
       },
       {
         url: 'url4',
-        signature:
-          'MAAAAAAAAADNYzSf29At1wxuqPXcvNYsYObrxZTmPXgg0KBH+BZm1lLczhv8NpedtgkPjX+GvwADAAAA',
+        signature: SIGNATURES[3],
       },
     ]
 
@@ -200,7 +192,7 @@ describe(`BLS service computes signature`, () => {
     // Should fail since 1/3 sigs are invalid
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
     // Should be false, now that the invalid signature has been removed
@@ -209,7 +201,7 @@ describe(`BLS service computes signature`, () => {
     await blsCryptoClient.addSignature(signatures[3])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
     const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
-    expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
+    expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
       Buffer.from(actual, 'base64'),
@@ -222,24 +214,20 @@ describe(`BLS service computes signature`, () => {
     const signatures: ServicePartialSignature[] = [
       {
         url: 'url1',
-        signature:
-          'MAAAAAAAAABMnIduYMm1JmaOWWgybOTc6rB7+eunT9h21RL2oTId3KSOH1OjAglgOpI6cjizLQEAAAAA',
+        signature: SIGNATURES[0],
       },
       {
         url: 'url2',
-        signature:
-          'MAAAAAAAAAD60iBC0rpJd9A+FjDzVix/xjdD5Rq8+euqX/pTJuwzooTXu/9+KBztQruAAAYWtAACAAAA',
+        signature: SIGNATURES[1],
       },
       {
         url: 'url3',
         // Invalid partial signature. Combination will succeed but verification of the combined signature will fail.
-        signature:
-          'MAAAAAAAAACanrA73tApLu+j569ICcXrEBRLi4czWJtInJPSUpoZUOVDc1667hvMq1ESncFzlgEHAAAA',
+        signature: SIGNATURES[2],
       },
       {
         url: 'url4',
-        signature:
-          'MAAAAAAAAADNYzSf29At1wxuqPXcvNYsYObrxZTmPXgg0KBH+BZm1lLczhv8NpedtgkPjX+GvwADAAAA',
+        signature: SIGNATURES[3],
       },
     ]
 
@@ -263,7 +251,7 @@ describe(`BLS service computes signature`, () => {
     // Should fail since signature from url3 was generated with the wrong key version
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
 
@@ -273,7 +261,7 @@ describe(`BLS service computes signature`, () => {
     await blsCryptoClient.addSignature(signatures[3])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
     const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
-    expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
+    expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
       Buffer.from(actual, 'base64'),

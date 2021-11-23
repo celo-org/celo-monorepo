@@ -207,6 +207,7 @@ describe('Running against a deployed service', () => {
       const data = await response.text()
       const signResponse = JSON.parse(data) as SignerResponse
       expect(signResponse.success).toBeTruthy()
+      console.log('SIGNATURE: ' + signResponse.signature)
       const sigBuffer = Buffer.from(signResponse.signature as string, 'base64')
       const isValid = isValidSignature(sigBuffer, blindedPhoneNumber, ODIS_PUBLIC_POLYNOMIAL)
       expect(isValid).toBeTruthy()
