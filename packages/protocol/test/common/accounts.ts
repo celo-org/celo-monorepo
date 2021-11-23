@@ -411,8 +411,8 @@ contract('Accounts', (accounts: string[]) => {
       })
 
       describe('when there are no storage roots', async () => {
-        it('should revert', async () => {
-          await assertRevert(accountsInstance.removeStorageRoot(0))
+        it('should revert with message', async () => {
+          await assertRevert(accountsInstance.removeStorageRoot(0), 'Invalid storage root index')
         })
       })
 
