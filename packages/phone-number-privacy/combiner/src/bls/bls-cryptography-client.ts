@@ -67,8 +67,6 @@ export class BLSCryptographyClient {
       // Verify each signature and remove invalid ones
       // This logging will help us troubleshoot which signers are having issues
       this.unverifiedSignatures.forEach((unverifiedSignature) => {
-        // Note: If a signer is using the wrong version of a valid key share,
-        // it will not be caught by this check.
         this.verifyPartialSignature(blindedMessage, unverifiedSignature, logger!)
       })
       this.clearUnverifiedSignatures()
@@ -91,9 +89,7 @@ export class BLSCryptographyClient {
         combinedSignature
       )
     } catch (error) {
-      logger.error({ url: 'ambiguous' }, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
-      // TODO: Add algorithm for checking every possible combination of received signatures
-      // against the public polynomial to identify which signer is using the wrong key version.
+      logger.error('Combined signature verification failed')
       throw error
     }
   }

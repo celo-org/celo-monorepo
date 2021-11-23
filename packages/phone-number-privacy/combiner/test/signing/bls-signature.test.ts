@@ -153,7 +153,7 @@ describe(`BLS service computes signature`, () => {
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
       throw new Error('Expected failure with missing signatures')
-    } catch (e: any) {
+    } catch (e) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
   })
@@ -218,8 +218,7 @@ describe(`BLS service computes signature`, () => {
     const publicKey = Buffer.from(PUBLIC_KEY, 'hex')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
-  it('throws error if combined signature is invalid, and CANNOT recover from failure with sufficient valid partial signatures', async () => {
-    // TODO: Upgrade this behavior so that combiner CAN recover from failure with sufficient valid partial signatures.
+  it('throws error if combined signature is invalid, and can recover from failure with sufficient valid partial signatures', async () => {
     const signatures: ServicePartialSignature[] = [
       {
         url: 'url1',
@@ -233,9 +232,8 @@ describe(`BLS service computes signature`, () => {
       },
       {
         url: 'url3',
-        // Same partial sig as url2. Combination will succeed but verification of the combined sig will fail.
-        signature:
-          'MAAAAAAAAAD60iBC0rpJd9A+FjDzVix/xjdD5Rq8+euqX/pTJuwzooTXu/9+KBztQruAAAYWtAACAAAA',
+        // Signature generated with wrong key version. Combination will succeed but verification of the combined signature will fail.
+        signature: 'TODO', // TODO(Alec): get appropriate signature
       },
       {
         url: 'url4',
@@ -261,22 +259,26 @@ describe(`BLS service computes signature`, () => {
     expect(blsCryptoClient.hasSufficientSignatures()).toBeFalsy()
     await blsCryptoClient.addSignature(signatures[2])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
-    // Should fail since signatures 2 and 3 are identical
+    // Should fail since signature from url3 was generated with the wrong key version
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     } catch (e) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
-    // Should be true, as the combiner cannot identify which partial signature to discard.
-    expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
+
+    // Should be false, now that the invalid partial signature has been removed
+    expect(blsCryptoClient.hasSufficientSignatures()).toBeFalsy()
 
     await blsCryptoClient.addSignature(signatures[3])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
-    // Should still fail since signatures 2 and 3 are identical
-    try {
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
-    } catch (e) {
-      expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
-    }
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+    expect(actual).toEqual('vy4TFsSNeyNsQK/xjGoH2TwLRI9ZCOiyvfMU7aRLJYw/oOIF/xCrBiwpK9gwLTQA')
+
+    const unblindedSignedMessage = threshold_bls.unblind(
+      Buffer.from(actual, 'base64'),
+      blindedMsgResult.blindingFactor
+    )
+    const publicKey = Buffer.from(PUBLIC_KEY, 'hex')
+    expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
 })
