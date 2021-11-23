@@ -24,7 +24,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { defined, noBool } from '@celo/utils/lib/sign-typed-data-utils'
 import debugFactory from 'debug'
-import { createBackup, openBackup } from './backup'
+import { Backup, createBackup, openBackup } from './backup'
 import { HardeningConfig } from './config'
 import { BackupErrorTypes } from './errors'
 import { deserializeBackup, serializeBackup } from './schema'
@@ -401,5 +401,140 @@ describe('createBackup', () => {
       hardening: { ...TEST_HARDENING_CONFIG, circuitBreaker: undefined },
     })
     expect(result.ok).toBe(true)
+  })
+})
+
+describe('openBackup', () => {
+  let mockOdis: MockOdis | undefined
+  let mockCircuitBreaker: MockCircuitBreaker | undefined
+
+  const testPassword = Buffer.from('backup test password', 'utf8')
+  const testData = Buffer.from('backup test data', 'utf8')
+  let testBackup: Backup | undefined
+
+  beforeEach(async () => {
+    fetchMock.reset()
+    fetchMock.config.overwriteRoutes = true
+
+    // Mock ODIS using the mock implementation defined above.
+    mockOdis = new MockOdis()
+    mockOdis.install(fetchMock)
+
+    // Mock the circuit breaker service using the implementation from the identity library.
+    mockCircuitBreaker = new MockCircuitBreaker()
+    mockCircuitBreaker.install(fetchMock)
+
+    // Create a backup to use for tests of opening below
+    const testBackupResult = await createBackup({
+      data: testData,
+      password: testPassword,
+      hardening: TEST_HARDENING_CONFIG,
+    })
+    if (!testBackupResult.ok) {
+      throw new Error(`failed to create backup for test setup: ${testBackupResult.error}`)
+    }
+    testBackup = testBackupResult.result
+  })
+
+  afterEach(() => {
+    fetchMock.reset()
+  })
+
+  it('should return a fetch error when request to ODIS fails', async () => {
+    mockOdis!.installSignEndpoint(fetchMock, { throws: new Error('fetch failed') })
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.FETCH_ERROR)
+  })
+
+  it('should return a service error when ODIS returns an error status', async () => {
+    mockOdis!.installSignEndpoint(fetchMock, { status: 501 })
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.ODIS_SERVICE_ERROR)
+  })
+
+  it('should return a rate limit error when ODIS returns a rate limiting status', async () => {
+    mockOdis!.installSignEndpoint(fetchMock, { status: 429, headers: { 'Retry-After': '60' } })
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.ODIS_RATE_LIMITING_ERROR)
+  })
+
+  it('should return a rate limit error when ODIS indicates no quota available', async () => {
+    mockOdis!.installQuotaEndpoint(fetchMock, {
+      status: 200,
+      body: {
+        success: true,
+        version: 'mock',
+        status: { timer: Date.now() / 1000 + 3600, counter: 0, disabled: false },
+      },
+    })
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.ODIS_RATE_LIMITING_ERROR)
+  })
+
+  it('should return a fetch error when circuit breaker unwrap key fails', async () => {
+    mockCircuitBreaker!.installUnwrapKeyEndpoint(fetchMock, { throws: new Error('fetch failed') })
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(CircuitBreakerErrorTypes.FETCH_ERROR)
+  })
+
+  it('should return a service error when the circuit breaker service returns 501', async () => {
+    mockCircuitBreaker!.installUnwrapKeyEndpoint(fetchMock, { status: 501 })
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(CircuitBreakerErrorTypes.SERVICE_ERROR)
+  })
+
+  it('should return an unavailable error when the circuit breaker key is destroyed', async () => {
+    mockCircuitBreaker!.keyStatus = CircuitBreakerKeyStatus.DESTROYED
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(CircuitBreakerErrorTypes.UNAVAILABLE_ERROR)
   })
 })
