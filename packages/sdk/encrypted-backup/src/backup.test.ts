@@ -29,8 +29,6 @@ import { HardeningConfig } from './config'
 import { BackupErrorTypes } from './errors'
 import { deserializeBackup, serializeBackup } from './schema'
 
-// DO NOT MERGE(victor): Create a more complete set of tests, including a number of error conditions.
-
 const debug = debugFactory('kit:encrypted-backup:backup:test')
 
 // Mock out the BLS blinding client. Verification of the result is not possible without using the
