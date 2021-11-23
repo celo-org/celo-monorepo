@@ -74,7 +74,12 @@ export async function odisHardenKey(
     quotaState
   )
   if (!accepted) {
-    return Err(new OdisRateLimitingError(notBefore))
+    return Err(
+      new OdisRateLimitingError(
+        notBefore,
+        new Error('client does not currently have quota based on status repsonse.')
+      )
+    )
   }
 
   // Instantiate a blinding client and blind the key, containing the users password to be hardended.
@@ -152,7 +157,11 @@ async function requestOdisQuotaStatus(
   const authorizer = domain.address.defined ? domain.address.value : undefined
   if (authorizer !== undefined) {
     if (wallet === undefined || !wallet.hasAccount(authorizer)) {
-      return Err(new AuthorizationError())
+      return Err(
+        new AuthorizationError(
+          new Error('key for signing ODIS quota status request is unavailable')
+        )
+      )
     }
     quotaStatusReq.options.signature = defined(
       await wallet.signTypedData(authorizer, domainQuotaStatusRequestEIP712(quotaStatusReq))
@@ -199,7 +208,11 @@ async function requestOdisDomainSignature(
   const authorizer = domain.address.defined ? domain.address.value : undefined
   if (authorizer !== undefined) {
     if (wallet === undefined || !wallet.hasAccount(authorizer)) {
-      return Err(new AuthorizationError())
+      return Err(
+        new AuthorizationError(
+          new Error('key for signing ODIS domain signature request is unavailable')
+        )
+      )
     }
     signatureReq.options.signature = defined(
       await wallet.signTypedData(authorizer, domainRestrictedSignatureRequestEIP712(signatureReq))

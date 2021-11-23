@@ -9,12 +9,15 @@ import {
 import { ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/query'
 import { SequentialDelayDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import * as crypto from 'crypto'
+import debugFactory from 'debug'
 import { HardeningConfig } from './config'
-import { BackupError, InvalidBackupError } from './errors'
+import { BackupError, DecryptionError, EncryptionError, InvalidBackupError } from './errors'
 import { buildOdisDomain, odisQueryAuthorizer, odisHardenKey } from './odis'
 import { deriveKey, decrypt, encrypt, KDFInfo } from './utils'
 
-// TODO(victor): Add links to the docs when that PR is merged. github.com/celo-org/docs/pull/150
+const debug = debugFactory('kit:encrypted-backup:backup')
+
+// DO NOT MERGE(victor): Add links to the docs when that PR is merged. github.com/celo-org/docs/pull/150
 export interface Backup {
   /**
    * AES-128-GCM encryption of the user's secret backup data.
@@ -28,7 +31,7 @@ export interface Backup {
    * A randomly chosen 128-bit value. Ensures uniqueness of the password derived encryption key.
    *
    * @remarks The nonce value is appended to the password for local key derivation. It is also used
-   * to derive an authentication key to include in the ODIS Domain for domain seperation and to
+   * to derive an authentication key to include in the ODIS Domain for domain separation and to
    * ensure quota cannot be consumed by parties without access to the backup.
    */
   nonce: Buffer
@@ -87,7 +90,7 @@ export interface CreateBackupArgs {
   metadata?: { [key: string]: unknown }
 }
 
-// TODO(victor): Add createPinEncryptedBackup function as a helpful wrapper.
+// DO NOT MERGE(victor): Add createPinEncryptedBackup function as a helpful wrapper.
 
 export async function createBackup({
   data,
@@ -95,12 +98,15 @@ export async function createBackup({
   hardening,
   metadata,
 }: CreateBackupArgs): Promise<Result<Backup, BackupError>> {
+  // Password and backup data are not included in any logging as they are likely sensitive.
+  debug('creating a backup with the following information', hardening, metadata)
   const nonce = crypto.randomBytes(16)
   let key = deriveKey(KDFInfo.PASSWORD, [password, nonce])
 
   // Generate a fuse key and mix it into the entropy of the key
   let encryptedFuseKey: Buffer | undefined
   if (hardening.circuitBreaker !== undefined) {
+    debug('generating a fuse key to enabled use of the circuit breaker service')
     const circuitBreakerClient = new CircuitBreakerClient(hardening.circuitBreaker.environment)
 
     // Check that the circuit breaker is online. Although we do not need to interact with the
@@ -113,8 +119,10 @@ export async function createBackup({
     if (serviceStatus.result !== CircuitBreakerKeyStatus.ENABLED) {
       return Err(new CircuitBreakerUnavailableError(serviceStatus.result))
     }
+    debug('confirmed that the circuit breaker is online')
 
     // Generate a fuse key and encrypt it against the circuit breaker public key.
+    debug('generating and wrapping the fuse key')
     const fuseKey = crypto.randomBytes(16)
     const wrap = circuitBreakerClient.wrapKey(fuseKey)
     if (!wrap.ok) {
@@ -123,20 +131,25 @@ export async function createBackup({
     encryptedFuseKey = wrap.result
 
     // Mix the fuse key into the ongoing key hardening. Note that mixing in the circuit breaker key
-    // occurs before the request to ODIS. This means an attacker would need to aquire the fuse key
+    // occurs before the request to ODIS. This means an attacker would need to acquire the fuse key
     // _before_ they can make any attempts to guess the user's secret.
+    debug('mixing the fuse key into the keying material')
     key = deriveKey(KDFInfo.FUSE_KEY, [key, fuseKey])
+  } else {
+    debug('not using the circuit breaker service')
   }
 
   // Harden the key with the output of a rate limited ODIS POPRF function.
   let domain: SequentialDelayDomain | undefined
   if (hardening.odis !== undefined) {
+    debug('hardening the user key with output from ODIS')
     // Derive the query authorizer wallet and address from the nonce, then build the ODIS domain.
     // This domain acts as a binding rate limit configuration for ODIS, enforcing that the client must
     // know the backup nonce, and can only make the given number of queries.
     const authorizer = odisQueryAuthorizer(nonce)
     domain = buildOdisDomain(hardening.odis, authorizer.address)
 
+    debug('sending request to ODIS to harden the backup encryption key')
     const odisHardenedKey = await odisHardenKey(
       key,
       domain,
@@ -147,11 +160,22 @@ export async function createBackup({
       return odisHardenedKey
     }
     key = odisHardenedKey.result
+  } else {
+    debug('not using ODIS for key hardening')
+  }
+
+  debug('encrypting backup data with final encrypted key')
+  let encryptedData: Buffer
+  try {
+    encryptedData = encrypt(key, data)
+  } catch (error) {
+    return Err(new EncryptionError(error as Error))
   }
 
   // Encrypted and wrap the data in a Backup structure.
+  debug('created encrypted backup')
   return Ok({
-    encryptedData: encrypt(key, data),
+    encryptedData,
     nonce,
     odisDomain: domain,
     encryptedFuseKey: encryptedFuseKey,
@@ -173,15 +197,24 @@ export async function openBackup({
   backup,
   password,
 }: OpenBackupArgs): Promise<Result<Buffer, BackupError>> {
+  debug('opening an encrypted backup')
   let key = deriveKey(KDFInfo.PASSWORD, [password, backup.nonce])
 
   // If a circuit breaker is in use, request a decryption of the fuse key and mix it in.
   if (backup.encryptedFuseKey !== undefined) {
     if (backup.environment?.circuitBreaker === undefined) {
-      return Err(new InvalidBackupError())
+      return Err(
+        new InvalidBackupError(
+          new Error('encrypted fuse key is provided but no circuit breaker environment is provided')
+        )
+      )
     }
     const circuitBreakerClient = new CircuitBreakerClient(backup.environment.circuitBreaker)
 
+    debug(
+      'requesting the circuit breaker service unwrap the encrypted circuit breaker key',
+      backup.environment.circuitBreaker
+    )
     const unwrap = await circuitBreakerClient.unwrapKey(backup.encryptedFuseKey)
     if (!unwrap.ok) {
       return Err(unwrap.error)
@@ -191,6 +224,8 @@ export async function openBackup({
     // occurs before the request to ODIS. This means an attacker would need to aquire the fuse key
     // _before_ they can make any attempts to guess the user's secret.
     key = deriveKey(KDFInfo.FUSE_KEY, [key, unwrap.result])
+  } else {
+    debug('backup did not specify an encrypted fuse key')
   }
 
   // If ODIS is in use, harden the key with the output of a rate limited ODIS POPRF function.
@@ -201,13 +236,23 @@ export async function openBackup({
     // If the ODIS domain is authenticated, the authorizer address should match the domain.
     const authorizer = odisQueryAuthorizer(backup.nonce)
     if (domain.address.defined && !eqAddress(authorizer.address, domain.address.value)) {
-      // TODO(victor): Include more detail in error messages.
-      return Err(new InvalidBackupError())
+      return Err(
+        new InvalidBackupError(
+          new Error(
+            'domain query authorizer address is provided but is not derived from the backup nonce'
+          )
+        )
+      )
     }
     if (backup.environment?.odis === undefined) {
-      return Err(new InvalidBackupError())
+      return Err(
+        new InvalidBackupError(
+          new Error('ODIS domain is provided by no ODIS environment information')
+        )
+      )
     }
 
+    debug('requesting a key hardening response from ODIS')
     const odisHardenedKey = await odisHardenKey(
       key,
       domain,
@@ -220,5 +265,13 @@ export async function openBackup({
     key = odisHardenedKey.result
   }
 
-  return Ok(decrypt(key, backup.encryptedData))
+  let decryptedData: Buffer
+  try {
+    decryptedData = decrypt(key, backup.encryptedData)
+  } catch (error) {
+    return Err(new DecryptionError(error as Error))
+  }
+
+  debug('requesting a key hardening response from ODIS')
+  return Ok(decryptedData)
 }

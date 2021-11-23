@@ -24,7 +24,9 @@ import { createBackup, openBackup } from './backup'
 import { HardeningConfig } from './config'
 import { deserializeBackup, serializeBackup } from './schema'
 
-// TODO(victor): Create a more complete set of tests, including a number of error conditions.
+// DO NOT MERGE(victor): Create a more complete set of tests, including a number of error conditions.
+
+const debug = debugFactory('kit:encrypted-backup:backup:test')
 
 // Mock out the BLS blinding client. Verification of the result is not possible without using the
 // real BLS OPRF implementation and a set of BLS keys.
@@ -38,8 +40,6 @@ jest.mock('@celo/identity/lib/odis/bls-blinding-client', () => {
     WasmBlsBlindingClient,
   }
 })
-
-const debug = debugFactory('kit:encrypted-backup:backup:test')
 
 const TEST_ODIS_ENVIRONMENT: OdisServiceContext = {
   odisUrl: 'https://mockodis.com',
