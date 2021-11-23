@@ -60,34 +60,51 @@ export class BLSCryptographyClient {
     // We do this since partial signature verification incurs higher latencies
     try {
       const result = threshold_bls.combine(threshold, this.allSignatures)
-      // TODO(Alec): Confirm and address bad documentation in threshold-bls lib.
-      // Documentation should not specify that verifyBlindSignature verifies the
-      // signature after it has been unblinded.
-      threshold_bls.verifyBlindSignature(
-        Buffer.from(config.thresholdSignature.pubKey, 'base64'),
-        Buffer.from(blindedMessage, 'base64'),
-        result
-      )
+      this.verifyCombinedSignature(blindedMessage, result, logger)
       return Buffer.from(result).toString('base64')
     } catch (error) {
       logger.error(error)
       // Verify each signature and remove invalid ones
       // This logging will help us troubleshoot which signers are having issues
       this.unverifiedSignatures.forEach((unverifiedSignature) => {
-        this.verifySignature(blindedMessage, unverifiedSignature, logger!)
+        // Note: If a signer is using the wrong version of a valid key share,
+        // it will not be caught by this check.
+        this.verifyPartialSignature(blindedMessage, unverifiedSignature, logger!)
       })
       this.clearUnverifiedSignatures()
       throw new Error(ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES)
     }
   }
 
-  private verifySignature(
+  private verifyCombinedSignature(
+    blindedMessage: string,
+    combinedSignature: Uint8Array,
+    logger: Logger
+  ) {
+    try {
+      // TODO: Address bad documentation in threshold-bls lib.
+      // Documentation should not specify that verifyBlindSignature verifies the
+      // signature after it has been unblinded.
+      threshold_bls.verifyBlindSignature(
+        Buffer.from(config.thresholdSignature.pubKey, 'base64'),
+        Buffer.from(blindedMessage, 'base64'),
+        combinedSignature
+      )
+    } catch (error) {
+      logger.error({ url: 'ambiguous' }, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
+      // TODO: Add algorithm for checking every possible combination of received signatures
+      // against the public polynomial to identify which signer is using the wrong key version.
+      throw error
+    }
+  }
+
+  private verifyPartialSignature(
     blindedMessage: string,
     unverifiedSignature: ServicePartialSignature,
     logger: Logger
   ) {
     const sigBuffer = Buffer.from(unverifiedSignature.signature, 'base64')
-    if (this.isValidSignature(sigBuffer, blindedMessage)) {
+    if (this.isValidPartialSignature(sigBuffer, blindedMessage)) {
       // We move it to the verified set so that we don't need to re-verify in the future
       this.verifiedSignatures.push(unverifiedSignature)
     } else {
@@ -99,7 +116,7 @@ export class BLSCryptographyClient {
     this.unverifiedSignatures = []
   }
 
-  private isValidSignature(signature: Buffer, blindedMessage: string) {
+  private isValidPartialSignature(signature: Buffer, blindedMessage: string) {
     const polynomial = config.thresholdSignature.polynomial
     try {
       threshold_bls.partialVerifyBlindSignature(
