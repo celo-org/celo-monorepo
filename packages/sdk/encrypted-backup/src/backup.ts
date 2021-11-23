@@ -22,7 +22,14 @@ import { deriveKey, decrypt, encrypt, KDFInfo } from './utils'
 
 const debug = debugFactory('kit:encrypted-backup:backup')
 
-// DO NOT MERGE(victor): Add links to the docs when that PR is merged. github.com/celo-org/docs/pull/150
+/**
+ * Backup structure encoding the information needed to implement the encrypted backup protocol.
+ *
+ * @remarks The structure below and its related functions implement the encrypted backup protocol
+ * designed for wallet account backups. More information about the protocol can be found in the
+ * official {@link https://docs.celo.org/celo-codebase/protocol/identity/encrypted-cloud-backup |
+ * Celo documentation}
+ */
 export interface Backup {
   /**
    * AES-128-GCM encryption of the user's secret backup data.
@@ -181,6 +188,9 @@ export async function createBackup({
     // Check that the circuit breaker is online. Although we do not need to interact with the
     // service to create the backup, we should ensure its keys are not disabled or destroyed,
     // otherwise we may not be able to open the backup that we create.
+    // Note that this status check is not strictly necessary and can be removed to all users to
+    // proceed when the circuit breaker is temporarily unavailable at the risk of not being able to
+    // open their backup later.
     const serviceStatus = await circuitBreakerClient.status()
     if (!serviceStatus.ok) {
       return Err(serviceStatus.error)
