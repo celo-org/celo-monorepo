@@ -3,6 +3,10 @@
 const fetchMock = require('fetch-mock').sandbox()
 jest.mock('cross-fetch', () => fetchMock)
 
+import {
+  CircuitBreakerErrorTypes,
+  CircuitBreakerKeyStatus,
+} from '@celo/identity/lib/odis/circuit-breaker'
 import { MockCircuitBreaker } from '@celo/identity/lib/odis/circuit-breaker.mock'
 import { ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/query'
 import {
@@ -274,7 +278,7 @@ describe('createBackup', () => {
     fetchMock.reset()
   })
 
-  it('should return a service error when request to ODIS fails', async () => {
+  it('should return a fetch error when request to ODIS fails', async () => {
     mockOdis!.installSignEndpoint(fetchMock, { throws: new Error('fetch failed') })
     const result = await createBackup({
       data: testData,
@@ -285,7 +289,7 @@ describe('createBackup', () => {
     if (result.ok) {
       return
     }
-    expect(result.error.errorType).toEqual(BackupErrorTypes.ODIS_SERVICE_ERROR)
+    expect(result.error.errorType).toEqual(BackupErrorTypes.FETCH_ERROR)
   })
 
   it('should return a service error when ODIS returns an error status', async () => {
@@ -316,12 +320,85 @@ describe('createBackup', () => {
     expect(result.error.errorType).toEqual(BackupErrorTypes.ODIS_RATE_LIMITING_ERROR)
   })
 
+  it('should return a rate limit error when ODIS indicates no quota available', async () => {
+    mockOdis!.installQuotaEndpoint(fetchMock, {
+      status: 200,
+      body: {
+        success: true,
+        version: 'mock',
+        status: { timer: Date.now() / 1000 + 3600, counter: 0, disabled: false },
+      },
+    })
+    const result = await createBackup({
+      data: testData,
+      password: testPassword,
+      hardening: TEST_HARDENING_CONFIG,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.ODIS_RATE_LIMITING_ERROR)
+  })
+
   it('should not rely on ODIS when not included in the configuration', async () => {
     mockOdis!.installSignEndpoint(fetchMock, { status: 501 })
     const result = await createBackup({
       data: testData,
       password: testPassword,
       hardening: { ...TEST_HARDENING_CONFIG, odis: undefined },
+    })
+    expect(result.ok).toBe(true)
+  })
+
+  it('should return a fetch error when the circuit breaker status check fails', async () => {
+    mockCircuitBreaker!.installStatusEndpoint(fetchMock, { throws: new Error('fetch failed') })
+    const result = await createBackup({
+      data: testData,
+      password: testPassword,
+      hardening: TEST_HARDENING_CONFIG,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(CircuitBreakerErrorTypes.FETCH_ERROR)
+  })
+
+  it('should return a service error when the circuit breaker service returns 501', async () => {
+    mockCircuitBreaker!.installStatusEndpoint(fetchMock, { status: 501 })
+    const result = await createBackup({
+      data: testData,
+      password: testPassword,
+      hardening: TEST_HARDENING_CONFIG,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(CircuitBreakerErrorTypes.SERVICE_ERROR)
+  })
+
+  it('should return an unavailable error when the circuit breaker key is destroyed', async () => {
+    mockCircuitBreaker!.keyStatus = CircuitBreakerKeyStatus.DESTROYED
+    const result = await createBackup({
+      data: testData,
+      password: testPassword,
+      hardening: TEST_HARDENING_CONFIG,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(CircuitBreakerErrorTypes.UNAVAILABLE_ERROR)
+  })
+
+  it('should not rely on the circuit breaker when not included in the configuration', async () => {
+    mockCircuitBreaker!.installStatusEndpoint(fetchMock, { status: 501 })
+    const result = await createBackup({
+      data: testData,
+      password: testPassword,
+      hardening: { ...TEST_HARDENING_CONFIG, circuitBreaker: undefined },
     })
     expect(result.ok).toBe(true)
   })

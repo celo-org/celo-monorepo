@@ -6,6 +6,7 @@ export enum BackupErrorTypes {
   DECODE_ERROR = 'DECODE_ERROR',
   DECRYPTION_ERROR = 'DECRYPTION_ERROR',
   ENCRYPTION_ERROR = 'ENCRYPTION_ERROR',
+  FETCH_ERROR = 'FETCH_ERROR',
   INVALID_BACKUP_ERROR = 'INVALID_BACKUP_ERROR',
   ODIS_SERVICE_ERROR = 'ODIS_SERVICE_ERROR',
   ODIS_RATE_LIMITING_ERROR = 'ODIS_RATE_LIMITING_ERROR',
@@ -35,6 +36,12 @@ export class EncryptionError extends RootError<BackupErrorTypes.ENCRYPTION_ERROR
   }
 }
 
+export class FetchError extends RootError<BackupErrorTypes.FETCH_ERROR> {
+  constructor(readonly error?: Error) {
+    super(BackupErrorTypes.FETCH_ERROR)
+  }
+}
+
 export class InvalidBackupError extends RootError<BackupErrorTypes.INVALID_BACKUP_ERROR> {
   constructor(readonly error?: Error) {
     super(BackupErrorTypes.INVALID_BACKUP_ERROR)
@@ -59,6 +66,7 @@ export type BackupError =
   | DecodeError
   | DecryptionError
   | EncryptionError
+  | FetchError
   | InvalidBackupError
   | OdisServiceError
   | OdisRateLimitingError

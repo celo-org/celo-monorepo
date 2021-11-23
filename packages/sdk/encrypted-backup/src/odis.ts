@@ -27,7 +27,13 @@ import { defined, noString, noNumber } from '@celo/utils/lib/sign-typed-data-uti
 import { LocalWallet } from '@celo/wallet-local'
 import * as crypto from 'crypto'
 import { OdisHardeningConfig } from './config'
-import { AuthorizationError, BackupError, OdisServiceError, OdisRateLimitingError } from './errors'
+import {
+  AuthorizationError,
+  BackupError,
+  FetchError,
+  OdisServiceError,
+  OdisRateLimitingError,
+} from './errors'
 import { deriveKey, EIP712Wallet, KDFInfo } from './utils'
 
 /**
@@ -181,7 +187,10 @@ async function requestOdisQuotaStatus(
       Endpoints.DOMAIN_QUOTA_STATUS
     )
   } catch (error) {
-    if ((error as Error).message === ErrorMessages.ODIS_RATE_LIMIT_ERROR) {
+    if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {
+      return Err(new FetchError(error as Error))
+    }
+    if ((error as Error).message?.includes(ErrorMessages.ODIS_RATE_LIMIT_ERROR)) {
       return Err(new OdisRateLimitingError(undefined, error as Error))
     }
     return Err(new OdisServiceError(error as Error))
@@ -235,7 +244,10 @@ async function requestOdisDomainSignature(
       Endpoints.DOMAIN_SIGN
     )
   } catch (error) {
-    if ((error as Error).message === ErrorMessages.ODIS_RATE_LIMIT_ERROR) {
+    if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {
+      return Err(new FetchError(error as Error))
+    }
+    if ((error as Error).message?.includes(ErrorMessages.ODIS_RATE_LIMIT_ERROR)) {
       return Err(new OdisRateLimitingError(undefined, error as Error))
     }
     return Err(new OdisServiceError(error as Error))

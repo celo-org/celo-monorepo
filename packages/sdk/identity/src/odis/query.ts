@@ -62,6 +62,7 @@ export enum ErrorMessages {
   ODIS_INPUT_ERROR = 'odisBadInputError',
   ODIS_AUTH_ERROR = 'odisAuthError',
   ODIS_CLIENT_ERROR = 'Unknown Client Error',
+  ODIS_FETCH_ERROR = 'odisFetchError',
 }
 
 export interface ServiceContext {
@@ -154,15 +155,20 @@ export async function queryOdis<ResponseType>(
 
   return selectiveRetryAsyncWithBackOff(
     async () => {
-      const res = await fetch(odisUrl + endpoint, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          ...authHeader,
-        },
-        body: bodyString,
-      })
+      let res: Response
+      try {
+        res = await fetch(odisUrl + endpoint, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            ...authHeader,
+          },
+          body: bodyString,
+        })
+      } catch (error) {
+        throw new Error(`${ErrorMessages.ODIS_FETCH_ERROR}: ${error}`)
+      }
 
       if (res.ok) {
         debug('Response ok. Parsing.')
