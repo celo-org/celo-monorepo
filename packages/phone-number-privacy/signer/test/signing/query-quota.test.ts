@@ -1,5 +1,5 @@
-import { isVerified, rootLogger } from '@celo/phone-number-privacy-common'
 import { StableToken } from '@celo/contractkit'
+import { isVerified, rootLogger } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import allSettled from 'promise.allsettled'
 import {
@@ -9,8 +9,8 @@ import {
   createMockContractKit,
   createMockToken,
   createMockWeb3,
-} from '../../../common/src/test/utils'
-import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values'
+} from '../../../common/src/test/utils.ts'
+import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values.ts'
 import { getPerformedQueryCount } from '../../src/database/wrappers/account'
 import { getRemainingQueryCount } from '../../src/signing/query-quota'
 import { getContractKit } from '../../src/web3/contracts'
