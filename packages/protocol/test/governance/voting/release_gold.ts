@@ -520,7 +520,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     describe('when unrevoked', () => {
-      it.only('sets the account by beneficiary', async () => {
+      it('sets the account by beneficiary', async () => {
         let isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
         await releaseGoldInstance.setAccount(
@@ -556,7 +556,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         )
       })
 
-      it.only('should set the name, dataEncryptionKey and walletAddress of the account by beneficiary', async () => {
+      it('should set the name, dataEncryptionKey and walletAddress of the account by beneficiary', async () => {
         let isAccount = await accountsInstance.isAccount(releaseGoldInstance.address)
         assert.isFalse(isAccount)
         await releaseGoldInstance.setAccount(
@@ -721,7 +721,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       })
 
       describe('when unrevoked', () => {
-        it.only('beneficiary should set the walletAddress', async () => {
+        it('beneficiary should set the walletAddress', async () => {
           await releaseGoldInstance.setAccountWalletAddress(
             walletAddress,
             proofOfWalletOwnership.v,
