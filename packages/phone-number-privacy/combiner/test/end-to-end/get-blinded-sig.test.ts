@@ -26,9 +26,8 @@ jest.setTimeout(60000)
 
 describe('Running against a deployed service', () => {
   beforeAll(() => {
-    console.log(process.env.ODIS_COMBINER_SERVICE_URL)
-    console.log(process.env.ODIS_SIGNER_SERVICE_URL)
-    console.log(process.env.ODIS_BLOCKCHAIN_PROVIDER)
+    console.log('ODIS_COMBINER_SERVICE_URL: ' + process.env.ODIS_COMBINER_SERVICE_URL)
+    console.log('ODIS_BLOCKCHAIN_PROVIDER: ' + process.env.ODIS_BLOCKCHAIN_PROVIDER)
   })
   describe('Returns status ODIS_INPUT_ERROR', () => {
     it('With invalid address', async () => {
@@ -100,9 +99,13 @@ describe('Running against a deployed service', () => {
       }
       // Query twice to test reusing the request
       for (let i = 0; i < 2; i++) {
-        await expect(
-          OdisUtils.Query.queryOdis(walletAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
-        ).resolves.toMatchObject({ success: true })
+        const result = OdisUtils.Query.queryOdis(
+          walletAuthSigner,
+          body,
+          SERVICE_CONTEXT,
+          SIGN_MESSAGE_ENDPOINT
+        )
+        await expect(result).resolves.toMatchObject({ success: true })
       }
     })
   })
