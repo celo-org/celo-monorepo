@@ -51,9 +51,9 @@ const getRandomBlindedPhoneNumber = () => {
 
 describe('Running against a deployed service', () => {
   beforeAll(() => {
-    console.log(DEFAULT_FORNO_URL)
-    console.log(ODIS_SIGNER)
-    console.log(ODIS_PUBLIC_POLYNOMIAL)
+    console.log('FORNO_URL: ' + DEFAULT_FORNO_URL)
+    console.log('ODIS_SIGNER: ' + ODIS_SIGNER)
+    console.log('ODIS_PUBLIC_POLYNOMIAL: ' + ODIS_PUBLIC_POLYNOMIAL)
   })
 
   describe('Returns status 400 with invalid input', () => {

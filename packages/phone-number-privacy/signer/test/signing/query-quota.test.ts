@@ -1,21 +1,22 @@
 import { StableToken } from '@celo/contractkit'
-import { isVerified, rootLogger } from '@celo/phone-number-privacy-common'
+import { isVerified, rootLogger, TestUtils } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import allSettled from 'promise.allsettled'
-import {
+import { getPerformedQueryCount } from '../../src/database/wrappers/account'
+import { getRemainingQueryCount } from '../../src/signing/query-quota'
+import { getContractKit } from '../../src/web3/contracts'
+
+allSettled.shim()
+
+const {
   ContractRetrieval,
   createMockAccounts,
   createMockAttestation,
   createMockContractKit,
   createMockToken,
   createMockWeb3,
-} from '../../../common/src/test/utils.ts'
-import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values.ts'
-import { getPerformedQueryCount } from '../../src/database/wrappers/account'
-import { getRemainingQueryCount } from '../../src/signing/query-quota'
-import { getContractKit } from '../../src/web3/contracts'
-
-allSettled.shim()
+} = TestUtils.Utils
+const { mockAccount, mockPhoneNumber } = TestUtils.Values
 
 jest.mock('../../src/web3/contracts')
 const mockGetContractKit = getContractKit as jest.Mock

@@ -26,9 +26,8 @@ jest.setTimeout(60000)
 
 describe('Running against a deployed service', () => {
   beforeAll(() => {
-    console.log(process.env.ODIS_COMBINER_SERVICE_URL)
-    console.log(process.env.ODIS_SIGNER_SERVICE_URL)
-    console.log(process.env.ODIS_BLOCKCHAIN_PROVIDER)
+    console.log('ODIS_COMBINER_SERVICE_URL: ' + process.env.ODIS_COMBINER_SERVICE_URL)
+    console.log('ODIS_BLOCKCHAIN_PROVIDER: ' + process.env.ODIS_BLOCKCHAIN_PROVIDER)
   })
   describe('Returns status ODIS_INPUT_ERROR', () => {
     it('With invalid address', async () => {
