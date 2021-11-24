@@ -16,6 +16,8 @@ const SIGNATURES = [
   'MAAAAAAAAAAhzTl/S+mldhE+5F5rt+2XKJQsNtELZeo+aoHjhsVVdw8Ofk1ZRr9EUZbvVKetNYADAAAA',
 ]
 const COMBINED_SIGNATURE = '16RcENpbLgq5pIkcPWdgnMofeLqSyuUVin9h4jof9/I8GRsmt5iRxjWAkpftKPWA'
+const INVALID_SIGNATURE =
+  'MAAAAAAAAACanrA73tApLu+j569ICcXrEBRLi4czWJtInJPSUpoZUOVDc1667hvMq1ESncFzlgEHAAAA'
 
 config.thresholdSignature = {
   threshold: 3,
@@ -226,9 +228,7 @@ describe(`BLS service computes signature`, () => {
       },
       {
         url: 'url3',
-        // Invalid partial signature. Combination will succeed but verification of the combined signature will fail.
-        signature:
-          'MAAAAAAAAACanrA73tApLu+j569ICcXrEBRLi4czWJtInJPSUpoZUOVDc1667hvMq1ESncFzlgEHAAAA',
+        signature: INVALID_SIGNATURE, // Combination will succeed but verification will fail.
       },
       {
         url: 'url4',

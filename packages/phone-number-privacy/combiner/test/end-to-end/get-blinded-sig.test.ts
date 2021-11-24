@@ -106,7 +106,6 @@ describe('Running against a deployed service', () => {
           SERVICE_CONTEXT,
           SIGN_MESSAGE_ENDPOINT
         )
-        console.log(result)
         await expect(result).resolves.toMatchObject({ success: true })
       }
     })
