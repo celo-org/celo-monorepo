@@ -106,16 +106,20 @@ export type CircuitBreakerError =
   | EncryptionError
   | FetchError
 
-// DO NOT MERGE(victor): Write up some docs on the circuit breaker and link them here.
 /**
  * Client for interacting with a circuit breaker service, such as the one deployed by Valora.
  *
  * @remarks A circuit breaker is a service supporting a public decryption function backed by an HSM
  * key. It is intended for use in key derivation when with ODIS as a key hardening service, and
  * allows the circuit breaker operator to shut down access to the decryption key in the event that
- * ODIS is conpromised. This acts as a safety measure to allow wallets to prvent attackers from
+ * ODIS is conpromised. This acts as a safety measure to allow wallets to prevent attackers from
  * being able to brute force their users cryptographic keys in the event that ODIS is compromised,
  * and thus is protection is no longer available.
+ *
+ * The circuit breaker service is designed for use in encryped cloud backip protocl. More
+ * information about encrypted cloud backup and the circuit breaker service can be found in the
+ * official {@link https://docs.celo.org/celo-codebase/protocol/identity/encrypted-cloud-backup |
+ * Celo documentation}
  */
 export class CircuitBreakerClient {
   constructor(readonly environment: CircuitBreakerServiceContext) {}

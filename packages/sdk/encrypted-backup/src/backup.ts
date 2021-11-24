@@ -119,8 +119,9 @@ export interface CreatePinEncryptedBackupArgs {
  * It is strongly recommended that the calling application implement a PIN blocklist to prevent the
  * user from selecting a number of the most common PIN codes (e.g. blocking the top 25k PINs by
  * frequency of appearance in the HIBP Passwords dataset). An example implementation can be seen in
- * the Valora wallet.
- * https://github.com/valora-inc/wallet/blob/3940661c40d08e4c5db952bd0abeaabb0030fc7a/packages/mobile/src/pincode/authentication.ts#L56-L108
+ * the Valora wallet. {@link
+ *  https://github.com/valora-inc/wallet/blob/3940661c40d08e4c5db952bd0abeaabb0030fc7a/packages/mobile/src/pincode/authentication.ts#L56-L108
+ *  | PIN blocklist implementation}
  *
  * In order to handle the event of an ODIS service compromise, this configuration additionally
  * includes a circuit breaker service run by Valora. In the event of an ODIS compromise, the Valora
