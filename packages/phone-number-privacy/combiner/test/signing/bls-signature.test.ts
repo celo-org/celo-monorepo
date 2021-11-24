@@ -5,13 +5,17 @@ import {
 } from '../../src/bls/bls-cryptography-client'
 import config from '../../src/config'
 
-// From Alfajores
 const PUBLIC_KEY =
-  'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA'
+  '8VZ0ZBPBjeRaH2nE+itNKiL/wKl38foK74MniCCIxvpA/9AfE1Uy7qbGGRyiKj8AAeiFpSaMzi7Flfe/Tj/qCWM8LMgQGR+eTvt7yiYsyKIVpGMJYVyzchEtPwFZyRyA'
 const PUBLIC_POLYNOMIAL =
-  '020000000000000090fa11c56744759fcd777b909e9dc5245b39e33ba24be92caaf3a6f71f2f63a2873c6f23adfab2b2f211534c2da98b01280ed2a00b0808c06ff02fc56f66690ceaa14aabebfec65b6681e641fbdbaabcdbb4320fbd422b1e0452d3274908cb00f3d2ba1d64ddc12f387ef5c6fb98265cee27afa66626edf91b9839d49f23890d75a550a49a2e7a75b06b3b49734a160035558eb2079c41926388ac560e75f1962dada39e5c30ba35bef59eb84ff4329432cdc10383b4dea40f5ad8fabbb09a81'
-const SIGNATURES = ['TODO', 'TODO', 'TODO', 'TODO']
-const COMBINED_SIGNATURE = 'TODO'
+  '0300000000000000f156746413c18de45a1f69c4fa2b4d2a22ffc0a977f1fa0aef8327882088c6fa40ffd01f135532eea6c6191ca22a3f0001e885a5268cce2ec595f7bf4e3fea09633c2cc810191f9e4efb7bca262cc8a215a46309615cb372112d3f0159c91c80ececfb0ecd57116e44c7580b57fe7c3f0f566d65f789f041b9febd83d3497e4c430af250cf8ac135f4782d283f3dd5009cf6e8de23a35be1cc21a8504ee2e3757a36f6c9813137d0f6b8aa75febc5ee77435cfd4280de80647670a60683e9481f091088a9940142b31d42ed3981dd548910fa41364f589c93c87bf62725468779a1442785600c08efbeff391f84e3200560dcd95d055998f4ef803a820356ef5b756cc75a98286bd21b5675cfe2db9bac0bcee64dc94c435d92aa5fbfa118680'
+const SIGNATURES = [
+  'MAAAAAAAAADkHsKIX91BuKRjNgsJR81otwGGln4HuguYe4QkZoInFwNIiU9QglFZeLpJmNEysIAAAAAA',
+  'MAAAAAAAAABqscf+GUMQD5I8SJW+zzZKuo83gyRZs/RUR7zePSDx4ZtewOGEc/VThpUpqgM5mAEBAAAA',
+  'MAAAAAAAAABH006sJMay5D4OtOHDdQh3W8gX7yafeyMSGJzba7RhBAWatCEztthuQ6gSEOYTYQECAAAA',
+  'MAAAAAAAAAAhzTl/S+mldhE+5F5rt+2XKJQsNtELZeo+aoHjhsVVdw8Ofk1ZRr9EUZbvVKetNYADAAAA',
+]
+const COMBINED_SIGNATURE = '16RcENpbLgq5pIkcPWdgnMofeLqSyuUVin9h4jof9/I8GRsmt5iRxjWAkpftKPWA'
 
 config.thresholdSignature = {
   threshold: 3,
@@ -66,7 +70,7 @@ describe(`BLS service computes signature`, () => {
       Buffer.from(actual, 'base64'),
       blindedMsgResult.blindingFactor
     )
-    const publicKey = Buffer.from(PUBLIC_KEY, 'hex')
+    const publicKey = Buffer.from(PUBLIC_KEY, 'base64')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
   it('provides blinded signature given one failure if still above threshold', async () => {
@@ -109,7 +113,7 @@ describe(`BLS service computes signature`, () => {
       Buffer.from(actual, 'base64'),
       blindedMsgResult.blindingFactor
     )
-    const publicKey = Buffer.from(PUBLIC_KEY, 'hex')
+    const publicKey = Buffer.from(PUBLIC_KEY, 'base64')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
   it('throws error if does not meet threshold signatures', async () => {
@@ -207,7 +211,7 @@ describe(`BLS service computes signature`, () => {
       Buffer.from(actual, 'base64'),
       blindedMsgResult.blindingFactor
     )
-    const publicKey = Buffer.from(PUBLIC_KEY, 'hex')
+    const publicKey = Buffer.from(PUBLIC_KEY, 'base64')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
   it('throws error if combined signature is invalid, and can recover from failure with sufficient valid partial signatures', async () => {
@@ -223,7 +227,8 @@ describe(`BLS service computes signature`, () => {
       {
         url: 'url3',
         // Invalid partial signature. Combination will succeed but verification of the combined signature will fail.
-        signature: SIGNATURES[2],
+        signature:
+          'MAAAAAAAAACanrA73tApLu+j569ICcXrEBRLi4czWJtInJPSUpoZUOVDc1667hvMq1ESncFzlgEHAAAA',
       },
       {
         url: 'url4',
@@ -267,7 +272,7 @@ describe(`BLS service computes signature`, () => {
       Buffer.from(actual, 'base64'),
       blindedMsgResult.blindingFactor
     )
-    const publicKey = Buffer.from(PUBLIC_KEY, 'hex')
+    const publicKey = Buffer.from(PUBLIC_KEY, 'base64')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
 })
