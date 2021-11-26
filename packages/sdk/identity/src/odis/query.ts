@@ -5,10 +5,10 @@ import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { ContractKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
+  DomainRequest,
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetContactMatchesResponse,
-  DomainRequest,
   KnownDomain,
   PhoneNumberPrivacyRequest,
 } from '@celo/phone-number-privacy-common'
