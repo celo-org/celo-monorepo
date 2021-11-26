@@ -1,7 +1,7 @@
 import {
+  CircuitBreakerServiceContext,
   VALORA_ALFAJORES_CIRCUIT_BREAKER_ENVIRONMENT,
   VALORA_MAINNET_CIRCUIT_BREAKER_ENVIRONMENT,
-  CircuitBreakerServiceContext,
 } from '@celo/identity/lib/odis/circuit-breaker'
 import {
   ODIS_ALFAJORES_CONTEXT,

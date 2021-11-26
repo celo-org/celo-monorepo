@@ -1,5 +1,11 @@
 import { Address } from '@celo/base/lib/address'
 import { Err, Ok, Result } from '@celo/base/lib/result'
+import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
+import {
+  ErrorMessages,
+  queryOdis,
+  ServiceContext as OdisServiceContext,
+} from '@celo/identity/lib/odis/query'
 import {
   AuthenticationMethod,
   checkSequentialDelayRateLimit,
@@ -13,17 +19,11 @@ import {
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseSuccess,
   Endpoints,
+  genSessionID,
   SequentialDelayDomain,
   SequentialDelayDomainState,
-  genSessionID,
 } from '@celo/phone-number-privacy-common'
-import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
-import {
-  ErrorMessages,
-  queryOdis,
-  ServiceContext as OdisServiceContext,
-} from '@celo/identity/lib/odis/query'
-import { defined, noString, noNumber } from '@celo/utils/lib/sign-typed-data-utils'
+import { defined, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import * as crypto from 'crypto'
 import { OdisHardeningConfig } from './config'
@@ -31,8 +31,8 @@ import {
   AuthorizationError,
   BackupError,
   FetchError,
-  OdisServiceError,
   OdisRateLimitingError,
+  OdisServiceError,
 } from './errors'
 import { deriveKey, EIP712Wallet, KDFInfo } from './utils'
 

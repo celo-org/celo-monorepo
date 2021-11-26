@@ -17,8 +17,8 @@ import {
   PIN_HARDENING_MAINNET_CONFIG,
 } from './config'
 import { BackupError, DecryptionError, EncryptionError, InvalidBackupError } from './errors'
-import { buildOdisDomain, odisQueryAuthorizer, odisHardenKey } from './odis'
-import { deriveKey, decrypt, encrypt, KDFInfo } from './utils'
+import { buildOdisDomain, odisHardenKey, odisQueryAuthorizer } from './odis'
+import { decrypt, deriveKey, encrypt, KDFInfo } from './utils'
 
 const debug = debugFactory('kit:encrypted-backup:backup')
 
@@ -258,7 +258,7 @@ export async function createBackup({
     encryptedData,
     nonce,
     odisDomain: domain,
-    encryptedFuseKey: encryptedFuseKey,
+    encryptedFuseKey,
     version: '0.0.1',
     metadata,
     environment: {

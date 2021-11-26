@@ -1,7 +1,7 @@
 import { Err, Ok, parseJsonAsResult, Result } from '@celo/base/lib/result'
 import { SequentialDelayDomainSchema } from '@celo/phone-number-privacy-common/lib/domains'
-import { pipe } from 'fp-ts/lib/pipeable'
 import { chain, isLeft } from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 import { Backup } from './backup'
 import { DecodeError } from './errors'
