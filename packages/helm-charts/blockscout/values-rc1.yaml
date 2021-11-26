@@ -47,5 +47,6 @@ blockscout:
       requests:
         memory: 500Mi
         cpu: 1500m
+    recaptchaSecretName: rc1-blockscout-recaptcha
   metrics:
     enabled: true
