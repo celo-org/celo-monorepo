@@ -4,8 +4,8 @@ import {
   BASE64_REGEXP,
   CircuitBreakerEndpoints,
   CircuitBreakerKeyStatus,
-  CircuitBreakerStatusResponse,
   CircuitBreakerServiceContext,
+  CircuitBreakerStatusResponse,
   CircuitBreakerUnwrapKeyRequest,
   CircuitBreakerUnwrapKeyResponse,
 } from './circuit-breaker'
@@ -85,7 +85,7 @@ export class MockCircuitBreaker {
     let plaintext: Buffer
     try {
       plaintext = crypto.privateDecrypt(
-        //@ts-ignore support for OAEP hash option, was added in Node 12.9.0.
+        // @ts-ignore support for OAEP hash option, was added in Node 12.9.0.
         { key: MOCK_CIRCUIT_BREAKER_PRIVATE_KEY, oaepHash: 'sha256' },
         Buffer.from(ciphertext, 'base64')
       )

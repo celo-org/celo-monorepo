@@ -8,9 +8,9 @@ import {
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetContactMatchesResponse,
-  PhoneNumberPrivacyRequest,
   DomainRequest,
   KnownDomain,
+  PhoneNumberPrivacyRequest,
 } from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
