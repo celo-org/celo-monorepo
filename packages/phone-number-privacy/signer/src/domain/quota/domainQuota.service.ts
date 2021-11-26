@@ -1,5 +1,5 @@
-import { isSequentialDelayDomain, KnownDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { isSequentialDelayDomain, KnownDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import { checkSequentialDelayRateLimit } from '@celo/phone-number-privacy-common/lib/domains/sequential-delay'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'

@@ -1,5 +1,5 @@
-import { domainHash, KnownDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { domainHash, KnownDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'

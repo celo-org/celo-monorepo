@@ -1,9 +1,9 @@
+import { SequentialDelayDomainState, WarningMessage } from '@celo/phone-number-privacy-common'
 import {
   Domain,
   domainHash,
   isSequentialDelayDomain,
 } from '@celo/phone-number-privacy-common/lib/domains'
-import { SequentialDelayDomainState, WarningMessage } from '@celo/phone-number-privacy-common'
 
 export const DOMAINS_STATES_TABLE = 'domainsStates'
 export enum DOMAINS_STATES_COLUMNS {
@@ -31,8 +31,8 @@ export class DomainState {
   [DOMAINS_STATES_COLUMNS.timer]: number | undefined;
   [DOMAINS_STATES_COLUMNS.disabled]: boolean
 
-  constructor(domainHash: string, domainState: SequentialDelayDomainState) {
-    this[DOMAINS_STATES_COLUMNS.domainHash] = domainHash
+  constructor(hash: string, domainState: SequentialDelayDomainState) {
+    this[DOMAINS_STATES_COLUMNS.domainHash] = hash
     this[DOMAINS_STATES_COLUMNS.counter] = domainState.counter
     this[DOMAINS_STATES_COLUMNS.timer] = domainState.timer
     this[DOMAINS_STATES_COLUMNS.disabled] = domainState.disabled
