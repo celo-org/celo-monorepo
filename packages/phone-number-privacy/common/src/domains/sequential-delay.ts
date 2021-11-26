@@ -144,7 +144,7 @@ export interface SequentialDelayResult {
   accepted: boolean
   /**
    * Earliest time a request will be accepted at the current stage.
-   * May be in the past. Undefined if a request will never be accepted.
+   * Provided on rejected requests. Undefined if a request will never be accepted.
    */
   notBefore?: number
   /** State after applying adding a query to the quota. Unchnaged is accepted is false */
@@ -195,7 +195,6 @@ export const checkSequentialDelayRateLimit = (
   // Request is accepted. Update the state.
   return {
     accepted: true,
-    notBefore,
     state: {
       counter: counter + 1,
       timer: resetTimer ? attemptTime : notBefore,

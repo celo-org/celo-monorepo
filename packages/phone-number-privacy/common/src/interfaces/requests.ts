@@ -37,7 +37,7 @@ export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod: AuthenticationMethod
+  authenticationMethod?: AuthenticationMethod
   /** Query message. A blinded elliptic curve point encoded in base64. */
   blindedQueryPhoneNumber: string
   /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
@@ -51,7 +51,7 @@ export interface GetBlindedMessageSigRequest {
 export interface GetContactMatchesRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod: AuthenticationMethod
+  authenticationMethod?: AuthenticationMethod
   userPhoneNumber: string // obfuscated with deterministic salt
   contactPhoneNumbers: string[] // obfuscated with deterministic salt
   hashedPhoneNumber: string // on-chain identifier
@@ -64,7 +64,7 @@ export interface GetContactMatchesRequest {
 export interface GetQuotaRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod: AuthenticationMethod
+  authenticationMethod?: AuthenticationMethod
   hashedPhoneNumber?: string // on-chain identifier
   sessionID?: string
   /** Client-specified version string */

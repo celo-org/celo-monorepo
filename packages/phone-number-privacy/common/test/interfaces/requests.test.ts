@@ -7,7 +7,7 @@ import {
   noNumber,
 } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
-import { Domain, DomainOptions, SequentialDelayDomain } from '../../src/domains'
+import { Domain, DomainIdentifiers, DomainOptions, SequentialDelayDomain } from '../../src/domains'
 import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
@@ -51,7 +51,7 @@ describe('domainRestrictedSignatureRequestEIP712()', () => {
   it('should generate the correct type data for request with SequentialDelayDomain', () => {
     const request: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
       domain: {
-        name: 'ODIS Sequential Delay Domain',
+        name: DomainIdentifiers.SequentialDelay,
         version: '1',
         stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
         address: defined('0x0000000000000000000000000000000000000b0b'),
@@ -75,7 +75,7 @@ describe('domainQuotaStatusRequestEIP712()', () => {
   it('should generate the correct type data for request with SequentialDelayDomain', () => {
     const request: DomainQuotaStatusRequest<SequentialDelayDomain> = {
       domain: {
-        name: 'ODIS Sequential Delay Domain',
+        name: DomainIdentifiers.SequentialDelay,
         version: '1',
         stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
         address: defined('0x0000000000000000000000000000000000000b0b'),
@@ -98,7 +98,7 @@ describe('disableDomainRequestEIP712()', () => {
   it('should generate the correct type data for request with SequentialDelayDomain', () => {
     const request: DisableDomainRequest<SequentialDelayDomain> = {
       domain: {
-        name: 'ODIS Sequential Delay Domain',
+        name: DomainIdentifiers.SequentialDelay,
         version: '1',
         stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
         address: defined('0x0000000000000000000000000000000000000b0b'),
@@ -124,7 +124,7 @@ const walletAddress = wallet.getAccounts()[0]!
 const badAddress = wallet.getAccounts()[1]!
 
 const authenticatedDomain: SequentialDelayDomain = {
-  name: 'ODIS Sequential Delay Domain',
+  name: DomainIdentifiers.SequentialDelay,
   version: '1',
   stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
   address: defined(walletAddress),
@@ -132,7 +132,7 @@ const authenticatedDomain: SequentialDelayDomain = {
 }
 
 const unauthenticatedDomain: SequentialDelayDomain = {
-  name: 'ODIS Sequential Delay Domain',
+  name: DomainIdentifiers.SequentialDelay,
   version: '1',
   stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
   address: noString,
@@ -140,7 +140,7 @@ const unauthenticatedDomain: SequentialDelayDomain = {
 }
 
 const manipulatedDomain: SequentialDelayDomain = {
-  name: 'ODIS Sequential Delay Domain',
+  name: DomainIdentifiers.SequentialDelay,
   version: '1',
   stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(100), repetitions: defined(10) }],
   address: defined(walletAddress),
