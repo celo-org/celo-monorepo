@@ -5,9 +5,8 @@ This package contains [Helm](https://github.com/helm/helm#helm-in-a-handbasket) 
 Use this to install helm chart:
 
 ```
-$ brew unlink kubernetes-helm (if you already have some other version installed)
-$ brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/9a698c885051f99b629513cf38684675df2109f9/Formula/kubernetes-helm.rb
- ( this has to be updated if we upgrade tiller on out clusters )
+$ brew unlink kubernetes-helm # (if you already have some other version installed)
+$ brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/9a698c885051f99b629513cf38684675df2109f9/Formula/kubernetes-helm.rb # ( this has to be updated if we upgrade tiller on out clusters )
 $ brew switch kubernetes-helm 2.11.0
 ```
 
