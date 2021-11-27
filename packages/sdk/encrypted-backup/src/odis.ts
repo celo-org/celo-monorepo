@@ -137,7 +137,7 @@ export async function odisHardenKey(
  */
 export function odisQueryAuthorizer(nonce: Buffer): { address: Address; wallet: EIP712Wallet } {
   // Derive the domain's request authorization key from the backup nonce.
-  const authKey = deriveKey(KDFInfo.ODIS_AUTH_KEY, [nonce], 32)
+  const authKey = deriveKey(KDFInfo.ODIS_AUTH_KEY, [nonce])
   const wallet = new LocalWallet()
   wallet.addAccount(authKey.toString('hex'))
   const address = wallet.getAccounts()[0]

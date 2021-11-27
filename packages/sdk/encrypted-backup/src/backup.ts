@@ -11,14 +11,15 @@ import { SequentialDelayDomain } from '@celo/phone-number-privacy-common/lib/dom
 import * as crypto from 'crypto'
 import debugFactory from 'debug'
 import {
+  ComputationalHardeningConfig,
   EnvironmentIdentifier,
   HardeningConfig,
   PIN_HARDENING_ALFAJORES_CONFIG,
   PIN_HARDENING_MAINNET_CONFIG,
 } from './config'
-import { BackupError, DecryptionError, EncryptionError, InvalidBackupError } from './errors'
+import { BackupError, InvalidBackupError } from './errors'
 import { buildOdisDomain, odisHardenKey, odisQueryAuthorizer } from './odis'
-import { decrypt, deriveKey, encrypt, KDFInfo } from './utils'
+import { computationalHardenKey, decrypt, deriveKey, encrypt, KDFInfo } from './utils'
 
 const debug = debugFactory('kit:encrypted-backup:backup')
 
@@ -64,6 +65,16 @@ export interface Backup {
    * the client will send this ciphertext to the circuit breaker service for decryption.
    */
   encryptedFuseKey?: Buffer
+
+  /**
+   * Options for local computational hardening of the encryption key through PBKDF or scrypt.
+   *
+   * @remarks Adding computational hardening provides a measure of security from password guessing
+   * when the password has a moderate amount of entropy (e.g. a password generated under good
+   * guidelines). If the user secret has very low entropy, such as with a 6-digit PIN,
+   * computational hardening does not add significant security.
+   */
+  computationalHardening?: ComputationalHardeningConfig
 
   /** Version number for the backup feature. Used to facilitate backwards compatibility. */
   version: string
@@ -168,6 +179,15 @@ export interface CreateBackupArgs {
  * @param password Password, PIN, or other user secret to use in deriving the encryption key.
  * @param hardening Configuration for how the password should be hardened in deriving the key.
  * @param metadata Arbitrary key-value data to include in the backup to identify it.
+ *
+ * @privateRemarks Most of this functions code is devoted to key generation starting with the input
+ * password or PIN and ending up with a hardened encryption key. It is important that the order and
+ * inputs to each step in the derivation be well considered and implemented correctly. One important
+ * requirement is that no output included in the backup acts as a "commitment" to the password or PIN
+ * value, except the final ciphertext. An example of an issue with this would be if a hash of the
+ * password and nonce were included in the backup. If a commitment to the password or PIN is
+ * included, an attacker can locally brute force that commitment to recover the password, then use
+ * that knowledge to complete the derivation.
  */
 export async function createBackup({
   data,
@@ -178,10 +198,12 @@ export async function createBackup({
   // Password and backup data are not included in any logging as they are likely sensitive.
   debug('creating a backup with the following information', hardening, metadata)
   const nonce = crypto.randomBytes(16)
-  let key = deriveKey(KDFInfo.PASSWORD, [password, nonce])
+  // DO NOT MERGE(victor): Fix up this variable renaming. Goal of avoiding mutable variables.
+  const initialKey = deriveKey(KDFInfo.PASSWORD, [password, nonce])
 
   // Generate a fuse key and mix it into the entropy of the key
   let encryptedFuseKey: Buffer | undefined
+  let updatedKey: Buffer
   if (hardening.circuitBreaker !== undefined) {
     debug('generating a fuse key to enabled use of the circuit breaker service')
     const circuitBreakerClient = new CircuitBreakerClient(hardening.circuitBreaker.environment)
@@ -214,13 +236,15 @@ export async function createBackup({
     // occurs before the request to ODIS. This means an attacker would need to acquire the fuse key
     // _before_ they can make any attempts to guess the user's secret.
     debug('mixing the fuse key into the keying material')
-    key = deriveKey(KDFInfo.FUSE_KEY, [key, fuseKey])
+    updatedKey = deriveKey(KDFInfo.FUSE_KEY, [initialKey, fuseKey])
   } else {
     debug('not using the circuit breaker service')
+    updatedKey = initialKey
   }
 
   // Harden the key with the output of a rate limited ODIS POPRF function.
   let domain: SequentialDelayDomain | undefined
+  let odisHardenedKey: Buffer | undefined
   if (hardening.odis !== undefined) {
     debug('hardening the user key with output from ODIS')
     // Derive the query authorizer wallet and address from the nonce, then build the ODIS domain.
@@ -230,32 +254,49 @@ export async function createBackup({
     domain = buildOdisDomain(hardening.odis, authorizer.address)
 
     debug('sending request to ODIS to harden the backup encryption key')
-    const odisHardenedKey = await odisHardenKey(
-      key,
+    const odisHardening = await odisHardenKey(
+      updatedKey,
       domain,
       hardening.odis.environment,
       authorizer.wallet
     )
-    if (!odisHardenedKey.ok) {
-      return odisHardenedKey
+    if (!odisHardening.ok) {
+      return Err(odisHardening.error)
     }
-    key = odisHardenedKey.result
+    odisHardenedKey = odisHardening.result
   } else {
     debug('not using ODIS for key hardening')
   }
 
-  debug('encrypting backup data with final encrypted key')
-  let encryptedData: Buffer
-  try {
-    encryptedData = encrypt(key, data)
-  } catch (error) {
-    return Err(new EncryptionError(error as Error))
+  let computationalHardenedKey: Buffer | undefined
+  if (hardening.computational !== undefined) {
+    debug('hardening user key with computational function', hardening.computational)
+    const computationalHardening = await computationalHardenKey(updatedKey, hardening.computational)
+    if (!computationalHardening.ok) {
+      return Err(computationalHardening.error)
+    }
+    computationalHardenedKey = computationalHardening.result
+  } else {
+    debug('not using computational key hardening')
+  }
+
+  debug('finalizing encryption key')
+  const finalKey = deriveKey(
+    KDFInfo.FINALIZE,
+    [updatedKey, odisHardenedKey ?? Buffer.alloc(0), computationalHardenedKey ?? Buffer.alloc(0)],
+    16
+  )
+
+  debug('encrypting backup data with final encryption key')
+  const encryption = encrypt(finalKey, data)
+  if (!encryption.ok) {
+    return Err(encryption.error)
   }
 
   // Encrypted and wrap the data in a Backup structure.
   debug('created encrypted backup')
   return Ok({
-    encryptedData,
+    encryptedData: encryption.result,
     nonce,
     odisDomain: domain,
     encryptedFuseKey,
@@ -284,9 +325,10 @@ export async function openBackup({
   password,
 }: OpenBackupArgs): Promise<Result<Buffer, BackupError>> {
   debug('opening an encrypted backup')
-  let key = deriveKey(KDFInfo.PASSWORD, [password, backup.nonce])
+  const initialKey = deriveKey(KDFInfo.PASSWORD, [password, backup.nonce])
 
   // If a circuit breaker is in use, request a decryption of the fuse key and mix it in.
+  let updatedKey: Buffer
   if (backup.encryptedFuseKey !== undefined) {
     if (backup.environment?.circuitBreaker === undefined) {
       return Err(
@@ -309,12 +351,14 @@ export async function openBackup({
     // Mix the fuse key into the ongoing key hardening. Note that mixing in the circuit breaker key
     // occurs before the request to ODIS. This means an attacker would need to aquire the fuse key
     // _before_ they can make any attempts to guess the user's secret.
-    key = deriveKey(KDFInfo.FUSE_KEY, [key, unwrap.result])
+    updatedKey = deriveKey(KDFInfo.FUSE_KEY, [initialKey, unwrap.result])
   } else {
     debug('backup did not specify an encrypted fuse key')
+    updatedKey = initialKey
   }
 
   // If ODIS is in use, harden the key with the output of a rate limited ODIS POPRF function.
+  let odisHardenedKey: Buffer | undefined
   if (backup.odisDomain !== undefined) {
     const domain = backup.odisDomain
 
@@ -339,25 +383,48 @@ export async function openBackup({
     }
 
     debug('requesting a key hardening response from ODIS')
-    const odisHardenedKey = await odisHardenKey(
-      key,
+    const odisHardening = await odisHardenKey(
+      updatedKey,
       domain,
       backup.environment.odis,
       authorizer.wallet
     )
-    if (!odisHardenedKey.ok) {
-      return odisHardenedKey
+    if (!odisHardening.ok) {
+      return Err(odisHardening.error)
     }
-    key = odisHardenedKey.result
+    odisHardenedKey = odisHardening.result
+  } else {
+    debug('not using ODIS for key hardening')
   }
 
-  let decryptedData: Buffer
-  try {
-    decryptedData = decrypt(key, backup.encryptedData)
-  } catch (error) {
-    return Err(new DecryptionError(error as Error))
+  let computationalHardenedKey: Buffer | undefined
+  if (backup.computationalHardening !== undefined) {
+    debug('hardening user key with computational function', backup.computationalHardening)
+    const computationalHardening = await computationalHardenKey(
+      updatedKey,
+      backup.computationalHardening
+    )
+    if (!computationalHardening.ok) {
+      return Err(computationalHardening.error)
+    }
+    computationalHardenedKey = computationalHardening.result
+  } else {
+    debug('not using computational key hardening')
+  }
+
+  debug('finalizing decryption key')
+  const finalKey = deriveKey(
+    KDFInfo.FINALIZE,
+    [updatedKey, odisHardenedKey ?? Buffer.alloc(0), computationalHardenedKey ?? Buffer.alloc(0)],
+    16
+  )
+
+  debug('decrypting backup with finalized decryption key')
+  const decryption = decrypt(finalKey, backup.encryptedData)
+  if (!decryption.ok) {
+    return Err(decryption.error)
   }
 
   debug('requesting a key hardening response from ODIS')
-  return Ok(decryptedData)
+  return Ok(decryption.result)
 }

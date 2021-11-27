@@ -1,5 +1,6 @@
 import { RootError } from '@celo/base/lib/result'
 import { CircuitBreakerError } from '@celo/identity/lib/odis/circuit-breaker'
+import { ScryptOptions } from './utils'
 
 export enum BackupErrorTypes {
   AUTHORIZATION_ERROR = 'AUTHORIZATION_ERROR',
@@ -10,6 +11,8 @@ export enum BackupErrorTypes {
   INVALID_BACKUP_ERROR = 'INVALID_BACKUP_ERROR',
   ODIS_SERVICE_ERROR = 'ODIS_SERVICE_ERROR',
   ODIS_RATE_LIMITING_ERROR = 'ODIS_RATE_LIMITING_ERROR',
+  PBKDF_ERROR = 'PBKDF_ERROR',
+  SCRYPT_ERROR = 'SCRYPT_ERROR',
 }
 
 export class AuthorizationError extends RootError<BackupErrorTypes.AUTHORIZATION_ERROR> {
@@ -60,6 +63,18 @@ export class OdisRateLimitingError extends RootError<BackupErrorTypes.ODIS_RATE_
   }
 }
 
+export class PbkdfError extends RootError<BackupErrorTypes.PBKDF_ERROR> {
+  constructor(readonly iterations: number, readonly error?: Error) {
+    super(BackupErrorTypes.PBKDF_ERROR)
+  }
+}
+
+export class ScryptError extends RootError<BackupErrorTypes.SCRYPT_ERROR> {
+  constructor(readonly options: ScryptOptions, readonly error?: Error) {
+    super(BackupErrorTypes.SCRYPT_ERROR)
+  }
+}
+
 export type BackupError =
   | AuthorizationError
   | CircuitBreakerError
@@ -70,3 +85,5 @@ export type BackupError =
   | InvalidBackupError
   | OdisServiceError
   | OdisRateLimitingError
+  | PbkdfError
+  | ScryptError

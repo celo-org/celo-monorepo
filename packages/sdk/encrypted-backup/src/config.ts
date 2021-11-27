@@ -10,8 +10,20 @@ import {
 } from '@celo/identity/lib/odis/query'
 import { SequentialDelayStage } from '@celo/phone-number-privacy-common'
 import { defined, noNumber } from '@celo/utils/lib/sign-typed-data-utils'
+import { ScryptOptions } from './utils'
 
 export interface HardeningConfig {
+  /**
+   * If provided, a computational hardening function (e.g. scrypt or PBKDF2) will be applied to
+   * locally harden the backup encryption key.
+   *
+   * @remarks Recommended for password-encrypted backups, especially if a circuit breaker is not in
+   * use, as this provides some degree of protection in the event of an ODIS compromise. When
+   * generating backups on low-power devices (e.g. budget smart phones) and encrypting with
+   * low-entropy secrets (e.g. 6-digit PINs) local hardening cannot offer significant protection.
+   */
+  computational?: ComputationalHardeningConfig
+
   /** If provided, ODIS will be used with the given configuration to harden the backup key */
   odis?: OdisHardeningConfig
 
@@ -41,6 +53,23 @@ export interface CircuitBreakerConfig {
   /** Environment information including the URL and public key of the circuit breaker service */
   environment: CircuitBreakerServiceContext
 }
+
+export enum ComputationalHardeningFunction {
+  PBKDF = 'pbkdf2_sha256',
+  SCRYPT = 'scrypt',
+  NONE = 'none',
+}
+
+export interface PbkdfConfig {
+  function: ComputationalHardeningFunction.PBKDF
+  iterations: number
+}
+
+export interface ScryptConfig extends ScryptOptions {
+  function: ComputationalHardeningFunction.SCRYPT
+}
+
+export type ComputationalHardeningConfig = PbkdfConfig | ScryptConfig
 
 /**
  * ODIS SequentialDelayDomain rate limit configured to be appropriate for hardening a 6-digit PIN.
