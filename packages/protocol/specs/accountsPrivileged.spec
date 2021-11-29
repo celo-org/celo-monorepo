@@ -24,6 +24,7 @@ definition knownAsNonPrivileged(method f) returns bool  = false
   || f.selector == removeDefaultSigner(bytes32).selector
   || f.selector == removeSigner(address,bytes32).selector
   || f.selector == setEip712DomainSeparator().selector
+  || f.selector == setPaymentDelegation().selector
   ; 
 
 rule privilegedOperation(method f, address privileged)
