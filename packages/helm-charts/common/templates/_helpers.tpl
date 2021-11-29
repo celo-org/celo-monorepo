@@ -168,12 +168,9 @@ fi
     {{- end }}
     fi
     {{- end }}
-    {{- if .metrics | default true }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
-    {{- end }}
-    {{- if .pprof | default false }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
-    {{- end }}
+
+{{ include  "common.geth-add-metrics-pprof-config" . | indent 4 }}
+
     PORT=30303
     {{- if .ports }}
     PORTS_PER_RID={{ join "," .ports }}
@@ -534,4 +531,22 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+{{- end -}}
+
+{{- define "common.geth-add-metrics-pprof-config" -}}
+{{- if .metrics | default true }}
+ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
+{{- end }}
+{{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
+# Check the format of pprof cmd arguments
+set +e
+geth --help | grep 'pprof.port' >/dev/null
+pprof_new_format=$?
+set -e
+if [ $pprof_new_format -eq 0 ]; then
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprof.port {{ .Values.pprof.port | default "6060" }} --pprof.addr 0.0.0.0"
+else
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
+fi
+{{- end }}
 {{- end -}}
