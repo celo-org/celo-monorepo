@@ -136,6 +136,7 @@ function getGethRunConfig(withDonut: boolean): GethRunConfig {
     genesisConfig: {
       churritoBlock: 0,
       donutBlock: withDonut ? 0 : null,
+      espressoBlock: withDonut ? 0 : null,
     },
     instances: [
       {
