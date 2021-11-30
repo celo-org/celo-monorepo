@@ -285,7 +285,7 @@ contract Accounts is
     uint256 numberRoots = offchainStorageRoots[account].length;
     uint256 totalLength = 0;
     for (uint256 i = 0; i < numberRoots; i++) {
-      totalLength += offchainStorageRoots[account][i].length;
+      totalLength = totalLength.add(offchainStorageRoots[account][i].length);
     }
 
     bytes memory concatenated = new bytes(totalLength);
