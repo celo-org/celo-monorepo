@@ -2269,6 +2269,30 @@ contract('Validators', (accounts: string[]) => {
         })
       })
 
+      describe('when the validator and group meet the balance requirements and no payment is delegated', async () => {
+        beforeEach(async () => {
+          expectedDelegatedPayment = new BigNumber(0)
+          expectedValidatorPayment = expectedTotalPayment.minus(expectedGroupPayment)
+
+          await accountsInstance.setPaymentDelegation(NULL_ADDRESS, toFixed(0))
+
+          ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
+          await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
+        })
+
+        it('should pay the validator', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(validator), expectedValidatorPayment)
+        })
+
+        it('should pay the group', async () => {
+          assertEqualBN(await mockStableToken.balanceOf(group), expectedGroupPayment)
+        })
+
+        it('should return the expected total payment', async () => {
+          assertEqualBN(ret, expectedTotalPayment)
+        })
+      })
+
       describe('when slashing multiplier is halved', () => {
         let halfExpectedTotalPayment: BigNumber
         let halfExpectedGroupPayment: BigNumber

@@ -524,7 +524,9 @@ contract Validators is
       IStableToken stableToken = getStableToken();
       require(stableToken.mint(group, groupPayment), "mint failed to validator group");
       require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
-      require(stableToken.mint(beneficiary, delegatedPayment), "mint failed to delegatee");
+      if (fraction != 0) {
+        require(stableToken.mint(beneficiary, delegatedPayment), "mint failed to delegatee");
+      }
       emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
