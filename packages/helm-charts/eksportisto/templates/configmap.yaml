@@ -30,7 +30,6 @@ data:
         sleepIntervalMilliseconds: 2000
       chainTip:
         enabled: true
-        queue: backfill
 
     indexer:
       concurrency: 10
