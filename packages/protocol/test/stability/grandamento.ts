@@ -1201,7 +1201,12 @@ contract('GrandaMento', (accounts: string[]) => {
 })
 
 // exchangeRate is the price of the sell token quoted in buy token
-function getBuyAmount(exchangeRate: BigNumber, sellAmount: BigNumber, spread: BigNumber.Value) {
+
+export function getBuyAmount(
+  exchangeRate: BigNumber,
+  sellAmount: BigNumber,
+  spread: BigNumber.Value
+) {
   return sellAmount.times(new BigNumber(1).minus(spread)).times(exchangeRate)
 }
 

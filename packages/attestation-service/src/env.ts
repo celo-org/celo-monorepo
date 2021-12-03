@@ -59,3 +59,17 @@ export function getAccountAddress() {
 export function isDevMode() {
   return fetchEnvOrDefault('NODE_ENV', '').toLowerCase() === 'dev'
 }
+
+export function getCeloProviders(): string[] {
+  const celoProvider = process.env.CELO_PROVIDER
+  const celoProviders = process.env.CELO_PROVIDERS
+  if ((celoProvider && celoProviders) || (!celoProvider && !celoProviders)) {
+    // Intent is unclear, so do not allow this
+    throw new Error('Must specify exactly one of: CELO_PROVIDER and CELO_PROVIDERS')
+  } else if (celoProvider) {
+    // Backwards comaptibility
+    return [celoProvider]
+  } else {
+    return celoProviders!.split(',').filter((t) => t != null && t !== '')
+  }
+}

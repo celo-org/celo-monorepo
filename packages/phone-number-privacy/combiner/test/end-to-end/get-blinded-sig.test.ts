@@ -26,9 +26,8 @@ jest.setTimeout(60000)
 
 describe('Running against a deployed service', () => {
   beforeAll(() => {
-    console.log(process.env.ODIS_COMBINER_SERVICE_URL)
-    console.log(process.env.ODIS_SIGNER_SERVICE_URL)
-    console.log(process.env.ODIS_BLOCKCHAIN_PROVIDER)
+    console.log('ODIS_COMBINER_SERVICE_URL: ' + process.env.ODIS_COMBINER_SERVICE_URL)
+    console.log('ODIS_BLOCKCHAIN_PROVIDER: ' + process.env.ODIS_BLOCKCHAIN_PROVIDER)
   })
   describe('Returns status ODIS_INPUT_ERROR', () => {
     it('With invalid address', async () => {
@@ -36,13 +35,12 @@ describe('Running against a deployed service', () => {
         account: '0x1234',
         authenticationMethod: AuthenticationMethod.WALLET_KEY,
         blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
-        timestamp: Date.now(),
         version: 'ignore',
         sessionID: genSessionID(),
       }
 
       await expect(
-        OdisUtils.Query.queryOdis(dekAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
+        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
 
@@ -51,7 +49,6 @@ describe('Running against a deployed service', () => {
         account: ACCOUNT_ADDRESS,
         authenticationMethod: AuthenticationMethod.WALLET_KEY,
         blindedQueryPhoneNumber: '',
-        timestamp: Date.now(),
         version: 'ignore',
         sessionID: genSessionID(),
       }
@@ -67,11 +64,10 @@ describe('Running against a deployed service', () => {
         account: ACCOUNT_ADDRESS,
         authenticationMethod: AuthenticationMethod.WALLET_KEY,
         blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
-        timestamp: Date.now(),
         version: 'ignore',
       }
       await expect(
-        OdisUtils.Query.queryOdis(dekAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
+        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
       ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
     })
   })
@@ -92,22 +88,24 @@ describe('Running against a deployed service', () => {
   describe('With enough quota', () => {
     // if these tests are failing, it may just be that the address needs to be fauceted:
     // celotooljs account faucet --account 0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb --dollar 1 --gold 1 -e <ENV> --verbose
-    const timestamp = Date.now()
     it('Returns sig when querying with unused and used request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS, contractKit)
       const body: SignMessageRequest = {
         account: ACCOUNT_ADDRESS,
         authenticationMethod: AuthenticationMethod.WALLET_KEY,
         blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
-        timestamp,
         version: 'ignore',
         sessionID: genSessionID(),
       }
       // Query twice to test reusing the request
       for (let i = 0; i < 2; i++) {
-        await expect(
-          OdisUtils.Query.queryOdis(walletAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
-        ).resolves.toMatchObject({ success: true })
+        const result = OdisUtils.Query.queryOdis(
+          walletAuthSigner,
+          body,
+          SERVICE_CONTEXT,
+          SIGN_MESSAGE_ENDPOINT
+        )
+        await expect(result).resolves.toMatchObject({ success: true })
       }
     })
   })

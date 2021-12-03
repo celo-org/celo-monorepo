@@ -1,13 +1,12 @@
 /* tslint:disable no-console */
 import Web3V1Celo from '@celo/typechain-target-web3-v1-celo'
 import { execSync } from 'child_process'
-import fs from 'fs'
+import { readJSONSync } from 'fs-extra'
 import path from 'path'
 import { tsGenerator } from 'ts-generator'
 
 const ROOT_DIR = path.normalize(path.join(__dirname, '../'))
-const BUILD_DIR = path.join(ROOT_DIR, 'build')
-const CONTRACTKIT_GEN_DIR = path.normalize(path.join(ROOT_DIR, '../sdk/contractkit/src/generated'))
+const BUILD_DIR = path.join(ROOT_DIR, process.env.BUILD_DIR ?? './build')
 
 export const ProxyContracts = [
   'AccountsProxy',
@@ -18,6 +17,7 @@ export const ProxyContracts = [
   'ElectionProxy',
   'EpochRewardsProxy',
   'EscrowProxy',
+  'ExchangeBRLProxy',
   'ExchangeEURProxy',
   'ExchangeProxy',
   'FeeCurrencyWhitelistProxy',
@@ -25,12 +25,14 @@ export const ProxyContracts = [
   'GoldTokenProxy',
   'GovernanceApproverMultiSigProxy',
   'GovernanceProxy',
+  'GrandaMentoProxy',
   'LockedGoldProxy',
   'MetaTransactionWalletProxy',
   'MetaTransactionWalletDeployerProxy',
   'RegistryProxy',
   'ReserveProxy',
   'ReserveSpenderMultiSigProxy',
+  'StableTokenBRLProxy',
   'StableTokenEURProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
@@ -69,11 +71,16 @@ export const CoreContracts = [
   // stability
   'Exchange',
   'ExchangeEUR',
+  'ExchangeBRL',
   'Reserve',
   'ReserveSpenderMultiSig',
   'StableToken',
   'StableTokenEUR',
+  'StableTokenBRL',
   'SortedOracles',
+
+  // liquidity
+  'GrandaMento',
 ]
 
 const OtherContracts = [
@@ -88,11 +95,6 @@ const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
 
-function getArtifact(contractName: string) {
-  const file = fs.readFileSync(`${BUILD_DIR}/contracts/${contractName}.json`).toString()
-  return JSON.parse(file)
-}
-
 function exec(cmd: string) {
   return execSync(cmd, { cwd: ROOT_DIR, stdio: 'inherit' })
 }
@@ -101,14 +103,14 @@ function hasEmptyBytecode(contract: any) {
   return contract.bytecode === '0x'
 }
 
-function compile() {
-  console.log('Compiling')
+function compile(outdir: string) {
+  console.log(`protocol: Compiling solidity to ${outdir}`)
 
-  exec(`yarn run --silent truffle compile --build_directory=${BUILD_DIR}`)
+  exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
 
   for (const contractName of ImplContracts) {
     try {
-      const fileStr = getArtifact(contractName)
+      const fileStr = readJSONSync(`${outdir}/contracts/${contractName}.json`)
       if (hasEmptyBytecode(fileStr)) {
         console.error(
           `${contractName} has empty bytecode. Maybe you forgot to fully implement an interface?`
@@ -123,23 +125,20 @@ function compile() {
   }
 }
 
-function generateFilesForTruffle() {
-  console.log('protocol: Generating Truffle Types')
-  exec(`rm -rf "${ROOT_DIR}/typechain"`)
+function generateFilesForTruffle(outdir: string) {
+  console.log(`protocol: Generating Truffle Types to ${outdir}`)
+  exec(`rm -rf "${outdir}"`)
 
   const globPattern = `${BUILD_DIR}/contracts/*.json`
-  exec(
-    `yarn run --silent typechain --target=truffle --outDir "./types/typechain" "${globPattern}" `
-  )
+  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}" `)
 }
 
-async function generateFilesForContractKit() {
-  console.log('contractkit: Generating Types')
-  exec(`rm -rf ${CONTRACTKIT_GEN_DIR}`)
-  const relativePath = path.relative(ROOT_DIR, CONTRACTKIT_GEN_DIR)
+async function generateFilesForContractKit(outdir: string) {
+  console.log(`protocol: Generating Web3 Types to ${outdir}`)
+  exec(`rm -rf ${outdir}`)
+  const relativePath = path.relative(ROOT_DIR, outdir)
 
   const contractKitContracts = CoreContracts.concat('Proxy').concat(Interfaces)
-
   const globPattern = `${BUILD_DIR}/contracts/@(${contractKitContracts.join('|')}).json`
 
   const cwd = process.cwd()
@@ -154,16 +153,33 @@ async function generateFilesForContractKit() {
 
   await tsGenerator({ cwd, loggingLvl: 'info' }, web3Generator)
 
-  exec(`yarn --cwd "${ROOT_DIR}/../.." prettier --write "${CONTRACTKIT_GEN_DIR}/**/*.ts"`)
+  exec(`yarn prettier --write "${outdir}/**/*.ts"`)
 }
 
-async function main() {
-  compile()
-  generateFilesForTruffle()
-  await generateFilesForContractKit()
+const _buildTargets = {
+  solidity: undefined,
+  truffleTypes: undefined,
+  web3Types: undefined,
 }
 
-main().catch((err) => {
+async function main(buildTargets: typeof _buildTargets) {
+  if (buildTargets.solidity) {
+    compile(buildTargets.solidity)
+  }
+  if (buildTargets.truffleTypes) {
+    generateFilesForTruffle(buildTargets.truffleTypes)
+  }
+  if (buildTargets.web3Types) {
+    await generateFilesForContractKit(buildTargets.web3Types)
+  }
+}
+
+const minimist = require('minimist')
+const argv = minimist(process.argv.slice(2), {
+  string: Object.keys(_buildTargets),
+})
+
+main(argv).catch((err) => {
   console.error(err)
   process.exit(1)
 })

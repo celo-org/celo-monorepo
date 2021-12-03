@@ -49,7 +49,8 @@ module "http_backends" {
   context_info                    = var.context_info_http
   health_check_destination_port   = 6000
   type                            = "http"
-  banned_cidr                     = var.banned_cidr
+  timeout_sec                     = 60 # 1 minute
+  security_policy_id              = google_compute_security_policy.forno.self_link
 }
 
 module "ws_backends" {
@@ -61,7 +62,20 @@ module "ws_backends" {
   health_check_destination_port   = 6001
   type                            = "ws"
   timeout_sec                     = 1200 # 20 minutes
-  banned_cidr                     = var.banned_cidr
+  security_policy_id              = google_compute_security_policy.forno.self_link
+}
+
+module "kong" {
+  source = "./modules/backends"
+  # variables
+  backend_max_requests_per_second = var.backend_max_requests_per_second_kong
+  celo_env                        = var.celo_env
+  context_info                    = var.context_info_kong
+  health_check_destination_port   = 8000
+  health_check_request_path       = "/kong/status"
+  type                            = "kong"
+  timeout_sec                     = 60 # 1 minute
+  security_policy_id              = google_compute_security_policy.forno.self_link
 }
 
 resource "google_compute_global_address" "global_address" {
@@ -87,11 +101,15 @@ resource "google_compute_managed_ssl_certificate" "ssl_cert" {
 
 resource "random_id" "ssl_random_suffix" {
   byte_length = 4
+
+  keepers = {
+    domains = join(",", var.ssl_cert_domains)
+  }
 }
 
 resource "google_compute_url_map" "url_map" {
   name            = "${var.celo_env}-forno-url-map"
-  default_service = module.http_backends.backend_service_id
+  default_service = module.kong.backend_service_id
 
   host_rule {
     hosts        = ["*"]
@@ -100,11 +118,16 @@ resource "google_compute_url_map" "url_map" {
 
   path_matcher {
     name            = "${var.celo_env}-forno-path-matcher"
-    default_service = module.http_backends.backend_service_id
+    default_service = module.kong.backend_service_id
 
     path_rule {
       paths   = ["/ws"]
       service = module.ws_backends.backend_service_id
+    }
+
+    path_rule {
+      paths   = ["/kong", "/kong/*"]
+      service = module.kong.backend_service_id
     }
   }
 }
@@ -113,9 +136,11 @@ resource "google_compute_url_map" "url_map" {
 # whose utilization is not full.
 # See https://cloud.google.com/load-balancing/docs/https#network-service-tiers_1
 resource "google_compute_target_https_proxy" "target_https_proxy" {
-  name             = "${var.celo_env}-forno-target-https-proxy"
-  url_map          = google_compute_url_map.url_map.id
-  ssl_certificates = [google_compute_managed_ssl_certificate.ssl_cert.id, "https://www.googleapis.com/compute/v1/projects/celo-testnet-production/global/sslCertificates/rc1-tx-node-lb-forno-cert-drmawdkoofenvgce"]
+  name    = "${var.celo_env}-forno-target-https-proxy"
+  url_map = google_compute_url_map.url_map.id
+  ssl_certificates = [
+    google_compute_managed_ssl_certificate.ssl_cert.id,
+  ]
 }
 
 resource "google_compute_global_forwarding_rule" "forwarding_rule" {
@@ -136,6 +161,6 @@ resource "google_compute_firewall" "allow-health-check" {
 
   allow {
     protocol = "tcp"
-    ports    = ["6000", "6001", "8545", "8546"]
+    ports    = ["6000", "6001", "8000", "8545", "8546"]
   }
 }

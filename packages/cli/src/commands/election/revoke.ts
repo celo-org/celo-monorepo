@@ -24,10 +24,7 @@ export default class ElectionRevoke extends BaseCommand {
   async run() {
     const res = this.parse(ElectionRevoke)
 
-    await newCheckBuilder(this, res.flags.from)
-      .isSignerOrAccount()
-      .isValidatorGroup(res.flags.for)
-      .runChecks()
+    await newCheckBuilder(this, res.flags.from).isSignerOrAccount().runChecks()
 
     const election = await this.kit.contracts.getElection()
     const accounts = await this.kit.contracts.getAccounts()

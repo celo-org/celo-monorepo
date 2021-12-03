@@ -1,1 +1,0 @@
-# Celo Walkthroughs

@@ -6,6 +6,7 @@ import { join as joinPath, resolve as resolvePath } from 'path'
 import readLastLines from 'read-last-lines'
 import Web3 from 'web3'
 import { spawnCmd, spawnCmdWithExitOnFailure } from '../lib/cmd-utils'
+import { envVar, fetchEnvOrFallback } from '../lib/env-utils'
 import {
   AccountType,
   getPrivateKeysFor,
@@ -34,6 +35,7 @@ import {
 import { GethInstanceConfig } from '../lib/interfaces/geth-instance-config'
 import { GethRepository } from '../lib/interfaces/geth-repository'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
+import { stringToBoolean } from '../lib/utils'
 
 const MonorepoRoot = resolvePath(joinPath(__dirname, '../..', '../..'))
 const verboseOutput = false
@@ -191,7 +193,7 @@ export async function assertRevert(promise: any, errorMessage: string = ''): Pro
   try {
     await promise
     assert.fail('Expected revert not received')
-  } catch (error) {
+  } catch (error: any) {
     const revertFound = error.message.search('revert') >= 0
     if (errorMessage === '') {
       assert(revertFound, `Expected "revert", got ${error} instead`)
@@ -215,6 +217,10 @@ export function getHooks(gethConfig: GethRunConfig) {
 }
 
 export function getContext(gethConfig: GethRunConfig, verbose: boolean = verboseOutput) {
+  // Use of mycelo can be enabled through gethConfig or through an env variable
+  const useMycelo =
+    !!gethConfig.useMycelo ||
+    stringToBoolean(fetchEnvOrFallback(envVar.E2E_TESTS_FORCE_USE_MYCELO, 'false'))
   const validatorInstances = gethConfig.instances.filter((x: any) => x.validating)
 
   const numValidators = validatorInstances.length
@@ -240,7 +246,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       await checkoutGethRepo(repo.branch || 'master', repo.path)
     }
 
-    if (gethConfig.useMycelo) {
+    if (useMycelo) {
       await buildGethAll(repo.path)
     } else {
       await buildGeth(repo.path)
@@ -255,7 +261,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       fs.mkdirSync(gethConfig.runPath, { recursive: true })
     }
 
-    if (gethConfig.useMycelo) {
+    if (useMycelo) {
       // Compile the contracts first because mycelo assumes they are compiled already, unless told not to
       if (!gethConfig.myceloSkipCompilingContracts) {
         await spawnCmdWithExitOnFailure('yarn', ['truffle', 'compile'], {
@@ -312,7 +318,7 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       }
     }
 
-    if (gethConfig.useMycelo || !(gethConfig.migrate || gethConfig.migrateTo)) {
+    if (useMycelo || !(gethConfig.migrate || gethConfig.migrateTo)) {
       // Just need to initialize the nodes in this case.  No need to actually start the network
       // since we don't need to run the migrations against it.
       for (const instance of gethConfig.instances) {
@@ -382,6 +388,11 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       if (!instance.privateKey && instance.validating) {
         instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
       }
+
+      if (!instance.minerValidator && (instance.validating || instance.isProxied)) {
+        instance.minerValidator = privateKeyToAddress(instance.privateKey!)
+      }
+
       await startGeth(gethConfig, gethBinaryPath, instance, verbose)
     }
 

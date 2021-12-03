@@ -120,6 +120,7 @@ spec:
 {{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.oracle.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
 {{ include "common.env-var" (dict "name" "CIRCUIT_BREAKER_PRICE_CHANGE_THRESHOLD" "dict" .Values.oracle "value_name" "circuitBreakerPriceChangeThreshold") | indent 8 }}
 {{ include "common.env-var" (dict "name" "CURRENCY_PAIR" "dict" .Values.oracle "value_name" "currencyPair") | indent 8 }}
+{{ include "common.env-var" (dict "name" "MINIMUM_PRICE_SOURCES" "dict" .Values.oracle "value_name" "minPriceSourceCount") | indent 8 }}
 {{ include "common.env-var" (dict "name" "PRICE_SOURCES" "dict" .Values.oracle "value_name" "priceSources") | indent 8 }}
 {{ include "common.env-var" (dict "name" "GAS_PRICE_MULTIPLIER" "dict" .Values.oracle "value_name" "gasPriceMultiplier") | indent 8 }}
 {{ include "common.env-var" (dict "name" "HTTP_RPC_PROVIDER_URL" "dict" .Values.oracle.rpcProviderUrls "value_name" "http") | indent 8 }}

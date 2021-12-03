@@ -47,6 +47,7 @@ blockscout:
       requests:
         memory: 1000Mi
         cpu: 2
+    erlangNodeName: blockscout-indexer
   api:
     port: 4000
     strategy:
@@ -79,7 +80,7 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 10
+    pool_size: 30
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -98,6 +99,7 @@ blockscout:
       requests:
         memory: 500Mi
         cpu: 500m
+    erlangNodeName: blockscout-api
   web:
     port: 4000
     strategy:
@@ -130,7 +132,7 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 10
+    pool_size: 30
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -145,10 +147,24 @@ blockscout:
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
+    sourcify:
+      enabled: true
+      serverUrl: https://sourcify.dev/server
+      repoUrl: https://repo.sourcify.dev/contracts
     resources:
       requests:
         memory: 250M
         cpu: 500m
+    erlangNodeName: blockscout-web
+    appsMenu:
+      enabled: true
+      externalApps: '[{"url":"https://valoraapp.com/", "title":"Valora"}, {"url":"https://celoterminal.com/", "title":"Celo Terminal"}, {"url":"https://celovote.com/", "title":"Celo Vote"}, {"url":"https://celowallet.app/", "title":"Celo Wallet"}]'
+      bridges: '[{"url":"https://optics.xyz/", "title":"Optics"},{"url":"https://bridge.mobius.money/#/", "title": "Mobius"}, {"url":"https://app.allbridge.io/bridge", "title": "Allbridge"}]'
+      otherBridges: '[]'
+      bridgesAlm: '[]'
+      defiList: '[{"url":"https://mento.finance/", "title":"Mento"}, {"url":"https://ubeswap.org/", "title":"Ubeswap"}, {"url":"https://app.sushi.com/swap", "title":"SushiSwap"}, {"url":"https://moola.market/", "title":"Moola Market"}, {"url":"https://app.pooltogether.com/pools/celo/CELO-cUSD", "title":"PoolTogether"}, {"url":"https://autofarm.network/celo/", "title":"Autofarm"}, {"url":"https://app.poof.cash/#/account", "title":"Poof Cash"}]'
+      resourcesList: '[{"url":"https://docs.celo.org/", "title":"Celo Docs"}, {"url":"https://celoreserve.org/", "title":"Celo Reserve"}, {"url":"https://forum.celo.org/", "title":"Celo Forum"}, {"url":"https://celohub.org/", "title":"Celo Hub"}, {"url":"https://thecelo.com/", "title":"TheCelo"}, {"url":"https://stats.celo.org/", "title":"Celo Stats"}, {"url":"https://celo.org/validators/explore", "title":"Validators"}]'
+      learningList: '[{"url": "https://celo.org/papers/whitepaper", "title":"Celo Whitepaper"}, {"url": "https://learn.figment.io/protocols/celo", "title":"Learn Celo"}, {"url": "https://celo.org/papers/stability", "title":"Celo Stability Analysis"}, {"url": "https://www.coinbase.com/price/celo", "title":"Coinbase Earn"}]'
   image:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo
@@ -161,9 +177,9 @@ blockscout:
     name: blockscout
     drop: "false"
   jsonrpc_http_url: http://tx-nodes-private:8545
-  jsonrpc_ws_url: ws://tx-nodes-private:8546
+  jsonrpc_ws_url: ws://tx-nodes-private:8545
   metadata_crawler:
     schedule: "*/30 * * * *"
     image:
       repository: gcr.io/celo-testnet/celo-monorepo
-      tag: metadata-crawler-33bb740ffb4ee7804046f48299f8686416afbe47
+      tag: metadata-crawler-77a392216d4927e85ce4b683508fc0539aa92a34

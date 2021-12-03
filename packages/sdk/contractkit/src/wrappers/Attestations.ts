@@ -440,9 +440,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param tokens List of tokens used for attestation fees.
    * @return AttestationsConfig object
    */
-  async getConfig(tokens: string[]): Promise<AttestationsConfig> {
+  async getConfig(tokens?: string[]): Promise<AttestationsConfig> {
+    const feeTokens =
+      tokens ?? (Object.values(await this.kit.celoTokens.getAddresses()) as string[])
     const fees = await Promise.all(
-      tokens.map(async (token) => {
+      feeTokens.map(async (token) => {
         const fee = await this.attestationRequestFees(token)
         return { fee, address: token }
       })
@@ -457,7 +459,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @dev Returns human readable configuration of the attestations contract
    * @return AttestationsConfig object
    */
-  async getHumanReadableConfig(tokens: string[]) {
+  async getHumanReadableConfig(tokens?: string[]) {
     const config = await this.getConfig(tokens)
     return {
       attestationRequestFees: config.attestationRequestFees,
@@ -708,6 +710,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       smsProvidersRandomized: null,
       maxDeliveryAttempts: null,
       maxRerequestMins: null,
+      twilioVerifySidProvided: null,
     }
 
     if (!hasAttestationSigner) {
@@ -737,7 +740,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       }
 
       attestationServiceURL = attestationServiceURLClaim.url
-    } catch (error) {
+    } catch (error: any) {
       ret.state =
         error.type === 'system'
           ? AttestationServiceStatusState.MetadataTimeout
@@ -767,6 +770,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
       ret.smsProvidersRandomized = statusResponseBody.smsProvidersRandomized
       ret.maxDeliveryAttempts = statusResponseBody.maxDeliveryAttempts
       ret.maxRerequestMins = statusResponseBody.maxRerequestMins
+      ret.twilioVerifySidProvided = statusResponseBody.twilioVerifySidProvided
 
       // Healthcheck was added in 1.0.1, same time version started being reported.
       if (statusResponseBody.version) {
@@ -799,7 +803,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
         // No version implies 1.0.0
         ret.version = '1.0.0'
       }
-    } catch (error) {
+    } catch (error: any) {
       ret.state = AttestationServiceStatusState.UnreachableAttestationService
       ret.error = error
     }
@@ -853,4 +857,5 @@ export interface AttestationServiceStatusResponse {
   smsProvidersRandomized: boolean | null
   maxDeliveryAttempts: number | null
   maxRerequestMins: number | null
+  twilioVerifySidProvided: boolean | null
 }
