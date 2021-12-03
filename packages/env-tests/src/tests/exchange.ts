@@ -35,10 +35,12 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: Sta
           `quote selling ${stableToken}`
         )
 
+        // console.log(exchange.address)
         const approveTx = await stableTokenInstance
           .approve(exchange.address, stableTokenAmountToSell.toString())
           .send()
         await approveTx.waitReceipt()
+        // console.log("approve1")
         const sellTx = await exchange
           .sell(
             stableTokenAmountToSell,
@@ -68,6 +70,7 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: Sta
           .approve(exchange.address, goldAmountToSell.toString())
           .send()
         await approveGoldTx.waitReceipt()
+        // console.log("approve2")
         await sleep(5000)
         const sellGoldTx = await exchange
           .sellGold(
