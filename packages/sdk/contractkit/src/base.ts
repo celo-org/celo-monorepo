@@ -10,6 +10,7 @@ export enum CeloContract {
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   ExchangeEUR = 'ExchangeEUR',
+  ExchangeBRL = 'ExchangeBRL',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -26,6 +27,7 @@ export enum CeloContract {
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   StableTokenEUR = 'StableTokenEUR',
+  StableTokenBRL = 'StableTokenBRL',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
 }
