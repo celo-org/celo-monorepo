@@ -172,6 +172,7 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: 8m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       location ~ /admin/.* {
         deny all;
