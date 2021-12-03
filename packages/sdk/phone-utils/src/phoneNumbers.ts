@@ -1,56 +1,15 @@
-import {
-  getPhoneHash as baseGetPhoneHash,
-  isE164Number,
-  ParsedPhoneNumber,
-} from '@celo/base/lib/phoneNumbers'
-import CountryData from 'country-data'
+import { isE164Number, ParsedPhoneNumber } from '@celo/base/lib/phoneNumbers'
 import {
   PhoneNumber,
   PhoneNumberFormat,
   PhoneNumberType,
   PhoneNumberUtil,
 } from 'google-libphonenumber'
-import { soliditySha3 } from 'web3-utils'
-
-// Exports moved to @celo/base, forwarding them
-// here for backwards compatibility
-
-export { anonymizedPhone, isE164Number, ParsedPhoneNumber } from '@celo/base/lib/phoneNumbers'
-
-const sha3 = (v: string): string | null => soliditySha3({ type: 'string', value: v })
-export const getPhoneHash = (phoneNumber: string, salt?: string): string => {
-  return baseGetPhoneHash(sha3, phoneNumber, salt)
-}
+import getPhoneHash from './getPhoneHash'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
 
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
-export function getCountryEmoji(
-  e164PhoneNumber: string,
-  countryCodePossible?: number,
-  regionCodePossible?: string
-) {
-  // The country code and region code can both be passed in, or it can be inferred from the e164PhoneNumber
-  let countryCode: any
-  let regionCode: any
-  countryCode = countryCodePossible
-  regionCode = regionCodePossible
-  if (!countryCode || !regionCode) {
-    countryCode = getCountryCode(e164PhoneNumber)
-    regionCode = getRegionCode(e164PhoneNumber)
-  }
-  const countries = CountryData.lookup.countries({ countryCallingCodes: `+${countryCode}` })
-  const userCountryArray = countries.filter((c: any) => c.alpha2 === regionCode)
-  const country = userCountryArray.length > 0 ? userCountryArray[0] : undefined
-
-  return country ? country.emoji : ''
-}
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 export function getCountryCode(e164PhoneNumber: string) {
   if (!e164PhoneNumber) {
     return null
@@ -62,9 +21,7 @@ export function getCountryCode(e164PhoneNumber: string) {
     return null
   }
 }
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
+
 export function getRegionCode(e164PhoneNumber: string) {
   if (!e164PhoneNumber) {
     return null
@@ -76,9 +33,7 @@ export function getRegionCode(e164PhoneNumber: string) {
     return null
   }
 }
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
+
 export function getRegionCodeFromCountryCode(countryCode: string) {
   if (!countryCode) {
     return null
@@ -91,9 +46,6 @@ export function getRegionCodeFromCountryCode(countryCode: string) {
   }
 }
 
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 export function getDisplayPhoneNumber(phoneNumber: string, defaultCountryCode: string) {
   const phoneDetails = parsePhoneNumber(phoneNumber, defaultCountryCode)
   if (phoneDetails) {
@@ -104,9 +56,6 @@ export function getDisplayPhoneNumber(phoneNumber: string, defaultCountryCode: s
   }
 }
 
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 export function getDisplayNumberInternational(e164PhoneNumber: string) {
   const countryCode = getCountryCode(e164PhoneNumber)
   const phoneDetails = parsePhoneNumber(e164PhoneNumber, (countryCode || '').toString())
@@ -118,17 +67,11 @@ export function getDisplayNumberInternational(e164PhoneNumber: string) {
   }
 }
 
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 export function getE164DisplayNumber(e164PhoneNumber: string) {
   const countryCode = getCountryCode(e164PhoneNumber)
   return getDisplayPhoneNumber(e164PhoneNumber, (countryCode || '').toString())
 }
 
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 export function getE164Number(phoneNumber: string, defaultCountryCode: string) {
   const phoneDetails = parsePhoneNumber(phoneNumber, defaultCountryCode)
   if (phoneDetails && isE164Number(phoneDetails.e164Number)) {
@@ -139,9 +82,6 @@ export function getE164Number(phoneNumber: string, defaultCountryCode: string) {
 }
 
 // Actually runs through the parsing instead of using a regex
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 export function isE164NumberStrict(phoneNumber: string) {
   try {
     const parsedPhoneNumber = phoneUtil.parse(phoneNumber)
@@ -154,9 +94,6 @@ export function isE164NumberStrict(phoneNumber: string) {
   }
 }
 
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 export function parsePhoneNumber(
   phoneNumberRaw: string,
   defaultCountryCode?: string
@@ -225,9 +162,6 @@ function handleSpecialCasesForParsing(
 
 // TODO(Rossy) Given the inconsistencies of numbers around the world, we should
 // display e164 everywhere to ensure users knows exactly who their sending money to
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 function handleSpecialCasesForDisplay(parsedNumber: PhoneNumber, countryCode?: number) {
   switch (countryCode) {
     // Argentina
@@ -251,9 +185,7 @@ function handleSpecialCasesForDisplay(parsedNumber: PhoneNumber, countryCode?: n
  * Some countries require a prefix before the area code depending on if the number is
  * mobile vs landline and international vs national
  */
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
+
 function prependToFormMobilePhoneNumber(
   parsedNumber: PhoneNumber,
   regionCode: string,
@@ -277,9 +209,6 @@ function prependToFormMobilePhoneNumber(
   return phoneUtil.getNumberType(adjustedNumber) === PhoneNumberType.MOBILE ? adjustedNumber : null
 }
 
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 export function getExampleNumber(
   regionCode: string,
   useOnlyZeroes: boolean = true,
