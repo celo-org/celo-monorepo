@@ -1201,7 +1201,6 @@ contract('GrandaMento', (accounts: string[]) => {
 })
 
 // exchangeRate is the price of the sell token quoted in buy token
-
 export function getBuyAmount(
   exchangeRate: BigNumber,
   sellAmount: BigNumber,
