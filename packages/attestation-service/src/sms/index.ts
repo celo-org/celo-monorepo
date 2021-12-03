@@ -21,7 +21,7 @@ import { obfuscateNumber, SmsProvider, SmsProviderType } from './base'
 import { MessageBirdSmsProvider } from './messagebird'
 import { NexmoSmsProvider } from './nexmo'
 import { TelekomSmsProvider } from './telekom'
-import { TwilioSmsProvider } from './twilio'
+import { TwilioMessagingProvider, TwilioVerifyProvider } from './twilio'
 
 // Maximum delivery attempts (including first) regardless of provider
 const maxDeliveryAttempts = parseInt(
@@ -32,6 +32,7 @@ const maxDeliveryAttempts = parseInt(
 // Time within which we allow forcing a retry of completed (or any state) attestations
 const allowRetryWithinCompletedMs =
   1000 * 60 * parseInt(fetchEnvOrDefault('MAX_REREQUEST_MINS', '55'), 10)
+const maxErrorLength = 255
 
 const smsProviders: SmsProvider[] = []
 const smsProvidersByType: any = {}
@@ -68,13 +69,23 @@ function phoneNumberTypeToString(t: PhoneNumberType): string {
   }
 }
 
+function providerNamesToList(providers: string) {
+  return (
+    providers
+      // Backwards compatibility: 'twilio' as syntactic sugar for 'twilioverify,twiliomessaging'
+      .replace(
+        new RegExp(`\\b(${SmsProviderType.TWILIO})\\b`, 'g'),
+        `${SmsProviderType.TWILIO_VERIFY},${SmsProviderType.TWILIO_MESSAGING}`
+      )
+      .split(',')
+      .filter((t) => t != null && t !== '')
+  )
+}
+
 export async function initializeSmsProviders(
   deliveryStatusURLForProviderType: (type: string) => string
 ) {
-  const smsProvidersToConfigure = fetchEnv('SMS_PROVIDERS')
-    .split(',')
-    .filter((t) => t != null && t !== '') as Array<SmsProviderType | string>
-
+  const smsProvidersToConfigure = providerNamesToList(fetchEnv('SMS_PROVIDERS'))
   if (smsProvidersToConfigure.length === 0) {
     throw new Error('You have to specify at least one sms provider')
   }
@@ -104,11 +115,21 @@ export async function initializeSmsProviders(
         smsProviders.push(nexmoProvider)
         smsProvidersByType[SmsProviderType.NEXMO] = nexmoProvider
         break
-      case SmsProviderType.TWILIO:
-        const twilioProvider = TwilioSmsProvider.fromEnv()
-        await twilioProvider.initialize(deliveryStatusURLForProviderType(configuredSmsProvider))
-        smsProviders.push(twilioProvider)
-        smsProvidersByType[SmsProviderType.TWILIO] = twilioProvider
+      case SmsProviderType.TWILIO_VERIFY:
+        const twilioVerifyProvider = TwilioVerifyProvider.fromEnv()
+        await twilioVerifyProvider.initialize(
+          deliveryStatusURLForProviderType(configuredSmsProvider)
+        )
+        smsProviders.push(twilioVerifyProvider)
+        smsProvidersByType[SmsProviderType.TWILIO_VERIFY] = twilioVerifyProvider
+        break
+      case SmsProviderType.TWILIO_MESSAGING:
+        const twilioMessagingProvider = TwilioMessagingProvider.fromEnv()
+        await twilioMessagingProvider.initialize(
+          deliveryStatusURLForProviderType(configuredSmsProvider)
+        )
+        smsProviders.push(twilioMessagingProvider)
+        smsProvidersByType[SmsProviderType.TWILIO_MESSAGING] = twilioMessagingProvider
         break
       default:
         throw new Error(`Unknown sms provider type specified: ${configuredSmsProvider}`)
@@ -123,9 +144,9 @@ function smsProvidersFor(
   phoneNumber: E164Number,
   logger: Logger
 ): SmsProvider[] {
-  const providersForRegion = fetchEnvOrDefault(`SMS_PROVIDERS_${countryCode}`, '')
-    .split(',')
-    .filter((t) => t != null && t !== '')
+  const providersForRegion = providerNamesToList(
+    fetchEnvOrDefault(`SMS_PROVIDERS_${countryCode}`, '')
+  )
   let providers =
     providersForRegion.length > 0
       ? providersForRegion.map((name) => smsProvidersByType[name])
@@ -183,10 +204,9 @@ function providersToCsv(providers: SmsProvider[]) {
 // but cannot require providers not configured or unsupported for this country code.
 function getProvidersFor(attestation: AttestationModel, logger: Logger) {
   const validProviders = smsProvidersFor(attestation.countryCode, attestation.phoneNumber, logger)
-  const attestationProviders = attestation.providers
-    .split(',')
-    .filter((t) => t != null && t !== '')
-    .map((name) => smsProvidersByType[name])
+  const attestationProviders = providerNamesToList(attestation.providers).map(
+    (name) => smsProvidersByType[name]
+  )
 
   for (const p of attestationProviders) {
     if (!validProviders.find((v) => p.type === v.type)) {
@@ -203,6 +223,8 @@ export async function startSendSms(
   messageToSend: string,
   securityCode: string | null = null,
   attestationCode: string | null = null,
+  appSignature: string | undefined,
+  language: string | undefined,
   logger: Logger,
   sequelizeLogger: SequelizeLogger,
   onlyUseProvider: string | null = null
@@ -243,6 +265,8 @@ export async function startSendSms(
         ongoingDeliveryId: null,
         securityCode,
         securityCodeAttempt: 0,
+        appSignature,
+        language,
       },
       transaction
     )
@@ -285,6 +309,9 @@ export async function startSendSms(
 // immediately if there are sufficient attempts remaining.
 export async function rerequestAttestation(
   key: AttestationKey,
+  appSignature: string | undefined,
+  language: string | undefined,
+  securityCodePrefix: string,
   logger: Logger,
   sequelizeLogger: SequelizeLogger
 ): Promise<AttestationModel> {
@@ -300,6 +327,18 @@ export async function rerequestAttestation(
     attestation = await findAttestationByKey(key, { transaction, lock: Transaction.LOCK.UPDATE })
     if (!attestation) {
       throw new Error('Cannot retrieve attestation')
+    }
+    // For backward compatibility
+    // Can be removed after 1.3.0
+    if (!attestation.appSignature) {
+      attestation.appSignature = appSignature
+    }
+    if (!attestation.language) {
+      attestation.language = language
+    }
+    // Old security code approach did not store the prefix
+    if (attestation.securityCode?.length === 7) {
+      attestation.securityCode = `${securityCodePrefix}${attestation.securityCode}`
     }
 
     if (attestation.completedAt) {
@@ -418,9 +457,9 @@ async function doSendSms(
       .inc()
 
     return false
-  } catch (error) {
+  } catch (error: any) {
     attestation.status = AttestationStatus.NotSent
-    const errorMsg = `${error.message ?? error}`
+    const errorMsg = `${error.message ?? error}`.slice(0, maxErrorLength)
     attestation.recordError(errorMsg)
     attestation.ongoingDeliveryId = null
     attestation.attempt += 1

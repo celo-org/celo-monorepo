@@ -86,5 +86,38 @@ onboarding:
     synchronize: true
     ssl: true
 
+rewards:
+  segmentApiKey: 'writeApiKey'
+  shouldSendRewards: false
+  relayer:
+    node_env: production
+    image:
+      repository: celotestnet.azurecr.io/komenci/relayer
+      tag: dae43ddce108a73da07dce73875b980ff077c7d4
+    replicas: 2
+    port: 3000
+    identities:
+    - address: 0xb04390478A57E3C2147599D5380434f25fa5234d
+      privateKey: 0x000
+      azure:
+        id: defaultId
+        clientId: defaultClientId
+        keyVaultName: staging-komenci-rewards
+    azureHsm:
+      initTryCount: 5
+      initMaxRetryBackoffMs: 30000
+    metrics:
+      enabled: true
+      prometheusPort: 9090
+    walletType: azure-hsm
+    gasPriceUpdateIntervalMs: "1200000"
+  db:
+    host: komenci-komenci-postgresql
+    port: 5432
+    username: 'postgres'
+    database: 'postgres'
+    synchronize: true
+    ssl: true
+
 loggingAgent:
   credentials: eydleGFtcGxlJzogJ2NyZWRlbnRpYWxzJ30K # base64 credentials.json of a gcloud service account

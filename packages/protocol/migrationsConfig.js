@@ -117,10 +117,20 @@ const DefaultConfig = {
     useMultiSig: true,
   },
   grandaMento: {
-    approver: '0x0000000000000000000000000000000000000000',
+    approver: network.from,
     maxApprovalExchangeRateChange: 0.3, // 30%
-    spread: 0.01, // 1%
-    vetoPeriodSeconds: 3 * HOUR, // > the 2 hour minimum possible governance proposal completion time.
+    spread: 0, // 0%
+    vetoPeriodSeconds: 10, // Set to 10 seconds for env-tests, this should be > time needed for a governance proposal in practice
+    stableTokenExchangeLimits: {
+      StableToken: {
+        min: '50000000000000000000000', // 50,000
+        max: '50000000000000000000000000', // 50,000,000
+      },
+      StableTokenEUR: {
+        min: '40000000000000000000000', // 40,000
+        max: '40000000000000000000000000', // 40,000,000
+      },
+    },
   },
   lockedGold: {
     unlockingPeriod: 3 * DAY,

@@ -55,6 +55,26 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   )
 
   /**
+   * @notice Returns a list of weights used for the allocation of reserve assets.
+   * @return An array of a list of weights used for the allocation of reserve assets.
+   */
+  getAssetAllocationWeights = proxyCall(
+    this.contract.methods.getAssetAllocationWeights,
+    undefined,
+    (weights) => weights.map(valueToBigNumber)
+  )
+
+  /**
+   * @notice Returns a list of token symbols that have been allocated.
+   * @return An array of token symbols that have been allocated.
+   */
+  getAssetAllocationSymbols = proxyCall(
+    this.contract.methods.getAssetAllocationSymbols,
+    undefined,
+    (symbols) => symbols.map(this.kit.web3.utils.hexToAscii)
+  )
+
+  /**
    * @alias {getReserveCeloBalance}
    */
   getReserveGoldBalance = proxyCall(

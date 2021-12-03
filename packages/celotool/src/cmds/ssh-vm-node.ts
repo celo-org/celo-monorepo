@@ -12,19 +12,31 @@ interface SshVmNodeArgv extends CeloEnvArgv {
   nodeIndex?: number
 }
 
+interface CheckArgs {
+  'celo-env': unknown
+  nodeType: string | undefined
+  nodeIndex?: string
+}
+
 export const builder = (argv: yargs.Argv) => {
+  const choices: readonly string[] = [
+    'validator',
+    'tx-node',
+    'tx-node-private',
+    'bootnode',
+    'proxy',
+  ]
   return addCeloEnvMiddleware(argv)
     .positional('nodeType', {
       describe: 'Type of node',
-      choices: ['validator', 'tx-node', 'tx-node-private', 'bootnode', 'proxy'],
-      type: 'string',
+      choices,
     })
     .positional('nodeIndex', {
       describe: 'Index of the node. Only needed for validator or tx-node',
       type: 'string',
       coerce: indexCoercer,
     })
-    .check((checkArgv: SshVmNodeArgv) => {
+    .check((checkArgv: CheckArgs) => {
       const requiresIndex = checkArgv.nodeType !== 'bootnode'
       if (requiresIndex && checkArgv.nodeIndex === undefined) {
         return new Error(`nodeIndex is required for nodeType ${checkArgv.nodeType}`)
