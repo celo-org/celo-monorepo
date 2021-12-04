@@ -24,7 +24,7 @@ metadata:
 spec:
   serviceName: eksportisto-indexer
   podManagementPolicy: Parallel
-  replicas: 32
+  replicas: 8
   selector:
     matchLabels:
       app: eksportisto
