@@ -41,5 +41,5 @@ data:
         table: data
       destination: bigquery
       dequeueTimeoutMilliseconds: 5000
-      blockRetryAttempts: 3
+      blockRetryAttempts: 1
       blockRetryDelayMilliseconds: 1000
