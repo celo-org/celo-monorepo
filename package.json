@@ -29,7 +29,8 @@
     "celotool": "yarn --cwd packages/celotool run --silent cli",
     "celocli": "yarn --cwd packages/cli run --silent celocli",
     "update-dependency-graph": "ts-node ./scripts/update_dependency_graph.ts",
-    "deploy-sdks": "ts-node ./scripts/deploy-sdks.ts"
+    "deploy-sdks": "ts-node ./scripts/deploy-sdks.ts",
+    "deprecate-sdks": "ts-node ./scripts/unpublish-sdks.ts"
   },
   "husky": {
     "hooks": {
