@@ -17,7 +17,7 @@ const lightUrl = 'http://localhost:8546'
 
 const notYetActivatedError = 'support for eth-compatible transactions is not enabled'
 const notCompatibleError = 'ethCompatible is true, but non-eth-compatible fields are present'
-const noReplayProtectionError = 'replay protection is required'
+const noReplayProtectionError = 'only replay-protected (EIP-155) transactions allowed over RPC'
 
 const validatorPrivateKey = generatePrivateKey(mnemonic, AccountType.VALIDATOR, 0)
 const validatorAddress = privateKeyToAddress(validatorPrivateKey)
@@ -151,6 +151,21 @@ function getGethRunConfig(withDonut: boolean): GethRunConfig {
   }
 }
 
+/**
+ * Copied from ethereumjs-utils
+ * Trims leading zeros from a `Buffer` or `Number[]`.
+ * @param a (Buffer|Uint8Array)
+ * @return (Buffer|Uint8Array)
+ */
+function stripZeros(a: any): Buffer | Uint8Array {
+  let first = a[0]
+  while (a.length > 0 && first.toString() === '0') {
+    a = a.slice(1)
+    first = a[0]
+  }
+  return a
+}
+
 // TestEnv encapsulates a pre-Donut or post-Donut environment and the tests to run on it
 class TestEnv {
   testCases: TestCase[]
@@ -244,7 +259,11 @@ class TestEnv {
     const signingHash = ejsUtil.rlphash(arr)
     const pk = ejsUtil.addHexPrefix(validatorPrivateKey)
     const sig = ejsUtil.ecsign(signingHash, ejsUtil.toBuffer(pk))
-    arr.push(ejsUtil.bufferToHex(sig.v), ejsUtil.bufferToHex(sig.r), ejsUtil.bufferToHex(sig.s))
+    arr.push(
+      ejsUtil.bufferToHex(stripZeros(sig.v)),
+      ejsUtil.bufferToHex(stripZeros(sig.r)),
+      ejsUtil.bufferToHex(stripZeros(sig.s))
+    )
     return ejsUtil.bufferToHex(encode(arr))
   }
 
@@ -269,33 +288,14 @@ class TestEnv {
           error = err.message
         }
       })
-
-      if (ethCompatible && !this.cipIsActivated) {
-        it('fails due to being ethereum-compatible', () => {
-          assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
-          assert.match(
-            error!,
-            new RegExp(notYetActivatedError),
-            `Got "${error}", expected "${notYetActivatedError}"`
-          )
-        })
-      } else if (this.cipIsActivated) {
-        // Replay protection is mandatory, so the transaction should fail
-        it('fails due to replay protection being mandatory', () => {
-          assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
-          assert.match(
-            error!,
-            new RegExp(noReplayProtectionError),
-            `Got "${error}", expected "${noReplayProtectionError}"`
-          )
-        })
-      } else {
-        // Should succeed, since replay protection is optional before Donut
-        it('succeeds', () => {
-          assert.isNull(error, 'Transaction failed when it should have succeeded')
-          assert.isFalse(minedTx.ethCompatible, 'Transaction has wrong ethCompatible value')
-        })
-      }
+      // Replay protection is mandatory, so the transaction should fail
+      // At this point all non protected transactions are rejected over the RPC as they
+      // will not be accepted now or in the future.
+      it('fails due to replay protection being mandatory', () => {
+        assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
+        console.warn(error!)
+        assert.equal(error!, noReplayProtectionError)
+      })
     })
   }
 
@@ -357,6 +357,7 @@ class TestEnv {
             // Once the transaction is signed and encoded, it doesn't matter whether we send it with web3 or contractkit
             txHash = (await w3.eth.sendSignedTransaction(raw)).transactionHash
           } else {
+            tx.chainId = undefined //  clear the chainId b/c web3js won't format it as a hex bignum...
             // Send using `eth_sendTransaction`
             const params: any = tx // haven't added `ethCompatible` to the tx type
             // Only include ethCompatible if it's true.  This confirms that omitting it results to normal Celo
