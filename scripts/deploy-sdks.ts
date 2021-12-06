@@ -68,14 +68,14 @@ type Answers = {
         'Invalid version given. Version must be major, minor, patch, or a semantic version.'
       )
     )
-    process.exit()
+    process.exit(1)
   }
 
   const shouldPublish = publish === 'Y' || publish === 'dry-run'
 
   if (!shouldPublish && !version) {
     console.error(colors.red('Either a version or --publish must be given'))
-    process.exit()
+    process.exit(1)
   }
 
   const sdkPackagePaths = findPackagePaths(path.join(__dirname, '..', 'packages', 'sdk'))
@@ -183,7 +183,7 @@ type Answers = {
       JSON.stringify({ packages: failedPackages, version: newVersion, publish })
     )
     console.error(colors.red(`Fix failed packages and try again.`))
-    process.exit()
+    process.exit(1)
   }
 
   const failedJsonPath = path.join(__dirname, 'failedSDKs.json')

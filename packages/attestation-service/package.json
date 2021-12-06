@@ -29,9 +29,9 @@
     "test-send-sms-twilio": "TS_NODE_FILES=true CONFIG=config/.env.development ts-node scripts/test-send-sms-twilio.ts"
   },
   "dependencies": {
-    "@celo/contractkit": "1.3.3-dev",
-    "@celo/keystores": "1.3.3-dev",
-    "@celo/utils": "1.3.3-dev",
+    "@celo/contractkit": "1.4.1-dev",
+    "@celo/keystores": "1.4.1-dev",
+    "@celo/utils": "1.4.1-dev",
     "bignumber.js": "^9.0.0",
     "body-parser": "1.19.0",
     "bunyan": "1.8.12",
