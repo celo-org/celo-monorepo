@@ -7,9 +7,6 @@ interface CountryNames {
   [name: string]: string
 }
 
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 export interface LocalizedCountry extends Omit<countryData.Country, 'countryCallingCodes'> {
   displayName: string
   displayNameNoDiacritics: string
@@ -37,9 +34,6 @@ const matchCountry = (country: LocalizedCountry, query: string) => {
   )
 }
 
-/**
- * @deprecated moved to @celo/phone-utils will be removed in next major version
- */
 export class Countries {
   language: string
   countryMap: Map<string, LocalizedCountry>
