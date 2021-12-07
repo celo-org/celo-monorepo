@@ -843,10 +843,9 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
 }
 
 async function helmCommand(command: string, pipeOutput = false) {
-  if (isCelotoolVerbose() && !command.includes(' dep build ')) {
-    await execCmdWithExitOnFailure(command + ' --dry-run --debug')
-  } else if (isCelotoolVerbose()) {
-    await execCmdWithExitOnFailure(command + ' --debug')
+  // "helm diff" is a plugin and doesn't support "--debug"
+  if (isCelotoolVerbose() && !command.startsWith('helm diff')) {
+    command += ' --debug'
   }
 
   await execCmdWithExitOnFailure(command, {}, pipeOutput)

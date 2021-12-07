@@ -34,6 +34,7 @@ targets:
       alfajores: alfajores
       baklavastaging: baklava
       mainnet: rc1
+      rc1staging: rc1staging
     endpoints:
       - port: http
         path: /metrics/web  # Web & API
@@ -51,6 +52,7 @@ targets:
       rc1-southamerica-east1: rc1
       rc1-us-east1: rc1
       rc1-us-west1: rc1
+      rc1staging: rc1staging
     endpoints:
       - port: pprof
         path: /debug/metrics/prometheus

@@ -195,8 +195,8 @@ const DefaultConfig = {
   stableTokenBRL: {
     decimals: 18,
     goldPrice: 1.2,
-    tokenName: 'Celo Euro',
-    tokenSymbol: 'cEUR',
+    tokenName: 'Celo Brazilian Real',
+    tokenSymbol: 'cREAL',
     inflationRate: 1,
     inflationPeriod: 1.5 * YEAR,
     initialBalances: {
