@@ -4,6 +4,7 @@ import { chain, isLeft } from 'fp-ts/lib/Either'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 import { Backup } from './backup'
+import { ComputationalHardeningFunction } from './config'
 import { DecodeError } from './errors'
 
 const BASE64_REGEXP = /^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/
@@ -40,6 +41,22 @@ export const BackupSchema: t.Type<Backup, object> = t.intersection([
     odisDomain: SequentialDelayDomainSchema,
     metadata: t.UnknownRecord,
     encryptedFuseKey: BufferFromBase64,
+    computationalHardening: t.union([
+      t.type({
+        function: t.literal(ComputationalHardeningFunction.PBKDF),
+        iterations: t.number,
+      }),
+      t.intersection([
+        t.type({
+          function: t.literal(ComputationalHardeningFunction.SCRYPT),
+          cost: t.number,
+        }),
+        t.partial({
+          blockSize: t.number,
+          parallelization: t.number,
+        }),
+      ]),
+    ]),
     environment: t.partial({
       odis: t.type({
         odisUrl: t.string,

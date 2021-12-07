@@ -57,7 +57,6 @@ export interface CircuitBreakerConfig {
 export enum ComputationalHardeningFunction {
   PBKDF = 'pbkdf2_sha256',
   SCRYPT = 'scrypt',
-  NONE = 'none',
 }
 
 export interface PbkdfConfig {
