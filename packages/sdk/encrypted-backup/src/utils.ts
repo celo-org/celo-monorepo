@@ -98,8 +98,8 @@ export function pbkdf2(key: Buffer, iterations: number): Promise<Result<Buffer, 
 /** Cost parameters for the scrypt computational hardening function. */
 export interface ScryptOptions {
   cost: number
-  blockSize: number
-  parallelization: number
+  blockSize?: number
+  parallelization?: number
 }
 
 /**
@@ -118,7 +118,7 @@ export interface ScryptOptions {
 export function scrypt(key: Buffer, options: ScryptOptions): Promise<Result<Buffer, ScryptError>> {
   // Define the maxmem parameter to be large enough to accommodate the provided options.
   // See the Node JS crypto implementation of scrypt for more detail.
-  const maxmem = Math.max(32 * 1024 * 1024, 196 * options.cost * options.blockSize)
+  const maxmem = Math.max(32 * 1024 * 1024, 128 * options.cost * (options.blockSize ?? 8))
   return new Promise((resolve) => {
     crypto.scrypt(key, KDFInfo.SCRYPT, 32, { maxmem, ...options }, (error, result) => {
       if (error) {

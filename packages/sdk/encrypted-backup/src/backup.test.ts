@@ -6,7 +6,7 @@ import { MockCircuitBreaker } from '@celo/identity/lib/odis/circuit-breaker.mock
 import { defined, noBool } from '@celo/utils/lib/sign-typed-data-utils'
 import debugFactory from 'debug'
 import { Backup, createBackup, openBackup } from './backup'
-import { HardeningConfig } from './config'
+import { ComputationalHardeningFunction, HardeningConfig } from './config'
 import { BackupErrorTypes } from './errors'
 import { MockOdis } from './odis.mock'
 import { deserializeBackup, serializeBackup } from './schema'
@@ -33,6 +33,10 @@ const TEST_HARDENING_CONFIG: HardeningConfig = {
   },
   circuitBreaker: {
     environment: MockCircuitBreaker.environment,
+  },
+  computational: {
+    function: ComputationalHardeningFunction.SCRYPT,
+    cost: 1024,
   },
 }
 

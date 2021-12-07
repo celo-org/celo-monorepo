@@ -300,6 +300,7 @@ export async function createBackup({
     nonce,
     odisDomain: domain,
     encryptedFuseKey,
+    computationalHardening: hardening.computational,
     version: '0.0.1',
     metadata,
     environment: {
