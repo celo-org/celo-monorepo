@@ -6,7 +6,7 @@ import { clearAllFundsToRoot, parseStableTokensList } from './scaffold'
 import { runExchangeTest } from './tests/exchange'
 import { runTransfersTest } from './tests/transfer'
 
-const DEFAULT_TOKENS_TO_TEST = [StableToken.cREAL]
+const DEFAULT_TOKENS_TO_TEST = [StableToken.cUSD]
 
 jest.setTimeout(120000)
 
