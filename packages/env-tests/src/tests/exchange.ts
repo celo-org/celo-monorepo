@@ -39,7 +39,6 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: Sta
           .approve(exchange.address, stableTokenAmountToSell.toString())
           .send()
         await approveTx.waitReceipt()
-        // console.log("approve1")
         const sellTx = await exchange
           .sell(
             stableTokenAmountToSell,
