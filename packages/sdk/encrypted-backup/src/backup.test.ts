@@ -40,23 +40,27 @@ const TEST_HARDENING_CONFIG: HardeningConfig = {
   },
 }
 
+let mockOdis: MockOdis | undefined
+let mockCircuitBreaker: MockCircuitBreaker | undefined
+
+beforeEach(() => {
+  fetchMock.reset()
+  fetchMock.config.overwriteRoutes = true
+
+  // Mock ODIS using the mock implementation defined above.
+  mockOdis = new MockOdis()
+  mockOdis.install(fetchMock)
+
+  // Mock the circuit breaker service using the implementation from the identity library.
+  mockCircuitBreaker = new MockCircuitBreaker()
+  mockCircuitBreaker.install(fetchMock)
+})
+
+afterEach(() => {
+  fetchMock.reset()
+})
+
 describe('end-to-end', () => {
-  beforeEach(() => {
-    fetchMock.reset()
-
-    // Mock ODIS using the mock implementation defined above.
-    const mockOdis = new MockOdis()
-    mockOdis.install(fetchMock)
-
-    // Mock the circuit breaker service using the implementation from the identity library.
-    const mockCircuitBreaker = new MockCircuitBreaker()
-    mockCircuitBreaker.install(fetchMock)
-  })
-
-  afterEach(() => {
-    fetchMock.reset()
-  })
-
   it('should be able to create, serialize, deserialize, and open a backup', async () => {
     const testData = Buffer.from('backup test data', 'utf8')
     const testPassword = Buffer.from('backup test password', 'utf8')
@@ -113,28 +117,8 @@ describe('end-to-end', () => {
 })
 
 describe('createBackup', () => {
-  let mockOdis: MockOdis | undefined
-  let mockCircuitBreaker: MockCircuitBreaker | undefined
-
   const testData = Buffer.from('backup test data', 'utf8')
   const testPassword = Buffer.from('backup test password', 'utf8')
-
-  beforeEach(() => {
-    fetchMock.reset()
-    fetchMock.config.overwriteRoutes = true
-
-    // Mock ODIS using the mock implementation defined above.
-    mockOdis = new MockOdis()
-    mockOdis.install(fetchMock)
-
-    // Mock the circuit breaker service using the implementation from the identity library.
-    mockCircuitBreaker = new MockCircuitBreaker()
-    mockCircuitBreaker.install(fetchMock)
-  })
-
-  afterEach(() => {
-    fetchMock.reset()
-  })
 
   it('should return a fetch error when request to ODIS fails', async () => {
     mockOdis!.installSignEndpoint(fetchMock, { throws: new Error('fetch failed') })
@@ -263,25 +247,11 @@ describe('createBackup', () => {
 })
 
 describe('openBackup', () => {
-  let mockOdis: MockOdis | undefined
-  let mockCircuitBreaker: MockCircuitBreaker | undefined
-
   const testPassword = Buffer.from('backup test password', 'utf8')
   const testData = Buffer.from('backup test data', 'utf8')
   let testBackup: Backup | undefined
 
   beforeEach(async () => {
-    fetchMock.reset()
-    fetchMock.config.overwriteRoutes = true
-
-    // Mock ODIS using the mock implementation defined above.
-    mockOdis = new MockOdis()
-    mockOdis.install(fetchMock)
-
-    // Mock the circuit breaker service using the implementation from the identity library.
-    mockCircuitBreaker = new MockCircuitBreaker()
-    mockCircuitBreaker.install(fetchMock)
-
     // Create a backup to use for tests of opening below
     const testBackupResult = await createBackup({
       data: testData,
@@ -294,8 +264,63 @@ describe('openBackup', () => {
     testBackup = testBackupResult.result
   })
 
-  afterEach(() => {
-    fetchMock.reset()
+  it('should result in a decryption error if the encrypted data is modified', async () => {
+    // Flip a bit in the encrypted data.
+    testBackup!.encryptedData[0] ^= 0x01
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.DECRYPTION_ERROR)
+  })
+
+  it('should result in a decryption error if odis domain is modified', async () => {
+    testBackup!.odisDomain!.salt = defined('some salt')
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.DECRYPTION_ERROR)
+  })
+
+  it('should result in a decryption error if the circuit breaker response changes', async () => {
+    mockCircuitBreaker!.installUnwrapKeyEndpoint(fetchMock, {
+      status: 200,
+      body: { plaintext: Buffer.from('bad fuse key').toString('base64') },
+    })
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.DECRYPTION_ERROR)
+  })
+
+  it('should result in a decryption error if the computational hardening is altered', async () => {
+    testBackup!.computationalHardening = {
+      function: ComputationalHardeningFunction.SCRYPT,
+      cost: 16,
+    }
+    const result = await openBackup({
+      backup: testBackup!,
+      password: testPassword,
+    })
+    expect(result.ok).toBe(false)
+    if (result.ok) {
+      return
+    }
+    expect(result.error.errorType).toEqual(BackupErrorTypes.DECRYPTION_ERROR)
   })
 
   it('should return a fetch error when request to ODIS fails', async () => {

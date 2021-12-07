@@ -101,7 +101,10 @@ export class MockOdis {
       body: {
         success: true,
         version: 'mock',
-        signature: `<signature on ${req.blindedMessage}>`,
+        signature: Buffer.from(
+          `<signature on ${req.blindedMessage} in domain ${hash}>`,
+          'utf8'
+        ).toString('base64'),
       },
     }
   }
@@ -114,8 +117,11 @@ export class MockOdis {
       },
       override ??
         ((url: string, req: { body: string }) => {
-          debug('Mocking request', { url, req })
-          return this.quota(JSON.parse(req.body) as DomainQuotaStatusRequest<SequentialDelayDomain>)
+          const res = this.quota(
+            JSON.parse(req.body) as DomainQuotaStatusRequest<SequentialDelayDomain>
+          )
+          debug('Mocking request', { url, req, res })
+          return res
         })
     )
   }
@@ -128,10 +134,11 @@ export class MockOdis {
       },
       override ??
         ((url: string, req: { body: string }) => {
-          debug('Mocking request', { url, req })
-          return this.sign(
+          const res = this.sign(
             JSON.parse(req.body) as DomainRestrictedSignatureRequest<SequentialDelayDomain>
           )
+          debug('Mocking request', { url, req, res })
+          return res
         })
     )
   }
