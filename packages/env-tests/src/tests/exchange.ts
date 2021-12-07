@@ -68,7 +68,6 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: Sta
           .approve(exchange.address, goldAmountToSell.toString())
           .send()
         await approveGoldTx.waitReceipt()
-        // console.log("approve2")
         await sleep(5000)
         const sellGoldTx = await exchange
           .sellGold(
