@@ -35,10 +35,10 @@ function runTests() {
     // TODO: Assert maximum loss after test
     runTransfersTest(context, stableTokensToTest)
     runExchangeTest(context, stableTokensToTest)
-    // runOracleTest(context)
-    // runReserveTest(context)
-    // runAttestationTest(context)
-    // runGrandaMentoTest(context, stableTokensToTest)
+    runOracleTest(context)
+    runReserveTest(context)
+    runAttestationTest(context)
+    runGrandaMentoTest(context, stableTokensToTest)
 
     // TODO: Governance Proposals
     // TODO: Validator election + Slashing
