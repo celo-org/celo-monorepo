@@ -35,7 +35,6 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: Sta
           `quote selling ${stableToken}`
         )
 
-        // console.log(exchange.address)
         const approveTx = await stableTokenInstance
           .approve(exchange.address, stableTokenAmountToSell.toString())
           .send()
