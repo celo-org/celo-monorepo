@@ -23,7 +23,7 @@ OPTIONS
 
   --globalHelp                                       View all available global flags
 
-  --stableToken=(cUSD|cusd|cEUR|ceur)                [default: cUSD] Name of the stable
+  --stableToken=(cUSD|cusd|cEUR|ceur|cREAL|creal)    [default: cUSD] Name of the stable
                                                      to receive
 
   --value=10000000000000000000000                    (required) The value of CELO to
@@ -120,7 +120,7 @@ OPTIONS
 
   --globalHelp                                       View all available global flags
 
-  --stableToken=(cUSD|cusd|cEUR|ceur)                [default: cUSD] Name of the stable
+  --stableToken=(cUSD|cusd|cEUR|ceur|cREAL|creal)    [default: cUSD] Name of the stable
                                                      to receive
 
   --value=10000000000000000000000                    (required) The value of CELO to
@@ -176,7 +176,7 @@ OPTIONS
 
   --globalHelp                                       View all available global flags
 
-  --stableToken=(cUSD|cusd|cEUR|ceur)                Name of the stable token to be
+  --stableToken=(cUSD|cusd|cEUR|ceur|cREAL|creal)    Name of the stable token to be
                                                      transfered
 
   --value=10000000000000000000000                    (required) The value of Stable
