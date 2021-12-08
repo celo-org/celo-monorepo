@@ -27,7 +27,7 @@ testWithGanache('StableToken Wrapper', async (web3) => {
     },
     [StableToken.cREAL]: {
       stableToken: StableToken.cREAL,
-      name: 'Celo Brazilian Rean',
+      name: 'Celo Brazilian Real',
       symbol: 'cREAL',
     },
   }
