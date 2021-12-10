@@ -64,7 +64,8 @@ export async function destroyKongAndKonga() {
 
 async function kongHelmParamenters(celoEnv: string) {
   // GCP Internal infra ips
-  let trustedIPs = '130.211.0.0/22,35.191.0.0/16'
+  let trustedIPs =
+    '130.211.0.0/22,35.191.0.0/16,173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22'
   const fornoPublicGlobalIp = await retrieveIPAddress(`${celoEnv}-forno-global-address`, 'global')
   trustedIPs = `${trustedIPs},${fornoPublicGlobalIp}/32`
   return [
@@ -86,7 +87,8 @@ export async function createUpdateKongConfigMap(celoEnv: string) {
   // We need to patch this file with the forno public ip as this ip will forward
   // the requests and need to put in the config file so kong/nginx can consider
   // that ip as internal
-  let trustedIPs = '130.211.0.0/22,35.191.0.0/16'
+  let trustedIPs =
+    '130.211.0.0/22,35.191.0.0/16,173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22'
   const fornoPublicGlobalIp = await retrieveIPAddress(`${celoEnv}-forno-global-address`, 'global')
   trustedIPs = `${trustedIPs},${fornoPublicGlobalIp}/32`
   const re = '/^trusted_ips = .+$/g'

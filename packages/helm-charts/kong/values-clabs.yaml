@@ -7,6 +7,11 @@ ingressController:
 
 postgresql:
   postgresqlPassword: kong
+  postgresqlPostgresPassword: kong
+  resources:
+    requests:
+      memory: 12Gi
+      cpu: '6'
 
 service:
   exposeAdmin: true
@@ -19,6 +24,7 @@ extraVolumes:
     name: kong-config
 
 kong:
+  replicaCount: 1
   extraVolumeMounts:
   - name: kong-config
     mountPath: /opt/bitnami/kong/conf/kong.conf.backup
@@ -26,14 +32,22 @@ kong:
 
   extraEnvVars:
   - name: KONG_TRUSTED_IPS
-    value: 130.211.0.0/22,35.191.0.0/16,34.120.148.61/32
+    value: 130.211.0.0/22,35.191.0.0/16,173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22,34.120.92.225/32
   - name: KONG_REAL_IP_HEADER
     value: X-Forwarded-For
   - name: KONG_REAL_IP_RECURSIVE
     value: "on"
+  - name: KONG_PG_MAX_CONCURRENT_QUERIES
+    value: "400"
   - name: KONG_PROXY_ACCESS_LOG
     value: /dev/stdout geth
   - name: KONG_ADMIN_ACCESS_LOG
     value: /dev/stdout geth
   - name: KONG_NGINX_HTTP_LOG_FORMAT
-    value: geth '$remote_addr - $remote_user [$time_local] "$request" $status  $body_bytes_sent "$http_referer" "$http_user_agent" "$http_x_forwarded_for" "$remote_addr"'
+    value: geth escape=json '$remote_addr - $remote_user [$time_local] "$request"
+      $status  $body_bytes_sent "$http_referer" "$http_user_agent" "$http_x_forwarded_for"
+      "$remote_addr" $request_body'
+  resources:
+    requests:
+      memory: 12Gi
+      cpu: '6'
