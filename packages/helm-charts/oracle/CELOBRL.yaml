@@ -1,0 +1,31 @@
+oracle:
+  currencyPair: CELOBRL
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      maxPercentageDeviation: 0.05
+      maxPercentageBidAskSpread: 0.025
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  priceSources: "[
+      [
+        { exchange: 'BINANCE', symbol: 'CELOBTC', toInvert: false },
+        { exchange: 'BINANCE', symbol: 'BTCBRL', toInvert: false }
+      ],
+      [
+        { exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false},
+        { exchange: 'BITSO', symbol: 'BTCBRL', toInvert: false }
+      ],
+      [
+        { exchange: 'BITTREX', symbol: 'CELOBTC', toInvert: false },
+        { exchange: 'NOVADAX', symbol: 'BTCBRL', toInvert: false }
+      ]
+    ]"
+  minPriceSourceCount: 2
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      minReportPriceChangeThreshold: 0.005 # 0.5%
