@@ -16,8 +16,8 @@ import {
 import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 
 export enum KeyName {
-  phoneNumberPrivacy = 'phoneNumberPrivacy',
-  domains = 'domains',
+  PHONE_NUMBER_PRIVACY = 'phoneNumberPrivacy',
+  DOMAINS = 'domains',
 }
 
 export interface GetBlindedMessageSigRequest {

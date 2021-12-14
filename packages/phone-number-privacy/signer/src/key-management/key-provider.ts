@@ -10,11 +10,11 @@ let keyProvider: KeyProvider
 
 export const keysToPrefetch: Key[] = [
   {
-    name: KeyName.phoneNumberPrivacy,
+    name: KeyName.PHONE_NUMBER_PRIVACY,
     version: config.keystore.keys.phoneNumberPrivacy.latest,
   },
   {
-    name: KeyName.domains,
+    name: KeyName.DOMAINS,
     version: config.keystore.keys.domains.latest,
   },
 ]

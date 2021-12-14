@@ -47,9 +47,9 @@ export abstract class KeyProviderBase implements KeyProvider {
 
   protected getCustomKeyName(key: Key) {
     switch (key.name) {
-      case KeyName.phoneNumberPrivacy:
+      case KeyName.PHONE_NUMBER_PRIVACY:
         return config.keystore.keys.phoneNumberPrivacy.name || key.name
-      case KeyName.domains:
+      case KeyName.DOMAINS:
         return config.keystore.keys.domains.name || key.name
       default:
         return key.name

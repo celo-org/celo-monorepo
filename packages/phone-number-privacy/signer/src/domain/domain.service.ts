@@ -5,8 +5,8 @@ import {
   DomainRestrictedSignatureRequest,
   DomainStatusResponse,
   ErrorMessage,
-  KEY_VERSION_HEADER,
   KeyName,
+  KEY_VERSION_HEADER,
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -17,7 +17,7 @@ import { respondWithError } from '../common/error-utils'
 import { Counters } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { getTransaction } from '../database/database'
-import { DOMAINS_STATES_COLUMNS, DomainState } from '../database/models/domainState'
+import { DomainState, DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
 import {
   getDomainState,
   getDomainStateWithLock,
@@ -143,7 +143,7 @@ export class DomainService implements IDomainService {
     })
 
     const key: Key = {
-      name: KeyName.domains,
+      name: KeyName.DOMAINS,
       version: Number(request.headers[KEY_VERSION_HEADER]) || config.keystore.keys.domains.latest,
     }
 

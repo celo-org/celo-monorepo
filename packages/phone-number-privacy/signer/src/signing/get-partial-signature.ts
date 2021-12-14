@@ -5,8 +5,8 @@ import {
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
-  KEY_VERSION_HEADER,
   KeyName,
+  KEY_VERSION_HEADER,
   SignMessageResponse,
   SignMessageResponseFailure,
   WarningMessage,
@@ -47,7 +47,7 @@ export async function handleGetBlindedMessagePartialSig(
   logger.debug('Begin handleGetBlindedMessagePartialSig')
 
   const key: Key = {
-    name: KeyName.phoneNumberPrivacy,
+    name: KeyName.PHONE_NUMBER_PRIVACY,
     version:
       Number(request.headers[KEY_VERSION_HEADER]) || config.keystore.keys.phoneNumberPrivacy.latest,
   }
