@@ -186,6 +186,9 @@ async function handleSuccessResponse(
   const logger: Logger = response.locals.logger
   const keyVersion: number = Number(response.header(KEY_VERSION_HEADER))
   logger.info({ keyVersion }, 'Signer responded with key version')
+  if (keyVersion !== config.keyVersions.phoneNumberPrivacy.toString()) {
+    throw new Error(`Incorrect key version received from signer ${serviceUrl}`)
+  }
   const signResponse = JSON.parse(data) as SignerResponse
   if (!signResponse.success) {
     // Continue on failure as long as signature is present to unblock user
