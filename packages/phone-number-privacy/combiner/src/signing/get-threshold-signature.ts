@@ -61,7 +61,6 @@ export async function handleGetBlindedMessageSig(request: Request, response: Res
 
 async function requestSignatures(request: Request, response: Response) {
   const responses: SignMsgRespWithStatus[] = []
-  const sentResult = { sent: false }
   const failedRequests = new Set<string>()
   const errorCodes: Map<number, number> = new Map()
   const blsCryptoClient = new BLSCryptographyClient()
@@ -171,7 +170,7 @@ async function requestSignatures(request: Request, response: Response) {
       // Fallback to handleMissingSignatures
     }
   }
-  handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
+  handleMissingSignatures(majorityErrorCode, response, logger)
 }
 
 async function handleSuccessResponse(
@@ -381,12 +380,8 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessageSigRequest): boo
 function handleMissingSignatures(
   majorityErrorCode: number | null,
   response: Response,
-  logger: Logger,
-  sentResult: { sent: boolean }
+  logger: Logger
 ) {
-  if (sentResult.sent) {
-    return
-  }
   if (majorityErrorCode === 403) {
     respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA, logger)
   } else {

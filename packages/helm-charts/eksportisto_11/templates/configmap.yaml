@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: eksportisto-{{ .Values.deploymentSuffix }}-config
-data:
-  sensitive-accounts.json: {{ .Values.sensitiveAccountsBase64 | b64dec | quote }}
