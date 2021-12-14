@@ -22,16 +22,16 @@ export const keysToPrefetch: Key[] = [
 export async function initKeyProvider() {
   logger.info('Initializing keystore')
   const type = config.keystore.type
-  if (type === SupportedKeystore.AzureKeyVault) {
+  if (type === SupportedKeystore.AZURE_KEY_VAULT) {
     logger.info('Using Azure key vault')
     keyProvider = new AzureKeyProvider()
-  } else if (type === SupportedKeystore.GoogleSecretManager) {
+  } else if (type === SupportedKeystore.GOOGLE_SECRET_MANAGER) {
     logger.info('Using Google Secret Manager')
     keyProvider = new GoogleKeyProvider()
-  } else if (type === SupportedKeystore.AWSSecretManager) {
+  } else if (type === SupportedKeystore.AWs_SECRET_MANAGER) {
     logger.info('Using AWS Secret Manager')
     keyProvider = new AWSKeyProvider()
-  } else if (type === SupportedKeystore.MockSecretManager) {
+  } else if (type === SupportedKeystore.MOCK_SECRET_MANAGER) {
     logger.info('Using Mock Secret Manager')
     keyProvider = new MockKeyProvider()
   } else {
