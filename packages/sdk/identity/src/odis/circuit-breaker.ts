@@ -116,7 +116,7 @@ export type CircuitBreakerError =
  * being able to brute force their users cryptographic keys in the event that ODIS is compromised,
  * and thus is protection is no longer available.
  *
- * The circuit breaker service is designed for use in encryped cloud backip protocl. More
+ * The circuit breaker service is designed for use in the encrypted cloud backup protocol. More
  * information about encrypted cloud backup and the circuit breaker service can be found in the
  * official {@link https://docs.celo.org/celo-codebase/protocol/identity/encrypted-cloud-backup |
  * Celo documentation}
