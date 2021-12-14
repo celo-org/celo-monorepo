@@ -15,11 +15,6 @@ import {
 } from '@celo/utils/lib/sign-typed-data-utils'
 import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 
-export enum KeyName {
-  PHONE_NUMBER_PRIVACY = 'phoneNumberPrivacy',
-  DOMAINS = 'domains',
-}
-
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */
   account: string

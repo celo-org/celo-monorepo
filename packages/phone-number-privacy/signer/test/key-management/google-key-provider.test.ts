@@ -1,4 +1,4 @@
-import { KeyName } from '@celo/phone-number-privacy-common'
+import { DefaultKeyName } from '../../src/config'
 import { GoogleKeyProvider } from '../../src/key-management/google-key-provider'
 import { Key } from '../../src/key-management/key-provider-base'
 
@@ -7,7 +7,7 @@ const mockResponse = [{ payload: { data: `${mockKey}` } }]
 const emptyMockResponse = [{ payload: {} }]
 const invalidMockResponse = [{ payload: { data: '123' } }]
 const key: Key = {
-  name: KeyName.PHONE_NUMBER_PRIVACY,
+  name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
   version: 1,
 }
 

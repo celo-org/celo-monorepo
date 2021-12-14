@@ -1,11 +1,11 @@
-import { KeyName } from '@celo/phone-number-privacy-common'
+import { DefaultKeyName } from '../../src/config'
 import { AzureKeyProvider } from '../../src/key-management/azure-key-provider'
 import { Key } from '../../src/key-management/key-provider-base'
 
 const mockKey = '030303030303030303030303030303030303030303030303030303030303030303030303'
 
 const key: Key = {
-  name: KeyName.PHONE_NUMBER_PRIVACY,
+  name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
   version: 1,
 }
 

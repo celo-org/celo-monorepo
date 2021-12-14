@@ -5,7 +5,6 @@ import {
   DomainRestrictedSignatureRequest,
   DomainStatusResponse,
   ErrorMessage,
-  KeyName,
   KEY_VERSION_HEADER,
   SignMessageResponseSuccess,
   WarningMessage,
@@ -15,7 +14,7 @@ import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { Counters } from '../common/metrics'
-import config, { getVersion } from '../config'
+import config, { DefaultKeyName, getVersion } from '../config'
 import { getTransaction } from '../database/database'
 import { DomainState, DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
 import {
@@ -143,7 +142,7 @@ export class DomainService implements IDomainService {
     })
 
     const key: Key = {
-      name: KeyName.DOMAINS,
+      name: DefaultKeyName.DOMAINS,
       version: Number(request.headers[KEY_VERSION_HEADER]) || config.keystore.keys.domains.latest,
     }
 

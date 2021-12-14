@@ -5,7 +5,6 @@ import {
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
-  KeyName,
   KEY_VERSION_HEADER,
   SignMessageResponse,
   SignMessageResponseFailure,
@@ -17,7 +16,7 @@ import allSettled from 'promise.allsettled'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { Counters, Histograms } from '../common/metrics'
-import config, { getVersion } from '../config'
+import config, { DefaultKeyName, getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
@@ -47,7 +46,7 @@ export async function handleGetBlindedMessagePartialSig(
   logger.debug('Begin handleGetBlindedMessagePartialSig')
 
   const key: Key = {
-    name: KeyName.PHONE_NUMBER_PRIVACY,
+    name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
     version:
       Number(request.headers[KEY_VERSION_HEADER]) || config.keystore.keys.phoneNumberPrivacy.latest,
   }

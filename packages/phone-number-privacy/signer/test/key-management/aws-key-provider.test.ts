@@ -1,4 +1,4 @@
-import { KeyName } from '@celo/phone-number-privacy-common'
+import { DefaultKeyName } from '../../src/config'
 import { AWSKeyProvider } from '../../src/key-management/aws-key-provider'
 import { Key } from '../../src/key-management/key-provider-base'
 
@@ -10,7 +10,7 @@ const mockInvalidResponse1 = { foo: 'bar' }
 const mockInvalidResponse2 = { SecretString: 'totally not a json string' }
 
 const key: Key = {
-  name: KeyName.PHONE_NUMBER_PRIVACY,
+  name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
   version: 1,
 }
 

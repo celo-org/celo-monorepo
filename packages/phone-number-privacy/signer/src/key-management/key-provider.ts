@@ -1,5 +1,5 @@
-import { KeyName, rootLogger as logger } from '@celo/phone-number-privacy-common'
-import config, { SupportedKeystore } from '../config'
+import { rootLogger as logger } from '@celo/phone-number-privacy-common'
+import config, { DefaultKeyName, SupportedKeystore } from '../config'
 import { AWSKeyProvider } from './aws-key-provider'
 import { AzureKeyProvider } from './azure-key-provider'
 import { GoogleKeyProvider } from './google-key-provider'
@@ -10,11 +10,11 @@ let keyProvider: KeyProvider
 
 export const keysToPrefetch: Key[] = [
   {
-    name: KeyName.PHONE_NUMBER_PRIVACY,
+    name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
     version: config.keystore.keys.phoneNumberPrivacy.latest,
   },
   {
-    name: KeyName.DOMAINS,
+    name: DefaultKeyName.DOMAINS,
     version: config.keystore.keys.domains.latest,
   },
 ]
