@@ -17,7 +17,6 @@ import { switchToProjectFromEnv } from 'src/lib/utils'
 
 const yaml = require('js-yaml')
 const chartDirForVersion: Record<number, string> = {
-  1: '../helm-charts/eksportisto_11',
   2: '../helm-charts/eksportisto-2.0',
   3: '../helm-charts/eksportisto',
 }
@@ -47,7 +46,7 @@ function buildContext(celoEnv: string): Context {
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '')
   const chartDir = chartDirForVersion[chartVersion]
   if (chartDir === undefined) {
-    throw new Error('version has to be 1, 2 or 3')
+    throw new Error('version has to be 2 or 3')
   }
 
   return {
@@ -245,7 +244,7 @@ async function helmParameters(context: Context) {
   }
 
   // These node parameters are not used by the latest eksportisto release.
-  // TODO(pedro-clabs): remove once eksportisto 11 is decomissioned.
+  // TODO(pedro-clabs): remove once eksportisto 14 is decomissioned.
   if (isVmBased() && context.chartVersion < 3) {
     const nodes = await getInternalTxNodeIps(context)
     if (nodes.tip === undefined) {
