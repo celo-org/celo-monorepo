@@ -16,7 +16,7 @@ import { respondWithError } from '../common/error-utils'
 import { Counters } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { getTransaction } from '../database/database'
-import { DomainState, DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
+import { DOMAINS_STATES_COLUMNS, DomainState } from '../database/models/domainState'
 import {
   getDomainState,
   getDomainStateWithLock,
