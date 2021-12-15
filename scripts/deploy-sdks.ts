@@ -199,6 +199,7 @@ type Answers = {
 
   const allPackagePaths = findPackagePaths(path.join(__dirname, '..', 'packages'))
 
+  const newDevVersion = getNewDevVersion(newVersion)
   // Finally we update all the packages across the monorepo
   // to use the most recent sdk packages.
   allPackagePaths.forEach((path) => {
@@ -207,21 +208,25 @@ type Answers = {
     const isSdk = sdkNames.includes(json.name)
 
     if (isSdk) {
-      json.version = `${newVersion}-dev`
+      json.version = `${newDevVersion}-dev`
       packageChanged = true
     }
 
     for (const depName in json.dependencies) {
       if (sdkNames.includes(depName)) {
-        const suffix = json.dependencies[depName].includes('-dev') || isSdk ? '-dev' : ''
-        json.dependencies[depName] = `${newVersion}${suffix}`
+        const versionUpdate =
+          json.dependencies[depName].includes('-dev') || isSdk ? `${newDevVersion}-dev` : newVersion
+        json.dependencies[depName] = versionUpdate
         packageChanged = true
       }
     }
     for (const depName in json.devDependencies) {
       if (sdkNames.includes(depName)) {
-        const suffix = json.devDependencies[depName].includes('-dev') || isSdk ? '-dev' : ''
-        json.devDependencies[depName] = `${newVersion}${suffix}`
+        const versionUpdate =
+          json.devDependencies[depName].includes('-dev') || isSdk
+            ? `${newDevVersion}-dev`
+            : newVersion
+        json.devDependencies[depName] = versionUpdate
         packageChanged = true
       }
     }
@@ -302,4 +307,12 @@ function writePackageJson(filePath: string, properties: Partial<PackageJson>) {
       2
     )
   )
+}
+
+function getNewDevVersion(version: string) {
+  const versionArray = version.split('.')
+  const bump = Number(versionArray[2]) + 1
+  if (isNaN(bump)) return version
+  versionArray[2] = `${bump}`
+  return versionArray.join('.')
 }
