@@ -14,7 +14,7 @@ import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { Counters } from '../common/metrics'
-import config, { DefaultKeyName, getVersion } from '../config'
+import config, { getVersion } from '../config'
 import { getTransaction } from '../database/database'
 import { DomainState, DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
 import {
@@ -24,7 +24,7 @@ import {
   setDomainDisabled,
 } from '../database/wrappers/domainState'
 import { getKeyProvider } from '../key-management/key-provider'
-import { Key } from '../key-management/key-provider-base'
+import { DefaultKeyName, Key } from '../key-management/key-provider-base'
 import { Endpoints } from '../server'
 import { IDomainAuthService } from './auth/domainAuth.interface'
 import { IDomainService } from './domain.interface'
