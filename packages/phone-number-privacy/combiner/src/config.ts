@@ -36,14 +36,19 @@ interface Config {
     signers: string
     timeoutMilliSeconds: number
   }
-  thresholdSignature: {
-    threshold: number
-    polynomial: string
-    pubKey: string
-  }
-  keyVersions: {
-    phoneNumberPrivacy: number
-    domains: number
+  keys: {
+    phoneNumberPrivacy: {
+      version: number
+      threshold: number
+      polynomial: string
+      pubKey: string
+    }
+    domains: {
+      version: number
+      threshold: number
+      polynomial: string
+      pubKey: string
+    }
   }
 }
 
@@ -67,14 +72,19 @@ if (DEV_MODE) {
         '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
       timeoutMilliSeconds: 5 * 1000,
     },
-    thresholdSignature: {
-      threshold: 1,
-      polynomial: DEV_POLYNOMIAL,
-      pubKey: DEV_PUBLIC_KEY,
-    },
-    keyVersions: {
-      phoneNumberPrivacy: 1,
-      domains: 1,
+    keys: {
+      phoneNumberPrivacy: {
+        version: 1,
+        threshold: 1,
+        polynomial: DEV_POLYNOMIAL,
+        pubKey: DEV_PUBLIC_KEY,
+      },
+      domains: {
+        version: 1,
+        threshold: 1,
+        polynomial: DEV_POLYNOMIAL,
+        pubKey: DEV_PUBLIC_KEY,
+      },
     },
   }
 } else {
@@ -94,14 +104,19 @@ if (DEV_MODE) {
       signers: functionConfig.odisservices.signers,
       timeoutMilliSeconds: functionConfig.odisservices.timeoutMilliSeconds || 5 * 1000,
     },
-    thresholdSignature: {
-      threshold: functionConfig.threshold_signature.threshold_signature_threshold,
-      polynomial: functionConfig.threshold_signature.threshold_polynomial,
-      pubKey: functionConfig.threshold_signature.public_key,
-    },
-    keyVersions: {
-      phoneNumberPrivacy: functionConfig.keyVersions.phoneNumberPrivacy,
-      domains: functionConfig.keyVersions.domains,
+    keys: {
+      phoneNumberPrivacy: {
+        version: functionConfig.keys.phoneNumberPrivacy.version,
+        threshold: functionConfig.keys.phoneNumberPrivacy.threshold,
+        polynomial: functionConfig.keys.phoneNumberPrivacy.polynomial,
+        pubKey: functionConfig.keys.phoneNumberPrivacy.pubKey,
+      },
+      domains: {
+        version: functionConfig.keys.domains.version,
+        threshold: functionConfig.keys.domains.threshold,
+        polynomial: functionConfig.keys.domains.polynomial,
+        pubKey: functionConfig.keys.domains.pubKey,
+      },
     },
   }
 }

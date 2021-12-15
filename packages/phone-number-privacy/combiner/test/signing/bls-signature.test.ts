@@ -19,7 +19,8 @@ const COMBINED_SIGNATURE = '16RcENpbLgq5pIkcPWdgnMofeLqSyuUVin9h4jof9/I8GRsmt5iR
 const INVALID_SIGNATURE =
   'MAAAAAAAAACanrA73tApLu+j569ICcXrEBRLi4czWJtInJPSUpoZUOVDc1667hvMq1ESncFzlgEHAAAA'
 
-config.thresholdSignature = {
+config.keys.phoneNumberPrivacy = {
+  version: 1,
   threshold: 3,
   polynomial: PUBLIC_POLYNOMIAL,
   pubKey: PUBLIC_KEY,

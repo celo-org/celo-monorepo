@@ -73,7 +73,7 @@ async function requestSignatures(request: Request, response: Response) {
   })
   obs.observe({ entryTypes: ['measure'], buffered: true })
 
-  request.headers[KEY_VERSION_HEADER] = config.keyVersions.phoneNumberPrivacy.toString()
+  request.headers[KEY_VERSION_HEADER] = config.keys.phoneNumberPrivacy.version.toString()
 
   const signers = JSON.parse(config.odisServices.signers) as SignerService[]
   let timedOut = false
@@ -186,7 +186,7 @@ async function handleSuccessResponse(
   const logger: Logger = response.locals.logger
   const keyVersion: number = Number(response.header(KEY_VERSION_HEADER))
   logger.info({ keyVersion }, 'Signer responded with key version')
-  if (keyVersion !== config.keyVersions.phoneNumberPrivacy.toString()) {
+  if (keyVersion !== config.keys.phoneNumberPrivacy.version) {
     throw new Error(`Incorrect key version received from signer ${serviceUrl}`)
   }
   const signResponse = JSON.parse(data) as SignerResponse
@@ -246,7 +246,8 @@ function handleFailedResponse(
   // Tracking failed request count via signer url prevents
   // double counting the same failed request by mistake
   failedRequests.add(service.url)
-  const shouldFailFast = signerCount - failedRequests.size < config.thresholdSignature.threshold
+  const shouldFailFast =
+    signerCount - failedRequests.size < config.keys.phoneNumberPrivacy.threshold
   logger.info(`Recieved failure from ${failedRequests.size}/${signerCount} signers.`)
   if (shouldFailFast) {
     logger.info('Not possible to reach a sufficient number of signatures. Failing fast.')

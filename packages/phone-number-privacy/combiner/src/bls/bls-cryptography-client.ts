@@ -31,7 +31,7 @@ export class BLSCryptographyClient {
    * Returns true if the number of valid signatures is enough to perform a combination
    */
   public hasSufficientSignatures(): boolean {
-    const threshold = config.thresholdSignature.threshold
+    const threshold = config.keys.phoneNumberPrivacy.threshold
     return this.allSignaturesLength >= threshold
   }
 
@@ -45,7 +45,7 @@ export class BLSCryptographyClient {
     logger?: Logger
   ): Promise<string> {
     logger = logger ?? rootLogger
-    const threshold = config.thresholdSignature.threshold
+    const threshold = config.keys.phoneNumberPrivacy.threshold
     if (!this.hasSufficientSignatures()) {
       logger.error(
         { signatures: this.allSignaturesLength, required: threshold },
@@ -84,7 +84,7 @@ export class BLSCryptographyClient {
       // Documentation should not specify that verifyBlindSignature verifies the
       // signature after it has been unblinded.
       threshold_bls.verifyBlindSignature(
-        Buffer.from(config.thresholdSignature.pubKey, 'base64'),
+        Buffer.from(config.keys.phoneNumberPrivacy.pubKey, 'base64'),
         Buffer.from(blindedMessage, 'base64'),
         combinedSignature
       )
@@ -113,7 +113,7 @@ export class BLSCryptographyClient {
   }
 
   private isValidPartialSignature(signature: Buffer, blindedMessage: string) {
-    const polynomial = config.thresholdSignature.polynomial
+    const polynomial = config.keys.phoneNumberPrivacy.polynomial
     try {
       threshold_bls.partialVerifyBlindSignature(
         Buffer.from(polynomial, 'hex'),
