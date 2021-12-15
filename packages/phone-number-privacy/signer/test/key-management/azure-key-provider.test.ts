@@ -1,6 +1,5 @@
-import { DefaultKeyName } from '../../src/config'
 import { AzureKeyProvider } from '../../src/key-management/azure-key-provider'
-import { Key } from '../../src/key-management/key-provider-base'
+import { DefaultKeyName, Key } from '../../src/key-management/key-provider-base'
 
 const mockKey = '030303030303030303030303030303030303030303030303030303030303030303030303'
 

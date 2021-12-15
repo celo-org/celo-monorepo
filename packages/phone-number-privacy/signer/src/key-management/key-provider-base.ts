@@ -1,7 +1,11 @@
-import { KeyName } from '@celo/phone-number-privacy-common'
-import config, { DefaultKeyName } from '../config'
+import config from '../config'
+
+export enum DefaultKeyName {
+  PHONE_NUMBER_PRIVACY = 'phoneNumberPrivacy',
+  DOMAINS = 'domains',
+}
 export interface Key {
-  name: KeyName
+  name: DefaultKeyName
   version: number
 }
 export interface KeyProvider {

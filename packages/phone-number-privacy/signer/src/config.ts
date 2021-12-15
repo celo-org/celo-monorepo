@@ -28,11 +28,6 @@ export enum SupportedKeystore {
   MOCK_SECRET_MANAGER = 'MockSecretManager',
 }
 
-export enum DefaultKeyName {
-  PHONE_NUMBER_PRIVACY = 'phoneNumberPrivacy',
-  DOMAINS = 'domains',
-}
-
 interface Config {
   server: {
     port: string | number

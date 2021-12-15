@@ -1,6 +1,7 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import {
   GetQuotaResponse,
+  KEY_VERSION_HEADER,
   rootLogger as logger,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
@@ -32,6 +33,7 @@ const { replenishQuota, registerWalletAddress } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 const ODIS_PUBLIC_POLYNOMIAL = process.env.ODIS_PUBLIC_POLYNOMIAL as string
+const ODIS_KEY_VERSION = (process.env.ODIS_KEY_VERSION || 1) as string
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'
 
@@ -54,6 +56,7 @@ describe('Running against a deployed service', () => {
     console.log('FORNO_URL: ' + DEFAULT_FORNO_URL)
     console.log('ODIS_SIGNER: ' + ODIS_SIGNER)
     console.log('ODIS_PUBLIC_POLYNOMIAL: ' + ODIS_PUBLIC_POLYNOMIAL)
+    console.log('ODIS_KEY_VERSION:' + ODIS_KEY_VERSION)
   })
 
   describe('Returns status 400 with invalid input', () => {
@@ -196,6 +199,8 @@ describe('Running against a deployed service', () => {
       expect(await getWalletAddress(logger, ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
     })
 
+    // Note: Use this test to check the signers' key configuration. Modify .env to try out different
+    // key/version combinations
     it('Returns sig when querying succeeds with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
       const blindedPhoneNumber = getRandomBlindedPhoneNumber()
@@ -277,7 +282,8 @@ async function postToSignMessage(
   base64BlindedMessage: string,
   account: string,
   timestamp?: number,
-  authHeader?: string
+  authHeader?: string,
+  keyVersion: string = ODIS_KEY_VERSION
 ): Promise<Response> {
   const body = JSON.stringify({
     hashedPhoneNumber: IDENTIFIER,
@@ -294,6 +300,7 @@ async function postToSignMessage(
       Accept: 'application/json',
       'Content-Type': 'application/json',
       Authorization: authorization,
+      [KEY_VERSION_HEADER]: keyVersion,
     },
     body,
   })
