@@ -394,6 +394,7 @@ contract('Integration: Governance', (accounts: string[]) => {
 Array.from([
   ['Exchange', 'StableToken'], // USD
   ['ExchangeEUR', 'StableTokenEUR'], // EUR
+  ['ExchangeBRL', 'StableTokenBRL'], // BRL (cREAL)
 ]).forEach(([exchangeId, stableTokenId]) =>
   contract(`Integration: ${exchangeId} ${stableTokenId}`, (accounts: string[]) => {
     const transferAmount = 10

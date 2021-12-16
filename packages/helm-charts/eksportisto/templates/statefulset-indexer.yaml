@@ -24,7 +24,7 @@ metadata:
 spec:
   serviceName: eksportisto-indexer
   podManagementPolicy: Parallel
-  replicas: 32
+  replicas: 8
   selector:
     matchLabels:
       app: eksportisto
@@ -49,8 +49,7 @@ spec:
         args:
           - "indexer"
           - "--config=/var/config/config.yaml"
-          - "--indexer-source=backfill"
-          - "--celo-node-uri=http://rc1-fullnodes-rpc-no-session-affinity:8545"
+          - "--celo-node-uri=http://rc1-fullnodes-rpc-internal-lb:8545"
         env:
         - name: GOOGLE_APPLICATION_CREDENTIALS
           value: "/var/config/service-account.json"
