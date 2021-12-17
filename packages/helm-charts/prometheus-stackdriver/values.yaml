@@ -1,9 +1,8 @@
-cluster: changeset
+cluster: null
 
 gcloud:
   project: null
   region: null
-  gceScrapeZones: null
 
 namespace: prometheus
 

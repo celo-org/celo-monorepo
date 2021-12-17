@@ -153,9 +153,6 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       `--set storageClassName=ssd`,
       `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
     )
-    if (fetchEnvOrFallback(envVar.PROMETHEUS_GCE_SCRAPE_REGIONS, '')) {
-      params.push(`--set gcloud.gceScrapeZones={${fetchEnv(envVar.PROMETHEUS_GCE_SCRAPE_REGIONS)}}`)
-    }
   }
 
   // Set scrape job if set for the context
