@@ -160,6 +160,7 @@
       "@celo/connect",
       "@celo/dev-utils",
       "@celo/flake-tracker",
+      "@celo/phone-utils",
       "@celo/protocol",
       "@celo/utils",
       "@celo/wallet-local"
