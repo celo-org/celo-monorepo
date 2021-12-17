@@ -109,14 +109,13 @@ spec:
           ACCOUNT_ADDRESSES=$(cat /root/.celo/address | tr '\n' ',')
           ACCOUNT_ADDRESSES=${ACCOUNT_ADDRESSES::-1}
 
+{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,web3,debug,admin,personal,net" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
+{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,web3,debug,admin,personal,net" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
+
           exec geth \
           --datadir /root/.celo \
           --ipcpath=geth.ipc \
           --nousb \
-          --rpc \
-          --rpcapi=eth,web3,debug,admin,personal,net \
-          --allow-insecure-unlock \
-          --rpcvhosts=* \
           --networkid={{ $.Values.geth.networkID }} \
           --nodekey=/root/.celo/pkey0 \
           --syncmode=fast \
@@ -125,8 +124,7 @@ spec:
           --verbosity=1 \
           --unlock=$ACCOUNT_ADDRESSES \
           --password=/root/.celo/account/accountSecret \
-          --port 30303 \
-          --rpcport 8545
+          --port 30303
         resources:
           requests:
             memory: 4Gi
@@ -154,12 +152,10 @@ spec:
 
           ACCOUNT_ADDRESS=$(awk 'NR=={{ add $index 1 }}' /root/.celo/address)
 
+{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,web3,debug,admin,personal,net" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
+
           exec geth \
           --nousb \
-          --rpc \
-          --rpcapi=eth,web3,debug,admin,personal,net \
-          --allow-insecure-unlock \
-          --rpcvhosts=* \
           --networkid={{ $.Values.geth.networkID }} \
           --nodekey=/root/.celo/pkey{{ $index }} \
           --syncmode=lightest \
@@ -169,7 +165,7 @@ spec:
           --unlock=$ACCOUNT_ADDRESS \
           --password=/root/.celo/account/accountSecret \
           --port {{ add 30303 $index }} \
-          --rpcport {{ add 8545 $index }}
+          --http.port {{ add 8545 $index }}
         resources:
           requests:
             memory: 200Mi

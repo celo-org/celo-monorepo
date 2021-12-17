@@ -185,6 +185,8 @@ spec:
 
 {{ include  "common.geth-add-metrics-pprof-config" . | indent 10 }}
 
+{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
+
 {{ .Values.geth.secondayExtraSnippet | indent 10 }}
 
           exec geth \
@@ -195,15 +197,6 @@ spec:
             --password=/root/.celo/account/accountSecret \
             --unlock=${ACCOUNT_ADDRESS} \
             --mine \
-            --rpc \
-            --rpcaddr 0.0.0.0 \
-            --rpcapi=eth,net,web3,debug \
-            --rpccorsdomain='*' \
-            --rpcvhosts=* \
-            --ws \
-            --wsaddr 0.0.0.0 \
-            --wsorigins=* \
-            --wsapi=eth,net,web3,debug \
             --etherbase=${ACCOUNT_ADDRESS} \
             --syncmode=full \
             --consoleformat=json \
