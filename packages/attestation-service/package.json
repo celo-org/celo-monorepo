@@ -32,7 +32,7 @@
     "@celo/contractkit": "1.5.1-dev",
     "@celo/keystores": "1.5.1-dev",
     "@celo/utils": "1.5.1-dev",
-    "@celo/phone-utils": "1.5.1-dev",
+    "@celo/phone-utils": "1.5.0",
     "bignumber.js": "^9.0.0",
     "body-parser": "1.19.0",
     "bunyan": "1.8.12",

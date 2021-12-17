@@ -8,8 +8,8 @@
     "dependencies": [
       "@celo/contractkit",
       "@celo/keystores",
-      "@celo/phone-utils",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/phone-utils"
     ]
   },
   "celo-azure-build": {
