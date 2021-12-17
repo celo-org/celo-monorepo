@@ -1,5 +1,14 @@
 # README GUIDE FOR CELO DEVELOPERS
 
+## How to run a local testnet
+
+Often when developing, it is useful to create a test network localy using the full celo-blockchain binary to go beyond what can be done with other options such as [Ganache](https://www.trufflesuite.com/ganache)
+
+The quickest way to get started with a local testnet is by running `yarn celotool local-testnet` from the `monorepo` root.
+This command will create a local testnet with a single validator node and deploy all smart contract migrations to it.
+Once the network is initialized a NodeJS REPL is provided to help interact with the running nodes.
+For more options, consult `yanr celotool local-testnet --help`, which provides an overview of the tool and its options.
+
 ## Monorepo inter-package dependencies
 
 Many packages depend on other packages within the monorepo. When this happens, follow these rules:
@@ -53,9 +62,9 @@ This confirms that it is locally installable and does not have implicit dependen
 ```
 # Specify the package to test. e.g. celocli, contractkit, utils
 celo-monorepo $ PACKAGE=cli
-celo-monorepo $ docker run --rm -v $PWD/packages/${PACKAGE}:/tmp/npm_package -it --entrypoint bash node:10
-root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
-root@e0d56700584f:/tmp/tmp1# npm install /tmp/npm_package/
+celo-monorepo $ docker run --rm -v $PWD/packages/${PACKAGE}:/tmp/npm_package -it --entrypoint bash gcr.io/celo-testnet/circleci-node12:1.0.0
+circleci@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
+circleci@e0d56700584f:/tmp/tmp1# npm install /tmp/npm_package/
 ```
 
 ### Publish the package
@@ -87,33 +96,45 @@ Once you publish do some manual tests, for example, after publishing `celocli`
 
 ```
 # Docker for an isolated environment again
-celo-monorepo $ docker run --rm -it --entrypoint bash node:10
-root@e0d56700584f:/# apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 -y
-root@e0d56700584f:/# mkdir /tmp/tmp1 && cd /tmp/tmp1
-root@e0d56700584f:/tmp/tmp1# npm install @celo/celocli@0.0.48
-/tmp/tmp1# ./node_modules/.bin/celocli
+celo-monorepo $ docker run --rm -it --entrypoint bash gcr.io/celo-testnet/circleci-node12:1.0.0
+circleci@7040a7660754:/$ mkdir /tmp/tmp1 && cd /tmp/tmp1
+circleci@7040a7660754:/tmp/tmp1$ npm install @celo/celocli@0.0.48
+...
+circleci@7040a7660754:/tmp/tmp1$ ./node_modules/.bin/celocli
 CLI Tool for transacting with the Celo protocol
 
 VERSION
-  @celo/celocli/0.0.48 linux-x64 node-v8.16.1
+  @celo/celocli/0.0.48 linux-x64 node-v12.21.0
 
 USAGE
   $ celocli [COMMAND]
 
 COMMANDS
-  account         Manage your account, send and receive Celo Gold and Celo Dollars
-  bonds           Manage bonded deposits to participate in governance and earn rewards
+  account         Manage your account, keys, and metadata
   config          Configure CLI options which persist across commands
-  exchange        Commands for interacting with the Exchange
+  election        Participate in and view the state of Validator Elections
+  exchange        Exchange Celo Dollars and Celo Gold via the stability mechanism
+  governance      Interact with on-chain governance proposals and hotfixes
   help            display help for celocli
-  node            Manage your full node
-  validator       View validator information and register your own
-  validatorgroup  View validator group information and cast votes
+  identity        Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
+  lockedgold      View and manage locked Celo Gold
+  multisig        Shows information about multi-sig contract
+  network         Prints Celo contract addesses.
+  node            Manage your Celo node
+  oracle          Remove expired oracle reports for a specified token (currently just Celo Dollar, aka: "StableToken")
+  releasegold     View and manage Release Gold contracts
+  reserve         Shows information about reserve
+  rewards         Show rewards information about a voter, registered Validator, or Validator Group
+  transfer        Transfer Celo Gold and Celo Dollars
+  validator       View and manage Validators
+  validatorgroup  View and manage Validator Groups
 
-root@f8c51e3c7bc3:/tmp/tmp1# ./node_modules/.bin/celocli account:new
-This is not being stored anywhere, so, save the mnemonic somewhere to use this account at a later point
+circleci@7040a7660754:/tmp/tmp1$ ./node_modules/.bin/celocli account:new
+Failed to initialize libusb.
+This is not being stored anywhere. Save the mnemonic somewhere to use this account at a later point.
 
-mnemonic: wall school patrol also peasant enroll build merit health reduce junior obtain awful sword warfare sponsor honey display resemble bubble trend elevator ostrich assist
-privateKey: a9531609ca3d1c224e0742a4bb9b9e2fae67cc9d872797869092804e1500d67c
-publicKey: 0429b83753806f2b61ddab2e8a139214c3c8a5dfd0557557830b13342f2490bad6f61767e1b0707be51685e5e13683e6fa276333cbdb06f07768a09b8070e27259accountAddress: 0xf63e0F60DFcd84090D2863e0Dfa452B871fdC6d7
+mnemonic: fury puzzle field laptop evidence stuff rescue display home museum ritual message million cave stadium carbon clinic dutch robust vehicle control lizard brass dinosaur
+accountAddress: 0x328e0394Dbb468FE4eD1fF73bD508442fBD305CF
+privateKey: 7adb0c1a98b00b98a180cbfcc44666f1aab7d315669190fbac30bbdc4989a2ec
+publicKey: 039f938bb038962080c9269b195b63999cf90b149921250c2b8a8db92f711d5c81
 ```

@@ -1,7 +1,7 @@
 import { Address, trimLeading0x } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok } from '@celo/base/lib/result'
-import OffchainDataWrapper from '../../offchain-data-wrapper'
-import { readEncrypted, signBuffer, writeEncrypted } from '../utils'
+import { OffchainDataWrapper } from '../../offchain-data-wrapper'
+import { readEncrypted, signBuffer, writeEncrypted, writeSymmetricKeys } from '../utils'
 import { OffchainError } from './errors'
 import { PrivateAccessor, PublicAccessor } from './interfaces'
 
@@ -43,6 +43,10 @@ export class PrivateBinaryAccessor implements PrivateAccessor<Buffer> {
 
   async write(data: Buffer, toAddresses: Address[], symmetricKey?: Buffer) {
     return writeEncrypted(this.wrapper, this.dataPath, data, toAddresses, symmetricKey)
+  }
+
+  async allowAccess(toAddresses: Address[], symmetricKey?: Buffer) {
+    return writeSymmetricKeys(this.wrapper, this.dataPath, toAddresses, symmetricKey)
   }
 
   async readAsResult(account: Address) {

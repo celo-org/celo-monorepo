@@ -32,9 +32,55 @@ geth:
     requests:
       memory: "256Mi"
       cpu: "500m"
-    limits:
-      memory: "4Gi"
-      cpu: "4"
+    limits: {}
+    # limits:
+    #   memory: "4Gi"
+    #   cpu: "4"
+  fullnodeCheckBlockAge: true
+  ws_port: 8546
+  validatorExtraSnippet: |
+    echo "Validator"
+  secondayExtraSnippet: |
+    echo "secondary-validator"
+  proxyExtraSnippet: |
+    echo "Proxy"
+  txNodeExtraSnippet: |
+    echo "txnode"
+  txNodePrivateExtraSnippet: |
+    echo "txnode-private"
+  validatorNodeSelector: {}
+  validatorTolerations: []
+  secondaryNodeSelector: {}
+  secondaryTolerations: []
+  proxyNodeSelector: {}
+  proxyTolerations: []
+  txNodeNodeSelector: {}
+  txNodeTolerations: []
+  txNodePrivateNodeSelector: {}
+  txNodePrivateTolerations: []
+
+# UpdateStrategy for statefulsets only. Partition=0 is default rollingUpdate behaviour.
+updateStrategy:
+  validators:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  secondaries:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  proxy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  tx_nodes:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  tx_nodes_private:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
 
 gethexporter:
   image:

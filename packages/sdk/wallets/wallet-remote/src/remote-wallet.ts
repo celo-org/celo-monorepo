@@ -6,7 +6,8 @@ import { WalletBase } from '@celo/wallet-base'
 /**
  * Abstract class representing a remote wallet that requires async initialization
  */
-export abstract class RemoteWallet<TSigner extends Signer> extends WalletBase<TSigner>
+export abstract class RemoteWallet<TSigner extends Signer>
+  extends WalletBase<TSigner>
   implements ReadOnlyWallet {
   private setupFinished = false
   private setupLocked = false
@@ -52,7 +53,7 @@ export abstract class RemoteWallet<TSigner extends Signer> extends WalletBase<TS
   /**
    * Discover accounts and store mapping in accountSigners
    */
-  protected abstract async loadAccountSigners(): Promise<Map<Address, TSigner>>
+  protected abstract loadAccountSigners(): Promise<Map<Address, TSigner>>
 
   /**
    * Get a list of accounts in the remote wallet

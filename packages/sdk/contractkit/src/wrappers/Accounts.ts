@@ -7,7 +7,10 @@ import {
   signedMessageToPublicKey,
 } from '@celo/utils/lib/signatureUtils'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
+import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
+import { keccak256 } from 'web3-utils'
 import { Accounts } from '../generated/Accounts'
+import { newContractVersion } from '../versions'
 import {
   BaseWrapper,
   proxyCall,
@@ -33,6 +36,8 @@ interface AccountSummary {
  * Contract for handling deposits needed for voting.
  */
 export class AccountsWrapper extends BaseWrapper<Accounts> {
+  private RELEASE_4_VERSION = newContractVersion(1, 1, 2, 0)
+
   /**
    * Creates an account.
    */
@@ -278,6 +283,47 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
         stringToSolidityBytes(blsPublicKey),
         stringToSolidityBytes(blsPop)
       )
+    )
+  }
+
+  async authorizeSigner(signer: Address, role: string) {
+    await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
+    const [accounts, chainId, accountsContract] = await Promise.all([
+      this.kit.connection.getAccounts(),
+      this.kit.connection.chainId(),
+      this.kit.contracts.getAccounts(),
+    ])
+    const account = this.kit.connection.defaultAccount || accounts[0]
+
+    const hashedRole = keccak256(role)
+    const typedData = buildAuthorizeSignerTypedData({
+      account,
+      signer,
+      chainId,
+      role: hashedRole,
+      accountsContractAddress: accountsContract.address,
+    })
+
+    const sig = await this.kit.connection.signTypedData(signer, typedData)
+    return toTransactionObject(
+      this.kit.connection,
+      this.contract.methods.authorizeSignerWithSignature(signer, hashedRole, sig.v, sig.r, sig.s)
+    )
+  }
+
+  async startSignerAuthorization(signer: Address, role: string) {
+    await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
+    return toTransactionObject(
+      this.kit.connection,
+      this.contract.methods.authorizeSigner(signer, keccak256(role))
+    )
+  }
+
+  async completeSignerAuthorization(account: Address, role: string) {
+    await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
+    return toTransactionObject(
+      this.kit.connection,
+      this.contract.methods.completeSignerAuthorization(account, keccak256(role))
     )
   }
 

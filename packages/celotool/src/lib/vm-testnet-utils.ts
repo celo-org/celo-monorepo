@@ -8,7 +8,7 @@ import {
   generatePublicKey,
   getAddressFromEnv,
   privateKeyToAddress,
-  privateKeyToPublicKey
+  privateKeyToPublicKey,
 } from './generate_utils'
 import {
   applyTerraformModule,
@@ -19,14 +19,15 @@ import {
   showTerraformModulePlan,
   taintTerraformModuleResource,
   TerraformVars,
-  untaintTerraformModuleResource
+  untaintTerraformModuleResource,
 } from './terraform'
 import {
   getGenesisBlockFromGoogleStorage,
   getProxiesPerValidator,
   getProxyName,
   uploadDataToGoogleStorage,
-  uploadTestnetInfoToGoogleStorage
+  uploadGenesisBlockToGoogleStorage,
+  uploadTestnetInfoToGoogleStorage,
 } from './testnet-utils'
 
 export interface ProxyIndex {
@@ -77,6 +78,7 @@ const testnetEnvVars: TerraformVars = {
   network_id: envVar.NETWORK_ID,
   private_tx_node_count: envVar.PRIVATE_TX_NODES,
   node_disk_size_gb: envVar.NODE_DISK_SIZE_GB,
+  private_node_disk_size_gb: envVar.PRIVATE_NODE_DISK_SIZE_GB,
   tx_node_count: envVar.TX_NODES,
   validator_count: envVar.VALIDATORS,
 }
@@ -137,8 +139,7 @@ export async function deploy(
       await generateAndUploadSecrets(celoEnv)
     }
   })
-  // TODO change this true value
-  await uploadTestnetInfoToGoogleStorage(celoEnv, !useExistingGenesis)
+  await uploadTestnetInfoToGoogleStorage(celoEnv)
 }
 
 export async function deployModule(
@@ -190,7 +191,11 @@ export async function destroy(celoEnv: string) {
   }
 }
 
-export async function destroyModule(celoEnv: string, terraformModule: string, vars: TerraformVars = {}) {
+export async function destroyModule(
+  celoEnv: string,
+  terraformModule: string,
+  vars: TerraformVars = {}
+) {
   const backendConfigVars: TerraformVars = getTerraformBackendConfigVars(celoEnv, terraformModule)
 
   const envType = fetchEnv(envVar.ENV_TYPE)
@@ -288,9 +293,13 @@ export function getTerraformBackendConfigVars(celoEnv: string, terraformModule: 
 }
 
 async function getTestnetVars(celoEnv: string, useExistingGenesis: boolean) {
-  const genesisContent = useExistingGenesis
-    ? await getGenesisBlockFromGoogleStorage(celoEnv)
-    : generateGenesisFromEnv()
+  let genesisContent: string = ''
+  if (useExistingGenesis) {
+    genesisContent = await getGenesisBlockFromGoogleStorage(celoEnv)
+  } else {
+    generateGenesisFromEnv()
+    await uploadGenesisBlockToGoogleStorage(genesisContent, celoEnv)
+  }
 
   const genesisBuffer = Buffer.from(genesisContent)
   const domainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)

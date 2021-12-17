@@ -311,8 +311,6 @@ export async function fetchLatestMessagesFromToday(
     to: phoneNumber,
     pageSize: count,
     // Twilio keeps track of dates in UTC so it could be yesterday too
-    dateSentAfter: moment()
-      .subtract(2, 'day')
-      .toDate(),
+    dateSentAfter: moment().subtract(2, 'day').toDate(),
   })
 }

@@ -1,4 +1,5 @@
 import { BaseCommand } from '../../base'
+import { newCheckBuilder } from '../../utils/checks'
 import { printValueMapRecursive } from '../../utils/cli'
 import { Args } from '../../utils/command'
 
@@ -16,7 +17,7 @@ export default class Show extends BaseCommand {
 
   async run() {
     const { args } = this.parse(Show)
-
+    await newCheckBuilder(this, args.address).isSignerOrAccount().runChecks()
     const accounts = await this.kit.contracts.getAccounts()
     const address = await accounts.signerToAccount(args.address)
     printValueMapRecursive(await accounts.getAccountSummary(address))

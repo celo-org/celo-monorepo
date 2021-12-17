@@ -39,6 +39,7 @@ interface Config {
     additionalVerifiedQueryMax: number
     queryPerTransaction: number
     minDollarBalance: BigNumber
+    minEuroBalance: BigNumber
     minCeloBalance: BigNumber
   }
   attestations: {
@@ -55,6 +56,7 @@ interface Config {
     host: string
     port?: number
     ssl: boolean
+    poolMaxSize: number
   }
   keystore: {
     type: SupportedKeystore
@@ -76,6 +78,8 @@ interface Config {
       secretKey: string
     }
   }
+  timeout: number
+  test_quota_bypass_percentage: number
 }
 
 const env = process.env as any
@@ -86,11 +90,13 @@ const config: Config = {
     sslCertPath: env.SERVER_SSL_CERT_PATH,
   },
   quota: {
-    unverifiedQueryMax: toNum(env.UNVERIFIED_QUERY_MAX) || 2,
+    unverifiedQueryMax: toNum(env.UNVERIFIED_QUERY_MAX) || 10,
     additionalVerifiedQueryMax: toNum(env.ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
     queryPerTransaction: toNum(env.QUERY_PER_TRANSACTION) || 2,
     // Min balance is .01 cUSD
     minDollarBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 1e16),
+    // Min balance is .01 cEUR
+    minEuroBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 1e16),
     // Min balance is .005 CELO
     minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 5e15),
   },
@@ -108,6 +114,7 @@ const config: Config = {
     host: env.DB_HOST,
     port: env.DB_PORT ? toNum(env.DB_PORT) : undefined,
     ssl: toBool(env.DB_USE_SSL, true),
+    poolMaxSize: env.DB_POOL_MAX_SIZE || 50,
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
@@ -129,5 +136,7 @@ const config: Config = {
       secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
+  timeout: env.ODIS_SIGNER_TIMEOUT || 5000,
+  test_quota_bypass_percentage: toNum(env.TEST_QUOTA_BYPASS_PERCENTAGE) || 0,
 }
 export default config

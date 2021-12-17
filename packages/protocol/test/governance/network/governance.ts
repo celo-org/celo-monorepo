@@ -67,6 +67,15 @@ enum VoteValue {
   Yes,
 }
 
+enum Stage {
+  None = 0,
+  Queued,
+  Approval,
+  Referendum,
+  Execution,
+  Expiration,
+}
+
 interface Transaction {
   value: number
   destination: string
@@ -112,11 +121,11 @@ contract('Governance', (accounts: string[]) => {
   let hotfixHash: Buffer
   let hotfixHashStr: string
   beforeEach(async () => {
-    accountsInstance = await Accounts.new()
+    accountsInstance = await Accounts.new(true)
     governance = await Governance.new()
     mockLockedGold = await MockLockedGold.new()
     mockValidators = await MockValidators.new()
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     testTransactions = await TestTransactions.new()
     await governance.initialize(
       registry.address,
@@ -1500,6 +1509,92 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
+  describe('#revokeVotes()', () => {
+    beforeEach(async () => {
+      await governance.setConcurrentProposals(3)
+      await governance.propose(
+        [transactionSuccess1.value],
+        [transactionSuccess1.destination],
+        // @ts-ignore bytes type
+        transactionSuccess1.data,
+        [transactionSuccess1.data.length],
+        descriptionUrl,
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        { value: minDeposit }
+      )
+      await governance.propose(
+        [transactionSuccess2.value],
+        [transactionSuccess2.destination],
+        // @ts-ignore bytes type
+        transactionSuccess2.data,
+        [transactionSuccess2.data.length],
+        descriptionUrl,
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        { value: minDeposit }
+      )
+      await governance.propose(
+        [transactionSuccess1.value],
+        [transactionSuccess1.destination],
+        // @ts-ignore bytes type
+        transactionSuccess1.data,
+        [transactionSuccess1.data.length],
+        descriptionUrl,
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        { value: minDeposit }
+      )
+      await timeTravel(dequeueFrequency, web3)
+      await governance.approve(1, 0)
+      await governance.approve(2, 1)
+      await governance.approve(3, 2)
+      await timeTravel(approvalStageDuration, web3)
+      await mockLockedGold.setAccountTotalLockedGold(account, weight)
+    })
+
+    for (let numVoted = 0; numVoted < 3; numVoted++) {
+      describe(`when account has voted on ${numVoted} proposals`, () => {
+        const value = VoteValue.Yes
+        beforeEach(async () => {
+          for (let i = 0; i < numVoted; i++) {
+            await governance.vote(i + 1, i, value)
+          }
+        })
+
+        it('should unset the most recent referendum proposal voted on', async () => {
+          await governance.revokeVotes()
+          const mostRecentReferendum = await governance.getMostRecentReferendumProposal(account)
+          assert.equal(mostRecentReferendum.toNumber(), 0)
+        })
+
+        it('should return false on `isVoting`', async () => {
+          await governance.revokeVotes()
+          const voting = await governance.isVoting(accounts[0])
+          assert.isFalse(voting)
+        })
+
+        it(`should emit the ProposalVoteRevoked event ${numVoted} times`, async () => {
+          const resp = await governance.revokeVotes()
+          assert.equal(resp.logs.length, numVoted)
+          resp.logs.map((log, i) =>
+            assertLogMatches2(log, {
+              event: 'ProposalVoteRevoked',
+              args: {
+                proposalId: i + 1,
+                account,
+                value,
+                weight,
+              },
+            })
+          )
+        })
+
+        it('should not revert when proposals are not in the Referendum stage', async () => {
+          await timeTravel(referendumStageDuration, web3)
+          await governance.revokeVotes()
+        })
+      })
+    }
+  })
+
   describe('#vote()', () => {
     const proposalId = 1
     const index = 0
@@ -2469,6 +2564,104 @@ contract('Governance', (accounts: string[]) => {
       it('should return false', async () => {
         const passing = await governance.isProposalPassing(proposalId)
         assert.isFalse(passing)
+      })
+    })
+  })
+
+  describe('#getProposalStage()', () => {
+    const expectStage = async (expected: Stage, _proposalId: number) => {
+      const stage = await governance.getProposalStage(_proposalId)
+      assertEqualBN(stage, expected)
+    }
+
+    it('should return None stage when proposal doesnt exist', async () => {
+      await expectStage(Stage.None, 0)
+      await expectStage(Stage.None, 1)
+    })
+
+    describe('when proposal exists', () => {
+      let proposalId: number
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          { value: minDeposit }
+        )
+        proposalId = 1
+        const exists = await governance.proposalExists(proposalId)
+        assert.isTrue(exists, 'proposal does not exist')
+      })
+
+      describe('when proposal is queued', () => {
+        beforeEach(async () => {
+          const queued = await governance.isQueued(proposalId)
+          assert.isTrue(queued, 'proposal not queued')
+        })
+
+        it('should return Queued when not expired', () => expectStage(Stage.Queued, proposalId))
+
+        it('should return Expiration when expired', async () => {
+          await timeTravel(queueExpiry, web3)
+          await expectStage(Stage.Expiration, proposalId)
+        })
+      })
+
+      describe('when proposal is dequeued', () => {
+        const index = 0
+        beforeEach(async () => {
+          await timeTravel(dequeueFrequency, web3)
+          await governance.dequeueProposalsIfReady()
+          const dequeued = await governance.isDequeuedProposal(proposalId, index)
+          assert.isTrue(dequeued, 'proposal not dequeued')
+        })
+
+        describe('when in approval stage', () => {
+          it('should return Approval when not expired', () =>
+            expectStage(Stage.Approval, proposalId))
+
+          it('should return Expiration when expired', async () => {
+            await timeTravel(approvalStageDuration, web3)
+            await expectStage(Stage.Expiration, proposalId)
+          })
+        })
+
+        describe('when in referendum stage', () => {
+          beforeEach(async () => {
+            await governance.approve(proposalId, index)
+            await timeTravel(approvalStageDuration, web3)
+          })
+
+          it('should return Referendum when not expired', () =>
+            expectStage(Stage.Referendum, proposalId))
+
+          it('should return Expiration when expired', async () => {
+            await timeTravel(referendumStageDuration, web3)
+            await expectStage(Stage.Expiration, proposalId)
+          })
+        })
+
+        describe('when in execution stage', () => {
+          beforeEach(async () => {
+            await governance.approve(proposalId, index)
+            await timeTravel(approvalStageDuration, web3)
+            await governance.vote(proposalId, index, VoteValue.Yes)
+            const passing = await governance.isProposalPassing(proposalId)
+            assert.isTrue(passing, 'proposal not passing')
+            await timeTravel(referendumStageDuration, web3)
+          })
+
+          it('should return Execution when not expired', () =>
+            expectStage(Stage.Execution, proposalId))
+
+          it('should return Expiration when expired', async () => {
+            await timeTravel(executionStageDuration, web3)
+            await expectStage(Stage.Expiration, proposalId)
+          })
+        })
       })
     })
   })

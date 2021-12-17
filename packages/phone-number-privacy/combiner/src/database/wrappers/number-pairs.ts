@@ -1,4 +1,4 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { getDatabase } from '../database'
 import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
@@ -19,7 +19,7 @@ export async function getNumberPairContacts(
     const contentPairs = await numberPairs()
       .select(NUMBER_PAIRS_COLUMN.userPhoneHash)
       .where(NUMBER_PAIRS_COLUMN.contactPhoneHash, userPhone)
-
+      .timeout(DB_TIMEOUT)
     const contactPhonesSet = new Set(contactPhones)
     return contentPairs
       .map((contactPair) => contactPair[NUMBER_PAIRS_COLUMN.userPhoneHash])
@@ -46,7 +46,7 @@ export async function setNumberPairContacts(
   }
   try {
     await getDatabase().batchInsert(NUMBER_PAIRS_TABLE, rows)
-  } catch (err) {
+  } catch (err: any) {
     // ignore duplicate insertion error (23505)
     if (err.code !== '23505') {
       logger.error(ErrorMessage.DATABASE_INSERT_FAILURE)

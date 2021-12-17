@@ -1,4 +1,6 @@
+import { CeloTransactionObject } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { StableToken, StableTokenInfo } from '@celo/contractkit/lib/celo-tokens'
 import { ensureLeading0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import Web3 from 'web3'
 
@@ -20,14 +22,22 @@ export class CeloAdapter {
     this.kit.connection.defaultAccount = this.defaultAddress
   }
 
-  async transferGold(to: string, amount: string) {
+  async transferGold(to: string, amount: string): Promise<CeloTransactionObject<boolean>> {
     const goldToken = await this.kit.contracts.getGoldToken()
     return goldToken.transfer(to, amount)
   }
 
-  async transferDollars(to: string, amount: string) {
+  // TODO deprecate after deployment
+  async transferDollars(to: string, amount: string): Promise<CeloTransactionObject<boolean>> {
     const stableToken = await this.kit.contracts.getStableToken()
     return stableToken.transfer(to, amount)
+  }
+
+  async transferStableTokens(to: string, amount: string) {
+    return this.kit.celoTokens.forStableCeloToken(async (info: StableTokenInfo) => {
+      const token = await this.kit.celoTokens.getWrapper(info.symbol as StableToken)
+      return token.transfer(to, amount)
+    })
   }
 
   async escrowDollars(
@@ -36,7 +46,7 @@ export class CeloAdapter {
     amount: string,
     expirySeconds: number,
     minAttestations: number
-  ) {
+  ): Promise<CeloTransactionObject<boolean>> {
     const escrow = await this.kit.contracts.getEscrow()
     const stableToken = await this.kit.contracts.getStableToken()
 

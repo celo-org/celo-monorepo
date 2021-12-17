@@ -1,11 +1,15 @@
 import countryData from 'country-data'
+// more countries @ https://github.com/umpirsky/country-list
+import esData from './data/countries/es/country.json'
 import { getExampleNumber } from './phoneNumbers'
-const esData = require('@umpirsky/country-list/data/es/country.json')
 
 interface CountryNames {
   [name: string]: string
 }
 
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export interface LocalizedCountry extends Omit<countryData.Country, 'countryCallingCodes'> {
   displayName: string
   displayNameNoDiacritics: string
@@ -33,6 +37,9 @@ const matchCountry = (country: LocalizedCountry, query: string) => {
   )
 }
 
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export class Countries {
   language: string
   countryMap: Map<string, LocalizedCountry>
@@ -78,6 +85,7 @@ export class Countries {
         // are fallback languages 'es-US' and 'es-LA' that are not covered
         const names: CountryNames = {
           'en-us': country.name,
+          // @ts-ignore
           'es-419': esData[country.alpha2],
         }
 

@@ -1,7 +1,7 @@
 import { _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { Address } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
-import { retryTx } from './proxy-utils'
+import { retryTx } from './web3-utils'
 
 /**
  * 

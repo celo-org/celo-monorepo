@@ -1,0 +1,52 @@
+imagePullPolicy: IfNotPresent
+blockscout:
+  indexer:
+    db:
+      proxy:
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 500m
+    pool_size: 100
+    resources:
+      requests:
+        memory: 12Gi
+        cpu: 5
+  api:
+    autoscaling:
+        maxReplicas: 5
+        minReplicas: 2
+        target:
+          cpu: 70
+    db:
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 300m
+    pool_size: 30
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 1500m
+  web:
+    host: explorer.celo.org
+    autoscaling:
+      maxReplicas: 5
+      minReplicas: 2
+      target:
+        cpu: 70
+    db:
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 300m
+    pool_size: 30
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 1500m
+    recaptchaSecretName: rc1-blockscout-recaptcha
+  metrics:
+    enabled: true

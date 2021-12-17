@@ -12,17 +12,9 @@ import Web3Utils = require('web3-utils')
 
 const truffle = require('@celo/protocol/truffle-config.js')
 
-const initializeArgs = async (): Promise<[
-  string,
-  number,
-  string,
-  number,
-  number,
-  string[],
-  string[],
-  string,
-  string
-]> => {
+const initializeArgs = async (): Promise<
+  [string, number, string, number, number, string[], string[], string, string]
+> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
     'Registry',
     artifacts
@@ -75,9 +67,10 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
       }
     }
 
-    const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<
-      ReserveSpenderMultiSigInstance
-    >(CeloContractName.ReserveSpenderMultiSig, artifacts)
+    const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<ReserveSpenderMultiSigInstance>(
+      CeloContractName.ReserveSpenderMultiSig,
+      artifacts
+    )
     console.info(`Marking ${reserveSpenderMultiSig.address} as a reserve spender`)
     await reserve.addSpender(reserveSpenderMultiSig.address)
   }

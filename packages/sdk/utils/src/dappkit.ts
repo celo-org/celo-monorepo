@@ -39,16 +39,19 @@ export interface AccountAuthResponseSuccess {
   status: DappKitResponseStatus.SUCCESS
   address: string
   phoneNumber: string
+  pepper: string | undefined
 }
 
 export const AccountAuthResponseSuccess = (
   address: string,
-  phoneNumber: string
+  phoneNumber: string,
+  pepper: string | undefined
 ): AccountAuthResponseSuccess => ({
   type: DappKitRequestTypes.ACCOUNT_ADDRESS,
   status: DappKitResponseStatus.SUCCESS,
   address,
   phoneNumber,
+  pepper,
 })
 
 export interface AccountAuthResponseFailure {

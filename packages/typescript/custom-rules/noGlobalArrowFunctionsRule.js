@@ -3,12 +3,12 @@ exports.__esModule = true
 var tslib_1 = require('tslib')
 var Lint = require('tslint')
 var ts = require('typescript')
-var Rule = /** @class */ (function(_super) {
+var Rule = /** @class */ (function (_super) {
   tslib_1.__extends(Rule, _super)
   function Rule() {
     return (_super !== null && _super.apply(this, arguments)) || this
   }
-  Rule.prototype.apply = function(sourceFile) {
+  Rule.prototype.apply = function (sourceFile) {
     return this.applyWithFunction(sourceFile, walk)
   }
   Rule.FAILURE_STRING = 'arrow functions forbidden in global scope, use named function'

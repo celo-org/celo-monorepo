@@ -1,9 +1,7 @@
-import { CeloTransactionObject } from '@celo/connect'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { StableToken } from '../generated/StableToken'
 import {
-  BaseWrapper,
   proxyCall,
   proxySend,
   secondsToDurationString,
@@ -11,9 +9,9 @@ import {
   tupleParser,
   unixSecondsTimestampToDateString,
   valueToBigNumber,
-  valueToInt,
   valueToString,
 } from './BaseWrapper'
+import { CeloTokenWrapper } from './CeloTokenWrapper'
 
 export interface InflationParameters {
   rate: BigNumber
@@ -30,49 +28,13 @@ export interface StableTokenConfig {
 }
 
 /**
- * Stable token with variable supply (cUSD)
+ * Stable token with variable supply
  */
-export class StableTokenWrapper extends BaseWrapper<StableToken> {
+export class StableTokenWrapper extends CeloTokenWrapper<StableToken> {
   /**
-   * Gets the amount of owner's StableToken allowed to be spent by spender.
-   * @param accountOwner The owner of the StableToken.
-   * @param spender The spender of the StableToken.
-   * @return The amount of StableToken owner is allowing spender to spend.
+   * Returns the address of the owner of the contract.
+   * @return the address of the owner of the contract.
    */
-  allowance = proxyCall(this.contract.methods.allowance, undefined, valueToBigNumber)
-
-  /**
-   * @return The name of the stable token.
-   */
-  name: () => Promise<string> = proxyCall(this.contract.methods.name)
-
-  /**
-   * @return The symbol of the stable token.
-   */
-  symbol: () => Promise<string> = proxyCall(this.contract.methods.symbol)
-
-  /**
-   * @return The number of decimal places to which StableToken is divisible.
-   */
-  decimals = proxyCall(this.contract.methods.decimals, undefined, valueToInt)
-
-  /**
-   * Returns the total supply of the token, that is, the amount of tokens currently minted.
-   * @returns Total supply.
-   */
-  totalSupply = proxyCall(this.contract.methods.totalSupply, undefined, valueToBigNumber)
-
-  /**
-   * Gets the balance of the specified address using the presently stored inflation factor.
-   * @param owner The address to query the balance of.
-   * @return The balance of the specified address.
-   */
-  balanceOf: (owner: string) => Promise<BigNumber> = proxyCall(
-    this.contract.methods.balanceOf,
-    undefined,
-    valueToBigNumber
-  )
-
   owner = proxyCall(this.contract.methods.owner)
 
   /**
@@ -161,6 +123,7 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
   async getHumanReadableConfig() {
     const config = await this.getConfig()
     const inflationParameters = {
+      ...config.inflationParameters,
       updatePeriod: secondsToDurationString(config.inflationParameters.updatePeriod),
       factorLastUpdated: unixSecondsTimestampToDateString(
         config.inflationParameters.factorLastUpdated
@@ -171,55 +134,4 @@ export class StableTokenWrapper extends BaseWrapper<StableToken> {
       inflationParameters,
     }
   }
-
-  /**
-   * Approve a user to transfer StableToken on behalf of another user.
-   * @param spender The address which is being approved to spend StableToken.
-   * @param value The amount of StableToken approved to the spender.
-   * @return True if the transaction succeeds.
-   */
-  approve: (spender: string, value: string | number) => CeloTransactionObject<boolean> = proxySend(
-    this.kit,
-    this.contract.methods.approve
-  )
-
-  /**
-   * Transfer token for a specified address
-   * @param to The address to transfer to.
-   * @param value The amount to be transferred.
-   * @param comment The transfer comment.
-   * @return True if the transaction succeeds.
-   */
-  transferWithComment: (
-    to: string,
-    value: string | number,
-    comment: string
-  ) => CeloTransactionObject<boolean> = proxySend(
-    this.kit,
-    this.contract.methods.transferWithComment
-  )
-
-  /**
-   * Transfers `value` from `msg.sender` to `to`
-   * @param to The address to transfer to.
-   * @param value The amount to be transferred.
-   */
-
-  transfer: (to: string, value: string | number) => CeloTransactionObject<boolean> = proxySend(
-    this.kit,
-    this.contract.methods.transfer
-  )
-
-  /**
-   * Transfers StableToken from one address to another on behalf of a user.
-   * @param from The address to transfer StableToken from.
-   * @param to The address to transfer StableToken to.
-   * @param value The amount of StableToken to transfer.
-   * @return True if the transaction succeeds.
-   */
-  transferFrom: (
-    from: string,
-    to: string,
-    value: string | number
-  ) => CeloTransactionObject<boolean> = proxySend(this.kit, this.contract.methods.transferFrom)
 }

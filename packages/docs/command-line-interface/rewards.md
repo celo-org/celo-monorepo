@@ -31,6 +31,9 @@ OPTIONS
   --filter=filter                                         filter property by partial
                                                           string matching, ex: name=foo
 
+  --globalHelp                                            View all available global
+                                                          flags
+
   --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      Validator Group to show
                                                           rewards for
 

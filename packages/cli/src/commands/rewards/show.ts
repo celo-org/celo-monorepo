@@ -106,7 +106,7 @@ export default class Show extends BaseCommand {
                 })
               )
             )
-          } catch (error) {
+          } catch (error: any) {
             if (error.message.includes('missing trie node')) {
               throw new Error(
                 'Exact voter information is avaiable only for 1024 blocks after each epoch.\n' +
@@ -184,7 +184,7 @@ export default class Show extends BaseCommand {
         voterRewards,
         {
           address: {},
-          addressPayment: { get: (e) => e.addressPayment.toFixed() },
+          addressPayment: { get: (e) => e.addressPayment.toFixed(0) },
           group: { get: (e) => e.group.address },
           averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
@@ -199,7 +199,7 @@ export default class Show extends BaseCommand {
         {
           groupName: { get: (e) => e.group.name },
           group: { get: (e) => e.group.address },
-          groupVoterPayment: { get: (e) => e.groupVoterPayment.toFixed() },
+          groupVoterPayment: { get: (e) => e.groupVoterPayment.toFixed(0) },
           averageValidatorScore: { get: (e) => averageValidatorScore(e.validators).toFixed() },
           epochNumber: {},
         },
@@ -230,7 +230,7 @@ export default class Show extends BaseCommand {
         {
           validatorName: { get: (e) => e.validator.name },
           validator: { get: (e) => e.validator.address },
-          validatorPayment: { get: (e) => e.validatorPayment.toFixed() },
+          validatorPayment: { get: (e) => e.validatorPayment.toFixed(0) },
           validatorScore: { get: (e) => e.validator.score.toFixed() },
           group: { get: (e) => e.group.address },
           epochNumber: {},
@@ -253,7 +253,7 @@ export default class Show extends BaseCommand {
         {
           groupName: { get: (e) => e.group.name },
           group: { get: (e) => e.group.address },
-          groupPayment: { get: (e) => e.groupPayment.toFixed() },
+          groupPayment: { get: (e) => e.groupPayment.toFixed(0) },
           validator: { get: (e) => e.validator.address },
           validatorScore: { get: (e) => e.validator.score.toFixed() },
           epochNumber: {},
@@ -269,9 +269,9 @@ export default class Show extends BaseCommand {
         accountsSlashed,
         {
           slashed: {},
-          penalty: { get: (e) => e.penalty.toFixed() },
+          penalty: { get: (e) => e.penalty.toFixed(0) },
           reporter: {},
-          reward: { get: (e) => e.reward.toFixed() },
+          reward: { get: (e) => e.reward.toFixed(0) },
           epochNumber: {},
         },
         res.flags

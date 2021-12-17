@@ -88,7 +88,7 @@ yargs
         })
         .option('release_gold_contracts', {
           type: 'string',
-          description: 'JSON list of release gold contracts',
+          description: 'Path to JSON containing list of release gold contracts',
         }),
     (args) =>
       exitOnError(
@@ -139,7 +139,7 @@ async function startGanache(
   })
 
   return () =>
-    new Promise((resolve, reject) => {
+    new Promise<void>((resolve, reject) => {
       server.close((err) => {
         if (chainCopy) {
           chainCopy.removeCallback()

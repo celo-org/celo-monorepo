@@ -1,7 +1,12 @@
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { Address } from '@celo/connect'
+import { StableToken } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { GovernanceWrapper, ProposalStage } from '@celo/contractkit/lib/wrappers/Governance'
+import {
+  ExchangeProposalState,
+  GrandaMentoWrapper,
+} from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { LockedGoldWrapper } from '@celo/contractkit/lib/wrappers/LockedGold'
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
 import { ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
@@ -92,6 +97,13 @@ class CheckBuilder {
     }
   }
 
+  withGrandaMento<A>(f: (accounts: GrandaMentoWrapper) => A): () => Promise<Resolve<A>> {
+    return async () => {
+      const accounts = await this.kit.contracts.getGrandaMento()
+      return f(accounts) as Resolve<A>
+    }
+  }
+
   withGovernance<A>(
     f: (governance: GovernanceWrapper, signer: Address, account: Address, ctx: CheckBuilder) => A
   ): () => Promise<Resolve<A>> {
@@ -130,14 +142,42 @@ class CheckBuilder {
       this.withGovernance((governance) => governance.proposalExists(proposalID))
     )
 
+  grandaMentoProposalExists = (proposalID: string) =>
+    this.addCheck(
+      `${proposalID} is an existing proposal`,
+      this.withGrandaMento((grandaMento) => grandaMento.exchangeProposalExists(proposalID))
+    )
+
+  grandaMentoProposalHasState = (proposalID: string, state: ExchangeProposalState) =>
+    this.addCheck(
+      `${proposalID} has state ${ExchangeProposalState[state]}`,
+      this.withGrandaMento(async (grandaMento) => {
+        const exchangeProposal = await grandaMento.getExchangeProposal(proposalID)
+        return exchangeProposal.state === state
+      })
+    )
+
+  grandaMentoProposalIsExecutable = (proposalID: string) => {
+    this.grandaMentoProposalHasState(proposalID, ExchangeProposalState.Approved)
+    return this.addCheck(
+      `${proposalID} veto period has elapsed`,
+      this.withGrandaMento(async (grandaMento) => {
+        const exchangeProposal = await grandaMento.getExchangeProposal(proposalID)
+        return exchangeProposal.approvalTimestamp
+          .plus(exchangeProposal.vetoPeriodSeconds)
+          .isLessThanOrEqualTo(Date.now() / 1000)
+      })
+    )
+  }
+
   proposalInStage = (proposalID: string, stage: keyof typeof ProposalStage) =>
     this.addCheck(
       `${proposalID} is in stage ${stage}`,
       this.withGovernance(async (governance) => {
         const match = (await governance.getProposalStage(proposalID)) === stage
         if (!match) {
-          const timeUntilStages = await governance.timeUntilStages(proposalID)
-          printValueMapRecursive({ timeUntilStages })
+          const schedule = await governance.proposalSchedule(proposalID)
+          printValueMapRecursive(schedule)
         }
         return match
       })
@@ -159,6 +199,12 @@ class CheckBuilder {
     this.addCheck(
       `Hotfix 0x${hash.toString('hex')} is not already executed`,
       this.withGovernance(async (governance) => !(await governance.getHotfixRecord(hash)).executed)
+    )
+
+  hotfixNotApproved = (hash: Buffer) =>
+    this.addCheck(
+      `Hotfix 0x${hash.toString('hex')} is not already approved`,
+      this.withGovernance(async (governance) => !(await governance.getHotfixRecord(hash)).approved)
     )
 
   canSign = (account: Address) =>
@@ -268,7 +314,8 @@ class CheckBuilder {
         const res =
           (await accounts.isAccount(this.signer!)) || (await accounts.isSigner(this.signer!))
         return res
-      })
+      }),
+      `${this.signer} is not a signer or registered as an account. Try authorizing as a signer or running account:register.`
     )
 
   isVoteSignerOrAccount = () =>
@@ -306,12 +353,26 @@ class CheckBuilder {
     )
   }
 
-  hasEnoughUsd = (account: Address, value: BigNumber) => {
+  hasEnoughStable = (
+    account: Address,
+    value: BigNumber,
+    stable: StableToken = StableToken.cUSD
+  ) => {
     const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
-    return this.addCheck(`Account has at least ${valueInEth} cUSD`, () =>
+    return this.addCheck(`Account has at least ${valueInEth} ${stable}`, () =>
       this.kit.contracts
-        .getStableToken()
+        .getStableToken(stable)
         .then((stableToken) => stableToken.balanceOf(account))
+        .then((balance) => balance.gte(value))
+    )
+  }
+
+  hasEnoughErc20 = (account: Address, value: BigNumber, erc20: Address) => {
+    const valueInEth = this.kit.connection.web3.utils.fromWei(value.toFixed(), 'ether')
+    return this.addCheck(`Account has at least ${valueInEth} erc20 token`, () =>
+      this.kit.contracts
+        .getErc20(erc20)
+        .then((goldToken) => goldToken.balanceOf(account))
         .then((balance) => balance.gte(value))
     )
   }

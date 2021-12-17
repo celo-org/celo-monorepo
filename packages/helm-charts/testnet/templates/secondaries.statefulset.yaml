@@ -31,7 +31,7 @@ spec:
           storage: {{ .Values.geth.diskSizeGB }}Gi
   podManagementPolicy: Parallel
   updateStrategy:
-    type: RollingUpdate
+{{ toYaml .Values.updateStrategy.secondaries | indent 4 }}
   replicas: {{ .Values.geth.secondaries }}
   serviceName: secondaries
   selector:
@@ -49,7 +49,7 @@ spec:
 {{- end }}
     spec:
       initContainers:
-{{ include "common.init-genesis-container" .  | indent 6 }}
+{{ include "common.conditional-init-genesis-container" .  | indent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: Always
@@ -57,7 +57,7 @@ spec:
         - /bin/bash
         - "-c"
         args:
-        - |
+        - |-
           [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
           RID=${BASH_REMATCH[1]}
           echo -n "$RID" >/root/.celo/replica_id
@@ -90,7 +90,7 @@ spec:
           cat /root/.celo/bootnodeEnodeAddress
 
           [[ "$BOOTNODE_IP_ADDRESS" == 'none' ]] && BOOTNODE_IP_ADDRESS=${{ .Release.Namespace | upper }}_BOOTNODE_SERVICE_HOST
-          echo `cat /root/.celo/bootnodeEnodeAddress`@$BOOTNODE_IP_ADDRESS:30301 > /root/.celo/bootnodeEnode
+          echo "enode://$(cat /root/.celo/bootnodeEnodeAddress)@$BOOTNODE_IP_ADDRESS:30301" > /root/.celo/bootnodeEnode
           echo -n "Generating Bootnode enode for the validator: "
           cat /root/.celo/bootnodeEnode
 
@@ -160,11 +160,11 @@ spec:
           ACCOUNT_ADDRESS=$(cat /root/.celo/address)
           RID=$(cat /root/.celo/replica_id)
 
-          if [ "$RID" -lt "$FAULTY_NODES" ]; then 
+          if [ "$RID" -lt "$FAULTY_NODES" ]; then
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --istanbul.faultymode $FAULTY_NODE_TYPE"
           fi
 
-          if geth --help | grep -q 'proxy.proxyenodeurlpairs'; then
+          if geth --help | grep 'proxy.proxyenodeurlpairs' >/dev/null; then
             PROXY_FLAG="--proxy.proxyenodeurlpairs"
           else
             PROXY_FLAG="--proxy.proxyenodeurlpair"
@@ -181,11 +181,7 @@ spec:
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
 
-          if [[ "{{ .Release.Name }}" == "alfajores" || "{{ .Release.Name }}" == "baklava" ]]; then
-            BOOTNODE_FLAG="--${network_name}"
-          else
-            BOOTNODE_FLAG="--bootnodes=enode://$(cat /root/.celo/bootnodeEnode)"
-          fi
+{{ include  "common.bootnode-flag-script" . | indent 10 }}
 
           {{- if .metrics | default true }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
@@ -193,9 +189,13 @@ spec:
           {{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
           ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
           {{- end }}
+
+{{ .Values.geth.secondayExtraSnippet | indent 10 }}
+
           exec geth \
             $BOOTNODE_FLAG \
             --datadir /root/.celo \
+            --ipcpath=geth.ipc \
             --nousb \
             --password=/root/.celo/account/accountSecret \
             --unlock=${ACCOUNT_ADDRESS} \
@@ -210,15 +210,12 @@ spec:
             --wsorigins=* \
             --wsapi=eth,net,web3,debug \
             --etherbase=${ACCOUNT_ADDRESS} \
-            --networkid=${NETWORK_ID} \
             --syncmode=full \
             --consoleformat=json \
             --consoleoutput=stdout \
             --verbosity={{ .Values.geth.verbosity }} \
             --vmodule={{ .Values.geth.vmodule }} \
             --istanbul.replica \
-            --istanbul.blockperiod={{ .Values.geth.blocktime }} \
-            --istanbul.requesttimeout={{ .Values.geth.istanbulrequesttimeout }} \
             --maxpeers=125 \
             --nat=extip:`cat /root/.celo/ipAddress` \
             --allow-insecure-unlock \
@@ -268,6 +265,14 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+      {{- if .Values.secondayNodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.secondayNodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.secondaryTolerations }}
+      tolerations:
+{{ toYaml .Values.secondaryTolerations | indent 8 }}
+      {{- end }}
       volumes:
       - name: data
         emptyDir: {}

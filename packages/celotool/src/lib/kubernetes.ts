@@ -63,15 +63,24 @@ export async function deleteResource(
 /**
  * Returns a sorted array of used node ports
  */
-export async function getAllUsedNodePorts(namespace?: string, cmdFlags?: { [key: string]: string }) {
+export async function getAllUsedNodePorts(
+  namespace?: string,
+  cmdFlags?: { [key: string]: string }
+) {
   const namespaceFlag = namespace ? `--namespace ${namespace}` : `--all-namespaces`
-  const cmdFlagStrs = cmdFlags ? Object.entries(cmdFlags).map(([flag, value]) =>
-    `--${flag} ${value}`
-  ) : []
+  const cmdFlagStrs = cmdFlags
+    ? Object.entries(cmdFlags).map(([flag, value]) => `--${flag} ${value}`)
+    : []
   const [output] = await execCmd(
-    `kubectl get svc ${namespaceFlag} ${cmdFlagStrs.join(' ')} -o go-template='{{range .items}}{{range .spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\\n"}}{{end}}{{end}}{{end}}'`
+    `kubectl get svc ${namespaceFlag} ${cmdFlagStrs.join(
+      ' '
+    )} -o go-template='{{range .items}}{{range .spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\\n"}}{{end}}{{end}}{{end}}'`
   )
-  const nodePorts = output.trim().split('\n').filter((portStr: string) => portStr.length).map((portStr: string) => parseInt(portStr, 10))
+  const nodePorts = output
+    .trim()
+    .split('\n')
+    .filter((portStr: string) => portStr.length)
+    .map((portStr: string) => parseInt(portStr, 10))
   // Remove duplicates and sort low -> high
   return Array.from(new Set(nodePorts)).sort((a: number, b: number) => a - b)
 }

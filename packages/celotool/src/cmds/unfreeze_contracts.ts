@@ -48,7 +48,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: UnfreezeContractsArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   const cb = async () => {
     const web3: Web3 = new Web3('http://localhost:8545')

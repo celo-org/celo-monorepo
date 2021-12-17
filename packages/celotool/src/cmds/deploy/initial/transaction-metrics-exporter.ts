@@ -9,7 +9,6 @@ export const describe = 'deploy the transaction metrics exporter'
 export const builder = {}
 
 export const handler = async (argv: InitialArgv) => {
-  await switchToClusterFromEnv()
-
+  await switchToClusterFromEnv(argv.celoEnv)
   await installHelmChart(argv.celoEnv)
 }

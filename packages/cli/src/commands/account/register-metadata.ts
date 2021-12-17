@@ -33,9 +33,7 @@ export default class RegisterMetadata extends BaseCommand {
   async run() {
     const res = this.parse(RegisterMetadata)
 
-    await newCheckBuilder(this)
-      .isAccount(res.flags.from)
-      .runChecks()
+    await newCheckBuilder(this).isAccount(res.flags.from).runChecks()
 
     const metadataURL = res.flags.url
 
@@ -45,7 +43,7 @@ export default class RegisterMetadata extends BaseCommand {
         console.info('Metadata contains the following claims: \n')
         await displayMetadata(metadata, this.kit, res.flags)
         console.info() // Print a newline.
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Metadata could not be retrieved from ${metadataURL}: ${error.toString()}`)
         console.info('Exiting without performing changes...')
         process.exit(-1)

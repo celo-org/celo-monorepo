@@ -17,6 +17,8 @@ import {
   StableTokenContract,
   StableTokenInstance,
 } from 'types'
+import { soliditySha3 } from 'web3-utils'
+import { SECONDS_IN_A_WEEK } from '../constants'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -33,13 +35,12 @@ contract('StableToken', (accounts: string[]) => {
   let initializationTime
 
   const amountToMint = 10
-  const SECONDS_IN_A_WEEK = 60 * 60 * 24 * 7
 
   beforeEach(async () => {
-    registry = await Registry.new()
-    freezer = await Freezer.new()
+    registry = await Registry.new(true)
+    freezer = await Freezer.new(true)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
-    stableToken = await StableToken.new()
+    stableToken = await StableToken.new(true)
     const response = await stableToken.initialize(
       'Celo Dollar',
       'cUSD',
@@ -48,7 +49,8 @@ contract('StableToken', (accounts: string[]) => {
       fixed1,
       SECONDS_IN_A_WEEK,
       [],
-      []
+      [],
+      'Exchange' // USD
     )
     initializationTime = (await web3.eth.getBlock(response.receipt.blockNumber)).timestamp
   })
@@ -102,7 +104,8 @@ contract('StableToken', (accounts: string[]) => {
           fixed1,
           SECONDS_IN_A_WEEK,
           [],
-          []
+          [],
+          'Exchange' // USD
         )
       )
     })
@@ -125,9 +128,11 @@ contract('StableToken', (accounts: string[]) => {
   describe('#mint()', () => {
     const exchange = accounts[0]
     const validators = accounts[1]
+    const grandaMento = accounts[2]
     beforeEach(async () => {
       await registry.setAddressFor(CeloContractName.Exchange, exchange)
       await registry.setAddressFor(CeloContractName.Validators, validators)
+      await registry.setAddressFor(CeloContractName.GrandaMento, grandaMento)
     })
 
     it('should allow the registered exchange contract to mint', async () => {
@@ -146,6 +151,14 @@ contract('StableToken', (accounts: string[]) => {
       assert.equal(supply, amountToMint)
     })
 
+    it('should allow the registered granda mento contract to mint', async () => {
+      await stableToken.mint(validators, amountToMint, { from: grandaMento })
+      const balance = (await stableToken.balanceOf(validators)).toNumber()
+      assert.equal(balance, amountToMint)
+      const supply = (await stableToken.totalSupply()).toNumber()
+      assert.equal(supply, amountToMint)
+    })
+
     it('should allow minting 0 value', async () => {
       await stableToken.mint(validators, 0, { from: validators })
       const balance = (await stableToken.balanceOf(validators)).toNumber()
@@ -155,7 +168,7 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('should not allow anyone else to mint', async () => {
-      await assertRevert(stableToken.mint(validators, amountToMint, { from: accounts[2] }))
+      await assertRevert(stableToken.mint(validators, amountToMint, { from: accounts[3] }))
     })
   })
 
@@ -370,24 +383,63 @@ contract('StableToken', (accounts: string[]) => {
   })
 
   describe('#burn()', () => {
-    const minter = accounts[0]
+    const exchange = accounts[0]
+    const grandaMento = accounts[1]
     const amountToBurn = 5
     beforeEach(async () => {
-      await registry.setAddressFor(CeloContractName.Exchange, minter)
-      await stableToken.mint(minter, amountToMint)
+      await registry.setAddressFor(CeloContractName.Exchange, exchange)
+      await registry.setAddressFor(CeloContractName.GrandaMento, grandaMento)
+      await stableToken.mint(exchange, amountToMint)
+      await stableToken.mint(grandaMento, amountToMint)
     })
 
-    it('should allow minter to burn', async () => {
-      await stableToken.burn(amountToBurn)
-      const balance = (await stableToken.balanceOf(minter)).toNumber()
+    it('should allow the registered exchange contract to burn', async () => {
+      await stableToken.burn(amountToBurn, { from: exchange })
+      const balance = (await stableToken.balanceOf(exchange)).toNumber()
       const expectedBalance = amountToMint - amountToBurn
       assert.equal(balance, expectedBalance)
       const supply = (await stableToken.totalSupply()).toNumber()
-      assert.equal(supply, expectedBalance)
+      const expectedSupply = amountToMint * 2 - amountToBurn
+      assert.equal(supply, expectedSupply)
+    })
+
+    it('should allow the registered granda mento contract to burn', async () => {
+      await stableToken.burn(amountToBurn, { from: grandaMento })
+      const balance = (await stableToken.balanceOf(grandaMento)).toNumber()
+      const expectedBalance = amountToMint - amountToBurn
+      assert.equal(balance, expectedBalance)
+      const supply = (await stableToken.totalSupply()).toNumber()
+      const expectedSupply = amountToMint * 2 - amountToBurn
+      assert.equal(supply, expectedSupply)
     })
 
     it('should not allow anyone else to burn', async () => {
-      await assertRevert(stableToken.burn(amountToBurn, { from: accounts[1] }))
+      await assertRevert(stableToken.burn(amountToBurn, { from: accounts[2] }))
+    })
+  })
+
+  describe('#getExchangeRegistryId()', () => {
+    it('should match initialized value', async () => {
+      const stableToken2 = await StableToken.new(true)
+      await stableToken2.initialize(
+        'Celo Dollar',
+        'cUSD',
+        18,
+        registry.address,
+        fixed1,
+        SECONDS_IN_A_WEEK,
+        [],
+        [],
+        CeloContractName.ExchangeEUR
+      )
+      const fetchedId = await stableToken2.getExchangeRegistryId()
+      assert.equal(fetchedId, soliditySha3(CeloContractName.ExchangeEUR))
+    })
+
+    it('should fallback to default when uninitialized', async () => {
+      const stableToken2 = await StableToken.new(true)
+      const fetchedId = await stableToken2.getExchangeRegistryId()
+      assert.equal(fetchedId, soliditySha3(CeloContractName.Exchange))
     })
   })
 

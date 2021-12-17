@@ -16,6 +16,7 @@ redirects:
   validator-guide/governance: celo-holder-guide/voting-governance.md
   developer-guide/start/celo-truffle-box: developer-resources/walkthroughs/hello-mobile-dapp.md
   developer-guide/overview/introduction: developer-resources/overview.md
+  developer-guide/start/development-chain: developer-guide/development-chain
   important-information/rc-network-disclaimer: important-information/mainnet-network-disclaimer.md
   getting-started/rc1: getting-started/mainnet.md
   getting-started/rc1/running-a-full-node-in-rc1: getting-started/running-a-full-node-in-mainnet.md
@@ -32,3 +33,4 @@ redirects:
   celo-owner-guide/voting-validators: celo-holder-guide/voting-validators.md
   celo-owner-guide/voting-governance: celo-holder-guide/voting-governance.md
   celo-owner-guide/eth-recovery: celo-holder-guide/eth-recovery.md
+  

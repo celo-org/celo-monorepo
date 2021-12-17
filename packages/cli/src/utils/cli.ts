@@ -17,27 +17,36 @@ export async function displaySendTx<A>(
   name: string,
   txObj: CeloTransactionObject<A>,
   tx?: Omit<CeloTx, 'data'>,
-  displayEventName?: string
+  displayEventName?: string | string[]
 ) {
   cli.action.start(`Sending Transaction: ${name}`)
-  const txResult = await txObj.send(tx)
+  try {
+    const txResult = await txObj.send(tx)
 
-  const txHash = await txResult.getHash()
+    const txHash = await txResult.getHash()
 
-  console.log(chalk`SendTransaction: {red.bold ${name}}`)
-  printValueMap({ txHash })
+    console.log(chalk`SendTransaction: {red.bold ${name}}`)
+    printValueMap({ txHash })
 
-  const txReceipt = await txResult.waitReceipt()
-  cli.action.stop()
+    const txReceipt = await txResult.waitReceipt()
+    cli.action.stop()
 
-  if (displayEventName && txReceipt.events) {
-    Object.entries(txReceipt.events)
-      .filter(([eventName]) => eventName === displayEventName)
-      .forEach(([eventName, log]) => {
-        const { params } = parseDecodedParams((log as EventLog).returnValues)
-        console.log(chalk.magenta.bold(`${eventName}:`))
-        printValueMap(params, chalk.magenta)
-      })
+    if (displayEventName && txReceipt.events) {
+      Object.entries(txReceipt.events)
+        .filter(
+          ([eventName]) =>
+            (typeof displayEventName === 'string' && eventName === displayEventName) ||
+            displayEventName.includes(eventName)
+        )
+        .forEach(([eventName, log]) => {
+          const { params } = parseDecodedParams((log as EventLog).returnValues)
+          console.log(chalk.magenta.bold(`${eventName}:`))
+          printValueMap(params, chalk.magenta)
+        })
+    }
+  } catch (e: any) {
+    cli.action.stop(`failed: ${e.message}`)
+    throw e
   }
 }
 
@@ -63,6 +72,8 @@ function toStringValueMapRecursive(valueMap: Record<string, any>, prefix: string
       if (BigNumber.isBigNumber(v)) {
         const extra = v.isGreaterThan(new BigNumber(10).pow(3)) ? `(~${v.toExponential(3)})` : ''
         return `${v.toFixed()} ${extra}`
+      } else if (v instanceof Error) {
+        return '\n' + chalk.red(v.message)
       }
       return '\n' + toStringValueMapRecursive(v, prefix + '  ')
     }

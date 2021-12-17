@@ -5,6 +5,7 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
+  assertRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
@@ -12,7 +13,7 @@ import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
-  ElectionTestContract,
+  ElectionContract,
   ElectionTestInstance,
   LockedGoldContract,
   LockedGoldInstance,
@@ -30,7 +31,7 @@ import {
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const LockedGold: LockedGoldContract = artifacts.require('LockedGold')
-const ElectionTest: ElectionTestContract = artifacts.require('Election')
+const Election: ElectionContract = artifacts.require('Election')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 const MockGovernance: MockGovernanceContract = artifacts.require('MockGovernance')
@@ -42,7 +43,7 @@ const Registry: RegistryContract = artifacts.require('Registry')
 LockedGold.numberFormat = 'BigNumber'
 // @ts-ignore
 // TODO(mcortesi): Use BN
-ElectionTest.numberFormat = 'BigNumber'
+Election.numberFormat = 'BigNumber'
 
 const HOUR = 60 * 60
 const DAY = 24 * HOUR
@@ -62,12 +63,12 @@ contract('LockedGold', (accounts: string[]) => {
 
   beforeEach(async () => {
     mockGoldToken = await MockGoldToken.new()
-    accountsInstance = await Accounts.new()
-    lockedGold = await LockedGold.new()
+    accountsInstance = await Accounts.new(true)
+    lockedGold = await LockedGold.new(true)
     mockElection = await MockElection.new()
     mockValidators = await MockValidators.new()
     mockGovernance = await MockGovernance.new()
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
@@ -476,7 +477,7 @@ contract('LockedGold', (accounts: string[]) => {
     const reporter = accounts[3]
 
     beforeEach(async () => {
-      election = await ElectionTest.new()
+      election = await Election.new(true)
       await registry.setAddressFor(CeloContractName.LockedGold, lockedGold.address)
       await election.initialize(
         registry.address,
@@ -495,6 +496,7 @@ contract('LockedGold', (accounts: string[]) => {
       await lockedGold.lock({ value })
       await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
       await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
+      await accountsInstance.createAccount({ from: reporter })
     })
 
     describe('when the account is slashed for all of its locked gold', () => {
@@ -529,7 +531,7 @@ contract('LockedGold', (accounts: string[]) => {
       })
     })
 
-    describe('when the account is removed from `isSlasher`', () => {
+    describe('when the slashing contract is removed from `isSlasher`', () => {
       const penalty = value
       const reward = value / 2
       beforeEach(async () => {
@@ -665,6 +667,48 @@ contract('LockedGold', (accounts: string[]) => {
           assert.equal(await web3.eth.getBalance(mockGovernance.address), value - reward)
         })
       })
+    })
+
+    it('cannot be invoked by non-account reporters', async () => {
+      const penalty = value
+      const reward = value / 2
+
+      await assertRevertWithReason(
+        lockedGold.slash(
+          account,
+          penalty,
+          accounts[4],
+          reward,
+          [NULL_ADDRESS],
+          [NULL_ADDRESS],
+          [0],
+          { from: accounts[2] }
+        ),
+        'Not an account'
+      )
+    })
+
+    it('can be invoked by an account signer on behalf of the account', async () => {
+      const signerReporter = accounts[4]
+      const role = '0x0000000000000000000000000000000000000000000000000000000000001337'
+      await accountsInstance.authorizeSigner(signerReporter, role, { from: reporter })
+      await accountsInstance.completeSignerAuthorization(reporter, role, { from: signerReporter })
+      const penalty = value
+      const reward = value / 2
+
+      await lockedGold.slash(
+        account,
+        penalty,
+        signerReporter,
+        reward,
+        [NULL_ADDRESS],
+        [NULL_ADDRESS],
+        [0],
+        { from: accounts[2] }
+      )
+
+      assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward)
+      assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
     })
   })
 })

@@ -38,9 +38,7 @@ export default class SetBeneficiary extends ReleaseGoldBaseCommand {
     const owner = await this.releaseGoldWrapper.getOwner()
     const releaseGoldMultiSig = await this.kit.contracts.getMultiSig(owner)
 
-    await newCheckBuilder(this)
-      .isMultiSigOwner(flags.from, releaseGoldMultiSig)
-      .runChecks()
+    await newCheckBuilder(this).isMultiSigOwner(flags.from, releaseGoldMultiSig).runChecks()
 
     if (!flags.yesreally) {
       const response = await prompts({

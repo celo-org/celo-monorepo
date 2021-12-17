@@ -1,0 +1,19 @@
+oracle:
+  currencyPair: CELOUSD
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      maxPercentageDeviation: 0.05
+      maxPercentageBidAskSpread: 0.025
+      # minReportPriceChangeThreshold
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  priceSources: "[[{exchange: 'BITTREX', symbol: 'CELOUSD', toInvert: false}],[{exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false}],[{exchange: 'OKCOIN', symbol: 'CELOUSD', toInvert: false}]]"
+  minPriceSourceCount: 2
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      minReportPriceChangeThreshold: 0.005 # 0.5%

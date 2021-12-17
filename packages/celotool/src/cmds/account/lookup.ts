@@ -33,7 +33,7 @@ export const builder = (yargs: Argv) => {
 }
 
 export const handler = async (argv: LookupArgv) => {
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false, true)
   console.log(`Looking up addresses attested to ${argv.phone}`)
   if (!argv.salt) {
     console.warn(

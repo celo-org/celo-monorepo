@@ -5,9 +5,12 @@ import {
   assertLogMatches2,
   assertRevert,
   assertSameAddress,
+  getDerivedKey,
+  getVerificationCodeSignature,
+  KeyOffsets,
   mineBlocks,
+  unlockAndAuthorizeKey,
 } from '@celo/protocol/lib/test-utils'
-import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
@@ -20,18 +23,17 @@ import {
   AttestationsTestInstance,
   MockElectionContract,
   MockElectionInstance,
+  MockERC20TokenContract,
+  MockERC20TokenInstance,
   MockLockedGoldContract,
   MockLockedGoldInstance,
   MockRandomContract,
   MockRandomInstance,
-  MockStableTokenContract,
-  MockStableTokenInstance,
   MockValidatorsContract,
   RegistryContract,
   RegistryInstance,
 } from 'types'
 import Web3 from 'web3'
-import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 import { beforeEachWithRetries } from '../customHooks'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
@@ -41,7 +43,7 @@ const Accounts: AccountsContract = artifacts.require('Accounts')
  * for Truffle unit tests.
  */
 const Attestations: AttestationsTestContract = artifacts.require('AttestationsTest')
-const MockStableToken: MockStableTokenContract = artifacts.require('MockStableToken')
+const MockERC20Token: MockERC20TokenContract = artifacts.require('MockERC20Token')
 const MockElection: MockElectionContract = artifacts.require('MockElection')
 const MockLockedGold: MockLockedGoldContract = artifacts.require('MockLockedGold')
 const MockValidators: MockValidatorsContract = artifacts.require('MockValidators')
@@ -51,8 +53,8 @@ const Registry: RegistryContract = artifacts.require('Registry')
 contract('Attestations', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let attestations: AttestationsTestInstance
-  let mockStableToken: MockStableTokenInstance
-  let otherMockStableToken: MockStableTokenInstance
+  let mockERC20Token: MockERC20TokenInstance
+  let otherMockERC20Token: MockERC20TokenInstance
   let random: MockRandomInstance
   let mockElection: MockElectionInstance
   let mockLockedGold: MockLockedGoldInstance
@@ -60,19 +62,6 @@ contract('Attestations', (accounts: string[]) => {
   const web3: Web3 = new Web3('http://localhost:8545')
   const phoneNumber: string = '+18005551212'
   const caller: string = accounts[0]
-  // Private keys of each of the 10 miners, in the same order as their addresses in 'accounts'.
-  const accountPrivateKeys: string[] = [
-    '0xf2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d',
-    '0x5d862464fe9303452126c8bc94274b8c5f9874cbd219789b3eb2128075a76f72',
-    '0xdf02719c4df8b9b8ac7f551fcb5d9ef48fa27eef7a66453879f4d8fdc6e78fb1',
-    '0xff12e391b79415e941a94de3bf3a9aee577aed0731e297d5cfa0b8a1e02fa1d0',
-    '0x752dd9cf65e68cfaba7d60225cbdbc1f4729dd5e5507def72815ed0d8abc6249',
-    '0xefb595a0178eb79a8df953f87c5148402a224cdf725e88c0146727c6aceadccd',
-    '0x83c6d2cc5ddcf9711a6d59b417dc20eb48afd58d45290099e5987e3d768f328f',
-    '0xbb2d3f7c9583780a7d3904a2f55d792707c345f21de1bacb2d389934d82796b2',
-    '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
-    '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89',
-  ]
 
   const phoneHash: string = getPhoneHash(phoneNumber)
 
@@ -81,15 +70,6 @@ contract('Attestations', (accounts: string[]) => {
   const selectIssuersWaitBlocks = 4
   const maxAttestations = 20
   const attestationFee = new BigNumber(web3.utils.toWei('.05', 'ether').toString())
-
-  async function getVerificationCodeSignature(
-    account: string,
-    issuer: string
-  ): Promise<[number, string, string]> {
-    const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer)
-    const { v, r, s } = AttestationUtils.attestToIdentifier(phoneHash, account, privateKey)
-    return [v, r, s]
-  }
 
   async function setAccountWalletAddress() {
     return accountsInstance.setWalletAddress(caller, '0x0', '0x0', '0x0')
@@ -104,59 +84,37 @@ contract('Attestations', (accounts: string[]) => {
     return accounts[nonIssuerIndex]
   }
 
-  enum KeyOffsets {
-    VALIDATING_KEY_OFFSET,
-    ATTESTING_KEY_OFFSET,
-    NEW_VALIDATING_KEY_OFFSET,
-    VOTING_KEY_OFFSET,
-  }
-
-  const getDerivedKey = (offset: number, address: string) => {
-    const pKey = accountPrivateKeys[accounts.indexOf(address)]
-    const aKey = Buffer.from(pKey.slice(2), 'hex')
-    aKey.write((aKey[0] + offset).toString(16))
-    return '0x' + aKey.toString('hex')
-  }
-
-  const unlockAndAuthorizeKey = async (offset: number, authorizeFn: any, account: string) => {
-    const key = getDerivedKey(offset, account)
-    const addr = privateKeyToAddress(key)
-    // @ts-ignore
-    await web3.eth.personal.importRawKey(key, 'passphrase')
-    await web3.eth.personal.unlockAccount(addr, 'passphrase', 1000000)
-
-    const signature = await getParsedSignatureOfAddress(web3, account, addr)
-    return authorizeFn(addr, signature.v, signature.r, signature.s, {
-      from: account,
-    })
-  }
-
   beforeEachWithRetries('Attestations setup', 3, 3000, async () => {
-    accountsInstance = await Accounts.new()
-    mockStableToken = await MockStableToken.new()
-    otherMockStableToken = await MockStableToken.new()
+    accountsInstance = await Accounts.new(true)
+    mockERC20Token = await MockERC20Token.new()
+    otherMockERC20Token = await MockERC20Token.new()
     const mockValidators = await MockValidators.new()
     attestations = await Attestations.new()
     random = await Random.new()
     await random.initialize(256)
     await random.addTestRandomness(0, '0x00')
     mockLockedGold = await MockLockedGold.new()
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
 
+    const tokenBalance = web3.utils.toWei('10', 'ether').toString()
     await Promise.all(
       accounts.map(async (account) => {
+        await mockERC20Token.mint(account, tokenBalance)
+        await otherMockERC20Token.mint(account, tokenBalance)
         await accountsInstance.createAccount({ from: account })
         await unlockAndAuthorizeKey(
           KeyOffsets.VALIDATING_KEY_OFFSET,
           accountsInstance.authorizeValidatorSigner,
-          account
+          account,
+          accounts
         )
         await unlockAndAuthorizeKey(
           KeyOffsets.ATTESTING_KEY_OFFSET,
           accountsInstance.authorizeAttestationSigner,
-          account
+          account,
+          accounts
         )
       })
     )
@@ -164,7 +122,7 @@ contract('Attestations', (accounts: string[]) => {
     mockElection = await MockElection.new()
     await mockElection.setElectedValidators(
       accounts.map((account) =>
-        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account))
+        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account, accounts))
       )
     )
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
@@ -176,13 +134,13 @@ contract('Attestations', (accounts: string[]) => {
       attestationExpiryBlocks,
       selectIssuersWaitBlocks,
       maxAttestations,
-      [mockStableToken.address, otherMockStableToken.address],
+      [mockERC20Token.address, otherMockERC20Token.address],
       [attestationFee, attestationFee]
     )
 
     await attestations.__setValidators(
       accounts.map((account) =>
-        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account))
+        privateKeyToAddress(getDerivedKey(KeyOffsets.VALIDATING_KEY_OFFSET, account, accounts))
       )
     )
   })
@@ -194,7 +152,7 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should have set the fee', async () => {
-      const fee = await attestations.getAttestationRequestFee(mockStableToken.address)
+      const fee = await attestations.getAttestationRequestFee(mockERC20Token.address)
       assert.equal(fee.toString(), attestationFee.toString())
     })
 
@@ -205,7 +163,7 @@ contract('Attestations', (accounts: string[]) => {
           attestationExpiryBlocks,
           selectIssuersWaitBlocks,
           maxAttestations,
-          [mockStableToken.address],
+          [mockERC20Token.address],
           [attestationFee]
         )
       )
@@ -244,18 +202,18 @@ contract('Attestations', (accounts: string[]) => {
     const newAttestationFee: BigNumber = attestationFee.plus(1)
 
     it('should set the fee', async () => {
-      await attestations.setAttestationRequestFee(mockStableToken.address, newAttestationFee)
-      const fee = await attestations.getAttestationRequestFee(mockStableToken.address)
+      await attestations.setAttestationRequestFee(mockERC20Token.address, newAttestationFee)
+      const fee = await attestations.getAttestationRequestFee(mockERC20Token.address)
       assert.equal(fee.toString(), newAttestationFee.toString())
     })
 
     it('should revert when the fee is being set to 0', async () => {
-      await assertRevert(attestations.setAttestationRequestFee(mockStableToken.address, 0))
+      await assertRevert(attestations.setAttestationRequestFee(mockERC20Token.address, 0))
     })
 
     it('should not be settable by a non-owner', async () => {
       await assertRevert(
-        attestations.setAttestationRequestFee(mockStableToken.address, newAttestationFee, {
+        attestations.setAttestationRequestFee(mockERC20Token.address, newAttestationFee, {
           from: accounts[1],
         })
       )
@@ -263,7 +221,7 @@ contract('Attestations', (accounts: string[]) => {
 
     it('should emit the AttestationRequestFeeSet event', async () => {
       const response = await attestations.setAttestationRequestFee(
-        mockStableToken.address,
+        mockERC20Token.address,
         newAttestationFee
       )
       assert.lengthOf(response.logs, 1)
@@ -271,7 +229,7 @@ contract('Attestations', (accounts: string[]) => {
       assertLogMatches2(event, {
         event: 'AttestationRequestFeeSet',
         args: {
-          token: mockStableToken.address,
+          token: mockERC20Token.address,
           value: newAttestationFee,
         },
       })
@@ -335,7 +293,7 @@ contract('Attestations', (accounts: string[]) => {
 
   describe('#request()', () => {
     it('should indicate an unselected attestation request', async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address)
       const requestBlock = await web3.eth.getBlock('latest')
 
       const [
@@ -346,11 +304,11 @@ contract('Attestations', (accounts: string[]) => {
 
       assertEqualBN(blockNumber, requestBlock.number)
       assertEqualBN(attestationsRequested, actualAttestationsRequested)
-      assertSameAddress(actualAttestationRequestFeeToken, mockStableToken.address)
+      assertSameAddress(actualAttestationRequestFeeToken, mockERC20Token.address)
     })
 
     it('should increment the number of attestations requested', async () => {
-      await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+      await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address)
 
       const [completed, total] = await attestations.getAttestationStats(phoneHash, caller)
       assertEqualBN(completed, 0)
@@ -358,14 +316,14 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert if 0 attestations are requested', async () => {
-      await assertRevert(attestations.request(phoneHash, 0, mockStableToken.address))
+      await assertRevert(attestations.request(phoneHash, 0, mockERC20Token.address))
     })
 
     it('should emit the AttestationsRequested event', async () => {
       const response = await attestations.request(
         phoneHash,
         attestationsRequested,
-        mockStableToken.address
+        mockERC20Token.address
       )
 
       assert.lengthOf(response.logs, 1)
@@ -376,25 +334,25 @@ contract('Attestations', (accounts: string[]) => {
           identifier: phoneHash,
           account: caller,
           attestationsRequested: new BigNumber(attestationsRequested),
-          attestationRequestFeeToken: mockStableToken.address,
+          attestationRequestFeeToken: mockERC20Token.address,
         },
       })
     })
 
     describe('when attestations have already been requested', () => {
       beforeEach(async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+        await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address)
       })
 
       describe('when the issuers have not yet been selected', () => {
         it('should revert requesting more attestations', async () => {
-          await assertRevert(attestations.request(phoneHash, 1, mockStableToken.address))
+          await assertRevert(attestations.request(phoneHash, 1, mockERC20Token.address))
         })
 
         describe('when the original request has expired', () => {
           it('should allow to request more attestations', async () => {
             await mineBlocks(attestationExpiryBlocks, web3)
-            await attestations.request(phoneHash, 1, mockStableToken.address)
+            await attestations.request(phoneHash, 1, mockERC20Token.address)
           })
         })
 
@@ -402,7 +360,7 @@ contract('Attestations', (accounts: string[]) => {
           it('should allow to request more attestations', async () => {
             const randomnessBlockRetentionWindow = await random.randomnessBlockRetentionWindow()
             await mineBlocks(randomnessBlockRetentionWindow.toNumber(), web3)
-            await attestations.request(phoneHash, 1, mockStableToken.address)
+            await attestations.request(phoneHash, 1, mockERC20Token.address)
           })
         })
       })
@@ -415,7 +373,7 @@ contract('Attestations', (accounts: string[]) => {
         })
 
         it('should allow to request more attestations', async () => {
-          await attestations.request(phoneHash, 1, mockStableToken.address)
+          await attestations.request(phoneHash, 1, mockERC20Token.address)
           const [completed, total] = await attestations.getAttestationStats(phoneHash, caller)
           assert.equal(completed.toNumber(), 0)
           assert.equal(total.toNumber(), attestationsRequested + 1)
@@ -439,7 +397,7 @@ contract('Attestations', (accounts: string[]) => {
       })
 
       it('does not select among those when requesting 5', async () => {
-        await attestations.request(phoneHash, 5, mockStableToken.address)
+        await attestations.request(phoneHash, 5, mockERC20Token.address)
         const requestBlockNumber = await web3.eth.getBlockNumber()
         await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
         await attestations.selectIssuers(phoneHash)
@@ -451,7 +409,7 @@ contract('Attestations', (accounts: string[]) => {
 
     describe('when attestations were requested', () => {
       beforeEach(async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+        await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address)
         expectedRequestBlockNumber = await web3.eth.getBlockNumber()
       })
 
@@ -547,7 +505,7 @@ contract('Attestations', (accounts: string[]) => {
                 identifier: phoneHash,
                 account: caller,
                 issuer,
-                attestationRequestFeeToken: mockStableToken.address,
+                attestationRequestFeeToken: mockERC20Token.address,
               },
             })
           })
@@ -556,7 +514,7 @@ contract('Attestations', (accounts: string[]) => {
         describe('when more attestations were requested', () => {
           beforeEach(async () => {
             await attestations.selectIssuers(phoneHash)
-            await attestations.request(phoneHash, 8, mockStableToken.address)
+            await attestations.request(phoneHash, 8, mockERC20Token.address)
             expectedRequestBlockNumber = await web3.eth.getBlockNumber()
             const requestBlockNumber = await web3.eth.getBlockNumber()
             await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
@@ -591,7 +549,8 @@ contract('Attestations', (accounts: string[]) => {
                 unlockAndAuthorizeKey(
                   KeyOffsets.NEW_VALIDATING_KEY_OFFSET,
                   accountsInstance.authorizeValidatorSigner,
-                  account
+                  account,
+                  accounts
                 )
               )
             )
@@ -624,12 +583,13 @@ contract('Attestations', (accounts: string[]) => {
   describe('#complete()', () => {
     let issuer: string
     let v: number
-    let r: string, s: string
+    let r: string
+    let s: string
 
     beforeEach(async () => {
       await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      ;[v, r, s] = await getVerificationCodeSignature(caller, issuer)
+      ;({ v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts))
     })
 
     it('should add the account to the list upon completion', async () => {
@@ -645,7 +605,7 @@ contract('Attestations', (accounts: string[]) => {
     it('should not add the account twice to the list', async () => {
       await attestations.complete(phoneHash, v, r, s)
       const secondIssuer = (await attestations.getAttestationIssuers(phoneHash, caller))[1]
-      ;[v, r, s] = await getVerificationCodeSignature(caller, secondIssuer)
+      ;({ v, r, s } = await getVerificationCodeSignature(caller, secondIssuer, phoneHash, accounts))
 
       await attestations.complete(phoneHash, v, r, s)
       const attestedAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
@@ -683,7 +643,7 @@ contract('Attestations', (accounts: string[]) => {
     it('should increment pendingWithdrawals for the rewards recipient', async () => {
       await attestations.complete(phoneHash, v, r, s)
       const pendingWithdrawals = await attestations.pendingWithdrawals(
-        mockStableToken.address,
+        mockERC20Token.address,
         issuer
       )
       assert.equal(pendingWithdrawals.toString(), attestationFee.toString())
@@ -710,12 +670,17 @@ contract('Attestations', (accounts: string[]) => {
     })
 
     it('should revert when an invalid attestation code is provided', async () => {
-      ;[v, r, s] = await getVerificationCodeSignature(accounts[1], issuer)
+      ;({ v, r, s } = await getVerificationCodeSignature(accounts[1], issuer, phoneHash, accounts))
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
 
     it('should revert with a non-requested issuer', async () => {
-      ;[v, r, s] = await getVerificationCodeSignature(caller, await getNonIssuer())
+      ;({ v, r, s } = await getVerificationCodeSignature(
+        caller,
+        await getNonIssuer(),
+        phoneHash,
+        accounts
+      ))
       await assertRevert(attestations.complete(phoneHash, v, r, s))
     })
 
@@ -735,17 +700,17 @@ contract('Attestations', (accounts: string[]) => {
     beforeEach(async () => {
       await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
+      const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
       await attestations.complete(phoneHash, v, r, s)
-      await mockStableToken.mint(attestations.address, attestationFee)
+      await mockERC20Token.mint(attestations.address, attestationFee)
     })
 
     it('should remove the balance of available rewards for the issuer from issuer', async () => {
-      await attestations.withdraw(mockStableToken.address, {
+      await attestations.withdraw(mockERC20Token.address, {
         from: issuer,
       })
       const pendingWithdrawals = await attestations.pendingWithdrawals(
-        mockStableToken.address,
+        mockERC20Token.address,
         issuer
       )
       assertEqualBN(pendingWithdrawals, 0)
@@ -753,11 +718,11 @@ contract('Attestations', (accounts: string[]) => {
 
     it('should remove the balance of available rewards for the issuer from attestation signer', async () => {
       const signer = await accountsInstance.getAttestationSigner(issuer)
-      await attestations.withdraw(mockStableToken.address, {
+      await attestations.withdraw(mockERC20Token.address, {
         from: signer,
       })
       const pendingWithdrawals = await attestations.pendingWithdrawals(
-        mockStableToken.address,
+        mockERC20Token.address,
         issuer
       )
       assertEqualBN(pendingWithdrawals, 0)
@@ -767,14 +732,15 @@ contract('Attestations', (accounts: string[]) => {
       await unlockAndAuthorizeKey(
         KeyOffsets.VOTING_KEY_OFFSET,
         accountsInstance.authorizeVoteSigner,
-        issuer
+        issuer,
+        accounts
       )
       const signer = await accountsInstance.getVoteSigner(issuer)
-      await assertRevert(attestations.withdraw(mockStableToken.address, { from: signer }))
+      await assertRevert(attestations.withdraw(mockERC20Token.address, { from: signer }))
     })
 
     it('should emit the Withdrawal event', async () => {
-      const response = await attestations.withdraw(mockStableToken.address, {
+      const response = await attestations.withdraw(mockERC20Token.address, {
         from: issuer,
       })
       assert.lengthOf(response.logs, 1)
@@ -783,7 +749,7 @@ contract('Attestations', (accounts: string[]) => {
         event: 'Withdrawal',
         args: {
           account: issuer,
-          token: mockStableToken.address,
+          token: mockERC20Token.address,
           amount: attestationFee,
         },
       })
@@ -791,13 +757,13 @@ contract('Attestations', (accounts: string[]) => {
 
     it('should not allow someone with no pending withdrawals to withdraw', async () => {
       await assertRevert(
-        attestations.withdraw(mockStableToken.address, { from: await getNonIssuer() })
+        attestations.withdraw(mockERC20Token.address, { from: await getNonIssuer() })
       )
     })
   })
 
   const requestAttestations = async () => {
-    await attestations.request(phoneHash, attestationsRequested, mockStableToken.address)
+    await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address)
     const requestBlockNumber = await web3.eth.getBlockNumber()
     await random.addTestRandomness(requestBlockNumber + selectIssuersWaitBlocks, '0x1')
     await attestations.selectIssuers(phoneHash)
@@ -805,7 +771,7 @@ contract('Attestations', (accounts: string[]) => {
   const requestAndCompleteAttestations = async () => {
     await requestAttestations()
     const issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-    const [v, r, s] = await getVerificationCodeSignature(caller, issuer)
+    const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
     await attestations.complete(phoneHash, v, r, s)
   }
 
@@ -903,7 +869,7 @@ contract('Attestations', (accounts: string[]) => {
           let other
           beforeEach(async () => {
             other = accounts[1]
-            await attestations.request(phoneHash, attestationsRequested, mockStableToken.address, {
+            await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address, {
               from: other,
             })
             const requestBlockNumber = await web3.eth.getBlockNumber()
@@ -911,7 +877,12 @@ contract('Attestations', (accounts: string[]) => {
             await attestations.selectIssuers(phoneHash, { from: other })
 
             const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
-            const [v, r, s] = await getVerificationCodeSignature(other, issuer)
+            const { v, r, s } = await getVerificationCodeSignature(
+              other,
+              issuer,
+              phoneHash,
+              accounts
+            )
             await attestations.complete(phoneHash, v, r, s, { from: other })
             await accountsInstance.setWalletAddress(other, '0x0', '0x0', '0x0', { from: other })
           })
@@ -1124,7 +1095,7 @@ contract('Attestations', (accounts: string[]) => {
       })
 
       it('should revert when the `to` address has attestations existing', async () => {
-        await attestations.request(phoneHash, attestationsRequested, mockStableToken.address, {
+        await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address, {
           from: replacementAddress,
         })
         const requestBlockNumber = await web3.eth.getBlockNumber()
@@ -1136,7 +1107,12 @@ contract('Attestations', (accounts: string[]) => {
             from: replacementAddress,
           })
         )[0]
-        const [v, r, s] = await getVerificationCodeSignature(replacementAddress, issuer)
+        const { v, r, s } = await getVerificationCodeSignature(
+          replacementAddress,
+          issuer,
+          phoneHash,
+          accounts
+        )
         await attestations.complete(phoneHash, v, r, s, { from: replacementAddress })
         await attestations.approveTransfer(phoneHash, 0, caller, replacementAddress, true, {
           from: replacementAddress,

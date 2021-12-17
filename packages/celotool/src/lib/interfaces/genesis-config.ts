@@ -11,7 +11,7 @@ export interface GenesisConfig {
   requestTimeout?: number
   enablePetersburg?: boolean
   timestamp?: number
-  // Activation block numbers for Celo hard forks
-  churritoBlock?: number
-  donutBlock?: number
+  // Activation block numbers for Celo hard forks, null for never activating
+  churritoBlock?: number | null
+  donutBlock?: number | null
 }

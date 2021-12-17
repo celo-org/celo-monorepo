@@ -1,0 +1,10 @@
+apiVersion: aadpodidentity.k8s.io/v1
+kind: AzureIdentity
+metadata:
+  name: {{ template "azure-identity-name" . }}
+  annotations:
+    aadpodidentity.k8s.io/Behavior: namespaced
+spec:
+  type: 0
+  resourceID: {{ .Values.azureKVIdentity.id }}
+  clientID: {{ .Values.azureKVIdentity.clientId }}

@@ -203,10 +203,7 @@ export function runAttestationTest(
       const stableBalanceRoot = await stableToken.balanceOf(attestationAccountAddress)
       const transferBackTx = stableToken.transfer(
         root.address,
-        stableBalanceRoot
-          .times(0.95)
-          .integerValue(BigNumber.ROUND_DOWN)
-          .toString()
+        stableBalanceRoot.times(0.95).integerValue(BigNumber.ROUND_DOWN).toString()
       )
       const transferBackTxReceipt = await transferBackTx.sendAndWaitForReceipt()
 

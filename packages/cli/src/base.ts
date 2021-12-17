@@ -1,23 +1,22 @@
 import { ReadOnlyWallet } from '@celo/connect'
-import { CeloContract, ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { ContractKit, newKitFromWeb3, StableToken, Token } from '@celo/contractkit'
+import { stableTokenInfos } from '@celo/contractkit/lib/celo-tokens'
 import { AzureHSMWallet } from '@celo/wallet-hsm-azure'
 import { AddressValidation, newLedgerWalletWithSetup } from '@celo/wallet-ledger'
 import { LocalWallet } from '@celo/wallet-local'
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import { Command, flags } from '@oclif/command'
 import { ParserOutput } from '@oclif/parser/lib/parse'
+import chalk from 'chalk'
 import net from 'net'
 import Web3 from 'web3'
 import { getGasCurrency, getNodeUrl } from './utils/config'
-import { requireNodeIsSynced } from './utils/helpers'
+import { enumEntriesDupWithLowercase, requireNodeIsSynced } from './utils/helpers'
 
-export enum GasOptions {
-  celo = 'celo',
-  CELO = 'celo',
-  cusd = 'cusd',
-  cUSD = 'cusd',
-  auto = 'auto',
-  Auto = 'auto',
+export const gasOptions = {
+  auto: 'auto',
+  Auto: 'auto',
+  ...enumEntriesDupWithLowercase(Object.entries(Token)),
+  ...enumEntriesDupWithLowercase(Object.entries(StableToken)),
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -32,9 +31,25 @@ export abstract class BaseCommand extends Command {
       char: 'n',
       description: "URL of the node to run commands against (defaults to 'http://localhost:8545')",
       hidden: true,
+      parse: (nodeUrl) => {
+        switch (nodeUrl) {
+          case 'local':
+          case 'localhost':
+            return 'http://localhost:8545'
+          case 'baklava':
+            return 'https://baklava-forno.celo-testnet.org'
+          case 'alfajores':
+            return 'https://alfajores-forno.celo-testnet.org'
+          case 'mainnet':
+          case 'forno':
+            return 'https://forno.celo.org'
+          default:
+            return nodeUrl
+        }
+      },
     }),
     gasCurrency: flags.enum({
-      options: Object.keys(GasOptions),
+      options: Object.keys(gasOptions),
       description:
         "Use a specific gas currency for transaction fees (defaults to 'auto' which uses whatever feeCurrency is available)",
       hidden: true,
@@ -70,6 +85,11 @@ export abstract class BaseCommand extends Command {
       default: false,
       hidden: true,
       description: 'Set it to ask confirmation for the address of the transaction from the ledger',
+    }),
+    globalHelp: flags.boolean({
+      default: false,
+      hidden: false,
+      description: 'View all available global flags',
     }),
   }
   // This specifies whether the node needs to be synced before the command
@@ -120,10 +140,21 @@ export abstract class BaseCommand extends Command {
     if (this.requireSynced) {
       await requireNodeIsSynced(this.web3)
     }
+
     const res: ParserOutput<any, any> = this.parse()
+    if (res.flags.globalHelp) {
+      console.log(chalk.red.bold('GLOBAL OPTIONS'))
+      Object.entries(BaseCommand.flags).forEach(([name, flag]) => {
+        console.log(chalk.black(`  --${name}`).padEnd(40) + chalk.gray(`${flag.description}`))
+      })
+      process.exit(0)
+    }
+
     if (res.flags.useLedger) {
-      let transport: Transport
+      let transport
       try {
+        // Importing for ledger uses only fixes running jest tests
+        const TransportNodeHid = (await import('@ledgerhq/hw-transport-node-hid')).default
         transport = await TransportNodeHid.open('')
         const derivationPathIndexes = res.raw.some(
           (value) => (value as any).flag === 'ledgerCustomAddresses'
@@ -165,21 +196,30 @@ export abstract class BaseCommand extends Command {
     }
 
     const gasCurrencyConfig = res.flags.gasCurrency
-      ? GasOptions[res.flags.gasCurrency as keyof typeof GasOptions]
+      ? (gasOptions as any)[res.flags.gasCurrency]
       : getGasCurrency(this.config.configDir)
 
-    const setUsdGas = async () => {
-      await this.kit.setFeeCurrency(CeloContract.StableToken)
+    const setStableTokenGas = async (stable: StableToken) => {
+      await this.kit.setFeeCurrency(stableTokenInfos[stable].contract)
       await this.kit.updateGasPriceInConnectionLayer(
-        await this.kit.registry.addressFor(CeloContract.StableToken)
+        await this.kit.registry.addressFor(stableTokenInfos[stable].contract)
       )
     }
-    if (gasCurrencyConfig === GasOptions.cUSD) {
-      await setUsdGas()
-    } else if (gasCurrencyConfig === GasOptions.auto && this.kit.defaultAccount) {
+    if (Object.keys(StableToken).includes(gasCurrencyConfig)) {
+      await setStableTokenGas(StableToken[gasCurrencyConfig as keyof typeof StableToken])
+    } else if (gasCurrencyConfig === gasOptions.auto && this.kit.defaultAccount) {
       const balances = await this.kit.getTotalBalance(this.kit.defaultAccount)
-      if (balances.CELO.isZero()) {
-        await setUsdGas()
+      if (balances.CELO!.isZero()) {
+        const stables = Object.entries(StableToken)
+        for (const stable of stables) {
+          const stableName = stable[0]
+          const stableToken = stable[1]
+          // has balance
+          if ((balances as any)[stableName] && !(balances as any)[stableName].isZero()) {
+            await setStableTokenGas(stableToken)
+            break
+          }
+        }
       }
     }
   }

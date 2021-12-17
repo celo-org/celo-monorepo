@@ -30,7 +30,7 @@ contract('MetaTransactionWalletDeployer', (accounts: string[]) => {
     let walletDeployedEvent
 
     before(async () => {
-      implementation = await MetaTransactionWallet.new()
+      implementation = await MetaTransactionWallet.new(true)
     })
 
     beforeEach(async () => {

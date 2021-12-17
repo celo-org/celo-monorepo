@@ -61,6 +61,7 @@ export interface ValidatorsConfig {
   membershipHistoryLength: BigNumber
   slashingMultiplierResetPeriod: BigNumber
   commissionUpdateDelay: BigNumber
+  downtimeGracePeriod: BigNumber
 }
 
 export interface GroupMembership {
@@ -150,6 +151,15 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
   )
 
   /**
+   * Returns the validator downtime grace period
+   */
+  getDowntimeGracePeriod = proxyCall(
+    this.contract.methods.downtimeGracePeriod,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
    * Returns current configuration parameters.
    */
   async getConfig(): Promise<ValidatorsConfig> {
@@ -160,6 +170,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       this.contract.methods.membershipHistoryLength().call(),
       this.getSlashingMultiplierResetPeriod(),
       this.getCommissionUpdateDelay(),
+      this.getDowntimeGracePeriod(),
     ])
     return {
       validatorLockedGoldRequirements: res[0],
@@ -168,6 +179,7 @@ export class ValidatorsWrapper extends BaseWrapper<Validators> {
       membershipHistoryLength: valueToBigNumber(res[3]),
       slashingMultiplierResetPeriod: res[4],
       commissionUpdateDelay: res[5],
+      downtimeGracePeriod: res[6],
     }
   }
 

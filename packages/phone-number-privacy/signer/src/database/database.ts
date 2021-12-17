@@ -7,7 +7,7 @@ import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 let db: Knex
 export async function initDatabase(doTestQuery = true) {
   logger.info({ config: config.db }, 'Initializing database connection')
-  const { type, host, port, user, password, database, ssl } = config.db
+  const { type, host, port, user, password, database, ssl, poolMaxSize } = config.db
 
   let dbConfig: any
   let client: string
@@ -49,7 +49,7 @@ export async function initDatabase(doTestQuery = true) {
 
   db = knex({
     client,
-    connection: dbConfig,
+    connection: { ...dbConfig, pool: { max: poolMaxSize } },
     debug: DEV_MODE,
   })
 
@@ -70,9 +70,7 @@ export async function initDatabase(doTestQuery = true) {
 
 async function executeTestQuery(_db: Knex) {
   logger.info('Counting accounts')
-  const result = await _db(ACCOUNTS_TABLE)
-    .count(ACCOUNTS_COLUMNS.address)
-    .first()
+  const result = await _db(ACCOUNTS_TABLE).count(ACCOUNTS_COLUMNS.address).first()
 
   if (!result) {
     throw new Error('No result from count, have migrations been run?')
@@ -92,4 +90,12 @@ export function getDatabase() {
   }
 
   return db
+}
+
+export function getTransaction() {
+  if (!db) {
+    throw new Error('Database not yet initialized')
+  }
+
+  return db.transaction()
 }

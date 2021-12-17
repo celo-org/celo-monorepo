@@ -38,10 +38,7 @@ module.exports = async (callback: (error?: any) => number) => {
     }
 
     const functionName = functionCall.split('(')[0]
-    const functionArgs = functionCall
-      .split('(')[1]
-      .split(')')[0]
-      .split(', ')
+    const functionArgs = functionCall.split('(')[1].split(')')[0].split(', ')
 
     console.log(contractName, contract.address, functionName, functionArgs)
     console.log('Calling', '"' + argv.command + '"', 'via MultiSig')

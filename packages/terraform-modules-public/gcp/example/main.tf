@@ -55,7 +55,7 @@ resource "google_compute_router_nat" "nat" {
 }
 
 module "celo_cluster" {
-  source             = "../testnet"
+  source             = "../celo-infra"
   network_depends_on = [google_compute_network.celo_network]
 
   gcloud_project          = var.google["project"]
@@ -70,8 +70,9 @@ module "celo_cluster" {
   stackdriver_logging_metrics    = var.stackdriver_logging_metrics
   
 
-  tx_node_count   = var.replicas["txnode"]
-  validator_count = var.replicas["validator"]
+  tx_node_count       = var.replicas["txnode"]
+  backup_node_count   = var.replicas["backup_node"]
+  validator_count     = var.replicas["validator"]
 
   validator_signer_account_addresses = var.validator_signer_accounts["account_addresses"]
   validator_signer_private_keys      = var.validator_signer_accounts["private_keys"]
@@ -99,22 +100,27 @@ module "celo_cluster" {
   geth_exporter_docker_image_repository = var.geth_exporter_docker_image["repository"]
   geth_exporter_docker_image_tag        = var.geth_exporter_docker_image["tag"]
 
-  attestation_service_count                        = var.replicas["attestation_service"]
-  attestation_service_db_username                  = var.attestation_service_db["username"]
-  attestation_service_db_password                  = var.attestation_service_db["password"]
-  attestation_service_docker_image_repository      = var.attestation_service_docker_image["repository"]
-  attestation_service_docker_image_tag             = var.attestation_service_docker_image["tag"]
-  attestation_signer_addresses                     = var.attestation_signer_accounts["account_addresses"]
-  attestation_signer_private_keys                  = var.attestation_signer_accounts["private_keys"]
-  attestation_signer_account_passwords             = var.attestation_signer_accounts["account_passwords"]
-  attestation_service_sms_providers                = var.attestation_service_credentials["sms_providers"]
-  attestation_service_nexmo_key                    = var.attestation_service_credentials["nexmo_key"]
-  attestation_service_nexmo_secret                 = var.attestation_service_credentials["nexmo_secret"]
-  attestation_service_nexmo_blacklist              = var.attestation_service_credentials["nexmo_blacklist"]
-  attestation_service_twilio_account_sid           = var.attestation_service_credentials["twilio_account_sid"]
-  attestation_service_twilio_messaging_service_sid = var.attestation_service_credentials["twilio_messaging_service_sid"]
-  attestation_service_twilio_auth_token            = var.attestation_service_credentials["twilio_auth_token"]
-  attestation_service_twilio_blacklist             = var.attestation_service_credentials["twilio_blacklist"]
+  attestation_service_count                           = var.replicas["attestation_service"]
+  attestation_service_db_username                     = var.attestation_service_db["username"]
+  attestation_service_db_password                     = var.attestation_service_db["password"]
+  attestation_service_docker_image_repository         = var.attestation_service_docker_image["repository"]
+  attestation_service_docker_image_tag                = var.attestation_service_docker_image["tag"]
+  attestation_signer_addresses                        = var.attestation_signer_accounts["account_addresses"]
+  attestation_signer_private_keys                     = var.attestation_signer_accounts["private_keys"]
+  attestation_signer_account_passwords                = var.attestation_signer_accounts["account_passwords"]
+  attestation_service_sms_providers                   = var.attestation_service_credentials["sms_providers"]
+  attestation_service_nexmo_key                       = var.attestation_service_credentials["nexmo_key"]
+  attestation_service_nexmo_secret                    = var.attestation_service_credentials["nexmo_secret"]
+  attestation_service_nexmo_blacklist                 = var.attestation_service_credentials["nexmo_blacklist"]
+  attestation_service_nexmo_unsupported_regions       = var.attestation_service_credentials["nexmo_unsupported_regions"]
+  attestation_service_twilio_account_sid              = var.attestation_service_credentials["twilio_account_sid"]
+  attestation_service_twilio_messaging_service_sid    = var.attestation_service_credentials["twilio_messaging_service_sid"]
+  attestation_service_twilio_verify_service_sid       = var.attestation_service_credentials["twilio_verify_service_sid"]
+  attestation_service_twilio_auth_token               = var.attestation_service_credentials["twilio_auth_token"]
+  attestation_service_twilio_blacklist                = var.attestation_service_credentials["twilio_blacklist"]
+  attestation_service_twilio_unsupported_regions      = var.attestation_service_credentials["twilio_unsupported_regions"]
+  attestation_service_messagebird_api_key             = var.attestation_service_credentials["messagebird_api_key"]
+  attestation_service_messagebird_unsupported_regions = var.attestation_service_credentials["messagebird_unsupported_regions"]
 }
 
 resource "google_logging_project_exclusion" "logging_exclusion" {
@@ -171,7 +177,7 @@ resource "google_storage_bucket" "chaindata_bucket" {
 
   lifecycle_rule {
     condition {
-      num_newer_versions = 2
+      num_newer_versions = 10  # keep 10 copies of chaindata backups (use `gsutil ls -la $bucket` to see versioned objects)
     }
     action {
       type = "Delete"
@@ -220,6 +226,9 @@ resource "google_storage_bucket_iam_binding" "chaindata_rsync_binding_read" {
     "serviceAccount:${var.GCP_DEFAULT_SERVICE_ACCOUNT}",
   ]
 }
+
+# validators need to expose metadata publicly
+# uncomment the following two blocks if you would like to use GCS for this purpose
 
 #resource "google_storage_bucket" "public_www_bucket" {
 #  name = var.public_www_fqdn

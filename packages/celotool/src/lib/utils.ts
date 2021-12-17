@@ -27,7 +27,7 @@ export async function retrieveTxNodeIpAddress(celoEnv: string, txNodeIndex: numb
 }
 
 export async function getVerificationPoolConfig(celoEnv: string) {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(celoEnv)
 
   const ip = await retrieveTxNodeIpAddress(celoEnv, 0)
 
@@ -95,4 +95,8 @@ export async function retryCmd(
     }
   }
   throw Error(`Retried ${numAttempts} without any successes`)
+}
+
+export const stringToBoolean = (myString: string) => {
+  return myString.toLowerCase() === 'true'
 }

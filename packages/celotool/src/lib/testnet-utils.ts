@@ -9,7 +9,6 @@ import { execCmdWithExitOnFailure } from './cmd-utils'
 import { getGenesisGoogleStorageUrl } from './endpoints'
 import { envVar, fetchEnvOrFallback, getEnvFile } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
-import { generateGenesisFromEnv } from './generate_utils'
 import { getBootnodeEnode, getEnodesWithExternalIPAddresses } from './geth'
 const genesisBlocksBucketName = GenesisBlocksGoogleStorageBucketName
 const staticNodesBucketName = StaticNodeUtils.getStaticNodesGoogleStorageBucketName()
@@ -19,24 +18,17 @@ const envBucketName = 'env_config_files'
 const bootnodesBucketName = 'env_bootnodes'
 
 // uploads genesis block, static nodes, env file, and bootnode to GCS
-export async function uploadTestnetInfoToGoogleStorage(
-  networkName: string,
-  uploadGenesis: boolean
-) {
-  if (uploadGenesis) {
-    await uploadGenesisBlockToGoogleStorage(networkName)
-  }
+export async function uploadTestnetInfoToGoogleStorage(networkName: string) {
   await uploadTestnetStaticNodesToGoogleStorage(networkName)
   await uploadBootnodeToGoogleStorage(networkName)
   await uploadEnvFileToGoogleStorage(networkName)
 }
 
-export async function uploadGenesisBlockToGoogleStorage(networkName: string) {
+export async function uploadGenesisBlockToGoogleStorage(networkName: string, genesis: string) {
   console.info(`\nUploading genesis block for ${networkName} to Google cloud storage`)
-  const genesisBlockJsonData = generateGenesisFromEnv()
-  console.debug(`Genesis block is ${genesisBlockJsonData} \n`)
+  console.debug(`Genesis block is ${genesis} \n`)
   await uploadDataToGoogleStorage(
-    genesisBlockJsonData,
+    genesis,
     genesisBlocksBucketName,
     networkName,
     true,
@@ -66,13 +58,7 @@ export async function uploadTestnetStaticNodesToGoogleStorage(networkName: strin
 export async function uploadStaticNodesToGoogleStorage(fileName: string, enodes: string[]) {
   const json = JSON.stringify(enodes)
   console.debug(`${fileName} static nodes are ${json}\n`)
-  await uploadDataToGoogleStorage(
-    json,
-    staticNodesBucketName,
-    fileName,
-    true,
-    'application/json'
-  )
+  await uploadDataToGoogleStorage(json, staticNodesBucketName, fileName, true, 'application/json')
 }
 
 export async function uploadBootnodeToGoogleStorage(networkName: string) {
@@ -126,18 +112,30 @@ async function getGoogleCloudUserInfo(): Promise<string> {
 
 async function getGitRepoName(): Promise<string> {
   const cmd = 'git config --get remote.origin.url'
-  let stdout = (await execCmdWithExitOnFailure(cmd))[0].trim()
-  stdout = stdout.split(':')[1]
-  if (stdout.endsWith('.git')) {
-    stdout = stdout.substring(0, stdout.length - '.git'.length)
+  let stdout = ''
+  try {
+    stdout = (await execCmdWithExitOnFailure(cmd))[0].trim()
+    stdout = stdout.split(':')[1]
+    if (stdout.endsWith('.git')) {
+      stdout = stdout.substring(0, stdout.length - '.git'.length)
+    }
+  } catch (error) {
+    // Not running from a git folder
+    stdout = 'celo-monorepo'
   }
+
   return stdout
 }
 
 async function getCommitHash(): Promise<string> {
-  const cmd = 'git show | head -n 1'
-  const stdout = (await execCmdWithExitOnFailure(cmd))[0]
-  return stdout.split(' ')[1].trim()
+  try {
+    const cmd = 'git show | head -n 1'
+    const stdout = (await execCmdWithExitOnFailure(cmd))[0]
+    return stdout.split(' ')[1].trim()
+  } catch (error) {
+    // Not running from a git folder
+    return 'no-commmit-hash'
+  }
 }
 
 // Writes data to a temporary file & uploads it to GCS
@@ -187,22 +185,17 @@ export async function uploadFileToGoogleStorage(
 
   if (makeFileWorldReadable) {
     // set the permission to be world-readable
-    await storage
-      .bucket(googleStorageBucketName)
-      .file(googleStorageFileName)
-      .acl.add({
-        entity: 'allUsers',
-        role: storage.acl.READER_ROLE,
-      })
+    await storage.bucket(googleStorageBucketName).file(googleStorageFileName).acl.add({
+      entity: 'allUsers',
+      role: storage.acl.READER_ROLE,
+    })
   }
 }
 
 // Reads the envVar VALIDATOR_PROXY_COUNTS, which indicates how many validators
 // have a certain number of proxies in the format:
 // <# of validators>:<proxy count>;<# of validators>:<proxy count>;...
-// For example, VALIDATOR_PROXY_COUNTS='2:1,3:2' will give [1,1,2,2,2]
-// The resulting array does not necessarily have the same length as the total
-// number of validators because non-proxied validators are not represented in the array
+// For example, VALIDATOR_PROXY_COUNTS='1:0,2:1,3:2' will give [0,1,1,2,2,2]
 export function getProxiesPerValidator() {
   const arr = []
   const valProxyCountsStr = fetchEnvOrFallback(envVar.VALIDATOR_PROXY_COUNTS, '')

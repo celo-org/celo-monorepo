@@ -1,66 +1,66 @@
 import {
   createDefaultIngressIfNotExists,
+  createGrafanaTagAnnotation,
   getInstanceName,
   getReleaseName,
   installHelmChart,
 } from 'src/lib/blockscout'
-import { createClusterIfNotExists, setupCluster, switchToClusterFromEnv } from 'src/lib/cluster'
+import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   createAndUploadCloudSQLSecretIfNotExists,
   createCloudSQLInstance,
   getServiceAccountName,
   grantRoles,
+  isCelotoolHelmDryRun,
 } from 'src/lib/helm_deploy'
 import { createServiceAccountIfNotExists } from 'src/lib/service-account-utils'
-import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
 
 export const command = 'blockscout'
 
 export const describe = 'deploy the blockscout package'
 
-export const builder = (argv: yargs.Argv) => {
-  return argv.option('skipClusterSetup', {
-    type: 'boolean',
-    description: 'If you know that you can skip the cluster setup',
-    default: false,
-  })
-}
+export const handler = async (argv: InitialArgv) => {
+  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+  const imageTag = fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_TAG)
 
-type BlockscoutInitialArgv = InitialArgv & { skipClusterSetup: boolean }
+  const instanceName = getInstanceName(argv.celoEnv, dbSuffix)
+  const helmReleaseName = getReleaseName(argv.celoEnv, dbSuffix)
+  await switchToClusterFromEnv(argv.celoEnv)
+  let blockscoutCredentials: string[] = [
+    'dummyUser',
+    'dummyPassword',
+    'dummy-project:region:instance',
+  ]
 
-export const handler = async (argv: BlockscoutInitialArgv) => {
-  const createdCluster = await createClusterIfNotExists()
-  await switchToClusterFromEnv()
+  if (!isCelotoolHelmDryRun()) {
+    // Create cloud SQL account with 'Cloud SQL Client' permissions.
+    const cloudSqlServiceAccountName = getServiceAccountName('cloud-sql-for')
+    await createServiceAccountIfNotExists(cloudSqlServiceAccountName)
 
-  if (!argv.skipClusterSetup) {
-    await setupCluster(argv.celoEnv, createdCluster)
+    await grantRoles(cloudSqlServiceAccountName, 'roles/cloudsql.client')
+
+    await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName, argv.celoEnv)
+
+    blockscoutCredentials = await createCloudSQLInstance(argv.celoEnv, instanceName)
+  } else {
+    console.info(
+      `Skipping Cloud SQL Database creation and IAM setup. Please check if you can execute the skipped steps.`
+    )
   }
-
-  // Create cloud SQL account with 'Cloud SQL Client' permissions.
-  const cloudSqlServiceAccountName = getServiceAccountName('cloud-sql-for')
-  await createServiceAccountIfNotExists(cloudSqlServiceAccountName)
-
-  await grantRoles(cloudSqlServiceAccountName, 'roles/cloudsql.client')
-
-  await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName)
-
-  const instanceName = getInstanceName(argv.celoEnv)
-  const helmReleaseName = getReleaseName(argv.celoEnv)
-
-  const [
-    blockscoutDBUsername,
-    blockscoutDBPassword,
-    blockscoutDBConnectionName,
-  ] = await createCloudSQLInstance(argv.celoEnv, instanceName)
 
   await installHelmChart(
     argv.celoEnv,
     helmReleaseName,
-    blockscoutDBUsername,
-    blockscoutDBPassword,
-    blockscoutDBConnectionName
+    imageTag,
+    blockscoutCredentials[0],
+    blockscoutCredentials[1],
+    blockscoutCredentials[2]
   )
 
-  await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
+  if (!isCelotoolHelmDryRun()) {
+    await createGrafanaTagAnnotation(argv.celoEnv, imageTag, dbSuffix)
+    await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
+  }
 }

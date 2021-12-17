@@ -1,7 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "importHelpers": false,
-    "target": "es2018"
-  }
-}

@@ -116,6 +116,22 @@ const DefaultConfig = {
     numInternalRequiredConfirmations: 1,
     useMultiSig: true,
   },
+  grandaMento: {
+    approver: network.from,
+    maxApprovalExchangeRateChange: 0.3, // 30%
+    spread: 0, // 0%
+    vetoPeriodSeconds: 10, // Set to 10 seconds for env-tests, this should be > time needed for a governance proposal in practice
+    stableTokenExchangeLimits: {
+      StableToken: {
+        min: '50000000000000000000000', // 50,000
+        max: '50000000000000000000000000', // 50,000,000
+      },
+      StableTokenEUR: {
+        min: '40000000000000000000000', // 40,000
+        max: '40000000000000000000000000', // 40,000,000
+      },
+    },
+  },
   lockedGold: {
     unlockingPeriod: 3 * DAY,
   },
@@ -162,6 +178,34 @@ const DefaultConfig = {
     oracles: [network.from],
     frozen: false,
   },
+  stableTokenEUR: {
+    decimals: 18,
+    goldPrice: 1.2,
+    tokenName: 'Celo Euro',
+    tokenSymbol: 'cEUR',
+    inflationRate: 1,
+    inflationPeriod: 1.5 * YEAR,
+    initialBalances: {
+      addresses: [network.from],
+      values: ['5000000000000000000000000'],
+    },
+    oracles: [network.from],
+    frozen: false,
+  },
+  stableTokenBRL: {
+    decimals: 18,
+    goldPrice: 1.2,
+    tokenName: 'Celo Brazilian Real',
+    tokenSymbol: 'cREAL',
+    inflationRate: 1,
+    inflationPeriod: 1.5 * YEAR,
+    initialBalances: {
+      addresses: [network.from],
+      values: ['5000000000000000000000000'],
+    },
+    oracles: [network.from],
+    frozen: false,
+  },
   transferWhitelist: {
     addresses: [],
     registryIds: [],
@@ -185,6 +229,7 @@ const DefaultConfig = {
     commissionUpdateDelay: (3 * DAY) / 5, // Approximately 3 days with 5s block times
     maxGroupSize: 5,
     slashingPenaltyResetPeriod: 30 * DAY,
+    downtimeGracePeriod: 0,
 
     // Register cLabs groups to contain an initial set of validators to run test networks.
     validatorKeys: [],
@@ -203,6 +248,12 @@ const NetworkConfigs = {
     election: {
       minElectableValidators: '10',
       frozen: false,
+    },
+    stableToken: {
+      initialBalances: {
+        addresses: ['0x5409ED021D9299bf6814279A6A1411A7e866A631'],
+        values: ['10000000000000000000'],
+      },
     },
     epochRewards: {
       frozen: false,
@@ -245,6 +296,11 @@ const NetworkConfigs = {
     governance: {
       skipSetConstitution: true,
       skipTransferOwnership: true,
+    },
+    governanceApproverMultiSig: {
+      signatories: [network.from],
+      numRequiredConfirmations: 1,
+      numInternalRequiredConfirmations: 1,
     },
     stableToken: {
       frozen: false,
@@ -562,6 +618,7 @@ const NetworkConfigs = {
   },
 }
 
+NetworkConfigs.local = NetworkConfigs.testing
 NetworkConfigs.baklavastaging = NetworkConfigs.baklava
 NetworkConfigs.alfajoresstaging = NetworkConfigs.alfajores
 NetworkConfigs.mainnet = NetworkConfigs.rc1

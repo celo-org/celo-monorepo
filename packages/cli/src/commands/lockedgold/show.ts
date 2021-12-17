@@ -20,9 +20,7 @@ export default class Show extends BaseCommand {
 
     const lockedGold = await this.kit.contracts.getLockedGold()
 
-    await newCheckBuilder(this)
-      .isAccount(args.account)
-      .runChecks()
+    await newCheckBuilder(this).isAccount(args.account).runChecks()
 
     printValueMapRecursive(await lockedGold.getAccountSummary(args.account))
   }

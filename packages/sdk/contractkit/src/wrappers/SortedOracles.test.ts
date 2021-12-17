@@ -3,8 +3,9 @@ import { describeEach } from '@celo/dev-utils/lib/describeEach'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import SortedOraclesABI from '@celo/protocol/build/contracts/SortedOracles.json'
 import { CeloContract } from '../base'
+import { StableToken } from '../celo-tokens'
 import { newKitFromWeb3 } from '../kit'
-import { OracleCurrencyPair, OracleRate, ReportTarget, SortedOraclesWrapper } from './SortedOracles'
+import { OracleRate, ReportTarget, SortedOraclesWrapper } from './SortedOracles'
 
 const truffleContract = require('@truffle/contract')
 
@@ -63,7 +64,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
    * the tests
    */
   async function newSortedOracles(owner: Address): Promise<SortedOraclesWrapper> {
-    const instance = await SortedOracles.new({ from: owner })
+    const instance = await SortedOracles.new(true, { from: owner })
     await instance.initialize(NetworkConfig.oracles.reportExpiry, { from: owner })
     return new SortedOraclesWrapper(kit, instance.contract)
   }
@@ -104,6 +105,9 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   let stableTokenAddress: Address
   let nonOracleAddress: Address
   let btcOracleOwner: Address
+  const CELOBTCIdentifier: Address = web3.utils.toChecksumAddress(
+    web3.utils.keccak256('CELOBTC').slice(26)
+  )
 
   beforeAll(async () => {
     allAccounts = await web3.eth.getAccounts()
@@ -121,13 +125,13 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     // For StableToken the oracles are setup in migrations, for our
     // custom CELO/BTC oracle we need to add them manually
     for (const oracle of celoBtcOracles) {
-      await addOracleForTarget(btcSortedOracles, OracleCurrencyPair.CELOBTC, oracle, btcOracleOwner)
+      await addOracleForTarget(btcSortedOracles, CELOBTCIdentifier, oracle, btcOracleOwner)
     }
     // And also report an initial price as happens in 09_stabletoken.ts
     // So that we can share tests between the two oracles.
     await (
       await btcSortedOracles.report(
-        OracleCurrencyPair.CELOBTC,
+        CELOBTCIdentifier,
         NetworkConfig.stableToken.goldPrice,
         oracleAddress
       )
@@ -141,14 +145,14 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     },
     {
       label: 'CELO/BTC',
-      reportTarget: OracleCurrencyPair.CELOBTC,
+      reportTarget: CELOBTCIdentifier,
     },
   ]
 
   describeEach(testCases, ({ reportTarget }) => {
     let sortedOracles: SortedOraclesWrapper
     beforeEach(() => {
-      if (reportTarget === OracleCurrencyPair.CELOBTC) {
+      if (reportTarget === CELOBTCIdentifier) {
         sortedOracles = btcSortedOracles
       } else if (reportTarget === CeloContract.StableToken) {
         sortedOracles = stableTokenSortedOracles
@@ -368,10 +372,21 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
    * those arguments are being set correctly.
    */
   describe('#reportStableToken', () => {
-    it('calls report with the address for StableToken', async () => {
+    it('calls report with the address for StableToken (cUSD) by default', async () => {
       const tx = await stableTokenSortedOracles.reportStableToken(14, oracleAddress)
       await tx.sendAndWaitForReceipt()
       expect(tx.txo.arguments[0]).toEqual(stableTokenAddress)
+    })
+
+    describe('calls report with the address for the provided StableToken', () => {
+      for (const token of Object.values(StableToken)) {
+        it(`calls report with token ${token}`, async () => {
+          console.log(`hola ${token},  ${oracleAddress}`)
+          const tx = await stableTokenSortedOracles.reportStableToken(14, oracleAddress, token)
+          await tx.sendAndWaitForReceipt()
+          expect(tx.txo.arguments[0]).toEqual(await kit.celoTokens.getAddress(token))
+        })
+      }
     })
   })
 

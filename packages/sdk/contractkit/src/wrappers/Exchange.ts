@@ -164,72 +164,113 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   )
 
   /**
-   * Sell amount of CELO in exchange for at least minUsdAmount of cUsd
+   * Sell amount of CELO in exchange for at least minStableAmount of the stable token
    * Requires the amount to have been approved to the exchange
    * @param amount The amount of CELO the user is selling to the exchange
-   * @param minUsdAmount The minimum amount of cUsd the user has to receive for this
+   * @param minStableAmount The minimum amount of the stable token the user has to receive for this
    * transaction to succeed
    */
-  sellGold = (amount: BigNumber.Value, minUSDAmount: BigNumber.Value) =>
-    this.sell(amount, minUSDAmount, true)
+  sellGold = (amount: BigNumber.Value, minStableAmount: BigNumber.Value) =>
+    this.sell(amount, minStableAmount, true)
 
   /**
-   * Sell amount of cUsd in exchange for at least minGoldAmount of CELO
+   * Sell amount of the stable token in exchange for at least minGoldAmount of CELO
    * Requires the amount to have been approved to the exchange
-   * @param amount The amount of cUsd the user is selling to the exchange
+   * @param amount The amount of the stable token the user is selling to the exchange
    * @param minGoldAmount The minimum amount of CELO the user has to receive for this
    * transaction to succeed
    */
-  sellDollar = (amount: BigNumber.Value, minGoldAmount: BigNumber.Value) =>
+  sellStable = (amount: BigNumber.Value, minGoldAmount: BigNumber.Value) =>
     this.sell(amount, minGoldAmount, false)
 
   /**
-   * Buy amount of CELO in exchange for at most maxUsdAmount of cUsd
+   * Deprecated alias of sellStable.
+   * Sell amount of the stable token in exchange for at least minGoldAmount of CELO
    * Requires the amount to have been approved to the exchange
-   * @param amount The amount of CELO the user is buying from the exchange
-   * @param maxUsdAmount The maximum amount of cUsd the user will pay for this
+   * @deprecated use sellStable instead
+   * @param amount The amount of the stable token the user is selling to the exchange
+   * @param minGoldAmount The minimum amount of CELO the user has to receive for this
    * transaction to succeed
    */
-  buyGold = (amount: BigNumber.Value, maxUSDAmount: BigNumber.Value) =>
-    this.buy(amount, maxUSDAmount, true)
+  sellDollar = this.sellStable
 
   /**
-   * Buy amount of cUsd in exchange for at least minGoldAmount of CELO
+   * Buy amount of CELO in exchange for at most maxStableAmount of the stable token
    * Requires the amount to have been approved to the exchange
-   * @param amount The amount of cUsd the user is selling to the exchange
+   * @param amount The amount of CELO the user is buying from the exchange
+   * @param maxStableAmount The maximum amount of the stable token the user will pay for this
+   * transaction to succeed
+   */
+  buyGold = (amount: BigNumber.Value, maxStableAmount: BigNumber.Value) =>
+    this.buy(amount, maxStableAmount, true)
+
+  /**
+   * Buy amount of the stable token in exchange for at least minGoldAmount of CELO
+   * Requires the amount to have been approved to the exchange
+   * @param amount The amount of the stable token the user is selling to the exchange
    * @param maxGoldAmount The maximum amount of CELO the user will pay for this
    * transaction to succeed
    */
-  buyDollar = (amount: BigNumber.Value, maxGoldAmount: BigNumber.Value) =>
+  buyStable = (amount: BigNumber.Value, maxGoldAmount: BigNumber.Value) =>
     this.buy(amount, maxGoldAmount, false)
 
   /**
-   * Returns the amount of CELO a user would get for sellAmount of cUsd
-   * @param sellAmount The amount of cUsd the user is selling to the exchange
-   * @return The corresponding CELO amount.
+   * Deprecated alias of buyStable.
+   * Buy amount of the stable token in exchange for at least minGoldAmount of CELO
+   * Requires the amount to have been approved to the exchange
+   * @deprecated use buyStable instead
+   * @param amount The amount of the stable token the user is selling to the exchange
+   * @param maxGoldAmount The maximum amount of CELO the user will pay for this
+   * transaction to succeed
    */
-  quoteUsdSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, false)
+  buyDollar = this.buyStable
 
   /**
-   * Returns the amount of cUsd a user would get for sellAmount of CELO
+   * Returns the amount of CELO a user would get for sellAmount of the stable token
+   * @param sellAmount The amount of the stable token the user is selling to the exchange
+   * @return The corresponding CELO amount.
+   */
+  quoteStableSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, false)
+
+  /**
+   * Deprecated alias of quoteStableSell.
+   * Returns the amount of CELO a user would get for sellAmount of the stable token
+   * @deprecated Use quoteStableSell instead
+   * @param sellAmount The amount of the stable token the user is selling to the exchange
+   * @return The corresponding CELO amount.
+   */
+  quoteUsdSell = this.quoteStableSell
+
+  /**
+   * Returns the amount of the stable token a user would get for sellAmount of CELO
    * @param sellAmount The amount of CELO the user is selling to the exchange
-   * @return The corresponding cUsd amount.
+   * @return The corresponding stable token amount.
    */
   quoteGoldSell = (sellAmount: BigNumber.Value) => this.getBuyTokenAmount(sellAmount, true)
 
   /**
    * Returns the amount of CELO a user would need to exchange to receive buyAmount of
-   * cUsd.
-   * @param buyAmount The amount of cUsd the user would like to purchase.
+   * the stable token.
+   * @param buyAmount The amount of the stable token the user would like to purchase.
    * @return The corresponding CELO amount.
    */
-  quoteUsdBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, false)
+  quoteStableBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, false)
 
   /**
-   * Returns the amount of cUsd a user would need to exchange to receive buyAmount of
+   * Deprecated alias of quoteStableBuy.
+   * Returns the amount of CELO a user would need to exchange to receive buyAmount of
+   * the stable token.
+   * @deprecated Use quoteStableBuy instead
+   * @param buyAmount The amount of the stable token the user would like to purchase.
+   * @return The corresponding CELO amount.
+   */
+  quoteUsdBuy = this.quoteStableBuy
+
+  /**
+   * Returns the amount of the stable token a user would need to exchange to receive buyAmount of
    * CELO.
    * @param buyAmount The amount of CELO the user would like to purchase.
-   * @return The corresponding cUsd amount.
+   * @return The corresponding stable token amount.
    */
   quoteGoldBuy = (buyAmount: BigNumber.Value) => this.getSellTokenAmount(buyAmount, true)
 
@@ -279,16 +320,25 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
   }
 
   /**
-   * Returns the exchange rate for cUsd estimated at the buyAmount
-   * @param buyAmount The amount of cUsd in wei to estimate the exchange rate at
-   * @return The exchange rate (number of CELO received for one cUsd)
+   * Returns the exchange rate for the stable token estimated at the buyAmount
+   * @param buyAmount The amount of the stable token in wei to estimate the exchange rate at
+   * @return The exchange rate (number of CELO received for one stable token)
    */
-  getUsdExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, false)
+  getStableExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, false)
+
+  /**
+   * Deprecated alias of getStableExchangeRate.
+   * Returns the exchange rate for the stable token estimated at the buyAmount
+   * @deprecated Use getStableExchangeRate instead
+   * @param buyAmount The amount of the stable token in wei to estimate the exchange rate at
+   * @return The exchange rate (number of CELO received for one stable token)
+   */
+  getUsdExchangeRate = this.getStableExchangeRate
 
   /**
    * Returns the exchange rate for CELO estimated at the buyAmount
    * @param buyAmount The amount of CELO in wei to estimate the exchange rate at
-   * @return The exchange rate (number of cUsd received for one CELO)
+   * @return The exchange rate (number of stable tokens received for one CELO)
    */
   getGoldExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, true)
 }

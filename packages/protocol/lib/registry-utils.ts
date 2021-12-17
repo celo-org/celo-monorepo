@@ -1,3 +1,11 @@
+/**
+ * Be careful when adding to this file or relying on this file.
+ * The verification tooling uses the CeloContractName enum as a
+ * source of truth for what contracts are considered "core" and
+ * need to be checked for backwards compatability and bytecode on
+ * an environment.
+ */
+
 export const celoRegistryAddress = '0x000000000000000000000000000000000000ce10'
 
 export enum CeloContractName {
@@ -11,6 +19,7 @@ export enum CeloContractName {
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   ExchangeEUR = 'ExchangeEUR',
+  ExchangeBRL = 'ExchangeBRL',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -18,6 +27,7 @@ export enum CeloContractName {
   Governance = 'Governance',
   GovernanceSlasher = 'GovernanceSlasher',
   GovernanceApproverMultiSig = 'GovernanceApproverMultiSig',
+  GrandaMento = 'GrandaMento',
   LockedGold = 'LockedGold',
   Random = 'Random',
   Reserve = 'Reserve',
@@ -25,6 +35,7 @@ export enum CeloContractName {
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   StableTokenEUR = 'StableTokenEUR',
+  StableTokenBRL = 'StableTokenBRL',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
 }
@@ -49,6 +60,7 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.GasPriceMinimum,
   CeloContractName.GoldToken,
   CeloContractName.GovernanceSlasher,
+  CeloContractName.GrandaMento,
   CeloContractName.Random,
   CeloContractName.Reserve,
   CeloContractName.SortedOracles,

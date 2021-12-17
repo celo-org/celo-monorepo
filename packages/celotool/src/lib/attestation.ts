@@ -1,6 +1,4 @@
-import {
-  AttestationsWrapper
-} from '@celo/contractkit/lib/wrappers/Attestations'
+import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { RequestAttestationError } from '@celo/env-tests/lib/shared/attestation'
 import { PhoneNumberUtils } from '@celo/utils'
 import { sample } from 'lodash'
@@ -12,32 +10,25 @@ export async function findSuitableNumber(
   attestations: AttestationsWrapper,
   numbers: string[],
   maximumNumberOfAttestations: number,
-  salt: string
+  salt: string,
+  clientAddress: string
 ) {
-  const attestedAccountsLookup = await attestations.lookupIdentifiers(
-    numbers.map((n) => PhoneNumberUtils.getPhoneHash(n, salt))
-  )
-  return numbers.find((number) => {
+  for (const number of numbers) {
     const phoneHash = PhoneNumberUtils.getPhoneHash(number, salt)
-    const allAccounts = attestedAccountsLookup[phoneHash]
-
-    if (!allAccounts) {
-      return true
+    const stats = await attestations.getAttestationStat(phoneHash, clientAddress)
+    if (stats.total < maximumNumberOfAttestations) {
+      return number
     }
-    const totalAttestations = Object.values(allAccounts)
-      .filter((x) => !!x)
-      .map((x) => x!.total)
-      .reduce((el, sum) => sum + el)
-
-    return totalAttestations < maximumNumberOfAttestations
-  })
+  }
+  return undefined
 }
 
 export async function createPhoneNumber(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
   maximumNumberOfAttestations: number,
-  salt: string
+  salt: string,
+  clientAddress: string
 ) {
   const countryCodes = ['GB', 'US']
   let attempts = 0
@@ -56,9 +47,9 @@ export async function createPhoneNumber(
       attestations,
       numbers.map((number) => number.phoneNumber),
       maximumNumberOfAttestations,
-      salt
+      salt,
+      clientAddress
     )
-
     if (!usableNumber) {
       if (attempts > 10) {
         throw new Error('Could not find suitable number')
@@ -78,7 +69,6 @@ export async function createPhoneNumber(
     return usableNumber
   }
 }
-
 
 export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationError[]) {
   for (const possibleError of possibleErrors) {
@@ -106,27 +96,36 @@ export async function getPhoneNumber(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
   maximumNumberOfAttestations: number,
-  salt: string
+  salt: string,
+  clientAddress: string
 ) {
   const phoneNumber = await chooseFromAvailablePhoneNumbers(
     attestations,
     twilioClient,
     maximumNumberOfAttestations,
-    salt
+    salt,
+    clientAddress
   )
 
   if (phoneNumber !== undefined) {
     return phoneNumber
   }
 
-  return createPhoneNumber(attestations, twilioClient, maximumNumberOfAttestations, salt)
+  return createPhoneNumber(
+    attestations,
+    twilioClient,
+    maximumNumberOfAttestations,
+    salt,
+    clientAddress
+  )
 }
 
 export async function chooseFromAvailablePhoneNumbers(
   attestations: AttestationsWrapper,
   twilioClient: Twilio,
   maximumNumberOfAttestations: number,
-  salt: string
+  salt: string,
+  clientAddress: string
 ) {
   const availableNumbers = (await twilioClient.incomingPhoneNumbers.list()).filter(
     (number) => number.smsUrl === DUMMY_SMS_URL
@@ -139,7 +138,8 @@ export async function chooseFromAvailablePhoneNumbers(
     attestations,
     availableNumbers.map((number) => number.phoneNumber),
     maximumNumberOfAttestations,
-    salt
+    salt,
+    clientAddress
   )
   return usableNumber
 }

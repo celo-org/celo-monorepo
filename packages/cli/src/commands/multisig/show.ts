@@ -32,7 +32,7 @@ export default class ShowMultiSig extends BaseCommand {
       flags: { tx, all, raw },
     } = this.parse(ShowMultiSig)
     const multisig = await this.kit.contracts.getMultiSig(args.address)
-    const txs = await multisig.getTransactionCount()
+    const txs = await multisig.totalTransactionCount()
     const explorer = await newBlockExplorer(this.kit)
     const process = async (txdata: TransactionData) => {
       if (raw) return txdata

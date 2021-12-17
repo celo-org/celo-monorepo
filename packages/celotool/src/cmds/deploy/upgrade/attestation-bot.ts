@@ -12,6 +12,6 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: UpgradeArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   await upgradeHelmChart(argv.celoEnv)
 }

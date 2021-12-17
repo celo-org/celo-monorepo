@@ -6,6 +6,11 @@ import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { displaySendTx, printValueMapRecursive } from '../../utils/cli'
 import { Flags } from '../../utils/command'
+import {
+  addExistingProposalIDToBuilder,
+  addExistingProposalJSONFileToBuilder,
+  checkProposal,
+} from '../../utils/governance'
 export default class Propose extends BaseCommand {
   static description = 'Submit a governance proposal'
 
@@ -17,9 +22,20 @@ export default class Propose extends BaseCommand {
     }),
     deposit: flags.string({ required: true, description: 'Amount of Gold to attach to proposal' }),
     from: Flags.address({ required: true, description: "Proposer's address" }),
+    force: flags.boolean({ description: 'Skip execution check', default: false }),
     descriptionURL: flags.string({
       required: true,
       description: 'A URL where further information about the proposal can be viewed',
+    }),
+    afterExecutingProposal: flags.string({
+      required: false,
+      description: 'Path to proposal which will be executed prior to proposal',
+      exclusive: ['afterExecutingID'],
+    }),
+    afterExecutingID: flags.string({
+      required: false,
+      description: 'Governance proposal identifier which will be executed prior to proposal',
+      exclusive: ['afterExecutingProposal'],
     }),
   }
 
@@ -40,6 +56,12 @@ export default class Propose extends BaseCommand {
 
     const builder = new ProposalBuilder(this.kit)
 
+    if (res.flags.afterExecutingID) {
+      await addExistingProposalIDToBuilder(this.kit, builder, res.flags.afterExecutingID)
+    } else if (res.flags.afterExecutingProposal) {
+      await addExistingProposalJSONFileToBuilder(builder, res.flags.afterExecutingProposal)
+    }
+
     // BUILD FROM JSON
     const jsonString = readFileSync(res.flags.jsonTransactions).toString()
     const jsonTransactions: ProposalTransactionJSON[] = JSON.parse(jsonString)
@@ -50,12 +72,18 @@ export default class Propose extends BaseCommand {
     // builder.addTx(params.setMinimumClientVersion(1, 8, 24), { to: params.address })
     // builder.addWeb3Tx()
     // builder.addProxyRepointingTx
-
     const proposal = await builder.build()
-
-    printValueMapRecursive(proposalToJSON(this.kit, proposal))
+    printValueMapRecursive(await proposalToJSON(this.kit, proposal, builder.registryAdditions))
 
     const governance = await this.kit.contracts.getGovernance()
+
+    if (!res.flags.force) {
+      const ok = await checkProposal(proposal, this.kit)
+      if (!ok) {
+        return
+      }
+    }
+
     await displaySendTx(
       'proposeTx',
       governance.propose(proposal, res.flags.descriptionURL),

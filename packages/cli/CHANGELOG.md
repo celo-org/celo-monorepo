@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.0.4--dev]**
+### **[1.2.1--dev]**
 Features
 - [one-line summary] - [link PR]
 
@@ -15,6 +15,40 @@ Bug Fixes
 Other Changes
 - [one-line summary] - [link PR]
 ## Published
+
+### **[1.2.0]** -- 2021-04-22
+Features
+- cEUR support - [#7524](https://github.com/celo-org/celo-monorepo/pull/7524)
+- Add more info to network:contracts - [#7379](https://github.com/celo-org/celo-monorepo/pull/7379)
+- Approvehotfix to support multisigs - [#7671](https://github.com/celo-org/celo-monorepo/pull/7671)
+
+Other Changes
+- Add --globalHelp option to BaseCommand - [#7669](https://github.com/celo-org/celo-monorepo/pull/7669)
+
+### **[1.1.1--beta]** -- 2021-03-22
+Features
+- Support Portuguese mnemonics - [#7220](https://github.com/celo-org/celo-monorepo/pull/7220)
+- Improve granularity of governance tooling information - [#6475](https://github.com/celo-org/celo-monorepo/pull/6475)
+- Small fixes in the proposal process for cEUR/Release 3 - [#7184](https://github.com/celo-org/celo-monorepo/pull/7184)
+- CIP8 name access via the CLI - [#6855](https://github.com/celo-org/celo-monorepo/pull/6855)
+
+Other Changes
+- Upload/Download Profile Data with CIP8 - [#6604](https://github.com/celo-org/celo-monorepo/pull/6604)
+- Improve naming in the DKG  - [#4062](https://github.com/celo-org/celo-monorepo/pull/4062)
+- Fix packages vulnerabilities - [#7476](https://github.com/celo-org/celo-monorepo/pull/7476)
+
+### **[1.1.0]** -- 2021-02-16
+Features
+- Add plugins to CLI - [#5973](https://github.com/celo-org/celo-monorepo/pull/5973)
+- New CLI command `identity:get-attestations` to query attestations - [#5974](https://github.com/celo-org/celo-monorepo/pull/5974)
+
+Bug Fixes
+- `releasegold:show` should succeed w/o account registration - [#7092](https://github.com/celo-org/celo-monorepo/pull/7092)
+- Add check for signer or registered account in `releasegold:show` - [#7098](https://github.com/celo-org/celo-monorepo/pull/7098)
+
+Other Changes
+- Clarify Docs for `multisig:transfer` - [#6982](https://github.com/celo-org/celo-monorepo/pull/6982)
+
 ### **[1.0.3]** -- 2021-01-25
 Bug Fixes
 - Add missing lib in the `shrinkwrap.json` that avoids the usage of the package - [#6671](https://github.com/celo-org/celo-monorepo/pull/6671)

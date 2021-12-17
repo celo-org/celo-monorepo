@@ -45,11 +45,11 @@ echo 'NEXMO_UNSUPPORTED_REGIONS=${nexmo_unsupported_regions}' >> $CONFIG_FILE_PA
 
 echo 'TWILIO_ACCOUNT_SID=${twilio_account_sid}' >> $CONFIG_FILE_PATH
 echo 'TWILIO_MESSAGING_SERVICE_SID=${twilio_messaging_service_sid}' >> $CONFIG_FILE_PATH
+echo 'TWILIO_VERIFY_SERVICE_SID=${twilio_verify_service_sid}' >> $CONFIG_FILE_PATH
 echo 'TWILIO_AUTH_TOKEN=${twilio_auth_token}' >> $CONFIG_FILE_PATH
 echo 'TWILIO_UNSUPPORTED_REGIONS=${twilio_unsupported_regions}' >> $CONFIG_FILE_PATH
 
-echo 'MAX_PROVIDER_RETRIES=2' >> $CONFIG_FILE_PATH
-echo 'TIMEOUT_CLEANUP_NO_RECEIPT_MIN=10' >> $CONFIG_FILE_PATH
+echo 'MAX_DELIVERY_ATTEMPTS=2' >> $CONFIG_FILE_PATH
 echo 'VERIFY_CONFIG_ON_STARTUP=1' >> $CONFIG_FILE_PATH
 
 echo 'LOG_FORMAT=json' >> $CONFIG_FILE_PATH

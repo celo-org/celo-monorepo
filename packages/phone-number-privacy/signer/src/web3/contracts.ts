@@ -1,21 +1,36 @@
-import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
-import { RETRY_COUNT, RETRY_DELAY_IN_MS } from '@celo/phone-number-privacy-common'
-import { retryAsyncWithBackOff } from '@celo/utils/lib/async'
-import Web3 from 'web3'
+import { retryAsyncWithBackOffAndTimeout } from '@celo/base'
+import { ContractKit, newKit } from '@celo/contractkit'
+import {
+  FULL_NODE_TIMEOUT_IN_MS,
+  RETRY_COUNT,
+  RETRY_DELAY_IN_MS,
+} from '@celo/phone-number-privacy-common'
+import { Counters, Histograms, Labels } from '../common/metrics'
 import config from '../config'
 
-const contractKit = newKitFromWeb3(new Web3(config.blockchain.provider))
+const contractKit = newKit(config.blockchain.provider)
 
 export function getContractKit(): ContractKit {
   return contractKit
 }
 
 export async function getBlockNumber(): Promise<number> {
-  // TODO(Alec): suppress console.info statements from these calls
-  return retryAsyncWithBackOff(
+  const getBlockNumberMeter = Histograms.getBlindedSigInstrumentation
+    .labels('getBlockNumber')
+    .startTimer()
+  const res = retryAsyncWithBackOffAndTimeout(
     () => getContractKit().connection.getBlockNumber(),
     RETRY_COUNT,
     [],
-    RETRY_DELAY_IN_MS
+    RETRY_DELAY_IN_MS,
+    undefined,
+    FULL_NODE_TIMEOUT_IN_MS
   )
+    .catch((err) => {
+      Counters.blockchainErrors.labels(Labels.read).inc()
+      throw err
+    })
+    .finally(getBlockNumberMeter)
+
+  return res
 }

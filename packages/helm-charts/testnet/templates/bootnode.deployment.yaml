@@ -31,6 +31,7 @@ spec:
           set -euo pipefail
           NAT_FLAG=""
           [[ "$IP_ADDRESS" != "none" ]] && NAT_FLAG="--nat=extip:$IP_ADDRESS"
+          /usr/local/bin/bootnode --nodekey=/etc/bootnode/node.key --writeaddress > /enode.key
           exec /usr/local/bin/bootnode --nodekey=/etc/bootnode/node.key --verbosity=5 ${NAT_FLAG} --networkid=${NETWORK_ID} --ping-ip-from-packet={{ .Values.geth.ping_ip_from_packet }}
         env:
         - name: IP_ADDRESS
@@ -40,23 +41,39 @@ spec:
             configMapKeyRef:
               name: {{ template "common.fullname" . }}-geth-config
               key: networkid
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - |
+               devp2p discv4 --networkid {{ .Values.genesis.networkId }} ping "enode://$(cat /enode.key)@127.0.0.1:0?discport=30301"
+          initialDelaySeconds: 30
+          periodSeconds: 30
         volumeMounts:
+        {{- if not .Values.geth.overwriteBootnodePrivateKey }}
         - name: data
           mountPath: /etc/bootnode
+        {{- else }}
+        - name: bootnode-pkey
+          mountPath: /etc/bootnode
+          readOnly: true
+        {{- end }}
         ports:
         - name: discovery
           containerPort: 30301
           protocol: UDP
+      {{- if not .Values.geth.overwriteBootnodePrivateKey }}
       initContainers:
       - name: generate-node-key
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         command:
-        - /bin/sh
+        - /bin/bash
         - -c
-        args:
         - |
-          celotooljs.sh generate bip32 --mnemonic \"$MNEMONIC\" --accountType bootnode --index 0 > /etc/bootnode/node.key
+           celotooljs.sh generate bip32 --mnemonic "$MNEMONIC" --accountType bootnode --index 0 > /etc/bootnode/node.key
+           celotooljs.sh generate public-key --mnemonic "$MNEMONIC" --accountType bootnode --index 0 > /etc/bootnode/enode.key
         env:
         - name: MNEMONIC
           valueFrom:
@@ -66,9 +83,18 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /etc/bootnode
+      {{- end }}
       volumes:
       - name: data
         emptyDir: {}
+      {{- if .Values.geth.overwriteBootnodePrivateKey }}
+      - name: bootnode-pkey
+        secret:
+          secretName: {{ template "common.fullname" . }}-geth-account
+          items:
+          - key: bootnodePrivateKey
+            path: node.key
+      {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

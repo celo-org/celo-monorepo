@@ -1,15 +1,23 @@
 import { Address, isHexString, trimLeading0x } from '@celo/base/lib/address'
 import {
+  AbiCoder,
   ABIDefinition,
   CeloTransactionObject,
   CeloTxObject,
   CeloTxPending,
   Contract,
-  getAbiTypes,
+  getAbiByName,
   parseDecodedParams,
 } from '@celo/connect'
-import { CeloContract, ContractKit, RegisteredContracts } from '@celo/contractkit'
+import {
+  CeloContract,
+  ContractKit,
+  RegisteredContracts,
+  REGISTRY_CONTRACT_ADDRESS,
+} from '@celo/contractkit'
+import { stripProxy, suffixProxy } from '@celo/contractkit/lib/base'
 import { ABI as GovernanceABI } from '@celo/contractkit/lib/generated/Governance'
+import { ABI as RegistryABI } from '@celo/contractkit/lib/generated/Registry'
 // tslint:disable: ordered-imports
 import {
   getInitializeAbiOfImplementation,
@@ -24,8 +32,9 @@ import {
   Proposal,
   ProposalTransaction,
 } from '@celo/contractkit/lib/wrappers/Governance'
-import { BlockExplorer, obtainKitContractDetails } from '@celo/explorer'
+import { newBlockExplorer } from '@celo/explorer'
 import { isValidAddress } from '@celo/utils/lib/address'
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
 import debugFactory from 'debug'
 import { keccak256 } from 'ethereumjs-util'
@@ -33,12 +42,13 @@ import * as inquirer from 'inquirer'
 
 const debug = debugFactory('governance:proposals')
 
-export const HOTFIX_PARAM_ABI_TYPES = getAbiTypes(GovernanceABI as any, 'executeHotfix')
+export const hotfixExecuteAbi = getAbiByName(GovernanceABI, 'executeHotfix')
 
 export const hotfixToEncodedParams = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
-  kit.connection
-    .getAbiCoder()
-    .encodeParameters(HOTFIX_PARAM_ABI_TYPES, hotfixToParams(proposal, salt))
+  kit.connection.getAbiCoder().encodeParameters(
+    hotfixExecuteAbi.inputs!.map((input) => input.type),
+    hotfixToParams(proposal, salt)
+  )
 
 export const hotfixToHash = (kit: ContractKit, proposal: Proposal, salt: Buffer) =>
   keccak256(hotfixToEncodedParams(kit, proposal, salt)) as Buffer
@@ -67,6 +77,36 @@ export interface ProposalTransactionJSON {
 const isRegistryRepoint = (tx: ProposalTransactionJSON) =>
   tx.contract === 'Registry' && tx.function === 'setAddressFor'
 
+const isGovernanceConstitutionSetter = (tx: ProposalTransactionJSON) =>
+  tx.contract === 'Governance' && tx.function === 'setConstitution'
+
+const registryRepointArgs = (tx: ProposalTransactionJSON) => {
+  if (!isRegistryRepoint(tx)) {
+    throw new Error(`Proposal transaction not a registry repoint:\n${JSON.stringify(tx, null, 2)}`)
+  }
+  return {
+    name: tx.args[0] as CeloContract,
+    address: tx.args[1] as string,
+  }
+}
+
+const setAddressAbi = getAbiByName(RegistryABI, 'setAddressFor')
+
+const isRegistryRepointRaw = (abiCoder: AbiCoder, tx: ProposalTransaction) =>
+  tx.to === REGISTRY_CONTRACT_ADDRESS &&
+  tx.input.startsWith(abiCoder.encodeFunctionSignature(setAddressAbi))
+
+const registryRepointRawArgs = (abiCoder: AbiCoder, tx: ProposalTransaction) => {
+  if (!isRegistryRepointRaw(abiCoder, tx)) {
+    throw new Error(`Proposal transaction not a registry repoint:\n${JSON.stringify(tx, null, 2)}`)
+  }
+  const params = abiCoder.decodeParameters(setAddressAbi.inputs!, trimLeading0x(tx.input).slice(8))
+  return {
+    name: params.identifier as CeloContract,
+    address: params.addr,
+  }
+}
+
 const isProxySetAndInitFunction = (tx: ProposalTransactionJSON) =>
   tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name!
 
@@ -77,18 +117,44 @@ const isProxySetFunction = (tx: ProposalTransactionJSON) =>
  * Convert a compiled proposal to a human-readable JSON form using network information.
  * @param kit Contract kit instance used to resolve addresses to contract names.
  * @param proposal A constructed proposal object.
+ * @param registryAdditions Registry remappings prior to parsing the proposal as a map of name to corresponding contract address.
  * @returns The JSON encoding of the proposal.
  */
-export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
-  const contractDetails = await obtainKitContractDetails(kit)
-  const blockExplorer = new BlockExplorer(kit, contractDetails)
+export const proposalToJSON = async (
+  kit: ContractKit,
+  proposal: Proposal,
+  registryAdditions?: RegistryAdditions
+) => {
+  const blockExplorer = await newBlockExplorer(kit)
 
+  const updateRegistryMapping = async (name: CeloContract, address: Address) => {
+    debug(`updating registry to reflect ${name} => ${address}`)
+    await blockExplorer.updateContractDetailsMapping(stripProxy(name), address)
+  }
+
+  if (registryAdditions) {
+    // Update the registry mapping with registry additions prior to processing the proposal.
+    for (const nameStr of Object.keys(registryAdditions)) {
+      const name = nameStr as CeloContract
+      if (!CeloContract[name]) {
+        throw new Error(`Name ${nameStr} in registry additions not a CeloContract`)
+      }
+      await updateRegistryMapping(name, registryAdditions[name])
+    }
+  }
+
+  const abiCoder = kit.connection.getAbiCoder()
   const proposalJson: ProposalTransactionJSON[] = []
   for (const tx of proposal) {
-    debug(`decoding tx ${tx}`)
+    if (isRegistryRepointRaw(abiCoder, tx)) {
+      const args = registryRepointRawArgs(abiCoder, tx)
+      await updateRegistryMapping(args.name, args.address)
+    }
+
+    debug(`decoding tx ${JSON.stringify(tx)}`)
     const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
     if (parsedTx == null) {
-      throw new Error(`Unable to parse ${tx} with block explorer`)
+      throw new Error(`Unable to parse ${JSON.stringify(tx)} with block explorer`)
     }
 
     const jsonTx: ProposalTransactionJSON = {
@@ -99,13 +165,10 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
       value: parsedTx.tx.value,
     }
 
-    if (isRegistryRepoint(jsonTx)) {
-      const [name, address] = jsonTx.args
-      await blockExplorer.updateContractDetailsMapping(name, address)
-    } else if (isProxySetFunction(jsonTx)) {
-      jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
+    if (isProxySetFunction(jsonTx)) {
+      jsonTx.contract = suffixProxy(jsonTx.contract)
     } else if (isProxySetAndInitFunction(jsonTx)) {
-      jsonTx.contract = `${jsonTx.contract}Proxy` as CeloContract
+      jsonTx.contract = suffixProxy(jsonTx.contract)
 
       // Transform delegate call initialize args into a readable params map
       const initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
@@ -118,6 +181,19 @@ export const proposalToJSON = async (kit: ContractKit, proposal: Proposal) => {
         kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
       )
       jsonTx.params![`initialize@${initSig}`] = initParams
+    } else if (isGovernanceConstitutionSetter(jsonTx)) {
+      const [address, functionId, threshold] = jsonTx.args
+      const { contract, abi } = blockExplorer.getContractMethodAbi(address, functionId)
+      if (!contract || !abi) {
+        throw new Error(
+          `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
+        )
+      }
+      jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
+        contract,
+        method: abi.name,
+        threshold: fromFixed(new BigNumber(threshold)),
+      }
     }
 
     proposalJson.push(jsonTx)
@@ -137,7 +213,7 @@ export class ProposalBuilder {
   constructor(
     private readonly kit: ContractKit,
     private readonly builders: Array<() => Promise<ProposalTransaction>> = [],
-    private readonly registryAdditions: RegistryAdditions = {}
+    public readonly registryAdditions: RegistryAdditions = {}
   ) {}
 
   /**
@@ -204,22 +280,42 @@ export class ProposalBuilder {
     this.addWeb3Tx(tx.txo, { to, value: valueToString(value.toString()) })
   }
 
-  fromJsonTx = async (tx: ProposalTransactionJSON) => {
-    // Account for canonical registry addresses from current proposal
-    let address = this.registryAdditions[tx.contract]
+  setRegistryAddition = (contract: CeloContract, address: string) =>
+    (this.registryAdditions[stripProxy(contract)] = address)
 
-    if (!address) {
-      address = await this.kit.registry.addressFor(tx.contract)
-    }
+  getRegistryAddition = (contract: CeloContract): string | undefined =>
+    this.registryAdditions[stripProxy(contract)]
 
+  isRegistered = (contract: CeloContract) =>
+    RegisteredContracts.includes(stripProxy(contract)) ||
+    this.getRegistryAddition(contract) !== undefined
+
+  fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
     if (isRegistryRepoint(tx)) {
       // Update canonical registry addresses
-      this.registryAdditions[tx.args[0]] = tx.args[1]
-      this.registryAdditions[tx.args[0] + 'Proxy'] = tx.args[1]
-    } else if (
-      tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name &&
-      Array.isArray(tx.args[1])
-    ) {
+      const args = registryRepointArgs(tx)
+      this.setRegistryAddition(args.name, args.address)
+    }
+
+    // handle sending value to unregistered contracts
+    if (!this.isRegistered(tx.contract)) {
+      if (!isValidAddress(tx.contract)) {
+        throw new Error(
+          `Transaction to unregistered contract ${tx.contract} only supported by address`
+        )
+      } else if (tx.function !== '' || tx.args !== []) {
+        throw new Error(
+          `Function ${tx.function} call with args ${tx.args} to unregistered contract not currently supported`
+        )
+      }
+      return { input: '', to: tx.contract, value: tx.value }
+    }
+
+    // Account for canonical registry addresses from current proposal
+    const address =
+      this.getRegistryAddition(tx.contract) ?? (await this.kit.registry.addressFor(tx.contract))
+
+    if (tx.function === SET_AND_INITIALIZE_IMPLEMENTATION_ABI.name && Array.isArray(tx.args[1])) {
       // Transform array of initialize arguments (if provided) into delegate call data
       tx.args[1] = this.kit.connection
         .getAbiCoder()
@@ -321,8 +417,9 @@ export class InteractiveProposalBuilder {
 
         // @ts-ignore
         const answer: string = inputAnswer[functionInput.name]
+        // transformedValue may not be in scientific notation
         const transformedValue =
-          functionInput.type === 'uint256' ? new BigNumber(answer).toString() : answer
+          functionInput.type === 'uint256' ? new BigNumber(answer).toString(10) : answer
         args.push(transformedValue)
       }
 

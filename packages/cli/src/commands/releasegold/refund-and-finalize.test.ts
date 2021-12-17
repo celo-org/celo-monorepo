@@ -14,11 +14,10 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
   let kit: ContractKit
 
   beforeEach(async () => {
-    const contractCanValidate = false
     contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
       web3,
-      contractCanValidate
+      { index: 1 } // revocable = true
     )
     kit = newKitFromWeb3(web3)
   })
@@ -30,7 +29,7 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
     const balanceBefore = await kit.getTotalBalance(refundAddress)
     await RefundAndFinalize.run(['--contract', contractAddress])
     const balanceAfter = await kit.getTotalBalance(refundAddress)
-    expect(balanceBefore.CELO.toNumber()).toBeLessThan(balanceAfter.CELO.toNumber())
+    expect(balanceBefore.CELO!.toNumber()).toBeLessThan(balanceAfter.CELO!.toNumber())
   })
 
   test('can finalize the contract', async () => {

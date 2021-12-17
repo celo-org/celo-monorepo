@@ -1,9 +1,15 @@
-import { Address, ensureLeading0x, eqAddress } from '@celo/base/lib/address'
+import { Address, ensureLeading0x } from '@celo/base/lib/address'
 import { Err, makeAsyncThrowable, Ok, Result, RootError } from '@celo/base/lib/result'
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes } from '@celo/contractkit/lib/identity/claims/types'
 import { IdentityMetadataWrapper } from '@celo/contractkit/lib/identity/metadata'
-import { recoverEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+import { publicKeyToAddress } from '@celo/utils/lib/address'
+import { ensureUncompressed } from '@celo/utils/lib/ecdh'
+import {
+  recoverEIP712TypedDataSignerRsv,
+  recoverEIP712TypedDataSignerVrs,
+  verifyEIP712TypedDataSigner,
+} from '@celo/utils/lib/signatureUtils'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
 import * as t from 'io-ts'
@@ -20,26 +26,26 @@ export enum OffchainErrorTypes {
   NoStorageProvider = 'NoStorageProvider',
 }
 
-class FetchError extends RootError<OffchainErrorTypes.FetchError> {
+export class FetchError extends RootError<OffchainErrorTypes.FetchError> {
   constructor(error: Error) {
     super(OffchainErrorTypes.FetchError)
     this.message = error.message
   }
 }
 
-class InvalidSignature extends RootError<OffchainErrorTypes.InvalidSignature> {
+export class InvalidSignature extends RootError<OffchainErrorTypes.InvalidSignature> {
   constructor() {
     super(OffchainErrorTypes.InvalidSignature)
   }
 }
 
-class NoStorageRootProvidedData extends RootError<OffchainErrorTypes.NoStorageRootProvidedData> {
+export class NoStorageRootProvidedData extends RootError<OffchainErrorTypes.NoStorageRootProvidedData> {
   constructor() {
     super(OffchainErrorTypes.NoStorageRootProvidedData)
   }
 }
 
-class NoStorageProvider extends RootError<OffchainErrorTypes.NoStorageProvider> {
+export class NoStorageProvider extends RootError<OffchainErrorTypes.NoStorageProvider> {
   constructor() {
     super(OffchainErrorTypes.NoStorageProvider)
   }
@@ -51,7 +57,20 @@ export type OffchainErrors =
   | NoStorageRootProvidedData
   | NoStorageProvider
 
-export default class OffchainDataWrapper {
+export interface OffchainDataWrapper {
+  kit: ContractKit
+  signer: Address
+  self: Address
+  writeDataTo(data: Buffer, signature: Buffer, dataPath: string): Promise<OffchainErrors | void>
+  readDataFromAsResult<DataType>(
+    account: Address,
+    dataPath: string,
+    checkOffchainSigners: boolean,
+    type?: t.Type<DataType>
+  ): Promise<Result<Buffer, OffchainErrors>>
+}
+
+export class BasicDataWrapper implements OffchainDataWrapper {
   storageWriter: StorageWriter | undefined
   signer: string
 
@@ -106,8 +125,8 @@ export default class OffchainDataWrapper {
         this.storageWriter.write(data, dataPath),
         this.storageWriter.write(signature, `${dataPath}.signature`),
       ])
-    } catch (e) {
-      return new FetchError(e)
+    } catch (e: any) {
+      return new FetchError(e instanceof Error ? e : new Error(e))
     }
   }
 }
@@ -131,8 +150,9 @@ class StorageRoot {
         fetch(resolvePath(this.root, dataPath)),
         fetch(resolvePath(this.root, `${dataPath}.signature`)),
       ])
-    } catch (error) {
-      return Err(new FetchError(error))
+    } catch (error: any) {
+      const fetchError = error instanceof Error ? error : new Error(error)
+      return Err(new FetchError(fetchError))
     }
 
     if (!dataResponse.ok) {
@@ -151,23 +171,34 @@ class StorageRoot {
 
     const toParse = type ? JSON.parse(body.toString()) : body
     const typedData = await buildEIP712TypedData(this.wrapper, dataPath, toParse, type)
-    const guessedSigner = recoverEIP712TypedDataSigner(typedData, signature)
-    if (eqAddress(guessedSigner, this.account)) {
+
+    if (verifyEIP712TypedDataSigner(typedData, signature, this.account)) {
       return Ok(body)
     }
 
     const accounts = await this.wrapper.kit.contracts.getAccounts()
     if (await accounts.isAccount(this.account)) {
-      const signers = await Promise.all([
+      const keys = await Promise.all([
         accounts.getVoteSigner(this.account),
         accounts.getValidatorSigner(this.account),
         accounts.getAttestationSigner(this.account),
+        accounts.getDataEncryptionKey(this.account),
       ])
-      if (signers.some((signer) => signer === guessedSigner)) {
+
+      const dekAddress = keys[3] ? publicKeyToAddress(ensureUncompressed(keys[3])) : '0x0'
+      const signers = [keys[0], keys[1], keys[2], dekAddress]
+
+      if (signers.some((signer) => verifyEIP712TypedDataSigner(typedData, signature, signer))) {
         return Ok(body)
       }
 
       if (checkOffchainSigners) {
+        let guessedSigner: string
+        try {
+          guessedSigner = recoverEIP712TypedDataSignerRsv(typedData, signature)
+        } catch (error) {
+          guessedSigner = recoverEIP712TypedDataSignerVrs(typedData, signature)
+        }
         const authorizedSignerAccessor = new AuthorizedSignerAccessor(this.wrapper)
         const authorizedSigner = await authorizedSignerAccessor.readAsResult(
           this.account,

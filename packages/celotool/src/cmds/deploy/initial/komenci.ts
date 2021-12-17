@@ -1,5 +1,6 @@
 import { InitialArgv } from 'src/cmds/deploy/initial'
 import { addContextMiddleware, ContextArgv, switchToContextCluster } from 'src/lib/context-utils'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { installHelmChart } from 'src/lib/komenci'
 import yargs from 'yargs'
 
@@ -21,6 +22,8 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: KomenciInitialArgv) => {
+  // Do not allow --helmdryrun because komenciIdentityHelmParameters function. It could be refactored to allow
+  exitIfCelotoolHelmDryRun()
   await switchToContextCluster(argv.celoEnv, argv.context)
   await installHelmChart(argv.celoEnv, argv.context, argv.useForno)
 }

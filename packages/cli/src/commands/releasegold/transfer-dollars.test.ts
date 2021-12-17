@@ -17,11 +17,10 @@ testWithGanache('releasegold:transfer-dollars cmd', (web3: Web3) => {
   let kit: ContractKit
 
   beforeEach(async () => {
-    const contractCanValidate = false
     contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
       web3,
-      contractCanValidate
+      { index: 1 } // canValidate = false
     )
     kit = newKitFromWeb3(web3)
     accounts = await web3.eth.getAccounts()
@@ -43,7 +42,7 @@ testWithGanache('releasegold:transfer-dollars cmd', (web3: Web3) => {
     ])
     // RG cUSD balance should match the amount sent
     const contractBalance = await kit.getTotalBalance(contractAddress)
-    expect(contractBalance.cUSD.toFixed()).toEqual(cUSDToTransfer)
+    expect(contractBalance.cUSD!.toFixed()).toEqual(cUSDToTransfer)
     // Attempt to send cUSD back
     await RGTransferDollars.run([
       '--contract',

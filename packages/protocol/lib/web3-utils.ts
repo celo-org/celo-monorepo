@@ -1,11 +1,13 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
 import { Address, CeloTxObject } from '@celo/connect'
-import { retryTx, setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
+import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { BigNumber } from 'bignumber.js'
+import prompts from 'prompts'
 import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
 import Web3 from 'web3'
 
@@ -133,7 +135,7 @@ export function randomUint256() {
     .valueOf()
 }
 
-function checkFunctionArgsLength(args: any[], abi: any) {
+export function checkFunctionArgsLength(args: any[], abi: any) {
   if (args.length !== abi.inputs.length) {
     throw new Error(`Incorrect number of arguments to Solidity function: ${abi.name}`)
   }
@@ -251,10 +253,11 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
 ) {
   const Contract = artifacts.require(name)
   const ContractProxy = artifacts.require(name + 'Proxy')
+  const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
     console.log('Deploying', name)
     deployer.deploy(ContractProxy)
-    deployer.deploy(Contract)
+    deployer.deploy(Contract, testingDeployment)
     deployer.then(async () => {
       const proxy: ProxyInstance = await ContractProxy.deployed()
       await proxy._transferOwnership(ContractProxy.defaults().from)
@@ -384,4 +387,43 @@ export function getFunctionSelectorsForContract(contract: any, contractName: str
       }
     })
   return selectors
+}
+
+// TODO: change to checkInheritance and use baseContracts field instead of importDirectives
+export function checkImports(baseContractName: string, derivativeContractArtifact: any, artifacts: any) {
+  const isImport = (astNode: any) => astNode.nodeType === 'ImportDirective'
+  const imports: any[] = derivativeContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode))
+  while (imports.length) { // BFS 
+    const importedContractName = (imports.pop().file as string).split('/').pop().split('.')[0]
+    if (importedContractName ===  baseContractName) {
+      return true
+    }
+    const importedContractArtifact = artifacts instanceof BuildArtifacts ? 
+      artifacts.getArtifactByName(importedContractName) :
+      artifacts.require(importedContractName)
+    imports.unshift(...importedContractArtifact.ast.nodes.filter((astNode: any) => isImport(astNode)))
+  }
+  return false
+}
+
+export async function retryTx(fn: any, args: any[]) {
+  while (true) {
+    try {
+      const rvalue = await fn(...args)
+      return rvalue
+    } catch (e) {
+      console.error(e)
+      // @ts-ignore
+      const { confirmation } = await prompts({
+        type: 'confirm',
+        name: 'confirmation',
+        // @ts-ignore: typings incorrectly only accept string.
+        initial: true,
+        message: 'Error while sending tx. Try again?',
+      })
+      if (!confirmation) {
+        throw e
+      }
+    }
+  }
 }

@@ -11,8 +11,8 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 20%
+      maxSurge: {{ .Values.blockscout.api.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.blockscout.api.strategy.rollingUpdate.maxUnavailable }}
   replicas: 1
   selector:
     matchLabels:
@@ -21,6 +21,12 @@ spec:
       component: blockscout-api
   template:
     metadata:
+      {{- if .Values.blockscout.metrics.enabled}}
+      annotations:
+        prometheus.io/path: /metrics/web
+        prometheus.io/port: "4000"
+        prometheus.io/scrape: "true"
+      {{- end}}
       labels:
         app: blockscout
         release: {{ .Release.Name }}
@@ -43,28 +49,36 @@ spec:
         - -c
         args:
         - |
-           exec mix cmd --app block_scout_web "iex -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix phx.server"
+           exec mix cmd --app block_scout_web "iex  --name {{ .Values.blockscout.api.erlangNodeName}}@0.0.0.0 -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix do deps.loadpaths --no-deps-check, phx.server --no-compile"
         ports:
         - name: http
-          containerPort: 4000
+          containerPort: {{ .Values.blockscout.api.port }}
+        {{- if .Values.blockscout.api.readinessProbe.enabled }}
         readinessProbe:
           httpGet:
             path: /api/v1/health/liveness
             port: http
-          initialDelaySeconds: 10
-          failureThreshold: 5
-          periodSeconds: 5
+          initialDelaySeconds: {{ .Values.blockscout.api.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.blockscout.api.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.blockscout.api.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.blockscout.api.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.blockscout.api.readinessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.blockscout.api.livenessProbe.enabled }}
         livenessProbe:
           httpGet:
             path: /api/v1/health/liveness
             port: http
-          initialDelaySeconds: 10
-          failureThreshold: 5
-          periodSeconds: 5
+          initialDelaySeconds: {{ .Values.blockscout.api.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.blockscout.api.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.blockscout.api.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.blockscout.api.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.blockscout.api.livenessProbe.failureThreshold }}
+        {{- end }}
         resources:
           requests:
-            memory: 500Mi
-            cpu: 500m
+            memory: {{ .Values.blockscout.api.resources.requests.memory }}
+            cpu: {{ .Values.blockscout.api.resources.requests.cpu }}
         env:
         - name: DISABLE_WEBAPP
           value: "true"
@@ -72,11 +86,23 @@ spec:
           value: "true"
         - name: DISABLE_INDEXER
           value: "true"
+        - name: DISABLE_EXCHANGE_RATES
+          value: "true"
         - name: POOL_SIZE
           value: {{ .Values.blockscout.api.pool_size | quote }}
-{{ include "celo.blockscout-env-vars" .  | indent 8 }}
-{{$data := dict "Values" .Values "DbSuffix" "-replica"}}
-{{ include "celo.blockscout-db-sidecar" $data  | indent 6 }}
+        - name: BLOCKSCOUT_HOST
+          value: {{ .Values.blockscout.web.host | quote }}
+        - name: ENABLE_SOURCIFY_INTEGRATION
+          value: {{ .Values.blockscout.web.sourcify.enabled | quote }}
+        - name: SOURCIFY_SERVER_URL
+          value: {{ .Values.blockscout.web.sourcify.serverUrl | quote }}
+        - name: SOURCIFY_REPO_URL
+          value: {{ .Values.blockscout.web.sourcify.repoUrl | quote }}
+        - name: CHAIN_ID
+          value: {{ .Values.blockscout.networkID | quote }}
+{{ include "celo.blockscout-env-vars" . | indent 8 }}
+{{- $data := dict "Values" .Values "DbSuffix" "-replica" "Database" .Values.blockscout.api.db }}
+{{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

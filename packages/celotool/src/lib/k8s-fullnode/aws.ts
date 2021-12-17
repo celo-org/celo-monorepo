@@ -1,4 +1,8 @@
-import { authorizeSecurityGroupIngress, getClusterSharedNodeSecurityGroup, revokeSecurityGroupIngress } from '../aws'
+import {
+  authorizeSecurityGroupIngress,
+  getClusterSharedNodeSecurityGroup,
+  revokeSecurityGroupIngress,
+} from '../aws'
 import { AwsClusterConfig } from '../k8s-cluster/aws'
 import { BaseFullNodeDeploymentConfig } from './base'
 import { BaseNodePortFullNodeDeployer } from './base-nodeport'
@@ -9,7 +13,7 @@ export interface AwsFullNodeDeploymentConfig extends BaseFullNodeDeploymentConfi
 
 enum Protocols {
   tcp = 'tcp',
-  udp = 'udp'
+  udp = 'udp',
 }
 
 /**
@@ -27,7 +31,7 @@ export class AwsFullNodeDeployer extends BaseNodePortFullNodeDeployer {
       `--set aws=true`,
       `--set storage.storageClass=gp2`,
       // A single element because we will be using tcp and udp on a single service
-      `--set geth.service_protocols='{tcp-and-udp}'`
+      `--set geth.service_protocols='{tcp-and-udp}'`,
     ]
   }
 
@@ -48,7 +52,9 @@ export class AwsFullNodeDeployer extends BaseNodePortFullNodeDeployer {
    */
   async setIngressRulesTCPAndUDP(ports: number[], authorize: boolean) {
     const cidrRange = '0.0.0.0/0'
-    const securityGroup = await getClusterSharedNodeSecurityGroup(this.deploymentConfig.clusterConfig)
+    const securityGroup = await getClusterSharedNodeSecurityGroup(
+      this.deploymentConfig.clusterConfig
+    )
 
     // Record the existing relevant rules on the security group. We want to know
     // if both udp and tcp ingress traffic has been enabled for the ports.
@@ -70,10 +76,13 @@ export class AwsFullNodeDeployer extends BaseNodePortFullNodeDeployer {
         continue
       }
       const port = rule.FromPort
-      existingRulesByPort[port] = Object.values(Protocols).reduce((obj: any, protocol: Protocols) => ({
-        ...obj,
-        [protocol]: obj[protocol] || rule.IpProtocol === protocol
-      }), existingRulesByPort[port] || {})
+      existingRulesByPort[port] = Object.values(Protocols).reduce(
+        (obj: any, protocol: Protocols) => ({
+          ...obj,
+          [protocol]: obj[protocol] || rule.IpProtocol === protocol,
+        }),
+        existingRulesByPort[port] || {}
+      )
     }
 
     // Iterate over all the provided ports and protocols, and either authorize

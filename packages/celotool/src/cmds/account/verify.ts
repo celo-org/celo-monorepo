@@ -52,7 +52,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: VerifyArgv) => {
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false, true)
 
   try {
     await portForwardAnd(argv.celoEnv, verifyCmd.bind(null, argv))

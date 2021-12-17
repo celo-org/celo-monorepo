@@ -1,8 +1,14 @@
 import { Address, trimLeading0x } from '@celo/base'
 import { Err, makeAsyncThrowable, Result } from '@celo/base/lib/result'
 import * as t from 'io-ts'
-import OffchainDataWrapper from '../../offchain-data-wrapper'
-import { buildEIP712TypedData, deserialize, readEncrypted, writeEncrypted } from '../utils'
+import { OffchainDataWrapper } from '../../offchain-data-wrapper'
+import {
+  buildEIP712TypedData,
+  deserialize,
+  readEncrypted,
+  writeEncrypted,
+  writeSymmetricKeys,
+} from '../utils'
 import { InvalidDataError, OffchainError, SchemaErrors } from './errors'
 import { PrivateAccessor, PublicAccessor } from './interfaces'
 
@@ -78,6 +84,10 @@ export class PrivateSimpleAccessor<DataType> implements PrivateAccessor<DataType
     }
 
     return writeEncrypted(this.wrapper, this.dataPath, serialize(data), toAddresses, symmetricKey)
+  }
+
+  async allowAccess(toAddresses: Address[], symmetricKey?: Buffer) {
+    return writeSymmetricKeys(this.wrapper, this.dataPath, toAddresses, symmetricKey)
   }
 
   async readAsResult(account: Address): Promise<Result<DataType, SchemaErrors>> {

@@ -25,9 +25,7 @@ export default class SetName extends BaseCommand {
     this.kit.defaultAccount = res.flags.account
     const accounts = await this.kit.contracts.getAccounts()
 
-    await newCheckBuilder(this)
-      .isAccount(res.flags.account)
-      .runChecks()
+    await newCheckBuilder(this).isAccount(res.flags.account).runChecks()
     await displaySendTx('setName', accounts.setName(res.flags.name))
   }
 }

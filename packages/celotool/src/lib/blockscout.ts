@@ -1,38 +1,50 @@
 import fs from 'fs'
+import fetch from 'node-fetch'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
-import { getCurrentGcloudAccount } from './gcloud_utils'
-import { installGenericHelmChart, removeGenericHelmChart } from './helm_deploy'
+import { accessSecretVersion, getCurrentGcloudAccount } from './gcloud_utils'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from './helm_deploy'
 import { outputIncludes } from './utils'
 import { getInternalTxNodeLoadBalancerIP } from './vm-testnet-utils'
 
-export function getInstanceName(celoEnv: string) {
-  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+const helmChartPath = '../helm-charts/blockscout'
+
+export function getInstanceName(celoEnv: string, dbSuffix: string) {
   return `${celoEnv}${dbSuffix}`
 }
 
-export function getReleaseName(celoEnv: string) {
-  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+export function getReleaseName(celoEnv: string, dbSuffix: string) {
   return `${celoEnv}-blockscout${dbSuffix}`
 }
 
 export async function installHelmChart(
   celoEnv: string,
   releaseName: string,
+  imageTag: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
 ) {
+  const valuesEnvFile = fs.existsSync(`${helmChartPath}/values-${celoEnv}.yaml`)
+    ? `values-${celoEnv}.yaml`
+    : `values.yaml`
   return installGenericHelmChart(
     celoEnv,
     releaseName,
-    '../helm-charts/blockscout',
+    helmChartPath,
     await helmParameters(
       celoEnv,
+      imageTag,
       blockscoutDBUsername,
       blockscoutDBPassword,
       blockscoutDBConnectionName
-    )
+    ),
+    true,
+    valuesEnvFile
   )
 }
 
@@ -43,32 +55,33 @@ export async function removeHelmRelease(helmReleaseName: string, celoEnv: string
 export async function upgradeHelmChart(
   celoEnv: string,
   helmReleaseName: string,
+  imageTag: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
 ) {
   console.info(`Upgrading helm release ${helmReleaseName}`)
-  const params = (
-    await helmParameters(
-      celoEnv,
-      blockscoutDBUsername,
-      blockscoutDBPassword,
-      blockscoutDBConnectionName
-    )
-  ).join(' ')
-  if (process.env.CELOTOOL_VERBOSE === 'true') {
-    await execCmdWithExitOnFailure(
-      `helm upgrade --debug --dry-run ${helmReleaseName} ../helm-charts/blockscout --namespace ${celoEnv} ${params}`
-    )
-  }
-  await execCmdWithExitOnFailure(
-    `helm upgrade ${helmReleaseName} ../helm-charts/blockscout --namespace ${celoEnv} ${params}`
+  const params = await helmParameters(
+    celoEnv,
+    imageTag,
+    blockscoutDBUsername,
+    blockscoutDBPassword,
+    blockscoutDBConnectionName
   )
+  await upgradeGenericHelmChart(
+    celoEnv,
+    helmReleaseName,
+    helmChartPath,
+    params,
+    `values-${celoEnv}.yaml`
+  )
+
   console.info(`Helm release ${helmReleaseName} upgrade successful`)
 }
 
 async function helmParameters(
   celoEnv: string,
+  imageTag: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
@@ -77,53 +90,64 @@ async function helmParameters(
   const privateNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
   const useMetadataCrawler = fetchEnvOrFallback(
     envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY,
-    'false',
+    'false'
   )
   const params = [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set blockscout.deployment.account="${currentGcloudAccount}"`,
+    `--set blockscout.deployment.timestamp="${new Date().toISOString()}"`,
     `--set blockscout.image.repository=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY)}`,
-    `--set blockscout.image.tag=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_TAG)}`,
+    `--set blockscout.image.tag=${imageTag}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
     `--set blockscout.db.drop=${fetchEnvOrFallback(envVar.BLOCKSCOUT_DROP_DB, 'false')}`,
-    `--set blockscout.replicas=${fetchEnv(envVar.BLOCKSCOUT_WEB_REPLICAS)}`,
     `--set blockscout.subnetwork="${fetchEnvOrFallback(
       envVar.BLOCKSCOUT_SUBNETWORK_NAME,
       celoEnv
     )}"`,
-    `--set promtosd.scrape_interval=${fetchEnv(envVar.PROMTOSD_SCRAPE_INTERVAL)}`,
-    `--set promtosd.export_interval=${fetchEnv(envVar.PROMTOSD_EXPORT_INTERVAL)}`,
+    `--set blockscout.segment_key=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
+    `--set blockscout.networkID=${fetchEnv(envVar.NETWORK_ID)}`,
   ]
   if (useMetadataCrawler !== 'false') {
     params.push(
-    `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
-      envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
-    )}`,
-    `--set blockscout.metadata_crawler.image.tag=${fetchEnv(
-      envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
-    )}`,
-    `--set blockscout.metadata_crawler.schedule="${fetchEnv(
-      envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
-    )}"`,
-    `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
-      envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
-      ''
-    )}`,
-    `--set blockscout.metadata_crawler.discord_cluster_name=${fetchEnvOrFallback(
-      envVar.METADATA_CRAWLER_DISCORD_CLUSTER_NAME,
-      celoEnv
-    )}`,
+      `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
+        envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
+      )}`,
+      `--set blockscout.metadata_crawler.image.tag=${fetchEnv(
+        envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
+      )}`,
+      `--set blockscout.metadata_crawler.schedule="${fetchEnv(
+        envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
+      )}"`,
+      `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
+        envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
+        ''
+      )}`,
+      `--set blockscout.metadata_crawler.discord_cluster_name=${fetchEnvOrFallback(
+        envVar.METADATA_CRAWLER_DISCORD_CLUSTER_NAME,
+        celoEnv
+      )}`
     )
   }
-  if (isVmBased()) {
+  if (
+    fetchEnvOrFallback(envVar.BLOCKSCOUT_OVERRIDE_RPC_ENDPOINT, '') !== '' &&
+    fetchEnvOrFallback(envVar.BLOCKSCOUT_OVERRIDE_WS_ENDPOINT, '') !== ''
+  ) {
+    params.push(
+      `--set blockscout.jsonrpc_http_url=${fetchEnv(envVar.BLOCKSCOUT_OVERRIDE_RPC_ENDPOINT)}`
+    )
+    params.push(
+      `--set blockscout.jsonrpc_ws_url=${fetchEnv(envVar.BLOCKSCOUT_OVERRIDE_WS_ENDPOINT)}`
+    )
+  } else if (isVmBased()) {
+    // TODO: Deprecated
     const txNodeLbIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
     params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
   } else if (privateNodes > 0) {
     params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-private:8545`)
-    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private:8546`)
+    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private:8545`)
   } else {
     params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes:8545`)
     params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes:8546`)
@@ -139,7 +163,7 @@ export async function createDefaultIngressIfNotExists(celoEnv: string, ingressNa
   )
   if (!ingressExists) {
     console.info(`Creating ingress ${celoEnv}-blockscout-web-ingress`)
-    const ingressFilePath = `/tmp/${celoEnv}-blockscout-web-ingress.json`
+    const ingressFilePath = `/tmp/${celoEnv}-blockscout-web-ingress.yaml`
     const ingressResource = `
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -147,13 +171,20 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 8m
     nginx.ingress.kubernetes.io/configuration-snippet: |
-    location ~ /admin/.* {
-      deny all;
-    }
-    location ~ /wobserver/.* {
-      deny all;
-    }
+      location ~ /admin/.* {
+        deny all;
+      }
+      location ~ /wobserver/.* {
+        deny all;
+      }
+      location ~ /address/(.*)/token_transfers {
+        return 301 /address/$1/token-transfers;
+      }
+      location ~ /address/(.*)/coin_balances {
+        return 301 /address/$1/coin-balances;
+      }
   labels:
     app: blockscout
     chart: blockscout
@@ -190,4 +221,25 @@ export async function switchIngressService(celoEnv: string, ingressName: string)
   const command = `kubectl patch --namespace=${celoEnv} ing/${celoEnv}-blockscout-web-ingress --type=json\
    -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"${ingressName}-web"}]'`
   await execCmdWithExitOnFailure(command)
+}
+
+export async function createGrafanaTagAnnotation(celoEnv: string, tag: string, suffix: string) {
+  const currentGcloudAccount = await getCurrentGcloudAccount()
+  const projectId = fetchEnv(envVar.GRAFANA_CLOUD_PROJECT_ID)
+  const secretName = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_NAME)
+  const secretVersion = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_VERSION)
+  const secret = await accessSecretVersion(projectId, secretName, secretVersion)
+  const token = JSON.parse(secret!)
+  await fetch(`${token!.grafana_endpoint}/api/annotations`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token!.grafana_api_token}`,
+    },
+    body: JSON.stringify({
+      text: `Deployed ${celoEnv} ${suffix} by ${currentGcloudAccount} with commit: \n \n
+      <a href=\"https://github.com/celo-org/blockscout/commit/${tag}"> ${tag}</a>\n`,
+      tags: ['deployment', celoEnv],
+    }),
+  })
 }

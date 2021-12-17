@@ -1,5 +1,8 @@
-import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
-import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 
 const helmChartPath = '../helm-charts/attestation-bot'
@@ -10,17 +13,12 @@ export async function installHelmChart(celoEnv: string) {
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  console.info(`Upgrading helm release ${releaseName(celoEnv)}`)
-
-  const upgradeCmdArgs = `${releaseName(
-    celoEnv
-  )} ${helmChartPath} --namespace ${celoEnv} ${helmParameters(celoEnv).join(' ')}`
-
-  if (process.env.CELOTOOL_VERBOSE === 'true') {
-    await execCmdWithExitOnFailure(`helm upgrade --debug --dry-run ${upgradeCmdArgs}`)
-  }
-  await execCmdWithExitOnFailure(`helm upgrade ${upgradeCmdArgs}`)
-  console.info(`Helm release ${releaseName(celoEnv)} upgrade successful`)
+  await upgradeGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv),
+    helmChartPath,
+    helmParameters(celoEnv)
+  )
 }
 
 export async function removeHelmRelease(celoEnv: string) {

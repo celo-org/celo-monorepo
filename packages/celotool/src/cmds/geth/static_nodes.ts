@@ -30,7 +30,7 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: StaticNodesArgv) => {
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false)
 
   const namespace = argv.celoEnv
   const outputDirPath = argv.outputDir

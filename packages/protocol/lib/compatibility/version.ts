@@ -123,6 +123,15 @@ export class ContractVersionDelta {
     const deltas = [this.storage, this.major, this.minor, this.patch]
     return deltas.map(d => d.toString()).join('.')
   }
+
+  public isVersionIncremented = () : boolean => {
+    return (
+      this.storage === Delta.Increment || 
+      this.major === Delta.Increment || 
+      this.minor === Delta.Increment|| 
+      this.patch === Delta.Increment
+    )
+  } 
 }
 
 /**

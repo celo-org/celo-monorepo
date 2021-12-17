@@ -1,4 +1,5 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { upgradePrometheus } from 'src/lib/prometheus'
 import { deploy, taintTestnet, untaintTestnet } from 'src/lib/vm-testnet-utils'
 import yargs from 'yargs'
@@ -34,7 +35,8 @@ export const builder = (argv: yargs.Argv) => {
 }
 
 export const handler = async (argv: VmTestnetArgv) => {
-  await switchToClusterFromEnv()
+  exitIfCelotoolHelmDryRun()
+  await switchToClusterFromEnv(argv.celoEnv)
 
   let onDeployFailed = () => Promise.resolve()
   if (argv.reset === true) {

@@ -63,13 +63,13 @@ export class LedgerSigner implements Signer {
         r: ethUtil.toBuffer(ensureLeading0x(signature.r)) as Buffer,
         s: ethUtil.toBuffer(ensureLeading0x(signature.s)) as Buffer,
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof TransportStatusError) {
         // The Ledger fails if it doesn't know the feeCurrency
         if (error.statusCode === 27264 && error.statusText === 'INCORRECT_DATA') {
           debug('Possible invalid feeCurrency field')
           throw new Error(
-            'ledger-signer@singTransaction: Incorrect Data. Verify that the feeCurrency is a valid one'
+            'ledger-signer@signTransaction: Incorrect Data. Verify that the feeCurrency is a valid one'
           )
         } else {
           transportErrorFriendlyMessage(error)

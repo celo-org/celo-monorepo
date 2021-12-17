@@ -22,6 +22,8 @@ OPTIONS
                                                      Validator Group or Validator Group
                                                      validator signer
 
+  --globalHelp                                       View all available global flags
+
   --queue-update=queue-update                        Queues an update to the commission,
                                                      which can be applied after the
                                                      update delay.
@@ -48,6 +50,8 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Signer or
                                                      ValidatorGroup's address
 
+  --globalHelp                                       View all available global flags
+
 EXAMPLE
   deregister --from 0x47e172f6cfb6c7d01c1574fa3e2be7cc73269d95
 ```
@@ -69,6 +73,7 @@ OPTIONS
   --columns=columns       only show provided columns (comma-separated)
   --csv                   output is csv format [alias: --output=csv]
   --filter=filter         filter property by partial string matching, ex: name=foo
+  --globalHelp            View all available global flags
   --no-header             hide table header from output
   --no-truncate           do not truncate output to fit screen
   --output=csv|json|yaml  output in a more machine friendly format
@@ -99,6 +104,8 @@ OPTIONS
                                                      group
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) ValidatorGroup's address
+
+  --globalHelp                                       View all available global flags
 
   --remove                                           Remove a validator from the members
                                                      list
@@ -139,6 +146,8 @@ OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address for the
                                                      Validator Group
 
+  --globalHelp                                       View all available global flags
+
   --yes                                              Answer yes to prompt
 
 EXAMPLE
@@ -160,6 +169,9 @@ USAGE
 ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
 
+OPTIONS
+  --globalHelp  View all available global flags
+
 EXAMPLE
   reset-slashing-multiplier 0x97f7333c51897469E8D98E7af8653aAb468050a3
 ```
@@ -178,6 +190,9 @@ USAGE
 
 ARGUMENTS
   GROUPADDRESS  ValidatorGroup's address
+
+OPTIONS
+  --globalHelp  View all available global flags
 
 EXAMPLE
   show 0x97f7333c51897469E8D98E7af8653aAb468050a3

@@ -24,9 +24,7 @@ export default class WhitelistHotfix extends BaseCommand {
     const account = res.flags.from
     this.kit.defaultAccount = account
 
-    await newCheckBuilder(this)
-      .hotfixNotExecuted(hash)
-      .runChecks()
+    await newCheckBuilder(this).hotfixNotExecuted(hash).runChecks()
 
     const governance = await this.kit.contracts.getGovernance()
     await displaySendTx(

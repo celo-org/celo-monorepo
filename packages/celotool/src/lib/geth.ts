@@ -6,6 +6,7 @@ import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWr
 import { waitForPortOpen } from '@celo/dev-utils/lib/network'
 import BigNumber from 'bignumber.js'
 import { spawn } from 'child_process'
+import { randomBytes } from 'crypto'
 import fs from 'fs'
 import { merge, range } from 'lodash'
 import fetch from 'node-fetch'
@@ -19,9 +20,10 @@ import { envVar, fetchEnv, isVmBased } from './env-utils'
 import {
   AccountType,
   generateGenesis,
+  generateGenesisWithMigrations,
   generatePrivateKey,
   privateKeyToPublicKey,
-  Validator
+  Validator,
 } from './generate_utils'
 import { retrieveClusterIPAddress, retrieveIPAddress } from './helm_deploy'
 import { GethInstanceConfig } from './interfaces/geth-instance-config'
@@ -88,12 +90,14 @@ export const getBootnodeEnode = async (namespace: string) => {
   return [getEnodeAddress(nodeId, ip, BOOTNODE_DISCOVERY_PORT)]
 }
 
-const retrieveBootnodeIPAddress = async (namespace: string) => {
+export const retrieveBootnodeIPAddress = async (namespace: string) => {
   if (isVmBased()) {
     const outputs = await getTestnetOutputs(namespace)
     return outputs.bootnode_ip_address.value
   } else {
-    const resourceName = `${namespace}-bootnode`
+    // Baklava bootnode address comes from VM and has an different name (not possible to update name after creation)
+    const resourceName =
+      namespace === 'baklava' ? `${namespace}-bootnode-address` : `${namespace}-bootnode`
     if (fetchEnv(envVar.STATIC_IPS_FOR_GETH_NODES) === 'true') {
       return retrieveIPAddress(resourceName)
     } else {
@@ -219,6 +223,13 @@ const validateGethRPC = async (
   handleError: HandleErrorCallback
 ) => {
   const transaction = await kit.connection.getTransaction(txHash)
+  handleError(!transaction || !transaction.from, {
+    location: '[GethRPC]',
+    error: `Contractkit did not return a valid transaction`,
+  })
+  if (transaction == null) {
+    return
+  }
   const txFrom = transaction.from.toLowerCase()
   const expectedFrom = from.toLowerCase()
   handleError(!transaction.from || expectedFrom !== txFrom, {
@@ -449,6 +460,7 @@ export const transferCeloGold = async (
     feeCurrency?: string
     gatewayFeeRecipient?: string
     gatewayFee?: string
+    nonce?: number
   } = {}
 ) => {
   const kitGoldToken = await kit.contracts.getGoldToken()
@@ -456,9 +468,10 @@ export const transferCeloGold = async (
     from: fromAddress,
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
-    feeCurrency: txOptions.feeCurrency,
+    feeCurrency: txOptions.feeCurrency || undefined,
     gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
     gatewayFee: txOptions.gatewayFee,
+    nonce: txOptions.nonce,
   })
 }
 
@@ -473,6 +486,7 @@ export const transferCeloDollars = async (
     feeCurrency?: string
     gatewayFeeRecipient?: string
     gatewayFee?: string
+    nonce?: number
   } = {}
 ) => {
   const kitStableToken = await kit.contracts.getStableToken()
@@ -480,10 +494,24 @@ export const transferCeloDollars = async (
     from: fromAddress,
     gas: txOptions.gas,
     gasPrice: txOptions.gasPrice,
-    feeCurrency: txOptions.feeCurrency,
+    feeCurrency: txOptions.feeCurrency || undefined,
     gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
     gatewayFee: txOptions.gatewayFee,
+    nonce: txOptions.nonce,
   })
+}
+
+export const unlock = async (
+  kit: ContractKit,
+  address: string,
+  password: string,
+  unlockPeriod: number
+) => {
+  try {
+    await kit.web3.eth.personal.unlockAccount(address, password, unlockPeriod)
+  } catch (error) {
+    console.error(`Unlock account ${address} failed:`, error)
+  }
 }
 
 export const simulateClient = async (
@@ -492,23 +520,53 @@ export const simulateClient = async (
   txPeriodMs: number, // time between new transactions in ms
   blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
-  index: number
+  index: number,
+  thread: number,
+  web3Provider: string = 'http://localhost:8545'
 ) => {
   // Assume the node is accessible via localhost with senderAddress unlocked
-  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
+  const kit = newKitFromWeb3(new Web3(web3Provider))
+  const password = fetchEnv('PASSWORD')
+
+  let lastNonce: number = -1
+  let lastTx: string = ''
+  let lastGasPriceMinimum: BigNumber = new BigNumber(0)
+  let nonce: number = 0
+  let unlockNeeded: boolean = true
+  let recipientAddressFinal: string = recipientAddress
+  const useRandomRecipient = fetchEnv(envVar.LOAD_TEST_USE_RANDOM_RECIPIENT)
+
+  const sleepTime = 5000
+  while (await kit.connection.isSyncing()) {
+    console.info(
+      `LoadTestId ${index} waiting for web3Provider to be synced. Sleeping ${sleepTime}ms`
+    )
+    await sleep(sleepTime)
+  }
   kit.defaultAccount = senderAddress
+
+  // sleep a random amount of time in the range [0, txPeriodMs) before starting so
+  // that if multiple simulations are started at the same time, they don't all
+  // submit transactions at the same time
+  const randomSleep = Math.random() * txPeriodMs
+  console.info(`Sleeping for ${randomSleep} ms`)
+  await sleep(randomSleep)
 
   const baseLogMessage: any = {
     loadTestID: index,
+    threadID: thread,
     sender: senderAddress,
-    recipient: recipientAddress,
+    recipient: recipientAddressFinal,
     feeCurrency: '',
     txHash: '',
   }
 
   while (true) {
     const sendTransactionTime = Date.now()
-
+    if (unlockNeeded) {
+      await unlock(kit, kit.defaultAccount, password, 9223372036)
+      unlockNeeded = false
+    }
     // randomly choose which token to use
     const transferGold = Boolean(Math.round(Math.random()))
     const transferFn = transferGold ? transferCeloGold : transferCeloDollars
@@ -517,26 +575,66 @@ export const simulateClient = async (
     // randomly choose which gas currency to use
     const feeCurrencyGold = Boolean(Math.round(Math.random()))
 
-    let feeCurrency
-    if (!feeCurrencyGold) {
-      try {
-        feeCurrency = await kit.registry.addressFor(CeloContract.StableToken)
-      } catch (error) {
-        tracerLog({
-          tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
-          error: error.toString(),
-          ...baseLogMessage,
-        })
-      }
+    // randomly choose the recipientAddress if configured
+    if (useRandomRecipient === 'true') {
+      recipientAddressFinal = `0x${randomBytes(20).toString('hex')}`
+      baseLogMessage.recipient = recipientAddressFinal
     }
-    baseLogMessage.feeCurrency = feeCurrency || ''
+
+    let feeCurrency, txOptions
+    try {
+      feeCurrency = feeCurrencyGold ? '' : await kit.registry.addressFor(CeloContract.StableToken)
+    } catch (error: any) {
+      tracerLog({
+        tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
+        error: error.toString(),
+        ...baseLogMessage,
+      })
+    }
+
+    try {
+      baseLogMessage.feeCurrency = feeCurrency
+
+      const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
+
+      const gasPriceBase = feeCurrency
+        ? await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
+        : await gasPriceMinimum.gasPriceMinimum()
+      let gasPrice = new BigNumber(gasPriceBase).times(2).dp(0)
+
+      // Check if last tx was mined. If not, reuse the same nonce
+      if (lastTx === '' || lastNonce === -1) {
+        nonce = await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')
+      } else if ((await kit.connection.getTransactionReceipt(lastTx))?.blockNumber) {
+        nonce = await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')
+      } else {
+        nonce = (await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')) - 1
+        gasPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.15)).dp(0)
+        console.warn(
+          `TX ${lastTx} was not mined. Replacing tx reusing nonce ${nonce} and gasPrice ${gasPrice}`
+        )
+      }
+
+      lastGasPriceMinimum = gasPrice
+      txOptions = {
+        gasPrice: gasPrice.toString(),
+        feeCurrency,
+        nonce,
+      }
+    } catch (error: any) {
+      tracerLog({
+        tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
+        error: error.toString(),
+        ...baseLogMessage,
+      })
+    }
 
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result
-    transferFn(kit, senderAddress, recipientAddress, LOAD_TEST_TRANSFER_WEI, {
-      feeCurrency,
-    })
+    await transferFn(kit, senderAddress, recipientAddressFinal, LOAD_TEST_TRANSFER_WEI, txOptions)
       .then(async (txResult: TransactionResult) => {
+        lastTx = await txResult.getHash()
+        lastNonce = (await kit.web3.eth.getTransaction(lastTx)).nonce
         await onLoadTestTxResult(
           kit,
           senderAddress,
@@ -548,14 +646,24 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
-        console.error('Load test transaction failed with error:', JSON.stringify(error))
-        tracerLog({
-          tag: LOG_TAG_TRANSACTION_ERROR,
-          error: error.toString(),
-          ...baseLogMessage,
-        })
+        if (
+          typeof error === 'string' &&
+          error.includes('Error: authentication needed: password or unlock')
+        ) {
+          console.warn('Load test transaction failed with locked account:', error)
+          unlockNeeded = true
+        } else {
+          console.error('Load test transaction failed with error:', error)
+          tracerLog({
+            tag: LOG_TAG_TRANSACTION_ERROR,
+            error: error.toString(),
+            ...baseLogMessage,
+          })
+        }
       })
-    await sleep(txPeriodMs)
+    if (sendTransactionTime + txPeriodMs > Date.now()) {
+      await sleep(sendTransactionTime + txPeriodMs - Date.now())
+    }
   }
 }
 
@@ -579,7 +687,6 @@ export const onLoadTestTxResult = async (
     p_time: receiptTime - sendTransactionTime,
     ...baseLogMessage,
   })
-
   // Continuing only with receipt received
   validateTransactionAndReceipt(senderAddress, txReceipt, (isError, data) => {
     if (isError) {
@@ -610,6 +717,18 @@ export const onLoadTestTxResult = async (
       })
     }
   })
+}
+
+/**
+ * This method generates key derivation index for loadtest clients and threads
+ *
+ * @param pod the pod replica number
+ * @param thread the thread number inside the pod
+ */
+export function getIndexForLoadTestThread(pod: number, thread: number) {
+  // max number of threads to avoid overlap is [0, base)
+  const base = 10000
+  return pod * base + thread
 }
 
 /**
@@ -668,7 +787,10 @@ export const runGethNodes = async ({
   validators: Validator[]
   verbose: boolean
 }) => {
-  const gethBinaryPath = path.join(gethConfig.gethRepoPath!, '/build/bin/geth')
+  const gethBinaryPath = path.join(
+    (gethConfig.repository && gethConfig.repository.path) || '',
+    'build/bin/geth'
+  )
 
   if (!fs.existsSync(gethBinaryPath)) {
     console.error(`Geth binary at ${gethBinaryPath} not found!`)
@@ -730,29 +852,20 @@ export async function initAndStartGeth(
   instance: GethInstanceConfig,
   verbose: boolean
 ) {
-  const datadir = getDatadir(gethConfig.runPath, instance)
-
-  if (verbose) {
-    console.info(`geth:${instance.name}: init datadir ${datadir}`)
-  }
-
-  const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
-  await init(gethBinaryPath, datadir, genesisPath, verbose)
-
-  if (instance.privateKey) {
-    await importPrivateKey(gethConfig, gethBinaryPath, instance, verbose)
-  }
-
+  await initGeth(gethConfig, gethBinaryPath, instance, verbose)
   return startGeth(gethConfig, gethBinaryPath, instance, verbose)
 }
 
-export async function init(
+export async function initGeth(
+  gethConfig: GethRunConfig,
   gethBinaryPath: string,
-  datadir: string,
-  genesisPath: string,
+  instance: GethInstanceConfig,
   verbose: boolean
 ) {
+  const datadir = getDatadir(gethConfig.runPath, instance)
+  const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
   if (verbose) {
+    console.info(`geth:${instance.name}: init datadir ${datadir}`)
     console.log(`init geth with genesis at ${genesisPath}`)
   }
 
@@ -760,6 +873,9 @@ export async function init(
   await spawnCmdWithExitOnFailure(gethBinaryPath, ['--datadir', datadir, 'init', genesisPath], {
     silent: !verbose,
   })
+  if (instance.privateKey) {
+    await importPrivateKey(gethConfig, gethBinaryPath, instance, verbose)
+  }
 }
 
 export async function importPrivateKey(
@@ -889,19 +1005,17 @@ export async function startGeth(
   if (instance.validating && !minerValidator) {
     throw new Error('miner.validator address from the instance is required')
   }
-  // TODO(ponti): add flag after Donut fork
-  // const txFeeRecipient = instance.txFeeRecipient || minerValidator
   const verbosity = gethConfig.verbosity ? gethConfig.verbosity : '3'
 
-  const gethArgs = [
+  instance.args = [
     '--datadir',
     datadir,
     '--syncmode',
     syncmode,
     '--debug',
+    '--metrics',
     '--port',
     port.toString(),
-    '--rpcvhosts=*',
     '--networkid',
     gethConfig.networkId.toString(),
     `--verbosity=${verbosity}`,
@@ -914,102 +1028,108 @@ export async function startGeth(
   ]
 
   if (minerValidator) {
-    gethArgs.push(
-      '--etherbase', // TODO(ponti): change to '--miner.validator' after deprecating the 'etherbase' flag
-      minerValidator
-    )
-    // TODO(ponti): add flag after Donut fork
-    // '--tx-fee-recipient',
-    // txFeeRecipient
+    const txFeeRecipient = instance.txFeeRecipient || minerValidator
+    instance.args.push('--miner.validator', minerValidator, '--tx-fee-recipient', txFeeRecipient)
   }
 
   if (rpcport) {
-    gethArgs.push(
-      '--rpc',
-      '--rpcport',
+    instance.args.push(
+      '--http',
+      '--http.port',
       rpcport.toString(),
-      '--rpccorsdomain=*',
-      '--rpcapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
+      '--http.corsdomain=*',
+      '--http.vhosts=*',
+      '--http.api=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
   if (wsport) {
-    gethArgs.push(
-      '--wsorigins=*',
+    instance.args.push(
       '--ws',
-      '--wsport',
+      '--ws.origins=*',
+      '--ws.port',
       wsport.toString(),
-      '--wsapi=eth,net,web3,debug,admin,personal,txpool,istanbul'
+      '--ws.api=eth,net,web3,debug,admin,personal,txpool,istanbul'
     )
   }
 
   if (lightserv) {
-    gethArgs.push('--light.serve=90')
-    gethArgs.push('--light.maxpeers=10')
+    instance.args.push('--light.serve=90')
+    instance.args.push('--light.maxpeers=10')
   } else if (syncmode === 'full' || syncmode === 'fast') {
-    gethArgs.push('--light.serve=0')
+    instance.args.push('--light.serve=0')
+  }
+
+  if (instance.nodekey) {
+    instance.args.push(`--nodekeyhex=${instance.nodekey}`)
+  } else if (!validating || !replica) {
+    instance.args.push(`--nodekeyhex=${privateKey}`)
   }
 
   if (gatewayFee) {
-    gethArgs.push(`--light.gatewayfee=${gatewayFee.toString()}`)
+    instance.args.push(`--light.gatewayfee=${gatewayFee.toString()}`)
   }
 
   if (validating) {
-    gethArgs.push('--mine', '--minerthreads=10')
-    if (!replica) {
-      gethArgs.push(`--nodekeyhex=${privateKey}`)
-    }
+    instance.args.push('--mine')
 
     if (validatingGasPrice) {
-      gethArgs.push(`--miner.gasprice=${validatingGasPrice}`)
+      instance.args.push(`--miner.gasprice=${validatingGasPrice}`)
     }
 
     if (isProxied) {
-      gethArgs.push('--proxy.proxied')
+      instance.args.push('--proxy.proxied')
     }
     if (replica) {
-      gethArgs.push('--istanbul.replica')
+      instance.args.push('--istanbul.replica')
     }
   } else if (isProxy) {
-    gethArgs.push('--proxy.proxy')
+    instance.args.push('--proxy.proxy')
     if (proxyport) {
-      gethArgs.push(`--proxy.internalendpoint=:${proxyport.toString()}`)
+      instance.args.push(`--proxy.internalendpoint=:${proxyport.toString()}`)
     }
-    gethArgs.push(`--proxy.proxiedvalidatoraddress=${instance.proxiedValidatorAddress}`)
-    gethArgs.push(`--nodekeyhex=${privateKey}`)
+    instance.args.push(`--proxy.proxiedvalidatoraddress=${instance.proxiedValidatorAddress}`)
   }
 
   if (bootnodeEnode) {
-    gethArgs.push(`--bootnodes=${bootnodeEnode}`)
+    instance.args.push(`--bootnodes=${bootnodeEnode}`)
   } else {
-    gethArgs.push('--nodiscover')
+    instance.args.push('--nodiscover')
   }
 
   if (isProxied && instance.proxies) {
     if (proxyAllowPrivateIp) {
-      gethArgs.push('--proxy.allowprivateip=true')
+      instance.args.push('--proxy.allowprivateip=true')
     }
-    gethArgs.push(`--proxy.proxyenodeurlpairs=${instance.proxies[0]!};${instance.proxies[1]!}`)
+    instance.args.push(`--proxy.proxyenodeurlpairs=${instance.proxies[0]!};${instance.proxies[1]!}`)
   }
 
   if (privateKey || ethstats) {
-    gethArgs.push('--password=/dev/null', `--unlock=0`)
+    instance.args.push('--password=/dev/null', `--unlock=0`)
   }
 
   if (ethstats) {
-    gethArgs.push(`--ethstats=${instance.name}@${ethstats}`, '--etherbase=0')
+    instance.args.push(`--ethstats=${instance.name}@${ethstats}`, '--etherbase=0')
   }
 
-  const gethProcess = spawnWithLog(gethBinaryPath, gethArgs, `${datadir}/logs.txt`, verbose)
+  const gethProcess = spawnWithLog(gethBinaryPath, instance.args, `${datadir}/logs.txt`, verbose)
   instance.pid = gethProcess.pid
 
-  gethProcess.on('error', (err) => {
-    throw new Error(`Geth crashed! Error: ${err}`)
+  gethProcess.on('error', (err: Error) => {
+    throw new Error(`geth:${instance.name} failed to start! ${err}`)
   })
 
-  const secondsToWait = 30
+  gethProcess.on('exit', (code: number) => {
+    if (code === 0) {
+      console.info(`geth:${instance.name} exited`)
+    } else {
+      console.error(`geth:${instance.name} exited with code ${code}`)
+    }
+    instance.pid = undefined
+  })
 
   // Give some time for geth to come up
+  const secondsToWait = 30
   if (rpcport) {
     const isOpen = await waitForPortOpen('localhost', rpcport, secondsToWait)
     if (!isOpen) {
@@ -1033,6 +1153,9 @@ export async function startGeth(
       console.info(`geth:${instance.name}: ws port open ${wsport}`)
     }
   }
+
+  // Geth startup isn't fully done even when the port is open, so give it another second
+  await sleep(1000)
 
   console.log(
     `${instance.name}: running.`,
@@ -1064,7 +1187,42 @@ export function writeGenesis(gethConfig: GethRunConfig, validators: Validator[],
   fs.writeFileSync(genesisPath, genesis)
 
   if (verbose) {
-    console.log(`wrote   genesis to ${genesisPath}`)
+    console.log(`wrote genesis to ${genesisPath}`)
+  }
+}
+
+export async function writeGenesisWithMigrations(
+  gethConfig: GethRunConfig,
+  gethRepoPath: string,
+  mnemonic: string,
+  numValidators: number,
+  verbose: boolean = false
+) {
+  const genesis: string = await generateGenesisWithMigrations({
+    gethRepoPath,
+    mnemonic,
+    numValidators,
+    verbose,
+    genesisConfig: {
+      blockTime: 1,
+      epoch: 10,
+      lookbackwindow: 3,
+      requestTimeout: 3000,
+      chainId: gethConfig.networkId,
+      ...gethConfig.genesisConfig,
+    },
+  })
+
+  const genesisPath = path.join(gethConfig.runPath, 'genesis.json')
+
+  if (verbose) {
+    console.log('writing genesis')
+  }
+
+  fs.writeFileSync(genesisPath, genesis)
+
+  if (verbose) {
+    console.log(`wrote genesis to ${genesisPath}`)
   }
 }
 
@@ -1098,6 +1256,10 @@ export async function restoreDatadir(runPath: string, instance: GethInstanceConf
 
 export async function buildGeth(gethPath: string) {
   await spawnCmdWithExitOnFailure('make', ['geth'], { cwd: gethPath })
+}
+
+export async function buildGethAll(gethPath: string) {
+  await spawnCmdWithExitOnFailure('make', ['all'], { cwd: gethPath })
 }
 
 export async function resetDataDir(dataDir: string, verbose: boolean) {
@@ -1145,39 +1307,67 @@ export function spawnWithLog(cmd: string, args: string[], logsFilepath: string, 
   return p
 }
 
+// Create a fully connected clique of peer connections with the given instances.
 export async function connectPeers(instances: GethInstanceConfig[], verbose: boolean = false) {
-  const admins = instances.map(({ wsport, rpcport }) => {
-    return new Admin(`${rpcport ? 'http' : 'ws'}://localhost:${rpcport || wsport}`)
-  })
+  await connectBipartiteClique(instances, instances, verbose)
+}
 
-  await Promise.all(
-    admins.map(async (admin, i) => {
-      const enodes = await Promise.all(admins.map(async (a) => (await a.getNodeInfo()).enode))
-      await Promise.all(
-        enodes.map(async (enode, j) => {
-          if (i === j) {
-            return
-          }
-          if (verbose) {
-            console.log(
-              `connecting ${instances[i].name} with ${instances[j].name} using enode ${enode}`
-            )
-          }
-          const success = await admin.addPeer(enode)
-          if (!success) {
-            throw new Error('Connecting validators failed!')
-          }
-        })
-      )
-    })
-  )
+// Fully connect all peers in the "left" set to all peers in the "right" set, forming a bipartite clique.
+export async function connectBipartiteClique(
+  left: GethInstanceConfig[],
+  right: GethInstanceConfig[],
+  verbose: boolean = false
+) {
+  const admins = (instances: GethInstanceConfig[]) =>
+    instances.map(
+      ({ wsport, rpcport }) =>
+        new Admin(`${rpcport ? 'http' : 'ws'}://localhost:${rpcport || wsport}`)
+    )
+
+  const connect = async (sources: GethInstanceConfig[], targets: GethInstanceConfig[]) => {
+    const targetEnodes = await Promise.all(
+      admins(targets).map(async (a) => (await a.getNodeInfo()).enode)
+    )
+
+    await Promise.all(
+      admins(sources).map(async (admin) => {
+        const sourceEnode = (await admin.getNodeInfo()).enode
+        await Promise.all(
+          targetEnodes.map(async (enode) => {
+            if (sourceEnode === enode) {
+              return
+            }
+            if (verbose) {
+              console.log(`connecting ${sourceEnode} with ${enode}`)
+            }
+            const success = await admin.addPeer(enode)
+            if (!success) {
+              throw new Error('Connecting geth peers failed!')
+            }
+          })
+        )
+      })
+    )
+  }
+
+  await connect(left, right)
+  await connect(right, left)
 }
 
 // Add validator 0 as a peer of each other validator.
 export async function connectValidatorPeers(instances: GethInstanceConfig[]) {
-  await connectPeers(
-    instances.filter(({ wsport, rpcport, validating, isProxy, isProxied }) => ((validating && !isProxied) || isProxy)  && (wsport || rpcport))
+  const validators = instances.filter(
+    (node) => (node.validating && !node.isProxied) || node.isProxy
   )
+  // Determine which validators are isolated (i.e. currently just that they are not using a bootnode)
+  const isolated = validators.filter((node) => !node.bootnodeEnode)
+  if (isolated.length <= 0) {
+    return
+  }
+
+  // Determine the root node to connect other validators to. It should be able to join the whole network of validators.
+  const root = validators.find((node) => node.bootnodeEnode) ?? validators[0]
+  await connectBipartiteClique([root], isolated)
 }
 
 export async function migrateContracts(
@@ -1204,7 +1394,7 @@ export async function migrateContracts(
       },
       blockchainParameters: {
         uptimeLookbackWindow: 3, // same as our default in `writeGenesis()`
-      },      
+      },
     },
     overrides
   )

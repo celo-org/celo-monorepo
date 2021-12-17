@@ -6,7 +6,9 @@ import { newKitFromWeb3 } from './kit'
 const TestedWrappers: ValidWrappers[] = [
   CeloContract.GoldToken,
   CeloContract.StableToken,
+  CeloContract.StableTokenEUR,
   CeloContract.Exchange,
+  CeloContract.ExchangeEUR,
   CeloContract.Validators,
   CeloContract.LockedGold,
 ]

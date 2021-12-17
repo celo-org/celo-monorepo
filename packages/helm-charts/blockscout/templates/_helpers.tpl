@@ -12,7 +12,7 @@ heritage: {{ .Release.Service }}
 Defines common annotations across all blockscout components.
 */ -}}
 {{- define "celo.blockscout.annotations" -}}
-kubernetes.io/change-cause: Deployed {{ .Values.blockscout.image.tag }} by {{ .Values.blockscout.deployment.account }}
+kubernetes.io/change-cause: Deployed {{ .Values.blockscout.image.tag }} by {{ .Values.blockscout.deployment.account }} on {{ .Values.blockscout.deployment.timestamp }}
 {{- end -}}
 
 {{- /*
@@ -63,15 +63,35 @@ the `volumes` section.
 */ -}}
 {{- define "celo.blockscout-db-sidecar" -}}
 - name: cloudsql-proxy
-  image: gcr.io/cloudsql-docker/gce-proxy:1.16
+  image: gcr.io/cloudsql-docker/gce-proxy:1.19.1
   command: ["/cloud_sql_proxy",
             "-instances={{ .Values.blockscout.db.connection_name }}{{ .DbSuffix | default "" }}=tcp:5432",
             "-credential_file=/secrets/cloudsql/credentials.json",
             "-term_timeout=30s"]
+  {{- if .Database.proxy.livenessProbe.enabled }}
+  livenessProbe:
+    tcpSocket:
+      port: {{ .Database.proxy.port }}
+    initialDelaySeconds: {{ .Database.proxy.livenessProbe.initialDelaySeconds }}
+    periodSeconds: {{ .Database.proxy.livenessProbe.periodSeconds }}
+    timeoutSeconds: {{ .Database.proxy.livenessProbe.timeoutSeconds }}
+    successThreshold: {{ .Database.proxy.livenessProbe.successThreshold }}
+    failureThreshold: {{ .Database.proxy.livenessProbe.failureThreshold }}
+  {{- end }}
+  {{- if .Database.proxy.readinessProbe.enabled }}
+  readinessProbe:
+    tcpSocket:
+      port: {{ .Database.proxy.port }}
+    initialDelaySeconds: {{ .Database.proxy.readinessProbe.initialDelaySeconds }}
+    periodSeconds: {{ .Database.proxy.readinessProbe.periodSeconds }}
+    timeoutSeconds: {{ .Database.proxy.readinessProbe.timeoutSeconds }}
+    successThreshold: {{ .Database.proxy.readinessProbe.successThreshold }}
+    failureThreshold: {{ .Database.proxy.readinessProbe.failureThreshold }}
+  {{- end }}
   resources:
     requests:
-      memory: 500Mi
-      cpu: 200m
+      memory: {{ .Database.proxy.resources.requests.memory }}
+      cpu: {{ .Database.proxy.resources.requests.cpu }}
   securityContext:
     runAsUser: 2  # non-root user
     allowPrivilegeEscalation: false
@@ -105,7 +125,9 @@ blockscout components.
 - name: SUBNETWORK
   value: {{ .Values.blockscout.subnetwork }}
 - name: COIN
-  value: cGLD
+  value: CELO
+- name: SEGMENT_KEY
+  value: {{ .Values.blockscout.segment_key }}
 - name: ECTO_USE_SSL
   value: "false"
 - name: ETHEREUM_JSONRPC_VARIANT
@@ -114,6 +136,8 @@ blockscout components.
   value: {{ .Values.blockscout.jsonrpc_http_url }}
 - name: ETHEREUM_JSONRPC_WS_URL
   value: {{ .Values.blockscout.jsonrpc_ws_url }}
+- name: PGUSER
+  value: $(DATABASE_USER)
 - name: DATABASE_URL
   value: postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@127.0.0.1:5432/{{ .Values.blockscout.db.name }}
 - name: DATABASE_DB

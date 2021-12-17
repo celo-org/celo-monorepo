@@ -32,7 +32,7 @@ contract Election is
 
   // 1e20 ensures that units can be represented as precisely as possible to avoid rounding errors
   // when translating to votes, without risking integer overflow.
-  // A maximum of 1,000,000,000 cGLD (1e27) yields a maximum of 1e47 units, whose product is at
+  // A maximum of 1,000,000,000 CELO (1e27) yields a maximum of 1e47 units, whose product is at
   // most 1e74, which is less than 2^256.
   uint256 private constant UNIT_PRECISION_FACTOR = 100000000000000000000;
 
@@ -136,7 +136,7 @@ contract Election is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 2, 1);
   }
 
   /**
@@ -161,6 +161,12 @@ contract Election is
     setMaxNumGroupsVotedFor(_maxNumGroupsVotedFor);
     setElectabilityThreshold(_electabilityThreshold);
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Updates the minimum and maximum number of validators that can be elected.
@@ -270,6 +276,21 @@ contract Election is
    */
   function activate(address group) external nonReentrant returns (bool) {
     address account = getAccounts().voteSignerToAccount(msg.sender);
+    return _activate(group, account);
+  }
+
+  /**
+   * @notice Converts `account`'s pending votes for `group` to active votes.
+   * @param group The validator group to vote for.
+   * @param account The validateor group account's pending votes to active votes
+   * @return True upon success.
+   * @dev Pending votes cannot be activated until an election has been held.
+   */
+  function activateForAccount(address group, address account) external nonReentrant returns (bool) {
+    return _activate(group, account);
+  }
+
+  function _activate(address group, address account) internal returns (bool) {
     PendingVote storage pendingVote = votes.pending.forGroup[group].byAccount[account];
     require(pendingVote.epoch < getEpochNumber(), "Pending vote epoch not passed");
     uint256 value = pendingVote.value;

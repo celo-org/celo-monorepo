@@ -1,20 +1,22 @@
-import { isVerified, rootLogger } from '@celo/phone-number-privacy-common'
+import { StableToken } from '@celo/contractkit'
+import { isVerified, rootLogger, TestUtils } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
-import {
+import allSettled from 'promise.allsettled'
+import { getPerformedQueryCount } from '../../src/database/wrappers/account'
+import { getRemainingQueryCount } from '../../src/signing/query-quota'
+import { getContractKit } from '../../src/web3/contracts'
+
+allSettled.shim()
+
+const {
   ContractRetrieval,
   createMockAccounts,
   createMockAttestation,
   createMockContractKit,
   createMockToken,
   createMockWeb3,
-} from '../../../common/src/test/utils'
-import { mockAccount, mockPhoneNumber } from '../../../common/src/test/values'
-import { getPerformedQueryCount } from '../../src/database/wrappers/account'
-import { getRemainingQueryCount } from '../../src/signing/query-quota'
-import { getContractKit } from '../../src/web3/contracts'
-import allSettled from 'promise.allsettled'
-
-allSettled.shim()
+} = TestUtils.Utils
+const { mockAccount, mockPhoneNumber } = TestUtils.Values
 
 jest.mock('../../src/web3/contracts')
 const mockGetContractKit = getContractKit as jest.Mock
@@ -43,7 +45,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 2,
-      totalQuota: 52,
+      totalQuota: 60,
     })
   })
   it('Calculates remaining query count for unverified account', async () => {
@@ -61,7 +63,7 @@ describe(getRemainingQueryCount, () => {
     mockIsVerified.mockReturnValue(false)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 1,
-      totalQuota: 2,
+      totalQuota: 10,
     })
   })
   it('Calculates remaining query count for verified account with many txs', async () => {
@@ -79,7 +81,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 10,
-      totalQuota: 432,
+      totalQuota: 440,
     })
   })
   it('Calculates remaining query count for unverified account with many txs', async () => {
@@ -97,7 +99,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 0,
-      totalQuota: 402,
+      totalQuota: 410,
     })
   })
   it('Calculates remaining query count for unverified account without any balance', async () => {
@@ -118,22 +120,54 @@ describe(getRemainingQueryCount, () => {
       totalQuota: 0,
     })
   })
-  it('Calculates remaining query count for unverified account with only cUSD balance', async () => {
+  it('Calculates remaining query count for unverified account with cUSD balance', async () => {
     const contractKitVerifiedNoTx = createMockContractKit(
       {
         [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
-        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(200000000000000000)),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(0)),
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(0)),
         [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
       createMockWeb3(0)
+    )
+    contractKitVerifiedNoTx.contracts[ContractRetrieval.getStableToken] = jest.fn(
+      (stableToken: StableToken) => {
+        return stableToken === StableToken.cUSD
+          ? createMockToken(new BigNumber(200000000000000000))
+          : createMockToken(new BigNumber(0))
+      }
     )
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
     mockIsVerified.mockReturnValue(false)
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 1,
-      totalQuota: 2,
+      totalQuota: 10,
+    })
+  })
+  it('Calculates remaining query count for unverified account with cEUR balance', async () => {
+    const contractKitVerifiedNoTx = createMockContractKit(
+      {
+        [ContractRetrieval.getAttestations]: createMockAttestation(0, 0),
+        [ContractRetrieval.getStableToken]: createMockToken(new BigNumber(0)),
+        [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(0)),
+        [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
+      },
+      createMockWeb3(0)
+    )
+    contractKitVerifiedNoTx.contracts[ContractRetrieval.getStableToken] = jest.fn(
+      (stableToken: StableToken) => {
+        return stableToken === StableToken.cEUR
+          ? createMockToken(new BigNumber(200000000000000000))
+          : createMockToken(new BigNumber(0))
+      }
+    )
+    mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
+    mockIsVerified.mockReturnValue(false)
+    mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
+    expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
+      performedQueryCount: 1,
+      totalQuota: 10,
     })
   })
   it('Calculates remaining query count for unverified account with only CELO balance', async () => {
@@ -151,7 +185,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, mockPhoneNumber)).toEqual({
       performedQueryCount: 1,
-      totalQuota: 2,
+      totalQuota: 10,
     })
   })
   it('No phone number hash when request own phone number', async () => {
@@ -168,7 +202,7 @@ describe(getRemainingQueryCount, () => {
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     expect(await getRemainingQueryCount(rootLogger, mockAccount, undefined)).toEqual({
       performedQueryCount: 0,
-      totalQuota: 2,
+      totalQuota: 10,
     })
   })
 })

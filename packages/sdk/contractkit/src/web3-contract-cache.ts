@@ -1,5 +1,6 @@
 import debugFactory from 'debug'
 import { CeloContract, ProxyContracts } from './base'
+import { StableToken } from './celo-tokens'
 import { newAccounts } from './generated/Accounts'
 import { newAttestations } from './generated/Attestations'
 import { newBlockchainParameters } from './generated/BlockchainParameters'
@@ -9,11 +10,15 @@ import { newElection } from './generated/Election'
 import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
+import { newExchangeBrl } from './generated/ExchangeBRL'
+import { newExchangeEur } from './generated/ExchangeEUR'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
+import { newGrandaMento } from './generated/GrandaMento'
+import { newIerc20 } from './generated/IERC20'
 import { newLockedGold } from './generated/LockedGold'
 import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
 import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
@@ -38,13 +43,17 @@ export const ContractFactories = {
   [CeloContract.DowntimeSlasher]: newDowntimeSlasher,
   [CeloContract.Election]: newElection,
   [CeloContract.EpochRewards]: newEpochRewards,
+  [CeloContract.ERC20]: newIerc20,
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
+  [CeloContract.ExchangeEUR]: newExchangeEur,
+  [CeloContract.ExchangeBRL]: newExchangeBrl,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
+  [CeloContract.GrandaMento]: newGrandaMento,
   [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
   [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
@@ -54,6 +63,8 @@ export const ContractFactories = {
   [CeloContract.Reserve]: newReserve,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
+  [CeloContract.StableTokenEUR]: newStableToken,
+  [CeloContract.StableTokenBRL]: newStableToken,
   [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
 }
@@ -94,11 +105,14 @@ export class Web3ContractCache {
   getEpochRewards() {
     return this.getContract(CeloContract.EpochRewards)
   }
+  getErc20(address: string) {
+    return this.getContract(CeloContract.ERC20, address)
+  }
   getEscrow() {
     return this.getContract(CeloContract.Escrow)
   }
-  getExchange() {
-    return this.getContract(CeloContract.Exchange)
+  getExchange(stableToken: StableToken = StableToken.cUSD) {
+    return this.getContract(this.kit.celoTokens.getExchangeContract(stableToken))
   }
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)
@@ -114,6 +128,9 @@ export class Web3ContractCache {
   }
   getGovernance() {
     return this.getContract(CeloContract.Governance)
+  }
+  getGrandaMento() {
+    return this.getContract(CeloContract.GrandaMento)
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
@@ -139,8 +156,8 @@ export class Web3ContractCache {
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)
   }
-  getStableToken() {
-    return this.getContract(CeloContract.StableToken)
+  getStableToken(stableToken: StableToken = StableToken.cUSD) {
+    return this.getContract(this.kit.celoTokens.getContract(stableToken))
   }
   getTransferWhitelist() {
     return this.getContract(CeloContract.TransferWhitelist)
@@ -154,19 +171,19 @@ export class Web3ContractCache {
    */
   async getContract<C extends keyof typeof ContractFactories>(contract: C, address?: string) {
     if (this.cacheMap[contract] == null || address !== undefined) {
+      // core contract in the registry
+      if (!address) {
+        address = await this.kit.registry.addressFor(contract)
+      }
       debug('Initiating contract %s', contract)
-      const createFn = ProxyContracts.includes(contract)
-        ? newProxy
-        : ContractFactories[contract]
-        ? (ContractFactories[contract] as CFType[C])
-        : newProxy
-      // @ts-ignore: Too complex union type
-      this.cacheMap[contract] = createFn(
-        this.kit.connection.web3,
-        address ?? (await this.kit.registry.addressFor(contract))
-      ) as NonNullable<ContractCacheMap[C]>
+      const createFn = ProxyContracts.includes(contract) ? newProxy : ContractFactories[contract]
+      this.cacheMap[contract] = createFn(this.kit.connection.web3, address) as ContractCacheMap[C]
     }
     // we know it's defined (thus the !)
     return this.cacheMap[contract]!
+  }
+
+  public invalidateContract<C extends keyof typeof ContractFactories>(contract: C) {
+    this.cacheMap[contract] = undefined
   }
 }

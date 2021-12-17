@@ -14,12 +14,14 @@ NETWORK=""
 FORNO=""
 BUILD_DIR=""
 LOG_FILE="/dev/null"
+GRANTS_FILE=""
 
-while getopts ':b:rl:d:' flag; do
+while getopts ':b:rl:d:g:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     l) LOG_FILE="${OPTARG}" ;;
     d) BUILD_DIR="${OPTARG}" ;;
+    g) GRANTS_FILE="${OPTARG}";;
     *) error "Unexpected option ${flag}" ;;
   esac
 done
@@ -28,7 +30,7 @@ done
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
 echo "- Checkout source code at $BRANCH"
-git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*' 2>>$LOG_FILE >> $LOG_FILE
+git fetch origin +'refs/tags/core-contracts.*:refs/tags/core-contracts.*' 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build contract artifacts"
@@ -38,7 +40,13 @@ yarn build >> $LOG_FILE
 
 # TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"
-yarn devchain generate-tar "$PWD/devchain.tar.gz" >> $LOG_FILE
+if [ -z "$GRANTS_FILE" ]; then
+  yarn devchain generate-tar "$PWD/devchain.tar.gz" >> $LOG_FILE
+else
+  yarn devchain generate-tar "$PWD/devchain.tar.gz" --release_gold_contracts $GRANTS_FILE >> $LOG_FILE
+fi
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR
 mv build/contracts $BUILD_DIR
 mv "$PWD/devchain.tar.gz" $BUILD_DIR/.
+
+git checkout -

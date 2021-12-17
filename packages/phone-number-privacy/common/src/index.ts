@@ -1,9 +1,11 @@
+export * from './domains/sequential-delay'
+export * from './interfaces'
 export { ErrorMessage, WarningMessage } from './interfaces/error-utils'
 export {
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
-} from './interfaces/sign-message-response'
+} from './interfaces/responses'
 export { TestUtils } from './test/index'
 export * from './utils/authentication'
 export { fetchEnv, fetchEnvOrDefault, toBool, toNum } from './utils/config-utils'

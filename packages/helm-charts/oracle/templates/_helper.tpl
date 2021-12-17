@@ -2,7 +2,7 @@
 The name of the deployment
 */}}
 {{- define "name" -}}
-{{- .Values.environment.name -}}-oracle
+{{- .Values.environment.name -}}-{{- .Values.oracle.currencyPair | lower -}}-oracle
 {{- end -}}
 
 {{/*
@@ -42,4 +42,11 @@ The name of the azure identity for all oracles
 */}}
 {{- define "azure-identity-name" -}}
 {{- with .dot -}}{{ template "name" . }}{{- end -}}-{{ .index }}-identity
+{{- end -}}
+
+{{/*
+The name of the pkey secret
+*/}}
+{{- define "pkey-secret-name" -}}
+pkey-secret-{{- .Values.oracle.currencyPair | lower -}}
 {{- end -}}

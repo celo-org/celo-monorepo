@@ -98,12 +98,7 @@ const mkTmpDir = (name) => {
 
 const readFileInFlakeDir = (file) => {
   const path = join(tmpdir(), flakeDir, file)
-  return fs.existsSync(path)
-    ? fs
-        .readFileSync(path)
-        .toString()
-        .split(delim)
-    : []
+  return fs.existsSync(path) ? fs.readFileSync(path).toString().split(delim) : []
 }
 
 const fmtTestKey = (testID) => {
@@ -111,10 +106,7 @@ const fmtTestKey = (testID) => {
   // Hashing is necessary because the full test path is too long.
   const titlePath = testID.split(' -> ')
   const testTitle = titlePath[titlePath.length - 1]
-  const testKey = hashCode(testID)
-    .concat('_', testTitle)
-    .trim()
-    .replace(/(\W)/g, '_')
+  const testKey = hashCode(testID).concat('_', testTitle).trim().replace(/(\W)/g, '_')
   return testKey
 }
 

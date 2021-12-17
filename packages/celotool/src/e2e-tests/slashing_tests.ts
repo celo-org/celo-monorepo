@@ -4,6 +4,7 @@ import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { ensureLeading0x } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
+import * as _ from 'lodash'
 import * as rlp from 'rlp'
 import Web3 from 'web3'
 import { GethRunConfig } from '../lib/interfaces/geth-run-config'
@@ -91,8 +92,8 @@ async function generateValidIntervalArrays(
   return { startBlocks, endBlocks }
 }
 
-describe('slashing tests', function(this: any) {
-  const gethConfigDown: GethRunConfig = {
+describe('slashing tests', function (this: any) {
+  const gethConfig: GethRunConfig = {
     network: 'local',
     networkId: 1101,
     runPath: TMP_PATH,
@@ -130,16 +131,6 @@ describe('slashing tests', function(this: any) {
         port: 30309,
         rpcport: 8551,
       },
-    ],
-  }
-
-  const gethConfig: GethRunConfig = {
-    network: 'local',
-    networkId: 1101,
-    runPath: TMP_PATH,
-    migrate: true,
-    instances: gethConfigDown.instances.concat([
-      // Validator 4 will be down in the downtime test
       {
         name: 'validator4',
         validating: true,
@@ -147,21 +138,25 @@ describe('slashing tests', function(this: any) {
         port: 30311,
         rpcport: 8553,
       },
-    ]),
+    ],
   }
+
+  // Do a shallow copy so that the instance objects are the the same (even after the init step fills private keys, etc.)
+  const gethConfigDown = _.clone(gethConfig)
+  // Exclude the last validator to simulate it being down
+  gethConfigDown.instances = gethConfig.instances.slice(0, gethConfig.instances.length - 1)
 
   const hooks: any = getHooks(gethConfig)
   const hooksDown: any = getHooks(gethConfigDown)
   let web3: Web3
   let kit: ContractKit
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
-    // Comment out the following line after a test run for a quick rerun.
     await hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await hooks.after()
   })
@@ -181,7 +176,7 @@ describe('slashing tests', function(this: any) {
   }
 
   describe('when running a network', () => {
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restartWithDowntime()
     })
@@ -221,15 +216,16 @@ describe('slashing tests', function(this: any) {
   let doubleSigningBlock: any
 
   describe('test slashing for downtime', () => {
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restartWithDowntime()
     })
 
-    it('slash for downtime', async function(this: any) {
+    it('slash for downtime', async function (this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit._web3Contracts.getDowntimeSlasher()
       const slashableDowntime = new BigNumber(await slasher.methods.slashableDowntime().call())
+      await waitForBlock(web3, 1)
       const blockNumber = await kit.connection.getBlockNumber()
       await waitForBlock(web3, blockNumber + slashableDowntime.toNumber() + 2 * safeMarginBlocks)
 
@@ -237,7 +233,6 @@ describe('slashing tests', function(this: any) {
       doubleSigningBlock = await kit.connection.getBlock(blockNumber + 2 * safeMarginBlocks)
 
       const signer = await slasher.methods.validatorSignerAddressFromSet(4, blockNumber).call()
-
       const validator = (await kit.connection.getAccounts())[0]
       await kit.connection.web3.eth.personal.unlockAccount(validator, '', 1000000)
       const lockedGold = await kit.contracts.getLockedGold()
@@ -288,12 +283,12 @@ describe('slashing tests', function(this: any) {
   })
 
   describe('test slashing for downtime with contractkit', () => {
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restartWithDowntime()
     })
 
-    it('slash for downtime with contractkit', async function(this: any) {
+    it('slash for downtime with contractkit', async function (this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit.contracts.getDowntimeSlasher()
       const blockNumber = await kit.connection.getBlockNumber()
@@ -327,12 +322,12 @@ describe('slashing tests', function(this: any) {
   })
 
   describe('test slashing for double signing', () => {
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
     })
 
-    it('slash for double signing', async function(this: any) {
+    it('slash for double signing', async function (this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit._web3Contracts.getDoubleSigningSlasher()
 
@@ -377,12 +372,12 @@ describe('slashing tests', function(this: any) {
   })
 
   describe('test slashing for double signing with contractkit', () => {
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
       await restart()
     })
 
-    it('slash for double signing with contractkit', async function(this: any) {
+    it('slash for double signing with contractkit', async function (this: any) {
       this.timeout(0) // Disable test timeout
       const slasher = await kit.contracts.getDoubleSigningSlasher()
       const election = await kit.contracts.getElection()

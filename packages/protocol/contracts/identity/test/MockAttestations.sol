@@ -14,7 +14,8 @@ contract MockAttestations {
   }
 
   struct Attestations {
-    uint64 completed;
+    uint32 completed;
+    uint32 requested;
     address[] issuers;
     mapping(address => Attestation) issuedAttestations;
   }
@@ -28,6 +29,14 @@ contract MockAttestations {
 
   function complete(bytes32 identifier, uint8, bytes32, bytes32) external {
     identifiers[identifier].attestations[msg.sender].completed++;
+
+    if (identifiers[identifier].attestations[msg.sender].completed == 1) {
+      identifiers[identifier].accounts.push(msg.sender);
+    }
+  }
+
+  function request(bytes32 identifier, uint8, bytes32, bytes32) external {
+    identifiers[identifier].attestations[msg.sender].requested++;
   }
 
   function getMaxAttestations() external pure returns (uint256) {
@@ -41,7 +50,15 @@ contract MockAttestations {
   {
     return (
       identifiers[identifier].attestations[account].completed,
-      uint64(identifiers[identifier].attestations[account].issuers.length)
+      identifiers[identifier].attestations[account].requested
     );
+  }
+
+  function lookupAccountsForIdentifier(bytes32 identifier)
+    external
+    view
+    returns (address[] memory)
+  {
+    return identifiers[identifier].accounts;
   }
 }

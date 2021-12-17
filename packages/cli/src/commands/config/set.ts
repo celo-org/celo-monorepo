@@ -1,4 +1,4 @@
-import { BaseCommand, GasOptions } from '../../base'
+import { BaseCommand, gasOptions } from '../../base'
 import { readConfig, writeConfig } from '../../utils/config'
 
 export default class Set extends BaseCommand {
@@ -30,7 +30,7 @@ export default class Set extends BaseCommand {
     const curr = readConfig(this.config.configDir)
     const node = res.flags.node ?? curr.node
     const gasCurrency = res.flags.gasCurrency
-      ? GasOptions[res.flags.gasCurrency as keyof typeof GasOptions]
+      ? (gasOptions as any)[res.flags.gasCurrency]
       : curr.gasCurrency
     writeConfig(this.config.configDir, {
       node,

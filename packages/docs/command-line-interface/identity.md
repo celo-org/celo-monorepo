@@ -18,6 +18,7 @@ OPTIONS
   --columns=columns       only show provided columns (comma-separated)
   --csv                   output is csv format [alias: --output=csv]
   --filter=filter         filter property by partial string matching, ex: name=foo
+  --globalHelp            View all available global flags
   --no-header             hide table header from output
   --no-truncate           do not truncate output to fit screen
   --output=csv|json|yaml  output in a more machine friendly format
@@ -25,6 +26,43 @@ OPTIONS
 ```
 
 _See code: [src/commands/identity/current-attestation-services.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/current-attestation-services.ts)_
+
+## `celocli identity:get-attestations`
+
+Looks up attestations associated with the provided phone number. If a pepper is not provided, it uses the --from account's balance to query the pepper.
+
+```
+Looks up attestations associated with the provided phone number. If a pepper is not provided, it uses the --from account's balance to query the pepper.
+
+USAGE
+  $ celocli identity:get-attestations
+
+OPTIONS
+  --from=from                Account whose balance to use for querying ODIS for the
+                             pepper lookup
+
+  --globalHelp               View all available global flags
+
+  --identifier=identifier    On-chain identifier
+
+  --network=network          The ODIS service to hit: mainnet, alfajores,
+                             alfajoresstaging
+
+  --pepper=pepper            ODIS phone number pepper
+
+  --phoneNumber=phoneNumber  Phone number to check attestations for
+
+EXAMPLES
+  get-attestations --phoneNumber +15555555555 --from
+  0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
+
+  get-attestations --phoneNumber +15555555555 --pepper XgnKVpplZc0p1
+
+  get-attestations --identifier
+  0x4952c9db9c283a62721b13f56c4b5e84a438e2569af3de21cb3440efa8840872
+```
+
+_See code: [src/commands/identity/get-attestations.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/identity/get-attestations.ts)_
 
 ## `celocli identity:identifier`
 
@@ -42,6 +80,8 @@ OPTIONS
 
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address from which
                                                      to perform the query
+
+  --globalHelp                                       View all available global flags
 
   --phoneNumber=+14152223333                         (required) The phone number for
                                                      which to query the identifier.
@@ -68,6 +108,8 @@ USAGE
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Your validator's signer
                                                      or account address
+
+  --globalHelp                                       View all available global flags
 
   --message=message                                  (required) The message of the SMS
 
@@ -99,6 +141,9 @@ OPTIONS
                                                              attestation signer address
                                                              or the underlying account
                                                              address
+
+  --globalHelp                                               View all available global
+                                                             flags
 
   --tokenAddress=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  The address of the token
                                                              that will be withdrawn.

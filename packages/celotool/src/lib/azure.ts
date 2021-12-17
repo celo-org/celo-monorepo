@@ -1,16 +1,14 @@
 import sleep from 'sleep-promise'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { retryCmd } from 'src/lib/utils'
+import { getAksClusterConfig } from './context-utils'
 import { AksClusterConfig } from './k8s-cluster/aks'
 
 /**
  * getIdentity gets basic info on an existing identity. If the identity doesn't
  * exist, undefined is returned
  */
-export async function getIdentity(
-  clusterConfig: AksClusterConfig,
-  identityName: string
-) {
+export async function getIdentity(clusterConfig: AksClusterConfig, identityName: string) {
   const [matchingIdentitiesStr] = await execCmdWithExitOnFailure(
     `az identity list -g ${clusterConfig.resourceGroup} --query "[?name == '${identityName}']" -o json`
   )
@@ -30,7 +28,9 @@ export async function createIdentityIdempotent(
 ) {
   const identity = await getIdentity(clusterConfig, identityName)
   if (identity) {
-    console.info(`Skipping identity creation, ${identityName} in resource group ${clusterConfig.resourceGroup} already exists`)
+    console.info(
+      `Skipping identity creation, ${identityName} in resource group ${clusterConfig.resourceGroup} already exists`
+    )
     return identity
   }
   console.info(`Creating identity ${identityName} in resource group ${clusterConfig.resourceGroup}`)
@@ -61,12 +61,21 @@ async function roleIsAssigned(assignee: string, scope: string, role: string) {
   return parseInt(matchingAssignedRoles.trim(), 10) > 0
 }
 
-export async function assignRoleIdempotent(assigneeObjectId: string, assigneePrincipalType: string, scope: string, role: string) {
+export async function assignRoleIdempotent(
+  assigneeObjectId: string,
+  assigneePrincipalType: string,
+  scope: string,
+  role: string
+) {
   if (await roleIsAssigned(assigneeObjectId, scope, role)) {
-    console.info(`Skipping role assignment, role ${role} already assigned to ${assigneeObjectId} for scope ${scope}`)
+    console.info(
+      `Skipping role assignment, role ${role} already assigned to ${assigneeObjectId} for scope ${scope}`
+    )
     return
   }
-  console.info(`Assigning role ${role} to ${assigneeObjectId} type ${assigneePrincipalType} for scope ${scope}`)
+  console.info(
+    `Assigning role ${role} to ${assigneeObjectId} type ${assigneePrincipalType} for scope ${scope}`
+  )
   await retryCmd(
     () =>
       execCmdWithExitOnFailure(
@@ -154,4 +163,152 @@ export async function waitForStaticIPDetachment(name: string, resourceGroup: str
     await sleep(tryIntervalMs)
   }
   throw Error(`Too many tries waiting for static IP association ID removal`)
+}
+
+/**
+ * This creates an Azure identity to access a key vault
+ */
+export async function createKeyVaultIdentityIfNotExists(
+  context: string,
+  identityName: string,
+  keyVaultName: string,
+  keyVaultResourceGroup: string | null | undefined,
+  keyPermissions: string[] | null,
+  secretPermissions: string[] | null
+) {
+  const clusterConfig = getAksClusterConfig(context)
+  const identity = await createIdentityIdempotent(clusterConfig, identityName)
+  // We want to grant the identity for the cluster permission to manage the odis signer identity.
+  // Get the correct object ID depending on the cluster configuration, either
+  // the service principal or the managed service identity.
+  // See https://github.com/Azure/aad-pod-identity/blob/b547ba86ab9b16d238db8a714aaec59a046afdc5/docs/readmes/README.role-assignment.md#obtaining-the-id-of-the-managed-identity--service-principal
+  let assigneeObjectId = await getAKSServicePrincipalObjectId(clusterConfig)
+  let assigneePrincipalType = 'ServicePrincipal'
+  // TODO Check how to manage the MSI type
+  if (!assigneeObjectId) {
+    assigneeObjectId = await getAKSManagedServiceIdentityObjectId(clusterConfig)
+    // assigneePrincipalType = 'MSI'
+    assigneePrincipalType = 'ServicePrincipal'
+  }
+  await assignRoleIdempotent(
+    assigneeObjectId,
+    assigneePrincipalType,
+    identity.id,
+    'Managed Identity Operator'
+  )
+  // Allow the odis signer identity to access the correct key vault
+  await setKeyVaultPolicyIfNotSet(
+    clusterConfig,
+    keyVaultName,
+    keyVaultResourceGroup,
+    identity,
+    keyPermissions,
+    secretPermissions
+  )
+  return identity
+}
+
+async function setKeyVaultPolicyIfNotSet(
+  clusterConfig: AksClusterConfig,
+  keyVaultName: string,
+  keyVaultResourceGroup: string | null | undefined,
+  azureIdentity: any,
+  keyPermissions: string[] | null,
+  secretPermissions: string[] | null
+) {
+  const kvResourceGroup = keyVaultResourceGroup
+    ? keyVaultResourceGroup
+    : clusterConfig.resourceGroup
+
+  const queryFilters = [`?objectId == '${azureIdentity.principalId}'`]
+  if (keyPermissions) {
+    queryFilters.push(
+      `sort(permissions.keys) == [${keyPermissions.map((perm) => `'${perm}'`).join(', ')}]`
+    )
+  }
+  if (secretPermissions) {
+    queryFilters.push(
+      `sort(permissions.secrets) == [${secretPermissions.map((perm) => `'${perm}'`).join(', ')}]`
+    )
+  }
+
+  const [keyVaultPoliciesStr] = await execCmdWithExitOnFailure(
+    `az keyvault show --name ${keyVaultName} -g ${kvResourceGroup} --query "properties.accessPolicies[${queryFilters.join(
+      ' && '
+    )}]"`
+  )
+  const keyVaultPolicies = JSON.parse(keyVaultPoliciesStr)
+  if (keyVaultPolicies.length) {
+    const keyPermStr = keyPermissions ? `key permissions: ${keyPermissions.join(' ')}` : ''
+    const secretPermStr = secretPermissions
+      ? `secret permissions: ${secretPermissions.join(' ')}`
+      : ''
+    console.info(
+      `Skipping setting policy {${keyPermStr}, ${secretPermStr}}. Already set for vault ${keyVaultName} and identity objectId ${azureIdentity.principalId}`
+    )
+    return
+  }
+
+  if (keyPermissions) {
+    console.info(
+      `Setting key permissions ${keyPermissions.join(
+        ' '
+      )} for vault ${keyVaultName} and identity objectId ${azureIdentity.principalId}`
+    )
+    return execCmdWithExitOnFailure(
+      `az keyvault set-policy --name ${keyVaultName} --key-permissions ${keyPermissions.join(
+        ' '
+      )} --object-id ${azureIdentity.principalId} -g ${kvResourceGroup}`
+    )
+  }
+
+  if (secretPermissions) {
+    console.info(
+      `Setting secret permissions ${secretPermissions.join(
+        ' '
+      )} for vault ${keyVaultName} and identity objectId ${azureIdentity.principalId}`
+    )
+    return execCmdWithExitOnFailure(
+      `az keyvault set-policy --name ${keyVaultName} --secret-permissions ${secretPermissions.join(
+        ' '
+      )} --object-id ${azureIdentity.principalId} -g ${kvResourceGroup}`
+    )
+  }
+}
+
+/**
+ * deleteAzureKeyVaultIdentity deletes the key vault policy and the managed identity
+ */
+export async function deleteAzureKeyVaultIdentity(
+  context: string,
+  identityName: string,
+  keyVaultName: string
+) {
+  const clusterConfig = getAksClusterConfig(context)
+  await deleteKeyVaultPolicy(clusterConfig, identityName, keyVaultName)
+  return deleteIdentity(clusterConfig, identityName)
+}
+
+async function deleteKeyVaultPolicy(
+  clusterConfig: AksClusterConfig,
+  identityName: string,
+  keyVaultName: string
+) {
+  const azureIdentity = await getIdentity(clusterConfig, identityName)
+  return execCmdWithExitOnFailure(
+    `az keyvault delete-policy --name ${keyVaultName} --object-id ${azureIdentity.principalId} -g ${clusterConfig.resourceGroup}`
+  )
+}
+
+/**
+ * @return the intended name of an azure identity given a key vault name
+ */
+export function getAzureKeyVaultIdentityName(
+  context: string,
+  prefix: string,
+  keyVaultName: string
+) {
+  // from https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-name-rules#microsoftmanagedidentity
+  const maxIdentityNameLength = 128
+  return `${prefix}-${keyVaultName}-${context}`.substring(0, maxIdentityNameLength)
 }

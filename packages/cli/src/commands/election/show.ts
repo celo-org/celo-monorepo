@@ -35,15 +35,11 @@ export default class ElectionShow extends BaseCommand {
     const election = await this.kit.contracts.getElection()
 
     if (res.flags.group) {
-      await newCheckBuilder(this)
-        .isValidatorGroup(address)
-        .runChecks()
+      await newCheckBuilder(this).isValidatorGroup(address).runChecks()
       const groupVotes = await election.getValidatorGroupVotes(address)
       printValueMapRecursive(groupVotes)
     } else if (res.flags.voter) {
-      await newCheckBuilder(this)
-        .isAccount(address)
-        .runChecks()
+      await newCheckBuilder(this).isAccount(address).runChecks()
       const voter = await election.getVoter(address)
       printValueMapRecursive(voter)
     } else {

@@ -1,5 +1,6 @@
 import sleep from 'sleep-promise'
 import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
+import { getClusterConfigForContext, switchToContextCluster } from './context-utils'
 import { doCheckOrPromptIfStagingOrProduction, EnvTypes, envVar, fetchEnv } from './env-utils'
 import {
   checkHelmVersion,
@@ -8,7 +9,8 @@ import {
   grantRoles,
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
-  installGCPSSDStorageClass
+  installGCPSSDStorageClass,
+  isCelotoolHelmDryRun,
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
 import { outputIncludes, switchToProjectFromEnv } from './utils'
@@ -21,13 +23,28 @@ const SYSTEM_HELM_RELEASES = [
 ]
 const HELM_RELEASE_REGEX = new RegExp(/(.*)-\d+\.\d+\.\d+$/)
 
-export async function switchToClusterFromEnv(checkOrPromptIfStagingOrProduction = true) {
+export async function switchToClusterFromEnv(
+  celoEnv: string,
+  checkOrPromptIfStagingOrProduction = true,
+  skipClusterSetup = true
+) {
   if (checkOrPromptIfStagingOrProduction) {
     await doCheckOrPromptIfStagingOrProduction()
   }
   await checkHelmVersion()
 
   await switchToProjectFromEnv()
+
+  if (!skipClusterSetup) {
+    if (!isCelotoolHelmDryRun()) {
+      // In this case we create the cluster if it does not exist
+      const createdCluster = await createClusterIfNotExists()
+      // Install common helm charts
+      await setupCluster(celoEnv, createdCluster)
+    } else {
+      console.info(`Skipping cluster setup due to --helmdryrun`)
+    }
+  }
 
   let currentCluster = null
   try {
@@ -81,8 +98,10 @@ export async function createNamespaceIfNotExists(namespace: string) {
     `Namespace ${namespace} exists, skipping creation`
   )
   if (!namespaceExists) {
-    console.info('Creating kubernetes namespace')
-    await execCmdWithExitOnFailure(`kubectl create namespace ${namespace}`)
+    const cmd = `kubectl create namespace ${namespace} ${
+      isCelotoolHelmDryRun() ? ' --dry-run=server' : ''
+    }`
+    await execCmdWithExitOnFailure(cmd)
   }
 }
 
@@ -105,7 +124,7 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   // Source: https://cloud.google.com/kubernetes-engine/docs/how-to/iam
   await grantRoles(blockchainBackupServiceAccountName, 'roles/container.viewer')
 
-  await createAndUploadBackupSecretIfNotExists(blockchainBackupServiceAccountName)
+  await createAndUploadBackupSecretIfNotExists(blockchainBackupServiceAccountName, celoEnv)
 
   // poll for cluster availability
   if (createdCluster) {
@@ -219,4 +238,14 @@ export function getPackageName(name: string) {
   }
 
   return prefix[1] === 'ethereum' ? 'testnet' : prefix[1]
+}
+
+export async function switchToClusterFromEnvOrContext(argv: any, skipClusterSetup = false) {
+  if (argv.context === undefined) {
+    // GCP top level cluster.
+    await switchToClusterFromEnv(argv.celoEnv, true, skipClusterSetup)
+  } else {
+    await switchToContextCluster(argv.celoEnv, argv.context, skipClusterSetup)
+    return getClusterConfigForContext(argv.context)
+  }
 }

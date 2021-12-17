@@ -14,9 +14,10 @@ USAGE
   $ celocli multisig:show ADDRESS
 
 OPTIONS
-  --all    Show info about all transactions
-  --raw    Do not attempt to parse transactions
-  --tx=tx  Show info for a transaction
+  --all         Show info about all transactions
+  --globalHelp  View all available global flags
+  --raw         Do not attempt to parse transactions
+  --tx=tx       Show info for a transaction
 
 EXAMPLES
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -42,8 +43,10 @@ OPTIONS
   --amount=amount                                      (required) Amount to transfer,
                                                        e.g. 10e18
 
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) account performing
-                                                       transaction
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account transferring
+                                                       value to the recipient
+
+  --globalHelp                                         View all available global flags
 
   --sender=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  Identify sender if performing
                                                        transferFrom
@@ -51,7 +54,7 @@ OPTIONS
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      (required) Recipient of transfer
 
   --transferFrom                                       Perform transferFrom instead of
-                                                       transfer
+                                                       transfer in the ERC-20 interface
 
 EXAMPLES
   transfer <multiSigAddr> --to 0x5409ed021d9299bf6814279a6a1411a7e866a631 --amount

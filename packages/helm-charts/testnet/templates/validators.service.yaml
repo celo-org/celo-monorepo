@@ -2,7 +2,7 @@
 
 {{ range $index, $e := until (.Values.geth.validators | int) }}
 
-{{ if (ge $index (len $.Values.geth.proxiesPerValidator)) }}
+{{ if (eq (index $.Values.geth.proxiesPerValidator $index | int) 0) }}
 
 {{ $loadBalancerIP := index $.Values.geth.validatorsIPAddressArray $index }}
 

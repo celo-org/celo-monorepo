@@ -1,6 +1,7 @@
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
 import { getBlockscoutUrl } from 'src/lib/endpoints'
+import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { portForwardAnd } from 'src/lib/port_forward'
 import yargs from 'yargs'
 import { InitialArgv } from '../../deploy/initial'
@@ -22,7 +23,8 @@ interface VerifyContractsInitialArgv extends InitialArgv {
 }
 
 export const handler = async (argv: VerifyContractsInitialArgv) => {
-  await switchToClusterFromEnv()
+  exitIfCelotoolHelmDryRun()
+  await switchToClusterFromEnv(argv.celoEnv)
   // Check if blockscout is deployed and online?
   const blockscoutUrl = getBlockscoutUrl(argv.celoEnv)
 

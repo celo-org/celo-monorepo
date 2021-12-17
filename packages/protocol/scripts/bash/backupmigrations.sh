@@ -26,8 +26,10 @@ else
   # cp migrations.bak/06_gaspriceminimum.* migrations/
   # cp migrations.bak/07_reserve_spender_multisig.* migrations/
   # cp migrations.bak/08_reserve.* migrations/
-  # cp migrations.bak/09_stabletoken.* migrations/
-  # cp migrations.bak/10_exchange.* migrations/
+  # cp migrations.bak/09_0_stabletoken_USD.* migrations/
+  # cp migrations.bak/09_1_stableToken_EUR.* migrations/
+  # cp migrations.bak/10_0_exchange_USD.* migrations/
+  # cp migrations.bak/10_1_exchange_EUR.* migrations/
   # cp migrations.bak/11_accounts.* migrations/
   # cp migrations.bak/12_lockedgold.* migrations/
   # cp migrations.bak/13_validators.* migrations/

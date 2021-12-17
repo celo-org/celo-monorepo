@@ -25,7 +25,7 @@ export const proxyReveal = functions.https.onCall(async (data, context) => {
       status: res.status,
       data: await res.text(),
     }
-  } catch (error) {
+  } catch (error: any) {
     // Firebase callable functions should throw errors of this type
     // to be fed back to the user
     throw new functions.https.HttpsError('unknown', error.message)
@@ -55,7 +55,7 @@ export const proxyRevealStatus = functions.https.onCall(async (data, context) =>
       status: res.status,
       data: await res.text(),
     }
-  } catch (error) {
+  } catch (error: any) {
     // Firebase callable functions should throw errors of this type
     // to be fed back to the user
     throw new functions.https.HttpsError('unknown', error.message)

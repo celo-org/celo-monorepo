@@ -1,0 +1,19 @@
+oracle:
+  currencyPair: CELOEUR
+  aggregation:
+    mid:
+      maxExchangeVolumeShare: 1
+      maxPercentageDeviation: 0.05
+      maxPercentageBidAskSpread: 0.025
+      # minReportPriceChangeThreshold
+  metrics:
+    enabled: true
+    prometheusPort: 9090
+  apiRequestTimeoutMs: 5000
+  circuitBreakerPriceChangeThreshold: 0.25
+  priceSources: "[[{exchange: 'BITTREX', symbol: 'CELOEUR', toInvert: false}],[{exchange: 'COINBASE', symbol: 'CELOEUR', toInvert: false}],[{exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false}, {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true}]]"
+  minPriceSourceCount: 2
+  reportStrategy: BLOCK_BASED
+  reporter:
+    blockBased:
+      minReportPriceChangeThreshold: 0.005 # 0.5%

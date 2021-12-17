@@ -77,7 +77,12 @@ class GetAttestationRequestHandler {
       }
 
       // Security code is supplied. Check it's correct.
-      if (attestation.securityCode === this.getRequest.securityCode) {
+      // Check with both methods (can remove second method after 1.3.0)
+      if (
+        attestation.securityCode &&
+        (attestation.securityCode.slice(1) === this.getRequest.securityCode ||
+          attestation.securityCode === this.getRequest.securityCode)
+      ) {
         callback(attestation, attestation.attestationCode)
         await transaction.commit()
         return
@@ -132,7 +137,7 @@ export async function handleGetAttestationRequest(
     await handler.withAttestationAndSecurityCodeChecked((attestation, attestationCode) => {
       respondWithAttestation(res, attestation, true, undefined, attestationCode)
     })
-  } catch (error) {
+  } catch (error: any) {
     if (!error.responseCode) {
       res.locals.logger.error({ error })
     } else {

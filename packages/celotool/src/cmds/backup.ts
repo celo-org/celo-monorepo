@@ -20,7 +20,7 @@ export const builder = (args: yargs.Argv) => {
 }
 
 export const handler = async (argv: BackupArgv) => {
-  await switchToClusterFromEnv(false)
+  await switchToClusterFromEnv(argv.celoEnv, false, true)
 
   const minerName = argv.minername
   // In the future, we can make this configurable.

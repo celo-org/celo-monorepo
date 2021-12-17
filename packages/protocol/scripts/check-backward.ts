@@ -73,6 +73,7 @@ try {
     new DefaultCategorizer(),
     out
   )
+
   out(`Writing compatibility report to ${outFile} ...`)
   writeJsonSync(outFile, backward, { spaces: 2 })
   out('Done\n')

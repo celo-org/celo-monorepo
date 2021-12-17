@@ -27,7 +27,7 @@ export const builder = (yargs: Argv) => {
 }
 
 export const handler = async (argv: InviteArgv) => {
-  await switchToClusterFromEnv()
+  await switchToClusterFromEnv(argv.celoEnv)
   const phone = argv.phone
 
   console.log(`Sending invitation code to ${phone}`)
@@ -36,7 +36,7 @@ export const handler = async (argv: InviteArgv) => {
   await execCmd('gcloud config set project celo-testnet')
   await execCmd(
     'gcloud kms decrypt --ciphertext-file=twilio-config.enc --plaintext-file=twilio-config.js \
-    --key=github-key --keyring=celo-keyring --location=global'
+    --key=github-mnemonic-key --keyring=celo-keyring --location=global'
   )
   const cb = async () => {
     const web3: Web3 = new Web3('http://localhost:8545')

@@ -3,9 +3,7 @@ import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../src/database/models/account
 
 export async function up(knex: Knex): Promise<any> {
   return knex.schema.createTable(ACCOUNTS_TABLE, (t) => {
-    t.string(ACCOUNTS_COLUMNS.address)
-      .notNullable()
-      .primary()
+    t.string(ACCOUNTS_COLUMNS.address).notNullable().primary()
     t.dateTime(ACCOUNTS_COLUMNS.createdAt).notNullable()
     t.dateTime(ACCOUNTS_COLUMNS.didMatchmaking)
   })

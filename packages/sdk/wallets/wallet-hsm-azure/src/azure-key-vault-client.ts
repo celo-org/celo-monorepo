@@ -13,6 +13,19 @@ import {
 } from '@celo/wallet-hsm'
 import { BigNumber } from 'bignumber.js'
 
+type SupportedCurve = 'P-256K' | 'SECP256K1'
+type SigningAlgorithm = 'ECDSA256' | 'ES256K'
+
+const SUPPORTED_CURVES: readonly SupportedCurve[] = ['P-256K', 'SECP256K1'] as const
+const SIGNING_ALGORITHM_FOR: Record<SupportedCurve, SigningAlgorithm> = {
+  'P-256K': 'ES256K',
+  SECP256K1: 'ECDSA256',
+}
+
+const isSupportedCurve = (curveName: string): curveName is SupportedCurve => {
+  return (SUPPORTED_CURVES as string[]).indexOf(curveName) > -1
+}
+
 /**
  * Provides an abstraction on Azure Key Vault for performing signing operations
  */
@@ -22,7 +35,6 @@ export class AzureKeyVaultClient {
   private readonly vaultUri: string
   private readonly credential: TokenCredential
   private readonly keyClient: KeyClient
-  private readonly SIGNING_ALGORITHM: string = 'ECDSA256'
   private cryptographyClientSet: Map<string, CryptographyClient> = new Map<
     string,
     CryptographyClient
@@ -71,10 +83,15 @@ export class AzureKeyVaultClient {
     if (!(await this.hasKey(keyName))) {
       throw new Error(`Unable to locate key: ${keyName}`)
     }
+    const curve = await this.getKeyCurve(keyName)
+    if (!isSupportedCurve(curve)) {
+      throw new Error(`Key curve ${curve} is not supported, must be one of: ${SUPPORTED_CURVES}`)
+    }
+    const signingAlgorithm = SIGNING_ALGORITHM_FOR[curve]
     const cryptographyClient = await this.getCryptographyClient(keyName)
     const signResult = await cryptographyClient.sign(
       // @ts-ignore-next-line (ECDSA256 is not included in the client enum but is valid)
-      this.SIGNING_ALGORITHM,
+      signingAlgorithm,
       new Uint8Array(message)
     )
     // The output of this will be a 64 byte array.
@@ -106,7 +123,7 @@ export class AzureKeyVaultClient {
   public async hasKey(keyName: string): Promise<boolean> {
     try {
       await this.keyClient.getKey(keyName)
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('this is not a valid private key')) {
         return false
       }
@@ -136,12 +153,21 @@ export class AzureKeyVaultClient {
       }
 
       return signingKey
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.includes('Key not found')) {
         throw new Error(`Key ${keyName} not found in KeyVault ${this.vaultName}`)
       }
       throw new Error(`Unexpected KeyVault error ${e.message}`)
     }
+  }
+
+  private async getKeyCurve(keyName: string): Promise<string> {
+    const key = await this.getKey(keyName)
+    if (key.key === undefined || key.key.crv === undefined) {
+      throw new Error(`Key or curve is undefined`)
+    }
+
+    return key.key.crv
   }
 
   /**

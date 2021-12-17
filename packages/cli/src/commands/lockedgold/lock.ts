@@ -39,9 +39,7 @@ export default class Lock extends BaseCommand {
     const relockValue = BigNumber.minimum(pendingWithdrawalsValue, value)
     const lockValue = value.minus(relockValue)
 
-    await newCheckBuilder(this)
-      .hasEnoughCelo(address, lockValue)
-      .runChecks()
+    await newCheckBuilder(this).hasEnoughCelo(address, lockValue).runChecks()
 
     const txos = await lockedGold.relock(address, relockValue)
     for (const txo of txos) {

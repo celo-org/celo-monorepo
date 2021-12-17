@@ -18,9 +18,7 @@ export default class RevokeUpvote extends BaseCommand {
     const signer = res.flags.from
     this.kit.defaultAccount = signer
 
-    await newCheckBuilder(this, signer)
-      .isVoteSignerOrAccount()
-      .runChecks()
+    await newCheckBuilder(this, signer).isVoteSignerOrAccount().runChecks()
 
     // TODO(nategraf): Check whether there are upvotes to revoke before sending transaction.
     const governance = await this.kit.contracts.getGovernance()

@@ -35,7 +35,7 @@ const verbose = false
 
 describe('replica swap tests', () => {
   const gethConfig: GethRunConfig = {
-    migrate: false,
+    migrate: true,
     runPath: TMP_PATH,
     verbosity: 4,
     networkId: 1101,
@@ -102,13 +102,13 @@ describe('replica swap tests', () => {
   const hooks: any = getHooks(gethConfig)
   let web3: Web3
 
-  before(async function(this: any) {
+  before(async function (this: any) {
     this.timeout(0)
     // Comment out the following line after a local run for a quick rerun.
     await hooks.before()
   })
 
-  after(async function(this: any) {
+  after(async function (this: any) {
     this.timeout(0)
     await hooks.after()
   })
@@ -127,12 +127,12 @@ describe('replica swap tests', () => {
     let swapBlock: number
     const missed: any = []
 
-    before(async function(this: any) {
+    before(async function (this: any) {
       this.timeout(0) // Disable test timeout
 
       await restart()
 
-      const proxyPubKey = privateKeyToPublicKey(gethConfig.instances[1].privateKey || '')
+      const proxyPubKey = privateKeyToPublicKey(gethConfig.instances[1].nodekey!)
       const replica: GethInstanceConfig = {
         name: 'validator0-replica0',
         replica: true,
@@ -200,7 +200,7 @@ describe('replica swap tests', () => {
               missed.push({ idx: i, num: header.number })
             }
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error(e)
           errorMsg = e
         }

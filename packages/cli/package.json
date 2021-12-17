@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "1.0.4-dev",
+  "version": "1.3.0",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -28,19 +28,19 @@
     "generate:shrinkwrap": "yarn run npm install --production && yarn run npm shrinkwrap",
     "check:shrinkwrap": "yarn run npm install --production && yarn run npm shrinkwrap && ./scripts/check_shrinkwrap_dirty.sh",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme && yarn run check:shrinkwrap",
-    "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 24 --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json",
+    "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 25 --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json",
     "test:livechain": "yarn --cwd ../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "1.0.1-dev",
-    "@celo/explorer": "1.0.1-dev",
-    "@celo/governance": "1.0.1-dev",
-    "@celo/identity": "1.0.1-dev",
-    "@celo/utils": "1.0.1-dev",
-    "@celo/wallet-hsm-azure": "1.0.1-dev",
-    "@celo/wallet-ledger": "1.0.1-dev",
-    "@celo/wallet-local": "1.0.1-dev",
+    "@celo/contractkit": "1.3.3-dev",
+    "@celo/explorer": "1.3.3-dev",
+    "@celo/governance": "1.3.3-dev",
+    "@celo/identity": "1.3.3-dev",
+    "@celo/utils": "1.3.3-dev",
+    "@celo/wallet-hsm-azure": "1.3.3-dev",
+    "@celo/wallet-ledger": "1.3.3-dev",
+    "@celo/wallet-local": "1.3.3-dev",
     "@ledgerhq/hw-transport-node-hid": "~5.11.0",
     "@oclif/command": "^1.6.0",
     "@oclif/config": "^1.6.0",
@@ -50,8 +50,9 @@
     "@oclif/plugin-not-found": "^1.2.4",
     "@oclif/plugin-warn-if-update-available": "^1.7.0",
     "@types/command-exists": "^1.2.0",
+    "@oclif/plugin-plugins": "^1.9.4",
     "bip32": "2.0.5",
-    "bip39": "3.0.2",
+    "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
     "bls12377js": "https://github.com/celo-org/bls12377js#cb38a4cfb643c778619d79b20ca3e5283a2122a6",
     "chalk": "^2.4.2",
     "cli-table": "^0.3.1",
@@ -69,7 +70,7 @@
     "randombytes": "^2.0.1",
     "save": "^2.4.0",
     "tslib": "^1",
-    "web3": "1.3.0"
+    "web3": "1.3.6"
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
@@ -80,12 +81,13 @@
     "@types/fs-extra": "^8.0.0",
     "@types/humanize-duration": "^3.18.0",
     "@types/inquirer": "^6.5.0",
+    "@types/ledgerhq__hw-transport-node-hid": "^4.22.2",
     "@types/mocha": "^7.0.2",
     "@types/node": "^10",
     "@types/web3": "^1.0.18",
     "globby": "^8",
     "prettier": "1.19.1",
-    "typescript": "^3.8.3"
+    "typescript": "4.4.3"
   },
   "files": [
     "README.md",
@@ -104,7 +106,8 @@
       "@oclif/plugin-autocomplete",
       "@oclif/plugin-not-found",
       "@oclif/plugin-commands",
-      "@oclif/plugin-warn-if-update-available"
+      "@oclif/plugin-warn-if-update-available",
+      "@oclif/plugin-plugins"
     ],
     "topics": {
       "account": {
@@ -154,6 +157,9 @@
       "timeoutInDays": 1,
       "message": "<%= config.name %> update available from <%= chalk.greenBright(config.version) %> to <%= chalk.greenBright(latest) %>."
     },
-    "repositoryPrefix": "https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/<%- commandPath %>"
+    "repositoryPrefix": "https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/<%- commandPath %>",
+    "hooks": {
+      "prerun": "./lib/hooks/prerun/plugin-warning"
+    }
   }
 }

@@ -6,7 +6,7 @@ import {
   getAddressesFor,
   getFaucetedAccounts,
   getPrivateKeysFor,
-  privateKeyToAddress
+  privateKeyToAddress,
 } from './generate_utils'
 import { ensure0x } from './utils'
 
@@ -26,7 +26,7 @@ export enum TestAccounts {
   Oracle,
   GovernanceApprover,
   ReserveSpender,
-  ReserveCustodian
+  ReserveCustodian,
 }
 
 export function minerForEnv() {
@@ -63,7 +63,13 @@ export async function migrationOverrides(faucet: boolean) {
     const envTestOracle = await getKey(mnemonic, TestAccounts.Oracle)
     const envTestGovernanceApprover = await getKey(mnemonic, TestAccounts.GovernanceApprover)
     const envTestReserveSpender = await getKey(mnemonic, TestAccounts.ReserveSpender)
-    const initialAddresses = [...faucetedAccountAddresses, ...attestationBotAddresses, ...validatorAddresses, envTestRoot.address, envTestOracle.address]
+    const initialAddresses = [
+      ...faucetedAccountAddresses,
+      ...attestationBotAddresses,
+      ...validatorAddresses,
+      envTestRoot.address,
+      envTestOracle.address,
+    ]
 
     const initialBalance = fetchEnvOrFallback(envVar.FAUCET_CUSD_WEI, DEFAULT_FAUCET_CUSD_WEI)
 
@@ -74,7 +80,11 @@ export async function migrationOverrides(faucet: boolean) {
           addresses: initialAddresses,
           values: initialAddresses.map(() => initialBalance),
         },
-        oracles: [...getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1), minerForEnv(), envTestOracle.address],
+        oracles: [
+          ...getAddressesFor(AccountType.PRICE_ORACLE, mnemonic, 1),
+          minerForEnv(),
+          envTestOracle.address,
+        ],
       },
       // from migrationsConfig
       governanceApproverMultiSig: {
@@ -87,9 +97,7 @@ export async function migrationOverrides(faucet: boolean) {
         initialBalance: 100000000, // CELO
         frozenAssetsStartBalance: 80000000, // Matches Mainnet after CGP-6
         frozenAssetsDays: 182, // 3x Mainnet thawing rate
-        otherAddresses: [
-          envTestReserveCustodian.address
-        ],
+        otherAddresses: [envTestReserveCustodian.address],
       },
       // from migrationsConfig
       reserveSpenderMultiSig: {

@@ -26,8 +26,11 @@ contract MetaTransactionWallet is
   );
   uint256 public nonce;
   address public signer;
+  address public guardian;
 
   event SignerSet(address indexed signer);
+  event GuardianSet(address indexed guardian);
+  event WalletRecovered(address indexed newSigner);
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
   event Deposit(address indexed sender, uint256 value);
   event TransactionExecution(
@@ -44,6 +47,20 @@ contract MetaTransactionWallet is
     bytes returnData
   );
 
+  // onlyGuardian functions can only be called when the guardian is not the zero address and
+  // the caller is the guardian.
+  modifier onlyGuardian() {
+    // Note that if the guardian is not set (e.g. its address 0), this require statement will fail.
+    require(guardian == msg.sender, "Caller is not the guardian");
+    _;
+  }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
+
   /**
    * @dev Fallback function allows to deposit ether.
    */
@@ -56,7 +73,7 @@ contract MetaTransactionWallet is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 1);
+    return (1, 1, 1, 1);
   }
 
   /**
@@ -79,6 +96,24 @@ contract MetaTransactionWallet is
    */
   function setSigner(address _signer) external onlyOwner {
     _setSigner(_signer);
+  }
+
+  /**
+   * @notice Sets the wallet's guardian address.
+   * @param _guardian The address authorized to change the wallet's signer
+   */
+  function setGuardian(address _guardian) external onlyOwner {
+    guardian = _guardian;
+    emit GuardianSet(guardian);
+  }
+
+  /**
+   * @notice Changes the wallet's signer
+   * @param newSigner The new signer address
+   */
+  function recoverWallet(address newSigner) external onlyGuardian {
+    _setSigner(newSigner);
+    emit WalletRecovered(newSigner);
   }
 
   /**
@@ -281,4 +316,5 @@ contract MetaTransactionWallet is
     signer = _signer;
     emit SignerSet(signer);
   }
+
 }

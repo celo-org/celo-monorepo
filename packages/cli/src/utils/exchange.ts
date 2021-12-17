@@ -1,4 +1,5 @@
-import { CeloContract, ContractKit } from '@celo/contractkit'
+import { ContractKit } from '@celo/contractkit'
+import { StableToken, StableTokenInfo, stableTokenInfos } from '@celo/contractkit/lib/celo-tokens'
 import BigNumber from 'bignumber.js'
 import { binaryPrompt } from './cli'
 
@@ -24,18 +25,19 @@ export async function checkNotDangerousExchange(
   amount: BigNumber,
   largeOrderPercentage: number,
   deppegedPricePercentage: number,
-  buyBucket: boolean
+  buyBucket: boolean,
+  stableTokenInfo: StableTokenInfo = stableTokenInfos[StableToken.cUSD]
 ): Promise<boolean> {
   const oracles = await kit.contracts.getSortedOracles()
-  const exchange = await kit.contracts.getExchange()
-  const oracleMedianRate = (await oracles.medianRate(CeloContract.StableToken)).rate
+  const exchange = await kit.contracts.getExchange(stableTokenInfo.symbol as StableToken)
+  const oracleMedianRate = (await oracles.medianRate(stableTokenInfo.contract)).rate
   const buckets = await exchange.getBuyAndSellBuckets(false)
 
   const chainRate = buckets[1].dividedBy(buckets[0])
   let warningMessage
   // XX% difference between rates
   if (Math.abs(oracleMedianRate.dividedBy(chainRate).toNumber() - 1) > deppegedPricePercentage) {
-    const warningDeppegedPrice = `Warning cUSD price here (i.e. on-chain) is depegged by >${deppegedPricePercentage}% from the oracle prices (i.e. exchange prices).`
+    const warningDeppegedPrice = `Warning ${stableTokenInfo.symbol} price here (i.e. on-chain) is depegged by >${deppegedPricePercentage}% from the oracle prices (i.e. exchange prices).`
     warningMessage = warningDeppegedPrice
   }
 

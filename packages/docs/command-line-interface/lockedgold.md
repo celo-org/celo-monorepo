@@ -15,6 +15,7 @@ USAGE
 
 OPTIONS
   --from=from    (required)
+  --globalHelp   View all available global flags
   --value=value  (required) The unit amount of CELO
 
 EXAMPLE
@@ -32,6 +33,9 @@ Show Locked Gold information for a given account. This includes the total amount
 
 USAGE
   $ celocli lockedgold:show ACCOUNT
+
+OPTIONS
+  --globalHelp  View all available global flags
 
 EXAMPLE
   show 0x5409ed021d9299bf6814279a6a1411a7e866a631
@@ -51,6 +55,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --globalHelp                                       View all available global flags
   --value=value                                      (required) The unit amount of CELO
 
 EXAMPLE
@@ -71,6 +76,7 @@ USAGE
 
 OPTIONS
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --globalHelp                                       View all available global flags
 
 EXAMPLE
   withdraw --from 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95

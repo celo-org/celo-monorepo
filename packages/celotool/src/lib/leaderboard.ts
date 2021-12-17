@@ -1,6 +1,10 @@
-import { execCmd, execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
+import { execCmd } from 'src/lib/cmd-utils'
 import { envVar, fetchEnv } from 'src/lib/env-utils'
-import { installGenericHelmChart, removeGenericHelmChart } from 'src/lib/helm_deploy'
+import {
+  installGenericHelmChart,
+  removeGenericHelmChart,
+  upgradeGenericHelmChart,
+} from 'src/lib/helm_deploy'
 const yaml = require('js-yaml')
 const helmChartPath = '../helm-charts/leaderboard'
 
@@ -18,17 +22,12 @@ export async function removeHelmRelease(celoEnv: string) {
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  console.info(`Upgrading helm release ${releaseName(celoEnv)}`)
-
-  const params = (await helmParameters(celoEnv)).join(' ')
-
-  const upgradeCmdArgs = `${releaseName(celoEnv)} ${helmChartPath} --namespace ${celoEnv} ${params}`
-
-  if (process.env.CELOTOOL_VERBOSE === 'true') {
-    await execCmdWithExitOnFailure(`helm upgrade --debug --dry-run ${upgradeCmdArgs}`)
-  }
-  await execCmdWithExitOnFailure(`helm upgrade ${upgradeCmdArgs}`)
-  console.info(`Helm release ${releaseName(celoEnv)} upgrade successful`)
+  await upgradeGenericHelmChart(
+    celoEnv,
+    releaseName(celoEnv),
+    helmChartPath,
+    await helmParameters(celoEnv)
+  )
 }
 
 export async function helmParameters(celoEnv: string) {

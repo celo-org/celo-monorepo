@@ -20,9 +20,7 @@ export default class ValidatorShow extends BaseCommand {
     const address = args.validatorAddress
     const validators = await this.kit.contracts.getValidators()
 
-    await newCheckBuilder(this)
-      .isValidator(address)
-      .runChecks()
+    await newCheckBuilder(this).isValidator(address).runChecks()
 
     const validator = await validators.getValidator(address)
     printValueMap(validator)

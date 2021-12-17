@@ -35,14 +35,6 @@ fi
 echo "- Run local network"
 startInBgAndWaitForString 'Ganache STARTED' yarn devchain run-tar packages/protocol/$BUILD_DIR/devchain.tar.gz >> $LOG_FILE
 
-if [ -n "$RE_BUILD_REPO" ]
-then
-    # Move back to branch from which we started
-    git checkout -
-    yarn install >> $LOG_FILE
-    yarn build >> $LOG_FILE
-fi
-
 GANACHE_PID=
 if command -v lsof; then
     GANACHE_PID=`lsof -i tcp:8545 | tail -n 1 | awk '{print $2}'`
@@ -50,24 +42,22 @@ if command -v lsof; then
 fi
 
 echo "- Verify bytecode of the network"
-git checkout $BRANCH >> $LOG_FILE
 yarn build >> $LOG_FILE
-yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts
-git checkout - >> $LOG_FILE
-yarn build >> $LOG_FILE
+yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --librariesFile libraries.json
 
 echo "- Check versions of current branch"
 # From check-versions.sh
-CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|.*LinkedList.*|MultiSig.*|ReleaseGold|MetaTransactionWallet|SlasherUtil|FixidityLib|Signatures|Proposals|UsingPrecompiles"
+CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles"
 yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
 
 # From make-release.sh
 echo "- Deploy release of current branch"
-yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --initialize_data example-initialize-data.json
+INITIALIZATION_FILE=`ls -1 releaseData/initializationData/* | tail -n 1 | xargs realpath`
+yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --librariesFile libraries.json --initialize_data $INITIALIZATION_FILE
 
 # From verify-release.sh
 echo "- Verify release"
-yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json
+yarn truffle exec --network development ./scripts/truffle/verify-bytecode.js --build_artifacts build/contracts --proposal ../../proposal.json --initialize_data $INITIALIZATION_FILE
 
 if [[ -n $GANACHE_PID ]]; then
     kill $GANACHE_PID
