@@ -110,7 +110,6 @@ spec:
           ACCOUNT_ADDRESSES=${ACCOUNT_ADDRESSES::-1}
 
 {{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,web3,debug,admin,personal,net" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
-{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,web3,debug,admin,personal,net" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
 
           exec geth \
           --datadir /root/.celo \
