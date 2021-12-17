@@ -106,7 +106,6 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
   }
 
   const params = [
-    `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${gcloudProject}`,
     `--set gcloud.region=${gcloudRegion}`,
     `--set stackdriver.sidecar.imageTag=${sidecarImageTag}`,
