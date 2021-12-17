@@ -45,7 +45,8 @@ const grafanaReleaseName = 'grafana'
 
 export async function installPrometheusIfNotExists(
   context?: string,
-  clusterConfig?: BaseClusterConfig
+  clusterConfig?: BaseClusterConfig,
+  disableStackdriver?: boolean
 ) {
   const prometheusExists = await outputIncludes(
     `helm list -n prometheus`,
@@ -54,17 +55,21 @@ export async function installPrometheusIfNotExists(
   )
   if (!prometheusExists) {
     console.info('Installing prometheus-stackdriver')
-    await installPrometheus(context, clusterConfig)
+    await installPrometheus(context, clusterConfig, disableStackdriver)
   }
 }
 
-async function installPrometheus(context?: string, clusterConfig?: BaseClusterConfig) {
+async function installPrometheus(
+  context?: string,
+  clusterConfig?: BaseClusterConfig,
+  disableStackdriver?: boolean
+) {
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(context, clusterConfig)
+    await helmParameters(context, clusterConfig, disableStackdriver)
   )
 }
 
@@ -72,17 +77,25 @@ export async function removePrometheus() {
   await removeGenericHelmChart(releaseName, kubeNamespace)
 }
 
-export async function upgradePrometheus(context?: string, clusterConfig?: BaseClusterConfig) {
+export async function upgradePrometheus(
+  context?: string,
+  clusterConfig?: BaseClusterConfig,
+  disableStackdriver?: boolean
+) {
   await createNamespaceIfNotExists(kubeNamespace)
   return upgradeGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(context, clusterConfig)
+    await helmParameters(context, clusterConfig, disableStackdriver)
   )
 }
 
-async function helmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
+async function helmParameters(
+  context?: string,
+  clusterConfig?: BaseClusterConfig,
+  disableStackdriver?: boolean
+) {
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
   const clusterName = usingGCP
     ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
@@ -108,11 +121,9 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
   const params = [
     `--set gcloud.project=${gcloudProject}`,
     `--set gcloud.region=${gcloudRegion}`,
-    `--set stackdriver.sidecar.imageTag=${sidecarImageTag}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set serviceAccount.name=${kubeServiceAccountName}`,
     `--set cluster=${clusterName}`,
-    `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`,
   ]
 
   // Remote write to Grafana.
@@ -128,21 +139,30 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     )
   }
 
-  if (!usingGCP) {
-    // Send metrics to Stackdriver from non-GCP.
-    const cloudProvider = getCloudProviderPrefix(clusterConfig!)
-    params.push(
-      `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${
-        clusterConfig!.clusterName
-      }`,
-      `--set serviceAccount.gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
-        clusterName,
-        cloudProvider,
-        gcloudProject
-      )}`
-    )
-  } else {
-    // GCP
+  params.push(`--set stackdriver.enable='${!disableStackdriver}'`)
+  if (!disableStackdriver) {
+    params.push(`--set stackdriver.sidecar.imageTag=${sidecarImageTag}`)
+
+    if (usingGCP) {
+      params.push(
+        `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`
+      )
+    } else {
+      const cloudProvider = getCloudProviderPrefix(clusterConfig!)
+      params.push(
+        `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${
+          clusterConfig!.clusterName
+        }`,
+        `--set stackdriver.gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
+          clusterName,
+          cloudProvider,
+          gcloudProject
+        )}`
+      )
+    }
+  }
+
+  if (usingGCP) {
     const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
     const cloudProvider = 'gcp'
     const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)

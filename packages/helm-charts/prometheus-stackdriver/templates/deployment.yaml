@@ -83,7 +83,7 @@ spec:
           volumeMounts:
             - name: prometheus-storage-volume
               mountPath: /prometheus
-{{- if not (kindIs "invalid" .Values.serviceAccount.gcloudServiceAccountKeyBase64) }}
+{{- if not (kindIs "invalid" .Values.stackdriver.gcloudServiceAccountKeyBase64) }}
             - name: prometheus-service-account-key
               mountPath: /var/secrets/google
           env:
