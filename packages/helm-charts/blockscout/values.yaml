@@ -165,6 +165,7 @@ blockscout:
       defiList: '[{"url":"https://mento.finance/", "title":"Mento"}, {"url":"https://ubeswap.org/", "title":"Ubeswap"}, {"url":"https://app.sushi.com/swap", "title":"SushiSwap"}, {"url":"https://moola.market/", "title":"Moola Market"}, {"url":"https://app.pooltogether.com/pools/celo/CELO-cUSD", "title":"PoolTogether"}, {"url":"https://autofarm.network/celo/", "title":"Autofarm"}, {"url":"https://app.poof.cash/#/account", "title":"Poof Cash"}]'
       resourcesList: '[{"url":"https://docs.celo.org/", "title":"Celo Docs"}, {"url":"https://celoreserve.org/", "title":"Celo Reserve"}, {"url":"https://forum.celo.org/", "title":"Celo Forum"}, {"url":"https://celohub.org/", "title":"Celo Hub"}, {"url":"https://thecelo.com/", "title":"TheCelo"}, {"url":"https://stats.celo.org/", "title":"Celo Stats"}, {"url":"https://celo.org/validators/explore", "title":"Validators"}]'
       learningList: '[{"url": "https://celo.org/papers/whitepaper", "title":"Celo Whitepaper"}, {"url": "https://learn.figment.io/protocols/celo", "title":"Learn Celo"}, {"url": "https://celo.org/papers/stability", "title":"Celo Stability Analysis"}, {"url": "https://www.coinbase.com/price/celo", "title":"Coinbase Earn"}]'
+    recaptchaSecretName: ""  # k8s secret that needs to pre-exist
   image:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo

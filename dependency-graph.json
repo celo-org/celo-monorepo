@@ -215,6 +215,15 @@
       "@celo/flake-tracker"
     ]
   },
+  "@celo/phone-utils": {
+    "location": "packages/sdk/phone-utils",
+    "dependencies": [
+      "@celo/base",
+      "@celo/flake-tracker",
+      "@celo/typescript",
+      "@celo/utils"
+    ]
+  },
   "@celo/transactions-uri": {
     "location": "packages/sdk/transactions-uri",
     "dependencies": [
