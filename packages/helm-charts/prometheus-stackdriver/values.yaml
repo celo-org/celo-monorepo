@@ -11,10 +11,10 @@ prometheus:
   retention_time: 7d
 
 # TODO: remove values from the .env files...
-scrapeJob:
-  Labels: null
-  Name: null
-  Targets: null
+scrapeJob: {}
+  # Labels: null
+  # Name: null
+  # Targets: null
 
 serviceAccount:
   # Annotations to add to the service account
@@ -94,7 +94,7 @@ stackdriver:
   sidecar:
     imageTag: 0.7.3
 
-storageClassName: ssd
+storageClassName: null
 storageSize: 50Gi
 
 remote_write:
