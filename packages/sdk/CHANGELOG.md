@@ -6,8 +6,8 @@ This package will follow the release process outlined [here](https://docs.celo.o
 ## Development (not published yet)
 
 ### **[2.0.0-dev]**
-Features
-  - Extract out heavy phone-utils into new package [#](https://github.com/celo-org/celo-monorepo/pull/8987)
+Breaking Change
+  - Removes phone and country related functions from utils. Now in phone-utils [#](https://github.com/celo-org/celo-monorepo/pull/8987)
 
 ### **[1.5.1-dev]**
 Features
