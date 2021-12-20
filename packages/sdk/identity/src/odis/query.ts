@@ -140,10 +140,28 @@ export async function queryOdis<ResponseType>(
 
   let authHeader = ''
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
+    if (!signer.rawKey) {
+      throw new Error(
+        ErrorMessages.ODIS_AUTH_ERROR +
+          ': AuthSigner using ENCRYPTION_KEY must define the rawKey property'
+      )
+    }
     authHeader = signWithDEK(bodyString, signer as EncryptionKeySigner)
   } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
+    if (!signer.contractKit) {
+      throw new Error(
+        ErrorMessages.ODIS_AUTH_ERROR +
+          ': AuthSigner using WALLET_KEY must define the contractKit property'
+      )
+    }
     authHeader = await signer.contractKit.connection.sign(bodyString, body.account)
   } else {
+    if (!signer.customSigner) {
+      throw new Error(
+        ErrorMessages.ODIS_AUTH_ERROR +
+          ': AuthSigner using CUSTOM_SIGNER must define the customSigner property'
+      )
+    }
     authHeader = await signer.customSigner(bodyString)
   }
 
