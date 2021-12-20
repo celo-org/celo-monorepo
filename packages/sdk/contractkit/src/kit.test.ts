@@ -3,7 +3,7 @@ import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { HttpProvider } from 'web3-core'
 import { XMLHttpRequest } from 'xhr2-cookies'
-import { newKitFromWeb3, newKitWithApiKey } from './kit'
+import { API_KEY_HEADER_KEY, newKitFromWeb3, newKitWithApiKey } from './kit'
 import { promiEventSpy } from './test-utils/PromiEventStub'
 
 interface TransactionObjectStub<T> extends CeloTxObject<T> {
@@ -119,7 +119,7 @@ describe('newKitWithApiKey()', () => {
     httpProvider.send(rpcPayload, (error: Error | null) => expect(error).toBeNull())
 
     // Api Key should be set in the request header
-    await expect(mockSetRequestHeader).toBeCalledTimes(2)
-    await expect(mockSetRequestHeader).toBeCalledWith('apiKey', 'key')
+    expect(mockSetRequestHeader).toBeCalledTimes(2)
+    expect(mockSetRequestHeader).toBeCalledWith(API_KEY_HEADER_KEY, 'key')
   })
 })

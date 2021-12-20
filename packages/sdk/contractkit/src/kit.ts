@@ -33,7 +33,7 @@ import { ValidatorsConfig } from './wrappers/Validators'
 
 import Types = require('web3-providers-http')
 export type HttpProviderOptions = Types.HttpProviderOptions
-const API_KEY_HEADER_KEY = 'apiKey'
+export const API_KEY_HEADER_KEY = 'apiKey'
 
 /**
  * Creates a new instance of `ContractKit` given a nodeUrl
