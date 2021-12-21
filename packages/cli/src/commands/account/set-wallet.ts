@@ -37,7 +37,7 @@ export default class SetWallet extends BaseCommand {
 
     await newCheckBuilder(this).isAccount(res.flags.account).runChecks()
 
-    if (res.flags.signature != undefined) {
+    if (res.flags.signature !== undefined) {
       try {
         accounts.parseSignatureOfAddress(res.flags.account, res.flags.signer, res.flags.signature)
       } catch (error) {
