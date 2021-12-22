@@ -119,6 +119,7 @@ async function helmParameters(
   }
 
   const params = [
+    `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${gcloudProject}`,
     `--set gcloud.region=${gcloudRegion}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
