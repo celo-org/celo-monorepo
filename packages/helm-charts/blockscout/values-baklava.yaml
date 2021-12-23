@@ -49,6 +49,10 @@ blockscout:
         memory: 250M
         cpu: 500m
     recaptchaSecretName: baklava-blockscout-recaptcha
+  metadata_crawler:
+    enabled: true
+    schedule: "*/30 * * * *"
+    discord_cluster_name: Baklava
   metrics:
     enabled: true
   chain:

@@ -47,6 +47,9 @@ blockscout:
         memory: 500Mi
         cpu: 1500m
     recaptchaSecretName: rc1-blockscout-recaptcha
+  metadata_crawler:
+    enabled: true
+    discord_cluster_name: Mainnet
   metrics:
     enabled: true
   chain:

@@ -88,10 +88,6 @@ async function helmParameters(
 ) {
   const currentGcloudAccount = await getCurrentGcloudAccount()
   const privateNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
-  const useMetadataCrawler = fetchEnvOrFallback(
-    envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY,
-    'false'
-  )
   const params = [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set blockscout.deployment.account="${currentGcloudAccount}"`,
@@ -102,28 +98,12 @@ async function helmParameters(
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
     `--set blockscout.db.drop=${fetchEnvOrFallback(envVar.BLOCKSCOUT_DROP_DB, 'false')}`,
     `--set blockscout.segment_key=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
+    // this is a secret, it has to be managed differently, moving it here for now as I got rid of the useMetadataCrawler flag
+    `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
+      envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
+      ''
+    )}`,
   ]
-  if (useMetadataCrawler !== 'false') {
-    params.push(
-      `--set blockscout.metadata_crawler.image.repository=${fetchEnv(
-        envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_REPOSITORY
-      )}`,
-      `--set blockscout.metadata_crawler.image.tag=${fetchEnv(
-        envVar.BLOCKSCOUT_METADATA_CRAWLER_IMAGE_TAG
-      )}`,
-      `--set blockscout.metadata_crawler.schedule="${fetchEnv(
-        envVar.BLOCKSCOUT_METADATA_CRAWLER_SCHEDULE
-      )}"`,
-      `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
-        envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
-        ''
-      )}`,
-      `--set blockscout.metadata_crawler.discord_cluster_name=${fetchEnvOrFallback(
-        envVar.METADATA_CRAWLER_DISCORD_CLUSTER_NAME,
-        celoEnv
-      )}`
-    )
-  }
   if (
     fetchEnvOrFallback(envVar.BLOCKSCOUT_OVERRIDE_RPC_ENDPOINT, '') !== '' &&
     fetchEnvOrFallback(envVar.BLOCKSCOUT_OVERRIDE_WS_ENDPOINT, '') !== ''

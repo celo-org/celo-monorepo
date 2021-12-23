@@ -166,7 +166,8 @@ blockscout:
       learningList: '[{"url": "https://celo.org/papers/whitepaper", "title":"Celo Whitepaper"}, {"url": "https://learn.figment.io/protocols/celo", "title":"Learn Celo"}, {"url": "https://celo.org/papers/stability", "title":"Celo Stability Analysis"}, {"url": "https://www.coinbase.com/price/celo", "title":"Coinbase Earn"}]'
     recaptchaSecretName: ""  # k8s secret that needs to pre-exist
   metadata_crawler:
-    schedule: "*/30 * * * *"
+    enabled: false
+    schedule: "0 */2 * * *"
     image:
       repository: gcr.io/celo-testnet/celo-monorepo
       tag: metadata-crawler-77a392216d4927e85ce4b683508fc0539aa92a34

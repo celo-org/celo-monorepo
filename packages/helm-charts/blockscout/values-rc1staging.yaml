@@ -48,7 +48,7 @@ blockscout:
         cpu: 500m
     recaptchaSecretName: rc1staging-blockscout-recaptcha
   metadata_crawler:
-    schedule: "0 */2 * * *"
+    enabled: true
   metrics:
     enabled: true
   jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
