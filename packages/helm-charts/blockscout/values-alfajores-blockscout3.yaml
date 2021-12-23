@@ -7,7 +7,7 @@ blockscout:
           requests:
             memory: 250Mi
             cpu: 200m
-    pool_size: 20
+    poolSize: 20
     resources:
       requests:
         memory: 700Mi
@@ -25,7 +25,7 @@ blockscout:
           requests:
             memory: 250Mi
             cpu: 200m
-    pool_size: 10
+    poolSize: 10
     resources:
       requests:
         memory: 250Mi
@@ -44,13 +44,13 @@ blockscout:
           requests:
             memory: 250Mi
             cpu: 200m
-    pool_size: 10
+    poolSize: 10
     resources:
       requests:
         memory: 250M
         cpu: 500m
     recaptchaSecretName: alfajores-blockscout-recaptcha
-  metadata_crawler:
+  metadataCrawler:
     enabled: true
     schedule: "*/30 * * * *"
   metrics:

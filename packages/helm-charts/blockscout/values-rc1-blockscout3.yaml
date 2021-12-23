@@ -7,7 +7,7 @@ blockscout:
           requests:
             memory: 4Gi
             cpu: 500m
-    pool_size: 100
+    poolSize: 100
     resources:
       requests:
         memory: 12Gi
@@ -25,7 +25,7 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 300m
-    pool_size: 30
+    poolSize: 30
     resources:
       requests:
         memory: 500Mi
@@ -44,18 +44,21 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 300m
-    pool_size: 30
+    poolSize: 30
     resources:
       requests:
         memory: 500Mi
         cpu: 1500m
     recaptchaSecretName: rc1-blockscout-recaptcha
-  metadata_crawler:
+    stats:
+      enabled: true
+      reportUrl: https://datastudio.google.com/embed/reporting/e0a253b1-fa37-43d0-bbc3-2706a64f2211/page/hDehC?hl=en
+  metadataCrawler:
     enabled: true
-    discord_cluster_name: Mainnet
+    discordClusterName: Mainnet
   archiveNodes:
-    jsonrpc_http_url: http://rc1-fullnodes-rpc-internal-lb:8545
-    jsonrpc_ws_url: ws://rc1-fullnodes-rpc-internal-lb:8545
+    jsonrpcHttpUrl: http://rc1-fullnodes-rpc-internal-lb:8545
+    jsonrpcWsUrl: ws://rc1-fullnodes-rpc-internal-lb:8545
   metrics:
     enabled: true
   chain:
