@@ -84,7 +84,6 @@ async function helmParameters(
 ) {
   const currentGcloudAccount = await getCurrentGcloudAccount()
   const params = [
-    `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set blockscout.deployment.account="${currentGcloudAccount}"`,
     `--set blockscout.deployment.timestamp="${new Date().toISOString()}"`,
     `--set blockscout.image.tag=${imageTag}`,

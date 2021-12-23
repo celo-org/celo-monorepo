@@ -30,10 +30,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Release.Name }}.{{ .Values.domain.name }}.org
+    - {{ .Release.Name }}.{{ .Values.blockscout.domainName }}
     secretName: {{ .Release.Name }}-web-tls
   rules:
-  - host: {{ .Release.Name }}.{{ .Values.domain.name }}.org
+  - host: {{ .Release.Name }}.{{ .Values.blockscout.domainName }}
     http:
       paths:
       - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)

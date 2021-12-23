@@ -19,10 +19,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Release.Name }}-api.{{ .Values.domain.name }}.org
+    - {{ .Release.Name }}-api.{{ .Values.blockscout.domainName }}
     secretName: {{ .Release.Name }}-api-tls
   rules:
-  - host: {{ .Release.Name }}-api.{{ .Values.domain.name }}.org
+  - host: {{ .Release.Name }}-api.{{ .Values.blockscout.domainName }}
     http:
       paths:
       - path: /
