@@ -89,8 +89,8 @@ spec:
           value: {{ .Values.blockscout.indexer.pool_size | quote }}
         - name: METRICS_ENABLED
           value: "{{.Values.blockscout.metrics.enabled}}"
-{{ include "celo.blockscout-env-vars" . | indent 8 }}
-{{- $data := dict "Values" .Values "Database" .Values.blockscout.indexer.db }}
+{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
+{{ include "celo.blockscout-env-vars" $data | indent 8 }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:

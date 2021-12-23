@@ -25,8 +25,7 @@ export async function installHelmChart(
   releaseName: string,
   imageTag: string,
   blockscoutDBUsername: string,
-  blockscoutDBPassword: string,
-  blockscoutDBConnectionName: string
+  blockscoutDBPassword: string
 ) {
   const valuesEnvFile = fs.existsSync(`${helmChartPath}/values-${celoEnv}.yaml`)
     ? `values-${celoEnv}.yaml`
@@ -35,12 +34,7 @@ export async function installHelmChart(
     celoEnv,
     releaseName,
     helmChartPath,
-    await helmParameters(
-      imageTag,
-      blockscoutDBUsername,
-      blockscoutDBPassword,
-      blockscoutDBConnectionName
-    ),
+    await helmParameters(imageTag, blockscoutDBUsername, blockscoutDBPassword),
     true,
     valuesEnvFile
   )
@@ -55,22 +49,16 @@ export async function upgradeHelmChart(
   helmReleaseName: string,
   imageTag: string,
   blockscoutDBUsername: string,
-  blockscoutDBPassword: string,
-  blockscoutDBConnectionName: string
+  blockscoutDBPassword: string
 ) {
   console.info(`Upgrading helm release ${helmReleaseName}`)
-  const params = await helmParameters(
-    imageTag,
-    blockscoutDBUsername,
-    blockscoutDBPassword,
-    blockscoutDBConnectionName
-  )
+  const params = await helmParameters(imageTag, blockscoutDBUsername, blockscoutDBPassword)
   await upgradeGenericHelmChart(
     celoEnv,
     helmReleaseName,
     helmChartPath,
     params,
-    `values-${celoEnv}.yaml`
+    `values-${helmReleaseName}.yaml`
   )
 
   console.info(`Helm release ${helmReleaseName} upgrade successful`)
@@ -79,8 +67,7 @@ export async function upgradeHelmChart(
 async function helmParameters(
   imageTag: string,
   blockscoutDBUsername: string,
-  blockscoutDBPassword: string,
-  blockscoutDBConnectionName: string
+  blockscoutDBPassword: string
 ) {
   const currentGcloudAccount = await getCurrentGcloudAccount()
   const params = [
@@ -88,7 +75,6 @@ async function helmParameters(
     `--set blockscout.image.tag=${imageTag}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
-    `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
     `--set blockscout.segment_key=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
     // this is a secret, it has to be managed differently, moving it here for now as I got rid of the useMetadataCrawler flag
     `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(

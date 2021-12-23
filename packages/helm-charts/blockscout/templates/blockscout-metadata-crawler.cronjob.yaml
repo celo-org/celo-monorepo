@@ -56,6 +56,7 @@ spec:
             volumeMounts:
             - mountPath: /tmp/pod
               name: tmp-pod
-{{ include "celo.blockscout-db-terminating-sidecar" .  | indent 10 }}
+{{- $data := dict "Values" .Values "Database" .Values.blockscout.indexer.db }}
+{{ include "celo.blockscout-db-terminating-sidecar" $data | indent 10 }}
           restartPolicy: Never
 {{- end}}

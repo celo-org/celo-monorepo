@@ -1,6 +1,7 @@
 blockscout:
   indexer:
     db:
+      connectionName: celo-testnet-production:us-west1:rc1staging
       proxy:
         resources:
           requests:
@@ -13,29 +14,12 @@ blockscout:
         cpu: 5
   api:
     autoscaling:
-        maxReplicas: 5
-        minReplicas: 2
-        target:
-          cpu: 70
-    db:
-      proxy:
-        resources:
-          requests:
-            memory: 500Mi
-            cpu: 300m
-    pool_size: 30
-    resources:
-      requests:
-        memory: 500Mi
-        cpu: 1500m
-  web:
-    host: explorer.celo.org
-    autoscaling:
-      maxReplicas: 5
-      minReplicas: 2
+      maxReplicas: 2
+      minReplicas: 1
       target:
         cpu: 70
     db:
+      connectionName: celo-testnet-production:us-west1:rc1staging-replica
       proxy:
         resources:
           requests:
@@ -45,14 +29,32 @@ blockscout:
     resources:
       requests:
         memory: 500Mi
-        cpu: 1500m
-    recaptchaSecretName: rc1-blockscout-recaptcha
+        cpu: 500m
+  web:
+    host: rc1staging-blockscout.celo-testnet.org
+    autoscaling:
+      maxReplicas: 2
+      minReplicas: 1
+      target:
+        cpu: 70
+    db:
+      connectionName: celo-testnet-production:us-west1:rc1staging
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 300m
+    pool_size: 30
+    resources:
+      requests:
+        memory: 250M
+        cpu: 500m
+    recaptchaSecretName: rc1staging-blockscout-recaptcha
   metadata_crawler:
     enabled: true
-    discord_cluster_name: Mainnet
   archiveNodes:
-    jsonrpc_http_url: http://rc1-fullnodes-rpc-internal-lb:8545
-    jsonrpc_ws_url: ws://rc1-fullnodes-rpc-internal-lb:8545
+    jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
+    jsonrpc_ws_url: ws://rc1staging-archivenodes-rpc:8545
   metrics:
     enabled: true
   chain:

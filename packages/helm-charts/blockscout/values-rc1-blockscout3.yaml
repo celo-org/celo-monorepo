@@ -1,0 +1,63 @@
+blockscout:
+  indexer:
+    db:
+      connectionName: celo-testnet-production:us-west1:rc13
+      proxy:
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 500m
+    pool_size: 100
+    resources:
+      requests:
+        memory: 12Gi
+        cpu: 5
+  api:
+    autoscaling:
+        maxReplicas: 5
+        minReplicas: 2
+        target:
+          cpu: 70
+    db:
+      connectionName: celo-testnet-production:us-west1:rc13-replica
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 300m
+    pool_size: 30
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 1500m
+  web:
+    host: explorer.celo.org
+    autoscaling:
+      maxReplicas: 5
+      minReplicas: 2
+      target:
+        cpu: 70
+    db:
+      connectionName: celo-testnet-production:us-west1:rc13
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 300m
+    pool_size: 30
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 1500m
+    recaptchaSecretName: rc1-blockscout-recaptcha
+  metadata_crawler:
+    enabled: true
+    discord_cluster_name: Mainnet
+  archiveNodes:
+    jsonrpc_http_url: http://rc1-fullnodes-rpc-internal-lb:8545
+    jsonrpc_ws_url: ws://rc1-fullnodes-rpc-internal-lb:8545
+  metrics:
+    enabled: true
+  chain:
+    subnetwork: Celo
+    networkID: 42220

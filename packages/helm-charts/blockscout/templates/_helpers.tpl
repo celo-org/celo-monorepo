@@ -30,7 +30,7 @@ the `volumes` section.
   - -c
   - |
     /cloud_sql_proxy \
-    -instances={{ .Values.blockscout.db.connection_name }}=tcp:5432 \
+    -instances={{ .Database.connectionName }}=tcp:{{ .Database.port }} \
     -credential_file=/secrets/cloudsql/credentials.json &
     CHILD_PID=$!
     (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; fi; sleep 1; done) &
@@ -65,7 +65,7 @@ the `volumes` section.
 - name: cloudsql-proxy
   image: gcr.io/cloudsql-docker/gce-proxy:1.19.1
   command: ["/cloud_sql_proxy",
-            "-instances={{ .Values.blockscout.db.connection_name }}{{ .DbSuffix | default "" }}=tcp:5432",
+            "-instances={{ .Database.connectionName }}=tcp:{{ .Database.port }}",
             "-credential_file=/secrets/cloudsql/credentials.json",
             "-term_timeout=30s"]
   {{- if .Database.proxy.livenessProbe.enabled }}
@@ -139,13 +139,13 @@ blockscout components.
 - name: PGUSER
   value: $(DATABASE_USER)
 - name: DATABASE_URL
-  value: postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@127.0.0.1:5432/{{ .Values.blockscout.db.name }}
+  value: postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@{{ .Database.proxy.host }}:{{ .Database.proxy.port }}/{{ .Database.name }}
 - name: DATABASE_DB
-  value: {{ .Values.blockscout.db.name }}
+  value: {{ .Database.name }}
 - name: DATABASE_HOSTNAME
-  value: "127.0.0.1"
+  value: {{ .Database.proxy.host | quote }}
 - name: DATABASE_PORT
-  value: "5432"
+  value: {{ .Database.proxy.port | quote }}
 - name: WOBSERVER_ENABLED
   value: "false"
 - name: HEALTHY_BLOCKS_PERIOD

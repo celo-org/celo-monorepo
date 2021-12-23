@@ -7,7 +7,14 @@ blockscout:
         maxSurge: 1
         maxUnavailable: 0
     db:
+      name: blockscout
+      connectionName: project:region:db-name
+      # to be fetched from secrets
+      # username: blockscout
+      # password: password
+      port: 5432
       proxy:
+        host: 127.0.0.1
         port: 5432
         livenessProbe:
           enabled: false
@@ -59,7 +66,14 @@ blockscout:
         target:
           cpu: 70
     db:
+      name: blockscout
+      connectionName: project:region:db-name
+      # to be fetched from secrets
+      # username: blockscout
+      # password: password
+      port: 5432
       proxy:
+        host: 127.0.0.1
         port: 5432
         livenessProbe:
           enabled: false
@@ -111,7 +125,14 @@ blockscout:
       target:
         cpu: 70
     db:
+      name: blockscout
+      connectionName: project:region:db-name
+      # to be fetched from secrets
+      # username: blockscout
+      # password: password
+      port: 5432
       proxy:
+        host: 127.0.0.1
         port: 5432
         livenessProbe:
           enabled: false
@@ -180,11 +201,6 @@ blockscout:
     tag: v2.0.4-beta-celo
   healthy_blocks_period: 300
   db:
-    # ip: must be provided at runtime # IP address of the postgres DB
-    # connection_name: must be provided at runtime # name of the cloud sql connection
-    # username: blockscout
-    # password: password
-    name: blockscout
     drop: "false"
   chain:
     subnetwork: Celo

@@ -1,0 +1,63 @@
+blockscout:
+  indexer:
+    db:
+      connectionName: celo-testnet-production:us-west1:baklava2
+      proxy:
+        resources:
+          requests:
+            memory: 250Mi
+            cpu: 200m
+    pool_size: 30
+    resources:
+      requests:
+        memory: 1000Mi
+        cpu: 2
+    metrics:
+      enabled: true
+  api:
+    autoscaling:
+        maxReplicas: 3
+        minReplicas: 2
+        target:
+          cpu: 70
+    db:
+      connectionName: celo-testnet-production:us-west1:baklava2-replica
+      proxy:
+        resources:
+          requests:
+            memory: 250Mi
+            cpu: 200m
+    pool_size: 10
+    resources:
+      requests:
+        memory: 250Mi
+        cpu: 500m
+  web:
+    host: baklava-blockscout.celo-testnet.org
+    autoscaling:
+      maxReplicas: 3
+      minReplicas: 2
+      target:
+        cpu: 70
+    db:
+      connectionName: celo-testnet-production:us-west1:baklava2
+      proxy:
+        resources:
+          requests:
+            memory: 250Mi
+            cpu: 200m
+    pool_size: 10
+    resources:
+      requests:
+        memory: 250M
+        cpu: 500m
+    recaptchaSecretName: baklava-blockscout-recaptcha
+  metadata_crawler:
+    enabled: true
+    schedule: "*/30 * * * *"
+    discord_cluster_name: Baklava
+  metrics:
+    enabled: true
+  chain:
+    subnetwork: Baklava
+    networkID: 62320
