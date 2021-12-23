@@ -86,7 +86,7 @@ spec:
         - name: DISABLE_WEBAPP
           value: "true"
         - name: POOL_SIZE
-          value: {{ .Values.blockscout.indexer.pool_size | quote }}
+          value: {{ .Values.blockscout.indexer.poolSize | quote }}
         - name: METRICS_ENABLED
           value: "{{.Values.blockscout.metrics.enabled}}"
 {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}

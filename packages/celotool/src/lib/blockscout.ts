@@ -71,13 +71,13 @@ async function helmParameters(
 ) {
   const currentGcloudAccount = await getCurrentGcloudAccount()
   const params = [
-    `--set change_cause="Deployed ${imageTag} by ${currentGcloudAccount} on ${new Date().toISOString()}"`,
+    `--set changeCause="Deployed ${imageTag} by ${currentGcloudAccount} on ${new Date().toISOString()}"`,
     `--set blockscout.image.tag=${imageTag}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
-    `--set blockscout.segment_key=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
+    `--set blockscout.segmentKey=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
     // this is a secret, it has to be managed differently, moving it here for now as I got rid of the useMetadataCrawler flag
-    `--set blockscout.metadata_crawler.discord_webhook_url=${fetchEnvOrFallback(
+    `--set blockscout.metadataCrawler.discordWebhookUrl=${fetchEnvOrFallback(
       envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
       ''
     )}`,

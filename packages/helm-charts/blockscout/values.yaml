@@ -34,7 +34,7 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 30
+    poolSize: 30
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -93,7 +93,7 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 30
+    poolSize: 30
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -152,7 +152,7 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 30
+    poolSize: 30
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -186,20 +186,20 @@ blockscout:
       resourcesList: '[{"url":"https://docs.celo.org/", "title":"Celo Docs"}, {"url":"https://celoreserve.org/", "title":"Celo Reserve"}, {"url":"https://forum.celo.org/", "title":"Celo Forum"}, {"url":"https://celohub.org/", "title":"Celo Hub"}, {"url":"https://thecelo.com/", "title":"TheCelo"}, {"url":"https://stats.celo.org/", "title":"Celo Stats"}, {"url":"https://celo.org/validators/explore", "title":"Validators"}]'
       learningList: '[{"url": "https://celo.org/papers/whitepaper", "title":"Celo Whitepaper"}, {"url": "https://learn.figment.io/protocols/celo", "title":"Learn Celo"}, {"url": "https://celo.org/papers/stability", "title":"Celo Stability Analysis"}, {"url": "https://www.coinbase.com/price/celo", "title":"Coinbase Earn"}]'
     recaptchaSecretName: ""  # k8s secret that needs to pre-exist
-  metadata_crawler:
+  metadataCrawler:
     enabled: false
     schedule: "0 */2 * * *"
     image:
       repository: gcr.io/celo-testnet/celo-monorepo
       tag: metadata-crawler-77a392216d4927e85ce4b683508fc0539aa92a34
   archiveNodes:
-    jsonrpc_http_url: http://tx-nodes-private:8545
-    jsonrpc_ws_url: ws://tx-nodes-private:8545
+    jsonrpcHttpUrl: http://tx-nodes-private:8545
+    jsonrpcWsUrl: ws://tx-nodes-private:8545
   image:
     repository: gcr.io/celo-testnet/blockscout
     pullPolicy: IfNotPresent
     tag: v2.0.4-beta-celo
-  healthy_blocks_period: 300
+  healthyBlocksPeriod: 300
   db:
     drop: "false"
   chain:

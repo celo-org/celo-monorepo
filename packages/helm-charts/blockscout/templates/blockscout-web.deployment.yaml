@@ -85,7 +85,7 @@ spec:
         - name: DISABLE_INDEXER
           value: "true"
         - name: POOL_SIZE
-          value: {{ .Values.blockscout.web.pool_size | quote }}
+          value: {{ .Values.blockscout.web.poolSize | quote }}
         - name: BLOCKSCOUT_HOST
           value: {{ .Values.blockscout.web.host | quote }}
         - name: ENABLE_SOURCIFY_INTEGRATION

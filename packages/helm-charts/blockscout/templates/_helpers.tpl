@@ -12,7 +12,7 @@ heritage: {{ .Release.Service }}
 Defines common annotations across all blockscout components.
 */ -}}
 {{- define "celo.blockscout.annotations" -}}
-kubernetes.io/change-cause: {{ .Values.change_cause }}
+kubernetes.io/change-cause: {{ .Values.changeCause }}
 {{- end -}}
 
 {{- /*
@@ -127,15 +127,15 @@ blockscout components.
 - name: COIN
   value: CELO
 - name: SEGMENT_KEY
-  value: {{ .Values.blockscout.segment_key }}
+  value: {{ .Values.blockscout.segmentKey }}
 - name: ECTO_USE_SSL
   value: "false"
 - name: ETHEREUM_JSONRPC_VARIANT
   value: geth
 - name: ETHEREUM_JSONRPC_HTTP_URL
-  value: {{ .Values.blockscout.archiveNodes.jsonrpc_http_url }}
+  value: {{ .Values.blockscout.archiveNodes.jsonrpcHttpUrl }}
 - name: ETHEREUM_JSONRPC_WS_URL
-  value: {{ .Values.blockscout.archiveNodes.jsonrpc_ws_url }}
+  value: {{ .Values.blockscout.archiveNodes.jsonrpcWsUrl }}
 - name: PGUSER
   value: $(DATABASE_USER)
 - name: DATABASE_URL
@@ -149,7 +149,7 @@ blockscout components.
 - name: WOBSERVER_ENABLED
   value: "false"
 - name: HEALTHY_BLOCKS_PERIOD
-  value: {{ .Values.blockscout.healthy_blocks_period | quote }}
+  value: {{ .Values.blockscout.healthyBlocksPeriod | quote }}
 - name: MIX_ENV
   value: prod
 - name: LOGO

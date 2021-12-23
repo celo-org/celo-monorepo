@@ -7,7 +7,7 @@ blockscout:
           requests:
             memory: 4Gi
             cpu: 2
-    pool_size: 100
+    poolSize: 100
     resources:
       requests:
         memory: 12Gi
@@ -27,7 +27,7 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 10
+    poolSize: 10
     resources:
       requests:
         memory: 500Mi
@@ -46,17 +46,17 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 10
+    poolSize: 10
     resources:
       requests:
         memory: 250M
         cpu: 500m
     recaptchaSecretName: blockscoutstagingrc1-blockscout-recaptcha
-  metadata_crawler:
+  metadataCrawler:
     enabled: true
   archiveNodes:
-    jsonrpc_http_url: http://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
-    jsonrpc_ws_url: ws://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
+    jsonrpcHttpUrl: http://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
+    jsonrpcWsUrl: ws://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
   metrics:
     enabled: false
   chain:
