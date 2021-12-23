@@ -14,7 +14,7 @@ spec:
       containers:
       - name: blockscout-migration
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
         command:
         - /bin/sh
         - -c

@@ -36,14 +36,14 @@ spec:
       initContainers:
       - name: "blockscout-init"
         image: "groundnuty/k8s-wait-for:1.3"
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
         args:
         - job
         - {{ .Release.Name }}-migration
       containers:
       - name: blockscout-api
         image: {{ .Values.blockscout.image.repository }}:api-{{ .Values.blockscout.image.tag }}
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
         command:
         - /bin/sh
         - -c
