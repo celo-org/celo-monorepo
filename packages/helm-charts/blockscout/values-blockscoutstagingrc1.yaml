@@ -51,6 +51,9 @@ blockscout:
     recaptchaSecretName: blockscoutstagingrc1-blockscout-recaptcha
   metadata_crawler:
     enabled: true
+  archiveNodes:
+    jsonrpc_http_url: http://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
+    jsonrpc_ws_url: ws://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
   metrics:
     enabled: false
   chain:

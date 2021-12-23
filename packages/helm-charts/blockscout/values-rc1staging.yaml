@@ -53,6 +53,9 @@ blockscout:
       makerdojo: '{"attestations": "https://makerdojo.io/public/dashboards/DjNVIYqQiyxIEcTx3Io4IwQg7U56lqQPyrSYdnXl?embed=clabs","uniswap":"https://makerdojo.io/public/dashboards/1qUlHeb7W9jnPVuXv6yeRatEYxSXPDsFQUODR1bp?embed=clabs","moola":"https://makerdojo.io/public/dashboards/tWnDs1CsMQyaSLHFHj0MUoNz20WbxjGv72fCTxgq?embed=clabs"}'
   metadata_crawler:
     enabled: true
+  archiveNodes:
+    jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
+    jsonrpc_ws_url: ws://rc1staging-archivenodes-rpc:8545
   metrics:
     enabled: true
   jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
