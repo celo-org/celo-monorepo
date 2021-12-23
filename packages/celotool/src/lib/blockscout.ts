@@ -84,8 +84,7 @@ async function helmParameters(
 ) {
   const currentGcloudAccount = await getCurrentGcloudAccount()
   const params = [
-    `--set blockscout.deployment.account="${currentGcloudAccount}"`,
-    `--set blockscout.deployment.timestamp="${new Date().toISOString()}"`,
+    `--set change_cause="Deployed ${imageTag} by ${currentGcloudAccount} on ${new Date().toISOString()}"`,
     `--set blockscout.image.tag=${imageTag}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,

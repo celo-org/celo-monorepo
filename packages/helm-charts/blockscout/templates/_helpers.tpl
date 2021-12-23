@@ -12,7 +12,7 @@ heritage: {{ .Release.Service }}
 Defines common annotations across all blockscout components.
 */ -}}
 {{- define "celo.blockscout.annotations" -}}
-kubernetes.io/change-cause: Deployed {{ .Values.blockscout.image.tag }} by {{ .Values.blockscout.deployment.account }} on {{ .Values.blockscout.deployment.timestamp }}
+kubernetes.io/change-cause: {{ .Values.change_cause }}
 {{- end -}}
 
 {{- /*
