@@ -49,3 +49,5 @@ blockscout:
     recaptchaSecretName: alfajores-blockscout-recaptcha
   metrics:
     enabled: true
+  chain:
+    subnetwork: Alfajores

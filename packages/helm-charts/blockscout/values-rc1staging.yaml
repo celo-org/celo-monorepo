@@ -59,4 +59,3 @@ db:
 domain_name: 'celo-testnet'
 
 network_id: 42220
-subnetwork: 'Celo'

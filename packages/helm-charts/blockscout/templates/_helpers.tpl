@@ -123,7 +123,7 @@ blockscout components.
 - name: NETWORK
   value: Celo
 - name: SUBNETWORK
-  value: {{ .Values.blockscout.subnetwork }}
+  value: {{ .Values.blockscout.chain.subnetwork }}
 - name: COIN
   value: CELO
 - name: SEGMENT_KEY

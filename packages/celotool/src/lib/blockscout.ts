@@ -101,10 +101,6 @@ async function helmParameters(
     `--set blockscout.db.password=${blockscoutDBPassword}`,
     `--set blockscout.db.connection_name=${blockscoutDBConnectionName.trim()}`,
     `--set blockscout.db.drop=${fetchEnvOrFallback(envVar.BLOCKSCOUT_DROP_DB, 'false')}`,
-    `--set blockscout.subnetwork="${fetchEnvOrFallback(
-      envVar.BLOCKSCOUT_SUBNETWORK_NAME,
-      celoEnv
-    )}"`,
     `--set blockscout.segment_key=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
     `--set blockscout.networkID=${fetchEnv(envVar.NETWORK_ID)}`,
   ]

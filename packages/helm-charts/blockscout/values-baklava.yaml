@@ -51,3 +51,5 @@ blockscout:
     recaptchaSecretName: baklava-blockscout-recaptcha
   metrics:
     enabled: true
+  chain:
+    subnetwork: Baklava
