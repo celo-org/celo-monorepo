@@ -1,6 +1,7 @@
 blockscout:
   indexer:
     db:
+      connectionName: celo-testnet-production:us-west1:rc1staging
       proxy:
         resources:
           requests:
@@ -13,29 +14,12 @@ blockscout:
         cpu: 5
   api:
     autoscaling:
-        maxReplicas: 5
-        minReplicas: 2
-        target:
-          cpu: 70
-    db:
-      proxy:
-        resources:
-          requests:
-            memory: 500Mi
-            cpu: 300m
-    pool_size: 30
-    resources:
-      requests:
-        memory: 500Mi
-        cpu: 1500m
-  web:
-    host: explorer.celo.org
-    autoscaling:
-      maxReplicas: 5
-      minReplicas: 2
+      maxReplicas: 2
+      minReplicas: 1
       target:
         cpu: 70
     db:
+      connectionName: celo-testnet-production:us-west1:rc1staging-replica
       proxy:
         resources:
           requests:
@@ -45,21 +29,48 @@ blockscout:
     resources:
       requests:
         memory: 500Mi
-        cpu: 1500m
-    recaptchaSecretName: rc1-blockscout-recaptcha
+        cpu: 500m
+  web:
+    host: rc1staging-blockscout.celo-testnet.org
+    autoscaling:
+      maxReplicas: 1
+      minReplicas: 1
+      target:
+        cpu: 70
+    db:
+      connectionName: celo-testnet-production:us-west1:rc1staging
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 300m
+    pool_size: 30
+    resources:
+      requests:
+        memory: 250M
+        cpu: 500m
+    recaptchaSecretName: rc1staging-blockscout-recaptcha
     stats:
       enabled: true
       reportUrl: '{"overview": "https://datastudio.google.com/embed/reporting/60bea1af-3e82-4eb0-a313-158582baa710/page/hDehC?hl=en", "addresses":"https://datastudio.google.com/embed/reporting/1e334bed-f7c9-4ee6-ac77-2c4cc3dae04c/page/hDehC?hl=en", "cStables":"https://datastudio.google.com/embed/reporting/28a3620e-e12d-41ea-b361-d44b82cbfeda/page/hDehC?hl=en", "transactions":"https://datastudio.google.com/embed/reporting/c5ecbd9b-d277-488f-8caf-4c8b64305e55/page/hDehC?hl=en", "reserve": "https://datastudio.google.com/embed/reporting/965b3c9f-6d36-4d45-818d-34d4f59d89dd/page/hDehC?hl=en"}'
       makerdojo: '{"attestations": "https://makerdojo.io/public/dashboards/DjNVIYqQiyxIEcTx3Io4IwQg7U56lqQPyrSYdnXl?embed=clabs","uniswap":"https://makerdojo.io/public/dashboards/1qUlHeb7W9jnPVuXv6yeRatEYxSXPDsFQUODR1bp?embed=clabs","moola":"https://makerdojo.io/public/dashboards/tWnDs1CsMQyaSLHFHj0MUoNz20WbxjGv72fCTxgq?embed=clabs"}'
   metadata_crawler:
     enabled: true
-    discord_cluster_name: Mainnet
   archiveNodes:
-    jsonrpc_http_url: http://rc1-fullnodes-rpc-internal-lb:8545
-    jsonrpc_ws_url: ws://rc1-fullnodes-rpc-internal-lb:8545
+    jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
+    jsonrpc_ws_url: ws://rc1staging-archivenodes-rpc:8545
   metrics:
     enabled: true
+  jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
+  jsonrpc_ws_url: ws://rc1staging-archivenodes-rpc:8545
   jsonrpc_public_http: https://forno.celo.org
+  epoch_rewards:
+    enabled: true
   chain:
     subnetwork: Celo
     networkID: 42220
+
+db:
+  drop: false
+
+domain_name: 'celo-testnet'

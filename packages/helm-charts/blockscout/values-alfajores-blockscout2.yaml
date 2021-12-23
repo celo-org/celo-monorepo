@@ -1,6 +1,7 @@
 blockscout:
   indexer:
     db:
+      connectionName: celo-testnet-production:us-west1:alfajores2
       proxy:
         resources:
           requests:
@@ -18,6 +19,7 @@ blockscout:
         target:
           cpu: 70
     db:
+      connectionName: celo-testnet-production:us-west1:alfajores2-replica
       proxy:
         resources:
           requests:
@@ -36,6 +38,7 @@ blockscout:
       target:
         cpu: 70
     db:
+      connectionName: celo-testnet-production:us-west1:alfajores2
       proxy:
         resources:
           requests:

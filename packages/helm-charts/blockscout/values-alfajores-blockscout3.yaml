@@ -1,0 +1,60 @@
+blockscout:
+  indexer:
+    db:
+      connectionName: celo-testnet-production:us-west1:alfajores3
+      proxy:
+        resources:
+          requests:
+            memory: 250Mi
+            cpu: 200m
+    pool_size: 20
+    resources:
+      requests:
+        memory: 700Mi
+        cpu: 1500m
+  api:
+    autoscaling:
+        maxReplicas: 3
+        minReplicas: 2
+        target:
+          cpu: 70
+    db:
+      connectionName: celo-testnet-production:us-west1:alfajores3-replica
+      proxy:
+        resources:
+          requests:
+            memory: 250Mi
+            cpu: 200m
+    pool_size: 10
+    resources:
+      requests:
+        memory: 250Mi
+        cpu: 500m
+  web:
+    host: alfajores-blockscout.celo-testnet.org
+    autoscaling:
+      maxReplicas: 3
+      minReplicas: 2
+      target:
+        cpu: 70
+    db:
+      connectionName: celo-testnet-production:us-west1:alfajores3
+      proxy:
+        resources:
+          requests:
+            memory: 250Mi
+            cpu: 200m
+    pool_size: 10
+    resources:
+      requests:
+        memory: 250M
+        cpu: 500m
+    recaptchaSecretName: alfajores-blockscout-recaptcha
+  metadata_crawler:
+    enabled: true
+    schedule: "*/30 * * * *"
+  metrics:
+    enabled: true
+  chain:
+    subnetwork: Alfajores
+    networkID: 44787

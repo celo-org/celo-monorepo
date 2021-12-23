@@ -55,8 +55,7 @@ export const handler = async (argv: InitialArgv) => {
     helmReleaseName,
     imageTag,
     blockscoutCredentials[0],
-    blockscoutCredentials[1],
-    blockscoutCredentials[2]
+    blockscoutCredentials[1]
   )
 
   if (!isCelotoolHelmDryRun()) {
