@@ -96,7 +96,6 @@ async function helmParameters(
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set blockscout.deployment.account="${currentGcloudAccount}"`,
     `--set blockscout.deployment.timestamp="${new Date().toISOString()}"`,
-    `--set blockscout.image.repository=${fetchEnv(envVar.BLOCKSCOUT_DOCKER_IMAGE_REPOSITORY)}`,
     `--set blockscout.image.tag=${imageTag}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,

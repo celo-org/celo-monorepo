@@ -1,4 +1,3 @@
-imagePullPolicy: IfNotPresent
 blockscout:
   indexer:
     db:
