@@ -1,3 +1,4 @@
+{{- if .Values.blockscout.metadata_crawler.enabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -57,3 +58,4 @@ spec:
               name: tmp-pod
 {{ include "celo.blockscout-db-terminating-sidecar" .  | indent 10 }}
           restartPolicy: Never
+{{- end}}

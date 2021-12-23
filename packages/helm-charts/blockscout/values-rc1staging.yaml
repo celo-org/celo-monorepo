@@ -51,7 +51,7 @@ blockscout:
       enabled: true
       reportUrl: '{"overview": "https://datastudio.google.com/embed/reporting/1a4324da-ed18-40ff-954b-5e621fa6cb3a/page/hDehC?hl=en", "addresses":"https://datastudio.google.com/embed/reporting/9524e606-ff9d-498b-9cee-1e139a25d458/page/hDehC?hl=en", "cStables":"https://datastudio.google.com/embed/reporting/0dd3299c-1133-4f32-9ec8-9a409924b69a/page/hDehC?hl=en", "transactions":"https://datastudio.google.com/embed/reporting/c5a8beb4-a3e8-478e-bdc1-c7acd39abcd2/page/hDehC?hl=en", "reserve": "https://datastudio.google.com/embed/reporting/082743c9-5f65-46b5-b4ef-3c1c38729042/page/hDehC?hl=en"}'
   metadata_crawler:
-    schedule: "0 */2 * * *"
+    enabled: true
   metrics:
     enabled: true
   jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545

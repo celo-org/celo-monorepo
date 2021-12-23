@@ -173,7 +173,8 @@ blockscout:
       enabled: false
       reportUrl: ""
   metadata_crawler:
-    schedule: "*/30 * * * *"
+    enabled: false
+    schedule: "0 */2 * * *"
     image:
       repository: gcr.io/celo-testnet/celo-monorepo
       tag: metadata-crawler-77a392216d4927e85ce4b683508fc0539aa92a34
