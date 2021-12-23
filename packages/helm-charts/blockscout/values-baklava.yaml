@@ -54,3 +54,4 @@ blockscout:
   jsonrpc_public_http: https://baklava-forno.celo-testnet.org
   chain:
     subnetwork: Baklava
+    networkID: 62320

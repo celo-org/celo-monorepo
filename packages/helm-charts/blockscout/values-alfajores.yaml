@@ -52,3 +52,4 @@ blockscout:
   jsonrpc_public_http: https://alfajores-forno.celo-testnet.org
   chain:
     subnetwork: Alfajores
+    networkID: 44787

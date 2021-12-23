@@ -199,3 +199,4 @@ blockscout:
     enabled: false
   chain:
     subnetwork: Celo
+    networkID: 1101

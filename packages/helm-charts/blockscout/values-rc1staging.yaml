@@ -60,10 +60,11 @@ blockscout:
   jsonrpc_public_http: https://forno.celo.org
   epoch_rewards:
     enabled: true
+  chain:
+    subnetwork: Celo
+    networkID: 42220
 
 db:
   drop: false
 
 domain_name: 'celo-testnet'
-
-network_id: 42220
