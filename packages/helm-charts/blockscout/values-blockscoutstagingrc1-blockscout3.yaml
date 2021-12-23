@@ -1,6 +1,7 @@
 blockscout:
   indexer:
     db:
+      connectionName: celo-testnet:us-west1:blockscoutstagingrc13
       proxy:
         resources:
           requests:
@@ -20,6 +21,7 @@ blockscout:
       target:
         cpu: 70
     db:
+      connectionName: celo-testnet:us-west1:blockscoutstagingrc13-replica
       proxy:
         resources:
           requests:
@@ -38,6 +40,7 @@ blockscout:
       target:
         cpu: 70
     db:
+      connectionName: celo-testnet:us-west1:blockscoutstagingrc13
       proxy:
         resources:
           requests:

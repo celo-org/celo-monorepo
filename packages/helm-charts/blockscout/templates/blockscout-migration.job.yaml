@@ -33,7 +33,8 @@ spec:
         env:
         - name: DROP_DB
           value: "{{ default "false" .Values.blockscout.db.drop }}"
-{{ include "celo.blockscout-env-vars" .  | indent 8 }}
-{{ include "celo.blockscout-db-terminating-sidecar" .  | indent 6 }}
+{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
+{{ include "celo.blockscout-env-vars" $data  | indent 8 }}
+{{ include "celo.blockscout-db-terminating-sidecar" $data | indent 6 }}
       restartPolicy: Never
   backoffLimit: 0
