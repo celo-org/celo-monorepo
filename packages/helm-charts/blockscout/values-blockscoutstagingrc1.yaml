@@ -49,6 +49,8 @@ blockscout:
         memory: 250M
         cpu: 500m
     recaptchaSecretName: blockscoutstagingrc1-blockscout-recaptcha
+  metadata_crawler:
+    enabled: true
   metrics:
     enabled: false
   chain:
