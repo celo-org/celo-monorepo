@@ -1,7 +1,7 @@
 import fs from 'fs'
 import fetch from 'node-fetch'
 import { execCmdWithExitOnFailure } from './cmd-utils'
-import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import { accessSecretVersion, getCurrentGcloudAccount } from './gcloud_utils'
 import {
   installGenericHelmChart,
@@ -9,7 +9,6 @@ import {
   upgradeGenericHelmChart,
 } from './helm_deploy'
 import { outputIncludes } from './utils'
-import { getInternalTxNodeLoadBalancerIP } from './vm-testnet-utils'
 
 const helmChartPath = '../helm-charts/blockscout'
 
@@ -37,7 +36,6 @@ export async function installHelmChart(
     releaseName,
     helmChartPath,
     await helmParameters(
-      celoEnv,
       imageTag,
       blockscoutDBUsername,
       blockscoutDBPassword,
@@ -62,7 +60,6 @@ export async function upgradeHelmChart(
 ) {
   console.info(`Upgrading helm release ${helmReleaseName}`)
   const params = await helmParameters(
-    celoEnv,
     imageTag,
     blockscoutDBUsername,
     blockscoutDBPassword,
@@ -80,14 +77,12 @@ export async function upgradeHelmChart(
 }
 
 async function helmParameters(
-  celoEnv: string,
   imageTag: string,
   blockscoutDBUsername: string,
   blockscoutDBPassword: string,
   blockscoutDBConnectionName: string
 ) {
   const currentGcloudAccount = await getCurrentGcloudAccount()
-  const privateNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
   const params = [
     `--set domain.name=${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}`,
     `--set blockscout.deployment.account="${currentGcloudAccount}"`,
@@ -104,28 +99,6 @@ async function helmParameters(
       ''
     )}`,
   ]
-  if (
-    fetchEnvOrFallback(envVar.BLOCKSCOUT_OVERRIDE_RPC_ENDPOINT, '') !== '' &&
-    fetchEnvOrFallback(envVar.BLOCKSCOUT_OVERRIDE_WS_ENDPOINT, '') !== ''
-  ) {
-    params.push(
-      `--set blockscout.jsonrpc_http_url=${fetchEnv(envVar.BLOCKSCOUT_OVERRIDE_RPC_ENDPOINT)}`
-    )
-    params.push(
-      `--set blockscout.jsonrpc_ws_url=${fetchEnv(envVar.BLOCKSCOUT_OVERRIDE_WS_ENDPOINT)}`
-    )
-  } else if (isVmBased()) {
-    // TODO: Deprecated
-    const txNodeLbIp = await getInternalTxNodeLoadBalancerIP(celoEnv)
-    params.push(`--set blockscout.jsonrpc_http_url=http://${txNodeLbIp}:8545`)
-    params.push(`--set blockscout.jsonrpc_ws_url=ws://${txNodeLbIp}:8546`)
-  } else if (privateNodes > 0) {
-    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes-private:8545`)
-    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes-private:8545`)
-  } else {
-    params.push(`--set blockscout.jsonrpc_http_url=http://tx-nodes:8545`)
-    params.push(`--set blockscout.jsonrpc_ws_url=ws://tx-nodes:8546`)
-  }
   return params
 }
 

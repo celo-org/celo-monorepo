@@ -50,6 +50,9 @@ blockscout:
   metadata_crawler:
     enabled: true
     discord_cluster_name: Mainnet
+  archiveNodes:
+    jsonrpc_http_url: http://rc1-fullnodes-rpc-internal-lb:8545
+    jsonrpc_ws_url: ws://rc1-fullnodes-rpc-internal-lb:8545
   metrics:
     enabled: true
   chain:

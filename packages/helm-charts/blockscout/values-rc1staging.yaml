@@ -49,10 +49,11 @@ blockscout:
     recaptchaSecretName: rc1staging-blockscout-recaptcha
   metadata_crawler:
     enabled: true
+  archiveNodes:
+    jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
+    jsonrpc_ws_url: ws://rc1staging-archivenodes-rpc:8545
   metrics:
     enabled: true
-  jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
-  jsonrpc_ws_url: ws://rc1staging-archivenodes-rpc:8545
   chain:
     subnetwork: Celo
     networkID: 42220

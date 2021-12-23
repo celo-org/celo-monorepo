@@ -133,9 +133,9 @@ blockscout components.
 - name: ETHEREUM_JSONRPC_VARIANT
   value: geth
 - name: ETHEREUM_JSONRPC_HTTP_URL
-  value: {{ .Values.blockscout.jsonrpc_http_url }}
+  value: {{ .Values.blockscout.archiveNodes.jsonrpc_http_url }}
 - name: ETHEREUM_JSONRPC_WS_URL
-  value: {{ .Values.blockscout.jsonrpc_ws_url }}
+  value: {{ .Values.blockscout.archiveNodes.jsonrpc_ws_url }}
 - name: PGUSER
   value: $(DATABASE_USER)
 - name: DATABASE_URL

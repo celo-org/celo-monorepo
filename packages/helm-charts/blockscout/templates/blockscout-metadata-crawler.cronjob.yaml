@@ -38,7 +38,7 @@ spec:
             - name: PGDATABASE
               value: "blockscout"
             - name: PROVIDER_URL
-              value: {{ .Values.blockscout.jsonrpc_http_url }}
+              value: {{ .Values.blockscout.archiveNodes.jsonrpc_http_url }}
             - name: PGUSER
               valueFrom:
                 secretKeyRef:
