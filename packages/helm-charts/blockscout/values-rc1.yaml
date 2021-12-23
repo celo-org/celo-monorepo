@@ -53,3 +53,6 @@ blockscout:
   metrics:
     enabled: true
   jsonrpc_public_http: https://forno.celo.org
+  chain:
+    subnetwork: Celo
+    networkID: 42220

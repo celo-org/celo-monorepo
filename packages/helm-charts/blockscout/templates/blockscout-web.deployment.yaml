@@ -99,7 +99,7 @@ spec:
         - name: SOURCIFY_REPO_URL
           value: {{ .Values.blockscout.web.sourcify.repoUrl | quote }}
         - name: CHAIN_ID
-          value: {{ .Values.blockscout.networkID | quote }}
+          value: {{ .Values.blockscout.chain.networkID | quote }}
         - name: JSON_RPC
           value: {{ .Values.blockscout.jsonrpc_public_http | quote }}
         - name: APPS_MENU
