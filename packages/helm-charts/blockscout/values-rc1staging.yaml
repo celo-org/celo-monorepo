@@ -47,13 +47,12 @@ blockscout:
         memory: 250M
         cpu: 500m
     recaptchaSecretName: rc1staging-blockscout-recaptcha
+  metadata_crawler:
+    schedule: "0 */2 * * *"
   metrics:
     enabled: true
   jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
   jsonrpc_ws_url: ws://rc1staging-archivenodes-rpc:8545
-  metadata_crawler:
-    schedule: "0 */2 * * *"
-
 db:
   drop: false
 
