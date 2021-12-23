@@ -204,3 +204,4 @@ blockscout:
   chain:
     subnetwork: Celo
     networkID: 1101
+  domainName: celo-testnet.org
