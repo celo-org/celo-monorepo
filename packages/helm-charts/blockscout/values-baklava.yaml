@@ -52,3 +52,5 @@ blockscout:
   metrics:
     enabled: true
   jsonrpc_public_http: https://baklava-forno.celo-testnet.org
+  chain:
+    subnetwork: Baklava
