@@ -53,3 +53,4 @@ blockscout:
     enabled: true
   chain:
     subnetwork: Baklava
+    networkID: 62320

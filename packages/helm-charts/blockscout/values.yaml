@@ -186,3 +186,4 @@ blockscout:
   jsonrpc_ws_url: ws://tx-nodes-private:8545
   chain:
     subnetwork: Celo
+    networkID: 1101

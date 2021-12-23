@@ -95,7 +95,7 @@ spec:
         - name: SOURCIFY_REPO_URL
           value: {{ .Values.blockscout.web.sourcify.repoUrl | quote }}
         - name: CHAIN_ID
-          value: {{ .Values.blockscout.networkID | quote }}
+          value: {{ .Values.blockscout.chain.networkID | quote }}
         - name: APPS_MENU
           value: {{ .Values.blockscout.web.appsMenu.enabled | quote }}
         - name: EXTERNAL_APPS

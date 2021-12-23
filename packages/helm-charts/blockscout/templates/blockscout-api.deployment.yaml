@@ -99,7 +99,7 @@ spec:
         - name: SOURCIFY_REPO_URL
           value: {{ .Values.blockscout.web.sourcify.repoUrl | quote }}
         - name: CHAIN_ID
-          value: {{ .Values.blockscout.networkID | quote }}
+          value: {{ .Values.blockscout.chain.networkID | quote }}
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "DbSuffix" "-replica" "Database" .Values.blockscout.api.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}

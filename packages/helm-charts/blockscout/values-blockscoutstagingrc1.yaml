@@ -51,3 +51,6 @@ blockscout:
     recaptchaSecretName: blockscoutstagingrc1-blockscout-recaptcha
   metrics:
     enabled: false
+  chain:
+    subnetwork: Celo
+    networkID: 42220

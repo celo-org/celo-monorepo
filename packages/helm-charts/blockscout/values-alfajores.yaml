@@ -51,3 +51,4 @@ blockscout:
     enabled: true
   chain:
     subnetwork: Alfajores
+    networkID: 44787
