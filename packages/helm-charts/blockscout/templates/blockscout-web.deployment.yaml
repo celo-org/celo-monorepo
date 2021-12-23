@@ -85,9 +85,9 @@ spec:
         - name: DISABLE_INDEXER
           value: "true"
         - name: POOL_SIZE
-          value: {{ .Values.blockscout.web.pool_size | quote }}
+          value: {{ .Values.blockscout.web.poolSize | quote }}
         - name: POOL_SIZE_API
-          value: {{ .Values.blockscout.web.pool_size_replica | quote }}
+          value: {{ .Values.blockscout.web.poolSizeReplica | quote }}
         - name: DISPLAY_TOKEN_ICONS
           value: "true"
         - name: BLOCKSCOUT_HOST
@@ -101,7 +101,7 @@ spec:
         - name: CHAIN_ID
           value: {{ .Values.blockscout.chain.networkID | quote }}
         - name: JSON_RPC
-          value: {{ .Values.blockscout.jsonrpc_public_http | quote }}
+          value: {{ .Values.blockscout.fullNodes.jsonrpcPublicHttp | quote }}
         - name: APPS_MENU
           value: {{ .Values.blockscout.web.appsMenu.enabled | quote }}
         - name: DISABLE_STATS
@@ -127,7 +127,7 @@ spec:
         - name: LEARNING_MENU_LIST
           value: {{ .Values.blockscout.web.appsMenu.learningList | quote }}
         - name: DISPLAY_REWARDS
-          value: "{{.Values.blockscout.epoch_rewards.enabled}}"
+          value: "{{.Values.blockscout.epochRewards.enabled}}"
         - name: RE_CAPTCHA_PROJECT_ID
           valueFrom:
             secretKeyRef:

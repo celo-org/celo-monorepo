@@ -86,15 +86,15 @@ spec:
         - name: DISABLE_WEBAPP
           value: "true"
         - name: POOL_SIZE
-          value: {{ .Values.blockscout.indexer.pool_size | quote }}
+          value: {{ .Values.blockscout.indexer.poolSize | quote }}
         - name: POOL_SIZE_API
-          value: {{ .Values.blockscout.indexer.pool_size_replica | quote }}
+          value: {{ .Values.blockscout.indexer.poolSizeReplica | quote }}
         - name: METRICS_ENABLED
           value: "{{.Values.blockscout.metrics.enabled}}"
         - name: INDEXER_DISABLE_EMPTY_BLOCK_SANITIZER
           value: "false"
         - name: DISPLAY_REWARDS
-          value: "{{.Values.blockscout.epoch_rewards.enabled}}"
+          value: "{{.Values.blockscout.epochRewards.enabled}}"
 {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
 {{ include "celo.blockscout-env-vars" $data | indent 8 }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}

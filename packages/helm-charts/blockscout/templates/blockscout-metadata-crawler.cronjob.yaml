@@ -1,4 +1,4 @@
-{{- if .Values.blockscout.metadata_crawler.enabled }}
+{{- if .Values.blockscout.metadataCrawler.enabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -7,7 +7,7 @@ metadata:
     {{- include "celo.blockscout.labels" . | nindent 4 }}
     component: blockscout-metadata-crawler
 spec:
-  schedule: "{{ .Values.blockscout.metadata_crawler.schedule }}"
+  schedule: "{{ .Values.blockscout.metadataCrawler.schedule }}"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -19,7 +19,7 @@ spec:
         spec:
           containers:
           - name: metadata-crawler
-            image: {{ .Values.blockscout.metadata_crawler.image.repository }}:{{ .Values.blockscout.metadata_crawler.image.tag }}
+            image: {{ .Values.blockscout.metadataCrawler.image.repository }}:{{ .Values.blockscout.metadataCrawler.image.tag }}
             imagePullPolicy: IfNotPresent
             command:
             - /bin/sh
@@ -38,7 +38,7 @@ spec:
             - name: PGDATABASE
               value: "blockscout"
             - name: PROVIDER_URL
-              value: {{ .Values.blockscout.archiveNodes.jsonrpc_http_url }}
+              value: {{ .Values.blockscout.archiveNodes.jsonrpcHttpUrl }}
             - name: PGUSER
               valueFrom:
                 secretKeyRef:
@@ -50,9 +50,9 @@ spec:
                   name: {{ .Release.Name }}
                   key: DATABASE_PASSWORD
             - name: DISCORD_WEBHOOK_URL
-              value: {{ .Values.blockscout.metadata_crawler.discord_webhook_url }}
+              value: {{ .Values.blockscout.metadataCrawler.discordWebhookUrl }}
             - name: CLUSTER_NAME
-              value: {{ .Values.blockscout.metadata_crawler.discord_cluster_name }}
+              value: {{ .Values.blockscout.metadataCrawler.discordClusterName }}
             volumeMounts:
             - mountPath: /tmp/pod
               name: tmp-pod
