@@ -196,3 +196,5 @@ blockscout:
   jsonrpc_public_http: ""
   epoch_rewards:
     enabled: false
+  chain:
+    subnetwork: Celo
