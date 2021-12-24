@@ -34,12 +34,8 @@ spec:
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
       initContainers:
-      - name: "blockscout-init"
-        image: "groundnuty/k8s-wait-for:1.3"
-        imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
-        args:
-        - job
-        - {{ .Release.Name }}-migration
+{{ include "celo.blockscout.initContainer.blockscout-init" . | indent 6 }}
+{{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
       containers:
       - name: blockscout-api
         image: {{ .Values.blockscout.image.repository }}:api-{{ .Values.blockscout.image.tag }}
@@ -101,8 +97,11 @@ spec:
         - name: CHAIN_ID
           value: {{ .Values.blockscout.chain.networkID | quote }}
 {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.api.db }}
-{{ include "celo.blockscout-env-vars" $data | indent 8 }}
-{{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
+{{ include "celo.blockscout.env-vars" $data | indent 8 }}
+{{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
+      volumes:
+{{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 8 }}
+{{ include "celo.blockscout.volume.temporary-dir" . | indent 8 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

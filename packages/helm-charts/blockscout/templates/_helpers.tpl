@@ -21,7 +21,7 @@ after termination of the main container.
 Should be included as the last container as it contains
 the `volumes` section.
 */ -}}
-{{- define "celo.blockscout-db-terminating-sidecar" -}}
+{{- define "celo.blockscout.container.db-terminating-sidecar" -}}
 - name: cloudsql-proxy
   image: gcr.io/cloudsql-docker/gce-proxy:1.11
   command:
@@ -44,15 +44,44 @@ the `volumes` section.
     mountPath: /secrets/cloudsql
     readOnly: true
   - mountPath: /tmp/pod
-    name: tmp-pod
+    name: temporary-dir
     readOnly: true
-volumes:
-  - name: blockscout-cloudsql-credentials
-    secret:
-      defaultMode: 420
-      secretName: blockscout-cloudsql-credentials
-  - name: tmp-pod
-    emptyDir: {}
+{{- end -}}
+
+{{- /* Defines the volume with CloudSQL proxy credentials file. */ -}}
+{{- define "celo.blockscout.volume.cloudsql-credentials" -}}
+- name: blockscout-cloudsql-credentials
+  secret:
+    defaultMode: 420
+    secretName: blockscout-cloudsql-credentials
+{{- end -}}
+
+{{- /* Defines an empty dir volume with write access for temporary pid files. */ -}}
+{{- define "celo.blockscout.volume.temporary-dir" -}}
+- name: temporary-dir
+  emptyDir: {}
+{{- end -}}
+
+{{- /* Defines init container awaiting for migrations to run. */ -}}
+{{- define "celo.blockscout.initContainer.blockscout-init" -}}
+- name: "blockscout-init"
+  image: "groundnuty/k8s-wait-for:1.3"
+  imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
+  args:
+  - job
+  - {{ .Release.Name }}-migration
+{{- end -}}
+
+{{- /* Defines init container copying secrets-init to the specified directory. */ -}}
+{{- define "celo.blockscout.initContainer.secrets-init" -}}
+- name: secrets-init
+  image: "doitintl/secrets-init:0.4.2"
+  args:
+    - copy
+    - /secrets/
+  volumeMounts:
+  - mountPath: /secrets
+    name: temporary-dir
 {{- end -}}
 
 {{- /*
@@ -61,7 +90,7 @@ access to the database to the main container.
 Should be included as the last container as it contains
 the `volumes` section.
 */ -}}
-{{- define "celo.blockscout-db-sidecar" -}}
+{{- define "celo.blockscout.container.db-sidecar" -}}
 - name: cloudsql-proxy
   image: gcr.io/cloudsql-docker/gce-proxy:1.19.1
   command: ["/cloud_sql_proxy",
@@ -99,17 +128,13 @@ the `volumes` section.
     - name: blockscout-cloudsql-credentials
       mountPath: /secrets/cloudsql
       readOnly: true
-volumes:
-  - name: blockscout-cloudsql-credentials
-    secret:
-      secretName: blockscout-cloudsql-credentials
 {{- end -}}
 
 {{- /*
 Defines shared environment variables for all
 blockscout components.
 */ -}}
-{{- define "celo.blockscout-env-vars" -}}
+{{- define "celo.blockscout.env-vars" -}}
 - name: DATABASE_USER
   valueFrom:
     secretKeyRef:
