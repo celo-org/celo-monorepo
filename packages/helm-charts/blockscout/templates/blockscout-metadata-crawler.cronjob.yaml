@@ -55,8 +55,11 @@ spec:
               value: {{ .Values.blockscout.metadataCrawler.discordClusterName }}
             volumeMounts:
             - mountPath: /tmp/pod
-              name: tmp-pod
+              name: temporary-dir
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.indexer.db }}
-{{ include "celo.blockscout-db-terminating-sidecar" $data | indent 10 }}
+{{ include "celo.blockscout.container.db-terminating-sidecar" $data | indent 10 }}
+          volumes:
+{{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 12 }}
+{{ include "celo.blockscout.volume.temporary-dir" . | indent 12 }}
           restartPolicy: Never
 {{- end}}

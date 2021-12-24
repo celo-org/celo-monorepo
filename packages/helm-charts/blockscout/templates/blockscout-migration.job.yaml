@@ -29,12 +29,15 @@ spec:
             cpu: 200m
         volumeMounts:
           - mountPath: /tmp/pod
-            name: tmp-pod
+            name: temporary-dir
         env:
         - name: DROP_DB
           value: "{{ default "false" .Values.blockscout.db.drop }}"
 {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
-{{ include "celo.blockscout-env-vars" $data  | indent 8 }}
-{{ include "celo.blockscout-db-terminating-sidecar" $data | indent 6 }}
+{{ include "celo.blockscout.env-vars" $data  | indent 8 }}
+{{ include "celo.blockscout.container.db-terminating-sidecar" $data | indent 6 }}
+      volumes:
+{{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 8 }}
+{{ include "celo.blockscout.volume.temporary-dir" . | indent 8 }}
       restartPolicy: Never
   backoffLimit: 0
