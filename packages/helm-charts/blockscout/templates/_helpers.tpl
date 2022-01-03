@@ -151,8 +151,6 @@ blockscout components.
   value: {{ .Values.blockscout.chain.subnetwork }}
 - name: COIN
   value: CELO
-- name: SEGMENT_KEY
-  value: {{ .Values.blockscout.segmentKey }}
 - name: ECTO_USE_SSL
   value: "false"
 - name: ETHEREUM_JSONRPC_VARIANT

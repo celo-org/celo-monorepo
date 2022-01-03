@@ -129,6 +129,8 @@ spec:
             secretKeyRef:
               name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
               key: api_key
+        - name: SEGMENT_KEY
+          value: {{ .Values.blockscout.secrets.segmentKey }}
 {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}
 {{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}

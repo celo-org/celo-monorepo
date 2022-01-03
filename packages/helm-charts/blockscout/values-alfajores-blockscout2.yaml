@@ -55,6 +55,8 @@ blockscout:
     schedule: "*/30 * * * *"
   metrics:
     enabled: true
+  secrets:
+    segmentKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-segmentKey
   chain:
     subnetwork: Alfajores
     networkID: 44787

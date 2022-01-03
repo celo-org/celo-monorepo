@@ -202,6 +202,14 @@ blockscout:
   healthyBlocksPeriod: 300
   db:
     drop: "false"
+  secrets:
+    # Format:
+    # secretName: gcp:secretmanager:projects/<project-id>/secrets/<env>-blockscout-<secret-key>
+    # - <project-id> - numeric project id
+    # - <env> - alfajores|baklava|rc1 etc.
+    # - <secret-key> - name of the secret
+    # Example: segmentKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-segmentKey
+    segmentKey: ""
   chain:
     subnetwork: Celo
     networkID: 1101

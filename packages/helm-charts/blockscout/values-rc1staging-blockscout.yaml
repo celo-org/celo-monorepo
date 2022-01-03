@@ -57,6 +57,8 @@ blockscout:
     jsonrpcWsUrl: ws://rc1staging-archivenodes-rpc:8545
   metrics:
     enabled: true
+  secrets:
+    segmentKey: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-segmentKey
   chain:
     subnetwork: Celo
     networkID: 42220

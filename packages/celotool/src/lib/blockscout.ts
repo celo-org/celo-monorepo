@@ -75,7 +75,6 @@ async function helmParameters(
     `--set blockscout.image.tag=${imageTag}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
-    `--set blockscout.segmentKey=${fetchEnvOrFallback(envVar.BLOCKSCOUT_SEGMENT_KEY, '')}`,
     // this is a secret, it has to be managed differently, moving it here for now as I got rid of the useMetadataCrawler flag
     `--set blockscout.metadataCrawler.discordWebhookUrl=${fetchEnvOrFallback(
       envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,

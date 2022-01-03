@@ -58,6 +58,8 @@ blockscout:
     discordClusterName: Baklava
   metrics:
     enabled: true
+  secrets:
+    segmentKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-segmentKey
   chain:
     subnetwork: Baklava
     networkID: 62320
