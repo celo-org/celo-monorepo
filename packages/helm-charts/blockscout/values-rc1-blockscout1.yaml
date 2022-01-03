@@ -63,6 +63,8 @@ blockscout:
     enabled: true
   fullNodes:
     jsonrpcPublicHttp: https://forno.celo.org
+  secrets:
+    segmentKey: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-segmentKey
   chain:
     subnetwork: Celo
     networkID: 42220

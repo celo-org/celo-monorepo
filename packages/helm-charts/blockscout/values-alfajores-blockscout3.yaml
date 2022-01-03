@@ -55,6 +55,10 @@ blockscout:
     schedule: "*/30 * * * *"
   metrics:
     enabled: true
+  fullNodes:
+    jsonrpcPublicHttp: https://alfajores-forno.celo-testnet.org
+  secrets:
+    segmentKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-segmentKey
   chain:
     subnetwork: Alfajores
     networkID: 44787
