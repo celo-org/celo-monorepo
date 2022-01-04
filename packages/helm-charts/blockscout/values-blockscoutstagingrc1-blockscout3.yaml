@@ -59,6 +59,10 @@ blockscout:
     jsonrpcWsUrl: ws://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
   metrics:
     enabled: false
+  secrets:
+    dbUser: gcp:secretmanager:projects/365081401101/secrets/blockscoutstagingrc1-blockscout3-dbUser
+    dbPassword: gcp:secretmanager:projects/365081401101/secrets/blockscoutstagingrc1-blockscout3-dbPassword
+    dbUrl: gcp:secretmanager:projects/365081401101/secrets/blockscoutstagingrc1-blockscout3-dbUrl
   chain:
     subnetwork: Celo
     networkID: 42220
