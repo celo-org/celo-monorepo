@@ -60,6 +60,9 @@ blockscout:
     enabled: true
   secrets:
     segmentKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-segmentKey
+    dbUser: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout2-dbUser
+    dbPassword: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout2-dbPassword
+    dbUrl: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout2-dbUrl
   chain:
     subnetwork: Baklava
     networkID: 62320

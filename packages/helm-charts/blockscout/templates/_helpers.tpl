@@ -136,15 +136,9 @@ blockscout components.
 */ -}}
 {{- define "celo.blockscout.env-vars" -}}
 - name: DATABASE_USER
-  valueFrom:
-    secretKeyRef:
-      name:  {{ .Release.Name }}
-      key: DATABASE_USER
+  value: {{ .Values.blockscout.secrets.dbUser }}
 - name: DATABASE_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name:  {{ .Release.Name }}
-      key: DATABASE_PASSWORD
+  value: {{ .Values.blockscout.secrets.dbPassword }}
 - name: NETWORK
   value: Celo
 - name: SUBNETWORK
@@ -160,9 +154,9 @@ blockscout components.
 - name: ETHEREUM_JSONRPC_WS_URL
   value: {{ .Values.blockscout.archiveNodes.jsonrpcWsUrl }}
 - name: PGUSER
-  value: $(DATABASE_USER)
+  value: {{ .Values.blockscout.secrets.dbUser }}
 - name: DATABASE_URL
-  value: postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@{{ .Database.proxy.host }}:{{ .Database.proxy.port }}/{{ .Database.name }}
+  value: {{ .Values.blockscout.secrets.dbUrl }}
 - name: DATABASE_DB
   value: {{ .Database.name }}
 - name: DATABASE_HOSTNAME

@@ -20,13 +20,7 @@ export function getReleaseName(celoEnv: string, dbSuffix: string) {
   return `${celoEnv}-blockscout${dbSuffix}`
 }
 
-export async function installHelmChart(
-  celoEnv: string,
-  releaseName: string,
-  imageTag: string,
-  blockscoutDBUsername: string,
-  blockscoutDBPassword: string
-) {
+export async function installHelmChart(celoEnv: string, releaseName: string, imageTag: string) {
   const valuesEnvFile = fs.existsSync(`${helmChartPath}/values-${celoEnv}.yaml`)
     ? `values-${celoEnv}.yaml`
     : `values.yaml`
@@ -34,7 +28,7 @@ export async function installHelmChart(
     celoEnv,
     releaseName,
     helmChartPath,
-    await helmParameters(imageTag, blockscoutDBUsername, blockscoutDBPassword),
+    await helmParameters(imageTag),
     true,
     valuesEnvFile
   )
@@ -44,15 +38,9 @@ export async function removeHelmRelease(helmReleaseName: string, celoEnv: string
   await removeGenericHelmChart(helmReleaseName, celoEnv)
 }
 
-export async function upgradeHelmChart(
-  celoEnv: string,
-  helmReleaseName: string,
-  imageTag: string,
-  blockscoutDBUsername: string,
-  blockscoutDBPassword: string
-) {
+export async function upgradeHelmChart(celoEnv: string, helmReleaseName: string, imageTag: string) {
   console.info(`Upgrading helm release ${helmReleaseName}`)
-  const params = await helmParameters(imageTag, blockscoutDBUsername, blockscoutDBPassword)
+  const params = await helmParameters(imageTag)
   await upgradeGenericHelmChart(
     celoEnv,
     helmReleaseName,
@@ -64,17 +52,11 @@ export async function upgradeHelmChart(
   console.info(`Helm release ${helmReleaseName} upgrade successful`)
 }
 
-async function helmParameters(
-  imageTag: string,
-  blockscoutDBUsername: string,
-  blockscoutDBPassword: string
-) {
+async function helmParameters(imageTag: string) {
   const currentGcloudAccount = await getCurrentGcloudAccount()
   const params = [
     `--set changeCause="Deployed ${imageTag} by ${currentGcloudAccount} on ${new Date().toISOString()}"`,
     `--set blockscout.image.tag=${imageTag}`,
-    `--set blockscout.db.username=${blockscoutDBUsername}`,
-    `--set blockscout.db.password=${blockscoutDBPassword}`,
   ]
   return params
 }

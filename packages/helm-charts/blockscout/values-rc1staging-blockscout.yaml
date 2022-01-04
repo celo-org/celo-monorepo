@@ -59,6 +59,9 @@ blockscout:
     enabled: true
   secrets:
     segmentKey: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-segmentKey
+    dbUser: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-dbUser
+    dbPassword: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-dbPassword
+    dbUrl: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-dbUrl
   chain:
     subnetwork: Celo
     networkID: 42220

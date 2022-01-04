@@ -34,18 +34,25 @@ spec:
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
       initContainers:
-{{ include "celo.blockscout.initContainer.blockscout-init" . | indent 6 }}
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
+{{ include "celo.blockscout.initContainer.blockscout-init" . | indent 6 }}
       containers:
       - name: blockscout-api
         image: {{ .Values.blockscout.image.repository }}:api-{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
         command:
+        - /secrets/secrets-init
+        args:
+        - --provider
+        - google
         - /bin/sh
         - -c
-        args:
         - |
            exec mix cmd --app block_scout_web "iex  --name {{ .Values.blockscout.api.erlangNodeName}}@0.0.0.0 -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix do deps.loadpaths --no-deps-check, phx.server --no-compile"
+        volumeMounts:
+        - mountPath: /secrets
+          name: temporary-dir
+          readOnly: true
         ports:
         - name: http
           containerPort: {{ .Values.blockscout.api.port }}

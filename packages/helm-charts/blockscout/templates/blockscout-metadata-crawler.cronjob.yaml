@@ -17,6 +17,7 @@ spec:
           labels:
             {{- include "celo.blockscout.labels" . | nindent 12 }}
         spec:
+          serviceAccountName: {{ .Release.Name }}-rbac
           initContainers:
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 10 }}
           containers:
@@ -45,15 +46,9 @@ spec:
             - name: PROVIDER_URL
               value: {{ .Values.blockscout.archiveNodes.jsonrpcHttpUrl }}
             - name: PGUSER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}
-                  key: DATABASE_USER
+              value: {{ .Values.blockscout.secrets.dbUser }}
             - name: PGPASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}
-                  key: DATABASE_PASSWORD
+              value: {{ .Values.blockscout.secrets.dbPassword }}
             - name: DISCORD_WEBHOOK_URL
               value: {{ .Values.blockscout.secrets.discordWebhookUrl }}
             - name: CLUSTER_NAME

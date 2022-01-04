@@ -10,11 +10,7 @@ import {
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
 import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
-import {
-  isCelotoolHelmDryRun,
-  resetCloudSQLInstance,
-  retrieveCloudSQLConnectionInfo,
-} from 'src/lib/helm_deploy'
+import { isCelotoolHelmDryRun, resetCloudSQLInstance } from 'src/lib/helm_deploy'
 import yargs from 'yargs'
 import { UpgradeArgv } from '../../deploy/upgrade'
 
@@ -55,12 +51,6 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
   const instanceName = getInstanceName(argv.celoEnv, dbSuffix)
   const helmReleaseName = getReleaseName(argv.celoEnv, dbSuffix)
 
-  const [blockscoutDBUsername, blockscoutDBPassword, _] = await retrieveCloudSQLConnectionInfo(
-    argv.celoEnv,
-    instanceName,
-    dbSuffix
-  )
-
   if (!isCelotoolHelmDryRun()) {
     if (argv.reset === true) {
       console.info(
@@ -87,13 +77,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     )
   }
 
-  await upgradeHelmChart(
-    argv.celoEnv,
-    helmReleaseName,
-    imageTag,
-    blockscoutDBUsername,
-    blockscoutDBPassword
-  )
+  await upgradeHelmChart(argv.celoEnv, helmReleaseName, imageTag)
 
   if (!isCelotoolHelmDryRun()) {
     await createGrafanaTagAnnotation(argv.celoEnv, imageTag, dbSuffix)

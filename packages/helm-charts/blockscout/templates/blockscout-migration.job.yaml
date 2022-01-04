@@ -11,14 +11,20 @@ spec:
       labels:
         {{- include "celo.blockscout.labels" . | nindent 8 }}
     spec:
+      serviceAccountName: {{ .Release.Name }}-rbac
+      initContainers:
+{{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
       containers:
       - name: blockscout-migration
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
         command:
+        - /tmp/pod/secrets-init
+        args:
+        - --provider
+        - google
         - /bin/sh
         - -c
-        args:
         - |
            trap "touch /tmp/pod/main-terminated" EXIT
            [ ${DROP_DB} == "true" ] && mix do ecto.drop, ecto.create
