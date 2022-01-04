@@ -85,21 +85,24 @@ export async function getDataEncryptionKey(
   contractKit: ContractKit,
   logger: Logger
 ): Promise<string> {
-  return retryAsyncWithBackOffAndTimeout(
-    async () => {
-      const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
-      return accountWrapper.getDataEncryptionKey(address)
-    },
-    RETRY_COUNT,
-    [],
-    RETRY_DELAY_IN_MS,
-    1.5,
-    FULL_NODE_TIMEOUT_IN_MS
-  ).catch((error) => {
-    logger.error('Failed to retrieve DEK: ' + error.message)
+  try {
+    const res = await retryAsyncWithBackOffAndTimeout(
+      async () => {
+        const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
+        return accountWrapper.getDataEncryptionKey(address)
+      },
+      RETRY_COUNT,
+      [],
+      RETRY_DELAY_IN_MS,
+      1.5,
+      FULL_NODE_TIMEOUT_IN_MS
+    )
+    return res
+  } catch (error) {
+    logger.error('Failed to retrieve DEK: ' + error)
     logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
     throw error
-  })
+  }
 }
 
 export async function isVerified(
@@ -109,7 +112,7 @@ export async function isVerified(
   logger: Logger
 ): Promise<boolean> {
   try {
-    return retryAsyncWithBackOffAndTimeout(
+    const res = await retryAsyncWithBackOffAndTimeout(
       async () => {
         const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
         const {
@@ -134,8 +137,10 @@ export async function isVerified(
       1.5,
       FULL_NODE_TIMEOUT_IN_MS
     )
+    return res
   } catch (error) {
-    logger.error('Failed to get verification status: ' + error.message)
+    logger.error('Failed to get verification status: ' + error)
+    logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
     logger.warn('Assuming user is verified')
     return true
   }

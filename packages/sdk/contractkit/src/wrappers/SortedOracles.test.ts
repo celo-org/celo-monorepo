@@ -381,6 +381,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
     describe('calls report with the address for the provided StableToken', () => {
       for (const token of Object.values(StableToken)) {
         it(`calls report with token ${token}`, async () => {
+          console.log(`hola ${token},  ${oracleAddress}`)
           const tx = await stableTokenSortedOracles.reportStableToken(14, oracleAddress, token)
           await tx.sendAndWaitForReceipt()
           expect(tx.txo.arguments[0]).toEqual(await kit.celoTokens.getAddress(token))

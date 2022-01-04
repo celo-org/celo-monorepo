@@ -40,17 +40,24 @@ export interface VerifiedPhoneNumberDekSignature {
   dekSigner: string
 }
 
-export async function handleGetContactMatches(
-  request: Request<{}, {}, GetContactMatchesRequest>,
-  response: Response
-) {
+export async function handleGetContactMatches(request: Request, response: Response) {
   const logger: Logger = response.locals.logger
   try {
     if (!isValidGetContactMatchesInput(request.body)) {
       respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
       return
     }
-    if (!(await authenticateUser(request, getContractKit(), logger))) {
+
+    // TODO: this error handling shouldn't be necessary here but there is a bug in the common package's
+    // error handling. Remove this or refactor once that bug is resolved.
+    let isAuthenticated = true // We assume user is authenticated on Forno errors
+    try {
+      isAuthenticated = await authenticateUser(request, getContractKit(), logger)
+    } catch {
+      logger.error('Forno error caught in handleGetContactMatches line 57') // Temporary for debugging
+      logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
+    }
+    if (!isAuthenticated) {
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
       return
     }
@@ -64,7 +71,16 @@ export async function handleGetContactMatches(
     } = request.body
 
     if (!shouldBypassVerificationForE2ETesting(userPhoneNumber, account)) {
-      if (!(await isVerified(account, hashedPhoneNumber, getContractKit(), logger))) {
+      // TODO: this error handling shouldn't be necessary here but there is a bug in the common package's
+      // error handling. Remove this or refactor once that bug is resolved.
+      let _isVerified = true // We assume user is authenticated on Forno errors
+      try {
+        _isVerified = await isVerified(account, hashedPhoneNumber, getContractKit(), logger)
+      } catch {
+        logger.error('Forno error caught in handleGetContactMatches line 80') // Temporary for debugging
+        logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
+      }
+      if (!_isVerified) {
         respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE, logger)
         return
       }
@@ -80,11 +96,18 @@ export async function handleGetContactMatches(
     // and fulfill the request as usual.
     let verifiedPhoneNumberDekSig: VerifiedPhoneNumberDekSignature | undefined
     if (signedUserPhoneNumber) {
-      const dekSigner = await getDataEncryptionKey(account, getContractKit(), logger).catch(() => {
+      // TODO: this error handling shouldn't be necessary here but there is a bug in the common package's
+      // error handling. Remove this or refactor once that bug is resolved.
+      let dekSigner = ''
+      try {
+        dekSigner = await getDataEncryptionKey(account, getContractKit(), logger)
+      } catch {
+        logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
         logger.warn(
           'Failed to retrieve DEK to verify signedUserPhoneNumber. Request wont be recorded.'
         )
-      })
+        logger.error('Forno error caught in handleGetContactMatches line 109') // Temporary for debugging
+      }
       if (dekSigner) {
         if (!verifyDEKSignature(userPhoneNumber, signedUserPhoneNumber, dekSigner, logger)) {
           respondWithError(

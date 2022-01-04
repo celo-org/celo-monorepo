@@ -7,7 +7,9 @@ import https from 'https'
 import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
 import config, { getVersion } from './config'
+import { DomainAuthService } from './domain/auth/domainAuth.service'
 import { DomainService } from './domain/domain.service'
+import { DomainQuotaService } from './domain/quota/domainQuota.service'
 import { handleGetBlindedMessagePartialSig } from './signing/get-partial-signature'
 import { handleGetQuota } from './signing/query-quota'
 
@@ -21,12 +23,12 @@ export enum Endpoints {
 
   DISABLE_DOMAIN = '/domain/disable',
   DOMAIN_SIGN = '/domain/sign/',
-  DOMAIN_STATUS = '/domain/quotaStatus',
+  DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
 }
 
-const domainService = new DomainService()
-
 export function createServer() {
+  const domainService = new DomainService(new DomainAuthService(), new DomainQuotaService())
+
   logger.info('Creating express server')
   const app = express()
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware)
@@ -53,10 +55,8 @@ export function createServer() {
   // EG. curl -v "http://localhost:8080/getBlindedMessagePartialSig" -H "Authorization: 0xdaf63ea42a092e69b2001db3826bc81dc859bffa4d51ce8943fddc8ccfcf6b2b1f55d64e4612e7c028791528796f5a62c1d2865b184b664589696a08c83fc62a00" -d '{"hashedPhoneNumber":"0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96","blindedQueryPhoneNumber":"n/I9srniwEHm5o6t3y0tTUB5fn7xjxRrLP1F/i8ORCdqV++WWiaAzUo3GA2UNHiB","account":"0x588e4b68193001e4d10928660aB4165b813717C0"}' -H 'Content-Type: application/json'
   addMeteredEndpoint(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, handleGetBlindedMessagePartialSig)
   addMeteredEndpoint(Endpoints.GET_QUOTA, handleGetQuota)
-  addMeteredEndpoint(Endpoints.DOMAIN_STATUS, domainService.handleGetDomainStatus)
-  addMeteredEndpoint(Endpoints.DOMAIN_SIGN, async (_, res) => {
-    res.sendStatus(501)
-  })
+  addMeteredEndpoint(Endpoints.DOMAIN_QUOTA_STATUS, domainService.handleGetDomainQuotaStatus)
+  addMeteredEndpoint(Endpoints.DOMAIN_SIGN, domainService.handleGetDomainRestrictedSignature)
   addMeteredEndpoint(Endpoints.DISABLE_DOMAIN, domainService.handleDisableDomain)
 
   const sslOptions = getSslOptions()

@@ -111,7 +111,8 @@
       "@celo/base",
       "@celo/contractkit",
       "@celo/identity",
-      "@celo/utils"
+      "@celo/utils",
+      "@celo/wallet-local"
     ]
   },
   "@celo/phone-number-privacy-monitor": {
@@ -212,6 +213,15 @@
     "dependencies": [
       "@celo/dev-utils",
       "@celo/flake-tracker"
+    ]
+  },
+  "@celo/phone-utils": {
+    "location": "packages/sdk/phone-utils",
+    "dependencies": [
+      "@celo/base",
+      "@celo/flake-tracker",
+      "@celo/typescript",
+      "@celo/utils"
     ]
   },
   "@celo/transactions-uri": {

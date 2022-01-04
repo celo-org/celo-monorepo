@@ -46,7 +46,7 @@ async function tryProposal(
         await txRes.waitReceipt()
       }
       console.log(chalk.green(`   ${chalk.bold('✔')}  Transaction ${i} success!`))
-    } catch (err) {
+    } catch (err: any) {
       console.log(chalk.red(`   ${chalk.bold('✘')}  Transaction ${i} failure: ${err.toString()}`))
       ok = false
     }

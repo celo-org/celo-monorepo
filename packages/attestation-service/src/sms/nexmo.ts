@@ -6,7 +6,7 @@ import Nexmo from 'nexmo'
 import { receivedDeliveryReport } from '.'
 import { fetchEnv, fetchEnvOrDefault, isYes } from '../env'
 import { Gauges } from '../metrics'
-import { AttestationModel, AttestationStatus } from '../models/attestation'
+import { AttestationStatus, SmsFields } from '../models/attestation'
 import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
@@ -106,7 +106,7 @@ export class NexmoSmsProvider extends SmsProvider {
 
   deliveryStatusHandlers = () => [bodyParser.json()]
 
-  async sendSms(attestation: AttestationModel) {
+  async sendSms(attestation: SmsFields) {
     const nexmoNumber = this.getMatchingNumber(attestation.countryCode)
     return new Promise<string>((resolve, reject) => {
       this.client.message.sendSms(
