@@ -60,6 +60,7 @@ blockscout:
     enabled: true
   secrets:
     segmentKey: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-segmentKey
+    discordWebhookUrl: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-discordWebhookUrl
   chain:
     subnetwork: Celo
     networkID: 42220

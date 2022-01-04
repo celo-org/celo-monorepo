@@ -17,13 +17,18 @@ spec:
           labels:
             {{- include "celo.blockscout.labels" . | nindent 12 }}
         spec:
+          initContainers:
+{{ include "celo.blockscout.initContainer.secrets-init" . | indent 10 }}
           containers:
           - name: metadata-crawler
             image: {{ .Values.blockscout.metadataCrawler.image.repository }}:{{ .Values.blockscout.metadataCrawler.image.tag }}
             imagePullPolicy: IfNotPresent
             command:
-            - /bin/sh
+            - /tmp/pod/secrets-init
             args:
+            - --provider
+            - google
+            - /bin/sh
             - -c
             - |
               trap "touch /tmp/pod/main-terminated" EXIT
@@ -50,7 +55,7 @@ spec:
                   name: {{ .Release.Name }}
                   key: DATABASE_PASSWORD
             - name: DISCORD_WEBHOOK_URL
-              value: {{ .Values.blockscout.metadataCrawler.discordWebhookUrl }}
+              value: {{ .Values.blockscout.secrets.discordWebhookUrl }}
             - name: CLUSTER_NAME
               value: {{ .Values.blockscout.metadataCrawler.discordClusterName }}
             volumeMounts:

@@ -1,7 +1,7 @@
 import fs from 'fs'
 import fetch from 'node-fetch'
 import { execCmdWithExitOnFailure } from './cmd-utils'
-import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
+import { envVar, fetchEnv } from './env-utils'
 import { accessSecretVersion, getCurrentGcloudAccount } from './gcloud_utils'
 import {
   installGenericHelmChart,
@@ -75,11 +75,6 @@ async function helmParameters(
     `--set blockscout.image.tag=${imageTag}`,
     `--set blockscout.db.username=${blockscoutDBUsername}`,
     `--set blockscout.db.password=${blockscoutDBPassword}`,
-    // this is a secret, it has to be managed differently, moving it here for now as I got rid of the useMetadataCrawler flag
-    `--set blockscout.metadataCrawler.discordWebhookUrl=${fetchEnvOrFallback(
-      envVar.METADATA_CRAWLER_DISCORD_WEBHOOK,
-      ''
-    )}`,
   ]
   return params
 }

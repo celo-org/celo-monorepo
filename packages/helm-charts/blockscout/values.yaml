@@ -210,6 +210,7 @@ blockscout:
     # - <secret-key> - name of the secret
     # Example: segmentKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-segmentKey
     segmentKey: ""
+    discordWebhookUrl: ""
   chain:
     subnetwork: Celo
     networkID: 1101
