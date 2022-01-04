@@ -11,7 +11,7 @@ export default class SetWallet extends BaseCommand {
   static flags = {
     ...BaseCommand.flags,
     account: Flags.address({ required: true }),
-    wallet: flags.string({ required: true }),
+    wallet: Flags.address({ required: true }),
     signature: Flags.proofOfPossession({
       required: false,
       description: 'Signature (a.k.a. proof-of-possession) of the signer key',
