@@ -35,8 +35,8 @@ spec:
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
       initContainers:
-{{ include "celo.blockscout.initContainer.blockscout-init" . | indent 6 }}
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
+{{ include "celo.blockscout.initContainer.blockscout-init" . | indent 6 }}
       containers:
       - name: blockscout-web
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
@@ -53,6 +53,7 @@ spec:
         volumeMounts:
         - mountPath: /secrets
           name: temporary-dir
+          readOnly: true
         ports:
         - name: http
           containerPort: {{ .Values.blockscout.web.port }}

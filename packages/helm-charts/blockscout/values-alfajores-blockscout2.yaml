@@ -59,6 +59,9 @@ blockscout:
     jsonrpcPublicHttp: https://alfajores-forno.celo-testnet.org
   secrets:
     segmentKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-segmentKey
+    dbUser: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout2-dbUser
+    dbPassword: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout2-dbPassword
+    dbUrl: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout2-dbUrl
   chain:
     subnetwork: Alfajores
     networkID: 44787
