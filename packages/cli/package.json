@@ -33,7 +33,7 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
-    "@celo/contractkit": "1.5.1-dev",
+    "@celo/contractkit": "1.5.2-dev",
     "@celo/explorer": "1.5.1-dev",
     "@celo/governance": "1.5.1-dev",
     "@celo/identity": "1.5.1-dev",

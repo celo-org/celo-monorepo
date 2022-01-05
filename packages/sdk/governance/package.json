@@ -24,7 +24,7 @@
     "@celo/base": "1.5.1-dev",
     "@celo/utils": "1.5.1-dev",
     "@celo/connect": "1.5.1-dev",
-    "@celo/contractkit": "1.5.1-dev",
+    "@celo/contractkit": "1.5.2-dev",
     "@celo/explorer": "1.5.1-dev",
     "@types/debug": "^4.1.5",
     "@types/inquirer": "^6.5.0",

@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/contractkit": "1.5.1-dev",
+    "@celo/contractkit": "1.5.2-dev",
     "dotenv": "^8.2.0",
     "@celo/flake-tracker": "0.0.1-dev"
   },

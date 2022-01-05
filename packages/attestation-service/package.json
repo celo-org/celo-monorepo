@@ -29,7 +29,7 @@
     "test-send-sms-twilio": "TS_NODE_FILES=true CONFIG=config/.env.development ts-node scripts/test-send-sms-twilio.ts"
   },
   "dependencies": {
-    "@celo/contractkit": "1.5.1-dev",
+    "@celo/contractkit": "1.5.2-dev",
     "@celo/keystores": "1.5.1-dev",
     "@celo/utils": "1.5.1-dev",
     "bignumber.js": "^9.0.0",

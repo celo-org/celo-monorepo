@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/contractkit": "1.5.1-dev"
+    "@celo/contractkit": "1.5.2-dev"
   },
   "engines": {
     "node": ">=8.13.0"
