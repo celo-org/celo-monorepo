@@ -727,7 +727,7 @@ OPTIONS
   --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   Address of the signer key to
                                                         verify proof of possession.
 
-  --wallet=wallet                                       (required)
+  --wallet=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d   (required) Account Address
 
 EXAMPLES
   set-wallet --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --wallet
