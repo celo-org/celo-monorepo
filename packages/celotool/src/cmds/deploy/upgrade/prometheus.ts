@@ -11,6 +11,7 @@ export type PrometheusUpgradeArgv = UpgradeArgv &
   ContextArgv & {
     deployGKEWorkloadMetrics: boolean
     deployGrafana: boolean
+    disableStackdriver: boolean
   }
 
 export const builder = (argv: PrometheusUpgradeArgv) => {
@@ -26,12 +27,17 @@ export const builder = (argv: PrometheusUpgradeArgv) => {
       description: 'Include the deployment of grafana helm chart',
       default: false,
     })
+    .option('disableStackdriver', {
+      type: 'boolean',
+      description: 'Disable exporting metrics to GCP Stackdriver',
+      default: false,
+    })
 }
 
 export const handler = async (argv: PrometheusUpgradeArgv) => {
   const clusterConfig = await switchToClusterFromEnvOrContext(argv, true)
 
-  await upgradePrometheus(argv.context, clusterConfig)
+  await upgradePrometheus(argv.context, clusterConfig, argv.disableStackdriver)
 
   if (argv.deployGKEWorkloadMetrics) {
     await upgradeGKEWorkloadMetrics(clusterConfig)
