@@ -71,7 +71,7 @@ export async function createDefaultIngressIfNotExists(celoEnv: string, ingressNa
     console.info(`Creating ingress ${celoEnv}-blockscout-web-ingress`)
     const ingressFilePath = `/tmp/${celoEnv}-blockscout-web-ingress.yaml`
     const ingressResource = `
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -102,17 +102,26 @@ spec:
     http:
       paths:
       - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
+        pathType: ImplementationSpecific
         backend:
-          serviceName: ${ingressName}-web
-          servicePort: 4000
+          service:
+            name: ${ingressName}-web
+            port:
+              number: 4000
       - path: /(graphql|graphiql|api)
+        pathType: ImplementationSpecific
         backend:
-          serviceName: ${ingressName}-api
-          servicePort: 4000
-      - backend:
-          serviceName: ${ingressName}-web
-          servicePort: 4000
-        path: /
+          service:
+            name: ${ingressName}-api
+            port:
+              number: 4000
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: ${ingressName}-web
+            port:
+              number: 4000
   tls:
   - hosts:
     - ${celoEnv}-blockscout.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org
