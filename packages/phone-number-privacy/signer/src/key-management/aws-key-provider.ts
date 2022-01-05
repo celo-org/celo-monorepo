@@ -17,10 +17,9 @@ export class AWSKeyProvider extends KeyProviderBase {
       client.config.update({ region })
 
       const response = await client
-        .getSecretValue({
-          SecretId: `${this.getCustomKeyName(key)}-${key.version}`,
-        })
+        .getSecretValue({ SecretId: `${this.getCustomKeyName(key)}-${key.version}` })
         .promise()
+        .catch(() => client.getSecretValue({ SecretId: config.keystore.aws.secretName }).promise())
 
       let privateKey
       if (response.SecretString) {

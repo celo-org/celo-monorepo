@@ -6,12 +6,20 @@ import { Key, KeyProviderBase } from './key-provider-base'
 export class GoogleKeyProvider extends KeyProviderBase {
   public async fetchPrivateKeyFromStore(key: Key) {
     try {
-      const { projectId } = config.keystore.google
+      const { projectId, secretName, secretVersion } = config.keystore.google
 
       const client = new SecretManagerServiceClient()
-      const [versionResponse] = await client.accessSecretVersion({
-        name: `projects/${projectId}/secrets/${this.getCustomKeyName(key)}/versions/${key.version}`,
-      })
+      const [versionResponse] = await client
+        .accessSecretVersion({
+          name: `projects/${projectId}/secrets/${this.getCustomKeyName(key)}/versions/${
+            key.version
+          }`,
+        })
+        .catch(() =>
+          client.accessSecretVersion({
+            name: `projects/${projectId}/secrets/${secretName}/versions/${secretVersion}`,
+          })
+        )
 
       // Extract the payload as a string.
       const privateKey = versionResponse?.payload?.data?.toString()

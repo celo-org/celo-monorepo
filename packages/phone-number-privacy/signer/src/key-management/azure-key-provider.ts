@@ -9,9 +9,9 @@ export class AzureKeyProvider extends KeyProviderBase {
       const { vaultName } = config.keystore.azure
 
       const keyVaultClient = new AzureKeyVaultClient(vaultName)
-      const privateKey = await keyVaultClient.getSecret(
-        `${this.getCustomKeyName(key)}-${key.version}`
-      )
+      const privateKey = await keyVaultClient
+        .getSecret(`${this.getCustomKeyName(key)}-${key.version}`)
+        .catch(() => keyVaultClient.getSecret(config.keystore.azure.secretName)) // TODO(Alec): improve logging
       this.setPrivateKey(key, privateKey)
     } catch (err) {
       logger.info(`Error retrieving key: ${JSON.stringify(key)}`)
