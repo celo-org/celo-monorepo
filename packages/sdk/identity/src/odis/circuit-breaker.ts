@@ -11,6 +11,7 @@ export interface CircuitBreakerServiceContext {
 
 export const VALORA_ALFAJORES_CIRCUIT_BREAKER_ENVIRONMENT: CircuitBreakerServiceContext = {
   url: 'https://us-central1-celo-mobile-alfajores.cloudfunctions.net/circuitBreaker/',
+  // DO NOT MERGE: These keys need to be removed or updated with the latest produciton keys.
   publicKey: `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi+9UKUsVY5UGYwHFN2M2
 90RlNputQeJmSi1phRtQgpXP2RvZK/IFkIygiigXPcFlm7FK35A5qi1HqNTL/2sy
@@ -24,6 +25,7 @@ wwIDAQAB
 
 export const VALORA_MAINNET_CIRCUIT_BREAKER_ENVIRONMENT: CircuitBreakerServiceContext = {
   url: 'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/circuitBreaker/',
+  // DO NOT MERGE: These keys need to be removed or updated with the latest produciton keys.
   publicKey: `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsMd1OIdYfTcnYkIXPeym
 KSiQmNCEn2DC2mUichrRpJFeb9VO65PeLjMXTIjKyp4TZ3PhXJyK9kEEF27E1wj8
@@ -107,14 +109,21 @@ export type CircuitBreakerError =
   | FetchError
 
 /**
- * Client for interacting with a circuit breaker service, such as the one deployed by Valora.
+ * Client for interacting with a circuit breaker service for encrypted cloud backups.
  *
  * @remarks A circuit breaker is a service supporting a public decryption function backed by an HSM
- * key. It is intended for use in key derivation when with ODIS as a key hardening service, and
- * allows the circuit breaker operator to shut down access to the decryption key in the event that
- * ODIS is conpromised. This acts as a safety measure to allow wallets to prevent attackers from
- * being able to brute force their users cryptographic keys in the event that ODIS is compromised,
- * and thus is protection is no longer available.
+ * key. If the need arises, the circuit breaker operator may take the decryption function offline.
+ * A client can encrypt data to the circuit breaker public key and store it in a non-public place.
+ * This data will then be available under normal circumstances, but become unavailable in the case
+ * of an emergency.
+ *
+ * It is intended for use in password-based key derivation when ODIS is used as a key hardening
+ * function. Clients may include in their key dervivation a random value which they encrypt to the
+ * circuit breaker public key. This allows the circuit breaker operator to disable key derivation,
+ * by restricting access to the encrypted keying material, in the event that ODIS is conpromised.
+ * This acts as a safety measure to allow wallet providers, or other users of ODIS key hardening, to
+ * prevent attackers from being able to brute force their users' derived keys in the event that
+ * ODIS is compromised such that it can no longer add to the key hardening.
  *
  * The circuit breaker service is designed for use in the encrypted cloud backup protocol. More
  * information about encrypted cloud backup and the circuit breaker service can be found in the

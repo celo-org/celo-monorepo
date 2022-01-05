@@ -80,6 +80,7 @@ export async function odisHardenKey(
   const quotaState = quotaResp.result.status as SequentialDelayDomainState
   const { accepted, notBefore } = checkSequentialDelayRateLimit(
     domain,
+    // Dividing by 1000 to convert ms to seconds for the rate limit check.
     Date.now() / 1000,
     quotaState
   )
@@ -189,9 +190,6 @@ async function requestOdisQuotaStatus(
   } catch (error) {
     if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {
       return Err(new FetchError(error as Error))
-    }
-    if ((error as Error).message?.includes(ErrorMessages.ODIS_RATE_LIMIT_ERROR)) {
-      return Err(new OdisRateLimitingError(undefined, error as Error))
     }
     return Err(new OdisServiceError(error as Error))
   }

@@ -426,6 +426,6 @@ export async function openBackup({
     return Err(decryption.error)
   }
 
-  debug('requesting a key hardening response from ODIS')
+  debug('decrypted backup')
   return Ok(decryption.result)
 }

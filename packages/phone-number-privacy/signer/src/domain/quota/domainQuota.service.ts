@@ -30,6 +30,7 @@ export class DomainQuotaService implements IDomainQuotaService {
   ) {
     const result = checkSequentialDelayRateLimit(
       domain,
+      // Divide by 1000 to convert the current time in ms to seconds.
       Date.now() / 1000,
       toSequentialDelayDomainState(domainState)
     )
