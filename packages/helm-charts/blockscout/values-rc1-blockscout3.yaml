@@ -49,7 +49,6 @@ blockscout:
       requests:
         memory: 500Mi
         cpu: 1500m
-    recaptchaSecretName: rc1-blockscout-recaptcha
     stats:
       enabled: true
       reportUrl: https://datastudio.google.com/embed/reporting/e0a253b1-fa37-43d0-bbc3-2706a64f2211/page/hDehC?hl=en
@@ -69,6 +68,10 @@ blockscout:
     dbUser: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout3-dbUser
     dbPassword: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout3-dbPassword
     dbUrl: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout3-dbUrl
+    recaptcha:
+      projectId: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaProjectId
+      siteKey: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaSiteKey
+      apiKey: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaApiKey
   chain:
     subnetwork: Celo
     networkID: 42220

@@ -132,20 +132,11 @@ spec:
         - name: DISPLAY_REWARDS
           value: "{{.Values.blockscout.epochRewards.enabled}}"
         - name: RE_CAPTCHA_PROJECT_ID
-          valueFrom:
-            secretKeyRef:
-              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
-              key: project_id
+          value: {{ .Values.blockscout.secrets.recaptcha.projectId }}
         - name: RE_CAPTCHA_SITE_KEY
-          valueFrom:
-            secretKeyRef:
-              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
-              key: site_key
+          value: {{ .Values.blockscout.secrets.recaptcha.siteKey }}
         - name: RE_CAPTCHA_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
-              key: api_key
+          value: {{ .Values.blockscout.secrets.recaptcha.apiKey }}
         - name: SEGMENT_KEY
           value: {{ .Values.blockscout.secrets.segmentKey }}
 {{- $data := dict "Release" .Release "nfs_volumes" true "Values" .Values "Database" .Values.blockscout.web.db }}
