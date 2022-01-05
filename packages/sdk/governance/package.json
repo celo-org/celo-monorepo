@@ -24,7 +24,7 @@
     "@celo/base": "1.3.3-dev",
     "@celo/utils": "1.3.3-dev",
     "@celo/connect": "1.3.3-dev",
-    "@celo/contractkit": "1.3.3-dev",
+    "@celo/contractkit": "1.3.4-dev",
     "@celo/explorer": "1.3.3-dev",
     "@types/debug": "^4.1.5",
     "@types/inquirer": "^6.5.0",
