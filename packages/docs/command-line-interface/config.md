@@ -30,18 +30,15 @@ USAGE
   $ celocli config:set
 
 OPTIONS
-  -n, --node=node                                          URL of the node to run
-                                                           commands against (defaults to
-                                                           'http://localhost:8545')
+  -n, --node=node
+      URL of the node to run commands against (defaults to 'http://localhost:8545')
 
-  --gasCurrency=(auto|Auto|CELO|celo|cUSD|cusd|cEUR|ceur)  Use a specific gas currency
-                                                           for transaction fees
-                                                           (defaults to 'auto' which
-                                                           uses whatever feeCurrency is
-                                                           available)
+  --gasCurrency=(auto|Auto|CELO|celo|cUSD|cusd|cEUR|ceur|cREAL|creal)
+      Use a specific gas currency for transaction fees (defaults to 'auto' which uses
+      whatever feeCurrency is available)
 
-  --globalHelp                                             View all available global
-                                                           flags
+  --globalHelp
+      View all available global flags
 
 EXAMPLES
   set --node ws://localhost:2500

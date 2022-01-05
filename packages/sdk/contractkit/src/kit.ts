@@ -31,16 +31,37 @@ import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
 
+import Types = require('web3-providers-http')
+export type HttpProviderOptions = Types.HttpProviderOptions
+export const API_KEY_HEADER_KEY = 'apiKey'
+
 /**
- * Creates a new instance of `ContractKit` give a nodeUrl
+ * Creates a new instance of `ContractKit` given a nodeUrl
  * @param url CeloBlockchain node url
- * @optional wallet to reuse or add a wallet different that the default (example ledger-wallet)
+ * @optional wallet to reuse or add a wallet different than the default (example ledger-wallet)
+ * @optional options to pass to the Web3 HttpProvider constructor
  */
-export function newKit(url: string, wallet?: ReadOnlyWallet) {
+export function newKit(url: string, wallet?: ReadOnlyWallet, options?: HttpProviderOptions) {
   const web3 = url.endsWith('.ipc')
     ? new Web3(new Web3.providers.IpcProvider(url, net))
-    : new Web3(url)
+    : new Web3(new Web3.providers.HttpProvider(url, options))
   return newKitFromWeb3(web3, wallet)
+}
+
+/**
+ * Creates a new instance of `ContractKit` given a nodeUrl and apiKey
+ * @param url CeloBlockchain node url
+ * @param apiKey to include in the http request header
+ * @optional wallet to reuse or add a wallet different than the default (example ledger-wallet)
+ */
+export function newKitWithApiKey(url: string, apiKey: string, wallet?: ReadOnlyWallet) {
+  const options: HttpProviderOptions = {}
+  options.headers = []
+  options.headers.push({
+    name: API_KEY_HEADER_KEY,
+    value: apiKey,
+  })
+  return newKit(url, wallet, options)
 }
 
 /**

@@ -23,7 +23,7 @@ OPTIONS
 
   --globalHelp                                       View all available global flags
 
-  --stableToken=(cUSD|cusd|cEUR|ceur)                [default: cUSD] Name of the stable
+  --stableToken=(cUSD|cusd|cEUR|ceur|cREAL|creal)    [default: cUSD] Name of the stable
                                                      to receive
 
   --value=10000000000000000000000                    (required) The value of CELO to
@@ -120,7 +120,7 @@ OPTIONS
 
   --globalHelp                                       View all available global flags
 
-  --stableToken=(cUSD|cusd|cEUR|ceur)                [default: cUSD] Name of the stable
+  --stableToken=(cUSD|cusd|cEUR|ceur|cREAL|creal)    [default: cUSD] Name of the stable
                                                      to receive
 
   --value=10000000000000000000000                    (required) The value of CELO to
@@ -134,6 +134,37 @@ EXAMPLES
 ```
 
 _See code: [src/commands/exchange/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/gold.ts)_
+
+## `celocli exchange:reals`
+
+Exchange Celo Brazilian Real (cBRL) for CELO via the stability mechanism
+
+```
+Exchange Celo Brazilian Real (cBRL) for CELO via the stability mechanism
+
+USAGE
+  $ celocli exchange:reals
+
+OPTIONS
+  --forAtLeast=10000000000000000000000               [default: 0] Optional, the minimum
+                                                     value of CELO to receive in return
+
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) The address with Celo
+                                                     Brazilian Real to exchange
+
+  --globalHelp                                       View all available global flags
+
+  --value=10000000000000000000000                    (required) The value of Celo
+                                                     Brazilian Real to exchange for CELO
+
+EXAMPLES
+  reals --value 10000000000000 --from 0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+
+  reals --value 10000000000000 --forAtLeast 50000000000000 --from
+  0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d
+```
+
+_See code: [src/commands/exchange/reals.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/exchange/reals.ts)_
 
 ## `celocli exchange:show`
 
@@ -176,7 +207,7 @@ OPTIONS
 
   --globalHelp                                       View all available global flags
 
-  --stableToken=(cUSD|cusd|cEUR|ceur)                Name of the stable token to be
+  --stableToken=(cUSD|cusd|cEUR|ceur|cREAL|creal)    Name of the stable token to be
                                                      transfered
 
   --value=10000000000000000000000                    (required) The value of Stable
