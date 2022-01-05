@@ -1,6 +1,7 @@
 import {
   DisableDomainRequest,
   DisableDomainResponse,
+  Domain,
   DomainQuotaStatusRequest,
   DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
@@ -9,15 +10,12 @@ import {
   DomainRestrictedSignatureResponseSuccess,
   Endpoints,
   ErrorMessage,
+  KnownDomain,
   KnownDomainState,
   WarningMessage,
-} from '@celo/phone-number-privacy-common'
-import {
-  Domain,
   domainHash,
   isKnownDomain,
-  KnownDomain,
-} from '@celo/phone-number-privacy-common/lib/domains'
+} from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
