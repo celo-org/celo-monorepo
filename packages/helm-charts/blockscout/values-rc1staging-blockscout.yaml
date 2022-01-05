@@ -49,7 +49,6 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
-    recaptchaSecretName: rc1staging-blockscout-recaptcha
   metadataCrawler:
     enabled: true
   archiveNodes:
@@ -62,6 +61,10 @@ blockscout:
     dbUser: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-dbUser
     dbPassword: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-dbPassword
     dbUrl: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-dbUrl
+    recaptcha:
+      projectId: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-recaptchaProjectId
+      siteKey: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-recaptchaSiteKey
+      apiKey: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-recaptchaApiKey
   chain:
     subnetwork: Celo
     networkID: 42220

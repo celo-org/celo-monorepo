@@ -51,7 +51,6 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
-    recaptchaSecretName: baklava-blockscout-recaptcha
   metadataCrawler:
     enabled: true
     schedule: "*/30 * * * *"
@@ -63,6 +62,10 @@ blockscout:
     dbUser: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout2-dbUser
     dbPassword: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout2-dbPassword
     dbUrl: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout2-dbUrl
+    recaptcha:
+      projectId: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaProjectId
+      siteKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaSiteKey
+      apiKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaApiKey
   chain:
     subnetwork: Baklava
     networkID: 62320

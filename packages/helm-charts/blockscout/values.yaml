@@ -214,6 +214,10 @@ blockscout:
     dbUser: ""
     dbPassword: ""
     dbUrl: ""
+    recaptcha:
+      projectId: ""
+      siteKey: ""
+      apiKey: ""
   chain:
     subnetwork: Celo
     networkID: 1101

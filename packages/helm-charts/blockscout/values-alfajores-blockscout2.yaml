@@ -49,7 +49,6 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
-    recaptchaSecretName: alfajores-blockscout-recaptcha
   metadataCrawler:
     enabled: true
     schedule: "*/30 * * * *"
@@ -60,6 +59,10 @@ blockscout:
     dbUser: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout2-dbUser
     dbPassword: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout2-dbPassword
     dbUrl: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout2-dbUrl
+    recaptcha:
+      projectId: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaProjectId
+      siteKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaSiteKey
+      apiKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaApiKey
   chain:
     subnetwork: Alfajores
     networkID: 44787
