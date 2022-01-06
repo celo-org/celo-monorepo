@@ -16,7 +16,7 @@ export async function createServiceAccountIfNotExists(
   }
   // TODO: add permissions for cloudsql editor to service account
   const serviceAccounts = await execCmdAndParseJson(
-    `gcloud iam service-accounts list --quiet --format json`
+    `gcloud iam service-accounts list --filter "displayName:${name}" --quiet --format json`
   )
   const serviceAccountExists = serviceAccounts.some((account: any) => account.displayName === name)
   if (!serviceAccountExists) {

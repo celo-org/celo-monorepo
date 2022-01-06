@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.2.3--dev]**
+### **[1.5.1-dev]**
 Features
 -  one-line summary - [#](link PR)
 
@@ -15,8 +15,16 @@ Bug Fixes
 Other Changes
 -  one-line summary - [#](link PR)
 
-
 ## Published
+
+### **[1.5.0]**
+Features
+- Adds cREAL support to contract kit [#9040](https://github.com/celo-org/celo-monorepo/pull/9040)
+
+### **[1.4.2]**
+Bug Fixes
+-  Fixes wallet connect issue in @celo/wallet-walletconnect
+
 
 ### **[1.2.2]** -- 2021-07-08
 Features

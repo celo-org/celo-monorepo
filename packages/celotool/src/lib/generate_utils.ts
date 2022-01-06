@@ -315,6 +315,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   // Celo hard fork activation blocks.  Default is undefined, which means not activated.
   const churritoBlock = hardForkActivationBlock(envVar.CHURRITO_BLOCK)
   const donutBlock = hardForkActivationBlock(envVar.DONUT_BLOCK)
+  const espressoBlock = hardForkActivationBlock(envVar.ESPRESSO_BLOCK)
 
   // network start timestamp
   const timestamp = parseInt(fetchEnvOrFallback(envVar.TIMESTAMP, '0'), 10)
@@ -332,6 +333,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     timestamp,
     churritoBlock,
     donutBlock,
+    espressoBlock,
   })
 }
 
@@ -390,6 +392,7 @@ export const generateGenesis = ({
   timestamp = 0,
   churritoBlock,
   donutBlock,
+  espressoBlock,
 }: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
@@ -402,6 +405,9 @@ export const generateGenesis = ({
   }
   if (typeof donutBlock === 'number') {
     genesis.config.donutBlock = donutBlock
+  }
+  if (typeof espressoBlock === 'number') {
+    genesis.config.espressoBlock = espressoBlock
   }
 
   genesis.config.chainId = chainId
@@ -527,6 +533,9 @@ export const generateGenesisWithMigrations = async ({
   }
   if (genesisConfig.donutBlock !== undefined) {
     mcConfig.hardforks.donutBlock = genesisConfig.donutBlock
+  }
+  if (genesisConfig.espressoBlock !== undefined) {
+    mcConfig.hardforks.espressoBlock = genesisConfig.espressoBlock
   }
   if (genesisConfig.timestamp !== undefined) {
     mcConfig.genesisTimestamp = genesisConfig.timestamp

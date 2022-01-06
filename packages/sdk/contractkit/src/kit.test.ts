@@ -1,7 +1,9 @@
-import { CeloTx, CeloTxObject, CeloTxReceipt, PromiEvent } from '@celo/connect'
+import { CeloTx, CeloTxObject, CeloTxReceipt, JsonRpcPayload, PromiEvent } from '@celo/connect'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
-import { newKitFromWeb3 } from './kit'
+import { HttpProvider } from 'web3-core'
+import { XMLHttpRequest } from 'xhr2-cookies'
+import { API_KEY_HEADER_KEY, newKitFromWeb3, newKitWithApiKey } from './kit'
 import { promiEventSpy } from './test-utils/PromiEventStub'
 
 interface TransactionObjectStub<T> extends CeloTxObject<T> {
@@ -98,5 +100,26 @@ describe('kit.sendTransactionObject()', () => {
       gas: 555,
       from: '0xAAFFF',
     })
+  })
+})
+
+describe('newKitWithApiKey()', () => {
+  const kit = newKitWithApiKey('http://', 'key')
+  const mockSetRequestHeader = jest.fn()
+  XMLHttpRequest.prototype.setRequestHeader = mockSetRequestHeader
+  XMLHttpRequest.prototype.send = jest.fn()
+
+  test('should set apiKey in request header', async () => {
+    const httpProvider = kit.web3.currentProvider as HttpProvider
+    const rpcPayload: JsonRpcPayload = {
+      jsonrpc: '',
+      method: '',
+      params: [],
+    }
+    httpProvider.send(rpcPayload, (error: Error | null) => expect(error).toBeNull())
+
+    // Api Key should be set in the request header
+    expect(mockSetRequestHeader).toBeCalledTimes(2)
+    expect(mockSetRequestHeader).toBeCalledWith(API_KEY_HEADER_KEY, 'key')
   })
 })
