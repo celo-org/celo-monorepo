@@ -2,6 +2,7 @@ import {
   DisableDomainRequest,
   DisableDomainResponse,
   Domain,
+  domainHash,
   DomainQuotaStatusRequest,
   DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
@@ -10,11 +11,10 @@ import {
   DomainRestrictedSignatureResponseSuccess,
   Endpoints,
   ErrorMessage,
+  isKnownDomain,
   KnownDomain,
   KnownDomainState,
   WarningMessage,
-  domainHash,
-  isKnownDomain,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
