@@ -27,6 +27,11 @@ export class AzureKeyProvider extends KeyProviderBase {
   }
 
   private async fetch(client: AzureKeyVaultClient, secretName: string) {
+    // check for empty strings from undefined env vars
+    if (!secretName) {
+      throw new Error('key name is undefined')
+    }
+
     const privateKey = await client.getSecret(secretName)
 
     if (!privateKey) {

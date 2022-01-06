@@ -37,6 +37,11 @@ export class AWSKeyProvider extends KeyProviderBase {
   }
 
   private async fetch(client: SecretsManager, secretName: string, secretKey: string) {
+    // check for empty strings from undefined env vars
+    if (!secretName) {
+      throw new Error('key name is undefined')
+    }
+
     const response = await client.getSecretValue({ SecretId: secretName }).promise()
 
     let privateKey

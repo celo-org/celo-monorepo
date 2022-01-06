@@ -37,6 +37,10 @@ export class GoogleKeyProvider extends KeyProviderBase {
     secretName: string,
     secretVersion: string
   ) {
+    // check for empty strings from undefined env vars
+    if (!(projectId && secretName && secretVersion)) {
+      throw new Error('key name is undefined')
+    }
     const secretID = `projects/${projectId}/secrets/${secretName}/versions/${secretVersion}`
     const [versionResponse] = await client.accessSecretVersion({ name: secretID })
 
