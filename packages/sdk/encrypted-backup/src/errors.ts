@@ -11,6 +11,7 @@ export enum BackupErrorTypes {
   INVALID_BACKUP_ERROR = 'INVALID_BACKUP_ERROR',
   ODIS_SERVICE_ERROR = 'ODIS_SERVICE_ERROR',
   ODIS_RATE_LIMITING_ERROR = 'ODIS_RATE_LIMITING_ERROR',
+  ODIS_VERIFICATION_ERROR = 'ODIS_VERIFICATION_ERROR',
   PBKDF_ERROR = 'PBKDF_ERROR',
   SCRYPT_ERROR = 'SCRYPT_ERROR',
 }
@@ -63,6 +64,12 @@ export class OdisRateLimitingError extends RootError<BackupErrorTypes.ODIS_RATE_
   }
 }
 
+export class OdisVerificationError extends RootError<BackupErrorTypes.ODIS_VERIFICATION_ERROR> {
+  constructor(readonly error?: Error) {
+    super(BackupErrorTypes.ODIS_VERIFICATION_ERROR)
+  }
+}
+
 export class PbkdfError extends RootError<BackupErrorTypes.PBKDF_ERROR> {
   constructor(readonly iterations: number, readonly error?: Error) {
     super(BackupErrorTypes.PBKDF_ERROR)
@@ -85,5 +92,6 @@ export type BackupError =
   | InvalidBackupError
   | OdisServiceError
   | OdisRateLimitingError
+  | OdisVerificationError
   | PbkdfError
   | ScryptError

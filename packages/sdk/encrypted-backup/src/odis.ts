@@ -33,6 +33,7 @@ import {
   FetchError,
   OdisRateLimitingError,
   OdisServiceError,
+  OdisVerificationError,
 } from './errors'
 import { deriveKey, EIP712Wallet, KDFInfo } from './utils'
 
@@ -121,7 +122,7 @@ export async function odisHardenKey(
     )
     odisOutput = Buffer.from(odisOutputBase64, 'base64')
   } catch (error) {
-    return Err(new OdisServiceError(error as Error))
+    return Err(new OdisVerificationError(error as Error))
   }
 
   // Mix the key with the output from ODIS to get the hardened key.
