@@ -327,7 +327,7 @@ contract Accounts is
   function setPaymentDelegation(address beneficiary, uint256 fraction) public {
     require(isAccount(msg.sender), "Not an account");
     FixidityLib.Fraction memory f = FixidityLib.wrap(fraction);
-    require(f.lt(FixidityLib.fixed1()), "Fraction must not be greater than 1");
+    require(f.lte(FixidityLib.fixed1()), "Fraction must not be greater than 1");
     paymentDelegations[msg.sender] = PaymentDelegation(beneficiary, f);
     emit PaymentDelegationSet(beneficiary, fraction);
   }
