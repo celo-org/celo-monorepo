@@ -6,17 +6,33 @@ import { Key, KeyProviderBase } from './key-provider-base'
 export class AzureKeyProvider extends KeyProviderBase {
   public async fetchPrivateKeyFromStore(key: Key) {
     try {
-      const { vaultName } = config.keystore.azure
+      const { vaultName, secretName } = config.keystore.azure
+      const client = new AzureKeyVaultClient(vaultName)
 
-      const keyVaultClient = new AzureKeyVaultClient(vaultName)
-      const privateKey = await keyVaultClient
-        .getSecret(`${this.getCustomKeyName(key)}-${key.version}`)
-        .catch(() => keyVaultClient.getSecret(config.keystore.azure.secretName)) // TODO(Alec): improve logging
+      let privateKey: string
+      try {
+        privateKey = await this.fetch(client, `${this.getCustomKeyName(key)}-${key.version}`)
+      } catch (err) {
+        logger.info(`Error retrieving key: ${JSON.stringify(key)}`)
+        logger.error(err)
+        logger.error(ErrorMessage.KEY_FETCH_ERROR)
+        privateKey = await this.fetch(client, secretName)
+      }
+
       this.setPrivateKey(key, privateKey)
     } catch (err) {
-      logger.info(`Error retrieving key: ${JSON.stringify(key)}`)
       logger.error(err)
       throw new Error(ErrorMessage.KEY_FETCH_ERROR)
     }
+  }
+
+  private async fetch(client: AzureKeyVaultClient, secretName: string) {
+    const privateKey = await client.getSecret(secretName)
+
+    if (!privateKey) {
+      throw new Error('Key is empty or undefined')
+    }
+
+    return privateKey
   }
 }
