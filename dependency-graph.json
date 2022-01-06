@@ -170,17 +170,6 @@
       "@celo/utils"
     ]
   },
-  "@celo/encrypted-backup": {
-    "location": "packages/sdk/encrypted-backup",
-    "dependencies": [
-      "@celo/base",
-      "@celo/dev-utils",
-      "@celo/flake-tracker",
-      "@celo/identity",
-      "@celo/phone-number-privacy-common",
-      "@celo/utils"
-    ]
-  },
   "@celo/explorer": {
     "location": "packages/sdk/explorer",
     "dependencies": [
