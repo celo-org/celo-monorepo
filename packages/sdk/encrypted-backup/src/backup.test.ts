@@ -266,6 +266,7 @@ describe('openBackup', () => {
 
   it('should result in a decryption error if the encrypted data is modified', async () => {
     // Flip a bit in the encrypted data.
+    // tslint:disable-next-line:no-bitwise
     testBackup!.encryptedData[0] ^= 0x01
     const result = await openBackup({
       backup: testBackup!,

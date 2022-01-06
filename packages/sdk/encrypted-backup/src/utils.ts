@@ -1,7 +1,7 @@
 import { Err, Ok, Result } from '@celo/base/lib/result'
 import { ReadOnlyWallet } from '@celo/connect'
 import * as crypto from 'crypto'
-import { ComputationalHardeningFunction, ComputationalHardeningConfig } from './config'
+import { ComputationalHardeningConfig, ComputationalHardeningFunction } from './config'
 import { DecryptionError, EncryptionError, PbkdfError, ScryptError } from './errors'
 
 // NOTE: This module is intended for use within the @celo/encrypted-backup package and so is not
