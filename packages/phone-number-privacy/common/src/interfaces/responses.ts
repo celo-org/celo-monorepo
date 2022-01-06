@@ -1,4 +1,4 @@
-import { KnownDomainState } from '../../src/domains'
+import { KnownDomainState } from '../domains'
 
 export interface SignMessageResponse {
   success: boolean
