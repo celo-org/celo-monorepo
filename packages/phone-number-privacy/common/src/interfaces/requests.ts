@@ -13,7 +13,7 @@ import {
   KnownDomain,
   KnownDomainOptions,
   SequentialDelayDomain,
-} from '../../src/domains'
+} from '../domains'
 
 export enum Endpoints {
   STATUS = '/status',
