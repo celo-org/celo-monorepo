@@ -24,7 +24,7 @@ export enum SupportedDatabase {
 export enum SupportedKeystore {
   AZURE_KEY_VAULT = 'AzureKeyVault',
   GOOGLE_SECRET_MANAGER = 'GoogleSecretManager',
-  AWs_SECRET_MANAGER = 'AWSSecretManager',
+  AWS_SECRET_MANAGER = 'AWSSecretManager',
   MOCK_SECRET_MANAGER = 'MockSecretManager',
 }
 

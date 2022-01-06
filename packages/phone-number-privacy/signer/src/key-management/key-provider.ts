@@ -28,7 +28,7 @@ export async function initKeyProvider() {
   } else if (type === SupportedKeystore.GOOGLE_SECRET_MANAGER) {
     logger.info('Using Google Secret Manager')
     keyProvider = new GoogleKeyProvider()
-  } else if (type === SupportedKeystore.AWs_SECRET_MANAGER) {
+  } else if (type === SupportedKeystore.AWS_SECRET_MANAGER) {
     logger.info('Using AWS Secret Manager')
     keyProvider = new AWSKeyProvider()
   } else if (type === SupportedKeystore.MOCK_SECRET_MANAGER) {
