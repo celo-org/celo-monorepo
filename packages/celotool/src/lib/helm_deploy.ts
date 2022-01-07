@@ -171,7 +171,7 @@ export async function createSecretInSecretManagerIfNotExists(
   try {
     await execCmd(`gcloud secrets describe ${secretId}`)
 
-    console.log(`Secret ${secretId} already exists, skipping creation...`)
+    console.info(`Secret ${secretId} already exists, skipping creation...`)
   } catch (error) {
     await execCmd(
       `gcloud secrets create ${secretId} --replication-policy="automatic" --labels ${secretLabels.join(
