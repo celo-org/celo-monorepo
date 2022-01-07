@@ -35,6 +35,8 @@ import {
 } from './testnet-utils'
 import { stringToBoolean } from './utils'
 
+const generator = require('generate-password')
+
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
 const TIMEOUT_FOR_LOAD_BALANCER_POLL = 1000 * 60 * 25 // 25 minutes
@@ -124,8 +126,17 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
     `gcloud sql instances patch ${instanceName} --backup-start-time 17:00`
   )
 
-  const blockscoutDBUsername = Math.random().toString(36).slice(-8)
-  const blockscoutDBPassword = Math.random().toString(36).slice(-8)
+  const passwordOptions = {
+    length: 22,
+    numbers: true,
+    symbols: false,
+    lowercase: true,
+    uppercase: true,
+    strict: true,
+  }
+
+  const blockscoutDBUsername = generator.generate(passwordOptions)
+  const blockscoutDBPassword = generator.generate(passwordOptions)
 
   console.info('Creating SQL user')
   await execCmdWithExitOnFailure(
@@ -198,6 +209,28 @@ export async function cloneCloudSQLInstance(
   )
 
   return [blockscoutDBUsername, blockscoutDBPassword, blockscoutDBConnectionName.trim()]
+}
+
+export async function createSecretInSecretManagerIfNotExists(
+  secretId: string,
+  secretLabels: string[],
+  secretValue: string
+) {
+  try {
+    await execCmd(`gcloud secrets describe ${secretId}`)
+
+    console.log(`Secret ${secretId} already exists, skipping creation...`)
+  } catch (error) {
+    await execCmd(
+      `gcloud secrets create ${secretId} --replication-policy="automatic" --labels ${secretLabels.join(
+        ','
+      )}`
+    )
+
+    await execCmd(
+      `echo -n "${secretValue}" | gcloud secrets versions add ${secretId} --data-file=-`
+    )
+  }
 }
 
 async function createAndUploadKubernetesSecretIfNotExists(
