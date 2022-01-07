@@ -185,6 +185,14 @@ export async function createSecretInSecretManagerIfNotExists(
   }
 }
 
+export async function deleteSecretFromSecretManager(secretId: string) {
+  try {
+    await execCmd(`gcloud secrets delete ${secretId}`)
+  } catch {
+    console.info(`Couldn't delete secret ${secretId} -- skipping`)
+  }
+}
+
 async function createAndUploadKubernetesSecretIfNotExists(
   secretName: string,
   serviceAccountName: string,
