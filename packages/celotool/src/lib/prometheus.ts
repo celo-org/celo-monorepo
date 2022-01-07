@@ -85,11 +85,11 @@ export async function upgradePrometheus(context?: string, clusterConfig?: BaseCl
 function getK8sContextVars(
   clusterConfig?: BaseClusterConfig,
   context?: string
-): [string, string, string] {
+): [string, string, string, string] {
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
   let clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
-  let gcloudProject
-  let gcloudRegion
+  let gcloudProject, gcloudRegion, stackdriverDisabled
+
   if (context) {
     gcloudProject = getDynamicEnvVarValue(
       DynamicEnvVar.PROM_SIDECAR_GCP_PROJECT,
@@ -106,12 +106,18 @@ function getK8sContextVars(
       { context },
       clusterName
     )
+    stackdriverDisabled = getDynamicEnvVarValue(
+      DynamicEnvVar.PROM_SIDECAR_DISABLED,
+      { context },
+      clusterName
+    )
   } else {
     gcloudProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
     gcloudRegion = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+    stackdriverDisabled = fetchEnvOrFallback(envVar.PROMETHEUS_DISABLE_STACKDRIVER_SIDECAR, 'false')
   }
 
-  return [clusterName, gcloudProject, gcloudRegion]
+  return [clusterName, gcloudProject, gcloudRegion, stackdriverDisabled]
 }
 
 function getRemoteWriteParameters(context?: string): string[] {
@@ -139,12 +145,11 @@ function getRemoteWriteParameters(context?: string): string[] {
 
 async function helmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
-  const [clusterName, gcloudProject, gcloudRegion] = getK8sContextVars(clusterConfig, context)
-  const cloudProvider = clusterConfig ? getCloudProviderPrefix(clusterConfig!) : 'gcp'
-  const stackdriverDisabled = fetchEnvOrFallback(
-    envVar.PROMETHEUS_DISABLE_STACKDRIVER_SIDECAR,
-    'false'
+  const [clusterName, gcloudProject, gcloudRegion, stackdriverDisabled] = getK8sContextVars(
+    clusterConfig,
+    context
   )
+  const cloudProvider = clusterConfig ? getCloudProviderPrefix(clusterConfig!) : 'gcp'
 
   const params = [
     `--set namespace=${kubeNamespace}`,
@@ -155,7 +160,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     `--set cluster=${clusterName}`,
     `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
     // Disable stackdriver sidecar env wide. TODO: Update to a contexted variable if needed
-    `--set disableStackDriverMetrics=${stackdriverDisabled}`,
+    `--set stackdriver.disabled=${stackdriverDisabled}`,
   ]
 
   // Remote write to Grafana Cloud
@@ -163,7 +168,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     params.push(...getRemoteWriteParameters(context))
   }
 
-  if (!stackdriverDisabled) {
+  if (stackdriverDisabled.toLowerCase() === 'false') {
     params.push(
       `--set stackdriver.sidecar.imageTag=${sidecarImageTag}`,
       `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`,

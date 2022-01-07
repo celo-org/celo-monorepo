@@ -24,7 +24,7 @@ serviceAccount:
   name: null
 
 stackdriver:
-  enable: true
+  disabled: false
   # When sending metrics from outside GCP to GCP Stackdriver.
   gcloudServiceAccountKeyBase64: null
   # To save $, don't send metrics to SD that probably won't be used.
@@ -94,7 +94,7 @@ stackdriver:
   sidecar:
     imageTag: 0.7.3
 
-storageClassName: null
+# storageClassName: null
 storageSize: 50Gi
 
 remote_write:

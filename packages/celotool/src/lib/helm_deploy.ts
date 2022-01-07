@@ -928,7 +928,7 @@ export async function upgradeGenericHelmChart(
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm upgrade --install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
