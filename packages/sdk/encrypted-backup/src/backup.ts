@@ -198,7 +198,6 @@ export async function createBackup({
   // Password and backup data are not included in any logging as they are likely sensitive.
   debug('creating a backup with the following information', hardening, metadata)
   const nonce = crypto.randomBytes(16)
-  // DO NOT MERGE(victor): Fix up this variable renaming. Goal of avoiding mutable variables.
   const initialKey = deriveKey(KDFInfo.PASSWORD, [password, nonce])
 
   // Generate a fuse key and mix it into the entropy of the key
