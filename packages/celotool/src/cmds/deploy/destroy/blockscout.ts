@@ -3,7 +3,11 @@ import { getInstanceName, getReleaseName, removeHelmRelease } from 'src/lib/bloc
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
-import { deleteCloudSQLInstance, exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
+import {
+  deleteCloudSQLInstance,
+  deleteSecretFromSecretManager,
+  exitIfCelotoolHelmDryRun,
+} from 'src/lib/helm_deploy'
 import { outputIncludes } from 'src/lib/utils'
 import yargs from 'yargs'
 
@@ -35,6 +39,9 @@ export const handler = async (argv: BlockscoutDestroyArgv) => {
   await deleteCloudSQLInstance(instanceName)
   await removeHelmRelease(helmReleaseName, argv.celoEnv)
   await cleanDefaultIngress(argv.celoEnv, `${argv.celoEnv}-blockscout-web-ingress`)
+  await deleteSecretFromSecretManager(`${helmReleaseName}-dbUser`)
+  await deleteSecretFromSecretManager(`${helmReleaseName}-dbPassword`)
+  await deleteSecretFromSecretManager(`${helmReleaseName}-dbUrl`)
 }
 
 async function cleanDefaultIngress(celoEnv: string, ingressName: string) {
