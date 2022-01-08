@@ -325,7 +325,7 @@ export function verifyDomainRestrictedSignatureRequestSignature(
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
  * to the undefined value for type EIP712Optional<string>).
  */
-export function verifyDomainQuotaStatusRequestSignature(
+export function verifyDomainQuotaStatusRequestSignature( // TODO(Alec): what is this?
   request: DomainQuotaStatusRequest<SequentialDelayDomain>
 ): boolean {
   return verifyRequestSignature(domainQuotaStatusRequestEIP712, request)
