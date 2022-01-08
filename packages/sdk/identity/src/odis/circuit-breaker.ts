@@ -11,29 +11,31 @@ export interface CircuitBreakerServiceContext {
 
 export const VALORA_ALFAJORES_CIRCUIT_BREAKER_ENVIRONMENT: CircuitBreakerServiceContext = {
   url: 'https://us-central1-celo-mobile-alfajores.cloudfunctions.net/circuitBreaker/',
-  // DO NOT MERGE: These keys need to be removed or updated with the latest produciton keys.
   publicKey: `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi+9UKUsVY5UGYwHFN2M2
-90RlNputQeJmSi1phRtQgpXP2RvZK/IFkIygiigXPcFlm7FK35A5qi1HqNTL/2sy
-EH+9KnfS5zaUYX0sb2tBiEfzuIh+xLf/MXo1r8fC3MqiIUOZpEDK1XJTxt5XaKC8
-+gg1WUyuMw5Qj7ngaEwWaQGCijsJno3aDMuyvt4GceFYCzhj43LnaA3mhili7ghV
-uOyKMIHCFd6wvMiSGUfIZRZ7md+zvlAZaWFHFMzbbSYvUIMRtkgfm2phRcXetoha
-FCP4PD70/ogeKQswFCiOJo4JKYr3SHujFHq8HgKT3GqJ0JXu3Ry2J/qU29kge6R+
-wwIDAQAB
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAsYkNg3iY1ha4KGCGvHLl
+mOMKV63lq+WsHIgUGfEuyfOWEBetVux9gvQEEPYpKbHgVQrfcegp28LoZYehWZHC
+dIHSACcW0SGZagSOFEgxVSY6MgZZjmbTdlUtLac2cvxIDx8qhkoBjWRWu4g5LfdW
+9QA0tiM3dR/pmA8YWcIYtyjGY1zglA/YqHClKsDRY+dbhshfILfohdFsVNJ3CWLS
+J4yGvVe78AE/WiaXISV5ol+bqve4QlxzbBLIV4s44YONCh18/YhmGHCuSn8yy1/0
+q3YW7COaFEGd7m8VnV2rU/dFLKyF0XEanS6xk9ciL9uafR9dMryEQ7AW+yKmfQBG
+H2i5uiKnWW2a3a873ShG2Qphl9mw1Kcrdxug4qk9y7RoKlMnG3Wdr4HMQb9S8KYf
+07ZyVEbFip26ANWGo8dCA8fWvVtU5DByoWPI+PuglOB22z2noXov98imSFJfz9vu
+yGAQt3CUOwUQvt+RObDXiHHIxJjU+6/81X3Jdnt3dFEfAgMBAAE=
 -----END PUBLIC KEY-----`,
 }
 
 export const VALORA_MAINNET_CIRCUIT_BREAKER_ENVIRONMENT: CircuitBreakerServiceContext = {
   url: 'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/circuitBreaker/',
-  // DO NOT MERGE: These keys need to be removed or updated with the latest produciton keys.
   publicKey: `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsMd1OIdYfTcnYkIXPeym
-KSiQmNCEn2DC2mUichrRpJFeb9VO65PeLjMXTIjKyp4TZ3PhXJyK9kEEF27E1wj8
-C1WqLIwSP97t1479UHaI7NzAV4nvqvziuP9Zq5fmbxourkMYoXMpZEYNK9OEwEvx
-hSQXA1XvYqMALJwRx/8S6taAcJEYenraKiRvxteWqXB6R8HSTxyaOR9qfakZFp1f
-d8B9/c3KDiue80yPng1W4AV5GnltoHCcwe97j5gabqztQl8K0yty73wmAFjDB3Ni
-cOY/855BxdoOT2XQLs99ytPJJG5uoHKEZbHVzy7d/bagnD08w1/vaeTxyRYuGgfb
-mQIDAQAB
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEArQ89m/HIGECXR7ceZZRS
+b6MZEw1S1o5qgi6sLEejBMUQhM/wgySoo5ydiW7S4iyiqEksQNAlOs5Mrv1aE9Ul
+bG+rpglOA1xYLyjY7xUZE2tyPksPXcSKgu6d+G9gVtbmFld1Kr0jVx4qOLejtH3S
+dGbX6g9GshgB1W4iEDZ4qEJBuvItSTudK3BFM1mBfEq1w3kDxNzYKC1zFlw+DWWh
+BgIPB7zEp+MJNTwel2z7H02wsEMJMXzKwaAWaDp8PYfF3RwgCDIFkf+QteYIEUrG
+C9bFhdYpDGY9Ldiz7kca9G9dvXWpZUQOYyOY7CFx0k2XcTBwx4Lq524lNR8waIDu
+OT5jj2SIwXf5eKtyFMUqRNnqgs+IHHcWgh0CH7mfhPlFBMivKlwHgQqCJH3rHlgu
+CMi3ENv4+p7+svshngntxGkEzZcLV3YVW7BG6xSOAqC1tjkM1PkmXENQOq+bxAL6
+bg3W6cTRQAQxoicu6+1c5Tdb/K36TXx0mHan7/Z8JCqfAgMBAAE=
 -----END PUBLIC KEY-----`,
 }
 
