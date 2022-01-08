@@ -29,7 +29,7 @@
   "dependencies": {
     "@celo/base": "1.5.1-dev",
     "@celo/connect": "1.5.1-dev",
-    "@celo/utils": "1.5.1-dev",
+    "@celo/utils": "1.5.2-dev",
     "@celo/wallet-local": "1.5.1-dev",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",

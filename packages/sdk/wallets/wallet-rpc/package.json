@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@celo/connect": "1.5.1-dev",
-    "@celo/utils": "1.5.1-dev",
+    "@celo/utils": "1.5.2-dev",
     "@celo/wallet-base": "1.5.1-dev",
     "@celo/wallet-remote": "1.5.1-dev",
     "bignumber.js": "^9.0.0",

@@ -37,7 +37,7 @@
     "@celo/explorer": "1.5.1-dev",
     "@celo/governance": "1.5.1-dev",
     "@celo/identity": "1.5.1-dev",
-    "@celo/utils": "1.5.1-dev",
+    "@celo/utils": "1.5.2-dev",
     "@celo/wallet-hsm-azure": "1.5.1-dev",
     "@celo/wallet-ledger": "1.5.1-dev",
     "@celo/wallet-local": "1.5.1-dev",

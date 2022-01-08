@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "@celo/base": "1.5.1-dev",
-    "@celo/utils": "1.5.1-dev",
+    "@celo/utils": "1.5.2-dev",
     "@types/country-data": "^0.0.0",
     "@types/ethereumjs-util": "^5.2.0",
     "@types/google-libphonenumber": "^7.4.17",

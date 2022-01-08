@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@celo/base": "1.5.1-dev",
-    "@celo/utils": "1.5.1-dev",
+    "@celo/utils": "1.5.2-dev",
     "@celo/connect": "1.5.1-dev",
     "@celo/contractkit": "1.5.1-dev",
     "@celo/explorer": "1.5.1-dev",

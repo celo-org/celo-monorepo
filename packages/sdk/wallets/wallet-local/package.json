@@ -20,7 +20,7 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/utils": "1.5.1-dev",
+    "@celo/utils": "1.5.2-dev",
     "@celo/connect": "1.5.1-dev",
     "@celo/wallet-base": "1.5.1-dev",
     "@types/ethereumjs-util": "^5.2.0",

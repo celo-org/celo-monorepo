@@ -22,7 +22,7 @@
   "dependencies": {
     "@celo/connect": "1.5.1-dev",
     "@celo/base": "1.5.1-dev",
-    "@celo/utils": "1.5.1-dev",
+    "@celo/utils": "1.5.2-dev",
     "@types/ethereumjs-util": "^5.2.0",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
