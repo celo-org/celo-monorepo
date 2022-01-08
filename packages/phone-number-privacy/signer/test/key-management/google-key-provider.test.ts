@@ -32,7 +32,7 @@ jest.mock('../../src/config', () => ({
 
 const accessSecretVersion = jest.fn()
 
-jest.mock('@google-cloud/secret-manager', () => ({
+jest.mock('@google-cloud/secret-manager/build/src/v1', () => ({
   SecretManagerServiceClient: jest.fn(() => ({ accessSecretVersion })),
 }))
 
