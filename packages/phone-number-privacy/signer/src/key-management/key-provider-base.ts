@@ -17,7 +17,11 @@ export interface KeyProvider {
 const PRIVATE_KEY_SIZE = 72
 
 export abstract class KeyProviderBase implements KeyProvider {
-  protected privateKeys: Map<Key, string> = new Map()
+  protected privateKeys: Map<Key, string>
+
+  constructor() {
+    this.privateKeys = new Map()
+  }
 
   public getPrivateKey(key: Key) {
     const privateKey = this.privateKeys.get(key)
