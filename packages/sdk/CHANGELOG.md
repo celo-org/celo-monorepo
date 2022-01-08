@@ -5,7 +5,7 @@ This package will follow the release process outlined [here](https://docs.celo.o
 
 
 ## Development (not published yet)
-### **[1.5.1-dev]**
+### **[1.5.2-dev]**
 Features
 -  one-line summary - [#](link PR)
 
@@ -16,6 +16,9 @@ Other Changes
 -  one-line summary - [#](link PR)
 
 ## Published
+
+### **[1.5.1]**
+DO NOT MERGE: Figure out what changed
 
 ### **[1.5.0]**
 Features
