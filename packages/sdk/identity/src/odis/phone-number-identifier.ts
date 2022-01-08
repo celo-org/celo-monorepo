@@ -7,10 +7,10 @@ import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthenticationMethod,
   AuthSigner,
+  CombinerSignMessageResponse,
   queryOdis,
   ServiceContext,
   SignMessageRequest,
-  SignMessageResponse,
 } from './query'
 
 // ODIS minimum dollar balance for sig retrieval
@@ -120,7 +120,7 @@ export async function getBlindedPhoneNumberSignature(
     body.sessionID = sessionID
   }
 
-  const response = await queryOdis<SignMessageResponse>(
+  const response = await queryOdis<CombinerSignMessageResponse>(
     signer,
     body,
     context,

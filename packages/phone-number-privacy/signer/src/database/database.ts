@@ -1,4 +1,4 @@
-import { rootLogger as logger } from '@celo/phone-number-privacy-common'
+import { rootLogger } from '@celo/phone-number-privacy-common'
 import knex from 'knex'
 import Knex from 'knex/types'
 import config, { DEV_MODE, SupportedDatabase } from '../config'
@@ -6,6 +6,7 @@ import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
 let db: Knex
 export async function initDatabase(doTestQuery = true) {
+  const logger = rootLogger()
   logger.info({ config: config.db }, 'Initializing database connection')
   const { type, host, port, user, password, database, ssl, poolMaxSize } = config.db
 
@@ -69,6 +70,7 @@ export async function initDatabase(doTestQuery = true) {
 }
 
 async function executeTestQuery(_db: Knex) {
+  const logger = rootLogger()
   logger.info('Counting accounts')
   const result = await _db(ACCOUNTS_TABLE).count(ACCOUNTS_COLUMNS.address).first()
 

@@ -1,5 +1,5 @@
 import { timeout } from '@celo/base'
-import { loggerMiddleware, rootLogger as logger } from '@celo/phone-number-privacy-common'
+import { Endpoints, loggerMiddleware, rootLogger } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'
@@ -7,28 +7,19 @@ import https from 'https'
 import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
 import config, { getVersion } from './config'
-import { DomainAuthService } from './domain/auth/domainAuth.service'
-import { DomainService } from './domain/domain.service'
-import { DomainQuotaService } from './domain/quota/domainQuota.service'
+// import { DomainAuthService } from './domain/auth/domainAuth.service'
+// import { DomainService } from './domain/domain.service'
+// import { DomainQuotaService } from './domain/quota/domainQuota.service'
 import { handleGetBlindedMessagePartialSig } from './signing/get-partial-signature'
 import { handleGetQuota } from './signing/query-quota'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export enum Endpoints {
-  STATUS = '/status',
-  METRICS = '/metrics',
-  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
-  GET_QUOTA = '/getQuota',
-
-  DISABLE_DOMAIN = '/domain/disable',
-  DOMAIN_SIGN = '/domain/sign/',
-  DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
-}
-
 export function createServer() {
   // TODO(Alec)
   // const domainService = new DomainService(new DomainAuthService(), new DomainQuotaService())
+
+  const logger = rootLogger()
 
   logger.info('Creating express server')
   const app = express()
@@ -88,6 +79,7 @@ async function callAndMeterLatency(
 }
 
 function getSslOptions() {
+  const logger = rootLogger()
   const { sslKeyPath, sslCertPath } = config.server
 
   if (!sslKeyPath || !sslCertPath) {

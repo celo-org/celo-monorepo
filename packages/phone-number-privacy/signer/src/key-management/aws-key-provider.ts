@@ -1,4 +1,4 @@
-import { ErrorMessage, rootLogger as logger } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, rootLogger } from '@celo/phone-number-privacy-common'
 import { SecretsManager } from 'aws-sdk'
 import config from '../config'
 import { Key, KeyProviderBase } from './key-provider-base'
@@ -9,6 +9,7 @@ interface SecretStringResult {
 
 export class AWSKeyProvider extends KeyProviderBase {
   public async fetchPrivateKeyFromStore(key: Key) {
+    const logger = rootLogger()
     try {
       // Credentials are managed by AWS client as described in https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html
       const { region, secretName, secretKey } = config.keystore.aws
@@ -31,6 +32,7 @@ export class AWSKeyProvider extends KeyProviderBase {
 
       this.setPrivateKey(key, privateKey)
     } catch (err) {
+      logger.info('Error retrieving key')
       logger.error(err)
       throw new Error(ErrorMessage.KEY_FETCH_ERROR)
     }

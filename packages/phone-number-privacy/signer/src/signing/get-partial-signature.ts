@@ -1,6 +1,8 @@
 import {
   authenticateUser,
+  Endpoints,
   ErrorMessage,
+  GetBlindedMessageSigRequest,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
@@ -21,19 +23,12 @@ import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
 import { DefaultKeyName, Key, KeyProvider } from '../key-management/key-provider-base'
-import { Endpoints } from '../server'
 import { getBlockNumber, getContractKit } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 
 allSettled.shim()
 
-export interface GetBlindedMessagePartialSigRequest {
-  account: string
-  blindedQueryPhoneNumber: string
-  hashedPhoneNumber?: string
-  timestamp?: number
-  sessionID?: string
-}
+export type GetBlindedMessagePartialSigRequest = GetBlindedMessageSigRequest
 
 export async function handleGetBlindedMessagePartialSig(
   request: Request<{}, {}, GetBlindedMessagePartialSigRequest>,

@@ -55,7 +55,7 @@ interface Config {
 let config: Config
 
 if (DEV_MODE) {
-  logger.debug('Running in dev mode')
+  logger().debug('Running in dev mode')
   config = {
     blockchain: {
       provider: FORNO_ALFAJORES,
