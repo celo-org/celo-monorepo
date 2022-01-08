@@ -21,6 +21,18 @@ export const E2E_TEST_PHONE_NUMBERS: string[] = E2E_TEST_PHONE_NUMBERS_RAW.map((
 )
 export const E2E_TEST_ACCOUNTS: string[] = ['0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb']
 
+// TODO(Alec)
+export enum Endpoints {
+  // STATUS = '/status',
+  // GET_QUOTA = '/getQuota',
+  MATCHMAKING = '/getContactMatches',
+  PNP_SIGN = '/getBlindedMessageSig',
+
+  // DISABLE_DOMAIN = '/domain/disable',
+  DOMAIN_SIGN = '/domain/sign/',
+  // DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
+}
+
 interface Config {
   blockchain: {
     provider: string
@@ -33,8 +45,14 @@ interface Config {
     ssl: boolean
   }
   odisServices: {
-    signers: string
-    timeoutMilliSeconds: number
+    phoneNumberPrivacy: {
+      signers: string
+      timeoutMilliSeconds: number
+    }
+    domains: {
+      signers: string
+      timeoutMilliSeconds: number
+    }
   }
   keys: {
     phoneNumberPrivacy: {
@@ -68,9 +86,16 @@ if (DEV_MODE) {
       ssl: false,
     },
     odisServices: {
-      signers:
-        '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
-      timeoutMilliSeconds: 5 * 1000,
+      phoneNumberPrivacy: {
+        signers:
+          '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
+        timeoutMilliSeconds: 5 * 1000,
+      },
+      domains: {
+        signers:
+          '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
+        timeoutMilliSeconds: 5 * 1000,
+      },
     },
     keys: {
       phoneNumberPrivacy: {
@@ -101,8 +126,15 @@ if (DEV_MODE) {
       ssl: toBool(functionConfig.db.ssl, true),
     },
     odisServices: {
-      signers: functionConfig.odisservices.signers,
-      timeoutMilliSeconds: functionConfig.odisservices.timeoutMilliSeconds || 5 * 1000,
+      phoneNumberPrivacy: {
+        signers: functionConfig.odisservices.phoneNumberPrivacy.signers,
+        timeoutMilliSeconds:
+          functionConfig.odisservices.phoneNumberPrivacy.timeoutMilliSeconds || 5 * 1000,
+      },
+      domains: {
+        signers: functionConfig.odisservices.domains.signers,
+        timeoutMilliSeconds: functionConfig.odisservices.domains.timeoutMilliSeconds || 5 * 1000,
+      },
     },
     keys: {
       phoneNumberPrivacy: {
