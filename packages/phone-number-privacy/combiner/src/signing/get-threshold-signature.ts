@@ -1,5 +1,10 @@
 import {
+  SequentialDelayDomain,
+  SequentialDelayDomainOptions,
+} from '@celo/identity/lib/odis/domains'
+import {
   authenticateUser,
+  DomainRestrictedSignatureRequest,
   ErrorMessage,
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
@@ -20,12 +25,24 @@ import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
-import config, { VERSION } from '../config'
+import config, { Endpoints, VERSION } from '../config'
 import { getContractKit } from '../web3/contracts'
 
-const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
-
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
+
+interface CombinerPnpSigReq {
+  endpoint: Endpoints.PNP_SIGN
+  request: GetBlindedMessageSigRequest
+}
+
+interface CombinerDomainsSigReq {
+  endpoint: Endpoints.DOMAIN_SIGN
+  request: DomainRestrictedSignatureRequest<SequentialDelayDomain, SequentialDelayDomainOptions>
+}
+
+type KnownCombinerSigReq = CombinerPnpSigReq | CombinerDomainsSigReq
+
+type CombinerSigEndpoint = Endpoints.PNP_SIGN | Endpoints.DOMAIN_SIGN
 
 interface SignerService {
   url: string
@@ -42,11 +59,12 @@ export async function handleGetBlindedMessageSig(request: Request, response: Res
   const logger: Logger = response.locals.logger
 
   try {
-    if (!isValidGetSignatureInput(request.body)) {
+    if (!isValidGetSignatureInput(request)) {
       respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
       return
     }
     if (!(await authenticateUser(request, getContractKit(), logger))) {
+      // TODO(Alec): handle authentication for Domains (currently lives in Signer)
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
       return
     }
@@ -73,15 +91,24 @@ async function requestSignatures(request: Request, response: Response) {
   })
   obs.observe({ entryTypes: ['measure'], buffered: true })
 
-  request.headers[KEY_VERSION_HEADER] = config.keys.phoneNumberPrivacy.version.toString()
+  // Get standardized variable set regardless of request type (PNP / Domains)
+  const {
+    signers,
+    timeoutMs,
+    keyVersion,
+    threshold,
+    blindedMessage,
+    pubKey,
+  } = standardizeRequestParams(request)
 
-  const signers = JSON.parse(config.odisServices.signers) as SignerService[]
+  request.headers[KEY_VERSION_HEADER] = keyVersion.toString()
+
   let timedOut = false
   const controller = new AbortController()
   const timeout = setTimeout(() => {
     timedOut = true
     controller.abort()
-  }, config.odisServices.timeoutMilliSeconds)
+  }, timeoutMs)
 
   const signerReqs = signers.map((service) => {
     const startMark = `Begin requestSignature ${service.url}`
@@ -104,8 +131,11 @@ async function requestSignatures(request: Request, response: Response) {
             responses,
             service.url,
             blsCryptoClient,
-            request.body.blindedQueryPhoneNumber,
-            controller
+            blindedMessage,
+            controller,
+            pubKey,
+            threshold,
+            keyVersion
           )
         } else {
           handleFailedResponse(
@@ -115,7 +145,8 @@ async function requestSignatures(request: Request, response: Response) {
             failedRequests,
             response,
             controller,
-            errorCodes
+            errorCodes,
+            threshold
           )
         }
       })
@@ -141,7 +172,8 @@ async function requestSignatures(request: Request, response: Response) {
           failedRequests,
           response,
           controller,
-          errorCodes
+          errorCodes,
+          threshold
         )
       })
       .finally(() => {
@@ -160,7 +192,9 @@ async function requestSignatures(request: Request, response: Response) {
   if (blsCryptoClient.hasSufficientSignatures()) {
     try {
       const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
-        request.body.blindedQueryPhoneNumber,
+        blindedMessage,
+        pubKey,
+        threshold,
         logger
       )
       response.json({ success: true, combinedSignature, version: VERSION })
@@ -180,13 +214,16 @@ async function handleSuccessResponse(
   responses: SignMsgRespWithStatus[],
   serviceUrl: string,
   blsCryptoClient: BLSCryptographyClient,
-  blindedQueryPhoneNumber: string,
-  controller: AbortController
+  blindedMessage: string,
+  controller: AbortController,
+  pubKey: string,
+  threshold: number,
+  expectedKeyVersion: number
 ) {
   const logger: Logger = response.locals.logger
   const keyVersion: number = Number(response.header(KEY_VERSION_HEADER))
   logger.info({ keyVersion }, 'Signer responded with key version')
-  if (keyVersion !== config.keys.phoneNumberPrivacy.version) {
+  if (keyVersion !== expectedKeyVersion) {
     throw new Error(`Incorrect key version received from signer ${serviceUrl}`)
   }
   const signResponse = JSON.parse(data) as SignerResponse
@@ -220,7 +257,12 @@ async function handleSuccessResponse(
   // BLS threshold signatures can be combined without all partial signatures
   if (blsCryptoClient.hasSufficientSignatures()) {
     try {
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedQueryPhoneNumber, logger)
+      await blsCryptoClient.combinePartialBlindedSignatures(
+        blindedMessage,
+        pubKey,
+        threshold,
+        logger
+      )
       // Close outstanding requests
       controller.abort()
     } catch {
@@ -237,7 +279,8 @@ function handleFailedResponse(
   failedRequests: Set<string>,
   response: Response,
   controller: AbortController,
-  errorCodes: Map<number, number>
+  errorCodes: Map<number, number>,
+  threshold: number
 ) {
   if (status) {
     errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
@@ -246,8 +289,8 @@ function handleFailedResponse(
   // Tracking failed request count via signer url prevents
   // double counting the same failed request by mistake
   failedRequests.add(service.url)
-  const shouldFailFast =
-    signerCount - failedRequests.size < config.keys.phoneNumberPrivacy.threshold
+
+  const shouldFailFast = signerCount - failedRequests.size < threshold
   logger.info(`Recieved failure from ${failedRequests.size}/${signerCount} signers.`)
   if (shouldFailFast) {
     logger.info('Not possible to reach a sufficient number of signatures. Failing fast.')
@@ -333,7 +376,7 @@ function parameterizedSignatureRequest(
   logger: Logger
 ): Promise<FetchResponse> {
   logger.debug({ signer: baseUrl }, `Requesting partial sig`)
-  const url = baseUrl + PARTIAL_SIGN_MESSAGE_ENDPOINT
+  const url = baseUrl + (request.path as CombinerSigEndpoint)
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -372,13 +415,70 @@ function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
   return maxErrorCode > 0 ? maxErrorCode : null
 }
 
-function isValidGetSignatureInput(requestBody: GetBlindedMessageSigRequest): boolean {
-  return (
-    hasValidAccountParam(requestBody) &&
-    hasValidBlindedPhoneNumberParam(requestBody) &&
-    identifierIsValidIfExists(requestBody) &&
-    isBodyReasonablySized(requestBody)
-  )
+function isValidGetSignatureInput(request: Request): boolean {
+  const knownSigReq: KnownCombinerSigReq = {
+    endpoint: request.path as CombinerSigEndpoint,
+    request: request.body,
+  }
+  switch (knownSigReq.endpoint) {
+    case Endpoints.DOMAIN_SIGN:
+      return true // TODO(Alec): input handling for Domains (currently lives in Signer)
+    case Endpoints.PNP_SIGN:
+      return (
+        hasValidAccountParam(knownSigReq.request) &&
+        hasValidBlindedPhoneNumberParam(knownSigReq.request) &&
+        identifierIsValidIfExists(knownSigReq.request) &&
+        isBodyReasonablySized(knownSigReq.request)
+      )
+    default:
+      // canary provides a compile-time check that all subtypes of KnownCombinerSigReq have branches.
+      // If a case was missed, then an error will report that knownSigReq cannot be assigned to type `never`.
+      const canary = (x: never) => x
+      canary(knownSigReq)
+      throw new Error('Implementation error. Input of type KnownCombinerSigReq was not recognized')
+  }
+}
+
+function standardizeRequestParams(
+  request: Request
+): {
+  signers: SignerService[]
+  timeoutMs: number
+  threshold: number
+  blindedMessage: string
+  keyVersion: number
+  pubKey: string
+} {
+  const knownSigReq: KnownCombinerSigReq = {
+    endpoint: request.path as CombinerSigEndpoint,
+    request: request.body,
+  }
+  switch (knownSigReq.endpoint) {
+    case Endpoints.PNP_SIGN:
+      return {
+        signers: JSON.parse(config.odisServices.phoneNumberPrivacy.signers),
+        timeoutMs: config.odisServices.phoneNumberPrivacy.timeoutMilliSeconds,
+        threshold: config.keys.phoneNumberPrivacy.threshold,
+        blindedMessage: request.body.blindedQueryPhoneNumber,
+        keyVersion: config.keys.phoneNumberPrivacy.version,
+        pubKey: config.keys.phoneNumberPrivacy.pubKey,
+      }
+    case Endpoints.DOMAIN_SIGN:
+      return {
+        signers: JSON.parse(config.odisServices.domains.signers),
+        timeoutMs: config.odisServices.domains.timeoutMilliSeconds,
+        threshold: config.keys.domains.threshold,
+        blindedMessage: request.body.blindedMessage,
+        keyVersion: config.keys.domains.version,
+        pubKey: config.keys.domains.pubKey,
+      }
+    default:
+      // canary provides a compile-time check that all subtypes of KnownCombinerSigReq have branches.
+      // If a case was missed, then an error will report that knownSigReq cannot be assigned to type `never`.
+      const canary = (x: never) => x
+      canary(knownSigReq)
+      throw new Error('Implementation error. Input of type KnownCombinerSigReq was not recognized')
+  }
 }
 
 function handleMissingSignatures(
