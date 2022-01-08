@@ -25,6 +25,7 @@ jest.mock('../../src/config', () => ({
     google: {
       projectId: 'mockProject',
       secretVersion: 'mockSecretVersion',
+      secretName: 'mockSecretName',
     },
   },
 }))
