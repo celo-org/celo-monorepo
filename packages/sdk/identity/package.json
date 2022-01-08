@@ -28,6 +28,7 @@
     "@celo/base": "1.5.1-dev",
     "@celo/utils": "1.5.1-dev",
     "@celo/contractkit": "1.5.1-dev",
+    "@celo/phone-number-privacy-common": "1.0.36-dev",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
@@ -46,6 +47,6 @@
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da"
   },
   "engines": {
-    "node": ">=8.13.0"
+    "node": ">=12.9.0"
   }
 }
