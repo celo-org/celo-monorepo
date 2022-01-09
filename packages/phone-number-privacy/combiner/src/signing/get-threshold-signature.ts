@@ -16,6 +16,7 @@ import {
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
+  verifyDomainRestrictedSignatureRequestSignature,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
@@ -63,8 +64,7 @@ export async function handleGetBlindedMessageSig(request: Request, response: Res
       respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
       return
     }
-    if (!(await authenticateUser(request, getContractKit(), logger))) {
-      // TODO(Alec): handle authentication for Domains (currently lives in Signer)
+    if (!(await authenticateSignatureRequest(request, logger))) {
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
       return
     }
@@ -430,6 +430,25 @@ function isValidGetSignatureInput(request: Request): boolean {
         identifierIsValidIfExists(knownSigReq.request) &&
         isBodyReasonablySized(knownSigReq.request)
       )
+    default:
+      // canary provides a compile-time check that all subtypes of KnownCombinerSigReq have branches.
+      // If a case was missed, then an error will report that knownSigReq cannot be assigned to type `never`.
+      const canary = (x: never) => x
+      canary(knownSigReq)
+      throw new Error('Implementation error. Input of type KnownCombinerSigReq was not recognized')
+  }
+}
+
+async function authenticateSignatureRequest(request: Request, logger: Logger): Promise<boolean> {
+  const knownSigReq: KnownCombinerSigReq = {
+    endpoint: request.path as CombinerSigEndpoint,
+    request: request.body,
+  }
+  switch (knownSigReq.endpoint) {
+    case Endpoints.DOMAIN_SIGN:
+      return verifyDomainRestrictedSignatureRequestSignature(knownSigReq.request)
+    case Endpoints.PNP_SIGN:
+      return await authenticateUser(request, getContractKit(), logger)
     default:
       // canary provides a compile-time check that all subtypes of KnownCombinerSigReq have branches.
       // If a case was missed, then an error will report that knownSigReq cannot be assigned to type `never`.
