@@ -21,18 +21,6 @@ export const E2E_TEST_PHONE_NUMBERS: string[] = E2E_TEST_PHONE_NUMBERS_RAW.map((
 )
 export const E2E_TEST_ACCOUNTS: string[] = ['0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb']
 
-// TODO(Alec)
-export enum Endpoints {
-  // STATUS = '/status',
-  // GET_QUOTA = '/getQuota',
-  MATCHMAKING = '/getContactMatches',
-  PNP_SIGN = '/getBlindedMessageSig',
-
-  // DISABLE_DOMAIN = '/domain/disable',
-  DOMAIN_SIGN = '/domain/sign/',
-  // DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
-}
-
 interface Config {
   blockchain: {
     provider: string

@@ -1,6 +1,7 @@
 import {
   authenticateUser,
   DomainRestrictedSignatureRequest,
+  Endpoints,
   ErrorMessage,
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
@@ -24,7 +25,7 @@ import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
-import config, { Endpoints, VERSION } from '../config'
+import config, { VERSION } from '../config'
 import { getContractKit } from '../web3/contracts'
 
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure

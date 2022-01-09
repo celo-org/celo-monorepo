@@ -1,8 +1,8 @@
-import { ErrorMessage, loggerMiddleware } from '@celo/phone-number-privacy-common'
+import { Endpoints, ErrorMessage, loggerMiddleware } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import config, { Endpoints, FORNO_ALFAJORES, VERSION } from './config'
+import config, { FORNO_ALFAJORES, VERSION } from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 import { handleGetBlindedMessageSig } from './signing/get-threshold-signature'
 
