@@ -1,8 +1,4 @@
 import {
-  SequentialDelayDomain,
-  SequentialDelayDomainOptions,
-} from '@celo/identity/lib/odis/domains'
-import {
   authenticateUser,
   DomainRestrictedSignatureRequest,
   ErrorMessage,
@@ -11,8 +7,11 @@ import {
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
+  isKnownDomain,
   KEY_VERSION_HEADER,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  SequentialDelayDomain,
+  SequentialDelayDomainOptions,
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
@@ -422,7 +421,7 @@ function isValidGetSignatureInput(request: Request): boolean {
   }
   switch (knownSigReq.endpoint) {
     case Endpoints.DOMAIN_SIGN:
-      return true // TODO(Alec): input handling for Domains (currently lives in Signer)
+      return isKnownDomain(knownSigReq.request.domain)
     case Endpoints.PNP_SIGN:
       return (
         hasValidAccountParam(knownSigReq.request) &&
