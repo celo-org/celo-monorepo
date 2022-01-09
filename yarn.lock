@@ -1477,6 +1477,23 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
+"@celo/identity@1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-1.5.1.tgz#4c1bf29c1db312cc98895b3ddc8b66572b13d9f2"
+  integrity sha512-wwOkhgxoGqo+BNeIWXKU0KT68L5fHYexAjo8736djf2GPRre81aUqbALL9UEX/CksqiQRFUjjUo+CdSGCLbEjw==
+  dependencies:
+    "@celo/base" "1.5.1"
+    "@celo/contractkit" "1.5.1"
+    "@celo/utils" "1.5.1"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    elliptic "^6.5.4"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.2.0.tgz#2560b470e348d2628debe899885724ce5b218bc3"

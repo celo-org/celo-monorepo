@@ -32,7 +32,7 @@ import { getContractKit } from '../web3/contracts'
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
 interface CombinerPnpSigReq {
-  endpoint: Endpoints.PNP_SIGN
+  endpoint: Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG
   request: GetBlindedMessageSigRequest
 }
 
@@ -43,7 +43,7 @@ interface CombinerDomainsSigReq {
 
 type KnownCombinerSigReq = CombinerPnpSigReq | CombinerDomainsSigReq
 
-type CombinerSigEndpoint = Endpoints.PNP_SIGN | Endpoints.DOMAIN_SIGN
+type CombinerSigEndpoint = Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG | Endpoints.DOMAIN_SIGN
 
 interface SignerService {
   url: string
@@ -423,7 +423,7 @@ function isValidGetSignatureInput(request: Request): boolean {
   switch (knownSigReq.endpoint) {
     case Endpoints.DOMAIN_SIGN:
       return isKnownDomain(knownSigReq.request.domain)
-    case Endpoints.PNP_SIGN:
+    case Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG:
       return (
         hasValidAccountParam(knownSigReq.request) &&
         hasValidBlindedPhoneNumberParam(knownSigReq.request) &&
@@ -447,7 +447,7 @@ async function authenticateSignatureRequest(request: Request, logger: Logger): P
   switch (knownSigReq.endpoint) {
     case Endpoints.DOMAIN_SIGN:
       return verifyDomainRestrictedSignatureRequestSignature(knownSigReq.request)
-    case Endpoints.PNP_SIGN:
+    case Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG:
       return await authenticateUser(request, getContractKit(), logger)
     default:
       // canary provides a compile-time check that all subtypes of KnownCombinerSigReq have branches.
@@ -473,7 +473,7 @@ function standardizeRequestParams(
     request: request.body,
   }
   switch (knownSigReq.endpoint) {
-    case Endpoints.PNP_SIGN:
+    case Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG:
       return {
         signers: JSON.parse(config.odisServices.phoneNumberPrivacy.signers),
         timeoutMs: config.odisServices.phoneNumberPrivacy.timeoutMilliSeconds,

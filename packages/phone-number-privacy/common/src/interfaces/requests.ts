@@ -20,6 +20,7 @@ export enum Endpoints {
   METRICS = '/metrics',
   GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
   GET_QUOTA = '/getQuota',
+  MATCHMAKING = '/getContactMatches',
 
   DISABLE_DOMAIN = '/domain/disable',
   DOMAIN_SIGN = '/domain/sign/',
