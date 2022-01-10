@@ -62,16 +62,6 @@ the `volumes` section.
   emptyDir: {}
 {{- end -}}
 
-{{- /* Defines init container awaiting for migrations to run. */ -}}
-{{- define "celo.blockscout.initContainer.blockscout-init" -}}
-- name: "blockscout-init"
-  image: "groundnuty/k8s-wait-for:1.3"
-  imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
-  args:
-  - job
-  - {{ .Release.Name }}-migration
-{{- end -}}
-
 {{- /* Defines init container copying secrets-init to the specified directory. */ -}}
 {{- define "celo.blockscout.initContainer.secrets-init" -}}
 - name: secrets-init

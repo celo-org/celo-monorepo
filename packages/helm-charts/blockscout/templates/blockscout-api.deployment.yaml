@@ -35,7 +35,6 @@ spec:
       serviceAccountName: {{ .Release.Name }}-rbac
       initContainers:
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
-{{ include "celo.blockscout.initContainer.blockscout-init" . | indent 6 }}
       containers:
       - name: blockscout-api
         image: {{ .Values.blockscout.image.repository }}:api-{{ .Values.blockscout.image.tag }}
