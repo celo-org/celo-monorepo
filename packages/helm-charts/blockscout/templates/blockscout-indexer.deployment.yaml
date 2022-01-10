@@ -36,7 +36,6 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.blockscout.indexer.terminationGracePeriodSeconds }}
       initContainers:
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
-{{ include "celo.blockscout.initContainer.blockscout-init" . | indent 6 }}
       containers:
       - name: blockscout-indexer
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
