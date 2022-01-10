@@ -1,9 +1,9 @@
 import { Request } from 'express'
 import Logger from 'bunyan'
 
+import { AuthenticationMethod } from '../../src/interfaces/requests'
 import * as auth from '../../src/utils/authentication'
 import { ContractKit } from '@celo/contractkit'
-import { AuthenticationMethod } from '@celo/identity/lib/odis/query'
 
 describe('Authentication test suite', () => {
   const logger = Logger.createLogger({
