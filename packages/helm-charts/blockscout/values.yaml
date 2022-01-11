@@ -215,6 +215,7 @@ blockscout:
     drop: "false"
   epochRewards:
     enabled: false
+  grafanaUrl: https://clabs.grafana.net
   secrets:
     # Format:
     # secretName: gcp:secretmanager:projects/<project-id>/secrets/<env>-blockscout-<secret-key>
