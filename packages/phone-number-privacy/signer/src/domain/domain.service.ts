@@ -6,12 +6,14 @@ import {
   DomainQuotaStatusRequest,
   DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
+  DomainRequest,
   DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseSuccess,
   Endpoints,
   ErrorMessage,
   isKnownDomain,
+  KEY_VERSION_HEADER,
   KnownDomain,
   KnownDomainState,
   WarningMessage,
@@ -21,7 +23,7 @@ import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { Counters } from '../common/metrics'
-import { getVersion } from '../config'
+import config, { getVersion } from '../config'
 import { getTransaction } from '../database/database'
 import { DOMAINS_STATES_COLUMNS, DomainState } from '../database/models/domainState'
 import {
@@ -31,9 +33,12 @@ import {
   setDomainDisabled,
 } from '../database/wrappers/domainState'
 import { getKeyProvider } from '../key-management/key-provider'
+import { DefaultKeyName, Key } from '../key-management/key-provider-base'
 import { IDomainAuthService } from './auth/domainAuth.interface'
 import { IDomainService } from './domain.interface'
 import { IDomainQuotaService } from './quota/domainQuota.interface'
+
+// TODO(Alec)(Next): Carefully review this file
 
 export class DomainService implements IDomainService {
   public constructor(
@@ -49,7 +54,7 @@ export class DomainService implements IDomainService {
 
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, response, Endpoints.DISABLE_DOMAIN, logger)) {
+    if (!this.inputValidation(domain, request, response, Endpoints.DISABLE_DOMAIN, logger)) {
       // inputValidation returns a response to the user internally. Nothing left to do.
       return
     }
@@ -59,9 +64,10 @@ export class DomainService implements IDomainService {
       version: domain.version,
       hash: domainHash(domain),
     })
+    const trx = await getTransaction()
     try {
-      const trx = await getTransaction()
       const domainState = await getDomainStateWithLock(domain, trx, logger)
+
       if (!domainState) {
         // If the domain is not currently recorded in the state database, add it now.
         await insertDomainState(DomainState.createEmptyDomainState(domain), trx, logger)
@@ -80,6 +86,7 @@ export class DomainService implements IDomainService {
         500,
         ErrorMessage.DATABASE_UPDATE_FAILURE
       )
+      trx.rollback(error)
     }
   }
 
@@ -91,7 +98,7 @@ export class DomainService implements IDomainService {
 
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
+    if (!this.inputValidation(domain, request, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
       // inputValidation returns a response to the user internally. Nothing left to do.
       return
     }
@@ -143,7 +150,7 @@ export class DomainService implements IDomainService {
 
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, response, Endpoints.DOMAIN_SIGN, logger)) {
+    if (!this.inputValidation(domain, request, response, Endpoints.DOMAIN_SIGN, logger)) {
       // inputValidation returns a response to the user internally. Nothing left to do.
       return
     }
@@ -153,15 +160,33 @@ export class DomainService implements IDomainService {
       hash: domainHash(domain),
     })
 
+    const key: Key = {
+      name: DefaultKeyName.DOMAINS,
+      version: Number(request.headers[KEY_VERSION_HEADER]) || config.keystore.keys.domains.latest,
+    }
+
     try {
       const trx = await getTransaction()
       let domainState = await getDomainStateWithLock(domain, trx, logger)
+
+      if (!this.nonceCheck(request, response, domainState, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
+        return
+      }
+
       if (!domainState) {
         domainState = await insertDomainState(
           DomainState.createEmptyDomainState(domain),
           trx,
           logger
         )
+      }
+      if (domainState[DOMAINS_STATES_COLUMNS.disabled]) {
+        logger.warn(`Domain is disabled`, {
+          name: domain.name,
+          version: domain.version,
+        })
+        respondWithError(Endpoints.DOMAIN_SIGN, response, 400, WarningMessage.DISABLED_DOMAIN)
+        return
       }
 
       const quotaState = await this.quotaService.checkAndUpdateQuota(
@@ -184,7 +209,7 @@ export class DomainService implements IDomainService {
       let signature: string
       try {
         const keyProvider = getKeyProvider()
-        const privateKey = keyProvider.getPrivateKey()
+        const privateKey = await keyProvider.getPrivateKeyOrFetchFromStore(key)
         signature = computeBlindedSignature(request.body.blindedMessage, privateKey, logger)
       } catch (err) {
         trx.rollback()
@@ -212,11 +237,12 @@ export class DomainService implements IDomainService {
 
   private inputValidation(
     domain: Domain,
+    request: Request<{}, {}, DomainRequest>,
     response: Response,
     endpoint: Endpoints,
     logger: Logger
   ): domain is KnownDomain {
-    if (!this.authService.authCheck()) {
+    if (!this.authService.authCheck(request.body, endpoint, logger)) {
       logger.warn(`Received unauthorized request to ${endpoint} `, {
         name: domain.name,
         version: domain.version,
@@ -234,6 +260,20 @@ export class DomainService implements IDomainService {
       return false
     }
 
+    return true
+  }
+
+  private nonceCheck(
+    request: Request<{}, {}, DomainRequest>,
+    response: Response,
+    domainState: DomainState | null,
+    endpoint: Endpoints,
+    logger: Logger
+  ): boolean {
+    if (domainState && !this.authService.nonceCheck(request.body, domainState, logger)) {
+      respondWithError(endpoint, response, 403, WarningMessage.UNAUTHENTICATED_USER)
+      return false
+    }
     return true
   }
 }
