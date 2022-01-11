@@ -222,13 +222,9 @@ export async function createSecretInSecretManagerIfNotExists(
     console.info(`Secret ${secretId} already exists, skipping creation...`)
   } catch (error) {
     await execCmd(
-      `gcloud secrets create ${secretId} --replication-policy="automatic" --labels ${secretLabels.join(
+      `echo -n "${secretValue}" | gcloud secrets create ${secretId} --data-file=- --replication-policy="automatic" --labels ${secretLabels.join(
         ','
       )}`
-    )
-
-    await execCmd(
-      `echo -n "${secretValue}" | gcloud secrets versions add ${secretId} --data-file=-`
     )
   }
 }

@@ -52,7 +52,7 @@ blockscout:
         memory: 250M
         cpu: 500m
   metadataCrawler:
-    enabled: true
+    enabled: false
   archiveNodes:
     jsonrpcHttpUrl: http://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
     jsonrpcWsUrl: ws://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
