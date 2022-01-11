@@ -1455,7 +1455,7 @@
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.17.tgz#dbe411467efd9aaf566e31dfdebda39342ff0f27"
   integrity sha512-XKIoGAij/FHWCzgIlZxkQR6PVWEGeE1V6rjOwDrM7WwGx9HJ3q3WBBUTibGTCz5gypMeurBbYGym/AZD/Nb78g==
   dependencies:
-    "@umpirsky/country-list" "https://github.com/umpirsky/country-list#05fda51"
+    "@umpirsky/country-list" "github:umpirsky/country-list#05fda51"
     bigi "^1.1.0"
     bignumber.js "^9.0.0"
     bip32 "2.0.5"
@@ -1478,7 +1478,7 @@
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-0.1.8.tgz#a9259f6f9a915da0f50c7f884cf2931f68627076"
   integrity sha512-Zgr/N7wHTdMsc+C519JkZCqe6rfrNW8LSnscTISi5NfMTPbvDs/TvWrcuKi36JLVU5SYAPx55JGrSVOhQ1mmeg==
   dependencies:
-    "@umpirsky/country-list" "https://github.com/umpirsky/country-list#05fda51"
+    "@umpirsky/country-list" "github:umpirsky/country-list#05fda51"
     bigi "^1.1.0"
     bignumber.js "^7.2.0"
     bls12377js "https://github.com/celo-org/bls12377js#400bcaeec9e7620b040bfad833268f5289699cac"
@@ -5623,9 +5623,9 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@umpirsky/country-list@https://github.com/umpirsky/country-list#05fda51":
+"@umpirsky/country-list@github:umpirsky/country-list#05fda51":
   version "1.0.0"
-  resolved "https://github.com/umpirsky/country-list#05fda51cd97b3294e8175ffed06104c44b3c71d7"
+  resolved "https://codeload.github.com/umpirsky/country-list#05fda51cd97b3294e8175ffed06104c44b3c71d7"
 
 "@walletconnect/client@2.0.0-beta.20.3":
   version "2.0.0-beta.20.3"
