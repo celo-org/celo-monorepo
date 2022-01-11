@@ -22,10 +22,10 @@ export enum SupportedDatabase {
 }
 
 export enum SupportedKeystore {
-  AzureKeyVault = 'AzureKeyVault',
-  GoogleSecretManager = 'GoogleSecretManager',
-  AWSSecretManager = 'AWSSecretManager',
-  MockSecretManager = 'MockSecretManager',
+  AZURE_KEY_VAULT = 'AzureKeyVault',
+  GOOGLE_SECRET_MANAGER = 'GoogleSecretManager',
+  AWS_SECRET_MANAGER = 'AWSSecretManager',
+  MOCK_SECRET_MANAGER = 'MockSecretManager',
 }
 
 interface Config {
@@ -60,6 +60,16 @@ interface Config {
   }
   keystore: {
     type: SupportedKeystore
+    keys: {
+      phoneNumberPrivacy: {
+        name: string
+        latest: number
+      }
+      domains: {
+        name: string
+        latest: number
+      }
+    }
     azure: {
       clientID: string
       clientSecret: string
@@ -118,6 +128,16 @@ const config: Config = {
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
+    keys: {
+      phoneNumberPrivacy: {
+        name: env.PHONE_NUMBER_PRIVACY_KEY_NAME_BASE,
+        latest: toNum(env.PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION) || 2,
+      },
+      domains: {
+        name: env.DOMAINS_KEY_NAME_BASE,
+        latest: toNum(env.DOMAINS_LATEST_KEY_VERSION) || 1,
+      },
+    },
     azure: {
       clientID: env.KEYSTORE_AZURE_CLIENT_ID,
       clientSecret: env.KEYSTORE_AZURE_CLIENT_SECRET,
@@ -136,7 +156,7 @@ const config: Config = {
       secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
-  timeout: env.ODIS_SIGNER_TIMEOUT || 5000,
+  timeout: toNum(env.ODIS_SIGNER_TIMEOUT) || 5000,
   test_quota_bypass_percentage: toNum(env.TEST_QUOTA_BYPASS_PERCENTAGE) || 0,
 }
 export default config

@@ -7,6 +7,7 @@ import {
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
+  KEY_VERSION_HEADER,
   SignMessageResponse,
   SignMessageResponseFailure,
   WarningMessage,
@@ -21,6 +22,7 @@ import config, { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
+import { DefaultKeyName, Key, KeyProvider } from '../key-management/key-provider-base'
 import { getBlockNumber, getContractKit } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 
@@ -37,6 +39,12 @@ export async function handleGetBlindedMessagePartialSig(
   const logger: Logger = response.locals.logger
   logger.info({ request: request.body }, 'Request received')
   logger.debug('Begin handleGetBlindedMessagePartialSig')
+
+  const key: Key = {
+    name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
+    version:
+      Number(request.headers[KEY_VERSION_HEADER]) || config.keystore.keys.phoneNumberPrivacy.latest,
+  }
 
   try {
     if (!isValidGetSignatureInput(request.body)) {
@@ -124,12 +132,10 @@ export async function handleGetBlindedMessagePartialSig(
     const meterGenerateSignature = Histograms.getBlindedSigInstrumentation
       .labels('generateSignature')
       .startTimer()
-    let keyProvider
-    let privateKey
-    let signature
+    let signature: string
     try {
-      keyProvider = getKeyProvider()
-      privateKey = keyProvider.getPrivateKey()
+      const keyProvider: KeyProvider = getKeyProvider()
+      const privateKey: string = await keyProvider.getPrivateKeyOrFetchFromStore(key)
       signature = computeBlindedSignature(blindedQueryPhoneNumber, privateKey, logger)
     } catch (err) {
       meterGenerateSignature()
@@ -181,7 +187,7 @@ export async function handleGetBlindedMessagePartialSig(
     }
     Counters.responses.labels(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, '200').inc()
     logger.info({ response: signMessageResponse }, 'Signature retrieval success')
-    response.json(signMessageResponse)
+    response.set(KEY_VERSION_HEADER, key.version.toString()).json(signMessageResponse)
   } catch (err) {
     logger.error('Failed to get signature')
     logger.error(err)
