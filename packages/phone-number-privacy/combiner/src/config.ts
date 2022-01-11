@@ -33,13 +33,28 @@ interface Config {
     ssl: boolean
   }
   odisServices: {
-    signers: string
-    timeoutMilliSeconds: number
+    phoneNumberPrivacy: {
+      signers: string
+      timeoutMilliSeconds: number
+    }
+    domains: {
+      signers: string
+      timeoutMilliSeconds: number
+    }
   }
-  thresholdSignature: {
-    threshold: number
-    polynomial: string
-    pubKey: string
+  keys: {
+    phoneNumberPrivacy: {
+      version: number
+      threshold: number
+      polynomial: string
+      pubKey: string
+    }
+    domains: {
+      version: number
+      threshold: number
+      polynomial: string
+      pubKey: string
+    }
   }
 }
 
@@ -59,14 +74,30 @@ if (DEV_MODE) {
       ssl: false,
     },
     odisServices: {
-      signers:
-        '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
-      timeoutMilliSeconds: 5 * 1000,
+      phoneNumberPrivacy: {
+        signers:
+          '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
+        timeoutMilliSeconds: 5 * 1000,
+      },
+      domains: {
+        signers:
+          '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
+        timeoutMilliSeconds: 5 * 1000,
+      },
     },
-    thresholdSignature: {
-      threshold: 1,
-      polynomial: DEV_POLYNOMIAL,
-      pubKey: DEV_PUBLIC_KEY,
+    keys: {
+      phoneNumberPrivacy: {
+        version: 1,
+        threshold: 1,
+        polynomial: DEV_POLYNOMIAL,
+        pubKey: DEV_PUBLIC_KEY,
+      },
+      domains: {
+        version: 1,
+        threshold: 1,
+        polynomial: DEV_POLYNOMIAL,
+        pubKey: DEV_PUBLIC_KEY,
+      },
     },
   }
 } else {
@@ -83,13 +114,29 @@ if (DEV_MODE) {
       ssl: toBool(functionConfig.db.ssl, true),
     },
     odisServices: {
-      signers: functionConfig.odisservices.signers,
-      timeoutMilliSeconds: functionConfig.odisservices.timeoutMilliSeconds || 5 * 1000,
+      phoneNumberPrivacy: {
+        signers: functionConfig.odisservices.phoneNumberPrivacy.signers,
+        timeoutMilliSeconds:
+          functionConfig.odisservices.phoneNumberPrivacy.timeoutMilliSeconds || 5 * 1000,
+      },
+      domains: {
+        signers: functionConfig.odisservices.domains.signers,
+        timeoutMilliSeconds: functionConfig.odisservices.domains.timeoutMilliSeconds || 5 * 1000,
+      },
     },
-    thresholdSignature: {
-      threshold: functionConfig.threshold_signature.threshold_signature_threshold,
-      polynomial: functionConfig.threshold_signature.threshold_polynomial,
-      pubKey: functionConfig.threshold_signature.public_key,
+    keys: {
+      phoneNumberPrivacy: {
+        version: functionConfig.keys.phoneNumberPrivacy.version,
+        threshold: functionConfig.keys.phoneNumberPrivacy.threshold,
+        polynomial: functionConfig.keys.phoneNumberPrivacy.polynomial,
+        pubKey: functionConfig.keys.phoneNumberPrivacy.pubKey,
+      },
+      domains: {
+        version: functionConfig.keys.domains.version,
+        threshold: functionConfig.keys.domains.threshold,
+        polynomial: functionConfig.keys.domains.polynomial,
+        pubKey: functionConfig.keys.domains.pubKey,
+      },
     },
   }
 }

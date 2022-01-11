@@ -1,15 +1,22 @@
+import { SequentialDelayDomainOptions } from '@celo/identity/lib/odis/domains'
 import {
   authenticateUser,
+  DomainRestrictedSignatureRequest,
+  Endpoints,
   ErrorMessage,
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
+  isKnownDomain,
+  KEY_VERSION_HEADER,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  SequentialDelayDomain,
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
+  verifyDomainRestrictedSignatureRequestSignature,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
@@ -22,9 +29,9 @@ import { respondWithError } from '../common/error-utils'
 import config, { VERSION } from '../config'
 import { getContractKit } from '../web3/contracts'
 
-const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
-
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
+
+type CombinerSigEndpoint = Endpoints.GET_BLINDED_MESSAGE_SIG | Endpoints.DOMAIN_SIGN
 
 interface SignerService {
   url: string
@@ -37,20 +44,32 @@ interface SignMsgRespWithStatus {
   status: number
 }
 
-export async function handleGetBlindedMessageSig(request: Request, response: Response) {
+export async function handlePnpSigReq(request: Request, response: Response) {
+  return handleGetBlindedMessageSig(request, response, Endpoints.GET_BLINDED_MESSAGE_SIG)
+}
+
+export async function handleDomainSigReq(request: Request, response: Response) {
+  return handleGetBlindedMessageSig(request, response, Endpoints.DOMAIN_SIGN)
+}
+
+async function handleGetBlindedMessageSig(
+  request: Request,
+  response: Response,
+  endpoint: CombinerSigEndpoint
+) {
   const logger: Logger = response.locals.logger
 
   try {
-    if (!isValidGetSignatureInput(request.body)) {
+    if (!isValidGetSignatureInput(request, endpoint)) {
       respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
       return
     }
-    if (!(await authenticateUser(request, getContractKit(), logger))) {
+    if (!(await authenticateSignatureRequest(request, endpoint, logger))) {
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
       return
     }
     logger.debug('Requesting signatures')
-    await requestSignatures(request, response)
+    await requestSignatures(request, response, endpoint)
   } catch (err) {
     logger.error('Unknown error in handleGetBlindedMessageSig')
     logger.error(err)
@@ -58,7 +77,11 @@ export async function handleGetBlindedMessageSig(request: Request, response: Res
   }
 }
 
-async function requestSignatures(request: Request, response: Response) {
+async function requestSignatures(
+  request: Request,
+  response: Response,
+  endpoint: CombinerSigEndpoint
+) {
   const responses: SignMsgRespWithStatus[] = []
   const failedRequests = new Set<string>()
   const errorCodes: Map<number, number> = new Map()
@@ -72,13 +95,24 @@ async function requestSignatures(request: Request, response: Response) {
   })
   obs.observe({ entryTypes: ['measure'], buffered: true })
 
-  const signers = JSON.parse(config.odisServices.signers) as SignerService[]
+  // Get standardized variable set regardless of request type (PNP / Domains)
+  const {
+    signers,
+    timeoutMs,
+    keyVersion,
+    threshold,
+    blindedMessage,
+    pubKey,
+  } = standardizeRequestParams(request, endpoint)
+
+  request.headers[KEY_VERSION_HEADER] = keyVersion.toString()
+
   let timedOut = false
   const controller = new AbortController()
   const timeout = setTimeout(() => {
     timedOut = true
     controller.abort()
-  }, config.odisServices.timeoutMilliSeconds)
+  }, timeoutMs)
 
   const signerReqs = signers.map((service) => {
     const startMark = `Begin requestSignature ${service.url}`
@@ -86,7 +120,7 @@ async function requestSignatures(request: Request, response: Response) {
     const entryName = service.url
     performance.mark(startMark)
 
-    return requestSignature(service, request, controller, logger)
+    return requestSignature(service, request, controller, endpoint, logger)
       .then(async (res: FetchResponse) => {
         const data = await res.text()
         logger.info(
@@ -101,8 +135,11 @@ async function requestSignatures(request: Request, response: Response) {
             responses,
             service.url,
             blsCryptoClient,
-            request.body.blindedQueryPhoneNumber,
-            controller
+            blindedMessage,
+            controller,
+            pubKey,
+            threshold,
+            keyVersion
           )
         } else {
           handleFailedResponse(
@@ -112,7 +149,8 @@ async function requestSignatures(request: Request, response: Response) {
             failedRequests,
             response,
             controller,
-            errorCodes
+            errorCodes,
+            threshold
           )
         }
       })
@@ -138,7 +176,8 @@ async function requestSignatures(request: Request, response: Response) {
           failedRequests,
           response,
           controller,
-          errorCodes
+          errorCodes,
+          threshold
         )
       })
       .finally(() => {
@@ -157,7 +196,9 @@ async function requestSignatures(request: Request, response: Response) {
   if (blsCryptoClient.hasSufficientSignatures()) {
     try {
       const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
-        request.body.blindedQueryPhoneNumber,
+        blindedMessage,
+        pubKey,
+        threshold,
         logger
       )
       response.json({ success: true, combinedSignature, version: VERSION })
@@ -177,10 +218,18 @@ async function handleSuccessResponse(
   responses: SignMsgRespWithStatus[],
   serviceUrl: string,
   blsCryptoClient: BLSCryptographyClient,
-  blindedQueryPhoneNumber: string,
-  controller: AbortController
+  blindedMessage: string,
+  controller: AbortController,
+  pubKey: string,
+  threshold: number,
+  expectedKeyVersion: number
 ) {
   const logger: Logger = response.locals.logger
+  const keyVersion: number = Number(response.header(KEY_VERSION_HEADER))
+  logger.info({ keyVersion }, 'Signer responded with key version')
+  if (keyVersion !== expectedKeyVersion) {
+    throw new Error(`Incorrect key version received from signer ${serviceUrl}`)
+  }
   const signResponse = JSON.parse(data) as SignerResponse
   if (!signResponse.success) {
     // Continue on failure as long as signature is present to unblock user
@@ -212,7 +261,12 @@ async function handleSuccessResponse(
   // BLS threshold signatures can be combined without all partial signatures
   if (blsCryptoClient.hasSufficientSignatures()) {
     try {
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedQueryPhoneNumber, logger)
+      await blsCryptoClient.combinePartialBlindedSignatures(
+        blindedMessage,
+        pubKey,
+        threshold,
+        logger
+      )
       // Close outstanding requests
       controller.abort()
     } catch {
@@ -229,7 +283,8 @@ function handleFailedResponse(
   failedRequests: Set<string>,
   response: Response,
   controller: AbortController,
-  errorCodes: Map<number, number>
+  errorCodes: Map<number, number>,
+  threshold: number
 ) {
   if (status) {
     errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
@@ -238,7 +293,8 @@ function handleFailedResponse(
   // Tracking failed request count via signer url prevents
   // double counting the same failed request by mistake
   failedRequests.add(service.url)
-  const shouldFailFast = signerCount - failedRequests.size < config.thresholdSignature.threshold
+
+  const shouldFailFast = signerCount - failedRequests.size < threshold
   logger.info(`Recieved failure from ${failedRequests.size}/${signerCount} signers.`)
   if (shouldFailFast) {
     logger.info('Not possible to reach a sufficient number of signatures. Failing fast.')
@@ -305,26 +361,36 @@ function requestSignature(
   service: SignerService,
   request: Request,
   controller: AbortController,
+  endpoint: CombinerSigEndpoint,
   logger: Logger
 ): Promise<FetchResponse> {
-  return parameterizedSignatureRequest(service.url, request, controller, logger).catch((e) => {
-    logger.error(`Signer failed with primary url ${service.url}`, e)
-    if (service.fallbackUrl) {
-      logger.warn(`Using fallback url to call signer ${service.fallbackUrl!}`)
-      return parameterizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
+  return parameterizedSignatureRequest(service.url, request, controller, endpoint, logger).catch(
+    (e) => {
+      logger.error(`Signer failed with primary url ${service.url}`, e)
+      if (service.fallbackUrl) {
+        logger.warn(`Using fallback url to call signer ${service.fallbackUrl!}`)
+        return parameterizedSignatureRequest(
+          service.fallbackUrl!,
+          request,
+          controller,
+          endpoint,
+          logger
+        )
+      }
+      throw e
     }
-    throw e
-  })
+  )
 }
 
 function parameterizedSignatureRequest(
   baseUrl: string,
   request: Request,
   controller: AbortController,
+  endpoint: CombinerSigEndpoint,
   logger: Logger
 ): Promise<FetchResponse> {
   logger.debug({ signer: baseUrl }, `Requesting partial sig`)
-  const url = baseUrl + PARTIAL_SIGN_MESSAGE_ENDPOINT
+  const url = baseUrl + endpoint
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -363,13 +429,84 @@ function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
   return maxErrorCode > 0 ? maxErrorCode : null
 }
 
-function isValidGetSignatureInput(requestBody: GetBlindedMessageSigRequest): boolean {
-  return (
-    hasValidAccountParam(requestBody) &&
-    hasValidBlindedPhoneNumberParam(requestBody) &&
-    identifierIsValidIfExists(requestBody) &&
-    isBodyReasonablySized(requestBody)
-  )
+function isDomainRestrictedSignatureRequest(
+  _body: any,
+  endpoint: CombinerSigEndpoint
+): _body is DomainRestrictedSignatureRequest<SequentialDelayDomain, SequentialDelayDomainOptions> {
+  return endpoint === Endpoints.DOMAIN_SIGN
+}
+
+function isPnpSignatureRequest(
+  _body: any,
+  endpoint: CombinerSigEndpoint
+): _body is GetBlindedMessageSigRequest {
+  return endpoint === Endpoints.GET_BLINDED_MESSAGE_SIG
+}
+
+function isValidGetSignatureInput(request: Request, endpoint: CombinerSigEndpoint): boolean {
+  if (isPnpSignatureRequest(request.body, endpoint)) {
+    return (
+      hasValidAccountParam(request.body) &&
+      hasValidBlindedPhoneNumberParam(request.body) &&
+      identifierIsValidIfExists(request.body) &&
+      isBodyReasonablySized(request.body)
+    )
+  }
+  if (isDomainRestrictedSignatureRequest(request.body, endpoint)) {
+    return isKnownDomain(request.body.domain)
+  }
+
+  throw new Error(`Implementation error. Signature endpoint ${endpoint} not recognized`)
+}
+
+async function authenticateSignatureRequest(
+  request: Request,
+  endpoint: CombinerSigEndpoint,
+  logger: Logger
+): Promise<boolean> {
+  if (isPnpSignatureRequest(request.body, endpoint)) {
+    return authenticateUser(request, getContractKit(), logger)
+  }
+  if (isDomainRestrictedSignatureRequest(request.body, endpoint)) {
+    return verifyDomainRestrictedSignatureRequestSignature(request.body)
+  }
+
+  throw new Error(`Implementation error. Signature endpoint ${endpoint} not recognized`)
+}
+
+function standardizeRequestParams(
+  request: Request,
+  endpoint: CombinerSigEndpoint
+): {
+  signers: SignerService[]
+  timeoutMs: number
+  threshold: number
+  blindedMessage: string
+  keyVersion: number
+  pubKey: string
+} {
+  if (isPnpSignatureRequest(request.body, endpoint)) {
+    return {
+      signers: JSON.parse(config.odisServices.phoneNumberPrivacy.signers),
+      timeoutMs: config.odisServices.phoneNumberPrivacy.timeoutMilliSeconds,
+      threshold: config.keys.phoneNumberPrivacy.threshold,
+      blindedMessage: request.body.blindedQueryPhoneNumber,
+      keyVersion: config.keys.phoneNumberPrivacy.version,
+      pubKey: config.keys.phoneNumberPrivacy.pubKey,
+    }
+  }
+  if (isDomainRestrictedSignatureRequest(request.body, endpoint)) {
+    return {
+      signers: JSON.parse(config.odisServices.domains.signers),
+      timeoutMs: config.odisServices.domains.timeoutMilliSeconds,
+      threshold: config.keys.domains.threshold,
+      blindedMessage: request.body.blindedMessage,
+      keyVersion: config.keys.domains.version,
+      pubKey: config.keys.domains.pubKey,
+    }
+  }
+
+  throw new Error(`Implementation error. Signature endpoint ${endpoint} not recognized`)
 }
 
 function handleMissingSignatures(

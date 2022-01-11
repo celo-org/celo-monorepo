@@ -31,7 +31,7 @@ export class BLSCryptographyClient {
    * Returns true if the number of valid signatures is enough to perform a combination
    */
   public hasSufficientSignatures(): boolean {
-    const threshold = config.thresholdSignature.threshold
+    const threshold = config.keys.phoneNumberPrivacy.threshold
     return this.allSignaturesLength >= threshold
   }
 
@@ -42,10 +42,11 @@ export class BLSCryptographyClient {
    */
   public async combinePartialBlindedSignatures(
     blindedMessage: string,
+    pubKey: string,
+    threshold: number,
     logger?: Logger
   ): Promise<string> {
     logger = logger ?? rootLogger()
-    const threshold = config.thresholdSignature.threshold
     if (!this.hasSufficientSignatures()) {
       logger.error(
         { signatures: this.allSignaturesLength, required: threshold },
@@ -60,7 +61,7 @@ export class BLSCryptographyClient {
     // We do this since partial signature verification incurs higher latencies
     try {
       const result = threshold_bls.combine(threshold, this.allSignatures)
-      this.verifyCombinedSignature(blindedMessage, result, logger)
+      this.verifyCombinedSignature(blindedMessage, result, pubKey, logger)
       return Buffer.from(result).toString('base64')
     } catch (error) {
       logger.error(error)
@@ -77,6 +78,7 @@ export class BLSCryptographyClient {
   private verifyCombinedSignature(
     blindedMessage: string,
     combinedSignature: Uint8Array,
+    pubKey: string,
     logger: Logger
   ) {
     try {
@@ -84,7 +86,7 @@ export class BLSCryptographyClient {
       // Documentation should not specify that verifyBlindSignature verifies the
       // signature after it has been unblinded.
       threshold_bls.verifyBlindSignature(
-        Buffer.from(config.thresholdSignature.pubKey, 'base64'),
+        Buffer.from(pubKey, 'base64'),
         Buffer.from(blindedMessage, 'base64'),
         combinedSignature
       )
@@ -113,7 +115,7 @@ export class BLSCryptographyClient {
   }
 
   private isValidPartialSignature(signature: Buffer, blindedMessage: string) {
-    const polynomial = config.thresholdSignature.polynomial
+    const polynomial = config.keys.phoneNumberPrivacy.polynomial
     try {
       threshold_bls.partialVerifyBlindSignature(
         Buffer.from(polynomial, 'hex'),
