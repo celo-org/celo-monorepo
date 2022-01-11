@@ -1,8 +1,7 @@
 import fs from 'fs'
-import fetch from 'node-fetch'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv } from './env-utils'
-import { accessSecretVersion, getCurrentGcloudAccount } from './gcloud_utils'
+import { getCurrentGcloudAccount } from './gcloud_utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
@@ -136,25 +135,4 @@ export async function switchIngressService(celoEnv: string, ingressName: string)
   const command = `kubectl patch --namespace=${celoEnv} ing/${celoEnv}-blockscout-web-ingress --type=json\
    -p='[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/serviceName", "value":"${ingressName}-web"}]'`
   await execCmdWithExitOnFailure(command)
-}
-
-export async function createGrafanaTagAnnotation(celoEnv: string, tag: string, suffix: string) {
-  const currentGcloudAccount = await getCurrentGcloudAccount()
-  const projectId = fetchEnv(envVar.GRAFANA_CLOUD_PROJECT_ID)
-  const secretName = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_NAME)
-  const secretVersion = fetchEnv(envVar.GRAFANA_CLOUD_SECRET_VERSION)
-  const secret = await accessSecretVersion(projectId, secretName, secretVersion)
-  const token = JSON.parse(secret!)
-  await fetch(`${token!.grafana_endpoint}/api/annotations`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token!.grafana_api_token}`,
-    },
-    body: JSON.stringify({
-      text: `Deployed ${celoEnv} ${suffix} by ${currentGcloudAccount} with commit: \n \n
-      <a href=\"https://github.com/celo-org/blockscout/commit/${tag}"> ${tag}</a>\n`,
-      tags: ['deployment', celoEnv],
-    }),
-  })
 }

@@ -62,6 +62,7 @@ blockscout:
     dbUser: gcp:secretmanager:projects/365081401101/secrets/blockscoutstagingrc1-blockscout3-dbUser
     dbPassword: gcp:secretmanager:projects/365081401101/secrets/blockscoutstagingrc1-blockscout3-dbPassword
     dbUrl: gcp:secretmanager:projects/365081401101/secrets/blockscoutstagingrc1-blockscout3-dbUrl
+    grafanaCloud: gcp:secretmanager:projects/365081401101/secrets/blockscoutstagingrc1-blockscout-grafanaCloud
     recaptcha:
       projectId: gcp:secretmanager:projects/365081401101/secrets/blockscoutstagingrc1-blockscout-recaptchaProjectId
       siteKey: gcp:secretmanager:projects/365081401101/secrets/blockscoutstagingrc1-blockscout-recaptchaSiteKey

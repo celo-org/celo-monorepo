@@ -202,6 +202,7 @@ blockscout:
   healthyBlocksPeriod: 300
   db:
     drop: "false"
+  grafanaUrl: https://clabs.grafana.net
   secrets:
     # Format:
     # secretName: gcp:secretmanager:projects/<project-id>/secrets/<env>-blockscout-<secret-key>
