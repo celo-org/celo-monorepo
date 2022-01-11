@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-combiner",
-  "version": "1.1.6-dev",
+  "version": "1.1.8-dev",
   "description": "Orchestrates and combines threshold signatures for use in ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -30,10 +30,10 @@
     "db:migrate:make": "knex --migrations-directory ./migrations migrate:make -x ts"
   },
   "dependencies": {
-    "@celo/contractkit": "1.5.0",
-    "@celo/identity": "1.5.0",
-    "@celo/phone-number-privacy-common": "1.0.36-dev",
-    "@celo/utils": "1.5.0",
+    "@celo/contractkit": "1.5.1",
+    "@celo/identity": "1.5.1",
+    "@celo/phone-number-privacy-common": "1.0.38-dev",
+    "@celo/utils": "1.5.1",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "elliptic": "^6.5.4",
     "firebase-admin": "^9.12.0",

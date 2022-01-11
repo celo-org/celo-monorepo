@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-common",
-  "version": "1.0.36-dev",
+  "version": "1.0.38-dev",
   "description": "Common library for the combiner and signer libraries",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -20,10 +20,7 @@
   "dependencies": {
     "@celo/base": "1.5.1",
     "@celo/contractkit": "1.5.1",
-    "@celo/utils": "1.5.1-dev",
-    "@celo/base": "1.5.0",
-    "@celo/contractkit": "1.5.0",
-    "@celo/utils": "1.5.1-dev",
+    "@celo/utils": "1.5.2-dev",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "btoa": "1.2.1",
@@ -35,7 +32,7 @@
     "is-base64": "^1.1.0"
   },
   "devDependencies": {
-    "@celo/wallet-local": "1.5.1-dev",
+    "@celo/wallet-local": "1.5.2-dev",
     "@types/btoa": "^1.2.3",
     "@types/bunyan": "1.8.4",
     "@types/elliptic": "^6.4.12",
