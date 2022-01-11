@@ -19,6 +19,10 @@ const helmChartPath = '../helm-charts/odis'
 interface ODISSignerKeyVaultConfig {
   vaultName: string
   secretName: string
+  pnpKeyNameBase: string
+  pnpKeyLatestVersion: string
+  domainsKeyNameBase: string
+  domainsKeyLatestVersion: string
 }
 
 /**
@@ -52,6 +56,10 @@ const contextODISSignerKeyVaultConfigDynamicEnvVars: {
 } = {
   vaultName: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_NAME,
   secretName: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_SECRET_NAME,
+  pnpKeyNameBase: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_PNP_KEY_NAME_BASE,
+  pnpKeyLatestVersion: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_PNP_KEY_LATEST_VERSION,
+  domainsKeyNameBase: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_DOMAINS_KEY_NAME_BASE,
+  domainsKeyLatestVersion: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_DOMAINS_KEY_LATEST_VERSION,
 }
 
 /**
@@ -139,6 +147,10 @@ async function helmParameters(celoEnv: string, context: string) {
     `--set db.password='${databaseConfig.password}'`,
     `--set keystore.vaultName=${keyVaultConfig.vaultName}`,
     `--set keystore.secretName=${keyVaultConfig.secretName}`,
+    `--set keystore.pnpKeyNameBase=${keyVaultConfig.pnpKeyNameBase}`,
+    `--set keystore.domainsKeyNameBase=${keyVaultConfig.domainsKeyNameBase}`,
+    `--set keystore.pnpKeyLatestVersion=${keyVaultConfig.pnpKeyLatestVersion}`,
+    `--set keystore.domainsKeyLatestVersion=${keyVaultConfig.domainsKeyLatestVersion}`,
     `--set blockchainProvider=${fetchEnv(envVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER)}`,
     `--set log.level=${loggingConfig.level}`,
     `--set log.format=${loggingConfig.format}`,
