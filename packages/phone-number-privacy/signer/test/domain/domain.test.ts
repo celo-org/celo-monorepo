@@ -1,4 +1,4 @@
-import { instance, mock, reset, verify, when } from 'ts-mockito'
+import { anything, instance, mock, reset, verify, when } from 'ts-mockito'
 import { beforeEach } from 'jest-circus'
 import { DomainService } from '../../src/domain/domain.service'
 import { Request, Response } from 'express'
@@ -32,7 +32,7 @@ describe('Domain service tests', () => {
   })
 
   it('Should respond with 403 on failed auth', async () => {
-    when(authServiceMock.authCheck()).thenReturn(false)
+    when(authServiceMock.authCheck(anything(), anything(), anything())).thenReturn(false)
     when(responseMock.status(403)).thenReturn(response)
     request.body = { domain: 'domain' }
 
@@ -42,9 +42,9 @@ describe('Domain service tests', () => {
   })
 
   it('Should respond with 404 on unknown domain', async () => {
-    when(authServiceMock.authCheck()).thenReturn(true)
+    when(authServiceMock.authCheck(anything(), anything(), anything())).thenReturn(true)
     when(responseMock.status(404)).thenReturn(response)
-    request.body = { domain: 'Some unknown domain' }
+    request.body = { domain: { name: 'Some unknown domain' } }
 
     await domainService.handleDisableDomain(request, response)
 
