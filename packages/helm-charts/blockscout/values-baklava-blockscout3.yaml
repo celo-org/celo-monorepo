@@ -53,7 +53,7 @@ blockscout:
         cpu: 500m
   metadataCrawler:
     enabled: true
-    schedule: "*/30 * * * *"
+    schedule: "*/30 * * * *" # every 30 minutes
     discordClusterName: Baklava
   metrics:
     enabled: true
