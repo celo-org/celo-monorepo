@@ -18,8 +18,10 @@ import {
 export enum Endpoints {
   STATUS = '/status',
   METRICS = '/metrics',
-  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
+  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig', // Signer
+  GET_BLINDED_MESSAGE_SIG = '/getBlindedMessageSig', // Combiner
   GET_QUOTA = '/getQuota',
+  MATCHMAKING = '/getContactMatches',
 
   DISABLE_DOMAIN = '/domain/disable',
   DOMAIN_SIGN = '/domain/sign/',
