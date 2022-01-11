@@ -65,10 +65,17 @@ The BLS key share should only exist in the keystore or as an encrypted backup. T
 
 ### Keystores
 
-Currently, the service retrieving keys from Azure Key Vault (AKV), Google Secret Manager and AWS Secrets Manager.
-You must specify the type, and then the keystore configs for that type.
+Currently, the service supports Azure Key Vault (AKV), Google Secret Manager and AWS Secrets Manager.
+You must specify the type, and then the keystore configs for that type as follows.
 
 - `KEYSTORE_TYPE` - `AzureKeyVault`, `GoogleSecretManager` or `AWSSecretManager`
+
+In addition, you must name your keys in your keystore according to the pattern `<keyName>-<keyVersion>` where
+
+- `keyName` is configurable via the env variables `PHONE_NUMBER_PRIVACY_KEY_NAME_BASE` and `DOMAINS_KEY_NAME_BASE` which default to `phoneNumberPrivacy` and `domains` respectively.
+- `keyVersion` is an integer corresponding to the iteration of the given key share. The variables `PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION` and `DOMAINS_LATEST_KEY_VERSION` should specify the latest version of the appropriate key share. This version will be fetched when the signer starts up.
+
+For example, the first iteration of the key share used for phone number privacy should be stored as `phoneNumberPrivacy-1` and the second iteration (after resharing) should be stored as `phoneNumberPrivacy-2` unless you specify a `PHONE_NUMBER_PRIVACY_KEY_NAME_BASE` env variable, in which case `phoneNumberPrivacy` should be replaced with that value. The version numbers and `-` delimeter are mandatory and not configurable.
 
 #### Azure Key Vault
 
@@ -123,6 +130,18 @@ Then check on the service to make sure its running:
 `docker container ls`
 
 `docker logs -f {CONTAINER_ID_HERE}`
+
+#### Key rotations
+
+After a key resharing, signers should rotate their key shares as follows:
+
+1. Store the new key share in the keystore according to the naming convention specified in the [Keystores](#keystores) section above.
+2. Increment `PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION` or `DOMAINS_LATEST_KEY_VERSION` as appropriate. This will instruct the signer to prefetch this new key version the next time it starts up, but there is no need to restart the signer at this point.
+3. Notify the combiner operator that your signer is ready for the key rotation.
+4. The combiner operator will run e2e tests against your signer to verify it has the correct key configuration.
+5. The combiner operator will update the combiner to request the new key share version via a custom request header field once all signers are ready. The combiner operator should remember to update the public polynomial in the combiner's config appropriately.
+6. The signers will fetch the new key shares from their keystores upon receiving these requests.
+7. When the combiner operator sees that all signers are signing with the new key share and confirms that the system is healthy, signers will be instructed to delete their old key shares.
 
 ### Logs
 
