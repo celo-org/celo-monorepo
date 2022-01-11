@@ -19,7 +19,8 @@ const COMBINED_SIGNATURE = '16RcENpbLgq5pIkcPWdgnMofeLqSyuUVin9h4jof9/I8GRsmt5iR
 const INVALID_SIGNATURE =
   'MAAAAAAAAACanrA73tApLu+j569ICcXrEBRLi4czWJtInJPSUpoZUOVDc1667hvMq1ESncFzlgEHAAAA'
 
-config.thresholdSignature = {
+config.keys.phoneNumberPrivacy = {
+  version: 1,
   threshold: 3,
   polynomial: PUBLIC_POLYNOMIAL,
   pubKey: PUBLIC_KEY,
@@ -65,7 +66,13 @@ describe(`BLS service computes signature`, () => {
       }
     }
 
-    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+    const { pubKey, threshold } = config.keys.phoneNumberPrivacy
+
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(
+      blindedMsg,
+      pubKey,
+      threshold
+    )
     expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
@@ -108,7 +115,12 @@ describe(`BLS service computes signature`, () => {
     await signatures.forEach(async (signature) => {
       await blsCryptoClient.addSignature(signature)
     })
-    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+    const { pubKey, threshold } = config.keys.phoneNumberPrivacy
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(
+      blindedMsg,
+      pubKey,
+      threshold
+    )
     expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
@@ -152,7 +164,8 @@ describe(`BLS service computes signature`, () => {
       await blsCryptoClient.addSignature(signature)
     })
     try {
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+      const { pubKey, threshold } = config.keys.phoneNumberPrivacy
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg, pubKey, threshold)
       throw new Error('Expected failure with missing signatures')
     } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
@@ -197,7 +210,8 @@ describe(`BLS service computes signature`, () => {
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
     // Should fail since 1/3 sigs are invalid
     try {
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+      const { pubKey, threshold } = config.keys.phoneNumberPrivacy
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg, pubKey, threshold)
     } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
@@ -206,7 +220,12 @@ describe(`BLS service computes signature`, () => {
 
     await blsCryptoClient.addSignature(signatures[3])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
-    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+    const { pubKey, threshold } = config.keys.phoneNumberPrivacy
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(
+      blindedMsg,
+      pubKey,
+      threshold
+    )
     expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
@@ -255,7 +274,8 @@ describe(`BLS service computes signature`, () => {
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
     // Should fail since signature from url3 was generated with the wrong key version
     try {
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+      const { pubKey, threshold } = config.keys.phoneNumberPrivacy
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg, pubKey, threshold)
     } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
@@ -265,7 +285,12 @@ describe(`BLS service computes signature`, () => {
 
     await blsCryptoClient.addSignature(signatures[3])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
-    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
+    const { pubKey, threshold } = config.keys.phoneNumberPrivacy
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(
+      blindedMsg,
+      pubKey,
+      threshold
+    )
     expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
