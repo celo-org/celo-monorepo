@@ -38,7 +38,7 @@ module.exports = deploymentForCoreContract<ExchangeEURInstance>(
       'Reserve',
       artifacts
     )
-    // cUSD doesn't need to be added as it currently harcoded in Reserve.sol
+    // cUSD doesn't need to be added as it is currently harcoded in Reserve.sol
     await reserve.addExchangeSpender(exchange.address)
     await exchange.activateStable()
   }

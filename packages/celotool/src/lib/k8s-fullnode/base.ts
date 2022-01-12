@@ -168,9 +168,9 @@ export abstract class BaseFullNodeDeployer {
     )
   }
 
-  abstract async additionalHelmParameters(): Promise<string[]>
-  abstract async deallocateAllIPs(): Promise<void>
-  abstract async getFullNodeIP(index: number): Promise<string>
+  abstract additionalHelmParameters(): Promise<string[]>
+  abstract deallocateAllIPs(): Promise<void>
+  abstract getFullNodeIP(index: number): Promise<string>
 
   get releaseName() {
     return `${this.celoEnv}-fullnodes`

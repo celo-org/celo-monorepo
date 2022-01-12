@@ -232,7 +232,7 @@ export async function handleAttestationRequest(
   try {
     const attestation = await handler.doAttestation()
     respondWithAttestation(res, attestation)
-  } catch (error) {
+  } catch (error: any) {
     if (!error.responseCode) {
       handler.logger.error({ error })
       Counters.attestationRequestUnexpectedErrors.inc()
