@@ -2,13 +2,12 @@ import { retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
-import { AuthenticationMethod } from '@celo/identity/lib/odis/query'
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Logger from 'bunyan'
 import { ec as EC } from 'elliptic'
 import { Request } from 'express'
-import { ErrorMessage } from '../interfaces'
+import { AuthenticationMethod, ErrorMessage } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
 const ec = new EC('secp256k1')
@@ -85,21 +84,24 @@ export async function getDataEncryptionKey(
   contractKit: ContractKit,
   logger: Logger
 ): Promise<string> {
-  return retryAsyncWithBackOffAndTimeout(
-    async () => {
-      const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
-      return accountWrapper.getDataEncryptionKey(address)
-    },
-    RETRY_COUNT,
-    [],
-    RETRY_DELAY_IN_MS,
-    1.5,
-    FULL_NODE_TIMEOUT_IN_MS
-  ).catch((error) => {
-    logger.error('Failed to retrieve DEK: ' + error.message)
+  try {
+    const res = await retryAsyncWithBackOffAndTimeout(
+      async () => {
+        const accountWrapper: AccountsWrapper = await contractKit.contracts.getAccounts()
+        return accountWrapper.getDataEncryptionKey(address)
+      },
+      RETRY_COUNT,
+      [],
+      RETRY_DELAY_IN_MS,
+      1.5,
+      FULL_NODE_TIMEOUT_IN_MS
+    )
+    return res
+  } catch (error) {
+    logger.error('Failed to retrieve DEK: ' + error)
     logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
     throw error
-  })
+  }
 }
 
 export async function isVerified(
@@ -109,7 +111,7 @@ export async function isVerified(
   logger: Logger
 ): Promise<boolean> {
   try {
-    return retryAsyncWithBackOffAndTimeout(
+    const res = await retryAsyncWithBackOffAndTimeout(
       async () => {
         const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
         const {
@@ -134,8 +136,10 @@ export async function isVerified(
       1.5,
       FULL_NODE_TIMEOUT_IN_MS
     )
+    return res
   } catch (error) {
-    logger.error('Failed to get verification status: ' + error.message)
+    logger.error('Failed to get verification status: ' + error)
+    logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
     logger.warn('Assuming user is verified')
     return true
   }

@@ -2,6 +2,7 @@ import { retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { NULL_ADDRESS, StableToken } from '@celo/contractkit'
 import {
   authenticateUser,
+  Endpoints,
   ErrorMessage,
   FULL_NODE_TIMEOUT_IN_MS,
   GetQuotaRequest,
@@ -21,7 +22,6 @@ import { respondWithError } from '../common/error-utils'
 import { Counters, Histograms, Labels } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
-import { Endpoints } from '../server'
 import { getContractKit } from '../web3/contracts'
 
 allSettled.shim()

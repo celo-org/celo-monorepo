@@ -44,7 +44,7 @@ export class BLSCryptographyClient {
     blindedMessage: string,
     logger?: Logger
   ): Promise<string> {
-    logger = logger ?? rootLogger
+    logger = logger ?? rootLogger()
     const threshold = config.thresholdSignature.threshold
     if (!this.hasSufficientSignatures()) {
       logger.error(
@@ -56,30 +56,51 @@ export class BLSCryptographyClient {
       )
     }
     // Optimistically attempt to combine unverified signatures
-    // If combination fails, iterate through each signature and remove invalid ones
-    // We do this since signature verification incurs higher latencies
+    // If combination or verification fails, iterate through each signature and remove invalid ones
+    // We do this since partial signature verification incurs higher latencies
     try {
       const result = threshold_bls.combine(threshold, this.allSignatures)
+      this.verifyCombinedSignature(blindedMessage, result, logger)
       return Buffer.from(result).toString('base64')
     } catch (error) {
       logger.error(error)
       // Verify each signature and remove invalid ones
       // This logging will help us troubleshoot which signers are having issues
       this.unverifiedSignatures.forEach((unverifiedSignature) => {
-        this.verifySignature(blindedMessage, unverifiedSignature, logger!)
+        this.verifyPartialSignature(blindedMessage, unverifiedSignature, logger!)
       })
       this.clearUnverifiedSignatures()
       throw new Error(ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES)
     }
   }
 
-  private verifySignature(
+  private verifyCombinedSignature(
+    blindedMessage: string,
+    combinedSignature: Uint8Array,
+    logger: Logger
+  ) {
+    try {
+      // TODO: Address bad documentation in threshold-bls lib.
+      // Documentation should not specify that verifyBlindSignature verifies the
+      // signature after it has been unblinded.
+      threshold_bls.verifyBlindSignature(
+        Buffer.from(config.thresholdSignature.pubKey, 'base64'),
+        Buffer.from(blindedMessage, 'base64'),
+        combinedSignature
+      )
+    } catch (error) {
+      logger.error('Combined signature verification failed')
+      throw error
+    }
+  }
+
+  private verifyPartialSignature(
     blindedMessage: string,
     unverifiedSignature: ServicePartialSignature,
     logger: Logger
   ) {
     const sigBuffer = Buffer.from(unverifiedSignature.signature, 'base64')
-    if (this.isValidSignature(sigBuffer, blindedMessage)) {
+    if (this.isValidPartialSignature(sigBuffer, blindedMessage)) {
       // We move it to the verified set so that we don't need to re-verify in the future
       this.verifiedSignatures.push(unverifiedSignature)
     } else {
@@ -91,7 +112,7 @@ export class BLSCryptographyClient {
     this.unverifiedSignatures = []
   }
 
-  private isValidSignature(signature: Buffer, blindedMessage: string) {
+  private isValidPartialSignature(signature: Buffer, blindedMessage: string) {
     const polynomial = config.thresholdSignature.polynomial
     try {
       threshold_bls.partialVerifyBlindSignature(

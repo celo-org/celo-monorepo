@@ -584,7 +584,7 @@ export const simulateClient = async (
     let feeCurrency, txOptions
     try {
       feeCurrency = feeCurrencyGold ? '' : await kit.registry.addressFor(CeloContract.StableToken)
-    } catch (error) {
+    } catch (error: any) {
       tracerLog({
         tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
         error: error.toString(),
@@ -621,7 +621,7 @@ export const simulateClient = async (
         feeCurrency,
         nonce,
       }
-    } catch (error) {
+    } catch (error: any) {
       tracerLog({
         tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
         error: error.toString(),

@@ -151,7 +151,7 @@ export abstract class BaseCommand extends Command {
     }
 
     if (res.flags.useLedger) {
-      let transport: Transport
+      let transport
       try {
         // Importing for ledger uses only fixes running jest tests
         const TransportNodeHid = (await import('@ledgerhq/hw-transport-node-hid')).default

@@ -1,5 +1,9 @@
 import { timeout } from '@celo/base'
-import { loggerMiddleware, rootLogger as logger } from '@celo/phone-number-privacy-common'
+import {
+  Endpoints,
+  loggerMiddleware,
+  rootLogger as logger,
+} from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'
@@ -7,27 +11,18 @@ import https from 'https'
 import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
 import config, { getVersion } from './config'
+import { DomainAuthService } from './domain/auth/domainAuth.service'
 import { DomainService } from './domain/domain.service'
+import { DomainQuotaService } from './domain/quota/domainQuota.service'
 import { handleGetBlindedMessagePartialSig } from './signing/get-partial-signature'
 import { handleGetQuota } from './signing/query-quota'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export enum Endpoints {
-  STATUS = '/status',
-  METRICS = '/metrics',
-  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
-  GET_QUOTA = '/getQuota',
-
-  DISABLE_DOMAIN = '/domain/disable',
-  DOMAIN_SIGN = '/domain/sign/',
-  DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
-}
-
-const domainService = new DomainService()
-
 export function createServer() {
-  logger.info('Creating express server')
+  const domainService = new DomainService(new DomainAuthService(), new DomainQuotaService())
+
+  logger().info('Creating express server')
   const app = express()
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware)
 
@@ -54,9 +49,7 @@ export function createServer() {
   addMeteredEndpoint(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, handleGetBlindedMessagePartialSig)
   addMeteredEndpoint(Endpoints.GET_QUOTA, handleGetQuota)
   addMeteredEndpoint(Endpoints.DOMAIN_QUOTA_STATUS, domainService.handleGetDomainQuotaStatus)
-  addMeteredEndpoint(Endpoints.DOMAIN_SIGN, async (_, res) => {
-    res.sendStatus(501)
-  })
+  addMeteredEndpoint(Endpoints.DOMAIN_SIGN, domainService.handleGetDomainRestrictedSignature)
   addMeteredEndpoint(Endpoints.DISABLE_DOMAIN, domainService.handleDisableDomain)
 
   const sslOptions = getSslOptions()
@@ -90,12 +83,12 @@ function getSslOptions() {
   const { sslKeyPath, sslCertPath } = config.server
 
   if (!sslKeyPath || !sslCertPath) {
-    logger.info('No SSL configs specified')
+    logger().info('No SSL configs specified')
     return null
   }
 
   if (!fs.existsSync(sslKeyPath) || !fs.existsSync(sslCertPath)) {
-    logger.error('SSL cert files not found')
+    logger().error('SSL cert files not found')
     return null
   }
 

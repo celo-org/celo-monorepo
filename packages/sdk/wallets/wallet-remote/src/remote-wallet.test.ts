@@ -85,7 +85,7 @@ describe('RemoteWallet', () => {
       try {
         wallet.getAccounts()
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toBe('wallet needs to be initialized first')
       }
     })
@@ -94,7 +94,7 @@ describe('RemoteWallet', () => {
       try {
         wallet.hasAccount(ACCOUNT_ADDRESS1)
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toBe('wallet needs to be initialized first')
       }
     })

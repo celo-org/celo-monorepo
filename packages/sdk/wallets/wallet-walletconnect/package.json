@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-walletconnect",
-  "version": "1.3.1-dev",
+  "version": "1.5.1-dev",
   "description": "WalletConnect wallet implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -24,17 +24,18 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/connect": "1.3.1-dev",
-    "@celo/utils": "1.3.1-dev",
-    "@celo/wallet-base": "1.3.1-dev",
-    "@celo/wallet-remote": "1.3.1-dev",
-    "@walletconnect/client": "2.0.0-beta.19",
-    "@walletconnect/types": "2.0.0-beta.19",
+    "@celo/connect": "1.5.1-dev",
+    "@celo/utils": "1.5.1-dev",
+    "@celo/wallet-base": "1.5.1-dev",
+    "@celo/wallet-remote": "1.5.1-dev",
+    "@walletconnect/client": "2.0.0-beta.20.3",
+    "@walletconnect/types": "2.0.0-beta.20.3",
+    "@walletconnect/utils": "2.0.0-beta.20.3",
     "debug": "^4.1.1",
     "ethereumjs-util": "^7.0.8"
   },
   "devDependencies": {
-    "@celo/contractkit": "1.3.1-dev",
+    "@celo/contractkit": "1.5.1-dev",
     "@celo/dev-utils": "0.0.1-dev"
   },
   "engines": {

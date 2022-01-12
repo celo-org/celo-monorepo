@@ -17,7 +17,7 @@ const lightUrl = 'http://localhost:8546'
 
 const notYetActivatedError = 'support for eth-compatible transactions is not enabled'
 const notCompatibleError = 'ethCompatible is true, but non-eth-compatible fields are present'
-const noReplayProtectionError = 'replay protection is required'
+const noReplayProtectionError = 'only replay-protected (EIP-155) transactions allowed over RPC'
 
 const validatorPrivateKey = generatePrivateKey(mnemonic, AccountType.VALIDATOR, 0)
 const validatorAddress = privateKeyToAddress(validatorPrivateKey)
@@ -125,7 +125,7 @@ function generateTestCases(cipIsActivated: boolean) {
   return cases
 }
 
-function getGethRunConfig(withDonut: boolean): GethRunConfig {
+function getGethRunConfig(withDonut: boolean, withEspresso: boolean): GethRunConfig {
   console.log('getGethRunConfig', withDonut)
   return {
     migrate: true,
@@ -136,6 +136,7 @@ function getGethRunConfig(withDonut: boolean): GethRunConfig {
     genesisConfig: {
       churritoBlock: 0,
       donutBlock: withDonut ? 0 : null,
+      espressoBlock: withEspresso ? 0 : null,
     },
     instances: [
       {
@@ -150,11 +151,27 @@ function getGethRunConfig(withDonut: boolean): GethRunConfig {
   }
 }
 
+/**
+ * Copied from ethereumjs-utils
+ * Trims leading zeros from a `Buffer` or `Number[]`.
+ * @param a (Buffer|Uint8Array)
+ * @return (Buffer|Uint8Array)
+ */
+function stripZeros(a: any): Buffer | Uint8Array {
+  let first = a[0]
+  while (a.length > 0 && first.toString() === '0') {
+    a = a.slice(1)
+    first = a[0]
+  }
+  return a
+}
+
 // TestEnv encapsulates a pre-Donut or post-Donut environment and the tests to run on it
 class TestEnv {
   testCases: TestCase[]
   gethConfig: GethRunConfig
   cipIsActivated: boolean
+  replayProtectionIsNotMandatory: boolean
   hooks: ReturnType<typeof getHooks>
   stableTokenAddr: string = ''
   gasPrice: string = ''
@@ -173,10 +190,11 @@ class TestEnv {
   web3: Web3
   web3Light: Web3
 
-  constructor(cipIsActivated: boolean) {
-    this.gethConfig = getGethRunConfig(cipIsActivated)
+  constructor(cipIsActivated: boolean, replayProtectionIsNotMandatory: boolean) {
+    this.gethConfig = getGethRunConfig(cipIsActivated, replayProtectionIsNotMandatory)
     this.hooks = getHooks(this.gethConfig)
     this.cipIsActivated = cipIsActivated
+    this.replayProtectionIsNotMandatory = replayProtectionIsNotMandatory
     this.testCases = generateTestCases(cipIsActivated)
     this.kit = newKitFromWeb3(new Web3(validatorUrl))
     this.kitLight = newKitFromWeb3(new Web3(lightUrl))
@@ -243,7 +261,11 @@ class TestEnv {
     const signingHash = ejsUtil.rlphash(arr)
     const pk = ejsUtil.addHexPrefix(validatorPrivateKey)
     const sig = ejsUtil.ecsign(signingHash, ejsUtil.toBuffer(pk))
-    arr.push(ejsUtil.bufferToHex(sig.v), ejsUtil.bufferToHex(sig.r), ejsUtil.bufferToHex(sig.s))
+    arr.push(
+      ejsUtil.bufferToHex(stripZeros(sig.v)),
+      ejsUtil.bufferToHex(stripZeros(sig.r)),
+      ejsUtil.bufferToHex(stripZeros(sig.s))
+    )
     return ejsUtil.bufferToHex(encode(arr))
   }
 
@@ -264,30 +286,28 @@ class TestEnv {
           const receipt = await (await this.kit.connection.sendSignedTransaction(tx)).waitReceipt()
           minedTx = await this.kit.web3.eth.getTransaction(receipt.transactionHash)
           error = null
-        } catch (err) {
+        } catch (err: any) {
           error = err.message
         }
       })
-
       if (ethCompatible && !this.cipIsActivated) {
         it('fails due to being ethereum-compatible', () => {
           assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
-          assert.match(
-            error!,
-            new RegExp(notYetActivatedError),
-            `Got "${error}", expected "${notYetActivatedError}"`
-          )
+          assert.equal(error!, notYetActivatedError)
         })
       } else if (this.cipIsActivated) {
-        // Replay protection is mandatory, so the transaction should fail
-        it('fails due to replay protection being mandatory', () => {
-          assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
-          assert.match(
-            error!,
-            new RegExp(noReplayProtectionError),
-            `Got "${error}", expected "${noReplayProtectionError}"`
-          )
-        })
+        if (this.replayProtectionIsNotMandatory) {
+          // Should succeed, since replay protection is optional after Espresso
+          it('succeeds', () => {
+            assert.isNull(error, 'Transaction failed when it should have succeeded')
+          })
+        } else {
+          // Replay protection is mandatory, so the transaction should fail
+          it('fails due to replay protection being mandatory', () => {
+            assert.isNull(minedTx, 'Transaction succeeded when it should have failed')
+            assert.equal(error!, noReplayProtectionError)
+          })
+        }
       } else {
         // Should succeed, since replay protection is optional before Donut
         it('succeeds', () => {
@@ -356,6 +376,7 @@ class TestEnv {
             // Once the transaction is signed and encoded, it doesn't matter whether we send it with web3 or contractkit
             txHash = (await w3.eth.sendSignedTransaction(raw)).transactionHash
           } else {
+            tx.chainId = undefined //  clear the chainId b/c web3js won't format it as a hex bignum...
             // Send using `eth_sendTransaction`
             const params: any = tx // haven't added `ethCompatible` to the tx type
             // Only include ethCompatible if it's true.  This confirms that omitting it results to normal Celo
@@ -370,7 +391,7 @@ class TestEnv {
 
           minedTx = await k.web3.eth.getTransaction(txHash)
           error = null
-        } catch (err) {
+        } catch (err: any) {
           error = err.message
         }
       })
@@ -404,7 +425,7 @@ describe('CIP-35 >', function (this: any) {
     if (devFilter.cipIsActivated === true) {
       return
     }
-    const testEnv = new TestEnv(false)
+    const testEnv = new TestEnv(false, false) // not donut, not espresso
     before(async function (this) {
       this.timeout(0)
       await testEnv.before()
@@ -430,7 +451,33 @@ describe('CIP-35 >', function (this: any) {
     if (devFilter.cipIsActivated === false) {
       return
     }
-    const testEnv = new TestEnv(true)
+    const testEnv = new TestEnv(true, false) // donut, not espresso
+    before(async function (this) {
+      this.timeout(0)
+      await testEnv.before()
+    })
+
+    if (replayProtectionTests !== 'only') {
+      for (const testCase of testEnv.testCases) {
+        testEnv.runTestCase(testCase)
+      }
+    }
+
+    if (replayProtectionTests !== 'skip') {
+      testEnv.runReplayProtectionTests()
+    }
+
+    after(async function (this: any) {
+      this.timeout(0)
+      await testEnv.hooks.after()
+    })
+  })
+
+  describe('after cip50 (optional replay protection)', async () => {
+    if (devFilter.cipIsActivated === false) {
+      return
+    }
+    const testEnv = new TestEnv(true, true) // donut and espresso
     before(async function (this) {
       this.timeout(0)
       await testEnv.before()
