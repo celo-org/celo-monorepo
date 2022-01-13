@@ -13,6 +13,7 @@ import {
   KEY_VERSION_HEADER,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   SequentialDelayDomain,
+  SequentialDelayDomainOptions,
   SignerEndpoint,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
@@ -86,7 +87,6 @@ async function requestSignatures(
   const responses: SignMsgRespWithStatus[] = []
   const failedRequests = new Set<string>()
   const errorCodes: Map<number, number> = new Map()
-  const blsCryptoClient = new BLSCryptographyClient()
 
   const logger: Logger = response.locals.logger
 
@@ -107,6 +107,8 @@ async function requestSignatures(
     pubKey,
     polynomial,
   } = standardizeRequestParams(request, endpoint)
+
+  const blsCryptoClient = new BLSCryptographyClient(threshold, pubKey, polynomial)
 
   request.headers[KEY_VERSION_HEADER] = keyVersion.toString()
 
@@ -140,9 +142,6 @@ async function requestSignatures(
             blsCryptoClient,
             blindedMessage,
             controller,
-            pubKey,
-            polynomial,
-            threshold,
             keyVersion,
             endpoint
           )
@@ -201,13 +200,10 @@ async function requestSignatures(
   }
 
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
-  if (blsCryptoClient.hasSufficientSignatures(threshold)) {
+  if (blsCryptoClient.hasSufficientSignatures()) {
     try {
       const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
         blindedMessage,
-        pubKey,
-        polynomial,
-        threshold,
         logger
       )
       response.json({ success: true, combinedSignature, version: VERSION })
@@ -229,9 +225,6 @@ async function handleSuccessResponse(
   blsCryptoClient: BLSCryptographyClient,
   blindedMessage: string,
   controller: AbortController,
-  pubKey: string,
-  polynomial: string,
-  threshold: number,
   expectedKeyVersion: number,
   endpoint: CombinerSigEndpoint
 ) {
@@ -263,22 +256,16 @@ async function handleSuccessResponse(
   logger.info(
     {
       signer: serviceUrl,
-      hasSufficientSignatures: blsCryptoClient.hasSufficientSignatures(threshold),
+      hasSufficientSignatures: blsCryptoClient.hasSufficientSignatures(),
       additionLatency: Date.now() - signatureAdditionStart,
     },
     'Added signature'
   )
   // Send response immediately once we cross threshold
   // BLS threshold signatures can be combined without all partial signatures
-  if (blsCryptoClient.hasSufficientSignatures(threshold)) {
+  if (blsCryptoClient.hasSufficientSignatures()) {
     try {
-      await blsCryptoClient.combinePartialBlindedSignatures(
-        blindedMessage,
-        pubKey,
-        polynomial,
-        threshold,
-        logger
-      )
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedMessage, logger)
       // Close outstanding requests
       controller.abort()
     } catch {
