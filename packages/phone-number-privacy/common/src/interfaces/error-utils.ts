@@ -19,7 +19,7 @@ export enum ErrorMessage {
 
 export enum WarningMessage {
   INVALID_INPUT = `CELO_ODIS_WARN_01 BAD_INPUT Invalid input parameters`,
-  UNAUTHENTICATED_USER = `CELO_ODIS_WARN_02 BAD_INPUT Missing or invalid authentication header`,
+  UNAUTHENTICATED_USER = `CELO_ODIS_WARN_02 BAD_INPUT Missing or invalid authentication`,
   EXCEEDED_QUOTA = `CELO_ODIS_WARN_03 QUOTA Requester exceeded service query quota`,
   UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE = `CELO_ODIS_WARN_04 QUOTA Unverified user attempting to matchmake`,
   DUPLICATE_REQUEST_TO_MATCHMAKE = `CELO_ODIS_WARN_05 QUOTA Attempt to request >1 matchmaking`,
