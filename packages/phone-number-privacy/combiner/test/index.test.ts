@@ -1,4 +1,8 @@
-import { Endpoints, getDataEncryptionKey, isVerified } from '@celo/phone-number-privacy-common'
+import {
+  SignerEndpoints,
+  getDataEncryptionKey,
+  isVerified,
+} from '@celo/phone-number-privacy-common'
 import { hexToBuffer } from '@celo/utils/lib/address'
 import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
@@ -141,7 +145,7 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
       fetchMock.mockImplementation((url) => {
         const primaryUrl =
           JSON.parse(config.odisServices.phoneNumberPrivacy.signers)[0].url +
-          Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG
+          SignerEndpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG
         numberOfCalls += 1
         if (url === primaryUrl) {
           return Promise.reject()

@@ -15,16 +15,24 @@ import {
   SequentialDelayDomain,
 } from '../domains'
 
-export enum Endpoints {
+export enum CombinerEndpoints {
   STATUS = '/status',
-  METRICS = '/metrics',
-  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig', // Signer
-  GET_BLINDED_MESSAGE_SIG = '/getBlindedMessageSig', // Combiner
-  GET_QUOTA = '/getQuota',
+  GET_BLINDED_MESSAGE_SIG = '/getBlindedMessageSig',
   MATCHMAKING = '/getContactMatches',
 
+  DOMAIN_SIGN = '/domainSign',
+  DISABLE_DOMAIN = '/domainDisable',
+  DOMAIN_QUOTA_STATUS = '/domainQuotaStatus',
+}
+
+export enum SignerEndpoints {
+  STATUS = '/status',
+  METRICS = '/metrics',
+  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
+  GET_QUOTA = '/getQuota',
+
+  DOMAIN_SIGN = '/domain/sign',
   DISABLE_DOMAIN = '/domain/disable',
-  DOMAIN_SIGN = '/domain/sign/',
   DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
 }
 

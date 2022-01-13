@@ -3,14 +3,14 @@ import {
   DomainQuotaStatusRequest,
   DomainRequest,
   DomainRestrictedSignatureRequest,
-  Endpoints,
   KnownDomain,
+  SignerEndpoints as Endpoints,
   verifyDisableDomainRequestAuthenticity,
   verifyDomainQuotaStatusRequestAuthenticity,
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { DomainState, DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
+import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
 import { IDomainAuthService } from './domainAuth.interface'
 
 // TODO(Alec): Does the combiner also need to support all these endpoints?

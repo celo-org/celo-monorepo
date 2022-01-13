@@ -1,5 +1,9 @@
 import { timeout } from '@celo/base'
-import { Endpoints, loggerMiddleware, rootLogger } from '@celo/phone-number-privacy-common'
+import {
+  loggerMiddleware,
+  rootLogger,
+  SignerEndpoints as Endpoints,
+} from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'

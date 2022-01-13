@@ -1,8 +1,14 @@
-import { Endpoints, ErrorMessage, loggerMiddleware } from '@celo/phone-number-privacy-common'
+import {
+  CombinerEndpoints as Endpoints,
+  ErrorMessage,
+  loggerMiddleware,
+} from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import config, { FORNO_ALFAJORES, VERSION } from './config'
+import { handleDomainDisableReq } from './domains/domain-disable'
+import { handleDomainQuotaStatusReq } from './domains/domain-quota-status'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 import { handleDomainSigReq, handlePnpSigReq } from './signing/get-threshold-signature'
 
@@ -52,6 +58,18 @@ async function meterResponse(
   obs.disconnect()
 }
 
+// EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getContactMatches" -H "Authorization: <SIGNED_BODY>" -d '{"userPhoneNumber": "+99999999999", "contactPhoneNumbers": ["+5555555555", "+3333333333"], "account": "0x117ea45d497ab022b85494ba3ab6f52969bf6812"}' -H 'Content-Type: application/json'
+export const getContactMatches = functions
+  .region('us-central1', 'europe-west3')
+  .runWith({
+    // Keep instances warm for this latency-critical function
+    // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
+    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
+  })
+  .https.onRequest(async (req: functions.Request, res: functions.Response) =>
+    meterResponse(handleGetContactMatches, req, res, Endpoints.MATCHMAKING)
+  )
+
 // EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getBlindedMessageSig" -H "Authorization: 0xfc2ee61c4d18b93374fdd525c9de09d01398f7d153d17340b9ae156f94a1eb3237207d9aacb42e7f2f4ee0cf2621ab6d5a0837211665a99e16e3367f5209a56b1b" -d '{"blindedQueryPhoneNumber":"+Dzuylsdcv1ZxbRcQwhQ29O0UJynTNYufjWc4jpw2Zr9FLu5gSU8bvvDJ3r/Nj+B","account":"0xdd18d08f1c2619ede729c26cc46da19af0a2aa7f", "hashedPhoneNumber":"0x8fb77f2aff2ef0343706535dc702fc99f61a5d1b8e46d7c144c80fd156826a77"}' -H 'Content-Type: application/json'
 export const getBlindedMessageSig = functions
   .region('us-central1', 'europe-west3')
@@ -64,7 +82,6 @@ export const getBlindedMessageSig = functions
     meterResponse(handlePnpSigReq, req, res, Endpoints.GET_BLINDED_MESSAGE_SIG)
   )
 
-// EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/domainSign" -H "Authorization: 0xfc2ee61c4d18b93374fdd525c9de09d01398f7d153d17340b9ae156f94a1eb3237207d9aacb42e7f2f4ee0cf2621ab6d5a0837211665a99e16e3367f5209a56b1b" -d '{"blindedQueryPhoneNumber":"+Dzuylsdcv1ZxbRcQwhQ29O0UJynTNYufjWc4jpw2Zr9FLu5gSU8bvvDJ3r/Nj+B","account":"0xdd18d08f1c2619ede729c26cc46da19af0a2aa7f", "hashedPhoneNumber":"0x8fb77f2aff2ef0343706535dc702fc99f61a5d1b8e46d7c144c80fd156826a77"}' -H 'Content-Type: application/json' // TODO(Alec)
 export const domainSign = functions
   .region('us-central1', 'europe-west3')
   .runWith({
@@ -76,8 +93,7 @@ export const domainSign = functions
     meterResponse(handleDomainSigReq, req, res, Endpoints.DOMAIN_SIGN)
   )
 
-// EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getContactMatches" -H "Authorization: <SIGNED_BODY>" -d '{"userPhoneNumber": "+99999999999", "contactPhoneNumbers": ["+5555555555", "+3333333333"], "account": "0x117ea45d497ab022b85494ba3ab6f52969bf6812"}' -H 'Content-Type: application/json'
-export const getContactMatches = functions
+export const domainQuotaStatus = functions
   .region('us-central1', 'europe-west3')
   .runWith({
     // Keep instances warm for this latency-critical function
@@ -85,7 +101,18 @@ export const getContactMatches = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) =>
-    meterResponse(handleGetContactMatches, req, res, Endpoints.MATCHMAKING)
+    meterResponse(handleDomainQuotaStatusReq, req, res, Endpoints.DOMAIN_QUOTA_STATUS)
+  )
+
+export const domainDisable = functions
+  .region('us-central1', 'europe-west3')
+  .runWith({
+    // Keep instances warm for this latency-critical function
+    // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
+    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
+  })
+  .https.onRequest(async (req: functions.Request, res: functions.Response) =>
+    meterResponse(handleDomainDisableReq, req, res, Endpoints.DISABLE_DOMAIN)
   )
 
 export const status = functions
