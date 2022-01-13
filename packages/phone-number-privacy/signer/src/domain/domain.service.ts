@@ -15,7 +15,7 @@ import {
   KEY_VERSION_HEADER,
   KnownDomain,
   KnownDomainState,
-  SignerEndpoints as Endpoints,
+  SignerEndpoint as Endpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -50,11 +50,11 @@ export class DomainService implements IDomainService {
     request: Request<{}, {}, DisableDomainRequest>,
     response: Response<DisableDomainResponse>
   ): Promise<void> {
-    Counters.requests.labels(Endpoints.DISABLE_DOMAIN).inc()
+    Counters.requests.labels(Endpoint.DISABLE_DOMAIN).inc()
 
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, request, response, Endpoints.DISABLE_DOMAIN, logger)) {
+    if (!this.inputValidation(domain, request, response, Endpoint.DISABLE_DOMAIN, logger)) {
       // inputValidation returns a response to the user internally. Nothing left to do.
       return
     }
@@ -80,12 +80,7 @@ export class DomainService implements IDomainService {
       return
     } catch (error) {
       logger.error('Error while disabling domain', error)
-      respondWithError(
-        Endpoints.DISABLE_DOMAIN,
-        response,
-        500,
-        ErrorMessage.DATABASE_UPDATE_FAILURE
-      )
+      respondWithError(Endpoint.DISABLE_DOMAIN, response, 500, ErrorMessage.DATABASE_UPDATE_FAILURE)
       trx.rollback(error)
     }
   }
@@ -94,11 +89,11 @@ export class DomainService implements IDomainService {
     request: Request<{}, {}, DomainQuotaStatusRequest>,
     response: Response<DomainQuotaStatusResponse>
   ): Promise<void> {
-    Counters.requests.labels(Endpoints.DOMAIN_QUOTA_STATUS).inc()
+    Counters.requests.labels(Endpoint.DOMAIN_QUOTA_STATUS).inc()
 
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, request, response, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
+    if (!this.inputValidation(domain, request, response, Endpoint.DOMAIN_QUOTA_STATUS, logger)) {
       // inputValidation returns a response to the user internally. Nothing left to do.
       return
     }
@@ -134,7 +129,7 @@ export class DomainService implements IDomainService {
     } catch (error) {
       logger.error('Error while getting domain status', error)
       respondWithError(
-        Endpoints.DOMAIN_QUOTA_STATUS,
+        Endpoint.DOMAIN_QUOTA_STATUS,
         response,
         500,
         ErrorMessage.DATABASE_GET_FAILURE
@@ -146,11 +141,11 @@ export class DomainService implements IDomainService {
     request: Request<{}, {}, DomainRestrictedSignatureRequest>,
     response: Response<DomainRestrictedSignatureResponse>
   ): Promise<void> {
-    Counters.requests.labels(Endpoints.DOMAIN_SIGN).inc()
+    Counters.requests.labels(Endpoint.DOMAIN_SIGN).inc()
 
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, request, response, Endpoints.DOMAIN_SIGN, logger)) {
+    if (!this.inputValidation(domain, request, response, Endpoint.DOMAIN_SIGN, logger)) {
       // inputValidation returns a response to the user internally. Nothing left to do.
       return
     }
@@ -169,7 +164,7 @@ export class DomainService implements IDomainService {
       const trx = await getTransaction()
       let domainState = await getDomainStateWithLock(domain, trx, logger)
 
-      if (!this.nonceCheck(request, response, domainState, Endpoints.DOMAIN_QUOTA_STATUS, logger)) {
+      if (!this.nonceCheck(request, response, domainState, Endpoint.DOMAIN_QUOTA_STATUS, logger)) {
         return
       }
 
@@ -185,7 +180,7 @@ export class DomainService implements IDomainService {
           name: domain.name,
           version: domain.version,
         })
-        respondWithError(Endpoints.DOMAIN_SIGN, response, 403, WarningMessage.DISABLED_DOMAIN)
+        respondWithError(Endpoint.DOMAIN_SIGN, response, 403, WarningMessage.DISABLED_DOMAIN)
         return
       }
 
@@ -202,7 +197,7 @@ export class DomainService implements IDomainService {
           name: domain.name,
           version: domain.version,
         })
-        respondWithError(Endpoints.DOMAIN_SIGN, response, 429, WarningMessage.EXCEEDED_QUOTA)
+        respondWithError(Endpoint.DOMAIN_SIGN, response, 429, WarningMessage.EXCEEDED_QUOTA)
         return
       }
 
@@ -231,7 +226,7 @@ export class DomainService implements IDomainService {
     } catch (err) {
       logger.error('Failed to get signature for a domain')
       logger.error(err)
-      respondWithError(Endpoints.DOMAIN_SIGN, response, 500, ErrorMessage.UNKNOWN_ERROR)
+      respondWithError(Endpoint.DOMAIN_SIGN, response, 500, ErrorMessage.UNKNOWN_ERROR)
     }
   }
 
@@ -239,7 +234,7 @@ export class DomainService implements IDomainService {
     domain: Domain,
     request: Request<{}, {}, DomainRequest>,
     response: Response,
-    endpoint: Endpoints,
+    endpoint: Endpoint,
     logger: Logger
   ): domain is KnownDomain {
     if (!this.authService.authCheck(request.body, endpoint, logger)) {
@@ -267,7 +262,7 @@ export class DomainService implements IDomainService {
     request: Request<{}, {}, DomainRequest>,
     response: Response,
     domainState: DomainState | null,
-    endpoint: Endpoints,
+    endpoint: Endpoint,
     logger: Logger
   ): boolean {
     if (domainState && !this.authService.nonceCheck(request.body, domainState, logger)) {

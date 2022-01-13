@@ -4,31 +4,31 @@ import {
   DomainRequest,
   DomainRestrictedSignatureRequest,
   KnownDomain,
-  SignerEndpoints as Endpoints,
+  SignerEndpoint as Endpoint,
   verifyDisableDomainRequestAuthenticity,
   verifyDomainQuotaStatusRequestAuthenticity,
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
+import { DomainState, DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
 import { IDomainAuthService } from './domainAuth.interface'
 
 // TODO(Alec): Does the combiner also need to support all these endpoints?
 // TODO(Alec): Should we standardize this pattern accross signer / combiner?
 export class DomainAuthService implements IDomainAuthService {
-  public authCheck(domainRequest: DomainRequest, endpoint: Endpoints, logger: Logger): boolean {
+  public authCheck(domainRequest: DomainRequest, endpoint: Endpoint, logger: Logger): boolean {
     try {
-      if (endpoint === Endpoints.DISABLE_DOMAIN) {
+      if (endpoint === Endpoint.DISABLE_DOMAIN) {
         return verifyDisableDomainRequestAuthenticity(
           domainRequest as DisableDomainRequest<KnownDomain>
         )
       }
-      if (endpoint === Endpoints.DOMAIN_QUOTA_STATUS) {
+      if (endpoint === Endpoint.DOMAIN_QUOTA_STATUS) {
         return verifyDomainQuotaStatusRequestAuthenticity(
           domainRequest as DomainQuotaStatusRequest<KnownDomain>
         )
       }
-      if (endpoint === Endpoints.DOMAIN_SIGN) {
+      if (endpoint === Endpoint.DOMAIN_SIGN) {
         return verifyDomainRestrictedSignatureRequestAuthenticity(
           domainRequest as DomainRestrictedSignatureRequest<KnownDomain>
         )

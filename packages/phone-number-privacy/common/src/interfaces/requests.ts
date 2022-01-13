@@ -15,7 +15,7 @@ import {
   SequentialDelayDomain,
 } from '../domains'
 
-export enum CombinerEndpoints {
+export enum CombinerEndpoint {
   STATUS = '/status',
   GET_BLINDED_MESSAGE_SIG = '/getBlindedMessageSig',
   MATCHMAKING = '/getContactMatches',
@@ -25,7 +25,7 @@ export enum CombinerEndpoints {
   DOMAIN_QUOTA_STATUS = '/domainQuotaStatus',
 }
 
-export enum SignerEndpoints {
+export enum SignerEndpoint {
   STATUS = '/status',
   METRICS = '/metrics',
   GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',

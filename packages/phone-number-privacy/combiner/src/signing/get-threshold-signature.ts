@@ -1,7 +1,7 @@
 import { SequentialDelayDomainOptions } from '@celo/identity/lib/odis/domains'
 import {
   authenticateUser,
-  CombinerEndpoints,
+  CombinerEndpoint,
   DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
   ErrorMessage,
@@ -14,7 +14,7 @@ import {
   KEY_VERSION_HEADER,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   SequentialDelayDomain,
-  SignerEndpoints,
+  SignerEndpoint,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
   verifyDomainRestrictedSignatureRequestAuthenticity,
@@ -32,10 +32,8 @@ import { getContractKit } from '../web3/contracts'
 
 type SignerPnpResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
-type CombinerSigEndpoint = CombinerEndpoints.GET_BLINDED_MESSAGE_SIG | CombinerEndpoints.DOMAIN_SIGN
-type SignerSigEndpoint =
-  | SignerEndpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG
-  | SignerEndpoints.DOMAIN_SIGN
+type CombinerSigEndpoint = CombinerEndpoint.GET_BLINDED_MESSAGE_SIG | CombinerEndpoint.DOMAIN_SIGN
+type SignerSigEndpoint = SignerEndpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG | SignerEndpoint.DOMAIN_SIGN
 
 interface SignerService {
   url: string
@@ -49,11 +47,11 @@ interface SignMsgRespWithStatus {
 }
 
 export async function handlePnpSigReq(request: Request, response: Response) {
-  return handleGetBlindedMessageSig(request, response, CombinerEndpoints.GET_BLINDED_MESSAGE_SIG)
+  return handleGetBlindedMessageSig(request, response, CombinerEndpoint.GET_BLINDED_MESSAGE_SIG)
 }
 
 export async function handleDomainSigReq(request: Request, response: Response) {
-  return handleGetBlindedMessageSig(request, response, CombinerEndpoints.DOMAIN_SIGN)
+  return handleGetBlindedMessageSig(request, response, CombinerEndpoint.DOMAIN_SIGN)
 }
 
 async function handleGetBlindedMessageSig(
@@ -199,7 +197,7 @@ async function requestSignatures(
   performance.clearMarks()
   obs.disconnect()
 
-  if (endpoint !== CombinerEndpoints.GET_BLINDED_MESSAGE_SIG) {
+  if (endpoint !== CombinerEndpoint.GET_BLINDED_MESSAGE_SIG) {
     logPnpResponseDiscrepancies(responses, logger)
   }
 
@@ -252,7 +250,7 @@ async function handleSuccessResponse(
     throw new Error(`Signature is missing from signer ${serviceUrl}`)
   }
 
-  if (endpoint === CombinerEndpoints.GET_BLINDED_MESSAGE_SIG) {
+  if (endpoint === CombinerEndpoint.GET_BLINDED_MESSAGE_SIG) {
     responses.push({
       url: serviceUrl,
       signMessageResponse: res as SignerPnpResponse,
@@ -494,28 +492,28 @@ function isDomainRestrictedSignatureRequest(
   _req: any,
   endpoint: CombinerSigEndpoint
 ): _req is DomainRestrictedSignatureRequest<SequentialDelayDomain, SequentialDelayDomainOptions> {
-  return endpoint === CombinerEndpoints.DOMAIN_SIGN
+  return endpoint === CombinerEndpoint.DOMAIN_SIGN
 }
 
 function isPnpSignatureRequest(
   _req: any,
   endpoint: CombinerSigEndpoint
 ): _req is GetBlindedMessageSigRequest {
-  return endpoint === CombinerEndpoints.GET_BLINDED_MESSAGE_SIG
+  return endpoint === CombinerEndpoint.GET_BLINDED_MESSAGE_SIG
 }
 
 function isDomainRestrictedSignatureResponse(
   _res: any,
   endpoint: CombinerSigEndpoint
 ): _res is DomainRestrictedSignatureResponse {
-  return endpoint === CombinerEndpoints.DOMAIN_SIGN
+  return endpoint === CombinerEndpoint.DOMAIN_SIGN
 }
 
 function isPnpSignatureResponse(
   _res: any,
   endpoint: CombinerSigEndpoint
 ): _res is SignerPnpResponse {
-  return endpoint === CombinerEndpoints.GET_BLINDED_MESSAGE_SIG
+  return endpoint === CombinerEndpoint.GET_BLINDED_MESSAGE_SIG
 }
 
 function isValidGetSignatureInput(request: Request, endpoint: CombinerSigEndpoint): boolean {
@@ -565,7 +563,7 @@ function standardizeRequestParams(
   if (isPnpSignatureRequest(request.body, endpoint)) {
     return {
       signers: JSON.parse(config.odisServices.phoneNumberPrivacy.signers),
-      signerEndpoint: SignerEndpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+      signerEndpoint: SignerEndpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG,
       timeoutMs: config.odisServices.phoneNumberPrivacy.timeoutMilliSeconds,
       threshold: config.keys.phoneNumberPrivacy.threshold,
       blindedMessage: request.body.blindedQueryPhoneNumber,
@@ -577,7 +575,7 @@ function standardizeRequestParams(
   if (isDomainRestrictedSignatureRequest(request.body, endpoint)) {
     return {
       signers: JSON.parse(config.odisServices.domains.signers),
-      signerEndpoint: SignerEndpoints.DOMAIN_SIGN,
+      signerEndpoint: SignerEndpoint.DOMAIN_SIGN,
       timeoutMs: config.odisServices.domains.timeoutMilliSeconds,
       threshold: config.keys.domains.threshold,
       blindedMessage: request.body.blindedMessage,

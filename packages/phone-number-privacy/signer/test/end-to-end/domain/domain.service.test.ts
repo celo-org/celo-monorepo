@@ -1,12 +1,12 @@
 import {
-  Endpoints,
   Domain,
   DomainOptions,
+  SignerEndpoint as Endpoint,
   SequentialDelayDomain,
 } from '@celo/phone-number-privacy-common'
-import 'isomorphic-fetch'
 import { defined, noBool, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { ACCOUNT_ADDRESS2 } from '@celo/wallet-rpc/lib/rpc-wallet.test'
+import 'isomorphic-fetch'
 import { contractKit } from '../../../../combiner/test/end-to-end/resources'
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
@@ -71,7 +71,7 @@ describe('Domain Service tests', () => {
         options,
       })
 
-      const res = await fetch(ODIS_SIGNER + Endpoints.DISABLE_DOMAIN, {
+      const res = await fetch(ODIS_SIGNER + Endpoint.DISABLE_DOMAIN, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

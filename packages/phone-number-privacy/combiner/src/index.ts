@@ -1,5 +1,5 @@
 import {
-  CombinerEndpoints as Endpoints,
+  CombinerEndpoint as Endpoint,
   ErrorMessage,
   loggerMiddleware,
 } from '@celo/phone-number-privacy-common'
@@ -18,7 +18,7 @@ async function meterResponse(
   handler: (req: functions.Request, res: functions.Response) => Promise<void>,
   req: functions.Request,
   res: functions.Response,
-  endpoint: Endpoints
+  endpoint: Endpoint
 ) {
   if (!res.locals) {
     res.locals = {}
@@ -67,7 +67,7 @@ export const getContactMatches = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) =>
-    meterResponse(handleGetContactMatches, req, res, Endpoints.MATCHMAKING)
+    meterResponse(handleGetContactMatches, req, res, Endpoint.MATCHMAKING)
   )
 
 // EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getBlindedMessageSig" -H "Authorization: 0xfc2ee61c4d18b93374fdd525c9de09d01398f7d153d17340b9ae156f94a1eb3237207d9aacb42e7f2f4ee0cf2621ab6d5a0837211665a99e16e3367f5209a56b1b" -d '{"blindedQueryPhoneNumber":"+Dzuylsdcv1ZxbRcQwhQ29O0UJynTNYufjWc4jpw2Zr9FLu5gSU8bvvDJ3r/Nj+B","account":"0xdd18d08f1c2619ede729c26cc46da19af0a2aa7f", "hashedPhoneNumber":"0x8fb77f2aff2ef0343706535dc702fc99f61a5d1b8e46d7c144c80fd156826a77"}' -H 'Content-Type: application/json'
@@ -79,7 +79,7 @@ export const getBlindedMessageSig = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) =>
-    meterResponse(handlePnpSigReq, req, res, Endpoints.GET_BLINDED_MESSAGE_SIG)
+    meterResponse(handlePnpSigReq, req, res, Endpoint.GET_BLINDED_MESSAGE_SIG)
   )
 
 export const domainSign = functions
@@ -90,7 +90,7 @@ export const domainSign = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) =>
-    meterResponse(handleDomainSigReq, req, res, Endpoints.DOMAIN_SIGN)
+    meterResponse(handleDomainSigReq, req, res, Endpoint.DOMAIN_SIGN)
   )
 
 export const domainQuotaStatus = functions
@@ -101,7 +101,7 @@ export const domainQuotaStatus = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) =>
-    meterResponse(handleDomainQuotaStatusReq, req, res, Endpoints.DOMAIN_QUOTA_STATUS)
+    meterResponse(handleDomainQuotaStatusReq, req, res, Endpoint.DOMAIN_QUOTA_STATUS)
   )
 
 export const domainDisable = functions
@@ -112,7 +112,7 @@ export const domainDisable = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) =>
-    meterResponse(handleDomainDisableReq, req, res, Endpoints.DISABLE_DOMAIN)
+    meterResponse(handleDomainDisableReq, req, res, Endpoint.DISABLE_DOMAIN)
   )
 
 export const status = functions
