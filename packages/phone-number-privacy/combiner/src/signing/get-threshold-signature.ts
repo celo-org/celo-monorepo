@@ -16,7 +16,7 @@ import {
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
-  verifyDomainRestrictedSignatureRequestSignature,
+  verifyDomainRestrictedSignatureRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
@@ -468,7 +468,7 @@ async function authenticateSignatureRequest(
     return authenticateUser(request, getContractKit(), logger)
   }
   if (isDomainRestrictedSignatureRequest(request.body, endpoint)) {
-    return verifyDomainRestrictedSignatureRequestSignature(request.body)
+    return verifyDomainRestrictedSignatureRequestAuthenticity(request.body)
   }
 
   throw new Error(`Implementation error. Signature endpoint ${endpoint} not recognized`)

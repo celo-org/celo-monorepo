@@ -131,11 +131,11 @@ const config: Config = {
     keys: {
       phoneNumberPrivacy: {
         name: env.PHONE_NUMBER_PRIVACY_KEY_NAME_BASE,
-        latest: toNum(env.PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION) || 2,
+        latest: toNum(env.PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION) ?? 2,
       },
       domains: {
         name: env.DOMAINS_KEY_NAME_BASE,
-        latest: toNum(env.DOMAINS_LATEST_KEY_VERSION) || 1,
+        latest: toNum(env.DOMAINS_LATEST_KEY_VERSION) ?? 1,
       },
     },
     azure: {
@@ -156,7 +156,7 @@ const config: Config = {
       secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
-  timeout: toNum(env.ODIS_SIGNER_TIMEOUT) || 5000,
-  test_quota_bypass_percentage: toNum(env.TEST_QUOTA_BYPASS_PERCENTAGE) || 0,
+  timeout: toNum(env.ODIS_SIGNER_TIMEOUT) ?? 5000,
+  test_quota_bypass_percentage: toNum(env.TEST_QUOTA_BYPASS_PERCENTAGE) ?? 0,
 }
 export default config

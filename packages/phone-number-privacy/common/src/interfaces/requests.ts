@@ -306,42 +306,42 @@ function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
 }
 
 /**
- * Verifies the signature over a signature request for authenticated domains.
+ * Verifies the authentication (e.g. client signature) over a domain signature request.
  * If the domain is unauthenticated, this function returns false.
  *
  * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
  * to the undefined value for type EIP712Optional<string>).
  */
-export function verifyDomainRestrictedSignatureRequestSignature(
+export function verifyDomainRestrictedSignatureRequestAuthenticity(
   request: DomainRestrictedSignatureRequest<SequentialDelayDomain>
 ): boolean {
   return verifyRequestSignature(domainRestrictedSignatureRequestEIP712, request)
 }
 
 /**
- * Verifies the signature over a domain quota status request for authenticated domains.
+ * Verifies the authentication (e.g. client signature) over a domain status request.
  * If the domain is unauthenticated, this function returns false.
  *
  * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
  * to the undefined value for type EIP712Optional<string>).
  */
-export function verifyDomainQuotaStatusRequestSignature(
+export function verifyDomainQuotaStatusRequestAuthenticity(
   request: DomainQuotaStatusRequest<SequentialDelayDomain>
 ): boolean {
   return verifyRequestSignature(domainQuotaStatusRequestEIP712, request)
 }
 
 /**
- * Verifies the signature over a disable domain request for authenticated domains.
+ * Verifies the authentication (e.g. client signature) over a disable domain request.
  * If the domain is unauthenticated, this function returns false.
  *
  * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
  * to the undefined value for type EIP712Optional<string>).
  */
-export function verifyDisableDomainRequestSignature(
+export function verifyDisableDomainRequestAuthenticity(
   request: DisableDomainRequest<SequentialDelayDomain>
 ): boolean {
   return verifyRequestSignature(disableDomainRequestEIP712, request)

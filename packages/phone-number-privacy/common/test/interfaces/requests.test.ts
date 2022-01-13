@@ -15,9 +15,9 @@ import {
   domainQuotaStatusRequestEIP712,
   DisableDomainRequest,
   disableDomainRequestEIP712,
-  verifyDisableDomainRequestSignature,
-  verifyDomainQuotaStatusRequestSignature,
-  verifyDomainRestrictedSignatureRequestSignature,
+  verifyDisableDomainRequestAuthenticity,
+  verifyDomainQuotaStatusRequestAuthenticity,
+  verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '../../src/interfaces/requests'
 
 // Compile-time check that DomainRestrictedSignatureRequest can be cast to type EIP712Object.
@@ -159,8 +159,8 @@ const cases = [
       sessionID: noString,
     } as DomainRestrictedSignatureRequest<SequentialDelayDomain>,
     typedDataBuilder: domainRestrictedSignatureRequestEIP712,
-    verifier: verifyDomainRestrictedSignatureRequestSignature,
-    name: 'verifyDomainRestrictedSignatureRequestSignature()',
+    verifier: verifyDomainRestrictedSignatureRequestAuthenticity,
+    name: 'verifyDomainRestrictedSignatureRequestAuthenticity()',
   },
   {
     request: {
@@ -172,8 +172,8 @@ const cases = [
       sessionID: noString,
     } as DomainQuotaStatusRequest<SequentialDelayDomain>,
     typedDataBuilder: domainQuotaStatusRequestEIP712,
-    verifier: verifyDomainQuotaStatusRequestSignature,
-    name: 'verifyDomainQuotaStatusRequestSignature()',
+    verifier: verifyDomainQuotaStatusRequestAuthenticity,
+    name: 'verifyDomainQuotaStatusRequestAuthenticity()',
   },
   {
     request: {
@@ -185,8 +185,8 @@ const cases = [
       sessionID: noString,
     } as DisableDomainRequest<SequentialDelayDomain>,
     typedDataBuilder: disableDomainRequestEIP712,
-    verifier: verifyDisableDomainRequestSignature,
-    name: 'verifyDisableDomainRequestSignature()',
+    verifier: verifyDisableDomainRequestAuthenticity,
+    name: 'verifyDisableDomainRequestAuthenticity()',
   },
 ]
 

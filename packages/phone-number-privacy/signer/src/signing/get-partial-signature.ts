@@ -43,7 +43,7 @@ export async function handleGetBlindedMessagePartialSig(
   const key: Key = {
     name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
     version:
-      Number(request.headers[KEY_VERSION_HEADER]) || config.keystore.keys.phoneNumberPrivacy.latest,
+      Number(request.headers[KEY_VERSION_HEADER]) ?? config.keystore.keys.phoneNumberPrivacy.latest,
   }
 
   try {

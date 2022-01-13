@@ -5,9 +5,9 @@ import {
   DomainRestrictedSignatureRequest,
   Endpoints,
   KnownDomain,
-  verifyDisableDomainRequestSignature,
-  verifyDomainQuotaStatusRequestSignature,
-  verifyDomainRestrictedSignatureRequestSignature,
+  verifyDisableDomainRequestAuthenticity,
+  verifyDomainQuotaStatusRequestAuthenticity,
+  verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { DomainState, DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
@@ -19,17 +19,17 @@ export class DomainAuthService implements IDomainAuthService {
   public authCheck(domainRequest: DomainRequest, endpoint: Endpoints, logger: Logger): boolean {
     try {
       if (endpoint === Endpoints.DISABLE_DOMAIN) {
-        return verifyDisableDomainRequestSignature(
+        return verifyDisableDomainRequestAuthenticity(
           domainRequest as DisableDomainRequest<KnownDomain>
         )
       }
       if (endpoint === Endpoints.DOMAIN_QUOTA_STATUS) {
-        return verifyDomainQuotaStatusRequestSignature(
+        return verifyDomainQuotaStatusRequestAuthenticity(
           domainRequest as DomainQuotaStatusRequest<KnownDomain>
         )
       }
       if (endpoint === Endpoints.DOMAIN_SIGN) {
-        return verifyDomainRestrictedSignatureRequestSignature(
+        return verifyDomainRestrictedSignatureRequestAuthenticity(
           domainRequest as DomainRestrictedSignatureRequest<KnownDomain>
         )
       }

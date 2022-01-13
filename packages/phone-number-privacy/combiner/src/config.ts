@@ -117,11 +117,11 @@ if (DEV_MODE) {
       phoneNumberPrivacy: {
         signers: functionConfig.odisservices.phoneNumberPrivacy.signers,
         timeoutMilliSeconds:
-          functionConfig.odisservices.phoneNumberPrivacy.timeoutMilliSeconds || 5 * 1000,
+          functionConfig.odisservices.phoneNumberPrivacy.timeoutMilliSeconds ?? 5 * 1000,
       },
       domains: {
         signers: functionConfig.odisservices.domains.signers,
-        timeoutMilliSeconds: functionConfig.odisservices.domains.timeoutMilliSeconds || 5 * 1000,
+        timeoutMilliSeconds: functionConfig.odisservices.domains.timeoutMilliSeconds ?? 5 * 1000,
       },
     },
     keys: {

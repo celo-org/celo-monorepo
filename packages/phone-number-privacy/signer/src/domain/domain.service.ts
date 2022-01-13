@@ -162,7 +162,7 @@ export class DomainService implements IDomainService {
 
     const key: Key = {
       name: DefaultKeyName.DOMAINS,
-      version: Number(request.headers[KEY_VERSION_HEADER]) || config.keystore.keys.domains.latest,
+      version: Number(request.headers[KEY_VERSION_HEADER]) ?? config.keystore.keys.domains.latest,
     }
 
     try {
@@ -185,7 +185,7 @@ export class DomainService implements IDomainService {
           name: domain.name,
           version: domain.version,
         })
-        respondWithError(Endpoints.DOMAIN_SIGN, response, 400, WarningMessage.DISABLED_DOMAIN)
+        respondWithError(Endpoints.DOMAIN_SIGN, response, 403, WarningMessage.DISABLED_DOMAIN)
         return
       }
 
@@ -202,7 +202,7 @@ export class DomainService implements IDomainService {
           name: domain.name,
           version: domain.version,
         })
-        respondWithError(Endpoints.DOMAIN_SIGN, response, 403, WarningMessage.EXCEEDED_QUOTA)
+        respondWithError(Endpoints.DOMAIN_SIGN, response, 429, WarningMessage.EXCEEDED_QUOTA)
         return
       }
 
@@ -247,7 +247,7 @@ export class DomainService implements IDomainService {
         name: domain.name,
         version: domain.version,
       })
-      respondWithError(endpoint, response, 403, WarningMessage.UNAUTHENTICATED_USER)
+      respondWithError(endpoint, response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return false
     }
 
@@ -271,7 +271,7 @@ export class DomainService implements IDomainService {
     logger: Logger
   ): boolean {
     if (domainState && !this.authService.nonceCheck(request.body, domainState, logger)) {
-      respondWithError(endpoint, response, 403, WarningMessage.UNAUTHENTICATED_USER)
+      respondWithError(endpoint, response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return false
     }
     return true
