@@ -18,8 +18,8 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "1.5.1",
-    "@celo/contractkit": "1.5.1",
+    "@celo/base": "1.5.2-dev",
+    "@celo/contractkit": "1.5.2-dev",
     "@celo/identity": "1.5.2-dev",
     "@celo/utils": "1.5.2-dev",
     "bignumber.js": "^9.0.0",
