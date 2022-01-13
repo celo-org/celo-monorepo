@@ -1,4 +1,3 @@
-import { SequentialDelayDomainOptions } from '@celo/identity/lib/odis/domains'
 import {
   authenticateUser,
   CombinerEndpoint,
