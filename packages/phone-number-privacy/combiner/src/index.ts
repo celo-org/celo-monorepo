@@ -1,4 +1,8 @@
-import { Endpoints, ErrorMessage, loggerMiddleware } from '@celo/phone-number-privacy-common'
+import {
+  CombinerEndpoints as Endpoints,
+  ErrorMessage,
+  loggerMiddleware,
+} from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
 import { performance, PerformanceObserver } from 'perf_hooks'

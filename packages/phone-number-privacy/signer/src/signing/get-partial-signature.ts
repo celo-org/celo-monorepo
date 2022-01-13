@@ -1,6 +1,5 @@
 import {
   authenticateUser,
-  Endpoints,
   ErrorMessage,
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
@@ -8,6 +7,7 @@ import {
   identifierIsValidIfExists,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
+  SignerEndpoints as Endpoints,
   SignMessageResponse,
   SignMessageResponseFailure,
   WarningMessage,

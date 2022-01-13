@@ -2,7 +2,6 @@ import { retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { NULL_ADDRESS, StableToken } from '@celo/contractkit'
 import {
   authenticateUser,
-  Endpoints,
   ErrorMessage,
   FULL_NODE_TIMEOUT_IN_MS,
   GetQuotaRequest,
@@ -12,6 +11,7 @@ import {
   isVerified,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
+  SignerEndpoints as Endpoints,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { BigNumber } from 'bignumber.js'

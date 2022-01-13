@@ -1,8 +1,8 @@
 import { SequentialDelayDomainOptions } from '@celo/identity/lib/odis/domains'
 import {
   authenticateUser,
+  CombinerEndpoints,
   DomainRestrictedSignatureRequest,
-  Endpoints,
   ErrorMessage,
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
@@ -13,6 +13,7 @@ import {
   KEY_VERSION_HEADER,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   SequentialDelayDomain,
+  SignerEndpoints,
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
@@ -31,7 +32,10 @@ import { getContractKit } from '../web3/contracts'
 
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
-type CombinerSigEndpoint = Endpoints.GET_BLINDED_MESSAGE_SIG | Endpoints.DOMAIN_SIGN
+type CombinerSigEndpoint = CombinerEndpoints.GET_BLINDED_MESSAGE_SIG | CombinerEndpoints.DOMAIN_SIGN
+type SignerSigEndpoint =
+  | SignerEndpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG
+  | SignerEndpoints.DOMAIN_SIGN
 
 interface SignerService {
   url: string
@@ -45,11 +49,11 @@ interface SignMsgRespWithStatus {
 }
 
 export async function handlePnpSigReq(request: Request, response: Response) {
-  return handleGetBlindedMessageSig(request, response, Endpoints.GET_BLINDED_MESSAGE_SIG)
+  return handleGetBlindedMessageSig(request, response, CombinerEndpoints.GET_BLINDED_MESSAGE_SIG)
 }
 
 export async function handleDomainSigReq(request: Request, response: Response) {
-  return handleGetBlindedMessageSig(request, response, Endpoints.DOMAIN_SIGN)
+  return handleGetBlindedMessageSig(request, response, CombinerEndpoints.DOMAIN_SIGN)
 }
 
 async function handleGetBlindedMessageSig(
@@ -98,6 +102,7 @@ async function requestSignatures(
   // Get standardized variable set regardless of request type (PNP / Domains)
   const {
     signers,
+    signerEndpoint,
     timeoutMs,
     keyVersion,
     threshold,
@@ -120,7 +125,7 @@ async function requestSignatures(
     const entryName = service.url
     performance.mark(startMark)
 
-    return requestSignature(service, request, controller, endpoint, logger)
+    return requestSignature(service, request, controller, signerEndpoint, logger)
       .then(async (res: FetchResponse) => {
         const data = await res.text()
         logger.info(
@@ -361,7 +366,7 @@ function requestSignature(
   service: SignerService,
   request: Request,
   controller: AbortController,
-  endpoint: CombinerSigEndpoint,
+  endpoint: SignerSigEndpoint,
   logger: Logger
 ): Promise<FetchResponse> {
   return parameterizedSignatureRequest(service.url, request, controller, endpoint, logger).catch(
@@ -386,7 +391,7 @@ function parameterizedSignatureRequest(
   baseUrl: string,
   request: Request,
   controller: AbortController,
-  endpoint: CombinerSigEndpoint,
+  endpoint: SignerSigEndpoint,
   logger: Logger
 ): Promise<FetchResponse> {
   logger.debug({ signer: baseUrl }, `Requesting partial sig`)
@@ -433,14 +438,14 @@ function isDomainRestrictedSignatureRequest(
   _body: any,
   endpoint: CombinerSigEndpoint
 ): _body is DomainRestrictedSignatureRequest<SequentialDelayDomain, SequentialDelayDomainOptions> {
-  return endpoint === Endpoints.DOMAIN_SIGN
+  return endpoint === CombinerEndpoints.DOMAIN_SIGN
 }
 
 function isPnpSignatureRequest(
   _body: any,
   endpoint: CombinerSigEndpoint
 ): _body is GetBlindedMessageSigRequest {
-  return endpoint === Endpoints.GET_BLINDED_MESSAGE_SIG
+  return endpoint === CombinerEndpoints.GET_BLINDED_MESSAGE_SIG
 }
 
 function isValidGetSignatureInput(request: Request, endpoint: CombinerSigEndpoint): boolean {
@@ -479,6 +484,7 @@ function standardizeRequestParams(
   endpoint: CombinerSigEndpoint
 ): {
   signers: SignerService[]
+  signerEndpoint: SignerSigEndpoint
   timeoutMs: number
   threshold: number
   blindedMessage: string
@@ -488,6 +494,7 @@ function standardizeRequestParams(
   if (isPnpSignatureRequest(request.body, endpoint)) {
     return {
       signers: JSON.parse(config.odisServices.phoneNumberPrivacy.signers),
+      signerEndpoint: SignerEndpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
       timeoutMs: config.odisServices.phoneNumberPrivacy.timeoutMilliSeconds,
       threshold: config.keys.phoneNumberPrivacy.threshold,
       blindedMessage: request.body.blindedQueryPhoneNumber,
@@ -498,6 +505,7 @@ function standardizeRequestParams(
   if (isDomainRestrictedSignatureRequest(request.body, endpoint)) {
     return {
       signers: JSON.parse(config.odisServices.domains.signers),
+      signerEndpoint: SignerEndpoints.DOMAIN_SIGN,
       timeoutMs: config.odisServices.domains.timeoutMilliSeconds,
       threshold: config.keys.domains.threshold,
       blindedMessage: request.body.blindedMessage,

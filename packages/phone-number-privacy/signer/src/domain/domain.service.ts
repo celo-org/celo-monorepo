@@ -10,12 +10,12 @@ import {
   DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseSuccess,
-  Endpoints,
   ErrorMessage,
   isKnownDomain,
   KEY_VERSION_HEADER,
   KnownDomain,
   KnownDomainState,
+  SignerEndpoints as Endpoints,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'

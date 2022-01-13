@@ -1,4 +1,4 @@
-import { DomainRequest, Endpoints } from '@celo/phone-number-privacy-common'
+import { DomainRequest, SignerEndpoints as Endpoints } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { DomainState } from '../../database/models/domainState'
 
