@@ -7,12 +7,12 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { ExchangeInstance, FreezerInstance, ReserveInstance } from 'types'
+import { ExchangeBRLInstance, FreezerInstance, ReserveInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
     config.registry.predeployedProxyAddress,
-    CeloContractName.StableToken,
+    CeloContractName.StableTokenBRL,
     toFixed(config.exchange.spread).toString(),
     toFixed(config.exchange.reserveFraction).toString(),
     config.exchange.updateFrequency,
@@ -20,12 +20,12 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
-module.exports = deploymentForCoreContract<ExchangeInstance>(
+module.exports = deploymentForCoreContract<ExchangeBRLInstance>(
   web3,
   artifacts,
   CeloContractName.ExchangeBRL,
   initializeArgs,
-  async (exchange: ExchangeInstance) => {
+  async (exchange: ExchangeBRLInstance) => {
     if (config.exchange.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
