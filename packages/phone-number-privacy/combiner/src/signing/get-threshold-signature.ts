@@ -3,6 +3,7 @@ import {
   authenticateUser,
   CombinerEndpoints,
   DomainRestrictedSignatureRequest,
+  DomainRestrictedSignatureResponse,
   ErrorMessage,
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
@@ -14,7 +15,6 @@ import {
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   SequentialDelayDomain,
   SignerEndpoints,
-  SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
   verifyDomainRestrictedSignatureRequestSignature,
@@ -30,7 +30,7 @@ import { respondWithError } from '../common/error-utils'
 import config, { VERSION } from '../config'
 import { getContractKit } from '../web3/contracts'
 
-type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
+type SignerPnpResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
 type CombinerSigEndpoint = CombinerEndpoints.GET_BLINDED_MESSAGE_SIG | CombinerEndpoints.DOMAIN_SIGN
 type SignerSigEndpoint =
@@ -44,7 +44,7 @@ interface SignerService {
 
 interface SignMsgRespWithStatus {
   url: string
-  signMessageResponse: SignMessageResponse
+  signMessageResponse: SignerPnpResponse
   status: number
 }
 
@@ -146,7 +146,8 @@ async function requestSignatures(
             pubKey,
             polynomial,
             threshold,
-            keyVersion
+            keyVersion,
+            endpoint
           )
         } else {
           handleFailedResponse(
@@ -198,7 +199,10 @@ async function requestSignatures(
   performance.clearMarks()
   obs.disconnect()
 
-  logResponseDiscrepancies(responses, logger)
+  if (endpoint !== CombinerEndpoints.GET_BLINDED_MESSAGE_SIG) {
+    logPnpResponseDiscrepancies(responses, logger)
+  }
+
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
   if (blsCryptoClient.hasSufficientSignatures(threshold)) {
     try {
@@ -231,7 +235,8 @@ async function handleSuccessResponse(
   pubKey: string,
   polynomial: string,
   threshold: number,
-  expectedKeyVersion: number
+  expectedKeyVersion: number,
+  endpoint: CombinerSigEndpoint
 ) {
   const logger: Logger = response.locals.logger
   const keyVersion: number = Number(response.header(KEY_VERSION_HEADER))
@@ -239,25 +244,25 @@ async function handleSuccessResponse(
   if (keyVersion !== expectedKeyVersion) {
     throw new Error(`Incorrect key version received from signer ${serviceUrl}`)
   }
-  const signResponse = JSON.parse(data) as SignerResponse
-  if (!signResponse.success) {
-    // Continue on failure as long as signature is present to unblock user
-    logger.error(
-      {
-        error: signResponse.error,
-        signer: serviceUrl,
-      },
-      'Signer responded with error'
-    )
-  }
-  if (!signResponse.signature) {
+
+  const res = JSON.parse(data)
+  const signature = parseSignature(res, endpoint, serviceUrl, logger)
+
+  if (!signature) {
     throw new Error(`Signature is missing from signer ${serviceUrl}`)
   }
-  responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
-  const partialSig = { url: serviceUrl, signature: signResponse.signature }
+
+  if (endpoint === CombinerEndpoints.GET_BLINDED_MESSAGE_SIG) {
+    responses.push({
+      url: serviceUrl,
+      signMessageResponse: res as SignerPnpResponse,
+      status,
+    })
+  }
+
   logger.info({ signer: serviceUrl }, 'Add signature')
   const signatureAdditionStart = Date.now()
-  await blsCryptoClient.addSignature(partialSig)
+  await blsCryptoClient.addSignature({ url: serviceUrl, signature })
   logger.info(
     {
       signer: serviceUrl,
@@ -283,6 +288,35 @@ async function handleSuccessResponse(
       // Already logged, continue to collect signatures
     }
   }
+}
+
+function parseSignature(
+  res: any,
+  endpoint: CombinerSigEndpoint,
+  serviceUrl: string,
+  logger: Logger
+): string | undefined {
+  if (isPnpSignatureResponse(res, endpoint)) {
+    if (!res.success) {
+      // Continue on failure as long as signature is present to unblock user
+      logger.error(
+        {
+          error: res.error,
+          signer: serviceUrl,
+        },
+        'Signer responded with error'
+      )
+    }
+    return res.signature
+  }
+  if (isDomainRestrictedSignatureResponse(res, endpoint)) {
+    if (!res.success) {
+      return undefined
+    }
+    return res.signature
+  }
+
+  throw new Error(`Implementation error. Signature endpoint ${endpoint} not recognized`)
 }
 
 // Fail fast if a sufficient number of signatures cannot be collected
@@ -312,7 +346,7 @@ function handleFailedResponse(
   }
 }
 
-function logResponseDiscrepancies(responses: SignMsgRespWithStatus[], logger: Logger) {
+function logPnpResponseDiscrepancies(responses: SignMsgRespWithStatus[], logger: Logger) {
   // Only compare responses which have values for the quota fields
   const successfulResponses = responses.filter(
     (response) =>
@@ -439,17 +473,48 @@ function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
   return maxErrorCode > 0 ? maxErrorCode : null
 }
 
+function handleMissingSignatures(
+  majorityErrorCode: number | null,
+  response: Response,
+  logger: Logger
+) {
+  if (majorityErrorCode === 403) {
+    respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA, logger)
+  } else {
+    respondWithError(
+      response,
+      majorityErrorCode || 500,
+      ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
+      logger
+    )
+  }
+}
+
 function isDomainRestrictedSignatureRequest(
-  _body: any,
+  _req: any,
   endpoint: CombinerSigEndpoint
-): _body is DomainRestrictedSignatureRequest<SequentialDelayDomain, SequentialDelayDomainOptions> {
+): _req is DomainRestrictedSignatureRequest<SequentialDelayDomain, SequentialDelayDomainOptions> {
   return endpoint === CombinerEndpoints.DOMAIN_SIGN
 }
 
 function isPnpSignatureRequest(
-  _body: any,
+  _req: any,
   endpoint: CombinerSigEndpoint
-): _body is GetBlindedMessageSigRequest {
+): _req is GetBlindedMessageSigRequest {
+  return endpoint === CombinerEndpoints.GET_BLINDED_MESSAGE_SIG
+}
+
+function isDomainRestrictedSignatureResponse(
+  _res: any,
+  endpoint: CombinerSigEndpoint
+): _res is DomainRestrictedSignatureResponse {
+  return endpoint === CombinerEndpoints.DOMAIN_SIGN
+}
+
+function isPnpSignatureResponse(
+  _res: any,
+  endpoint: CombinerSigEndpoint
+): _res is SignerPnpResponse {
   return endpoint === CombinerEndpoints.GET_BLINDED_MESSAGE_SIG
 }
 
@@ -523,21 +588,4 @@ function standardizeRequestParams(
   }
 
   throw new Error(`Implementation error. Signature endpoint ${endpoint} not recognized`)
-}
-
-function handleMissingSignatures(
-  majorityErrorCode: number | null,
-  response: Response,
-  logger: Logger
-) {
-  if (majorityErrorCode === 403) {
-    respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA, logger)
-  } else {
-    respondWithError(
-      response,
-      majorityErrorCode || 500,
-      ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
-      logger
-    )
-  }
 }
