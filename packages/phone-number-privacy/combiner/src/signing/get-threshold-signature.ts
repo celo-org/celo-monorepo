@@ -108,6 +108,7 @@ async function requestSignatures(
     threshold,
     blindedMessage,
     pubKey,
+    polynomial,
   } = standardizeRequestParams(request, endpoint)
 
   request.headers[KEY_VERSION_HEADER] = keyVersion.toString()
@@ -143,6 +144,7 @@ async function requestSignatures(
             blindedMessage,
             controller,
             pubKey,
+            polynomial,
             threshold,
             keyVersion
           )
@@ -198,11 +200,12 @@ async function requestSignatures(
 
   logResponseDiscrepancies(responses, logger)
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
-  if (blsCryptoClient.hasSufficientSignatures()) {
+  if (blsCryptoClient.hasSufficientSignatures(threshold)) {
     try {
       const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
         blindedMessage,
         pubKey,
+        polynomial,
         threshold,
         logger
       )
@@ -226,6 +229,7 @@ async function handleSuccessResponse(
   blindedMessage: string,
   controller: AbortController,
   pubKey: string,
+  polynomial: string,
   threshold: number,
   expectedKeyVersion: number
 ) {
@@ -257,18 +261,19 @@ async function handleSuccessResponse(
   logger.info(
     {
       signer: serviceUrl,
-      hasSufficientSignatures: blsCryptoClient.hasSufficientSignatures(),
+      hasSufficientSignatures: blsCryptoClient.hasSufficientSignatures(threshold),
       additionLatency: Date.now() - signatureAdditionStart,
     },
     'Added signature'
   )
   // Send response immediately once we cross threshold
   // BLS threshold signatures can be combined without all partial signatures
-  if (blsCryptoClient.hasSufficientSignatures()) {
+  if (blsCryptoClient.hasSufficientSignatures(threshold)) {
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(
         blindedMessage,
         pubKey,
+        polynomial,
         threshold,
         logger
       )
@@ -490,6 +495,7 @@ function standardizeRequestParams(
   blindedMessage: string
   keyVersion: number
   pubKey: string
+  polynomial: string
 } {
   if (isPnpSignatureRequest(request.body, endpoint)) {
     return {
@@ -500,6 +506,7 @@ function standardizeRequestParams(
       blindedMessage: request.body.blindedQueryPhoneNumber,
       keyVersion: config.keys.phoneNumberPrivacy.version,
       pubKey: config.keys.phoneNumberPrivacy.pubKey,
+      polynomial: config.keys.phoneNumberPrivacy.polynomial,
     }
   }
   if (isDomainRestrictedSignatureRequest(request.body, endpoint)) {
@@ -511,6 +518,7 @@ function standardizeRequestParams(
       blindedMessage: request.body.blindedMessage,
       keyVersion: config.keys.domains.version,
       pubKey: config.keys.domains.pubKey,
+      polynomial: config.keys.domains.polynomial,
     }
   }
 

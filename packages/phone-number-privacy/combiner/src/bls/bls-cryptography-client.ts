@@ -1,7 +1,6 @@
 import { ErrorMessage, rootLogger } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import Logger from 'bunyan'
-import config from '../config'
 
 export interface ServicePartialSignature {
   url: string
@@ -30,8 +29,7 @@ export class BLSCryptographyClient {
   /**
    * Returns true if the number of valid signatures is enough to perform a combination
    */
-  public hasSufficientSignatures(): boolean {
-    const threshold = config.keys.phoneNumberPrivacy.threshold
+  public hasSufficientSignatures(threshold: number): boolean {
     return this.allSignaturesLength >= threshold
   }
 
@@ -43,11 +41,12 @@ export class BLSCryptographyClient {
   public async combinePartialBlindedSignatures(
     blindedMessage: string,
     pubKey: string,
+    polynomial: string,
     threshold: number,
     logger?: Logger
   ): Promise<string> {
     logger = logger ?? rootLogger()
-    if (!this.hasSufficientSignatures()) {
+    if (!this.hasSufficientSignatures(threshold)) {
       logger.error(
         { signatures: this.allSignaturesLength, required: threshold },
         ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
@@ -68,7 +67,7 @@ export class BLSCryptographyClient {
       // Verify each signature and remove invalid ones
       // This logging will help us troubleshoot which signers are having issues
       this.unverifiedSignatures.forEach((unverifiedSignature) => {
-        this.verifyPartialSignature(blindedMessage, unverifiedSignature, logger!)
+        this.verifyPartialSignature(blindedMessage, unverifiedSignature, polynomial, logger!)
       })
       this.clearUnverifiedSignatures()
       throw new Error(ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES)
@@ -99,10 +98,11 @@ export class BLSCryptographyClient {
   private verifyPartialSignature(
     blindedMessage: string,
     unverifiedSignature: ServicePartialSignature,
+    polynomial: string,
     logger: Logger
   ) {
     const sigBuffer = Buffer.from(unverifiedSignature.signature, 'base64')
-    if (this.isValidPartialSignature(sigBuffer, blindedMessage)) {
+    if (this.isValidPartialSignature(sigBuffer, blindedMessage, polynomial)) {
       // We move it to the verified set so that we don't need to re-verify in the future
       this.verifiedSignatures.push(unverifiedSignature)
     } else {
@@ -114,8 +114,7 @@ export class BLSCryptographyClient {
     this.unverifiedSignatures = []
   }
 
-  private isValidPartialSignature(signature: Buffer, blindedMessage: string) {
-    const polynomial = config.keys.phoneNumberPrivacy.polynomial
+  private isValidPartialSignature(signature: Buffer, blindedMessage: string, polynomial: string) {
     try {
       threshold_bls.partialVerifyBlindSignature(
         Buffer.from(polynomial, 'hex'),
