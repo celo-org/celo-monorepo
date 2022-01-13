@@ -10,10 +10,9 @@ import {
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { DomainState, DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
+import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
 import { IDomainAuthService } from './domainAuth.interface'
 
-// TODO(Alec): Does the combiner also need to support all these endpoints?
 // TODO(Alec): Should we standardize this pattern accross signer / combiner?
 export class DomainAuthService implements IDomainAuthService {
   public authCheck(domainRequest: DomainRequest, endpoint: Endpoint, logger: Logger): boolean {
@@ -47,12 +46,15 @@ export class DomainAuthService implements IDomainAuthService {
     logger: Logger
   ): boolean {
     const nonce = domainRequest?.options?.nonce
+    if (!nonce) {
+      logger.info('Nonce is undefined')
+      return false
+    }
     const currentNonce = domainState[DOMAINS_STATES_COLUMNS.counter]
-    if (currentNonce) {
-      return nonce.defined && nonce.value === currentNonce
-    } else {
+    if (!currentNonce) {
       logger.info('Counter is undefined')
       return true
     }
+    return nonce.value === currentNonce
   }
 }
