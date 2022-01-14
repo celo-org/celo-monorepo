@@ -19,12 +19,12 @@
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
-    "@celo/base": "1.5.1",
-    "@celo/contractkit": "1.5.1",
+    "@celo/base": "1.5.2-dev",
+    "@celo/contractkit": "1.5.2-dev",
     "@celo/phone-number-privacy-common": "1.0.36-dev",
     "@celo/identity": "1.5.2-dev",
     "@celo/utils": "1.5.2-dev",
-    "@celo/wallet-hsm-azure": "1.5.1",
+    "@celo/wallet-hsm-azure": "1.5.2-dev",
     "@google-cloud/secret-manager": "3.0.0",
     "@types/bunyan": "^1.8.6",
     "@types/elliptic": "^6.4.12",
