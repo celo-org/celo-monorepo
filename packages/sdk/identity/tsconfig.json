@@ -2,8 +2,18 @@
   "extends": "@celo/typescript/tsconfig.library.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "declaration": true,
+    "target": "es2017",
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "preserveConstEnums": true,
+    "composite": true
   },
-  "include": ["src/**/*", "types/**/*"],
+  "include": ["src/**/*", "types/**/*", "index.d.ts"],
   "exclude": ["**/*.test.ts"]
 }
