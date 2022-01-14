@@ -14,7 +14,9 @@ export enum ErrorMessage {
   FAILURE_TO_STORE_REQUEST = `CELO_ODIS_ERR_12 DB_ERR Failed to store partial sig request`,
   FAILURE_TO_INCREMENT_QUERY_COUNT = `CELO_ODIS_ERR_13 DB_ERR Failed to increment user query count`,
   DOMAIN_ALREADY_DISABLED_FAILURE = `CELO_ODIS_ERR_14 DB_ERR Domain is already disabled`,
-  UNSUPPORTED_DOMAIN = `CELO_ODIS_ERR_15 SIG_ERR Domain type is not supported`,
+  UNSUPPORTED_DOMAIN = `CELO_ODIS_ERR_15 DOMAIN Domain type is not supported`,
+  SIGNER_DISABLE_DOMAIN_FAILURE = `CELO_ODIS_ERR_16 DOMAIN Failed to disable domain on a signer`,
+  THRESHOLD_DISABLE_DOMAIN_FAILURE = `CELO_ODIS_ERR_17 DOMAIN Failed to disable domain on a threshold of signers`,
 }
 
 export enum WarningMessage {
