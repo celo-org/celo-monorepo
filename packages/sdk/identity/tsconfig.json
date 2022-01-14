@@ -12,7 +12,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "preserveConstEnums": true,
-    "composite": true
+    "composite": true,
+    "moduleResolution": "node"
   },
   "include": ["src/**/*", "types/**/*", "index.d.ts"],
   "exclude": ["**/*.test.ts"]
