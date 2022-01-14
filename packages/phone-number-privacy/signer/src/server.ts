@@ -1,5 +1,9 @@
 import { timeout } from '@celo/base'
-import { loggerMiddleware, rootLogger as logger } from '@celo/phone-number-privacy-common'
+import {
+  Endpoints,
+  loggerMiddleware,
+  rootLogger as logger,
+} from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'
@@ -15,21 +19,10 @@ import { handleGetQuota } from './signing/query-quota'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export enum Endpoints {
-  STATUS = '/status',
-  METRICS = '/metrics',
-  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
-  GET_QUOTA = '/getQuota',
-
-  DISABLE_DOMAIN = '/domain/disable',
-  DOMAIN_SIGN = '/domain/sign/',
-  DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
-}
-
 export function createServer() {
   const domainService = new DomainService(new DomainAuthService(), new DomainQuotaService())
 
-  logger.info('Creating express server')
+  logger().info('Creating express server')
   const app = express()
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware)
 
@@ -90,12 +83,12 @@ function getSslOptions() {
   const { sslKeyPath, sslCertPath } = config.server
 
   if (!sslKeyPath || !sslCertPath) {
-    logger.info('No SSL configs specified')
+    logger().info('No SSL configs specified')
     return null
   }
 
   if (!fs.existsSync(sslKeyPath) || !fs.existsSync(sslCertPath)) {
-    logger.error('SSL cert files not found')
+    logger().error('SSL cert files not found')
     return null
   }
 

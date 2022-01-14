@@ -110,7 +110,6 @@
     "dependencies": [
       "@celo/base",
       "@celo/contractkit",
-      "@celo/identity",
       "@celo/utils",
       "@celo/wallet-local"
     ]
@@ -197,6 +196,7 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
+      "@celo/phone-number-privacy-common",
       "@celo/utils",
       "@celo/wallet-local"
     ]
