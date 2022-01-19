@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}"
+  name: "{{ .Release.Name }}"-deployment-annotation-hook
   annotations:
     "helm.sh/hook": post-install, post-upgrade
     "helm.sh/hook-weight": "2"
