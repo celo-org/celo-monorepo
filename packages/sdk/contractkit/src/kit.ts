@@ -42,9 +42,14 @@ export const API_KEY_HEADER_KEY = 'apiKey'
  * @optional options to pass to the Web3 HttpProvider constructor
  */
 export function newKit(url: string, wallet?: ReadOnlyWallet, options?: HttpProviderOptions) {
-  const web3 = url.endsWith('.ipc')
-    ? new Web3(new Web3.providers.IpcProvider(url, net))
-    : new Web3(new Web3.providers.HttpProvider(url, options))
+  let web3: Web3
+  if (url.endsWith('.ipc')) {
+    web3 = new Web3(new Web3.providers.IpcProvider(url, net))
+  } else if (url.toLowerCase().startsWith('http')) {
+    web3 = new Web3(new Web3.providers.HttpProvider(url, options))
+  } else {
+    web3 = new Web3(url)
+  }
   return newKitFromWeb3(web3, wallet)
 }
 
