@@ -17,6 +17,8 @@ export enum ErrorMessage {
   UNSUPPORTED_DOMAIN = `CELO_ODIS_ERR_15 DOMAIN Domain type is not supported`,
   SIGNER_DISABLE_DOMAIN_FAILURE = `CELO_ODIS_ERR_16 DOMAIN Failed to disable domain on a signer`,
   THRESHOLD_DISABLE_DOMAIN_FAILURE = `CELO_ODIS_ERR_17 DOMAIN Failed to disable domain on a threshold of signers`,
+  SIGNER_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_18 DOMAIN Failed to get domain status from signer`,
+  THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_17 DOMAIN Failed to get domain quota status from a threshold of signers`,
 }
 
 export enum WarningMessage {

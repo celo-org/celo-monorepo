@@ -4,6 +4,7 @@ import {
   DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
   ErrorMessage,
+  KnownDomainState,
   SequentialDelayDomain,
   SequentialDelayDomainOptions,
   SignerEndpoint,
@@ -94,15 +95,7 @@ async function requestDomainQuotaStatusFromSigners(request: Request, response: R
           'received requestDomainQuotaStatus response from signer'
         )
         if (res.ok) {
-          await handleSuccessResponse(
-            data,
-            res.status,
-            response,
-            successes,
-            service.url,
-            controller,
-            threshold
-          )
+          await handleSuccessResponse(data, res.status, response, successes, service.url)
         } else {
           handleFailedResponse(
             service,
@@ -129,7 +122,7 @@ async function requestDomainQuotaStatusFromSigners(request: Request, response: R
           }
         } else {
           // TODO(Alec)
-          logger.error({ signer: service }, ErrorMessage.SIGNER_DISABLE_DOMAIN_FAILURE)
+          logger.error({ signer: service }, ErrorMessage.SIGNER_DOMAIN_QUOTA_STATUS_FAILURE)
         }
         logger.error(err)
         handleFailedResponse(
@@ -154,9 +147,12 @@ async function requestDomainQuotaStatusFromSigners(request: Request, response: R
   performance.clearMarks()
   obs.disconnect()
 
-  // TODO(Alec)
   if (successes.length >= threshold) {
-    response.json({ success: true, version: VERSION })
+    const domainQuotaStatus = findThresholdDomainState(
+      successes.map((s) => s.domainQuotaStatusResponse.status),
+      threshold
+    )
+    response.json({ success: true, status: domainQuotaStatus, version: VERSION })
     return
   }
 
@@ -164,9 +160,50 @@ async function requestDomainQuotaStatusFromSigners(request: Request, response: R
   respondWithError(
     response,
     majorityErrorCode ?? 500,
-    ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE, // TODO(Alec)
+    ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
     logger
   )
+}
+
+function findThresholdDomainState(
+  domainStates: KnownDomainState[],
+  threshold: number
+): KnownDomainState {
+  if (domainStates.length < threshold) {
+    // TODO(Alec)(Next): Think through consequences of throwing here
+    throw new Error('Insufficient number of signer responses') // TODO(Alec): better error message
+  }
+
+  domainStates = domainStates.filter((ds) => !ds.disabled)
+
+  if (domainStates.length < threshold) {
+    return {
+      timer: 0,
+      counter: 0,
+      disabled: true,
+    }
+  }
+
+  const domainStatesAscendingByCounter = domainStates.sort((a, b) => a.counter - b.counter)
+  const nthLeastRestrictiveByCounter = domainStatesAscendingByCounter[threshold - 1]
+  const thresholdCounter = nthLeastRestrictiveByCounter.counter
+
+  // Client should submit requests with nonce == thresholdCounter
+
+  const domainStatesWithThresholdCounter = domainStates.filter(
+    (ds) => ds.counter <= thresholdCounter
+  )
+  const domainStatesAscendingByTimer = domainStatesWithThresholdCounter.sort(
+    (a, b) => a.timer - b.timer
+  )
+  const nthLeastRestrictiveByTimer = domainStatesAscendingByTimer[threshold - 1]
+  const thresholdTimer = nthLeastRestrictiveByTimer.timer
+
+  return {
+    timer: thresholdTimer,
+    counter: thresholdCounter,
+    disabled: false,
+  }
 }
 
 async function handleSuccessResponse(
@@ -174,9 +211,7 @@ async function handleSuccessResponse(
   status: number,
   response: Response,
   successes: DomainQuotaStatusRespWithStatus[],
-  serviceUrl: string,
-  controller: AbortController,
-  threshold: number
+  serviceUrl: string
 ) {
   const logger: Logger = response.locals.logger
   const domainQuotaStatusResponse = JSON.parse(data) as DomainQuotaStatusResponse
@@ -193,13 +228,6 @@ async function handleSuccessResponse(
   }
 
   successes.push({ url: serviceUrl, domainQuotaStatusResponse, status })
-  // logger.info({ signer: serviceUrl }, 'Signer successfully disabled domain')
-
-  // TODO(Alec)
-  // Send response immediately once we cross threshold
-  if (successes.length >= threshold) {
-    controller.abort()
-  }
 }
 
 function handleFailedResponse(
@@ -213,19 +241,21 @@ function handleFailedResponse(
   threshold: number
 ) {
   const logger: Logger = response.locals.logger
+
   if (status) {
     // Increment counter for status code by 1
     errorCodes.set(status, (errorCodes.get(status) ?? 0) + 1)
   }
+
   // Tracking failed request count via signer url prevents
   // double counting the same failed request by mistake
   failures.add(service.url)
-  // TODO(Alec)
+
   const shouldFailFast = signerCount - failures.size < threshold
-  logger.info(`Recieved failure from ${failures.size}/${signerCount} signers.`)
+  logger.info(`Received failure from ${failures.size}/${signerCount} signers.`)
   if (shouldFailFast) {
     logger.info(
-      'Not possible to reach a threshold of succesful disableDomain responses. Failing fast.'
+      'Not possible to reach a threshold of successful domain quota status responses. Failing fast.'
     )
     controller.abort()
   }
@@ -311,7 +341,7 @@ function isValidInput(request: Request): boolean {
 
 function authenticateRequest(request: Request): boolean {
   return verifyDomainQuotaStatusRequestAuthenticity(
-    // TODO(Alec): Review cip40
+    // TODO(Alec)
     request.body as DomainQuotaStatusRequest<SequentialDelayDomain, SequentialDelayDomainOptions>
   )
 }
