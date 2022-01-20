@@ -147,7 +147,7 @@ export interface SequentialDelayResult {
    * Provided on rejected requests. Undefined if a request will never be accepted.
    */
   notBefore?: number
-  /** State after applying adding a query to the quota. Unchnaged is accepted is false */
+  /** State after applying adding a query to the quota. Unchanged if accepted is false */
   state: SequentialDelayDomainState | undefined
 }
 
