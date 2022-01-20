@@ -12,6 +12,7 @@ import {
   DomainRestrictedSignatureResponseSuccess,
   ErrorMessage,
   isKnownDomain,
+  isSequentialDelayDomain,
   KEY_VERSION_HEADER,
   KnownDomain,
   KnownDomainState,
@@ -26,6 +27,7 @@ import { Counters } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { getTransaction } from '../database/database'
 import { DOMAINS_STATES_COLUMNS, DomainState } from '../database/models/domainState'
+import { getDomainRequestExists, storeDomainRequest } from '../database/wrappers/domainRequest'
 import {
   getDomainState,
   getDomainStateWithLock,
@@ -142,7 +144,7 @@ export class DomainService implements IDomainService {
     Counters.requests.labels(endpoint).inc()
 
     const logger = response.locals.logger
-    const domain = request.body.domain
+    const { domain, blindedMessage } = request.body
 
     if (!this.inputValidation(domain, request, response, endpoint, logger)) {
       // inputValidation returns a response to the user internally. Nothing left to do.
@@ -183,21 +185,28 @@ export class DomainService implements IDomainService {
         return
       }
 
-      const quotaState = await this.quotaService.checkAndUpdateQuota(
-        domain,
-        domainState,
-        trx,
-        logger
-      )
-
-      if (!quotaState.sufficient) {
-        trx.rollback()
-        logger.warn(`Exceeded quota`, {
-          name: domain.name,
-          version: domain.version,
-        })
-        respondWithError(endpoint, response, 429, WarningMessage.EXCEEDED_QUOTA)
-        return
+      if (await getDomainRequestExists(domain, blindedMessage, trx, logger)) {
+        Counters.duplicateRequests.inc() // TODO(Alec)
+        logger.debug(
+          'Signature request already exists in db. Will not store request or increment counter.'
+        )
+      } else {
+        await storeDomainRequest(domain, blindedMessage, trx, logger)
+        const quotaState = await this.quotaService.checkAndUpdateQuota(
+          domain,
+          domainState,
+          trx,
+          logger
+        )
+        if (!quotaState.sufficient) {
+          trx.rollback()
+          logger.warn(`Exceeded quota`, {
+            name: domain.name,
+            version: domain.version,
+          })
+          respondWithError(endpoint, response, 429, WarningMessage.EXCEEDED_QUOTA)
+          return
+        }
       }
 
       let signature: string
@@ -257,6 +266,7 @@ export class DomainService implements IDomainService {
     return true
   }
 
+  // TODO(Alec)
   private nonceCheck(
     request: Request<{}, {}, DomainRequest>,
     response: Response,
@@ -264,10 +274,21 @@ export class DomainService implements IDomainService {
     endpoint: Endpoint,
     logger: Logger
   ): boolean {
+    // if (!domainState) {
+    //   domainState = createEmptyDomainState(request.body)
+
+    // }
+
     if (domainState && !this.authService.nonceCheck(request.body, domainState, logger)) {
       respondWithError(endpoint, response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return false
     }
     return true
+
+    // if (domainState && !this.authService.nonceCheck(request.body, domainState, logger)) {
+    //   respondWithError(endpoint, response, 401, WarningMessage.UNAUTHENTICATED_USER)
+    //   return false
+    // }
+    // return true
   }
 }

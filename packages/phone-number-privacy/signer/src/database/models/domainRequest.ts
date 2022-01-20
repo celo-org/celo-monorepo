@@ -1,8 +1,4 @@
-import {
-  domainHash,
-  DomainRestrictedSignatureRequest,
-  KnownDomain,
-} from '@celo/phone-number-privacy-common'
+import { domainHash, KnownDomain } from '@celo/phone-number-privacy-common'
 
 export const DOMAIN_REQUESTS_TABLE = 'domainRequests'
 export enum DOMAIN_REQUESTS_COLUMNS {
@@ -10,14 +6,14 @@ export enum DOMAIN_REQUESTS_COLUMNS {
   timestamp = 'timestamp',
   blindedMessage = 'blinded_message',
 }
-export class DomainRequest {
+export class DomainSigRequest {
   [DOMAIN_REQUESTS_COLUMNS.domainHash]: string;
   [DOMAIN_REQUESTS_COLUMNS.timestamp]: Date;
   [DOMAIN_REQUESTS_COLUMNS.blindedMessage]: string
 
-  constructor(request: DomainRestrictedSignatureRequest<KnownDomain>) {
-    this[DOMAIN_REQUESTS_COLUMNS.domainHash] = domainHash(request.domain).toString('hex')
+  constructor(domain: KnownDomain, blindedMessage: string) {
+    this[DOMAIN_REQUESTS_COLUMNS.domainHash] = domainHash(domain).toString('hex')
     this[DOMAIN_REQUESTS_COLUMNS.timestamp] = new Date()
-    this[DOMAIN_REQUESTS_COLUMNS.blindedMessage] = request.blindedMessage
+    this[DOMAIN_REQUESTS_COLUMNS.blindedMessage] = blindedMessage
   }
 }
