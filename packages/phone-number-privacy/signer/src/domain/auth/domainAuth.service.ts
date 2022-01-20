@@ -55,6 +55,6 @@ export class DomainAuthService implements IDomainAuthService {
       logger.info('Counter is undefined')
       return true
     }
-    return nonce.value === currentNonce
+    return nonce.value >= currentNonce
   }
 }
