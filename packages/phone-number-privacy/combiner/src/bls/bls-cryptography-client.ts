@@ -44,7 +44,7 @@ export class BLSCryptographyClient {
     blindedMessage: string,
     logger?: Logger
   ): Promise<string> {
-    logger = logger ?? rootLogger
+    logger = logger ?? rootLogger()
     const threshold = config.thresholdSignature.threshold
     if (!this.hasSufficientSignatures()) {
       logger.error(
