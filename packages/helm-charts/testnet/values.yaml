@@ -48,6 +48,7 @@ geth:
     echo "txnode"
   txNodePrivateExtraSnippet: |
     echo "txnode-private"
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http.timeout.read 600 --http.timeout.write 600 --http.timeout.idle 2400"
   validatorNodeSelector: {}
   validatorTolerations: []
   secondaryNodeSelector: {}
