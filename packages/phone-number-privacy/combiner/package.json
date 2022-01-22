@@ -36,7 +36,7 @@
     "@celo/utils": "1.5.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "elliptic": "^6.5.4",
-    "firebase-admin": "^9.12.0",
+    "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.15.7",
     "knex": "^0.21.1",
     "node-fetch": "^2.6.1",
