@@ -16,11 +16,11 @@ import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance, PerformanceObserver } from 'perf_hooks'
+import { domain } from 'process'
 import { respondWithError } from '../common/error-utils'
 import config, { VERSION } from '../config'
 
 // TODO(Alec): De-dupe with get-threshold-signature
-// TODO(Alec): This is still mostly a copy/paste from domain-disable
 interface SignerService {
   url: string
   fallbackUrl?: string
@@ -150,7 +150,9 @@ async function requestDomainQuotaStatusFromSigners(request: Request, response: R
   if (successes.length >= threshold) {
     const domainQuotaStatus = findThresholdDomainState(
       successes.map((s) => s.domainQuotaStatusResponse.status),
-      threshold
+      threshold,
+      signers.length,
+      logger
     )
     response.json({ success: true, status: domainQuotaStatus, version: VERSION })
     return
@@ -167,22 +169,34 @@ async function requestDomainQuotaStatusFromSigners(request: Request, response: R
 
 function findThresholdDomainState(
   domainStates: KnownDomainState[],
-  threshold: number
+  threshold: number,
+  numSigners: number,
+  logger: Logger
 ): KnownDomainState {
   if (domainStates.length < threshold) {
     // TODO(Alec)(Next): Think through consequences of throwing here
     throw new Error('Insufficient number of signer responses') // TODO(Alec): better error message
   }
 
-  domainStates = domainStates.filter((ds) => !ds.disabled)
+  const numDisabled = domainStates.filter((ds) => ds.disabled).length
 
-  if (domainStates.length < threshold) {
+  if (numDisabled && numDisabled < domainStates.length) {
+    logger.warn('Inconsistent domain disabled state across signers') // TODO(Alec)
+  }
+
+  if (numSigners - numDisabled < threshold) {
     return {
       timer: 0,
       counter: 0,
       disabled: true,
     }
   }
+
+  if (domainStates.length - numDisabled < threshold) {
+    throw new Error('Insufficient number of signer responses. Domain may be disabled') // TODO(Alec): better error message
+  }
+
+  domainStates = domainStates.filter((ds) => !ds.disabled)
 
   const domainStatesAscendingByCounter = domainStates.sort((a, b) => a.counter - b.counter)
   const nthLeastRestrictiveByCounter = domainStatesAscendingByCounter[threshold - 1]
