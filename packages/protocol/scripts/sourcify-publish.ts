@@ -4,14 +4,26 @@ import fs from 'fs'
 import fetch from 'node-fetch'
 import path from 'path'
 
-const sleep = (ms) => {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+/*
+ * A script that reads the artifacts from the build/contracts directory and publish using the sourcify api.
+ *
+ * Expects the following flags:
+ *   network: The network for which artifacts should be
+ *
+ * Run using yarn run sourcify-publish, e.g.:
+ * yarn run sourcify-publish \
+ *   --network alfajores --buildArtifacts ./build/contracts
+ */
+
+const _buildTargets = {
+  network: undefined,
+  buildArtifacts: undefined,
 }
 
-async function main() {
-  const artifactBasePath = './build/contracts'
+async function main(buildTargets: typeof _buildTargets) {
+  const artifactBasePath = buildTargets.buildArtifacts || './build/contracts'
   const artifactPaths = fs.readdirSync(artifactBasePath)
-  const network = process.env.NETWORK || 'development'
+  const network = buildTargets.network
 
   console.log('Uploading sources & metadata')
   console.log('============================')
@@ -42,14 +54,16 @@ async function main() {
           `https://${network}-blockscout.celo-testnet.org/address/${json.result[0].address}/contracts`
         )
       )
-
-    console.log(`Waiting 2 seconds before sending next file...`)
-    await sleep(2000)
   }
   console.log('Finished.')
 }
 
-main()
+const minimist = require('minimist')
+const argv = minimist(process.argv.slice(2), {
+  string: Object.keys(_buildTargets),
+})
+
+main(argv)
   .then(() => process.exit(0))
   .catch((err) => {
     console.log(err)
