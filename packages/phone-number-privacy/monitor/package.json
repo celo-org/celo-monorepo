@@ -21,9 +21,9 @@
     "loadTest": "ts-node src/scripts/runLoadTest.ts"
   },
   "dependencies": {
-    "@celo/contractkit": "1.5.0",
-    "@celo/identity": "1.5.0",
-    "@celo/wallet-local": "1.5.0",
+    "@celo/contractkit": "1.5.1-dev",
+    "@celo/identity": "1.5.1-dev",
+    "@celo/wallet-local": "1.5.1-dev",
     "@celo/phone-number-privacy-common": "1.0.36-dev",
     "@celo/utils": "1.5.0",
     "firebase-admin": "^8.10.0",

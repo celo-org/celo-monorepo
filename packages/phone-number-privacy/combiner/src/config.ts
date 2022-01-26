@@ -24,6 +24,7 @@ export const E2E_TEST_ACCOUNTS: string[] = ['0x1be31a94361a391bbafb2a4ccd704f57d
 interface Config {
   blockchain: {
     provider: string
+    apiKey?: string
   }
   db: {
     user: string
@@ -74,6 +75,7 @@ if (DEV_MODE) {
   config = {
     blockchain: {
       provider: functionConfig.blockchain.provider,
+      apiKey: functionConfig.blockchain.apiKey,
     },
     db: {
       user: functionConfig.db.username,

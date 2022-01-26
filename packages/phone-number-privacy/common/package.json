@@ -18,11 +18,8 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "1.5.1",
-    "@celo/contractkit": "1.5.1",
-    "@celo/utils": "1.5.1-dev",
-    "@celo/base": "1.5.0",
-    "@celo/contractkit": "1.5.0",
+    "@celo/base": "1.5.1-dev",
+    "@celo/contractkit": "1.5.1-dev",
     "@celo/utils": "1.5.1-dev",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
