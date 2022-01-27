@@ -296,7 +296,10 @@ contract Exchange is
     */
   function setSpread(uint256 newSpread) public onlyOwner {
     spread = FixidityLib.wrap(newSpread);
-    require(FixidityLib.lt(spread, FixidityLib.fixed1()), "value of spread must be smaller than 1");
+    require(
+      FixidityLib.lte(spread, FixidityLib.fixed1()),
+      "the value of spread must be less than or equal to 1"
+    );
     emit SpreadSet(newSpread);
   }
 
