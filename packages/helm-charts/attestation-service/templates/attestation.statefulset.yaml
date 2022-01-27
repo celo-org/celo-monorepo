@@ -80,9 +80,9 @@ spec:
           ATTESTATION_SIGNER_ADDRESS=`cat /root/.celo/attestationSignerAddress`
           exec geth {{ .Values.geth.networkFlag }} \
             --ws \
-            --wsaddr 0.0.0.0 \
-            --wsorigins=* \
-            --wsapi=eth,net,web3,debug \
+            --ws.addr 0.0.0.0 \
+            --ws.origins=* \
+            --ws.api=eth,net,web3,debug \
             --syncmode=lightest \
             --consoleformat=json \
             --consoleoutput=stdout \

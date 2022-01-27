@@ -4,6 +4,12 @@ metadata:
   name: eksportisto-config
 data:
   service-account.json: {{ .Values.serviceAccountBase64 | b64dec | quote }}
+  config_monitor.yaml: |
+    monitoring:
+      port: 8080
+      address: 0.0.0.0
+      requestTimeoutSeconds: 25
+
   config.yaml: |
     monitoring:
       port: 8080
@@ -34,5 +40,5 @@ data:
         table: data
       destination: bigquery
       dequeueTimeoutMilliseconds: 5000
-      blockRetryAttempts: 3
+      blockRetryAttempts: 1
       blockRetryDelayMilliseconds: 1000

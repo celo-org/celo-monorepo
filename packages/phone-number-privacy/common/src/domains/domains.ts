@@ -1,12 +1,20 @@
 import {
   EIP712Object,
   EIP712ObjectValue,
-  EIP712Optional,
-  eip712OptionalType,
   EIP712TypedData,
   EIP712TypesWithPrimary,
   generateTypedDataHash,
 } from '@celo/utils/lib/sign-typed-data-utils'
+import * as t from 'io-ts'
+import {
+  isSequentialDelayDomain,
+  SequentialDelayDomain,
+  sequentialDelayDomainEIP712Types,
+  SequentialDelayDomainOptions,
+  sequentialDelayDomainOptionsEIP712Types,
+  SequentialDelayDomainSchema,
+  SequentialDelayDomainState,
+} from './sequential-delay'
 
 // Concrete Domain subtypes are only assignable to Domain and EIP712Object when using type instead
 // of interface. Otherwise the compiler complains about a missing index signature.
@@ -33,100 +41,6 @@ export interface Domain {
  */
 export type DomainOptions = EIP712Object
 
-export type SequentialDelayStage = {
-  /**
-   * How many seconds each batch of attempts in this stage is delayed with
-   * respect to the timer.
-   */
-  delay: number
-  /**
-   * Whether the timer should be reset between attempts during this stage.
-   * Defaults to true.
-   */
-  resetTimer: EIP712Optional<boolean>
-  /**
-   * The number of continuous attempts a user gets before the next delay
-   * in each repetition of this stage. Defaults to 1.
-   */
-  batchSize: EIP712Optional<number>
-  /**
-   * The number of times this stage repeats before continuing to the next stage
-   * in the RateLimit array. Defaults to 1.
-   */
-  repetitions: EIP712Optional<number>
-}
-
-export type SequentialDelayDomain = {
-  name: 'ODIS Sequential Delay Domain'
-  version: '1'
-  stages: SequentialDelayStage[]
-  /**
-   * Optional Celo address against which signed requests must be authenticated.
-   * In the case of Cloud Backup, this will be derived from a one-time key stored with the ciphertext.
-   * Encoded as a checksummed address with leading "0x".
-   */
-  address: EIP712Optional<string>
-  /**
-   * Optional string to distinguish the output of this domain instance from
-   * other SequentialDelayDomain instances
-   */
-  salt: EIP712Optional<string>
-}
-
-export type SequentialDelayDomainOptions = {
-  /**
-   * EIP-712 signature over the entire request by the address specified in the domain.
-   * Required if `address` is defined in the domain instance. If `address` is
-   * not defined in the domain instance, then a signature must not be provided.
-   * Encoded as a hex string with leading 0x.
-   */
-  signature: EIP712Optional<string>
-  /**
-   * Used to prevent replay attacks. Required if a signature is provided.
-   * Code verifying the signature for rate limiting should check this nonce against a counter of
-   * applied requests. E.g. Ensure the nonce is 0 on the first request and 2 on the third.
-   */
-  nonce: EIP712Optional<number>
-}
-
-export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDelayDomain =>
-  domain.name === 'ODIS Sequential Delay Domain' && domain.version === '1'
-
-export const sequentialDelayDomainEIP712Types: EIP712TypesWithPrimary = {
-  types: {
-    SequentialDelayDomain: [
-      { name: 'address', type: 'Optional<address>' },
-      { name: 'name', type: 'string' },
-      { name: 'salt', type: 'Optional<string>' },
-      { name: 'stages', type: 'SequentialDelayStage[]' },
-      { name: 'version', type: 'string' },
-    ],
-    SequentialDelayStage: [
-      { name: 'batchSize', type: 'Optional<uint256>' },
-      { name: 'delay', type: 'uint256' },
-      { name: 'repetitions', type: 'Optional<uint256>' },
-      { name: 'resetTimer', type: 'Optional<bool>' },
-    ],
-    ...eip712OptionalType('address'),
-    ...eip712OptionalType('string'),
-    ...eip712OptionalType('uint256'),
-    ...eip712OptionalType('bool'),
-  },
-  primaryType: 'SequentialDelayDomain',
-}
-
-export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
-  types: {
-    SequentialDelayDomainOptions: [
-      { name: 'nonce', type: 'Optional<uint256>' },
-      { name: 'signature', type: 'Optional<string>' },
-    ],
-    ...eip712OptionalType('string'),
-    ...eip712OptionalType('uint256'),
-  },
-  primaryType: 'SequentialDelayDomainOptions',
-}
-
 /**
  * Union type of domains which are currently implmented and standardized for use with ODIS.
  * Domains should be added to the union type as they are implemented.
@@ -134,6 +48,9 @@ export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
  * @remarks Additional domain types should be added to this type union as the are standardized.
  */
 export type KnownDomain = SequentialDelayDomain
+
+/** io-ts schema for encoding and decoding domains of any standardized type */
+export const KnownDomainSchema: t.Type<KnownDomain> = SequentialDelayDomainSchema
 
 export function isKnownDomain(domain: Domain): domain is KnownDomain {
   return isSequentialDelayDomain(domain)
@@ -147,6 +64,15 @@ export function isKnownDomain(domain: Domain): domain is KnownDomain {
 export type KnownDomainOptions<
   D extends KnownDomain = KnownDomain
 > = D extends SequentialDelayDomain ? SequentialDelayDomainOptions : never
+
+/**
+ * Parameterized union type of currently implemented and standarized domain state structs. If the
+ * type parameter is specified to be a concrete Domain subtype, then only its associated
+ * Domain state type is selected and assignable to the parameterized type.
+ */
+export type KnownDomainState<D extends KnownDomain = KnownDomain> = D extends SequentialDelayDomain
+  ? SequentialDelayDomainState
+  : never
 
 export function domainEIP712Types(domain: KnownDomain): EIP712TypesWithPrimary {
   if (isSequentialDelayDomain(domain)) {

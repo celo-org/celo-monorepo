@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: eksportisto-idx-tip
+  name: eksportisto-indexer
   labels:
     component: eksportisto
     release: {{ .Release.Name }}
@@ -14,7 +14,7 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: eksportisto-idx-tip
+  name: eksportisto-indexer
   labels:
     app: eksportisto
     chart: eksportisto
@@ -22,9 +22,9 @@ metadata:
     heritage: {{ .Release.Service }}
     component: eksportisto
 spec:
-  serviceName: eksportisto-idx-tip
+  serviceName: eksportisto-indexer
   podManagementPolicy: Parallel
-  replicas: 1
+  replicas: 8
   selector:
     matchLabels:
       app: eksportisto
@@ -49,17 +49,18 @@ spec:
         args:
           - "indexer"
           - "--config=/var/config/config.yaml"
-          - "--indexer-source=tip"
-          - "--celo-node-uri=ws://rc1-fullnodes-rpc-no-session-affinity:8545"
+          - "--celo-node-uri=http://rc1-fullnodes-rpc-internal-lb:8545"
         env:
-        - name: GOGC
-          value: "11300"
         - name: GOOGLE_APPLICATION_CREDENTIALS
           value: "/var/config/service-account.json"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         resources:
           requests:
-            memory: 200Mi
-            cpu: 500m
+            memory: 100Mi
+            cpu: 100m
         ports:
         - name: prometheus
           containerPort: 8080
