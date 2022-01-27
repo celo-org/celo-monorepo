@@ -1,3 +1,4 @@
+import { NULL_ADDRESS } from '@celo/base'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   addressMinedLatestBlock,
@@ -24,6 +25,7 @@ import {
   StableTokenContract,
   StableTokenInstance,
 } from 'types'
+import { keccak256 } from 'web3-utils'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
 const Exchange: ExchangeContract = artifacts.require('Exchange')
@@ -126,7 +128,7 @@ contract('Exchange', (accounts: string[]) => {
       SECONDS_IN_A_WEEK,
       [],
       [],
-      'Exchange' // USD
+      CeloContractName.Exchange // USD
     )
 
     mockSortedOracles = await MockSortedOracles.new()
@@ -140,12 +142,14 @@ contract('Exchange', (accounts: string[]) => {
     exchange = await Exchange.new(true)
     await exchange.initialize(
       registry.address,
-      stableToken.address,
+      CeloContractName.StableToken,
       spread,
       reserveFraction,
       updateFrequency,
       minimumReports
     )
+
+    await registry.setAddressFor(CeloContractName.StableToken, stableToken.address)
     await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
   })
 
@@ -155,17 +159,52 @@ contract('Exchange', (accounts: string[]) => {
       assert.equal(expectedOwner, accounts[0])
     })
 
+    it('should set stable token identfier', async () => {
+      const identifier = await exchange.stableTokenRegistryId()
+      assert.equal(identifier, keccak256(CeloContractName.StableToken))
+    })
+
     it('should not be callable again', async () => {
       await assertRevert(
         exchange.initialize(
           registry.address,
-          stableToken.address,
+          CeloContractName.StableToken,
           spread,
           reserveFraction,
           updateFrequency,
           minimumReports
         )
       )
+    })
+  })
+
+  describe('#activateStable', () => {
+    it('should emit a StableTokenSet event', async () => {
+      const tx = await exchange.activateStable()
+      assertLogMatches2(tx.logs[0], {
+        event: 'StableTokenSet',
+        args: {
+          stable: stableToken.address,
+        },
+      })
+    })
+
+    it('should set the stable storage address', async () => {
+      const stableBefore = await exchange.stable()
+      assert.equal(stableBefore, NULL_ADDRESS)
+      await exchange.activateStable()
+      const stableAfter = await exchange.stable()
+      assert.equal(stableAfter, stableToken.address)
+    })
+
+    it('should not allow a non-owner to activate', async () => {
+      const nonOwner = accounts[1]
+      await assertRevert(exchange.activateStable({ from: nonOwner }))
+    })
+
+    it('should not be callable again', async () => {
+      await exchange.activateStable()
+      await assertRevert(exchange.activateStable())
     })
   })
 
@@ -318,6 +357,10 @@ contract('Exchange', (accounts: string[]) => {
   })
 
   describe('#getBuyAndSellBuckets', () => {
+    beforeEach(async () => {
+      await exchange.activateStable()
+    })
+
     it('should return the correct amount of buy and sell token', async () => {
       const [buyBucketSize, sellBucketSize] = await exchange.getBuyAndSellBuckets(true)
       assertEqualBN(sellBucketSize, initialGoldBucket)
@@ -355,6 +398,7 @@ contract('Exchange', (accounts: string[]) => {
 
       it(`should return the same value if updateFrequency seconds haven't passed yet`, async () => {
         await mockSortedOracles.setMedianTimestampToNow(stableToken.address)
+
         const [buyBucketSize, sellBucketSize] = await exchange.getBuyAndSellBuckets(true)
 
         assertEqualBN(sellBucketSize, initialGoldBucket)
@@ -374,6 +418,10 @@ contract('Exchange', (accounts: string[]) => {
   })
 
   describe('#getBuyTokenAmount', () => {
+    beforeEach(async () => {
+      await exchange.activateStable()
+    })
+
     it('should return the correct amount of buyToken', async () => {
       const amount = 10
       const buyAmount = await exchange.getBuyTokenAmount(amount, true)
@@ -389,6 +437,10 @@ contract('Exchange', (accounts: string[]) => {
   })
 
   describe('#getSellTokenAmount', () => {
+    beforeEach(async () => {
+      await exchange.activateStable()
+    })
+
     it('should return the correct amount of sellToken', async () => {
       const buyAmount = 10
       const sellAmount = await exchange.getSellTokenAmount(buyAmount, true)
@@ -409,6 +461,10 @@ contract('Exchange', (accounts: string[]) => {
 
   for (const sellFunctionName of sellFunctionNames) {
     describe(`#${sellFunctionName}`, () => {
+      beforeEach(async () => {
+        await exchange.activateStable()
+      })
+
       const user = accounts[1]
 
       // This test is run for both the `sell` and `exchange` functions
@@ -924,6 +980,10 @@ contract('Exchange', (accounts: string[]) => {
   }
 
   describe('#buy', () => {
+    beforeEach(async () => {
+      await exchange.activateStable()
+    })
+
     const user = accounts[1]
 
     describe('when buying stable with gold', () => {

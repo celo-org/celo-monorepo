@@ -2,11 +2,14 @@ import { newKitFromWeb3 } from '@celo/contractkit'
 import {
   GetQuotaResponse,
   rootLogger as logger,
+  SignMessageResponseFailure,
+  SignMessageResponseSuccess,
   TestUtils,
 } from '@celo/phone-number-privacy-common'
 import { getBlindedPhoneNumber } from '@celo/phone-number-privacy-common/lib/test/utils'
 import { PHONE_NUMBER } from '@celo/phone-number-privacy-common/lib/test/values'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
+import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
@@ -28,6 +31,7 @@ const {
 const { replenishQuota, registerWalletAddress } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
+const ODIS_PUBLIC_POLYNOMIAL = process.env.ODIS_PUBLIC_POLYNOMIAL as string
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'
 
@@ -47,8 +51,9 @@ const getRandomBlindedPhoneNumber = () => {
 
 describe('Running against a deployed service', () => {
   beforeAll(() => {
-    console.log(DEFAULT_FORNO_URL)
-    console.log(ODIS_SIGNER)
+    console.log('FORNO_URL: ' + DEFAULT_FORNO_URL)
+    console.log('ODIS_SIGNER: ' + ODIS_SIGNER)
+    console.log('ODIS_PUBLIC_POLYNOMIAL: ' + ODIS_PUBLIC_POLYNOMIAL)
   })
 
   describe('Returns status 400 with invalid input', () => {
@@ -188,13 +193,23 @@ describe('Running against a deployed service', () => {
 
     it('Check that accounts are set up correctly', async () => {
       expect(await getQuota(ACCOUNT_ADDRESS2, IDENTIFIER)).toBeLessThan(initialQuota)
-      expect(await getWalletAddress(logger, ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
+      expect(await getWalletAddress(logger(), ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
     })
 
     it('Returns sig when querying succeeds with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
-      const response = await postToSignMessage(getRandomBlindedPhoneNumber(), ACCOUNT_ADDRESS3)
+      const blindedPhoneNumber = getRandomBlindedPhoneNumber()
+      const response = await postToSignMessage(blindedPhoneNumber, ACCOUNT_ADDRESS3)
       expect(response.status).toBe(200)
+
+      // Validate signature
+      type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
+      const data = await response.text()
+      const signResponse = JSON.parse(data) as SignerResponse
+      expect(signResponse.success).toBeTruthy()
+      const sigBuffer = Buffer.from(signResponse.signature as string, 'base64')
+      const isValid = isValidSignature(sigBuffer, blindedPhoneNumber, ODIS_PUBLIC_POLYNOMIAL)
+      expect(isValid).toBeTruthy()
     })
 
     it('Returns count when querying with unused request increments query count', async () => {
@@ -255,7 +270,7 @@ async function queryQuotaEndpoint(
     body,
   })
 
-  return await res.json()
+  return res.json()
 }
 
 async function postToSignMessage(
@@ -284,4 +299,17 @@ async function postToSignMessage(
   })
 
   return res
+}
+
+function isValidSignature(signature: Buffer, blindedMessage: string, polynomial: string) {
+  try {
+    threshold_bls.partialVerifyBlindSignature(
+      Buffer.from(polynomial, 'hex'),
+      Buffer.from(blindedMessage, 'base64'),
+      signature
+    )
+    return true
+  } catch {
+    return false
+  }
 }

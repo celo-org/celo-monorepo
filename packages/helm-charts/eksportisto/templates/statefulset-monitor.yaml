@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: eksportisto-idx-backfill
+  name: eksportisto-monitor
   labels:
     component: eksportisto
     release: {{ .Release.Name }}
@@ -14,7 +14,7 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: eksportisto-idx-backfill
+  name: eksportisto-monitor
   labels:
     app: eksportisto
     chart: eksportisto
@@ -22,7 +22,7 @@ metadata:
     heritage: {{ .Release.Service }}
     component: eksportisto
 spec:
-  serviceName: eksportisto-idx-backfill
+  serviceName: eksportisto-monitor
   podManagementPolicy: Parallel
   replicas: 1
   selector:
@@ -47,21 +47,16 @@ spec:
         image: {{ .Values.imageRepository }}:{{ .Values.imageTag }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         args:
-          - "indexer"
-          - "--config=/var/config/config.yaml"
-          - "--indexer-source=backfill"
-          - "--celo-node-uri=http://rc1-fullnodes-rpc-no-session-affinity:8545"
+          - "monitor"
+          - "--config=/var/config/config_monitor.yaml"
+          - "--celo-node-uri=ws://rc1-fullnodes-rpc-internal-lb:8545"
         env:
         - name: GOOGLE_APPLICATION_CREDENTIALS
           value: "/var/config/service-account.json"
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
         resources:
           requests:
-            memory: 200Mi
-            cpu: 500m
+            memory: 300Mi
+            cpu: 200m
         ports:
         - name: prometheus
           containerPort: 8080

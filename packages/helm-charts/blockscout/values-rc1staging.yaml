@@ -1,0 +1,63 @@
+blockscout:
+  indexer:
+    db:
+      proxy:
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 500m
+    pool_size: 100
+    resources:
+      requests:
+        memory: 12Gi
+        cpu: 5
+  api:
+    autoscaling:
+      maxReplicas: 2
+      minReplicas: 1
+      target:
+        cpu: 70
+    db:
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 300m
+    pool_size: 30
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 500m
+  web:
+    host: rc1staging-blockscout.celo-testnet.org
+    autoscaling:
+      maxReplicas: 2
+      minReplicas: 1
+      target:
+        cpu: 70
+    db:
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 300m
+    pool_size: 30
+    resources:
+      requests:
+        memory: 250M
+        cpu: 500m
+    recaptchaSecretName: rc1staging-blockscout-recaptcha
+  metrics:
+    enabled: true
+  jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
+  jsonrpc_ws_url: ws://rc1staging-archivenodes-rpc:8545
+  metadata_crawler:
+    schedule: "0 */2 * * *"
+
+db:
+  drop: false
+
+domain_name: 'celo-testnet'
+
+network_id: 42220
+subnetwork: 'Celo'
