@@ -27,9 +27,9 @@ export function getFornoUrl(celoEnv: string) {
 }
 
 export function getFornoWebSocketUrl(celoEnv: string) {
-  return celoEnv === 'rc1' ?
-    `wss://forno.celo.org/ws` :
-    `wss://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org/ws`
+  return celoEnv === 'rc1'
+    ? `wss://forno.celo.org/ws`
+    : `wss://${celoEnv}-forno.${fetchEnv(envVar.CLUSTER_DOMAIN_NAME)}.org/ws`
 }
 
 export function getFullNodeHttpRpcInternalUrl(celoEnv: string) {
