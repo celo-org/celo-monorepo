@@ -306,6 +306,7 @@ contract('Exchange', (accounts: string[]) => {
 
     it('the spread should always be less than or equal to 1', async () => {
       assert.isTrue(fixed1.gte(newSpread))
+      await assertRevert(exchange.setSpread(toFixed(1001 / 1000)))
     })
 
     it('should emit a SpreadSet event', async () => {
