@@ -1,0 +1,11 @@
+name: eksportisto
+version: 3.0
+description: Chart which is used to run eksportisto
+keywords:
+- ethereum
+- blockchain
+- monitoring
+dependencies:
+- name: redis
+  version: 12.8.3
+  repository: https://charts.bitnami.com/bitnami

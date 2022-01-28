@@ -110,7 +110,6 @@
     "dependencies": [
       "@celo/base",
       "@celo/contractkit",
-      "@celo/identity",
       "@celo/utils",
       "@celo/wallet-local"
     ]
@@ -197,6 +196,7 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
+      "@celo/phone-number-privacy-common",
       "@celo/utils",
       "@celo/wallet-local"
     ]
@@ -213,6 +213,15 @@
     "dependencies": [
       "@celo/dev-utils",
       "@celo/flake-tracker"
+    ]
+  },
+  "@celo/phone-utils": {
+    "location": "packages/sdk/phone-utils",
+    "dependencies": [
+      "@celo/base",
+      "@celo/flake-tracker",
+      "@celo/typescript",
+      "@celo/utils"
     ]
   },
   "@celo/transactions-uri": {
@@ -294,17 +303,6 @@
   },
   "@celo/wallet-rpc": {
     "location": "packages/sdk/wallets/wallet-rpc",
-    "dependencies": [
-      "@celo/connect",
-      "@celo/contractkit",
-      "@celo/dev-utils",
-      "@celo/utils",
-      "@celo/wallet-base",
-      "@celo/wallet-remote"
-    ]
-  },
-  "@celo/wallet-walletconnect": {
-    "location": "packages/sdk/wallets/wallet-walletconnect",
     "dependencies": [
       "@celo/connect",
       "@celo/contractkit",
