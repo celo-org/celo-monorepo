@@ -21,41 +21,35 @@ export const E2E_TEST_PHONE_NUMBERS: string[] = E2E_TEST_PHONE_NUMBERS_RAW.map((
 )
 export const E2E_TEST_ACCOUNTS: string[] = ['0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb']
 
-interface Config {
-  blockchain: {
-    provider: string
-  }
-  db: {
-    user: string
-    password: string
-    database: string
-    host: string
-    ssl: boolean
-  }
+interface BlockchainConfig {
+  provider: string
+}
+
+interface DatabaseConfig {
+  user: string
+  password: string
+  database: string
+  host: string
+  ssl: boolean
+}
+
+export interface OdisConfig {
   odisServices: {
-    phoneNumberPrivacy: {
-      signers: string
-      timeoutMilliSeconds: number
-    }
-    domains: {
-      signers: string
-      timeoutMilliSeconds: number
-    }
+    signers: string
+    timeoutMilliSeconds: number
   }
   keys: {
-    phoneNumberPrivacy: {
-      version: number
-      threshold: number
-      polynomial: string
-      pubKey: string
-    }
-    domains: {
-      version: number
-      threshold: number
-      polynomial: string
-      pubKey: string
-    }
+    version: number
+    threshold: number
+    polynomial: string
+    pubKey: string
   }
+}
+interface Config {
+  blockchain: BlockchainConfig
+  db: DatabaseConfig
+  phoneNumberPrivacy: OdisConfig
+  domains: OdisConfig
 }
 
 let config: Config
@@ -73,26 +67,26 @@ if (DEV_MODE) {
       host: 'fakeHost',
       ssl: false,
     },
-    odisServices: {
-      phoneNumberPrivacy: {
+    phoneNumberPrivacy: {
+      odisServices: {
         signers:
           '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
         timeoutMilliSeconds: 5 * 1000,
       },
-      domains: {
-        signers:
-          '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
-        timeoutMilliSeconds: 5 * 1000,
-      },
-    },
-    keys: {
-      phoneNumberPrivacy: {
+      keys: {
         version: 1,
         threshold: 1,
         polynomial: DEV_POLYNOMIAL,
         pubKey: DEV_PUBLIC_KEY,
       },
-      domains: {
+    },
+    domains: {
+      odisServices: {
+        signers:
+          '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
+        timeoutMilliSeconds: 5 * 1000,
+      },
+      keys: {
         version: 1,
         threshold: 1,
         polynomial: DEV_POLYNOMIAL,
@@ -113,29 +107,29 @@ if (DEV_MODE) {
       host: `/cloudsql/${functionConfig.db.host}`,
       ssl: toBool(functionConfig.db.ssl, true),
     },
-    odisServices: {
-      phoneNumberPrivacy: {
-        signers: functionConfig.odisservices.phoneNumberPrivacy.signers,
+    phoneNumberPrivacy: {
+      odisServices: {
+        signers: functionConfig.phoneNumberPrivacy.odisservices.signers,
         timeoutMilliSeconds:
-          functionConfig.odisservices.phoneNumberPrivacy.timeoutMilliSeconds ?? 5 * 1000,
+          functionConfig.phoneNumberPrivacy.odisservices.timeoutMilliSeconds ?? 5 * 1000,
       },
-      domains: {
-        signers: functionConfig.odisservices.domains.signers,
-        timeoutMilliSeconds: functionConfig.odisservices.domains.timeoutMilliSeconds ?? 5 * 1000,
+      keys: {
+        version: functionConfig.phoneNumberPrivacy.keys.version,
+        threshold: functionConfig.phoneNumberPrivacy.keys.threshold,
+        polynomial: functionConfig.phoneNumberPrivacy.keys.polynomial,
+        pubKey: functionConfig.phoneNumberPrivacy.keys.pubKey,
       },
     },
-    keys: {
-      phoneNumberPrivacy: {
-        version: functionConfig.keys.phoneNumberPrivacy.version,
-        threshold: functionConfig.keys.phoneNumberPrivacy.threshold,
-        polynomial: functionConfig.keys.phoneNumberPrivacy.polynomial,
-        pubKey: functionConfig.keys.phoneNumberPrivacy.pubKey,
+    domains: {
+      odisServices: {
+        signers: functionConfig.domains.odisservices.signers,
+        timeoutMilliSeconds: functionConfig.domains.odisservices.timeoutMilliSeconds ?? 5 * 1000,
       },
-      domains: {
-        version: functionConfig.keys.domains.version,
-        threshold: functionConfig.keys.domains.threshold,
-        polynomial: functionConfig.keys.domains.polynomial,
-        pubKey: functionConfig.keys.domains.pubKey,
+      keys: {
+        version: functionConfig.domains.keys.version,
+        threshold: functionConfig.domains.keys.threshold,
+        polynomial: functionConfig.domains.keys.polynomial,
+        pubKey: functionConfig.domains.keys.pubKey,
       },
     },
   }

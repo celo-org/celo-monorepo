@@ -8,7 +8,7 @@ export enum ErrorMessage {
   VERIFY_PARITAL_SIGNATURE_ERROR = `CELO_ODIS_ERR_06 SIG_ERR BLS partial signature verification Failure`,
   NOT_ENOUGH_PARTIAL_SIGNATURES = `CELO_ODIS_ERR_07 SIG_ERR Not enough partial signatures`,
   INCONSISTENT_SIGNER_RESPONSES = `CELO_ODIS_ERR_08 SIG_ERR Inconsistent responses from signers`,
-  ERROR_REQUESTING_SIGNATURE = `CELO_ODIS_ERR_09 SIG_ERR Failed to request signature from signer`,
+  SIGNER_REQUEST_ERROR = `CELO_ODIS_ERR_09 SIG_ERR Failure in signer request`,
   TIMEOUT_FROM_SIGNER = `CELO_ODIS_ERR_10 SIG_ERR Timeout from signer`,
   CONTRACT_GET_FAILURE = `CELO_ODIS_ERR_11 SIG_ERR Failed to read contract state`,
   FAILURE_TO_STORE_REQUEST = `CELO_ODIS_ERR_12 DB_ERR Failed to store partial sig request`,

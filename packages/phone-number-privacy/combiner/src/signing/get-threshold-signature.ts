@@ -35,16 +35,16 @@ type SignerPnpResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 type CombinerSigEndpoint = CombinerEndpoint.GET_BLINDED_MESSAGE_SIG | CombinerEndpoint.DOMAIN_SIGN
 type SignerSigEndpoint = SignerEndpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG | SignerEndpoint.DOMAIN_SIGN
 
-interface SignerService {
-  url: string
-  fallbackUrl?: string
-}
+// interface SignerService {
+//   url: string
+//   fallbackUrl?: string
+// }
 
-interface SignMsgRespWithStatus {
-  url: string
-  signMessageResponse: SignerPnpResponse
-  status: number
-}
+// interface SignMsgRespWithStatus {
+//   url: string
+//   signMessageResponse: SignerPnpResponse
+//   status: number
+// }
 
 export async function handlePnpSigReq(request: Request, response: Response) {
   return handleGetBlindedMessageSig(request, response, CombinerEndpoint.GET_BLINDED_MESSAGE_SIG)
@@ -229,7 +229,7 @@ async function handleSuccessResponse(
   endpoint: CombinerSigEndpoint
 ) {
   const logger: Logger = response.locals.logger
-  const keyVersion: number = Number(response.header(KEY_VERSION_HEADER))
+  const keyVersion: number = Number(response.header(KEY_VERSION_HEADER)) // TODO(Alec): This is the wrong response object
   logger.info({ keyVersion }, 'Signer responded with key version')
   if (keyVersion !== expectedKeyVersion) {
     throw new Error(`Incorrect key version received from signer ${serviceUrl}`)
@@ -569,6 +569,35 @@ function standardizeRequestParams(
       pubKey: config.keys.domains.pubKey,
       polynomial: config.keys.domains.polynomial,
     }
+  }
+
+  throw new Error(`Implementation error. Signature endpoint ${endpoint} not recognized`)
+}
+
+function parseSignature(
+  res: any,
+  endpoint: CombinerSigEndpoint,
+  serviceUrl: string,
+  logger: Logger
+): string | undefined {
+  if (isPnpSignatureResponse(res, endpoint)) {
+    if (!res.success) {
+      // Continue on failure as long as signature is present to unblock user
+      logger.error(
+        {
+          error: res.error,
+          signer: serviceUrl,
+        },
+        'Signer responded with error'
+      )
+    }
+    return res.signature
+  }
+  if (isDomainRestrictedSignatureResponse(res, endpoint)) {
+    if (!res.success) {
+      return undefined
+    }
+    return res.signature
   }
 
   throw new Error(`Implementation error. Signature endpoint ${endpoint} not recognized`)

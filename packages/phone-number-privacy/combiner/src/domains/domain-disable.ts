@@ -20,16 +20,16 @@ import config, { VERSION } from '../config'
 
 // TODO(Alec): De-dupe with get-threhold-signature
 
-interface SignerService {
-  url: string
-  fallbackUrl?: string
-}
+// interface SignerService {
+//   url: string
+//   fallbackUrl?: string
+// }
 
-interface DisableDomainRespWithStatus {
-  url: string
-  disableDomainResponse: DisableDomainResponseSuccess
-  status: number
-}
+// interface DisableDomainRespWithStatus {
+//   url: string
+//   disableDomainResponse: DisableDomainResponseSuccess
+//   status: number
+// }
 
 export async function handleDomainDisableReq(request: Request, response: Response) {
   const logger: Logger = response.locals.logger

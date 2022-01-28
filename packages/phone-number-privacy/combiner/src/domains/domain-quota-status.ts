@@ -16,20 +16,19 @@ import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import { domain } from 'process'
 import { respondWithError } from '../common/error-utils'
 import config, { VERSION } from '../config'
 
 // TODO(Alec): De-dupe with get-threshold-signature
-interface SignerService {
-  url: string
-  fallbackUrl?: string
-}
-interface DomainQuotaStatusRespWithStatus {
-  url: string
-  domainQuotaStatusResponse: DomainQuotaStatusResponseSuccess
-  status: number
-}
+// interface SignerService {
+//   url: string
+//   fallbackUrl?: string
+// }
+// interface DomainQuotaStatusRespWithStatus {
+//   url: string
+//   domainQuotaStatusResponse: DomainQuotaStatusResponseSuccess
+//   status: number
+// }
 
 export async function handleDomainQuotaStatusReq(request: Request, response: Response) {
   const logger: Logger = response.locals.logger
