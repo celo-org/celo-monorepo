@@ -1,33 +1,28 @@
 import {
-  CombinerEndpoint,
-  DomainRestrictedSignatureResponse,
+  DomainRestrictedSignatureRequest,
   ErrorMessage,
   KEY_VERSION_HEADER,
-  SignerEndpoint,
-  SignMessageResponseFailure,
-  SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import AbortController from 'abort-controller'
 import { Request, Response } from 'express'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { OdisConfig, VERSION } from '../config'
-import { CombinerService } from './combiner.service'
+import { CombinerService, SignerPnpResponse } from './combiner.service'
 import { ICombinerInputService } from './input.interface'
 
-// TODO(Alec)
-type SignerPnpResponse = SignMessageResponseFailure | SignMessageResponseSuccess
+export type SignerSigResponse = SignerPnpResponse | DomainRestrictedSignatureRequest
 
 export abstract class SignService extends CombinerService {
   protected blsCryptoClient: BLSCryptographyClient
 
   public constructor(
     _config: OdisConfig,
-    protected endpoint: CombinerEndpoint,
     protected inputService: ICombinerInputService,
     protected blindedMessage: string
   ) {
-    super(_config, endpoint, inputService)
+    super(_config, inputService)
     this.blsCryptoClient = new BLSCryptographyClient(this.threshold, this.pubKey, this.polynomial)
   }
 
@@ -56,9 +51,7 @@ export abstract class SignService extends CombinerService {
       throw new Error(`Signature is missing from signer ${url}`)
     }
 
-    if (this.signerEndpoint === SignerEndpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG) {
-      this.responses.push({ url, res, status })
-    }
+    this.responses.push({ url, res, status })
 
     this.logger.info({ signer: url }, 'Add signature')
     const signatureAdditionStart = Date.now()
@@ -106,30 +99,7 @@ export abstract class SignService extends CombinerService {
 
   protected abstract logResponseDiscrepancies(): void
 
-  // TODO(Alec)
-  private parseSignature(res: any, signerUrl: string): string | undefined {
-    if (isPnpSignatureResponse(res, this.endpoint)) {
-      if (!res.success) {
-        // Continue on failure as long as signature is present to unblock user
-        this.logger.error(
-          {
-            error: res.error,
-            signer: signerUrl,
-          },
-          'Signer responded with error'
-        )
-      }
-      return res.signature
-    }
-    if (isDomainRestrictedSignatureResponse(res, this.endpoint)) {
-      if (!res.success) {
-        return undefined
-      }
-      return res.signature
-    }
-
-    throw new Error(`Implementation error. Signature endpoint ${this.endpoint} not recognized`)
-  }
+  protected abstract parseSignature(res: SignerSigResponse, signerUrl: string): string | undefined
 
   private handleMissingSignatures(majorityErrorCode: number | null, response: Response) {
     if (majorityErrorCode === 403) {
@@ -143,17 +113,4 @@ export abstract class SignService extends CombinerService {
       )
     }
   }
-}
-
-// TODO(Alec)
-function isDomainRestrictedSignatureResponse(
-  _res: any,
-  endpoint: CombinerEndpoint
-): _res is DomainRestrictedSignatureResponse {
-  return endpoint === CombinerEndpoint.DOMAIN_SIGN
-}
-
-// TODO(Alec)
-function isPnpSignatureResponse(_res: any, endpoint: CombinerEndpoint): _res is SignerPnpResponse {
-  return endpoint === CombinerEndpoint.GET_BLINDED_MESSAGE_SIG
 }

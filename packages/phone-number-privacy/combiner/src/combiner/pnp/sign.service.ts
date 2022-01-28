@@ -1,15 +1,59 @@
-import { MAX_BLOCK_DISCREPANCY_THRESHOLD, WarningMessage } from '@celo/phone-number-privacy-common'
+import {
+  CombinerEndpoint,
+  getSignerEndpoint,
+  MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  SignerEndpoint,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
+import { OdisConfig } from '../../config'
+import { SignerPnpResponse, SignerResponseWithStatus } from '../combiner.service'
+import { ICombinerInputService } from '../input.interface'
 import { SignService } from '../sign.service'
 
+interface PnpSignResponseWithStatus extends SignerResponseWithStatus {
+  url: string
+  res: SignerPnpResponse
+  status: number
+}
 export class PnpSignService extends SignService {
+  protected endpoint: CombinerEndpoint
+  protected signerEndpoint: SignerEndpoint
+  protected responses: PnpSignResponseWithStatus[]
+
+  public constructor(
+    _config: OdisConfig,
+    protected inputService: ICombinerInputService,
+    protected blindedMessage: string
+  ) {
+    super(_config, inputService, blindedMessage)
+    this.endpoint = CombinerEndpoint.GET_BLINDED_MESSAGE_SIG
+    this.signerEndpoint = getSignerEndpoint(this.endpoint)
+    this.responses = []
+  }
+
+  protected parseSignature(res: SignerPnpResponse, signerUrl: string): string | undefined {
+    if (!res.success) {
+      this.logger.error(
+        {
+          error: res.error,
+          signer: signerUrl,
+        },
+        'Signer responded with error'
+      )
+      // Continue on failure as long as signature is present to unblock user
+    }
+    return res.signature
+  }
+
+  // TODO(Alec)(Next): clean this up
   protected logResponseDiscrepancies(): void {
     // Only compare responses which have values for the quota fields
     const successes = this.responses.filter(
-      (response) =>
-        response.res &&
-        response.res.performedQueryCount &&
-        response.res.totalQuota &&
-        response.res.blockNumber
+      (signerResponse) =>
+        signerResponse.res &&
+        signerResponse.res.performedQueryCount &&
+        signerResponse.res.totalQuota &&
+        signerResponse.res.blockNumber
     )
 
     if (successes.length === 0) {
@@ -20,24 +64,28 @@ export class PnpSignService extends SignService {
     const expectedTotalQuota = successes[0].res.totalQuota
     const expectedBlockNumber = successes[0].res.blockNumber!
     let discrepancyFound = false
-    for (const resp of successes) {
+    for (const signerResponse of successes) {
       // Performed query count should never diverge; however the totalQuota may
       // diverge if the queried block number is different
       if (
-        resp.res.performedQueryCount !== expectedQueryCount ||
-        (resp.res.totalQuota !== expectedTotalQuota && resp.res.blockNumber === expectedBlockNumber)
+        signerResponse.res.performedQueryCount !== expectedQueryCount ||
+        (signerResponse.res.totalQuota !== expectedTotalQuota &&
+          signerResponse.res.blockNumber === expectedBlockNumber)
       ) {
-        const values = successes.map((response) => {
+        const values = successes.map((_signerResponse) => {
           return {
-            signer: response.url,
-            performedQueryCount: response.res.performedQueryCount,
-            totalQuota: response.res.totalQuota,
+            signer: _signerResponse.url,
+            performedQueryCount: _signerResponse.res.performedQueryCount,
+            totalQuota: _signerResponse.res.totalQuota,
           }
         })
         this.logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
         discrepancyFound = true
       }
-      if (Math.abs(resp.res.blockNumber! - expectedBlockNumber) > MAX_BLOCK_DISCREPANCY_THRESHOLD) {
+      if (
+        Math.abs(signerResponse.res.blockNumber! - expectedBlockNumber) >
+        MAX_BLOCK_DISCREPANCY_THRESHOLD
+      ) {
         const values = successes.map((response) => {
           return {
             signer: response.url,

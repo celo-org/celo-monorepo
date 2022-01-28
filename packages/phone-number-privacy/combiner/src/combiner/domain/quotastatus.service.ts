@@ -1,15 +1,37 @@
 import {
+  CombinerEndpoint,
+  DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
   ErrorMessage,
+  getSignerEndpoint,
   KnownDomainState,
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
+import AbortController from 'abort-controller'
 import { Response } from 'express'
 import { respondWithError } from '../../common/error-utils'
-import { VERSION } from '../../config'
-import { CombinerService } from '../combiner.service'
+import { OdisConfig, VERSION } from '../../config'
+import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
+import { ICombinerInputService } from '../input.interface'
+
+interface DomainQuotaStatusResponseWithStatus extends SignerResponseWithStatus {
+  url: string
+  res: DomainQuotaStatusResponse
+  status: number
+}
 
 export class DomainQuotaStatusService extends CombinerService {
+  protected endpoint: CombinerEndpoint
+  protected signerEndpoint: SignerEndpoint
+  protected responses: DomainQuotaStatusResponseWithStatus[]
+
+  public constructor(_config: OdisConfig, protected inputService: ICombinerInputService) {
+    super(_config, inputService)
+    this.endpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
+    this.signerEndpoint = getSignerEndpoint(this.endpoint)
+    this.responses = []
+  }
+
   protected async handleSuccessResponse(
     data: string,
     status: number,
@@ -57,7 +79,7 @@ export class DomainQuotaStatusService extends CombinerService {
   private findThresholdDomainState(): KnownDomainState {
     let domainStates = this.responses.map((s) => (s.res as DomainQuotaStatusResponseSuccess).status)
     if (domainStates.length < this.threshold) {
-      // TODO(Alec)(Next): Think through consequences of throwing here
+      // TODO(Alec): Think through consequences of throwing here
       throw new Error('Insufficient number of signer responses') // TODO(Alec): better error message
     }
 

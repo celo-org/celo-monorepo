@@ -1,10 +1,35 @@
-import { ErrorMessage, SignerEndpoint } from '@celo/phone-number-privacy-common'
+import {
+  CombinerEndpoint,
+  DisableDomainResponse,
+  ErrorMessage,
+  getSignerEndpoint,
+  SignerEndpoint,
+} from '@celo/phone-number-privacy-common'
+import AbortController from 'abort-controller'
 import { Response } from 'express'
 import { respondWithError } from '../../common/error-utils'
-import { VERSION } from '../../config'
-import { CombinerService } from '../combiner.service'
+import { OdisConfig, VERSION } from '../../config'
+import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
+import { ICombinerInputService } from '../input.interface'
+
+interface DomainDisableResponseWithStatus extends SignerResponseWithStatus {
+  url: string
+  res: DisableDomainResponse
+  status: number
+}
 
 export class DomainDisableService extends CombinerService {
+  protected endpoint: CombinerEndpoint
+  protected signerEndpoint: SignerEndpoint
+  protected responses: DomainDisableResponseWithStatus[]
+
+  public constructor(_config: OdisConfig, protected inputService: ICombinerInputService) {
+    super(_config, inputService)
+    this.endpoint = CombinerEndpoint.DISABLE_DOMAIN
+    this.signerEndpoint = getSignerEndpoint(this.endpoint)
+    this.responses = []
+  }
+
   protected async handleSuccessResponse(
     data: string,
     status: number,

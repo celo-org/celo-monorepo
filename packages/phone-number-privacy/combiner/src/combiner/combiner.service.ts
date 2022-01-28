@@ -3,13 +3,13 @@ import {
   DisableDomainResponseSuccess,
   DomainQuotaStatusResponseSuccess,
   ErrorMessage,
-  getSignerEndpoint,
   rootLogger,
   SignerEndpoint,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import fetch, { Response as FetchResponse } from 'node-fetch'
@@ -18,26 +18,25 @@ import { OdisConfig } from '../config'
 import { ICombinerService } from './combiner.interface'
 import { ICombinerInputService } from './input.interface'
 
-type SignerPnpResponse = SignMessageResponseSuccess | SignMessageResponseFailure
+export type SignerPnpResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
-type SignerResponse =
+export type SignerResponse =
   | SignerPnpResponse
   | DomainQuotaStatusResponseSuccess
   | DisableDomainResponseSuccess
 
-interface SignerResponseWithStatus {
+export interface SignerResponseWithStatus {
   url: string
   res: SignerResponse
   status: number
 }
 
-interface SignerService {
+export interface SignerService {
   url: string
   fallbackUrl?: string
 }
 
 export abstract class CombinerService implements ICombinerService {
-  protected responses: SignerResponseWithStatus[]
   protected failedSigners: Set<string>
   protected errorCodes: Map<number, number>
   protected timedOut: boolean
@@ -47,17 +46,13 @@ export abstract class CombinerService implements ICombinerService {
   protected pubKey: string
   protected keyVersion: number
   protected polynomial: string
-  protected signerEndpoint: SignerEndpoint
   protected logger: Logger
+  protected abstract endpoint: CombinerEndpoint
+  protected abstract signerEndpoint: SignerEndpoint
+  protected abstract responses: SignerResponseWithStatus[]
 
-  public constructor(
-    _config: OdisConfig,
-    protected endpoint: CombinerEndpoint,
-    protected inputService: ICombinerInputService
-  ) {
+  public constructor(_config: OdisConfig, protected inputService: ICombinerInputService) {
     this.logger = rootLogger() // This is later assigned a request specific logger
-    this.signerEndpoint = getSignerEndpoint(endpoint)
-    this.responses = []
     this.failedSigners = new Set<string>()
     this.errorCodes = new Map<number, number>()
     this.timedOut = false
