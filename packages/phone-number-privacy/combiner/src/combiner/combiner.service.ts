@@ -15,7 +15,7 @@ import { Request, Response } from 'express'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { respondWithError } from '../common/error-utils'
 import { OdisConfig } from '../config'
-import { ICombinerService } from './combiner.interface'
+import { DistributedRequest, ICombinerService } from './combiner.interface'
 import { ICombinerInputService } from './input.interface'
 
 export type SignerPnpResponse = SignMessageResponseSuccess | SignMessageResponseFailure
@@ -43,28 +43,25 @@ export abstract class CombinerService implements ICombinerService {
   protected signers: SignerService[]
   protected timeoutMs: number
   protected threshold: number
-  protected pubKey: string
-  protected keyVersion: number
-  protected polynomial: string
   protected logger: Logger
   protected abstract endpoint: CombinerEndpoint
   protected abstract signerEndpoint: SignerEndpoint
   protected abstract responses: SignerResponseWithStatus[]
 
-  public constructor(_config: OdisConfig, protected inputService: ICombinerInputService) {
-    this.logger = rootLogger() // This is later assigned a request specific logger
+  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+    this.logger = rootLogger()
     this.failedSigners = new Set<string>()
     this.errorCodes = new Map<number, number>()
     this.timedOut = false
-    this.signers = JSON.parse(_config.odisServices.signers)
-    this.timeoutMs = _config.odisServices.timeoutMilliSeconds
-    this.threshold = _config.keys.threshold
-    this.pubKey = _config.keys.pubKey
-    this.keyVersion = _config.keys.version
-    this.polynomial = _config.keys.polynomial
+    this.signers = JSON.parse(config.odisServices.signers)
+    this.timeoutMs = config.odisServices.timeoutMilliSeconds
+    this.threshold = config.keys.threshold
   }
 
-  public async handleDistributedRequest(request: Request, response: Response) {
+  public async handleDistributedRequest(
+    request: Request<{}, {}, DistributedRequest>,
+    response: Response
+  ) {
     this.logger = response.locals.logger
     try {
       if (!this.inputService.validate(request)) {
@@ -77,7 +74,7 @@ export abstract class CombinerService implements ICombinerService {
       }
 
       await this.forwardToSigners(request)
-      await this.combineSignerResponses(response)
+      await this.combineSignerResponses(request, response)
     } catch (err) {
       this.logger.error(`Unknown error in handleDistributedRequest for ${this.endpoint}`)
       this.logger.error(err)
@@ -85,7 +82,7 @@ export abstract class CombinerService implements ICombinerService {
     }
   }
 
-  protected async forwardToSigners(request: Request) {
+  protected async forwardToSigners(request: Request<{}, {}, DistributedRequest>) {
     const obs = new PerformanceObserver((list) => {
       const entry = list.getEntries()[0]
       this.logger.info({ latency: entry, signer: entry!.name }, 'Signer response latency measured')
@@ -133,9 +130,13 @@ export abstract class CombinerService implements ICombinerService {
     return maxErrorCode > 0 ? maxErrorCode : null
   }
 
-  protected abstract combineSignerResponses(response: Response): Promise<void>
+  protected abstract combineSignerResponses(
+    request: Request<{}, {}, DistributedRequest>,
+    response: Response
+  ): Promise<void>
 
   protected abstract handleSuccessResponse(
+    request: Request<{}, {}, DistributedRequest>,
     data: string,
     status: number,
     url: string,
@@ -144,36 +145,40 @@ export abstract class CombinerService implements ICombinerService {
 
   private async fetchSignerResponse(
     signer: SignerService,
-    request: Request,
+    request: Request<{}, {}, DistributedRequest>,
     controller: AbortController
   ) {
-    let res: FetchResponse
+    let signerResponse: FetchResponse
     try {
-      res = await this.sendMeteredSignerRequest(signer, request, controller)
+      signerResponse = await this.sendMeteredSignerRequest(request, signer, controller)
     } catch (err) {
       return this.handleSignerRequestFailure(err, signer, controller)
     }
 
-    return this.handleSignerResponse(res, signer, controller)
+    return this.handleSignerResponse(request, signerResponse, signer, controller)
   }
 
   private async handleSignerResponse(
-    res: FetchResponse,
+    request: Request<{}, {}, DistributedRequest>,
+    signerResponse: FetchResponse,
     signer: SignerService,
     controller: AbortController
   ) {
-    if (!res.ok) {
-      return this.handleFailure(signer, res.status, controller)
+    if (!signerResponse.ok) {
+      return this.handleFailure(signer, signerResponse.status, controller)
     }
 
-    const data = await res.text()
-    this.logger.info({ signer, res: data, status: res.status }, 'received response from signer')
-    return this.handleSuccessResponse(data, res.status, signer.url, controller)
+    const data = await signerResponse.text()
+    this.logger.info(
+      { signer, res: data, status: signerResponse.status },
+      'received response from signer'
+    )
+    return this.handleSuccessResponse(request, data, signerResponse.status, signer.url, controller)
   }
 
   private async sendMeteredSignerRequest(
+    request: Request<{}, {}, DistributedRequest>,
     signer: SignerService,
-    request: Request,
     controller: AbortController
   ): Promise<FetchResponse> {
     const start = `Start ${signer.url}/${this.signerEndpoint}`
@@ -197,7 +202,7 @@ export abstract class CombinerService implements ICombinerService {
 
   private async sendRequest(
     signerUrl: string,
-    request: Request,
+    request: Request<{}, {}, DistributedRequest>,
     controller: AbortController
   ): Promise<FetchResponse> {
     this.logger.debug({ signerUrl }, `Sending signer request`)

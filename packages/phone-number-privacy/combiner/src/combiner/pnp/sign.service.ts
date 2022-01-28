@@ -1,5 +1,6 @@
 import {
   CombinerEndpoint,
+  GetBlindedMessageSigRequest,
   getSignerEndpoint,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   SignerEndpoint,
@@ -20,15 +21,15 @@ export class PnpSignService extends SignService {
   protected signerEndpoint: SignerEndpoint
   protected responses: PnpSignResponseWithStatus[]
 
-  public constructor(
-    _config: OdisConfig,
-    protected inputService: ICombinerInputService,
-    protected blindedMessage: string
-  ) {
-    super(_config, inputService, blindedMessage)
+  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+    super(config, inputService)
     this.endpoint = CombinerEndpoint.GET_BLINDED_MESSAGE_SIG
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
     this.responses = []
+  }
+
+  protected parseBlindedMessage(req: GetBlindedMessageSigRequest): string {
+    return req.blindedQueryPhoneNumber
   }
 
   protected parseSignature(res: SignerPnpResponse, signerUrl: string): string | undefined {
@@ -45,7 +46,7 @@ export class PnpSignService extends SignService {
     return res.signature
   }
 
-  // TODO(Alec)(Next): clean this up
+  // TODO(Alec): clean this up
   protected logResponseDiscrepancies(): void {
     // Only compare responses which have values for the quota fields
     const successes = this.responses.filter(

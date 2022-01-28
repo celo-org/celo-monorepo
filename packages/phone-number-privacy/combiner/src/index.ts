@@ -88,12 +88,7 @@ export const getBlindedMessageSig = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    const blindedMessage = 'TODO(Alec)(Next)'
-    const service = new PnpSignService(
-      config.phoneNumberPrivacy,
-      new PnpInputService(),
-      blindedMessage
-    )
+    const service = new PnpSignService(config.phoneNumberPrivacy, new PnpInputService())
     return meterResponse(
       service.handleDistributedRequest,
       req,
@@ -110,12 +105,7 @@ export const domainSign = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    const blindedMessage = 'TODO(Alec)(Next)'
-    const service = new DomainSignService(
-      config.domains,
-      new DomainSignInputService(),
-      blindedMessage
-    )
+    const service = new DomainSignService(config.domains, new DomainSignInputService())
     return meterResponse(service.handleDistributedRequest, req, res, Endpoint.DOMAIN_SIGN)
   })
 

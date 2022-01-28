@@ -1,6 +1,7 @@
 import {
   DomainRestrictedSignatureRequest,
   ErrorMessage,
+  GetBlindedMessageSigRequest,
   KEY_VERSION_HEADER,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -14,24 +15,29 @@ import { ICombinerInputService } from './input.interface'
 
 export type SignerSigResponse = SignerPnpResponse | DomainRestrictedSignatureRequest
 
+export type SigRequest = DomainRestrictedSignatureRequest | GetBlindedMessageSigRequest
+
 export abstract class SignService extends CombinerService {
   protected blsCryptoClient: BLSCryptographyClient
+  protected pubKey: string
+  protected keyVersion: number
+  protected polynomial: string
 
-  public constructor(
-    _config: OdisConfig,
-    protected inputService: ICombinerInputService,
-    protected blindedMessage: string
-  ) {
-    super(_config, inputService)
+  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+    super(config, inputService)
+    this.pubKey = config.keys.pubKey
+    this.keyVersion = config.keys.version
+    this.polynomial = config.keys.polynomial
     this.blsCryptoClient = new BLSCryptographyClient(this.threshold, this.pubKey, this.polynomial)
   }
 
-  protected async forwardToSigners(request: Request) {
+  protected async forwardToSigners(request: Request<{}, {}, SigRequest>) {
     request.headers[KEY_VERSION_HEADER] = this.keyVersion.toString()
     return super.forwardToSigners(request)
   }
 
   protected async handleSuccessResponse(
+    request: Request<{}, {}, SigRequest>,
     data: string,
     status: number,
     url: string,
@@ -55,7 +61,7 @@ export abstract class SignService extends CombinerService {
 
     this.logger.info({ signer: url }, 'Add signature')
     const signatureAdditionStart = Date.now()
-    await this.blsCryptoClient.addSignature({ url, signature })
+    this.blsCryptoClient.addSignature({ url, signature })
     this.logger.info(
       {
         signer: url,
@@ -68,7 +74,9 @@ export abstract class SignService extends CombinerService {
     // BLS threshold signatures can be combined without all partial signatures
     if (this.blsCryptoClient.hasSufficientSignatures()) {
       try {
-        await this.blsCryptoClient.combinePartialBlindedSignatures(this.blindedMessage)
+        await this.blsCryptoClient.combinePartialBlindedSignatures(
+          this.parseBlindedMessage(request.body)
+        )
         // Close outstanding requests
         controller.abort()
       } catch {
@@ -77,13 +85,16 @@ export abstract class SignService extends CombinerService {
     }
   }
 
-  protected async combineSignerResponses(response: Response<any>): Promise<void> {
+  protected async combineSignerResponses(
+    request: Request<{}, {}, SigRequest>,
+    response: Response
+  ): Promise<void> {
     this.logResponseDiscrepancies()
 
     if (this.blsCryptoClient.hasSufficientSignatures()) {
       try {
         const combinedSignature = await this.blsCryptoClient.combinePartialBlindedSignatures(
-          this.blindedMessage,
+          this.parseBlindedMessage(request.body),
           this.logger
         )
         response.json({ success: true, combinedSignature, version: VERSION })
@@ -100,6 +111,8 @@ export abstract class SignService extends CombinerService {
   protected abstract logResponseDiscrepancies(): void
 
   protected abstract parseSignature(res: SignerSigResponse, signerUrl: string): string | undefined
+
+  protected abstract parseBlindedMessage(req: SigRequest): string
 
   private handleMissingSignatures(majorityErrorCode: number | null, response: Response) {
     if (majorityErrorCode === 403) {

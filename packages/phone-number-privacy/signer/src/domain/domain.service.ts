@@ -12,7 +12,6 @@ import {
   DomainRestrictedSignatureResponseSuccess,
   ErrorMessage,
   isKnownDomain,
-  isSequentialDelayDomain,
   KEY_VERSION_HEADER,
   KnownDomain,
   KnownDomainState,
@@ -26,7 +25,7 @@ import { respondWithError } from '../common/error-utils'
 import { Counters } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { getTransaction } from '../database/database'
-import { DOMAINS_STATES_COLUMNS, DomainState } from '../database/models/domainState'
+import { DomainState, DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
 import { getDomainRequestExists, storeDomainRequest } from '../database/wrappers/domainRequest'
 import {
   getDomainState,
@@ -40,7 +39,7 @@ import { IDomainAuthService } from './auth/domainAuth.interface'
 import { IDomainService } from './domain.interface'
 import { IDomainQuotaService } from './quota/domainQuota.interface'
 
-// TODO(Alec)(Next): Carefully review this file
+// TODO(Alec): Carefully review this file
 
 export class DomainService implements IDomainService {
   public constructor(

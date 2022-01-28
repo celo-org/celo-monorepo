@@ -1,5 +1,6 @@
 import {
   CombinerEndpoint,
+  DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
   getSignerEndpoint,
   SignerEndpoint,
@@ -20,12 +21,8 @@ export class DomainSignService extends SignService {
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainSignResponseWithStatus[]
 
-  public constructor(
-    _config: OdisConfig,
-    protected inputService: ICombinerInputService,
-    protected blindedMessage: string
-  ) {
-    super(_config, inputService, blindedMessage)
+  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+    super(config, inputService)
     this.endpoint = CombinerEndpoint.DOMAIN_SIGN
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
     this.responses = []
@@ -48,8 +45,12 @@ export class DomainSignService extends SignService {
     return res.signature
   }
 
+  protected parseBlindedMessage(req: DomainRestrictedSignatureRequest): string {
+    return req.blindedMessage
+  }
+
   protected logResponseDiscrepancies(): void {
-    // TODO(Alec)(Next)
+    // TODO(Alec)
     throw new Error('Method not implemented.')
   }
 }

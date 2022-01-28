@@ -1,5 +1,6 @@
 import {
   CombinerEndpoint,
+  DomainQuotaStatusRequest,
   DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
   ErrorMessage,
@@ -8,7 +9,7 @@ import {
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { respondWithError } from '../../common/error-utils'
 import { OdisConfig, VERSION } from '../../config'
 import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
@@ -25,14 +26,15 @@ export class DomainQuotaStatusService extends CombinerService {
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainQuotaStatusResponseWithStatus[]
 
-  public constructor(_config: OdisConfig, protected inputService: ICombinerInputService) {
-    super(_config, inputService)
+  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+    super(config, inputService)
     this.endpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
     this.responses = []
   }
 
   protected async handleSuccessResponse(
+    _request: Request<{}, {}, DomainQuotaStatusRequest>,
     data: string,
     status: number,
     url: string,
@@ -61,7 +63,10 @@ export class DomainQuotaStatusService extends CombinerService {
     }
   }
 
-  protected async combineSignerResponses(response: Response<any>): Promise<void> {
+  protected async combineSignerResponses(
+    _request: Request<{}, {}, DomainQuotaStatusRequest>,
+    response: Response<any>
+  ): Promise<void> {
     if (this.responses.length >= this.threshold) {
       const domainQuotaStatus = this.findThresholdDomainState()
       response.json({ success: true, status: domainQuotaStatus, version: VERSION })
