@@ -265,7 +265,6 @@ export class DomainService implements IDomainService {
     return true
   }
 
-  // TODO(Alec)
   private nonceCheck(
     request: Request<{}, {}, DomainRequest>,
     response: Response,
@@ -273,21 +272,13 @@ export class DomainService implements IDomainService {
     endpoint: Endpoint,
     logger: Logger
   ): boolean {
-    // if (!domainState) {
-    //   domainState = createEmptyDomainState(request.body)
-
-    // }
-
-    if (domainState && !this.authService.nonceCheck(request.body, domainState, logger)) {
+    if (!domainState) {
+      domainState = DomainState.createEmptyDomainState(request.body.domain)
+    }
+    if (!this.authService.nonceCheck(request.body, domainState, logger)) {
       respondWithError(endpoint, response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return false
     }
     return true
-
-    // if (domainState && !this.authService.nonceCheck(request.body, domainState, logger)) {
-    //   respondWithError(endpoint, response, 401, WarningMessage.UNAUTHENTICATED_USER)
-    //   return false
-    // }
-    // return true
   }
 }
