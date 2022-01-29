@@ -225,7 +225,7 @@ export class DomainService implements IDomainService {
           version: getVersion(),
           signature,
         }
-        response.json(signMessageResponseSuccess)
+        response.set(KEY_VERSION_HEADER, key.version.toString()).json(signMessageResponseSuccess)
       } catch (err) {
         trx.rollback()
         throw err
