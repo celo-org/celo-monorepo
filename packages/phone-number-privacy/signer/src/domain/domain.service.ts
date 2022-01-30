@@ -155,9 +155,15 @@ export class DomainService implements IDomainService {
       hash: domainHash(domain),
     })
 
+    let keyVersion = Number(request.headers[KEY_VERSION_HEADER])
+    if (Number.isNaN(keyVersion)) {
+      logger.warn('Supplied keyVersion in request header is NaN')
+      keyVersion = config.keystore.keys.domains.latest
+    }
+
     const key: Key = {
       name: DefaultKeyName.DOMAINS,
-      version: Number(request.headers[KEY_VERSION_HEADER]) ?? config.keystore.keys.domains.latest,
+      version: keyVersion,
     }
 
     try {

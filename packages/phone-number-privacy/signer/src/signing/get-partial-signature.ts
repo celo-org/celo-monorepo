@@ -40,10 +40,15 @@ export async function handleGetBlindedMessagePartialSig(
   logger.info({ request: request.body }, 'Request received')
   logger.debug('Begin handleGetBlindedMessagePartialSig')
 
+  let keyVersion = Number(request.headers[KEY_VERSION_HEADER])
+  if (Number.isNaN(keyVersion)) {
+    logger.warn('Supplied keyVersion in request header is NaN')
+    keyVersion = config.keystore.keys.phoneNumberPrivacy.latest
+  }
+
   const key: Key = {
     name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
-    version:
-      Number(request.headers[KEY_VERSION_HEADER]) ?? config.keystore.keys.phoneNumberPrivacy.latest,
+    version: keyVersion,
   }
 
   try {
