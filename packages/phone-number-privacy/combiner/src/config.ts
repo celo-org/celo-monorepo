@@ -1,16 +1,9 @@
 import { OdisUtils } from '@celo/identity'
-import { rootLogger as logger, toBool } from '@celo/phone-number-privacy-common'
+import { rootLogger as logger, TestUtils, toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 export const VERSION = process.env.npm_package_version
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
-
-export const DEV_PUBLIC_KEY =
-  '1f33136ac029a702eb041096bd9ef09dc9c368dde52a972866bdeaff0896f8596b74ab7adfd7318bba38527599768400df44bcab66bcf3843c17a2ce838bcd5a8ba1634c18314ff0565a7c769905b8a8fba27a86bf4c6cb22df89e1badfe2b81'
-export const DEV_PRIVATE_KEY =
-  '00000000dd0005bf4de5f2f052174f5cf58dae1af1d556c7f7f85d6fb3656e1d0f10720f'
-export const DEV_POLYNOMIAL =
-  '01000000000000001f33136ac029a702eb041096bd9ef09dc9c368dde52a972866bdeaff0896f8596b74ab7adfd7318bba38527599768400df44bcab66bcf3843c17a2ce838bcd5a8ba1634c18314ff0565a7c769905b8a8fba27a86bf4c6cb22df89e1badfe2b81'
 
 export const FORNO_ALFAJORES = 'https://alfajores-forno.celo-testnet.org'
 
@@ -78,8 +71,8 @@ if (DEV_MODE) {
       keys: {
         version: 1,
         threshold: 1,
-        polynomial: DEV_POLYNOMIAL,
-        pubKey: DEV_PUBLIC_KEY,
+        polynomial: TestUtils.Values.PNP_DEV_ODIS_POLYNOMIAL,
+        pubKey: TestUtils.Values.PNP_DEV_ODIS_PUBLIC_KEY,
       },
     },
     domains: {
@@ -92,8 +85,8 @@ if (DEV_MODE) {
       keys: {
         version: 1,
         threshold: 1,
-        polynomial: DEV_POLYNOMIAL,
-        pubKey: DEV_PUBLIC_KEY,
+        polynomial: TestUtils.Values.DOMAINS_DEV_ODIS_POLYNOMIAL,
+        pubKey: TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY,
       },
     },
   }

@@ -1,7 +1,6 @@
+import { rootLogger, TestUtils } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import { computeBlindedSignature } from '../../src/bls/bls-cryptography-client'
-import { DEV_POLYNOMIAL, DEV_PRIVATE_KEY, DEV_PUBLIC_KEY } from '../../src/config'
-import { rootLogger } from '@celo/phone-number-privacy-common'
 
 describe(`BLS service computes signature`, () => {
   it('provides blinded signature', async () => {
@@ -14,14 +13,18 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const actual = await computeBlindedSignature(blindedMsg, DEV_PRIVATE_KEY, rootLogger())
+    const actual = await computeBlindedSignature(
+      blindedMsg,
+      TestUtils.Values.PNP_DEV_SIGNER_PRIVATE_KEY,
+      rootLogger()
+    )
     expect(actual).toEqual(
       'MAAAAAAAAADDilSaA/xvbtE4NV3agMzHIf8PGPQ83Cu8gQy5E2mRWyUIges8bjE4EBe1L7pcY4AAAAAA'
     )
 
     expect(
       threshold_bls.partialVerifyBlindSignature(
-        Buffer.from(DEV_POLYNOMIAL, 'hex'),
+        Buffer.from(TestUtils.Values.PNP_DEV_ODIS_POLYNOMIAL, 'hex'),
         blindedMsgResult.message,
         Buffer.from(actual, 'base64')
       )
@@ -32,7 +35,7 @@ describe(`BLS service computes signature`, () => {
       combinedSignature,
       blindedMsgResult.blindingFactor
     )
-    const publicKey = Buffer.from(DEV_PUBLIC_KEY, 'hex')
+    const publicKey = Buffer.from(TestUtils.Values.PNP_DEV_ODIS_PUBLIC_KEY, 'hex')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
 
@@ -40,6 +43,8 @@ describe(`BLS service computes signature`, () => {
     const blindedMsg = Buffer.from('invalid blinded message').toString('base64')
 
     expect.assertions(1)
-    await expect(() => computeBlindedSignature(blindedMsg, DEV_PRIVATE_KEY, rootLogger())).toThrow()
+    await expect(() =>
+      computeBlindedSignature(blindedMsg, TestUtils.Values.PNP_DEV_SIGNER_PRIVATE_KEY, rootLogger())
+    ).toThrow()
   })
 })
