@@ -8,12 +8,11 @@ import {
   KnownDomainState,
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
-import AbortController from 'abort-controller'
 import { Request, Response } from 'express'
 import { respondWithError } from '../../common/error-utils'
 import { OdisConfig, VERSION } from '../../config'
 import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
-import { ICombinerInputService } from '../input.interface'
+import { IInputService } from '../input.interface'
 
 interface DomainQuotaStatusResponseWithStatus extends SignerResponseWithStatus {
   url: string
@@ -26,7 +25,7 @@ export class DomainQuotaStatusService extends CombinerService {
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainQuotaStatusResponseWithStatus[]
 
-  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+  public constructor(config: OdisConfig, protected inputService: IInputService) {
     super(config, inputService)
     this.endpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
@@ -37,8 +36,7 @@ export class DomainQuotaStatusService extends CombinerService {
     _request: Request<{}, {}, DomainQuotaStatusRequest>,
     data: string,
     status: number,
-    url: string,
-    controller: AbortController
+    url: string
   ): Promise<void> {
     const res = JSON.parse(data)
 
@@ -55,12 +53,6 @@ export class DomainQuotaStatusService extends CombinerService {
 
     this.logger.info({ signer: url }, `Signer request successful`)
     this.responses.push({ url, res, status })
-
-    if (this.signerEndpoint === SignerEndpoint.DISABLE_DOMAIN) {
-      if (this.responses.length >= this.threshold) {
-        controller.abort()
-      }
-    }
   }
 
   protected async combineSignerResponses(

@@ -8,7 +8,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { OdisConfig } from '../../config'
 import { SignerPnpResponse, SignerResponseWithStatus } from '../combiner.service'
-import { ICombinerInputService } from '../input.interface'
+import { IInputService } from '../input.interface'
 import { SignService } from '../sign.service'
 
 interface PnpSignResponseWithStatus extends SignerResponseWithStatus {
@@ -21,7 +21,7 @@ export class PnpSignService extends SignService {
   protected signerEndpoint: SignerEndpoint
   protected responses: PnpSignResponseWithStatus[]
 
-  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+  public constructor(config: OdisConfig, protected inputService: IInputService) {
     super(config, inputService)
     this.endpoint = CombinerEndpoint.GET_BLINDED_MESSAGE_SIG
     this.signerEndpoint = getSignerEndpoint(this.endpoint)

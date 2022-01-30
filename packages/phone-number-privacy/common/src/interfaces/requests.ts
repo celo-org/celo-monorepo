@@ -37,6 +37,15 @@ export interface GetBlindedMessageSigRequest {
   version?: string
 }
 
+// export const GetBlindedMessageSigRequestSchema: t.Type<GetBlindedMessageSigRequest> = t.type({
+//   account: t.string,
+//   authenticationMethod: eip712OptionalSchema(t.string), // TODO(Alec); figure out how to represent enums
+//   blindedQueryPhoneNumber: t.string,
+//   hashedPhoneNumber: eip712OptionalSchema(t.string),
+//   sessionID: eip712OptionalSchema(t.string),
+//   version: eip712OptionalSchema(t.string),
+// })
+
 export interface GetContactMatchesRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
@@ -50,6 +59,17 @@ export interface GetContactMatchesRequest {
   version?: string
 }
 
+// export const GetContactMatchesRequestSchema: t.Type<GetContactMatchesRequest> = t.type({
+//   account: t.string,
+//   authenticationMethod: eip712OptionalSchema(t.string), // TODO(Alec); figure out how to represent enums
+//   userPhoneNumber: t.string,
+//   contactPhoneNumbers: t.array(t.string),
+//   hashedPhoneNumber: t.string,
+//   signedUserPhoneNumber: eip712OptionalSchema(t.string),
+//   sessionID: eip712OptionalSchema(t.string),
+//   version: eip712OptionalSchema(t.string),
+// })
+
 export interface GetQuotaRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
@@ -59,6 +79,14 @@ export interface GetQuotaRequest {
   /** Client-specified version string */
   version?: string
 }
+
+// export const GetQuotaRequestSchema: t.Type<GetQuotaRequest> = t.type({
+//   account: t.string,
+//   authenticationMethod: eip712OptionalSchema(t.string), // TODO(Alec); figure out how to represent enums
+//   hashedPhoneNumber: eip712OptionalSchema(t.string),
+//   sessionID: eip712OptionalSchema(t.string),
+//   version: eip712OptionalSchema(t.string),
+// })
 
 export type PhoneNumberPrivacyRequest =
   | GetBlindedMessageSigRequest
@@ -94,6 +122,10 @@ export type DomainRestrictedSignatureRequest<
   'options'
 >
 
+// export const DomainRestrictedSignatureRequestSchema: t.Type<DomainRestrictedSignatureRequest> = t.Type({
+//   // TODO(Alec)
+// })
+
 /**
  * Request to get the quota status of the given domain. ODIS will respond with the current state
  * relevant to calculating quota under the associated rate limiting rules.
@@ -120,6 +152,10 @@ export type DomainQuotaStatusRequest<
   'options'
 >
 
+// export const DomainQuotaStatusRequestSchema: t.Type<DomainQuotaStatusRequest> = t.Type({
+//   // TODO(Alec)
+// })
+
 /**
  * Request to disable a domain such that not further requests for signatures in the given domain
  * will be served. Available for domains which need to option to prevent further requests for
@@ -145,6 +181,10 @@ export type DisableDomainRequest<
   },
   'options'
 >
+
+// export const DisableDomainRequestSchema: t.Type<DisableDomainRequest> = t.Type({
+//   // TODO(Alec)
+// })
 
 /** Union type of Domain API requests */
 export type DomainRequest<

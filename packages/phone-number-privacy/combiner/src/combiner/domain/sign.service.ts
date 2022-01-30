@@ -7,7 +7,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { OdisConfig } from '../../config'
 import { SignerResponseWithStatus } from '../combiner.service'
-import { ICombinerInputService } from '../input.interface'
+import { IInputService } from '../input.interface'
 import { SignService } from '../sign.service'
 
 interface DomainSignResponseWithStatus extends SignerResponseWithStatus {
@@ -21,7 +21,7 @@ export class DomainSignService extends SignService {
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainSignResponseWithStatus[]
 
-  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+  public constructor(config: OdisConfig, protected inputService: IInputService) {
     super(config, inputService)
     this.endpoint = CombinerEndpoint.DOMAIN_SIGN
     this.signerEndpoint = getSignerEndpoint(this.endpoint)

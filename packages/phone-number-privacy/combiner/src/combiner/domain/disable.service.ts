@@ -11,7 +11,7 @@ import { Request, Response } from 'express'
 import { respondWithError } from '../../common/error-utils'
 import { OdisConfig, VERSION } from '../../config'
 import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
-import { ICombinerInputService } from '../input.interface'
+import { IInputService } from '../input.interface'
 
 interface DomainDisableResponseWithStatus extends SignerResponseWithStatus {
   url: string
@@ -24,7 +24,7 @@ export class DomainDisableService extends CombinerService {
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainDisableResponseWithStatus[]
 
-  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+  public constructor(config: OdisConfig, protected inputService: IInputService) {
     super(config, inputService)
     this.endpoint = CombinerEndpoint.DISABLE_DOMAIN
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
@@ -48,10 +48,8 @@ export class DomainDisableService extends CombinerService {
     this.logger.info({ signer: url }, `Signer request successful`)
     this.responses.push({ url, res, status })
 
-    if (this.signerEndpoint === SignerEndpoint.DISABLE_DOMAIN) {
-      if (this.responses.length >= this.threshold) {
-        controller.abort()
-      }
+    if (this.responses.length >= this.threshold) {
+      controller.abort()
     }
   }
 

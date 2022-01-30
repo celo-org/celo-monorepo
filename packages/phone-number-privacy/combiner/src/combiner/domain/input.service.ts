@@ -10,17 +10,15 @@ import {
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
-import { ICombinerInputService } from '../input.interface'
+import { IInputService } from '../input.interface'
 
 // tslint:disable: max-classes-per-file
 
-export abstract class DomainInputService implements ICombinerInputService {
+export abstract class DomainInputService implements IInputService {
   validate(request: Request<{}, {}, DomainRequest>): boolean {
     return isKnownDomain(request.body.domain)
   }
-  abstract authenticate(
-    request: Request<{}, {}, DomainRestrictedSignatureRequest<KnownDomain>>
-  ): Promise<boolean>
+  abstract authenticate(request: Request<{}, {}, DomainRequest>): Promise<boolean>
 }
 
 export class DomainSignInputService extends DomainInputService {

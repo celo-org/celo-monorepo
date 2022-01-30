@@ -9,9 +9,9 @@ import {
 import Logger from 'bunyan'
 import { Request } from 'express'
 import { getContractKit } from '../../web3/contracts'
-import { ICombinerInputService } from '../input.interface'
+import { IInputService } from '../input.interface'
 
-export class PnpInputService implements ICombinerInputService {
+export class PnpInputService implements IInputService {
   validate(request: Request<{}, {}, GetBlindedMessageSigRequest>): boolean {
     return (
       hasValidAccountParam(request.body) &&
@@ -20,6 +20,7 @@ export class PnpInputService implements ICombinerInputService {
       isBodyReasonablySized(request.body)
     )
   }
+
   authenticate(
     request: Request<{}, {}, GetBlindedMessageSigRequest>,
     logger: Logger

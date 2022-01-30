@@ -18,7 +18,7 @@ export enum ErrorMessage {
   SIGNER_DISABLE_DOMAIN_FAILURE = `CELO_ODIS_ERR_16 DOMAIN Failed to disable domain on a signer`,
   THRESHOLD_DISABLE_DOMAIN_FAILURE = `CELO_ODIS_ERR_17 DOMAIN Failed to disable domain on a threshold of signers`,
   SIGNER_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_18 DOMAIN Failed to get domain status from signer`,
-  THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_17 DOMAIN Failed to get domain quota status from a threshold of signers`,
+  THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_19 DOMAIN Failed to get domain quota status from a threshold of signers`,
 }
 
 export enum WarningMessage {
@@ -35,4 +35,5 @@ export enum WarningMessage {
   INVALID_USER_PHONE_NUMBER_SIGNATURE = 'CELO_ODIS_WARN_10 BAD_INPUT User phone number signature is invalid',
   UNKNOWN_DOMAIN = 'CELO_ODIS_WARN_11 BAD_INPUT Provided domain name and version is not recognized',
   DISABLED_DOMAIN = 'CELO_ODIS_WARN_12 BAD_INPUT Provided domain is disabled',
+  INVALID_KEY_HEADER = `CELO_ODIS_WARN_13 BAD_INPUT Provided key version header is invalid`,
 }

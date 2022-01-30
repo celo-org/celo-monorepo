@@ -16,7 +16,7 @@ import fetch, { Response as FetchResponse } from 'node-fetch'
 import { respondWithError } from '../common/error-utils'
 import { OdisConfig } from '../config'
 import { DistributedRequest, ICombinerService } from './combiner.interface'
-import { ICombinerInputService } from './input.interface'
+import { IInputService } from './input.interface'
 
 export type SignerPnpResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
@@ -48,7 +48,7 @@ export abstract class CombinerService implements ICombinerService {
   protected abstract signerEndpoint: SignerEndpoint
   protected abstract responses: SignerResponseWithStatus[]
 
-  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+  public constructor(config: OdisConfig, protected io: IInputService) {
     this.logger = rootLogger()
     this.failedSigners = new Set<string>()
     this.errorCodes = new Map<number, number>()
@@ -64,15 +64,9 @@ export abstract class CombinerService implements ICombinerService {
   ) {
     this.logger = response.locals.logger
     try {
-      if (!this.inputService.validate(request)) {
-        respondWithError(response, 400, WarningMessage.INVALID_INPUT, this.logger)
+      if (!(await this.inputCheck(request, response))) {
         return
       }
-      if (!(await this.inputService.authenticate(request))) {
-        respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, this.logger)
-        return
-      }
-
       await this.forwardToSigners(request)
       await this.combineSignerResponses(request, response)
     } catch (err) {
@@ -80,6 +74,21 @@ export abstract class CombinerService implements ICombinerService {
       this.logger.error(err)
       respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, this.logger)
     }
+  }
+
+  protected async inputCheck(
+    request: Request<{}, {}, DistributedRequest>,
+    response: Response
+  ): Promise<boolean> {
+    if (!this.io.validate(request, this.logger)) {
+      respondWithError(response, 400, WarningMessage.INVALID_INPUT, this.logger)
+      return false
+    }
+    if (!(await this.io.authenticate(request, this.logger))) {
+      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, this.logger)
+      return false
+    }
+    return true
   }
 
   protected async forwardToSigners(request: Request<{}, {}, DistributedRequest>) {
@@ -140,7 +149,7 @@ export abstract class CombinerService implements ICombinerService {
     data: string,
     status: number,
     url: string,
-    controller: AbortController
+    controller?: AbortController
   ): Promise<void>
 
   private async fetchSignerResponse(

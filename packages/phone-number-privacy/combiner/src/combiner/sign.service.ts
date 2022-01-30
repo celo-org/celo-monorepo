@@ -11,11 +11,11 @@ import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { OdisConfig, VERSION } from '../config'
 import { CombinerService, SignerPnpResponse } from './combiner.service'
-import { ICombinerInputService } from './input.interface'
+import { IInputService } from './input.interface'
 
 export type SignerSigResponse = SignerPnpResponse | DomainRestrictedSignatureRequest
 
-export type SigRequest = DomainRestrictedSignatureRequest | GetBlindedMessageSigRequest
+export type SignRequest = DomainRestrictedSignatureRequest | GetBlindedMessageSigRequest
 
 export abstract class SignService extends CombinerService {
   protected blsCryptoClient: BLSCryptographyClient
@@ -23,7 +23,7 @@ export abstract class SignService extends CombinerService {
   protected keyVersion: number
   protected polynomial: string
 
-  public constructor(config: OdisConfig, protected inputService: ICombinerInputService) {
+  public constructor(config: OdisConfig, protected inputService: IInputService) {
     super(config, inputService)
     this.pubKey = config.keys.pubKey
     this.keyVersion = config.keys.version
@@ -31,13 +31,19 @@ export abstract class SignService extends CombinerService {
     this.blsCryptoClient = new BLSCryptographyClient(this.threshold, this.pubKey, this.polynomial)
   }
 
-  protected async forwardToSigners(request: Request<{}, {}, SigRequest>) {
-    request.headers[KEY_VERSION_HEADER] = this.keyVersion.toString()
-    return super.forwardToSigners(request)
+  protected async inputCheck(
+    request: Request<{}, {}, SignRequest>,
+    response: Response
+  ): Promise<boolean> {
+    if (Number(request.headers[KEY_VERSION_HEADER]) !== this.keyVersion) {
+      respondWithError(response, 400, WarningMessage.INVALID_KEY_HEADER, this.logger)
+      return false
+    }
+    return super.inputCheck(request, response)
   }
 
   protected async handleSuccessResponse(
-    request: Request<{}, {}, SigRequest>,
+    request: Request<{}, {}, SignRequest>,
     data: string,
     status: number,
     url: string,
@@ -86,7 +92,7 @@ export abstract class SignService extends CombinerService {
   }
 
   protected async combineSignerResponses(
-    request: Request<{}, {}, SigRequest>,
+    request: Request<{}, {}, SignRequest>,
     response: Response
   ): Promise<void> {
     this.logResponseDiscrepancies()
@@ -112,7 +118,7 @@ export abstract class SignService extends CombinerService {
 
   protected abstract parseSignature(res: SignerSigResponse, signerUrl: string): string | undefined
 
-  protected abstract parseBlindedMessage(req: SigRequest): string
+  protected abstract parseBlindedMessage(req: SignRequest): string
 
   private handleMissingSignatures(majorityErrorCode: number | null, response: Response) {
     if (majorityErrorCode === 403) {
