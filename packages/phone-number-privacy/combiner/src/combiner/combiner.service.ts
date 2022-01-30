@@ -43,6 +43,7 @@ export abstract class CombinerService implements ICombinerService {
   protected signers: SignerService[]
   protected timeoutMs: number
   protected threshold: number
+  protected enabled: boolean
   protected logger: Logger
   protected abstract endpoint: CombinerEndpoint
   protected abstract signerEndpoint: SignerEndpoint
@@ -56,6 +57,7 @@ export abstract class CombinerService implements ICombinerService {
     this.signers = JSON.parse(config.odisServices.signers)
     this.timeoutMs = config.odisServices.timeoutMilliSeconds
     this.threshold = config.keys.threshold
+    this.enabled = config.enabled
   }
 
   public async handleDistributedRequest(
@@ -80,6 +82,10 @@ export abstract class CombinerService implements ICombinerService {
     request: Request<{}, {}, DistributedRequest>,
     response: Response
   ): Promise<boolean> {
+    if (!this.enabled) {
+      respondWithError(response, 501, WarningMessage.API_UNAVAILABLE, this.logger)
+      return false
+    }
     if (!this.io.validate(request, this.logger)) {
       respondWithError(response, 400, WarningMessage.INVALID_INPUT, this.logger)
       return false

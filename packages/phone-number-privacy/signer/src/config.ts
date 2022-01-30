@@ -42,6 +42,14 @@ interface Config {
     minEuroBalance: BigNumber
     minCeloBalance: BigNumber
   }
+  api: {
+    domains: {
+      enabled: boolean
+    }
+    phoneNumberPrivacy: {
+      enabled: boolean
+    }
+  }
   attestations: {
     numberAttestationsRequired: number
   }
@@ -109,6 +117,14 @@ const config: Config = {
     minEuroBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 1e16),
     // Min balance is .005 CELO
     minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 5e15),
+  },
+  api: {
+    domains: {
+      enabled: toBool(env.DOMAINS_API_ENABLED, false),
+    },
+    phoneNumberPrivacy: {
+      enabled: toBool(env.PHONE_NUMBER_PRIVACY_API_ENABLED, false),
+    },
   },
   attestations: {
     numberAttestationsRequired: toNum(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED) || 3,

@@ -36,4 +36,5 @@ export enum WarningMessage {
   UNKNOWN_DOMAIN = 'CELO_ODIS_WARN_11 BAD_INPUT Provided domain name and version is not recognized',
   DISABLED_DOMAIN = 'CELO_ODIS_WARN_12 BAD_INPUT Provided domain is disabled',
   INVALID_KEY_HEADER = `CELO_ODIS_WARN_13 BAD_INPUT Provided key version header is invalid`,
+  API_UNAVAILABLE = `CELO_ODIS_WARN_14 BAD_INPUT API is unavailable`,
 }

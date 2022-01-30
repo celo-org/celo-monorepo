@@ -151,6 +151,8 @@ async function helmParameters(celoEnv: string, context: string) {
     `--set keystore.domainsKeyNameBase=${keyVaultConfig.domainsKeyNameBase}`,
     `--set keystore.pnpKeyLatestVersion=${keyVaultConfig.pnpKeyLatestVersion}`,
     `--set keystore.domainsKeyLatestVersion=${keyVaultConfig.domainsKeyLatestVersion}`,
+    `--set api.pnpAPIEnabled=${fetchEnv(envVar.ODIS_SIGNER_PNP_API_ENABLED)}`,
+    `--set api.domainsAPIEnabled=${fetchEnv(envVar.ODIS_SIGNER_DOMAINS_API_ENABLED)}`,
     `--set blockchainProvider=${fetchEnv(envVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER)}`,
     `--set log.level=${loggingConfig.level}`,
     `--set log.format=${loggingConfig.format}`,

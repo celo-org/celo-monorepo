@@ -34,6 +34,7 @@ interface DatabaseConfig {
 }
 
 export interface OdisConfig {
+  enabled: boolean
   odisServices: {
     signers: string
     timeoutMilliSeconds: number
@@ -68,6 +69,7 @@ if (DEV_MODE) {
       ssl: false,
     },
     phoneNumberPrivacy: {
+      enabled: true,
       odisServices: {
         signers:
           '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
@@ -81,6 +83,7 @@ if (DEV_MODE) {
       },
     },
     domains: {
+      enabled: true,
       odisServices: {
         signers:
           '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
@@ -108,6 +111,7 @@ if (DEV_MODE) {
       ssl: toBool(functionConfig.db.ssl, true),
     },
     phoneNumberPrivacy: {
+      enabled: toBool(functionConfig.phoneNumberPrivacy.enabled, false),
       odisServices: {
         signers: functionConfig.phoneNumberPrivacy.odisservices.signers,
         timeoutMilliSeconds:
@@ -121,6 +125,7 @@ if (DEV_MODE) {
       },
     },
     domains: {
+      enabled: toBool(functionConfig.domains.enabled, false),
       odisServices: {
         signers: functionConfig.domains.odisservices.signers,
         timeoutMilliSeconds: functionConfig.domains.odisservices.timeoutMilliSeconds ?? 5 * 1000,

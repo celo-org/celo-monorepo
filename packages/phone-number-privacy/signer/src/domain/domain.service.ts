@@ -52,6 +52,12 @@ export class DomainService implements IDomainService {
     response: Response<DisableDomainResponse>
   ): Promise<void> {
     const endpoint = Endpoint.DISABLE_DOMAIN
+
+    if (!config.api.domains.enabled) {
+      respondWithError(endpoint, response, 501, WarningMessage.API_UNAVAILABLE)
+      return
+    }
+
     Counters.requests.labels(endpoint).inc()
 
     const logger = response.locals.logger
@@ -92,6 +98,12 @@ export class DomainService implements IDomainService {
     response: Response<DomainQuotaStatusResponse>
   ): Promise<void> {
     const endpoint = Endpoint.DOMAIN_QUOTA_STATUS
+
+    if (!config.api.domains.enabled) {
+      respondWithError(endpoint, response, 501, WarningMessage.API_UNAVAILABLE)
+      return
+    }
+
     Counters.requests.labels(endpoint).inc()
 
     const logger = response.locals.logger
@@ -140,6 +152,12 @@ export class DomainService implements IDomainService {
     response: Response<DomainRestrictedSignatureResponse>
   ): Promise<void> {
     const endpoint = Endpoint.DOMAIN_SIGN
+
+    if (!config.api.domains.enabled) {
+      respondWithError(endpoint, response, 501, WarningMessage.API_UNAVAILABLE)
+      return
+    }
+
     Counters.requests.labels(endpoint).inc()
 
     const logger = response.locals.logger
