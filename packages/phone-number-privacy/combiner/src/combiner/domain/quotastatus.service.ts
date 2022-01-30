@@ -64,7 +64,6 @@ export class DomainQuotaStatusService extends CombinerService {
       response.json({ success: true, status: domainQuotaStatus, version: VERSION })
       return
     }
-
     respondWithError(
       response,
       this.getMajorityErrorCode() ?? 500,

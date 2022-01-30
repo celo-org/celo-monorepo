@@ -7,6 +7,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import { Request, Response } from 'express'
+import { HeaderInit } from 'node-fetch'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
 import { OdisConfig, VERSION } from '../config'
@@ -35,11 +36,19 @@ export abstract class SignService extends CombinerService {
     request: Request<{}, {}, SignRequest>,
     response: Response
   ): Promise<boolean> {
-    if (Number(request.headers[KEY_VERSION_HEADER]) !== this.keyVersion) {
+    const reqKeyVersion = request.headers[KEY_VERSION_HEADER]
+    if (reqKeyVersion && Number(reqKeyVersion) !== this.keyVersion) {
       respondWithError(response, 400, WarningMessage.INVALID_KEY_HEADER, this.logger)
       return false
     }
     return super.inputCheck(request, response)
+  }
+
+  protected headers(request: Request<{}, {}, GetBlindedMessageSigRequest>): HeaderInit | undefined {
+    return {
+      ...super.headers(request),
+      [KEY_VERSION_HEADER]: this.keyVersion.toString(),
+    }
   }
 
   protected async handleSuccessResponse(
@@ -54,7 +63,7 @@ export abstract class SignService extends CombinerService {
     const resKeyVersion: number = Number(res.header(KEY_VERSION_HEADER))
     this.logger.info({ resKeyVersion }, 'Signer responded with key version')
     if (resKeyVersion !== this.keyVersion) {
-      throw new Error(`Incorrect key version received from signer ${url}`)
+      throw new Error(`Incorrect key version received from signer ${url}`) // TODO(Alec): Better error
     }
 
     const signature = this.parseSignature(res, url)

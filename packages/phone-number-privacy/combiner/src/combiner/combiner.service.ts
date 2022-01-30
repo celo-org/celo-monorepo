@@ -12,7 +12,7 @@ import {
 import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import fetch, { Response as FetchResponse } from 'node-fetch'
+import fetch, { HeaderInit, Response as FetchResponse } from 'node-fetch'
 import { respondWithError } from '../common/error-utils'
 import { OdisConfig } from '../config'
 import { DistributedRequest, ICombinerService } from './combiner.interface'
@@ -113,6 +113,28 @@ export abstract class CombinerService implements ICombinerService {
     obs.disconnect()
   }
 
+  protected headers(_request: Request<{}, {}, DistributedRequest>): HeaderInit | undefined {
+    return {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    }
+  }
+
+  protected async sendRequest(
+    signerUrl: string,
+    request: Request<{}, {}, DistributedRequest>,
+    controller: AbortController
+  ): Promise<FetchResponse> {
+    this.logger.debug({ signerUrl }, `Sending signer request`)
+    const url = signerUrl + this.signerEndpoint
+    return fetch(url, {
+      method: 'POST',
+      headers: this.headers(request),
+      body: JSON.stringify(request.body),
+      signal: controller.signal,
+    })
+  }
+
   protected getMajorityErrorCode() {
     // Ignore timeouts
     const ignoredErrorCodes = [408]
@@ -207,25 +229,6 @@ export abstract class CombinerService implements ICombinerService {
         performance.mark(end)
         performance.measure(signer.url, start, end)
       })
-  }
-
-  private async sendRequest(
-    signerUrl: string,
-    request: Request<{}, {}, DistributedRequest>,
-    controller: AbortController
-  ): Promise<FetchResponse> {
-    this.logger.debug({ signerUrl }, `Sending signer request`)
-    const url = signerUrl + this.signerEndpoint
-    return fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: request.headers.authorization!,
-      },
-      body: JSON.stringify(request.body),
-      signal: controller.signal,
-    })
   }
 
   private handleFailure(

@@ -6,6 +6,8 @@ import {
   SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { Request } from 'express'
+import { HeaderInit } from 'node-fetch'
 import { OdisConfig } from '../../config'
 import { SignerPnpResponse, SignerResponseWithStatus } from '../combiner.service'
 import { IInputService } from '../input.interface'
@@ -26,6 +28,13 @@ export class PnpSignService extends SignService {
     this.endpoint = CombinerEndpoint.GET_BLINDED_MESSAGE_SIG
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
     this.responses = []
+  }
+
+  protected headers(request: Request<{}, {}, GetBlindedMessageSigRequest>): HeaderInit | undefined {
+    return {
+      ...super.headers(request),
+      Authorization: request.headers.authorization!,
+    }
   }
 
   protected parseBlindedMessage(req: GetBlindedMessageSigRequest): string {
