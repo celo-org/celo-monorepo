@@ -10,7 +10,7 @@ import {
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
+import { DomainState, DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
 import { IDomainAuthService } from './domainAuth.interface'
 
 // TODO(Alec): Should we standardize this pattern accross signer / combiner?
@@ -50,10 +50,10 @@ export class DomainAuthService implements IDomainAuthService {
       logger.info('Nonce is undefined')
       return false
     }
-    const currentNonce = domainState[DOMAINS_STATES_COLUMNS.counter]
+    let currentNonce = domainState[DOMAINS_STATES_COLUMNS.counter]
     if (!currentNonce) {
       logger.info('Counter is undefined')
-      return true
+      currentNonce = 0
     }
     return nonce.value >= currentNonce
   }
