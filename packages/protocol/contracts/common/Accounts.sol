@@ -334,7 +334,9 @@ contract Accounts is
 
   /**
    * @notice Gets validator payment delegation settings.
-   * @return Beneficiary address and fraction of payment delegated.
+   * @param address of the validator.
+   * @return Beneficiary address.
+   * @return 24 decimal fraction of payment delegated.
    */
   function getPaymentDelegation(address account) external view returns (address, uint256) {
     PaymentDelegation storage delegation = paymentDelegations[account];
