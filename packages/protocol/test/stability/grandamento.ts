@@ -1167,7 +1167,7 @@ contract('GrandaMento', (accounts: string[]) => {
   })
 
   describe('#setVetoPeriodSeconds', () => {
-    const newVetoPeriodSeconds = 60 * 60 * 24 * 7 // 7 days
+    const newVetoPeriodSeconds = SECONDS_IN_A_WEEK
     it('sets the spread', async () => {
       await grandaMento.setVetoPeriodSeconds(newVetoPeriodSeconds)
       assertEqualBN(await grandaMento.vetoPeriodSeconds(), newVetoPeriodSeconds)
@@ -1184,7 +1184,7 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts when the veto period is greater than 4 weeks', async () => {
-      const fourWeeks = 60 * 60 * 24 * 7 * 4
+      const fourWeeks = SECONDS_IN_A_WEEK * 4
       await assertRevertWithReason(
         grandaMento.setVetoPeriodSeconds(fourWeeks + 1),
         'Veto period cannot exceed 4 weeks'
