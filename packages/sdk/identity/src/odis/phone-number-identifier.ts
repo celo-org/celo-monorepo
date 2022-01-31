@@ -8,6 +8,7 @@ import {
   AuthenticationMethod,
   AuthSigner,
   CombinerSignMessageResponse,
+  EncryptionKeySigner,
   queryOdis,
   ServiceContext,
   SignMessageRequest,
@@ -55,7 +56,7 @@ export async function getPhoneNumberIdentifier(
   if (blindingFactor) {
     seed = Buffer.from(blindingFactor)
   } else if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    seed = Buffer.from(signer.rawKey)
+    seed = Buffer.from((signer as EncryptionKeySigner).rawKey)
   }
 
   // Fallback to using Wasm version if not specified
