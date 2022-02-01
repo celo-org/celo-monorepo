@@ -1,6 +1,7 @@
 ![CELO Bug Bounty Program Intigriti](https://i.imgur.com/fyrJi0R.png)
 
 # Security
+
 ## Security Announcements
 
 > Public announcements of new releases with security fixes and of disclosure of any vulnerabilities will be made in the Celo Forum's [Security Announcements](https://forum.celo.org/c/security-announcements/) channel.
