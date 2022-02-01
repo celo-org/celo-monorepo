@@ -334,7 +334,7 @@ contract Accounts is
 
   /**
    * @notice Gets validator payment delegation settings.
-   * @param address of the validator.
+   * @param account Account of the validator.
    * @return Beneficiary address.
    * @return 24 decimal fraction of payment delegated.
    */
