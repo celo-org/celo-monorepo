@@ -20,6 +20,7 @@
     "gas": "yarn run test --gas",
     "build:sol": "ts-node ./scripts/build.ts --solidity ${BUILD_DIR:-./build}",
     "build": "yarn build:sol && yarn build:ts",
+    "sourcify-publish": "ts-node ./scripts/sourcify-publish.ts",
     "migrate": "./scripts/bash/migrate.sh",
     "set_block_gas_limit": "./scripts/bash/set_block_gas_limit.sh",
     "verify": "./scripts/bash/verify_contracts.sh",
