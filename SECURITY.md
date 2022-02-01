@@ -14,9 +14,9 @@
 The Celo community asks that all suspected vulnerabilities be privately and responsibly disclosed.
 
 ## Creating a report:
-1.  Submit your vulnerability to [Celo on Intigrity](https://www.intigrity.com).
+1.  Submit your vulnerability to [Celo on Intigriti](https://www.intigriti.com).
 	- This is currently a private program, and a public launch has been planned. If you would like to participate in the private program please create an account on intigriti.com, and send an email to intigrity.com support asking them to invite you to this program. 
-3. You can also email the [security@celo.co](mailto:security@clabs) list with the details of reproducing the vulnerability as well as the usual details expected for all bug reports.
+3. You can also email the [security@clabs.co](mailto:security@clabs.co) list with the details of reproducing the vulnerability as well as the usual details expected for all bug reports.
 
 ## Primary Focus 
 - Celo protocol,  but the team may be able to assist in coordinating a response to a vulnerability in the third-party apps or tools in the Celo ecosystem.
