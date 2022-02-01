@@ -106,6 +106,8 @@ export interface Backup {
   }
 }
 
+// DO NOT MERGE(victor): Add a createPasswordEncryptedBackup function with computational hardening.
+
 export interface CreatePinEncryptedBackupArgs {
   data: Buffer
   pin: string
@@ -188,6 +190,8 @@ export interface CreateBackupArgs {
  * password and nonce were included in the backup. If a commitment to the password or PIN is
  * included, an attacker can locally brute force that commitment to recover the password, then use
  * that knowledge to complete the derivation.
+ *
+ * DO NOT MERGE(victor): Bury this function.
  */
 export async function createBackup({
   data,
@@ -197,6 +201,8 @@ export async function createBackup({
 }: CreateBackupArgs): Promise<Result<Backup, BackupError>> {
   // Password and backup data are not included in any logging as they are likely sensitive.
   debug('creating a backup with the following information', hardening, metadata)
+  // DO NOT MERGE(victor): Generate 32 bytes of nonce data, use the first 16 for mixing with the
+  // password and the second 16 for odis authentication key.
   const nonce = crypto.randomBytes(16)
   const initialKey = deriveKey(KDFInfo.PASSWORD, [password, nonce])
 
@@ -300,6 +306,7 @@ export async function createBackup({
     odisDomain: domain,
     encryptedFuseKey,
     computationalHardening: hardening.computational,
+    // TODO(victor): Bump this to 1.0 when the final crypto is added.
     version: '0.0.1',
     metadata,
     environment: {

@@ -23,6 +23,7 @@ export enum KDFInfo {
 
 /**
  * Key derivation function for mixing source keying material.
+ * DO NOT MERGE(victor): Add a not that no hardening is providing here.
  * @param info Fixed string value used for domain separation.
  * @param sources An array of keying material source values (e.g. a password and a nonce).
  */
@@ -35,6 +36,7 @@ export function deriveKey(info: KDFInfo, sources: Buffer[], length: number = 32)
     return hash.digest()
   })
 
+  // DO NOT MERGE(victor): Add note about how we would prefer to use HKDF.
   return crypto.pbkdf2Sync(Buffer.concat(chunks), Buffer.alloc(0), 1, length, 'sha256')
 }
 
@@ -57,8 +59,10 @@ export function encrypt(key: Buffer, data: Buffer): Result<Buffer, EncryptionErr
  * Ciphertext should be encoded as { iv || data || auth tag }.
  */
 export function decrypt(key: Buffer, ciphertext: Buffer): Result<Buffer, DecryptionError> {
+  // DO NOT MERGE(victor) Add a length check before slicing the data.
   try {
     const len = ciphertext.length
+    // DO NOT MERGE(victor): Rename this from IV
     const iv = ciphertext.slice(0, 16)
     const ciphertextData = ciphertext.slice(16, len - 16)
     const auth = ciphertext.slice(len - 16, len)

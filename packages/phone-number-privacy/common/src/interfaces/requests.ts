@@ -275,7 +275,7 @@ function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
   request: R
 ): boolean {
   // If the address field is undefined, then this domain is unauthenticated.
-  // Return false as the signature cannot need to be checked.
+  // Return false as the signature cannot be checked.
   if (!request.domain.address.defined) {
     return false
   }

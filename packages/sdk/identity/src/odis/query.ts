@@ -19,6 +19,7 @@ import { ec as EC } from 'elliptic'
 const debug = debugFactory('kit:odis:query')
 const ec = new EC('secp256k1')
 
+// DO NOT MERGE(victor): Rename this from being Auth.NONE
 export interface NoSigner {
   authenticationMethod: AuthenticationMethod.NONE
 }

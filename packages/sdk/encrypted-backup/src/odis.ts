@@ -38,6 +38,7 @@ import {
 import { deriveKey, EIP712Wallet, KDFInfo } from './utils'
 
 /**
+ * DO NOT MERGE(victor): Update this comment.
  * Builds an ODIS SequentialDelayDomain with recommended rate limiting for a 6-digit PIN.
  *
  * @param authorizer Address of the key that should authorize requests to ODIS.
@@ -57,6 +58,7 @@ export function buildOdisDomain(
   }
 }
 
+// DO NOT MERGE(victor) Document this function including why `wallet` is optional.
 export async function odisHardenKey(
   key: Buffer,
   domain: SequentialDelayDomain,
@@ -69,10 +71,10 @@ export async function odisHardenKey(
     throw new Error('ODIS POPRF function is not yet available')
   }
 
-  // Session ID for logging requsests.
+  // Session ID for logging requests.
   const sessionID = genSessionID()
 
-  // Request the quota status the domain to get the state, including the quota counter.
+  // Request the quota status for the domain to get the state, including the quota counter.
   const quotaResp = await requestOdisQuotaStatus(domain, environment, sessionID, wallet)
   if (!quotaResp.ok) {
     return quotaResp
@@ -95,12 +97,13 @@ export async function odisHardenKey(
     return Err(
       new OdisRateLimitingError(
         notBefore,
-        new Error('client does not currently have quota based on status repsonse.')
+        new Error('client does not currently have quota based on status response.')
       )
     )
   }
 
-  // Instantiate a blinding client and blind the key, containing the users password to be hardended.
+  // Instantiate a blinding client and blind the key derived from the users password to be hardened.
+  // DO NOT MERGE(victor): Add a note that this assumes we are talking to the combiners.
   const blindingSeed = crypto.randomBytes(16)
   const blindingClient = new WasmBlsBlindingClient(environment.odisPubKey)
   const blindedMessage = await blindingClient.blindMessage(key.toString('base64'), blindingSeed)
@@ -136,7 +139,7 @@ export async function odisHardenKey(
 }
 
 /**
- * Derive from the nonce a private key and use it to instanciate a wallet for request signing
+ * Derive from the nonce a private key and use it to instantiate a wallet for request signing
  *
  * @remarks It is important that the auth key does not mix in entropy from the password value. If
  * it did, then the derived address and signatures would act as a commitment to the underlying
@@ -226,6 +229,7 @@ async function requestOdisDomainSignature(
   }
 
   // If a query authorizer is defined in the domain, include a siganture over the request.
+  // DO NOT MERGE(victor): Also error if the user provides a wallet, but the domain is unauthorized.
   const authorizer = domain.address.defined ? domain.address.value : undefined
   if (authorizer !== undefined) {
     if (wallet === undefined || !wallet.hasAccount(authorizer)) {
