@@ -38,7 +38,7 @@ export class DomainSignService extends SignService {
           error: res.error,
           signer: signerUrl,
         },
-        'Signer responded with error'
+        'Signer responded with error' // TODO(Alec)
       )
       return undefined
     }

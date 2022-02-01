@@ -98,6 +98,7 @@ export abstract class CombinerService implements ICombinerService {
   }
 
   protected async forwardToSigners(request: Request<{}, {}, DistributedRequest>) {
+    // TODO(Alec): Factor out metering code
     const obs = new PerformanceObserver((list) => {
       const entry = list.getEntries()[0]
       this.logger.info({ latency: entry, signer: entry!.name }, 'Signer response latency measured')
@@ -115,6 +116,7 @@ export abstract class CombinerService implements ICombinerService {
     )
 
     clearTimeout(timeout)
+
     performance.clearMarks()
     obs.disconnect()
   }
@@ -172,7 +174,7 @@ export abstract class CombinerService implements ICombinerService {
     response: Response
   ): Promise<void>
 
-  protected abstract handleSuccessResponse(
+  protected abstract handleResponseOK(
     request: Request<{}, {}, DistributedRequest>,
     data: string,
     status: number,
@@ -201,16 +203,21 @@ export abstract class CombinerService implements ICombinerService {
     signer: SignerService,
     controller: AbortController
   ) {
-    if (!signerResponse.ok) {
-      return this.handleFailure(signer, signerResponse.status, controller)
+    if (signerResponse.ok) {
+      try {
+        const data = await signerResponse.text()
+        this.logger.info(
+          { signer, res: data, status: signerResponse.status },
+          'received ok response from signer'
+        )
+        await this.handleResponseOK(request, data, signerResponse.status, signer.url, controller)
+      } catch (err) {
+        // TODO(Alec): Review this error handling
+        this.logger.error(err)
+      }
     }
 
-    const data = await signerResponse.text()
-    this.logger.info(
-      { signer, res: data, status: signerResponse.status },
-      'received response from signer'
-    )
-    return this.handleSuccessResponse(request, data, signerResponse.status, signer.url, controller)
+    return this.handleFailure(signer, signerResponse.status ?? 502, controller)
   }
 
   private async sendMeteredSignerRequest(
@@ -223,13 +230,13 @@ export abstract class CombinerService implements ICombinerService {
     performance.mark(start)
 
     return this.sendRequest(signer.url, request, controller)
-      .catch((e) => {
-        this.logger.error(`Signer failed with primary url ${signer.url}`, e)
+      .catch((err) => {
+        this.logger.error(`Signer failed with primary url ${signer.url}`, err)
         if (signer.fallbackUrl) {
           this.logger.warn(`Using fallback url to call signer ${signer.fallbackUrl}`)
           return this.sendRequest(signer.fallbackUrl, request, controller)
         }
-        throw e
+        throw err
       })
       .finally(() => {
         performance.mark(end)
@@ -259,10 +266,6 @@ export abstract class CombinerService implements ICombinerService {
     }
   }
 
-  private incrementErrorCodeCount(errorCode: number) {
-    this.errorCodes.set(errorCode, (this.errorCodes.get(errorCode) ?? 0) + 1)
-  }
-
   private async handleSignerRequestFailure(
     err: any,
     signer: SignerService,
@@ -284,5 +287,9 @@ export abstract class CombinerService implements ICombinerService {
     this.logger.error(err)
 
     this.handleFailure(signer, errorCode, controller)
+  }
+
+  private incrementErrorCodeCount(errorCode: number) {
+    this.errorCodes.set(errorCode, (this.errorCodes.get(errorCode) ?? 0) + 1)
   }
 }

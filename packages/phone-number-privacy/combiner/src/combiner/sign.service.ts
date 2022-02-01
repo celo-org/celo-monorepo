@@ -9,7 +9,7 @@ import AbortController from 'abort-controller'
 import { Request, Response } from 'express'
 import { HeaderInit } from 'node-fetch'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
-import { respondWithError } from '../common/error-utils'
+import { ErrorType, respondWithError } from '../common/error-utils'
 import { OdisConfig, VERSION } from '../config'
 import { CombinerService, SignerPnpResponse } from './combiner.service'
 import { IInputService } from './input.interface'
@@ -36,12 +36,7 @@ export abstract class SignService extends CombinerService {
     request: Request<{}, {}, SignRequest>,
     response: Response
   ): Promise<boolean> {
-    const reqKeyVersion = request.headers[KEY_VERSION_HEADER]
-    if (reqKeyVersion && Number(reqKeyVersion) !== this.keyVersion) {
-      respondWithError(response, 400, WarningMessage.INVALID_KEY_HEADER, this.logger)
-      return false
-    }
-    return super.inputCheck(request, response)
+    return (await super.inputCheck(request, response)) && this.reqKeyHeaderCheck(request, response)
   }
 
   protected headers(request: Request<{}, {}, GetBlindedMessageSigRequest>): HeaderInit | undefined {
@@ -51,7 +46,7 @@ export abstract class SignService extends CombinerService {
     }
   }
 
-  protected async handleSuccessResponse(
+  protected async handleResponseOK(
     request: Request<{}, {}, SignRequest>,
     data: string,
     status: number,
@@ -63,13 +58,12 @@ export abstract class SignService extends CombinerService {
     const resKeyVersion: number = Number(res.header(KEY_VERSION_HEADER))
     this.logger.info({ resKeyVersion }, 'Signer responded with key version')
     if (resKeyVersion !== this.keyVersion) {
-      throw new Error(`Incorrect key version received from signer ${url}`) // TODO(Alec): Better error
+      throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
 
     const signature = this.parseSignature(res, url)
-
     if (!signature) {
-      throw new Error(`Signature is missing from signer ${url}`)
+      throw new Error(ErrorMessage.SIGNATURE_MISSING_FROM_SIGNER_RESPONSE)
     }
 
     this.responses.push({ url, res, status })
@@ -129,16 +123,20 @@ export abstract class SignService extends CombinerService {
 
   protected abstract parseBlindedMessage(req: SignRequest): string
 
-  private handleMissingSignatures(majorityErrorCode: number | null, response: Response) {
-    if (majorityErrorCode === 403) {
-      respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA, this.logger)
-    } else {
-      respondWithError(
-        response,
-        majorityErrorCode || 500,
-        ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
-        this.logger
-      )
+  private reqKeyHeaderCheck(request: Request<{}, {}, SignRequest>, response: Response): boolean {
+    const reqKeyVersion = request.headers[KEY_VERSION_HEADER]
+    if (reqKeyVersion && Number(reqKeyVersion) !== this.keyVersion) {
+      respondWithError(response, 400, WarningMessage.INVALID_KEY_VERSION_REQUEST, this.logger)
+      return false
     }
+    return true
+  }
+
+  private handleMissingSignatures(majorityErrorCode: number | null, response: Response) {
+    let msg: ErrorType = ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
+    if (majorityErrorCode === 403) {
+      msg = WarningMessage.EXCEEDED_QUOTA
+    }
+    respondWithError(response, majorityErrorCode ?? 500, msg, this.logger)
   }
 }

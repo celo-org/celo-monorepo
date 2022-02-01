@@ -10,10 +10,10 @@ import {
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { DomainState, DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
+import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
 import { IDomainAuthService } from './domainAuth.interface'
 
-// TODO(Alec): Should we standardize this pattern accross signer / combiner?
+// TODO(Alec): Should we standardize this pattern across signer / combiner?
 export class DomainAuthService implements IDomainAuthService {
   public authCheck(domainRequest: DomainRequest, endpoint: Endpoint, logger: Logger): boolean {
     try {

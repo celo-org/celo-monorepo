@@ -7,6 +7,7 @@ import {
   getSignerEndpoint,
   KnownDomainState,
   SignerEndpoint,
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { respondWithError } from '../../common/error-utils'
@@ -32,7 +33,7 @@ export class DomainQuotaStatusService extends CombinerService {
     this.responses = []
   }
 
-  protected async handleSuccessResponse(
+  protected async handleResponseOK(
     _request: Request<{}, {}, DomainQuotaStatusRequest>,
     data: string,
     status: number,
@@ -41,14 +42,8 @@ export class DomainQuotaStatusService extends CombinerService {
     const res = JSON.parse(data)
 
     if (!res.success) {
-      this.logger.error(
-        {
-          error: res.error,
-          signer: url,
-        },
-        'Signer responded with error'
-      )
-      throw new Error(`Signer request to ${url}/${this.signerEndpoint} request failed`)
+      this.logger.warn({ signer: url, error: res.error }, 'Signer responded with error')
+      throw new Error(res.error) // TODO(Alec): Can this part be factored out?
     }
 
     this.logger.info({ signer: url }, `Signer request successful`)
@@ -60,9 +55,17 @@ export class DomainQuotaStatusService extends CombinerService {
     response: Response<any>
   ): Promise<void> {
     if (this.responses.length >= this.threshold) {
-      const domainQuotaStatus = this.findThresholdDomainState()
-      response.json({ success: true, status: domainQuotaStatus, version: VERSION })
-      return
+      try {
+        const domainQuotaStatus = this.findThresholdDomainState()
+        response.json({
+          success: true,
+          status: domainQuotaStatus,
+          version: VERSION,
+        })
+        return
+      } catch (error) {
+        this.logger.error({ error }, 'Error combining signer quota status responses')
+      }
     }
     respondWithError(
       response,
@@ -73,45 +76,43 @@ export class DomainQuotaStatusService extends CombinerService {
   }
 
   private findThresholdDomainState(): KnownDomainState {
-    let domainStates = this.responses.map((s) => (s.res as DomainQuotaStatusResponseSuccess).status)
+    const domainStates = this.responses.map(
+      (s) => (s.res as DomainQuotaStatusResponseSuccess).status // TODO(Alec)
+    )
     if (domainStates.length < this.threshold) {
-      // TODO(Alec): Think through consequences of throwing here
-      throw new Error('Insufficient number of signer responses') // TODO(Alec): better error message
+      throw new Error('Insufficient number of signer responses')
     }
 
-    const numDisabled = domainStates.filter((ds) => ds.disabled).length
+    const domainStatesEnabled = domainStates.filter((ds) => !ds.disabled)
+    const numDisabled = domainStates.length - domainStatesEnabled.length
 
-    if (numDisabled && numDisabled < domainStates.length) {
-      this.logger.warn('Inconsistent domain disabled state across signers') // TODO(Alec)
+    if (numDisabled > 0 && numDisabled < domainStates.length) {
+      this.logger.warn(WarningMessage.INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES)
     }
 
     if (this.signers.length - numDisabled < this.threshold) {
-      return {
-        timer: 0,
-        counter: 0,
-        disabled: true,
-      }
+      return { timer: 0, counter: 0, disabled: true }
     }
 
-    if (domainStates.length - numDisabled < this.threshold) {
-      throw new Error('Insufficient number of signer responses. Domain may be disabled') // TODO(Alec): better error message
+    if (domainStatesEnabled.length < this.threshold) {
+      throw new Error('Insufficient number of signer responses. Domain may be disabled')
     }
 
-    domainStates = domainStates.filter((ds) => !ds.disabled)
+    const n = this.threshold - 1
 
-    const domainStatesAscendingByCounter = domainStates.sort((a, b) => a.counter - b.counter)
-    const nthLeastRestrictiveByCounter = domainStatesAscendingByCounter[this.threshold - 1]
+    const domainStatesAscendingByCounter = domainStatesEnabled.sort((a, b) => a.counter - b.counter)
+    const nthLeastRestrictiveByCounter = domainStatesAscendingByCounter[n]
     const thresholdCounter = nthLeastRestrictiveByCounter.counter
 
-    // Client should submit requests with nonce == thresholdCounter
+    // Client should submit requests with nonce === thresholdCounter
 
-    const domainStatesWithThresholdCounter = domainStates.filter(
+    const domainStatesWithThresholdCounter = domainStatesEnabled.filter(
       (ds) => ds.counter <= thresholdCounter
     )
     const domainStatesAscendingByTimer = domainStatesWithThresholdCounter.sort(
       (a, b) => a.timer - b.timer
     )
-    const nthLeastRestrictiveByTimer = domainStatesAscendingByTimer[this.threshold - 1]
+    const nthLeastRestrictiveByTimer = domainStatesAscendingByTimer[n]
     const thresholdTimer = nthLeastRestrictiveByTimer.timer
 
     return {

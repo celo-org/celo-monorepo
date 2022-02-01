@@ -31,7 +31,7 @@ export class DomainDisableService extends CombinerService {
     this.responses = []
   }
 
-  protected async handleSuccessResponse(
+  protected async handleResponseOK(
     _request: Request<{}, {}, DisableDomainRequest>,
     data: string,
     status: number,

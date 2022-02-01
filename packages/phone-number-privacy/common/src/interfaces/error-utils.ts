@@ -19,6 +19,8 @@ export enum ErrorMessage {
   THRESHOLD_DISABLE_DOMAIN_FAILURE = `CELO_ODIS_ERR_17 DOMAIN Failed to disable domain on a threshold of signers`,
   SIGNER_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_18 DOMAIN Failed to get domain status from signer`,
   THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_19 DOMAIN Failed to get domain quota status from a threshold of signers`,
+  INVALID_KEY_VERSION_RESPONSE = `CELO_ODIS_ERR_20 SIG_ERR Response key version header is invalid`,
+  SIGNATURE_MISSING_FROM_SIGNER_RESPONSE = `CELO_ODIS_ERR_21 SIG_ERR Signature missing from signer response`,
 }
 
 export enum WarningMessage {
@@ -35,6 +37,7 @@ export enum WarningMessage {
   INVALID_USER_PHONE_NUMBER_SIGNATURE = 'CELO_ODIS_WARN_10 BAD_INPUT User phone number signature is invalid',
   UNKNOWN_DOMAIN = 'CELO_ODIS_WARN_11 BAD_INPUT Provided domain name and version is not recognized',
   DISABLED_DOMAIN = 'CELO_ODIS_WARN_12 BAD_INPUT Provided domain is disabled',
-  INVALID_KEY_HEADER = `CELO_ODIS_WARN_13 BAD_INPUT Provided key version header is invalid`,
+  INVALID_KEY_VERSION_REQUEST = `CELO_ODIS_WARN_13 BAD_INPUT Request key version header is invalid`,
   API_UNAVAILABLE = `CELO_ODIS_WARN_14 BAD_INPUT API is unavailable`,
+  INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES = `CELO_ODIS_WARN_15 SIGNER Discrepency found in signer domain disabled states`,
 }
