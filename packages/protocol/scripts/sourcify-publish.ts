@@ -8,6 +8,9 @@ import Web3 from 'web3'
 /*
  * A script that reads the artifacts from the build/contracts directory and publish using the sourcify api.
  *
+ * NOTE: this script hasn't been tested yet. It should be manually tested and
+ * potentially adjusted before including it in the release process.
+ *
  * Expects the following flags:
  *   network: The network for which artifacts should be
  *   build_artifacts_path: Path containing the artifacts to publish
