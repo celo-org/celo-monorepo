@@ -1,13 +1,13 @@
+import * as Logger from 'bunyan'
+import { isValidAddress, toChecksumAddress } from 'ethereumjs-util'
+import { Request } from 'express'
+import { anyNumber, capture, instance, mock, reset, verify, when } from 'ts-mockito'
+import { findAttestationByKey } from '../../src/db'
+import { Response } from '../../src/request'
 import {
   handleAttestationRequest,
   INVALID_SIGNATURE_ERROR,
 } from '../../src/requestHandlers/attestation'
-import { anyNumber, capture, instance, mock, reset, verify, when } from 'ts-mockito'
-import { Response } from '../../src/request'
-import { Request } from 'express'
-import * as Logger from 'bunyan'
-import { isValidAddress, toChecksumAddress } from 'ethereumjs-util'
-import { findAttestationByKey } from '../../src/db'
 import { rerequestAttestation } from '../../src/sms'
 
 jest.mock('ethereumjs-util')
@@ -62,7 +62,7 @@ describe('Attestation request handler', () => {
         salt: 'salt',
         securityCodePrefix: 'p',
         smsRetrieverAppSig: 'sig',
-        blindedPhoneNumberSignature: undefined,
+        phoneNumberSignature: undefined,
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(1)
@@ -85,7 +85,7 @@ describe('Attestation request handler', () => {
         salt: 'salt',
         securityCodePrefix: '',
         smsRetrieverAppSig: 'sig',
-        blindedPhoneNumberSignature: undefined,
+        phoneNumberSignature: undefined,
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(0)
@@ -111,7 +111,7 @@ describe('Attestation request handler', () => {
         salt: 'salt',
         securityCodePrefix: 'p',
         smsRetrieverAppSig: 'sig',
-        blindedPhoneNumberSignature: undefined,
+        phoneNumberSignature: undefined,
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(0)
@@ -138,7 +138,7 @@ describe('Attestation request handler', () => {
         salt: 'salt',
         securityCodePrefix: 'p',
         smsRetrieverAppSig: 'sig',
-        blindedPhoneNumberSignature: 'wrongSignature',
+        phoneNumberSignature: 'wrongSignature',
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(1)
@@ -169,8 +169,7 @@ describe('Attestation request handler', () => {
         salt: 'salt',
         securityCodePrefix: 'p',
         smsRetrieverAppSig: 'sig',
-        blindedPhoneNumberSignature:
-          '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+        phoneNumberSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(1)
@@ -193,7 +192,7 @@ describe('Attestation request handler', () => {
         salt: 'salt',
         securityCodePrefix: 'p',
         smsRetrieverAppSig: 'sig',
-        blindedPhoneNumberSignature: undefined,
+        phoneNumberSignature: undefined,
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(0)

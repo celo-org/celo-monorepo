@@ -1,4 +1,5 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
+import { getPepperFromThresholdSignature } from '@celo/identity/lib/odis/phone-number-identifier'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { eqAddress } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
@@ -117,23 +118,6 @@ class AttestationRequestHandler {
     // TODO: Check expiration
   }
 
-  private async verifyPepperIfApplicable(): Promise<void> {
-    if (this.attestationRequest.blindedPhoneNumberSignature) {
-      Counters.attestationRequestsProvidedBlindedSignature.inc()
-
-      try {
-        await thresholdBls.verify(
-          odisPubKey,
-          this.attestationRequest.phoneNumber,
-          this.attestationRequest.blindedPhoneNumberSignature
-        )
-      } catch (e) {
-        this.logger.error('Cannot get phone number from signature', e)
-        throw new ErrorWithResponse(INVALID_SIGNATURE_ERROR, 422)
-      }
-    }
-  }
-
   async signAttestation() {
     const { phoneNumber, account, salt } = this.attestationRequest
     const message = AttestationUtils.getAttestationMessageToSignFromPhoneNumber(
@@ -243,6 +227,29 @@ class AttestationRequestHandler {
     }
 
     return attestation
+  }
+
+  private async verifyPepperIfApplicable(): Promise<void> {
+    if (this.attestationRequest.phoneNumberSignature) {
+      Counters.attestationRequestsProvidedBlindedSignature.inc()
+
+      try {
+        await thresholdBls.verify(
+          odisPubKey,
+          this.attestationRequest.phoneNumber,
+          this.attestationRequest.phoneNumberSignature
+        )
+
+        const sigBuf = Buffer.from(this.attestationRequest.phoneNumberSignature, 'base64')
+        const pepper = getPepperFromThresholdSignature(sigBuf)
+        if (pepper !== this.attestationRequest.salt) {
+          throw new ErrorWithResponse('Pepper is invalid', 422)
+        }
+      } catch (e) {
+        this.logger.error('Cannot get phone number from signature', e)
+        throw new ErrorWithResponse(INVALID_SIGNATURE_ERROR, 422)
+      }
+    }
   }
 }
 
