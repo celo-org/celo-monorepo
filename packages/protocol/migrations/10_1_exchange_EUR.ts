@@ -7,21 +7,12 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import {
-  ExchangeEURInstance,
-  FreezerInstance,
-  ReserveInstance,
-  StableTokenEURInstance,
-} from 'types'
+import { ExchangeEURInstance, FreezerInstance, ReserveInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  const stableTokenEUR: StableTokenEURInstance = await getDeployedProxiedContract<StableTokenEURInstance>(
-    'StableTokenEUR',
-    artifacts
-  )
   return [
     config.registry.predeployedProxyAddress,
-    stableTokenEUR.address,
+    CeloContractName.StableTokenEUR,
     toFixed(config.exchange.spread).toString(),
     toFixed(config.exchange.reserveFraction).toString(),
     config.exchange.updateFrequency,
@@ -47,7 +38,8 @@ module.exports = deploymentForCoreContract<ExchangeEURInstance>(
       'Reserve',
       artifacts
     )
-    // cUSD doesn't need to be added as it currently harcoded in Reserve.sol
+    // cUSD doesn't need to be added as it is currently harcoded in Reserve.sol
     await reserve.addExchangeSpender(exchange.address)
+    await exchange.activateStable()
   }
 )

@@ -38,6 +38,31 @@ This could be a node with RPC set up. Preferably this would be an node dedicated
 
 - `BLOCKCHAIN_PROVIDER` - The blockchain node provider for chain state access. `
 
+### Security
+
+The ODIS Signer service provides partial signatures that can be combined to generate domain-specific encryption keys. These keys are used for a variety of different purposes from phone number privacy to account backup encryption. It's very important to keep your BLS key share safe. We provide the following recommended best practices for keeping your key secure.
+
+#### Leverage a cloud keystore
+
+All cloud providers have a keystore offering that keeps your key secure while still being accessible by your service. ODIS Signer supports Azure, GCP, and AWS keystores. You can find configuration details in the [Keystores](#keystores) section below.
+
+#### Lock down your cloud
+
+- [ ] Ensure that you have multi-factor authentication enabled for all cloud accounts.
+- [ ] Reduce access to the ODIS resources to as minimal of a set of people as possible.
+- [ ] Revisit your cloud's admin set and ensure it is up to date.
+- [ ] Enable Just-In-Time access policies if your cloud provider has this functionality available. For example, Azure provides [Privileged Identity Management](https://docs.microsoft.com/en-us/azure/active-directory/privileged-identity-management/pim-configure) which allows you to specify an approval list and limited time window in which an employee may access a given resource.
+- [ ] Monitor/Audit access to the keystore and ODIS resource group.
+
+#### Create a secure backup
+
+The BLS key share should only exist in the keystore or as an encrypted backup. To create a backup, you can either download an encrypted copy from your keystore or manually encrypt it locally. Make sure that you keep it somewhere memorable (ex. external hard drive or password manager). Here are a couple options to create a local encrypted backup:
+
+- [Azure Key Vault](https://docs.microsoft.com/en-us/azure/key-vault/general/backup?tabs=azure-cli)
+- [MacOS](https://support.apple.com/guide/mac-help/protect-your-mac-information-with-encryption-mh40593/mac)
+- [Windows](https://support.microsoft.com/en-us/windows/how-to-encrypt-a-file-1131805c-47b8-2e3e-a705-807e13c10da7)
+- [GPG Command](https://www.gnupg.org/gph/en/manual/x110.html)
+
 ### Keystores
 
 Currently, the service retrieving keys from Azure Key Vault (AKV), Google Secret Manager and AWS Secrets Manager.

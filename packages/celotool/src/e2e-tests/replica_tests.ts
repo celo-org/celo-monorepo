@@ -200,7 +200,7 @@ describe('replica swap tests', () => {
               missed.push({ idx: i, num: header.number })
             }
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error(e)
           errorMsg = e
         }

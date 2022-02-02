@@ -77,7 +77,7 @@ describe('Local wallet class', () => {
     try {
       wallet.addAccount('this is not a valid private key')
       throw new Error('Expected exception to be thrown')
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('private key length is invalid')
     }
   })

@@ -49,7 +49,7 @@ spec:
         - -c
         args:
         - |
-           exec mix cmd --app block_scout_web "iex --name {{ .Values.blockscout.web.erlangNodeName}}@0.0.0.0 -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix phx.server"
+           exec mix cmd --app block_scout_web "iex --name {{ .Values.blockscout.web.erlangNodeName}}@0.0.0.0 -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix do deps.loadpaths --no-deps-check, phx.server --no-compile"
         ports:
         - name: http
           containerPort: {{ .Values.blockscout.web.port }}
@@ -96,6 +96,37 @@ spec:
           value: {{ .Values.blockscout.web.sourcify.repoUrl | quote }}
         - name: CHAIN_ID
           value: {{ .Values.blockscout.networkID | quote }}
+        - name: APPS_MENU
+          value: {{ .Values.blockscout.web.appsMenu.enabled | quote }}
+        - name: EXTERNAL_APPS
+          value: {{ .Values.blockscout.web.appsMenu.externalApps | quote }}
+        - name: BRIDGES
+          value: {{ .Values.blockscout.web.appsMenu.bridges | quote }}
+        - name: OTHER_BRIDGES
+          value: {{ .Values.blockscout.web.appsMenu.otherBridges | quote }}
+        - name: BRIDGES_ALM
+          value: {{ .Values.blockscout.web.appsMenu.bridgesAlm | quote }}
+        - name: DEFI_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.defiList | quote }}
+        - name: RESOURCES_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.resourcesList | quote }}
+        - name: LEARNING_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.learningList | quote }}
+        - name: RE_CAPTCHA_PROJECT_ID
+          valueFrom:
+            secretKeyRef:
+              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
+              key: project_id
+        - name: RE_CAPTCHA_SITE_KEY
+          valueFrom:
+            secretKeyRef:
+              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
+              key: site_key
+        - name: RE_CAPTCHA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
+              key: api_key
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
