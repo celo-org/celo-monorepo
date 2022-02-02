@@ -231,7 +231,7 @@ class AttestationRequestHandler {
 
   private async verifyPepperIfApplicable(): Promise<void> {
     if (this.attestationRequest.phoneNumberSignature) {
-      Counters.attestationRequestsProvidedBlindedSignature.inc()
+      Counters.attestationRequestsProvidedSignature.inc()
 
       try {
         await thresholdBls.verify(
@@ -243,7 +243,8 @@ class AttestationRequestHandler {
         const sigBuf = Buffer.from(this.attestationRequest.phoneNumberSignature, 'base64')
         const pepper = getPepperFromThresholdSignature(sigBuf)
         if (pepper !== this.attestationRequest.salt) {
-          throw new ErrorWithResponse('Pepper is invalid', 422)
+          this.logger.error('Pepper is invalid')
+          // throw new ErrorWithResponse('Pepper is invalid', 422)
         }
       } catch (e) {
         this.logger.error('Cannot get phone number from signature', e)
