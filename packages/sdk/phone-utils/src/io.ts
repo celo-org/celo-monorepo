@@ -51,6 +51,8 @@ export const AttestationRequestType = t.type({
   // if specified, the message sent will be short random number prefixed by this string
   securityCodePrefix: t.union([t.undefined, t.string]),
   language: t.union([t.undefined, t.string]),
+  // unblinded signature
+  phoneNumberSignature: t.union([t.undefined, t.string]),
 })
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>

@@ -130,7 +130,6 @@ export const AttestationRequestType = t.type({
   account: AddressType,
   issuer: AddressType,
   // io-ts way of defining optional key-value pair
-  phoneNumberSignature: t.union([t.undefined, t.string]), // unblinded
   salt: t.union([t.undefined, SaltType]),
   smsRetrieverAppSig: t.union([t.undefined, t.string]),
   // if specified, the message sent will be short random number prefixed by this string

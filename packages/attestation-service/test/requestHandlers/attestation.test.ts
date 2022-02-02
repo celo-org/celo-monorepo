@@ -166,7 +166,7 @@ describe('Attestation request handler', () => {
         language: 'en',
         account: 'account',
         issuer: address,
-        salt: 'salt',
+        salt: 'nHIvMC9B4j2+H',
         securityCodePrefix: 'p',
         smsRetrieverAppSig: 'sig',
         phoneNumberSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',

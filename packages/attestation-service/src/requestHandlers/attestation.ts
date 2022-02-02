@@ -1,9 +1,9 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { getPepperFromThresholdSignature } from '@celo/identity/lib/odis/phone-number-identifier'
+import { AttestationRequest } from '@celo/phone-utils/lib/io'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { eqAddress } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
-import { AttestationRequest } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { randomBytes } from 'crypto'
 import express from 'express'
@@ -235,9 +235,9 @@ class AttestationRequestHandler {
 
       try {
         await thresholdBls.verify(
-          odisPubKey,
-          this.attestationRequest.phoneNumber,
-          this.attestationRequest.phoneNumberSignature
+          Buffer.from(odisPubKey, 'base64'),
+          Buffer.from(this.attestationRequest.phoneNumber, 'base64'),
+          Buffer.from(this.attestationRequest.phoneNumberSignature, 'base64')
         )
 
         const sigBuf = Buffer.from(this.attestationRequest.phoneNumberSignature, 'base64')
