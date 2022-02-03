@@ -8,11 +8,10 @@ import {
   hasValidIdentifier,
   hasValidUserPhoneNumberParam,
   isVerified,
+  verifyDEKSignature,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { trimLeading0x } from '@celo/utils/lib/address'
 import Logger from 'bunyan'
-import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
 import config, {
@@ -29,8 +28,6 @@ import {
 } from '../database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 import { getContractKit } from '../web3/contracts'
-
-const ec = new EC('secp256k1')
 
 interface ContactMatch {
   phoneNumber: string
@@ -233,24 +230,6 @@ async function isInvalidReplay(
     'Allowing account to requery matches for the same phone number as before.'
   )
   return false
-}
-
-export function verifyDEKSignature(
-  message: string,
-  messageSignature: string,
-  registeredEncryptionKey: string,
-  logger?: Logger
-) {
-  try {
-    const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
-    return key.verify(message, JSON.parse(messageSignature))
-  } catch (err) {
-    if (logger) {
-      logger.error('Failed to verify signature with DEK')
-      logger.error({ err, dek: registeredEncryptionKey })
-    }
-    return false
-  }
 }
 
 async function userHasNewDek(

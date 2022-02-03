@@ -13,11 +13,10 @@ import {
   PhoneNumberPrivacyRequest,
 } from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
+import crypto from 'crypto'
 import debugFactory from 'debug'
-import { ec as EC } from 'elliptic'
 
 const debug = debugFactory('kit:odis:query')
-const ec = new EC('secp256k1')
 
 export interface NoSigner {
   authenticationMethod: AuthenticationMethod.NONE
@@ -99,15 +98,31 @@ export function getServiceContext(contextName = 'mainnet') {
   }
 }
 
-export function signWithDEK(message: string, signer: EncryptionKeySigner) {
+export function signWithDEK(msg: string, signer: EncryptionKeySigner) {
+  return signWithRawKey(msg, signer.rawKey)
+}
+
+export function signWithRawKey(msg: string, rawKey: string) {
+  // NOTE: Elliptic will truncate the raw msg to 64 bytes before signing,
+  // so make sure to always pass the msgDigest instead.
+  const msgDigest = crypto.createHash('sha256').update(JSON.stringify(msg)).digest('base64')
+
+  // NOTE: elliptic is disabled elsewhere in this library to prevent
+  // accidental signing of truncated messages.
+  // tslint:disable-next-line:import-blacklist
+  const EC = require('elliptic').ec
+  const ec = new EC('secp256k1')
+
   // Sign
-  const key = ec.keyFromPrivate(hexToBuffer(signer.rawKey))
-  const sig = JSON.stringify(key.sign(message).toDER())
+  const key = ec.keyFromPrivate(hexToBuffer(rawKey))
+  const sig = JSON.stringify(key.sign(msgDigest).toDER())
+
   // Verify
-  const dek = key.getPublic(true, 'hex')
-  const pubkey = ec.keyFromPublic(trimLeading0x(dek), 'hex')
-  const validSignature: boolean = pubkey.verify(message, JSON.parse(sig))
-  debug(`Signature is valid: ${validSignature} signed by ${dek}`)
+  const pub = key.getPublic(true, 'hex')
+  const pubKey = ec.keyFromPublic(trimLeading0x(pub), 'hex')
+  const validSignature: boolean = pubKey.verify(msgDigest, JSON.parse(sig))
+
+  debug(`Signature is valid: ${validSignature} signed by ${pub}`)
   return sig
 }
 

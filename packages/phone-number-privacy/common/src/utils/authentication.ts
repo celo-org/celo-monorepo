@@ -5,9 +5,11 @@ import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations
 import { trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Logger from 'bunyan'
+import crypto from 'crypto'
 import { ec as EC } from 'elliptic'
 import { Request } from 'express'
-import { AuthenticationMethod, ErrorMessage } from '../interfaces'
+import { rootLogger } from '..'
+import { AuthenticationMethod, ErrorMessage, WarningMessage } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
 const ec = new EC('secp256k1')
@@ -66,15 +68,25 @@ export function verifyDEKSignature(
   registeredEncryptionKey: string,
   logger?: Logger
 ) {
+  logger = logger ?? rootLogger()
   try {
+    const msgDigest = crypto.createHash('sha256').update(JSON.stringify(message)).digest('base64')
+
     const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
     const parsedSig = JSON.parse(messageSignature)
-    return key.verify(message, parsedSig)
-  } catch (err) {
-    if (logger) {
-      logger.error('Failed to verify signature with DEK')
-      logger.error({ err, dek: registeredEncryptionKey })
+    if (key.verify(msgDigest, parsedSig)) {
+      return true
     }
+
+    if (key.verify(message, parsedSig)) {
+      // TODO: Remove this once clients upgrade to @celo/identity v1.5.3
+      logger.warn(WarningMessage.INVALID_AUTH_SIGNATURE)
+      return true
+    }
+    return false
+  } catch (err) {
+    logger.error('Failed to verify signature with DEK')
+    logger.error({ err, dek: registeredEncryptionKey })
     return false
   }
 }
