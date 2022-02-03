@@ -34,6 +34,7 @@ export const ProxyContracts = [
   'ReserveSpenderMultiSigProxy',
   'StableTokenBRLProxy',
   'StableTokenEURProxy',
+  'StableTokenGBPProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
 ]
@@ -72,11 +73,13 @@ export const CoreContracts = [
   'Exchange',
   'ExchangeEUR',
   'ExchangeBRL',
+  'ExchangeGBP',
   'Reserve',
   'ReserveSpenderMultiSig',
   'StableToken',
   'StableTokenEUR',
   'StableTokenBRL',
+  'StableTokenGBP',
   'SortedOracles',
 
   // liquidity
