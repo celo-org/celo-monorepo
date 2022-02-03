@@ -487,6 +487,13 @@ contract('Accounts', (accounts: string[]) => {
         )
       })
 
+      it('should not allow a beneficiary with address 0x0', async () => {
+        await assertRevertWithReason(
+          accountsInstance.setPaymentDelegation(NULL_ADDRESS, fraction),
+          'Beneficiary cannot be address 0x0'
+        )
+      })
+
       it('emits a PaymentDelegationSet event', async () => {
         const resp = await accountsInstance.setPaymentDelegation(beneficiary, fraction)
         assertLogMatches2(resp.logs[0], {
