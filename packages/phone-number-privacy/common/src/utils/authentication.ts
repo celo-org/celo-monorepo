@@ -68,6 +68,7 @@ export function verifyDEKSignature(
   registeredEncryptionKey: string,
   logger?: Logger
 ) {
+  const insecureAllowIncorrectlyGeneratedSignature = true
   logger = logger ?? rootLogger()
   try {
     const msgDigest = crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex')
