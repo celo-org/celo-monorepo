@@ -77,9 +77,12 @@ export function verifyDEKSignature(
     if (key.verify(msgDigest, parsedSig)) {
       return true
     }
-
-    if (key.verify(message, parsedSig)) {
-      // TODO: Remove this once clients upgrade to @celo/identity v1.5.3
+    // TODO: Remove this once clients upgrade to @celo/identity v1.5.3
+    // Due to an error in the original implementation of the sign and verify functions
+    // used here, older clients may generate signatures over the truncated message,
+    // instead of its hash. These signatures represent a risk to the signer as they do
+    // not protect against modifications of the message past the first 64 characters of the message.
+    if (insecureAllowIncorrectlyGeneratedSignature && key.verify(message, parsedSig)) {
       logger.warn(WarningMessage.INVALID_AUTH_SIGNATURE)
       return true
     }
