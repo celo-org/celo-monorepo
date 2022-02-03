@@ -204,7 +204,10 @@ module.exports = deploymentForCoreContract<Exchange{TICKER}Instance>(
 `
 
 function errorFunct(err) {
-  if (err) return console.log(err)
+  if (err) {
+    // tslint:disable-next-line: no-console
+    return console.log(err)
+  }
 }
 
 try {
@@ -253,6 +256,7 @@ try {
     errorFunct
   )
 
+  // tslint:disable-next-line: no-console
   console.log(`Other thinks that should be updated:
   * Add constitution parameters: packages/protocol/governanceConstitution.js
   * Rename migration with right number: packages/protocol/migrations/09_Y_stableToken_X.ts and packages/protocol/migrations/10_Y_Exchange_X.ts
@@ -261,5 +265,6 @@ try {
   * Add it to the env tests packages/protocol/test/common/integration.ts
   `)
 } catch (e) {
+  // tslint:disable-next-line: no-console
   console.error(`Something went wrong: ${e}`)
 }
