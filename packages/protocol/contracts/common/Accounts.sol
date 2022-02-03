@@ -333,6 +333,11 @@ contract Accounts is
     emit PaymentDelegationSet(beneficiary, fraction);
   }
 
+  function deletePaymentDelegation() public {
+    paymentDelegations[msg.sender] = PaymentDelegation(address(0x0), FixidityLib.wrap(0));
+    emit PaymentDelegationSet(address(0x0), 0);
+  }
+
   /**
    * @notice Gets validator payment delegation settings.
    * @return Beneficiary address and fraction of payment delegated.
