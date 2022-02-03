@@ -137,9 +137,9 @@ export async function queryOdis<ResponseType>(
     signature = signWithDEK(bodyString, signer as EncryptionKeySigner)
   } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
     const account = (body as PhoneNumberPrivacyRequest).account
-    signature = await signer.contractKit.connection.sign(bodyString, account)
+    signature = await (signer as WalletKeySigner).contractKit.connection.sign(bodyString, account)
   } else if (signer.authenticationMethod === AuthenticationMethod.CUSTOM_SIGNER) {
-    signature = await signer.customSigner(bodyString)
+    signature = await (signer as CustomSigner).customSigner(bodyString)
   }
   const authHeader = signature !== undefined ? { Authorization: signature } : undefined
 
