@@ -70,7 +70,7 @@ export function verifyDEKSignature(
 ) {
   logger = logger ?? rootLogger()
   try {
-    const msgDigest = crypto.createHash('sha256').update(JSON.stringify(message)).digest('base64')
+    const msgDigest = crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex')
 
     const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
     const parsedSig = JSON.parse(messageSignature)

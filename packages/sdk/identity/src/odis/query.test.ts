@@ -9,8 +9,8 @@ describe(signWithRawKey, () => {
     const msg = 'test'
 
     // NOTE: Elliptic will truncate the raw msg to 64 bytes before signing,
-    // so make sure to always pass the msgDigest instead.
-    const msgDigest = crypto.createHash('sha256').update(JSON.stringify(msg)).digest('base64')
+    // so make sure to always pass the hex encoded msgDigest instead.
+    const msgDigest = crypto.createHash('sha256').update(JSON.stringify(msg)).digest('hex')
 
     // NOTE: elliptic is disabled elsewhere in this library to prevent
     // accidental signing of truncated messages.
