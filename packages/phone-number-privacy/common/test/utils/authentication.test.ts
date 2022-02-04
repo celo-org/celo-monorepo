@@ -24,7 +24,7 @@ describe('Authentication test suite', () => {
 
       const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBeFalsy()
+      expect(result).toBe(false)()
     })
 
     it('Should fail authentication with missing signer', async () => {
@@ -36,7 +36,7 @@ describe('Authentication test suite', () => {
 
       const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBeFalsy()
+      expect(result).toBe(false)()
     })
 
     it('Should succeed authentication with error in getDataEncryptionKey', async () => {
@@ -51,7 +51,7 @@ describe('Authentication test suite', () => {
 
       const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBeTruthy()
+      expect(result).toBe(true)()
     })
 
     it('Should fail authentication when key is not registered', async () => {
@@ -76,7 +76,7 @@ describe('Authentication test suite', () => {
 
       const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBeFalsy()
+      expect(result).toBe(false)()
     })
 
     it('Should fail authentication when key is registered but not valid', async () => {
@@ -101,7 +101,7 @@ describe('Authentication test suite', () => {
 
       const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBeFalsy()
+      expect(result).toBe(false)()
     })
 
     it('Should succeed authentication when key is registered and valid', async () => {
@@ -135,7 +135,7 @@ describe('Authentication test suite', () => {
 
       const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBeTruthy()
+      expect(result).toBe(true)()
     })
 
     // Backwards compatibility check
@@ -172,7 +172,7 @@ describe('Authentication test suite', () => {
 
       const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBeTruthy()
+      expect(result).toBe(true)()
     })
   })
 
@@ -194,7 +194,7 @@ describe('Authentication test suite', () => {
 
       const result = await auth.isVerified('', '', mockContractKit, logger)
 
-      expect(result).toBeTruthy()
+      expect(result).toBe(true)()
     })
     it('Should fail when verification is not ok', async () => {
       const mockContractKit = {
@@ -213,7 +213,7 @@ describe('Authentication test suite', () => {
 
       const result = await auth.isVerified('', '', mockContractKit, logger)
 
-      expect(result).toBeFalsy()
+      expect(result).toBe(false)()
     })
   })
 })
