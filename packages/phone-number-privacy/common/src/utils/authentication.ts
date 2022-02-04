@@ -68,7 +68,6 @@ export function verifyDEKSignature(
   registeredEncryptionKey: string,
   logger?: Logger
 ) {
-  const insecureAllowIncorrectlyGeneratedSignature = true
   logger = logger ?? rootLogger()
   try {
     const msgDigest = crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex')
@@ -83,7 +82,7 @@ export function verifyDEKSignature(
     // used here, older clients may generate signatures over the truncated message,
     // instead of its hash. These signatures represent a risk to the signer as they do
     // not protect against modifications of the message past the first 64 characters of the message.
-    if (insecureAllowIncorrectlyGeneratedSignature && key.verify(message, parsedSig)) {
+    if (key.verify(message, parsedSig)) {
       logger.warn(WarningMessage.INVALID_AUTH_SIGNATURE)
       return true
     }
