@@ -513,6 +513,13 @@ contract('Accounts', (accounts: string[]) => {
       await accountsInstance.setPaymentDelegation(beneficiary, fraction)
     })
 
+    it('should not be callable by a non-account', async () => {
+      await assertRevertWithReason(
+        accountsInstance.setPaymentDelegation(beneficiary, fraction, { from: accounts[2] }),
+        'Not an account'
+      )
+    })
+
     it('should set the address and beneficiary to 0', async () => {
       await accountsInstance.deletePaymentDelegation()
       const [realBeneficiary, realFraction] = await accountsInstance.getPaymentDelegation.call(

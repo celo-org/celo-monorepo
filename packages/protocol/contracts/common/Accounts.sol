@@ -339,6 +339,7 @@ contract Accounts is
    * fraction to 0.
    */
   function deletePaymentDelegation() public {
+    require(isAccount(msg.sender), "Not an account");
     paymentDelegations[msg.sender] = PaymentDelegation(address(0x0), FixidityLib.wrap(0));
     emit PaymentDelegationSet(address(0x0), 0);
   }
