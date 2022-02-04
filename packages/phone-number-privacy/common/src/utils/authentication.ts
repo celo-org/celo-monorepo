@@ -48,7 +48,11 @@ export async function authenticateUser(
       return false
     } else {
       logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
-      if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
+      if (
+        verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger, {
+          insecureAllowIncorrectlyGeneratedSignature: true,
+        })
+      ) {
         return true
       }
     }
@@ -66,7 +70,10 @@ export function verifyDEKSignature(
   message: string,
   messageSignature: string,
   registeredEncryptionKey: string,
-  logger?: Logger
+  logger?: Logger,
+  { insecureAllowIncorrectlyGeneratedSignature } = {
+    insecureAllowIncorrectlyGeneratedSignature: false,
+  }
 ) {
   logger = logger ?? rootLogger()
   try {
@@ -82,7 +89,7 @@ export function verifyDEKSignature(
     // used here, older clients may generate signatures over the truncated message,
     // instead of its hash. These signatures represent a risk to the signer as they do
     // not protect against modifications of the message past the first 64 characters of the message.
-    if (key.verify(message, parsedSig)) {
+    if (insecureAllowIncorrectlyGeneratedSignature && key.verify(message, parsedSig)) {
       logger.warn(WarningMessage.INVALID_AUTH_SIGNATURE)
       return true
     }
