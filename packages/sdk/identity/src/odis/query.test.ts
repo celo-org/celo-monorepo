@@ -35,6 +35,7 @@ describe(signWithRawKey, () => {
     expect(isValid(msgDigest, receivedSig)).toBeTruthy()
     expect(receivedSig).toEqual(expectedSig)
   })
+
   it('Signs full message', async () => {
     const msg1 = `${'a'.repeat(64)} + ${'b'.repeat(16)}`
     const msg2 = `${'a'.repeat(64)} + ${'c'.repeat(16)}`
@@ -64,38 +65,5 @@ describe(signWithRawKey, () => {
     expect(isValid(msgDigest2, sig2)).toBeTruthy()
     expect(isValid(msgDigest1, sig2)).toBeFalsy()
     expect(isValid(msgDigest2, sig1)).toBeFalsy()
-  })
-  xit('Is cross compatible with crypto library secp256k1', async () => {
-    const msg = `${'a'.repeat(64)} + ${'b'.repeat(16)}`
-
-    const sigEllipticLibrary = signWithRawKey(msg, rawKey)
-    const sigCryptoLibrary = crypto.createSign('secp256k1').update(msg).sign(rawKey)
-
-    console.log('sigEllipticLibrary: ' + sigEllipticLibrary)
-    console.log('sigCryptoLibrary: ' + sigCryptoLibrary)
-
-    // NOTE: Elliptic will truncate the raw msg to 64 bytes before signing,
-    // so make sure to always pass the hex encoded msgDigest instead.
-    const msgDigest = crypto.createHash('sha256').update(JSON.stringify(msg)).digest('hex')
-
-    // NOTE: elliptic is disabled elsewhere in this library to prevent
-    // accidental signing of truncated messages.
-    // tslint:disable-next-line:import-blacklist
-    const EC = require('elliptic').ec
-    const ec = new EC('secp256k1')
-
-    // Sign
-    const key = ec.keyFromPrivate(hexToBuffer(rawKey))
-
-    // Verify
-    const pub = key.getPublic(true, 'hex')
-    const pubKey = ec.keyFromPublic(trimLeading0x(pub), 'hex')
-    const ellipticIsValid = (_msg: string, _sig: string) => pubKey.verify(_msg, JSON.parse(_sig))
-    const cryptoIsValid = (_msg: string, _sig: Buffer) =>
-      crypto.createVerify('secp256k1').verify(_msg, _sig)
-    expect(ellipticIsValid(msgDigest, sigEllipticLibrary)).toBeTruthy()
-    expect(ellipticIsValid(msgDigest, sigCryptoLibrary.toString())).toBeTruthy()
-    expect(cryptoIsValid(msgDigest, Buffer.from(sigEllipticLibrary, 'hex'))).toBeFalsy()
-    expect(cryptoIsValid(msgDigest, sigCryptoLibrary)).toBeFalsy()
   })
 })

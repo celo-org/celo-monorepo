@@ -106,7 +106,11 @@ export async function handleGetContactMatches(request: Request, response: Respon
         logger.error('Forno error caught in handleGetContactMatches line 109') // Temporary for debugging
       }
       if (dekSigner) {
-        if (!verifyDEKSignature(userPhoneNumber, signedUserPhoneNumber, dekSigner, logger)) {
+        if (
+          !verifyDEKSignature(userPhoneNumber, signedUserPhoneNumber, dekSigner, logger, {
+            insecureAllowIncorrectlyGeneratedSignature: true,
+          })
+        ) {
           respondWithError(
             response,
             403,
@@ -241,7 +245,9 @@ async function userHasNewDek(
   const dekSignerRecord = await getDekSignerRecord(account, logger)
   const isKeyRotation =
     !!dekSignerRecord &&
-    verifyDEKSignature(userPhoneNumber, signedUserPhoneNumberRecord, dekSignerRecord, logger)
+    verifyDEKSignature(userPhoneNumber, signedUserPhoneNumberRecord, dekSignerRecord, logger, {
+      insecureAllowIncorrectlyGeneratedSignature: true,
+    })
   if (isKeyRotation) {
     logger.info(
       {
