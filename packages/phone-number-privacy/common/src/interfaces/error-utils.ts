@@ -1,3 +1,24 @@
+import Logger from 'bunyan'
+import { Response } from 'express'
+import { OdisResponse } from './responses'
+
+// TODO(Alec): This needs different behavior by code path
+export function respondWithError(
+  res: Response,
+  body: OdisResponse,
+  statusCode: number,
+  error: ErrorType,
+  logger: Logger
+) {
+  if (error in WarningMessage) {
+    logger.warn({ error, statusCode }, 'Responding with warning')
+  } else {
+    logger.error({ error, statusCode }, 'Responding with error')
+  }
+  // res.status(statusCode).json({ success: false, error, version: VERSION })
+  res.status(statusCode).json(body)
+}
+
 export enum ErrorMessage {
   UNKNOWN_ERROR = `CELO_ODIS_ERR_00 Something went wrong`,
   DATABASE_UPDATE_FAILURE = `CELO_ODIS_ERR_01 DB_ERR Failed to update database entry`,
@@ -40,4 +61,7 @@ export enum WarningMessage {
   INVALID_KEY_VERSION_REQUEST = `CELO_ODIS_WARN_13 BAD_INPUT Request key version header is invalid`,
   API_UNAVAILABLE = `CELO_ODIS_WARN_14 BAD_INPUT API is unavailable`,
   INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES = `CELO_ODIS_WARN_15 SIGNER Discrepency found in signer domain disabled states`,
+  INVALID_AUTH_SIGNATURE = 'CELO_ODIS_WARN_12 BAD_INPUT Authorization signature was incorrectly generated. Request will be rejected in a future version.',
 }
+
+export type ErrorType = ErrorMessage | WarningMessage
