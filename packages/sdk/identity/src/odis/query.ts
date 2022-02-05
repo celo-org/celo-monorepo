@@ -1,6 +1,6 @@
 // Utilities for interacting with the Oblivious Decentralized Identifier Service (ODIS)
 
-import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
+import { hexToBuffer } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { ContractKit } from '@celo/contractkit'
 import {
@@ -115,15 +115,7 @@ export function signWithRawKey(msg: string, rawKey: string) {
 
   // Sign
   const key = ec.keyFromPrivate(hexToBuffer(rawKey))
-  const sig = JSON.stringify(key.sign(msgDigest).toDER())
-
-  // Verify
-  const pub = key.getPublic(true, 'hex')
-  const pubKey = ec.keyFromPublic(trimLeading0x(pub), 'hex')
-  const validSignature: boolean = pubKey.verify(msgDigest, JSON.parse(sig))
-
-  debug(`Signature is valid: ${validSignature} signed by ${pub}`)
-  return sig
+  return JSON.stringify(key.sign(msgDigest).toDER())
 }
 
 /**

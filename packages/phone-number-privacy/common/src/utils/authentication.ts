@@ -48,7 +48,11 @@ export async function authenticateUser(
       return false
     } else {
       logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
-      if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
+      if (
+        verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger, {
+          insecureAllowIncorrectlyGeneratedSignature: true,
+        })
+      ) {
         return true
       }
     }
@@ -66,9 +70,11 @@ export function verifyDEKSignature(
   message: string,
   messageSignature: string,
   registeredEncryptionKey: string,
-  logger?: Logger
+  logger?: Logger,
+  { insecureAllowIncorrectlyGeneratedSignature } = {
+    insecureAllowIncorrectlyGeneratedSignature: false,
+  }
 ) {
-  const insecureAllowIncorrectlyGeneratedSignature = true
   logger = logger ?? rootLogger()
   try {
     const msgDigest = crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex')
