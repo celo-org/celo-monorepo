@@ -1,8 +1,5 @@
-import { ec as EC } from 'elliptic'
 import { Bip39, generateKeys } from './account'
 import { ensureLeading0x } from './address'
-
-const ec = new EC('secp256k1')
 
 /**
  * Turns a private key to a compressed public key (hex string with hex leader).
@@ -11,6 +8,11 @@ const ec = new EC('secp256k1')
  * @returns {string} Corresponding compessed public key in hex encoding with '0x' leader.
  */
 export function compressedPubKey(privateKey: Buffer): string {
+  // NOTE: elliptic is disabled elsewhere in this library to prevent
+  // accidental signing of truncated messages.
+  // tslint:disable-next-line:import-blacklist
+  const EC = require('elliptic').ec
+  const ec = new EC('secp256k1')
   const key = ec.keyFromPrivate(privateKey)
   return ensureLeading0x(key.getPublic(true, 'hex'))
 }
