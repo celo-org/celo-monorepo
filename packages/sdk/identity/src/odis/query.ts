@@ -1,5 +1,3 @@
-// Utilities for interacting with the Oblivious Decentralized Identifier Service (ODIS)
-
 import { hexToBuffer } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { ContractKit } from '@celo/contractkit'
