@@ -71,8 +71,8 @@ export const Counters = {
     help: 'Counter for requests by country and type of phone number',
   }),
   attestationRequestsProvidedSignature: new Counter({
-    name: 'attestation_requests_provided_blinded_signature',
-    help: 'Counter for the number of requests which provided blinded phone number signature',
+    name: 'attestation_requests_provided_signature',
+    help: 'Counter for the number of requests which provided phone number signature',
   }),
 }
 
