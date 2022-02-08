@@ -1,10 +1,12 @@
 import { randomBytes } from 'crypto'
-import { ec as EC } from 'elliptic'
 import { decryptComment, encryptComment } from './commentEncryption'
 
-const ec = new EC('secp256k1')
-
 describe('Comment Encryption', () => {
+  // NOTE: elliptic is disabled elsewhere in this library to prevent
+  // accidental signing of truncated messages.
+  // tslint:disable-next-line:import-blacklist
+  const EC = require('elliptic').ec
+  const ec = new EC('secp256k1')
   const self = ec.keyFromPrivate(randomBytes(32))
   const selfPublic = Buffer.from(self.getPublic('hex'), 'hex')
   const selfPriv = Buffer.from(self.getPrivate('hex'), 'hex')
@@ -90,7 +92,7 @@ describe('Comment Encryption', () => {
 
     const newComment = 'regression test on encryption method 👍'
     // How comment was encrypted.
-    // Uses elliptic package
+    // Uses elliptic package (see note above)
     // console.info(
     //   encryptComment(
     //     comment,
