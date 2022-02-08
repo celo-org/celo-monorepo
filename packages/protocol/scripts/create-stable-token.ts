@@ -76,35 +76,35 @@ import {
   FreezerInstance,
   ReserveInstance,
   SortedOraclesInstance,
-  StableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}Instance,
+  StableToken{TICKER}Instance,
 } from 'types'
 import Web3 from 'web3'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (): Promise<any[]> => {
-  const rate = toFixed(config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.inflationRate)
+  const rate = toFixed(config.stableToken{TICKER}.inflationRate)
   return [
-    config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.tokenName,
-    config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.tokenSymbol,
-    config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.decimals,
+    config.stableToken{TICKER}.tokenName,
+    config.stableToken{TICKER}.tokenSymbol,
+    config.stableToken{TICKER}.decimals,
     config.registry.predeployedProxyAddress,
     rate.toString(),
-    config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.inflationPeriod,
-    config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.initialBalances.addresses,
-    config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.initialBalances.values,
-    'Exchange[KEY_TO_BE_REPLACED_IN_TEMPLATES}',
+    config.stableToken{TICKER}.inflationPeriod,
+    config.stableToken{TICKER}.initialBalances.addresses,
+    config.stableToken{TICKER}.initialBalances.values,
+    'Exchange{TICKER}',
   ]
 }
 
 // TODO make this general
-module.exports = deploymentForCoreContract<StableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}Instance>(
+module.exports = deploymentForCoreContract<StableToken{TICKER}Instance>(
   web3,
   artifacts,
-  CeloContractName.StableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES},
+  CeloContractName.StableToken{TICKER},
   initializeArgs,
-  async (stableToken: StableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}Instance, _web3: Web3, networkName: string) => {
-    if (config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.frozen) {
+  async (stableToken: StableToken{TICKER}Instance, _web3: Web3, networkName: string) => {
+    if (config.stableToken{TICKER}.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
         artifacts
@@ -116,22 +116,22 @@ module.exports = deploymentForCoreContract<StableToken[KEY_TO_BE_REPLACED_IN_TEM
       artifacts
     )
 
-    for (const oracle of config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.oracles) {
-      console.info(\`Adding \${ oracle } as an Oracle for StableToken([KEY_TO_BE_REPLACED_IN_TEMPLATES})\`)
+    for (const oracle of config.stableToken{TICKER}.oracles) {
+      console.info(\`Adding \${ oracle } as an Oracle for StableToken({TICKER})\`)
       await sortedOracles.addOracle(stableToken.address, ensureLeading0x(oracle))
     }
 
-    const goldPrice = config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.goldPrice
+    const goldPrice = config.stableToken{TICKER}.goldPrice
     if (goldPrice) {
       const fromAddress = truffle.networks[networkName].from
-      const isOracle = config.stableToken[KEY_TO_BE_REPLACED_IN_TEMPLATES}.oracles.some((o) => eqAddress(o, fromAddress))
+      const isOracle = config.stableToken{TICKER}.oracles.some((o) => eqAddress(o, fromAddress))
       if (!isOracle) {
         console.warn(
           \`Gold price specified in migration but \${ fromAddress } not explicitly authorized as oracle, authorizing...\`
         )
         await sortedOracles.addOracle(stableToken.address, ensureLeading0x(fromAddress))
       }
-      console.info('Reporting price of StableToken ([KEY_TO_BE_REPLACED_IN_TEMPLATES}) to oracle')
+      console.info('Reporting price of StableToken ({TICKER}) to oracle')
       await sortedOracles.report(
         stableToken.address,
         toFixed(goldPrice),
@@ -142,11 +142,11 @@ module.exports = deploymentForCoreContract<StableToken[KEY_TO_BE_REPLACED_IN_TEM
         'Reserve',
         artifacts
       )
-      console.info('Adding StableToken ([KEY_TO_BE_REPLACED_IN_TEMPLATES}) to Reserve')
+      console.info('Adding StableToken ({TICKER}) to Reserve')
       await reserve.addToken(stableToken.address)
     }
 
-    console.info('Whitelisting StableToken ([KEY_TO_BE_REPLACED_IN_TEMPLATES}) as a fee currency')
+    console.info('Whitelisting StableToken ({TICKER}) as a fee currency')
     const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract<FeeCurrencyWhitelistInstance>(
       'FeeCurrencyWhitelist',
       artifacts
@@ -223,46 +223,80 @@ try {
   // contracts
   fs.writeFile(
     `${stabilityContractPath}/StableToken${fiatTicker}.sol`,
-    StableTokenTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    StableTokenTemplate.split(KEY_TO_BE_REPLACED_IN_TEMPLATES).join(fiatTicker),
     errorFunct
   )
   fs.writeFile(
     `${stabilityContractPath}/Exchange${fiatTicker}.sol`,
-    ExchangeTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    ExchangeTemplate.split(KEY_TO_BE_REPLACED_IN_TEMPLATES).join(fiatTicker),
     errorFunct
   )
 
   // proxy
   fs.writeFile(
     `${stabilityProxyPath}/StableToken${fiatTicker}.sol`,
-    StableTokenProxyTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    StableTokenProxyTemplate.split(KEY_TO_BE_REPLACED_IN_TEMPLATES).join(fiatTicker),
     errorFunct
   )
   fs.writeFile(
     `${stabilityProxyPath}/Exchange${fiatTicker}.sol`,
-    ExchangeProxyTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    ExchangeProxyTemplate.split(KEY_TO_BE_REPLACED_IN_TEMPLATES).join(fiatTicker),
     errorFunct
   )
 
   // migration
   fs.writeFile(
-    `${migrationPath}/09_999_stableToken_${fiatTicker}.sol`,
-    migrationStableTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    `${migrationPath}/09_999_stableToken_${fiatTicker}.ts`,
+    migrationStableTemplate.split(KEY_TO_BE_REPLACED_IN_TEMPLATES).join(fiatTicker),
     errorFunct
   )
   fs.writeFile(
-    `${migrationPath}/10_999_exchange_${fiatTicker}.sol`,
-    migrationExchangeTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    `${migrationPath}/10_999_exchange_${fiatTicker}.ts`,
+    migrationExchangeTemplate.split(KEY_TO_BE_REPLACED_IN_TEMPLATES).join(fiatTicker),
     errorFunct
   )
 
   // tslint:disable-next-line: no-console
-  console.log(`Other thinks that should be updated:
-  * Add constitution parameters: packages/protocol/governanceConstitution.js
-  * Rename migration with right number: packages/protocol/migrations/09_Y_stableToken_X.ts and packages/protocol/migrations/10_Y_Exchange_X.ts
-  * Add keys to migration config: packages/protocol/migrationsConfig.js
-  * Add files to the build: packages/protocol/scripts/build.ts
-  * Add it to the env tests packages/protocol/test/common/integration.ts
+  console.log(`Other things that should be updated:
+  * Add constitution parameters: packages/protocol/governanceConstitution.js:
+  Exchange${fiatTicker}: {
+    default: 0.8,
+    setRegistry: 0.9,
+    setUpdateFrequency: 0.8,
+    setMinimumReports: 0.8,
+    setStableToken: 0.8,
+    setSpread: 0.8,
+    setReserveFraction: 0.8,
+  },
+  StableToken${fiatTicker}: {
+    default: 0.8,
+    setRegistry: 0.9,
+    setInflationParameters: 0.9,
+    transfer: 0.6,
+    transferWithComment: 0.6,
+    approve: 0.6,
+  },
+
+  * Rename migrations with right number: packages/protocol/migrations/09_Y_stableToken_X.ts and packages/protocol/migrations/10_Y_Exchange_X.ts
+  * Add keys to migration config: packages/protocol/migrationsConfig.js:
+  stableToken${fiatTicker}: {
+    decimals: 18,
+    goldPrice: 1.2,
+    tokenName: 'TO BE COMPLETED',
+    tokenSymbol: 'TO BE COMPLETED',
+    inflationRate: 1,
+    inflationPeriod: 1.5 * YEAR,
+    initialBalances: {
+      addresses: [network.from],
+      values: ['5000000000000000000000000'],
+    },
+    oracles: [network.from],
+    frozen: false,
+  },
+
+  * Add files to the build in the ProxyContracts and CoreContracts list: packages/protocol/scripts/build.ts
+  * Add it to the env tests packages/protocol/test/common/integration.ts (look for the comment "Add new StableTokens here")
+  * Add contracts to CeloContractName enum in the Registry Utils packages/protocol/lib/registry-utils.ts 
   `)
 } catch (e) {
   // tslint:disable-next-line: no-console

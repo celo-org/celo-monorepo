@@ -391,6 +391,7 @@ contract('Integration: Governance', (accounts: string[]) => {
   })
 })
 
+// Add new StableTokens here
 Array.from([
   ['Exchange', 'StableToken'], // USD
   ['ExchangeEUR', 'StableTokenEUR'], // EUR
