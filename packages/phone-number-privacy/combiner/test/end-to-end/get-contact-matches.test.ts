@@ -21,7 +21,7 @@ require('dotenv').config()
 jest.setTimeout(60000)
 
 describe('Running against a deployed service', () => {
-  it('Service is deployed at correct version', async () => {
+  xit('Service is deployed at correct version', async () => {
     const response = await fetch(process.env.ODIS_COMBINER_SERVICE_URL + Endpoints.STATUS, {
       method: 'GET',
     })
