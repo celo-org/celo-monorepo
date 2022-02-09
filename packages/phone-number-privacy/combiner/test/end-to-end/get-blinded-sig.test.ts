@@ -4,9 +4,11 @@ import {
   ErrorMessages,
   SignMessageRequest,
 } from '@celo/identity/lib/odis/query'
+import { Endpoints } from '@celo/phone-number-privacy-common'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
 import 'isomorphic-fetch'
 import { replenishQuota } from '../../../common/src/test/utils'
+import { VERSION } from '../../src/config'
 import {
   ACCOUNT_ADDRESS,
   ACCOUNT_ADDRESS_NO_QUOTA,
@@ -29,6 +31,16 @@ describe('Running against a deployed service', () => {
     console.log('ODIS_COMBINER_SERVICE_URL: ' + process.env.ODIS_COMBINER_SERVICE_URL)
     console.log('ODIS_BLOCKCHAIN_PROVIDER: ' + process.env.ODIS_BLOCKCHAIN_PROVIDER)
   })
+
+  it('Service is deployed at correct version', async () => {
+    const response = await fetch(process.env.ODIS_COMBINER_SERVICE_URL + Endpoints.STATUS, {
+      method: 'GET',
+    })
+    const body = await response.json()
+    // This checks against local package.json version, change if necessary
+    expect(body.version).toBe(VERSION)
+  })
+
   describe('Returns status ODIS_INPUT_ERROR', () => {
     it('With invalid address', async () => {
       const body: SignMessageRequest = {
