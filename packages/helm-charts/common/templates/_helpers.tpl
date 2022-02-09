@@ -524,7 +524,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
      fi
      mkdir -p /root/.celo/celo
      cd /root/.celo/celo
-     wget https://storage.googleapis.com/{{ .Values.geth.gstorage_data_bucket }}/chaindata-latest.tar.gz chaindata.tar.gz
+     curl -L https://storage.googleapis.com/{{ .Values.geth.gstorage_data_bucket }}/chaindata-latest.tar.gz --output chaindata.tar.gz
      tar -xzvf chaindata.tar.gz -C /root/.celo/celo
      rm -f chaindata.tar.gz
   volumeMounts:
