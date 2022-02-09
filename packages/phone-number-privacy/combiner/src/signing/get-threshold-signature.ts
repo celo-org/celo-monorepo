@@ -1,6 +1,7 @@
 import {
   authenticateUser,
   ErrorMessage,
+  ErrorType,
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
@@ -8,6 +9,7 @@ import {
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  respondWithError,
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
@@ -19,7 +21,6 @@ import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
-import { respondWithError } from '../common/error-utils'
 import config, { VERSION } from '../config'
 import { getContractKit } from '../web3/contracts'
 
@@ -40,16 +41,34 @@ interface SignMsgRespWithStatus {
   status: number
 }
 
+function sendFailureResponse(
+  response: Response<SignMessageResponseFailure>,
+  error: ErrorType,
+  status: number,
+  logger: Logger
+) {
+  respondWithError(
+    response,
+    {
+      success: false,
+      version: VERSION,
+      error,
+    },
+    status,
+    logger
+  )
+}
+
 export async function handleGetBlindedMessageSig(request: Request, response: Response) {
   const logger: Logger = response.locals.logger
 
   try {
     if (!isValidGetSignatureInput(request.body)) {
-      respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
+      sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400, logger)
       return
     }
     if (!(await authenticateUser(request, getContractKit(), logger))) {
-      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
+      sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401, logger)
       return
     }
     logger.debug('Requesting signatures')
@@ -57,7 +76,7 @@ export async function handleGetBlindedMessageSig(request: Request, response: Res
   } catch (err) {
     logger.error('Unknown error in handleGetBlindedMessageSig')
     logger.error(err)
-    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, logger)
+    sendFailureResponse(response, ErrorMessage.UNKNOWN_ERROR, 500, logger)
   }
 }
 
@@ -387,12 +406,12 @@ function handleMissingSignatures(
   logger: Logger
 ) {
   if (majorityErrorCode === 403) {
-    respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA, logger)
+    sendFailureResponse(response, WarningMessage.EXCEEDED_QUOTA, 403, logger)
   } else {
-    respondWithError(
+    sendFailureResponse(
       response,
-      majorityErrorCode || 500,
       ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
+      majorityErrorCode ?? 500,
       logger
     )
   }

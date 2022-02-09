@@ -2,13 +2,13 @@ import {
   CombinerEndpoint,
   DisableDomainRequest,
   DisableDomainResponse,
+  DisableDomainResponseSuccess,
   ErrorMessage,
   getSignerEndpoint,
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import { Request, Response } from 'express'
-import { respondWithError } from '../../common/error-utils'
 import { OdisConfig, VERSION } from '../../config'
 import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
 import { IInputService } from '../input.interface'
@@ -53,6 +53,13 @@ export class DomainDisableService extends CombinerService {
     }
   }
 
+  protected sendSuccessResponse(response: Response<DisableDomainResponseSuccess>, status: number) {
+    response.status(status).json({
+      success: true,
+      version: VERSION,
+    })
+  }
+
   protected async combineSignerResponses(
     _request: Request<{}, {}, DisableDomainRequest>,
     response: Response<any>
@@ -62,11 +69,10 @@ export class DomainDisableService extends CombinerService {
       return
     }
 
-    respondWithError(
+    this.sendFailureResponse(
       response,
-      this.getMajorityErrorCode() ?? 500,
       ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE,
-      this.logger
+      this.getMajorityErrorCode() ?? 500
     )
   }
 }

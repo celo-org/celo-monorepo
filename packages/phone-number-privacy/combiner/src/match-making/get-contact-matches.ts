@@ -1,6 +1,7 @@
 import {
   authenticateUser,
   ErrorMessage,
+  ErrorType,
   GetContactMatchesRequest,
   getDataEncryptionKey,
   hasValidAccountParam,
@@ -8,12 +9,12 @@ import {
   hasValidIdentifier,
   hasValidUserPhoneNumberParam,
   isVerified,
+  respondWithError,
   verifyDEKSignature,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
-import { respondWithError } from '../common/error-utils'
 import config, {
   E2E_TEST_ACCOUNTS,
   E2E_TEST_PHONE_NUMBERS,
@@ -37,11 +38,24 @@ export interface VerifiedPhoneNumberDekSignature {
   dekSigner: string
 }
 
+function sendFailureResponse(response: Response, error: ErrorType, status: number, logger: Logger) {
+  respondWithError(
+    response,
+    {
+      success: false,
+      version: VERSION,
+      error,
+    },
+    status,
+    logger
+  )
+}
+
 export async function handleGetContactMatches(request: Request, response: Response) {
   const logger: Logger = response.locals.logger
   try {
     if (!isValidGetContactMatchesInput(request.body)) {
-      respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
+      sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400, logger)
       return
     }
 
@@ -55,7 +69,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
       logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
     }
     if (!isAuthenticated) {
-      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
+      sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401, logger)
       return
     }
 
@@ -78,7 +92,12 @@ export async function handleGetContactMatches(request: Request, response: Respon
         logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
       }
       if (!_isVerified) {
-        respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE, logger)
+        sendFailureResponse(
+          response,
+          WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE,
+          403,
+          logger
+        )
         return
       }
     } else {
@@ -111,10 +130,10 @@ export async function handleGetContactMatches(request: Request, response: Respon
             insecureAllowIncorrectlyGeneratedSignature: true,
           })
         ) {
-          respondWithError(
+          sendFailureResponse(
             response,
-            403,
             WarningMessage.INVALID_USER_PHONE_NUMBER_SIGNATURE,
+            403,
             logger
           )
           return
@@ -135,7 +154,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
       verifiedPhoneNumberDekSig = undefined
     })
     if (invalidReplay) {
-      respondWithError(response, 403, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, logger)
+      sendFailureResponse(response, WarningMessage.DUPLICATE_REQUEST_TO_MATCHMAKE, 403, logger)
       return
     }
 
@@ -150,7 +169,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
   } catch (err) {
     logger.error('Failed to getContactMatches')
     logger.error(err)
-    respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, logger)
+    sendFailureResponse(response, ErrorMessage.UNKNOWN_ERROR, 500, logger)
   }
 }
 

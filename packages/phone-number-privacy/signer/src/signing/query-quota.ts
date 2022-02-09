@@ -3,28 +3,51 @@ import { NULL_ADDRESS, StableToken } from '@celo/contractkit'
 import {
   authenticateUser,
   ErrorMessage,
+  ErrorType,
   FULL_NODE_TIMEOUT_IN_MS,
   GetQuotaRequest,
   hasValidAccountParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
   isVerified,
+  respondWithError,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
   SignerEndpoint as Endpoint,
+  SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import allSettled from 'promise.allsettled'
-import { respondWithError } from '../common/error-utils'
 import { Counters, Histograms, Labels } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { getPerformedQueryCount } from '../database/wrappers/account'
 import { getContractKit } from '../web3/contracts'
 
 allSettled.shim()
+
+function sendFailureResponse(
+  response: Response,
+  error: ErrorType,
+  status: number,
+  endpoint: SignerEndpoint,
+  logger: Logger
+) {
+  Counters.responses.labels(endpoint, status.toString()).inc()
+  respondWithError(
+    response,
+    {
+      success: false,
+      error,
+      version: getVersion(),
+      // TODO(Alec)
+    },
+    status,
+    logger
+  )
+}
 
 export async function handleGetQuota(
   request: Request<{}, {}, GetQuotaRequest>,
@@ -36,6 +59,7 @@ export async function handleGetQuota(
   logger.debug('Begin handleGetQuota')
   try {
     if (!isValidGetQuotaInput(request.body)) {
+      sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400)
       respondWithError(Endpoint.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)
       return
     }

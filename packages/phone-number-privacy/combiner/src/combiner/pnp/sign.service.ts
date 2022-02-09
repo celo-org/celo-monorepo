@@ -1,21 +1,25 @@
 import {
   CombinerEndpoint,
+  ErrorType,
   GetBlindedMessageSigRequest,
   getSignerEndpoint,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  respondWithError,
   SignerEndpoint,
+  SignMessageResponse,
+  SignMessageResponseFailure,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 import { HeaderInit } from 'node-fetch'
-import { OdisConfig } from '../../config'
-import { SignerPnpResponse, SignerResponseWithStatus } from '../combiner.service'
+import { OdisConfig, VERSION } from '../../config'
+import { SignerResponseWithStatus } from '../combiner.service'
 import { IInputService } from '../input.interface'
 import { SignService } from '../sign.service'
 
 interface PnpSignResponseWithStatus extends SignerResponseWithStatus {
   url: string
-  res: SignerPnpResponse
+  res: SignMessageResponse
   status: number
 }
 export class PnpSignService extends SignService {
@@ -41,7 +45,7 @@ export class PnpSignService extends SignService {
     return req.blindedQueryPhoneNumber
   }
 
-  protected parseSignature(res: SignerPnpResponse, signerUrl: string): string | undefined {
+  protected parseSignature(res: SignMessageResponse, signerUrl: string): string | undefined {
     if (!res.success) {
       this.logger.error(
         {
@@ -53,6 +57,29 @@ export class PnpSignService extends SignService {
       // Continue on failure as long as signature is present to unblock user
     }
     return res.signature
+  }
+
+  protected sendFailureResponse(
+    response: Response<SignMessageResponseFailure>,
+    error: ErrorType,
+    status: number,
+    performedQueryCount?: number,
+    totalQuota?: number,
+    blockNumber?: number
+  ) {
+    respondWithError(
+      response,
+      {
+        success: false,
+        version: VERSION,
+        error,
+        performedQueryCount,
+        totalQuota,
+        blockNumber,
+      },
+      status,
+      this.logger
+    )
   }
 
   // TODO(Alec): clean this up

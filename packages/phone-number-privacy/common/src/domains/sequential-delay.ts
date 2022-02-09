@@ -130,7 +130,11 @@ export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
 }
 
 export interface SequentialDelayDomainState {
-  /** Timestamp in seconds since the Unix Epoch determining when a new request will be accepted. */
+  // TODO(Alec)(next): make sure this nuance is reflected in combiner and sdk code
+  /**
+   * Timestamp in seconds since the Unix Epoch to which the next delay should be applied
+   * to calculate when a new request will be accepted.
+   */
   timer: number
   /** Number of queries that have been accepted for the SequentialDelayDomain instance. */
   counter: number

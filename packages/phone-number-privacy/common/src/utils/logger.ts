@@ -2,8 +2,8 @@ import Logger, { createLogger, levelFromName, LogLevelString, stdSerializers } f
 import bunyanDebugStream from 'bunyan-debug-stream'
 import { createStream } from 'bunyan-gke-stackdriver'
 import { NextFunction, Request, Response } from 'express'
-import { WarningMessage } from '../interfaces/error-utils'
-import { fetchEnv, fetchEnvOrDefault } from './config-utils'
+import { WarningMessage } from '../interfaces/errors'
+import { fetchEnv, fetchEnvOrDefault } from './config.utils'
 
 let _rootLogger: Logger | undefined
 

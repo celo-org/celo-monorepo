@@ -2,10 +2,16 @@ import {
   CombinerEndpoint,
   DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
+  DomainRestrictedSignatureResponseFailure,
+  ErrorType,
+  FailureResponse,
   getSignerEndpoint,
+  respondWithError,
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
-import { OdisConfig } from '../../config'
+import { Response } from 'express'
+import { logger } from 'firebase-functions/v1'
+import { OdisConfig, VERSION } from '../../config'
 import { SignerResponseWithStatus } from '../combiner.service'
 import { IInputService } from '../input.interface'
 import { SignService } from '../sign.service'
@@ -45,6 +51,25 @@ export class DomainSignService extends SignService {
     return res.signature
   }
 
+  protected sendFailureResponse(
+    response: Response<FailureResponse>,
+    error: ErrorType,
+    status: number
+  ) {
+    respondWithError(
+      response,
+      {
+        success: false,
+        version: VERSION,
+        error,
+        retryAfter: this.getRetryAfter(),
+        date: this.getDate(),
+      },
+      status,
+      this.logger
+    )
+  }
+
   protected parseBlindedMessage(req: DomainRestrictedSignatureRequest): string {
     return req.blindedMessage
   }
@@ -52,5 +77,29 @@ export class DomainSignService extends SignService {
   protected logResponseDiscrepancies(): void {
     // TODO(Alec)
     throw new Error('Method not implemented.')
+  }
+
+  private getRetryAfter(): number {
+    try {
+      return this.responses
+        .filter((response) => !response.res.success && response.res.retryAfter > 0)
+        .map((response) => response.res as DomainRestrictedSignatureResponseFailure)
+        .sort((a, b) => a.retryAfter - b.retryAfter)[this.threshold - 1].retryAfter
+    } catch (error) {
+      logger.error({ error }, 'Error getting threshold response retryAfter value')
+      return -1
+    }
+  }
+
+  private getDate(): number {
+    try {
+      return this.responses
+        .filter((response) => !response.res.success && response.res.date > 0)
+        .map((response) => response.res as DomainRestrictedSignatureResponseFailure)
+        .sort((a, b) => a.date - b.date)[this.threshold - 1].date
+    } catch (error) {
+      logger.error({ error }, 'Error getting threshold response date value')
+      return -1
+    }
   }
 }

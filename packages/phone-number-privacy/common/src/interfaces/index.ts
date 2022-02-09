@@ -1,4 +1,4 @@
 export * from './endpoints'
-export * from './error-utils'
+export * from './errors'
 export * from './requests'
 export * from './responses'

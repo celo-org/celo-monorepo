@@ -1,29 +1,26 @@
 import {
   CombinerEndpoint,
-  DisableDomainResponseSuccess,
-  DomainQuotaStatusResponseSuccess,
+  DisableDomainResponse,
+  DomainQuotaStatusResponse,
   ErrorMessage,
+  ErrorType,
+  FailureResponse,
+  OdisResponse,
+  respondWithError,
   rootLogger,
   SignerEndpoint,
-  SignMessageResponseFailure,
-  SignMessageResponseSuccess,
+  SignMessageResponse,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import fetch, { HeaderInit, Response as FetchResponse } from 'node-fetch'
-import { respondWithError } from '../common/error-utils'
-import { OdisConfig } from '../config'
+import { OdisConfig, VERSION } from '../config'
 import { DistributedRequest, ICombinerService } from './combiner.interface'
 import { IInputService } from './input.interface'
 
-export type SignerPnpResponse = SignMessageResponseSuccess | SignMessageResponseFailure
-
-export type SignerResponse =
-  | SignerPnpResponse
-  | DomainQuotaStatusResponseSuccess
-  | DisableDomainResponseSuccess
+export type SignerResponse = SignMessageResponse | DomainQuotaStatusResponse | DisableDomainResponse
 
 export interface SignerResponseWithStatus {
   url: string
@@ -74,7 +71,7 @@ export abstract class CombinerService implements ICombinerService {
     } catch (err) {
       this.logger.error(`Unknown error in handleDistributedRequest for ${this.endpoint}`)
       this.logger.error(err)
-      respondWithError(response, 500, ErrorMessage.UNKNOWN_ERROR, this.logger)
+      this.sendFailureResponse(response, ErrorMessage.UNKNOWN_ERROR, 500)
     }
   }
 
@@ -83,15 +80,15 @@ export abstract class CombinerService implements ICombinerService {
     response: Response
   ): Promise<boolean> {
     if (!this.enabled) {
-      respondWithError(response, 501, WarningMessage.API_UNAVAILABLE, this.logger)
+      this.sendFailureResponse(response, WarningMessage.API_UNAVAILABLE, 501)
       return false
     }
     if (!this.io.validate(request, this.logger)) {
-      respondWithError(response, 400, WarningMessage.INVALID_INPUT, this.logger)
+      this.sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400)
       return false
     }
     if (!(await this.io.authenticate(request, this.logger))) {
-      respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, this.logger)
+      this.sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401)
       return false
     }
     return true
@@ -143,6 +140,23 @@ export abstract class CombinerService implements ICombinerService {
     })
   }
 
+  protected sendFailureResponse(
+    response: Response<FailureResponse>,
+    error: ErrorType,
+    status: number
+  ) {
+    respondWithError(
+      response,
+      {
+        success: false,
+        version: VERSION,
+        error,
+      },
+      status,
+      this.logger
+    )
+  }
+
   protected getMajorityErrorCode() {
     // Ignore timeouts
     const ignoredErrorCodes = [408]
@@ -171,7 +185,7 @@ export abstract class CombinerService implements ICombinerService {
 
   protected abstract combineSignerResponses(
     request: Request<{}, {}, DistributedRequest>,
-    response: Response
+    response: Response<OdisResponse>
   ): Promise<void>
 
   protected abstract handleResponseOK(

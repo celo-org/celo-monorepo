@@ -1,22 +1,26 @@
 import {
   DomainRestrictedSignatureRequest,
+  DomainRestrictedSignatureResponse,
+  DomainRestrictedSignatureResponseSuccess,
   ErrorMessage,
+  ErrorType,
   GetBlindedMessageSigRequest,
   KEY_VERSION_HEADER,
+  SignMessageResponse,
+  SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import { Request, Response } from 'express'
 import { HeaderInit } from 'node-fetch'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
-import { ErrorType, respondWithError } from '../common/error-utils'
 import { OdisConfig, VERSION } from '../config'
-import { CombinerService, SignerPnpResponse } from './combiner.service'
+import { CombinerService } from './combiner.service'
 import { IInputService } from './input.interface'
 
-export type SignerSigResponse = SignerPnpResponse | DomainRestrictedSignatureRequest
+export type SignatureResponse = SignMessageResponse | DomainRestrictedSignatureResponse
 
-export type SignRequest = DomainRestrictedSignatureRequest | GetBlindedMessageSigRequest
+export type SignatureRequest = DomainRestrictedSignatureRequest | GetBlindedMessageSigRequest
 
 export abstract class SignService extends CombinerService {
   protected blsCryptoClient: BLSCryptographyClient
@@ -33,7 +37,7 @@ export abstract class SignService extends CombinerService {
   }
 
   protected async inputCheck(
-    request: Request<{}, {}, SignRequest>,
+    request: Request<{}, {}, SignatureRequest>,
     response: Response
   ): Promise<boolean> {
     return (await super.inputCheck(request, response)) && this.reqKeyHeaderCheck(request, response)
@@ -47,7 +51,7 @@ export abstract class SignService extends CombinerService {
   }
 
   protected async handleResponseOK(
-    request: Request<{}, {}, SignRequest>,
+    request: Request<{}, {}, SignatureRequest>,
     data: string,
     status: number,
     url: string,
@@ -94,8 +98,20 @@ export abstract class SignService extends CombinerService {
     }
   }
 
+  protected sendSuccessResponse(
+    response: Response<DomainRestrictedSignatureResponseSuccess | SignMessageResponseSuccess>,
+    signature: string,
+    status: number
+  ) {
+    response.status(status).json({
+      success: true,
+      version: VERSION,
+      signature,
+    })
+  }
+
   protected async combineSignerResponses(
-    request: Request<{}, {}, SignRequest>,
+    request: Request<{}, {}, SignatureRequest>,
     response: Response
   ): Promise<void> {
     this.logResponseDiscrepancies()
@@ -106,8 +122,7 @@ export abstract class SignService extends CombinerService {
           this.parseBlindedMessage(request.body),
           this.logger
         )
-        response.json({ success: true, combinedSignature, version: VERSION })
-        return
+        return this.sendSuccessResponse(response, combinedSignature, 200)
       } catch {
         // May fail upon combining signatures if too many sigs are invalid
         // Fallback to handleMissingSignatures
@@ -119,24 +134,27 @@ export abstract class SignService extends CombinerService {
 
   protected abstract logResponseDiscrepancies(): void
 
-  protected abstract parseSignature(res: SignerSigResponse, signerUrl: string): string | undefined
+  protected abstract parseSignature(res: SignatureResponse, signerUrl: string): string | undefined
 
-  protected abstract parseBlindedMessage(req: SignRequest): string
+  protected abstract parseBlindedMessage(req: SignatureRequest): string
 
-  private reqKeyHeaderCheck(request: Request<{}, {}, SignRequest>, response: Response): boolean {
+  private reqKeyHeaderCheck(
+    request: Request<{}, {}, SignatureRequest>,
+    response: Response
+  ): boolean {
     const reqKeyVersion = request.headers[KEY_VERSION_HEADER]
     if (reqKeyVersion && Number(reqKeyVersion) !== this.keyVersion) {
-      respondWithError(response, 400, WarningMessage.INVALID_KEY_VERSION_REQUEST, this.logger)
+      this.sendFailureResponse(response, WarningMessage.INVALID_KEY_VERSION_REQUEST, 400)
       return false
     }
     return true
   }
 
   private handleMissingSignatures(majorityErrorCode: number | null, response: Response) {
-    let msg: ErrorType = ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
+    let error: ErrorType = ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
     if (majorityErrorCode === 403) {
-      msg = WarningMessage.EXCEEDED_QUOTA
+      error = WarningMessage.EXCEEDED_QUOTA
     }
-    respondWithError(response, majorityErrorCode ?? 500, msg, this.logger)
+    this.sendFailureResponse(response, error, majorityErrorCode ?? 500)
   }
 }

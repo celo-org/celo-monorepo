@@ -1,40 +1,58 @@
+import { ErrorType } from '.'
 import { KnownDomainState } from '../domains'
 
-export interface SignMessageResponse {
-  success: boolean
-  version?: string
+export interface SignMessageResponseSuccess {
+  success: true
+  version: string
+  performedQueryCount?: number
+  totalQuota?: number
+  blockNumber?: number
   signature?: string
+}
+
+export interface SignMessageResponseFailure {
+  success: false
+  version: string
+  performedQueryCount?: number
+  totalQuota?: number
+  blockNumber?: number
+  signature?: string
+}
+
+export type SignMessageResponse = SignMessageResponseSuccess | SignMessageResponseFailure
+export interface GetQuotaResponseSuccess {
+  success: true
+  version: string
   performedQueryCount?: number
   totalQuota?: number
   blockNumber?: number
 }
 
-export interface SignMessageResponseFailure extends SignMessageResponse {
+export interface GetQuotaResponseFailure {
   success: false
-  error: string
+  version: string
+  error: ErrorType
 }
 
-export interface SignMessageResponseSuccess extends SignMessageResponse {
+export type GetQuotaResponse = GetQuotaResponseSuccess | GetQuotaResponseFailure
+
+export interface GetContactMatchesResponseSuccess {
   success: true
+  version: string
+  matchedContacts: Array<{ phoneNumber: string }>
+}
+export interface GetContactMatchesResponseFailure {
+  success: false
+  version: string
+  error: ErrorType
 }
 
-export interface GetQuotaResponse {
-  success: boolean
-  version: string
-  performedQueryCount: number
-  totalQuota: number
-}
-
-export interface GetContactMatchesResponse {
-  success: boolean
-  matchedContacts: Array<{
-    phoneNumber: string
-  }>
-  version: string
-}
+export type GetContactMatchesResponse =
+  | GetContactMatchesResponseSuccess
+  | GetContactMatchesResponseFailure
 
 export interface DomainRestrictedSignatureResponseSuccess {
-  success: true
+  successs: true
   version: string
   signature: string
 }
@@ -42,7 +60,9 @@ export interface DomainRestrictedSignatureResponseSuccess {
 export interface DomainRestrictedSignatureResponseFailure {
   success: false
   version: string
-  error: string
+  status: KnownDomainState
+  /** Server Unix tiimestamp in seconds */
+  date: number
 }
 
 export type DomainRestrictedSignatureResponse =
@@ -53,12 +73,14 @@ export interface DomainQuotaStatusResponseSuccess {
   success: true
   version: string
   status: KnownDomainState
+  /** Server Unix tiimestamp in seconds */
+  date: number
 }
 
 export interface DomainQuotaStatusResponseFailure {
   success: false
   version: string
-  error: string
+  error: ErrorType
 }
 
 export type DomainQuotaStatusResponse =
@@ -73,7 +95,41 @@ export interface DisableDomainResponseSuccess {
 export interface DisableDomainResponseFailure {
   success: false
   version: string
-  error: string
+  error: ErrorType
 }
 
-export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
+// TODO(Alec)
+
+// export type DisableDomainResponse =
+//   | DisableDomainResponseSuccess
+//   | DisableDomainResponseFailure
+
+// export type PnpResponseSuccess =
+//   | SignMessageResponseSuccess
+//   | GetQuotaResponseSuccess
+//   | GetContactMatchesResponseSuccess
+
+// export type PnpResponseFailure =
+//   | SignMessageResponseFailure
+//   | GetQuotaResponseFailure
+//   | GetContactMatchesResponseFailure
+
+// export type DomainsResponseSuccess =
+//   | DomainRestrictedSignatureResponseSuccess
+//   | DomainQuotaStatusResponseSuccess
+//   | DisableDomainResponseSuccess
+
+// export type DomainsResponseFailure =
+//   | DomainRestrictedSignatureResponseFailure
+//   | DomainQuotaStatusResponseFailure
+//   | DisableDomainResponseFailure
+
+// export type PnpResponse = PnpResponseSuccess | PnpResponseFailure
+
+// export type DomainsResponse = DomainsResponseSuccess | DomainsResponseFailure
+
+// export type SuccessResponse = PnpResponseSuccess | DomainsResponseSuccess
+
+// export type FailureResponse = PnpResponseFailure | DomainsResponseFailure
+
+// export type OdisResponse = SuccessResponse | FailureResponse

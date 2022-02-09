@@ -10,7 +10,6 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
-import { respondWithError } from '../../common/error-utils'
 import { OdisConfig, VERSION } from '../../config'
 import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
 import { IInputService } from '../input.interface'
@@ -67,12 +66,23 @@ export class DomainQuotaStatusService extends CombinerService {
         this.logger.error({ error }, 'Error combining signer quota status responses')
       }
     }
-    respondWithError(
+    this.sendFailureResponse(
       response,
-      this.getMajorityErrorCode() ?? 500,
       ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
-      this.logger
+      this.getMajorityErrorCode() ?? 500
     )
+  }
+
+  protected sendSuccessResponse(
+    response: Response<DomainQuotaStatusResponseSuccess>,
+    quotaStatus: KnownDomainState,
+    statusCode: number
+  ) {
+    response.status(statusCode).json({
+      success: true,
+      version: VERSION,
+      status: quotaStatus,
+    })
   }
 
   private findThresholdDomainState(): KnownDomainState {

@@ -1,24 +1,3 @@
-import Logger from 'bunyan'
-import { Response } from 'express'
-import { OdisResponse } from './responses'
-
-// TODO(Alec): This needs different behavior by code path
-export function respondWithError(
-  res: Response,
-  body: OdisResponse,
-  statusCode: number,
-  error: ErrorType,
-  logger: Logger
-) {
-  if (error in WarningMessage) {
-    logger.warn({ error, statusCode }, 'Responding with warning')
-  } else {
-    logger.error({ error, statusCode }, 'Responding with error')
-  }
-  // res.status(statusCode).json({ success: false, error, version: VERSION })
-  res.status(statusCode).json(body)
-}
-
 export enum ErrorMessage {
   UNKNOWN_ERROR = `CELO_ODIS_ERR_00 Something went wrong`,
   DATABASE_UPDATE_FAILURE = `CELO_ODIS_ERR_01 DB_ERR Failed to update database entry`,
