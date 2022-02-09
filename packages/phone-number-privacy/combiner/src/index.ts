@@ -78,8 +78,8 @@ export const getContactMatches = functions
 
 export const status = functions
   .region('us-central1', 'europe-west3')
-  .https.onRequest(async (_request, response) => {
-    response.status(200).json({
+  .https.onRequest(async (_req: functions.Request, res: functions.Response) => {
+    res.status(200).json({
       version: VERSION,
     })
   })
