@@ -6,13 +6,10 @@ import { trimLeading0x } from '@celo/utils/lib/address'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Logger from 'bunyan'
 import crypto from 'crypto'
-import { ec as EC } from 'elliptic'
 import { Request } from 'express'
 import { rootLogger } from '..'
 import { AuthenticationMethod, ErrorMessage, WarningMessage } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
-
-const ec = new EC('secp256k1')
 
 /*
  * Confirms that user is who they say they are and throws error on failure to confirm.
@@ -79,6 +76,11 @@ export function verifyDEKSignature(
   try {
     const msgDigest = crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex')
 
+    // NOTE: elliptic is disabled elsewhere in this library to prevent
+    // accidental signing of truncated messages.
+    // tslint:disable-next-line:import-blacklist
+    const EC = require('elliptic').ec
+    const ec = new EC('secp256k1')
     const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
     const parsedSig = JSON.parse(messageSignature)
     if (key.verify(msgDigest, parsedSig)) {
