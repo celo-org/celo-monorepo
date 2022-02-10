@@ -1,0 +1,9 @@
+{
+  "fiat_ticket": "GBP",
+  "oracles": {},
+  "amountToFudOracles": "100",
+  "oracle_funding_amount": {},
+  "oracle_minimum_reports": {},
+  "constitution_parameters": {},
+  "granda_mento": {}
+}
