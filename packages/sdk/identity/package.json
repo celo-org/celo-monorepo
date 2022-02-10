@@ -28,7 +28,7 @@
     "@celo/base": "1.5.3-dev",
     "@celo/utils": "1.5.3-dev",
     "@celo/contractkit": "1.5.3-dev",
-    "@celo/phone-number-privacy-common": "1.0.36-dev",
+    "@celo/phone-number-privacy-common": "1.0.39",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
