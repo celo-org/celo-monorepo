@@ -5,7 +5,7 @@ import { ASTDetailedVersionedReport } from '@celo/protocol/lib/compatibility/rep
 import { getCeloContractDependencies } from '@celo/protocol/lib/contract-dependencies'
 import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
-import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
+import { readdirSync, readJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
 import { TruffleContract } from 'truffle-contract'
 import { RegistryInstance } from 'types'
@@ -283,7 +283,6 @@ module.exports = async (callback: (error?: any) => number) => {
         await release(contractName)
       }
     }
-    writeJsonSync(argv.proposal, proposal, { spaces: 2 })
     callback()
   } catch (error) {
     callback(error)
