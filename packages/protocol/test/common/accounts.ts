@@ -1,7 +1,14 @@
 import { Address, ensureLeading0x } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
-import { assertLogMatches, assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
+import {
+  assertEqualBN,
+  assertLogMatches,
+  assertLogMatches2,
+  assertRevert,
+  assertRevertWithReason,
+} from '@celo/protocol/lib/test-utils'
+import { toFixed } from '@celo/utils/lib/fixidity'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { generateTypedDataHash } from '@celo/utils/src/sign-typed-data-utils'
@@ -448,6 +455,49 @@ contract('Accounts', (accounts: string[]) => {
             event: 'OffchainStorageRootRemoved',
             args: { account: caller, url: storageRoot, index: 0 },
           })
+        })
+      })
+    })
+  })
+
+  describe('#setPaymentDelegation', () => {
+    const beneficiary = accounts[1]
+    const fraction = toFixed(0.2)
+    const badFraction = toFixed(1.2)
+
+    it('should not be callable by a non-account', async () => {
+      await assertRevertWithReason(
+        accountsInstance.setPaymentDelegation(beneficiary, fraction),
+        'Not an account'
+      )
+    })
+
+    describe('when an account has been created', () => {
+      beforeEach(async () => {
+        await accountsInstance.createAccount()
+      })
+
+      it('should set an address and a fraction', async () => {
+        await accountsInstance.setPaymentDelegation(beneficiary, fraction)
+        const [realBeneficiary, realFraction] = await accountsInstance.getPaymentDelegation.call(
+          accounts[0]
+        )
+        assert.equal(realBeneficiary, beneficiary)
+        assertEqualBN(realFraction, fraction)
+      })
+
+      it('should not allow a fraction greater than 1', async () => {
+        await assertRevertWithReason(
+          accountsInstance.setPaymentDelegation(beneficiary, badFraction),
+          'Fraction must not be greater than 1'
+        )
+      })
+
+      it('emits a PaymentDelegationSet event', async () => {
+        const resp = await accountsInstance.setPaymentDelegation(beneficiary, fraction)
+        assertLogMatches2(resp.logs[0], {
+          event: 'PaymentDelegationSet',
+          args: { beneficiary, fraction },
         })
       })
     })

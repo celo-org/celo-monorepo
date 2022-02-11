@@ -1,6 +1,7 @@
 import { NULL_ADDRESS, trimLeading0x } from '@celo/base/lib/address'
 import { BigNumber } from 'bignumber.js'
 import { keccak } from 'ethereumjs-util'
+import * as t from 'io-ts'
 import coder from 'web3-eth-abi'
 
 export interface EIP712Parameter {
@@ -82,6 +83,16 @@ export const eip712OptionalType = (typeName: string): EIP712Types => ({
     { name: 'value', type: typeName },
   ],
 })
+
+/**
+ * Utility to build EIP712Optional<T> schemas for encoding and decoding with io-ts.
+ * @param schema io-ts type (a.k.a. schema or codec) describing the inner type.
+ */
+export const eip712OptionalSchema = <S extends t.Mixed>(schema: S) =>
+  t.type({
+    defined: t.boolean,
+    value: schema,
+  })
 
 /** Utility to construct an defined EIP712Optional value with inferred type. */
 export const defined = <T extends EIP712ObjectValue>(value: T): EIP712Optional<T> => ({

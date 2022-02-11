@@ -112,6 +112,21 @@ spec:
           value: {{ .Values.blockscout.web.appsMenu.resourcesList | quote }}
         - name: LEARNING_MENU_LIST
           value: {{ .Values.blockscout.web.appsMenu.learningList | quote }}
+        - name: RE_CAPTCHA_PROJECT_ID
+          valueFrom:
+            secretKeyRef:
+              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
+              key: project_id
+        - name: RE_CAPTCHA_SITE_KEY
+          valueFrom:
+            secretKeyRef:
+              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
+              key: site_key
+        - name: RE_CAPTCHA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
+              key: api_key
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}

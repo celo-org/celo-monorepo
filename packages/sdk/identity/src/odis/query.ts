@@ -1,14 +1,24 @@
-// Utilities for interacting with the Oblivious Decentralized Identifier Service (ODIS)
-
-import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
+import { hexToBuffer } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { ContractKit } from '@celo/contractkit'
+import {
+  AuthenticationMethod,
+  DomainRequest,
+  GetBlindedMessageSigRequest,
+  GetContactMatchesRequest,
+  GetContactMatchesResponse,
+  KnownDomain,
+  PhoneNumberPrivacyRequest,
+} from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
+import crypto from 'crypto'
 import debugFactory from 'debug'
-import { ec as EC } from 'elliptic'
 
 const debug = debugFactory('kit:odis:query')
-const ec = new EC('secp256k1')
+
+export interface NoSigner {
+  authenticationMethod: AuthenticationMethod.NONE
+}
 
 export interface WalletKeySigner {
   authenticationMethod: AuthenticationMethod.WALLET_KEY
@@ -26,52 +36,30 @@ export interface CustomSigner {
 }
 
 // Support signing with the DEK or with the
-export type AuthSigner = WalletKeySigner | EncryptionKeySigner | CustomSigner
+export type AuthSigner = WalletKeySigner | EncryptionKeySigner | CustomSigner | NoSigner
 
-export enum AuthenticationMethod {
-  WALLET_KEY = 'wallet_key',
-  ENCRYPTION_KEY = 'encryption_key',
-  CUSTOM_SIGNER = 'custom_signer',
-}
+// Re-export types and aliases to maintain backwards compatibility.
+export { AuthenticationMethod, PhoneNumberPrivacyRequest }
+export type SignMessageRequest = GetBlindedMessageSigRequest
+export type MatchmakingRequest = GetContactMatchesRequest
+export type MatchmakingResponse = GetContactMatchesResponse
 
-// TODO(victor) Requests here are duplicated in. They should be deduplicated.
-// https://github.com/celo-org/celo-monorepo/blob/d5a275b56ca62360d1da9d00d38870888c9dbada/packages/phone-number-privacy/common/src/interfaces/requests.ts#L4
-export interface PhoneNumberPrivacyRequest {
-  account: string
-  authenticationMethod: AuthenticationMethod
-  version?: string
-  sessionID?: string
-}
-
-export interface SignMessageRequest extends PhoneNumberPrivacyRequest {
-  blindedQueryPhoneNumber: string
-  hashedPhoneNumber?: string
-}
-
-export interface MatchmakingRequest extends PhoneNumberPrivacyRequest {
-  userPhoneNumber: string
-  contactPhoneNumbers: string[]
-  hashedPhoneNumber: string
-  signedUserPhoneNumber?: string
-}
-
-export interface SignMessageResponse {
+// Combiner returns a response inconsistent with the SignMessageResponse defined in
+// @celo/phone-number-privacy-common. Combiner response type is defined here as a result.
+export interface CombinerSignMessageResponse {
   success: boolean
   combinedSignature: string
 }
-
-export interface MatchmakingResponse {
-  success: boolean
-  matchedContacts: Array<{
-    phoneNumber: string
-  }>
-}
+/** @deprecated Exported as SignMessageResponse for backwards compatibility. */
+export type SignMessageResponse = CombinerSignMessageResponse
 
 export enum ErrorMessages {
   ODIS_QUOTA_ERROR = 'odisQuotaError',
+  ODIS_RATE_LIMIT_ERROR = 'odisRateLimitError',
   ODIS_INPUT_ERROR = 'odisBadInputError',
   ODIS_AUTH_ERROR = 'odisAuthError',
   ODIS_CLIENT_ERROR = 'Unknown Client Error',
+  ODIS_FETCH_ERROR = 'odisFetchError',
 }
 
 export interface ServiceContext {
@@ -108,16 +96,24 @@ export function getServiceContext(contextName = 'mainnet') {
   }
 }
 
-export function signWithDEK(message: string, signer: EncryptionKeySigner) {
+export function signWithDEK(msg: string, signer: EncryptionKeySigner) {
+  return signWithRawKey(msg, signer.rawKey)
+}
+
+export function signWithRawKey(msg: string, rawKey: string) {
+  // NOTE: Elliptic will truncate the raw msg to 64 bytes before signing,
+  // so make sure to always pass the hex encoded msgDigest instead.
+  const msgDigest = crypto.createHash('sha256').update(JSON.stringify(msg)).digest('hex')
+
+  // NOTE: elliptic is disabled elsewhere in this library to prevent
+  // accidental signing of truncated messages.
+  // tslint:disable-next-line:import-blacklist
+  const EC = require('elliptic').ec
+  const ec = new EC('secp256k1')
+
   // Sign
-  const key = ec.keyFromPrivate(hexToBuffer(signer.rawKey))
-  const sig = JSON.stringify(key.sign(message).toDER())
-  // Verify
-  const dek = key.getPublic(true, 'hex')
-  const pubkey = ec.keyFromPublic(trimLeading0x(dek), 'hex')
-  const validSignature: boolean = pubkey.verify(message, JSON.parse(sig))
-  debug(`Signature is valid: ${validSignature} signed by ${dek}`)
-  return sig
+  const key = ec.keyFromPrivate(hexToBuffer(rawKey))
+  return JSON.stringify(key.sign(msgDigest).toDER())
 }
 
 /**
@@ -129,28 +125,34 @@ export function signWithDEK(message: string, signer: EncryptionKeySigner) {
  */
 export async function queryOdis<ResponseType>(
   signer: AuthSigner,
-  body: PhoneNumberPrivacyRequest,
+  body: PhoneNumberPrivacyRequest | DomainRequest<KnownDomain>,
   context: ServiceContext,
   endpoint: string
-) {
+): Promise<ResponseType> {
   debug(`Posting to ${endpoint}`)
 
-  // Sign payload using account privkey
   const bodyString = JSON.stringify(body)
 
-  let authHeader = ''
+  // Sign payload using provided account and authentication method.
+  // NOTE: Signing and verifying signatures over JSON encoded blobs relies on both the serializer
+  // (e.g. this client) and the verifier (e.g. ODIS) to have the same deterministic JSON
+  // implementation. This is maintained for backwards compatibility, but not recommended.
+  let signature: string | undefined
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    authHeader = signWithDEK(bodyString, signer as EncryptionKeySigner)
+    signature = signWithDEK(bodyString, signer as EncryptionKeySigner)
   } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
-    authHeader = await signer.contractKit.connection.sign(bodyString, body.account)
-  } else {
-    authHeader = await signer.customSigner(bodyString)
+    const account = (body as PhoneNumberPrivacyRequest).account
+    signature = await (signer as WalletKeySigner).contractKit.connection.sign(bodyString, account)
+  } else if (signer.authenticationMethod === AuthenticationMethod.CUSTOM_SIGNER) {
+    signature = await (signer as CustomSigner).customSigner(bodyString)
   }
+  const authHeader = signature !== undefined ? { Authorization: signature } : undefined
 
   const { odisUrl } = context
 
   const dontRetry = [
     ErrorMessages.ODIS_QUOTA_ERROR,
+    ErrorMessages.ODIS_RATE_LIMIT_ERROR,
     ErrorMessages.ODIS_AUTH_ERROR,
     ErrorMessages.ODIS_INPUT_ERROR,
     ErrorMessages.ODIS_CLIENT_ERROR,
@@ -158,15 +160,20 @@ export async function queryOdis<ResponseType>(
 
   return selectiveRetryAsyncWithBackOff(
     async () => {
-      const res = await fetch(odisUrl + endpoint, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: authHeader,
-        },
-        body: bodyString,
-      })
+      let res: Response
+      try {
+        res = await fetch(odisUrl + endpoint, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            ...authHeader,
+          },
+          body: bodyString,
+        })
+      } catch (error) {
+        throw new Error(`${ErrorMessages.ODIS_FETCH_ERROR}: ${error}`)
+      }
 
       if (res.ok) {
         debug('Response ok. Parsing.')
@@ -179,6 +186,8 @@ export async function queryOdis<ResponseType>(
       switch (res.status) {
         case 403:
           throw new Error(ErrorMessages.ODIS_QUOTA_ERROR)
+        case 429:
+          throw new Error(ErrorMessages.ODIS_RATE_LIMIT_ERROR)
         case 400:
           throw new Error(ErrorMessages.ODIS_INPUT_ERROR)
         case 401:

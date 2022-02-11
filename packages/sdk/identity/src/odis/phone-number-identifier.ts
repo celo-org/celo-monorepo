@@ -7,10 +7,11 @@ import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthenticationMethod,
   AuthSigner,
+  CombinerSignMessageResponse,
+  EncryptionKeySigner,
   queryOdis,
   ServiceContext,
   SignMessageRequest,
-  SignMessageResponse,
 } from './query'
 
 // ODIS minimum dollar balance for sig retrieval
@@ -55,7 +56,7 @@ export async function getPhoneNumberIdentifier(
   if (blindingFactor) {
     seed = Buffer.from(blindingFactor)
   } else if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    seed = Buffer.from(signer.rawKey)
+    seed = Buffer.from((signer as EncryptionKeySigner).rawKey)
   }
 
   // Fallback to using Wasm version if not specified
@@ -120,7 +121,7 @@ export async function getBlindedPhoneNumberSignature(
     body.sessionID = sessionID
   }
 
-  const response = await queryOdis<SignMessageResponse>(
+  const response = await queryOdis<CombinerSignMessageResponse>(
     signer,
     body,
     context,
