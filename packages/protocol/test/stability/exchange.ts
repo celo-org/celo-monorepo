@@ -64,6 +64,9 @@ contract('Exchange', (accounts: string[]) => {
   const updateFrequency = 60 * 60
   const minimumReports = 2
 
+  const minSupplyForStableBucketCap = new BigNumber('1e24')
+  const stableBucketFractionCap = toFixed(1 / 22)
+
   const unit = new BigNumber(10).pow(decimals)
   const initialReserveBalance = new BigNumber(10000000000000000000000)
   const reserveFraction = toFixed(5 / 100)
@@ -146,7 +149,9 @@ contract('Exchange', (accounts: string[]) => {
       spread,
       reserveFraction,
       updateFrequency,
-      minimumReports
+      minimumReports,
+      minSupplyForStableBucketCap,
+      stableBucketFractionCap
     )
 
     await registry.setAddressFor(CeloContractName.StableToken, stableToken.address)
@@ -172,7 +177,9 @@ contract('Exchange', (accounts: string[]) => {
           spread,
           reserveFraction,
           updateFrequency,
-          minimumReports
+          minimumReports,
+          minSupplyForStableBucketCap,
+          stableBucketFractionCap
         )
       )
     })
