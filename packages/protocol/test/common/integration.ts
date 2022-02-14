@@ -632,8 +632,8 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
         '1300000000000000000000', // reserveFraction, matches mainnet for cEUR
         '300', // updateFrequency, matches mainnet for cUSD and cEUR
         '1', // minimumReports, minimum possible to avoid having to mock multiple reports,
-        'dksdskds',
-        '0,005'
+        '1000000000000000000000000', // minSupplyForStableBucketCap, minimum amount of stabletoken supply considered for the stable token bucket cap
+        '45454545454545456000000' // stableBucketMaxFraction,  value for stable bucket Fraction CAP
       )
     })
 
