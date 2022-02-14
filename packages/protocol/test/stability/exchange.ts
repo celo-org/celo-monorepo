@@ -70,8 +70,6 @@ contract('Exchange', (accounts: string[]) => {
   const unit = new BigNumber(10).pow(decimals)
   const initialReserveBalance = new BigNumber(10000000000000000000000)
   const reserveFraction = toFixed(5 / 100)
-  console.log(stableBucketMaxFraction, 'stableBucketMaxFraction')
-  console.log(minSupplyForStableBucketCap, 'minSupplyForStableBucketCap')
   const initialGoldBucket = initialReserveBalance
     .times(fromFixed(reserveFraction))
     .integerValue(BigNumber.ROUND_FLOOR)
@@ -365,6 +363,42 @@ contract('Exchange', (accounts: string[]) => {
 
     it('should not allow a non-owner not set the reserve fraction', async () => {
       await assertRevert(exchange.setReserveFraction(newReserveFraction, { from: accounts[1] }))
+    })
+  })
+
+  describe('#setStableBucketMaxFraction', () => {
+    const newStableBucketFractionCap = toFixed(2 / 22)
+
+    it('should set the stableBucketFractionCap', async () => {
+      await exchange.setStableBucketMaxFraction(newStableBucketFractionCap)
+
+      assertEqualBN(await exchange.stableBucketMaxFraction(), newStableBucketFractionCap)
+    })
+
+    it('emits StableBucketFractionCapSet', async () => {
+      const setStableBucketMaxFractionTx = await exchange.setStableBucketMaxFraction(
+        newStableBucketFractionCap
+      )
+
+      const exchangeLogs = setStableBucketMaxFractionTx.logs.filter(
+        (x) => x.event === 'StableBucketFractionCapSet'
+      )
+      assert(exchangeLogs.length === 1, 'Did not receive event')
+    })
+
+    it('should not allow to set the stableBucketFractionCap greater than 1', async () => {
+      await assertRevert(exchange.setStableBucketMaxFraction(toFixed(1)))
+      await assertRevert(exchange.setStableBucketMaxFraction(toFixed(2)))
+    })
+
+    it('should not allow to set the stableBucketFractionCap to zero', async () => {
+      await assertRevert(exchange.setStableBucketMaxFraction(toFixed(0)))
+    })
+
+    it('should not allow a non-owner not set the stableBucketFractionCap', async () => {
+      await assertRevert(
+        exchange.setStableBucketMaxFraction(newStableBucketFractionCap, { from: accounts[1] })
+      )
     })
   })
 
