@@ -36,6 +36,7 @@
     "check-versions": "./scripts/bash/check-versions.sh",
     "check-opcodes": "ts-node scripts/check-opcodes.ts",
     "make-release": "./scripts/bash/make-release.sh",
+    "make-release-stabletoken": "./scripts/bash/make-release-stabletoken.sh",
     "verify-deployed": "./scripts/bash/verify-deployed.sh",
     "verify-release": "./scripts/bash/verify-release.sh",
     "invite": "./scripts/bash/invite.sh",
