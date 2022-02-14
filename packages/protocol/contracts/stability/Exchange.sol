@@ -92,6 +92,8 @@ contract Exchange is
    * present in the oracle to update buckets
    * commit to the gold bucket 
    * @param stableTokenIdentifier String identifier of stabletoken in registry
+   * @param _minSupplyForStableBucketCap The minimum amount of stabletoken supply considered for the stable token bucket cap 
+   * @param _stableBucketMaxFraction The value for stable bucket Fraction CAP
    */
   function initialize(
     address registryAddress,
