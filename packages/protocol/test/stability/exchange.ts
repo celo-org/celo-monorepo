@@ -402,6 +402,39 @@ contract('Exchange', (accounts: string[]) => {
     })
   })
 
+  describe('#setMinSupplyForStableBucketCap', () => {
+    const newMinSupplyForStableBucketCap = new BigNumber('2e24')
+
+    it('should set the minSupplyForStableBucketCap', async () => {
+      await exchange.setMinSupplyForStableBucketCap(newMinSupplyForStableBucketCap)
+
+      assertEqualBN(await exchange.minSupplyForStableBucketCap(), newMinSupplyForStableBucketCap)
+    })
+
+    it('emits MinSupplyForStableBucketCapSet', async () => {
+      const setMinSupplyForStableBucketCapTx = await exchange.setMinSupplyForStableBucketCap(
+        newMinSupplyForStableBucketCap
+      )
+
+      const exchangeLogs = setMinSupplyForStableBucketCapTx.logs.filter(
+        (x) => x.event === 'MinSupplyForStableBucketCapSet'
+      )
+      assert(exchangeLogs.length === 1, 'Did not receive event')
+    })
+
+    it('should not allow to set the minSupplyForStableBucketCap to zero', async () => {
+      await assertRevert(exchange.setMinSupplyForStableBucketCap(toFixed(0)))
+    })
+
+    it('should not allow a non-owner not set the minSupplyForStableBucketCap', async () => {
+      await assertRevert(
+        exchange.setMinSupplyForStableBucketCap(newMinSupplyForStableBucketCap, {
+          from: accounts[1],
+        })
+      )
+    })
+  })
+
   describe('#getBuyAndSellBuckets', () => {
     beforeEach(async () => {
       await exchange.activateStable()
