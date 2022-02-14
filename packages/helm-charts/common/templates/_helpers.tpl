@@ -506,6 +506,10 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+  resources:
+    requests:
+      cpu: "0.5"
+      memory: 1Gi
 {{- end -}}
 
 {{- /* Needs a serviceAccountName in the pod with permissions to access gstorage */ -}}
@@ -530,6 +534,10 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+  resources:
+    requests:
+      cpu: "1"
+      memory: 2Gi
 {{- end -}}
 
 {{- define "common.geth-add-metrics-pprof-config" -}}
