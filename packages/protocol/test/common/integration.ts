@@ -631,7 +631,9 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
         '5000000000000000000000', // spread, matches mainnet for cUSD and cEUR
         '1300000000000000000000', // reserveFraction, matches mainnet for cEUR
         '300', // updateFrequency, matches mainnet for cUSD and cEUR
-        '1' // minimumReports, minimum possible to avoid having to mock multiple reports
+        '1', // minimumReports, minimum possible to avoid having to mock multiple reports,
+        'dksdskds',
+        '0,005'
       )
     })
 

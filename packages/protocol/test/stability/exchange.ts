@@ -70,6 +70,8 @@ contract('Exchange', (accounts: string[]) => {
   const unit = new BigNumber(10).pow(decimals)
   const initialReserveBalance = new BigNumber(10000000000000000000000)
   const reserveFraction = toFixed(5 / 100)
+  console.log(stableBucketMaxFraction, 'stableBucketMaxFraction')
+  console.log(minSupplyForStableBucketCap, 'minSupplyForStableBucketCap')
   const initialGoldBucket = initialReserveBalance
     .times(fromFixed(reserveFraction))
     .integerValue(BigNumber.ROUND_FLOOR)
