@@ -101,7 +101,7 @@ contract Exchange is
     uint256 _updateFrequency,
     uint256 _minimumReports,
     uint256 _minSupplyForStableBucketCap,
-    uint256 _stableBucketFractionCap
+    uint256 _stableBucketMaxFraction
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -111,7 +111,7 @@ contract Exchange is
     setUpdateFrequency(_updateFrequency);
     setMinimumReports(_minimumReports);
     setMinSupplyForStableBucketCap(_minSupplyForStableBucketCap);
-    setStableBucketFractionCap(_stableBucketFractionCap);
+    setStableBucketMaxFraction(_stableBucketMaxFraction);
   }
 
   /**
@@ -315,16 +315,16 @@ contract Exchange is
 
   /**
     * @notice Allows owner to set the Stable Bucket Fraction Cap
-    * @param newStableBucketFractionCap The new value for the Stable Bucket Fraction CAP
+    * @param newStableBucketMaxFraction The new value for the Stable Bucket Fraction CAP
     */
-  function setStableBucketFractionCap(uint256 newStableBucketFractionCap) public onlyOwner {
-    stableBucketFractionCap = FixidityLib.wrap(newStableBucketFractionCap);
+  function setStableBucketMaxFraction(uint256 newStableBucketMaxFraction) public onlyOwner {
+    stableBucketMaxFraction = FixidityLib.wrap(newStableBucketMaxFraction);
     require(
-      stableBucketFractionCap.lt(FixidityLib.fixed1()),
+      stableBucketMaxFraction.lt(FixidityLib.fixed1()),
       "bucket fraction must be smaller than 1"
     );
-    require(newStableBucketFractionCap > 0, "bucket fraction must be greather than 0");
-    emit StableBucketFractionCapSet(newStableBucketFractionCap);
+    require(newStableBucketMaxFraction > 0, "bucket fraction must be greather than 0");
+    emit StableBucketMaxFractionSet(newStableBucketMaxFraction);
   }
 
   /**
@@ -448,7 +448,7 @@ contract Exchange is
    */
   function getStableBucketCap() public view returns (uint256) {
     uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), minSupplyForStableBucketCap);
-    return FixidityLib.newFixed(stableTokenSupply).multiply(stableBucketFractionCap).fromFixed();
+    return FixidityLib.newFixed(stableTokenSupply).multiply(stableBucketMaxFraction).fromFixed();
   }
 
   function getUpdatedGoldBucket() private view returns (uint256) {
