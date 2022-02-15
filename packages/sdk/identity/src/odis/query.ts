@@ -1,6 +1,4 @@
-// Utilities for interacting with the Oblivious Decentralized Identifier Service (ODIS)
-
-import { hexToBuffer, trimLeading0x } from '@celo/base/lib/address'
+import { hexToBuffer } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { ContractKit } from '@celo/contractkit'
 import {
@@ -13,11 +11,10 @@ import {
   PhoneNumberPrivacyRequest,
 } from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
+import crypto from 'crypto'
 import debugFactory from 'debug'
-import { ec as EC } from 'elliptic'
 
 const debug = debugFactory('kit:odis:query')
-const ec = new EC('secp256k1')
 
 export interface NoSigner {
   authenticationMethod: AuthenticationMethod.NONE
@@ -99,16 +96,24 @@ export function getServiceContext(contextName = 'mainnet') {
   }
 }
 
-export function signWithDEK(message: string, signer: EncryptionKeySigner) {
+export function signWithDEK(msg: string, signer: EncryptionKeySigner) {
+  return signWithRawKey(msg, signer.rawKey)
+}
+
+export function signWithRawKey(msg: string, rawKey: string) {
+  // NOTE: Elliptic will truncate the raw msg to 64 bytes before signing,
+  // so make sure to always pass the hex encoded msgDigest instead.
+  const msgDigest = crypto.createHash('sha256').update(JSON.stringify(msg)).digest('hex')
+
+  // NOTE: elliptic is disabled elsewhere in this library to prevent
+  // accidental signing of truncated messages.
+  // tslint:disable-next-line:import-blacklist
+  const EC = require('elliptic').ec
+  const ec = new EC('secp256k1')
+
   // Sign
-  const key = ec.keyFromPrivate(hexToBuffer(signer.rawKey))
-  const sig = JSON.stringify(key.sign(message).toDER())
-  // Verify
-  const dek = key.getPublic(true, 'hex')
-  const pubkey = ec.keyFromPublic(trimLeading0x(dek), 'hex')
-  const validSignature: boolean = pubkey.verify(message, JSON.parse(sig))
-  debug(`Signature is valid: ${validSignature} signed by ${dek}`)
-  return sig
+  const key = ec.keyFromPrivate(hexToBuffer(rawKey))
+  return JSON.stringify(key.sign(msgDigest).toDER())
 }
 
 /**
@@ -137,9 +142,9 @@ export async function queryOdis<ResponseType>(
     signature = signWithDEK(bodyString, signer as EncryptionKeySigner)
   } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
     const account = (body as PhoneNumberPrivacyRequest).account
-    signature = await signer.contractKit.connection.sign(bodyString, account)
+    signature = await (signer as WalletKeySigner).contractKit.connection.sign(bodyString, account)
   } else if (signer.authenticationMethod === AuthenticationMethod.CUSTOM_SIGNER) {
-    signature = await signer.customSigner(bodyString)
+    signature = await (signer as CustomSigner).customSigner(bodyString)
   }
   const authHeader = signature !== undefined ? { Authorization: signature } : undefined
 

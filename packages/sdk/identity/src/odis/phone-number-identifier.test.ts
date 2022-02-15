@@ -1,5 +1,3 @@
-import { hexToBuffer } from '@celo/base'
-import { ec as EC } from 'elliptic'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getBlindedPhoneNumber,
@@ -15,6 +13,7 @@ import {
   EncryptionKeySigner,
   ErrorMessages,
   ServiceContext,
+  signWithRawKey,
 } from './query'
 
 jest.mock('./bls-blinding-client', () => {
@@ -27,8 +26,6 @@ jest.mock('./bls-blinding-client', () => {
     WasmBlsBlindingClient,
   }
 })
-
-const ec = new EC('secp256k1')
 
 const mockE164Number = '+14155550000'
 const mockAccount = '0x0000000000000000000000000000000000007E57'
@@ -84,8 +81,7 @@ describe(getPhoneNumberIdentifier, () => {
       })
 
       const customSignerMethod = jest.fn((bodyString) => {
-        const key = ec.keyFromPrivate(hexToBuffer(rawKey))
-        return Promise.resolve(JSON.stringify(key.sign(bodyString).toDER()))
+        return Promise.resolve(signWithRawKey(bodyString, rawKey))
       })
       const customSigner: CustomSigner = {
         authenticationMethod: AuthenticationMethod.CUSTOM_SIGNER,
@@ -149,7 +145,7 @@ describe(getPhoneNumberIdentifier, () => {
 describe(getPepperFromThresholdSignature, () => {
   it('Hashes sigs correctly', () => {
     const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
-    const signature = new Buffer(base64Sig, 'base64')
+    const signature = Buffer.from(base64Sig, 'base64')
     expect(getPepperFromThresholdSignature(signature)).toBe('piWqRHHYWtfg9')
   })
 })
