@@ -75,7 +75,7 @@ if (DEV_MODE) {
   config = {
     blockchain: {
       provider: functionConfig.blockchain.provider,
-      apiKey: functionConfig.blockchain.apiKey,
+      apiKey: functionConfig.blockchain.api_key,
     },
     db: {
       user: functionConfig.db.username,
