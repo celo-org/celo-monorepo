@@ -441,6 +441,7 @@ contract('Exchange', (accounts: string[]) => {
     })
 
     it('should return the correct amount of buy and sell token', async () => {
+      // stable, gold
       const [buyBucketSize, sellBucketSize] = await exchange.getBuyAndSellBuckets(true)
       assertEqualBN(sellBucketSize, initialGoldBucket)
       assertEqualBN(buyBucketSize, initialStableBucket)
@@ -759,6 +760,63 @@ contract('Exchange', (accounts: string[]) => {
               // The new value should be the updatedStableBucket (derived from the new
               // Gold Bucket value), minus the amount purchased during the exchange
               assertEqualBN(newStableBucket, updatedStableBucket.minus(expectedStableAmount))
+            })
+          })
+
+          describe.only('when stableBucket needs to be capped', () => {
+            console.log(new BigNumber('0x20000000000000000')) // --> 36893488147419103232
+            console.log(new BigNumber('2e21')) // --> 2000000000000000000000
+            console.log(new BigNumber('1e21'), '1e21') // --> 1000000000000000000000
+            beforeEach(async () => {
+              await registry.setAddressFor(CeloContractName.Exchange, owner)
+
+              await mockSortedOracles.setMedianRate(
+                stableToken.address,
+                new BigNumber('0x20000000000000000')
+              ) // 1 CELO = 2 USD
+
+              await stableToken.mint(user, new BigNumber('61e24')) // 6M
+              await registry.setAddressFor(CeloContractName.Exchange, exchange.address)
+            })
+
+            it('has the right stableBucketMaxFraction', async () => {
+              assertEqualBN(await exchange.stableBucketMaxFraction(), toFixed(1 / 22))
+            })
+
+            it("doesn't hit the cap and it shouldn't be resized", async () => {
+              const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+              assertEqualBN(mintableStable, new BigNumber('2e21'))
+              console.log(new BigNumber(mintableStable.dividedBy(tradeableGold)), 'gold')
+              console.log(new BigNumber('2'))
+              // assertEqualBN(tradeableGold, new BigNumber('1e21'))
+              assertRevert(tradeableGold.eq(new BigNumber('1e21')))
+
+              // the buckets hold the price
+              assertEqualBN(
+                new BigNumber(mintableStable.dividedBy(tradeableGold)),
+                new BigNumber('2')
+              )
+            })
+
+            it('has the correct getStableBucketCap', async () => {
+              assertEqualBN(
+                await exchange.getStableBucketCap(),
+                new BigNumber('2772727272727272816000000')
+              )
+            })
+
+            it('has the right price after the cap', async () => {
+              await mockSortedOracles.setMedianRate(
+                stableToken.address,
+                new BigNumber('0x20000000000000000').multipliedBy(2000)
+              ) // bump the price by 2000, leaving with 4K CELO per dollar
+
+              const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+
+              assertEqualBN(
+                new BigNumber(mintableStable.dividedBy(tradeableGold)),
+                new BigNumber('4000')
+              )
             })
           })
 
