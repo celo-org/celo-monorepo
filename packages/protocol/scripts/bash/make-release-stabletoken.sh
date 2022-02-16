@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Checks that the contract version numbers in a provided branch are as expected given
-# a released branch.
+# Builds and deploy a contract release involving stable tokens
 #
 # Flags:
 # -n: The network to deploy to.
@@ -13,7 +12,8 @@ set -euo pipefail
 # -d: Whether to dry-run this deploy
 # -f: Address to sign transactions from.
 # -l: Path to the canonical library mapping.
-# -F: Whether to use the forno endpoint
+# -F: Whether to use the forno endpoint.
+# -s: Path to the data needed to initialize StableTokens.
 
 NETWORK=""
 PROPOSAL=""
@@ -60,5 +60,5 @@ yarn run truffle exec ./scripts/truffle/make-release-stabletoken.js \
   --librariesFile $LIBRARIES \
   --proposal $PROPOSAL \
   --from $FROM \
-  --initialize_data $INITIALIZE_DATA $DRYRUN $FORNO
   --stabletoken_data $STABLETOKEN_DATA
+  --initialize_data $INITIALIZE_DATA $DRYRUN $FORNO
