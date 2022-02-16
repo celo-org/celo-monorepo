@@ -225,7 +225,15 @@ export interface ProposalTx {
 module.exports = async (callback: (error?: any) => number) => {
   try {
     const argv = require('minimist')(process.argv.slice(2), {
-      string: ['report', 'from', 'proposal', 'librariesFile', 'initialize_data', 'build_directory'],
+      string: [
+        'report',
+        'from',
+        'proposal',
+        'librariesFile',
+        'initialize_data',
+        'build_directory',
+        'stabletoken_data',
+      ],
       boolean: ['dry_run'],
     })
     const fullReport = readJsonSync(argv.report)
@@ -234,6 +242,9 @@ module.exports = async (callback: (error?: any) => number) => {
     )
     const report: ASTDetailedVersionedReport = fullReport.report
     const initializationData = readJsonSync(argv.initialize_data)
+    console.log('name of file' + argv.stabletoken_data)
+    const stabletokenData = readJsonSync(argv.stabletoken_data)
+    console.log(stabletokenData)
     const dependencies = getCeloContractDependencies()
     const contracts = readdirSync(join(argv.build_directory, 'contracts')).map((x) =>
       basename(x, '.json')
