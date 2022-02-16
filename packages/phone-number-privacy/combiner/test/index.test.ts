@@ -1,6 +1,5 @@
+import { signWithDEK } from '@celo/identity/lib/odis/query'
 import { getDataEncryptionKey, isVerified } from '@celo/phone-number-privacy-common'
-import { hexToBuffer } from '@celo/utils/lib/address'
-import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
 import config, { E2E_TEST_ACCOUNTS, E2E_TEST_PHONE_NUMBERS, VERSION } from '../src/config'
@@ -13,21 +12,8 @@ import {
 } from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getBlindedMessageSig, getContactMatches } from '../src/index'
-import { BLINDED_PHONE_NUMBER, deks } from './end-to-end/resources'
-
-const ec = new EC('secp256k1')
-
+import { BLINDED_PHONE_NUMBER, dekAuthSigner, deks } from './end-to-end/resources'
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
-interface DEK {
-  privateKey: string
-  publicKey: string
-  address: string
-}
-
-const signWithDEK = (message: string, dek: DEK) => {
-  const key = ec.keyFromPrivate(hexToBuffer(dek.privateKey))
-  return JSON.stringify(key.sign(message).toDER())
-}
 
 jest.mock('@celo/phone-number-privacy-common', () => ({
   ...jest.requireActual('@celo/phone-number-privacy-common'),
@@ -323,7 +309,7 @@ describe(`POST /getContactMatches endpoint`, () => {
     })
 
     describe('w/ signedUserPhoneNumber', () => {
-      const signedUserPhoneNumber = signWithDEK(validInput.userPhoneNumber, deks[0])
+      const signedUserPhoneNumber = signWithDEK(validInput.userPhoneNumber, dekAuthSigner(0))
       const req = {
         body: {
           ...validInput,
@@ -367,7 +353,10 @@ describe(`POST /getContactMatches endpoint`, () => {
                   mockIsVerified.mockResolvedValue(false)
                   req.body.account = E2E_TEST_ACCOUNTS[0]
                   req.body.userPhoneNumber = E2E_TEST_PHONE_NUMBERS[0]
-                  req.body.signedUserPhoneNumber = signWithDEK(req.body.userPhoneNumber, deks[0])
+                  req.body.signedUserPhoneNumber = signWithDEK(
+                    req.body.userPhoneNumber,
+                    dekAuthSigner(0)
+                  )
                   mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
                     req.body.signedUserPhoneNumber
                   )
@@ -376,7 +365,10 @@ describe(`POST /getContactMatches endpoint`, () => {
                   mockIsVerified.mockResolvedValue(true)
                   req.body.account = validInput.account
                   req.body.userPhoneNumber = validInput.userPhoneNumber
-                  req.body.signedUserPhoneNumber = signWithDEK(req.body.userPhoneNumber, deks[0])
+                  req.body.signedUserPhoneNumber = signWithDEK(
+                    req.body.userPhoneNumber,
+                    dekAuthSigner(0)
+                  )
                   mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
                     req.body.signedUserPhoneNumber
                   )
@@ -396,9 +388,12 @@ describe(`POST /getContactMatches endpoint`, () => {
               describe('When user has rotated their dek', () => {
                 beforeAll(() => {
                   mockGetDataEncryptionKey.mockResolvedValue(deks[1].publicKey)
-                  req.body.signedUserPhoneNumber = signWithDEK(validInput.userPhoneNumber, deks[1])
+                  req.body.signedUserPhoneNumber = signWithDEK(
+                    validInput.userPhoneNumber,
+                    dekAuthSigner(1)
+                  )
                   mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
-                    signWithDEK(validInput.userPhoneNumber, deks[0])
+                    signWithDEK(validInput.userPhoneNumber, dekAuthSigner(0))
                   )
                   mockGetDekSignerRecord.mockResolvedValue(deks[0].publicKey)
                 })
@@ -463,7 +458,7 @@ describe(`POST /getContactMatches endpoint`, () => {
             describe('When user has rotated their dek', () => {
               beforeAll(() => {
                 mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
-                  signWithDEK(validInput.userPhoneNumber, deks[1])
+                  signWithDEK(validInput.userPhoneNumber, dekAuthSigner(1))
                 )
                 mockGetDekSignerRecord.mockResolvedValue(deks[1].publicKey)
               })
