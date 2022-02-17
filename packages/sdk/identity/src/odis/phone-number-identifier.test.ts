@@ -7,13 +7,7 @@ import {
   getPhoneNumberIdentifierFromSignature,
   isBalanceSufficientForSigRetrieval,
 } from './phone-number-identifier'
-import {
-  AuthenticationMethod,
-  EncryptionKeySigner,
-  ErrorMessages,
-  ServiceContext,
-  signWithRawKey,
-} from './query'
+import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
 
 jest.mock('./bls-blinding-client', () => {
   // tslint:disable-next-line:no-shadowed-variable
