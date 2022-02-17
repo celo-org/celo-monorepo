@@ -242,8 +242,6 @@ export interface CreateBackupArgs {
  * password and nonce were included in the backup. If a commitment to the password or PIN is
  * included, an attacker can locally brute force that commitment to recover the password, then use
  * that knowledge to complete the derivation.
- *
- * DO NOT MERGE(victor): Bury this function.
  */
 export async function createBackup({
   data,
@@ -253,6 +251,13 @@ export async function createBackup({
 }: CreateBackupArgs): Promise<Result<Backup, BackupError>> {
   // Password and backup data are not included in any logging as they are likely sensitive.
   debug('creating a backup with the following information', hardening, metadata)
+
+  // Safety measure to prevent users from accidentally using this API without any hardening.
+  if (hardening.odis === undefined && hardening.computational === undefined) {
+    return Err(
+      new UsageError(new Error('createBackup cannot be used with a empty hardening config'))
+    )
+  }
 
   // Generate a 32-byte random nonce for the backup. Use the first half to salt the user secret
   // input and the second half to derive an authentication key for making queries to ODIS.
