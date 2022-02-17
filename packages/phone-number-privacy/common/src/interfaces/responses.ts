@@ -1,10 +1,10 @@
+import { KnownDomainState } from '../domains'
 import {
-  DomainRequest,
   DisableDomainRequest,
   DomainQuotaStatusRequest,
+  DomainRequest,
   DomainRestrictedSignatureRequest,
 } from './requests'
-import { KnownDomainState } from '../domains'
 
 export interface SignMessageResponse {
   success: boolean
