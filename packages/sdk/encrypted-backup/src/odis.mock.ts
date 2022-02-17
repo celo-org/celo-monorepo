@@ -1,12 +1,12 @@
 import { ServiceContext as OdisServiceContext } from '@celo/identity/lib/odis/query'
 import {
   checkSequentialDelayRateLimit,
+  DomainEndpoint,
   domainHash,
   DomainQuotaStatusRequest,
   DomainQuotaStatusResponse,
   DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
-  Endpoints,
   SequentialDelayDomain,
   SequentialDelayDomainState,
   verifyDomainQuotaStatusRequestSignature,
@@ -112,7 +112,7 @@ export class MockOdis {
   installQuotaEndpoint(mock: typeof fetchMock, override?: any) {
     mock.mock(
       {
-        url: new URL(Endpoints.DOMAIN_QUOTA_STATUS, MockOdis.environment.odisUrl).href,
+        url: new URL(DomainEndpoint.DOMAIN_QUOTA_STATUS, MockOdis.environment.odisUrl).href,
         method: 'POST',
       },
       override ??
@@ -129,7 +129,7 @@ export class MockOdis {
   installSignEndpoint(mock: typeof fetchMock, override?: any) {
     mock.mock(
       {
-        url: new URL(Endpoints.DOMAIN_SIGN, MockOdis.environment.odisUrl).href,
+        url: new URL(DomainEndpoint.DOMAIN_SIGN, MockOdis.environment.odisUrl).href,
         method: 'POST',
       },
       override ??

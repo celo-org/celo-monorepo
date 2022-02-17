@@ -1,3 +1,9 @@
+import {
+  DomainRequest,
+  DisableDomainRequest,
+  DomainQuotaStatusRequest,
+  DomainRestrictedSignatureRequest,
+} from './requests'
 import { KnownDomainState } from '../domains'
 
 export interface SignMessageResponse {
@@ -77,3 +83,13 @@ export interface DisableDomainResponseFailure {
 }
 
 export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
+
+export type DomainResponse<
+  R extends DomainRequest = DomainRequest
+> = R extends DomainRestrictedSignatureRequest
+  ? DomainRestrictedSignatureResponse
+  : never | R extends DomainQuotaStatusRequest
+  ? DomainQuotaStatusResponse
+  : never | R extends DisableDomainRequest
+  ? DisableDomainResponse
+  : never

@@ -23,11 +23,15 @@ export enum KDFInfo {
 
 /**
  * Key derivation function for mixing source keying material.
- * DO NOT MERGE(victor): Add a not that no hardening is providing here.
+ *
+ * @remarks This function does not add any hardening to the input keying material. It is used only
+ * to mix the provided key material sources. It's output should not be used to directly derive a key
+ * from a password or other low entropy sources.
+ *
  * @param info Fixed string value used for domain separation.
  * @param sources An array of keying material source values (e.g. a password and a nonce).
  */
-export function deriveKey(info: KDFInfo, sources: Buffer[], length: number = 32): Buffer {
+export function deriveKey(info: KDFInfo, sources: Buffer[]): Buffer {
   // Hash each source keying material component, and the info value, to prevent hashing collisions
   // that might result if the variable length data is simply concatenated.
   const chunks = [Buffer.from(info, 'utf8'), ...sources].map((source: Buffer) => {
@@ -36,37 +40,45 @@ export function deriveKey(info: KDFInfo, sources: Buffer[], length: number = 32)
     return hash.digest()
   })
 
-  // DO NOT MERGE(victor): Add note about how we would prefer to use HKDF.
-  return crypto.pbkdf2Sync(Buffer.concat(chunks), Buffer.alloc(0), 1, length, 'sha256')
+  // NOTE: We would prefer to use HKDF here, but is only available in Node v15 and above.
+  return crypto.pbkdf2Sync(Buffer.concat(chunks), Buffer.alloc(0), 1, 32, 'sha256')
 }
 
 /**
- * AES-128-GCM encrypt the given data with the given 16-byte key.
+ * AES-256-GCM encrypt the given data with the given 32-byte key.
  * Encode the ciphertext as { iv || data || auth tag }
  */
 export function encrypt(key: Buffer, data: Buffer): Result<Buffer, EncryptionError> {
   try {
-    const iv = crypto.randomBytes(16)
-    const cipher = crypto.createCipheriv('aes-128-gcm', key, iv)
-    return Ok(Buffer.concat([iv, cipher.update(data), cipher.final(), cipher.getAuthTag()]))
+    // NOTE: AES-GCM uses a 12-byte nonce. Longer nonces get hashed before use.
+    const nonce = crypto.randomBytes(12)
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, nonce)
+    return Ok(Buffer.concat([nonce, cipher.update(data), cipher.final(), cipher.getAuthTag()]))
   } catch (error) {
     return Err(new EncryptionError(error as Error))
   }
 }
 
 /**
- * AES-128-GCM decrypt the given data with the given 16-byte key.
+ * AES-256-GCM decrypt the given data with the given 32-byte key.
  * Ciphertext should be encoded as { iv || data || auth tag }.
  */
 export function decrypt(key: Buffer, ciphertext: Buffer): Result<Buffer, DecryptionError> {
-  // DO NOT MERGE(victor) Add a length check before slicing the data.
+  const len = ciphertext.length
+  if (len < 28) {
+    return Err(
+      new DecryptionError(
+        new Error(`ciphertext is too short: expected at least 28 bytes, but got ${len}`)
+      )
+    )
+  }
+
   try {
-    const len = ciphertext.length
-    // DO NOT MERGE(victor): Rename this from IV
-    const iv = ciphertext.slice(0, 16)
+    // NOTE: AES-GCM uses a 12-byte nonce. Longer nonces get hashed before use.
+    const nonce = ciphertext.slice(0, 12)
     const ciphertextData = ciphertext.slice(16, len - 16)
     const auth = ciphertext.slice(len - 16, len)
-    const decipher = crypto.createDecipheriv('aes-128-gcm', key, iv)
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, nonce)
     decipher.setAuthTag(auth)
     return Ok(Buffer.concat([decipher.update(ciphertextData), decipher.final()]))
   } catch (error) {

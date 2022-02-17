@@ -77,32 +77,6 @@ describe(getPhoneNumberIdentifier, () => {
       })
     })
 
-    it('Using CustomSigner', async () => {
-      fetchMock.mock(endpoint, {
-        success: true,
-        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
-      })
-
-      const customSignerMethod = jest.fn((bodyString) => {
-        const key = ec.keyFromPrivate(hexToBuffer(rawKey))
-        return Promise.resolve(JSON.stringify(key.sign(bodyString).toDER()))
-      })
-      const customSigner: CustomSigner = {
-        authenticationMethod: AuthenticationMethod.CUSTOM_SIGNER,
-        customSigner: customSignerMethod,
-      }
-
-      await expect(
-        getPhoneNumberIdentifier(mockE164Number, mockAccount, customSigner, serviceContext)
-      ).resolves.toMatchObject({
-        e164Number: mockE164Number,
-        pepper: expectedPepper,
-        phoneHash: expectedPhoneHash,
-      })
-
-      expect(customSignerMethod.mock.calls.length).toBe(1)
-    })
-
     it('Preblinding the phone number', async () => {
       fetchMock.mock(endpoint, {
         success: true,

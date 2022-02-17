@@ -5,11 +5,15 @@ import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { ContractKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
+  CombinerEndpoint,
+  DomainEndpoint,
   DomainRequest,
+  DomainResponse,
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetContactMatchesResponse,
   KnownDomain,
+  PhoneNumberPrivacyEndpoint,
   PhoneNumberPrivacyRequest,
 } from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
@@ -18,11 +22,6 @@ import { ec as EC } from 'elliptic'
 
 const debug = debugFactory('kit:odis:query')
 const ec = new EC('secp256k1')
-
-// DO NOT MERGE(victor): Rename this from being Auth.NONE
-export interface NoSigner {
-  authenticationMethod: AuthenticationMethod.NONE
-}
 
 export interface WalletKeySigner {
   authenticationMethod: AuthenticationMethod.WALLET_KEY
@@ -34,13 +33,8 @@ export interface EncryptionKeySigner {
   rawKey: string
 }
 
-export interface CustomSigner {
-  authenticationMethod: AuthenticationMethod.CUSTOM_SIGNER
-  customSigner: (body: string) => Promise<string>
-}
-
 // Support signing with the DEK or with the
-export type AuthSigner = WalletKeySigner | EncryptionKeySigner | CustomSigner | NoSigner
+export type AuthSigner = WalletKeySigner | EncryptionKeySigner
 
 // Re-export types and aliases to maintain backwards compatibility.
 export { AuthenticationMethod, PhoneNumberPrivacyRequest }
@@ -114,35 +108,29 @@ export function signWithDEK(message: string, signer: EncryptionKeySigner) {
 
 /**
  * Make a request to lookup the phone number identifier or perform matchmaking
- * @param signer type of key to sign with
- * @param body request body
- * @param context contains service URL
- * @param endpoint endpoint to hit
+ * @param signer Type of key to sign with. May be undefined if the request is presigned.
+ * @param body Request to send in the body of the HTTP request.
+ * @param context Contains service URL and public to determine which instance to contact.
+ * @param endpoint Endpoint to query (e.g. '/getBlindedMessagePartialSig', '/getContactMatches').
  */
 export async function queryOdis<ResponseType>(
   signer: AuthSigner,
-  body: PhoneNumberPrivacyRequest | DomainRequest<KnownDomain>,
+  body: PhoneNumberPrivacyRequest,
   context: ServiceContext,
-  endpoint: string
+  endpoint: PhoneNumberPrivacyEndpoint | CombinerEndpoint
 ): Promise<ResponseType> {
   debug(`Posting to ${endpoint}`)
 
   const bodyString = JSON.stringify(body)
 
   // Sign payload using provided account and authentication method.
-  // NOTE: Signing and verifying signatures over JSON encoded blobs relies on both the serializer
-  // (e.g. this client) and the verifier (e.g. ODIS) to have the same deterministic JSON
-  // implementation. This is maintained for backwards compatibility, but not recommended.
-  let signature: string | undefined
+  let signature: string
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     signature = signWithDEK(bodyString, signer as EncryptionKeySigner)
   } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
     const account = (body as PhoneNumberPrivacyRequest).account
     signature = await signer.contractKit.connection.sign(bodyString, account)
-  } else if (signer.authenticationMethod === AuthenticationMethod.CUSTOM_SIGNER) {
-    signature = await signer.customSigner(bodyString)
   }
-  const authHeader = signature !== undefined ? { Authorization: signature } : undefined
 
   const { odisUrl } = context
 
@@ -163,7 +151,7 @@ export async function queryOdis<ResponseType>(
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            ...authHeader,
+            Authorization: signature,
           },
           body: bodyString,
         })
@@ -175,6 +163,80 @@ export async function queryOdis<ResponseType>(
         debug('Response ok. Parsing.')
         const response = await res.json()
         return response as ResponseType
+      }
+
+      debug(`Response not okay. Status ${res.status}`)
+
+      switch (res.status) {
+        case 403:
+          throw new Error(ErrorMessages.ODIS_QUOTA_ERROR)
+        case 429:
+          throw new Error(ErrorMessages.ODIS_RATE_LIMIT_ERROR)
+        case 400:
+          throw new Error(ErrorMessages.ODIS_INPUT_ERROR)
+        case 401:
+          throw new Error(ErrorMessages.ODIS_AUTH_ERROR)
+        default:
+          if (res.status >= 400 && res.status < 500) {
+            // Don't retry error codes in 400s
+            throw new Error(`${ErrorMessages.ODIS_CLIENT_ERROR} ${res.status}`)
+          }
+          throw new Error(`Unknown failure ${res.status}`)
+      }
+    },
+    3,
+    dontRetry,
+    []
+  )
+}
+
+/**
+ * Send the given domain request to ODIS (e.g. to get a POPRF evaluation or check quota).
+ * @param body Request to send in the body of the HTTP request.
+ * @param context Contains service URL and public to determine which instance to contact.
+ * @param endpoint Endpoint to query (e.g. '/domain/sign', '/domain/quotaStatus').
+ */
+export async function sendOdisDomainRequest<RequestType extends DomainRequest<KnownDomain>>(
+  body: RequestType,
+  context: ServiceContext,
+  endpoint: DomainEndpoint
+): Promise<DomainResponse<RequestType>> {
+  debug(`Posting to ${endpoint}`)
+
+  const bodyString = JSON.stringify(body)
+
+  const { odisUrl } = context
+
+  const dontRetry = [
+    ErrorMessages.ODIS_QUOTA_ERROR,
+    ErrorMessages.ODIS_RATE_LIMIT_ERROR,
+    ErrorMessages.ODIS_AUTH_ERROR,
+    ErrorMessages.ODIS_INPUT_ERROR,
+    ErrorMessages.ODIS_CLIENT_ERROR,
+  ]
+
+  return selectiveRetryAsyncWithBackOff(
+    async () => {
+      let res: Response
+      try {
+        res = await fetch(odisUrl + endpoint, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: bodyString,
+        })
+      } catch (error) {
+        throw new Error(`${ErrorMessages.ODIS_FETCH_ERROR}: ${error}`)
+      }
+
+      if (res.ok) {
+        debug('Response ok. Parsing.')
+        const response = await res.json()
+        // NOTE: This is an unsafe conversion that can lead to type safety issues in calling code.
+        // This code could be improved by ensuring the response is the correct type with io-ts.
+        return response as DomainResponse<RequestType>
       }
 
       debug(`Response not okay. Status ${res.status}`)

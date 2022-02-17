@@ -3,12 +3,12 @@ import { Err, Ok, Result } from '@celo/base/lib/result'
 import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import {
   ErrorMessages,
-  queryOdis,
+  sendOdisDomainRequest,
   ServiceContext as OdisServiceContext,
 } from '@celo/identity/lib/odis/query'
 import {
-  AuthenticationMethod,
   checkSequentialDelayRateLimit,
+  DomainEndpoint,
   DomainIdentifiers,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestEIP712,
@@ -18,7 +18,6 @@ import {
   domainRestrictedSignatureRequestEIP712,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseSuccess,
-  Endpoints,
   genSessionID,
   SequentialDelayDomain,
   SequentialDelayDomainState,
@@ -34,15 +33,15 @@ import {
   OdisRateLimitingError,
   OdisServiceError,
   OdisVerificationError,
+  UsageError,
 } from './errors'
 import { deriveKey, EIP712Wallet, KDFInfo } from './utils'
 
 /**
- * DO NOT MERGE(victor): Update this comment.
- * Builds an ODIS SequentialDelayDomain with recommended rate limiting for a 6-digit PIN.
+ * Builds an ODIS SequentialDelayDomain with the given hardening configuration.
  *
  * @param authorizer Address of the key that should authorize requests to ODIS.
- * @returns A SequentialDelayDomain with a recommended rate limiting configuration.
+ * @returns A SequentialDelayDomain with the provided rate limiting configuration.
  */
 export function buildOdisDomain(
   config: OdisHardeningConfig,
@@ -58,7 +57,16 @@ export function buildOdisDomain(
   }
 }
 
-// DO NOT MERGE(victor) Document this function including why `wallet` is optional.
+/**
+ * Returns a hardened key derived from the input key material and a POPRF evaluation on that keying
+ * material under the given rate limiting domain.
+ *
+ * @param key Input key material which will be the blinded input to the ODIS POPRF.
+ * @param domain Rate limiting configuration and domain input to the ODIS POPRF.
+ * @param environment Information for the targeted ODIS environment.
+ * @param wallet Wallet with access to the authorizer signing key specified in the domain input.
+ *        Should be provided if the input domain is authenticated.
+ */
 export async function odisHardenKey(
   key: Buffer,
   domain: SequentialDelayDomain,
@@ -103,7 +111,8 @@ export async function odisHardenKey(
   }
 
   // Instantiate a blinding client and blind the key derived from the users password to be hardened.
-  // DO NOT MERGE(victor): Add a note that this assumes we are talking to the combiners.
+  // NOTE: We do not include a response aggregation step here because it is assumed that we are
+  // talking to the combiner service, as opposed to talking directly to the signers.
   const blindingSeed = crypto.randomBytes(16)
   const blindingClient = new WasmBlsBlindingClient(environment.odisPubKey)
   const blindedMessage = await blindingClient.blindMessage(key.toString('base64'), blindingSeed)
@@ -187,15 +196,16 @@ async function requestOdisQuotaStatus(
     quotaStatusReq.options.signature = defined(
       await wallet.signTypedData(authorizer, domainQuotaStatusRequestEIP712(quotaStatusReq))
     )
+  } else if (wallet !== undefined) {
+    return Err(new UsageError(new Error('wallet provided but the domain is unauthenticated')))
   }
 
   let quotaResp: DomainQuotaStatusResponse
   try {
-    quotaResp = await queryOdis<DomainQuotaStatusResponse>(
-      { authenticationMethod: AuthenticationMethod.NONE },
+    quotaResp = await sendOdisDomainRequest(
       quotaStatusReq,
       environment,
-      Endpoints.DOMAIN_QUOTA_STATUS
+      DomainEndpoint.DOMAIN_QUOTA_STATUS
     )
   } catch (error) {
     if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {
@@ -229,7 +239,6 @@ async function requestOdisDomainSignature(
   }
 
   // If a query authorizer is defined in the domain, include a siganture over the request.
-  // DO NOT MERGE(victor): Also error if the user provides a wallet, but the domain is unauthorized.
   const authorizer = domain.address.defined ? domain.address.value : undefined
   if (authorizer !== undefined) {
     if (wallet === undefined || !wallet.hasAccount(authorizer)) {
@@ -242,15 +251,16 @@ async function requestOdisDomainSignature(
     signatureReq.options.signature = defined(
       await wallet.signTypedData(authorizer, domainRestrictedSignatureRequestEIP712(signatureReq))
     )
+  } else if (wallet !== undefined) {
+    return Err(new UsageError(new Error('wallet provided but the domain is unauthenticated')))
   }
 
   let signatureResp: DomainRestrictedSignatureResponse
   try {
-    signatureResp = await queryOdis<DomainRestrictedSignatureResponse>(
-      { authenticationMethod: AuthenticationMethod.NONE },
+    signatureResp = await sendOdisDomainRequest(
       signatureReq,
       environment,
-      Endpoints.DOMAIN_SIGN
+      DomainEndpoint.DOMAIN_SIGN
     )
   } catch (error) {
     if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {

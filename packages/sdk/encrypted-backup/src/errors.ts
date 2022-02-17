@@ -14,6 +14,7 @@ export enum BackupErrorTypes {
   ODIS_VERIFICATION_ERROR = 'ODIS_VERIFICATION_ERROR',
   PBKDF_ERROR = 'PBKDF_ERROR',
   SCRYPT_ERROR = 'SCRYPT_ERROR',
+  USAGE_ERROR = 'USAGE_ERROR',
 }
 
 export class AuthorizationError extends RootError<BackupErrorTypes.AUTHORIZATION_ERROR> {
@@ -82,6 +83,12 @@ export class ScryptError extends RootError<BackupErrorTypes.SCRYPT_ERROR> {
   }
 }
 
+export class UsageError extends RootError<BackupErrorTypes.USAGE_ERROR> {
+  constructor(readonly error?: Error) {
+    super(BackupErrorTypes.USAGE_ERROR)
+  }
+}
+
 export type BackupError =
   | AuthorizationError
   | CircuitBreakerError
@@ -95,3 +102,4 @@ export type BackupError =
   | OdisVerificationError
   | PbkdfError
   | ScryptError
+  | UsageError

@@ -19,7 +19,7 @@ export const BufferFromBase64 = new t.Type<Buffer, string, unknown>(
       chain((str: string) => {
         // Check that the string is base64 data and return the decoding if it is.
         if (!BASE64_REGEXP.test(str)) {
-          return t.failure(unk, context)
+          return t.failure(unk, context, 'provided string is not base64')
         }
         return t.success(Buffer.from(str, 'base64'))
       })
@@ -80,10 +80,23 @@ export function deserializeBackup(data: string): Result<Backup, DecodeError> {
     return Err(new DecodeError(jsonDecode.error))
   }
 
-  const backup = BackupSchema.decode(jsonDecode.result)
-  if (isLeft(backup)) {
-    return Err(new DecodeError())
+  const decoding = BackupSchema.decode(jsonDecode.result)
+  if (isLeft(decoding)) {
+    return Err(
+      new DecodeError(
+        new Error(`error in validating backup object: ${JSON.stringify(decoding.left)}`)
+      )
+    )
+  }
+  const backup = decoding.right
+
+  if (backup.nonce.length !== 32) {
+    return Err(
+      new DecodeError(
+        new Error(`expected backup nonce to be 32 bytes but got ${backup.nonce.length}`)
+      )
+    )
   }
 
-  return Ok(backup.right)
+  return Ok(backup)
 }

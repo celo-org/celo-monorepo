@@ -41,7 +41,7 @@ export interface Backup {
   encryptedData: Buffer
 
   /**
-   * A randomly chosen 128-bit value. Ensures uniqueness of the password derived encryption key.
+   * A randomly chosen 256-bit value. Ensures uniqueness of the password derived encryption key.
    *
    * @remarks The nonce value is appended to the password for local key derivation. It is also used
    * to derive an authentication key to include in the ODIS Domain for domain separation and to
@@ -201,10 +201,13 @@ export async function createBackup({
 }: CreateBackupArgs): Promise<Result<Backup, BackupError>> {
   // Password and backup data are not included in any logging as they are likely sensitive.
   debug('creating a backup with the following information', hardening, metadata)
-  // DO NOT MERGE(victor): Generate 32 bytes of nonce data, use the first 16 for mixing with the
-  // password and the second 16 for odis authentication key.
-  const nonce = crypto.randomBytes(16)
-  const initialKey = deriveKey(KDFInfo.PASSWORD, [password, nonce])
+
+  // Generate a 32-byte random nonce for the backup. Use the first half to salt the password input
+  // and the second half to derive an authentication key for making queries to ODIS.
+  const nonce = crypto.randomBytes(32)
+  const passwordSalt = nonce.slice(0, 16)
+  const odisAuthKeySeed = nonce.slice(16, 32)
+  const initialKey = deriveKey(KDFInfo.PASSWORD, [password, passwordSalt])
 
   // Generate a fuse key and mix it into the entropy of the key
   let encryptedFuseKey: Buffer | undefined
@@ -255,7 +258,7 @@ export async function createBackup({
     // Derive the query authorizer wallet and address from the nonce, then build the ODIS domain.
     // This domain acts as a binding rate limit configuration for ODIS, enforcing that the client must
     // know the backup nonce, and can only make the given number of queries.
-    const authorizer = odisQueryAuthorizer(nonce)
+    const authorizer = odisQueryAuthorizer(odisAuthKeySeed)
     domain = buildOdisDomain(hardening.odis, authorizer.address)
 
     debug('sending request to ODIS to harden the backup encryption key')
@@ -286,11 +289,11 @@ export async function createBackup({
   }
 
   debug('finalizing encryption key')
-  const finalKey = deriveKey(
-    KDFInfo.FINALIZE,
-    [updatedKey, odisHardenedKey ?? Buffer.alloc(0), computationalHardenedKey ?? Buffer.alloc(0)],
-    16
-  )
+  const finalKey = deriveKey(KDFInfo.FINALIZE, [
+    updatedKey,
+    odisHardenedKey ?? Buffer.alloc(0),
+    computationalHardenedKey ?? Buffer.alloc(0),
+  ])
 
   debug('encrypting backup data with final encryption key')
   const encryption = encrypt(finalKey, data)
@@ -332,7 +335,12 @@ export async function openBackup({
   password,
 }: OpenBackupArgs): Promise<Result<Buffer, BackupError>> {
   debug('opening an encrypted backup')
-  const initialKey = deriveKey(KDFInfo.PASSWORD, [password, backup.nonce])
+
+  // Split the nonce into the two halves for password salting and auth key generation respectively.
+  const passwordSalt = backup.nonce.slice(0, 16)
+  const odisAuthKeySeed = backup.nonce.slice(16, 32)
+
+  const initialKey = deriveKey(KDFInfo.PASSWORD, [password, passwordSalt])
 
   // If a circuit breaker is in use, request a decryption of the fuse key and mix it in.
   let updatedKey: Buffer
@@ -371,7 +379,7 @@ export async function openBackup({
 
     // Derive the query authorizer wallet and address from the nonce.
     // If the ODIS domain is authenticated, the authorizer address should match the domain.
-    const authorizer = odisQueryAuthorizer(backup.nonce)
+    const authorizer = odisQueryAuthorizer(odisAuthKeySeed)
     if (domain.address.defined && !eqAddress(authorizer.address, domain.address.value)) {
       return Err(
         new InvalidBackupError(
@@ -420,11 +428,11 @@ export async function openBackup({
   }
 
   debug('finalizing decryption key')
-  const finalKey = deriveKey(
-    KDFInfo.FINALIZE,
-    [updatedKey, odisHardenedKey ?? Buffer.alloc(0), computationalHardenedKey ?? Buffer.alloc(0)],
-    16
-  )
+  const finalKey = deriveKey(KDFInfo.FINALIZE, [
+    updatedKey,
+    odisHardenedKey ?? Buffer.alloc(0),
+    computationalHardenedKey ?? Buffer.alloc(0),
+  ])
 
   debug('decrypting backup with finalized decryption key')
   const decryption = decrypt(finalKey, backup.encryptedData)
