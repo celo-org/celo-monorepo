@@ -2,7 +2,7 @@ import { retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { NULL_ADDRESS, StableToken } from '@celo/contractkit'
 import {
   authenticateUser,
-  Endpoints,
+  Endpoint,
   ErrorMessage,
   FULL_NODE_TIMEOUT_IN_MS,
   GetQuotaRequest,
@@ -30,17 +30,17 @@ export async function handleGetQuota(
   request: Request<{}, {}, GetQuotaRequest>,
   response: Response
 ) {
-  Counters.requests.labels(Endpoints.GET_QUOTA).inc()
+  Counters.requests.labels(Endpoint.GET_QUOTA).inc()
   const logger: Logger = response.locals.logger
   logger.info({ request: request.body }, 'Request received')
   logger.debug('Begin handleGetQuota')
   try {
     if (!isValidGetQuotaInput(request.body)) {
-      respondWithError(Endpoints.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)
+      respondWithError(Endpoint.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)
       return
     }
     if (!(await authenticateUser(request, getContractKit() as any, logger))) {
-      respondWithError(Endpoints.GET_QUOTA, response, 401, WarningMessage.UNAUTHENTICATED_USER)
+      respondWithError(Endpoint.GET_QUOTA, response, 401, WarningMessage.UNAUTHENTICATED_USER)
       return
     }
 
@@ -55,13 +55,13 @@ export async function handleGetQuota(
       totalQuota: queryCount.totalQuota,
     }
 
-    Counters.responses.labels(Endpoints.GET_QUOTA, '200').inc()
+    Counters.responses.labels(Endpoint.GET_QUOTA, '200').inc()
     logger.info({ response: queryQuotaResponse }, 'Query quota retrieval success')
     response.status(200).json(queryQuotaResponse)
   } catch (err) {
     logger.error('Failed to get user quota')
     logger.error(err)
-    respondWithError(Endpoints.GET_QUOTA, response, 500, ErrorMessage.DATABASE_GET_FAILURE)
+    respondWithError(Endpoint.GET_QUOTA, response, 500, ErrorMessage.DATABASE_GET_FAILURE)
   }
 }
 
