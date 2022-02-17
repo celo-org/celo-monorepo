@@ -48,7 +48,7 @@ export async function getContactMatches(
   }
 
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    dekSigner = signer
+    dekSigner = signer as EncryptionKeySigner
   }
 
   if (dekSigner) {
@@ -64,7 +64,9 @@ export async function getContactMatches(
     CombinerEndpoint.MATCHMAKING
   )
 
-  const matchHashes: string[] = response.matchedContacts.map((match) => match.phoneNumber)
+  const matchHashes: string[] = response.matchedContacts.map(
+    (match: { phoneNumber: string }) => match.phoneNumber
+  )
 
   if (!matchHashes || !matchHashes.length) {
     debug('No matches found')

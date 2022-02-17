@@ -19,7 +19,7 @@ import {
   PIN_HARDENING_ALFAJORES_CONFIG,
   PIN_HARDENING_MAINNET_CONFIG,
 } from './config'
-import { BackupError, InvalidBackupError } from './errors'
+import { BackupError, InvalidBackupError, UsageError } from './errors'
 import { buildOdisDomain, odisHardenKey, odisQueryAuthorizer } from './odis'
 import { computationalHardenKey, decrypt, deriveKey, encrypt, KDFInfo } from './utils'
 

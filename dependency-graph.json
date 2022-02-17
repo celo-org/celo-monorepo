@@ -322,16 +322,5 @@
       "@celo/wallet-base",
       "@celo/wallet-remote"
     ]
-  },
-  "@celo/wallet-walletconnect": {
-    "location": "packages/sdk/wallets/wallet-walletconnect",
-    "dependencies": [
-      "@celo/connect",
-      "@celo/contractkit",
-      "@celo/dev-utils",
-      "@celo/utils",
-      "@celo/wallet-base",
-      "@celo/wallet-remote"
-    ]
   }
 }
