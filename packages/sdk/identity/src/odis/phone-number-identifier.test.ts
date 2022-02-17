@@ -9,7 +9,6 @@ import {
 } from './phone-number-identifier'
 import {
   AuthenticationMethod,
-  CustomSigner,
   EncryptionKeySigner,
   ErrorMessages,
   ServiceContext,
