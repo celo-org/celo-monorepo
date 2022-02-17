@@ -649,10 +649,10 @@ contract('Exchange', (accounts: string[]) => {
               from: user,
             }
           )
-          const [mintableStable, tradeableGold] = await exchange.getBuyAndSellBuckets(true)
-          const expectedTradeableGold = initialGoldBucket.plus(goldTokenAmount)
+          const [mintableStable, tradableGold] = await exchange.getBuyAndSellBuckets(true)
+          const expectedTradableGold = initialGoldBucket.plus(goldTokenAmount)
           const expectedMintableStable = initialStableBucket.minus(expectedStableBalance)
-          assertEqualBN(tradeableGold, expectedTradeableGold)
+          assertEqualBN(tradableGold, expectedTradableGold)
           assertEqualBN(mintableStable, expectedMintableStable)
         })
 
@@ -778,13 +778,13 @@ contract('Exchange', (accounts: string[]) => {
             })
 
             it("doesn't hit the cap and it shouldn't be resized", async () => {
-              const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+              const [tradableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
               assertEqualBN(mintableStable, new BigNumber('2e21'))
-              assertEqualBN(tradeableGold, new BigNumber('1e21'))
+              assertEqualBN(tradableGold, new BigNumber('1e21'))
 
               // the buckets hold the price
               assertEqualBN(
-                new BigNumber(mintableStable.dividedBy(tradeableGold)),
+                new BigNumber(mintableStable.dividedBy(tradableGold)),
                 new BigNumber('2')
               )
             })
@@ -802,10 +802,10 @@ contract('Exchange', (accounts: string[]) => {
                 new BigNumber('2e24').multipliedBy(2000)
               ) // bump the price by 2000, leaving with 4K CELO per dollar
 
-              const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+              const [tradableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
 
               assertEqualBN(
-                new BigNumber(mintableStable.dividedBy(tradeableGold)),
+                new BigNumber(mintableStable.dividedBy(tradableGold)),
                 new BigNumber('4000')
               )
             })
@@ -957,11 +957,11 @@ contract('Exchange', (accounts: string[]) => {
               from: user,
             }
           )
-          const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+          const [tradableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
           const expectedMintableStable = initialStableBucket.plus(stableTokenBalance)
-          const expectedTradeableGold = initialGoldBucket.minus(expectedGoldBalanceIncrease)
+          const expectedTradableGold = initialGoldBucket.minus(expectedGoldBalanceIncrease)
           assert.isTrue(mintableStable.eq(expectedMintableStable))
-          assert.isTrue(tradeableGold.eq(expectedTradeableGold))
+          assert.isTrue(tradableGold.eq(expectedTradableGold))
         })
 
         it('should emit an Exchanged event', async () => {
@@ -1210,10 +1210,10 @@ contract('Exchange', (accounts: string[]) => {
             from: user,
           }
         )
-        const [mintableStable, tradeableGold] = await exchange.getBuyAndSellBuckets(true)
-        const expectedTradeableGold = initialGoldBucket.plus(expectedGoldAmount)
+        const [mintableStable, tradableGold] = await exchange.getBuyAndSellBuckets(true)
+        const expectedTradableGold = initialGoldBucket.plus(expectedGoldAmount)
         const expectedMintableStable = initialStableBucket.minus(buyStableAmount)
-        assertEqualBN(tradeableGold, expectedTradeableGold)
+        assertEqualBN(tradableGold, expectedTradableGold)
         assertEqualBN(mintableStable, expectedMintableStable)
       })
 
@@ -1468,11 +1468,11 @@ contract('Exchange', (accounts: string[]) => {
             from: user,
           }
         )
-        const [tradeableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+        const [tradableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
         const expectedMintableStable = initialStableBucket.plus(expectedStableAmount)
-        const expectedTradeableGold = initialGoldBucket.minus(buyGoldAmount)
+        const expectedTradableGold = initialGoldBucket.minus(buyGoldAmount)
         assert.isTrue(mintableStable.eq(expectedMintableStable))
-        assert.isTrue(tradeableGold.eq(expectedTradeableGold))
+        assert.isTrue(tradableGold.eq(expectedTradableGold))
       })
 
       it('should emit an Exchanged event', async () => {
