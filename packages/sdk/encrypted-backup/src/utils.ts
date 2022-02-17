@@ -76,7 +76,7 @@ export function decrypt(key: Buffer, ciphertext: Buffer): Result<Buffer, Decrypt
   try {
     // NOTE: AES-GCM uses a 12-byte nonce. Longer nonces get hashed before use.
     const nonce = ciphertext.slice(0, 12)
-    const ciphertextData = ciphertext.slice(16, len - 16)
+    const ciphertextData = ciphertext.slice(12, len - 16)
     const auth = ciphertext.slice(len - 16, len)
     const decipher = crypto.createDecipheriv('aes-256-gcm', key, nonce)
     decipher.setAuthTag(auth)

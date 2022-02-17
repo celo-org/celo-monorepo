@@ -14,6 +14,8 @@ import {
   ComputationalHardeningConfig,
   EnvironmentIdentifier,
   HardeningConfig,
+  PASSWORD_HARDENING_ALFAJORES_CONFIG,
+  PASSWORD_HARDENING_MAINNET_CONFIG,
   PIN_HARDENING_ALFAJORES_CONFIG,
   PIN_HARDENING_MAINNET_CONFIG,
 } from './config'
@@ -106,8 +108,6 @@ export interface Backup {
   }
 }
 
-// DO NOT MERGE(victor): Add a createPasswordEncryptedBackup function with computational hardening.
-
 export interface CreatePinEncryptedBackupArgs {
   data: Buffer
   pin: string
@@ -143,7 +143,7 @@ export interface CreatePinEncryptedBackupArgs {
  * forcibly open backups created with this function.
  *
  * @param data The secret data (e.g. BIP-39 mnemonic phrase) to be included in the encrypted backup.
- * @param password Password, PIN, or other user secret to use in deriving the encryption key.
+ * @param pin PIN to use in deriving the encryption key.
  * @param hardening Configuration for how the password should be hardened in deriving the key.
  * @param metadata Arbitrary key-value data to include in the backup to identify it.
  */
@@ -164,12 +164,64 @@ export async function createPinEncryptedBackup({
     throw new Error('Implementation error: unhandled environment identifier')
   }
 
-  return createBackup({ data, password: Buffer.from(pin, 'utf8'), hardening, metadata })
+  return createBackup({ data, userSecret: Buffer.from(pin, 'utf8'), hardening, metadata })
+}
+
+export interface CreatePasswordEncryptedBackupArgs {
+  data: Buffer
+  password: string
+  environment?: EnvironmentIdentifier
+  metadata?: { [key: string]: unknown }
+}
+
+/**
+ * Create a data backup, encrypting it with a hardened key derived from the given password.
+ *
+ * @remarks Because passwords have moderate entropy, the total number of guesses is restricted.
+ *   * The user initially gets 5 attempts without delay.
+ *   * Then the user gets two attempts every 5 seconds for up to 20 attempts.
+ *   * Then the user gets two attempts every 30 seconds for up to 20 attempts.
+ *   * Then the user gets two attempts every 5 minutes for up to 20 attempts.
+ *   * Then the user gets two attempts every hour for up to 20 attempts.
+ *   * Then the user gets two attempts every day for up to 20 attempts.
+ *
+ * Following guidelines in NIST-800-63-3 it is strongly recommended that the caller apply a password
+ * blocklist to the users choice of password.
+ *
+ * In order to handle the event of an ODIS service compromise, this configuration additionally
+ * hardens the password input with a computational hardening function. In particular, scrypt is used
+ * with IETF recommended parameters {@link
+ * https://tools.ietf.org/id/draft-whited-kitten-password-storage-00.html#name-scrypt | IETF
+ * recommended scrypt parameters }
+ *
+ * @param data The secret data (e.g. BIP-39 mnemonic phrase) to be included in the encrypted backup.
+ * @param password Password to use in deriving the encryption key.
+ * @param hardening Configuration for how the password should be hardened in deriving the key.
+ * @param metadata Arbitrary key-value data to include in the backup to identify it.
+ */
+export async function createPasswordEncryptedBackup({
+  data,
+  password,
+  environment,
+  metadata,
+}: CreatePasswordEncryptedBackupArgs): Promise<Result<Backup, BackupError>> {
+  // Select the hardening configuration based on the environment selector.
+  let hardening: HardeningConfig | undefined
+  if (environment === EnvironmentIdentifier.ALFAJORES) {
+    hardening = PASSWORD_HARDENING_ALFAJORES_CONFIG
+  } else if (environment === EnvironmentIdentifier.MAINNET || environment === undefined) {
+    hardening = PASSWORD_HARDENING_MAINNET_CONFIG
+  }
+  if (hardening === undefined) {
+    throw new Error('Implementation error: unhandled environment identifier')
+  }
+
+  return createBackup({ data, userSecret: Buffer.from(password, 'utf8'), hardening, metadata })
 }
 
 export interface CreateBackupArgs {
   data: Buffer
-  password: Buffer
+  userSecret: Buffer
   hardening: HardeningConfig
   metadata?: { [key: string]: unknown }
 }
@@ -178,7 +230,7 @@ export interface CreateBackupArgs {
  * Create a data backup, encrypting it with a hardened key derived from the given password or PIN.
  *
  * @param data The secret data (e.g. BIP-39 mnemonic phrase) to be included in the encrypted backup.
- * @param password Password, PIN, or other user secret to use in deriving the encryption key.
+ * @param userSecret Password, PIN, or other user secret to use in deriving the encryption key.
  * @param hardening Configuration for how the password should be hardened in deriving the key.
  * @param metadata Arbitrary key-value data to include in the backup to identify it.
  *
@@ -195,19 +247,19 @@ export interface CreateBackupArgs {
  */
 export async function createBackup({
   data,
-  password,
+  userSecret,
   hardening,
   metadata,
 }: CreateBackupArgs): Promise<Result<Backup, BackupError>> {
   // Password and backup data are not included in any logging as they are likely sensitive.
   debug('creating a backup with the following information', hardening, metadata)
 
-  // Generate a 32-byte random nonce for the backup. Use the first half to salt the password input
-  // and the second half to derive an authentication key for making queries to ODIS.
+  // Generate a 32-byte random nonce for the backup. Use the first half to salt the user secret
+  // input and the second half to derive an authentication key for making queries to ODIS.
   const nonce = crypto.randomBytes(32)
   const passwordSalt = nonce.slice(0, 16)
   const odisAuthKeySeed = nonce.slice(16, 32)
-  const initialKey = deriveKey(KDFInfo.PASSWORD, [password, passwordSalt])
+  const initialKey = deriveKey(KDFInfo.PASSWORD, [userSecret, passwordSalt])
 
   // Generate a fuse key and mix it into the entropy of the key
   let encryptedFuseKey: Buffer | undefined
@@ -321,18 +373,18 @@ export async function createBackup({
 
 export interface OpenBackupArgs {
   backup: Backup
-  password: Buffer
+  userSecret: Buffer
 }
 
 /**
  * Open an encrypted backup file, using the provided password or PIN to derive the decryption key.
  *
  * @param backup Backup structure including the ciphertext and key derivation information.
- * @param password Password, PIN, or other user secret to use in deriving the encryption key.
+ * @param userSecret Password, PIN, or other user secret to use in deriving the encryption key.
  */
 export async function openBackup({
   backup,
-  password,
+  userSecret,
 }: OpenBackupArgs): Promise<Result<Buffer, BackupError>> {
   debug('opening an encrypted backup')
 
@@ -340,7 +392,7 @@ export async function openBackup({
   const passwordSalt = backup.nonce.slice(0, 16)
   const odisAuthKeySeed = backup.nonce.slice(16, 32)
 
-  const initialKey = deriveKey(KDFInfo.PASSWORD, [password, passwordSalt])
+  const initialKey = deriveKey(KDFInfo.PASSWORD, [userSecret, passwordSalt])
 
   // If a circuit breaker is in use, request a decryption of the fuse key and mix it in.
   let updatedKey: Buffer

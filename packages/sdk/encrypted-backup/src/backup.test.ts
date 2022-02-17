@@ -71,7 +71,7 @@ describe('end-to-end', () => {
 
     const backup = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: TEST_HARDENING_CONFIG,
       metadata: testMetadata,
     })
@@ -83,7 +83,7 @@ describe('end-to-end', () => {
     expect(backup.result.metadata).toEqual(testMetadata)
 
     // Attempt to open the backup before passing it through the serialize function.
-    const opened = await openBackup({ backup: backup.result, password: testPassword })
+    const opened = await openBackup({ backup: backup.result, userSecret: testPassword })
     debug('Open backup result', opened)
     expect(opened.ok).toBe(true)
     if (!opened.ok) {
@@ -106,7 +106,7 @@ describe('end-to-end', () => {
     expect(deserialized.result.metadata).toEqual(testMetadata)
 
     // Open the backup and check that that the expect data is recovered.
-    const reopened = await openBackup({ backup: deserialized.result, password: testPassword })
+    const reopened = await openBackup({ backup: deserialized.result, userSecret: testPassword })
     debug('Reopen backup result', reopened)
     expect(reopened.ok).toBe(true)
     if (!reopened.ok) {
@@ -124,7 +124,7 @@ describe('createBackup', () => {
     mockOdis!.installSignEndpoint(fetchMock, { throws: new Error('fetch failed') })
     const result = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: TEST_HARDENING_CONFIG,
     })
     expect(result.ok).toBe(false)
@@ -138,7 +138,7 @@ describe('createBackup', () => {
     mockOdis!.installSignEndpoint(fetchMock, { status: 501 })
     const result = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: TEST_HARDENING_CONFIG,
     })
     expect(result.ok).toBe(false)
@@ -152,7 +152,7 @@ describe('createBackup', () => {
     mockOdis!.installSignEndpoint(fetchMock, { status: 429, headers: { 'Retry-After': '60' } })
     const result = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: TEST_HARDENING_CONFIG,
     })
     expect(result.ok).toBe(false)
@@ -173,7 +173,7 @@ describe('createBackup', () => {
     })
     const result = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: TEST_HARDENING_CONFIG,
     })
     expect(result.ok).toBe(false)
@@ -187,7 +187,7 @@ describe('createBackup', () => {
     mockOdis!.installSignEndpoint(fetchMock, { status: 501 })
     const result = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: { ...TEST_HARDENING_CONFIG, odis: undefined },
     })
     expect(result.ok).toBe(true)
@@ -197,7 +197,7 @@ describe('createBackup', () => {
     mockCircuitBreaker!.installStatusEndpoint(fetchMock, { throws: new Error('fetch failed') })
     const result = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: TEST_HARDENING_CONFIG,
     })
     expect(result.ok).toBe(false)
@@ -211,7 +211,7 @@ describe('createBackup', () => {
     mockCircuitBreaker!.installStatusEndpoint(fetchMock, { status: 501 })
     const result = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: TEST_HARDENING_CONFIG,
     })
     expect(result.ok).toBe(false)
@@ -225,7 +225,7 @@ describe('createBackup', () => {
     mockCircuitBreaker!.keyStatus = CircuitBreakerKeyStatus.DESTROYED
     const result = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: TEST_HARDENING_CONFIG,
     })
     expect(result.ok).toBe(false)
@@ -239,7 +239,7 @@ describe('createBackup', () => {
     mockCircuitBreaker!.installStatusEndpoint(fetchMock, { status: 501 })
     const result = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: { ...TEST_HARDENING_CONFIG, circuitBreaker: undefined },
     })
     expect(result.ok).toBe(true)
@@ -255,7 +255,7 @@ describe('openBackup', () => {
     // Create a backup to use for tests of opening below
     const testBackupResult = await createBackup({
       data: testData,
-      password: testPassword,
+      userSecret: testPassword,
       hardening: TEST_HARDENING_CONFIG,
     })
     if (!testBackupResult.ok) {
@@ -270,7 +270,7 @@ describe('openBackup', () => {
     testBackup!.encryptedData[0] ^= 0x01
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {
@@ -283,7 +283,7 @@ describe('openBackup', () => {
     testBackup!.odisDomain!.salt = defined('some salt')
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {
@@ -299,7 +299,7 @@ describe('openBackup', () => {
     })
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {
@@ -315,7 +315,7 @@ describe('openBackup', () => {
     }
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {
@@ -328,7 +328,7 @@ describe('openBackup', () => {
     mockOdis!.installSignEndpoint(fetchMock, { throws: new Error('fetch failed') })
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {
@@ -341,7 +341,7 @@ describe('openBackup', () => {
     mockOdis!.installSignEndpoint(fetchMock, { status: 501 })
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {
@@ -354,7 +354,7 @@ describe('openBackup', () => {
     mockOdis!.installSignEndpoint(fetchMock, { status: 429, headers: { 'Retry-After': '60' } })
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {
@@ -374,7 +374,7 @@ describe('openBackup', () => {
     })
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {
@@ -387,7 +387,7 @@ describe('openBackup', () => {
     mockCircuitBreaker!.installUnwrapKeyEndpoint(fetchMock, { throws: new Error('fetch failed') })
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {
@@ -400,7 +400,7 @@ describe('openBackup', () => {
     mockCircuitBreaker!.installUnwrapKeyEndpoint(fetchMock, { status: 501 })
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {
@@ -413,7 +413,7 @@ describe('openBackup', () => {
     mockCircuitBreaker!.keyStatus = CircuitBreakerKeyStatus.DESTROYED
     const result = await openBackup({
       backup: testBackup!,
-      password: testPassword,
+      userSecret: testPassword,
     })
     expect(result.ok).toBe(false)
     if (result.ok) {

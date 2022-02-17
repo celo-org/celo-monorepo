@@ -190,6 +190,64 @@ const PIN_HARDENING_RATE_LIMIT: SequentialDelayStage[] = [
   },
 ]
 
+/**
+ * ODIS SequentialDelayDomain rate limit configured to be appropriate for hardening a password.
+ *
+ * @remarks Because passwords have moderate entropy, the total number of guesses is restricted.
+ *   * The user initially gets 5 attempts without delay.
+ *   * Then the user gets two attempts every 5 seconds for up to 20 attempts.
+ *   * Then the user gets two attempts every 30 seconds for up to 20 attempts.
+ *   * Then the user gets two attempts every 5 minutes for up to 20 attempts.
+ *   * Then the user gets two attempts every hour for up to 20 attempts.
+ *   * Then the user gets two attempts every day for up to 20 attempts.
+ */
+const PASSWORD_HARDENING_RATE_LIMIT: SequentialDelayStage[] = [
+  // First stage is setup, as the user will need to make a single query to create their backup.
+  {
+    delay: 0,
+    resetTimer: defined(true),
+    batchSize: defined(1),
+    repetitions: noNumber,
+  },
+  // After the first 5 attempts, the user has 100 attempts with the delays increasing every 20.
+  {
+    delay: 0,
+    resetTimer: defined(true),
+    batchSize: defined(5),
+    repetitions: noNumber,
+  },
+  {
+    delay: 5,
+    resetTimer: defined(true),
+    batchSize: defined(2),
+    repetitions: defined(10),
+  },
+  {
+    delay: 30,
+    resetTimer: defined(true),
+    batchSize: defined(2),
+    repetitions: defined(10),
+  },
+  {
+    delay: 300,
+    resetTimer: defined(true),
+    batchSize: defined(2),
+    repetitions: defined(10),
+  },
+  {
+    delay: 3600,
+    resetTimer: defined(true),
+    batchSize: defined(2),
+    repetitions: defined(10),
+  },
+  {
+    delay: 86400,
+    resetTimer: defined(true),
+    batchSize: defined(2),
+    repetitions: defined(10),
+  },
+]
+
 export enum EnvironmentIdentifier {
   MAINNET = 'MAINNET',
   ALFAJORES = 'ALFAJORES',
@@ -212,5 +270,31 @@ export const PIN_HARDENING_ALFAJORES_CONFIG: HardeningConfig = {
   },
   circuitBreaker: {
     environment: VALORA_ALFAJORES_CIRCUIT_BREAKER_ENVIRONMENT,
+  },
+}
+
+export const PASSWORD_HARDENING_MAINNET_CONFIG: HardeningConfig = {
+  odis: {
+    rateLimit: PASSWORD_HARDENING_RATE_LIMIT,
+    environment: ODIS_MAINNET_CONTEXT,
+  },
+  computational: {
+    function: ComputationalHardeningFunction.SCRYPT,
+    cost: 32768,
+    blockSize: 8,
+    parallelization: 1,
+  },
+}
+
+export const PASSWORD_HARDENING_ALFAJORES_CONFIG: HardeningConfig = {
+  odis: {
+    rateLimit: PASSWORD_HARDENING_RATE_LIMIT,
+    environment: ODIS_ALFAJORES_CONTEXT,
+  },
+  computational: {
+    function: ComputationalHardeningFunction.SCRYPT,
+    cost: 32768,
+    blockSize: 8,
+    parallelization: 1,
   },
 }
