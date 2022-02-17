@@ -32,6 +32,7 @@ describe('Running against a deployed service', () => {
     console.log('ODIS_BLOCKCHAIN_PROVIDER: ' + process.env.ODIS_BLOCKCHAIN_PROVIDER)
   })
 
+  // This test is disabled because the Combiner status endpoint doesn't work
   xit('Service is deployed at correct version', async () => {
     const response = await fetch(process.env.ODIS_COMBINER_SERVICE_URL + Endpoints.STATUS, {
       method: 'GET',

@@ -1,9 +1,8 @@
 import { OdisUtils } from '@celo/identity/lib/odis'
 import { ErrorMessages } from '@celo/identity/lib/odis/query'
-import { Endpoints } from '@celo/phone-number-privacy-common'
 import { ensureLeading0x } from '@celo/utils/lib/address'
 import 'isomorphic-fetch'
-import { E2E_TEST_ACCOUNTS, E2E_TEST_PHONE_NUMBERS_RAW, VERSION } from '../../src/config'
+import { E2E_TEST_ACCOUNTS, E2E_TEST_PHONE_NUMBERS_RAW } from '../../src/config'
 import {
   ACCOUNT_ADDRESS,
   CONTACT_PHONE_NUMBERS,
@@ -21,15 +20,6 @@ require('dotenv').config()
 jest.setTimeout(60000)
 
 describe('Running against a deployed service', () => {
-  xit('Service is deployed at correct version', async () => {
-    const response = await fetch(process.env.ODIS_COMBINER_SERVICE_URL + Endpoints.STATUS, {
-      method: 'GET',
-    })
-    const body = await response.json()
-    // This checks against local package.json version, change if necessary
-    expect(body.version).toBe(VERSION)
-  })
-
   it('Returns input error for invalid phone hash', async () => {
     await expect(
       OdisUtils.Matchmaking.getContactMatches(
