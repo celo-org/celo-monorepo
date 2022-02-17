@@ -1,5 +1,4 @@
 import * as Logger from 'bunyan'
-import { isValidAddress, toChecksumAddress } from 'ethereumjs-util'
 import { Request } from 'express'
 import { anyNumber, capture, instance, mock, reset, verify, when } from 'ts-mockito'
 import { findAttestationByKey } from '../../src/db'
@@ -10,15 +9,29 @@ import {
 } from '../../src/requestHandlers/attestation'
 import { rerequestAttestation } from '../../src/sms'
 
-jest.mock('ethereumjs-util')
-const isValidAddressMock = isValidAddress as jest.Mock
-const toChecksumAddressMock = toChecksumAddress as jest.Mock
+import ethereumJsUtil = require('ethereumjs-util')
+const isValidAddressMock = jest.spyOn(ethereumJsUtil, 'isValidAddress')
+const toChecksumAddressMock = jest.spyOn(ethereumJsUtil, 'toChecksumAddress')
 
 jest.mock('../../src/db')
 const findAttestationByKeyMock = findAttestationByKey as jest.Mock
 
 jest.mock('../../src/sms')
 const rerequestAttestationMock = rerequestAttestation as jest.Mock
+
+jest.mock('@celo/identity', () => {
+  const OdisUtils = {
+    Query: {
+      getServiceContext: () => {
+        return {
+          odisPubKey:
+            'ru+9GmEsBi+/SHtNc4lBwR+evpvcVLcmVDYhzyveWXVwaN7EdUGF+GgUvOMMqpUAaxQl+4DkgtbTP4CIFFAUyGnZF0nRLqo64PVSv/mrGrTet0ej5cJeS1Fla+n8o5sB',
+        }
+      },
+    },
+  }
+  return { OdisUtils }
+})
 
 describe('Attestation request handler', () => {
   const requestMock = mock<Request>()
@@ -166,10 +179,10 @@ describe('Attestation request handler', () => {
         language: 'en',
         account: 'account',
         issuer: address,
-        salt: 'nHIvMC9B4j2+H',
+        salt: '4EcPvcixnoe/N',
         securityCodePrefix: 'p',
         smsRetrieverAppSig: 'sig',
-        phoneNumberSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+        phoneNumberSignature: 'xNOQZWEa6JIyuAhGf9H0Evjx60BB8PQ6E9498CTLod2PhYRypKMdwGVDtLNkptAA',
       })
 
       expect(findAttestationByKeyMock).toBeCalledTimes(1)
