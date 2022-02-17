@@ -7,14 +7,7 @@ import {
   getPhoneNumberIdentifierFromSignature,
   isBalanceSufficientForSigRetrieval,
 } from './phone-number-identifier'
-import {
-  AuthenticationMethod,
-  CustomSigner,
-  EncryptionKeySigner,
-  ErrorMessages,
-  ServiceContext,
-  signWithRawKey,
-} from './query'
+import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
 
 jest.mock('./bls-blinding-client', () => {
   // tslint:disable-next-line:no-shadowed-variable
@@ -72,31 +65,6 @@ describe(getPhoneNumberIdentifier, () => {
         pepper: expectedPepper,
         phoneHash: expectedPhoneHash,
       })
-    })
-
-    it('Using CustomSigner', async () => {
-      fetchMock.mock(endpoint, {
-        success: true,
-        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
-      })
-
-      const customSignerMethod = jest.fn((bodyString) => {
-        return Promise.resolve(signWithRawKey(bodyString, rawKey))
-      })
-      const customSigner: CustomSigner = {
-        authenticationMethod: AuthenticationMethod.CUSTOM_SIGNER,
-        customSigner: customSignerMethod,
-      }
-
-      await expect(
-        getPhoneNumberIdentifier(mockE164Number, mockAccount, customSigner, serviceContext)
-      ).resolves.toMatchObject({
-        e164Number: mockE164Number,
-        pepper: expectedPepper,
-        phoneHash: expectedPhoneHash,
-      })
-
-      expect(customSignerMethod.mock.calls.length).toBe(1)
     })
 
     it('Preblinding the phone number', async () => {
