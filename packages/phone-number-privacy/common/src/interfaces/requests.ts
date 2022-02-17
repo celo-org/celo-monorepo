@@ -28,16 +28,16 @@ export enum DomainEndpoint {
   DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
 }
 
+export type SignerEndpoint = PhoneNumberPrivacyEndpoint | DomainEndpoint
 export const SignerEndpoint = { ...PhoneNumberPrivacyEndpoint, ...DomainEndpoint }
-export type SignerEndpoint = typeof SignerEndpoint
 
 export enum CombinerEndpoint {
   SIGN_MESSAGE = '/getBlindedMessageSig',
   MATCHMAKING = '/getContactMatches',
 }
 
+export type Endpoint = SignerEndpoint | CombinerEndpoint
 export const Endpoint = { ...SignerEndpoint, ...CombinerEndpoint }
-export type Endpoint = typeof Endpoint
 
 export enum AuthenticationMethod {
   WALLET_KEY = 'wallet_key',
