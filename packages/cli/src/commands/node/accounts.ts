@@ -7,7 +7,7 @@ export default class NodeAccounts extends BaseCommand {
     ...BaseCommand.flags,
   }
 
-  requireSynced = false
+  requireSynced = fsada
 
   async run() {
     this.parse(NodeAccounts)
