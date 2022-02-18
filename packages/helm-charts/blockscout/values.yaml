@@ -166,6 +166,9 @@ blockscout:
       resourcesList: '[{"url":"https://docs.celo.org/", "title":"Celo Docs"}, {"url":"https://celoreserve.org/", "title":"Celo Reserve"}, {"url":"https://forum.celo.org/", "title":"Celo Forum"}, {"url":"https://celohub.org/", "title":"Celo Hub"}, {"url":"https://thecelo.com/", "title":"TheCelo"}, {"url":"https://stats.celo.org/", "title":"Celo Stats"}, {"url":"https://celo.org/validators/explore", "title":"Validators"}]'
       learningList: '[{"url": "https://celo.org/papers/whitepaper", "title":"Celo Whitepaper"}, {"url": "https://learn.figment.io/protocols/celo", "title":"Learn Celo"}, {"url": "https://celo.org/papers/stability", "title":"Celo Stability Analysis"}, {"url": "https://www.coinbase.com/price/celo", "title":"Coinbase Earn"}]'
     recaptchaSecretName: ""  # k8s secret that needs to pre-exist
+    stats:
+      enabled: false
+      reportUrl: ""
   image:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo
