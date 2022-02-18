@@ -763,7 +763,25 @@ contract('Exchange', (accounts: string[]) => {
             })
           })
 
-          describe('when stableBucket needs to be capped', () => {
+          describe.only('when stableBucket has been capped', async () => {
+            beforeEach(async () => {
+              await mockSortedOracles.setMedianRate(
+                stableToken.address,
+                new BigNumber('2e24').multipliedBy(2000)
+              ) // bump the price by 2000, leaving with 4K CELO per dollar
+            })
+
+            it('has the right price after the cap', async () => {
+              const [tradableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
+
+              assertEqualBN(
+                new BigNumber(mintableStable.dividedBy(tradableGold)),
+                new BigNumber('4000')
+              )
+            })
+          })
+
+          describe.only('when stableBucket needs to be capped', () => {
             beforeEach(async () => {
               await registry.setAddressFor(CeloContractName.Exchange, owner)
 
@@ -793,20 +811,6 @@ contract('Exchange', (accounts: string[]) => {
               assertEqualBN(
                 await exchange.getStableBucketCap(),
                 new BigNumber('2772727272727272816000000')
-              )
-            })
-
-            it('has the right price after the cap', async () => {
-              await mockSortedOracles.setMedianRate(
-                stableToken.address,
-                new BigNumber('2e24').multipliedBy(2000)
-              ) // bump the price by 2000, leaving with 4K CELO per dollar
-
-              const [tradableGold, mintableStable] = await exchange.getBuyAndSellBuckets(false)
-
-              assertEqualBN(
-                new BigNumber(mintableStable.dividedBy(tradableGold)),
-                new BigNumber('4000')
               )
             })
           })
