@@ -74,7 +74,7 @@ spec:
 {{ indent 12 (printf "- --include=%s" .Values.stackdriver.includeFilter) }}
 {{- end -}}
 {{/* This used to be enabled, but now is not. Enable this for oracle clusters only. */}}
-{{- if (and false .Values.stackdriver.metricsPrefix) }}
+{{- if (and true .Values.stackdriver.metricsPrefix) }}
             - --stackdriver.metrics-prefix={{ .Values.stackdriver.metricsPrefix }}
 {{- end }}
           ports:

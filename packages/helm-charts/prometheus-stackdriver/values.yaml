@@ -90,7 +90,7 @@ stackdriver:
     __name__!~"rest_client_.+",
     __name__!~"storage_.+",
     __name__!~"workqueue_.+"}
-  metricsPrefix: external.googleapis.com/prometheus/prefix
+  # metricsPrefix: external.googleapis.com/prometheus/prefix
   sidecar:
     imageTag: 0.7.3
 
