@@ -16,7 +16,6 @@ import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
-import CircuitBreaker, { Options } from 'opossum'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { respondWithError } from '../common/error-utils'
@@ -24,8 +23,6 @@ import config, { VERSION } from '../config'
 import { getContractKit } from '../web3/contracts'
 
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
-
-const signersCircuitBreaker = new Map<string, CircuitBreaker<any, FetchResponse>>()
 
 type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
@@ -40,10 +37,7 @@ interface SignMsgRespWithStatus {
   status: number
 }
 
-export async function handleGetBlindedMessageSig(
-  request: Request<{}, {}, GetBlindedMessageSigRequest>,
-  response: Response
-) {
+export async function handleGetBlindedMessageSig(request: Request, response: Response) {
   const logger: Logger = response.locals.logger
 
   try {
@@ -66,7 +60,6 @@ export async function handleGetBlindedMessageSig(
 
 async function requestSignatures(request: Request, response: Response) {
   const responses: SignMsgRespWithStatus[] = []
-  const sentResult = { sent: false }
   const failedRequests = new Set<string>()
   const errorCodes: Map<number, number> = new Map()
   const blsCryptoClient = new BLSCryptographyClient()
@@ -174,7 +167,7 @@ async function requestSignatures(request: Request, response: Response) {
       // Fallback to handleMissingSignatures
     }
   }
-  handleMissingSignatures(majorityErrorCode, response, logger, sentResult)
+  handleMissingSignatures(majorityErrorCode, response, logger)
 }
 
 async function handleSuccessResponse(
@@ -314,31 +307,17 @@ function requestSignature(
   controller: AbortController,
   logger: Logger
 ): Promise<FetchResponse> {
-  if (!signersCircuitBreaker.has(service.url)) {
-    const options: Options = {
-      timeout: config.odisServices.timeoutMilliSeconds / 2,
-      resetTimeout: 15,
+  return parameterizedSignatureRequest(service.url, request, controller, logger).catch((e) => {
+    logger.error(`Signer failed with primary url ${service.url}`, e)
+    if (service.fallbackUrl) {
+      logger.warn(`Using fallback url to call signer ${service.fallbackUrl!}`)
+      return parameterizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
     }
-
-    const newSignerCircuitBreaker = new CircuitBreaker(parametrizedSignatureRequest, options)
-    newSignerCircuitBreaker.on('fallback', () =>
-      logger.warn(`Signer cannot be queried by primary url : ${service.url}`)
-    )
-    signersCircuitBreaker.set(service.url, newSignerCircuitBreaker)
-  }
-
-  const signerCircuitBreaker = signersCircuitBreaker.get(service.url)!
-
-  if (service.fallbackUrl) {
-    signerCircuitBreaker.fallback(() =>
-      parametrizedSignatureRequest(service.fallbackUrl!, request, controller, logger)
-    )
-  }
-
-  return signerCircuitBreaker.fire(service.url, request, controller, logger)
+    throw e
+  })
 }
 
-function parametrizedSignatureRequest(
+function parameterizedSignatureRequest(
   baseUrl: string,
   request: Request,
   controller: AbortController,
@@ -396,12 +375,8 @@ function isValidGetSignatureInput(requestBody: GetBlindedMessageSigRequest): boo
 function handleMissingSignatures(
   majorityErrorCode: number | null,
   response: Response,
-  logger: Logger,
-  sentResult: { sent: boolean }
+  logger: Logger
 ) {
-  if (sentResult.sent) {
-    return
-  }
   if (majorityErrorCode === 403) {
     respondWithError(response, 403, WarningMessage.EXCEEDED_QUOTA, logger)
   } else {

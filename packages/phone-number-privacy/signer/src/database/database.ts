@@ -6,13 +6,13 @@ import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
 let db: Knex
 export async function initDatabase(doTestQuery = true) {
-  logger.info({ config: config.db }, 'Initializing database connection')
+  logger().info({ config: config.db }, 'Initializing database connection')
   const { type, host, port, user, password, database, ssl, poolMaxSize } = config.db
 
   let dbConfig: any
   let client: string
   if (type === SupportedDatabase.Postgres) {
-    logger.info('Using Postgres')
+    logger().info('Using Postgres')
     client = 'pg'
     dbConfig = {
       user,
@@ -23,7 +23,7 @@ export async function initDatabase(doTestQuery = true) {
       ssl,
     }
   } else if (type === SupportedDatabase.MySql) {
-    logger.info('Using MySql')
+    logger().info('Using MySql')
     client = 'mysql2'
     dbConfig = {
       user,
@@ -34,7 +34,7 @@ export async function initDatabase(doTestQuery = true) {
       ssl,
     }
   } else if (type === SupportedDatabase.MsSql) {
-    logger.info('Using MS SQL')
+    logger().info('Using MS SQL')
     client = 'mssql'
     dbConfig = {
       user,
@@ -53,7 +53,7 @@ export async function initDatabase(doTestQuery = true) {
     debug: DEV_MODE,
   })
 
-  logger.info('Running Migrations')
+  logger().info('Running Migrations')
 
   await db.migrate.latest({
     directory: './dist/migrations',
@@ -64,12 +64,12 @@ export async function initDatabase(doTestQuery = true) {
     await executeTestQuery(db)
   }
 
-  logger.info('Database initialized successfully')
+  logger().info('Database initialized successfully')
   return db
 }
 
 async function executeTestQuery(_db: Knex) {
-  logger.info('Counting accounts')
+  logger().info('Counting accounts')
   const result = await _db(ACCOUNTS_TABLE).count(ACCOUNTS_COLUMNS.address).first()
 
   if (!result) {
@@ -81,7 +81,7 @@ async function executeTestQuery(_db: Knex) {
     throw new Error('No result from count, have migrations been run?')
   }
 
-  logger.info(`Found ${count} accounts`)
+  logger().info(`Found ${count} accounts`)
 }
 
 export function getDatabase() {
@@ -90,4 +90,12 @@ export function getDatabase() {
   }
 
   return db
+}
+
+export function getTransaction() {
+  if (!db) {
+    throw new Error('Database not yet initialized')
+  }
+
+  return db.transaction()
 }

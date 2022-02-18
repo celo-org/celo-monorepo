@@ -33,7 +33,7 @@ export default class GetMetadata extends BaseCommand {
       const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
       console.info('Metadata contains the following claims: \n')
       await displayMetadata(metadata, this.kit, flags)
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Metadata could not be retrieved from ${metadataURL}: ${error.toString()}`)
     }
   }

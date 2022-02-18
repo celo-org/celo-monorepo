@@ -205,6 +205,10 @@ rule viewFunctionsDoNotRevert(method f) filtered { f ->
 	// some functions we ignore, and the reasons:
 	&& f.selector != hasAuthorizedSigner(address,string).selector // Calldatasize may not match
 	&& f.selector != batchGetMetadataURL(address[]).selector // Calldatasize may not match
+
+  // These require an account to exist
+	&& f.selector != getOffchainStorageRoots(address).selector
+	&& f.selector != offchainStorageRoots(address,uint256).selector
 } {
 	env e;
 	require e.msg.value == 0; // view functions are not payable

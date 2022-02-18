@@ -31,6 +31,22 @@ export abstract class BaseCommand extends Command {
       char: 'n',
       description: "URL of the node to run commands against (defaults to 'http://localhost:8545')",
       hidden: true,
+      parse: (nodeUrl) => {
+        switch (nodeUrl) {
+          case 'local':
+          case 'localhost':
+            return 'http://localhost:8545'
+          case 'baklava':
+            return 'https://baklava-forno.celo-testnet.org'
+          case 'alfajores':
+            return 'https://alfajores-forno.celo-testnet.org'
+          case 'mainnet':
+          case 'forno':
+            return 'https://forno.celo.org'
+          default:
+            return nodeUrl
+        }
+      },
     }),
     gasCurrency: flags.enum({
       options: Object.keys(gasOptions),
@@ -135,7 +151,7 @@ export abstract class BaseCommand extends Command {
     }
 
     if (res.flags.useLedger) {
-      let transport: Transport
+      let transport
       try {
         // Importing for ledger uses only fixes running jest tests
         const TransportNodeHid = (await import('@ledgerhq/hw-transport-node-hid')).default

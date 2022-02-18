@@ -39,13 +39,14 @@ interface Config {
   thresholdSignature: {
     threshold: number
     polynomial: string
+    pubKey: string
   }
 }
 
 let config: Config
 
 if (DEV_MODE) {
-  logger.debug('Running in dev mode')
+  logger().debug('Running in dev mode')
   config = {
     blockchain: {
       provider: FORNO_ALFAJORES,
@@ -65,6 +66,7 @@ if (DEV_MODE) {
     thresholdSignature: {
       threshold: 1,
       polynomial: DEV_POLYNOMIAL,
+      pubKey: DEV_PUBLIC_KEY,
     },
   }
 } else {
@@ -87,6 +89,7 @@ if (DEV_MODE) {
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,
       polynomial: functionConfig.threshold_signature.threshold_polynomial,
+      pubKey: functionConfig.threshold_signature.public_key,
     },
   }
 }

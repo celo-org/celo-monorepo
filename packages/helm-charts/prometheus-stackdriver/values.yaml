@@ -1,41 +1,146 @@
-cluster: changeset
-
-disableStackDriverMetrics: false
+cluster: null
 
 gcloud:
-  project: celo-testnet
-  region: us-west1-b
-  # gceScrapeZones:
-  # - "us-west1-a"
-  # - "us-west1-b"
-  # - "us-west1-c"
-
-includeFilter: '{job=~".+",__name__!~"kube_.+_labels",__name__!~"apiserver_.+",__name__!~"kube_certificatesigningrequest_.+",__name__!~"kube_configmap_.+",__name__!~"kube_cronjob_.+",__name__!~"kube_endpoint_.+",__name__!~"kube_horizontalpodautoscaler_.+",__name__!~"kube_ingress_.+",__name__!~"kube_job_.+",__name__!~"kube_lease_.+",__name__!~"kube_limitrange_.+",__name__!~"kube_mutatingwebhookconfiguration_.+",__name__!~"kube_namespace_.+",__name__!~"kube_networkpolicy_.+",__name__!~"kube_poddisruptionbudget_.+",__name__!~"kube_replicaset_.+",__name__!~"kube_replicationcontroller_.+",__name__!~"kube_resourcequota_.+",__name__!~"kube_secret_.+",__name__!~"kube_service_.+",__name__!~"kube_storageclass_.+",__name__!~"kube_service_.+",__name__!~"kube_validatingwebhookconfiguration_.+",__name__!~"kube_verticalpodautoscaler_.+",__name__!~"kube_volumeattachment_.+",__name__!~"kubelet_.+",__name__!~"phoenix_.+",__name__!~"workqueue_.+"}'
+  project: null
+  region: null
 
 namespace: prometheus
 
 prometheus:
-  imageTag: v2.17.0
+  imageTag: v2.27.1
   retention_time: 7d
 
-sidecar:
-  imageTag: 0.7.3
-
-stackdriver_metrics_prefix: external.googleapis.com/prometheus/prefix
-
-# storageClassName: ssd
-
-storageSize: 50Gi
+# TODO: remove values from the .env files...
+scrapeJob: {}
+  # Labels: null
+  # Name: null
+  # Targets: null
 
 serviceAccount:
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: null
 
-remote_write: {}
-# - url: https://prometheus-us-central1.grafana.net/api/prom/push
-#   basic_auth:
-#     username: 51505
-#     password: ey...
+stackdriver:
+  enable: true
+  # When sending metrics from outside GCP to GCP Stackdriver.
+  gcloudServiceAccountKeyBase64: null
+  # To save $, don't send metrics to SD that probably won't be used.
+  # nginx metrics currently breaks sidecar.
+  # Stackdriver allows a maximum of 10 custom labels.
+  # kube-state-metrics has some metrics of the form "kube_.+_labels"
+  # that provides the labels of k8s resources as metric labels.
+  # If some k8s resources have too many labels, this results in a bunch of 
+  # errors when the sidecar tries to send metrics to Stackdriver.
+  includeFilter: >-
+    {job=~".+",
+    __name__!~"apiserver_.+",
+    __name__!~"container_cpu_load_average_10s",
+    __name__!~"container_cpu_system_seconds_total",
+    __name__!~"container_cpu_user_seconds_total",
+    __name__!~"container_file_.+",
+    __name__!~"container_fs_.+",
+    __name__!~"container_last_.+",
+    __name__!~"container_memory_[^w].*",
+    __name__!~"container_network_.+",
+    __name__!~"container_processes",
+    __name__!~"container_sockets",
+    __name__!~"container_spec_.+",
+    __name__!~"container_start_.+",
+    __name__!~"container_tasks_state",
+    __name__!~"container_threads",
+    __name__!~"container_threads_max",
+    __name__!~"erlang_.+",
+    __name__!~"etcd_.+",
+    __name__!~"kube_.+_labels",
+    __name__!~"kube_certificatesigningrequest_.+",
+    __name__!~"kube_configmap_.+",
+    __name__!~"kube_cronjob_.+",
+    __name__!~"kube_endpoint_.+",
+    __name__!~"kube_horizontalpodautoscaler_.+",
+    __name__!~"kube_ingress_.+",
+    __name__!~"kube_job_.+",
+    __name__!~"kube_lease_.+",
+    __name__!~"kube_limitrange_.+",
+    __name__!~"kube_mutatingwebhookconfiguration_.+",
+    __name__!~"kube_namespace_.+",
+    __name__!~"kube_networkpolicy_.+",
+    __name__!~"kube_pod_[^cs].+",
+    __name__!~"kube_pod_container_[^r].+",
+    __name__!~"kube_pod_container_status_last_terminated_reason",
+    __name__!~"kube_pod_container_status_terminated_reason",
+    __name__!~"kube_pod_container_status_waiting_reason",
+    __name__!~"kube_poddisruptionbudget_.+",
+    __name__!~"kube_replicaset_.+",
+    __name__!~"kube_replicationcontroller_.+",
+    __name__!~"kube_resourcequota_.+",
+    __name__!~"kube_secret_.+",
+    __name__!~"kube_service_.+",
+    __name__!~"kube_node_status_condition",
+    __name__!~"kube_storageclass_.+",
+    __name__!~"kube_service_.+",
+    __name__!~"kube_validatingwebhookconfiguration_.+",
+    __name__!~"kube_verticalpodautoscaler_.+",
+    __name__!~"kube_volumeattachment_.+",
+    __name__!~"kubelet_.+",
+    __name__!~"nginx_.+",
+    __name__!~"phoenix_.+",
+    __name__!~"rest_client_.+",
+    __name__!~"storage_.+",
+    __name__!~"workqueue_.+"}
+  metricsPrefix: external.googleapis.com/prometheus/prefix
+  sidecar:
+    imageTag: 0.7.3
+
+storageClassName: null
+storageSize: 50Gi
+
+remote_write:
+  url: null
+  basic_auth:
+    username: null
+    password: null
+  write_relabel_configs:
+    - action: drop
+      regex: "(apiserver_.+\
+              |container_cpu_load_average_10s\
+              |container_cpu_system_seconds_total\
+              |container_cpu_user_seconds_total\
+              |container_file_.+\
+              |container_fs_.+\
+              |container_memory_[^w].*\
+              |container_last_.+\
+              |container_network_.+\
+              |container_processes\
+              |container_sockets\
+              |container_spec_.+\
+              |container_start_.+\
+              |container_tasks_state\
+              |container_threads\
+              |container_threads_max\
+              |erlang_.+\
+              |etcd_.+\
+              |kubelet_[^v].+\
+              |kube_node_status_condition\
+              |kube_pod_[^cs].+\
+              |kube_pod_status_phase\
+              |kube_pod_container_[^r].+\
+              |kube_pod_container_status_last_terminated_reason\
+              |kube_pod_container_status_terminated_reason\
+              |kube_pod_container_status_waiting_reason\
+              |kube_secret_.+\
+              |nginx_.+\
+              |phoenix_.+\
+              |rest_client_.+\
+              |state_.+\
+              |storage_.+\
+              |workqueue_.+)"
+      source_labels: [__name__]
+    - action: drop
+      regex: lens-metrics
+      source_labels: [kubernetes_namespace]
+    - action: drop
+      regex: (container_.*|kube_.*);(kube.+|lens-metrics|default|kong|pl)
+      source_labels: [__name__,namespace]

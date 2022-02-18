@@ -25,7 +25,7 @@ export class AzureHSMWallet extends RemoteWallet<AzureHSMSigner> implements Read
       try {
         const address = await this.getAddressFromKeyName(key)
         addressToSigner.set(address, new AzureHSMSigner(this.keyVaultClient, key))
-      } catch (e) {
+      } catch (e: any) {
         // Safely ignore non-secp256k1 keys
         if (!e.message.includes('Invalid secp256k1')) {
           throw e
