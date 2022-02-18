@@ -1622,41 +1622,6 @@
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
 
-"@celo/wallet-hsm-azure@1.5.2":
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-hsm-azure/-/wallet-hsm-azure-1.5.2.tgz#8c160676134fc0b9afa592b3255afdfe466f0aa1"
-  integrity sha512-EL6htDnj4kyl+86bjOle5MaDCukAOuZOQZ7BxeiUg/+tVZFqfgrHojI3zMfWjfEBlecKdk8I/im10KYCl9kNKA==
-  dependencies:
-    "@azure/identity" "^1.1.0"
-    "@azure/keyvault-keys" "^4.1.0"
-    "@azure/keyvault-secrets" "^4.1.0"
-    "@celo/connect" "1.5.2"
-    "@celo/utils" "1.5.2"
-    "@celo/wallet-base" "1.5.2"
-    "@celo/wallet-hsm" "1.5.2"
-    "@celo/wallet-remote" "1.5.2"
-    "@types/secp256k1" "^4.0.0"
-    bignumber.js "^9.0.0"
-    debug "^4.1.1"
-    eth-lib "^0.2.8"
-    ethereumjs-util "^5.2.0"
-    secp256k1 "^4.0.0"
-
-"@celo/wallet-hsm@1.5.2":
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-hsm/-/wallet-hsm-1.5.2.tgz#f2b68ae12925cb3ebe86a20ce330cbafbf9bc1f9"
-  integrity sha512-aKrhXgGEZokMkmGIXPBlaMpwc3hbSVPW7q6VNBnGlJjZGSFGyDNubFWvnzl7uuwtVHTdzF/SEra+E1+8dCLF2A==
-  dependencies:
-    "@celo/base" "1.5.2"
-    "@types/asn1js" "^0.0.2"
-    "@types/debug" "^4.1.5"
-    "@types/secp256k1" "^4.0.0"
-    asn1js "^2.0.26"
-    elliptic "^6.5.4"
-    eth-lib "^0.2.8"
-    ethereumjs-util "^5.2.0"
-    secp256k1 "^4.0.0"
-
 "@celo/wallet-local@1.5.1":
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/@celo/wallet-local/-/wallet-local-1.5.1.tgz#5f58a1f3bdce06392154459216647798e8e7d08a"
@@ -1677,19 +1642,6 @@
     "@celo/connect" "1.5.2"
     "@celo/utils" "1.5.2"
     "@celo/wallet-base" "1.5.2"
-    "@types/ethereumjs-util" "^5.2.0"
-    eth-lib "^0.2.8"
-    ethereumjs-util "^5.2.0"
-
-"@celo/wallet-remote@1.5.2":
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-remote/-/wallet-remote-1.5.2.tgz#2eb9500033453cbc051f15ba97d1e1e388761109"
-  integrity sha512-WLBtR/htAYi9gjBduEb0aGoOLD5MFuAl7zrg3wNbeC992VeTcAUmZJO6zRL0mnREtfULLepoPnOOgIzl21kWyQ==
-  dependencies:
-    "@celo/connect" "1.5.2"
-    "@celo/utils" "1.5.2"
-    "@celo/wallet-base" "1.5.2"
-    "@types/debug" "^4.1.5"
     "@types/ethereumjs-util" "^5.2.0"
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
