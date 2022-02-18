@@ -14,7 +14,7 @@
     "@celo/explorer": "1.5.3-dev",
     "@celo/governance": "1.5.3-dev",
     "@celo/identity": "1.5.3-dev",
-    "@celo/network-utils": "1.5.2-dev",
+    "@celo/network-utils": "1.5.3-dev",
     "@celo/utils": "1.5.3-dev",
     "@google-cloud/monitoring": "0.7.1",
     "@google-cloud/pubsub": "^0.28.1",
