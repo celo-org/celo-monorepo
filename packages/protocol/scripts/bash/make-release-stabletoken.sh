@@ -26,7 +26,7 @@ LIBRARIES=""
 FORNO=""
 STABLETOKEN_DATA=""
 
-while getopts 'b:n:p:i:r:df:l:F:s' flag; do
+while getopts 'b:n:p:i:r:df:l:Fs:' flag; do
   case "${flag}" in
     b) BRANCH="${OPTARG}" ;;
     n) NETWORK="${OPTARG}" ;;
