@@ -27,7 +27,6 @@ import {
 } from 'types'
 import { keccak256 } from 'web3-utils'
 import { SECONDS_IN_A_WEEK } from '../constants'
-
 const Exchange: ExchangeContract = artifacts.require('Exchange')
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
