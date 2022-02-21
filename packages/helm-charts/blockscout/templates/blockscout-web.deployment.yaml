@@ -98,6 +98,10 @@ spec:
           value: {{ .Values.blockscout.networkID | quote }}
         - name: APPS_MENU
           value: {{ .Values.blockscout.web.appsMenu.enabled | quote }}
+        - name: DISABLE_STATS
+          value: {{ not .Values.blockscout.web.stats.enabled | quote }}
+        - name: STATS_REPORT_URL
+          value: {{ .Values.blockscout.web.stats.reportUrl | quote }}
         - name: EXTERNAL_APPS
           value: {{ .Values.blockscout.web.appsMenu.externalApps | quote }}
         - name: BRIDGES
