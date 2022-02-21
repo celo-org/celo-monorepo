@@ -1336,18 +1336,6 @@
     debug "^4.1.1"
     utf8 "3.0.0"
 
-"@celo/connect@1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-1.5.1.tgz#c06631134150c5d0cbf9676a7a45f620e49a5e89"
-  integrity sha512-UjZIu1GRvnsUrGfTUDqxyrt8qyDpj4cuxQ/WVETss8l+x98zV5/7edKOA0QRWEKFhh3F1mCi0N08hEpp+q7QaA==
-  dependencies:
-    "@celo/utils" "1.5.1"
-    "@types/debug" "^4.1.5"
-    "@types/utf8" "^2.1.6"
-    bignumber.js "^9.0.0"
-    debug "^4.1.1"
-    utf8 "3.0.0"
-
 "@celo/contractkit@0.3.1":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-0.3.1.tgz#52415183a8d2711081b827c4f17777df3765b760"
@@ -1368,24 +1356,6 @@
     web3-eth-abi "1.2.4"
     web3-eth-contract "1.2.4"
     web3-utils "1.2.4"
-
-"@celo/contractkit@1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-1.5.1.tgz#723c3516bf08d0598f32dc45a17a99a576c90fa3"
-  integrity sha512-hUgH0yTbI1JUn9ytCWW/0QLfAruF3YL5xfcSmzXItklQ2GKGsTSfGlY7XTUY97xq/WYO2InXw+Vuhop6CcFOiw==
-  dependencies:
-    "@celo/base" "1.5.1"
-    "@celo/connect" "1.5.1"
-    "@celo/utils" "1.5.1"
-    "@celo/wallet-local" "1.5.1"
-    "@types/debug" "^4.1.5"
-    bignumber.js "^9.0.0"
-    cross-fetch "^3.0.6"
-    debug "^4.1.1"
-    fp-ts "2.1.1"
-    io-ts "2.0.1"
-    semver "^7.3.5"
-    web3 "1.3.6"
 
 "@celo/contractkit@1.5.1":
   version "1.5.1"
@@ -1471,24 +1441,6 @@
     elliptic "^6.5.4"
     fp-ts "2.1.1"
     io-ts "2.0.1"
-
-"@celo/phone-number-privacy-common@1.0.37":
-  version "1.0.37"
-  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.37.tgz#89dc19902d5116336a3297498a5767b562ec13ca"
-  integrity sha512-6z6/Y7kUh+xEl6D0z4TwrImLQ5MtG0EMswnYrYX4rl4hFhrq7U6mRAwZxVDNa/MC2Kr0kQK92IcybmUjbs7Btg==
-  dependencies:
-    "@celo/base" "1.5.1"
-    "@celo/contractkit" "1.5.1"
-    "@celo/utils" "1.5.1"
-    bignumber.js "^9.0.0"
-    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
-    btoa "1.2.1"
-    bunyan "1.8.12"
-    bunyan-debug-stream "2.0.0"
-    bunyan-gke-stackdriver "0.1.2"
-    dotenv "^8.2.0"
-    elliptic "^6.5.4"
-    is-base64 "^1.1.0"
 
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
@@ -1578,6 +1530,36 @@
     "@celo/wallet-base" "1.5.1"
     "@types/ethereumjs-util" "^5.2.0"
     eth-lib "^0.2.8"
+    ethereumjs-util "^5.2.0"
+
+"@cnakazawa/watch@^1.0.3":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.4.tgz#f864ae85004d0fcab6f50be9141c4da368d1656a"
+  integrity sha512-v9kIhKwjeZThiWrLmj0y17CWoyddASLj9O2yvbZkbvw/N3rWOYy9zkV66ursAoVr0mV15bL8g0c4QZUE6cdDoQ==
+  dependencies:
+    exec-sh "^0.3.2"
+    minimist "^1.2.0"
+
+"@ethersproject/abi@5.0.0-beta.142":
+  version "5.0.0-beta.142"
+  resolved "https://registry.yarnpkg.com/@ethersproject/abi/-/abi-5.0.0-beta.142.tgz#cde0ced7daa2fbc98e35a2c31203331907e84a39"
+  integrity sha512-vJ2V9fPNzi+8iutY4sjy6mgogkJtiGsd9hmpa1bjnGW6qnHOEkAV1fzVpvT002LlnjFgqgtzuLBDZob6oU7i8w==
+  dependencies:
+    "@ethersproject/address" ">=5.0.0-beta.128"
+    "@ethersproject/bignumber" ">=5.0.0-beta.130"
+    "@ethersproject/bytes" ">=5.0.0-beta.129"
+    "@ethersproject/constants" ">=5.0.0-beta.128"
+    "@ethersproject/hash" ">=5.0.0-beta.128"
+    "@ethersproject/keccak256" ">=5.0.0-beta.127"
+    "@ethersproject/logger" ">=5.0.0-beta.129"
+    "@ethersproject/properties" ">=5.0.0-beta.131"
+    "@ethersproject/strings" ">=5.0.0-beta.130"
+
+"@ethersproject/abi@5.0.0-beta.153":
+  version "5.0.0-beta.153"
+  resolved "https://registry.yarnpkg.com/@ethersproject/abi/-/abi-5.0.0-beta.153.tgz#43a37172b33794e4562999f6e2d555b7599a8eee"
+  integrity sha512-aXweZ1Z7vMNzJdLpR1CZUAIgnwjrZeUSvN9syCwlBaEBUFJmFY+HHnfuTI5vIhVs/mRkfJVrbEyl51JZQqyjAg==
+  dependencies:
     "@ethersproject/address" ">=5.0.0-beta.128"
     "@ethersproject/bignumber" ">=5.0.0-beta.130"
     "@ethersproject/bytes" ">=5.0.0-beta.129"
