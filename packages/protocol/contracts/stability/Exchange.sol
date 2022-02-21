@@ -92,7 +92,8 @@ contract Exchange is
    * present in the oracle to update buckets
    * commit to the gold bucket 
    * @param stableTokenIdentifier String identifier of stabletoken in registry
-   * @param _minSupplyForStableBucketCap The minimum amount of stabletoken supply considered for the stable token bucket cap 
+   * @param _minSupplyForStableBucketCap The minimum amount of stabletoken supply 
+   * considered for the stable token bucket cap 
    * @param _stableBucketMaxFraction The value for stable bucket Fraction CAP
    */
   function initialize(
@@ -340,7 +341,8 @@ contract Exchange is
   }
 
   /**
-    * @notice Allows owner to set the minSupplyForStableBucketCap, the minimal stableToken supply considered for the stableToken cap
+    * @notice Allows owner to set the minSupplyForStableBucketCap,
+    *  the minimal stableToken supply considered for the stableToken cap
     * @param newMinSupplyForStableBucketCap The new value for the minSupplyForStableBucketCap
     */
   function setMinSupplyForStableBucketCap(uint256 newMinSupplyForStableBucketCap) public onlyOwner {
@@ -445,8 +447,9 @@ contract Exchange is
   }
 
   /**
-   * @notice returns the max size the stableToken can be set during a bucket update. if the supply of stableToken
-   * is smaller than minSupplyForStableBucketCap, the cap is calculated based on minSupplyForStableBucketCap.
+   * @notice returns the max size the stableToken can be set during a bucket update.
+   * if the supply of stableToken is smaller than minSupplyForStableBucketCap,
+   * the cap is calculated based on minSupplyForStableBucketCap.
    */
   function getStableBucketCap() public view returns (uint256) {
     uint256 stableTokenSupply = Math.max(IERC20(stable).totalSupply(), minSupplyForStableBucketCap);

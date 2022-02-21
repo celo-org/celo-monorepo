@@ -763,7 +763,7 @@ contract('Exchange', (accounts: string[]) => {
             })
           })
 
-          describe.only('when stableBucket has been capped', async () => {
+          describe('when stableBucket has been capped', async () => {
             beforeEach(async () => {
               await mockSortedOracles.setMedianRate(
                 stableToken.address,
@@ -781,7 +781,7 @@ contract('Exchange', (accounts: string[]) => {
             })
           })
 
-          describe.only('when stableBucket needs to be capped', () => {
+          describe('when stableBucket needs to be capped', () => {
             beforeEach(async () => {
               await registry.setAddressFor(CeloContractName.Exchange, owner)
 
