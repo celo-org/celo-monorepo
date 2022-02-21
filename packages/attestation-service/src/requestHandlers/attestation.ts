@@ -9,7 +9,12 @@ import Logger from 'bunyan'
 import { randomBytes } from 'crypto'
 import express from 'express'
 import { findAttestationByKey, makeSequelizeLogger, SequelizeLogger, useKit } from '../db'
-import { fetchEnv, getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
+import {
+  fetchEnvOrDefault,
+  getAccountAddress,
+  getAttestationSignerAddress,
+  isDevMode,
+} from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError, Response } from '../request'
@@ -20,7 +25,8 @@ const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
 export const INVALID_SIGNATURE_ERROR = 'Signature is invalid'
 
-const odisPubKey = OdisUtils.Query.getServiceContext(fetchEnv('NETWORK')).odisPubKey
+const odisPubKey = OdisUtils.Query.getServiceContext(fetchEnvOrDefault('NETWORK', 'mainnet'))
+  .odisPubKey
 const thresholdBls = require('blind-threshold-bls')
 
 function toBase64(str: string) {
