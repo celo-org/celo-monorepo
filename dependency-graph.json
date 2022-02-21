@@ -9,7 +9,7 @@
       "@celo/contractkit",
       "@celo/identity",
       "@celo/keystores",
-      "@celo/utils"
+      "@celo/phone-utils"
     ]
   },
   "celo-azure-build": {
