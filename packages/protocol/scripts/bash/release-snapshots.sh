@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-N=`echo -n $RELEASE_TAG | tail -c -1`
+N=`ls releaseData/versionReports/ \
+    | grep --only-matching "[[:digit:]]\+" \
+    | sort -n \
+    | tail -n 1`
 
-for i in `eval echo {1..$N}`
+for i in `seq $N`
 do
     yarn check-versions \
         -a "core-contracts.v$(($i - 1))" \
