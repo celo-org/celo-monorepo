@@ -1,6 +1,6 @@
 {
   "name": "@celo/keystores",
-  "version": "1.5.1-dev",
+  "version": "1.5.3-dev",
   "description": "keystore implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -15,13 +15,13 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "docs": "typedoc && ts-node ../utils/scripts/linkdocs.ts keystores",
-    "test": "jest --runInBand",
+    "test": "SKIP_KNOWN_FLAKES=false jest --runInBand",
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/utils": "1.5.1-dev",
-    "@celo/wallet-local": "1.5.1-dev",
+    "@celo/utils": "1.5.3-dev",
+    "@celo/wallet-local": "1.5.3-dev",
     "@types/ethereumjs-util": "^5.2.0",
     "ethereumjs-wallet": "^1.0.1"
   },

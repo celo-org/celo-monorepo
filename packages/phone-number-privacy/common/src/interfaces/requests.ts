@@ -15,22 +15,33 @@ import {
   SequentialDelayDomain,
 } from '../domains'
 
-export enum Endpoints {
+export enum PhoneNumberPrivacyEndpoint {
   STATUS = '/status',
   METRICS = '/metrics',
   GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
   GET_QUOTA = '/getQuota',
+}
 
+export enum DomainEndpoint {
   DISABLE_DOMAIN = '/domain/disable',
   DOMAIN_SIGN = '/domain/sign/',
   DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
 }
 
+export type SignerEndpoint = PhoneNumberPrivacyEndpoint | DomainEndpoint
+export const SignerEndpoint = { ...PhoneNumberPrivacyEndpoint, ...DomainEndpoint }
+
+export enum CombinerEndpoint {
+  SIGN_MESSAGE = '/getBlindedMessageSig',
+  MATCHMAKING = '/getContactMatches',
+}
+
+export type Endpoint = SignerEndpoint | CombinerEndpoint
+export const Endpoint = { ...SignerEndpoint, ...CombinerEndpoint }
+
 export enum AuthenticationMethod {
-  NONE = 'none',
   WALLET_KEY = 'wallet_key',
   ENCRYPTION_KEY = 'encryption_key',
-  CUSTOM_SIGNER = 'custom_signer',
 }
 
 export interface GetBlindedMessageSigRequest {
@@ -275,7 +286,7 @@ function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
   request: R
 ): boolean {
   // If the address field is undefined, then this domain is unauthenticated.
-  // Return false as the signature cannot need to be checked.
+  // Return false as the signature cannot be checked.
   if (!request.domain.address.defined) {
     return false
   }

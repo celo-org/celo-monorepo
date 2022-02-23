@@ -1,4 +1,5 @@
 import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
+import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import { createHash } from 'crypto'
@@ -8,6 +9,7 @@ import {
   AuthenticationMethod,
   AuthSigner,
   CombinerSignMessageResponse,
+  EncryptionKeySigner,
   queryOdis,
   ServiceContext,
   SignMessageRequest,
@@ -22,7 +24,6 @@ const debug = debugFactory('kit:odis:phone-number-identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
-const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSig'
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -55,7 +56,7 @@ export async function getPhoneNumberIdentifier(
   if (blindingFactor) {
     seed = Buffer.from(blindingFactor)
   } else if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    seed = Buffer.from(signer.rawKey)
+    seed = Buffer.from((signer as EncryptionKeySigner).rawKey)
   }
 
   // Fallback to using Wasm version if not specified
@@ -124,7 +125,7 @@ export async function getBlindedPhoneNumberSignature(
     signer,
     body,
     context,
-    SIGN_MESSAGE_ENDPOINT
+    CombinerEndpoint.SIGN_MESSAGE
   )
   return response.combinedSignature
 }

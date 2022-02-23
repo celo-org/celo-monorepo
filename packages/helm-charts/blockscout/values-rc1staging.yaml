@@ -47,6 +47,9 @@ blockscout:
         memory: 250M
         cpu: 500m
     recaptchaSecretName: rc1staging-blockscout-recaptcha
+    stats:
+      enabled: true
+      reportUrl: https://datastudio.google.com/embed/reporting/e0a253b1-fa37-43d0-bbc3-2706a64f2211/page/hDehC?hl=en
   metrics:
     enabled: true
   jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545

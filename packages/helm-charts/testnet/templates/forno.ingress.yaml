@@ -28,7 +28,3 @@ spec:
         backend:
           serviceName: tx-nodes
           servicePort: 8545
-      - path: /ws
-        backend:
-          serviceName: tx-nodes
-          servicePort: 8546

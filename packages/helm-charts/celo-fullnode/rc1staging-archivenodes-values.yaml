@@ -25,6 +25,7 @@ geth:
   service_type: None
   use_gstorage_data: false
   ws_port: 8545
+  increase_timeouts: true
 namespace: rc1staging
 replicaCount: 2
 storage:
