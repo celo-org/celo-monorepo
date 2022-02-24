@@ -28,4 +28,12 @@ contract StableTokenRegistry {
     stableTokens[currencyType] = true;
     fiatTickers.push(currencyType);
   }
+
+  /**
+   * @notice Returns fiat currencies that have been issued.
+   * @return An array of currencies issued.
+   */
+  function getFiatTickers() external view returns (string[] memory) {
+    return fiatTickers;
+  }
 }
