@@ -9,11 +9,10 @@ import {
   DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseSuccess,
+  DomainSchema,
+  DomainState,
   Endpoint,
   ErrorMessage,
-  isKnownDomain,
-  KnownDomain,
-  KnownDomainState,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -23,7 +22,7 @@ import { respondWithError } from '../common/error-utils'
 import { Counters } from '../common/metrics'
 import { getVersion } from '../config'
 import { getTransaction } from '../database/database'
-import { DOMAINS_STATES_COLUMNS, DomainState } from '../database/models/domainState'
+import { DOMAINS_STATES_COLUMNS, DomainStateRecord } from '../database/models/domainState'
 import {
   getDomainState,
   getDomainStateWithLock,
@@ -64,7 +63,7 @@ export class DomainService implements IDomainService {
       const domainState = await getDomainStateWithLock(domain, trx, logger)
       if (!domainState) {
         // If the domain is not currently recorded in the state database, add it now.
-        await insertDomainState(DomainState.createEmptyDomainState(domain), trx, logger)
+        await insertDomainState(DomainStateRecord.createEmptyDomainState(domain), trx, logger)
         await trx.commit()
       }
       if (!(domainState?.disabled ?? false)) {
@@ -98,7 +97,7 @@ export class DomainService implements IDomainService {
     })
     try {
       const domainState = await getDomainState(domain, logger)
-      let quotaStatus: KnownDomainState
+      let quotaStatus: DomainState
       if (domainState) {
         quotaStatus = {
           counter: domainState[DOMAINS_STATES_COLUMNS.counter] ?? 0,
@@ -130,6 +129,7 @@ export class DomainService implements IDomainService {
     }
   }
 
+  // DO NOT MERGE: Type safety dictates that the request type should specify unknown.
   public async handleGetDomainRestrictedSignature(
     request: Request<{}, {}, DomainRestrictedSignatureRequest>,
     response: Response<DomainRestrictedSignatureResponse>
@@ -153,7 +153,7 @@ export class DomainService implements IDomainService {
       let domainState = await getDomainStateWithLock(domain, trx, logger)
       if (!domainState) {
         domainState = await insertDomainState(
-          DomainState.createEmptyDomainState(domain),
+          DomainStateRecord.createEmptyDomainState(domain),
           trx,
           logger
         )
@@ -206,26 +206,23 @@ export class DomainService implements IDomainService {
   }
 
   private inputValidation(
-    domain: Domain,
+    domain: unknown,
     response: Response,
     endpoint: Endpoint,
     logger: Logger
-  ): domain is KnownDomain {
+  ): domain is Domain {
+    if (!DomainSchema.is(domain)) {
+      logger.warn(`Received request to ${endpoint} for an invalid domain`, JSON.stringify(domain))
+      respondWithError(endpoint, response, 404, WarningMessage.UNKNOWN_DOMAIN)
+      return false
+    }
+
     if (!this.authService.authCheck()) {
       logger.warn(`Received unauthorized request to ${endpoint} `, {
         name: domain.name,
         version: domain.version,
       })
       respondWithError(endpoint, response, 403, WarningMessage.UNAUTHENTICATED_USER)
-      return false
-    }
-
-    if (!isKnownDomain(domain)) {
-      logger.warn(`Received request to ${endpoint} for an unknown domain`, {
-        name: domain.name,
-        version: domain.version,
-      })
-      respondWithError(endpoint, response, 404, WarningMessage.UNKNOWN_DOMAIN)
       return false
     }
 

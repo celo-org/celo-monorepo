@@ -69,7 +69,7 @@ export type SequentialDelayDomainOptions = {
 }
 
 /** io-ts schema for encoding and decoding SequentialDelayStage structs */
-export const SequentialDelayStageSchema: t.Type<SequentialDelayStage> = t.type({
+export const SequentialDelayStageSchema: t.Type<SequentialDelayStage> = t.strict({
   delay: t.number,
   resetTimer: eip712OptionalSchema(t.boolean),
   batchSize: eip712OptionalSchema(t.number),
@@ -77,7 +77,7 @@ export const SequentialDelayStageSchema: t.Type<SequentialDelayStage> = t.type({
 })
 
 /** io-ts schema for encoding and decoding SequentialDelayDomain structs */
-export const SequentialDelayDomainSchema: t.Type<SequentialDelayDomain> = t.type({
+export const SequentialDelayDomainSchema: t.Type<SequentialDelayDomain> = t.strict({
   name: t.literal(DomainIdentifiers.SequentialDelay),
   version: t.literal('1'),
   stages: t.array(SequentialDelayStageSchema),
@@ -86,7 +86,7 @@ export const SequentialDelayDomainSchema: t.Type<SequentialDelayDomain> = t.type
 })
 
 /** io-ts schema for encoding and decoding SequentialDelayDomainOptions structs */
-export const SequentialDelayDomainOptionsSchema: t.Type<SequentialDelayDomainOptions> = t.type({
+export const SequentialDelayDomainOptionsSchema: t.Type<SequentialDelayDomainOptions> = t.strict({
   signature: eip712OptionalSchema(t.string),
   nonce: eip712OptionalSchema(t.number),
 })

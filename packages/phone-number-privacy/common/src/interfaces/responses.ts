@@ -1,4 +1,4 @@
-import { KnownDomainState } from '../domains'
+import { DomainState } from '../domains'
 import {
   DisableDomainRequest,
   DomainQuotaStatusRequest,
@@ -58,7 +58,7 @@ export type DomainRestrictedSignatureResponse =
 export interface DomainQuotaStatusResponseSuccess {
   success: true
   version: string
-  status: KnownDomainState
+  status: DomainState
 }
 
 export interface DomainQuotaStatusResponseFailure {

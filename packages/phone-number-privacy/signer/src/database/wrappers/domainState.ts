@@ -1,16 +1,20 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
-import { domainHash, KnownDomain } from '@celo/phone-number-privacy-common/lib/domains'
+import { Domain, domainHash } from '@celo/phone-number-privacy-common/lib/domains'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
-import { DOMAINS_STATES_COLUMNS, DOMAINS_STATES_TABLE, DomainState } from '../models/domainState'
+import {
+  DOMAINS_STATES_COLUMNS,
+  DOMAINS_STATES_TABLE,
+  DomainStateRecord,
+} from '../models/domainState'
 
 function domainsStates() {
-  return getDatabase()<DomainState>(DOMAINS_STATES_TABLE)
+  return getDatabase()<DomainStateRecord>(DOMAINS_STATES_TABLE)
 }
 
-export async function setDomainDisabled(domain: KnownDomain, logger: Logger): Promise<void> {
+export async function setDomainDisabled(domain: Domain, logger: Logger): Promise<void> {
   const disableDomainMeter = Histograms.dbOpsInstrumentation.labels('disableDomain').startTimer()
   const hash = domainHash(domain).toString('hex')
   logger.debug('Disabling domain', { hash, domain })
@@ -32,9 +36,9 @@ export async function setDomainDisabled(domain: KnownDomain, logger: Logger): Pr
 }
 
 export async function getDomainState(
-  domain: KnownDomain,
+  domain: Domain,
   logger: Logger
-): Promise<DomainState | null> {
+): Promise<DomainStateRecord | null> {
   const getDomainStateMeter = Histograms.dbOpsInstrumentation.labels('getDomainState').startTimer()
   const hash = domainHash(domain).toString('hex')
   logger.debug('Getting domain state from db', { hash, domain })
@@ -57,10 +61,10 @@ export async function getDomainState(
 }
 
 export async function getDomainStateWithLock(
-  domain: KnownDomain,
-  trx: Transaction<DomainState>,
+  domain: Domain,
+  trx: Transaction<DomainStateRecord>,
   logger: Logger
-): Promise<DomainState | null> {
+): Promise<DomainStateRecord | null> {
   const getDomainStateWithLockMeter = Histograms.dbOpsInstrumentation
     .labels('getDomainStateWithLock')
     .startTimer()
@@ -87,9 +91,9 @@ export async function getDomainStateWithLock(
 }
 
 export async function updateDomainState(
-  domain: KnownDomain,
-  domainState: DomainState,
-  trx: Transaction<DomainState>,
+  domain: Domain,
+  domainState: DomainStateRecord,
+  trx: Transaction<DomainStateRecord>,
   logger: Logger
 ): Promise<void> {
   const updateDomainStateMeter = Histograms.dbOpsInstrumentation
@@ -126,10 +130,10 @@ export async function updateDomainState(
 }
 
 export async function insertDomainState(
-  domainState: DomainState,
-  trx: Transaction<DomainState>,
+  domainState: DomainStateRecord,
+  trx: Transaction<DomainStateRecord>,
   logger: Logger
-): Promise<DomainState> {
+): Promise<DomainStateRecord> {
   const insertDomainStateMeter = Histograms.dbOpsInstrumentation
     .labels('insertDomainState')
     .startTimer()

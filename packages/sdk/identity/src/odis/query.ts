@@ -4,13 +4,13 @@ import { ContractKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
   CombinerEndpoint,
+  Domain,
   DomainEndpoint,
   DomainRequest,
   DomainResponse,
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetContactMatchesResponse,
-  KnownDomain,
   PhoneNumberPrivacyEndpoint,
   PhoneNumberPrivacyRequest,
 } from '@celo/phone-number-privacy-common'
@@ -201,7 +201,7 @@ export async function queryOdis<ResponseType>(
  * @param context Contains service URL and public to determine which instance to contact.
  * @param endpoint Endpoint to query (e.g. '/domain/sign', '/domain/quotaStatus').
  */
-export async function sendOdisDomainRequest<RequestType extends DomainRequest<KnownDomain>>(
+export async function sendOdisDomainRequest<RequestType extends DomainRequest<Domain>>(
   body: RequestType,
   context: ServiceContext,
   endpoint: DomainEndpoint

@@ -10,8 +10,6 @@ import {
   domainEIP712Types,
   DomainOptions,
   domainOptionsEIP712Types,
-  KnownDomain,
-  KnownDomainOptions,
   SequentialDelayDomain,
 } from '../domains'
 
@@ -92,13 +90,10 @@ export type PhoneNumberPrivacyRequest =
  * domain, as specified by CIP-40.
  *
  * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
+ * DomainOptions. If the specified Domain has associated options, then the options field is
  * required. If not, it must not be provided.
  */
-export type DomainRestrictedSignatureRequest<
-  D extends Domain = Domain,
-  O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
-> = OmitIfNever<
+export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = OmitIfNever<
   {
     /** Domain specification. Selects the PRF domain and rate limiting rules. */
     domain: D
@@ -107,7 +102,7 @@ export type DomainRestrictedSignatureRequest<
      * Used for inputs relevant to the domain, but not part of the domain string.
      * Example: { "authorization": <signature> } for an account-restricted domain.
      */
-    options: O
+    options: DomainOptions<D>
     /** Query message. A blinded elliptic curve point encoded in base64. */
     blindedMessage: string
     /** Client-specified session ID. */
@@ -124,18 +119,15 @@ export type DomainRestrictedSignatureRequest<
  * E.g. Quota state may reveal whether or not a user has attempted to recover a given account.
  *
  * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
+ * DomainOptions. If the specified Domain has associated options, then the options field is
  * required. If not, it must not be provided.
  */
-export type DomainQuotaStatusRequest<
-  D extends Domain = Domain,
-  O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
-> = OmitIfNever<
+export type DomainQuotaStatusRequest<D extends Domain = Domain> = OmitIfNever<
   {
     /** Domain specification. Selects the PRF domain and rate limiting rules. */
     domain: D
     /** Domain-specific options. */
-    options: O
+    options: DomainOptions<D>
     /** Client-specified session ID. */
     sessionID: EIP712Optional<string>
   },
@@ -150,18 +142,15 @@ export type DomainQuotaStatusRequest<
  * Options may be provided for authentication to prevent unintended parties from disabling a domain.
  *
  * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
+ * DomainOptions. If the specified Domain has associated options, then the options field is
  * required. If not, it must not be provided.
  */
-export type DisableDomainRequest<
-  D extends Domain = Domain,
-  O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
-> = OmitIfNever<
+export type DisableDomainRequest<D extends Domain = Domain> = OmitIfNever<
   {
     /** Domain specification. Selects the PRF domain and rate limiting rules. */
     domain: D
     /** Domain-specific options. */
-    options: O
+    options: DomainOptions<D>
     /** Client-specified session ID. */
     sessionID: EIP712Optional<string>
   },
@@ -169,16 +158,13 @@ export type DisableDomainRequest<
 >
 
 /** Union type of Domain API requests */
-export type DomainRequest<
-  D extends Domain = Domain,
-  O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
-> =
-  | DomainRestrictedSignatureRequest<D, O>
-  | DomainQuotaStatusRequest<D, O>
-  | DisableDomainRequest<D, O>
+export type DomainRequest<D extends Domain = Domain> =
+  | DomainRestrictedSignatureRequest<D>
+  | DomainQuotaStatusRequest<D>
+  | DisableDomainRequest<D>
 
 /** Wraps the signature request as an EIP-712 typed data structure for hashing and signing */
-export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
+export function domainRestrictedSignatureRequestEIP712<D extends Domain>(
   request: DomainRestrictedSignatureRequest<D>
 ): EIP712TypedData {
   const domainTypes = domainEIP712Types(request.domain)
@@ -210,7 +196,7 @@ export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
 }
 
 /** Wraps the domain quota request as an EIP-712 typed data structure for hashing and signing */
-export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
+export function domainQuotaStatusRequestEIP712<D extends Domain>(
   request: DomainQuotaStatusRequest<D>
 ): EIP712TypedData {
   const domainTypes = domainEIP712Types(request.domain)
@@ -241,7 +227,7 @@ export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
 }
 
 /** Wraps the disable domain request as an EIP-712 typed data structure for hashing and signing */
-export function disableDomainRequestEIP712<D extends KnownDomain>(
+export function disableDomainRequestEIP712<D extends Domain>(
   request: DisableDomainRequest<D>
 ): EIP712TypedData {
   const domainTypes = domainEIP712Types(request.domain)
