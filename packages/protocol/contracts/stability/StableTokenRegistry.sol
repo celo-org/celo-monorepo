@@ -1,9 +1,5 @@
 pragma solidity ^0.5.13;
 
-import "./StableToken.sol";
-import "./StableTokenEUR.sol";
-import "./StableTokenBRL.sol";
-
 /**
  * @title contract that lists what stable coins are deployed as part of Celo's Stability protocol.
  */
