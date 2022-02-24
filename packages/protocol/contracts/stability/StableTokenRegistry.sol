@@ -10,13 +10,13 @@ import "./StableTokenBRL.sol";
 contract StableTokenRegistry {
   mapping(string => string) public stableTokens;
   string[] public fiatTickers;
+  string[] public contracts;
 
   /**
   * @notice Sets initialized == true on implementation contracts
   * @param test Set to true to skip implementation initialization
   */
   constructor(bool test) public Initializable(test) {}
-
   /**
   * @notice adds fiat currencies to fiatTickers collection
   * @param currencyType the type of currency we're trying to push into the collection  
@@ -31,10 +31,18 @@ contract StableTokenRegistry {
 
   /**
    * @notice Returns fiat currencies that have been issued.
-   * @return An array of currencies issued.
+   * @return A collection of currencies issued.
    */
   function getFiatTickers() external view returns (string[] memory) {
     return fiatTickers;
+  }
+
+  /**
+   * @notice Returns contracts that have been issued.
+   * @return A collection of contracts issued.
+   */
+  function getContracts() external view returns (string[] memory) {
+    return contracts;
   }
 
   /**
