@@ -8,15 +8,15 @@ contract StableTokenRegistry {
   string[] public fiatTickers;
 
   /**
-  * @notice Sets initialized == true on implementation contracts
-  * @param test Set to true to skip implementation initialization
-  */
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
   constructor(bool test) public Initializable(test) {}
 
   /**
-  * @notice adds fiat currencies to fiatTickers collection
-  * @param currencyType the type of currency we're trying to push into the collection  
-  */
+   * @notice adds fiat currencies to fiatTickers collection
+   * @param currencyType the type of currency we're trying to push into the collection  
+   */
   function addFiatTickers(string _currencyType) external onlyOwner {
     //also check if it already exists in the array, if it does then don't add
     //so I can make sure there are no dublicates
@@ -62,6 +62,19 @@ contract StableTokenRegistry {
     }
     fiatTickers[newNumFiats] = "";
     fiatTickers.length = newNumFiats;
+  }
+
+  /**
+   * @notice Gives an address permission to spend Reserve without limit.
+   * @param spender The address that is allowed to spend Reserve funds.
+   */
+
+  function addNewRegistry(string fiatType, string contractType) external onlyOwner {
+    require("" != fiatType, "fiatType cant be an empty string");
+    require("" != contractType, "contractType cant be an empty string");
+    require(stableTokens[fiatType] != "", "This registry already exists");
+    stableTokens[fiatType] = contractType;
+    fiatTickers.push(fiatType);
   }
 
 }
