@@ -17,11 +17,10 @@ contract StableTokenRegistry {
    * @notice adds fiat currencies to fiatTickers collection
    * @param currencyType the type of currency we're trying to push into the collection  
    */
-  function addFiatTickers(string _currencyType) external onlyOwner {
+  function addFiatTickers(string currencyType) external onlyOwner {
     //also check if it already exists in the array, if it does then don't add
     //so I can make sure there are no dublicates
-    require(!stableTokens[currencyType], "Stable token hasn't been issued");
-    stableTokens[currencyType] = true;
+    require(stableTokens[currencyType] != "", "Stable token hasn't been issued");
     fiatTickers.push(currencyType);
   }
 
