@@ -23,7 +23,7 @@ COPY packages/attestation-service/package.json packages/attestation-service/
 COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
 COPY packages/sdk/identity/package.json packages/sdk/identity/
 COPY packages/sdk/phone-utils/package.json packages/sdk/phone-utils/package.json
-COPY packages/phone-number-privacy/common/package.json packages/phone-number-privacy/common
+COPY packages/phone-number-privacy/common/package.json packages/phone-number-privacy/common/
 
 RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
