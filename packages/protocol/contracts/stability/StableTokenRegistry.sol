@@ -1,13 +1,15 @@
 pragma solidity ^0.5.13;
 
 import "../common/Initializable.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
  * @title contract that lists what stable coins are deployed as part of Celo's Stability protocol.
  */
-contract StableTokenRegistry {
+contract StableTokenRegistry is Initializable, Ownable {
   mapping(string => string) public stableTokens;
   string[] public fiatTickers;
+  string[] public contracts;
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -20,7 +22,10 @@ contract StableTokenRegistry {
    * @param fiatTicker The fiat currency.
    * @param stableTokenContractName The name of a stable token smart contract.
    */
-  function initialize(string fiatTicker, string stableTokenContractName) external initializer {
+  function initialize(string calldata fiatTicker, string calldata stableTokenContractName)
+    external
+    initializer
+  {
     stableTokens[fiatTicker] = stableTokenContractName;
   }
 
@@ -37,8 +42,7 @@ contract StableTokenRegistry {
    * @return collection of stable token contracts.
    */
   function getContractInstances() external view returns (string[] memory) {
-    string[] memory contracts;
-    for (i = 0; i < fiatTickers.length; i++) {
+    for (uint256 i = 0; i < fiatTickers.length; i++) {
       contracts.push(stableTokens[fiatTickers[i]]);
     }
     return contracts;
@@ -49,7 +53,7 @@ contract StableTokenRegistry {
    * @param fiatTicker The type of currency that is no longer supported.
    * @param index The index in fiatTickers of fiatTicker.
    */
-  function removeStableToken(string fiatTicker, uint256 index) external onlyowner {
+  function removeStableToken(string calldata fiatTicker, uint256 index) external onlyOwner {
     uint256 numFiats = fiatTickers.length;
     require(index < numFiats, "Index is invalid");
     require(fiatTicker == fiatTickers[index], "Index does not match fiat type");
@@ -64,9 +68,12 @@ contract StableTokenRegistry {
 
   /**
    * @notice Gives an address permission to spend Reserve without limit.
-   * @param spender The address that is allowed to spend Reserve funds.
+   * @param fiatTicker The address that is allowed to spend Reserve funds.
    */
-  function addNewStableToken(string fiatTicker, string stableTokenContractName) external onlyOwner {
+  function addNewStableToken(string calldata fiatTicker, string calldata stableTokenContractName)
+    external
+    onlyOwner
+  {
     require(fiatTicker != "", "fiatTicker cant be an empty string");
     require(stableTokenContractName != "", "stableTokenContractName cant be an empty string");
     require(stableTokens[fiatTicker] != "", "This registry already exists");
