@@ -179,6 +179,8 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /root/.celo
+        - name: NETWORK
+          value: alfajores
 
       volumes:
         - name: data
