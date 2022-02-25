@@ -13,6 +13,7 @@ contract StableTokenRegistry {
   * @param test Set to true to skip implementation initialization
   */
   constructor(bool test) public Initializable(test) {}
+
   /**
   * @notice adds fiat currencies to fiatTickers collection
   * @param currencyType the type of currency we're trying to push into the collection  
@@ -47,5 +48,13 @@ contract StableTokenRegistry {
    */
   function queryContractByFiatType(string _fiatTicker) public view returns (string) {
     return stableTokens[_fiatTicker];
+  }
+
+  function getContractInstances() external view returns (string[] memory) {
+    string[] memory contracts;
+    for (i = 0; i < fiatTickers.length; i++) {
+      contracts.push(stableTokens[fiatTickers[i]]);
+    }
+    return contracts;
   }
 }
