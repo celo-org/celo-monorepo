@@ -27,9 +27,6 @@ import {
  */
 export type Domain = SequentialDelayDomain
 
-/** io-ts schema for encoding and decoding domains of any standardized type */
-export const DomainSchema: t.Type<Domain> = SequentialDelayDomainSchema
-
 /**
  * Parameterized union type of standardized domain options.
  *
@@ -38,7 +35,7 @@ export const DomainSchema: t.Type<Domain> = SequentialDelayDomainSchema
  *
  * Additional domain options types should be added to this type union along with the new domain type
  * definition, if the new domain type has associated options. If a domain type has no associated
- * options, it's corresponding options type will be `never`.
+ * options, it's corresponding options type should be an empty struct.
  *
  * Domain options must be assignable to EIP712Object.
  */
@@ -55,6 +52,9 @@ export type DomainState<D extends Domain = Domain> = D extends SequentialDelayDo
   ? SequentialDelayDomainState
   : never
 
+/** io-ts schema for encoding and decoding domains of any standardized type */
+export const DomainSchema: t.Type<Domain> = SequentialDelayDomainSchema
+
 export function domainEIP712Types(domain: Domain): EIP712TypesWithPrimary {
   if (isSequentialDelayDomain(domain)) {
     return sequentialDelayDomainEIP712Types
@@ -67,7 +67,7 @@ export function domainEIP712Types(domain: Domain): EIP712TypesWithPrimary {
   throw new Error('Implementation error. Input of type Domain was not recognized')
 }
 
-export function domainOptionsEIP712Types(domain: Domain): EIP712TypesWithPrimary | undefined {
+export function domainOptionsEIP712Types(domain: Domain): EIP712TypesWithPrimary {
   if (isSequentialDelayDomain(domain)) {
     return sequentialDelayDomainOptionsEIP712Types
   }

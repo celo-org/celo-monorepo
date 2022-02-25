@@ -1,9 +1,11 @@
 import {
   EIP712Optional,
+  eip712OptionalSchema,
   eip712OptionalType,
   EIP712TypedData,
   noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
+import * as t from 'io-ts'
 import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import {
   Domain,
@@ -93,23 +95,20 @@ export type PhoneNumberPrivacyRequest =
  * DomainOptions. If the specified Domain has associated options, then the options field is
  * required. If not, it must not be provided.
  */
-export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = OmitIfNever<
-  {
-    /** Domain specification. Selects the PRF domain and rate limiting rules. */
-    domain: D
-    /**
-     * Domain-specific options.
-     * Used for inputs relevant to the domain, but not part of the domain string.
-     * Example: { "authorization": <signature> } for an account-restricted domain.
-     */
-    options: DomainOptions<D>
-    /** Query message. A blinded elliptic curve point encoded in base64. */
-    blindedMessage: string
-    /** Client-specified session ID. */
-    sessionID: EIP712Optional<string>
-  },
-  'options'
->
+export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = {
+  /** Domain specification. Selects the PRF domain and rate limiting rules. */
+  domain: D
+  /**
+   * Domain-specific options.
+   * Used for inputs relevant to the domain, but not part of the domain string.
+   * Example: { "authorization": <signature> } for an account-restricted domain.
+   */
+  options: DomainOptions<D>
+  /** Query message. A blinded elliptic curve point encoded in base64. */
+  blindedMessage: string
+  /** Client-specified session ID. */
+  sessionID: EIP712Optional<string>
+}
 
 /**
  * Request to get the quota status of the given domain. ODIS will respond with the current state
@@ -122,17 +121,14 @@ export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = OmitIf
  * DomainOptions. If the specified Domain has associated options, then the options field is
  * required. If not, it must not be provided.
  */
-export type DomainQuotaStatusRequest<D extends Domain = Domain> = OmitIfNever<
-  {
-    /** Domain specification. Selects the PRF domain and rate limiting rules. */
-    domain: D
-    /** Domain-specific options. */
-    options: DomainOptions<D>
-    /** Client-specified session ID. */
-    sessionID: EIP712Optional<string>
-  },
-  'options'
->
+export type DomainQuotaStatusRequest<D extends Domain = Domain> = {
+  /** Domain specification. Selects the PRF domain and rate limiting rules. */
+  domain: D
+  /** Domain-specific options. */
+  options: DomainOptions<D>
+  /** Client-specified session ID. */
+  sessionID: EIP712Optional<string>
+}
 
 /**
  * Request to disable a domain such that not further requests for signatures in the given domain
@@ -145,23 +141,33 @@ export type DomainQuotaStatusRequest<D extends Domain = Domain> = OmitIfNever<
  * DomainOptions. If the specified Domain has associated options, then the options field is
  * required. If not, it must not be provided.
  */
-export type DisableDomainRequest<D extends Domain = Domain> = OmitIfNever<
-  {
-    /** Domain specification. Selects the PRF domain and rate limiting rules. */
-    domain: D
-    /** Domain-specific options. */
-    options: DomainOptions<D>
-    /** Client-specified session ID. */
-    sessionID: EIP712Optional<string>
-  },
-  'options'
->
+export type DisableDomainRequest<D extends Domain = Domain> = {
+  /** Domain specification. Selects the PRF domain and rate limiting rules. */
+  domain: D
+  /** Domain-specific options. */
+  options: DomainOptions<D>
+  /** Client-specified session ID. */
+  sessionID: EIP712Optional<string>
+}
 
 /** Union type of Domain API requests */
 export type DomainRequest<D extends Domain = Domain> =
   | DomainRestrictedSignatureRequest<D>
   | DomainQuotaStatusRequest<D>
   | DisableDomainRequest<D>
+
+/** Parameterized schema for checking unknown input against DomainRestrictedSignatureRequest */
+export function domainRestrictedSignatureRequestSchema<D extends Domain = Domain>(
+  domain: t.Type<D>,
+  options: t.Type<DomainOptions<D>>
+): t.Type<DomainRestrictedSignatureRequest<D>> {
+  return t.strict({
+    domain,
+    options,
+    blindedMessage: t.string,
+    sessionID: eip712OptionalSchema(t.string),
+  })
+}
 
 /** Wraps the signature request as an EIP-712 typed data structure for hashing and signing */
 export function domainRestrictedSignatureRequestEIP712<D extends Domain>(
@@ -175,11 +181,11 @@ export function domainRestrictedSignatureRequestEIP712<D extends Domain>(
         { name: 'blindedMessage', type: 'string' },
         { name: 'domain', type: domainTypes.primaryType },
         // Only include the `options` field in the EIP-712 type if there are options.
-        ...(optionsTypes ? [{ name: 'options', type: optionsTypes.primaryType }] : []),
+        { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
       ...domainTypes.types,
-      ...optionsTypes?.types,
+      ...optionsTypes.types,
       ...eip712OptionalType('string'),
       EIP712Domain: [
         { name: 'name', type: 'string' },
@@ -206,11 +212,11 @@ export function domainQuotaStatusRequestEIP712<D extends Domain>(
       DomainQuotaStatusRequest: [
         { name: 'domain', type: domainTypes.primaryType },
         // Only include the `options` field in the EIP-712 type if there are options.
-        ...(optionsTypes ? [{ name: 'options', type: optionsTypes.primaryType }] : []),
+        { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
       ...domainTypes.types,
-      ...optionsTypes?.types,
+      ...optionsTypes.types,
       ...eip712OptionalType('string'),
       EIP712Domain: [
         { name: 'name', type: 'string' },
@@ -237,11 +243,11 @@ export function disableDomainRequestEIP712<D extends Domain>(
       DisableDomainRequest: [
         { name: 'domain', type: domainTypes.primaryType },
         // Only include the `options` field in the EIP-712 type if there are options.
-        ...(optionsTypes ? [{ name: 'options', type: optionsTypes.primaryType }] : []),
+        { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
       ...domainTypes.types,
-      ...optionsTypes?.types,
+      ...optionsTypes.types,
       ...eip712OptionalType('string'),
       EIP712Domain: [
         { name: 'name', type: 'string' },
@@ -341,12 +347,3 @@ export function verifyDisableDomainRequestSignature(
 ): boolean {
   return verifyRequestSignature(disableDomainRequestEIP712, request)
 }
-
-// Use distributive conditional types to extract from the keys of T, keys with value type != never.
-// Eg. AssignableKeys<{ foo: string, bar: never }, 'foo'|'bar'> = 'foo'
-type AssignableKeys<T, K extends keyof T> = K extends (T[K] extends never ? never : K) ? K : never
-
-// Exclude fields with value type `never` from T. If K is specified, only check those keys.
-// Used above to exclude the 'option' field if its type is specified as `never` (i.e. no options).
-// Eg. OmitIfNever<{ foo: string, bar: never, baz: never }, 'foo'|'bar'> = { foo: string, baz: never }
-type OmitIfNever<T, K extends keyof T = keyof T> = Omit<T, K> & Pick<T, AssignableKeys<T, K>>
