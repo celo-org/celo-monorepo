@@ -37,7 +37,6 @@ contract StableTokenRegistry {
    * @notice Returns all the contract instances created.
    * @return collection of stable token contracts.
    */
-
   function getContractInstances() external view returns (string[] memory) {
     string[] memory contracts;
     for (i = 0; i < fiatTickers.length; i++) {
@@ -68,7 +67,6 @@ contract StableTokenRegistry {
    * @notice Gives an address permission to spend Reserve without limit.
    * @param spender The address that is allowed to spend Reserve funds.
    */
-
   function addNewRegistry(string fiatType, string contractType) external onlyOwner {
     require("" != fiatType, "fiatType cant be an empty string");
     require("" != contractType, "contractType cant be an empty string");
