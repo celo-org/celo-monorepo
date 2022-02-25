@@ -7,14 +7,22 @@ import {
   noNumber,
 } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
-import { Domain, DomainIdentifiers, SequentialDelayDomain } from '../../src/domains'
+import {
+  Domain,
+  DomainIdentifiers,
+  SequentialDelayDomain,
+  SequentialDelayDomainSchema,
+} from '../../src/domains'
 import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
+  domainRestrictedSignatureRequestSchema,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestEIP712,
+  domainQuotaStatusRequestSchema,
   DisableDomainRequest,
   disableDomainRequestEIP712,
+  disableDomainRequestSchema,
   verifyDisableDomainRequestSignature,
   verifyDomainQuotaStatusRequestSignature,
   verifyDomainRestrictedSignatureRequestSignature,
@@ -135,50 +143,56 @@ const manipulatedDomain: SequentialDelayDomain = {
   salt: noString,
 }
 
-const cases = [
+const signatureRequest: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
+  domain: authenticatedDomain,
+  options: {
+    signature: noString,
+    nonce: defined(0),
+  },
+  blindedMessage: '<blinded message>',
+  sessionID: noString,
+}
+
+const quotaRequest: DomainQuotaStatusRequest<SequentialDelayDomain> = {
+  domain: authenticatedDomain,
+  options: {
+    signature: noString,
+    nonce: defined(0),
+  },
+  sessionID: noString,
+}
+
+const disableRequest: DisableDomainRequest<SequentialDelayDomain> = {
+  domain: authenticatedDomain,
+  options: {
+    signature: noString,
+    nonce: defined(0),
+  },
+  sessionID: noString,
+}
+
+const verifyCases = [
   {
-    request: {
-      domain: authenticatedDomain,
-      options: {
-        signature: noString,
-        nonce: defined(0),
-      },
-      blindedMessage: '<blinded message>',
-      sessionID: noString,
-    } as DomainRestrictedSignatureRequest<SequentialDelayDomain>,
+    request: signatureRequest,
     typedDataBuilder: domainRestrictedSignatureRequestEIP712,
     verifier: verifyDomainRestrictedSignatureRequestSignature,
     name: 'verifyDomainRestrictedSignatureRequestSignature()',
   },
   {
-    request: {
-      domain: authenticatedDomain,
-      options: {
-        signature: noString,
-        nonce: defined(0),
-      },
-      sessionID: noString,
-    } as DomainQuotaStatusRequest<SequentialDelayDomain>,
+    request: quotaRequest,
     typedDataBuilder: domainQuotaStatusRequestEIP712,
     verifier: verifyDomainQuotaStatusRequestSignature,
     name: 'verifyDomainQuotaStatusRequestSignature()',
   },
   {
-    request: {
-      domain: authenticatedDomain,
-      options: {
-        signature: noString,
-        nonce: defined(0),
-      },
-      sessionID: noString,
-    } as DisableDomainRequest<SequentialDelayDomain>,
+    request: disableRequest,
     typedDataBuilder: disableDomainRequestEIP712,
     verifier: verifyDisableDomainRequestSignature,
     name: 'verifyDisableDomainRequestSignature()',
   },
 ]
 
-for (const { request, verifier, typedDataBuilder, name } of cases) {
+for (const { request, verifier, typedDataBuilder, name } of verifyCases) {
   describe(name, () => {
     it('should report a correctly signed request as verified', async () => {
       //@ts-ignore type checking does not correctly infer types.
@@ -247,6 +261,36 @@ for (const { request, verifier, typedDataBuilder, name } of cases) {
       }
       //@ts-ignore type checking does not correctly infer types.
       expect(verifier(unauthenticatedRequest)).toBe(false)
+    })
+  })
+}
+
+const schemaCases = [
+  {
+    request: signatureRequest,
+    schema: domainRestrictedSignatureRequestSchema(SequentialDelayDomainSchema),
+    name: 'verifyDomainRestrictedSignatureRequestSignature()',
+  },
+  {
+    request: quotaRequest,
+    schema: domainQuotaStatusRequestSchema(SequentialDelayDomainSchema),
+    name: 'verifyDomainQuotaStatusRequestSignature()',
+  },
+  {
+    request: disableRequest,
+    schema: disableDomainRequestSchema(SequentialDelayDomainSchema),
+    name: 'verifyDisableDomainRequestSignature()',
+  },
+]
+
+for (const { request, schema, name } of schemaCases) {
+  describe(name, () => {
+    it('should report a correctly constructed request as validated', async () => {
+      expect(schema.is(request)).toBe(true)
+    })
+
+    it('should report an invalid request as not validated', async () => {
+      expect(schema.is({ ...request, options: {} })).toBe(false)
     })
   })
 }
