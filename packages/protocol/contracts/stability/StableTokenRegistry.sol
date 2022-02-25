@@ -64,8 +64,8 @@ contract StableTokenRegistry {
    * @param spender The address that is allowed to spend Reserve funds.
    */
   function addNewStableToken(string fiatTicker, string stableTokenContractName) external onlyOwner {
-    require("" != fiatTicker, "fiatTicker cant be an empty string");
-    require("" != stableTokenContractName, "stableTokenContractName cant be an empty string");
+    require(fiatTicker != "", "fiatTicker cant be an empty string");
+    require(stableTokenContractName != "", "stableTokenContractName cant be an empty string");
     require(stableTokens[fiatTicker] != "", "This registry already exists");
     stableTokens[fiatTicker] = stableTokenContractName;
     fiatTickers.push(fiatTicker);
