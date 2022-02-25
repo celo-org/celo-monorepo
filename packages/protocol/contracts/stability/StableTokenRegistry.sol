@@ -1,4 +1,5 @@
 pragma solidity ^0.5.13;
+
 import "../common/Initializable.sol";
 
 /**
@@ -19,7 +20,9 @@ contract StableTokenRegistry {
    * @param fiatTicker The fiat currency.
    * @param stableTokenContractName The name of a stable token smart contract.
    */
-  function initialize() external initializer {}
+  function initialize(string fiatTicker, string stableTokenContractName) external initializer {
+    stableTokens[fiatTicker] = stableTokenContractName;
+  }
 
   /**
    * @notice Returns fiat currencies that have been issued.
