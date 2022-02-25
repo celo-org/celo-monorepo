@@ -12,7 +12,7 @@ import { SequentialDelayDomain } from './sequential-delay'
 
 // Compile-time check that Domain can be cast to type EIP712Object
 export const TEST_DOMAIN_IS_EIP712: EIP712Object = ({} as unknown) as Domain
-//
+
 // Compile-time check that DomainOptions can be cast to type EIP712Object
 export const TEST_DOMAIN_OPTIONS_ARE_EIP712: EIP712Object = ({} as unknown) as DomainOptions
 

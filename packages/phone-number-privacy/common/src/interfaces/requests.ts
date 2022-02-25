@@ -5,10 +5,10 @@ import {
   EIP712TypedData,
   noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
+import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import { chain, isRight } from 'fp-ts/lib/Either'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
-import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import {
   Domain,
   domainEIP712Types,
@@ -18,6 +18,10 @@ import {
   SequentialDelayDomain,
   SequentialDelayDomainOptionsSchema,
 } from '../domains'
+
+// Domain request types are only assignable to EIP712Object when using type instead
+// of interface. Otherwise the compiler complains about a missing index signature.
+// tslint:disable:interface-over-type-literal
 
 export enum PhoneNumberPrivacyEndpoint {
   STATUS = '/status',
