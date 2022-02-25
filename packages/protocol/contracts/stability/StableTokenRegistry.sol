@@ -50,6 +50,11 @@ contract StableTokenRegistry {
     return stableTokens[_fiatTicker];
   }
 
+  /**
+   * @notice Returns all the contract instances created.
+   * @return collection of stable token contracts.
+   */
+
   function getContractInstances() external view returns (string[] memory) {
     string[] memory contracts;
     for (i = 0; i < fiatTickers.length; i++) {
