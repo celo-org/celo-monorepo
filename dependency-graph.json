@@ -59,6 +59,7 @@
       "@celo/connect",
       "@celo/contractkit",
       "@celo/identity",
+      "@celo/phone-utils",
       "@celo/utils"
     ]
   },
