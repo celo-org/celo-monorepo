@@ -1,4 +1,5 @@
 pragma solidity ^0.5.13;
+import "../common/Initializable.sol";
 
 /**
  * @title contract that lists what stable coins are deployed as part of Celo's Stability protocol.
@@ -12,6 +13,13 @@ contract StableTokenRegistry {
    * @param test Set to true to skip implementation initialization
    */
   constructor(bool test) public Initializable(test) {}
+
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param fiatTicker The fiat currency.
+   * @param stableTokenContractName The name of a stable token smart contract.
+   */
+  function initialize() external initializer {}
 
   /**
    * @notice Returns fiat currencies that have been issued.
@@ -38,7 +46,7 @@ contract StableTokenRegistry {
    * @param fiatTicker The type of currency that is no longer supported.
    * @param index The index in fiatTickers of fiatTicker.
    */
-  function removeRegistry(string fiatTicker, uint256 index) external onlyowner {
+  function removeStableToken(string fiatTicker, uint256 index) external onlyowner {
     uint256 numFiats = fiatTickers.length;
     require(index < numFiats, "Index is invalid");
     require(fiatTicker == fiatTickers[index], "Index does not match fiat type");
@@ -55,7 +63,7 @@ contract StableTokenRegistry {
    * @notice Gives an address permission to spend Reserve without limit.
    * @param spender The address that is allowed to spend Reserve funds.
    */
-  function addNewRegistry(string fiatTicker, string stableTokenContractName) external onlyOwner {
+  function addNewStableToken(string fiatTicker, string stableTokenContractName) external onlyOwner {
     require("" != fiatTicker, "fiatTicker cant be an empty string");
     require("" != stableTokenContractName, "stableTokenContractName cant be an empty string");
     require(stableTokens[fiatTicker] != "", "This registry already exists");
