@@ -6,7 +6,6 @@ pragma solidity ^0.5.13;
 contract StableTokenRegistry {
   mapping(string => string) public stableTokens;
   string[] public fiatTickers;
-  string[] public contracts;
 
   /**
   * @notice Sets initialized == true on implementation contracts
@@ -32,14 +31,6 @@ contract StableTokenRegistry {
    */
   function getFiatTickers() external view returns (string[] memory) {
     return fiatTickers;
-  }
-
-  /**
-   * @notice Returns contracts that have been issued.
-   * @return A collection of contracts issued.
-   */
-  function getContracts() external view returns (string[] memory) {
-    return contracts;
   }
 
   /**
