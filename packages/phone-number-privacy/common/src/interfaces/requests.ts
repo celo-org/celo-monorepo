@@ -169,6 +169,30 @@ export function domainRestrictedSignatureRequestSchema<D extends Domain = Domain
   })
 }
 
+/** Parameterized schema for checking unknown input against DomainQuotaStatusRequest */
+export function domainQuotaStatusRequestSchema<D extends Domain = Domain>(
+  domain: t.Type<D>,
+  options: t.Type<DomainOptions<D>>
+): t.Type<DomainQuotaStatusRequest<D>> {
+  return t.strict({
+    domain,
+    options,
+    sessionID: eip712OptionalSchema(t.string),
+  })
+}
+
+/** Parameterized schema for checking unknown input against DisableDomainRequest */
+export function disableDomainRequestSchema<D extends Domain = Domain>(
+  domain: t.Type<D>,
+  options: t.Type<DomainOptions<D>>
+): t.Type<DisableDomainRequest<D>> {
+  return t.strict({
+    domain,
+    options,
+    sessionID: eip712OptionalSchema(t.string),
+  })
+}
+
 /** Wraps the signature request as an EIP-712 typed data structure for hashing and signing */
 export function domainRestrictedSignatureRequestEIP712<D extends Domain>(
   request: DomainRestrictedSignatureRequest<D>
