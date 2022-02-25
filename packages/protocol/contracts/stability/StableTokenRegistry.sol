@@ -45,4 +45,23 @@ contract StableTokenRegistry {
     }
     return contracts;
   }
+
+  /**
+   * @notice Removes unwamted token instances.
+   * @param fiatType The type of currency that is no longer supported.
+   * @param index The index in fiatTickers of fiatType.
+   */
+  function removeRegistry(string fiatType, uint256 index) external onlyowner {
+    uint256 numFiats = fiatTickers.length;
+    require(index < numFiats, "Index is invalid");
+    require(fiatType == fiatTickers[index], "Index does not match fiat type");
+    uint256 newNumFiats = numFiats.sub(1);
+
+    if (index != newNumFiats) {
+      fiatTickers[index] = fiatTickers[newNumFiats];
+    }
+    fiatTickers[newNumFiats] = "";
+    fiatTickers.length = newNumFiats;
+  }
+
 }
