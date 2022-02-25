@@ -5,6 +5,8 @@ import {
   EIP712TypedData,
   noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
+import { chain, isRight } from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
 import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import {
@@ -12,7 +14,9 @@ import {
   domainEIP712Types,
   DomainOptions,
   domainOptionsEIP712Types,
+  isSequentialDelayDomain,
   SequentialDelayDomain,
+  SequentialDelayDomainOptionsSchema,
 } from '../domains'
 
 export enum PhoneNumberPrivacyEndpoint {
@@ -156,41 +160,134 @@ export type DomainRequest<D extends Domain = Domain> =
   | DomainQuotaStatusRequest<D>
   | DisableDomainRequest<D>
 
+// NOTE: Next three functions are a bit repetitive. An attempt was made to combine them, but the
+// type signature got quite complicated. Feel free to attempt it if you are motivated.
+
 /** Parameterized schema for checking unknown input against DomainRestrictedSignatureRequest */
 export function domainRestrictedSignatureRequestSchema<D extends Domain = Domain>(
-  domain: t.Type<D>,
-  options: t.Type<DomainOptions<D>>
+  domain: t.Type<D>
 ): t.Type<DomainRestrictedSignatureRequest<D>> {
-  return t.strict({
+  // The schema defined here does most of the work, but does not guarantee consistency between the
+  // domain and options fields. We wrap the schema below to add a consistency check.
+  const schema = t.strict({
     domain,
-    options,
+    options: t.unknown,
     blindedMessage: t.string,
     sessionID: eip712OptionalSchema(t.string),
   })
+
+  const validation = (
+    unk: unknown,
+    ctx: t.Context
+  ): t.Validation<DomainRestrictedSignatureRequest<D>> =>
+    pipe(
+      schema.validate(unk, ctx),
+      chain((value: t.TypeOf<typeof schema>) => {
+        if (isSequentialDelayDomain(value.domain)) {
+          const either = SequentialDelayDomainOptionsSchema.validate(value.options, ctx)
+          if (isRight(either)) {
+            return t.success(value as DomainRestrictedSignatureRequest<D>)
+          }
+
+          return t.failure(unk, ctx, 'options type does not match domain type')
+        }
+
+        // canary provides a compile-time check that all subtypes of Domain have branches. If a case
+        // was missed, then an error will report that domain cannot be assigned to type `never`.
+        const canary = (x: never) => x
+        canary(value.domain)
+        throw new Error('Implementation error: validated domain is not of any known type')
+      })
+    )
+
+  return new t.Type<DomainRestrictedSignatureRequest<D>, DomainRestrictedSignatureRequest<D>>(
+    `DomainRestrictedSignatureRequestSchema<${domain.name}>`,
+    (unk: unknown): unk is DomainRestrictedSignatureRequest<D> => isRight(validation(unk, [])),
+    validation,
+    (req: DomainRestrictedSignatureRequest<D>) => req
+  )
 }
 
 /** Parameterized schema for checking unknown input against DomainQuotaStatusRequest */
 export function domainQuotaStatusRequestSchema<D extends Domain = Domain>(
-  domain: t.Type<D>,
-  options: t.Type<DomainOptions<D>>
+  domain: t.Type<D>
 ): t.Type<DomainQuotaStatusRequest<D>> {
-  return t.strict({
+  // The schema defined here does most of the work, but does not guarantee consistency between the
+  // domain and options fields. We wrap the schema below to add a consistency check.
+  const schema = t.strict({
     domain,
-    options,
+    options: t.unknown,
     sessionID: eip712OptionalSchema(t.string),
   })
+
+  const validation = (unk: unknown, ctx: t.Context): t.Validation<DomainQuotaStatusRequest<D>> =>
+    pipe(
+      schema.validate(unk, ctx),
+      chain((value: t.TypeOf<typeof schema>) => {
+        if (isSequentialDelayDomain(value.domain)) {
+          const either = SequentialDelayDomainOptionsSchema.validate(value.options, ctx)
+          if (isRight(either)) {
+            return t.success(value as DomainQuotaStatusRequest<D>)
+          }
+
+          return t.failure(unk, ctx, 'options type does not match domain type')
+        }
+
+        // canary provides a compile-time check that all subtypes of Domain have branches. If a case
+        // was missed, then an error will report that domain cannot be assigned to type `never`.
+        const canary = (x: never) => x
+        canary(value.domain)
+        throw new Error('Implementation error: validated domain is not of any known type')
+      })
+    )
+
+  return new t.Type<DomainQuotaStatusRequest<D>, DomainQuotaStatusRequest<D>>(
+    `DomainQuotaStatusRequestSchema<${domain.name}>`,
+    (unk: unknown): unk is DomainQuotaStatusRequest<D> => isRight(validation(unk, [])),
+    validation,
+    (req: DomainQuotaStatusRequest<D>) => req
+  )
 }
 
 /** Parameterized schema for checking unknown input against DisableDomainRequest */
 export function disableDomainRequestSchema<D extends Domain = Domain>(
-  domain: t.Type<D>,
-  options: t.Type<DomainOptions<D>>
+  domain: t.Type<D>
 ): t.Type<DisableDomainRequest<D>> {
-  return t.strict({
+  // The schema defined here does most of the work, but does not guarantee consistency between the
+  // domain and options fields. We wrap the schema below to add a consistency check.
+  const schema = t.strict({
     domain,
-    options,
+    options: t.unknown,
     sessionID: eip712OptionalSchema(t.string),
   })
+
+  const validation = (unk: unknown, ctx: t.Context): t.Validation<DisableDomainRequest<D>> =>
+    pipe(
+      schema.validate(unk, ctx),
+      chain((value: t.TypeOf<typeof schema>) => {
+        if (isSequentialDelayDomain(value.domain)) {
+          const either = SequentialDelayDomainOptionsSchema.validate(value.options, ctx)
+          if (isRight(either)) {
+            return t.success(value as DisableDomainRequest<D>)
+          }
+
+          return t.failure(unk, ctx, 'options type does not match domain type')
+        }
+
+        // canary provides a compile-time check that all subtypes of Domain have branches. If a case
+        // was missed, then an error will report that domain cannot be assigned to type `never`.
+        const canary = (x: never) => x
+        canary(value.domain)
+        throw new Error('Implementation error: validated domain is not of any known type')
+      })
+    )
+
+  return new t.Type<DisableDomainRequest<D>, DisableDomainRequest<D>>(
+    `DisableDomainRequestSchema<${domain.name}>`,
+    (unk: unknown): unk is DisableDomainRequest<D> => isRight(validation(unk, [])),
+    validation,
+    (req: DisableDomainRequest<D>) => req
+  )
 }
 
 /** Wraps the signature request as an EIP-712 typed data structure for hashing and signing */

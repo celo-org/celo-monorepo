@@ -1,12 +1,12 @@
 import {
-  DisableDomainRequest,
+  disableDomainRequestSchema,
   DisableDomainResponse,
   Domain,
   domainHash,
-  DomainQuotaStatusRequest,
+  domainQuotaStatusRequestSchema,
   DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
-  DomainRestrictedSignatureRequest,
+  domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
@@ -41,15 +41,21 @@ export class DomainService implements IDomainService {
   ) {}
 
   public async handleDisableDomain(
-    request: Request<{}, {}, DisableDomainRequest>,
+    request: Request<{}, {}, unknown>,
     response: Response<DisableDomainResponse>
   ): Promise<void> {
     Counters.requests.labels(Endpoint.DISABLE_DOMAIN).inc()
 
+    // Check that the body contains the correct request type.
+    if (!disableDomainRequestSchema(DomainSchema).is(request.body)) {
+      respondWithError(Endpoint.DISABLE_DOMAIN, response, 400, WarningMessage.INVALID_INPUT)
+      return
+    }
+
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, response, Endpoint.DISABLE_DOMAIN, logger)) {
-      // inputValidation returns a response to the user internally. Nothing left to do.
+    if (!this.authenticateRequest(domain, response, Endpoint.DISABLE_DOMAIN, logger)) {
+      // authenticateRequest returns a response to the user internally. Nothing left to do.
       return
     }
 
@@ -78,15 +84,21 @@ export class DomainService implements IDomainService {
   }
 
   public async handleGetDomainQuotaStatus(
-    request: Request<{}, {}, DomainQuotaStatusRequest>,
+    request: Request<{}, {}, unknown>,
     response: Response<DomainQuotaStatusResponse>
   ): Promise<void> {
     Counters.requests.labels(Endpoint.DOMAIN_QUOTA_STATUS).inc()
 
+    // Check that the body contains the correct request type.
+    if (!domainQuotaStatusRequestSchema(DomainSchema).is(request.body)) {
+      respondWithError(Endpoint.DOMAIN_QUOTA_STATUS, response, 400, WarningMessage.INVALID_INPUT)
+      return
+    }
+
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, response, Endpoint.DOMAIN_QUOTA_STATUS, logger)) {
-      // inputValidation returns a response to the user internally. Nothing left to do.
+    if (!this.authenticateRequest(domain, response, Endpoint.DOMAIN_QUOTA_STATUS, logger)) {
+      // authenticateRequest returns a response to the user internally. Nothing left to do.
       return
     }
 
@@ -129,17 +141,22 @@ export class DomainService implements IDomainService {
     }
   }
 
-  // DO NOT MERGE: Type safety dictates that the request type should specify unknown.
   public async handleGetDomainRestrictedSignature(
-    request: Request<{}, {}, DomainRestrictedSignatureRequest>,
+    request: Request<{}, {}, unknown>,
     response: Response<DomainRestrictedSignatureResponse>
   ): Promise<void> {
     Counters.requests.labels(Endpoint.DOMAIN_SIGN).inc()
 
+    // Check that the body contains the correct request type.
+    if (!domainRestrictedSignatureRequestSchema(DomainSchema).is(request.body)) {
+      respondWithError(Endpoint.DOMAIN_SIGN, response, 400, WarningMessage.INVALID_INPUT)
+      return
+    }
+
     const logger = response.locals.logger
     const domain = request.body.domain
-    if (!this.inputValidation(domain, response, Endpoint.DOMAIN_SIGN, logger)) {
-      // inputValidation returns a response to the user internally. Nothing left to do.
+    if (!this.authenticateRequest(domain, response, Endpoint.DOMAIN_SIGN, logger)) {
+      // authenticateRequest returns a response to the user internally. Nothing left to do.
       return
     }
     logger.info('Processing request to get domain signature ', {
@@ -205,18 +222,12 @@ export class DomainService implements IDomainService {
     }
   }
 
-  private inputValidation(
-    domain: unknown,
+  private authenticateRequest(
+    domain: Domain,
     response: Response,
     endpoint: Endpoint,
     logger: Logger
-  ): domain is Domain {
-    if (!DomainSchema.is(domain)) {
-      logger.warn(`Received request to ${endpoint} for an invalid domain`, JSON.stringify(domain))
-      respondWithError(endpoint, response, 404, WarningMessage.UNKNOWN_DOMAIN)
-      return false
-    }
-
+  ): boolean {
     if (!this.authService.authCheck()) {
       logger.warn(`Received unauthorized request to ${endpoint} `, {
         name: domain.name,
