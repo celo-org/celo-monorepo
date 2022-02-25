@@ -34,14 +34,6 @@ contract StableTokenRegistry {
   }
 
   /**
-   * @notice Returns queried stable contract.
-   * @return stable contract.
-   */
-  function queryContractByFiatType(string _fiatTicker) public view returns (string) {
-    return stableTokens[_fiatTicker];
-  }
-
-  /**
    * @notice Returns all the contract instances created.
    * @return collection of stable token contracts.
    */
