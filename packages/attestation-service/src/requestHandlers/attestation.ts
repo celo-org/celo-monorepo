@@ -238,7 +238,6 @@ class AttestationRequestHandler {
 
   private async verifyPepperIfApplicable(): Promise<void> {
     if (this.attestationRequest.phoneNumberSignature && this.attestationRequest.salt) {
-      Counters.attestationRequestsProvidedSignature.inc()
       const sigBuf = Buffer.from(this.attestationRequest.phoneNumberSignature, 'base64')
 
       try {
@@ -259,6 +258,7 @@ class AttestationRequestHandler {
         throw new ErrorWithResponse(INVALID_SIGNATURE_ERROR, 422)
       }
     }
+    Counters.attestationRequestsDidNotProvideSignature.inc()
   }
 }
 
