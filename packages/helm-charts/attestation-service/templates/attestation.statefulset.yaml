@@ -135,6 +135,8 @@ spec:
           value: /root/.celo
         - name: LOG_FORMAT
           value: stackdriver
+        - name: NETWORK
+          value: alfajores
         - name: NEXMO_KEY
           valueFrom:
             secretKeyRef:
@@ -179,8 +181,6 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /root/.celo
-        - name: NETWORK
-          value: alfajores
 
       volumes:
         - name: data
