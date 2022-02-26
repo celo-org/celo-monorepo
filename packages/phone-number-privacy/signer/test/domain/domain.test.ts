@@ -1,3 +1,12 @@
+import { defined, noBool, noString } from '@celo/utils/lib/sign-typed-data-utils'
+import { LocalWallet } from '@celo/wallet-local'
+import {
+  DomainIdentifiers,
+  //DomainRestrictedSignatureRequest,
+  //DomainQuotaStatusRequest,
+  DisableDomainRequest,
+  SequentialDelayDomain,
+} from '@celo/phone-number-privacy-common'
 import { instance, mock, reset, verify, when } from 'ts-mockito'
 import { beforeEach } from 'jest-circus'
 import { DomainService } from '../../src/domain/domain.service'
@@ -5,7 +14,7 @@ import { Request, Response } from 'express'
 import { DomainAuthService } from '../../src/domain/auth/domainAuth.service'
 import { DomainQuotaService } from '../../src/domain/quota/domainQuota.service'
 
-describe('Domain service tests', () => {
+describe('domainService', () => {
   const requestMock = mock<Request>()
   const request = instance(requestMock)
 
@@ -20,6 +29,48 @@ describe('Domain service tests', () => {
 
   const domainService = new DomainService(authService, quotaService)
 
+  const wallet = new LocalWallet()
+  wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
+  const walletAddress = wallet.getAccounts()[0]!
+
+  const authenticatedDomain: SequentialDelayDomain = {
+    name: DomainIdentifiers.SequentialDelay,
+    version: '1',
+    stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+    address: defined(walletAddress),
+    salt: noString,
+  }
+
+  /*
+  const signatureRequest: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
+    domain: authenticatedDomain,
+    options: {
+      signature: noString,
+      nonce: defined(0),
+    },
+    blindedMessage: '<blinded message>',
+    sessionID: noString,
+  }
+
+  const quotaRequest: DomainQuotaStatusRequest<SequentialDelayDomain> = {
+    domain: authenticatedDomain,
+    options: {
+      signature: noString,
+      nonce: defined(0),
+    },
+    sessionID: noString,
+  }
+  */
+
+  const disableRequest: DisableDomainRequest<SequentialDelayDomain> = {
+    domain: authenticatedDomain,
+    options: {
+      signature: noString,
+      nonce: defined(0),
+    },
+    sessionID: noString,
+  }
+
   beforeAll(() => {
     response.locals = { logger: { warn: jest.fn(), error: jest.fn(), info: jest.fn() } }
   })
@@ -31,23 +82,35 @@ describe('Domain service tests', () => {
     reset(requestMock)
   })
 
-  it('Should respond with 403 on failed auth', async () => {
-    when(authServiceMock.authCheck()).thenReturn(false)
-    when(responseMock.status(403)).thenReturn(response)
-    request.body = { domain: 'domain' }
+  describe('.handleDisableDomain', () => {
+    it.only('Should respond with 200 on valid request', async () => {
+      when(authServiceMock.authCheck()).thenReturn(true)
+      when(responseMock.status(200)).thenReturn(response)
+      request.body = disableRequest
 
-    await domainService.handleDisableDomain(request, response)
+      await domainService.handleDisableDomain(request, response)
 
-    verify(responseMock.status(403)).once()
-  })
+      verify(responseMock.status(200)).once()
+    })
 
-  it('Should respond with 404 on unknown domain', async () => {
-    when(authServiceMock.authCheck()).thenReturn(true)
-    when(responseMock.status(404)).thenReturn(response)
-    request.body = { domain: 'Some unknown domain' }
+    it('Should respond with 403 on failed auth', async () => {
+      when(authServiceMock.authCheck()).thenReturn(false)
+      when(responseMock.status(403)).thenReturn(response)
+      request.body = { domain: 'domain' }
 
-    await domainService.handleDisableDomain(request, response)
+      await domainService.handleDisableDomain(request, response)
 
-    verify(responseMock.status(404)).once()
+      verify(responseMock.status(403)).once()
+    })
+
+    it('Should respond with 404 on unknown domain', async () => {
+      when(authServiceMock.authCheck()).thenReturn(true)
+      when(responseMock.status(404)).thenReturn(response)
+      request.body = { domain: 'Some unknown domain' }
+
+      await domainService.handleDisableDomain(request, response)
+
+      verify(responseMock.status(404)).once()
+    })
   })
 })
