@@ -81,8 +81,11 @@ contract StableTokenRegistry is Initializable, Ownable {
     onlyOwner
   {
     require(bytes(fiatTicker).length != 0, "fiatTicker cant be an empty string");
-    require(bytes(stableTokenContractName) != 0, "stableTokenContractName cant be an empty string");
-    require(bytes(stableTokens[fiatTicker]) != 0, "This registry already exists");
+    require(
+      bytes(stableTokenContractName).length != 0,
+      "stableTokenContractName cant be an empty string"
+    );
+    require(bytes(stableTokens[fiatTicker]).length != 0, "This registry already exists");
     stableTokens[fiatTicker] = stableTokenContractName;
     fiatTickers.push(fiatTicker);
   }
