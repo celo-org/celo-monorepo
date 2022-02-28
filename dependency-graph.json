@@ -7,8 +7,9 @@
     "location": "packages/attestation-service",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/identity",
       "@celo/keystores",
-      "@celo/utils"
+      "@celo/phone-utils"
     ]
   },
   "celo-azure-build": {
@@ -58,6 +59,7 @@
       "@celo/connect",
       "@celo/contractkit",
       "@celo/identity",
+      "@celo/phone-utils",
       "@celo/utils"
     ]
   },
