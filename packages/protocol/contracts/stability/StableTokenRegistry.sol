@@ -57,11 +57,12 @@ contract StableTokenRegistry is Initializable, Ownable {
    * @param index The index in fiatTickers of fiatTicker.
    */
   function removeStableToken(string calldata fiatTicker, uint256 index) external onlyOwner {
+    stableTokens[fiatTicker] = "";
     uint256 numFiats = fiatTickers.length;
     require(index < numFiats, "Index is invalid");
     require(
       keccak256(bytes(fiatTicker)) == keccak256(bytes(fiatTickers[index])),
-      "Index does not match fiat type"
+      "Index does not match fiatTicker"
     );
     uint256 newNumFiats = numFiats.sub(1);
 
