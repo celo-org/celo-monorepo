@@ -3,6 +3,7 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
+import "../../contracts/common/Registry.sol";
 import "./interfaces/IRegistry.sol";
 import "./Initializable.sol";
 
