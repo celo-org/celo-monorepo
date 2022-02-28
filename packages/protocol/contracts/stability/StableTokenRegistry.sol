@@ -1,5 +1,7 @@
 pragma solidity ^0.5.13;
+pragma experimental ABIEncoderV2;
 
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/Initializable.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -7,9 +9,9 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
  * @title contract that lists what stable coins are deployed as part of Celo's Stability protocol.
  */
 contract StableTokenRegistry is Initializable, Ownable {
+  using SafeMath for uint256;
   mapping(string => string) public stableTokens;
   string[] public fiatTickers;
-  string[] public contracts;
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -42,8 +44,9 @@ contract StableTokenRegistry is Initializable, Ownable {
    * @return collection of stable token contracts.
    */
   function getContractInstances() external view returns (string[] memory) {
+    string[] memory contracts;
     for (uint256 i = 0; i < fiatTickers.length; i++) {
-      contracts.push(stableTokens[fiatTickers[i]]);
+      contracts[i] = stableTokens[fiatTickers[i]];
     }
     return contracts;
   }
@@ -56,7 +59,10 @@ contract StableTokenRegistry is Initializable, Ownable {
   function removeStableToken(string calldata fiatTicker, uint256 index) external onlyOwner {
     uint256 numFiats = fiatTickers.length;
     require(index < numFiats, "Index is invalid");
-    require(fiatTicker == fiatTickers[index], "Index does not match fiat type");
+    require(
+      keccak256(bytes(fiatTicker)) == keccak256(bytes(fiatTickers[index])),
+      "Index does not match fiat type"
+    );
     uint256 newNumFiats = numFiats.sub(1);
 
     if (index != newNumFiats) {
@@ -74,9 +80,9 @@ contract StableTokenRegistry is Initializable, Ownable {
     external
     onlyOwner
   {
-    require(fiatTicker != "", "fiatTicker cant be an empty string");
-    require(stableTokenContractName != "", "stableTokenContractName cant be an empty string");
-    require(stableTokens[fiatTicker] != "", "This registry already exists");
+    require(bytes(fiatTicker).length != 0, "fiatTicker cant be an empty string");
+    require(bytes(stableTokenContractName) != 0, "stableTokenContractName cant be an empty string");
+    require(bytes(stableTokens[fiatTicker]) != 0, "This registry already exists");
     stableTokens[fiatTicker] = stableTokenContractName;
     fiatTickers.push(fiatTicker);
   }
