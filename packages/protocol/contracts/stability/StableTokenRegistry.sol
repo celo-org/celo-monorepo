@@ -21,14 +21,21 @@ contract StableTokenRegistry is Initializable, Ownable {
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param fiatTicker The fiat currency.
-   * @param stableTokenContractName The name of a stable token smart contract.
+   * @param existingFiatTickers Collection of fiat currencies issued already.
+   * @param existingStableTokenContractNames Collection of stable token smart contract names.
    */
-  function initialize(string calldata fiatTicker, string calldata stableTokenContractName)
-    external
-    initializer
-  {
-    stableTokens[fiatTicker] = stableTokenContractName;
+  function initialize(
+    string[] calldata existingFiatTickers,
+    string[] calldata existingStableTokenContractNames
+  ) external initializer {
+    _transferOwnership(msg.sender);
+    require(
+      existingFiatTickers.length == existingStableTokenContractNames.length,
+      "Array length mismatch"
+    );
+    for (uint256 i = 0; i < existingFiatTickers.length; i++) {
+      stableTokens[fiatTickers[i]] = existingFiatTickers[i];
+    }
   }
 
   /**
