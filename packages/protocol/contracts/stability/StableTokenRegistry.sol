@@ -4,8 +4,6 @@ pragma experimental ABIEncoderV2;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/Initializable.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-// import "../common/Registry.sol";
-// import "../common/UsingRegistry.sol";
 import "../common/interfaces/IRegistry.sol";
 
 /**
