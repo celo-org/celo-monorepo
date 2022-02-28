@@ -94,5 +94,5 @@ a few useful commands to make running a node really easy.
 
 #### MacOS Setup
 
-- Install Helm 3.X (available on Homebrew)
+- Install Helm 3.4 or higher (available on Homebrew)
   To get past the Unidentified Developer error: open the directory containing helm, then ctrl-click helm and select Open then Open again. Repeat for tiller.
