@@ -21,6 +21,9 @@ COPY packages/sdk/contractkit/package.json packages/sdk/contractkit/
 COPY packages/sdk/keystores/package.json packages/sdk/keystores/
 COPY packages/attestation-service/package.json packages/attestation-service/
 COPY packages/flake-tracker/package.json packages/flake-tracker/package.json
+COPY packages/sdk/identity/package.json packages/sdk/identity/
+COPY packages/sdk/phone-utils/package.json packages/sdk/phone-utils/package.json
+COPY packages/phone-number-privacy/common/package.json packages/phone-number-privacy/common/
 
 RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 
@@ -37,6 +40,9 @@ COPY packages/sdk/contractkit packages/sdk/contractkit/
 COPY packages/sdk/keystores packages/sdk/keystores/
 COPY packages/attestation-service packages/attestation-service/
 COPY packages/flake-tracker packages/flake-tracker
+COPY packages/sdk/identity packages/sdk/identity
+COPY packages/sdk/phone-utils packages/sdk/phone-utils/
+COPY packages/phone-number-privacy/common packages/phone-number-privacy/common
 
 ENV NODE_ENV production
 
