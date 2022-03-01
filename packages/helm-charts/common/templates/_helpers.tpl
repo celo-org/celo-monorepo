@@ -141,9 +141,7 @@ fi
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --unlock=${ACCOUNT_ADDRESS} --password /root/.celo/account/accountSecret --allow-insecure-unlock"
     {{- end }}
     {{- if .expose }}
-    RPC_APIS="{{ .rpc_apis | default "eth,net,web3,debug,txpool" }}"
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr 0.0.0.0 --rpcapi=${RPC_APIS} --rpccorsdomain='*' --rpcvhosts=*"
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=${RPC_APIS} --wsport={{ default .Values.geth.ws_port .ws_port }}"
+{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" (default "eth,net,web3,debug,txpool" .rpc_apis) "ws_port" (default .Values.geth.ws_port .ws_port ) "listen_address" "0.0.0.0") | indent 4 }}
     {{- end }}
     {{- if .ping_ip_from_packet | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
@@ -168,12 +166,9 @@ fi
     {{- end }}
     fi
     {{- end }}
-    {{- if .metrics | default true }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
-    {{- end }}
-    {{- if .pprof | default false }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
-    {{- end }}
+
+{{ include  "common.geth-add-metrics-pprof-config" . | indent 4 }}
+
     PORT=30303
     {{- if .ports }}
     PORTS_PER_RID={{ join "," .ports }}
@@ -292,7 +287,7 @@ data:
 {{- end -}}
 {{- end -}}
 
-{{- define "common.celotool-validator-container" -}}
+{{- define "common.celotool-full-node-statefulset-container" -}}
 - name: get-account
   image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
   imagePullPolicy: {{ .Values.celotool.image.imagePullPolicy }}
@@ -534,4 +529,40 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+{{- end -}}
+
+{{- define "common.geth-add-metrics-pprof-config" -}}
+{{- if .metrics | default true }}
+ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
+{{- end }}
+{{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
+# Check the format of pprof cmd arguments
+set +e
+geth --help | grep 'pprof.port' >/dev/null
+pprof_new_format=$?
+set -e
+if [ $pprof_new_format -eq 0 ]; then
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprof.port {{ .Values.pprof.port | default "6060" }} --pprof.addr 0.0.0.0"
+else
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
+fi
+{{- end }}
+{{- end -}}
+
+{{- define "common.geth-http-ws-flags" -}}
+# Check the format of http/rcp and ws cmd arguments
+RPC_APIS={{ .rpc_apis | default "eth,net,web3,debug" | quote }}
+WS_PORT="{{ .ws_port | default 8545 }}"
+LISTEN_ADDRESS={{ .listen_address | default "0.0.0.0" | quote }}
+set +e
+geth --help | grep 'http.addr' >/dev/null
+http_new_format=$?
+set -e
+if [ $http_new_format -eq 0 ]; then
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http --http.addr $LISTEN_ADDRESS --http.api=$RPC_APIS --http.corsdomain='*' --http.vhosts=*"
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ws --ws.addr $LISTEN_ADDRESS --ws.origins=* --ws.api=$RPC_APIS --ws.port=$WS_PORT --ws.rpcprefix=/"
+else
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr $LISTEN_ADDRESS --rpcapi=$RPC_APIS --rpccorsdomain='*' --rpcvhosts=*"
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ws --wsaddr $LISTEN_ADDRESS --wsorigins=* --wsapi=$RPC_APIS --wsport=$WS_PORT"
+fi
 {{- end -}}

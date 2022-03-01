@@ -1,4 +1,10 @@
-import { Domain } from '@celo/identity/lib/odis/domains'
+import { KnownDomainState } from '../domains'
+import {
+  DisableDomainRequest,
+  DomainQuotaStatusRequest,
+  DomainRequest,
+  DomainRestrictedSignatureRequest,
+} from './requests'
 
 export interface SignMessageResponse {
   success: boolean
@@ -25,9 +31,65 @@ export interface GetQuotaResponse {
   totalQuota: number
 }
 
-export interface DomainStatusResponse {
-  domain: Domain
-  counter: number
-  disabled: boolean
-  timer: number
+export interface GetContactMatchesResponse {
+  success: boolean
+  matchedContacts: Array<{
+    phoneNumber: string
+  }>
+  version: string
 }
+
+export interface DomainRestrictedSignatureResponseSuccess {
+  success: true
+  version: string
+  signature: string
+}
+
+export interface DomainRestrictedSignatureResponseFailure {
+  success: false
+  version: string
+  error: string
+}
+
+export type DomainRestrictedSignatureResponse =
+  | DomainRestrictedSignatureResponseSuccess
+  | DomainRestrictedSignatureResponseFailure
+
+export interface DomainQuotaStatusResponseSuccess {
+  success: true
+  version: string
+  status: KnownDomainState
+}
+
+export interface DomainQuotaStatusResponseFailure {
+  success: false
+  version: string
+  error: string
+}
+
+export type DomainQuotaStatusResponse =
+  | DomainQuotaStatusResponseSuccess
+  | DomainQuotaStatusResponseFailure
+
+export interface DisableDomainResponseSuccess {
+  success: true
+  version: string
+}
+
+export interface DisableDomainResponseFailure {
+  success: false
+  version: string
+  error: string
+}
+
+export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
+
+export type DomainResponse<
+  R extends DomainRequest = DomainRequest
+> = R extends DomainRestrictedSignatureRequest
+  ? DomainRestrictedSignatureResponse
+  : never | R extends DomainQuotaStatusRequest
+  ? DomainQuotaStatusResponse
+  : never | R extends DisableDomainRequest
+  ? DisableDomainResponse
+  : never

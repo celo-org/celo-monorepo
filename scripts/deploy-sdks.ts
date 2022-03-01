@@ -3,7 +3,7 @@
 /*
  * deploy-sdks script
  * THIS SCRIPT MUST BE RUN WITH NPM TO PUBLISH - `npm run deploy-sdks`
- * From the monorepo root run `yarn deploy-sdks`
+ * From the monorepo root run `npm run deploy-sdks`
  * You'll first be asked which version to update the sdks to.
  * You can pick major, minor, patch, a semantic version,
  * or nothing if you don't want to update the versions.
@@ -68,14 +68,14 @@ type Answers = {
         'Invalid version given. Version must be major, minor, patch, or a semantic version.'
       )
     )
-    process.exit()
+    process.exit(1)
   }
 
   const shouldPublish = publish === 'Y' || publish === 'dry-run'
 
   if (!shouldPublish && !version) {
     console.error(colors.red('Either a version or --publish must be given'))
-    process.exit()
+    process.exit(1)
   }
 
   const sdkPackagePaths = findPackagePaths(path.join(__dirname, '..', 'packages', 'sdk'))
@@ -121,12 +121,13 @@ type Answers = {
 
   const otpPrompt = [
     {
-      name: 'otp',
+      name: 'newOtp',
       description: colors.green(`Enter 2FA code`),
     },
   ]
 
   let successfulPackages = []
+  let otp = ''
   if (shouldPublish) {
     // Here we build and publish all the sdk packages
     for (let index = 0; index < sdkPackagePaths.length; index++) {
@@ -144,11 +145,16 @@ type Answers = {
 
         console.log(`Publishing ${packageJson.name}@${packageJson.version}`)
         // Here you enter the 2FA code for npm
-        const { otp } = await prompt.get(otpPrompt)
+        let { newOtp } = (await prompt.get(otpPrompt)) as { newOtp: string }
+        if (newOtp) {
+          otp = newOtp
+        } else {
+          newOtp = otp
+        }
 
         // Here is the actual publishing
         child_process.execSync(
-          `npm publish --access public --otp ${otp} ${publish === 'dry-run' ? '--dry-run' : ''}`,
+          `npm publish --access public --otp ${newOtp} ${publish === 'dry-run' ? '--dry-run' : ''}`,
           { cwd: packageFolderPath, stdio: 'ignore' }
         )
         successfulPackages.push(packageJson.name)
@@ -183,7 +189,7 @@ type Answers = {
       JSON.stringify({ packages: failedPackages, version: newVersion, publish })
     )
     console.error(colors.red(`Fix failed packages and try again.`))
-    process.exit()
+    process.exit(1)
   }
 
   const failedJsonPath = path.join(__dirname, 'failedSDKs.json')
@@ -193,6 +199,7 @@ type Answers = {
 
   const allPackagePaths = findPackagePaths(path.join(__dirname, '..', 'packages'))
 
+  const newDevVersion = getNewDevVersion(newVersion)
   // Finally we update all the packages across the monorepo
   // to use the most recent sdk packages.
   allPackagePaths.forEach((path) => {
@@ -201,21 +208,25 @@ type Answers = {
     const isSdk = sdkNames.includes(json.name)
 
     if (isSdk) {
-      json.version = `${newVersion}-dev`
+      json.version = `${newDevVersion}-dev`
       packageChanged = true
     }
 
     for (const depName in json.dependencies) {
       if (sdkNames.includes(depName)) {
-        const suffix = json.dependencies[depName].includes('-dev') || isSdk ? '-dev' : ''
-        json.dependencies[depName] = `${newVersion}${suffix}`
+        const versionUpdate =
+          json.dependencies[depName].includes('-dev') || isSdk ? `${newDevVersion}-dev` : newVersion
+        json.dependencies[depName] = versionUpdate
         packageChanged = true
       }
     }
     for (const depName in json.devDependencies) {
       if (sdkNames.includes(depName)) {
-        const suffix = json.devDependencies[depName].includes('-dev') || isSdk ? '-dev' : ''
-        json.devDependencies[depName] = `${newVersion}${suffix}`
+        const versionUpdate =
+          json.devDependencies[depName].includes('-dev') || isSdk
+            ? `${newDevVersion}-dev`
+            : newVersion
+        json.devDependencies[depName] = versionUpdate
         packageChanged = true
       }
     }
@@ -276,7 +287,7 @@ function incrementVersion(version: string, command: string) {
 }
 
 function removeDevSuffix(version: string) {
-  return version.endsWith('-dev') ? version.slice(0, 5) : version
+  return version.endsWith('-dev') ? version.slice(0, -4) : version
 }
 
 function readPackageJson(filePath: string): PackageJson {
@@ -296,4 +307,12 @@ function writePackageJson(filePath: string, properties: Partial<PackageJson>) {
       2
     )
   )
+}
+
+function getNewDevVersion(version: string) {
+  const versionArray = version.split('.')
+  const bump = Number(versionArray[2]) + 1
+  if (isNaN(bump)) return version
+  versionArray[2] = `${bump}`
+  return versionArray.join('.')
 }

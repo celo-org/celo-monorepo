@@ -1,4 +1,11 @@
 import {
+  EIP712Optional,
+  eip712OptionalType,
+  EIP712TypedData,
+  noString,
+} from '@celo/utils/lib/sign-typed-data-utils'
+import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+import {
   Domain,
   domainEIP712Types,
   DomainOptions,
@@ -6,40 +13,79 @@ import {
   KnownDomain,
   KnownDomainOptions,
   SequentialDelayDomain,
-} from '@celo/identity/lib/odis/domains'
-import {
-  EIP712Optional,
-  eip712OptionalType,
-  EIP712TypedData,
-  noString,
-} from '@celo/utils/lib/sign-typed-data-utils'
-import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+} from '../domains'
+
+export enum PhoneNumberPrivacyEndpoint {
+  STATUS = '/status',
+  METRICS = '/metrics',
+  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
+  GET_QUOTA = '/getQuota',
+}
+
+export enum DomainEndpoint {
+  DISABLE_DOMAIN = '/domain/disable',
+  DOMAIN_SIGN = '/domain/sign/',
+  DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
+}
+
+export type SignerEndpoint = PhoneNumberPrivacyEndpoint | DomainEndpoint
+export const SignerEndpoint = { ...PhoneNumberPrivacyEndpoint, ...DomainEndpoint }
+
+export enum CombinerEndpoint {
+  SIGN_MESSAGE = '/getBlindedMessageSig',
+  MATCHMAKING = '/getContactMatches',
+}
+
+export type Endpoint = SignerEndpoint | CombinerEndpoint
+export const Endpoint = { ...SignerEndpoint, ...CombinerEndpoint }
+
+export enum AuthenticationMethod {
+  WALLET_KEY = 'wallet_key',
+  ENCRYPTION_KEY = 'encryption_key',
+}
 
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */
   account: string
+  /** Authentication method to use for verifying the signature in the Authorization header */
+  authenticationMethod?: AuthenticationMethod
   /** Query message. A blinded elliptic curve point encoded in base64. */
   blindedQueryPhoneNumber: string
   /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
   hashedPhoneNumber?: string
   /** Client-specified session ID for the request. */
   sessionID?: string
+  /** Client-specified version string */
+  version?: string
 }
 
 export interface GetContactMatchesRequest {
   account: string
+  /** Authentication method to use for verifying the signature in the Authorization header */
+  authenticationMethod?: AuthenticationMethod
   userPhoneNumber: string // obfuscated with deterministic salt
   contactPhoneNumbers: string[] // obfuscated with deterministic salt
   hashedPhoneNumber: string // on-chain identifier
   signedUserPhoneNumber?: string // signed with DEK
   sessionID?: string
+  /** Client-specified version string */
+  version?: string
 }
 
 export interface GetQuotaRequest {
   account: string
+  /** Authentication method to use for verifying the signature in the Authorization header */
+  authenticationMethod?: AuthenticationMethod
   hashedPhoneNumber?: string // on-chain identifier
   sessionID?: string
+  /** Client-specified version string */
+  version?: string
 }
+
+export type PhoneNumberPrivacyRequest =
+  | GetBlindedMessageSigRequest
+  | GetContactMatchesRequest
+  | GetQuotaRequest
 
 /**
  * Domain restricted signature request to get a pOPRF evaluation on the given message in a given
@@ -240,7 +286,7 @@ function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
   request: R
 ): boolean {
   // If the address field is undefined, then this domain is unauthenticated.
-  // Return false as the signature cannot need to be checked.
+  // Return false as the signature cannot be checked.
   if (!request.domain.address.defined) {
     return false
   }
