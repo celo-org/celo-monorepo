@@ -372,46 +372,49 @@ data:
 {{- end -}}
 
 {{- define "common.node-health-check" -}}
-# fail if any wgets fail
-set -euo pipefail
-RPC_URL=http://localhost:8545
-MAX_LATEST_BLOCK_AGE_SECONDS="{{ .Values.geth.readiness_probe_max_block_age_seconds | default 30 }}"
-MAX_EPOCH_BLOCK_AGE_SECONDS="{{ .Values.geth.readiness_probe_max_block_epoch_age_seconds | default 300 }}"
-EPOCH_SIZE="{{ .Values.genesis.epoch_size | default 17280 }}"
-EPOCH_SIZE_LESS_ONE="$(( $EPOCH_SIZE - 1 ))"
+function isReady {
+  geth attach << EOF
 
-# first check if it's syncing
-SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
-NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
-if [ ! $NOT_SYNCING ]; then
-  echo "Node is syncing: $SYNCING"
-  exit 1
-fi
+    // last block max age in seconds
+    var maxAge = 20
+    // minimum peers to consider eth_syncing a good indicator for considering low chances of new block on chain
+    var minPeers = 30
 
-{{ if .Values.geth.fullnodeCheckBlockAge }}
-# then make sure that the latest block is new
-LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
-BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
-BLOCK_NUMBER_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"number":"[^"]*' | grep -o '[a-fA-F0-9]*$')
-BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
-BLOCK_NUMBER=$(( 16#$BLOCK_NUMBER_HEX ))
-CURRENT_TIMESTAMP=$(date +%s)
+    // getLastBlockAge() returns chain lastBlock age in seconds
+    function getLastBlockAge() {
+      var lastBlock = web3.eth.getBlockByNumber(web3.eth.blockNumber)
+      var blockTimestamp = parseInt(lastBlock.timestamp, 16)
+      var now = Math.floor(Date.now() / 1000)
+      return (now - blockTimestamp)
+    }
 
-# different age allowed for epoch and epoch+1 blocks
-BLOCK_EPOCH_DIFFERENCE=$(( BLOCK_NUMBER % EPOCH_SIZE ))
-case "$BLOCK_EPOCH_DIFFERENCE" in
-  0|$EPOCH_SIZE_LESS_ONE) ALLOWED_AGE="$MAX_EPOCH_BLOCK_AGE_SECONDS" ;;
-  *) ALLOWED_AGE="$MAX_LATEST_BLOCK_AGE_SECONDS" ;;
-esac
+    // isReady() determines if the node is ready to handle requests
+    // returns true if node is ready to handle requests, false elsewhere
+    function isReady(maxAge, minPeers) {
+      // If block was produced recently -> node is ready
+      if (getLastBlockAge() <= maxAge) {
+        return true
+      }
+      // First let's check if it's syncing. If node is syncing -> there is
+      // peers with blocks ahead from local head -> not ready
+      if (web3.eth.syncing) {
+          return false
+      }
+      // If node is not syncing, lets check the peers
+      if (web3.net.peerCount < minPeers) {
+          // Not enough peers -> Node may have just started -> Not ready
+          return false
+      }
+      // If peers > minPeers and not syncing -> We consider node as ready
+      return true
+    }
 
-# if the most recent block is too old, then indicate the node is not ready
-BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
-if [ $BLOCK_AGE_SECONDS -gt $ALLOWED_AGE ]; then
-  echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
-  exit 1
-fi
-exit 0
-{{- end }}
+    console.log(isReady(maxAge, minPeers))
+EOF
+}
+
+# Check if scripts prints true as readiness signal
+isReady | grep true
 {{- end }}
 
 {{- define "common.geth-exporter-container" -}}
