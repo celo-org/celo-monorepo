@@ -63,7 +63,7 @@ contract StableTokenRegistry is Initializable, Ownable {
 
   /**
    * @notice Removes unwamted token instances.
-   * @param fiatTicker The type of currency that is no longer supported.
+   * @param fiatTicker The currency that is no longer supported.
    * @param index The index in fiatTickers of fiatTicker.
    */
   function removeStableToken(string calldata fiatTicker, uint256 index) external onlyOwner {
@@ -84,8 +84,9 @@ contract StableTokenRegistry is Initializable, Ownable {
   }
 
   /**
-   * @notice Gives an address permission to spend Reserve without limit.
-   * @param fiatTicker The address that is allowed to spend Reserve funds.
+   * @notice Adds new Fiat Ticker and Stable Token contract to the registry.
+   * @param fiatTicker The currency we are trying to add in the registry.
+   * @param stableTokenContractName The contract we are trying to add in the registry.
    */
   function addNewStableToken(string calldata fiatTicker, string calldata stableTokenContractName)
     external
