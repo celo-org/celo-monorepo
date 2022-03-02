@@ -88,7 +88,7 @@ geth:
       partition: 0
       # maxUnavailable: 25%
       # maxSurge: 25%
-  maxpeers: 1500
+  maxpeers: 1150
   light:
     maxpeers: 1000
     serve: 70
