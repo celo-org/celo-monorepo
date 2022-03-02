@@ -292,9 +292,9 @@ contract LockedGold is
     require(getAccounts().isAccount(account), "Unknown account");
     require(index < balances[account].pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[index]);
-    value = pendingWithdrawal.value;
-    timestamp = pendingWithdrawal.timestamp;
-    
+    uint256 value = pendingWithdrawal.value;
+    uint256 timestamp = pendingWithdrawal.timestamp;
+
     return (value, timestamp);
   }
 
