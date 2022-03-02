@@ -36,6 +36,7 @@ export const ProxyContracts = [
   'StableTokenEURProxy',
   'StableTokenProxy',
   'SortedOraclesProxy',
+  'StableTokenRegistryProxy',
 ]
 export const CoreContracts = [
   // common
@@ -89,6 +90,7 @@ const OtherContracts = [
   // abstract
   'Initializable',
   'UsingRegistry',
+  'StableTokenRegistry',
 ]
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
