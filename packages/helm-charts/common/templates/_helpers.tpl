@@ -494,8 +494,8 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
       lastBlockTimestamp=$(timeout 600 geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --txpool.nolocals --exec "eth.getBlock(\"latest\").timestamp")
       day=$(date +%s)
       diff=$(($day - $lastBlockTimestamp))
-      # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
-      if [ "$diff" -gt 86400 ]; then
+      # If lastBlockTimestamp is older than 20 day old, pull the chaindata rather than using the current PVC.
+      if [ "$diff" -gt 1728000 ]; then
         echo Chaindata is more than one day out of date. Wiping existing chaindata.
         rm -rf /root/.celo/celo/chaindata
       else
