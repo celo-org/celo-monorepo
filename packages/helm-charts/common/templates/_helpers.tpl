@@ -409,12 +409,14 @@ function isReady {
       return true
     }
 
-    console.log(isReady(maxAge, minPeers))
+    if(isReady(maxAge, minPeers)) {
+      console.log('CELO BLOCKCHAIN IS READY')
+    }
 EOF
 }
 
 # Check if scripts prints true as readiness signal
-isReady | grep true
+isReady | grep 'CELO BLOCKCHAIN IS READY'
 {{- end }}
 
 {{- define "common.geth-exporter-container" -}}
