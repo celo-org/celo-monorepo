@@ -31,13 +31,13 @@ contract StableTokenRegistry is Initializable, Ownable {
     string[] calldata existingFiatTickers,
     string[] calldata existingStableTokenContractNames
   ) external initializer {
-    _transferOwnership(msg.sender);
     require(
       existingFiatTickers.length == existingStableTokenContractNames.length,
       "Array length mismatch"
     );
+    _transferOwnership(msg.sender);
     for (uint256 i = 0; i < existingFiatTickers.length; i++) {
-      stableTokens[fiatTickers[i]] = existingFiatTickers[i];
+      addNewStableToken(fiatTickers[i], existingFiatTickers[i]);
     }
   }
 
@@ -88,8 +88,8 @@ contract StableTokenRegistry is Initializable, Ownable {
    * @param fiatTicker The currency we are trying to add in the registry.
    * @param stableTokenContractName The contract we are trying to add in the registry.
    */
-  function addNewStableToken(string calldata fiatTicker, string calldata stableTokenContractName)
-    external
+  function addNewStableToken(string memory fiatTicker, string memory stableTokenContractName)
+    public
     onlyOwner
   {
     registry.getAddressForOrDie(keccak256(abi.encodePacked(stableTokenContractName)));
