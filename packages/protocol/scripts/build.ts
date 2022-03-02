@@ -79,6 +79,7 @@ export const CoreContracts = [
   'StableTokenEUR',
   'StableTokenBRL',
   'SortedOracles',
+  'StableTokenRegistry',
 
   // liquidity
   'GrandaMento',
@@ -90,7 +91,6 @@ const OtherContracts = [
   // abstract
   'Initializable',
   'UsingRegistry',
-  'StableTokenRegistry',
 ]
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
