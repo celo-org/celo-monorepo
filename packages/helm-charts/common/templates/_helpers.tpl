@@ -389,7 +389,7 @@ function isReady {
     }
 
     // isReady() determines if the node is ready to handle requests
-    // returns true if node is ready to handle requests, false elsewhere
+    // Prints 'CELO BLOCKCHAIN IS READY' if the node is ready
     function isReady(maxAge, minPeers) {
       // If block was produced recently -> node is ready
       if (getLastBlockAge() <= maxAge) {
@@ -409,12 +409,14 @@ function isReady {
       return true
     }
 
-    console.log(isReady(maxAge, minPeers))
+    if(isReady(maxAge, minPeers)) {
+      console.log('CELO BLOCKCHAIN IS READY')
+    }
 EOF
 }
 
-# Check if scripts prints true as readiness signal
-isReady | grep true
+# Check if scripts prints 'CELO BLOCKCHAIN IS READY' as readiness signal
+isReady | grep 'CELO BLOCKCHAIN IS READY'
 {{- end }}
 
 {{- define "common.geth-exporter-container" -}}
