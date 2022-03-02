@@ -33,9 +33,9 @@ export function respondWithError(
   const logger: Logger = res.locals.logger
 
   if (error in WarningMessage) {
-    logger.warn({ endpoint, error, statusCode, response }, 'Responding with warning')
+    logger.warn({ error, statusCode, response }, 'Responding with warning')
   } else {
-    logger.error({ endpoint, error, statusCode, response }, 'Responding with error')
+    logger.error({ error, statusCode, response }, 'Responding with error')
   }
 
   Counters.responses.labels(endpoint, statusCode.toString()).inc()
