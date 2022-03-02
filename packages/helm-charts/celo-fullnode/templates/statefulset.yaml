@@ -16,6 +16,12 @@ spec:
       resources:
         requests:
           storage: {{ .Values.storage.size }}
+      {{- if .Values.storage.snapshot.enabled | default false }}
+      dataSource:
+        apiGroup: snapshot.storage.k8s.io
+        kind: {{ .Values.storage.snapshot.kind | default "VolumeSnapshot" }}
+        name: {{ .Values.storage.snapshot.name | default "forno-snapshot" }}
+      {{- end }}
 {{ end }}
   podManagementPolicy: Parallel
   updateStrategy:
