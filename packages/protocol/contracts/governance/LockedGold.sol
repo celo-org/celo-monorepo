@@ -285,11 +285,12 @@ contract LockedGold is
   }
 
   /**
-   * @notice Returns the pending withdrawal at `index` from unlocked 
-   * gold for an account.
+   * @notice Returns the pending withdrawal at a given index for
+   * a given account.
    * @param account The address of the account.
    * @param index The index of the pending withdrawal.
-   * @return The value and timestamp for each pending withdrawal.
+   * @return The value of the pending withdrawal.
+   * @return The timestamp of the pending withdrawal.
    */
   function getPendingWithdrawal(address account, uint256 index)
     external
