@@ -81,7 +81,7 @@ contract LockedGold is
   * @return The storage, major, minor, and patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 3);
+    return (1, 1, 2, 0);
   }
 
   /**
@@ -284,6 +284,13 @@ contract LockedGold is
     return (values, timestamps);
   }
 
+  /**
+   * @notice Returns the pending withdrawal at `index` from unlocked 
+   * gold for an account.
+   * @param account The address of the account.
+   * @param index The index of the pending withdrawal.
+   * @return The value and timestamp for each pending withdrawal.
+   */
   function getPendingWithdrawal(address account, uint256 index)
     external
     view
@@ -292,10 +299,8 @@ contract LockedGold is
     require(getAccounts().isAccount(account), "Unknown account");
     require(index < balances[account].pendingWithdrawals.length, "Bad pending withdrawal index");
     PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[index]);
-    uint256 value = pendingWithdrawal.value;
-    uint256 timestamp = pendingWithdrawal.timestamp;
 
-    return (value, timestamp);
+    return (pendingWithdrawal.value, pendingWithdrawal.timestamp);
   }
 
   /**

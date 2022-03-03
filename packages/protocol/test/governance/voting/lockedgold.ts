@@ -189,7 +189,6 @@ contract('LockedGold', (accounts: string[]) => {
     const value = 1000
     let availabilityTime: BigNumber
     let resp: any
-    let index = 0
     describe('when there are no balance requirements', () => {
       beforeEach(async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
@@ -205,7 +204,7 @@ contract('LockedGold', (accounts: string[]) => {
 
         it('should add a pending withdrawal', async () => {
           // Get the first pending withdrawal.
-          const [val, timestamp] = await lockedGold.getPendingWithdrawal(account, index)
+          const [val, timestamp] = await lockedGold.getPendingWithdrawal(account, 0)
           assertEqualBN(val, value)
           assertEqualBN(timestamp, availabilityTime)
         })
