@@ -285,8 +285,7 @@ contract LockedGold is
   }
 
   /**
-   * @notice Returns the pending withdrawal at a given index for
-   * a given account.
+   * @notice Returns the pending withdrawal at a given index for a given account.
    * @param account The address of the account.
    * @param index The index of the pending withdrawal.
    * @return The value of the pending withdrawal.
