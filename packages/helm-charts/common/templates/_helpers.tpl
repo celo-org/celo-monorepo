@@ -120,7 +120,11 @@ fi
 
     # Taking local ip for natting (probably this means pod cannot have incomming connection from external LAN peers)
     if [[ -z $NAT_IP ]]; then
-      NAT_IP=$(cat /root/.celo/ipAddress)
+      if [[ -f /root/.celo/ipAddress]]; then
+        NAT_IP=$(cat /root/.celo/ipAddress)
+      else
+        NAT_IP=(hostname -i)
+      fi
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
 
@@ -179,7 +183,7 @@ fi
     PORT=$(echo $PORTS_PER_RID | cut -d ',' -f $((RID + 1)))
     {{- end }}
 
-    {{- include  "common.bootnode-flag-script" . | indent 4 }}
+    {{- include  "common.bootnode-flag-script" . | nindent 4 }}
 
     {{- if .extra_setup }}
     {{ .extra_setup | indent 4 }}
