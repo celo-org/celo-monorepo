@@ -116,7 +116,10 @@ fi
     NAT_FLAG=""
     if [[ ! -z $IP_ADDRESSES ]]; then
       NAT_IP=$(echo "$IP_ADDRESSES" | awk -v RID=$(expr "$RID" + "1") '{split($0,a,","); print a[RID]}')
-    else
+    fi
+
+    # Taking local ip for natting (probably this means pod cannot have incomming connection from external LAN peers)
+    if [[ -z $NAT_IP ]]; then
       NAT_IP=$(cat /root/.celo/ipAddress)
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
@@ -176,9 +179,11 @@ fi
     PORT=$(echo $PORTS_PER_RID | cut -d ',' -f $((RID + 1)))
     {{- end }}
 
-    {{- include  "common.bootnode-flag-script" . | nindent 4 }}
+    {{- include  "common.bootnode-flag-script" . | indent 4 }}
 
-    {{ default "# No extra setup" .extra_setup | nindent 4 | trim }}
+    {{- if .extra_setup }}
+    {{ .extra_setup | indent 4 }}
+    {{- end }}
 
     exec geth \
       --port $PORT \
