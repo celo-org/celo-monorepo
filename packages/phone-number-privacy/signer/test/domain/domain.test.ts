@@ -7,12 +7,15 @@ import {
   DisableDomainRequest,
   SequentialDelayDomain,
 } from '@celo/phone-number-privacy-common'
-import { instance, mock, reset, verify, when } from 'ts-mockito'
-import { beforeEach } from 'jest-circus'
-import { DomainService } from '../../src/domain/domain.service'
 import { Request, Response } from 'express'
+import { instance, mock, reset, verify, when } from 'ts-mockito'
+import config, { SupportedDatabase } from '../../src/config'
+import { closeDatabase, initDatabase } from '../../src/database/database'
+import { DomainService } from '../../src/domain/domain.service'
 import { DomainAuthService } from '../../src/domain/auth/domainAuth.service'
 import { DomainQuotaService } from '../../src/domain/quota/domainQuota.service'
+
+config.db.type = SupportedDatabase.Sqlite
 
 describe('domainService', () => {
   const requestMock = mock<Request>()
@@ -75,11 +78,16 @@ describe('domainService', () => {
     response.locals = { logger: { warn: jest.fn(), error: jest.fn(), info: jest.fn() } }
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await initDatabase()
     reset(authServiceMock)
     reset(quotaServiceMock)
     reset(responseMock)
     reset(requestMock)
+  })
+
+  afterEach(async () => {
+    await closeDatabase()
   })
 
   describe('.handleDisableDomain', () => {
