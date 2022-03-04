@@ -203,10 +203,10 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should add a pending withdrawal', async () => {
-          // Get the first pending withdrawal.
           const [val, timestamp] = await lockedGold.getPendingWithdrawal(account, 0)
           assertEqualBN(val, value)
           assertEqualBN(timestamp, availabilityTime)
+          await assertRevert(lockedGold.getPendingWithdrawal(account, 1))
         })
 
         it("should decrease the account's nonvoting locked gold balance", async () => {
