@@ -1,5 +1,3 @@
-import { hexToBuffer } from '@celo/base'
-import { ec as EC } from 'elliptic'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getBlindedPhoneNumber,
@@ -9,13 +7,7 @@ import {
   getPhoneNumberIdentifierFromSignature,
   isBalanceSufficientForSigRetrieval,
 } from './phone-number-identifier'
-import {
-  AuthenticationMethod,
-  CustomSigner,
-  EncryptionKeySigner,
-  ErrorMessages,
-  ServiceContext,
-} from './query'
+import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
 
 jest.mock('./bls-blinding-client', () => {
   // tslint:disable-next-line:no-shadowed-variable
@@ -27,8 +19,6 @@ jest.mock('./bls-blinding-client', () => {
     WasmBlsBlindingClient,
   }
 })
-
-const ec = new EC('secp256k1')
 
 const mockE164Number = '+14155550000'
 const mockAccount = '0x0000000000000000000000000000000000007E57'
@@ -77,32 +67,6 @@ describe(getPhoneNumberIdentifier, () => {
       })
     })
 
-    it('Using CustomSigner', async () => {
-      fetchMock.mock(endpoint, {
-        success: true,
-        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
-      })
-
-      const customSignerMethod = jest.fn((bodyString) => {
-        const key = ec.keyFromPrivate(hexToBuffer(rawKey))
-        return Promise.resolve(JSON.stringify(key.sign(bodyString).toDER()))
-      })
-      const customSigner: CustomSigner = {
-        authenticationMethod: AuthenticationMethod.CUSTOM_SIGNER,
-        customSigner: customSignerMethod,
-      }
-
-      await expect(
-        getPhoneNumberIdentifier(mockE164Number, mockAccount, customSigner, serviceContext)
-      ).resolves.toMatchObject({
-        e164Number: mockE164Number,
-        pepper: expectedPepper,
-        phoneHash: expectedPhoneHash,
-      })
-
-      expect(customSignerMethod.mock.calls.length).toBe(1)
-    })
-
     it('Preblinding the phone number', async () => {
       fetchMock.mock(endpoint, {
         success: true,
@@ -149,7 +113,7 @@ describe(getPhoneNumberIdentifier, () => {
 describe(getPepperFromThresholdSignature, () => {
   it('Hashes sigs correctly', () => {
     const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
-    const signature = new Buffer(base64Sig, 'base64')
+    const signature = Buffer.from(base64Sig, 'base64')
     expect(getPepperFromThresholdSignature(signature)).toBe('piWqRHHYWtfg9')
   })
 })

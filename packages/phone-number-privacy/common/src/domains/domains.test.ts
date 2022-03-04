@@ -6,15 +6,9 @@ import {
   noNumber,
   noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
-import {
-  Domain,
-  domainEIP712,
-  DomainOptions,
-  KnownDomain,
-  KnownDomainOptions,
-  SequentialDelayDomain,
-  SequentialDelayDomainOptions,
-} from './domains'
+import { DomainIdentifiers } from './constants'
+import { Domain, domainEIP712, DomainOptions, KnownDomain, KnownDomainOptions } from './domains'
+import { SequentialDelayDomain, SequentialDelayDomainOptions } from './sequential-delay'
 
 // Compile-time check that Domain can be cast to type EIP712Object
 export const TEST_DOMAIN_IS_EIP712: EIP712Object = ({} as unknown) as Domain
@@ -36,7 +30,7 @@ TEST_KNOWN_DOMAIN_DOMAIN_OPTIONS_ARE_DOMAIN_OPTIONS = ({} as unknown) as KnownDo
 describe('domainEIP712()', () => {
   it('should generate the correct type data for SequentialDelayDomain instance', () => {
     const domain: SequentialDelayDomain = {
-      name: 'ODIS Sequential Delay Domain',
+      name: DomainIdentifiers.SequentialDelay,
       version: '1',
       stages: [
         { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: noNumber },

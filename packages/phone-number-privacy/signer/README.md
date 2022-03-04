@@ -37,6 +37,7 @@ The service needs a connection to a full node in order to access chain state. Th
 This could be a node with RPC set up. Preferably this would be an node dedicated to this service. Alternatively, the public Forno endpoints can be used but their uptime guarantees are not as strong. For development with Alfajores, the forno url is `https://alfajores-forno.celo-testnet.org`. For Mainnet, it would be `https://forno.celo.org`
 
 - `BLOCKCHAIN_PROVIDER` - The blockchain node provider for chain state access. `
+- `BLOCKCHAIN_API_KEY` - Optional API key to be added to the authentication header. `
 
 ### Security
 

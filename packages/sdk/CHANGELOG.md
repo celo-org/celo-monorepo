@@ -18,6 +18,7 @@ Bug Fixes
 
 Other Changes
 -  one-line summary - [#](link PR)
+-  migrated @celo/wallet-walletconnect from celo/celo-monorepo to celo/use-contractkit
 
 ## Published
 

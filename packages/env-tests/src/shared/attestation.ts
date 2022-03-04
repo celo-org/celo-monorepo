@@ -8,8 +8,8 @@ import {
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { OdisUtils } from '@celo/identity'
 import { AuthSigner } from '@celo/identity/lib/odis/query'
-import { AttestationRequest, PhoneNumberUtils } from '@celo/phone-utils'
-import { AttestationUtils } from '@celo/utils'
+import { AttestationRequest } from '@celo/phone-utils/lib/io'
+import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
 import Logger from 'bunyan'
 import { sample } from 'lodash'
@@ -41,6 +41,7 @@ export async function requestAttestationsFromIssuers(
         smsRetrieverAppSig: undefined,
         securityCodePrefix: securityCode ? getSecurityCodePrefix(attestation.issuer) : undefined,
         language: undefined,
+        phoneNumberSignature: undefined,
       }
 
       const response = await attestations.revealPhoneNumberToIssuer(

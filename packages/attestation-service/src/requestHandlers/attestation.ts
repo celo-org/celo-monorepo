@@ -1,14 +1,20 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
+import { getPepperFromThresholdSignature } from '@celo/identity/lib/odis/phone-number-identifier'
 import { PhoneNumberUtils } from '@celo/phone-utils'
 import { AttestationRequest } from '@celo/phone-utils/lib/io'
-import { AttestationUtils } from '@celo/utils'
+import { AttestationUtils, OdisUtils } from '@celo/utils'
 import { eqAddress } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
 import Logger from 'bunyan'
 import { randomBytes } from 'crypto'
 import express from 'express'
 import { findAttestationByKey, makeSequelizeLogger, SequelizeLogger, useKit } from '../db'
-import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
+import {
+  fetchEnvOrDefault,
+  getAccountAddress,
+  getAttestationSignerAddress,
+  isDevMode,
+} from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError, Response } from '../request'
@@ -17,6 +23,11 @@ import { obfuscateNumber } from '../sms/base'
 
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
+export const INVALID_SIGNATURE_ERROR = 'Signature is invalid'
+
+const odisPubKey = OdisUtils.Query.getServiceContext(fetchEnvOrDefault('NETWORK', 'mainnet'))
+  .odisPubKey
+const thresholdBls = require('blind-threshold-bls')
 
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
@@ -78,6 +89,8 @@ class AttestationRequestHandler {
     const attestation = await findAttestationByKey(this.key, {
       logging: this.sequelizeLogger,
     })
+
+    await this.verifyPepperIfApplicable()
 
     // Re-requests for existing attestations skip the on-chain check.
     if (attestation) {
@@ -221,6 +234,31 @@ class AttestationRequestHandler {
     }
 
     return attestation
+  }
+
+  private async verifyPepperIfApplicable(): Promise<void> {
+    if (this.attestationRequest.phoneNumberSignature && this.attestationRequest.salt) {
+      const sigBuf = Buffer.from(this.attestationRequest.phoneNumberSignature, 'base64')
+
+      try {
+        await thresholdBls.verify(
+          Buffer.from(odisPubKey, 'base64'),
+          Buffer.from(this.attestationRequest.phoneNumber, 'base64'),
+          sigBuf
+        )
+
+        const pepper = getPepperFromThresholdSignature(sigBuf)
+        if (pepper !== this.attestationRequest.salt) {
+          this.logger.error('Pepper is invalid')
+          // temporarily only silently fail, so as not to block users
+          // throw new ErrorWithResponse('Pepper is invalid', 422)
+        }
+      } catch (e) {
+        this.logger.error('Cannot get phone number from signature', e)
+        throw new ErrorWithResponse(INVALID_SIGNATURE_ERROR, 422)
+      }
+    }
+    Counters.attestationRequestsDidNotProvideSignature.inc()
   }
 }
 
