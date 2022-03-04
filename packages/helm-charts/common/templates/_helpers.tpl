@@ -124,6 +124,7 @@ fi
         NAT_IP=$(cat /root/.celo/ipAddress)
       else
         NAT_IP=(hostname -i)
+      fi
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
 
