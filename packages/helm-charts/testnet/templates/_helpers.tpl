@@ -53,7 +53,7 @@ metadata:
 {{- end }}
     component: {{ .component_label }}
 spec:
-  sessionAffinity: ClientIP
+  sessionAffinity: None
   ports:
   - port: 8545
     name: rpc
@@ -174,7 +174,7 @@ spec:
       - name: account
         secret:
           secretName: {{ template "common.fullname" . }}-geth-account
-{{- end -}}
+{{- end -}}s
 
 {{- /* This template puts a semicolon-separated pair of proxy enodes into $PROXY_ENODE_URL_PAIR. */ -}}
 {{- /* I.e <internal enode>;<external enode>. */ -}}
