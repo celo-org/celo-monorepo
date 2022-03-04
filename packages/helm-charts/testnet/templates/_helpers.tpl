@@ -174,7 +174,7 @@ spec:
       - name: account
         secret:
           secretName: {{ template "common.fullname" . }}-geth-account
-{{- end -}}s
+{{- end -}}
 
 {{- /* This template puts a semicolon-separated pair of proxy enodes into $PROXY_ENODE_URL_PAIR. */ -}}
 {{- /* I.e <internal enode>;<external enode>. */ -}}
