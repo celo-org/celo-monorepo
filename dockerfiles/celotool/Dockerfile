@@ -33,6 +33,7 @@ COPY packages/sdk/wallets/wallet-local/package.json packages/sdk/wallets/wallet-
 COPY packages/typescript/package.json packages/typescript/
 COPY patches/ patches/
 COPY scripts/ scripts/
+COPY packages/sdk/phone-utils/package.json packages/sdk/phone-utils/package.json
 
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 
@@ -54,6 +55,7 @@ COPY packages/sdk/utils packages/sdk/utils/
 COPY packages/sdk/wallets/wallet-base packages/sdk/wallets/wallet-base/
 COPY packages/sdk/wallets/wallet-local packages/sdk/wallets/wallet-local/
 COPY packages/typescript packages/typescript/
+COPY packages/sdk/phone-utils packages/sdk/phone-utils/
 
 RUN yarn build
 

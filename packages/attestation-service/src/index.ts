@@ -2,7 +2,7 @@ import {
   AttestationRequestType,
   AttestationServiceTestRequestType,
   GetAttestationRequestType,
-} from '@celo/utils/lib/io'
+} from '@celo/phone-utils/lib/io'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
 import requestIdMiddleware from 'express-request-id'
