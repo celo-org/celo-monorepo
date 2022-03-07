@@ -224,7 +224,7 @@ fi
       - /bin/sh
       - "-c"
       - |
-{{ include "common.node-health-check" . | indent 8 }}
+{{ include "common.node-health-check" (dict "maxpeers" .maxpeers "light_maxpeers" .light_maxpeers ) | indent 8 }}
     initialDelaySeconds: 20
     periodSeconds: 10
 {{- end }}
@@ -375,10 +375,22 @@ data:
 function isReady {
   geth attach << EOF
 
+    // Deployment configuration
+    var maxpeers = {{ .maxpeers | default 1150 }}
+    var lightpeers = {{ .light_maxpeers | default 1000 }}
+
+    // minimum peers to consider eth_syncing a good indicator for considering low chances of new block on chain
+    // With current dial ratio a node will try to open connections to (maxpeers - lightpeers)/3 peers.
+    // Consider 1/5 of (maxpeers - lightpeers) as reference value for peers, with a minimum of 5.
+    var minPeers = (maxpeers - lightpeers) * 0.2
+    if (minPeers > 30) {
+      minPeers = 30
+    } else if (minPeers < 5) {
+      minPeers = 5
+    }
+
     // last block max age in seconds
     var maxAge = 20
-    // minimum peers to consider eth_syncing a good indicator for considering low chances of new block on chain
-    var minPeers = 30
 
     // getLastBlockAge() returns chain lastBlock age in seconds
     function getLastBlockAge() {
