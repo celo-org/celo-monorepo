@@ -165,7 +165,7 @@ export type DomainRequest<D extends Domain = Domain> =
   | DisableDomainRequest<D>
 
 // NOTE: Next three functions are a bit repetitive. An attempt was made to combine them, but the
-// type signature got quite complicated. Feel free to attempt it if you are motivated.
+// type signature got quite complicated. Feel free to attempt it if you are motivated. TODO(Alec)
 
 /** Parameterized schema for checking unknown input against DomainRestrictedSignatureRequest */
 export function domainRestrictedSignatureRequestSchema<D extends Domain = Domain>(

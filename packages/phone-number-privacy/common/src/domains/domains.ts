@@ -20,8 +20,8 @@ import {
  *
  * @remarks Additional domain types should be added to this type union as they are standardized.
  *
- * All new Domain types must be contain the fields { name: string, version: string }. Domain types
- * may have additional fields, which must assignable to EIP712Value. See CIP-40 for more details:
+ * All new Domain types must contain the fields { name: string, version: string }. Domain types
+ * may have additional fields, which must be assignable to EIP712Value. See CIP-40 for more details:
  *
  * https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0040.md#extension-for-domain-restricted-requests
  */
