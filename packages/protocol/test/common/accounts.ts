@@ -487,12 +487,53 @@ contract('Accounts', (accounts: string[]) => {
         )
       })
 
+      it('should not allow a beneficiary with address 0x0', async () => {
+        await assertRevertWithReason(
+          accountsInstance.setPaymentDelegation(NULL_ADDRESS, fraction),
+          'Beneficiary cannot be address 0x0'
+        )
+      })
+
       it('emits a PaymentDelegationSet event', async () => {
         const resp = await accountsInstance.setPaymentDelegation(beneficiary, fraction)
         assertLogMatches2(resp.logs[0], {
           event: 'PaymentDelegationSet',
           args: { beneficiary, fraction },
         })
+      })
+    })
+  })
+
+  describe('#deletePaymentDelegation', () => {
+    const beneficiary = accounts[1]
+    const fraction = toFixed(0.2)
+
+    beforeEach(async () => {
+      await accountsInstance.createAccount()
+      await accountsInstance.setPaymentDelegation(beneficiary, fraction)
+    })
+
+    it('should not be callable by a non-account', async () => {
+      await assertRevertWithReason(
+        accountsInstance.setPaymentDelegation(beneficiary, fraction, { from: accounts[2] }),
+        'Not an account'
+      )
+    })
+
+    it('should set the address and beneficiary to 0', async () => {
+      await accountsInstance.deletePaymentDelegation()
+      const [realBeneficiary, realFraction] = await accountsInstance.getPaymentDelegation.call(
+        accounts[0]
+      )
+      assert.equal(realBeneficiary, NULL_ADDRESS)
+      assertEqualBN(realFraction, new BigNumber(0))
+    })
+
+    it('emits a PaymentDelegationSet event', async () => {
+      const resp = await accountsInstance.deletePaymentDelegation()
+      assertLogMatches2(resp.logs[0], {
+        event: 'PaymentDelegationSet',
+        args: { beneficiary: NULL_ADDRESS, fraction: new BigNumber(0) },
       })
     })
   })
