@@ -376,8 +376,8 @@ function isReady {
   geth attach << EOF
 
     // Deployment configuration
-    var maxpeers = {{ .maxpeers | default 1150 }}
-    var lightpeers = {{ .light_maxpeers | default 1000 }}
+    var maxpeers = {{ required "maxpeers is required" .maxpeers }}
+    var lightpeers = {{ required "light_maxpeers is required"  .light_maxpeers }}
 
     // minimum peers to consider eth_syncing a good indicator for considering low chances of new block on chain
     // With current dial ratio a node will try to open connections to (maxpeers - lightpeers)/3 peers.
