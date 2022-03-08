@@ -323,13 +323,25 @@ contract Accounts is
    * @param fraction The fraction of the validator's payment that should be
    * diverted to `beneficiary` every epoch, given as FixidyLib value. Must not
    * be greater than 1.
+   * @dev Use `deletePaymentDelegation` to unset the payment delegation.
    */
   function setPaymentDelegation(address beneficiary, uint256 fraction) public {
     require(isAccount(msg.sender), "Not an account");
+    require(beneficiary != address(0), "Beneficiary cannot be address 0x0");
     FixidityLib.Fraction memory f = FixidityLib.wrap(fraction);
     require(f.lte(FixidityLib.fixed1()), "Fraction must not be greater than 1");
     paymentDelegations[msg.sender] = PaymentDelegation(beneficiary, f);
     emit PaymentDelegationSet(beneficiary, fraction);
+  }
+
+  /**
+   * @notice Removes a validator's payment delegation by setting benficiary and
+   * fraction to 0.
+   */
+  function deletePaymentDelegation() public {
+    require(isAccount(msg.sender), "Not an account");
+    paymentDelegations[msg.sender] = PaymentDelegation(address(0x0), FixidityLib.wrap(0));
+    emit PaymentDelegationSet(address(0x0), 0);
   }
 
   /**
