@@ -8,6 +8,9 @@ on:
         description: 'Network to run env-tests against.  Possible values are (staging|baklava|alfajores|mainnet)'
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   env-tests:
     runs-on: ubuntu-latest
