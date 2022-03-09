@@ -207,6 +207,7 @@ fi
       --vmodule={{ .Values.geth.vmodule }} \
       --datadir=/root/.celo \
       --ipcpath=geth.ipc \
+      --txlookuplimit {{ .Values.geth.txlookuplimit | default 0 }} \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
