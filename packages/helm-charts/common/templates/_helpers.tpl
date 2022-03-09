@@ -123,7 +123,7 @@ fi
       if [[ -f /root/.celo/ipAddress]]; then
         NAT_IP=$(cat /root/.celo/ipAddress)
       else
-        NAT_IP=(hostname -i)
+        NAT_IP=$(hostname -i)
       fi
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
@@ -207,6 +207,7 @@ fi
       --vmodule={{ .Values.geth.vmodule }} \
       --datadir=/root/.celo \
       --ipcpath=geth.ipc \
+      --txlookuplimit {{ .Values.geth.txlookuplimit | default 0 }} \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
