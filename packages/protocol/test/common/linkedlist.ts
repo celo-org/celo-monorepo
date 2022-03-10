@@ -1,4 +1,4 @@
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertRevert, assertRevertWithReason } from '@celo/protocol/lib/test-utils'
 import { LinkedListTestContract, LinkedListTestInstance } from 'types'
 
 const LinkedListTest: LinkedListTestContract = artifacts.require('LinkedListTest')
@@ -76,6 +76,52 @@ contract('LinkedListTest', () => {
 
       it('should revert if next and previous equal to key', async () => {
         await assertRevert(linkedListTest.insert(addedKey, addedKey, addedKey))
+      })
+    })
+  })
+
+  describe('#remove()', () => {
+    const NULL_KEY = '0x00' + '00'.repeat(31)
+    const firstKey = '0x01' + '00'.repeat(31)
+    const middleKey = '0x02' + '00'.repeat(31)
+    const lastKey = '0x03' + '00'.repeat(31)
+    const keys = [firstKey, middleKey, lastKey]
+
+    describe('removing from an empty list', () => {
+      it('should revert', async () => {
+        await assertRevertWithReason(linkedListTest.remove(firstKey), 'key not in list')
+      })
+    })
+
+    describe('when removing from a list with more items', () => {
+      beforeEach(async () => {
+        await linkedListTest.insert(firstKey, NULL_KEY, NULL_KEY)
+        for (let i = 1; i < keys.length; i++) {
+          await linkedListTest.insert(keys[i], keys[i - 1], NULL_KEY)
+        }
+      })
+
+      it('should remove the first element', async () => {
+        await linkedListTest.remove(firstKey)
+        const exists = await linkedListTest.contains(firstKey)
+        assert.isFalse(exists)
+      })
+
+      it('should end with the middle element at head', async () => {
+        await linkedListTest.remove(firstKey)
+        const tail = await linkedListTest.tail()
+        assert.equal(tail, middleKey)
+      })
+
+      it('should reduce the number of list elements', async () => {
+        await linkedListTest.remove(firstKey)
+        const numElements = await linkedListTest.getNumElements()
+        assert.equal(numElements.toNumber(), 2)
+      })
+
+      it('should revert when attempting to remove a removed element', async () => {
+        await linkedListTest.remove(firstKey)
+        await assertRevertWithReason(linkedListTest.remove(firstKey), 'key not in list')
       })
     })
   })
