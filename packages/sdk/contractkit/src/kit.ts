@@ -30,7 +30,6 @@ import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
-
 import Types = require('web3-providers-http')
 export type HttpProviderOptions = Types.HttpProviderOptions
 export const API_KEY_HEADER_KEY = 'apiKey'
@@ -114,10 +113,10 @@ export class ContractKit {
   gasPriceSuggestionMultiplier = 5
 
   constructor(readonly connection: Connection) {
-    this.registry = new AddressRegistry(this)
-    this._web3Contracts = new Web3ContractCache(this)
-    this.contracts = new WrapperCache(this)
-    this.celoTokens = new CeloTokens(this)
+    this.registry = new AddressRegistry(connection)
+    this._web3Contracts = new Web3ContractCache(this.connection)
+    this.contracts = new WrapperCache(connection, this._web3Contracts, this.registry)
+    this.celoTokens = new CeloTokens(this.contracts, this.registry)
   }
 
   getWallet() {
@@ -215,40 +214,22 @@ export class ContractKit {
 
   async getEpochSize(): Promise<number> {
     const validators = await this.contracts.getValidators()
-    const epochSize = await validators.getEpochSize()
-
-    return epochSize.toNumber()
+    return validators.getEpochSizeNumber()
   }
 
   async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSize()
-    // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    if (epochNumber === 0) {
-      // No first block for epoch 0
-      return 0
-    }
-    return (epochNumber - 1) * epochSize + 1
+    const validators = await this.contracts.getValidators()
+    return validators.getFirstBlockNumberForEpoch(epochNumber)
   }
 
   async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSize()
-    // Follows GetEpochLastBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    if (epochNumber === 0) {
-      return 0
-    }
-    const firstBlockNumberForEpoch = await this.getFirstBlockNumberForEpoch(epochNumber)
-    return firstBlockNumberForEpoch + (epochSize - 1)
+    const validators = await this.contracts.getValidators()
+    return validators.getLastBlockNumberForEpoch(epochNumber)
   }
 
   async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSize()
-    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    const epochNumber = Math.floor(blockNumber / epochSize)
-    if (blockNumber % epochSize === 0) {
-      return epochNumber
-    } else {
-      return epochNumber + 1
-    }
+    const validators = await this.contracts.getValidators()
+    return validators.getEpochNumberOfBlock(blockNumber)
   }
 
   // *** NOTICE ***

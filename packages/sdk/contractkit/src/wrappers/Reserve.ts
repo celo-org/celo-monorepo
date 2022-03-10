@@ -36,8 +36,8 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
     fixidityValueToBigNumber
   )
   isSpender: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isSpender)
-  transferGold = proxySend(this.kit, this.contract.methods.transferGold)
-  getOrComputeTobinTax = proxySend(this.kit, this.contract.methods.getOrComputeTobinTax)
+  transferGold = proxySend(this.connection, this.contract.methods.transferGold)
+  getOrComputeTobinTax = proxySend(this.connection, this.contract.methods.getOrComputeTobinTax)
   frozenReserveGoldStartBalance = proxyCall(
     this.contract.methods.frozenReserveGoldStartBalance,
     undefined,
@@ -71,7 +71,7 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   getAssetAllocationSymbols = proxyCall(
     this.contract.methods.getAssetAllocationSymbols,
     undefined,
-    (symbols) => symbols.map(this.kit.web3.utils.hexToAscii)
+    (symbols) => symbols.map(this.connection.web3.utils.hexToAscii)
   )
 
   /**

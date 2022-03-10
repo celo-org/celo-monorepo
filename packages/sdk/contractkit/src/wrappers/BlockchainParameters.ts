@@ -31,7 +31,7 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
    * Setting the extra intrinsic gas for transactions, where gas is paid using non-gold currency.
    */
   setIntrinsicGasForAlternativeFeeCurrency = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.setIntrinsicGasForAlternativeFeeCurrency
   )
 
@@ -43,7 +43,7 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
   /**
    * Setting the block gas limit.
    */
-  setBlockGasLimit = proxySend(this.kit, this.contract.methods.setBlockGasLimit)
+  setBlockGasLimit = proxySend(this.connection, this.contract.methods.setBlockGasLimit)
 
   /**
    * Get minimum client version.
@@ -60,7 +60,10 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
   /**
    * Set minimum client version.
    */
-  setMinimumClientVersion = proxySend(this.kit, this.contract.methods.setMinimumClientVersion)
+  setMinimumClientVersion = proxySend(
+    this.connection,
+    this.contract.methods.setMinimumClientVersion
+  )
 
   /**
    * Returns current configuration parameters.
@@ -84,5 +87,8 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
   /**
    * Setting the uptime lookback window.
    */
-  setUptimeLookbackWindow = proxySend(this.kit, this.contract.methods.setUptimeLookbackWindow)
+  setUptimeLookbackWindow = proxySend(
+    this.connection,
+    this.contract.methods.setUptimeLookbackWindow
+  )
 }

@@ -12,12 +12,12 @@ import { keccak256 } from 'web3-utils'
 import { Accounts } from '../generated/Accounts'
 import { newContractVersion } from '../versions'
 import {
-  BaseWrapper,
   proxyCall,
   proxySend,
   solidityBytesToString,
   stringToSolidityBytes,
 } from '../wrappers/BaseWrapper'
+import { VotableBaseWrapper } from './VotableBaseWrapper'
 
 interface AccountSummary {
   address: string
@@ -35,13 +35,13 @@ interface AccountSummary {
 /**
  * Contract for handling deposits needed for voting.
  */
-export class AccountsWrapper extends BaseWrapper<Accounts> {
+export class AccountsWrapper extends VotableBaseWrapper<Accounts> {
   private RELEASE_4_VERSION = newContractVersion(1, 1, 2, 0)
 
   /**
    * Creates an account.
    */
-  createAccount = proxySend(this.kit, this.contract.methods.createAccount)
+  createAccount = proxySend(this.connection, this.contract.methods.createAccount)
 
   /**
    * Returns the attestation signer for the specified account.
@@ -165,7 +165,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.authorizeAttestationSigner(
         signer,
         proofOfSigningKeyPossession.v,
@@ -185,7 +185,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.authorizeVoteSigner(
         signer,
         proofOfSigningKeyPossession.v,
@@ -205,11 +205,10 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     signer: Address,
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    const validators = await this.kit.contracts.getValidators()
-    const account =
-      this.kit.connection.defaultAccount || (await this.kit.connection.getAccounts())[0]
+    const validators = await this.contracts.getValidators()
+    const account = this.connection.defaultAccount || (await this.connection.getAccounts())[0]
     if (await validators.isValidator(account)) {
-      const message = this.kit.connection.web3.utils.soliditySha3({
+      const message = this.connection.web3.utils.soliditySha3({
         type: 'address',
         value: account,
       })!
@@ -221,7 +220,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
         proofOfSigningKeyPossession.s
       )
       return toTransactionObject(
-        this.kit.connection,
+        this.connection,
         this.contract.methods.authorizeValidatorSignerWithPublicKey(
           signer,
           proofOfSigningKeyPossession.v,
@@ -232,7 +231,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       )
     } else {
       return toTransactionObject(
-        this.kit.connection,
+        this.connection,
         this.contract.methods.authorizeValidatorSigner(
           signer,
           proofOfSigningKeyPossession.v,
@@ -259,9 +258,8 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     blsPublicKey: string,
     blsPop: string
   ): Promise<CeloTransactionObject<void>> {
-    const account =
-      this.kit.connection.defaultAccount || (await this.kit.connection.getAccounts())[0]
-    const message = this.kit.connection.web3.utils.soliditySha3({
+    const account = this.connection.defaultAccount || (await this.connection.getAccounts())[0]
+    const message = this.connection.web3.utils.soliditySha3({
       type: 'address',
       value: account,
     })!
@@ -273,7 +271,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       proofOfSigningKeyPossession.s
     )
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.authorizeValidatorSignerWithKeys(
         signer,
         proofOfSigningKeyPossession.v,
@@ -289,11 +287,11 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   async authorizeSigner(signer: Address, role: string) {
     await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     const [accounts, chainId, accountsContract] = await Promise.all([
-      this.kit.connection.getAccounts(),
-      this.kit.connection.chainId(),
-      this.kit.contracts.getAccounts(),
+      this.connection.getAccounts(),
+      this.connection.chainId(),
+      this.contracts.getAccounts(),
     ])
-    const account = this.kit.connection.defaultAccount || accounts[0]
+    const account = this.connection.defaultAccount || accounts[0]
 
     const hashedRole = keccak256(role)
     const typedData = buildAuthorizeSignerTypedData({
@@ -304,9 +302,9 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       accountsContractAddress: accountsContract.address,
     })
 
-    const sig = await this.kit.connection.signTypedData(signer, typedData)
+    const sig = await this.connection.signTypedData(signer, typedData)
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.authorizeSignerWithSignature(signer, hashedRole, sig.v, sig.r, sig.s)
     )
   }
@@ -314,7 +312,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   async startSignerAuthorization(signer: Address, role: string) {
     await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.authorizeSigner(signer, keccak256(role))
     )
   }
@@ -322,7 +320,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   async completeSignerAuthorization(account: Address, role: string) {
     await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.completeSignerAuthorization(account, keccak256(role))
     )
   }
@@ -331,7 +329,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     return this.getParsedSignatureOfAddress(
       account,
       signer,
-      NativeSigner(this.kit.connection.web3.eth.sign, signer)
+      NativeSigner(this.connection.web3.eth.sign, signer)
     )
   }
 
@@ -374,7 +372,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param encryptionKey The key to set
    */
   setAccountDataEncryptionKey = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.setAccountDataEncryptionKey
   )
 
@@ -393,7 +391,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   ): CeloTransactionObject<void> {
     if (proofOfPossession) {
       return toTransactionObject(
-        this.kit.connection,
+        this.connection,
         this.contract.methods.setAccount(
           name,
           // @ts-ignore
@@ -406,7 +404,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       )
     } else {
       return toTransactionObject(
-        this.kit.connection,
+        this.connection,
         this.contract.methods.setAccount(
           name,
           // @ts-ignore
@@ -424,13 +422,13 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * Sets the name for the account
    * @param name The name to set
    */
-  setName = proxySend(this.kit, this.contract.methods.setName)
+  setName = proxySend(this.connection, this.contract.methods.setName)
 
   /**
    * Sets the metadataURL for the account
    * @param url The url to set
    */
-  setMetadataURL = proxySend(this.kit, this.contract.methods.setMetadataURL)
+  setMetadataURL = proxySend(this.connection, this.contract.methods.setMetadataURL)
 
   /**
    * Sets the wallet address for the account
@@ -442,7 +440,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   ): CeloTransactionObject<void> {
     if (proofOfPossession) {
       return toTransactionObject(
-        this.kit.connection,
+        this.connection,
         this.contract.methods.setWalletAddress(
           walletAddress,
           proofOfPossession.v,
@@ -452,7 +450,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
       )
     } else {
       return toTransactionObject(
-        this.kit.connection,
+        this.connection,
         this.contract.methods.setWalletAddress(walletAddress, '0x0', '0x0', '0x0')
       )
     }

@@ -5,7 +5,7 @@ import { promisify } from 'util'
 import { ContractKit } from '../..'
 import { IdentityMetadataWrapper } from '../metadata'
 import { AccountClaim } from './account'
-import { Claim, DOMAIN_TXT_HEADER, DomainClaim, serializeClaim } from './claim'
+import { Claim, DomainClaim, DOMAIN_TXT_HEADER, serializeClaim } from './claim'
 import { verifyKeybaseClaim } from './keybase'
 import { ClaimTypes } from './types'
 
@@ -44,7 +44,11 @@ export const verifyAccountClaim = async (
 
   let metadata: IdentityMetadataWrapper
   try {
-    metadata = await IdentityMetadataWrapper.fetchFromURL(kit, metadataURL, tries)
+    metadata = await IdentityMetadataWrapper.fetchFromURL(
+      await kit.contracts.getAccounts(),
+      metadataURL,
+      tries
+    )
   } catch (error: any) {
     return `Metadata could not be fetched for ${
       claim.address
@@ -85,7 +89,7 @@ export const verifyDomainRecord = async (
           const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
           if (
             await IdentityMetadataWrapper.verifySignerForAddress(
-              kit,
+              await kit.contracts.getAccounts(),
               serializeClaim(claim),
               signature,
               address

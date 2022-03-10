@@ -34,7 +34,7 @@ export async function verifyKeybaseClaim(
     }
 
     const hasValidSignature = await IdentityMetadataWrapper.verifySignerForAddress(
-      kit,
+      await kit.contracts.getAccounts(),
       hashOfClaim(parsedClaim.right.claim),
       parsedClaim.right.signature,
       signer

@@ -47,7 +47,10 @@ testWithGanache('Metadata', (web3) => {
       }
       await metadata.addClaim(createNameClaim(name), NativeSigner(kit.connection.sign, signer))
       const serializedMetadata = metadata.toString()
-      const parsedMetadata = await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
+      const parsedMetadata = await IdentityMetadataWrapper.fromRawString(
+        await kit.contracts.getAccounts(),
+        serializedMetadata
+      )
       const nameClaim = parsedMetadata.findClaim(ClaimTypes.NAME)
 
       expect(nameClaim).not.toBeUndefined()

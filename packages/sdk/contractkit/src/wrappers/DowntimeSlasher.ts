@@ -83,7 +83,7 @@ export class DowntimeSlasherWrapper extends BaseSlasher<DowntimeSlasher> {
    * @return The signature bitmap for the specified interval.
    */
   setBitmapForInterval = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.setBitmapForInterval,
     unpackInterval
   )
@@ -99,12 +99,16 @@ export class DowntimeSlasherWrapper extends BaseSlasher<DowntimeSlasher> {
     block?: number,
     maximumLength = 4000
   ): Promise<Interval[]> {
-    const window = await this.getSlashableDowntimeWindow(undefined, block)
+    const [window, validatorsContract] = await Promise.all([
+      this.getSlashableDowntimeWindow(undefined, block),
+      this.contracts.getValidators(),
+    ])
+
     let end = window.end
     const intervals: Interval[] = []
     while (end > window.start) {
-      const epochNumber = await this.kit.getEpochNumberOfBlock(end)
-      const firstBlock = await this.kit.getFirstBlockNumberForEpoch(epochNumber)
+      const epochNumber = await validatorsContract.getEpochNumberOfBlock(end)
+      const firstBlock = await validatorsContract.getFirstBlockNumberForEpoch(epochNumber)
       const start = Math.max(window.start, end - maximumLength, firstBlock)
       intervals.push({ start, end })
       end = start - 1
@@ -171,11 +175,11 @@ export class DowntimeSlasherWrapper extends BaseSlasher<DowntimeSlasher> {
     if (intervals.length === 0) {
       throw new Error('intervals array should have at least one element')
     }
-
+    const validatorContract = await this.contracts.getValidators()
     const signerIndices = []
     let prevEpochNumber = -1
     for (const interval of intervals) {
-      const epochNumber = await this.kit.getFirstBlockNumberForEpoch(interval.start)
+      const epochNumber = await validatorContract.getFirstBlockNumberForEpoch(interval.start)
       if (epochNumber !== prevEpochNumber) {
         const signerIndex = await this.signerIndexAtBlock(address, interval.start)
         signerIndices.push(signerIndex)
@@ -206,9 +210,7 @@ export class DowntimeSlasherWrapper extends BaseSlasher<DowntimeSlasher> {
       length = await this.slashableDowntime()
     }
     if (!endBlock) {
-      endBlock = startBlock
-        ? startBlock + length - 1
-        : (await this.kit.connection.getBlockNumber()) - 2 // latest grandparent
+      endBlock = startBlock ? startBlock + length - 1 : (await this.connection.getBlockNumber()) - 2 // latest grandparent
     }
 
     return {

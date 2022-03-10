@@ -8,7 +8,7 @@ import { isLeft } from 'fp-ts/lib/Either'
 import { readFileSync } from 'fs'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
-import { ContractKit } from '../kit'
+import { AccountsWrapper } from '../wrappers/Accounts'
 import { Claim, ClaimPayload, ClaimType, hashOfClaims, isOfType } from './claims/claim'
 import { ClaimTypes, SINGULAR_CLAIM_TYPES } from './claims/types'
 
@@ -38,14 +38,14 @@ export class IdentityMetadataWrapper {
     })
   }
 
-  static async fetchFromURL(kit: ContractKit, url: string, tries = 3) {
+  static async fetchFromURL(accounts: AccountsWrapper, url: string, tries = 3) {
     return selectiveRetryAsyncWithBackOff(
       async () => {
         const resp = await fetch(url)
         if (!resp.ok) {
           throw new Error(`Request failed with status ${resp.status}`)
         }
-        return this.fromRawString(kit, await resp.text())
+        return this.fromRawString(accounts, await resp.text())
       },
       tries,
       ['Request failed with status 404'],
@@ -53,16 +53,16 @@ export class IdentityMetadataWrapper {
     )
   }
 
-  static fromFile(kit: ContractKit, path: string) {
-    return this.fromRawString(kit, readFileSync(path, 'utf-8'))
+  static fromFile(accounts: AccountsWrapper, path: string) {
+    return this.fromRawString(accounts, readFileSync(path, 'utf-8'))
   }
 
-  static async verifySigner(kit: ContractKit, hash: any, signature: any, metadata: any) {
-    return this.verifySignerForAddress(kit, hash, signature, metadata.address)
+  static async verifySigner(accounts: AccountsWrapper, hash: any, signature: any, metadata: any) {
+    return this.verifySignerForAddress(accounts, hash, signature, metadata.address)
   }
 
   static async verifySignerForAddress(
-    kit: ContractKit,
+    accounts: AccountsWrapper,
     hash: any,
     signature: any,
     address: Address
@@ -70,7 +70,6 @@ export class IdentityMetadataWrapper {
     // First try to verify on account's address
     if (!verifySignature(hash, signature, address)) {
       // If this fails, signature may still be one of `address`' signers
-      const accounts = await kit.contracts.getAccounts()
       if (await accounts.isAccount(address)) {
         const signers = await Promise.all([
           accounts.getVoteSigner(address),
@@ -84,7 +83,7 @@ export class IdentityMetadataWrapper {
     return true
   }
 
-  static async fromRawString(kit: ContractKit, rawData: string) {
+  static async fromRawString(accounts: AccountsWrapper, rawData: string) {
     const data = JSON.parse(rawData)
 
     const validatedData = IdentityMetadataType.decode(data)
@@ -100,7 +99,7 @@ export class IdentityMetadataWrapper {
     if (
       claims.length > 0 &&
       !(await this.verifySigner(
-        kit,
+        accounts,
         hash,
         validatedData.right.meta.signature,
         validatedData.right.meta
