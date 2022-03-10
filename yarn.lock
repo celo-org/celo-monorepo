@@ -1460,14 +1460,15 @@
     ethereumjs-wallet "0.6.4"
     web3 "1.2.4"
 
-"@celo/identity@1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-1.5.1.tgz#4c1bf29c1db312cc98895b3ddc8b66572b13d9f2"
-  integrity sha512-wwOkhgxoGqo+BNeIWXKU0KT68L5fHYexAjo8736djf2GPRre81aUqbALL9UEX/CksqiQRFUjjUo+CdSGCLbEjw==
+"@celo/identity@1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-1.5.2.tgz#6401aeefbf7893374f6f940c9e0918d0a75d0411"
+  integrity sha512-/9JTL5P4xTY37hgu6qh5tU1d2GS3duBjP3QL600Zz1KAQrUVgb8g8JPpiRY21oEK6L7ZoNTukQJIuM3sbi//vg==
   dependencies:
-    "@celo/base" "1.5.1"
-    "@celo/contractkit" "1.5.1"
-    "@celo/utils" "1.5.1"
+    "@celo/base" "1.5.2"
+    "@celo/contractkit" "1.5.2"
+    "@celo/phone-number-privacy-common" "1.0.39"
+    "@celo/utils" "1.5.2"
     "@types/debug" "^4.1.5"
     bignumber.js "^9.0.0"
     blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
@@ -1477,7 +1478,7 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
-"@celo/phone-number-privacy-common@1.0.38-dev":
+"@celo/phone-number-privacy-common@1.0.39":
   version "1.0.39"
   resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-1.0.39.tgz#3c9568f70378d24d11afcc4306024c5cf4f8efe9"
   integrity sha512-0sbeuoYCN2ZQYO1CryR0Hf9HhOQKuIDZraWFMpUlwrUKk5qKmSMlV16xobG4VL5qUpXHgIRjKPfmcaf0rkrn8A==
@@ -1646,9 +1647,9 @@
     ethereumjs-util "^5.2.0"
 
 "@cnakazawa/watch@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.3.tgz#099139eaec7ebf07a27c1786a3ff64f39464d2ef"
-  integrity sha512-r5160ogAvGyHsal38Kux7YYtodEKOj89RGb28ht1jh3SJb08VwRwAKKJL0bGb04Zd/3r9FL3BFIc3bBidYffCA==
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@cnakazawa/watch/-/watch-1.0.4.tgz#f864ae85004d0fcab6f50be9141c4da368d1656a"
+  integrity sha512-v9kIhKwjeZThiWrLmj0y17CWoyddASLj9O2yvbZkbvw/N3rWOYy9zkV66ursAoVr0mV15bL8g0c4QZUE6cdDoQ==
   dependencies:
     exec-sh "^0.3.2"
     minimist "^1.2.0"

@@ -48,6 +48,7 @@ interface Config {
   }
   blockchain: {
     provider: string
+    apiKey?: string
   }
   db: {
     type: SupportedDatabase
@@ -124,6 +125,7 @@ const config: Config = {
   },
   blockchain: {
     provider: env.BLOCKCHAIN_PROVIDER,
+    apiKey: env.BLOCKCHAIN_API_KEY,
   },
   db: {
     type: env.DB_TYPE ? env.DB_TYPE.toLowerCase() : SupportedDatabase.Postgres,

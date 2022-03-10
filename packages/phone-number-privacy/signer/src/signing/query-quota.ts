@@ -2,8 +2,8 @@ import { retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { NULL_ADDRESS, StableToken } from '@celo/contractkit'
 import {
   authenticateUser,
+  Endpoint,
   ErrorMessage,
-  ErrorType,
   FULL_NODE_TIMEOUT_IN_MS,
   GetQuotaRequest,
   hasValidAccountParam,
@@ -13,8 +13,6 @@ import {
   respondWithError,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
-  SignerEndpoint as Endpoint,
-  SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { BigNumber } from 'bignumber.js'
@@ -59,7 +57,8 @@ export async function handleGetQuota(
   logger.debug('Begin handleGetQuota')
   try {
     if (!isValidGetQuotaInput(request.body)) {
-      sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400)
+      // TODO(Alec)
+      // sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400)
       respondWithError(Endpoint.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)
       return
     }

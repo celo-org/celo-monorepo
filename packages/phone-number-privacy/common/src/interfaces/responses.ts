@@ -1,4 +1,10 @@
-import { ErrorType } from '.'
+import {
+  DisableDomainRequest,
+  DomainQuotaStatusRequest,
+  DomainRequest,
+  DomainRestrictedSignatureRequest,
+  ErrorType,
+} from '.'
 import { KnownDomainState } from '../domains'
 
 export interface SignMessageResponseSuccess {
@@ -98,38 +104,14 @@ export interface DisableDomainResponseFailure {
   error: ErrorType
 }
 
-// TODO(Alec)
+export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
 
-// export type DisableDomainResponse =
-//   | DisableDomainResponseSuccess
-//   | DisableDomainResponseFailure
-
-// export type PnpResponseSuccess =
-//   | SignMessageResponseSuccess
-//   | GetQuotaResponseSuccess
-//   | GetContactMatchesResponseSuccess
-
-// export type PnpResponseFailure =
-//   | SignMessageResponseFailure
-//   | GetQuotaResponseFailure
-//   | GetContactMatchesResponseFailure
-
-// export type DomainsResponseSuccess =
-//   | DomainRestrictedSignatureResponseSuccess
-//   | DomainQuotaStatusResponseSuccess
-//   | DisableDomainResponseSuccess
-
-// export type DomainsResponseFailure =
-//   | DomainRestrictedSignatureResponseFailure
-//   | DomainQuotaStatusResponseFailure
-//   | DisableDomainResponseFailure
-
-// export type PnpResponse = PnpResponseSuccess | PnpResponseFailure
-
-// export type DomainsResponse = DomainsResponseSuccess | DomainsResponseFailure
-
-// export type SuccessResponse = PnpResponseSuccess | DomainsResponseSuccess
-
-// export type FailureResponse = PnpResponseFailure | DomainsResponseFailure
-
-// export type OdisResponse = SuccessResponse | FailureResponse
+export type DomainResponse<
+  R extends DomainRequest = DomainRequest
+> = R extends DomainRestrictedSignatureRequest
+  ? DomainRestrictedSignatureResponse
+  : never | R extends DomainQuotaStatusRequest
+  ? DomainQuotaStatusResponse
+  : never | R extends DisableDomainRequest
+  ? DisableDomainResponse
+  : never

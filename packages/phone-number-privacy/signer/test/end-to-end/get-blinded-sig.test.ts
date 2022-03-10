@@ -1,5 +1,6 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import {
+  Endpoints,
   GetQuotaResponse,
   KEY_VERSION_HEADER,
   rootLogger as logger,
@@ -14,7 +15,7 @@ import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
-import config from '../../src/config'
+import config, { getVersion } from '../../src/config'
 import { getWalletAddress } from '../../src/signing/query-quota'
 
 require('dotenv').config()
@@ -57,6 +58,13 @@ describe('Running against a deployed service', () => {
     console.log('ODIS_SIGNER: ' + ODIS_SIGNER)
     console.log('ODIS_PUBLIC_POLYNOMIAL: ' + ODIS_PUBLIC_POLYNOMIAL)
     console.log('ODIS_KEY_VERSION:' + ODIS_KEY_VERSION)
+  })
+
+  it('Service is deployed at correct version', async () => {
+    const response = await fetch(ODIS_SIGNER + Endpoints.STATUS, { method: 'GET' })
+    const body = await response.json()
+    // This checks against local package.json version, change if necessary
+    expect(body.version).toBe(getVersion())
   })
 
   describe('Returns status 400 with invalid input', () => {

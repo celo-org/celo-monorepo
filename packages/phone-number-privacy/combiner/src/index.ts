@@ -16,7 +16,7 @@ import { DomainQuotaStatusService } from './combiner/domain/quotastatus.service'
 import { DomainSignService } from './combiner/domain/sign.service'
 import { PnpInputService } from './combiner/pnp/input.service'
 import { PnpSignService } from './combiner/pnp/sign.service'
-import config, { FORNO_ALFAJORES, VERSION } from './config'
+import config, { FORNO_ALFAJORES } from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 
 require('dotenv').config()
@@ -136,10 +136,11 @@ export const domainDisable = functions
     return meterResponse(service.handleDistributedRequest, req, res, Endpoint.DISABLE_DOMAIN)
   })
 
-export const status = functions
-  .region('us-central1', 'europe-west3')
-  .https.onRequest(async (_request, response) => {
-    response.status(200).json({
-      version: VERSION,
-    })
-  })
+// TODO: Fix status cloud function. It currenly just returns an empty object.
+// export const status = functions
+//   .region('us-central1', 'europe-west3')
+//   .https.onRequest(async (_req: functions.Request, res: functions.Response) => {
+//     await Promise.resolve(res.status(200).json({
+//       version: VERSION,
+//     }))
+//   })

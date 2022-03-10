@@ -14,11 +14,12 @@ export const E2E_TEST_PHONE_NUMBERS: string[] = E2E_TEST_PHONE_NUMBERS_RAW.map((
 )
 export const E2E_TEST_ACCOUNTS: string[] = ['0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb']
 
-interface BlockchainConfig {
+export interface BlockchainConfig {
   provider: string
+  apiKey?: string
 }
 
-interface DatabaseConfig {
+export interface DatabaseConfig {
   user: string
   password: string
   database: string
@@ -39,6 +40,7 @@ export interface OdisConfig {
     pubKey: string
   }
 }
+
 interface Config {
   blockchain: BlockchainConfig
   db: DatabaseConfig
@@ -95,6 +97,7 @@ if (DEV_MODE) {
   config = {
     blockchain: {
       provider: functionConfig.blockchain.provider,
+      apiKey: functionConfig.blockchain.api_key,
     },
     db: {
       user: functionConfig.db.username,
