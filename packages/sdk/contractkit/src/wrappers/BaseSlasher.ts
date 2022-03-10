@@ -1,7 +1,7 @@
 import { findAddressIndex } from '@celo/base/lib/address'
 import { CeloTxObject, Contract, toTransactionObject } from '@celo/connect'
 import { proxyCall, valueToBigNumber } from './BaseWrapper'
-import { VotableBaseWrapper } from './VotableBaseWrapper'
+import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
 
 type TrailingSlasherParams = [
   number | string,
@@ -23,7 +23,7 @@ interface SlasherContract extends Contract {
   }
 }
 
-export class BaseSlasher<T extends SlasherContract> extends VotableBaseWrapper<T> {
+export class BaseSlasher<T extends SlasherContract> extends BaseWrapperWithContracts<T> {
   protected async signerIndexAtBlock(address: string, blockNumber: number) {
     const election = await this.contracts.getElection()
     const validators = await this.contracts.getValidators()

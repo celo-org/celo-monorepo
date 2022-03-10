@@ -19,7 +19,7 @@ import {
   valueToString,
 } from './BaseWrapper'
 import { PendingWithdrawal } from './LockedGold'
-import { VotableBaseWrapper } from './VotableBaseWrapper'
+import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
 
 export interface BalanceState {
   totalWithdrawn: string
@@ -64,7 +64,7 @@ interface RevocationInfo {
 /**
  * Contract for handling an instance of a ReleaseGold contract.
  */
-export class ReleaseGoldWrapper extends VotableBaseWrapper<ReleaseGold> {
+export class ReleaseGoldWrapper extends BaseWrapperWithContracts<ReleaseGold> {
   /**
    * Returns the underlying Release schedule of the ReleaseGold contract
    * @return A ReleaseSchedule.

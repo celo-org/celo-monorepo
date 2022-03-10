@@ -15,7 +15,7 @@ import {
   valueToBigNumber,
   valueToString,
 } from '../wrappers/BaseWrapper'
-import { VotableBaseWrapper } from './VotableBaseWrapper'
+import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
 
 type AddressListItem = ALI<BigNumber>
 const bigNumberComparator: Comparator<BigNumber> = (a: BigNumber, b: BigNumber) => a.lt(b)
@@ -64,7 +64,7 @@ export interface LockedGoldConfig {
  * Contract for handling deposits needed for voting.
  */
 
-export class LockedGoldWrapper extends VotableBaseWrapper<LockedGold> {
+export class LockedGoldWrapper extends BaseWrapperWithContracts<LockedGold> {
   /**
    * Withdraws a gold that has been unlocked after the unlocking period has passed.
    * @param index The index of the pending withdrawal to withdraw.

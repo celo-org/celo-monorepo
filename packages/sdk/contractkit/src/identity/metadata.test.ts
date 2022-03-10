@@ -15,7 +15,10 @@ testWithGanache('Metadata', (web3) => {
     const metadata = IdentityMetadataWrapper.fromEmpty(address)
     await metadata.addClaim(createNameClaim(name), NativeSigner(kit.connection.sign, address))
     const serializedMetadata = metadata.toString()
-    const parsedMetadata = await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
+    const parsedMetadata = await IdentityMetadataWrapper.fromRawString(
+      await kit.contracts.getAccounts(),
+      serializedMetadata
+    )
     const nameClaim = parsedMetadata.findClaim(ClaimTypes.NAME)
 
     expect(nameClaim).not.toBeUndefined()
@@ -67,7 +70,10 @@ testWithGanache('Metadata', (web3) => {
     await metadata.addClaim(createNameClaim(name), NativeSigner(kit.connection.sign, otherAddress))
     const serializedMetadata = metadata.toString()
     try {
-      await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
+      await IdentityMetadataWrapper.fromRawString(
+        await kit.contracts.getAccounts(),
+        serializedMetadata
+      )
     } catch (e: any) {
       expect(e.toString()).toContain('Signature could not be validated')
     }

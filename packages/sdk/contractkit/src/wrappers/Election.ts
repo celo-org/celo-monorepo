@@ -19,7 +19,7 @@ import {
   valueToInt,
 } from './BaseWrapper'
 import { Validator, ValidatorGroup } from './Validators'
-import { VotableBaseWrapper } from './VotableBaseWrapper'
+import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
 
 export interface ValidatorGroupVote {
   address: Address
@@ -69,7 +69,7 @@ export interface ElectionConfig {
 /**
  * Contract for voting for validators and managing validator groups.
  */
-export class ElectionWrapper extends VotableBaseWrapper<Election> {
+export class ElectionWrapper extends BaseWrapperWithContracts<Election> {
   /**
    * Returns the minimum and maximum number of validators that can be elected.
    * @returns The minimum and maximum number of validators that can be elected.

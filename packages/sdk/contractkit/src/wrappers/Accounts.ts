@@ -17,7 +17,7 @@ import {
   solidityBytesToString,
   stringToSolidityBytes,
 } from '../wrappers/BaseWrapper'
-import { VotableBaseWrapper } from './VotableBaseWrapper'
+import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
 
 interface AccountSummary {
   address: string
@@ -35,7 +35,7 @@ interface AccountSummary {
 /**
  * Contract for handling deposits needed for voting.
  */
-export class AccountsWrapper extends VotableBaseWrapper<Accounts> {
+export class AccountsWrapper extends BaseWrapperWithContracts<Accounts> {
   private RELEASE_4_VERSION = newContractVersion(1, 1, 2, 0)
 
   /**

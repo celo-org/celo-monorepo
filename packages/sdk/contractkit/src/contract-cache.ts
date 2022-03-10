@@ -172,6 +172,7 @@ export class WrapperCache {
       case CeloContract.SortedOracles:
         return this.registry
       case CeloContract.Accounts:
+      case CeloContract.Attestations:
       case CeloContract.DoubleSigningSlasher:
       case CeloContract.DowntimeSlasher:
       case CeloContract.Election:

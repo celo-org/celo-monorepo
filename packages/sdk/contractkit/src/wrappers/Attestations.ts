@@ -20,7 +20,7 @@ import {
   valueToInt,
 } from './BaseWrapper'
 import { Validator } from './Validators'
-import { VotableBaseWrapper } from './VotableBaseWrapper'
+import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
 
 function hashAddressToSingleDigit(address: Address): number {
   return new BigNumber(address.toLowerCase()).modulo(10).toNumber()
@@ -101,7 +101,7 @@ function parseGetCompletableAttestations(response: GetCompletableAttestationsRes
   ).map(([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL }))
 }
 
-export class AttestationsWrapper extends VotableBaseWrapper<Attestations> {
+export class AttestationsWrapper extends BaseWrapperWithContracts<Attestations> {
   /**
    *  Returns the time an attestation can be completable before it is considered expired
    */
