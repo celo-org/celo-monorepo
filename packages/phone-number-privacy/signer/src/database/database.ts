@@ -80,7 +80,7 @@ export async function initDatabase(doTestQuery = true) {
 // Closes the connections to the database.
 // If the database is sqlite in-memory database, the database will be destroyed.
 export async function closeDatabase() {
-  db?.destroy()
+  await db?.destroy()
   db = undefined
 }
 

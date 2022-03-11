@@ -14,12 +14,17 @@ function domainsStates() {
   return getDatabase()<DomainStateRecord>(DOMAINS_STATES_TABLE)
 }
 
-export async function setDomainDisabled(domain: Domain, logger: Logger): Promise<void> {
+export async function setDomainDisabled(
+  domain: Domain,
+  trx: Transaction<DomainStateRecord>,
+  logger: Logger
+): Promise<void> {
   const disableDomainMeter = Histograms.dbOpsInstrumentation.labels('disableDomain').startTimer()
   const hash = domainHash(domain).toString('hex')
   logger.debug('Disabling domain', { hash, domain })
   try {
     await domainsStates()
+      .transacting(trx)
       .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
       .update(DOMAINS_STATES_COLUMNS.disabled, true)
       .timeout(DB_TIMEOUT)

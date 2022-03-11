@@ -34,7 +34,7 @@ import { IDomainAuthService } from './auth/domainAuth.interface'
 import { IDomainService } from './domain.interface'
 import { IDomainQuotaService } from './quota/domainQuota.interface'
 
-// TODO: De-dupe with common package 
+// TODO: De-dupe with common package
 function respondWithError(
   endpoint: DomainEndpoint,
   res: Response<DomainResponse & { success: false }>,
@@ -91,17 +91,22 @@ export class DomainService implements IDomainService {
     })
     try {
       const trx = await getTransaction()
-      const domainState = await getDomainStateWithLock(domain, trx, logger)
-      if (!domainState) {
-        // If the domain is not currently recorded in the state database, add it now.
-        await insertDomainState(DomainStateRecord.createEmptyDomainState(domain), trx, logger)
+      try {
+        const domainState = await getDomainStateWithLock(domain, trx, logger)
+        if (!domainState) {
+          // If the domain is not currently recorded in the state database, add it now.
+          await insertDomainState(DomainStateRecord.createEmptyDomainState(domain), trx, logger)
+        }
+        if (!(domainState?.disabled ?? false)) {
+          await setDomainDisabled(domain, trx, logger)
+        }
         await trx.commit()
+      } catch (error) {
+        // Rollback will return a rejected pormise, resulting in a new throw.
+        await trx.rollback(error)
       }
-      if (!(domainState?.disabled ?? false)) {
-        await setDomainDisabled(domain, logger)
-      }
+
       response.status(200).send({ success: true, version: getVersion() })
-      return
     } catch (error) {
       logger.error('Error while disabling domain', error)
       respondWithError(
@@ -245,7 +250,7 @@ export class DomainService implements IDomainService {
           version: getVersion(),
           signature,
         }
-        response.json(signMessageResponseSuccess)
+        response.status(200).json(signMessageResponseSuccess)
       } catch (err) {
         trx.rollback()
         throw err
