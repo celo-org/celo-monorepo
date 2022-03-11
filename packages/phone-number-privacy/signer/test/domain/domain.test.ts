@@ -83,7 +83,6 @@ describe('domainService', () => {
   })
 
   beforeAll(async () => {
-    // DO NOT MERGE: Put the logger into some kind of test mode.
     response.locals = { logger: rootLogger() }
     await initKeyProvider()
   })
