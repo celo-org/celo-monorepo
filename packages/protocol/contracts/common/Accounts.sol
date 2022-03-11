@@ -5,7 +5,8 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IAccounts.sol";
 
-import "../common/InitializableV2.sol";
+import "../common/FixidityLib.sol";
+import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Signatures.sol";
 import "../common/UsingRegistry.sol";
@@ -16,9 +17,10 @@ contract Accounts is
   ICeloVersionedContract,
   Ownable,
   ReentrancyGuard,
-  InitializableV2,
+  Initializable,
   UsingRegistry
 {
+  using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
   struct Signers {
@@ -57,6 +59,13 @@ contract Accounts is
     string metadataURL;
   }
 
+  struct PaymentDelegation {
+    // Address that should receive a fraction of validator payments.
+    address beneficiary;
+    // Fraction of payment to delegate to `beneficiary`.
+    FixidityLib.Fraction fraction;
+  }
+
   mapping(address => Account) internal accounts;
   // Maps authorized signers to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
@@ -71,6 +80,12 @@ contract Accounts is
   );
   bytes32 public eip712DomainSeparator;
 
+  // A per-account list of CIP8 storage roots, bypassing CIP3.
+  mapping(address => bytes[]) public offchainStorageRoots;
+
+  // Optional per-account validator payment delegation information.
+  mapping(address => PaymentDelegation) internal paymentDelegations;
+
   bytes32 constant ValidatorSigner = keccak256(abi.encodePacked("celo.org/core/validator"));
   bytes32 constant AttestationSigner = keccak256(abi.encodePacked("celo.org/core/attestation"));
   bytes32 constant VoteSigner = keccak256(abi.encodePacked("celo.org/core/vote"));
@@ -84,27 +99,34 @@ contract Accounts is
   event AttestationSignerRemoved(address indexed account, address oldSigner);
   event VoteSignerRemoved(address indexed account, address oldSigner);
   event ValidatorSignerRemoved(address indexed account, address oldSigner);
+  event IndexedSignerSet(address indexed account, address signer, bytes32 role);
+  event IndexedSignerRemoved(address indexed account, address oldSigner, bytes32 role);
   event DefaultSignerSet(address indexed account, address signer, bytes32 role);
   event DefaultSignerRemoved(address indexed account, address oldSigner, bytes32 role);
+  event LegacySignerSet(address indexed account, address signer, bytes32 role);
+  event LegacySignerRemoved(address indexed account, address oldSigner, bytes32 role);
   event SignerRemoved(address indexed account, address oldSigner, bytes32 indexed role);
   event AccountDataEncryptionKeySet(address indexed account, bytes dataEncryptionKey);
   event AccountNameSet(address indexed account, string name);
   event AccountMetadataURLSet(address indexed account, string metadataURL);
   event AccountWalletAddressSet(address indexed account, address walletAddress);
   event AccountCreated(address indexed account);
+  event OffchainStorageRootAdded(address indexed account, bytes url);
+  event OffchainStorageRootRemoved(address indexed account, bytes url, uint256 index);
+  event PaymentDelegationSet(address indexed beneficiary, uint256 fraction);
 
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
+    return (1, 1, 3, 0);
   }
 
   /**
@@ -114,12 +136,13 @@ contract Accounts is
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+    setEip712DomainSeparator();
   }
 
   /**
    * @notice Sets the EIP712 domain separator for the Celo Accounts abstraction.
    */
-  function setEip712DomainSeparator() public onlyOwner {
+  function setEip712DomainSeparator() public {
     uint256 chainId;
     assembly {
       chainId := chainid
@@ -234,6 +257,91 @@ contract Accounts is
   }
 
   /**
+   * @notice Adds a new CIP8 storage root.
+   * @param url The URL pointing to the offchain storage root.
+   */
+  function addStorageRoot(bytes calldata url) external {
+    require(isAccount(msg.sender), "Unknown account");
+    offchainStorageRoots[msg.sender].push(url);
+    emit OffchainStorageRootAdded(msg.sender, url);
+  }
+
+  /**
+   * @notice Removes a CIP8 storage root.
+   * @param index The index of the storage root to be removed in the account's
+   * list of storage roots.
+   * @dev The order of storage roots may change after this operation (the last
+   * storage root will be moved to `index`), be aware of this if removing
+   * multiple storage roots at a time.
+   */
+  function removeStorageRoot(uint256 index) external {
+    require(isAccount(msg.sender), "Unknown account");
+    require(index < offchainStorageRoots[msg.sender].length);
+    uint256 lastIndex = offchainStorageRoots[msg.sender].length - 1;
+    bytes memory url = offchainStorageRoots[msg.sender][index];
+    offchainStorageRoots[msg.sender][index] = offchainStorageRoots[msg.sender][lastIndex];
+    offchainStorageRoots[msg.sender].length--;
+    emit OffchainStorageRootRemoved(msg.sender, url, index);
+  }
+
+  /**
+   * @notice Returns the full list of offchain storage roots for an account.
+   * @param account The account whose storage roots to return.
+   * @return List of storage root URLs.
+   */
+  function getOffchainStorageRoots(address account)
+    external
+    view
+    returns (bytes memory, uint256[] memory)
+  {
+    require(isAccount(account), "Unknown account");
+    uint256 numberRoots = offchainStorageRoots[account].length;
+    uint256 totalLength = 0;
+    for (uint256 i = 0; i < numberRoots; i++) {
+      totalLength += offchainStorageRoots[account][i].length;
+    }
+
+    bytes memory concatenated = new bytes(totalLength);
+    uint256 lastIndex = 0;
+    uint256[] memory lengths = new uint256[](numberRoots);
+    for (uint256 i = 0; i < numberRoots; i++) {
+      bytes storage root = offchainStorageRoots[account][i];
+      lengths[i] = root.length;
+      for (uint256 j = 0; j < lengths[i]; j++) {
+        concatenated[lastIndex] = root[j];
+        lastIndex++;
+      }
+    }
+
+    return (concatenated, lengths);
+  }
+
+  /**
+   * @notice Sets validator payment delegation settings.
+   * @param beneficiary The address that should receive a portion of vaidator
+   * payments.
+   * @param fraction The fraction of the validator's payment that should be
+   * diverted to `beneficiary` every epoch, given as FixidyLib value. Must not
+   * be greater than 1.
+   */
+  function setPaymentDelegation(address beneficiary, uint256 fraction) public {
+    require(isAccount(msg.sender), "Not an account");
+    FixidityLib.Fraction memory f = FixidityLib.wrap(fraction);
+    require(f.lte(FixidityLib.fixed1()), "Fraction must not be greater than 1");
+    paymentDelegations[msg.sender] = PaymentDelegation(beneficiary, f);
+    emit PaymentDelegationSet(beneficiary, fraction);
+  }
+
+  /**
+   * @notice Gets validator payment delegation settings.
+   * @return Beneficiary address and fraction of payment delegated.
+   */
+  function getPaymentDelegation(address account) external view returns (address, uint256) {
+    PaymentDelegation storage delegation = paymentDelegations[account];
+    return (delegation.beneficiary, delegation.fraction.unwrap());
+  }
+
+  /**
    * @notice Set the indexed signer for a specific role
    * @param signer the address to set as default
    * @param role the role to register a default signer for
@@ -248,27 +356,32 @@ contract Accounts is
     require(isSigner(msg.sender, signer, role), "Must authorize signer before setting as default");
 
     Account storage account = accounts[msg.sender];
-    if (role == VoteSigner) {
-      account.signers.vote = signer;
-    } else if (role == AttestationSigner) {
-      account.signers.attestation = signer;
-    } else if (role == ValidatorSigner) {
-      account.signers.validator = signer;
+    if (isLegacyRole(role)) {
+      if (role == VoteSigner) {
+        account.signers.vote = signer;
+      } else if (role == AttestationSigner) {
+        account.signers.attestation = signer;
+      } else if (role == ValidatorSigner) {
+        account.signers.validator = signer;
+      }
+      emit LegacySignerSet(msg.sender, signer, role);
     } else {
       defaultSigners[msg.sender][role] = signer;
+      emit DefaultSignerSet(msg.sender, signer, role);
     }
 
-    emit DefaultSignerSet(msg.sender, signer, role);
+    emit IndexedSignerSet(msg.sender, signer, role);
   }
 
   /**
-   * @notice Authorizes an address to as a signer on behalf of the account.
+   * @notice Authorizes an address to act as a signer, for `role`, on behalf of the account.
    * @param signer The address of the signing key to authorize.
    * @param role The role to authorize signing for.
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev v, r, s constitute `signer`'s signature on `msg.sender`.
+   * @dev v, r, s constitute `signer`'s EIP712 signature over `role`, `msg.sender`  
+   *      and `signer`.
    */
   function authorizeSignerWithSignature(address signer, bytes32 role, uint8 v, bytes32 r, bytes32 s)
     public
@@ -528,17 +641,23 @@ contract Accounts is
    * @notice Remove one of the Validator, Attestation or 
    * Vote signers from an account. Should only be called from
    * methods that check the role is a legacy signer.
+   * @param role The role that has been authorized.
    */
   function removeLegacySigner(bytes32 role) private {
     Account storage account = accounts[msg.sender];
 
+    address signer;
     if (role == ValidatorSigner) {
+      signer = account.signers.validator;
       account.signers.validator = address(0);
     } else if (role == AttestationSigner) {
+      signer = account.signers.attestation;
       account.signers.attestation = address(0);
     } else if (role == VoteSigner) {
+      signer = account.signers.vote;
       account.signers.vote = address(0);
     }
+    emit LegacySignerRemoved(msg.sender, signer, role);
   }
 
   /**
@@ -547,7 +666,10 @@ contract Accounts is
    * @param role The role of the signer.
    */
   function removeIndexedSigner(bytes32 role) public {
+    address oldSigner = getIndexedSigner(msg.sender, role);
     isLegacyRole(role) ? removeLegacySigner(role) : removeDefaultSigner(role);
+
+    emit IndexedSignerRemoved(msg.sender, oldSigner, role);
   }
 
   /**
@@ -653,8 +775,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Checks whether the role is one of Vote, Validator or 
-   * Attestation
+   * @notice Checks whether the role is one of Vote, Validator or Attestation
    * @param role The role to check
    */
   function isLegacyRole(bytes32 role) public pure returns (bool) {
@@ -885,7 +1006,7 @@ contract Accounts is
   }
 
   /**
-   * @notice Check if an address has been an authorized signer for an account.
+   * @notice Check if an address has not been an authorized signer for an account.
    * @param signer The possibly authorized address.
    * @return Returns `false` if authorized. Returns `true` otherwise.
    */
@@ -894,7 +1015,8 @@ contract Accounts is
   }
 
   /**
-   * @notice Check if an address has been an authorized signer for an account.
+   * @notice Check if `signer` has not been authorized, and if it has been previously
+   *         authorized that it was authorized by `account`.
    * @param account The authorizing account address.
    * @param signer The possibly authorized address.
    * @return Returns `false` if authorized. Returns `true` otherwise.
@@ -913,9 +1035,9 @@ contract Accounts is
    * @param v The recovery id of the incoming ECDSA signature.
    * @param r Output value r of the ECDSA signature.
    * @param s Output value s of the ECDSA signature.
-   * @dev Fails if the address is already authorized or is an account.
+   * @dev Fails if the address is already authorized to another account or is an account itself.
    * @dev Note that once an address is authorized, it may never be authorized again.
-   * @dev v, r, s constitute `current`'s signature on `msg.sender`.
+   * @dev v, r, s constitute `authorized`'s signature on `msg.sender`.
    */
   function authorizeAddress(address authorized, uint8 v, bytes32 r, bytes32 s) private {
     address signer = Signatures.getSignerOfAddress(msg.sender, v, r, s);
@@ -925,15 +1047,15 @@ contract Accounts is
   }
 
   /**
+   * @notice Returns the address that signed the provided role authorization.
+   * @param account The `account` property signed over in the EIP712 signature
+   * @param signer The `signer` property signed over in the EIP712 signature
+   * @param role The `role` property signed over in the EIP712 signature
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @return The address that signed the provided role authorization.
    */
-  function getRoleAuthorizationStructHash(address account, address signer, bytes32 role)
-    internal
-    pure
-    returns (bytes32)
-  {
-    return keccak256(abi.encode(EIP712_AUTHORIZE_SIGNER_TYPEHASH, account, signer, role));
-  }
-
   function getRoleAuthorizationSigner(
     address account,
     address signer,
@@ -942,10 +1064,23 @@ contract Accounts is
     bytes32 r,
     bytes32 s
   ) public view returns (address) {
-    bytes32 structHash = getRoleAuthorizationStructHash(account, signer, role);
+    bytes32 structHash = keccak256(
+      abi.encode(EIP712_AUTHORIZE_SIGNER_TYPEHASH, account, signer, role)
+    );
     return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
   }
 
+  /**
+   * @notice Authorizes a role of `msg.sender`'s account to another address (`authorized`).
+   * @param authorized The address to authorize.
+   * @param role The role to authorize.
+   * @param v The recovery id of the incoming ECDSA signature.
+   * @param r Output value r of the ECDSA signature.
+   * @param s Output value s of the ECDSA signature.
+   * @dev Fails if the address is already authorized to another account or is an account itself.
+   * @dev Note that this signature is EIP712 compliant over the authorizing `account` 
+   * (`msg.sender`), `signer` (`authorized`) and `role`.
+   */
   function authorizeAddressWithRole(address authorized, bytes32 role, uint8 v, bytes32 r, bytes32 s)
     private
   {
@@ -955,6 +1090,11 @@ contract Accounts is
     authorize(authorized);
   }
 
+  /**
+   * @notice Authorizes an address to `msg.sender`'s account
+   * @param authorized The address to authorize.
+   * @dev Fails if the address is already authorized for another account or is an account itself.
+   */
   function authorize(address authorized) private {
     require(isAccount(msg.sender), "Unknown account");
     require(

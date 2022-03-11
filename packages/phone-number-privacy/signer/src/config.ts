@@ -39,6 +39,7 @@ interface Config {
     additionalVerifiedQueryMax: number
     queryPerTransaction: number
     minDollarBalance: BigNumber
+    minEuroBalance: BigNumber
     minCeloBalance: BigNumber
   }
   attestations: {
@@ -46,6 +47,7 @@ interface Config {
   }
   blockchain: {
     provider: string
+    apiKey?: string
   }
   db: {
     type: SupportedDatabase
@@ -94,6 +96,8 @@ const config: Config = {
     queryPerTransaction: toNum(env.QUERY_PER_TRANSACTION) || 2,
     // Min balance is .01 cUSD
     minDollarBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 1e16),
+    // Min balance is .01 cEUR
+    minEuroBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 1e16),
     // Min balance is .005 CELO
     minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 5e15),
   },
@@ -102,6 +106,7 @@ const config: Config = {
   },
   blockchain: {
     provider: env.BLOCKCHAIN_PROVIDER,
+    apiKey: env.BLOCKCHAIN_API_KEY,
   },
   db: {
     type: env.DB_TYPE ? env.DB_TYPE.toLowerCase() : SupportedDatabase.Postgres,

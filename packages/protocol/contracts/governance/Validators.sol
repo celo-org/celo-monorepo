@@ -163,8 +163,14 @@ contract Validators is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 0);
+    return (1, 2, 0, 2);
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -509,10 +515,18 @@ contract Validators is
         .multiply(validators[account].score)
         .multiply(groups[group].slashInfo.multiplier);
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
-      uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
+      FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
+        totalPayment.fromFixed().sub(groupPayment)
+      );
+      (address beneficiary, uint256 fraction) = getAccounts().getPaymentDelegation(account);
+      uint256 delegatedPayment = remainingPayment.multiply(FixidityLib.wrap(fraction)).fromFixed();
+      uint256 validatorPayment = remainingPayment.fromFixed().sub(delegatedPayment);
       IStableToken stableToken = getStableToken();
       require(stableToken.mint(group, groupPayment), "mint failed to validator group");
       require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
+      if (fraction != 0) {
+        require(stableToken.mint(beneficiary, delegatedPayment), "mint failed to delegatee");
+      }
       emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
@@ -1167,7 +1181,7 @@ contract Validators is
       history.lastRemovedFromGroupTimestamp = now;
     }
 
-    if (history.entries[head].epochNumber == epochNumber) {
+    if (history.numEntries > 0 && history.entries[head].epochNumber == epochNumber) {
       // There have been no elections since the validator last changed membership, overwrite the
       // previous entry.
       history.entries[head] = MembershipHistoryEntry(epochNumber, group);

@@ -5,6 +5,7 @@ import {
   assertLogMatches,
   assertLogMatches2,
   assertRevert,
+  assertRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { toFixed } from '@celo/utils/lib/fixidity'
@@ -67,7 +68,7 @@ contract('LockedGold', (accounts: string[]) => {
     mockElection = await MockElection.new()
     mockValidators = await MockValidators.new()
     mockGovernance = await MockGovernance.new()
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
@@ -213,11 +214,10 @@ contract('LockedGold', (accounts: string[]) => {
         })
 
         it('should add a pending withdrawal', async () => {
-          const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
-          assert.equal(values.length, 1)
-          assert.equal(timestamps.length, 1)
-          assertEqualBN(values[0], value)
-          assertEqualBN(timestamps[0], availabilityTime)
+          const [val, timestamp] = await lockedGold.getPendingWithdrawal(account, 0)
+          assertEqualBN(val, value)
+          assertEqualBN(timestamp, availabilityTime)
+          await assertRevert(lockedGold.getPendingWithdrawal(account, 1))
         })
 
         it("should decrease the account's nonvoting locked gold balance", async () => {
@@ -511,6 +511,7 @@ contract('LockedGold', (accounts: string[]) => {
       await lockedGold.lock({ value })
       await registry.setAddressFor(CeloContractName.DowntimeSlasher, accounts[2])
       await lockedGold.addSlasher(CeloContractName.DowntimeSlasher)
+      await accountsInstance.createAccount({ from: reporter })
     })
 
     describe('when the account is slashed for all of its locked gold', () => {
@@ -545,7 +546,7 @@ contract('LockedGold', (accounts: string[]) => {
       })
     })
 
-    describe('when the account is removed from `isSlasher`', () => {
+    describe('when the slashing contract is removed from `isSlasher`', () => {
       const penalty = value
       const reward = value / 2
       beforeEach(async () => {
@@ -681,6 +682,48 @@ contract('LockedGold', (accounts: string[]) => {
           assert.equal(await web3.eth.getBalance(mockGovernance.address), value - reward)
         })
       })
+    })
+
+    it('cannot be invoked by non-account reporters', async () => {
+      const penalty = value
+      const reward = value / 2
+
+      await assertRevertWithReason(
+        lockedGold.slash(
+          account,
+          penalty,
+          accounts[4],
+          reward,
+          [NULL_ADDRESS],
+          [NULL_ADDRESS],
+          [0],
+          { from: accounts[2] }
+        ),
+        'Not an account'
+      )
+    })
+
+    it('can be invoked by an account signer on behalf of the account', async () => {
+      const signerReporter = accounts[4]
+      const role = '0x0000000000000000000000000000000000000000000000000000000000001337'
+      await accountsInstance.authorizeSigner(signerReporter, role, { from: reporter })
+      await accountsInstance.completeSignerAuthorization(reporter, role, { from: signerReporter })
+      const penalty = value
+      const reward = value / 2
+
+      await lockedGold.slash(
+        account,
+        penalty,
+        signerReporter,
+        reward,
+        [NULL_ADDRESS],
+        [NULL_ADDRESS],
+        [0],
+        { from: accounts[2] }
+      )
+
+      assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(reporter), reward)
+      assertEqualBN(await lockedGold.getAccountTotalLockedGold(reporter), reward)
     })
   })
 })

@@ -1,13 +1,20 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
+import { OdisUtils } from '@celo/identity'
+import { getPepperFromThresholdSignature } from '@celo/identity/lib/odis/phone-number-identifier'
+import { AttestationRequest } from '@celo/phone-utils/lib/io'
 import { AttestationUtils, PhoneNumberUtils } from '@celo/utils'
 import { eqAddress } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
-import { AttestationRequest } from '@celo/utils/lib/io'
 import Logger from 'bunyan'
 import { randomBytes } from 'crypto'
 import express from 'express'
 import { findAttestationByKey, makeSequelizeLogger, SequelizeLogger, useKit } from '../db'
-import { getAccountAddress, getAttestationSignerAddress, isDevMode } from '../env'
+import {
+  fetchEnvOrDefault,
+  getAccountAddress,
+  getAttestationSignerAddress,
+  isDevMode,
+} from '../env'
 import { Counters } from '../metrics'
 import { AttestationKey, AttestationModel } from '../models/attestation'
 import { ErrorWithResponse, respondWithAttestation, respondWithError, Response } from '../request'
@@ -16,6 +23,11 @@ import { obfuscateNumber } from '../sms/base'
 
 const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
+export const INVALID_SIGNATURE_ERROR = 'Signature is invalid'
+
+const odisPubKey = OdisUtils.Query.getServiceContext(fetchEnvOrDefault('NETWORK', 'mainnet'))
+  .odisPubKey
+const thresholdBls = require('blind-threshold-bls')
 
 function toBase64(str: string) {
   return Buffer.from(str.slice(2), 'hex').toString('base64')
@@ -77,6 +89,8 @@ class AttestationRequestHandler {
     const attestation = await findAttestationByKey(this.key, {
       logging: this.sequelizeLogger,
     })
+
+    await this.verifyPepperIfApplicable()
 
     // Re-requests for existing attestations skip the on-chain check.
     if (attestation) {
@@ -152,35 +166,41 @@ class AttestationRequestHandler {
   // Main process for handling an attestation.
   async doAttestation() {
     Counters.attestationRequestsTotal.inc()
+    if (
+      !this.attestationRequest.securityCodePrefix ||
+      this.attestationRequest.securityCodePrefix.length !== 1
+    ) {
+      throw new ErrorWithResponse('Invalid securityCodePrefix', 422)
+    }
+
     let attestation = await this.findOrValidateRequest()
 
     if (attestation && attestation.message) {
       // Re-request existing attestation. In this case, security code prefix is ignored (the message sent is the same as before)
-      attestation = await rerequestAttestation(this.key, this.logger, this.sequelizeLogger)
+      attestation = await rerequestAttestation(
+        this.key,
+        this.attestationRequest.smsRetrieverAppSig,
+        this.attestationRequest.language,
+        this.attestationRequest.securityCodePrefix,
+        this.logger,
+        this.sequelizeLogger
+      )
     } else {
       // New attestation: create new attestation code, new delivery.
       const attestationCode = await this.signAttestation()
       await this.validateAttestationCode(attestationCode)
+      // This attestation code is stored in the attestation object
+      // and will be returned to the user with the get_attestation call
       const attestationCodeDeeplink = `celo://wallet/v/${toBase64(attestationCode)}`
 
-      // Determine if we're sending a security code, or the full deep link.
       let messageBase, securityCode
-      if (this.attestationRequest.securityCodePrefix) {
-        if (this.attestationRequest.securityCodePrefix.length !== 1) {
-          throw new ErrorWithResponse('Invalid securityCodePrefix', 422)
-        }
 
-        // Client is requesting a security code SMS. Generate a challenge and just store the deeplink.
-        securityCode = randomBytes(7)
-          .map((x) => x % 10)
-          .join('')
-        messageBase = `${getSecurityCodeText(this.attestationRequest.language)}: ${
-          this.attestationRequest.securityCodePrefix
-        }${securityCode}`
-      } else {
-        // Client is requesting direct SMS with the deeplink.
-        messageBase = attestationCodeDeeplink
-      }
+      // Generate a security code to be sent over SMS
+      securityCode = randomBytes(7)
+        .map((x) => x % 10)
+        .join('')
+      securityCode = `${this.attestationRequest.securityCodePrefix}${securityCode}`
+      messageBase = `${getSecurityCodeText(this.attestationRequest.language)}: ${securityCode}`
 
       let textMessage
 
@@ -200,6 +220,8 @@ class AttestationRequestHandler {
         textMessage,
         securityCode,
         attestationCodeDeeplink,
+        this.attestationRequest.smsRetrieverAppSig,
+        this.attestationRequest.language,
         this.logger,
         this.sequelizeLogger
       )
@@ -213,6 +235,31 @@ class AttestationRequestHandler {
 
     return attestation
   }
+
+  private async verifyPepperIfApplicable(): Promise<void> {
+    if (this.attestationRequest.phoneNumberSignature && this.attestationRequest.salt) {
+      const sigBuf = Buffer.from(this.attestationRequest.phoneNumberSignature, 'base64')
+
+      try {
+        await thresholdBls.verify(
+          Buffer.from(odisPubKey, 'base64'),
+          Buffer.from(this.attestationRequest.phoneNumber, 'base64'),
+          sigBuf
+        )
+
+        const pepper = getPepperFromThresholdSignature(sigBuf)
+        if (pepper !== this.attestationRequest.salt) {
+          this.logger.error('Pepper is invalid')
+          // temporarily only silently fail, so as not to block users
+          // throw new ErrorWithResponse('Pepper is invalid', 422)
+        }
+      } catch (e) {
+        this.logger.error('Cannot get phone number from signature', e)
+        throw new ErrorWithResponse(INVALID_SIGNATURE_ERROR, 422)
+      }
+    }
+    Counters.attestationRequestsDidNotProvideSignature.inc()
+  }
 }
 
 export async function handleAttestationRequest(
@@ -224,7 +271,7 @@ export async function handleAttestationRequest(
   try {
     const attestation = await handler.doAttestation()
     respondWithAttestation(res, attestation)
-  } catch (error) {
+  } catch (error: any) {
     if (!error.responseCode) {
       handler.logger.error({ error })
       Counters.attestationRequestUnexpectedErrors.inc()

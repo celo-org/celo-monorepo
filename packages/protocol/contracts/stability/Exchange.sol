@@ -54,6 +54,8 @@ contract Exchange is
   uint256 public updateFrequency;
   uint256 public minimumReports;
 
+  bytes32 public stableTokenRegistryId;
+
   modifier updateBucketsIfNecessary() {
     _updateBucketsIfNecessary();
     _;
@@ -64,13 +66,18 @@ contract Exchange is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 2, 0, 0);
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
-   * @param stableToken Address of the stable token
    * @param _spread Spread charged on exchanges
    * @param _reserveFraction Fraction to commit to the gold bucket
    * @param _updateFrequency The time period that needs to elapse between bucket
@@ -78,10 +85,11 @@ contract Exchange is
    * @param _minimumReports The minimum number of fresh reports that need to be
    * present in the oracle to update buckets
    * commit to the gold bucket
+   * @param stableTokenIdentifier String identifier of stabletoken in registry
    */
   function initialize(
     address registryAddress,
-    address stableToken,
+    string calldata stableTokenIdentifier,
     uint256 _spread,
     uint256 _reserveFraction,
     uint256 _updateFrequency,
@@ -89,11 +97,20 @@ contract Exchange is
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    setStableToken(stableToken);
+    stableTokenRegistryId = keccak256(abi.encodePacked(stableTokenIdentifier));
     setSpread(_spread);
     setReserveFraction(_reserveFraction);
     setUpdateFrequency(_updateFrequency);
     setMinimumReports(_minimumReports);
+  }
+
+  /**
+   * @notice Ensures stable token address is set in storage and initializes buckets.
+   * @dev Will revert if stable token is not registered or does not have oracle reports.
+   */
+  function activateStable() external onlyOwner {
+    require(stable == address(0), "StableToken address already activated");
+    _setStableToken(registry.getAddressForOrDie(stableTokenRegistryId));
     _updateBucketsIfNecessary();
   }
 
@@ -270,8 +287,7 @@ contract Exchange is
     * @param newStableToken The new address for Stable Token
     */
   function setStableToken(address newStableToken) public onlyOwner {
-    stable = newStableToken;
-    emit StableTokenSet(newStableToken);
+    _setStableToken(newStableToken);
   }
 
   /**
@@ -280,6 +296,10 @@ contract Exchange is
     */
   function setSpread(uint256 newSpread) public onlyOwner {
     spread = FixidityLib.wrap(newSpread);
+    require(
+      FixidityLib.lte(spread, FixidityLib.fixed1()),
+      "the value of spread must be less than or equal to 1"
+    );
     emit SpreadSet(newSpread);
   }
 
@@ -291,6 +311,11 @@ contract Exchange is
     reserveFraction = FixidityLib.wrap(newReserveFraction);
     require(reserveFraction.lt(FixidityLib.fixed1()), "reserve fraction must be smaller than 1");
     emit ReserveFractionSet(newReserveFraction);
+  }
+
+  function _setStableToken(address newStableToken) internal {
+    stable = newStableToken;
+    emit StableTokenSet(newStableToken);
   }
 
   /**

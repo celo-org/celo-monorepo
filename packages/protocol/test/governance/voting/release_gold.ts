@@ -138,19 +138,26 @@ contract('ReleaseGold', (accounts: string[]) => {
 
   const createNewReleaseGoldInstance = async (
     releaseGoldSchedule: ReleaseGoldConfig,
-    web3: Web3
+    web3: Web3,
+    override = {
+      prefund: true,
+      startReleasing: false,
+    }
   ) => {
-    releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + 5 * MINUTE
+    const startDelay = 5 * MINUTE
+    releaseGoldSchedule.releaseStartTime = (await getCurrentBlockchainTimestamp(web3)) + startDelay
     releaseGoldInstance = await ReleaseGold.new(isTest)
-    await goldTokenInstance.transfer(
-      releaseGoldInstance.address,
-      releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
-        releaseGoldSchedule.numReleasePeriods
-      ),
-      {
-        from: owner,
-      }
-    )
+    if (override.prefund) {
+      await goldTokenInstance.transfer(
+        releaseGoldInstance.address,
+        releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
+          releaseGoldSchedule.numReleasePeriods
+        ),
+        {
+          from: owner,
+        }
+      )
+    }
     await releaseGoldInstance.initialize(
       releaseGoldSchedule.releaseStartTime,
       releaseGoldSchedule.releaseCliffTime,
@@ -168,6 +175,12 @@ contract('ReleaseGold', (accounts: string[]) => {
       registry.address,
       { from: owner }
     )
+    if (override.startReleasing) {
+      await timeTravel(
+        startDelay + releaseGoldSchedule.releaseCliffTime + releaseGoldSchedule.releasePeriod,
+        web3
+      )
+    }
   }
 
   const getCurrentBlockchainTimestamp = (web3: Web3): Promise<number> =>
@@ -175,7 +188,7 @@ contract('ReleaseGold', (accounts: string[]) => {
 
   beforeEach(async () => {
     accountsInstance = await Accounts.new(true)
-    freezerInstance = await Freezer.new()
+    freezerInstance = await Freezer.new(true)
     goldTokenInstance = await GoldToken.new(true)
     lockedGoldInstance = await LockedGold.new(true)
     mockElection = await MockElection.new()
@@ -183,7 +196,7 @@ contract('ReleaseGold', (accounts: string[]) => {
     mockValidators = await MockValidators.new()
     mockStableToken = await MockStableToken.new()
 
-    registry = await Registry.new()
+    registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.Freezer, freezerInstance.address)
@@ -198,12 +211,77 @@ contract('ReleaseGold', (accounts: string[]) => {
     await accountsInstance.createAccount({ from: beneficiary })
   })
 
+  describe('#initialize', () => {
+    it('should indicate isFunded() if deployment is prefunded', async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3, {
+        prefund: true,
+        startReleasing: false,
+      })
+      const isFunded = await releaseGoldInstance.isFunded()
+      assert.isTrue(isFunded)
+    })
+
+    it('should not indicate isFunded() (and not revert) if deployment is not prefunded', async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3, {
+        prefund: false,
+        startReleasing: false,
+      })
+      const isFunded = await releaseGoldInstance.isFunded()
+      assert.isFalse(isFunded)
+    })
+  })
+
   describe('#payable', () => {
     it('should accept gold transfer by default from anyone', async () => {
       await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
       await goldTokenInstance.transfer(releaseGoldInstance.address, ONE_GOLDTOKEN.times(2), {
         from: accounts[8],
       })
+    })
+
+    it('should not update isFunded() if schedule principle not fulfilled', async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3, {
+        prefund: false,
+        startReleasing: false,
+      })
+      const insufficientPrinciple = releaseGoldDefaultSchedule.amountReleasedPerPeriod
+        .multipliedBy(releaseGoldDefaultSchedule.numReleasePeriods)
+        .minus(1)
+      await goldTokenInstance.transfer(releaseGoldInstance.address, insufficientPrinciple, {
+        from: owner,
+      })
+      const isFunded = await releaseGoldInstance.isFunded()
+      assert.isFalse(isFunded)
+    })
+
+    it('should update isFunded() if schedule principle is fulfilled after deployment', async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3, {
+        prefund: false,
+        startReleasing: false,
+      })
+      const sufficientPrinciple = releaseGoldDefaultSchedule.amountReleasedPerPeriod.multipliedBy(
+        releaseGoldDefaultSchedule.numReleasePeriods
+      )
+      await goldTokenInstance.transfer(releaseGoldInstance.address, sufficientPrinciple, {
+        from: owner,
+      })
+      const isFunded = await releaseGoldInstance.isFunded()
+      assert.isTrue(isFunded)
+    })
+
+    it('should update isFunded() if schedule principle not fulfilled but has begun releasing', async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3, {
+        prefund: false,
+        startReleasing: true,
+      })
+      const insufficientPrinciple = releaseGoldDefaultSchedule.amountReleasedPerPeriod
+        .multipliedBy(releaseGoldDefaultSchedule.numReleasePeriods)
+        .minus(1)
+      await goldTokenInstance.transfer(releaseGoldInstance.address, insufficientPrinciple, {
+        from: owner,
+      })
+      const isFunded = await releaseGoldInstance.isFunded()
+      assert.isTrue(isFunded)
     })
   })
 
@@ -217,13 +295,41 @@ contract('ReleaseGold', (accounts: string[]) => {
     })
 
     it('should transfer stable token from the release gold instance', async () => {
+      await releaseGoldInstance.transfer(receiver, transferAmount, { from: beneficiary })
+      const contractBalance = await mockStableToken.balanceOf(releaseGoldInstance.address)
+      const recipientBalance = await mockStableToken.balanceOf(receiver)
+      assertEqualBN(contractBalance, 0)
+      assertEqualBN(recipientBalance, transferAmount)
+    })
+  })
+
+  describe('#genericTransfer', () => {
+    const receiver = accounts[5]
+    const transferAmount = 10
+
+    beforeEach(async () => {
+      await createNewReleaseGoldInstance(releaseGoldDefaultSchedule, web3)
+      await mockStableToken.mint(releaseGoldInstance.address, transferAmount)
+    })
+
+    it('should transfer stable token from the release gold instance', async () => {
       const startBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
       const startBalanceTo = await mockStableToken.balanceOf(receiver)
-      await releaseGoldInstance.transfer(receiver, transferAmount, { from: beneficiary })
+      await releaseGoldInstance.genericTransfer(mockStableToken.address, receiver, transferAmount, {
+        from: beneficiary,
+      })
       const endBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
       const endBalanceTo = await mockStableToken.balanceOf(receiver)
       assertEqualBN(endBalanceFrom, startBalanceFrom.minus(transferAmount))
       assertEqualBN(endBalanceTo, startBalanceTo.plus(transferAmount))
+    })
+
+    it('should revert when attempting transfer of goldtoken from the release gold instance', async () => {
+      await assertRevert(
+        releaseGoldInstance.genericTransfer(goldTokenInstance.address, receiver, transferAmount, {
+          from: beneficiary,
+        })
+      )
     })
   })
 

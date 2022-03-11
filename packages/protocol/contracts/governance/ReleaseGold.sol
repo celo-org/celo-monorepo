@@ -8,10 +8,10 @@ import "./interfaces/IReleaseGold.sol";
 
 import "../common/FixidityLib.sol";
 import "../common/libraries/ReentrancyGuard.sol";
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 
-contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, InitializableV2 {
+contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializable {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
   using Address for address payable; // prettier-ignore
@@ -160,15 +160,38 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
-  function() external payable {} // solhint-disable no-empty-blocks
+  function isFunded() public view returns (bool) {
+    // grants which have already released are considered funded for backwards compatibility
+    return
+      getCurrentReleasedTotalAmount() > 0 ||
+      address(this).balance >=
+      releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods);
+  }
+
+  function() external payable {}
 
   /**
    * @notice Wrapper function for stable token transfer function.
    */
   function transfer(address to, uint256 value) external onlyWhenInProperState {
     IERC20(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID)).transfer(to, value);
+  }
+
+  /**
+   * @notice Wrapper function for any ERC-20 transfer function.
+   * @dev Protects against celo balance changes.
+   */
+  function genericTransfer(address erc20, address to, uint256 value)
+    external
+    onlyWhenInProperState
+  {
+    require(
+      erc20 != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      "Transfer must not target celo balance"
+    );
+    IERC20(erc20).transfer(to, value);
   }
 
   /**
@@ -228,18 +251,12 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       "The release schedule beneficiary cannot be the zero addresss"
     );
     require(registryAddress != address(0), "The registry address cannot be the zero address");
-    require(
-      address(this).balance ==
-        releaseSchedule.amountReleasedPerPeriod.mul(releaseSchedule.numReleasePeriods),
-      "Contract balance must equal the entire grant amount"
-    );
     require(!(revocable && _canValidate), "Revocable contracts cannot validate");
     require(initialDistributionRatio <= 1000, "Initial distribution ratio out of bounds");
     require(
       (revocable && _refundAddress != address(0)) || (!revocable && _refundAddress == address(0)),
       "If contract is revocable there must be an address to refund"
     );
-
     setRegistry(registryAddress);
     _setBeneficiary(_beneficiary);
     revocationInfo.revocable = revocable;

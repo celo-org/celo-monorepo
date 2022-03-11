@@ -98,7 +98,7 @@ release: {{ .Release.Name }}
 if [[ "{{ .Values.genesis.network }}" == "alfajores" || "{{ .Values.genesis.network }}" == "baklava" ]]; then
   BOOTNODE_FLAG="--{{ .Values.genesis.network }}"
 else
-  BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
+  [ -f /root/.celo/bootnodeEnode ] && BOOTNODE_FLAG="--bootnodes=$(cat /root/.celo/bootnodeEnode) --networkid={{ .Values.genesis.networkId }}"
 fi
 {{- end -}}
 
@@ -141,8 +141,7 @@ fi
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --unlock=${ACCOUNT_ADDRESS} --password /root/.celo/account/accountSecret --allow-insecure-unlock"
     {{- end }}
     {{- if .expose }}
-    RPC_APIS="{{ .rpc_apis | default "eth,net,web3,debug,txpool" }}"
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr 0.0.0.0 --rpcapi=${RPC_APIS} --rpccorsdomain='*' --rpcvhosts=* --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=${RPC_APIS}"
+{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" (default "eth,net,web3,debug,txpool" .rpc_apis) "ws_port" (default .Values.geth.ws_port .ws_port ) "listen_address" "0.0.0.0") | indent 4 }}
     {{- end }}
     {{- if .ping_ip_from_packet | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
@@ -155,21 +154,21 @@ fi
     {{- end }}
     {{- if .ethstats | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+    if grep -nri ${ACCOUNT_ADDRESS#0x} /root/.celo/keystore/ > /dev/null; then
+      :
     {{- if .proxy | default false }}
-    [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+      [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
     {{- else }}
     {{- if not (.proxied | default false) }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
     {{- end }}
     {{- end }}
+    fi
     {{- end }}
-    {{- if .metrics | default true }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
-    {{- end }}
-    {{- if .pprof | default false }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
-    {{- end }}
+
+{{ include  "common.geth-add-metrics-pprof-config" . | indent 4 }}
+
     PORT=30303
     {{- if .ports }}
     PORTS_PER_RID={{ join "," .ports }}
@@ -178,7 +177,7 @@ fi
 
 {{ include  "common.bootnode-flag-script" . | indent 4 }}
 
-{{ .extra_setup }}
+{{ default "" .extra_setup | indent 4 }}
 
     exec geth \
       --port $PORT  \
@@ -187,7 +186,7 @@ fi
 {{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
-      --maxpeers {{ .maxpeers | default 1200 }} \
+      --maxpeers={{- if kindIs "invalid" .maxpeers -}}1200{{- else -}}{{- .maxpeers -}}{{- end }} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \
@@ -198,6 +197,7 @@ fi
       --vmodule={{ .Values.geth.vmodule }} \
       --datadir=/root/.celo \
       --ipcpath=geth.ipc \
+      --txlookuplimit {{ .Values.geth.txlookuplimit | default 0 }} \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
@@ -216,6 +216,7 @@ fi
       fieldRef:
         fieldPath: status.hostIP
 {{- end }}
+{{ include  "common.geth-prestop-hook" . | indent 2 -}}
 {{/* TODO: make this use IPC */}}
 {{- if .expose }}
   readinessProbe:
@@ -248,7 +249,7 @@ fi
   - name: rpc
     containerPort: 8545
   - name: ws
-    containerPort: 8546
+    containerPort: {{ default .Values.geth.ws_port .ws_port }}
 {{ end }}
 {{- if .pprof }}
   - name: pprof
@@ -266,6 +267,13 @@ fi
 {{- end }}
 {{- end -}}
 
+{{- define "common.geth-prestop-hook" -}}
+lifecycle:
+  preStop:
+    exec:
+      command: ["/bin/sh","-c","killall -SIGTERM geth; while killall -0 geth; do sleep 1; done"]
+{{- end -}}
+
 {{- define "common.geth-configmap" -}}
 apiVersion: v1
 kind: ConfigMap
@@ -280,7 +288,7 @@ data:
 {{- end -}}
 {{- end -}}
 
-{{- define "common.celotool-validator-container" -}}
+{{- define "common.celotool-full-node-statefulset-container" -}}
 - name: get-account
   image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
   imagePullPolicy: {{ .Values.celotool.image.imagePullPolicy }}
@@ -294,6 +302,7 @@ data:
       # To allow proxies to scale up easily without conflicting with keys of
       # proxies associated with other validators
       KEY_INDEX=$(( ({{ .validator_index }} * 10000) + $RID ))
+      echo {{ .validator_index }} > /root/.celo/validator_index
       {{ else }}
       KEY_INDEX=$RID
       {{ end }}
@@ -482,7 +491,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - "-c"
   - |
     if [ -d /root/.celo/celo/chaindata ]; then
-      lastBlockTimestamp=$(geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
+      lastBlockTimestamp=$(timeout 600 geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --txpool.nolocals --exec "eth.getBlock(\"latest\").timestamp")
       day=$(date +%s)
       diff=$(($day - $lastBlockTimestamp))
       # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
@@ -504,7 +513,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- define "common.gsutil-sync-data-init-container" -}}
 - name: gsutil-sync-data
   image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   command:
   - /bin/sh
   - -c
@@ -521,4 +530,40 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+{{- end -}}
+
+{{- define "common.geth-add-metrics-pprof-config" -}}
+{{- if .metrics | default true }}
+ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
+{{- end }}
+{{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
+# Check the format of pprof cmd arguments
+set +e
+geth --help | grep 'pprof.port' >/dev/null
+pprof_new_format=$?
+set -e
+if [ $pprof_new_format -eq 0 ]; then
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprof.port {{ .Values.pprof.port | default "6060" }} --pprof.addr 0.0.0.0"
+else
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
+fi
+{{- end }}
+{{- end -}}
+
+{{- define "common.geth-http-ws-flags" -}}
+# Check the format of http/rcp and ws cmd arguments
+RPC_APIS={{ .rpc_apis | default "eth,net,web3,debug" | quote }}
+WS_PORT="{{ .ws_port | default 8545 }}"
+LISTEN_ADDRESS={{ .listen_address | default "0.0.0.0" | quote }}
+set +e
+geth --help | grep 'http.addr' >/dev/null
+http_new_format=$?
+set -e
+if [ $http_new_format -eq 0 ]; then
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http --http.addr $LISTEN_ADDRESS --http.api=$RPC_APIS --http.corsdomain='*' --http.vhosts=*"
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ws --ws.addr $LISTEN_ADDRESS --ws.origins=* --ws.api=$RPC_APIS --ws.port=$WS_PORT --ws.rpcprefix=/"
+else
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr $LISTEN_ADDRESS --rpcapi=$RPC_APIS --rpccorsdomain='*' --rpcvhosts=*"
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ws --wsaddr $LISTEN_ADDRESS --wsorigins=* --wsapi=$RPC_APIS --wsport=$WS_PORT"
+fi
 {{- end -}}

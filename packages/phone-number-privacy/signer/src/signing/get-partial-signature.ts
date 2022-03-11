@@ -1,11 +1,12 @@
 import {
   authenticateUser,
+  Endpoint,
   ErrorMessage,
+  GetBlindedMessageSigRequest,
   hasValidAccountParam,
-  hasValidQueryPhoneNumberParam,
-  hasValidTimestamp,
+  hasValidBlindedPhoneNumberParam,
+  identifierIsValidIfExists,
   isBodyReasonablySized,
-  phoneNumberHashIsValidIfExists,
   SignMessageResponse,
   SignMessageResponseFailure,
   WarningMessage,
@@ -20,25 +21,18 @@ import config, { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
 import { getRequestExists, storeRequest } from '../database/wrappers/request'
 import { getKeyProvider } from '../key-management/key-provider'
-import { Endpoints } from '../server'
 import { getBlockNumber, getContractKit } from '../web3/contracts'
 import { getRemainingQueryCount } from './query-quota'
 
 allSettled.shim()
 
-export interface GetBlindedMessagePartialSigRequest {
-  account: string
-  blindedQueryPhoneNumber: string
-  hashedPhoneNumber?: string
-  timestamp?: number
-  sessionID?: string
-}
+export type GetBlindedMessagePartialSigRequest = GetBlindedMessageSigRequest
 
 export async function handleGetBlindedMessagePartialSig(
   request: Request<{}, {}, GetBlindedMessagePartialSigRequest>,
   response: Response
 ) {
-  Counters.requests.labels(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG).inc()
+  Counters.requests.labels(Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG).inc()
 
   const logger: Logger = response.locals.logger
   logger.info({ request: request.body }, 'Request received')
@@ -47,7 +41,7 @@ export async function handleGetBlindedMessagePartialSig(
   try {
     if (!isValidGetSignatureInput(request.body)) {
       respondWithError(
-        Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+        Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG,
         response,
         400,
         WarningMessage.INVALID_INPUT
@@ -62,7 +56,7 @@ export async function handleGetBlindedMessagePartialSig(
       !(await authenticateUser(request, getContractKit(), logger).finally(meterAuthenticateUser))
     ) {
       respondWithError(
-        Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+        Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG,
         response,
         401,
         WarningMessage.UNAUTHENTICATED_USER
@@ -115,7 +109,7 @@ export async function handleGetBlindedMessagePartialSig(
         logger.info({ request: request.body }, 'Request will bypass quota check for testing')
       } else {
         respondWithError(
-          Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+          Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG,
           response,
           403,
           WarningMessage.EXCEEDED_QUOTA,
@@ -185,14 +179,14 @@ export async function handleGetBlindedMessagePartialSig(
     } else {
       signMessageResponse = signMessageResponseSuccess
     }
-    Counters.responses.labels(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, '200').inc()
+    Counters.responses.labels(Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG, '200').inc()
     logger.info({ response: signMessageResponse }, 'Signature retrieval success')
     response.json(signMessageResponse)
   } catch (err) {
     logger.error('Failed to get signature')
     logger.error(err)
     respondWithError(
-      Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+      Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG,
       response,
       500,
       ErrorMessage.UNKNOWN_ERROR
@@ -203,10 +197,9 @@ export async function handleGetBlindedMessagePartialSig(
 function isValidGetSignatureInput(requestBody: GetBlindedMessagePartialSigRequest): boolean {
   return (
     hasValidAccountParam(requestBody) &&
-    hasValidQueryPhoneNumberParam(requestBody) &&
-    phoneNumberHashIsValidIfExists(requestBody) &&
-    isBodyReasonablySized(requestBody) &&
-    hasValidTimestamp(requestBody)
+    hasValidBlindedPhoneNumberParam(requestBody) &&
+    identifierIsValidIfExists(requestBody) &&
+    isBodyReasonablySized(requestBody)
   )
 }
 
