@@ -4,7 +4,6 @@ import {
   DomainQuotaStatusRequest,
   DomainRequest,
   DomainRestrictedSignatureRequest,
-  ErrorType,
 } from '.'
 import { Domain, DomainState } from '../domains'
 
@@ -38,7 +37,7 @@ export interface GetQuotaResponseSuccess {
 export interface GetQuotaResponseFailure {
   success: false
   version: string
-  error: ErrorType
+  error: string
 }
 
 export type GetQuotaResponse = GetQuotaResponseSuccess | GetQuotaResponseFailure
@@ -51,7 +50,7 @@ export interface GetContactMatchesResponseSuccess {
 export interface GetContactMatchesResponseFailure {
   success: false
   version: string
-  error: ErrorType
+  error: string
 }
 
 export type GetContactMatchesResponse =
@@ -68,7 +67,7 @@ export interface DomainRestrictedSignatureResponseSuccess<D extends Domain = Dom
 export interface DomainRestrictedSignatureResponseFailure<D extends Domain = Domain> {
   success: false
   version: string
-  error: ErrorType
+  error: string
   status: DomainState<D>
 }
 
@@ -85,7 +84,7 @@ export interface DomainQuotaStatusResponseSuccess<D extends Domain = Domain> {
 export interface DomainQuotaStatusResponseFailure {
   success: false
   version: string
-  error: ErrorType
+  error: string
 }
 
 export type DomainQuotaStatusResponse<D extends Domain = Domain> =
@@ -100,7 +99,7 @@ export interface DisableDomainResponseSuccess {
 export interface DisableDomainResponseFailure {
   success: false
   version: string
-  error: ErrorType
+  error: string
 }
 
 export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
@@ -122,7 +121,7 @@ export function domainRestrictedSignatureResponseSchema<D extends Domain>(
     t.type({
       success: t.literal(false),
       version: t.string,
-      error: t.string, // TODO
+      error: t.string,
       status: state,
     }),
     t.type({
@@ -146,7 +145,7 @@ export function domainQuotaStatusResponseSchema<D extends Domain>(
     t.type({
       success: t.literal(false),
       version: t.string,
-      error: t.type(ErrorType), // TODO
+      error: t.string,
     }),
   ])
 }
