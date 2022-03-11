@@ -57,6 +57,7 @@ export async function initDatabase(doTestQuery = true) {
 
   db = knex({
     client,
+    useNullAsDefault: type === SupportedDatabase.Sqlite,
     connection,
     debug: DEV_MODE,
   })
