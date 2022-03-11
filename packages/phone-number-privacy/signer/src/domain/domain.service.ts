@@ -21,7 +21,7 @@ import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { Counters } from '../common/metrics'
 import { getVersion } from '../config'
-import { getTransaction } from '../database/database'
+import { getDatabase } from '../database/database'
 import { DOMAINS_STATES_COLUMNS, DomainStateRecord } from '../database/models/domainState'
 import {
   getDomainState,
@@ -90,8 +90,8 @@ export class DomainService implements IDomainService {
       hash: domainHash(domain),
     })
     try {
-      const trx = await getTransaction()
-      try {
+      // Inside a database transaction, update or create the domain to mark it disabled.
+      await getDatabase().transaction(async (trx) => {
         const domainState = await getDomainStateWithLock(domain, trx, logger)
         if (!domainState) {
           // If the domain is not currently recorded in the state database, add it now.
@@ -100,11 +100,7 @@ export class DomainService implements IDomainService {
         if (!(domainState?.disabled ?? false)) {
           await setDomainDisabled(domain, trx, logger)
         }
-        await trx.commit()
-      } catch (error) {
-        // Rollback will return a rejected pormise, resulting in a new throw.
-        await trx.rollback(error)
-      }
+      })
 
       response.status(200).send({ success: true, version: getVersion() })
     } catch (error) {
@@ -195,6 +191,7 @@ export class DomainService implements IDomainService {
 
     const logger = response.locals.logger
     const domain = request.body.domain
+    const blindedMessage = request.body.blindedMessage
     if (!this.authenticateRequest(domain, response, DomainEndpoint.DOMAIN_SIGN, logger)) {
       // authenticateRequest returns a response to the user internally. Nothing left to do.
       return
@@ -206,54 +203,45 @@ export class DomainService implements IDomainService {
     })
 
     try {
-      const trx = await getTransaction()
-      let domainState = await getDomainStateWithLock(domain, trx, logger)
-      if (!domainState) {
-        domainState = await insertDomainState(
-          DomainStateRecord.createEmptyDomainState(domain),
+      let signature: string | undefined
+      await getDatabase().transaction(async (trx) => {
+        // Get the current domain state record, or use an empty record one does not exist.
+        const domainState =
+          (await getDomainStateWithLock(domain, trx, logger)) ??
+          DomainStateRecord.createEmptyDomainState(domain)
+
+        const quotaState = await this.quotaService.checkAndUpdateQuota(
+          domain,
+          domainState,
           trx,
           logger
         )
-      }
 
-      const quotaState = await this.quotaService.checkAndUpdateQuota(
-        domain,
-        domainState,
-        trx,
-        logger
-      )
+        if (!quotaState.sufficient) {
+          logger.warn(`Exceeded quota`, {
+            name: domain.name,
+            version: domain.version,
+            hash: domainHash(domain),
+          })
+          respondWithError(DomainEndpoint.DOMAIN_SIGN, response, 429, WarningMessage.EXCEEDED_QUOTA)
+          return
+        }
 
-      if (!quotaState.sufficient) {
-        trx.rollback()
-        logger.warn(`Exceeded quota`, {
-          name: domain.name,
-          version: domain.version,
-        })
-        respondWithError(DomainEndpoint.DOMAIN_SIGN, response, 403, WarningMessage.EXCEEDED_QUOTA)
-        return
-      }
-
-      let signature: string
-      try {
+        // Compute the signature inside the transaction such that it will rollback on error.
         const keyProvider = getKeyProvider()
         const privateKey = keyProvider.getPrivateKey()
-        signature = computeBlindedSignature(request.body.blindedMessage, privateKey, logger)
-      } catch (err) {
-        trx.rollback()
-        throw err
-      }
+        signature = computeBlindedSignature(blindedMessage, privateKey, logger)
+      })
 
-      try {
-        trx.commit()
+      // TODO(victor): Checking the existance of the sigature to determine whether this operation
+      // succeeded is a little clunky. Refactor this to improve the flow.
+      if (signature) {
         const signMessageResponseSuccess: DomainRestrictedSignatureResponseSuccess = {
           success: true,
           version: getVersion(),
           signature,
         }
         response.status(200).json(signMessageResponseSuccess)
-      } catch (err) {
-        trx.rollback()
-        throw err
       }
     } catch (err) {
       logger.error('Failed to get signature for a domain')
