@@ -126,7 +126,7 @@ contract Accounts is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 3, 0);
+    return (1, 1, 4, 0);
   }
 
   /**
@@ -318,10 +318,10 @@ contract Accounts is
 
   /**
    * @notice Sets validator payment delegation settings.
-   * @param beneficiary The address that should receive a portion of vaidator
+   * @param beneficiary The address that should receive a portion of validator
    * payments.
    * @param fraction The fraction of the validator's payment that should be
-   * diverted to `beneficiary` every epoch, given as FixidyLib value. Must not
+   * diverted to `beneficiary` every epoch, given as FixidityLib value. Must not
    * be greater than 1.
    * @dev Use `deletePaymentDelegation` to unset the payment delegation.
    */
