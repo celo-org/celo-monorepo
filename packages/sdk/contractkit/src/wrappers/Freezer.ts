@@ -6,3 +6,5 @@ export class FreezerWrapper extends BaseWrapper<Freezer> {
   unfreeze = proxySend(this.connection, this.contract.methods.unfreeze)
   isFrozen = proxyCall(this.contract.methods.isFrozen)
 }
+
+export type FreezerWrapperType = FreezerWrapper

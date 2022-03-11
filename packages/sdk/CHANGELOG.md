@@ -9,6 +9,9 @@ This package will follow the release process outlined [here](https://docs.celo.o
 Breaking Change
   - Removes phone and country related functions from utils. Now in phone-utils [#](https://github.com/celo-org/celo-monorepo/pull/8987)
 
+  - @celo/contractkit AccountsWrapper.authorizeValidatorSigner now requires a ValidatorWrapper as third param
+
+  -  contract Wrappers are now loaded async
 ### **[1.5.1-dev]**
 Features
 -  one-line summary - [#](link PR)

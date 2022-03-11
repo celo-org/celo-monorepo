@@ -17,7 +17,7 @@ import {
   solidityBytesToString,
   stringToSolidityBytes,
 } from '../wrappers/BaseWrapper'
-import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
+import { BaseWrapper } from './BaseWrapper'
 
 interface AccountSummary {
   address: string
@@ -35,7 +35,7 @@ interface AccountSummary {
 /**
  * Contract for handling deposits needed for voting.
  */
-export class AccountsWrapper extends BaseWrapperWithContracts<Accounts> {
+export class AccountsWrapper extends BaseWrapper<Accounts> {
   private RELEASE_4_VERSION = newContractVersion(1, 1, 2, 0)
 
   /**
@@ -203,11 +203,11 @@ export class AccountsWrapper extends BaseWrapperWithContracts<Accounts> {
    */
   async authorizeValidatorSigner(
     signer: Address,
-    proofOfSigningKeyPossession: Signature
+    proofOfSigningKeyPossession: Signature,
+    validatorsWrapper: { isValidator: (account: string) => Promise<boolean> }
   ): Promise<CeloTransactionObject<void>> {
-    const validators = await this.contracts.getValidators()
     const account = this.connection.defaultAccount || (await this.connection.getAccounts())[0]
-    if (await validators.isValidator(account)) {
+    if (await validatorsWrapper.isValidator(account)) {
       const message = this.connection.web3.utils.soliditySha3({
         type: 'address',
         value: account,
@@ -286,10 +286,10 @@ export class AccountsWrapper extends BaseWrapperWithContracts<Accounts> {
 
   async authorizeSigner(signer: Address, role: string) {
     await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
-    const [accounts, chainId, accountsContract] = await Promise.all([
+    const [accounts, chainId] = await Promise.all([
       this.connection.getAccounts(),
       this.connection.chainId(),
-      this.contracts.getAccounts(),
+      // This IS the accounts contract wrapper no need to get it
     ])
     const account = this.connection.defaultAccount || accounts[0]
 
@@ -299,7 +299,7 @@ export class AccountsWrapper extends BaseWrapperWithContracts<Accounts> {
       signer,
       chainId,
       role: hashedRole,
-      accountsContractAddress: accountsContract.address,
+      accountsContractAddress: this.address,
     })
 
     const sig = await this.connection.signTypedData(signer, typedData)
@@ -467,3 +467,5 @@ export class AccountsWrapper extends BaseWrapperWithContracts<Accounts> {
     return parseSignature(hash!, signature, signer)
   }
 }
+
+export type AccountsWrapperType = AccountsWrapper

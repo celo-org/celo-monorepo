@@ -47,3 +47,5 @@ export class DoubleSigningSlasherWrapper extends BaseSlasher<DoubleSigningSlashe
     )
   }
 }
+
+export type DoubleSigningSlasherWrapperType = DoubleSigningSlasherWrapper

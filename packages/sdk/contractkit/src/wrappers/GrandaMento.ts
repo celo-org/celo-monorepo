@@ -229,3 +229,5 @@ export class GrandaMentoWrapper extends BaseWrapper<GrandaMento> {
     }
   }
 }
+
+export type GrandaMentoWrapperType = GrandaMentoWrapper

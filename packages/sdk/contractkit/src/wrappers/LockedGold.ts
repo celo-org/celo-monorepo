@@ -315,3 +315,5 @@ export class LockedGoldWrapper extends BaseWrapperWithContracts<LockedGold> {
     return res
   }
 }
+
+export type LockedGoldWrapperType = LockedGoldWrapper

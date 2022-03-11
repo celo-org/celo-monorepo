@@ -219,3 +219,5 @@ export class DowntimeSlasherWrapper extends BaseSlasher<DowntimeSlasher> {
     }
   }
 }
+
+export type DowntimeSlasherWrapperType = DowntimeSlasherWrapper

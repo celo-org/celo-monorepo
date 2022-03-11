@@ -18,8 +18,8 @@ import {
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
-import { Validator, ValidatorGroup } from './Validators'
 import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
+import { Validator, ValidatorGroup } from './Validators'
 
 export interface ValidatorGroupVote {
   address: Address
@@ -543,3 +543,5 @@ export class ElectionWrapper extends BaseWrapperWithContracts<Election> {
     )
   }
 }
+
+export type ElectionWrapperType = ElectionWrapper

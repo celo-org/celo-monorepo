@@ -4,65 +4,106 @@ import { CeloContract } from './base'
 import { StableToken, stableTokenInfos } from './celo-tokens'
 import { Ierc20 } from './generated/IERC20'
 import { Web3ContractCache } from './web3-contract-cache'
-import { AccountsWrapper } from './wrappers/Accounts'
-import { AttestationsWrapper } from './wrappers/Attestations'
-import { BlockchainParametersWrapper } from './wrappers/BlockchainParameters'
-import { DoubleSigningSlasherWrapper } from './wrappers/DoubleSigningSlasher'
-import { DowntimeSlasherWrapper } from './wrappers/DowntimeSlasher'
-import { ElectionWrapper } from './wrappers/Election'
-import { EpochRewardsWrapper } from './wrappers/EpochRewards'
-import { Erc20Wrapper } from './wrappers/Erc20Wrapper'
-import { EscrowWrapper } from './wrappers/Escrow'
-import { ExchangeWrapper } from './wrappers/Exchange'
-import { FreezerWrapper } from './wrappers/Freezer'
-import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
-import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
-import { GovernanceWrapper } from './wrappers/Governance'
-import { GrandaMentoWrapper } from './wrappers/GrandaMento'
-import { LockedGoldWrapper } from './wrappers/LockedGold'
-import { MetaTransactionWalletWrapper } from './wrappers/MetaTransactionWallet'
-import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransactionWalletDeployer'
-import { MultiSigWrapper } from './wrappers/MultiSig'
-import { ReserveWrapper } from './wrappers/Reserve'
-import { SortedOraclesWrapper } from './wrappers/SortedOracles'
-import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
-import { ValidatorsWrapper } from './wrappers/Validators'
+import { AccountsWrapperType } from './wrappers/Accounts'
+import { AttestationsWrapperType } from './wrappers/Attestations'
+import { BlockchainParametersWrapperType } from './wrappers/BlockchainParameters'
+import { DoubleSigningSlasherWrapperType } from './wrappers/DoubleSigningSlasher'
+import { DowntimeSlasherWrapperType } from './wrappers/DowntimeSlasher'
+import { ElectionWrapperType } from './wrappers/Election'
+import { EpochRewardsWrapperType } from './wrappers/EpochRewards'
+import { Erc20WrapperType } from './wrappers/Erc20Wrapper'
+import { EscrowWrapperType } from './wrappers/Escrow'
+import { ExchangeWrapperType } from './wrappers/Exchange'
+import { FreezerWrapperType } from './wrappers/Freezer'
+import { GasPriceMinimumWrapperType } from './wrappers/GasPriceMinimum'
+import { GoldTokenWrapperType } from './wrappers/GoldTokenWrapper'
+import { GovernanceWrapperType } from './wrappers/Governance'
+import { GrandaMentoWrapperType } from './wrappers/GrandaMento'
+import { LockedGoldWrapperType } from './wrappers/LockedGold'
+import { MetaTransactionWalletWrapperType } from './wrappers/MetaTransactionWallet'
+import { MetaTransactionWalletDeployerWrapperType } from './wrappers/MetaTransactionWalletDeployer'
+import { MultiSigWrapperType } from './wrappers/MultiSig'
+import { ReserveWrapperType } from './wrappers/Reserve'
+import { SortedOraclesWrapperType } from './wrappers/SortedOracles'
+import { StableTokenWrapperType } from './wrappers/StableTokenWrapper'
+import { ValidatorsWrapperType } from './wrappers/Validators'
 
 const WrapperFactories = {
-  [CeloContract.Accounts]: AccountsWrapper,
-  [CeloContract.Attestations]: AttestationsWrapper,
-  [CeloContract.BlockchainParameters]: BlockchainParametersWrapper,
-  [CeloContract.DoubleSigningSlasher]: DoubleSigningSlasherWrapper,
-  [CeloContract.DowntimeSlasher]: DowntimeSlasherWrapper,
-  [CeloContract.Election]: ElectionWrapper,
-  [CeloContract.EpochRewards]: EpochRewardsWrapper,
-  [CeloContract.ERC20]: Erc20Wrapper,
-  [CeloContract.Escrow]: EscrowWrapper,
-  [CeloContract.Exchange]: ExchangeWrapper,
-  [CeloContract.ExchangeEUR]: ExchangeWrapper,
-  [CeloContract.ExchangeBRL]: ExchangeWrapper,
+  [CeloContract.Accounts]: async () =>
+    import('./wrappers/Accounts').then((mod) => mod.AccountsWrapper),
+  [CeloContract.BlockchainParameters]: async () =>
+    import('./wrappers/BlockchainParameters').then((mod) => mod.BlockchainParametersWrapper),
+  [CeloContract.EpochRewards]: async () =>
+    import('./wrappers/EpochRewards').then((mod) => mod.EpochRewardsWrapper),
+  [CeloContract.ERC20]: async () =>
+    import('./wrappers/Erc20Wrapper').then((mod) => mod.Erc20Wrapper),
+  [CeloContract.Escrow]: async () => import('./wrappers/Escrow').then((mod) => mod.EscrowWrapper),
+  [CeloContract.Exchange]: async () =>
+    import('./wrappers/Exchange').then((mod) => mod.ExchangeWrapper),
+  [CeloContract.ExchangeEUR]: async () =>
+    import('./wrappers/Exchange').then((mod) => mod.ExchangeWrapper),
+  [CeloContract.ExchangeBRL]: async () =>
+    import('./wrappers/Exchange').then((mod) => mod.ExchangeWrapper),
   // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
-  [CeloContract.Freezer]: FreezerWrapper,
-  [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
-  [CeloContract.GoldToken]: GoldTokenWrapper,
-  [CeloContract.Governance]: GovernanceWrapper,
-  [CeloContract.GrandaMento]: GrandaMentoWrapper,
-  [CeloContract.LockedGold]: LockedGoldWrapper,
+  [CeloContract.Freezer]: async () =>
+    import('./wrappers/Freezer').then((mod) => mod.FreezerWrapper),
+  [CeloContract.GasPriceMinimum]: async () =>
+    import('./wrappers/GasPriceMinimum').then((mod) => mod.GasPriceMinimumWrapper),
+  [CeloContract.GoldToken]: async () =>
+    import('./wrappers/GoldTokenWrapper').then((mod) => mod.GoldTokenWrapper),
+  [CeloContract.GrandaMento]: async () =>
+    import('./wrappers/GrandaMento').then((mod) => mod.GrandaMentoWrapper),
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
-  [CeloContract.MetaTransactionWallet]: MetaTransactionWalletWrapper,
-  [CeloContract.MetaTransactionWalletDeployer]: MetaTransactionWalletDeployerWrapper,
-  [CeloContract.MultiSig]: MultiSigWrapper,
-  [CeloContract.Reserve]: ReserveWrapper,
-  [CeloContract.SortedOracles]: SortedOraclesWrapper,
-  [CeloContract.StableToken]: StableTokenWrapper,
-  [CeloContract.StableTokenEUR]: StableTokenWrapper,
-  [CeloContract.StableTokenBRL]: StableTokenWrapper,
-  [CeloContract.Validators]: ValidatorsWrapper,
+  [CeloContract.MetaTransactionWallet]: async () =>
+    import('./wrappers/MetaTransactionWallet').then((mod) => mod.MetaTransactionWalletWrapper),
+  [CeloContract.MetaTransactionWalletDeployer]: async () =>
+    import('./wrappers/MetaTransactionWalletDeployer').then(
+      (mod) => mod.MetaTransactionWalletDeployerWrapper
+    ),
+  [CeloContract.MultiSig]: async () =>
+    import('./wrappers/MultiSig').then((mod) => mod.MultiSigWrapper),
+  [CeloContract.Reserve]: async () =>
+    import('./wrappers/Reserve').then((mod) => mod.ReserveWrapper),
+  [CeloContract.StableToken]: async () =>
+    import('./wrappers/StableTokenWrapper').then((mod) => mod.StableTokenWrapper),
+  [CeloContract.StableTokenEUR]: () =>
+    import('./wrappers/StableTokenWrapper').then((mod) => mod.StableTokenWrapper),
+  [CeloContract.StableTokenBRL]: () =>
+    import('./wrappers/StableTokenWrapper').then((mod) => mod.StableTokenWrapper),
+} as const
+
+const WithRegistry = {
+  [CeloContract.SortedOracles]: async () =>
+    import('./wrappers/SortedOracles').then((mod) => mod.SortedOraclesWrapper),
+} as const
+
+const WrapperFactoriesWhichNeedCache = {
+  [CeloContract.Attestations]: async () =>
+    import('./wrappers/Attestations').then((mod) => mod.AttestationsWrapper),
+  [CeloContract.DoubleSigningSlasher]: async () =>
+    import('./wrappers/DoubleSigningSlasher').then((mod) => mod.DoubleSigningSlasherWrapper),
+  [CeloContract.DowntimeSlasher]: async () =>
+    import('./wrappers/DowntimeSlasher').then((mod) => mod.DowntimeSlasherWrapper),
+  [CeloContract.Election]: async () =>
+    import('./wrappers/Election').then((mod) => mod.ElectionWrapper),
+  [CeloContract.Governance]: async () =>
+    import('./wrappers/Governance').then((mod) => mod.GovernanceWrapper),
+  [CeloContract.LockedGold]: async () =>
+    import('./wrappers/LockedGold').then((mod) => mod.LockedGoldWrapper),
+  [CeloContract.Validators]: async () =>
+    import('./wrappers/Validators').then((mod) => mod.ValidatorsWrapper),
 }
 
 type CFType = typeof WrapperFactories
-export type ValidWrappers = keyof CFType
+type RegistryType = typeof WithRegistry
+type WrapperFactoriesWhichNeedCacheType = typeof WrapperFactoriesWhichNeedCache
+export type ValidWrappers =
+  | keyof CFType
+  | keyof RegistryType
+  | keyof WrapperFactoriesWhichNeedCacheType
+
+const contractsWhichRequireCache = new Set(Object.keys(WrapperFactoriesWhichNeedCache))
 
 /**
  * Kit ContractWrappers factory & cache.
@@ -78,112 +119,83 @@ export class WrapperCache {
     readonly registry: AddressRegistry
   ) {}
 
-  getAccounts() {
-    return this.getContract(CeloContract.Accounts) as Promise<AccountsWrapper>
+  getAccounts(): Promise<AccountsWrapperType> {
+    return this.getContract(CeloContract.Accounts)
   }
-  getAttestations() {
-    return this.getContract(CeloContract.Attestations) as Promise<AttestationsWrapper>
+  getAttestations(): Promise<AttestationsWrapperType> {
+    return this.getContract(CeloContract.Attestations)
   }
-  getBlockchainParameters() {
-    return this.getContract(
-      CeloContract.BlockchainParameters
-    ) as Promise<BlockchainParametersWrapper>
+  getBlockchainParameters(): Promise<BlockchainParametersWrapperType> {
+    return this.getContract(CeloContract.BlockchainParameters)
   }
-  getDoubleSigningSlasher() {
-    return this.getContract(
-      CeloContract.DoubleSigningSlasher
-    ) as Promise<DoubleSigningSlasherWrapper>
+  getDoubleSigningSlasher(): Promise<DoubleSigningSlasherWrapperType> {
+    return this.getContract<CeloContract.DoubleSigningSlasher>(CeloContract.DoubleSigningSlasher)
   }
-  getDowntimeSlasher() {
-    return this.getContract(CeloContract.DowntimeSlasher) as Promise<DowntimeSlasherWrapper>
+  getDowntimeSlasher(): Promise<DowntimeSlasherWrapperType> {
+    return this.getContract(CeloContract.DowntimeSlasher)
   }
-  getElection() {
-    return this.getContract(CeloContract.Election) as Promise<ElectionWrapper>
+  getElection(): Promise<ElectionWrapperType> {
+    return this.getContract(CeloContract.Election)
   }
-  getEpochRewards() {
+  getEpochRewards(): Promise<EpochRewardsWrapperType> {
     return this.getContract(CeloContract.EpochRewards)
   }
-  getErc20<T extends Ierc20>(address: string) {
-    return this.getContract(CeloContract.ERC20, address) as Promise<Erc20Wrapper<T>>
+  getErc20<T extends Ierc20>(address: string): Promise<Erc20WrapperType<T>> {
+    return this.getContract(CeloContract.ERC20, address)
   }
-  getEscrow() {
-    return this.getContract(CeloContract.Escrow) as Promise<EscrowWrapper>
-  }
-
-  getExchange(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(
-      stableTokenInfos[stableToken].exchangeContract
-    ) as Promise<ExchangeWrapper>
+  getEscrow(): Promise<EscrowWrapperType> {
+    return this.getContract(CeloContract.Escrow)
   }
 
-  getFreezer() {
-    return this.getContract(CeloContract.Freezer) as Promise<FreezerWrapper>
+  getExchange(stableToken: StableToken = StableToken.cUSD): Promise<ExchangeWrapperType> {
+    return this.getContract(stableTokenInfos[stableToken].exchangeContract)
+  }
+
+  getFreezer(): Promise<FreezerWrapperType> {
+    return this.getContract(CeloContract.Freezer)
   }
   // getFeeCurrencyWhitelist() {
   //   return this.getWrapper(CeloContract.FeeCurrencyWhitelist, newFeeCurrencyWhitelist)
   // }
-  getGasPriceMinimum() {
-    return this.getContract(CeloContract.GasPriceMinimum) as Promise<GasPriceMinimumWrapper>
+  getGasPriceMinimum(): Promise<GasPriceMinimumWrapperType> {
+    return this.getContract(CeloContract.GasPriceMinimum)
   }
-  getGoldToken() {
-    return this.getContract(CeloContract.GoldToken) as Promise<GoldTokenWrapper>
+  getGoldToken(): Promise<GoldTokenWrapperType> {
+    return this.getContract(CeloContract.GoldToken)
   }
-  getGovernance() {
-    return this.getContract(CeloContract.Governance) as Promise<GovernanceWrapper>
+  getGovernance(): Promise<GovernanceWrapperType> {
+    return this.getContract(CeloContract.Governance)
   }
-  getGrandaMento() {
-    return this.getContract(CeloContract.GrandaMento) as Promise<GrandaMentoWrapper>
+  getGrandaMento(): Promise<GrandaMentoWrapperType> {
+    return this.getContract(CeloContract.GrandaMento)
   }
-  getLockedGold() {
-    return this.getContract(CeloContract.LockedGold) as Promise<LockedGoldWrapper>
+  getLockedGold(): Promise<LockedGoldWrapperType> {
+    return this.getContract(CeloContract.LockedGold)
   }
-  getMetaTransactionWallet(address: string) {
-    return this.getContract(
-      CeloContract.MetaTransactionWallet,
-      address
-    ) as Promise<MetaTransactionWalletWrapper>
+  getMetaTransactionWallet(address: string): Promise<MetaTransactionWalletWrapperType> {
+    return this.getContract(CeloContract.MetaTransactionWallet, address)
   }
-  getMetaTransactionWalletDeployer(address: string) {
-    return this.getContract(
-      CeloContract.MetaTransactionWalletDeployer,
-      address
-    ) as Promise<MetaTransactionWalletDeployerWrapper>
+  getMetaTransactionWalletDeployer(
+    address: string
+  ): Promise<MetaTransactionWalletDeployerWrapperType> {
+    return this.getContract(CeloContract.MetaTransactionWalletDeployer, address)
   }
-  getMultiSig(address: string) {
-    return this.getContract(CeloContract.MultiSig, address) as Promise<MultiSigWrapper>
+  getMultiSig(address: string): Promise<MultiSigWrapperType> {
+    return this.getContract(CeloContract.MultiSig, address)
   }
 
-  getReserve() {
-    return this.getContract(CeloContract.Reserve) as Promise<ReserveWrapper>
+  getReserve(): Promise<ReserveWrapperType> {
+    return this.getContract(CeloContract.Reserve)
   }
-  getSortedOracles() {
-    return this.getContract(CeloContract.SortedOracles) as Promise<SortedOraclesWrapper>
-  }
-
-  getStableToken(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(stableTokenInfos[stableToken].contract) as Promise<StableTokenWrapper>
-  }
-  getValidators() {
-    return this.getContract(CeloContract.Validators) as Promise<ValidatorsWrapper>
+  getSortedOracles(): Promise<SortedOraclesWrapperType> {
+    return this.getContract(CeloContract.SortedOracles)
   }
 
-  private getThirdArgument(contract: CeloContract) {
-    switch (contract) {
-      case CeloContract.SortedOracles:
-        return this.registry
-      case CeloContract.Accounts:
-      case CeloContract.Attestations:
-      case CeloContract.DoubleSigningSlasher:
-      case CeloContract.DowntimeSlasher:
-      case CeloContract.Election:
-      case CeloContract.Governance:
-      case CeloContract.LockedGold:
-      // case CeloContract.ReleaseGold weirdly missing from the enum?
-      case CeloContract.Validators:
-        return this
-      default:
-        return undefined
-    }
+  getStableToken(stableToken: StableToken = StableToken.cUSD): Promise<StableTokenWrapperType> {
+    return this.getContract(stableTokenInfos[stableToken].contract)
+  }
+  getValidators(): Promise<ValidatorsWrapperType> {
+    return this.getContract(CeloContract.Validators)
   }
 
   /**
@@ -191,19 +203,27 @@ export class WrapperCache {
    */
   public async getContract<C extends ValidWrappers>(contract: C, address?: string) {
     if (this.wrapperCache[contract] == null || address !== undefined) {
-      const instance = await this._web3Contracts.getContract(contract, address)
-      const Klass: CFType[C] = WrapperFactories[contract]
-      this.wrapperCache[contract] = new Klass(
-        this.connection,
-        instance as any,
-        this.getThirdArgument(contract) as any
-      ) as any
+      const instance = await this._web3Contracts.getContract<C>(contract, address)
+      if (contract === CeloContract.SortedOracles) {
+        const getSortedOracles = WithRegistry[CeloContract.SortedOracles]
+        const Klass = await getSortedOracles()
+        this.wrapperCache[contract] = new Klass(this.connection, instance as any, this.registry)
+      } else if (contractsWhichRequireCache.has(contract)) {
+        let contractName = contract as keyof WrapperFactoriesWhichNeedCacheType
+        const getClass = WrapperFactoriesWhichNeedCache[contractName]
+        const Klass = await getClass()
+        this.wrapperCache[contract] = new Klass(this.connection, instance as any, this)
+      } else {
+        const getClass = WrapperFactories[contract as keyof CFType]
+        const Klass = await getClass()
+        this.wrapperCache[contract] = new Klass(this.connection, instance as any)
+      }
     }
     return this.wrapperCache[contract]!
   }
 
   public invalidateContract<C extends CeloContract>(contract: C) {
     this._web3Contracts.invalidateContract(contract)
-    ;(this.wrapperCache[contract] as any) = null
+    this.wrapperCache[contract] = null
   }
 }

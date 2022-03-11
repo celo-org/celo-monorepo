@@ -21,3 +21,5 @@ export class EscrowWrapper extends BaseWrapper<Escrow> {
 
   revoke = proxySend(this.connection, this.contract.methods.revoke)
 }
+
+export type EscrowWrapperType = EscrowWrapper

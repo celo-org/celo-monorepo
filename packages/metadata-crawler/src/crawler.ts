@@ -9,7 +9,8 @@ import {
   AttestationServiceStatusState,
   AttestationsWrapper,
 } from '@celo/contractkit/lib/wrappers/Attestations'
-import { Validator } from '@celo/contractkit/lib/wrappers/Validators'
+import { ElectionWrapper } from '@celo/contractkit/lib/wrappers/Election'
+import { Validator, ValidatorsWrapper } from '@celo/contractkit/lib/wrappers/Validators'
 import { normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import Logger from 'bunyan'
@@ -259,8 +260,8 @@ async function postToDiscord(content: string) {
 
 async function processAttestationServices() {
   operationalLogger.debug('processAttestationServices start')
-  const validatorsWrapper = await kit.contracts.getValidators()
-  const electionsWrapper = await kit.contracts.getElection()
+  const validatorsWrapper = (await kit.contracts.getValidators()) as ValidatorsWrapper
+  const electionsWrapper = (await kit.contracts.getElection()) as ElectionWrapper
   const attestationsWrapper = await kit.contracts.getAttestations()
   const validators = await validatorsWrapper.getRegisteredValidators()
 

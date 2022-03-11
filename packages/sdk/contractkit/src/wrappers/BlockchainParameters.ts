@@ -92,3 +92,5 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
     this.contract.methods.setUptimeLookbackWindow
   )
 }
+
+export type BlockchainParametersWrapperType = BlockchainParametersWrapper

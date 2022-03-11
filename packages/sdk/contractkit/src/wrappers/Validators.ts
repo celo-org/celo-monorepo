@@ -696,3 +696,5 @@ export class ValidatorsWrapper extends BaseWrapperWithContracts<Validators> {
     return revIndex < 0 ? -1 : history.length - revIndex - 1
   }
 }
+
+export type ValidatorsWrapperType = ValidatorsWrapper

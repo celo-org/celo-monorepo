@@ -320,3 +320,5 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     }
   }
 }
+
+export type SortedOraclesWrapperType = SortedOraclesWrapper

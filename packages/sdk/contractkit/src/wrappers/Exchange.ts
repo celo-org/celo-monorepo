@@ -342,3 +342,5 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    */
   getGoldExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, true)
 }
+
+export type ExchangeWrapperType = ExchangeWrapper

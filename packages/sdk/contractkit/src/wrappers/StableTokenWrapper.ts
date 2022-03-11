@@ -135,3 +135,5 @@ export class StableTokenWrapper extends CeloTokenWrapper<StableToken> {
     }
   }
 }
+
+export type StableTokenWrapperType = StableTokenWrapper

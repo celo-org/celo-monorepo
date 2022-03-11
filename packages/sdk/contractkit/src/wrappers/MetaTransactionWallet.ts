@@ -198,6 +198,8 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   }
 }
 
+export type MetaTransactionWalletWrapperType = MetaTransactionWalletWrapper
+
 /**
  * Turns any possible way to pass in a transaction into the raw values
  * that are actually required. This is used both internally to normalize

@@ -19,8 +19,8 @@ import {
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
-import { Validator } from './Validators'
 import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
+import { Validator } from './Validators'
 
 function hashAddressToSingleDigit(address: Address): number {
   return new BigNumber(address.toLowerCase()).modulo(10).toNumber()
@@ -865,3 +865,5 @@ export interface AttestationServiceStatusResponse {
   maxRerequestMins: number | null
   twilioVerifySidProvided: boolean | null
 }
+
+export type AttestationsWrapperType = AttestationsWrapper

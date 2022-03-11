@@ -914,3 +914,5 @@ export class GovernanceWrapper extends BaseWrapperWithContracts<Governance> {
    */
   executeHotfix = proxySend(this.connection, this.contract.methods.executeHotfix, hotfixToParams)
 }
+
+export type GovernanceWrapperType = GovernanceWrapper

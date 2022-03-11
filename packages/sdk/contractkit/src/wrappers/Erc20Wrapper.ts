@@ -59,3 +59,5 @@ export class Erc20Wrapper<T extends Ierc20> extends BaseWrapper<T> {
     valueToBigNumber
   )
 }
+
+export type Erc20WrapperType<T extends Ierc20> = Erc20Wrapper<T>

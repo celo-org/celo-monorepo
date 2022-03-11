@@ -145,3 +145,5 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
     return spendersAdded.filter((spender) => !spendersRemoved.includes(spender))
   }
 }
+
+export type ReserveWrapperType = ReserveWrapper

@@ -119,3 +119,5 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
     return res
   }
 }
+
+export type MultiSigWrapperType = MultiSigWrapper

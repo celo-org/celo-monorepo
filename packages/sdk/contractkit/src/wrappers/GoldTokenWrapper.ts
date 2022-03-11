@@ -47,3 +47,5 @@ export class GoldTokenWrapper extends CeloTokenWrapper<GoldToken> {
   balanceOf = (account: Address) =>
     this.connection.web3.eth.getBalance(account).then(valueToBigNumber)
 }
+
+export type GoldTokenWrapperType = GoldTokenWrapper
