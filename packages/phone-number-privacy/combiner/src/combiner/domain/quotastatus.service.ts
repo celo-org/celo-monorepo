@@ -85,7 +85,7 @@ export class DomainQuotaStatusService extends CombinerService {
     })
   }
 
-  private findThresholdDomainState(): KnownDomainState {
+  private findThresholdDomainState(): DomainState {
     const domainStates = this.responses.map(
       (s) => (s.res as DomainQuotaStatusResponseSuccess).status // TODO(Alec)
     )
@@ -125,10 +125,17 @@ export class DomainQuotaStatusService extends CombinerService {
     const nthLeastRestrictiveByTimer = domainStatesAscendingByTimer[n]
     const thresholdTimer = nthLeastRestrictiveByTimer.timer
 
+    const domainStatesAscendingByDate = domainStatesWithThresholdCounter.sort(
+      (a, b) => a.date - b.date
+    )
+    const nthLeastRestrictiveByDate = domainStatesAscendingByDate[n]
+    const thresholdDate = nthLeastRestrictiveByDate.date
+
     return {
       timer: thresholdTimer,
       counter: thresholdCounter,
       disabled: false,
+      date: thresholdDate,
     }
   }
 }
