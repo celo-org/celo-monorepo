@@ -98,6 +98,10 @@ spec:
           value: {{ .Values.blockscout.networkID | quote }}
         - name: APPS_MENU
           value: {{ .Values.blockscout.web.appsMenu.enabled | quote }}
+        - name: DISABLE_STATS
+          value: {{ not .Values.blockscout.web.stats.enabled | quote }}
+        - name: STATS_REPORT_URL
+          value: {{ .Values.blockscout.web.stats.reportUrl | quote }}
         - name: EXTERNAL_APPS
           value: {{ .Values.blockscout.web.appsMenu.externalApps | quote }}
         - name: BRIDGES
@@ -108,8 +112,25 @@ spec:
           value: {{ .Values.blockscout.web.appsMenu.bridgesAlm | quote }}
         - name: DEFI_MENU_LIST
           value: {{ .Values.blockscout.web.appsMenu.defiList | quote }}
-        - name: NFT_MENU_LIST
-          value: {{ .Values.blockscout.web.appsMenu.nftList | quote }}
+        - name: RESOURCES_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.resourcesList | quote }}
+        - name: LEARNING_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.learningList | quote }}
+        - name: RE_CAPTCHA_PROJECT_ID
+          valueFrom:
+            secretKeyRef:
+              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
+              key: project_id
+        - name: RE_CAPTCHA_SITE_KEY
+          valueFrom:
+            secretKeyRef:
+              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
+              key: site_key
+        - name: RE_CAPTCHA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
+              key: api_key
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}

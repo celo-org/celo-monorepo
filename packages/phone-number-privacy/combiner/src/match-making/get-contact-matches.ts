@@ -8,11 +8,10 @@ import {
   hasValidIdentifier,
   hasValidUserPhoneNumberParam,
   isVerified,
+  verifyDEKSignature,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { trimLeading0x } from '@celo/utils/lib/address'
 import Logger from 'bunyan'
-import { ec as EC } from 'elliptic'
 import { Request, Response } from 'firebase-functions'
 import { respondWithError } from '../common/error-utils'
 import config, {
@@ -30,8 +29,6 @@ import {
 import { getNumberPairContacts, setNumberPairContacts } from '../database/wrappers/number-pairs'
 import { getContractKit } from '../web3/contracts'
 
-const ec = new EC('secp256k1')
-
 interface ContactMatch {
   phoneNumber: string
 }
@@ -47,7 +44,17 @@ export async function handleGetContactMatches(request: Request, response: Respon
       respondWithError(response, 400, WarningMessage.INVALID_INPUT, logger)
       return
     }
-    if (!(await authenticateUser(request, getContractKit(), logger))) {
+
+    // TODO: this error handling shouldn't be necessary here but there is a bug in the common package's
+    // error handling. Remove this or refactor once that bug is resolved.
+    let isAuthenticated = true // We assume user is authenticated on Forno errors
+    try {
+      isAuthenticated = await authenticateUser(request, getContractKit(), logger)
+    } catch {
+      logger.error('Forno error caught in handleGetContactMatches line 57') // Temporary for debugging
+      logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
+    }
+    if (!isAuthenticated) {
       respondWithError(response, 401, WarningMessage.UNAUTHENTICATED_USER, logger)
       return
     }
@@ -61,7 +68,16 @@ export async function handleGetContactMatches(request: Request, response: Respon
     } = request.body
 
     if (!shouldBypassVerificationForE2ETesting(userPhoneNumber, account)) {
-      if (!(await isVerified(account, hashedPhoneNumber, getContractKit(), logger))) {
+      // TODO: this error handling shouldn't be necessary here but there is a bug in the common package's
+      // error handling. Remove this or refactor once that bug is resolved.
+      let _isVerified = true // We assume user is authenticated on Forno errors
+      try {
+        _isVerified = await isVerified(account, hashedPhoneNumber, getContractKit(), logger)
+      } catch {
+        logger.error('Forno error caught in handleGetContactMatches line 80') // Temporary for debugging
+        logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
+      }
+      if (!_isVerified) {
         respondWithError(response, 403, WarningMessage.UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE, logger)
         return
       }
@@ -77,13 +93,24 @@ export async function handleGetContactMatches(request: Request, response: Respon
     // and fulfill the request as usual.
     let verifiedPhoneNumberDekSig: VerifiedPhoneNumberDekSignature | undefined
     if (signedUserPhoneNumber) {
-      const dekSigner = await getDataEncryptionKey(account, getContractKit(), logger).catch(() => {
+      // TODO: this error handling shouldn't be necessary here but there is a bug in the common package's
+      // error handling. Remove this or refactor once that bug is resolved.
+      let dekSigner = ''
+      try {
+        dekSigner = await getDataEncryptionKey(account, getContractKit(), logger)
+      } catch {
+        logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
         logger.warn(
           'Failed to retrieve DEK to verify signedUserPhoneNumber. Request wont be recorded.'
         )
-      })
+        logger.error('Forno error caught in handleGetContactMatches line 109') // Temporary for debugging
+      }
       if (dekSigner) {
-        if (!verifyDEKSignature(userPhoneNumber, signedUserPhoneNumber, dekSigner, logger)) {
+        if (
+          !verifyDEKSignature(userPhoneNumber, signedUserPhoneNumber, dekSigner, logger, {
+            insecureAllowIncorrectlyGeneratedSignature: true,
+          })
+        ) {
           respondWithError(
             response,
             403,
@@ -209,24 +236,6 @@ async function isInvalidReplay(
   return false
 }
 
-export function verifyDEKSignature(
-  message: string,
-  messageSignature: string,
-  registeredEncryptionKey: string,
-  logger?: Logger
-) {
-  try {
-    const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
-    return key.verify(message, JSON.parse(messageSignature))
-  } catch (err) {
-    if (logger) {
-      logger.error('Failed to verify signature with DEK')
-      logger.error({ err, dek: registeredEncryptionKey })
-    }
-    return false
-  }
-}
-
 async function userHasNewDek(
   account: string,
   userPhoneNumber: string,
@@ -236,7 +245,9 @@ async function userHasNewDek(
   const dekSignerRecord = await getDekSignerRecord(account, logger)
   const isKeyRotation =
     !!dekSignerRecord &&
-    verifyDEKSignature(userPhoneNumber, signedUserPhoneNumberRecord, dekSignerRecord, logger)
+    verifyDEKSignature(userPhoneNumber, signedUserPhoneNumberRecord, dekSignerRecord, logger, {
+      insecureAllowIncorrectlyGeneratedSignature: true,
+    })
   if (isKeyRotation) {
     logger.info(
       {

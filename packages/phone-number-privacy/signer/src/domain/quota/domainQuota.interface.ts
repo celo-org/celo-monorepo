@@ -1,4 +1,4 @@
-import { KnownDomain } from '@celo/identity/lib/odis/domains'
+import { KnownDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { DomainState } from '../../database/models/domainState'

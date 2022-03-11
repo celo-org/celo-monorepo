@@ -108,6 +108,10 @@ export class TwilioVerifyProvider extends TwilioSmsProvider {
         requestParams.locale = locale
       }
     }
+
+    // Note: SID returned by Verify API is not unique for a phone number (within a 10 min interval)
+    // i.e. re-requests to the same phone number in <10 min will return an exisiting SID
+
     try {
       const m = await this.client.verify
         .services(this.verifyServiceSid)

@@ -183,12 +183,12 @@ spec:
 
 {{ include  "common.bootnode-flag-script" . | indent 10 }}
 
-          {{- if .metrics | default true }}
-          ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
-          {{- end }}
-          {{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
-          ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
-          {{- end }}
+{{ include  "common.geth-add-metrics-pprof-config" . | indent 10 }}
+
+{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
+
+{{ .Values.geth.secondayExtraSnippet | indent 10 }}
+
           exec geth \
             $BOOTNODE_FLAG \
             --datadir /root/.celo \
@@ -197,15 +197,6 @@ spec:
             --password=/root/.celo/account/accountSecret \
             --unlock=${ACCOUNT_ADDRESS} \
             --mine \
-            --rpc \
-            --rpcaddr 0.0.0.0 \
-            --rpcapi=eth,net,web3,debug \
-            --rpccorsdomain='*' \
-            --rpcvhosts=* \
-            --ws \
-            --wsaddr 0.0.0.0 \
-            --wsorigins=* \
-            --wsapi=eth,net,web3,debug \
             --etherbase=${ACCOUNT_ADDRESS} \
             --syncmode=full \
             --consoleformat=json \
@@ -262,6 +253,14 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+      {{- if .Values.secondayNodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.secondayNodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.secondaryTolerations }}
+      tolerations:
+{{ toYaml .Values.secondaryTolerations | indent 8 }}
+      {{- end }}
       volumes:
       - name: data
         emptyDir: {}
