@@ -89,7 +89,7 @@ contract Reserve is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 1);
+    return (1, 1, 2, 2);
   }
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -225,13 +225,6 @@ contract Reserve is
    */
   function addToken(address token) external onlyOwner nonReentrant returns (bool) {
     require(!isToken[token], "token addr already registered");
-    // Require an exchange rate between the new token and Gold exists.
-    address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
-    ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
-    uint256 tokenAmount;
-    uint256 goldAmount;
-    (tokenAmount, goldAmount) = sortedOracles.medianRate(token);
-    require(goldAmount > 0, "median rate returned 0 gold");
     isToken[token] = true;
     _tokens.push(token);
     emit TokenAdded(token);
