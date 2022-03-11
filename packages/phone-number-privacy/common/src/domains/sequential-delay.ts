@@ -69,12 +69,17 @@ export type SequentialDelayDomainOptions = {
 }
 
 export interface SequentialDelayDomainState {
-  /** Timestamp in seconds since the Unix Epoch determining when a new request will be accepted. */
+  /**
+   * Timestamp in seconds since the Unix Epoch to which the next delay should be applied
+   * to calculate when a new request will be accepted.
+   */
   timer: number
   /** Number of queries that have been accepted for the SequentialDelayDomain instance. */
   counter: number
-  /** Whether or not the domain has been disabled. If disabled, no more queries will be served */
+  /** Whether or not the domain has been disabled. If disabled, no more queries will be served. */
   disabled: boolean
+  /** Server timestamp in seconds since the Unix Epoch. */
+  date: number
 }
 
 /** io-ts schema for encoding and decoding SequentialDelayStage structs */
@@ -105,6 +110,7 @@ export const SequentialDelayDomainStateSchema: t.Type<SequentialDelayDomainState
   timer: t.number,
   counter: t.number,
   disabled: t.boolean,
+  date: t.number,
 })
 
 export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDelayDomain =>
@@ -143,19 +149,6 @@ export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
     ...eip712OptionalType('uint256'),
   },
   primaryType: 'SequentialDelayDomainOptions',
-}
-
-export interface SequentialDelayDomainState {
-  // TODO(Alec)(next): make sure this nuance is reflected in combiner and sdk code
-  /**
-   * Timestamp in seconds since the Unix Epoch to which the next delay should be applied
-   * to calculate when a new request will be accepted.
-   */
-  timer: number
-  /** Number of queries that have been accepted for the SequentialDelayDomain instance. */
-  counter: number
-  /** Whether or not the domain has been disabled. If disabled, no more queries will be served */
-  disabled: boolean
 }
 
 /** Result values of the sequential delay domain rate limiting function */

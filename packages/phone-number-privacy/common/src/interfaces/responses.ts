@@ -58,23 +58,22 @@ export type GetContactMatchesResponse =
   | GetContactMatchesResponseSuccess
   | GetContactMatchesResponseFailure
 
-export interface DomainRestrictedSignatureResponseSuccess {
+export interface DomainRestrictedSignatureResponseSuccess<D extends Domain = Domain> {
   successs: true
   version: string
   signature: string
+  status: DomainState<D>
 }
 
 export interface DomainRestrictedSignatureResponseFailure<D extends Domain = Domain> {
   success: false
   version: string
-  status: DomainState<D>
-  /** Server Unix tiimestamp in seconds */
-  date: number
   error: ErrorType
+  status: DomainState<D>
 }
 
 export type DomainRestrictedSignatureResponse<D extends Domain = Domain> =
-  | DomainRestrictedSignatureResponseSuccess
+  | DomainRestrictedSignatureResponseSuccess<D>
   | DomainRestrictedSignatureResponseFailure<D>
 
 export interface DomainQuotaStatusResponseSuccess<D extends Domain = Domain> {
@@ -123,15 +122,14 @@ export function domainRestrictedSignatureResponseSchema<D extends Domain>(
     t.type({
       success: t.literal(false),
       version: t.string,
-      status: state,
-      /** Server Unix tiimestamp in seconds */
-      date: t.number,
       error: t.string, // TODO
+      status: state,
     }),
     t.type({
       success: t.literal(true),
       version: t.string,
       signature: t.string,
+      status: state,
     }),
   ])
 }
