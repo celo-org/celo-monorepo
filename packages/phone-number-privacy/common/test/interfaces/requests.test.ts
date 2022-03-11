@@ -3,49 +3,42 @@ import {
   EIP712Object,
   generateTypedDataHash,
   noBool,
-  noString,
   noNumber,
+  noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
-import { Domain, DomainIdentifiers, DomainOptions, SequentialDelayDomain } from '../../src/domains'
 import {
-  DomainRestrictedSignatureRequest,
-  domainRestrictedSignatureRequestEIP712,
-  DomainQuotaStatusRequest,
-  domainQuotaStatusRequestEIP712,
+  Domain,
+  DomainIdentifiers,
+  SequentialDelayDomain,
+  SequentialDelayDomainSchema,
+} from '../../src/domains'
+import {
   DisableDomainRequest,
   disableDomainRequestEIP712,
-  verifyDisableDomainRequestAuthenticity,
-  verifyDomainQuotaStatusRequestAuthenticity,
-  verifyDomainRestrictedSignatureRequestAuthenticity,
+  disableDomainRequestSchema,
+  DomainQuotaStatusRequest,
+  domainQuotaStatusRequestEIP712,
+  domainQuotaStatusRequestSchema,
+  DomainRestrictedSignatureRequest,
+  domainRestrictedSignatureRequestEIP712,
+  domainRestrictedSignatureRequestSchema,
 } from '../../src/interfaces/requests'
 
 // Compile-time check that DomainRestrictedSignatureRequest can be cast to type EIP712Object.
 export let TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712: EIP712Object
 TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest
 TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<Domain>
-TEST_DOMAIN_RESTRICTED_SIGNATURE_REQUEST_IS_EIP712 = ({} as unknown) as DomainRestrictedSignatureRequest<
-  Domain,
-  DomainOptions
->
 
 // Compile-time check that DomainQuotaStatusRequest can be cast to type EIP712Object.
 export let TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712: EIP712Object
 TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = ({} as unknown) as DomainQuotaStatusRequest
 TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = ({} as unknown) as DomainQuotaStatusRequest<Domain>
-TEST_DOMAIN_QUOTA_STATUS_REQUEST_IS_EIP712 = ({} as unknown) as DomainQuotaStatusRequest<
-  Domain,
-  DomainOptions
->
 
 // Compile-time check that DomainQuotaStatusRequest can be cast to type EIP712Object.
 export let TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712: EIP712Object
 TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = ({} as unknown) as DisableDomainRequest
 TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = ({} as unknown) as DisableDomainRequest<Domain>
-TEST_DISABLE_DOMAIN_REQUEST_IS_EIP712 = ({} as unknown) as DisableDomainRequest<
-  Domain,
-  DomainOptions
->
 
 describe('domainRestrictedSignatureRequestEIP712()', () => {
   it('should generate the correct type data for request with SequentialDelayDomain', () => {
@@ -147,50 +140,56 @@ const manipulatedDomain: SequentialDelayDomain = {
   salt: noString,
 }
 
-const cases = [
+const signatureRequest: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
+  domain: authenticatedDomain,
+  options: {
+    signature: noString,
+    nonce: defined(0),
+  },
+  blindedMessage: '<blinded message>',
+  sessionID: noString,
+}
+
+const quotaRequest: DomainQuotaStatusRequest<SequentialDelayDomain> = {
+  domain: authenticatedDomain,
+  options: {
+    signature: noString,
+    nonce: defined(0),
+  },
+  sessionID: noString,
+}
+
+const disableRequest: DisableDomainRequest<SequentialDelayDomain> = {
+  domain: authenticatedDomain,
+  options: {
+    signature: noString,
+    nonce: defined(0),
+  },
+  sessionID: noString,
+}
+
+const verifyCases = [
   {
-    request: {
-      domain: authenticatedDomain,
-      options: {
-        signature: noString,
-        nonce: defined(0),
-      },
-      blindedMessage: '<blinded message>',
-      sessionID: noString,
-    } as DomainRestrictedSignatureRequest<SequentialDelayDomain>,
+    request: signatureRequest,
     typedDataBuilder: domainRestrictedSignatureRequestEIP712,
     verifier: verifyDomainRestrictedSignatureRequestAuthenticity,
     name: 'verifyDomainRestrictedSignatureRequestAuthenticity()',
   },
   {
-    request: {
-      domain: authenticatedDomain,
-      options: {
-        signature: noString,
-        nonce: defined(0),
-      },
-      sessionID: noString,
-    } as DomainQuotaStatusRequest<SequentialDelayDomain>,
+    request: quotaRequest,
     typedDataBuilder: domainQuotaStatusRequestEIP712,
     verifier: verifyDomainQuotaStatusRequestAuthenticity,
     name: 'verifyDomainQuotaStatusRequestAuthenticity()',
   },
   {
-    request: {
-      domain: authenticatedDomain,
-      options: {
-        signature: noString,
-        nonce: defined(0),
-      },
-      sessionID: noString,
-    } as DisableDomainRequest<SequentialDelayDomain>,
+    request: disableRequest,
     typedDataBuilder: disableDomainRequestEIP712,
     verifier: verifyDisableDomainRequestAuthenticity,
     name: 'verifyDisableDomainRequestAuthenticity()',
   },
 ]
 
-for (const { request, verifier, typedDataBuilder, name } of cases) {
+for (const { request, verifier, typedDataBuilder, name } of verifyCases) {
   describe(name, () => {
     it('should report a correctly signed request as verified', async () => {
       //@ts-ignore type checking does not correctly infer types.
@@ -259,6 +258,36 @@ for (const { request, verifier, typedDataBuilder, name } of cases) {
       }
       //@ts-ignore type checking does not correctly infer types.
       expect(verifier(unauthenticatedRequest)).toBe(false)
+    })
+  })
+}
+
+const schemaCases = [
+  {
+    request: signatureRequest,
+    schema: domainRestrictedSignatureRequestSchema(SequentialDelayDomainSchema),
+    name: 'verifyDomainRestrictedSignatureRequestSignature()',
+  },
+  {
+    request: quotaRequest,
+    schema: domainQuotaStatusRequestSchema(SequentialDelayDomainSchema),
+    name: 'verifyDomainQuotaStatusRequestSignature()',
+  },
+  {
+    request: disableRequest,
+    schema: disableDomainRequestSchema(SequentialDelayDomainSchema),
+    name: 'verifyDisableDomainRequestSignature()',
+  },
+]
+
+for (const { request, schema, name } of schemaCases) {
+  describe(name, () => {
+    it('should report a correctly constructed request as validated', async () => {
+      expect(schema.is(request)).toBe(true)
+    })
+
+    it('should report an invalid request as not validated', async () => {
+      expect(schema.is({ ...request, options: {} })).toBe(false)
     })
   })
 }

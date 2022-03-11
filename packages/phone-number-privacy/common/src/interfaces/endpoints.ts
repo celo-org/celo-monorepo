@@ -1,20 +1,26 @@
-export enum CombinerEndpoint {
+export enum SignerEndpointPNP {
+  PARTIAL_SIGN_MESSAGE = '/getBlindedMessagePartialSig',
+  GET_QUOTA = '/getQuota',
+  METRICS = '/metrics',
   STATUS = '/status',
-  GET_BLINDED_MESSAGE_SIG = '/getBlindedMessageSig',
-  MATCHMAKING = '/getContactMatches',
-
-  DOMAIN_SIGN = '/domainSign',
-  DISABLE_DOMAIN = '/domainDisable',
-  DOMAIN_QUOTA_STATUS = '/domainQuotaStatus',
 }
 
-export enum SignerEndpoint {
-  STATUS = '/status',
-  METRICS = '/metrics',
-  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
-  GET_QUOTA = '/getQuota',
+export enum CombinerEndpointPNP {
+  SIGN_MESSAGE = '/getBlindedMessageSig',
+  MATCHMAKING = '/getContactMatches',
+}
 
-  DOMAIN_SIGN = '/domain/sign',
+export enum DomainEndpoint {
+  DOMAIN_SIGN = '/domain/sign/',
   DISABLE_DOMAIN = '/domain/disable',
   DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
 }
+
+export type SignerEndpoint = SignerEndpointPNP | DomainEndpoint
+export const SignerEndpoint = { ...SignerEndpointPNP, ...DomainEndpoint }
+
+export type CombinerEndpoint = CombinerEndpointPNP | DomainEndpoint
+export const CombinerEndpoint = { ...CombinerEndpointPNP, ...DomainEndpoint }
+
+export type Endpoint = SignerEndpoint | CombinerEndpoint
+export const Endpoint = { ...SignerEndpoint, ...CombinerEndpoint }

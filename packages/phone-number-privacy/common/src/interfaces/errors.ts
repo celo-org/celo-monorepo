@@ -1,3 +1,5 @@
+import * as t from 'io-ts'
+
 export enum ErrorMessage {
   UNKNOWN_ERROR = `CELO_ODIS_ERR_00 Something went wrong`,
   DATABASE_UPDATE_FAILURE = `CELO_ODIS_ERR_01 DB_ERR Failed to update database entry`,
@@ -44,3 +46,5 @@ export enum WarningMessage {
 }
 
 export type ErrorType = ErrorMessage | WarningMessage
+export const ErrorType = { ...ErrorMessage, ...WarningMessage }
+export const ErrorTypeSchema: t.Type<ErrorType> = t.type(ErrorType) // TODO

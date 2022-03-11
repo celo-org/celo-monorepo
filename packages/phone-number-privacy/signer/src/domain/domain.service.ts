@@ -1,21 +1,18 @@
 import {
-  DisableDomainRequest,
   DisableDomainResponse,
   Domain,
+  DomainEndpoint,
   domainHash,
-  DomainQuotaStatusRequest,
+  domainQuotaStatusRequestSchema,
   DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
   DomainRequest,
-  DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseSuccess,
   ErrorMessage,
   ErrorType,
   isKnownDomain,
   KEY_VERSION_HEADER,
-  KnownDomain,
-  KnownDomainState,
   respondWithError,
   SignerEndpoint as Endpoint,
   SignerEndpoint,
@@ -27,7 +24,11 @@ import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { Counters } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { getTransaction } from '../database/database'
-import { DomainState, DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
+import {
+  DomainState,
+  DomainStateRecord,
+  DOMAINS_STATES_COLUMNS,
+} from '../database/models/domainState'
 import { getDomainRequestExists, storeDomainRequest } from '../database/wrappers/domainRequest'
 import {
   getDomainState,
@@ -41,7 +42,30 @@ import { IDomainAuthService } from './auth/domainAuth.interface'
 import { IDomainService } from './domain.interface'
 import { IDomainQuotaService } from './quota/domainQuota.interface'
 
-// TODO(Alec): Carefully review this file
+// TODO: De-dupe with common package
+function respondWithError(
+  endpoint: DomainEndpoint,
+  res: Response<DomainResponse & { success: false }>,
+  status: number,
+  error: ErrorMessage | WarningMessage
+) {
+  const response: DomainResponse = {
+    success: false,
+    version: getVersion(),
+    error,
+  }
+
+  const logger: Logger = res.locals.logger
+
+  if (error in WarningMessage) {
+    logger.warn({ error, status, response }, 'Responding with warning')
+  } else {
+    logger.error({ error, status, response }, 'Responding with error')
+  }
+
+  Counters.responses.labels(endpoint, status.toString()).inc()
+  res.status(status).json(response)
+}
 
 export class DomainService implements IDomainService {
   public constructor(
@@ -50,10 +74,17 @@ export class DomainService implements IDomainService {
   ) {}
 
   public async handleDisableDomain(
-    request: Request<{}, {}, DisableDomainRequest>,
+    request: Request<{}, {}, unknown>,
     response: Response<DisableDomainResponse>
   ): Promise<void> {
     const endpoint = Endpoint.DISABLE_DOMAIN
+    Counters.requests.labels(endpoint).inc()
+
+    // Check that the body contains the correct request type.
+    if (!disableDomainRequestSchema(DomainSchema).is(request.body)) {
+      respondWithError(DomainEndpoint.DISABLE_DOMAIN, response, 400, WarningMessage.INVALID_INPUT)
+      return
+    }
 
     const logger = response.locals.logger
     Counters.requests.labels(endpoint).inc()
@@ -80,7 +111,7 @@ export class DomainService implements IDomainService {
 
       if (!domainState) {
         // If the domain is not currently recorded in the state database, add it now.
-        await insertDomainState(DomainState.createEmptyDomainState(domain), trx, logger)
+        await insertDomainState(DomainStateRecord.createEmptyDomainState(domain), trx, logger)
         await trx.commit()
       }
       if (!(domainState?.disabled ?? false)) {
@@ -102,10 +133,22 @@ export class DomainService implements IDomainService {
   }
 
   public async handleGetDomainQuotaStatus(
-    request: Request<{}, {}, DomainQuotaStatusRequest>,
+    request: Request<{}, {}, unknown>,
     response: Response<DomainQuotaStatusResponse>
   ): Promise<void> {
     const endpoint = Endpoint.DOMAIN_QUOTA_STATUS
+    Counters.requests.labels(endpoint).inc()
+
+    // Check that the body contains the correct request type.
+    if (!domainQuotaStatusRequestSchema(DomainSchema).is(request.body)) {
+      respondWithError(
+        DomainEndpoint.DOMAIN_QUOTA_STATUS,
+        response,
+        400,
+        WarningMessage.INVALID_INPUT
+      )
+      return
+    }
 
     const logger = response.locals.logger
     Counters.requests.labels(endpoint).inc()
@@ -128,7 +171,7 @@ export class DomainService implements IDomainService {
     })
     try {
       const domainState = await getDomainState(domain, logger)
-      let quotaStatus: KnownDomainState
+      let quotaStatus: DomainState
       if (domainState) {
         quotaStatus = {
           counter: domainState[DOMAINS_STATES_COLUMNS.counter] ?? 0,
@@ -156,10 +199,17 @@ export class DomainService implements IDomainService {
   }
 
   public async handleGetDomainRestrictedSignature(
-    request: Request<{}, {}, DomainRestrictedSignatureRequest>,
+    request: Request<{}, {}, unknown>,
     response: Response<DomainRestrictedSignatureResponse>
   ): Promise<void> {
     const endpoint = Endpoint.DOMAIN_SIGN
+    Counters.requests.labels(endpoint).inc()
+
+    // Check that the body contains the correct request type.
+    if (!domainRestrictedSignatureRequestSchema(DomainSchema).is(request.body)) {
+      respondWithError(DomainEndpoint.DOMAIN_SIGN, response, 400, WarningMessage.INVALID_INPUT)
+      return
+    }
 
     Counters.requests.labels(endpoint).inc()
     const logger = response.locals.logger
@@ -202,7 +252,7 @@ export class DomainService implements IDomainService {
 
       if (!domainState) {
         domainState = await insertDomainState(
-          DomainState.createEmptyDomainState(domain),
+          DomainStateRecord.createEmptyDomainState(domain),
           trx,
           logger
         )
@@ -276,13 +326,13 @@ export class DomainService implements IDomainService {
     }
   }
 
-  private inputValidation(
+  private authenticateRequest(
     domain: Domain,
     request: Request<{}, {}, DomainRequest>,
     response: Response,
-    endpoint: Endpoint,
+    endpoint: DomainEndpoint,
     logger: Logger
-  ): domain is KnownDomain {
+  ): boolean {
     if (!this.authService.authCheck(request.body, endpoint, logger)) {
       logger.warn(`Received unauthorized request to ${endpoint} `, {
         name: domain.name,
