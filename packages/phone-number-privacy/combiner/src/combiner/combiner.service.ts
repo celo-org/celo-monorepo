@@ -34,17 +34,18 @@ export interface SignerService {
 }
 
 export abstract class CombinerService implements ICombinerService {
-  protected failedSigners: Set<string>
-  protected errorCodes: Map<number, number>
+  protected readonly failedSigners: Set<string>
+  protected readonly errorCodes: Map<number, number>
+  protected readonly timeoutMs: number
+  protected readonly signers: SignerService[]
+  protected readonly threshold: number
+  protected readonly enabled: boolean
+  protected readonly logger: Logger
+  protected abstract readonly endpoint: CombinerEndpoint
+  protected abstract readonly signerEndpoint: SignerEndpoint
+  protected abstract readonly responses: SignerResponseWithStatus[]
+
   protected timedOut: boolean
-  protected signers: SignerService[]
-  protected timeoutMs: number
-  protected threshold: number
-  protected enabled: boolean
-  protected logger: Logger
-  protected abstract endpoint: CombinerEndpoint
-  protected abstract signerEndpoint: SignerEndpoint
-  protected abstract responses: SignerResponseWithStatus[]
 
   public constructor(config: OdisConfig, protected io: IInputService) {
     this.logger = rootLogger()
@@ -57,10 +58,7 @@ export abstract class CombinerService implements ICombinerService {
     this.enabled = config.enabled
   }
 
-  public async handleDistributedRequest(
-    request: Request<{}, {}, DistributedRequest>,
-    response: Response
-  ) {
+  public async handleDistributedRequest(request: Request<{}, {}, unknown>, response: Response) {
     this.logger = response.locals.logger
     try {
       if (!(await this.inputCheck(request, response))) {
@@ -76,7 +74,7 @@ export abstract class CombinerService implements ICombinerService {
   }
 
   protected async inputCheck(
-    request: Request<{}, {}, DistributedRequest>,
+    request: Request<{}, {}, unknown>,
     response: Response
   ): Promise<boolean> {
     if (!this.enabled) {

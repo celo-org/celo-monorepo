@@ -9,7 +9,7 @@ export type DistributedRequest = GetBlindedMessageSigRequest | DomainRequest
 
 export interface ICombinerService {
   handleDistributedRequest(
-    request: Request<{}, {}, DistributedRequest>,
+    request: Request<{}, {}, unknown>,
     response: Response,
     endpoint: CombinerEndpoint
   ): Promise<void>
