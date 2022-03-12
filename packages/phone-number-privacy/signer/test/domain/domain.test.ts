@@ -1,3 +1,4 @@
+import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import {
   DisableDomainRequest,
   DomainIdentifiers,
@@ -11,7 +12,7 @@ import { defined, noBool, noString } from '@celo/utils/lib/sign-typed-data-utils
 import { LocalWallet } from '@celo/wallet-local'
 import { Request, Response } from 'express'
 import { anyNumber, instance, mock, reset, verify, when } from 'ts-mockito'
-import config, { SupportedDatabase, SupportedKeystore } from '../../src/config'
+import config, { DEV_PUBLIC_KEY, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { closeDatabase, initDatabase } from '../../src/database/database'
 import { DomainAuthService } from '../../src/domain/auth/domainAuth.service'
 import { DomainService } from '../../src/domain/domain.service'
@@ -47,15 +48,21 @@ describe('domainService', () => {
     salt: noString,
   }
 
-  const signatureRequest = (): DomainRestrictedSignatureRequest<SequentialDelayDomain> => ({
-    domain: authenticatedDomain,
-    options: {
-      signature: noString,
-      nonce: defined(0),
-    },
-    blindedMessage: '<blinded message>',
-    sessionID: defined(genSessionID()),
-  })
+  const signatureRequest = async (): Promise<
+    DomainRestrictedSignatureRequest<SequentialDelayDomain>
+  > => {
+    const blsBlindingClient = new WasmBlsBlindingClient(DEV_PUBLIC_KEY)
+
+    return {
+      domain: authenticatedDomain,
+      options: {
+        signature: noString,
+        nonce: defined(0),
+      },
+      blindedMessage: await blsBlindingClient.blindMessage('test message'),
+      sessionID: defined(genSessionID()),
+    }
+  }
 
   const quotaRequest = (): DomainQuotaStatusRequest<SequentialDelayDomain> => ({
     domain: authenticatedDomain,
@@ -76,7 +83,6 @@ describe('domainService', () => {
   })
 
   beforeAll(async () => {
-    // DO NOT MERGE: Put the logger into some kind of test mode.
     response.locals = { logger: rootLogger() }
     await initKeyProvider()
   })
@@ -93,7 +99,9 @@ describe('domainService', () => {
   })
 
   afterEach(async () => {
-    // Close and destroy the in memory database after each test.
+    // Close and destroy the in-memory database.
+    // Note: If tests start to be too slow, this could be replaced with more complicated logic to
+    // reset the database state without destroying and recreting it for each test.
     await closeDatabase()
   })
 
@@ -101,7 +109,7 @@ describe('domainService', () => {
     it('Should respond with 200 on valid request', async () => {
       when(authServiceMock.authCheck()).thenReturn(true)
 
-      request.body = disableRequest()
+      when(requestMock.body).thenReturn(disableRequest())
       await domainService.handleDisableDomain(request, response)
 
       verify(responseMock.status(200)).once()
@@ -110,10 +118,10 @@ describe('domainService', () => {
     it('Should respond with 200 on repeated valid requests', async () => {
       when(authServiceMock.authCheck()).thenReturn(true)
 
-      request.body = disableRequest()
+      when(requestMock.body).thenReturn(disableRequest())
       await domainService.handleDisableDomain(request, response)
 
-      request.body = disableRequest()
+      when(requestMock.body).thenReturn(disableRequest())
       await domainService.handleDisableDomain(request, response)
 
       verify(responseMock.status(200)).twice()
@@ -122,7 +130,7 @@ describe('domainService', () => {
     it('Should respond with 403 on failed auth', async () => {
       when(authServiceMock.authCheck()).thenReturn(false)
 
-      request.body = disableRequest()
+      when(requestMock.body).thenReturn(disableRequest())
       await domainService.handleDisableDomain(request, response)
 
       verify(responseMock.status(403)).once()
@@ -131,8 +139,11 @@ describe('domainService', () => {
     it('Should respond with 400 on unknown domain', async () => {
       when(authServiceMock.authCheck()).thenReturn(true)
 
-      request.body = disableRequest()
-      request.body.domain.name = 'UnknownDomain'
+      const req = disableRequest()
+      when(requestMock.body).thenReturn({
+        ...req,
+        domain: { ...req.domain, name: 'UnknownDomain' },
+      })
       await domainService.handleDisableDomain(request, response)
 
       verify(responseMock.status(400)).once()
@@ -143,18 +154,18 @@ describe('domainService', () => {
     it('Should respond with 200 on valid request', async () => {
       when(authServiceMock.authCheck()).thenReturn(true)
 
-      request.body = quotaRequest()
+      when(requestMock.body).thenReturn(quotaRequest())
       await domainService.handleGetDomainQuotaStatus(request, response)
 
       verify(responseMock.status(200)).once()
     })
   })
 
-  describe.only('.handleGetDomainRestrictedSignature', () => {
+  describe('.handleGetDomainRestrictedSignature', () => {
     it('Should respond with 200 on valid request', async () => {
       when(authServiceMock.authCheck()).thenReturn(true)
 
-      request.body = signatureRequest()
+      when(requestMock.body).thenReturn(await signatureRequest())
       await domainService.handleGetDomainRestrictedSignature(request, response)
 
       verify(responseMock.status(200)).once()

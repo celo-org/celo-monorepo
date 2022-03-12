@@ -14,12 +14,17 @@ function domainsStates() {
   return getDatabase()<DomainStateRecord>(DOMAINS_STATES_TABLE)
 }
 
-export async function setDomainDisabled(domain: Domain, logger: Logger): Promise<void> {
+export async function setDomainDisabled(
+  domain: Domain,
+  trx: Transaction<DomainStateRecord>,
+  logger: Logger
+): Promise<void> {
   const disableDomainMeter = Histograms.dbOpsInstrumentation.labels('disableDomain').startTimer()
   const hash = domainHash(domain).toString('hex')
   logger.debug('Disabling domain', { hash, domain })
   try {
     await domainsStates()
+      .transacting(trx)
       .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
       .update(DOMAINS_STATES_COLUMNS.disabled, true)
       .timeout(DB_TIMEOUT)
@@ -102,12 +107,17 @@ export async function updateDomainState(
   const hash = domainHash(domain).toString('hex')
   logger.debug('Update domain state', { hash, domain, domainState })
   try {
+    // Check whether the domain is already in the database.
+    // TODO(victor): Usage of this in the signature flow results in redudant queries of the current
+    // state. It would be good to refactor this to avoid making more than one SELECT.
     const result = await domainsStates()
       .transacting(trx)
+      .forUpdate()
       .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
       .first()
       .timeout(DB_TIMEOUT)
 
+    // Insert or update the domain state record.
     if (!result) {
       await insertDomainState(domainState, trx, logger)
     } else {

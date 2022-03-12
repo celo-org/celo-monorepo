@@ -81,7 +81,9 @@ export async function initDatabase(doTestQuery = true) {
 // Closes the connections to the database.
 // If the database is sqlite in-memory database, the database will be destroyed.
 export async function closeDatabase() {
-  db?.destroy()
+  // NOTE: If this operation is stuck (e.g. if you tests are failing because this operation causes
+  // them to time out) it is likely because a connection is being held open e.g. by a transaction.
+  await db?.destroy()
   db = undefined
 }
 
@@ -108,12 +110,4 @@ export function getDatabase() {
   }
 
   return db
-}
-
-export function getTransaction() {
-  if (!db) {
-    throw new Error('Database not yet initialized')
-  }
-
-  return db.transaction()
 }
