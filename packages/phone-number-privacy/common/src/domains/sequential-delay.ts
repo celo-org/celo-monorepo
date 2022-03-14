@@ -212,6 +212,7 @@ export const checkSequentialDelayRateLimit = (
       counter: counter + 1,
       timer: resetTimer ? attemptTime : notBefore,
       disabled: state?.disabled ?? false,
+      date: attemptTime,
     },
   }
 }

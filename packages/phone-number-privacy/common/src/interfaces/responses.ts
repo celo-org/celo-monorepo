@@ -58,7 +58,7 @@ export type GetContactMatchesResponse =
   | GetContactMatchesResponseFailure
 
 export interface DomainRestrictedSignatureResponseSuccess<D extends Domain = Domain> {
-  successs: true
+  success: true
   version: string
   signature: string
   status: DomainState<D>
@@ -119,15 +119,15 @@ export function domainRestrictedSignatureResponseSchema<D extends Domain>(
 ): t.Type<DomainRestrictedSignatureResponse<D>> {
   return t.union([
     t.type({
-      success: t.literal(false),
-      version: t.string,
-      error: t.string,
-      status: state,
-    }),
-    t.type({
       success: t.literal(true),
       version: t.string,
       signature: t.string,
+      status: state,
+    }),
+    t.type({
+      success: t.literal(false),
+      version: t.string,
+      error: t.string,
       status: state,
     }),
   ])
