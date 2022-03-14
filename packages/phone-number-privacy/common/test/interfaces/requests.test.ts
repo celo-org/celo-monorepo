@@ -23,6 +23,9 @@ import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
   domainRestrictedSignatureRequestSchema,
+  verifyDisableDomainRequestAuthenticity,
+  verifyDomainQuotaStatusRequestAuthenticity,
+  verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '../../src/interfaces/requests'
 
 // Compile-time check that DomainRestrictedSignatureRequest can be cast to type EIP712Object.

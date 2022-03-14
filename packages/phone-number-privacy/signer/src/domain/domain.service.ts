@@ -1,4 +1,5 @@
 import {
+  disableDomainRequestSchema,
   DisableDomainResponse,
   Domain,
   DomainEndpoint,
@@ -7,29 +8,22 @@ import {
   DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
   DomainRequest,
+  DomainResponse,
+  domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseSuccess,
+  DomainSchema,
+  DomainState,
   ErrorMessage,
-  ErrorType,
-  isKnownDomain,
-  KEY_VERSION_HEADER,
-  respondWithError,
-  SignerEndpoint as Endpoint,
-  SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { Counters } from '../common/metrics'
-import config, { getVersion } from '../config'
+import { getVersion } from '../config'
 import { getDatabase } from '../database/database'
-import {
-  DomainState,
-  DomainStateRecord,
-  DOMAINS_STATES_COLUMNS,
-} from '../database/models/domainState'
-import { getDomainRequestExists, storeDomainRequest } from '../database/wrappers/domainRequest'
+import { DomainStateRecord, DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
 import {
   getDomainState,
   getDomainStateWithLock,
@@ -77,7 +71,7 @@ export class DomainService implements IDomainService {
     request: Request<{}, {}, unknown>,
     response: Response<DisableDomainResponse>
   ): Promise<void> {
-    const endpoint = Endpoint.DISABLE_DOMAIN
+    const endpoint = DomainEndpoint.DISABLE_DOMAIN
     Counters.requests.labels(endpoint).inc()
 
     // Check that the body contains the correct request type.
@@ -95,8 +89,8 @@ export class DomainService implements IDomainService {
     }
 
     const domain = request.body.domain
-    if (!this.inputValidation(domain, request, response, endpoint, logger)) {
-      // inputValidation returns a response to the user internally. Nothing left to do.
+    if (!this.authenticateRequest(domain, response, endpoint, logger)) {
+      // authenticateRequest returns a response to the user internally. Nothing left to do.
       return
     }
 
@@ -121,13 +115,7 @@ export class DomainService implements IDomainService {
       response.status(200).send({ success: true, version: getVersion() })
     } catch (error) {
       logger.error('Error while disabling domain', error)
-      this.sendFailureResponse(
-        response,
-        ErrorMessage.DATABASE_UPDATE_FAILURE,
-        500,
-        endpoint,
-        logger
-      )
+      respondWithError(endpoint, response, 500, ErrorMessage.DATABASE_UPDATE_FAILURE)
     }
   }
 
@@ -135,7 +123,7 @@ export class DomainService implements IDomainService {
     request: Request<{}, {}, unknown>,
     response: Response<DomainQuotaStatusResponse>
   ): Promise<void> {
-    const endpoint = Endpoint.DOMAIN_QUOTA_STATUS
+    const endpoint = DomainEndpoint.DOMAIN_QUOTA_STATUS
     Counters.requests.labels(endpoint).inc()
 
     // Check that the body contains the correct request type.
@@ -158,8 +146,8 @@ export class DomainService implements IDomainService {
     }
 
     const domain = request.body.domain
-    if (!this.inputValidation(domain, request, response, endpoint, logger)) {
-      // inputValidation returns a response to the user internally. Nothing left to do.
+    if (!this.authenticateRequest(domain, response, endpoint, logger)) {
+      // authenticateRequest returns a response to the user internally. Nothing left to do.
       return
     }
 
@@ -193,7 +181,7 @@ export class DomainService implements IDomainService {
       response.status(200).send(resultResponse)
     } catch (error) {
       logger.error('Error while getting domain status', error)
-      this.sendFailureResponse(response, ErrorMessage.DATABASE_GET_FAILURE, 500, endpoint, logger)
+      respondWithError(endpoint, response, 500, ErrorMessage.DATABASE_GET_FAILURE)
     }
   }
 
@@ -201,24 +189,19 @@ export class DomainService implements IDomainService {
     request: Request<{}, {}, unknown>,
     response: Response<DomainRestrictedSignatureResponse>
   ): Promise<void> {
-    const endpoint = Endpoint.DOMAIN_SIGN
+    const endpoint = DomainEndpoint.DOMAIN_SIGN
     Counters.requests.labels(endpoint).inc()
 
     // Check that the body contains the correct request type.
     if (!domainRestrictedSignatureRequestSchema(DomainSchema).is(request.body)) {
-      respondWithError(DomainEndpoint.DOMAIN_SIGN, response, 400, WarningMessage.INVALID_INPUT)
+      respondWithError(endpoint, response, 400, WarningMessage.INVALID_INPUT)
       return
     }
 
     Counters.requests.labels(endpoint).inc()
     const logger = response.locals.logger
-
-    if (!config.api.domains.enabled) {
-      this.sendFailureResponse(response, WarningMessage.API_UNAVAILABLE, 501, endpoint, logger)
-      return
-    }
-
-    const { domain, blindedMessage } = request.body
+    const domain = request.body.domain
+    const blindedMessage = request.body.blindedMessage
     if (!this.authenticateRequest(domain, response, DomainEndpoint.DOMAIN_SIGN, logger)) {
       // authenticateRequest returns a response to the user internally. Nothing left to do.
       return
@@ -248,54 +231,26 @@ export class DomainService implements IDomainService {
           (await getDomainStateWithLock(domain, trx, logger)) ??
           DomainStateRecord.createEmptyDomainState(domain)
 
-        if (!this.nonceCheck(request, response, domainState, endpoint, logger)) {
-          return
-        }
+        const quotaState = await this.quotaService.checkAndUpdateQuota(
+          domain,
+          domainState,
+          trx,
+          logger
+        )
 
-        if (domainState[DOMAINS_STATES_COLUMNS.disabled]) {
-          logger.warn(`Domain is disabled`, {
+        if (!quotaState.sufficient) {
+          logger.warn(`Exceeded quota`, {
             name: domain.name,
             version: domain.version,
             hash: domainHash(domain),
           })
-          this.sendFailureResponse(response, WarningMessage.DISABLED_DOMAIN, 403, endpoint, logger)
+          respondWithError(DomainEndpoint.DOMAIN_SIGN, response, 429, WarningMessage.EXCEEDED_QUOTA)
           return
-        }
-
-        if (await getDomainRequestExists(domain, blindedMessage, trx, logger)) {
-          Counters.duplicateRequests.inc() // TODO(Alec)
-          logger.debug(
-            'Signature request already exists in db. Will not store request or increment counter.'
-          )
-        } else {
-          await storeDomainRequest(domain, blindedMessage, trx, logger)
-          const quotaState = await this.quotaService.checkAndUpdateQuota(
-            domain,
-            domainState,
-            trx,
-            logger
-          )
-          if (!quotaState.sufficient) {
-            logger.warn(`Exceeded quota`, {
-              name: domain.name,
-              version: domain.version,
-              hash: domainHash(domain),
-            })
-            this.sendFailureResponse(
-              response,
-              WarningMessage.EXCEEDED_QUOTA,
-              429,
-              endpoint,
-              logger,
-              quotaState.newState.timer
-            )
-            return
-          }
         }
 
         // Compute the signature inside the transaction such that it will rollback on error.
         const keyProvider = getKeyProvider()
-        const privateKey = await keyProvider.getPrivateKeyOrFetchFromStore(key)
+        const privateKey = keyProvider.getPrivateKey()
         signature = computeBlindedSignature(blindedMessage, privateKey, logger)
       })
 
@@ -315,7 +270,7 @@ export class DomainService implements IDomainService {
     } catch (err) {
       logger.error('Failed to get signature for a domain')
       logger.error(err)
-      this.sendFailureResponse(response, ErrorMessage.UNKNOWN_ERROR, 500, endpoint, logger)
+      respondWithError(DomainEndpoint.DOMAIN_SIGN, response, 500, ErrorMessage.UNKNOWN_ERROR)
     }
   }
 
@@ -332,15 +287,6 @@ export class DomainService implements IDomainService {
         version: domain.version,
       })
       this.sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401, endpoint, logger)
-      return false
-    }
-
-    if (!isKnownDomain(domain)) {
-      logger.warn(`Received request to ${endpoint} for an unknown domain`, {
-        name: domain.name,
-        version: domain.version,
-      })
-      this.sendFailureResponse(response, WarningMessage.UNKNOWN_DOMAIN, 404, endpoint, logger)
       return false
     }
 
