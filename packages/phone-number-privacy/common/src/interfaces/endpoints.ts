@@ -11,7 +11,7 @@ export enum CombinerEndpointPNP {
 }
 
 export enum DomainEndpoint {
-  DOMAIN_SIGN = '/domain/sign/',
+  DOMAIN_SIGN = '/domain/sign',
   DISABLE_DOMAIN = '/domain/disable',
   DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
 }

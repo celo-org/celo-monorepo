@@ -11,17 +11,14 @@ function flattenSigsArray(sigs: Uint8Array[]) {
   return Uint8Array.from(sigs.reduce((a, b) => a.concat(Array.from(b)), [] as any))
 }
 export class BLSCryptographyClient {
-  private pubKey: string
-  private polynomial: string
-  private threshold: number
   private unverifiedSignatures: ServicePartialSignature[] = []
   private verifiedSignatures: ServicePartialSignature[] = []
 
-  constructor(_threshold: number, _pubKey: string, _polynomial: string) {
-    this.pubKey = _pubKey
-    this.polynomial = _polynomial
-    this.threshold = _threshold
-  }
+  constructor(
+    private readonly threshold: number,
+    private readonly pubKey: string,
+    private readonly polynomial: string
+  ) {}
 
   private get allSignaturesLength(): number {
     return this.unverifiedSignatures.length + this.verifiedSignatures.length
