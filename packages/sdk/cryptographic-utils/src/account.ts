@@ -6,12 +6,12 @@ import {
   RandomNumberGenerator,
 } from '@celo/base/lib/account'
 import { normalizeAccents } from '@celo/base/lib/string'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { levenshteinDistance } from '@celo/utils/lib/levenshtein'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
 import { keccak256 } from 'ethereumjs-util'
 import randomBytes from 'randombytes'
-import { privateKeyToAddress } from './address'
-import { levenshteinDistance } from './levenshtein'
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
 export {

@@ -1,5 +1,5 @@
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import { Bip39, generateKeys } from './account'
-import { ensureLeading0x } from './address'
 
 /**
  * Turns a private key to a compressed public key (hex string with hex leader).

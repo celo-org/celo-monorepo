@@ -166,6 +166,12 @@
       "@celo/wallet-local"
     ]
   },
+  "@celo/cryptographic-utils": {
+    "location": "packages/sdk/cryptographic-utils",
+    "dependencies": [
+      "@celo/utils"
+    ]
+  },
   "@celo/dappkit": {
     "location": "packages/sdk/dappkit",
     "dependencies": [

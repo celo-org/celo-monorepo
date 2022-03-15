@@ -12,6 +12,10 @@ Breaking Change
   - @celo/contractkit AccountsWrapper.authorizeValidatorSigner now requires a ValidatorWrapper as third param
 
   -  contract Wrappers are now loaded async
+
+
+  - @celo/utils
+      * comment encryption, bls and mneumonic functions moved to @celo/cryptographic-utils
 ### **[1.5.1-dev]**
 Features
 -  one-line summary - [#](link PR)

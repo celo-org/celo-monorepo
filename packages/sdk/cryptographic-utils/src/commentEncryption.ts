@@ -1,11 +1,11 @@
-import { randomBytes } from 'crypto'
-import { decompressPublicKey } from './dataEncryptionKey'
 import {
   AES128DecryptAndHMAC,
   AES128EncryptAndHMAC,
   Decrypt as ECIESDecrypt,
   Encrypt as ECIESEncrypt,
-} from './ecies'
+} from '@celo/utils/lib/ecies'
+import { randomBytes } from 'crypto'
+import { decompressPublicKey } from './dataEncryptionKey'
 
 const ECIES_SESSION_KEY_LEN = 129
 const MIN_COMMENT_KEY_LENGTH = 33

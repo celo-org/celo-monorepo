@@ -1,15 +1,15 @@
 {
   "name": "@celo/dappkit",
-  "version": "1.5.3-dev",
+  "version": "2.0.0-alpha.2-dev",
   "scripts": {
     "build": "tsc",
     "clean": "tsc -b . --clean",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/connect": "1.5.3-dev",
-    "@celo/contractkit": "1.5.3-dev",
-    "@celo/utils": "1.5.3-dev",
+    "@celo/connect": "2.0.0-alpha.2-dev",
+    "@celo/contractkit": "2.0.0-alpha.2-dev",
+    "@celo/utils": "2.0.0-alpha.2-dev",
     "react-native": "^0.63.4"
   },
   "devDependencies": {
