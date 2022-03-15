@@ -7,14 +7,8 @@ import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { DomainDisableService } from './combiner/domain/disable.service'
-import {
-  DomainDisableInputService,
-  DomainQuotaStatusInputService,
-  DomainSignInputService,
-} from './combiner/domain/input.service'
 import { DomainQuotaStatusService } from './combiner/domain/quotastatus.service'
 import { DomainSignService } from './combiner/domain/sign.service'
-import { PnpInputService } from './combiner/pnp/input.service'
 import { PnpSignService } from './combiner/pnp/sign.service'
 import config, { FORNO_ALFAJORES } from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
@@ -88,7 +82,7 @@ export const getBlindedMessageSig = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    const service = new PnpSignService(config.phoneNumberPrivacy, new PnpInputService())
+    const service = new PnpSignService(config.phoneNumberPrivacy)
     return meterResponse(service.handleDistributedRequest, req, res, Endpoint.SIGN_MESSAGE)
   })
 
@@ -100,7 +94,7 @@ export const domainSign = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    const service = new DomainSignService(config.domains, new DomainSignInputService())
+    const service = new DomainSignService(config.domains) // @victor would it be more idiomatic to pass req/res into constructor or less?
     return meterResponse(service.handleDistributedRequest, req, res, Endpoint.DOMAIN_SIGN)
   })
 
@@ -112,10 +106,7 @@ export const domainQuotaStatus = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    const service = new DomainQuotaStatusService(
-      config.domains,
-      new DomainQuotaStatusInputService()
-    )
+    const service = new DomainQuotaStatusService(config.domains)
     return meterResponse(service.handleDistributedRequest, req, res, Endpoint.DOMAIN_QUOTA_STATUS)
   })
 
@@ -127,7 +118,7 @@ export const domainDisable = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    const service = new DomainDisableService(config.domains, new DomainDisableInputService())
+    const service = new DomainDisableService(config.domains)
     return meterResponse(service.handleDistributedRequest, req, res, Endpoint.DISABLE_DOMAIN)
   })
 

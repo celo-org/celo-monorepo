@@ -16,7 +16,6 @@ import { HeaderInit } from 'node-fetch'
 import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { OdisConfig, VERSION } from '../config'
 import { CombinerService } from './combiner.service'
-import { IInputService } from './input.interface'
 
 export type SignatureResponse = SignMessageResponse | DomainRestrictedSignatureResponse
 
@@ -28,8 +27,8 @@ export abstract class SignService extends CombinerService {
   protected keyVersion: number
   protected polynomial: string
 
-  public constructor(config: OdisConfig, protected inputService: IInputService) {
-    super(config, inputService)
+  public constructor(config: OdisConfig) {
+    super(config)
     this.pubKey = config.keys.pubKey
     this.keyVersion = config.keys.version
     this.polynomial = config.keys.polynomial
@@ -37,10 +36,13 @@ export abstract class SignService extends CombinerService {
   }
 
   protected async inputCheck(
-    request: Request<{}, {}, SignatureRequest>,
+    request: Request<{}, {}, unknown>,
     response: Response
   ): Promise<boolean> {
-    return (await super.inputCheck(request, response)) && this.reqKeyHeaderCheck(request, response)
+    return (
+      (await super.inputCheck(request, response)) &&
+      this.reqKeyHeaderCheck(request as Request<{}, {}, SignatureRequest>, response)
+    )
   }
 
   protected headers(request: Request<{}, {}, GetBlindedMessageSigRequest>): HeaderInit | undefined {

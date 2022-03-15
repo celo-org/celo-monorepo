@@ -1,17 +1,20 @@
 import {
   CombinerEndpoint,
   DisableDomainRequest,
+  disableDomainRequestSchema,
   DisableDomainResponse,
   DisableDomainResponseSuccess,
+  Domain,
+  DomainSchema,
   ErrorMessage,
   getSignerEndpoint,
   SignerEndpoint,
+  verifyDisableDomainRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import { Request, Response } from 'express'
 import { OdisConfig, VERSION } from '../../config'
 import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
-import { IInputService } from '../input.interface'
 
 interface DomainDisableResponseWithStatus extends SignerResponseWithStatus {
   url: string
@@ -24,11 +27,21 @@ export class DomainDisableService extends CombinerService {
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainDisableResponseWithStatus[]
 
-  public constructor(config: OdisConfig, protected inputService: IInputService) {
-    super(config, inputService)
+  public constructor(config: OdisConfig) {
+    super(config)
     this.endpoint = CombinerEndpoint.DISABLE_DOMAIN
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
     this.responses = []
+  }
+
+  protected validate(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, DisableDomainRequest> {
+    return disableDomainRequestSchema(DomainSchema).is(request.body)
+  }
+
+  protected authenticate(request: Request<{}, {}, DisableDomainRequest<Domain>>): Promise<boolean> {
+    return Promise.resolve(verifyDisableDomainRequestAuthenticity(request.body))
   }
 
   protected async handleResponseOK(

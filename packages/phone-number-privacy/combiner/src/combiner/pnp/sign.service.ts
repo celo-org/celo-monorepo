@@ -1,8 +1,13 @@
 import {
+  authenticateUser,
   CombinerEndpoint,
   ErrorType,
   GetBlindedMessageSigRequest,
   getSignerEndpoint,
+  hasValidAccountParam,
+  hasValidBlindedPhoneNumberParam,
+  identifierIsValidIfExists,
+  isBodyReasonablySized,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   respondWithError,
   SignerEndpoint,
@@ -13,8 +18,8 @@ import {
 import { Request, Response } from 'express'
 import { HeaderInit } from 'node-fetch'
 import { OdisConfig, VERSION } from '../../config'
+import { getContractKit } from '../../web3/contracts'
 import { SignerResponseWithStatus } from '../combiner.service'
-import { IInputService } from '../input.interface'
 import { SignService } from '../sign.service'
 
 interface PnpSignResponseWithStatus extends SignerResponseWithStatus {
@@ -27,11 +32,29 @@ export class PnpSignService extends SignService {
   protected signerEndpoint: SignerEndpoint
   protected responses: PnpSignResponseWithStatus[]
 
-  public constructor(config: OdisConfig, protected inputService: IInputService) {
-    super(config, inputService)
+  public constructor(config: OdisConfig) {
+    super(config)
     this.endpoint = CombinerEndpoint.SIGN_MESSAGE
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
     this.responses = []
+  }
+
+  protected validate(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, GetBlindedMessageSigRequest> {
+    return (
+      // TODO(Alec): add io-ts schemas for phone number privacy
+      hasValidAccountParam(request.body as GetBlindedMessageSigRequest) &&
+      hasValidBlindedPhoneNumberParam(request.body as GetBlindedMessageSigRequest) &&
+      identifierIsValidIfExists(request.body as GetBlindedMessageSigRequest) &&
+      isBodyReasonablySized(request.body as GetBlindedMessageSigRequest)
+    )
+  }
+
+  protected async authenticate(
+    request: Request<{}, {}, GetBlindedMessageSigRequest>
+  ): Promise<boolean> {
+    return authenticateUser(request, getContractKit(), this.logger)
   }
 
   protected headers(request: Request<{}, {}, GetBlindedMessageSigRequest>): HeaderInit | undefined {

@@ -1,18 +1,20 @@
 import {
   CombinerEndpoint,
   DomainQuotaStatusRequest,
+  domainQuotaStatusRequestSchema,
   DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
+  DomainSchema,
   DomainState,
   ErrorMessage,
   getSignerEndpoint,
   SignerEndpoint,
+  verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { OdisConfig, VERSION } from '../../config'
 import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
-import { IInputService } from '../input.interface'
 
 interface DomainQuotaStatusResponseWithStatus extends SignerResponseWithStatus {
   url: string
@@ -25,11 +27,21 @@ export class DomainQuotaStatusService extends CombinerService {
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainQuotaStatusResponseWithStatus[]
 
-  public constructor(config: OdisConfig, protected inputService: IInputService) {
-    super(config, inputService)
+  public constructor(config: OdisConfig) {
+    super(config)
     this.endpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
     this.responses = []
+  }
+
+  protected validate(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, DomainQuotaStatusRequest> {
+    return domainQuotaStatusRequestSchema(DomainSchema).is(request.body)
+  }
+
+  protected authenticate(request: Request<{}, {}, DomainQuotaStatusRequest>): Promise<boolean> {
+    return Promise.resolve(verifyDomainQuotaStatusRequestAuthenticity(request.body))
   }
 
   protected async handleResponseOK(
@@ -51,7 +63,7 @@ export class DomainQuotaStatusService extends CombinerService {
 
   protected async combineSignerResponses(
     _request: Request<{}, {}, DomainQuotaStatusRequest>,
-    response: Response<any>
+    response: Response<DomainQuotaStatusResponse>
   ): Promise<void> {
     if (this.responses.length >= this.threshold) {
       try {

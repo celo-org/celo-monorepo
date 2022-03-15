@@ -1,17 +1,19 @@
 import {
   CombinerEndpoint,
   DomainRestrictedSignatureRequest,
+  domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseFailure,
+  DomainSchema,
   ErrorType,
   getSignerEndpoint,
   respondWithError,
   SignerEndpoint,
+  verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { OdisConfig, VERSION } from '../../config'
 import { SignerResponseWithStatus } from '../combiner.service'
-import { IInputService } from '../input.interface'
 import { SignService } from '../sign.service'
 
 interface DomainSignResponseWithStatus extends SignerResponseWithStatus {
@@ -25,11 +27,23 @@ export class DomainSignService extends SignService {
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainSignResponseWithStatus[]
 
-  public constructor(config: OdisConfig, protected inputService: IInputService) {
-    super(config, inputService)
+  public constructor(config: OdisConfig) {
+    super(config)
     this.endpoint = CombinerEndpoint.DOMAIN_SIGN
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
     this.responses = []
+  }
+
+  protected validate(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, DomainRestrictedSignatureRequest> {
+    return domainRestrictedSignatureRequestSchema(DomainSchema).is(request.body)
+  }
+
+  protected authenticate(
+    request: Request<{}, {}, DomainRestrictedSignatureRequest>
+  ): Promise<boolean> {
+    return Promise.resolve(verifyDomainRestrictedSignatureRequestAuthenticity(request.body))
   }
 
   protected parseSignature(

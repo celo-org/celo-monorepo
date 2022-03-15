@@ -18,7 +18,8 @@ import { Request, Response } from 'express'
 import fetch, { HeaderInit, Response as FetchResponse } from 'node-fetch'
 import { OdisConfig, VERSION } from '../config'
 import { DistributedRequest, ICombinerService } from './combiner.interface'
-import { IInputService } from './input.interface'
+
+// TODO(Alec): Rename this folder to something other than "combiner" (potentially add / refactor matchmaking code to match)
 
 export type SignerResponse = SignMessageResponse | DomainQuotaStatusResponse | DisableDomainResponse
 
@@ -47,7 +48,7 @@ export abstract class CombinerService implements ICombinerService {
   protected logger: Logger
   protected timedOut: boolean
 
-  public constructor(config: OdisConfig, protected io: IInputService) {
+  public constructor(config: OdisConfig) {
     this.logger = rootLogger()
     this.failedSigners = new Set<string>()
     this.errorCodes = new Map<number, number>()
@@ -64,8 +65,9 @@ export abstract class CombinerService implements ICombinerService {
       if (!(await this.inputCheck(request, response))) {
         return
       }
-      await this.forwardToSigners(request) // TODO(Alec)
-      await this.combineSignerResponses(request, response)
+      // @victor HALP, I seem to be stuck here. Not sure what the best way to remove these type casts is
+      await this.forwardToSigners(request as Request<{}, {}, DistributedRequest>)
+      await this.combineSignerResponses(request as Request<{}, {}, DistributedRequest>, response)
     } catch (err) {
       this.logger.error(`Unknown error in handleDistributedRequest for ${this.endpoint}`)
       this.logger.error(err)
@@ -81,11 +83,11 @@ export abstract class CombinerService implements ICombinerService {
       this.sendFailureResponse(response, WarningMessage.API_UNAVAILABLE, 501)
       return false
     }
-    if (!this.io.validate(request, this.logger)) {
+    if (!this.validate(request)) {
       this.sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400)
       return false
     }
-    if (!(await this.io.authenticate(request, this.logger))) {
+    if (!(await this.authenticate(request))) {
       this.sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401)
       return false
     }
@@ -180,6 +182,12 @@ export abstract class CombinerService implements ICombinerService {
     })
     return maxErrorCode > 0 ? maxErrorCode : null
   }
+
+  protected abstract validate(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, DistributedRequest>
+
+  protected abstract authenticate(request: Request<{}, {}, DistributedRequest>): Promise<boolean>
 
   protected abstract combineSignerResponses(
     request: Request<{}, {}, DistributedRequest>,
