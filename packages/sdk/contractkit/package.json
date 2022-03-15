@@ -4,6 +4,7 @@
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "sideEffects": false,
   "author": "Celo",
   "license": "Apache-2.0",
   "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit",
@@ -27,10 +28,12 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
+
     "@celo/base": "1.5.3-dev",
     "@celo/connect": "1.5.3-dev",
     "@celo/utils": "1.5.3-dev",
     "@celo/wallet-local": "1.5.3-dev",
+    "@types/bn.js": "^5.1.0",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "cross-fetch": "^3.0.6",

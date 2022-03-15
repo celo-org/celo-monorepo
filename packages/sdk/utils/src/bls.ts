@@ -1,9 +1,9 @@
 // this is an implementation of a subset of BLS12-377
-const keccak256 = require('keccak256')
+import { BLS } from 'bls12377js'
+import { keccak256 } from 'ethereumjs-util'
+import { isValidAddress } from './address'
 const BigInteger = require('bigi')
 const reverse = require('buffer-reverse')
-import * as bls12377js from 'bls12377js'
-import { isValidAddress } from './address'
 
 const n = BigInteger.fromHex('12ab655e9a2ca55660b44d1e5c37b00159aa76fed00000010a11800000000001', 16)
 
@@ -47,7 +47,7 @@ const getBlsPrivateKey = (privateKeyHex: string) => {
 
 export const getBlsPublicKey = (privateKeyHex: string) => {
   const blsPrivateKeyBytes = getBlsPrivateKey(privateKeyHex)
-  return '0x' + bls12377js.BLS.privateToPublicBytes(blsPrivateKeyBytes).toString('hex')
+  return '0x' + BLS.privateToPublicBytes(blsPrivateKeyBytes).toString('hex')
 }
 
 export const getBlsPoP = (address: string, privateKeyHex: string) => {
@@ -56,7 +56,6 @@ export const getBlsPoP = (address: string, privateKeyHex: string) => {
   }
   const blsPrivateKeyBytes = getBlsPrivateKey(privateKeyHex)
   return (
-    '0x' +
-    bls12377js.BLS.signPoP(blsPrivateKeyBytes, Buffer.from(address.slice(2), 'hex')).toString('hex')
+    '0x' + BLS.signPoP(blsPrivateKeyBytes, Buffer.from(address.slice(2), 'hex')).toString('hex')
   )
 }

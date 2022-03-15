@@ -8,7 +8,7 @@ import {
 } from '@celo/utils/lib/signatureUtils'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
-import { keccak256 } from 'web3-utils'
+import BN from 'bn.js' // just the types
 import { Accounts } from '../generated/Accounts'
 import { newContractVersion } from '../versions'
 import {
@@ -18,7 +18,6 @@ import {
   stringToSolidityBytes,
 } from '../wrappers/BaseWrapper'
 import { BaseWrapper } from './BaseWrapper'
-
 interface AccountSummary {
   address: string
   name: string
@@ -293,7 +292,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     ])
     const account = this.connection.defaultAccount || accounts[0]
 
-    const hashedRole = keccak256(role)
+    const hashedRole = this.keccak256(role)
     const typedData = buildAuthorizeSignerTypedData({
       account,
       signer,
@@ -313,7 +312,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     return toTransactionObject(
       this.connection,
-      this.contract.methods.authorizeSigner(signer, keccak256(role))
+      this.contract.methods.authorizeSigner(signer, this.keccak256(role))
     )
   }
 
@@ -321,7 +320,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     await this.onlyVersionOrGreater(this.RELEASE_4_VERSION)
     return toTransactionObject(
       this.connection,
-      this.contract.methods.completeSignerAuthorization(account, keccak256(role))
+      this.contract.methods.completeSignerAuthorization(account, this.keccak256(role))
     )
   }
 
@@ -465,6 +464,10 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     const hash = soliditySha3({ type: 'address', value: address })
     const signature = await signerFn.sign(hash!)
     return parseSignature(hash!, signature, signer)
+  }
+
+  private keccak256(value: string | BN): string {
+    return this.connection.web3.utils.keccak256(value)
   }
 }
 

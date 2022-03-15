@@ -1,4 +1,3 @@
-import { AbiInput, AbiItem } from 'web3-utils'
 import { EventLog } from './types'
 
 export type ABIType = 'uint256' | 'boolean' | 'string' | 'bytes' | string // TODO complete list
@@ -11,8 +10,35 @@ export interface DecodedParamsObject extends DecodedParamsArray {
   [key: string]: any
 }
 
-export { AbiItem }
-export { AbiInput }
+type AbiType = 'function' | 'constructor' | 'event' | 'fallback'
+type StateMutabilityType = 'pure' | 'view' | 'nonpayable' | 'payable'
+
+export interface AbiInput {
+  name: string
+  type: string
+  indexed?: boolean
+  components?: AbiInput[]
+  internalType?: string
+}
+
+export interface AbiOutput {
+  name: string
+  type: string
+  components?: AbiOutput[]
+  internalType?: string
+}
+
+export interface AbiItem {
+  anonymous?: boolean
+  constant?: boolean
+  inputs?: AbiInput[]
+  name?: string
+  outputs?: AbiOutput[]
+  payable?: boolean
+  stateMutability?: StateMutabilityType
+  type: AbiType
+  gas?: number
+}
 
 export interface ABIDefinition extends AbiItem {
   signature: string

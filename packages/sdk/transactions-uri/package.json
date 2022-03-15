@@ -28,7 +28,7 @@
     "@types/qrcode": "^1.3.4",
     "@celo/base": "1.5.3-dev",
     "@celo/connect": "1.5.3-dev",
-    "bn.js": "4.11.8",
+    "bn.js": "^4.11.8",
     "qrcode": "^1.4.4",
     "web3-eth-abi": "1.3.6"
   },
