@@ -15,13 +15,15 @@ import {
   DomainSchema,
   DomainState,
   ErrorMessage,
+  ErrorType,
+  KEY_VERSION_HEADER,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { Counters } from '../common/metrics'
-import { getVersion } from '../config'
+import config, { getVersion } from '../config'
 import { getDatabase } from '../database/database'
 import { DomainStateRecord, DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
 import {
@@ -36,7 +38,7 @@ import { IDomainAuthService } from './auth/domainAuth.interface'
 import { IDomainService } from './domain.interface'
 import { IDomainQuotaService } from './quota/domainQuota.interface'
 
-// TODO: De-dupe with common package
+// TODO(Alec): De-dupe with common package
 function respondWithError(
   endpoint: DomainEndpoint,
   res: Response<DomainResponse & { success: false }>,
@@ -89,7 +91,7 @@ export class DomainService implements IDomainService {
     }
 
     const domain = request.body.domain
-    if (!this.authenticateRequest(domain, response, endpoint, logger)) {
+    if (!this.authenticateRequest(domain, request, response, endpoint, logger)) {
       // authenticateRequest returns a response to the user internally. Nothing left to do.
       return
     }
@@ -146,7 +148,7 @@ export class DomainService implements IDomainService {
     }
 
     const domain = request.body.domain
-    if (!this.authenticateRequest(domain, response, endpoint, logger)) {
+    if (!this.authenticateRequest(domain, request, response, endpoint, logger)) {
       // authenticateRequest returns a response to the user internally. Nothing left to do.
       return
     }
@@ -297,7 +299,7 @@ export class DomainService implements IDomainService {
     response: Response,
     error: ErrorType,
     status: number,
-    endpoint: SignerEndpoint,
+    endpoint: DomainEndpoint,
     logger: Logger,
     retryAfterMs: number = 0
   ) {
@@ -319,12 +321,12 @@ export class DomainService implements IDomainService {
   private nonceCheck(
     request: Request<{}, {}, DomainRequest>,
     response: Response,
-    domainState: DomainState | null,
-    endpoint: Endpoint,
+    domainState: DomainStateRecord | null,
+    endpoint: DomainEndpoint,
     logger: Logger
   ): boolean {
     if (!domainState) {
-      domainState = DomainState.createEmptyDomainState(request.body.domain)
+      domainState = DomainStateRecord.createEmptyDomainState(request.body.domain)
     }
     if (!this.authService.nonceCheck(request.body, domainState, logger)) {
       this.sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401, endpoint, logger)

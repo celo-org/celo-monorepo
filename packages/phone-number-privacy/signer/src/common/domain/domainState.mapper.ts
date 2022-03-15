@@ -1,5 +1,5 @@
 import { SequentialDelayDomainState } from '@celo/phone-number-privacy-common'
-import { DOMAINS_STATES_COLUMNS, DomainStateRecord } from '../../database/models/domainState'
+import { DomainStateRecord, DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
 
 export function toSequentialDelayDomainState(
   domainState: DomainStateRecord
@@ -8,5 +8,6 @@ export function toSequentialDelayDomainState(
     counter: domainState[DOMAINS_STATES_COLUMNS.counter]!,
     timer: domainState[DOMAINS_STATES_COLUMNS.timer]!,
     disabled: domainState[DOMAINS_STATES_COLUMNS.disabled]!,
+    date: 0, // TODO(Alec)
   }
 }

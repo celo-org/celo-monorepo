@@ -4,6 +4,7 @@ import {
   authenticateUser,
   Endpoint,
   ErrorMessage,
+  ErrorType,
   FULL_NODE_TIMEOUT_IN_MS,
   GetQuotaRequest,
   hasValidAccountParam,
@@ -13,6 +14,7 @@ import {
   respondWithError,
   RETRY_COUNT,
   RETRY_DELAY_IN_MS,
+  SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { BigNumber } from 'bignumber.js'
@@ -51,19 +53,18 @@ export async function handleGetQuota(
   request: Request<{}, {}, GetQuotaRequest>,
   response: Response
 ) {
-  Counters.requests.labels(Endpoint.GET_QUOTA).inc()
+  const endpoint = SignerEndpoint.GET_QUOTA
+  Counters.requests.labels(endpoint).inc()
   const logger: Logger = response.locals.logger
   logger.info({ request: request.body }, 'Request received')
   logger.debug('Begin handleGetQuota')
   try {
     if (!isValidGetQuotaInput(request.body)) {
-      // TODO(Alec)
-      // sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400)
-      respondWithError(Endpoint.GET_QUOTA, response, 400, WarningMessage.INVALID_INPUT)
+      sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400, endpoint, logger)
       return
     }
     if (!(await authenticateUser(request, getContractKit() as any, logger))) {
-      respondWithError(Endpoint.GET_QUOTA, response, 401, WarningMessage.UNAUTHENTICATED_USER)
+      sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401, endpoint, logger)
       return
     }
 
@@ -84,7 +85,7 @@ export async function handleGetQuota(
   } catch (err) {
     logger.error('Failed to get user quota')
     logger.error(err)
-    respondWithError(Endpoint.GET_QUOTA, response, 500, ErrorMessage.DATABASE_GET_FAILURE)
+    sendFailureResponse(response, ErrorMessage.DATABASE_GET_FAILURE, 500, endpoint, logger)
   }
 }
 

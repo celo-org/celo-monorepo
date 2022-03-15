@@ -1,13 +1,16 @@
 import {
   authenticateUser,
   ErrorMessage,
+  ErrorType,
   GetBlindedMessageSigRequest,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
+  respondWithError,
   SignerEndpoint as Endpoint,
+  SignerEndpoint,
   SignMessageResponse,
   SignMessageResponseFailure,
   WarningMessage,
@@ -16,7 +19,6 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import allSettled from 'promise.allsettled'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
-import { respondWithError } from '../common/error-utils'
 import { Counters, Histograms } from '../common/metrics'
 import config, { getVersion } from '../config'
 import { incrementQueryCount } from '../database/wrappers/account'
@@ -30,11 +32,36 @@ allSettled.shim()
 
 export type GetBlindedMessagePartialSigRequest = GetBlindedMessageSigRequest
 
+// TODO(Alec): De-dupe
+function sendFailureResponse(
+  response: Response,
+  error: ErrorType,
+  status: number,
+  endpoint: SignerEndpoint,
+  logger: Logger,
+  performedQueryCount?: number,
+  totalQuota?: number,
+  blockNumber?: number
+) {
+  Counters.responses.labels(endpoint, status.toString()).inc()
+  respondWithError(
+    response,
+    {
+      success: false,
+      error,
+      version: getVersion(),
+    },
+    status,
+    logger
+  )
+}
+
 export async function handleGetBlindedMessagePartialSig(
   request: Request<{}, {}, GetBlindedMessagePartialSigRequest>,
   response: Response
 ) {
-  Counters.requests.labels(Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG).inc()
+  const endpoint = Endpoint.PARTIAL_SIGN_MESSAGE
+  Counters.requests.labels(endpoint).inc()
 
   const logger: Logger = response.locals.logger
   logger.info({ request: request.body }, 'Request received')
@@ -53,12 +80,7 @@ export async function handleGetBlindedMessagePartialSig(
 
   try {
     if (!isValidGetSignatureInput(request.body)) {
-      respondWithError(
-        Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG,
-        response,
-        400,
-        WarningMessage.INVALID_INPUT
-      )
+      sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400, endpoint, logger)
       return
     }
 
@@ -68,12 +90,7 @@ export async function handleGetBlindedMessagePartialSig(
     if (
       !(await authenticateUser(request, getContractKit(), logger).finally(meterAuthenticateUser))
     ) {
-      respondWithError(
-        Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG,
-        response,
-        401,
-        WarningMessage.UNAUTHENTICATED_USER
-      )
+      sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401, endpoint, logger)
       return
     }
 
@@ -121,14 +138,15 @@ export async function handleGetBlindedMessagePartialSig(
         Counters.testQuotaBypassedRequests.inc()
         logger.info({ request: request.body }, 'Request will bypass quota check for testing')
       } else {
-        respondWithError(
-          Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG,
+        sendFailureResponse(
           response,
-          403,
           WarningMessage.EXCEEDED_QUOTA,
+          403,
+          endpoint,
+          logger,
           performedQueryCount,
           totalQuota,
-          blockNumber
+          blockNumber // TODO(Alec)
         )
         return
       }
@@ -190,18 +208,13 @@ export async function handleGetBlindedMessagePartialSig(
     } else {
       signMessageResponse = signMessageResponseSuccess
     }
-    Counters.responses.labels(Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG, '200').inc()
+    Counters.responses.labels(endpoint, '200').inc()
     logger.info({ response: signMessageResponse }, 'Signature retrieval success')
     response.set(KEY_VERSION_HEADER, key.version.toString()).json(signMessageResponse)
   } catch (err) {
     logger.error('Failed to get signature')
     logger.error(err)
-    respondWithError(
-      Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG,
-      response,
-      500,
-      ErrorMessage.UNKNOWN_ERROR
-    )
+    sendFailureResponse(response, ErrorMessage.UNKNOWN_ERROR, 500, endpoint, logger)
   }
 }
 

@@ -19,6 +19,7 @@ export class DomainStateRecord {
         [DOMAINS_STATES_COLUMNS.domainHash]: domainHash(domain).toString('hex'),
         [DOMAINS_STATES_COLUMNS.counter]: 0,
         [DOMAINS_STATES_COLUMNS.timer]: 0,
+
         [DOMAINS_STATES_COLUMNS.disabled]: false,
       }
     }

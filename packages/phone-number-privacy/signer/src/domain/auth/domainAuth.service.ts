@@ -10,7 +10,7 @@ import {
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { DomainState, DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
+import { DomainStateRecord, DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
 import { IDomainAuthService } from './domainAuth.interface'
 
 // TODO(Alec): Should we standardize this pattern across signer / combiner?
@@ -40,7 +40,7 @@ export class DomainAuthService implements IDomainAuthService {
   // TODO(Alec): does this best belong in this file or elsewhere?
   public nonceCheck(
     domainRequest: DomainRequest<Domain>,
-    domainState: DomainState,
+    domainState: DomainStateRecord,
     logger: Logger
   ): boolean {
     const nonce = domainRequest?.options?.nonce
