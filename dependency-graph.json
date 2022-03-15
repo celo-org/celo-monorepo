@@ -169,6 +169,9 @@
   "@celo/cryptographic-utils": {
     "location": "packages/sdk/cryptographic-utils",
     "dependencies": [
+      "@celo/base",
+      "@celo/flake-tracker",
+      "@celo/typescript",
       "@celo/utils"
     ]
   },
@@ -217,7 +220,6 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
-      "@celo/phone-utils",
       "@celo/phone-number-privacy-common",
       "@celo/utils",
       "@celo/wallet-local"
