@@ -1,10 +1,10 @@
 import Logger from 'bunyan'
 import { Response } from 'express'
-import { WarningMessage } from '..'
+import { FailureResponse, WarningMessage } from '..'
 
 export function respondWithError(
   response: Response,
-  body: { error: string },
+  body: FailureResponse,
   statusCode: number,
   logger: Logger
 ) {

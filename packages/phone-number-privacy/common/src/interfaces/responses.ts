@@ -7,6 +7,8 @@ import {
 } from '.'
 import { Domain, DomainState } from '../domains'
 
+// Phone Number Privacy
+
 export interface SignMessageResponseSuccess {
   success: true
   version: string
@@ -19,6 +21,7 @@ export interface SignMessageResponseSuccess {
 export interface SignMessageResponseFailure {
   success: false
   version: string
+  error: string
   performedQueryCount?: number
   totalQuota?: number
   blockNumber?: number
@@ -56,6 +59,8 @@ export interface GetContactMatchesResponseFailure {
 export type GetContactMatchesResponse =
   | GetContactMatchesResponseSuccess
   | GetContactMatchesResponseFailure
+
+// Domains
 
 export interface DomainRestrictedSignatureResponseSuccess<D extends Domain = Domain> {
   success: true
@@ -161,3 +166,23 @@ export const DisableDomainResponseSchema: t.Type<DisableDomainResponse> = t.unio
     error: t.string,
   }),
 ])
+
+// General
+
+export type FailureResponse<D extends Domain = Domain> =
+  | SignMessageResponseFailure
+  | GetQuotaResponseFailure
+  | GetContactMatchesResponseFailure
+  | DomainRestrictedSignatureResponseFailure<D>
+  | DomainQuotaStatusResponseFailure
+  | DisableDomainResponseFailure
+
+export type SuccessResponse<D extends Domain = Domain> =
+  | SignMessageResponseSuccess
+  | GetQuotaResponseSuccess
+  | GetContactMatchesResponseSuccess
+  | DomainRestrictedSignatureResponseSuccess<D>
+  | DomainQuotaStatusResponseSuccess
+  | DisableDomainResponseSuccess
+
+export type OdisResponse<D extends Domain = Domain> = SuccessResponse<D> | FailureResponse<D>

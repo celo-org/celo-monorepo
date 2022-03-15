@@ -1,16 +1,16 @@
 import {
   DisableDomainRequest,
+  Domain,
   DomainQuotaStatusRequest,
   DomainRequest,
   DomainRestrictedSignatureRequest,
-  KnownDomain,
   SignerEndpoint as Endpoint,
   verifyDisableDomainRequestAuthenticity,
   verifyDomainQuotaStatusRequestAuthenticity,
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
+import { DomainState, DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
 import { IDomainAuthService } from './domainAuth.interface'
 
 // TODO(Alec): Should we standardize this pattern across signer / combiner?
@@ -18,18 +18,16 @@ export class DomainAuthService implements IDomainAuthService {
   public authCheck(domainRequest: DomainRequest, endpoint: Endpoint, logger: Logger): boolean {
     try {
       if (endpoint === Endpoint.DISABLE_DOMAIN) {
-        return verifyDisableDomainRequestAuthenticity(
-          domainRequest as DisableDomainRequest<KnownDomain>
-        )
+        return verifyDisableDomainRequestAuthenticity(domainRequest as DisableDomainRequest<Domain>)
       }
       if (endpoint === Endpoint.DOMAIN_QUOTA_STATUS) {
         return verifyDomainQuotaStatusRequestAuthenticity(
-          domainRequest as DomainQuotaStatusRequest<KnownDomain>
+          domainRequest as DomainQuotaStatusRequest<Domain>
         )
       }
       if (endpoint === Endpoint.DOMAIN_SIGN) {
         return verifyDomainRestrictedSignatureRequestAuthenticity(
-          domainRequest as DomainRestrictedSignatureRequest<KnownDomain>
+          domainRequest as DomainRestrictedSignatureRequest<Domain>
         )
       }
       throw new Error(`Endpoint not supported ${endpoint}`)
@@ -41,7 +39,7 @@ export class DomainAuthService implements IDomainAuthService {
 
   // TODO(Alec): does this best belong in this file or elsewhere?
   public nonceCheck(
-    domainRequest: DomainRequest<KnownDomain>,
+    domainRequest: DomainRequest<Domain>,
     domainState: DomainState,
     logger: Logger
   ): boolean {

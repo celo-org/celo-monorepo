@@ -1,10 +1,12 @@
 import {
   DisableDomainRequest,
+  disableDomainRequestSchema,
+  Domain,
   DomainQuotaStatusRequest,
-  DomainRequest,
+  domainQuotaStatusRequestSchema,
   DomainRestrictedSignatureRequest,
-  isKnownDomain,
-  KnownDomain,
+  domainRestrictedSignatureRequestSchema,
+  DomainSchema,
   verifyDisableDomainRequestAuthenticity,
   verifyDomainQuotaStatusRequestAuthenticity,
   verifyDomainRestrictedSignatureRequestAuthenticity,
@@ -14,29 +16,35 @@ import { IInputService } from '../input.interface'
 
 // tslint:disable: max-classes-per-file
 
-export abstract class DomainInputService implements IInputService {
-  validate(request: Request<{}, {}, DomainRequest>): boolean {
-    return isKnownDomain(request.body.domain)
+export class DomainSignInputService implements IInputService {
+  validate(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, DomainRestrictedSignatureRequest> {
+    return domainRestrictedSignatureRequestSchema(DomainSchema).is(request.body)
   }
-  abstract authenticate(request: Request<{}, {}, DomainRequest>): Promise<boolean>
-}
-
-export class DomainSignInputService extends DomainInputService {
   authenticate(
-    request: Request<{}, {}, DomainRestrictedSignatureRequest<KnownDomain>>
+    request: Request<{}, {}, DomainRestrictedSignatureRequest<Domain>>
   ): Promise<boolean> {
     return Promise.resolve(verifyDomainRestrictedSignatureRequestAuthenticity(request.body))
   }
 }
 
-export class DomainQuotaStatusInputService extends DomainInputService {
-  authenticate(request: Request<{}, {}, DomainQuotaStatusRequest<KnownDomain>>): Promise<boolean> {
+export class DomainQuotaStatusInputService implements IInputService {
+  validate(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, DomainQuotaStatusRequest> {
+    return domainQuotaStatusRequestSchema(DomainSchema).is(request.body)
+  }
+  authenticate(request: Request<{}, {}, DomainQuotaStatusRequest<Domain>>): Promise<boolean> {
     return Promise.resolve(verifyDomainQuotaStatusRequestAuthenticity(request.body))
   }
 }
 
-export class DomainDisableInputService extends DomainInputService {
-  authenticate(request: Request<{}, {}, DisableDomainRequest<KnownDomain>>): Promise<boolean> {
+export class DomainDisableInputService implements IInputService {
+  validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, DisableDomainRequest> {
+    return disableDomainRequestSchema(DomainSchema).is(request.body)
+  }
+  authenticate(request: Request<{}, {}, DisableDomainRequest<Domain>>): Promise<boolean> {
     return Promise.resolve(verifyDisableDomainRequestAuthenticity(request.body))
   }
 }

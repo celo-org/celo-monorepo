@@ -89,12 +89,7 @@ export const getBlindedMessageSig = functions
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
     const service = new PnpSignService(config.phoneNumberPrivacy, new PnpInputService())
-    return meterResponse(
-      service.handleDistributedRequest,
-      req,
-      res,
-      Endpoint.GET_BLINDED_MESSAGE_SIG
-    )
+    return meterResponse(service.handleDistributedRequest, req, res, Endpoint.SIGN_MESSAGE)
   })
 
 export const domainSign = functions

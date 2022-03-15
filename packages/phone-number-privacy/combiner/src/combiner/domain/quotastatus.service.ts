@@ -3,9 +3,9 @@ import {
   DomainQuotaStatusRequest,
   DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
+  DomainState,
   ErrorMessage,
   getSignerEndpoint,
-  KnownDomainState,
   SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -75,7 +75,7 @@ export class DomainQuotaStatusService extends CombinerService {
 
   protected sendSuccessResponse(
     response: Response<DomainQuotaStatusResponseSuccess>,
-    quotaStatus: KnownDomainState,
+    quotaStatus: DomainState,
     statusCode: number
   ) {
     response.status(statusCode).json({
@@ -101,7 +101,7 @@ export class DomainQuotaStatusService extends CombinerService {
     }
 
     if (this.signers.length - numDisabled < this.threshold) {
-      return { timer: 0, counter: 0, disabled: true }
+      return { timer: 0, counter: 0, disabled: true, date: 0 }
     }
 
     if (domainStatesEnabled.length < this.threshold) {

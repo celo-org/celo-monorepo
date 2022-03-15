@@ -12,12 +12,15 @@ import { getContractKit } from '../../web3/contracts'
 import { IInputService } from '../input.interface'
 
 export class PnpInputService implements IInputService {
-  validate(request: Request<{}, {}, GetBlindedMessageSigRequest>): boolean {
+  validate(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, GetBlindedMessageSigRequest> {
     return (
+      GetBlindedMessageSigRequestSchema.is(request.body),
       hasValidAccountParam(request.body) &&
-      hasValidBlindedPhoneNumberParam(request.body) &&
-      identifierIsValidIfExists(request.body) &&
-      isBodyReasonablySized(request.body)
+        hasValidBlindedPhoneNumberParam(request.body) &&
+        identifierIsValidIfExists(request.body) &&
+        isBodyReasonablySized(request.body)
     )
   }
 

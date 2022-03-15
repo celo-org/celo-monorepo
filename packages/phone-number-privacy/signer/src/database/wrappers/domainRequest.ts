@@ -1,17 +1,12 @@
-import {
-  DB_TIMEOUT,
-  domainHash,
-  ErrorMessage,
-  KnownDomain,
-} from '@celo/phone-number-privacy-common'
+import { DB_TIMEOUT, Domain, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import {
+  DomainSigRequest,
   DOMAIN_REQUESTS_COLUMNS,
   DOMAIN_REQUESTS_TABLE,
-  DomainSigRequest,
 } from '../models/domainRequest'
 
 function domainRequests() {
@@ -19,7 +14,7 @@ function domainRequests() {
 }
 
 export async function getDomainRequestExists(
-  domain: KnownDomain,
+  domain: Domain,
   blindedMessage: string,
   trx: Transaction<DomainSigRequest>,
   logger: Logger
@@ -49,7 +44,7 @@ export async function getDomainRequestExists(
 }
 
 export async function storeDomainRequest(
-  domain: KnownDomain,
+  domain: Domain,
   blindedMessage: string,
   trx: Transaction<DomainSigRequest>,
   logger: Logger

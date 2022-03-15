@@ -40,11 +40,11 @@ export abstract class CombinerService implements ICombinerService {
   protected readonly signers: SignerService[]
   protected readonly threshold: number
   protected readonly enabled: boolean
-  protected readonly logger: Logger
   protected abstract readonly endpoint: CombinerEndpoint
   protected abstract readonly signerEndpoint: SignerEndpoint
   protected abstract readonly responses: SignerResponseWithStatus[]
 
+  protected logger: Logger
   protected timedOut: boolean
 
   public constructor(config: OdisConfig, protected io: IInputService) {
@@ -64,7 +64,7 @@ export abstract class CombinerService implements ICombinerService {
       if (!(await this.inputCheck(request, response))) {
         return
       }
-      await this.forwardToSigners(request)
+      await this.forwardToSigners(request) // TODO(Alec)
       await this.combineSignerResponses(request, response)
     } catch (err) {
       this.logger.error(`Unknown error in handleDistributedRequest for ${this.endpoint}`)

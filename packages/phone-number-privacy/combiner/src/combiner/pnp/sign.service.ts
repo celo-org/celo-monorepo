@@ -29,7 +29,7 @@ export class PnpSignService extends SignService {
 
   public constructor(config: OdisConfig, protected inputService: IInputService) {
     super(config, inputService)
-    this.endpoint = CombinerEndpoint.GET_BLINDED_MESSAGE_SIG
+    this.endpoint = CombinerEndpoint.SIGN_MESSAGE
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
     this.responses = []
   }
