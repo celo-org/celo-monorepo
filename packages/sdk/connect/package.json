@@ -1,14 +1,14 @@
 {
   "name": "@celo/connect",
   "version": "2.0.0-alpha.2-dev",
-  "description": "Toolkit for connecting with the Celo network",
+  "description": "Light Toolkit for connecting with the Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "sideEffects": false,
   "author": "Celo",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/connect",
-  "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/connect",
+  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/connect",
+  "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/connect",
   "keywords": [
     "celo",
     "blockchain"

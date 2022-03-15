@@ -6,6 +6,8 @@
     "clean": "tsc -b . --clean",
     "prepublishOnly": "yarn build"
   },
+  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/dappkit",
+  "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/dappkit",
   "dependencies": {
     "@celo/connect": "2.0.0-alpha.2-dev",
     "@celo/contractkit": "2.0.0-alpha.2-dev",

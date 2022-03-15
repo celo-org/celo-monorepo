@@ -11,6 +11,8 @@
     "blockchain",
     "sdk"
   ],
+  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/keystores",
+  "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/keystores",
   "scripts": {
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
@@ -19,6 +21,7 @@
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
   },
+
   "dependencies": {
     "@celo/utils": "2.0.0-alpha.2-dev",
     "@celo/wallet-local": "2.0.0-alpha.2-dev",

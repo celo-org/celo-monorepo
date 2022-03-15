@@ -7,6 +7,8 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "sideEffects": false,
+  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/phone-utils",
+  "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/phone-utils",
   "scripts": {
     "prepublishOnly": "yarn build",
     "build": "tsc -b .",

@@ -45,6 +45,12 @@ export interface ConnectionOptions {
   from?: Address
 }
 
+/**
+ * Connection a Class for connecting to Celo, sending Transactions, etc
+ * @param web3 an instance of web3
+ * @optional wallet a wallet
+ * @optional handleRevert sets handleRevert on the web3.eth instance passed in
+ */
 export class Connection {
   private config: ConnectionOptions
   readonly paramsPopulator: TxParamsNormalizer
@@ -202,7 +208,7 @@ export class Connection {
    * Send a transaction to celo-blockchain.
    *
    * Similar to `web3.eth.sendTransaction()` but with following differences:
-   *  - applies kit tx's defaults
+   *  - applies connections tx's defaults
    *  - estimatesGas before sending
    *  - returns a `TransactionResult` instead of `PromiEvent`
    */
