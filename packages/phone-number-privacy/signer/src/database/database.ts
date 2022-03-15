@@ -49,7 +49,7 @@ export async function initDatabase(doTestQuery = true) {
       pool: { max: poolMaxSize },
     }
   } else if (type === SupportedDatabase.Sqlite) {
-    logger().info('Using SQLite')
+    logger.info('Using SQLite')
     client = 'sqlite3'
     connection = ':memory:'
   } else {
