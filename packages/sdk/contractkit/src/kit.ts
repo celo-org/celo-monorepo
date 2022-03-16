@@ -12,6 +12,7 @@ import { LocalWallet } from '@celo/wallet-local'
 import { BigNumber } from 'bignumber.js'
 import net from 'net'
 import Web3 from 'web3'
+import { HttpProviderOptions as Web3HttpProviderOptions } from 'web3-providers-http'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, CeloTokenContract } from './base'
 import { CeloTokens, EachCeloToken } from './celo-tokens'
@@ -30,8 +31,7 @@ import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
-import Types = require('web3-providers-http')
-export type HttpProviderOptions = Types.HttpProviderOptions
+export type HttpProviderOptions = Web3HttpProviderOptions
 export const API_KEY_HEADER_KEY = 'apiKey'
 
 /**
