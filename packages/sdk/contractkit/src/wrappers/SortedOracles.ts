@@ -5,12 +5,7 @@ import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { AddressRegistry } from '../address-registry'
 import { CeloContract, StableTokenContract } from '../base'
-import {
-  celoTokenInfos,
-  isStableTokenContract,
-  StableToken,
-  stableTokenInfos,
-} from '../celo-tokens'
+import { isStableTokenContract, StableToken, stableTokenInfos } from '../celo-tokens'
 import { SortedOracles } from '../generated/SortedOracles'
 import {
   BaseWrapper,
@@ -20,8 +15,6 @@ import {
   valueToFrac,
   valueToInt,
 } from './BaseWrapper'
-
-celoTokenInfos
 
 export enum MedianRelation {
   Undefined,

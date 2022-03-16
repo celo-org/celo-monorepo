@@ -30,7 +30,7 @@ export function getSecurityCodePrefix(issuerAddress: Address) {
 }
 
 // from '@celo/phone-utils/lib/io'
-type AttestationRequest = {
+interface AttestationRequest {
   phoneNumber: string
   account: string
   issuer: string
@@ -40,7 +40,7 @@ type AttestationRequest = {
   language: string | undefined
   phoneNumberSignature: string | undefined
 }
-type GetAttestationRequest = {
+interface GetAttestationRequest {
   phoneNumber: string
   account: string
   issuer: string

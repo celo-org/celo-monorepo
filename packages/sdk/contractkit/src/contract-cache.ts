@@ -209,7 +209,7 @@ export class WrapperCache {
         const Klass = await getSortedOracles()
         this.wrapperCache[contract] = new Klass(this.connection, instance as any, this.registry)
       } else if (contractsWhichRequireCache.has(contract)) {
-        let contractName = contract as keyof WrapperFactoriesWhichNeedCacheType
+        const contractName = contract as keyof WrapperFactoriesWhichNeedCacheType
         const getClass = WrapperFactoriesWhichNeedCache[contractName]
         const Klass = await getClass()
         this.wrapperCache[contract] = new Klass(this.connection, instance as any, this)

@@ -18,8 +18,8 @@ import {
   valueToInt,
   valueToString,
 } from './BaseWrapper'
-import { PendingWithdrawal } from './LockedGold'
 import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
+import { PendingWithdrawal } from './LockedGold'
 
 export interface BalanceState {
   totalWithdrawn: string
