@@ -1,20 +1,20 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
-import { isSequentialDelayDomain, KnownDomain } from '@celo/phone-number-privacy-common/lib/domains'
+import { Domain, isSequentialDelayDomain } from '@celo/phone-number-privacy-common/lib/domains'
 import { checkSequentialDelayRateLimit } from '@celo/phone-number-privacy-common/lib/domains/sequential-delay'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { toSequentialDelayDomainState } from '../../common/domain/domainState.mapper'
-import { DOMAINS_STATES_COLUMNS, DomainState } from '../../database/models/domainState'
+import { DOMAINS_STATES_COLUMNS, DomainStateRecord } from '../../database/models/domainState'
 import { updateDomainState } from '../../database/wrappers/domainState'
 import { IDomainQuotaService } from './domainQuota.interface'
 
 export class DomainQuotaService implements IDomainQuotaService {
   public async checkAndUpdateQuota(
-    domain: KnownDomain,
-    domainState: DomainState,
-    trx: Transaction<DomainState>,
+    domain: Domain,
+    domainState: DomainStateRecord,
+    trx: Transaction<DomainStateRecord>,
     logger: Logger
-  ): Promise<{ sufficient: boolean; newState: DomainState }> {
+  ): Promise<{ sufficient: boolean; newState: DomainStateRecord }> {
     if (isSequentialDelayDomain(domain)) {
       return this.handleSequentialDelayDomain(domain, domainState, trx, logger)
     } else {
@@ -23,9 +23,9 @@ export class DomainQuotaService implements IDomainQuotaService {
   }
 
   private async handleSequentialDelayDomain(
-    domain: KnownDomain,
-    domainState: DomainState,
-    trx: Transaction<DomainState>,
+    domain: Domain,
+    domainState: DomainStateRecord,
+    trx: Transaction<DomainStateRecord>,
     logger: Logger
   ) {
     const result = checkSequentialDelayRateLimit(
@@ -34,16 +34,25 @@ export class DomainQuotaService implements IDomainQuotaService {
       Date.now() / 1000,
       toSequentialDelayDomainState(domainState)
     )
+
+    // If the result indicates insufficient quota, return a failure.
+    // Note that the database will not be updated.
     if (!result.accepted || !result.state) {
       return { sufficient: false, newState: domainState }
     }
-    const newState: DomainState = {
+
+    // Convert the result to a database record.
+    const newState: DomainStateRecord = {
       timer: result.state.timer,
       counter: result.state.counter,
       domainHash: domainState[DOMAINS_STATES_COLUMNS.domainHash],
       disabled: domainState[DOMAINS_STATES_COLUMNS.disabled],
     }
+
+    // Persist the updated domain quota to the database.
+    // This will trigger an insert if this is the first update to the domain.
     await updateDomainState(domain, newState, trx, logger)
+
     return {
       sufficient: true,
       newState,
