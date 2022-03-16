@@ -13,14 +13,17 @@ import {
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestEIP712,
   DomainQuotaStatusResponse,
+  domainQuotaStatusResponseSchema,
   DomainQuotaStatusResponseSuccess,
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
   DomainRestrictedSignatureResponse,
+  DomainRestrictedSignatureResponseSchema,
   DomainRestrictedSignatureResponseSuccess,
   genSessionID,
   SequentialDelayDomain,
   SequentialDelayDomainState,
+  SequentialDelayDomainStateSchema,
 } from '@celo/phone-number-privacy-common'
 import { defined, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
@@ -205,7 +208,8 @@ async function requestOdisQuotaStatus(
     quotaResp = await sendOdisDomainRequest(
       quotaStatusReq,
       environment,
-      DomainEndpoint.DOMAIN_QUOTA_STATUS
+      DomainEndpoint.DOMAIN_QUOTA_STATUS,
+      domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
     )
   } catch (error) {
     if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {
@@ -260,7 +264,8 @@ async function requestOdisDomainSignature(
     signatureResp = await sendOdisDomainRequest(
       signatureReq,
       environment,
-      DomainEndpoint.DOMAIN_SIGN
+      DomainEndpoint.DOMAIN_SIGN,
+      DomainRestrictedSignatureResponseSchema
     )
   } catch (error) {
     if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {
