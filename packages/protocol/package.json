@@ -80,7 +80,7 @@
     "truffle": "5.1.18",
     "truffle-artifactor": "^4.0.30",
     "truffle-contract": "^4.0.31",
-    "truffle-plugin-blockscout-verify": "git+https://github.com/celo-org/truffle-plugin-blockscout-verify#91627b3",
+    "truffle-plugin-blockscout-verify": "https://github.com/celo-org/truffle-plugin-blockscout-verify#82b2a122826b8586b068ad6bb8606b046a9ea33a",
     "truffle-resolver": "^5.0.16",
     "truffle-security": "^1.7.1",
     "twilio": "^3.57.0",
