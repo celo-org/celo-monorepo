@@ -60,6 +60,7 @@
       "@celo/base",
       "@celo/connect",
       "@celo/contractkit",
+      "@celo/cryptographic-utils",
       "@celo/identity",
       "@celo/phone-utils",
       "@celo/utils"
@@ -124,6 +125,7 @@
     "location": "packages/phone-number-privacy/monitor",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/cryptographic-utils",
       "@celo/identity",
       "@celo/phone-number-privacy-common",
       "@celo/utils",

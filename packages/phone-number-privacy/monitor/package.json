@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "2.0.0-alpha.3",
+    "@celo/cryptographic-utils": "2.0.0-alpha.3-dev",
     "@celo/identity": "2.0.0-alpha.3",
     "@celo/wallet-local": "2.0.0-alpha.3",
     "@celo/phone-number-privacy-common": "1.0.40-dev",
