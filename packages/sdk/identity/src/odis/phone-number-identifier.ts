@@ -29,7 +29,7 @@ export interface PhoneNumberHashDetails {
   e164Number: string
   phoneHash: string
   pepper: string
-  unblindedSignature: string
+  unblindedSignature?: string
 }
 
 /**
