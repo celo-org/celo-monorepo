@@ -7,7 +7,7 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { privateKeyToAddress, privateKeyToPublicKey } from '@celo/utils/lib/address'
-import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
+import { getBlsPoP, getBlsPublicKey } from '@celo/cryptographic-utils/lib/bls'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { signMessage } from '@celo/utils/lib/signatureUtils'
 import { BigNumber } from 'bignumber.js'

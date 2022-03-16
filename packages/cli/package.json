@@ -38,6 +38,7 @@
     "@celo/governance": "2.0.0-alpha.3-dev",
     "@celo/identity": "2.0.0-alpha.3-dev",
     "@celo/utils": "2.0.0-alpha.3-dev",
+    "@celo/cryptographic-utils": "2.0.0-alpha.3-dev",
     "@celo/wallet-hsm-azure": "2.0.0-alpha.3-dev",
     "@celo/wallet-ledger": "2.0.0-alpha.3-dev",
     "@celo/wallet-local": "2.0.0-alpha.3-dev",

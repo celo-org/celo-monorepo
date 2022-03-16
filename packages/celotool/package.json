@@ -8,6 +8,7 @@
   "dependencies": {
     "@celo/base": "2.0.0-alpha.3-dev",
     "@celo/connect": "2.0.0-alpha.3-dev",
+    "@celo/cryptographic-utils": "2.0.0-alpha.3-dev",
     "@celo/contractkit": "2.0.0-alpha.3-dev",
     "@celo/env-tests": "1.0.0",
     "@types/ethereumjs-util": "^5.2.0",
