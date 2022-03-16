@@ -3,6 +3,7 @@ import {
   DisableDomainRequest,
   disableDomainRequestSchema,
   DisableDomainResponse,
+  DisableDomainResponseSchema,
   DisableDomainResponseSuccess,
   Domain,
   DomainSchema,
@@ -51,17 +52,36 @@ export class DomainDisableService extends CombinerService {
     url: string,
     controller: AbortController
   ): Promise<void> {
-    const res = JSON.parse(data)
+    const res: unknown = JSON.parse(data)
 
+    if (!DisableDomainResponseSchema.is(res)) {
+      this.logger.error({ data: data, signer: url }, 'Signer responded with malformed response')
+      throw new Error(
+        `Signer request to ${url}/${this.signerEndpoint} request returned malformed response`
+      )
+    }
+
+    // In this function HTTP response status is assumed 200. Error if the response is failed.
     if (!res.success) {
-      this.logger.error({ error: res.error, signer: url }, 'Signer responded with error')
-      throw new Error(`Signer request to ${url}/${this.signerEndpoint} request failed`)
+      this.logger.error(
+        { error: res.error, signer: url },
+        'Signer responded with error and 200 status'
+      )
+      throw new Error(
+        `Signer request to ${url}/${this.signerEndpoint} request failed with 200 status`
+      )
     }
 
     this.logger.info({ signer: url }, `Signer request successful`)
     this.responses.push({ url, res, status })
 
-    if (this.responses.length >= this.threshold) {
+    // If we have received a threshold of responses return immediately.
+    // With a t of n threshold, the domain is disabled as long as n-t+1 disable the domain. When the
+    // threshold is greater than half the signers, t > n-t+1. When that is the case, wait for a
+    // full threshold of responses before responding OK to add to the safety margin.
+    if (
+      this.responses.length >= Math.max(this.threshold, this.signers.length - this.threshold + 1)
+    ) {
       controller.abort()
     }
   }
@@ -78,7 +98,7 @@ export class DomainDisableService extends CombinerService {
     response: Response<any>
   ): Promise<void> {
     if (this.responses.length >= this.threshold) {
-      response.json({ success: true, version: VERSION })
+      response.status(200).json({ success: true, version: VERSION })
       return
     }
 

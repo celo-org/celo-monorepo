@@ -35,16 +35,19 @@ export interface SignerService {
 }
 
 export abstract class CombinerService implements ICombinerService {
-  protected readonly failedSigners: Set<string>
-  protected readonly errorCodes: Map<number, number>
+  // Configuration values for the service. Constant after construction.
   protected readonly timeoutMs: number
-  protected readonly signers: SignerService[]
   protected readonly threshold: number
   protected readonly enabled: boolean
+  protected readonly signers: SignerService[]
   protected abstract readonly endpoint: CombinerEndpoint
   protected abstract readonly signerEndpoint: SignerEndpoint
-  protected abstract readonly responses: SignerResponseWithStatus[]
 
+  // State used to track the status of a request.
+  // Modified as requests and resposes are sent and received.
+  protected readonly failedSigners: Set<string>
+  protected readonly errorCodes: Map<number, number>
+  protected abstract readonly responses: SignerResponseWithStatus[]
   protected logger: Logger
   protected timedOut: boolean
 
@@ -62,36 +65,30 @@ export abstract class CombinerService implements ICombinerService {
   public async handleDistributedRequest(request: Request<{}, {}, unknown>, response: Response) {
     this.logger = response.locals.logger
     try {
-      if (!(await this.inputCheck(request, response))) {
-        return
+      // Check that the service is enabled, the request is valid, and the request is authenticated.
+      if (!this.enabled) {
+        this.sendFailureResponse(response, WarningMessage.API_UNAVAILABLE, 501)
+        return false
       }
-      // @victor HALP, I seem to be stuck here. Not sure what the best way to remove these type casts is
-      await this.forwardToSigners(request as Request<{}, {}, DistributedRequest>)
-      await this.combineSignerResponses(request as Request<{}, {}, DistributedRequest>, response)
+      if (!this.validate(request)) {
+        this.sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400)
+        return false
+      }
+      if (!(await this.authenticate(request))) {
+        this.sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401)
+        return false
+      }
+
+      // Send the requests off to the signer services and process the responses.
+      await this.forwardToSigners(request)
+      await this.combineSignerResponses(request, response)
     } catch (err) {
-      this.logger.error(`Unknown error in handleDistributedRequest for ${this.endpoint}`)
-      this.logger.error(err)
+      this.logger.error(
+        { error: err },
+        `Unknown error in handleDistributedRequest for ${this.endpoint}`
+      )
       this.sendFailureResponse(response, ErrorMessage.UNKNOWN_ERROR, 500)
     }
-  }
-
-  protected async inputCheck(
-    request: Request<{}, {}, unknown>,
-    response: Response
-  ): Promise<boolean> {
-    if (!this.enabled) {
-      this.sendFailureResponse(response, WarningMessage.API_UNAVAILABLE, 501)
-      return false
-    }
-    if (!this.validate(request)) {
-      this.sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400)
-      return false
-    }
-    if (!(await this.authenticate(request))) {
-      this.sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401)
-      return false
-    }
-    return true
   }
 
   protected async forwardToSigners(request: Request<{}, {}, DistributedRequest>) {
@@ -251,9 +248,9 @@ export abstract class CombinerService implements ICombinerService {
 
     return this.sendRequest(signer.url, request, controller)
       .catch((err) => {
-        this.logger.error(`Signer failed with primary url ${signer.url}`, err)
+        this.logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
         if (signer.fallbackUrl) {
-          this.logger.warn(`Using fallback url to call signer ${signer.fallbackUrl}`)
+          this.logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
           return this.sendRequest(signer.fallbackUrl, request, controller)
         }
         throw err

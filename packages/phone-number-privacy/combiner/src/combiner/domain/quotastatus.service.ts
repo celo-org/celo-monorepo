@@ -3,6 +3,7 @@ import {
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
   DomainQuotaStatusResponse,
+  domainQuotaStatusResponseSchema,
   DomainQuotaStatusResponseSuccess,
   DomainSchema,
   DomainState,
@@ -50,11 +51,24 @@ export class DomainQuotaStatusService extends CombinerService {
     status: number,
     url: string
   ): Promise<void> {
-    const res = JSON.parse(data)
+    const res: unknown = JSON.parse(data)
 
+    if (!domainQuotaStatusRequestSchema(DomainSchema).is(res)) {
+      this.logger.error({ data: data, signer: url }, 'Signer responded with malformed response')
+      throw new Error(
+        `Signer request to ${url}/${this.signerEndpoint} request returned malformed response`
+      )
+    }
+
+    // In this function HTTP response status is assumed 200. Error if the response is failed.
     if (!res.success) {
-      this.logger.warn({ signer: url, error: res.error }, 'Signer responded with error')
-      throw new Error(res.error) // TODO(Alec): Can this part be factored out?
+      this.logger.error(
+        { error: res.error, signer: url },
+        'Signer responded with error and 200 status'
+      )
+      throw new Error(
+        `Signer request to ${url}/${this.signerEndpoint} request failed with 200 status`
+      )
     }
 
     this.logger.info({ signer: url }, `Signer request successful`)
@@ -68,7 +82,7 @@ export class DomainQuotaStatusService extends CombinerService {
     if (this.responses.length >= this.threshold) {
       try {
         const domainQuotaStatus = this.findThresholdDomainState()
-        response.json({
+        response.status(200).json({
           success: true,
           status: domainQuotaStatus,
           version: VERSION,
