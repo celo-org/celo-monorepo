@@ -1,6 +1,6 @@
 {
   "name": "@celo/keystores",
-  "version": "2.0.0-alpha.2-dev",
+  "version": "2.0.0-alpha.3-dev",
   "description": "keystore implementation",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -21,10 +21,9 @@
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
   },
-
   "dependencies": {
-    "@celo/utils": "2.0.0-alpha.2-dev",
-    "@celo/wallet-local": "2.0.0-alpha.2-dev",
+    "@celo/utils": "2.0.0-alpha.3-dev",
+    "@celo/wallet-local": "2.0.0-alpha.3-dev",
     "@types/ethereumjs-util": "^5.2.0",
     "ethereumjs-wallet": "^1.0.1"
   },
