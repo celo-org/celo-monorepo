@@ -32,6 +32,7 @@ contract MockStableToken {
   }
 
   function mint(address to, uint256 value) external returns (bool) {
+    require(to != address(0), "0 is a reserved address");
     balances[to] = balances[to].add(valueToUnits(value));
     _totalSupply = _totalSupply.add(value);
     return true;
