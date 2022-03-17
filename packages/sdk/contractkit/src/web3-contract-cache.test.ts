@@ -1,10 +1,11 @@
-import { Connection } from '@celo/connect'
 import Web3 from 'web3'
+import { AddressRegistry } from './address-registry'
 import { AllContracts } from './index'
 import { Web3ContractCache } from './web3-contract-cache'
 function newWeb3ContractCache() {
-  const connection = new Connection(new Web3('http://localhost:8545'))
-  return new Web3ContractCache(connection)
+  const web3 = new Web3('http://localhost:8545')
+  const registry = new AddressRegistry(web3)
+  return new Web3ContractCache(registry)
 }
 
 describe('getContract()', () => {

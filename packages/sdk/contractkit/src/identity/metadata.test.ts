@@ -26,6 +26,7 @@ testWithGanache('Metadata', (web3) => {
   })
 
   test("correctly recovers the claims when the metadata is signed by any of the account's authorized signers", async () => {
+    const validator = await kit.contracts.getValidators()
     const name = 'Celo'
     const voteMetadata = IdentityMetadataWrapper.fromEmpty(address)
     const validatorMetadata = IdentityMetadataWrapper.fromEmpty(address)
@@ -44,7 +45,9 @@ testWithGanache('Metadata', (web3) => {
       if (action === 'vote') {
         await (await accounts.authorizeVoteSigner(signer, pop)).send({ from: address })
       } else if (action === 'validator') {
-        await (await accounts.authorizeValidatorSigner(signer, pop)).send({ from: address })
+        await (await accounts.authorizeValidatorSigner(signer, pop, validator)).send({
+          from: address,
+        })
       } else if (action === 'attestation') {
         await (await accounts.authorizeAttestationSigner(signer, pop)).send({ from: address })
       }

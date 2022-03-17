@@ -1,6 +1,6 @@
 import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
-import { Connection } from '@celo/connect'
 import debugFactory from 'debug'
+import Web3 from 'web3'
 import { CeloContract, RegisteredContracts, stripProxy } from './base'
 import { newRegistry, Registry } from './generated/Registry'
 
@@ -22,9 +22,9 @@ export class AddressRegistry {
   private readonly registry: Registry
   private readonly cache: Map<CeloContract, Address> = new Map()
 
-  constructor(connection: Connection) {
+  constructor(readonly web3: Web3) {
     this.cache.set(CeloContract.Registry, REGISTRY_CONTRACT_ADDRESS)
-    this.registry = newRegistry(connection.web3, REGISTRY_CONTRACT_ADDRESS)
+    this.registry = newRegistry(web3, REGISTRY_CONTRACT_ADDRESS)
   }
 
   /**

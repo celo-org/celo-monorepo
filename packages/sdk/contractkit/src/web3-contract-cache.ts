@@ -1,4 +1,3 @@
-import { Connection } from '@celo/connect'
 import debugFactory from 'debug'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, ProxyContracts } from './base'
@@ -96,11 +95,7 @@ type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
 export class Web3ContractCache {
   private cacheMap: ContractCacheMap = {}
   /** core contract's address registry */
-  readonly registry: AddressRegistry
-
-  constructor(readonly connection: Connection) {
-    this.registry = new AddressRegistry(connection)
-  }
+  constructor(readonly registry: AddressRegistry) {}
   getAccounts() {
     return this.getContract(CeloContract.Accounts)
   }
@@ -194,7 +189,7 @@ export class Web3ContractCache {
       }
       debug('Initiating contract %s', contract)
       const createFn = ProxyContracts.includes(contract) ? newProxy : ContractFactories[contract]
-      this.cacheMap[contract] = createFn(this.connection.web3, address) as ContractCacheMap[C]
+      this.cacheMap[contract] = createFn(this.registry.web3, address) as ContractCacheMap[C]
     }
     // we know it's defined (thus the !)
     return this.cacheMap[contract]!

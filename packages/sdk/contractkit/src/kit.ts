@@ -113,8 +113,8 @@ export class ContractKit {
   gasPriceSuggestionMultiplier = 5
 
   constructor(readonly connection: Connection) {
-    this.registry = new AddressRegistry(connection)
-    this._web3Contracts = new Web3ContractCache(this.connection)
+    this.registry = new AddressRegistry(connection.web3)
+    this._web3Contracts = new Web3ContractCache(this.registry)
     this.contracts = new WrapperCache(connection, this._web3Contracts, this.registry)
     this.celoTokens = new CeloTokens(this.contracts, this.registry)
   }
