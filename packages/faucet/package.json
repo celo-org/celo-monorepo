@@ -18,9 +18,9 @@
     "build:rules": "firebase-bolt database-rules.bolt"
   },
   "dependencies": {
-    "@celo/connect": "1.1.1-beta",
-    "@celo/contractkit": "1.1.1-beta",
-    "@celo/utils": "1.1.1-beta",
+    "@celo/connect": "1.5.1",
+    "@celo/contractkit": "1.5.1",
+    "@celo/utils": "1.5.1",
     "@firebase/app": "^0.5.3",
     "@google-cloud/logging": "^7.1.0",
     "debug": "^4.1.1",
@@ -37,7 +37,6 @@
     "cross-env": "5.2.0",
     "firebase-bolt": "^0.8.4",
     "firebase-tools": "^8.4.2",
-    "rimraf": "2.6.3",
     "yargs": "14.0.0"
   },
   "engines": {

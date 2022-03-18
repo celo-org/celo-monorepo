@@ -1,0 +1,10 @@
+imagePullPolicy: IfNotPresent
+configBase64: config.yaml in base64
+serviceAccountBase64: service account in base 64
+
+configHash: "0"
+
+redis:
+  cluster:
+    enabled: false
+  usePassword: false

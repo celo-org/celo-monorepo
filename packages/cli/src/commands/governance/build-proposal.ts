@@ -1,13 +1,12 @@
-import {
-  InteractiveProposalBuilder,
-  ProposalBuilder,
-  proposalToJSON,
-  ProposalTransactionJSON,
-} from '@celo/governance/lib/proposals'
+import { InteractiveProposalBuilder, ProposalBuilder } from '@celo/governance/lib/proposals'
 import { flags } from '@oclif/command'
-import { readJsonSync, writeFileSync } from 'fs-extra'
+import { writeFileSync } from 'fs-extra'
 import { BaseCommand } from '../../base'
-import { checkProposal } from '../../utils/governance'
+import {
+  addExistingProposalIDToBuilder,
+  addExistingProposalJSONFileToBuilder,
+  checkProposal,
+} from '../../utils/governance'
 
 export default class BuildProposal extends BaseCommand {
   static description = 'Interactively build a governance proposal'
@@ -39,28 +38,10 @@ export default class BuildProposal extends BaseCommand {
 
     const builder = new ProposalBuilder(this.kit)
 
-    if (res.flags.afterExecutingID || res.flags.afterExecutingProposal) {
-      let preProposal: ProposalTransactionJSON[]
-      if (res.flags.afterExecutingID) {
-        const governance = await this.kit.contracts.getGovernance()
-        const proposalRaw = await governance.getProposal(res.flags.afterExecutingID)
-        preProposal = await proposalToJSON(this.kit, proposalRaw)
-      } else {
-        preProposal = readJsonSync(res.flags.afterExecutingProposal!)
-      }
-
-      // accounts for registry additions and caches in builder
-      for (const tx of preProposal) {
-        await builder.fromJsonTx(tx)
-      }
-
-      console.info(
-        `After executing provided proposal, account for registry remappings: ${JSON.stringify(
-          builder.registryAdditions,
-          null,
-          2
-        )}`
-      )
+    if (res.flags.afterExecutingID) {
+      await addExistingProposalIDToBuilder(this.kit, builder, res.flags.afterExecutingID)
+    } else if (res.flags.afterExecutingProposal) {
+      await addExistingProposalJSONFileToBuilder(builder, res.flags.afterExecutingProposal)
     }
 
     // TODO: optimize builder redundancies

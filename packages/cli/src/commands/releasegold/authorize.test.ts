@@ -14,11 +14,9 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
   let kit: any
 
   beforeEach(async () => {
-    const contractCanValidate = true
     contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
-      web3,
-      contractCanValidate
+      web3
     )
     kit = newKitFromWeb3(web3)
     await CreateAccount.run(['--contract', contractAddress])

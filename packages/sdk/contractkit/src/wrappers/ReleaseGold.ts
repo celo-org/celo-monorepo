@@ -1,8 +1,10 @@
+import { concurrentMap } from '@celo/base'
 import { findAddressIndex } from '@celo/base/lib/address'
 import { Signature } from '@celo/base/lib/signatureUtils'
 import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
 import { hashMessageWithPrefix, signedMessageToPublicKey } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
+import { flatten } from 'fp-ts/lib/Array'
 import { ReleaseGold } from '../generated/ReleaseGold'
 import {
   BaseWrapper,
@@ -278,6 +280,12 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   )
 
   /**
+   * Revoke a vesting CELO schedule from the contract's beneficiary.
+   * @return A CeloTransactionObject
+   */
+  revokeBeneficiary = this.revokeReleasing
+
+  /**
    * Refund `refundAddress` and `beneficiary` after the ReleaseGold schedule has been revoked.
    * @return A CeloTransactionObject
    */
@@ -311,6 +319,12 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     this.contract.methods.unlockGold,
     tupleParser(valueToString)
   )
+
+  async unlockAllGold() {
+    const lockedGold = await this.kit.contracts.getLockedGold()
+    const amount = await lockedGold.getAccountTotalLockedGold(this.address)
+    return this.unlockGold(amount)
+  }
 
   /**
    * Relocks gold in the ReleaseGold instance that has been unlocked but not withdrawn.
@@ -575,6 +589,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
 
   /**
    * Revokes pending votes
+   * @deprecated prefer revokePendingVotes
    * @param account The account to revoke from.
    * @param validatorGroup The group to revoke the vote for.
    * @param value The amount of gold to revoke.
@@ -599,9 +614,18 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   }
 
   /**
-   * Revokes active votes
-   * @param account The account to revoke from.
+   * Revokes pending votes
    * @param validatorGroup The group to revoke the vote for.
+   * @param value The amount of gold to revoke.
+   */
+  revokePendingVotes = (group: Address, value: BigNumber) =>
+    this.revokePending(this.address, group, value)
+
+  /**
+   * Revokes active votes
+   * @deprecated Prefer revokeActiveVotes
+   * @param account The account to revoke from.
+   * @param group The group to revoke the vote for.
    * @param value The amount of gold to revoke.
    */
   async revokeActive(
@@ -623,6 +647,21 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     )
   }
 
+  /**
+   * Revokes active votes
+   * @param group The group to revoke the vote for.
+   * @param value The amount of gold to revoke.
+   */
+  revokeActiveVotes = (group: Address, value: BigNumber) =>
+    this.revokeActive(this.address, group, value)
+
+  /**
+   * Revokes value from pending/active aggregate
+   * @deprecated prefer revokeValueFromVotes
+   * @param account The account to revoke from.
+   * @param group The group to revoke the vote for.
+   * @param value The amount of gold to revoke.
+   */
   async revoke(
     account: Address,
     group: Address,
@@ -643,5 +682,38 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
       txos.push(await this.revokeActive(account, group, activeValue))
     }
     return txos
+  }
+
+  /**
+   * Revokes value from pending/active aggregate
+   * @param group The group to revoke the vote for.
+   * @param value The amount of gold to revoke.
+   */
+  revokeValueFromVotes = (group: Address, value: BigNumber) =>
+    this.revoke(this.address, group, value)
+
+  revokeAllVotesForGroup = async (group: Address) => {
+    const txos = []
+    const electionContract = await this.kit.contracts.getElection()
+    const { pending, active } = await electionContract.getVotesForGroupByAccount(
+      this.address,
+      group
+    )
+    if (pending.isGreaterThan(0)) {
+      const revokePendingTx = await this.revokePendingVotes(group, pending)
+      txos.push(revokePendingTx)
+    }
+    if (active.isGreaterThan(0)) {
+      const revokeActiveTx = await this.revokeActiveVotes(group, active)
+      txos.push(revokeActiveTx)
+    }
+    return txos
+  }
+
+  revokeAllVotesForAllGroups = async () => {
+    const electionContract = await this.kit.contracts.getElection()
+    const groups = await electionContract.getGroupsVotedForByAccount(this.address)
+    const txoMatrix = await concurrentMap(4, groups, (group) => this.revokeAllVotesForGroup(group))
+    return flatten(txoMatrix)
   }
 }
