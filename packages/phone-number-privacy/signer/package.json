@@ -29,12 +29,12 @@
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
-    "@celo/base": "2.0.0-alpha.3-dev",
-    "@celo/contractkit": "2.0.0-alpha.3-dev",
+    "@celo/base": "2.0.0-alpha.4-dev",
+    "@celo/contractkit": "2.0.0-alpha.4-dev",
     "@celo/phone-number-privacy-common": "1.0.40-dev",
-    "@celo/identity": "2.0.0-alpha.3-dev",
-    "@celo/utils": "2.0.0-alpha.3-dev",
-    "@celo/wallet-hsm-azure": "2.0.0-alpha.3-dev",
+    "@celo/identity": "2.0.0-alpha.4-dev",
+    "@celo/utils": "2.0.0-alpha.4-dev",
+    "@celo/wallet-hsm-azure": "2.0.0-alpha.4-dev",
     "@google-cloud/secret-manager": "3.0.0",
     "@types/bunyan": "^1.8.6",
     "@types/promise.allsettled": "^1.0.3",
