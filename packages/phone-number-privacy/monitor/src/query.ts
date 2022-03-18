@@ -1,9 +1,5 @@
 import { newKit } from '@celo/contractkit'
-import {
-  generateKeys,
-  generateMnemonic,
-  MnemonicStrength,
-} from '@celo/cryptographic-utils/lib/account'
+import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/cryptographic-utils'
 import { OdisUtils } from '@celo/identity'
 import { AuthSigner } from '@celo/identity/lib/odis/query'
 import { fetchEnv } from '@celo/phone-number-privacy-common'

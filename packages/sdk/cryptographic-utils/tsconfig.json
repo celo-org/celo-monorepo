@@ -6,6 +6,6 @@
     "downlevelIteration": true,
     "resolveJsonModule": true
   },
-  "include": ["src/", "src/**/*.json"],
+  "include": ["src/**/*.ts", "src/**/*.json"],
   "exclude": ["**/*.test.ts"]
 }
