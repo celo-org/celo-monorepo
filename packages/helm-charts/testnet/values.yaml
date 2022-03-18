@@ -38,6 +38,27 @@ geth:
     #   cpu: "4"
   fullnodeCheckBlockAge: true
   ws_port: 8546
+  validatorExtraSnippet: |
+    echo "Validator"
+  secondayExtraSnippet: |
+    echo "secondary-validator"
+  proxyExtraSnippet: |
+    echo "Proxy"
+  txNodeExtraSnippet: |
+    echo "txnode"
+  txNodePrivateExtraSnippet: |
+    echo "txnode-private"
+    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http.timeout.read 600 --http.timeout.write 600 --http.timeout.idle 2400"
+  validatorNodeSelector: {}
+  validatorTolerations: []
+  secondaryNodeSelector: {}
+  secondaryTolerations: []
+  proxyNodeSelector: {}
+  proxyTolerations: []
+  txNodeNodeSelector: {}
+  txNodeTolerations: []
+  txNodePrivateNodeSelector: {}
+  txNodePrivateTolerations: []
 
 # UpdateStrategy for statefulsets only. Partition=0 is default rollingUpdate behaviour.
 updateStrategy:

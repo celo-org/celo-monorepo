@@ -28,7 +28,7 @@ export function rpcCallHandler(
       })
   } catch (error) {
     // Called if the handler fails before making the promise
-    callback(error)
+    callback(error instanceof Error ? error : null)
   }
 }
 
@@ -76,7 +76,7 @@ export class DefaultRpcCaller implements RpcCaller {
         params,
       }
       this.send(payload, (err: any, response?: JsonRpcResponse) => {
-        if (err != null) {
+        if (err != null || !response) {
           reject(err)
         } else {
           resolve(response)

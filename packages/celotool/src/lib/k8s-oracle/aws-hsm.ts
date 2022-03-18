@@ -135,14 +135,14 @@ export class AwsHsmOracleDeployer extends RbacOracleDeployer {
       // Don't throw if it's not attached
       try {
         await detachPolicyIdempotent(roleName, policyArn)
-      } catch (e) {
+      } catch (e: any) {
         console.info(`Could not detatch policy ${policyArn} from role ${roleName}:`, e.message)
       }
       await deletePolicy(policyArn)
     }
     try {
       await deleteRole(roleName)
-    } catch (e) {
+    } catch (e: any) {
       console.info(`Could not delete role ${roleName}:`, e.message)
     }
   }

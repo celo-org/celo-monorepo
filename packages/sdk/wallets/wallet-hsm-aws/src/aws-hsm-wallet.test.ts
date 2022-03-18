@@ -9,7 +9,6 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '@celo/wallet-base'
 import { asn1FromPublicKey } from '@celo/wallet-hsm'
 import { BigNumber } from 'bignumber.js'
-import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
 import { AwsHsmWallet } from './aws-hsm-wallet'
@@ -69,7 +68,6 @@ const MOCK_KEY_ID = '1d6db902-9a45-4dd5-bd1e-7250b2306f18'
 const AWS_HSM_KEY_ID = USING_MOCK ? MOCK_KEY_ID : process.env.AWS_HSM_KEY_ID
 
 const key1 = PRIVATE_KEY1
-const ec = new EC('secp256k1')
 
 const keys: Map<string, string> = new Map([[MOCK_KEY_ID, key1]])
 const listKeysResponse = {
@@ -131,6 +129,11 @@ describe('AwsHsmWallet class', () => {
               const privateKey = trimLeading0x(keys.get(KeyId)!)
               if (privateKey) {
                 const pkBuffer = Buffer.from(privateKey, 'hex')
+                // NOTE: elliptic is disabled elsewhere in this library to prevent
+                // accidental signing of truncated messages.
+                // tslint:disable-next-line:import-blacklist
+                const EC = require('elliptic').ec
+                const ec = new EC('secp256k1')
                 const signature = ec.sign(Message, pkBuffer, { canonical: true })
                 return { Signature: Buffer.from(signature.toDER()) }
               }
@@ -158,7 +161,7 @@ describe('AwsHsmWallet class', () => {
     try {
       await wallet.getAddressFromKeyId('invalid')
       throw new Error('expected error to have been thrown')
-    } catch (e) {
+    } catch (e: any) {
       expect(e.message).toBe('Invalid keyId invalid')
     }
   })
@@ -189,7 +192,7 @@ describe('AwsHsmWallet class', () => {
         try {
           await wallet.getAddressFromKeyId(unknownKey)
           throw new Error('Expected exception to be thrown')
-        } catch (e) {
+        } catch (e: any) {
           expect(e.message).toMatch(
             new RegExp(`Key 'arn:aws:kms:.*:key/${unknownKey}' does not exist`)
           )
@@ -200,7 +203,7 @@ describe('AwsHsmWallet class', () => {
         try {
           await wallet.signTransaction(celoTransaction)
           throw new Error('Expected exception to be thrown')
-        } catch (e) {
+        } catch (e: any) {
           expect(e.message).toBe(`Could not find address ${unknownAddress}`)
         }
       })
@@ -210,7 +213,7 @@ describe('AwsHsmWallet class', () => {
         try {
           await wallet.signPersonalMessage(unknownAddress, hexStr)
           throw new Error('Expected exception to be thrown')
-        } catch (e) {
+        } catch (e: any) {
           expect(e.message).toBe(`Could not find address ${unknownAddress}`)
         }
       })
@@ -219,7 +222,7 @@ describe('AwsHsmWallet class', () => {
         try {
           await wallet.signTypedData(unknownAddress, TYPED_DATA)
           throw new Error('Expected exception to be thrown')
-        } catch (e) {
+        } catch (e: any) {
           expect(e.message).toBe(`Could not find address ${unknownAddress}`)
         }
       })

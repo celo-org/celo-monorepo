@@ -1,6 +1,6 @@
 {
   "name": "@celo/base",
-  "version": "1.2.3-dev",
+  "version": "1.5.3-dev",
   "description": "Celo base common utils, no dependencies",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -18,8 +18,7 @@
   "files": [
     "lib/**/*"
   ],
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/typescript": "0.0.1",

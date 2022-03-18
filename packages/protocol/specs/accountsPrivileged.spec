@@ -8,6 +8,8 @@ definition knownAsNonPrivileged(method f) returns bool  = false
   || f.selector == authorizeSigner(address,bytes32).selector
   || f.selector == setIndexedSigner(address,bytes32).selector
   || f.selector == setMetadataURL(string).selector
+  || f.selector == addStorageRoot(bytes).selector
+  || f.selector == removeStorageRoot(uint256).selector
   || f.selector == removeAttestationSigner().selector
   || f.selector == authorizeAttestationSigner(address,uint8,bytes32,bytes32).selector
   || f.selector == setAccount(string,bytes,address,uint8,bytes32,bytes32).selector
@@ -22,6 +24,7 @@ definition knownAsNonPrivileged(method f) returns bool  = false
   || f.selector == removeDefaultSigner(bytes32).selector
   || f.selector == removeSigner(address,bytes32).selector
   || f.selector == setEip712DomainSeparator().selector
+  || f.selector == setPaymentDelegation(address,uint256).selector
   ; 
 
 rule privilegedOperation(method f, address privileged)

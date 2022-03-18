@@ -193,7 +193,7 @@ export async function assertRevert(promise: any, errorMessage: string = ''): Pro
   try {
     await promise
     assert.fail('Expected revert not received')
-  } catch (error) {
+  } catch (error: any) {
     const revertFound = error.message.search('revert') >= 0
     if (errorMessage === '') {
       assert(revertFound, `Expected "revert", got ${error} instead`)
@@ -388,6 +388,11 @@ export function getContext(gethConfig: GethRunConfig, verbose: boolean = verbose
       if (!instance.privateKey && instance.validating) {
         instance.privateKey = validatorPrivateKeys[validatorIndices[i]]
       }
+
+      if (!instance.minerValidator && (instance.validating || instance.isProxied)) {
+        instance.minerValidator = privateKeyToAddress(instance.privateKey!)
+      }
+
       await startGeth(gethConfig, gethBinaryPath, instance, verbose)
     }
 
