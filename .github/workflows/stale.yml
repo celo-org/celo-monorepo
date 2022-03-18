@@ -23,10 +23,11 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         stale-issue-message: 'Stale: Marked for Closing'
         stale-pr-message: 'Stale: Marked for Closing'
-        stale-issue-label: 'no-issue-activity'
-        stale-pr-label: 'no-pr-activity'
+        stale-issue-label: 'stale'
+        stale-pr-label: 'stale'
         exempt-issue-labels: 'do-not-close'
         exempt-pr-labels: 'do-not-close'
         days-before-stale: 120
+        days-before-issue-stale: 270
         days-before-close: 30
-  
+
