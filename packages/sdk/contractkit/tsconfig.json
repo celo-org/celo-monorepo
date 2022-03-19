@@ -6,5 +6,6 @@
     "resolveJsonModule": true
   },
   "include": ["src/**/*", "types/**/*"],
-  "references": [{ "path": "../utils" }]
+  "references": [{ "path": "../utils" }],
+  "exclude": ["**/*.test.ts"]
 }

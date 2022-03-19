@@ -139,7 +139,7 @@ async function startGanache(
   })
 
   return () =>
-    new Promise((resolve, reject) => {
+    new Promise<void>((resolve, reject) => {
       server.close((err) => {
         if (chainCopy) {
           chainCopy.removeCallback()

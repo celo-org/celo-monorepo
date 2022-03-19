@@ -1,4 +1,4 @@
-import { fromFixed } from '@celo/utils/src/fixidity'
+import { fromFixed } from '@celo/utils/lib/fixidity'
 import { EpochRewards } from '../generated/EpochRewards'
 import { BaseWrapper, proxyCall, valueToBigNumber } from './BaseWrapper'
 

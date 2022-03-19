@@ -7,8 +7,6 @@
 'use strict'
 
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes } from 'crypto'
-import { ec as EC } from 'elliptic'
-const ec = new EC('secp256k1')
 
 export const IV_LENGTH = 16
 
@@ -134,6 +132,11 @@ export function AES128DecryptAndHMAC(
  * @returns {Buffer} Encrypted message, serialized, 113+ bytes
  */
 export function Encrypt(pubKeyTo: Buffer, plaintext: Buffer) {
+  // NOTE: elliptic is disabled elsewhere in this library to prevent
+  // accidental signing of truncated messages.
+  // tslint:disable-next-line:import-blacklist
+  const EC = require('elliptic').ec
+  const ec = new EC('secp256k1')
   const ephemPrivKey = ec.keyFromPrivate(randomBytes(32))
   const ephemPubKey = ephemPrivKey.getPublic(false, 'hex')
   const ephemPubKeyEncoded = Buffer.from(ephemPubKey, 'hex')
@@ -161,6 +164,12 @@ export function Decrypt(privKey: Buffer, encrypted: Buffer) {
   // Read iv, ephemPubKey, mac, ciphertext from encrypted message
   const ephemPubKeyEncoded = encrypted.slice(0, 65)
   const symmetricEncrypted = encrypted.slice(65)
+
+  // NOTE: elliptic is disabled elsewhere in this library to prevent
+  // accidental signing of truncated messages.
+  // tslint:disable-next-line:import-blacklist
+  const EC = require('elliptic').ec
+  const ec = new EC('secp256k1')
 
   const ephemPubKey = ec.keyFromPublic(ephemPubKeyEncoded).getPublic()
   const px = ec.keyFromPrivate(privKey).derive(ephemPubKey)

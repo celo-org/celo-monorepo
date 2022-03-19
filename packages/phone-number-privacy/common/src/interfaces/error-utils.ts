@@ -14,6 +14,7 @@ export enum ErrorMessage {
   FAILURE_TO_STORE_REQUEST = `CELO_ODIS_ERR_12 DB_ERR Failed to store partial sig request`,
   FAILURE_TO_INCREMENT_QUERY_COUNT = `CELO_ODIS_ERR_13 DB_ERR Failed to increment user query count`,
   DOMAIN_ALREADY_DISABLED_FAILURE = `CELO_ODIS_ERR_14 DB_ERR Domain is already disabled`,
+  UNSUPPORTED_DOMAIN = `CELO_ODIS_ERR_15 SIG_ERR Domain type is not supported`,
 }
 
 export enum WarningMessage {
@@ -29,4 +30,5 @@ export enum WarningMessage {
   CANCELLED_REQUEST_TO_SIGNER = 'CELO_ODIS_WARN_09 SIGNER Cancelled request to signer',
   INVALID_USER_PHONE_NUMBER_SIGNATURE = 'CELO_ODIS_WARN_10 BAD_INPUT User phone number signature is invalid',
   UNKNOWN_DOMAIN = 'CELO_ODIS_WARN_11 BAD_INPUT Provided domain name and version is not recognized',
+  INVALID_AUTH_SIGNATURE = 'CELO_ODIS_WARN_12 BAD_INPUT Authorization signature was incorrectly generated. Request will be rejected in a future version.',
 }

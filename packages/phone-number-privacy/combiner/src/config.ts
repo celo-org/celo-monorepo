@@ -24,6 +24,7 @@ export const E2E_TEST_ACCOUNTS: string[] = ['0x1be31a94361a391bbafb2a4ccd704f57d
 interface Config {
   blockchain: {
     provider: string
+    apiKey?: string
   }
   db: {
     user: string
@@ -39,13 +40,14 @@ interface Config {
   thresholdSignature: {
     threshold: number
     polynomial: string
+    pubKey: string
   }
 }
 
 let config: Config
 
 if (DEV_MODE) {
-  logger.debug('Running in dev mode')
+  logger().debug('Running in dev mode')
   config = {
     blockchain: {
       provider: FORNO_ALFAJORES,
@@ -65,6 +67,7 @@ if (DEV_MODE) {
     thresholdSignature: {
       threshold: 1,
       polynomial: DEV_POLYNOMIAL,
+      pubKey: DEV_PUBLIC_KEY,
     },
   }
 } else {
@@ -72,6 +75,7 @@ if (DEV_MODE) {
   config = {
     blockchain: {
       provider: functionConfig.blockchain.provider,
+      apiKey: functionConfig.blockchain.api_key,
     },
     db: {
       user: functionConfig.db.username,
@@ -87,6 +91,7 @@ if (DEV_MODE) {
     thresholdSignature: {
       threshold: functionConfig.threshold_signature.threshold_signature_threshold,
       polynomial: functionConfig.threshold_signature.threshold_polynomial,
+      pubKey: functionConfig.threshold_signature.public_key,
     },
   }
 }

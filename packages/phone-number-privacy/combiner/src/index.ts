@@ -2,7 +2,7 @@ import { ErrorMessage, loggerMiddleware } from '@celo/phone-number-privacy-commo
 import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import config, { FORNO_ALFAJORES, VERSION } from './config'
+import config, { FORNO_ALFAJORES } from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 import { handleGetBlindedMessageSig } from './signing/get-threshold-signature'
 
@@ -76,10 +76,11 @@ export const getContactMatches = functions
     meterResponse(handleGetContactMatches, req, res, '/getContactMatches')
   )
 
-export const status = functions
-  .region('us-central1', 'europe-west3')
-  .https.onRequest(async (_request, response) => {
-    response.status(200).json({
-      version: VERSION,
-    })
-  })
+// TODO: Fix status cloud function. It currenly just returns an empty object.
+// export const status = functions
+//   .region('us-central1', 'europe-west3')
+//   .https.onRequest(async (_req: functions.Request, res: functions.Response) => {
+//     await Promise.resolve(res.status(200).json({
+//       version: VERSION,
+//     }))
+//   })

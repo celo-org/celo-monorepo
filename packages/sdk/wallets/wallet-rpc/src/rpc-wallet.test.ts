@@ -106,7 +106,7 @@ testWithGanache('rpc-wallet', (web3) => {
       try {
         await rpcWallet.addAccount('this is not a valid private key', PASSPHRASE)
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toBe('private key length is invalid')
       }
     })
@@ -120,7 +120,7 @@ testWithGanache('rpc-wallet', (web3) => {
       try {
         await rpcWallet.addAccount(PRIVATE_KEY1, PASSPHRASE)
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toBe(`RpcWallet: account already exists`)
       }
     })
@@ -141,7 +141,7 @@ testWithGanache('rpc-wallet', (web3) => {
         test('fails if you use an invalid passphrase', async () => {
           try {
             await rpcWallet.unlockAccount(ACCOUNT_ADDRESS1, 'wrong_passphrase', DURATION)
-          } catch (e) {
+          } catch (e: any) {
             expect(e.message).toContain('Invalid password')
           }
         })
