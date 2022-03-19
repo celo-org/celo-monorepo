@@ -125,6 +125,21 @@ Then check on the service to make sure its running:
 
 `docker logs -f {CONTAINER_ID_HERE}`
 
+### Validate before going live
+
+You can test your mainnet service is set up correctly by running a specific end-to-end test that checks the signature against a public polynomial. Because the test requires quota, you must first point your provider endpoint to Alfajores.
+
+1. Change your signer’s forno endpoint to Alfajores: `https://alfajores-forno.celo-testnet.org`
+2. Navigate to the signer directory in monorepo (this directory).
+3. Modify the .env file:
+
+   - Change `ODIS_SIGNER_SERVICE_URL` to your service endpoint.
+   - Swap the `ODIS_PUBLIC_POLYNOMIAL` with the *mainnet* one.
+
+4. Run `yarn jest test/end-to-end/get-blinded-sig.test.ts -t 'When walletAddress has enough quota Returns sig when querying succeeds with unused request'`
+5. Verify test passes.
+6. Change your signer’s forno endpoint back to Mainnet: `https://forno.celo.org`
+
 ### Logs
 
 Error logs will be prefixed with `CELO_ODIS_ERROR_XX`. You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).
