@@ -4,10 +4,7 @@ import {
   DomainQuotaStatusResponse,
   ErrorMessage,
   ErrorType,
-  FailureResponse,
-  OdisResponse,
   respondWithError,
-  rootLogger,
   SignerEndpoint,
   SignMessageResponse,
   WarningMessage,
@@ -17,7 +14,6 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import fetch, { HeaderInit, Response as FetchResponse } from 'node-fetch'
 import { OdisConfig, VERSION } from '../config'
-import { DistributedRequest, ICombinerService } from './combiner.interface'
 
 // TODO(Alec): Rename this folder to something other than "combiner" (potentially add / refactor matchmaking code to match)
 
@@ -34,130 +30,29 @@ export interface SignerService {
   fallbackUrl?: string
 }
 
-export abstract class CombinerService implements ICombinerService {
-  protected readonly failedSigners: Set<string>
-  protected readonly errorCodes: Map<number, number>
-  protected readonly timeoutMs: number
-  protected readonly signers: SignerService[]
-  protected readonly threshold: number
-  protected readonly enabled: boolean
-  protected abstract readonly endpoint: CombinerEndpoint
-  protected abstract readonly signerEndpoint: SignerEndpoint
-  protected abstract readonly responses: SignerResponseWithStatus[]
+export class Session<I, O> {
+  logger: Logger
+  controller: AbortController
+  timedOut: boolean
 
-  protected logger: Logger
-  protected timedOut: boolean
+  readonly failedSigners: Set<string>
+  readonly errorCodes: Map<number, number>
+  readonly responses: SignerResponseWithStatus[]
 
-  public constructor(config: OdisConfig) {
-    this.logger = rootLogger()
+  public constructor(readonly request: Request<{}, {}, I>, readonly response: Response<O>) {
+    this.logger = response.locals.logger()
+    this.controller = new AbortController()
+    this.timedOut = false
     this.failedSigners = new Set<string>()
     this.errorCodes = new Map<number, number>()
-    this.timedOut = false
-    this.signers = JSON.parse(config.odisServices.signers)
-    this.timeoutMs = config.odisServices.timeoutMilliSeconds
-    this.threshold = config.keys.threshold
-    this.enabled = config.enabled
+    this.responses = []
   }
 
-  public async handleDistributedRequest(request: Request<{}, {}, unknown>, response: Response) {
-    this.logger = response.locals.logger
-    try {
-      if (!(await this.inputCheck(request, response))) {
-        return
-      }
-      // @victor HALP, I seem to be stuck here. Not sure what the best way to remove these type casts is
-      await this.forwardToSigners(request as Request<{}, {}, DistributedRequest>)
-      await this.combineSignerResponses(request as Request<{}, {}, DistributedRequest>, response)
-    } catch (err) {
-      this.logger.error(`Unknown error in handleDistributedRequest for ${this.endpoint}`)
-      this.logger.error(err)
-      this.sendFailureResponse(response, ErrorMessage.UNKNOWN_ERROR, 500)
-    }
+  public incrementErrorCodeCount(errorCode: number) {
+    this.errorCodes.set(errorCode, (this.errorCodes.get(errorCode) ?? 0) + 1)
   }
 
-  protected async inputCheck(
-    request: Request<{}, {}, unknown>,
-    response: Response
-  ): Promise<boolean> {
-    if (!this.enabled) {
-      this.sendFailureResponse(response, WarningMessage.API_UNAVAILABLE, 501)
-      return false
-    }
-    if (!this.validate(request)) {
-      this.sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400)
-      return false
-    }
-    if (!(await this.authenticate(request))) {
-      this.sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401)
-      return false
-    }
-    return true
-  }
-
-  protected async forwardToSigners(request: Request<{}, {}, DistributedRequest>) {
-    // TODO(Alec): Factor out metering code
-    const obs = new PerformanceObserver((list) => {
-      const entry = list.getEntries()[0]
-      this.logger.info({ latency: entry, signer: entry!.name }, 'Signer response latency measured')
-    })
-    obs.observe({ entryTypes: ['measure'], buffered: true })
-
-    const controller = new AbortController()
-    const timeout = setTimeout(() => {
-      this.timedOut = true
-      controller.abort()
-    }, this.timeoutMs)
-
-    await Promise.all(
-      this.signers.map((signer) => this.fetchSignerResponse(signer, request, controller))
-    )
-
-    clearTimeout(timeout)
-
-    performance.clearMarks()
-    obs.disconnect()
-  }
-
-  protected headers(_request: Request<{}, {}, DistributedRequest>): HeaderInit | undefined {
-    return {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    }
-  }
-
-  protected async sendRequest(
-    signerUrl: string,
-    request: Request<{}, {}, DistributedRequest>,
-    controller: AbortController
-  ): Promise<FetchResponse> {
-    this.logger.debug({ signerUrl }, `Sending signer request`)
-    const url = signerUrl + this.signerEndpoint
-    return fetch(url, {
-      method: 'POST',
-      headers: this.headers(request),
-      body: JSON.stringify(request.body),
-      signal: controller.signal,
-    })
-  }
-
-  protected sendFailureResponse(
-    response: Response<FailureResponse>,
-    error: ErrorType,
-    status: number
-  ) {
-    respondWithError(
-      response,
-      {
-        success: false,
-        version: VERSION,
-        error,
-      },
-      status,
-      this.logger
-    )
-  }
-
-  protected getMajorityErrorCode() {
+  public getMajorityErrorCode() {
     // Ignore timeouts
     const ignoredErrorCodes = [408]
     const uniqueErrorCount = Array.from(this.errorCodes.keys()).filter(
@@ -173,6 +68,7 @@ export abstract class CombinerService implements ICombinerService {
     let maxErrorCode = -1
     let maxCount = -1
     this.errorCodes.forEach((count, errorCode) => {
+      // B
       // This gives priority to the lower status codes in the event of a tie
       // because 400s are more helpful than 500s for user feedback
       if (count > maxCount || (count === maxCount && errorCode < maxErrorCode)) {
@@ -182,79 +78,185 @@ export abstract class CombinerService implements ICombinerService {
     })
     return maxErrorCode > 0 ? maxErrorCode : null
   }
+}
 
-  protected abstract validate(
-    request: Request<{}, {}, unknown>
-  ): request is Request<{}, {}, DistributedRequest>
+export interface ICombinerService<I, O> {
+  handle(request: Request<{}, {}, I>, response: Response<O>): Promise<void>
+}
 
-  protected abstract authenticate(request: Request<{}, {}, DistributedRequest>): Promise<boolean>
+// tslint:disable-next-line: max-classes-per-file
+export abstract class CombinerService<I, O> implements ICombinerService<I, O> {
+  protected readonly timeoutMs: number
+  protected readonly signers: SignerService[]
+  protected readonly threshold: number
+  protected readonly enabled: boolean
+  protected abstract readonly endpoint: CombinerEndpoint
+  protected abstract readonly signerEndpoint: SignerEndpoint
 
-  protected abstract combineSignerResponses(
-    request: Request<{}, {}, DistributedRequest>,
-    response: Response<OdisResponse>
-  ): Promise<void>
+  public constructor(config: OdisConfig) {
+    this.signers = JSON.parse(config.odisServices.signers)
+    this.timeoutMs = config.odisServices.timeoutMilliSeconds
+    this.threshold = config.keys.threshold
+    this.enabled = config.enabled
+  }
+
+  public async handle(request: Request<{}, {}, I>, response: Response) {
+    const logger = response.locals.logger()
+    try {
+      if (!this.enabled) {
+        return this.sendFailureResponse(WarningMessage.API_UNAVAILABLE, 501, logger)
+      }
+      if (!this.validate(request)) {
+        return this.sendFailureResponse(WarningMessage.INVALID_INPUT, 400, logger)
+      }
+      if (!this.reqKeyHeaderCheck(request)) {
+        return this.sendFailureResponse(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, logger)
+      }
+      if (!(await this.authenticate(request, logger))) {
+        return this.sendFailureResponse(WarningMessage.UNAUTHENTICATED_USER, 401, logger)
+      }
+
+      const result = await this.distribute(request, response)
+      await this.combine(result)
+      // TODO(Alec)
+      // const responseBody = await this.combine(result)
+      // // this.send(res)
+    } catch (err) {
+      logger.error(`Unknown error in handleDistributedRequest for ${this.endpoint}`)
+      logger.error(err)
+      this.sendFailureResponse(ErrorMessage.UNKNOWN_ERROR, 500, logger)
+    }
+  }
+
+  protected async distribute(
+    request: Request<{}, {}, I>,
+    response: Response
+  ): Promise<Session<I, O>> {
+    const session = new Session<I, O>(request, response)
+
+    // TODO(Alec): Factor out metering code
+    const obs = new PerformanceObserver((list) => {
+      const entry = list.getEntries()[0]
+      session.logger.info(
+        { latency: entry, signer: entry!.name },
+        'Signer response latency measured'
+      )
+    })
+    obs.observe({ entryTypes: ['measure'], buffered: true })
+
+    const timeout = setTimeout(() => {
+      // 1
+      session.timedOut = true
+      session.controller.abort()
+    }, this.timeoutMs)
+
+    await Promise.all(this.signers.map((signer) => this.fetchSignerResponse(signer, session)))
+
+    clearTimeout(timeout)
+
+    performance.clearMarks()
+    obs.disconnect()
+
+    return session
+  }
+
+  protected headers(_request: Request<{}, {}, I>): HeaderInit | undefined {
+    return {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    }
+  }
+
+  protected async sendRequest(signerUrl: string, session: Session<I, O>): Promise<FetchResponse> {
+    session.logger.debug({ signerUrl }, `Sending signer request`)
+    const url = signerUrl + this.signerEndpoint
+    return fetch(url, {
+      method: 'POST',
+      headers: this.headers(session.request),
+      body: JSON.stringify(session.request.body),
+      signal: session.controller.signal,
+    })
+  }
+
+  // protected sendSuccessResponse(res: O, status: number, session: Session<I, O>) {
+  //   session.response.status(status).json(res)
+  // }
+
+  protected sendFailureResponse(error: ErrorType, status: number, session: Session<I, O>) {
+    respondWithError(
+      session.response,
+      {
+        success: false,
+        version: VERSION,
+        error,
+      },
+      status,
+      session.logger
+    )
+  }
+
+  protected abstract validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, I>
+
+  protected abstract authenticate(request: Request<{}, {}, I>, logger: Logger): Promise<boolean>
+
+  protected abstract reqKeyHeaderCheck(request: Request<{}, {}, I>): boolean
+
+  protected abstract combine(session: Session<I, O>): Promise<void>
 
   protected abstract handleResponseOK(
-    request: Request<{}, {}, DistributedRequest>,
     data: string,
     status: number,
     url: string,
-    controller?: AbortController
+    session: Session<I, O>
   ): Promise<void>
 
-  private async fetchSignerResponse(
-    signer: SignerService,
-    request: Request<{}, {}, DistributedRequest>,
-    controller: AbortController
-  ) {
+  private async fetchSignerResponse(signer: SignerService, session: Session<I, O>) {
     let signerResponse: FetchResponse
     try {
-      signerResponse = await this.sendMeteredSignerRequest(request, signer, controller)
+      signerResponse = await this.sendMeteredSignerRequest(signer, session)
     } catch (err) {
-      return this.handleSignerRequestFailure(err, signer, controller)
+      return this.handleSignerRequestFailure(err, signer, session)
     }
 
-    return this.handleSignerResponse(request, signerResponse, signer, controller)
+    return this.handleSignerResponse(signerResponse, signer, session)
   }
 
   private async handleSignerResponse(
-    request: Request<{}, {}, DistributedRequest>,
     signerResponse: FetchResponse,
     signer: SignerService,
-    controller: AbortController
+    session: Session<I, O>
   ) {
     if (signerResponse.ok) {
       try {
         const data = await signerResponse.text()
-        this.logger.info(
+        session.logger.info(
           { signer, res: data, status: signerResponse.status },
           'received ok response from signer'
         )
-        await this.handleResponseOK(request, data, signerResponse.status, signer.url, controller)
+        await this.handleResponseOK(data, signerResponse.status, signer.url, session)
       } catch (err) {
         // TODO(Alec): Review this error handling
-        this.logger.error(err)
+        session.logger.error(err)
       }
     }
 
-    return this.handleFailure(signer, signerResponse.status ?? 502, controller)
+    return this.handleFailure(signer, signerResponse.status ?? 502, session)
   }
 
   private async sendMeteredSignerRequest(
-    request: Request<{}, {}, DistributedRequest>,
     signer: SignerService,
-    controller: AbortController
+    session: Session<I, O>
   ): Promise<FetchResponse> {
     const start = `Start ${signer.url}/${this.signerEndpoint}`
     const end = `End ${signer.url}/${this.signerEndpoint}`
     performance.mark(start)
 
-    return this.sendRequest(signer.url, request, controller)
+    return this.sendRequest(signer.url, session)
       .catch((err) => {
-        this.logger.error(`Signer failed with primary url ${signer.url}`, err)
+        session.logger.error(`Signer failed with primary url ${signer.url}`, err)
         if (signer.fallbackUrl) {
-          this.logger.warn(`Using fallback url to call signer ${signer.fallbackUrl}`)
-          return this.sendRequest(signer.fallbackUrl, request, controller)
+          session.logger.warn(`Using fallback url to call signer ${signer.fallbackUrl}`)
+          return this.sendRequest(signer.fallbackUrl, session)
         }
         throw err
       })
@@ -267,49 +269,45 @@ export abstract class CombinerService implements ICombinerService {
   private handleFailure(
     signer: SignerService,
     errorCode: number | undefined,
-    controller: AbortController
+    session: Session<I, O>
   ) {
     if (errorCode) {
-      this.incrementErrorCodeCount(errorCode)
+      session.incrementErrorCodeCount(errorCode)
     }
     // Tracking failed request count via signer url prevents
     // double counting the same failed request by mistake
-    this.failedSigners.add(signer.url)
+    session.failedSigners.add(signer.url)
 
-    const shouldFailFast = this.signers.length - this.failedSigners.size < this.threshold
-    this.logger.info(
-      `Recieved failure from ${this.failedSigners.size}/${this.signers.length} signers`
+    const shouldFailFast = this.signers.length - session.failedSigners.size < this.threshold
+    session.logger.info(
+      `Recieved failure from ${session.failedSigners.size}/${this.signers.length} signers`
     )
     if (shouldFailFast) {
-      this.logger.info('Not possible to reach a threshold of signer responses. Failing fast')
-      controller.abort()
+      session.logger.info('Not possible to reach a threshold of signer responses. Failing fast')
+      session.controller.abort() // 3
     }
   }
 
   private async handleSignerRequestFailure(
     err: any,
     signer: SignerService,
-    controller: AbortController
+    session: Session<I, O>
   ) {
     let errorCode: number | undefined
     if (err instanceof Error && err.name === 'AbortError') {
-      if (this.timedOut) {
+      if (session.timedOut) {
         errorCode = 408
-        this.logger.error({ signer }, ErrorMessage.TIMEOUT_FROM_SIGNER)
+        session.logger.error({ signer }, ErrorMessage.TIMEOUT_FROM_SIGNER)
       } else {
         // Request was cancelled, assuming it would have been successful (no errorCode)
-        this.logger.info({ signer }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
+        session.logger.info({ signer }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
       }
     } else {
       errorCode = 500
-      this.logger.error({ signer }, ErrorMessage.SIGNER_REQUEST_ERROR)
+      session.logger.error({ signer }, ErrorMessage.SIGNER_REQUEST_ERROR)
     }
-    this.logger.error(err)
+    session.logger.error(err)
 
-    this.handleFailure(signer, errorCode, controller)
-  }
-
-  private incrementErrorCodeCount(errorCode: number) {
-    this.errorCodes.set(errorCode, (this.errorCodes.get(errorCode) ?? 0) + 1)
+    this.handleFailure(signer, errorCode, session)
   }
 }

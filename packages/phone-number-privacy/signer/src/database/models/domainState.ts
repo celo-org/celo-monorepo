@@ -32,6 +32,17 @@ export class DomainStateRecord {
     throw new Error(WarningMessage.UNKNOWN_DOMAIN)
   }
 
+  public static toSequentialDelayDomainState(
+    domainState: DomainStateRecord
+  ): SequentialDelayDomainState {
+    return {
+      counter: domainState[DOMAINS_STATES_COLUMNS.counter]!,
+      timer: domainState[DOMAINS_STATES_COLUMNS.timer]!,
+      disabled: domainState[DOMAINS_STATES_COLUMNS.disabled]!,
+      date: 0, // TODO(Alec)
+    }
+  }
+
   [DOMAINS_STATES_COLUMNS.domainHash]: string;
   [DOMAINS_STATES_COLUMNS.counter]: number | undefined;
   [DOMAINS_STATES_COLUMNS.timer]: number | undefined;

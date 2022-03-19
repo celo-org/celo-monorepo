@@ -68,7 +68,7 @@ export class DomainService implements IDomainService {
     }
 
     const domain = request.body.domain
-    if (!this.authenticateRequest(domain, request, response, endpoint, logger)) {
+    if (!this.authenticateRequest(domain, request.body, response, endpoint, logger)) {
       // authenticateRequest returns a response to the user internally. Nothing left to do.
       return
     }
@@ -272,6 +272,23 @@ export class DomainService implements IDomainService {
     return true
   }
 
+  // private nonceCheck(
+  //   request: Request<{}, {}, DomainRequest>,
+  //   response: Response,
+  //   domainState: DomainStateRecord | null,
+  //   endpoint: DomainEndpoint,
+  //   logger: Logger
+  // ): boolean {
+  //   if (!domainState) {
+  //     domainState = DomainStateRecord.createEmptyDomainState(request.body.domain)
+  //   }
+  //   if (!this.authService.nonceCheck(request.body, domainState, logger)) {
+  //     this.sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401, endpoint, logger)
+  //     return false
+  //   }
+  //   return true
+  // }
+
   private sendFailureResponse(
     response: Response,
     error: ErrorType,
@@ -292,21 +309,4 @@ export class DomainService implements IDomainService {
       logger
     )
   }
-
-  // private nonceCheck(
-  //   request: Request<{}, {}, DomainRequest>,
-  //   response: Response,
-  //   domainState: DomainStateRecord | null,
-  //   endpoint: DomainEndpoint,
-  //   logger: Logger
-  // ): boolean {
-  //   if (!domainState) {
-  //     domainState = DomainStateRecord.createEmptyDomainState(request.body.domain)
-  //   }
-  //   if (!this.authService.nonceCheck(request.body, domainState, logger)) {
-  //     this.sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401, endpoint, logger)
-  //     return false
-  //   }
-  //   return true
-  // }
 }

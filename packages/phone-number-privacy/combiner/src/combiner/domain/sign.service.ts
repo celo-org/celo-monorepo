@@ -3,7 +3,6 @@ import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
-  DomainRestrictedSignatureResponseFailure,
   DomainSchema,
   ErrorType,
   getSignerEndpoint,
@@ -11,9 +10,9 @@ import {
   SignerEndpoint,
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import { OdisConfig, VERSION } from '../../config'
-import { SignerResponseWithStatus } from '../combiner.service'
+import { Session, SignerResponseWithStatus } from '../combiner.service'
 import { SignService } from '../sign.service'
 
 interface DomainSignResponseWithStatus extends SignerResponseWithStatus {
@@ -22,7 +21,10 @@ interface DomainSignResponseWithStatus extends SignerResponseWithStatus {
   status: number
 }
 
-export class DomainSignService extends SignService {
+export class DomainSignService extends SignService<
+  DomainRestrictedSignatureRequest,
+  DomainRestrictedSignatureResponse
+> {
   protected endpoint: CombinerEndpoint
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainSignResponseWithStatus[]
@@ -48,10 +50,11 @@ export class DomainSignService extends SignService {
 
   protected parseSignature(
     res: DomainRestrictedSignatureResponse,
-    signerUrl: string
+    signerUrl: string,
+    session: Session<DomainRestrictedSignatureRequest, DomainRestrictedSignatureResponse>
   ): string | undefined {
     if (!res.success) {
-      this.logger.error(
+      session.logger.error(
         {
           error: res.error,
           signer: signerUrl,
@@ -64,19 +67,19 @@ export class DomainSignService extends SignService {
   }
 
   protected sendFailureResponse(
-    response: Response<DomainRestrictedSignatureResponseFailure>,
     error: ErrorType,
-    status: number
+    status: number,
+    session: Session<DomainRestrictedSignatureRequest, DomainRestrictedSignatureResponse>
   ) {
     respondWithError(
-      response,
+      session.response,
       {
         success: false,
         version: VERSION,
         error,
       },
       status,
-      this.logger
+      session.logger
     )
   }
 

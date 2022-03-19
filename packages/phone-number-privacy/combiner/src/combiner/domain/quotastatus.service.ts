@@ -14,7 +14,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { OdisConfig, VERSION } from '../../config'
-import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
+import { CombinerService, Session, SignerResponseWithStatus } from '../combiner.service'
 
 interface DomainQuotaStatusResponseWithStatus extends SignerResponseWithStatus {
   url: string
@@ -22,7 +22,10 @@ interface DomainQuotaStatusResponseWithStatus extends SignerResponseWithStatus {
   status: number
 }
 
-export class DomainQuotaStatusService extends CombinerService {
+export class DomainQuotaStatusService extends CombinerService<
+  DomainQuotaStatusRequest,
+  DomainQuotaStatusResponse
+> {
   protected endpoint: CombinerEndpoint
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainQuotaStatusResponseWithStatus[]
@@ -44,44 +47,50 @@ export class DomainQuotaStatusService extends CombinerService {
     return Promise.resolve(verifyDomainQuotaStatusRequestAuthenticity(request.body))
   }
 
+  protected reqKeyHeaderCheck(_request: Request<{}, {}, DomainQuotaStatusRequest>): boolean {
+    return true // does not require key header
+  }
+
   protected async handleResponseOK(
-    _request: Request<{}, {}, DomainQuotaStatusRequest>,
     data: string,
     status: number,
-    url: string
+    url: string,
+    session: Session<DomainQuotaStatusRequest, DomainQuotaStatusResponse>
   ): Promise<void> {
     const res = JSON.parse(data)
 
     if (!res.success) {
-      this.logger.warn({ signer: url, error: res.error }, 'Signer responded with error')
+      session.logger.warn({ signer: url, error: res.error }, 'Signer responded with error')
       throw new Error(res.error) // TODO(Alec): Can this part be factored out?
     }
 
-    this.logger.info({ signer: url }, `Signer request successful`)
+    session.logger.info({ signer: url }, `Signer request successful`)
     this.responses.push({ url, res, status })
   }
 
-  protected async combineSignerResponses(
-    _request: Request<{}, {}, DomainQuotaStatusRequest>,
-    response: Response<DomainQuotaStatusResponse>
+  // protected abstract combine(session: Session<R>): Promise<void>
+
+  protected async combine(
+    session: Session<DomainQuotaStatusRequest, DomainQuotaStatusResponse>
   ): Promise<void> {
     if (this.responses.length >= this.threshold) {
+      // A
       try {
-        const domainQuotaStatus = this.findThresholdDomainState()
-        response.json({
+        const domainQuotaStatus = this.findThresholdDomainState(session)
+        session.response.json({
           success: true,
           status: domainQuotaStatus,
           version: VERSION,
         })
         return
       } catch (error) {
-        this.logger.error({ error }, 'Error combining signer quota status responses')
+        session.logger.error({ error }, 'Error combining signer quota status responses')
       }
     }
     this.sendFailureResponse(
-      response,
       ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
-      this.getMajorityErrorCode() ?? 500
+      session.getMajorityErrorCode() ?? 500, // B
+      session
     )
   }
 
@@ -97,7 +106,9 @@ export class DomainQuotaStatusService extends CombinerService {
     })
   }
 
-  private findThresholdDomainState(): DomainState {
+  private findThresholdDomainState(
+    session: Session<DomainQuotaStatusRequest, DomainQuotaStatusResponse>
+  ): DomainState {
     const domainStates = this.responses.map(
       (s) => (s.res as DomainQuotaStatusResponseSuccess).status // TODO(Alec)
     )
@@ -109,7 +120,7 @@ export class DomainQuotaStatusService extends CombinerService {
     const numDisabled = domainStates.length - domainStatesEnabled.length
 
     if (numDisabled > 0 && numDisabled < domainStates.length) {
-      this.logger.warn(WarningMessage.INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES)
+      session.logger.warn(WarningMessage.INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES)
     }
 
     if (this.signers.length - numDisabled < this.threshold) {

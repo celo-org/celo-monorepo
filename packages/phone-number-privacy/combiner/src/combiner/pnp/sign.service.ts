@@ -1,3 +1,4 @@
+import { SignMessageRequest } from '@celo/identity/lib/odis/query'
 import {
   authenticateUser,
   CombinerEndpoint,
@@ -12,14 +13,14 @@ import {
   respondWithError,
   SignerEndpoint,
   SignMessageResponse,
-  SignMessageResponseFailure,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { Request, Response } from 'express'
+import Logger from 'bunyan'
+import { Request } from 'express'
 import { HeaderInit } from 'node-fetch'
 import { OdisConfig, VERSION } from '../../config'
 import { getContractKit } from '../../web3/contracts'
-import { SignerResponseWithStatus } from '../combiner.service'
+import { Session, SignerResponseWithStatus } from '../combiner.service'
 import { SignService } from '../sign.service'
 
 interface PnpSignResponseWithStatus extends SignerResponseWithStatus {
@@ -27,7 +28,7 @@ interface PnpSignResponseWithStatus extends SignerResponseWithStatus {
   res: SignMessageResponse
   status: number
 }
-export class PnpSignService extends SignService {
+export class PnpSignService extends SignService<GetBlindedMessageSigRequest, SignMessageResponse> {
   protected endpoint: CombinerEndpoint
   protected signerEndpoint: SignerEndpoint
   protected responses: PnpSignResponseWithStatus[]
@@ -52,9 +53,10 @@ export class PnpSignService extends SignService {
   }
 
   protected async authenticate(
-    request: Request<{}, {}, GetBlindedMessageSigRequest>
+    request: Request<{}, {}, GetBlindedMessageSigRequest>,
+    logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, getContractKit(), this.logger)
+    return authenticateUser(request, getContractKit(), logger)
   }
 
   protected headers(request: Request<{}, {}, GetBlindedMessageSigRequest>): HeaderInit | undefined {
@@ -68,9 +70,13 @@ export class PnpSignService extends SignService {
     return req.blindedQueryPhoneNumber
   }
 
-  protected parseSignature(res: SignMessageResponse, signerUrl: string): string | undefined {
+  protected parseSignature(
+    res: SignMessageResponse,
+    signerUrl: string,
+    session: Session<GetBlindedMessageSigRequest, SignMessageResponse>
+  ): string | undefined {
     if (!res.success) {
-      this.logger.error(
+      session.logger.error(
         {
           error: res.error,
           signer: signerUrl,
@@ -83,15 +89,15 @@ export class PnpSignService extends SignService {
   }
 
   protected sendFailureResponse(
-    response: Response<SignMessageResponseFailure>,
     error: ErrorType,
     status: number,
+    session: Session<SignMessageRequest, SignMessageResponse>,
     performedQueryCount?: number,
     totalQuota?: number,
     blockNumber?: number
   ) {
     respondWithError(
-      response,
+      session.response,
       {
         success: false,
         version: VERSION,
@@ -101,12 +107,14 @@ export class PnpSignService extends SignService {
         blockNumber,
       },
       status,
-      this.logger
+      session.logger
     )
   }
 
-  // TODO(Alec): clean this up
-  protected logResponseDiscrepancies(): void {
+  // TODO(Alec): clean this up, consider adding to Session
+  protected logResponseDiscrepancies(
+    session: Session<SignMessageRequest, SignMessageResponse>
+  ): void {
     // Only compare responses which have values for the quota fields
     const successes = this.responses.filter(
       (signerResponse) =>
@@ -139,7 +147,7 @@ export class PnpSignService extends SignService {
             totalQuota: _signerResponse.res.totalQuota,
           }
         })
-        this.logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
+        session.logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
         discrepancyFound = true
       }
       if (
@@ -152,7 +160,7 @@ export class PnpSignService extends SignService {
             blockNumber: response.res.blockNumber,
           }
         })
-        this.logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
+        session.logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
         discrepancyFound = true
       }
       if (discrepancyFound) {

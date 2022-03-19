@@ -11,10 +11,9 @@ import {
   SignerEndpoint,
   verifyDisableDomainRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
-import AbortController from 'abort-controller'
 import { Request, Response } from 'express'
 import { OdisConfig, VERSION } from '../../config'
-import { CombinerService, SignerResponseWithStatus } from '../combiner.service'
+import { CombinerService, Session, SignerResponseWithStatus } from '../combiner.service'
 
 interface DomainDisableResponseWithStatus extends SignerResponseWithStatus {
   url: string
@@ -22,7 +21,10 @@ interface DomainDisableResponseWithStatus extends SignerResponseWithStatus {
   status: number
 }
 
-export class DomainDisableService extends CombinerService {
+export class DomainDisableService extends CombinerService<
+  DisableDomainRequest,
+  DisableDomainResponse
+> {
   protected endpoint: CombinerEndpoint
   protected signerEndpoint: SignerEndpoint
   protected responses: DomainDisableResponseWithStatus[]
@@ -44,25 +46,28 @@ export class DomainDisableService extends CombinerService {
     return Promise.resolve(verifyDisableDomainRequestAuthenticity(request.body))
   }
 
+  protected reqKeyHeaderCheck(_request: Request<{}, {}, DisableDomainRequest>): boolean {
+    return true // does not require key header
+  }
+
   protected async handleResponseOK(
-    _request: Request<{}, {}, DisableDomainRequest>,
     data: string,
     status: number,
     url: string,
-    controller: AbortController
+    session: Session<DisableDomainRequest, DisableDomainResponse>
   ): Promise<void> {
     const res = JSON.parse(data)
 
     if (!res.success) {
-      this.logger.error({ error: res.error, signer: url }, 'Signer responded with error')
+      session.logger.error({ error: res.error, signer: url }, 'Signer responded with error')
       throw new Error(`Signer request to ${url}/${this.signerEndpoint} request failed`)
     }
 
-    this.logger.info({ signer: url }, `Signer request successful`)
+    session.logger.info({ signer: url }, `Signer request successful`)
     this.responses.push({ url, res, status })
 
     if (this.responses.length >= this.threshold) {
-      controller.abort()
+      session.controller.abort()
     }
   }
 
@@ -73,19 +78,19 @@ export class DomainDisableService extends CombinerService {
     })
   }
 
-  protected async combineSignerResponses(
-    _request: Request<{}, {}, DisableDomainRequest>,
-    response: Response<any>
+  protected async combine(
+    session: Session<DisableDomainRequest, DisableDomainResponse>
   ): Promise<void> {
     if (this.responses.length >= this.threshold) {
-      response.json({ success: true, version: VERSION })
+      // A
+      session.response.json({ success: true, version: VERSION })
       return
     }
 
     this.sendFailureResponse(
-      response,
       ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE,
-      this.getMajorityErrorCode() ?? 500
+      session.getMajorityErrorCode() ?? 500, // B
+      session
     )
   }
 }

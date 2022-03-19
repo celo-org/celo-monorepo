@@ -34,6 +34,7 @@ export function asyncHandler<T>(handler: (req: express.Request, res: Response) =
   }
 }
 
+// TODO(Alec): consider using this pattern
 export function createValidatedHandler<T>(
   requestType: t.Type<T>,
   handler: (req: express.Request, res: Response, parsedRequest: T) => Promise<void>

@@ -74,6 +74,7 @@ export const getContactMatches = functions
   })
 
 // EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getBlindedMessageSig" -H "Authorization: 0xfc2ee61c4d18b93374fdd525c9de09d01398f7d153d17340b9ae156f94a1eb3237207d9aacb42e7f2f4ee0cf2621ab6d5a0837211665a99e16e3367f5209a56b1b" -d '{"blindedQueryPhoneNumber":"+Dzuylsdcv1ZxbRcQwhQ29O0UJynTNYufjWc4jpw2Zr9FLu5gSU8bvvDJ3r/Nj+B","account":"0xdd18d08f1c2619ede729c26cc46da19af0a2aa7f", "hashedPhoneNumber":"0x8fb77f2aff2ef0343706535dc702fc99f61a5d1b8e46d7c144c80fd156826a77"}' -H 'Content-Type: application/json'
+const pnpSignHandler = new PnpSignService(config.phoneNumberPrivacy)
 export const getBlindedMessageSig = functions
   .region('us-central1', 'europe-west3')
   .runWith({
@@ -82,10 +83,10 @@ export const getBlindedMessageSig = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    const service = new PnpSignService(config.phoneNumberPrivacy)
-    return meterResponse(service.handleDistributedRequest, req, res, Endpoint.SIGN_MESSAGE)
+    return meterResponse(pnpSignHandler.handle, req, res, Endpoint.SIGN_MESSAGE)
   })
 
+const domainSignHandler = new DomainSignService(config.domains)
 export const domainSign = functions
   .region('us-central1', 'europe-west3')
   .runWith({
@@ -94,10 +95,10 @@ export const domainSign = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    const service = new DomainSignService(config.domains) // @victor would it be more idiomatic to pass req/res into constructor or less?
-    return meterResponse(service.handleDistributedRequest, req, res, Endpoint.DOMAIN_SIGN)
+    return meterResponse(domainSignHandler.handle, req, res, Endpoint.DOMAIN_SIGN)
   })
 
+const domainQuotaStatusHandler = new DomainQuotaStatusService(config.domains)
 export const domainQuotaStatus = functions
   .region('us-central1', 'europe-west3')
   .runWith({
@@ -106,10 +107,10 @@ export const domainQuotaStatus = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    const service = new DomainQuotaStatusService(config.domains)
-    return meterResponse(service.handleDistributedRequest, req, res, Endpoint.DOMAIN_QUOTA_STATUS)
+    return meterResponse(domainQuotaStatusHandler.handle, req, res, Endpoint.DOMAIN_QUOTA_STATUS)
   })
 
+const domainDisableHandler = new DomainDisableService(config.domains)
 export const domainDisable = functions
   .region('us-central1', 'europe-west3')
   .runWith({
@@ -118,8 +119,7 @@ export const domainDisable = functions
     minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
   })
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    const service = new DomainDisableService(config.domains)
-    return meterResponse(service.handleDistributedRequest, req, res, Endpoint.DISABLE_DOMAIN)
+    return meterResponse(domainDisableHandler.handle, req, res, Endpoint.DISABLE_DOMAIN)
   })
 
 // TODO: Fix status cloud function. It currenly just returns an empty object.
