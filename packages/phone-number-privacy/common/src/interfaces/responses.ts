@@ -4,6 +4,11 @@ import {
   DomainQuotaStatusRequest,
   DomainRequest,
   DomainRestrictedSignatureRequest,
+  MatchmakingRequest,
+  OdisRequest,
+  PhoneNumberPrivacyRequest,
+  PnpQuotaRequest,
+  SignMessageRequest,
 } from '.'
 import { Domain, DomainState } from '../domains'
 
@@ -60,6 +65,16 @@ export type GetContactMatchesResponse =
   | GetContactMatchesResponseSuccess
   | GetContactMatchesResponseFailure
 
+export type PhoneNumberPrivacyResponse<
+  R extends PhoneNumberPrivacyRequest = PhoneNumberPrivacyRequest
+> = R extends SignMessageRequest
+  ? SignMessageResponse
+  : never | R extends MatchmakingRequest
+  ? GetContactMatchesResponse
+  : never | R extends PnpQuotaRequest
+  ? GetQuotaResponse
+  : never
+
 // Domains
 
 export interface DomainRestrictedSignatureResponseSuccess<D extends Domain = Domain> {
@@ -109,12 +124,22 @@ export interface DisableDomainResponseFailure {
 
 export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
 
+// export type DomainResponse<
+//   R extends DomainRequest = DomainRequest
+// > = R extends DomainRestrictedSignatureRequest
+//   ? DomainRestrictedSignatureResponse
+//   : never | R extends DomainQuotaStatusRequest<infer D>
+//   ? DomainQuotaStatusResponse<D>
+//   : never | R extends DisableDomainRequest
+//   ? DisableDomainResponse
+//   : never
+
 export type DomainResponse<
   R extends DomainRequest = DomainRequest
 > = R extends DomainRestrictedSignatureRequest
   ? DomainRestrictedSignatureResponse
   : never | R extends DomainQuotaStatusRequest<infer D>
-  ? DomainQuotaStatusResponse<D>
+  ? DomainQuotaStatusResponse<D> | DisableDomainResponse // @victor I was seeing some weirdness here bc the types have the same structure
   : never | R extends DisableDomainRequest
   ? DisableDomainResponse
   : never
@@ -169,20 +194,14 @@ export const DisableDomainResponseSchema: t.Type<DisableDomainResponse> = t.unio
 
 // General
 
-export type FailureResponse<D extends Domain = Domain> =
-  | SignMessageResponseFailure
-  | GetQuotaResponseFailure
-  | GetContactMatchesResponseFailure
-  | DomainRestrictedSignatureResponseFailure<D>
-  | DomainQuotaStatusResponseFailure
-  | DisableDomainResponseFailure
+export type OdisResponse<R extends OdisRequest = OdisRequest> = R extends DomainRequest
+  ? DomainResponse<R>
+  : never | R extends PhoneNumberPrivacyRequest
+  ? PhoneNumberPrivacyResponse<R>
+  : never
 
-export type SuccessResponse<D extends Domain = Domain> =
-  | SignMessageResponseSuccess
-  | GetQuotaResponseSuccess
-  | GetContactMatchesResponseSuccess
-  | DomainRestrictedSignatureResponseSuccess<D>
-  | DomainQuotaStatusResponseSuccess
-  | DisableDomainResponseSuccess
+export type SuccessResponse<R extends OdisRequest> = OdisResponse<R> & { success: true }
 
-export type OdisResponse<D extends Domain = Domain> = SuccessResponse<D> | FailureResponse<D>
+export type FailureResponse<R extends OdisRequest = OdisRequest> = OdisResponse<R> & {
+  success: false
+}

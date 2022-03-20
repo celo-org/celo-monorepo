@@ -2,39 +2,30 @@ import {
   CombinerEndpoint,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
-  DomainQuotaStatusResponse,
   DomainQuotaStatusResponseSuccess,
+  DomainRestrictedSignatureRequest,
   DomainSchema,
   DomainState,
   ErrorMessage,
+  ErrorType,
   getSignerEndpoint,
+  respondWithError,
   SignerEndpoint,
   verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import { OdisConfig, VERSION } from '../../config'
-import { CombinerService, Session, SignerResponseWithStatus } from '../combiner.service'
+import { CombinerService, Session } from '../combiner.service'
 
-interface DomainQuotaStatusResponseWithStatus extends SignerResponseWithStatus {
-  url: string
-  res: DomainQuotaStatusResponse
-  status: number
-}
-
-export class DomainQuotaStatusService extends CombinerService<
-  DomainQuotaStatusRequest,
-  DomainQuotaStatusResponse
-> {
-  protected endpoint: CombinerEndpoint
-  protected signerEndpoint: SignerEndpoint
-  protected responses: DomainQuotaStatusResponseWithStatus[]
+export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusRequest> {
+  readonly endpoint: CombinerEndpoint
+  readonly signerEndpoint: SignerEndpoint
 
   public constructor(config: OdisConfig) {
     super(config)
     this.endpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
-    this.responses = []
   }
 
   protected validate(
@@ -55,7 +46,7 @@ export class DomainQuotaStatusService extends CombinerService<
     data: string,
     status: number,
     url: string,
-    session: Session<DomainQuotaStatusRequest, DomainQuotaStatusResponse>
+    session: Session<DomainQuotaStatusRequest>
   ): Promise<void> {
     const res = JSON.parse(data)
 
@@ -65,18 +56,16 @@ export class DomainQuotaStatusService extends CombinerService<
     }
 
     session.logger.info({ signer: url }, `Signer request successful`)
-    this.responses.push({ url, res, status })
+    session.responses.push({ url, res, status })
   }
 
   // protected abstract combine(session: Session<R>): Promise<void>
 
-  protected async combine(
-    session: Session<DomainQuotaStatusRequest, DomainQuotaStatusResponse>
-  ): Promise<void> {
-    if (this.responses.length >= this.threshold) {
+  protected async combine(session: Session<DomainQuotaStatusRequest>): Promise<void> {
+    if (session.responses.length >= this.threshold) {
       // A
       try {
-        const domainQuotaStatus = this.findThresholdDomainState(session)
+        const domainQuotaStatus = findThresholdDomainState(session)
         session.response.json({
           success: true,
           status: domainQuotaStatus,
@@ -95,70 +84,86 @@ export class DomainQuotaStatusService extends CombinerService<
   }
 
   protected sendSuccessResponse(
-    response: Response<DomainQuotaStatusResponseSuccess>,
-    quotaStatus: DomainState,
-    statusCode: number
+    res: DomainQuotaStatusResponseSuccess,
+    status: number,
+    session: Session<DomainQuotaStatusRequest>
   ) {
-    response.status(statusCode).json({
-      success: true,
-      version: VERSION,
-      status: quotaStatus,
-    })
+    session.response.status(status).json(res)
   }
 
-  private findThresholdDomainState(
-    session: Session<DomainQuotaStatusRequest, DomainQuotaStatusResponse>
-  ): DomainState {
-    const domainStates = this.responses.map(
-      (s) => (s.res as DomainQuotaStatusResponseSuccess).status // TODO(Alec)
+  protected sendFailureResponse(
+    error: ErrorType,
+    status: number,
+    session: Session<DomainQuotaStatusRequest>
+  ) {
+    // TODO(Alec)
+    respondWithError(
+      session.response,
+      {
+        success: false,
+        version: VERSION,
+        error,
+      },
+      status,
+      session.logger
     )
-    if (domainStates.length < this.threshold) {
-      throw new Error('Insufficient number of signer responses')
-    }
+  }
+}
 
-    const domainStatesEnabled = domainStates.filter((ds) => !ds.disabled)
-    const numDisabled = domainStates.length - domainStatesEnabled.length
+// TODO(Alec): Move this elsewhere
+export function findThresholdDomainState<
+  R extends DomainRestrictedSignatureRequest | DomainQuotaStatusRequest
+>(session: Session<R>): DomainState {
+  const domainStates = session.responses
+    .map((signerResponse) => ('status' in signerResponse.res ? signerResponse.res.status : null))
+    .filter((state) => state ?? false) as DomainState[]
+  const threshold = session.service.threshold
+  if (domainStates.length < threshold) {
+    throw new Error('Insufficient number of signer responses')
+  }
 
-    if (numDisabled > 0 && numDisabled < domainStates.length) {
-      session.logger.warn(WarningMessage.INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES)
-    }
+  const domainStatesEnabled = domainStates.filter((ds) => !ds.disabled)
+  const numDisabled = domainStates.length - domainStatesEnabled.length
 
-    if (this.signers.length - numDisabled < this.threshold) {
-      return { timer: 0, counter: 0, disabled: true, date: 0 }
-    }
+  if (numDisabled > 0 && numDisabled < domainStates.length) {
+    session.logger.warn(WarningMessage.INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES)
+  }
 
-    if (domainStatesEnabled.length < this.threshold) {
-      throw new Error('Insufficient number of signer responses. Domain may be disabled')
-    }
+  if (session.service.signers.length - numDisabled < threshold) {
+    return { timer: 0, counter: 0, disabled: true, date: 0 }
+  }
 
-    const n = this.threshold - 1
+  if (domainStatesEnabled.length < threshold) {
+    throw new Error('Insufficient number of signer responses. Domain may be disabled')
+  }
 
-    const domainStatesAscendingByCounter = domainStatesEnabled.sort((a, b) => a.counter - b.counter)
-    const nthLeastRestrictiveByCounter = domainStatesAscendingByCounter[n]
-    const thresholdCounter = nthLeastRestrictiveByCounter.counter
+  const n = threshold - 1
 
-    // Client should submit requests with nonce === thresholdCounter
+  const domainStatesAscendingByCounter = domainStatesEnabled.sort((a, b) => a.counter - b.counter)
+  const nthLeastRestrictiveByCounter = domainStatesAscendingByCounter[n]
+  const thresholdCounter = nthLeastRestrictiveByCounter.counter
 
-    const domainStatesWithThresholdCounter = domainStatesEnabled.filter(
-      (ds) => ds.counter <= thresholdCounter
-    )
-    const domainStatesAscendingByTimer = domainStatesWithThresholdCounter.sort(
-      (a, b) => a.timer - b.timer
-    )
-    const nthLeastRestrictiveByTimer = domainStatesAscendingByTimer[n]
-    const thresholdTimer = nthLeastRestrictiveByTimer.timer
+  // Client should submit requests with nonce === thresholdCounter
 
-    const domainStatesAscendingByDate = domainStatesWithThresholdCounter.sort(
-      (a, b) => a.date - b.date
-    )
-    const nthLeastRestrictiveByDate = domainStatesAscendingByDate[n]
-    const thresholdDate = nthLeastRestrictiveByDate.date
+  const domainStatesWithThresholdCounter = domainStatesEnabled.filter(
+    (ds) => ds.counter <= thresholdCounter
+  )
+  const domainStatesAscendingByTimer = domainStatesWithThresholdCounter.sort(
+    (a, b) => a.timer - b.timer
+  )
+  const nthLeastRestrictiveByTimer = domainStatesAscendingByTimer[n]
+  const thresholdTimer = nthLeastRestrictiveByTimer.timer
 
-    return {
-      timer: thresholdTimer,
-      counter: thresholdCounter,
-      disabled: false,
-      date: thresholdDate,
-    }
+  const domainStatesAscendingByDate = domainStatesWithThresholdCounter.sort(
+    (a, b) => a.date - b.date
+  )
+  const nthLeastRestrictiveByDate = domainStatesAscendingByDate[n]
+  const thresholdDate = nthLeastRestrictiveByDate.date
+
+  return {
+    timer: thresholdTimer,
+    counter: thresholdCounter,
+    disabled: false,
+    date: thresholdDate,
   }
 }

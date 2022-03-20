@@ -1,43 +1,49 @@
 import {
   DomainRestrictedSignatureRequest,
-  DomainRestrictedSignatureResponse,
   ErrorMessage,
   ErrorType,
-  GetBlindedMessageSigRequest,
   KEY_VERSION_HEADER,
-  SignMessageResponse,
+  OdisResponse,
+  SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
 import { HeaderInit } from 'node-fetch'
-import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
-import { OdisConfig, VERSION } from '../config'
 import { CombinerService, Session } from './combiner.service'
 
-export type SignatureRequest = GetBlindedMessageSigRequest | DomainRestrictedSignatureRequest
+export type SignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
+export type SignatureResponse<R extends SignatureRequest> = OdisResponse<R>
 
-export type SignatureResponse = SignMessageResponse | DomainRestrictedSignatureResponse
+// export class SignSession<R extends SignatureRequest> extends SessionBase<R> {
+//   protected readonly blsCryptoClient: BLSCryptographyClient
 
-// TODO(Alec): Don't know if this type handling is correct
-export abstract class SignService<
-  I extends SignatureRequest,
-  O extends SignatureResponse
-> extends CombinerService<I, O> {
-  protected blsCryptoClient: BLSCryptographyClient
-  protected pubKey: string
-  protected keyVersion: number
-  protected polynomial: string
+//   public constructor(
+//     readonly request: Request<{}, {}, R>,
+//     readonly response: Response<OdisResponse<R>>,
+//     readonly service: SignService<R>
+//   ) {
+//     super(request, response, service)
+//     this.blsCryptoClient = new BLSCryptographyClient(service.threshold, service.pubKey, service.polynomial)
+//   }
+// }
 
-  public constructor(config: OdisConfig) {
-    super(config)
-    this.pubKey = config.keys.pubKey
-    this.keyVersion = config.keys.version
-    this.polynomial = config.keys.polynomial
-    // TODO(Alec): add this to session
-    this.blsCryptoClient = new BLSCryptographyClient(this.threshold, this.pubKey, this.polynomial)
-  }
+// tslint:disable-next-line: max-classes-per-file
+export abstract class SignService<R extends SignatureRequest> extends CombinerService<R> {
+  // readonly blsCryptoClient: BLSCryptographyClient
+  // readonly pubKey: string
+  // readonly keyVersion: number
+  // readonly polynomial: string
 
-  protected headers(request: Request<{}, {}, I>): HeaderInit | undefined {
+  // public constructor(config: OdisConfig) {
+  //   super(config)
+  //   this.pubKey = config.keys.pubKey
+  //   this.keyVersion = config.keys.version
+  //   this.polynomial = config.keys.polynomial
+  //   // TODO(Alec): add this to session (NEXT)
+  //   // this.blsCryptoClient = new BLSCryptographyClient(this.threshold, this.pubKey, this.polynomial)
+  // }
+
+  protected headers(request: Request<{}, {}, R>): HeaderInit | undefined {
     return {
       ...super.headers(request),
       [KEY_VERSION_HEADER]: this.keyVersion.toString(),
@@ -48,7 +54,7 @@ export abstract class SignService<
     data: string,
     status: number,
     url: string,
-    session: Session<I, O>
+    session: Session<R>
   ): Promise<void> {
     const res = JSON.parse(data)
 
@@ -67,20 +73,20 @@ export abstract class SignService<
 
     session.logger.info({ signer: url }, 'Add signature')
     const signatureAdditionStart = Date.now()
-    this.blsCryptoClient.addSignature({ url, signature })
+    session.blsCryptoClient.addSignature({ url, signature })
     session.logger.info(
       {
         signer: url,
-        hasSufficientSignatures: this.blsCryptoClient.hasSufficientSignatures(),
+        hasSufficientSignatures: session.blsCryptoClient.hasSufficientSignatures(),
         additionLatency: Date.now() - signatureAdditionStart,
       },
       'Added signature'
     )
     // Send response immediately once we cross threshold
     // BLS threshold signatures can be combined without all partial signatures
-    if (this.blsCryptoClient.hasSufficientSignatures()) {
+    if (session.blsCryptoClient.hasSufficientSignatures()) {
       try {
-        await this.blsCryptoClient.combinePartialBlindedSignatures(
+        await session.blsCryptoClient.combinePartialBlindedSignatures(
           this.parseBlindedMessage(session.request.body)
         )
         // Close outstanding requests
@@ -91,38 +97,17 @@ export abstract class SignService<
     }
   }
 
-  protected sendSuccessResponse(status: number, signature: string, session: Session<I, O>) {
-    // TODO(Alec)
-    session.response.status(status).json({
-      success: true,
-      version: VERSION,
-      signature,
-    })
-  }
+  // protected buildSession(
+  //   request: Request<{}, {}, R>,
+  //   response: Response<OdisResponse<R>>,
+  //   service: this
+  // ): Session<R> {
+  //   return new SignSession<R>(request, response, service)
+  // }
 
-  protected abstract logResponseDiscrepancies(session: Session<I, O>): void
+  protected abstract logResponseDiscrepancies(session: Session<R>): void
 
-  protected async combine(session: Session<I, O>): Promise<void> {
-    this.logResponseDiscrepancies(session)
-
-    if (this.blsCryptoClient.hasSufficientSignatures()) {
-      // C
-      try {
-        const combinedSignature = await this.blsCryptoClient.combinePartialBlindedSignatures(
-          this.parseBlindedMessage(session.request.body),
-          session.logger
-        )
-        return this.sendSuccessResponse(200, combinedSignature, session)
-      } catch {
-        // May fail upon combining signatures if too many sigs are invalid
-        // Fallback to handleMissingSignatures
-      }
-    }
-
-    this.handleMissingSignatures(session) // B
-  }
-
-  protected reqKeyHeaderCheck(request: Request<{}, {}, I>): boolean {
+  protected reqKeyHeaderCheck(request: Request<{}, {}, R>): boolean {
     const reqKeyVersion = request.headers[KEY_VERSION_HEADER]
     if (reqKeyVersion && Number(reqKeyVersion) !== this.keyVersion) {
       return false
@@ -130,15 +115,7 @@ export abstract class SignService<
     return true
   }
 
-  protected abstract parseSignature(
-    res: O,
-    signerUrl: string,
-    session: Session<I, O>
-  ): string | undefined
-
-  protected abstract parseBlindedMessage(req: I): string
-
-  private handleMissingSignatures(session: Session<I, O>) {
+  protected handleMissingSignatures(session: Session<R>) {
     let error: ErrorType = ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
     const majorityErrorCode = session.getMajorityErrorCode()
     if (majorityErrorCode === 403) {
@@ -146,4 +123,16 @@ export abstract class SignService<
     }
     this.sendFailureResponse(error, majorityErrorCode ?? 500, session)
   }
+
+  protected sendSuccessResponse(res: SignatureResponse<R>, status: number, session: Session<R>) {
+    session.response.status(status).json(res)
+  }
+
+  protected abstract parseSignature(
+    res: SignatureResponse<R>,
+    signerUrl: string,
+    session: Session<R>
+  ): string | undefined
+
+  protected abstract parseBlindedMessage(req: R): string
 }

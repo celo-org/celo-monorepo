@@ -28,6 +28,7 @@ export enum AuthenticationMethod {
   ENCRYPTION_KEY = 'encryption_key',
 }
 
+// TODO(Alec): investigate alias in sdk/identity
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */
   account: string
@@ -43,6 +44,8 @@ export interface GetBlindedMessageSigRequest {
   version?: string
 }
 
+export declare type SignMessageRequest = GetBlindedMessageSigRequest
+
 export interface GetContactMatchesRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
@@ -56,6 +59,8 @@ export interface GetContactMatchesRequest {
   version?: string
 }
 
+export declare type MatchmakingRequest = GetContactMatchesRequest
+
 export interface GetQuotaRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
@@ -66,10 +71,9 @@ export interface GetQuotaRequest {
   version?: string
 }
 
-export type PhoneNumberPrivacyRequest =
-  | GetBlindedMessageSigRequest
-  | GetContactMatchesRequest
-  | GetQuotaRequest
+export declare type PnpQuotaRequest = GetQuotaRequest
+
+export type PhoneNumberPrivacyRequest = SignMessageRequest | MatchmakingRequest | PnpQuotaRequest
 
 /**
  * Domain restricted signature request to get a pOPRF evaluation on the given message in a given
@@ -139,6 +143,8 @@ export type DomainRequest<D extends Domain = Domain> =
   | DomainRestrictedSignatureRequest<D>
   | DomainQuotaStatusRequest<D>
   | DisableDomainRequest<D>
+
+export type OdisRequest<D extends Domain = Domain> = DomainRequest<D> | PhoneNumberPrivacyRequest
 
 // NOTE: Next three functions are a bit repetitive. An attempt was made to combine them, but the
 // type signature got quite complicated. Feel free to attempt it if you are motivated.

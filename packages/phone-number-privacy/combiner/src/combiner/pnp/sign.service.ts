@@ -3,7 +3,6 @@ import {
   authenticateUser,
   CombinerEndpoint,
   ErrorType,
-  GetBlindedMessageSigRequest,
   getSignerEndpoint,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
@@ -13,6 +12,7 @@ import {
   respondWithError,
   SignerEndpoint,
   SignMessageResponse,
+  SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -20,60 +20,81 @@ import { Request } from 'express'
 import { HeaderInit } from 'node-fetch'
 import { OdisConfig, VERSION } from '../../config'
 import { getContractKit } from '../../web3/contracts'
-import { Session, SignerResponseWithStatus } from '../combiner.service'
+import { Session } from '../combiner.service'
 import { SignService } from '../sign.service'
-
-interface PnpSignResponseWithStatus extends SignerResponseWithStatus {
-  url: string
-  res: SignMessageResponse
-  status: number
-}
-export class PnpSignService extends SignService<GetBlindedMessageSigRequest, SignMessageResponse> {
-  protected endpoint: CombinerEndpoint
-  protected signerEndpoint: SignerEndpoint
-  protected responses: PnpSignResponseWithStatus[]
+export class PnpSignService extends SignService<SignMessageRequest> {
+  readonly endpoint: CombinerEndpoint
+  readonly signerEndpoint: SignerEndpoint
 
   public constructor(config: OdisConfig) {
     super(config)
     this.endpoint = CombinerEndpoint.SIGN_MESSAGE
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
-    this.responses = []
   }
 
   protected validate(
     request: Request<{}, {}, unknown>
-  ): request is Request<{}, {}, GetBlindedMessageSigRequest> {
+  ): request is Request<{}, {}, SignMessageRequest> {
     return (
-      // TODO(Alec): add io-ts schemas for phone number privacy
-      hasValidAccountParam(request.body as GetBlindedMessageSigRequest) &&
-      hasValidBlindedPhoneNumberParam(request.body as GetBlindedMessageSigRequest) &&
-      identifierIsValidIfExists(request.body as GetBlindedMessageSigRequest) &&
-      isBodyReasonablySized(request.body as GetBlindedMessageSigRequest)
+      // TODO(Alec)(next): add io-ts schemas for phone number privacy
+      hasValidAccountParam(request.body as SignMessageRequest) &&
+      hasValidBlindedPhoneNumberParam(request.body as SignMessageRequest) &&
+      identifierIsValidIfExists(request.body as SignMessageRequest) &&
+      isBodyReasonablySized(request.body as SignMessageRequest)
     )
   }
 
   protected async authenticate(
-    request: Request<{}, {}, GetBlindedMessageSigRequest>,
+    request: Request<{}, {}, SignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
     return authenticateUser(request, getContractKit(), logger)
   }
 
-  protected headers(request: Request<{}, {}, GetBlindedMessageSigRequest>): HeaderInit | undefined {
+  protected async combine(session: Session<SignMessageRequest>): Promise<void> {
+    this.logResponseDiscrepancies(session)
+
+    if (session.blsCryptoClient.hasSufficientSignatures()) {
+      // C
+      try {
+        const combinedSignature = await session.blsCryptoClient.combinePartialBlindedSignatures(
+          this.parseBlindedMessage(session.request.body),
+          session.logger
+        )
+        // TODO(Alec): return other fields?
+        return this.sendSuccessResponse(
+          {
+            success: true,
+            version: VERSION,
+            signature: combinedSignature,
+          },
+          200,
+          session
+        )
+      } catch {
+        // May fail upon combining signatures if too many sigs are invalid
+        // Fallback to handleMissingSignatures
+      }
+    }
+
+    this.handleMissingSignatures(session) // B
+  }
+
+  protected headers(request: Request<{}, {}, SignMessageRequest>): HeaderInit | undefined {
     return {
       ...super.headers(request),
       Authorization: request.headers.authorization!,
     }
   }
 
-  protected parseBlindedMessage(req: GetBlindedMessageSigRequest): string {
+  protected parseBlindedMessage(req: SignMessageRequest): string {
     return req.blindedQueryPhoneNumber
   }
 
   protected parseSignature(
     res: SignMessageResponse,
     signerUrl: string,
-    session: Session<GetBlindedMessageSigRequest, SignMessageResponse>
+    session: Session<SignMessageRequest>
   ): string | undefined {
     if (!res.success) {
       session.logger.error(
@@ -88,10 +109,18 @@ export class PnpSignService extends SignService<GetBlindedMessageSigRequest, Sig
     return res.signature
   }
 
+  protected sendSuccessResponse(
+    res: SignMessageResponseSuccess,
+    status: number,
+    session: Session<SignMessageRequest>
+  ) {
+    session.response.status(status).json(res)
+  }
+
   protected sendFailureResponse(
     error: ErrorType,
     status: number,
-    session: Session<SignMessageRequest, SignMessageResponse>,
+    session: Session<SignMessageRequest>,
     performedQueryCount?: number,
     totalQuota?: number,
     blockNumber?: number
@@ -112,11 +141,9 @@ export class PnpSignService extends SignService<GetBlindedMessageSigRequest, Sig
   }
 
   // TODO(Alec): clean this up, consider adding to Session
-  protected logResponseDiscrepancies(
-    session: Session<SignMessageRequest, SignMessageResponse>
-  ): void {
+  protected logResponseDiscrepancies(session: Session<SignMessageRequest>): void {
     // Only compare responses which have values for the quota fields
-    const successes = this.responses.filter(
+    const successes = session.responses.filter(
       (signerResponse) =>
         signerResponse.res &&
         signerResponse.res.performedQueryCount &&

@@ -3,6 +3,7 @@ import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
+  DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
   ErrorType,
   getSignerEndpoint,
@@ -12,28 +13,18 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
 import { OdisConfig, VERSION } from '../../config'
-import { Session, SignerResponseWithStatus } from '../combiner.service'
+import { Session } from '../combiner.service'
 import { SignService } from '../sign.service'
+import { findThresholdDomainState } from './quotastatus.service'
 
-interface DomainSignResponseWithStatus extends SignerResponseWithStatus {
-  url: string
-  res: DomainRestrictedSignatureResponse
-  status: number
-}
-
-export class DomainSignService extends SignService<
-  DomainRestrictedSignatureRequest,
-  DomainRestrictedSignatureResponse
-> {
-  protected endpoint: CombinerEndpoint
-  protected signerEndpoint: SignerEndpoint
-  protected responses: DomainSignResponseWithStatus[]
+export class DomainSignService extends SignService<DomainRestrictedSignatureRequest> {
+  readonly endpoint: CombinerEndpoint
+  readonly signerEndpoint: SignerEndpoint
 
   public constructor(config: OdisConfig) {
     super(config)
     this.endpoint = CombinerEndpoint.DOMAIN_SIGN
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
-    this.responses = []
   }
 
   protected validate(
@@ -48,10 +39,40 @@ export class DomainSignService extends SignService<
     return Promise.resolve(verifyDomainRestrictedSignatureRequestAuthenticity(request.body))
   }
 
+  protected async combine(session: Session<DomainRestrictedSignatureRequest>): Promise<void> {
+    this.logResponseDiscrepancies(session)
+
+    if (session.blsCryptoClient.hasSufficientSignatures()) {
+      // C
+      try {
+        const combinedSignature = await session.blsCryptoClient.combinePartialBlindedSignatures(
+          this.parseBlindedMessage(session.request.body),
+          session.logger
+        )
+        // TODO(Alec): return other fields?
+        return this.sendSuccessResponse(
+          {
+            success: true,
+            version: VERSION,
+            signature: combinedSignature,
+            status: findThresholdDomainState(session),
+          },
+          200,
+          session
+        )
+      } catch {
+        // May fail upon combining signatures if too many sigs are invalid
+        // Fallback to handleMissingSignatures
+      }
+    }
+
+    this.handleMissingSignatures(session) // B
+  }
+
   protected parseSignature(
     res: DomainRestrictedSignatureResponse,
     signerUrl: string,
-    session: Session<DomainRestrictedSignatureRequest, DomainRestrictedSignatureResponse>
+    session: Session<DomainRestrictedSignatureRequest>
   ): string | undefined {
     if (!res.success) {
       session.logger.error(
@@ -66,10 +87,18 @@ export class DomainSignService extends SignService<
     return res.signature
   }
 
+  protected sendSuccessResponse(
+    res: DomainRestrictedSignatureResponseSuccess,
+    status: number,
+    session: Session<DomainRestrictedSignatureRequest>
+  ) {
+    session.response.status(status).json(res)
+  }
+
   protected sendFailureResponse(
     error: ErrorType,
     status: number,
-    session: Session<DomainRestrictedSignatureRequest, DomainRestrictedSignatureResponse>
+    session: Session<DomainRestrictedSignatureRequest>
   ) {
     respondWithError(
       session.response,
@@ -87,7 +116,7 @@ export class DomainSignService extends SignService<
     return req.blindedMessage
   }
 
-  protected logResponseDiscrepancies(): void {
+  protected logResponseDiscrepancies(_session: Session<DomainRestrictedSignatureRequest>): void {
     // TODO(Alec)
     throw new Error('Method not implemented.')
   }

@@ -2,38 +2,28 @@ import {
   CombinerEndpoint,
   DisableDomainRequest,
   disableDomainRequestSchema,
-  DisableDomainResponse,
   DisableDomainResponseSuccess,
   Domain,
   DomainSchema,
   ErrorMessage,
+  ErrorType,
   getSignerEndpoint,
+  respondWithError,
   SignerEndpoint,
   verifyDisableDomainRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import { OdisConfig, VERSION } from '../../config'
-import { CombinerService, Session, SignerResponseWithStatus } from '../combiner.service'
+import { CombinerService, Session } from '../combiner.service'
 
-interface DomainDisableResponseWithStatus extends SignerResponseWithStatus {
-  url: string
-  res: DisableDomainResponse
-  status: number
-}
-
-export class DomainDisableService extends CombinerService<
-  DisableDomainRequest,
-  DisableDomainResponse
-> {
-  protected endpoint: CombinerEndpoint
-  protected signerEndpoint: SignerEndpoint
-  protected responses: DomainDisableResponseWithStatus[]
+export class DomainDisableService extends CombinerService<DisableDomainRequest> {
+  readonly endpoint: CombinerEndpoint
+  readonly signerEndpoint: SignerEndpoint
 
   public constructor(config: OdisConfig) {
     super(config)
     this.endpoint = CombinerEndpoint.DISABLE_DOMAIN
     this.signerEndpoint = getSignerEndpoint(this.endpoint)
-    this.responses = []
   }
 
   protected validate(
@@ -54,7 +44,7 @@ export class DomainDisableService extends CombinerService<
     data: string,
     status: number,
     url: string,
-    session: Session<DisableDomainRequest, DisableDomainResponse>
+    session: Session<DisableDomainRequest>
   ): Promise<void> {
     const res = JSON.parse(data)
 
@@ -64,26 +54,49 @@ export class DomainDisableService extends CombinerService<
     }
 
     session.logger.info({ signer: url }, `Signer request successful`)
-    this.responses.push({ url, res, status })
+    session.responses.push({ url, res, status })
 
-    if (this.responses.length >= this.threshold) {
+    if (session.responses.length >= this.threshold) {
       session.controller.abort()
     }
   }
 
-  protected sendSuccessResponse(response: Response<DisableDomainResponseSuccess>, status: number) {
-    response.status(status).json({
-      success: true,
-      version: VERSION,
-    })
+  protected sendSuccessResponse(
+    res: DisableDomainResponseSuccess,
+    status: number,
+    session: Session<DisableDomainRequest>
+  ) {
+    session.response.status(status).json(res)
   }
 
-  protected async combine(
-    session: Session<DisableDomainRequest, DisableDomainResponse>
-  ): Promise<void> {
-    if (this.responses.length >= this.threshold) {
-      // A
-      session.response.json({ success: true, version: VERSION })
+  protected sendFailureResponse(
+    error: ErrorType,
+    status: number,
+    session: Session<DisableDomainRequest>
+  ): void {
+    // TODO(Alec)
+    respondWithError(
+      session.response,
+      {
+        success: false,
+        version: VERSION,
+        error,
+      },
+      status,
+      session.logger
+    )
+  }
+
+  protected async combine(session: Session<DisableDomainRequest>): Promise<void> {
+    if (session.responses.length >= this.threshold) {
+      this.sendSuccessResponse(
+        {
+          success: true,
+          version: VERSION,
+        },
+        200,
+        session
+      ) // A
       return
     }
 
