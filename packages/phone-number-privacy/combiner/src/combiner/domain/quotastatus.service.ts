@@ -59,8 +59,6 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
     session.responses.push({ url, res, status })
   }
 
-  // protected abstract combine(session: Session<R>): Promise<void>
-
   protected async combine(session: Session<DomainQuotaStatusRequest>): Promise<void> {
     if (session.responses.length >= this.threshold) {
       // A

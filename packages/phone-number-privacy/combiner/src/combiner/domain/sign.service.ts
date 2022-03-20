@@ -121,6 +121,7 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
     throw new Error('Method not implemented.')
   }
 
+  // TODO(Alec)
   // private getRetryAfter(): number {
   //   try {
   //     return this.responses

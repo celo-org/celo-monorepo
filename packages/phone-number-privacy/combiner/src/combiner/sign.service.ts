@@ -11,38 +11,12 @@ import { Request } from 'express'
 import { HeaderInit } from 'node-fetch'
 import { CombinerService, Session } from './combiner.service'
 
+// TODO(Alec): move this (might be duplicated in combiner.service)
 export type SignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
 export type SignatureResponse<R extends SignatureRequest> = OdisResponse<R>
 
-// export class SignSession<R extends SignatureRequest> extends SessionBase<R> {
-//   protected readonly blsCryptoClient: BLSCryptographyClient
-
-//   public constructor(
-//     readonly request: Request<{}, {}, R>,
-//     readonly response: Response<OdisResponse<R>>,
-//     readonly service: SignService<R>
-//   ) {
-//     super(request, response, service)
-//     this.blsCryptoClient = new BLSCryptographyClient(service.threshold, service.pubKey, service.polynomial)
-//   }
-// }
-
 // tslint:disable-next-line: max-classes-per-file
 export abstract class SignService<R extends SignatureRequest> extends CombinerService<R> {
-  // readonly blsCryptoClient: BLSCryptographyClient
-  // readonly pubKey: string
-  // readonly keyVersion: number
-  // readonly polynomial: string
-
-  // public constructor(config: OdisConfig) {
-  //   super(config)
-  //   this.pubKey = config.keys.pubKey
-  //   this.keyVersion = config.keys.version
-  //   this.polynomial = config.keys.polynomial
-  //   // TODO(Alec): add this to session (NEXT)
-  //   // this.blsCryptoClient = new BLSCryptographyClient(this.threshold, this.pubKey, this.polynomial)
-  // }
-
   protected headers(request: Request<{}, {}, R>): HeaderInit | undefined {
     return {
       ...super.headers(request),
@@ -96,14 +70,6 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
       }
     }
   }
-
-  // protected buildSession(
-  //   request: Request<{}, {}, R>,
-  //   response: Response<OdisResponse<R>>,
-  //   service: this
-  // ): Session<R> {
-  //   return new SignSession<R>(request, response, service)
-  // }
 
   protected abstract logResponseDiscrepancies(session: Session<R>): void
 

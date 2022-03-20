@@ -18,9 +18,6 @@ import { OdisConfig } from '../config'
 
 // TODO(Alec): Rename this folder to something other than "combiner" (potentially add / refactor matchmaking code to match)
 
-// // TODO(Alec): try to remove this type
-// export type SignerResponse = SignMessageResponse | DomainQuotaStatusResponse | DisableDomainResponse
-
 // tslint:disable-next-line: interface-over-type-literal
 export type SignerResponse<R extends OdisRequest> = {
   url: string
@@ -33,15 +30,9 @@ export interface SignerService {
   fallbackUrl?: string
 }
 
-// export interface ISession<R extends OdisRequest> {
-//   incrementErrorCodeCount(errorCode: number): void
-//   getMajorityErrorCode(): number | null
-// }
-
+// TODO(Alec): move this
 export type SignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
 export type SignatureResponse<R extends SignatureRequest> = OdisResponse<R>
-
-// export type Session<R extends OdisRequest> = R extends SignatureRequest ? SignSession<R> : SessionBase<R>
 
 export class Session<R extends OdisRequest> {
   timedOut: boolean
@@ -51,7 +42,6 @@ export class Session<R extends OdisRequest> {
   readonly errorCodes: Map<number, number>
   readonly responses: Array<SignerResponse<R>>
   readonly blsCryptoClient: BLSCryptographyClient
-  session: any
 
   public constructor(
     readonly request: Request<{}, {}, R>,
@@ -210,14 +200,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     })
   }
 
-  // protected buildSession(
-  //   request: Request<{}, {}, R>,
-  //   response: Response<OdisResponse<R>>,
-  //   service: this
-  // ): Session<R> {
-  //   return new Session<R>(request, response, service)
-  // }
-
+  // TODO(Alec): decide on approach here
   // protected sendSuccessResponse(res: SuccessResponse<R>, status: number, session: Session<R>) {
   //   session.response.status(status).json(res)
   // }
