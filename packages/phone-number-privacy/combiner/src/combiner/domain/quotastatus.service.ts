@@ -2,6 +2,7 @@ import {
   CombinerEndpoint,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
+  domainQuotaStatusResponseSchema,
   DomainRestrictedSignatureRequest,
   DomainSchema,
   DomainState,
@@ -46,11 +47,25 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
     url: string,
     session: Session<DomainQuotaStatusRequest>
   ): Promise<void> {
-    const res = JSON.parse(data)
+    const res: unknown = JSON.parse(data)
 
+    if (!domainQuotaStatusResponseSchema(DomainSchema).is(res)) {
+      // TODO(Alec)(Next)
+      session.logger.error({ data, signer: url }, 'Signer responded with malformed response')
+      throw new Error(
+        `Signer request to ${url}/${this.signerEndpoint} request returned malformed response`
+      )
+    }
+
+    // In this function HTTP response status is assumed 200. Error if the response is failed.
     if (!res.success) {
-      session.logger.warn({ signer: url, error: res.error }, 'Signer responded with error')
-      throw new Error(res.error) // TODO(Alec): Can this part be factored out?
+      session.logger.error(
+        { error: res.error, signer: url },
+        'Signer responded with error and 200 status'
+      )
+      throw new Error(
+        `Signer request to ${url}/${this.signerEndpoint} request failed with 200 status`
+      )
     }
 
     session.logger.info({ signer: url }, `Signer request successful`)
@@ -61,6 +76,7 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
     if (session.responses.length >= this.threshold) {
       try {
         const domainQuotaStatus = findThresholdDomainState(session)
+        // TODO(Alec): use sendSuccessResponse
         session.response.json({
           success: true,
           status: domainQuotaStatus,
@@ -73,7 +89,7 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
     }
     this.sendFailureResponse(
       ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
-      session.getMajorityErrorCode() ?? 500, // B
+      session.getMajorityErrorCode() ?? 500,
       session
     )
   }

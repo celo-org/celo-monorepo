@@ -54,15 +54,16 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
   }
 
   public async handle(request: Request<{}, {}, unknown>, response: Response<OdisResponse<R>>) {
-    const logger = response.locals.logger()
+    const logger: Logger = response.locals.logger
     try {
       if (!this.enabled) {
-        return this.sendFailureResponse(WarningMessage.API_UNAVAILABLE, 501, logger)
+        return this.sendFailureResponse(WarningMessage.API_UNAVAILABLE, 501, logger) // TODO(Alec)(Next)
       }
       if (!this.validate(request)) {
         return this.sendFailureResponse(WarningMessage.INVALID_INPUT, 400, logger)
       }
       if (!this.reqKeyHeaderCheck(request)) {
+        // TODO(Alec): better name
         return this.sendFailureResponse(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, logger)
       }
       if (!(await this.authenticate(request, logger))) {
@@ -72,9 +73,8 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
       const result = await this.distribute(request, response)
       await this.combine(result)
     } catch (err) {
-      // TODO(Alec): look into bunyan logging
-      logger.error(`Unknown error in handle() for ${this.endpoint}`)
-      logger.error(err)
+      // TODO(Alec): review bunyan logging
+      logger.error({ error: err }, `Unknown error in handleDistributedRequest for ${this.endpoint}`)
       this.sendFailureResponse(ErrorMessage.UNKNOWN_ERROR, 500, logger)
     }
   }
@@ -204,9 +204,9 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
 
     return this.sendRequest(signer.url, session)
       .catch((err) => {
-        session.logger.error(`Signer failed with primary url ${signer.url}`, err)
+        session.logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
         if (signer.fallbackUrl) {
-          session.logger.warn(`Using fallback url to call signer ${signer.fallbackUrl}`)
+          session.logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
           return this.sendRequest(signer.fallbackUrl, session)
         }
         throw err

@@ -2,6 +2,7 @@ import {
   CombinerEndpoint,
   DisableDomainRequest,
   disableDomainRequestSchema,
+  DisableDomainResponseSchema,
   Domain,
   DomainSchema,
   ErrorMessage,
@@ -44,17 +45,40 @@ export class DomainDisableService extends CombinerService<DisableDomainRequest> 
     url: string,
     session: Session<DisableDomainRequest>
   ): Promise<void> {
-    const res = JSON.parse(data)
+    const res: unknown = JSON.parse(data)
 
+    if (!DisableDomainResponseSchema.is(res)) {
+      session.logger.error({ data, signer: url }, 'Signer responded with malformed response')
+      throw new Error(
+        `Signer request to ${url}/${this.signerEndpoint} request returned malformed response`
+      )
+    }
+
+    // In this function HTTP response status is assumed 200. Error if the response is failed.
     if (!res.success) {
-      session.logger.error({ error: res.error, signer: url }, 'Signer responded with error')
-      throw new Error(`Signer request to ${url}/${this.signerEndpoint} request failed`)
+      session.logger.error(
+        { error: res.error, signer: url },
+        'Signer responded with error and 200 status'
+      )
+      throw new Error(
+        `Signer request to ${url}/${this.signerEndpoint} request failed with 200 status`
+      )
     }
 
     session.logger.info({ signer: url }, `Signer request successful`)
     session.responses.push({ url, res, status })
 
-    if (session.responses.length >= this.threshold) {
+    // If we have received a threshold of responses return immediately.
+    // With a t of n threshold, the domain is disabled as long as n-t+1 disable the domain. When the
+    // threshold is greater than half the signers, t > n-t+1. When that is the case, wait for a
+    // full threshold of responses before responding OK to add to the safety margin.
+    // TODO(Alec)(Next): Review this
+    // if (session.responses.length >= this.threshold) {
+    //   session.controller.abort()
+    // }
+    if (
+      session.responses.length >= Math.max(this.threshold, this.signers.length - this.threshold + 1)
+    ) {
       session.controller.abort()
     }
   }
@@ -73,7 +97,7 @@ export class DomainDisableService extends CombinerService<DisableDomainRequest> 
 
     this.sendFailureResponse(
       ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE,
-      session.getMajorityErrorCode() ?? 500, // B
+      session.getMajorityErrorCode() ?? 500,
       session
     )
   }
