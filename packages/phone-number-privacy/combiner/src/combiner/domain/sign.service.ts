@@ -3,11 +3,8 @@ import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
-  DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
-  ErrorType,
   getSignerEndpoint,
-  respondWithError,
   SignerEndpoint,
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
@@ -43,13 +40,12 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
     this.logResponseDiscrepancies(session)
 
     if (session.blsCryptoClient.hasSufficientSignatures()) {
-      // C
       try {
         const combinedSignature = await session.blsCryptoClient.combinePartialBlindedSignatures(
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
-        // TODO(Alec): return other fields?
+        // TODO(Alec)(Next)(responding): return other fields?
         return this.sendSuccessResponse(
           {
             success: true,
@@ -66,7 +62,7 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
       }
     }
 
-    this.handleMissingSignatures(session) // B
+    this.handleMissingSignatures(session)
   }
 
   protected parseSignature(
@@ -87,31 +83,6 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
     return res.signature
   }
 
-  protected sendSuccessResponse(
-    res: DomainRestrictedSignatureResponseSuccess,
-    status: number,
-    session: Session<DomainRestrictedSignatureRequest>
-  ) {
-    session.response.status(status).json(res)
-  }
-
-  protected sendFailureResponse(
-    error: ErrorType,
-    status: number,
-    session: Session<DomainRestrictedSignatureRequest>
-  ) {
-    respondWithError(
-      session.response,
-      {
-        success: false,
-        version: VERSION,
-        error,
-      },
-      status,
-      session.logger
-    )
-  }
-
   protected parseBlindedMessage(req: DomainRestrictedSignatureRequest): string {
     return req.blindedMessage
   }
@@ -121,7 +92,7 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
     throw new Error('Method not implemented.')
   }
 
-  // TODO(Alec)
+  // TODO(Alec)(Next)
   // private getRetryAfter(): number {
   //   try {
   //     return this.responses

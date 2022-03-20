@@ -12,7 +12,6 @@ import { HeaderInit } from 'node-fetch'
 import { CombinerService } from './combiner.service'
 import { Session } from './session'
 
-// TODO(Alec): move this (might be duplicated in combiner.service)
 export type SignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
 export type SignatureResponse<R extends SignatureRequest> = OdisResponse<R>
 
@@ -65,7 +64,7 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
           this.parseBlindedMessage(session.request.body)
         )
         // Close outstanding requests
-        session.controller.abort() // 2
+        session.controller.abort()
       } catch {
         // Already logged, continue to collect signatures
       }
@@ -89,10 +88,6 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
       error = WarningMessage.EXCEEDED_QUOTA
     }
     this.sendFailureResponse(error, majorityErrorCode ?? 500, session)
-  }
-
-  protected sendSuccessResponse(res: SignatureResponse<R>, status: number, session: Session<R>) {
-    session.response.status(status).json(res)
   }
 
   protected abstract parseSignature(

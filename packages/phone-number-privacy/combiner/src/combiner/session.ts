@@ -52,7 +52,6 @@ export class Session<R extends OdisRequest> {
     let maxErrorCode = -1
     let maxCount = -1
     this.errorCodes.forEach((count, errorCode) => {
-      // B
       // This gives priority to the lower status codes in the event of a tie
       // because 400s are more helpful than 500s for user feedback
       if (count > maxCount || (count === maxCount && errorCode < maxErrorCode)) {

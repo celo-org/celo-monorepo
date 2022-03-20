@@ -1,18 +1,18 @@
 import {
   CombinerEndpoint,
-  DomainRestrictedSignatureRequest,
   ErrorMessage,
   ErrorType,
   OdisRequest,
   OdisResponse,
+  respondWithError,
   SignerEndpoint,
-  SignMessageRequest,
+  SuccessResponse,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import fetch, { HeaderInit, Response as FetchResponse } from 'node-fetch'
-import { OdisConfig } from '../config'
+import { OdisConfig, VERSION } from '../config'
 import { Session } from './session'
 
 // TODO(Alec): Rename this folder to something other than "combiner" (potentially add / refactor matchmaking code to match)
@@ -28,10 +28,6 @@ export interface SignerService {
   url: string
   fallbackUrl?: string
 }
-
-// TODO(Alec): move this
-export type SignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
-export type SignatureResponse<R extends SignatureRequest> = OdisResponse<R>
 export interface ICombinerService<R extends OdisRequest> {
   handle(request: Request<{}, {}, R>, response: Response<OdisResponse<R>>): Promise<void>
 }
@@ -61,7 +57,6 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     const logger = response.locals.logger()
     try {
       if (!this.enabled) {
-        // TODO(Alec): Move these response functions inside Session
         return this.sendFailureResponse(WarningMessage.API_UNAVAILABLE, 501, logger)
       }
       if (!this.validate(request)) {
@@ -76,9 +71,6 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
 
       const result = await this.distribute(request, response)
       await this.combine(result)
-      // TODO(Alec)
-      // const responseBody = await this.combine(result)
-      // // this.send(res)
     } catch (err) {
       // TODO(Alec): look into bunyan logging
       logger.error(`Unknown error in handle() for ${this.endpoint}`)
@@ -105,7 +97,6 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     obs.observe({ entryTypes: ['measure'], buffered: true })
 
     const timeout = setTimeout(() => {
-      // 1
       session.timedOut = true
       session.controller.abort()
     }, this.timeoutMs)
@@ -138,31 +129,22 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     })
   }
 
-  // TODO(Alec): decide on approach here
-  // protected sendSuccessResponse(res: SuccessResponse<R>, status: number, session: Session<R>) {
-  //   session.response.status(status).json(res)
-  // }
+  protected sendSuccessResponse(res: SuccessResponse<R>, status: number, session: Session<R>) {
+    session.response.status(status).json(res)
+  }
 
-  // protected sendFailureResponse(error: ErrorType, status: number, session: Session<R>) {
-  //   respondWithError(
-  //     session.response,
-  //     {
-  //       success: false,
-  //       version: VERSION,
-  //       error,
-  //     },
-  //     status,
-  //     session.logger
-  //   )
-  // }
-
-  // protected abstract sendSuccessResponse(res: OdisResponse<R>, status: number, session: Session<R>): void
-
-  protected abstract sendFailureResponse(
-    error: ErrorType,
-    status: number,
-    session: Session<R>
-  ): void
+  protected sendFailureResponse(error: ErrorType, status: number, session: Session<R>) {
+    respondWithError(
+      session.response,
+      {
+        success: false,
+        version: VERSION,
+        error,
+      },
+      status,
+      session.logger
+    )
+  }
 
   protected abstract validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, R>
 
@@ -249,7 +231,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     )
     if (shouldFailFast) {
       session.logger.info('Not possible to reach a threshold of signer responses. Failing fast')
-      session.controller.abort() // 3
+      session.controller.abort()
     }
   }
 

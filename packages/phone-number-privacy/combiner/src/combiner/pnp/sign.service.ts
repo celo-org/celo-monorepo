@@ -12,7 +12,6 @@ import {
   respondWithError,
   SignerEndpoint,
   SignMessageResponse,
-  SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -36,7 +35,7 @@ export class PnpSignService extends SignService<SignMessageRequest> {
     request: Request<{}, {}, unknown>
   ): request is Request<{}, {}, SignMessageRequest> {
     return (
-      // TODO(Alec)(next): add io-ts schemas for phone number privacy
+      // TODO(Alec): add io-ts schemas for phone number privacy
       hasValidAccountParam(request.body as SignMessageRequest) &&
       hasValidBlindedPhoneNumberParam(request.body as SignMessageRequest) &&
       identifierIsValidIfExists(request.body as SignMessageRequest) &&
@@ -55,13 +54,12 @@ export class PnpSignService extends SignService<SignMessageRequest> {
     this.logResponseDiscrepancies(session)
 
     if (session.blsCryptoClient.hasSufficientSignatures()) {
-      // C
       try {
         const combinedSignature = await session.blsCryptoClient.combinePartialBlindedSignatures(
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
-        // TODO(Alec): return other fields?
+        // TODO(Alec)(Next)(responding): return other fields?
         return this.sendSuccessResponse(
           {
             success: true,
@@ -77,7 +75,7 @@ export class PnpSignService extends SignService<SignMessageRequest> {
       }
     }
 
-    this.handleMissingSignatures(session) // B
+    this.handleMissingSignatures(session)
   }
 
   protected headers(request: Request<{}, {}, SignMessageRequest>): HeaderInit | undefined {
@@ -107,14 +105,6 @@ export class PnpSignService extends SignService<SignMessageRequest> {
       // Continue on failure as long as signature is present to unblock user
     }
     return res.signature
-  }
-
-  protected sendSuccessResponse(
-    res: SignMessageResponseSuccess,
-    status: number,
-    session: Session<SignMessageRequest>
-  ) {
-    session.response.status(status).json(res)
   }
 
   protected sendFailureResponse(

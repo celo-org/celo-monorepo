@@ -2,13 +2,10 @@ import {
   CombinerEndpoint,
   DisableDomainRequest,
   disableDomainRequestSchema,
-  DisableDomainResponseSuccess,
   Domain,
   DomainSchema,
   ErrorMessage,
-  ErrorType,
   getSignerEndpoint,
-  respondWithError,
   SignerEndpoint,
   verifyDisableDomainRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
@@ -62,43 +59,16 @@ export class DomainDisableService extends CombinerService<DisableDomainRequest> 
     }
   }
 
-  protected sendSuccessResponse(
-    res: DisableDomainResponseSuccess,
-    status: number,
-    session: Session<DisableDomainRequest>
-  ) {
-    session.response.status(status).json(res)
-  }
-
-  protected sendFailureResponse(
-    error: ErrorType,
-    status: number,
-    session: Session<DisableDomainRequest>
-  ): void {
-    // TODO(Alec)
-    respondWithError(
-      session.response,
-      {
-        success: false,
-        version: VERSION,
-        error,
-      },
-      status,
-      session.logger
-    )
-  }
-
   protected async combine(session: Session<DisableDomainRequest>): Promise<void> {
     if (session.responses.length >= this.threshold) {
-      this.sendSuccessResponse(
+      return this.sendSuccessResponse(
         {
           success: true,
           version: VERSION,
         },
         200,
         session
-      ) // A
-      return
+      )
     }
 
     this.sendFailureResponse(

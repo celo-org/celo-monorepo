@@ -2,14 +2,11 @@ import {
   CombinerEndpoint,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
-  DomainQuotaStatusResponseSuccess,
   DomainRestrictedSignatureRequest,
   DomainSchema,
   DomainState,
   ErrorMessage,
-  ErrorType,
   getSignerEndpoint,
-  respondWithError,
   SignerEndpoint,
   verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
@@ -62,7 +59,6 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
 
   protected async combine(session: Session<DomainQuotaStatusRequest>): Promise<void> {
     if (session.responses.length >= this.threshold) {
-      // A
       try {
         const domainQuotaStatus = findThresholdDomainState(session)
         session.response.json({
@@ -79,32 +75,6 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
       ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
       session.getMajorityErrorCode() ?? 500, // B
       session
-    )
-  }
-
-  protected sendSuccessResponse(
-    res: DomainQuotaStatusResponseSuccess,
-    status: number,
-    session: Session<DomainQuotaStatusRequest>
-  ) {
-    session.response.status(status).json(res)
-  }
-
-  protected sendFailureResponse(
-    error: ErrorType,
-    status: number,
-    session: Session<DomainQuotaStatusRequest>
-  ) {
-    // TODO(Alec)
-    respondWithError(
-      session.response,
-      {
-        success: false,
-        version: VERSION,
-        error,
-      },
-      status,
-      session.logger
     )
   }
 }
