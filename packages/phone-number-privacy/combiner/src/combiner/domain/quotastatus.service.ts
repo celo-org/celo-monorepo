@@ -16,7 +16,8 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
 import { OdisConfig, VERSION } from '../../config'
-import { CombinerService, Session } from '../combiner.service'
+import { CombinerService } from '../combiner.service'
+import { Session } from '../session'
 
 export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusRequest> {
   readonly endpoint: CombinerEndpoint

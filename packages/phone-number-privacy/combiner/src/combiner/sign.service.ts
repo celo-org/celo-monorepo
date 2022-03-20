@@ -9,7 +9,8 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
 import { HeaderInit } from 'node-fetch'
-import { CombinerService, Session } from './combiner.service'
+import { CombinerService } from './combiner.service'
+import { Session } from './session'
 
 // TODO(Alec): move this (might be duplicated in combiner.service)
 export type SignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest

@@ -20,7 +20,7 @@ import { Request } from 'express'
 import { HeaderInit } from 'node-fetch'
 import { OdisConfig, VERSION } from '../../config'
 import { getContractKit } from '../../web3/contracts'
-import { Session } from '../combiner.service'
+import { Session } from '../session'
 import { SignService } from '../sign.service'
 export class PnpSignService extends SignService<SignMessageRequest> {
   readonly endpoint: CombinerEndpoint

@@ -13,7 +13,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
 import { OdisConfig, VERSION } from '../../config'
-import { Session } from '../combiner.service'
+import { Session } from '../session'
 import { SignService } from '../sign.service'
 import { findThresholdDomainState } from './quotastatus.service'
 
