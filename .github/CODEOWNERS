@@ -8,8 +8,8 @@
 # directory and file-level owners. Feel free to add to this!
 /packages/azure/ @codyborn
 /packages/celotool/ @asaj
-/packages/cli/ @aaronmgdr @crondinini @dckesler @nicolasbrugneaux @celo-org/devx
-/packages/sdk/ @aaronmgdr @crondinini @dckesler @nicolasbrugneaux @celo-org/devx
+/packages/cli/ @celo-org/applications
+/packages/sdk/ @celo-org/applications
 /packages/dev-utils/ @mcortesi
 /packages/docs/ @timmoreton @barbaraliau @critesjosh
 /packages/faucet/ @eelanagaraj @celo-org/devx
