@@ -4,19 +4,21 @@ import { ContractKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
   CombinerEndpoint,
+  Domain,
   DomainEndpoint,
   DomainRequest,
   DomainResponse,
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetContactMatchesResponse,
-  KnownDomain,
   PhoneNumberPrivacyEndpoint,
   PhoneNumberPrivacyRequest,
 } from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
 import crypto from 'crypto'
 import debugFactory from 'debug'
+import { isLeft } from 'fp-ts/lib/Either'
+import * as t from 'io-ts'
 
 const debug = debugFactory('kit:odis:query')
 
@@ -55,6 +57,7 @@ export enum ErrorMessages {
   ODIS_AUTH_ERROR = 'odisAuthError',
   ODIS_CLIENT_ERROR = 'Unknown Client Error',
   ODIS_FETCH_ERROR = 'odisFetchError',
+  ODIS_RESPONSE_ERROR = 'odisResponseError',
 }
 
 export interface ServiceContext {
@@ -197,14 +200,17 @@ export async function queryOdis<ResponseType>(
 
 /**
  * Send the given domain request to ODIS (e.g. to get a POPRF evaluation or check quota).
+ *
  * @param body Request to send in the body of the HTTP request.
  * @param context Contains service URL and public to determine which instance to contact.
  * @param endpoint Endpoint to query (e.g. '/domain/sign', '/domain/quotaStatus').
+ * @param responseSchema io-ts type for the expected response type. Provided to ensure type safety.
  */
-export async function sendOdisDomainRequest<RequestType extends DomainRequest<KnownDomain>>(
+export async function sendOdisDomainRequest<RequestType extends DomainRequest<Domain>>(
   body: RequestType,
   context: ServiceContext,
-  endpoint: DomainEndpoint
+  endpoint: DomainEndpoint,
+  responseSchema: t.Type<DomainResponse<RequestType>>
 ): Promise<DomainResponse<RequestType>> {
   debug(`Posting to ${endpoint}`)
 
@@ -239,9 +245,13 @@ export async function sendOdisDomainRequest<RequestType extends DomainRequest<Kn
       if (res.ok) {
         debug('Response ok. Parsing.')
         const response = await res.json()
-        // NOTE: This is an unsafe conversion that can lead to type safety issues in calling code.
-        // This code could be improved by ensuring the response is the correct type with io-ts.
-        return response as DomainResponse<RequestType>
+
+        // Verify that the response is the type we expected, then return it.
+        const decoding = responseSchema.decode(response)
+        if (isLeft(decoding)) {
+          throw new Error(ErrorMessages.ODIS_RESPONSE_ERROR)
+        }
+        return decoding.right
       }
 
       debug(`Response not okay. Status ${res.status}`)

@@ -9,4 +9,4 @@ metadata:
 data:
   health-check.sh: |-
     #!/bin/sh
-{{ include "common.node-health-check" . | indent 4 }}
+{{ include "common.node-health-check" (dict "maxpeers" .Values.geth.maxpeers "light_maxpeers" .Values.geth.light.maxpeers ) | indent 4 }}
