@@ -3,26 +3,26 @@
 # For details on acceptable file patterns, please refer to the [Github Documentation](https://help.github.com/articles/about-codeowners/)
 
 # default owners, overridden by package specific owners below
-* @asaj @timmoreton @mcortesi
+* @celo-org/super-owners
 
 # directory and file-level owners. Feel free to add to this!
 /packages/attestation-proxy/ @celo-org/identity
 /packages/attestation-service/ @celo-org/identity
-/packages/azure/ @codyborn
-/packages/celotool/ @asaj @m-chrzan
+/packages/azure/ @celo-org/azure
+/packages/celotool/ @celo-org/protocol-owners
 /packages/cli/ @celo-org/applications
 /packages/dev-utils/ @celo-org/applications
 /packages/docs/ @timmoreton @celo-org/applications @celo-org/devrel
 /packages/env-tests @celo-org/cap
 /packages/faucet/ @celo-org/applications
-/packages/flake-tracker @alecps
-/packages/helm-charts/ @nambrot @timmoreton
-/packages/helm-charts/oracle/ @celo-org/platform-economics @martinvol
+/packages/flake-tracker @celo-org/flake-trackers
+/packages/helm-charts/ @celo-org/helm-chart-owners
+/packages/helm-charts/oracle/ @celo-org/platform-economics  @celo-org/helm-chart-owners
 /packages/metadata-crawler/ @celo-org/identity
 /packages/phone-number-privacy/ @celo-org/identity
-/packages/protocol/ @celo-org/cap @m-chrzan
+/packages/protocol/ @celo-org/cap @celo-org/protocol-owners
 /packages/sdk/ @celo-org/applications
 /packages/sdk/contractkit/ @celo-org/cap @celo-org/applications
-/packages/terraform-modules-public/ @tkporter
-/packages/terraform-modules/ @tkporter
+/packages/terraform-modules-public/ @celo-org/terraformers
+/packages/terraform-modules/ @celo-org/terraformers
 /packages/typescript/ @celo-org/applications
