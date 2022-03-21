@@ -31,4 +31,5 @@ jobs:
         days-before-issue-stale: 270
         days-before-close: 30
         ascending: true
+        operations-per-run: 50
 
