@@ -79,7 +79,7 @@ contract StableTokenRegistry is Initializable, Ownable {
     if (index != newNumFiats) {
       fiatTickers[index] = fiatTickers[newNumFiats];
     }
-    fiatTickers[newNumFiats] = "";
+    delete fiatTickers[newNumFiats];
     fiatTickers.length = newNumFiats;
   }
 
