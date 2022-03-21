@@ -9,18 +9,18 @@
 /packages/attestation-proxy/ @celo-org/identity
 /packages/attestation-service/ @celo-org/identity
 /packages/azure/ @codyborn
-/packages/celotool/ @asaj
+/packages/celotool/ @asaj @m-chrzan
 /packages/cli/ @celo-org/applications
 /packages/dev-utils/ @celo-org/applications
 /packages/docs/ @timmoreton @celo-org/applications @critesjosh
-/packages/env-tests @celo-org/contracts
-/packages/faucet/ @eelanagaraj @celo-org/applications
+/packages/env-tests @celo-org/cap
+/packages/faucet/ @celo-org/applications
 /packages/flake-tracker @alecps
 /packages/helm-charts/ @nambrot @timmoreton
-/packages/helm-charts/oracle/ @celo-org/platform-economics
+/packages/helm-charts/oracle/ @celo-org/platform-economics @martinvol
 /packages/metadata-crawler/ @celo-org/identity
 /packages/phone-number-privacy/ @celo-org/identity
-/packages/protocol/ @celo-org/contracts
+/packages/protocol/ @celo-org/cap @m-chrzan
 /packages/sdk/ @celo-org/applications
 /packages/sdk/contractkit/ @celo-org/cap @celo-org/applications
 /packages/terraform-modules-public/ @tkporter
