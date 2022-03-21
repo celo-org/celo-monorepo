@@ -12,7 +12,7 @@
 /packages/celotool/ @asaj @m-chrzan
 /packages/cli/ @celo-org/applications
 /packages/dev-utils/ @celo-org/applications
-/packages/docs/ @timmoreton @celo-org/applications @critesjosh
+/packages/docs/ @timmoreton @celo-org/applications @celo-org/devrel
 /packages/env-tests @celo-org/cap
 /packages/faucet/ @celo-org/applications
 /packages/flake-tracker @alecps
