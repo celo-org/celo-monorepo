@@ -3,7 +3,7 @@
 # For details on acceptable file patterns, please refer to the [Github Documentation](https://help.github.com/articles/about-codeowners/)
 
 # default owners, overridden by package specific owners below
-* @asaj @cmcewen @timmoreton
+* @asaj @timmoreton @mcortesi
 
 # directory and file-level owners. Feel free to add to this!
 /packages/attestation-proxy/ @celo-org/identity
@@ -12,7 +12,7 @@
 /packages/celotool/ @asaj
 /packages/cli/ @celo-org/applications
 /packages/dev-utils/ @celo-org/applications
-/packages/docs/ @timmoreton @barbaraliau @critesjosh 
+/packages/docs/ @timmoreton @celo-org/applications @critesjosh
 /packages/env-tests @celo-org/contracts
 /packages/faucet/ @eelanagaraj @celo-org/applications
 /packages/flake-tracker @alecps
@@ -25,4 +25,4 @@
 /packages/sdk/contractkit/ @celo-org/cap @celo-org/applications
 /packages/terraform-modules-public/ @tkporter
 /packages/terraform-modules/ @tkporter
-/packages/typescript/ @cmcewen
+/packages/typescript/ @celo-org/applications
