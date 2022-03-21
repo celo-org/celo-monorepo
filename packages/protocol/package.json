@@ -86,8 +86,8 @@
     "web3": "1.3.6",
     "web3-core": "1.3.6",
     "web3-core-helpers": "1.3.6",
-    "web3-utils": "1.3.6",
-    "web3-provider-engine": "^15.0.0"
+    "web3-provider-engine": "^15.0.0",
+    "web3-utils": "1.3.6"
   },
   "devDependencies": {
     "@celo/flake-tracker": "0.0.1-dev",
@@ -97,7 +97,6 @@
     "@types/chai": "^4.1.3",
     "@types/mathjs": "^4.4.1",
     "@types/mocha": "^7.0.2",
-    "@types/nodemailer": "^4.6.5",
     "@types/targz": "^1.0.0",
     "@types/tmp": "^0.1.0",
     "@types/underscore": "^1.8.8",
@@ -105,7 +104,6 @@
     "cross-env": "^5.1.6",
     "eth-gas-reporter": "^0.2.16",
     "merkle-patricia-tree": "4.0.0",
-    "nodemailer": "^4.6.8",
     "targz": "^1.0.1",
     "tmp": "^0.1.0",
     "truffle-typings": "^1.0.6",
