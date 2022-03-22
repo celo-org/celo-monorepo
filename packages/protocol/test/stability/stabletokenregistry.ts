@@ -50,14 +50,12 @@ contract('StableTokenRegistry', (accounts: string[]) => {
     })
 
     it('removes from a big array', async () => {
-      await strc.addNewStableToken(fiatTicker, stableTokenContractName)
       await strc.removeStableToken(fiatTicker, 0)
       const fiatTickers = await strc.getFiatTickers()
-      assert.deepEqual(fiatTickers, [accounts[1]])
+      assert.deepEqual(fiatTickers, [])
     })
 
     it("doesn't remove an fiat ticker with the wrong index", async () => {
-      await strc.addNewStableToken(fiatTicker, stableTokenContractName)
       await assertRevert(strc.removeStableToken(fiatTicker, 1))
     })
   })
