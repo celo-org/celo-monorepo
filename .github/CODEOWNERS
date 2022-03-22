@@ -7,25 +7,33 @@
 
 # directory and file-level owners. Feel free to add to this!
 /packages/azure/ @codyborn
+/packages/blockchain-api/ @jmrossy @cmcewen @i1skn @jeanregisser
 /packages/celotool/ @asaj
-/packages/cli/ @celo-org/applications
-/packages/sdk/ @celo-org/applications
+/packages/cli/ @mcortesi @gastonponti @medhak1 @celo-org/devx
+/packages/sdk/ @mcortesi @gastonponti @medhak1 @barbaraliau @celo-org/devx
+/packages/dappkit/ @cmcewen @barbaraliau @celo-org/devx
 /packages/dev-utils/ @mcortesi
-/packages/docs/ @timmoreton @barbaraliau @critesjosh
+/packages/docs/ @timmoreton @barbaraliau @critesjosh 
 /packages/faucet/ @eelanagaraj @celo-org/devx
+/packages/mobile/ @celo-org/wallet 
+/packages/moonpay-auth/ @annakaz @i1skn 
+/packages/notification-service/ @annakaz @cmcewen @i1skn @jeanregisser
 /packages/flake-tracker @alecps
 
 /packages/protocol/ @celo-org/cap
 /packages/sdk/contractkit/ @celo-org/cap
+/packages/komencikit/ @celo-org/cap
 /packages/phone-number-privacy/ @celo-org/cap
 /packages/attestation-proxy/ @celo-org/cap
 /packages/attestation-service/ @celo-org/cap
 /packages/metadata-crawler/ @celo-org/cap
 /packages/env-tests @celo-org/cap
 
+/packages/react-components/ @i1skn @jeanregisser @celo-org/wallet
 /packages/terraform-modules-public/ @tkporter
 /packages/terraform-modules/ @tkporter
 /packages/typescript/ @cmcewen
+/packages/sdk/utils/ @barbaraliau @medhak1 @celo-org/devx
 /packages/sdk/base/ @barbaraliau @medhak1 @celo-org/devx
 
 # helm-charts rules.
