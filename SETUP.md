@@ -21,7 +21,7 @@ This is a living document! Please edit and update it as part of your onboarding 
 
 ## Reading
 
-Review the README from each directory in [packages](packages/). The [protocol](packages/protocol) is a good starting points.
+Review the README from each directory in [packages](packages/). The [protocol](packages/protocol) is a good starting point.
 
 ## Getting everything installed
 
