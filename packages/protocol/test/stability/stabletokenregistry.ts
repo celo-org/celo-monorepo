@@ -59,4 +59,26 @@ contract('StableTokenRegistry', (accounts: string[]) => {
       await assertRevert(strc.removeStableToken(fiatTicker, 1))
     })
   })
+
+  describe('#addNewStableToken(fiatTicker)', () => {
+    it('only allows owner', async () => {
+      await assertRevert(
+        strc.addNewStableToken(fiatTicker, stableTokenContractName, { from: nonOwner })
+      )
+    })
+
+    it('does not allow empty strings', async () => {
+      await assertRevert(strc.addNewStableToken(fiatTicker, ''))
+      await assertRevert(strc.addNewStableToken('', fiatTicker))
+      await assertRevert(strc.addNewStableToken('', ''))
+    })
+
+    it('has the right list of fiat tickers after addition', async () => {
+      const spendersBeforeAdditions = await strc.getFiatTickers()
+      assert.deepEqual(spendersBeforeAdditions, [])
+      await strc.addNewStableToken(fiatTicker, stableTokenContractName)
+      const fiatTickers = await strc.getFiatTickers()
+      assert.deepEqual(fiatTickers, [])
+    })
+  })
 })
