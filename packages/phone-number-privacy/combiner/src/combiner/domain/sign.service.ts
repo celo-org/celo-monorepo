@@ -3,12 +3,18 @@ import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
+  DomainRestrictedSignatureResponseFailure,
+  DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
+  DomainState,
+  ErrorType,
   getSignerEndpoint,
+  send,
   SignerEndpoint,
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
-import { Request } from 'express'
+import Logger from 'bunyan'
+import { Request, Response } from 'express'
 import { OdisConfig, VERSION } from '../../config'
 import { Session } from '../session'
 import { SignService } from '../sign.service'
@@ -46,15 +52,12 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
           session.logger
         )
         // TODO(Alec)(Next)(responding): return other fields?
-        return this.sendSuccessResponse(
-          {
-            success: true,
-            version: VERSION,
-            signature: combinedSignature,
-            status: findThresholdDomainState(session),
-          },
+        return this.sendSuccess(
           200,
-          session
+          session.response,
+          session.logger,
+          combinedSignature,
+          findThresholdDomainState(session)
         )
       } catch {
         // May fail upon combining signatures if too many sigs are invalid
@@ -63,6 +66,46 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
     }
 
     this.handleMissingSignatures(session)
+  }
+
+  protected sendSuccess(
+    status: number,
+    response: Response<DomainRestrictedSignatureResponseSuccess>,
+    logger: Logger,
+    combinedSignature: string,
+    domainState: DomainState
+  ) {
+    send(
+      response,
+      {
+        success: true,
+        version: VERSION,
+        signature: combinedSignature,
+        status: domainState,
+      },
+      status,
+      logger
+    )
+  }
+
+  protected sendFailure(
+    error: ErrorType,
+    status: number,
+    response: Response<DomainRestrictedSignatureResponseFailure>,
+    logger: Logger,
+    domainState: DomainState
+  ) {
+    send(
+      response,
+      {
+        success: false,
+        version: VERSION,
+        error,
+        status: domainState,
+      },
+      status,
+      logger
+    )
   }
 
   protected parseSignature(

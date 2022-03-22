@@ -9,13 +9,15 @@ import {
   identifierIsValidIfExists,
   isBodyReasonablySized,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
-  respondWithError,
+  send,
   SignerEndpoint,
   SignMessageResponse,
+  SignMessageResponseFailure,
+  SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 import { HeaderInit } from 'node-fetch'
 import { OdisConfig, VERSION } from '../../config'
 import { getContractKit } from '../../web3/contracts'
@@ -60,15 +62,7 @@ export class PnpSignService extends SignService<SignMessageRequest> {
           session.logger
         )
         // TODO(Alec)(Next)(responding): return other fields?
-        return this.sendSuccessResponse(
-          {
-            success: true,
-            version: VERSION,
-            signature: combinedSignature,
-          },
-          200,
-          session
-        )
+        return this.sendSuccess(200, session.response, session.logger, combinedSignature)
       } catch {
         // May fail upon combining signatures if too many sigs are invalid
         // Fallback to handleMissingSignatures
@@ -107,16 +101,35 @@ export class PnpSignService extends SignService<SignMessageRequest> {
     return res.signature
   }
 
-  protected sendFailureResponse(
+  protected sendSuccess(
+    status: number,
+    response: Response<SignMessageResponseSuccess>,
+    logger: Logger,
+    combinedSignature: string
+  ) {
+    send(
+      response,
+      {
+        success: true,
+        version: VERSION,
+        signature: combinedSignature,
+      },
+      status,
+      logger
+    )
+  }
+
+  protected sendFailure(
     error: ErrorType,
     status: number,
-    session: Session<SignMessageRequest>,
+    response: Response<SignMessageResponseFailure>,
+    logger: Logger,
     performedQueryCount?: number,
     totalQuota?: number,
     blockNumber?: number
   ) {
-    respondWithError(
-      session.response,
+    send(
+      response,
       {
         success: false,
         version: VERSION,
@@ -126,11 +139,11 @@ export class PnpSignService extends SignService<SignMessageRequest> {
         blockNumber,
       },
       status,
-      session.logger
+      logger
     )
   }
 
-  // TODO(Alec): clean this up, consider adding to Session
+  // TODO(Alec): clean this up
   protected logResponseDiscrepancies(session: Session<SignMessageRequest>): void {
     // Only compare responses which have values for the quota fields
     const successes = session.responses.filter(

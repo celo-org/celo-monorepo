@@ -2,17 +2,23 @@ import {
   CombinerEndpoint,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
+  DomainQuotaStatusResponseFailure,
   domainQuotaStatusResponseSchema,
+  DomainQuotaStatusResponseSuccess,
   DomainRestrictedSignatureRequest,
   DomainSchema,
   DomainState,
   ErrorMessage,
+  ErrorType,
   getSignerEndpoint,
+  send,
+  SequentialDelayDomainStateSchema,
   SignerEndpoint,
   verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { Request } from 'express'
+import Logger from 'bunyan'
+import { Request, Response } from 'express'
 import { OdisConfig, VERSION } from '../../config'
 import { CombinerService } from '../combiner.service'
 import { Session } from '../session'
@@ -32,42 +38,31 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
   ): request is Request<{}, {}, DomainQuotaStatusRequest> {
     return domainQuotaStatusRequestSchema(DomainSchema).is(request.body)
   }
-
+  protected checkKeyVersionHeader(_request: Request<{}, {}, DomainQuotaStatusRequest>): boolean {
+    return true // does not require key version header
+  }
   protected authenticate(request: Request<{}, {}, DomainQuotaStatusRequest>): Promise<boolean> {
     return Promise.resolve(verifyDomainQuotaStatusRequestAuthenticity(request.body))
   }
 
-  protected reqKeyHeaderCheck(_request: Request<{}, {}, DomainQuotaStatusRequest>): boolean {
-    return true // does not require key header
-  }
-
-  protected async handleResponseOK(
+  protected async receiveSuccess(
     data: string,
     status: number,
     url: string,
     session: Session<DomainQuotaStatusRequest>
   ): Promise<void> {
     const res: unknown = JSON.parse(data)
-
-    if (!domainQuotaStatusResponseSchema(DomainSchema).is(res)) {
-      // TODO(Alec)(Next)
-      session.logger.error({ data, signer: url }, 'Signer responded with malformed response')
-      throw new Error(
-        `Signer request to ${url}/${this.signerEndpoint} request returned malformed response`
-      )
+    if (!domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
+      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
+      session.logger.error({ data, signer: url }, msg)
+      throw new Error(msg)
     }
-
     // In this function HTTP response status is assumed 200. Error if the response is failed.
     if (!res.success) {
-      session.logger.error(
-        { error: res.error, signer: url },
-        'Signer responded with error and 200 status'
-      )
-      throw new Error(
-        `Signer request to ${url}/${this.signerEndpoint} request failed with 200 status`
-      )
+      const msg = `Signer request to ${url}/${this.signerEndpoint} failed with 200 status`
+      session.logger.error({ error: res.error, signer: url }, msg)
+      throw new Error(msg)
     }
-
     session.logger.info({ signer: url }, `Signer request successful`)
     session.responses.push({ url, res, status })
   }
@@ -76,26 +71,58 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
     if (session.responses.length >= this.threshold) {
       try {
         const domainQuotaStatus = findThresholdDomainState(session)
-        // TODO(Alec): use sendSuccessResponse
-        session.response.json({
-          success: true,
-          status: domainQuotaStatus,
-          version: VERSION,
-        })
+        this.sendSuccess(200, session.response, session.logger, domainQuotaStatus)
         return
       } catch (error) {
         session.logger.error({ error }, 'Error combining signer quota status responses')
       }
     }
-    this.sendFailureResponse(
+    this.sendFailure(
       ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
       session.getMajorityErrorCode() ?? 500,
-      session
+      session.response,
+      session.logger
+    )
+  }
+
+  protected sendSuccess(
+    status: number,
+    response: Response<DomainQuotaStatusResponseSuccess>,
+    logger: Logger,
+    domainState: DomainState
+  ) {
+    send(
+      response,
+      {
+        success: true,
+        version: VERSION,
+        status: domainState,
+      },
+      status,
+      logger
+    )
+  }
+
+  protected sendFailure(
+    error: ErrorType,
+    status: number,
+    response: Response<DomainQuotaStatusResponseFailure>,
+    logger: Logger
+  ) {
+    send(
+      response,
+      {
+        success: false,
+        version: VERSION,
+        error,
+      },
+      status,
+      logger
     )
   }
 }
 
-// TODO(Alec): Move this elsewhere
+// TODO(Alec): Move this elsewhere (consider near sequential delay code)
 export function findThresholdDomainState<
   R extends DomainRestrictedSignatureRequest | DomainQuotaStatusRequest
 >(session: Session<R>): DomainState {

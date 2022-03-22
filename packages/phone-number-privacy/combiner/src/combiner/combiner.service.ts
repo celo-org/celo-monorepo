@@ -2,9 +2,9 @@ import {
   CombinerEndpoint,
   ErrorMessage,
   ErrorType,
+  FailureResponse,
   OdisRequest,
   OdisResponse,
-  respondWithError,
   SignerEndpoint,
   SuccessResponse,
   WarningMessage,
@@ -12,7 +12,7 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import fetch, { HeaderInit, Response as FetchResponse } from 'node-fetch'
-import { OdisConfig, VERSION } from '../config'
+import { OdisConfig } from '../config'
 import { Session } from './session'
 
 // TODO(Alec): Rename this folder to something other than "combiner" (potentially add / refactor matchmaking code to match)
@@ -24,7 +24,7 @@ export type SignerResponse<R extends OdisRequest> = {
   status: number
 }
 
-export interface SignerService {
+export interface Signer {
   url: string
   fallbackUrl?: string
 }
@@ -34,7 +34,7 @@ export interface ICombinerService<R extends OdisRequest> {
 
 export abstract class CombinerService<R extends OdisRequest> implements ICombinerService<R> {
   readonly timeoutMs: number
-  readonly signers: SignerService[]
+  readonly signers: Signer[]
   readonly threshold: number
   readonly enabled: boolean
   readonly pubKey: string
@@ -57,25 +57,21 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     const logger: Logger = response.locals.logger
     try {
       if (!this.enabled) {
-        return this.sendFailureResponse(WarningMessage.API_UNAVAILABLE, 501, logger) // TODO(Alec)(Next)
+        return this.sendFailure(WarningMessage.API_UNAVAILABLE, 501, response, logger)
       }
       if (!this.validate(request)) {
-        return this.sendFailureResponse(WarningMessage.INVALID_INPUT, 400, logger)
+        return this.sendFailure(WarningMessage.INVALID_INPUT, 400, response, logger)
       }
-      if (!this.reqKeyHeaderCheck(request)) {
-        // TODO(Alec): better name
-        return this.sendFailureResponse(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, logger)
+      if (!this.checkKeyVersionHeader(request)) {
+        return this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response, logger)
       }
       if (!(await this.authenticate(request, logger))) {
-        return this.sendFailureResponse(WarningMessage.UNAUTHENTICATED_USER, 401, logger)
+        return this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response, logger)
       }
-
-      const result = await this.distribute(request, response)
-      await this.combine(result)
+      await this.distribute(request, response).then(this.combine)
     } catch (err) {
-      // TODO(Alec): review bunyan logging
       logger.error({ error: err }, `Unknown error in handleDistributedRequest for ${this.endpoint}`)
-      this.sendFailureResponse(ErrorMessage.UNKNOWN_ERROR, 500, logger)
+      this.sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, response, logger)
     }
   }
 
@@ -83,10 +79,8 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     request: Request<{}, {}, R>,
     response: Response<OdisResponse<R>>
   ): Promise<Session<R>> {
-    // const session = this.buildSession(request, response, this)
     const session = new Session<R>(request, response, this)
 
-    // TODO(Alec): Factor out metering code
     const obs = new PerformanceObserver((list) => {
       const entry = list.getEntries()[0]
       session.logger.info(
@@ -96,11 +90,13 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     })
     obs.observe({ entryTypes: ['measure'], buffered: true })
 
+    // TODO(Alec): look into abort controller timeout
     const timeout = setTimeout(() => {
       session.timedOut = true
       session.controller.abort()
     }, this.timeoutMs)
 
+    // Forward request to signers
     await Promise.all(this.signers.map((signer) => this.fetchSignerResponse(signer, session)))
 
     clearTimeout(timeout)
@@ -109,13 +105,6 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     obs.disconnect()
 
     return session
-  }
-
-  protected headers(_request: Request<{}, {}, R>): HeaderInit | undefined {
-    return {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    }
   }
 
   protected async sendRequest(signerUrl: string, session: Session<R>): Promise<FetchResponse> {
@@ -129,39 +118,39 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     })
   }
 
-  protected sendSuccessResponse(res: SuccessResponse<R>, status: number, session: Session<R>) {
-    session.response.status(status).json(res)
-  }
-
-  protected sendFailureResponse(error: ErrorType, status: number, session: Session<R>) {
-    respondWithError(
-      session.response,
-      {
-        success: false,
-        version: VERSION,
-        error,
-      },
-      status,
-      session.logger
-    )
+  protected headers(_request: Request<{}, {}, R>): HeaderInit | undefined {
+    return {
+      // TODO(Alec)
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    }
   }
 
   protected abstract validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, R>
-
   protected abstract authenticate(request: Request<{}, {}, R>, logger: Logger): Promise<boolean>
-
-  protected abstract reqKeyHeaderCheck(request: Request<{}, {}, R>): boolean
-
+  protected abstract checkKeyVersionHeader(request: Request<{}, {}, R>): boolean
   protected abstract combine(session: Session<R>): Promise<void>
-
-  protected abstract handleResponseOK(
+  protected abstract receiveSuccess(
     data: string,
     status: number,
     url: string,
     session: Session<R>
   ): Promise<void>
+  protected abstract sendSuccess(
+    status: number,
+    response: Response<SuccessResponse<R>>,
+    logger: Logger,
+    ...args: any[]
+  ): void
+  protected abstract sendFailure(
+    error: ErrorType,
+    status: number,
+    response: Response<FailureResponse<R>>,
+    logger: Logger,
+    ...args: any[]
+  ): void
 
-  private async fetchSignerResponse(signer: SignerService, session: Session<R>) {
+  private async fetchSignerResponse(signer: Signer, session: Session<R>) {
     let signerResponse: FetchResponse
     try {
       signerResponse = await this.sendMeteredSignerRequest(signer, session)
@@ -174,7 +163,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
 
   private async handleSignerResponse(
     signerResponse: FetchResponse,
-    signer: SignerService,
+    signer: Signer,
     session: Session<R>
   ) {
     if (signerResponse.ok) {
@@ -184,18 +173,18 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
           { signer, res: data, status: signerResponse.status },
           'received ok response from signer'
         )
-        await this.handleResponseOK(data, signerResponse.status, signer.url, session)
+        await this.receiveSuccess(data, signerResponse.status, signer.url, session)
       } catch (err) {
         // TODO(Alec): Review this error handling
         session.logger.error(err)
       }
     }
 
-    return this.handleFailure(signer, signerResponse.status ?? 502, session)
+    return this.receiveFailure(signer, signerResponse.status ?? 502, session)
   }
 
   private async sendMeteredSignerRequest(
-    signer: SignerService,
+    signer: Signer,
     session: Session<R>
   ): Promise<FetchResponse> {
     const start = `Start ${signer.url}/${this.signerEndpoint}`
@@ -217,7 +206,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
       })
   }
 
-  private handleFailure(signer: SignerService, errorCode: number | undefined, session: Session<R>) {
+  private receiveFailure(signer: Signer, errorCode: number | undefined, session: Session<R>) {
     if (errorCode) {
       session.incrementErrorCodeCount(errorCode)
     }
@@ -235,7 +224,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     }
   }
 
-  private async handleSignerRequestFailure(err: any, signer: SignerService, session: Session<R>) {
+  private async handleSignerRequestFailure(err: any, signer: Signer, session: Session<R>) {
     let errorCode: number | undefined
     if (err instanceof Error && err.name === 'AbortError') {
       if (session.timedOut) {
@@ -251,6 +240,6 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     }
     session.logger.error(err)
 
-    this.handleFailure(signer, errorCode, session)
+    this.receiveFailure(signer, errorCode, session)
   }
 }

@@ -200,7 +200,9 @@ export type OdisResponse<R extends OdisRequest = OdisRequest> = R extends Domain
   ? PhoneNumberPrivacyResponse<R>
   : never
 
-export type SuccessResponse<R extends OdisRequest> = OdisResponse<R> & { success: true }
+export type SuccessResponse<R extends OdisRequest = OdisRequest> = OdisResponse<R> & {
+  success: true
+}
 
 export type FailureResponse<R extends OdisRequest = OdisRequest> = OdisResponse<R> & {
   success: false

@@ -24,7 +24,7 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
     }
   }
 
-  protected async handleResponseOK(
+  protected async receiveSuccess(
     data: string,
     status: number,
     url: string,
@@ -73,7 +73,7 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
 
   protected abstract logResponseDiscrepancies(session: Session<R>): void
 
-  protected reqKeyHeaderCheck(request: Request<{}, {}, R>): boolean {
+  protected checkKeyVersionHeader(request: Request<{}, {}, R>): boolean {
     const reqKeyVersion = request.headers[KEY_VERSION_HEADER]
     if (reqKeyVersion && Number(reqKeyVersion) !== this.keyVersion) {
       return false
@@ -87,7 +87,7 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
     if (majorityErrorCode === 403) {
       error = WarningMessage.EXCEEDED_QUOTA
     }
-    this.sendFailureResponse(error, majorityErrorCode ?? 500, session)
+    this.sendFailure(error, majorityErrorCode ?? 500, session.response, session.logger)
   }
 
   protected abstract parseSignature(

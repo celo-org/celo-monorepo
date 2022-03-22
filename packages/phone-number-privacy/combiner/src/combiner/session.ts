@@ -6,7 +6,7 @@ import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
 import { CombinerService, SignerResponse } from './combiner.service'
 
 export class Session<R extends OdisRequest> {
-  timedOut: boolean
+  public timedOut: boolean
   readonly logger: Logger
   readonly controller: AbortController
   readonly failedSigners: Set<string>
