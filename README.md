@@ -115,6 +115,7 @@ The repository has the following packages (sub projects):
 - [helm-charts](packages/helm-charts) - templatized deployments of entire environments to Kubernetes clusters
 - [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/celo-codebase/protocol))
 - [sdk](packages/sdk)
+- [contractkit](packages/sdk/contractkit) - library to help developers and validators interact with the protocol and its smart contracts ([docs](https://docs.celo.org/celo-sdk/contractkit))
 - [terraform-modules](packages/terraform-modules) - templatized deployments of entire VM-based testnets for Google Cloud Platform
 - [typescript](packages/typescript) - no README available (improve?)
 
