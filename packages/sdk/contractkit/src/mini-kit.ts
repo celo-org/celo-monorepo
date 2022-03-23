@@ -1,4 +1,4 @@
-import { Address, Connection, ReadOnlyWallet } from '@celo/connect'
+import { Address, CeloTx, Connection, ReadOnlyWallet } from '@celo/connect'
 import { LocalWallet } from '@celo/wallet-local'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
@@ -93,6 +93,13 @@ export class MiniContractKit {
     const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
     const gasPrice = rawGasPrice.multipliedBy(this.gasPriceSuggestionMultiplier).toFixed()
     await this.connection.setGasPriceForCurrency(currency, gasPrice)
+  }
+
+  async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
+    if (tx.feeCurrency && tx.gasPrice === '0') {
+      await this.updateGasPriceInConnectionLayer(tx.feeCurrency)
+    }
+    return this.connection.fillGasPrice(tx)
   }
 }
 
