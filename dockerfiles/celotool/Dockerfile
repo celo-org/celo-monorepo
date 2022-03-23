@@ -47,6 +47,7 @@ COPY packages/protocol packages/protocol/
 COPY packages/sdk/base packages/sdk/base/
 COPY packages/sdk/connect packages/sdk/connect/
 COPY packages/sdk/contractkit packages/sdk/contractkit/
+COPY packages/sdk/cryptographic-utils packages/sdk/cryptographic-utils/
 COPY packages/sdk/explorer packages/sdk/explorer/
 COPY packages/sdk/governance packages/sdk/governance/
 COPY packages/sdk/identity packages/sdk/identity/
