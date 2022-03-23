@@ -10,13 +10,17 @@ import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { Signature } from '@celo/utils/lib/signatureUtils'
 import { LocalWallet } from '@celo/wallet-local'
 import { BigNumber } from 'bignumber.js'
-import net from 'net'
 import Web3 from 'web3'
-import { HttpProviderOptions as Web3HttpProviderOptions } from 'web3-providers-http'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, CeloTokenContract } from './base'
 import { CeloTokens, EachCeloToken } from './celo-tokens'
 import { ValidWrappers, WrapperCache } from './contract-cache'
+import {
+  ensureCurrentProvider,
+  getWeb3ForKit,
+  HttpProviderOptions,
+  setupAPIKey,
+} from './setupForKits'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
 import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
@@ -31,8 +35,7 @@ import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
-export type HttpProviderOptions = Web3HttpProviderOptions
-export const API_KEY_HEADER_KEY = 'apiKey'
+export { API_KEY_HEADER_KEY, HttpProviderOptions } from './setupForKits'
 
 /**
  * Creates a new instance of `ContractKit` given a nodeUrl
@@ -41,14 +44,7 @@ export const API_KEY_HEADER_KEY = 'apiKey'
  * @optional options to pass to the Web3 HttpProvider constructor
  */
 export function newKit(url: string, wallet?: ReadOnlyWallet, options?: HttpProviderOptions) {
-  let web3: Web3
-  if (url.endsWith('.ipc')) {
-    web3 = new Web3(new Web3.providers.IpcProvider(url, net))
-  } else if (url.toLowerCase().startsWith('http')) {
-    web3 = new Web3(new Web3.providers.HttpProvider(url, options))
-  } else {
-    web3 = new Web3(url)
-  }
+  const web3: Web3 = getWeb3ForKit(url, options)
   return newKitFromWeb3(web3, wallet)
 }
 
@@ -59,12 +55,7 @@ export function newKit(url: string, wallet?: ReadOnlyWallet, options?: HttpProvi
  * @optional wallet to reuse or add a wallet different than the default (example ledger-wallet)
  */
 export function newKitWithApiKey(url: string, apiKey: string, wallet?: ReadOnlyWallet) {
-  const options: HttpProviderOptions = {}
-  options.headers = []
-  options.headers.push({
-    name: API_KEY_HEADER_KEY,
-    value: apiKey,
-  })
+  const options: HttpProviderOptions = setupAPIKey(apiKey)
   return newKit(url, wallet, options)
 }
 
@@ -73,9 +64,7 @@ export function newKitWithApiKey(url: string, apiKey: string, wallet?: ReadOnlyW
  * @param web3 Web3 instance
  */
 export function newKitFromWeb3(web3: Web3, wallet: ReadOnlyWallet = new LocalWallet()) {
-  if (!web3.currentProvider) {
-    throw new Error('Must have a valid Provider')
-  }
+  ensureCurrentProvider(web3)
   return new ContractKit(new Connection(web3, wallet))
 }
 export interface NetworkConfig {

@@ -1,3 +1,4 @@
+import { StableToken } from '@celo/base'
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { concurrentMap, sleep } from '@celo/base/lib/async'
 import { notEmpty, zip3 } from '@celo/base/lib/collections'
@@ -8,7 +9,6 @@ import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
-import { StableToken } from '..'
 import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import {
@@ -268,7 +268,6 @@ export class AttestationsWrapper extends BaseWrapperWithContracts<Attestations> 
    */
   async getAttestationFeeRequired(attestationsRequested: number) {
     const contract = await this.contracts.getStableToken(StableToken.cUSD)
-    // TODO confirm that contract.address === registry.addressFor(StableToken)
     const attestationFee = await this.contract.methods
       .getAttestationRequestFee(contract.address)
       .call()
@@ -537,8 +536,6 @@ export class AttestationsWrapper extends BaseWrapperWithContracts<Attestations> 
    * @param attestationsRequested The number of attestations to request
    */
   async request(identifier: string, attestationsRequested: number) {
-    // TODO ensure address given by contract.address === tokenAddress
-    // const tokenAddress = await this.registry.addressFor(CeloContract.StableToken)
     const contract = await this.contracts.getStableToken(StableToken.cUSD)
 
     return toTransactionObject(

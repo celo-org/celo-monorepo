@@ -1,27 +1,16 @@
 import { BigNumber } from 'bignumber.js'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, CeloTokenContract, ExchangeContract, StableTokenContract } from './base'
-import { WrapperCache } from './contract-cache'
+import { ContractCacheType } from './basic-contract-cache-type'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
-
-export enum StableToken {
-  cUSD = 'cUSD',
-  cEUR = 'cEUR',
-  cREAL = 'cREAL',
-}
-
-export enum Token {
-  CELO = 'CELO',
-}
-
-export type CeloTokenType = StableToken | Token
-
-type CeloTokenWrapper = GoldTokenWrapper | StableTokenWrapper
+export { StableToken, Token, CeloTokenType } from '@celo/base'
 
 export type EachCeloToken<T> = {
   [key in CeloTokenType]?: T
 }
+
+export type CeloTokenWrapper = GoldTokenWrapper | StableTokenWrapper
 
 export interface CeloTokenInfo {
   contract: CeloTokenContract
@@ -69,7 +58,7 @@ export const celoTokenInfos: {
  * A helper class to interact with all Celo tokens, ie CELO and stable tokens
  */
 export class CeloTokens {
-  constructor(readonly contracts: WrapperCache, readonly registry: AddressRegistry) {}
+  constructor(readonly contracts: ContractCacheType, readonly registry: AddressRegistry) {}
 
   /**
    * Gets an address's balance for each celo token.
