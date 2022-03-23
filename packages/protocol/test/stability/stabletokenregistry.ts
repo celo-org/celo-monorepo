@@ -35,9 +35,11 @@ contract('StableTokenRegistry', (accounts: string[]) => {
     })
 
     it('has the right list of fiat tickers after removing one', async () => {
+      await strc.addNewStableToken('cEUR', 'StableTokenEUR')
+      await strc.addNewStableToken('cBRL', 'StableTokenBRL')
       await strc.removeStableToken(fiatTicker, 0)
       const fiatTickers = await strc.getFiatTickers()
-      assert.deepEqual(fiatTickers, [])
+      assert.deepEqual(fiatTickers, ['cBRL', 'cEUR'])
     })
 
     it("can't be removed twice", async () => {
