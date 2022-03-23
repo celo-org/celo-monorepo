@@ -6,7 +6,7 @@ const STRC: StableTokenRegistryContract = artifacts.require('StableTokenRegistry
 contract('StableTokenRegistry', (accounts: string[]) => {
   let strc: StableTokenRegistryInstance
   const nonOwner: string = accounts[1]
-  const fiatTicker: string = 'USD'
+  const fiatTicker: string = 'cUSD'
   const stableTokenContractName = 'StableToken'
 
   beforeEach(async () => {
@@ -49,7 +49,7 @@ contract('StableTokenRegistry', (accounts: string[]) => {
       await assertRevert(strc.removeStableToken(fiatTicker, 1))
     })
 
-    it('removes from a big array', async () => {
+    it('removes from fiatTickers array', async () => {
       await strc.removeStableToken(fiatTicker, 0)
       const fiatTickers = await strc.getFiatTickers()
       assert.deepEqual(fiatTickers, [])
@@ -74,11 +74,11 @@ contract('StableTokenRegistry', (accounts: string[]) => {
     })
 
     it('has the right list of fiat tickers after addition', async () => {
-      const spendersBeforeAdditions = await strc.getFiatTickers()
-      assert.deepEqual(spendersBeforeAdditions, [])
+      const fiatTickersBefore = await strc.getFiatTickers()
+      assert.deepEqual(fiatTickersBefore, [])
       await strc.addNewStableToken(fiatTicker, stableTokenContractName)
       const fiatTickers = await strc.getFiatTickers()
-      assert.deepEqual(fiatTickers, [])
+      assert.deepEqual(fiatTickers, ['cUSD'])
     })
   })
 })
