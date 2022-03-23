@@ -1,10 +1,11 @@
+import { CeloTokenType, StableToken, Token } from '@celo/base'
 import { BigNumber } from 'bignumber.js'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, CeloTokenContract, ExchangeContract, StableTokenContract } from './base'
 import { ContractCacheType } from './basic-contract-cache-type'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
-export { StableToken, Token, CeloTokenType } from '@celo/base'
+export { CeloTokenType, StableToken, Token } from '@celo/base'
 
 export type EachCeloToken<T> = {
   [key in CeloTokenType]?: T
