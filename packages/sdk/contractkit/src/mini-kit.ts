@@ -20,7 +20,7 @@ import {
  * @optional options to pass to the Web3 HttpProvider constructor
  */
 export function newKit(url: string, wallet?: ReadOnlyWallet, options?: HttpProviderOptions) {
-  let web3: Web3 = getWeb3ForKit(url, options)
+  const web3: Web3 = getWeb3ForKit(url, options)
   return newKitFromWeb3(web3, wallet)
 }
 
