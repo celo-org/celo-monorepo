@@ -13,6 +13,11 @@ ContractKit supports the following functionality:
 
 ## User Guide
 
+### TIP
+
+You might not need the full ContractKit, Consider using `@celo/connect` which powers much of ContractKit such as building and sending Transactions, signing, etc, but does not give access to any celo Contract Wrappers. Or if a subset of Wrappers, setting the feeCurrency and account info is all your dapp needs consider replacing your imports of Contractkit with `@celo/contractkit/lib/mini-kit`
+
+
 ### Getting Started
 
 To install:
@@ -23,7 +28,7 @@ npm install @celo/contractkit
 yarn add @celo/contractkit
 ```
 
-You will need Node.js v12.x. 
+You will need Node.js v12.x.
 
 To start working with contractkit you need a `kit` instance:
 
@@ -50,15 +55,15 @@ import { newKit, CeloContract } from '@celo/contractkit'
 async function getKit(myAddress: string, privateKey: string) {
   const kit = newKit('https://alfajores-forno.celo-testnet.org')
 
-  // default from account 
+  // default from account
   kit.defaultAccount = myAddress
-  
+
   // add the account private key for tx signing when connecting to a remote node
   kit.connection.addAccount(privateKey)
-  
+
   // paid gas in celo dollars
   await kit.setFeeCurrency(CeloContract.StableToken)
-  
+
   return kit
 }
 ```
