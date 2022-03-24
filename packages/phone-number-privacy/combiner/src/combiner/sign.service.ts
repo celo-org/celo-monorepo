@@ -7,6 +7,7 @@ import {
   SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import Logger from 'bunyan'
 import { Request } from 'express'
 import { HeaderInit, Response as FetchResponse } from 'node-fetch'
 import { CombinerService } from './combiner.service'
@@ -74,25 +75,20 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
     }
   }
 
-  protected abstract validateSignerResponse(
-    data: string,
-    url: string,
-    session: Session<R>
-  ): SignatureResponse<R>
-  protected abstract logResponseDiscrepancies(session: Session<R>): void
-
-  protected checkRequestKeyVersion(request: Request<{}, {}, R>): boolean {
-    const reqKeyVersion = request.headers[KEY_VERSION_HEADER]
-    if (reqKeyVersion && Number(reqKeyVersion) !== this.keyVersion) {
+  // TODO(Alec): should forward user key version if possible
+  protected checkRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): boolean {
+    const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
+    logger.info({ keyVersionHeader }, 'User requested with key version')
+    if (keyVersionHeader && Number(keyVersionHeader) !== this.keyVersion) {
       return false
     }
     return true
   }
 
   protected checkResponseKeyVersion(response: FetchResponse, session: Session<R>): boolean {
-    const responseKeyVersion = response.headers.get(KEY_VERSION_HEADER)
-    session.logger.info({ responseKeyVersion }, 'Signer responded with key version')
-    if (responseKeyVersion && Number(responseKeyVersion) !== this.keyVersion) {
+    const keyVersionHeader = response.headers.get(KEY_VERSION_HEADER)
+    session.logger.info({ keyVersionHeader }, 'Signer responded with key version')
+    if (keyVersionHeader && Number(keyVersionHeader) !== this.keyVersion) {
       return false
     }
     return true
@@ -107,11 +103,16 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
     this.sendFailure(error, majorityErrorCode ?? 500, session.response, session.logger)
   }
 
+  protected abstract validateSignerResponse(
+    data: string,
+    url: string,
+    session: Session<R>
+  ): SignatureResponse<R>
+  protected abstract logResponseDiscrepancies(session: Session<R>): void
   protected abstract parseSignature(
     res: SignatureResponse<R>,
     signerUrl: string,
     session: Session<R>
   ): string | undefined
-
   protected abstract parseBlindedMessage(req: R): string
 }

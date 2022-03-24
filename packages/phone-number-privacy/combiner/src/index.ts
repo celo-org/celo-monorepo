@@ -59,8 +59,6 @@ async function meterResponse(
   obs.disconnect()
 }
 
-// TODO(Alec): brainstorm ways to cleanup this code
-
 // EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getContactMatches" -H "Authorization: <SIGNED_BODY>" -d '{"userPhoneNumber": "+99999999999", "contactPhoneNumbers": ["+5555555555", "+3333333333"], "account": "0x117ea45d497ab022b85494ba3ab6f52969bf6812"}' -H 'Content-Type: application/json'
 export const getContactMatches = functions
   .region('us-central1', 'europe-west3')
@@ -121,12 +119,3 @@ export const domainDisable = functions
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
     return meterResponse(domainDisableHandler.handle, req, res, Endpoint.DISABLE_DOMAIN)
   })
-
-// TODO: Fix status cloud function. It currenly just returns an empty object.
-// export const status = functions
-//   .region('us-central1', 'europe-west3')
-//   .https.onRequest(async (_req: functions.Request, res: functions.Response) => {
-//     await Promise.resolve(res.status(200).json({
-//       version: VERSION,
-//     }))
-//   })

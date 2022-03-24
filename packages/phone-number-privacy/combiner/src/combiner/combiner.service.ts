@@ -62,7 +62,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
       if (!this.validate(request)) {
         return this.sendFailure(WarningMessage.INVALID_INPUT, 400, response, logger)
       }
-      if (!this.checkKeyVersionHeader(request)) {
+      if (!this.checkRequestKeyVersion(request, logger)) {
         return this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response, logger)
       }
       if (!(await this.authenticate(request, logger))) {
@@ -70,7 +70,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
       }
       await this.distribute(request, response).then(this.combine)
     } catch (err) {
-      logger.error({ error: err }, `Unknown error in handleDistributedRequest for ${this.endpoint}`)
+      logger.error({ error: err }, `Unknown error in handler for ${this.endpoint}`)
       this.sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, response, logger)
     }
   }
@@ -79,6 +79,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     request: Request<{}, {}, R>,
     response: Response<OdisResponse<R>>
   ): Promise<Session<R>> {
+    // TODO: Consider injecting this in request. Clarify the intent of this "Session"
     const session = new Session<R>(request, response, this)
 
     const obs = new PerformanceObserver((list) => {
@@ -96,8 +97,9 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
       session.controller.abort()
     }, this.timeoutMs)
 
+    // TODO(Alec): Investigate race condition
     // Forward request to signers
-    await Promise.all(this.signers.map((signer) => this.fetchSignerResponse(signer, session)))
+    await Promise.all(this.signers.map((signer) => this.forwardToSigner(signer, session)))
 
     clearTimeout(timeout)
 
@@ -105,17 +107,6 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     obs.disconnect()
 
     return session
-  }
-
-  protected async sendRequest(signerUrl: string, session: Session<R>): Promise<FetchResponse> {
-    session.logger.debug({ signerUrl }, `Sending signer request`)
-    const url = signerUrl + this.signerEndpoint
-    return fetch(url, {
-      method: 'POST',
-      headers: this.headers(session.request),
-      body: JSON.stringify(session.request.body),
-      signal: session.controller.signal,
-    })
   }
 
   protected headers(_request: Request<{}, {}, R>): HeaderInit | undefined {
@@ -127,8 +118,8 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
   }
 
   protected abstract validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, R>
+  protected abstract checkRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): boolean
   protected abstract authenticate(request: Request<{}, {}, R>, logger: Logger): Promise<boolean>
-  protected abstract checkKeyVersionHeader(request: Request<{}, {}, R>): boolean
   protected abstract combine(session: Session<R>): Promise<void>
   protected abstract receiveSuccess(
     signerResponse: FetchResponse,
@@ -143,7 +134,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     ...args: unknown[]
   ): void
 
-  private async fetchSignerResponse(signer: Signer, session: Session<R>) {
+  private async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
     let signerResponse: FetchResponse
     try {
       signerResponse = await this.sendMeteredSignerRequest(signer, session)
@@ -152,6 +143,40 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     }
 
     return this.handleSignerResponse(signerResponse, signer, session)
+  }
+
+  private async sendMeteredSignerRequest(
+    signer: Signer,
+    session: Session<R>
+  ): Promise<FetchResponse> {
+    // TODO(Alec): Factor out this metering code
+    const start = `Start ${signer.url}/${this.signerEndpoint}`
+    const end = `End ${signer.url}/${this.signerEndpoint}`
+    performance.mark(start)
+
+    return this.sendRequest(signer.url, session)
+      .catch((err) => {
+        session.logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
+        if (signer.fallbackUrl) {
+          session.logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
+          return this.sendRequest(signer.fallbackUrl, session)
+        }
+        throw err
+      })
+      .finally(() => {
+        performance.mark(end)
+        performance.measure(signer.url, start, end)
+      })
+  }
+  private async sendRequest(signerUrl: string, session: Session<R>): Promise<FetchResponse> {
+    session.logger.debug({ signerUrl }, `Sending signer request`)
+    const url = signerUrl + this.signerEndpoint
+    return fetch(url, {
+      method: 'POST',
+      headers: this.headers(session.request),
+      body: JSON.stringify(session.request.body),
+      signal: session.controller.signal,
+    })
   }
 
   private async handleSignerResponse(
@@ -172,42 +197,17 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     return this.receiveFailure(signer, signerResponse.status ?? 502, session)
   }
 
-  private async sendMeteredSignerRequest(
-    signer: Signer,
-    session: Session<R>
-  ): Promise<FetchResponse> {
-    const start = `Start ${signer.url}/${this.signerEndpoint}`
-    const end = `End ${signer.url}/${this.signerEndpoint}`
-    performance.mark(start)
-
-    return this.sendRequest(signer.url, session)
-      .catch((err) => {
-        session.logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
-        if (signer.fallbackUrl) {
-          session.logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
-          return this.sendRequest(signer.fallbackUrl, session)
-        }
-        throw err
-      })
-      .finally(() => {
-        performance.mark(end)
-        performance.measure(signer.url, start, end)
-      })
-  }
-
   private receiveFailure(signer: Signer, errorCode: number | undefined, session: Session<R>) {
-    if (errorCode) {
-      session.incrementErrorCodeCount(errorCode)
-    }
-    // Tracking failed request count via signer url prevents
-    // double counting the same failed request by mistake
-    session.failedSigners.add(signer.url)
-
-    const shouldFailFast = this.signers.length - session.failedSigners.size < this.threshold
     session.logger.info(
       `Recieved failure from ${session.failedSigners.size}/${this.signers.length} signers`
     )
-    if (shouldFailFast) {
+    // Tracking failed request count via signer url prevents
+    // double counting the same failed request by mistake
+    session.failedSigners.add(signer.url)
+    if (errorCode) {
+      session.incrementErrorCodeCount(errorCode)
+    }
+    if (this.signers.length - session.failedSigners.size < this.threshold) {
       session.logger.info('Not possible to reach a threshold of signer responses. Failing fast')
       session.controller.abort()
     }

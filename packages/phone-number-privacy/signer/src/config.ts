@@ -22,7 +22,7 @@ export enum SupportedKeystore {
   MOCK_SECRET_MANAGER = 'MockSecretManager',
 }
 
-interface Config {
+export interface Config {
   server: {
     port: string | number
     sslKeyPath?: string

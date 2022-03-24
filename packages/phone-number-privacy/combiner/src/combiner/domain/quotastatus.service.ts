@@ -19,6 +19,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
+import { Response as FetchResponse } from 'node-fetch'
 import { VERSION } from '../../config'
 import { CombinerService } from '../combiner.service'
 import { Session } from '../session'
@@ -32,7 +33,7 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
   ): request is Request<{}, {}, DomainQuotaStatusRequest> {
     return domainQuotaStatusRequestSchema(DomainSchema).is(request.body)
   }
-  protected checkKeyVersionHeader(_request: Request<{}, {}, DomainQuotaStatusRequest>): boolean {
+  protected checkRequestKeyVersion(_request: Request<{}, {}, DomainQuotaStatusRequest>): boolean {
     return true // does not require key version header
   }
   protected authenticate(request: Request<{}, {}, DomainQuotaStatusRequest>): Promise<boolean> {
@@ -40,11 +41,12 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
   }
 
   protected async receiveSuccess(
-    data: string,
-    status: number,
+    signerResponse: FetchResponse,
     url: string,
     session: Session<DomainQuotaStatusRequest>
   ): Promise<void> {
+    const status: number = signerResponse.status
+    const data: string = await signerResponse.text()
     const res: unknown = JSON.parse(data)
     if (!domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
       const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
