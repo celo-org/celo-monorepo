@@ -2,4 +2,5 @@
 
 # @celo/transactions-uri
 
-functions for generating / reading / building URIs and QR codes for Building Celo Transactions
+
+Makes it easy to generate Celo transaction URIs and QR codes.
