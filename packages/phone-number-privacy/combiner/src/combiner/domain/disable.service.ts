@@ -16,28 +16,24 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { OdisConfig, VERSION } from '../../config'
+import { VERSION } from '../../config'
 import { CombinerService } from '../combiner.service'
 import { Session } from '../session'
 
 export class DomainDisableService extends CombinerService<DisableDomainRequest> {
-  readonly endpoint: CombinerEndpoint
-  readonly signerEndpoint: SignerEndpoint
-
-  public constructor(config: OdisConfig) {
-    super(config)
-    this.endpoint = CombinerEndpoint.DISABLE_DOMAIN
-    this.signerEndpoint = getSignerEndpoint(this.endpoint)
-  }
+  readonly endpoint: CombinerEndpoint = CombinerEndpoint.DISABLE_DOMAIN
+  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(CombinerEndpoint.DISABLE_DOMAIN)
 
   protected validate(
     request: Request<{}, {}, unknown>
   ): request is Request<{}, {}, DisableDomainRequest> {
     return disableDomainRequestSchema(DomainSchema).is(request.body)
   }
+
   protected checkKeyVersionHeader(_request: Request<{}, {}, DisableDomainRequest>): boolean {
     return true // does not require request key header
   }
+
   protected authenticate(request: Request<{}, {}, DisableDomainRequest<Domain>>): Promise<boolean> {
     return Promise.resolve(verifyDisableDomainRequestAuthenticity(request.body))
   }

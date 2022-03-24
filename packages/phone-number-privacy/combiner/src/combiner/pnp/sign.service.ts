@@ -19,19 +19,14 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { HeaderInit } from 'node-fetch'
-import { OdisConfig, VERSION } from '../../config'
+import { VERSION } from '../../config'
 import { getContractKit } from '../../web3/contracts'
 import { Session } from '../session'
 import { SignService } from '../sign.service'
-export class PnpSignService extends SignService<SignMessageRequest> {
-  readonly endpoint: CombinerEndpoint
-  readonly signerEndpoint: SignerEndpoint
 
-  public constructor(config: OdisConfig) {
-    super(config)
-    this.endpoint = CombinerEndpoint.SIGN_MESSAGE
-    this.signerEndpoint = getSignerEndpoint(this.endpoint)
-  }
+export class PnpSignService extends SignService<SignMessageRequest> {
+  readonly endpoint: CombinerEndpoint = CombinerEndpoint.SIGN_MESSAGE
+  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(CombinerEndpoint.SIGN_MESSAGE)
 
   protected validate(
     request: Request<{}, {}, unknown>
@@ -92,7 +87,7 @@ export class PnpSignService extends SignService<SignMessageRequest> {
   protected headers(request: Request<{}, {}, SignMessageRequest>): HeaderInit | undefined {
     return {
       ...super.headers(request),
-      Authorization: request.headers.authorization!,
+      ...(request.headers.authorization ? { Authorization: request.headers.authorization } : {}),
     }
   }
 

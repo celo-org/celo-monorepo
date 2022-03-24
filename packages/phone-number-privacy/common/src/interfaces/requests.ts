@@ -417,7 +417,7 @@ function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
  * Verifies the authentication (e.g. client signature) over a domain signature request.
  * If the domain is unauthenticated, this function returns false.
  *
- * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
+ * @remarks As specified in CIP-40, the signed message is the full request interpreted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
  * to the undefined value for type EIP712Optional<string>).
  */
@@ -431,7 +431,7 @@ export function verifyDomainRestrictedSignatureRequestAuthenticity(
  * Verifies the authentication (e.g. client signature) over a domain status request.
  * If the domain is unauthenticated, this function returns false.
  *
- * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
+ * @remarks As specified in CIP-40, the signed message is the full request interpreted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
  * to the undefined value for type EIP712Optional<string>).
  */
@@ -445,7 +445,7 @@ export function verifyDomainQuotaStatusRequestAuthenticity(
  * Verifies the authentication (e.g. client signature) over a disable domain request.
  * If the domain is unauthenticated, this function returns false.
  *
- * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
+ * @remarks As specified in CIP-40, the signed message is the full request interpreted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
  * to the undefined value for type EIP712Optional<string>).
  */

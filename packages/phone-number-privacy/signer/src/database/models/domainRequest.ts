@@ -6,7 +6,7 @@ export enum DOMAIN_REQUESTS_COLUMNS {
   timestamp = 'timestamp',
   blindedMessage = 'blinded_message',
 }
-export class DomainSigRequest {
+export class DomainSigRequestRecord {
   [DOMAIN_REQUESTS_COLUMNS.domainHash]: string;
   [DOMAIN_REQUESTS_COLUMNS.timestamp]: Date;
   [DOMAIN_REQUESTS_COLUMNS.blindedMessage]: string

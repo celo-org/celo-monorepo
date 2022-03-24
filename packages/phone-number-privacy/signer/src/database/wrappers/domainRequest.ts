@@ -4,19 +4,19 @@ import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import {
-  DomainSigRequest,
+  DomainSigRequestRecord,
   DOMAIN_REQUESTS_COLUMNS,
   DOMAIN_REQUESTS_TABLE,
 } from '../models/domainRequest'
 
 function domainRequests() {
-  return getDatabase()<DomainSigRequest>(DOMAIN_REQUESTS_TABLE)
+  return getDatabase()<DomainSigRequestRecord>(DOMAIN_REQUESTS_TABLE)
 }
 
 export async function getDomainRequestExists(
   domain: Domain,
   blindedMessage: string,
-  trx: Transaction<DomainSigRequest>,
+  trx: Transaction<DomainSigRequestRecord>,
   logger: Logger
 ): Promise<boolean> {
   logger.debug({ domain, blindedMessage }, 'Checking if domain request exists')
@@ -46,7 +46,7 @@ export async function getDomainRequestExists(
 export async function storeDomainRequest(
   domain: Domain,
   blindedMessage: string,
-  trx: Transaction<DomainSigRequest>,
+  trx: Transaction<DomainSigRequestRecord>,
   logger: Logger
 ) {
   const storeRequestMeter = Histograms.dbOpsInstrumentation
@@ -56,7 +56,7 @@ export async function storeDomainRequest(
   try {
     await domainRequests()
       .transacting(trx)
-      .insert(new DomainSigRequest(domain, blindedMessage))
+      .insert(new DomainSigRequestRecord(domain, blindedMessage))
       .timeout(DB_TIMEOUT)
     storeRequestMeter()
     return true
