@@ -33,16 +33,16 @@ You will need Node.js v12.x.
 To start working with contractkit you need a `kit` instance:
 
 ```ts
-import { newKit } from '@celo/contractkit'
+import { newKit } from '@celo/contractkit' // or import { newKit } from '@celo/contractkit/lib/mini-kit'
 
 // Remotely connect to the Alfajores testnet
 const kit = newKit('https://alfajores-forno.celo-testnet.org')
 ```
 
-To access web3:
+To access balance:
 
 ```ts
-await kit.web3.eth.getBalance(someAddress)
+await kit.
 ```
 
 ### Setting Default Tx Options
@@ -50,7 +50,7 @@ await kit.web3.eth.getBalance(someAddress)
 `kit` allows you to set default transaction options:
 
 ```ts
-import { newKit, CeloContract } from '@celo/contractkit'
+import { newKit, CeloContract } from '@celo/contractkit/lib/mini-kit'
 
 async function getKit(myAddress: string, privateKey: string) {
   const kit = newKit('https://alfajores-forno.celo-testnet.org')
@@ -115,19 +115,60 @@ const receipt = await tx.waitReceipt()
 
 ### Interacting with Other Contracts
 
-Apart from GoldToken and StableToken, there are many core contracts.
+There are many core contracts.
 
-For the moment, we have contract wrappers for:
+- AccountsWrapper
+- AttestationsWrapper
+- BlockchainParametersWrapper
+- DoubleSigningSlasherWrapper
+- DowntimeSlasherWrapper
+- ElectionWrapper
+- EpochRewardsWrapper
+- Erc20Wrapper
+- EscrowWrapper
+- ExchangeWrapper
+- FreezerWrapper
+- GasPriceMinimumWrapper
+- GoldTokenWrapper
+- GovernanceWrapper
+- GrandaMentoWrapper
+- LockedGoldWrapper
+- MetaTransactionWalletWrapper
+- MetaTransactionWalletDeployerWrapper
+- MultiSigWrapper
+- ReserveWrapper
+- SortedOraclesWrapper
+- StableTokenWrapper
+- ValidatorsWrapper
 
-- Accounts
-- Exchange (Uniswap kind exchange between Gold and Stable tokens)
-- Validators
-- LockedGold
-- GoldToken
-- StableToken
-- Attestations
+#### Thru Kit
 
-In the following weeks will add wrapper for all other contracts
+When using the Kit you can access Contracts like
+
+` kit.contracts.get{ContractName}`
+
+E.G. ` kit.contracts.getAccounts()`,  ` kit.contracts.getValidators()` `
+
+
+#### Stand Alone
+
+You can also Initialize contracts directly They Require a `Connection`
+
+```typescript
+
+// Minikit only gives access to a Limited Set of Contracts by default
+import {newKit} from "@celo/contractkit/lib/mini-kit"
+import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
+// Alternatively import { Connection } from '@celo/connect'
+// const connection = new Connection(web3)
+
+
+const miniKit = newKit("https://alfajores-forno.celo-testnet.org/")
+
+const multisig = new MultiSigWrapper(miniKit.connection)
+
+```
+
 
 ### Accessing web3 contract wrappers
 
