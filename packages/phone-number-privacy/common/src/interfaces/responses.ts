@@ -34,6 +34,7 @@ export interface SignMessageResponseFailure {
 }
 
 export type SignMessageResponse = SignMessageResponseSuccess | SignMessageResponseFailure
+
 export interface GetQuotaResponseSuccess {
   success: true
   version: string

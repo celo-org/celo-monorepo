@@ -15,20 +15,14 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { OdisConfig, VERSION } from '../../config'
+import { VERSION } from '../../config'
 import { Session } from '../session'
 import { SignService } from '../sign.service'
 import { findThresholdDomainState } from './quotastatus.service'
 
 export class DomainSignService extends SignService<DomainRestrictedSignatureRequest> {
-  readonly endpoint: CombinerEndpoint
-  readonly signerEndpoint: SignerEndpoint
-
-  public constructor(config: OdisConfig) {
-    super(config)
-    this.endpoint = CombinerEndpoint.DOMAIN_SIGN
-    this.signerEndpoint = getSignerEndpoint(this.endpoint)
-  }
+  readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_SIGN
+  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(CombinerEndpoint.DOMAIN_SIGN)
 
   protected validate(
     request: Request<{}, {}, unknown>
@@ -39,6 +33,9 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
   protected authenticate(
     request: Request<{}, {}, DomainRestrictedSignatureRequest>
   ): Promise<boolean> {
+    // Note that signing requests may include a nonce for replay protection that will be checked by
+    // the signer, but is not checked here. As a result, requests that pass the authentication check
+    // here may still fail when sent to the signer.
     return Promise.resolve(verifyDomainRestrictedSignatureRequestAuthenticity(request.body))
   }
 

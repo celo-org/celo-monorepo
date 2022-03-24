@@ -66,7 +66,8 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
         // Close outstanding requests
         session.controller.abort()
       } catch {
-        // Already logged, continue to collect signatures
+        // One or more signatures failed verification and were discarded.
+        // Error has already been logged, continue to collect signatures.
       }
     }
   }

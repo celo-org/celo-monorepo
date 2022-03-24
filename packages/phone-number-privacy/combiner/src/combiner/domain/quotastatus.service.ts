@@ -19,19 +19,13 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { OdisConfig, VERSION } from '../../config'
+import { VERSION } from '../../config'
 import { CombinerService } from '../combiner.service'
 import { Session } from '../session'
 
 export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusRequest> {
-  readonly endpoint: CombinerEndpoint
-  readonly signerEndpoint: SignerEndpoint
-
-  public constructor(config: OdisConfig) {
-    super(config)
-    this.endpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
-    this.signerEndpoint = getSignerEndpoint(this.endpoint)
-  }
+  readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
+  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(CombinerEndpoint.DOMAIN_QUOTA_STATUS)
 
   protected validate(
     request: Request<{}, {}, unknown>
@@ -126,6 +120,7 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
 export function findThresholdDomainState<
   R extends DomainRestrictedSignatureRequest | DomainQuotaStatusRequest
 >(session: Session<R>): DomainState {
+  // Get the domain status from the responses, filtering out responses that don't have the status.
   const domainStates = session.responses
     .map((signerResponse) => ('status' in signerResponse.res ? signerResponse.res.status : null))
     .filter((state) => state ?? false) as DomainState[]
@@ -134,6 +129,7 @@ export function findThresholdDomainState<
     throw new Error('Insufficient number of signer responses')
   }
 
+  // Check whether the domain is disabled, either by all signers or by some.
   const domainStatesEnabled = domainStates.filter((ds) => !ds.disabled)
   const numDisabled = domainStates.length - domainStatesEnabled.length
 
@@ -149,6 +145,7 @@ export function findThresholdDomainState<
     throw new Error('Insufficient number of signer responses. Domain may be disabled')
   }
 
+  // Set n to last signer index in a quorum of signers are sorted from least to most restrictive.
   const n = threshold - 1
 
   const domainStatesAscendingByCounter = domainStatesEnabled.sort((a, b) => a.counter - b.counter)

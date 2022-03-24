@@ -6,7 +6,6 @@ import {
   OdisRequest,
   OdisResponse,
   SignerEndpoint,
-  SuccessResponse,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -28,6 +27,7 @@ export interface Signer {
   url: string
   fallbackUrl?: string
 }
+
 export interface ICombinerService<R extends OdisRequest> {
   handle(request: Request<{}, {}, R>, response: Response<OdisResponse<R>>): Promise<void>
 }
@@ -136,18 +136,12 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     url: string,
     session: Session<R>
   ): Promise<void>
-  protected abstract sendSuccess(
-    status: number,
-    response: Response<SuccessResponse<R>>,
-    logger: Logger,
-    ...args: any[]
-  ): void
   protected abstract sendFailure(
     error: ErrorType,
     status: number,
     response: Response<FailureResponse<R>>,
     logger: Logger,
-    ...args: any[]
+    ...args: unknown[]
   ): void
 
   private async fetchSignerResponse(signer: Signer, session: Session<R>) {
@@ -175,7 +169,8 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
         )
         await this.receiveSuccess(data, signerResponse.status, signer.url, session)
       } catch (err) {
-        // TODO(Alec): Review this error handling
+        // TODO(Alec): Review this error handling. Ensure this request gets marked as failed so the
+        // fail-fast logic gets triggered as intended.
         session.logger.error(err)
       }
     }
