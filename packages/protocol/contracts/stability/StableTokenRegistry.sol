@@ -37,7 +37,7 @@ contract StableTokenRegistry is Initializable, Ownable {
     );
     _transferOwnership(msg.sender);
     for (uint256 i = 0; i < existingFiatTickers.length; i++) {
-      addNewStableToken(fiatTickers[i], existingFiatTickers[i]);
+      addNewStableToken(existingFiatTickers[i], existingStableTokenContractNames[i]);
     }
   }
 
@@ -92,13 +92,13 @@ contract StableTokenRegistry is Initializable, Ownable {
     public
     onlyOwner
   {
-    registry.getAddressForOrDie(keccak256(abi.encodePacked(stableTokenContractName)));
+    // registry.getAddressForOrDie(keccak256(abi.encodePacked(stableTokenContractName)));
     require(bytes(fiatTicker).length != 0, "fiatTicker cant be an empty string");
     require(
       bytes(stableTokenContractName).length != 0,
       "stableTokenContractName cant be an empty string"
     );
-    require(bytes(stableTokens[fiatTicker]).length != 0, "This registry already exists");
+    // require(bytes(stableTokens[fiatTicker]).length != 0, "This registry already exists");
     stableTokens[fiatTicker] = stableTokenContractName;
     fiatTickers.push(fiatTicker);
   }
