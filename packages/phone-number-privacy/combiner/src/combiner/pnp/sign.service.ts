@@ -52,6 +52,23 @@ export class PnpSignService extends SignService<SignMessageRequest> {
     return authenticateUser(request, getContractKit(), logger)
   }
 
+  protected validateSignerResponse(
+    data: string,
+    _url: string,
+    _session: Session<SignMessageRequest>
+  ): SignMessageResponse {
+    // TODO(Alec)(Next): add io-ts types for pnp
+    const res: unknown = JSON.parse(data)
+    // if (!domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
+    //   // TODO(Alec): add error type for this
+    //   const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
+    //   session.logger.error({ data, signer: url }, msg)
+    //   throw new Error(msg)
+    // }
+    // if (!signerResponse.signature)
+    return res as SignMessageResponse
+  }
+
   protected async combine(session: Session<SignMessageRequest>): Promise<void> {
     this.logResponseDiscrepancies(session)
 

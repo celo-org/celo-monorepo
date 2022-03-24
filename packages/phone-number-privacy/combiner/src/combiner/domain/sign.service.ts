@@ -4,12 +4,14 @@ import {
   domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseFailure,
+  domainRestrictedSignatureResponseSchema,
   DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
   DomainState,
   ErrorType,
   getSignerEndpoint,
   send,
+  SequentialDelayDomainStateSchema,
   SignerEndpoint,
   verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
@@ -106,6 +108,21 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
       status,
       logger
     )
+  }
+
+  protected validateSignerResponse(
+    data: string,
+    url: string,
+    session: Session<DomainRestrictedSignatureRequest>
+  ): DomainRestrictedSignatureResponse {
+    const res: unknown = JSON.parse(data)
+    if (!domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
+      // TODO(Alec): add error type for this
+      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
+      session.logger.error({ data, signer: url }, msg)
+      throw new Error(msg)
+    }
+    return res
   }
 
   protected parseSignature(

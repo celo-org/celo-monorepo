@@ -131,8 +131,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
   protected abstract checkKeyVersionHeader(request: Request<{}, {}, R>): boolean
   protected abstract combine(session: Session<R>): Promise<void>
   protected abstract receiveSuccess(
-    data: string,
-    status: number,
+    signerResponse: FetchResponse,
     url: string,
     session: Session<R>
   ): Promise<void>
@@ -168,12 +167,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
   ) {
     if (signerResponse.ok) {
       try {
-        const data = await signerResponse.text()
-        session.logger.info(
-          { signer, res: data, status: signerResponse.status },
-          'received ok response from signer'
-        )
-        await this.receiveSuccess(data, signerResponse.status, signer.url, session)
+        await this.receiveSuccess(signerResponse, signer.url, session)
       } catch (err) {
         // TODO(Alec): Review this error handling
         session.logger.error(err)

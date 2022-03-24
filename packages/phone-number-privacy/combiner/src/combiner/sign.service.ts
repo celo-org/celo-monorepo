@@ -8,7 +8,7 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
-import { HeaderInit } from 'node-fetch'
+import { HeaderInit, Response as FetchResponse } from 'node-fetch'
 import { CombinerService } from './combiner.service'
 import { Session } from './session'
 
@@ -25,18 +25,20 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
   }
 
   protected async receiveSuccess(
-    data: string,
-    status: number,
+    signerResponse: FetchResponse,
     url: string,
     session: Session<R>
   ): Promise<void> {
-    const res = JSON.parse(data)
-
-    const resKeyVersion: number = Number(res.header(KEY_VERSION_HEADER))
-    session.logger.info({ resKeyVersion }, 'Signer responded with key version')
-    if (resKeyVersion !== this.keyVersion) {
+    if (!this.checkResponseKeyVersion(signerResponse, session)) {
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
+
+    const status: number = signerResponse.status
+    const data: string = await signerResponse.text()
+    session.logger.info({ url, res: data, status }, 'received OK response from signer')
+
+    // TODO(Alec): Move this up one level
+    const res = this.validateSignerResponse(data, url, session)
 
     const signature = this.parseSignature(res, url, session)
     if (!signature) {
@@ -71,11 +73,25 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
     }
   }
 
+  protected abstract validateSignerResponse(
+    data: string,
+    url: string,
+    session: Session<R>
+  ): SignatureResponse<R>
   protected abstract logResponseDiscrepancies(session: Session<R>): void
 
-  protected checkKeyVersionHeader(request: Request<{}, {}, R>): boolean {
+  protected checkRequestKeyVersion(request: Request<{}, {}, R>): boolean {
     const reqKeyVersion = request.headers[KEY_VERSION_HEADER]
     if (reqKeyVersion && Number(reqKeyVersion) !== this.keyVersion) {
+      return false
+    }
+    return true
+  }
+
+  protected checkResponseKeyVersion(response: FetchResponse, session: Session<R>): boolean {
+    const responseKeyVersion = response.headers.get(KEY_VERSION_HEADER)
+    session.logger.info({ responseKeyVersion }, 'Signer responded with key version')
+    if (responseKeyVersion && Number(responseKeyVersion) !== this.keyVersion) {
       return false
     }
     return true
