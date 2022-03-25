@@ -86,14 +86,14 @@ export class PnpSign extends Signer<SignMessageRequest> {
     status: number,
     response: Response<SignMessageResponseSuccess>,
     logger: Logger,
-    combinedSignature: string
+    signature: string
   ) {
     send(
       response,
       {
         success: true,
         version: getVersion(),
-        signature: combinedSignature,
+        signature,
       },
       status,
       logger

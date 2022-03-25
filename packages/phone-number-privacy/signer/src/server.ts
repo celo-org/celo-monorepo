@@ -18,8 +18,6 @@ require('events').EventEmitter.defaultMaxListeners = 15
 export function createServer() {
   const logger = rootLogger()
 
-  // const domainService = new DomainService(new DomainAuthService(), new DomainQuotaService())
-
   logger.info('Creating express server')
   const app = express()
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware)

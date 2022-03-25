@@ -26,7 +26,7 @@ import { SignService } from '../sign.service'
 
 export class PnpSignService extends SignService<SignMessageRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.SIGN_MESSAGE
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(CombinerEndpoint.SIGN_MESSAGE)
+  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
 
   protected validate(
     request: Request<{}, {}, unknown>

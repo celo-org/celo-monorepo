@@ -24,7 +24,7 @@ import { findThresholdDomainState } from './quotastatus.service'
 
 export class DomainSignService extends SignService<DomainRestrictedSignatureRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_SIGN
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(CombinerEndpoint.DOMAIN_SIGN)
+  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
 
   protected validate(
     request: Request<{}, {}, unknown>

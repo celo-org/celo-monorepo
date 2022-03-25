@@ -23,7 +23,7 @@ import { Session } from '../session'
 
 export class DomainDisableService extends CombinerService<DisableDomainRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DISABLE_DOMAIN
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(CombinerEndpoint.DISABLE_DOMAIN)
+  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
 
   protected validate(
     request: Request<{}, {}, unknown>

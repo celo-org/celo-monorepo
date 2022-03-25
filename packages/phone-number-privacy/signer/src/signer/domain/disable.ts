@@ -2,10 +2,9 @@ import {
   DisableDomainRequest,
   disableDomainRequestSchema,
   DisableDomainResponseFailure,
+  DisableDomainResponseSuccess,
   domainHash,
-  DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
-  DomainState,
   ErrorMessage,
   ErrorType,
   getCombinerEndpoint,
@@ -55,8 +54,7 @@ export class DomainDisable extends Signer<DisableDomainRequest> {
           await setDomainDisabled(domain, trx, session.logger)
         }
       })
-
-      session.response.status(200).send({ success: true, version: getVersion() })
+      this.sendSuccess(200, session.response, session.logger)
     } catch (error) {
       session.logger.error('Error while disabling domain', error)
       this.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response, session.logger)
@@ -75,21 +73,17 @@ export class DomainDisable extends Signer<DisableDomainRequest> {
 
   protected sendSuccess(
     status: number,
-    response: Response<DomainRestrictedSignatureResponseSuccess>,
-    signature: string,
-    domainState: DomainState,
-    session: Session<DisableDomainRequest>
+    response: Response<DisableDomainResponseSuccess>,
+    logger: Logger
   ) {
     send(
       response,
       {
         success: true,
         version: getVersion(),
-        signature,
-        status: domainState,
       },
       status,
-      session.logger
+      logger
     )
     // TODO(Alec): Is there a way to not have to repeat this so many times?
     Counters.responses.labels(this.endpoint, status.toString()).inc()

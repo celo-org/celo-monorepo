@@ -1,9 +1,9 @@
 import {
   domainHash,
   DomainQuotaStatusRequest,
+  DomainQuotaStatusResponseFailure,
   DomainQuotaStatusResponseSuccess,
   domainRestrictedSignatureRequestSchema,
-  DomainRestrictedSignatureResponseFailure,
   DomainSchema,
   DomainState,
   ErrorMessage,
@@ -28,6 +28,7 @@ export class DomainQuotaStatus extends Signer<DomainQuotaStatusRequest> {
 
   protected async _handle(session: Session<DomainQuotaStatusRequest>): Promise<void> {
     const domain = session.request.body.domain
+    // TODO(Alec)(Next): logging
     session.logger.info('Processing request to get domain quota status', {
       name: domain.name,
       version: domain.version,
@@ -91,7 +92,7 @@ export class DomainQuotaStatus extends Signer<DomainQuotaStatusRequest> {
   protected sendFailure(
     error: ErrorType,
     status: number,
-    response: Response<DomainRestrictedSignatureResponseFailure>,
+    response: Response<DomainQuotaStatusResponseFailure>,
     logger: Logger,
     domainState?: DomainState
   ) {

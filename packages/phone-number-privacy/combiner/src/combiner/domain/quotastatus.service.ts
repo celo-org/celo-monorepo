@@ -26,7 +26,7 @@ import { Session } from '../session'
 
 export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(CombinerEndpoint.DOMAIN_QUOTA_STATUS)
+  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
 
   protected validate(
     request: Request<{}, {}, unknown>
