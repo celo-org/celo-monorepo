@@ -238,6 +238,10 @@ const DefaultConfig = {
     commission: 0.1,
     votesRatioOfLastVsFirstGroup: 2.0,
   },
+  stableTokenRegistry: {
+    existingFiatTickers: ['cUSD', 'cEUR', 'cBRL'],
+    existingStableTokenContractNames: ['StableToken', 'StableTokenEUR', 'StableTokenBRL'],
+  },
 }
 
 const NetworkConfigs = {
