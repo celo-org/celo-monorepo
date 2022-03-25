@@ -17,8 +17,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Counters } from '../../common/metrics'
 import { getVersion } from '../../config'
-import { DOMAINS_STATES_COLUMNS } from '../../database/models/domainState'
-import { getDomainState } from '../../database/wrappers/domainState'
+import { getDomainStateRecordOrEmpty } from '../../database/wrappers/domainState'
 import { Session } from '../session'
 import { Signer } from '../signer'
 
@@ -27,33 +26,22 @@ export class DomainQuotaStatus extends Signer<DomainQuotaStatusRequest> {
   readonly combinerEndpoint = getCombinerEndpoint(this.endpoint)
 
   protected async _handle(session: Session<DomainQuotaStatusRequest>): Promise<void> {
+    // TODO(Alec): factor this beginning part out
     const domain = session.request.body.domain
-    // TODO(Alec)(Next): logging
     session.logger.info('Processing request to get domain quota status', {
       name: domain.name,
       version: domain.version,
       hash: domainHash(domain),
     })
-    try {
-      const domainState = await getDomainState(domain, session.logger)
-      let quotaStatus: DomainState
-      if (domainState) {
-        quotaStatus = {
-          counter: domainState[DOMAINS_STATES_COLUMNS.counter] ?? 0,
-          disabled: domainState[DOMAINS_STATES_COLUMNS.disabled],
-          timer: domainState[DOMAINS_STATES_COLUMNS.timer] ?? 0,
-          date: Date.now(), // TODO(Alec)(Next)
-        }
-      } else {
-        quotaStatus = {
-          counter: 0,
-          disabled: false,
-          timer: 0,
-          date: Date.now(), // TODO(Alec)(Next)
-        }
-      }
 
-      this.sendSuccess(200, session.response, session.logger, quotaStatus)
+    try {
+      const domainStateRecord = await getDomainStateRecordOrEmpty(domain, session.logger)
+      this.sendSuccess(
+        200,
+        session.response,
+        session.logger,
+        domainStateRecord.toSequentialDelayDomainState()
+      )
     } catch (error) {
       session.logger.error('Error while getting domain status', error)
       this.sendFailure(ErrorMessage.DATABASE_GET_FAILURE, 500, session.response, session.logger)

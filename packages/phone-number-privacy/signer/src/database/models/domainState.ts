@@ -1,57 +1,36 @@
-import { SequentialDelayDomainState, WarningMessage } from '@celo/phone-number-privacy-common'
 import {
   Domain,
   domainHash,
-  isSequentialDelayDomain,
+  DomainState,
+  SequentialDelayDomainState,
 } from '@celo/phone-number-privacy-common/lib/domains'
 
-export const DOMAINS_STATES_TABLE = 'domainsStates'
-export enum DOMAINS_STATES_COLUMNS {
+export const DOMAIN_STATE_TABLE = 'domainState'
+export enum DOMAIN_STATE_COLUMNS {
   domainHash = 'domainHash',
   counter = 'counter',
   timer = 'timer',
   disabled = 'disabled',
 }
-export class DomainStateRecord {
-  public static createEmptyDomainState(domain: Domain): DomainStateRecord {
-    if (isSequentialDelayDomain(domain)) {
-      return {
-        [DOMAINS_STATES_COLUMNS.domainHash]: domainHash(domain).toString('hex'),
-        [DOMAINS_STATES_COLUMNS.counter]: 0,
-        [DOMAINS_STATES_COLUMNS.timer]: 0,
+export class DomainStateRecord<D extends Domain> {
+  [DOMAIN_STATE_COLUMNS.domainHash]: string;
+  [DOMAIN_STATE_COLUMNS.disabled]: boolean;
+  [DOMAIN_STATE_COLUMNS.counter]: number;
+  [DOMAIN_STATE_COLUMNS.timer]: number
 
-        [DOMAINS_STATES_COLUMNS.disabled]: false,
-      }
-    }
-
-    // canary provides a compile-time check that all subtypes of Domain have branches. If a case
-    // was missed, then an error will report that domain cannot be assigned to type `never`.
-    const canary = (x: never) => x
-    canary(domain)
-
-    throw new Error(WarningMessage.UNKNOWN_DOMAIN)
+  constructor(domain: D, domainState: DomainState<D>) {
+    this[DOMAIN_STATE_COLUMNS.domainHash] = domainHash(domain).toString('hex')
+    this[DOMAIN_STATE_COLUMNS.disabled] = domainState.disabled
+    this[DOMAIN_STATE_COLUMNS.counter] = domainState.counter
+    this[DOMAIN_STATE_COLUMNS.timer] = domainState.timer
   }
 
-  public static toSequentialDelayDomainState(
-    domainState: DomainStateRecord
-  ): SequentialDelayDomainState {
+  public toSequentialDelayDomainState(): SequentialDelayDomainState {
     return {
-      counter: domainState[DOMAINS_STATES_COLUMNS.counter]!,
-      timer: domainState[DOMAINS_STATES_COLUMNS.timer]!,
-      disabled: domainState[DOMAINS_STATES_COLUMNS.disabled]!,
-      date: 0, // TODO(Alec)
+      disabled: this[DOMAIN_STATE_COLUMNS.disabled],
+      counter: this[DOMAIN_STATE_COLUMNS.counter],
+      timer: this[DOMAIN_STATE_COLUMNS.timer],
+      date: 0, // TODO(Alec)(Next)
     }
-  }
-
-  [DOMAINS_STATES_COLUMNS.domainHash]: string;
-  [DOMAINS_STATES_COLUMNS.counter]: number | undefined;
-  [DOMAINS_STATES_COLUMNS.timer]: number | undefined;
-  [DOMAINS_STATES_COLUMNS.disabled]: boolean
-
-  constructor(hash: string, domainState: SequentialDelayDomainState) {
-    this[DOMAINS_STATES_COLUMNS.domainHash] = hash
-    this[DOMAINS_STATES_COLUMNS.counter] = domainState.counter
-    this[DOMAINS_STATES_COLUMNS.timer] = domainState.timer
-    this[DOMAINS_STATES_COLUMNS.disabled] = domainState.disabled
   }
 }

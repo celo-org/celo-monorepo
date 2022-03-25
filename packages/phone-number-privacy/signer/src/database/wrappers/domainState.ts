@@ -4,105 +4,122 @@ import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
-import {
-  DOMAINS_STATES_COLUMNS,
-  DOMAINS_STATES_TABLE,
-  DomainStateRecord,
-} from '../models/domainState'
+import { DomainStateRecord, DOMAIN_STATE_COLUMNS, DOMAIN_STATE_TABLE } from '../models/domainState'
 
-function domainsStates() {
-  return getDatabase()<DomainStateRecord>(DOMAINS_STATES_TABLE)
+function domainStates<D extends Domain>() {
+  return getDatabase()<DomainStateRecord<D>>(DOMAIN_STATE_TABLE)
 }
 
-export async function setDomainDisabled(
-  domain: Domain,
-  trx: Transaction<DomainStateRecord>,
+export async function setDomainDisabled<D extends Domain>(
+  domain: D,
+  trx: Transaction<DomainStateRecord<D>>,
   logger: Logger
 ): Promise<void> {
   const disableDomainMeter = Histograms.dbOpsInstrumentation.labels('disableDomain').startTimer()
   const hash = domainHash(domain).toString('hex')
   logger.debug('Disabling domain', { hash, domain })
   try {
-    await domainsStates()
+    await domainStates()
       .transacting(trx)
-      .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
-      .update(DOMAINS_STATES_COLUMNS.disabled, true)
+      .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
+      .update(DOMAIN_STATE_COLUMNS.disabled, true)
       .timeout(DB_TIMEOUT)
-    disableDomainMeter()
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
     logger.error(err)
-    disableDomainMeter()
     throw err
   } finally {
     disableDomainMeter()
   }
 }
 
-export async function getDomainState(
-  domain: Domain,
+export async function getDomainStateRecord<D extends Domain>(
+  domain: D,
   logger: Logger
-): Promise<DomainStateRecord | null> {
+): Promise<DomainStateRecord<D> | null> {
   const getDomainStateMeter = Histograms.dbOpsInstrumentation.labels('getDomainState').startTimer()
   const hash = domainHash(domain).toString('hex')
   logger.debug('Getting domain state from db', { hash, domain })
   try {
-    const result = await domainsStates()
-      .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
+    const result = await domainStates()
+      .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
       .first()
       .timeout(DB_TIMEOUT)
-    getDomainStateMeter()
     return result ?? null
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
-    getDomainStateMeter()
     throw err
   } finally {
     getDomainStateMeter()
   }
 }
 
-export async function getDomainStateWithLock(
+export async function getDomainStateRecordOrEmpty(
   domain: Domain,
-  trx: Transaction<DomainStateRecord>,
   logger: Logger
-): Promise<DomainStateRecord | null> {
-  const getDomainStateWithLockMeter = Histograms.dbOpsInstrumentation
-    .labels('getDomainStateWithLock')
+): Promise<DomainStateRecord<Domain>> {
+  return (await getDomainStateRecord(domain, logger)) ?? createEmptyDomainStateRecord(domain)
+}
+
+export async function getDomainStateRecordOrEmptyWithLock(
+  domain: Domain,
+  trx: Transaction,
+  logger: Logger
+): Promise<DomainStateRecord<Domain>> {
+  return (
+    (await getDomainStateRecordWithLock(domain, trx, logger)) ??
+    createEmptyDomainStateRecord(domain)
+  )
+}
+
+export function createEmptyDomainStateRecord(domain: Domain) {
+  return new DomainStateRecord(domain, {
+    timer: 0,
+    counter: 0,
+    disabled: false,
+    date: 0, // TODO(Alec)(Next)
+  })
+}
+
+export async function getDomainStateRecordWithLock<D extends Domain>(
+  domain: D,
+  trx: Transaction<DomainStateRecord<D>>,
+  logger: Logger
+): Promise<DomainStateRecord<D> | null> {
+  const getDomainStateRecordWithLockMeter = Histograms.dbOpsInstrumentation
+    .labels('getDomainStateRecordWithLock')
     .startTimer()
   const hash = domainHash(domain).toString('hex')
   logger.debug('Getting domain state from db with lock', { hash, domain })
   try {
-    const result = await domainsStates()
+    const result = await domainStates()
       .transacting(trx)
       .forUpdate()
-      .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
+      .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
       .first()
       .timeout(DB_TIMEOUT)
-    getDomainStateWithLockMeter()
     return result ?? null
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
-    getDomainStateWithLockMeter()
     throw err
   } finally {
-    getDomainStateWithLockMeter()
+    getDomainStateRecordWithLockMeter()
   }
 }
 
-export async function updateDomainState(
-  domain: Domain,
-  domainState: DomainStateRecord,
-  trx: Transaction<DomainStateRecord>,
+export async function updateDomainStateRecord<D extends Domain>(
+  domain: D,
+  domainState: DomainStateRecord<D>,
+  trx: Transaction<DomainStateRecord<D>>,
   logger: Logger
 ): Promise<void> {
-  const updateDomainStateMeter = Histograms.dbOpsInstrumentation
-    .labels('updateDomainState')
+  const updateDomainStateRecordMeter = Histograms.dbOpsInstrumentation
+    .labels('updateDomainStateRecord')
     .startTimer()
   const hash = domainHash(domain).toString('hex')
   logger.debug('Update domain state', { hash, domain, domainState })
@@ -110,57 +127,51 @@ export async function updateDomainState(
     // Check whether the domain is already in the database.
     // TODO(victor): Usage of this in the signature flow results in redudant queries of the current
     // state. It would be good to refactor this to avoid making more than one SELECT.
-    const result = await domainsStates()
+    const result = await domainStates()
       .transacting(trx)
       .forUpdate()
-      .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
+      .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
       .first()
       .timeout(DB_TIMEOUT)
 
     // Insert or update the domain state record.
     if (!result) {
-      await insertDomainState(domainState, trx, logger)
+      await insertDomainStateRecord(domainState, trx, logger)
     } else {
-      await domainsStates()
+      await domainStates()
         .transacting(trx)
-        .where(DOMAINS_STATES_COLUMNS.domainHash, hash)
+        .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
         .update(domainState)
         .timeout(DB_TIMEOUT)
     }
-    updateDomainStateMeter()
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
     logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
     logger.error(err)
-    updateDomainStateMeter()
     throw err
   } finally {
-    updateDomainStateMeter()
+    updateDomainStateRecordMeter()
   }
 }
 
-export async function insertDomainState(
-  domainState: DomainStateRecord,
-  trx: Transaction<DomainStateRecord>,
+export async function insertDomainStateRecord<D extends Domain>(
+  domainState: DomainStateRecord<D>,
+  trx: Transaction<DomainStateRecord<D>>,
   logger: Logger
-): Promise<DomainStateRecord> {
-  const insertDomainStateMeter = Histograms.dbOpsInstrumentation
+): Promise<DomainStateRecord<D>> {
+  const insertDomainStateRecordMeter = Histograms.dbOpsInstrumentation
     .labels('insertDomainState')
     .startTimer()
   logger.debug('Insert domain state', { domainState })
   try {
-    await domainsStates().transacting(trx).insert(domainState).timeout(DB_TIMEOUT)
-
-    insertDomainStateMeter()
-
+    await domainStates().transacting(trx).insert(domainState).timeout(DB_TIMEOUT)
     return domainState
   } catch (err) {
     Counters.databaseErrors.labels(Labels.insert).inc()
     logger.error(ErrorMessage.DATABASE_INSERT_FAILURE)
     logger.error(err)
-    insertDomainStateMeter()
     throw err
   } finally {
-    insertDomainStateMeter()
+    insertDomainStateRecordMeter()
   }
 }
