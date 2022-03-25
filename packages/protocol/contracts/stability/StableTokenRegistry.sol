@@ -37,8 +37,8 @@ contract StableTokenRegistry is Initializable, Ownable {
     _transferOwnership(msg.sender);
     for (uint256 i = 0; i < existingFiatTickers.length; i++) {
       addNewStableToken(
-        string(abi.encodePacked(existingFiatTickers[i])),
-        string(abi.encodePacked(existingStableTokenContractNames[i]))
+        abi.encodePacked(existingFiatTickers[i]),
+        abi.encodePacked(existingStableTokenContractNames[i])
       );
     }
   }
@@ -74,12 +74,12 @@ contract StableTokenRegistry is Initializable, Ownable {
    * @param fiatTicker The currency that is no longer supported.
    * @param index The index in fiatTickers of fiatTicker.
    */
-  function removeStableToken(string calldata fiatTicker, uint256 index) external onlyOwner {
-    stableTokens[fiatTicker] = "";
+  function removeStableToken(bytes calldata fiatTicker, uint256 index) external onlyOwner {
+    delete stableTokens[fiatTicker];
     uint256 numFiats = fiatTickers.length;
     require(index < numFiats, "Index is invalid");
     require(
-      keccak256(bytes(fiatTicker)) == keccak256(bytes(abi.encodePacked(fiatTickers[index]))),
+      keccak256(fiatTicker) == keccak256(fiatTickers[index]),
       "Index does not match fiatTicker"
     );
     uint256 newNumFiats = numFiats.sub(1);
@@ -96,7 +96,7 @@ contract StableTokenRegistry is Initializable, Ownable {
    * @param fiatTicker The currency we are trying to add in the registry.
    * @param stableTokenContractName The contract we are trying to add in the registry.
    */
-  function addNewStableToken(string memory fiatTicker, string memory stableTokenContractName)
+  function addNewStableToken(bytes memory fiatTicker, bytes memory stableTokenContractName)
     public
     onlyOwner
   {
@@ -110,5 +110,4 @@ contract StableTokenRegistry is Initializable, Ownable {
     stableTokens[fiatTicker] = stableTokenContractName;
     fiatTickers.push(fiatTicker);
   }
-
 }
