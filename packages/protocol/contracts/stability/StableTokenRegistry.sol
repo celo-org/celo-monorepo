@@ -1,5 +1,4 @@
 pragma solidity ^0.5.13;
-pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/Initializable.sol";
@@ -11,8 +10,8 @@ import "../common/interfaces/IRegistry.sol";
  */
 contract StableTokenRegistry is Initializable, Ownable {
   using SafeMath for uint256;
-  mapping(string => string) public stableTokens;
-  string[] public fiatTickers;
+  mapping(bytes => bytes) public stableTokens;
+  bytes[] public fiatTickers;
 
   IRegistry public registry;
 
@@ -28,8 +27,8 @@ contract StableTokenRegistry is Initializable, Ownable {
    * @param existingStableTokenContractNames Collection of stable token smart contract names.
    */
   function initialize(
-    string[] calldata existingFiatTickers,
-    string[] calldata existingStableTokenContractNames
+    bytes32[] calldata existingFiatTickers,
+    bytes32[] calldata existingStableTokenContractNames
   ) external initializer {
     require(
       existingFiatTickers.length == existingStableTokenContractNames.length,
@@ -37,28 +36,37 @@ contract StableTokenRegistry is Initializable, Ownable {
     );
     _transferOwnership(msg.sender);
     for (uint256 i = 0; i < existingFiatTickers.length; i++) {
-      addNewStableToken(existingFiatTickers[i], existingStableTokenContractNames[i]);
+      addNewStableToken(
+        string(abi.encodePacked(existingFiatTickers[i])),
+        string(abi.encodePacked(existingStableTokenContractNames[i]))
+      );
     }
-  }
-
-  /**
-   * @notice Returns fiat currencies that have been issued.
-   * @return A collection of currencies issued.
-   */
-  function getFiatTickers() external view returns (string[] memory) {
-    return fiatTickers;
   }
 
   /**
    * @notice Returns all the contract instances created.
    * @return collection of stable token contracts.
    */
-  function getContractInstances() external view returns (string[] memory) {
-    string[] memory contracts;
+  function getContractInstances() external view returns (bytes memory, uint256[] memory) {
+    bytes[] memory contracts;
+    uint256 totalLength = 0;
     for (uint256 i = 0; i < fiatTickers.length; i++) {
       contracts[i] = stableTokens[fiatTickers[i]];
+      totalLength += stableTokens[fiatTickers[i]].length;
     }
-    return contracts;
+    uint256 numOfContracts = contracts.length;
+    bytes memory concatenated = new bytes(totalLength);
+    uint256 lastIndex = 0;
+    uint256[] memory lengths = new uint256[](numOfContracts);
+    for (uint256 i = 0; i < numOfContracts; i++) {
+      bytes storage contractName = stableTokens[fiatTickers[i]];
+      lengths[i] = contractName.length;
+      for (uint256 j = 0; j < lengths[i]; j++) {
+        concatenated[lastIndex] = contractName[j];
+        lastIndex++;
+      }
+    }
+    return (concatenated, lengths);
   }
 
   /**
@@ -71,7 +79,7 @@ contract StableTokenRegistry is Initializable, Ownable {
     uint256 numFiats = fiatTickers.length;
     require(index < numFiats, "Index is invalid");
     require(
-      keccak256(bytes(fiatTicker)) == keccak256(bytes(fiatTickers[index])),
+      keccak256(bytes(fiatTicker)) == keccak256(bytes(abi.encodePacked(fiatTickers[index]))),
       "Index does not match fiatTicker"
     );
     uint256 newNumFiats = numFiats.sub(1);
