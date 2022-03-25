@@ -18,7 +18,7 @@ const TestedWrappers: ValidWrappers[] = [
 function newWrapperCache() {
   const web3 = new Web3('http://localhost:8545')
   const connection = new Connection(web3)
-  const registry = new AddressRegistry(web3)
+  const registry = new AddressRegistry(connection)
   const web3ContractCache = new Web3ContractCache(registry)
   const AnyContractAddress = '0xe832065fb5117dbddcb566ff7dc4340999583e38'
   jest.spyOn(registry, 'addressFor').mockResolvedValue(AnyContractAddress)
