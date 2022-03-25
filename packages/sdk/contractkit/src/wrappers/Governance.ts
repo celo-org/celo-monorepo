@@ -25,7 +25,7 @@ import {
   valueToInt,
   valueToString,
 } from './BaseWrapper'
-import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
+import { BaseWrapperForGoverning } from './BaseWrapperForGoverning'
 
 export enum ProposalStage {
   None = 'None',
@@ -148,7 +148,7 @@ const ZERO_BN = new BigNumber(0)
 /**
  * Contract managing voting for governance proposals.
  */
-export class GovernanceWrapper extends BaseWrapperWithContracts<Governance> {
+export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   /**
    * Querying number of possible concurrent proposals.
    * @returns Current number of possible concurrent proposals.

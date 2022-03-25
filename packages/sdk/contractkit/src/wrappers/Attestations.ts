@@ -4,21 +4,23 @@ import { concurrentMap, sleep } from '@celo/base/lib/async'
 import { notEmpty, zip3 } from '@celo/base/lib/collections'
 import { parseSolidityStringArray } from '@celo/base/lib/parsing'
 import { appendPath } from '@celo/base/lib/string'
-import { Address, toTransactionObject } from '@celo/connect'
+import { Address, Connection, toTransactionObject } from '@celo/connect'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
+import { AccountsWrapper } from './Accounts'
 import {
+  BaseWrapper,
   blocksToDurationString,
   proxyCall,
   proxySend,
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
-import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
+import { StableTokenWrapper } from './StableTokenWrapper'
 import { Validator } from './Validators'
 
 function hashAddressToSingleDigit(address: Address): number {
@@ -119,7 +121,21 @@ function parseGetCompletableAttestations(response: GetCompletableAttestationsRes
   ).map(([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL }))
 }
 
-export class AttestationsWrapper extends BaseWrapperWithContracts<Attestations> {
+interface ContractsForAttestation {
+  getAccounts(): Promise<AccountsWrapper>
+
+  getStableToken(stableToken: StableToken): Promise<StableTokenWrapper>
+}
+
+export class AttestationsWrapper extends BaseWrapper<Attestations> {
+  constructor(
+    protected readonly connection: Connection,
+    protected readonly contract: Attestations,
+    protected readonly contracts: ContractsForAttestation
+  ) {
+    super(connection, contract)
+  }
+
   /**
    *  Returns the time an attestation can be completable before it is considered expired
    */

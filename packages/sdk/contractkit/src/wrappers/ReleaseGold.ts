@@ -18,7 +18,7 @@ import {
   valueToInt,
   valueToString,
 } from './BaseWrapper'
-import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
+import { BaseWrapperForGoverning } from './BaseWrapperForGoverning'
 import { PendingWithdrawal } from './LockedGold'
 
 export interface BalanceState {
@@ -64,7 +64,7 @@ interface RevocationInfo {
 /**
  * Contract for handling an instance of a ReleaseGold contract.
  */
-export class ReleaseGoldWrapper extends BaseWrapperWithContracts<ReleaseGold> {
+export class ReleaseGoldWrapper extends BaseWrapperForGoverning<ReleaseGold> {
   /**
    * Returns the underlying Release schedule of the ReleaseGold contract
    * @return A ReleaseSchedule.
