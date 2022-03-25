@@ -12,6 +12,7 @@
   "scripts": {
     "prepublishOnly": "yarn build",
     "build": "tsc -b .",
+    "docs": "typedoc",
     "clean": "tsc -b . --clean",
     "test": "jest --runInBand --ci",
     "test:verbose": "jest --verbose",
