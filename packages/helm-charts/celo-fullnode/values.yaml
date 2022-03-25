@@ -92,7 +92,6 @@ geth:
   light:
     maxpeers: 1000
     serve: 70
-  fullnodeCheckBlockAge: true
   ws_port: 8546
 
 genesis:
