@@ -16,7 +16,7 @@ import {
   valueToFixidityString,
   valueToInt,
 } from './BaseWrapper'
-import { BaseWrapperWithContracts } from './BaseWrapperWithContracts'
+import { BaseWrapperForGoverning } from './BaseWrapperForGoverning'
 
 export interface Validator {
   name: string
@@ -78,7 +78,7 @@ export interface MembershipHistoryExtraData {
  * Contract for voting for validators and managing validator groups.
  */
 // TODO(asa): Support validator signers
-export class ValidatorsWrapper extends BaseWrapperWithContracts<Validators> {
+export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
   /**
    * Queues an update to a validator group's commission.
    * @param commission Fixidity representation of the commission this group receives on epoch

@@ -56,7 +56,7 @@ export class MiniContractKit {
   gasPriceSuggestionMultiplier = 5
 
   constructor(readonly connection: Connection) {
-    this.registry = new AddressRegistry(connection.web3)
+    this.registry = new AddressRegistry(connection)
     this.contracts = new MiniContractCache(connection, this.registry)
     this.celoTokens = new CeloTokens(this.contracts, this.registry)
   }
