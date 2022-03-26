@@ -2,6 +2,7 @@ import {
   CombinerEndpoint,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
+  DomainQuotaStatusResponse,
   DomainQuotaStatusResponseFailure,
   domainQuotaStatusResponseSchema,
   DomainQuotaStatusResponseSuccess,
@@ -47,12 +48,7 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
   ): Promise<void> {
     const status: number = signerResponse.status
     const data: string = await signerResponse.text()
-    const res: unknown = JSON.parse(data)
-    if (!domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
-      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
-      session.logger.error({ data, signer: url }, msg)
-      throw new Error(msg)
-    }
+    const res = this.validateSignerResponse(data, url, session)
     // In this function HTTP response status is assumed 200. Error if the response is failed.
     if (!res.success) {
       const msg = `Signer request to ${url}/${this.signerEndpoint} failed with 200 status`
@@ -61,6 +57,21 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
     }
     session.logger.info({ signer: url }, `Signer request successful`)
     session.responses.push({ url, res, status })
+  }
+
+  protected validateSignerResponse(
+    data: string,
+    url: string,
+    session: Session<DomainQuotaStatusRequest>
+  ): DomainQuotaStatusResponse {
+    const res: unknown = JSON.parse(data)
+    if (!domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
+      // TODO(Alec): add error type for this
+      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
+      session.logger.error({ data, signer: url }, msg)
+      throw new Error(msg)
+    }
+    return res
   }
 
   protected async combine(session: Session<DomainQuotaStatusRequest>): Promise<void> {

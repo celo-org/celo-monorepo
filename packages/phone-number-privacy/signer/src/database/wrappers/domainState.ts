@@ -102,11 +102,10 @@ export async function getDomainStateRecordWithLock<D extends Domain>(
       .first()
       .timeout(DB_TIMEOUT)
     return result ?? null
-  } catch (err) {
+  } catch (error) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
-    logger.error(err)
-    throw err
+    logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
+    throw new Error(ErrorMessage.DATABASE_GET_FAILURE)
   } finally {
     getDomainStateRecordWithLockMeter()
   }

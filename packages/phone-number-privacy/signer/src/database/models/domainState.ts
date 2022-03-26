@@ -12,7 +12,7 @@ export enum DOMAIN_STATE_COLUMNS {
   timer = 'timer',
   disabled = 'disabled',
 }
-export class DomainStateRecord<D extends Domain> {
+export class DomainStateRecord<D extends Domain = Domain> {
   [DOMAIN_STATE_COLUMNS.domainHash]: string;
   [DOMAIN_STATE_COLUMNS.disabled]: boolean;
   [DOMAIN_STATE_COLUMNS.counter]: number;

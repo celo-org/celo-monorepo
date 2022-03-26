@@ -23,10 +23,10 @@ import {
   insertDomainStateRecord,
   setDomainDisabled,
 } from '../../database/wrappers/domainState'
+import { Controller } from '../controller'
 import { Session } from '../session'
-import { Signer } from '../signer'
 
-export class DomainDisable extends Signer<DisableDomainRequest> {
+export class DomainDisable extends Controller<DisableDomainRequest> {
   readonly endpoint = SignerEndpoint.DISABLE_DOMAIN
   readonly combinerEndpoint = getCombinerEndpoint(this.endpoint)
 

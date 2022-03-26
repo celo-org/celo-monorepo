@@ -18,10 +18,10 @@ import { Request, Response } from 'express'
 import { Counters } from '../../common/metrics'
 import { getVersion } from '../../config'
 import { getDomainStateRecordOrEmpty } from '../../database/wrappers/domainState'
+import { Controller } from '../controller'
 import { Session } from '../session'
-import { Signer } from '../signer'
 
-export class DomainQuotaStatus extends Signer<DomainQuotaStatusRequest> {
+export class DomainQuotaStatus extends Controller<DomainQuotaStatusRequest> {
   readonly endpoint = SignerEndpoint.DOMAIN_QUOTA_STATUS
   readonly combinerEndpoint = getCombinerEndpoint(this.endpoint)
 

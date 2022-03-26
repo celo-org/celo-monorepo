@@ -32,46 +32,79 @@ export enum AuthenticationMethod {
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */
   account: string
-  /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod?: AuthenticationMethod
   /** Query message. A blinded elliptic curve point encoded in base64. */
   blindedQueryPhoneNumber: string
+  /** Authentication method to use for verifying the signature in the Authorization header */
+  authenticationMethod: string | undefined
   /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
-  hashedPhoneNumber?: string
+  hashedPhoneNumber: string | undefined
   /** Client-specified session ID for the request. */
-  sessionID?: string
+  sessionID: string | undefined
   /** Client-specified version string */
-  version?: string
+  version: string | undefined
 }
-
 export declare type SignMessageRequest = GetBlindedMessageSigRequest
 
-export interface GetContactMatchesRequest {
-  account: string
-  /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod?: AuthenticationMethod
-  userPhoneNumber: string // obfuscated with deterministic salt
-  contactPhoneNumbers: string[] // obfuscated with deterministic salt
-  hashedPhoneNumber: string // on-chain identifier
-  signedUserPhoneNumber?: string // signed with DEK
-  sessionID?: string
-  /** Client-specified version string */
-  version?: string
-}
+export const SignMessageRequestSchema: t.Type<SignMessageRequest> = t.type({
+  account: t.string,
+  blindedQueryPhoneNumber: t.string,
+  authenticationMethod: t.union([t.string, t.undefined]),
+  hashedPhoneNumber: t.union([t.string, t.undefined]),
+  sessionID: t.union([t.string, t.undefined]),
+  version: t.union([t.string, t.undefined]),
+})
 
+export interface GetContactMatchesRequest {
+  /** Celo account address of the user */
+  account: string
+  /** User's phone number obfuscated with deterministic salt */
+  userPhoneNumber: string
+  /** User's contact list obfuscated with deterministic salt */
+  contactPhoneNumbers: string[]
+  /** User's ODIS generated on-chain identifier */
+  hashedPhoneNumber: string
+  /** Authentication method to use for verifying the signature in the Authorization header */
+  authenticationMethod: string | undefined
+  /** DEK signature over the user's phone number */
+  signedUserPhoneNumber: string | undefined
+  /** Client-specified session ID for the request. */
+  sessionID: string | undefined
+  /** Client-specified version string */
+  version: string | undefined
+}
 export declare type MatchmakingRequest = GetContactMatchesRequest
+
+export const MatchmakingRequestSchema: t.Type<MatchmakingRequest> = t.type({
+  account: t.string,
+  userPhoneNumber: t.string,
+  contactPhoneNumbers: t.array(t.string),
+  hashedPhoneNumber: t.string,
+  authenticationMethod: t.union([t.string, t.undefined]),
+  signedUserPhoneNumber: t.union([t.string, t.undefined]),
+  sessionID: t.union([t.string, t.undefined]),
+  version: t.union([t.string, t.undefined]),
+})
 
 export interface GetQuotaRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod?: AuthenticationMethod
-  hashedPhoneNumber?: string // on-chain identifier
-  sessionID?: string
+  authenticationMethod: string | undefined
+  /** User's ODIS generated on-chain identifier */
+  hashedPhoneNumber: string | undefined
+  /** Client-specified session ID for the request. */
+  sessionID: string | undefined
   /** Client-specified version string */
-  version?: string
+  version: string | undefined
 }
-
 export declare type PnpQuotaRequest = GetQuotaRequest
+
+export const PnpQuotaRequestSchema: t.Type<PnpQuotaRequest> = t.type({
+  account: t.string,
+  authenticationMethod: t.union([t.string, t.undefined]),
+  hashedPhoneNumber: t.union([t.string, t.undefined]),
+  sessionID: t.union([t.string, t.undefined]),
+  version: t.union([t.string, t.undefined]),
+})
 
 export type PhoneNumberPrivacyRequest = SignMessageRequest | MatchmakingRequest | PnpQuotaRequest
 

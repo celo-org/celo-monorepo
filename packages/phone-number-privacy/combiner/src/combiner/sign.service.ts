@@ -102,12 +102,6 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
     }
     this.sendFailure(error, majorityErrorCode ?? 500, session.response, session.logger)
   }
-
-  protected abstract validateSignerResponse(
-    data: string,
-    url: string,
-    session: Session<R>
-  ): SignatureResponse<R>
   protected abstract logResponseDiscrepancies(session: Session<R>): void
   protected abstract parseSignature(
     res: SignatureResponse<R>,

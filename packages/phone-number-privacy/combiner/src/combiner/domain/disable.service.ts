@@ -2,6 +2,7 @@ import {
   CombinerEndpoint,
   DisableDomainRequest,
   disableDomainRequestSchema,
+  DisableDomainResponse,
   DisableDomainResponseFailure,
   DisableDomainResponseSchema,
   DisableDomainResponseSuccess,
@@ -42,18 +43,13 @@ export class DomainDisableService extends CombinerService<DisableDomainRequest> 
     url: string,
     session: Session<DisableDomainRequest>
   ): Promise<void> {
-    const status: number = signerResponse.status
+    const status: number = signerResponse.status // TODO(Alec)
     const data: string = await signerResponse.text()
-    const res: unknown = JSON.parse(data)
-    if (!DisableDomainResponseSchema.is(res)) {
-      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
-      session.logger.error({ data, signer: url }, msg)
-      throw new Error(msg)
-    }
+    const res = this.validateSignerResponse(data, url, session)
 
     // In this function HTTP response status is assumed 200. Error if the response is failed.
     if (!res.success) {
-      const msg = `Signer request to ${url}/${this.signerEndpoint} failed with 200 status`
+      const msg = `Signer request to ${url}/${this.signerEndpoint} failed with 200 status` // TODO(Alec)
       session.logger.error({ error: res.error, signer: url }, msg)
       throw new Error(msg)
     }
@@ -64,6 +60,21 @@ export class DomainDisableService extends CombinerService<DisableDomainRequest> 
     if (this.checkThresholdDisabled(session)) {
       session.controller.abort()
     }
+  }
+
+  protected validateSignerResponse(
+    data: string,
+    url: string,
+    session: Session<DisableDomainRequest>
+  ): DisableDomainResponse {
+    const res: unknown = JSON.parse(data)
+    if (!DisableDomainResponseSchema.is(res)) {
+      // TODO(Alec): add error type for this
+      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
+      session.logger.error({ data, signer: url }, msg)
+      throw new Error(msg)
+    }
+    return res
   }
 
   protected async combine(session: Session<DisableDomainRequest>): Promise<void> {

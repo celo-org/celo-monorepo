@@ -133,6 +133,11 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     logger: Logger,
     ...args: unknown[]
   ): void
+  protected abstract validateSignerResponse(
+    data: string,
+    url: string,
+    session: Session<R>
+  ): OdisResponse<R>
 
   private async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
     let signerResponse: FetchResponse

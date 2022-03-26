@@ -12,13 +12,14 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Counters } from '../common/metrics'
 import { Config } from '../config'
+import { DomainQuotaService } from './domain/quota.service'
 import { Session } from './session'
 
-export abstract class Signer<R extends OdisRequest> {
+export abstract class Controller<R extends OdisRequest> {
   abstract readonly endpoint: SignerEndpoint
   abstract readonly combinerEndpoint: CombinerEndpoint
 
-  constructor(readonly config: Config) {}
+  constructor(readonly config: Config, readonly quotaService: DomainQuotaService) {} // TODO(Alec)
 
   public async handle(
     request: Request<{}, {}, unknown>,
@@ -39,6 +40,7 @@ export abstract class Signer<R extends OdisRequest> {
       if (!(await this.authenticate(request, logger))) {
         return this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response, logger)
       }
+      // TODO(Alec)
       const session = new Session<R>(request, response)
       await this._handle(session)
     } catch (err) {

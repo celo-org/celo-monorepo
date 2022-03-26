@@ -17,30 +17,50 @@ import { Domain, DomainState } from '../domains'
 export interface SignMessageResponseSuccess {
   success: true
   version: string
-  performedQueryCount?: number
-  totalQuota?: number
-  blockNumber?: number
-  signature?: string
+  performedQueryCount: number | undefined
+  totalQuota: number | undefined
+  blockNumber: number | undefined
+  signature: string | undefined
 }
 
 export interface SignMessageResponseFailure {
   success: false
   version: string
   error: string
-  performedQueryCount?: number
-  totalQuota?: number
-  blockNumber?: number
-  signature?: string
+  performedQueryCount: number | undefined
+  totalQuota: number | undefined
+  blockNumber: number | undefined
+  signature: string | undefined
 }
 
 export type SignMessageResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
+export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
+  t.type({
+    success: t.literal(true),
+    version: t.string,
+    performedQueryCount: t.union([t.number, t.undefined]),
+    totalQuota: t.union([t.number, t.undefined]),
+    blockNumber: t.union([t.number, t.undefined]),
+    signature: t.union([t.string, t.undefined]),
+  }),
+  t.type({
+    success: t.literal(false),
+    version: t.string,
+    error: t.string,
+    performedQueryCount: t.union([t.number, t.undefined]),
+    totalQuota: t.union([t.number, t.undefined]),
+    blockNumber: t.union([t.number, t.undefined]),
+    signature: t.union([t.string, t.undefined]),
+  }),
+])
+
 export interface GetQuotaResponseSuccess {
   success: true
   version: string
-  performedQueryCount?: number
-  totalQuota?: number
-  blockNumber?: number
+  performedQueryCount: number | undefined
+  totalQuota: number | undefined
+  blockNumber: number | undefined
 }
 
 export interface GetQuotaResponseFailure {
@@ -50,6 +70,21 @@ export interface GetQuotaResponseFailure {
 }
 
 export type GetQuotaResponse = GetQuotaResponseSuccess | GetQuotaResponseFailure
+
+export const GetQuotaResponseSchema: t.Type<GetQuotaResponse> = t.union([
+  t.type({
+    success: t.literal(true),
+    version: t.string,
+    performedQueryCount: t.union([t.number, t.undefined]),
+    totalQuota: t.union([t.number, t.undefined]),
+    blockNumber: t.union([t.number, t.undefined]),
+  }),
+  t.type({
+    success: t.literal(false),
+    version: t.string,
+    error: t.string,
+  }),
+])
 
 export interface GetContactMatchesResponseSuccess {
   success: true
@@ -65,6 +100,19 @@ export interface GetContactMatchesResponseFailure {
 export type GetContactMatchesResponse =
   | GetContactMatchesResponseSuccess
   | GetContactMatchesResponseFailure
+
+export const GetContactMatchesResponseSchema: t.Type<GetContactMatchesResponse> = t.union([
+  t.type({
+    success: t.literal(true),
+    version: t.string,
+    matchedContacts: t.array(t.type({ phoneNumber: t.string })),
+  }),
+  t.type({
+    success: t.literal(false),
+    version: t.string,
+    error: t.string,
+  }),
+])
 
 export type PhoneNumberPrivacyResponse<
   R extends PhoneNumberPrivacyRequest = PhoneNumberPrivacyRequest
@@ -89,7 +137,7 @@ export interface DomainRestrictedSignatureResponseFailure<D extends Domain = Dom
   success: false
   version: string
   error: string
-  status: DomainState<D>
+  status: DomainState<D> | undefined
 }
 
 export type DomainRestrictedSignatureResponse<D extends Domain = Domain> =
@@ -159,7 +207,7 @@ export function domainRestrictedSignatureResponseSchema<D extends Domain>(
       success: t.literal(false),
       version: t.string,
       error: t.string,
-      status: state,
+      status: t.union([state, t.undefined]),
     }),
   ])
 }

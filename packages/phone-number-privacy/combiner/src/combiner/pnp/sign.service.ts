@@ -11,8 +11,10 @@ import {
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   send,
   SignerEndpoint,
+  SignMessageRequestSchema,
   SignMessageResponse,
   SignMessageResponseFailure,
+  SignMessageResponseSchema,
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -32,11 +34,11 @@ export class PnpSignService extends SignService<SignMessageRequest> {
     request: Request<{}, {}, unknown>
   ): request is Request<{}, {}, SignMessageRequest> {
     return (
-      // TODO(Alec): add io-ts schemas for phone number privacy
-      hasValidAccountParam(request.body as SignMessageRequest) &&
-      hasValidBlindedPhoneNumberParam(request.body as SignMessageRequest) &&
-      identifierIsValidIfExists(request.body as SignMessageRequest) &&
-      isBodyReasonablySized(request.body as SignMessageRequest)
+      SignMessageRequestSchema.is(request.body) &&
+      hasValidAccountParam(request.body) &&
+      hasValidBlindedPhoneNumberParam(request.body) &&
+      identifierIsValidIfExists(request.body) &&
+      isBodyReasonablySized(request.body)
     )
   }
 
@@ -49,19 +51,17 @@ export class PnpSignService extends SignService<SignMessageRequest> {
 
   protected validateSignerResponse(
     data: string,
-    _url: string,
-    _session: Session<SignMessageRequest>
+    url: string,
+    session: Session<SignMessageRequest>
   ): SignMessageResponse {
-    // TODO(Alec)(Next): add io-ts types for pnp
     const res: unknown = JSON.parse(data)
-    // if (!domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
-    //   // TODO(Alec): add error type for this
-    //   const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
-    //   session.logger.error({ data, signer: url }, msg)
-    //   throw new Error(msg)
-    // }
-    // if (!signerResponse.signature)
-    return res as SignMessageResponse
+    if (!SignMessageResponseSchema.is(res)) {
+      // TODO(Alec): add error type for this
+      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
+      session.logger.error({ data, signer: url }, msg)
+      throw new Error(msg)
+    }
+    return res
   }
 
   protected async combine(session: Session<SignMessageRequest>): Promise<void> {
@@ -125,6 +125,9 @@ export class PnpSignService extends SignService<SignMessageRequest> {
         success: true,
         version: VERSION,
         signature: combinedSignature,
+        performedQueryCount: undefined,
+        totalQuota: undefined,
+        blockNumber: undefined,
       },
       status,
       logger
@@ -138,7 +141,8 @@ export class PnpSignService extends SignService<SignMessageRequest> {
     logger: Logger,
     performedQueryCount?: number,
     totalQuota?: number,
-    blockNumber?: number
+    blockNumber?: number,
+    signature?: string
   ) {
     send(
       response,
@@ -149,6 +153,7 @@ export class PnpSignService extends SignService<SignMessageRequest> {
         performedQueryCount,
         totalQuota,
         blockNumber,
+        signature,
       },
       status,
       logger
