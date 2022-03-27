@@ -97,7 +97,7 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
   protected handleMissingSignatures(session: Session<R>) {
     let error: ErrorType = ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
     const majorityErrorCode = session.getMajorityErrorCode()
-    if (majorityErrorCode === 403) {
+    if (majorityErrorCode === 403 || majorityErrorCode === 429) {
       error = WarningMessage.EXCEEDED_QUOTA
     }
     this.sendFailure(error, majorityErrorCode ?? 500, session.response, session.logger)

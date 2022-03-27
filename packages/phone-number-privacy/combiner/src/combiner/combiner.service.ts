@@ -57,7 +57,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     const logger: Logger = response.locals.logger
     try {
       if (!this.enabled) {
-        return this.sendFailure(WarningMessage.API_UNAVAILABLE, 501, response, logger)
+        return this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response, logger)
       }
       if (!this.validate(request)) {
         return this.sendFailure(WarningMessage.INVALID_INPUT, 400, response, logger)
@@ -155,8 +155,8 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     session: Session<R>
   ): Promise<FetchResponse> {
     // TODO(Alec): Factor out this metering code
-    const start = `Start ${signer.url}/${this.signerEndpoint}`
-    const end = `End ${signer.url}/${this.signerEndpoint}`
+    const start = `Start ${signer.url + this.signerEndpoint}`
+    const end = `End ${signer.url + this.signerEndpoint}`
     performance.mark(start)
 
     return this.sendRequest(signer.url, session)
@@ -220,9 +220,9 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
 
   private async handleSignerRequestFailure(err: any, signer: Signer, session: Session<R>) {
     let errorCode: number | undefined
-    if (err instanceof Error && err.name === 'AbortError') {
+    if (err instanceof Error && err.name === 'AbortError' && session.controller.signal.aborted) {
       if (session.timedOut) {
-        errorCode = 408
+        errorCode = 504 // @victor what status code should we use here
         session.logger.error({ signer }, ErrorMessage.TIMEOUT_FROM_SIGNER)
       } else {
         // Request was cancelled, assuming it would have been successful (no errorCode)
@@ -233,7 +233,6 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
       session.logger.error({ signer }, ErrorMessage.SIGNER_REQUEST_ERROR)
     }
     session.logger.error(err)
-
     this.receiveFailure(signer, errorCode, session)
   }
 }

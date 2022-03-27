@@ -79,7 +79,7 @@ export interface SequentialDelayDomainState {
   /** Whether or not the domain has been disabled. If disabled, no more queries will be served. */
   disabled: boolean
   /** Server timestamp in seconds since the Unix Epoch. */
-  date: number
+  now: number
 }
 
 /** io-ts schema for encoding and decoding SequentialDelayStage structs */
@@ -110,7 +110,7 @@ export const SequentialDelayDomainStateSchema: t.Type<SequentialDelayDomainState
   timer: t.number,
   counter: t.number,
   disabled: t.boolean,
-  date: t.number,
+  now: t.number,
 })
 
 export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDelayDomain =>
@@ -224,7 +224,7 @@ export const checkSequentialDelayRateLimit = (
       counter: counter + 1,
       timer: resetTimer ? attemptTime : notBefore,
       disabled: false,
-      date: attemptTime,
+      now: attemptTime,
     },
   }
 }

@@ -38,7 +38,7 @@ export class Session<R extends OdisRequest> {
 
   public getMajorityErrorCode(): number | null {
     // Ignore timeouts
-    const ignoredErrorCodes = [408]
+    const ignoredErrorCodes = [504] // @victor what status code should we use here
     const uniqueErrorCount = Array.from(this.errorCodes.keys()).filter(
       (status) => !ignoredErrorCodes.includes(status)
     ).length

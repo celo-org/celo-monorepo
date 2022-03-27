@@ -29,7 +29,7 @@ export abstract class Controller<R extends OdisRequest> {
     const logger: Logger = response.locals.logger
     try {
       if (!this.config.api.domains.enabled) {
-        return this.sendFailure(WarningMessage.API_UNAVAILABLE, 501, response, logger)
+        return this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response, logger)
       }
       if (!this.validate(request)) {
         return this.sendFailure(WarningMessage.INVALID_INPUT, 400, response, logger)
