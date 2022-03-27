@@ -17,10 +17,11 @@ import { Domain, DomainState } from '../domains'
 export interface SignMessageResponseSuccess {
   success: true
   version: string
+  signature: string
   performedQueryCount: number | undefined
   totalQuota: number | undefined
   blockNumber: number | undefined
-  signature: string | undefined
+  warnings: string[] | undefined
 }
 
 export interface SignMessageResponseFailure {
@@ -30,7 +31,6 @@ export interface SignMessageResponseFailure {
   performedQueryCount: number | undefined
   totalQuota: number | undefined
   blockNumber: number | undefined
-  signature: string | undefined
 }
 
 export type SignMessageResponse = SignMessageResponseSuccess | SignMessageResponseFailure
@@ -39,10 +39,11 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
   t.type({
     success: t.literal(true),
     version: t.string,
+    signature: t.string,
     performedQueryCount: t.union([t.number, t.undefined]),
     totalQuota: t.union([t.number, t.undefined]),
     blockNumber: t.union([t.number, t.undefined]),
-    signature: t.union([t.string, t.undefined]),
+    warnings: t.union([t.array(t.string), t.undefined]),
   }),
   t.type({
     success: t.literal(false),
@@ -51,7 +52,6 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
     performedQueryCount: t.union([t.number, t.undefined]),
     totalQuota: t.union([t.number, t.undefined]),
     blockNumber: t.union([t.number, t.undefined]),
-    signature: t.union([t.string, t.undefined]),
   }),
 ])
 

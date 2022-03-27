@@ -60,6 +60,11 @@ export const Counters = {
     name: 'timeouts',
     help: 'Counter for the number of signer timeouts as measured by the signer',
   }),
+  requestsFailingOpen: new Counter({
+    name: 'requests_failing_open',
+    help:
+      'Counter for the number of requests bypassing quota due to blockchain or db connection failures',
+  }),
 }
 const buckets = [
   0.001,

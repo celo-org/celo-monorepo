@@ -15,41 +15,19 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { Counters, Histograms } from '../../common/metrics'
+import { Counters } from '../../common/metrics'
 import { getVersion } from '../../config'
-import { getRemainingQueryCount } from '../../signing/query-quota'
-import { getBlockNumber, getContractKit } from '../../web3/contracts'
+import { getContractKit } from '../../web3/contracts'
 import { Controller } from '../controller'
 import { Session } from '../session'
+import { getQuotaStatus } from './sign'
 
 export class PnpQuota extends Controller<PnpQuotaRequest> {
   readonly endpoint: SignerEndpoint = SignerEndpoint.GET_QUOTA
   readonly combinerEndpoint: CombinerEndpoint = getCombinerEndpoint(this.endpoint)
 
   protected async _handle(session: Session<PnpQuotaRequest>): Promise<void> {
-    // TODO(Alec)(Next)
-
-    // TODO(Alec): de-dupe
-    const meterGetQueryCountAndBlockNumber = Histograms.getBlindedSigInstrumentation
-      .labels('getQueryCountAndBlockNumber')
-      .startTimer()
-    const [queryCountResult, blockNumberResult] = await Promise.allSettled([
-      // Note: The database read of the user's performedQueryCount
-      // included here resolves to 0 on error
-      getRemainingQueryCount(
-        session.logger,
-        session.request.body.account,
-        session.request.body.hashedPhoneNumber
-      ),
-      getBlockNumber(),
-    ]).finally(meterGetQueryCountAndBlockNumber)
-
-    const { performedQueryCount, totalQuota } =
-      queryCountResult.status === 'fulfilled'
-        ? queryCountResult.value
-        : { performedQueryCount: undefined, totalQuota: undefined }
-    const blockNumber =
-      blockNumberResult.status === 'fulfilled' ? blockNumberResult.value : undefined
+    const { performedQueryCount, totalQuota, blockNumber } = await getQuotaStatus(session)
 
     // TODO(Alec): how do we want to represent errors here?
 
@@ -62,6 +40,7 @@ export class PnpQuota extends Controller<PnpQuotaRequest> {
       blockNumber
     )
 
+    // TODO(Alec): Make sure we're not forgetting to log correctly elsewhere
     // catch (err) {
     //   logger.error('Failed to get user quota')
     //   logger.error(err)
