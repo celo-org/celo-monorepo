@@ -104,17 +104,17 @@ export async function getRemainingQueryCount(
   logger: Logger,
   account: string,
   hashedPhoneNumber?: string
-): Promise<{ performedQueryCount: number; totalQuota: number }> {
+): Promise<{ queryCount: number; totalQuota: number }> {
   logger.debug({ account }, 'Retrieving remaining query count')
-  const meterGetRemainingQueryCount = Histograms.getRemainingQueryCountInstrumentation
+  const meter = Histograms.getRemainingQueryCountInstrumentation
     .labels('getRemainingQueryCount')
     .startTimer()
-  const [totalQuota, performedQueryCount] = await Promise.all([
+  const [totalQuota, queryCount] = await Promise.all([
     getQueryQuota(logger, account, hashedPhoneNumber),
     getPerformedQueryCount(account, logger),
-  ]).finally(meterGetRemainingQueryCount)
-  Histograms.userRemainingQuotaAtRequest.observe(totalQuota - performedQueryCount)
-  return { performedQueryCount, totalQuota }
+  ]).finally(meter)
+  Histograms.userRemainingQuotaAtRequest.observe(totalQuota - queryCount)
+  return { queryCount, totalQuota }
 }
 
 async function getQueryQuota(logger: Logger, account: string, hashedPhoneNumber?: string) {

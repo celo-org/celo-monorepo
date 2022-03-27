@@ -2,14 +2,12 @@ import { SignMessageRequest } from '@celo/identity/lib/odis/query'
 import {
   authenticateUser,
   CombinerEndpoint,
-  ErrorMessage,
   getCombinerEndpoint,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
-  PnpQuotaRequest,
   send,
   SignerEndpoint,
   SignMessageRequestSchema,
@@ -20,14 +18,12 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../../bls/bls-cryptography-client'
-import { Counters, Histograms } from '../../common/metrics'
-import config, { getVersion } from '../../config'
-import { incrementQueryCount } from '../../database/wrappers/account'
-import { getRequestExists, storeRequest } from '../../database/wrappers/request'
+import { Counters } from '../../common/metrics'
+import { getVersion } from '../../config'
+import { getRequestExists } from '../../database/wrappers/request'
 import { getKeyProvider } from '../../key-management/key-provider'
 import { DefaultKeyName, Key } from '../../key-management/key-provider-base'
-import { getRemainingQueryCount } from '../../signing/query-quota'
-import { getBlockNumber, getContractKit } from '../../web3/contracts'
+import { getContractKit } from '../../web3/contracts'
 import { Controller } from '../controller'
 import { Session } from '../session'
 
@@ -53,7 +49,7 @@ export class PnpSign extends Controller<SignMessageRequest> {
   }
 
   protected async _handle(session: Session<SignMessageRequest>): Promise<void> {
-    let performedQueryCount, totalQuota, blockNumber
+    let queryCount, totalQuota, blockNumber
     if (await getRequestExists(session.request.body, session.logger)) {
       Counters.duplicateRequests.inc()
       session.logger.debug(
@@ -61,34 +57,38 @@ export class PnpSign extends Controller<SignMessageRequest> {
       )
       session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
     } else {
-      const quotaStatus = await getQuotaStatus(session)
-      performedQueryCount = quotaStatus.performedQueryCount
+      const quotaStatus = await this.quotaService.getQuotaStatus(session)
+      queryCount = quotaStatus.queryCount
       totalQuota = quotaStatus.totalQuota
       blockNumber = quotaStatus.blockNumber
-      // In the case of a blockchain connection failure, totalQuota and blockNumber
-      // will be undefined.
-      // In the case of a database read failure, performedQueryCount
-      // will be undefined.
-      if (performedQueryCount && totalQuota) {
-        // TODO(Alec): copy domain pattern
-        if (!(await this.checkAndUpdateQuotaStatus(performedQueryCount, totalQuota, session))) {
+      // In the case of a blockchain connection failure, totalQuota and/or blockNumber
+      // may be undefined.
+      // In the case of a database connection failure, queryCount
+      // may be undefined.
+      if (queryCount && totalQuota) {
+        const { accepted, newQueryCount } = await this.quotaService.checkAndUpdateQuota(
+          queryCount,
+          totalQuota,
+          session
+        )
+        if (!accepted) {
           this.sendFailure(
             WarningMessage.EXCEEDED_QUOTA,
             403,
             session.response,
             session.logger,
-            performedQueryCount,
+            queryCount,
             totalQuota,
             blockNumber
           )
           return
         }
-      }
-      {
+        queryCount = newQueryCount
+      } else {
         Counters.requestsFailingOpen.inc()
       }
     }
-    // If performedQueryCount or totalQuota are undefined,
+    // If queryCount or totalQuota are undefined,
     // we fail open and service the request to not block the user.
     // Error messages are stored in the session and included along
     // with the signature in the response.
@@ -99,49 +99,11 @@ export class PnpSign extends Controller<SignMessageRequest> {
       session.logger,
       key,
       signature,
-      performedQueryCount,
+      queryCount,
       totalQuota,
       blockNumber,
       session.errors
     )
-  }
-
-  protected async checkAndUpdateQuotaStatus(
-    performedQueryCount: number,
-    totalQuota: number,
-    session: Session<SignMessageRequest>
-  ): Promise<boolean> {
-    if (performedQueryCount >= totalQuota) {
-      session.logger.debug({ performedQueryCount, totalQuota }, 'No remaining quota')
-      if (bypassQuotaForE2ETesting(session.request.body)) {
-        Counters.testQuotaBypassedRequests.inc()
-        session.logger.info(
-          { request: session.request.body },
-          'Request will bypass quota check for e2e testing'
-        )
-      } else {
-        return false
-      }
-    } else {
-      await this.updateQuotaStatus(session)
-    }
-    return true
-  }
-
-  protected async updateQuotaStatus(session: Session<SignMessageRequest>) {
-    // TODO(Alec)(Next): use a db transaction here
-    const [requestStored, queryCountIncremented] = await Promise.all([
-      storeRequest(session.request.body, session.logger),
-      incrementQueryCount(session.request.body.account, session.logger),
-    ])
-    if (!requestStored) {
-      session.logger.debug('Did not store request.')
-      session.errors.push(ErrorMessage.FAILURE_TO_STORE_REQUEST)
-    }
-    if (!queryCountIncremented) {
-      session.logger.debug('Did not increment query count.')
-      session.errors.push(ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT)
-    }
   }
 
   // TODO(Alec): de-dupe
@@ -220,7 +182,7 @@ export class PnpSign extends Controller<SignMessageRequest> {
     status: number,
     response: Response<SignMessageResponseFailure>,
     logger: Logger,
-    performedQueryCount?: number,
+    queryCount?: number,
     totalQuota?: number,
     blockNumber?: number
   ) {
@@ -230,7 +192,7 @@ export class PnpSign extends Controller<SignMessageRequest> {
         success: false,
         version: getVersion(),
         error,
-        performedQueryCount,
+        performedQueryCount: queryCount,
         totalQuota,
         blockNumber,
       },
@@ -239,49 +201,4 @@ export class PnpSign extends Controller<SignMessageRequest> {
     )
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
-}
-
-// TODO(Alec): Use dependency injection for this
-export async function getQuotaStatus(session: Session<SignMessageRequest | PnpQuotaRequest>) {
-  const meter = Histograms.getBlindedSigInstrumentation
-    .labels('getQueryCountAndBlockNumber')
-    .startTimer()
-  const [queryCountResult, blockNumberResult] = await Promise.allSettled([
-    // TODO(Alec)
-    // Note: The database read of the user's performedQueryCount
-    // included here resolves to 0 on error
-    getRemainingQueryCount(
-      session.logger,
-      session.request.body.account,
-      session.request.body.hashedPhoneNumber
-    ),
-    getBlockNumber(),
-  ]).finally(meter)
-
-  let performedQueryCount, totalQuota, blockNumber
-  let hadBlockchainError = false
-  if (queryCountResult.status === 'fulfilled') {
-    performedQueryCount = queryCountResult.value.performedQueryCount
-    totalQuota = queryCountResult.value.totalQuota
-  } else {
-    session.logger.error(queryCountResult.reason)
-    hadBlockchainError = true
-  }
-  if (blockNumberResult.status === 'fulfilled') {
-    blockNumber = blockNumberResult.value
-  } else {
-    session.logger.error(blockNumberResult.reason)
-    hadBlockchainError = true
-  }
-
-  if (hadBlockchainError) {
-    session.errors.push(ErrorMessage.CONTRACT_GET_FAILURE)
-  }
-
-  return { performedQueryCount, totalQuota, blockNumber }
-}
-
-function bypassQuotaForE2ETesting(requestBody: SignMessageRequest) {
-  const sessionID = Number(requestBody.sessionID)
-  return sessionID && sessionID % 100 < config.test_quota_bypass_percentage
 }

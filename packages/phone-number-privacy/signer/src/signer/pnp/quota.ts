@@ -20,25 +20,17 @@ import { getVersion } from '../../config'
 import { getContractKit } from '../../web3/contracts'
 import { Controller } from '../controller'
 import { Session } from '../session'
-import { getQuotaStatus } from './sign'
 
 export class PnpQuota extends Controller<PnpQuotaRequest> {
   readonly endpoint: SignerEndpoint = SignerEndpoint.GET_QUOTA
   readonly combinerEndpoint: CombinerEndpoint = getCombinerEndpoint(this.endpoint)
 
   protected async _handle(session: Session<PnpQuotaRequest>): Promise<void> {
-    const { performedQueryCount, totalQuota, blockNumber } = await getQuotaStatus(session)
+    const { queryCount, totalQuota, blockNumber } = await this.quotaService.getQuotaStatus(session)
 
     // TODO(Alec): how do we want to represent errors here?
 
-    this.sendSuccess(
-      200,
-      session.response,
-      session.logger,
-      performedQueryCount,
-      totalQuota,
-      blockNumber
-    )
+    this.sendSuccess(200, session.response, session.logger, queryCount, totalQuota, blockNumber)
 
     // TODO(Alec): Make sure we're not forgetting to log correctly elsewhere
     // catch (err) {
