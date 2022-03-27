@@ -1,8 +1,7 @@
-import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { DB_TIMEOUT, ErrorMessage, SignMessageRequest } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
-import { GetBlindedMessagePartialSigRequest } from '../../signing/get-partial-signature'
 import { getDatabase } from '../database'
 import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
 
@@ -11,7 +10,7 @@ function requests() {
 }
 
 export async function getRequestExists(
-  request: GetBlindedMessagePartialSigRequest,
+  request: SignMessageRequest,
   logger: Logger,
   trx: Transaction
 ): Promise<boolean> {
@@ -39,11 +38,7 @@ export async function getRequestExists(
   }
 }
 
-export async function storeRequest(
-  request: GetBlindedMessagePartialSigRequest,
-  logger: Logger,
-  trx: Transaction
-) {
+export async function storeRequest(request: SignMessageRequest, logger: Logger, trx: Transaction) {
   const storeRequestMeter = Histograms.dbOpsInstrumentation.labels('storeRequest').startTimer()
   logger.debug({ request }, 'Storing salt request')
   try {

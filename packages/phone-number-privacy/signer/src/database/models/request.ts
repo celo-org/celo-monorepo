@@ -1,4 +1,4 @@
-import { GetBlindedMessagePartialSigRequest } from '../../signing/get-partial-signature'
+import { SignMessageRequest } from '@celo/phone-number-privacy-common'
 
 export const REQUESTS_TABLE = 'requests'
 export enum REQUESTS_COLUMNS {
@@ -11,7 +11,7 @@ export class Request {
   [REQUESTS_COLUMNS.timestamp]: Date;
   [REQUESTS_COLUMNS.blindedQuery]: string
 
-  constructor(request: GetBlindedMessagePartialSigRequest) {
+  constructor(request: SignMessageRequest) {
     this[REQUESTS_COLUMNS.address] = request.account
     this[REQUESTS_COLUMNS.timestamp] = new Date()
     this[REQUESTS_COLUMNS.blindedQuery] = request.blindedQueryPhoneNumber
