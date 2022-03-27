@@ -1,5 +1,6 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
+import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
@@ -11,48 +12,82 @@ function accounts() {
 /*
  * Returns how many queries the account has already performed.
  */
-export async function getPerformedQueryCount(account: string, logger: Logger): Promise<number> {
+export async function getPerformedQueryCount(
+  account: string,
+  logger: Logger,
+  trx?: Transaction
+): Promise<number> {
   logger.debug({ account }, 'Getting performed query count')
   const getPerformedQueryCountMeter = Histograms.dbOpsInstrumentation
     .labels('getPerformedQueryCount')
     .startTimer()
   try {
-    const queryCounts = await accounts()
-      .select(ACCOUNTS_COLUMNS.numLookups)
-      .where(ACCOUNTS_COLUMNS.address, account)
-      .first()
-      .timeout(DB_TIMEOUT)
-    getPerformedQueryCountMeter()
+    const queryCounts = trx
+      ? await accounts()
+          .transacting(trx)
+          .forUpdate()
+          .select(ACCOUNTS_COLUMNS.numLookups)
+          .where(ACCOUNTS_COLUMNS.address, account)
+          .first()
+          .timeout(DB_TIMEOUT)
+      : await accounts()
+          .select(ACCOUNTS_COLUMNS.numLookups)
+          .where(ACCOUNTS_COLUMNS.address, account)
+          .first()
+          .timeout(DB_TIMEOUT)
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
-    logger.error(err)
-    getPerformedQueryCountMeter()
+    logger.error({ error: err }, ErrorMessage.DATABASE_GET_FAILURE)
     return 0
+  } finally {
+    getPerformedQueryCountMeter()
   }
 }
 
-async function getAccountExists(account: string): Promise<boolean> {
+async function getAccountExists(
+  account: string,
+  logger: Logger,
+  trx?: Transaction
+): Promise<boolean> {
   const getAccountExistsMeter = Histograms.dbOpsInstrumentation
     .labels('getAccountExists')
     .startTimer()
-  return _getAccountExists(account).finally(getAccountExistsMeter)
-}
-
-async function _getAccountExists(account: string): Promise<boolean> {
-  const existingAccountRecord = await accounts().where(ACCOUNTS_COLUMNS.address, account).first()
-  return !!existingAccountRecord
+  try {
+    const accountRecord = trx
+      ? await accounts()
+          .transacting(trx)
+          .forUpdate()
+          .where(ACCOUNTS_COLUMNS.address, account)
+          .first()
+          .timeout(DB_TIMEOUT)
+      : await accounts().where(ACCOUNTS_COLUMNS.address, account).first().timeout(DB_TIMEOUT)
+    return !!accountRecord
+  } catch (err) {
+    Counters.databaseErrors.labels(Labels.read).inc()
+    logger.error({ error: err }, ErrorMessage.DATABASE_GET_FAILURE)
+    return false
+  } finally {
+    getAccountExistsMeter()
+  }
 }
 
 /*
  * Increments query count in database.  If record doesn't exist, create one.
  */
-async function _incrementQueryCount(account: string, logger: Logger) {
+export async function incrementQueryCount(
+  account: string,
+  logger: Logger,
+  trx: Transaction
+): Promise<boolean> {
+  const incrementQueryCountMeter = Histograms.dbOpsInstrumentation
+    .labels('incrementQueryCount')
+    .startTimer()
   logger.debug({ account }, 'Incrementing query count')
   try {
-    if (await getAccountExists(account)) {
+    if (await getAccountExists(account, logger, trx)) {
       await accounts()
+        .transacting(trx)
         .where(ACCOUNTS_COLUMNS.address, account)
         .increment(ACCOUNTS_COLUMNS.numLookups, 1)
         .timeout(DB_TIMEOUT)
@@ -60,24 +95,24 @@ async function _incrementQueryCount(account: string, logger: Logger) {
     } else {
       const newAccount = new Account(account)
       newAccount[ACCOUNTS_COLUMNS.numLookups] = 1
-      return insertRecord(newAccount)
+      return insertRecord(newAccount, logger, trx)
     }
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error(err)
-    return null
+    logger.error({ error: err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    return false
+  } finally {
+    incrementQueryCountMeter()
   }
 }
 
-export async function incrementQueryCount(account: string, logger: Logger) {
-  const incrementQueryCountMeter = Histograms.dbOpsInstrumentation
-    .labels('incrementQueryCount')
-    .startTimer()
-  return _incrementQueryCount(account, logger).finally(incrementQueryCountMeter)
-}
-
-async function insertRecord(data: Account) {
-  await accounts().insert(data).timeout(DB_TIMEOUT)
-  return true
+async function insertRecord(data: Account, logger: Logger, trx: Transaction) {
+  try {
+    await accounts().transacting(trx).insert(data).timeout(DB_TIMEOUT)
+    return true
+  } catch (err) {
+    Counters.databaseErrors.labels(Labels.update).inc()
+    logger.error({ error: err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    return false
+  }
 }

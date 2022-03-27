@@ -17,7 +17,6 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Counters } from '../../common/metrics'
 import { getVersion } from '../../config'
-import { getDomainStateRecordOrEmpty } from '../../database/wrappers/domainState'
 import { Controller } from '../controller'
 import { Session } from '../session'
 
@@ -35,7 +34,7 @@ export class DomainQuotaStatus extends Controller<DomainQuotaStatusRequest> {
     })
 
     try {
-      const domainStateRecord = await getDomainStateRecordOrEmpty(domain, session.logger)
+      const domainStateRecord = await this.quotaService.getQuotaStatus(session)
       this.sendSuccess(
         200,
         session.response,

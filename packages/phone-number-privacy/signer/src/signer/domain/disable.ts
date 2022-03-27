@@ -19,7 +19,7 @@ import { getVersion } from '../../config'
 import { getDatabase } from '../../database/database'
 import {
   createEmptyDomainStateRecord,
-  getDomainStateRecordWithLock,
+  getDomainStateRecord,
   insertDomainStateRecord,
   setDomainDisabled,
 } from '../../database/wrappers/domainState'
@@ -43,7 +43,7 @@ export class DomainDisable extends Controller<DisableDomainRequest> {
       // Inside a database transaction, update or create the domain to mark it disabled.
       await getDatabase().transaction(async (trx) => {
         const domainStateRecord =
-          (await getDomainStateRecordWithLock(domain, trx, session.logger)) ??
+          (await getDomainStateRecord(domain, session.logger, trx)) ??
           (await insertDomainStateRecord(createEmptyDomainStateRecord(domain), trx, session.logger))
         if (!domainStateRecord.disabled) {
           await setDomainDisabled(domain, trx, session.logger)

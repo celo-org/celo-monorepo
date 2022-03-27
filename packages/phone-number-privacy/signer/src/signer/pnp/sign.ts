@@ -20,6 +20,7 @@ import { Request, Response } from 'express'
 import { computeBlindedSignature } from '../../bls/bls-cryptography-client'
 import { Counters } from '../../common/metrics'
 import { getVersion } from '../../config'
+import { getDatabase } from '../../database/database'
 import { getRequestExists } from '../../database/wrappers/request'
 import { getKeyProvider } from '../../key-management/key-provider'
 import { DefaultKeyName, Key } from '../../key-management/key-provider-base'
@@ -49,61 +50,63 @@ export class PnpSign extends Controller<SignMessageRequest> {
   }
 
   protected async _handle(session: Session<SignMessageRequest>): Promise<void> {
-    let queryCount, totalQuota, blockNumber
-    if (await getRequestExists(session.request.body, session.logger)) {
-      Counters.duplicateRequests.inc()
-      session.logger.debug(
-        'Request already exists in db. Will service request without charging quota.'
-      )
-      session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
-    } else {
-      const quotaStatus = await this.quotaService.getQuotaStatus(session)
-      queryCount = quotaStatus.queryCount
-      totalQuota = quotaStatus.totalQuota
-      blockNumber = quotaStatus.blockNumber
-      // In the case of a blockchain connection failure, totalQuota and/or blockNumber
-      // may be undefined.
-      // In the case of a database connection failure, queryCount
-      // may be undefined.
-      if (queryCount && totalQuota) {
-        const { accepted, newQueryCount } = await this.quotaService.checkAndUpdateQuota(
-          queryCount,
-          totalQuota,
-          session
+    await getDatabase().transaction(async (trx) => {
+      let queryCount, totalQuota, blockNumber
+      if (await getRequestExists(session.request.body, session.logger, trx)) {
+        Counters.duplicateRequests.inc()
+        session.logger.debug(
+          'Request already exists in db. Will service request without charging quota.'
         )
-        if (!accepted) {
-          this.sendFailure(
-            WarningMessage.EXCEEDED_QUOTA,
-            403,
-            session.response,
-            session.logger,
-            queryCount,
-            totalQuota,
-            blockNumber
-          )
-          return
-        }
-        queryCount = newQueryCount
+        session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
       } else {
-        Counters.requestsFailingOpen.inc()
+        const quotaStatus = await this.quotaService.getQuotaStatus(session, trx) // TODO(Alec)
+        queryCount = quotaStatus.queryCount
+        totalQuota = quotaStatus.totalQuota
+        blockNumber = quotaStatus.blockNumber
+        // In the case of a blockchain connection failure, totalQuota and/or blockNumber
+        // may be undefined.
+        // In the case of a database connection failure, queryCount
+        // may be undefined.
+        if (quotaStatus.queryCount && quotaStatus.totalQuota) {
+          const { sufficient, state } = await this.quotaService.checkAndUpdateQuotaStatus(
+            quotaStatus,
+            session,
+            trx
+          )
+          if (!sufficient) {
+            this.sendFailure(
+              WarningMessage.EXCEEDED_QUOTA,
+              403,
+              session.response,
+              session.logger,
+              queryCount,
+              totalQuota,
+              blockNumber
+            )
+            return
+          }
+          queryCount = state.queryCount
+        } else {
+          Counters.requestsFailingOpen.inc()
+        }
       }
-    }
-    // If queryCount or totalQuota are undefined,
-    // we fail open and service the request to not block the user.
-    // Error messages are stored in the session and included along
-    // with the signature in the response.
-    const { signature, key } = await this.sign(session)
-    this.sendSuccess(
-      200,
-      session.response,
-      session.logger,
-      key,
-      signature,
-      queryCount,
-      totalQuota,
-      blockNumber,
-      session.errors
-    )
+      // If queryCount or totalQuota are undefined,
+      // we fail open and service the request to not block the user.
+      // Error messages are stored in the session and included along
+      // with the signature in the response.
+      const { signature, key } = await this.sign(session)
+      this.sendSuccess(
+        200,
+        session.response,
+        session.logger,
+        key,
+        signature,
+        queryCount,
+        totalQuota,
+        blockNumber,
+        session.errors
+      )
+    })
   }
 
   // TODO(Alec): de-dupe

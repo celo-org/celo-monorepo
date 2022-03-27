@@ -12,14 +12,14 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Counters } from '../common/metrics'
 import { Config } from '../config'
-import { DomainQuotaService } from './domain/quota.service'
+import { IQuotaService } from './quota.interface'
 import { Session } from './session'
 
 export abstract class Controller<R extends OdisRequest> {
   abstract readonly endpoint: SignerEndpoint
   abstract readonly combinerEndpoint: CombinerEndpoint
 
-  constructor(readonly config: Config, readonly quotaService: DomainQuotaService) {} // TODO(Alec)
+  constructor(readonly config: Config, readonly quotaService: IQuotaService<R>) {} // TODO(Alec): dep injection?
 
   public async handle(
     request: Request<{}, {}, unknown>,

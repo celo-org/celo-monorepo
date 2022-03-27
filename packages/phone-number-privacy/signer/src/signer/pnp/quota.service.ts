@@ -7,6 +7,7 @@ import {
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
+import { Transaction } from 'knex'
 import { Counters, Histograms } from '../../common/metrics'
 import config from '../../config'
 import { getPerformedQueryCount, incrementQueryCount } from '../../database/wrappers/account'
@@ -20,34 +21,25 @@ import {
   getWalletAddress,
   meter,
 } from '../../web3/contracts'
+import { IQuotaService, OdisQuotaStatusResult } from '../quota.interface'
 import { Session } from '../session'
 
-export type PnpQuotaStatus = {
-  queryCount?: number
-  totalQuota?: number
-  blockNumber?: number
+export interface PnpQuotaStatus {
+  queryCount: number
+  totalQuota: number
+  blockNumber: number
 }
 
-export interface IPnpQuotaService {
-  // checkAndUpdateQuota: (
-  //   domain: Domain,
-  //   domainState: DomainStateRecord,
-  //   trx: Transaction<DomainStateRecord>,
-  //   logger: Logger
-  // ) => Promise<{ sufficient: boolean; state: DomainStateRecord }>
-}
-
-export class DomainQuotaService implements IPnpQuotaService {
+export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQuotaRequest> {
   public async checkAndUpdateQuotaStatus(
-    queryCount: number,
-    totalQuota: number,
-    session: Session<SignMessageRequest>
-  ): Promise<{ accepted: boolean; newQueryCount: number }> {
-    Histograms.userRemainingQuotaAtRequest.observe(totalQuota - queryCount)
-    let accepted = true,
-      newQueryCount = queryCount
-    if (queryCount >= totalQuota) {
-      session.logger.debug({ queryCount, totalQuota }, 'No remaining quota')
+    state: PnpQuotaStatus,
+    session: Session<SignMessageRequest>,
+    trx: Transaction
+  ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
+    Histograms.userRemainingQuotaAtRequest.observe(state.totalQuota - state.queryCount)
+    let sufficient = state.queryCount >= state.totalQuota
+    if (sufficient) {
+      session.logger.debug({ ...state }, 'No remaining quota')
       if (this.bypassQuotaForE2ETesting(session.request.body)) {
         Counters.testQuotaBypassedRequests.inc()
         session.logger.info(
@@ -55,42 +47,27 @@ export class DomainQuotaService implements IPnpQuotaService {
           'Request will bypass quota check for e2e testing'
         )
       } else {
-        accepted = false
+        sufficient = false
       }
     } else {
-      await this.updateQuotaStatus(session)
-      newQueryCount++
+      await this.updateQuotaStatus(trx, session)
+      state.queryCount++
     }
-    return { accepted, newQueryCount }
+    return { sufficient, state }
   }
 
-  protected async updateQuotaStatus(session: Session<SignMessageRequest>) {
-    // TODO(Alec)(Next): use a db transaction here
-    const [requestStored, queryCountIncremented] = await Promise.all([
-      storeRequest(session.request.body, session.logger),
-      incrementQueryCount(session.request.body.account, session.logger),
-    ])
-    if (!requestStored) {
-      session.logger.debug('Did not store request.')
-      session.errors.push(ErrorMessage.FAILURE_TO_STORE_REQUEST)
-    }
-    if (!queryCountIncremented) {
-      session.logger.debug('Did not increment query count.')
-      session.errors.push(ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT)
-    }
-  }
-
-  protected async getQuotaStatus(
-    session: Session<SignMessageRequest | PnpQuotaRequest>
+  public async getQuotaStatus(
+    session: Session<SignMessageRequest | PnpQuotaRequest>,
+    trx?: Transaction
   ): Promise<PnpQuotaStatus> {
     const { account } = session.request.body
     const [queryCountResult, totalQuotaResult, blockNumberResult] = await meter(
       (_session: Session<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
-          // TODO(Alec)
+          // TODO(Alec)(Next)
           // Note: The database read of the user's queryCount
           // included here resolves to 0 on error
-          getPerformedQueryCount(account, session.logger),
+          getPerformedQueryCount(account, session.logger, trx),
           this.getTotalQuota(session),
           getBlockNumber(),
         ]),
@@ -102,10 +79,10 @@ export class DomainQuotaService implements IPnpQuotaService {
       'getQuotaStatus'
     )
 
-    let hadBlockchainError = false,
-      queryCount,
-      totalQuota,
-      blockNumber
+    let hadBlockchainError = false
+    let queryCount = -1,
+      totalQuota = -1,
+      blockNumber = -1
     if (queryCountResult.status === 'fulfilled') {
       queryCount = queryCountResult.value
     } else {
@@ -129,6 +106,22 @@ export class DomainQuotaService implements IPnpQuotaService {
     }
 
     return { queryCount, totalQuota, blockNumber }
+  }
+
+  protected async updateQuotaStatus(trx: Transaction, session: Session<SignMessageRequest>) {
+    // TODO(Alec): Review db error handling
+    const [requestStored, queryCountIncremented] = await Promise.all([
+      storeRequest(session.request.body, session.logger, trx),
+      incrementQueryCount(session.request.body.account, session.logger, trx),
+    ])
+    if (!requestStored) {
+      session.logger.debug('Did not store request.')
+      session.errors.push(ErrorMessage.FAILURE_TO_STORE_REQUEST)
+    }
+    if (!queryCountIncremented) {
+      session.logger.debug('Did not increment query count.')
+      session.errors.push(ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT)
+    }
   }
 
   protected async getWalletAddressAndIsVerified(

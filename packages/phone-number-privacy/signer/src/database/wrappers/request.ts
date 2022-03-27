@@ -1,5 +1,6 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
+import { Transaction } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { GetBlindedMessagePartialSigRequest } from '../../signing/get-partial-signature'
 import { getDatabase } from '../database'
@@ -11,7 +12,8 @@ function requests() {
 
 export async function getRequestExists(
   request: GetBlindedMessagePartialSigRequest,
-  logger: Logger
+  logger: Logger,
+  trx: Transaction
 ): Promise<boolean> {
   logger.debug({ request }, 'Checking if request exists')
   const getRequestExistsMeter = Histograms.dbOpsInstrumentation
@@ -19,35 +21,39 @@ export async function getRequestExists(
     .startTimer()
   try {
     const existingRequest = await requests()
+      .transacting(trx)
       .where({
         [REQUESTS_COLUMNS.address]: request.account,
         [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
       })
       .first()
       .timeout(DB_TIMEOUT)
-    getRequestExistsMeter()
     return !!existingRequest
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error(ErrorMessage.DATABASE_GET_FAILURE)
     logger.error(err)
-    getRequestExistsMeter()
     return false
+  } finally {
+    getRequestExistsMeter()
   }
 }
 
-export async function storeRequest(request: GetBlindedMessagePartialSigRequest, logger: Logger) {
+export async function storeRequest(
+  request: GetBlindedMessagePartialSigRequest,
+  logger: Logger,
+  trx: Transaction
+) {
   const storeRequestMeter = Histograms.dbOpsInstrumentation.labels('storeRequest').startTimer()
   logger.debug({ request }, 'Storing salt request')
   try {
-    await requests().insert(new Request(request)).timeout(DB_TIMEOUT)
-    storeRequestMeter()
+    await requests().transacting(trx).insert(new Request(request)).timeout(DB_TIMEOUT)
     return true
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error(err)
-    storeRequestMeter()
+    logger.error({ error: err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
     return null
+  } finally {
+    storeRequestMeter()
   }
 }

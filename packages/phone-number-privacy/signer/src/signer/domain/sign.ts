@@ -23,7 +23,6 @@ import { Counters } from '../../common/metrics'
 import { getVersion } from '../../config'
 import { getDatabase } from '../../database/database'
 import { DomainStateRecord } from '../../database/models/domainState'
-import { getDomainStateRecordOrEmptyWithLock } from '../../database/wrappers/domainState'
 import { getKeyProvider } from '../../key-management/key-provider'
 import { DefaultKeyName, Key } from '../../key-management/key-provider-base'
 import { Controller } from '../controller'
@@ -44,15 +43,11 @@ export class DomainSign extends Controller<DomainRestrictedSignatureRequest> {
     try {
       await getDatabase().transaction(async (trx) => {
         // Get the current domain state record, or use an empty record if one does not exist.
-        const domainStateRecord = await getDomainStateRecordOrEmptyWithLock(
-          domain,
-          trx,
-          session.logger
-        )
+        const domainStateRecord = await this.quotaService.getQuotaStatus(session, trx)
 
         if (!this.nonceCheck(domainStateRecord, session)) {
           return this.sendFailure(
-            WarningMessage.UNAUTHENTICATED_USER, // TODO(Alec)
+            WarningMessage.UNAUTHENTICATED_USER, // TODO(Alec): Different error type
             401,
             session.response,
             session.logger,
@@ -60,11 +55,10 @@ export class DomainSign extends Controller<DomainRestrictedSignatureRequest> {
           )
         }
 
-        const quotaStatus = await this.quotaService.checkAndUpdateQuota(
-          domain,
+        const quotaStatus = await this.quotaService.checkAndUpdateQuotaStatus(
           domainStateRecord,
-          trx,
-          session.logger
+          session,
+          trx
         )
 
         if (!quotaStatus.sufficient) {
@@ -105,7 +99,7 @@ export class DomainSign extends Controller<DomainRestrictedSignatureRequest> {
   ): boolean {
     const nonce: EIP712Optional<number> = session.request.body.options.nonce
     if (!nonce.defined) {
-      session.logger.info('Nonce is undefined') // TODO(Alec)
+      session.logger.info('Nonce is undefined') // TODO(Alec): Better logging
       return false
     }
     return nonce.value >= domainStateRecord.counter

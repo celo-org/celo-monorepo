@@ -34,45 +34,12 @@ export async function setDomainDisabled<D extends Domain>(
   }
 }
 
-export async function getDomainStateRecord<D extends Domain>(
-  domain: D,
-  logger: Logger
-): Promise<DomainStateRecord<D> | null> {
-  const getDomainStateMeter = Histograms.dbOpsInstrumentation.labels('getDomainState').startTimer()
-  const hash = domainHash(domain).toString('hex')
-  logger.debug('Getting domain state from db', { hash, domain })
-  try {
-    const result = await domainStates()
-      .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
-      .first()
-      .timeout(DB_TIMEOUT)
-    return result ?? null
-  } catch (err) {
-    Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
-    logger.error(err)
-    throw err
-  } finally {
-    getDomainStateMeter()
-  }
-}
-
 export async function getDomainStateRecordOrEmpty(
   domain: Domain,
-  logger: Logger
+  logger: Logger,
+  trx?: Transaction
 ): Promise<DomainStateRecord<Domain>> {
-  return (await getDomainStateRecord(domain, logger)) ?? createEmptyDomainStateRecord(domain)
-}
-
-export async function getDomainStateRecordOrEmptyWithLock(
-  domain: Domain,
-  trx: Transaction,
-  logger: Logger
-): Promise<DomainStateRecord<Domain>> {
-  return (
-    (await getDomainStateRecordWithLock(domain, trx, logger)) ??
-    createEmptyDomainStateRecord(domain)
-  )
+  return (await getDomainStateRecord(domain, logger, trx)) ?? createEmptyDomainStateRecord(domain)
 }
 
 export function createEmptyDomainStateRecord(domain: Domain) {
@@ -84,10 +51,10 @@ export function createEmptyDomainStateRecord(domain: Domain) {
   })
 }
 
-export async function getDomainStateRecordWithLock<D extends Domain>(
+export async function getDomainStateRecord<D extends Domain>(
   domain: D,
-  trx: Transaction<DomainStateRecord<D>>,
-  logger: Logger
+  logger: Logger,
+  trx?: Transaction<DomainStateRecord<D>>
 ): Promise<DomainStateRecord<D> | null> {
   const getDomainStateRecordWithLockMeter = Histograms.dbOpsInstrumentation
     .labels('getDomainStateRecordWithLock')
@@ -95,12 +62,17 @@ export async function getDomainStateRecordWithLock<D extends Domain>(
   const hash = domainHash(domain).toString('hex')
   logger.debug('Getting domain state from db with lock', { hash, domain })
   try {
-    const result = await domainStates()
-      .transacting(trx)
-      .forUpdate()
-      .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
-      .first()
-      .timeout(DB_TIMEOUT)
+    const result = trx
+      ? await domainStates()
+          .transacting(trx)
+          .forUpdate()
+          .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
+          .first()
+          .timeout(DB_TIMEOUT)
+      : await domainStates()
+          .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
+          .first()
+          .timeout(DB_TIMEOUT)
     return result ?? null
   } catch (error) {
     Counters.databaseErrors.labels(Labels.read).inc()
@@ -143,11 +115,10 @@ export async function updateDomainStateRecord<D extends Domain>(
         .update(domainState)
         .timeout(DB_TIMEOUT)
     }
-  } catch (err) {
+  } catch (error) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error(err)
-    throw err
+    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw error
   } finally {
     updateDomainStateRecordMeter()
   }
@@ -165,11 +136,10 @@ export async function insertDomainStateRecord<D extends Domain>(
   try {
     await domainStates().transacting(trx).insert(domainState).timeout(DB_TIMEOUT)
     return domainState
-  } catch (err) {
+  } catch (error) {
     Counters.databaseErrors.labels(Labels.insert).inc()
-    logger.error(ErrorMessage.DATABASE_INSERT_FAILURE)
-    logger.error(err)
-    throw err
+    logger.error({ error }, ErrorMessage.DATABASE_INSERT_FAILURE)
+    throw error
   } finally {
     insertDomainStateRecordMeter()
   }
