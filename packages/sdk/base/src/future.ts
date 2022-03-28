@@ -1,4 +1,4 @@
-// A Future is like an exernally fulfillable (resolvable) promise
+// A Future is like an externally fulfillable (resolvable) promise
 /** @internal */
 export class Future<T> {
   private promise: Promise<T>
@@ -42,12 +42,12 @@ export class Future<T> {
     return this.promise
   }
 }
-/**@internal */
+/** @internal */
 export function toFuture<A>(p: Promise<A>): Future<A> {
   const future = new Future<A>()
   return pipeToFuture(p, future)
 }
-/**@internal */
+/** @internal */
 export function pipeToFuture<A>(p: Promise<A>, future: Future<A>): Future<A> {
   p.then(future.resolve.bind(future)).catch(future.reject.bind(future))
   return future

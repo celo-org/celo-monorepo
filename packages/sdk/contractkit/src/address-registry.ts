@@ -19,7 +19,6 @@ export class UnregisteredError extends Error {
  * Celo Core Contract's Address Registry
  *
  * @param connection – an instance of @celo/connect {@link Connection}
-
  */
 export class AddressRegistry {
   private readonly registry: Registry
