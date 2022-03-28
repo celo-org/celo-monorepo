@@ -44,6 +44,15 @@ export function newKitFromWeb3(web3: Web3, wallet: ReadOnlyWallet = new LocalWal
   return new MiniContractKit(new Connection(web3, wallet))
 }
 
+/**
+ * MiniContractKit provides a core subset of {@link ContractKit}'s functionality
+ *
+ * @remarks
+ *
+ * It is recommended to use this over ContractKit for dApps for a lighter bundle size
+ *
+ * @param connection – an instance of @celo/connect {@link Connection}
+ */
 export class MiniContractKit {
   /** core contract's address registry */
   readonly registry: AddressRegistry
