@@ -1,10 +1,12 @@
-import { rootLogger as logger } from '@celo/phone-number-privacy-common'
+import { rootLogger } from '@celo/phone-number-privacy-common'
 import config, { SupportedKeystore } from '../config'
 import { AWSKeyProvider } from './aws-key-provider'
 import { AzureKeyProvider } from './azure-key-provider'
 import { GoogleKeyProvider } from './google-key-provider'
 import { KeyProvider } from './key-provider-base'
 import { MockKeyProvider } from './mock-key-provider'
+
+const logger = rootLogger()
 
 let keyProvider: KeyProvider
 

@@ -1,15 +1,18 @@
 import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
+import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import { createHash } from 'crypto'
 import debugFactory from 'debug'
 import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
+  AuthenticationMethod,
   AuthSigner,
+  CombinerSignMessageResponse,
+  EncryptionKeySigner,
   queryOdis,
   ServiceContext,
   SignMessageRequest,
-  SignMessageResponse,
 } from './query'
 
 // ODIS minimum dollar balance for sig retrieval
@@ -21,7 +24,6 @@ const debug = debugFactory('kit:odis:phone-number-identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
-const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSig'
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -38,6 +40,7 @@ export async function getPhoneNumberIdentifier(
   account: string,
   signer: AuthSigner,
   context: ServiceContext,
+  blindingFactor?: string,
   selfPhoneHash?: string,
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient,
@@ -48,6 +51,14 @@ export async function getPhoneNumberIdentifier(
   if (!isE164Number(e164Number)) {
     throw new Error(`Invalid phone number: ${e164Number}`)
   }
+
+  let seed: Buffer | undefined
+  if (blindingFactor) {
+    seed = Buffer.from(blindingFactor)
+  } else if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
+    seed = Buffer.from((signer as EncryptionKeySigner).rawKey)
+  }
+
   // Fallback to using Wasm version if not specified
 
   if (!blsBlindingClient) {
@@ -55,7 +66,7 @@ export async function getPhoneNumberIdentifier(
     blsBlindingClient = new WasmBlsBlindingClient(context.odisPubKey)
   }
 
-  const base64BlindedMessage = await getBlindedPhoneNumber(e164Number, blsBlindingClient)
+  const base64BlindedMessage = await getBlindedPhoneNumber(e164Number, blsBlindingClient, seed)
 
   const base64BlindSig = await getBlindedPhoneNumberSignature(
     account,
@@ -76,11 +87,12 @@ export async function getPhoneNumberIdentifier(
  */
 export async function getBlindedPhoneNumber(
   e164Number: string,
-  blsBlindingClient: BlsBlindingClient
+  blsBlindingClient: BlsBlindingClient,
+  seed?: Buffer
 ): Promise<string> {
   debug('Retrieving blinded message')
   const base64PhoneNumber = Buffer.from(e164Number).toString('base64')
-  return blsBlindingClient.blindMessage(base64PhoneNumber)
+  return blsBlindingClient.blindMessage(base64PhoneNumber, seed)
 }
 
 /**
@@ -109,11 +121,11 @@ export async function getBlindedPhoneNumberSignature(
     body.sessionID = sessionID
   }
 
-  const response = await queryOdis<SignMessageResponse>(
+  const response = await queryOdis<CombinerSignMessageResponse>(
     signer,
     body,
     context,
-    SIGN_MESSAGE_ENDPOINT
+    CombinerEndpoint.SIGN_MESSAGE
   )
   return response.combinedSignature
 }

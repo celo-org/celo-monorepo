@@ -527,6 +527,15 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     })
   )
 
+  async isUpvoting(upvoter: Address) {
+    const upvote = await this.getUpvoteRecord(upvoter)
+    return (
+      !upvote.proposalID.isZero() &&
+      (await this.isQueued(upvote.proposalID)) &&
+      !(await this.isQueuedProposalExpired(upvote.proposalID))
+    )
+  }
+
   /**
    * Returns the corresponding vote record
    * @param voter Address of voter
@@ -636,6 +645,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const dequeue = await this.getDequeue()
     const voteRecords = await Promise.all(dequeue.map((id) => this.getVoteRecord(voter, id)))
     return voteRecords.filter((record) => record != null) as VoteRecord[]
+  }
+
+  async isVotingReferendum(voter: Address) {
+    const records = await this.getVoteRecords(voter)
+    return records.length !== 0
   }
 
   /*
@@ -800,6 +814,8 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
       this.contract.methods.vote(valueToString(proposalID), proposalIndex, voteNum)
     )
   }
+
+  revokeVotes = proxySend(this.kit, this.contract.methods.revokeVotes)
 
   /**
    * Returns `voter`'s vote choice on a given proposal.

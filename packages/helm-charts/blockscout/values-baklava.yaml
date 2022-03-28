@@ -49,5 +49,6 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
+    recaptchaSecretName: baklava-blockscout-recaptcha
   metrics:
-    enabled: false
+    enabled: true

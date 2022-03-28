@@ -1,13 +1,15 @@
 import { ensureLeading0x } from '@celo/base/lib/address'
 import { AbiCoder, AbiItem, DecodedParamsObject } from '../abi-types'
 
-export const getAbiTypes = (abi: AbiItem[], methodName: string) =>
-  abi.find((entry) => entry.name! === methodName)!.inputs!.map((input) => input.type)
+export const getAbiByName = (abi: AbiItem[], methodName: string) =>
+  abi.find((entry) => entry.name! === methodName)!
 
 export const parseDecodedParams = (params: DecodedParamsObject) => {
   const args = new Array(params.__length__)
-  delete params.__length__
   Object.keys(params).forEach((key) => {
+    if (key === '__length__') {
+      return
+    }
     const argIndex = parseInt(key, 10)
     if (argIndex >= 0) {
       args[argIndex] = params[key]

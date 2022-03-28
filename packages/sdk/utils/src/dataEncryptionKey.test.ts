@@ -1,8 +1,5 @@
 import { randomBytes } from 'crypto'
-import { ec as EC } from 'elliptic'
 import { decompressPublicKey, deriveDek } from './dataEncryptionKey'
-
-const ec = new EC('secp256k1')
 
 describe('deriveDek', () => {
   it('should produce a the expected keys', async () => {
@@ -16,6 +13,11 @@ describe('deriveDek', () => {
 
 describe('decompressPublicKey', () => {
   it('should work with compressed input', () => {
+    // NOTE: elliptic is disabled elsewhere in this library to prevent
+    // accidental signing of truncated messages.
+    // tslint:disable-next-line:import-blacklist
+    const EC = require('elliptic').ec
+    const ec = new EC('secp256k1')
     const privateKey = ec.keyFromPrivate(randomBytes(32))
     const publicKeyFull = Buffer.from(privateKey.getPublic(false, 'hex'), 'hex')
     const publicKeyCompressed = Buffer.from(privateKey.getPublic(true, 'hex'), 'hex')
@@ -24,6 +26,11 @@ describe('decompressPublicKey', () => {
     expect(decompressed).toHaveLength(64)
   })
   it('should work with long form input', () => {
+    // NOTE: elliptic is disabled elsewhere in this library to prevent
+    // accidental signing of truncated messages.
+    // tslint:disable-next-line:import-blacklist
+    const EC = require('elliptic').ec
+    const ec = new EC('secp256k1')
     const privateKey = ec.keyFromPrivate(randomBytes(32))
     const publicKeyFull = Buffer.from(privateKey.getPublic(false, 'hex'), 'hex')
     const decompressed = decompressPublicKey(publicKeyFull)

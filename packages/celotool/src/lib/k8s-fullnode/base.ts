@@ -2,11 +2,12 @@ import fs from 'fs'
 import { range } from 'lodash'
 import { readableContext } from 'src/lib/context-utils'
 import { createNamespaceIfNotExists } from '../cluster'
-import { envVar, fetchEnv, fetchEnvOrFallback, isProduction } from '../env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from '../env-utils'
 import { generatePrivateKeyWithDerivations, privateKeyToPublicKey } from '../generate_utils'
 import {
   deletePersistentVolumeClaims,
   installGenericHelmChart,
+  isCelotoolHelmDryRun,
   removeGenericHelmChart,
   upgradeGenericHelmChart,
 } from '../helm_deploy'
@@ -63,24 +64,33 @@ export abstract class BaseFullNodeDeployer {
   // If the node key is generated, then a promise containing the enodes is returned.
   // Otherwise, the enode cannot be calculated deterministically so a Promise<void> is returned.
   async upgradeChart(context: string, reset: boolean): Promise<string[] | void> {
-    if (reset) {
-      await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, 0)
-      await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
+    if (isCelotoolHelmDryRun()) {
+      await upgradeGenericHelmChart(
+        this.kubeNamespace,
+        this.releaseName,
+        helmChartPath,
+        await this.helmParameters(context)
+      )
+    } else {
+      if (reset) {
+        await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, 0)
+        await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
+      }
+
+      await upgradeGenericHelmChart(
+        this.kubeNamespace,
+        this.releaseName,
+        helmChartPath,
+        await this.helmParameters(context)
+      )
+
+      await scaleResource(
+        this.celoEnv,
+        'StatefulSet',
+        `${this.celoEnv}-fullnodes`,
+        this._deploymentConfig.replicas
+      )
     }
-
-    await upgradeGenericHelmChart(
-      this.kubeNamespace,
-      this.releaseName,
-      helmChartPath,
-      await this.helmParameters(context)
-    )
-
-    await scaleResource(
-      this.celoEnv,
-      'StatefulSet',
-      `${this.celoEnv}-fullnodes`,
-      this._deploymentConfig.replicas
-    )
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
       return this.getEnodes()
     }
@@ -124,11 +134,6 @@ export abstract class BaseFullNodeDeployer {
       `--set geth.use_gstorage_data=${this._deploymentConfig.useGstoreData}`,
       `--set geth.ws_port=${this._deploymentConfig.wsPort}`,
       `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
-      // Disable by default block age check in fullnode readinessProbe except for production envs
-      `--set geth.fullnodeCheckBlockAge=${fetchEnvOrFallback(
-        envVar.FULL_NODE_READINESS_CHECK_BLOCK_AGE,
-        `${isProduction()}`
-      )}`,
       ...(await this.additionalHelmParameters()),
       nodeKeys ? `--set geth.node_keys='{${nodeKeys.join(',')}}'` : '',
       fs.existsSync(customValuesFile) ? `-f ${customValuesFile}` : '',
@@ -158,9 +163,9 @@ export abstract class BaseFullNodeDeployer {
     )
   }
 
-  abstract async additionalHelmParameters(): Promise<string[]>
-  abstract async deallocateAllIPs(): Promise<void>
-  abstract async getFullNodeIP(index: number): Promise<string>
+  abstract additionalHelmParameters(): Promise<string[]>
+  abstract deallocateAllIPs(): Promise<void>
+  abstract getFullNodeIP(index: number): Promise<string>
 
   get releaseName() {
     return `${this.celoEnv}-fullnodes`

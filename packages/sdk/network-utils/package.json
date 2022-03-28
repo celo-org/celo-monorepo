@@ -1,6 +1,6 @@
 {
   "name": "@celo/network-utils",
-  "version": "1.2.3-dev",
+  "version": "1.5.3-dev",
   "description": "Utilities for fetching static information about the Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -16,7 +16,7 @@
   "scripts": {
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
-    "docs": "typedoc && ts-node ../utils/scripts/linkdocs.ts network-utils",
+    "docs": "typedoc",
     "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"

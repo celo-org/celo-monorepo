@@ -4,9 +4,11 @@ import {
   ErrorMessages,
   SignMessageRequest,
 } from '@celo/identity/lib/odis/query'
+import { Endpoints } from '@celo/phone-number-privacy-common'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
 import 'isomorphic-fetch'
 import { replenishQuota } from '../../../common/src/test/utils'
+import { VERSION } from '../../src/config'
 import {
   ACCOUNT_ADDRESS,
   ACCOUNT_ADDRESS_NO_QUOTA,
@@ -26,10 +28,20 @@ jest.setTimeout(60000)
 
 describe('Running against a deployed service', () => {
   beforeAll(() => {
-    console.log(process.env.ODIS_COMBINER_SERVICE_URL)
-    console.log(process.env.ODIS_SIGNER_SERVICE_URL)
-    console.log(process.env.ODIS_BLOCKCHAIN_PROVIDER)
+    console.log('ODIS_COMBINER_SERVICE_URL: ' + process.env.ODIS_COMBINER_SERVICE_URL)
+    console.log('ODIS_BLOCKCHAIN_PROVIDER: ' + process.env.ODIS_BLOCKCHAIN_PROVIDER)
   })
+
+  // This test is disabled because the Combiner status endpoint doesn't work
+  xit('Service is deployed at correct version', async () => {
+    const response = await fetch(process.env.ODIS_COMBINER_SERVICE_URL + Endpoints.STATUS, {
+      method: 'GET',
+    })
+    const body = await response.json()
+    // This checks against local package.json version, change if necessary
+    expect(body.version).toBe(VERSION)
+  })
+
   describe('Returns status ODIS_INPUT_ERROR', () => {
     it('With invalid address', async () => {
       const body: SignMessageRequest = {
@@ -41,7 +53,7 @@ describe('Running against a deployed service', () => {
       }
 
       await expect(
-        OdisUtils.Query.queryOdis(dekAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
+        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
 
@@ -68,7 +80,7 @@ describe('Running against a deployed service', () => {
         version: 'ignore',
       }
       await expect(
-        OdisUtils.Query.queryOdis(dekAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
+        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
       ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
     })
   })
@@ -100,9 +112,13 @@ describe('Running against a deployed service', () => {
       }
       // Query twice to test reusing the request
       for (let i = 0; i < 2; i++) {
-        await expect(
-          OdisUtils.Query.queryOdis(walletAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
-        ).resolves.toMatchObject({ success: true })
+        const result = OdisUtils.Query.queryOdis(
+          walletAuthSigner,
+          body,
+          SERVICE_CONTEXT,
+          SIGN_MESSAGE_ENDPOINT
+        )
+        await expect(result).resolves.toMatchObject({ success: true })
       }
     })
   })
