@@ -1,4 +1,5 @@
 // A Future is like an exernally fulfillable (resolvable) promise
+/** @internal */
 export class Future<T> {
   private promise: Promise<T>
   private _finished = false

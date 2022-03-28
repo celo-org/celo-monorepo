@@ -1,11 +1,17 @@
 import { EventLog } from './types'
 
+/** @internal */
+
 export type ABIType = 'uint256' | 'boolean' | 'string' | 'bytes' | string // TODO complete list
+
+/** @internal */
 
 export interface DecodedParamsArray {
   [index: number]: any
   __length__: number
 }
+
+/** @internal */
 export interface DecodedParamsObject extends DecodedParamsArray {
   [key: string]: any
 }
@@ -15,6 +21,7 @@ export interface DecodedParamsObject extends DecodedParamsArray {
 type AbiType = 'function' | 'constructor' | 'event' | 'fallback'
 type StateMutabilityType = 'pure' | 'view' | 'nonpayable' | 'payable'
 
+/** @internal */
 export interface AbiInput {
   name: string
   type: string
@@ -23,13 +30,14 @@ export interface AbiInput {
   internalType?: string
 }
 
+/** @internal */
 export interface AbiOutput {
   name: string
   type: string
   components?: AbiOutput[]
   internalType?: string
 }
-
+/** @internal */
 export interface AbiItem {
   anonymous?: boolean
   constant?: boolean
@@ -41,11 +49,11 @@ export interface AbiItem {
   type: AbiType
   gas?: number
 }
-
+/** @internal */
 export interface ABIDefinition extends AbiItem {
   signature: string
 }
-
+/** @internal */
 export interface AbiCoder {
   decodeLog(inputs: AbiInput[], hexString: string, topics: string[]): EventLog
 
