@@ -1,17 +1,11 @@
 import { sleep } from '@celo/base'
+import { StableToken } from '@celo/contractkit'
 import { describe, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
-import {
-  fundAccountWithStableToken,
-  getKey,
-  initExchangeFromRegistry,
-  initStableTokenFromRegistry,
-  ONE,
-  TestAccounts,
-} from '../scaffold'
+import { fundAccountWithStableToken, getKey, ONE, TestAccounts } from '../scaffold'
 
-export function runExchangeTest(context: EnvTestContext, stableTokensToTest: string[]) {
+export function runExchangeTest(context: EnvTestContext, stableTokensToTest: StableToken[]) {
   describe('Exchange Test', () => {
     const logger = context.logger.child({ test: 'exchange' })
 
@@ -24,7 +18,7 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
           stableTokenAmountToFund,
           stableToken
         )
-        const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
+        const stableTokenInstance = await context.kit.celoTokens.getWrapper(stableToken)
 
         const from = await getKey(context.mnemonic, TestAccounts.Exchange)
         context.kit.connection.addAccount(from.privateKey)
@@ -32,7 +26,7 @@ export function runExchangeTest(context: EnvTestContext, stableTokensToTest: str
         context.kit.connection.defaultFeeCurrency = stableTokenInstance.address
         const goldToken = await context.kit.contracts.getGoldToken()
 
-        const exchange = await initExchangeFromRegistry(stableToken, context.kit)
+        const exchange = await context.kit.contracts.getExchange(stableToken)
         const previousGoldBalance = await goldToken.balanceOf(from.address)
         const stableTokenAmountToSell = stableTokenAmountToFund.times(0.5)
         const goldAmount = await exchange.getBuyTokenAmount(stableTokenAmountToSell, false)

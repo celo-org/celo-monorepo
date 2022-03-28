@@ -26,13 +26,18 @@ data:
       evaluation_interval: 5s
       # Label the metrics with a custom label if using multiple prometheus for same environments
       external_labels:
-        cluster_name: {{ .Values.cluster }}
-        enable_alerts: {{ .Values.enable_alerts }}
+        cluster_name: {{ required "Valid .Values.cluster entry required!" .Values.cluster }}
 
-    {{- with .Values.remote_write }}
-
+    {{- if .Values.remote_write }}
     remote_write:
-{{ toYaml . | indent 6 }}
+      - basic_auth:
+          password: {{ .Values.remote_write.basic_auth.password }}
+          username: {{ .Values.remote_write.basic_auth.username }}
+        url: {{ .Values.remote_write.url }}
+        write_relabel_configs:
+          {{- with .Values.remote_write.write_relabel_configs }}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
     {{- end }}
 
     scrape_configs:
@@ -140,37 +145,6 @@ data:
         - source_labels: [__meta_kubernetes_service_name]
           action: replace
           target_label: kubernetes_name
-{{- range .Values.gcloud.gceScrapeZones }}
-      - job_name: 'gce-instances-{{ . }}'
-
-        gce_sd_configs:
-        - project: {{ $.Values.gcloud.project }}
-          zone: {{ . }}
-          filter: '(status="RUNNING") AND (labels.prometheus_cluster="{{ $.Values.cluster }}")'
-          refresh_interval: 60s
-          port: 6060
-
-        relabel_configs:
-          - source_labels: [__meta_gce_zone]
-            target_label: cloud_zone
-          - source_labels: [__meta_gce_network]
-            target_label: cloud_network
-          - source_labels: [__meta_gce_instance_name]
-            target_label: node_name
-          - source_labels: [__meta_gce_private_ip, __meta_gce_metadata_prometheus_port]
-            action: replace
-            regex: ([^:]+)(?::\d+)?;(\d+)
-            replacement: $1:$2
-            target_label: __address__
-          - source_labels: [__meta_gce_metadata_prometheus_path]
-            action: replace
-            regex: (.+)
-            target_label: __metrics_path__
-          - source_labels: [__name__]
-            regex: .*
-            replacement: '{{ $.Values.cluster }}'
-            target_label: cluster_name
-{{- end -}}
 {{- if .Values.scrapeJob }}
   {{- if .Values.scrapeJob.Name }}
       - job_name: {{ .Values.scrapeJob.Name }}

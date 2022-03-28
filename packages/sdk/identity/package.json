@@ -1,6 +1,6 @@
 {
   "name": "@celo/identity",
-  "version": "1.2.2-dev",
+  "version": "1.5.3-dev",
   "description": "Utilities for interacting with Celo's identity protocol",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -17,17 +17,18 @@
   "scripts": {
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
-    "docs": "typedoc && ts-node ../utils/scripts/linkdocs.ts identity",
-    "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 24",
+    "docs": "typedoc",
+    "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 25",
     "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/base": "1.2.2-dev",
-    "@celo/utils": "1.2.2-dev",
-    "@celo/contractkit": "1.2.2-dev",
+    "@celo/base": "1.5.3-dev",
+    "@celo/utils": "1.5.3-dev",
+    "@celo/contractkit": "1.5.3-dev",
+    "@celo/phone-number-privacy-common": "1.0.40-dev",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
@@ -39,13 +40,13 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/wallet-local": "1.2.2-dev",
+    "@celo/wallet-local": "1.5.3-dev",
     "fetch-mock": "9.10.4",
     "@types/elliptic": "^6.4.12",
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da"
   },
   "engines": {
-    "node": ">=8.13.0"
+    "node": ">=12.9.0"
   }
 }

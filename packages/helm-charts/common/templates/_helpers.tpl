@@ -141,8 +141,7 @@ fi
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --unlock=${ACCOUNT_ADDRESS} --password /root/.celo/account/accountSecret --allow-insecure-unlock"
     {{- end }}
     {{- if .expose }}
-    RPC_APIS="{{ .rpc_apis | default "eth,net,web3,debug,txpool" }}"
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr 0.0.0.0 --rpcapi=${RPC_APIS} --rpccorsdomain='*' --rpcvhosts=* --ws --wsaddr 0.0.0.0 --wsorigins=* --wsapi=${RPC_APIS}"
+{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" (default "eth,net,web3,debug,txpool" .rpc_apis) "ws_port" (default .Values.geth.ws_port .ws_port ) "listen_address" "0.0.0.0") | indent 4 }}
     {{- end }}
     {{- if .ping_ip_from_packet | default false }}
     ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ping-ip-from-packet"
@@ -155,21 +154,21 @@ fi
     {{- end }}
     {{- if .ethstats | default false }}
     ACCOUNT_ADDRESS=$(cat /root/.celo/address)
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+    if grep -nri ${ACCOUNT_ADDRESS#0x} /root/.celo/keystore/ > /dev/null; then
+      :
     {{- if .proxy | default false }}
-    [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
+      [[ "$RID" -eq 0 ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
     {{- else }}
     {{- if not (.proxied | default false) }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
+      ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ethstats=${HOSTNAME}@{{ .ethstats }}"
     {{- end }}
     {{- end }}
+    fi
     {{- end }}
-    {{- if .metrics | default true }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
-    {{- end }}
-    {{- if .pprof | default false }}
-    ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .pprof_port }} --pprofaddr 0.0.0.0"
-    {{- end }}
+
+{{ include  "common.geth-add-metrics-pprof-config" . | indent 4 }}
+
     PORT=30303
     {{- if .ports }}
     PORTS_PER_RID={{ join "," .ports }}
@@ -178,7 +177,7 @@ fi
 
 {{ include  "common.bootnode-flag-script" . | indent 4 }}
 
-{{ .extra_setup }}
+{{ default "" .extra_setup | indent 4 }}
 
     exec geth \
       --port $PORT  \
@@ -187,7 +186,7 @@ fi
 {{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \
       --light.maxpeers={{- if kindIs "invalid" .light_maxpeers -}}1000{{- else -}}{{- .light_maxpeers -}}{{- end }} \
-      --maxpeers {{ .maxpeers | default 1200 }} \
+      --maxpeers={{- if kindIs "invalid" .maxpeers -}}1200{{- else -}}{{- .maxpeers -}}{{- end }} \
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \
@@ -198,6 +197,7 @@ fi
       --vmodule={{ .Values.geth.vmodule }} \
       --datadir=/root/.celo \
       --ipcpath=geth.ipc \
+      --txlookuplimit {{ .Values.geth.txlookuplimit | default 0 }} \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
@@ -225,7 +225,7 @@ fi
       - /bin/sh
       - "-c"
       - |
-{{ include "common.node-health-check" . | indent 8 }}
+{{ include "common.node-health-check" (dict "maxpeers" .maxpeers "light_maxpeers" .light_maxpeers ) | indent 8 }}
     initialDelaySeconds: 20
     periodSeconds: 10
 {{- end }}
@@ -249,7 +249,7 @@ fi
   - name: rpc
     containerPort: 8545
   - name: ws
-    containerPort: 8546
+    containerPort: {{ default .Values.geth.ws_port .ws_port }}
 {{ end }}
 {{- if .pprof }}
   - name: pprof
@@ -271,7 +271,7 @@ fi
 lifecycle:
   preStop:
     exec:
-      command: ["/bin/sh","-c","killall -HUP geth; while killall -0 geth; do sleep 1; done"]
+      command: ["/bin/sh","-c","killall -SIGTERM geth; while killall -0 geth; do sleep 1; done"]
 {{- end -}}
 
 {{- define "common.geth-configmap" -}}
@@ -288,7 +288,7 @@ data:
 {{- end -}}
 {{- end -}}
 
-{{- define "common.celotool-validator-container" -}}
+{{- define "common.celotool-full-node-statefulset-container" -}}
 - name: get-account
   image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
   imagePullPolicy: {{ .Values.celotool.image.imagePullPolicy }}
@@ -302,6 +302,7 @@ data:
       # To allow proxies to scale up easily without conflicting with keys of
       # proxies associated with other validators
       KEY_INDEX=$(( ({{ .validator_index }} * 10000) + $RID ))
+      echo {{ .validator_index }} > /root/.celo/validator_index
       {{ else }}
       KEY_INDEX=$RID
       {{ end }}
@@ -372,46 +373,63 @@ data:
 {{- end -}}
 
 {{- define "common.node-health-check" -}}
-# fail if any wgets fail
-set -euo pipefail
-RPC_URL=http://localhost:8545
-MAX_LATEST_BLOCK_AGE_SECONDS="{{ .Values.geth.readiness_probe_max_block_age_seconds | default 30 }}"
-MAX_EPOCH_BLOCK_AGE_SECONDS="{{ .Values.geth.readiness_probe_max_block_epoch_age_seconds | default 300 }}"
-EPOCH_SIZE="{{ .Values.genesis.epoch_size | default 17280 }}"
-EPOCH_SIZE_LESS_ONE="$(( $EPOCH_SIZE - 1 ))"
+function isReady {
+  geth attach << EOF
 
-# first check if it's syncing
-SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
-NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
-if [ ! $NOT_SYNCING ]; then
-  echo "Node is syncing: $SYNCING"
-  exit 1
-fi
+    // Deployment configuration
+    var maxpeers = {{ required "maxpeers is required" .maxpeers }}
+    var lightpeers = {{ required "light_maxpeers is required"  .light_maxpeers }}
 
-{{ if .Values.geth.fullnodeCheckBlockAge }}
-# then make sure that the latest block is new
-LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
-BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
-BLOCK_NUMBER_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"number":"[^"]*' | grep -o '[a-fA-F0-9]*$')
-BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
-BLOCK_NUMBER=$(( 16#$BLOCK_NUMBER_HEX ))
-CURRENT_TIMESTAMP=$(date +%s)
+    // minimum peers to consider eth_syncing a good indicator for considering low chances of new block on chain
+    // With current dial ratio a node will try to open connections to (maxpeers - lightpeers)/3 peers.
+    // Consider 1/5 of (maxpeers - lightpeers) as reference value for peers, with a minimum of 5.
+    var minPeers = (maxpeers - lightpeers) * 0.2
+    if (minPeers > 30) {
+      minPeers = 30
+    } else if (minPeers < 5) {
+      minPeers = 5
+    }
 
-# different age allowed for epoch and epoch+1 blocks
-BLOCK_EPOCH_DIFFERENCE=$(( BLOCK_NUMBER % EPOCH_SIZE ))
-case "$BLOCK_EPOCH_DIFFERENCE" in
-  0|$EPOCH_SIZE_LESS_ONE) ALLOWED_AGE="$MAX_EPOCH_BLOCK_AGE_SECONDS" ;;
-  *) ALLOWED_AGE="$MAX_LATEST_BLOCK_AGE_SECONDS" ;;
-esac
+    // last block max age in seconds
+    var maxAge = 20
 
-# if the most recent block is too old, then indicate the node is not ready
-BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
-if [ $BLOCK_AGE_SECONDS -gt $ALLOWED_AGE ]; then
-  echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
-  exit 1
-fi
-exit 0
-{{- end }}
+    // getLastBlockAge() returns chain lastBlock age in seconds
+    function getLastBlockAge() {
+      var lastBlock = web3.eth.getBlockByNumber(web3.eth.blockNumber)
+      var blockTimestamp = parseInt(lastBlock.timestamp, 16)
+      var now = Math.floor(Date.now() / 1000)
+      return (now - blockTimestamp)
+    }
+
+    // isReady() determines if the node is ready to handle requests
+    // Prints 'CELO BLOCKCHAIN IS READY' if the node is ready
+    function isReady(maxAge, minPeers) {
+      // If block was produced recently -> node is ready
+      if (getLastBlockAge() <= maxAge) {
+        return true
+      }
+      // First let's check if it's syncing. If node is syncing -> there is
+      // peers with blocks ahead from local head -> not ready
+      if (web3.eth.syncing) {
+          return false
+      }
+      // If node is not syncing, lets check the peers
+      if (web3.net.peerCount < minPeers) {
+          // Not enough peers -> Node may have just started -> Not ready
+          return false
+      }
+      // If peers > minPeers and not syncing -> We consider node as ready
+      return true
+    }
+
+    if(isReady(maxAge, minPeers)) {
+      console.log('CELO BLOCKCHAIN IS READY')
+    }
+EOF
+}
+
+# Check if scripts prints 'CELO BLOCKCHAIN IS READY' as readiness signal
+isReady | grep 'CELO BLOCKCHAIN IS READY'
 {{- end }}
 
 {{- define "common.geth-exporter-container" -}}
@@ -490,7 +508,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   - "-c"
   - |
     if [ -d /root/.celo/celo/chaindata ]; then
-      lastBlockTimestamp=$(geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --exec "eth.getBlock(\"latest\").timestamp" 2> /dev/null)
+      lastBlockTimestamp=$(timeout 600 geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --txpool.nolocals --exec "eth.getBlock(\"latest\").timestamp")
       day=$(date +%s)
       diff=$(($day - $lastBlockTimestamp))
       # If lastBlockTimestamp is older than 1 day old, pull the chaindata rather than using the current PVC.
@@ -512,7 +530,7 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
 {{- define "common.gsutil-sync-data-init-container" -}}
 - name: gsutil-sync-data
   image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
   command:
   - /bin/sh
   - -c
@@ -529,4 +547,40 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+{{- end -}}
+
+{{- define "common.geth-add-metrics-pprof-config" -}}
+{{- if .metrics | default true }}
+ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --metrics"
+{{- end }}
+{{- if (or .Values.metrics .Values.pprof.enabled) | default false }}
+# Check the format of pprof cmd arguments
+set +e
+geth --help | grep 'pprof.port' >/dev/null
+pprof_new_format=$?
+set -e
+if [ $pprof_new_format -eq 0 ]; then
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprof.port {{ .Values.pprof.port | default "6060" }} --pprof.addr 0.0.0.0"
+else
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --pprof --pprofport {{ .Values.pprof.port | default "6060" }} --pprofaddr 0.0.0.0"
+fi
+{{- end }}
+{{- end -}}
+
+{{- define "common.geth-http-ws-flags" -}}
+# Check the format of http/rcp and ws cmd arguments
+RPC_APIS={{ .rpc_apis | default "eth,net,web3,debug" | quote }}
+WS_PORT="{{ .ws_port | default 8545 }}"
+LISTEN_ADDRESS={{ .listen_address | default "0.0.0.0" | quote }}
+set +e
+geth --help | grep 'http.addr' >/dev/null
+http_new_format=$?
+set -e
+if [ $http_new_format -eq 0 ]; then
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http --http.addr $LISTEN_ADDRESS --http.api=$RPC_APIS --http.corsdomain='*' --http.vhosts=*"
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ws --ws.addr $LISTEN_ADDRESS --ws.origins=* --ws.api=$RPC_APIS --ws.port=$WS_PORT --ws.rpcprefix=/"
+else
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --rpc --rpcaddr $LISTEN_ADDRESS --rpcapi=$RPC_APIS --rpccorsdomain='*' --rpcvhosts=*"
+  ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --ws --wsaddr $LISTEN_ADDRESS --wsorigins=* --wsapi=$RPC_APIS --wsport=$WS_PORT"
+fi
 {{- end -}}

@@ -7,19 +7,21 @@ import {
   fetchEnv,
   fetchEnvOrFallback,
   getDynamicEnvVarValue,
-  isProduction,
 } from './env-utils'
 import {
   installGenericHelmChart,
+  isCelotoolHelmDryRun,
   removeGenericHelmChart,
   setHelmArray,
   upgradeGenericHelmChart,
 } from './helm_deploy'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
+import { GCPClusterConfig } from './k8s-cluster/gcp'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
   getServiceAccountKey,
+  setupGKEWorkloadIdentities,
 } from './service-account-utils'
 import { outputIncludes, switchToGCPProject } from './utils'
 const yaml = require('js-yaml')
@@ -33,14 +35,18 @@ const kubeServiceAccountName = releaseName
 // Container registry with latest tags: https://console.cloud.google.com/gcr/images/stackdriver-prometheus/GLOBAL/stackdriver-prometheus-sidecar?gcrImageListsize=30
 const sidecarImageTag = '0.8.2'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
-const prometheusImageTag = 'v2.25.0'
+const prometheusImageTag = 'v2.27.1'
+
+const GKEWorkloadMetricsHelmChartPath = '../helm-charts/gke-workload-metrics'
+const GKEWorkloadMetricsReleaseName = 'gke-workload-metrics'
 
 const grafanaHelmChartPath = '../helm-charts/grafana'
 const grafanaReleaseName = 'grafana'
 
 export async function installPrometheusIfNotExists(
   context?: string,
-  clusterConfig?: BaseClusterConfig
+  clusterConfig?: BaseClusterConfig,
+  disableStackdriver?: boolean
 ) {
   const prometheusExists = await outputIncludes(
     `helm list -n prometheus`,
@@ -49,17 +55,21 @@ export async function installPrometheusIfNotExists(
   )
   if (!prometheusExists) {
     console.info('Installing prometheus-stackdriver')
-    await installPrometheus(context, clusterConfig)
+    await installPrometheus(context, clusterConfig, disableStackdriver)
   }
 }
 
-async function installPrometheus(context?: string, clusterConfig?: BaseClusterConfig) {
+async function installPrometheus(
+  context?: string,
+  clusterConfig?: BaseClusterConfig,
+  disableStackdriver?: boolean
+) {
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(context, clusterConfig)
+    await helmParameters(context, clusterConfig, disableStackdriver)
   )
 }
 
@@ -67,52 +77,25 @@ export async function removePrometheus() {
   await removeGenericHelmChart(releaseName, kubeNamespace)
 }
 
-export async function upgradePrometheus(context?: string, clusterConfig?: BaseClusterConfig) {
+export async function upgradePrometheus(
+  context?: string,
+  clusterConfig?: BaseClusterConfig,
+  disableStackdriver?: boolean
+) {
   await createNamespaceIfNotExists(kubeNamespace)
   return upgradeGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(context, clusterConfig)
+    await helmParameters(context, clusterConfig, disableStackdriver)
   )
 }
 
-async function helmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
-  // To save $, don't send metrics to SD that probably won't be used
-  // nginx metrics currently breaks sidecar
-  const exclusions = [
-    '__name__!~"kube_.+_labels"',
-    '__name__!~"apiserver_.+"',
-    '__name__!~"kube_certificatesigningrequest_.+"',
-    '__name__!~"kube_configmap_.+"',
-    '__name__!~"kube_cronjob_.+"',
-    '__name__!~"kube_endpoint_.+"',
-    '__name__!~"kube_horizontalpodautoscaler_.+"',
-    '__name__!~"kube_ingress_.+"',
-    '__name__!~"kube_job_.+"',
-    '__name__!~"kube_lease_.+"',
-    '__name__!~"kube_limitrange_.+"',
-    '__name__!~"kube_mutatingwebhookconfiguration_.+"',
-    '__name__!~"kube_namespace_.+"',
-    '__name__!~"kube_networkpolicy_.+"',
-    '__name__!~"kube_poddisruptionbudget_.+"',
-    '__name__!~"kube_replicaset_.+"',
-    '__name__!~"kube_replicationcontroller_.+"',
-    '__name__!~"kube_resourcequota_.+"',
-    '__name__!~"kube_secret_.+"',
-    '__name__!~"kube_service_.+"',
-    '__name__!~"kube_storageclass_.+"',
-    '__name__!~"kube_service_.+"',
-    '__name__!~"kube_validatingwebhookconfiguration_.+"',
-    '__name__!~"kube_verticalpodautoscaler_.+"',
-    '__name__!~"kube_volumeattachment_.+"',
-    '__name__!~"kubelet_.+"',
-    '__name__!~"phoenix_.+"',
-    '__name__!~"workqueue_.+"',
-    '__name__!~"nginx_.+"',
-    '__name__!~"etcd_.+"',
-  ]
-
+async function helmParameters(
+  context?: string,
+  clusterConfig?: BaseClusterConfig,
+  disableStackdriver?: boolean
+) {
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
   const clusterName = usingGCP
     ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
@@ -139,46 +122,48 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     `--set namespace=${kubeNamespace}`,
     `--set gcloud.project=${gcloudProject}`,
     `--set gcloud.region=${gcloudRegion}`,
-    `--set sidecar.imageTag=${sidecarImageTag}`,
     `--set prometheus.imageTag=${prometheusImageTag}`,
-    `--set stackdriver_metrics_prefix=${prometheusImageTag}`,
     `--set serviceAccount.name=${kubeServiceAccountName}`,
-    // Stackdriver allows a maximum of 10 custom labels. kube-state-metrics
-    // has some metrics of the form "kube_.+_labels" that provides the labels
-    // of k8s resources as metric labels. If some k8s resources have too many labels,
-    // this results in a bunch of errors when the sidecar tries to send metrics to Stackdriver.
-    `--set-string includeFilter='\\{job=~".+"\\,${exclusions.join('\\,')}\\}'`,
     `--set cluster=${clusterName}`,
-    `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
   ]
 
+  // Remote write to Grafana.
   if (fetchEnvOrFallback(envVar.PROMETHEUS_REMOTE_WRITE_URL, '') !== '') {
     params.push(
-      `--set remote_write[0].url=${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}`,
-      `--set remote_write[0].basic_auth.username=${fetchEnv(
+      `--set remote_write.url='${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}'`,
+      `--set remote_write.basic_auth.username='${fetchEnv(
         envVar.PROMETHEUS_REMOTE_WRITE_USERNAME
-      )}`,
-      `--set remote_write[0].basic_auth.password=${fetchEnv(
+      )}'`,
+      `--set remote_write.basic_auth.password='${fetchEnv(
         envVar.PROMETHEUS_REMOTE_WRITE_PASSWORD
-      )}`,
-      `--set enable_alerts="${isProduction()}"`
+      )}'`
     )
   }
 
-  if (!usingGCP) {
-    const cloudProvider = getCloudProviderPrefix(clusterConfig!)
-    params.push(
-      `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${
-        clusterConfig!.clusterName
-      }`,
-      `--set gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
-        clusterName,
-        cloudProvider,
-        gcloudProject
-      )}`
-    )
-  } else {
-    // GCP
+  params.push(`--set stackdriver.enable='${!disableStackdriver}'`)
+  if (!disableStackdriver) {
+    params.push(`--set stackdriver.sidecar.imageTag=${sidecarImageTag}`)
+
+    if (usingGCP) {
+      params.push(
+        `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`
+      )
+    } else {
+      const cloudProvider = getCloudProviderPrefix(clusterConfig!)
+      params.push(
+        `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${
+          clusterConfig!.clusterName
+        }`,
+        `--set stackdriver.gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
+          clusterName,
+          cloudProvider,
+          gcloudProject
+        )}`
+      )
+    }
+  }
+
+  if (usingGCP) {
     const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
     const cloudProvider = 'gcp'
     const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
@@ -189,9 +174,6 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       `--set storageClassName=ssd`,
       `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
     )
-    if (fetchEnvOrFallback(envVar.PROMETHEUS_GCE_SCRAPE_REGIONS, '')) {
-      params.push(`--set gcloud.gceScrapeZones={${fetchEnv(envVar.PROMETHEUS_GCE_SCRAPE_REGIONS)}}`)
-    }
   }
 
   // Set scrape job if set for the context
@@ -272,8 +254,18 @@ async function createPrometheusGcloudServiceAccount(
     await execCmdWithExitOnFailure(
       `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/monitoring.metricWriter --member serviceAccount:${serviceAccountEmail}`
     )
+    // Prometheus needs roles/compute.viewer to discover the VMs asking GCE API
+    await execCmdWithExitOnFailure(
+      `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/compute.viewer --member serviceAccount:${serviceAccountEmail}`
+    )
+
     // Setup workload identity IAM permissions
-    await setupWorkloadIdentities(serviceAccountName, gcloudProjectName)
+    await setupGKEWorkloadIdentities(
+      serviceAccountName,
+      gcloudProjectName,
+      kubeNamespace,
+      kubeServiceAccountName
+    )
   }
 }
 
@@ -397,24 +389,104 @@ export async function removeGrafanaHelmRelease() {
   }
 }
 
-async function setupWorkloadIdentities(serviceAccountName: string, gcloudProjectName: string) {
-  // https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
-  // Only grant access to GCE API to Prometheus SA deployed in GKE
-  if (!serviceAccountName.includes('gcp')) {
-    return
+// See https://cloud.google.com/stackdriver/docs/solutions/gke/managing-metrics#enable-workload-metrics
+async function enableGKESystemAndWorkloadMetrics(
+  clusterID: string,
+  zone: string,
+  gcloudProjectName: string
+) {
+  const GKEWMEnabled = await outputIncludes(
+    `gcloud beta container clusters describe ${clusterID} --zone=${zone} --project=${gcloudProjectName} --format="value(monitoringConfig.componentConfig.enableComponents)"`,
+    'WORKLOADS',
+    `GKE cluster ${clusterID} in zone ${zone} and project ${gcloudProjectName} has GKE workload metrics enabled, skipping gcloud beta container clusters update`
+  )
+
+  if (!GKEWMEnabled) {
+    if (isCelotoolHelmDryRun()) {
+      console.info(
+        `Skipping enabling GKE workload metrics for cluster ${clusterID} in zone ${zone} and project ${gcloudProjectName} due to --helmdryrun`
+      )
+    } else {
+      await execCmdWithExitOnFailure(
+        `gcloud beta container clusters update ${clusterID} --zone=${zone} --project=${gcloudProjectName} --monitoring=SYSTEM,WORKLOAD`
+      )
+    }
+  }
+}
+
+async function GKEWorkloadMetricsHelmParameters(clusterConfig?: BaseClusterConfig) {
+  // Abandon if not using GCP, it's GKE specific.
+  if (clusterConfig && clusterConfig.cloudProvider !== CloudProvider.GCP) {
+    console.error('Cannot create gke-workload-metrics in a non GCP k8s cluster, skipping')
+    process.exit(1)
   }
 
-  // Prometheus needs roles/compute.viewer to discover the VMs asking GCE API
-  const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-  await execCmdWithExitOnFailure(
-    `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/compute.viewer --member serviceAccount:${serviceAccountEmail}`
-  )
+  const clusterName = clusterConfig
+    ? clusterConfig!.clusterName
+    : fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
 
-  // Allow the Kubernetes service account to impersonate the Google service account
-  await execCmdWithExitOnFailure(
-    `gcloud iam --project ${gcloudProjectName} service-accounts add-iam-policy-binding \
-    --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:${gcloudProjectName}.svc.id.goog[${kubeNamespace}/${kubeServiceAccountName}]" \
-    ${serviceAccountEmail}`
+  const params = [`--set cluster=${clusterName}`]
+  return params
+}
+
+export async function installGKEWorkloadMetricsIfNotExists(clusterConfig?: BaseClusterConfig) {
+  const GKEWMExists = await outputIncludes(
+    `helm list -A`,
+    GKEWorkloadMetricsReleaseName,
+    `gke-workload-metrics exists, skipping install`
   )
+  if (!GKEWMExists) {
+    console.info('Installing gke-workload-metrics')
+    await installGKEWorkloadMetrics(clusterConfig)
+  }
+}
+
+async function installGKEWorkloadMetrics(clusterConfig?: BaseClusterConfig) {
+  // Abandon if not using GCP, it's GKE specific.
+  if (clusterConfig && clusterConfig.cloudProvider !== CloudProvider.GCP) {
+    console.error('Cannot create gke-workload-metrics in a non GCP k8s cluster, skipping')
+    process.exit(1)
+  }
+
+  let k8sClusterName, k8sClusterZone, gcpProjectName
+  if (clusterConfig) {
+    const configGCP = clusterConfig as GCPClusterConfig
+    k8sClusterName = configGCP!.clusterName
+    k8sClusterZone = configGCP!.zone
+    gcpProjectName = configGCP!.projectName
+  } else {
+    k8sClusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
+    k8sClusterZone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+    gcpProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
+  }
+
+  await enableGKESystemAndWorkloadMetrics(k8sClusterName, k8sClusterZone, gcpProjectName)
+
+  await createNamespaceIfNotExists(kubeNamespace)
+  return installGenericHelmChart(
+    kubeNamespace,
+    GKEWorkloadMetricsReleaseName,
+    GKEWorkloadMetricsHelmChartPath,
+    await GKEWorkloadMetricsHelmParameters(clusterConfig)
+  )
+}
+
+export async function upgradeGKEWorkloadMetrics(clusterConfig?: BaseClusterConfig) {
+  const params = await GKEWorkloadMetricsHelmParameters(clusterConfig)
+
+  await createNamespaceIfNotExists(kubeNamespace)
+  return upgradeGenericHelmChart(
+    kubeNamespace,
+    GKEWorkloadMetricsReleaseName,
+    GKEWorkloadMetricsHelmChartPath,
+    params
+  )
+}
+
+export async function removeGKEWorkloadMetrics() {
+  const GKEWMExists = await outputIncludes(`helm list -A`, GKEWorkloadMetricsReleaseName)
+  if (GKEWMExists) {
+    console.info('Removing gke-workload-metrics')
+    await removeGenericHelmChart(GKEWorkloadMetricsReleaseName, kubeNamespace)
+  }
 }

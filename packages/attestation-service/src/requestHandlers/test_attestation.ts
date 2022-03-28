@@ -54,15 +54,17 @@ export async function handleTestAttestationRequest(
       key,
       testRequest.phoneNumber,
       testRequest.message,
-      null,
+      '12345678',
       testRequest.message,
+      undefined,
+      undefined,
       logger,
       sequelizeLogger,
       testRequest.provider
     )
 
     respondWithAttestation(res, attestation, false, salt)
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error)
     respondWithError(res, 500, `${error.message ?? error}`)
   }

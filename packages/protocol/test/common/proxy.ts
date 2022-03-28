@@ -236,9 +236,9 @@ contract('Proxy', (accounts: string[]) => {
     GoldToken.numberFormat = 'BigNumber'
     const Registry: RegistryContract = artifacts.require('Registry')
 
-    const freezer = await Freezer.new()
+    const freezer = await Freezer.new(true)
     const goldToken = await GoldToken.new(true)
-    const registry = await Registry.new()
+    const registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await goldToken.initialize(registry.address)
 
