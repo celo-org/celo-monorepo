@@ -6,6 +6,7 @@ import {
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
   send,
+  SignerEndpoint,
   SignMessageRequest,
   SignMessageRequestSchema,
   SignMessageResponse,
@@ -15,36 +16,33 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { Config, getVersion } from '../../config'
+import { Counters } from '../../common/metrics'
+import config, { getVersion } from '../../config'
 import { Key } from '../../key-management/key-provider-base'
 import { getContractKit } from '../../web3/contracts'
-import { IIOService } from '../io.interface'
+import { IOAbstract } from '../io.abstract'
 import { PnpSession } from './session'
 
-export class PnpSignIO implements IIOService<SignMessageRequest> {
-  constructor(readonly config: Config) {}
+export class PnpSignIO extends IOAbstract<SignMessageRequest> {
+  readonly enabled: boolean = config.api.phoneNumberPrivacy.enabled
+  readonly endpoint = SignerEndpoint.PARTIAL_SIGN_MESSAGE
 
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
   ): Promise<PnpSession<SignMessageRequest> | null> {
-    const logger: Logger = response.locals.logger()
-    if (!this.config.api.phoneNumberPrivacy.enabled) {
-      this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
+    if (!super._inputChecks(request, response)) {
       return null
     }
+    if (!(await this.authenticate(request, response.locals.logger()))) {
+      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
+      return null
+    }
+    // TODO(Alec): Do we need this?
     // if (this.getRequestKeyVersion(request, logger) ?? false) {
     //   this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
     //   return null
     // }
-    if (!this.validate(request)) {
-      this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
-      return null
-    }
-    if (!(await this.authenticate(request, logger))) {
-      this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
-      return null
-    }
     return new PnpSession(request, response)
   }
 
@@ -90,7 +88,7 @@ export class PnpSignIO implements IIOService<SignMessageRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
@@ -114,6 +112,6 @@ export class PnpSignIO implements IIOService<SignMessageRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

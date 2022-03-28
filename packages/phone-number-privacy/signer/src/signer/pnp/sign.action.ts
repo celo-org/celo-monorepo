@@ -1,29 +1,17 @@
 import { SignMessageRequest } from '@celo/identity/lib/odis/query'
-import {
-  CombinerEndpoint,
-  getCombinerEndpoint,
-  SignerEndpoint,
-  WarningMessage,
-} from '@celo/phone-number-privacy-common'
+import { WarningMessage } from '@celo/phone-number-privacy-common'
 import { Counters } from '../../common/metrics'
 import { Config } from '../../config'
 import { getDatabase } from '../../database/database'
 import { getRequestExists } from '../../database/wrappers/request'
 import { DefaultKeyName, Key } from '../../key-management/key-provider-base'
-import { SignAction } from '../sign.abstract'
+import { SignAbstract } from '../sign.abstract'
 import { PnpQuotaService } from './quota.service'
 import { PnpSession } from './session'
 import { PnpSignIO } from './sign.io'
 
-export class PnpSignAction extends SignAction<SignMessageRequest> {
-  readonly endpoint: SignerEndpoint = SignerEndpoint.PARTIAL_SIGN_MESSAGE
-  readonly combinerEndpoint: CombinerEndpoint = getCombinerEndpoint(this.endpoint)
-
-  constructor(
-    readonly config: Config,
-    readonly quotaService: PnpQuotaService,
-    readonly io: PnpSignIO
-  ) {
+export class PnpSignAction extends SignAbstract<SignMessageRequest> {
+  constructor(readonly config: Config, readonly quota: PnpQuotaService, readonly io: PnpSignIO) {
     super()
   }
 
@@ -37,7 +25,7 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
         )
         session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
       } else {
-        const quotaStatus = await this.quotaService.getQuotaStatus(session, trx) // TODO(Alec)
+        const quotaStatus = await this.quota.getQuotaStatus(session, trx)
         queryCount = quotaStatus.queryCount
         totalQuota = quotaStatus.totalQuota
         blockNumber = quotaStatus.blockNumber
@@ -46,7 +34,7 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
         // In the case of a database connection failure, queryCount
         // may be undefined.
         if (quotaStatus.queryCount && quotaStatus.totalQuota) {
-          const { sufficient, state } = await this.quotaService.checkAndUpdateQuotaStatus(
+          const { sufficient, state } = await this.quota.checkAndUpdateQuotaStatus(
             quotaStatus,
             session,
             trx

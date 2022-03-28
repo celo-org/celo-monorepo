@@ -2,8 +2,6 @@ import {
   domainHash,
   DomainRestrictedSignatureRequest,
   ErrorMessage,
-  getCombinerEndpoint,
-  SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { EIP712Optional } from '@celo/utils/lib/sign-typed-data-utils'
@@ -11,15 +9,12 @@ import { Config } from '../../config'
 import { getDatabase } from '../../database/database'
 import { DomainStateRecord } from '../../database/models/domainState'
 import { DefaultKeyName, Key } from '../../key-management/key-provider-base'
-import { SignAction } from '../sign.abstract'
+import { SignAbstract } from '../sign.abstract'
 import { DomainQuotaService } from './quota.service'
 import { DomainSession } from './session'
 import { DomainSignIO } from './sign.io'
 
-export class DomainSignAction extends SignAction<DomainRestrictedSignatureRequest> {
-  readonly endpoint = SignerEndpoint.DOMAIN_SIGN
-  readonly combinerEndpoint = getCombinerEndpoint(this.endpoint)
-
+export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequest> {
   constructor(
     readonly config: Config,
     readonly quota: DomainQuotaService,
@@ -43,7 +38,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
 
         if (!this.nonceCheck(domainStateRecord, session)) {
           return this.io.sendFailure(
-            WarningMessage.UNAUTHENTICATED_USER, // TODO(Alec): Different error type
+            WarningMessage.INVALID_NONCE,
             401,
             session.response,
             domainStateRecord.toSequentialDelayDomainState()
@@ -96,13 +91,13 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
     }
   }
 
-  protected nonceCheck(
+  nonceCheck(
     domainStateRecord: DomainStateRecord,
     session: DomainSession<DomainRestrictedSignatureRequest>
   ): boolean {
     const nonce: EIP712Optional<number> = session.request.body.options.nonce
     if (!nonce.defined) {
-      session.logger.info('Nonce is undefined') // TODO(Alec): Better logging
+      session.logger.info('Nonce is undefined')
       return false
     }
     return nonce.value >= domainStateRecord.counter

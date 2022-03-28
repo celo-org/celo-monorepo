@@ -10,28 +10,26 @@ import {
   PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
   send,
+  SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { Config, getVersion } from '../../config'
+import { Counters } from '../../common/metrics'
+import config, { getVersion } from '../../config'
 import { getContractKit } from '../../web3/contracts'
-import { IIOService } from '../io.interface'
+import { IOAbstract } from '../io.abstract'
 import { PnpSession } from './session'
 
-export class PnpQuotaIO implements IIOService<PnpQuotaRequest> {
-  constructor(readonly config: Config) {}
+export class PnpQuotaIO extends IOAbstract<PnpQuotaRequest> {
+  readonly enabled: boolean = config.api.phoneNumberPrivacy.enabled
+  readonly endpoint = SignerEndpoint.GET_QUOTA
 
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<PnpQuotaResponse>
   ): Promise<PnpSession<PnpQuotaRequest> | null> {
-    if (!this.config.api.domains.enabled) {
-      this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
-      return null
-    }
-    if (!this.validate(request)) {
-      this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
+    if (!super._inputChecks(request, response)) {
       return null
     }
     if (!(await this.authenticate(request, response.locals.logger()))) {
@@ -73,7 +71,7 @@ export class PnpQuotaIO implements IIOService<PnpQuotaRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
@@ -97,6 +95,6 @@ export class PnpQuotaIO implements IIOService<PnpQuotaRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

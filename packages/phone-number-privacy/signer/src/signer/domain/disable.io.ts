@@ -8,27 +8,25 @@ import {
   DomainState,
   ErrorType,
   send,
+  SignerEndpoint,
   verifyDisableDomainRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
-import { Config, getVersion } from '../../config'
-import { IIOService } from '../io.interface'
+import { Counters } from '../../common/metrics'
+import config, { getVersion } from '../../config'
+import { IOAbstract } from '../io.abstract'
 import { DomainSession } from './session'
 
-export class DomainDisableIO implements IIOService<DisableDomainRequest> {
-  constructor(readonly config: Config) {}
+export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
+  readonly enabled: boolean = config.api.domains.enabled
+  readonly endpoint = SignerEndpoint.DISABLE_DOMAIN
 
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<DisableDomainResponse>
   ): Promise<DomainSession<DisableDomainRequest> | null> {
-    if (!this.config.api.domains.enabled) {
-      this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
-      return null
-    }
-    if (!this.validate(request)) {
-      this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
+    if (!super._inputChecks(request, response)) {
       return null
     }
     if (!(await this.authenticate(request))) {
@@ -61,7 +59,7 @@ export class DomainDisableIO implements IIOService<DisableDomainRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
@@ -81,6 +79,6 @@ export class DomainDisableIO implements IIOService<DisableDomainRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

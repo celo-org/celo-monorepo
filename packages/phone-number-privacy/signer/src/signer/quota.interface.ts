@@ -11,7 +11,7 @@ import { Session } from './action.interface'
 import { PnpQuotaStatus } from './pnp/quota.service'
 
 export type OdisQuotaStatus<R extends OdisRequest> = R extends
-  | DomainQuotaStatusRequest
+  | DomainQuotaStatusRequest // @victor do you know how to prevent this weird auto formatting?
   | DomainRestrictedSignatureRequest
   ? DomainStateRecord
   : never | R extends SignMessageRequest | PnpQuotaRequest

@@ -1,46 +1,46 @@
 import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestSchema,
-  DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseFailure,
   DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
   DomainState,
   ErrorType,
   KEY_VERSION_HEADER,
+  OdisResponse,
   send,
+  SignerEndpoint,
   verifyDomainRestrictedSignatureRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
-import { Config, getVersion } from '../../config'
+import { Counters } from '../../common/metrics'
+import config, { getVersion } from '../../config'
 import { Key } from '../../key-management/key-provider-base'
-import { IIOService } from '../io.interface'
+import { IOAbstract } from '../io.abstract'
 import { DomainSession } from './session'
 
-export class DomainSignIO implements IIOService<DomainRestrictedSignatureRequest> {
-  constructor(readonly config: Config) {}
+export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
+  readonly enabled: boolean = config.api.domains.enabled
+  readonly endpoint = SignerEndpoint.DOMAIN_SIGN
 
   async init(
     request: Request<{}, {}, unknown>,
-    response: Response<DomainRestrictedSignatureResponse>
+    response: Response<OdisResponse<DomainRestrictedSignatureRequest>> // @victor type weirdness here
   ): Promise<DomainSession<DomainRestrictedSignatureRequest> | null> {
-    if (!this.config.api.domains.enabled) {
-      this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
-      return null
-    }
-    // if (this.getRequestKeyVersion(request, logger) ?? false) {
-    //   this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
-    //   return null
-    // }
-    if (!this.validate(request)) {
-      this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
+    if (!super._inputChecks(request, response)) {
       return null
     }
     if (!(await this.authenticate(request))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
+    // TODO(Alec): Do we need this?
+    // if (this.getRequestKeyVersion(request, logger) ?? false) {
+    //   this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+    //   return null
+    // }
+
     return new DomainSession(request, response)
   }
 
@@ -61,7 +61,6 @@ export class DomainSignIO implements IIOService<DomainRestrictedSignatureRequest
     signature: string,
     domainState: DomainState
   ) {
-    // TODO(Alec): make sure this is happening everywhere it needs to
     response.set(KEY_VERSION_HEADER, key.version.toString())
     send(
       response,
@@ -74,7 +73,7 @@ export class DomainSignIO implements IIOService<DomainRestrictedSignatureRequest
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
@@ -94,6 +93,6 @@ export class DomainSignIO implements IIOService<DomainRestrictedSignatureRequest
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

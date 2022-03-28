@@ -381,8 +381,6 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
 
   private bypassQuotaForE2ETesting(requestBody: SignMessageRequest): boolean {
     const sessionID = Number(requestBody.sessionID)
-    return (
-      !Number.isNaN(sessionID) && sessionID % 100 < config.test_quota_bypass_percentage // TODO(Alec): add sessionID to PnpSession?
-    )
+    return !Number.isNaN(sessionID) && sessionID % 100 < config.test_quota_bypass_percentage
   }
 }

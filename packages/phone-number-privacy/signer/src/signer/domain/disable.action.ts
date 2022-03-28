@@ -1,10 +1,4 @@
-import {
-  DisableDomainRequest,
-  domainHash,
-  ErrorMessage,
-  getCombinerEndpoint,
-  SignerEndpoint,
-} from '@celo/phone-number-privacy-common'
+import { DisableDomainRequest, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Config } from '../../config'
 import { getDatabase } from '../../database/database'
 import {
@@ -13,23 +7,19 @@ import {
   insertDomainStateRecord,
   setDomainDisabled,
 } from '../../database/wrappers/domainState'
-import { IActionService } from '../action.interface'
+import { IAction } from '../action.interface'
 import { DomainDisableIO } from './disable.io'
 import { DomainSession } from './session'
 
-export class DomainDisableAction implements IActionService<DisableDomainRequest> {
-  readonly endpoint = SignerEndpoint.DISABLE_DOMAIN
-  readonly combinerEndpoint = getCombinerEndpoint(this.endpoint)
-
+export class DomainDisableAction implements IAction<DisableDomainRequest> {
   constructor(readonly config: Config, readonly io: DomainDisableIO) {}
 
   public async perform(session: DomainSession<DisableDomainRequest>): Promise<void> {
-    // TODO(Alec): factor this beginning part out
     const domain = session.request.body.domain
     session.logger.info('Processing request to disable domain', {
       name: domain.name,
       version: domain.version,
-      hash: domainHash(domain),
+      hash: domainHash(domain).toString('hex'),
     })
 
     try {

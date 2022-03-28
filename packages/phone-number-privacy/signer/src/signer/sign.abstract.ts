@@ -1,8 +1,6 @@
 import {
-  CombinerEndpoint,
   DomainRestrictedSignatureRequest,
   KEY_VERSION_HEADER,
-  SignerEndpoint,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -10,13 +8,13 @@ import { Request } from 'express'
 import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { getKeyProvider } from '../key-management/key-provider'
 import { Key } from '../key-management/key-provider-base'
-import { IActionService, Session } from './action.interface'
+import { IAction, Session } from './action.interface'
+import { IOAbstract } from './io.abstract'
 
 declare type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
 
-export abstract class SignAction<R extends OdisSignatureRequest> implements IActionService<R> {
-  abstract readonly endpoint: SignerEndpoint
-  abstract readonly combinerEndpoint: CombinerEndpoint
+export abstract class SignAbstract<R extends OdisSignatureRequest> implements IAction<R> {
+  abstract readonly io: IOAbstract<R>
 
   public abstract perform(session: Session<R>): Promise<void>
 

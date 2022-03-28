@@ -8,14 +8,18 @@ import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
 import config, { getVersion } from './config'
 import { Controller } from './signer/controller'
-import { DomainDisable } from './signer/domain/disable.action'
-import { DomainQuotaStatus } from './signer/domain/quota'
+import { DomainDisableAction } from './signer/domain/disable.action'
+import { DomainDisableIO } from './signer/domain/disable.io'
+import { DomainQuotaAction } from './signer/domain/quota.action'
+import { DomainQuotaIO } from './signer/domain/quota.io'
 import { DomainQuotaService } from './signer/domain/quota.service'
-import { DomainSign } from './signer/domain/sign.action'
-import { PnpQuota } from './signer/pnp/quota'
+import { DomainSignAction } from './signer/domain/sign.action'
+import { DomainSignIO } from './signer/domain/sign.io'
 import { PnpQuotaAction } from './signer/pnp/quota.action'
 import { PnpQuotaIO } from './signer/pnp/quota.io'
 import { PnpQuotaService } from './signer/pnp/quota.service'
+import { PnpSignAction } from './signer/pnp/sign.action'
+import { PnpSignIO } from './signer/pnp/sign.io'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -36,8 +40,7 @@ export function createServer() {
     res.send(PromClient.register.metrics())
   })
 
-  // TODO(Alec): Clean this up
-
+  // TODO(Alec): Clean this up / add to Controller class
   const addMeteredSignerEndpoint = (
     endpoint: SignerEndpoint,
     handler: (req: Request, res: Response) => Promise<void>,
@@ -47,23 +50,39 @@ export function createServer() {
       await callAndMeterLatency(endpoint, handler, req, res)
     })
 
-  // TODO(Alec)(Next)
-  const pnpSign = new Controller(
-    config,
-    new PnpQuotaService(),
-    new PnpQuotaAction(),
-    new PnpQuotaIO(config)
-  )
+  async function callAndMeterLatency(
+    endpoint: SignerEndpoint,
+    handler: (req: Request, res: Response) => Promise<void>,
+    req: Request,
+    res: Response
+  ) {
+    const childLogger: Logger = res.locals.logger
+    const end = Histograms.responseLatency.labels(endpoint).startTimer()
+    const timeoutRes = Symbol()
+    await timeout(handler, [req, res], config.timeout, timeoutRes)
+      .catch((error: any) => {
+        if (error === timeoutRes) {
+          Counters.timeouts.inc()
+          childLogger.warn(`Timed out after ${config.timeout}ms`)
+        }
+      })
+      .finally(end)
+  }
 
-  addMeteredSignerEndpoint(SignerEndpoint.PARTIAL_SIGN_MESSAGE, pnpSign.handle)
-  const pnpQuota = new PnpQuota(config, new PnpQuotaService())
-  addMeteredSignerEndpoint(SignerEndpoint.GET_QUOTA, pnpQuota.handle)
-  const domainQuotaStatus = new DomainQuotaStatus(config, new DomainQuotaService())
-  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuotaStatus.handle)
-  const domainSign = new DomainSign(config, new DomainQuotaService())
-  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle)
-  const domainDisable = new DomainDisable(config, new DomainQuotaService())
-  addMeteredSignerEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle)
+  const pnpQuotaService = new PnpQuotaService()
+  const domainQuotaService = new DomainQuotaService()
+
+  const pnpQuota = new PnpQuotaAction(config, pnpQuotaService, new PnpQuotaIO())
+  const pnpSign = new PnpSignAction(config, pnpQuotaService, new PnpSignIO())
+  const domainQuota = new DomainQuotaAction(config, domainQuotaService, new DomainQuotaIO())
+  const domainSign = new DomainSignAction(config, domainQuotaService, new DomainSignIO())
+  const domainDisable = new DomainDisableAction(config, new DomainDisableIO())
+
+  addMeteredSignerEndpoint(SignerEndpoint.PARTIAL_SIGN_MESSAGE, new Controller(pnpSign).handle)
+  addMeteredSignerEndpoint(SignerEndpoint.GET_QUOTA, new Controller(pnpQuota).handle)
+  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, new Controller(domainQuota).handle)
+  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_SIGN, new Controller(domainSign).handle)
+  addMeteredSignerEndpoint(SignerEndpoint.DISABLE_DOMAIN, new Controller(domainDisable).handle)
 
   const sslOptions = getSslOptions()
   if (sslOptions) {
@@ -71,25 +90,6 @@ export function createServer() {
   } else {
     return app
   }
-}
-
-async function callAndMeterLatency(
-  endpoint: SignerEndpoint,
-  handler: (req: Request, res: Response) => Promise<void>,
-  req: Request,
-  res: Response
-) {
-  const childLogger: Logger = res.locals.logger
-  const end = Histograms.responseLatency.labels(endpoint).startTimer()
-  const timeoutRes = Symbol()
-  await timeout(handler, [req, res], config.timeout, timeoutRes)
-    .catch((error: any) => {
-      if (error === timeoutRes) {
-        Counters.timeouts.inc()
-        childLogger.warn(`Timed out after ${config.timeout}ms`)
-      }
-    })
-    .finally(end)
 }
 
 function getSslOptions() {

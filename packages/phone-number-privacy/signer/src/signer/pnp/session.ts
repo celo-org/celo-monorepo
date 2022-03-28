@@ -8,13 +8,12 @@ import { Request, Response } from 'express'
 
 export class PnpSession<R extends PhoneNumberPrivacyRequest> {
   readonly logger: Logger
-  readonly errors: ErrorType[]
+  readonly errors: ErrorType[] = []
 
   public constructor(
     readonly request: Request<{}, {}, R>,
     readonly response: Response<PhoneNumberPrivacyResponse<R>>
   ) {
     this.logger = response.locals.logger()
-    this.errors = []
   }
 }

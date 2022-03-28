@@ -8,28 +8,25 @@ import {
   ErrorType,
   OdisResponse,
   send,
+  SignerEndpoint,
   verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
-import { Config, getVersion } from '../../config'
-import { IIOService } from '../io.interface'
+import { Counters } from '../../common/metrics'
+import config, { getVersion } from '../../config'
+import { IOAbstract } from '../io.abstract'
 import { DomainSession } from './session'
 
-export class DomainQuotaIO implements IIOService<DomainQuotaStatusRequest> {
-  constructor(readonly config: Config) {}
+export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
+  readonly enabled: boolean = config.api.domains.enabled
+  readonly endpoint = SignerEndpoint.DOMAIN_QUOTA_STATUS
 
-  // TODO(Alec): Can we factor this out?
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<OdisResponse<DomainQuotaStatusRequest>> // @victor I'm seeing some weird type stuff here if I use DomainQuotaStatusResponse
   ): Promise<DomainSession<DomainQuotaStatusRequest> | null> {
-    if (!this.config.api.domains.enabled) {
-      this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
-      return null
-    }
-    if (!this.validate(request)) {
-      this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
+    if (!super._inputChecks(request, response)) {
       return null
     }
     if (!(await this.authenticate(request))) {
@@ -64,7 +61,7 @@ export class DomainQuotaIO implements IIOService<DomainQuotaStatusRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
@@ -84,6 +81,6 @@ export class DomainQuotaIO implements IIOService<DomainQuotaStatusRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

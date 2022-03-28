@@ -14,19 +14,23 @@ import {
 import { IQuotaService, OdisQuotaStatusResult } from '../quota.interface'
 import { DomainSession } from './session'
 
-export class DomainQuotaService
-  implements IQuotaService<DomainQuotaStatusRequest | DomainRestrictedSignatureRequest> {
+declare type QuotaDependentDomainRequest =
+  | DomainQuotaStatusRequest
+  | DomainRestrictedSignatureRequest
+
+export class DomainQuotaService implements IQuotaService<QuotaDependentDomainRequest> {
   public async checkAndUpdateQuotaStatus(
     state: DomainStateRecord,
-    session: DomainSession<DomainQuotaStatusRequest | DomainRestrictedSignatureRequest>,
-    trx: Transaction<DomainStateRecord>
-  ): Promise<OdisQuotaStatusResult<DomainQuotaStatusRequest | DomainRestrictedSignatureRequest>> {
+    session: DomainSession<QuotaDependentDomainRequest>,
+    trx: Transaction<DomainStateRecord>,
+    attemptTime: number = Date.now() / 1000 // Convert current time in ms to seconds.
+  ): Promise<OdisQuotaStatusResult<QuotaDependentDomainRequest>> {
     const { domain } = session.request.body
     if (isSequentialDelayDomain(domain)) {
       const result = checkSequentialDelayRateLimit(
         domain,
-        Date.now() / 1000, // Divide by 1000 to convert the current time in ms to seconds.
-        state.toSequentialDelayDomainState()
+        attemptTime,
+        state.toSequentialDelayDomainState(attemptTime)
       )
       if (result.accepted) {
         const newState = new DomainStateRecord(domain, result.state)
@@ -43,7 +47,7 @@ export class DomainQuotaService
   }
 
   public async getQuotaStatus(
-    session: DomainSession<DomainQuotaStatusRequest | DomainRestrictedSignatureRequest>,
+    session: DomainSession<QuotaDependentDomainRequest>,
     trx?: Transaction<DomainStateRecord>
   ): Promise<DomainStateRecord> {
     return getDomainStateRecordOrEmpty(session.request.body.domain, session.logger, trx)

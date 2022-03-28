@@ -47,7 +47,7 @@ export function createEmptyDomainStateRecord(domain: Domain) {
     timer: 0,
     counter: 0,
     disabled: false,
-    date: 0, // TODO(Alec)(Next)
+    now: 0,
   })
 }
 

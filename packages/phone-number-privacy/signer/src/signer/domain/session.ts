@@ -1,4 +1,4 @@
-import { DomainRequest } from '@celo/phone-number-privacy-common'
+import { DomainRequest, OdisResponse } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 

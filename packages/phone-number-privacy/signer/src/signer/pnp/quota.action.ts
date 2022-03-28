@@ -1,19 +1,11 @@
-import {
-  CombinerEndpoint,
-  getCombinerEndpoint,
-  PnpQuotaRequest,
-  SignerEndpoint,
-} from '@celo/phone-number-privacy-common'
+import { PnpQuotaRequest } from '@celo/phone-number-privacy-common'
 import { Config } from '../../config'
-import { IActionService } from '../action.interface'
+import { IAction } from '../action.interface'
 import { PnpQuotaIO } from './quota.io'
 import { PnpQuotaService } from './quota.service'
 import { PnpSession } from './session'
 
-export class PnpQuotaAction implements IActionService<PnpQuotaRequest> {
-  readonly endpoint: SignerEndpoint = SignerEndpoint.GET_QUOTA
-  readonly combinerEndpoint: CombinerEndpoint = getCombinerEndpoint(this.endpoint)
-
+export class PnpQuotaAction implements IAction<PnpQuotaRequest> {
   constructor(readonly config: Config, readonly quota: PnpQuotaService, readonly io: PnpQuotaIO) {}
 
   public async perform(session: PnpSession<PnpQuotaRequest>): Promise<void> {
