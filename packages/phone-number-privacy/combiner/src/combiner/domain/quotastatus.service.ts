@@ -151,7 +151,7 @@ export function findThresholdDomainState<
   }
 
   if (session.service.signers.length - numDisabled < threshold) {
-    return { timer: 0, counter: 0, disabled: true, date: 0 }
+    return { timer: 0, counter: 0, disabled: true, now: 0 }
   }
 
   if (domainStatesEnabled.length < threshold) {
@@ -170,22 +170,30 @@ export function findThresholdDomainState<
   const domainStatesWithThresholdCounter = domainStatesEnabled.filter(
     (ds) => ds.counter <= thresholdCounter
   )
-  const domainStatesAscendingByTimer = domainStatesWithThresholdCounter.sort(
-    (a, b) => a.timer - b.timer
-  )
-  const nthLeastRestrictiveByTimer = domainStatesAscendingByTimer[n]
-  const thresholdTimer = nthLeastRestrictiveByTimer.timer
 
-  const domainStatesAscendingByDate = domainStatesWithThresholdCounter.sort(
-    (a, b) => a.date - b.date
+  const domainStatesAscendingByTimestampRestrictiveness = domainStatesWithThresholdCounter.sort(
+    (a, b) => a.timer - a.now - (b.timer - b.now)
+    /**
+     * This name is "intentionally" confusing. There's some nuance to how this works, and you
+     * should review the code in '@celo/phone-number-privacy-common/src/domains/sequential-delay.ts'
+     * as well as the spec in (TODO(Alec): add link) for a full understanding.
+     *
+     * For a given DomainState, it is always the case that 'now' >= 'timer'. This ordering ensures
+     * that we take the 'timer' and 'date' from the same DomainState while still returning a reasonable
+     * definition of the "nth least restrictive" values. For simplicity, we do not take into consideration
+     * the 'delay' until the next request will be accepted as that would require calculating this value for
+     * each DomainState with the checkSequentialDelayDomainState algorithm in sequential-delay.ts.
+     * This would add complexity because DomainStates may have different values for 'counter' that dramatically
+     * alter this 'delay' and we want to protect the user's quota by returning the lowest possible
+     * threshold 'counter'. Feel free to implement a more exact solution if you're up for a coding challenge :)
+     */
   )
-  const nthLeastRestrictiveByDate = domainStatesAscendingByDate[n]
-  const thresholdDate = nthLeastRestrictiveByDate.date
+  const nthLeastRestrictiveByTimestamps = domainStatesAscendingByTimestampRestrictiveness[n]
 
   return {
-    timer: thresholdTimer,
+    timer: nthLeastRestrictiveByTimestamps.timer,
     counter: thresholdCounter,
     disabled: false,
-    date: thresholdDate,
+    now: nthLeastRestrictiveByTimestamps.now,
   }
 }

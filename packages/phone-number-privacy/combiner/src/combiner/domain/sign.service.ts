@@ -122,24 +122,6 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
     return res
   }
 
-  protected parseSignature(
-    res: DomainRestrictedSignatureResponse,
-    signerUrl: string,
-    session: Session<DomainRestrictedSignatureRequest>
-  ): string | undefined {
-    if (!res.success) {
-      session.logger.error(
-        {
-          error: res.error,
-          signer: signerUrl,
-        },
-        'Signer responded with error' // TODO(Alec)
-      )
-      return undefined
-    }
-    return res.signature
-  }
-
   protected parseBlindedMessage(req: DomainRestrictedSignatureRequest): string {
     return req.blindedMessage
   }
@@ -148,29 +130,4 @@ export class DomainSignService extends SignService<DomainRestrictedSignatureRequ
     // TODO(Alec)
     throw new Error('Method not implemented.')
   }
-
-  // TODO(Alec)(Next)
-  // private getRetryAfter(): number {
-  //   try {
-  //     return this.responses
-  //       .filter((response) => !response.res.success && response.res.retryAfter > 0)
-  //       .map((response) => response.res as DomainRestrictedSignatureResponseFailure)
-  //       .sort((a, b) => a.retryAfter - b.retryAfter)[this.threshold - 1].retryAfter
-  //   } catch (error) {
-  //     logger.error({ error }, 'Error getting threshold response retryAfter value')
-  //     return -1
-  //   }
-  // }
-
-  // private getDate(): number {
-  //   try {
-  //     return this.responses
-  //       .filter((response) => !response.res.success && response.res.date > 0)
-  //       .map((response) => response.res as DomainRestrictedSignatureResponseFailure)
-  //       .sort((a, b) => a.date - b.date)[this.threshold - 1].date
-  //   } catch (error) {
-  //     logger.error({ error }, 'Error getting threshold response date value')
-  //     return -1
-  //   }
-  // }
 }

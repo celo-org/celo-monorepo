@@ -95,24 +95,6 @@ export class PnpSignService extends SignService<SignMessageRequest> {
     return req.blindedQueryPhoneNumber
   }
 
-  protected parseSignature(
-    res: SignMessageResponse,
-    signerUrl: string,
-    session: Session<SignMessageRequest>
-  ): string | undefined {
-    if (!res.success) {
-      session.logger.error(
-        {
-          error: res.error,
-          signer: signerUrl,
-        },
-        'Signer responded with error'
-      )
-      // Continue on failure as long as signature is present to unblock user
-    }
-    return res.signature
-  }
-
   protected sendSuccess(
     status: number,
     response: Response<SignMessageResponseSuccess>,
@@ -128,6 +110,7 @@ export class PnpSignService extends SignService<SignMessageRequest> {
         performedQueryCount: undefined,
         totalQuota: undefined,
         blockNumber: undefined,
+        warnings: undefined,
       },
       status,
       logger

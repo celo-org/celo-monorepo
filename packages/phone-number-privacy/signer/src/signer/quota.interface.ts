@@ -7,8 +7,8 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Transaction } from 'knex'
 import { DomainStateRecord } from '../database/models/domainState'
+import { Session } from './action.interface'
 import { PnpQuotaStatus } from './pnp/quota.service'
-import { Session } from './session'
 
 export type OdisQuotaStatus<R extends OdisRequest> = R extends
   | DomainQuotaStatusRequest

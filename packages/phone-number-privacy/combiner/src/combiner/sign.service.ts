@@ -1,10 +1,12 @@
 import {
   DomainRestrictedSignatureRequest,
+  DomainRestrictedSignatureResponseSuccess,
   ErrorMessage,
   ErrorType,
   KEY_VERSION_HEADER,
   OdisResponse,
   SignMessageRequest,
+  SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
@@ -26,7 +28,7 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
   }
 
   protected async receiveSuccess(
-    signerResponse: FetchResponse,
+    res: SignMessageResponseSuccess | DomainRestrictedSignatureResponseSuccess,
     url: string,
     session: Session<R>
   ): Promise<void> {
@@ -41,10 +43,7 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
     // TODO(Alec): Move this up one level
     const res = this.validateSignerResponse(data, url, session)
 
-    const signature = this.parseSignature(res, url, session)
-    if (!signature) {
-      throw new Error(ErrorMessage.SIGNATURE_MISSING_FROM_SIGNER_RESPONSE)
-    }
+    const signature = res.success ? res.signature : never // TODO(Alec)(Next)
 
     session.responses.push({ url, res, status })
 
@@ -103,10 +102,5 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
     this.sendFailure(error, majorityErrorCode ?? 500, session.response, session.logger)
   }
   protected abstract logResponseDiscrepancies(session: Session<R>): void
-  protected abstract parseSignature(
-    res: SignatureResponse<R>,
-    signerUrl: string,
-    session: Session<R>
-  ): string | undefined
   protected abstract parseBlindedMessage(req: R): string
 }

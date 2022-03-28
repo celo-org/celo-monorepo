@@ -12,13 +12,13 @@ import {
   updateDomainStateRecord,
 } from '../../database/wrappers/domainState'
 import { IQuotaService, OdisQuotaStatusResult } from '../quota.interface'
-import { Session } from '../session'
+import { DomainSession } from './session'
 
 export class DomainQuotaService
   implements IQuotaService<DomainQuotaStatusRequest | DomainRestrictedSignatureRequest> {
   public async checkAndUpdateQuotaStatus(
     state: DomainStateRecord,
-    session: Session<DomainQuotaStatusRequest | DomainRestrictedSignatureRequest>,
+    session: DomainSession<DomainQuotaStatusRequest | DomainRestrictedSignatureRequest>,
     trx: Transaction<DomainStateRecord>
   ): Promise<OdisQuotaStatusResult<DomainQuotaStatusRequest | DomainRestrictedSignatureRequest>> {
     const { domain } = session.request.body
@@ -43,7 +43,7 @@ export class DomainQuotaService
   }
 
   public async getQuotaStatus(
-    session: Session<DomainQuotaStatusRequest | DomainRestrictedSignatureRequest>,
+    session: DomainSession<DomainQuotaStatusRequest | DomainRestrictedSignatureRequest>,
     trx?: Transaction<DomainStateRecord>
   ): Promise<DomainStateRecord> {
     return getDomainStateRecordOrEmpty(session.request.body.domain, session.logger, trx)

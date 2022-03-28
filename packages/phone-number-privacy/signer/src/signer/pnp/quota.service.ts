@@ -22,8 +22,7 @@ import {
   meter,
 } from '../../web3/contracts'
 import { IQuotaService, OdisQuotaStatusResult } from '../quota.interface'
-import { Session } from '../session'
-
+import { PnpSession } from './session'
 export interface PnpQuotaStatus {
   queryCount: number
   totalQuota: number
@@ -33,7 +32,7 @@ export interface PnpQuotaStatus {
 export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQuotaRequest> {
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
-    session: Session<SignMessageRequest>,
+    session: PnpSession<SignMessageRequest>,
     trx: Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
     Histograms.userRemainingQuotaAtRequest.observe(state.totalQuota - state.queryCount)
@@ -57,18 +56,18 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
   }
 
   public async getQuotaStatus(
-    session: Session<SignMessageRequest | PnpQuotaRequest>,
+    session: PnpSession<SignMessageRequest | PnpQuotaRequest>,
     trx?: Transaction
   ): Promise<PnpQuotaStatus> {
     const { account } = session.request.body
     const [queryCountResult, totalQuotaResult, blockNumberResult] = await meter(
-      (_session: Session<SignMessageRequest | PnpQuotaRequest>) =>
+      (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
           // TODO(Alec)(Next)
           // Note: The database read of the user's queryCount
           // included here resolves to 0 on error
           getPerformedQueryCount(account, session.logger, trx),
-          this.getTotalQuota(session),
+          this.getTotalQuota(_session),
           getBlockNumber(),
         ]),
       [session],
@@ -108,7 +107,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
     return { queryCount, totalQuota, blockNumber }
   }
 
-  protected async updateQuotaStatus(trx: Transaction, session: Session<SignMessageRequest>) {
+  protected async updateQuotaStatus(trx: Transaction, session: PnpSession<SignMessageRequest>) {
     // TODO(Alec): Review db error handling
     const [requestStored, queryCountIncremented] = await Promise.all([
       storeRequest(session.request.body, session.logger, trx),
@@ -125,12 +124,12 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
   }
 
   protected async getWalletAddressAndIsVerified(
-    session: Session<SignMessageRequest | PnpQuotaRequest>
+    session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<{ walletAddress: string; isAccountVerified: boolean }> {
     const { account, hashedPhoneNumber } = session.request.body
 
     const [walletAddressResult, isVerifiedResult] = await meter(
-      (_session: Session<SignMessageRequest | PnpQuotaRequest>) =>
+      (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
           getWalletAddress(session.logger, account),
           hashedPhoneNumber
@@ -173,7 +172,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
   }
 
   protected async getBalances(
-    session: Session<SignMessageRequest | PnpQuotaRequest>,
+    session: PnpSession<SignMessageRequest | PnpQuotaRequest>,
     ...addresses: string[]
   ) {
     const [
@@ -223,7 +222,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
   }
 
   protected async getTotalQuota(
-    session: Session<SignMessageRequest | PnpQuotaRequest>
+    session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<number> {
     return meter(
       this._getTotalQuota,
@@ -242,7 +241,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
    * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
    */
   private async _getTotalQuota(
-    session: Session<SignMessageRequest | PnpQuotaRequest>
+    session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<number> {
     const {
       unverifiedQueryMax,
@@ -383,7 +382,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
   private bypassQuotaForE2ETesting(requestBody: SignMessageRequest): boolean {
     const sessionID = Number(requestBody.sessionID)
     return (
-      !Number.isNaN(sessionID) && sessionID % 100 < config.test_quota_bypass_percentage // TODO(Alec): add sessionID to Session?
+      !Number.isNaN(sessionID) && sessionID % 100 < config.test_quota_bypass_percentage // TODO(Alec): add sessionID to PnpSession?
     )
   }
 }

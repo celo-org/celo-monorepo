@@ -7,13 +7,15 @@ import https from 'https'
 import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
 import config, { getVersion } from './config'
-import { DomainDisable } from './signer/domain/disable'
+import { Controller } from './signer/controller'
+import { DomainDisable } from './signer/domain/disable.action'
 import { DomainQuotaStatus } from './signer/domain/quota'
 import { DomainQuotaService } from './signer/domain/quota.service'
-import { DomainSign } from './signer/domain/sign'
+import { DomainSign } from './signer/domain/sign.action'
 import { PnpQuota } from './signer/pnp/quota'
+import { PnpQuotaAction } from './signer/pnp/quota.action'
+import { PnpQuotaIO } from './signer/pnp/quota.io'
 import { PnpQuotaService } from './signer/pnp/quota.service'
-import { PnpSign } from './signer/pnp/sign'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -45,7 +47,14 @@ export function createServer() {
       await callAndMeterLatency(endpoint, handler, req, res)
     })
 
-  const pnpSign = new PnpSign(config, new PnpQuotaService())
+  // TODO(Alec)(Next)
+  const pnpSign = new Controller(
+    config,
+    new PnpQuotaService(),
+    new PnpQuotaAction(),
+    new PnpQuotaIO(config)
+  )
+
   addMeteredSignerEndpoint(SignerEndpoint.PARTIAL_SIGN_MESSAGE, pnpSign.handle)
   const pnpQuota = new PnpQuota(config, new PnpQuotaService())
   addMeteredSignerEndpoint(SignerEndpoint.GET_QUOTA, pnpQuota.handle)

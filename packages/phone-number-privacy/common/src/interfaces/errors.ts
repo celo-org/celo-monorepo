@@ -20,7 +20,6 @@ export enum ErrorMessage {
   SIGNER_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_18 DOMAIN Failed to get domain status from signer`,
   THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_19 DOMAIN Failed to get domain quota status from a threshold of signers`,
   INVALID_KEY_VERSION_RESPONSE = `CELO_ODIS_ERR_20 SIG_ERR Response key version header is invalid`,
-  SIGNATURE_MISSING_FROM_SIGNER_RESPONSE = `CELO_ODIS_ERR_21 SIG_ERR Signature missing from signer response`,
 }
 
 export enum WarningMessage {

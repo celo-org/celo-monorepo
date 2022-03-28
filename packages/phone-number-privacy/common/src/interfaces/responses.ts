@@ -55,7 +55,7 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
   }),
 ])
 
-export interface GetQuotaResponseSuccess {
+export interface PnpQuotaResponseSuccess {
   success: true
   version: string
   performedQueryCount: number | undefined
@@ -63,15 +63,15 @@ export interface GetQuotaResponseSuccess {
   blockNumber: number | undefined
 }
 
-export interface GetQuotaResponseFailure {
+export interface PnpQuotaResponseFailure {
   success: false
   version: string
   error: string
 }
 
-export type GetQuotaResponse = GetQuotaResponseSuccess | GetQuotaResponseFailure
+export type PnpQuotaResponse = PnpQuotaResponseSuccess | PnpQuotaResponseFailure
 
-export const GetQuotaResponseSchema: t.Type<GetQuotaResponse> = t.union([
+export const PnpQuotaResponseSchema: t.Type<PnpQuotaResponse> = t.union([
   t.type({
     success: t.literal(true),
     version: t.string,
@@ -121,7 +121,7 @@ export type PhoneNumberPrivacyResponse<
   : never | R extends MatchmakingRequest
   ? GetContactMatchesResponse
   : never | R extends PnpQuotaRequest
-  ? GetQuotaResponse
+  ? PnpQuotaResponse
   : never
 
 // Domains
