@@ -63,7 +63,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
     const [queryCountResult, totalQuotaResult, blockNumberResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
-          // TODO(Alec)(db)
+          // TODO(Alec)(pnp)
           // Note: The database read of the user's queryCount
           // included here resolves to 0 on error
           getPerformedQueryCount(account, session.logger, trx),
@@ -79,9 +79,9 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
     )
 
     let hadBlockchainError = false
-    let queryCount = -1,
-      totalQuota = -1,
-      blockNumber = -1
+    let queryCount = -1
+    let totalQuota = -1
+    let blockNumber = -1
     if (queryCountResult.status === 'fulfilled') {
       queryCount = queryCountResult.value
     } else {
@@ -108,7 +108,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
   }
 
   protected async updateQuotaStatus(trx: Transaction, session: PnpSession<SignMessageRequest>) {
-    // TODO(Alec)(db): Review db error handling
+    // TODO(Alec)(pnp): Review db error handling
     const [requestStored, queryCountIncremented] = await Promise.all([
       storeRequest(session.request.body, session.logger, trx),
       incrementQueryCount(session.request.body.account, session.logger, trx),
@@ -250,7 +250,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
       minDollarBalance,
       minEuroBalance,
       minCeloBalance,
-    } = config.quota // TODO(Alec)(pnp): where should we be getting config from?
+    } = config.quota
 
     const { account } = session.request.body
 

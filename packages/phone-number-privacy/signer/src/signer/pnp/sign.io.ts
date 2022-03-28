@@ -78,7 +78,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
         performedQueryCount,
         totalQuota,
         blockNumber,
-        warnings, // TODO(Alec)(types): update handling of these types in combiner
+        warnings, // TODO(Alec)(pnp): update handling of these types in combiner
       },
       status,
       response.locals.logger()

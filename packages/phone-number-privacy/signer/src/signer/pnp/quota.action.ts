@@ -10,16 +10,6 @@ export class PnpQuotaAction implements IAction<PnpQuotaRequest> {
 
   public async perform(session: PnpSession<PnpQuotaRequest>): Promise<void> {
     const { queryCount, totalQuota, blockNumber } = await this.quota.getQuotaStatus(session)
-
-    // TODO(Alec)(logging): how do we want to represent errors here?
-
-    this.io.sendSuccess(200, session.response, queryCount, totalQuota, blockNumber)
-
-    // TODO(Alec)(logging): Make sure we're not forgetting to log correctly elsewhere
-    // catch (err) {
-    //   logger.error('Failed to get user quota')
-    //   logger.error(err)
-    //   sendFailureResponse(response, ErrorMessage.DATABASE_GET_FAILURE, 500, endpoint, logger)
-    // }
+    this.io.sendSuccess(200, session.response, queryCount, totalQuota, blockNumber, session.errors)
   }
 }

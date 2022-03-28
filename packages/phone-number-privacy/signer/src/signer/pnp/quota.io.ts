@@ -57,7 +57,8 @@ export class PnpQuotaIO extends IOAbstract<PnpQuotaRequest> {
     response: Response<PnpQuotaResponseSuccess>,
     performedQueryCount?: number,
     totalQuota?: number,
-    blockNumber?: number
+    blockNumber?: number,
+    warnings?: string[]
   ) {
     send(
       response,
@@ -67,6 +68,7 @@ export class PnpQuotaIO extends IOAbstract<PnpQuotaRequest> {
         performedQueryCount,
         totalQuota,
         blockNumber,
+        warnings,
       },
       status,
       response.locals.logger()

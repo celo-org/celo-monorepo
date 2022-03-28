@@ -61,6 +61,7 @@ export interface PnpQuotaResponseSuccess {
   performedQueryCount: number | undefined
   totalQuota: number | undefined
   blockNumber: number | undefined
+  warnings: string[] | undefined
 }
 
 export interface PnpQuotaResponseFailure {
@@ -78,6 +79,7 @@ export const PnpQuotaResponseSchema: t.Type<PnpQuotaResponse> = t.union([
     performedQueryCount: t.union([t.number, t.undefined]),
     totalQuota: t.union([t.number, t.undefined]),
     blockNumber: t.union([t.number, t.undefined]),
+    warnings: t.union([t.array(t.string), t.undefined]),
   }),
   t.type({
     success: t.literal(false),
