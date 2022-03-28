@@ -6,9 +6,10 @@
 * @celo-org/default-owners
 
 # directory and file-level owners. Feel free to add to this!
+
 /packages/attestation-proxy/ @celo-org/identity
 /packages/attestation-service/ @celo-org/identity
-/packages/azure/ @celo-org/azure
+/packages/azure/ @celo-org/devopsre
 /packages/celotool/ @celo-org/protocol-owners
 /packages/cli/ @celo-org/applications
 /packages/dev-utils/ @celo-org/applications
@@ -16,13 +17,14 @@
 /packages/env-tests @celo-org/cap
 /packages/faucet/ @celo-org/applications
 /packages/flake-tracker @celo-org/flake-trackers
-/packages/helm-charts/ @celo-org/helm-chart-owners
-/packages/helm-charts/oracle/ @celo-org/platform-economics  @celo-org/helm-chart-owners
+/packages/helm-charts/ @celo-org/devopsre
+/packages/helm-charts/oracle/ @celo-org/platform-economics  @celo-org/devopsre
 /packages/metadata-crawler/ @celo-org/identity
 /packages/phone-number-privacy/ @celo-org/identity
 /packages/protocol/ @celo-org/cap @celo-org/protocol-owners
 /packages/sdk/ @celo-org/applications
+/packages/sdk/identity/  @celo-org/identity @celo-org/applications
 /packages/sdk/contractkit/ @celo-org/cap @celo-org/applications
-/packages/terraform-modules-public/ @celo-org/terraformers
-/packages/terraform-modules/ @celo-org/terraformers
+/packages/terraform-modules-public/ @celo-org/devopsre
+/packages/terraform-modules/ @celo-org/devopsre
 /packages/typescript/ @celo-org/applications
