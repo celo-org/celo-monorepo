@@ -2,6 +2,7 @@ import {
   DomainRestrictedSignatureRequest,
   KEY_VERSION_HEADER,
   SignMessageRequest,
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request } from 'express'
@@ -25,11 +26,22 @@ export abstract class SignAbstract<R extends OdisSignatureRequest> implements IA
   ): Promise<{ signature: string; key: Key }> {
     let keyVersion = this.getRequestKeyVersion(session.request, session.logger)
     if (keyVersion ?? false) {
-      // TODO(Alec): Should we throw here?
       keyVersion = defaultKey.version
     }
     const key: Key = { name: defaultKey.name, version: keyVersion! }
-    const privateKey = await getKeyProvider().getPrivateKeyOrFetchFromStore(key)
+    let privateKey: string
+    try {
+      privateKey = await getKeyProvider().getPrivateKeyOrFetchFromStore(key)
+    } catch (err) {
+      if (key.version !== defaultKey.version) {
+        // @victor Is this the correct behavior?
+        // If the requested keyVersion is not supported, attempt signing with the default keyVersion
+        key.version = defaultKey.version
+        privateKey = await getKeyProvider().getPrivateKeyOrFetchFromStore(key)
+      } else {
+        throw err
+      }
+    }
     const signature = computeBlindedSignature(blindedMessage, privateKey, session.logger)
     return { signature, key }
   }
@@ -42,11 +54,9 @@ export abstract class SignAbstract<R extends OdisSignatureRequest> implements IA
     logger.info({ keyVersionHeader })
     const requestedKeyVersion = Number(keyVersionHeader)
     if (Number.isNaN(requestedKeyVersion)) {
-      // TODO(Alec): New error type + review error whether we should throw at any point
-      logger.warn({ keyVersionHeader }, 'Supplied keyVersion in request header is NaN')
+      logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
       return undefined
     }
-    // TODO(Alec)(Next): should we check against the supported key versions?
     return requestedKeyVersion
   }
 }

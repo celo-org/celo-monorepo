@@ -35,12 +35,6 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    // TODO(Alec): Do we need this?
-    // if (this.getRequestKeyVersion(request, logger) ?? false) {
-    //   this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
-    //   return null
-    // }
-
     return new DomainSession(request, response)
   }
 

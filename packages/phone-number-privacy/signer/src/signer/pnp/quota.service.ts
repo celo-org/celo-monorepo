@@ -63,7 +63,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
     const [queryCountResult, totalQuotaResult, blockNumberResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
-          // TODO(Alec)(Next)
+          // TODO(Alec)(db)
           // Note: The database read of the user's queryCount
           // included here resolves to 0 on error
           getPerformedQueryCount(account, session.logger, trx),
@@ -108,7 +108,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
   }
 
   protected async updateQuotaStatus(trx: Transaction, session: PnpSession<SignMessageRequest>) {
-    // TODO(Alec): Review db error handling
+    // TODO(Alec)(db): Review db error handling
     const [requestStored, queryCountIncremented] = await Promise.all([
       storeRequest(session.request.body, session.logger, trx),
       incrementQueryCount(session.request.body.account, session.logger, trx),
@@ -250,7 +250,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
       minDollarBalance,
       minEuroBalance,
       minCeloBalance,
-    } = config.quota // TODO(Alec): where should we be getting config from?
+    } = config.quota // TODO(Alec)(pnp): where should we be getting config from?
 
     const { account } = session.request.body
 
@@ -263,7 +263,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
     const transactionCount = await getTransactionCount(
       session.logger,
       account,
-      walletAddress // TODO(Alec): Make sure we filter out null address in getTransactionCount
+      walletAddress // TODO(Alec)(pnp): Make sure we filter out null address in getTransactionCount
     )
     session.logger.debug({ account, transactionCount })
 
@@ -343,7 +343,6 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
     transactionCount: number,
     logger: Logger
   ): number {
-    // TODO(Alec): We'll need to update verification heuristic for ASv2
     const quota =
       unverifiedQueryMax + additionalVerifiedQueryMax + queryPerTransaction * transactionCount
 

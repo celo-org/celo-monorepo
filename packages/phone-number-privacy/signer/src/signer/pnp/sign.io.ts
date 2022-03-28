@@ -38,11 +38,6 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    // TODO(Alec): Do we need this?
-    // if (this.getRequestKeyVersion(request, logger) ?? false) {
-    //   this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
-    //   return null
-    // }
     return new PnpSession(request, response)
   }
 
@@ -83,7 +78,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
         performedQueryCount,
         totalQuota,
         blockNumber,
-        warnings, // TODO(Alec): update handling of these types in combiner
+        warnings, // TODO(Alec)(types): update handling of these types in combiner
       },
       status,
       response.locals.logger()
