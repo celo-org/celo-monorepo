@@ -17,18 +17,17 @@ export async function setDomainDisabled<D extends Domain>(
 ): Promise<void> {
   const disableDomainMeter = Histograms.dbOpsInstrumentation.labels('disableDomain').startTimer()
   const hash = domainHash(domain).toString('hex')
-  logger.debug('Disabling domain', { hash, domain })
+  logger.debug({ hash, domain }, 'Disabling domain')
   try {
     await domainStates()
       .transacting(trx)
       .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
       .update(DOMAIN_STATE_COLUMNS.disabled, true)
       .timeout(DB_TIMEOUT)
-  } catch (err) {
+  } catch (error) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
-    logger.error(err)
-    throw err
+    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw error
   } finally {
     disableDomainMeter()
   }
@@ -56,11 +55,9 @@ export async function getDomainStateRecord<D extends Domain>(
   logger: Logger,
   trx?: Transaction<DomainStateRecord<D>>
 ): Promise<DomainStateRecord<D> | null> {
-  const getDomainStateRecordWithLockMeter = Histograms.dbOpsInstrumentation
-    .labels('getDomainStateRecordWithLock')
-    .startTimer()
+  const meter = Histograms.dbOpsInstrumentation.labels('getDomainStateRecord').startTimer()
   const hash = domainHash(domain).toString('hex')
-  logger.debug('Getting domain state from db with lock', { hash, domain })
+  logger.debug({ hash, domain }, 'Getting domain state from db')
   try {
     const result = trx
       ? await domainStates()
@@ -77,9 +74,9 @@ export async function getDomainStateRecord<D extends Domain>(
   } catch (error) {
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
-    throw new Error(ErrorMessage.DATABASE_GET_FAILURE)
+    throw error
   } finally {
-    getDomainStateRecordWithLockMeter()
+    meter()
   }
 }
 
@@ -89,21 +86,14 @@ export async function updateDomainStateRecord<D extends Domain>(
   trx: Transaction<DomainStateRecord<D>>,
   logger: Logger
 ): Promise<void> {
-  const updateDomainStateRecordMeter = Histograms.dbOpsInstrumentation
-    .labels('updateDomainStateRecord')
-    .startTimer()
+  const meter = Histograms.dbOpsInstrumentation.labels('updateDomainStateRecord').startTimer()
   const hash = domainHash(domain).toString('hex')
-  logger.debug('Update domain state', { hash, domain, domainState })
+  logger.debug({ hash, domain, domainState }, 'Update domain state')
   try {
     // Check whether the domain is already in the database.
     // TODO(victor): Usage of this in the signature flow results in redudant queries of the current
     // state. It would be good to refactor this to avoid making more than one SELECT.
-    const result = await domainStates()
-      .transacting(trx)
-      .forUpdate()
-      .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
-      .first()
-      .timeout(DB_TIMEOUT)
+    const result = await getDomainStateRecord(domain, logger, trx)
 
     // Insert or update the domain state record.
     if (!result) {
@@ -120,7 +110,7 @@ export async function updateDomainStateRecord<D extends Domain>(
     logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
     throw error
   } finally {
-    updateDomainStateRecordMeter()
+    meter()
   }
 }
 
@@ -132,7 +122,7 @@ export async function insertDomainStateRecord<D extends Domain>(
   const insertDomainStateRecordMeter = Histograms.dbOpsInstrumentation
     .labels('insertDomainState')
     .startTimer()
-  logger.debug('Insert domain state', { domainState })
+  logger.debug({ domainState }, 'Insert domain state')
   try {
     await domainStates().transacting(trx).insert(domainState).timeout(DB_TIMEOUT)
     return domainState
