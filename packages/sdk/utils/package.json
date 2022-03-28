@@ -7,7 +7,7 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "sideEffects": false,
-  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/utils",
+  "homepage": "https://celo-sdk-docs.readthedocs.io/en/latest/utils",
   "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/utils",
   "scripts": {
     "prepublishOnly": "yarn build",

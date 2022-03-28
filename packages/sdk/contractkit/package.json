@@ -7,7 +7,7 @@
   "sideEffects": false,
   "author": "Celo",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit",
+  "homepage": "https://docs.celo.org/developer-guide/contractkit",
   "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit",
   "keywords": [
     "celo",
