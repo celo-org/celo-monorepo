@@ -23,7 +23,9 @@ type EventsEnum<T extends Contract> = {
   [event in Events<T>]: event
 }
 
-/** Base ContractWrapper */
+/**
+ * @internal -- use its children
+ */
 export abstract class BaseWrapper<T extends Contract> {
   protected _version?: T['methods'] extends ICeloVersionedContract['methods']
     ? ContractVersion

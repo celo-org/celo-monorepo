@@ -49,7 +49,7 @@ export interface ConnectionOptions {
  * Connection a Class for connecting to Celo, sending Transactions, etc
  *
  * @param web3 an instance of web3
- * @optional wallet a wallet
+ * @optional wallet a child class of {@link WalletBase}
  * @optional handleRevert sets handleRevert on the web3.eth instance passed in
  */
 export class Connection {

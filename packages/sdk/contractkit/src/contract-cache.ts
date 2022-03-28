@@ -86,7 +86,7 @@ const contractsWhichRequireCache = new Set(Object.keys(WrapperFactoriesWhichNeed
  * @remarks
  *
  * Because it provides access to all contract wrappers it must load all wrappers and the contract ABIs for them
- * Consider Using MiniWrapperCache, building your own, or if you only need one Wrapper using it directly
+ * Consider Using {@link MiniWrapperCache}, building your own, or if you only need one Wrapper using it directly
  */
 
 export class WrapperCache implements ContractCacheType {

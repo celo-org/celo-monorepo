@@ -14,6 +14,7 @@ interface ContractWrappersForVotingAndRules {
   getMultiSig: (address: string) => Promise<MultiSigWrapper>
 }
 
+/** @internal */
 export class BaseWrapperForGoverning<T extends Contract> extends BaseWrapper<T> {
   constructor(
     protected readonly connection: Connection,

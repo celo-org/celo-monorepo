@@ -1,11 +1,9 @@
 import { EventLog } from './types'
 
 /** @internal */
-
 export type ABIType = 'uint256' | 'boolean' | 'string' | 'bytes' | string // TODO complete list
 
 /** @internal */
-
 export interface DecodedParamsArray {
   [index: number]: any
   __length__: number
@@ -17,7 +15,6 @@ export interface DecodedParamsObject extends DecodedParamsArray {
 }
 
 // Note the following types come from web3-utils: AbiInput, AbiOutput, AbiItem, AbiType StateMutabilityType, ABIDefinition
-
 type AbiType = 'function' | 'constructor' | 'event' | 'fallback'
 type StateMutabilityType = 'pure' | 'view' | 'nonpayable' | 'payable'
 

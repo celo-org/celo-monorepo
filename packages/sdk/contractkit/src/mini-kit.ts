@@ -49,7 +49,7 @@ export function newKitFromWeb3(web3: Web3, wallet: ReadOnlyWallet = new LocalWal
  *
  * @remarks
  *
- * It is recommended to use this over ContractKit for dApps for a lighter bundle size
+ * It is recommended to use this over ContractKit for dApps as it is lighter
  *
  * @param connection – an instance of @celo/connect {@link Connection}
  */
