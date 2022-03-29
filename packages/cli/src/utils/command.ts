@@ -119,10 +119,10 @@ export const parseIntRange = (input: string) => {
   let end: number
   if (input.endsWith(']')) {
     end = range[1]
-  } else if (input.startsWith(')')) {
+  } else if (input.endsWith(')')) {
     end = range[1] - 1
   } else {
-    throw new Error('range input must end with "[" (inclusive) or "(" (exclusive)')
+    throw new Error('range input must end with "]" (inclusive) or ")" (exclusive)')
   }
 
   return { start, end }
