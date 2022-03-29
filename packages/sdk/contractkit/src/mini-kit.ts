@@ -66,7 +66,7 @@ export class MiniContractKit {
   }
 
   // Like get Total Balance on MiniContractKit but does not include locked celo or pending
-  async getBalances(address: string): Promise<EachCeloToken<BigNumber>> {
+  async getTotalBalance(address: string): Promise<EachCeloToken<BigNumber>> {
     return {
       ...(await this.celoTokens.balancesOf(address)),
     }
