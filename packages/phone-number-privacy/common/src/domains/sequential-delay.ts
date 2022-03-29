@@ -192,7 +192,7 @@ interface IndexedSequentialDelayStage extends SequentialDelayStage {
 export const checkSequentialDelayRateLimit = (
   domain: SequentialDelayDomain,
   attemptTime: number,
-  state?: SequentialDelayDomainState // TODO(Alec): does this have to be optional?
+  state?: SequentialDelayDomainState
 ): SequentialDelayResult => {
   // If the domain has been disabled, all queries are to be rejected.
   if (state?.disabled) {

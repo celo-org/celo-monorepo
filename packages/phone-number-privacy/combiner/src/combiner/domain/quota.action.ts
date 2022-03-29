@@ -1,6 +1,9 @@
 import {
-  DomainQuotaStatusRequest, DomainRestrictedSignatureRequest, DomainState,
-  ErrorMessage, WarningMessage
+  DomainQuotaStatusRequest,
+  DomainRestrictedSignatureRequest,
+  DomainState,
+  ErrorMessage,
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../../config'
@@ -9,11 +12,7 @@ import { IOAbstract } from '../io.abstract'
 import { Session } from '../session'
 
 export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
-
-  constructor(
-    config: OdisConfig, 
-    readonly io: IOAbstract<DomainQuotaStatusRequest>
-  ) { 
+  constructor(config: OdisConfig, readonly io: IOAbstract<DomainQuotaStatusRequest>) {
     super(config, io)
   }
 
@@ -101,7 +100,8 @@ export function findThresholdDomainState<
     /**
      * This name is "intentionally" confusing. There's some nuance to how this works, and you
      * should review the code in '@celo/phone-number-privacy-common/src/domains/sequential-delay.ts'
-     * as well as the spec in (TODO(Alec): add link) for a full understanding.
+     * as well as the spec in https://github.com/celo-org/celo-proposals/blob/master/CIPs/CIP-0040/sequentialDelayDomain.md
+     * for a full understanding.
      *
      * For a given DomainState, it is always the case that 'now' >= 'timer'. This ordering ensures
      * that we take the 'timer' and 'date' from the same DomainState while still returning a reasonable

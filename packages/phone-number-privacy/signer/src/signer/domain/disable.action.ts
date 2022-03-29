@@ -40,7 +40,7 @@ export class DomainDisableAction implements IAction<DisableDomainRequest> {
 
       this.io.sendSuccess(
         res.status,
-        session.response,
+        session.response, // @victor this is the weird type error I mentioned seemingly caused by DomainQuotaStatusRequest and DisableDomainRequest having the same structure
         res.domainStateRecord.toSequentialDelayDomainState()
       )
     } catch (error) {
