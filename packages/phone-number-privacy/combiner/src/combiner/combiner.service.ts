@@ -14,8 +14,6 @@ import fetch, { HeaderInit, Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
 import { Session } from './session'
 
-// TODO(Alec): Rename this folder to something other than "combiner" (potentially add / refactor matchmaking code to match)
-
 // tslint:disable-next-line: interface-over-type-literal
 export type SignerResponse<R extends OdisRequest> = {
   url: string

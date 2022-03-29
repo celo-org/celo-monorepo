@@ -31,10 +31,15 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
   ): Promise<PnpSession<SignMessageRequest> | null> {
+    const logger = response.locals.logger()
     if (!super._inputChecks(request, response)) {
       return null
     }
-    if (!(await this.authenticate(request, response.locals.logger()))) {
+    if (!this.getRequestKeyVersion(request, logger)) {
+      this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+      return null
+    }
+    if (!(await this.authenticate(request, logger))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }

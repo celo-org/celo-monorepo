@@ -1,6 +1,7 @@
 import {
   ErrorType,
   FailureResponse,
+  KEY_VERSION_HEADER,
   OdisRequest,
   OdisResponse,
   SignerEndpoint,
@@ -32,6 +33,17 @@ export abstract class IOAbstract<R extends OdisRequest> {
     response: Response<SuccessResponse<R>>,
     ...args: unknown[]
   ): void
+
+  getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
+    const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
+    logger.info({ keyVersionHeader })
+    const requestedKeyVersion = Number(keyVersionHeader)
+    if (Number.isNaN(requestedKeyVersion)) {
+      logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
+      return undefined
+    }
+    return requestedKeyVersion
+  }
 
   protected _inputChecks(
     request: Request<{}, {}, unknown>,
