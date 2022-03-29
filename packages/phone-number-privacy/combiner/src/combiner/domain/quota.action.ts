@@ -1,44 +1,38 @@
 import {
-  CombinerEndpoint,
-  DomainQuotaStatusRequest,
-  domainQuotaStatusRequestSchema,
-  DomainQuotaStatusResponse,
-  DomainQuotaStatusResponseFailure,
-  domainQuotaStatusResponseSchema,
-  DomainQuotaStatusResponseSuccess,
-  DomainRestrictedSignatureRequest,
-  DomainSchema,
-  DomainState,
-  ErrorMessage,
-  ErrorType,
-  getSignerEndpoint,
-  send,
-  SequentialDelayDomainStateSchema,
-  SignerEndpoint,
-  verifyDomainQuotaStatusRequestAuthenticity,
-  WarningMessage,
+  DomainQuotaStatusRequest, DomainRestrictedSignatureRequest, DomainState,
+  ErrorMessage, WarningMessage
 } from '@celo/phone-number-privacy-common'
-import Logger from 'bunyan'
-import { Request, Response } from 'express'
 import { Response as FetchResponse } from 'node-fetch'
-import { VERSION } from '../../config'
-import { CombinerService } from '../combiner.service'
+import { OdisConfig } from '../../config'
+import { CombineAction } from '../combine.action'
+import { IOAbstract } from '../io.abstract'
 import { Session } from '../session'
 
-export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusRequest> {
-  readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
+export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
 
-  protected validate(
-    request: Request<{}, {}, unknown>
-  ): request is Request<{}, {}, DomainQuotaStatusRequest> {
-    return domainQuotaStatusRequestSchema(DomainSchema).is(request.body)
+  constructor(
+    config: OdisConfig, 
+    readonly io: IOAbstract<DomainQuotaStatusRequest>
+  ) { 
+    super(config, io)
   }
-  protected checkRequestKeyVersion(_request: Request<{}, {}, DomainQuotaStatusRequest>): boolean {
-    return true // does not require key version header
-  }
-  protected authenticate(request: Request<{}, {}, DomainQuotaStatusRequest>): Promise<boolean> {
-    return Promise.resolve(verifyDomainQuotaStatusRequestAuthenticity(request.body))
+
+  async combine(session: Session<DomainQuotaStatusRequest>): Promise<void> {
+    if (session.responses.length >= this.threshold) {
+      try {
+        const domainQuotaStatus = findThresholdDomainState(session)
+        this.io.sendSuccess(200, session.response, session.logger, domainQuotaStatus)
+        return
+      } catch (error) {
+        session.logger.error({ error }, 'Error combining signer quota status responses')
+      }
+    }
+    this.io.sendFailure(
+      ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
+      session.getMajorityErrorCode() ?? 500,
+      session.response,
+      session.logger
+    )
   }
 
   protected async receiveSuccess(
@@ -48,84 +42,15 @@ export class DomainQuotaStatusService extends CombinerService<DomainQuotaStatusR
   ): Promise<void> {
     const status: number = signerResponse.status
     const data: string = await signerResponse.text()
-    const res = this.validateSignerResponse(data, url, session)
+    const res = this.io.validateSignerResponse(data, url, session)
     // In this function HTTP response status is assumed 200. Error if the response is failed.
     if (!res.success) {
-      const msg = `Signer request to ${url}/${this.signerEndpoint} failed with 200 status`
+      const msg = `Signer request to ${url}/${this.io.signerEndpoint} failed with 200 status`
       session.logger.error({ error: res.error, signer: url }, msg)
       throw new Error(msg)
     }
     session.logger.info({ signer: url }, `Signer request successful`)
     session.responses.push({ url, res, status })
-  }
-
-  protected validateSignerResponse(
-    data: string,
-    url: string,
-    session: Session<DomainQuotaStatusRequest>
-  ): DomainQuotaStatusResponse {
-    const res: unknown = JSON.parse(data)
-    if (!domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
-      // TODO(Alec): add error type for this
-      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
-      session.logger.error({ data, signer: url }, msg)
-      throw new Error(msg)
-    }
-    return res
-  }
-
-  protected async combine(session: Session<DomainQuotaStatusRequest>): Promise<void> {
-    if (session.responses.length >= this.threshold) {
-      try {
-        const domainQuotaStatus = findThresholdDomainState(session)
-        this.sendSuccess(200, session.response, session.logger, domainQuotaStatus)
-        return
-      } catch (error) {
-        session.logger.error({ error }, 'Error combining signer quota status responses')
-      }
-    }
-    this.sendFailure(
-      ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
-      session.getMajorityErrorCode() ?? 500,
-      session.response,
-      session.logger
-    )
-  }
-
-  protected sendSuccess(
-    status: number,
-    response: Response<DomainQuotaStatusResponseSuccess>,
-    logger: Logger,
-    domainState: DomainState
-  ) {
-    send(
-      response,
-      {
-        success: true,
-        version: VERSION,
-        status: domainState,
-      },
-      status,
-      logger
-    )
-  }
-
-  protected sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<DomainQuotaStatusResponseFailure>,
-    logger: Logger
-  ) {
-    send(
-      response,
-      {
-        success: false,
-        version: VERSION,
-        error,
-      },
-      status,
-      logger
-    )
   }
 }
 

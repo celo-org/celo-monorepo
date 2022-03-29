@@ -1,17 +1,14 @@
 import {
-  CombinerEndpoint,
   ErrorMessage,
-  ErrorType,
-  FailureResponse,
   OdisRequest,
   OdisResponse,
-  SignerEndpoint,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import Logger from 'bunyan'
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import fetch, { HeaderInit, Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
+import { IAction } from './action.interface'
+import { IOAbstract } from './io.abstract'
 import { Session } from './session'
 
 // tslint:disable-next-line: interface-over-type-literal
@@ -26,11 +23,7 @@ export interface Signer {
   fallbackUrl?: string
 }
 
-export interface ICombinerService<R extends OdisRequest> {
-  handle(request: Request<{}, {}, R>, response: Response<OdisResponse<R>>): Promise<void>
-}
-
-export abstract class CombinerService<R extends OdisRequest> implements ICombinerService<R> {
+export abstract class CombineAction<R extends OdisRequest> implements IAction<R> {
   readonly timeoutMs: number
   readonly signers: Signer[]
   readonly threshold: number
@@ -38,10 +31,8 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
   readonly pubKey: string
   readonly keyVersion: number
   readonly polynomial: string
-  abstract readonly endpoint: CombinerEndpoint
-  abstract readonly signerEndpoint: SignerEndpoint
 
-  public constructor(config: OdisConfig) {
+  public constructor(config: OdisConfig, readonly io: IOAbstract<R>) {
     this.timeoutMs = config.odisServices.timeoutMilliSeconds
     this.signers = JSON.parse(config.odisServices.signers)
     this.threshold = config.keys.threshold
@@ -51,34 +42,11 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     this.polynomial = config.keys.polynomial
   }
 
-  public async handle(request: Request<{}, {}, unknown>, response: Response<OdisResponse<R>>) {
-    const logger: Logger = response.locals.logger
-    try {
-      if (!this.enabled) {
-        return this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response, logger)
-      }
-      if (!this.validate(request)) {
-        return this.sendFailure(WarningMessage.INVALID_INPUT, 400, response, logger)
-      }
-      if (!this.checkRequestKeyVersion(request, logger)) {
-        return this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response, logger)
-      }
-      if (!(await this.authenticate(request, logger))) {
-        return this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response, logger)
-      }
-      await this.distribute(request, response).then(this.combine)
-    } catch (err) {
-      logger.error({ error: err }, `Unknown error in handler for ${this.endpoint}`)
-      this.sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, response, logger)
-    }
+  async perform(session: Session<R>) {
+    await this.distribute(session).then(this.combine)
   }
 
-  protected async distribute(
-    request: Request<{}, {}, R>,
-    response: Response<OdisResponse<R>>
-  ): Promise<Session<R>> {
-    const session = new Session<R>(request, response, this)
-
+  async distribute(session: Session<R>): Promise<Session<R>> {
     const obs = new PerformanceObserver((list) => {
       const entry = list.getEntries()[0]
       session.logger.info(
@@ -88,13 +56,11 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     })
     obs.observe({ entryTypes: ['measure'], buffered: true })
 
-    // TODO(Alec): look into abort controller timeout
     const timeout = setTimeout(() => {
       session.timedOut = true
       session.controller.abort()
     }, this.timeoutMs)
 
-    // TODO(Alec): Investigate race condition
     // Forward request to signers
     await Promise.all(this.signers.map((signer) => this.forwardToSigner(signer, session)))
 
@@ -106,37 +72,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     return session
   }
 
-  protected headers(_request: Request<{}, {}, R>): HeaderInit | undefined {
-    return {
-      // TODO(Alec)
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    }
-  }
-
-  protected abstract validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, R>
-  protected abstract checkRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): boolean
-  protected abstract authenticate(request: Request<{}, {}, R>, logger: Logger): Promise<boolean>
-  protected abstract combine(session: Session<R>): Promise<void>
-  protected abstract receiveSuccess(
-    signerResponse: FetchResponse,
-    url: string,
-    session: Session<R>
-  ): Promise<void>
-  protected abstract sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<FailureResponse<R>>,
-    logger: Logger,
-    ...args: unknown[]
-  ): void
-  protected abstract validateSignerResponse(
-    data: string,
-    url: string,
-    session: Session<R>
-  ): OdisResponse<R>
-
-  private async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
+  async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
     let signerResponse: FetchResponse
     try {
       signerResponse = await this.sendMeteredSignerRequest(signer, session)
@@ -147,13 +83,34 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     return this.handleSignerResponse(signerResponse, signer, session)
   }
 
+  abstract combine(session: Session<R>): Promise<void>
+
+  protected abstract receiveSuccess(
+    signerResponse: FetchResponse,
+    url: string,
+    session: Session<R>
+  ): Promise<void>
+  // protected abstract validateSignerResponse(
+  //   data: string,
+  //   url: string,
+  //   session: Session<R>
+  // ): OdisResponse<R>
+
+  protected headers(_request: Request<{}, {}, R>): HeaderInit | undefined {
+    return {
+      // TODO(Alec)
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    }
+  }
+
   private async sendMeteredSignerRequest(
     signer: Signer,
     session: Session<R>
   ): Promise<FetchResponse> {
     // TODO(Alec): Factor out this metering code
-    const start = `Start ${signer.url + this.signerEndpoint}`
-    const end = `End ${signer.url + this.signerEndpoint}`
+    const start = `Start ${signer.url + this.io.signerEndpoint}`
+    const end = `End ${signer.url + this.io.signerEndpoint}`
     performance.mark(start)
 
     return this.sendRequest(signer.url, session)
@@ -172,7 +129,7 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
   }
   private async sendRequest(signerUrl: string, session: Session<R>): Promise<FetchResponse> {
     session.logger.debug({ signerUrl }, `Sending signer request`)
-    const url = signerUrl + this.signerEndpoint
+    const url = signerUrl + this.io.signerEndpoint
     return fetch(url, {
       method: 'POST',
       headers: this.headers(session.request),

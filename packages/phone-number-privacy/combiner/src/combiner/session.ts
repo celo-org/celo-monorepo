@@ -2,8 +2,7 @@ import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-priv
 import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { BLSCryptographyClient } from '../bls/bls-cryptography-client'
-import { CombinerService, SignerResponse } from './combiner.service'
+// import { SignerResponse } from './combiner.service'
 
 export class Session<R extends OdisRequest> {
   public timedOut: boolean
@@ -11,32 +10,25 @@ export class Session<R extends OdisRequest> {
   readonly controller: AbortController
   readonly failedSigners: Set<string>
   readonly errorCodes: Map<number, number>
-  readonly responses: Array<SignerResponse<R>>
-  readonly blsCryptoClient: BLSCryptographyClient
+  readonly responses: Array<OdisResponse<R>>
 
   public constructor(
     readonly request: Request<{}, {}, R>,
-    readonly response: Response<OdisResponse<R>>,
-    readonly service: CombinerService<R>
+    readonly response: Response<OdisResponse<R>>
   ) {
     this.logger = response.locals.logger()
     this.controller = new AbortController()
     this.timedOut = false
     this.failedSigners = new Set<string>()
     this.errorCodes = new Map<number, number>()
-    this.responses = new Array<SignerResponse<R>>()
-    this.blsCryptoClient = new BLSCryptographyClient(
-      service.threshold,
-      service.pubKey,
-      service.polynomial
-    )
+    this.responses = new Array<OdisResponse<R>>()
   }
 
-  public incrementErrorCodeCount(errorCode: number) {
+  incrementErrorCodeCount(errorCode: number) {
     this.errorCodes.set(errorCode, (this.errorCodes.get(errorCode) ?? 0) + 1)
   }
 
-  public getMajorityErrorCode(): number | null {
+  getMajorityErrorCode(): number | null {
     // Ignore timeouts
     const ignoredErrorCodes = [504] // @victor what status code should we use here
     const uniqueErrorCount = Array.from(this.errorCodes.keys()).filter(

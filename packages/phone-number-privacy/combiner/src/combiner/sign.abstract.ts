@@ -7,19 +7,20 @@ import {
   OdisResponse,
   SignMessageRequest,
   SignMessageResponseSuccess,
-  WarningMessage,
+  WarningMessage
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request } from 'express'
 import { HeaderInit, Response as FetchResponse } from 'node-fetch'
-import { CombinerService } from './combiner.service'
+import { CombineAction } from './combine.action'
 import { Session } from './session'
 
 export type SignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
 export type SignatureResponse<R extends SignatureRequest> = OdisResponse<R>
 
 // tslint:disable-next-line: max-classes-per-file
-export abstract class SignService<R extends SignatureRequest> extends CombinerService<R> {
+export abstract class SignAbstract<R extends SignatureRequest> extends CombineAction<R> {
+  
   protected headers(request: Request<{}, {}, R>): HeaderInit | undefined {
     return {
       ...super.headers(request),
@@ -32,16 +33,16 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
     url: string,
     session: Session<R>
   ): Promise<void> {
-    if (!this.checkResponseKeyVersion(signerResponse, session)) {
+    if (!this.io.checkResponseKeyVersion(res, session)) {
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
 
-    const status: number = signerResponse.status
+    const status: number = res.status
     const data: string = await signerResponse.text()
     session.logger.info({ url, res: data, status }, 'received OK response from signer')
 
     // TODO(Alec): Move this up one level
-    const res = this.validateSignerResponse(data, url, session)
+    const res = this.io.validateSignerResponse(data, url, session)
 
     const signature = res.success ? res.signature : never // TODO(Alec)(Next)
 
@@ -99,8 +100,8 @@ export abstract class SignService<R extends SignatureRequest> extends CombinerSe
     if (majorityErrorCode === 403 || majorityErrorCode === 429) {
       error = WarningMessage.EXCEEDED_QUOTA
     }
-    this.sendFailure(error, majorityErrorCode ?? 500, session.response, session.logger)
+    this.io.sendFailure(error, majorityErrorCode ?? 500, session.response, session.logger)
   }
-  protected abstract logResponseDiscrepancies(session: Session<R>): void
+  // protected abstract logResponseDiscrepancies(session: Session<R>): void
   protected abstract parseBlindedMessage(req: R): string
 }

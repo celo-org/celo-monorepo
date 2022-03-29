@@ -41,11 +41,16 @@ export interface OdisConfig {
   }
 }
 
+export interface CloudFunctionConfig {
+  minInstances: number
+}
+
 interface Config {
   blockchain: BlockchainConfig
   db: DatabaseConfig
   phoneNumberPrivacy: OdisConfig
   domains: OdisConfig
+  cloudFunction: CloudFunctionConfig
 }
 
 let config: Config
@@ -91,6 +96,9 @@ if (DEV_MODE) {
         pubKey: TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY,
       },
     },
+    cloudFunction: {
+      minInstances: 0
+    }
   }
 } else {
   const functionConfig = functions.config()
@@ -133,6 +141,11 @@ if (DEV_MODE) {
         pubKey: functionConfig.domains.keys.pubKey,
       },
     },
+    cloudFunction: {
+      // Keep instances warm for mainnet functions
+      // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
+      minInstances: functionConfig.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
+    }
   }
 }
 export default config

@@ -1,16 +1,21 @@
 import {
   CombinerEndpoint as Endpoint,
   ErrorMessage,
-  loggerMiddleware,
+  loggerMiddleware
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import { DomainDisableService } from './combiner/domain/disable.service'
-import { DomainQuotaStatusService } from './combiner/domain/quotastatus.service'
-import { DomainSignService } from './combiner/domain/sign.service'
-import { PnpSignService } from './combiner/pnp/sign.service'
-import config, { FORNO_ALFAJORES } from './config'
+import { Controller } from './combiner/controller'
+import { DomainDisableAction } from './combiner/domain/disable.action'
+import { DomainDisableIO } from './combiner/domain/disable.io'
+import { DomainQuotaAction } from './combiner/domain/quota.action'
+import { DomainQuotaIO } from './combiner/domain/quota.io'
+import { DomainSignAction } from './combiner/domain/sign.action'
+import { DomainSignIO } from './combiner/domain/sign.io'
+import { PnpSignAction } from './combiner/pnp/sign.action'
+import { PnpSignIO } from './combiner/pnp/sign.io'
+import config from './config'
 import { handleGetContactMatches } from './match-making/get-contact-matches'
 
 require('dotenv').config()
@@ -59,63 +64,49 @@ async function meterResponse(
   obs.disconnect()
 }
 
-// EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getContactMatches" -H "Authorization: <SIGNED_BODY>" -d '{"userPhoneNumber": "+99999999999", "contactPhoneNumbers": ["+5555555555", "+3333333333"], "account": "0x117ea45d497ab022b85494ba3ab6f52969bf6812"}' -H 'Content-Type: application/json'
 export const getContactMatches = functions
   .region('us-central1', 'europe-west3')
-  .runWith({
-    // Keep instances warm for this latency-critical function
-    // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
-    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
-  })
+  .runWith(config.cloudFunction)
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
     return meterResponse(handleGetContactMatches, req, res, Endpoint.MATCHMAKING)
   })
 
-// EG. curl -v "http://localhost:5000/celo-phone-number-privacy/us-central1/getBlindedMessageSig" -H "Authorization: 0xfc2ee61c4d18b93374fdd525c9de09d01398f7d153d17340b9ae156f94a1eb3237207d9aacb42e7f2f4ee0cf2621ab6d5a0837211665a99e16e3367f5209a56b1b" -d '{"blindedQueryPhoneNumber":"+Dzuylsdcv1ZxbRcQwhQ29O0UJynTNYufjWc4jpw2Zr9FLu5gSU8bvvDJ3r/Nj+B","account":"0xdd18d08f1c2619ede729c26cc46da19af0a2aa7f", "hashedPhoneNumber":"0x8fb77f2aff2ef0343706535dc702fc99f61a5d1b8e46d7c144c80fd156826a77"}' -H 'Content-Type: application/json'
-const pnpSignHandler = new PnpSignService(config.phoneNumberPrivacy)
+const pnpSignHandler = new Controller(
+  new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy))
+)
 export const getBlindedMessageSig = functions
   .region('us-central1', 'europe-west3')
-  .runWith({
-    // Keep instances warm for this latency-critical function
-    // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
-    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
-  })
+  .runWith(config.cloudFunction)
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
     return meterResponse(pnpSignHandler.handle, req, res, Endpoint.SIGN_MESSAGE)
   })
 
-const domainSignHandler = new DomainSignService(config.domains)
+const domainSignHandler = new Controller(
+  new DomainSignAction(config.domains, new DomainSignIO(config.domains))
+)
 export const domainSign = functions
   .region('us-central1', 'europe-west3')
-  .runWith({
-    // Keep instances warm for this latency-critical function
-    // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
-    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
-  })
+  .runWith(config.cloudFunction)
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
     return meterResponse(domainSignHandler.handle, req, res, Endpoint.DOMAIN_SIGN)
   })
 
-const domainQuotaStatusHandler = new DomainQuotaStatusService(config.domains)
+const domainQuotaStatusHandler = new Controller(
+  new DomainQuotaAction(config.domains, new DomainQuotaIO(config.domains))
+)
 export const domainQuotaStatus = functions
   .region('us-central1', 'europe-west3')
-  .runWith({
-    // Keep instances warm for this latency-critical function
-    // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
-    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
-  })
+  .runWith(config.cloudFunction)
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
     return meterResponse(domainQuotaStatusHandler.handle, req, res, Endpoint.DOMAIN_QUOTA_STATUS)
   })
 
-const domainDisableHandler = new DomainDisableService(config.domains)
+const domainDisableHandler = new Controller(
+  new DomainDisableAction(config.domains, new DomainDisableIO(config.domains))
+)
 export const domainDisable = functions
   .region('us-central1', 'europe-west3')
-  .runWith({
-    // Keep instances warm for this latency-critical function
-    // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
-    minInstances: config.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
-  })
+  .runWith(config.cloudFunction)
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
     return meterResponse(domainDisableHandler.handle, req, res, Endpoint.DISABLE_DOMAIN)
   })
