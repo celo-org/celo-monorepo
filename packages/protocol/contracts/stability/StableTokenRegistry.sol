@@ -80,7 +80,7 @@ contract StableTokenRegistry is Initializable, Ownable {
     require(index < numFiats, "Index is invalid");
     require(
       keccak256(fiatTicker) == keccak256(fiatTickers[index]),
-      "Index does not match fiatTicker"
+      "Source fiatTicker does not match the one in the storage on given index"
     );
     uint256 newNumFiats = numFiats.sub(1);
 
@@ -106,7 +106,7 @@ contract StableTokenRegistry is Initializable, Ownable {
       bytes(stableTokenContractName).length != 0,
       "stableTokenContractName cant be an empty string"
     );
-    // require(bytes(stableTokens[fiatTicker]).length != 0, "This registry already exists");
+    require(stableTokens[fiatTicker].length == 0, "This registry already exists");
     stableTokens[fiatTicker] = stableTokenContractName;
     fiatTickers.push(fiatTicker);
   }
