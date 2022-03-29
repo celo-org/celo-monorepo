@@ -28,7 +28,7 @@ npm install @celo/contractkit
 yarn add @celo/contractkit
 ```
 
-You will need Node.js v12.x.
+You will need Node.js v12.x. or greater
 
 To start working with contractkit you need a `kit` instance:
 
@@ -42,7 +42,11 @@ const kit = newKit('https://alfajores-forno.celo-testnet.org')
 To access balance:
 
 ```ts
-await kit.
+const balances = await kit.getTotalBalance()
+// on Contractkit {lockedGold, pending, cUSD, cEUR, cBRL}
+
+// on MiniContractKit {cUSD, cEUR, cBRL}
+
 ```
 
 ### Setting Default Tx Options
@@ -152,18 +156,21 @@ E.G. ` kit.contracts.getAccounts()`,  ` kit.contracts.getValidators()` `
 
 #### Stand Alone
 
-You can also Initialize contracts directly They Require a `Connection`
+You can also initialize contracts directly. They Require a `Connection`
 
 ```typescript
 
-// Minikit only gives access to a Limited Set of Contracts by default
+// MiniContractKit only gives access to a Limited Set of Contracts, so we import Multisig
+
 import {newKit} from "@celo/contractkit/lib/mini-kit"
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
-// Alternatively import { Connection } from '@celo/connect'
-// const connection = new Connection(web3)
+
 
 
 const miniKit = newKit("https://alfajores-forno.celo-testnet.org/")
+
+// Alternatively import { Connection } from '@celo/connect'
+// const connection = new Connection(web3)
 
 const multisig = new MultiSigWrapper(miniKit.connection)
 
@@ -172,6 +179,8 @@ const multisig = new MultiSigWrapper(miniKit.connection)
 
 ### Accessing web3 contract wrappers
 
+`MiniContractKit` *does not provide access to the web3 contracts*
+
 Some user might want to access web3 native contract wrappers.
 
 To do so, you can:
@@ -179,6 +188,7 @@ To do so, you can:
 ```ts
 const web3Exchange = await kit._web3Contracts.getExchange()
 ```
+
 
 We expose native wrappers for all Celo core contracts.
 
@@ -239,10 +249,10 @@ const receipt = await tx.waitReceipt()
 When interacting with a web3 contract object:
 
 ```ts
-const goldtoken = await kit._web3Contracts.getGoldToken()
+const celoNativeToken = await kit._web3Contracts.getGoldToken()
 const oneGold = kit.connection.web3.utils.toWei('1', 'ether')
 
-const txo = await goldtoken.methods.transfer(someAddress, oneGold)
+const txo = await celoNativeToken.methods.transfer(someAddress, oneGold)
 const tx = await kit.sendTransactionObject(txo, { from: myAddress })
 const hash = await tx.getHash()
 const receipt = await tx.waitReceipt()
