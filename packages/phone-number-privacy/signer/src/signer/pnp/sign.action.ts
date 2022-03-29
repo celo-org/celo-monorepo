@@ -52,6 +52,10 @@ export class PnpSignAction extends SignAbstract<SignMessageRequest> {
           }
           queryCount = state.queryCount
         } else {
+          // If queryCount or totalQuota are undefined,
+          // we fail open and service the request to not block the user.
+          // Error messages are stored in the session and included along
+          // with the signature in the response.
           session.logger.error(
             'Error fetching PNP quota in servicing a signing request: failing open.'
           )
@@ -59,20 +63,16 @@ export class PnpSignAction extends SignAbstract<SignMessageRequest> {
         }
       }
 
-      const defaultKey: Key = {
-        version: this.config.keystore.keys.phoneNumberPrivacy.latest,
+      const key: Key = {
+        version:
+          this.io.getRequestKeyVersion(session.request, session.logger) ??
+          this.config.keystore.keys.phoneNumberPrivacy.latest,
         name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
       }
 
-      // If queryCount or totalQuota are undefined,
-      // we fail open and service the request to not block the user.
-      // Error messages are stored in the session and included along
-      // with the signature in the response.
-      const { signature, key } = await this.sign(
-        session.request.body.blindedQueryPhoneNumber,
-        defaultKey,
-        session
-      )
+      // Compute signature inside transaction so it will rollback on error.
+      const signature = await this.sign(session.request.body.blindedQueryPhoneNumber, key, session)
+
       this.io.sendSuccess(
         200,
         session.response,

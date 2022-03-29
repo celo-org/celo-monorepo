@@ -10,21 +10,12 @@ import { IOAbstract } from './io.abstract'
 
 declare type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
 
-export abstract class SignAbstract implements IAction<OdisSignatureRequest> {
-  abstract readonly io: IOAbstract<OdisSignatureRequest>
+export abstract class SignAbstract<R extends OdisSignatureRequest> implements IAction<R> {
+  abstract readonly io: IOAbstract<R>
 
-  public abstract perform(session: Session<OdisSignatureRequest>): Promise<void>
+  public abstract perform(session: Session<R>): Promise<void>
 
-  protected async sign(
-    blindedMessage: string,
-    defaultKey: Key,
-    session: Session<OdisSignatureRequest>
-  ): Promise<{ signature: string; key: Key }> {
-    let keyVersion = this.io.getRequestKeyVersion(session.request, session.logger)
-    if (!keyVersion) {
-      keyVersion = defaultKey.version
-    }
-    const key: Key = { name: defaultKey.name, version: keyVersion! }
+  protected async sign(blindedMessage: string, key: Key, session: Session<R>): Promise<string> {
     let privateKey: string
     try {
       privateKey = await getKeyProvider().getPrivateKeyOrFetchFromStore(key)
@@ -32,7 +23,6 @@ export abstract class SignAbstract implements IAction<OdisSignatureRequest> {
       session.logger.error({ key }, 'Requested key version not supported')
       throw err
     }
-    const signature = computeBlindedSignature(blindedMessage, privateKey, session.logger)
-    return { signature, key }
+    return computeBlindedSignature(blindedMessage, privateKey, session.logger)
   }
 }

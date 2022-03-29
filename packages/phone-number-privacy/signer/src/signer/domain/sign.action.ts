@@ -67,17 +67,15 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
           )
         }
 
-        const defaultKey: Key = {
-          version: this.config.keystore.keys.domains.latest,
+        const key: Key = {
+          version:
+            this.io.getRequestKeyVersion(session.request, session.logger) ??
+            this.config.keystore.keys.domains.latest,
           name: DefaultKeyName.DOMAINS,
         }
 
         // Compute signature inside transaction so it will rollback on error.
-        const { signature, key } = await this.sign(
-          session.request.body.blindedMessage,
-          defaultKey,
-          session
-        )
+        const signature = await this.sign(session.request.body.blindedMessage, key, session)
 
         this.io.sendSuccess(
           200,
