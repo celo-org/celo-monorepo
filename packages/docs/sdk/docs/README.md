@@ -7,11 +7,13 @@ You can find more information about the specific packages at the following links
 - [Base](./base)
 - [Connect](./connect)
 - [ContractKit](./contractkit)
+- [Encrypted Backup](./ecrypted-backup)
 - [Explorer](./explorer)
 - [Governance](./governance)
 - [Identity](./identity)
 - [Keystores](./keystores)
 - [Network Utils](./network-utils)
+- [Phone Utils](./phone-utils)
 - [Transactions Uri](./transactions-uri)
 - [Utils](./utils)
 - [Wallet-base](./wallet-base)
@@ -22,7 +24,6 @@ You can find more information about the specific packages at the following links
 - [Wallet-local](./wallet-local)
 - [Wallet-remote](./wallet-remote)
 - [Wallet-rpc](./wallet-rpc)
-- [Wallet-walletconnect](./wallet-walletconnect)
 
 ## Celo Project
 
