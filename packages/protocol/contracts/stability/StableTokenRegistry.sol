@@ -78,16 +78,14 @@ contract StableTokenRegistry is Initializable, Ownable {
     delete stableTokens[fiatTicker];
     uint256 numFiats = fiatTickers.length;
     require(index < numFiats, "Index is invalid");
-    // require(fiatTicker.length == fiatTickers[index].length, "mismatch in length");
     for (uint256 i = 0; i < fiatTicker.length; i++) {
-      for (uint256 j = 0; j < fiatTickers[index].length; j++) {
-        require(fiatTicker[i] == fiatTickers[index][i]);
+      if (fiatTicker[i] != 0) {
+        require(
+          fiatTicker[i] == fiatTickers[index][i],
+          "source doesn't match the existing fiatTicker"
+        );
       }
     }
-    // require(
-    //   keccak256(abi.encodePacked(fiatTicker)) == keccak256(abi.encodePacked(fiatTickers[index])),
-    //   "Source fiatTicker does not match the one in the storage on given index"
-    // );
     uint256 newNumFiats = numFiats.sub(1);
 
     if (index != newNumFiats) {

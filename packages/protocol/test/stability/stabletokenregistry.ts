@@ -22,11 +22,9 @@ contract('StableTokenRegistry', (accounts: string[]) => {
       try {
         updatedFiatTickers.push(web3.utils.hexToUtf8(await strc.fiatTickers(i)))
       } catch (error) {
-        console.log(error)
-        break
+        return updatedFiatTickers
       }
     }
-    return updatedFiatTickers
   }
 
   beforeEach(async () => {
@@ -84,6 +82,10 @@ contract('StableTokenRegistry', (accounts: string[]) => {
 
     it("doesn't remove an fiat ticker with the wrong index", async () => {
       await assertRevert(strc.removeStableToken(convertToHex('cUSD'), 1))
+    })
+
+    it('reverts if a wrong values is passed as a fiatTicker', async () => {
+      await assertRevert(strc.removeStableToken(convertToHex('cEUR'), 0))
     })
   })
 
