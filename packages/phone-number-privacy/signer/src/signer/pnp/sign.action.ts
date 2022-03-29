@@ -52,6 +52,9 @@ export class PnpSignAction extends SignAbstract<SignMessageRequest> {
           }
           queryCount = state.queryCount
         } else {
+          session.logger.error(
+            'Error fetching PNP quota in servicing a signing request: failing open.'
+          )
           Counters.requestsFailingOpen.inc()
         }
       }

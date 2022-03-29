@@ -36,6 +36,8 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
         // Get the current domain state record, or use an empty record if one does not exist.
         const domainStateRecord = await this.quota.getQuotaStatus(session, trx)
 
+        // Note that this action occurs in the same transaction as the remainder of the siging
+        // action. As a result, this is included here rather than in the authentication function.
         if (!this.nonceCheck(domainStateRecord, session)) {
           return this.io.sendFailure(
             WarningMessage.INVALID_NONCE,

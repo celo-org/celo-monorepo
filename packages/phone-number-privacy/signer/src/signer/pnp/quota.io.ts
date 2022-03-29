@@ -29,7 +29,7 @@ export class PnpQuotaIO extends IOAbstract<PnpQuotaRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<PnpQuotaResponse>
   ): Promise<PnpSession<PnpQuotaRequest> | null> {
-    if (!super._inputChecks(request, response)) {
+    if (!super.inputChecks(request, response)) {
       return null
     }
     if (!(await this.authenticate(request, response.locals.logger()))) {

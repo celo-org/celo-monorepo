@@ -26,7 +26,7 @@ export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<DisableDomainResponse>
   ): Promise<DomainSession<DisableDomainRequest> | null> {
-    if (!super._inputChecks(request, response)) {
+    if (!super.inputChecks(request, response)) {
       return null
     }
     if (!(await this.authenticate(request))) {

@@ -25,7 +25,7 @@ export abstract class SignAbstract<R extends OdisSignatureRequest> implements IA
     session: Session<R>
   ): Promise<{ signature: string; key: Key }> {
     let keyVersion = this.getRequestKeyVersion(session.request, session.logger)
-    if (keyVersion ?? false) {
+    if (!keyVersion) {
       keyVersion = defaultKey.version
     }
     const key: Key = { name: defaultKey.name, version: keyVersion! }

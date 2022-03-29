@@ -26,7 +26,7 @@ export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<OdisResponse<DomainQuotaStatusRequest>> // @victor I'm seeing some weird type stuff here if I use DomainQuotaStatusResponse
   ): Promise<DomainSession<DomainQuotaStatusRequest> | null> {
-    if (!super._inputChecks(request, response)) {
+    if (!super.inputChecks(request, response)) {
       return null
     }
     if (!(await this.authenticate(request))) {
