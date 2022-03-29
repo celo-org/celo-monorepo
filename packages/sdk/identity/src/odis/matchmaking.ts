@@ -34,6 +34,13 @@ export async function getContactMatches(
   const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(e164NumberCaller)
   const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberContacts)
 
+  let signedUserPhoneNumber: string | undefined
+  if (dekSigner) {
+    signedUserPhoneNumber = signWithDEK(selfPhoneNumObfuscated, dekSigner)
+  } else {
+    console.warn('Failure to provide DEK will prevent users from requerying their matches')
+  }
+
   const body: MatchmakingRequest = {
     account,
     userPhoneNumber: selfPhoneNumObfuscated,
@@ -41,20 +48,12 @@ export async function getContactMatches(
     hashedPhoneNumber: phoneNumberIdentifier,
     version: clientVersion ? clientVersion : 'unknown',
     authenticationMethod: signer.authenticationMethod,
-  }
-
-  if (sessionID) {
-    body.sessionID = sessionID
+    signedUserPhoneNumber,
+    sessionID,
   }
 
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     dekSigner = signer as EncryptionKeySigner
-  }
-
-  if (dekSigner) {
-    body.signedUserPhoneNumber = signWithDEK(selfPhoneNumObfuscated, dekSigner)
-  } else {
-    console.warn('Failure to provide DEK will prevent users from requerying their matches')
   }
 
   const response = await queryOdis<MatchmakingResponse>(
@@ -63,6 +62,11 @@ export async function getContactMatches(
     context,
     CombinerEndpoint.MATCHMAKING
   )
+
+  if (!response.success) {
+    debug(`request for matchmaking returned failure response: ${JSON.stringify(response)}`)
+    throw new Error(`request for matchmaking returned failure response: ${response.error}`)
+  }
 
   const matchHashes: string[] = response.matchedContacts.map(
     (match: { phoneNumber: string }) => match.phoneNumber

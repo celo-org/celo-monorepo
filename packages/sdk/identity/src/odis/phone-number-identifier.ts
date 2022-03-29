@@ -115,6 +115,7 @@ export async function getBlindedPhoneNumberSignature(
     hashedPhoneNumber: selfPhoneHash,
     version: clientVersion ? clientVersion : 'unknown',
     authenticationMethod: signer.authenticationMethod,
+    sessionID,
   }
 
   if (sessionID) {
