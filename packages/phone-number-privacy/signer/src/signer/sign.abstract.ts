@@ -21,7 +21,7 @@ export abstract class SignAbstract implements IAction<OdisSignatureRequest> {
     session: Session<OdisSignatureRequest>
   ): Promise<{ signature: string; key: Key }> {
     let keyVersion = this.io.getRequestKeyVersion(session.request, session.logger)
-    if (keyVersion ?? false) {
+    if (!keyVersion) {
       keyVersion = defaultKey.version
     }
     const key: Key = { name: defaultKey.name, version: keyVersion! }

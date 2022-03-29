@@ -28,7 +28,7 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<OdisResponse<DomainRestrictedSignatureRequest>> // @victor type weirdness here
   ): Promise<DomainSession<DomainRestrictedSignatureRequest> | null> {
-    if (!super._inputChecks(request, response)) {
+    if (!super.inputChecks(request, response)) {
       return null
     }
     if (!this.getRequestKeyVersion(request, response.locals.logger())) {

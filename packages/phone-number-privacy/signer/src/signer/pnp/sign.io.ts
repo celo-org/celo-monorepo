@@ -32,7 +32,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
     response: Response<SignMessageResponse>
   ): Promise<PnpSession<SignMessageRequest> | null> {
     const logger = response.locals.logger()
-    if (!super._inputChecks(request, response)) {
+    if (!super.inputChecks(request, response)) {
       return null
     }
     if (!this.getRequestKeyVersion(request, logger)) {
