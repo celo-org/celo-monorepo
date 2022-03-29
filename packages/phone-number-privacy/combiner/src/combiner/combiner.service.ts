@@ -77,7 +77,6 @@ export abstract class CombinerService<R extends OdisRequest> implements ICombine
     request: Request<{}, {}, R>,
     response: Response<OdisResponse<R>>
   ): Promise<Session<R>> {
-    // TODO: Consider injecting this in request. Clarify the intent of this "Session"
     const session = new Session<R>(request, response, this)
 
     const obs = new PerformanceObserver((list) => {

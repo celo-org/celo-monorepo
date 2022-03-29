@@ -24,15 +24,24 @@ export class DomainDisableAction implements IAction<DisableDomainRequest> {
 
     try {
       // Inside a database transaction, update or create the domain to mark it disabled.
-      await getDatabase().transaction(async (trx) => {
+      const res = await getDatabase().transaction(async (trx) => {
         const domainStateRecord =
           (await getDomainStateRecord(domain, session.logger, trx)) ??
           (await insertDomainStateRecord(createEmptyDomainStateRecord(domain), trx, session.logger))
         if (!domainStateRecord.disabled) {
           await setDomainDisabled(domain, trx, session.logger)
         }
-        this.io.sendSuccess(200, session.response, domainStateRecord.toSequentialDelayDomainState())
+        return {
+          success: true,
+          status: 200,
+          domainStateRecord,
+        }
       })
+      this.io.sendSuccess(
+        res.status,
+        session.response,
+        res.domainStateRecord.toSequentialDelayDomainState()
+      )
     } catch (error) {
       session.logger.error('Error while disabling domain', error)
       this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)

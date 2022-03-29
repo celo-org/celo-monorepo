@@ -2,6 +2,7 @@ import {
   domainHash,
   DomainRestrictedSignatureRequest,
   ErrorMessage,
+  ErrorType,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { EIP712Optional } from '@celo/utils/lib/sign-typed-data-utils'
@@ -13,6 +14,22 @@ import { SignAbstract } from '../sign.abstract'
 import { DomainQuotaService } from './quota.service'
 import { DomainSession } from './session'
 import { DomainSignIO } from './sign.io'
+
+// TODO(Alec): find a cleaner way to do this
+type TrxResult =
+  | {
+      success: false
+      status: number
+      domainStateRecord: DomainStateRecord
+      error: ErrorType
+    }
+  | {
+      success: true
+      status: number
+      domainStateRecord: DomainStateRecord
+      key: Key
+      signature: string
+    }
 
 export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequest> {
   constructor(
@@ -32,19 +49,19 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
     })
 
     try {
-      await getDatabase().transaction(async (trx) => {
+      const res: TrxResult = await getDatabase().transaction(async (trx) => {
         // Get the current domain state record, or use an empty record if one does not exist.
         const domainStateRecord = await this.quota.getQuotaStatus(session, trx)
 
         // Note that this action occurs in the same transaction as the remainder of the siging
         // action. As a result, this is included here rather than in the authentication function.
         if (!this.nonceCheck(domainStateRecord, session)) {
-          return this.io.sendFailure(
-            WarningMessage.INVALID_NONCE,
-            401,
-            session.response,
-            domainStateRecord.toSequentialDelayDomainState()
-          )
+          return {
+            success: false,
+            status: 401,
+            domainStateRecord,
+            error: WarningMessage.INVALID_NONCE,
+          }
         }
 
         const quotaStatus = await this.quota.checkAndUpdateQuotaStatus(
@@ -59,12 +76,12 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
             version: domain.version,
             hash: domainHash(domain),
           })
-          return this.io.sendFailure(
-            WarningMessage.EXCEEDED_QUOTA,
-            429,
-            session.response,
-            quotaStatus.state.toSequentialDelayDomainState()
-          )
+          return {
+            success: false,
+            status: 429,
+            domainStateRecord: quotaStatus.state,
+            error: WarningMessage.EXCEEDED_QUOTA,
+          }
         }
 
         const key: Key = {
@@ -77,14 +94,26 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
         // Compute signature inside transaction so it will rollback on error.
         const signature = await this.sign(session.request.body.blindedMessage, key, session)
 
-        this.io.sendSuccess(
-          200,
-          session.response,
+        return {
+          success: true,
+          status: 200,
+          domainStateRecord: quotaStatus.state,
           key,
           signature,
-          quotaStatus.state.toSequentialDelayDomainState()
-        )
+        }
       })
+
+      if (res.success) {
+        this.io.sendSuccess(
+          res.status,
+          session.response,
+          res.key,
+          res.signature,
+          res.domainStateRecord.toSequentialDelayDomainState()
+        )
+      } else {
+        this.io.sendFailure(res.error, res.status, session.response)
+      }
     } catch (error) {
       session.logger.error('Failed to get signature for a domain', error)
       this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)
