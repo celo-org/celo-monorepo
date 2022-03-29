@@ -35,9 +35,10 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
     session: PnpSession<SignMessageRequest>,
     trx: Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
-    Histograms.userRemainingQuotaAtRequest.observe(state.totalQuota - state.queryCount)
-    let sufficient = state.queryCount >= state.totalQuota
-    if (sufficient) {
+    const remainingQuota = state.totalQuota - state.queryCount
+    Histograms.userRemainingQuotaAtRequest.observe(remainingQuota)
+    let sufficient = remainingQuota > 0
+    if (!sufficient) {
       session.logger.debug({ ...state }, 'No remaining quota')
       if (this.bypassQuotaForE2ETesting(session.request.body)) {
         Counters.testQuotaBypassedRequests.inc()
@@ -45,8 +46,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
           { request: session.request.body },
           'Request will bypass quota check for e2e testing'
         )
-      } else {
-        sufficient = false
+        sufficient = true
       }
     } else {
       await this.updateQuotaStatus(trx, session)
