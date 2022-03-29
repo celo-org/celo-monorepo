@@ -25,14 +25,12 @@ export class DomainStateRecord<D extends Domain = Domain> {
     this[DOMAIN_STATE_COLUMNS.timer] = domainState.timer
   }
 
-  public toSequentialDelayDomainState(
-    attemptTime: number = Date.now() / 1000
-  ): SequentialDelayDomainState {
+  public toSequentialDelayDomainState(attemptTime?: number): SequentialDelayDomainState {
     return {
       disabled: this[DOMAIN_STATE_COLUMNS.disabled],
       counter: this[DOMAIN_STATE_COLUMNS.counter],
       timer: this[DOMAIN_STATE_COLUMNS.timer],
-      now: attemptTime,
+      now: attemptTime ?? Date.now() / 1000,
     }
   }
 }

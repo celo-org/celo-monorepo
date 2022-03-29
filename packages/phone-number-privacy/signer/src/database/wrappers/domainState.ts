@@ -6,8 +6,8 @@ import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import { DomainStateRecord, DOMAIN_STATE_COLUMNS, DOMAIN_STATE_TABLE } from '../models/domainState'
 
-function domainStates<D extends Domain>() {
-  return getDatabase()<DomainStateRecord<D>>(DOMAIN_STATE_TABLE)
+function domainStates() {
+  return getDatabase()<DomainStateRecord<Domain>>(DOMAIN_STATE_TABLE)
 }
 
 export async function setDomainDisabled<D extends Domain>(

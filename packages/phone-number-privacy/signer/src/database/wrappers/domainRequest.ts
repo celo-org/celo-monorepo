@@ -9,8 +9,8 @@ import {
   DOMAIN_REQUESTS_TABLE,
 } from '../models/domainRequest'
 
-function domainRequests<D extends Domain>() {
-  return getDatabase()<DomainRequestRecord<D>>(DOMAIN_REQUESTS_TABLE)
+function domainRequests() {
+  return getDatabase()<DomainRequestRecord<Domain>>(DOMAIN_REQUESTS_TABLE)
 }
 
 export async function getDomainRequestRecordExists<D extends Domain>(

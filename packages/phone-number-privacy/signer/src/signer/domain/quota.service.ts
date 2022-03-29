@@ -23,9 +23,10 @@ export class DomainQuotaService implements IQuotaService<QuotaDependentDomainReq
     state: DomainStateRecord,
     session: DomainSession<QuotaDependentDomainRequest>,
     trx: Transaction<DomainStateRecord>,
-    attemptTime: number = Date.now() / 1000 // Convert current time in ms to seconds.
+    attemptTime?: number
   ): Promise<OdisQuotaStatusResult<QuotaDependentDomainRequest>> {
     const { domain } = session.request.body
+    attemptTime = attemptTime ?? Date.now() / 1000 // Convert ms to seconds.
     if (isSequentialDelayDomain(domain)) {
       const result = checkSequentialDelayRateLimit(
         domain,
