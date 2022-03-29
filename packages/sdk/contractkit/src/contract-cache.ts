@@ -188,7 +188,7 @@ export class WrapperCache implements ContractCacheType {
     return this.wrapperCache[contract]!
   }
 
-  public invalidateContract<C extends CeloContract>(contract: C) {
+  public invalidateContract<C extends ValidWrappers>(contract: C) {
     this._web3Contracts.invalidateContract(contract)
     this.wrapperCache[contract] = null
   }

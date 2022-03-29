@@ -421,11 +421,6 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    */
-
-  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
-
-  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
-
   registerValidator: (
     ecdsaPublicKey: string,
     blsPublicKey: string,
@@ -435,6 +430,10 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
     this.contract.methods.registerValidator,
     tupleParser(stringToSolidityBytes, stringToSolidityBytes, stringToSolidityBytes)
   )
+
+  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
+
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
 
   /**
    * De-registers a validator, removing it from the group for which it is a member.

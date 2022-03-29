@@ -38,6 +38,7 @@ import { ReadOnlyWallet } from './wallet'
 
 const debugGasEstimation = debugFactory('connection:gas-estimation')
 
+type BN = ReturnType<Web3['utils']['toBN']>
 export interface ConnectionOptions {
   gasInflationFactor: number
   gasPrice: string
@@ -90,6 +91,16 @@ export class Connection {
     } catch {
       return false
     }
+  }
+
+  // functions which for now call web3 functions but may do something else later
+
+  keccak256(value: string | BN): string {
+    return this.web3.utils.keccak256(value)
+  }
+
+  hexToAscii(hex: string) {
+    return this.web3.utils.hexToAscii(hex)
   }
 
   /**

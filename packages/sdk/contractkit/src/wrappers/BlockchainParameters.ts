@@ -91,6 +91,10 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
     this.connection,
     this.contract.methods.setUptimeLookbackWindow
   )
+
+  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
+
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
 }
 
 export type BlockchainParametersWrapperType = BlockchainParametersWrapper

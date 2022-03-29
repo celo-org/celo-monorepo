@@ -467,7 +467,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   private keccak256(value: string | BN): string {
-    return this.connection.web3.utils.keccak256(value)
+    return this.connection.keccak256(value)
   }
 }
 
