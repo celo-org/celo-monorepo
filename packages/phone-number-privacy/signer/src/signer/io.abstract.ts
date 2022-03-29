@@ -19,21 +19,25 @@ export abstract class IOAbstract<R extends OdisRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<OdisResponse<R>>
   ): Promise<Session<R> | null>
+
   abstract validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, R>
+
   abstract authenticate(request: Request<{}, {}, R>, logger?: Logger): Promise<boolean>
+
   abstract sendFailure(
     error: ErrorType,
     status: number,
     response: Response<FailureResponse<R>>,
     ...args: unknown[]
   ): void
+
   abstract sendSuccess(
     status: number,
     response: Response<SuccessResponse<R>>,
     ...args: unknown[]
   ): void
 
-  protected _inputChecks(
+  protected inputChecks(
     request: Request<{}, {}, unknown>,
     response: Response<OdisResponse<R>>
   ): request is Request<{}, {}, R> {

@@ -225,7 +225,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<number> {
     return meter(
-      this._getTotalQuota,
+      this.getTotalQuota,
       [session],
       (err: any) => {
         throw err
@@ -240,7 +240,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
    * unverifiedQueryCount + verifiedQueryCount + (queryPerTransaction * transactionCount)
    * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
    */
-  private async _getTotalQuota(
+  private async getTotalQuota(
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<number> {
     const {

@@ -31,7 +31,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
   ): Promise<PnpSession<SignMessageRequest> | null> {
-    if (!super._inputChecks(request, response)) {
+    if (!super.inputChecks(request, response)) {
       return null
     }
     if (!(await this.authenticate(request, response.locals.logger()))) {
