@@ -116,15 +116,13 @@ export const GetContactMatchesResponseSchema: t.Type<GetContactMatchesResponse> 
   }),
 ])
 
+// prettier-ignore
 export type PhoneNumberPrivacyResponse<
   R extends PhoneNumberPrivacyRequest = PhoneNumberPrivacyRequest
-> = R extends SignMessageRequest
-  ? SignMessageResponse
-  : never | R extends MatchmakingRequest
-  ? GetContactMatchesResponse
-  : never | R extends PnpQuotaRequest
-  ? PnpQuotaResponse
-  : never
+> =
+  | R extends SignMessageRequest ? SignMessageResponse : never
+  | R extends MatchmakingRequest ? GetContactMatchesResponse : never
+  | R extends PnpQuotaRequest ? PnpQuotaResponse : never
 
 // Domains
 
@@ -180,7 +178,7 @@ export type DomainResponse<
   R extends DomainRequest = DomainRequest
 > = 
   | R extends DomainRestrictedSignatureRequest ? DomainRestrictedSignatureResponse : never
-  | R extends DomainQuotaStatusRequest<infer D> ? DomainQuotaStatusResponse<D> | DisableDomainResponse : never
+  | R extends DomainQuotaStatusRequest<infer D> ? DomainQuotaStatusResponse<D> : never
   | R extends DisableDomainRequest ? DisableDomainResponse : never
 
 export function domainRestrictedSignatureResponseSchema<D extends Domain>(
@@ -233,11 +231,10 @@ export const DisableDomainResponseSchema: t.Type<DisableDomainResponse> = t.unio
 
 // General
 
-export type OdisResponse<R extends OdisRequest = OdisRequest> = R extends DomainRequest
-  ? DomainResponse<R>
-  : never | R extends PhoneNumberPrivacyRequest
-  ? PhoneNumberPrivacyResponse<R>
-  : never
+// prettier-ignore
+export type OdisResponse<R extends OdisRequest = OdisRequest> =
+  | R extends DomainRequest ? DomainResponse<R> : never
+  | R extends PhoneNumberPrivacyRequest ? PhoneNumberPrivacyResponse<R> : never
 
 export type SuccessResponse<R extends OdisRequest = OdisRequest> = OdisResponse<R> & {
   success: true

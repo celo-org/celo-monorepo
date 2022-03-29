@@ -202,14 +202,12 @@ async function requestOdisQuotaStatus(
 
   let quotaResp: DomainQuotaStatusResponse
   try {
-    // DO NOT MERGE(victor) Cast is included to fix the build until type issues are resolved.
-    // Remove this type cast before merging.
-    quotaResp = (await sendOdisDomainRequest(
+    quotaResp = await sendOdisDomainRequest(
       quotaStatusReq,
       environment,
       DomainEndpoint.DOMAIN_QUOTA_STATUS,
-      domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema) as any
-    )) as DomainQuotaStatusResponse<SequentialDelayDomain>
+      domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
+    )
   } catch (error) {
     if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {
       return Err(new FetchError(error as Error))
