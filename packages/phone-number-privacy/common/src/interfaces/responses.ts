@@ -175,16 +175,13 @@ export interface DisableDomainResponseFailure {
 
 export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
 
+// prettier-ignore
 export type DomainResponse<
   R extends DomainRequest = DomainRequest
-> = R extends DomainRestrictedSignatureRequest
-  ? DomainRestrictedSignatureResponse
-  : never | R extends DomainQuotaStatusRequest<infer D>
-  ? // @victor I was seeing some weirdness here bc the types have the same structure
-    DomainQuotaStatusResponse<D> | DisableDomainResponse
-  : never | R extends DisableDomainRequest
-  ? DisableDomainResponse
-  : never
+> = 
+  | R extends DomainRestrictedSignatureRequest ? DomainRestrictedSignatureResponse : never
+  | R extends DomainQuotaStatusRequest<infer D> ? DomainQuotaStatusResponse<D> | DisableDomainResponse : never
+  | R extends DisableDomainRequest ? DisableDomainResponse : never
 
 export function domainRestrictedSignatureResponseSchema<D extends Domain>(
   state: t.Type<DomainState<D>>
