@@ -37,6 +37,7 @@ export class DomainDisableAction implements IAction<DisableDomainRequest> {
           domainStateRecord,
         }
       })
+
       this.io.sendSuccess(
         res.status,
         session.response,
