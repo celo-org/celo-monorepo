@@ -5,6 +5,6 @@ mkdocs:
   fail_on_warning: false
 
 # Optionally declare the Python requirements required to build your docs
-python:
-   install:
-   - requirements: packages/docs/sdk/requirements.txt
+# python:
+#    install:
+#    - requirements: packages/docs/sdk/requirements.txt
