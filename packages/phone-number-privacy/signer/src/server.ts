@@ -72,11 +72,30 @@ export function createServer() {
   const pnpQuotaService = new PnpQuotaService()
   const domainQuotaService = new DomainQuotaService()
 
-  const pnpQuota = new PnpQuotaAction(config, pnpQuotaService, new PnpQuotaIO())
-  const pnpSign = new PnpSignAction(config, pnpQuotaService, new PnpSignIO())
-  const domainQuota = new DomainQuotaAction(config, domainQuotaService, new DomainQuotaIO())
-  const domainSign = new DomainSignAction(config, domainQuotaService, new DomainSignIO())
-  const domainDisable = new DomainDisableAction(config, new DomainDisableIO())
+  const pnpQuota = new PnpQuotaAction(
+    config,
+    pnpQuotaService,
+    new PnpQuotaIO(config.api.phoneNumberPrivacy.enabled)
+  )
+  const pnpSign = new PnpSignAction(
+    config,
+    pnpQuotaService,
+    new PnpSignIO(config.api.phoneNumberPrivacy.enabled)
+  )
+  const domainQuota = new DomainQuotaAction(
+    config,
+    domainQuotaService,
+    new DomainQuotaIO(config.api.domains.enabled)
+  )
+  const domainSign = new DomainSignAction(
+    config,
+    domainQuotaService,
+    new DomainSignIO(config.api.domains.enabled)
+  )
+  const domainDisable = new DomainDisableAction(
+    config,
+    new DomainDisableIO(config.api.domains.enabled)
+  )
 
   addMeteredSignerEndpoint(SignerEndpoint.PARTIAL_SIGN_MESSAGE, new Controller(pnpSign).handle)
   addMeteredSignerEndpoint(SignerEndpoint.GET_QUOTA, new Controller(pnpQuota).handle)

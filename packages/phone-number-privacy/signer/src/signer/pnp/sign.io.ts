@@ -17,14 +17,13 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Counters } from '../../common/metrics'
-import config, { getVersion } from '../../config'
+import { getVersion } from '../../config'
 import { Key } from '../../key-management/key-provider-base'
 import { getContractKit } from '../../web3/contracts'
 import { IOAbstract } from '../io.abstract'
 import { PnpSession } from './session'
 
 export class PnpSignIO extends IOAbstract<SignMessageRequest> {
-  readonly enabled: boolean = config.api.phoneNumberPrivacy.enabled
   readonly endpoint = SignerEndpoint.PARTIAL_SIGN_MESSAGE
 
   async init(

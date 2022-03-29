@@ -14,12 +14,11 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { Counters } from '../../common/metrics'
-import config, { getVersion } from '../../config'
+import { getVersion } from '../../config'
 import { IOAbstract } from '../io.abstract'
 import { DomainSession } from './session'
 
 export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
-  readonly enabled: boolean = config.api.domains.enabled
   readonly endpoint = SignerEndpoint.DISABLE_DOMAIN
 
   async init(

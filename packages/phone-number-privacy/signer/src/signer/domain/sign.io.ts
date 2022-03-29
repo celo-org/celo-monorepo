@@ -15,13 +15,12 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { Counters } from '../../common/metrics'
-import config, { getVersion } from '../../config'
+import { getVersion } from '../../config'
 import { Key } from '../../key-management/key-provider-base'
 import { IOAbstract } from '../io.abstract'
 import { DomainSession } from './session'
 
 export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
-  readonly enabled: boolean = config.api.domains.enabled
   readonly endpoint = SignerEndpoint.DOMAIN_SIGN
 
   async init(

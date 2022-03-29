@@ -13,8 +13,9 @@ import { Request, Response } from 'express'
 import { Session } from './action.interface'
 
 export abstract class IOAbstract<R extends OdisRequest> {
-  abstract readonly enabled: boolean
   abstract readonly endpoint: SignerEndpoint
+
+  constructor(readonly enabled: boolean) {}
 
   abstract init(
     request: Request<{}, {}, unknown>,
