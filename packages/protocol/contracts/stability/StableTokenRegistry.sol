@@ -78,10 +78,16 @@ contract StableTokenRegistry is Initializable, Ownable {
     delete stableTokens[fiatTicker];
     uint256 numFiats = fiatTickers.length;
     require(index < numFiats, "Index is invalid");
-    require(
-      keccak256(fiatTicker) == keccak256(fiatTickers[index]),
-      "Source fiatTicker does not match the one in the storage on given index"
-    );
+    // require(fiatTicker.length == fiatTickers[index].length, "mismatch in length");
+    for (uint256 i = 0; i < fiatTicker.length; i++) {
+      for (uint256 j = 0; j < fiatTickers[index].length; j++) {
+        require(fiatTicker[i] == fiatTickers[index][i]);
+      }
+    }
+    // require(
+    //   keccak256(abi.encodePacked(fiatTicker)) == keccak256(abi.encodePacked(fiatTickers[index])),
+    //   "Source fiatTicker does not match the one in the storage on given index"
+    // );
     uint256 newNumFiats = numFiats.sub(1);
 
     if (index != newNumFiats) {
@@ -101,11 +107,8 @@ contract StableTokenRegistry is Initializable, Ownable {
     onlyOwner
   {
     // registry.getAddressForOrDie(keccak256(abi.encodePacked(stableTokenContractName)));
-    require(bytes(fiatTicker).length != 0, "fiatTicker cant be an empty string");
-    require(
-      bytes(stableTokenContractName).length != 0,
-      "stableTokenContractName cant be an empty string"
-    );
+    require(fiatTicker.length != 0, "fiatTicker cant be an empty string");
+    require(stableTokenContractName.length != 0, "stableTokenContractName cant be an empty string");
     require(stableTokens[fiatTicker].length == 0, "This registry already exists");
     stableTokens[fiatTicker] = stableTokenContractName;
     fiatTickers.push(fiatTicker);
