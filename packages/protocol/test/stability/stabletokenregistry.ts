@@ -56,10 +56,9 @@ contract('StableTokenRegistry', (accounts: string[]) => {
     })
 
     it('has the right list of fiat tickers after removing one', async () => {
-      await strc.addNewStableToken(fiatTicker, stableTokenContractName)
       await strc.removeStableToken(fiatTicker, 0)
       const updatedFiatTickers = await getFiatTickers()
-      assert.deepEqual(updatedFiatTickers, ['cEUR', 'cBRL'])
+      assert.deepEqual(updatedFiatTickers, ['cBRL', 'cEUR'])
     })
 
     // it('has the right list of contract names after removing one', async () => {
@@ -80,7 +79,7 @@ contract('StableTokenRegistry', (accounts: string[]) => {
     it('removes from fiatTickers array', async () => {
       await strc.removeStableToken(fiatTicker, 0)
       const updatedFiatTickers = await getFiatTickers()
-      assert.deepEqual(updatedFiatTickers, [])
+      assert.deepEqual(updatedFiatTickers, ['cBRL', 'cEUR'])
     })
 
     it("doesn't remove an fiat ticker with the wrong index", async () => {
@@ -101,6 +100,10 @@ contract('StableTokenRegistry', (accounts: string[]) => {
       await assertRevert(strc.addNewStableToken(convertToHex(''), convertToHex('')))
     })
 
+    it('does not allow duplicate values', async () => {
+      await assertRevert(strc.addNewStableToken(fiatTicker, stableTokenContractName))
+    })
+
     it('has the right list of fiat tickers after addition', async () => {
       const fiatTickersBefore = await getFiatTickers()
       assert.deepEqual(fiatTickersBefore, ['cUSD', 'cEUR'])
@@ -109,10 +112,4 @@ contract('StableTokenRegistry', (accounts: string[]) => {
       assert.deepEqual(updatedFiatTickers, ['cUSD', 'cEUR', 'cBRL'])
     })
   })
-
-  // it('has no duplicates', async () => {
-  //   console.log('yay')
-  //   console.log(await getFiatTickers);
-  //  await assertRevert(strc.addNewStableToken(fiatTicker, stableTokenContractName))
-  // })
 })
