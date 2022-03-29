@@ -116,15 +116,13 @@ export const GetContactMatchesResponseSchema: t.Type<GetContactMatchesResponse> 
   }),
 ])
 
+// prettier-ignore
 export type PhoneNumberPrivacyResponse<
   R extends PhoneNumberPrivacyRequest = PhoneNumberPrivacyRequest
-> = R extends SignMessageRequest
-  ? SignMessageResponse
-  : never | R extends MatchmakingRequest
-  ? GetContactMatchesResponse
-  : never | R extends PnpQuotaRequest
-  ? PnpQuotaResponse
-  : never
+> =
+  | R extends SignMessageRequest ? SignMessageResponse : never
+  | R extends MatchmakingRequest ? GetContactMatchesResponse : never
+  | R extends PnpQuotaRequest ? PnpQuotaResponse : never
 
 // Domains
 
@@ -175,16 +173,13 @@ export interface DisableDomainResponseFailure {
 
 export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
 
+// prettier-ignore
 export type DomainResponse<
   R extends DomainRequest = DomainRequest
-> = R extends DomainRestrictedSignatureRequest
-  ? DomainRestrictedSignatureResponse
-  : never | R extends DomainQuotaStatusRequest<infer D>
-  ? // @victor I was seeing some weirdness here bc the types have the same structure
-    DomainQuotaStatusResponse<D> | DisableDomainResponse
-  : never | R extends DisableDomainRequest
-  ? DisableDomainResponse
-  : never
+> = 
+  | R extends DomainRestrictedSignatureRequest ? DomainRestrictedSignatureResponse : never
+  | R extends DomainQuotaStatusRequest<infer D> ? DomainQuotaStatusResponse<D> : never
+  | R extends DisableDomainRequest ? DisableDomainResponse : never
 
 export function domainRestrictedSignatureResponseSchema<D extends Domain>(
   state: t.Type<DomainState<D>>
@@ -236,11 +231,10 @@ export const DisableDomainResponseSchema: t.Type<DisableDomainResponse> = t.unio
 
 // General
 
-export type OdisResponse<R extends OdisRequest = OdisRequest> = R extends DomainRequest
-  ? DomainResponse<R>
-  : never | R extends PhoneNumberPrivacyRequest
-  ? PhoneNumberPrivacyResponse<R>
-  : never
+// prettier-ignore
+export type OdisResponse<R extends OdisRequest = OdisRequest> =
+  | R extends DomainRequest ? DomainResponse<R> : never
+  | R extends PhoneNumberPrivacyRequest ? PhoneNumberPrivacyResponse<R> : never
 
 export type SuccessResponse<R extends OdisRequest = OdisRequest> = OdisResponse<R> & {
   success: true

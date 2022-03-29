@@ -1,13 +1,11 @@
 import {
   DomainRestrictedSignatureRequest,
-  DomainRestrictedSignatureResponseSuccess,
   ErrorMessage,
   ErrorType,
   KEY_VERSION_HEADER,
   OdisResponse,
   SignMessageRequest,
-  SignMessageResponseSuccess,
-  WarningMessage
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request } from 'express'
@@ -29,7 +27,7 @@ export abstract class SignAbstract<R extends SignatureRequest> extends CombineAc
   }
 
   protected async receiveSuccess(
-    res: SignMessageResponseSuccess | DomainRestrictedSignatureResponseSuccess,
+    signerResponse: FetchResponse,
     url: string,
     session: Session<R>
   ): Promise<void> {
@@ -44,13 +42,15 @@ export abstract class SignAbstract<R extends SignatureRequest> extends CombineAc
     // TODO(Alec): Move this up one level
     const res = this.io.validateSignerResponse(data, url, session)
 
-    const signature = res.success ? res.signature : never // TODO(Alec)(Next)
+    if (!res.success) {
+      throw new Error('DO NOT MERGE: Add error message')
+    }
 
     session.responses.push({ url, res, status })
 
     session.logger.info({ signer: url }, 'Add signature')
     const signatureAdditionStart = Date.now()
-    session.blsCryptoClient.addSignature({ url, signature })
+    session.blsCryptoClient.addSignature({ url, signature: res.signature })
     session.logger.info(
       {
         signer: url,

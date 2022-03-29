@@ -18,11 +18,10 @@ import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
   DomainRestrictedSignatureResponse,
-  DomainRestrictedSignatureResponseSchema,
+  domainRestrictedSignatureResponseSchema,
   DomainRestrictedSignatureResponseSuccess,
   genSessionID,
   SequentialDelayDomain,
-  SequentialDelayDomainState,
   SequentialDelayDomainStateSchema,
 } from '@celo/phone-number-privacy-common'
 import { defined, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
@@ -92,22 +91,20 @@ export async function odisHardenKey(
   }
 
   // Check locally whether or not we should expect to be able to make a query to ODIS right now.
-  // TODO(victor) Using Date.now is actually not appropriate because mobile clients may have a large
-  // clock drift. Modify this to use a time returned from ODIS either in the status response, or as
-  // part of the 429 response upon rejecting the signature request. Risk with the latter approach is
-  // that unless replay handling is implemented, having the request accepted by half of the signers,
-  // but rejected by the other half can get the client into a bad state.
-  const quotaState = quotaResp.result.status as SequentialDelayDomainState
-  const { accepted, notBefore } = checkSequentialDelayRateLimit(
+  // Note that this uses the servers timestamp through the `quotaState.now` field. This is because
+  // mobile clients may have a large clock drift. This prevents that clock drift from resulting in
+  // misinterpretations of the domain quota.
+  const quotaState = quotaResp.result.status
+  const quotaResult = checkSequentialDelayRateLimit(
     domain,
-    // Dividing by 1000 to convert ms to seconds for the rate limit check.
-    Date.now() / 1000,
+    // Use the local clock as a fallback. Divide by 1000 to get seconds from ms.
+    quotaState.now ?? Date.now() / 1000,
     quotaState
   )
-  if (!accepted) {
+  if (!quotaResult.accepted) {
     return Err(
       new OdisRateLimitingError(
-        notBefore,
+        quotaResult.notBefore,
         new Error('client does not currently have quota based on status response.')
       )
     )
@@ -265,7 +262,7 @@ async function requestOdisDomainSignature(
       signatureReq,
       environment,
       DomainEndpoint.DOMAIN_SIGN,
-      DomainRestrictedSignatureResponseSchema
+      domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema)
     )
   } catch (error) {
     if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {

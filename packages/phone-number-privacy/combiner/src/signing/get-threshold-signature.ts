@@ -220,10 +220,16 @@ async function handleSuccessResponse(
       'Signer responded with error'
     )
   }
+
+  // @ts-ignore: DO NOT MERGE: signature may be included to allow permissive error cases. This is an
+  // inconsistency between the types and the actual system behavior and should be addressed.
   if (!signResponse.signature) {
     throw new Error(`Signature is missing from signer ${serviceUrl}`)
   }
+
   responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
+  // @ts-ignore: DO NOT MERGE: signature may be included to allow permissive error cases. This is an
+  // inconsistency between the types and the actual system behavior and should be addressed.
   const partialSig = { url: serviceUrl, signature: signResponse.signature }
   logger.info({ signer: serviceUrl }, 'Add signature')
   const signatureAdditionStart = Date.now()

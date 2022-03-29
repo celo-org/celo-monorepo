@@ -1,12 +1,9 @@
-import {
-  DisableDomainRequest, ErrorMessage
-} from '@celo/phone-number-privacy-common'
+import { DisableDomainRequest, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
 import { CombineAction } from '../combine.action'
 import { Session } from '../session'
 
 export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
-
   async combine(session: Session<DisableDomainRequest>): Promise<void> {
     if (this.checkThresholdDisabled(session)) {
       return this.io.sendSuccess(200, session.response, session.logger)
@@ -37,7 +34,7 @@ export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
     }
 
     session.logger.info({ signer: url }, `Signer request successful`)
-    session.responses.push({ url, res, res.status })
+    session.responses.push({ url, res, status: res.status })
 
     if (this.checkThresholdDisabled(session)) {
       session.controller.abort()

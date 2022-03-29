@@ -11,7 +11,6 @@ import {
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetContactMatchesResponse,
-  PhoneNumberPrivacyEndpoint,
   PhoneNumberPrivacyRequest,
 } from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
@@ -125,7 +124,7 @@ export async function queryOdis<ResponseType>(
   signer: AuthSigner,
   body: PhoneNumberPrivacyRequest,
   context: ServiceContext,
-  endpoint: PhoneNumberPrivacyEndpoint | CombinerEndpoint
+  endpoint: CombinerEndpoint
 ): Promise<ResponseType> {
   debug(`Posting to ${endpoint}`)
 
