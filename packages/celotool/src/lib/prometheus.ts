@@ -168,6 +168,11 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     params.push(...getRemoteWriteParameters(context))
   }
 
+  if (usingGCP) {
+    // Note: ssd is not the default storageClass in GCP clusters
+    params.push(`--set storageClassName=ssd`)
+  }
+
   if (stackdriverDisabled.toLowerCase() === 'false') {
     params.push(
       `--set stackdriver.sidecar.imageTag=${sidecarImageTag}`,
@@ -185,8 +190,6 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       console.info(serviceAccountName)
       const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
       params.push(
-        // Note: ssd is not the default storageClass in GCP clusters
-        `--set storageClassName=ssd`,
         `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
       )
     }
