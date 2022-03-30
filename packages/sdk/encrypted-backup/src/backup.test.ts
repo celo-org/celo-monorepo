@@ -168,7 +168,12 @@ describe('createBackup', () => {
       body: {
         success: true,
         version: 'mock',
-        status: { timer: Date.now() / 1000 + 3600, counter: 0, disabled: false },
+        status: {
+          timer: Date.now() / 1000 + 3600,
+          counter: 0,
+          disabled: false,
+          now: Date.now() / 1000,
+        },
       },
     })
     const result = await createBackup({
@@ -369,7 +374,12 @@ describe('openBackup', () => {
       body: {
         success: true,
         version: 'mock',
-        status: { timer: Date.now() / 1000 + 3600, counter: 0, disabled: false },
+        status: {
+          timer: Date.now() / 1000 + 3600,
+          counter: 0,
+          disabled: false,
+          now: Date.now() / 1000,
+        },
       },
     })
     const result = await openBackup({

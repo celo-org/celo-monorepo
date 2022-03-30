@@ -108,6 +108,12 @@ export const PnpQuotaRequestSchema: t.Type<PnpQuotaRequest> = t.type({
 
 export type PhoneNumberPrivacyRequest = SignMessageRequest | MatchmakingRequest | PnpQuotaRequest
 
+export enum DomainRequestTypeTag {
+  SIGN = 'DomainRestrictedSignatureRequest',
+  QUOTA = 'DomainQuotaStatusRequest',
+  DISABLE = 'DisableDomainRequest',
+}
+
 /**
  * Domain restricted signature request to get a pOPRF evaluation on the given message in a given
  * domain, as specified by CIP-40.
@@ -116,6 +122,8 @@ export type PhoneNumberPrivacyRequest = SignMessageRequest | MatchmakingRequest 
  * domain has no options, an empty struct should be used.
  */
 export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = {
+  /** Request type tag to ensure this type can be distinguished from other request objects. */
+  type: DomainRequestTypeTag.SIGN
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
   domain: D
   /**
@@ -141,6 +149,8 @@ export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = {
  * domain has no options, an empty struct should be used.
  */
 export type DomainQuotaStatusRequest<D extends Domain = Domain> = {
+  /** Request type tag to ensure this type can be distinguished from other request objects. */
+  type: DomainRequestTypeTag.QUOTA
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
   domain: D
   /** Domain-specific options. */
@@ -160,6 +170,8 @@ export type DomainQuotaStatusRequest<D extends Domain = Domain> = {
  * domain has no options, an empty struct should be used.
  */
 export type DisableDomainRequest<D extends Domain = Domain> = {
+  /** Request type tag to ensure this type can be distinguished from other request objects. */
+  type: DomainRequestTypeTag.DISABLE
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
   domain: D
   /** Domain-specific options. */
@@ -187,6 +199,7 @@ export function domainRestrictedSignatureRequestSchema<D extends Domain = Domain
   // domain and options fields. We wrap the schema below to add a consistency check.
   const schema = t.strict({
     domain,
+    type: t.literal(DomainRequestTypeTag.SIGN),
     options: t.unknown,
     blindedMessage: t.string,
     sessionID: eip712OptionalSchema(t.string),
@@ -232,6 +245,7 @@ export function domainQuotaStatusRequestSchema<D extends Domain = Domain>(
   // domain and options fields. We wrap the schema below to add a consistency check.
   const schema = t.strict({
     domain,
+    type: t.literal(DomainRequestTypeTag.QUOTA),
     options: t.unknown,
     sessionID: eip712OptionalSchema(t.string),
   })
@@ -273,6 +287,7 @@ export function disableDomainRequestSchema<D extends Domain = Domain>(
   // domain and options fields. We wrap the schema below to add a consistency check.
   const schema = t.strict({
     domain,
+    type: t.literal(DomainRequestTypeTag.DISABLE),
     options: t.unknown,
     sessionID: eip712OptionalSchema(t.string),
   })
@@ -315,9 +330,9 @@ export function domainRestrictedSignatureRequestEIP712<D extends Domain>(
   return {
     types: {
       DomainRestrictedSignatureRequest: [
+        { name: 'type', type: 'string' },
         { name: 'blindedMessage', type: 'string' },
         { name: 'domain', type: domainTypes.primaryType },
-        // Only include the `options` field in the EIP-712 type if there are options.
         { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
@@ -347,8 +362,8 @@ export function domainQuotaStatusRequestEIP712<D extends Domain>(
   return {
     types: {
       DomainQuotaStatusRequest: [
+        { name: 'type', type: 'string' },
         { name: 'domain', type: domainTypes.primaryType },
-        // Only include the `options` field in the EIP-712 type if there are options.
         { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
@@ -378,8 +393,8 @@ export function disableDomainRequestEIP712<D extends Domain>(
   return {
     types: {
       DisableDomainRequest: [
+        { name: 'type', type: 'string' },
         { name: 'domain', type: domainTypes.primaryType },
-        // Only include the `options` field in the EIP-712 type if there are options.
         { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
