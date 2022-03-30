@@ -241,10 +241,10 @@ export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
    * @param epochNumber The epoch to retrieve AccountSlashed at.
    */
   async getAccountsSlashed(epochNumber: number): Promise<AccountSlashed[]> {
-    const validatorsContract = await this.contracts.getValidators()
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
     const events = await this.getPastEvents('AccountSlashed', {
-      fromBlock: await validatorsContract.getFirstBlockNumberForEpoch(epochNumber),
-      toBlock: await validatorsContract.getLastBlockNumberForEpoch(epochNumber),
+      fromBlock: await blockchainParamsWrapper.getFirstBlockNumberForEpoch(epochNumber),
+      toBlock: await blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber),
     })
     return events.map(
       (e: EventLog): AccountSlashed => ({

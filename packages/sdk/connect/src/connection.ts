@@ -95,11 +95,11 @@ export class Connection {
 
   // functions which for now call web3 functions but may do something else later
 
-  keccak256(value: string | BN): string {
+  keccak256 = (value: string | BN): string => {
     return this.web3.utils.keccak256(value)
   }
 
-  hexToAscii(hex: string) {
+  hexToAscii = (hex: string) => {
     return this.web3.utils.hexToAscii(hex)
   }
 

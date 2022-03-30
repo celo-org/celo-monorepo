@@ -71,7 +71,7 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   getAssetAllocationSymbols = proxyCall(
     this.contract.methods.getAssetAllocationSymbols,
     undefined,
-    (symbols) => symbols.map(this.connection.hexToAscii)
+    (symbols) => symbols.map((symbol) => this.connection.hexToAscii(symbol))
   )
 
   /**

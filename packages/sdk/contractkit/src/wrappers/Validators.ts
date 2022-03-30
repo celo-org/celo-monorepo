@@ -583,35 +583,16 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
     return epochSize.toNumber()
   }
 
-  async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSizeNumber()
-    // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    if (epochNumber === 0) {
-      // No first block for epoch 0
-      return 0
-    }
-    return (epochNumber - 1) * epochSize + 1
-  }
-
   async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSizeNumber()
-    // Follows GetEpochLastBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    if (epochNumber === 0) {
-      return 0
-    }
-    const firstBlockNumberForEpoch = await this.getFirstBlockNumberForEpoch(epochNumber)
-    return firstBlockNumberForEpoch + (epochSize - 1)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+
+    return blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber)
   }
 
   async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSizeNumber()
-    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    const epochNumber = Math.floor(blockNumber / epochSize)
-    if (blockNumber % epochSize === 0) {
-      return epochNumber
-    } else {
-      return epochNumber + 1
-    }
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+
+    return blockchainParamsWrapper.getEpochNumberOfBlock(blockNumber)
   }
 
   /**

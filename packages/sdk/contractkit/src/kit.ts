@@ -149,11 +149,13 @@ export class ContractKit {
 
     const configMethod = async (contract: ValidWrappers) => {
       try {
+        const eachTokenAddress = await this.celoTokens.getAddresses()
+        const addresses = Object.values(eachTokenAddress)
         const configContractWrapper = await this.contracts.getContract(contract)
         if (humanReadable && 'getHumanReadableConfig' in configContractWrapper) {
-          return configContractWrapper.getHumanReadableConfig()
+          return configContractWrapper.getHumanReadableConfig(addresses)
         } else if ('getConfig' in configContractWrapper) {
-          return configContractWrapper.getConfig()
+          return configContractWrapper.getConfig(addresses)
         } else {
           throw new Error('No config endpoint found')
         }
@@ -202,23 +204,23 @@ export class ContractKit {
   }
 
   async getEpochSize(): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    return validators.getEpochSizeNumber()
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getEpochSizeNumber()
   }
 
   async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    return validators.getFirstBlockNumberForEpoch(epochNumber)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getFirstBlockNumberForEpoch(epochNumber)
   }
 
   async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    return validators.getLastBlockNumberForEpoch(epochNumber)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber)
   }
 
   async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    return validators.getEpochNumberOfBlock(blockNumber)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getEpochNumberOfBlock(blockNumber)
   }
 
   // *** NOTICE ***
