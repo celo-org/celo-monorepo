@@ -15,14 +15,7 @@ import {
   spawnCmd,
   spawnCmdWithExitOnFailure,
 } from './cmd-utils'
-import {
-  EnvTypes,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-  isProduction,
-  monorepoRoot,
-} from './env-utils'
+import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import {
@@ -817,11 +810,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
-    // Disable by default block age check in fullnode readinessProbe except for production envs
-    `--set geth.fullnodeCheckBlockAge=${fetchEnvOrFallback(
-      envVar.FULL_NODE_READINESS_CHECK_BLOCK_AGE,
-      `${isProduction()}`
-    )}`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
     `--set geth.private_tx_nodes="${fetchEnv(envVar.PRIVATE_TX_NODES)}"`,
     `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,

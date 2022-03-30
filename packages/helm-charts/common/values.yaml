@@ -25,7 +25,6 @@ geth:
   service_type: LoadBalancer
   use_static_ips: true
   azure_mixed_protocols: true
-  fullnodeCheckBlockAge: true
   ws_port: 8546
 
 # Genesis
