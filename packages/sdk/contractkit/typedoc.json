@@ -7,7 +7,7 @@
   "includeDeclarations": false,
   "ignoreCompilerErrors": true,
   "hideGenerator": "true",
-  "theme": "gitbook",
-  "out": "../../docs/developer-resources/contractkit/reference",
-  "gitRevision": "master"
+  "out": "../../docs/sdk/docs/contractkit",
+  "gitRevision": "master",
+  "readme": "none"
 }
