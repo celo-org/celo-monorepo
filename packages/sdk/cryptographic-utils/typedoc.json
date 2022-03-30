@@ -1,5 +1,3 @@
-
-
 {
   "mode": "modules",
   "exclude": ["**/*+(index|.test).ts"],
@@ -11,5 +9,5 @@
   "hideGenerator": "true",
   "out": "../../docs/sdk/docs/cryptographic-utils",
   "gitRevision": "master",
-  "readme": "readme.md"
+  "readme": "README.md"
 }
