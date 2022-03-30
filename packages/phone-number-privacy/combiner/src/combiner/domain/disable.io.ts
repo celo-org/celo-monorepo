@@ -54,7 +54,7 @@ export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
     const res: unknown = JSON.parse(data)
     if (!DisableDomainResponseSchema.is(res)) {
       // TODO(Alec): add error type for this
-      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
+      const msg = `Signer request to ${url + this.signerEndpoint} returned malformed response`
       session.logger.error({ data, signer: url }, msg)
       throw new Error(msg)
     }
