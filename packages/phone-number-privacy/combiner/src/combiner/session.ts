@@ -2,26 +2,21 @@ import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-priv
 import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-// import { SignerResponse } from './combiner.service'
+import { SignerResponse } from './io.abstract'
 
 export class Session<R extends OdisRequest> {
-  public timedOut: boolean
+  public timedOut: boolean = false
   readonly logger: Logger
-  readonly controller: AbortController
-  readonly failedSigners: Set<string>
-  readonly errorCodes: Map<number, number>
-  readonly responses: Array<OdisResponse<R>>
+  readonly controller: AbortController = new AbortController()
+  readonly failedSigners: Set<string> = new Set<string>()
+  readonly errorCodes: Map<number, number> = new Map<number, number>()
+  readonly responses: Array<SignerResponse<R>> = new Array<SignerResponse<R>>()
 
   public constructor(
     readonly request: Request<{}, {}, R>,
     readonly response: Response<OdisResponse<R>>
   ) {
     this.logger = response.locals.logger()
-    this.controller = new AbortController()
-    this.timedOut = false
-    this.failedSigners = new Set<string>()
-    this.errorCodes = new Map<number, number>()
-    this.responses = new Array<OdisResponse<R>>()
   }
 
   incrementErrorCodeCount(errorCode: number) {

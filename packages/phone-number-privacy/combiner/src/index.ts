@@ -1,7 +1,7 @@
 import {
   CombinerEndpoint as Endpoint,
   ErrorMessage,
-  loggerMiddleware
+  loggerMiddleware,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import * as functions from 'firebase-functions'

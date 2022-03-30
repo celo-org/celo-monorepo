@@ -19,7 +19,7 @@ declare type QuotaDependentDomainRequest =
   | DomainRestrictedSignatureRequest
 
 export class DomainQuotaService implements IQuotaService<QuotaDependentDomainRequest> {
-  public async checkAndUpdateQuotaStatus(
+  async checkAndUpdateQuotaStatus(
     state: DomainStateRecord,
     session: DomainSession<QuotaDependentDomainRequest>,
     trx: Transaction<DomainStateRecord>,
@@ -47,7 +47,7 @@ export class DomainQuotaService implements IQuotaService<QuotaDependentDomainReq
     }
   }
 
-  public async getQuotaStatus(
+  async getQuotaStatus(
     session: DomainSession<QuotaDependentDomainRequest>,
     trx?: Transaction<DomainStateRecord>
   ): Promise<DomainStateRecord> {

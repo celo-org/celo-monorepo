@@ -5,7 +5,8 @@ import {
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
-  isBodyReasonablySized, send,
+  isBodyReasonablySized,
+  send,
   SignerEndpoint,
   SignMessageRequest,
   SignMessageRequestSchema,
@@ -13,36 +14,46 @@ import {
   SignMessageResponseFailure,
   SignMessageResponseSchema,
   SignMessageResponseSuccess,
-  WarningMessage
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
+import { BLSCryptographyClient } from '../../bls/bls-cryptography-client'
 import { VERSION } from '../../config'
 import { getContractKit } from '../../web3/contracts'
-import { IOAbstract } from '../io.abstract'
+import { SignIOAbstract } from '../io.abstract'
+import { Session } from '../session'
 import { PnpSignSession } from './sign.session'
 
-export class PnpSignIO extends IOAbstract<SignMessageRequest> {
+export class PnpSignIO extends SignIOAbstract<SignMessageRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.SIGN_MESSAGE
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
 
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
-  ): Promise<PnpSignSession | null> {
-    const logger = response.locals.logger()
+  ): Promise<Session<SignMessageRequest> | null> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!this.getRequestKeyVersion(request, logger)) {
+    if (!this.getRequestKeyVersion(request, response.locals.logger())) {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
-    if (!(await this.authenticate(request, logger))) {
+    if (!(await this.authenticate(request, response.locals.logger()))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new PnpSignSession(request, response, this.config)
+    // TODO(Alec): could these be the same class for both Pnp and Domains?
+    return new PnpSignSession(
+      request,
+      response,
+      new BLSCryptographyClient(
+        this.config.keys.threshold,
+        this.config.keys.pubKey,
+        this.config.keys.polynomial
+      )
+    )
   }
 
   validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, SignMessageRequest> {
@@ -65,7 +76,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
   validateSignerResponse(
     data: string,
     url: string,
-    session: PnpSignSession
+    session: Session<SignMessageRequest>
   ): SignMessageResponse {
     const res: unknown = JSON.parse(data)
     if (!SignMessageResponseSchema.is(res)) {

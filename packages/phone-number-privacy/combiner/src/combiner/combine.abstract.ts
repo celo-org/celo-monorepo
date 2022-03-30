@@ -1,9 +1,4 @@
-import {
-  ErrorMessage,
-  OdisRequest,
-  OdisResponse,
-  WarningMessage,
-} from '@celo/phone-number-privacy-common'
+import { ErrorMessage, OdisRequest, WarningMessage } from '@celo/phone-number-privacy-common'
 import { Request } from 'express'
 import fetch, { HeaderInit, Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
@@ -11,35 +6,15 @@ import { IAction } from './action.interface'
 import { IOAbstract } from './io.abstract'
 import { Session } from './session'
 
-// tslint:disable-next-line: interface-over-type-literal
-export type SignerResponse<R extends OdisRequest> = {
-  url: string
-  res: OdisResponse<R>
-  status: number
-}
-
 export interface Signer {
   url: string
   fallbackUrl?: string
 }
 
-export abstract class CombineAction<R extends OdisRequest> implements IAction<R> {
-  readonly timeoutMs: number
+export abstract class CombineAbstract<R extends OdisRequest> implements IAction<R> {
   readonly signers: Signer[]
-  readonly threshold: number
-  readonly enabled: boolean
-  readonly pubKey: string
-  readonly keyVersion: number
-  readonly polynomial: string
-
-  public constructor(config: OdisConfig, readonly io: IOAbstract<R>) {
-    this.timeoutMs = config.odisServices.timeoutMilliSeconds
-    this.signers = JSON.parse(config.odisServices.signers)
-    this.threshold = config.keys.threshold
-    this.enabled = config.enabled
-    this.pubKey = config.keys.pubKey
-    this.keyVersion = config.keys.version
-    this.polynomial = config.keys.polynomial
+  public constructor(readonly config: OdisConfig, readonly io: IOAbstract<R>) {
+    this.signers = JSON.parse(config.odisServices.signers) // TODO(Alec): io-ts here?
   }
 
   async perform(session: Session<R>) {
@@ -59,7 +34,7 @@ export abstract class CombineAction<R extends OdisRequest> implements IAction<R>
     const timeout = setTimeout(() => {
       session.timedOut = true
       session.controller.abort()
-    }, this.timeoutMs)
+    }, this.config.odisServices.timeoutMilliSeconds)
 
     // Forward request to signers
     await Promise.all(this.signers.map((signer) => this.forwardToSigner(signer, session)))
@@ -90,11 +65,6 @@ export abstract class CombineAction<R extends OdisRequest> implements IAction<R>
     url: string,
     session: Session<R>
   ): Promise<void>
-  // protected abstract validateSignerResponse(
-  //   data: string,
-  //   url: string,
-  //   session: Session<R>
-  // ): OdisResponse<R>
 
   protected headers(_request: Request<{}, {}, R>): HeaderInit | undefined {
     return {
@@ -166,7 +136,7 @@ export abstract class CombineAction<R extends OdisRequest> implements IAction<R>
     if (errorCode) {
       session.incrementErrorCodeCount(errorCode)
     }
-    if (this.signers.length - session.failedSigners.size < this.threshold) {
+    if (this.signers.length - session.failedSigners.size < this.config.keys.threshold) {
       session.logger.info('Not possible to reach a threshold of signer responses. Failing fast')
       session.controller.abort()
     }

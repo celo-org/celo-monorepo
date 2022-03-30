@@ -16,11 +16,13 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
+import { BLSCryptographyClient } from '../../bls/bls-cryptography-client'
 import { VERSION } from '../../config'
-import { IOAbstract } from '../io.abstract'
+import { SignIOAbstract } from '../io.abstract'
 import { Session } from '../session'
+import { DomainSignSession } from './sign.session'
 
-export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
+export class DomainSignIO extends SignIOAbstract<DomainRestrictedSignatureRequest> {
   readonly endpoint = CombinerEndpoint.DOMAIN_SIGN
   readonly signerEndpoint = getSignerEndpoint(this.endpoint)
 
@@ -39,7 +41,15 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response)
+    return new DomainSignSession(
+      request,
+      response,
+      new BLSCryptographyClient(
+        this.config.keys.threshold,
+        this.config.keys.pubKey,
+        this.config.keys.polynomial
+      )
+    )
   }
 
   validate(
@@ -63,7 +73,7 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
     const res: unknown = JSON.parse(data)
     if (!domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
       // TODO(Alec): add error type for this
-      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
+      const msg = `Signer request to ${url + this.signerEndpoint} returned malformed response`
       session.logger.error({ data, signer: url }, msg)
       throw new Error(msg)
     }
@@ -76,6 +86,7 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
     signature: string,
     domainState: DomainState
   ) {
+    // TODO(Alec)
     // response.set(KEY_VERSION_HEADER, key.version.toString())
     send(
       response,

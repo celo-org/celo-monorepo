@@ -1,20 +1,24 @@
 import { SignMessageRequest } from '@celo/identity/lib/odis/query'
-import { ErrorType, send, SignMessageResponseFailure, SignMessageResponseSuccess } from '@celo/phone-number-privacy-common'
+import {
+  ErrorType,
+  send,
+  SignMessageResponseFailure,
+  SignMessageResponseSuccess,
+} from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { HeaderInit } from 'node-fetch'
 import { VERSION } from '../../config'
+import { Session } from '../session'
 import { SignAbstract } from '../sign.abstract'
-import { PnpSignSession } from './sign.session'
 
 export class PnpSignAction extends SignAbstract<SignMessageRequest> {
-
-  async combine(session: PnpSignSession): Promise<void> {
+  async combine(session: Session<SignMessageRequest>): Promise<void> {
     // this.logResponseDiscrepancies(session)
 
-    if (session.blsCryptoClient.hasSufficientSignatures()) {
+    if (session.crypto.hasSufficientSignatures()) {
       try {
-        const combinedSignature = await session.blsCryptoClient.combinePartialBlindedSignatures(
+        const combinedSignature = await session.crypto.combinePartialBlindedSignatures(
           this.parseBlindedMessage(session.request.body),
           session.logger
         )

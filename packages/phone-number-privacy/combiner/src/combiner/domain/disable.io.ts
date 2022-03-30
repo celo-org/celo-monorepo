@@ -13,7 +13,7 @@ import {
   send,
   SignerEndpoint,
   verifyDisableDomainRequestAuthenticity,
-  WarningMessage
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { VERSION } from '../../config'
@@ -96,6 +96,6 @@ export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
+    // Counters.responses.labels(this.endpoint, status.toString()).inc() // TODO(Alec)
   }
 }

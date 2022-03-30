@@ -1,31 +1,33 @@
 import {
   CombinerEndpoint,
-  DomainRestrictedSignatureRequest, getSignerEndpoint, SignerEndpoint
+  DomainRestrictedSignatureRequest,
+  getSignerEndpoint,
+  SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import { OdisConfig } from '../../config'
-import { IOAbstract } from '../io.abstract'
+import { SignIOAbstract } from '../io.abstract'
 import { Session } from '../session'
 import { SignAbstract } from '../sign.abstract'
-import { findThresholdDomainState } from './quota.action'
-import { DomainSignSession } from './sign.session'
+import { DomainStateCombinerService } from './state.service'
 
 export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_SIGN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
 
   constructor(
-    config: OdisConfig, 
-    readonly io: IOAbstract<DomainRestrictedSignatureRequest>
-  ) { 
+    readonly config: OdisConfig,
+    readonly io: SignIOAbstract<DomainRestrictedSignatureRequest>,
+    readonly stateCombiner: DomainStateCombinerService<DomainRestrictedSignatureRequest>
+  ) {
     super(config, io)
   }
 
-  async combine(session: DomainSignSession): Promise<void> {
+  async combine(session: Session<DomainRestrictedSignatureRequest>): Promise<void> {
     this.logResponseDiscrepancies(session)
 
-    if (session.blsCryptoClient.hasSufficientSignatures()) {
+    if (session.crypto.hasSufficientSignatures()) {
       try {
-        const combinedSignature = await session.blsCryptoClient.combinePartialBlindedSignatures(
+        const combinedSignature = await session.crypto.combinePartialBlindedSignatures(
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
@@ -35,7 +37,7 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
           session.response,
           session.logger,
           combinedSignature,
-          findThresholdDomainState(session)
+          this.stateCombiner.findThresholdDomainState(session) // TODO(Alec): naming
         )
       } catch {
         // May fail upon combining signatures if too many sigs are invalid
