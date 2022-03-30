@@ -1,6 +1,6 @@
 # ContractKit
 
-Celo's ContractKit is a library to help developers and validators to interact with the celo-blockchain.
+Celo's ContractKit is a library to help developers and validators to interact with the Celo blockchain.
 
 ContractKit supports the following functionality:
 
@@ -13,10 +13,11 @@ ContractKit supports the following functionality:
 
 ## User Guide
 
-### TIP
+:::tip
 
 You might not need the full ContractKit, Consider using `@celo/connect` which powers much of ContractKit such as building and sending Transactions, signing, etc, but does not give access to any celo Contract Wrappers. Or if a subset of Wrappers, setting the feeCurrency and account info is all your dapp needs consider replacing your imports of Contractkit with `@celo/contractkit/lib/mini-kit`
 
+:::
 
 ### Getting Started
 
@@ -28,7 +29,7 @@ npm install @celo/contractkit
 yarn add @celo/contractkit
 ```
 
-You will need Node.js v12.x. or greater
+You will need Node.js v12.x. or greater.
 
 To start working with contractkit you need a `kit` instance:
 
@@ -74,7 +75,7 @@ async function getKit(myAddress: string, privateKey: string) {
 
 ### Interacting with CELO & cUSD
 
-celo-blockchain has two initial coins: CELO and cUSD (stableToken).
+Celo has two initial coins: CELO and cUSD (stableToken).
 Both implement the ERC20 standard, and to interact with them is as simple as:
 
 ```ts
@@ -117,7 +118,7 @@ const hash = await tx.getHash()
 const receipt = await tx.waitReceipt()
 ```
 
-### Interacting with Other Contracts
+### Interacting with Core Contracts
 
 There are many core contracts.
 
@@ -145,27 +146,24 @@ There are many core contracts.
 - StableTokenWrapper
 - ValidatorsWrapper
 
-#### Thru Kit
+#### Through Kit
 
-When using the Kit you can access Contracts like
+When using the `kit` you can access core contracts like
 
-` kit.contracts.get{ContractName}`
+`kit.contracts.get{ContractName}`
 
-E.G. ` kit.contracts.getAccounts()`,  ` kit.contracts.getValidators()` `
+E.G. `kit.contracts.getAccounts()`,  `kit.contracts.getValidators()`
 
 
 #### Stand Alone
 
-You can also initialize contracts directly. They Require a `Connection`
+You can also initialize contracts directly. They require a `Connection`:
 
 ```typescript
+// MiniContractKit only gives access to a limited set of Contracts, so we import Multisig
 
-// MiniContractKit only gives access to a Limited Set of Contracts, so we import Multisig
-
-import {newKit} from "@celo/contractkit/lib/mini-kit"
+import { newKit } from "@celo/contractkit/lib/mini-kit"
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
-
-
 
 const miniKit = newKit("https://alfajores-forno.celo-testnet.org/")
 
@@ -173,9 +171,7 @@ const miniKit = newKit("https://alfajores-forno.celo-testnet.org/")
 // const connection = new Connection(web3)
 
 const multisig = new MultiSigWrapper(miniKit.connection)
-
 ```
-
 
 ### Accessing web3 contract wrappers
 
@@ -188,7 +184,6 @@ To do so, you can:
 ```ts
 const web3Exchange = await kit._web3Contracts.getExchange()
 ```
-
 
 We expose native wrappers for all Celo core contracts.
 
@@ -211,12 +206,12 @@ The complete list of Celo Core contracts is:
 - StableToken
 - Validators
 
-## A Note About Contract Addresses
+### A Note About Contract Addresses
 
 Celo Core Contracts addresses, can be obtained by looking at the `Registry` contract.
-That's actually how `kit` obtain them.
+That's how `kit` obtains them.
 
-We expose the registry api, which can be accessed by:
+We expose the registry API, which can be accessed by:
 
 ```ts
 const goldTokenAddress = await kit.registry.addressFor(CeloContract.GoldToken)
@@ -230,7 +225,11 @@ Celo transaction object is not the same as Ethereum's. There are three new field
 - gatewayFeeRecipient (coinbase address of the full serving the light client's trasactions)
 - gatewayFee (value paid to the gateway fee recipient, denominated in the fee currency)
 
-This means that using `web3.eth.sendTransaction` or `myContract.methods.transfer().send()` should be avoided.
+:::note
+The `gatewayFeeRecipient`, and `gatewayFee` fields are currently not used by the protocol.
+:::
+
+This means that using `web3.eth.sendTransaction` or `myContract.methods.transfer().send()` should be avoided to take advantage of paying transaction fees in alternative currencies.
 
 Instead, `kit` provides an utility method to send transaction in both scenarios. **If you use contract wrappers, there is no need to use this.**
 
