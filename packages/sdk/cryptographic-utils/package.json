@@ -26,7 +26,7 @@
     "@types/bn.js": "^5.1.0",
     "@types/elliptic": "^6.4.9",
     "@types/ethereumjs-util": "^5.2.0",
-    "@types/node": "^14.12.18",
+    "@types/node": "^10.12.18",
     "@types/randombytes": "^2.0.0",
     "bigi": "^1.1.0",
     "bip32": "^2.0.6",
