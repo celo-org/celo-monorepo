@@ -40,15 +40,28 @@ import { newKit } from '@celo/contractkit' // or import { newKit } from '@celo/c
 const kit = newKit('https://alfajores-forno.celo-testnet.org')
 ```
 
-To access balance:
+To access balances:
 
 ```ts
-const balances = await kit.getTotalBalance()
-// on Contractkit {lockedGold, pending, cUSD, cEUR, cBRL}
+// returns an object with {lockedGold, pending, cUSD, cEUR, cBRL}
 
-// on MiniContractKit {cUSD, cEUR, cBRL}
+const balances = await kit.getTotalBalance()
+
+// returns an object with {cUSD, cEUR, cBRL}
+const balances = await miniKit.getTotalBalance()
 
 ```
+
+If you don't need the balances of all tokens use the balanceOf method
+```ts
+
+const stableTokenWrapper = await kit.getStableToken(StableToken.cREAL)
+
+const cRealBalance = stableTokenWrapper.balanceOf(accountAddress)
+
+```
+
+
 
 ### Setting Default Tx Options
 
@@ -101,21 +114,22 @@ const hash = await tx.getHash()
 const receipt = await tx.waitReceipt()
 ```
 
-If you would like to pay fees in cUSD, set the gas price manually:
+If you would like to pay fees in cUSD, (or other cStables like cEUR, cUSD).
 
 ```ts
-const stableTokenAddress = await kit.registry.addressFor(CeloContract.StableToken)
-const gasPriceMinimumContract = await kit.contracts.getGasPriceMinimum()
-const gasPriceMinimum = await gasPriceMinimumContract.getGasPriceMinimum(stableTokenAddress)
-const gasPrice = Math.ceil(gasPriceMinimum * 1.3) // Wiggle room if gas price minimum changes before tx is sent
-contractKit.setFeeCurrency(CeloContract.StableToken) // Default to paying fees in cUSD
+
+kit.setFeeCurrency(CeloContract.StableToken) // Default to paying fees in cUSD
 
 const stableTokenContract = kit.contracts.getStableToken()
+
 const tx = await stableTokenContract
   .transfer(recipient, weiTransferAmount)
   .send({ from: myAddress, gasPrice })
+
 const hash = await tx.getHash()
+
 const receipt = await tx.waitReceipt()
+
 ```
 
 ### Interacting with Core Contracts
@@ -146,7 +160,7 @@ There are many core contracts.
 - StableTokenWrapper
 - ValidatorsWrapper
 
-#### Through Kit
+#### Wrappers Through Kit
 
 When using the `kit` you can access core contracts like
 
@@ -155,7 +169,7 @@ When using the `kit` you can access core contracts like
 E.G. `kit.contracts.getAccounts()`,  `kit.contracts.getValidators()`
 
 
-#### Stand Alone
+#### Stand Alone Wrappers
 
 You can also initialize contracts directly. They require a `Connection`:
 
