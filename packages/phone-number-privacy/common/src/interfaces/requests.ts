@@ -1,19 +1,27 @@
 import {
   EIP712Optional,
+  eip712OptionalSchema,
   eip712OptionalType,
   EIP712TypedData,
   noString,
 } from '@celo/utils/lib/sign-typed-data-utils'
 import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
+import { chain, isRight } from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/pipeable'
+import * as t from 'io-ts'
 import {
   Domain,
   domainEIP712Types,
   DomainOptions,
   domainOptionsEIP712Types,
-  KnownDomain,
-  KnownDomainOptions,
+  isSequentialDelayDomain,
   SequentialDelayDomain,
+  SequentialDelayDomainOptionsSchema,
 } from '../domains'
+
+// Domain request types are only assignable to EIP712Object when using type instead
+// of interface. Otherwise the compiler complains about a missing index signature.
+// tslint:disable:interface-over-type-literal
 
 export enum PhoneNumberPrivacyEndpoint {
   STATUS = '/status',
@@ -92,29 +100,23 @@ export type PhoneNumberPrivacyRequest =
  * domain, as specified by CIP-40.
  *
  * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
+ * DomainOptions. If the specified Domain has associated options, then the options field is
  * required. If not, it must not be provided.
  */
-export type DomainRestrictedSignatureRequest<
-  D extends Domain = Domain,
-  O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
-> = OmitIfNever<
-  {
-    /** Domain specification. Selects the PRF domain and rate limiting rules. */
-    domain: D
-    /**
-     * Domain-specific options.
-     * Used for inputs relevant to the domain, but not part of the domain string.
-     * Example: { "authorization": <signature> } for an account-restricted domain.
-     */
-    options: O
-    /** Query message. A blinded elliptic curve point encoded in base64. */
-    blindedMessage: string
-    /** Client-specified session ID. */
-    sessionID: EIP712Optional<string>
-  },
-  'options'
->
+export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = {
+  /** Domain specification. Selects the PRF domain and rate limiting rules. */
+  domain: D
+  /**
+   * Domain-specific options.
+   * Used for inputs relevant to the domain, but not part of the domain string.
+   * Example: { "authorization": <signature> } for an account-restricted domain.
+   */
+  options: DomainOptions<D>
+  /** Query message. A blinded elliptic curve point encoded in base64. */
+  blindedMessage: string
+  /** Client-specified session ID. */
+  sessionID: EIP712Optional<string>
+}
 
 /**
  * Request to get the quota status of the given domain. ODIS will respond with the current state
@@ -124,23 +126,17 @@ export type DomainRestrictedSignatureRequest<
  * E.g. Quota state may reveal whether or not a user has attempted to recover a given account.
  *
  * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
+ * DomainOptions. If the specified Domain has associated options, then the options field is
  * required. If not, it must not be provided.
  */
-export type DomainQuotaStatusRequest<
-  D extends Domain = Domain,
-  O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
-> = OmitIfNever<
-  {
-    /** Domain specification. Selects the PRF domain and rate limiting rules. */
-    domain: D
-    /** Domain-specific options. */
-    options: O
-    /** Client-specified session ID. */
-    sessionID: EIP712Optional<string>
-  },
-  'options'
->
+export type DomainQuotaStatusRequest<D extends Domain = Domain> = {
+  /** Domain specification. Selects the PRF domain and rate limiting rules. */
+  domain: D
+  /** Domain-specific options. */
+  options: DomainOptions<D>
+  /** Client-specified session ID. */
+  sessionID: EIP712Optional<string>
+}
 
 /**
  * Request to disable a domain such that not further requests for signatures in the given domain
@@ -150,35 +146,156 @@ export type DomainQuotaStatusRequest<
  * Options may be provided for authentication to prevent unintended parties from disabling a domain.
  *
  * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If a DomainOptions type parameter is specified, then the options field is
+ * DomainOptions. If the specified Domain has associated options, then the options field is
  * required. If not, it must not be provided.
  */
-export type DisableDomainRequest<
-  D extends Domain = Domain,
-  O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
-> = OmitIfNever<
-  {
-    /** Domain specification. Selects the PRF domain and rate limiting rules. */
-    domain: D
-    /** Domain-specific options. */
-    options: O
-    /** Client-specified session ID. */
-    sessionID: EIP712Optional<string>
-  },
-  'options'
->
+export type DisableDomainRequest<D extends Domain = Domain> = {
+  /** Domain specification. Selects the PRF domain and rate limiting rules. */
+  domain: D
+  /** Domain-specific options. */
+  options: DomainOptions<D>
+  /** Client-specified session ID. */
+  sessionID: EIP712Optional<string>
+}
 
 /** Union type of Domain API requests */
-export type DomainRequest<
-  D extends Domain = Domain,
-  O extends DomainOptions = D extends KnownDomain ? KnownDomainOptions<D> : never
-> =
-  | DomainRestrictedSignatureRequest<D, O>
-  | DomainQuotaStatusRequest<D, O>
-  | DisableDomainRequest<D, O>
+export type DomainRequest<D extends Domain = Domain> =
+  | DomainRestrictedSignatureRequest<D>
+  | DomainQuotaStatusRequest<D>
+  | DisableDomainRequest<D>
+
+// NOTE: Next three functions are a bit repetitive. An attempt was made to combine them, but the
+// type signature got quite complicated. Feel free to attempt it if you are motivated. TODO(Alec)
+
+/** Parameterized schema for checking unknown input against DomainRestrictedSignatureRequest */
+export function domainRestrictedSignatureRequestSchema<D extends Domain = Domain>(
+  domain: t.Type<D>
+): t.Type<DomainRestrictedSignatureRequest<D>> {
+  // The schema defined here does most of the work, but does not guarantee consistency between the
+  // domain and options fields. We wrap the schema below to add a consistency check.
+  const schema = t.strict({
+    domain,
+    options: t.unknown,
+    blindedMessage: t.string,
+    sessionID: eip712OptionalSchema(t.string),
+  })
+
+  const validation = (
+    unk: unknown,
+    ctx: t.Context
+  ): t.Validation<DomainRestrictedSignatureRequest<D>> =>
+    pipe(
+      schema.validate(unk, ctx),
+      chain((value: t.TypeOf<typeof schema>) => {
+        if (isSequentialDelayDomain(value.domain)) {
+          const either = SequentialDelayDomainOptionsSchema.validate(value.options, ctx)
+          if (isRight(either)) {
+            return t.success(value as DomainRestrictedSignatureRequest<D>)
+          }
+
+          return t.failure(unk, ctx, 'options type does not match domain type')
+        }
+
+        // canary provides a compile-time check that all subtypes of Domain have branches. If a case
+        // was missed, then an error will report that domain cannot be assigned to type `never`.
+        const canary = (x: never) => x
+        canary(value.domain)
+        throw new Error('Implementation error: validated domain is not of any known type')
+      })
+    )
+
+  return new t.Type<DomainRestrictedSignatureRequest<D>, DomainRestrictedSignatureRequest<D>>(
+    `DomainRestrictedSignatureRequestSchema<${domain.name}>`,
+    (unk: unknown): unk is DomainRestrictedSignatureRequest<D> => isRight(validation(unk, [])),
+    validation,
+    (req: DomainRestrictedSignatureRequest<D>) => req
+  )
+}
+
+/** Parameterized schema for checking unknown input against DomainQuotaStatusRequest */
+export function domainQuotaStatusRequestSchema<D extends Domain = Domain>(
+  domain: t.Type<D>
+): t.Type<DomainQuotaStatusRequest<D>> {
+  // The schema defined here does most of the work, but does not guarantee consistency between the
+  // domain and options fields. We wrap the schema below to add a consistency check.
+  const schema = t.strict({
+    domain,
+    options: t.unknown,
+    sessionID: eip712OptionalSchema(t.string),
+  })
+
+  const validation = (unk: unknown, ctx: t.Context): t.Validation<DomainQuotaStatusRequest<D>> =>
+    pipe(
+      schema.validate(unk, ctx),
+      chain((value: t.TypeOf<typeof schema>) => {
+        if (isSequentialDelayDomain(value.domain)) {
+          const either = SequentialDelayDomainOptionsSchema.validate(value.options, ctx)
+          if (isRight(either)) {
+            return t.success(value as DomainQuotaStatusRequest<D>)
+          }
+
+          return t.failure(unk, ctx, 'options type does not match domain type')
+        }
+
+        // canary provides a compile-time check that all subtypes of Domain have branches. If a case
+        // was missed, then an error will report that domain cannot be assigned to type `never`.
+        const canary = (x: never) => x
+        canary(value.domain)
+        throw new Error('Implementation error: validated domain is not of any known type')
+      })
+    )
+
+  return new t.Type<DomainQuotaStatusRequest<D>, DomainQuotaStatusRequest<D>>(
+    `DomainQuotaStatusRequestSchema<${domain.name}>`,
+    (unk: unknown): unk is DomainQuotaStatusRequest<D> => isRight(validation(unk, [])),
+    validation,
+    (req: DomainQuotaStatusRequest<D>) => req
+  )
+}
+
+/** Parameterized schema for checking unknown input against DisableDomainRequest */
+export function disableDomainRequestSchema<D extends Domain = Domain>(
+  domain: t.Type<D>
+): t.Type<DisableDomainRequest<D>> {
+  // The schema defined here does most of the work, but does not guarantee consistency between the
+  // domain and options fields. We wrap the schema below to add a consistency check.
+  const schema = t.strict({
+    domain,
+    options: t.unknown,
+    sessionID: eip712OptionalSchema(t.string),
+  })
+
+  const validation = (unk: unknown, ctx: t.Context): t.Validation<DisableDomainRequest<D>> =>
+    pipe(
+      schema.validate(unk, ctx),
+      chain((value: t.TypeOf<typeof schema>) => {
+        if (isSequentialDelayDomain(value.domain)) {
+          const either = SequentialDelayDomainOptionsSchema.validate(value.options, ctx)
+          if (isRight(either)) {
+            return t.success(value as DisableDomainRequest<D>)
+          }
+
+          return t.failure(unk, ctx, 'options type does not match domain type')
+        }
+
+        // canary provides a compile-time check that all subtypes of Domain have branches. If a case
+        // was missed, then an error will report that domain cannot be assigned to type `never`.
+        const canary = (x: never) => x
+        canary(value.domain)
+        throw new Error('Implementation error: validated domain is not of any known type')
+      })
+    )
+
+  return new t.Type<DisableDomainRequest<D>, DisableDomainRequest<D>>(
+    `DisableDomainRequestSchema<${domain.name}>`,
+    (unk: unknown): unk is DisableDomainRequest<D> => isRight(validation(unk, [])),
+    validation,
+    (req: DisableDomainRequest<D>) => req
+  )
+}
 
 /** Wraps the signature request as an EIP-712 typed data structure for hashing and signing */
-export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
+export function domainRestrictedSignatureRequestEIP712<D extends Domain>(
   request: DomainRestrictedSignatureRequest<D>
 ): EIP712TypedData {
   const domainTypes = domainEIP712Types(request.domain)
@@ -189,11 +306,11 @@ export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
         { name: 'blindedMessage', type: 'string' },
         { name: 'domain', type: domainTypes.primaryType },
         // Only include the `options` field in the EIP-712 type if there are options.
-        ...(optionsTypes ? [{ name: 'options', type: optionsTypes.primaryType }] : []),
+        { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
       ...domainTypes.types,
-      ...optionsTypes?.types,
+      ...optionsTypes.types,
       ...eip712OptionalType('string'),
       EIP712Domain: [
         { name: 'name', type: 'string' },
@@ -210,7 +327,7 @@ export function domainRestrictedSignatureRequestEIP712<D extends KnownDomain>(
 }
 
 /** Wraps the domain quota request as an EIP-712 typed data structure for hashing and signing */
-export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
+export function domainQuotaStatusRequestEIP712<D extends Domain>(
   request: DomainQuotaStatusRequest<D>
 ): EIP712TypedData {
   const domainTypes = domainEIP712Types(request.domain)
@@ -220,11 +337,11 @@ export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
       DomainQuotaStatusRequest: [
         { name: 'domain', type: domainTypes.primaryType },
         // Only include the `options` field in the EIP-712 type if there are options.
-        ...(optionsTypes ? [{ name: 'options', type: optionsTypes.primaryType }] : []),
+        { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
       ...domainTypes.types,
-      ...optionsTypes?.types,
+      ...optionsTypes.types,
       ...eip712OptionalType('string'),
       EIP712Domain: [
         { name: 'name', type: 'string' },
@@ -241,7 +358,7 @@ export function domainQuotaStatusRequestEIP712<D extends KnownDomain>(
 }
 
 /** Wraps the disable domain request as an EIP-712 typed data structure for hashing and signing */
-export function disableDomainRequestEIP712<D extends KnownDomain>(
+export function disableDomainRequestEIP712<D extends Domain>(
   request: DisableDomainRequest<D>
 ): EIP712TypedData {
   const domainTypes = domainEIP712Types(request.domain)
@@ -251,11 +368,11 @@ export function disableDomainRequestEIP712<D extends KnownDomain>(
       DisableDomainRequest: [
         { name: 'domain', type: domainTypes.primaryType },
         // Only include the `options` field in the EIP-712 type if there are options.
-        ...(optionsTypes ? [{ name: 'options', type: optionsTypes.primaryType }] : []),
+        { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
       ...domainTypes.types,
-      ...optionsTypes?.types,
+      ...optionsTypes.types,
       ...eip712OptionalType('string'),
       EIP712Domain: [
         { name: 'name', type: 'string' },
@@ -355,12 +472,3 @@ export function verifyDisableDomainRequestSignature(
 ): boolean {
   return verifyRequestSignature(disableDomainRequestEIP712, request)
 }
-
-// Use distributive conditional types to extract from the keys of T, keys with value type != never.
-// Eg. AssignableKeys<{ foo: string, bar: never }, 'foo'|'bar'> = 'foo'
-type AssignableKeys<T, K extends keyof T> = K extends (T[K] extends never ? never : K) ? K : never
-
-// Exclude fields with value type `never` from T. If K is specified, only check those keys.
-// Used above to exclude the 'option' field if its type is specified as `never` (i.e. no options).
-// Eg. OmitIfNever<{ foo: string, bar: never, baz: never }, 'foo'|'bar'> = { foo: string, baz: never }
-type OmitIfNever<T, K extends keyof T = keyof T> = Omit<T, K> & Pick<T, AssignableKeys<T, K>>

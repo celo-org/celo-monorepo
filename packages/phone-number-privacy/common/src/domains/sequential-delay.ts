@@ -68,8 +68,17 @@ export type SequentialDelayDomainOptions = {
   nonce: EIP712Optional<number>
 }
 
+export interface SequentialDelayDomainState {
+  /** Timestamp in seconds since the Unix Epoch determining when a new request will be accepted. */
+  timer: number
+  /** Number of queries that have been accepted for the SequentialDelayDomain instance. */
+  counter: number
+  /** Whether or not the domain has been disabled. If disabled, no more queries will be served */
+  disabled: boolean
+}
+
 /** io-ts schema for encoding and decoding SequentialDelayStage structs */
-export const SequentialDelayStageSchema: t.Type<SequentialDelayStage> = t.type({
+export const SequentialDelayStageSchema: t.Type<SequentialDelayStage> = t.strict({
   delay: t.number,
   resetTimer: eip712OptionalSchema(t.boolean),
   batchSize: eip712OptionalSchema(t.number),
@@ -77,7 +86,7 @@ export const SequentialDelayStageSchema: t.Type<SequentialDelayStage> = t.type({
 })
 
 /** io-ts schema for encoding and decoding SequentialDelayDomain structs */
-export const SequentialDelayDomainSchema: t.Type<SequentialDelayDomain> = t.type({
+export const SequentialDelayDomainSchema: t.Type<SequentialDelayDomain> = t.strict({
   name: t.literal(DomainIdentifiers.SequentialDelay),
   version: t.literal('1'),
   stages: t.array(SequentialDelayStageSchema),
@@ -86,9 +95,16 @@ export const SequentialDelayDomainSchema: t.Type<SequentialDelayDomain> = t.type
 })
 
 /** io-ts schema for encoding and decoding SequentialDelayDomainOptions structs */
-export const SequentialDelayDomainOptionsSchema: t.Type<SequentialDelayDomainOptions> = t.type({
+export const SequentialDelayDomainOptionsSchema: t.Type<SequentialDelayDomainOptions> = t.strict({
   signature: eip712OptionalSchema(t.string),
   nonce: eip712OptionalSchema(t.number),
+})
+
+/** io-ts schema for encoding and decoding SequentialDelayDomainState structs */
+export const SequentialDelayDomainStateSchema: t.Type<SequentialDelayDomainState> = t.strict({
+  timer: t.number,
+  counter: t.number,
+  disabled: t.boolean,
 })
 
 export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDelayDomain =>
@@ -127,15 +143,6 @@ export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
     ...eip712OptionalType('uint256'),
   },
   primaryType: 'SequentialDelayDomainOptions',
-}
-
-export interface SequentialDelayDomainState {
-  /** Timestamp in seconds since the Unix Epoch determining when a new request will be accepted. */
-  timer: number
-  /** Number of queries that have been accepted for the SequentialDelayDomain instance. */
-  counter: number
-  /** Whether or not the domain has been disabled. If disabled, no more queries will be served */
-  disabled: boolean
 }
 
 /** Result values of the sequential delay domain rate limiting function */

@@ -29,6 +29,7 @@
     "bunyan-gke-stackdriver": "0.1.2",
     "dotenv": "^8.2.0",
     "elliptic": "^6.5.4",
+    "io-ts": "2.0.1",
     "is-base64": "^1.1.0"
   },
   "devDependencies": {

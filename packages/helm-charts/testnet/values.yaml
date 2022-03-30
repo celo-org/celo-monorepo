@@ -36,7 +36,6 @@ geth:
     # limits:
     #   memory: "4Gi"
     #   cpu: "4"
-  fullnodeCheckBlockAge: true
   ws_port: 8546
   validatorExtraSnippet: |
     echo "Validator"

@@ -197,6 +197,7 @@ fi
       --vmodule={{ .Values.geth.vmodule }} \
       --datadir=/root/.celo \
       --ipcpath=geth.ipc \
+      --txlookuplimit {{ .Values.geth.txlookuplimit | default 0 }} \
       ${ADDITIONAL_FLAGS}
   env:
   - name: GETH_DEBUG
@@ -224,7 +225,7 @@ fi
       - /bin/sh
       - "-c"
       - |
-{{ include "common.node-health-check" . | indent 8 }}
+{{ include "common.node-health-check" (dict "maxpeers" .maxpeers "light_maxpeers" .light_maxpeers ) | indent 8 }}
     initialDelaySeconds: 20
     periodSeconds: 10
 {{- end }}
@@ -372,46 +373,63 @@ data:
 {{- end -}}
 
 {{- define "common.node-health-check" -}}
-# fail if any wgets fail
-set -euo pipefail
-RPC_URL=http://localhost:8545
-MAX_LATEST_BLOCK_AGE_SECONDS="{{ .Values.geth.readiness_probe_max_block_age_seconds | default 30 }}"
-MAX_EPOCH_BLOCK_AGE_SECONDS="{{ .Values.geth.readiness_probe_max_block_epoch_age_seconds | default 300 }}"
-EPOCH_SIZE="{{ .Values.genesis.epoch_size | default 17280 }}"
-EPOCH_SIZE_LESS_ONE="$(( $EPOCH_SIZE - 1 ))"
+function isReady {
+  geth attach << EOF
 
-# first check if it's syncing
-SYNCING=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_syncing\",\"params\":[],\"id\":65}" $RPC_URL)
-NOT_SYNCING=$(echo $SYNCING | grep -o '"result":false')
-if [ ! $NOT_SYNCING ]; then
-  echo "Node is syncing: $SYNCING"
-  exit 1
-fi
+    // Deployment configuration
+    var maxpeers = {{ required "maxpeers is required" .maxpeers }}
+    var lightpeers = {{ required "light_maxpeers is required"  .light_maxpeers }}
 
-{{ if .Values.geth.fullnodeCheckBlockAge }}
-# then make sure that the latest block is new
-LATEST_BLOCK_JSON=$(wget -q --tries=1 --timeout=5 --header "Content-Type: application/json" -O - --post-data "{\"jsonrpc\":\"2.0\",\"method\":\"eth_getBlockByNumber\",\"params\":[\"latest\", false],\"id\":67}" $RPC_URL)
-BLOCK_TIMESTAMP_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"timestamp":"[^"]*' | grep -o '[a-fA-F0-9]*$')
-BLOCK_NUMBER_HEX=$(echo $LATEST_BLOCK_JSON | grep -o '"number":"[^"]*' | grep -o '[a-fA-F0-9]*$')
-BLOCK_TIMESTAMP=$(( 16#$BLOCK_TIMESTAMP_HEX ))
-BLOCK_NUMBER=$(( 16#$BLOCK_NUMBER_HEX ))
-CURRENT_TIMESTAMP=$(date +%s)
+    // minimum peers to consider eth_syncing a good indicator for considering low chances of new block on chain
+    // With current dial ratio a node will try to open connections to (maxpeers - lightpeers)/3 peers.
+    // Consider 1/5 of (maxpeers - lightpeers) as reference value for peers, with a minimum of 5.
+    var minPeers = (maxpeers - lightpeers) * 0.2
+    if (minPeers > 30) {
+      minPeers = 30
+    } else if (minPeers < 5) {
+      minPeers = 5
+    }
 
-# different age allowed for epoch and epoch+1 blocks
-BLOCK_EPOCH_DIFFERENCE=$(( BLOCK_NUMBER % EPOCH_SIZE ))
-case "$BLOCK_EPOCH_DIFFERENCE" in
-  0|$EPOCH_SIZE_LESS_ONE) ALLOWED_AGE="$MAX_EPOCH_BLOCK_AGE_SECONDS" ;;
-  *) ALLOWED_AGE="$MAX_LATEST_BLOCK_AGE_SECONDS" ;;
-esac
+    // last block max age in seconds
+    var maxAge = 20
 
-# if the most recent block is too old, then indicate the node is not ready
-BLOCK_AGE_SECONDS=$(( $CURRENT_TIMESTAMP - $BLOCK_TIMESTAMP ))
-if [ $BLOCK_AGE_SECONDS -gt $ALLOWED_AGE ]; then
-  echo "Latest block too old. Age: $BLOCK_AGE_SECONDS Block JSON: $LATEST_BLOCK_JSON"
-  exit 1
-fi
-exit 0
-{{- end }}
+    // getLastBlockAge() returns chain lastBlock age in seconds
+    function getLastBlockAge() {
+      var lastBlock = web3.eth.getBlockByNumber(web3.eth.blockNumber)
+      var blockTimestamp = parseInt(lastBlock.timestamp, 16)
+      var now = Math.floor(Date.now() / 1000)
+      return (now - blockTimestamp)
+    }
+
+    // isReady() determines if the node is ready to handle requests
+    // Prints 'CELO BLOCKCHAIN IS READY' if the node is ready
+    function isReady(maxAge, minPeers) {
+      // If block was produced recently -> node is ready
+      if (getLastBlockAge() <= maxAge) {
+        return true
+      }
+      // First let's check if it's syncing. If node is syncing -> there is
+      // peers with blocks ahead from local head -> not ready
+      if (web3.eth.syncing) {
+          return false
+      }
+      // If node is not syncing, lets check the peers
+      if (web3.net.peerCount < minPeers) {
+          // Not enough peers -> Node may have just started -> Not ready
+          return false
+      }
+      // If peers > minPeers and not syncing -> We consider node as ready
+      return true
+    }
+
+    if(isReady(maxAge, minPeers)) {
+      console.log('CELO BLOCKCHAIN IS READY')
+    }
+EOF
+}
+
+# Check if scripts prints 'CELO BLOCKCHAIN IS READY' as readiness signal
+isReady | grep 'CELO BLOCKCHAIN IS READY'
 {{- end }}
 
 {{- define "common.geth-exporter-container" -}}
