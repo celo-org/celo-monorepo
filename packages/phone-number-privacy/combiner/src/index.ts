@@ -13,6 +13,7 @@ import { DomainQuotaAction } from './combiner/domain/quota.action'
 import { DomainQuotaIO } from './combiner/domain/quota.io'
 import { DomainSignAction } from './combiner/domain/sign.action'
 import { DomainSignIO } from './combiner/domain/sign.io'
+import { DomainStateCombinerService } from './combiner/domain/state.service'
 import { PnpSignAction } from './combiner/pnp/sign.action'
 import { PnpSignIO } from './combiner/pnp/sign.io'
 import config from './config'
@@ -82,7 +83,11 @@ export const getBlindedMessageSig = functions
   })
 
 const domainSignHandler = new Controller(
-  new DomainSignAction(config.domains, new DomainSignIO(config.domains))
+  new DomainSignAction(
+    config.domains,
+    new DomainSignIO(config.domains),
+    new DomainStateCombinerService(config.domains)
+  )
 )
 export const domainSign = functions
   .region('us-central1', 'europe-west3')
@@ -92,7 +97,11 @@ export const domainSign = functions
   })
 
 const domainQuotaStatusHandler = new Controller(
-  new DomainQuotaAction(config.domains, new DomainQuotaIO(config.domains))
+  new DomainQuotaAction(
+    config.domains,
+    new DomainQuotaIO(config.domains),
+    new DomainStateCombinerService(config.domains)
+  )
 )
 export const domainQuotaStatus = functions
   .region('us-central1', 'europe-west3')

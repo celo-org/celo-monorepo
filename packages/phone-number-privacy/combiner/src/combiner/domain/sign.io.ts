@@ -18,11 +18,10 @@ import {
 import { Request, Response } from 'express'
 import { BLSCryptographyClient } from '../../bls/bls-cryptography-client'
 import { VERSION } from '../../config'
-import { SignIOAbstract } from '../io.abstract'
+import { IOAbstract } from '../io.abstract'
 import { Session } from '../session'
-import { DomainSignSession } from './sign.session'
 
-export class DomainSignIO extends SignIOAbstract<DomainRestrictedSignatureRequest> {
+export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
   readonly endpoint = CombinerEndpoint.DOMAIN_SIGN
   readonly signerEndpoint = getSignerEndpoint(this.endpoint)
 
@@ -41,7 +40,7 @@ export class DomainSignIO extends SignIOAbstract<DomainRestrictedSignatureReques
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new DomainSignSession(
+    return new Session(
       request,
       response,
       new BLSCryptographyClient(

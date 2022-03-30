@@ -5,7 +5,7 @@ import {
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
 import { OdisConfig } from '../../config'
-import { SignIOAbstract } from '../io.abstract'
+import { IOAbstract } from '../io.abstract'
 import { Session } from '../session'
 import { SignAbstract } from '../sign.abstract'
 import { DomainStateCombinerService } from './state.service'
@@ -16,7 +16,7 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
 
   constructor(
     readonly config: OdisConfig,
-    readonly io: SignIOAbstract<DomainRestrictedSignatureRequest>,
+    readonly io: IOAbstract<DomainRestrictedSignatureRequest>,
     readonly stateCombiner: DomainStateCombinerService<DomainRestrictedSignatureRequest>
   ) {
     super(config, io)

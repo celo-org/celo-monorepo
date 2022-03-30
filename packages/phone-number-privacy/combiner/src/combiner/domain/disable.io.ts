@@ -35,7 +35,7 @@ export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response)
+    return new Session(request, response, undefined)
   }
 
   validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, DisableDomainRequest> {

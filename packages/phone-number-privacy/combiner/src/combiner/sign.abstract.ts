@@ -10,14 +10,14 @@ import { Request } from 'express'
 import { HeaderInit, Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
 import { CombineAbstract } from './combine.abstract'
-import { SignIOAbstract } from './io.abstract'
+import { IOAbstract } from './io.abstract'
 import { Session } from './session'
 
 export type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
 
 // tslint:disable-next-line: max-classes-per-file
 export abstract class SignAbstract<R extends OdisSignatureRequest> extends CombineAbstract<R> {
-  constructor(readonly config: OdisConfig, readonly io: SignIOAbstract<R>) {
+  constructor(readonly config: OdisConfig, readonly io: IOAbstract<R>) {
     super(config, io)
   }
 
@@ -88,5 +88,5 @@ export abstract class SignAbstract<R extends OdisSignatureRequest> extends Combi
     this.io.sendFailure(error, majorityErrorCode ?? 500, session.response, session.logger)
   }
   // protected abstract logResponseDiscrepancies(session: Session<R>): void
-  protected abstract parseBlindedMessage(req: R): string
+  protected abstract parseBlindedMessage(req: OdisSignatureRequest): string
 }

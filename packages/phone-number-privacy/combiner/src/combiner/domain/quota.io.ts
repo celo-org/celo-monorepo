@@ -15,7 +15,7 @@ import {
   SequentialDelayDomainStateSchema,
   SignerEndpoint,
   verifyDomainQuotaStatusRequestAuthenticity,
-  WarningMessage
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { VERSION } from '../../config'
@@ -37,7 +37,7 @@ export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response)
+    return new Session(request, response, undefined)
   }
 
   validate(

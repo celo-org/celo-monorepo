@@ -21,11 +21,10 @@ import { Request, Response } from 'express'
 import { BLSCryptographyClient } from '../../bls/bls-cryptography-client'
 import { VERSION } from '../../config'
 import { getContractKit } from '../../web3/contracts'
-import { SignIOAbstract } from '../io.abstract'
+import { IOAbstract } from '../io.abstract'
 import { Session } from '../session'
-import { PnpSignSession } from './sign.session'
 
-export class PnpSignIO extends SignIOAbstract<SignMessageRequest> {
+export class PnpSignIO extends IOAbstract<SignMessageRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.SIGN_MESSAGE
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
 
@@ -45,7 +44,7 @@ export class PnpSignIO extends SignIOAbstract<SignMessageRequest> {
       return null
     }
     // TODO(Alec): could these be the same class for both Pnp and Domains?
-    return new PnpSignSession(
+    return new Session(
       request,
       response,
       new BLSCryptographyClient(

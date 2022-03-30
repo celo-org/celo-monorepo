@@ -14,10 +14,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Response as FetchResponse } from 'node-fetch' // TODO(Alec): why are we using both express and node-fetch?
 import { OdisConfig } from '../config'
-import { DomainSignSession } from './domain/sign.session'
-import { PnpSignSession } from './pnp/sign.session'
 import { Session } from './session'
-import { OdisSignatureRequest } from './sign.abstract'
 
 // tslint:disable-next-line: interface-over-type-literal
 export type SignerResponse<R extends OdisRequest> = {
@@ -56,29 +53,6 @@ export abstract class IOAbstract<R extends OdisRequest> {
 
   abstract validateSignerResponse(data: string, url: string, session: Session<R>): OdisResponse<R>
 
-  protected inputChecks(
-    request: Request<{}, {}, unknown>,
-    response: Response<OdisResponse<R>>
-  ): request is Request<{}, {}, R> {
-    if (!this.config.enabled) {
-      this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
-      return false
-    }
-    if (!this.validate(request)) {
-      this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
-      return false
-    }
-    return true
-  }
-}
-
-// tslint:disable-next-line: max-classes-per-file
-export abstract class SignIOAbstract<R extends OdisSignatureRequest> extends IOAbstract<R> {
-  abstract init(
-    request: Request<{}, {}, unknown>,
-    response: Response<OdisResponse<R>>
-  ): Promise<DomainSignSession | PnpSignSession | null> // TODO(Alec)
-
   // TODO(Alec): should forward user key version if possible
   getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
@@ -105,18 +79,18 @@ export abstract class SignIOAbstract<R extends OdisSignatureRequest> extends IOA
     return responseKeyVersion
   }
 
-  // protected inputChecks(
-  //   request: Request<{}, {}, unknown>,
-  //   response: Response<OdisResponse<R>>
-  // ): request is Request<{}, {}, R> {
-  //   if (!this.config.enabled) {
-  //     this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
-  //     return false
-  //   }
-  //   if (!this.validate(request)) {
-  //     this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
-  //     return false
-  //   }
-  //   return true
-  // }
+  protected inputChecks(
+    request: Request<{}, {}, unknown>,
+    response: Response<OdisResponse<R>>
+  ): request is Request<{}, {}, R> {
+    if (!this.config.enabled) {
+      this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
+      return false
+    }
+    if (!this.validate(request)) {
+      this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
+      return false
+    }
+    return true
+  }
 }
