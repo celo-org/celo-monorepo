@@ -10,13 +10,10 @@ import { DomainStateRecord } from '../database/models/domainState'
 import { Session } from './action.interface'
 import { PnpQuotaStatus } from './pnp/quota.service'
 
-export type OdisQuotaStatus<R extends OdisRequest> = R extends
-  | DomainQuotaStatusRequest // @victor do you know how to prevent this weird auto formatting?
-  | DomainRestrictedSignatureRequest
-  ? DomainStateRecord
-  : never | R extends SignMessageRequest | PnpQuotaRequest
-  ? PnpQuotaStatus
-  : never
+// prettier-ignore
+export type OdisQuotaStatus<R extends OdisRequest> =
+  | R extends DomainQuotaStatusRequest | DomainRestrictedSignatureRequest ? DomainStateRecord : never
+  | R extends SignMessageRequest | PnpQuotaRequest ? PnpQuotaStatus : never
 
 export interface OdisQuotaStatusResult<R extends OdisRequest> {
   sufficient: boolean

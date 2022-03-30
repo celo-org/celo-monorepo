@@ -27,7 +27,7 @@ export class MockOdis {
 
   state: Record<string, SequentialDelayDomainState> = {}
 
-  private now = () => Date.now() / 1000
+  private now = () => Math.floor(Date.now() / 1000)
 
   private domainState(hash: Buffer) {
     return (
@@ -130,7 +130,7 @@ export class MockOdis {
           const res = this.quota(
             JSON.parse(req.body) as DomainQuotaStatusRequest<SequentialDelayDomain>
           )
-          debug('Mocking request', { url, req, res })
+          debug('Mocking request', JSON.stringify({ url, req, res }))
           return res
         })
     )
@@ -147,7 +147,7 @@ export class MockOdis {
           const res = this.sign(
             JSON.parse(req.body) as DomainRestrictedSignatureRequest<SequentialDelayDomain>
           )
-          debug('Mocking request', { url, req, res })
+          debug('Mocking request', JSON.stringify({ url, req, res }))
           return res
         })
     )

@@ -8,10 +8,12 @@ import {
   DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
   DomainState,
-  ErrorType, getSignerEndpoint, OdisResponse,
+  ErrorType,
+  getSignerEndpoint,
   send,
-  SequentialDelayDomainStateSchema, verifyDomainRestrictedSignatureRequestAuthenticity,
-  WarningMessage
+  SequentialDelayDomainStateSchema,
+  verifyDomainRestrictedSignatureRequestAuthenticity,
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { VERSION } from '../../config'
@@ -24,7 +26,7 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
 
   async init(
     request: Request<{}, {}, unknown>,
-    response: Response<OdisResponse<DomainRestrictedSignatureRequest>> // @victor type weirdness here
+    response: Response<DomainRestrictedSignatureResponse>
   ): Promise<Session<DomainRestrictedSignatureRequest> | null> {
     if (!super.inputChecks(request, response)) {
       return null

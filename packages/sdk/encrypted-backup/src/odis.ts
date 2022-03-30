@@ -15,6 +15,7 @@ import {
   DomainQuotaStatusResponse,
   domainQuotaStatusResponseSchema,
   DomainQuotaStatusResponseSuccess,
+  DomainRequestTypeTag,
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
   DomainRestrictedSignatureResponse,
@@ -175,6 +176,7 @@ async function requestOdisQuotaStatus(
   wallet?: EIP712Wallet
 ): Promise<Result<DomainQuotaStatusResponseSuccess, BackupError>> {
   const quotaStatusReq: DomainQuotaStatusRequest<SequentialDelayDomain> = {
+    type: DomainRequestTypeTag.QUOTA,
     domain,
     options: {
       signature: noString,
@@ -230,6 +232,7 @@ async function requestOdisDomainSignature(
   wallet?: EIP712Wallet
 ): Promise<Result<DomainRestrictedSignatureResponseSuccess, BackupError>> {
   const signatureReq: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
+    type: DomainRequestTypeTag.SIGN,
     domain,
     options: {
       signature: noString,
