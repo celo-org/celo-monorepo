@@ -8,20 +8,17 @@ This package contains shared classes and functions used by other celo packages. 
 
 ```typescript
 // enums StableTokens and Token are enums, CeloTokenType is the type that must be one of the 2 enums
-import { StableTokens ,Token, CeloTokenType} from "@celo/base"
+import { StableTokens, Token, CeloTokenType } from "@celo/base"
 
 StableTokens.cUSD
 
 StableTokens.cREAL
 
 Token.CELO
-
 ```
 
 ## Notable Functions
 
 ```typescript
-import { eqAddress, normalizeAddress, isNullAddress, } from "@celo/base"
-
-
+import { eqAddress, normalizeAddress, isNullAddress } from "@celo/base"
 ```
