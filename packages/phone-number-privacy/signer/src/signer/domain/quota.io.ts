@@ -1,12 +1,12 @@
 import {
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestSchema,
+  DomainQuotaStatusResponse,
   DomainQuotaStatusResponseFailure,
   DomainQuotaStatusResponseSuccess,
   DomainSchema,
   DomainState,
   ErrorType,
-  OdisResponse,
   send,
   SignerEndpoint,
   verifyDomainQuotaStatusRequestAuthenticity,
@@ -23,7 +23,7 @@ export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
 
   async init(
     request: Request<{}, {}, unknown>,
-    response: Response<OdisResponse<DomainQuotaStatusRequest>> // @victor I'm seeing some weird type stuff here if I use DomainQuotaStatusResponse
+    response: Response<DomainQuotaStatusResponse>
   ): Promise<DomainSession<DomainQuotaStatusRequest> | null> {
     if (!super.inputChecks(request, response)) {
       return null

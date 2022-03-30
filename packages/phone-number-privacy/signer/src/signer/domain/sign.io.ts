@@ -1,13 +1,13 @@
 import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestSchema,
+  DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseFailure,
   DomainRestrictedSignatureResponseSuccess,
   DomainSchema,
   DomainState,
   ErrorType,
   KEY_VERSION_HEADER,
-  OdisResponse,
   send,
   SignerEndpoint,
   verifyDomainRestrictedSignatureRequestAuthenticity,
@@ -25,7 +25,7 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
 
   async init(
     request: Request<{}, {}, unknown>,
-    response: Response<OdisResponse<DomainRestrictedSignatureRequest>> // @victor type weirdness here
+    response: Response<DomainRestrictedSignatureResponse>
   ): Promise<DomainSession<DomainRestrictedSignatureRequest> | null> {
     if (!super.inputChecks(request, response)) {
       return null
