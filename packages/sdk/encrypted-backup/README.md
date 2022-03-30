@@ -25,7 +25,7 @@ import { createPinEncryptedBackup } from '@celo/encrypted-backup'
 
 const backup = await createPinEncryptedBackup(accountData, userPin)
 if (!backup.ok) {
-  // handle errors
+  // handle backup.error
 }
 storeUserBackup(backup.result)
 ```
@@ -42,9 +42,9 @@ user account.
 import { openBackup } from '@celo/encrypted-backup'
 
 const backup = await fetchUserBackup()
-const accountData await openBackup(backup, userPin)
+const accountData = await openBackup(backup, userPin)
 if (!accountKey.ok) {
-  // handle errors
+  // handle backup.error
 }
 restoreAccount(accountData.result)
 ```
