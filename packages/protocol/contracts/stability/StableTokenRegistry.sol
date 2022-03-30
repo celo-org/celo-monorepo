@@ -1,4 +1,5 @@
 pragma solidity ^0.5.13;
+pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/Initializable.sol";
@@ -27,8 +28,8 @@ contract StableTokenRegistry is Initializable, Ownable {
    * @param existingStableTokenContractNames Collection of stable token smart contract names.
    */
   function initialize(
-    bytes32[] calldata existingFiatTickers,
-    bytes32[] calldata existingStableTokenContractNames
+    bytes[] calldata existingFiatTickers,
+    bytes[] calldata existingStableTokenContractNames
   ) external initializer {
     require(
       existingFiatTickers.length == existingStableTokenContractNames.length,
@@ -36,10 +37,7 @@ contract StableTokenRegistry is Initializable, Ownable {
     );
     _transferOwnership(msg.sender);
     for (uint256 i = 0; i < existingFiatTickers.length; i++) {
-      addNewStableToken(
-        abi.encodePacked(existingFiatTickers[i]),
-        abi.encodePacked(existingStableTokenContractNames[i])
-      );
+      addNewStableToken(existingFiatTickers[i], existingStableTokenContractNames[i]);
     }
   }
 

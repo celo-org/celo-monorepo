@@ -49,7 +49,6 @@ contract('StableTokenRegistry', (accounts: string[]) => {
     })
 
     it('only allows owner', async () => {
-      await strc.addNewStableToken(fiatTicker, stableTokenContractName)
       await assertRevert(strc.removeStableToken(fiatTicker, 0, { from: nonOwner }))
     })
 
@@ -103,6 +102,7 @@ contract('StableTokenRegistry', (accounts: string[]) => {
     })
 
     it('does not allow duplicate values', async () => {
+      await assertRevert(strc.addNewStableToken(fiatTicker, stableTokenContractName))
       await assertRevert(strc.addNewStableToken(fiatTicker, stableTokenContractName))
     })
 
