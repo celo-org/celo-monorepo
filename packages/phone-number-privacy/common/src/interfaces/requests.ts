@@ -112,9 +112,8 @@ export type PhoneNumberPrivacyRequest = SignMessageRequest | MatchmakingRequest 
  * Domain restricted signature request to get a pOPRF evaluation on the given message in a given
  * domain, as specified by CIP-40.
  *
- * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If the specified Domain has associated options, then the options field is
- * required. If not, it must not be provided.
+ * @remarks Concrete request types are created by specifying the type parameter for Domain. If a
+ * domain has no options, an empty struct should be used.
  */
 export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = {
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
@@ -138,9 +137,8 @@ export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = {
  * Options may be provided for authentication in case the quota state is non-public information.
  * E.g. Quota state may reveal whether or not a user has attempted to recover a given account.
  *
- * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If the specified Domain has associated options, then the options field is
- * required. If not, it must not be provided.
+ * @remarks Concrete request types are created by specifying the type parameter for Domain. If a
+ * domain has no options, an empty struct should be used.
  */
 export type DomainQuotaStatusRequest<D extends Domain = Domain> = {
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
@@ -158,9 +156,8 @@ export type DomainQuotaStatusRequest<D extends Domain = Domain> = {
  *
  * Options may be provided for authentication to prevent unintended parties from disabling a domain.
  *
- * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If the specified Domain has associated options, then the options field is
- * required. If not, it must not be provided.
+ * @remarks Concrete request types are created by specifying the type parameter for Domain. If a
+ * domain has no options, an empty struct should be used.
  */
 export type DisableDomainRequest<D extends Domain = Domain> = {
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
