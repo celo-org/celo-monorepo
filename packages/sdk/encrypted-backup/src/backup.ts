@@ -164,7 +164,7 @@ export async function createPinEncryptedBackup({
     throw new Error('Implementation error: unhandled environment identifier')
   }
 
-  return createBackup({ data, userSecret: Buffer.from(pin, 'utf8'), hardening, metadata })
+  return createBackup({ data, userSecret: pin, hardening, metadata })
 }
 
 export interface CreatePasswordEncryptedBackupArgs {
@@ -216,12 +216,12 @@ export async function createPasswordEncryptedBackup({
     throw new Error('Implementation error: unhandled environment identifier')
   }
 
-  return createBackup({ data, userSecret: Buffer.from(password, 'utf8'), hardening, metadata })
+  return createBackup({ data, userSecret: password, hardening, metadata })
 }
 
 export interface CreateBackupArgs {
   data: Buffer
-  userSecret: Buffer
+  userSecret: Buffer | string
   hardening: HardeningConfig
   metadata?: { [key: string]: unknown }
 }
@@ -231,6 +231,7 @@ export interface CreateBackupArgs {
  *
  * @param data The secret data (e.g. BIP-39 mnemonic phrase) to be included in the encrypted backup.
  * @param userSecret Password, PIN, or other user secret to use in deriving the encryption key.
+ *  If a string is provided, it will be UTF-8 encoded into a Buffer before use.
  * @param hardening Configuration for how the password should be hardened in deriving the key.
  * @param metadata Arbitrary key-value data to include in the backup to identify it.
  *
@@ -264,7 +265,9 @@ export async function createBackup({
   const nonce = crypto.randomBytes(32)
   const passwordSalt = nonce.slice(0, 16)
   const odisAuthKeySeed = nonce.slice(16, 32)
-  const initialKey = deriveKey(KDFInfo.PASSWORD, [userSecret, passwordSalt])
+  const userSecretBuffer =
+    typeof userSecret === 'string' ? Buffer.from(userSecret, 'utf8') : userSecret
+  const initialKey = deriveKey(KDFInfo.PASSWORD, [userSecretBuffer, passwordSalt])
 
   // Generate a fuse key and mix it into the entropy of the key
   let encryptedFuseKey: Buffer | undefined
@@ -378,7 +381,7 @@ export async function createBackup({
 
 export interface OpenBackupArgs {
   backup: Backup
-  userSecret: Buffer
+  userSecret: Buffer | string
 }
 
 /**
@@ -386,6 +389,7 @@ export interface OpenBackupArgs {
  *
  * @param backup Backup structure including the ciphertext and key derivation information.
  * @param userSecret Password, PIN, or other user secret to use in deriving the encryption key.
+ *  If a string is provided, it will be UTF-8 encoded into a Buffer before use.
  */
 export async function openBackup({
   backup,
@@ -396,8 +400,9 @@ export async function openBackup({
   // Split the nonce into the two halves for password salting and auth key generation respectively.
   const passwordSalt = backup.nonce.slice(0, 16)
   const odisAuthKeySeed = backup.nonce.slice(16, 32)
-
-  const initialKey = deriveKey(KDFInfo.PASSWORD, [userSecret, passwordSalt])
+  const userSecretBuffer =
+    typeof userSecret === 'string' ? Buffer.from(userSecret, 'utf8') : userSecret
+  const initialKey = deriveKey(KDFInfo.PASSWORD, [userSecretBuffer, passwordSalt])
 
   // If a circuit breaker is in use, request a decryption of the fuse key and mix it in.
   let updatedKey: Buffer
