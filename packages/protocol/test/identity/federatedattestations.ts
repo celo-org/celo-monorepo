@@ -1,4 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+// import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import {
   AccountsContract,
   AccountsInstance,
@@ -34,7 +35,7 @@ contract('Attestations', (accounts: string[]) => {
 
   describe('#initialize()', () => {
     it('TODO ASv2', async () => {
-      // TODO ASv2; asserting these just to keep the vars
+      // TODO ASv2
       assert(caller)
       assert(federatedAttestations)
     })

@@ -57,7 +57,7 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Escrow,
   CeloContractName.Exchange,
   // TODO ASv2 revisit this
-  // CeloContractName.FederatedAttestations,
+  CeloContractName.FederatedAttestations,
   CeloContractName.FeeCurrencyWhitelist,
   CeloContractName.Freezer,
   CeloContractName.GasPriceMinimum,

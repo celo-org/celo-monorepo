@@ -12,6 +12,7 @@ import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newExchangeBrl } from './generated/ExchangeBRL'
 import { newExchangeEur } from './generated/ExchangeEUR'
+import { newFederatedAttestations } from './generated/FederatedAttestations'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
@@ -48,6 +49,7 @@ export const ContractFactories = {
   [CeloContract.Exchange]: newExchange,
   [CeloContract.ExchangeEUR]: newExchangeEur,
   [CeloContract.ExchangeBRL]: newExchangeBrl,
+  [CeloContract.FederatedAttestations]: newFederatedAttestations,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
@@ -113,6 +115,9 @@ export class Web3ContractCache {
   }
   getExchange(stableToken: StableToken = StableToken.cUSD) {
     return this.getContract(this.kit.celoTokens.getExchangeContract(stableToken))
+  }
+  getFederatedAttestations() {
+    return this.getContract(CeloContract.FederatedAttestations)
   }
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)
