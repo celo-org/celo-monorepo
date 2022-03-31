@@ -7,10 +7,6 @@ import {
 import { OdisConfig } from '../../config'
 import { Session } from '../session'
 
-declare type QuotaDependentDomainRequest =
-  | DomainQuotaStatusRequest
-  | DomainRestrictedSignatureRequest
-
 export class DomainStateCombinerService<
   R extends DomainQuotaStatusRequest | DomainRestrictedSignatureRequest
 > {

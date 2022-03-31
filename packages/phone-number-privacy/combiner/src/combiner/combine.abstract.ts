@@ -1,6 +1,5 @@
 import { ErrorMessage, OdisRequest, WarningMessage } from '@celo/phone-number-privacy-common'
-import { Request } from 'express'
-import fetch, { HeaderInit, Response as FetchResponse } from 'node-fetch'
+import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
 import { IAction } from './action.interface'
 import { IOAbstract } from './io.abstract'
@@ -14,7 +13,7 @@ export interface Signer {
 export abstract class CombineAbstract<R extends OdisRequest> implements IAction<R> {
   readonly signers: Signer[]
   public constructor(readonly config: OdisConfig, readonly io: IOAbstract<R>) {
-    this.signers = JSON.parse(config.odisServices.signers) // TODO(Alec): io-ts here?
+    this.signers = JSON.parse(config.odisServices.signers)
   }
 
   async perform(session: Session<R>) {
@@ -22,6 +21,7 @@ export abstract class CombineAbstract<R extends OdisRequest> implements IAction<
   }
 
   async distribute(session: Session<R>): Promise<Session<R>> {
+    // TODO: Factor out this metering code
     const obs = new PerformanceObserver((list) => {
       const entry = list.getEntries()[0]
       session.logger.info(
@@ -50,7 +50,7 @@ export abstract class CombineAbstract<R extends OdisRequest> implements IAction<
   async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
     let signerResponse: FetchResponse
     try {
-      signerResponse = await this.sendMeteredSignerRequest(signer, session)
+      signerResponse = await this.io.fetchSignerResponseWithFallback(signer, session)
     } catch (err) {
       return this.handleSignerRequestFailure(err, signer, session)
     }
@@ -66,48 +66,6 @@ export abstract class CombineAbstract<R extends OdisRequest> implements IAction<
     session: Session<R>
   ): Promise<void>
 
-  protected headers(_request: Request<{}, {}, R>): HeaderInit | undefined {
-    return {
-      // TODO(Alec)
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    }
-  }
-
-  private async sendMeteredSignerRequest(
-    signer: Signer,
-    session: Session<R>
-  ): Promise<FetchResponse> {
-    // TODO(Alec): Factor out this metering code
-    const start = `Start ${signer.url + this.io.signerEndpoint}`
-    const end = `End ${signer.url + this.io.signerEndpoint}`
-    performance.mark(start)
-
-    return this.sendRequest(signer.url, session)
-      .catch((err) => {
-        session.logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
-        if (signer.fallbackUrl) {
-          session.logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
-          return this.sendRequest(signer.fallbackUrl, session)
-        }
-        throw err
-      })
-      .finally(() => {
-        performance.mark(end)
-        performance.measure(signer.url, start, end)
-      })
-  }
-  private async sendRequest(signerUrl: string, session: Session<R>): Promise<FetchResponse> {
-    session.logger.debug({ signerUrl }, `Sending signer request`)
-    const url = signerUrl + this.io.signerEndpoint
-    return fetch(url, {
-      method: 'POST',
-      headers: this.headers(session.request),
-      body: JSON.stringify(session.request.body),
-      signal: session.controller.signal,
-    })
-  }
-
   private async handleSignerResponse(
     signerResponse: FetchResponse,
     signer: Signer,
@@ -117,7 +75,7 @@ export abstract class CombineAbstract<R extends OdisRequest> implements IAction<
       try {
         await this.receiveSuccess(signerResponse, signer.url, session)
       } catch (err) {
-        // TODO(Alec): Review this error handling. Ensure this request gets marked as failed so the
+        // TODO(Alec)(next)(error handling): Review this error handling. Ensure this request gets marked as failed so the
         // fail-fast logic gets triggered as intended.
         session.logger.error(err)
       }
@@ -146,7 +104,7 @@ export abstract class CombineAbstract<R extends OdisRequest> implements IAction<
     let errorCode: number | undefined
     if (err instanceof Error && err.name === 'AbortError' && session.controller.signal.aborted) {
       if (session.timedOut) {
-        errorCode = 504 // @victor what status code should we use here
+        errorCode = 504 // TODO(Alec)
         session.logger.error({ signer }, ErrorMessage.TIMEOUT_FROM_SIGNER)
       } else {
         // Request was cancelled, assuming it would have been successful (no errorCode)

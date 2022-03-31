@@ -34,7 +34,7 @@ export class DomainDisableAction extends CombineAbstract<DisableDomainRequest> {
 
     // In this function HTTP response status is assumed 200. Error if the response is failed.
     if (!res.success) {
-      const msg = `Signer request to ${url}/${this.io.signerEndpoint} failed with 200 status` // TODO(Alec)
+      const msg = `Signer request to ${url + this.io.signerEndpoint} failed with 200 status` // TODO(Alec)
       session.logger.error({ error: res.error, signer: url }, msg)
       throw new Error(msg)
     }

@@ -58,7 +58,7 @@ export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
     const res: unknown = JSON.parse(data)
     if (!domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
       // TODO(Alec): add error type for this
-      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
+      const msg = `Signer request to ${url + this.signerEndpoint} returned malformed response`
       session.logger.error({ data, signer: url }, msg)
       throw new Error(msg)
     }

@@ -178,6 +178,7 @@ export type DomainResponse<
   R extends DomainRequest = DomainRequest
 > = 
   | R extends DomainRestrictedSignatureRequest<infer D> ? DomainRestrictedSignatureResponse<D> : never
+  // tslint:disable-next-line: no-shadowed-variable
   | R extends DomainQuotaStatusRequest<infer D> ? DomainQuotaStatusResponse<D> : never
   | R extends DisableDomainRequest ? DisableDomainResponse : never
 

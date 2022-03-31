@@ -1,6 +1,7 @@
 import {
   authenticateUser,
   CombinerEndpoint,
+  ErrorType,
   getSignerEndpoint,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
@@ -35,15 +36,10 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!this.getRequestKeyVersion(request, response.locals.logger())) {
-      this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
-      return null
-    }
     if (!(await this.authenticate(request, response.locals.logger()))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    // TODO(Alec): could these be the same class for both Pnp and Domains?
     return new Session(
       request,
       response,
@@ -80,7 +76,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
     const res: unknown = JSON.parse(data)
     if (!SignMessageResponseSchema.is(res)) {
       // TODO(Alec): add error type for this
-      const msg = `Signer request to ${url}/${this.signerEndpoint} returned malformed response`
+      const msg = `Signer request to ${url + this.signerEndpoint} returned malformed response`
       session.logger.error({ data, signer: url }, msg)
       throw new Error(msg)
     }
@@ -96,7 +92,6 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
     blockNumber?: number,
     warnings?: string[]
   ) {
-    // response.set(KEY_VERSION_HEADER, key.version.toString())
     send(
       response,
       {
@@ -106,7 +101,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
         performedQueryCount,
         totalQuota,
         blockNumber,
-        warnings, // TODO(Alec)(pnp): update handling of these types in combiner
+        warnings,
       },
       status,
       response.locals.logger()
@@ -115,12 +110,13 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
   }
 
   sendFailure(
-    error: string,
+    error: ErrorType,
     status: number,
     response: Response<SignMessageResponseFailure>,
     queryCount?: number,
     totalQuota?: number,
-    blockNumber?: number
+    blockNumber?: number,
+    signature?: string
   ) {
     send(
       response,
@@ -131,6 +127,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
         performedQueryCount: queryCount,
         totalQuota,
         blockNumber,
+        signature,
       },
       status,
       response.locals.logger()

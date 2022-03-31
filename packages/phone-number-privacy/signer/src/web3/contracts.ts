@@ -24,7 +24,7 @@ declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
 export async function meter<T extends any[], U>(
   inFunction: InFunction<T, U>,
   params: T,
-  onError: (err: any) => any, // TODO(Alec): Should this return U?
+  onError: (err: any) => U,
   prometheus: Histogram<'codeSegment'>,
   name: string
 ): Promise<U> {

@@ -2,12 +2,10 @@ import {
   DomainRestrictedSignatureRequest,
   ErrorMessage,
   ErrorType,
-  KEY_VERSION_HEADER,
   SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { Request } from 'express'
-import { HeaderInit, Response as FetchResponse } from 'node-fetch'
+import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
 import { CombineAbstract } from './combine.abstract'
 import { IOAbstract } from './io.abstract'
@@ -21,21 +19,17 @@ export abstract class SignAbstract<R extends OdisSignatureRequest> extends Combi
     super(config, io)
   }
 
-  protected headers(request: Request<{}, {}, R>): HeaderInit | undefined {
-    return {
-      ...super.headers(request),
-      [KEY_VERSION_HEADER]: this.config.keys.version.toString(),
-    }
-  }
-
   protected async receiveSuccess(
     signerResponse: FetchResponse,
     url: string,
     session: Session<R>
   ): Promise<void> {
     const responseKeyVersion = this.io.getResponseKeyVersion(signerResponse, session.logger)
-    // TODO(Alec)
-    if (!responseKeyVersion) {
+    const requestKeyVersion =
+      this.io.getRequestKeyVersion(session.request, session.logger) ?? this.config.keys.version
+
+    if (responseKeyVersion !== requestKeyVersion) {
+      // TODO(Alec)
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
 
@@ -47,7 +41,7 @@ export abstract class SignAbstract<R extends OdisSignatureRequest> extends Combi
     const res = this.io.validateSignerResponse(data, url, session)
 
     if (!res.success) {
-      throw new Error('DO NOT MERGE: Add error message')
+      throw new Error('DO NOT MERGE: Add error message') // TODO(Alec)
     }
 
     session.responses.push({ url, res, status })
@@ -87,6 +81,6 @@ export abstract class SignAbstract<R extends OdisSignatureRequest> extends Combi
     }
     this.io.sendFailure(error, majorityErrorCode ?? 500, session.response, session.logger)
   }
-  // protected abstract logResponseDiscrepancies(session: Session<R>): void
+
   protected abstract parseBlindedMessage(req: OdisSignatureRequest): string
 }

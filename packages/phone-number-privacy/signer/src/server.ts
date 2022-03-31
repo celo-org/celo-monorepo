@@ -40,7 +40,7 @@ export function createServer() {
     res.send(PromClient.register.metrics())
   })
 
-  // TODO(Alec): Clean this up / add to Controller class
+  // TODO: Clean this up / maybe roll into to Controller class
   const addMeteredSignerEndpoint = (
     endpoint: SignerEndpoint,
     handler: (req: Request, res: Response) => Promise<void>,

@@ -12,8 +12,9 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { Response as FetchResponse } from 'node-fetch' // TODO(Alec): why are we using both express and node-fetch?
+import fetch, { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
+import { Signer } from './combine.abstract'
 import { Session } from './session'
 
 // tslint:disable-next-line: interface-over-type-literal
@@ -53,13 +54,10 @@ export abstract class IOAbstract<R extends OdisRequest> {
 
   abstract validateSignerResponse(data: string, url: string, session: Session<R>): OdisResponse<R>
 
-  // TODO(Alec): should forward user key version if possible
   getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
-    logger.info({ keyVersionHeader })
     const requestedKeyVersion = Number(keyVersionHeader)
-    if (Number.isNaN(requestedKeyVersion) || requestedKeyVersion !== this.config.keys.version) {
-      // TODO(Alec)
+    if (Number.isNaN(requestedKeyVersion)) {
       logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
       return undefined
     }
@@ -70,13 +68,64 @@ export abstract class IOAbstract<R extends OdisRequest> {
   getResponseKeyVersion(response: FetchResponse, logger: Logger): number | undefined {
     const keyVersionHeader = response.headers.get(KEY_VERSION_HEADER)
     const responseKeyVersion = Number(keyVersionHeader)
-    if (Number.isNaN(responseKeyVersion) || responseKeyVersion !== this.config.keys.version) {
-      // TODO(Alec)
+    if (Number.isNaN(responseKeyVersion)) {
       logger.warn({ keyVersionHeader }, ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
       return undefined
     }
     logger.info({ responseKeyVersion }, 'Signer response has valid key version')
     return responseKeyVersion
+  }
+
+  async fetchSignerResponseWithFallback(
+    signer: Signer,
+    session: Session<R>
+  ): Promise<FetchResponse> {
+    // TODO: Factor out this metering code
+    const start = `Start ${signer.url + this.signerEndpoint}`
+    const end = `End ${signer.url + this.signerEndpoint}`
+    performance.mark(start)
+
+    return this.fetchSignerResponse(signer.url, session)
+      .catch((err) => {
+        session.logger.error({ url: signer.url, error: err }, `Signer failed with primary url`)
+        if (signer.fallbackUrl) {
+          session.logger.warn({ url: signer.fallbackUrl }, `Using fallback url to call signer`)
+          return this.fetchSignerResponse(signer.fallbackUrl, session)
+        }
+        throw err
+      })
+      .finally(() => {
+        performance.mark(end)
+        performance.measure(signer.url, start, end)
+      })
+  }
+
+  protected async fetchSignerResponse(
+    signerUrl: string,
+    session: Session<R>
+  ): Promise<FetchResponse> {
+    const { request, logger, controller } = session
+    const url = signerUrl + this.signerEndpoint
+    logger.debug({ url }, `Sending signer request`)
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        ...(request.headers.authorization
+          ? {
+              // Pnp requests provide authorization in the request header
+              Authorization: request.headers.authorization,
+            }
+          : {}),
+        [KEY_VERSION_HEADER]: // Forward requested keyVersion if provided by client,
+        // otherwise use default keyVersion.
+        // This will be ignored for non-signing requests.
+        (this.getRequestKeyVersion(request, logger) ?? this.config.keys.version).toString(),
+      },
+      body: JSON.stringify(request.body),
+      signal: controller.signal,
+    })
   }
 
   protected inputChecks(

@@ -1,16 +1,5 @@
 import { SignMessageRequest } from '@celo/identity/lib/odis/query'
-import {
-  ErrorType,
-  MAX_BLOCK_DISCREPANCY_THRESHOLD,
-  send,
-  SignMessageResponseFailure,
-  SignMessageResponseSuccess,
-  WarningMessage,
-} from '@celo/phone-number-privacy-common'
-import Logger from 'bunyan'
-import { Request, Response } from 'express'
-import { HeaderInit } from 'node-fetch'
-import { VERSION } from '../../config'
+import { MAX_BLOCK_DISCREPANCY_THRESHOLD, WarningMessage } from '@celo/phone-number-privacy-common'
 import { Session } from '../session'
 import { SignAbstract } from '../sign.abstract'
 
@@ -25,7 +14,7 @@ export class PnpSignAction extends SignAbstract<SignMessageRequest> {
           session.logger
         )
         // TODO(Alec)(Next)(responding): return other fields?
-        return this.sendSuccess(200, session.response, session.logger, combinedSignature)
+        return this.io.sendSuccess(200, session.response, session.logger, combinedSignature)
       } catch {
         // May fail upon combining signatures if too many sigs are invalid
         // Fallback to handleMissingSignatures
@@ -35,63 +24,8 @@ export class PnpSignAction extends SignAbstract<SignMessageRequest> {
     this.handleMissingSignatures(session)
   }
 
-  protected headers(request: Request<{}, {}, SignMessageRequest>): HeaderInit | undefined {
-    return {
-      ...super.headers(request),
-      ...(request.headers.authorization ? { Authorization: request.headers.authorization } : {}),
-    }
-  }
-
   protected parseBlindedMessage(req: SignMessageRequest): string {
     return req.blindedQueryPhoneNumber
-  }
-
-  protected sendSuccess(
-    status: number,
-    response: Response<SignMessageResponseSuccess>,
-    logger: Logger,
-    combinedSignature: string
-  ) {
-    send(
-      response,
-      {
-        success: true,
-        version: VERSION,
-        signature: combinedSignature,
-        performedQueryCount: undefined,
-        totalQuota: undefined,
-        blockNumber: undefined,
-        warnings: undefined,
-      },
-      status,
-      logger
-    )
-  }
-
-  protected sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<SignMessageResponseFailure>,
-    logger: Logger,
-    performedQueryCount?: number,
-    totalQuota?: number,
-    blockNumber?: number,
-    signature?: string
-  ) {
-    send(
-      response,
-      {
-        success: false,
-        version: VERSION,
-        error,
-        performedQueryCount,
-        totalQuota,
-        blockNumber,
-        signature,
-      },
-      status,
-      logger
-    )
   }
 
   protected logResponseDiscrepancies(session: Session<SignMessageRequest>): void {
