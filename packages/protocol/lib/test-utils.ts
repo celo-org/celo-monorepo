@@ -377,6 +377,7 @@ export const isSameAddress = (minerAddress, otherAddress) => {
 // TODO(amy): Pull this list from the build artifacts instead
 export const proxiedContracts: string[] = [
   'Attestations',
+  // TODO ASv2 revisit if we need to update test-utils
   'Escrow',
   'GoldToken',
   'Registry',
@@ -388,6 +389,7 @@ export const proxiedContracts: string[] = [
 // TODO(asa): Pull this list from the build artifacts instead
 export const ownedContracts: string[] = [
   'Attestations',
+  // TODO ASv2 revisit if we need to update test-utils
   'Escrow',
   'Exchange',
   'Registry',
