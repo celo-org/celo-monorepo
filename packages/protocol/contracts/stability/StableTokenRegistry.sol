@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/Initializable.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/interfaces/IRegistry.sol";
+import "../common/UsingRegistry.sol";
 
 /**
  * @title contract that lists what stable coins are deployed as part of Celo's Stability protocol.
@@ -23,24 +24,28 @@ contract StableTokenRegistry is Initializable, Ownable {
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param existingFiatTickers Collection of fiat currencies issued already.
-   * @param existingStableTokenContractNames Collection of stable token smart contract names.
+   * @param fiatTicker Collection of fiat currencies issued already.
+   * @param stableTokenContractName Collection of stable token smart contract names.
    */
-  function initialize(
-    bytes32[] calldata existingFiatTickers,
-    bytes32[] calldata existingStableTokenContractNames
-  ) external initializer {
-    require(
-      existingFiatTickers.length == existingStableTokenContractNames.length,
-      "Array length mismatch"
-    );
+  function initialize(bytes calldata fiatTicker, bytes calldata stableTokenContractName)
+    external
+    initializer
+  {
+    // require(
+    //   existingFiatTickers.length == existingStableTokenContractNames.length,
+    //   "Array length mismatch"
+    // );
     _transferOwnership(msg.sender);
-    for (uint256 i = 0; i < existingFiatTickers.length; i++) {
-      addNewStableToken(
-        abi.encodePacked(existingFiatTickers[i]),
-        abi.encodePacked(existingStableTokenContractNames[i])
-      );
-    }
+    bytes memory USD = bytes("USD");
+    bytes memory StableToken = "537461626c65546f6b656e";
+    bytes memory EUR = "455552";
+    bytes memory StableTokenEUR = "537461626c65546f6b656e455552";
+    bytes memory BRL = "42524c";
+    bytes memory StableTokenBRL = "537461626c65546f6b656e42524c";
+    addNewStableToken(bytes("USD"), bytes("StableToken"));
+    addNewStableToken(bytes("EUR"), bytes("StableTokenEUR"));
+    addNewStableToken(bytes("BRL"), bytes("StableTokenBRL"));
+    addNewStableToken(fiatTicker, stableTokenContractName);
   }
 
   /**
@@ -110,5 +115,15 @@ contract StableTokenRegistry is Initializable, Ownable {
     require(stableTokens[fiatTicker].length == 0, "This registry already exists");
     stableTokens[fiatTicker] = stableTokenContractName;
     fiatTickers.push(fiatTicker);
+  }
+
+  // TODO make function that inputs fiatTicker and returns a StableTokenContract
+
+  /**
+   * @notice Adds new Fiat Ticker and Stable Token contract to the registry.
+   * @param fiatTicker The currency we are trying to add in the registry.
+   */
+  function getFiatTickerLength(bytes memory fiatTicker) public returns (bytes memory) {
+    return stableTokens[fiatTicker];
   }
 }
