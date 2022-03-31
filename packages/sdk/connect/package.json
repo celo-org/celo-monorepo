@@ -1,6 +1,6 @@
 {
   "name": "@celo/connect",
-  "version": "2.0.0-alpha.5-dev",
+  "version": "2.0.0-beta.1-dev",
   "description": "Light Toolkit for connecting with the Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -24,7 +24,7 @@
   "dependencies": {
     "@types/debug": "^4.1.5",
     "@types/utf8": "^2.1.6",
-    "@celo/utils": "2.0.0-alpha.5-dev",
+    "@celo/utils": "2.0.0-beta.1-dev",
     "bignumber.js": "^9.0.0",
     "debug": "^4.1.1",
     "utf8": "3.0.0"

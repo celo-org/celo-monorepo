@@ -7522,9 +7522,9 @@ blakejs@^1.1.0:
   version "0.1.0"
   resolved "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208"
 
-"bls12377js@https://github.com/celo-org/bls12377js#7c7403462c85e1696089330447fe508c640bea0d":
+"bls12377js@https://github.com/celo-org/bls12377js#c4bb2eed9c809908c4e103c346faf1d417734b55":
   version "0.1.0"
-  resolved "https://github.com/celo-org/bls12377js#7c7403462c85e1696089330447fe508c640bea0d"
+  resolved "https://github.com/celo-org/bls12377js#c4bb2eed9c809908c4e103c346faf1d417734b55"
   dependencies:
     "@stablelib/blake2xs" "0.10.4"
     big-integer "^1.6.44"
