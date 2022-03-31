@@ -1475,6 +1475,11 @@
     elliptic "^6.5.4"
     is-base64 "^1.1.0"
 
+"@celo/poprf@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@celo/poprf/-/poprf-0.1.0.tgz#031ece3dd8bb5beaa403ef77c2afcc640f2d779b"
+  integrity sha512-J3+wMnB2fwOXGWYHti6rMzirmGuNvkUV0Rp6yDazOrkyH9OJw/8mxmQLduPq6iVoam3L0rxg8wtf7I5o63GlsA==
+
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.2.0.tgz#2560b470e348d2628debe899885724ce5b218bc3"
