@@ -30,9 +30,9 @@ contract FederatedAttestations is
   using SafeMath for uint256;
   using SafeCast for uint256;
 
-  // TODO State var declarations
+  // TODO ASv2 State var declarations
 
-  // TODO Event declarations
+  // TODO ASv2 Event declarations
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -47,7 +47,7 @@ contract FederatedAttestations is
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    // TODO initialize any other variables here
+    // TODO ASv2 initialize any other variables here
   }
 
   /**
