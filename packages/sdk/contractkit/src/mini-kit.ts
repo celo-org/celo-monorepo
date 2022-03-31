@@ -1,9 +1,8 @@
-import { Address, CeloTx, Connection, ReadOnlyWallet } from '@celo/connect'
+import { Connection, ReadOnlyWallet } from '@celo/connect'
 import { LocalWallet } from '@celo/wallet-local'
 import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { AddressRegistry } from './address-registry'
-import { CeloContract, CeloTokenContract } from './base'
 import { CeloTokens, EachCeloToken } from './celo-tokens'
 import { MiniContractCache } from './mini-contract-cache'
 import {
@@ -52,9 +51,6 @@ export class MiniContractKit {
   /** helper for interacting with CELO & stable tokens */
   readonly celoTokens: CeloTokens
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
-  gasPriceSuggestionMultiplier = 5
-
   constructor(readonly connection: Connection) {
     this.registry = new AddressRegistry(connection)
     this.contracts = new MiniContractCache(connection, this.registry)
@@ -70,36 +66,6 @@ export class MiniContractKit {
     return {
       ...(await this.celoTokens.balancesOf(address)),
     }
-  }
-
-  /**
-   * Set CeloToken to use to pay for gas fees
-   * @param tokenContract CELO (GoldToken) or a supported StableToken contract
-   */
-  async setFeeCurrency(tokenContract: CeloTokenContract): Promise<void> {
-    const address =
-      tokenContract === CeloContract.GoldToken
-        ? undefined
-        : await this.registry.addressFor(tokenContract)
-    if (address) {
-      await this.updateGasPriceInConnectionLayer(address)
-    }
-    this.connection.defaultFeeCurrency = address
-  }
-
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
-  async updateGasPriceInConnectionLayer(currency: Address) {
-    const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
-    const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
-    const gasPrice = rawGasPrice.multipliedBy(this.gasPriceSuggestionMultiplier).toFixed()
-    await this.connection.setGasPriceForCurrency(currency, gasPrice)
-  }
-
-  async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
-    if (tx.feeCurrency && tx.gasPrice === '0') {
-      await this.updateGasPriceInConnectionLayer(tx.feeCurrency)
-    }
-    return this.connection.fillGasPrice(tx)
   }
 }
 

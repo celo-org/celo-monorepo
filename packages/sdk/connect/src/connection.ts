@@ -57,7 +57,7 @@ export class Connection {
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
 
   constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet, handleRevert = true) {
@@ -325,7 +325,7 @@ export class Connection {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   fillGasPrice(tx: CeloTx): CeloTx {
     if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
       return {
@@ -335,7 +335,7 @@ export class Connection {
     }
     return tx
   }
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   async setGasPriceForCurrency(address: Address, gasPrice: string) {
     this.currencyGasPrice.set(address, gasPrice)
   }
