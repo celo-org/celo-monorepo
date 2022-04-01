@@ -1,5 +1,5 @@
 {
-  "name": "@celo/phone-number-privacy-common",
+  "name": "@nategraf/phone-number-privacy-common",
   "version": "1.0.40-dev",
   "description": "Common library for the combiner and signer libraries",
   "author": "Celo",

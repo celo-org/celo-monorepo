@@ -5,6 +5,8 @@ import { randomBytes } from 'crypto'
 // https://www.typescriptlang.org/docs/handbook/modules.html#optional-module-loading-and-other-advanced-loading-scenarios
 import * as POPRF from '@celo/poprf'
 
+// tslint:disable: max-classes-per-file
+
 let _poprf: typeof POPRF | undefined
 
 /**
@@ -30,11 +32,11 @@ function poprf(): typeof POPRF {
 }
 
 export class PoprfClient {
-  /** Secret blinding factor used for blinding and response verification. */
-  protected readonly blindingFactor: Buffer
-
   /** Blinded message to be sent to the POPRF service for evaluation */
   public readonly blindedMessage: Buffer
+
+  /** Secret blinding factor used for blinding and response verification. */
+  protected readonly blindingFactor: Buffer
 
   /**
    * Constructs POPRF client state, blinding the given message and saving the public key, blinding
