@@ -16,7 +16,7 @@
 
 ▸ **buildOdisDomain**(`config`: [OdisHardeningConfig](../interfaces/_config_.odishardeningconfig.md), `authorizer`: Address, `salt?`: undefined | string): *SequentialDelayDomain*
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.ts#L49)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.ts#L50)*
 
 Builds an ODIS SequentialDelayDomain with the given hardening configuration.
 
@@ -38,7 +38,7 @@ ___
 
 ▸ **odisHardenKey**(`key`: Buffer, `domain`: SequentialDelayDomain, `environment`: OdisServiceContext, `wallet?`: [EIP712Wallet](_utils_.md#eip712wallet)): *Promise‹Result‹Buffer, [BackupError](_errors_.md#backuperror)››*
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.ts#L73)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.ts#L74)*
 
 Returns a hardened key derived from the input key material and a POPRF evaluation on that keying
 material under the given rate limiting domain.
@@ -60,7 +60,7 @@ ___
 
 ▸ **odisQueryAuthorizer**(`nonce`: Buffer): *object*
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.ts:161](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.ts#L161)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.ts:158](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.ts#L158)*
 
 Derive from the nonce a private key and use it to instantiate a wallet for request signing
 

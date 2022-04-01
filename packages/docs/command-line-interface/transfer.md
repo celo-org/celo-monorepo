@@ -2,7 +2,6 @@
 
 Transfer CELO and Celo Dollars
 
-
 ## `celocli transfer:celo`
 
 Transfer CELO to a specified address. (Note: this is the equivalent of the old transfer:gold)

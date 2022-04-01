@@ -2,7 +2,6 @@
 
 View and manage Validators
 
-
 ## `celocli validator:affiliate GROUPADDRESS`
 
 Affiliate a Validator with a Validator Group. This allows the Validator Group to add that Validator as a member. If the Validator is already a member of a Validator Group, affiliating with a different Group will remove the Validator from the first group's members.

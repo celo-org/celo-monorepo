@@ -2,7 +2,6 @@
 
 Publish your locally computed DKG results to the blockchain
 
-
 ## `celocli dkg:allowlist`
 
 Allowlist an address in the DKG

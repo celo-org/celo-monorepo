@@ -11,5 +11,6 @@
 * ["errors"](modules/_errors_.md)
 * ["odis"](modules/_odis_.md)
 * ["odis.mock"](modules/_odis_mock_.md)
+* ["poprf"](modules/_poprf_.md)
 * ["schema"](modules/_schema_.md)
 * ["utils"](modules/_utils_.md)

@@ -2,7 +2,6 @@
 
 View and manage locked CELO
 
-
 ## `celocli lockedgold:lock`
 
 Locks CELO to be used in governance and validator elections.

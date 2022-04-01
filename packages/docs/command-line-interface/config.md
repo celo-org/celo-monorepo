@@ -2,7 +2,6 @@
 
 Configure CLI options which persist across commands
 
-
 ## `celocli config:get`
 
 Output network node configuration

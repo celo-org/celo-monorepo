@@ -18,16 +18,16 @@
 
 ### ▪ **MOCK_ODIS_ENVIRONMENT**: *object*
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L19)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L23)*
 
 ###  odisPubKey
 
-• **odisPubKey**: *string* = "7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA"
+• **odisPubKey**: *string* = Buffer.from(MOCK_ODIS_KEYPAIR.publicKey).toString('base64')
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L21)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L25)*
 
 ###  odisUrl
 
 • **odisUrl**: *string* = "https://mockodis.com"
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L20)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L24)*

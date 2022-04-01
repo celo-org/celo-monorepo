@@ -2,7 +2,6 @@
 
 Exchange Celo Dollars and CELO via the stability mechanism
 
-
 ## `celocli exchange:celo`
 
 Exchange CELO for StableTokens via the stability mechanism. (Note: this is the equivalent of the old exchange:gold)

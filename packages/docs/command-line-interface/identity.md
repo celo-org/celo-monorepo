@@ -2,7 +2,6 @@
 
 Interact with ODIS and the attestations service
 
-
 ## `celocli identity:current-attestation-services`
 
 Outputs the set of validators currently participating in BFT and which ones are participating in Celo's lightweight identity protocol
