@@ -25,10 +25,10 @@ export class PoprfClient {
    *   if this is intended (e.g. to provide for retries of requests without consuming quota).
    */
   constructor(
-    readonly publicKey: Buffer,
-    readonly tag: Buffer,
-    readonly message: Buffer,
-    readonly seed?: Buffer
+    readonly publicKey: Uint8Array,
+    readonly tag: Uint8Array,
+    readonly message: Uint8Array,
+    readonly seed?: Uint8Array
   ) {
     const blinded = poprf.blindMsg(message, seed ?? randomBytes(32))
 
@@ -46,7 +46,7 @@ export class PoprfClient {
    * @throws If the given response is invalid or cannot be verified against the public key, tag, and
    * blinding state present in this client.
    */
-  public unblindResponse(response: Buffer): Buffer {
+  public unblindResponse(response: Uint8Array): Buffer {
     return Buffer.from(poprf.unblindResp(this.publicKey, this.blindingFactor, this.tag, response))
   }
 }
@@ -63,8 +63,8 @@ export class PoprfCombiner {
   /**
    * Adds the given blinded partial response(s) to the array of responses held on this object.
    */
-  public addBlindedResponse(...responses: Buffer[]) {
-    this.blindedResponses.push(...responses)
+  public addBlindedResponse(...responses: Uint8Array[]) {
+    this.blindedResponses.push(...responses.map(Buffer.from))
   }
 
   /**
@@ -105,11 +105,11 @@ export class ThresholdPoprfClient extends PoprfClient {
    *   if this is intended (e.g. to provide for retries of requests without consuming quota).
    */
   constructor(
-    readonly publicKey: Buffer,
-    readonly polynomial: Buffer,
-    readonly tag: Buffer,
-    readonly message: Buffer,
-    readonly seed?: Buffer
+    readonly publicKey: Uint8Array,
+    readonly polynomial: Uint8Array,
+    readonly tag: Uint8Array,
+    readonly message: Uint8Array,
+    readonly seed?: Uint8Array
   ) {
     super(publicKey, tag, message, seed)
   }
@@ -123,7 +123,7 @@ export class ThresholdPoprfClient extends PoprfClient {
    * @throws If the given response is invalid or cannot be verified against the public key, tag, and
    * blinding state present in this client.
    */
-  public unblindPartialResponse(response: Buffer): Buffer {
+  public unblindPartialResponse(response: Uint8Array): Buffer {
     return Buffer.from(
       poprf.unblindPartialResp(this.polynomial, this.blindingFactor, this.tag, response)
     )
@@ -131,7 +131,7 @@ export class ThresholdPoprfClient extends PoprfClient {
 }
 
 export class PoprfServer {
-  constructor(readonly privateKey: Buffer) {}
+  constructor(readonly privateKey: Uint8Array) {}
 
   /**
    * Evaluates the POPRF function over the tag and blinded message with the (complete) private key
@@ -140,13 +140,13 @@ export class PoprfServer {
    *
    * @returns a serialized blinded evaluation response.
    */
-  public blindEval(tag: Buffer, blindedMessage: Buffer): Buffer {
+  public blindEval(tag: Uint8Array, blindedMessage: Uint8Array): Buffer {
     return Buffer.from(poprf.blindEval(this.privateKey, tag, blindedMessage))
   }
 }
 
 export class ThresholdPoprfServer {
-  constructor(readonly privateKeyShare: Buffer) {}
+  constructor(readonly privateKeyShare: Uint8Array) {}
 
   /**
    * Evaluates the POPRF function over the tag and blinded message with the private key share.
@@ -155,7 +155,7 @@ export class ThresholdPoprfServer {
    *
    * @returns a serialized blinded partial evaluation response.
    */
-  public blindPartialEval(tag: Buffer, blindedMessage: Buffer): Buffer {
+  public blindPartialEval(tag: Uint8Array, blindedMessage: Uint8Array): Buffer {
     return Buffer.from(poprf.blindPartialEval(this.privateKeyShare, tag, blindedMessage))
   }
 }

@@ -77,12 +77,6 @@ export async function odisHardenKey(
   environment: OdisServiceContext,
   wallet?: EIP712Wallet
 ): Promise<Result<Buffer, BackupError>> {
-  // Allow this function to be called in tests, but not in any other environment. This safety gate
-  // can be removed when the POPRF verification function is implemented and added below.
-  if (process?.env?.JEST_WORKER_ID === undefined && process?.env?.NODE_ENV !== 'test') {
-    throw new Error('ODIS POPRF function is not yet available')
-  }
-
   // Session ID for logging requests.
   const sessionID = genSessionID()
 
