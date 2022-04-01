@@ -7,6 +7,7 @@ import {
   DomainQuotaStatusResponse,
   DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
+  PoprfServer,
   SequentialDelayDomain,
   SequentialDelayDomainState,
   verifyDomainQuotaStatusRequestSignature,
@@ -14,7 +15,6 @@ import {
 } from '@celo/phone-number-privacy-common'
 import * as poprf from '@celo/poprf'
 import debugFactory from 'debug'
-import { PoprfServer } from './poprf'
 
 const debug = debugFactory('kit:encrypted-backup:odis:mock')
 

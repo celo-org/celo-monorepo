@@ -1,7 +1,33 @@
 import { randomBytes } from 'crypto'
-// TODO(victor): This will only initially work in Node environments. If we want to have this work in
-// ReactNative and browser environments, some work will need to be done in @celo/poprf or here.
-import * as poprf from '@celo/poprf'
+
+// Note that this import is only ever used for its type information. As a result, it will not be
+// included in the compiled JavaScript or result in an import at runtime.
+// https://www.typescriptlang.org/docs/handbook/modules.html#optional-module-loading-and-other-advanced-loading-scenarios
+import * as POPRF from '@celo/poprf'
+
+let _poprf: typeof POPRF | undefined
+
+/**
+ * Lazy loading function for the POPRF WASM implementation dependency.
+ *
+ * @remarks @celo/poprf version 0.1.x is compiled to a WASM is around 320 kB. Note that this must be
+ * loaded into memory at runtime. In order to avoid that cost, both on-disk and in memory, for users
+ * that do not need the POPRF functionality, it is loaded lazily, and included only as a dev
+ * dependency for clients that do not need it. If a package wants to utilize the POPRF
+ * functionality, it should add @celo/poprf to its dependencies (i.e. package.json).
+ */
+function poprf(): typeof POPRF {
+  // TODO(victor): This will only initially work in Node environments. If we want to have this work in
+  // ReactNative and browser environments, some work will need to be done in @celo/poprf or here.
+  if (_poprf === undefined) {
+    try {
+      _poprf = require('@celo/poprf')
+    } catch {
+      throw new Error('@celo/poprf not available. Add it to the package.json')
+    }
+  }
+  return _poprf!
+}
 
 export class PoprfClient {
   /** Secret blinding factor used for blinding and response verification. */
@@ -30,7 +56,7 @@ export class PoprfClient {
     readonly message: Uint8Array,
     readonly seed?: Uint8Array
   ) {
-    const blinded = poprf.blindMsg(message, seed ?? randomBytes(32))
+    const blinded = poprf().blindMsg(message, seed ?? randomBytes(32))
 
     // Save the blinding factor to the class state so that unblind can use it.
     this.blindingFactor = Buffer.from(blinded.blindingFactor)
@@ -47,7 +73,7 @@ export class PoprfClient {
    * blinding state present in this client.
    */
   public unblindResponse(response: Uint8Array): Buffer {
-    return Buffer.from(poprf.unblindResp(this.publicKey, this.blindingFactor, this.tag, response))
+    return Buffer.from(poprf().unblindResp(this.publicKey, this.blindingFactor, this.tag, response))
   }
 }
 
@@ -82,7 +108,7 @@ export class PoprfCombiner {
       return undefined
     }
 
-    return Buffer.from(poprf.blindAggregate(this.threshold, Buffer.concat(this.blindedResponses)))
+    return Buffer.from(poprf().blindAggregate(this.threshold, Buffer.concat(this.blindedResponses)))
   }
 }
 
@@ -125,7 +151,7 @@ export class ThresholdPoprfClient extends PoprfClient {
    */
   public unblindPartialResponse(response: Uint8Array): Buffer {
     return Buffer.from(
-      poprf.unblindPartialResp(this.polynomial, this.blindingFactor, this.tag, response)
+      poprf().unblindPartialResp(this.polynomial, this.blindingFactor, this.tag, response)
     )
   }
 }
@@ -141,7 +167,7 @@ export class PoprfServer {
    * @returns a serialized blinded evaluation response.
    */
   public blindEval(tag: Uint8Array, blindedMessage: Uint8Array): Buffer {
-    return Buffer.from(poprf.blindEval(this.privateKey, tag, blindedMessage))
+    return Buffer.from(poprf().blindEval(this.privateKey, tag, blindedMessage))
   }
 }
 
@@ -156,6 +182,6 @@ export class ThresholdPoprfServer {
    * @returns a serialized blinded partial evaluation response.
    */
   public blindPartialEval(tag: Uint8Array, blindedMessage: Uint8Array): Buffer {
-    return Buffer.from(poprf.blindPartialEval(this.privateKeyShare, tag, blindedMessage))
+    return Buffer.from(poprf().blindPartialEval(this.privateKeyShare, tag, blindedMessage))
   }
 }

@@ -21,6 +21,7 @@ import {
   DomainRestrictedSignatureResponseSchema,
   DomainRestrictedSignatureResponseSuccess,
   genSessionID,
+  PoprfClient,
   SequentialDelayDomain,
   SequentialDelayDomainState,
   SequentialDelayDomainStateSchema,
@@ -38,7 +39,6 @@ import {
   OdisVerificationError,
   UsageError,
 } from './errors'
-import { PoprfClient } from './poprf'
 import { deriveKey, EIP712Wallet, KDFInfo } from './utils'
 
 /**
