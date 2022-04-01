@@ -1,8 +1,11 @@
 import {
   DomainRestrictedSignatureRequest,
+  DomainRestrictedSignatureResponse,
   ErrorMessage,
   ErrorType,
+  OdisResponse,
   SignMessageRequest,
+  SignMessageResponse,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
@@ -11,7 +14,13 @@ import { CombineAbstract } from './combine.abstract'
 import { IOAbstract } from './io.abstract'
 import { Session } from './session'
 
+// prettier-ignore
 export type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
+export type OdisSignatureResponse<R extends OdisSignatureRequest> = R extends SignMessageRequest
+  ? SignMessageResponse
+  : never | R extends DomainRestrictedSignatureRequest
+  ? DomainRestrictedSignatureResponse
+  : never
 
 // tslint:disable-next-line: max-classes-per-file
 export abstract class SignAbstract<R extends OdisSignatureRequest> extends CombineAbstract<R> {
@@ -19,58 +28,50 @@ export abstract class SignAbstract<R extends OdisSignatureRequest> extends Combi
     super(config, io)
   }
 
-  protected async receiveSuccess(
+  // Throws if response is not actually successful
+  protected async receiveSuccessResponse(
     signerResponse: FetchResponse,
     url: string,
     session: Session<R>
-  ): Promise<void> {
+  ): Promise<OdisResponse<R>> {
+    // Check key version header
     const responseKeyVersion = this.io.getResponseKeyVersion(signerResponse, session.logger)
     const requestKeyVersion =
       this.io.getRequestKeyVersion(session.request, session.logger) ?? this.config.keys.version
-
     if (responseKeyVersion !== requestKeyVersion) {
-      // TODO(Alec)
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
 
-    const status: number = signerResponse.status
-    const data: string = await signerResponse.text()
-    session.logger.info({ url, res: data, status }, 'received OK response from signer')
+    const res = await super.receiveSuccess(signerResponse, url, session)
 
-    // TODO(Alec): Move this up one level
-    const res = this.io.validateSignerResponse(data, url, session)
-
-    if (!res.success) {
-      throw new Error('DO NOT MERGE: Add error message') // TODO(Alec)
-    }
-
-    session.responses.push({ url, res, status })
-
-    session.logger.info({ signer: url }, 'Add signature')
-    const signatureAdditionStart = Date.now()
-    session.crypto.addSignature({ url, signature: res.signature })
-    session.logger.info(
-      {
-        signer: url,
-        hasSufficientSignatures: session.crypto.hasSufficientSignatures(),
-        additionLatency: Date.now() - signatureAdditionStart,
-      },
-      'Added signature'
-    )
-    // Send response immediately once we cross threshold
-    // BLS threshold signatures can be combined without all partial signatures
-    if (session.crypto.hasSufficientSignatures()) {
-      try {
-        await session.crypto.combinePartialBlindedSignatures(
-          this.parseBlindedMessage(session.request.body)
-        )
-        // Close outstanding requests
-        session.controller.abort()
-      } catch {
-        // One or more signatures failed verification and were discarded.
-        // Error has already been logged, continue to collect signatures.
+    if (res.success) {
+      // TODO figure out how to use types to make this check unneccesary
+      const signatureAdditionStart = Date.now()
+      session.crypto.addSignature({ url, signature: res.signature })
+      session.logger.info(
+        {
+          signer: url,
+          hasSufficientSignatures: session.crypto.hasSufficientSignatures(),
+          additionLatency: Date.now() - signatureAdditionStart,
+        },
+        'Added signature'
+      )
+      // Send response immediately once we cross threshold
+      // BLS threshold signatures can be combined without all partial signatures
+      if (session.crypto.hasSufficientSignatures()) {
+        try {
+          await session.crypto.combinePartialBlindedSignatures(
+            this.parseBlindedMessage(session.request.body)
+          )
+          // Close outstanding requests
+          session.controller.abort()
+        } catch {
+          // One or more signatures failed verification and were discarded.
+          // Error has already been logged, continue to collect signatures.
+        }
       }
     }
+    return res
   }
 
   protected handleMissingSignatures(session: Session<R>) {

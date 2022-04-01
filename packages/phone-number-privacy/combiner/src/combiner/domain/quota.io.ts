@@ -1,18 +1,13 @@
 import {
   CombinerEndpoint,
   DomainQuotaStatusRequest,
-  domainQuotaStatusRequestSchema,
-  DomainQuotaStatusResponse,
   DomainQuotaStatusResponseFailure,
-  domainQuotaStatusResponseSchema,
   DomainQuotaStatusResponseSuccess,
-  DomainSchema,
   DomainState,
   ErrorType,
   getSignerEndpoint,
   OdisResponse,
   send,
-  SequentialDelayDomainStateSchema,
   SignerEndpoint,
   verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
@@ -40,29 +35,8 @@ export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
     return new Session(request, response, undefined)
   }
 
-  validate(
-    request: Request<{}, {}, unknown>
-  ): request is Request<{}, {}, DomainQuotaStatusRequest> {
-    return domainQuotaStatusRequestSchema(DomainSchema).is(request.body)
-  }
-
   authenticate(request: Request<{}, {}, DomainQuotaStatusRequest>): Promise<boolean> {
     return Promise.resolve(verifyDomainQuotaStatusRequestAuthenticity(request.body))
-  }
-
-  validateSignerResponse(
-    data: string,
-    url: string,
-    session: Session<DomainQuotaStatusRequest>
-  ): DomainQuotaStatusResponse {
-    const res: unknown = JSON.parse(data)
-    if (!domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
-      // TODO(Alec): add error type for this
-      const msg = `Signer request to ${url + this.signerEndpoint} returned malformed response`
-      session.logger.error({ data, signer: url }, msg)
-      throw new Error(msg)
-    }
-    return res
   }
 
   sendSuccess(
@@ -80,7 +54,6 @@ export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
@@ -100,6 +73,5 @@ export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

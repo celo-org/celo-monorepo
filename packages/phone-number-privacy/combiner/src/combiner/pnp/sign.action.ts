@@ -13,7 +13,6 @@ export class PnpSignAction extends SignAbstract<SignMessageRequest> {
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
-        // TODO(Alec)(Next)(responding): return other fields?
         return this.io.sendSuccess(200, session.response, session.logger, combinedSignature)
       } catch {
         // May fail upon combining signatures if too many sigs are invalid

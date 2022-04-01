@@ -19,7 +19,9 @@ export enum ErrorMessage {
   THRESHOLD_DISABLE_DOMAIN_FAILURE = `CELO_ODIS_ERR_17 DOMAIN Failed to disable domain on a threshold of signers`,
   SIGNER_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_18 DOMAIN Failed to get domain status from signer`,
   THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_19 DOMAIN Failed to get domain quota status from a threshold of signers`,
-  INVALID_KEY_VERSION_RESPONSE = `CELO_ODIS_ERR_20 SIG_ERR Response key version header is invalid`,
+  INVALID_KEY_VERSION_RESPONSE = `CELO_ODIS_ERR_20 SIG_ERR Signer response key version header is invalid`,
+  INVALID_SIGNER_RESPONSE = `CELO_ODIS_ERR_21 SIG_ERR Signer response body is invalid`,
+  SIGNER_RESPONSE_FAILED_WITH_OK_STATUS = `CELO_ODIS_ERR_22 SIG_ERR Signer response failed with 200 status`,
 }
 
 export enum WarningMessage {

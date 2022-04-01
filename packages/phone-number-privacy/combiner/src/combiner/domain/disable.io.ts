@@ -1,12 +1,9 @@
 import {
   CombinerEndpoint,
   DisableDomainRequest,
-  disableDomainRequestSchema,
   DisableDomainResponse,
   DisableDomainResponseFailure,
-  DisableDomainResponseSchema,
   DisableDomainResponseSuccess,
-  DomainSchema,
   DomainState,
   ErrorType,
   getSignerEndpoint,
@@ -38,27 +35,8 @@ export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
     return new Session(request, response, undefined)
   }
 
-  validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, DisableDomainRequest> {
-    return disableDomainRequestSchema(DomainSchema).is(request.body)
-  }
-
   authenticate(request: Request<{}, {}, DisableDomainRequest>): Promise<boolean> {
     return Promise.resolve(verifyDisableDomainRequestAuthenticity(request.body))
-  }
-
-  validateSignerResponse(
-    data: string,
-    url: string,
-    session: Session<DisableDomainRequest>
-  ): DisableDomainResponse {
-    const res: unknown = JSON.parse(data)
-    if (!DisableDomainResponseSchema.is(res)) {
-      // TODO(Alec): add error type for this
-      const msg = `Signer request to ${url + this.signerEndpoint} returned malformed response`
-      session.logger.error({ data, signer: url }, msg)
-      throw new Error(msg)
-    }
-    return res
   }
 
   sendSuccess(
@@ -76,7 +54,6 @@ export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
@@ -96,6 +73,5 @@ export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc() // TODO(Alec)
   }
 }

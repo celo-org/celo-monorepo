@@ -10,10 +10,8 @@ import {
   send,
   SignerEndpoint,
   SignMessageRequest,
-  SignMessageRequestSchema,
   SignMessageResponse,
   SignMessageResponseFailure,
-  SignMessageResponseSchema,
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -51,9 +49,11 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
     )
   }
 
-  validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, SignMessageRequest> {
+  validateClientRequest(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, SignMessageRequest> {
     return (
-      SignMessageRequestSchema.is(request.body) &&
+      super.validateClientRequest(request) &&
       hasValidAccountParam(request.body) &&
       hasValidBlindedPhoneNumberParam(request.body) &&
       identifierIsValidIfExists(request.body) &&
@@ -66,21 +66,6 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
     logger: Logger
   ): Promise<boolean> {
     return authenticateUser(request, getContractKit(), logger)
-  }
-
-  validateSignerResponse(
-    data: string,
-    url: string,
-    session: Session<SignMessageRequest>
-  ): SignMessageResponse {
-    const res: unknown = JSON.parse(data)
-    if (!SignMessageResponseSchema.is(res)) {
-      // TODO(Alec): add error type for this
-      const msg = `Signer request to ${url + this.signerEndpoint} returned malformed response`
-      session.logger.error({ data, signer: url }, msg)
-      throw new Error(msg)
-    }
-    return res
   }
 
   sendSuccess(
@@ -106,7 +91,6 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
@@ -132,6 +116,5 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

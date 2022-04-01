@@ -1,4 +1,9 @@
-import { ErrorMessage, OdisRequest, WarningMessage } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessage,
+  OdisRequest,
+  OdisResponse,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
 import { IAction } from './action.interface'
@@ -15,6 +20,8 @@ export abstract class CombineAbstract<R extends OdisRequest> implements IAction<
   public constructor(readonly config: OdisConfig, readonly io: IOAbstract<R>) {
     this.signers = JSON.parse(config.odisServices.signers)
   }
+
+  abstract combine(session: Session<R>): Promise<void>
 
   async perform(session: Session<R>) {
     await this.distribute(session).then(this.combine)
@@ -47,44 +54,68 @@ export abstract class CombineAbstract<R extends OdisRequest> implements IAction<
     return session
   }
 
-  async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
-    let signerResponse: FetchResponse
+  protected async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
+    let signerFetchResult: FetchResponse | undefined
     try {
-      signerResponse = await this.io.fetchSignerResponseWithFallback(signer, session)
+      signerFetchResult = await this.io.fetchSignerResponseWithFallback(signer, session)
     } catch (err) {
-      return this.handleSignerRequestFailure(err, signer, session)
+      session.logger.debug({ err }, 'signer request failure')
+      if (err instanceof Error && err.name === 'AbortError' && session.controller.signal.aborted) {
+        if (session.timedOut) {
+          session.logger.error({ signer }, ErrorMessage.TIMEOUT_FROM_SIGNER)
+        } else {
+          session.logger.info({ signer }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
+        }
+      } else {
+        session.logger.error({ signer, err }, ErrorMessage.SIGNER_REQUEST_ERROR)
+      }
     }
-
-    return this.handleSignerResponse(signerResponse, signer, session)
+    return this.handleFetchResult(signer, session, signerFetchResult)
   }
 
-  abstract combine(session: Session<R>): Promise<void>
-
-  protected abstract receiveSuccess(
-    signerResponse: FetchResponse,
-    url: string,
-    session: Session<R>
-  ): Promise<void>
-
-  private async handleSignerResponse(
-    signerResponse: FetchResponse,
+  protected async handleFetchResult(
     signer: Signer,
-    session: Session<R>
-  ) {
-    if (signerResponse.ok) {
+    session: Session<R>,
+    signerFetchResult?: FetchResponse
+  ): Promise<void> {
+    if (signerFetchResult?.ok) {
       try {
-        await this.receiveSuccess(signerResponse, signer.url, session)
+        // Throws if response is not actually successful
+        await this.receiveSuccess(signerFetchResult, signer.url, session)
       } catch (err) {
-        // TODO(Alec)(next)(error handling): Review this error handling. Ensure this request gets marked as failed so the
-        // fail-fast logic gets triggered as intended.
         session.logger.error(err)
       }
     }
-
-    return this.receiveFailure(signer, signerResponse.status ?? 502, session)
+    return this.addFailureToSession(signer, signerFetchResult?.status ?? 502, session)
   }
 
-  private receiveFailure(signer: Signer, errorCode: number | undefined, session: Session<R>) {
+  protected async receiveSuccess(
+    signerFetchResult: FetchResponse,
+    url: string,
+    session: Session<R>
+  ): Promise<OdisResponse<R>> {
+    if (!signerFetchResult.ok) {
+      throw new Error(
+        `Implementation Error: handleSuccessResponse should only receive 'OK' responses`
+      )
+    }
+    const { status } = signerFetchResult
+    const data: string = await signerFetchResult.text()
+    session.logger.info({ signer: url, res: data, status }, `received 'OK' response from signer`)
+    const signerResponse: OdisResponse<R> = this.io.validateSignerResponse(data, url, session)
+    if (!signerResponse.success) {
+      session.logger.error(
+        { error: signerResponse.error, signer: url, status },
+        `Signer request to ${url + this.io.signerEndpoint} failed with 'OK' status`
+      )
+      throw new Error(ErrorMessage.SIGNER_RESPONSE_FAILED_WITH_OK_STATUS)
+    }
+    session.logger.info({ signer: url }, `Signer request successful`)
+    session.responses.push({ url, res: signerResponse, status })
+    return signerResponse
+  }
+
+  private addFailureToSession(signer: Signer, errorCode: number | undefined, session: Session<R>) {
     session.logger.info(
       `Recieved failure from ${session.failedSigners.size}/${this.signers.length} signers`
     )
@@ -98,23 +129,5 @@ export abstract class CombineAbstract<R extends OdisRequest> implements IAction<
       session.logger.info('Not possible to reach a threshold of signer responses. Failing fast')
       session.controller.abort()
     }
-  }
-
-  private async handleSignerRequestFailure(err: any, signer: Signer, session: Session<R>) {
-    let errorCode: number | undefined
-    if (err instanceof Error && err.name === 'AbortError' && session.controller.signal.aborted) {
-      if (session.timedOut) {
-        errorCode = 504 // TODO(Alec)
-        session.logger.error({ signer }, ErrorMessage.TIMEOUT_FROM_SIGNER)
-      } else {
-        // Request was cancelled, assuming it would have been successful (no errorCode)
-        session.logger.info({ signer }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
-      }
-    } else {
-      errorCode = 500
-      session.logger.error({ signer }, ErrorMessage.SIGNER_REQUEST_ERROR)
-    }
-    session.logger.error(err)
-    this.receiveFailure(signer, errorCode, session)
   }
 }

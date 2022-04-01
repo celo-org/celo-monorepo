@@ -1,7 +1,17 @@
 import {
   CombinerEndpoint as Endpoint,
+  disableDomainRequestSchema,
+  DisableDomainResponseSchema,
+  domainQuotaStatusRequestSchema,
+  domainQuotaStatusResponseSchema,
+  domainRestrictedSignatureRequestSchema,
+  domainRestrictedSignatureResponseSchema,
+  DomainSchema,
   ErrorMessage,
   loggerMiddleware,
+  SequentialDelayDomainStateSchema,
+  SignMessageRequestSchema,
+  SignMessageResponseSchema,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import * as functions from 'firebase-functions'
@@ -73,7 +83,10 @@ export const getContactMatches = functions
   })
 
 const pnpSignHandler = new Controller(
-  new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy))
+  new PnpSignAction(
+    config.phoneNumberPrivacy,
+    new PnpSignIO(config.phoneNumberPrivacy, SignMessageRequestSchema, SignMessageResponseSchema)
+  )
 )
 export const getBlindedMessageSig = functions
   .region('us-central1', 'europe-west3')
@@ -85,7 +98,11 @@ export const getBlindedMessageSig = functions
 const domainSignHandler = new Controller(
   new DomainSignAction(
     config.domains,
-    new DomainSignIO(config.domains),
+    new DomainSignIO(
+      config.domains,
+      domainRestrictedSignatureRequestSchema(DomainSchema),
+      domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema)
+    ),
     new DomainStateCombinerService(config.domains)
   )
 )
@@ -99,7 +116,11 @@ export const domainSign = functions
 const domainQuotaStatusHandler = new Controller(
   new DomainQuotaAction(
     config.domains,
-    new DomainQuotaIO(config.domains),
+    new DomainQuotaIO(
+      config.domains,
+      domainQuotaStatusRequestSchema(DomainSchema),
+      domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
+    ),
     new DomainStateCombinerService(config.domains)
   )
 )
@@ -111,7 +132,14 @@ export const domainQuotaStatus = functions
   })
 
 const domainDisableHandler = new Controller(
-  new DomainDisableAction(config.domains, new DomainDisableIO(config.domains))
+  new DomainDisableAction(
+    config.domains,
+    new DomainDisableIO(
+      config.domains,
+      disableDomainRequestSchema(DomainSchema),
+      DisableDomainResponseSchema
+    )
+  )
 )
 export const domainDisable = functions
   .region('us-central1', 'europe-west3')

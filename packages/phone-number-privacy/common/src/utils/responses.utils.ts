@@ -2,6 +2,7 @@ import Logger from 'bunyan'
 import { Response } from 'express'
 import { FailureResponse, OdisRequest, OdisResponse, WarningMessage } from '..'
 
+// TODO: remove this once it is no longer being used by matchmaking
 export function respondWithError(
   response: Response,
   body: FailureResponse,
@@ -22,11 +23,10 @@ export function send<
   O extends OdisResponse<I> = OdisResponse<I>
 >(response: Response<O>, body: O, status: number, logger: Logger) {
   if (!body.success) {
-    const logObj = { error: body.error, status, body }
     if (body.error in WarningMessage) {
-      logger.warn(logObj, 'Responding with warning')
+      logger.warn({ error: body.error, status, body }, 'Responding with warning')
     } else {
-      logger.error(logObj, 'Responding with error')
+      logger.error({ error: body.error, status, body }, 'Responding with error')
     }
   } else {
     logger.info({ status, body }, 'Responding with success')

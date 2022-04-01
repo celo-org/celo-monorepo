@@ -12,6 +12,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
+import * as t from 'io-ts'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
 import { Signer } from './combine.abstract'
@@ -28,14 +29,16 @@ export abstract class IOAbstract<R extends OdisRequest> {
   abstract readonly endpoint: CombinerEndpoint
   abstract readonly signerEndpoint: SignerEndpoint
 
-  constructor(readonly config: OdisConfig) {}
+  constructor(
+    readonly config: OdisConfig,
+    readonly requestSchema: t.Type<R, R, unknown>,
+    readonly responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>
+  ) {}
 
   abstract init(
     request: Request<{}, {}, unknown>,
     response: Response<OdisResponse<R>>
   ): Promise<Session<R> | null>
-
-  abstract validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, R>
 
   abstract authenticate(request: Request<{}, {}, R>, logger?: Logger): Promise<boolean>
 
@@ -52,7 +55,21 @@ export abstract class IOAbstract<R extends OdisRequest> {
     ...args: unknown[]
   ): void
 
-  abstract validateSignerResponse(data: string, url: string, session: Session<R>): OdisResponse<R>
+  validateClientRequest(request: Request<{}, {}, unknown>): request is Request<{}, {}, R> {
+    return this.requestSchema.is(request.body)
+  }
+
+  validateSignerResponse(data: string, url: string, session: Session<R>): OdisResponse<R> {
+    const res: unknown = JSON.parse(data)
+    if (!this.responseSchema.is(res)) {
+      session.logger.error(
+        { data, signer: url },
+        `Signer request to ${url + this.signerEndpoint} returned malformed response`
+      )
+      throw new Error(ErrorMessage.INVALID_SIGNER_RESPONSE)
+    }
+    return res
+  }
 
   getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
@@ -107,18 +124,16 @@ export abstract class IOAbstract<R extends OdisRequest> {
     const { request, logger, controller } = session
     const url = signerUrl + this.signerEndpoint
     logger.debug({ url }, `Sending signer request`)
+    // prettier-ignore
     return fetch(url, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        ...(request.headers.authorization
-          ? {
-              // Pnp requests provide authorization in the request header
-              Authorization: request.headers.authorization,
-            }
-          : {}),
-        [KEY_VERSION_HEADER]: // Forward requested keyVersion if provided by client,
+        // Pnp requests provide authorization in the request header
+        ...(request.headers.authorization ? { Authorization: request.headers.authorization } : {}),
+        [KEY_VERSION_HEADER]: 
+        // Forward requested keyVersion if provided by client,
         // otherwise use default keyVersion.
         // This will be ignored for non-signing requests.
         (this.getRequestKeyVersion(request, logger) ?? this.config.keys.version).toString(),
@@ -136,7 +151,7 @@ export abstract class IOAbstract<R extends OdisRequest> {
       this.sendFailure(WarningMessage.API_UNAVAILABLE, 503, response)
       return false
     }
-    if (!this.validate(request)) {
+    if (!this.validateClientRequest(request)) {
       this.sendFailure(WarningMessage.INVALID_INPUT, 400, response)
       return false
     }

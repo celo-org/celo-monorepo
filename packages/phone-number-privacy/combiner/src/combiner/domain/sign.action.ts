@@ -31,13 +31,12 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
-        // TODO(Alec)(Next)(responding): return other fields?
         return this.io.sendSuccess(
           200,
           session.response,
           session.logger,
           combinedSignature,
-          this.stateCombiner.findThresholdDomainState(session) // TODO(Alec): naming
+          this.stateCombiner.findThresholdDomainState(session)
         )
       } catch {
         // May fail upon combining signatures if too many sigs are invalid
@@ -53,7 +52,7 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
   }
 
   protected logResponseDiscrepancies(_session: Session<DomainRestrictedSignatureRequest>): void {
-    // TODO(Alec)
+    // TODO
     throw new Error('Method not implemented.')
   }
 }

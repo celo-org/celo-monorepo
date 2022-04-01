@@ -1,17 +1,13 @@
 import {
   CombinerEndpoint,
   DomainRestrictedSignatureRequest,
-  domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseFailure,
-  domainRestrictedSignatureResponseSchema,
   DomainRestrictedSignatureResponseSuccess,
-  DomainSchema,
   DomainState,
   ErrorType,
   getSignerEndpoint,
   send,
-  SequentialDelayDomainStateSchema,
   verifyDomainRestrictedSignatureRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -47,32 +43,11 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
     )
   }
 
-  validate(
-    request: Request<{}, {}, unknown>
-  ): request is Request<{}, {}, DomainRestrictedSignatureRequest> {
-    return domainRestrictedSignatureRequestSchema(DomainSchema).is(request.body)
-  }
-
   authenticate(request: Request<{}, {}, DomainRestrictedSignatureRequest>): Promise<boolean> {
     // Note that signing requests may include a nonce for replay protection that will be checked by
     // the signer, but is not checked here. As a result, requests that pass the authentication check
     // here may still fail when sent to the signer.
     return Promise.resolve(verifyDomainRestrictedSignatureRequestAuthenticity(request.body))
-  }
-
-  validateSignerResponse(
-    data: string,
-    url: string,
-    session: Session<DomainRestrictedSignatureRequest>
-  ): DomainRestrictedSignatureResponse {
-    const res: unknown = JSON.parse(data)
-    if (!domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema).is(res)) {
-      // TODO(Alec): add error type for this
-      const msg = `Signer request to ${url + this.signerEndpoint} returned malformed response`
-      session.logger.error({ data, signer: url }, msg)
-      throw new Error(msg)
-    }
-    return res
   }
 
   sendSuccess(
@@ -92,7 +67,6 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
@@ -112,6 +86,5 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
       status,
       response.locals.logger()
     )
-    // Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

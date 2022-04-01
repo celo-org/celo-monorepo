@@ -13,7 +13,6 @@ import {
 import { Domain, DomainState } from '../domains'
 
 // Phone Number Privacy
-
 export interface SignMessageResponseSuccess {
   success: true
   version: string
@@ -240,7 +239,6 @@ export type OdisResponse<R extends OdisRequest = OdisRequest> =
 export type SuccessResponse<R extends OdisRequest = OdisRequest> = OdisResponse<R> & {
   success: true
 }
-
 export type FailureResponse<R extends OdisRequest = OdisRequest> = OdisResponse<R> & {
   success: false
 }
