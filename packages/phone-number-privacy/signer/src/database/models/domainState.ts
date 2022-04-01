@@ -30,7 +30,8 @@ export class DomainStateRecord<D extends Domain = Domain> {
       disabled: this[DOMAIN_STATE_COLUMNS.disabled],
       counter: this[DOMAIN_STATE_COLUMNS.counter],
       timer: this[DOMAIN_STATE_COLUMNS.timer],
-      now: attemptTime ?? Date.now() / 1000,
+      // Timestamp precision is lowered to seconds to reduce the chance of effective timing attacks.
+      now: attemptTime ?? Math.floor(Date.now() / 1000),
     }
   }
 }
