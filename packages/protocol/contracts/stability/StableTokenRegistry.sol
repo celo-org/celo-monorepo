@@ -43,7 +43,6 @@ contract StableTokenRegistry is Initializable, Ownable {
    * @return collection of stable token contracts.
    */
   function getContractInstances() external view returns (bytes memory, uint256[] memory) {
-    // bytes[] memory contracts;
     uint256 totalLength = 0;
     for (uint256 i = 0; i < fiatTickers.length; i++) {
       totalLength += stableTokens[fiatTickers[i]].length;
