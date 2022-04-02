@@ -117,13 +117,11 @@ contract StableTokenRegistry is Initializable, Ownable {
     fiatTickers.push(fiatTicker);
   }
 
-  // TODO make function that inputs fiatTicker and returns a StableTokenContract
-
   /**
-   * @notice Adds new Fiat Ticker and Stable Token contract to the registry.
-   * @param fiatTicker The currency we are trying to add in the registry.
+   * @notice Queries a corresponding StableToken contract name based on fiat ticker.
+   * @param fiatTicker Type of currency to query corresponding contract.
    */
-  function getFiatTickerLength(bytes memory fiatTicker) public returns (bytes memory) {
+  function queryStableTokenContractNames(bytes memory fiatTicker) public returns (bytes memory) {
     return stableTokens[fiatTicker];
   }
 }

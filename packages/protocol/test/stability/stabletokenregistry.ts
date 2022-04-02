@@ -1,28 +1,30 @@
 import { assertRevert } from '@celo/protocol/lib/test-utils'
+import BigNumber from 'bignumber.js'
 import { StableTokenRegistryContract, StableTokenRegistryInstance } from 'types'
 
-
-
 const STRC: StableTokenRegistryContract = artifacts.require('StableTokenRegistry')
-// const Registry: RegistryContract = artifacts.require('Registry')
 
+// const Registry: RegistryContract = artifacts.require('Registry')
 
 const convertToHex = (input: string) => {
   return web3.utils.utf8ToHex(input)
 }
 
-// const assertSTContractNames = (contractsHex: string, lengths: BigNumber[], expectedContracts: string[]) => {
-//   assert.equal(lengths.length, expectedContracts.length)
-//   const contracts = web3.utils.hexToUtf8(contractsHex)
-//   let currentIndex = 0
-//   expectedContracts.forEach((expectedContract: string, i: number) => {
-//     const contract = contracts.slice(currentIndex, currentIndex + lengths[i].toNumber())
-//     currentIndex += lengths[i].toNumber()
-//     assert.equal(contract, expectedContract)
-//   })
-//   assert.equal(contracts.length, currentIndex)
-// }
-
+const assertSTContractNames = (
+  contractsHex: string,
+  lengths: BigNumber[],
+  expectedContracts: string[]
+) => {
+  assert.equal(lengths.length, expectedContracts.length)
+  const contracts = web3.utils.hexToUtf8(contractsHex)
+  let currentIndex = 0
+  expectedContracts.forEach((expectedContract: string, i: number) => {
+    const contract = contracts.slice(currentIndex, currentIndex + lengths[i].toNumber())
+    currentIndex += lengths[i].toNumber()
+    assert.equal(contract, expectedContract)
+  })
+  assert.equal(contracts.length, currentIndex)
+}
 
 contract('StableTokenRegistry', (accounts: string[]) => {
   let strc: StableTokenRegistryInstance
@@ -35,15 +37,14 @@ contract('StableTokenRegistry', (accounts: string[]) => {
 
   const getFiatTickers = async () => {
     const updatedFiatTickers = []
-    try 
-    {
+    try {
       let index = 0
-    while (await strc.fiatTickers(index)) {
+      while (await strc.fiatTickers(index)) {
         updatedFiatTickers.push(web3.utils.hexToUtf8(await strc.fiatTickers(index)))
         index++
-      } 
-      } catch (error) {
-        return updatedFiatTickers
+      }
+    } catch (error) {
+      return updatedFiatTickers
     }
   }
 
@@ -81,9 +82,12 @@ contract('StableTokenRegistry', (accounts: string[]) => {
     })
 
     // it('has the right list of contract names after removing one', async () => {
-    //   await strc.removeStableToken(fiatTicker, 0) 
+    //   console.log('yes')
+    //   await strc.removeStableToken(fiatTicker, 0)
+    //   console.log('works');
     //   const [contractsHex, lengths] = await strc.getContractInstances()
-    //   assertSTContractNames(contractsHex, lengths, [])
+    //   console.log(contractsHex, lengths);
+    //   assertSTContractNames(contractsHex, lengths, ['StableTokenEUR', 'StableTokenBRL'])
     // })
 
     it("can't be removed twice", async () => {
@@ -98,7 +102,7 @@ contract('StableTokenRegistry', (accounts: string[]) => {
     it('removes from fiatTickers array', async () => {
       await strc.removeStableToken(fiatTicker, 0)
       const updatedFiatTickers = await getFiatTickers()
-      assert.deepEqual(updatedFiatTickers, [ 'GBP', 'EUR', 'BRL', 'GEL' ])
+      assert.deepEqual(updatedFiatTickers, ['GBP', 'EUR', 'BRL', 'GEL'])
     })
 
     it("doesn't remove an fiat ticker with the wrong index", async () => {
@@ -122,7 +126,7 @@ contract('StableTokenRegistry', (accounts: string[]) => {
       await assertRevert(strc.addNewStableToken(convertToHex(''), fiatTicker))
       await assertRevert(strc.addNewStableToken(convertToHex(''), convertToHex('')))
     })
-    
+
     it('does not allow duplicate values', async () => {
       await assertRevert(strc.addNewStableToken(fiatTicker, stableTokenContractName))
     })
@@ -133,6 +137,13 @@ contract('StableTokenRegistry', (accounts: string[]) => {
       await strc.addNewStableToken(convertToHex('MXN'), convertToHex('StableTokenMXN'))
       const updatedFiatTickers = await getFiatTickers()
       assert.deepEqual(updatedFiatTickers, ['USD', 'EUR', 'BRL', 'GEL', 'MXN'])
+    })
+  })
+
+  describe('#queryStableTokenContractNames(fiatTicker)', () => {
+    it('returns the corresponfing contract name', async () => {
+      const queriedContract = await strc.queryStableTokenContractNames.call(fiatTicker)
+      assert.deepEqual(queriedContract, stableTokenContractName)
     })
   })
 })
