@@ -2,6 +2,7 @@
 
 Interact with on-chain governance proposals and hotfixes
 
+
 ## `celocli governance:build-proposal`
 
 Interactively build a governance proposal

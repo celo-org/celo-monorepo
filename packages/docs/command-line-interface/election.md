@@ -2,6 +2,7 @@
 
 Participate in and view the state of Validator Elections
 
+
 ## `celocli election:activate`
 
 Activate pending votes in validator elections to begin earning rewards. To earn rewards as a voter, it is required to activate your pending votes at some point after the end of the epoch in which they were made.

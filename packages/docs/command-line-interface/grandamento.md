@@ -2,6 +2,7 @@
 
 Cancels a Granda Mento exchange proposal
 
+
 ## `celocli grandamento:cancel`
 
 Cancels a Granda Mento exchange proposal

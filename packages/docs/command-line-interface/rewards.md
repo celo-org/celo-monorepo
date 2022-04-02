@@ -2,6 +2,7 @@
 
 Show rewards information about a voter, registered Validator, or Validator Group
 
+
 ## `celocli rewards:show`
 
 Show rewards information about a voter, registered Validator, or Validator Group

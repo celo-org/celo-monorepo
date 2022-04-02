@@ -2,6 +2,7 @@
 
 Shows information about multi-sig contract
 
+
 ## `celocli multisig:show ADDRESS`
 
 Shows information about multi-sig contract

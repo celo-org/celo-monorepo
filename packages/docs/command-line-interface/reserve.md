@@ -2,6 +2,7 @@
 
 Shows information about reserve
 
+
 ## `celocli reserve:status`
 
 Shows information about reserve

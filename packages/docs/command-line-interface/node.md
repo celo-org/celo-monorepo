@@ -2,6 +2,7 @@
 
 Manage your Celo node
 
+
 ## `celocli node:accounts`
 
 List the addresses that this node has the private keys for.
