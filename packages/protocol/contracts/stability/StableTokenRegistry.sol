@@ -31,17 +31,7 @@ contract StableTokenRegistry is Initializable, Ownable {
     external
     initializer
   {
-    // require(
-    //   existingFiatTickers.length == existingStableTokenContractNames.length,
-    //   "Array length mismatch"
-    // );
     _transferOwnership(msg.sender);
-    bytes memory USD = bytes("USD");
-    bytes memory StableToken = "537461626c65546f6b656e";
-    bytes memory EUR = "455552";
-    bytes memory StableTokenEUR = "537461626c65546f6b656e455552";
-    bytes memory BRL = "42524c";
-    bytes memory StableTokenBRL = "537461626c65546f6b656e42524c";
     addNewStableToken(bytes("USD"), bytes("StableToken"));
     addNewStableToken(bytes("EUR"), bytes("StableTokenEUR"));
     addNewStableToken(bytes("BRL"), bytes("StableTokenBRL"));
@@ -53,13 +43,12 @@ contract StableTokenRegistry is Initializable, Ownable {
    * @return collection of stable token contracts.
    */
   function getContractInstances() external view returns (bytes memory, uint256[] memory) {
-    bytes[] memory contracts;
+    // bytes[] memory contracts;
     uint256 totalLength = 0;
     for (uint256 i = 0; i < fiatTickers.length; i++) {
-      contracts[i] = stableTokens[fiatTickers[i]];
       totalLength += stableTokens[fiatTickers[i]].length;
     }
-    uint256 numOfContracts = contracts.length;
+    uint256 numOfContracts = fiatTickers.length;
     bytes memory concatenated = new bytes(totalLength);
     uint256 lastIndex = 0;
     uint256[] memory lengths = new uint256[](numOfContracts);
