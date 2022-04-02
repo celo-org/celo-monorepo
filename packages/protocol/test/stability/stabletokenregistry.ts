@@ -81,14 +81,16 @@ contract('StableTokenRegistry', (accounts: string[]) => {
       assert.deepEqual(updatedFiatTickers, ['GBP', 'EUR', 'BRL', 'GEL'])
     })
 
-    // it('has the right list of contract names after removing one', async () => {
-    //   console.log('yes')
-    //   await strc.removeStableToken(fiatTicker, 0)
-    //   console.log('works');
-    //   const [contractsHex, lengths] = await strc.getContractInstances()
-    //   console.log(contractsHex, lengths);
-    //   assertSTContractNames(contractsHex, lengths, ['StableTokenEUR', 'StableTokenBRL'])
-    // })
+    it('has the right list of contract names after removing one', async () => {
+      await strc.removeStableToken(fiatTicker, 0)
+      const [contractsHex, lengths] = await strc.getContractInstances()
+      assertSTContractNames(contractsHex, lengths, [
+        'StableTokenGBP',
+        'StableTokenEUR',
+        'StableTokenBRL',
+        'StableTokenGEL',
+      ])
+    })
 
     it("can't be removed twice", async () => {
       await strc.removeStableToken(convertToHex('USD'), 0)
@@ -137,6 +139,18 @@ contract('StableTokenRegistry', (accounts: string[]) => {
       await strc.addNewStableToken(convertToHex('MXN'), convertToHex('StableTokenMXN'))
       const updatedFiatTickers = await getFiatTickers()
       assert.deepEqual(updatedFiatTickers, ['USD', 'EUR', 'BRL', 'GEL', 'MXN'])
+    })
+
+    it('has the right list of contract names after adding one', async () => {
+      await strc.addNewStableToken(convertToHex('MXN'), convertToHex('StableTokenMXN'))
+      const [contractsHex, lengths] = await strc.getContractInstances()
+      assertSTContractNames(contractsHex, lengths, [
+        'StableToken',
+        'StableTokenEUR',
+        'StableTokenBRL',
+        'StableTokenGEL',
+        'StableTokenMXN',
+      ])
     })
   })
 
