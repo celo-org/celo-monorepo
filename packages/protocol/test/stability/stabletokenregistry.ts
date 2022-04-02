@@ -4,8 +4,6 @@ import { StableTokenRegistryContract, StableTokenRegistryInstance } from 'types'
 
 const STRC: StableTokenRegistryContract = artifacts.require('StableTokenRegistry')
 
-// const Registry: RegistryContract = artifacts.require('Registry')
-
 const convertToHex = (input: string) => {
   return web3.utils.utf8ToHex(input)
 }
@@ -32,8 +30,6 @@ contract('StableTokenRegistry', (accounts: string[]) => {
 
   const fiatTicker: string = convertToHex('USD')
   const stableTokenContractName = convertToHex('StableToken')
-  // const fiatTickers: string[] = [convertToHex('cUSD'), convertToHex('cEUR')]
-  // const stableTokenContractNames = [convertToHex('StableToken'), convertToHex('StableTokenEUR')]
 
   const getFiatTickers = async () => {
     const updatedFiatTickers = []
@@ -50,8 +46,6 @@ contract('StableTokenRegistry', (accounts: string[]) => {
 
   beforeEach(async () => {
     strc = await STRC.new(true)
-    // const registry = await Registry.new(true)
-    // await registry.setAddressFor(CeloContractName.StableTokenRegistry, strc.address)
     await strc.initialize(convertToHex('GEL'), convertToHex('StableTokenGEL'))
   })
 
