@@ -1475,10 +1475,10 @@
     elliptic "^6.5.4"
     is-base64 "^1.1.0"
 
-"@celo/poprf@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@celo/poprf/-/poprf-0.1.2.tgz#3715470c62f53f287d9f7a9a18fbc78d89e1a0c8"
-  integrity sha512-LeEzE/eIYbSjdIh5cKegqwZKgU3LRbk43g5oI0clPsvxnjhV798L/nK9q+vZ6SKK/phSFZsrKbBad2yQuU5Mrw==
+"@celo/poprf@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@celo/poprf/-/poprf-0.1.5.tgz#5756b12ce61d257c1b2fe1b384180c2f465763a0"
+  integrity sha512-BMMkaqxpec38Z/sYPoo8fzBq67Mgx3egVhK+KhitnWsKyKqdd3TwskrnVTrSL4ZcuVyLDe6MarBbbXbCmq5GdA==
 
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
