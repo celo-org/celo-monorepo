@@ -7,7 +7,6 @@ NODE_DIRECTORY=/home/ubuntu/celo-proxy-node
 
 mkdir $NODE_DIRECTORY
 cd $NODE_DIRECTORY
-docker run -v $PWD:/root/.celo --rm $CELO_IMAGE init /celo/genesis.json
 
 BOOTNODE_ENODES="$(docker run --rm --entrypoint cat $CELO_IMAGE /celo/bootnodes)"
 PROXY_ADDRESS=${proxy_address}

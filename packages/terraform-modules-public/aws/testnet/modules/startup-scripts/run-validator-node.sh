@@ -13,7 +13,6 @@ PROXY_INTERNAL_IP=${proxy_internal_ip}
 PROXY_EXTERNAL_IP=${proxy_external_ip}
 
 echo -n '${validator_signer_private_key_password}' > .password
-docker run -v $PWD:/root/.celo --rm $CELO_IMAGE init /celo/genesis.json
 echo -n '${validator_signer_private_key_file_contents}' > keystore/${validator_signer_private_key_filename}
 
 CLOUDWATCH_LOG_GROUP_NAME=${cloudwatch_log_group_name}
