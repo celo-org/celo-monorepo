@@ -20,6 +20,7 @@ export enum CeloContractName {
   Exchange = 'Exchange',
   ExchangeEUR = 'ExchangeEUR',
   ExchangeBRL = 'ExchangeBRL',
+  FederatedAttestations = 'FederatedAttestations',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -55,6 +56,8 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Election,
   CeloContractName.Escrow,
   CeloContractName.Exchange,
+  // TODO ASv2 revisit this
+  CeloContractName.FederatedAttestations,
   CeloContractName.FeeCurrencyWhitelist,
   CeloContractName.Freezer,
   CeloContractName.GasPriceMinimum,

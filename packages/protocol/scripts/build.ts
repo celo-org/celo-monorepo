@@ -20,6 +20,7 @@ export const ProxyContracts = [
   'ExchangeBRLProxy',
   'ExchangeEURProxy',
   'ExchangeProxy',
+  'FederatedAttestationsProxy',
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
   'GoldTokenProxy',
@@ -66,6 +67,7 @@ export const CoreContracts = [
   // identity
   'Attestations',
   'Escrow',
+  'FederatedAttestations',
   'Random',
 
   // stability

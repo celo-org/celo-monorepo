@@ -9,6 +9,7 @@ import { ABI as ElectionABI } from './generated/Election'
 import { ABI as EpochRewardsABI } from './generated/EpochRewards'
 import { ABI as EscrowABI } from './generated/Escrow'
 import { ABI as ExchangeABI } from './generated/Exchange'
+import { ABI as FederatedAttestationsABI } from './generated/FederatedAttestations'
 import { ABI as FeeCurrencyWhitelistABI } from './generated/FeeCurrencyWhitelist'
 import { ABI as FreezerABI } from './generated/Freezer'
 import { ABI as GasPriceMinimumABI } from './generated/GasPriceMinimum'
@@ -104,6 +105,7 @@ const initializeAbiMap = {
   ExchangeProxy: findInitializeAbi(ExchangeABI),
   ExchangeEURProxy: findInitializeAbi(ExchangeABI),
   ExchangeBRLProxy: findInitializeAbi(ExchangeABI),
+  FederatedAttestationsProxy: findInitializeAbi(FederatedAttestationsABI),
   FeeCurrencyWhitelistProxy: findInitializeAbi(FeeCurrencyWhitelistABI),
   FreezerProxy: findInitializeAbi(FreezerABI),
   GasPriceMinimumProxy: findInitializeAbi(GasPriceMinimumABI),
