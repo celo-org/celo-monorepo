@@ -5,10 +5,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { StableTokenRegistryInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  return [
-    config.StableTokenRegistry.existingFiatTickers,
-    config.StableTokenRegistry.existingStableTokenContractNames,
-  ]
+  return [config.stableTokenRegistry.fiatTicker, config.stableTokenRegistry.stableTokenContractName]
 }
 
 module.exports = deploymentForCoreContract<StableTokenRegistryInstance>(

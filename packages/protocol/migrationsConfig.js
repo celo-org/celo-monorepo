@@ -239,8 +239,8 @@ const DefaultConfig = {
     votesRatioOfLastVsFirstGroup: 2.0,
   },
   stableTokenRegistry: {
-    existingFiatTickers: ['cUSD', 'cEUR', 'cBRL'],
-    existingStableTokenContractNames: ['StableToken', 'StableTokenEUR', 'StableTokenBRL'],
+    fiatTicker: '0x474250',
+    stableTokenContractName: '0x537473626c65546f6b656e474250',
   },
 }
 
