@@ -1,8 +1,10 @@
+import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertRevert } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
-import { StableTokenRegistryContract, StableTokenRegistryInstance } from 'types'
+import { RegistryContract, StableTokenRegistryContract, StableTokenRegistryInstance } from 'types'
 
 const STRC: StableTokenRegistryContract = artifacts.require('StableTokenRegistry')
+const Registry: RegistryContract = artifacts.require('Registry')
 
 const convertToHex = (input: string) => {
   return web3.utils.utf8ToHex(input)
@@ -46,17 +48,22 @@ contract('StableTokenRegistry', (accounts: string[]) => {
 
   beforeEach(async () => {
     strc = await STRC.new(true)
-    await strc.initialize(convertToHex('GEL'), convertToHex('StableTokenGEL'))
+    const registry = await Registry.new(true)
+    await registry.setAddressFor(CeloContractName.Accounts, strc.address)
+    await strc.initialize(convertToHex('GEL'), convertToHex('StableTokenGEL'), registry.address)
   })
 
   describe('#initialize()', async () => {
+    const registry = await Registry.new(true)
     it('should have set the owner', async () => {
       const owner: string = await strc.owner()
       assert.equal(owner, accounts[0])
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(strc.initialize(convertToHex('GEL'), convertToHex('StableTokenGEL')))
+      await assertRevert(
+        strc.initialize(convertToHex('GEL'), convertToHex('StableTokenGEL'), registry.address)
+      )
     })
   })
 
