@@ -100,7 +100,6 @@ contract StableTokenRegistry is Initializable, Ownable, UsingRegistry {
     public
     onlyOwner
   {
-    // registry.getAddressForOrDie(keccak256(abi.encodePacked(stableTokenContractName)));
     require(fiatTicker.length != 0, "fiatTicker cant be an empty string");
     require(stableTokenContractName.length != 0, "stableTokenContractName cant be an empty string");
     require(stableTokens[fiatTicker].length == 0, "This registry already exists");

@@ -16,5 +16,6 @@ module.exports = deploymentForCoreContract<StableTokenRegistryInstance>(
   artifacts,
   CeloContractName.StableTokenRegistry,
   initializeArgs,
-  async (StableTokenRegistry: StableTokenRegistryInstance) => {}
+  // tslint:disable-next-line: no-empty
+  async (_StableTokenRegistry: StableTokenRegistryInstance) => {}
 )
