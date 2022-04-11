@@ -1,11 +1,22 @@
 /* tslint:disable:no-console */
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
+import {
+  deploymentForCoreContract,
+  getDeployedProxiedContract,
+} from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { StableTokenRegistryInstance } from 'types'
+import { RegistryInstance, StableTokenRegistryInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  return [config.stableTokenRegistry.fiatTicker, config.stableTokenRegistry.stableTokenContractName]
+  const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
+    'Registry',
+    artifacts
+  )
+  return [
+    config.stableTokenRegistry.fiatTicker,
+    config.stableTokenRegistry.stableTokenContractName,
+    registry.address,
+  ]
 }
 
 module.exports = deploymentForCoreContract<StableTokenRegistryInstance>(
