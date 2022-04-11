@@ -49,7 +49,7 @@ contract('StableTokenRegistry', (accounts: string[]) => {
   beforeEach(async () => {
     strc = await STRC.new(true)
     const registry = await Registry.new(true)
-    await registry.setAddressFor(CeloContractName.Accounts, strc.address)
+    await registry.setAddressFor(CeloContractName.StableTokenRegistry, strc.address)
     await strc.initialize(convertToHex('GEL'), convertToHex('StableTokenGEL'), registry.address)
   })
 
