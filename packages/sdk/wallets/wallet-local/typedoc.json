@@ -7,7 +7,7 @@
     "includeDeclarations": false,
     "ignoreCompilerErrors": true,
     "hideGenerator": "true",
-    "theme": "gitbook",
-    "out": "../../../docs/developer-resources/wallet-local/reference",
-    "gitRevision": "master"
+    "out": "../../../docs/sdk/docs/wallet-local",
+    "gitRevision": "master",
+    "readme": "none"
   }
