@@ -21,7 +21,7 @@ const initializeArgs = async (): Promise<
   )
   return [
     registry.address,
-    config.reserve.tobinTaxStalenessThreshold,
+    config.reserve.tobinTaxStalenessThareshold,
     config.reserve.dailySpendingRatio,
     0, // frozenGold cannot be set until the reserve us funded
     0, // frozenGold cannot be set until the reserve us funded
