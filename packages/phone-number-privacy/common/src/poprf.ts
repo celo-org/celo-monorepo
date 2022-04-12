@@ -112,9 +112,6 @@ export class PoprfClient {
  * well-formed.
  */
 export class PoprfCombiner {
-  /** Collect of responses received from the service. Note that they are not verified */
-  readonly blindedResponses: Buffer[] = []
-
   constructor(readonly threshold: number) {
     if (threshold % 1 !== 0) {
       throw new Error('POPRF threshold must be an integer')
@@ -122,28 +119,39 @@ export class PoprfCombiner {
   }
 
   /**
-   * Adds the given blinded partial response(s) to the array of responses held on this object.
-   */
-  public addBlindedResponse(...responses: Uint8Array[]) {
-    this.blindedResponses.push(...responses.map(Buffer.from))
-  }
-
-  /**
-   * If there are enough responses added to this combiner instance, aggregates the current
-   * collection of blind partial evaluations to a single blind threshold evaluation.
+   * If there are enough responses provided, aggregates the collection of blind partial evaluations
+   * to a single blind threshold evaluation.
    *
-   * @remarks This method does not verify any of the responses. Verification only occurs during
-   * unblinding.
+   * @param response An array of blinded partial evaluation responses.
+   * @remarks Does not verify any of the responses. Verification only occurs during unblinding.
    *
    * @returns A buffer with a blind aggregated POPRF evaluation response, or undefined if there are
-   * less than the threshold number of responses available.
+   * less than the threshold number of responses provided.
    */
-  public blindAggregate(): Buffer | undefined {
-    if (this.blindedResponses.length < this.threshold) {
+  public blindAggregate(blindedResponses: Uint8Array[]): Buffer | undefined {
+    if (blindedResponses.length < this.threshold) {
       return undefined
     }
 
-    return Buffer.from(poprf().blindAggregate(this.threshold, Buffer.concat(this.blindedResponses)))
+    return Buffer.from(
+      poprf().blindAggregate(this.threshold, Buffer.concat(blindedResponses.map(Buffer.from)))
+    )
+  }
+
+  /**
+   * If there are enough responses provided, aggregates the collection of partial evaluations
+   * to a single PORF evaluation.
+   *
+   * @param response An array of partial evaluation responses.
+   * @returns A buffer with a POPRF evaluation, or undefined if there are less than the threshold
+   * number of responses provided.
+   */
+  public aggregate(responses: Uint8Array[]): Buffer | undefined {
+    if (responses.length < this.threshold) {
+      return undefined
+    }
+
+    return Buffer.from(poprf().aggregate(this.threshold, Buffer.concat(responses.map(Buffer.from))))
   }
 }
 
