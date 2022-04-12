@@ -111,7 +111,11 @@ contract StableTokenRegistry is Initializable, Ownable, UsingRegistry {
    * @notice Queries a corresponding StableToken contract name based on fiat ticker.
    * @param fiatTicker Type of currency to query corresponding contract.
    */
-  function queryStableTokenContractNames(bytes memory fiatTicker) public returns (bytes memory) {
+  function queryStableTokenContractNames(bytes memory fiatTicker)
+    public
+    view
+    returns (bytes memory)
+  {
     return stableTokens[fiatTicker];
   }
 }
