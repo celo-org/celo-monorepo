@@ -5,6 +5,22 @@ import { randomBytes } from 'crypto'
 // https://www.typescriptlang.org/docs/handbook/modules.html#optional-module-loading-and-other-advanced-loading-scenarios
 import * as POPRF from '@celo/poprf'
 
+/**
+ * @module
+ * This module provides interfaces for the Pith POPRF. It allows the construction of client, server,
+ * and combiner objects that wrap that package the required functionality.
+ *
+ * A partially-oblivious PRF (POPRF) is a protocol between a client and a server to evaluate the
+ * keyed pseudo-random function F(k, t, m). The client provides the tag input, t, and message input,
+ * m. The server provides the secret key input k. During the exchange the server learns the
+ * client-provided tag, but gains no other information. In particular, they learn nothing about the
+ * message. The client learns the output of the PRF function F, but no other information about the
+ * secret key held by the server.
+ *
+ * Implementation of the POPRF can be found in the following repository:
+ * https://github.com/celo-org/celo-poprf-rs
+ */
+
 // tslint:disable: max-classes-per-file
 
 let _poprf: typeof POPRF | undefined
@@ -31,6 +47,7 @@ function poprf(): typeof POPRF {
   return _poprf!
 }
 
+/** Client for an instance of the POPRF protocol interacting with a POPRF service. */
 export class PoprfClient {
   /** Blinded message to be sent to the POPRF service for evaluation */
   public readonly blindedMessage: Buffer
@@ -42,7 +59,7 @@ export class PoprfClient {
    * Constructs POPRF client state, blinding the given message and saving the public key, blinding
    * factor, and tag for use in verification and unbinding of the response.
    *
-   * Note that this client represents the client-side of a single protocol exchange.
+   * @remarks Note that this client represents the client-side of a single protocol exchange.
    *
    * @param publicKey Public key for the POPRF service for use in verification.
    * @param tag A plaintext tag which will be sent to the service along with the message.
@@ -68,6 +85,11 @@ export class PoprfClient {
   /**
    * Given a blinded evaluation response, unblind and verify the evaluation, returning the result.
    *
+   * @remarks Note that this function expects a complete/aggregated response, and not a partial
+   * response as is returned by an individual server in a threshold service implementation. If the
+   * client wishes to unblind and verify partial responses, they will need to use the
+   * ThresholdPoprfClient.
+   *
    * @param response A blinded evaluation response.
    * @returns a buffer with the final POPRF output.
    *
@@ -79,7 +101,18 @@ export class PoprfClient {
   }
 }
 
+/**
+ * Combiner for an instance of the POPRF protocol acting as a relayer between the client and
+ * threshold service operators. A combiner effectively combines a set of service operators to appear
+ * as a single service.
+ *
+ * @remarks In the Pith POPRF protocol, verification occurs as part of the unblinding process and
+ * therefore only the client and determine is a given response is valid. As a result, the combiner
+ * cannot determine whether the responses from the service as correct, as long as they are
+ * well-formed.
+ */
 export class PoprfCombiner {
+  /** Collect of responses received from the service. Note that they are not verified */
   readonly blindedResponses: Buffer[] = []
 
   constructor(readonly threshold: number) {
@@ -114,8 +147,13 @@ export class PoprfCombiner {
   }
 }
 
-// TODO(victor) Combine this class with the functionality from the combiner to create a POPRF client
-// that can handle expunging bad partial evaluations from a set of responses.
+/**
+ * Client for interacting with a threshold implementation of the POPRF service without a combiner.
+ *
+ * @privateRemarks
+ * TODO(victor) Combine this class with the functionality from the combiner to create a POPRF client
+ * that can handle expunging bad partial evaluations from a set of responses.
+ */
 export class ThresholdPoprfClient extends PoprfClient {
   /**
    * Constructs POPRF client state, blinding the given message and saving the public keys, blinding
@@ -158,6 +196,12 @@ export class ThresholdPoprfClient extends PoprfClient {
   }
 }
 
+/**
+ * Server for the POPRF protocol for answering queries from clients.
+ *
+ * @remarks Note that, unlike the client, the server object is stateless and may be used for
+ * multiple protocol exchanges, including being used concurrently.
+ */
 export class PoprfServer {
   constructor(readonly privateKey: Uint8Array) {}
 
@@ -173,6 +217,12 @@ export class PoprfServer {
   }
 }
 
+/**
+ * Server for a threshold implementation of the POPRF protocol for answering queries from clients.
+ *
+ * @remarks Note that, unlike the client, the server object is stateless and may be used for
+ * multiple protocol exchanges, including being used concurrently.
+ */
 export class ThresholdPoprfServer {
   constructor(readonly privateKeyShare: Uint8Array) {}
 
