@@ -239,8 +239,8 @@ const DefaultConfig = {
     votesRatioOfLastVsFirstGroup: 2.0,
   },
   stableTokenRegistry: {
-    fiatTicker: '0x474250',
-    stableTokenContractName: '0x537473626c65546f6b656e474250',
+    fiatTicker: '0x494e52', // fiat ticker
+    stableTokenContractName: '0x537461626c65546f6b656e494e52', // stable token contract name
   },
 }
 
