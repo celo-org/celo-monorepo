@@ -582,8 +582,11 @@ contract GrandaMento is
    * @param newSpread The new value for the spread to be wrapped. Must be <= fixed 1.
    */
   function setSpread(uint256 newSpread) public onlyOwner {
-    require(newSpread <= FixidityLib.fixed1().unwrap(), "Spread must be smaller than 1");
     spread = FixidityLib.wrap(newSpread);
+    require(
+      FixidityLib.lte(spread, FixidityLib.fixed1()),
+      "Spread must be less than or equal to 1"
+    );
     emit SpreadSet(newSpread);
   }
 
