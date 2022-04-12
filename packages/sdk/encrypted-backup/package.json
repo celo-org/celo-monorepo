@@ -28,6 +28,7 @@
     "@celo/base":  "1.5.3-dev",
     "@celo/identity":  "1.5.3-dev",
     "@celo/phone-number-privacy-common": "1.0.40-dev",
+    "@celo/poprf": "^0.1.6",
     "@celo/utils":  "1.5.3-dev",
     "@types/debug": "^4.1.5",
     "debug": "^4.1.1",
