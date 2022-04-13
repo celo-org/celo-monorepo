@@ -112,6 +112,15 @@ contract FederatedAttestations is
     return identifiers;
   }
 
+  function validateAttestation(
+    bytes32 identifier,
+    address issuer,
+    Attestation attestation,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public view returns (address) {}
+
   function registerAttestation(bytes32 identifier, address issuer, Attestation attestation) public {
     require(
       msg.sender == attestation.account || msg.sender == issuer || msg.sender == attestation.signer
@@ -143,5 +152,9 @@ contract FederatedAttestations is
         break;
       }
     }
+  }
+
+  function revokeSigner(address signer, uint256 revokedOn) public {
+    revokedSigners[signer] = revokedOn;
   }
 }
