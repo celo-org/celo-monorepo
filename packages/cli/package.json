@@ -28,7 +28,7 @@
     "generate:shrinkwrap": "npm install --production && npm shrinkwrap",
     "check:shrinkwrap": "npm install --production && npm shrinkwrap && ./scripts/check_shrinkwrap_dirty.sh",
     "prepack": "yarn run build && oclif-dev manifest && oclif-dev readme && yarn run check:shrinkwrap",
-    "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 25 --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json",
+    "test:reset": "yarn --cwd ../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../dev-utils/src/migration-override.json --upto 26 --release_gold_contracts scripts/truffle/releaseGoldExampleConfigs.json",
     "test:livechain": "yarn --cwd ../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "TZ=UTC jest --runInBand"
   },

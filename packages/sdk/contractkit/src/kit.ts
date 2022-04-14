@@ -22,7 +22,8 @@ import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
 import { DowntimeSlasherConfig } from './wrappers/DowntimeSlasher'
 import { ElectionConfig } from './wrappers/Election'
 import { ExchangeConfig } from './wrappers/Exchange'
-import { FederatedAttestationsConfig } from './wrappers/FederatedAttestations'
+// TODO ASv2
+// import { FederatedAttestationsConfig } from './wrappers/FederatedAttestations'
 import { GasPriceMinimumConfig } from './wrappers/GasPriceMinimum'
 import { GovernanceConfig } from './wrappers/Governance'
 import { GrandaMentoConfig } from './wrappers/GrandaMento'
@@ -86,7 +87,7 @@ export interface NetworkConfig {
   election: ElectionConfig
   attestations: AttestationsConfig
   // TODO ASv2
-  federatedattestations: FederatedAttestationsConfig
+  // federatedattestations: FederatedAttestationsConfig
   governance: GovernanceConfig
   lockedGold: LockedGoldConfig
   sortedOracles: SortedOraclesConfig
@@ -151,7 +152,7 @@ export class ContractKit {
       CeloContract.Election,
       CeloContract.Attestations,
       // TODO ASv2
-      CeloContract.FederatedAttestations,
+      // CeloContract.FederatedAttestations,
       CeloContract.Governance,
       CeloContract.LockedGold,
       CeloContract.SortedOracles,
