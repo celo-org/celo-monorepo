@@ -82,7 +82,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'Escrow',
       'Exchange',
       'ExchangeEUR',
-      // TODO ASv2 revisit
+      'FederatedAttestations',
       'FeeCurrencyWhitelist',
       'Freezer',
       'GasPriceMinimum',
