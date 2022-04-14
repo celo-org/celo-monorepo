@@ -183,36 +183,43 @@ contract FederatedAttestations is
     addressToIdentifiers[attestation.account][issuer].push(identifier);
   }
 
-  function deleteAttestation(
-    bytes32 identifier,
-    address issuer,
-    address account,
-    Attestation memory attestation
-  ) public {
-    require(msg.sender == attestation.account || msg.sender == issuer);
-    // TODO need to revisit all of this once we have the invariants set between
+  function deleteAttestation(bytes32 identifier, address issuer, address account, uint256 issuedOn)
+    public
+  {
+    // TODO ASv2 this should short-circuit, but double check (i.e. succeeds if msg.sender == account)
+    require(
+      msg.sender == account || getAccounts().attestationSignerToAccount(msg.sender) == issuer
+    );
+    // TODO ASv2 need to revisit all of this once we have the invariants set between
     // identifier -> addresses and reverse mapping
 
-    // for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i++) {
-    //   if (identifierToAddresses[identifier][issuer][i].account == account) {
-    //     identifierToAddresses[identifier][issuer][i] = identifierToAddresses[identifier][issuer][identifierToAddresses[identifier][issuer]
-    //       .length -
-    //       1];
-    //     // TODO revisit: need to ensure the invariant that identifier -> addresses
-    //     // and address -> identifiers stay aligned with one another
-    //     identifierToAddresses[identifier][issuer].pop();
-    //     for (uint256 j = 0; j < addressToIdentifiers[account][issuer].length; j++) {
-    //       if (addressToIdentifiers[account][issuer][j].account == account) {
-    //         addressToIdentifiers[account][issuer][j] = addressToIdentifiers[account][issuer][addressToIdentifiers[account][issuer]
-    //           .length -
-    //           1];
-    //         addressToIdentifiers[account][issuer].pop();
-    //         break;
-    //       }
-    //     }
-    //     break;
-    //   }
-    // }
+    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i++) {
+      Attestation memory attestation = identifierToAddresses[identifier][issuer][i];
+      if (attestation.account == account && attestation.issuedOn == issuedOn) {
+        // Delete only first matching attestation
+        // TODO ASv2 revisit: alternatively, for not just first match could while loop on attestation.account == account and keep swapping in the last element, then break...weird tho
+        identifierToAddresses[identifier][issuer][i] = identifierToAddresses[identifier][issuer][identifierToAddresses[identifier][issuer]
+          .length -
+          1];
+        identifierToAddresses[identifier][issuer].pop();
+
+        bool deletedIdentifier = false;
+        for (uint256 j = 0; j < addressToIdentifiers[account][issuer].length; j++) {
+          // Delete only first matching identifier
+          if (addressToIdentifiers[account][issuer][j] == identifier) {
+            addressToIdentifiers[account][issuer][j] = addressToIdentifiers[account][issuer][addressToIdentifiers[account][issuer]
+              .length -
+              1];
+            addressToIdentifiers[account][issuer].pop();
+            deletedIdentifier = true;
+            break;
+          }
+        }
+        // Hard requirement to delete from both mappings in unison
+        require(deletedIdentifier);
+        break;
+      }
+    }
   }
 
   function revokeSigner(address signer, uint256 revokedOn) public {
