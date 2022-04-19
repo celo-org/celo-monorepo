@@ -223,6 +223,7 @@ contract FederatedAttestations is
   }
 
   function revokeSigner(address signer, uint256 revokedOn) public {
+    // TODO ASv2 add constraints on who can revoke a signer
     revokedSigners[signer] = revokedOn;
   }
 }
