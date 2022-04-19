@@ -16,9 +16,15 @@ Breaking Change
 
   - @celo/utils
       * comment encryption, bls and mneumonic functions moved to @celo/cryptographic-utils
-### **[1.5.1-dev]**
+
+### **[1.5.3]**
 Features
--  one-line summary - [#](link PR)
+- Adds the @celo/encrypted-backup package - [#8896] [#9348] [#9413] [#9434]
+
+[#8896]: https://github.com/celo-org/celo-monorepo/pull/8896
+[#9348]: https://github.com/celo-org/celo-monorepo/pull/9348
+[#9413]: https://github.com/celo-org/celo-monorepo/pull/9413
+[#9434]: https://github.com/celo-org/celo-monorepo/pull/9434
 
 Bug Fixes
 -  one-line summary - [#](link PR)

@@ -25,7 +25,7 @@
 
 ▸ **createBackup**(`__namedParameters`: object): *Promise‹Result‹[Backup](../interfaces/_backup_.backup.md), [BackupError](_errors_.md#backuperror)››*
 
-*Defined in [packages/sdk/encrypted-backup/src/backup.ts:246](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/backup.ts#L246)*
+*Defined in [packages/sdk/encrypted-backup/src/backup.ts:247](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/backup.ts#L247)*
 
 Create a data backup, encrypting it with a hardened key derived from the given password or PIN.
 
@@ -47,7 +47,7 @@ Name | Type | Description |
 `data` | Buffer‹› | The secret data (e.g. BIP-39 mnemonic phrase) to be included in the encrypted backup. |
 `hardening` | [HardeningConfig](../interfaces/_config_.hardeningconfig.md) | Configuration for how the password should be hardened in deriving the key. |
 `metadata` | undefined &#124; object | Arbitrary key-value data to include in the backup to identify it.  |
-`userSecret` | Buffer‹› | Password, PIN, or other user secret to use in deriving the encryption key. |
+`userSecret` | string &#124; Buffer‹› | Password, PIN, or other user secret to use in deriving the encryption key.  If a string is provided, it will be UTF-8 encoded into a Buffer before use. |
 
 **Returns:** *Promise‹Result‹[Backup](../interfaces/_backup_.backup.md), [BackupError](_errors_.md#backuperror)››*
 
@@ -140,7 +140,7 @@ ___
 
 ▸ **openBackup**(`__namedParameters`: object): *Promise‹Result‹Buffer, [BackupError](_errors_.md#backuperror)››*
 
-*Defined in [packages/sdk/encrypted-backup/src/backup.ts:390](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/backup.ts#L390)*
+*Defined in [packages/sdk/encrypted-backup/src/backup.ts:394](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/backup.ts#L394)*
 
 Open an encrypted backup file, using the provided password or PIN to derive the decryption key.
 
@@ -151,6 +151,6 @@ Open an encrypted backup file, using the provided password or PIN to derive the 
 Name | Type | Description |
 ------ | ------ | ------ |
 `backup` | [Backup](../interfaces/_backup_.backup.md) | Backup structure including the ciphertext and key derivation information. |
-`userSecret` | Buffer‹› | Password, PIN, or other user secret to use in deriving the encryption key.  |
+`userSecret` | string &#124; Buffer‹› | Password, PIN, or other user secret to use in deriving the encryption key.  If a string is provided, it will be UTF-8 encoded into a Buffer before use.  |
 
 **Returns:** *Promise‹Result‹Buffer, [BackupError](_errors_.md#backuperror)››*

@@ -2,6 +2,13 @@ export * from './domains'
 export * from './interfaces'
 export { ErrorMessage, WarningMessage } from './interfaces/error-utils'
 export {
+  PoprfClient,
+  PoprfCombiner,
+  PoprfServer,
+  ThresholdPoprfClient,
+  ThresholdPoprfServer,
+} from './poprf'
+export {
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
