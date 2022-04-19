@@ -109,7 +109,7 @@ spec:
         - name: WALLET_MENU_LIST
           value: {{ .Values.blockscout.web.appsMenu.walletList | quote }}
         - name: NFT_MENU_LIST
-          value: {{ .Values.blockscout.web.appsMenu.nftList | quote }}.
+          value: {{ .Values.blockscout.web.appsMenu.nftList | quote }}
         - name: CONNECT_MENU_LIST
           value: {{ .Values.blockscout.web.appsMenu.connectList | quote }}
         - name: SPEND_MENU_LIST
