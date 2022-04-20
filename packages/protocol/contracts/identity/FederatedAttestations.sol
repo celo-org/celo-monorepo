@@ -93,7 +93,7 @@ contract FederatedAttestations is
     return attestations;
   }
 
-  function lookupIdentifiersbyAddress(address account, address[] trustedIssuers)
+  function lookupIdentifiersByAddress(address account, address[] trustedIssuers)
     public
     view
     returns (bytes32[])
