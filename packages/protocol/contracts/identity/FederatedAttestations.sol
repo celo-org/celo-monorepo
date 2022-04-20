@@ -45,6 +45,9 @@ contract FederatedAttestations is
   // signer => revocation time
   mapping(address => uint256) public revokedSigners;
 
+  bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256("ValidateAttestation");
+  bytes32 public eip712DomainSeparator;
+
   // TODO ASv2 Event declarations
 
   /**
@@ -60,7 +63,30 @@ contract FederatedAttestations is
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+    setEip712DomainSeparator();
     // TODO ASv2 initialize any other variables here
+  }
+
+  /**
+   * @notice Sets the EIP712 domain separator for the Celo FederatedAttestations abstraction.
+   */
+  function setEip712DomainSeparator() public {
+    uint256 chainId;
+    assembly {
+      chainId := chainid
+    }
+
+    eip712DomainSeparator = keccak256(
+      abi.encode(
+        keccak256(
+          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        ),
+        keccak256(bytes("FederatedAttestations")),
+        keccak256("1.0"),
+        chainId,
+        address(this)
+      )
+    );
   }
 
   /**
@@ -174,6 +200,16 @@ contract FederatedAttestations is
     bytes32 s
   ) public view returns (address) {
     // TODO check if signer is revoked and is a valid signer of the account
+    bytes32 structHash = keccak256(
+      abi.encode(
+        EIP712_VALIDATE_ATTESTATION_TYPEHASH,
+        identifier,
+        issuer,
+        attestation.account,
+        attestation.signer
+      )
+    );
+    return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
   }
 
   function registerAttestation(
