@@ -155,6 +155,7 @@ contract FederatedAttestations is
   }
 
   function revokeSigner(address signer, uint256 revokedOn) public {
+    // TODO: add permissions for who can revoke
     revokedSigners[signer] = revokedOn;
   }
 }
