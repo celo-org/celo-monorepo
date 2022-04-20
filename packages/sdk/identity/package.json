@@ -18,7 +18,7 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "docs": "typedoc",
-    "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 25",
+    "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 26",
     "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project .",
