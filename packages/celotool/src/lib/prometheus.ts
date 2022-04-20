@@ -145,10 +145,14 @@ function getRemoteWriteParameters(context?: string): string[] {
 }
 
 async function helmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
-  const [cloudProvider, clusterName, gcloudProject, gcloudRegion, stackdriverDisabled, usingGCP] = getK8sContextVars(
-    clusterConfig,
-    context
-  )
+  const [
+    cloudProvider,
+    clusterName,
+    gcloudProject,
+    gcloudRegion,
+    stackdriverDisabled,
+    usingGCP,
+  ] = getK8sContextVars(clusterConfig, context)
 
   const params = [
     `--set namespace=${kubeNamespace}`,
@@ -196,9 +200,7 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     }
   } else {
     // Stackdriver disabled
-    params.push(
-      `--set stackdriver.disabled=true`,
-    )
+    params.push(`--set stackdriver.disabled=true`)
   }
 
   // Set scrape job if set for the context
@@ -330,6 +332,7 @@ async function installGrafana(context?: string, clusterConfig?: BaseClusterConfi
     grafanaHelmChartPath,
     await grafanaHelmParameters(context, clusterConfig),
     // Adding this file and clabs' default values file.
+    true,
     'values-clabs.yaml'
   )
 }
@@ -372,7 +375,7 @@ async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClust
       'auth.google': {
         client_id: fetchEnv(envVar.GRAFANA_LOCAL_OAUTH2_CLIENT_ID),
         client_secret: fetchEnv(envVar.GRAFANA_LOCAL_OAUTH2_CLIENT_SECRET),
-      }
+      },
     },
     ingress: {
       hosts: [grafanaUrl],
@@ -380,9 +383,9 @@ async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClust
         {
           secretName: `${k8sClusterName}-grafana-tls`,
           hosts: [grafanaUrl],
-        }
-      ]
-    }
+        },
+      ],
+    },
   }
 
   const valuesFile = '/tmp/grafana-values.yaml'
