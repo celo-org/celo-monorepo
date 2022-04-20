@@ -15,7 +15,7 @@ const FederatedAttestations: FederatedAttestationsContract = artifacts.require(
 )
 const Registry: RegistryContract = artifacts.require('Registry')
 
-contract('Attestations', (accounts: string[]) => {
+contract('FederatedAttestations', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let federatedAttestations: FederatedAttestationsInstance
   let registry: RegistryInstance
@@ -39,5 +39,25 @@ contract('Attestations', (accounts: string[]) => {
       assert(caller)
       assert(federatedAttestations)
     })
+  })
+
+  describe('#lookupAttestations', () => {
+    it('should', async () => {})
+  })
+
+  describe('#lookupIdentifiersByAddress', () => {
+    it('should', async () => {})
+  })
+
+  describe('#validateAttestation', () => {
+    it('should', async () => {})
+  })
+
+  describe('#registerAttestation', () => {
+    it('should', async () => {})
+  })
+
+  describe('#deleteAttestation', () => {
+    it('should', async () => {})
   })
 })
