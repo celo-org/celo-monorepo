@@ -1,3 +1,4 @@
+// TODO figure out if we can use a new solidity version for just this one contract
 pragma solidity ^0.5.13;
 // TODO ASv2 come back to this and possibly flatten structs as arg params
 pragma experimental ABIEncoderV2;
@@ -32,13 +33,13 @@ contract FederatedAttestations is
   using SafeMath for uint256;
   using SafeCast for uint256;
 
-  struct Attestation {
+  struct IdentifierOwnershipAttestation {
     address account;
     uint256 issuedOn;
     address signer;
   }
   // identifier -> issuer -> attestations
-  mapping(bytes32 => mapping(address => Attestation[])) public identifierToAddresses;
+  mapping(bytes32 => mapping(address => IdentifierOwnershipAttestation[])) public identifierToAddresses;
   // account -> issuer -> identifiers
   mapping(address => mapping(address => bytes32[])) public addressToIdentifiers;
   // signer => revocation time
@@ -81,18 +82,20 @@ contract FederatedAttestations is
     bytes32 identifier,
     address[] memory trustedIssuers,
     uint256 maxAttestations
-  ) public view returns (Attestation[] memory) {
+  ) public view returns (IdentifierOwnershipAttestation[] memory) {
     // Cannot dynamically allocate an in-memory array
     // For now require a max returned parameter to pre-allocate and then shrink
     // TODO ASv2 probably need a more gas-efficient lookup for the single most-recent attestation for one trusted issuer
     uint256 currIndex = 0;
-    Attestation[] memory attestations = new Attestation[](maxAttestations);
+    IdentifierOwnershipAttestation[] memory attestations = new IdentifierOwnershipAttestation[](
+      maxAttestations
+    );
     for (uint256 i = 0; i < trustedIssuers.length; i++) {
       address trustedIssuer = trustedIssuers[i];
       for (uint256 j = 0; j < identifierToAddresses[identifier][trustedIssuer].length; j++) {
         // Only create and push new attestation if we haven't hit max
         if (currIndex < maxAttestations) {
-          Attestation memory attestation = identifierToAddresses[identifier][trustedIssuer][j];
+          IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuer][j];
           if (!_isRevoked(attestation.signer, attestation.issuedOn)) {
             attestations[currIndex] = attestation;
             currIndex++;
@@ -103,7 +106,9 @@ contract FederatedAttestations is
       }
     }
     if (currIndex < maxAttestations) {
-      Attestation[] memory trimmedAttestations = new Attestation[](currIndex);
+      IdentifierOwnershipAttestation[] memory trimmedAttestations = new IdentifierOwnershipAttestation[](
+        currIndex
+      );
       for (uint256 i = 0; i < currIndex; i++) {
         trimmedAttestations[i] = attestations[i];
       }
@@ -130,7 +135,7 @@ contract FederatedAttestations is
           bytes32 identifier = addressToIdentifiers[account][trustedIssuer][j];
           // Check if this signer for this particular signer is revoked
           for (uint256 k = 0; k < identifierToAddresses[identifier][trustedIssuer].length; k++) {
-            Attestation memory attestation = identifierToAddresses[identifier][trustedIssuer][k];
+            IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuer][k];
             // For now, just take the first published, unrevoked signer that matches
             // TODO redo this to take into account either recency or the "correct" identifier
             // based on the index
@@ -163,49 +168,51 @@ contract FederatedAttestations is
   function validateAttestation(
     bytes32 identifier,
     address issuer,
-    Attestation memory attestation,
+    IdentifierOwnershipAttestation memory attestation,
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) public view returns (address) {}
+  ) public view returns (address) {
+    // TODO check if signer is revoked and is a valid signer of the account
+  }
 
-  function registerAttestation(bytes32 identifier, address issuer, Attestation memory attestation)
-    public
-  {
+  function registerAttestation(
+    bytes32 identifier,
+    address issuer,
+    IdentifierOwnershipAttestation memory attestation
+  ) public {
+    // TODO call validateAttestation here
     require(
       msg.sender == attestation.account || msg.sender == issuer || msg.sender == attestation.signer
     );
     for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i++) {
-      // TODO revisit this: do we only want to check that the account address is not duplicated?
+      // This enforces only one attestation to be uploaded for a given set of (identifier, issuer, account)
+      // Editing/upgrading an attestation requires that it be deleted before a new one is registered
       require(identifierToAddresses[identifier][issuer][i].account != attestation.account);
     }
     identifierToAddresses[identifier][issuer].push(attestation);
     addressToIdentifiers[attestation.account][issuer].push(identifier);
   }
 
-  function deleteAttestation(bytes32 identifier, address issuer, address account, uint256 issuedOn)
-    public
-  {
+  function deleteAttestation(bytes32 identifier, address issuer, address account) public {
     // TODO ASv2 this should short-circuit, but double check (i.e. succeeds if msg.sender == account)
     require(
       msg.sender == account || getAccounts().attestationSignerToAccount(msg.sender) == issuer
     );
-    // TODO ASv2 need to revisit all of this once we have the invariants set between
-    // identifier -> addresses and reverse mapping
 
     for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i++) {
-      Attestation memory attestation = identifierToAddresses[identifier][issuer][i];
-      if (attestation.account == account && attestation.issuedOn == issuedOn) {
-        // Delete only first matching attestation
-        // TODO ASv2 revisit: alternatively, for not just first match could while loop on attestation.account == account and keep swapping in the last element, then break...weird tho
+      IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][issuer][i];
+      if (attestation.account == account) {
+        // This is meant to delete the attestation in the array and then move the last element in the array to that empty spot, to avoid having empty elements in the array
+        // Not sure if this is needed and if the added gas costs from the complexity is worth it
         identifierToAddresses[identifier][issuer][i] = identifierToAddresses[identifier][issuer][identifierToAddresses[identifier][issuer]
           .length -
           1];
         identifierToAddresses[identifier][issuer].pop();
 
+        // TODO revisit if deletedIdentifier check is necessary - not sure if there would ever be a situation where the matching identifier is not present
         bool deletedIdentifier = false;
         for (uint256 j = 0; j < addressToIdentifiers[account][issuer].length; j++) {
-          // Delete only first matching identifier
           if (addressToIdentifiers[account][issuer][j] == identifier) {
             addressToIdentifiers[account][issuer][j] = addressToIdentifiers[account][issuer][addressToIdentifiers[account][issuer]
               .length -
