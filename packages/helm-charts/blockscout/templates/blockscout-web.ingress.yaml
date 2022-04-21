@@ -8,7 +8,6 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
-    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/proxy-body-size: 8m
     nginx.ingress.kubernetes.io/configuration-snippet: |
       location ~ /admin/.* {
@@ -24,6 +23,7 @@ metadata:
         return 301 /address/$1/coin-balances;
       }
 spec:
+  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
   tls:
   - hosts:
     - {{ .Release.Name }}.{{ .Values.domain.name }}.org
@@ -34,13 +34,16 @@ spec:
       paths:
       - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
         backend:
-          serviceName: {{ .Release.Name }}-web
-          servicePort: 4000
+          service:
+            name: {{ .Release.Name }}-web
+            port: 4000
       - path: /(graphql|graphiql|api)
         backend:
-          serviceName: {{ .Release.Name }}-api
-          servicePort: 4000
+          service:
+            name: {{ .Release.Name }}-api
+            port: 4000
       - path: /
         backend:
-          serviceName: {{ .Release.Name }}-web
-          servicePort: 4000
+          service:
+            name: {{ .Release.Name }}-web
+            port: 4000

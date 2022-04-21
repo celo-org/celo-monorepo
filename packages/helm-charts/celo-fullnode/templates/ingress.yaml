@@ -15,6 +15,7 @@ metadata:
 {{- end }}
 {{- end }}
 spec:
+  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
 {{- if .Values.ingress.tls }}
   tls:
   {{- range .Values.ingress.tls }}
@@ -32,7 +33,8 @@ spec:
         paths:
           - path: {{ $ingressPath }}
             backend:
-              serviceName: {{ $fullName }}-rpc
-              servicePort: rpc
+              service:
+                name: {{ $fullName }}-rpc
+                port: rpc
   {{- end }}
 {{- end }}

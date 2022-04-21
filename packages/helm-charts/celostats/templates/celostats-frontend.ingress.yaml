@@ -10,8 +10,8 @@ metadata:
     component: celostats-frontend
   annotations:
     kubernetes.io/tls-acme: "true"
-    kubernetes.io/ingress.class: nginx
 spec:
+  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
   tls:
   - hosts:
     - {{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}.org
@@ -22,5 +22,6 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: {{ .Release.Namespace }}-celostats-frontend
-          servicePort: 80
+          service:
+            name: {{ .Release.Namespace }}-celostats-frontend
+            port: 80

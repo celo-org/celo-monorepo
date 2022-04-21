@@ -331,7 +331,6 @@ async function grafanaHelmParameters() {
     ingress: {
       enabled: true,
       annotations: {
-        'kubernetes.io/ingress.class': 'nginx',
         'kubernetes.io/tls-acme': 'true',
       },
       hosts: [`${k8sClusterName}-grafana.${k8sDomainName}.org`],

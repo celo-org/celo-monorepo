@@ -1,8 +1,4 @@
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1" }}
 apiVersion: networking.k8s.io/v1
-{{ else }}
-apiVersion: extensions/v1beta1
-{{ end -}}
 kind: Ingress
 metadata:
   name: {{ .Release.Namespace }}-forno-ingress
@@ -16,6 +12,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "1200"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "1200"
 spec:
+  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
   tls:
   - hosts:
     - {{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
@@ -26,5 +23,6 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: tx-nodes
-          servicePort: 8545
+          service:
+            name: tx-nodes
+            port: 8545
