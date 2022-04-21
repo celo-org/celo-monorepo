@@ -36,6 +36,9 @@ export const JSONStringType = new t.Type<string, string, unknown>(
   String
 )
 
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export const E164PhoneNumberType = new t.Type<string, string, unknown>(
   'E164Number',
   t.string.is,
@@ -76,6 +79,9 @@ export const SignatureType = t.string
 
 export const SaltType = t.string
 
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export const AttestationServiceStatusResponseType = t.type({
   status: t.literal('ok'),
   smsProviders: t.array(t.string),
@@ -93,18 +99,32 @@ export const AttestationServiceStatusResponseType = t.type({
   twilioVerifySidProvided: t.boolean,
 })
 
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export const AttestationServiceTestRequestType = t.type({
   phoneNumber: E164PhoneNumberType,
   message: t.string,
   signature: SignatureType,
   provider: t.union([t.string, t.undefined]),
 })
+
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export type AttestationServiceTestRequest = t.TypeOf<typeof AttestationServiceTestRequestType>
 
 export type Signature = t.TypeOf<typeof SignatureType>
 export type Address = t.TypeOf<typeof AddressType>
+
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export type E164Number = t.TypeOf<typeof E164PhoneNumberType>
 
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export const AttestationRequestType = t.type({
   phoneNumber: E164PhoneNumberType,
   account: AddressType,
@@ -117,8 +137,14 @@ export const AttestationRequestType = t.type({
   language: t.union([t.undefined, t.string]),
 })
 
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>
 
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export const GetAttestationRequestType = t.type({
   phoneNumber: E164PhoneNumberType,
   account: AddressType,
@@ -129,6 +155,9 @@ export const GetAttestationRequestType = t.type({
   securityCode: t.union([t.undefined, t.string]),
 })
 
+/**
+ * @deprecated moved to @celo/phone-utils will be removed in next major version
+ */
 export type GetAttestationRequest = t.TypeOf<typeof GetAttestationRequestType>
 
 export const AttestationResponseType = t.type({

@@ -1,3 +1,9 @@
+queue_rules:
+  - name: default
+    conditions:
+      # Conditions to get out of the queue (= merged)
+      - "-merged"
+
 pull_request_rules:
   - name: Automatically merge on CI success and code review
     conditions:
@@ -10,9 +16,9 @@ pull_request_rules:
       # Only enable this when the pull request is being merged into master
       - "base=master"
     actions:
-      merge:
-        method: squash 
-        strict: true
+      queue:
+        method: squash
+        name: default
         commit_message: title+body
       delete_head_branch:
         force: False

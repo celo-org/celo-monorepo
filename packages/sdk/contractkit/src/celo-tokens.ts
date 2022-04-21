@@ -7,6 +7,7 @@ import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 export enum StableToken {
   cUSD = 'cUSD',
   cEUR = 'cEUR',
+  cREAL = 'cREAL',
 }
 
 export enum Token {
@@ -44,6 +45,11 @@ export const stableTokenInfos: {
     contract: CeloContract.StableTokenEUR,
     exchangeContract: CeloContract.ExchangeEUR,
     symbol: StableToken.cEUR,
+  },
+  [StableToken.cREAL]: {
+    contract: CeloContract.StableTokenBRL,
+    exchangeContract: CeloContract.ExchangeBRL,
+    symbol: StableToken.cREAL,
   },
 }
 

@@ -29,6 +29,7 @@
     "void-zero": false,
     "no-global-arrow-functions": true,
     "no-floating-promises": true,
-    "no-promise-as-boolean": true
+    "no-promise-as-boolean": true,
+    "import-blacklist": [true, { "elliptic": ["ec"]}]
   }
 }
