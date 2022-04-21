@@ -1,7 +1,7 @@
 # @celo/connect
 
 
-*Connect to the Celo Blockchain.*  `Connection` provides the core of what you need to interact with Celo blockchain. The Core Difference between it and ContractKit is that it provides zero Contract Wrappers, and therefore leaves out convenience methods for example  for setting FeeCurrency, or getting configs
+*Connect to the Celo Blockchain.*  `Connection` provides the core of what you need to interact with Celo blockchain. The Core Difference between it and ContractKit is that it provides zero Contract Wrappers, and therefore leaves out convenience methods for example for setting FeeCurrency, or getting configs.
 
 ## Examples
 
