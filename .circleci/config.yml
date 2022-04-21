@@ -191,13 +191,6 @@ jobs:
       - run: yarn run prettify:diff
       - run: yarn run lint
 
-  vulnerability-checks:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run: ./scripts/ci_check_vulnerabilities.sh
-
   general-test:
     <<: *defaults
     resource_class: large
@@ -894,9 +887,6 @@ workflows:
           requires:
             - install_dependencies
       - lint-checks:
-          requires:
-            - install_dependencies
-      - vulnerability-checks:
           requires:
             - install_dependencies
       - general-test:
