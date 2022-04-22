@@ -185,9 +185,7 @@ fi
 
     {{- include  "common.bootnode-flag-script" . | nindent 4 }}
 
-    {{- if .extra_setup }}
-    {{ .extra_setup | indent 4 }}
-    {{- end }}
+    {{ default "# No extra setup" .extra_setup | nindent 4 | trim }}
 
     exec geth \
       --port $PORT \

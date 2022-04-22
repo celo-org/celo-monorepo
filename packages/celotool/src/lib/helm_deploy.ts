@@ -445,7 +445,7 @@ export async function deleteIPAddress(name: string, zone?: string) {
   console.info(`Deleting IP address ${name}`)
   try {
     if (isCelotoolVerbose()) {
-      console.log(`IP Address ${name} would be deleted`)
+      console.info(`IP Address ${name} would be deleted`)
     } else {
       await execCmd(
         `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
