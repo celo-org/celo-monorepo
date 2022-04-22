@@ -444,9 +444,13 @@ export async function registerIPAddress(name: string, zone?: string) {
 export async function deleteIPAddress(name: string, zone?: string) {
   console.info(`Deleting IP address ${name}`)
   try {
-    await execCmd(
-      `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
-    )
+    if (isCelotoolVerbose()) {
+      console.info(`IP Address ${name} would be deleted`)
+    } else {
+      await execCmd(
+        `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
+      )
+    }
   } catch (error: any) {
     if (!error.toString().includes('was not found')) {
       console.error(error)
