@@ -53,7 +53,7 @@ metadata:
 {{- end }}
     component: {{ .component_label }}
 spec:
-  sessionAffinity: ClientIP
+  sessionAffinity: None
   ports:
   - port: 8545
     name: rpc
