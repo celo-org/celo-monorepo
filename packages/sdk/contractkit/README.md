@@ -15,7 +15,7 @@ ContractKit supports the following functionality:
 
 :::tip
 
-You might not need the full ContractKit, Consider using `@celo/connect` which powers much of ContractKit such as building and sending Transactions, signing, etc, but does not give access to any celo Contract Wrappers. Or if a subset of Wrappers, setting the feeCurrency and account info is all your dapp needs consider replacing your imports of Contractkit with `@celo/contractkit/lib/mini-kit`
+You might not need the full ContractKit. Consider using `@celo/connect` which powers much of ContractKit such as building and sending Transactions, signing, etc, but does not give access to any celo Contract Wrappers. Or if a subset of Wrappers, setting the feeCurrency and account info is all your dapp needs consider replacing your imports of Contractkit with `@celo/contractkit/lib/mini-kit`
 
 :::
 
