@@ -18,9 +18,9 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "2.0.0-beta.2-dev",
-    "@celo/contractkit": "2.0.0-beta.2-dev",
-    "@celo/utils": "2.0.0-beta.2-dev",
+    "@celo/base": "2.0.0-rc.1-dev",
+    "@celo/contractkit": "2.0.0-rc.1-dev",
+    "@celo/utils": "2.0.0-rc.1-dev",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "btoa": "1.2.1",
@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@celo/poprf": "^0.1.6",
-    "@celo/wallet-local": "2.0.0-beta.2-dev",
+    "@celo/wallet-local": "2.0.0-rc.1-dev",
     "@types/btoa": "^1.2.3",
     "@types/bunyan": "1.8.4",
     "@types/elliptic": "^6.4.12",
