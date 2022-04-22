@@ -25,6 +25,7 @@ for detail info see [#9127](https://github.com/celo-org/celo-monorepo/pull/9127)
 - @celo/contractkit
   - AccountsWrapper.authorizeValidatorSigner now requires a ValidatorWrapper as third param
   - kit is now longer required when constructing WrapperCache, AddressRegistry, Contract Wrappers
+  - proxySend now takes a Connection rather than a Kit
 
 - @celo/utils
 
