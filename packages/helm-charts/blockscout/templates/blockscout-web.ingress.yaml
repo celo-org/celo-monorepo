@@ -23,7 +23,9 @@ metadata:
         return 301 /address/$1/coin-balances;
       }
 spec:
-  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   tls:
   - hosts:
     - {{ .Release.Name }}.{{ .Values.domain.name }}.org

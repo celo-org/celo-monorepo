@@ -12,7 +12,9 @@ metadata:
         deny all;
       }
 spec:
-  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   tls:
   - hosts:
     - {{ .Release.Name }}-api.{{ .Values.domain.name }}.org

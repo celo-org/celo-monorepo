@@ -15,7 +15,9 @@ metadata:
         return 301 https://{{ .Release.Namespace }}-celostats.{{ .Values.domain.name }}.org/;
       }
 spec:
-  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   tls:
   - hosts:
     - {{ .Release.Namespace }}-ethstats.{{ .Values.domain.name }}.org

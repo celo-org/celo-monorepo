@@ -12,7 +12,9 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     kubernetes.io/tls-acme: "true"
 spec:
-  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   tls:
   - hosts:
     - {{ .Release.Name }}.{{ .Values.domain.name }}.org

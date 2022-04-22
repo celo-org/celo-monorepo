@@ -5,7 +5,9 @@ metadata:
   annotations:
     kubernetes.io/tls-acme: "true"
 spec:
-  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   tls:
   - secretName: {{ .Release.Namespace }}-web-tls
   rules:
