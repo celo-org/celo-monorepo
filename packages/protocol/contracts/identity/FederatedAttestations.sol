@@ -73,10 +73,9 @@ contract FederatedAttestations is
   }
 
   function _isRevoked(address signer, uint256 time) internal view returns (bool) {
-    if (revokedSigners[signer] > 0 && revokedSigners[signer] >= time) {
-      return true;
-    }
-    return false;
+    require(time >= 0);
+    uint256 revokedOn = revokedSigners[signer];
+    return revokedOn > 0 && revokedOn <= time ? true : false;
   }
 
   /**
