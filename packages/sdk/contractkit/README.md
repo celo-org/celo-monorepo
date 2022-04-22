@@ -171,7 +171,7 @@ E.G. `kit.contracts.getAccounts()`,  `kit.contracts.getValidators()`
 
 #### Stand Alone Wrappers
 
-You can also initialize contracts directly. They require a `Connection`:
+You can also initialize contracts wrappers directly. They require a `Connection`:
 
 ```typescript
 // MiniContractKit only gives access to a limited set of Contracts, so we import Multisig
