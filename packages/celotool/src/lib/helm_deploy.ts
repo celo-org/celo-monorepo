@@ -908,7 +908,7 @@ export async function upgradeGenericHelmChart(
     )
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm diff upgrade --install -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`,
       true
@@ -916,7 +916,7 @@ export async function upgradeGenericHelmChart(
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm upgrade --install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
