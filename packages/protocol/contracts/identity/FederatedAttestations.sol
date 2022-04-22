@@ -33,6 +33,7 @@ contract FederatedAttestations is
   using SafeMath for uint256;
   using SafeCast for uint256;
 
+  // TODO ASv2 fix all ++ -> SafeMath x = x.add(1)
   struct IdentifierOwnershipAttestation {
     address account;
     uint256 issuedOn;
@@ -78,43 +79,74 @@ contract FederatedAttestations is
     return false;
   }
 
+  /**
+   * @notice Returns attestations for an identifier produced by a list of issuers
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @param maxAttestations Limit the number of attestations that will be returned
+   * @return for m found attestations, m <= maxAttestations:
+   *         [
+   *           Array of m accounts,
+   *           Array of m issuedOns,
+   *           Array of m signers
+   *         ]; index corresponds to the same attestation
+   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
+   * @dev Adds all attestations produced by unrevoked signers for an
+   * (identifier, issuer) pair; i.e. not only the most recent attestation.
+   */
+
+  // TODO ASv2 consider also returning an array with counts of attestations per issuer
   function lookupAttestations(
     bytes32 identifier,
     address[] memory trustedIssuers,
     uint256 maxAttestations
-  ) public view returns (IdentifierOwnershipAttestation[] memory) {
+  ) public view returns (address[] memory, uint256[] memory, address[] memory) {
     // Cannot dynamically allocate an in-memory array
     // For now require a max returned parameter to pre-allocate and then shrink
-    // TODO ASv2 probably need a more gas-efficient lookup for the single most-recent attestation for one trusted issuer
+    // TODO ASv2 is it a risk to allocate an array of size maxAttestations?
+    // Same index corresponds to same attestation
+    address[] memory accounts = new address[](maxAttestations);
+    uint256[] memory issuedOns = new uint256[](maxAttestations);
+    address[] memory signers = new address[](maxAttestations);
+
     uint256 currIndex = 0;
-    IdentifierOwnershipAttestation[] memory attestations = new IdentifierOwnershipAttestation[](
-      maxAttestations
-    );
-    for (uint256 i = 0; i < trustedIssuers.length; i++) {
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       address trustedIssuer = trustedIssuers[i];
-      for (uint256 j = 0; j < identifierToAddresses[identifier][trustedIssuer].length; j++) {
+      for (
+        uint256 j = 0;
+        j < identifierToAddresses[identifier][trustedIssuer].length;
+        j = j.add(1)
+      ) {
         // Only create and push new attestation if we haven't hit max
         if (currIndex < maxAttestations) {
           IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuer][j];
           if (!_isRevoked(attestation.signer, attestation.issuedOn)) {
-            attestations[currIndex] = attestation;
-            currIndex++;
+            accounts[currIndex] = attestation.account;
+            issuedOns[currIndex] = attestation.issuedOn;
+            signers[currIndex] = attestation.signer;
+            currIndex = currIndex.add(1);
           }
         } else {
           break;
         }
       }
     }
+
+    // Trim returned structs if necessary
     if (currIndex < maxAttestations) {
-      IdentifierOwnershipAttestation[] memory trimmedAttestations = new IdentifierOwnershipAttestation[](
-        currIndex
-      );
-      for (uint256 i = 0; i < currIndex; i++) {
-        trimmedAttestations[i] = attestations[i];
+      address[] memory trimmedAccounts = new address[](currIndex);
+      uint256[] memory trimmedIssuedOns = new uint256[](currIndex);
+      address[] memory trimmedSigners = new address[](currIndex);
+
+      for (uint256 i = 0; i < currIndex; i = i.add(1)) {
+        trimmedAccounts[i] = accounts[i];
+        trimmedIssuedOns[i] = issuedOns[i];
+        trimmedSigners[i] = signers[i];
       }
-      return trimmedAttestations;
+      return (trimmedAccounts, trimmedIssuedOns, trimmedSigners);
     } else {
-      return attestations;
+      return (accounts, issuedOns, signers);
     }
   }
 
