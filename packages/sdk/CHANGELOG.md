@@ -14,10 +14,9 @@ Other Changes
 
 ## Development (not published yet)
 
+### **[2.0.0]**
 
-
-### **[2.0.0-dev]**
-
+See [Upgrade Guide](https://docs.celo.org/developer-guide/contractkit/migrating-to-contractkit-v2)
 
 Breaking Changes
 
