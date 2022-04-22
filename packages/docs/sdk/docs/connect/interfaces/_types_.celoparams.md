@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["types"](../modules/_types_.md) › [CeloParams](_types_.celoparams.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["types"](../modules/_types_.md) › [CeloParams](_types_.celoparams.md)
 
 # Interface: CeloParams
 
@@ -20,7 +20,7 @@
 
 • **feeCurrency**: *string*
 
-*Defined in [packages/sdk/connect/src/types.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L7)*
+*Defined in [types.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L7)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **gatewayFee**: *string*
 
-*Defined in [packages/sdk/connect/src/types.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L9)*
+*Defined in [types.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L9)*
 
 ___
 
@@ -36,4 +36,4 @@ ___
 
 • **gatewayFeeRecipient**: *string*
 
-*Defined in [packages/sdk/connect/src/types.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L8)*
+*Defined in [types.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L8)*

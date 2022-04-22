@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["identity/metadata"](_identity_metadata_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["identity/metadata"](_identity_metadata_.md)
 
 # Module: "identity/metadata"
 
@@ -32,7 +32,7 @@
 
 Ƭ **IdentityMetadata**: *t.TypeOf‹typeof IdentityMetadataType›*
 
-*Defined in [packages/sdk/contractkit/src/identity/metadata.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/metadata.ts#L26)*
+*Defined in [packages/sdk/contractkit/src/identity/metadata.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/metadata.ts#L30)*
 
 ## Variables
 
@@ -43,4 +43,4 @@
   meta: MetaType,
 })
 
-*Defined in [packages/sdk/contractkit/src/identity/metadata.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/metadata.ts#L22)*
+*Defined in [packages/sdk/contractkit/src/identity/metadata.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/metadata.ts#L25)*

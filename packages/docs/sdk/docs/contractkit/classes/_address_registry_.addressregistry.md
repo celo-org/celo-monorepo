@@ -1,8 +1,10 @@
-[@celo/contractkit](../README.md) › ["address-registry"](../modules/_address_registry_.md) › [AddressRegistry](_address_registry_.addressregistry.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["address-registry"](../modules/_address_registry_.md) › [AddressRegistry](_address_registry_.addressregistry.md)
 
 # Class: AddressRegistry
 
 Celo Core Contract's Address Registry
+
+**`param`** – an instance of @celo/connect {@link Connection}
 
 ## Hierarchy
 
@@ -14,6 +16,10 @@ Celo Core Contract's Address Registry
 
 * [constructor](_address_registry_.addressregistry.md#constructor)
 
+### Properties
+
+* [connection](_address_registry_.addressregistry.md#readonly-connection)
+
 ### Methods
 
 * [addressFor](_address_registry_.addressregistry.md#addressfor)
@@ -23,17 +29,25 @@ Celo Core Contract's Address Registry
 
 ###  constructor
 
-\+ **new AddressRegistry**(`kit`: [ContractKit](_kit_.contractkit.md)): *[AddressRegistry](_address_registry_.addressregistry.md)*
+\+ **new AddressRegistry**(`connection`: Connection): *[AddressRegistry](_address_registry_.addressregistry.md)*
 
-*Defined in [packages/sdk/contractkit/src/address-registry.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L23)*
+*Defined in [packages/sdk/contractkit/src/address-registry.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L25)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`kit` | [ContractKit](_kit_.contractkit.md) |
+`connection` | Connection |
 
 **Returns:** *[AddressRegistry](_address_registry_.addressregistry.md)*
+
+## Properties
+
+### `Readonly` connection
+
+• **connection**: *Connection*
+
+*Defined in [packages/sdk/contractkit/src/address-registry.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L27)*
 
 ## Methods
 
@@ -41,7 +55,7 @@ Name | Type |
 
 ▸ **addressFor**(`contract`: [CeloContract](../enums/_base_.celocontract.md)): *Promise‹Address›*
 
-*Defined in [packages/sdk/contractkit/src/address-registry.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L33)*
+*Defined in [packages/sdk/contractkit/src/address-registry.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L35)*
 
 Get the address for a `CeloContract`
 
@@ -59,7 +73,7 @@ ___
 
 ▸ **addressMapping**(): *Promise‹Map‹[CeloContract](../enums/_base_.celocontract.md), string››*
 
-*Defined in [packages/sdk/contractkit/src/address-registry.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L51)*
+*Defined in [packages/sdk/contractkit/src/address-registry.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/address-registry.ts#L53)*
 
 Get the address mapping for known registered contracts
 

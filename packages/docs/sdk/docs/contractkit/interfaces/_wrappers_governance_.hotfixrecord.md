@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [HotfixRecord](_wrappers_governance_.hotfixrecord.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [HotfixRecord](_wrappers_governance_.hotfixrecord.md)
 
 # Interface: HotfixRecord
 

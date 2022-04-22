@@ -1,20 +1,37 @@
-[@celo/connect](README.md)
+[@celo/connect](README.md) › [Globals](globals.md)
 
 # @celo/connect
 
-## Index
+# @celo/connect
 
-### Modules
+*Connect to the Celo Blockchain.*  `Connection` provides the core of what you need to interact with Celo blockchain. The Core Difference between it and ContractKit is that it provides zero Contract Wrappers, and therefore leaves out convenience methods for example for setting FeeCurrency, or getting configs.
 
-* ["abi-types"](modules/_abi_types_.md)
-* ["celo-provider"](modules/_celo_provider_.md)
-* ["connection"](modules/_connection_.md)
-* ["types"](modules/_types_.md)
-* ["utils/abi-utils"](modules/_utils_abi_utils_.md)
-* ["utils/celo-transaction-object"](modules/_utils_celo_transaction_object_.md)
-* ["utils/formatter"](modules/_utils_formatter_.md)
-* ["utils/provider-utils"](modules/_utils_provider_utils_.md)
-* ["utils/rpc-caller"](modules/_utils_rpc_caller_.md)
-* ["utils/tx-params-normalizer"](modules/_utils_tx_params_normalizer_.md)
-* ["utils/tx-result"](modules/_utils_tx_result_.md)
-* ["wallet"](modules/_wallet_.md)
+## Examples
+
+### Basic
+
+```typescript
+import { Connection, CeloProvider } from '@celo/connect'
+
+const web3 = new Web3("YOUR_RPC_URL")
+const connection = new Connection(web3)
+
+connection.setProvider()
+
+const connectedChainID =  await connection.chainId()
+
+```
+
+For a raw transaction:
+
+```ts
+const oneCelo = connection.web3.utils.toWei('1', 'ether')
+
+const tx = connection.sendTransaction({
+  from: myAddress,
+  to: someAddress,
+  value: oneCelo,
+})
+const hash = await tx.getHash()
+const receipt = await tx.waitReceipt()
+```

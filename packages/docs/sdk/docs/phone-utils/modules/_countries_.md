@@ -1,4 +1,4 @@
-[@celo/phone-utils](../README.md) › ["countries"](_countries_.md)
+[@celo/phone-utils](../README.md) › [Globals](../globals.md) › ["countries"](_countries_.md)
 
 # Module: "countries"
 

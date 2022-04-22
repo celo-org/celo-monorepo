@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Exchange"](../modules/_wrappers_exchange_.md) › [ExchangeConfig](_wrappers_exchange_.exchangeconfig.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Exchange"](../modules/_wrappers_exchange_.md) › [ExchangeConfig](_wrappers_exchange_.exchangeconfig.md)
 
 # Interface: ExchangeConfig
 

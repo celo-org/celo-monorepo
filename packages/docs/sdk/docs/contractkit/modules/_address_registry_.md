@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["address-registry"](_address_registry_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["address-registry"](_address_registry_.md)
 
 # Module: "address-registry"
 

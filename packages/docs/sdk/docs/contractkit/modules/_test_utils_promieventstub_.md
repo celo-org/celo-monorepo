@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["test-utils/PromiEventStub"](_test_utils_promieventstub_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["test-utils/PromiEventStub"](_test_utils_promieventstub_.md)
 
 # Module: "test-utils/PromiEventStub"
 

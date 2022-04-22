@@ -1,4 +1,4 @@
-[@celo/phone-utils](../README.md) › ["getCountryEmoji"](_getcountryemoji_.md)
+[@celo/phone-utils](../README.md) › [Globals](../globals.md) › ["getCountryEmoji"](_getcountryemoji_.md)
 
 # Module: "getCountryEmoji"
 

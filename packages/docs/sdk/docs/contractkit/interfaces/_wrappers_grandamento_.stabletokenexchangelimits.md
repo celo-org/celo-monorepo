@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/GrandaMento"](../modules/_wrappers_grandamento_.md) › [StableTokenExchangeLimits](_wrappers_grandamento_.stabletokenexchangelimits.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/GrandaMento"](../modules/_wrappers_grandamento_.md) › [StableTokenExchangeLimits](_wrappers_grandamento_.stabletokenexchangelimits.md)
 
 # Interface: StableTokenExchangeLimits
 

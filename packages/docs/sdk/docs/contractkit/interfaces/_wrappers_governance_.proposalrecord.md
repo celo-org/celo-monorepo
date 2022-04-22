@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [ProposalRecord](_wrappers_governance_.proposalrecord.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [ProposalRecord](_wrappers_governance_.proposalrecord.md)
 
 # Interface: ProposalRecord
 

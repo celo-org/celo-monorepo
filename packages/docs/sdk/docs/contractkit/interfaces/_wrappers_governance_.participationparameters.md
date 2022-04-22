@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [ParticipationParameters](_wrappers_governance_.participationparameters.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [ParticipationParameters](_wrappers_governance_.participationparameters.md)
 
 # Interface: ParticipationParameters
 

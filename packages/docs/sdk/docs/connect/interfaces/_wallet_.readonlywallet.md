@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["wallet"](../modules/_wallet_.md) › [ReadOnlyWallet](_wallet_.readonlywallet.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["wallet"](../modules/_wallet_.md) › [ReadOnlyWallet](_wallet_.readonlywallet.md)
 
 # Interface: ReadOnlyWallet
 
@@ -25,7 +25,7 @@
 
 • **computeSharedSecret**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L12)*
+*Defined in [wallet.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L12)*
 
 #### Type declaration:
 
@@ -44,7 +44,7 @@ ___
 
 • **decrypt**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L11)*
+*Defined in [wallet.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L11)*
 
 #### Type declaration:
 
@@ -63,7 +63,7 @@ ___
 
 • **getAccounts**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L5)*
+*Defined in [wallet.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L5)*
 
 #### Type declaration:
 
@@ -75,7 +75,7 @@ ___
 
 • **hasAccount**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L7)*
+*Defined in [wallet.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L7)*
 
 #### Type declaration:
 
@@ -93,7 +93,7 @@ ___
 
 • **removeAccount**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L6)*
+*Defined in [wallet.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L6)*
 
 #### Type declaration:
 
@@ -111,7 +111,7 @@ ___
 
 • **signPersonalMessage**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L10)*
+*Defined in [wallet.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L10)*
 
 #### Type declaration:
 
@@ -130,7 +130,7 @@ ___
 
 • **signTransaction**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L8)*
+*Defined in [wallet.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L8)*
 
 #### Type declaration:
 
@@ -148,7 +148,7 @@ ___
 
 • **signTypedData**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L9)*
+*Defined in [wallet.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L9)*
 
 #### Type declaration:
 

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Election"](../modules/_wrappers_election_.md) › [Voter](_wrappers_election_.voter.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Election"](../modules/_wrappers_election_.md) › [Voter](_wrappers_election_.voter.md)
 
 # Interface: Voter
 
