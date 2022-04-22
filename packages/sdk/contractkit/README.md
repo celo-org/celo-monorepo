@@ -171,20 +171,24 @@ E.G. `kit.contracts.getAccounts()`,  `kit.contracts.getValidators()`
 
 #### Stand Alone Wrappers
 
-You can also initialize contracts wrappers directly. They require a `Connection`:
+You can also initialize contracts wrappers directly. They require a `Connection` and their contract:
 
 ```typescript
 // MiniContractKit only gives access to a limited set of Contracts, so we import Multisig
 
 import { newKit } from "@celo/contractkit/lib/mini-kit"
 import { MultiSigWrapper } from '@celo/contractkit/lib/wrappers/MultiSig'
+import { newMultiSig } from '@celo/contractkit/lib/generated/MultiSig'
+
 
 const miniKit = newKit("https://alfajores-forno.celo-testnet.org/")
 
 // Alternatively import { Connection } from '@celo/connect'
 // const connection = new Connection(web3)
 
-const multisig = new MultiSigWrapper(miniKit.connection)
+const contract = newMultiSig(web3)
+
+const multisigWrapper = new MultiSigWrapper(miniKit.connection, contract)
 ```
 
 ### Accessing web3 contract wrappers
