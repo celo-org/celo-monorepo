@@ -1,7 +1,7 @@
 import { Address } from '@celo/base/lib/address'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { StableToken } from '@celo/contractkit/lib/celo-tokens'
-import { setGrandaMentoLimits } from '@celo/contractkit/lib/test-utils/grandaMento'
+import { setGrandaMentoLimits } from '../../test-utils/grandaMento'
 import { assumeOwnership } from '@celo/contractkit/lib/test-utils/transferownership'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'

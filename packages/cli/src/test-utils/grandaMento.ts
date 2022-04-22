@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { GrandaMentoWrapper } from '../wrappers/GrandaMento'
+import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
 
 export const setGrandaMentoLimits = async (
   grandaMento: GrandaMentoWrapper,
@@ -7,11 +7,7 @@ export const setGrandaMentoLimits = async (
   newLimitMax: BigNumber = new BigNumber('1000000000000'),
   stableToken: string = 'StableToken'
 ) => {
-  await (
-    await grandaMento.setStableTokenExchangeLimits(
-      stableToken,
-      newLimitMin.toString(),
-      newLimitMax.toString()
-    )
-  ).sendAndWaitForReceipt()
+  await grandaMento
+    .setStableTokenExchangeLimits(stableToken, newLimitMin.toString(), newLimitMax.toString())
+    .sendAndWaitForReceipt()
 }

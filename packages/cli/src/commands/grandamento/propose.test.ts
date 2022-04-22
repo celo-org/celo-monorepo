@@ -1,6 +1,6 @@
 import { Address } from '@celo/base/lib/address'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { setGrandaMentoLimits } from '@celo/contractkit/lib/test-utils/grandaMento'
+import { setGrandaMentoLimits } from '../../test-utils/grandaMento'
 import { assumeOwnership } from '@celo/contractkit/lib/test-utils/transferownership'
 import {
   ExchangeProposalState,
