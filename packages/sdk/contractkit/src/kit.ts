@@ -109,7 +109,7 @@ export class ContractKit {
   /** helper for interacting with CELO & stable tokens */
   readonly celoTokens: CeloTokens
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   gasPriceSuggestionMultiplier = 5
 
   constructor(readonly connection: Connection) {
@@ -160,11 +160,13 @@ export class ContractKit {
 
     const configMethod = async (contract: ValidWrappers) => {
       try {
+        const eachTokenAddress = await this.celoTokens.getAddresses()
+        const addresses = Object.values(eachTokenAddress)
         const configContractWrapper = await this.contracts.getContract(contract)
         if (humanReadable && 'getHumanReadableConfig' in configContractWrapper) {
-          return configContractWrapper.getHumanReadableConfig()
+          return configContractWrapper.getHumanReadableConfig(addresses)
         } else if ('getConfig' in configContractWrapper) {
-          return configContractWrapper.getConfig()
+          return configContractWrapper.getConfig(addresses)
         } else {
           throw new Error('No config endpoint found')
         }
@@ -204,7 +206,7 @@ export class ContractKit {
     this.connection.defaultFeeCurrency = address
   }
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   async updateGasPriceInConnectionLayer(currency: Address) {
     const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
     const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
@@ -213,23 +215,23 @@ export class ContractKit {
   }
 
   async getEpochSize(): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    return validators.getEpochSizeNumber()
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getEpochSizeNumber()
   }
 
   async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    return validators.getFirstBlockNumberForEpoch(epochNumber)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getFirstBlockNumberForEpoch(epochNumber)
   }
 
   async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    return validators.getLastBlockNumberForEpoch(epochNumber)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber)
   }
 
   async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    return validators.getEpochNumberOfBlock(blockNumber)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getEpochNumberOfBlock(blockNumber)
   }
 
   // *** NOTICE ***
@@ -279,7 +281,7 @@ export class ContractKit {
   isSyncing(): Promise<boolean> {
     return this.connection.isSyncing()
   }
-
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
     if (tx.feeCurrency && tx.gasPrice === '0') {
       await this.updateGasPriceInConnectionLayer(tx.feeCurrency)

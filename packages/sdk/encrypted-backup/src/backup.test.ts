@@ -13,19 +13,6 @@ import { deserializeBackup, serializeBackup } from './schema'
 
 const debug = debugFactory('kit:encrypted-backup:backup:test')
 
-// Mock out the BLS blinding client. Verification of the result is not possible without using the
-// real BLS OPRF implementation and a set of BLS keys.
-jest.mock('@celo/identity/lib/odis/bls-blinding-client', () => {
-  // tslint:disable-next-line:no-shadowed-variable
-  class WasmBlsBlindingClient {
-    blindMessage = (m: string) => m
-    unblindAndVerifyMessage = (m: string) => m
-  }
-  return {
-    WasmBlsBlindingClient,
-  }
-})
-
 const TEST_HARDENING_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: [{ delay: 0, resetTimer: noBool, batchSize: defined(3), repetitions: defined(1) }],

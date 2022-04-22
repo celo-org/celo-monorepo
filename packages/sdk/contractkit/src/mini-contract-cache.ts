@@ -100,9 +100,6 @@ export class MiniContractCache implements ContractCacheType {
     return this.getContract(stableTokenInfos[stableToken].exchangeContract)
   }
 
-  getGasPriceMinimum(): Promise<GasPriceMinimumWrapper> {
-    return this.getContract(CeloContract.GasPriceMinimum)
-  }
   getGoldToken(): Promise<GoldTokenWrapper> {
     return this.getContract(CeloContract.GoldToken)
   }

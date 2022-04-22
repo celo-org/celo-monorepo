@@ -19,12 +19,12 @@
 
 • **backup**: *[Backup](_backup_.backup.md)*
 
-*Defined in [packages/sdk/encrypted-backup/src/backup.ts:380](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/backup.ts#L380)*
+*Defined in [packages/sdk/encrypted-backup/src/backup.ts:383](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/backup.ts#L383)*
 
 ___
 
 ###  userSecret
 
-• **userSecret**: *Buffer*
+• **userSecret**: *Buffer | string*
 
-*Defined in [packages/sdk/encrypted-backup/src/backup.ts:381](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/backup.ts#L381)*
+*Defined in [packages/sdk/encrypted-backup/src/backup.ts:384](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/backup.ts#L384)*

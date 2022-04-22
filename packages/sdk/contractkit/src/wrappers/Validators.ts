@@ -421,11 +421,6 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
    * @param blsPop The BLS public key proof-of-possession, which consists of a signature on the
    *   account address. 96 bytes.
    */
-
-  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
-
-  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
-
   registerValidator: (
     ecdsaPublicKey: string,
     blsPublicKey: string,
@@ -435,6 +430,10 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
     this.contract.methods.registerValidator,
     tupleParser(stringToSolidityBytes, stringToSolidityBytes, stringToSolidityBytes)
   )
+
+  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
+
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
 
   /**
    * De-registers a validator, removing it from the group for which it is a member.
@@ -584,35 +583,16 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
     return epochSize.toNumber()
   }
 
-  async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSizeNumber()
-    // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    if (epochNumber === 0) {
-      // No first block for epoch 0
-      return 0
-    }
-    return (epochNumber - 1) * epochSize + 1
-  }
-
   async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSizeNumber()
-    // Follows GetEpochLastBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    if (epochNumber === 0) {
-      return 0
-    }
-    const firstBlockNumberForEpoch = await this.getFirstBlockNumberForEpoch(epochNumber)
-    return firstBlockNumberForEpoch + (epochSize - 1)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+
+    return blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber)
   }
 
   async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSizeNumber()
-    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    const epochNumber = Math.floor(blockNumber / epochSize)
-    if (blockNumber % epochSize === 0) {
-      return epochNumber
-    } else {
-      return epochNumber + 1
-    }
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+
+    return blockchainParamsWrapper.getEpochNumberOfBlock(blockNumber)
   }
 
   /**

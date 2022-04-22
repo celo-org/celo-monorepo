@@ -76,24 +76,6 @@ export function txoStub<T>(): TransactionObjectStub<T> {
       )
     })
 
-    test('should retrieve currency gasPrice with feeCurrency', async () => {
-      const txo = txoStub()
-      const gasPrice = 100
-      const getGasPriceMin = jest.fn().mockImplementation(() => ({
-        getGasPriceMinimum() {
-          return new BigNumber(gasPrice)
-        },
-      }))
-      kit.contracts.getGasPriceMinimum = getGasPriceMin.bind(kit.contracts)
-      await kit.updateGasPriceInConnectionLayer('XXX')
-      const options: CeloTx = { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' }
-      await kit.connection.sendTransactionObject(txo, options)
-      expect(txo.send).toBeCalledWith({
-        gasPrice: `${gasPrice * 5}`,
-        ...options,
-      })
-    })
-
     test('should forward txoptions to txo.send()', async () => {
       const txo = txoStub()
       await kit.connection.sendTransactionObject(txo, { gas: 555, from: '0xAAFFF' })
@@ -103,6 +85,26 @@ export function txoStub<T>(): TransactionObjectStub<T> {
         from: '0xAAFFF',
       })
     })
+  })
+})
+
+test('should retrieve currency gasPrice with feeCurrency', async () => {
+  const kit = newFullKitFromWeb3(new Web3('http://'))
+
+  const txo = txoStub()
+  const gasPrice = 100
+  const getGasPriceMin = jest.fn().mockImplementation(() => ({
+    getGasPriceMinimum() {
+      return new BigNumber(gasPrice)
+    },
+  }))
+  kit.contracts.getGasPriceMinimum = getGasPriceMin.bind(kit.contracts)
+  await kit.updateGasPriceInConnectionLayer('XXX')
+  const options: CeloTx = { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' }
+  await kit.connection.sendTransactionObject(txo, options)
+  expect(txo.send).toBeCalledWith({
+    gasPrice: `${gasPrice * 5}`,
+    ...options,
   })
 })
 

@@ -453,8 +453,8 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
    * @param epochNumber The epoch to retrieve the elected validator set at.
    */
   async getElectedValidators(epochNumber: number): Promise<Validator[]> {
-    const validatorsContract = await this.validators()
-    const blockNumber = await validatorsContract.getFirstBlockNumberForEpoch(epochNumber)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    const blockNumber = await blockchainParamsWrapper.getFirstBlockNumberForEpoch(epochNumber)
     const signers = await this.getValidatorSigners(blockNumber)
     const validators = await this.contracts.getValidators()
     return concurrentMap(10, signers, (addr) => validators.getValidatorFromSigner(addr))
@@ -465,9 +465,9 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
    * @param epochNumber The epoch to retrieve GroupVoterRewards at.
    */
   async getGroupVoterRewards(epochNumber: number): Promise<GroupVoterReward[]> {
-    const validatorsContract = await this.validators()
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
 
-    const blockNumber = await validatorsContract.getLastBlockNumberForEpoch(epochNumber)
+    const blockNumber = await blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber)
     const events = await this.getPastEvents('EpochRewardsDistributedToVoters', {
       fromBlock: blockNumber,
       toBlock: blockNumber,
@@ -485,10 +485,6 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     )
   }
 
-  private validators() {
-    return this.contracts.getValidators()
-  }
-
   /**
    * Retrieves VoterRewards for address at epochNumber.
    * @param address The address to retrieve VoterRewards for.
@@ -504,7 +500,9 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
       voterShare ||
       (await this.getVoterShare(
         address,
-        await (await this.validators()).getLastBlockNumberForEpoch(epochNumber)
+        await (await this.contracts.getBlockchainParameters()).getLastBlockNumberForEpoch(
+          epochNumber
+        )
       ))
     const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)
     const voterRewards = groupVoterRewards.filter(
