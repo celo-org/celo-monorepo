@@ -29,9 +29,11 @@
     "bunyan-gke-stackdriver": "0.1.2",
     "dotenv": "^8.2.0",
     "elliptic": "^6.5.4",
+    "io-ts": "2.0.1",
     "is-base64": "^1.1.0"
   },
   "devDependencies": {
+    "@celo/poprf": "^0.1.6",
     "@celo/wallet-local": "1.5.3-dev",
     "@types/btoa": "^1.2.3",
     "@types/bunyan": "1.8.4",
