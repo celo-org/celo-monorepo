@@ -2,7 +2,6 @@ import { ensureLeading0x } from '@celo/base/lib/address'
 import { AbiCoder, AbiItem, DecodedParamsObject } from '../abi-types'
 
 /** @internal */
-
 export const getAbiByName = (abi: AbiItem[], methodName: string) =>
   abi.find((entry) => entry.name! === methodName)!
 
