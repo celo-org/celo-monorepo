@@ -43,6 +43,6 @@ export const handler = async (argv: PrometheusUpgradeArgv) => {
     await upgradeGKEWorkloadMetrics(clusterConfig)
   }
   if (argv.deployGrafana) {
-    await upgradeGrafana()
+    await upgradeGrafana(argv.context, clusterConfig)
   }
 }
