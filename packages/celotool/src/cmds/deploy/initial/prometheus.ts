@@ -47,7 +47,7 @@ export const builder = (argv: PrometheusInitialArgv) => {
 export const handler = async (argv: PrometheusInitialArgv) => {
   const clusterConfig = await switchToClusterFromEnvOrContext(argv, argv.skipClusterSetup)
 
-  await installPrometheusIfNotExists(argv.context, clusterConfig, argv.disableStackdriver)
+  await installPrometheusIfNotExists(argv.context, clusterConfig)
   if (argv.deployGKEWorkloadMetrics) {
     await installGKEWorkloadMetricsIfNotExists(clusterConfig)
   }
