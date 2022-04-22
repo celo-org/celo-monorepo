@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/BaseSlasher"](_wrappers_baseslasher_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/BaseSlasher"](_wrappers_baseslasher_.md)
 
 # Module: "wrappers/BaseSlasher"
 

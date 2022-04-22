@@ -7,11 +7,12 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "sideEffects": false,
-  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/cryptographic-utils",
+  "homepage": "https://celo-sdk-docs.readthedocs.io/en/latest/cryptographic-utils",
   "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/cryptographic-utils",
   "scripts": {
     "prepublishOnly": "yarn build",
     "build": "tsc -b .",
+    "docs": "typedoc",
     "clean": "tsc -b . --clean",
     "test": "jest --runInBand --ci",
     "test:verbose": "jest --verbose",

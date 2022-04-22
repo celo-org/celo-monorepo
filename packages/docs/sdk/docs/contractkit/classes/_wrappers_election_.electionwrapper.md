@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Election"](../modules/_wrappers_election_.md) › [ElectionWrapper](_wrappers_election_.electionwrapper.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Election"](../modules/_wrappers_election_.md) › [ElectionWrapper](_wrappers_election_.electionwrapper.md)
 
 # Class: ElectionWrapper
 
@@ -6,7 +6,7 @@ Contract for voting for validators and managing validator groups.
 
 ## Hierarchy
 
-* [BaseWrapper](_wrappers_basewrapper_.basewrapper.md)‹Election›
+  ↳ [BaseWrapperForGoverning](_wrappers_basewrapperforgoverning_.basewrapperforgoverning.md)‹Election›
 
   ↳ **ElectionWrapper**
 
@@ -68,18 +68,21 @@ Contract for voting for validators and managing validator groups.
 
 ###  constructor
 
-\+ **new ElectionWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: Election): *[ElectionWrapper](_wrappers_election_.electionwrapper.md)*
+\+ **new ElectionWrapper**(`connection`: Connection, `contract`: Election, `contracts`: ContractWrappersForVotingAndRules): *[ElectionWrapper](_wrappers_election_.electionwrapper.md)*
 
-*Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
+*Inherited from [ValidatorsWrapper](_wrappers_validators_.validatorswrapper.md).[constructor](_wrappers_validators_.validatorswrapper.md#constructor)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
+*Overrides [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
+
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapperForGoverning.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapperForGoverning.ts#L20)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`kit` | [ContractKit](_kit_.contractkit.md) |
+`connection` | Connection |
 `contract` | Election |
+`contracts` | ContractWrappersForVotingAndRules |
 
 **Returns:** *[ElectionWrapper](_wrappers_election_.electionwrapper.md)*
 
@@ -120,7 +123,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L61)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L63)*
 
 ___
 
@@ -130,7 +133,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L59)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L61)*
 
 ___
 
@@ -261,7 +264,7 @@ ___
       acc[method] =
         methodABI === undefined
           ? '0x'
-          : this.kit.connection.getAbiCoder().encodeFunctionSignature(methodABI)
+          : this.connection.getAbiCoder().encodeFunctionSignature(methodABI)
 
       return acc
     },
@@ -270,7 +273,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L66)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L68)*
 
 ___
 
@@ -388,7 +391,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L37)*
 
 Contract address
 
@@ -535,7 +538,7 @@ ___
 
 ▸ **getGroupVoterRewards**(`epochNumber`: number): *Promise‹[GroupVoterReward](../interfaces/_wrappers_election_.groupvoterreward.md)[]›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:466](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L466)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:467](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L467)*
 
 Retrieves GroupVoterRewards at epochNumber.
 
@@ -555,7 +558,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L55)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L57)*
 
 Contract getPastEvents
 
@@ -660,7 +663,7 @@ ___
 
 ▸ **getVoterRewards**(`address`: Address, `epochNumber`: number, `voterShare?`: Record‹Address, BigNumber›): *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:491](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L491)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:494](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L494)*
 
 Retrieves VoterRewards for address at epochNumber.
 
@@ -680,7 +683,7 @@ ___
 
 ▸ **getVoterShare**(`address`: Address, `blockNumber?`: undefined | number): *Promise‹Record‹Address, BigNumber››*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:521](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L521)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:529](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L529)*
 
 Retrieves a voter's share of active votes.
 
@@ -809,7 +812,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[version](_wrappers_basewrapper_.basewrapper.md#version)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
 
 **Returns:** *Promise‹NonNullable‹T["methods"] extends object ? ContractVersion<> : never››*
 

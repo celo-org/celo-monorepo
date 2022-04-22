@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [VoteValue](_wrappers_governance_.votevalue.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [VoteValue](_wrappers_governance_.votevalue.md)
 
 # Enumeration: VoteValue
 

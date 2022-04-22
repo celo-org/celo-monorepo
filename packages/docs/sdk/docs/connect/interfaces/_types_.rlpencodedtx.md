@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["types"](../modules/_types_.md) › [RLPEncodedTx](_types_.rlpencodedtx.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["types"](../modules/_types_.md) › [RLPEncodedTx](_types_.rlpencodedtx.md)
 
 # Interface: RLPEncodedTx
 
@@ -19,7 +19,7 @@
 
 • **rlpEncode**: *string*
 
-*Defined in [packages/sdk/connect/src/types.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L71)*
+*Defined in [types.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L71)*
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **transaction**: *[CeloTx](../modules/_types_.md#celotx)*
 
-*Defined in [packages/sdk/connect/src/types.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L70)*
+*Defined in [types.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L70)*

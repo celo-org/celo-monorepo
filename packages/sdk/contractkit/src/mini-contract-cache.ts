@@ -77,7 +77,11 @@ const contractsWhichRequireCache = new Set([
 /**
  * Alternative Contract Cache with Minimal Contracts
  *
- * Provides access to a subset of wrappers for Accounts,  Exchange, GasPriceMinimum  and CeloToken contracts
+ * Provides access to a subset of wrappers: {@link AccountsWrapper},  {@link ExchangeWrapper}, {@link GasPriceMinimumWrapper} and Celo Token contracts
+ * Used internally by {@link MiniContractKit}
+ *
+ * @param connection – {@link Connection}
+ * @param registry – {@link AddressRegistry}
  */
 
 export class MiniContractCache implements ContractCacheType {

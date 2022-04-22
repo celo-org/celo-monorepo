@@ -4,6 +4,8 @@ import { HttpProviderOptions as Web3HttpProviderOptions } from 'web3-providers-h
 export type HttpProviderOptions = Web3HttpProviderOptions
 
 export const API_KEY_HEADER_KEY = 'apiKey'
+
+/** @internal */
 export function setupAPIKey(apiKey: string) {
   const options: HttpProviderOptions = {}
   options.headers = []
@@ -13,11 +15,13 @@ export function setupAPIKey(apiKey: string) {
   })
   return options
 }
+/** @internal */
 export function ensureCurrentProvider(web3: Web3) {
   if (!web3.currentProvider) {
     throw new Error('Must have a valid Provider')
   }
 }
+/** @internal */
 export function getWeb3ForKit(url: string, options: Web3HttpProviderOptions | undefined) {
   let web3: Web3
   if (url.endsWith('.ipc')) {

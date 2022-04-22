@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/SortedOracles"](../modules/_wrappers_sortedoracles_.md) › [OracleTimestamp](_wrappers_sortedoracles_.oracletimestamp.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/SortedOracles"](../modules/_wrappers_sortedoracles_.md) › [OracleTimestamp](_wrappers_sortedoracles_.oracletimestamp.md)
 
 # Interface: OracleTimestamp
 
@@ -20,7 +20,7 @@
 
 • **address**: *Address*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L36)*
+*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L37)*
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • **medianRelation**: *[MedianRelation](../enums/_wrappers_sortedoracles_.medianrelation.md)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L38)*
+*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L39)*
 
 ___
 
@@ -36,4 +36,4 @@ ___
 
 • **timestamp**: *BigNumber*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L37)*
+*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L38)*

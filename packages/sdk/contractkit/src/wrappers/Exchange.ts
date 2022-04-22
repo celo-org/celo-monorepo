@@ -25,7 +25,7 @@ export interface ExchangeConfig {
 
 /**
  * Contract that allows to exchange StableToken for GoldToken and vice versa
- * using a Constant Product Market Maker Model
+ * using a Constant Product Market Maker Model aka Mento
  */
 export class ExchangeWrapper extends BaseWrapper<Exchange> {
   /**

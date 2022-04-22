@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Election"](../modules/_wrappers_election_.md) › [GroupVote](_wrappers_election_.groupvote.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Election"](../modules/_wrappers_election_.md) › [GroupVote](_wrappers_election_.groupvote.md)
 
 # Interface: GroupVote
 

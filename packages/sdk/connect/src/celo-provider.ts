@@ -28,6 +28,9 @@ export function assertIsCeloProvider(provider: any): asserts provider is CeloPro
   }
 }
 
+/*
+ * CeloProvider wraps a web3.js provider for use with Celo
+ */
 export class CeloProvider implements Provider {
   private alreadyStopped: boolean = false
   // Transaction nonce is calculated as the max of an account's nonce on-chain, and any pending transactions in a node's
@@ -40,17 +43,17 @@ export class CeloProvider implements Provider {
     this.addProviderDelegatedFunctions()
   }
 
-  // Used for backwards compatibility. Use the `addAccount` from the Connection
+  // @deprecated  Use the `addAccount` from the Connection
   addAccount(privateKey: string) {
     this.connection.addAccount(privateKey)
   }
 
-  // Used for backwards compatibility. Use the `removeAccount` from the Connection
+  // @deprecated  Use the `removeAccount` from the Connection
   removeAccount(address: string) {
     this.connection.removeAccount(address)
   }
 
-  // Used for backwards compatibility. Use the `getAccounts` from the Connection
+  // @deprecated  Use the `getAccounts` from the Connection
   async getAccounts(): Promise<string[]> {
     return this.connection.getAccounts()
   }

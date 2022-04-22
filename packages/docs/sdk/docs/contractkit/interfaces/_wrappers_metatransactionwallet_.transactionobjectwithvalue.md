@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/MetaTransactionWallet"](../modules/_wrappers_metatransactionwallet_.md) › [TransactionObjectWithValue](_wrappers_metatransactionwallet_.transactionobjectwithvalue.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/MetaTransactionWallet"](../modules/_wrappers_metatransactionwallet_.md) › [TransactionObjectWithValue](_wrappers_metatransactionwallet_.transactionobjectwithvalue.md)
 
 # Interface: TransactionObjectWithValue <**T**>
 

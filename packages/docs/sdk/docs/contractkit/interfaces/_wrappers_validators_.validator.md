@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Validators"](../modules/_wrappers_validators_.md) › [Validator](_wrappers_validators_.validator.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Validators"](../modules/_wrappers_validators_.md) › [Validator](_wrappers_validators_.validator.md)
 
 # Interface: Validator
 

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["identity/claims/verify"](_identity_claims_verify_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["identity/claims/verify"](_identity_claims_verify_.md)
 
 # Module: "identity/claims/verify"
 
@@ -58,7 +58,7 @@ ___
 
 ▸ **verifyDomainRecord**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [DomainClaim](_identity_claims_claim_.md#domainclaim), `address`: string, `dnsResolver`: dnsResolverFunction): *Promise‹undefined | string›*
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/verify.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/verify.ts#L72)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/verify.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/verify.ts#L76)*
 
 It verifies if a DNS domain includes in the TXT records an entry with name
 `celo-site-verification` and a valid signature in base64

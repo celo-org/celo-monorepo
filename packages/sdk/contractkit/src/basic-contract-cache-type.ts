@@ -5,6 +5,10 @@ import { ExchangeWrapper } from './wrappers/Exchange'
 import { GoldTokenWrapper, GoldTokenWrapperType } from './wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 
+/**
+ * Interface for a class with the minimum required wrappers
+ * to make a {@link MiniContractKit} or {@link CeloTokens} Class
+ */
 export interface ContractCacheType {
   getAccounts(): Promise<AccountsWrapper>
   getExchange(stableToken: StableToken): Promise<ExchangeWrapper>

@@ -26,6 +26,7 @@ export const IdentityMetadataType = t.type({
   claims: t.array(ClaimType),
   meta: MetaType,
 })
+
 export type IdentityMetadata = t.TypeOf<typeof IdentityMetadataType>
 
 export class IdentityMetadataWrapper {

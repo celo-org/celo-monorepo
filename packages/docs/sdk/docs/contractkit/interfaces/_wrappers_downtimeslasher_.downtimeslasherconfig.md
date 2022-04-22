@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/DowntimeSlasher"](../modules/_wrappers_downtimeslasher_.md) › [DowntimeSlasherConfig](_wrappers_downtimeslasher_.downtimeslasherconfig.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/DowntimeSlasher"](../modules/_wrappers_downtimeslasher_.md) › [DowntimeSlasherConfig](_wrappers_downtimeslasher_.downtimeslasherconfig.md)
 
 # Interface: DowntimeSlasherConfig
 

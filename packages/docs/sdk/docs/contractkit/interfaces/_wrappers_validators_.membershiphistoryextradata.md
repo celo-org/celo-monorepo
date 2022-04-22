@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Validators"](../modules/_wrappers_validators_.md) › [MembershipHistoryExtraData](_wrappers_validators_.membershiphistoryextradata.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Validators"](../modules/_wrappers_validators_.md) › [MembershipHistoryExtraData](_wrappers_validators_.membershiphistoryextradata.md)
 
 # Interface: MembershipHistoryExtraData
 

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [UpvoteRecord](_wrappers_governance_.upvoterecord.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [UpvoteRecord](_wrappers_governance_.upvoterecord.md)
 
 # Interface: UpvoteRecord
 

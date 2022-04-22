@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["address-registry"](../modules/_address_registry_.md) › [UnregisteredError](_address_registry_.unregisterederror.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["address-registry"](../modules/_address_registry_.md) › [UnregisteredError](_address_registry_.unregisterederror.md)
 
 # Class: UnregisteredError
 
@@ -64,8 +64,6 @@ ___
 • **stack**? : *undefined | string*
 
 *Inherited from [UnregisteredError](_address_registry_.unregisterederror.md).[stack](_address_registry_.unregisterederror.md#optional-stack)*
-
-*Overrides [UnregisteredError](_address_registry_.unregisterederror.md).[stack](_address_registry_.unregisterederror.md#optional-stack)*
 
 Defined in node_modules/typescript/lib/lib.es5.d.ts:975
 

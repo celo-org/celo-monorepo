@@ -7,7 +7,7 @@
   "sideEffects": false,
   "author": "Celo",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/connect",
+  "homepage": "https://celo-sdk-docs.readthedocs.io/en/latest/connect",
   "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/connect",
   "keywords": [
     "celo",

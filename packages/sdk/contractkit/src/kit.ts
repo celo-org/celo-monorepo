@@ -87,6 +87,17 @@ interface AccountBalance extends EachCeloToken<BigNumber> {
   lockedCELO: BigNumber
   pending: BigNumber
 }
+/*
+ * ContractKit provides a convenient interface for All Celo Contracts
+ *
+ * @remarks
+ *
+ * For most use cases this ContractKit class might be more than you need.
+ * Consider {@link MiniContractKit} for a scaled down subset of contract Wrappers,
+ * or {@link Connection} for a lighter package without contract Wrappers
+ *
+ * @param connection – an instance of @celo/connect {@link Connection}
+ */
 
 export class ContractKit {
   /** core contract's address registry */

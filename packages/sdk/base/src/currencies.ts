@@ -1,3 +1,4 @@
+/** @deprecated use StableToken and Token */
 export enum CURRENCY_ENUM {
   GOLD = 'Celo Gold',
   DOLLAR = 'Celo Dollar',
@@ -24,6 +25,7 @@ interface Currency {
 
 type CurrencyObject = { [key in CURRENCY_ENUM]: Currency }
 
+/** @deprecated */
 export const CURRENCIES: CurrencyObject = {
   [CURRENCY_ENUM.GOLD]: {
     symbol: '',
@@ -55,12 +57,14 @@ export const resolveCurrency = (label: string): CURRENCY_ENUM => {
   }
 }
 
+/** @deprecated use StableToken and Token */
 export enum SHORT_CURRENCIES {
   DOLLAR = 'dollar',
   GOLD = 'gold',
   EURO = 'euro',
 }
 
+/** @deprecated use StableToken and Token */
 export const currencyToShortMap = {
   [CURRENCY_ENUM.DOLLAR]: SHORT_CURRENCIES.DOLLAR,
   [CURRENCY_ENUM.GOLD]: SHORT_CURRENCIES.GOLD,
