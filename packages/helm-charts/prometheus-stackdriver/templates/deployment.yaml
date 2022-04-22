@@ -61,7 +61,7 @@ spec:
               mountPath: /etc/prometheus/
             - name: prometheus-storage-volume
               mountPath: /prometheus/
-{{- if .Values.stackdriver.enable }}
+{{- if not .Values.stackdriver.disabled }}
         - name: sidecar
           image: gcr.io/stackdriver-prometheus/stackdriver-prometheus-sidecar:{{ .Values.stackdriver.sidecar.imageTag }}
           imagePullPolicy: Always
@@ -74,7 +74,7 @@ spec:
 {{ indent 12 (printf "- --include=%s" .Values.stackdriver.includeFilter) }}
 {{- end -}}
 {{/* This used to be enabled, but now is not. Enable this for oracle clusters only. */}}
-{{- if (and false .Values.stackdriver.metricsPrefix) }}
+{{- if (and true .Values.stackdriver.metricsPrefix) }}
             - --stackdriver.metrics-prefix={{ .Values.stackdriver.metricsPrefix }}
 {{- end }}
           ports:
@@ -99,7 +99,7 @@ spec:
         - name: prometheus-storage-volume
           persistentVolumeClaim:
             claimName: prometheus
-{{- if not (kindIs "invalid" .Values.serviceAccount.gcloudServiceAccountKeyBase64) }}
+{{- if not (kindIs "invalid" .Values.stackdriver.gcloudServiceAccountKeyBase64) }}
         - name: prometheus-service-account-key
           secret:
             secretName: prometheus-service-account-key

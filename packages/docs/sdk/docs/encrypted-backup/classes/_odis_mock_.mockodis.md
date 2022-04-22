@@ -10,7 +10,8 @@
 
 ### Properties
 
-* [state](_odis_mock_.mockodis.md#state)
+* [poprf](_odis_mock_.mockodis.md#readonly-poprf)
+* [state](_odis_mock_.mockodis.md#readonly-state)
 * [environment](_odis_mock_.mockodis.md#static-readonly-environment)
 
 ### Methods
@@ -23,11 +24,19 @@
 
 ## Properties
 
-###  state
+### `Readonly` poprf
+
+• **poprf**: *PoprfServer‹›* = new PoprfServer(MOCK_ODIS_KEYPAIR.privateKey)
+
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L32)*
+
+___
+
+### `Readonly` state
 
 • **state**: *Record‹string, SequentialDelayDomainState›*
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L28)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L31)*
 
 ___
 
@@ -35,7 +44,7 @@ ___
 
 ▪ **environment**: *ServiceContext* = MOCK_ODIS_ENVIRONMENT
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L26)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L29)*
 
 ## Methods
 
@@ -43,7 +52,7 @@ ___
 
 ▸ **install**(`mock`: typeof fetchMock): *void*
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:146](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L146)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:171](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L171)*
 
 **Parameters:**
 
@@ -59,7 +68,7 @@ ___
 
 ▸ **installQuotaEndpoint**(`mock`: typeof fetchMock, `override?`: any): *void*
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L112)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:137](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L137)*
 
 **Parameters:**
 
@@ -76,7 +85,7 @@ ___
 
 ▸ **installSignEndpoint**(`mock`: typeof fetchMock, `override?`: any): *void*
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:129](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L129)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:154](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L154)*
 
 **Parameters:**
 
@@ -93,7 +102,7 @@ ___
 
 ▸ **quota**(`req`: DomainQuotaStatusRequest‹SequentialDelayDomain›): *object*
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L30)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L34)*
 
 **Parameters:**
 
@@ -113,7 +122,7 @@ ___
 
 ▸ **sign**(`req`: DomainRestrictedSignatureRequest‹SequentialDelayDomain›): *object*
 
-*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L57)*
+*Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L61)*
 
 **Parameters:**
 
