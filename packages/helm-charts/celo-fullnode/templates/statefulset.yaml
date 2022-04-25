@@ -56,9 +56,9 @@ spec:
 {{- if .Values.geth.use_gstorage_data | default false }}
 {{ include "common.remove-old-chaindata" . | indent 6 }}
 {{ include "common.gsutil-sync-data-init-container" . | indent 6 }}
-{{ end }}
+{{- end }}
 {{ include "common.conditional-init-genesis-container" .  | indent 6 }}
-{{ if .Values.geth.node_keys }}
+{{- if .Values.geth.node_keys }}
       - name: set-node-key
         image: alpine:3.12
         command:
