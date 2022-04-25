@@ -37,7 +37,7 @@ export const builder = (argv: PrometheusUpgradeArgv) => {
 export const handler = async (argv: PrometheusUpgradeArgv) => {
   const clusterConfig = await switchToClusterFromEnvOrContext(argv, true)
 
-  await upgradePrometheus(argv.context, clusterConfig, argv.disableStackdriver)
+  await upgradePrometheus(argv.context, clusterConfig)
 
   if (argv.deployGKEWorkloadMetrics) {
     await upgradeGKEWorkloadMetrics(clusterConfig)
