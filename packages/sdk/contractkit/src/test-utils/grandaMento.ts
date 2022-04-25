@@ -1,5 +1,5 @@
-import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
 import BigNumber from 'bignumber.js'
+import { GrandaMentoWrapper } from '../wrappers/GrandaMento'
 
 export const setGrandaMentoLimits = async (
   grandaMento: GrandaMentoWrapper,
