@@ -1,38 +1,43 @@
-{{ if .Values.data_migration }}
-apiVersion: batch/v1
-kind: Job
+apiVersion: batch/v1betav1
+kind: CronJob
 metadata:
   name: {{ .Release.Name }}-data-migration
   labels:
     {{- include "celo.blockscout.labels" . | nindent 4 }}
     component: blockscout-data-migration
 spec:
-  template:
-    metadata:
-      labels:
-        {{- include "celo.blockscout.labels" . | nindent 8 }}
+  suspend:  true
+  jobTemplate:
     spec:
-      containers:
-      - name: blockscout-data-migration
-        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-        command:
-        - /bin/sh
-        - -c
-        args:
-        - |
-           trap "touch /tmp/pod/main-terminated" EXIT
-           mix data_migrate
-        resources:
-          requests:
-            memory: 250M
-            cpu: 200m
-        volumeMounts:
-          - mountPath: /tmp/pod
-            name: tmp-pod
-        env:
-{{ include "celo.blockscout-env-vars" .  | indent 8 }}
-{{ include "celo.blockscout-db-terminating-sidecar" .  | indent 6 }}
-      restartPolicy: Never
-  backoffLimit: 0
-{{ end }}
+      template:
+        metadata:
+          labels:
+            {{- include "celo.blockscout.labels" . | nindent 8 }}
+        spec:
+          containers:
+          - name: blockscout-data-migration
+            image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
+            imagePullPolicy: {{ .Values.imagePullPolicy }}
+            command:
+            - /bin/sh
+            - -c
+            args:
+            - |
+              trap "touch /tmp/pod/main-terminated" EXIT
+              mix data_migrate
+            resources:
+              requests:
+                memory: 250M
+                cpu: 200m
+            volumeMounts:
+              - mountPath: /tmp/pod
+                name: tmp-pod
+            env:
+              - name: INITIAL_VALUE
+                valueFrom:
+                  secretKeyRef:
+                    name: blockscout-data-migration-secret-key-ref
+                    key: initial-value
+{{ include "celo.blockscout-env-vars" .  | indent 14 }}
+{{ include "celo.blockscout-db-terminating-sidecar" .  | indent 10 }}
+          restartPolicy: Never
