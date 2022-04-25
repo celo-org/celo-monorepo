@@ -24,7 +24,9 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
           service:
             name: {{ .Release.Name }}-api
-            port: 4000
+            port: 
+              number: 4000

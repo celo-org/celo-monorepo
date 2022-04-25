@@ -25,7 +25,9 @@ spec:
     http:
       paths:
       - path: /(.*)
+        pathType: Prefix
         backend:
           service:
             name: tx-nodes
-            port: 8545
+            port: 
+              number: 8545

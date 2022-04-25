@@ -35,17 +35,23 @@ spec:
     http:
       paths:
       - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
+        pathType: Prefix
         backend:
           service:
             name: {{ .Release.Name }}-web
-            port: 4000
+            port: 
+              number: 4000
       - path: /(graphql|graphiql|api)
+        pathType: Prefix
         backend:
           service:
             name: {{ .Release.Name }}-api
-            port: 4000
+            port: 
+              number: 4000
       - path: /
+        pathType: Prefix
         backend:
           service:
             name: {{ .Release.Name }}-web
-            port: 4000
+            port: 
+              number: 4000
