@@ -1,4 +1,4 @@
-apiVersion: batch/v1betav1
+apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: {{ .Release.Name }}-data-migration
@@ -7,12 +7,13 @@ metadata:
     component: blockscout-data-migration
 spec:
   suspend:  true
+  schedule: "0 0 5 31 2 ?"
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
-            {{- include "celo.blockscout.labels" . | nindent 8 }}
+            {{- include "celo.blockscout.labels" . | nindent 12 }}
         spec:
           containers:
           - name: blockscout-data-migration
