@@ -137,7 +137,8 @@ export async function isVerified(
   try {
     const res = await retryAsyncWithBackOffAndTimeout(
       async () => {
-        const attestationsWrapper: AttestationsWrapper = await contractKit.contracts.getAttestations()
+        const attestationsWrapper: AttestationsWrapper =
+          await contractKit.contracts.getAttestations()
         const {
           isVerified: _isVerified,
           completed,

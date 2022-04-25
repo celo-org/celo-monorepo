@@ -14,7 +14,8 @@ import {
 } from './sign-typed-data-utils'
 
 // Compile-time check that Domain can be cast to type EIP712Object
-export const TEST_OPTIONAL_IS_EIP712: EIP712Object = ({} as unknown) as EIP712Optional<EIP712ObjectValue>
+export const TEST_OPTIONAL_IS_EIP712: EIP712Object =
+  {} as unknown as EIP712Optional<EIP712ObjectValue>
 
 interface EIP712TestCase {
   primaryType: string

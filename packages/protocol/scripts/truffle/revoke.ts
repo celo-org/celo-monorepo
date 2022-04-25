@@ -22,10 +22,8 @@ module.exports = async (callback: (error?: any) => number) => {
     const phoneNumber: string = argv.phone
     // @ts-ignore soliditySha3 can take an object
     const phoneHash: string = web3.utils.soliditySha3({ type: 'string', value: phoneNumber })
-    const attestations: AttestationsInstance = await getDeployedProxiedContract<AttestationsInstance>(
-      'Attestations',
-      artifacts
-    )
+    const attestations: AttestationsInstance =
+      await getDeployedProxiedContract<AttestationsInstance>('Attestations', artifacts)
 
     const currentAccounts = await attestations.lookupAccountsForIdentifier(phoneHash)
     const account = (await web3.eth.getAccounts())[0]

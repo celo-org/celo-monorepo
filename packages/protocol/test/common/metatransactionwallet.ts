@@ -7,9 +7,8 @@ import { assertEqualBN, assertLogMatches2, assertRevert } from '@celo/protocol/l
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
 import { MetaTransactionWalletContract, MetaTransactionWalletInstance } from 'types'
 
-const MetaTransactionWallet: MetaTransactionWalletContract = artifacts.require(
-  'MetaTransactionWallet'
-)
+const MetaTransactionWallet: MetaTransactionWalletContract =
+  artifacts.require('MetaTransactionWallet')
 
 contract('MetaTransactionWallet', (accounts: string[]) => {
   let wallet: MetaTransactionWalletInstance

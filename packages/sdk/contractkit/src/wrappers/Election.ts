@@ -95,10 +95,8 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param blockNumber Block number to retrieve the validator set from.
    * @return Address of validator at the requested index.
    */
-  validatorSignerAddressFromSet: (
-    signerIndex: number,
-    blockNumber: number
-  ) => Promise<Address> = proxyCall(this.contract.methods.validatorSignerAddressFromSet)
+  validatorSignerAddressFromSet: (signerIndex: number, blockNumber: number) => Promise<Address> =
+    proxyCall(this.contract.methods.validatorSignerAddressFromSet)
 
   /**
    * Gets a validator address from the current validator set.
@@ -500,17 +498,15 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const voterRewards = groupVoterRewards.filter(
       (e: GroupVoterReward) => normalizeAddressWith0x(e.group.address) in activeVoteShare
     )
-    return voterRewards.map(
-      (e: GroupVoterReward): VoterReward => {
-        const group = normalizeAddressWith0x(e.group.address)
-        return {
-          address,
-          addressPayment: e.groupVoterPayment.times(activeVoteShare[group]),
-          group: e.group,
-          epochNumber: e.epochNumber,
-        }
+    return voterRewards.map((e: GroupVoterReward): VoterReward => {
+      const group = normalizeAddressWith0x(e.group.address)
+      return {
+        address,
+        addressPayment: e.groupVoterPayment.times(activeVoteShare[group]),
+        group: e.group,
+        epochNumber: e.epochNumber,
       }
-    )
+    })
   }
 
   /**

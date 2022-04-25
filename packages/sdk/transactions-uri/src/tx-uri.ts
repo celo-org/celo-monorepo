@@ -6,7 +6,7 @@ import qrcode from 'qrcode'
 import querystring from 'querystring'
 import abiWeb3 from 'web3-eth-abi'
 
-const abi = (abiWeb3 as unknown) as AbiCoder
+const abi = abiWeb3 as unknown as AbiCoder
 
 // see https://solidity.readthedocs.io/en/v0.5.3/abi-spec.html#function-selector-and-argument-encoding
 const ABI_TYPE_REGEX = '(u?int(8|16|32|64|128|256)|address|bool|bytes(4|32)?|string)(\\[\\])?'

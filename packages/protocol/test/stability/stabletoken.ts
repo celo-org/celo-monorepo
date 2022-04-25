@@ -82,12 +82,8 @@ contract('StableToken', (accounts: string[]) => {
     })
 
     it('should have set the inflation rate parameters', async () => {
-      const [
-        rate,
-        factor,
-        updatePeriod,
-        factorLastUpdated,
-      ] = await stableToken.getInflationParameters()
+      const [rate, factor, updatePeriod, factorLastUpdated] =
+        await stableToken.getInflationParameters()
       assert.isTrue(rate.eq(fixed1))
       assert.isTrue(factor.eq(fixed1))
       assert.equal(updatePeriod.toNumber(), SECONDS_IN_A_WEEK)

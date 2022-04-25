@@ -110,7 +110,8 @@ describe('AwsHsmWallet class', () => {
           }),
           getPublicKey: ({ KeyId }: { KeyId: string }) => ({
             promise: async () => {
-              const isGuid = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
+              const isGuid =
+                /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
               if (!KeyId.match(isGuid)) {
                 throw new Error(`Invalid keyId ${KeyId}`)
               }

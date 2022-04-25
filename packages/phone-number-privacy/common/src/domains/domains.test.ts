@@ -11,10 +11,10 @@ import { Domain, domainEIP712, DomainOptions } from './domains'
 import { SequentialDelayDomain } from './sequential-delay'
 
 // Compile-time check that Domain can be cast to type EIP712Object
-export const TEST_DOMAIN_IS_EIP712: EIP712Object = ({} as unknown) as Domain
+export const TEST_DOMAIN_IS_EIP712: EIP712Object = {} as unknown as Domain
 
 // Compile-time check that DomainOptions can be cast to type EIP712Object
-export const TEST_DOMAIN_OPTIONS_ARE_EIP712: EIP712Object = ({} as unknown) as DomainOptions
+export const TEST_DOMAIN_OPTIONS_ARE_EIP712: EIP712Object = {} as unknown as DomainOptions
 
 describe('domainEIP712()', () => {
   it('should generate the correct type data for SequentialDelayDomain instance', () => {

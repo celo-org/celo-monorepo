@@ -18,12 +18,10 @@ import {
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Reserve: Truffle.Contract<ReserveInstance> = artifacts.require('Reserve')
-const MockStableToken: Truffle.Contract<MockStableTokenInstance> = artifacts.require(
-  'MockStableToken'
-)
-const MockSortedOracles: Truffle.Contract<MockSortedOraclesInstance> = artifacts.require(
-  'MockSortedOracles'
-)
+const MockStableToken: Truffle.Contract<MockStableTokenInstance> =
+  artifacts.require('MockStableToken')
+const MockSortedOracles: Truffle.Contract<MockSortedOraclesInstance> =
+  artifacts.require('MockSortedOracles')
 
 // @ts-ignore
 Reserve.numberFormat = 'BigNumber'

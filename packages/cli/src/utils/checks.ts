@@ -444,9 +444,8 @@ class CheckBuilder {
     return this.addCheck(
       `Enough time has passed since the account was removed from a validator group`,
       this.withValidators(async (validators, _signer, account) => {
-        const {
-          lastRemovedFromGroupTimestamp,
-        } = await validators.getValidatorMembershipHistoryExtraData(account)
+        const { lastRemovedFromGroupTimestamp } =
+          await validators.getValidatorMembershipHistoryExtraData(account)
         const { duration } = await validators.getValidatorLockedGoldRequirements()
         return duration.toNumber() + lastRemovedFromGroupTimestamp < Date.now() / 1000
       })

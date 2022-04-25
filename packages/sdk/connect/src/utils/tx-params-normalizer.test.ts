@@ -23,17 +23,15 @@ describe('TxParamsNormalizer class', () => {
   }
 
   beforeEach(() => {
-    mockRpcCall = jest.fn(
-      (method: string, _params: any[]): Promise<JsonRpcResponse> => {
-        return new Promise((resolve, _reject) =>
-          resolve({
-            jsonrpc: '2.0',
-            id: 1,
-            result: method === 'net_version' ? '27' : '0x27',
-          })
-        )
-      }
-    )
+    mockRpcCall = jest.fn((method: string, _params: any[]): Promise<JsonRpcResponse> => {
+      return new Promise((resolve, _reject) =>
+        resolve({
+          jsonrpc: '2.0',
+          id: 1,
+          result: method === 'net_version' ? '27' : '0x27',
+        })
+      )
+    })
     const rpcMock: RpcCaller = {
       call: mockRpcCall,
       // tslint:disable-next-line: no-empty

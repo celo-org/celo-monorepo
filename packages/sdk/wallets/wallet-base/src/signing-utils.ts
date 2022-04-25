@@ -47,11 +47,11 @@ function makeEven(hex: string) {
   return hex
 }
 
-function signatureFormatter(signature: {
-  v: number
-  r: Buffer
-  s: Buffer
-}): { v: string; r: string; s: string } {
+function signatureFormatter(signature: { v: number; r: Buffer; s: Buffer }): {
+  v: string
+  r: string
+  s: string
+} {
   return {
     v: stringNumberToHex(signature.v),
     r: makeEven(trimLeadingZero(ensureLeading0x(signature.r.toString('hex')))),

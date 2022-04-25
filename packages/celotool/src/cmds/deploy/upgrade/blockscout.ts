@@ -55,11 +55,8 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
   const instanceName = getInstanceName(argv.celoEnv, dbSuffix)
   const helmReleaseName = getReleaseName(argv.celoEnv, dbSuffix)
 
-  const [
-    blockscoutDBUsername,
-    blockscoutDBPassword,
-    blockscoutDBConnectionName,
-  ] = await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName, dbSuffix)
+  const [blockscoutDBUsername, blockscoutDBPassword, blockscoutDBConnectionName] =
+    await retrieveCloudSQLConnectionInfo(argv.celoEnv, instanceName, dbSuffix)
 
   if (!isCelotoolHelmDryRun()) {
     if (argv.reset === true) {
