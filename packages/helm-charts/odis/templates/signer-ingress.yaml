@@ -1,11 +1,13 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: odis-signer-ingress
   annotations:
     kubernetes.io/tls-acme: "true"
-    kubernetes.io/ingress.class: nginx
 spec:
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   tls:
   - secretName: {{ .Release.Namespace }}-web-tls
   rules:
@@ -13,5 +15,6 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: {{ include "name" . }}
-          servicePort: 3000
+          service:
+            name: {{ include "name" . }}
+            port: 3000
