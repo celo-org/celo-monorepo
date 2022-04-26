@@ -1,6 +1,6 @@
 import {
   getDomainDigest,
-  getSignatureForAttestation,
+  getSignatureForAttestation
 } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
@@ -11,7 +11,7 @@ import {
   FederatedAttestationsContract,
   FederatedAttestationsInstance,
   RegistryContract,
-  RegistryInstance,
+  RegistryInstance
 } from 'types'
 import { keccak256 } from 'web3-utils'
 
@@ -38,7 +38,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
     accountsInstance = await Accounts.new(true)
     federatedAttestations = await FederatedAttestations.new(true)
     registry = await Registry.new(true)
-    await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(
       CeloContractName.FederatedAttestations,
