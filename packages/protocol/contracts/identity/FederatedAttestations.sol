@@ -45,7 +45,9 @@ contract FederatedAttestations is
   // signer => revocation time
   mapping(address => uint256) public revokedSigners;
 
-  bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256("ValidateAttestation");
+  bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
+    "IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
+  );
   bytes32 public eip712DomainSeparator;
 
   // TODO ASv2 Event declarations
@@ -194,22 +196,27 @@ contract FederatedAttestations is
   function validateAttestation(
     bytes32 identifier,
     address issuer,
-    IdentifierOwnershipAttestation memory attestation,
+    address account,
+    uint256 issuedOn,
+    address signer,
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) public view returns (address) {
+  ) public view returns (bool) {
     // TODO check if signer is revoked and is a valid signer of the account
+    // require(!_isRevoked(signer), time);
     bytes32 structHash = keccak256(
-      abi.encode(
-        EIP712_VALIDATE_ATTESTATION_TYPEHASH,
-        identifier,
-        issuer,
-        attestation.account,
-        attestation.signer
-      )
+      abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
     );
-    return Signatures.getSignerOfTypedDataHash(eip712DomainSeparator, structHash, v, r, s);
+    address guessedSigner = Signatures.getSignerOfTypedDataHash(
+      eip712DomainSeparator,
+      structHash,
+      v,
+      r,
+      s
+    );
+    return guessedSigner == signer;
+    // return guessedSigner
   }
 
   function registerAttestation(

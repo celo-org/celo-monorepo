@@ -13,6 +13,7 @@ import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { generateTypedDataHash } from '@celo/utils/src/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/src/signatureUtils'
+import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
@@ -21,8 +22,6 @@ import {
   RegistryContract,
 } from 'types'
 import { keccak256 } from 'web3-utils'
-
-import BigNumber from 'bignumber.js'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -38,6 +37,41 @@ const assertStorageRoots = (rootsHex: string, lengths: BigNumber[], expectedRoot
     assert.equal(root, expectedRoot)
   })
   assert.equal(roots.length, currentIndex)
+}
+
+export const getSignatureForAuthorization = async (
+  _account: Address,
+  signer: Address,
+  role: string,
+  accountsContractAddress: string
+) => {
+  const typedData = buildAuthorizeSignerTypedData({
+    account: _account,
+    signer,
+    accountsContractAddress,
+    role,
+    chainId: 1,
+  })
+
+  const signature = await new Promise<string>((resolve, reject) => {
+    web3.currentProvider.send(
+      {
+        method: 'eth_signTypedData',
+        params: [signer, typedData],
+      },
+      (error, resp) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve(resp.result)
+        }
+      }
+    )
+  })
+
+  const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
+  const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
+  return parsedSignature
 }
 
 contract('Accounts', (accounts: string[]) => {
@@ -526,41 +560,6 @@ contract('Accounts', (accounts: string[]) => {
       })
     })
   })
-
-  const getSignatureForAuthorization = async (
-    _account: Address,
-    signer: Address,
-    role: string,
-    accountsContractAddress: string
-  ) => {
-    const typedData = buildAuthorizeSignerTypedData({
-      account: _account,
-      signer,
-      accountsContractAddress,
-      role,
-      chainId: 1,
-    })
-
-    const signature = await new Promise<string>((resolve, reject) => {
-      web3.currentProvider.send(
-        {
-          method: 'eth_signTypedData',
-          params: [signer, typedData],
-        },
-        (error, resp) => {
-          if (error) {
-            reject(error)
-          } else {
-            resolve(resp.result)
-          }
-        }
-      )
-    })
-
-    const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
-    const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
-    return parsedSignature
-  }
 
   describe('generic authorization', () => {
     const account2 = accounts[1]

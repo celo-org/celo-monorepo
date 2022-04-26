@@ -1,5 +1,6 @@
+import { getSignatureForAttestation } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-// import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
+import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import {
   AccountsContract,
   AccountsInstance,
@@ -21,16 +22,23 @@ contract('FederatedAttestations', (accounts: string[]) => {
   let registry: RegistryInstance
 
   const caller: string = accounts[0]
-  // const phoneNumber: string = '+18005551212'
-  // const phoneHash: string = getPhoneHash(phoneNumber)
+  const phoneNumber: string = '+18005551212'
+  const pnIdentifier: string = getPhoneHash(phoneNumber)
+
+  const getCurrentUnixTime = () => Math.floor(Date.now() / 1000)
 
   beforeEach('FederatedAttestations setup', async () => {
     accountsInstance = await Accounts.new(true)
     federatedAttestations = await FederatedAttestations.new(true)
     registry = await Registry.new(true)
-    await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
+    await registry.setAddressFor(
+      CeloContractName.FederatedAttestations,
+      federatedAttestations.address
+    )
+    await accountsInstance.initialize(registry.address)
     await federatedAttestations.initialize(registry.address)
+    await federatedAttestations.setEip712DomainSeparator()
   })
 
   describe('#initialize()', () => {
@@ -50,7 +58,34 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#validateAttestation', () => {
-    it('should', async () => {})
+    const issuer = accounts[0]
+    const signer = accounts[1]
+    const account = accounts[2]
+    const issuedOn = getCurrentUnixTime()
+
+    it('should', async () => {
+      const sig = await getSignatureForAttestation(
+        pnIdentifier,
+        issuer,
+        account,
+        issuedOn,
+        signer,
+        1,
+        federatedAttestations.address
+      )
+      assert.isTrue(
+        await federatedAttestations.validateAttestation(
+          pnIdentifier,
+          issuer,
+          account,
+          issuedOn,
+          signer,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+      )
+    })
   })
 
   describe('#registerAttestation', () => {
