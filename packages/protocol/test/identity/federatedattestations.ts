@@ -1,6 +1,6 @@
 import {
   getDomainDigest,
-  getSignatureForAttestation,
+  getSignatureForAttestation
 } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
@@ -11,7 +11,7 @@ import {
   FederatedAttestationsContract,
   FederatedAttestationsInstance,
   RegistryContract,
-  RegistryInstance,
+  RegistryInstance
 } from 'types'
 import { keccak256 } from 'web3-utils'
 
