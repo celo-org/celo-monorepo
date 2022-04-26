@@ -1,0 +1,39 @@
+annotations:
+  prometheus.io/path: /metrics
+  prometheus.io/port: "3000"
+  prometheus.io/scrape: "false"
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - access: proxy
+      isDefault: true
+      name: Prometheus
+      type: prometheus
+      url: http://prometheus-server.prometheus:9090
+deploymentStrategy:
+  type: Recreate
+grafana.ini:
+  auth.google:
+    allow_sign_up: "true"
+    allowed_domains: clabs.co
+    auth_url: https://accounts.google.com/o/oauth2/auth
+    enabled: true
+    scopes: https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
+    token_url: https://accounts.google.com/o/oauth2/token
+ingress:
+  annotations:
+    kubernetes.io/tls-acme: "true"
+  enabled: true
+  path: /
+persistence:
+  enabled: true
+  size: 10Gi
+  storageClassName: ssd
+sidecar:
+  dashboards:
+    enabled: true
+  datasources:
+    enabled: false
+  notifiers:
+    enabled: false

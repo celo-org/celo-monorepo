@@ -6,6 +6,7 @@ export const mockVerifyCreate = jest.fn((_obj: Object) => {
     sid: undefined,
   }
 })
+export const mockVerifyUpdate = jest.fn()
 export const mockMessagesCreate = jest.fn((_obj: Object) => {
   return {
     sid: undefined,
@@ -28,9 +29,16 @@ const twilio = jest.fn().mockImplementation((_twilioSid, _twilioAuthToken) => {
       services: Object.assign(
         (_sid: string) => {
           return {
-            verifications: {
-              create: mockVerifyCreate,
-            },
+            verifications: Object.assign(
+              (_sid: string) => {
+                return {
+                  update: mockVerifyUpdate,
+                }
+              },
+              {
+                create: mockVerifyCreate,
+              }
+            ),
           }
         },
         {

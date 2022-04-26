@@ -53,7 +53,7 @@ metadata:
 {{- end }}
     component: {{ .component_label }}
 spec:
-  sessionAffinity: ClientIP
+  sessionAffinity: None
   ports:
   - port: 8545
     name: rpc
@@ -150,13 +150,21 @@ spec:
     spec:
       initContainers:
 {{ include "common.conditional-init-genesis-container" .  | indent 6 }}
-{{ include "common.celotool-validator-container" (dict  "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "mnemonic_account_type" .mnemonic_account_type "service_ip_env_var_prefix" .service_ip_env_var_prefix "ip_addresses" .ip_addresses "validator_index" .validator_index) | indent 6 }}
+{{ include "common.celotool-full-node-statefulset-container" (dict  "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "mnemonic_account_type" .mnemonic_account_type "service_ip_env_var_prefix" .service_ip_env_var_prefix "ip_addresses" .ip_addresses "validator_index" .validator_index) | indent 6 }}
 {{ if .unlock | default false }}
 {{ include "common.import-geth-account-container" .  | indent 6 }}
 {{ end }}
       containers:
-{{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "rpc_apis" .rpc_apis "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "ws_port" (default .Values.geth.ws_port .ws_port) "pprof" (or (.Values.metrics) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" .Values.metrics "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace))  | indent 6 }}
+{{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "rpc_apis" .rpc_apis "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "ws_port" (default .Values.geth.ws_port .ws_port) "pprof" (or (.Values.metrics) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "metrics" .Values.metrics "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace) "extra_setup" .extra_setup)  | indent 6 }}
       terminationGracePeriodSeconds:  {{ .Values.geth.terminationGracePeriodSeconds | default 300 }}
+      {{- if .node_selector }}
+      nodeSelector:
+{{ toYaml .node_selector | indent 8 }}
+      {{- end }}
+      {{- if .tolerations }}
+      tolerations:
+{{ toYaml .tolerations | indent 8 }}
+      {{- end }}
       volumes:
       - name: data
         emptyDir: {}

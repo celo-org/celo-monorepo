@@ -57,7 +57,7 @@ metadata:
 {{ end }}
 spec:
   type: ClusterIP
-  sessionAffinity: {{ default "ClientIP" .Values.geth.service_session_affinity }}
+  sessionAffinity: {{ default "None" .Values.geth.service_session_affinity }}
   ports:
 {{ include "celo-fullnode.rpc-ports" . | indent 4 }}
   selector:

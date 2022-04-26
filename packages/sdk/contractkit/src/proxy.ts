@@ -103,6 +103,7 @@ const initializeAbiMap = {
   EscrowProxy: findInitializeAbi(EscrowABI),
   ExchangeProxy: findInitializeAbi(ExchangeABI),
   ExchangeEURProxy: findInitializeAbi(ExchangeABI),
+  ExchangeBRLProxy: findInitializeAbi(ExchangeABI),
   FeeCurrencyWhitelistProxy: findInitializeAbi(FeeCurrencyWhitelistABI),
   FreezerProxy: findInitializeAbi(FreezerABI),
   GasPriceMinimumProxy: findInitializeAbi(GasPriceMinimumABI),
@@ -120,6 +121,7 @@ const initializeAbiMap = {
   SortedOraclesProxy: findInitializeAbi(SortedOraclesABI),
   StableTokenProxy: findInitializeAbi(StableTokenABI),
   StableTokenEURProxy: findInitializeAbi(StableTokenABI),
+  StableTokenBRLProxy: findInitializeAbi(StableTokenABI),
   TransferWhitelistProxy: findInitializeAbi(TransferWhitelistABI),
   ValidatorsProxy: findInitializeAbi(ValidatorsABI),
 }

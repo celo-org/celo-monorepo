@@ -141,6 +141,32 @@ EXAMPLE
 
 _See code: [src/commands/transfer/gold.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/gold.ts)_
 
+## `celocli transfer:reals`
+
+Transfer Celo Brazilian Real (cREAL) to a specified address.
+
+```
+Transfer Celo Brazilian Real (cREAL) to a specified address.
+
+USAGE
+  $ celocli transfer:reals
+
+OPTIONS
+  --comment=comment                                  Transfer comment
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
+  --globalHelp                                       View all available global flags
+  --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
+
+  --value=value                                      (required) Amount to transfer (in
+                                                     wei)
+
+EXAMPLE
+  reals --from 0xa0Af2E71cECc248f4a7fD606F203467B500Dd53B --to
+  0x5409ed021d9299bf6814279a6a1411a7e866a631 --value 1000000000000000000
+```
+
+_See code: [src/commands/transfer/reals.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/transfer/reals.ts)_
+
 ## `celocli transfer:stable`
 
 Transfer a stable token to a specified address.
@@ -155,7 +181,7 @@ OPTIONS
   --comment=comment                                  Transfer comment
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the sender
   --globalHelp                                       View all available global flags
-  --stableToken=(cUSD|cusd|cEUR|ceur)                Name of the stable to be transfered
+  --stableToken=(cUSD|cusd|cEUR|ceur|cREAL|creal)    Name of the stable to be transfered
   --to=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Address of the receiver
 
   --value=value                                      (required) Amount to transfer (in

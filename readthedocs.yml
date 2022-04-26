@@ -1,0 +1,10 @@
+version: 2
+
+mkdocs:
+  configuration: packages/docs/sdk/mkdocs.yml
+  fail_on_warning: true
+
+# Optionally declare the Python requirements required to build your docs
+python:
+   install:
+   - requirements: packages/docs/sdk/requirements.txt

@@ -46,6 +46,6 @@ export const handler = async (argv: PrometheusInitialArgv) => {
     await installGKEWorkloadMetricsIfNotExists(clusterConfig)
   }
   if (argv.deployGrafana) {
-    await installGrafanaIfNotExists()
+    await installGrafanaIfNotExists(argv.context, clusterConfig)
   }
 }
