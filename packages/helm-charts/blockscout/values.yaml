@@ -193,6 +193,6 @@ nfs-server-provisioner:
   persistence:
     enabled: true
     storageClass: "ssd"
-    size: 20Gi
+    size: 1Gi
   storageClass:
     defaultClass: false
