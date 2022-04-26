@@ -34,7 +34,7 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: release/core-contracts/6
+    RELEASE_TAG: release/core-contracts/7
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
