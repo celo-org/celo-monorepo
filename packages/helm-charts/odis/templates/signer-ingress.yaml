@@ -14,7 +14,9 @@ spec:
   - http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
           service:
             name: {{ include "name" . }}
-            port: 3000
+            port: 
+              number: 3000
