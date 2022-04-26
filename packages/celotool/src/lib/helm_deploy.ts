@@ -15,14 +15,7 @@ import {
   spawnCmd,
   spawnCmdWithExitOnFailure,
 } from './cmd-utils'
-import {
-  EnvTypes,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-  isProduction,
-  monorepoRoot,
-} from './env-utils'
+import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import {
@@ -451,9 +444,13 @@ export async function registerIPAddress(name: string, zone?: string) {
 export async function deleteIPAddress(name: string, zone?: string) {
   console.info(`Deleting IP address ${name}`)
   try {
-    await execCmd(
-      `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
-    )
+    if (isCelotoolVerbose()) {
+      console.info(`IP Address ${name} would be deleted`)
+    } else {
+      await execCmd(
+        `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
+      )
+    }
   } catch (error: any) {
     if (!error.toString().includes('was not found')) {
       console.error(error)
@@ -817,11 +814,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
-    // Disable by default block age check in fullnode readinessProbe except for production envs
-    `--set geth.fullnodeCheckBlockAge=${fetchEnvOrFallback(
-      envVar.FULL_NODE_READINESS_CHECK_BLOCK_AGE,
-      `${isProduction()}`
-    )}`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
     `--set geth.private_tx_nodes="${fetchEnv(envVar.PRIVATE_TX_NODES)}"`,
     `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,
@@ -920,7 +912,7 @@ export async function upgradeGenericHelmChart(
     )
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm diff upgrade --install -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`,
       true
@@ -928,7 +920,7 @@ export async function upgradeGenericHelmChart(
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm upgrade --install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )

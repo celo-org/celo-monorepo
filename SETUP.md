@@ -19,11 +19,9 @@
 
 This is a living document! Please edit and update it as part of your onboarding process :-)
 
-
 ## Reading
 
-Review the README from each directory in [packages](packages/). The [protocol](packages/protocol) and [mobile](packages/mobile) packages are good starting points.
-
+Review the README from each directory in [packages](packages/). The [protocol](packages/protocol) is a good starting point.
 
 ## Getting everything installed
 
@@ -105,7 +103,7 @@ sudo apt-get update && sudo apt-get install yarn
 
 #### Install Rust
 
-We use Rust for some [cryptography repositories](https://github.com/celo-org?q=&type=&language=rust) This is not 
+We use Rust for some [cryptography repositories](https://github.com/celo-org?q=&type=&language=rust) This is not
 required if you only want use the blockchain, monorepo, and mobile wallet.
 
 ```bash
@@ -129,6 +127,7 @@ rustup default 1.42.0
 If you're building Geth for Android, you need a NDK that has a cross-compilation toolchain. We need version 19.
 
 On Mac (darwin):
+
 ```bash
 brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/a39a95824122da8448dbeb0b0ca1dde78e5a793c/Casks/android-ndk.rb
 
@@ -142,7 +141,6 @@ export NDK_VERSION=android-ndk-r19c
 ```
 
 and run `make ndk_bundle`. This will download the NDK for your platform.
-
 
 ## Building celo-monorepo
 
@@ -174,13 +172,11 @@ yarn build --ignore docs
 > and the `postinstall` step which uses it is not automatically run after using `yarn remove`.
 
 > The docs package relies on gitbook which has problems off of a fresh install. Running
-> `yarn build --ignore docs` is a known workaround. 
-
+> `yarn build --ignore docs` is a known workaround.
 
 ## Running the mobile wallet
 
 To build and run the mobile wallet on your iOS or Android devices see the guide in the [mobile](https://github.com/celo-org/wallet/tree/main/packages/mobile) directory.
-
 
 [celo-monorepo]: https://github.com/celo-org/celo-monorepo
 [celo-blockchain]: https://github.com/celo-org/celo-blockchain

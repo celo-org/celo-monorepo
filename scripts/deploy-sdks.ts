@@ -32,11 +32,11 @@
  * to use their `-dev` new version.
  */
 
+import * as child_process from 'child_process'
+import * as colors from 'colors'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as prompt from 'prompt'
-import * as colors from 'colors'
-import * as child_process from 'child_process'
 import * as semver from 'semver'
 
 const VERSIONS = ['major', 'minor', 'patch']
@@ -76,6 +76,27 @@ type Answers = {
   if (!shouldPublish && !version) {
     console.error(colors.red('Either a version or --publish must be given'))
     process.exit(1)
+  }
+
+  let tag = 'latest'
+  const prerelease = semver.prerelease(version)
+  if (prerelease) {
+    tag = (prerelease[0] + '').trim()
+
+    if (!['alpha', 'beta', 'canary', 'rc'].includes(tag)) {
+      const errorPrompt = [
+        {
+          name: 'confirmTag',
+          description: colors.red(
+            `Unknown prerelease keyword given, do you really want to publish ${version} with tag ${tag}? Y/N`
+          ),
+        },
+      ]
+      const { confirmTag } = await prompt.get(errorPrompt)
+      if (confirmTag !== 'Y') {
+        process.exit(1)
+      }
+    }
   }
 
   const sdkPackagePaths = findPackagePaths(path.join(__dirname, '..', 'packages', 'sdk'))
@@ -143,7 +164,7 @@ type Answers = {
         console.log(`Building ${packageJson.name}`)
         child_process.execSync('yarn build', { cwd: packageFolderPath, stdio: 'ignore' })
 
-        console.log(`Publishing ${packageJson.name}@${packageJson.version}`)
+        console.info(`Publishing ${packageJson.name}@${packageJson.version} tagged as ${tag}...`)
         // Here you enter the 2FA code for npm
         let { newOtp } = (await prompt.get(otpPrompt)) as { newOtp: string }
         if (newOtp) {
@@ -154,7 +175,9 @@ type Answers = {
 
         // Here is the actual publishing
         child_process.execSync(
-          `npm publish --access public --otp ${newOtp} ${publish === 'dry-run' ? '--dry-run' : ''}`,
+          `npm publish --access public --otp ${newOtp} ${
+            publish === 'dry-run' ? '--dry-run' : ''
+          } --tag ${tag}`,
           { cwd: packageFolderPath, stdio: 'ignore' }
         )
         successfulPackages.push(packageJson.name)

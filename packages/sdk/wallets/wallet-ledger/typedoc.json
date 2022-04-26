@@ -7,7 +7,7 @@
     "includeDeclarations": false,
     "ignoreCompilerErrors": true,
     "hideGenerator": "true",
-    "theme": "gitbook",
-    "out": "../../../docs/developer-resources/wallet-ledger/reference",
-    "gitRevision": "master"
+    "out": "../../../docs/sdk/docs/wallet-ledger",
+    "gitRevision": "master",
+    "readme": "none"
   }

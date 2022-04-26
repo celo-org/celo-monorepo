@@ -221,7 +221,8 @@ fi
 
 METRICS_FLAGS=""
 if [[ ${geth_metrics} == "true" ]]; then
-  METRICS_FLAGS="$METRICS_FLAGS --metrics --pprof --pprofport 6060 --pprofaddr 127.0.0.1"
+  # Valid from celo-blockchain >=1.5.x
+  METRICS_FLAGS="$METRICS_FLAGS --metrics --pprof --pprof.port 6060 --pprof.addr 127.0.0.1"
 fi
 
 IN_MEMORY_DISCOVERY_TABLE_FLAG=""

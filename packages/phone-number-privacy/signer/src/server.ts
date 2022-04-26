@@ -1,9 +1,5 @@
 import { timeout } from '@celo/base'
-import {
-  Endpoints,
-  loggerMiddleware,
-  rootLogger as logger,
-} from '@celo/phone-number-privacy-common'
+import { Endpoint, loggerMiddleware, rootLogger as logger } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'
@@ -11,33 +7,30 @@ import https from 'https'
 import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
 import config, { getVersion } from './config'
-import { DomainAuthService } from './domain/auth/domainAuth.service'
-import { DomainService } from './domain/domain.service'
-import { DomainQuotaService } from './domain/quota/domainQuota.service'
 import { handleGetBlindedMessagePartialSig } from './signing/get-partial-signature'
 import { handleGetQuota } from './signing/query-quota'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
 export function createServer() {
-  const domainService = new DomainService(new DomainAuthService(), new DomainQuotaService())
+  // const domainService = new DomainService(new DomainAuthService(), new DomainQuotaService())
 
   logger().info('Creating express server')
   const app = express()
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware)
 
-  app.get(Endpoints.STATUS, (_req, res) => {
+  app.get(Endpoint.STATUS, (_req, res) => {
     res.status(200).json({
       version: getVersion(),
     })
   })
 
-  app.get(Endpoints.METRICS, (_req, res) => {
+  app.get(Endpoint.METRICS, (_req, res) => {
     res.send(PromClient.register.metrics())
   })
 
   const addMeteredEndpoint = (
-    endpoint: Endpoints,
+    endpoint: Endpoint,
     handler: (req: Request, res: Response) => Promise<void>,
     method: 'post' | 'get' = 'post'
   ) =>
@@ -46,11 +39,11 @@ export function createServer() {
     })
 
   // EG. curl -v "http://localhost:8080/getBlindedMessagePartialSig" -H "Authorization: 0xdaf63ea42a092e69b2001db3826bc81dc859bffa4d51ce8943fddc8ccfcf6b2b1f55d64e4612e7c028791528796f5a62c1d2865b184b664589696a08c83fc62a00" -d '{"hashedPhoneNumber":"0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96","blindedQueryPhoneNumber":"n/I9srniwEHm5o6t3y0tTUB5fn7xjxRrLP1F/i8ORCdqV++WWiaAzUo3GA2UNHiB","account":"0x588e4b68193001e4d10928660aB4165b813717C0"}' -H 'Content-Type: application/json'
-  addMeteredEndpoint(Endpoints.GET_BLINDED_MESSAGE_PARTIAL_SIG, handleGetBlindedMessagePartialSig)
-  addMeteredEndpoint(Endpoints.GET_QUOTA, handleGetQuota)
-  addMeteredEndpoint(Endpoints.DOMAIN_QUOTA_STATUS, domainService.handleGetDomainQuotaStatus)
-  addMeteredEndpoint(Endpoints.DOMAIN_SIGN, domainService.handleGetDomainRestrictedSignature)
-  addMeteredEndpoint(Endpoints.DISABLE_DOMAIN, domainService.handleDisableDomain)
+  addMeteredEndpoint(Endpoint.GET_BLINDED_MESSAGE_PARTIAL_SIG, handleGetBlindedMessagePartialSig)
+  addMeteredEndpoint(Endpoint.GET_QUOTA, handleGetQuota)
+  // addMeteredEndpoint(Endpoints.DOMAIN_QUOTA_STATUS, domainService.handleGetDomainQuotaStatus)
+  // addMeteredEndpoint(Endpoints.DOMAIN_SIGN, domainService.handleGetDomainRestrictedSignature)
+  // addMeteredEndpoint(Endpoints.DISABLE_DOMAIN, domainService.handleDisableDomain)
 
   const sslOptions = getSslOptions()
   if (sslOptions) {
@@ -61,7 +54,7 @@ export function createServer() {
 }
 
 async function callAndMeterLatency(
-  endpoint: Endpoints,
+  endpoint: Endpoint,
   handler: (req: Request, res: Response) => Promise<void>,
   req: Request,
   res: Response
