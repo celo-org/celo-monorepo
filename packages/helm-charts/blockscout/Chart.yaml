@@ -7,7 +7,3 @@ keywords:
 - blockchain
 - blockscout
 appVersion: v2.0.4-beta
-dependencies:
-  - name: nfs-server-provisioner
-    version: v1.4.0
-    repository: https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/
