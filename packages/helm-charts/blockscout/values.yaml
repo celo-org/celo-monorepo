@@ -189,3 +189,10 @@ blockscout:
     image:
       repository: gcr.io/celo-testnet/celo-monorepo
       tag: metadata-crawler-77a392216d4927e85ce4b683508fc0539aa92a34
+nfs-server-provisioner:
+  persistence:
+    enabled: true
+    storageClass: "ssd"
+    size: 20Gi
+  storageClass:
+    defaultClass: false
