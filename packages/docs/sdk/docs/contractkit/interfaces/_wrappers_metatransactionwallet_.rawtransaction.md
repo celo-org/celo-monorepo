@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/MetaTransactionWallet"](../modules/_wrappers_metatransactionwallet_.md) › [RawTransaction](_wrappers_metatransactionwallet_.rawtransaction.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/MetaTransactionWallet"](../modules/_wrappers_metatransactionwallet_.md) › [RawTransaction](_wrappers_metatransactionwallet_.rawtransaction.md)
 
 # Interface: RawTransaction
 

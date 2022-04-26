@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Governance"](_wrappers_governance_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Governance"](_wrappers_governance_.md)
 
 # Module: "wrappers/Governance"
 
@@ -27,6 +27,7 @@
 
 ### Type aliases
 
+* [GovernanceWrapperType](_wrappers_governance_.md#governancewrappertype)
 * [HotfixParams](_wrappers_governance_.md#hotfixparams)
 * [Proposal](_wrappers_governance_.md#proposal)
 * [ProposalParams](_wrappers_governance_.md#proposalparams)
@@ -38,6 +39,14 @@
 * [proposalToParams](_wrappers_governance_.md#const-proposaltoparams)
 
 ## Type aliases
+
+###  GovernanceWrapperType
+
+Ƭ **GovernanceWrapperType**: *[GovernanceWrapper](../classes/_wrappers_governance_.governancewrapper.md)*
+
+*Defined in [packages/sdk/contractkit/src/wrappers/Governance.ts:918](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L918)*
+
+___
 
 ###  HotfixParams
 

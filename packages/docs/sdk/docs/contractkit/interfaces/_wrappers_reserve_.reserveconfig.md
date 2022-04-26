@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Reserve"](../modules/_wrappers_reserve_.md) › [ReserveConfig](_wrappers_reserve_.reserveconfig.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Reserve"](../modules/_wrappers_reserve_.md) › [ReserveConfig](_wrappers_reserve_.reserveconfig.md)
 
 # Interface: ReserveConfig
 

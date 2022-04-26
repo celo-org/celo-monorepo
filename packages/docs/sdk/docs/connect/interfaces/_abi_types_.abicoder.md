@@ -1,6 +1,8 @@
-[@celo/connect](../README.md) › ["abi-types"](../modules/_abi_types_.md) › [AbiCoder](_abi_types_.abicoder.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["abi-types"](../modules/_abi_types_.md) › [AbiCoder](_abi_types_.abicoder.md)
 
 # Interface: AbiCoder
+
+**`internal`** 
 
 ## Hierarchy
 
@@ -23,15 +25,15 @@
 
 ###  decodeLog
 
-▸ **decodeLog**(`inputs`: AbiInput[], `hexString`: string, `topics`: string[]): *EventLog*
+▸ **decodeLog**(`inputs`: [AbiInput](_abi_types_.abiinput.md)[], `hexString`: string, `topics`: string[]): *EventLog*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L22)*
+*Defined in [abi-types.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L55)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`inputs` | AbiInput[] |
+`inputs` | [AbiInput](_abi_types_.abiinput.md)[] |
 `hexString` | string |
 `topics` | string[] |
 
@@ -43,7 +45,7 @@ ___
 
 ▸ **decodeParameter**(`type`: [ABIType](../modules/_abi_types_.md#abitype), `hex`: string): *any*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L31)*
+*Defined in [abi-types.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L64)*
 
 **Parameters:**
 
@@ -60,7 +62,7 @@ ___
 
 ▸ **decodeParameters**(`types`: [ABIType](../modules/_abi_types_.md#abitype)[], `hex`: string): *[DecodedParamsArray](_abi_types_.decodedparamsarray.md)*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L33)*
+*Defined in [abi-types.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L66)*
 
 **Parameters:**
 
@@ -71,15 +73,15 @@ Name | Type |
 
 **Returns:** *[DecodedParamsArray](_abi_types_.decodedparamsarray.md)*
 
-▸ **decodeParameters**(`types`: AbiInput[], `hex`: string): *[DecodedParamsObject](_abi_types_.decodedparamsobject.md)*
+▸ **decodeParameters**(`types`: [AbiInput](_abi_types_.abiinput.md)[], `hex`: string): *[DecodedParamsObject](_abi_types_.decodedparamsobject.md)*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L34)*
+*Defined in [abi-types.ts:67](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L67)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`types` | AbiInput[] |
+`types` | [AbiInput](_abi_types_.abiinput.md)[] |
 `hex` | string |
 
 **Returns:** *[DecodedParamsObject](_abi_types_.decodedparamsobject.md)*
@@ -90,7 +92,7 @@ ___
 
 ▸ **encodeEventSignature**(`name`: string | object): *string*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L27)*
+*Defined in [abi-types.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L60)*
 
 **Parameters:**
 
@@ -106,7 +108,7 @@ ___
 
 ▸ **encodeFunctionCall**(`jsonInterface`: object, `parameters`: any[]): *string*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L28)*
+*Defined in [abi-types.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L61)*
 
 **Parameters:**
 
@@ -123,7 +125,7 @@ ___
 
 ▸ **encodeFunctionSignature**(`name`: string | object): *string*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L29)*
+*Defined in [abi-types.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L62)*
 
 **Parameters:**
 
@@ -139,7 +141,7 @@ ___
 
 ▸ **encodeParameter**(`type`: [ABIType](../modules/_abi_types_.md#abitype), `parameter`: any): *string*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L24)*
+*Defined in [abi-types.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L57)*
 
 **Parameters:**
 
@@ -156,7 +158,7 @@ ___
 
 ▸ **encodeParameters**(`types`: [ABIType](../modules/_abi_types_.md#abitype)[], `paramaters`: any[]): *string*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L25)*
+*Defined in [abi-types.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L58)*
 
 **Parameters:**
 

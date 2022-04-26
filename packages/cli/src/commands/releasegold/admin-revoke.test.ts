@@ -34,7 +34,11 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
       { index: 1 } // revocable: true
     )
     kit = newKitFromWeb3(web3)
-    releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
+    releaseGoldWrapper = new ReleaseGoldWrapper(
+      kit.connection,
+      newReleaseGold(web3, contractAddress),
+      kit.contracts
+    )
     accounts = await web3.eth.getAccounts()
   })
 

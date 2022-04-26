@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["base"](_base_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["base"](_base_.md)
 
 # Module: "base"
 
@@ -76,7 +76,7 @@ ___
 
 • **ProxyContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = AllContracts.map((c) => suffixProxy(c))
 
-*Defined in [packages/sdk/contractkit/src/base.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L66)*
+*Defined in [packages/sdk/contractkit/src/base.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L68)*
 
 ___
 
@@ -92,7 +92,9 @@ ___
 
 ▸ **stripProxy**(`contract`: [CeloContract](../enums/_base_.celocontract.md)): *[CeloContract](../enums/_base_.celocontract.md)*
 
-*Defined in [packages/sdk/contractkit/src/base.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L61)*
+*Defined in [packages/sdk/contractkit/src/base.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L62)*
+
+**`internal`** 
 
 **Parameters:**
 
@@ -108,7 +110,9 @@ ___
 
 ▸ **suffixProxy**(`contract`: [CeloContract](../enums/_base_.celocontract.md)): *[CeloContract](../enums/_base_.celocontract.md)*
 
-*Defined in [packages/sdk/contractkit/src/base.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L63)*
+*Defined in [packages/sdk/contractkit/src/base.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L65)*
+
+**`internal`** 
 
 **Parameters:**
 

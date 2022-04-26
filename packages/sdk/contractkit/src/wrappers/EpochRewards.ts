@@ -61,3 +61,5 @@ export class EpochRewardsWrapper extends BaseWrapper<EpochRewards> {
     }
   }
 }
+
+export type EpochRewardsWrapperType = EpochRewardsWrapper

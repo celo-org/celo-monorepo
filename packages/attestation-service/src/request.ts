@@ -1,4 +1,4 @@
-import { AttestationResponseType } from '@celo/utils/lib/io'
+import { AttestationResponseType } from '@celo/phone-utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import { isLeft } from 'fp-ts/lib/Either'

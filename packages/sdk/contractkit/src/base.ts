@@ -58,8 +58,10 @@ const AuxiliaryContracts = [
 ]
 export const RegisteredContracts = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 
+/** @internal */
 export const stripProxy = (contract: CeloContract) => contract.replace('Proxy', '') as CeloContract
 
+/** @internal */
 export const suffixProxy = (contract: CeloContract) =>
   contract.endsWith('Proxy') ? contract : (`${contract}Proxy` as CeloContract)
 

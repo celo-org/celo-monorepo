@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Validators"](../modules/_wrappers_validators_.md) › [LockedGoldRequirements](_wrappers_validators_.lockedgoldrequirements.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Validators"](../modules/_wrappers_validators_.md) › [LockedGoldRequirements](_wrappers_validators_.lockedgoldrequirements.md)
 
 # Interface: LockedGoldRequirements
 

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [AttestationStat](_wrappers_attestations_.attestationstat.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [AttestationStat](_wrappers_attestations_.attestationstat.md)
 
 # Interface: AttestationStat
 
@@ -19,7 +19,7 @@
 
 • **completed**: *number*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L34)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L54)*
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **total**: *number*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L35)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L55)*

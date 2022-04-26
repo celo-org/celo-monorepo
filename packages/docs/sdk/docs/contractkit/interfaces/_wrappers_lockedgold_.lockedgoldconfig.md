@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/LockedGold"](../modules/_wrappers_lockedgold_.md) › [LockedGoldConfig](_wrappers_lockedgold_.lockedgoldconfig.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/LockedGold"](../modules/_wrappers_lockedgold_.md) › [LockedGoldConfig](_wrappers_lockedgold_.lockedgoldconfig.md)
 
 # Interface: LockedGoldConfig
 

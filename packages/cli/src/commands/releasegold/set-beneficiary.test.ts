@@ -28,7 +28,11 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
       { index: 1 } // canValidate = false
     )
     kit = newKitFromWeb3(web3)
-    releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
+    releaseGoldWrapper = new ReleaseGoldWrapper(
+      kit.connection,
+      newReleaseGold(web3, contractAddress),
+      kit.contracts
+    )
     beneficiary = await releaseGoldWrapper.getBeneficiary()
     const owner = await releaseGoldWrapper.getOwner()
     releaseGoldMultiSig = await kit.contracts.getMultiSig(owner)

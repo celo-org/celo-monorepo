@@ -9,5 +9,5 @@
   "hideGenerator": "true",
   "out": "../../docs/sdk/docs/contractkit",
   "gitRevision": "master",
-  "readme": "none"
+  "readme": "README.md"
 }

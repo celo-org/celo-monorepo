@@ -1,5 +1,5 @@
 // @ts-ignore
-import { blsPrivateKeyToProcessedPrivateKey } from '@celo/utils/lib/bls'
+import { blsPrivateKeyToProcessedPrivateKey } from '@celo/cryptographic-utils/lib/bls'
 import BigNumber from 'bignumber.js'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'

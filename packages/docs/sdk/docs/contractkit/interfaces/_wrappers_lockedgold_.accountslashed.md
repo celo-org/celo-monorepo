@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/LockedGold"](../modules/_wrappers_lockedgold_.md) › [AccountSlashed](_wrappers_lockedgold_.accountslashed.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/LockedGold"](../modules/_wrappers_lockedgold_.md) › [AccountSlashed](_wrappers_lockedgold_.accountslashed.md)
 
 # Interface: AccountSlashed
 

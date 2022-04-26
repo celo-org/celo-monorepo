@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["contract-cache"](_contract_cache_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["contract-cache"](_contract_cache_.md)
 
 # Module: "contract-cache"
 
@@ -16,6 +16,6 @@
 
 ###  ValidWrappers
 
-Ƭ **ValidWrappers**: *keyof CFType*
+Ƭ **ValidWrappers**: *keyof CFType | keyof RegistryType | keyof WrapperFactoriesWhichNeedCacheType*
 
-*Defined in [packages/sdk/contractkit/src/contract-cache.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L64)*
+*Defined in [packages/sdk/contractkit/src/contract-cache.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L74)*

@@ -1,5 +1,5 @@
 
-   
+
 {
   "mode": "modules",
   "exclude": ["**/*+(index|.test).ts"],
@@ -11,5 +11,5 @@
   "hideGenerator": "true",
   "out": "../../docs/sdk/docs/phone-utils",
   "gitRevision": "master",
-  "readme": "none"
+  "readme": "readme.md"
 }
