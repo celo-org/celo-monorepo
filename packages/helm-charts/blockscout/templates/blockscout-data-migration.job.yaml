@@ -1,4 +1,4 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ .Release.Name }}-data-migration
@@ -7,7 +7,7 @@ metadata:
     component: blockscout-data-migration
 spec:
   suspend:  true
-  schedule: "0 0 5 31 2 ?"
+  schedule: "0 0 31 2 *"
   jobTemplate:
     spec:
       template:
@@ -28,8 +28,8 @@ spec:
               mix data_migrate
             resources:
               requests:
-                memory: 250M
-                cpu: 200m
+                memory: 2Gi
+                cpu: 2
             volumeMounts:
               - mountPath: /tmp/pod
                 name: tmp-pod
