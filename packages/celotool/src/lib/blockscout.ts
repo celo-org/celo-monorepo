@@ -102,21 +102,21 @@ spec:
     http:
       paths:
       - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: ${ingressName}-web
             port:
               number: 4000
       - path: /(graphql|graphiql|api)
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: ${ingressName}-api
             port:
               number: 4000
       - path: /
-        pathType: ImplementationSpecific
+        pathType: Prefix
         backend:
           service:
             name: ${ingressName}-web
