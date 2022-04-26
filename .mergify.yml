@@ -13,12 +13,10 @@ pull_request_rules:
       - "-draft"
       # At least one approval required
       - "#approved-reviews-by>=1"
-      # Only enable this when the pull request is being merged into master
-      - "base=master"
     actions:
       queue:
         method: squash
         name: default
-        commit_message_template: {{title}}
+        commit_message_template: "{{title}}"
       delete_head_branch:
         force: False
