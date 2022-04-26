@@ -25,8 +25,10 @@ spec:
       paths:
       {{ range $index, $e := until (.Values.geth.validators | int) }}
       - path: /{{ $index | toString }}/(.*)
+        pathType: Prefix
         backend:
           service:
             name: {{ $.Release.Name }}-{{ $index | toString }}
-            port: 3000
+            port: 
+              number: 3000
       {{ end }}

@@ -17,12 +17,16 @@ spec:
     http:
       paths:
       - path: /rewards
+        pathType: Prefix
         backend:
           service:
             name: {{ .Release.Namespace }}-rewards
-            port: 3000
+            port: 
+              number: 3000
       - path: /
+        pathType: Prefix
         backend:
           service:
             name: {{ .Release.Namespace }}-onboarding
-            port: 3000
+            port: 
+              number: 3000

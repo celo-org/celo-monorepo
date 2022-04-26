@@ -23,7 +23,9 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
           service:
             name: {{ .Release.Namespace }}-celostats-server
-            port: 80
+            port: 
+              number: 80
