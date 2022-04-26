@@ -18,10 +18,10 @@
     "build:rules": "firebase-bolt database-rules.bolt"
   },
   "dependencies": {
-    "@celo/connect": "2.0.0-rc.3",
-    "@celo/contractkit": "2.0.0-rc.3",
-    "@celo/utils": "2.0.0-rc.3",
-    "@celo/phone-utils": "2.0.0-rc.3",
+    "@celo/connect": "2.0.0",
+    "@celo/contractkit": "2.0.0",
+    "@celo/utils": "2.0.0",
+    "@celo/phone-utils": "2.0.0",
     "@firebase/app": "^0.5.3",
     "@google-cloud/logging": "^7.1.0",
     "debug": "^4.1.1",

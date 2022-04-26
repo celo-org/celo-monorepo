@@ -1,6 +1,6 @@
 {
   "name": "@celo/encrypted-backup",
-  "version": "2.0.0-rc.3-dev",
+  "version": "2.0.1-dev",
   "description": "Libraries for implemented password encrypted account backups",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -25,11 +25,11 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/base": "2.0.0-rc.3-dev",
-    "@celo/identity": "2.0.0-rc.3-dev",
+    "@celo/base": "2.0.1-dev",
+    "@celo/identity": "2.0.1-dev",
     "@celo/phone-number-privacy-common": "1.0.39",
     "@celo/poprf": "^0.1.6",
-    "@celo/utils": "2.0.0-rc.3-dev",
+    "@celo/utils": "2.0.1-dev",
     "@types/debug": "^4.1.5",
     "debug": "^4.1.1",
     "fp-ts": "2.1.1",
