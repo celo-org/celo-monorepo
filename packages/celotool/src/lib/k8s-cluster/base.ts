@@ -3,6 +3,7 @@ import { execCmd, execCmdWithExitOnFailure } from '../cmd-utils'
 import {
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
+  installNFSServerProvisioner,
   isCelotoolHelmDryRun,
 } from '../helm_deploy'
 
@@ -83,6 +84,7 @@ export abstract class BaseClusterManager {
 
       await installCertManagerAndNginx(this.celoEnv, this.clusterConfig)
       await installAndEnableMetricsDeps(true, context, this.clusterConfig)
+      await installNFSServerProvisioner(this.celoEnv)
     }
   }
 
