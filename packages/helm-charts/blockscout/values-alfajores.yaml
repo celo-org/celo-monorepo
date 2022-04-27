@@ -14,8 +14,8 @@ blockscout:
         cpu: 1500m
   api:
     autoscaling:
-        maxReplicas: 5
-        minReplicas: 2
+        maxReplicas: 6
+        minReplicas: 3
         target:
           cpu: 70
     db:
@@ -24,7 +24,7 @@ blockscout:
           requests:
             memory: 250Mi
             cpu: 200m
-    pool_size: 15
+    pool_size: 25
     resources:
       requests:
         memory: 250Mi
