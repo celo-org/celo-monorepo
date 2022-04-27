@@ -99,20 +99,25 @@ the `volumes` section.
     - name: blockscout-cloudsql-credentials
       mountPath: /secrets/cloudsql
       readOnly: true
-    - name: vyper-compilers
-      mountPath: /opt/app/apps/explorer/priv/vyper_compilers
-    - name: solc-compilers
-      mountPath: /opt/app/apps/explorer/priv/solc_compilers
+{{- end -}}
+
+{{- /*
+Defines shared environment variables for all
+blockscout volumes.
+*/ -}}
+{{- define "celo.blockscout-volumes" -}}
 volumes:
   - name: blockscout-cloudsql-credentials
     secret:
       secretName: blockscout-cloudsql-credentials
+  {{- if .nfs_volumes }}
   - name: vyper-compilers
     persistentVolumeClaim:
-      claimName: nfs-volume
+      claimName: {{ .Release.Name }}-nfs-vyper-compilers-volume
   - name: solc-compilers
     persistentVolumeClaim:
-      claimName: nfs-volume
+      claimName: {{ .Release.Name }}-nfs-solc-compilers-volume
+  {{- end -}}
 {{- end -}}
 
 {{- /*
