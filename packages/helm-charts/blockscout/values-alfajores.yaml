@@ -24,7 +24,7 @@ blockscout:
           requests:
             memory: 250Mi
             cpu: 200m
-    pool_size: 15
+    pool_size: 25
     resources:
       requests:
         memory: 250Mi
