@@ -42,8 +42,8 @@ contract FederatedAttestations is
   mapping(bytes32 => mapping(address => IdentifierOwnershipAttestation[])) public identifierToAddresses;
   // account -> issuer -> identifiers
   mapping(address => mapping(address => bytes32[])) public addressToIdentifiers;
-  // signer => revocation time
-  mapping(address => uint256) public revokedSigners;
+  // signer => isRevoked
+  mapping(address => bool) public revokedSigners;
 
   bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
     "IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
@@ -99,13 +99,6 @@ contract FederatedAttestations is
     return (1, 1, 0, 0);
   }
 
-  function _isRevoked(address signer, uint256 time) internal view returns (bool) {
-    if (revokedSigners[signer] > 0 && revokedSigners[signer] >= time) {
-      return true;
-    }
-    return false;
-  }
-
   function lookupAttestations(
     bytes32 identifier,
     address[] memory trustedIssuers,
@@ -124,7 +117,7 @@ contract FederatedAttestations is
         // Only create and push new attestation if we haven't hit max
         if (currIndex < maxAttestations) {
           IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuer][j];
-          if (!_isRevoked(attestation.signer, attestation.issuedOn)) {
+          if (!revokedSigners[attestation.signer]) {
             attestations[currIndex] = attestation;
             currIndex++;
           }
@@ -167,10 +160,7 @@ contract FederatedAttestations is
             // For now, just take the first published, unrevoked signer that matches
             // TODO redo this to take into account either recency or the "correct" identifier
             // based on the index
-            if (
-              attestation.account == account &&
-              !_isRevoked(attestation.signer, attestation.issuedOn)
-            ) {
+            if (attestation.account == account && !revokedSigners[attestation.signer]) {
               identifiers[currIndex] = identifier;
               currIndex++;
               break;
@@ -203,8 +193,8 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) public view returns (bool) {
-    // TODO check if signer is revoked and is a valid signer of the account
-    // require(!_isRevoked(signer), time);
+    // TODO check if signer is a valid signer of the account
+    require(!revokedSigners[signer]);
     bytes32 structHash = keccak256(
       abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
     );
@@ -272,8 +262,8 @@ contract FederatedAttestations is
     }
   }
 
-  function revokeSigner(address signer, uint256 revokedOn) public {
-    // TODO ASv2 add constraints on who can revoke a signer
-    revokedSigners[signer] = revokedOn;
+  function revokeSigner(address signer) public {
+    // TODO ASv2 add constraints on who has permissions to revoke a signer
+    revokedSigners[signer] = true;
   }
 }
