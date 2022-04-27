@@ -5,7 +5,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName:  {{ .Release.Name }}-nfs
+  storageClassName: nfs
   resources:
     requests:
       storage: 1Gi

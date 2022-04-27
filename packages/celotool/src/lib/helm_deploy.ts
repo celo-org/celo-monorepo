@@ -1271,10 +1271,10 @@ export async function installNFSServerProvisioner(celoEnv: string) {
     await nfsHelmParameters(valueFilePath)
 
     await helmAddAndUpdateRepos()
-    await execCmdWithExitOnFailure(`helm install \
+    await execCmdWithExitOnFailure(`helm upgrade --install \
       -n ${nfsChartNamespace} \
       --version ${nfsChartVersion} \
-      nfs-ganesha-server-and-external-provisioner/nfs-server-provisioner \
+      nfs-server-release nfs-ganesha-server-and-external-provisioner/nfs-server-provisioner \
       -f ${valueFilePath}
     `)
   }
