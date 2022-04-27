@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["proxy"](_proxy_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["proxy"](_proxy_.md)
 
 # Module: "proxy"
 

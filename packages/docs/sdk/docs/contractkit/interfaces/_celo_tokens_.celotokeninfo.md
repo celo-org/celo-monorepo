@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["celo-tokens"](../modules/_celo_tokens_.md) › [CeloTokenInfo](_celo_tokens_.celotokeninfo.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["celo-tokens"](../modules/_celo_tokens_.md) › [CeloTokenInfo](_celo_tokens_.celotokeninfo.md)
 
 # Interface: CeloTokenInfo
 
@@ -21,7 +21,7 @@
 
 • **contract**: *[CeloTokenContract](../modules/_base_.md#celotokencontract)*
 
-*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L26)*
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L17)*
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 • **symbol**: *[CeloTokenType](../modules/_celo_tokens_.md#celotokentype)*
 
-*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L27)*
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L18)*

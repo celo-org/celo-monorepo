@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["test-utils/teardown.global"](_test_utils_teardown_global_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["test-utils/teardown.global"](_test_utils_teardown_global_.md)
 
 # Module: "test-utils/teardown.global"
 

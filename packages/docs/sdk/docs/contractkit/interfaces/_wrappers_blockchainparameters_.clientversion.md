@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/BlockchainParameters"](../modules/_wrappers_blockchainparameters_.md) › [ClientVersion](_wrappers_blockchainparameters_.clientversion.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/BlockchainParameters"](../modules/_wrappers_blockchainparameters_.md) › [ClientVersion](_wrappers_blockchainparameters_.clientversion.md)
 
 # Interface: ClientVersion
 

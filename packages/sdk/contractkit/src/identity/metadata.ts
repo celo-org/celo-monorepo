@@ -9,10 +9,13 @@ import { readFileSync } from 'fs'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
 import { ContractKit } from '../kit'
+import { AccountsWrapper } from '../wrappers/Accounts'
 import { Claim, ClaimPayload, ClaimType, hashOfClaims, isOfType } from './claims/claim'
 import { ClaimTypes, SINGULAR_CLAIM_TYPES } from './claims/types'
 
 export { ClaimTypes } from './claims/types'
+
+type KitOrAccountsWrapper = ContractKit | AccountsWrapper
 
 const MetaType = t.type({
   address: AddressType,
@@ -23,6 +26,7 @@ export const IdentityMetadataType = t.type({
   claims: t.array(ClaimType),
   meta: MetaType,
 })
+
 export type IdentityMetadata = t.TypeOf<typeof IdentityMetadataType>
 
 export class IdentityMetadataWrapper {
@@ -38,14 +42,18 @@ export class IdentityMetadataWrapper {
     })
   }
 
-  static async fetchFromURL(kit: ContractKit, url: string, tries = 3) {
+  static async fetchFromURL(
+    contractKitOrAccountsWrapper: KitOrAccountsWrapper,
+    url: string,
+    tries = 3
+  ) {
     return selectiveRetryAsyncWithBackOff(
       async () => {
         const resp = await fetch(url)
         if (!resp.ok) {
           throw new Error(`Request failed with status ${resp.status}`)
         }
-        return this.fromRawString(kit, await resp.text())
+        return this.fromRawString(contractKitOrAccountsWrapper, await resp.text())
       },
       tries,
       ['Request failed with status 404'],
@@ -53,24 +61,34 @@ export class IdentityMetadataWrapper {
     )
   }
 
-  static fromFile(kit: ContractKit, path: string) {
-    return this.fromRawString(kit, readFileSync(path, 'utf-8'))
+  static fromFile(contractKitOrAccountsWrapper: KitOrAccountsWrapper, path: string) {
+    return this.fromRawString(contractKitOrAccountsWrapper, readFileSync(path, 'utf-8'))
   }
 
-  static async verifySigner(kit: ContractKit, hash: any, signature: any, metadata: any) {
-    return this.verifySignerForAddress(kit, hash, signature, metadata.address)
+  static async verifySigner(
+    contractKitOrAccountsWrapper: KitOrAccountsWrapper,
+    hash: any,
+    signature: any,
+    metadata: any
+  ) {
+    return this.verifySignerForAddress(
+      contractKitOrAccountsWrapper,
+      hash,
+      signature,
+      metadata.address
+    )
   }
 
   static async verifySignerForAddress(
-    kit: ContractKit,
+    contractKitOrAccountsWrapper: KitOrAccountsWrapper,
     hash: any,
     signature: any,
     address: Address
   ) {
     // First try to verify on account's address
     if (!verifySignature(hash, signature, address)) {
+      const accounts = await getAccounts(contractKitOrAccountsWrapper)
       // If this fails, signature may still be one of `address`' signers
-      const accounts = await kit.contracts.getAccounts()
       if (await accounts.isAccount(address)) {
         const signers = await Promise.all([
           accounts.getVoteSigner(address),
@@ -84,7 +102,7 @@ export class IdentityMetadataWrapper {
     return true
   }
 
-  static async fromRawString(kit: ContractKit, rawData: string) {
+  static async fromRawString(contractKitOrAccountsWrapper: KitOrAccountsWrapper, rawData: string) {
     const data = JSON.parse(rawData)
 
     const validatedData = IdentityMetadataType.decode(data)
@@ -100,7 +118,7 @@ export class IdentityMetadataWrapper {
     if (
       claims.length > 0 &&
       !(await this.verifySigner(
-        kit,
+        contractKitOrAccountsWrapper,
         hash,
         validatedData.right.meta.signature,
         validatedData.right.meta
@@ -188,5 +206,17 @@ export class IdentityMetadataWrapper {
 
   filterClaims<K extends ClaimTypes>(type: K): Array<ClaimPayload<K>> {
     return this.data.claims.filter(isOfType(type))
+  }
+}
+
+// at first these functions required a `kit` but thats a bit heavy
+// as all that is used is the Accounts Wrapper so allow either.
+async function getAccounts(
+  contractKitOrAccountsWrapper: KitOrAccountsWrapper
+): Promise<AccountsWrapper> {
+  if (contractKitOrAccountsWrapper instanceof AccountsWrapper) {
+    return contractKitOrAccountsWrapper
+  } else {
+    return contractKitOrAccountsWrapper.contracts.getAccounts()
   }
 }

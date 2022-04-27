@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/LockedGold"](../modules/_wrappers_lockedgold_.md) › [PendingWithdrawal](_wrappers_lockedgold_.pendingwithdrawal.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/LockedGold"](../modules/_wrappers_lockedgold_.md) › [PendingWithdrawal](_wrappers_lockedgold_.pendingwithdrawal.md)
 
 # Interface: PendingWithdrawal
 

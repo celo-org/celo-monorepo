@@ -1,3 +1,4 @@
+/** @internal */
 export function getErrorMessage(error: Error) {
   // This replacement is because when the error reaches here, it's been wrapped
   // by Error: multiple times

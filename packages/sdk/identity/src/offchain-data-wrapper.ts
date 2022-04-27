@@ -87,7 +87,7 @@ export class BasicDataWrapper implements OffchainDataWrapper {
     const accounts = await this.kit.contracts.getAccounts()
     const metadataURL = await accounts.getMetadataURL(account)
     debug({ account, metadataURL })
-    const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
+    const metadata = await IdentityMetadataWrapper.fetchFromURL(accounts, metadataURL)
     // TODO: Filter StorageRoots with the datapath glob
     const storageRoots = metadata
       .filterClaims(ClaimTypes.STORAGE)

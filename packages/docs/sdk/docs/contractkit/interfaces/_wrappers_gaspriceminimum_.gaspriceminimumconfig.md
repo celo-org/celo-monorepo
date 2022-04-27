@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/GasPriceMinimum"](../modules/_wrappers_gaspriceminimum_.md) › [GasPriceMinimumConfig](_wrappers_gaspriceminimum_.gaspriceminimumconfig.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/GasPriceMinimum"](../modules/_wrappers_gaspriceminimum_.md) › [GasPriceMinimumConfig](_wrappers_gaspriceminimum_.gaspriceminimumconfig.md)
 
 # Interface: GasPriceMinimumConfig
 

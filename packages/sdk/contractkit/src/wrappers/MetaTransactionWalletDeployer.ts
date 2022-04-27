@@ -2,5 +2,7 @@ import { MetaTransactionWalletDeployer } from '../generated/MetaTransactionWalle
 import { BaseWrapper, proxySend } from './BaseWrapper'
 
 export class MetaTransactionWalletDeployerWrapper extends BaseWrapper<MetaTransactionWalletDeployer> {
-  deploy = proxySend(this.kit, this.contract.methods.deploy)
+  deploy = proxySend(this.connection, this.contract.methods.deploy)
 }
+
+export type MetaTransactionWalletDeployerWrapperType = MetaTransactionWalletDeployerWrapper

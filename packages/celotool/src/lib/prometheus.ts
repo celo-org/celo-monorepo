@@ -45,8 +45,7 @@ const grafanaReleaseName = 'grafana'
 
 export async function installPrometheusIfNotExists(
   context?: string,
-  clusterConfig?: BaseClusterConfig,
-  disableStackdriver?: boolean
+  clusterConfig?: BaseClusterConfig
 ) {
   const prometheusExists = await outputIncludes(
     `helm list -n prometheus`,
@@ -55,21 +54,17 @@ export async function installPrometheusIfNotExists(
   )
   if (!prometheusExists) {
     console.info('Installing prometheus-stackdriver')
-    await installPrometheus(context, clusterConfig, disableStackdriver)
+    await installPrometheus(context, clusterConfig)
   }
 }
 
-async function installPrometheus(
-  context?: string,
-  clusterConfig?: BaseClusterConfig,
-  disableStackdriver?: boolean
-) {
+async function installPrometheus(context?: string, clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(context, clusterConfig, disableStackdriver)
+    await helmParameters(context, clusterConfig)
   )
 }
 
@@ -77,31 +72,25 @@ export async function removePrometheus() {
   await removeGenericHelmChart(releaseName, kubeNamespace)
 }
 
-export async function upgradePrometheus(
-  context?: string,
-  clusterConfig?: BaseClusterConfig,
-  disableStackdriver?: boolean
-) {
+export async function upgradePrometheus(context?: string, clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
   return upgradeGenericHelmChart(
     kubeNamespace,
     releaseName,
     helmChartPath,
-    await helmParameters(context, clusterConfig, disableStackdriver)
+    await helmParameters(context, clusterConfig)
   )
 }
 
-async function helmParameters(
-  context?: string,
+function getK8sContextVars(
   clusterConfig?: BaseClusterConfig,
-  disableStackdriver?: boolean
-) {
+  context?: string
+): [string, string, string, string, string, boolean] {
+  const cloudProvider = clusterConfig ? getCloudProviderPrefix(clusterConfig!) : 'gcp'
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
-  const clusterName = usingGCP
-    ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
-    : clusterConfig!.clusterName
-  let gcloudProject
-  let gcloudRegion
+  let clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
+  let gcloudProject, gcloudRegion, stackdriverDisabled
+
   if (context) {
     gcloudProject = getDynamicEnvVarValue(
       DynamicEnvVar.PROM_SIDECAR_GCP_PROJECT,
@@ -113,10 +102,57 @@ async function helmParameters(
       { context },
       fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
     )
+    clusterName = getDynamicEnvVarValue(
+      DynamicEnvVar.KUBERNETES_CLUSTER_NAME,
+      { context },
+      clusterName
+    )
+    stackdriverDisabled = getDynamicEnvVarValue(
+      DynamicEnvVar.PROM_SIDECAR_DISABLED,
+      { context },
+      clusterName
+    )
   } else {
     gcloudProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
     gcloudRegion = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
+    stackdriverDisabled = fetchEnvOrFallback(envVar.PROMETHEUS_DISABLE_STACKDRIVER_SIDECAR, 'false')
   }
+
+  return [cloudProvider, clusterName, gcloudProject, gcloudRegion, stackdriverDisabled, usingGCP]
+}
+
+function getRemoteWriteParameters(context?: string): string[] {
+  const remoteWriteUrl = getDynamicEnvVarValue(
+    DynamicEnvVar.PROM_REMOTE_WRITE_URL,
+    { context },
+    fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)
+  )
+  const remoteWriteUser = getDynamicEnvVarValue(
+    DynamicEnvVar.PROM_REMOTE_WRITE_USERNAME,
+    { context },
+    fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_USERNAME)
+  )
+  const remoteWritePassword = getDynamicEnvVarValue(
+    DynamicEnvVar.PROM_REMOTE_WRITE_PASSWORD,
+    { context },
+    fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_PASSWORD)
+  )
+  return [
+    `--set remote_write.url='${remoteWriteUrl}'`,
+    `--set remote_write.basic_auth.username='${remoteWriteUser}'`,
+    `--set remote_write.basic_auth.password='${remoteWritePassword}'`,
+  ]
+}
+
+async function helmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
+  const [
+    cloudProvider,
+    clusterName,
+    gcloudProject,
+    gcloudRegion,
+    stackdriverDisabled,
+    usingGCP,
+  ] = getK8sContextVars(clusterConfig, context)
 
   const params = [
     `--set namespace=${kubeNamespace}`,
@@ -125,55 +161,46 @@ async function helmParameters(
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set serviceAccount.name=${kubeServiceAccountName}`,
     `--set cluster=${clusterName}`,
+    `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
+    // Disable stackdriver sidecar env wide. TODO: Update to a contexted variable if needed
+    `--set stackdriver.disabled=${stackdriverDisabled}`,
   ]
 
-  // Remote write to Grafana.
+  // Remote write to Grafana Cloud
   if (fetchEnvOrFallback(envVar.PROMETHEUS_REMOTE_WRITE_URL, '') !== '') {
-    params.push(
-      `--set remote_write.url='${fetchEnv(envVar.PROMETHEUS_REMOTE_WRITE_URL)}'`,
-      `--set remote_write.basic_auth.username='${fetchEnv(
-        envVar.PROMETHEUS_REMOTE_WRITE_USERNAME
-      )}'`,
-      `--set remote_write.basic_auth.password='${fetchEnv(
-        envVar.PROMETHEUS_REMOTE_WRITE_PASSWORD
-      )}'`
-    )
-  }
-
-  params.push(`--set stackdriver.enable='${!disableStackdriver}'`)
-  if (!disableStackdriver) {
-    params.push(`--set stackdriver.sidecar.imageTag=${sidecarImageTag}`)
-
-    if (usingGCP) {
-      params.push(
-        `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`
-      )
-    } else {
-      const cloudProvider = getCloudProviderPrefix(clusterConfig!)
-      params.push(
-        `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${
-          clusterConfig!.clusterName
-        }`,
-        `--set stackdriver.gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
-          clusterName,
-          cloudProvider,
-          gcloudProject
-        )}`
-      )
-    }
+    params.push(...getRemoteWriteParameters(context))
   }
 
   if (usingGCP) {
-    const gcloudProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-    const cloudProvider = 'gcp'
-    const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
-    await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
-    console.info(serviceAccountName)
-    const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+    // Note: ssd is not the default storageClass in GCP clusters
+    params.push(`--set storageClassName=ssd`)
+  }
+
+  if (stackdriverDisabled.toLowerCase() === 'false') {
     params.push(
-      `--set storageClassName=ssd`,
-      `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
+      // Disable stackdriver sidecar env wide. TODO: Update to a contexted variable if needed
+      `--set stackdriver.disabled=false`,
+      `--set stackdriver.sidecar.imageTag=${sidecarImageTag}`,
+      `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`,
+      `--set stackdriver.gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
+        clusterName,
+        cloudProvider,
+        gcloudProject
+      )}`
     )
+
+    if (usingGCP) {
+      const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
+      await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProject)
+      console.info(serviceAccountName)
+      const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
+      params.push(
+        `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
+      )
+    }
+  } else {
+    // Stackdriver disabled
+    params.push(`--set stackdriver.disabled=true`)
   }
 
   // Set scrape job if set for the context
@@ -254,10 +281,6 @@ async function createPrometheusGcloudServiceAccount(
     await execCmdWithExitOnFailure(
       `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/monitoring.metricWriter --member serviceAccount:${serviceAccountEmail}`
     )
-    // Prometheus needs roles/compute.viewer to discover the VMs asking GCE API
-    await execCmdWithExitOnFailure(
-      `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/compute.viewer --member serviceAccount:${serviceAccountEmail}`
-    )
 
     // Setup workload identity IAM permissions
     await setupGKEWorkloadIdentities(
@@ -286,7 +309,10 @@ function getServiceAccountName(clusterName: string, cloudProvider: string) {
     .replace(/[^a-zA-Z0-9]+$/g, '')
 }
 
-export async function installGrafanaIfNotExists() {
+export async function installGrafanaIfNotExists(
+  context?: string,
+  clusterConfig?: BaseClusterConfig
+) {
   const grafanaExists = await outputIncludes(
     `helm list -A`,
     grafanaReleaseName,
@@ -294,90 +320,32 @@ export async function installGrafanaIfNotExists() {
   )
   if (!grafanaExists) {
     console.info('Installing grafana')
-    await installGrafana()
+    await installGrafana(context, clusterConfig)
   }
 }
 
-async function installGrafana() {
+async function installGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
     grafanaReleaseName,
     grafanaHelmChartPath,
-    await grafanaHelmParameters()
+    await grafanaHelmParameters(context, clusterConfig),
+    // Adding this file and clabs' default values file.
+    true,
+    'values-clabs.yaml'
   )
 }
 
-async function grafanaHelmParameters() {
-  const k8sClusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
-  const k8sDomainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
-  const values = {
-    annotations: {
-      'prometheus.io/scrape': 'false',
-      'prometheus.io/path': '/metrics',
-      'prometheus.io/port': '3000',
-    },
-    sidecar: {
-      dashboards: {
-        enabled: true,
-      },
-      datasources: {
-        enabled: false,
-      },
-      notifiers: {
-        enabled: false,
-      },
-    },
-    ingress: {
-      enabled: true,
-      annotations: {
-        'kubernetes.io/ingress.class': 'nginx',
-        'kubernetes.io/tls-acme': 'true',
-      },
-      hosts: [`${k8sClusterName}-grafana.${k8sDomainName}.org`],
-      path: '/',
-      tls: [
-        {
-          secretName: `${k8sClusterName}-grafana-tls`,
-          hosts: [`${k8sClusterName}-grafana.${k8sDomainName}.org`],
-        },
-      ],
-    },
-    persistence: {
-      enabled: true,
-      size: '10Gi',
-      storageClassName: 'ssd',
-    },
-    datasources: {
-      'datasources.yaml': {
-        apiVersion: 1,
-        datasources: [
-          {
-            name: 'Prometheus',
-            type: 'prometheus',
-            url: 'http://prometheus-server.prometheus:9090',
-            access: 'proxy',
-            isDefault: true,
-          },
-        ],
-      },
-    },
-  }
-
-  const valuesFile = '/tmp/grafana-values.yaml'
-  fs.writeFileSync(valuesFile, yaml.safeDump(values))
-
-  const params = [`-f ${valuesFile}`]
-  return params
-}
-
-export async function upgradeGrafana() {
+export async function upgradeGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
   return upgradeGenericHelmChart(
     kubeNamespace,
     grafanaReleaseName,
     grafanaHelmChartPath,
-    await grafanaHelmParameters()
+    await grafanaHelmParameters(context, clusterConfig),
+    // Adding this file and clabs' default values file.
+    'values-clabs.yaml'
   )
 }
 
@@ -387,6 +355,45 @@ export async function removeGrafanaHelmRelease() {
     console.info('Removing grafana')
     await removeGenericHelmChart(grafanaReleaseName, kubeNamespace)
   }
+}
+
+async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
+  // Grafana chart is a copy from source. No changes done directly on the chart.
+  const [_, k8sClusterName] = getK8sContextVars(clusterConfig, context)
+  const k8sDomainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
+  // Rename baklavastaging -> baklava
+  const grafanaUrl =
+    k8sClusterName !== 'baklavastaging'
+      ? `${k8sClusterName}-grafana.${k8sDomainName}.org`
+      : `baklava-grafana.${k8sDomainName}.org`
+  const values = {
+    adminPassword: fetchEnv(envVar.GRAFANA_LOCAL_ADMIN_PASSWORD),
+    'grafana.ini': {
+      server: {
+        root_url: `https://${grafanaUrl}`,
+      },
+      'auth.google': {
+        client_id: fetchEnv(envVar.GRAFANA_LOCAL_OAUTH2_CLIENT_ID),
+        client_secret: fetchEnv(envVar.GRAFANA_LOCAL_OAUTH2_CLIENT_SECRET),
+      },
+    },
+    ingress: {
+      hosts: [grafanaUrl],
+      tls: [
+        {
+          secretName: `${k8sClusterName}-grafana-tls`,
+          hosts: [grafanaUrl],
+        },
+      ],
+    },
+  }
+
+  const valuesFile = '/tmp/grafana-values.yaml'
+  fs.writeFileSync(valuesFile, yaml.safeDump(values))
+
+  // Adding this file and clabs' default values file.
+  const params = [`-f ${valuesFile}`]
+  return params
 }
 
 // See https://cloud.google.com/stackdriver/docs/solutions/gke/managing-metrics#enable-workload-metrics

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["identity/claims/account"](_identity_claims_account_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["identity/claims/account"](_identity_claims_account_.md)
 
 # Module: "identity/claims/account"
 
@@ -23,7 +23,7 @@
 
 Ƭ **AccountClaim**: *t.TypeOf‹typeof AccountClaimTypeH›*
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/account.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/account.ts#L32)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/account.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/account.ts#L35)*
 
 ## Variables
 
@@ -45,7 +45,7 @@
   (x) => x
 )
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/account.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/account.ts#L16)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/account.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/account.ts#L19)*
 
 ___
 
@@ -59,7 +59,9 @@ ___
   publicKey: t.union([t.undefined, PublicKeyType]),
 })
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/account.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/account.ts#L8)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/account.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/account.ts#L11)*
+
+Provide the type minus the validation that the public key and address are derived from the same private key
 
 ## Functions
 
@@ -67,7 +69,7 @@ ___
 
 ▸ **createAccountClaim**(`address`: string, `publicKey?`: undefined | string): *[AccountClaim](_identity_claims_account_.md#accountclaim)*
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/account.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/account.ts#L34)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/account.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/account.ts#L37)*
 
 **Parameters:**
 

@@ -1,6 +1,6 @@
 {
   "name": "@celo/wallet-hsm",
-  "version": "1.5.3-dev",
+  "version": "2.0.1-dev",
   "description": "HSM wallet implementation utils",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -20,7 +20,7 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/base": "1.5.3-dev",
+    "@celo/base": "2.0.1-dev",
     "@types/asn1js": "^0.0.2",
     "@types/secp256k1": "^4.0.0",
     "@types/debug": "^4.1.5",

@@ -1,4 +1,5 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
+import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
@@ -13,7 +14,6 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
-import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import { range, uniq } from 'lodash'
 import {

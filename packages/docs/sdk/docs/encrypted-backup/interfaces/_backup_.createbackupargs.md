@@ -43,6 +43,6 @@ ___
 
 ###  userSecret
 
-• **userSecret**: *Buffer*
+• **userSecret**: *Buffer | string*
 
 *Defined in [packages/sdk/encrypted-backup/src/backup.ts:224](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/backup.ts#L224)*

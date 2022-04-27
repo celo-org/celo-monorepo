@@ -62,3 +62,5 @@ export class GasPriceMinimumWrapper extends BaseWrapper<GasPriceMinimum> {
     }
   }
 }
+
+export type GasPriceMinimumWrapperType = GasPriceMinimumWrapper

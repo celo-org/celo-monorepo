@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/DowntimeSlasher"](../modules/_wrappers_downtimeslasher_.md) › [Interval](_wrappers_downtimeslasher_.interval.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/DowntimeSlasher"](../modules/_wrappers_downtimeslasher_.md) › [Interval](_wrappers_downtimeslasher_.interval.md)
 
 # Interface: Interval
 

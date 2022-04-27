@@ -15,7 +15,6 @@ export type PrometheusInitialArgv = InitialArgv &
   ContextArgv & {
     deployGKEWorkloadMetrics: boolean
     deployGrafana: boolean
-    disableStackdriver: boolean
     skipClusterSetup: boolean
   }
 
@@ -32,11 +31,6 @@ export const builder = (argv: PrometheusInitialArgv) => {
       description: 'Include the deployment of grafana helm chart',
       default: false,
     })
-    .option('disableStackdriver', {
-      type: 'boolean',
-      description: 'Disable exporting metrics to GCP Stackdriver',
-      default: false,
-    })
     .option('skipClusterSetup', {
       type: 'boolean',
       description: 'If you know that you can skip the cluster setup',
@@ -47,11 +41,11 @@ export const builder = (argv: PrometheusInitialArgv) => {
 export const handler = async (argv: PrometheusInitialArgv) => {
   const clusterConfig = await switchToClusterFromEnvOrContext(argv, argv.skipClusterSetup)
 
-  await installPrometheusIfNotExists(argv.context, clusterConfig, argv.disableStackdriver)
+  await installPrometheusIfNotExists(argv.context, clusterConfig)
   if (argv.deployGKEWorkloadMetrics) {
     await installGKEWorkloadMetricsIfNotExists(clusterConfig)
   }
   if (argv.deployGrafana) {
-    await installGrafanaIfNotExists()
+    await installGrafanaIfNotExists(argv.context, clusterConfig)
   }
 }

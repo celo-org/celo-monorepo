@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/SortedOracles"](../modules/_wrappers_sortedoracles_.md) › [SortedOraclesConfig](_wrappers_sortedoracles_.sortedoraclesconfig.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/SortedOracles"](../modules/_wrappers_sortedoracles_.md) › [SortedOraclesConfig](_wrappers_sortedoracles_.sortedoraclesconfig.md)
 
 # Interface: SortedOraclesConfig
 
@@ -18,4 +18,4 @@
 
 • **reportExpirySeconds**: *BigNumber*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L26)*
+*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L27)*

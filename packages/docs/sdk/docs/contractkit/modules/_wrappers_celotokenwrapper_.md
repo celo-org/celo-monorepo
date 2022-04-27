@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/CeloTokenWrapper"](_wrappers_celotokenwrapper_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/CeloTokenWrapper"](_wrappers_celotokenwrapper_.md)
 
 # Module: "wrappers/CeloTokenWrapper"
 

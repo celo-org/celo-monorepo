@@ -21,11 +21,12 @@
     "loadTest": "ts-node src/scripts/runLoadTest.ts"
   },
   "dependencies": {
-    "@celo/contractkit": "1.5.2",
-    "@celo/identity": "1.5.2",
-    "@celo/wallet-local": "1.5.2",
-    "@celo/phone-number-privacy-common": "1.0.40-dev",
-    "@celo/utils": "1.5.2",
+    "@celo/contractkit": "2.0.0",
+    "@celo/cryptographic-utils": "2.0.1-dev",
+    "@celo/identity": "2.0.0",
+    "@celo/wallet-local": "2.0.0",
+    "@celo/phone-number-privacy-common": "1.0.39",
+    "@celo/utils": "2.0.0",
     "firebase-admin": "^9.12.0",
     "firebase-functions": "^3.15.7"
   },
