@@ -101,11 +101,16 @@ the `volumes` section.
       readOnly: true
     - name: vyper-compilers
       mountPath: /opt/app/apps/explorer/priv/vyper_compilers
+    - name: solc-compilers
+      mountPath: /opt/app/apps/explorer/priv/solc_compilers
 volumes:
   - name: blockscout-cloudsql-credentials
     secret:
       secretName: blockscout-cloudsql-credentials
   - name: vyper-compilers
+    persistentVolumeClaim:
+      claimName: nfs-volume
+  - name: solc-compilers
     persistentVolumeClaim:
       claimName: nfs-volume
 {{- end -}}
