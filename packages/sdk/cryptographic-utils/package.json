@@ -1,0 +1,44 @@
+{
+  "name": "@celo/cryptographic-utils",
+  "version": "2.0.1-dev",
+  "description": "Some Celo utils for comment/data encryption, bls, and mnemonics",
+  "author": "Celo",
+  "license": "Apache-2.0",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "sideEffects": false,
+  "homepage": "https://celo-sdk-docs.readthedocs.io/en/latest/cryptographic-utils",
+  "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/cryptographic-utils",
+  "scripts": {
+    "prepublishOnly": "yarn build",
+    "build": "tsc -b .",
+    "docs": "typedoc",
+    "clean": "tsc -b . --clean",
+    "test": "jest --runInBand --ci",
+    "test:verbose": "jest --verbose",
+    "lint": "tslint -c tslint.json --project ."
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "dependencies": {
+    "@celo/utils": "2.0.1-dev",
+    "@celo/base": "2.0.1-dev",
+    "@types/bn.js": "^5.1.0",
+    "@types/elliptic": "^6.4.9",
+    "@types/ethereumjs-util": "^5.2.0",
+    "@types/node": "^10.12.18",
+    "@types/randombytes": "^2.0.0",
+    "bigi": "^1.1.0",
+    "bip32": "^2.0.6",
+    "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
+    "bls12377js": "https://github.com/celo-org/bls12377js#cee721830e78bffcc03a660649b12c62386fb4bc",
+    "buffer-reverse": "^1.0.1",
+    "elliptic": "^6.5.4",
+    "ethereumjs-util": "^5.2.0"
+  },
+  "devDependencies": {
+    "@celo/flake-tracker": "0.0.1-dev",
+    "@celo/typescript": "0.0.1"
+  }
+}

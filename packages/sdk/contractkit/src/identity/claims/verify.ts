@@ -44,7 +44,11 @@ export const verifyAccountClaim = async (
 
   let metadata: IdentityMetadataWrapper
   try {
-    metadata = await IdentityMetadataWrapper.fetchFromURL(kit, metadataURL, tries)
+    metadata = await IdentityMetadataWrapper.fetchFromURL(
+      await kit.contracts.getAccounts(),
+      metadataURL,
+      tries
+    )
   } catch (error: any) {
     return `Metadata could not be fetched for ${
       claim.address
@@ -85,7 +89,7 @@ export const verifyDomainRecord = async (
           const signature = Buffer.from(signatureBase64, 'base64').toString('binary')
           if (
             await IdentityMetadataWrapper.verifySignerForAddress(
-              kit,
+              await kit.contracts.getAccounts(),
               serializeClaim(claim),
               signature,
               address

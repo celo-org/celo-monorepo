@@ -1,6 +1,5 @@
 import { Address } from '@celo/base/lib/address'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { setGrandaMentoLimits } from '@celo/contractkit/lib/test-utils/grandaMento'
 import { assumeOwnership } from '@celo/contractkit/lib/test-utils/transferownership'
 import {
   ExchangeProposalState,
@@ -9,6 +8,7 @@ import {
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { setGrandaMentoLimits } from '../../test-utils/grandaMento'
 import Propose from './propose'
 
 testWithGanache('grandamento:propose cmd', (web3: Web3) => {

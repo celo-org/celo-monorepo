@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/StableTokenWrapper"](../modules/_wrappers_stabletokenwrapper_.md) › [StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/StableTokenWrapper"](../modules/_wrappers_stabletokenwrapper_.md) › [StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)
 
 # Class: StableTokenWrapper
 
@@ -56,17 +56,17 @@ Stable token with variable supply
 
 ###  constructor
 
-\+ **new StableTokenWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: StableToken): *[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)*
+\+ **new StableTokenWrapper**(`connection`: Connection, `contract`: StableToken): *[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L32)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`kit` | [ContractKit](_kit_.contractkit.md) |
+`connection` | Connection |
 `contract` | StableToken |
 
 **Returns:** *[StableTokenWrapper](_wrappers_stabletokenwrapper_.stabletokenwrapper.md)*
@@ -103,7 +103,7 @@ ___
 
 ###  approve
 
-• **approve**: *function* = proxySend(this.kit, this.contract.methods.approve)
+• **approve**: *function* = proxySend(this.connection, this.contract.methods.approve)
 
 *Inherited from [Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md).[approve](_wrappers_erc20wrapper_.erc20wrapper.md#approve)*
 
@@ -161,7 +161,7 @@ ___
 
 ###  burn
 
-• **burn**: *function* = proxySend(this.kit, this.contract.methods.burn)
+• **burn**: *function* = proxySend(this.connection, this.contract.methods.burn)
 
 *Defined in [packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L83)*
 
@@ -203,7 +203,7 @@ ___
 
 ###  decreaseAllowance
 
-• **decreaseAllowance**: *function* = proxySend(this.kit, this.contract.methods.decreaseAllowance)
+• **decreaseAllowance**: *function* = proxySend(this.connection, this.contract.methods.decreaseAllowance)
 
 *Defined in [packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts:81](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L81)*
 
@@ -236,7 +236,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L61)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L63)*
 
 ___
 
@@ -246,14 +246,14 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L59)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L61)*
 
 ___
 
 ###  increaseAllowance
 
 • **increaseAllowance**: *function* = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.increaseAllowance,
     tupleParser(stringIdentity, valueToString)
   )
@@ -289,7 +289,7 @@ ___
       acc[method] =
         methodABI === undefined
           ? '0x'
-          : this.kit.connection.getAbiCoder().encodeFunctionSignature(methodABI)
+          : this.connection.getAbiCoder().encodeFunctionSignature(methodABI)
 
       return acc
     },
@@ -298,13 +298,13 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L66)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L68)*
 
 ___
 
 ###  mint
 
-• **mint**: *function* = proxySend(this.kit, this.contract.methods.mint)
+• **mint**: *function* = proxySend(this.connection, this.contract.methods.mint)
 
 *Defined in [packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L82)*
 
@@ -368,7 +368,7 @@ ___
 
 ###  setInflationParameters
 
-• **setInflationParameters**: *function* = proxySend(this.kit, this.contract.methods.setInflationParameters)
+• **setInflationParameters**: *function* = proxySend(this.connection, this.contract.methods.setInflationParameters)
 
 *Defined in [packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/StableTokenWrapper.ts#L85)*
 
@@ -434,7 +434,7 @@ ___
 
 ###  transfer
 
-• **transfer**: *function* = proxySend(this.kit, this.contract.methods.transfer)
+• **transfer**: *function* = proxySend(this.connection, this.contract.methods.transfer)
 
 *Inherited from [Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md).[transfer](_wrappers_erc20wrapper_.erc20wrapper.md#transfer)*
 
@@ -462,7 +462,7 @@ ___
 
 ###  transferFrom
 
-• **transferFrom**: *function* = proxySend(this.kit, this.contract.methods.transferFrom)
+• **transferFrom**: *function* = proxySend(this.connection, this.contract.methods.transferFrom)
 
 *Inherited from [Erc20Wrapper](_wrappers_erc20wrapper_.erc20wrapper.md).[transferFrom](_wrappers_erc20wrapper_.erc20wrapper.md#transferfrom)*
 
@@ -492,7 +492,7 @@ ___
 
 ###  transferWithComment
 
-• **transferWithComment**: *function* = proxySend(this.kit, this.contract.methods.transferWithComment)
+• **transferWithComment**: *function* = proxySend(this.connection, this.contract.methods.transferWithComment)
 
 *Inherited from [CeloTokenWrapper](_wrappers_celotokenwrapper_.celotokenwrapper.md).[transferWithComment](_wrappers_celotokenwrapper_.celotokenwrapper.md#transferwithcomment)*
 
@@ -585,7 +585,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L37)*
 
 Contract address
 
@@ -639,7 +639,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L55)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L57)*
 
 Contract getPastEvents
 
@@ -660,6 +660,6 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[version](_wrappers_basewrapper_.basewrapper.md#version)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
 
 **Returns:** *Promise‹NonNullable‹T["methods"] extends object ? ContractVersion<> : never››*

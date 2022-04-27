@@ -15,7 +15,10 @@ testWithGanache('Metadata', (web3) => {
     const metadata = IdentityMetadataWrapper.fromEmpty(address)
     await metadata.addClaim(createNameClaim(name), NativeSigner(kit.connection.sign, address))
     const serializedMetadata = metadata.toString()
-    const parsedMetadata = await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
+    const parsedMetadata = await IdentityMetadataWrapper.fromRawString(
+      await kit.contracts.getAccounts(),
+      serializedMetadata
+    )
     const nameClaim = parsedMetadata.findClaim(ClaimTypes.NAME)
 
     expect(nameClaim).not.toBeUndefined()
@@ -23,6 +26,7 @@ testWithGanache('Metadata', (web3) => {
   })
 
   test("correctly recovers the claims when the metadata is signed by any of the account's authorized signers", async () => {
+    const validator = await kit.contracts.getValidators()
     const name = 'Celo'
     const voteMetadata = IdentityMetadataWrapper.fromEmpty(address)
     const validatorMetadata = IdentityMetadataWrapper.fromEmpty(address)
@@ -41,13 +45,18 @@ testWithGanache('Metadata', (web3) => {
       if (action === 'vote') {
         await (await accounts.authorizeVoteSigner(signer, pop)).send({ from: address })
       } else if (action === 'validator') {
-        await (await accounts.authorizeValidatorSigner(signer, pop)).send({ from: address })
+        await (await accounts.authorizeValidatorSigner(signer, pop, validator)).send({
+          from: address,
+        })
       } else if (action === 'attestation') {
         await (await accounts.authorizeAttestationSigner(signer, pop)).send({ from: address })
       }
       await metadata.addClaim(createNameClaim(name), NativeSigner(kit.connection.sign, signer))
       const serializedMetadata = metadata.toString()
-      const parsedMetadata = await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
+      const parsedMetadata = await IdentityMetadataWrapper.fromRawString(
+        await kit.contracts.getAccounts(),
+        serializedMetadata
+      )
       const nameClaim = parsedMetadata.findClaim(ClaimTypes.NAME)
 
       expect(nameClaim).not.toBeUndefined()
@@ -64,7 +73,10 @@ testWithGanache('Metadata', (web3) => {
     await metadata.addClaim(createNameClaim(name), NativeSigner(kit.connection.sign, otherAddress))
     const serializedMetadata = metadata.toString()
     try {
-      await IdentityMetadataWrapper.fromRawString(kit, serializedMetadata)
+      await IdentityMetadataWrapper.fromRawString(
+        await kit.contracts.getAccounts(),
+        serializedMetadata
+      )
     } catch (e: any) {
       expect(e.toString()).toContain('Signature could not be validated')
     }

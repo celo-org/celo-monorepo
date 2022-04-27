@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["base"](../modules/_base_.md) › [CeloContract](_base_.celocontract.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["base"](../modules/_base_.md) › [CeloContract](_base_.celocontract.md)
 
 # Enumeration: CeloContract
 

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["identity/claims/keybase"](_identity_claims_keybase_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["identity/claims/keybase"](_identity_claims_keybase_.md)
 
 # Module: "identity/claims/keybase"
 
@@ -29,7 +29,7 @@
 
 ▸ **createKeybaseClaim**(`username`: string): *[KeybaseClaim](_identity_claims_claim_.md#keybaseclaim)*
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/keybase.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L62)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/keybase.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L72)*
 
 **Parameters:**
 
@@ -78,7 +78,11 @@ ___
 
 ▸ **verifyKeybaseClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [KeybaseClaim](_identity_claims_claim_.md#keybaseclaim), `signer`: Address): *Promise‹string | undefined›*
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/keybase.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L16)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/keybase.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/keybase.ts#L26)*
+
+**`remarks`** 
+If verification encounters an error, returns the error message as a string
+otherwise returns undefined when successful
 
 **Parameters:**
 
@@ -89,3 +93,5 @@ Name | Type |
 `signer` | Address |
 
 **Returns:** *Promise‹string | undefined›*
+
+a human readable string with claims (non)verifiability or undefined

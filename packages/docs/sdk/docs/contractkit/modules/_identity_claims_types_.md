@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["identity/claims/types"](_identity_claims_types_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["identity/claims/types"](_identity_claims_types_.md)
 
 # Module: "identity/claims/types"
 
@@ -26,7 +26,7 @@
 
 • **SINGULAR_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.NAME, ClaimTypes.ATTESTATION_SERVICE_URL]
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/types.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/types.ts#L24)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/types.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/types.ts#L25)*
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • **VALIDATABLE_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.ATTESTATION_SERVICE_URL]
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/types.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/types.ts#L22)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/types.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/types.ts#L23)*
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • **VERIFIABLE_CLAIM_TYPES**: *[ClaimTypes](../enums/_identity_claims_types_.claimtypes.md)[]* = [ClaimTypes.KEYBASE, ClaimTypes.ACCOUNT, ClaimTypes.DOMAIN]
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/types.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/types.ts#L19)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/types.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/types.ts#L20)*
 
 ## Functions
 
@@ -66,6 +66,8 @@ ___
 
 ▸ **now**(): *number*
 
-*Defined in [packages/sdk/contractkit/src/identity/claims/types.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/types.ts#L6)*
+*Defined in [packages/sdk/contractkit/src/identity/claims/types.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/types.ts#L7)*
+
+**`internal`** 
 
 **Returns:** *number*

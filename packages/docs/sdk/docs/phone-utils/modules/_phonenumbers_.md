@@ -1,4 +1,4 @@
-[@celo/phone-utils](../README.md) › ["phoneNumbers"](_phonenumbers_.md)
+[@celo/phone-utils](../README.md) › [Globals](../globals.md) › ["phoneNumbers"](_phonenumbers_.md)
 
 # Module: "phoneNumbers"
 

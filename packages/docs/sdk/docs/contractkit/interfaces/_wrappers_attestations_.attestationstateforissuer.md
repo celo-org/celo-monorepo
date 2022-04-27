@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [AttestationStateForIssuer](_wrappers_attestations_.attestationstateforissuer.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [AttestationStateForIssuer](_wrappers_attestations_.attestationstateforissuer.md)
 
 # Interface: AttestationStateForIssuer
 
@@ -18,4 +18,4 @@
 
 • **attestationState**: *[AttestationState](../enums/_wrappers_attestations_.attestationstate.md)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L39)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L59)*

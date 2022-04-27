@@ -276,7 +276,7 @@ contract Accounts is
    */
   function removeStorageRoot(uint256 index) external {
     require(isAccount(msg.sender), "Unknown account");
-    require(index < offchainStorageRoots[msg.sender].length);
+    require(index < offchainStorageRoots[msg.sender].length, "Invalid storage root index");
     uint256 lastIndex = offchainStorageRoots[msg.sender].length - 1;
     bytes memory url = offchainStorageRoots[msg.sender][index];
     offchainStorageRoots[msg.sender][index] = offchainStorageRoots[msg.sender][lastIndex];
@@ -298,7 +298,7 @@ contract Accounts is
     uint256 numberRoots = offchainStorageRoots[account].length;
     uint256 totalLength = 0;
     for (uint256 i = 0; i < numberRoots; i++) {
-      totalLength += offchainStorageRoots[account][i].length;
+      totalLength = totalLength.add(offchainStorageRoots[account][i].length);
     }
 
     bytes memory concatenated = new bytes(totalLength);

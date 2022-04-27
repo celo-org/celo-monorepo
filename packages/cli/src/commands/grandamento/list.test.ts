@@ -1,13 +1,13 @@
 import { Address } from '@celo/base/lib/address'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import { StableToken } from '@celo/contractkit/lib/celo-tokens'
-import { setGrandaMentoLimits } from '@celo/contractkit/lib/test-utils/grandaMento'
 import { assumeOwnership } from '@celo/contractkit/lib/test-utils/transferownership'
 import { GoldTokenWrapper } from '@celo/contractkit/lib/wrappers/GoldTokenWrapper'
 import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { setGrandaMentoLimits } from '../../test-utils/grandaMento'
 import List from './list'
 
 testWithGanache('grandamento:list cmd', (web3: Web3) => {

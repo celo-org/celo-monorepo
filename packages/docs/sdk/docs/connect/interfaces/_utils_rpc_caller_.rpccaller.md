@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["utils/rpc-caller"](../modules/_utils_rpc_caller_.md) › [RpcCaller](_utils_rpc_caller_.rpccaller.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["utils/rpc-caller"](../modules/_utils_rpc_caller_.md) › [RpcCaller](_utils_rpc_caller_.rpccaller.md)
 
 # Interface: RpcCaller
 
@@ -23,7 +23,7 @@
 
 • **call**: *function*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L64)*
+*Defined in [utils/rpc-caller.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L64)*
 
 #### Type declaration:
 
@@ -42,7 +42,7 @@ ___
 
 • **send**: *function*
 
-*Defined in [packages/sdk/connect/src/utils/rpc-caller.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L65)*
+*Defined in [utils/rpc-caller.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/rpc-caller.ts#L65)*
 
 #### Type declaration:
 
