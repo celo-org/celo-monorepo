@@ -25,7 +25,7 @@ spec:
             args:
             - |
               trap "touch /tmp/pod/main-terminated" EXIT
-              mix data_migrate
+              iex --name data-migration@0.0.0.0 -S mix data_migrate
             resources:
               requests:
                 memory: 2Gi
