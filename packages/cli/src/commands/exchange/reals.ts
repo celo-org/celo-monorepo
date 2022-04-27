@@ -2,7 +2,7 @@ import { StableToken } from '@celo/contractkit'
 import ExchangeStableBase from '../../exchange-stable-base'
 import { Flags } from '../../utils/command'
 export default class ExchangeEuros extends ExchangeStableBase {
-  static description = 'Exchange Celo Brazilian Real (cBRL) for CELO via the stability mechanism'
+  static description = 'Exchange Celo Brazilian Real (cREAL) for CELO via the stability mechanism'
 
   static flags = {
     ...ExchangeStableBase.flags,
