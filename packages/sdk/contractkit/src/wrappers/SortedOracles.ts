@@ -1,10 +1,11 @@
 import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
-import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
+import { Address, CeloTransactionObject, Connection, toTransactionObject } from '@celo/connect'
 import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
+import { AddressRegistry } from '../address-registry'
 import { CeloContract, StableTokenContract } from '../base'
-import { StableToken } from '../celo-tokens'
+import { isStableTokenContract, StableToken, stableTokenInfos } from '../celo-tokens'
 import { SortedOracles } from '../generated/SortedOracles'
 import {
   BaseWrapper,
@@ -54,6 +55,13 @@ export type ReportTarget = StableTokenContract | Address
  * Currency price oracle contract.
  */
 export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
+  constructor(
+    protected readonly connection: Connection,
+    protected readonly contract: SortedOracles,
+    protected readonly registry: AddressRegistry
+  ) {
+    super(connection, contract)
+  }
   /**
    * Gets the number of rates that have been reported for the given target
    * @param target The ReportTarget, either CeloToken or currency pair
@@ -147,7 +155,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
       numReports = (await this.getReports(target)).length - 1
     }
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.removeExpiredReports(identifier, numReports)
     )
   }
@@ -172,7 +180,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     )
 
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.report(identifier, fixedValue.toFixed(), lesserKey, greaterKey),
       { from: oracleAddress }
     )
@@ -189,7 +197,7 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     oracleAddress: Address,
     token: StableToken = StableToken.cUSD
   ): Promise<CeloTransactionObject<void>> {
-    return this.report(this.kit.celoTokens.getContract(token), value, oracleAddress)
+    return this.report(stableTokenInfos[token].contract, value, oracleAddress)
   }
 
   /**
@@ -296,8 +304,8 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
   }
 
   private async toCurrencyPairIdentifier(target: ReportTarget): Promise<Address> {
-    if (this.kit.celoTokens.isStableTokenContract(target as CeloContract)) {
-      return this.kit.registry.addressFor(target as StableTokenContract)
+    if (isStableTokenContract(target as CeloContract)) {
+      return this.registry.addressFor(target as StableTokenContract)
     } else if (isValidAddress(target)) {
       return target
     } else {
@@ -305,3 +313,5 @@ export class SortedOraclesWrapper extends BaseWrapper<SortedOracles> {
     }
   }
 }
+
+export type SortedOraclesWrapperType = SortedOraclesWrapper

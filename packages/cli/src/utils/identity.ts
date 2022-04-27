@@ -48,7 +48,10 @@ export abstract class ClaimCommand extends BaseCommand {
     const filePath = args.file
     try {
       cli.action.start(`Read Metadata from ${filePath}`)
-      const data = await IdentityMetadataWrapper.fromFile(this.kit, filePath)
+      const data = await IdentityMetadataWrapper.fromFile(
+        await this.kit.contracts.getAccounts(),
+        filePath
+      )
       await this.checkMetadataAddress(data.data.meta.address, flags.from)
       cli.action.stop()
       return data
@@ -160,7 +163,10 @@ export const modifyMetadata = async (
   filePath: string,
   operation: (metadata: IdentityMetadataWrapper) => Promise<void>
 ) => {
-  const metadata = await IdentityMetadataWrapper.fromFile(kit, filePath)
+  const metadata = await IdentityMetadataWrapper.fromFile(
+    await kit.contracts.getAccounts(),
+    filePath
+  )
   await operation(metadata)
   writeFileSync(filePath, metadata.toString())
 }

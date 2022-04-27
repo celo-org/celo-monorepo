@@ -3,6 +3,7 @@ import * as t from 'io-ts'
 export const SignatureType = t.string
 export const TimestampType = t.number
 
+/** @internal */
 export const now = () => Math.round(new Date().getTime() / 1000)
 
 export enum ClaimTypes {

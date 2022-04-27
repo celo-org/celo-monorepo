@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Attestations"](_wrappers_attestations_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Attestations"](_wrappers_attestations_.md)
 
 # Module: "wrappers/Attestations"
 
@@ -25,6 +25,7 @@
 
 ### Type aliases
 
+* [AttestationsWrapperType](_wrappers_attestations_.md#attestationswrappertype)
 * [IdentifierLookupResult](_wrappers_attestations_.md#identifierlookupresult)
 
 ### Functions
@@ -33,11 +34,19 @@
 
 ## Type aliases
 
+###  AttestationsWrapperType
+
+Ƭ **AttestationsWrapperType**: *[AttestationsWrapper](../classes/_wrappers_attestations_.attestationswrapper.md)*
+
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:900](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L900)*
+
+___
+
 ###  IdentifierLookupResult
 
 Ƭ **IdentifierLookupResult**: *Record‹string, Record‹Address, [AttestationStat](../interfaces/_wrappers_attestations_.attestationstat.md) | undefined› | undefined›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L80)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L100)*
 
 ## Functions
 
@@ -45,7 +54,7 @@
 
 ▸ **getSecurityCodePrefix**(`issuerAddress`: Address): *string*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L29)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L30)*
 
 **Parameters:**
 

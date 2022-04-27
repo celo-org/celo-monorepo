@@ -1,18 +1,8 @@
 # Changelog
-All notable changes to the [Celo SDK](https://docs.celo.org/developer-guide/sdk-code-reference) will be documented in this file. 
+All notable changes to the [Celo SDK](https://docs.celo.org/developer-guide/sdk-code-reference) will be documented in this file.
 
 This package will follow the release process outlined [here](https://docs.celo.org/community/release-process).
 
-
-## Development (not published yet)
-### **[1.5.3-dev]**
-Features
-- Adds the @celo/encrypted-backup package - [#8896] [#9348] [#9413] [#9434]
-
-[#8896]: https://github.com/celo-org/celo-monorepo/pull/8896
-[#9348]: https://github.com/celo-org/celo-monorepo/pull/9348
-[#9413]: https://github.com/celo-org/celo-monorepo/pull/9413
-[#9434]: https://github.com/celo-org/celo-monorepo/pull/9434
 
 Bug Fixes
 -  one-line summary - [#](link PR)
@@ -20,6 +10,48 @@ Bug Fixes
 Other Changes
 -  one-line summary - [#](link PR)
 -  migrated @celo/wallet-walletconnect from celo/celo-monorepo to celo/use-contractkit
+
+
+## Development (not published yet)
+
+### **[2.0.0]**
+
+See [Upgrade Guide](https://docs.celo.org/developer-guide/contractkit/migrating-to-contractkit-v2)
+
+Breaking Changes
+
+for detail info see [#9127](https://github.com/celo-org/celo-monorepo/pull/9127)
+
+- @celo/contractkit
+  - AccountsWrapper.authorizeValidatorSigner now requires a ValidatorWrapper as third param
+  - kit is now longer required when constructing WrapperCache, AddressRegistry, Contract Wrappers
+  - proxySend now takes a Connection rather than a Kit
+
+- @celo/utils
+
+  - Removes phone and country related functions from utils. Now in [phone-utils](https://github.com/celo-org/celo-monorepo/pull/8987)
+
+  - comment encryption, bls and mneumonic functions moved to @celo/cryptographic-utils
+
+
+Features
+
+- All Packages Now marked as Side Effect: false
+
+- Bundle Sized Reduced 45%
+
+- Adds the @celo/encrypted-backup package - [#8896] [#9348] [#9413] [#9434]
+
+[#8896]: https://github.com/celo-org/celo-monorepo/pull/8896
+[#9348]: https://github.com/celo-org/celo-monorepo/pull/9348
+[#9413]: https://github.com/celo-org/celo-monorepo/pull/9413
+[#9434]: https://github.com/celo-org/celo-monorepo/pull/9434
+
+Bug Fixes / Package Updates
+
+- Upgrades bls12377, bip32,
+
+
 
 ## Published
 

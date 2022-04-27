@@ -3,7 +3,8 @@ import { BigNumber } from 'bignumber.js'
 import Web3 from 'web3'
 import { HttpProvider } from 'web3-core'
 import { XMLHttpRequest } from 'xhr2-cookies'
-import { API_KEY_HEADER_KEY, newKitFromWeb3, newKitWithApiKey } from './kit'
+import { API_KEY_HEADER_KEY, newKitFromWeb3 as newFullKitFromWeb3, newKitWithApiKey } from './kit'
+import { newKitFromWeb3 as newMiniKitFromWeb3 } from './mini-kit'
 import { promiEventSpy } from './test-utils/PromiEventStub'
 
 interface TransactionObjectStub<T> extends CeloTxObject<T> {
@@ -41,65 +42,69 @@ export function txoStub<T>(): TransactionObjectStub<T> {
   return pe
 }
 
-describe('kit.sendTransactionObject()', () => {
-  const kit = newKitFromWeb3(new Web3('http://'))
+;[newFullKitFromWeb3, newMiniKitFromWeb3].forEach((newKitFromWeb3) => {
+  describe('kit.sendTransactionObject()', () => {
+    const kit = newKitFromWeb3(new Web3('http://'))
 
-  test('should send transaction on simple case', async () => {
-    const txo = txoStub()
-    txo.estimateGasMock.mockResolvedValue(1000)
-    const txRes = await kit.connection.sendTransactionObject(txo)
+    test('should send transaction on simple case', async () => {
+      const txo = txoStub()
+      txo.estimateGasMock.mockResolvedValue(1000)
+      const txRes = await kit.connection.sendTransactionObject(txo)
 
-    txo.resolveHash('HASH')
-    txo.resolveReceipt('Receipt' as any)
+      txo.resolveHash('HASH')
+      txo.resolveReceipt('Receipt' as any)
 
-    await expect(txRes.getHash()).resolves.toBe('HASH')
-    await expect(txRes.waitReceipt()).resolves.toBe('Receipt')
-  })
+      await expect(txRes.getHash()).resolves.toBe('HASH')
+      await expect(txRes.waitReceipt()).resolves.toBe('Receipt')
+    })
 
-  test('should not estimateGas if gas is provided', async () => {
-    const txo = txoStub()
-    await kit.connection.sendTransactionObject(txo, { gas: 555 })
-    expect(txo.estimateGasMock).not.toBeCalled()
-  })
+    test('should not estimateGas if gas is provided', async () => {
+      const txo = txoStub()
+      await kit.connection.sendTransactionObject(txo, { gas: 555 })
+      expect(txo.estimateGasMock).not.toBeCalled()
+    })
 
-  test('should use inflation factor on gas', async () => {
-    const txo = txoStub()
-    txo.estimateGasMock.mockResolvedValue(1000)
-    kit.connection.defaultGasInflationFactor = 2
-    await kit.connection.sendTransactionObject(txo)
-    expect(txo.send).toBeCalledWith(
-      expect.objectContaining({
-        gas: 1000 * 2,
+    test('should use inflation factor on gas', async () => {
+      const txo = txoStub()
+      txo.estimateGasMock.mockResolvedValue(1000)
+      kit.connection.defaultGasInflationFactor = 2
+      await kit.connection.sendTransactionObject(txo)
+      expect(txo.send).toBeCalledWith(
+        expect.objectContaining({
+          gas: 1000 * 2,
+        })
+      )
+    })
+
+    test('should forward txoptions to txo.send()', async () => {
+      const txo = txoStub()
+      await kit.connection.sendTransactionObject(txo, { gas: 555, from: '0xAAFFF' })
+      expect(txo.send).toBeCalledWith({
+        gasPrice: '0',
+        gas: 555,
+        from: '0xAAFFF',
       })
-    )
-  })
-
-  test('should retrieve currency gasPrice with feeCurrency', async () => {
-    const txo = txoStub()
-    const gasPrice = 100
-    const getGasPriceMin = jest.fn().mockImplementation(() => ({
-      getGasPriceMinimum() {
-        return new BigNumber(gasPrice)
-      },
-    }))
-    kit.contracts.getGasPriceMinimum = getGasPriceMin.bind(kit.contracts)
-    await kit.updateGasPriceInConnectionLayer('XXX')
-    const options: CeloTx = { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' }
-    await kit.connection.sendTransactionObject(txo, options)
-    expect(txo.send).toBeCalledWith({
-      gasPrice: `${gasPrice * 5}`,
-      ...options,
     })
   })
+})
 
-  test('should forward txoptions to txo.send()', async () => {
-    const txo = txoStub()
-    await kit.connection.sendTransactionObject(txo, { gas: 555, from: '0xAAFFF' })
-    expect(txo.send).toBeCalledWith({
-      gasPrice: '0',
-      gas: 555,
-      from: '0xAAFFF',
-    })
+test('should retrieve currency gasPrice with feeCurrency', async () => {
+  const kit = newFullKitFromWeb3(new Web3('http://'))
+
+  const txo = txoStub()
+  const gasPrice = 100
+  const getGasPriceMin = jest.fn().mockImplementation(() => ({
+    getGasPriceMinimum() {
+      return new BigNumber(gasPrice)
+    },
+  }))
+  kit.contracts.getGasPriceMinimum = getGasPriceMin.bind(kit.contracts)
+  await kit.updateGasPriceInConnectionLayer('XXX')
+  const options: CeloTx = { gas: 555, feeCurrency: 'XXX', from: '0xAAFFF' }
+  await kit.connection.sendTransactionObject(txo, options)
+  expect(txo.send).toBeCalledWith({
+    gasPrice: `${gasPrice * 5}`,
+    ...options,
   })
 })
 

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/ReleaseGold"](../modules/_wrappers_releasegold_.md) › [BalanceState](_wrappers_releasegold_.balancestate.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/ReleaseGold"](../modules/_wrappers_releasegold_.md) › [BalanceState](_wrappers_releasegold_.balancestate.md)
 
 # Interface: BalanceState
 

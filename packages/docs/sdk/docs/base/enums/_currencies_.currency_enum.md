@@ -2,6 +2,8 @@
 
 # Enumeration: CURRENCY_ENUM
 
+**`deprecated`** use StableToken and Token
+
 ## Index
 
 ### Enumeration members
@@ -16,7 +18,7 @@
 
 • **DOLLAR**: = "Celo Dollar"
 
-*Defined in [packages/sdk/base/src/currencies.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L3)*
+*Defined in [packages/sdk/base/src/currencies.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L4)*
 
 ___
 
@@ -24,7 +26,7 @@ ___
 
 • **EURO**: = "Celo Euro"
 
-*Defined in [packages/sdk/base/src/currencies.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L4)*
+*Defined in [packages/sdk/base/src/currencies.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L5)*
 
 ___
 
@@ -32,4 +34,4 @@ ___
 
 • **GOLD**: = "Celo Gold"
 
-*Defined in [packages/sdk/base/src/currencies.ts:2](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L2)*
+*Defined in [packages/sdk/base/src/currencies.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L3)*

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["web3-contract-cache"](_web3_contract_cache_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["web3-contract-cache"](_web3_contract_cache_.md)
 
 # Module: "web3-contract-cache"
 
@@ -22,7 +22,7 @@
 
 Ƭ **CFType**: *typeof ContractFactories*
 
-*Defined in [packages/sdk/contractkit/src/web3-contract-cache.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L72)*
+*Defined in [packages/sdk/contractkit/src/web3-contract-cache.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/web3-contract-cache.ts#L84)*
 
 ## Object literals
 

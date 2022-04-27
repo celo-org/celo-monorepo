@@ -1,11 +1,14 @@
 {
   "name": "@celo/base",
-  "version": "1.5.3-dev",
+  "version": "2.0.1-dev",
   "description": "Celo base common utils, no dependencies",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "sideEffects": false,
+  "homepage": "https://celo-sdk-docs.readthedocs.io/en/latest/base",
+  "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/base",
   "scripts": {
     "prepublishOnly": "yarn build",
     "build": "tsc -b .",

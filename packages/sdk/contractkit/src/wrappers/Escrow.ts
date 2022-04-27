@@ -15,9 +15,11 @@ export class EscrowWrapper extends BaseWrapper<Escrow> {
 
   getSentPaymentIds = proxyCall(this.contract.methods.getSentPaymentIds)
 
-  transfer = proxySend(this.kit, this.contract.methods.transfer)
+  transfer = proxySend(this.connection, this.contract.methods.transfer)
 
-  withdraw = proxySend(this.kit, this.contract.methods.withdraw)
+  withdraw = proxySend(this.connection, this.contract.methods.withdraw)
 
-  revoke = proxySend(this.kit, this.contract.methods.revoke)
+  revoke = proxySend(this.connection, this.contract.methods.revoke)
 }
+
+export type EscrowWrapperType = EscrowWrapper

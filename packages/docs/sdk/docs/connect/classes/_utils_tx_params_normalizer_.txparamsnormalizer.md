@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["utils/tx-params-normalizer"](../modules/_utils_tx_params_normalizer_.md) › [TxParamsNormalizer](_utils_tx_params_normalizer_.txparamsnormalizer.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["utils/tx-params-normalizer"](../modules/_utils_tx_params_normalizer_.md) › [TxParamsNormalizer](_utils_tx_params_normalizer_.txparamsnormalizer.md)
 
 # Class: TxParamsNormalizer
 
@@ -26,7 +26,7 @@
 
 \+ **new TxParamsNormalizer**(`connection`: [Connection](_connection_.connection.md)): *[TxParamsNormalizer](_utils_tx_params_normalizer_.txparamsnormalizer.md)*
 
-*Defined in [packages/sdk/connect/src/utils/tx-params-normalizer.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-params-normalizer.ts#L16)*
+*Defined in [utils/tx-params-normalizer.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-params-normalizer.ts#L16)*
 
 **Parameters:**
 
@@ -42,7 +42,7 @@ Name | Type |
 
 • **connection**: *[Connection](_connection_.connection.md)*
 
-*Defined in [packages/sdk/connect/src/utils/tx-params-normalizer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-params-normalizer.ts#L18)*
+*Defined in [utils/tx-params-normalizer.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-params-normalizer.ts#L18)*
 
 ## Methods
 
@@ -50,7 +50,7 @@ Name | Type |
 
 ▸ **populate**(`celoTxParams`: [CeloTx](../modules/_types_.md#celotx)): *Promise‹[CeloTx](../modules/_types_.md#celotx)›*
 
-*Defined in [packages/sdk/connect/src/utils/tx-params-normalizer.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-params-normalizer.ts#L20)*
+*Defined in [utils/tx-params-normalizer.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-params-normalizer.ts#L20)*
 
 **Parameters:**
 

@@ -186,7 +186,7 @@ type Answers = {
           {
             name: 'retry',
             description: colors.red(
-              `${packageJson.name} failed to publish. Error message: ${e.message} Retry? Y/N`
+              `${packageJson.name} failed to publish. (Did you run 'yarn deploy-sdks'? must be run as 'npm run deploy-sdks') Error message: ${e.message} Retry? Y/N`
             ),
           },
         ]

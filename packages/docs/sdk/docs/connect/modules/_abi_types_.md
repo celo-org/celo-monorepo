@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["abi-types"](_abi_types_.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["abi-types"](_abi_types_.md)
 
 # Module: "abi-types"
 
@@ -8,6 +8,9 @@
 
 * [ABIDefinition](../interfaces/_abi_types_.abidefinition.md)
 * [AbiCoder](../interfaces/_abi_types_.abicoder.md)
+* [AbiInput](../interfaces/_abi_types_.abiinput.md)
+* [AbiItem](../interfaces/_abi_types_.abiitem.md)
+* [AbiOutput](../interfaces/_abi_types_.abioutput.md)
 * [DecodedParamsArray](../interfaces/_abi_types_.decodedparamsarray.md)
 * [DecodedParamsObject](../interfaces/_abi_types_.decodedparamsobject.md)
 
@@ -21,4 +24,6 @@
 
 Ƭ **ABIType**: *"uint256" | "boolean" | "string" | "bytes" | string*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L4)*
+*Defined in [abi-types.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L4)*
+
+**`internal`**
