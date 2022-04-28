@@ -239,6 +239,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       )
     })
+
+    it('should fail if the signer is revoked', () => {})
   })
 
   describe('#registerAttestation', () => {
