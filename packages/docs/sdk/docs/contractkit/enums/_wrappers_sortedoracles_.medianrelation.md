@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/SortedOracles"](../modules/_wrappers_sortedoracles_.md) › [MedianRelation](_wrappers_sortedoracles_.medianrelation.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/SortedOracles"](../modules/_wrappers_sortedoracles_.md) › [MedianRelation](_wrappers_sortedoracles_.medianrelation.md)
 
 # Enumeration: MedianRelation
 
@@ -17,7 +17,7 @@
 
 • **Equal**:
 
-*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L22)*
+*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L23)*
 
 ___
 
@@ -25,7 +25,7 @@ ___
 
 • **Greater**:
 
-*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L21)*
+*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L22)*
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 • **Lesser**:
 
-*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L20)*
+*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L21)*
 
 ___
 
@@ -41,4 +41,4 @@ ___
 
 • **Undefined**:
 
-*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L19)*
+*Defined in [packages/sdk/contractkit/src/wrappers/SortedOracles.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/SortedOracles.ts#L20)*

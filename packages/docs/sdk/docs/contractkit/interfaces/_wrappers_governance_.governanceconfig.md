@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [GovernanceConfig](_wrappers_governance_.governanceconfig.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [GovernanceConfig](_wrappers_governance_.governanceconfig.md)
 
 # Interface: GovernanceConfig
 

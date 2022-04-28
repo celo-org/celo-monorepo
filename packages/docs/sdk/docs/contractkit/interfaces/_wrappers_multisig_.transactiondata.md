@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/MultiSig"](../modules/_wrappers_multisig_.md) › [TransactionData](_wrappers_multisig_.transactiondata.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/MultiSig"](../modules/_wrappers_multisig_.md) › [TransactionData](_wrappers_multisig_.transactiondata.md)
 
 # Interface: TransactionData
 

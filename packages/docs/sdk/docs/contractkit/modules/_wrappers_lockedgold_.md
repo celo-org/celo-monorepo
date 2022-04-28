@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/LockedGold"](_wrappers_lockedgold_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/LockedGold"](_wrappers_lockedgold_.md)
 
 # Module: "wrappers/LockedGold"
 
@@ -14,3 +14,15 @@
 * [LockedGoldConfig](../interfaces/_wrappers_lockedgold_.lockedgoldconfig.md)
 * [PendingWithdrawal](../interfaces/_wrappers_lockedgold_.pendingwithdrawal.md)
 * [VotingDetails](../interfaces/_wrappers_lockedgold_.votingdetails.md)
+
+### Type aliases
+
+* [LockedGoldWrapperType](_wrappers_lockedgold_.md#lockedgoldwrappertype)
+
+## Type aliases
+
+###  LockedGoldWrapperType
+
+Ƭ **LockedGoldWrapperType**: *[LockedGoldWrapper](../classes/_wrappers_lockedgold_.lockedgoldwrapper.md)*
+
+*Defined in [packages/sdk/contractkit/src/wrappers/LockedGold.ts:319](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/LockedGold.ts#L319)*

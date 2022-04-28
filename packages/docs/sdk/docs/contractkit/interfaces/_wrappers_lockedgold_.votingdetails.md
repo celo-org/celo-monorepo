@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/LockedGold"](../modules/_wrappers_lockedgold_.md) › [VotingDetails](_wrappers_lockedgold_.votingdetails.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/LockedGold"](../modules/_wrappers_lockedgold_.md) › [VotingDetails](_wrappers_lockedgold_.votingdetails.md)
 
 # Interface: VotingDetails
 

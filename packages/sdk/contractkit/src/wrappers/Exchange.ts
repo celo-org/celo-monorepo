@@ -25,7 +25,7 @@ export interface ExchangeConfig {
 
 /**
  * Contract that allows to exchange StableToken for GoldToken and vice versa
- * using a Constant Product Market Maker Model
+ * using a Constant Product Market Maker Model aka Mento
  */
 export class ExchangeWrapper extends BaseWrapper<Exchange> {
   /**
@@ -76,7 +76,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
     minBuyAmount: BigNumber.Value,
     sellGold: boolean
   ) => CeloTransactionObject<string> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.exchange,
     tupleParser(valueToString, valueToString, identity)
   )
@@ -95,7 +95,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
     minBuyAmount: BigNumber.Value,
     sellGold: boolean
   ) => CeloTransactionObject<string> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.sell,
     tupleParser(valueToString, valueToString, identity)
   )
@@ -114,7 +114,7 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
     maxSellAmount: BigNumber.Value,
     buyGold: boolean
   ) => CeloTransactionObject<string> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.buy,
     tupleParser(valueToString, valueToString, identity)
   )
@@ -342,3 +342,5 @@ export class ExchangeWrapper extends BaseWrapper<Exchange> {
    */
   getGoldExchangeRate = (buyAmount: BigNumber.Value) => this.getExchangeRate(buyAmount, true)
 }
+
+export type ExchangeWrapperType = ExchangeWrapper

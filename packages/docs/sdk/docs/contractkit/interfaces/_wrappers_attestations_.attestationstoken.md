@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [AttestationsToken](_wrappers_attestations_.attestationstoken.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [AttestationsToken](_wrappers_attestations_.attestationstoken.md)
 
 # Interface: AttestationsToken
 
@@ -19,7 +19,7 @@
 
 • **address**: *Address*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L43)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L63)*
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **fee**: *BigNumber*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L44)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L64)*

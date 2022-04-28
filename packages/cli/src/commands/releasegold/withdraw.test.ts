@@ -28,7 +28,11 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
     await SetLiquidityProvision.run(['--contract', contractAddress, '--yesreally'])
     // ReleasePeriod of default contract
     await timeTravel(100000000, web3)
-    const releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
+    const releaseGoldWrapper = new ReleaseGoldWrapper(
+      kit.connection,
+      newReleaseGold(web3, contractAddress),
+      kit.contracts
+    )
     const beneficiary = await releaseGoldWrapper.getBeneficiary()
     const balanceBefore = (await kit.getTotalBalance(beneficiary)).CELO!
     // Use a value which would lose precision if converted to a normal javascript number
@@ -43,7 +47,11 @@ testWithGanache('releasegold:withdraw cmd', (web3: Web3) => {
     await SetLiquidityProvision.run(['--contract', contractAddress, '--yesreally'])
     // ReleasePeriod of default contract
     await timeTravel(100000000, web3)
-    const releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
+    const releaseGoldWrapper = new ReleaseGoldWrapper(
+      kit.connection,
+      newReleaseGold(web3, contractAddress),
+      kit.contracts
+    )
     const beneficiary = await releaseGoldWrapper.getBeneficiary()
     const balanceBefore = await kit.getTotalBalance(beneficiary)
     const remainingBalance = await releaseGoldWrapper.getRemainingUnlockedBalance()

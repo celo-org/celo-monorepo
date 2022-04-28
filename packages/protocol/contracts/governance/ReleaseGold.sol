@@ -2,6 +2,7 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-solidity/contracts/utils/Address.sol";
 
 import "./interfaces/IReleaseGold.sol";
@@ -191,7 +192,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
       erc20 != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
       "Transfer must not target celo balance"
     );
-    IERC20(erc20).transfer(to, value);
+    SafeERC20.safeTransfer(IERC20(erc20), to, value);
   }
 
   /**

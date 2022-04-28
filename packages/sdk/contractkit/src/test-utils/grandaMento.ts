@@ -7,11 +7,7 @@ export const setGrandaMentoLimits = async (
   newLimitMax: BigNumber = new BigNumber('1000000000000'),
   stableToken: string = 'StableToken'
 ) => {
-  await (
-    await grandaMento.setStableTokenExchangeLimits(
-      stableToken,
-      newLimitMin.toString(),
-      newLimitMax.toString()
-    )
-  ).sendAndWaitForReceipt()
+  await grandaMento
+    .setStableTokenExchangeLimits(stableToken, newLimitMin.toString(), newLimitMax.toString())
+    .sendAndWaitForReceipt()
 }

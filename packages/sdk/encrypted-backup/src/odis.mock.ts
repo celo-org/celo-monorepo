@@ -7,25 +7,29 @@ import {
   DomainQuotaStatusResponse,
   DomainRestrictedSignatureRequest,
   DomainRestrictedSignatureResponse,
+  PoprfServer,
   SequentialDelayDomain,
   SequentialDelayDomainState,
   verifyDomainQuotaStatusRequestSignature,
   verifyDomainRestrictedSignatureRequestSignature,
 } from '@celo/phone-number-privacy-common'
+import * as poprf from '@celo/poprf'
 import debugFactory from 'debug'
 
 const debug = debugFactory('kit:encrypted-backup:odis:mock')
 
+const MOCK_ODIS_KEYPAIR = poprf.keygen(Buffer.from('MOCK ODIS KEYPAIR SEED'))
+
 export const MOCK_ODIS_ENVIRONMENT: OdisServiceContext = {
   odisUrl: 'https://mockodis.com',
-  odisPubKey:
-    '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
+  odisPubKey: Buffer.from(MOCK_ODIS_KEYPAIR.publicKey).toString('base64'),
 }
 
 export class MockOdis {
   static readonly environment = MOCK_ODIS_ENVIRONMENT
 
-  state: Record<string, SequentialDelayDomainState> = {}
+  readonly state: Record<string, SequentialDelayDomainState> = {}
+  readonly poprf = new PoprfServer(MOCK_ODIS_KEYPAIR.privateKey)
 
   quota(
     req: DomainQuotaStatusRequest<SequentialDelayDomain>
@@ -69,8 +73,12 @@ export class MockOdis {
       }
     }
 
-    const hash = domainHash(req.domain).toString('hex')
-    const domainState = this.state[hash] ?? { timer: 0, counter: 0, disabled: false }
+    const hash = domainHash(req.domain)
+    const domainState = this.state[hash.toString('hex')] ?? {
+      timer: 0,
+      counter: 0,
+      disabled: false,
+    }
     const nonce = req.options.nonce.defined ? req.options.nonce.value : undefined
     if (nonce !== domainState.counter) {
       return {
@@ -94,17 +102,34 @@ export class MockOdis {
         },
       }
     }
-    this.state[hash] = limitCheck.state
+    this.state[hash.toString('hex')] = limitCheck.state
+
+    let signature: string
+    try {
+      signature = this.poprf
+        .blindEval(hash, Buffer.from(req.blindedMessage, 'base64'))
+        .toString('base64')
+    } catch (error) {
+      return {
+        // TODO(victor) Note that although this is a returned as a 500, the fault my actually be the
+        // users because the blinded message is not validated in JS before attempting the evaluation.
+        // This logic is the same in the real service. When validation functions are added to the
+        // WASM interface for the POPRF, this can be improved.
+        status: 500,
+        body: {
+          success: false,
+          version: 'mock',
+          error: (error as Error).toString(),
+        },
+      }
+    }
 
     return {
       status: 200,
       body: {
         success: true,
         version: 'mock',
-        signature: Buffer.from(
-          `<signature on ${req.blindedMessage} in domain ${hash}>`,
-          'utf8'
-        ).toString('base64'),
+        signature,
       },
     }
   }

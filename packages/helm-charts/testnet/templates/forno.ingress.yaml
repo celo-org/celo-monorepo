@@ -1,8 +1,4 @@
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
-apiVersion: networking.k8s.io/v1beta1
-{{ else }}
-apiVersion: extensions/v1beta1
-{{ end -}}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Namespace }}-forno-ingress
@@ -15,7 +11,11 @@ metadata:
     # Allows WS connections to be 20 minutes long, see https://kubernetes.github.io/ingress-nginx/user-guide/miscellaneous/#websockets
     nginx.ingress.kubernetes.io/proxy-read-timeout: "1200"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "1200"
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   tls:
   - hosts:
     - {{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
@@ -24,7 +24,10 @@ spec:
   - host: {{ .Release.Namespace }}-forno.{{ .Values.domain.name }}.org
     http:
       paths:
-      - path: /
+      - path: /(.*)
+        pathType: Prefix
         backend:
-          serviceName: tx-nodes
-          servicePort: 8545
+          service:
+            name: tx-nodes
+            port: 
+              number: 8545

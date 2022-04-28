@@ -1,6 +1,6 @@
 /* tslint:disable max-classes-per-file */
 import { CeloTransactionObject } from '@celo/connect'
-import { PhoneNumberUtils } from '@celo/utils'
+import { PhoneNumberUtils } from '@celo/phone-utils'
 import { retryAsync, sleep } from '@celo/utils/lib/async'
 import { database } from 'firebase-admin'
 import { DataSnapshot } from 'firebase-functions/lib/providers/database'

@@ -30,6 +30,8 @@
 
 *Defined in [packages/sdk/base/src/io.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/io.ts#L6)*
 
+**`internal`** 
+
 **Parameters:**
 
 Name | Type |

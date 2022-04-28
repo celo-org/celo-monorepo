@@ -1,6 +1,8 @@
-[@celo/contractkit](../README.md) › ["versions"](../modules/_versions_.md) › [ContractVersion](_versions_.contractversion.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["versions"](../modules/_versions_.md) › [ContractVersion](_versions_.contractversion.md)
 
 # Class: ContractVersion
+
+**`internal`** 
 
 ## Hierarchy
 
@@ -32,7 +34,7 @@
 
 \+ **new ContractVersion**(`storage`: number | string, `major`: number | string, `minor`: number | string, `patch`: number | string): *[ContractVersion](_versions_.contractversion.md)*
 
-*Defined in [packages/sdk/contractkit/src/versions.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L3)*
+*Defined in [packages/sdk/contractkit/src/versions.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L4)*
 
 **Parameters:**
 
@@ -51,7 +53,7 @@ Name | Type |
 
 • **major**: *number | string*
 
-*Defined in [packages/sdk/contractkit/src/versions.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L6)*
+*Defined in [packages/sdk/contractkit/src/versions.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L7)*
 
 ___
 
@@ -59,7 +61,7 @@ ___
 
 • **minor**: *number | string*
 
-*Defined in [packages/sdk/contractkit/src/versions.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L7)*
+*Defined in [packages/sdk/contractkit/src/versions.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L8)*
 
 ___
 
@@ -67,7 +69,7 @@ ___
 
 • **patch**: *number | string*
 
-*Defined in [packages/sdk/contractkit/src/versions.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L8)*
+*Defined in [packages/sdk/contractkit/src/versions.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L9)*
 
 ___
 
@@ -75,7 +77,7 @@ ___
 
 • **storage**: *number | string*
 
-*Defined in [packages/sdk/contractkit/src/versions.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L5)*
+*Defined in [packages/sdk/contractkit/src/versions.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L6)*
 
 ## Methods
 
@@ -83,7 +85,7 @@ ___
 
 ▸ **isAtLeast**(`other`: [ContractVersion](_versions_.contractversion.md)): *any*
 
-*Defined in [packages/sdk/contractkit/src/versions.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L11)*
+*Defined in [packages/sdk/contractkit/src/versions.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L12)*
 
 **Parameters:**
 
@@ -99,7 +101,7 @@ ___
 
 ▸ **toRaw**(): *string | number[]*
 
-*Defined in [packages/sdk/contractkit/src/versions.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L13)*
+*Defined in [packages/sdk/contractkit/src/versions.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L14)*
 
 **Returns:** *string | number[]*
 
@@ -109,7 +111,7 @@ ___
 
 ▸ **toString**(): *string*
 
-*Defined in [packages/sdk/contractkit/src/versions.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L12)*
+*Defined in [packages/sdk/contractkit/src/versions.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L13)*
 
 **Returns:** *string*
 
@@ -119,7 +121,7 @@ ___
 
 ▸ **fromRaw**(`raw`: ReturnType‹ContractVersion["toRaw"]›): *[ContractVersion](_versions_.contractversion.md)‹›*
 
-*Defined in [packages/sdk/contractkit/src/versions.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L14)*
+*Defined in [packages/sdk/contractkit/src/versions.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L15)*
 
 **Parameters:**
 

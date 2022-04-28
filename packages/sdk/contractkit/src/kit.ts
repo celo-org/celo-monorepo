@@ -10,12 +10,17 @@ import { EIP712TypedData } from '@celo/utils/lib/sign-typed-data-utils'
 import { Signature } from '@celo/utils/lib/signatureUtils'
 import { LocalWallet } from '@celo/wallet-local'
 import { BigNumber } from 'bignumber.js'
-import net from 'net'
 import Web3 from 'web3'
 import { AddressRegistry } from './address-registry'
 import { CeloContract, CeloTokenContract } from './base'
 import { CeloTokens, EachCeloToken } from './celo-tokens'
 import { ValidWrappers, WrapperCache } from './contract-cache'
+import {
+  ensureCurrentProvider,
+  getWeb3ForKit,
+  HttpProviderOptions,
+  setupAPIKey,
+} from './setupForKits'
 import { Web3ContractCache } from './web3-contract-cache'
 import { AttestationsConfig } from './wrappers/Attestations'
 import { BlockchainParametersConfig } from './wrappers/BlockchainParameters'
@@ -30,10 +35,7 @@ import { ReserveConfig } from './wrappers/Reserve'
 import { SortedOraclesConfig } from './wrappers/SortedOracles'
 import { StableTokenConfig } from './wrappers/StableTokenWrapper'
 import { ValidatorsConfig } from './wrappers/Validators'
-
-import Types = require('web3-providers-http')
-export type HttpProviderOptions = Types.HttpProviderOptions
-export const API_KEY_HEADER_KEY = 'apiKey'
+export { API_KEY_HEADER_KEY, HttpProviderOptions } from './setupForKits'
 
 /**
  * Creates a new instance of `ContractKit` given a nodeUrl
@@ -42,14 +44,7 @@ export const API_KEY_HEADER_KEY = 'apiKey'
  * @optional options to pass to the Web3 HttpProvider constructor
  */
 export function newKit(url: string, wallet?: ReadOnlyWallet, options?: HttpProviderOptions) {
-  let web3: Web3
-  if (url.endsWith('.ipc')) {
-    web3 = new Web3(new Web3.providers.IpcProvider(url, net))
-  } else if (url.toLowerCase().startsWith('http')) {
-    web3 = new Web3(new Web3.providers.HttpProvider(url, options))
-  } else {
-    web3 = new Web3(url)
-  }
+  const web3: Web3 = getWeb3ForKit(url, options)
   return newKitFromWeb3(web3, wallet)
 }
 
@@ -60,12 +55,7 @@ export function newKit(url: string, wallet?: ReadOnlyWallet, options?: HttpProvi
  * @optional wallet to reuse or add a wallet different than the default (example ledger-wallet)
  */
 export function newKitWithApiKey(url: string, apiKey: string, wallet?: ReadOnlyWallet) {
-  const options: HttpProviderOptions = {}
-  options.headers = []
-  options.headers.push({
-    name: API_KEY_HEADER_KEY,
-    value: apiKey,
-  })
+  const options: HttpProviderOptions = setupAPIKey(apiKey)
   return newKit(url, wallet, options)
 }
 
@@ -74,9 +64,7 @@ export function newKitWithApiKey(url: string, apiKey: string, wallet?: ReadOnlyW
  * @param web3 Web3 instance
  */
 export function newKitFromWeb3(web3: Web3, wallet: ReadOnlyWallet = new LocalWallet()) {
-  if (!web3.currentProvider) {
-    throw new Error('Must have a valid Provider')
-  }
+  ensureCurrentProvider(web3)
   return new ContractKit(new Connection(web3, wallet))
 }
 export interface NetworkConfig {
@@ -99,6 +87,17 @@ interface AccountBalance extends EachCeloToken<BigNumber> {
   lockedCELO: BigNumber
   pending: BigNumber
 }
+/*
+ * ContractKit provides a convenient interface for All Celo Contracts
+ *
+ * @remarks
+ *
+ * For most use cases this ContractKit class might be more than you need.
+ * Consider {@link MiniContractKit} for a scaled down subset of contract Wrappers,
+ * or {@link Connection} for a lighter package without contract Wrappers
+ *
+ * @param connection – an instance of @celo/connect {@link Connection}
+ */
 
 export class ContractKit {
   /** core contract's address registry */
@@ -110,14 +109,14 @@ export class ContractKit {
   /** helper for interacting with CELO & stable tokens */
   readonly celoTokens: CeloTokens
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   gasPriceSuggestionMultiplier = 5
 
   constructor(readonly connection: Connection) {
-    this.registry = new AddressRegistry(this)
-    this._web3Contracts = new Web3ContractCache(this)
-    this.contracts = new WrapperCache(this)
-    this.celoTokens = new CeloTokens(this)
+    this.registry = new AddressRegistry(connection)
+    this._web3Contracts = new Web3ContractCache(this.registry)
+    this.contracts = new WrapperCache(connection, this._web3Contracts, this.registry)
+    this.celoTokens = new CeloTokens(this.contracts, this.registry)
   }
 
   getWallet() {
@@ -161,11 +160,13 @@ export class ContractKit {
 
     const configMethod = async (contract: ValidWrappers) => {
       try {
+        const eachTokenAddress = await this.celoTokens.getAddresses()
+        const addresses = Object.values(eachTokenAddress)
         const configContractWrapper = await this.contracts.getContract(contract)
         if (humanReadable && 'getHumanReadableConfig' in configContractWrapper) {
-          return configContractWrapper.getHumanReadableConfig()
+          return configContractWrapper.getHumanReadableConfig(addresses)
         } else if ('getConfig' in configContractWrapper) {
-          return configContractWrapper.getConfig()
+          return configContractWrapper.getConfig(addresses)
         } else {
           throw new Error('No config endpoint found')
         }
@@ -205,7 +206,7 @@ export class ContractKit {
     this.connection.defaultFeeCurrency = address
   }
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   async updateGasPriceInConnectionLayer(currency: Address) {
     const gasPriceMinimum = await this.contracts.getGasPriceMinimum()
     const rawGasPrice = await gasPriceMinimum.getGasPriceMinimum(currency)
@@ -214,41 +215,23 @@ export class ContractKit {
   }
 
   async getEpochSize(): Promise<number> {
-    const validators = await this.contracts.getValidators()
-    const epochSize = await validators.getEpochSize()
-
-    return epochSize.toNumber()
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getEpochSizeNumber()
   }
 
   async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSize()
-    // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    if (epochNumber === 0) {
-      // No first block for epoch 0
-      return 0
-    }
-    return (epochNumber - 1) * epochSize + 1
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getFirstBlockNumberForEpoch(epochNumber)
   }
 
   async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSize()
-    // Follows GetEpochLastBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    if (epochNumber === 0) {
-      return 0
-    }
-    const firstBlockNumberForEpoch = await this.getFirstBlockNumberForEpoch(epochNumber)
-    return firstBlockNumberForEpoch + (epochSize - 1)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber)
   }
 
   async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
-    const epochSize = await this.getEpochSize()
-    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
-    const epochNumber = Math.floor(blockNumber / epochSize)
-    if (blockNumber % epochSize === 0) {
-      return epochNumber
-    } else {
-      return epochNumber + 1
-    }
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    return blockchainParamsWrapper.getEpochNumberOfBlock(blockNumber)
   }
 
   // *** NOTICE ***
@@ -298,7 +281,7 @@ export class ContractKit {
   isSyncing(): Promise<boolean> {
     return this.connection.isSyncing()
   }
-
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   async fillGasPrice(tx: CeloTx): Promise<CeloTx> {
     if (tx.feeCurrency && tx.gasPrice === '0') {
       await this.updateGasPriceInConnectionLayer(tx.feeCurrency)

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [ProposalStage](_wrappers_governance_.proposalstage.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Governance"](../modules/_wrappers_governance_.md) › [ProposalStage](_wrappers_governance_.proposalstage.md)
 
 # Enumeration: ProposalStage
 

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [ActionableAttestation](_wrappers_attestations_.actionableattestation.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [ActionableAttestation](_wrappers_attestations_.actionableattestation.md)
 
 # Interface: ActionableAttestation
 
@@ -22,7 +22,7 @@
 
 • **attestationServiceURL**: *string*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:64](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L64)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L84)*
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 • **blockNumber**: *number*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L63)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:83](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L83)*
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 • **issuer**: *Address*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L62)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L82)*
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 • **name**: *string | undefined*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L65)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L85)*
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 • **version**: *string*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L66)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L86)*

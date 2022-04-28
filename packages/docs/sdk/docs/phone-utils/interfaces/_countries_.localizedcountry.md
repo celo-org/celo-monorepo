@@ -1,4 +1,4 @@
-[@celo/phone-utils](../README.md) › ["countries"](../modules/_countries_.md) › [LocalizedCountry](_countries_.localizedcountry.md)
+[@celo/phone-utils](../README.md) › [Globals](../globals.md) › ["countries"](../modules/_countries_.md) › [LocalizedCountry](_countries_.localizedcountry.md)
 
 # Interface: LocalizedCountry
 

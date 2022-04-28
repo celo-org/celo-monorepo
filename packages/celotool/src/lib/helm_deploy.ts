@@ -444,9 +444,13 @@ export async function registerIPAddress(name: string, zone?: string) {
 export async function deleteIPAddress(name: string, zone?: string) {
   console.info(`Deleting IP address ${name}`)
   try {
-    await execCmd(
-      `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
-    )
+    if (isCelotoolVerbose()) {
+      console.info(`IP Address ${name} would be deleted`)
+    } else {
+      await execCmd(
+        `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
+      )
+    }
   } catch (error: any) {
     if (!error.toString().includes('was not found')) {
       console.error(error)
@@ -908,7 +912,7 @@ export async function upgradeGenericHelmChart(
     )
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm diff upgrade --install -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`,
       true
@@ -916,7 +920,7 @@ export async function upgradeGenericHelmChart(
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm upgrade --install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )

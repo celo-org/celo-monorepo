@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/ReleaseGold"](_wrappers_releasegold_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/ReleaseGold"](_wrappers_releasegold_.md)
 
 # Module: "wrappers/ReleaseGold"
 
