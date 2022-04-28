@@ -1,6 +1,8 @@
-[@celo/connect](../README.md) › ["abi-types"](../modules/_abi_types_.md) › [DecodedParamsArray](_abi_types_.decodedparamsarray.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["abi-types"](../modules/_abi_types_.md) › [DecodedParamsArray](_abi_types_.decodedparamsarray.md)
 
 # Interface: DecodedParamsArray
+
+**`internal`** 
 
 ## Hierarchy
 
@@ -11,6 +13,8 @@
 ## Indexable
 
 * \[ **index**: *number*\]: any
+
+**`internal`** 
 
 ## Index
 
@@ -24,4 +28,4 @@
 
 • **__length__**: *number*
 
-*Defined in [packages/sdk/connect/src/abi-types.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L8)*
+*Defined in [abi-types.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/abi-types.ts#L9)*

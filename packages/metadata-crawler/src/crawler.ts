@@ -125,7 +125,10 @@ async function processDomainClaimForValidator(item: { url: string; address: stri
   const itemLogger = operationalLogger.child({ url: item.url, address: item.address })
   try {
     itemLogger.debug('fetch_metadata')
-    const metadata = await IdentityMetadataWrapper.fetchFromURL(kit, item.url)
+    const metadata = await IdentityMetadataWrapper.fetchFromURL(
+      await kit.contracts.getAccounts(),
+      item.url
+    )
     const verifiedAccounts = await getVerifiedAccounts(metadata, item.address)
     const verifiedDomains = await getVerifiedDomains(metadata, item.address, itemLogger)
 

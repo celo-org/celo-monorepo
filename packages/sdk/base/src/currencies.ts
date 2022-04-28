@@ -1,8 +1,21 @@
+/** @deprecated use StableToken and Token */
 export enum CURRENCY_ENUM {
   GOLD = 'Celo Gold',
   DOLLAR = 'Celo Dollar',
   EURO = 'Celo Euro',
 }
+
+export enum StableToken {
+  cUSD = 'cUSD',
+  cEUR = 'cEUR',
+  cREAL = 'cREAL',
+}
+
+export enum Token {
+  CELO = 'CELO',
+}
+
+export type CeloTokenType = StableToken | Token
 
 interface Currency {
   symbol: string
@@ -12,6 +25,7 @@ interface Currency {
 
 type CurrencyObject = { [key in CURRENCY_ENUM]: Currency }
 
+/** @deprecated */
 export const CURRENCIES: CurrencyObject = {
   [CURRENCY_ENUM.GOLD]: {
     symbol: '',
@@ -43,12 +57,14 @@ export const resolveCurrency = (label: string): CURRENCY_ENUM => {
   }
 }
 
+/** @deprecated use StableToken and Token */
 export enum SHORT_CURRENCIES {
   DOLLAR = 'dollar',
   GOLD = 'gold',
   EURO = 'euro',
 }
 
+/** @deprecated use StableToken and Token */
 export const currencyToShortMap = {
   [CURRENCY_ENUM.DOLLAR]: SHORT_CURRENCIES.DOLLAR,
   [CURRENCY_ENUM.GOLD]: SHORT_CURRENCIES.GOLD,

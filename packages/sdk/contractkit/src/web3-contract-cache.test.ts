@@ -1,14 +1,16 @@
+import { Connection } from '@celo/connect'
 import Web3 from 'web3'
-import { AllContracts } from '.'
-import { newKitFromWeb3 } from './kit'
+import { AddressRegistry } from './address-registry'
+import { AllContracts } from './index'
 import { Web3ContractCache } from './web3-contract-cache'
-
 function newWeb3ContractCache() {
-  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
+  const web3 = new Web3('http://localhost:8545')
+  const connection = new Connection(web3)
+  const registry = new AddressRegistry(connection)
   const AnyContractAddress = '0xe832065fb5117dbddcb566ff7dc4340999583e38'
-  jest.spyOn(kit.registry, 'addressFor').mockResolvedValue(AnyContractAddress)
-  const contractCache = new Web3ContractCache(kit)
-  return contractCache
+  jest.spyOn(registry, 'addressFor').mockResolvedValue(AnyContractAddress)
+
+  return new Web3ContractCache(registry)
 }
 
 describe('getContract()', () => {

@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["utils/tx-result"](../modules/_utils_tx_result_.md) › [TransactionResult](_utils_tx_result_.transactionresult.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["utils/tx-result"](../modules/_utils_tx_result_.md) › [TransactionResult](_utils_tx_result_.transactionresult.md)
 
 # Class: TransactionResult
 
@@ -27,7 +27,7 @@ up being nicer when doing promise/async based programming.
 
 \+ **new TransactionResult**(`pe`: PromiEvent‹any›): *[TransactionResult](_utils_tx_result_.transactionresult.md)*
 
-*Defined in [packages/sdk/connect/src/utils/tx-result.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-result.ts#L21)*
+*Defined in [utils/tx-result.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-result.ts#L21)*
 
 **Parameters:**
 
@@ -43,7 +43,7 @@ Name | Type |
 
 ▸ **getHash**(): *Promise‹string›*
 
-*Defined in [packages/sdk/connect/src/utils/tx-result.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-result.ts#L45)*
+*Defined in [utils/tx-result.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-result.ts#L45)*
 
 Get (& wait for) transaction hash
 
@@ -55,7 +55,7 @@ ___
 
 ▸ **waitReceipt**(): *Promise‹[CeloTxReceipt](../modules/_types_.md#celotxreceipt)›*
 
-*Defined in [packages/sdk/connect/src/utils/tx-result.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-result.ts#L57)*
+*Defined in [utils/tx-result.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/tx-result.ts#L57)*
 
 Get (& wait for) transaction receipt
 

@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["wallet"](../modules/_wallet_.md) › [Signer](_wallet_.signer.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["wallet"](../modules/_wallet_.md) › [Signer](_wallet_.signer.md)
 
 # Interface: Signer
 
@@ -23,7 +23,7 @@
 
 • **computeSharedSecret**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L29)*
+*Defined in [wallet.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L29)*
 
 #### Type declaration:
 
@@ -41,7 +41,7 @@ ___
 
 • **decrypt**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L28)*
+*Defined in [wallet.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L28)*
 
 #### Type declaration:
 
@@ -59,7 +59,7 @@ ___
 
 • **getNativeKey**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L27)*
+*Defined in [wallet.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L27)*
 
 #### Type declaration:
 
@@ -71,7 +71,7 @@ ___
 
 • **signPersonalMessage**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L25)*
+*Defined in [wallet.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L25)*
 
 #### Type declaration:
 
@@ -89,7 +89,7 @@ ___
 
 • **signTransaction**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L21)*
+*Defined in [wallet.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L21)*
 
 Signs the message and returns an EVM transaction
 
@@ -114,7 +114,7 @@ ___
 
 • **signTypedData**: *function*
 
-*Defined in [packages/sdk/connect/src/wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L26)*
+*Defined in [wallet.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/wallet.ts#L26)*
 
 #### Type declaration:
 

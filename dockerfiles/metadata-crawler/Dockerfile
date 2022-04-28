@@ -15,6 +15,8 @@ COPY patches/ patches/
 COPY packages/typescript/package.json packages/typescript/
 COPY packages/sdk/base/package.json packages/sdk/base/
 COPY packages/sdk/utils/package.json packages/sdk/utils/
+COPY packages/sdk/cryptographic-utils/package.json packages/sdk/cryptographic-utils/
+COPY packages/sdk/phone-utils/package.json packages/sdk/phone-utils/
 COPY packages/dev-utils/package.json packages/dev-utils/
 COPY packages/sdk/connect/package.json packages/sdk/connect/
 COPY packages/sdk/wallets/wallet-base/package.json packages/sdk/wallets/wallet-base/
@@ -30,6 +32,8 @@ RUN yarn install --frozen-lockfile --network-timeout 100000 && yarn cache clean
 COPY packages/typescript packages/typescript/
 COPY packages/sdk/base packages/sdk/base/
 COPY packages/sdk/utils packages/sdk/utils/
+COPY packages/sdk/phone-utils packages/sdk/phone-utils/
+COPY packages/sdk/cryptographic-utils packages/sdk/cryptographic-utils/
 COPY packages/dev-utils packages/dev-utils/
 COPY packages/sdk/connect packages/sdk/connect/
 COPY packages/sdk/wallets/wallet-base packages/sdk/wallets/wallet-base

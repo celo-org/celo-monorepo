@@ -1,4 +1,4 @@
-[@celo/phone-utils](../README.md) › ["io"](_io_.md)
+[@celo/phone-utils](../README.md) › [Globals](../globals.md) › ["io"](_io_.md)
 
 # Module: "io"
 
@@ -16,7 +16,6 @@
 
 * [AttestationRequestType](_io_.md#const-attestationrequesttype)
 * [AttestationResponseType](_io_.md#const-attestationresponsetype)
-* [AttestationServiceStatusResponseType](_io_.md#const-attestationservicestatusresponsetype)
 * [AttestationServiceTestRequestType](_io_.md#const-attestationservicetestrequesttype)
 * [E164PhoneNumberType](_io_.md#const-e164phonenumbertype)
 * [GetAttestationRequestType](_io_.md#const-getattestationrequesttype)
@@ -27,7 +26,7 @@
 
 Ƭ **AttestationRequest**: *t.TypeOf‹typeof AttestationRequestType›*
 
-*Defined in [io.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L58)*
+*Defined in [io.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L41)*
 
 ___
 
@@ -35,7 +34,7 @@ ___
 
 Ƭ **AttestationResponse**: *t.TypeOf‹typeof AttestationResponseType›*
 
-*Defined in [io.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L104)*
+*Defined in [io.ts:87](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L87)*
 
 ___
 
@@ -43,7 +42,7 @@ ___
 
 Ƭ **AttestationServiceTestRequest**: *t.TypeOf‹typeof AttestationServiceTestRequestType›*
 
-*Defined in [io.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L40)*
+*Defined in [io.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L23)*
 
 ___
 
@@ -51,7 +50,7 @@ ___
 
 Ƭ **E164Number**: *t.TypeOf‹typeof E164PhoneNumberType›*
 
-*Defined in [io.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L42)*
+*Defined in [io.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L25)*
 
 ___
 
@@ -59,7 +58,7 @@ ___
 
 Ƭ **GetAttestationRequest**: *t.TypeOf‹typeof GetAttestationRequestType›*
 
-*Defined in [io.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L70)*
+*Defined in [io.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L53)*
 
 ## Variables
 
@@ -79,7 +78,7 @@ ___
   phoneNumberSignature: t.union([t.undefined, t.string]),
 })
 
-*Defined in [io.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L44)*
+*Defined in [io.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L27)*
 
 ___
 
@@ -117,30 +116,7 @@ ___
   attestationCode: t.union([t.undefined, t.string]),
 })
 
-*Defined in [io.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L72)*
-
-___
-
-### `Const` AttestationServiceStatusResponseType
-
-• **AttestationServiceStatusResponseType**: *TypeC‹object›* = t.type({
-  status: t.literal('ok'),
-  smsProviders: t.array(t.string),
-  blacklistedRegionCodes: t.union([t.array(t.string), t.undefined]),
-  accountAddress: AddressType,
-  signature: t.union([SignatureType, t.undefined]),
-  version: t.string,
-  latestBlock: t.number,
-  ageOfLatestBlock: t.number,
-  isNodeSyncing: t.boolean,
-  appSignature: t.string,
-  smsProvidersRandomized: t.boolean,
-  maxDeliveryAttempts: t.number,
-  maxRerequestMins: t.number,
-  twilioVerifySidProvided: t.boolean,
-})
-
-*Defined in [io.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L17)*
+*Defined in [io.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L55)*
 
 ___
 
@@ -153,7 +129,7 @@ ___
   provider: t.union([t.string, t.undefined]),
 })
 
-*Defined in [io.ts:34](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L34)*
+*Defined in [io.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L17)*
 
 ___
 
@@ -187,4 +163,4 @@ ___
   securityCode: t.union([t.undefined, t.string]),
 })
 
-*Defined in [io.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L60)*
+*Defined in [io.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/io.ts#L43)*

@@ -26,7 +26,7 @@ export default class AttestationServicesCurrent extends BaseCommand {
     const validatorInfo = await concurrentMap(
       5,
       validatorList,
-      attestations.getAttestationServiceStatus.bind(this)
+      attestations.getAttestationServiceStatus.bind(attestations)
     )
 
     cli.action.stop()

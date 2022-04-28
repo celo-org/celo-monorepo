@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["celo-provider"](_celo_provider_.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["celo-provider"](_celo_provider_.md)
 
 # Module: "celo-provider"
 
@@ -18,7 +18,7 @@
 
 ▸ **assertIsCeloProvider**(`provider`: any): *asserts provider is CeloProvider*
 
-*Defined in [packages/sdk/connect/src/celo-provider.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L23)*
+*Defined in [celo-provider.ts:23](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L23)*
 
 **Parameters:**
 

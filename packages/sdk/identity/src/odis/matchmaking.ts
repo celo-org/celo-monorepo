@@ -1,5 +1,5 @@
 import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
-import { E164Number } from '@celo/utils/lib/io'
+import { E164Number } from '@celo/phone-utils/lib/io'
 import crypto from 'crypto'
 import debugFactory from 'debug'
 import {

@@ -1,8 +1,13 @@
-[@celo/contractkit](../README.md) › ["kit"](_kit_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["kit"](_kit_.md)
 
 # Module: "kit"
 
 ## Index
+
+### References
+
+* [API_KEY_HEADER_KEY](_kit_.md#api_key_header_key)
+* [HttpProviderOptions](_kit_.md#httpprovideroptions)
 
 ### Classes
 
@@ -12,35 +17,23 @@
 
 * [NetworkConfig](../interfaces/_kit_.networkconfig.md)
 
-### Type aliases
-
-* [HttpProviderOptions](_kit_.md#httpprovideroptions)
-
-### Variables
-
-* [API_KEY_HEADER_KEY](_kit_.md#const-api_key_header_key)
-
 ### Functions
 
 * [newKit](_kit_.md#newkit)
 * [newKitFromWeb3](_kit_.md#newkitfromweb3)
 * [newKitWithApiKey](_kit_.md#newkitwithapikey)
 
-## Type aliases
+## References
+
+###  API_KEY_HEADER_KEY
+
+• **API_KEY_HEADER_KEY**:
+
+___
 
 ###  HttpProviderOptions
 
-Ƭ **HttpProviderOptions**: *HttpProviderOptions*
-
-*Defined in [packages/sdk/contractkit/src/kit.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L35)*
-
-## Variables
-
-### `Const` API_KEY_HEADER_KEY
-
-• **API_KEY_HEADER_KEY**: *"apiKey"* = "apiKey"
-
-*Defined in [packages/sdk/contractkit/src/kit.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L36)*
+• **HttpProviderOptions**:
 
 ## Functions
 
@@ -48,7 +41,7 @@
 
 ▸ **newKit**(`url`: string, `wallet?`: ReadOnlyWallet, `options?`: [HttpProviderOptions](_kit_.md#httpprovideroptions)): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [packages/sdk/contractkit/src/kit.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L44)*
+*Defined in [packages/sdk/contractkit/src/kit.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L46)*
 
 Creates a new instance of `ContractKit` given a nodeUrl
 
@@ -72,7 +65,7 @@ ___
 
 ▸ **newKitFromWeb3**(`web3`: Web3, `wallet`: ReadOnlyWallet): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [packages/sdk/contractkit/src/kit.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L76)*
+*Defined in [packages/sdk/contractkit/src/kit.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L66)*
 
 Creates a new instance of the `ContractKit` with a web3 instance
 
@@ -91,7 +84,7 @@ ___
 
 ▸ **newKitWithApiKey**(`url`: string, `apiKey`: string, `wallet?`: ReadOnlyWallet): *[ContractKit](../classes/_kit_.contractkit.md)‹›*
 
-*Defined in [packages/sdk/contractkit/src/kit.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L62)*
+*Defined in [packages/sdk/contractkit/src/kit.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/kit.ts#L57)*
 
 Creates a new instance of `ContractKit` given a nodeUrl and apiKey
 

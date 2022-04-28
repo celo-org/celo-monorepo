@@ -8,6 +8,12 @@
 
 * [CURRENCY_ENUM](../enums/_currencies_.currency_enum.md)
 * [SHORT_CURRENCIES](../enums/_currencies_.short_currencies.md)
+* [StableToken](../enums/_currencies_.stabletoken.md)
+* [Token](../enums/_currencies_.token.md)
+
+### Type aliases
+
+* [CeloTokenType](_currencies_.md#celotokentype)
 
 ### Functions
 
@@ -18,13 +24,21 @@
 * [CURRENCIES](_currencies_.md#const-currencies)
 * [currencyToShortMap](_currencies_.md#const-currencytoshortmap)
 
+## Type aliases
+
+###  CeloTokenType
+
+Ƭ **CeloTokenType**: *[StableToken](../enums/_currencies_.stabletoken.md) | [Token](../enums/_currencies_.token.md)*
+
+*Defined in [packages/sdk/base/src/currencies.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L18)*
+
 ## Functions
 
 ### `Const` resolveCurrency
 
 ▸ **resolveCurrency**(`label`: string): *[CURRENCY_ENUM](../enums/_currencies_.currency_enum.md)*
 
-*Defined in [packages/sdk/base/src/currencies.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L33)*
+*Defined in [packages/sdk/base/src/currencies.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L47)*
 
 **Parameters:**
 
@@ -40,11 +54,13 @@ Name | Type |
 
 ### ▪ **CURRENCIES**: *object*
 
-*Defined in [packages/sdk/base/src/currencies.ts:15](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L15)*
+*Defined in [packages/sdk/base/src/currencies.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L29)*
+
+**`deprecated`** 
 
 ▪ **[CURRENCY_ENUM.DOLLAR]**: *object*
 
-*Defined in [packages/sdk/base/src/currencies.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L21)*
+*Defined in [packages/sdk/base/src/currencies.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L35)*
 
 * **code**: *string* = "cUSD"
 
@@ -54,7 +70,7 @@ Name | Type |
 
 ▪ **[CURRENCY_ENUM.EURO]**: *object*
 
-*Defined in [packages/sdk/base/src/currencies.ts:26](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L26)*
+*Defined in [packages/sdk/base/src/currencies.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L40)*
 
 * **code**: *string* = "cEUR"
 
@@ -64,7 +80,7 @@ Name | Type |
 
 ▪ **[CURRENCY_ENUM.GOLD]**: *object*
 
-*Defined in [packages/sdk/base/src/currencies.ts:16](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L16)*
+*Defined in [packages/sdk/base/src/currencies.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L30)*
 
 * **code**: *string* = "cGLD"
 
@@ -78,22 +94,24 @@ ___
 
 ### ▪ **currencyToShortMap**: *object*
 
-*Defined in [packages/sdk/base/src/currencies.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L52)*
+*Defined in [packages/sdk/base/src/currencies.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L68)*
+
+**`deprecated`** use StableToken and Token
 
 ###  [CURRENCY_ENUM.DOLLAR]
 
 • **[CURRENCY_ENUM.DOLLAR]**: *[SHORT_CURRENCIES](../enums/_currencies_.short_currencies.md)* = SHORT_CURRENCIES.DOLLAR
 
-*Defined in [packages/sdk/base/src/currencies.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L53)*
+*Defined in [packages/sdk/base/src/currencies.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L69)*
 
 ###  [CURRENCY_ENUM.EURO]
 
 • **[CURRENCY_ENUM.EURO]**: *[SHORT_CURRENCIES](../enums/_currencies_.short_currencies.md)* = SHORT_CURRENCIES.EURO
 
-*Defined in [packages/sdk/base/src/currencies.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L55)*
+*Defined in [packages/sdk/base/src/currencies.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L71)*
 
 ###  [CURRENCY_ENUM.GOLD]
 
 • **[CURRENCY_ENUM.GOLD]**: *[SHORT_CURRENCIES](../enums/_currencies_.short_currencies.md)* = SHORT_CURRENCIES.GOLD
 
-*Defined in [packages/sdk/base/src/currencies.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L54)*
+*Defined in [packages/sdk/base/src/currencies.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/currencies.ts#L70)*

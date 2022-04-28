@@ -1,4 +1,4 @@
-import { E164Number } from '@celo/utils/lib/io'
+import { E164Number } from '@celo/phone-utils/lib/io'
 import { BuildOptions, DataTypes, Model, Sequelize } from 'sequelize'
 
 // Split out SmsFields from the underlying data model;

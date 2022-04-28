@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["utils/provider-utils"](_utils_provider_utils_.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["utils/provider-utils"](_utils_provider_utils_.md)
 
 # Module: "utils/provider-utils"
 
@@ -15,7 +15,9 @@
 
 ▸ **hasProperty**<**T**>(`object`: any, `property`: string): *object is T*
 
-*Defined in [packages/sdk/connect/src/utils/provider-utils.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/provider-utils.ts#L3)*
+*Defined in [utils/provider-utils.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/provider-utils.ts#L4)*
+
+**`internal`** 
 
 **Type parameters:**
 
@@ -36,7 +38,9 @@ ___
 
 ▸ **stopProvider**(`defaultProvider`: [Provider](../interfaces/_types_.provider.md)): *void*
 
-*Defined in [packages/sdk/connect/src/utils/provider-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/provider-utils.ts#L7)*
+*Defined in [utils/provider-utils.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/provider-utils.ts#L9)*
+
+**`internal`** 
 
 **Parameters:**
 

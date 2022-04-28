@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [AttestationsConfig](_wrappers_attestations_.attestationsconfig.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [AttestationsConfig](_wrappers_attestations_.attestationsconfig.md)
 
 # Interface: AttestationsConfig
 
@@ -19,7 +19,7 @@
 
 • **attestationExpiryBlocks**: *number*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L48)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L68)*
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **attestationRequestFees**: *[AttestationsToken](_wrappers_attestations_.attestationstoken.md)[]*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L49)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:69](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L69)*
