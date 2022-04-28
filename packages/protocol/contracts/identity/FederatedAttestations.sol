@@ -45,14 +45,9 @@ contract FederatedAttestations is
   // signer => isRevoked
   mapping(address => bool) public revokedSigners;
 
-  bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
-    "IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
-  );
-  bytes32 public eip712DomainSeparator;
 
   // TODO: should this be hardcoded here?
   bytes32 constant SIGNER_ROLE = keccak256(abi.encodePacked("celo.org/core/attestation"));
-
   bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
     "IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
   );
