@@ -185,7 +185,126 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#lookupIdentifiersByAddress', () => {
-    it('should', async () => {})
+    const issuer2 = accounts[2]
+    const issuer2Signer = accounts[3]
+    const issuer3 = accounts[4]
+
+    const pnIdentifier2 = getPhoneHash(phoneNumber, 'dummySalt')
+
+    type identifierTestCase = {
+      pnIdentifier: string
+      signer: string
+    }
+
+    const checkAgainstExpectedIdCases = (
+      expectedIdentifiers: identifierTestCase[],
+      actualIdentifiers: string[]
+    ) => {
+      expect(expectedIdentifiers.map((idCase) => idCase.pnIdentifier)).to.eql(actualIdentifiers)
+    }
+
+    const issuer1IdCases: identifierTestCase[] = [
+      {
+        pnIdentifier: pnIdentifier1,
+        signer: issuer1,
+      },
+      {
+        pnIdentifier: pnIdentifier2,
+        signer: issuer1,
+      },
+    ]
+    const issuer2IdCases: identifierTestCase[] = [
+      {
+        pnIdentifier: pnIdentifier1,
+        signer: issuer2,
+      },
+      {
+        pnIdentifier: pnIdentifier2,
+        signer: issuer2Signer,
+      },
+    ]
+
+    beforeEach(async () => {
+      // Require consistent order for test cases
+      for (const { issuer, idCasesPerIssuer } of [
+        { issuer: issuer1, idCasesPerIssuer: issuer1IdCases },
+        { issuer: issuer2, idCasesPerIssuer: issuer2IdCases },
+      ]) {
+        for (const idCase of idCasesPerIssuer) {
+          const attestation = {
+            account: account1,
+            issuedOn: nowUnixTime,
+            signer: idCase.signer,
+          }
+          await federatedAttestations.registerAttestation(
+            idCase.pnIdentifier,
+            issuer,
+            attestation,
+            {
+              from: attestation.account,
+            }
+          )
+        }
+      }
+    })
+
+    it('should return all identifiers from one issuer', async () => {
+      const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+        account1,
+        [issuer1],
+        issuer1IdCases.length + 1
+      )
+      checkAgainstExpectedIdCases(issuer1IdCases, actualIdentifiers)
+    })
+
+    it('should return identifiers from multiple issuers in correct order', async () => {
+      const expectedIdCases = issuer2IdCases.concat(issuer1IdCases)
+      const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+        account1,
+        [issuer2, issuer1],
+        expectedIdCases.length + 1
+      )
+      checkAgainstExpectedIdCases(expectedIdCases, actualIdentifiers)
+    })
+
+    it('should return empty list if maxIdentifiers == 0', async () => {
+      const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+        account1,
+        [issuer1],
+        0
+      )
+      assert.equal(actualIdentifiers.length, 0)
+    })
+
+    it('should only return maxIdentifiers identifiers when more are present', async () => {
+      const expectedIdCases = issuer2IdCases.concat(issuer1IdCases).slice(0, -1)
+      const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+        account1,
+        [issuer2, issuer1],
+        expectedIdCases.length
+      )
+      checkAgainstExpectedIdCases(expectedIdCases, actualIdentifiers)
+    })
+
+    it('should return none if no identifiers exist for an (issuer,address)', async () => {
+      const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+        account1,
+        [issuer3],
+        1
+      )
+      assert.equal(actualIdentifiers.length, 0)
+    })
+
+    it('should not return identifiers from revoked signers', async () => {
+      await federatedAttestations.revokeSigner(issuer2IdCases[0].signer, nowUnixTime)
+      const expectedIdCases = issuer2IdCases.slice(1)
+      const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+        account1,
+        [issuer2],
+        expectedIdCases.length + 1
+      )
+      checkAgainstExpectedIdCases(expectedIdCases, actualIdentifiers)
+    })
   })
 
   describe('#validateAttestation', () => {
