@@ -1,3 +1,6 @@
+# This CronJob is intended to act as a template for blockscout data migration jobs that are run manually via `kubectl job create --from=cronjon/this-job`
+# Ideally this would be a Job instance, but due to the interaction of celotool + helm this would be triggered upon every deploy.
+# Instead, this is a CronJob that will never + should never be scheduled and remains present yet permanently suspended within the namespace.
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -7,6 +10,8 @@ metadata:
     component: blockscout-data-migration
 spec:
   suspend:  true
+  # This schedule (31st February) is designed to never be triggered and is
+  # included only to satisfy the CronJob schema validation.
   schedule: "0 0 31 2 *"
   jobTemplate:
     spec:
