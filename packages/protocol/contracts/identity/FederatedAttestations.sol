@@ -1,4 +1,3 @@
-// TODO figure out if we can use a new solidity version for just this one contract
 pragma solidity ^0.5.13;
 // TODO ASv2 come back to this and possibly flatten structs as arg params
 pragma experimental ABIEncoderV2;

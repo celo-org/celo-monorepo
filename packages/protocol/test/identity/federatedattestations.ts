@@ -54,13 +54,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
     const issuer3 = accounts[4]
     const issuer2Signer = accounts[5]
 
-    type attestationTestCase = {
+    interface AttestationTestCase {
       account: string
       issuedOn: number
       signer: string
     }
 
-    const issuer1Attestations: attestationTestCase[] = [
+    const issuer1Attestations: AttestationTestCase[] = [
       {
         account: account1,
         issuedOn: nowUnixTime,
@@ -73,7 +73,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         signer: issuer1,
       },
     ]
-    const issuer2Attestations: attestationTestCase[] = [
+    const issuer2Attestations: AttestationTestCase[] = [
       // Same account as issuer1Attestations[0], different issuer
       {
         account: account1,
@@ -103,7 +103,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     const checkAgainstExpectedAttestations = (
-      expectedAttestations: attestationTestCase[],
+      expectedAttestations: AttestationTestCase[],
       actualAddresses: string[],
       actualIssuedOns: BigNumber[],
       actualSigners: string[]
@@ -191,19 +191,19 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     const pnIdentifier2 = getPhoneHash(phoneNumber, 'dummySalt')
 
-    type identifierTestCase = {
+    interface IdentifierTestCase {
       pnIdentifier: string
       signer: string
     }
 
     const checkAgainstExpectedIdCases = (
-      expectedIdentifiers: identifierTestCase[],
+      expectedIdentifiers: IdentifierTestCase[],
       actualIdentifiers: string[]
     ) => {
       expect(expectedIdentifiers.map((idCase) => idCase.pnIdentifier)).to.eql(actualIdentifiers)
     }
 
-    const issuer1IdCases: identifierTestCase[] = [
+    const issuer1IdCases: IdentifierTestCase[] = [
       {
         pnIdentifier: pnIdentifier1,
         signer: issuer1,
@@ -213,7 +213,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         signer: issuer1,
       },
     ]
-    const issuer2IdCases: identifierTestCase[] = [
+    const issuer2IdCases: IdentifierTestCase[] = [
       {
         pnIdentifier: pnIdentifier1,
         signer: issuer2,
