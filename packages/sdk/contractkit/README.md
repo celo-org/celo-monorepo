@@ -43,11 +43,11 @@ const kit = newKit('https://alfajores-forno.celo-testnet.org')
 To access balances:
 
 ```ts
-// returns an object with {lockedGold, pending, cUSD, cEUR, cBRL}
+// returns an object with {lockedGold, pending, cUSD, cEUR, cREAL}
 
 const balances = await kit.getTotalBalance()
 
-// returns an object with {cUSD, cEUR, cBRL}
+// returns an object with {cUSD, cEUR, cREAL}
 const balances = await miniKit.getTotalBalance()
 
 ```
