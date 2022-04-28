@@ -4,6 +4,7 @@ import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { accessSecretVersion, getCurrentGcloudAccount } from './gcloud_utils'
 import {
+  helmAddAndUpdateRepos,
   installGenericHelmChart,
   removeGenericHelmChart,
   upgradeGenericHelmChart,
@@ -242,4 +243,40 @@ export async function createGrafanaTagAnnotation(celoEnv: string, tag: string, s
       tags: ['deployment', celoEnv],
     }),
   })
+}
+
+export async function installNFSServerProvisioner(celoEnv: string) {
+  const nfsChartVersion = '1.4.0'
+  const nfsChartNamespace = 'default'
+
+  const nfsReleaseExists = await outputIncludes(
+    `helm list -n default`,
+    `nfs-server`,
+    `nfs-server exists, skipping install`
+  )
+  if (!nfsReleaseExists) {
+    const valueFilePath = `/tmp/${celoEnv}-nfs-testnet-values.yaml`
+    await nfsHelmParameters(valueFilePath)
+
+    await helmAddAndUpdateRepos()
+    await execCmdWithExitOnFailure(`helm upgrade --install \
+      -n ${nfsChartNamespace} \
+      --version ${nfsChartVersion} \
+      nfs-server-release nfs-ganesha-server-and-external-provisioner/nfs-server-provisioner \
+      -f ${valueFilePath}
+    `)
+  }
+}
+
+async function nfsHelmParameters(valueFilePath: string) {
+  const valueFileContent = `
+nfs-server-provisioner:
+  persistence:
+    enabled: true
+    storageClass: "ssd"
+    size: 1Gi
+  storageClass:
+    defaultClass: false
+`
+  fs.writeFileSync(valueFilePath, valueFileContent)
 }

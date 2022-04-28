@@ -10,7 +10,6 @@ import {
   installAndEnableMetricsDeps,
   installCertManagerAndNginx,
   installGCPSSDStorageClass,
-  installNFSServerProvisioner,
   isCelotoolHelmDryRun,
 } from './helm_deploy'
 import { createServiceAccountIfNotExists } from './service-account-utils'
@@ -137,8 +136,6 @@ export async function setupCluster(celoEnv: string, createdCluster: boolean) {
   await installGCPSSDStorageClass()
 
   await installCertManagerAndNginx(celoEnv)
-
-  await installNFSServerProvisioner(celoEnv)
 
   if (envType !== EnvTypes.DEVELOPMENT) {
     console.info('Installing metric tools installation')
