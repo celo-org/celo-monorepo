@@ -8,13 +8,13 @@ import {
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
-import BN = require('bn.js')
 import {
   MockSortedOraclesInstance,
   MockStableTokenInstance,
   RegistryInstance,
   ReserveInstance,
 } from 'types'
+import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
 const Reserve: Truffle.Contract<ReserveInstance> = artifacts.require('Reserve')
@@ -781,7 +781,7 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe('#getReserveRatio', () => {
+  describe.only('#getReserveRatio', () => {
     let mockStableToken: MockStableTokenInstance
     let reserveGoldBalance: BigNumber
     const exchangeRate = 10
@@ -804,6 +804,26 @@ contract('Reserve', (accounts: string[]) => {
         value: reserveGoldBalance,
       })
     })
+
+    describe.only('works with stabletoken with no report', async () => {
+      let mockStableToken2: MockStableTokenInstance
+      beforeEach(async () => {
+        // Add another stable token
+        mockStableToken2 = await MockStableToken.new()
+        await reserve.addToken(mockStableToken2.address)
+      })
+
+      it('should return the correct ratio', async () => {
+        const stableTokenSupply = new BigNumber(10).pow(21)
+        await mockStableToken.setTotalSupply(stableTokenSupply)
+        const ratio = new BigNumber(await reserve.getReserveRatio())
+        assert(
+          fromFixed(ratio).isEqualTo(reserveGoldBalance.div(stableTokenSupply.div(exchangeRate))),
+          'reserve ratio should be correct'
+        )
+      })
+    })
+
     it('should return the correct ratio', async () => {
       const stableTokenSupply = new BigNumber(10).pow(21)
       await mockStableToken.setTotalSupply(stableTokenSupply)
