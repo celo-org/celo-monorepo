@@ -1,18 +1,22 @@
+queue_rules:
+  - name: default
+    conditions:
+      # Conditions to get out of the queue (= merged)
+      - "-merged"
+
 pull_request_rules:
   - name: Automatically merge on CI success and code review
     conditions:
-      # Add this label when you are ready to automerge the pull request.       
+      # Add this label when you are ready to automerge the pull request.
       - "label=automerge"
       # Exclude drafts
       - "-draft"
       # At least one approval required
       - "#approved-reviews-by>=1"
-      # Only enable this when the pull request is being merged into master
-      - "base=master"
     actions:
-      merge:
-        method: squash 
-        strict: true
-        commit_message: title+body
+      queue:
+        method: squash
+        name: default
+        commit_message_template: "{{title}}"
       delete_head_branch:
         force: False

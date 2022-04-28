@@ -1,8 +1,8 @@
 import { Address, NULL_ADDRESS } from '@celo/base/lib/address'
+import { Connection } from '@celo/connect'
 import debugFactory from 'debug'
 import { CeloContract, RegisteredContracts, stripProxy } from './base'
 import { newRegistry, Registry } from './generated/Registry'
-import { ContractKit } from './kit'
 
 const debug = debugFactory('kit:registry')
 
@@ -17,14 +17,16 @@ export class UnregisteredError extends Error {
 
 /**
  * Celo Core Contract's Address Registry
+ *
+ * @param connection – an instance of @celo/connect {@link Connection}
  */
 export class AddressRegistry {
   private readonly registry: Registry
   private readonly cache: Map<CeloContract, Address> = new Map()
 
-  constructor(kit: ContractKit) {
+  constructor(readonly connection: Connection) {
     this.cache.set(CeloContract.Registry, REGISTRY_CONTRACT_ADDRESS)
-    this.registry = newRegistry(kit.connection.web3, REGISTRY_CONTRACT_ADDRESS)
+    this.registry = newRegistry(connection.web3, REGISTRY_CONTRACT_ADDRESS)
   }
 
   /**

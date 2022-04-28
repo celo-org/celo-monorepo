@@ -1,5 +1,5 @@
 import { NativeSigner, serializeSignature, Signature, Signer } from '@celo/base/lib/signatureUtils'
-import * as Web3Utils from 'web3-utils'
+import { isHexStrict, soliditySha3 } from 'web3-utils'
 import { ensureLeading0x, eqAddress, privateKeyToAddress, trimLeading0x } from './address'
 import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
 
@@ -16,7 +16,7 @@ const ethjsutil = require('ethereumjs-util')
 
 // If messages is a hex, the length of it should be the number of bytes
 function messageLength(message: string) {
-  if (Web3Utils.isHexStrict(message)) {
+  if (isHexStrict(message)) {
     return (message.length - 2) / 2
   }
   return message.length
@@ -25,11 +25,11 @@ function messageLength(message: string) {
 // https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign
 export function hashMessageWithPrefix(message: string): string {
   const prefix = '\x19Ethereum Signed Message:\n' + messageLength(message)
-  return Web3Utils.soliditySha3(prefix, message)!
+  return soliditySha3(prefix, message)!
 }
 
 export function hashMessage(message: string): string {
-  return Web3Utils.soliditySha3({ type: 'string', value: message })!
+  return soliditySha3({ type: 'string', value: message })!
 }
 
 export async function addressToPublicKey(

@@ -55,6 +55,19 @@ NAT_FLAG="--nat=extip:${PUBLIC_IP}"
 {{- end -}}
 
 {{/*
+ * Blockscout indexer requests can take longer than default
+ * request timeouts.
+ * Adding a dummy comment (template .extra_setup) because helm indenting problems if this template is empty
+*/}}
+{{- define "celo-fullnode.extra_setup" }}
+# template .extra_setup
+{{- include  "celo-fullnode.aws-subnet-specific-nat-ip" . }}
+{{- if .Values.geth.increase_timeouts }}
+ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http.timeout.read 600 --http.timeout.write 600 --http.timeout.idle 2400"
+{{- end -}}
+{{- end -}}
+
+{{/*
  * This will create an HTTP server at .server_port
  * that is intended for GCP NEG health checks. It will
  * ensure that TCP at port .tcp_check_port works and

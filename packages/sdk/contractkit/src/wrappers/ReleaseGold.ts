@@ -7,7 +7,6 @@ import BigNumber from 'bignumber.js'
 import { flatten } from 'fp-ts/lib/Array'
 import { ReleaseGold } from '../generated/ReleaseGold'
 import {
-  BaseWrapper,
   proxyCall,
   proxySend,
   secondsToDurationString,
@@ -19,6 +18,7 @@ import {
   valueToInt,
   valueToString,
 } from './BaseWrapper'
+import { BaseWrapperForGoverning } from './BaseWrapperForGoverning'
 import { PendingWithdrawal } from './LockedGold'
 
 export interface BalanceState {
@@ -64,7 +64,7 @@ interface RevocationInfo {
 /**
  * Contract for handling an instance of a ReleaseGold contract.
  */
-export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
+export class ReleaseGoldWrapper extends BaseWrapperForGoverning<ReleaseGold> {
   /**
    * Returns the underlying Release schedule of the ReleaseGold contract
    * @return A ReleaseSchedule.
@@ -275,7 +275,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @return A CeloTransactionObject
    */
   revokeReleasing: () => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.revoke
   )
 
@@ -290,7 +290,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @return A CeloTransactionObject
    */
   refundAndFinalize: () => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.refundAndFinalize
   )
 
@@ -299,13 +299,13 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @param value The amount of gold to lock
    */
   lockGold: (value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.lockGold,
     tupleParser(valueToString)
   )
 
   transfer: (to: Address, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.transfer,
     tupleParser(stringIdentity, valueToString)
   )
@@ -315,13 +315,13 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @param value The amount of gold to unlock
    */
   unlockGold: (value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.unlockGold,
     tupleParser(valueToString)
   )
 
   async unlockAllGold() {
-    const lockedGold = await this.kit.contracts.getLockedGold()
+    const lockedGold = await this.contracts.getLockedGold()
     const amount = await lockedGold.getAccountTotalLockedGold(this.address)
     return this.unlockGold(amount)
   }
@@ -332,7 +332,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @param value The value to relock from the specified pending withdrawal.
    */
   async relockGold(value: BigNumber.Value): Promise<Array<CeloTransactionObject<void>>> {
-    const lockedGold = await this.kit.contracts.getLockedGold()
+    const lockedGold = await this.contracts.getLockedGold()
     const pendingWithdrawals = await lockedGold.getPendingWithdrawals(this.address)
     // Ensure there are enough pending withdrawals to relock.
     const totalValue = await lockedGold.getPendingWithdrawalsTotalValue(this.address)
@@ -370,7 +370,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @param value The value to relock from the specified pending withdrawal.
    */
   _relockGold: (index: number, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.relockGold,
     tupleParser(valueToString, valueToString)
   )
@@ -380,7 +380,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @param index The index of the pending locked gold withdrawal
    */
   withdrawLockedGold: (index: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.withdrawLockedGold,
     tupleParser(valueToString)
   )
@@ -390,7 +390,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @param value The requested gold amount
    */
   withdraw: (value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.withdraw,
     tupleParser(valueToString)
   )
@@ -398,7 +398,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   /**
    * Beneficiary creates an account on behalf of the ReleaseGold contract.
    */
-  createAccount = proxySend(this.kit, this.contract.methods.createAccount)
+  createAccount = proxySend(this.connection, this.contract.methods.createAccount)
 
   /**
    * Beneficiary creates an account on behalf of the ReleaseGold contract.
@@ -406,55 +406,58 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
    * @param dataEncryptionKey The key to set
    * @param walletAddress The address to set
    */
-  setAccount = proxySend(this.kit, this.contract.methods.setAccount)
+  setAccount = proxySend(this.connection, this.contract.methods.setAccount)
 
   /**
    * Sets the name for the account
    * @param name The name to set
    */
-  setAccountName = proxySend(this.kit, this.contract.methods.setAccountName)
+  setAccountName = proxySend(this.connection, this.contract.methods.setAccountName)
 
   /**
    * Sets the metadataURL for the account
    * @param metadataURL The url to set
    */
-  setAccountMetadataURL = proxySend(this.kit, this.contract.methods.setAccountMetadataURL)
+  setAccountMetadataURL = proxySend(this.connection, this.contract.methods.setAccountMetadataURL)
 
   /**
    * Sets the wallet address for the account
    * @param walletAddress The address to set
    */
-  setAccountWalletAddress = proxySend(this.kit, this.contract.methods.setAccountWalletAddress)
+  setAccountWalletAddress = proxySend(
+    this.connection,
+    this.contract.methods.setAccountWalletAddress
+  )
 
   /**
    * Sets the data encryption of the account
    * @param dataEncryptionKey The key to set
    */
   setAccountDataEncryptionKey = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.setAccountDataEncryptionKey
   )
 
   /**
    * Sets the contract's liquidity provision to true
    */
-  setLiquidityProvision = proxySend(this.kit, this.contract.methods.setLiquidityProvision)
+  setLiquidityProvision = proxySend(this.connection, this.contract.methods.setLiquidityProvision)
 
   /**
    * Sets the contract's `canExpire` field to `_canExpire`
    * @param _canExpire If the contract can expire `EXPIRATION_TIME` after the release schedule finishes.
    */
-  setCanExpire = proxySend(this.kit, this.contract.methods.setCanExpire)
+  setCanExpire = proxySend(this.connection, this.contract.methods.setCanExpire)
 
   /**
    * Sets the contract's max distribution
    */
-  setMaxDistribution = proxySend(this.kit, this.contract.methods.setMaxDistribution)
+  setMaxDistribution = proxySend(this.connection, this.contract.methods.setMaxDistribution)
 
   /**
    * Sets the contract's beneficiary
    */
-  setBeneficiary = proxySend(this.kit, this.contract.methods.setBeneficiary)
+  setBeneficiary = proxySend(this.connection, this.contract.methods.setBeneficiary)
 
   /**
    * Authorizes an address to sign votes on behalf of the account.
@@ -467,7 +470,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.authorizeVoteSigner(
         signer,
         proofOfSigningKeyPossession.v,
@@ -487,10 +490,10 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     signer: Address,
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
-    const validators = await this.kit.contracts.getValidators()
+    const validators = await this.contracts.getValidators()
     const account = this.address
     if (await validators.isValidator(account)) {
-      const message = this.kit.connection.web3.utils.soliditySha3({
+      const message = this.connection.web3.utils.soliditySha3({
         type: 'address',
         value: account,
       })!
@@ -502,7 +505,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
         proofOfSigningKeyPossession.s
       )
       return toTransactionObject(
-        this.kit.connection,
+        this.connection,
         this.contract.methods.authorizeValidatorSignerWithPublicKey(
           signer,
           proofOfSigningKeyPossession.v,
@@ -513,7 +516,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
       )
     } else {
       return toTransactionObject(
-        this.kit.connection,
+        this.connection,
         this.contract.methods.authorizeValidatorSigner(
           signer,
           proofOfSigningKeyPossession.v,
@@ -541,7 +544,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     blsPop: string
   ): Promise<CeloTransactionObject<void>> {
     const account = this.address
-    const message = this.kit.connection.web3.utils.soliditySha3({
+    const message = this.connection.web3.utils.soliditySha3({
       type: 'address',
       value: account,
     })!
@@ -553,7 +556,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
       proofOfSigningKeyPossession.s
     )
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.authorizeValidatorSignerWithKeys(
         signer,
         proofOfSigningKeyPossession.v,
@@ -577,7 +580,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     proofOfSigningKeyPossession: Signature
   ): Promise<CeloTransactionObject<void>> {
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.authorizeAttestationSigner(
         signer,
         proofOfSigningKeyPossession.v,
@@ -599,7 +602,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     group: Address,
     value: BigNumber
   ): Promise<CeloTransactionObject<void>> {
-    const electionContract = await this.kit.contracts.getElection()
+    const electionContract = await this.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(account)
     const index = findAddressIndex(group, groups)
     const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
@@ -608,7 +611,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     )
 
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.revokePending(group, value.toFixed(), lesser, greater, index)
     )
   }
@@ -633,7 +636,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     group: Address,
     value: BigNumber
   ): Promise<CeloTransactionObject<void>> {
-    const electionContract = await this.kit.contracts.getElection()
+    const electionContract = await this.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(account)
     const index = findAddressIndex(group, groups)
     const { lesser, greater } = await electionContract.findLesserAndGreaterAfterVote(
@@ -642,7 +645,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     )
 
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
     )
   }
@@ -667,7 +670,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
     group: Address,
     value: BigNumber
   ): Promise<Array<CeloTransactionObject<void>>> {
-    const electionContract = await this.kit.contracts.getElection()
+    const electionContract = await this.contracts.getElection()
     const vote = await electionContract.getVotesForGroupByAccount(account, group)
     if (value.gt(vote.pending.plus(vote.active))) {
       throw new Error(`can't revoke more votes for ${group} than have been made by ${account}`)
@@ -694,7 +697,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
 
   revokeAllVotesForGroup = async (group: Address) => {
     const txos = []
-    const electionContract = await this.kit.contracts.getElection()
+    const electionContract = await this.contracts.getElection()
     const { pending, active } = await electionContract.getVotesForGroupByAccount(
       this.address,
       group
@@ -711,7 +714,7 @@ export class ReleaseGoldWrapper extends BaseWrapper<ReleaseGold> {
   }
 
   revokeAllVotesForAllGroups = async () => {
-    const electionContract = await this.kit.contracts.getElection()
+    const electionContract = await this.contracts.getElection()
     const groups = await electionContract.getGroupsVotedForByAccount(this.address)
     const txoMatrix = await concurrentMap(4, groups, (group) => this.revokeAllVotesForGroup(group))
     return flatten(txoMatrix)

@@ -1,6 +1,6 @@
-import { PhoneNumberUtils } from '@celo/utils'
+import { PhoneNumberUtils } from '@celo/phone-utils'
+import { GetAttestationRequest } from '@celo/phone-utils/lib/io'
 import { isValidAddress, publicKeyToAddress } from '@celo/utils/lib/address'
-import { GetAttestationRequest } from '@celo/utils/lib/io'
 import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import Logger from 'bunyan'

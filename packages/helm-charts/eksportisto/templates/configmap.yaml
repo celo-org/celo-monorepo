@@ -30,7 +30,6 @@ data:
         sleepIntervalMilliseconds: 2000
       chainTip:
         enabled: true
-        queue: backfill
 
     indexer:
       concurrency: 10
@@ -41,5 +40,5 @@ data:
         table: data
       destination: bigquery
       dequeueTimeoutMilliseconds: 5000
-      blockRetryAttempts: 3
+      blockRetryAttempts: 1
       blockRetryDelayMilliseconds: 1000

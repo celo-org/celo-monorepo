@@ -218,7 +218,7 @@ export async function verifyConfigurationAndGetURL() {
 
   const metadataURL = await accounts.getMetadataURL(validator)
   try {
-    const metadata = await useKit((k) => IdentityMetadataWrapper.fetchFromURL(k, metadataURL))
+    const metadata = await IdentityMetadataWrapper.fetchFromURL(accounts, metadataURL)
     const claim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
     if (!claim) {
       throw Error('Missing ATTESTATION_SERVICE_URL claim')

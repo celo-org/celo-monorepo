@@ -1,5 +1,5 @@
-import { PhoneNumberUtils } from '@celo/utils'
-import { AttestationServiceTestRequest } from '@celo/utils/lib/io'
+import { PhoneNumberUtils } from '@celo/phone-utils'
+import { AttestationServiceTestRequest } from '@celo/phone-utils/lib/io'
 import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { randomBytes } from 'crypto'
 import express from 'express'

@@ -7,8 +7,9 @@
     "location": "packages/attestation-service",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/identity",
       "@celo/keystores",
-      "@celo/utils"
+      "@celo/phone-utils"
     ]
   },
   "celo-azure-build": {
@@ -21,6 +22,7 @@
       "@celo/base",
       "@celo/connect",
       "@celo/contractkit",
+      "@celo/cryptographic-utils",
       "@celo/dev-utils",
       "@celo/env-tests",
       "@celo/explorer",
@@ -36,6 +38,7 @@
     "location": "packages/cli",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/cryptographic-utils",
       "@celo/dev-utils",
       "@celo/explorer",
       "@celo/flake-tracker",
@@ -57,15 +60,9 @@
       "@celo/base",
       "@celo/connect",
       "@celo/contractkit",
+      "@celo/cryptographic-utils",
       "@celo/identity",
-      "@celo/utils"
-    ]
-  },
-  "@celo/faucet-app": {
-    "location": "packages/faucet",
-    "dependencies": [
-      "@celo/connect",
-      "@celo/contractkit",
+      "@celo/phone-utils",
       "@celo/utils"
     ]
   },
@@ -86,6 +83,7 @@
     "dependencies": [
       "@celo/base",
       "@celo/connect",
+      "@celo/cryptographic-utils",
       "@celo/flake-tracker",
       "@celo/typescript",
       "@celo/utils"
@@ -110,7 +108,6 @@
     "dependencies": [
       "@celo/base",
       "@celo/contractkit",
-      "@celo/identity",
       "@celo/utils",
       "@celo/wallet-local"
     ]
@@ -119,6 +116,7 @@
     "location": "packages/phone-number-privacy/monitor",
     "dependencies": [
       "@celo/contractkit",
+      "@celo/cryptographic-utils",
       "@celo/identity",
       "@celo/phone-number-privacy-common",
       "@celo/utils",
@@ -158,9 +156,19 @@
       "@celo/connect",
       "@celo/dev-utils",
       "@celo/flake-tracker",
+      "@celo/phone-utils",
       "@celo/protocol",
       "@celo/utils",
       "@celo/wallet-local"
+    ]
+  },
+  "@celo/cryptographic-utils": {
+    "location": "packages/sdk/cryptographic-utils",
+    "dependencies": [
+      "@celo/base",
+      "@celo/flake-tracker",
+      "@celo/typescript",
+      "@celo/utils"
     ]
   },
   "@celo/dappkit": {
@@ -168,6 +176,17 @@
     "dependencies": [
       "@celo/connect",
       "@celo/contractkit",
+      "@celo/utils"
+    ]
+  },
+  "@celo/encrypted-backup": {
+    "location": "packages/sdk/encrypted-backup",
+    "dependencies": [
+      "@celo/base",
+      "@celo/dev-utils",
+      "@celo/flake-tracker",
+      "@celo/identity",
+      "@celo/phone-number-privacy-common",
       "@celo/utils"
     ]
   },
@@ -197,6 +216,7 @@
       "@celo/contractkit",
       "@celo/dev-utils",
       "@celo/flake-tracker",
+      "@celo/phone-number-privacy-common",
       "@celo/utils",
       "@celo/wallet-local"
     ]
@@ -213,6 +233,15 @@
     "dependencies": [
       "@celo/dev-utils",
       "@celo/flake-tracker"
+    ]
+  },
+  "@celo/phone-utils": {
+    "location": "packages/sdk/phone-utils",
+    "dependencies": [
+      "@celo/base",
+      "@celo/flake-tracker",
+      "@celo/typescript",
+      "@celo/utils"
     ]
   },
   "@celo/transactions-uri": {
@@ -294,17 +323,6 @@
   },
   "@celo/wallet-rpc": {
     "location": "packages/sdk/wallets/wallet-rpc",
-    "dependencies": [
-      "@celo/connect",
-      "@celo/contractkit",
-      "@celo/dev-utils",
-      "@celo/utils",
-      "@celo/wallet-base",
-      "@celo/wallet-remote"
-    ]
-  },
-  "@celo/wallet-walletconnect": {
-    "location": "packages/sdk/wallets/wallet-walletconnect",
     "dependencies": [
       "@celo/connect",
       "@celo/contractkit",

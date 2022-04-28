@@ -1,4 +1,5 @@
-import { E164Number } from '@celo/utils/lib/io'
+import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
+import { E164Number } from '@celo/phone-utils/lib/io'
 import crypto from 'crypto'
 import debugFactory from 'debug'
 import {
@@ -14,7 +15,6 @@ import {
 
 const debug = debugFactory('kit:odis:matchmaking')
 
-const MATCHMAKING_ENDPOINT = '/getContactMatches'
 // Eventually, the matchmaking process will use blinded numbers same as salt lookups
 // But for now numbers are simply hashed using this static salt
 const SALT = '__celo__'
@@ -48,7 +48,7 @@ export async function getContactMatches(
   }
 
   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    dekSigner = signer
+    dekSigner = signer as EncryptionKeySigner
   }
 
   if (dekSigner) {
@@ -57,9 +57,16 @@ export async function getContactMatches(
     console.warn('Failure to provide DEK will prevent users from requerying their matches')
   }
 
-  const response = await queryOdis<MatchmakingResponse>(signer, body, context, MATCHMAKING_ENDPOINT)
+  const response = await queryOdis<MatchmakingResponse>(
+    signer,
+    body,
+    context,
+    CombinerEndpoint.MATCHMAKING
+  )
 
-  const matchHashes: string[] = response.matchedContacts.map((match) => match.phoneNumber)
+  const matchHashes: string[] = response.matchedContacts.map(
+    (match: { phoneNumber: string }) => match.phoneNumber
+  )
 
   if (!matchHashes || !matchHashes.length) {
     debug('No matches found')

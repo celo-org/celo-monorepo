@@ -37,6 +37,7 @@ The service needs a connection to a full node in order to access chain state. Th
 This could be a node with RPC set up. Preferably this would be an node dedicated to this service. Alternatively, the public Forno endpoints can be used but their uptime guarantees are not as strong. For development with Alfajores, the forno url is `https://alfajores-forno.celo-testnet.org`. For Mainnet, it would be `https://forno.celo.org`
 
 - `BLOCKCHAIN_PROVIDER` - The blockchain node provider for chain state access. `
+- `BLOCKCHAIN_API_KEY` - Optional API key to be added to the authentication header. `
 
 ### Security
 
@@ -123,6 +124,21 @@ Then check on the service to make sure its running:
 `docker container ls`
 
 `docker logs -f {CONTAINER_ID_HERE}`
+
+### Validate before going live
+
+You can test your mainnet service is set up correctly by running a specific end-to-end test that checks the signature against a public polynomial. Because the test requires quota, you must first point your provider endpoint to Alfajores.
+
+1. Change your signer’s forno endpoint to Alfajores: `https://alfajores-forno.celo-testnet.org`
+2. Navigate to the signer directory in monorepo (this directory).
+3. Modify the .env file:
+
+   - Change `ODIS_SIGNER_SERVICE_URL` to your service endpoint.
+   - Swap the `ODIS_PUBLIC_POLYNOMIAL` with the *mainnet* one.
+
+4. Run `yarn jest test/end-to-end/get-blinded-sig.test.ts -t 'When walletAddress has enough quota Returns sig when querying succeeds with unused request'`
+5. Verify test passes.
+6. Change your signer’s forno endpoint back to Mainnet: `https://forno.celo.org`
 
 ### Logs
 
