@@ -50,6 +50,9 @@ contract FederatedAttestations is
   );
   bytes32 public eip712DomainSeparator;
 
+  // TODO: should this be hardcoded here?
+  bytes32 constant signerRole = keccak256(abi.encodePacked("celo.org/core/attestation"));
+
   // TODO ASv2 Event declarations
 
   /**
@@ -193,8 +196,8 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) public view returns (bool) {
-    // TODO check if signer is a valid signer of the account
     require(!revokedSigners[signer]);
+    require(getAccounts().isSigner(issuer, signer, signerRole));
     bytes32 structHash = keccak256(
       abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
     );
@@ -206,7 +209,6 @@ contract FederatedAttestations is
       s
     );
     return guessedSigner == signer;
-    // return guessedSigner
   }
 
   function registerAttestation(

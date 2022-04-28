@@ -9,6 +9,7 @@ import {
   RegistryContract,
   RegistryInstance,
 } from 'types'
+import { keccak256 } from 'web3-utils'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const FederatedAttestations: FederatedAttestationsContract = artifacts.require(
@@ -31,12 +32,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
     accountsInstance = await Accounts.new(true)
     federatedAttestations = await FederatedAttestations.new(true)
     registry = await Registry.new(true)
-    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
-    await registry.setAddressFor(
-      CeloContractName.FederatedAttestations,
-      federatedAttestations.address
-    )
     await accountsInstance.initialize(registry.address)
+    await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
+    // await registry.setAddressFor(
+    //   CeloContractName.FederatedAttestations,
+    //   federatedAttestations.address
+    // )
+
     await federatedAttestations.initialize(registry.address)
     await federatedAttestations.setEip712DomainSeparator()
   })
@@ -63,7 +65,16 @@ contract('FederatedAttestations', (accounts: string[]) => {
     const account = accounts[2]
     const issuedOn = getCurrentUnixTime()
 
-    it('should', async () => {
+    beforeEach(async () => {
+      await accountsInstance.createAccount({ from: issuer })
+
+      // authorizing signer to issuer
+      const role = keccak256('celo.org/core/attestation')
+      await accountsInstance.authorizeSigner(signer, role, { from: issuer })
+      await accountsInstance.completeSignerAuthorization(issuer, role, { from: signer })
+    })
+
+    it('should return true if a valid signature is used', async () => {
       const sig = await getSignatureForAttestation(
         pnIdentifier,
         issuer,
@@ -86,6 +97,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       )
     })
+
+    it('should fail if the signer is revoked', () => {})
   })
 
   describe('#registerAttestation', () => {
