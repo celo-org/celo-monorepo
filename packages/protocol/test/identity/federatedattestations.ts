@@ -21,12 +21,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
   let federatedAttestations: FederatedAttestationsInstance
   let registry: RegistryInstance
 
-  const caller: string = accounts[0]
+  const account1 = accounts[0]
+  const issuer1 = accounts[1]
   const phoneNumber: string = '+18005551212'
-  // TODO ASv2 possibly rename to pnIdentifier
-  const phoneHash: string = getPhoneHash(phoneNumber)
-
-  const getCurrentUnixTime = () => Math.floor(Date.now() / 1000)
+  const pnIdentifier1 = getPhoneHash(phoneNumber)
+  const nowUnixTime = Math.floor(Date.now() / 1000)
 
   beforeEach('FederatedAttestations setup', async () => {
     accountsInstance = await Accounts.new(true)
@@ -44,49 +43,46 @@ contract('FederatedAttestations', (accounts: string[]) => {
   describe('#initialize()', () => {
     it('TODO ASv2', async () => {
       // TODO ASv2
-      assert(caller)
       assert(federatedAttestations)
     })
   })
 
   describe('#lookupAttestations', () => {
-    const issuer1 = accounts[1]
-    const nowUnixTime = getCurrentUnixTime()
-    const issuer2 = accounts[2]
-    const issuer3 = accounts[3]
-    const caller2 = accounts[4]
+    const account2 = accounts[2]
+
+    const issuer2 = accounts[3]
+    const issuer3 = accounts[4]
     const issuer2Signer = accounts[5]
 
-    type testAttestation = {
+    type attestationTestCase = {
       account: string
       issuedOn: number
       signer: string
     }
 
-    const issuer1Attestations: testAttestation[] = [
+    const issuer1Attestations: attestationTestCase[] = [
       {
-        account: caller,
+        account: account1,
         issuedOn: nowUnixTime,
         signer: issuer1,
       },
       // Same issuer as [0], different account
       {
-        account: caller2,
+        account: account2,
         issuedOn: nowUnixTime,
         signer: issuer1,
       },
     ]
-
-    const issuer2Attestations: testAttestation[] = [
+    const issuer2Attestations: attestationTestCase[] = [
       // Same account as issuer1Attestations[0], different issuer
       {
-        account: caller,
+        account: account1,
         issuedOn: nowUnixTime,
         signer: issuer2,
       },
       // Different account and signer
       {
-        account: caller2,
+        account: account2,
         issuedOn: nowUnixTime,
         signer: issuer2Signer,
       },
@@ -99,29 +95,15 @@ contract('FederatedAttestations', (accounts: string[]) => {
       ]) {
         for (const attestation of attestationsPerIssuer) {
           // Require consistent order for test cases
-          await federatedAttestations.registerAttestation(phoneHash, issuer, attestation, {
+          await federatedAttestations.registerAttestation(pnIdentifier1, issuer, attestation, {
             from: attestation.account,
           })
         }
       }
     })
 
-    const runLookupAttestationsTestCase = async (
-      phoneHash: string,
-      trustedIssuers: string[],
-      maxAttestations: number,
-      expectedAttestations: testAttestation[]
-    ) => {
-      const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
-        phoneHash,
-        trustedIssuers,
-        maxAttestations
-      )
-      checkAgainstExpectedAttestations(expectedAttestations, addresses, issuedOns, signers)
-    }
-
     const checkAgainstExpectedAttestations = (
-      expectedAttestations: testAttestation[],
+      expectedAttestations: attestationTestCase[],
       actualAddresses: string[],
       actualIssuedOns: BigNumber[],
       actualSigners: string[]
@@ -138,69 +120,67 @@ contract('FederatedAttestations', (accounts: string[]) => {
     }
 
     it('should return all attestations from one issuer', async () => {
-      await runLookupAttestationsTestCase(
-        phoneHash,
+      const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+        pnIdentifier1,
         [issuer1],
-        issuer1Attestations.length,
-        issuer1Attestations
+        // Do not allow for maxAttestations to coincidentally limit incorrect output
+        issuer1Attestations.length + 1
       )
+      checkAgainstExpectedAttestations(issuer1Attestations, addresses, issuedOns, signers)
     })
 
-    it('should return attestations from multiple issuers', async () => {
-      const expectedAttestations = issuer1Attestations.concat(issuer2Attestations)
-      await runLookupAttestationsTestCase(
-        phoneHash,
-        [issuer1, issuer2],
-        expectedAttestations.length,
-        expectedAttestations
-      )
-    })
-    it('should return attestations ordered by issuer', async () => {
+    it('should return attestations from multiple issuers in correct order', async () => {
       const expectedAttestations = issuer2Attestations.concat(issuer1Attestations)
-      await runLookupAttestationsTestCase(
-        phoneHash,
+      const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+        pnIdentifier1,
         [issuer2, issuer1],
-        expectedAttestations.length,
-        expectedAttestations
+        expectedAttestations.length + 1
       )
+      checkAgainstExpectedAttestations(expectedAttestations, addresses, issuedOns, signers)
     })
+
     it('should return empty list if maxAttestations == 0', async () => {
-      await runLookupAttestationsTestCase(phoneHash, [issuer1], 0, [])
-    })
-    it('should succeed when maxAttestations > available attestations', async () => {
-      await runLookupAttestationsTestCase(
-        phoneHash,
+      const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+        pnIdentifier1,
         [issuer1],
-        issuer1Attestations.length + 1,
-        issuer1Attestations
+        0
       )
+      checkAgainstExpectedAttestations([], addresses, issuedOns, signers)
     })
+
     it('should only return maxAttestations attestations when more are present', async () => {
       const expectedAttestations = issuer1Attestations.slice(0, -1)
-      await runLookupAttestationsTestCase(
-        phoneHash,
+      const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+        pnIdentifier1,
         [issuer1],
-        expectedAttestations.length,
-        expectedAttestations
+        expectedAttestations.length
       )
+      checkAgainstExpectedAttestations(expectedAttestations, addresses, issuedOns, signers)
     })
+
     it('should return none if no attestations exist for an issuer', async () => {
-      await runLookupAttestationsTestCase(phoneHash, [issuer3], 0, [])
+      const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+        pnIdentifier1,
+        [issuer3],
+        1
+      )
+      checkAgainstExpectedAttestations([], addresses, issuedOns, signers)
     })
+
     it('should not return attestations from revoked signers', async () => {
-      const attestationToRevoke = issuer2Attestations[1]
-      const revokedOn = attestationToRevoke.issuedOn - 10
-      await federatedAttestations.revokeSigner(attestationToRevoke.signer, revokedOn)
-      const expectedAttestations = issuer2Attestations.filter(
-        (attestation) =>
-          attestation.signer != attestationToRevoke.signer || attestation.issuedOn < revokedOn
+      const attestationToRevoke = issuer2Attestations[0]
+      await federatedAttestations.revokeSigner(
+        attestationToRevoke.signer,
+        attestationToRevoke.issuedOn - 1
       )
-      await runLookupAttestationsTestCase(
-        phoneHash,
+      const expectedAttestations = issuer2Attestations.slice(1)
+
+      const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+        pnIdentifier1,
         [issuer2],
-        issuer2Attestations.length, // Do not limit by maxAttestations
-        expectedAttestations
+        issuer2Attestations.length
       )
+      checkAgainstExpectedAttestations(expectedAttestations, addresses, issuedOns, signers)
     })
   })
 

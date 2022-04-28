@@ -79,7 +79,8 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Returns attestations for an identifier produced by a list of issuers
+   * @notice Returns info about attestations (with unrevoked signers)
+   *   for an identifier produced by a list of issuers
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @param maxAttestations Limit the number of attestations that will be returned
@@ -90,8 +91,7 @@ contract FederatedAttestations is
    *           Array of m signers
    *         ]; index corresponds to the same attestation
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
-   * @dev Adds all attestations produced by unrevoked signers for an
-   * (identifier, issuer) pair; i.e. not only the most recent attestation.
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
 
   // TODO ASv2 consider also returning an array with counts of attestations per issuer
