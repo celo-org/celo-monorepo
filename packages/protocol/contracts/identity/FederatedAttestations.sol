@@ -171,8 +171,6 @@ contract FederatedAttestations is
     uint256 currIndex = 0;
     bytes32[] memory identifiers = new bytes32[](maxIdentifiers);
 
-    // TODO safemath
-
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       address trustedIssuer = trustedIssuers[i];
       for (uint256 j = 0; j < addressToIdentifiers[account][trustedIssuer].length; j = j.add(1)) {
