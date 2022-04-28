@@ -137,10 +137,10 @@ _See code: [src/commands/exchange/gold.ts](https://github.com/celo-org/celo-mono
 
 ## `celocli exchange:reals`
 
-Exchange Celo Brazilian Real (cBRL) for CELO via the stability mechanism
+Exchange Celo Brazilian Real (cREAL) for CELO via the stability mechanism
 
 ```
-Exchange Celo Brazilian Real (cBRL) for CELO via the stability mechanism
+Exchange Celo Brazilian Real (cREAL) for CELO via the stability mechanism
 
 USAGE
   $ celocli exchange:reals
