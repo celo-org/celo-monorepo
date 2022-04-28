@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/GrandaMento"](../modules/_wrappers_grandamento_.md) › [ExchangeProposal](_wrappers_grandamento_.exchangeproposal.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/GrandaMento"](../modules/_wrappers_grandamento_.md) › [ExchangeProposal](_wrappers_grandamento_.exchangeproposal.md)
 
 # Interface: ExchangeProposal
 

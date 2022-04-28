@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/GrandaMento"](../modules/_wrappers_grandamento_.md) › [ExchangeProposalState](_wrappers_grandamento_.exchangeproposalstate.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/GrandaMento"](../modules/_wrappers_grandamento_.md) › [ExchangeProposalState](_wrappers_grandamento_.exchangeproposalstate.md)
 
 # Enumeration: ExchangeProposalState
 

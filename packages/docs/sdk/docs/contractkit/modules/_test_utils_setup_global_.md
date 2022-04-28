@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["test-utils/setup.global"](_test_utils_setup_global_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["test-utils/setup.global"](_test_utils_setup_global_.md)
 
 # Module: "test-utils/setup.global"
 

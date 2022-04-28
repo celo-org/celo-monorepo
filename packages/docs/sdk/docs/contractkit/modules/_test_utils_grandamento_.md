@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["test-utils/grandaMento"](_test_utils_grandamento_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["test-utils/grandaMento"](_test_utils_grandamento_.md)
 
 # Module: "test-utils/grandaMento"
 

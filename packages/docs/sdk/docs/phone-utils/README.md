@@ -1,15 +1,9 @@
-[@celo/phone-utils](README.md)
+[@celo/phone-utils](README.md) › [Globals](globals.md)
 
 # @celo/phone-utils
 
-## Index
+# @celo/phone-utils
 
-### Modules
+These are A collection of functions for formatting and reading phonenumbers used by the v1 Attestation Service and wallets such as Valora. It uses `google-lib-phonenumber`,  under the hood.
 
-* ["countries"](modules/_countries_.md)
-* ["data/countries/es/country"](modules/_data_countries_es_country_.md)
-* ["getCountryEmoji"](modules/_getcountryemoji_.md)
-* ["getPhoneHash"](modules/_getphonehash_.md)
-* ["inputValidation"](modules/_inputvalidation_.md)
-* ["io"](modules/_io_.md)
-* ["phoneNumbers"](modules/_phonenumbers_.md)
+It may be deprecated in the future.

@@ -26,7 +26,7 @@
 
 ### `Readonly` poprf
 
-• **poprf**: *PoprfServer‹›* = new PoprfServer(MOCK_ODIS_KEYPAIR.privateKey)
+• **poprf**: *any* = new PoprfServer(MOCK_ODIS_KEYPAIR.privateKey)
 
 *Defined in [packages/sdk/encrypted-backup/src/odis.mock.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/encrypted-backup/src/odis.mock.ts#L32)*
 

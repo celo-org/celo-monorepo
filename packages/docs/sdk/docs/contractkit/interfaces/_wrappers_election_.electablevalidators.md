@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Election"](../modules/_wrappers_election_.md) › [ElectableValidators](_wrappers_election_.electablevalidators.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Election"](../modules/_wrappers_election_.md) › [ElectableValidators](_wrappers_election_.electablevalidators.md)
 
 # Interface: ElectableValidators
 

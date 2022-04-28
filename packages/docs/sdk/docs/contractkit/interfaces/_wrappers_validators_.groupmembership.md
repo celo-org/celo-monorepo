@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Validators"](../modules/_wrappers_validators_.md) › [GroupMembership](_wrappers_validators_.groupmembership.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Validators"](../modules/_wrappers_validators_.md) › [GroupMembership](_wrappers_validators_.groupmembership.md)
 
 # Interface: GroupMembership
 
