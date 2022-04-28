@@ -149,6 +149,19 @@ contract FederatedAttestations is
     }
   }
 
+  /**
+   * @notice Returns identifiers mapped (by unrevoked signers) to a
+   *   given account address by a list of trusted issuers
+   * @param account Address of the account
+   * @param trustedIssuers Array of n issuers whose identifier mappings will be used
+   * @param maxIdentifiers Limit the number of identifiers that will be returned
+   * @return Array (length <= maxIdentifiers) of identifiers
+   * @dev Adds identifier info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
+   */
+
+  // TODO ASv2 consider also returning an array with counts of identifiers per issuer
+
   function lookupIdentifiersByAddress(
     address account,
     address[] memory trustedIssuers,
@@ -158,24 +171,28 @@ contract FederatedAttestations is
     uint256 currIndex = 0;
     bytes32[] memory identifiers = new bytes32[](maxIdentifiers);
 
-    for (uint256 i = 0; i < trustedIssuers.length; i++) {
+    // TODO safemath
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       address trustedIssuer = trustedIssuers[i];
-      for (uint256 j = 0; j < addressToIdentifiers[account][trustedIssuer].length; j++) {
+      for (uint256 j = 0; j < addressToIdentifiers[account][trustedIssuer].length; j = j.add(1)) {
         // Iterate through the list of identifiers
         if (currIndex < maxIdentifiers) {
           bytes32 identifier = addressToIdentifiers[account][trustedIssuer][j];
-          // Check if this signer for this particular signer is revoked
-          for (uint256 k = 0; k < identifierToAddresses[identifier][trustedIssuer].length; k++) {
+          // Check if the mapping was produced by a revoked signer
+          for (
+            uint256 k = 0;
+            k < identifierToAddresses[identifier][trustedIssuer].length;
+            k = k.add(1)
+          ) {
             IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuer][k];
-            // For now, just take the first published, unrevoked signer that matches
-            // TODO redo this to take into account either recency or the "correct" identifier
-            // based on the index
+            // (identifier, account, issuer) tuples should be unique
             if (
               attestation.account == account &&
               !_isRevoked(attestation.signer, attestation.issuedOn)
             ) {
               identifiers[currIndex] = identifier;
-              currIndex++;
+              currIndex = currIndex.add(1);
               break;
             }
           }
@@ -187,7 +204,7 @@ contract FederatedAttestations is
     if (currIndex < maxIdentifiers) {
       // Allocate and fill properly-sized array
       bytes32[] memory trimmedIdentifiers = new bytes32[](currIndex);
-      for (uint256 i = 0; i < currIndex; i++) {
+      for (uint256 i = 0; i < currIndex; i = i.add(1)) {
         trimmedIdentifiers[i] = identifiers[i];
       }
       return trimmedIdentifiers;
