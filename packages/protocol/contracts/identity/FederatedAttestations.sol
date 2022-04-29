@@ -186,6 +186,20 @@ contract FederatedAttestations is
     }
   }
 
+  /**
+   * @notice Validates the given attestation code.
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the attestation was issued by the issuer
+   * @param signer Address of the signer of the attestation
+   * @param v The recovery id of the incoming ECDSA signature
+   * @param r Output value r of the ECDSA signature
+   * @param s Output value s of the ECDSA signature
+   * @return Whether the signature is valid
+   * @dev Throwas if signer is revoked
+   * @dev Throws if signer is not an authorized AttestationSigner of the issuer
+   */
   function validateAttestation(
     bytes32 identifier,
     address issuer,
