@@ -35,10 +35,10 @@ contract('FederatedAttestations', (accounts: string[]) => {
     registry = await Registry.new(true)
     await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
-    // await registry.setAddressFor(
-    //   CeloContractName.FederatedAttestations,
-    //   federatedAttestations.address
-    // )
+    await registry.setAddressFor(
+      CeloContractName.FederatedAttestations,
+      federatedAttestations.address
+    )
 
     await federatedAttestations.initialize(registry.address)
     await federatedAttestations.setEip712DomainSeparator()
