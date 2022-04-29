@@ -210,8 +210,11 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) public view returns (bool) {
-    require(!revokedSigners[signer]);
-    require(getAccounts().isSigner(issuer, signer, signerRole));
+    require(!revokedSigners[signer], "Signer has been revoked");
+    require(
+      getAccounts().isSigner(issuer, signer, signerRole),
+      "Signer has not been authorized as an AttestationSigner by the issuer"
+    );
     bytes32 structHash = keccak256(
       abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
     );

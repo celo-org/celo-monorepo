@@ -1,5 +1,6 @@
 import { getSignatureForAttestation } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { assertRevert } from '@celo/protocol/lib/test-utils'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import {
   AccountsContract,
@@ -59,23 +60,15 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should', async () => {})
   })
 
-  describe('#validateAttestation', () => {
+  describe('#validateAttestation', async () => {
     const issuer = accounts[0]
     const signer = accounts[1]
     const account = accounts[2]
     const issuedOn = getCurrentUnixTime()
+    let sig
 
     beforeEach(async () => {
-      await accountsInstance.createAccount({ from: issuer })
-
-      // authorizing signer to issuer
-      const role = keccak256('celo.org/core/attestation')
-      await accountsInstance.authorizeSigner(signer, role, { from: issuer })
-      await accountsInstance.completeSignerAuthorization(issuer, role, { from: signer })
-    })
-
-    it('should return true if a valid signature is used', async () => {
-      const sig = await getSignatureForAttestation(
+      sig = await getSignatureForAttestation(
         pnIdentifier,
         issuer,
         account,
@@ -84,8 +77,99 @@ contract('FederatedAttestations', (accounts: string[]) => {
         1,
         federatedAttestations.address
       )
-      assert.isTrue(
-        await federatedAttestations.validateAttestation(
+      await accountsInstance.createAccount({ from: issuer })
+    })
+
+    describe('with an authorized AttestationSigner', async () => {
+      beforeEach(async () => {
+        const role = keccak256('celo.org/core/attestation')
+        await accountsInstance.authorizeSigner(signer, role, { from: issuer })
+        await accountsInstance.completeSignerAuthorization(issuer, role, { from: signer })
+      })
+
+      it('should return true if a valid signature is used', async () => {
+        assert.isTrue(
+          await federatedAttestations.validateAttestation(
+            pnIdentifier,
+            issuer,
+            account,
+            issuedOn,
+            signer,
+            sig.v,
+            sig.r,
+            sig.s
+          )
+        )
+      })
+
+      it('should return false if an invalid signature is provided', async () => {
+        const sig2 = (sig = await getSignatureForAttestation(
+          pnIdentifier,
+          issuer,
+          account,
+          issuedOn,
+          accounts[3],
+          1,
+          federatedAttestations.address
+        ))
+        assert.isFalse(
+          await federatedAttestations.validateAttestation(
+            pnIdentifier,
+            issuer,
+            account,
+            issuedOn,
+            signer,
+            sig2.v,
+            sig2.r,
+            sig2.s
+          )
+        )
+      })
+
+      const wrongArgs = [
+        [0, 'identifier', getPhoneHash('+14169483397')],
+        [1, 'issuer', accounts[3]],
+        [2, 'account', accounts[3]],
+        [3, 'issuedOn', issuedOn - 1],
+        [4, 'signer', accounts[3]],
+      ]
+      wrongArgs.forEach(([index, arg, wrongValue]) => {
+        it(`should fail if the provided ${arg} is different from the attestation`, async () => {
+          let args = [pnIdentifier, issuer, account, issuedOn, signer, sig.v, sig.r, sig.s]
+          args[index] = wrongValue
+
+          if (arg == 'issuer' || arg == 'signer') {
+            await assertRevert(
+              federatedAttestations.validateAttestation.apply(this, args),
+              'Signer has not been authorized as an AttestationSigner by the issuer'
+            )
+          } else {
+            assert.isFalse(await federatedAttestations.validateAttestation.apply(this, args))
+          }
+        })
+      })
+
+      it('should revert if the signer is revoked', async () => {
+        await federatedAttestations.revokeSigner(signer)
+        await assertRevert(
+          federatedAttestations.validateAttestation(
+            pnIdentifier,
+            issuer,
+            account,
+            issuedOn,
+            signer,
+            sig.v,
+            sig.r,
+            sig.s
+          ),
+          'Signer has been revoked'
+        )
+      })
+    })
+
+    it('should revert if the signer is not authorized as an AttestationSigner by the issuer', async () => {
+      await assertRevert(
+        federatedAttestations.validateAttestation(
           pnIdentifier,
           issuer,
           account,
@@ -98,7 +182,24 @@ contract('FederatedAttestations', (accounts: string[]) => {
       )
     })
 
-    it('should fail if the signer is revoked', () => {})
+    it('should revert if the signer is authorized as a different role by the issuer', async () => {
+      const role = keccak256('random')
+      await accountsInstance.authorizeSigner(signer, role, { from: issuer })
+      await accountsInstance.completeSignerAuthorization(issuer, role, { from: signer })
+
+      await assertRevert(
+        federatedAttestations.validateAttestation(
+          pnIdentifier,
+          issuer,
+          account,
+          issuedOn,
+          signer,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+      )
+    })
   })
 
   describe('#registerAttestation', () => {
