@@ -48,12 +48,6 @@ export const handler = async (argv: InitialArgv) => {
       secretLabels,
       dbPassword
     )
-
-    await createSecretInSecretManagerIfNotExists(
-      `${helmReleaseName}-dbUrl`,
-      secretLabels,
-      `postgres://${dbUser}:${dbPassword}@127.0.0.1:5432/blockscout`
-    )
   } else {
     console.info(
       `Skipping Cloud SQL Database creation and IAM setup. Please check if you can execute the skipped steps.`

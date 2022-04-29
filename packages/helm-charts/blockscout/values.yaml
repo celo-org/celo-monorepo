@@ -227,7 +227,6 @@ blockscout:
     discordWebhookUrl: ""
     dbUser: ""
     dbPassword: ""
-    dbUrl: ""
     recaptcha:
       projectId: ""
       siteKey: ""

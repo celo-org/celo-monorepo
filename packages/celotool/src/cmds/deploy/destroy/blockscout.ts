@@ -41,7 +41,6 @@ export const handler = async (argv: BlockscoutDestroyArgv) => {
   await cleanDefaultIngress(argv.celoEnv, `${argv.celoEnv}-blockscout-web-ingress`)
   await deleteSecretFromSecretManager(`${helmReleaseName}-dbUser`)
   await deleteSecretFromSecretManager(`${helmReleaseName}-dbPassword`)
-  await deleteSecretFromSecretManager(`${helmReleaseName}-dbUrl`)
 }
 
 async function cleanDefaultIngress(celoEnv: string, ingressName: string) {

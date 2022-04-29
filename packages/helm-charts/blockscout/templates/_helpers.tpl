@@ -160,8 +160,6 @@ blockscout components.
   value: {{ .Values.blockscout.archiveNodes.jsonrpcWsUrl }}
 - name: PGUSER
   value: {{ .Values.blockscout.secrets.dbUser }}
-- name: DATABASE_URL
-  value: {{ .Values.blockscout.secrets.dbUrl }}
 - name: DATABASE_DB
   value: {{ .Database.name }}
 - name: DATABASE_HOSTNAME
