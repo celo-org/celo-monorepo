@@ -154,7 +154,7 @@ describe(`BLS service computes signature`, () => {
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
       throw new Error('Expected failure with missing signatures')
-    } catch (e: any) {
+    } catch (e) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
   })
@@ -198,7 +198,7 @@ describe(`BLS service computes signature`, () => {
     // Should fail since 1/3 sigs are invalid
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
-    } catch (e: any) {
+    } catch (e) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
     // Should be false, now that the invalid signature has been removed
@@ -256,7 +256,7 @@ describe(`BLS service computes signature`, () => {
     // Should fail since signature from url3 was generated with the wrong key version
     try {
       await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
-    } catch (e: any) {
+    } catch (e) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
 
