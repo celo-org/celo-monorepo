@@ -58,12 +58,23 @@ describe(getPhoneNumberIdentifier, () => {
         combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
       })
 
+      const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
+      const base64BlindedMessage = await getBlindedPhoneNumber(mockE164Number, blsBlindingClient)
+      const base64BlindSig = await getBlindedPhoneNumberSignature(
+        mockAccount,
+        authSigner,
+        serviceContext,
+        base64BlindedMessage
+      )
+      const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
+
       await expect(
         getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
       ).resolves.toMatchObject({
         e164Number: mockE164Number,
         pepper: expectedPepper,
         phoneHash: expectedPhoneHash,
+        unblindedSignature: base64UnblindedSig,
       })
     })
 
