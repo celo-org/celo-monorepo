@@ -33,6 +33,7 @@
     "is-base64": "^1.1.0"
   },
   "devDependencies": {
+    "@celo/phone-utils": "2.0.0",
     "@celo/poprf": "^0.1.6",
     "@celo/wallet-local": "2.0.0",
     "@types/btoa": "^1.2.3",

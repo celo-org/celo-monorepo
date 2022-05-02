@@ -1481,6 +1481,22 @@
     elliptic "^6.5.4"
     is-base64 "^1.1.0"
 
+"@celo/phone-utils@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@celo/phone-utils/-/phone-utils-2.0.0.tgz#0b0cc43326281a88396808cc5f6c4bdd774fe4d5"
+  integrity sha512-/A9SeE/yZJ5w8wuwcgnoAXlPgbWHeYE2LlvK+E3cPI+i+x75kyQghyQbpdbRe1n6XHre+IpzZsJCrsZlNNYQJQ==
+  dependencies:
+    "@celo/base" "2.0.0"
+    "@celo/utils" "2.0.0"
+    "@types/country-data" "^0.0.0"
+    "@types/ethereumjs-util" "^5.2.0"
+    "@types/google-libphonenumber" "^7.4.17"
+    "@types/node" "^10.12.18"
+    country-data "^0.0.31"
+    fp-ts "2.1.1"
+    google-libphonenumber "^3.2.15"
+    io-ts "2.0.1"
+
 "@celo/poprf@^0.1.6":
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/@celo/poprf/-/poprf-0.1.6.tgz#f8960a454b027910741595ecd3fcc067838c16e1"
