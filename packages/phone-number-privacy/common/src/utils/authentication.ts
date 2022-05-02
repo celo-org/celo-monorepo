@@ -86,7 +86,7 @@ export function verifyDEKSignature(
     if (key.verify(msgDigest, parsedSig)) {
       return true
     }
-    // TODO: Remove this once clients upgrade to @celo/identity v1.5.3
+    // TODO: Remove this once clients upgrade to @celo/identity v2.0.0 or greater
     // Due to an error in the original implementation of the sign and verify functions
     // used here, older clients may generate signatures over the truncated message,
     // instead of its hash. These signatures represent a risk to the signer as they do
