@@ -1,10 +1,3 @@
-import { newKit } from '@celo/contractkit'
-import {
-  AuthenticationMethod,
-  EncryptionKeySigner,
-  ServiceContext,
-  WalletKeySigner,
-} from '@celo/identity/lib/odis/query'
 import { PhoneNumberUtils } from '@celo/phone-utils'
 import {
   ensureLeading0x,
@@ -12,6 +5,13 @@ import {
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
 import 'isomorphic-fetch'
+import { newKit } from '../../../../sdk/contractkit'
+import {
+  AuthenticationMethod,
+  EncryptionKeySigner,
+  ServiceContext,
+  WalletKeySigner,
+} from '../../../../sdk/identity/lib/odis/query'
 import { getBlindedPhoneNumber } from '../../../common/src/test/utils'
 
 require('dotenv').config()

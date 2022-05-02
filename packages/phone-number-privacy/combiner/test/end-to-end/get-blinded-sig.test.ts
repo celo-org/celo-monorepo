@@ -1,12 +1,12 @@
-import { OdisUtils } from '@celo/identity/lib/odis'
+import { Endpoint } from '@celo/phone-number-privacy-common'
+import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
+import 'isomorphic-fetch'
+import { OdisUtils } from '../../../../sdk/identity/lib/odis'
 import {
   AuthenticationMethod,
   ErrorMessages,
   SignMessageRequest,
-} from '@celo/identity/lib/odis/query'
-import { Endpoint } from '@celo/phone-number-privacy-common'
-import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
-import 'isomorphic-fetch'
+} from '../../../../sdk/identity/lib/odis/query'
 import { replenishQuota } from '../../../common/src/test/utils'
 import { VERSION } from '../../src/config'
 import {
