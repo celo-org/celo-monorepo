@@ -1,6 +1,6 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import {
-  Endpoints,
+  Endpoint,
   GetQuotaResponse,
   rootLogger as logger,
   SignMessageResponseFailure,
@@ -58,7 +58,7 @@ describe('Running against a deployed service', () => {
   })
 
   it('Service is deployed at correct version', async () => {
-    const response = await fetch(ODIS_SIGNER + Endpoints.STATUS, { method: 'GET' })
+    const response = await fetch(ODIS_SIGNER + Endpoint.STATUS, { method: 'GET' })
     const body = await response.json()
     // This checks against local package.json version, change if necessary
     expect(body.version).toBe(getVersion())
@@ -119,7 +119,7 @@ describe('Running against a deployed service', () => {
 
   describe('When account address has enough quota', () => {
     // if these tests are failing, it may just be that the address needs to be fauceted:
-    // celotooljs account faucet --account ACCOUNT_ADDRESS2 --dollar 1 --gold 1 -e <ENV> --verbose
+    // celotooljs account faucet --account 0x588e4b68193001e4d10928660aB4165b813717C0 --e alfajores --verbose --tokenParams CELO,2 cUSD,2 cEUR,2
 
     beforeAll(async () => {
       console.log('ACCOUNT_ADDRESS1 ' + ACCOUNT_ADDRESS1)
@@ -184,9 +184,10 @@ describe('Running against a deployed service', () => {
     })
   })
 
+  // TODO(Alec): Why are these tests failing on Mainnet?
   describe('When walletAddress has enough quota', () => {
     // if these tests are failing, it may just be that the address needs to be fauceted:
-    // celotooljs account faucet --account ACCOUNT_ADDRESS2 --dollar 1 --gold 1 -e <ENV> --verbose
+    // celotooljs account faucet --account 0x588e4b68193001e4d10928660aB4165b813717C0 --e alfajores --verbose --tokenParams CELO,2 cUSD,2 cEUR,2
     // NOTE: DO NOT FAUCET ACCOUNT_ADDRESS3
     let initialQuota: number
     let initialQueryCount: number
@@ -205,6 +206,8 @@ describe('Running against a deployed service', () => {
     })
 
     it('Returns sig when querying succeeds with unused request', async () => {
+      // Note: Use this test to check the signers' key configuration. Modify .env to try out different
+      // public polynomials
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
       const blindedPhoneNumber = getRandomBlindedPhoneNumber()
       const response = await postToSignMessage(blindedPhoneNumber, ACCOUNT_ADDRESS3)
