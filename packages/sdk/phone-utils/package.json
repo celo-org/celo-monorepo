@@ -26,12 +26,12 @@
     "@celo/utils": "2.0.1-dev",
     "@types/country-data": "^0.0.0",
     "@types/ethereumjs-util": "^5.2.0",
-    "@types/google-libphonenumber": "^7.4.17",
+    "@types/google-libphonenumber": "^7.4.23",
     "@types/node": "^10.12.18",
     "country-data": "^0.0.31",
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",
-    "google-libphonenumber": "^3.2.15"
+    "google-libphonenumber": "^3.2.27"
   },
   "devDependencies": {
     "@celo/flake-tracker": "0.0.1-dev",
