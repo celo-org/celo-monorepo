@@ -173,13 +173,3 @@ yarn build --ignore docs
 
 > The docs package relies on gitbook which has problems off of a fresh install. Running
 > `yarn build --ignore docs` is a known workaround.
-
-## Running the mobile wallet
-
-To build and run the mobile wallet on your iOS or Android devices see the guide in the [mobile](https://github.com/celo-org/wallet/tree/main/packages/mobile) directory.
-
-[celo-monorepo]: https://github.com/celo-org/celo-monorepo
-[celo-blockchain]: https://github.com/celo-org/celo-blockchain
-[celo-bls]: https://github.com/celo-org/celo-bls-go
-[Homebrew]: https://brew.sh
-[https://github.com/nvm-sh/nvm]: https://github.com/nvm-sh/nvm
