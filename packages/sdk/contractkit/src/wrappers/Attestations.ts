@@ -5,6 +5,7 @@ import { notEmpty, zip3 } from '@celo/base/lib/collections'
 import { parseSolidityStringArray } from '@celo/base/lib/parsing'
 import { appendPath } from '@celo/base/lib/string'
 import { Address, Connection, toTransactionObject } from '@celo/connect'
+import { AttestationRequest, GetAttestationRequest } from '@celo/phone-utils/lib/io'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import BigNumber from 'bignumber.js'
@@ -29,25 +30,6 @@ function hashAddressToSingleDigit(address: Address): number {
 
 export function getSecurityCodePrefix(issuerAddress: Address) {
   return `${hashAddressToSingleDigit(issuerAddress)}`
-}
-
-// from '@celo/phone-utils/lib/io'
-interface AttestationRequest {
-  phoneNumber: string
-  account: string
-  issuer: string
-  salt: string | undefined
-  smsRetrieverAppSig: string | undefined
-  securityCodePrefix: string | undefined
-  language: string | undefined
-  phoneNumberSignature: string | undefined
-}
-interface GetAttestationRequest {
-  phoneNumber: string
-  account: string
-  issuer: string
-  salt: string | undefined
-  securityCode: string | undefined
 }
 
 export interface AttestationStat {

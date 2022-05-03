@@ -18,6 +18,7 @@ const COUNTRY_CODES = {
   AR: '+54',
   MX: '+52',
   LR: '+231',
+  CI: '+225',
 }
 
 const TEST_PHONE_NUMBERS = {
@@ -36,12 +37,15 @@ const TEST_PHONE_NUMBERS = {
   VALID_MX_2: '1 33 1234-5678',
   VALID_MX_3: '+52 1 33 1234-5678',
   VALID_LR: '881551952',
+  VALID_CI: '+225 2122003801',
   FORMATTED_AR: '+5491126431111',
   FORMATTED_MX: '+523312345678',
   FORMATTED_LR: '+231881551952',
+  FORMATTED_CI: '+2252122003801',
   DISPLAY_AR: '9 11 2643-1111',
   DISPLAY_MX: '33 1234 5678',
   DISPLAY_LR: '88 155 1952',
+  DISPLAY_CI: '21 22 0 03801',
   INVALID_EMPTY: '',
   TOO_SHORT: '123',
   VALID_E164: '+141555544444',
@@ -134,6 +138,12 @@ describe('Phone number formatting and utilities', () => {
         TEST_PHONE_NUMBERS.FORMATTED_LR
       )
     })
+
+    it('Format CI phone with country code', () => {
+      expect(getE164Number(TEST_PHONE_NUMBERS.VALID_CI, COUNTRY_CODES.CI)).toBe(
+        TEST_PHONE_NUMBERS.FORMATTED_CI
+      )
+    })
   })
 
   describe('Display formatting', () => {
@@ -212,6 +222,12 @@ describe('Phone number formatting and utilities', () => {
         TEST_PHONE_NUMBERS.DISPLAY_LR
       )
     })
+
+    it('Format CI phone with no country code', () => {
+      expect(getDisplayPhoneNumber(TEST_PHONE_NUMBERS.VALID_CI, COUNTRY_CODES.CI)).toBe(
+        TEST_PHONE_NUMBERS.DISPLAY_CI
+      )
+    })
   })
 
   describe('Number Parsing', () => {
@@ -254,6 +270,15 @@ describe('Phone number formatting and utilities', () => {
         regionCode: 'MX',
       })
     })
+
+    it('Format CI phone #', () => {
+      expect(parsePhoneNumber(TEST_PHONE_NUMBERS.VALID_CI, COUNTRY_CODES.CI)).toMatchObject({
+        e164Number: TEST_PHONE_NUMBERS.FORMATTED_CI,
+        displayNumber: TEST_PHONE_NUMBERS.DISPLAY_CI,
+        countryCode: 225,
+        regionCode: 'CI',
+      })
+    })
   })
 
   describe('Other phone helper methods', () => {
@@ -261,18 +286,21 @@ describe('Phone number formatting and utilities', () => {
       expect(getCountryCode(TEST_PHONE_NUMBERS.VALID_US_3)).toBe(1)
       expect(getCountryCode(TEST_PHONE_NUMBERS.VALID_DE_3)).toBe(49)
       expect(getCountryCode(TEST_PHONE_NUMBERS.VALID_AR_3)).toBe(54)
+      expect(getCountryCode(TEST_PHONE_NUMBERS.VALID_CI)).toBe(225)
     })
 
     it('gets region code', () => {
       expect(getRegionCode(TEST_PHONE_NUMBERS.VALID_US_3)).toBe('US')
       expect(getRegionCode(TEST_PHONE_NUMBERS.VALID_DE_3)).toBe('DE')
       expect(getRegionCode(TEST_PHONE_NUMBERS.VALID_AR_3)).toBe('AR')
+      expect(getRegionCode(TEST_PHONE_NUMBERS.VALID_CI)).toBe('CI')
     })
 
     it('gets region code from country code', () => {
       expect(getRegionCodeFromCountryCode(COUNTRY_CODES.US)).toBe('US')
       expect(getRegionCodeFromCountryCode(COUNTRY_CODES.DE)).toBe('DE')
       expect(getRegionCodeFromCountryCode(COUNTRY_CODES.AR)).toBe('AR')
+      expect(getRegionCodeFromCountryCode(COUNTRY_CODES.CI)).toBe('CI')
     })
 
     it('checks if number is e164', () => {
@@ -291,18 +319,21 @@ describe('Phone number formatting and utilities', () => {
       expect(getExampleNumber(COUNTRY_CODES.AR)).toBe('000 0000-0000')
       expect(getExampleNumber(COUNTRY_CODES.DE)).toBe('000 000000')
       expect(getExampleNumber(COUNTRY_CODES.US)).toBe('(000) 000-0000')
+      expect(getExampleNumber(COUNTRY_CODES.CI)).toBe('00 00 0 00000')
     })
 
     it('gets example by country', () => {
       expect(getExampleNumber(COUNTRY_CODES.AR, false)).toBe('011 2345-6789')
       expect(getExampleNumber(COUNTRY_CODES.DE, false)).toBe('030 123456')
       expect(getExampleNumber(COUNTRY_CODES.US, false)).toBe('(201) 555-0123')
+      expect(getExampleNumber(COUNTRY_CODES.CI, false)).toBe('21 23 4 56789')
     })
 
     it('gets example by country showing zeros in international way', () => {
       expect(getExampleNumber(COUNTRY_CODES.AR, true, true)).toBe('+54 00 0000-0000')
       expect(getExampleNumber(COUNTRY_CODES.DE, true, true)).toBe('+49 00 000000')
       expect(getExampleNumber(COUNTRY_CODES.US, true, true)).toBe('+1 000-000-0000')
+      expect(getExampleNumber(COUNTRY_CODES.CI, true, true)).toBe('+225 00 00 0 00000')
     })
   })
 })

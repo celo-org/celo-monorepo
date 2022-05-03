@@ -103,6 +103,7 @@ spec:
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "DbSuffix" "-replica" "Database" .Values.blockscout.api.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
+{{ include "celo.blockscout-volumes" (dict "nfs_volumes" false "Release" .Release) | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
