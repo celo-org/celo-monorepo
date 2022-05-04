@@ -805,7 +805,7 @@ contract('Reserve', (accounts: string[]) => {
       })
     })
 
-    describe.only('works with stabletoken with no report', async () => {
+    describe('works with stabletoken with no report', async () => {
       let mockStableToken2: MockStableTokenInstance
       beforeEach(async () => {
         // Add another stable token
