@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["utils/abi-utils"](_utils_abi_utils_.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["utils/abi-utils"](_utils_abi_utils_.md)
 
 # Module: "utils/abi-utils"
 
@@ -16,7 +16,9 @@
 
 ▸ **decodeStringParameter**(`ethAbi`: [AbiCoder](../interfaces/_abi_types_.abicoder.md), `str`: string): *any*
 
-*Defined in [packages/sdk/connect/src/utils/abi-utils.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L22)*
+*Defined in [utils/abi-utils.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L25)*
+
+**`internal`** 
 
 **Parameters:**
 
@@ -31,18 +33,20 @@ ___
 
 ### `Const` getAbiByName
 
-▸ **getAbiByName**(`abi`: AbiItem[], `methodName`: string): *AbiItem*
+▸ **getAbiByName**(`abi`: [AbiItem](../interfaces/_abi_types_.abiitem.md)[], `methodName`: string): *[AbiItem](../interfaces/_abi_types_.abiitem.md)*
 
-*Defined in [packages/sdk/connect/src/utils/abi-utils.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L4)*
+*Defined in [utils/abi-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L5)*
+
+**`internal`** 
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`abi` | AbiItem[] |
+`abi` | [AbiItem](../interfaces/_abi_types_.abiitem.md)[] |
 `methodName` | string |
 
-**Returns:** *AbiItem*
+**Returns:** *[AbiItem](../interfaces/_abi_types_.abiitem.md)*
 
 ___
 
@@ -50,7 +54,9 @@ ___
 
 ▸ **parseDecodedParams**(`params`: [DecodedParamsObject](../interfaces/_abi_types_.decodedparamsobject.md)): *object*
 
-*Defined in [packages/sdk/connect/src/utils/abi-utils.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L7)*
+*Defined in [utils/abi-utils.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/abi-utils.ts#L9)*
+
+**`internal`** 
 
 **Parameters:**
 

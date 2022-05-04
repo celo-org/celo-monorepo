@@ -1,13 +1,14 @@
-[@celo/contractkit](../README.md) › ["celo-tokens"](_celo_tokens_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["celo-tokens"](_celo_tokens_.md)
 
 # Module: "celo-tokens"
 
 ## Index
 
-### Enumerations
+### References
 
-* [StableToken](../enums/_celo_tokens_.stabletoken.md)
-* [Token](../enums/_celo_tokens_.token.md)
+* [CeloTokenType](_celo_tokens_.md#celotokentype)
+* [StableToken](_celo_tokens_.md#stabletoken)
+* [Token](_celo_tokens_.md#token)
 
 ### Classes
 
@@ -20,21 +21,43 @@
 
 ### Type aliases
 
-* [CeloTokenType](_celo_tokens_.md#celotokentype)
+* [CeloTokenWrapper](_celo_tokens_.md#celotokenwrapper)
 * [EachCeloToken](_celo_tokens_.md#eachcelotoken)
+
+### Functions
+
+* [isStableTokenContract](_celo_tokens_.md#isstabletokencontract)
 
 ### Object literals
 
 * [celoTokenInfos](_celo_tokens_.md#const-celotokeninfos)
 * [stableTokenInfos](_celo_tokens_.md#const-stabletokeninfos)
 
-## Type aliases
+## References
 
 ###  CeloTokenType
 
-Ƭ **CeloTokenType**: *[StableToken](../enums/_celo_tokens_.stabletoken.md) | [Token](../enums/_celo_tokens_.token.md)*
+• **CeloTokenType**:
 
-*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:17](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L17)*
+___
+
+###  StableToken
+
+• **StableToken**:
+
+___
+
+###  Token
+
+• **Token**:
+
+## Type aliases
+
+###  CeloTokenWrapper
+
+Ƭ **CeloTokenWrapper**: *[GoldTokenWrapper](../classes/_wrappers_goldtokenwrapper_.goldtokenwrapper.md) | [StableTokenWrapper](../classes/_wrappers_stabletokenwrapper_.stabletokenwrapper.md)*
+
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:14](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L14)*
 
 ___
 
@@ -42,9 +65,25 @@ ___
 
 Ƭ **EachCeloToken**: *object*
 
-*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L21)*
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L10)*
 
 #### Type declaration:
+
+## Functions
+
+###  isStableTokenContract
+
+▸ **isStableTokenContract**(`contract`: [CeloContract](../enums/_base_.celocontract.md)): *boolean*
+
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:275](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L275)*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`contract` | [CeloContract](../enums/_base_.celocontract.md) |
+
+**Returns:** *boolean*
 
 ## Object literals
 
@@ -52,17 +91,17 @@ ___
 
 ### ▪ **celoTokenInfos**: *object*
 
-*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L57)*
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L48)*
 
 Basic info for each supported celo token, including stable tokens
 
 ▪ **[Token.CELO]**: *object*
 
-*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:60](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L60)*
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L51)*
 
 * **contract**: *[GoldToken](../enums/_base_.celocontract.md#goldtoken)* = CeloContract.GoldToken
 
-* **symbol**: *[CELO](../enums/_celo_tokens_.token.md#celo)* = Token.CELO
+* **symbol**: *CELO* = Token.CELO
 
 ___
 
@@ -70,36 +109,36 @@ ___
 
 ### ▪ **stableTokenInfos**: *object*
 
-*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L36)*
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L27)*
 
 Basic info for each stable token
 
 ▪ **[StableToken.cEUR]**: *object*
 
-*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L44)*
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L35)*
 
 * **contract**: *[StableTokenEUR](../enums/_base_.celocontract.md#stabletokeneur)* = CeloContract.StableTokenEUR
 
 * **exchangeContract**: *[ExchangeEUR](../enums/_base_.celocontract.md#exchangeeur)* = CeloContract.ExchangeEUR
 
-* **symbol**: *[cEUR](../enums/_celo_tokens_.stabletoken.md#ceur)* = StableToken.cEUR
+* **symbol**: *cEUR* = StableToken.cEUR
 
 ▪ **[StableToken.cREAL]**: *object*
 
-*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L49)*
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L40)*
 
 * **contract**: *[StableTokenBRL](../enums/_base_.celocontract.md#stabletokenbrl)* = CeloContract.StableTokenBRL
 
 * **exchangeContract**: *[ExchangeBRL](../enums/_base_.celocontract.md#exchangebrl)* = CeloContract.ExchangeBRL
 
-* **symbol**: *[cREAL](../enums/_celo_tokens_.stabletoken.md#creal)* = StableToken.cREAL
+* **symbol**: *cREAL* = StableToken.cREAL
 
 ▪ **[StableToken.cUSD]**: *object*
 
-*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L39)*
+*Defined in [packages/sdk/contractkit/src/celo-tokens.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L30)*
 
 * **contract**: *[StableToken](../enums/_base_.celocontract.md#stabletoken)* = CeloContract.StableToken
 
 * **exchangeContract**: *[Exchange](../enums/_base_.celocontract.md#exchange)* = CeloContract.Exchange
 
-* **symbol**: *[cUSD](../enums/_celo_tokens_.stabletoken.md#cusd)* = StableToken.cUSD
+* **symbol**: *cUSD* = StableToken.cUSD

@@ -1,12 +1,14 @@
 {
   "name": "@celo/phone-utils",
-  "version": "1.5.3-dev",
+  "version": "2.0.1-dev",
   "description": "Celo phone utils",
   "author": "Celo",
   "license": "Apache-2.0",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "sideEffects": false,
+  "homepage": "https://celo-sdk-docs.readthedocs.io/en/latest/phone-utils",
+  "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/phone-utils",
   "scripts": {
     "prepublishOnly": "yarn build",
     "build": "tsc -b .",
@@ -20,16 +22,16 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "1.5.3-dev",
-    "@celo/utils": "1.5.3-dev",
+    "@celo/base": "2.0.1-dev",
+    "@celo/utils": "2.0.1-dev",
     "@types/country-data": "^0.0.0",
     "@types/ethereumjs-util": "^5.2.0",
-    "@types/google-libphonenumber": "^7.4.17",
+    "@types/google-libphonenumber": "^7.4.23",
     "@types/node": "^10.12.18",
     "country-data": "^0.0.31",
     "fp-ts": "2.1.1",
     "io-ts": "2.0.1",
-    "google-libphonenumber": "^3.2.15"
+    "google-libphonenumber": "^3.2.27"
   },
   "devDependencies": {
     "@celo/flake-tracker": "0.0.1-dev",

@@ -1,7 +1,9 @@
+import { Connection } from '@celo/connect'
 import Web3 from 'web3'
 import { CeloContract } from '.'
+import { AddressRegistry } from './address-registry'
 import { ValidWrappers, WrapperCache } from './contract-cache'
-import { newKitFromWeb3 } from './kit'
+import { Web3ContractCache } from './web3-contract-cache'
 
 const TestedWrappers: ValidWrappers[] = [
   CeloContract.GoldToken,
@@ -14,10 +16,13 @@ const TestedWrappers: ValidWrappers[] = [
 ]
 
 function newWrapperCache() {
-  const kit = newKitFromWeb3(new Web3('http://localhost:8545'))
+  const web3 = new Web3('http://localhost:8545')
+  const connection = new Connection(web3)
+  const registry = new AddressRegistry(connection)
+  const web3ContractCache = new Web3ContractCache(registry)
   const AnyContractAddress = '0xe832065fb5117dbddcb566ff7dc4340999583e38'
-  jest.spyOn(kit.registry, 'addressFor').mockResolvedValue(AnyContractAddress)
-  const contractCache = new WrapperCache(kit)
+  jest.spyOn(registry, 'addressFor').mockResolvedValue(AnyContractAddress)
+  const contractCache = new WrapperCache(connection, web3ContractCache, registry)
   return contractCache
 }
 

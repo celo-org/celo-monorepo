@@ -1,4 +1,4 @@
-[@celo/phone-utils](../README.md) › ["inputValidation"](_inputvalidation_.md)
+[@celo/phone-utils](../README.md) › [Globals](../globals.md) › ["inputValidation"](_inputvalidation_.md)
 
 # Module: "inputValidation"
 

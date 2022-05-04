@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/GrandaMento"](../modules/_wrappers_grandamento_.md) › [GrandaMentoConfig](_wrappers_grandamento_.grandamentoconfig.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/GrandaMento"](../modules/_wrappers_grandamento_.md) › [GrandaMentoConfig](_wrappers_grandamento_.grandamentoconfig.md)
 
 # Interface: GrandaMentoConfig
 

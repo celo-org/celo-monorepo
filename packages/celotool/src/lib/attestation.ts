@@ -1,6 +1,6 @@
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { RequestAttestationError } from '@celo/env-tests/lib/shared/attestation'
-import { PhoneNumberUtils } from '@celo/utils'
+import { PhoneNumberUtils } from '@celo/phone-utils'
 import { sample } from 'lodash'
 import { Twilio } from 'twilio'
 

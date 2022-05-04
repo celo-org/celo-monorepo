@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/GrandaMento"](../modules/_wrappers_grandamento_.md) › [GrandaMentoWrapper](_wrappers_grandamento_.grandamentowrapper.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/GrandaMento"](../modules/_wrappers_grandamento_.md) › [GrandaMentoWrapper](_wrappers_grandamento_.grandamentowrapper.md)
 
 # Class: GrandaMentoWrapper
 
@@ -56,17 +56,17 @@
 
 ###  constructor
 
-\+ **new GrandaMentoWrapper**(`kit`: [ContractKit](_kit_.contractkit.md), `contract`: GrandaMento): *[GrandaMentoWrapper](_wrappers_grandamento_.grandamentowrapper.md)*
+\+ **new GrandaMentoWrapper**(`connection`: Connection, `contract`: GrandaMento): *[GrandaMentoWrapper](_wrappers_grandamento_.grandamentowrapper.md)*
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[constructor](_wrappers_basewrapper_.basewrapper.md#constructor)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L30)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L32)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`kit` | [ContractKit](_kit_.contractkit.md) |
+`connection` | Connection |
 `contract` | GrandaMento |
 
 **Returns:** *[GrandaMentoWrapper](_wrappers_grandamento_.grandamentowrapper.md)*
@@ -75,7 +75,10 @@ Name | Type |
 
 ###  approveExchangeProposal
 
-• **approveExchangeProposal**: *function* = proxySend(this.kit, this.contract.methods.approveExchangeProposal)
+• **approveExchangeProposal**: *function* = proxySend(
+    this.connection,
+    this.contract.methods.approveExchangeProposal
+  )
 
 *Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L105)*
 
@@ -111,9 +114,9 @@ ___
 
 ###  cancelExchangeProposal
 
-• **cancelExchangeProposal**: *function* = proxySend(this.kit, this.contract.methods.cancelExchangeProposal)
+• **cancelExchangeProposal**: *function* = proxySend(this.connection, this.contract.methods.cancelExchangeProposal)
 
-*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:108](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L108)*
+*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L114)*
 
 #### Type declaration:
 
@@ -136,7 +139,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[eventTypes](_wrappers_basewrapper_.basewrapper.md#eventtypes)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L61)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L63)*
 
 ___
 
@@ -146,7 +149,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[events](_wrappers_basewrapper_.basewrapper.md#events)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L59)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L61)*
 
 ___
 
@@ -174,9 +177,12 @@ ___
 
 ###  executeExchangeProposal
 
-• **executeExchangeProposal**: *function* = proxySend(this.kit, this.contract.methods.executeExchangeProposal)
+• **executeExchangeProposal**: *function* = proxySend(
+    this.connection,
+    this.contract.methods.executeExchangeProposal
+  )
 
-*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:107](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L107)*
+*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L110)*
 
 #### Type declaration:
 
@@ -221,7 +227,7 @@ ___
       acc[method] =
         methodABI === undefined
           ? '0x'
-          : this.kit.connection.getAbiCoder().encodeFunctionSignature(methodABI)
+          : this.connection.getAbiCoder().encodeFunctionSignature(methodABI)
 
       return acc
     },
@@ -230,7 +236,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L66)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L68)*
 
 ___
 
@@ -254,7 +260,7 @@ ___
 
 ###  setApprover
 
-• **setApprover**: *function* = proxySend(this.kit, this.contract.methods.setApprover)
+• **setApprover**: *function* = proxySend(this.connection, this.contract.methods.setApprover)
 
 *Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L66)*
 
@@ -273,7 +279,7 @@ ___
 ###  setMaxApprovalExchangeRateChange
 
 • **setMaxApprovalExchangeRateChange**: *function* = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.setMaxApprovalExchangeRateChange
   )
 
@@ -293,7 +299,7 @@ ___
 
 ###  setSpread
 
-• **setSpread**: *function* = proxySend(this.kit, this.contract.methods.setSpread)
+• **setSpread**: *function* = proxySend(this.connection, this.contract.methods.setSpread)
 
 *Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:79](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L79)*
 
@@ -312,7 +318,7 @@ ___
 ###  setStableTokenExchangeLimits
 
 • **setStableTokenExchangeLimits**: *function* = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.setStableTokenExchangeLimits
   )
 
@@ -332,7 +338,7 @@ ___
 
 ###  setVetoPeriodSeconds
 
-• **setVetoPeriodSeconds**: *function* = proxySend(this.kit, this.contract.methods.setVetoPeriodSeconds)
+• **setVetoPeriodSeconds**: *function* = proxySend(this.connection, this.contract.methods.setVetoPeriodSeconds)
 
 *Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L86)*
 
@@ -394,7 +400,7 @@ Name | Type |
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[address](_wrappers_basewrapper_.basewrapper.md#address)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L35)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L37)*
 
 Contract address
 
@@ -406,7 +412,7 @@ Contract address
 
 ▸ **createExchangeProposal**(`stableTokenRegistryId`: [StableTokenContract](../modules/_base_.md#stabletokencontract), `sellAmount`: BigNumber, `sellCelo`: boolean): *Promise‹CeloTransactionObject‹string››*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L110)*
+*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L116)*
 
 **Parameters:**
 
@@ -424,7 +430,7 @@ ___
 
 ▸ **exchangeProposalExists**(`exchangeProposalID`: string | number): *Promise‹boolean›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:122](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L122)*
+*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L128)*
 
 **Parameters:**
 
@@ -450,7 +456,7 @@ ___
 
 ▸ **getAllStableTokenLimits**(): *Promise‹AllStableConfig›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:184](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L184)*
+*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:190](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L190)*
 
 **Returns:** *Promise‹AllStableConfig›*
 
@@ -460,7 +466,7 @@ ___
 
 ▸ **getBuyAmount**(`celoStableTokenOracleRate`: BigNumber, `sellAmount`: BigNumber, `sellCelo`: boolean): *Promise‹BigNumber›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:198](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L198)*
+*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:204](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L204)*
 
 **Parameters:**
 
@@ -478,7 +484,7 @@ ___
 
 ▸ **getConfig**(): *Promise‹[GrandaMentoConfig](../interfaces/_wrappers_grandamento_.grandamentoconfig.md)›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:209](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L209)*
+*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:215](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L215)*
 
 **Returns:** *Promise‹[GrandaMentoConfig](../interfaces/_wrappers_grandamento_.grandamentoconfig.md)›*
 
@@ -488,7 +494,7 @@ ___
 
 ▸ **getExchangeProposal**(`exchangeProposalID`: string | number): *Promise‹[ExchangeProposal](../interfaces/_wrappers_grandamento_.exchangeproposal.md)›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L128)*
+*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L134)*
 
 **Parameters:**
 
@@ -504,7 +510,7 @@ ___
 
 ▸ **getHumanReadableExchangeProposal**(`exchangeProposalID`: string | number): *Promise‹[ExchangeProposalReadable](../interfaces/_wrappers_grandamento_.exchangeproposalreadable.md)›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:149](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L149)*
+*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:155](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L155)*
 
 **Parameters:**
 
@@ -522,7 +528,7 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[getPastEvents](_wrappers_basewrapper_.basewrapper.md#getpastevents)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L55)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L57)*
 
 Contract getPastEvents
 
@@ -539,15 +545,15 @@ ___
 
 ###  stableTokenExchangeLimits
 
-▸ **stableTokenExchangeLimits**(`stableTokenTymbol`: StableTokenEnum): *Promise‹[StableTokenExchangeLimits](../interfaces/_wrappers_grandamento_.stabletokenexchangelimits.md)›*
+▸ **stableTokenExchangeLimits**(`stableTokenSymbol`: StableTokenEnum): *Promise‹[StableTokenExchangeLimits](../interfaces/_wrappers_grandamento_.stabletokenexchangelimits.md)›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:171](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L171)*
+*Defined in [packages/sdk/contractkit/src/wrappers/GrandaMento.ts:177](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/GrandaMento.ts#L177)*
 
 **Parameters:**
 
 Name | Type |
 ------ | ------ |
-`stableTokenTymbol` | StableTokenEnum |
+`stableTokenSymbol` | StableTokenEnum |
 
 **Returns:** *Promise‹[StableTokenExchangeLimits](../interfaces/_wrappers_grandamento_.stabletokenexchangelimits.md)›*
 
@@ -559,6 +565,6 @@ ___
 
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[version](_wrappers_basewrapper_.basewrapper.md#version)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L39)*
+*Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L41)*
 
 **Returns:** *Promise‹NonNullable‹T["methods"] extends object ? ContractVersion<> : never››*

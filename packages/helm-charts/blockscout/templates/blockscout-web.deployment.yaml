@@ -79,6 +79,11 @@ spec:
           requests:
             memory: {{ .Values.blockscout.web.resources.requests.memory }}
             cpu: {{ .Values.blockscout.web.resources.requests.cpu }}
+        volumeMounts:
+        - name: vyper-compilers
+          mountPath: /opt/app/apps/explorer/priv/vyper_compilers
+        - name: solc-compilers
+          mountPath: /opt/app/apps/explorer/priv/solc_compilers
         env:
         - name: PORT
           value: {{ .Values.blockscout.web.port | quote }}
@@ -102,16 +107,20 @@ spec:
           value: {{ not .Values.blockscout.web.stats.enabled | quote }}
         - name: STATS_REPORT_URL
           value: {{ .Values.blockscout.web.stats.reportUrl | quote }}
-        - name: EXTERNAL_APPS
-          value: {{ .Values.blockscout.web.appsMenu.externalApps | quote }}
-        - name: BRIDGES
-          value: {{ .Values.blockscout.web.appsMenu.bridges | quote }}
-        - name: OTHER_BRIDGES
-          value: {{ .Values.blockscout.web.appsMenu.otherBridges | quote }}
-        - name: BRIDGES_ALM
-          value: {{ .Values.blockscout.web.appsMenu.bridgesAlm | quote }}
+        - name: SWAP_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.swapList | quote }}
         - name: DEFI_MENU_LIST
           value: {{ .Values.blockscout.web.appsMenu.defiList | quote }}
+        - name: WALLET_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.walletList | quote }}
+        - name: NFT_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.nftList | quote }}
+        - name: CONNECT_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.connectList | quote }}
+        - name: SPEND_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.spendList | quote }}
+        - name: FINANCE_TOOLS_MENU_LIST
+          value: {{ .Values.blockscout.web.appsMenu.financeToolsList | quote }}
         - name: RESOURCES_MENU_LIST
           value: {{ .Values.blockscout.web.appsMenu.resourcesList | quote }}
         - name: LEARNING_MENU_LIST
@@ -134,6 +143,7 @@ spec:
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
+{{ include "celo.blockscout-volumes" (dict "nfs_volumes" true "Release" .Release) | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

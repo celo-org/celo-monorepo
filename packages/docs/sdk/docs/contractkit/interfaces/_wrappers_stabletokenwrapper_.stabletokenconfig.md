@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/StableTokenWrapper"](../modules/_wrappers_stabletokenwrapper_.md) › [StableTokenConfig](_wrappers_stabletokenwrapper_.stabletokenconfig.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/StableTokenWrapper"](../modules/_wrappers_stabletokenwrapper_.md) › [StableTokenConfig](_wrappers_stabletokenwrapper_.stabletokenconfig.md)
 
 # Interface: StableTokenConfig
 

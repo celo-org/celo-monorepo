@@ -9,9 +9,9 @@
   "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/metadata-crawler",
   "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/metadata-crawler",
   "dependencies": {
-    "@celo/connect": "1.5.3-dev",
-    "@celo/contractkit": "1.5.3-dev",
-    "@celo/utils": "1.5.3-dev",
+    "@celo/connect": "2.0.1-dev",
+    "@celo/contractkit": "2.0.1-dev",
+    "@celo/utils": "2.0.1-dev",
     "@types/pg": "^7.14.3",
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["identity/claims/attestation-service-url"](_identity_claims_attestation_service_url_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["identity/claims/attestation-service-url"](_identity_claims_attestation_service_url_.md)
 
 # Module: "identity/claims/attestation-service-url"
 

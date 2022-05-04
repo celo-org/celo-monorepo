@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/StableTokenWrapper"](../modules/_wrappers_stabletokenwrapper_.md) › [InflationParameters](_wrappers_stabletokenwrapper_.inflationparameters.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/StableTokenWrapper"](../modules/_wrappers_stabletokenwrapper_.md) › [InflationParameters](_wrappers_stabletokenwrapper_.inflationparameters.md)
 
 # Interface: InflationParameters
 

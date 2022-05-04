@@ -111,7 +111,6 @@ The repository has the following packages (sub projects):
 - [cli](packages/cli) - tool that uses ContractKit to interact with the Celo protocol ([docs](https://docs.celo.org/command-line-interface/introduction))
 - [dev-utils](packages/dev-utils) - a utils package for use as a dev dependency
 - [docs](packages/docs) - technical documentation for the Celo project ([live](https://docs.celo.org/))
-- [faucet](packages/faucet) - faucet deployment configuration ([live](https://celo.org/build/faucet))
 - [helm-charts](packages/helm-charts) - templatized deployments of entire environments to Kubernetes clusters
 - [protocol](packages/protocol) - identity, stability and other smart contracts for the Celo protocol ([docs](https://docs.celo.org/celo-codebase/protocol))
 - [sdk](packages/sdk) - Typescript packages for interacting with Celo, including Contracts, Wallets, Crypto++

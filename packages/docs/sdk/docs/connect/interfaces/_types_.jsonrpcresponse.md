@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["types"](../modules/_types_.md) › [JsonRpcResponse](_types_.jsonrpcresponse.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["types"](../modules/_types_.md) › [JsonRpcResponse](_types_.jsonrpcresponse.md)
 
 # Interface: JsonRpcResponse
 
@@ -21,7 +21,7 @@
 
 • **error**? : *string | object*
 
-*Defined in [packages/sdk/connect/src/types.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L55)*
+*Defined in [types.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L55)*
 
 ___
 
@@ -29,7 +29,7 @@ ___
 
 • **id**: *number*
 
-*Defined in [packages/sdk/connect/src/types.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L53)*
+*Defined in [types.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L53)*
 
 ___
 
@@ -37,7 +37,7 @@ ___
 
 • **jsonrpc**: *string*
 
-*Defined in [packages/sdk/connect/src/types.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L52)*
+*Defined in [types.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L52)*
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 • **result**? : *any*
 
-*Defined in [packages/sdk/connect/src/types.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L54)*
+*Defined in [types.ts:54](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/types.ts#L54)*

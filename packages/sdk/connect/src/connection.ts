@@ -38,6 +38,7 @@ import { ReadOnlyWallet } from './wallet'
 
 const debugGasEstimation = debugFactory('connection:gas-estimation')
 
+type BN = ReturnType<Web3['utils']['toBN']>
 export interface ConnectionOptions {
   gasInflationFactor: number
   gasPrice: string
@@ -45,12 +46,18 @@ export interface ConnectionOptions {
   from?: Address
 }
 
+/**
+ * Connection is a Class for connecting to Celo, sending Transactions, etc
+ * @param web3 an instance of web3
+ * @optional wallet a child class of {@link WalletBase}
+ * @optional handleRevert sets handleRevert on the web3.eth instance passed in
+ */
 export class Connection {
   private config: ConnectionOptions
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
 
   constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet, handleRevert = true) {
@@ -84,6 +91,14 @@ export class Connection {
     } catch {
       return false
     }
+  }
+
+  keccak256 = (value: string | BN): string => {
+    return this.web3.utils.keccak256(value)
+  }
+
+  hexToAscii = (hex: string) => {
+    return this.web3.utils.hexToAscii(hex)
   }
 
   /**
@@ -202,7 +217,7 @@ export class Connection {
    * Send a transaction to celo-blockchain.
    *
    * Similar to `web3.eth.sendTransaction()` but with following differences:
-   *  - applies kit tx's defaults
+   *  - applies connections tx's defaults
    *  - estimatesGas before sending
    *  - returns a `TransactionResult` instead of `PromiEvent`
    */
@@ -308,7 +323,7 @@ export class Connection {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   fillGasPrice(tx: CeloTx): CeloTx {
     if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
       return {
@@ -318,7 +333,7 @@ export class Connection {
     }
     return tx
   }
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   async setGasPriceForCurrency(address: Address, gasPrice: string) {
     this.currencyGasPrice.set(address, gasPrice)
   }

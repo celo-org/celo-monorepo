@@ -1,8 +1,4 @@
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
-apiVersion: networking.k8s.io/v1beta1
-{{ else }}
-apiVersion: extensions/v1beta1
-{{ end -}}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-web-ingress
@@ -12,7 +8,6 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
-    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/proxy-body-size: 8m
     nginx.ingress.kubernetes.io/configuration-snippet: |
       location ~ /admin/.* {
@@ -28,6 +23,9 @@ metadata:
         return 301 /address/$1/coin-balances;
       }
 spec:
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   tls:
   - hosts:
     - {{ .Release.Name }}.{{ .Values.domain.name }}.org
@@ -37,14 +35,23 @@ spec:
     http:
       paths:
       - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
+        pathType: Prefix
         backend:
-          serviceName: {{ .Release.Name }}-web
-          servicePort: 4000
+          service:
+            name: {{ .Release.Name }}-web
+            port: 
+              number: 4000
       - path: /(graphql|graphiql|api)
+        pathType: Prefix
         backend:
-          serviceName: {{ .Release.Name }}-api
-          servicePort: 4000
+          service:
+            name: {{ .Release.Name }}-api
+            port: 
+              number: 4000
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: {{ .Release.Name }}-web
-          servicePort: 4000
+          service:
+            name: {{ .Release.Name }}-web
+            port: 
+              number: 4000

@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [AttestationState](_wrappers_attestations_.attestationstate.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Attestations"](../modules/_wrappers_attestations_.md) › [AttestationState](_wrappers_attestations_.attestationstate.md)
 
 # Enumeration: AttestationState
 
@@ -18,7 +18,7 @@ Contract for managing identities
 
 • **Complete**:
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:58](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L58)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:78](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L78)*
 
 ___
 
@@ -26,7 +26,7 @@ ___
 
 • **Incomplete**:
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L57)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:77](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L77)*
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 • **None**:
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L56)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:76](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L76)*

@@ -66,7 +66,7 @@ testWithGanache('SortedOracles Wrapper', (web3) => {
   async function newSortedOracles(owner: Address): Promise<SortedOraclesWrapper> {
     const instance = await SortedOracles.new(true, { from: owner })
     await instance.initialize(NetworkConfig.oracles.reportExpiry, { from: owner })
-    return new SortedOraclesWrapper(kit, instance.contract)
+    return new SortedOraclesWrapper(kit.connection, instance.contract, kit.registry)
   }
 
   async function addOracleForTarget(
