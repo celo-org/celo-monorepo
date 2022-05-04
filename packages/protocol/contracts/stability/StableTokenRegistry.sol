@@ -26,19 +26,16 @@ contract StableTokenRegistry is Initializable, Ownable, UsingRegistry {
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param fiatTicker Collection of fiat currencies issued already.
    * @param stableTokenContractName Collection of stable token smart contract names.
-   * @param registryAddress The address of the registry core smart contract.
    */
-  function initialize(
-    bytes calldata fiatTicker,
-    bytes calldata stableTokenContractName,
-    address registryAddress
-  ) external initializer {
+  function initialize(bytes calldata fiatTicker, bytes calldata stableTokenContractName)
+    external
+    initializer
+  {
     _transferOwnership(msg.sender);
     addNewStableToken(bytes("USD"), bytes("StableToken"));
     addNewStableToken(bytes("EUR"), bytes("StableTokenEUR"));
     addNewStableToken(bytes("BRL"), bytes("StableTokenBRL"));
     addNewStableToken(fiatTicker, stableTokenContractName);
-    setRegistry(registryAddress);
   }
 
   /**
