@@ -298,7 +298,7 @@ contract Exchange is
     spread = FixidityLib.wrap(newSpread);
     require(
       FixidityLib.lte(spread, FixidityLib.fixed1()),
-      "the value of spread must be less than or equal to 1"
+      "Spread must be less than or equal to 1"
     );
     emit SpreadSet(newSpread);
   }
