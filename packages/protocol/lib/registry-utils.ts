@@ -38,14 +38,12 @@ export enum CeloContractName {
   StableTokenBRL = 'StableTokenBRL',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
-  StableTokenRegistry = 'StableTokenRegistry',
 }
 
 export const usesRegistry = [
   CeloContractName.Escrow,
   CeloContractName.Reserve,
   CeloContractName.StableToken,
-  CeloContractName.StableTokenRegistry
 ]
 
 export const hasEntryInRegistry: string[] = [
@@ -67,5 +65,4 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Reserve,
   CeloContractName.SortedOracles,
   CeloContractName.StableToken,
-  CeloContractName.StableTokenRegistry
 ]
