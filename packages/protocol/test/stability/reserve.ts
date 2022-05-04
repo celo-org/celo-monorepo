@@ -781,7 +781,7 @@ contract('Reserve', (accounts: string[]) => {
     })
   })
 
-  describe.only('#getReserveRatio', () => {
+  describe('#getReserveRatio', () => {
     let mockStableToken: MockStableTokenInstance
     let reserveGoldBalance: BigNumber
     const exchangeRate = 10
