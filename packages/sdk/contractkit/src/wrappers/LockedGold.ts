@@ -8,7 +8,6 @@ import { Address, CeloTransactionObject, EventLog } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { LockedGold } from '../generated/LockedGold'
 import {
-  BaseWrapper,
   proxyCall,
   proxySend,
   secondsToDurationString,
@@ -16,6 +15,7 @@ import {
   valueToBigNumber,
   valueToString,
 } from '../wrappers/BaseWrapper'
+import { BaseWrapperForGoverning } from './BaseWrapperForGoverning'
 
 type AddressListItem = ALI<BigNumber>
 const bigNumberComparator: Comparator<BigNumber> = (a: BigNumber, b: BigNumber) => a.lt(b)
@@ -63,13 +63,14 @@ export interface LockedGoldConfig {
 /**
  * Contract for handling deposits needed for voting.
  */
-export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
+
+export class LockedGoldWrapper extends BaseWrapperForGoverning<LockedGold> {
   /**
    * Withdraws a gold that has been unlocked after the unlocking period has passed.
    * @param index The index of the pending withdrawal to withdraw.
    */
   withdraw: (index: number) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.withdraw
   )
 
@@ -77,14 +78,14 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * Locks gold to be used for voting.
    * The gold to be locked, must be specified as the `tx.value`
    */
-  lock = proxySend(this.kit, this.contract.methods.lock)
+  lock = proxySend(this.connection, this.contract.methods.lock)
 
   /**
    * Unlocks gold that becomes withdrawable after the unlocking period.
    * @param value The amount of gold to unlock.
    */
   unlock: (value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.unlock,
     tupleParser(valueToString)
   )
@@ -142,7 +143,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * @param value The value to relock from the specified pending withdrawal.
    */
   _relock: (index: number, value: BigNumber.Value) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.relock,
     tupleParser(valueToString, valueToString)
   )
@@ -205,7 +206,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
   async getAccountSummary(account: string): Promise<AccountSummary> {
     const nonvoting = await this.getAccountNonvotingLockedGold(account)
     const total = await this.getAccountTotalLockedGold(account)
-    const validators = await this.kit.contracts.getValidators()
+    const validators = await this.contracts.getValidators()
     const requirement = await validators.getAccountLockedGoldRequirement(account)
     const pendingWithdrawals = await this.getPendingWithdrawals(account)
     return {
@@ -240,9 +241,10 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * @param epochNumber The epoch to retrieve AccountSlashed at.
    */
   async getAccountsSlashed(epochNumber: number): Promise<AccountSlashed[]> {
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
     const events = await this.getPastEvents('AccountSlashed', {
-      fromBlock: await this.kit.getFirstBlockNumberForEpoch(epochNumber),
-      toBlock: await this.kit.getLastBlockNumberForEpoch(epochNumber),
+      fromBlock: await blockchainParamsWrapper.getFirstBlockNumberForEpoch(epochNumber),
+      toBlock: await blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber),
     })
     return events.map(
       (e: EventLog): AccountSlashed => ({
@@ -262,7 +264,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
    * @return List of (group, voting gold) to decrement from `account`.
    */
   async computeInitialParametersForSlashing(account: string, penalty: BigNumber) {
-    const election = await this.kit.contracts.getElection()
+    const election = await this.contracts.getElection()
     const eligible = await election.getEligibleValidatorGroupsVotes()
     const groups: AddressListItem[] = eligible.map((x) => ({ address: x.address, value: x.votes }))
     return this.computeParametersForSlashing(account, penalty, groups)
@@ -292,7 +294,7 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     }
     let difference = penalty.minus(nonVoting)
     // find voted groups
-    const election = await this.kit.contracts.getElection()
+    const election = await this.contracts.getElection()
     const groups = await election.getGroupsVotedForByAccount(account)
     const res = []
     //
@@ -313,3 +315,5 @@ export class LockedGoldWrapper extends BaseWrapper<LockedGold> {
     return res
   }
 }
+
+export type LockedGoldWrapperType = LockedGoldWrapper

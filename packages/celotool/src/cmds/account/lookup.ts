@@ -1,7 +1,7 @@
 /* tslint:disable no-console */
 
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { PhoneNumberUtils } from '@celo/utils'
+import { PhoneNumberUtils } from '@celo/phone-utils'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { portForwardAnd } from 'src/lib/port_forward'
 import Web3 from 'web3'

@@ -158,13 +158,15 @@ blockscout:
     erlangNodeName: blockscout-web
     appsMenu:
       enabled: true
-      externalApps: '[{"url":"https://valoraapp.com/", "title":"Valora"}, {"url":"https://celoterminal.com/", "title":"Celo Terminal"}, {"url":"https://celovote.com/", "title":"Celo Vote"}, {"url":"https://celowallet.app/", "title":"Celo Wallet"}]'
-      bridges: '[{"url":"https://optics.xyz/", "title":"Optics"},{"url":"https://bridge.mobius.money/#/", "title": "Mobius"}, {"url":"https://app.allbridge.io/bridge", "title": "Allbridge"}]'
-      otherBridges: '[]'
-      bridgesAlm: '[]'
-      defiList: '[{"url":"https://mento.finance/", "title":"Mento"}, {"url":"https://ubeswap.org/", "title":"Ubeswap"}, {"url":"https://app.sushi.com/swap", "title":"SushiSwap"}, {"url":"https://moola.market/", "title":"Moola Market"}, {"url":"https://app.pooltogether.com/pools/celo/CELO-cUSD", "title":"PoolTogether"}, {"url":"https://autofarm.network/celo/", "title":"Autofarm"}, {"url":"https://app.poof.cash/#/account", "title":"Poof Cash"}]'
-      resourcesList: '[{"url":"https://docs.celo.org/", "title":"Celo Docs"}, {"url":"https://celoreserve.org/", "title":"Celo Reserve"}, {"url":"https://forum.celo.org/", "title":"Celo Forum"}, {"url":"https://celohub.org/", "title":"Celo Hub"}, {"url":"https://thecelo.com/", "title":"TheCelo"}, {"url":"https://stats.celo.org/", "title":"Celo Stats"}, {"url":"https://celo.org/validators/explore", "title":"Validators"}]'
-      learningList: '[{"url": "https://celo.org/papers/whitepaper", "title":"Celo Whitepaper"}, {"url": "https://learn.figment.io/protocols/celo", "title":"Learn Celo"}, {"url": "https://celo.org/papers/stability", "title":"Celo Stability Analysis"}, {"url": "https://www.coinbase.com/price/celo", "title":"Coinbase Earn"}]'
+      swapList: '[{"url":"https://ubeswap.org/", "title":"Ubeswap"}, {"url":"https://symmetric.finance/", "title":"Symmetric"}, {"url":"https://www.mobius.money/", "title":"Mobius"}, {"url":"https://mento.finance/", "title":"Mento-fi"}, {"url":"https://swap.bitssa.com/", "title":"Swap Bitssa"}]'
+      defiList: '[{"url":"https://moola.market/", "title":"Moola"},  {"url":"https://www.pinnata.xyz/farm#/", "title":"Pinnata"}, {"url":"https://goodghosting.com/", "title":"GoodGhosting"}, {"url":"https://revo.market/", "title":"Revo"}, {"url":"https://www.immortaldao.finance", "title":"ImmortalDao Finance"}]'
+      walletList: '[{"url":"https://valoraapp.com/", "title":"Valora"}, {"url":"https://celoterminal.com/", "title":"Celo Terminal"}, {"url":"https://celowallet.app/", "title":"Celo Wallet"}, {"url":"https://www.nodewallet.xyz/", "title":"Node Wallet"}]'
+      nftList: '[{"url":"https://niftydrop.net/", "title":"Niftydrop"}, {"url":"https://nfts.valoraapp.com/", "title":"NFT Viewer"}, {"url":"https://cyberbox.art/", "title":"Cyberbox"}, {"url":"https://nom.space/", "title":"Nomspace"}, {"url":"https://alities.io/", "title":"Alities"}]'
+      connectList: '[{"url":"https://impactmarket.com/", "title":"impactMarket"}, {"url":"https://talentprotocol.com/", "title":"Talent Protocol"}, {"url":"https://doni.app/", "title":"Doni"}]'
+      spendList: '[{"url":"https://giftcards.bidali.com/", "title":"Bidali"}, {"url":"https://flywallet.io/", "title":"Flywallet"},{"url":"https://chispend.com/", "title":"ChiSpend"}]'
+      financeToolsList: '[{"url":"https://celotracker.com/", "title":"Celo Tracker"}, {"url":"https://celo.tax/", "title":"celo.tax"}, {"url":"https://trelis.com/", "title": "Trelis"}]'
+      learningList: '[{"url": "https://celo.org/papers/whitepaper", "title":"Celo Whitepaper"}, {"url": "https://learn.figment.io/protocols/celo", "title":"Learn Celo"}, {"url": "https://www.coinbase.com/price/celo", "title":"Coinbase Earn"}]'
+      resourcesList: '[{"url":"https://celovote.com/", "title":"Celo Vote"}, {"url":"https://forum.celo.org/", "title":"Celo Forum"}, {"url":"https://thecelo.com/", "title":"TheCelo"}, {"url":"https://celo.org/validators/explore", "title":"Validators"}, {"url":"https://celoreserve.org/", "title":"Celo Reserve"}, {"url":"https://docs.celo.org/", "title":"Celo Docs"}]'
     recaptchaSecretName: ""  # k8s secret that needs to pre-exist
     stats:
       enabled: false

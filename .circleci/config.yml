@@ -191,13 +191,6 @@ jobs:
       - run: yarn run prettify:diff
       - run: yarn run lint
 
-  vulnerability-checks:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run: ./scripts/ci_check_vulnerabilities.sh
-
   general-test:
     <<: *defaults
     resource_class: large
@@ -261,6 +254,9 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against $RELEASE_TAG"
+            # Github has phased out the git protocol so we ensure that we use
+            # https for all git operations that yarn may perform.
+            git config --global url."https://github.com".insteadOf git://github.com
             yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
       - persist_to_workspace:
           root: .
@@ -891,9 +887,6 @@ workflows:
           requires:
             - install_dependencies
       - lint-checks:
-          requires:
-            - install_dependencies
-      - vulnerability-checks:
           requires:
             - install_dependencies
       - general-test:

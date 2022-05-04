@@ -1,6 +1,5 @@
 import { Address } from '@celo/base/lib/address'
 import { Err, Ok, Result } from '@celo/base/lib/result'
-import { WasmBlsBlindingClient } from '@celo/identity/lib/odis/bls-blinding-client'
 import {
   ErrorMessages,
   sendOdisDomainRequest,
@@ -9,18 +8,23 @@ import {
 import {
   checkSequentialDelayRateLimit,
   DomainEndpoint,
+  domainHash,
   DomainIdentifiers,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestEIP712,
   DomainQuotaStatusResponse,
+  domainQuotaStatusResponseSchema,
   DomainQuotaStatusResponseSuccess,
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
   DomainRestrictedSignatureResponse,
+  DomainRestrictedSignatureResponseSchema,
   DomainRestrictedSignatureResponseSuccess,
   genSessionID,
+  PoprfClient,
   SequentialDelayDomain,
   SequentialDelayDomainState,
+  SequentialDelayDomainStateSchema,
 } from '@celo/phone-number-privacy-common'
 import { defined, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
@@ -73,12 +77,6 @@ export async function odisHardenKey(
   environment: OdisServiceContext,
   wallet?: EIP712Wallet
 ): Promise<Result<Buffer, BackupError>> {
-  // Allow this function to be called in tests, but not in any other environment. This safety gate
-  // can be removed when the POPRF verification function is implemented and added below.
-  if (process?.env?.JEST_WORKER_ID === undefined && process?.env?.NODE_ENV !== 'test') {
-    throw new Error('ODIS POPRF function is not yet available')
-  }
-
   // Session ID for logging requests.
   const sessionID = genSessionID()
 
@@ -114,13 +112,17 @@ export async function odisHardenKey(
   // NOTE: We do not include a response aggregation step here because it is assumed that we are
   // talking to the combiner service, as opposed to talking directly to the signers.
   const blindingSeed = crypto.randomBytes(16)
-  const blindingClient = new WasmBlsBlindingClient(environment.odisPubKey)
-  const blindedMessage = await blindingClient.blindMessage(key.toString('base64'), blindingSeed)
+  const poprfClient = new PoprfClient(
+    Buffer.from(environment.odisPubKey, 'base64'),
+    domainHash(domain),
+    key,
+    blindingSeed
+  )
 
   // Request the partial oblivious signature from ODIS.
   // Note that making this request will, if successful, result in quota being used in the domain.
   const signatureResp = await requestOdisDomainSignature(
-    blindedMessage,
+    poprfClient.blindedMessage.toString('base64'),
     quotaState.counter,
     domain,
     environment,
@@ -134,11 +136,9 @@ export async function odisHardenKey(
   // Unblind the signature response received from ODIS to get the POPRF output.
   let odisOutput: Buffer
   try {
-    // TODO(victor): Once the pOPRF implementation is available, use that instead.
-    const odisOutputBase64 = await blindingClient.unblindAndVerifyMessage(
-      signatureResp.result.signature
+    odisOutput = await poprfClient.unblindResponse(
+      Buffer.from(signatureResp.result.signature, 'base64')
     )
-    odisOutput = Buffer.from(odisOutputBase64, 'base64')
   } catch (error) {
     return Err(new OdisVerificationError(error as Error))
   }
@@ -205,7 +205,8 @@ async function requestOdisQuotaStatus(
     quotaResp = await sendOdisDomainRequest(
       quotaStatusReq,
       environment,
-      DomainEndpoint.DOMAIN_QUOTA_STATUS
+      DomainEndpoint.DOMAIN_QUOTA_STATUS,
+      domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
     )
   } catch (error) {
     if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {
@@ -260,7 +261,8 @@ async function requestOdisDomainSignature(
     signatureResp = await sendOdisDomainRequest(
       signatureReq,
       environment,
-      DomainEndpoint.DOMAIN_SIGN
+      DomainEndpoint.DOMAIN_SIGN,
+      DomainRestrictedSignatureResponseSchema
     )
   } catch (error) {
     if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {
