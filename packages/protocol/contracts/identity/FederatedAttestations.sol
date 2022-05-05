@@ -110,15 +110,11 @@ contract FederatedAttestations is
     uint256 currIndex = 0;
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      address trustedIssuer = trustedIssuers[i];
-      for (
-        uint256 j = 0;
-        j < identifierToAddresses[identifier][trustedIssuer].length;
-        j = j.add(1)
-      ) {
+      uint256 numTrustedIssuers = identifierToAddresses[identifier][trustedIssuers[i]].length;
+      for (uint256 j = 0; j < numTrustedIssuers; j = j.add(1)) {
         // Only create and push new attestation if we haven't hit max
         if (currIndex < maxAttestations) {
-          IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuer][j];
+          IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuers[i]][j];
           if (!_isRevoked(attestation.signer, attestation.issuedOn)) {
             accounts[currIndex] = attestation.account;
             issuedOns[currIndex] = attestation.issuedOn;
@@ -172,17 +168,15 @@ contract FederatedAttestations is
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       address trustedIssuer = trustedIssuers[i];
-      for (uint256 j = 0; j < addressToIdentifiers[account][trustedIssuer].length; j = j.add(1)) {
+      uint256 numIssuersForAddress = addressToIdentifiers[account][trustedIssuer].length;
+      for (uint256 j = 0; j < numIssuersForAddress; j = j.add(1)) {
         // Iterate through the list of identifiers
         if (currIndex < maxIdentifiers) {
           bytes32 identifier = addressToIdentifiers[account][trustedIssuer][j];
           // Check if the mapping was produced by a revoked signer
-          for (
-            uint256 k = 0;
-            k < identifierToAddresses[identifier][trustedIssuer].length;
-            k = k.add(1)
-          ) {
-            IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuer][k];
+          IdentifierOwnershipAttestation[] memory attestationsForIssuer = identifierToAddresses[identifier][trustedIssuer];
+          for (uint256 k = 0; k < attestationsForIssuer.length; k = k.add(1)) {
+            IdentifierOwnershipAttestation memory attestation = attestationsForIssuer[k];
             // (identifier, account, issuer) tuples should be unique
             if (
               attestation.account == account &&
