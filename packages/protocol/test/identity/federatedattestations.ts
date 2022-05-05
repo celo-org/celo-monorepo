@@ -89,6 +89,22 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should not be callable again', async () => {
       await assertRevert(federatedAttestations.initialize(registry.address))
     })
+
+    it.only('should have set the EIP-712 domain separator', async () => {
+      assert.equal(
+        await federatedAttestations.eip712DomainSeparator(),
+        getDomainDigest(federatedAttestations.address)
+      )
+    })
+
+    it('should emit the EIP712DomainSeparatorSet event', () => {
+      assertLogMatches2(initialize.logs[1], {
+        event: 'EIP712DomainSeparatorSet',
+        args: {
+          eip712DomainSeparator: getDomainDigest(federatedAttestations.address),
+        },
+      })
+    })
   })
 
   describe('#lookupAttestations', () => {
