@@ -1,5 +1,6 @@
 import {
   getDomainDigest,
+
   getSignatureForAttestation
 } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
