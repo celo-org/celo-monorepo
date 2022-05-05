@@ -16,7 +16,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus
-  namespace: {{ .Values.namespace }}
   labels:
 {{ include "prometheus-stackdriver.labels" .  | indent 4 }}
 spec:
