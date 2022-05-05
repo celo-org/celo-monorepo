@@ -45,7 +45,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
     )
 
     initialize = await federatedAttestations.initialize(registry.address)
-    // await federatedAttestations.setEip712DomainSeparator()
   })
 
   describe('#EIP712_VALIDATE_ATTESTATION_TYPEHASH()', () => {
@@ -68,7 +67,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       assert(federatedAttestations)
     })
 
-    it.only('should have set the EIP-712 domain separator', async () => {
+    it('should have set the EIP-712 domain separator', async () => {
       assert.equal(
         await federatedAttestations.eip712DomainSeparator(),
         getDomainDigest(federatedAttestations.address)
@@ -76,7 +75,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should emit the EIP712DomainSeparatorSet event', () => {
-      assertLogMatches2(initialize.logs[1], {
+      assertLogMatches2(initialize.logs[2], {
         event: 'EIP712DomainSeparatorSet',
         args: {
           eip712DomainSeparator: getDomainDigest(federatedAttestations.address),
