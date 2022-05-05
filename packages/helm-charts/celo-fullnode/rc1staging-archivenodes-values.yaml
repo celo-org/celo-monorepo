@@ -29,5 +29,5 @@ geth:
 namespace: rc1staging
 replicaCount: 2
 storage:
-  size: 800Gi
+  size: 1500Gi
   storageClass: ssd
