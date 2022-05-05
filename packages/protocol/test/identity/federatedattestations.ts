@@ -1,6 +1,9 @@
-import { getSignatureForAttestation } from '@celo/protocol/lib/fed-attestations-utils'
+import {
+  getDomainDigest,
+  getSignatureForAttestation,
+} from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import {
   AccountsContract,
@@ -22,6 +25,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
   let accountsInstance: AccountsInstance
   let federatedAttestations: FederatedAttestationsInstance
   let registry: RegistryInstance
+  let initialize
 
   const caller: string = accounts[0]
   const phoneNumber: string = '+18005551212'
@@ -40,15 +44,44 @@ contract('FederatedAttestations', (accounts: string[]) => {
       federatedAttestations.address
     )
 
-    await federatedAttestations.initialize(registry.address)
-    await federatedAttestations.setEip712DomainSeparator()
+    initialize = await federatedAttestations.initialize(registry.address)
+    // await federatedAttestations.setEip712DomainSeparator()
+  })
+
+  describe('#EIP712_VALIDATE_ATTESTATION_TYPEHASH()', () => {
+    it('should have set the right typehash', async () => {
+      const expectedTypehash = keccak256(
+        'IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)'
+      )
+      assert.equal(
+        await federatedAttestations.EIP712_VALIDATE_ATTESTATION_TYPEHASH(),
+        expectedTypehash
+      )
+    })
   })
 
   describe('#initialize()', () => {
+    // TODO more intialize tests
     it('TODO ASv2', async () => {
       // TODO ASv2
       assert(caller)
       assert(federatedAttestations)
+    })
+
+    it.only('should have set the EIP-712 domain separator', async () => {
+      assert.equal(
+        await federatedAttestations.eip712DomainSeparator(),
+        getDomainDigest(federatedAttestations.address)
+      )
+    })
+
+    it('should emit the EIP712DomainSeparatorSet event', () => {
+      assertLogMatches2(initialize.logs[1], {
+        event: 'EIP712DomainSeparatorSet',
+        args: {
+          eip712DomainSeparator: getDomainDigest(federatedAttestations.address),
+        },
+      })
     })
   })
 
