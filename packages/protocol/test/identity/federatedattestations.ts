@@ -240,7 +240,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await accountsInstance.completeSignerAuthorization(issuer, role, { from: signer })
 
       await assertRevert(
-        federatedAttestations.validateAttestation(
+        federatedAttestations.isValidAttestation(
           pnIdentifier,
           issuer,
           account,
