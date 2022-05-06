@@ -98,6 +98,9 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
   const key = fetchEnv(envVar.LOKI_KEY)
   const url = fetchEnv(envVar.LOKI_URL)
   params.push(`--set config.lokiAddress=https://${user}:${key}@${url}`)
+  params.push(
+    `--set extraArgs[0]='-client.external-labels=cluster_name=${clusterConfig?.clusterName}'`
+  )
   params.push(`--set promtail.imageTag=${promtailImageTag}`)
   params.push(`--version=${chartVersion}`)
 
