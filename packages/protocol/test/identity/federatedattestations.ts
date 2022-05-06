@@ -104,22 +104,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should not be callable again', async () => {
       await assertRevert(federatedAttestations.initialize(registry.address))
     })
-
-    it('should have set the EIP-712 domain separator', async () => {
-      assert.equal(
-        await federatedAttestations.eip712DomainSeparator(),
-        getDomainDigest(federatedAttestations.address)
-      )
-    })
-
-    it('should emit the EIP712DomainSeparatorSet event', () => {
-      assertLogMatches2(initialize.logs[2], {
-        event: 'EIP712DomainSeparatorSet',
-        args: {
-          eip712DomainSeparator: getDomainDigest(federatedAttestations.address),
-        },
-      })
-    })
   })
 
   describe('#lookupAttestations', () => {
@@ -152,7 +136,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       })
 
-      it('should revert if an invalid signature is provided', async () => {
+      it('should return false if an invalid signature is provided', async () => {
         const sig2 = await getSignatureForAttestation(
           pnIdentifier,
           issuer,
