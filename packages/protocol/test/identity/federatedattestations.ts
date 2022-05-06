@@ -1,6 +1,6 @@
 import {
   getDomainDigest,
-  getSignatureForAttestation
+  getSignatureForAttestation,
 } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
@@ -11,7 +11,7 @@ import {
   FederatedAttestationsContract,
   FederatedAttestationsInstance,
   RegistryContract,
-  RegistryInstance
+  RegistryInstance,
 } from 'types'
 import { keccak256 } from 'web3-utils'
 
@@ -57,7 +57,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       account,
       issuedOn,
       signer,
-      1,
+      chainId,
       federatedAttestations.address
     )
   })
@@ -152,7 +152,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       })
 
-      it('should return false if an invalid signature is provided', async () => {
+      it('should revert if an invalid signature is provided', async () => {
         const sig2 = await getSignatureForAttestation(
           pnIdentifier,
           issuer,
@@ -280,29 +280,14 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
     })
 
-    it('should revert if the same attestation is uploaded again', async () => {
-      await federatedAttestations.registerAttestation(
-        pnIdentifier,
-        issuer,
-        account,
-        issuedOn,
-        signer,
-        sig.v,
-        sig.r,
-        sig.s
-      )
-
-      // Upload the same attestation from a different signer, authorized under the same issuer
-      const signer2 = accounts[4]
-      await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer })
-      await accountsInstance.completeSignerAuthorization(issuer, signerRole, { from: signer2 })
+    it('should revert if an invalid signature is provided', async () => {
       const sig2 = await getSignatureForAttestation(
         pnIdentifier,
         issuer,
         account,
-        issuedOn + 1,
-        signer2,
-        1,
+        issuedOn,
+        accounts[3],
+        chainId,
         federatedAttestations.address
       )
       await assertRevert(
@@ -311,7 +296,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           issuer,
           account,
           issuedOn,
-          signer2,
+          signer,
           sig2.v,
           sig2.r,
           sig2.s
@@ -319,7 +304,156 @@ contract('FederatedAttestations', (accounts: string[]) => {
       )
     })
 
-    it('should revert if an invalid user attempts to upload the attestation', async () => {
+    describe('when registering a second attestation', () => {
+      beforeEach(async () => {
+        // register first attestation
+        await federatedAttestations.registerAttestation(
+          pnIdentifier,
+          issuer,
+          account,
+          issuedOn,
+          signer,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+      })
+
+      it('should revert if the same attestation is uploaded again', async () => {
+        // Upload the same attestation signed by a different signer, authorized under the same issuer
+        const signer2 = accounts[4]
+        await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer })
+        await accountsInstance.completeSignerAuthorization(issuer, signerRole, { from: signer2 })
+        const sig2 = await getSignatureForAttestation(
+          pnIdentifier,
+          issuer,
+          account,
+          issuedOn + 1,
+          signer2,
+          1,
+          federatedAttestations.address
+        )
+        await assertRevert(
+          federatedAttestations.registerAttestation(
+            pnIdentifier,
+            issuer,
+            account,
+            issuedOn,
+            signer2,
+            sig2.v,
+            sig2.r,
+            sig2.s
+          )
+        )
+      })
+
+      it('should succeed with a different identifier', async () => {
+        const identifier2 = getPhoneHash('+19199199919')
+        const sig2 = await getSignatureForAttestation(
+          identifier2,
+          issuer,
+          account,
+          issuedOn,
+          signer,
+          chainId,
+          federatedAttestations.address
+        )
+        const register2 = await federatedAttestations.registerAttestation(
+          identifier2,
+          issuer,
+          account,
+          issuedOn,
+          signer,
+          sig2.v,
+          sig2.r,
+          sig2.s
+        )
+        assertLogMatches2(register2.logs[0], {
+          event: 'AttestationRegistered',
+          args: {
+            identifier: identifier2,
+            issuer,
+            account,
+            issuedOn,
+            signer,
+          },
+        })
+      })
+
+      it('should succeed with a different issuer', async () => {
+        const issuer2 = accounts[4]
+        const signer2 = accounts[5]
+        await accountsInstance.createAccount({ from: issuer2 })
+        await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer2 })
+        await accountsInstance.completeSignerAuthorization(issuer2, signerRole, { from: signer2 })
+        const sig2 = await getSignatureForAttestation(
+          pnIdentifier,
+          issuer2,
+          account,
+          issuedOn,
+          signer2,
+          chainId,
+          federatedAttestations.address
+        )
+        const register2 = await federatedAttestations.registerAttestation(
+          pnIdentifier,
+          issuer2,
+          account,
+          issuedOn,
+          signer2,
+          sig2.v,
+          sig2.r,
+          sig2.s,
+          { from: issuer2 }
+        )
+        assertLogMatches2(register2.logs[0], {
+          event: 'AttestationRegistered',
+          args: {
+            identifier: pnIdentifier,
+            issuer: issuer2,
+            account,
+            issuedOn,
+            signer: signer2,
+          },
+        })
+      })
+
+      // it.only('should succeed with a different account', async () => {
+      //   const account2 = accounts[4]
+      //   const sig2 = await getSignatureForAttestation(
+      //     pnIdentifier,
+      //     issuer,
+      //     account2,
+      //     issuedOn,
+      //     signer,
+      //     chainId,
+      //     federatedAttestations.address
+      //   )
+      //   const register2 = await federatedAttestations.registerAttestation(
+      //     pnIdentifier,
+      //     issuer,
+      //     account2,
+      //     issuedOn,
+      //     signer,
+      //     sig2.v,
+      //     sig2.r,
+      //     sig2.s,
+      //     { from: issuer, gasPrice: 0 }
+      //   )
+      //   assertLogMatches2(register2.logs[0], {
+      //     event: 'AttestationRegistered',
+      //     args: {
+      //       identifier: pnIdentifier,
+      //       issuer,
+      //       account: account2,
+      //       issuedOn,
+      //       signer,
+      //     },
+      //   })
+      // })
+    })
+
+    it('should revert if an invalid user attempts to register the attestation', async () => {
       await assertRevert(
         federatedAttestations.registerAttestation(
           pnIdentifier,
@@ -333,6 +467,33 @@ contract('FederatedAttestations', (accounts: string[]) => {
           { from: accounts[4] }
         )
       )
+    })
+
+    it('should succeed if a different AttestationSigner authorized by the same issuer registers the attestation', async () => {
+      const signer2 = accounts[4]
+      await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer })
+      await accountsInstance.completeSignerAuthorization(issuer, signerRole, { from: signer2 })
+      const register = await federatedAttestations.registerAttestation(
+        pnIdentifier,
+        issuer,
+        account,
+        issuedOn,
+        signer,
+        sig.v,
+        sig.r,
+        sig.s,
+        { from: signer2 }
+      )
+      assertLogMatches2(register.logs[0], {
+        event: 'AttestationRegistered',
+        args: {
+          identifier: pnIdentifier,
+          issuer,
+          account,
+          issuedOn,
+          signer,
+        },
+      })
     })
   })
 

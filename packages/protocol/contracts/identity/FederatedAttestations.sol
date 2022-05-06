@@ -193,9 +193,11 @@ contract FederatedAttestations is
     }
   }
 
-  modifier isValidUser(address issuer, address account, address signer) {
+  modifier isValidUser(address issuer, address account) {
     require(
-      msg.sender == account || msg.sender == issuer || msg.sender == signer,
+      msg.sender == account ||
+        msg.sender == issuer ||
+        getAccounts().attestationSignerToAccount(msg.sender) == issuer,
       "User does not have permission to perform this action"
     );
     _;
@@ -265,7 +267,7 @@ contract FederatedAttestations is
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) public isValidUser(issuer, account, signer) {
+  ) public isValidUser(issuer, account) {
     require(
       isValidAttestation(identifier, issuer, account, issuedOn, signer, v, r, s),
       "Signature is invalid"
