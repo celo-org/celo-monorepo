@@ -1,0 +1,49 @@
+# This CronJob is intended to act as a template for blockscout data migration jobs that are run manually via `kubectl job create --from=cronjon/this-job`
+# Ideally this would be a Job instance, but due to the interaction of celotool + helm this would be triggered upon every deploy.
+# Instead, this is a CronJob that will never + should never be scheduled and remains present yet permanently suspended within the namespace.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-data-migration
+  labels:
+    {{- include "celo.blockscout.labels" . | nindent 4 }}
+    component: blockscout-data-migration
+spec:
+  suspend:  true
+  # This schedule (31st February) is designed to never be triggered and is
+  # included only to satisfy the CronJob schema validation.
+  schedule: "0 0 31 2 *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "celo.blockscout.labels" . | nindent 12 }}
+        spec:
+          containers:
+          - name: blockscout-data-migration
+            image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
+            imagePullPolicy: {{ .Values.imagePullPolicy }}
+            command:
+            - /bin/sh
+            - -c
+            args:
+            - |
+              trap "touch /tmp/pod/main-terminated" EXIT
+              iex --name data-migration@0.0.0.0 -S mix data_migrate
+            resources:
+              requests:
+                memory: 2Gi
+                cpu: 2
+            volumeMounts:
+              - mountPath: /tmp/pod
+                name: tmp-pod
+            env:
+              - name: INITIAL_VALUE
+                valueFrom:
+                  secretKeyRef:
+                    name: blockscout-data-migration-secret-key-ref
+                    key: initial-value
+{{ include "celo.blockscout-env-vars" .  | indent 14 }}
+{{ include "celo.blockscout-db-terminating-sidecar" .  | indent 10 }}
+          restartPolicy: Never
