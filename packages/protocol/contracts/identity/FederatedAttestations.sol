@@ -51,7 +51,7 @@ contract FederatedAttestations is
   bytes32 public eip712DomainSeparator;
 
   // TODO: should this be hardcoded here?
-  bytes32 constant SignerRole = keccak256(abi.encodePacked("celo.org/core/attestation"));
+  bytes32 constant SIGNER_ROLE = keccak256(abi.encodePacked("celo.org/core/attestation"));
 
   // TODO ASv2 Event declarations
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
@@ -214,7 +214,7 @@ contract FederatedAttestations is
   ) public view returns (bool) {
     require(!revokedSigners[signer], "Signer has been revoked");
     require(
-      getAccounts().isSigner(issuer, signer, SignerRole),
+      getAccounts().isSigner(issuer, signer, SIGNER_ROLE),
       "Signer has not been authorized as an AttestationSigner by the issuer"
     );
     bytes32 structHash = keccak256(
