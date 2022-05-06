@@ -213,6 +213,29 @@ module.exports = deploymentForCoreContract<Exchange${ticker}Instance>(
 `
 }
 
+function exchangeConstitution(ticker: string): string {
+  return `Exchange${ticker}: {
+  default: 0.8,
+  setRegistry: 0.9,
+  setUpdateFrequency: 0.8,
+  setMinimumReports: 0.8,
+  setStableToken: 0.8,
+  setSpread: 0.8,
+  setReserveFraction: 0.8,
+}`
+}
+
+function stableTokenConstitution(ticker: string): string {
+  return `StableToken${ticker}: {
+  default: 0.8,
+  setRegistry: 0.9,
+  setInflationParameters: 0.9,
+  transfer: 0.6,
+  transferWithComment: 0.6,
+  approve: 0.6,
+}`
+}
+
 function errorFunct(err) {
   if (err) return console.log(err)
 }
@@ -265,6 +288,9 @@ try {
 
   console.log(`Other things that should be updated:
   * Add constitution parameters: packages/protocol/governanceConstitution.js
+    Suggested values:
+${exchangeConstitution(fiatTicker)}
+${stableTokenConstitution(fiatTicker)}
   * Rename migration with right number: packages/protocol/migrations/09_Y_stableToken_X.ts and packages/protocol/migrations/10_Y_Exchange_X.ts
   * Add keys to migration config: packages/protocol/migrationsConfig.js
   * Add files to the build: packages/protocol/scripts/build.ts
