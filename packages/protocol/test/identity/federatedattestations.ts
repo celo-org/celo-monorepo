@@ -38,7 +38,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
     accountsInstance = await Accounts.new(true)
     federatedAttestations = await FederatedAttestations.new(true)
     registry = await Registry.new(true)
-    await accountsInstance.initialize(registry.address)
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(
       CeloContractName.FederatedAttestations,
@@ -61,11 +60,14 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#initialize()', () => {
-    // TODO more intialize tests
-    it('TODO ASv2', async () => {
-      // TODO ASv2
-      assert(caller)
-      assert(federatedAttestations)
+    it('should have set the owner', async () => {
+      const owner: string = await federatedAttestations.owner()
+      assert.equal(owner, caller)
+    })
+
+    it('should have set the registry address', async () => {
+      const registryAddress: string = await federatedAttestations.registry()
+      assert.equal(registryAddress, registry.address)
     })
 
     it('should have set the EIP-712 domain separator', async () => {
@@ -82,6 +84,10 @@ contract('FederatedAttestations', (accounts: string[]) => {
           eip712DomainSeparator: getDomainDigest(federatedAttestations.address),
         },
       })
+    })
+
+    it('should not be callable again', async () => {
+      await assertRevert(federatedAttestations.initialize(registry.address))
     })
   })
 
