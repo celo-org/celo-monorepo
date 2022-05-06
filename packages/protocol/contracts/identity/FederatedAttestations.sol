@@ -45,7 +45,6 @@ contract FederatedAttestations is
   // signer => isRevoked
   mapping(address => bool) public revokedSigners;
 
-
   // TODO: should this be hardcoded here?
   bytes32 constant SIGNER_ROLE = keccak256(abi.encodePacked("celo.org/core/attestation"));
   bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
@@ -53,7 +52,6 @@ contract FederatedAttestations is
   );
   bytes32 public eip712DomainSeparator;
 
-  // TODO ASv2 Event declarations
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
 
   /**

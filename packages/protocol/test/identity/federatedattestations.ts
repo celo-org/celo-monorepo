@@ -1,7 +1,6 @@
 import {
   getDomainDigest,
-
-  getSignatureForAttestation
+  getSignatureForAttestation,
 } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
@@ -12,7 +11,7 @@ import {
   FederatedAttestationsContract,
   FederatedAttestationsInstance,
   RegistryContract,
-  RegistryInstance
+  RegistryInstance,
 } from 'types'
 import { keccak256 } from 'web3-utils'
 
@@ -208,25 +207,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should revert if the signer is not authorized as an AttestationSigner by the issuer', async () => {
-      await assertRevert(
-        federatedAttestations.isValidAttestation(
-          pnIdentifier,
-          issuer,
-          account,
-          issuedOn,
-          signer,
-          sig.v,
-          sig.r,
-          sig.s
-        )
-      )
-    })
-
-    it('should revert if the signer is authorized as a different role by the issuer', async () => {
-      const role = keccak256('random')
-      await accountsInstance.authorizeSigner(signer, role, { from: issuer })
-      await accountsInstance.completeSignerAuthorization(issuer, role, { from: signer })
-
       await assertRevert(
         federatedAttestations.isValidAttestation(
           pnIdentifier,
