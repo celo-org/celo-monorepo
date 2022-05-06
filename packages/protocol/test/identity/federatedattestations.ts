@@ -92,7 +92,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should', async () => {})
   })
 
-  describe('#validateAttestation', async () => {
+  describe('#isValidAttestation', async () => {
     const issuer = accounts[0]
     const signer = accounts[1]
     const account = accounts[2]
@@ -121,7 +121,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
       it('should return true if a valid signature is used', async () => {
         assert.isTrue(
-          await federatedAttestations.validateAttestation(
+          await federatedAttestations.isValidAttestation(
             pnIdentifier,
             issuer,
             account,
@@ -145,7 +145,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           federatedAttestations.address
         ))
         assert.isFalse(
-          await federatedAttestations.validateAttestation(
+          await federatedAttestations.isValidAttestation(
             pnIdentifier,
             issuer,
             account,
@@ -172,11 +172,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
           if (arg == 'issuer' || arg == 'signer') {
             await assertRevert(
-              federatedAttestations.validateAttestation.apply(this, args),
+              federatedAttestations.isValidAttestation.apply(this, args),
               'Signer has not been authorized as an AttestationSigner by the issuer'
             )
           } else {
-            assert.isFalse(await federatedAttestations.validateAttestation.apply(this, args))
+            assert.isFalse(await federatedAttestations.isValidAttestation.apply(this, args))
           }
         })
       })
@@ -184,7 +184,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       it('should revert if the signer is revoked', async () => {
         await federatedAttestations.revokeSigner(signer)
         await assertRevert(
-          federatedAttestations.validateAttestation(
+          federatedAttestations.isValidAttestation(
             pnIdentifier,
             issuer,
             account,
@@ -201,7 +201,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     it('should revert if the signer is not authorized as an AttestationSigner by the issuer', async () => {
       await assertRevert(
-        federatedAttestations.validateAttestation(
+        federatedAttestations.isValidAttestation(
           pnIdentifier,
           issuer,
           account,
@@ -220,7 +220,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await accountsInstance.completeSignerAuthorization(issuer, role, { from: signer })
 
       await assertRevert(
-        federatedAttestations.validateAttestation(
+        federatedAttestations.isValidAttestation(
           pnIdentifier,
           issuer,
           account,
