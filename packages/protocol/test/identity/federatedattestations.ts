@@ -319,7 +319,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       })
 
-      it('should revert if the same attestation is uploaded again', async () => {
+      it('should revert if an attestation with the same (issuer, identifier, account) is uploaded again', async () => {
         // Upload the same attestation signed by a different signer, authorized under the same issuer
         const signer2 = accounts[4]
         await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer })
@@ -418,6 +418,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         })
       })
 
+      // TODO figure out why this test results in an out of gas error
       // it.only('should succeed with a different account', async () => {
       //   const account2 = accounts[4]
       //   const sig2 = await getSignatureForAttestation(

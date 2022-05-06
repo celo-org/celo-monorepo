@@ -193,6 +193,7 @@ contract FederatedAttestations is
     }
   }
 
+  // TODO do we want to restrict permissions, or should anyone with a valid signature be able to register an attestation?
   modifier isValidUser(address issuer, address account) {
     require(
       msg.sender == account ||
