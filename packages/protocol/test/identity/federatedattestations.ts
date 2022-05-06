@@ -32,6 +32,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
   const pnIdentifier: string = getPhoneHash(phoneNumber)
 
   const getCurrentUnixTime = () => Math.floor(Date.now() / 1000)
+  const chainId = 1
 
   beforeEach('FederatedAttestations setup', async () => {
     accountsInstance = await Accounts.new(true)
@@ -106,7 +107,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         account,
         issuedOn,
         signer,
-        1,
+        chainId,
         federatedAttestations.address
       )
       await accountsInstance.createAccount({ from: issuer })
@@ -141,7 +142,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           account,
           issuedOn,
           accounts[3],
-          1,
+          chainId,
           federatedAttestations.address
         ))
         assert.isFalse(
