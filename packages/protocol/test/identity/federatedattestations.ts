@@ -27,12 +27,17 @@ contract('FederatedAttestations', (accounts: string[]) => {
   let registry: RegistryInstance
   let initialize
 
-  const caller: string = accounts[0]
   const phoneNumber: string = '+18005551212'
   const pnIdentifier: string = getPhoneHash(phoneNumber)
-
   const getCurrentUnixTime = () => Math.floor(Date.now() / 1000)
   const chainId = 1
+
+  const issuer = accounts[0]
+  const signer = accounts[1]
+  const account = accounts[2]
+  const issuedOn = getCurrentUnixTime()
+  const signerRole = keccak256('celo.org/core/attestation')
+  let sig
 
   beforeEach('FederatedAttestations setup', async () => {
     accountsInstance = await Accounts.new(true)
@@ -43,8 +48,18 @@ contract('FederatedAttestations', (accounts: string[]) => {
       CeloContractName.FederatedAttestations,
       federatedAttestations.address
     )
-
     initialize = await federatedAttestations.initialize(registry.address)
+
+    await accountsInstance.createAccount({ from: issuer })
+    sig = await getSignatureForAttestation(
+      pnIdentifier,
+      issuer,
+      account,
+      issuedOn,
+      signer,
+      1,
+      federatedAttestations.address
+    )
   })
 
   describe('#EIP712_VALIDATE_ATTESTATION_TYPEHASH()', () => {
@@ -62,7 +77,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
   describe('#initialize()', () => {
     it('should have set the owner', async () => {
       const owner: string = await federatedAttestations.owner()
-      assert.equal(owner, caller)
+      assert.equal(owner, issuer)
     })
 
     it('should have set the registry address', async () => {
@@ -116,30 +131,10 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#isValidAttestation', async () => {
-    const issuer = accounts[0]
-    const signer = accounts[1]
-    const account = accounts[2]
-    const issuedOn = getCurrentUnixTime()
-    let sig
-
-    beforeEach(async () => {
-      sig = await getSignatureForAttestation(
-        pnIdentifier,
-        issuer,
-        account,
-        issuedOn,
-        signer,
-        chainId,
-        federatedAttestations.address
-      )
-      await accountsInstance.createAccount({ from: issuer })
-    })
-
     describe('with an authorized AttestationSigner', async () => {
       beforeEach(async () => {
-        const role = keccak256('celo.org/core/attestation')
-        await accountsInstance.authorizeSigner(signer, role, { from: issuer })
-        await accountsInstance.completeSignerAuthorization(issuer, role, { from: signer })
+        await accountsInstance.authorizeSigner(signer, signerRole, { from: issuer })
+        await accountsInstance.completeSignerAuthorization(issuer, signerRole, { from: signer })
       })
 
       it('should return true if a valid signature is used', async () => {
@@ -158,7 +153,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return false if an invalid signature is provided', async () => {
-        const sig2 = (sig = await getSignatureForAttestation(
+        const sig2 = await getSignatureForAttestation(
           pnIdentifier,
           issuer,
           account,
@@ -166,7 +161,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           accounts[3],
           chainId,
           federatedAttestations.address
-        ))
+        )
         assert.isFalse(
           await federatedAttestations.isValidAttestation(
             pnIdentifier,
@@ -258,7 +253,87 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#registerAttestation', () => {
-    it('should', async () => {})
+    beforeEach(async () => {
+      await accountsInstance.authorizeSigner(signer, signerRole, { from: issuer })
+      await accountsInstance.completeSignerAuthorization(issuer, signerRole, { from: signer })
+    })
+    it('should emit AttestationRegistered for a valid attestation', async () => {
+      const register = await federatedAttestations.registerAttestation(
+        pnIdentifier,
+        issuer,
+        account,
+        issuedOn,
+        signer,
+        sig.v,
+        sig.r,
+        sig.s
+      )
+      assertLogMatches2(register.logs[0], {
+        event: 'AttestationRegistered',
+        args: {
+          identifier: pnIdentifier,
+          issuer,
+          account,
+          issuedOn,
+          signer,
+        },
+      })
+    })
+
+    it('should revert if the same attestation is uploaded again', async () => {
+      await federatedAttestations.registerAttestation(
+        pnIdentifier,
+        issuer,
+        account,
+        issuedOn,
+        signer,
+        sig.v,
+        sig.r,
+        sig.s
+      )
+
+      // Upload the same attestation from a different signer, authorized under the same issuer
+      const signer2 = accounts[4]
+      await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer })
+      await accountsInstance.completeSignerAuthorization(issuer, signerRole, { from: signer2 })
+      const sig2 = await getSignatureForAttestation(
+        pnIdentifier,
+        issuer,
+        account,
+        issuedOn + 1,
+        signer2,
+        1,
+        federatedAttestations.address
+      )
+      await assertRevert(
+        federatedAttestations.registerAttestation(
+          pnIdentifier,
+          issuer,
+          account,
+          issuedOn,
+          signer2,
+          sig2.v,
+          sig2.r,
+          sig2.s
+        )
+      )
+    })
+
+    it('should revert if an invalid user attempts to upload the attestation', async () => {
+      await assertRevert(
+        federatedAttestations.registerAttestation(
+          pnIdentifier,
+          issuer,
+          account,
+          issuedOn,
+          signer,
+          sig.v,
+          sig.r,
+          sig.s,
+          { from: accounts[4] }
+        )
+      )
+    })
   })
 
   describe('#deleteAttestation', () => {
