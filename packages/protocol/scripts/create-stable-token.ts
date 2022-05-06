@@ -263,7 +263,7 @@ try {
     errorFunct
   )
 
-  console.log(`Other thinks that should be updated:
+  console.log(`Other things that should be updated:
   * Add constitution parameters: packages/protocol/governanceConstitution.js
   * Rename migration with right number: packages/protocol/migrations/09_Y_stableToken_X.ts and packages/protocol/migrations/10_Y_Exchange_X.ts
   * Add keys to migration config: packages/protocol/migrationsConfig.js
