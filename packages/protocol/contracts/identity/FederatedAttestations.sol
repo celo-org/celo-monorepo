@@ -243,6 +243,19 @@ contract FederatedAttestations is
     return guessedSigner == signer;
   }
 
+  /**
+   * @notice Registers an attestation with a valid signature
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param signer Address of the signer of the attestation
+   * @param v The recovery id of the incoming ECDSA signature
+   * @param r Output value r of the ECDSA signature
+   * @param s Output value s of the ECDSA signature
+   * @dev Throws if sender is not the issuer, account, or signer
+   * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
+   */
   function registerAttestation(
     bytes32 identifier,
     address issuer,
@@ -257,7 +270,7 @@ contract FederatedAttestations is
       isValidAttestation(identifier, issuer, account, issuedOn, signer, v, r, s),
       "Signature is invalid"
     );
-    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i++) {
+    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i.add(1)) {
       // This enforces only one attestation to be uploaded for a given set of (identifier, issuer, account)
       // Editing/upgrading an attestation requires that it be deleted before a new one is registered
       require(
