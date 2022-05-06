@@ -1,13 +1,12 @@
 import * as fs from 'fs'
 
-const KEY_TO_BE_REPLACED_IN_TEMPLATES = '{TICKER}'
-
-const StableTokenTemplate = `pragma solidity ^0.5.13;
+function stableTokenSource(ticker: string): string {
+  return `pragma solidity ^0.5.13;
 
 import "./StableToken.sol";
 
-contract StableToken{TICKER} is StableToken {
-  \/**
+contract StableToken${ticker} is StableToken {
+  /**
    * @notice Sets initialized == true on implementation contracts.
    * @param test Set to true to skip implementation initialization.
    */
@@ -23,13 +22,15 @@ contract StableToken{TICKER} is StableToken {
   }
 }
 `
+}
 
-const ExchangeTemplate = `pragma solidity ^0.5.13;
+function exchangeSource(ticker: string): string {
+  return `pragma solidity ^0.5.13;
 
 import "./Exchange.sol";
 
-contract Exchange{TICKER} is Exchange {
-  \/**
+contract Exchange${ticker} is Exchange {
+  /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
@@ -45,24 +46,30 @@ contract Exchange{TICKER} is Exchange {
   }
 }
 `
+}
 
-const StableTokenProxyTemplate = `pragma solidity ^0.5.13;
-
-import "../../common/Proxy.sol";
-
-/* solhint-disable no-empty-blocks */
-contract StableToken{TICKER}Proxy is Proxy {}
-`
-
-const ExchangeProxyTemplate = `pragma solidity ^0.5.13;
+function stableTokenProxySource(ticker: string): string {
+  return `pragma solidity ^0.5.13;
 
 import "../../common/Proxy.sol";
 
 /* solhint-disable no-empty-blocks */
-contract Exchange{TICKER}Proxy is Proxy {}
+contract StableToken${ticker}Proxy is Proxy {}
 `
+}
 
-const migrationStableTemplate = `/* tslint:disable:no-console */
+function exchangeProxySource(ticker: string): string {
+  return `pragma solidity ^0.5.13;
+
+import "../../common/Proxy.sol";
+
+/* solhint-disable no-empty-blocks */
+contract Exchange${ticker}Proxy is Proxy {}
+`
+}
+
+function migrationStableSource(ticker: string): string {
+  return `/* tslint:disable:no-console */
 import { ensureLeading0x, eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
@@ -76,35 +83,35 @@ import {
   FreezerInstance,
   ReserveInstance,
   SortedOraclesInstance,
-  StableToken{TICKER}Instance,
+  StableToken${ticker}Instance,
 } from 'types'
 import Web3 from 'web3'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 
 const initializeArgs = async (): Promise<any[]> => {
-  const rate = toFixed(config.stableToken{TICKER}.inflationRate)
+  const rate = toFixed(config.stableToken${ticker}.inflationRate)
   return [
-    config.stableToken{TICKER}.tokenName,
-    config.stableToken{TICKER}.tokenSymbol,
-    config.stableToken{TICKER}.decimals,
+    config.stableToken${ticker}.tokenName,
+    config.stableToken${ticker}.tokenSymbol,
+    config.stableToken${ticker}.decimals,
     config.registry.predeployedProxyAddress,
     rate.toString(),
-    config.stableToken{TICKER}.inflationPeriod,
-    config.stableToken{TICKER}.initialBalances.addresses,
-    config.stableToken{TICKER}.initialBalances.values,
-    'Exchange{TICKER}',
+    config.stableToken${ticker}.inflationPeriod,
+    config.stableToken${ticker}.initialBalances.addresses,
+    config.stableToken${ticker}.initialBalances.values,
+    'Exchange${ticker}',
   ]
 }
 
 // TODO make this general
-module.exports = deploymentForCoreContract<StableToken{TICKER}Instance>(
+module.exports = deploymentForCoreContract<StableToken${ticker}Instance>(
   web3,
   artifacts,
-  CeloContractName.StableToken{TICKER},
+  CeloContractName.StableToken${ticker},
   initializeArgs,
-  async (stableToken: StableToken{TICKER}Instance, _web3: Web3, networkName: string) => {
-    if (config.stableToken{TICKER}.frozen) {
+  async (stableToken: StableToken${ticker}Instance, _web3: Web3, networkName: string) => {
+    if (config.stableToken${ticker}.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
         artifacts
@@ -116,22 +123,22 @@ module.exports = deploymentForCoreContract<StableToken{TICKER}Instance>(
       artifacts
     )
 
-    for (const oracle of config.stableToken{TICKER}.oracles) {
-      console.info(\`Adding \${ oracle } as an Oracle for StableToken({TICKER})\`)
+    for (const oracle of config.stableToken${ticker}.oracles) {
+      console.info(\`Adding \${ oracle } as an Oracle for StableToken(${ticker})\`)
       await sortedOracles.addOracle(stableToken.address, ensureLeading0x(oracle))
     }
 
-    const goldPrice = config.stableToken{TICKER}.goldPrice
+    const goldPrice = config.stableToken${ticker}.goldPrice
     if (goldPrice) {
       const fromAddress = truffle.networks[networkName].from
-      const isOracle = config.stableToken{TICKER}.oracles.some((o) => eqAddress(o, fromAddress))
+      const isOracle = config.stableToken${ticker}.oracles.some((o) => eqAddress(o, fromAddress))
       if (!isOracle) {
         console.warn(
           \`Gold price specified in migration but \${ fromAddress } not explicitly authorized as oracle, authorizing...\`
         )
         await sortedOracles.addOracle(stableToken.address, ensureLeading0x(fromAddress))
       }
-      console.info('Reporting price of StableToken ({TICKER}) to oracle')
+      console.info('Reporting price of StableToken (${ticker}) to oracle')
       await sortedOracles.report(
         stableToken.address,
         toFixed(goldPrice),
@@ -142,11 +149,11 @@ module.exports = deploymentForCoreContract<StableToken{TICKER}Instance>(
         'Reserve',
         artifacts
       )
-      console.info('Adding StableToken ({TICKER}) to Reserve')
+      console.info('Adding StableToken (${ticker}) to Reserve')
       await reserve.addToken(stableToken.address)
     }
 
-    console.info('Whitelisting StableToken ({TICKER}) as a fee currency')
+    console.info('Whitelisting StableToken (${ticker}) as a fee currency')
     const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract<FeeCurrencyWhitelistInstance>(
       'FeeCurrencyWhitelist',
       artifacts
@@ -155,8 +162,10 @@ module.exports = deploymentForCoreContract<StableToken{TICKER}Instance>(
   }
 )
 `
+}
 
-const migrationExchangeTemplate = `/* tslint:disable:no-console */
+function migrationExchangeSource(ticker: string): string {
+  return `/* tslint:disable:no-console */
 
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
@@ -165,12 +174,12 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { Exchange{TICKER}Instance, FreezerInstance, ReserveInstance } from 'types'
+import { Exchange${ticker}Instance, FreezerInstance, ReserveInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
     config.registry.predeployedProxyAddress,
-    CeloContractName.StableToken{TICKER},
+    CeloContractName.StableToken${ticker},
     toFixed(config.exchange.spread).toString(),
     toFixed(config.exchange.reserveFraction).toString(),
     config.exchange.updateFrequency,
@@ -178,12 +187,12 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
-module.exports = deploymentForCoreContract<Exchange{TICKER}Instance>(
+module.exports = deploymentForCoreContract<Exchange${ticker}Instance>(
   web3,
   artifacts,
-  CeloContractName.Exchange{TICKER},
+  CeloContractName.Exchange${ticker},
   initializeArgs,
-  async (exchange: Exchange{TICKER}Instance) => {
+  async (exchange: Exchange${ticker}Instance) => {
     if (config.exchange.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
@@ -202,6 +211,7 @@ module.exports = deploymentForCoreContract<Exchange{TICKER}Instance>(
   }
 )
 `
+}
 
 function errorFunct(err) {
   if (err) return console.log(err)
@@ -220,36 +230,36 @@ try {
   // contracts
   fs.writeFile(
     `${stabilityContractPath}/StableToken${fiatTicker}.sol`,
-    StableTokenTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    stableTokenSource(fiatTicker),
     errorFunct
   )
   fs.writeFile(
     `${stabilityContractPath}/Exchange${fiatTicker}.sol`,
-    ExchangeTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    exchangeSource(fiatTicker),
     errorFunct
   )
 
   // proxy
   fs.writeFile(
     `${stabilityProxyPath}/StableToken${fiatTicker}.sol`,
-    StableTokenProxyTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    stableTokenProxySource(fiatTicker),
     errorFunct
   )
   fs.writeFile(
     `${stabilityProxyPath}/Exchange${fiatTicker}.sol`,
-    ExchangeProxyTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    exchangeProxySource(fiatTicker),
     errorFunct
   )
 
   // migration
   fs.writeFile(
     `${migrationPath}/09_999_stableToken_${fiatTicker}.sol`,
-    migrationStableTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    migrationStableSource(fiatTicker),
     errorFunct
   )
   fs.writeFile(
     `${migrationPath}/10_999_exchange_${fiatTicker}.sol`,
-    migrationExchangeTemplate.replace(KEY_TO_BE_REPLACED_IN_TEMPLATES, fiatTicker),
+    migrationExchangeSource(fiatTicker),
     errorFunct
   )
 
