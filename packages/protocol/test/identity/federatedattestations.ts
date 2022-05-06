@@ -255,25 +255,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       )
     })
-
-    it('should revert if the signer is authorized as a different role by the issuer', async () => {
-      const role = keccak256('random')
-      await accountsInstance.authorizeSigner(signer, role, { from: issuer })
-      await accountsInstance.completeSignerAuthorization(issuer, role, { from: signer })
-
-      await assertRevert(
-        federatedAttestations.validateAttestation(
-          pnIdentifier,
-          issuer,
-          account,
-          issuedOn,
-          signer,
-          sig.v,
-          sig.r,
-          sig.s
-        )
-      )
-    })
   })
 
   describe('#registerAttestation', () => {
