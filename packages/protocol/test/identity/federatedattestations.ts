@@ -487,10 +487,10 @@ contract('FederatedAttestations', (accounts: string[]) => {
       ]
       wrongArgs.forEach(([index, arg, wrongValue]) => {
         it(`should fail if the provided ${arg} is different from the attestation`, async () => {
-          let args = [identifier1, issuer1, account1, nowUnixTime, signer1, sig.v, sig.r, sig.s]
+          const args = [identifier1, issuer1, account1, nowUnixTime, signer1, sig.v, sig.r, sig.s]
           args[index] = wrongValue
 
-          if (arg == 'issuer' || arg == 'signer') {
+          if (arg === 'issuer' || arg === 'signer') {
             await assertRevert(
               federatedAttestations.isValidAttestation.apply(this, args),
               'Signer has not been authorized as an AttestationSigner by the issuer'
@@ -802,6 +802,9 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#deleteAttestation', () => {
-    it('should', async () => {})
+    it('should', async () => {
+      // Fix lint checks until these tests are here
+      assert(true)
+    })
   })
 })
