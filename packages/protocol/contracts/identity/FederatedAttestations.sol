@@ -42,10 +42,24 @@ contract FederatedAttestations is
   mapping(bytes32 => mapping(address => IdentifierOwnershipAttestation[])) public identifierToAddresses;
   // account -> issuer -> identifiers
   mapping(address => mapping(address => bytes32[])) public addressToIdentifiers;
-  // signer => revocation time
-  mapping(address => uint256) public revokedSigners;
+  // signer => isRevoked
+  mapping(address => bool) public revokedSigners;
 
-  // TODO ASv2 Event declarations
+  // TODO: should this be hardcoded here?
+  bytes32 constant SIGNER_ROLE = keccak256(abi.encodePacked("celo.org/core/attestation"));
+  bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
+    "IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
+  );
+  bytes32 public eip712DomainSeparator;
+
+  event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
+  event AttestationRegistered(
+    bytes32 indexed identifier,
+    address indexed issuer,
+    address indexed account,
+    uint256 issuedOn,
+    address signer
+  );
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -60,7 +74,31 @@ contract FederatedAttestations is
   function initialize(address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+    setEip712DomainSeparator();
     // TODO ASv2 initialize any other variables here
+  }
+
+  /**
+   * @notice Sets the EIP712 domain separator for the Celo FederatedAttestations abstraction.
+   */
+  function setEip712DomainSeparator() public {
+    uint256 chainId;
+    assembly {
+      chainId := chainid
+    }
+
+    eip712DomainSeparator = keccak256(
+      abi.encode(
+        keccak256(
+          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        ),
+        keccak256(bytes("FederatedAttestations")),
+        keccak256("1.0"),
+        chainId,
+        address(this)
+      )
+    );
+    emit EIP712DomainSeparatorSet(eip712DomainSeparator);
   }
 
   /**
@@ -69,12 +107,6 @@ contract FederatedAttestations is
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
-  }
-
-  function _isRevoked(address signer, uint256 time) internal view returns (bool) {
-    require(time >= 0);
-    uint256 revokedOn = revokedSigners[signer];
-    return revokedOn > 0 && revokedOn <= time;
   }
 
   /**
@@ -115,7 +147,7 @@ contract FederatedAttestations is
         // Only create and push new attestation if we haven't hit max
         if (currIndex < maxAttestations) {
           IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuers[i]][j];
-          if (!_isRevoked(attestation.signer, attestation.issuedOn)) {
+          if (!revokedSigners[attestation.signer]) {
             accounts[currIndex] = attestation.account;
             issuedOns[currIndex] = attestation.issuedOn;
             signers[currIndex] = attestation.signer;
@@ -178,10 +210,7 @@ contract FederatedAttestations is
           for (uint256 k = 0; k < attestationsForIssuer.length; k = k.add(1)) {
             IdentifierOwnershipAttestation memory attestation = attestationsForIssuer[k];
             // (identifier, account, issuer) tuples should be unique
-            if (
-              attestation.account == account &&
-              !_isRevoked(attestation.signer, attestation.issuedOn)
-            ) {
+            if (attestation.account == account && !revokedSigners[attestation.signer]) {
               identifiers[currIndex] = identifier;
               currIndex = currIndex.add(1);
               break;
@@ -204,33 +233,102 @@ contract FederatedAttestations is
     }
   }
 
-  function validateAttestation(
+  // TODO do we want to restrict permissions, or should anyone with a valid signature be able to register an attestation?
+  modifier isValidUser(address issuer, address account) {
+    require(
+      msg.sender == account ||
+        msg.sender == issuer ||
+        getAccounts().attestationSignerToAccount(msg.sender) == issuer,
+      "User does not have permission to perform this action"
+    );
+    _;
+  }
+
+  /**
+   * @notice Validates the given attestation and signature
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param signer Address of the signer of the attestation
+   * @param v The recovery id of the incoming ECDSA signature
+   * @param r Output value r of the ECDSA signature
+   * @param s Output value s of the ECDSA signature
+   * @return Whether the signature is valid
+   * @dev Throws if signer is revoked
+   * @dev Throws if signer is not an authorized AttestationSigner of the issuer
+   */
+  function isValidAttestation(
     bytes32 identifier,
     address issuer,
-    IdentifierOwnershipAttestation memory attestation,
+    address account,
+    uint256 issuedOn,
+    address signer,
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) public view returns (address) {
-    // TODO check if signer is revoked and is a valid signer of the account
+  ) public view returns (bool) {
+    require(!revokedSigners[signer], "Signer has been revoked");
+    require(
+      getAccounts().isSigner(issuer, signer, SIGNER_ROLE),
+      "Signer has not been authorized as an AttestationSigner by the issuer"
+    );
+    bytes32 structHash = keccak256(
+      abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
+    );
+    address guessedSigner = Signatures.getSignerOfTypedDataHash(
+      eip712DomainSeparator,
+      structHash,
+      v,
+      r,
+      s
+    );
+    return guessedSigner == signer;
   }
 
+  /**
+   * @notice Registers an attestation with a valid signature
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param signer Address of the signer of the attestation
+   * @param v The recovery id of the incoming ECDSA signature
+   * @param r Output value r of the ECDSA signature
+   * @param s Output value s of the ECDSA signature
+   * @dev Throws if sender is not the issuer, account, or signer
+   * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
+   */
   function registerAttestation(
     bytes32 identifier,
     address issuer,
-    IdentifierOwnershipAttestation memory attestation
-  ) public {
-    // TODO call validateAttestation here
+    address account,
+    uint256 issuedOn,
+    address signer,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public isValidUser(issuer, account) {
     require(
-      msg.sender == attestation.account || msg.sender == issuer || msg.sender == attestation.signer
+      isValidAttestation(identifier, issuer, account, issuedOn, signer, v, r, s),
+      "Signature is invalid"
     );
-    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i++) {
+    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i.add(1)) {
       // This enforces only one attestation to be uploaded for a given set of (identifier, issuer, account)
       // Editing/upgrading an attestation requires that it be deleted before a new one is registered
-      require(identifierToAddresses[identifier][issuer][i].account != attestation.account);
+      require(
+        identifierToAddresses[identifier][issuer][i].account != account,
+        "Attestation for this account already exists"
+      );
     }
+    IdentifierOwnershipAttestation memory attestation = IdentifierOwnershipAttestation(
+      account,
+      issuedOn,
+      signer
+    );
     identifierToAddresses[identifier][issuer].push(attestation);
-    addressToIdentifiers[attestation.account][issuer].push(identifier);
+    addressToIdentifiers[account][issuer].push(identifier);
+    emit AttestationRegistered(identifier, issuer, account, issuedOn, signer);
   }
 
   function deleteAttestation(bytes32 identifier, address issuer, address account) public {
@@ -268,8 +366,8 @@ contract FederatedAttestations is
     }
   }
 
-  function revokeSigner(address signer, uint256 revokedOn) public {
-    // TODO ASv2 add constraints on who can revoke a signer
-    revokedSigners[signer] = revokedOn;
+  function revokeSigner(address signer) public {
+    // TODO ASv2 add constraints on who has permissions to revoke a signer
+    revokedSigners[signer] = true;
   }
 }
