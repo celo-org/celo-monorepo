@@ -28,7 +28,7 @@ config:
         - namespace
       # TODO: reconsider what should be kept from the default namespace
       # eg: ingress controller
-      regex: (alfajores|baklava|default|komenci|rc1|rc1staging|walletconnect)
+      regex: (alfajores|baklava|default|komenci|rc1|rc1staging|staging|walletconnect)
 
 serviceAccount:
   # add a iam.gke.io/gcp-service-account, see
