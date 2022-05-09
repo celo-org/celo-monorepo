@@ -17,15 +17,15 @@ const getTypedData = (chainId: number, contractAddress: Address, message?: Attes
       EIP712Domain: [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256'},  // consider removing
-        { name: 'verifyingContract', type: 'address'}, // consider removing
+        { name: 'chainId', type: 'uint256'},  // TODO ASv2 consider removing
+        { name: 'verifyingContract', type: 'address'}, // TODO ASv2 consider removing
       ],
       IdentifierOwnershipAttestation: [
           { name: 'identifier', type: 'bytes32' },
           { name: 'issuer', type: 'address'},
           { name: 'account', type: 'address' },
           { name: 'issuedOn', type: 'uint256' },
-          // Consider including a nonce (which could also be used as an ID)
+          // TODO ASv2 Consider including a nonce (which could also be used as an ID)
       ],
     },
     primaryType: 'IdentifierOwnershipAttestation',
