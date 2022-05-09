@@ -14,6 +14,8 @@ import {
   RegistryInstance,
   ReserveInstance,
 } from 'types'
+
+// tslint:disable-next-line: ordered-imports
 import BN = require('bn.js')
 
 const Registry: Truffle.Contract<RegistryInstance> = artifacts.require('Registry')
