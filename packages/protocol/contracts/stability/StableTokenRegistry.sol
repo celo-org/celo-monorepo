@@ -4,17 +4,14 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../common/Initializable.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "../common/interfaces/IRegistry.sol";
-import "../common/UsingRegistry.sol";
 
 /**
  * @title contract that lists what stable coins are deployed as part of Celo's Stability protocol.
  */
-contract StableTokenRegistry is Initializable, Ownable, UsingRegistry {
+contract StableTokenRegistry is Initializable, Ownable {
   using SafeMath for uint256;
   mapping(bytes => bytes) public stableTokens;
   bytes[] public fiatTickers;
-
-  IRegistry public registry;
 
   /**
    * @notice Sets initialized == true on implementation contracts
