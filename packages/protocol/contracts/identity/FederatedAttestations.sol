@@ -1,6 +1,4 @@
 pragma solidity ^0.5.13;
-// TODO ASv2 come back to this and possibly flatten structs as arg params
-pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
