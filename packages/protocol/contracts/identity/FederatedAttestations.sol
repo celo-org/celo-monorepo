@@ -313,7 +313,7 @@ contract FederatedAttestations is
       isValidAttestation(identifier, issuer, account, issuedOn, signer, v, r, s),
       "Signature is invalid"
     );
-    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i.add(1)) {
+    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i = i.add(1)) {
       // This enforces only one attestation to be uploaded for a given set of (identifier, issuer, account)
       // Editing/upgrading an attestation requires that it be deleted before a new one is registered
       require(
