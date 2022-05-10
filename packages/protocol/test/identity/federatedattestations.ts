@@ -3,7 +3,11 @@ import {
   getSignatureForAttestation,
 } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
+import {
+  assertLogMatches2,
+  assertRevert,
+  assertRevertWithReason,
+} from '@celo/protocol/lib/test-utils'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import {
@@ -491,10 +495,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           args[index] = wrongValue
 
           if (arg === 'issuer' || arg === 'signer') {
-            await assertRevert(
-              federatedAttestations.isValidAttestation.apply(this, args),
-              'Signer has not been authorized as an AttestationSigner by the issuer'
-            )
+            await assertRevert(federatedAttestations.isValidAttestation.apply(this, args))
           } else {
             assert.isFalse(await federatedAttestations.isValidAttestation.apply(this, args))
           }
@@ -503,7 +504,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
       it('should revert if the signer is revoked', async () => {
         await federatedAttestations.revokeSigner(signer1)
-        await assertRevert(
+        await assertRevertWithReason(
           federatedAttestations.isValidAttestation(
             identifier1,
             issuer1,
@@ -802,9 +803,103 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#deleteAttestation', () => {
-    it('should', async () => {
-      // Fix lint checks until these tests are here
-      assert(true)
+    beforeEach(async () => {
+      await accountsInstance.authorizeSigner(signer1, signerRole, { from: issuer1 })
+      await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer1 })
+      await federatedAttestations.registerAttestation(
+        identifier1,
+        issuer1,
+        account1,
+        nowUnixTime,
+        signer1,
+        sig.v,
+        sig.r,
+        sig.s
+      )
+    })
+
+    it('should emit an AttestationDeleted event after successfully deleting', async () => {
+      const deleteAttestation = await federatedAttestations.deleteAttestation(
+        identifier1,
+        issuer1,
+        account1
+      )
+      assertLogMatches2(deleteAttestation.logs[0], {
+        event: 'AttestationDeleted',
+        args: {
+          identifier: identifier1,
+          issuer: issuer1,
+          account: account1,
+        },
+      })
+    })
+
+    it('should revert if an invalid user attempts to delete the attestation', async () => {
+      await assertRevert(
+        federatedAttestations.deleteAttestation(identifier1, issuer1, account1, {
+          from: accounts[4],
+        })
+      )
+    })
+
+    it('should revert if a revoked signer attempts to delete the attestation', async () => {
+      await federatedAttestations.revokeSigner(signer1)
+      await assertRevert(
+        federatedAttestations.deleteAttestation(identifier1, issuer1, account1, { from: signer1 })
+      )
+    })
+
+    it('should successfully delete an attestation with a revoked signer', async () => {
+      await federatedAttestations.revokeSigner(signer1)
+      const deleteAttestation = await federatedAttestations.deleteAttestation(
+        identifier1,
+        issuer1,
+        account1
+      )
+      assertLogMatches2(deleteAttestation.logs[0], {
+        event: 'AttestationDeleted',
+        args: {
+          identifier: identifier1,
+          issuer: issuer1,
+          account: account1,
+        },
+      })
+    })
+
+    it('should fail registering same attestation but succeed after deleting it', async () => {
+      await assertRevert(
+        federatedAttestations.registerAttestation(
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime,
+          signer1,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+      )
+      await federatedAttestations.deleteAttestation(identifier1, issuer1, account1)
+      const register = await federatedAttestations.registerAttestation(
+        identifier1,
+        issuer1,
+        account1,
+        nowUnixTime,
+        signer1,
+        sig.v,
+        sig.r,
+        sig.s
+      )
+      assertLogMatches2(register.logs[0], {
+        event: 'AttestationRegistered',
+        args: {
+          identifier: identifier1,
+          issuer: issuer1,
+          account: account1,
+          issuedOn: nowUnixTime,
+          signer: signer1,
+        },
+      })
     })
   })
 })

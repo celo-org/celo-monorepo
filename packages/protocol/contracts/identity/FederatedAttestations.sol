@@ -47,8 +47,6 @@ contract FederatedAttestations is
   // signer => isRevoked
   mapping(address => bool) public revokedSigners;
 
-  // TODO: should this be hardcoded here?
-  bytes32 constant SIGNER_ROLE = keccak256(abi.encodePacked("celo.org/core/attestation"));
   bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
     // solhint-disable-next-line max-line-length
     "IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
@@ -62,6 +60,11 @@ contract FederatedAttestations is
     address indexed account,
     uint256 issuedOn,
     address signer
+  );
+  event AttestationDeleted(
+    bytes32 indexed identifier,
+    address indexed issuer,
+    address indexed account
   );
 
   /**
@@ -137,6 +140,7 @@ contract FederatedAttestations is
     // Cannot dynamically allocate an in-memory array
     // For now require a max returned parameter to pre-allocate and then shrink
     // TODO ASv2 is it a risk to allocate an array of size maxAttestations?
+
     // Same index corresponds to same attestation
     address[] memory accounts = new address[](maxAttestations);
     uint256[] memory issuedOns = new uint256[](maxAttestations);
@@ -247,6 +251,7 @@ contract FederatedAttestations is
         getAccounts().attestationSignerToAccount(msg.sender) == issuer,
       "User does not have permission to perform this action"
     );
+    require(!revokedSigners[msg.sender], "User has been revoked ");
     _;
   }
 
@@ -281,7 +286,7 @@ contract FederatedAttestations is
     //   "Signer has not been authorized as an AttestationSigner by the issuer"
     // );
     require(
-      getAccounts().isSigner(issuer, signer, SIGNER_ROLE),
+      getAccounts().attestationSignerToAccount(signer) == issuer,
       "Signer has not been authorized as an AttestationSigner by the issuer"
     );
     bytes32 structHash = keccak256(
@@ -307,7 +312,7 @@ contract FederatedAttestations is
    * @param v The recovery id of the incoming ECDSA signature
    * @param r Output value r of the ECDSA signature
    * @param s Output value s of the ECDSA signature
-   * @dev Throws if sender is not the issuer, account, or signer
+   * @dev Throws if sender is not the issuer, account, or an authorized AttestationSigner
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
   function registerAttestation(
@@ -343,34 +348,34 @@ contract FederatedAttestations is
     emit AttestationRegistered(identifier, issuer, account, issuedOn, signer);
   }
 
-  function deleteAttestation(bytes32 identifier, address issuer, address account) public {
-    require(
-      msg.sender == account || getAccounts().attestationSignerToAccount(msg.sender) == issuer
-    );
-
+  /**
+   * @notice Deletes an attestation 
+   * @param identifier Hash of the identifier to be deleted
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account mapped to the identifier
+   * @dev Throws if sender is not the issuer, account, or an authorized AttestationSigner
+   */
+  function deleteAttestation(bytes32 identifier, address issuer, address account)
+    public
+    isValidUser(issuer, account)
+  {
     // TODO ASv2 store the intermeidate arrays where possible to prevent
     // repeated storage lookups for same values
-
-    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i++) {
-      // solhint-disable-next-line max-line-length
+    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i.add(1)) {
       IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][issuer][i];
       if (attestation.account == account) {
         // This is meant to delete the attestation in the array
         // and then move the last element in the array to that empty spot,
         // to avoid having empty elements in the array
-        // Not sure if this is needed and if the added gas costs from the complexity is worth it
-
+        // Not sure if this is needed
         // solhint-disable-next-line max-line-length
         identifierToAddresses[identifier][issuer][i] = identifierToAddresses[identifier][issuer][identifierToAddresses[identifier][issuer]
           .length -
           1];
         identifierToAddresses[identifier][issuer].pop();
 
-        // TODO revisit if deletedIdentifier check is necessary
-        // - not sure if there would ever be a situation where the
-        // matching identifier is not present
         bool deletedIdentifier = false;
-        for (uint256 j = 0; j < addressToIdentifiers[account][issuer].length; j++) {
+        for (uint256 j = 0; j < addressToIdentifiers[account][issuer].length; j.add(1)) {
           if (addressToIdentifiers[account][issuer][j] == identifier) {
             // solhint-disable-next-line max-line-length
             addressToIdentifiers[account][issuer][j] = addressToIdentifiers[account][issuer][addressToIdentifiers[account][issuer]
@@ -381,8 +386,10 @@ contract FederatedAttestations is
             break;
           }
         }
-        // Hard requirement to delete from both mappings in unison
-        require(deletedIdentifier);
+        // Should never be false - both mappings should always be updated in unison
+        assert(deletedIdentifier);
+
+        emit AttestationDeleted(identifier, issuer, account);
         break;
       }
     }
@@ -390,6 +397,8 @@ contract FederatedAttestations is
 
   function revokeSigner(address signer) public {
     // TODO ASv2 add constraints on who has permissions to revoke a signer
+    // TODO ASv2 consider whether we want to check if the signer is an authorized signer
+    // or to allow any address to be revoked
     revokedSigners[signer] = true;
   }
 }
