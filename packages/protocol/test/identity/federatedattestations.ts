@@ -112,7 +112,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
   describe('#EIP712_VALIDATE_ATTESTATION_TYPEHASH()', () => {
     it('should have set the right typehash', async () => {
       const expectedTypehash = keccak256(
-        'IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)'
+        'OwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)'
       )
       assert.equal(
         await federatedAttestations.EIP712_VALIDATE_ATTESTATION_TYPEHASH(),
