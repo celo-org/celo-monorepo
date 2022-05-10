@@ -30,7 +30,6 @@ contract FederatedAttestations is
   using SafeMath for uint256;
   using SafeCast for uint256;
 
-  // TODO ASv2 fix all ++ -> SafeMath x = x.add(1)
   struct IdentifierOwnershipAttestation {
     address account;
     uint256 issuedOn;
@@ -140,7 +139,6 @@ contract FederatedAttestations is
     // Cannot dynamically allocate an in-memory array
     // For now require a max returned parameter to pre-allocate and then shrink
     // TODO ASv2 is it a risk to allocate an array of size maxAttestations?
-
     // Same index corresponds to same attestation
     address[] memory accounts = new address[](maxAttestations);
     uint256[] memory issuedOns = new uint256[](maxAttestations);
