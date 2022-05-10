@@ -30,7 +30,7 @@ contract FederatedAttestations is
   using SafeMath for uint256;
   using SafeCast for uint256;
 
-  struct IdentifierOwnershipAttestation {
+  struct OwnershipAttestation {
     address account;
     uint256 issuedOn;
     address signer;
@@ -39,16 +39,14 @@ contract FederatedAttestations is
   // TODO ASv2 revisit linting issues & all solhint-disable-next-line max-line-length
 
   // identifier -> issuer -> attestations
-  // solhint-disable-next-line max-line-length
-  mapping(bytes32 => mapping(address => IdentifierOwnershipAttestation[])) public identifierToAddresses;
+  mapping(bytes32 => mapping(address => OwnershipAttestation[])) public identifierToAddresses;
   // account -> issuer -> identifiers
   mapping(address => mapping(address => bytes32[])) public addressToIdentifiers;
   // signer => isRevoked
   mapping(address => bool) public revokedSigners;
 
   bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
-    // solhint-disable-next-line max-line-length
-    "IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
+    "OwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
   );
   bytes32 public eip712DomainSeparator;
 
@@ -152,7 +150,7 @@ contract FederatedAttestations is
         // Only create and push new attestation if we haven't hit max
         if (currIndex < maxAttestations) {
           // solhint-disable-next-line max-line-length
-          IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuers[i]][j];
+          OwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuers[i]][j];
           if (!revokedSigners[attestation.signer]) {
             accounts[currIndex] = attestation.account;
             issuedOns[currIndex] = attestation.issuedOn;
@@ -213,9 +211,9 @@ contract FederatedAttestations is
           bytes32 identifier = addressToIdentifiers[account][trustedIssuer][j];
           // Check if the mapping was produced by a revoked signer
           // solhint-disable-next-line max-line-length
-          IdentifierOwnershipAttestation[] memory attestationsForIssuer = identifierToAddresses[identifier][trustedIssuer];
+          OwnershipAttestation[] memory attestationsForIssuer = identifierToAddresses[identifier][trustedIssuer];
           for (uint256 k = 0; k < attestationsForIssuer.length; k = k.add(1)) {
-            IdentifierOwnershipAttestation memory attestation = attestationsForIssuer[k];
+            OwnershipAttestation memory attestation = attestationsForIssuer[k];
             // (identifier, account, issuer) tuples should be unique
             if (attestation.account == account && !revokedSigners[attestation.signer]) {
               identifiers[currIndex] = identifier;
@@ -336,11 +334,7 @@ contract FederatedAttestations is
         "Attestation for this account already exists"
       );
     }
-    IdentifierOwnershipAttestation memory attestation = IdentifierOwnershipAttestation(
-      account,
-      issuedOn,
-      signer
-    );
+    OwnershipAttestation memory attestation = OwnershipAttestation(account, issuedOn, signer);
     identifierToAddresses[identifier][issuer].push(attestation);
     addressToIdentifiers[account][issuer].push(identifier);
     emit AttestationRegistered(identifier, issuer, account, issuedOn, signer);
@@ -360,7 +354,7 @@ contract FederatedAttestations is
     // TODO ASv2 store the intermeidate arrays where possible to prevent
     // repeated storage lookups for same values
     for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i.add(1)) {
-      IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][issuer][i];
+      OwnershipAttestation memory attestation = identifierToAddresses[identifier][issuer][i];
       if (attestation.account == account) {
         // This is meant to delete the attestation in the array
         // and then move the last element in the array to that empty spot,
