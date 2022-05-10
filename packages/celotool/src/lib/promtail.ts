@@ -82,10 +82,14 @@ async function helmParameters(clusterConfig?: BaseClusterConfig) {
       params.push(
         `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
       )
+      params.push(`--set extraArgs[0]='-client.external-labels=cluster_name=${clusterName}'`)
       break
 
     case CloudProvider.AZURE:
-      // Nothing special to be done.
+      // Adding cluster_name label
+      params.push(
+        `--set extraArgs[0]='-client.external-labels=cluster_name=${clusterConfig?.clusterName}'`
+      )
       break
 
     case CloudProvider.AWS:
