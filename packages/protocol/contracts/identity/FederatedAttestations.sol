@@ -1,7 +1,4 @@
-// TODO figure out if we can use a new solidity version for just this one contract
 pragma solidity ^0.5.13;
-// TODO ASv2 come back to this and possibly flatten structs as arg params
-pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -33,12 +30,17 @@ contract FederatedAttestations is
   using SafeMath for uint256;
   using SafeCast for uint256;
 
+  // TODO ASv2 fix all ++ -> SafeMath x = x.add(1)
   struct IdentifierOwnershipAttestation {
     address account;
     uint256 issuedOn;
     address signer;
   }
+
+  // TODO ASv2 revisit linting issues & all solhint-disable-next-line max-line-length
+
   // identifier -> issuer -> attestations
+  // solhint-disable-next-line max-line-length
   mapping(bytes32 => mapping(address => IdentifierOwnershipAttestation[])) public identifierToAddresses;
   // account -> issuer -> identifiers
   mapping(address => mapping(address => bytes32[])) public addressToIdentifiers;
@@ -48,6 +50,7 @@ contract FederatedAttestations is
   // TODO: should this be hardcoded here?
   bytes32 constant SIGNER_ROLE = keccak256(abi.encodePacked("celo.org/core/attestation"));
   bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
+    // solhint-disable-next-line max-line-length
     "IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
   );
   bytes32 public eip712DomainSeparator;
@@ -109,45 +112,86 @@ contract FederatedAttestations is
     return (1, 1, 0, 0);
   }
 
+  /**
+   * @notice Returns info about attestations (with unrevoked signers)
+   *   for an identifier produced by a list of issuers
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @param maxAttestations Limit the number of attestations that will be returned
+   * @return for m found attestations, m <= maxAttestations:
+   *         [
+   *           Array of m accounts,
+   *           Array of m issuedOns,
+   *           Array of m signers
+   *         ]; index corresponds to the same attestation
+   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
+   */
+
+  // TODO ASv2 consider also returning an array with counts of attestations per issuer
   function lookupAttestations(
     bytes32 identifier,
     address[] memory trustedIssuers,
     uint256 maxAttestations
-  ) public view returns (IdentifierOwnershipAttestation[] memory) {
+  ) public view returns (address[] memory, uint256[] memory, address[] memory) {
     // Cannot dynamically allocate an in-memory array
     // For now require a max returned parameter to pre-allocate and then shrink
-    // TODO ASv2 probably need a more gas-efficient lookup for the single most-recent attestation for one trusted issuer
+    // TODO ASv2 is it a risk to allocate an array of size maxAttestations?
+    // Same index corresponds to same attestation
+    address[] memory accounts = new address[](maxAttestations);
+    uint256[] memory issuedOns = new uint256[](maxAttestations);
+    address[] memory signers = new address[](maxAttestations);
+
     uint256 currIndex = 0;
-    IdentifierOwnershipAttestation[] memory attestations = new IdentifierOwnershipAttestation[](
-      maxAttestations
-    );
-    for (uint256 i = 0; i < trustedIssuers.length; i++) {
-      address trustedIssuer = trustedIssuers[i];
-      for (uint256 j = 0; j < identifierToAddresses[identifier][trustedIssuer].length; j++) {
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      uint256 numTrustedIssuers = identifierToAddresses[identifier][trustedIssuers[i]].length;
+      for (uint256 j = 0; j < numTrustedIssuers; j = j.add(1)) {
         // Only create and push new attestation if we haven't hit max
         if (currIndex < maxAttestations) {
-          IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuer][j];
+          // solhint-disable-next-line max-line-length
+          IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuers[i]][j];
           if (!revokedSigners[attestation.signer]) {
-            attestations[currIndex] = attestation;
-            currIndex++;
+            accounts[currIndex] = attestation.account;
+            issuedOns[currIndex] = attestation.issuedOn;
+            signers[currIndex] = attestation.signer;
+            currIndex = currIndex.add(1);
           }
         } else {
           break;
         }
       }
     }
+
+    // Trim returned structs if necessary
     if (currIndex < maxAttestations) {
-      IdentifierOwnershipAttestation[] memory trimmedAttestations = new IdentifierOwnershipAttestation[](
-        currIndex
-      );
-      for (uint256 i = 0; i < currIndex; i++) {
-        trimmedAttestations[i] = attestations[i];
+      address[] memory trimmedAccounts = new address[](currIndex);
+      uint256[] memory trimmedIssuedOns = new uint256[](currIndex);
+      address[] memory trimmedSigners = new address[](currIndex);
+
+      for (uint256 i = 0; i < currIndex; i = i.add(1)) {
+        trimmedAccounts[i] = accounts[i];
+        trimmedIssuedOns[i] = issuedOns[i];
+        trimmedSigners[i] = signers[i];
       }
-      return trimmedAttestations;
+      return (trimmedAccounts, trimmedIssuedOns, trimmedSigners);
     } else {
-      return attestations;
+      return (accounts, issuedOns, signers);
     }
   }
+
+  /**
+   * @notice Returns identifiers mapped (by unrevoked signers) to a
+   *   given account address by a list of trusted issuers
+   * @param account Address of the account
+   * @param trustedIssuers Array of n issuers whose identifier mappings will be used
+   * @param maxIdentifiers Limit the number of identifiers that will be returned
+   * @return Array (length <= maxIdentifiers) of identifiers
+   * @dev Adds identifier info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
+   */
+
+  // TODO ASv2 consider also returning an array with counts of identifiers per issuer
 
   function lookupIdentifiersByAddress(
     address account,
@@ -158,21 +202,22 @@ contract FederatedAttestations is
     uint256 currIndex = 0;
     bytes32[] memory identifiers = new bytes32[](maxIdentifiers);
 
-    for (uint256 i = 0; i < trustedIssuers.length; i++) {
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       address trustedIssuer = trustedIssuers[i];
-      for (uint256 j = 0; j < addressToIdentifiers[account][trustedIssuer].length; j++) {
+      uint256 numIssuersForAddress = addressToIdentifiers[account][trustedIssuer].length;
+      for (uint256 j = 0; j < numIssuersForAddress; j = j.add(1)) {
         // Iterate through the list of identifiers
         if (currIndex < maxIdentifiers) {
           bytes32 identifier = addressToIdentifiers[account][trustedIssuer][j];
-          // Check if this signer for this particular signer is revoked
-          for (uint256 k = 0; k < identifierToAddresses[identifier][trustedIssuer].length; k++) {
-            IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuer][k];
-            // For now, just take the first published, unrevoked signer that matches
-            // TODO redo this to take into account either recency or the "correct" identifier
-            // based on the index
+          // Check if the mapping was produced by a revoked signer
+          // solhint-disable-next-line max-line-length
+          IdentifierOwnershipAttestation[] memory attestationsForIssuer = identifierToAddresses[identifier][trustedIssuer];
+          for (uint256 k = 0; k < attestationsForIssuer.length; k = k.add(1)) {
+            IdentifierOwnershipAttestation memory attestation = attestationsForIssuer[k];
+            // (identifier, account, issuer) tuples should be unique
             if (attestation.account == account && !revokedSigners[attestation.signer]) {
               identifiers[currIndex] = identifier;
-              currIndex++;
+              currIndex = currIndex.add(1);
               break;
             }
           }
@@ -184,7 +229,7 @@ contract FederatedAttestations is
     if (currIndex < maxIdentifiers) {
       // Allocate and fill properly-sized array
       bytes32[] memory trimmedIdentifiers = new bytes32[](currIndex);
-      for (uint256 i = 0; i < currIndex; i++) {
+      for (uint256 i = 0; i < currIndex; i = i.add(1)) {
         trimmedIdentifiers[i] = identifiers[i];
       }
       return trimmedIdentifiers;
@@ -193,7 +238,8 @@ contract FederatedAttestations is
     }
   }
 
-  // TODO do we want to restrict permissions, or should anyone with a valid signature be able to register an attestation?
+  // TODO do we want to restrict permissions, or should anyone
+  // with a valid signature be able to register an attestation?
   modifier isValidUser(address issuer, address account) {
     require(
       msg.sender == account ||
@@ -229,6 +275,11 @@ contract FederatedAttestations is
     bytes32 s
   ) public view returns (bool) {
     require(!revokedSigners[signer], "Signer has been revoked");
+    // TODO ASv2 consider this solution instead since it allows the issuer to be the signer as well
+    // require(
+    //   getAccounts().attestationSignerToAccount(signer) == issuer,
+    //   "Signer has not been authorized as an AttestationSigner by the issuer"
+    // );
     require(
       getAccounts().isSigner(issuer, signer, SIGNER_ROLE),
       "Signer has not been authorized as an AttestationSigner by the issuer"
@@ -273,8 +324,9 @@ contract FederatedAttestations is
       isValidAttestation(identifier, issuer, account, issuedOn, signer, v, r, s),
       "Signature is invalid"
     );
-    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i.add(1)) {
-      // This enforces only one attestation to be uploaded for a given set of (identifier, issuer, account)
+    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i = i.add(1)) {
+      // This enforces only one attestation to be uploaded
+      // for a given set of (identifier, issuer, account)
       // Editing/upgrading an attestation requires that it be deleted before a new one is registered
       require(
         identifierToAddresses[identifier][issuer][i].account != account,
@@ -292,25 +344,35 @@ contract FederatedAttestations is
   }
 
   function deleteAttestation(bytes32 identifier, address issuer, address account) public {
-    // TODO ASv2 this should short-circuit, but double check (i.e. succeeds if msg.sender == account)
     require(
       msg.sender == account || getAccounts().attestationSignerToAccount(msg.sender) == issuer
     );
 
+    // TODO ASv2 store the intermeidate arrays where possible to prevent
+    // repeated storage lookups for same values
+
     for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i++) {
+      // solhint-disable-next-line max-line-length
       IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][issuer][i];
       if (attestation.account == account) {
-        // This is meant to delete the attestation in the array and then move the last element in the array to that empty spot, to avoid having empty elements in the array
+        // This is meant to delete the attestation in the array
+        // and then move the last element in the array to that empty spot,
+        // to avoid having empty elements in the array
         // Not sure if this is needed and if the added gas costs from the complexity is worth it
+
+        // solhint-disable-next-line max-line-length
         identifierToAddresses[identifier][issuer][i] = identifierToAddresses[identifier][issuer][identifierToAddresses[identifier][issuer]
           .length -
           1];
         identifierToAddresses[identifier][issuer].pop();
 
-        // TODO revisit if deletedIdentifier check is necessary - not sure if there would ever be a situation where the matching identifier is not present
+        // TODO revisit if deletedIdentifier check is necessary
+        // - not sure if there would ever be a situation where the
+        // matching identifier is not present
         bool deletedIdentifier = false;
         for (uint256 j = 0; j < addressToIdentifiers[account][issuer].length; j++) {
           if (addressToIdentifiers[account][issuer][j] == identifier) {
+            // solhint-disable-next-line max-line-length
             addressToIdentifiers[account][issuer][j] = addressToIdentifiers[account][issuer][addressToIdentifiers[account][issuer]
               .length -
               1];

@@ -5,6 +5,7 @@ import {
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertLogMatches2, assertRevert } from '@celo/protocol/lib/test-utils'
 import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
+import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
@@ -27,17 +28,59 @@ contract('FederatedAttestations', (accounts: string[]) => {
   let registry: RegistryInstance
   let initialize
 
-  const phoneNumber: string = '+18005551212'
-  const pnIdentifier: string = getPhoneHash(phoneNumber)
-  const getCurrentUnixTime = () => Math.floor(Date.now() / 1000)
   const chainId = 1
 
-  const issuer = accounts[0]
-  const signer = accounts[1]
-  const account = accounts[2]
-  const issuedOn = getCurrentUnixTime()
+  const issuer1 = accounts[0]
+  const signer1 = accounts[1]
+  const account1 = accounts[2]
+
+  const phoneNumber: string = '+18005551212'
+  const identifier1 = getPhoneHash(phoneNumber)
+  const identifier2 = getPhoneHash(phoneNumber, 'dummySalt')
+
+  const nowUnixTime = Math.floor(Date.now() / 1000)
+
   const signerRole = keccak256('celo.org/core/attestation')
   let sig
+
+  const signAndRegisterAttestation = async (
+    identifier: string,
+    issuer: string, // Must be a registered account
+    account: string,
+    issuedOn: number,
+    signer: string
+  ) => {
+    const attestationSignature = await getSignatureForAttestation(
+      identifier,
+      issuer,
+      account,
+      issuedOn,
+      signer,
+      chainId,
+      federatedAttestations.address
+    )
+    if (issuer !== signer && !(await accountsInstance.isSigner(issuer, signer, signerRole))) {
+      await accountsInstance.authorizeSigner(signer, signerRole, {
+        from: issuer,
+      })
+      await accountsInstance.completeSignerAuthorization(issuer, signerRole, {
+        from: signer,
+      })
+    }
+    await federatedAttestations.registerAttestation(
+      identifier,
+      issuer,
+      account,
+      issuedOn,
+      signer,
+      attestationSignature.v,
+      attestationSignature.r,
+      attestationSignature.s,
+      {
+        from: issuer,
+      }
+    )
+  }
 
   beforeEach('FederatedAttestations setup', async () => {
     accountsInstance = await Accounts.new(true)
@@ -50,13 +93,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
     )
     initialize = await federatedAttestations.initialize(registry.address)
 
-    await accountsInstance.createAccount({ from: issuer })
+    await accountsInstance.createAccount({ from: issuer1 })
     sig = await getSignatureForAttestation(
-      pnIdentifier,
-      issuer,
-      account,
-      issuedOn,
-      signer,
+      identifier1,
+      issuer1,
+      account1,
+      nowUnixTime,
+      signer1,
       chainId,
       federatedAttestations.address
     )
@@ -77,7 +120,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
   describe('#initialize()', () => {
     it('should have set the owner', async () => {
       const owner: string = await federatedAttestations.owner()
-      assert.equal(owner, issuer)
+      assert.equal(owner, issuer1)
     })
 
     it('should have set the registry address', async () => {
@@ -107,28 +150,303 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#lookupAttestations', () => {
-    it('should', async () => {})
+    interface AttestationTestCase {
+      account: string
+      issuedOn: number
+      signer: string
+    }
+
+    const checkAgainstExpectedAttestations = (
+      expectedAttestations: AttestationTestCase[],
+      actualAddresses: string[],
+      actualIssuedOns: BigNumber[],
+      actualSigners: string[]
+    ) => {
+      assert.lengthOf(actualAddresses, expectedAttestations.length)
+      assert.lengthOf(actualIssuedOns, expectedAttestations.length)
+      assert.lengthOf(actualSigners, expectedAttestations.length)
+
+      expectedAttestations.forEach((expectedAttestation, index) => {
+        assert.equal(expectedAttestation.account, actualAddresses[index])
+        assert.equal(expectedAttestation.issuedOn, actualIssuedOns[index].toNumber())
+        assert.equal(expectedAttestation.signer, actualSigners[index])
+      })
+    }
+
+    describe('when identifier has not been registered', () => {
+      it('should return empty list', async () => {
+        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+          identifier1,
+          [issuer1],
+          1
+        )
+        checkAgainstExpectedAttestations([], addresses, issuedOns, signers)
+      })
+    })
+
+    describe('when identifier has been registered', () => {
+      const account2 = accounts[3]
+
+      const issuer2 = accounts[4]
+      const issuer2Signer = accounts[5]
+      const issuer2Signer2 = accounts[6]
+      const issuer3 = accounts[7]
+
+      const issuer1Attestations: AttestationTestCase[] = [
+        {
+          account: account1,
+          issuedOn: nowUnixTime,
+          signer: signer1,
+        },
+        // Same issuer as [0], different account
+        {
+          account: account2,
+          issuedOn: nowUnixTime,
+          signer: signer1,
+        },
+      ]
+      const issuer2Attestations: AttestationTestCase[] = [
+        // Same account as issuer1Attestations[0], different issuer
+        {
+          account: account1,
+          issuedOn: nowUnixTime,
+          signer: issuer2Signer,
+        },
+        // Different account and signer
+        {
+          account: account2,
+          issuedOn: nowUnixTime,
+          signer: issuer2Signer2,
+        },
+      ]
+
+      beforeEach(async () => {
+        // Require consistent order for test cases
+        await accountsInstance.createAccount({ from: issuer2 })
+        for (const { issuer, attestationsPerIssuer } of [
+          { issuer: issuer1, attestationsPerIssuer: issuer1Attestations },
+          { issuer: issuer2, attestationsPerIssuer: issuer2Attestations },
+        ]) {
+          for (const attestation of attestationsPerIssuer) {
+            await signAndRegisterAttestation(
+              identifier1,
+              issuer,
+              attestation.account,
+              attestation.issuedOn,
+              attestation.signer
+            )
+          }
+        }
+      })
+
+      it('should return all attestations from one issuer', async () => {
+        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+          identifier1,
+          [issuer1],
+          // Do not allow for maxAttestations to coincidentally limit incorrect output
+          issuer1Attestations.length + 1
+        )
+        checkAgainstExpectedAttestations(issuer1Attestations, addresses, issuedOns, signers)
+      })
+
+      it('should return empty list if no attestations exist for an issuer', async () => {
+        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+          identifier1,
+          [issuer3],
+          1
+        )
+        checkAgainstExpectedAttestations([], addresses, issuedOns, signers)
+      })
+
+      it('should return attestations from multiple issuers in correct order', async () => {
+        const expectedAttestations = issuer2Attestations.concat(issuer1Attestations)
+        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+          identifier1,
+          [issuer3, issuer2, issuer1],
+          expectedAttestations.length + 1
+        )
+        checkAgainstExpectedAttestations(expectedAttestations, addresses, issuedOns, signers)
+      })
+
+      it('should return empty list if maxAttestations == 0', async () => {
+        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+          identifier1,
+          [issuer1],
+          0
+        )
+        checkAgainstExpectedAttestations([], addresses, issuedOns, signers)
+      })
+
+      it('should only return maxAttestations attestations when more are present', async () => {
+        const expectedAttestations = issuer1Attestations.slice(0, -1)
+        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+          identifier1,
+          [issuer1],
+          expectedAttestations.length
+        )
+        checkAgainstExpectedAttestations(expectedAttestations, addresses, issuedOns, signers)
+      })
+
+      it('should not return attestations from revoked signers', async () => {
+        const attestationToRevoke = issuer2Attestations[0]
+        await federatedAttestations.revokeSigner(attestationToRevoke.signer)
+        const expectedAttestations = issuer2Attestations.slice(1)
+
+        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+          identifier1,
+          [issuer2],
+          issuer2Attestations.length
+        )
+        checkAgainstExpectedAttestations(expectedAttestations, addresses, issuedOns, signers)
+      })
+    })
   })
 
   describe('#lookupIdentifiersByAddress', () => {
-    it('should', async () => {})
+    describe('when address has not been registered', () => {
+      it('should return empty list', async () => {
+        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+          account1,
+          [issuer1],
+          1
+        )
+        assert.equal(actualIdentifiers.length, 0)
+      })
+    })
+
+    describe('when address has been registered', () => {
+      interface IdentifierTestCase {
+        identifier: string
+        signer: string
+      }
+
+      const checkAgainstExpectedIdCases = (
+        expectedIdentifiers: IdentifierTestCase[],
+        actualIdentifiers: string[]
+      ) => {
+        expect(expectedIdentifiers.map((idCase) => idCase.identifier)).to.eql(actualIdentifiers)
+      }
+
+      const issuer2 = accounts[3]
+      const issuer2Signer = accounts[4]
+      const issuer2Signer2 = accounts[5]
+      const issuer3 = accounts[6]
+
+      const issuer1IdCases: IdentifierTestCase[] = [
+        {
+          identifier: identifier1,
+          signer: signer1,
+        },
+        {
+          identifier: identifier2,
+          signer: signer1,
+        },
+      ]
+      const issuer2IdCases: IdentifierTestCase[] = [
+        {
+          identifier: identifier1,
+          signer: issuer2Signer2,
+        },
+        {
+          identifier: identifier2,
+          signer: issuer2Signer,
+        },
+      ]
+
+      beforeEach(async () => {
+        await accountsInstance.createAccount({ from: issuer2 })
+        // Require consistent order for test cases
+        for (const { issuer, idCasesPerIssuer } of [
+          { issuer: issuer1, idCasesPerIssuer: issuer1IdCases },
+          { issuer: issuer2, idCasesPerIssuer: issuer2IdCases },
+        ]) {
+          for (const idCase of idCasesPerIssuer) {
+            await signAndRegisterAttestation(
+              idCase.identifier,
+              issuer,
+              account1,
+              nowUnixTime,
+              idCase.signer
+            )
+          }
+        }
+      })
+
+      it('should return all identifiers from one issuer', async () => {
+        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+          account1,
+          [issuer1],
+          issuer1IdCases.length + 1
+        )
+        checkAgainstExpectedIdCases(issuer1IdCases, actualIdentifiers)
+      })
+
+      it('should return empty list if no identifiers exist for an (issuer,address)', async () => {
+        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+          account1,
+          [issuer3],
+          1
+        )
+        assert.equal(actualIdentifiers.length, 0)
+      })
+
+      it('should return identifiers from multiple issuers in correct order', async () => {
+        const expectedIdCases = issuer2IdCases.concat(issuer1IdCases)
+        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+          account1,
+          [issuer3, issuer2, issuer1],
+          expectedIdCases.length + 1
+        )
+        checkAgainstExpectedIdCases(expectedIdCases, actualIdentifiers)
+      })
+
+      it('should return empty list if maxIdentifiers == 0', async () => {
+        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+          account1,
+          [issuer1],
+          0
+        )
+        assert.equal(actualIdentifiers.length, 0)
+      })
+
+      it('should only return maxIdentifiers identifiers when more are present', async () => {
+        const expectedIdCases = issuer2IdCases.concat(issuer1IdCases).slice(0, -1)
+        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+          account1,
+          [issuer2, issuer1],
+          expectedIdCases.length
+        )
+        checkAgainstExpectedIdCases(expectedIdCases, actualIdentifiers)
+      })
+
+      it('should not return identifiers from revoked signers', async () => {
+        await federatedAttestations.revokeSigner(issuer2IdCases[0].signer)
+        const expectedIdCases = issuer2IdCases.slice(1)
+        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+          account1,
+          [issuer2],
+          expectedIdCases.length + 1
+        )
+        checkAgainstExpectedIdCases(expectedIdCases, actualIdentifiers)
+      })
+    })
   })
 
   describe('#isValidAttestation', async () => {
     describe('with an authorized AttestationSigner', async () => {
       beforeEach(async () => {
-        await accountsInstance.authorizeSigner(signer, signerRole, { from: issuer })
-        await accountsInstance.completeSignerAuthorization(issuer, signerRole, { from: signer })
+        await accountsInstance.authorizeSigner(signer1, signerRole, { from: issuer1 })
+        await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer1 })
       })
 
       it('should return true if a valid signature is used', async () => {
         assert.isTrue(
           await federatedAttestations.isValidAttestation(
-            pnIdentifier,
-            issuer,
-            account,
-            issuedOn,
-            signer,
+            identifier1,
+            issuer1,
+            account1,
+            nowUnixTime,
+            signer1,
             sig.v,
             sig.r,
             sig.s
@@ -138,21 +456,21 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
       it('should return false if an invalid signature is provided', async () => {
         const sig2 = await getSignatureForAttestation(
-          pnIdentifier,
-          issuer,
-          account,
-          issuedOn,
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime,
           accounts[3],
           chainId,
           federatedAttestations.address
         )
         assert.isFalse(
           await federatedAttestations.isValidAttestation(
-            pnIdentifier,
-            issuer,
-            account,
-            issuedOn,
-            signer,
+            identifier1,
+            issuer1,
+            account1,
+            nowUnixTime,
+            signer1,
             sig2.v,
             sig2.r,
             sig2.s
@@ -161,18 +479,18 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       const wrongArgs = [
-        [0, 'identifier', getPhoneHash('+14169483397')],
+        [0, 'identifier', identifier2],
         [1, 'issuer', accounts[3]],
         [2, 'account', accounts[3]],
-        [3, 'issuedOn', issuedOn - 1],
+        [3, 'issuedOn', nowUnixTime - 1],
         [4, 'signer', accounts[3]],
       ]
       wrongArgs.forEach(([index, arg, wrongValue]) => {
         it(`should fail if the provided ${arg} is different from the attestation`, async () => {
-          let args = [pnIdentifier, issuer, account, issuedOn, signer, sig.v, sig.r, sig.s]
+          const args = [identifier1, issuer1, account1, nowUnixTime, signer1, sig.v, sig.r, sig.s]
           args[index] = wrongValue
 
-          if (arg == 'issuer' || arg == 'signer') {
+          if (arg === 'issuer' || arg === 'signer') {
             await assertRevert(
               federatedAttestations.isValidAttestation.apply(this, args),
               'Signer has not been authorized as an AttestationSigner by the issuer'
@@ -184,14 +502,14 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should revert if the signer is revoked', async () => {
-        await federatedAttestations.revokeSigner(signer)
+        await federatedAttestations.revokeSigner(signer1)
         await assertRevert(
           federatedAttestations.isValidAttestation(
-            pnIdentifier,
-            issuer,
-            account,
-            issuedOn,
-            signer,
+            identifier1,
+            issuer1,
+            account1,
+            nowUnixTime,
+            signer1,
             sig.v,
             sig.r,
             sig.s
@@ -204,11 +522,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should revert if the signer is not authorized as an AttestationSigner by the issuer', async () => {
       await assertRevert(
         federatedAttestations.isValidAttestation(
-          pnIdentifier,
-          issuer,
-          account,
-          issuedOn,
-          signer,
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime,
+          signer1,
           sig.v,
           sig.r,
           sig.s
@@ -218,16 +536,16 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     it('should revert if the signer is authorized as a different role by the issuer', async () => {
       const role = keccak256('random')
-      await accountsInstance.authorizeSigner(signer, role, { from: issuer })
-      await accountsInstance.completeSignerAuthorization(issuer, role, { from: signer })
+      await accountsInstance.authorizeSigner(signer1, role, { from: issuer1 })
+      await accountsInstance.completeSignerAuthorization(issuer1, role, { from: signer1 })
 
       await assertRevert(
         federatedAttestations.isValidAttestation(
-          pnIdentifier,
-          issuer,
-          account,
-          issuedOn,
-          signer,
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime,
+          signer1,
           sig.v,
           sig.r,
           sig.s
@@ -238,16 +556,19 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
   describe('#registerAttestation', () => {
     beforeEach(async () => {
-      await accountsInstance.authorizeSigner(signer, signerRole, { from: issuer })
-      await accountsInstance.completeSignerAuthorization(issuer, signerRole, { from: signer })
+      await accountsInstance.authorizeSigner(signer1, signerRole, { from: issuer1 })
+      await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer1 })
     })
+
+    // TODO ASv2: add case for when issuer == signer
+
     it('should emit AttestationRegistered for a valid attestation', async () => {
       const register = await federatedAttestations.registerAttestation(
-        pnIdentifier,
-        issuer,
-        account,
-        issuedOn,
-        signer,
+        identifier1,
+        issuer1,
+        account1,
+        nowUnixTime,
+        signer1,
         sig.v,
         sig.r,
         sig.s
@@ -255,32 +576,32 @@ contract('FederatedAttestations', (accounts: string[]) => {
       assertLogMatches2(register.logs[0], {
         event: 'AttestationRegistered',
         args: {
-          identifier: pnIdentifier,
-          issuer,
-          account,
-          issuedOn,
-          signer,
+          identifier: identifier1,
+          issuer: issuer1,
+          account: account1,
+          issuedOn: nowUnixTime,
+          signer: signer1,
         },
       })
     })
 
     it('should revert if an invalid signature is provided', async () => {
       const sig2 = await getSignatureForAttestation(
-        pnIdentifier,
-        issuer,
-        account,
-        issuedOn,
+        identifier1,
+        issuer1,
+        account1,
+        nowUnixTime,
         accounts[3],
         chainId,
         federatedAttestations.address
       )
       await assertRevert(
         federatedAttestations.registerAttestation(
-          pnIdentifier,
-          issuer,
-          account,
-          issuedOn,
-          signer,
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime,
+          signer1,
           sig2.v,
           sig2.r,
           sig2.s
@@ -292,11 +613,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
       beforeEach(async () => {
         // register first attestation
         await federatedAttestations.registerAttestation(
-          pnIdentifier,
-          issuer,
-          account,
-          issuedOn,
-          signer,
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime,
+          signer1,
           sig.v,
           sig.r,
           sig.s
@@ -306,23 +627,23 @@ contract('FederatedAttestations', (accounts: string[]) => {
       it('should revert if an attestation with the same (issuer, identifier, account) is uploaded again', async () => {
         // Upload the same attestation signed by a different signer, authorized under the same issuer
         const signer2 = accounts[4]
-        await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer })
-        await accountsInstance.completeSignerAuthorization(issuer, signerRole, { from: signer2 })
+        await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer1 })
+        await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer2 })
         const sig2 = await getSignatureForAttestation(
-          pnIdentifier,
-          issuer,
-          account,
-          issuedOn + 1,
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime + 1,
           signer2,
           1,
           federatedAttestations.address
         )
         await assertRevert(
           federatedAttestations.registerAttestation(
-            pnIdentifier,
-            issuer,
-            account,
-            issuedOn,
+            identifier1,
+            issuer1,
+            account1,
+            nowUnixTime,
             signer2,
             sig2.v,
             sig2.r,
@@ -332,22 +653,21 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should succeed with a different identifier', async () => {
-        const identifier2 = getPhoneHash('+19199199919')
         const sig2 = await getSignatureForAttestation(
           identifier2,
-          issuer,
-          account,
-          issuedOn,
-          signer,
+          issuer1,
+          account1,
+          nowUnixTime,
+          signer1,
           chainId,
           federatedAttestations.address
         )
         const register2 = await federatedAttestations.registerAttestation(
           identifier2,
-          issuer,
-          account,
-          issuedOn,
-          signer,
+          issuer1,
+          account1,
+          nowUnixTime,
+          signer1,
           sig2.v,
           sig2.r,
           sig2.s
@@ -356,10 +676,10 @@ contract('FederatedAttestations', (accounts: string[]) => {
           event: 'AttestationRegistered',
           args: {
             identifier: identifier2,
-            issuer,
-            account,
-            issuedOn,
-            signer,
+            issuer: issuer1,
+            account: account1,
+            issuedOn: nowUnixTime,
+            signer: signer1,
           },
         })
       })
@@ -371,19 +691,19 @@ contract('FederatedAttestations', (accounts: string[]) => {
         await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer2 })
         await accountsInstance.completeSignerAuthorization(issuer2, signerRole, { from: signer2 })
         const sig2 = await getSignatureForAttestation(
-          pnIdentifier,
+          identifier1,
           issuer2,
-          account,
-          issuedOn,
+          account1,
+          nowUnixTime,
           signer2,
           chainId,
           federatedAttestations.address
         )
         const register2 = await federatedAttestations.registerAttestation(
-          pnIdentifier,
+          identifier1,
           issuer2,
-          account,
-          issuedOn,
+          account1,
+          nowUnixTime,
           signer2,
           sig2.v,
           sig2.r,
@@ -393,59 +713,58 @@ contract('FederatedAttestations', (accounts: string[]) => {
         assertLogMatches2(register2.logs[0], {
           event: 'AttestationRegistered',
           args: {
-            identifier: pnIdentifier,
+            identifier: identifier1,
             issuer: issuer2,
-            account,
-            issuedOn,
+            account: account1,
+            issuedOn: nowUnixTime,
             signer: signer2,
           },
         })
       })
 
-      // TODO figure out why this test results in an out of gas error
-      // it.only('should succeed with a different account', async () => {
-      //   const account2 = accounts[4]
-      //   const sig2 = await getSignatureForAttestation(
-      //     pnIdentifier,
-      //     issuer,
-      //     account2,
-      //     issuedOn,
-      //     signer,
-      //     chainId,
-      //     federatedAttestations.address
-      //   )
-      //   const register2 = await federatedAttestations.registerAttestation(
-      //     pnIdentifier,
-      //     issuer,
-      //     account2,
-      //     issuedOn,
-      //     signer,
-      //     sig2.v,
-      //     sig2.r,
-      //     sig2.s,
-      //     { from: issuer, gasPrice: 0 }
-      //   )
-      //   assertLogMatches2(register2.logs[0], {
-      //     event: 'AttestationRegistered',
-      //     args: {
-      //       identifier: pnIdentifier,
-      //       issuer,
-      //       account: account2,
-      //       issuedOn,
-      //       signer,
-      //     },
-      //   })
-      // })
+      it('should succeed with a different account', async () => {
+        const account2 = accounts[4]
+        const sig2 = await getSignatureForAttestation(
+          identifier1,
+          issuer1,
+          account2,
+          nowUnixTime,
+          signer1,
+          chainId,
+          federatedAttestations.address
+        )
+        const register2 = await federatedAttestations.registerAttestation(
+          identifier1,
+          issuer1,
+          account2,
+          nowUnixTime,
+          signer1,
+          sig2.v,
+          sig2.r,
+          sig2.s,
+          { from: issuer1 }
+        )
+        assertLogMatches2(register2.logs[0], {
+          event: 'AttestationRegistered',
+          args: {
+            identifier: identifier1,
+            issuer: issuer1,
+            account: account2,
+            issuedOn: nowUnixTime,
+            signer: signer1,
+          },
+        })
+      })
     })
 
     it('should revert if an invalid user attempts to register the attestation', async () => {
       await assertRevert(
         federatedAttestations.registerAttestation(
-          pnIdentifier,
-          issuer,
-          account,
-          issuedOn,
-          signer,
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime,
+          signer1,
           sig.v,
           sig.r,
           sig.s,
@@ -456,14 +775,14 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     it('should succeed if a different AttestationSigner authorized by the same issuer registers the attestation', async () => {
       const signer2 = accounts[4]
-      await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer })
-      await accountsInstance.completeSignerAuthorization(issuer, signerRole, { from: signer2 })
+      await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer1 })
+      await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer2 })
       const register = await federatedAttestations.registerAttestation(
-        pnIdentifier,
-        issuer,
-        account,
-        issuedOn,
-        signer,
+        identifier1,
+        issuer1,
+        account1,
+        nowUnixTime,
+        signer1,
         sig.v,
         sig.r,
         sig.s,
@@ -472,17 +791,20 @@ contract('FederatedAttestations', (accounts: string[]) => {
       assertLogMatches2(register.logs[0], {
         event: 'AttestationRegistered',
         args: {
-          identifier: pnIdentifier,
-          issuer,
-          account,
-          issuedOn,
-          signer,
+          identifier: identifier1,
+          issuer: issuer1,
+          account: account1,
+          issuedOn: nowUnixTime,
+          signer: signer1,
         },
       })
     })
   })
 
   describe('#deleteAttestation', () => {
-    it('should', async () => {})
+    it('should', async () => {
+      // Fix lint checks until these tests are here
+      assert(true)
+    })
   })
 })
