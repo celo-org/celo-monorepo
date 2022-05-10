@@ -71,6 +71,10 @@ const DefaultConstitution = {
     setSpread: 0.8,
     setReserveFraction: 0.8,
   },
+  FederatedAttestations: {
+    default: 0.6,
+    setRegistry: 0.9,
+  },
   FeeCurrencyWhitelist: {
     default: 0.8,
     addToken: 0.8,
