@@ -30,8 +30,7 @@ contract FederatedAttestations is
   using SafeMath for uint256;
   using SafeCast for uint256;
 
-  // TODO ASv2 fix all ++ -> SafeMath x = x.add(1)
-  struct IdentifierOwnershipAttestation {
+  struct OwnershipAttestation {
     address account;
     uint256 issuedOn;
     address signer;
@@ -40,18 +39,14 @@ contract FederatedAttestations is
   // TODO ASv2 revisit linting issues & all solhint-disable-next-line max-line-length
 
   // identifier -> issuer -> attestations
-  // solhint-disable-next-line max-line-length
-  mapping(bytes32 => mapping(address => IdentifierOwnershipAttestation[])) public identifierToAddresses;
+  mapping(bytes32 => mapping(address => OwnershipAttestation[])) public identifierToAddresses;
   // account -> issuer -> identifiers
   mapping(address => mapping(address => bytes32[])) public addressToIdentifiers;
   // signer => isRevoked
   mapping(address => bool) public revokedSigners;
 
-  // TODO: should this be hardcoded here?
-  bytes32 constant SIGNER_ROLE = keccak256(abi.encodePacked("celo.org/core/attestation"));
   bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
-    // solhint-disable-next-line max-line-length
-    "IdentifierOwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
+    "OwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
   );
   bytes32 public eip712DomainSeparator;
 
@@ -62,6 +57,11 @@ contract FederatedAttestations is
     address indexed account,
     uint256 issuedOn,
     address signer
+  );
+  event AttestationDeleted(
+    bytes32 indexed identifier,
+    address indexed issuer,
+    address indexed account
   );
 
   /**
@@ -150,7 +150,7 @@ contract FederatedAttestations is
         // Only create and push new attestation if we haven't hit max
         if (currIndex < maxAttestations) {
           // solhint-disable-next-line max-line-length
-          IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuers[i]][j];
+          OwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuers[i]][j];
           if (!revokedSigners[attestation.signer]) {
             accounts[currIndex] = attestation.account;
             issuedOns[currIndex] = attestation.issuedOn;
@@ -211,9 +211,9 @@ contract FederatedAttestations is
           bytes32 identifier = addressToIdentifiers[account][trustedIssuer][j];
           // Check if the mapping was produced by a revoked signer
           // solhint-disable-next-line max-line-length
-          IdentifierOwnershipAttestation[] memory attestationsForIssuer = identifierToAddresses[identifier][trustedIssuer];
+          OwnershipAttestation[] memory attestationsForIssuer = identifierToAddresses[identifier][trustedIssuer];
           for (uint256 k = 0; k < attestationsForIssuer.length; k = k.add(1)) {
-            IdentifierOwnershipAttestation memory attestation = attestationsForIssuer[k];
+            OwnershipAttestation memory attestation = attestationsForIssuer[k];
             // (identifier, account, issuer) tuples should be unique
             if (attestation.account == account && !revokedSigners[attestation.signer]) {
               identifiers[currIndex] = identifier;
@@ -247,6 +247,7 @@ contract FederatedAttestations is
         getAccounts().attestationSignerToAccount(msg.sender) == issuer,
       "User does not have permission to perform this action"
     );
+    require(!revokedSigners[msg.sender], "User has been revoked ");
     _;
   }
 
@@ -281,7 +282,7 @@ contract FederatedAttestations is
     //   "Signer has not been authorized as an AttestationSigner by the issuer"
     // );
     require(
-      getAccounts().isSigner(issuer, signer, SIGNER_ROLE),
+      getAccounts().attestationSignerToAccount(signer) == issuer,
       "Signer has not been authorized as an AttestationSigner by the issuer"
     );
     bytes32 structHash = keccak256(
@@ -307,7 +308,7 @@ contract FederatedAttestations is
    * @param v The recovery id of the incoming ECDSA signature
    * @param r Output value r of the ECDSA signature
    * @param s Output value s of the ECDSA signature
-   * @dev Throws if sender is not the issuer, account, or signer
+   * @dev Throws if sender is not the issuer, account, or an authorized AttestationSigner
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
   function registerAttestation(
@@ -333,44 +334,40 @@ contract FederatedAttestations is
         "Attestation for this account already exists"
       );
     }
-    IdentifierOwnershipAttestation memory attestation = IdentifierOwnershipAttestation(
-      account,
-      issuedOn,
-      signer
-    );
+    OwnershipAttestation memory attestation = OwnershipAttestation(account, issuedOn, signer);
     identifierToAddresses[identifier][issuer].push(attestation);
     addressToIdentifiers[account][issuer].push(identifier);
     emit AttestationRegistered(identifier, issuer, account, issuedOn, signer);
   }
 
-  function deleteAttestation(bytes32 identifier, address issuer, address account) public {
-    require(
-      msg.sender == account || getAccounts().attestationSignerToAccount(msg.sender) == issuer
-    );
-
+  /**
+   * @notice Deletes an attestation 
+   * @param identifier Hash of the identifier to be deleted
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account mapped to the identifier
+   * @dev Throws if sender is not the issuer, account, or an authorized AttestationSigner
+   */
+  function deleteAttestation(bytes32 identifier, address issuer, address account)
+    public
+    isValidUser(issuer, account)
+  {
     // TODO ASv2 store the intermeidate arrays where possible to prevent
     // repeated storage lookups for same values
-
-    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i++) {
-      // solhint-disable-next-line max-line-length
-      IdentifierOwnershipAttestation memory attestation = identifierToAddresses[identifier][issuer][i];
+    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i.add(1)) {
+      OwnershipAttestation memory attestation = identifierToAddresses[identifier][issuer][i];
       if (attestation.account == account) {
         // This is meant to delete the attestation in the array
         // and then move the last element in the array to that empty spot,
         // to avoid having empty elements in the array
-        // Not sure if this is needed and if the added gas costs from the complexity is worth it
-
+        // Not sure if this is needed
         // solhint-disable-next-line max-line-length
         identifierToAddresses[identifier][issuer][i] = identifierToAddresses[identifier][issuer][identifierToAddresses[identifier][issuer]
           .length -
           1];
         identifierToAddresses[identifier][issuer].pop();
 
-        // TODO revisit if deletedIdentifier check is necessary
-        // - not sure if there would ever be a situation where the
-        // matching identifier is not present
         bool deletedIdentifier = false;
-        for (uint256 j = 0; j < addressToIdentifiers[account][issuer].length; j++) {
+        for (uint256 j = 0; j < addressToIdentifiers[account][issuer].length; j.add(1)) {
           if (addressToIdentifiers[account][issuer][j] == identifier) {
             // solhint-disable-next-line max-line-length
             addressToIdentifiers[account][issuer][j] = addressToIdentifiers[account][issuer][addressToIdentifiers[account][issuer]
@@ -381,8 +378,10 @@ contract FederatedAttestations is
             break;
           }
         }
-        // Hard requirement to delete from both mappings in unison
-        require(deletedIdentifier);
+        // Should never be false - both mappings should always be updated in unison
+        assert(deletedIdentifier);
+
+        emit AttestationDeleted(identifier, issuer, account);
         break;
       }
     }
@@ -390,6 +389,8 @@ contract FederatedAttestations is
 
   function revokeSigner(address signer) public {
     // TODO ASv2 add constraints on who has permissions to revoke a signer
+    // TODO ASv2 consider whether we want to check if the signer is an authorized signer
+    // or to allow any address to be revoked
     revokedSigners[signer] = true;
   }
 }
