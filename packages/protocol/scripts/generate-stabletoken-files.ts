@@ -236,6 +236,23 @@ function stableTokenConstitution(ticker: string): string {
 }`
 }
 
+function migrationsConfig(ticker: string): string {
+  return `stableToken${ticker}: {
+  decimals: 18,
+  goldPrice: 1.2,
+  tokenName: 'Celo ${ticker}',
+  tokenSymbol: 'c${ticker}',
+  inflationRate: 1,
+  inflationPeriod: 1.5 * YEAR,
+  initialBalances: {
+    addresses: [network.from],
+    values: ['5000000000000000000000000'],
+  },
+  oracles: [network.from],
+  frozen: false,
+}`
+}
+
 function errorFunct(err) {
   if (err) return console.log(err)
 }
@@ -293,6 +310,8 @@ ${exchangeConstitution(fiatTicker)}
 ${stableTokenConstitution(fiatTicker)}
   * Rename migration with right number: packages/protocol/migrations/09_Y_stableToken_X.ts and packages/protocol/migrations/10_Y_Exchange_X.ts
   * Add keys to migration config: packages/protocol/migrationsConfig.js
+    Suggested values:
+${migrationsConfig(fiatTicker)}
   * Add files to the build: packages/protocol/scripts/build.ts
   * Add it to the env tests packages/protocol/test/common/integration.ts
   `)
