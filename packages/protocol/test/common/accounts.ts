@@ -13,6 +13,7 @@ import { parseSolidityStringArray } from '@celo/utils/lib/parsing'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { generateTypedDataHash } from '@celo/utils/src/sign-typed-data-utils'
 import { parseSignatureWithoutPrefix } from '@celo/utils/src/signatureUtils'
+import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
   AccountsInstance,
@@ -21,8 +22,6 @@ import {
   RegistryContract,
 } from 'types'
 import { keccak256 } from 'web3-utils'
-
-import BigNumber from 'bignumber.js'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const Registry: RegistryContract = artifacts.require('Registry')
