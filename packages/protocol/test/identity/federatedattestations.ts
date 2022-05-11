@@ -561,8 +561,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer1 })
     })
 
-    // TODO ASv2: add case for when issuer == signer
-
     it('should emit AttestationRegistered for a valid attestation', async () => {
       const register = await federatedAttestations.registerAttestation(
         identifier1,
@@ -582,6 +580,38 @@ contract('FederatedAttestations', (accounts: string[]) => {
           account: account1,
           issuedOn: nowUnixTime,
           signer: signer1,
+        },
+      })
+    })
+
+    it('should succeed if issuer == signer', async () => {
+      const issuerSig = await getSignatureForAttestation(
+        identifier1,
+        issuer1,
+        account1,
+        nowUnixTime,
+        issuer1,
+        chainId,
+        federatedAttestations.address
+      )
+      const register = await federatedAttestations.registerAttestation(
+        identifier1,
+        issuer1,
+        account1,
+        nowUnixTime,
+        issuer1,
+        issuerSig.v,
+        issuerSig.r,
+        issuerSig.s
+      )
+      assertLogMatches2(register.logs[0], {
+        event: 'AttestationRegistered',
+        args: {
+          identifier: identifier1,
+          issuer: issuer1,
+          account: account1,
+          issuedOn: nowUnixTime,
+          signer: issuer1,
         },
       })
     })
