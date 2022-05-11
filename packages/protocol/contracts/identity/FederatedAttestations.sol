@@ -276,11 +276,6 @@ contract FederatedAttestations is
     bytes32 s
   ) public view returns (bool) {
     require(!revokedSigners[signer], "Signer has been revoked");
-    // TODO ASv2 consider this solution instead since it allows the issuer to be the signer as well
-    // require(
-    //   getAccounts().attestationSignerToAccount(signer) == issuer,
-    //   "Signer has not been authorized as an AttestationSigner by the issuer"
-    // );
     require(
       getAccounts().attestationSignerToAccount(signer) == issuer,
       "Signer has not been authorized as an AttestationSigner by the issuer"
@@ -351,28 +346,23 @@ contract FederatedAttestations is
     public
     isValidUser(issuer, account)
   {
-    // TODO ASv2 store the intermeidate arrays where possible to prevent
-    // repeated storage lookups for same values
-    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i.add(1)) {
-      OwnershipAttestation memory attestation = identifierToAddresses[identifier][issuer][i];
+    OwnershipAttestation[] memory attestations = identifierToAddresses[identifier][issuer];
+    for (uint256 i = 0; i < attestations.length; i.add(1)) {
+      OwnershipAttestation memory attestation = attestations[i];
       if (attestation.account == account) {
         // This is meant to delete the attestation in the array
         // and then move the last element in the array to that empty spot,
         // to avoid having empty elements in the array
         // Not sure if this is needed
-        // solhint-disable-next-line max-line-length
-        identifierToAddresses[identifier][issuer][i] = identifierToAddresses[identifier][issuer][identifierToAddresses[identifier][issuer]
-          .length -
-          1];
+        identifierToAddresses[identifier][issuer][i] = attestations[attestations.length - 1];
         identifierToAddresses[identifier][issuer].pop();
 
         bool deletedIdentifier = false;
-        for (uint256 j = 0; j < addressToIdentifiers[account][issuer].length; j.add(1)) {
-          if (addressToIdentifiers[account][issuer][j] == identifier) {
-            // solhint-disable-next-line max-line-length
-            addressToIdentifiers[account][issuer][j] = addressToIdentifiers[account][issuer][addressToIdentifiers[account][issuer]
-              .length -
-              1];
+
+        bytes32[] memory identifiers = addressToIdentifiers[account][issuer];
+        for (uint256 j = 0; j < identifiers.length; j.add(1)) {
+          if (identifiers[j] == identifier) {
+            addressToIdentifiers[account][issuer][j] = identifiers[identifiers.length - 1];
             addressToIdentifiers[account][issuer].pop();
             deletedIdentifier = true;
             break;
