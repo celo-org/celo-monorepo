@@ -610,6 +610,23 @@ contract('FederatedAttestations', (accounts: string[]) => {
       )
     })
 
+    it('should revert if signer has been revoked', async () => {
+      await federatedAttestations.revokeSigner(signer1)
+      await assertRevertWithReason(
+        federatedAttestations.registerAttestation(
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime,
+          signer1,
+          sig.v,
+          sig.r,
+          sig.s
+        ),
+        'Signer has been revoked'
+      )
+    })
+
     describe('when registering a second attestation', () => {
       beforeEach(async () => {
         // register first attestation
