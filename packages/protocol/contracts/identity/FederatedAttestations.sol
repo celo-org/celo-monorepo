@@ -347,20 +347,20 @@ contract FederatedAttestations is
     isValidUser(issuer, account)
   {
     OwnershipAttestation[] memory attestations = identifierToAddresses[identifier][issuer];
-    for (uint256 i = 0; i < attestations.length; i.add(1)) {
+    for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
       OwnershipAttestation memory attestation = attestations[i];
       if (attestation.account == account) {
         // This is meant to delete the attestation in the array
         // and then move the last element in the array to that empty spot,
         // to avoid having empty elements in the array
-        // Not sure if this is needed
+        // TODO reviewers: is there a better way of doing this?
         identifierToAddresses[identifier][issuer][i] = attestations[attestations.length - 1];
         identifierToAddresses[identifier][issuer].pop();
 
         bool deletedIdentifier = false;
 
         bytes32[] memory identifiers = addressToIdentifiers[account][issuer];
-        for (uint256 j = 0; j < identifiers.length; j.add(1)) {
+        for (uint256 j = 0; j < identifiers.length; j = j.add(1)) {
           if (identifiers[j] == identifier) {
             addressToIdentifiers[account][issuer][j] = identifiers[identifiers.length - 1];
             addressToIdentifiers[account][issuer].pop();

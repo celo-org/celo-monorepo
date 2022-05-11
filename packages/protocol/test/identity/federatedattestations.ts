@@ -803,6 +803,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#deleteAttestation', () => {
+    // TODO ASv2 check that the actual entries were deleted in both mappings
+    // (for identifiers and attestations)
     beforeEach(async () => {
       await accountsInstance.authorizeSigner(signer1, signerRole, { from: issuer1 })
       await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer1 })
@@ -828,6 +830,47 @@ contract('FederatedAttestations', (accounts: string[]) => {
         event: 'AttestationDeleted',
         args: {
           identifier: identifier1,
+          issuer: issuer1,
+          account: account1,
+        },
+      })
+    })
+
+    it('should succeed when >1 attestations are registered for (identifier, issuer)', async () => {
+      const account2 = accounts[3]
+      await signAndRegisterAttestation(identifier1, issuer1, account2, nowUnixTime, signer1)
+      const deleteAttestation = await federatedAttestations.deleteAttestation(
+        identifier1,
+        issuer1,
+        account2,
+        {
+          from: account2,
+        }
+      )
+      assertLogMatches2(deleteAttestation.logs[0], {
+        event: 'AttestationDeleted',
+        args: {
+          identifier: identifier1,
+          issuer: issuer1,
+          account: account2,
+        },
+      })
+    })
+
+    it('should succeed when >1 identifiers are registered for (account, issuer)', async () => {
+      await signAndRegisterAttestation(identifier2, issuer1, account1, nowUnixTime, signer1)
+      const deleteAttestation = await federatedAttestations.deleteAttestation(
+        identifier2,
+        issuer1,
+        account1,
+        {
+          from: account1,
+        }
+      )
+      assertLogMatches2(deleteAttestation.logs[0], {
+        event: 'AttestationDeleted',
+        args: {
+          identifier: identifier2,
           issuer: issuer1,
           account: account1,
         },
