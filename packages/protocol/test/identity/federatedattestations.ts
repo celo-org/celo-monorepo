@@ -1,3 +1,4 @@
+import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
 import {
   getDomainDigest,
   getSignatureForAttestation,
@@ -8,7 +9,6 @@ import {
   assertRevert,
   assertRevertWithReason,
 } from '@celo/protocol/lib/test-utils'
-import { getPhoneHash } from '@celo/utils/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,

@@ -86,6 +86,7 @@
       "@celo/connect",
       "@celo/cryptographic-utils",
       "@celo/flake-tracker",
+      "@celo/phone-utils",
       "@celo/typescript",
       "@celo/utils"
     ]
