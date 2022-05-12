@@ -93,6 +93,7 @@
   },
   "devDependencies": {
     "@celo/flake-tracker": "0.0.1-dev",
+    "@celo/phone-utils": "2.0.1-dev",
     "@celo/typechain-target-web3-v1-celo": "0.2.0",
     "@celo/typescript": "0.0.1",
     "@types/bn.js": "^4.11.0",
