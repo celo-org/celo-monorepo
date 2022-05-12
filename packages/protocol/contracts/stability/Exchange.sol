@@ -90,7 +90,7 @@ contract Exchange is
    * updates
    * @param _minimumReports The minimum number of fresh reports that need to be
    * present in the oracle to update buckets
-   * commit to the gold bucket 
+   * commit to the gold bucket
    * @param stableTokenIdentifier String identifier of stabletoken in registry
    * @param _minSupplyForStableBucketCap The minimum amount of stabletoken supply 
    * considered for the stable token bucket cap 
