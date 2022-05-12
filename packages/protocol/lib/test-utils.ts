@@ -1,7 +1,7 @@
 import { Signature } from '@celo/base/lib/signatureUtils'
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
-import {getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
@@ -138,11 +138,9 @@ export async function assertRevertWithReason(promise: any, expectedRevertReason:
     // When it's a transaction (eg a non-view send call), error.message has a shape like:
     // `Returned error: VM Exception while processing transaction: revert ${revertMessage} -- Reason given: ${revertMessage}.`
     // Therefore we try to parse the first instance of `${revertMessage}`.
-    const revertReasonStartIndex = 'Returned error: VM Exception while processing transaction: revert '.length
-    const foundRevertReason = error.message.substring(
-      revertReasonStartIndex,
-      revertReasonStartIndex + expectedRevertReason.length
-    )
+    const foundRevertReason = error.message
+      .split(" -- Reason given: ")[0]
+      .split('Returned error: VM Exception while processing transaction: revert ')[1]
     assert.equal(foundRevertReason, expectedRevertReason, 'Incorrect revert message')
   }
 }
