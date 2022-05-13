@@ -118,7 +118,8 @@ contract FederatedAttestations is
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @param maxAttestations Limit the number of attestations that will be returned
-   * @return for m found attestations, m <= maxAttestations:
+   * @return [0] Array of number of attestations returned per issuer
+   * @return [1 - 3] for m (== sum([0])) found attestations, m <= maxAttestations:
    *         [
    *           Array of m accounts,
    *           Array of m issuedOns,
@@ -127,35 +128,35 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-
-  // TODO ASv2 consider also returning an array with counts of attestations per issuer
+  // TODO EN revisit more efficient as external (+ use calldata) if possible
   function lookupAttestations(
     bytes32 identifier,
     address[] memory trustedIssuers,
     uint256 maxAttestations
-  ) public view returns (address[] memory, uint256[] memory, address[] memory) {
-    // Cannot dynamically allocate an in-memory array
-    // For now require a max returned parameter to pre-allocate and then shrink
-    // TODO ASv2 is it a risk to allocate an array of size maxAttestations?
+  ) public view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
+    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
+
+    // Pre-computing length of unrevoked attestations requires many storage lookups.
+    // Allow users to call that first and pass this in as maxAttestations.
     // Same index corresponds to same attestation
     address[] memory accounts = new address[](maxAttestations);
     uint256[] memory issuedOns = new uint256[](maxAttestations);
     address[] memory signers = new address[](maxAttestations);
 
     uint256 currIndex = 0;
+    OwnershipAttestation[] memory attestationsPerIssuer;
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      uint256 numTrustedIssuers = identifierToAddresses[identifier][trustedIssuers[i]].length;
-      for (uint256 j = 0; j < numTrustedIssuers; j = j.add(1)) {
+      attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+      for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
         // Only create and push new attestation if we haven't hit max
         if (currIndex < maxAttestations) {
-          // solhint-disable-next-line max-line-length
-          OwnershipAttestation memory attestation = identifierToAddresses[identifier][trustedIssuers[i]][j];
-          if (!revokedSigners[attestation.signer]) {
-            accounts[currIndex] = attestation.account;
-            issuedOns[currIndex] = attestation.issuedOn;
-            signers[currIndex] = attestation.signer;
+          if (!revokedSigners[attestationsPerIssuer[j].signer]) {
+            accounts[currIndex] = attestationsPerIssuer[j].account;
+            issuedOns[currIndex] = attestationsPerIssuer[j].issuedOn;
+            signers[currIndex] = attestationsPerIssuer[j].signer;
             currIndex = currIndex.add(1);
+            countsPerIssuer[i] = countsPerIssuer[i].add(1);
           }
         } else {
           break;
@@ -174,9 +175,9 @@ contract FederatedAttestations is
         trimmedIssuedOns[i] = issuedOns[i];
         trimmedSigners[i] = signers[i];
       }
-      return (trimmedAccounts, trimmedIssuedOns, trimmedSigners);
+      return (countsPerIssuer, trimmedAccounts, trimmedIssuedOns, trimmedSigners);
     } else {
-      return (accounts, issuedOns, signers);
+      return (countsPerIssuer, accounts, issuedOns, signers);
     }
   }
 

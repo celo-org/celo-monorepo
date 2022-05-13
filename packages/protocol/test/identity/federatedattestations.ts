@@ -161,11 +161,15 @@ contract('FederatedAttestations', (accounts: string[]) => {
     }
 
     const checkAgainstExpectedAttestations = (
+      expectedCountsPerIssuer: number[],
       expectedAttestations: AttestationTestCase[],
+      actualCountsPerIssuer: BigNumber[],
       actualAddresses: string[],
       actualIssuedOns: BigNumber[],
       actualSigners: string[]
     ) => {
+      expect(expectedCountsPerIssuer).to.eql(actualCountsPerIssuer.map((count) => count.toNumber()))
+
       assert.lengthOf(actualAddresses, expectedAttestations.length)
       assert.lengthOf(actualIssuedOns, expectedAttestations.length)
       assert.lengthOf(actualSigners, expectedAttestations.length)
@@ -179,12 +183,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     describe('when identifier has not been registered', () => {
       it('should return empty list', async () => {
-        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
-          identifier1,
-          [issuer1],
-          1
-        )
-        checkAgainstExpectedAttestations([], addresses, issuedOns, signers)
+        const [
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers,
+        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1], 1)
+        checkAgainstExpectedAttestations([0], [], countsPerIssuer, addresses, issuedOns, signers)
       })
     })
 
@@ -244,64 +249,116 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return all attestations from one issuer', async () => {
-        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+        const [
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers,
+        ] = await federatedAttestations.lookupAttestations(
           identifier1,
           [issuer1],
           // Do not allow for maxAttestations to coincidentally limit incorrect output
           issuer1Attestations.length + 1
         )
-        checkAgainstExpectedAttestations(issuer1Attestations, addresses, issuedOns, signers)
+        checkAgainstExpectedAttestations(
+          [issuer1Attestations.length],
+          issuer1Attestations,
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers
+        )
       })
 
       it('should return empty list if no attestations exist for an issuer', async () => {
-        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
-          identifier1,
-          [issuer3],
-          1
-        )
-        checkAgainstExpectedAttestations([], addresses, issuedOns, signers)
+        const [
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers,
+        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer3], 1)
+        checkAgainstExpectedAttestations([0], [], countsPerIssuer, addresses, issuedOns, signers)
       })
 
       it('should return attestations from multiple issuers in correct order', async () => {
         const expectedAttestations = issuer2Attestations.concat(issuer1Attestations)
-        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+        const expectedCountsPerIssuer = [0, issuer2Attestations.length, issuer1Attestations.length]
+        const [
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers,
+        ] = await federatedAttestations.lookupAttestations(
           identifier1,
           [issuer3, issuer2, issuer1],
           expectedAttestations.length + 1
         )
-        checkAgainstExpectedAttestations(expectedAttestations, addresses, issuedOns, signers)
+        checkAgainstExpectedAttestations(
+          expectedCountsPerIssuer,
+          expectedAttestations,
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers
+        )
       })
 
       it('should return empty list if maxAttestations == 0', async () => {
-        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
-          identifier1,
-          [issuer1],
-          0
-        )
-        checkAgainstExpectedAttestations([], addresses, issuedOns, signers)
+        const [
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers,
+        ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1], 0)
+        checkAgainstExpectedAttestations([0], [], countsPerIssuer, addresses, issuedOns, signers)
       })
 
       it('should only return maxAttestations attestations when more are present', async () => {
         const expectedAttestations = issuer1Attestations.slice(0, -1)
-        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+        const expectedCountsPerIssuer = [expectedAttestations.length]
+        const [
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers,
+        ] = await federatedAttestations.lookupAttestations(
           identifier1,
           [issuer1],
           expectedAttestations.length
         )
-        checkAgainstExpectedAttestations(expectedAttestations, addresses, issuedOns, signers)
+        checkAgainstExpectedAttestations(
+          expectedCountsPerIssuer,
+          expectedAttestations,
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers
+        )
       })
 
       it('should not return attestations from revoked signers', async () => {
         const attestationToRevoke = issuer2Attestations[0]
         await federatedAttestations.revokeSigner(attestationToRevoke.signer)
         const expectedAttestations = issuer2Attestations.slice(1)
-
-        const [addresses, issuedOns, signers] = await federatedAttestations.lookupAttestations(
+        const expectedCountsPerIssuer = [expectedAttestations.length]
+        const [
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers,
+        ] = await federatedAttestations.lookupAttestations(
           identifier1,
           [issuer2],
           issuer2Attestations.length
         )
-        checkAgainstExpectedAttestations(expectedAttestations, addresses, issuedOns, signers)
+        checkAgainstExpectedAttestations(
+          expectedCountsPerIssuer,
+          expectedAttestations,
+          countsPerIssuer,
+          addresses,
+          issuedOns,
+          signers
+        )
       })
     })
   })
