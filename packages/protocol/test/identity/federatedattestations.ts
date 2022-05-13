@@ -8,6 +8,7 @@ import {
   assertLogMatches2,
   assertRevert,
   assertRevertWithReason,
+  assertThrowsAsync,
 } from '@celo/protocol/lib/test-utils'
 import BigNumber from 'bignumber.js'
 import {
@@ -762,9 +763,21 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
   })
 
-  describe.only('#deleteAttestation', () => {
-    // TODO ASv2 check that the actual entries were deleted in both mappings
-    // (for identifiers and attestations)
+  describe('#deleteAttestation', () => {
+    const checkAttestationDeleted = (
+      identifier: string,
+      issuer: string,
+      account: string,
+      addressIndex: number,
+      identifierIndex: number
+    ) => {
+      assertThrowsAsync(
+        federatedAttestations.identifierToAddresses(identifier, issuer, addressIndex)
+      )
+      assertThrowsAsync(
+        federatedAttestations.addressToIdentifiers(account, issuer, identifierIndex)
+      )
+    }
     beforeEach(async () => {
       await accountsInstance.authorizeSigner(signer1, signerRole, { from: issuer1 })
       await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer1 })
@@ -812,7 +825,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await federatedAttestations.deleteAttestation(identifier2, issuer1, account1, {
         from: account1,
       })
-      assertRevert(checkStorageState(identifier2, issuer1, 0, account1, nowUnixTime, signer1, 1))
+      checkAttestationDeleted(identifier2, issuer1, account1, 0, 1)
+      // assertRevert(checkStorageState(identifier2, issuer1, 0, account1, nowUnixTime, signer1, 1))
     })
 
     it('should revert if an invalid user attempts to delete the attestation', async () => {
@@ -833,7 +847,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should successfully delete an attestation with a revoked signer', async () => {
       await federatedAttestations.revokeSigner(signer1)
       await federatedAttestations.deleteAttestation(identifier1, issuer1, account1)
-      assertRevert(checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0))
+      checkAttestationDeleted(identifier1, issuer1, account1, 0, 1)
     })
 
     it('should fail registering same attestation but succeed after deleting it', async () => {
@@ -864,11 +878,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
       await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
-
       await federatedAttestations.deleteAttestation(identifier1, issuer1, account1)
-      // fails because array of attestations is an empty list
-      assertRevert(federatedAttestations.identifierToAddresses(identifier1, issuer1, 0))
-      assertRevert(federatedAttestations.addressToIdentifiers(account1, issuer1, 0))
+      checkAttestationDeleted(identifier1, issuer1, account1, 0, 0)
     })
   })
 })
