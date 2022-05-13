@@ -113,6 +113,37 @@ contract FederatedAttestations is
   }
 
   /**
+   * @notice Calculates the total number of attestations completed for an identifier
+             by each trusted issuer, from unrevoked signers only
+             This can be used to obtain an exact value for maxAttestations
+             prior to calling lookupAttestations
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @return [0] Sum total of attestations found
+   *         [1] Array of number of attestations found per issuer
+   */
+  function getNumberOfUnrevokedAttestations(bytes32 identifier, address[] calldata trustedIssuers)
+    external
+    view
+    returns (uint256, uint256[] memory)
+  {
+    uint256 totalAttestations = 0;
+    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
+
+    OwnershipAttestation[] memory attestationsPerIssuer;
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+      for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
+        if (!revokedSigners[attestationsPerIssuer[j].signer]) {
+          totalAttestations = totalAttestations.add(1);
+          countsPerIssuer[i] = countsPerIssuer[i].add(1);
+        }
+      }
+    }
+    return (totalAttestations, countsPerIssuer);
+  }
+
+  /**
    * @notice Helper function for lookupAllAttestations to calculate the
              total number of attestations completed for an identifier
              by each trusted issuer
