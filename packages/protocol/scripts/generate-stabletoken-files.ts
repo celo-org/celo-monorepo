@@ -253,6 +253,10 @@ function migrationsConfig(ticker: string): string {
 }`
 }
 
+function integrationTestSnippet(ticker: string): string {
+  return `['Exchange${ticker}', 'StableToken${ticker}'], // ${ticker}`
+}
+
 function errorFunct(err) {
   if (err) return console.log(err)
 }
@@ -314,6 +318,8 @@ ${stableTokenConstitution(fiatTicker)}
 ${migrationsConfig(fiatTicker)}
   * Add files to the build: packages/protocol/scripts/build.ts
   * Add it to the env tests packages/protocol/test/common/integration.ts
+    Code snippet:
+${integrationTestSnippet(fiatTicker)}
   `)
 } catch (e) {
   console.error(`Something went wrong: ${e}`)
