@@ -283,6 +283,47 @@ contract FederatedAttestations is
   }
 
   /**
+   * @notice Calculates the total number of identifiers completed for an identifier
+             by each trusted issuer, from unrevoked signers only
+             This can be used to obtain an exact value for maxIdentifiers
+             prior to calling lookupIdentifiersByAddress
+   * @param account Address of the account
+   * @param trustedIssuers Array of n issuers whose identifiers will be included
+   * @return [0] Sum total of identifiers found
+   *         [1] Array of number of identifiers found per issuer
+   */
+  function getNumberOfUnrevokedIdentifiers(address account, address[] calldata trustedIssuers)
+    external
+    view
+    returns (uint256, uint256[] memory)
+  {
+    uint256 totalIdentifiers = 0;
+    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
+
+    OwnershipAttestation[] memory attestationsPerIssuer;
+    bytes32[] memory identifiersPerIssuer;
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
+      for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
+        bytes32 identifier = identifiersPerIssuer[j];
+        // Check if the mapping was produced by a revoked signer
+        attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+        for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
+          OwnershipAttestation memory attestation = attestationsPerIssuer[k];
+          // (identifier, account, issuer) tuples should be unique
+          if (attestation.account == account && !revokedSigners[attestation.signer]) {
+            totalIdentifiers = totalIdentifiers.add(1);
+            countsPerIssuer[i] = countsPerIssuer[i].add(1);
+            break;
+          }
+        }
+      }
+    }
+    return (totalIdentifiers, countsPerIssuer);
+  }
+
+  /**
    * @notice Returns identifiers mapped (by unrevoked signers) to a
    *   given account address by a list of trusted issuers
    * @param account Address of the account

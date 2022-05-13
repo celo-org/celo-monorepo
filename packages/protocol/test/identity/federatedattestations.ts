@@ -182,6 +182,16 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
   }
 
+  const checkAgainstExpectedCountsPerIssuer = (
+    expectedCountsPerIssuer: number[],
+    actualTotal: BigNumber,
+    actualCountsPerIssuer: BigNumber[]
+  ) => {
+    const expectedTotal = expectedCountsPerIssuer.reduce((sum, prev) => sum + prev, 0)
+    assert.equal(actualTotal.toNumber(), expectedTotal)
+    expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
+  }
+
   describe('#lookupAttestations', () => {
     describe('when identifier has not been registered', () => {
       it('should return empty list', async () => {
@@ -256,7 +266,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           addresses,
           issuedOns,
           signers,
-        ] = await federatedAttestations.lookupAllAttestations(identifier1, [])
+        ] = await federatedAttestations.lookupAttestations(identifier1, [], 1)
         checkAgainstExpectedAttestations([], [], countsPerIssuer, addresses, issuedOns, signers)
       })
 
@@ -375,7 +385,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
   })
 
-  describe.only('#lookupAllAttestations', () => {
+  describe('#lookupAllAttestations', () => {
     describe('when identifier has not been registered', () => {
       it('should return empty list', async () => {
         const [
@@ -443,38 +453,27 @@ contract('FederatedAttestations', (accounts: string[]) => {
         }
       })
 
-      describe.only('#getNumberOfUnrevokedAttestations', () => {
-        const checkAgainstExpectedNumberAttestations = (
-          expectedCountsPerIssuer: number[],
-          actualTotal: BigNumber,
-          actualCountsPerIssuer: BigNumber[]
-        ) => {
-          const expectedTotal = expectedCountsPerIssuer.reduce((sum, prev) => sum + prev, 0)
-          assert.equal(actualTotal.toNumber(), expectedTotal)
-          expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(
-            expectedCountsPerIssuer
-          )
-        }
-        it('should get no attestations when list of issuers is empty', async () => {
+      describe('#getNumberOfUnrevokedAttestations', () => {
+        it('should get no attestations if no issuers specified', async () => {
           const [
             totalAttestations,
             countsPerIssuer,
           ] = await federatedAttestations.getNumberOfUnrevokedAttestations(identifier1, [])
-          checkAgainstExpectedNumberAttestations([], totalAttestations, countsPerIssuer)
+          checkAgainstExpectedCountsPerIssuer([], totalAttestations, countsPerIssuer)
         })
         it('should get no attestations with unregistered identifier', async () => {
           const [
             totalAttestations,
             countsPerIssuer,
           ] = await federatedAttestations.getNumberOfUnrevokedAttestations(identifier2, [issuer1])
-          checkAgainstExpectedNumberAttestations([0], totalAttestations, countsPerIssuer)
+          checkAgainstExpectedCountsPerIssuer([0], totalAttestations, countsPerIssuer)
         })
         it('should get the correct total number of attestations with one issuer', async () => {
           const [
             totalAttestations,
             countsPerIssuer,
           ] = await federatedAttestations.getNumberOfUnrevokedAttestations(identifier1, [issuer1])
-          checkAgainstExpectedNumberAttestations(
+          checkAgainstExpectedCountsPerIssuer(
             [issuer1Attestations.length],
             totalAttestations,
             countsPerIssuer
@@ -489,7 +488,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
             issuer1,
             issuer2,
           ])
-          checkAgainstExpectedNumberAttestations(
+          checkAgainstExpectedCountsPerIssuer(
             [0, issuer1Attestations.length, issuer2Attestations.length],
             totalAttestations,
             countsPerIssuer
@@ -501,13 +500,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
             totalAttestations,
             countsPerIssuer,
           ] = await federatedAttestations.getNumberOfUnrevokedAttestations(identifier1, [issuer2])
-          checkAgainstExpectedNumberAttestations([1], totalAttestations, countsPerIssuer)
+          checkAgainstExpectedCountsPerIssuer([1], totalAttestations, countsPerIssuer)
         })
       })
 
       // TODO EN delete these if this is a private helper function
       xdescribe('#getTotalNumberOfAttestations', () => {
-        it('should get 0 attestations when list of issuers is empty', async () => {
+        it('should get 0 attestations if no issuers specified', async () => {
           const [
             totalAttestations,
             countsPerIssuer,
@@ -709,14 +708,63 @@ contract('FederatedAttestations', (accounts: string[]) => {
         }
       })
 
+      describe.only('#getNumberOfUnrevokedIdentifiers', () => {
+        it('should get no identifiers if no issuers specified', async () => {
+          const [
+            totalIdentifiers,
+            countsPerIssuer,
+          ] = await federatedAttestations.getNumberOfUnrevokedIdentifiers(account1, [])
+          checkAgainstExpectedCountsPerIssuer([], totalIdentifiers, countsPerIssuer)
+        })
+        it('should get no identifiers with unregistered address', async () => {
+          const [
+            totalIdentifiers,
+            countsPerIssuer,
+          ] = await federatedAttestations.getNumberOfUnrevokedIdentifiers(accounts[7], [issuer1])
+          checkAgainstExpectedCountsPerIssuer([0], totalIdentifiers, countsPerIssuer)
+        })
+        it('should get the correct total number of identifiers with one issuer', async () => {
+          const [
+            totalIdentifiers,
+            countsPerIssuer,
+          ] = await federatedAttestations.getNumberOfUnrevokedIdentifiers(account1, [issuer1])
+          checkAgainstExpectedCountsPerIssuer(
+            [issuer1IdCases.length],
+            totalIdentifiers,
+            countsPerIssuer
+          )
+        })
+        it('should get the correct total number of identifiers with multiple issuers in the correct order', async () => {
+          const [
+            totalIdentifiers,
+            countsPerIssuer,
+          ] = await federatedAttestations.getNumberOfUnrevokedIdentifiers(account1, [
+            issuer3,
+            issuer1,
+            issuer2,
+          ])
+          checkAgainstExpectedCountsPerIssuer(
+            [0, issuer1IdCases.length, issuer2IdCases.length],
+            totalIdentifiers,
+            countsPerIssuer
+          )
+        })
+        it('should not get identifiers from revoked signers', async () => {
+          await federatedAttestations.revokeSigner(issuer2IdCases[0].signer)
+          const [
+            totalIdentifiers,
+            countsPerIssuer,
+          ] = await federatedAttestations.getNumberOfUnrevokedIdentifiers(account1, [issuer2])
+          checkAgainstExpectedCountsPerIssuer([1], totalIdentifiers, countsPerIssuer)
+        })
+      })
+
       it('should return empty count if no issuers specified', async () => {
         const [
-          countsPerIssuer,
-          addresses,
-          issuedOns,
-          signers,
-        ] = await federatedAttestations.lookupAllAttestations(identifier1, [])
-        checkAgainstExpectedAttestations([], [], countsPerIssuer, addresses, issuedOns, signers)
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiersByAddress(account1, [], 1)
+        checkAgainstExpectedIdCases([], [], actualCountsPerIssuer, actualIdentifiers)
       })
 
       it('should return all identifiers from one issuer', async () => {
