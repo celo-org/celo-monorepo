@@ -158,13 +158,13 @@ contract FederatedAttestations is
     returns (uint256, uint256[] memory)
   {
     uint256 totalAttestations = 0;
-    uint256 numIdsForIssuer;
+    uint256 numAttestationsForIssuer;
     uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      numIdsForIssuer = identifierToAddresses[identifier][trustedIssuers[i]].length;
-      totalAttestations = totalAttestations.add(numIdsForIssuer);
-      countsPerIssuer[i] = numIdsForIssuer;
+      numAttestationsForIssuer = identifierToAddresses[identifier][trustedIssuers[i]].length;
+      totalAttestations = totalAttestations.add(numAttestationsForIssuer);
+      countsPerIssuer[i] = numAttestationsForIssuer;
     }
     return (totalAttestations, countsPerIssuer);
   }
