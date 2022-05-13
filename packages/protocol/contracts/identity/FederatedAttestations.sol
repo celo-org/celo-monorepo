@@ -113,6 +113,32 @@ contract FederatedAttestations is
   }
 
   /**
+   * @notice Helper function for lookupAllAttestations to calculate the
+             total number of attestations completed for an identifier
+             by each trusted issuer
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @return [0] Sum total of attestations found
+   *         [1] Array of number of attestations found per issuer
+   */
+  function getTotalNumberOfAttestations(bytes32 identifier, address[] memory trustedIssuers)
+    public
+    view
+    returns (uint256, uint256[] memory)
+  {
+    uint256 totalAttestations = 0;
+    uint256 numIdsForIssuer;
+    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      numIdsForIssuer = identifierToAddresses[identifier][trustedIssuers[i]].length;
+      totalAttestations = totalAttestations.add(numIdsForIssuer);
+      countsPerIssuer[i] = numIdsForIssuer;
+    }
+    return (totalAttestations, countsPerIssuer);
+  }
+
+  /**
    * @notice Returns info about attestations (with unrevoked signers)
    *   for an identifier produced by a list of issuers
    * @param identifier Hash of the identifier
@@ -179,6 +205,50 @@ contract FederatedAttestations is
     } else {
       return (countsPerIssuer, accounts, issuedOns, signers);
     }
+  }
+
+  /**
+   * @notice Similar to lookupAttestations but returns all attestations for
+   *   an identifier produced by a list of issuers, regardless of whether
+   *   signers have been revoked or not
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @return [0] Array of number of attestations returned per issuer
+   * @return [1 - 3] for m (== sum([0])) found attestations:
+   *         [
+   *           Array of m accounts,
+   *           Array of m issuedOns,
+   *           Array of m signers
+   *         ]; index corresponds to the same attestation
+   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
+   */
+  function lookupAllAttestations(bytes32 identifier, address[] calldata trustedIssuers)
+    external
+    view
+    returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory)
+  {
+    uint256 totalAttestations;
+    uint256[] memory countsPerIssuer;
+
+    (totalAttestations, countsPerIssuer) = getTotalNumberOfAttestations(identifier, trustedIssuers);
+    address[] memory accounts = new address[](totalAttestations);
+    uint256[] memory issuedOns = new uint256[](totalAttestations);
+    address[] memory signers = new address[](totalAttestations);
+
+    OwnershipAttestation[] memory attestationsPerIssuer;
+    totalAttestations = 0;
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+      for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
+        accounts[totalAttestations] = attestationsPerIssuer[j].account;
+        issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
+        signers[totalAttestations] = attestationsPerIssuer[j].signer;
+        totalAttestations = totalAttestations.add(1);
+      }
+    }
+    return (countsPerIssuer, accounts, issuedOns, signers);
   }
 
   /**
