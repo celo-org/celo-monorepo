@@ -324,6 +324,36 @@ contract FederatedAttestations is
   }
 
   /**
+   * @notice Helper function for lookupIdentifiersByAddress to calculate the
+             total number of identifiers completed for an identifier
+             by each trusted issuer
+   * @param account Address of the account
+   * @param trustedIssuers Array of n issuers whose identifiers will be included
+   * @return [0] Sum total of identifiers found
+   *         [1] Array of number of identifiers found per issuer
+   */
+  // TODO EN revisit and make internal after testing
+  function getTotalNumberOfIdentifiers(address account, address[] memory trustedIssuers)
+    public
+    view
+    returns (uint256, uint256[] memory)
+  {
+    uint256 totalIdentifiers = 0;
+    uint256 numIdentifiersForIssuer;
+    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
+
+    OwnershipAttestation[] memory attestationsPerIssuer;
+    bytes32[] memory identifiersPerIssuer;
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      numIdentifiersForIssuer = addressToIdentifiers[account][trustedIssuers[i]].length;
+      totalIdentifiers = totalIdentifiers.add(numIdentifiersForIssuer);
+      countsPerIssuer[i] = numIdentifiersForIssuer;
+    }
+    return (totalIdentifiers, countsPerIssuer);
+  }
+
+  /**
    * @notice Returns identifiers mapped (by unrevoked signers) to a
    *   given account address by a list of trusted issuers
    * @param account Address of the account
