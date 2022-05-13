@@ -268,6 +268,7 @@ contract FederatedAttestations is
     address[] memory signers = new address[](totalAttestations);
 
     OwnershipAttestation[] memory attestationsPerIssuer;
+    // Reset this and use as current index to get around stack-too-deep
     totalAttestations = 0;
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
@@ -342,9 +343,6 @@ contract FederatedAttestations is
     uint256 numIdentifiersForIssuer;
     uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
 
-    OwnershipAttestation[] memory attestationsPerIssuer;
-    bytes32[] memory identifiersPerIssuer;
-
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       numIdentifiersForIssuer = addressToIdentifiers[account][trustedIssuers[i]].length;
       totalIdentifiers = totalIdentifiers.add(numIdentifiersForIssuer);
@@ -409,6 +407,42 @@ contract FederatedAttestations is
     } else {
       return (countsPerIssuer, identifiers);
     }
+  }
+
+  /**
+   * @notice Similar to lookupIdentifiersByAddress but returns all identifiers for
+   *   mapped to an address with attestations from a list of issuers,
+   *   regardless of whether the signers have been revoked or not
+   * @param account Address of the account
+   * @param trustedIssuers Array of n issuers whose identifier mappings will be used
+   * @return [0] Array of number of identifiers returned per issuer
+   * @return [1] Array (length == sum([0])) of identifiers
+   * @dev Adds identifier info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
+   */
+  function lookupAllIdentifiersByAddress(address account, address[] calldata trustedIssuers)
+    external
+    view
+    returns (uint256[] memory, bytes32[] memory)
+  {
+    uint256 totalIdentifiers;
+    uint256[] memory countsPerIssuer;
+
+    (totalIdentifiers, countsPerIssuer) = getTotalNumberOfIdentifiers(account, trustedIssuers);
+
+    bytes32[] memory identifiers = new bytes32[](totalIdentifiers);
+    bytes32[] memory identifiersPerIssuer;
+
+    uint256 currIndex = 0;
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
+      for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
+        identifiers[currIndex] = identifiersPerIssuer[j];
+        currIndex = currIndex.add(1);
+      }
+    }
+    return (countsPerIssuer, identifiers);
   }
 
   // TODO do we want to restrict permissions, or should anyone
