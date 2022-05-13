@@ -169,16 +169,16 @@ contract('FederatedAttestations', (accounts: string[]) => {
     actualIssuedOns: BigNumber[],
     actualSigners: string[]
   ) => {
-    expect(expectedCountsPerIssuer).to.eql(actualCountsPerIssuer.map((count) => count.toNumber()))
+    expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
 
     assert.lengthOf(actualAddresses, expectedAttestations.length)
     assert.lengthOf(actualIssuedOns, expectedAttestations.length)
     assert.lengthOf(actualSigners, expectedAttestations.length)
 
     expectedAttestations.forEach((expectedAttestation, index) => {
-      assert.equal(expectedAttestation.account, actualAddresses[index])
-      assert.equal(expectedAttestation.issuedOn, actualIssuedOns[index].toNumber())
-      assert.equal(expectedAttestation.signer, actualSigners[index])
+      assert.equal(actualAddresses[index], expectedAttestation.account)
+      assert.equal(actualIssuedOns[index].toNumber(), expectedAttestation.issuedOn)
+      assert.equal(actualSigners[index], expectedAttestation.signer)
     })
   }
 
@@ -649,8 +649,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       actualCountsPerIssuer: BigNumber[],
       actualIdentifiers: string[]
     ) => {
-      expect(expectedCountsPerIssuer).to.eql(actualCountsPerIssuer.map((count) => count.toNumber()))
-      expect(expectedIdentifiers.map((idCase) => idCase.identifier)).to.eql(actualIdentifiers)
+      expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
+      expect(actualIdentifiers).to.eql(expectedIdentifiers.map((idCase) => idCase.identifier))
     }
 
     describe('when address has not been registered', () => {
