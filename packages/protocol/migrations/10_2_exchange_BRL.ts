@@ -49,5 +49,6 @@ module.exports = deploymentForCoreContract<ExchangeBRLInstance>(
     )
     // cUSD doesn't need to be added as it is currently harcoded in Reserve.sol
     await reserve.addExchangeSpender(exchange.address)
+    await exchange.activateStable()
   }
 )
