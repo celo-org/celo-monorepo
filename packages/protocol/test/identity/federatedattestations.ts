@@ -86,6 +86,31 @@ contract('FederatedAttestations', (accounts: string[]) => {
     )
   }
 
+  const checkStorageState = async (
+    identifier: string,
+    issuer: string,
+    attestationIndex: number,
+    account: string,
+    issuedOn: number,
+    signer: string,
+    identifierIndex: number
+  ) => {
+    const attestation = await federatedAttestations.identifierToAddresses(
+      identifier,
+      issuer,
+      attestationIndex
+    )
+    assert.equal(attestation['account'], account)
+    assert.equal(attestation['issuedOn'], issuedOn)
+    assert.equal(attestation['signer'], signer)
+    const storedIdentifier = await federatedAttestations.addressToIdentifiers(
+      account1,
+      issuer1,
+      identifierIndex
+    )
+    assert.equal(identifier, storedIdentifier)
+  }
+
   beforeEach('FederatedAttestations setup', async () => {
     accountsInstance = await Accounts.new(true)
     federatedAttestations = await FederatedAttestations.new(true)
@@ -585,35 +610,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should succeed if issuer == signer', async () => {
-      const issuerSig = await getSignatureForAttestation(
-        identifier1,
-        issuer1,
-        account1,
-        nowUnixTime,
-        issuer1,
-        chainId,
-        federatedAttestations.address
-      )
-      const register = await federatedAttestations.registerAttestation(
-        identifier1,
-        issuer1,
-        account1,
-        nowUnixTime,
-        issuer1,
-        issuerSig.v,
-        issuerSig.r,
-        issuerSig.s
-      )
-      assertLogMatches2(register.logs[0], {
-        event: 'AttestationRegistered',
-        args: {
-          identifier: identifier1,
-          issuer: issuer1,
-          account: account1,
-          issuedOn: nowUnixTime,
-          signer: issuer1,
-        },
-      })
+      await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, issuer1)
+      await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, issuer1, 0)
     })
 
     it('should revert if an invalid signature is provided', async () => {
@@ -672,6 +670,15 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       })
 
+      it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
+        await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
+
+        // adding second attestation
+        const account2 = accounts[3]
+        await signAndRegisterAttestation(identifier1, issuer1, account2, nowUnixTime, signer1)
+        await checkStorageState(identifier1, issuer1, 1, account2, nowUnixTime, signer1, 0)
+      })
+
       it('should revert if an attestation with the same (issuer, identifier, account) is uploaded again', async () => {
         // Upload the same attestation signed by a different signer, authorized under the same issuer
         const signer2 = accounts[4]
@@ -701,107 +708,22 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should succeed with a different identifier', async () => {
-        const sig2 = await getSignatureForAttestation(
-          identifier2,
-          issuer1,
-          account1,
-          nowUnixTime,
-          signer1,
-          chainId,
-          federatedAttestations.address
-        )
-        const register2 = await federatedAttestations.registerAttestation(
-          identifier2,
-          issuer1,
-          account1,
-          nowUnixTime,
-          signer1,
-          sig2.v,
-          sig2.r,
-          sig2.s
-        )
-        assertLogMatches2(register2.logs[0], {
-          event: 'AttestationRegistered',
-          args: {
-            identifier: identifier2,
-            issuer: issuer1,
-            account: account1,
-            issuedOn: nowUnixTime,
-            signer: signer1,
-          },
-        })
+        await signAndRegisterAttestation(identifier2, issuer1, account1, nowUnixTime, signer1)
+        await checkStorageState(identifier2, issuer1, 0, account1, nowUnixTime, signer1, 1)
       })
 
       it('should succeed with a different issuer', async () => {
         const issuer2 = accounts[4]
         const signer2 = accounts[5]
         await accountsInstance.createAccount({ from: issuer2 })
-        await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer2 })
-        await accountsInstance.completeSignerAuthorization(issuer2, signerRole, { from: signer2 })
-        const sig2 = await getSignatureForAttestation(
-          identifier1,
-          issuer2,
-          account1,
-          nowUnixTime,
-          signer2,
-          chainId,
-          federatedAttestations.address
-        )
-        const register2 = await federatedAttestations.registerAttestation(
-          identifier1,
-          issuer2,
-          account1,
-          nowUnixTime,
-          signer2,
-          sig2.v,
-          sig2.r,
-          sig2.s,
-          { from: issuer2 }
-        )
-        assertLogMatches2(register2.logs[0], {
-          event: 'AttestationRegistered',
-          args: {
-            identifier: identifier1,
-            issuer: issuer2,
-            account: account1,
-            issuedOn: nowUnixTime,
-            signer: signer2,
-          },
-        })
+        await signAndRegisterAttestation(identifier1, issuer2, account1, nowUnixTime, signer2)
+        await checkStorageState(identifier1, issuer2, 0, account1, nowUnixTime, signer2, 0)
       })
 
       it('should succeed with a different account', async () => {
         const account2 = accounts[4]
-        const sig2 = await getSignatureForAttestation(
-          identifier1,
-          issuer1,
-          account2,
-          nowUnixTime,
-          signer1,
-          chainId,
-          federatedAttestations.address
-        )
-        const register2 = await federatedAttestations.registerAttestation(
-          identifier1,
-          issuer1,
-          account2,
-          nowUnixTime,
-          signer1,
-          sig2.v,
-          sig2.r,
-          sig2.s,
-          { from: issuer1 }
-        )
-        assertLogMatches2(register2.logs[0], {
-          event: 'AttestationRegistered',
-          args: {
-            identifier: identifier1,
-            issuer: issuer1,
-            account: account2,
-            issuedOn: nowUnixTime,
-            signer: signer1,
-          },
-        })
+        await signAndRegisterAttestation(identifier1, issuer1, account2, nowUnixTime, signer1)
+        await checkStorageState(identifier1, issuer1, 1, account2, nowUnixTime, signer1, 0)
       })
     })
 
@@ -825,7 +747,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       const signer2 = accounts[4]
       await accountsInstance.authorizeSigner(signer2, signerRole, { from: issuer1 })
       await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer2 })
-      const register = await federatedAttestations.registerAttestation(
+      await federatedAttestations.registerAttestation(
         identifier1,
         issuer1,
         account1,
@@ -836,20 +758,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
         sig.s,
         { from: signer2 }
       )
-      assertLogMatches2(register.logs[0], {
-        event: 'AttestationRegistered',
-        args: {
-          identifier: identifier1,
-          issuer: issuer1,
-          account: account1,
-          issuedOn: nowUnixTime,
-          signer: signer1,
-        },
-      })
+      await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
     })
   })
 
-  describe('#deleteAttestation', () => {
+  describe.only('#deleteAttestation', () => {
     // TODO ASv2 check that the actual entries were deleted in both mappings
     // (for identifiers and attestations)
     beforeEach(async () => {
@@ -886,42 +799,20 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should succeed when >1 attestations are registered for (identifier, issuer)', async () => {
       const account2 = accounts[3]
       await signAndRegisterAttestation(identifier1, issuer1, account2, nowUnixTime, signer1)
-      const deleteAttestation = await federatedAttestations.deleteAttestation(
-        identifier1,
-        issuer1,
-        account2,
-        {
-          from: account2,
-        }
-      )
-      assertLogMatches2(deleteAttestation.logs[0], {
-        event: 'AttestationDeleted',
-        args: {
-          identifier: identifier1,
-          issuer: issuer1,
-          account: account2,
-        },
+      await checkStorageState(identifier1, issuer1, 1, account2, nowUnixTime, signer1, 0)
+      await federatedAttestations.deleteAttestation(identifier1, issuer1, account2, {
+        from: account2,
       })
+      await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
     })
 
     it('should succeed when >1 identifiers are registered for (account, issuer)', async () => {
       await signAndRegisterAttestation(identifier2, issuer1, account1, nowUnixTime, signer1)
-      const deleteAttestation = await federatedAttestations.deleteAttestation(
-        identifier2,
-        issuer1,
-        account1,
-        {
-          from: account1,
-        }
-      )
-      assertLogMatches2(deleteAttestation.logs[0], {
-        event: 'AttestationDeleted',
-        args: {
-          identifier: identifier2,
-          issuer: issuer1,
-          account: account1,
-        },
+      await checkStorageState(identifier2, issuer1, 0, account1, nowUnixTime, signer1, 1)
+      await federatedAttestations.deleteAttestation(identifier2, issuer1, account1, {
+        from: account1,
       })
+      assertRevert(checkStorageState(identifier2, issuer1, 0, account1, nowUnixTime, signer1, 1))
     })
 
     it('should revert if an invalid user attempts to delete the attestation', async () => {
@@ -941,19 +832,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     it('should successfully delete an attestation with a revoked signer', async () => {
       await federatedAttestations.revokeSigner(signer1)
-      const deleteAttestation = await federatedAttestations.deleteAttestation(
-        identifier1,
-        issuer1,
-        account1
-      )
-      assertLogMatches2(deleteAttestation.logs[0], {
-        event: 'AttestationDeleted',
-        args: {
-          identifier: identifier1,
-          issuer: issuer1,
-          account: account1,
-        },
-      })
+      await federatedAttestations.deleteAttestation(identifier1, issuer1, account1)
+      assertRevert(checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0))
     })
 
     it('should fail registering same attestation but succeed after deleting it', async () => {
@@ -970,7 +850,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       )
       await federatedAttestations.deleteAttestation(identifier1, issuer1, account1)
-      const register = await federatedAttestations.registerAttestation(
+      await federatedAttestations.registerAttestation(
         identifier1,
         issuer1,
         account1,
@@ -980,16 +860,15 @@ contract('FederatedAttestations', (accounts: string[]) => {
         sig.r,
         sig.s
       )
-      assertLogMatches2(register.logs[0], {
-        event: 'AttestationRegistered',
-        args: {
-          identifier: identifier1,
-          issuer: issuer1,
-          account: account1,
-          issuedOn: nowUnixTime,
-          signer: signer1,
-        },
-      })
+    })
+
+    it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
+      await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
+
+      await federatedAttestations.deleteAttestation(identifier1, issuer1, account1)
+      // fails because array of attestations is an empty list
+      assertRevert(federatedAttestations.identifierToAddresses(identifier1, issuer1, 0))
+      assertRevert(federatedAttestations.addressToIdentifiers(account1, issuer1, 0))
     })
   })
 })
