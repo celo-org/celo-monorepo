@@ -187,38 +187,38 @@ contract FederatedAttestations is
    * @param account Address of the account
    * @param trustedIssuers Array of n issuers whose identifier mappings will be used
    * @param maxIdentifiers Limit the number of identifiers that will be returned
-   * @return Array (length <= maxIdentifiers) of identifiers
+   * @return [0] Array of number of identifiers returned per issuer
+   * @return [1] Array (length == sum([0]) <= maxIdentifiers) of identifiers
    * @dev Adds identifier info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-
-  // TODO ASv2 consider also returning an array with counts of identifiers per issuer
-
   function lookupIdentifiersByAddress(
     address account,
-    address[] memory trustedIssuers,
+    address[] calldata trustedIssuers,
     uint256 maxIdentifiers
-  ) public view returns (bytes32[] memory) {
+  ) external view returns (uint256[] memory, bytes32[] memory) {
+    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
     // Same as for the other lookup, preallocate and then trim for now
     uint256 currIndex = 0;
     bytes32[] memory identifiers = new bytes32[](maxIdentifiers);
 
+    OwnershipAttestation[] memory attestationsPerIssuer;
+    bytes32[] memory identifiersPerIssuer;
+
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      address trustedIssuer = trustedIssuers[i];
-      uint256 numIssuersForAddress = addressToIdentifiers[account][trustedIssuer].length;
-      for (uint256 j = 0; j < numIssuersForAddress; j = j.add(1)) {
-        // Iterate through the list of identifiers
+      identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
+      for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
+        bytes32 identifier = identifiersPerIssuer[j];
         if (currIndex < maxIdentifiers) {
-          bytes32 identifier = addressToIdentifiers[account][trustedIssuer][j];
           // Check if the mapping was produced by a revoked signer
-          // solhint-disable-next-line max-line-length
-          OwnershipAttestation[] memory attestationsForIssuer = identifierToAddresses[identifier][trustedIssuer];
-          for (uint256 k = 0; k < attestationsForIssuer.length; k = k.add(1)) {
-            OwnershipAttestation memory attestation = attestationsForIssuer[k];
+          attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+          for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
+            OwnershipAttestation memory attestation = attestationsPerIssuer[k];
             // (identifier, account, issuer) tuples should be unique
             if (attestation.account == account && !revokedSigners[attestation.signer]) {
               identifiers[currIndex] = identifier;
               currIndex = currIndex.add(1);
+              countsPerIssuer[i] = countsPerIssuer[i].add(1);
               break;
             }
           }
@@ -233,9 +233,9 @@ contract FederatedAttestations is
       for (uint256 i = 0; i < currIndex; i = i.add(1)) {
         trimmedIdentifiers[i] = identifiers[i];
       }
-      return trimmedIdentifiers;
+      return (countsPerIssuer, trimmedIdentifiers);
     } else {
-      return identifiers;
+      return (countsPerIssuer, identifiers);
     }
   }
 

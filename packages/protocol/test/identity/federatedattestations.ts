@@ -364,30 +364,32 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#lookupIdentifiersByAddress', () => {
+    interface IdentifierTestCase {
+      identifier: string
+      signer: string
+    }
+
+    const checkAgainstExpectedIdCases = (
+      expectedCountsPerIssuer: number[],
+      expectedIdentifiers: IdentifierTestCase[],
+      actualCountsPerIssuer: BigNumber[],
+      actualIdentifiers: string[]
+    ) => {
+      expect(expectedCountsPerIssuer).to.eql(actualCountsPerIssuer.map((count) => count.toNumber()))
+      expect(expectedIdentifiers.map((idCase) => idCase.identifier)).to.eql(actualIdentifiers)
+    }
+
     describe('when address has not been registered', () => {
       it('should return empty list', async () => {
-        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
-          account1,
-          [issuer1],
-          1
-        )
-        assert.equal(actualIdentifiers.length, 0)
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiersByAddress(account1, [issuer1], 1)
+        checkAgainstExpectedIdCases([0], [], actualCountsPerIssuer, actualIdentifiers)
       })
     })
 
     describe('when address has been registered', () => {
-      interface IdentifierTestCase {
-        identifier: string
-        signer: string
-      }
-
-      const checkAgainstExpectedIdCases = (
-        expectedIdentifiers: IdentifierTestCase[],
-        actualIdentifiers: string[]
-      ) => {
-        expect(expectedIdentifiers.map((idCase) => idCase.identifier)).to.eql(actualIdentifiers)
-      }
-
       const issuer2 = accounts[3]
       const issuer2Signer = accounts[4]
       const issuer2Signer2 = accounts[5]
@@ -434,61 +436,97 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should return all identifiers from one issuer', async () => {
-        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiersByAddress(
           account1,
           [issuer1],
           issuer1IdCases.length + 1
         )
-        checkAgainstExpectedIdCases(issuer1IdCases, actualIdentifiers)
+        checkAgainstExpectedIdCases(
+          [issuer1IdCases.length],
+          issuer1IdCases,
+          actualCountsPerIssuer,
+          actualIdentifiers
+        )
       })
 
       it('should return empty list if no identifiers exist for an (issuer,address)', async () => {
-        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
-          account1,
-          [issuer3],
-          1
-        )
-        assert.equal(actualIdentifiers.length, 0)
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiersByAddress(account1, [issuer3], 1)
+        checkAgainstExpectedIdCases([0], [], actualCountsPerIssuer, actualIdentifiers)
       })
 
       it('should return identifiers from multiple issuers in correct order', async () => {
         const expectedIdCases = issuer2IdCases.concat(issuer1IdCases)
-        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+        const expectedCountsPerIssuer = [0, issuer2IdCases.length, issuer1IdCases.length]
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiersByAddress(
           account1,
           [issuer3, issuer2, issuer1],
           expectedIdCases.length + 1
         )
-        checkAgainstExpectedIdCases(expectedIdCases, actualIdentifiers)
+        checkAgainstExpectedIdCases(
+          expectedCountsPerIssuer,
+          expectedIdCases,
+          actualCountsPerIssuer,
+          actualIdentifiers
+        )
       })
 
       it('should return empty list if maxIdentifiers == 0', async () => {
-        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
-          account1,
-          [issuer1],
-          0
-        )
-        assert.equal(actualIdentifiers.length, 0)
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiersByAddress(account1, [issuer1], 0)
+        checkAgainstExpectedIdCases([0], [], actualCountsPerIssuer, actualIdentifiers)
       })
 
       it('should only return maxIdentifiers identifiers when more are present', async () => {
         const expectedIdCases = issuer2IdCases.concat(issuer1IdCases).slice(0, -1)
-        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+        const expectedCountsPerIssuer = [
+          issuer2IdCases.length,
+          expectedIdCases.length - issuer2IdCases.length,
+        ]
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiersByAddress(
           account1,
           [issuer2, issuer1],
           expectedIdCases.length
         )
-        checkAgainstExpectedIdCases(expectedIdCases, actualIdentifiers)
+        checkAgainstExpectedIdCases(
+          expectedCountsPerIssuer,
+          expectedIdCases,
+          actualCountsPerIssuer,
+          actualIdentifiers
+        )
       })
 
       it('should not return identifiers from revoked signers', async () => {
         await federatedAttestations.revokeSigner(issuer2IdCases[0].signer)
         const expectedIdCases = issuer2IdCases.slice(1)
-        const actualIdentifiers = await federatedAttestations.lookupIdentifiersByAddress(
+        const expectedCountsPerIssuer = [expectedIdCases.length]
+        const [
+          actualCountsPerIssuer,
+          actualIdentifiers,
+        ] = await federatedAttestations.lookupIdentifiersByAddress(
           account1,
           [issuer2],
           expectedIdCases.length + 1
         )
-        checkAgainstExpectedIdCases(expectedIdCases, actualIdentifiers)
+        checkAgainstExpectedIdCases(
+          expectedCountsPerIssuer,
+          expectedIdCases,
+          actualCountsPerIssuer,
+          actualIdentifiers
+        )
       })
     })
   })
