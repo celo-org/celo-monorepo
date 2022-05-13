@@ -3,7 +3,7 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForCoreContract,
-  getDeployedProxiedContract
+  getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
@@ -11,7 +11,7 @@ import {
   ExchangeBRLInstance,
   FreezerInstance,
   ReserveInstance,
-  StableTokenBRLInstance
+  StableTokenBRLInstance,
 } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
