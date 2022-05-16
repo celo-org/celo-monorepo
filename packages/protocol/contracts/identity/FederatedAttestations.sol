@@ -149,7 +149,7 @@ contract FederatedAttestations is
    *         [1] Array of number of attestations found per issuer
    */
   function getTotalNumberOfAttestations(bytes32 identifier, address[] memory trustedIssuers)
-    public
+    internal
     view
     returns (uint256, uint256[] memory)
   {
@@ -352,9 +352,8 @@ contract FederatedAttestations is
    * @return [0] Sum total of identifiers found
    *         [1] Array of number of identifiers found per issuer
    */
-  // TODO EN revisit and make internal after testing
   function getTotalNumberOfIdentifiers(address account, address[] memory trustedIssuers)
-    public
+    internal
     view
     returns (uint256, uint256[] memory)
   {
