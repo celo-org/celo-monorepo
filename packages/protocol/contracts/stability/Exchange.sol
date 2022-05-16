@@ -324,7 +324,7 @@ contract Exchange is
     stableBucketMaxFraction = FixidityLib.wrap(newStableBucketMaxFraction);
     require(
       stableBucketMaxFraction.lt(FixidityLib.fixed1()),
-      "bucket fraction must be smaller than 1"
+      "Bucket fraction must be smaller than 1"
     );
     require(newStableBucketMaxFraction > 0, "bucket fraction must be greather than 0");
     emit StableBucketMaxFractionSet(newStableBucketMaxFraction);
