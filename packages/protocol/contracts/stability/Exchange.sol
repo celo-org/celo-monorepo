@@ -349,7 +349,7 @@ contract Exchange is
     minSupplyForStableBucketCap = newMinSupplyForStableBucketCap;
     require(
       newMinSupplyForStableBucketCap > 0,
-      "min supply for stable bucket cap must be greather than 0"
+      "Min supply for stable bucket cap must be greather than 0"
     );
     emit MinSupplyForStableBucketCapSet(newMinSupplyForStableBucketCap);
   }
