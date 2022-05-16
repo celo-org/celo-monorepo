@@ -181,12 +181,36 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  // TODO EN revisit more efficient as external (+ use calldata) if possible
   function lookupAttestations(
+    bytes32 identifier,
+    address[] calldata trustedIssuers,
+    uint256 maxAttestations
+  ) external view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
+    // TODO reviewers: this is to get around a stack too deep error;
+    // are there better ways of dealing with this?
+    return _lookupAttestations(identifier, trustedIssuers, maxAttestations);
+  }
+
+  /**
+   * @notice Helper function for lookupAttestations to get around stack too deep
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @param maxAttestations Limit the number of attestations that will be returned
+   * @return [0] Array of number of attestations returned per issuer
+   * @return [1 - 3] for m (== sum([0])) found attestations, m <= maxAttestations:
+   *         [
+   *           Array of m accounts,
+   *           Array of m issuedOns,
+   *           Array of m signers
+   *         ]; index corresponds to the same attestation
+   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
+   */
+  function _lookupAttestations(
     bytes32 identifier,
     address[] memory trustedIssuers,
     uint256 maxAttestations
-  ) public view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
+  ) private view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
     uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
 
     // Pre-computing length of unrevoked attestations requires many storage lookups.
@@ -199,7 +223,7 @@ contract FederatedAttestations is
     uint256 currIndex = 0;
     OwnershipAttestation[] memory attestationsPerIssuer;
 
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < trustedIssuers.length && currIndex < maxAttestations; i = i.add(1)) {
       attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
       for (
         uint256 j = 0;
@@ -370,7 +394,7 @@ contract FederatedAttestations is
     OwnershipAttestation[] memory attestationsPerIssuer;
     bytes32[] memory identifiersPerIssuer;
 
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+    for (uint256 i = 0; i < trustedIssuers.length && currIndex < maxIdentifiers; i = i.add(1)) {
       identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
       for (
         uint256 j = 0;
@@ -381,9 +405,11 @@ contract FederatedAttestations is
         // Check if the mapping was produced by a revoked signer
         attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
         for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
-          OwnershipAttestation memory attestation = attestationsPerIssuer[k];
           // (identifier, account, issuer) tuples should be unique
-          if (attestation.account == account && !revokedSigners[attestation.signer]) {
+          if (
+            attestationsPerIssuer[k].account == account &&
+            !revokedSigners[attestationsPerIssuer[k].signer]
+          ) {
             identifiers[currIndex] = identifier;
             currIndex = currIndex.add(1);
             countsPerIssuer[i] = countsPerIssuer[i].add(1);
