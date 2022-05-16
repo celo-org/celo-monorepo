@@ -8,7 +8,7 @@
   "exchange": {
     "frozen": false,
     "minimumReports": 1,
-    "minSupplyForStableBucketCap": 1000000000000000000000000,
+    "minSupplyForStableBucketCap": "1000000000000000000000000",
     "stableBucketFractionCap": 0.04545454545
   },
   "exchangeEUR": {
