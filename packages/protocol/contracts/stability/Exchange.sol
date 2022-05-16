@@ -435,7 +435,7 @@ contract Exchange is
       exchangeRateDenominator
     );
     uint256 maxStableBucketSize = getStableBucketCap();
-    // check if the bucket is bigger
+    // Check if the bucket is bigger that the cap
     if (updatedStableBucket > maxStableBucketSize) {
       // resize Celo bucket
       uint256 cappedUpdatedGoldBucket = exchangeRateDenominator.mul((maxStableBucketSize)).div(
