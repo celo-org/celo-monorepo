@@ -12,8 +12,6 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/Signatures.sol";
-import "../common/UsingPrecompiles.sol";
-import "../common/libraries/ReentrancyGuard.sol";
 
 /**
  * @title Contract mapping identifiers to accounts
@@ -23,9 +21,7 @@ contract FederatedAttestations is
   ICeloVersionedContract,
   Ownable,
   Initializable,
-  UsingRegistry,
-  ReentrancyGuard,
-  UsingPrecompiles
+  UsingRegistry
 {
   using SafeMath for uint256;
   using SafeCast for uint256;
@@ -205,18 +201,17 @@ contract FederatedAttestations is
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
-      for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
-        // Only create and push new attestation if we haven't hit max
-        if (currIndex < maxAttestations) {
-          if (!revokedSigners[attestationsPerIssuer[j].signer]) {
-            accounts[currIndex] = attestationsPerIssuer[j].account;
-            issuedOns[currIndex] = attestationsPerIssuer[j].issuedOn;
-            signers[currIndex] = attestationsPerIssuer[j].signer;
-            currIndex = currIndex.add(1);
-            countsPerIssuer[i] = countsPerIssuer[i].add(1);
-          }
-        } else {
-          break;
+      for (
+        uint256 j = 0;
+        j < attestationsPerIssuer.length && currIndex < maxAttestations;
+        j = j.add(1)
+      ) {
+        if (!revokedSigners[attestationsPerIssuer[j].signer]) {
+          accounts[currIndex] = attestationsPerIssuer[j].account;
+          issuedOns[currIndex] = attestationsPerIssuer[j].issuedOn;
+          signers[currIndex] = attestationsPerIssuer[j].signer;
+          currIndex = currIndex.add(1);
+          countsPerIssuer[i] = countsPerIssuer[i].add(1);
         }
       }
     }
@@ -377,23 +372,23 @@ contract FederatedAttestations is
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
-      for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
+      for (
+        uint256 j = 0;
+        j < identifiersPerIssuer.length && currIndex < maxIdentifiers;
+        j = j.add(1)
+      ) {
         bytes32 identifier = identifiersPerIssuer[j];
-        if (currIndex < maxIdentifiers) {
-          // Check if the mapping was produced by a revoked signer
-          attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
-          for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
-            OwnershipAttestation memory attestation = attestationsPerIssuer[k];
-            // (identifier, account, issuer) tuples should be unique
-            if (attestation.account == account && !revokedSigners[attestation.signer]) {
-              identifiers[currIndex] = identifier;
-              currIndex = currIndex.add(1);
-              countsPerIssuer[i] = countsPerIssuer[i].add(1);
-              break;
-            }
+        // Check if the mapping was produced by a revoked signer
+        attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+        for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
+          OwnershipAttestation memory attestation = attestationsPerIssuer[k];
+          // (identifier, account, issuer) tuples should be unique
+          if (attestation.account == account && !revokedSigners[attestation.signer]) {
+            identifiers[currIndex] = identifier;
+            currIndex = currIndex.add(1);
+            countsPerIssuer[i] = countsPerIssuer[i].add(1);
+            break;
           }
-        } else {
-          break;
         }
       }
     }
