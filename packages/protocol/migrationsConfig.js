@@ -87,7 +87,7 @@ const DefaultConfig = {
     updateFrequency: 5 * MINUTE,
     minimumReports: 1,
     frozen: false,
-    minSupplyForStableBucketCap: '1000000000000000000000000', // 1e24 = 1M
+    minSupplyForStableBucketCap: 1000000000000000000000000, // 1e24 = 1M
     stableBucketFractionCap: 1 / 22,
   },
   gasPriceMinimum: {
