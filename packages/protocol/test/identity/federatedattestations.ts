@@ -153,50 +153,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
   })
 
-  // TODO EN: move this up; possibly contain this in a describe block as needed?
-  // TODO EN: possibly move this into fed-attestations-utils?
-  interface AttestationTestCase {
-    account: string
-    issuedOn: number
-    signer: string
-  }
-
-  const checkAgainstExpectedAttestations = (
-    expectedCountsPerIssuer: number[],
-    expectedAttestations: AttestationTestCase[],
-    actualCountsPerIssuer: BigNumber[],
-    actualAddresses: string[],
-    actualIssuedOns: BigNumber[],
-    actualSigners: string[]
-  ) => {
-    expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
-
-    assert.lengthOf(actualAddresses, expectedAttestations.length)
-    assert.lengthOf(actualIssuedOns, expectedAttestations.length)
-    assert.lengthOf(actualSigners, expectedAttestations.length)
-
-    expectedAttestations.forEach((expectedAttestation, index) => {
-      assert.equal(actualAddresses[index], expectedAttestation.account)
-      assert.equal(actualIssuedOns[index].toNumber(), expectedAttestation.issuedOn)
-      assert.equal(actualSigners[index], expectedAttestation.signer)
-    })
-  }
-
-  interface IdentifierTestCase {
-    identifier: string
-    signer: string
-  }
-
-  const checkAgainstExpectedIdCases = (
-    expectedCountsPerIssuer: number[],
-    expectedIdentifiers: IdentifierTestCase[],
-    actualCountsPerIssuer: BigNumber[],
-    actualIdentifiers: string[]
-  ) => {
-    expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
-    expect(actualIdentifiers).to.eql(expectedIdentifiers.map((idCase) => idCase.identifier))
-  }
-
   const checkAgainstExpectedCountsPerIssuer = (
     expectedCountsPerIssuer: number[],
     actualTotal: BigNumber,
@@ -208,6 +164,33 @@ contract('FederatedAttestations', (accounts: string[]) => {
   }
 
   describe('looking up attestations', () => {
+    interface AttestationTestCase {
+      account: string
+      issuedOn: number
+      signer: string
+    }
+
+    const checkAgainstExpectedAttestations = (
+      expectedCountsPerIssuer: number[],
+      expectedAttestations: AttestationTestCase[],
+      actualCountsPerIssuer: BigNumber[],
+      actualAddresses: string[],
+      actualIssuedOns: BigNumber[],
+      actualSigners: string[]
+    ) => {
+      expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
+
+      assert.lengthOf(actualAddresses, expectedAttestations.length)
+      assert.lengthOf(actualIssuedOns, expectedAttestations.length)
+      assert.lengthOf(actualSigners, expectedAttestations.length)
+
+      expectedAttestations.forEach((expectedAttestation, index) => {
+        assert.equal(actualAddresses[index], expectedAttestation.account)
+        assert.equal(actualIssuedOns[index].toNumber(), expectedAttestation.issuedOn)
+        assert.equal(actualSigners[index], expectedAttestation.signer)
+      })
+    }
+
     describe('when identifier has not been registered', () => {
       describe('#lookupAttestations', () => {
         it('should return empty list', async () => {
@@ -296,8 +279,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
         }
       })
 
-      // Less readable to extract too much out of this due to the differences with maxAttestations
-      // TODO EN: can revisit this; could possibly do this for all the non-max attestations tests
       describe('#lookupAttestations', () => {
         it('should return empty count if no issuers specified', async () => {
           const [
@@ -617,6 +598,21 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('looking up identifiers', () => {
+    interface IdentifierTestCase {
+      identifier: string
+      signer: string
+    }
+
+    const checkAgainstExpectedIdCases = (
+      expectedCountsPerIssuer: number[],
+      expectedIdentifiers: IdentifierTestCase[],
+      actualCountsPerIssuer: BigNumber[],
+      actualIdentifiers: string[]
+    ) => {
+      expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
+      expect(actualIdentifiers).to.eql(expectedIdentifiers.map((idCase) => idCase.identifier))
+    }
+
     describe('when address has not been registered', () => {
       describe('#lookupIdentifiersByAddress', () => {
         it('should return empty list', async () => {
