@@ -1012,7 +1012,7 @@ export async function startGeth(
     datadir,
     '--syncmode',
     syncmode,
-    '--debug',
+    '--log.debug',
     '--metrics',
     '--port',
     port.toString(),
