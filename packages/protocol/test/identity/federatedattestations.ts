@@ -87,7 +87,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     )
   }
 
-  const checkStorageState = async (
+  const assertAttestationInStorage = async (
     identifier: string,
     issuer: string,
     attestationIndex: number,
@@ -110,6 +110,21 @@ contract('FederatedAttestations', (accounts: string[]) => {
       identifierIndex
     )
     assert.equal(identifier, storedIdentifier)
+  }
+
+  const assertAttestationNotInStorage = async (
+    identifier: string,
+    issuer: string,
+    account: string,
+    addressIndex: number,
+    identifierIndex: number
+  ) => {
+    await assertThrowsAsync(
+      federatedAttestations.identifierToAddresses(identifier, issuer, addressIndex)
+    )
+    await assertThrowsAsync(
+      federatedAttestations.addressToIdentifiers(account, issuer, identifierIndex)
+    )
   }
 
   beforeEach('FederatedAttestations setup', async () => {
@@ -612,7 +627,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     it('should succeed if issuer == signer', async () => {
       await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, issuer1)
-      await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, issuer1, 0)
+      await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, issuer1, 0)
     })
 
     it('should revert if an invalid signature is provided', async () => {
@@ -656,6 +671,12 @@ contract('FederatedAttestations', (accounts: string[]) => {
       )
     })
 
+    it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
+      await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 0)
+      await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, signer1)
+      await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
+    })
+
     describe('when registering a second attestation', () => {
       beforeEach(async () => {
         // register first attestation
@@ -672,12 +693,12 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
-        await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
-
-        // adding second attestation
         const account2 = accounts[3]
+        await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
+        await assertAttestationNotInStorage(identifier1, issuer1, account2, 1, 0)
+
         await signAndRegisterAttestation(identifier1, issuer1, account2, nowUnixTime, signer1)
-        await checkStorageState(identifier1, issuer1, 1, account2, nowUnixTime, signer1, 0)
+        await assertAttestationInStorage(identifier1, issuer1, 1, account2, nowUnixTime, signer1, 0)
       })
 
       it('should revert if an attestation with the same (issuer, identifier, account) is uploaded again', async () => {
@@ -710,7 +731,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
       it('should succeed with a different identifier', async () => {
         await signAndRegisterAttestation(identifier2, issuer1, account1, nowUnixTime, signer1)
-        await checkStorageState(identifier2, issuer1, 0, account1, nowUnixTime, signer1, 1)
+        await assertAttestationInStorage(identifier2, issuer1, 0, account1, nowUnixTime, signer1, 1)
       })
 
       it('should succeed with a different issuer', async () => {
@@ -718,13 +739,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
         const signer2 = accounts[5]
         await accountsInstance.createAccount({ from: issuer2 })
         await signAndRegisterAttestation(identifier1, issuer2, account1, nowUnixTime, signer2)
-        await checkStorageState(identifier1, issuer2, 0, account1, nowUnixTime, signer2, 0)
+        await assertAttestationInStorage(identifier1, issuer2, 0, account1, nowUnixTime, signer2, 0)
       })
 
       it('should succeed with a different account', async () => {
         const account2 = accounts[4]
         await signAndRegisterAttestation(identifier1, issuer1, account2, nowUnixTime, signer1)
-        await checkStorageState(identifier1, issuer1, 1, account2, nowUnixTime, signer1, 0)
+        await assertAttestationInStorage(identifier1, issuer1, 1, account2, nowUnixTime, signer1, 0)
       })
     })
 
@@ -759,25 +780,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
         sig.s,
         { from: signer2 }
       )
-      await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
+      await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
     })
   })
 
   describe('#deleteAttestation', () => {
-    const checkAttestationDeleted = (
-      identifier: string,
-      issuer: string,
-      account: string,
-      addressIndex: number,
-      identifierIndex: number
-    ) => {
-      assertThrowsAsync(
-        federatedAttestations.identifierToAddresses(identifier, issuer, addressIndex)
-      )
-      assertThrowsAsync(
-        federatedAttestations.addressToIdentifiers(account, issuer, identifierIndex)
-      )
-    }
     beforeEach(async () => {
       await accountsInstance.authorizeSigner(signer1, signerRole, { from: issuer1 })
       await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer1 })
@@ -812,21 +819,20 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should succeed when >1 attestations are registered for (identifier, issuer)', async () => {
       const account2 = accounts[3]
       await signAndRegisterAttestation(identifier1, issuer1, account2, nowUnixTime, signer1)
-      await checkStorageState(identifier1, issuer1, 1, account2, nowUnixTime, signer1, 0)
       await federatedAttestations.deleteAttestation(identifier1, issuer1, account2, {
         from: account2,
       })
-      await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
+      await assertAttestationNotInStorage(identifier1, issuer1, account2, 1, 0)
+      await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
     })
 
     it('should succeed when >1 identifiers are registered for (account, issuer)', async () => {
       await signAndRegisterAttestation(identifier2, issuer1, account1, nowUnixTime, signer1)
-      await checkStorageState(identifier2, issuer1, 0, account1, nowUnixTime, signer1, 1)
       await federatedAttestations.deleteAttestation(identifier2, issuer1, account1, {
         from: account1,
       })
-      checkAttestationDeleted(identifier2, issuer1, account1, 0, 1)
-      // assertRevert(checkStorageState(identifier2, issuer1, 0, account1, nowUnixTime, signer1, 1))
+      await assertAttestationNotInStorage(identifier2, issuer1, account1, 0, 1)
+      await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
     })
 
     it('should revert if an invalid user attempts to delete the attestation', async () => {
@@ -847,7 +853,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should successfully delete an attestation with a revoked signer', async () => {
       await federatedAttestations.revokeSigner(signer1)
       await federatedAttestations.deleteAttestation(identifier1, issuer1, account1)
-      checkAttestationDeleted(identifier1, issuer1, account1, 0, 1)
+      await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 1)
     })
 
     it('should fail registering same attestation but succeed after deleting it', async () => {
@@ -874,12 +880,13 @@ contract('FederatedAttestations', (accounts: string[]) => {
         sig.r,
         sig.s
       )
+      await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
     })
 
     it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
-      await checkStorageState(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
+      await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
       await federatedAttestations.deleteAttestation(identifier1, issuer1, account1)
-      checkAttestationDeleted(identifier1, issuer1, account1, 0, 0)
+      await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 0)
     })
   })
 })
