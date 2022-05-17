@@ -784,7 +784,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
   })
 
-  describe('#deleteAttestation', () => {
+  describe.only('#deleteAttestation', () => {
     beforeEach(async () => {
       await accountsInstance.authorizeSigner(signer1, signerRole, { from: issuer1 })
       await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer1 })
@@ -814,6 +814,10 @@ contract('FederatedAttestations', (accounts: string[]) => {
           account: account1,
         },
       })
+    })
+
+    it("should revert when deleting an attestation that doesn't exist", async () => {
+      await assertRevert(federatedAttestations.deleteAttestation(identifier1, issuer1, accounts[4]))
     })
 
     it('should succeed when >1 attestations are registered for (identifier, issuer)', async () => {

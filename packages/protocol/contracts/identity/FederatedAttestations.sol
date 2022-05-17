@@ -372,9 +372,10 @@ contract FederatedAttestations is
         assert(deletedIdentifier);
 
         emit AttestationDeleted(identifier, issuer, account);
-        break;
+        return;
       }
     }
+    revert("Attestion to be deleted does not exist");
   }
 
   function revokeSigner(address signer) public {
