@@ -53,6 +53,10 @@ spec:
         - mountPath: /secrets
           name: temporary-dir
           readOnly: true
+        - name: vyper-compilers
+          mountPath: /opt/app/apps/explorer/priv/vyper_compilers
+        - name: solc-compilers
+          mountPath: /opt/app/apps/explorer/priv/solc_compilers
         ports:
         - name: http
           containerPort: {{ .Values.blockscout.web.port }}
@@ -143,10 +147,9 @@ spec:
           value: {{ .Values.blockscout.secrets.recaptcha.apiKey }}
         - name: SEGMENT_KEY
           value: {{ .Values.blockscout.secrets.segmentKey }}
-{{- $data := dict "Release" .Release "nfs_volumes" true "Values" .Values "Database" .Values.blockscout.web.db }}
+{{- $data := dict "Release" .Release "Values" .Values "DbSuffix" "-replica" "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}
 {{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
-{{ include "celo.blockscout-volumes" $data | indent 6 }}
       volumes:
 {{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 8 }}
 {{ include "celo.blockscout.volume.temporary-dir" . | indent 8 }}

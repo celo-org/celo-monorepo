@@ -65,6 +65,16 @@ the `volumes` section.
   emptyDir: {}
 {{- end -}}
 
+{{- /* Defines NFS volumes for storing various compilers versions. */ -}}
+{{- define "celo.blockscout.volume.compilers" -}}
+- name: vyper-compilers
+  persistentVolumeClaim:
+    claimName: {{ .Release.Name }}-nfs-vyper-compilers-volume
+- name: solc-compilers
+  persistentVolumeClaim:
+    claimName: {{ .Release.Name }}-nfs-solc-compilers-volume
+{{- end -}}
+
 {{- /* Defines init container copying secrets-init to the specified directory. */ -}}
 {{- define "celo.blockscout.initContainer.secrets-init" -}}
 - name: secrets-init
@@ -121,10 +131,6 @@ the `volumes` section.
     - name: blockscout-cloudsql-credentials
       mountPath: /secrets/cloudsql
       readOnly: true
-volumes:
-  - name: blockscout-cloudsql-credentials
-    secret:
-      secretName: blockscout-cloudsql-credentials
 {{- end -}}
 
 {{- /*
