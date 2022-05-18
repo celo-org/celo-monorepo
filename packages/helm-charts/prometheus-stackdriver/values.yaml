@@ -162,7 +162,6 @@ remote_write:
               |rest_client_.+\
               |scrape.*\
               |state_.+\
-              |state_snapshot.*\
               |storage_.+\
               |workqueue_.+)"
       source_labels: [__name__]
