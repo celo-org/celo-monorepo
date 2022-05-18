@@ -104,7 +104,12 @@ remote_write:
     password: null
   write_relabel_configs:
     - action: drop
-      regex: "(apiserver_.+\
+      regex: "(aadpodidentity.*\
+              |apiserver_.+\
+              |authentication.*\
+              |certmanager.*\
+              |configconnector.*\
+              |container_blkio.*\
               |container_cpu_load_average_10s\
               |container_cpu_system_seconds_total\
               |container_cpu_user_seconds_total\
@@ -120,48 +125,46 @@ remote_write:
               |container_tasks_state\
               |container_threads\
               |container_threads_max\
+              |container_ulimits.*\
+              |coredns.*\
+              |csi_operations.*\
               |erlang_.+\
               |etcd_.+\
-              |kubelet_[^v].+\
+              |go_gc_.*\
+              |go_memstats_gc_.*\
+              |go_memstats_last_gc_time_seconds
+              |go_memstats_next_gc_bytes
+              |kubedns.*\
+              |kube_configmap.*\
+              |kube_endpoint.*\
+              |kube_job.*\
+              |kube_namespace.*\
               |kube_node_status_condition\
+              |kube_persistentvolume.*\
               |kube_pod_[^cs].+\
               |kube_pod_status_phase\
               |kube_pod_container_[^r].+\
               |kube_pod_container_status_last_terminated_reason\
               |kube_pod_container_status_terminated_reason\
               |kube_pod_container_status_waiting_reason\
+              |kube_replicaset.*\
+              |kube_resourcequota.*\
               |kube_secret_.+\
+              |kube_service.*\
+              |kubelet_[^v].+\
+              |net_conntrack_.*\
               |nginx_.+\
+              |nodejs_gc_.*\
               |phoenix_.+\
+              |prometheus.*\
+              |python.*\
+              |relay_nodejs_gc_.*\
               |rest_client_.+\
+              |scrape.*\
               |state_.+\
+              |state_snapshot.*\
               |storage_.+\
               |workqueue_.+)"
-      source_labels: [__name__]
-    - action: drop
-      regex: "(aadpodidentity.*\
-             |authentication.*\
-             |certmanager.*\
-             |configconnector.*\
-             |container_blkio.*\
-             |coredns.*\
-             |csi_operations.*\
-             |.*_gc_.*\
-             |kubedns.*\
-             |kube_configmap.*\
-             |kube_endpoint.*\
-             |kube_job.*\
-             |kube_namespace.*\
-             |kube_persistentvolume.*\
-             |kube_replicaset.*\
-             |kube_resourcequota.*\
-             |kube_service.*\
-             |net_conntrack_.*\
-             |prometheus.*\
-             |python.*\
-             |scrape.*\
-             |state_snapshot.*\
-             |.*ulimits.*)"
       source_labels: [__name__]
     - action: drop
       regex: lens-metrics
