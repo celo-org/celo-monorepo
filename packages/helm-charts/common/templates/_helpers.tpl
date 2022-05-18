@@ -191,6 +191,7 @@ fi
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \
+      --rpc.gascap={{ .rpc_gascap | default .Values.geth.rpc_gascap }} \
       ${NAT_FLAG} \
       --consoleformat=json \
       --consoleoutput=stdout \
