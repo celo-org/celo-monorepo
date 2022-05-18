@@ -321,6 +321,8 @@ ${stableTokenConstitution(fiatTicker)}
     Suggested values:
 ${migrationsConfig(fiatTicker)}
   * Add files to the build: packages/protocol/scripts/build.ts
+    'Exchange${fiatTicker}Proxy' and 'StableToken${fiatTicker}Proxy' to 'ProxyContracts'.
+    'Exchange${fiatTicker}' and 'StableToken${fiatTicker}' to 'CoreContracts'.
   * Add it to the env tests packages/protocol/test/common/integration.ts
     Code snippet:
 ${integrationTestSnippet(fiatTicker)}
