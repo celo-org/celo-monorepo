@@ -258,7 +258,10 @@ function integrationTestSnippet(ticker: string): string {
 }
 
 function errorFunct(err) {
-  if (err) return console.log(err)
+  if (err) {
+    // tslint:disable-next-line:no-console
+    return console.log(err)
+  }
 }
 
 try {
@@ -307,6 +310,7 @@ try {
     errorFunct
   )
 
+  // tslint:disable-next-line:no-console
   console.log(`Other things that should be updated:
   * Add constitution parameters: packages/protocol/governanceConstitution.js
     Suggested values:
