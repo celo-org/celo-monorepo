@@ -139,6 +139,31 @@ remote_write:
               |workqueue_.+)"
       source_labels: [__name__]
     - action: drop
+      regex: "(aadpodidentity.*\
+             |authentication.*\
+             |certmanager.*\
+             |configconnector.*\
+             |container_blkio.*\
+             |coredns.*\
+             |csi_operations.*\
+             |.*_gc_.*\
+             |kubedns.*\
+             |kube_configmap.*\
+             |kube_endpoint.*\
+             |kube_job.*\
+             |kube_namespace.*\
+             |kube_persistentvolume.*\
+             |kube_replicaset.*\
+             |kube_resourcequota.*\
+             |kube_service.*\
+             |net_conntrack_.*\
+             |prometheus.*\
+             |python.*\
+             |scrape.*\
+             |state_snapshot.*\
+             |.*ulimits.*)"
+      source_labels: [__name__]
+    - action: drop
       regex: lens-metrics
       source_labels: [kubernetes_namespace]
     - action: drop
