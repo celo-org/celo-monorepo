@@ -288,6 +288,8 @@ contract FederatedAttestations is
 
     OwnershipAttestation[] memory attestationsPerIssuer;
     // Reset this and use as current index to get around stack-too-deep
+    // TODO reviewers: is it preferable to pack two uint256 counters into a struct
+    // and use one for total (above) & one for currIndex (below)?
     totalAttestations = 0;
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
@@ -331,7 +333,7 @@ contract FederatedAttestations is
         attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
         for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
           OwnershipAttestation memory attestation = attestationsPerIssuer[k];
-          // (identifier, account, issuer) tuples should be unique
+          // (identifier, account, issuer) tuples are checked for uniquness on registration
           if (attestation.account == account && !revokedSigners[attestation.signer]) {
             totalIdentifiers = totalIdentifiers.add(1);
             countsPerIssuer[i] = countsPerIssuer[i].add(1);
@@ -404,7 +406,7 @@ contract FederatedAttestations is
         // Check if the mapping was produced by a revoked signer
         attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
         for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
-          // (identifier, account, issuer) tuples should be unique
+          // (identifier, account, issuer) tuples are checked for uniquness on registration
           if (
             attestationsPerIssuer[k].account == account &&
             !revokedSigners[attestationsPerIssuer[k].signer]
