@@ -8,6 +8,7 @@ import {
   recoverTransaction,
   verifyEIP712TypedDataSigner,
 } from '@celo/wallet-base'
+import Ledger from '@ledgerhq/hw-app-eth'
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 // @ts-ignore-next-line
 import { account as Account } from 'eth-lib'
@@ -99,68 +100,86 @@ const TYPED_DATA = {
 }
 
 function mockLedger(wallet: LedgerWallet, mockForceValidation: () => void) {
-  jest.spyOn<any, any>(wallet, 'generateNewLedger').mockImplementation((_transport: any) => {
-    return {
-      getAddress: async (derivationPath: string, forceValidation?: boolean) => {
-        if (forceValidation) {
-          mockForceValidation()
-        }
-        if (ledgerAddresses[derivationPath]) {
-          return { address: ledgerAddresses[derivationPath].address, derivationPath }
-        }
-        return {}
-      },
-      signTransaction: async (derivationPath: string, data: string) => {
-        if (ledgerAddresses[derivationPath]) {
-          const hash = getHashFromEncoded(ensureLeading0x(data))
-          const signature = Account.makeSigner(chainIdTransformationForSigning(CHAIN_ID))(
-            hash,
-            ledgerAddresses[derivationPath].privateKey
-          )
-          const [v, r, s] = Account.decodeSignature(signature)
-          return { v, r, s }
-        }
-        throw new Error('Invalid Path')
-      },
-      signPersonalMessage: async (derivationPath: string, data: string) => {
-        if (ledgerAddresses[derivationPath]) {
-          const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
-          const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
+  jest.spyOn<LedgerWallet, any>(wallet, 'generateNewLedger').mockImplementation(
+    (_transport: any): Partial<Ledger> => {
+      return {
+        getAddress: async (derivationPath: string, forceValidation?: boolean) => {
+          if (forceValidation) {
+            mockForceValidation()
+          }
+          if (ledgerAddresses[derivationPath]) {
+            return {
+              address: ledgerAddresses[derivationPath].address,
+              derivationPath,
+              publicKey: '',
+            }
+          }
+          return { address: '', publicKey: '', derivationPath }
+        },
+        signTransaction: async (derivationPath: string, data: string) => {
+          if (ledgerAddresses[derivationPath]) {
+            const hash = getHashFromEncoded(ensureLeading0x(data))
+            const signature = Account.makeSigner(chainIdTransformationForSigning(CHAIN_ID))(
+              hash,
+              ledgerAddresses[derivationPath].privateKey
+            )
+            const [v, r, s] = Account.decodeSignature(signature)
+            return { v, r, s }
+          }
+          throw new Error('Invalid Path')
+        },
+        signPersonalMessage: async (derivationPath: string, data: string) => {
+          if (ledgerAddresses[derivationPath]) {
+            const dataBuff = ethUtil.toBuffer(ensureLeading0x(data))
+            const msgHashBuff = ethUtil.hashPersonalMessage(dataBuff)
+
+            const trimmedKey = trimLeading0x(ledgerAddresses[derivationPath].privateKey)
+            const pkBuffer = Buffer.from(trimmedKey, 'hex')
+            const signature = ethUtil.ecsign(msgHashBuff, pkBuffer)
+            return {
+              v: signature.v,
+              r: signature.r.toString('hex'),
+              s: signature.s.toString('hex'),
+            }
+          }
+          throw new Error('Invalid Path')
+        },
+        signEIP712HashedMessage: async (
+          derivationPath: string,
+          domainSeparator: string,
+          structHash: string
+        ) => {
+          const encoder = new TextEncoder()
+          const messageHash = ethUtil.sha3(
+            Buffer.concat([
+              Buffer.from('1901', 'hex'),
+              encoder.encode(domainSeparator),
+              encoder.encode(structHash),
+            ])
+          ) as Buffer
 
           const trimmedKey = trimLeading0x(ledgerAddresses[derivationPath].privateKey)
           const pkBuffer = Buffer.from(trimmedKey, 'hex')
-          const signature = ethUtil.ecsign(msgHashBuff, pkBuffer)
+          const signature = ethUtil.ecsign(messageHash, pkBuffer)
           return {
             v: signature.v,
             r: signature.r.toString('hex'),
             s: signature.s.toString('hex'),
           }
-        }
-        throw new Error('Invalid Path')
-      },
-      signEIP712HashedMessage: async (
-        derivationPath: string,
-        domainSeparator: Buffer,
-        structHash: Buffer
-      ) => {
-        const messageHash = ethUtil.sha3(
-          Buffer.concat([Buffer.from('1901', 'hex'), domainSeparator, structHash])
-        ) as Buffer
-
-        const trimmedKey = trimLeading0x(ledgerAddresses[derivationPath].privateKey)
-        const pkBuffer = Buffer.from(trimmedKey, 'hex')
-        const signature = ethUtil.ecsign(messageHash, pkBuffer)
-        return {
-          v: signature.v,
-          r: signature.r.toString('hex'),
-          s: signature.s.toString('hex'),
-        }
-      },
-      getAppConfiguration: async () => {
-        return { arbitraryDataEnabled: 1, version: '0.0.0' }
-      },
+        },
+        getAppConfiguration: async () => {
+          // Do the numbers here matter?
+          return {
+            arbitraryDataEnabled: 1,
+            version: '0.0.0',
+            erc20ProvisioningNecessary: 1,
+            starkEnabled: 1,
+            starkv2Supported: 1,
+          }
+        },
+      }
     }
-  })
+  )
 }
 
 describe('LedgerWallet class', () => {
@@ -424,7 +443,7 @@ describe('LedgerWallet class', () => {
 
     describe('never', () => {
       beforeEach(() => {
-        wallet = new LedgerWallet(undefined, undefined, {}, AddressValidation.never)
+        wallet = new LedgerWallet(undefined, undefined, undefined, AddressValidation.never)
         mockForceValidation = jest.fn((): void => {
           // do nothing
         })
@@ -441,7 +460,12 @@ describe('LedgerWallet class', () => {
 
     describe('only in the initialization', () => {
       beforeEach(() => {
-        wallet = new LedgerWallet(undefined, undefined, {}, AddressValidation.initializationOnly)
+        wallet = new LedgerWallet(
+          undefined,
+          undefined,
+          undefined,
+          AddressValidation.initializationOnly
+        )
         mockForceValidation = jest.fn((): void => {
           // do nothing
         })
@@ -458,7 +482,12 @@ describe('LedgerWallet class', () => {
 
     describe('every transaction', () => {
       beforeEach(() => {
-        wallet = new LedgerWallet(undefined, undefined, {}, AddressValidation.everyTransaction)
+        wallet = new LedgerWallet(
+          undefined,
+          undefined,
+          undefined,
+          AddressValidation.everyTransaction
+        )
         mockForceValidation = jest.fn((): void => {
           // do nothing
         })
@@ -480,7 +509,7 @@ describe('LedgerWallet class', () => {
         wallet = new LedgerWallet(
           undefined,
           undefined,
-          {},
+          undefined,
           AddressValidation.firstTransactionPerAddress
         )
         mockForceValidation = jest.fn((): void => {

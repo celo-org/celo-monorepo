@@ -4,6 +4,7 @@ import { Address, ReadOnlyWallet } from '@celo/connect'
 import { RemoteWallet } from '@celo/wallet-remote'
 import { TransportError, TransportStatusError } from '@ledgerhq/errors'
 import Ledger from '@ledgerhq/hw-app-eth'
+import Transport from '@ledgerhq/hw-transport'
 import debugFactory from 'debug'
 import { LedgerSigner } from './ledger-signer'
 import { transportErrorFriendlyMessage } from './ledger-utils'
@@ -24,7 +25,7 @@ export enum AddressValidation {
 }
 
 export async function newLedgerWalletWithSetup(
-  transport: any,
+  transport: Transport,
   derivationPathIndexes?: number[],
   baseDerivationPath?: string,
   ledgerAddressValidation?: AddressValidation
@@ -42,7 +43,7 @@ export async function newLedgerWalletWithSetup(
 const debug = debugFactory('kit:wallet:ledger')
 
 export class LedgerWallet extends RemoteWallet<LedgerSigner> implements ReadOnlyWallet {
-  private ledger: any
+  private ledger: Ledger | undefined
 
   /**
    * @param derivationPathIndexes number array of "address_index" for the base derivation path.
@@ -55,7 +56,7 @@ export class LedgerWallet extends RemoteWallet<LedgerSigner> implements ReadOnly
   constructor(
     readonly derivationPathIndexes: number[] = zeroRange(ADDRESS_QTY),
     readonly baseDerivationPath: string = CELO_BASE_DERIVATION_PATH,
-    readonly transport: any = {},
+    readonly transport: Transport = new Transport(),
     readonly ledgerAddressValidation: AddressValidation = AddressValidation.firstTransactionPerAddress
   ) {
     super()
@@ -85,7 +86,7 @@ export class LedgerWallet extends RemoteWallet<LedgerSigner> implements ReadOnly
   }
 
   // Extracted for testing purpose
-  private generateNewLedger(transport: any) {
+  private generateNewLedger(transport: Transport) {
     return new Ledger(transport)
   }
 
@@ -101,7 +102,7 @@ export class LedgerWallet extends RemoteWallet<LedgerSigner> implements ReadOnly
       addressToSigner.set(
         addressInfo.address,
         new LedgerSigner(
-          this.ledger,
+          this.ledger as Ledger,
           derivationPath,
           this.ledgerAddressValidation,
           appConfiguration

@@ -2,12 +2,12 @@ import { ensureLeading0x, trimLeading0x } from '@celo/base/lib/address'
 import { RLPEncodedTx, Signer } from '@celo/connect'
 import { EIP712TypedData, structHash } from '@celo/utils/lib/sign-typed-data-utils'
 import { TransportStatusError } from '@ledgerhq/errors'
+import Ledger from '@ledgerhq/hw-app-eth'
 import debugFactory from 'debug'
 import * as ethUtil from 'ethereumjs-util'
 import { transportErrorFriendlyMessage } from './ledger-utils'
 import { AddressValidation } from './ledger-wallet'
 import { compareLedgerAppVersions, tokenInfoByAddressAndChainId } from './tokens'
-
 const debug = debugFactory('kit:wallet:ledger')
 const CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION = '1.0.2'
 
@@ -15,14 +15,14 @@ const CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION = '1.0.2'
  * Signs the EVM transaction with a Ledger device
  */
 export class LedgerSigner implements Signer {
-  private ledger: any
+  private ledger: Ledger
   private derivationPath: string
   private validated: boolean = false
   private ledgerAddressValidation: AddressValidation
   private appConfiguration: { arbitraryDataEnabled: number; version: string }
 
   constructor(
-    ledger: any,
+    ledger: Ledger,
     derivationPath: string,
     ledgerAddressValidation: AddressValidation,
     appConfiguration: { arbitraryDataEnabled: number; version: string } = {
@@ -47,7 +47,7 @@ export class LedgerSigner implements Signer {
     try {
       const validatedDerivationPath = await this.getValidatedDerivationPath()
       await this.checkForKnownToken(encodedTx)
-      const signature = await this.ledger!.signTransaction(
+      const signature = await this.ledger.signTransaction(
         validatedDerivationPath,
         trimLeading0x(encodedTx.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
       )
@@ -59,13 +59,14 @@ export class LedgerSigner implements Signer {
       }
       signature.v = addToV.toString(10)
       return {
-        v: signature.v,
+        v: parseInt(signature.v, 10), // TODO check if this should be a 10 and not a 16
         r: ethUtil.toBuffer(ensureLeading0x(signature.r)) as Buffer,
         s: ethUtil.toBuffer(ensureLeading0x(signature.s)) as Buffer,
       }
     } catch (error: any) {
       if (error instanceof TransportStatusError) {
         // The Ledger fails if it doesn't know the feeCurrency
+        // @ts-ignore
         if (error.statusCode === 27264 && error.statusText === 'INCORRECT_DATA') {
           debug('Possible invalid feeCurrency field')
           throw new Error(
@@ -82,7 +83,7 @@ export class LedgerSigner implements Signer {
   async signPersonalMessage(data: string): Promise<{ v: number; r: Buffer; s: Buffer }> {
     try {
       // Ledger's signPersonalMessage adds the 'Ethereum' header
-      const signature = await this.ledger!.signPersonalMessage(
+      const signature = await this.ledger.signPersonalMessage(
         await this.getValidatedDerivationPath(),
         trimLeading0x(data)
       )
@@ -109,14 +110,14 @@ export class LedgerSigner implements Signer {
         typedData.types
       )
 
-      const sig = await this.ledger!.signEIP712HashedMessage(
+      const sig = await this.ledger.signEIP712HashedMessage(
         await this.getValidatedDerivationPath(),
-        domainSeparator,
-        hashStructMessage
+        domainSeparator.toString('hex'),
+        hashStructMessage.toString('hex')
       )
 
       return {
-        v: parseInt(sig.v, 10),
+        v: sig.v,
         r: ethUtil.toBuffer(ensureLeading0x(sig.r)) as Buffer,
         s: ethUtil.toBuffer(ensureLeading0x(sig.s)) as Buffer,
       }
@@ -130,7 +131,7 @@ export class LedgerSigner implements Signer {
 
   private async getValidatedDerivationPath(): Promise<string> {
     if (this.validationRequired()) {
-      await this.ledger!.getAddress(this.derivationPath, true)
+      await this.ledger.getAddress(this.derivationPath, true)
       this.validated = true
     }
     return this.derivationPath
@@ -173,7 +174,7 @@ export class LedgerSigner implements Signer {
         rlpEncoded.transaction.chainId!
       )
       if (tokenInfo) {
-        await this.ledger!.provideERC20TokenInformation(tokenInfo)
+        await this.ledger.provideERC20TokenInformation(tokenInfo)
       }
       if (rlpEncoded.transaction.feeCurrency && rlpEncoded.transaction.feeCurrency !== '0x') {
         const feeTokenInfo = tokenInfoByAddressAndChainId(
@@ -181,7 +182,7 @@ export class LedgerSigner implements Signer {
           rlpEncoded.transaction.chainId!
         )
         if (feeTokenInfo) {
-          await this.ledger!.provideERC20TokenInformation(feeTokenInfo)
+          await this.ledger.provideERC20TokenInformation(feeTokenInfo)
         }
       }
     }
