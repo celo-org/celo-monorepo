@@ -203,6 +203,17 @@ contract('FederatedAttestations', (accounts: string[]) => {
           checkAgainstExpectedAttestations([0], [], countsPerIssuer, addresses, issuedOns, signers)
         })
       })
+      describe('#lookupAllAttestations unrevoked', () => {
+        it('should return empty list', async () => {
+          const [
+            countsPerIssuer,
+            addresses,
+            issuedOns,
+            signers,
+          ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1], 1)
+          checkAgainstExpectedAttestations([0], [], countsPerIssuer, addresses, issuedOns, signers)
+        })
+      })
       describe('#lookupAllAttestations', () => {
         it('should return empty list', async () => {
           const [
@@ -210,17 +221,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
             addresses,
             issuedOns,
             signers,
-          ] = await federatedAttestations.lookupAllAttestations(identifier1, [issuer1])
+          ] = await federatedAttestations.lookupAllAttestations(identifier1, [issuer1], true)
           checkAgainstExpectedAttestations([0], [], countsPerIssuer, addresses, issuedOns, signers)
-        })
-      })
-      describe('#getNumberOfUnrevokedAttestations', () => {
-        it('should return no matches', async () => {
-          const [
-            totalAttestations,
-            countsPerIssuer,
-          ] = await federatedAttestations.getNumberOfUnrevokedAttestations(identifier1, [issuer1])
-          checkAgainstExpectedCountsPerIssuer([0], totalAttestations, countsPerIssuer)
         })
       })
     })
@@ -409,139 +411,148 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
 
       describe('#lookupAllAttestations', () => {
-        it('should return empty count and list if no issuers specified', async () => {
-          const [
-            countsPerIssuer,
-            addresses,
-            issuedOns,
-            signers,
-          ] = await federatedAttestations.lookupAllAttestations(identifier1, [])
-          checkAgainstExpectedAttestations([], [], countsPerIssuer, addresses, issuedOns, signers)
-        })
+        ;[true, false].forEach((includeRevoked) => {
+          describe(`includeRevoked = ${includeRevoked}`, () => {
+            it('should return empty count and list if no issuers specified', async () => {
+              const [
+                countsPerIssuer,
+                addresses,
+                issuedOns,
+                signers,
+              ] = await federatedAttestations.lookupAllAttestations(identifier1, [], includeRevoked)
+              checkAgainstExpectedAttestations(
+                [],
+                [],
+                countsPerIssuer,
+                addresses,
+                issuedOns,
+                signers
+              )
+            })
 
-        it('should return all attestations from one issuer', async () => {
-          const [
-            countsPerIssuer,
-            addresses,
-            issuedOns,
-            signers,
-          ] = await federatedAttestations.lookupAllAttestations(identifier1, [issuer1])
-          checkAgainstExpectedAttestations(
-            [issuer1Attestations.length],
-            issuer1Attestations,
-            countsPerIssuer,
-            addresses,
-            issuedOns,
-            signers
-          )
-        })
+            it('should return all attestations from one issuer', async () => {
+              const [
+                countsPerIssuer,
+                addresses,
+                issuedOns,
+                signers,
+              ] = await federatedAttestations.lookupAllAttestations(
+                identifier1,
+                [issuer1],
+                includeRevoked
+              )
+              checkAgainstExpectedAttestations(
+                [issuer1Attestations.length],
+                issuer1Attestations,
+                countsPerIssuer,
+                addresses,
+                issuedOns,
+                signers
+              )
+            })
 
-        it('should return empty list if no attestations exist for an issuer', async () => {
-          const [
-            countsPerIssuer,
-            addresses,
-            issuedOns,
-            signers,
-          ] = await federatedAttestations.lookupAllAttestations(identifier1, [issuer3])
-          checkAgainstExpectedAttestations([0], [], countsPerIssuer, addresses, issuedOns, signers)
-        })
+            it('should return empty list if no attestations exist for an issuer', async () => {
+              const [
+                countsPerIssuer,
+                addresses,
+                issuedOns,
+                signers,
+              ] = await federatedAttestations.lookupAllAttestations(
+                identifier1,
+                [issuer3],
+                includeRevoked
+              )
+              checkAgainstExpectedAttestations(
+                [0],
+                [],
+                countsPerIssuer,
+                addresses,
+                issuedOns,
+                signers
+              )
+            })
 
-        it('should return attestations from multiple issuers in correct order', async () => {
-          const expectedAttestations = issuer2Attestations.concat(issuer1Attestations)
-          const expectedCountsPerIssuer = [
-            0,
-            issuer2Attestations.length,
-            issuer1Attestations.length,
-          ]
-          const [
-            countsPerIssuer,
-            addresses,
-            issuedOns,
-            signers,
-          ] = await federatedAttestations.lookupAllAttestations(identifier1, [
-            issuer3,
-            issuer2,
-            issuer1,
-          ])
-          checkAgainstExpectedAttestations(
-            expectedCountsPerIssuer,
-            expectedAttestations,
-            countsPerIssuer,
-            addresses,
-            issuedOns,
-            signers
-          )
-        })
+            it('should return attestations from multiple issuers in correct order', async () => {
+              const expectedAttestations = issuer2Attestations.concat(issuer1Attestations)
+              const expectedCountsPerIssuer = [
+                0,
+                issuer2Attestations.length,
+                issuer1Attestations.length,
+              ]
+              const [
+                countsPerIssuer,
+                addresses,
+                issuedOns,
+                signers,
+              ] = await federatedAttestations.lookupAllAttestations(
+                identifier1,
+                [issuer3, issuer2, issuer1],
+                includeRevoked
+              )
+              checkAgainstExpectedAttestations(
+                expectedCountsPerIssuer,
+                expectedAttestations,
+                countsPerIssuer,
+                addresses,
+                issuedOns,
+                signers
+              )
+            })
 
-        it('should return attestations from revoked and unrevoked signers', async () => {
-          await federatedAttestations.revokeSigner(issuer1Attestations[0].signer)
-          const expectedAttestations = issuer1Attestations.concat(issuer2Attestations)
-          const expectedCountsPerIssuer = [issuer1Attestations.length, issuer2Attestations.length]
-          const [
-            countsPerIssuer,
-            addresses,
-            issuedOns,
-            signers,
-          ] = await federatedAttestations.lookupAllAttestations(identifier1, [issuer1, issuer2])
-          checkAgainstExpectedAttestations(
-            expectedCountsPerIssuer,
-            expectedAttestations,
-            countsPerIssuer,
-            addresses,
-            issuedOns,
-            signers
-          )
-        })
-      })
-
-      describe('#getNumberOfUnrevokedAttestations', () => {
-        it('should get no attestations if no issuers specified', async () => {
-          const [
-            totalAttestations,
-            countsPerIssuer,
-          ] = await federatedAttestations.getNumberOfUnrevokedAttestations(identifier1, [])
-          checkAgainstExpectedCountsPerIssuer([], totalAttestations, countsPerIssuer)
-        })
-        it('should get no attestations with unregistered identifier', async () => {
-          const [
-            totalAttestations,
-            countsPerIssuer,
-          ] = await federatedAttestations.getNumberOfUnrevokedAttestations(identifier2, [issuer1])
-          checkAgainstExpectedCountsPerIssuer([0], totalAttestations, countsPerIssuer)
-        })
-        it('should get the correct total number of attestations with one issuer', async () => {
-          const [
-            totalAttestations,
-            countsPerIssuer,
-          ] = await federatedAttestations.getNumberOfUnrevokedAttestations(identifier1, [issuer1])
-          checkAgainstExpectedCountsPerIssuer(
-            [issuer1Attestations.length],
-            totalAttestations,
-            countsPerIssuer
-          )
-        })
-        it('should get the correct total number of attestations with multiple issuers in the correct order', async () => {
-          const [
-            totalAttestations,
-            countsPerIssuer,
-          ] = await federatedAttestations.getNumberOfUnrevokedAttestations(identifier1, [
-            issuer3,
-            issuer1,
-            issuer2,
-          ])
-          checkAgainstExpectedCountsPerIssuer(
-            [0, issuer1Attestations.length, issuer2Attestations.length],
-            totalAttestations,
-            countsPerIssuer
-          )
-        })
-        it('should not get attestations from revoked signers', async () => {
-          await federatedAttestations.revokeSigner(issuer2Attestations[0].signer)
-          const [
-            totalAttestations,
-            countsPerIssuer,
-          ] = await federatedAttestations.getNumberOfUnrevokedAttestations(identifier1, [issuer2])
-          checkAgainstExpectedCountsPerIssuer([1], totalAttestations, countsPerIssuer)
+            if (includeRevoked) {
+              it('should return attestations from revoked and unrevoked signers', async () => {
+                await federatedAttestations.revokeSigner(issuer1Attestations[0].signer)
+                const expectedAttestations = issuer1Attestations.concat(issuer2Attestations)
+                const expectedCountsPerIssuer = [
+                  issuer1Attestations.length,
+                  issuer2Attestations.length,
+                ]
+                const [
+                  countsPerIssuer,
+                  addresses,
+                  issuedOns,
+                  signers,
+                ] = await federatedAttestations.lookupAllAttestations(
+                  identifier1,
+                  [issuer1, issuer2],
+                  includeRevoked
+                )
+                checkAgainstExpectedAttestations(
+                  expectedCountsPerIssuer,
+                  expectedAttestations,
+                  countsPerIssuer,
+                  addresses,
+                  issuedOns,
+                  signers
+                )
+              })
+            } else {
+              it('should not return attestations from revoked signers', async () => {
+                const attestationToRevoke = issuer2Attestations[0]
+                await federatedAttestations.revokeSigner(attestationToRevoke.signer)
+                const expectedAttestations = issuer2Attestations.slice(1)
+                const expectedCountsPerIssuer = [expectedAttestations.length]
+                const [
+                  countsPerIssuer,
+                  addresses,
+                  issuedOns,
+                  signers,
+                ] = await federatedAttestations.lookupAllAttestations(
+                  identifier1,
+                  [issuer2],
+                  includeRevoked
+                )
+                checkAgainstExpectedAttestations(
+                  expectedCountsPerIssuer,
+                  expectedAttestations,
+                  countsPerIssuer,
+                  addresses,
+                  issuedOns,
+                  signers
+                )
+              })
+            }
+          })
         })
       })
     })

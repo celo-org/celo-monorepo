@@ -109,17 +109,16 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Calculates the total number of attestations completed for an identifier
+   * @notice Helper function for lookupAllAttestations to calculate the
+             total number of attestations completed for an identifier
              by each trusted issuer, from unrevoked signers only
-             This can be used to obtain an exact value for maxAttestations
-             prior to calling lookupAttestations
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @return [0] Sum total of attestations found
    *         [1] Array of number of attestations found per issuer
    */
-  function getNumberOfUnrevokedAttestations(bytes32 identifier, address[] calldata trustedIssuers)
-    external
+  function getNumberOfUnrevokedAttestations(bytes32 identifier, address[] memory trustedIssuers)
+    internal
     view
     returns (uint256, uint256[] memory)
   {
@@ -210,7 +209,7 @@ contract FederatedAttestations is
     bytes32 identifier,
     address[] memory trustedIssuers,
     uint256 maxAttestations
-  ) private view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
+  ) internal view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
     uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
 
     // Pre-computing length of unrevoked attestations requires many storage lookups.
@@ -263,6 +262,7 @@ contract FederatedAttestations is
    *   signers have been revoked or not
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @param includeRevoked Whether to include attestations produced by revoked signers
    * @return [0] Array of number of attestations returned per issuer
    * @return [1 - 3] for m (== sum([0])) found attestations:
    *         [
@@ -273,15 +273,51 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function lookupAllAttestations(bytes32 identifier, address[] calldata trustedIssuers)
-    external
-    view
-    returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory)
-  {
+  function lookupAllAttestations(
+    bytes32 identifier,
+    address[] calldata trustedIssuers,
+    bool includeRevoked
+  ) external view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
+    // TODO reviewers: this is to get around a stack too deep error;
+    // are there better ways of dealing with this?
+    return _lookupAllAttestations(identifier, trustedIssuers, includeRevoked);
+  }
+
+  /**
+   * @notice Helper function for lookupAllAttestations to get around stack too deep
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @param includeRevoked Whether to include attestations produced by revoked signers
+   * @return [0] Array of number of attestations returned per issuer
+   * @return [1 - 3] for m (== sum([0])) found attestations:
+   *         [
+   *           Array of m accounts,
+   *           Array of m issuedOns,
+   *           Array of m signers
+   *         ]; index corresponds to the same attestation
+   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
+   */
+  function _lookupAllAttestations(
+    bytes32 identifier,
+    address[] memory trustedIssuers,
+    bool includeRevoked
+  ) internal view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
     uint256 totalAttestations;
     uint256[] memory countsPerIssuer;
 
-    (totalAttestations, countsPerIssuer) = getTotalNumberOfAttestations(identifier, trustedIssuers);
+    if (includeRevoked) {
+      (totalAttestations, countsPerIssuer) = getTotalNumberOfAttestations(
+        identifier,
+        trustedIssuers
+      );
+    } else {
+      (totalAttestations, countsPerIssuer) = getNumberOfUnrevokedAttestations(
+        identifier,
+        trustedIssuers
+      );
+    }
+
     address[] memory accounts = new address[](totalAttestations);
     uint256[] memory issuedOns = new uint256[](totalAttestations);
     address[] memory signers = new address[](totalAttestations);
@@ -295,10 +331,12 @@ contract FederatedAttestations is
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
       for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
-        accounts[totalAttestations] = attestationsPerIssuer[j].account;
-        issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
-        signers[totalAttestations] = attestationsPerIssuer[j].signer;
-        totalAttestations = totalAttestations.add(1);
+        if (includeRevoked || (!revokedSigners[attestationsPerIssuer[j].signer])) {
+          accounts[totalAttestations] = attestationsPerIssuer[j].account;
+          issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
+          signers[totalAttestations] = attestationsPerIssuer[j].signer;
+          totalAttestations = totalAttestations.add(1);
+        }
       }
     }
     return (countsPerIssuer, accounts, issuedOns, signers);
@@ -314,11 +352,10 @@ contract FederatedAttestations is
    * @return [0] Sum total of identifiers found
    *         [1] Array of number of identifiers found per issuer
    */
-  function getNumberOfUnrevokedIdentifiers(address account, address[] calldata trustedIssuers)
-    external
-    view
-    returns (uint256, uint256[] memory)
-  {
+  function getNumberOfUnrevokedIdentifiers(
+    address account,
+    address[] memory trustedIssuers // TODO make internal after testing
+  ) public view returns (uint256, uint256[] memory) {
     uint256 totalIdentifiers = 0;
     uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
 
@@ -333,7 +370,7 @@ contract FederatedAttestations is
         attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
         for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
           OwnershipAttestation memory attestation = attestationsPerIssuer[k];
-          // (identifier, account, issuer) tuples are checked for uniquness on registration
+          // (identifier, account, issuer) tuples are checked for uniqueness on registration
           if (attestation.account == account && !revokedSigners[attestation.signer]) {
             totalIdentifiers = totalIdentifiers.add(1);
             countsPerIssuer[i] = countsPerIssuer[i].add(1);
@@ -406,7 +443,7 @@ contract FederatedAttestations is
         // Check if the mapping was produced by a revoked signer
         attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
         for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
-          // (identifier, account, issuer) tuples are checked for uniquness on registration
+          // (identifier, account, issuer) tuples are checked for uniqueness on registration
           if (
             attestationsPerIssuer[k].account == account &&
             !revokedSigners[attestationsPerIssuer[k].signer]
