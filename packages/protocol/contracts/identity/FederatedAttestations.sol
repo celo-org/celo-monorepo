@@ -35,7 +35,7 @@ contract FederatedAttestations is
   // TODO ASv2 revisit linting issues & all solhint-disable-next-line max-line-length
 
   // identifier -> issuer -> attestations
-  mapping(bytes32 => mapping(address => OwnershipAttestation[])) public identifierToAddresses;
+  mapping(bytes32 => mapping(address => OwnershipAttestation[])) public identifierToAttestations;
   // account -> issuer -> identifiers
   mapping(address => mapping(address => bytes32[])) public addressToIdentifiers;
   // signer => isRevoked
@@ -127,7 +127,7 @@ contract FederatedAttestations is
 
     OwnershipAttestation[] memory attestationsPerIssuer;
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+      attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
       for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
         if (!revokedSigners[attestationsPerIssuer[j].signer]) {
           totalAttestations = totalAttestations.add(1);
@@ -157,7 +157,7 @@ contract FederatedAttestations is
     uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      numAttestationsForIssuer = identifierToAddresses[identifier][trustedIssuers[i]].length;
+      numAttestationsForIssuer = identifierToAttestations[identifier][trustedIssuers[i]].length;
       totalAttestations = totalAttestations.add(numAttestationsForIssuer);
       countsPerIssuer[i] = numAttestationsForIssuer;
     }
@@ -223,7 +223,7 @@ contract FederatedAttestations is
     OwnershipAttestation[] memory attestationsPerIssuer;
 
     for (uint256 i = 0; i < trustedIssuers.length && currIndex < maxAttestations; i = i.add(1)) {
-      attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+      attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
       for (
         uint256 j = 0;
         j < attestationsPerIssuer.length && currIndex < maxAttestations;
@@ -321,7 +321,7 @@ contract FederatedAttestations is
     totalAttestations = 0;
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+      attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
       for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
         if (includeRevoked || (!revokedSigners[attestationsPerIssuer[j].signer])) {
           accounts[totalAttestations] = attestationsPerIssuer[j].account;
@@ -359,7 +359,7 @@ contract FederatedAttestations is
       for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
         bytes32 identifier = identifiersPerIssuer[j];
         // Check if the mapping was produced by a revoked signer
-        attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+        attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
         for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
           OwnershipAttestation memory attestation = attestationsPerIssuer[k];
           // (identifier, account, issuer) tuples are checked for uniqueness on registration
@@ -433,7 +433,7 @@ contract FederatedAttestations is
       ) {
         bytes32 identifier = identifiersPerIssuer[j];
         // Check if the mapping was produced by a revoked signer
-        attestationsPerIssuer = identifierToAddresses[identifier][trustedIssuers[i]];
+        attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
         for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
           // (identifier, account, issuer) tuples are checked for uniqueness on registration
           if (
@@ -518,7 +518,7 @@ contract FederatedAttestations is
     view
     returns (bool)
   {
-    OwnershipAttestation[] memory attestations = identifierToAddresses[identifier][issuer];
+    OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
     for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
       if (attestations[i].account == account && !revokedSigners[attestations[i].signer]) {
         return true;
@@ -609,17 +609,17 @@ contract FederatedAttestations is
       isValidAttestation(identifier, issuer, account, issuedOn, signer, v, r, s),
       "Signature is invalid"
     );
-    for (uint256 i = 0; i < identifierToAddresses[identifier][issuer].length; i = i.add(1)) {
+    for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
       // This enforces only one attestation to be uploaded
       // for a given set of (identifier, issuer, account)
       // Editing/upgrading an attestation requires that it be deleted before a new one is registered
       require(
-        identifierToAddresses[identifier][issuer][i].account != account,
+        identifierToAttestations[identifier][issuer][i].account != account,
         "Attestation for this account already exists"
       );
     }
     OwnershipAttestation memory attestation = OwnershipAttestation(account, issuedOn, signer);
-    identifierToAddresses[identifier][issuer].push(attestation);
+    identifierToAttestations[identifier][issuer].push(attestation);
     addressToIdentifiers[account][issuer].push(identifier);
     emit AttestationRegistered(identifier, issuer, account, issuedOn, signer);
   }
@@ -635,7 +635,7 @@ contract FederatedAttestations is
     public
     isValidUser(issuer, account)
   {
-    OwnershipAttestation[] memory attestations = identifierToAddresses[identifier][issuer];
+    OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
     for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
       OwnershipAttestation memory attestation = attestations[i];
       if (attestation.account == account) {
@@ -643,8 +643,8 @@ contract FederatedAttestations is
         // and then move the last element in the array to that empty spot,
         // to avoid having empty elements in the array
         // TODO reviewers: is there a better way of doing this?
-        identifierToAddresses[identifier][issuer][i] = attestations[attestations.length - 1];
-        identifierToAddresses[identifier][issuer].pop();
+        identifierToAttestations[identifier][issuer][i] = attestations[attestations.length - 1];
+        identifierToAttestations[identifier][issuer].pop();
 
         bool deletedIdentifier = false;
 
