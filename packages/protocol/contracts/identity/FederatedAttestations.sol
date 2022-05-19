@@ -352,10 +352,11 @@ contract FederatedAttestations is
    * @return [0] Sum total of identifiers found
    *         [1] Array of number of identifiers found per issuer
    */
-  function getNumberOfUnrevokedIdentifiers(
-    address account,
-    address[] memory trustedIssuers // TODO make internal after testing
-  ) public view returns (uint256, uint256[] memory) {
+  function getNumberOfUnrevokedIdentifiers(address account, address[] memory trustedIssuers)
+    internal
+    view
+    returns (uint256, uint256[] memory)
+  {
     uint256 totalIdentifiers = 0;
     uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
 
@@ -479,15 +480,22 @@ contract FederatedAttestations is
    * @dev Adds identifier info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function lookupAllIdentifiersByAddress(address account, address[] calldata trustedIssuers)
-    external
-    view
-    returns (uint256[] memory, bytes32[] memory)
-  {
+  function lookupAllIdentifiersByAddress(
+    address account,
+    address[] calldata trustedIssuers,
+    bool includeRevoked
+  ) external view returns (uint256[] memory, bytes32[] memory) {
     uint256 totalIdentifiers;
     uint256[] memory countsPerIssuer;
 
-    (totalIdentifiers, countsPerIssuer) = getTotalNumberOfIdentifiers(account, trustedIssuers);
+    if (includeRevoked) {
+      (totalIdentifiers, countsPerIssuer) = getTotalNumberOfIdentifiers(account, trustedIssuers);
+    } else {
+      (totalIdentifiers, countsPerIssuer) = getNumberOfUnrevokedIdentifiers(
+        account,
+        trustedIssuers
+      );
+    }
 
     bytes32[] memory identifiers = new bytes32[](totalIdentifiers);
     bytes32[] memory identifiersPerIssuer;
@@ -497,11 +505,39 @@ contract FederatedAttestations is
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
       for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
-        identifiers[currIndex] = identifiersPerIssuer[j];
-        currIndex = currIndex.add(1);
+        if (
+          includeRevoked ||
+          foundUnrevokedAttestation(account, identifiersPerIssuer[j], trustedIssuers[i])
+        ) {
+          identifiers[currIndex] = identifiersPerIssuer[j];
+          currIndex = currIndex.add(1);
+        }
       }
     }
     return (countsPerIssuer, identifiers);
+  }
+
+  /**
+   * @notice Helper function for lookupAllIdentifiersByAddress to search the
+   *   attestations from `issuer` for one with an unrevoked signer
+   *   that maps `account` -> `identifier
+   * @param account Address of the account
+   * @param identifier Hash of the identifier
+   * @param issuer Issuer whose attestations to search
+   * @return Whether or not an unrevoked attestation is found establishing the mapping
+   */
+  function foundUnrevokedAttestation(address account, bytes32 identifier, address issuer)
+    internal
+    view
+    returns (bool)
+  {
+    OwnershipAttestation[] memory attestations = identifierToAddresses[identifier][issuer];
+    for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
+      if (attestations[i].account == account && !revokedSigners[attestations[i].signer]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // TODO do we want to restrict permissions, or should anyone
