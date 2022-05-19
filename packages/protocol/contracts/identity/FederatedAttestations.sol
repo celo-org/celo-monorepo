@@ -109,7 +109,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for lookupAllAttestations to calculate the
+   * @notice Helper function for _lookupAllAttestations to calculate the
              total number of attestations completed for an identifier
              by each trusted issuer, from unrevoked signers only
    * @param identifier Hash of the identifier
@@ -139,7 +139,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for lookupAllAttestations to calculate the
+   * @notice Helper function for _lookupAllAttestations to calculate the
              total number of attestations completed for an identifier
              by each trusted issuer
    * @param identifier Hash of the identifier
@@ -258,8 +258,8 @@ contract FederatedAttestations is
 
   /**
    * @notice Similar to lookupAttestations but returns all attestations for
-   *   an identifier produced by a list of issuers, regardless of whether
-   *   signers have been revoked or not
+   *   an identifier produced by a list of issuers,
+   *   either including or excluding attestations from revoked signers
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @param includeRevoked Whether to include attestations produced by revoked signers
@@ -343,10 +343,9 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Calculates the total number of identifiers completed for an identifier
+    * @notice Helper function for lookupAllIdentifiersByAddress to calculate the
+             total number of identifiers completed for an identifier
              by each trusted issuer, from unrevoked signers only
-             This can be used to obtain an exact value for maxIdentifiers
-             prior to calling lookupIdentifiersByAddress
    * @param account Address of the account
    * @param trustedIssuers Array of n issuers whose identifiers will be included
    * @return [0] Sum total of identifiers found
@@ -384,7 +383,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for lookupIdentifiersByAddress to calculate the
+   * @notice Helper function for lookupAllIdentifiersByAddress to calculate the
              total number of identifiers completed for an identifier
              by each trusted issuer
    * @param account Address of the account
@@ -472,9 +471,10 @@ contract FederatedAttestations is
   /**
    * @notice Similar to lookupIdentifiersByAddress but returns all identifiers for
    *   mapped to an address with attestations from a list of issuers,
-   *   regardless of whether the signers have been revoked or not
+   *   either including or excluding attestations from revoked signers
    * @param account Address of the account
    * @param trustedIssuers Array of n issuers whose identifier mappings will be used
+   * @param includeRevoked Whether to include identifiers attested by revoked signers
    * @return [0] Array of number of identifiers returned per issuer
    * @return [1] Array (length == sum([0])) of identifiers
    * @dev Adds identifier info to the arrays in order of provided trustedIssuers
