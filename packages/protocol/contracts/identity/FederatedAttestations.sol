@@ -109,7 +109,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for _lookupAllAttestations to calculate the
+   * @notice Helper function for _lookupAttestations to calculate the
              total number of attestations completed for an identifier
              by each trusted issuer, from unrevoked signers only
    * @param identifier Hash of the identifier
@@ -117,7 +117,7 @@ contract FederatedAttestations is
    * @return [0] Sum total of attestations found
    *         [1] Array of number of attestations found per issuer
    */
-  function getNumberOfUnrevokedAttestations(bytes32 identifier, address[] memory trustedIssuers)
+  function getNumUnrevokedAttestations(bytes32 identifier, address[] memory trustedIssuers)
     internal
     view
     returns (uint256, uint256[] memory)
@@ -139,7 +139,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for _lookupAllAttestations to calculate the
+   * @notice Helper function for _lookupAttestations to calculate the
              total number of attestations completed for an identifier
              by each trusted issuer
    * @param identifier Hash of the identifier
@@ -147,7 +147,7 @@ contract FederatedAttestations is
    * @return [0] Sum total of attestations found
    *         [1] Array of number of attestations found per issuer
    */
-  function getTotalNumberOfAttestations(bytes32 identifier, address[] memory trustedIssuers)
+  function getNumAttestations(bytes32 identifier, address[] memory trustedIssuers)
     internal
     view
     returns (uint256, uint256[] memory)
@@ -165,8 +165,8 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Returns info about attestations (with unrevoked signers)
-   *   for an identifier produced by a list of issuers
+   * @notice Returns info about up to `maxAttestations` attestations for
+   *   `identifier` produced by unrevoked signers of `trustedIssuers`
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @param maxAttestations Limit the number of attestations that will be returned
@@ -180,18 +180,18 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function lookupAttestations(
+  function lookupUnrevokedAttestations(
     bytes32 identifier,
     address[] calldata trustedIssuers,
     uint256 maxAttestations
   ) external view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
     // TODO reviewers: this is to get around a stack too deep error;
     // are there better ways of dealing with this?
-    return _lookupAttestations(identifier, trustedIssuers, maxAttestations);
+    return _lookupUnrevokedAttestations(identifier, trustedIssuers, maxAttestations);
   }
 
   /**
-   * @notice Helper function for lookupAttestations to get around stack too deep
+   * @notice Helper function for lookupUnrevokedAttestations to get around stack too deep
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @param maxAttestations Limit the number of attestations that will be returned
@@ -205,7 +205,7 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function _lookupAttestations(
+  function _lookupUnrevokedAttestations(
     bytes32 identifier,
     address[] memory trustedIssuers,
     uint256 maxAttestations
@@ -257,8 +257,8 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Similar to lookupAttestations but returns all attestations for
-   *   an identifier produced by a list of issuers,
+   * @notice Similar to lookupUnrevokedAttestations but returns all attestations
+   *   for `identifier` produced by `trustedIssuers`,
    *   either including or excluding attestations from revoked signers
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
@@ -273,18 +273,18 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function lookupAllAttestations(
+  function lookupAttestations(
     bytes32 identifier,
     address[] calldata trustedIssuers,
     bool includeRevoked
   ) external view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
     // TODO reviewers: this is to get around a stack too deep error;
     // are there better ways of dealing with this?
-    return _lookupAllAttestations(identifier, trustedIssuers, includeRevoked);
+    return _lookupAttestations(identifier, trustedIssuers, includeRevoked);
   }
 
   /**
-   * @notice Helper function for lookupAllAttestations to get around stack too deep
+   * @notice Helper function for lookupAttestations to get around stack too deep
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @param includeRevoked Whether to include attestations produced by revoked signers
@@ -298,7 +298,7 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function _lookupAllAttestations(
+  function _lookupAttestations(
     bytes32 identifier,
     address[] memory trustedIssuers,
     bool includeRevoked
@@ -307,12 +307,9 @@ contract FederatedAttestations is
     uint256[] memory countsPerIssuer;
 
     if (includeRevoked) {
-      (totalAttestations, countsPerIssuer) = getTotalNumberOfAttestations(
-        identifier,
-        trustedIssuers
-      );
+      (totalAttestations, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
     } else {
-      (totalAttestations, countsPerIssuer) = getNumberOfUnrevokedAttestations(
+      (totalAttestations, countsPerIssuer) = getNumUnrevokedAttestations(
         identifier,
         trustedIssuers
       );
@@ -343,7 +340,7 @@ contract FederatedAttestations is
   }
 
   /**
-    * @notice Helper function for lookupAllIdentifiersByAddress to calculate the
+    * @notice Helper function for lookupIdentifiers to calculate the
              total number of identifiers completed for an identifier
              by each trusted issuer, from unrevoked signers only
    * @param account Address of the account
@@ -351,7 +348,7 @@ contract FederatedAttestations is
    * @return [0] Sum total of identifiers found
    *         [1] Array of number of identifiers found per issuer
    */
-  function getNumberOfUnrevokedIdentifiers(address account, address[] memory trustedIssuers)
+  function getNumUnrevokedIdentifiers(address account, address[] memory trustedIssuers)
     internal
     view
     returns (uint256, uint256[] memory)
@@ -383,7 +380,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for lookupAllIdentifiersByAddress to calculate the
+   * @notice Helper function for lookupIdentifiers to calculate the
              total number of identifiers completed for an identifier
              by each trusted issuer
    * @param account Address of the account
@@ -391,7 +388,7 @@ contract FederatedAttestations is
    * @return [0] Sum total of identifiers found
    *         [1] Array of number of identifiers found per issuer
    */
-  function getTotalNumberOfIdentifiers(address account, address[] memory trustedIssuers)
+  function getNumIdentifiers(address account, address[] memory trustedIssuers)
     internal
     view
     returns (uint256, uint256[] memory)
@@ -409,8 +406,8 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Returns identifiers mapped (by unrevoked signers) to a
-   *   given account address by a list of trusted issuers
+   * @notice Returns up to `maxIdentifiers` identifiers mapped to `account`
+   *   by unrevoked signers of `trustedIssuers`
    * @param account Address of the account
    * @param trustedIssuers Array of n issuers whose identifier mappings will be used
    * @param maxIdentifiers Limit the number of identifiers that will be returned
@@ -419,7 +416,7 @@ contract FederatedAttestations is
    * @dev Adds identifier info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function lookupIdentifiersByAddress(
+  function lookupUnrevokedIdentifiers(
     address account,
     address[] calldata trustedIssuers,
     uint256 maxIdentifiers
@@ -469,7 +466,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Similar to lookupIdentifiersByAddress but returns all identifiers for
+   * @notice Similar to lookupUnrevokedIdentifiers but returns all identifiers
    *   mapped to an address with attestations from a list of issuers,
    *   either including or excluding attestations from revoked signers
    * @param account Address of the account
@@ -480,7 +477,7 @@ contract FederatedAttestations is
    * @dev Adds identifier info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function lookupAllIdentifiersByAddress(
+  function lookupIdentifiers(
     address account,
     address[] calldata trustedIssuers,
     bool includeRevoked
@@ -489,12 +486,9 @@ contract FederatedAttestations is
     uint256[] memory countsPerIssuer;
 
     if (includeRevoked) {
-      (totalIdentifiers, countsPerIssuer) = getTotalNumberOfIdentifiers(account, trustedIssuers);
+      (totalIdentifiers, countsPerIssuer) = getNumIdentifiers(account, trustedIssuers);
     } else {
-      (totalIdentifiers, countsPerIssuer) = getNumberOfUnrevokedIdentifiers(
-        account,
-        trustedIssuers
-      );
+      (totalIdentifiers, countsPerIssuer) = getNumUnrevokedIdentifiers(account, trustedIssuers);
     }
 
     bytes32[] memory identifiers = new bytes32[](totalIdentifiers);
@@ -518,7 +512,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for lookupAllIdentifiersByAddress to search the
+   * @notice Helper function for lookupIdentifiers to search through the
    *   attestations from `issuer` for one with an unrevoked signer
    *   that maps `account` -> `identifier
    * @param account Address of the account
