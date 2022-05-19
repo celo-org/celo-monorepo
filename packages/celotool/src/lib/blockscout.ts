@@ -20,8 +20,8 @@ export function getReleaseName(celoEnv: string, dbSuffix: string) {
 }
 
 export async function installHelmChart(celoEnv: string, releaseName: string, imageTag: string) {
-  const valuesEnvFile = fs.existsSync(`${helmChartPath}/values-${celoEnv}.yaml`)
-    ? `values-${celoEnv}.yaml`
+  const valuesEnvFile = fs.existsSync(`${helmChartPath}/values-${releaseName}.yaml`)
+    ? `values-${releaseName}.yaml`
     : `values.yaml`
   return installGenericHelmChart(
     celoEnv,
