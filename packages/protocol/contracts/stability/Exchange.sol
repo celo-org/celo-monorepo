@@ -78,7 +78,6 @@ contract Exchange is
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
-   * @param stableTokenIdentifier String identifier of stabletoken in registry
    * @param _spread Spread charged on exchanges
    * @param _reserveFraction Fraction to commit to the gold bucket
    * @param _updateFrequency The time period that needs to elapse between bucket
@@ -86,6 +85,7 @@ contract Exchange is
    * @param _minimumReports The minimum number of fresh reports that need to be
    * present in the oracle to update buckets
    * commit to the gold bucket
+   * @param stableTokenIdentifier String identifier of stabletoken in registry
    */
   function initialize(
     address registryAddress,
@@ -298,7 +298,7 @@ contract Exchange is
     spread = FixidityLib.wrap(newSpread);
     require(
       FixidityLib.lte(spread, FixidityLib.fixed1()),
-      "Spread must be less than or equal to 1"
+      "the value of spread must be less than or equal to 1"
     );
     emit SpreadSet(newSpread);
   }
