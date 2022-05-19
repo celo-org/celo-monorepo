@@ -1,9 +1,47 @@
 {
-  "oldArtifactsFolder": "/home/martx/celo/celo-monorepo/packages/protocol/build/cREAL-contracts-deploy/contracts",
-  "newArtifactsFolder": "/home/martx/celo/celo-monorepo/packages/protocol/build/release_core-contracts_6/contracts",
+  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/core-contracts.v5/contracts",
+  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/core-contracts.v6/contracts",
   "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles/",
   "report": {
     "contracts": {
+      "ExchangeBRL": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "ExchangeBRL",
+              "type": "NewContract"
+            }
+          ],
+          "minor": [],
+          "patch": []
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
+      "StableTokenBRL": {
+        "changes": {
+          "storage": [],
+          "major": [
+            {
+              "contract": "StableTokenBRL",
+              "type": "NewContract"
+            }
+          ],
+          "minor": [],
+          "patch": []
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "+1",
+          "minor": "0",
+          "patch": "0"
+        }
+      },
       "Accounts": {
         "changes": {
           "storage": [],
