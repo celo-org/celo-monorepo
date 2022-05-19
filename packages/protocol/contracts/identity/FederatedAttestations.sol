@@ -306,14 +306,9 @@ contract FederatedAttestations is
     uint256 totalAttestations;
     uint256[] memory countsPerIssuer;
 
-    if (includeRevoked) {
-      (totalAttestations, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
-    } else {
-      (totalAttestations, countsPerIssuer) = getNumUnrevokedAttestations(
-        identifier,
-        trustedIssuers
-      );
-    }
+    (totalAttestations, countsPerIssuer) = includeRevoked
+      ? getNumAttestations(identifier, trustedIssuers)
+      : getNumUnrevokedAttestations(identifier, trustedIssuers);
 
     address[] memory accounts = new address[](totalAttestations);
     uint256[] memory issuedOns = new uint256[](totalAttestations);
@@ -485,11 +480,9 @@ contract FederatedAttestations is
     uint256 totalIdentifiers;
     uint256[] memory countsPerIssuer;
 
-    if (includeRevoked) {
-      (totalIdentifiers, countsPerIssuer) = getNumIdentifiers(account, trustedIssuers);
-    } else {
-      (totalIdentifiers, countsPerIssuer) = getNumUnrevokedIdentifiers(account, trustedIssuers);
-    }
+    (totalIdentifiers, countsPerIssuer) = includeRevoked
+      ? getNumIdentifiers(account, trustedIssuers)
+      : getNumUnrevokedIdentifiers(account, trustedIssuers);
 
     bytes32[] memory identifiers = new bytes32[](totalIdentifiers);
     bytes32[] memory identifiersPerIssuer;
