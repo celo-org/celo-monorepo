@@ -110,14 +110,6 @@ volumes:
   - name: blockscout-cloudsql-credentials
     secret:
       secretName: blockscout-cloudsql-credentials
-  {{- if .nfs_volumes }}
-  - name: vyper-compilers
-    persistentVolumeClaim:
-      claimName: {{ .Release.Name }}-nfs-vyper-compilers-volume
-  - name: solc-compilers
-    persistentVolumeClaim:
-      claimName: {{ .Release.Name }}-nfs-solc-compilers-volume
-  {{- end -}}
 {{- end -}}
 
 {{- /*
