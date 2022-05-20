@@ -23,7 +23,6 @@ const assertSTContractNames = (
   })
   assert.equal(contracts.length, currentIndex)
 }
-
 contract('StableTokenRegistry', (accounts: string[]) => {
   let strc: StableTokenRegistryInstance
   const nonOwner: string = accounts[1]
@@ -31,6 +30,7 @@ contract('StableTokenRegistry', (accounts: string[]) => {
   const fiatTicker: string = convertToHex('USD')
   const stableTokenContractName = convertToHex('StableToken')
 
+  // Add this to contractkit once we have it
   const getFiatTickers = async () => {
     const updatedFiatTickers = []
     try {
@@ -71,7 +71,7 @@ contract('StableTokenRegistry', (accounts: string[]) => {
 
     it('has the right list of fiat tickers after removing one', async () => {
       await strc.removeStableToken(fiatTicker, 0)
-      const updatedFiatTickers = await getFiatTickers()
+      const updatedFiatTickers = await strc.getFiatTickers()
       assert.deepEqual(updatedFiatTickers, ['GBP', 'EUR', 'BRL', 'GEL'])
     })
 

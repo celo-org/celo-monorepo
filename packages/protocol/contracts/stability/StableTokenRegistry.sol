@@ -32,7 +32,9 @@ contract StableTokenRegistry is Initializable, Ownable {
     addNewStableToken(bytes("USD"), bytes("StableToken"));
     addNewStableToken(bytes("EUR"), bytes("StableTokenEUR"));
     addNewStableToken(bytes("BRL"), bytes("StableTokenBRL"));
-    addNewStableToken(fiatTicker, stableTokenContractName);
+    if (fiatTicker.length != 0 && stableTokenContractName.length != 0) {
+      addNewStableToken(fiatTicker, stableTokenContractName);
+    }
   }
 
   /**
