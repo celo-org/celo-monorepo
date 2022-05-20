@@ -64,16 +64,16 @@ volumes:
   - -c
   - |
     /while true; do \
-      gsutil rsync vyper-compilers gs://compilers/vyper_compilers;\
-      gsutil rsync solc-compilers gs://compilers/solc_compilers;\
-      gsutil rsync gs://compilers/solc_compilers solc-compilers;\
-      gsutil rsync gs://compilers/vyper_compilers vyper-compilers;\
+      gsutil rsync -r vyper-compilers gs://compilers/vyper_compilers;\
+      gsutil rsync -r solc-compilers gs://compilers/solc_compilers;\
+      gsutil rsync -r gs://compilers/solc_compilers solc-compilers;\
+      gsutil rsync -r gs://compilers/vyper_compilers vyper-compilers;\
       sleep 600;\
-    done\
+    done
   securityContext:
     runAsUser: 2  # non-root user
     allowPrivilegeEscalation: false
-  serviceAccountName: block
+  serviceAccountName: blockscout1-rbac@celo-testnet.iam.gserviceaccount.com 
   volumeMounts:
   - name: vyper-compilers
     mountPath: /opt/app/apps/explorer/priv/vyper_compilers
