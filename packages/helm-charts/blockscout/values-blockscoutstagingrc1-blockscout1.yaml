@@ -1,7 +1,7 @@
 blockscout:
   indexer:
     db:
-      connectionName: celo-testnet:us-west1:blockscoutstagingrc13
+      connectionName: celo-testnet:us-west1:blockscoutstagingrc11
       proxy:
         resources:
           requests:
@@ -21,7 +21,7 @@ blockscout:
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet:us-west1:blockscoutstagingrc13-replica
+      connectionName: celo-testnet:us-west1:blockscoutstagingrc11
       proxy:
         resources:
           requests:
@@ -33,14 +33,14 @@ blockscout:
         memory: 500Mi
         cpu: 500m
   web:
-    host: blockscoutstagingrc1-blockscout3.celo-testnet.org
+    host: blockscoutstagingrc1-blockscout1.celo-testnet.org
     autoscaling:
       maxReplicas: 2
       minReplicas: 1
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet:us-west1:blockscoutstagingrc13
+      connectionName: celo-testnet:us-west1:blockscoutstagingrc11
       proxy:
         resources:
           requests:
@@ -59,8 +59,8 @@ blockscout:
   metrics:
     enabled: false
   secrets:
-    dbUser: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout3-dbUser
-    dbPassword: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout3-dbPassword
+    dbUser: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout1-dbUser
+    dbPassword: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout1-dbPassword
     grafanaCloud: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout-grafanaCloud
     recaptcha:
       projectId: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout-recaptchaProjectId
