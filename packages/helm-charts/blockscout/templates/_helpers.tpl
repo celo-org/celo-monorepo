@@ -55,6 +55,38 @@ volumes:
     emptyDir: {}
 {{- end -}}
 
+{{- define "celo.blockscout-rsync-sidecar" -}}
+- name: rsync
+  image: google/cloud-sdk:latest
+  command:
+  - /bin/sh
+  args:
+  - -c
+  - |
+    /while true; do \
+      gsutil rsync vyper-compilers gs://compilers/vyper_compilers;\
+      gsutil rsync solc-compilers gs://compilers/solc_compilers;\
+      gsutil rsync gs://compilers/solc_compilers solc-compilers;\
+      gsutil rsync gs://compilers/vyper_compilers vyper-compilers;\
+      sleep 600;\
+    done\
+  securityContext:
+    runAsUser: 2  # non-root user
+    allowPrivilegeEscalation: false
+  serviceAccountName: block
+  volumeMounts:
+  - name: vyper-compilers
+    mountPath: /opt/app/apps/explorer/priv/vyper_compilers
+  - name: solc-compilers
+    mountPath: /opt/app/apps/explorer/priv/solc_compilers
+volumes:
+  - name: vyper-compilers
+    emptyDir: {}
+  - name: solc-compilers
+    emptyDir: {}
+{{- end -}}
+
+
 {{- /*
 Defines the CloudSQL proxy container that provides
 access to the database to the main container.
@@ -112,11 +144,9 @@ volumes:
       secretName: blockscout-cloudsql-credentials
   {{- if .nfs_volumes }}
   - name: vyper-compilers
-    persistentVolumeClaim:
-      claimName: {{ .Release.Name }}-nfs-vyper-compilers-volume
+    emptyDir: {}
   - name: solc-compilers
-    persistentVolumeClaim:
-      claimName: {{ .Release.Name }}-nfs-solc-compilers-volume
+    emptyDir: {}
   {{- end -}}
 {{- end -}}
 
