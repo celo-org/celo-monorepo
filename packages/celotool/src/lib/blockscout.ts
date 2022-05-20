@@ -4,7 +4,6 @@ import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
 import { accessSecretVersion, getCurrentGcloudAccount } from './gcloud_utils'
 import {
-  helmAddAndUpdateRepos,
   installGenericHelmChart,
   removeGenericHelmChart,
   upgradeGenericHelmChart,
