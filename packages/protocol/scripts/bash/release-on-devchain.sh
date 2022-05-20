@@ -52,7 +52,7 @@ yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/cont
 
 # From make-release.sh
 echo "- Deploy release of current branch"
-INITIALIZATION_FILE=`ls -1 releaseData/initializationData/release?.json | tail -n 1 | xargs realpath`
+INITIALIZATION_FILE=`ls -1 releaseData/initializationData/* | tail -n 1 | xargs realpath`
 yarn truffle exec --network development ./scripts/truffle/make-release.js --build_directory build/ --report report.json --proposal proposal.json --librariesFile libraries.json --initialize_data $INITIALIZATION_FILE
 
 # From verify-release.sh
