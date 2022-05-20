@@ -132,6 +132,7 @@ export function randomUint256() {
   return BigNumber.random()
     .times(maxUint256)
     .integerValue()
+    .valueOf()
 }
 
 export function checkFunctionArgsLength(args: any[], abi: any) {
