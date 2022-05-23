@@ -137,7 +137,7 @@ volumes:
   - name: blockscout-cloudsql-credentials
     secret:
       secretName: blockscout-cloudsql-credentials
-  {{- if .nfs_volumes }}
+  {{- if .compilers_volumes }}
   - name: vyper-compilers
     emptyDir: {}
   - name: solc-compilers

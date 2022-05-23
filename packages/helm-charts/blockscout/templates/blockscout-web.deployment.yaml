@@ -144,7 +144,7 @@ spec:
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
 {{ include "celo.blockscout-rsync-sidecar" $data | indent 6 }}
-{{ include "celo.blockscout-volumes" (dict "nfs_volumes" true "Release" .Release) | indent 6 }}
+{{ include "celo.blockscout-volumes" (dict "compilers_volumes" true "Release" .Release) | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
