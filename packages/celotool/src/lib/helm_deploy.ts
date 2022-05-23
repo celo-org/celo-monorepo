@@ -319,9 +319,6 @@ export async function helmAddAndUpdateRepos() {
   )
   await execCmdWithExitOnFailure(`helm repo add stable https://charts.helm.sh/stable`)
   await execCmdWithExitOnFailure(`helm repo add grafana https://grafana.github.io/helm-charts`)
-  await execCmdWithExitOnFailure(
-    `helm repo add nfs-ganesha-server-and-external-provisioner https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/`
-  )
   await execCmdWithExitOnFailure(`helm repo update`)
 }
 
