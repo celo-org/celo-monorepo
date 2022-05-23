@@ -180,13 +180,19 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       // Disable stackdriver sidecar env wide. TODO: Update to a contexted variable if needed
       `--set stackdriver.disabled=false`,
       `--set stackdriver.sidecar.imageTag=${sidecarImageTag}`,
-      `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`,
       `--set stackdriver.gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
         clusterName,
         cloudProvider,
         gcloudProject
       )}`
     )
+
+    // Metrics prefix for non-ODIS clusters.
+    if (!context?.startsWith('AZURE_ODIS')) {
+      params.push(
+        `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`
+      )
+    }
 
     if (usingGCP) {
       const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
