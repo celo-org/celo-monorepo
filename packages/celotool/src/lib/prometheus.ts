@@ -174,6 +174,8 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
   if (usingGCP) {
     // Note: ssd is not the default storageClass in GCP clusters
     params.push(`--set storageClassName=ssd`)
+  } else if (context?.startsWith('AZURE_ODIS')) {
+    params.push(`--set storageClassName=default`)
   }
 
   if (stackdriverDisabled.toLowerCase() === 'false') {
