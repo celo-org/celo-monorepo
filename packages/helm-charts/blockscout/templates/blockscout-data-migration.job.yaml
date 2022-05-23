@@ -20,14 +20,20 @@ spec:
           labels:
             {{- include "celo.blockscout.labels" . | nindent 12 }}
         spec:
+          serviceAccountName: {{ .Release.Name }}-rbac
+          initContainers:
+            {{ include "celo.blockscout.initContainer.secrets-init" . | nindent 12 }}
           containers:
           - name: blockscout-data-migration
             image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
             imagePullPolicy: {{ .Values.imagePullPolicy }}
             command:
+            - /tmp/pod/secrets-init
+            args:
+            - --provider
+            - google
             - /bin/sh
             - -c
-            args:
             - |
               trap "touch /tmp/pod/main-terminated" EXIT
               iex --name data-migration@0.0.0.0 -S mix data_migrate --no-compile
@@ -37,14 +43,14 @@ spec:
                 cpu: 2
             volumeMounts:
               - mountPath: /tmp/pod
-                name: tmp-pod
+                name: temporary-dir
             env:
               - name: INITIAL_VALUE
                 valueFrom:
                   secretKeyRef:
                     name: blockscout-data-migration-secret-key-ref
                     key: initial-value
-{{ include "celo.blockscout-env-vars" .  | indent 14 }}
-{{ include "celo.blockscout-db-terminating-sidecar" .  | indent 10 }}
+{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
+{{ include "celo.blockscout.env-vars" $data | indent 14 }}
+{{ include "celo.blockscout.container.db-terminating-sidecar" $data | indent 10 }}
           restartPolicy: Never
-      backoffLimit: 0  

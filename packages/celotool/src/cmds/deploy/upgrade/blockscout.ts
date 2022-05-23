@@ -67,10 +67,6 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     )
   }
 
-  if (!isCelotoolHelmDryRun()) {
-    await installNFSServerProvisioner(argv.celoEnv)
-  }
-
   await upgradeHelmChart(argv.celoEnv, helmReleaseName, imageTag)
 
   if (!isCelotoolHelmDryRun()) {
