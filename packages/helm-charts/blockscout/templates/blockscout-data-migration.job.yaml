@@ -53,4 +53,7 @@ spec:
 {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 14 }}
 {{ include "celo.blockscout.container.db-terminating-sidecar" $data | indent 10 }}
+          volumes:
+            {{ include "celo.blockscout.volume.cloudsql-credentials" . | nindent 12 }}
+            {{ include "celo.blockscout.volume.temporary-dir" . | nindent 12 }}
           restartPolicy: Never

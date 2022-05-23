@@ -52,10 +52,6 @@ spec:
         - mountPath: /secrets
           name: temporary-dir
           readOnly: true
-        - name: vyper-compilers
-          mountPath: /opt/app/apps/explorer/priv/vyper_compilers
-        - name: solc-compilers
-          mountPath: /opt/app/apps/explorer/priv/solc_compilers
         ports:
         - name: http
           containerPort: {{ .Values.blockscout.web.port }}
