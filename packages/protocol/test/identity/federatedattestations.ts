@@ -784,7 +784,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
   })
 
-  describe.only('#deleteAttestation', () => {
+  describe('#deleteAttestation', () => {
     beforeEach(async () => {
       await accountsInstance.authorizeSigner(signer1, signerRole, { from: issuer1 })
       await accountsInstance.completeSignerAuthorization(issuer1, signerRole, { from: signer1 })
