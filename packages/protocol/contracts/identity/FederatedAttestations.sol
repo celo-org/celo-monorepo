@@ -125,14 +125,15 @@ contract FederatedAttestations is
     uint256 totalAttestations = 0;
     uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
 
-    OwnershipAttestation[] memory attestationsPerIssuer;
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
+      // solhint-disable-next-line max-line-length
+      OwnershipAttestation[] storage attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
       for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
-        if (!revokedSigners[attestationsPerIssuer[j].signer]) {
-          totalAttestations = totalAttestations.add(1);
-          countsPerIssuer[i] = countsPerIssuer[i].add(1);
+        if (revokedSigners[attestationsPerIssuer[j].signer]) {
+          continue;
         }
+        totalAttestations = totalAttestations.add(1);
+        countsPerIssuer[i] = countsPerIssuer[i].add(1);
       }
     }
     return (totalAttestations, countsPerIssuer);
@@ -180,6 +181,8 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
+  // TODO reviewers: is it preferable to return an array of `trustedIssuer` indices
+  // (indicating issuer per attestation) instead of counts per attestation?
   function lookupUnrevokedAttestations(
     bytes32 identifier,
     address[] calldata trustedIssuers,
@@ -229,31 +232,32 @@ contract FederatedAttestations is
         j < attestationsPerIssuer.length && currIndex < maxAttestations;
         j = j.add(1)
       ) {
-        if (!revokedSigners[attestationsPerIssuer[j].signer]) {
-          accounts[currIndex] = attestationsPerIssuer[j].account;
-          issuedOns[currIndex] = attestationsPerIssuer[j].issuedOn;
-          signers[currIndex] = attestationsPerIssuer[j].signer;
-          currIndex = currIndex.add(1);
-          countsPerIssuer[i] = countsPerIssuer[i].add(1);
+        if (revokedSigners[attestationsPerIssuer[j].signer]) {
+          continue;
         }
+        accounts[currIndex] = attestationsPerIssuer[j].account;
+        issuedOns[currIndex] = attestationsPerIssuer[j].issuedOn;
+        signers[currIndex] = attestationsPerIssuer[j].signer;
+        currIndex = currIndex.add(1);
+        countsPerIssuer[i] = countsPerIssuer[i].add(1);
       }
+    }
+
+    if (currIndex >= maxAttestations) {
+      return (countsPerIssuer, accounts, issuedOns, signers);
     }
 
     // Trim returned structs if necessary
-    if (currIndex < maxAttestations) {
-      address[] memory trimmedAccounts = new address[](currIndex);
-      uint256[] memory trimmedIssuedOns = new uint256[](currIndex);
-      address[] memory trimmedSigners = new address[](currIndex);
+    address[] memory trimmedAccounts = new address[](currIndex);
+    uint256[] memory trimmedIssuedOns = new uint256[](currIndex);
+    address[] memory trimmedSigners = new address[](currIndex);
 
-      for (uint256 i = 0; i < currIndex; i = i.add(1)) {
-        trimmedAccounts[i] = accounts[i];
-        trimmedIssuedOns[i] = issuedOns[i];
-        trimmedSigners[i] = signers[i];
-      }
-      return (countsPerIssuer, trimmedAccounts, trimmedIssuedOns, trimmedSigners);
-    } else {
-      return (countsPerIssuer, accounts, issuedOns, signers);
+    for (uint256 i = 0; i < currIndex; i = i.add(1)) {
+      trimmedAccounts[i] = accounts[i];
+      trimmedIssuedOns[i] = issuedOns[i];
+      trimmedSigners[i] = signers[i];
     }
+    return (countsPerIssuer, trimmedAccounts, trimmedIssuedOns, trimmedSigners);
   }
 
   /**
@@ -323,12 +327,13 @@ contract FederatedAttestations is
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
       for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
-        if (includeRevoked || (!revokedSigners[attestationsPerIssuer[j].signer])) {
-          accounts[totalAttestations] = attestationsPerIssuer[j].account;
-          issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
-          signers[totalAttestations] = attestationsPerIssuer[j].signer;
-          totalAttestations = totalAttestations.add(1);
+        if (!includeRevoked && revokedSigners[attestationsPerIssuer[j].signer]) {
+          continue;
         }
+        accounts[totalAttestations] = attestationsPerIssuer[j].account;
+        issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
+        signers[totalAttestations] = attestationsPerIssuer[j].signer;
+        totalAttestations = totalAttestations.add(1);
       }
     }
     return (countsPerIssuer, accounts, issuedOns, signers);
@@ -363,11 +368,12 @@ contract FederatedAttestations is
         for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
           OwnershipAttestation memory attestation = attestationsPerIssuer[k];
           // (identifier, account, issuer) tuples are checked for uniqueness on registration
-          if (attestation.account == account && !revokedSigners[attestation.signer]) {
-            totalIdentifiers = totalIdentifiers.add(1);
-            countsPerIssuer[i] = countsPerIssuer[i].add(1);
-            break;
+          if (!(attestation.account == account) || revokedSigners[attestation.signer]) {
+            continue;
           }
+          totalIdentifiers = totalIdentifiers.add(1);
+          countsPerIssuer[i] = countsPerIssuer[i].add(1);
+          break;
         }
       }
     }
@@ -437,27 +443,27 @@ contract FederatedAttestations is
         for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
           // (identifier, account, issuer) tuples are checked for uniqueness on registration
           if (
-            attestationsPerIssuer[k].account == account &&
-            !revokedSigners[attestationsPerIssuer[k].signer]
+            !(attestationsPerIssuer[k].account == account) ||
+            revokedSigners[attestationsPerIssuer[k].signer]
           ) {
-            identifiers[currIndex] = identifier;
-            currIndex = currIndex.add(1);
-            countsPerIssuer[i] = countsPerIssuer[i].add(1);
-            break;
+            continue;
           }
+          identifiers[currIndex] = identifier;
+          currIndex = currIndex.add(1);
+          countsPerIssuer[i] = countsPerIssuer[i].add(1);
+          break;
         }
       }
     }
-    if (currIndex < maxIdentifiers) {
-      // Allocate and fill properly-sized array
-      bytes32[] memory trimmedIdentifiers = new bytes32[](currIndex);
-      for (uint256 i = 0; i < currIndex; i = i.add(1)) {
-        trimmedIdentifiers[i] = identifiers[i];
-      }
-      return (countsPerIssuer, trimmedIdentifiers);
-    } else {
+    if (currIndex >= maxIdentifiers) {
       return (countsPerIssuer, identifiers);
     }
+    // Allocate and fill properly-sized array
+    bytes32[] memory trimmedIdentifiers = new bytes32[](currIndex);
+    for (uint256 i = 0; i < currIndex; i = i.add(1)) {
+      trimmedIdentifiers[i] = identifiers[i];
+    }
+    return (countsPerIssuer, trimmedIdentifiers);
   }
 
   /**
@@ -493,12 +499,13 @@ contract FederatedAttestations is
       identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
       for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
         if (
-          includeRevoked ||
-          foundUnrevokedAttestation(account, identifiersPerIssuer[j], trustedIssuers[i])
+          !includeRevoked &&
+          !foundUnrevokedAttestation(account, identifiersPerIssuer[j], trustedIssuers[i])
         ) {
-          identifiers[currIndex] = identifiersPerIssuer[j];
-          currIndex = currIndex.add(1);
+          continue;
         }
+        identifiers[currIndex] = identifiersPerIssuer[j];
+        currIndex = currIndex.add(1);
       }
     }
     return (countsPerIssuer, identifiers);
