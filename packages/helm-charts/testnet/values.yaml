@@ -58,6 +58,10 @@ geth:
   txNodeTolerations: []
   txNodePrivateNodeSelector: {}
   txNodePrivateTolerations: []
+  maxpeers: 1150
+  light:
+    maxpeers: 1000
+    serve: 70
 
 # UpdateStrategy for statefulsets only. Partition=0 is default rollingUpdate behaviour.
 updateStrategy:
@@ -101,3 +105,5 @@ blockscout:
 
 domain:
   name: celo-networks-dev
+
+ingressClassName: nginx
