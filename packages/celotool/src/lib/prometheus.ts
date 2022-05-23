@@ -161,9 +161,6 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set serviceAccount.name=${kubeServiceAccountName}`,
     `--set cluster=${clusterName}`,
-    `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
-    // Disable stackdriver sidecar env wide. TODO: Update to a contexted variable if needed
-    `--set stackdriver.disabled=${stackdriverDisabled}`,
   ]
 
   // Remote write to Grafana Cloud
