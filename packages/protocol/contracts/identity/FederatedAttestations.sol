@@ -674,7 +674,7 @@ contract FederatedAttestations is
 
   function revokeSigner(address signer) public {
     // TODO ASv2 DO NOT MERGE add constraints on who has permissions to revoke a signer
-    // TODO ASv2 DO NOT MERGE consider whether we want to check if the signer is an authorized signer
+    // TODO ASv2 DO NOT MERGE consider whether to check if the signer is an authorized signer
     // or to allow any address to be revoked
     revokedSigners[signer] = true;
   }
