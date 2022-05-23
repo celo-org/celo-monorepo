@@ -32,7 +32,7 @@ contract FederatedAttestations is
     address signer;
   }
 
-  // TODO ASv2 revisit linting issues & all solhint-disable-next-line max-line-length
+  // TODO ASv2 DO NOT MERGE revisit linting issues & all solhint-disable-next-line max-line-length
 
   // identifier -> issuer -> attestations
   mapping(bytes32 => mapping(address => OwnershipAttestation[])) public identifierToAttestations;
@@ -74,7 +74,6 @@ contract FederatedAttestations is
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setEip712DomainSeparator();
-    // TODO ASv2 initialize any other variables here
   }
 
   /**
@@ -674,8 +673,8 @@ contract FederatedAttestations is
   }
 
   function revokeSigner(address signer) public {
-    // TODO ASv2 add constraints on who has permissions to revoke a signer
-    // TODO ASv2 consider whether we want to check if the signer is an authorized signer
+    // TODO ASv2 DO NOT MERGE add constraints on who has permissions to revoke a signer
+    // TODO ASv2 DO NOT MERGE consider whether we want to check if the signer is an authorized signer
     // or to allow any address to be revoked
     revokedSigners[signer] = true;
   }

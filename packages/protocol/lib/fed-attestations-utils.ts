@@ -25,7 +25,7 @@ const getTypedData = (chainId: number, contractAddress: Address, message?: Attes
           { name: 'issuer', type: 'address'},
           { name: 'account', type: 'address' },
           { name: 'issuedOn', type: 'uint256' },
-          // TODO ASv2 Consider including a nonce (which could also be used as an ID)
+          // TODO ASv2 DO NOT MERGE Consider including a nonce (which could also be used as an ID)
       ],
     },
     primaryType: 'OwnershipAttestation',

@@ -16,8 +16,8 @@ testWithGanache('FederatedAttestations Wrapper', (web3) => {
     kit.defaultAccount = accounts[0]
   })
 
-  describe('TODO ASv2', () => {
-    it('TODO ASv2', async () => {
+  describe('TODO ASv2 DO NOT MERGE', () => {
+    it('TODO ASv2 DO NOT MERGE', async () => {
       expect(accounts)
       federatedAttestations = await kit.contracts.getFederatedAttestations()
       expect(federatedAttestations)

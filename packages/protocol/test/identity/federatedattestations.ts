@@ -1250,7 +1250,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#deleteAttestation', () => {
-    // TODO ASv2 check that the actual entries were deleted in both mappings
+    // TODO ASv2 DO NOT MERGE check that the actual entries were deleted in both mappings
     // (for identifiers and attestations)
     beforeEach(async () => {
       await accountsInstance.authorizeSigner(signer1, signerRole, { from: issuer1 })
