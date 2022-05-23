@@ -64,10 +64,10 @@ volumes:
   - -c
   - |
     /while true; do \
-      gsutil rsync -r vyper-compilers gs://compilers/vyper_compilers;\
-      gsutil rsync -r solc-compilers gs://compilers/solc_compilers;\
-      gsutil rsync -r gs://compilers/solc_compilers solc-compilers;\
-      gsutil rsync -r gs://compilers/vyper_compilers vyper-compilers;\
+      gsutil rsync -r -u vyper-compilers gs://compilers/vyper_compilers;\
+      gsutil rsync -r -u solc-compilers gs://compilers/solc_compilers;\
+      gsutil rsync -r -u gs://compilers/solc_compilers solc-compilers;\
+      gsutil rsync -r -u gs://compilers/vyper_compilers vyper-compilers;\
       sleep 600;\
     done
   securityContext:
@@ -79,11 +79,6 @@ volumes:
     mountPath: /opt/app/apps/explorer/priv/vyper_compilers
   - name: solc-compilers
     mountPath: /opt/app/apps/explorer/priv/solc_compilers
-volumes:
-  - name: vyper-compilers
-    emptyDir: {}
-  - name: solc-compilers
-    emptyDir: {}
 {{- end -}}
 
 
