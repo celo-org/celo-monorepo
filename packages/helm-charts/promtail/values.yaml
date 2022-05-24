@@ -28,7 +28,7 @@ config:
         - namespace
       # TODO: reconsider what should be kept from the default namespace
       # eg: ingress controller
-      regex: (alfajores|baklava|default|komenci|rc1|rc1staging|walletconnect)
+      regex: (alfajores|baklava|default|komenci|rc1|rc1staging|staging|walletconnect)
     - action: labeldrop
       regex: (app_kubernetes_io_component|app_kubernetes_io_instance|app.kubernetes.io/managed-by|app_kubernetes_io_managed_by|app_kubernetes_io_name|app_kubernetes_io_version|controller-revision-hash|controller_revision_hash|pod_template_hash|filename)
 
