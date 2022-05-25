@@ -53,6 +53,7 @@ const WrapperFactories = {
   [CeloContract.StableToken]: StableTokenWrapper,
   [CeloContract.StableTokenEUR]: StableTokenWrapper,
   [CeloContract.StableTokenBRL]: StableTokenWrapper,
+  [CeloContract.StableTokenRegistry]: StableTokenRegistryWrapper,
 } as const
 
 const WithRegistry = {
@@ -110,6 +111,7 @@ interface WrapperCacheMap {
   [CeloContract.StableToken]?: StableTokenWrapper
   [CeloContract.StableTokenEUR]?: StableTokenWrapper
   [CeloContract.StableTokenBRL]?: StableTokenWrapper
+  [CeloContract.StableTokenRegistry]: StableTokenRegistryWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
 }
 
