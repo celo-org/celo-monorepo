@@ -79,11 +79,6 @@ spec:
           requests:
             memory: {{ .Values.blockscout.web.resources.requests.memory }}
             cpu: {{ .Values.blockscout.web.resources.requests.cpu }}
-        volumeMounts:
-        - name: vyper-compilers
-          mountPath: /opt/app/apps/explorer/priv/vyper_compilers
-        - name: solc-compilers
-          mountPath: /opt/app/apps/explorer/priv/solc_compilers
         env:
         - name: PORT
           value: {{ .Values.blockscout.web.port | quote }}
@@ -143,7 +138,6 @@ spec:
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
-{{ include "celo.blockscout-volumes" (dict "nfs_volumes" true "Release" .Release) | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
