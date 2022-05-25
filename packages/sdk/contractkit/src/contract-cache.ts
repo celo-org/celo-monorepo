@@ -26,6 +26,7 @@ import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransaction
 import { MultiSigWrapper } from './wrappers/MultiSig'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
+import { StableTokenRegistryWrapper } from './wrappers/StableTokenRegistry'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
 
@@ -66,6 +67,7 @@ const WrapperFactoriesWhichNeedCache = {
   [CeloContract.Governance]: GovernanceWrapper,
   [CeloContract.LockedGold]: LockedGoldWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
+  [CeloContract.StableTokenRegistry]: StableTokenRegistryWrapper,
 }
 
 type CFType = typeof WrapperFactories
