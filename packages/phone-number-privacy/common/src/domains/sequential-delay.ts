@@ -227,9 +227,8 @@ export const checkSequentialDelayRateLimit = (
     state: {
       counter: state.counter + 1,
       timer: resetTimer ? attemptTime : notBefore,
-      disabled: false,
-      now: attemptTime,
       disabled: state.disabled,
+      now: attemptTime,
     },
   }
 }
