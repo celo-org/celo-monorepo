@@ -82,6 +82,13 @@ export interface SequentialDelayDomainState {
   now: number
 }
 
+export const INITIAL_SEQUENTIAL_DELAY_DOMAIN_STATE: SequentialDelayDomainState = {
+  timer: 0,
+  counter: 0,
+  disabled: false,
+  now: 0,
+}
+
 /** io-ts schema for encoding and decoding SequentialDelayStage structs */
 export const SequentialDelayStageSchema: t.Type<SequentialDelayStage> = t.strict({
   delay: t.number,
@@ -162,11 +169,8 @@ export interface SequentialDelayResultAccepted {
 export interface SequentialDelayResultRejected {
   /** Whether or not a request will be accepted at the given time */
   accepted: false
-  /**
-   * State after rejecting the request. Should be unchanged.
-   * May be undefined if rejecting the first request against a domain instance.
-   */
-  state?: SequentialDelayDomainState
+  /** State after rejecting the request. Should be unchanged. */
+  state: SequentialDelayDomainState
   /**
    * Earliest time a request will be accepted at the current stage.
    * Undefined if a request will never be accepted.
@@ -194,37 +198,38 @@ export const checkSequentialDelayRateLimit = (
   attemptTime: number,
   state?: SequentialDelayDomainState
 ): SequentialDelayResult => {
+  state = state ?? INITIAL_SEQUENTIAL_DELAY_DOMAIN_STATE
+
   // If the domain has been disabled, all queries are to be rejected.
-  if (state?.disabled) {
-    return { accepted: false, state }
+  if (state.disabled) {
+    return { accepted: false, state: { ...state, now: attemptTime } }
   }
 
   // If no state is available (i.e. this is the first request against the domain) use the initial state.
-  const counter = state?.counter ?? 0
-  const timer = state?.timer ?? 0
-  const stage = getIndexedStage(domain, counter)
+  const stage = getIndexedStage(domain, state.counter)
 
   // If the counter is past the last stage (i.e. the domain is permanently out of quota) return early.
   if (!stage) {
-    return { accepted: false, state }
+    return { accepted: false, state: { ...state, now: attemptTime } }
   }
 
   const resetTimer = stage.resetTimer.defined ? stage.resetTimer.value : true
-  const delay = getDelay(stage, counter)
-  const notBefore = timer + delay
+  const delay = getDelay(stage, state.counter)
+  const notBefore = state.timer + delay
 
   if (attemptTime < notBefore) {
-    return { accepted: false, notBefore, state }
+    return { accepted: false, notBefore, state: { ...state, now: attemptTime } }
   }
 
   // Request is accepted. Update the state.
   return {
     accepted: true,
     state: {
-      counter: counter + 1,
+      counter: state.counter + 1,
       timer: resetTimer ? attemptTime : notBefore,
       disabled: false,
       now: attemptTime,
+      disabled: state.disabled,
     },
   }
 }
