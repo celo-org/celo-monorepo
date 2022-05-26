@@ -161,9 +161,6 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     `--set prometheus.imageTag=${prometheusImageTag}`,
     `--set serviceAccount.name=${kubeServiceAccountName}`,
     `--set cluster=${clusterName}`,
-    `--set stackdriver_metrics_prefix=external.googleapis.com/prometheus/${clusterName}`,
-    // Disable stackdriver sidecar env wide. TODO: Update to a contexted variable if needed
-    `--set stackdriver.disabled=${stackdriverDisabled}`,
   ]
 
   // Remote write to Grafana Cloud
@@ -174,6 +171,8 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
   if (usingGCP) {
     // Note: ssd is not the default storageClass in GCP clusters
     params.push(`--set storageClassName=ssd`)
+  } else if (context?.startsWith('AZURE_ODIS')) {
+    params.push(`--set storageClassName=default`)
   }
 
   if (stackdriverDisabled.toLowerCase() === 'false') {
@@ -181,13 +180,19 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
       // Disable stackdriver sidecar env wide. TODO: Update to a contexted variable if needed
       `--set stackdriver.disabled=false`,
       `--set stackdriver.sidecar.imageTag=${sidecarImageTag}`,
-      `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`,
       `--set stackdriver.gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
         clusterName,
         cloudProvider,
         gcloudProject
       )}`
     )
+
+    // Metrics prefix for non-ODIS clusters.
+    if (!context?.startsWith('AZURE_ODIS')) {
+      params.push(
+        `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`
+      )
+    }
 
     if (usingGCP) {
       const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
