@@ -4,7 +4,6 @@ metadata:
   name: prometheus-server
   labels:
 {{ include "prometheus-stackdriver.labels" .  | indent 4 }}
-  namespace: {{ .Values.namespace }}
 spec:
   ports:
   - name: web

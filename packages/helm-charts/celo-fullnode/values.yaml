@@ -48,6 +48,10 @@ storage:
   storageClass: default
   accessModes: ReadWriteOnce
   size: 20Gi
+  snapshot:
+    enabled: false
+    kind: VolumeSnapshot
+    name: forno-snapshot
 
 geth:
   image:

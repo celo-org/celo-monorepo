@@ -5,7 +5,7 @@ metadata:
   labels:
 {{ include "common.standard.labels" .  | indent 4 }}
     component: health-check-config-map
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.namespace }}
 data:
   health-check.sh: |-
     #!/bin/sh

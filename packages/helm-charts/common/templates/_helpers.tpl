@@ -3,7 +3,7 @@
 Expand the name of the chart.
 */}}
 {{- define "common.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default $.Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -25,7 +25,7 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{- define "common.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" $.Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "common.standard.labels" -}}
@@ -116,8 +116,15 @@ fi
     NAT_FLAG=""
     if [[ ! -z $IP_ADDRESSES ]]; then
       NAT_IP=$(echo "$IP_ADDRESSES" | awk -v RID=$(expr "$RID" + "1") '{split($0,a,","); print a[RID]}')
-    else
-      NAT_IP=$(cat /root/.celo/ipAddress)
+    fi
+
+    # Taking local ip for natting (probably this means pod cannot have incomming connection from external LAN peers)
+    if [[ -z $NAT_IP ]]; then
+      if [[ -f /root/.celo/ipAddress]]; then
+        NAT_IP=$(cat /root/.celo/ipAddress)
+      else
+        NAT_IP=$(hostname -i)
+      fi
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
 
@@ -523,12 +530,12 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
       lastBlockTimestamp=$(timeout 600 geth console --maxpeers 0 --light.maxpeers 0 --syncmode full --txpool.nolocals --exec "eth.getBlock(\"latest\").timestamp")
       day=$(date +%s)
       diff=$(($day - $lastBlockTimestamp))
-      # If lastBlockTimestamp is older than 20 day old, pull the chaindata rather than using the current PVC.
+      # If lastBlockTimestamp is older than 20 days, pull the chaindata rather than using the current PVC.
       if [ "$diff" -gt 1728000 ]; then
-        echo Chaindata is more than one day out of date. Wiping existing chaindata.
+        echo Chaindata is more than 20 days out of date. Wiping existing chaindata.
         rm -rf /root/.celo/celo/chaindata
       else
-        echo Chaindata is less than one day out of date. Using existing chaindata.
+        echo Chaindata is less than 20 days out of date. Using existing chaindata.
       fi
     else
       echo No chaindata at all.
@@ -536,6 +543,10 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+  resources:
+    requests:
+      cpu: "2"
+      memory: 4Gi
 {{- end -}}
 
 {{- /* Needs a serviceAccountName in the pod with permissions to access gstorage */ -}}
@@ -553,12 +564,17 @@ prometheus.io/port: "{{ $pprof.port | default 6060 }}"
        exit 0
      fi
      mkdir -p /root/.celo/celo
-     gsutil -m cp -r gs://{{ .Values.geth.gstorage_data_bucket }}/chaindata-latest.tar.gz chaindata.tar.gz
+     cd /root/.celo/celo
+     curl -L https://storage.googleapis.com/{{ .Values.geth.gstorage_data_bucket }}/chaindata-latest.tar.gz --output chaindata.tar.gz
      tar -xzvf chaindata.tar.gz -C /root/.celo/celo
-     rm chaindata.tar.gz
+     rm -f chaindata.tar.gz
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+  resources:
+    requests:
+      cpu: "1"
+      memory: 2Gi
 {{- end -}}
 
 {{- define "common.geth-add-metrics-pprof-config" }}
