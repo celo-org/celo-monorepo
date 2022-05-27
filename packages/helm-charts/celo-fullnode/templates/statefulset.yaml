@@ -6,7 +6,7 @@ metadata:
 {{ include "common.standard.labels" .  | indent 4 }}
     component: celo-fullnode
 spec:
-{{ if .Values.storage.enable }}
+  {{- if .Values.storage.enable }}
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -20,9 +20,9 @@ spec:
       dataSource:
         apiGroup: snapshot.storage.k8s.io
         kind: {{ .Values.storage.snapshot.kind | default "VolumeSnapshot" }}
-        name: {{ .Values.storage.snapshot.name | default "forno-snapshot" }}
+        name: {{ .Values.storage.snapshot.name }}
       {{- end }}
-{{ end }}
+  {{- end }}
   podManagementPolicy: Parallel
   updateStrategy:
 {{ toYaml .Values.geth.updateStrategy | indent 4 }}
