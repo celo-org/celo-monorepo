@@ -85,6 +85,7 @@ geth:
   readiness_probe_max_block_age_seconds: 30
   readiness_probe_max_block_epoch_age_seconds: 300
   rpc_apis: eth,net,rpc,web3
+  rpc_gascap: 10000000
   create_network_endpoint_group: false
   updateStrategy:
     type: RollingUpdate

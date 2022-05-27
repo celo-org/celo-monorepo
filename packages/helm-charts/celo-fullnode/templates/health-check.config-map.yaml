@@ -9,4 +9,8 @@ metadata:
 data:
   health-check.sh: |-
     #!/bin/sh
-{{ include "common.node-health-check" (dict "maxpeers" .Values.geth.maxpeers "light_maxpeers" .Values.geth.light.maxpeers ) | indent 4 }}
+    if [ -f /data-shared/ready ]; then
+      exit 0
+    else
+      exit 1
+    fi

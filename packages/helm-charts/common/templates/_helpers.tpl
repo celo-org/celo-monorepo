@@ -198,6 +198,7 @@ fi
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \
+      --rpc.gascap={{- printf "%v" (default (int .Values.geth.rpc_gascap) (int .rcp_gascap)) -}} \
       ${NAT_FLAG} \
       --consoleformat=json \
       --consoleoutput=stdout \
@@ -268,6 +269,8 @@ fi
   volumeMounts:
   - name: data
     mountPath: /root/.celo
+  - name: data-shared
+    mountPath: /data-shared
 {{- if .ethstats }}
   - name: account
     mountPath: /root/.celo/account
@@ -437,7 +440,15 @@ EOF
 }
 
 # Check if scripts prints 'CELO BLOCKCHAIN IS READY' as readiness signal
-isReady | grep 'CELO BLOCKCHAIN IS READY'
+isReady | grep 'CELO BLOCKCHAIN IS READY' >/dev/null
+outputIsReady=$?
+if [ $outputIsReady -eq 0 ]; then
+  touch /data-shared/ready
+  exit 0
+else
+  rm -f /data-shared/ready
+  exit 1
+fi
 {{- end }}
 
 {{- define "common.geth-exporter-container" -}}
