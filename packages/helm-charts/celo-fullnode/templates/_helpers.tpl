@@ -90,4 +90,6 @@ ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http.timeout.read 600 --http.timeout.wri
   - name: health-check
     mountPath: /health-check.sh
     subPath: health-check.sh
+  - name: data-shared
+    mountPath: /data-shared
 {{- end -}}
