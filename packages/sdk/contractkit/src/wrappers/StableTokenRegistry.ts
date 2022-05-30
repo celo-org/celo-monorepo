@@ -1,9 +1,10 @@
+import { string } from 'io-ts'
 import { StableTokenRegistry } from '../generated/StableTokenRegistry'
 import { BaseWrapper, proxyCall } from './BaseWrapper'
 
 interface ContractInstance {
   concatenatedContracts: string
-  contractLengths: number[]
+  contractLengths: string
 }
 
 export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry> {
@@ -16,7 +17,7 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
    * @return concatenatedContract, ContractLengths
    */
   async getContractInstances(): Promise<ContractInstance> {
-    const ret = await Promise.all(this.contract.methods.getContractInstances())
+    const ret = await Promise.resolve(this.contract.methods.getContractInstances())
     return {
       concatenatedContracts: Object.keys(ret)[0],
       contractLengths: Object.keys(ret)[1],
