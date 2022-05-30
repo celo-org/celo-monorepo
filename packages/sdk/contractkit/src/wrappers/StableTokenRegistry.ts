@@ -2,6 +2,12 @@ import Web3 from 'web3'
 import { StableTokenRegistry } from '../generated/StableTokenRegistry'
 import { BaseWrapper, proxyCall } from './BaseWrapper'
 
+/**
+ * Returns the contatenated contracts and each of their lengths
+ * @param contractHex concatenated contracts
+ * @param lengths their lengths
+ * @return string array containing contract names
+ */
 const returnSTContractNames = (contractsHex: string, lengths: string[]): string[] => {
   const contracts = Web3.utils.hexToUtf8(contractsHex)
   let currentIndex = 0
