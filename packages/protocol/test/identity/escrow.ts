@@ -1,6 +1,6 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
+import { assertRevert, assertRevertWithReason, timeTravel } from '@celo/protocol/lib/test-utils'
 import {
   EscrowContract,
   EscrowInstance,
@@ -118,61 +118,89 @@ contract('Escrow', (accounts: string[]) => {
       await mockERC20Token.mint(sender, aValue)
     })
 
-    describe('#transfer()', () => {
-      // in the protocol layer, the amount of verifications is not checked. So, any account
-      // can get sent an escrowed payment.
-      it('should allow users to transfer tokens to any user', async () => {
+    xdescribe('#transfer()', async () => {
+      const runTransferSuccessCase = async (
+        escrowSender: string,
+        identifier: string,
+        value: number,
+        expirySeconds: number,
+        paymentId: string,
+        minAttestations: number
+      ) => {
+        const startingEscrowContractBalance = (
+          await mockERC20Token.balanceOf(escrow.address)
+        ).toNumber()
+        const startingSenderBalance = (await mockERC20Token.balanceOf(escrowSender)).toNumber()
+
         await escrow.transfer(
-          aPhoneHash,
+          identifier,
           mockERC20Token.address,
-          aValue,
-          oneDayInSecs,
-          withdrawKeyAddress,
-          0,
-          {
-            from: sender,
-          }
+          value,
+          expirySeconds,
+          paymentId,
+          minAttestations,
+          { from: escrowSender }
         )
+        const escrowedPayment = await getEscrowedPayment(paymentId, escrow)
 
-        const uniquePaymentID: string = withdrawKeyAddress
-
-        const escrowedPayment = await getEscrowedPayment(uniquePaymentID, escrow)
-
-        const received = await escrow.receivedPaymentIds(aPhoneHash, escrowedPayment.receivedIndex)
-
+        const received = await escrow.receivedPaymentIds(identifier, escrowedPayment.receivedIndex)
         assert.equal(
           received,
-          uniquePaymentID,
-          "Correct Escrowed Payment ID should be stored in aPhoneHash's received payments list"
+          paymentId,
+          "expected paymentId not found at expected index in identifier's received payments list"
         )
 
-        const sent = await escrow.sentPaymentIds(sender, escrowedPayment.sentIndex)
-
+        const sent = await escrow.sentPaymentIds(escrowSender, escrowedPayment.sentIndex)
         assert.equal(
           sent,
-          uniquePaymentID,
-          "Correct Escrowed Payment ID should be stored in sender's sent payments list"
+          paymentId,
+          "expected paymentId not found in escrowSender's sent payments list"
         )
-
         assert.equal(
           escrowedPayment.value,
-          aValue,
-          'Should have correct value saved in payment struct'
+          value,
+          'incorrect escrowedPayment.value in payment struct'
         )
 
         assert.equal(
-          (await mockERC20Token.balanceOf(receiver)).toNumber(),
-          0,
-          'Should have correct total balance for receiver'
+          (await mockERC20Token.balanceOf(escrowSender)).toNumber(),
+          startingSenderBalance - value,
+          'incorrect final sender balance'
         )
         assert.equal(
           (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
+          startingEscrowContractBalance + value,
+          'incorrect final Escrow contract balance'
+        )
+      }
+
+      it('should allow users to transfer tokens to any user', async () => {
+        await runTransferSuccessCase(
+          sender,
+          aPhoneHash,
           aValue,
-          'Should have correct total balance for the escrow contract'
+          oneDayInSecs,
+          withdrawKeyAddress,
+          0
         )
       })
 
-      it('should not allow two transfers with same ID', async () => {
+      it('should allow transfer when minAttestations > 0 and identifier is provided', async () => {
+        await runTransferSuccessCase(
+          sender,
+          aPhoneHash,
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          3
+        )
+      })
+
+      it('should allow transfer when no identifier is provided', async () => {
+        await runTransferSuccessCase(sender, '0x0', aValue, oneDayInSecs, withdrawKeyAddress, 0)
+      })
+
+      it('should not allow two transfers with same paymentId', async () => {
         await escrow.transfer(
           aPhoneHash,
           mockERC20Token.address,
@@ -184,7 +212,7 @@ contract('Escrow', (accounts: string[]) => {
             from: sender,
           }
         )
-        await assertRevert(
+        await assertRevertWithReason(
           escrow.transfer(
             aPhoneHash,
             mockERC20Token.address,
@@ -195,7 +223,8 @@ contract('Escrow', (accounts: string[]) => {
             {
               from: sender,
             }
-          )
+          ),
+          'paymentId already used'
         )
       })
 
@@ -232,10 +261,19 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should not allow a transfer if identifier is empty but minAttestations is > 0', async () => {
-        await assertRevert(
-          escrow.transfer('0x0', mockERC20Token.address, aValue, 0, withdrawKeyAddress, 1, {
-            from: sender,
-          })
+        await assertRevertWithReason(
+          escrow.transfer(
+            '0x0',
+            mockERC20Token.address,
+            aValue,
+            oneDayInSecs,
+            withdrawKeyAddress,
+            1,
+            {
+              from: sender,
+            }
+          ),
+          "Invalid privacy inputs: Can't require attestations if no identifier"
         )
       })
     })
