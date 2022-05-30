@@ -21,7 +21,7 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
 
   /**
    * Returns the contatenated contracts and each of their lengths
-   * @return string array
+   * @return string array containing contract names
    */
   async getContractInstances(): Promise<string[]> {
     const ret = await Promise.resolve(this.contract.methods.getContractInstances())
@@ -35,6 +35,6 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
    * @return queried stableTokenContractName
    */
   async queryStableTokenContractNames(fiatTicker: string): Promise<string> {
-    return Promise.resolve(this.stableTokens[fiatTicker])
+    return Promise.resolve(this.stableTokens(fiatTicker))
   }
 }
