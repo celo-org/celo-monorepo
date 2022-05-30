@@ -5,7 +5,6 @@ metadata:
     component: mic
     k8s-app: aad-pod-id
   name: mic
-  namespace: {{ .Values.namespace }}
 spec:
   replicas: 2
   selector:
