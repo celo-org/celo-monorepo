@@ -1,15 +1,14 @@
-import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import { StableTokenRegistry } from '../generated/StableTokenRegistry'
 import { BaseWrapper, proxyCall } from './BaseWrapper'
 
-const returnSTContractNames = (contractsHex: string, lengths: BigNumber[]): string[] => {
+const returnSTContractNames = (contractsHex: string, lengths: string[]): string[] => {
   const contracts = Web3.utils.hexToUtf8(contractsHex)
   let currentIndex = 0
-  let contractsArr = []
-  for (let i = 0; i < lengths.length; i++) {
-    const contract = contracts.slice(currentIndex, currentIndex + lengths[i].toNumber())
-    currentIndex += lengths[i].toNumber()
+  const contractsArr = []
+  for (let i = 0; i < lengths.length - 1; i++) {
+    const contract = contracts.slice(currentIndex, currentIndex + Number(lengths[i]))
+    currentIndex += Number(lengths[i])
     contractsArr.push(contract)
   }
   return contractsArr
@@ -26,8 +25,8 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
    */
   async getContractInstances(): Promise<string[]> {
     const ret = await Promise.resolve(this.contract.methods.getContractInstances())
-    let concatenatedContracts = Object.keys(ret)[0]
-    let contractLengths = Object.keys(ret)[1]
+    const concatenatedContracts = Object.keys(ret)[0]
+    const contractLengths = Object.keys(ret)
     return returnSTContractNames(concatenatedContracts, contractLengths)
   }
 
@@ -36,6 +35,6 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
    * @return queried stableTokenContractName
    */
   async queryStableTokenContractNames(fiatTicker: string): Promise<string> {
-    return this.stableTokens[fiatTicker]
+    return Promise.resolve(this.stableTokens[fiatTicker])
   }
 }
