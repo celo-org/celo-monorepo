@@ -8,6 +8,7 @@ import * as ethUtil from 'ethereumjs-util'
 import { transportErrorFriendlyMessage } from './ledger-utils'
 import { AddressValidation } from './ledger-wallet'
 import { compareLedgerAppVersions, tokenInfoByAddressAndChainId } from './tokens'
+
 const debug = debugFactory('kit:wallet:ledger')
 const CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION = '1.0.2'
 
