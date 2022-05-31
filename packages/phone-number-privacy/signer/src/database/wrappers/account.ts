@@ -1,6 +1,6 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { Transaction } from 'knex'
+import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
@@ -15,7 +15,7 @@ function accounts() {
 export async function getPerformedQueryCount(
   account: string,
   logger: Logger,
-  trx?: Transaction
+  trx?: Knex.Transaction
 ): Promise<number> {
   logger.debug({ account }, 'Getting performed query count')
   const getPerformedQueryCountMeter = Histograms.dbOpsInstrumentation
@@ -48,7 +48,7 @@ export async function getPerformedQueryCount(
 async function getAccountExists(
   account: string,
   logger: Logger,
-  trx?: Transaction
+  trx?: Knex.Transaction
 ): Promise<boolean> {
   const getAccountExistsMeter = Histograms.dbOpsInstrumentation
     .labels('getAccountExists')
@@ -78,7 +78,7 @@ async function getAccountExists(
 export async function incrementQueryCount(
   account: string,
   logger: Logger,
-  trx: Transaction
+  trx: Knex.Transaction
 ): Promise<boolean> {
   const incrementQueryCountMeter = Histograms.dbOpsInstrumentation
     .labels('incrementQueryCount')
@@ -106,7 +106,7 @@ export async function incrementQueryCount(
   }
 }
 
-async function insertRecord(data: Account, logger: Logger, trx: Transaction) {
+async function insertRecord(data: Account, logger: Logger, trx: Knex.Transaction) {
   try {
     await accounts().transacting(trx).insert(data).timeout(DB_TIMEOUT)
     return true

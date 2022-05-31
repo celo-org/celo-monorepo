@@ -1,6 +1,6 @@
 import { DB_TIMEOUT, Domain, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { Transaction } from 'knex'
+import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import {
@@ -16,7 +16,7 @@ function domainRequests() {
 export async function getDomainRequestRecordExists<D extends Domain>(
   domain: D,
   blindedMessage: string,
-  trx: Transaction<DomainRequestRecord<D>>,
+  trx: Knex.Transaction<DomainRequestRecord<D>>,
   logger: Logger
 ): Promise<boolean> {
   const getRequestRecordExistsMeter = Histograms.dbOpsInstrumentation
@@ -46,7 +46,7 @@ export async function getDomainRequestRecordExists<D extends Domain>(
 export async function storeDomainRequestRecord<D extends Domain>(
   domain: D,
   blindedMessage: string,
-  trx: Transaction<DomainRequestRecord<D>>,
+  trx: Knex.Transaction<DomainRequestRecord<D>>,
   logger: Logger
 ) {
   const storeRequestRecordMeter = Histograms.dbOpsInstrumentation

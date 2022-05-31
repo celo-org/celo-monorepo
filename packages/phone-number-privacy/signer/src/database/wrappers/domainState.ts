@@ -1,7 +1,7 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Domain, domainHash } from '@celo/phone-number-privacy-common/lib/domains'
 import Logger from 'bunyan'
-import { Transaction } from 'knex'
+import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import { DomainStateRecord, DOMAIN_STATE_COLUMNS, DOMAIN_STATE_TABLE } from '../models/domainState'
@@ -12,7 +12,7 @@ function domainStates() {
 
 export async function setDomainDisabled<D extends Domain>(
   domain: D,
-  trx: Transaction<DomainStateRecord<D>>,
+  trx: Knex.Transaction<DomainStateRecord<D>>,
   logger: Logger
 ): Promise<void> {
   const disableDomainMeter = Histograms.dbOpsInstrumentation.labels('disableDomain').startTimer()
@@ -36,7 +36,7 @@ export async function setDomainDisabled<D extends Domain>(
 export async function getDomainStateRecordOrEmpty(
   domain: Domain,
   logger: Logger,
-  trx?: Transaction
+  trx?: Knex.Transaction
 ): Promise<DomainStateRecord<Domain>> {
   return (await getDomainStateRecord(domain, logger, trx)) ?? createEmptyDomainStateRecord(domain)
 }
@@ -53,7 +53,7 @@ export function createEmptyDomainStateRecord(domain: Domain) {
 export async function getDomainStateRecord<D extends Domain>(
   domain: D,
   logger: Logger,
-  trx?: Transaction<DomainStateRecord<D>>
+  trx?: Knex.Transaction<DomainStateRecord<D>>
 ): Promise<DomainStateRecord<D> | null> {
   const meter = Histograms.dbOpsInstrumentation.labels('getDomainStateRecord').startTimer()
   const hash = domainHash(domain).toString('hex')
@@ -83,7 +83,7 @@ export async function getDomainStateRecord<D extends Domain>(
 export async function updateDomainStateRecord<D extends Domain>(
   domain: D,
   domainState: DomainStateRecord<D>,
-  trx: Transaction<DomainStateRecord<D>>,
+  trx: Knex.Transaction<DomainStateRecord<D>>,
   logger: Logger
 ): Promise<void> {
   const meter = Histograms.dbOpsInstrumentation.labels('updateDomainStateRecord').startTimer()
@@ -116,7 +116,7 @@ export async function updateDomainStateRecord<D extends Domain>(
 
 export async function insertDomainStateRecord<D extends Domain>(
   domainState: DomainStateRecord<D>,
-  trx: Transaction<DomainStateRecord<D>>,
+  trx: Knex.Transaction<DomainStateRecord<D>>,
   logger: Logger
 ): Promise<DomainStateRecord<D>> {
   const insertDomainStateRecordMeter = Histograms.dbOpsInstrumentation

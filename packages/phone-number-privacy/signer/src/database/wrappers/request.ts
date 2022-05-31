@@ -1,6 +1,6 @@
 import { DB_TIMEOUT, ErrorMessage, SignMessageRequest } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { Transaction } from 'knex'
+import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
 import { getDatabase } from '../database'
 import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
@@ -12,7 +12,7 @@ function requests() {
 export async function getRequestExists(
   request: SignMessageRequest,
   logger: Logger,
-  trx: Transaction
+  trx: Knex.Transaction
 ): Promise<boolean> {
   logger.debug({ request }, 'Checking if request exists')
   const getRequestExistsMeter = Histograms.dbOpsInstrumentation
@@ -38,7 +38,11 @@ export async function getRequestExists(
   }
 }
 
-export async function storeRequest(request: SignMessageRequest, logger: Logger, trx: Transaction) {
+export async function storeRequest(
+  request: SignMessageRequest,
+  logger: Logger,
+  trx: Knex.Transaction
+) {
   const storeRequestMeter = Histograms.dbOpsInstrumentation.labels('storeRequest').startTimer()
   logger.debug({ request }, 'Storing salt request')
   try {

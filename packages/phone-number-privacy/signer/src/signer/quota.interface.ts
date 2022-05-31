@@ -5,7 +5,7 @@ import {
   PnpQuotaRequest,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
-import { Transaction } from 'knex'
+import { Knex } from 'knex'
 import { DomainStateRecord } from '../database/models/domainState'
 import { Session } from './action.interface'
 import { PnpQuotaStatus } from './pnp/quota.service'
@@ -24,11 +24,11 @@ export interface IQuotaService<R extends OdisRequest> {
   checkAndUpdateQuotaStatus(
     state: OdisQuotaStatus<R>,
     session: Session<R>,
-    trx: Transaction<OdisQuotaStatus<R>>
+    trx: Knex.Transaction<OdisQuotaStatus<R>>
   ): Promise<OdisQuotaStatusResult<R>>
 
   getQuotaStatus(
     session: Session<R>,
-    trx?: Transaction<OdisQuotaStatus<R>>
+    trx?: Knex.Transaction<OdisQuotaStatus<R>>
   ): Promise<OdisQuotaStatus<R>>
 }

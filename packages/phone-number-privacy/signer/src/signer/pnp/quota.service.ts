@@ -7,7 +7,7 @@ import {
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { Transaction } from 'knex'
+import { Knex } from 'knex'
 import { Counters, Histograms } from '../../common/metrics'
 import config from '../../config'
 import { getPerformedQueryCount, incrementQueryCount } from '../../database/wrappers/account'
@@ -33,7 +33,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
     session: PnpSession<SignMessageRequest>,
-    trx: Transaction
+    trx: Knex.Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
     const remainingQuota = state.totalQuota - state.queryCount
     Histograms.userRemainingQuotaAtRequest.observe(remainingQuota)
@@ -57,7 +57,7 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
 
   public async getQuotaStatus(
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>,
-    trx?: Transaction
+    trx?: Knex.Transaction
   ): Promise<PnpQuotaStatus> {
     const { account } = session.request.body
     const [queryCountResult, totalQuotaResult, blockNumberResult] = await meter(
@@ -107,7 +107,10 @@ export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQu
     return { queryCount, totalQuota, blockNumber }
   }
 
-  protected async updateQuotaStatus(trx: Transaction, session: PnpSession<SignMessageRequest>) {
+  protected async updateQuotaStatus(
+    trx: Knex.Transaction,
+    session: PnpSession<SignMessageRequest>
+  ) {
     // TODO(Alec)(pnp): Review db error handling
     const [requestStored, queryCountIncremented] = await Promise.all([
       storeRequest(session.request.body, session.logger, trx),

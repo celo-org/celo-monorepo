@@ -5,7 +5,7 @@ import {
   ErrorMessage,
   isSequentialDelayDomain,
 } from '@celo/phone-number-privacy-common'
-import { Transaction } from 'knex'
+import { Knex } from 'knex'
 import { DomainStateRecord } from '../../database/models/domainState'
 import {
   getDomainStateRecordOrEmpty,
@@ -22,7 +22,7 @@ export class DomainQuotaService implements IQuotaService<QuotaDependentDomainReq
   async checkAndUpdateQuotaStatus(
     state: DomainStateRecord,
     session: DomainSession<QuotaDependentDomainRequest>,
-    trx: Transaction<DomainStateRecord>,
+    trx: Knex.Transaction<DomainStateRecord>,
     attemptTime?: number
   ): Promise<OdisQuotaStatusResult<QuotaDependentDomainRequest>> {
     const { domain } = session.request.body
@@ -50,7 +50,7 @@ export class DomainQuotaService implements IQuotaService<QuotaDependentDomainReq
 
   async getQuotaStatus(
     session: DomainSession<QuotaDependentDomainRequest>,
-    trx?: Transaction<DomainStateRecord>
+    trx?: Knex.Transaction<DomainStateRecord>
   ): Promise<DomainStateRecord> {
     return getDomainStateRecordOrEmpty(session.request.body.domain, session.logger, trx)
   }
