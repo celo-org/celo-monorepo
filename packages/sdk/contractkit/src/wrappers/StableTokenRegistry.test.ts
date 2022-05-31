@@ -1,12 +1,8 @@
 import { Address } from '@celo/base/lib/address'
-import { NetworkConfig, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import BigNumber from 'bignumber.js'
+import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
 import { newKitFromWeb3 } from '../kit'
-// import { assumeOwnership } from '../test-utils/transferownership'
 import { StableTokenRegistryWrapper } from './StableTokenRegistry'
-
-const expConfig = NetworkConfig.stableTokenRegistry
 
 testWithGanache('StableTokenRegistry Wrapper', (web3: Web3) => {
   const kit = newKitFromWeb3(web3)
@@ -20,8 +16,18 @@ testWithGanache('StableTokenRegistry Wrapper', (web3: Web3) => {
   })
 
   describe('Verifying that it always has correct values', () => {
-    it('deployes already issued tokens', () => {
-      expect(stableTokenRegistry.methodIds.fiatTickers).toEqual(['USD', 'EUR', 'BRL'])
+    it('has the correct list of fiatTicker', () => {
+      expect(stableTokenRegistry.FiatTickers()).toEqual(['USD', 'EUR', 'BRL'])
+    })
+    it('has the correct list of stable token contracts', () => {
+      expect(stableTokenRegistry.getContractInstances()).toEqual([
+        'StableToken',
+        'StableTokenEUR',
+        'StableTokenBRL',
+      ])
+    })
+    it('can query stable token contract names', () => {
+      expect(stableTokenRegistry.queryStableTokenContractNames('USD')).toEqual('StableToken')
     })
   })
 })
