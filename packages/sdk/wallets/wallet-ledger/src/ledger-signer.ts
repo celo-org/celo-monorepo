@@ -12,6 +12,9 @@ import { compareLedgerAppVersions, tokenInfoByAddressAndChainId } from './tokens
 const debug = debugFactory('kit:wallet:ledger')
 const CELO_APP_ACCEPTS_CONTRACT_DATA_FROM_VERSION = '1.0.2'
 
+// TransportStatusError is written as a function so it cant be used as a type
+type TransportStatusErrorType = Error & { statusCode: number; statusText: string }
+
 /**
  * Signs the EVM transaction with a Ledger device
  */
@@ -60,15 +63,15 @@ export class LedgerSigner implements Signer {
       }
       signature.v = addToV.toString(10)
       return {
-        v: parseInt(signature.v, 10), // TODO check if this should be a 10 and not a 16
+        v: parseInt(signature.v, 10),
         r: ethUtil.toBuffer(ensureLeading0x(signature.r)) as Buffer,
         s: ethUtil.toBuffer(ensureLeading0x(signature.s)) as Buffer,
       }
     } catch (error: any) {
       if (error instanceof TransportStatusError) {
         // The Ledger fails if it doesn't know the feeCurrency
-        // @ts-ignore
-        if (error.statusCode === 27264 && error.statusText === 'INCORRECT_DATA') {
+        const transError = error as TransportStatusErrorType
+        if (transError.statusCode === 27264 && transError.statusText === 'INCORRECT_DATA') {
           debug('Possible invalid feeCurrency field')
           throw new Error(
             'ledger-signer@signTransaction: Incorrect Data. Verify that the feeCurrency is a valid one'
