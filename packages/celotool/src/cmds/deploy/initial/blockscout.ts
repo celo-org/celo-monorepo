@@ -4,7 +4,6 @@ import {
   getInstanceName,
   getReleaseName,
   installHelmChart,
-  installNFSServerProvisioner,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
@@ -62,7 +61,6 @@ export const handler = async (argv: InitialArgv) => {
 
   if (!isCelotoolHelmDryRun()) {
     await createGrafanaTagAnnotation(argv.celoEnv, imageTag, dbSuffix)
-    await installNFSServerProvisioner(argv.celoEnv)
     await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
   }
 }

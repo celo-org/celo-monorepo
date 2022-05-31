@@ -5,7 +5,6 @@ apiVersion: monitoring.gke.io/v1alpha1
 kind: PodMonitor
 metadata:
   name: "{{ $.Release.Name }}-{{ $target.service }}"
-  namespace: {{ $.Values.namespace }}
 
 spec:
   # Namespaces to search for pods.
@@ -46,7 +45,6 @@ apiVersion: monitoring.gke.io/v1alpha1
 kind: PodMonitor
 metadata:
   name: "{{ $.Release.Name }}-kube-state"
-  namespace: {{ $.Values.namespace }}
 
 spec:
   namespaceSelector:
