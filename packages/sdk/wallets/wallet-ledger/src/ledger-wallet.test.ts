@@ -149,12 +149,11 @@ function mockLedger(wallet: LedgerWallet, mockForceValidation: () => void) {
           domainSeparator: string,
           structHash: string
         ) => {
-          const encoder = new TextEncoder()
           const messageHash = ethUtil.sha3(
             Buffer.concat([
               Buffer.from('1901', 'hex'),
-              encoder.encode(domainSeparator),
-              encoder.encode(structHash),
+              Buffer.from(domainSeparator, 'hex'),
+              Buffer.from(structHash, 'hex'),
             ])
           ) as Buffer
 
@@ -424,6 +423,17 @@ describe('LedgerWallet class', () => {
               expect(signedMessage).not.toBeUndefined()
               const valid = verifyEIP712TypedDataSigner(TYPED_DATA, signedMessage, knownAddress)
               expect(valid).toBeTruthy()
+            },
+            TEST_TIMEOUT_IN_MS
+          )
+
+          test(
+            'returns correctly',
+            async () => {
+              const signedMessage = await wallet.signTypedData(knownAddress, TYPED_DATA)
+              expect(signedMessage).toEqual(
+                '0x51a454925c2ff4cad0a09cc64fc970685a17f39b2c3a843323f0cc08942d413d15e1ee8c7ff2e12e85eaf1f887cadfbb20b270a579f0945f30de2a73cad4d8ce01'
+              )
             },
             TEST_TIMEOUT_IN_MS
           )
