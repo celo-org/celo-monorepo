@@ -279,6 +279,8 @@ contract('Escrow', (accounts: string[]) => {
     })
 
     async function doubleTransfer() {
+      // EN TODO: refactor this into a single transfer
+      // this is super confusing --> the second mint happens outside, in the main function
       await mockERC20Token.mint(sender, aValue)
       await escrow.transfer(
         aPhoneHash,
@@ -305,37 +307,217 @@ contract('Escrow', (accounts: string[]) => {
       )
     }
 
+    // TODO EN REFACTOR
+    // describe('#withdraw with identifier == 0 flow', () => {
+    //   // it.only('should allow user to withdraw escrowed tokens without verified identifier', async () => {
+    //   //   await mockERC20Token.mint(sender, aValue)
+    //   //   await escrow.transfer(
+    //   //     '0x0',
+    //   //     mockERC20Token.address,
+    //   //     aValue,
+    //   //     oneDayInSecs,
+    //   //     withdrawKeyAddress,
+    //   //     // 0,
+    //   //     1, // old version -- what happens in this case?
+    //   //     {
+    //   //       from: sender,
+    //   //     }
+    //   //   )
+    //   //   const parsedSig = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
+    //   //   await escrow.withdraw(withdrawKeyAddress, parsedSig.v, parsedSig.r, parsedSig.s, {
+    //   //     from: receiver,
+    //   //   })
+    //   //   assert.equal(
+    //   //     (await mockERC20Token.balanceOf(receiver)).toNumber(),
+    //   //     aValue,
+    //   //     'Should have correct total balance for receiver'
+    //   //   )
+    //   //   assert.equal(
+    //   //     (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
+    //   //     0,
+    //   //     'Should have correct total balance for the escrow contract'
+    //   //   )
+    //   //   // TODO EN add all the intense checks -- factor that out of withdraw and then write a function to do those checks
+    //   // })
+    //   it('what happens with revoking with ID == 0x0', async () => {
+    //     await mockERC20Token.mint(sender, aValue)
+    //     await escrow.transfer(
+    //       '0x0',
+    //       mockERC20Token.address,
+    //       aValue,
+    //       oneDayInSecs,
+    //       withdrawKeyAddress,
+    //       0,
+    //       // 1, // old version -- what happens in this case?
+    //       {
+    //         from: sender,
+    //       }
+    //     )
+
+    //     await timeTravel(oneDayInSecs, web3)
+
+    //     const escrowedPaymentBefore = await getEscrowedPayment(withdrawKeyAddress, escrow)
+    //     const receivedEscrowedPaymentsBefore = await escrow.getReceivedPaymentIds('0x0')
+    //     await escrow.revoke(withdrawKeyAddress, { from: sender })
+
+    //     const sentPaymentsAfterRevoke = await escrow.getSentPaymentIds(sender)
+    //     const receivedPaymentsAfterRevoke = await escrow.getReceivedPaymentIds('0x0')
+    //     console.log(escrowedPaymentBefore)
+    //     console.log(receivedEscrowedPaymentsBefore)
+    //     console.log(sentPaymentsAfterRevoke)
+    //     console.log(receivedPaymentsAfterRevoke)
+
+    //     // const parsedSig = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
+    //     // await escrow.withdraw(withdrawKeyAddress, parsedSig.v, parsedSig.r, parsedSig.s, {
+    //     //   from: receiver,
+    //     // })
+    //     // assert.equal(
+    //     //   (await mockERC20Token.balanceOf(receiver)).toNumber(),
+    //     //   aValue,
+    //     //   'Should have correct total balance for receiver'
+    //     // )
+    //     // assert.equal(
+    //     //   (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
+    //     //   0,
+    //     //   'Should have correct total balance for the escrow contract'
+    //     // )
+    //     // TODO EN add all the intense checks -- factor that out of withdraw and then write a function to do those checks
+    //   })
+    // })
+
     describe('#withdraw()', () => {
-      let uniquePaymentIDWithdraw: string
       let parsedSig1: any
-      let parsedSig2: any
+      const uniquePaymentIDWithdraw = withdrawKeyAddress
 
       beforeEach(async () => {
-        parsedSig1 = await getParsedSignatureOfAddress(web3, accounts[2], accounts[5])
-        parsedSig2 = await getParsedSignatureOfAddress(web3, accounts[2], accounts[6])
-        await doubleTransfer()
-        uniquePaymentIDWithdraw = withdrawKeyAddress
+        parsedSig1 = await getParsedSignatureOfAddress(web3, receiver, uniquePaymentIDWithdraw)
+        // TODO EN delete or get rid of or move the doubleTransfer func & do first transfer here
       })
 
-      it('should allow verified users to withdraw their escrowed tokens', async () => {
-        const receivedPaymentsBefore = await escrow.getReceivedPaymentIds(aPhoneHash)
-        const sentPaymentsBefore = await escrow.getSentPaymentIds(sender)
-        const paymentBefore = await getEscrowedPayment(uniquePaymentIDWithdraw, escrow)
-        const sendersLastEscrowedPaymentBefore = await getEscrowedPayment(
-          sentPaymentsBefore[sentPaymentsBefore.length - 1],
-          escrow
-        )
-        const receiversLastEscrowedPaymentBefore = await getEscrowedPayment(
-          receivedPaymentsBefore[receivedPaymentsBefore.length - 1],
-          escrow
-        )
+      const withdrawAndCheckState = async (
+        escrowSender: string,
+        escrowReceiver: string,
+        // parsedSig: any, // TODO -- possibly do this within test case
+        identifier: string,
+        value: number,
+        paymentId: string,
+        minAttestations: number,
+        multipleEscrowsForSenderAndReceiver: boolean
+      ) => {
+        const receiverBalanceBefore = await (
+          await mockERC20Token.balanceOf(escrowReceiver)
+        ).toNumber()
+        const escrowContractBalanceBefore = await (
+          await mockERC20Token.balanceOf(escrow.address)
+        ).toNumber()
+        const receivedPaymentsBefore = await escrow.getReceivedPaymentIds(identifier)
+        const sentPaymentsBefore = await escrow.getSentPaymentIds(escrowSender)
+        const paymentBefore = await getEscrowedPayment(paymentId, escrow)
+        // TODO EN: what is this stuff here for? (last before)
+        // TODO EN: is the best way to parameterize this?
+        let sendersLastEscrowedPaymentBefore: EscrowedPayment
+        let receiversLastEscrowedPaymentBefore: EscrowedPayment
+        // if (sentPaymentsBefore.length > 1 && receivedPaymentsBefore.length > 1) {
 
-        await escrow.withdraw(uniquePaymentIDWithdraw, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
-          from: receiver,
+        // Explicitly parameterize this to prevent hidden errors
+        // TODOE EN: revisit this -- should be only toggled "off" when absolutely sure + no prev lengths are 0
+        // multipleEscrowsForSenderAndReceiver ||= sentPaymentsBefore.length > 1 || receivedPaymentsBefore.length > 1
+        if (multipleEscrowsForSenderAndReceiver) {
+          sendersLastEscrowedPaymentBefore = await getEscrowedPayment(
+            sentPaymentsBefore[sentPaymentsBefore.length - 1],
+            escrow
+          )
+          receiversLastEscrowedPaymentBefore = await getEscrowedPayment(
+            receivedPaymentsBefore[receivedPaymentsBefore.length - 1],
+            escrow
+          )
+        } else {
+          // Should only not be checked when there aren't multiple escrows
+          // for the same (sender, receiver)
+          assert.isTrue(sentPaymentsBefore.length <= 1 && receivedPaymentsBefore.length <= 1)
+        }
+        // const sendersLastEscrowedPaymentBefore = await getEscrowedPayment(
+        //   sentPaymentsBefore[sentPaymentsBefore.length - 1],
+        //   escrow
+        // )
+        // const receiversLastEscrowedPaymentBefore = await getEscrowedPayment(
+        //   receivedPaymentsBefore[receivedPaymentsBefore.length - 1],
+        //   escrow
+        // )
+        // TODO can complete n minAttestations as needed
+        console.log('minAttestations: ', minAttestations)
+        const parsedSig = await getParsedSignatureOfAddress(web3, escrowReceiver, paymentId)
+        await escrow.withdraw(paymentId, parsedSig.v, parsedSig.r, parsedSig.s, {
+          from: escrowReceiver,
         })
+        const receivedPaymentsAfterWithdraw = await escrow.getReceivedPaymentIds(identifier)
+        const sentPaymentsAfterWithdraw = await escrow.getSentPaymentIds(escrowSender)
 
-        const receivedPaymentsAfterWithdraw = await escrow.getReceivedPaymentIds(aPhoneHash)
-        const sentPaymentsAfterWithdraw = await escrow.getSentPaymentIds(sender)
+        console.log('receivedPaymentsAfterWithdraw: ', receivedPaymentsAfterWithdraw)
+        console.log('sentPaymentsAfterWithdraw: ', sentPaymentsAfterWithdraw)
+        console.log('sentPaymentsAfterWithdraw.length - 1: ', sentPaymentsAfterWithdraw.length - 1)
+
+        // this should be specific to the "multiple escrows" tests to check index reordering
+        // fails for single escrows
+
+        assert.equal(
+          (await mockERC20Token.balanceOf(escrowReceiver)).toNumber(),
+          receiverBalanceBefore + value, // TODO fix -- update with previous balance, etc.
+          'Should have correct total balance for receiver'
+        )
+
+        assert.equal(
+          (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
+          escrowContractBalanceBefore - value, // TODO fix -- update with previous balance, etc.
+          'Should have correct total balance for the escrow contract'
+        )
+
+        // EN TODO: this belongs in the transfer test (/is already tested there...)
+        // probably not necessary again here
+        assert.include(
+          receivedPaymentsBefore,
+          paymentId,
+          "Should have saved this escrowed payment in receiver's receivedPaymentIds list after transfer"
+        )
+
+        // EN TODO: keep
+        assert.notInclude(
+          receivedPaymentsAfterWithdraw,
+          paymentId,
+          "Should have deleted this escrowed payment from receiver's receivedPaymentIds list after withdraw"
+        )
+
+        // EN TODO: this belongs in the transfer test (/is already tested there...)
+        // probably not necessary again here
+        assert.include(
+          sentPaymentsBefore,
+          paymentId,
+          "Should have saved this escrowed payment in sender's sentPaymentIds list after transfer"
+        )
+
+        // EN TODO: keep
+        assert.notInclude(
+          sentPaymentsAfterWithdraw,
+          paymentId,
+          "Should have deleted this escrowed payment from sender's sentPaymentIds list after withdraw"
+        )
+
+        // EN TODO: double check that these are doing what we think they're doing now?? are these all undefined??
+        // EN TODO: revisit + redo this stuff for single withdrawal
+        // console.log('sendersLastEscrowedPaymentBefore:', sendersLastEscrowedPaymentBefore)
+        // console.log('receiversLastEscrowedPaymentBefore:', receiversLastEscrowedPaymentBefore)
+        // console.log('paymentBefore:', paymentBefore)
+        // TODO MOVE TO MULTIPLE ESCROWS TESTS
+        // this is only the case for multiple escrows, not for single escrows
+        // even then, this doesn't seem to be checking any invariant in the code,
+        // only checking an invariant in the test it seems...
+        // TODO EN: keep this in the "multi" tests for now, but not in the >= 1 escrow tests
+
+        if (!multipleEscrowsForSenderAndReceiver) {
+          return
+        }
+
+        // Checking assumptions about indices when multiple payments are present
         const sendersLastPaymentAfterWithdraw = await getEscrowedPayment(
           sentPaymentsAfterWithdraw[sentPaymentsAfterWithdraw.length - 1],
           escrow
@@ -344,42 +526,10 @@ contract('Escrow', (accounts: string[]) => {
           receivedPaymentsAfterWithdraw[receivedPaymentsAfterWithdraw.length - 1],
           escrow
         )
-
-        assert.equal(
-          (await mockERC20Token.balanceOf(receiver)).toNumber(),
-          aValue,
-          'Should have correct total balance for receiver'
-        )
-
-        assert.equal(
-          (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
-          aValue,
-          'Should have correct total balance for the escrow contract'
-        )
-
-        assert.include(
-          receivedPaymentsBefore,
-          uniquePaymentIDWithdraw,
-          "Should have saved this escrowed payment in receiver's receivedPaymentIds list after transfer"
-        )
-
-        assert.notInclude(
-          receivedPaymentsAfterWithdraw,
-          uniquePaymentIDWithdraw,
-          "Should have deleted this escrowed payment from receiver's receivedPaymentIds list after withdraw"
-        )
-
-        assert.include(
-          sentPaymentsBefore,
-          uniquePaymentIDWithdraw,
-          "Should have saved this escrowed payment in sender's sentPaymentIds list after transfer"
-        )
-
-        assert.notInclude(
-          sentPaymentsAfterWithdraw,
-          uniquePaymentIDWithdraw,
-          "Should have deleted this escrowed payment from sender's sentPaymentIds list after withdraw"
-        )
+        console.log('sentPaymentsBefore: ', sentPaymentsBefore)
+        console.log('paymentBefore: ', paymentBefore)
+        console.log('sendersLastPaymentAfterWithdraw: ', sendersLastPaymentAfterWithdraw)
+        console.log('receiversLastPaymentAfterWithdraw: ', receiversLastPaymentAfterWithdraw)
 
         assert.notEqual(
           sendersLastEscrowedPaymentBefore.sentIndex,
@@ -392,7 +542,7 @@ contract('Escrow', (accounts: string[]) => {
           paymentBefore.receivedIndex,
           "This escrowed payments receivedIndex should be different from that of receiver's receivedPaymentIds last payment before withdraw"
         )
-
+        // EN TODO: possibly move this to the multiple escrows tests to check index ordering
         assert.equal(
           sendersLastPaymentAfterWithdraw.sentIndex,
           paymentBefore.sentIndex,
@@ -404,32 +554,252 @@ contract('Escrow', (accounts: string[]) => {
           paymentBefore.receivedIndex,
           "Should have changed receivedIndex for this escrowed payment from receiver's receivedPaymentIds list after withdraw"
         )
-      })
+      }
 
-      it('should not allow a user who does not prove ownership of the withdraw key to withdraw tokens', async () => {
-        // The signature is invalidated if it's sent from a different address
-        await assertRevert(
-          escrow.withdraw(uniquePaymentIDWithdraw, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
-            from: accounts[3],
-          })
-        )
-      })
+      describe('when payment is escrowed without an identifier', () => {
+        beforeEach(async () => {
+          await escrow.transfer(
+            '0x0',
+            mockERC20Token.address,
+            aValue,
+            oneDayInSecs,
+            uniquePaymentIDWithdraw,
+            0,
+            {
+              from: sender,
+            }
+          )
+        })
 
-      it('should not allow sender to use withdraw function even if payment has expired', async () => {
-        await timeTravel(oneDayInSecs, web3)
-        await assertRevert(
-          escrow.withdraw(uniquePaymentIDWithdraw, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
-            from: sender,
-          })
-        )
-      })
+        it.only('test with new withdraw func', async () => {
+          await withdrawAndCheckState(
+            sender,
+            receiver,
+            '0x0',
+            aValue,
+            uniquePaymentIDWithdraw,
+            0,
+            false
+          )
+        })
 
-      it('should not allow a user to withdraw a payment if they have fewer than minAttestations', async () => {
-        await assertRevert(
-          escrow.withdraw(anotherWithdrawKeyAddress, parsedSig2.v, parsedSig2.r, parsedSig2.s, {
+        it('should allow withdrawal with possession of PK and no attestations', async () => {
+          const receiverBalanceBefore = (await mockERC20Token.balanceOf(receiver)).toNumber()
+          const escrowContractBalanceBefore = (
+            await mockERC20Token.balanceOf(escrow.address)
+          ).toNumber()
+          await escrow.withdraw(uniquePaymentIDWithdraw, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
             from: receiver,
           })
-        )
+          // TODO EN: more rigorous checks of the sent/received lists
+          assert.equal(
+            (await mockERC20Token.balanceOf(receiver)).toNumber(),
+            receiverBalanceBefore + aValue
+          )
+          assert.equal(
+            (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
+            escrowContractBalanceBefore - aValue
+          )
+        })
+
+        it('should withdraw properly when multiple escrows for an empty identifier exist', async () => {
+          // TODO -- check this within the double escrow section probably?
+        })
+      })
+
+      describe('when one payment is escrowed by a sender for an identifier with >= 1 attestation', () => {
+        beforeEach(async () => {
+          await escrow.transfer(
+            aPhoneHash,
+            mockERC20Token.address,
+            aValue,
+            oneDayInSecs,
+            uniquePaymentIDWithdraw,
+            1,
+            {
+              from: sender,
+            }
+          )
+        })
+
+        // TODO EN: case for no identifier, separate describe block
+        // it('should allow users to withdraw after ')
+
+        it('should allow users to withdraw after completing attestations', async () => {
+          assertRevert(
+            escrow.withdraw(uniquePaymentIDWithdraw, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
+              from: receiver,
+            })
+          )
+          await mockAttestations.complete(aPhoneHash, 0, '0x0', '0x0', { from: receiver })
+          // TODO EN: extract out the tests that check withdraw state (check deleted out of various lists, etc)
+          const receiverBalanceBefore = (await mockERC20Token.balanceOf(receiver)).toNumber()
+          const escrowContractBalanceBefore = (
+            await mockERC20Token.balanceOf(escrow.address)
+          ).toNumber()
+          await escrow.withdraw(uniquePaymentIDWithdraw, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
+            from: receiver,
+          })
+          assert.equal(
+            (await mockERC20Token.balanceOf(receiver)).toNumber(),
+            receiverBalanceBefore + aValue
+          )
+          assert.equal(
+            (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
+            escrowContractBalanceBefore - aValue
+          )
+        })
+
+        it('should not allow a user who does not prove ownership of the withdraw key to withdraw tokens', async () => {
+          // The signature is invalidated if it's sent from a different address
+          await assertRevertWithReason(
+            escrow.withdraw(uniquePaymentIDWithdraw, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
+              from: sender,
+            }),
+            'Failed to prove ownership of the withdraw key'
+          )
+        })
+
+        it('should not allow a user to withdraw a payment if they have fewer than minAttestations', async () => {
+          assertRevertWithReason(
+            escrow.withdraw(uniquePaymentIDWithdraw, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
+              from: receiver,
+            }),
+            'This account does not have enough attestations to withdraw this payment.'
+          )
+        })
+      })
+
+      describe('when multiple payments are escrowed by a sender for an identifier', () => {
+        // let parsedSig2: any
+
+        beforeEach(async () => {
+          // parsedSig2 = await getParsedSignatureOfAddress(web3, receiver, anotherWithdrawKeyAddress)
+          await doubleTransfer()
+          // uniquePaymentIDWithdraw = withdrawKeyAddress
+        })
+
+        it('should allow withdrawing escrowed funds with PK and no required attestations', async () => {
+          const receivedPaymentsBefore = await escrow.getReceivedPaymentIds(aPhoneHash)
+          const sentPaymentsBefore = await escrow.getSentPaymentIds(sender)
+          const paymentBefore = await getEscrowedPayment(uniquePaymentIDWithdraw, escrow)
+          // TODO EN: what is this stuff here for? (last before)
+          const sendersLastEscrowedPaymentBefore = await getEscrowedPayment(
+            sentPaymentsBefore[sentPaymentsBefore.length - 1],
+            escrow
+          )
+          const receiversLastEscrowedPaymentBefore = await getEscrowedPayment(
+            receivedPaymentsBefore[receivedPaymentsBefore.length - 1],
+            escrow
+          )
+
+          await escrow.withdraw(uniquePaymentIDWithdraw, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
+            from: receiver,
+          })
+
+          const receivedPaymentsAfterWithdraw = await escrow.getReceivedPaymentIds(aPhoneHash)
+          const sentPaymentsAfterWithdraw = await escrow.getSentPaymentIds(sender)
+          const sendersLastPaymentAfterWithdraw = await getEscrowedPayment(
+            sentPaymentsAfterWithdraw[sentPaymentsAfterWithdraw.length - 1],
+            escrow
+          )
+          const receiversLastPaymentAfterWithdraw = await getEscrowedPayment(
+            receivedPaymentsAfterWithdraw[receivedPaymentsAfterWithdraw.length - 1],
+            escrow
+          )
+
+          assert.equal(
+            (await mockERC20Token.balanceOf(receiver)).toNumber(),
+            aValue,
+            'Should have correct total balance for receiver'
+          )
+
+          assert.equal(
+            (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
+            aValue,
+            'Should have correct total balance for the escrow contract'
+          )
+
+          // EN TODO: this belongs in the transfer test (/is already tested there...)
+          // probably not necessary again here
+          assert.include(
+            receivedPaymentsBefore,
+            uniquePaymentIDWithdraw,
+            "Should have saved this escrowed payment in receiver's receivedPaymentIds list after transfer"
+          )
+
+          // EN TODO: keep
+          assert.notInclude(
+            receivedPaymentsAfterWithdraw,
+            uniquePaymentIDWithdraw,
+            "Should have deleted this escrowed payment from receiver's receivedPaymentIds list after withdraw"
+          )
+
+          // EN TODO: this belongs in the transfer test (/is already tested there...)
+          // probably not necessary again here
+          assert.include(
+            sentPaymentsBefore,
+            uniquePaymentIDWithdraw,
+            "Should have saved this escrowed payment in sender's sentPaymentIds list after transfer"
+          )
+
+          // EN TODO: keep
+          assert.notInclude(
+            sentPaymentsAfterWithdraw,
+            uniquePaymentIDWithdraw,
+            "Should have deleted this escrowed payment from sender's sentPaymentIds list after withdraw"
+          )
+
+          // EN TODO: redo these next 4, as these are super weird
+          assert.notEqual(
+            sendersLastEscrowedPaymentBefore.sentIndex,
+            paymentBefore.sentIndex,
+            "This escrowed payments sentIndex should be different from that of sender's sentPaymentIds last payment before withdraw"
+          )
+
+          assert.notEqual(
+            receiversLastEscrowedPaymentBefore.receivedIndex,
+            paymentBefore.receivedIndex,
+            "This escrowed payments receivedIndex should be different from that of receiver's receivedPaymentIds last payment before withdraw"
+          )
+
+          assert.equal(
+            sendersLastPaymentAfterWithdraw.sentIndex,
+            paymentBefore.sentIndex,
+            "Should have changed sentIndex for this escrowed payment from sender's sentPaymentIds list after withdraw"
+          )
+
+          assert.equal(
+            receiversLastPaymentAfterWithdraw.receivedIndex,
+            paymentBefore.receivedIndex,
+            "Should have changed receivedIndex for this escrowed payment from receiver's receivedPaymentIds list after withdraw"
+          )
+        })
+
+        // it('should allow users to withdraw after completing attestations', async () => {
+        //   await mockAttestations.complete(aPhoneHash, 0, '0x0', '0x0', { from: receiver })
+        //   const receiverBalanceBefore = await (await mockERC20Token.balanceOf(receiver)).toNumber()
+        //   const escrowContractBalanceBefore = await (
+        //     await mockERC20Token.balanceOf(escrow.address)
+        //   ).toNumber()
+        //   await escrow.withdraw(
+        //     anotherWithdrawKeyAddress,
+        //     parsedSig2.v,
+        //     parsedSig2.r,
+        //     parsedSig2.s,
+        //     {
+        //       from: receiver,
+        //     }
+        //   )
+        //   assert.equal(
+        //     (await mockERC20Token.balanceOf(receiver)).toNumber(),
+        //     receiverBalanceBefore + aValue
+        //   )
+        //   assert.equal(
+        //     (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
+        //     escrowContractBalanceBefore - aValue
+        //   )
+        // })
       })
     })
 
@@ -440,7 +810,7 @@ contract('Escrow', (accounts: string[]) => {
       beforeEach(async () => {
         await doubleTransfer()
         uniquePaymentIDRevoke = withdrawKeyAddress
-        parsedSig1 = await getParsedSignatureOfAddress(web3, accounts[2], accounts[5])
+        parsedSig1 = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
       })
 
       it('should allow sender to redeem payment after payment has expired', async () => {
