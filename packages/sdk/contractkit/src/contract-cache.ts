@@ -111,7 +111,7 @@ interface WrapperCacheMap {
   [CeloContract.StableToken]?: StableTokenWrapper
   [CeloContract.StableTokenEUR]?: StableTokenWrapper
   [CeloContract.StableTokenBRL]?: StableTokenWrapper
-  [CeloContract.StableTokenRegistry]: StableTokenRegistryWrapper
+  [CeloContract.StableTokenRegistry]?: StableTokenRegistryWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
 }
 

@@ -12,4 +12,16 @@ testWithGanache('StableTokenRegistry Wrapper', (web3: Web3) => {
   const kit = newKitFromWeb3(web3)
   let accounts: Address[] = []
   let stableTokenRegistry: StableTokenRegistryWrapper
+
+  beforeAll(async () => {
+    accounts = await web3.eth.getAccounts()
+    kit.defaultAccount = accounts[0]
+    stableTokenRegistry = await kit.contracts.getStableTokenRegistry()
+  })
+
+  describe('Verifying that it always has correct values', () => {
+    it('deployes already issued tokens', () => {
+      expect(stableTokenRegistry.methodIds.fiatTickers).toEqual(['USD', 'EUR', 'BRL'])
+    })
+  })
 })
