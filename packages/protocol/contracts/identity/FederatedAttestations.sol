@@ -61,6 +61,7 @@ contract FederatedAttestations is
     bytes32 indexed identifier,
     address indexed issuer,
     address indexed account,
+    address signer,
     uint64 issuedOn
   );
 
@@ -139,7 +140,7 @@ contract FederatedAttestations is
 
   /**
    * @notice Returns info about up to `maxAttestations` attestations for
-   *   `identifier` produced signers of `trustedIssuers`
+   *   `identifier` produced by signers of `trustedIssuers`
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @return [0] Array of number of attestations returned per issuer
@@ -152,6 +153,8 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
+  // TODO reviewers: is it preferable to return an array of `trustedIssuer` indices
+  // (indicating issuer per attestation) instead of counts per attestation?
   function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
     external
     view
@@ -279,11 +282,10 @@ contract FederatedAttestations is
    * @param v The recovery id of the incoming ECDSA signature
    * @param r Output value r of the ECDSA signature
    * @param s Output value s of the ECDSA signature
-   * @return Whether the signature is valid and the signer is authorized to make attestations.
    * @dev Throws if attestation has been revoked
    * @dev Throws if signer is not an authorized AttestationSigner of the issuer
    */
-  function isValidAttestation(
+  function validateAttestation(
     bytes32 identifier,
     address issuer,
     address account,
@@ -292,7 +294,7 @@ contract FederatedAttestations is
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) public view returns (bool) {
+  ) public view {
     require(
       !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
       "Attestation has been revoked"
@@ -330,14 +332,14 @@ contract FederatedAttestations is
     bytes32 identifier,
     address issuer,
     address account,
-    uint64 issuedOn,
     address signer,
+    uint64 issuedOn,
     uint8 v,
     bytes32 r,
     bytes32 s
   ) external {
     // TODO allow for updating existing attestation by only updating signer and publishedOn
-    isValidAttestation(identifier, issuer, account, issuedOn, signer, v, r, s);
+    validateAttestation(identifier, issuer, account, issuedOn, signer, v, r, s);
     for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
       // This enforces only one attestation to be uploaded
       // for a given set of (identifier, issuer, account)
@@ -347,7 +349,7 @@ contract FederatedAttestations is
         "Attestation for this account already exists"
       );
     }
-    uint64 publishedOn = uint64(now);
+    uint64 publishedOn = uint64(block.timestamp);
     OwnershipAttestation memory attestation = OwnershipAttestation(
       account,
       signer,
@@ -408,7 +410,7 @@ contract FederatedAttestations is
         );
         revokedAttestations[attestationHash] = true;
 
-        emit AttestationRevoked(identifier, issuer, account, issuedOn);
+        emit AttestationRevoked(identifier, issuer, account, signer, issuedOn);
         return;
       }
     }
