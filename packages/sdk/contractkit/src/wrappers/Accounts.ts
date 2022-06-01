@@ -325,39 +325,24 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   /**
-   * Removes signing authorization from the default signer associated with a particular role
-   * @param role the role that has been authorized for a signer
+   * Removes the currently authorized vote signer for the account
    * @returns A CeloTransactionObject
    */
-  async removeDefaultSigner(role: string): Promise<CeloTransactionObject<void>> {
+   async removeVoteSigner(): Promise<CeloTransactionObject<void>> {
     return toTransactionObject(
       this.connection,
-      this.contract.methods.removeDefaultSigner(this.keccak256(role))
+      this.contract.methods.removeVoteSigner()
     )
   }
 
   /**
-   * Removes signing authorization from the indexed signer associated with a particular role
-   * @param role the role that has been authorized for a signer
+   * Removes the currently authorized attestation signer for the account
    * @returns A CeloTransactionObject
    */
-  async removeIndexedSigner(role: string): Promise<CeloTransactionObject<void>> {
+  async removeAttestationSigner(): Promise<CeloTransactionObject<void>> {
     return toTransactionObject(
       this.connection,
-      this.contract.methods.removeIndexedSigner(this.keccak256(role))
-    )
-  }
-
-  /**
-   * Removes the currently authorized signer for a particular role and if the signer is indexed, remove that as well
-   * @param signer the address of the signer
-   * @param role the role that has been authorized for a signer
-   * @returns A CeloTransactionObject
-   */
-  async removeSigner(signer: Address, role: string): Promise<CeloTransactionObject<void>> {
-    return toTransactionObject(
-      this.connection,
-      this.contract.methods.removeSigner(signer, this.keccak256(role))
+      this.contract.methods.removeAttestationSigner()
     )
   }
 
