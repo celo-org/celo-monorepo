@@ -64,6 +64,23 @@ testWithGanache('Accounts Wrapper', (web3) => {
       })
   }
 
+  test('SBAT authorize attestation key', async () => {
+    const account = accounts[0]
+    const signer = accounts[1]
+    await accountsInstance.createAccount()
+    const sig = await getParsedSignatureOfAddress(account, signer)
+    await accountsInstance.authorizeAttestationSigner(account, sig)
+  })
+
+  test('SBAT remove attestation key authorization', async () => {
+    const account = accounts[0]
+    const signer = accounts[1]
+    await accountsInstance.createAccount()
+    const sig = await getParsedSignatureOfAddress(account, signer)
+    await accountsInstance.authorizeAttestationSigner(account, sig)
+    await accountsInstance.removeAttestationSigner()
+  })
+
   test('SBAT authorize validator key when not a validator', async () => {
     const account = accounts[0]
     const signer = accounts[1]

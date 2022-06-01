@@ -42,7 +42,6 @@ export default class Deauthorize extends BaseCommand {
 
     let tx = await accounts.removeAttestationSigner()
 
-
     await displaySendTx('deauthorizeTx', tx)
   }
 }
