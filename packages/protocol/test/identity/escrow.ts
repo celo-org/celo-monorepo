@@ -121,15 +121,15 @@ contract('Escrow', (accounts: string[]) => {
     })
 
     describe('#transfer()', async () => {
-      const runTransferCase = async (
+      const transferAndCheckState = async (
         escrowSender: string,
         identifier: string,
         value: number,
         expirySeconds: number,
         paymentId: string,
         minAttestations: number,
-        expectedSentIndex: number,
-        expectedReceivedIndex: number
+        expectedSentPaymentIds: string[],
+        expectedReceivedPaymentIds: string[]
       ) => {
         const startingEscrowContractBalance = (
           await mockERC20Token.balanceOf(escrow.address)
@@ -147,32 +147,27 @@ contract('Escrow', (accounts: string[]) => {
         )
         const escrowedPayment = await getEscrowedPayment(paymentId, escrow)
 
-        // Check against objectively expected indices
-        assert.equal(
-          escrowedPayment.sentIndex,
-          expectedSentIndex,
-          'unexpected escrowedPayment.sendIndex'
+        // Check against expected receivedPaymentIds and sentPaymentIds,
+        // and corresponding indices in the payment struct
+        const receivedPaymentIds = await escrow.getReceivedPaymentIds(identifier)
+        assert.deepEqual(
+          receivedPaymentIds,
+          expectedReceivedPaymentIds,
+          'unexpected receivedPaymentIds'
         )
         assert.equal(
-          escrowedPayment.receivedIndex,
-          expectedReceivedIndex,
-          'unexpected escrowedPayment.receivedIndex'
-        )
-
-        // Check that sent/received indices correspond to stored lists
-        const received = await escrow.receivedPaymentIds(identifier, escrowedPayment.receivedIndex)
-        assert.equal(
-          received,
+          receivedPaymentIds[escrowedPayment.receivedIndex],
           paymentId,
           "expected paymentId not found at expected index in identifier's received payments list"
         )
-
-        const sent = await escrow.sentPaymentIds(escrowSender, escrowedPayment.sentIndex)
+        const sentPaymentIds = await escrow.getSentPaymentIds(escrowSender)
+        assert.deepEqual(sentPaymentIds, expectedSentPaymentIds, 'unexpected sentPaymentIds')
         assert.equal(
-          sent,
+          sentPaymentIds[escrowedPayment.receivedIndex],
           paymentId,
           "expected paymentId not found in escrowSender's sent payments list"
         )
+
         assert.equal(
           escrowedPayment.value,
           value,
@@ -192,15 +187,42 @@ contract('Escrow', (accounts: string[]) => {
       }
 
       it('should allow users to transfer tokens to any user', async () => {
-        await runTransferCase(sender, aPhoneHash, aValue, oneDayInSecs, withdrawKeyAddress, 0, 0, 0)
+        await transferAndCheckState(
+          sender,
+          aPhoneHash,
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          0,
+          [withdrawKeyAddress],
+          [withdrawKeyAddress]
+        )
       })
 
       it('should allow transfer when minAttestations > 0 and identifier is provided', async () => {
-        await runTransferCase(sender, aPhoneHash, aValue, oneDayInSecs, withdrawKeyAddress, 3, 0, 0)
+        await transferAndCheckState(
+          sender,
+          aPhoneHash,
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          3,
+          [withdrawKeyAddress],
+          [withdrawKeyAddress]
+        )
       })
 
       it('should allow transfer when no identifier is provided', async () => {
-        await runTransferCase(sender, '0x0', aValue, oneDayInSecs, withdrawKeyAddress, 0, 0, 0)
+        await transferAndCheckState(
+          sender,
+          '0x0',
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          0,
+          [withdrawKeyAddress],
+          [withdrawKeyAddress]
+        )
       })
 
       it('should allow transfers from same sender with different paymentIds', async () => {
@@ -216,12 +238,16 @@ contract('Escrow', (accounts: string[]) => {
           { from: sender }
         )
         // TODO EN: revisit: consider removing the objective check?? I think it makes sense to have but not sure
-        await runTransferCase(sender, '0x0', aValue, oneDayInSecs, withdrawKeyAddress, 0, 1, 1)
-
-        // Ensure that second payment didn't affect indices of existing payment
-        const firstPayment = await getEscrowedPayment(anotherWithdrawKeyAddress, escrow)
-        assert.equal(firstPayment.sentIndex, 0)
-        assert.equal(firstPayment.receivedIndex, 0)
+        await transferAndCheckState(
+          sender,
+          '0x0',
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          0,
+          [anotherWithdrawKeyAddress, withdrawKeyAddress],
+          [anotherWithdrawKeyAddress, withdrawKeyAddress]
+        )
       })
 
       it('should not allow two transfers with same paymentId', async () => {
@@ -331,10 +357,33 @@ contract('Escrow', (accounts: string[]) => {
       )
     }
 
+    // TODO EN: move somewhere more sensible
+    const mintAndTransfer = async (
+      escrowSender: string,
+      identifier: string,
+      value: number,
+      expirySeconds: number,
+      paymentId: string,
+      minAttestations: number
+    ) => {
+      await mockERC20Token.mint(escrowSender, value)
+      await escrow.transfer(
+        identifier,
+        mockERC20Token.address,
+        value,
+        expirySeconds,
+        paymentId,
+        minAttestations,
+        {
+          from: escrowSender,
+        }
+      )
+    }
+
     describe('#withdraw()', () => {
       const uniquePaymentIDWithdraw = withdrawKeyAddress
 
-      const runWithdrawCase = async (
+      const withdrawAndCheckState = async (
         escrowSender: string,
         escrowReceiver: string,
         identifier: string,
@@ -367,7 +416,6 @@ contract('Escrow', (accounts: string[]) => {
         assert.equal(
           (await mockERC20Token.balanceOf(escrowReceiver)).toNumber(),
           receiverBalanceBefore + value,
-          // TODO EN: change all of the weird assert phrasings for all of these messages
           'incorrect final receiver balance'
         )
 
@@ -376,33 +424,11 @@ contract('Escrow', (accounts: string[]) => {
           escrowContractBalanceBefore - value,
           'incorrect final Escrow contract balance'
         )
-
-        // EN TODO: this belongs in the transfer test (/is already tested there...)
-        // TODO: add a test for this? / for the getReceivedPaymentIds & getSentPaymentId functions?
-        // EN TODO: change after making the bug fix
-        // probably not necessary again here
-        // assert.include(
-        //   receivedPaymentsBefore,
-        //   paymentId,
-        //   "Should have saved this escrowed payment in receiver's receivedPaymentIds list after transfer"
-        // )
-
-        // EN TODO: keep
         assert.notInclude(
           receivedPaymentsAfterWithdraw,
           paymentId,
           "paymentId still in receiver's receivedPaymentIds list after withdraw"
         )
-
-        // EN TODO: this belongs in the transfer test (/is already tested there...)
-        // probably not necessary again here
-        // assert.include(
-        //   sentPaymentsBefore,
-        //   paymentId,
-        //   "Should have saved this escrowed payment in sender's sentPaymentIds list after transfer"
-        // )
-
-        // EN TODO: keep
         assert.notInclude(
           sentPaymentsAfterWithdraw,
           paymentId,
@@ -415,11 +441,6 @@ contract('Escrow', (accounts: string[]) => {
             sentPaymentsBefore[sentPaymentsBefore.length - 1],
             escrow
           )
-          // assert.notEqual(
-          //   sendersLastEscrowedPaymentBefore.sentIndex,
-          //   paymentBefore.sentIndex,
-          //   "incorrect pre-withdraw sentIndex of last payment in sender's sentPaymentIds"
-          // )
           assert.equal(
             sendersLastPaymentAfterWithdraw.sentIndex,
             paymentBefore.sentIndex,
@@ -432,40 +453,12 @@ contract('Escrow', (accounts: string[]) => {
             receivedPaymentsBefore[receivedPaymentsBefore.length - 1],
             escrow
           )
-          // assert.notEqual(
-          //   receiversLastEscrowedPaymentBefore.receivedIndex,
-          //   paymentBefore.receivedIndex,
-          //   "incorrect pre-withdraw receivedIndex of last payment in receiver's receivedPaymentIds"
-          // )
           assert.equal(
             receiversLastPaymentAfterWithdraw.receivedIndex,
             paymentBefore.receivedIndex,
             "receivedIndex of last payment in receiver's receivedPaymentIds not updated properly"
           )
         }
-      }
-
-      // TODO EN: move somewhere more sensible
-      const mintAndTransfer = async (
-        escrowSender: string,
-        identifier: string,
-        value: number,
-        expirySeconds: number,
-        paymentId: string,
-        minAttestations: number
-      ) => {
-        await mockERC20Token.mint(escrowSender, value)
-        await escrow.transfer(
-          identifier,
-          mockERC20Token.address,
-          value,
-          expirySeconds,
-          paymentId,
-          minAttestations,
-          {
-            from: escrowSender,
-          }
-        )
       }
 
       describe('when first payment from sender is escrowed without an identifier', () => {
@@ -486,12 +479,12 @@ contract('Escrow', (accounts: string[]) => {
         })
 
         it('should allow withdrawal with possession of PK and no attestations', async () => {
-          await runWithdrawCase(sender, receiver, '0x0', aValue, uniquePaymentIDWithdraw, 0)
+          await withdrawAndCheckState(sender, receiver, '0x0', aValue, uniquePaymentIDWithdraw, 0)
         })
 
         it('should withdraw properly when second payment escrowed with empty identifier', async () => {
           await mintAndTransfer(sender, '0x0', aValue, oneDayInSecs, anotherWithdrawKeyAddress, 0)
-          await runWithdrawCase(sender, receiver, '0x0', aValue, uniquePaymentIDWithdraw, 0)
+          await withdrawAndCheckState(sender, receiver, '0x0', aValue, uniquePaymentIDWithdraw, 0)
         })
         it("should withdraw properly when sender's second payment has an identifier with attestations", async () => {
           await mintAndTransfer(
@@ -502,7 +495,7 @@ contract('Escrow', (accounts: string[]) => {
             anotherWithdrawKeyAddress,
             3
           )
-          await runWithdrawCase(sender, receiver, '0x0', aValue, uniquePaymentIDWithdraw, 0)
+          await withdrawAndCheckState(sender, receiver, '0x0', aValue, uniquePaymentIDWithdraw, 0)
         })
         it('should not allow withdrawing without a valid signature using the withdraw key', async () => {
           // The signature is invalidated if it's sent from a different address
@@ -538,7 +531,7 @@ contract('Escrow', (accounts: string[]) => {
         })
 
         it('should allow users to withdraw after completing attestations', async () => {
-          await runWithdrawCase(
+          await withdrawAndCheckState(
             sender,
             receiver,
             aPhoneHash,
@@ -549,7 +542,7 @@ contract('Escrow', (accounts: string[]) => {
         })
         it('should not allow a user to withdraw a payment if they have fewer than minAttestations', async () => {
           await assertRevertWithReason(
-            runWithdrawCase(
+            withdrawAndCheckState(
               sender,
               receiver,
               aPhoneHash,
@@ -569,7 +562,7 @@ contract('Escrow', (accounts: string[]) => {
             anotherWithdrawKeyAddress,
             0
           )
-          await runWithdrawCase(
+          await withdrawAndCheckState(
             sender,
             receiver,
             aPhoneHash,
@@ -650,6 +643,59 @@ contract('Escrow', (accounts: string[]) => {
       it('should not allow any account who is not the sender to use revoke function', async () => {
         await timeTravel(oneDayInSecs, web3)
         await assertRevert(escrow.revoke(uniquePaymentIDRevoke, { from: accounts[4] }))
+      })
+    })
+
+    // TODO EN: possibly move these to transfer tests themselves ???
+    describe('#getReceivedPaymentIds', () => {
+      const identifiers = ['0x0', aPhoneHash]
+      identifiers.forEach((identifier) => {
+        describe(`when identifier is ${identifier == '0x0' ? '' : 'not'} empty`, async () => {
+          it('should return empty list if no payments are escrowed for paymentId', async () => {
+            const receivedPaymentIds = await escrow.getReceivedPaymentIds(identifier)
+            assert.deepEqual(receivedPaymentIds, [])
+          })
+          it('should list received payment after transfer', async () => {
+            await mintAndTransfer(sender, identifier, aValue, oneDayInSecs, withdrawKeyAddress, 1)
+            const receivedPaymentIds = await escrow.getReceivedPaymentIds(identifier)
+            assert.deepEqual(receivedPaymentIds, [withdrawKeyAddress])
+          })
+          it('should list multiple paymentIds in received order', async () => {
+            await mintAndTransfer(sender, identifier, aValue, oneDayInSecs, withdrawKeyAddress, 1)
+            await mintAndTransfer(
+              sender,
+              identifier,
+              aValue,
+              oneDayInSecs,
+              anotherWithdrawKeyAddress,
+              1
+            )
+            const receivedPaymentIds = await escrow.getReceivedPaymentIds(identifier)
+            assert.deepEqual(receivedPaymentIds, [withdrawKeyAddress, anotherWithdrawKeyAddress])
+          })
+        })
+      })
+    })
+    describe('#getSentPaymentIds', () => {
+      const identifiers = ['0x0', aPhoneHash]
+      identifiers.forEach((identifier) => {
+        describe(`when identifier is ${identifier == '0x0' ? '' : 'not'} empty`, async () => {
+          it('should return empty list if no payments are escrowed for paymentId', async () => {
+            const sentPaymentIds = await escrow.getSentPaymentIds(sender)
+            assert.deepEqual(sentPaymentIds, [])
+          })
+          it('should list sent paymentIds after transfer', async () => {
+            await mintAndTransfer(sender, identifier, aValue, oneDayInSecs, withdrawKeyAddress, 1)
+            const sentPaymentIds = await escrow.getSentPaymentIds(sender)
+            assert.deepEqual(sentPaymentIds, [withdrawKeyAddress])
+          })
+        })
+      })
+      it('should display sent paymentIds in sent order with multiple identifiers', async () => {
+        await mintAndTransfer(sender, aPhoneHash, aValue, oneDayInSecs, withdrawKeyAddress, 1)
+        await mintAndTransfer(sender, '0x0', aValue, oneDayInSecs, anotherWithdrawKeyAddress, 1)
+        const sentPaymentIds = await escrow.getSentPaymentIds(sender)
+        assert.deepEqual(sentPaymentIds, [withdrawKeyAddress, anotherWithdrawKeyAddress])
       })
     })
   })
