@@ -325,17 +325,6 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   }
 
   /**
-   * Removes the currently authorized vote signer for the account
-   * @returns A CeloTransactionObject
-   */
-   async removeVoteSigner(): Promise<CeloTransactionObject<void>> {
-    return toTransactionObject(
-      this.connection,
-      this.contract.methods.removeVoteSigner()
-    )
-  }
-
-  /**
    * Removes the currently authorized attestation signer for the account
    * @returns A CeloTransactionObject
    */

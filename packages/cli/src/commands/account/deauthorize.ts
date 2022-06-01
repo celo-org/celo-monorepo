@@ -10,7 +10,7 @@ export default class Deauthorize extends BaseCommand {
     from: Flags.address({ required: true }),
     role: flags.string({
       char: 'r',
-      options: ['vote', 'attestation'],
+      options: ['attestation'],
       description: 'Role to remove',
       required: true,
     }),
@@ -20,7 +20,6 @@ export default class Deauthorize extends BaseCommand {
   static args = []
 
   static examples = [
-    'deauthorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role vote --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb',
     'deauthorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role attestation --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb',
   ]
 
@@ -28,31 +27,22 @@ export default class Deauthorize extends BaseCommand {
     const res = this.parse(Deauthorize)
 
     const accounts = await this.kit.contracts.getAccounts()
-
-    let tx: any
-    let signer: any
-    if (res.flags.role === 'vote') {
-      signer = await accounts.getVoteSigner(res.flags.from)
-      
-      if(res.flags.signer != signer){
-        this.error(`Invalid signer provided`)
-        return
-      }
-
-      tx = await accounts.removeVoteSigner()
-    } else if (res.flags.role === 'attestation') {
-      signer = await accounts.getAttestationSigner(res.flags.from)
-
-      if(res.flags.signer != signer){
-        this.error(`Invalid signer provided`)
-        return
-      }
-
-      tx = await accounts.removeAttestationSigner()
-    } else {
+    
+    if (res.flags.role !== 'attestation') {
       this.error(`Invalid role provided`)
       return
     }
+
+    let attestationSigner = await accounts.getAttestationSigner(res.flags.from)
+
+    if(res.flags.signer != attestationSigner){
+      this.error(`Invalid signer provided`)
+      return
+    }
+
+    let tx = await accounts.removeAttestationSigner()
+
+
     await displaySendTx('deauthorizeTx', tx)
   }
 }
