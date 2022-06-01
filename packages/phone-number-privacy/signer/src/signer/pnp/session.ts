@@ -14,6 +14,6 @@ export class PnpSession<R extends PhoneNumberPrivacyRequest> {
     readonly request: Request<{}, {}, R>,
     readonly response: Response<PhoneNumberPrivacyResponse<R>>
   ) {
-    this.logger = response.locals.logger()
+    this.logger = response.locals.logger
   }
 }

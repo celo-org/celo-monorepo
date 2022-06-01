@@ -25,6 +25,7 @@ export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<DisableDomainResponse>
   ): Promise<DomainSession<DisableDomainRequest> | null> {
+    // Input checks sends a response to the user internally.
     if (!super.inputChecks(request, response)) {
       return null
     }
@@ -56,7 +57,7 @@ export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
         status: domainState,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
@@ -76,7 +77,7 @@ export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
         status: domainState,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }

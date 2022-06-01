@@ -13,13 +13,15 @@ export class Controller<R extends OdisRequest> {
     Counters.requests.labels(this.action.io.endpoint).inc()
     try {
       const session = await this.action.io.init(request, response)
+      // Init returns a response to the user internally.
       if (session) {
         await this.action.perform(session)
       }
     } catch (err) {
-      response.locals
-        .logger()
-        .error({ error: err }, `Unknown error in handler for ${this.action.io.endpoint}`)
+      response.locals.logger.error(
+        { error: err },
+        `Unknown error in handler for ${this.action.io.endpoint}`
+      )
       this.action.io.sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, response)
     }
   }

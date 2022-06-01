@@ -12,6 +12,7 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --testPathIgnorePatterns test/end-to-end",
+    "test:debug": "node --inspect ../../../node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --runInBand test/end-to-end",
     "test:e2e:staging:0": "ODIS_SIGNER_SERVICE_URL=https://staging-pgpnp-signer0.azurefd.net yarn test:e2e",
     "test:e2e:staging:1": "ODIS_SIGNER_SERVICE_URL=https://staging-pgpnp-signer1.azurefd.net yarn test:e2e",
