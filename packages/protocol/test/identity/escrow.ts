@@ -13,24 +13,16 @@ import {
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
-// For reference:
-//    accounts[0] = owner
-//    accounts[1] = sender
-//    accounts[2] = receiver
-//    accounts[3] = registry
-//    accounts[4] = a random other account
-//    accounts[5] = withdrawKeyAddress (temporary wallet address, no attestations)
-//    accounts[6] = anotherWithdrawKeyAddress (a different temporary wallet address, requires attestations)
-
 const Escrow: EscrowContract = artifacts.require('Escrow')
 const MockERC20Token: MockERC20TokenContract = artifacts.require('MockERC20Token')
 const Registry: RegistryContract = artifacts.require('Registry')
 const MockAttestations: MockAttestationsContract = artifacts.require('MockAttestations')
 
+const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
 const NULL_ESCROWED_PAYMENT: EscrowedPayment = {
-  recipientPhoneHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
-  sender: '0x0000000000000000000000000000000000000000',
-  token: '0x0000000000000000000000000000000000000000',
+  recipientIdentifier: NULL_BYTES32,
+  sender: NULL_ADDRESS,
+  token: NULL_ADDRESS,
   value: 0,
   sentIndex: 0,
   receivedIndex: 0,
@@ -39,7 +31,7 @@ const NULL_ESCROWED_PAYMENT: EscrowedPayment = {
   minAttestations: 0,
 }
 interface EscrowedPayment {
-  recipientPhoneHash: string
+  recipientIdentifier: string
   sender: string
   token: string
   value: number
@@ -56,7 +48,7 @@ const getEscrowedPayment = async (
 ): Promise<EscrowedPayment> => {
   const payment = await escrow.escrowedPayments(paymentID)
   return {
-    recipientPhoneHash: payment[0],
+    recipientIdentifier: payment[0],
     sender: payment[1],
     token: payment[2],
     value: payment[3].toNumber(),
@@ -100,7 +92,7 @@ contract('Escrow', (accounts: string[]) => {
 
   describe('#setRegistry()', () => {
     const nonOwner: string = accounts[1]
-    const anAddress: string = accounts[3]
+    const anAddress: string = accounts[2]
 
     it('should allow owner to set registry', async () => {
       await escrow.setRegistry(anAddress)
@@ -115,21 +107,40 @@ contract('Escrow', (accounts: string[]) => {
   describe('tests with tokens', () => {
     let mockERC20Token: MockERC20TokenInstance
     const aValue: number = 10
-    const receiver: string = accounts[2]
     const sender: string = accounts[1]
+    const receiver: string = accounts[2]
 
     // @ts-ignore
     const aPhoneHash: string = web3.utils.soliditySha3({ t: 'string', v: '+18005555555' })
-    const withdrawKeyAddress: string = accounts[5]
-    const anotherWithdrawKeyAddress: string = accounts[6]
+    const withdrawKeyAddress: string = accounts[3]
+    const anotherWithdrawKeyAddress: string = accounts[4]
     const oneDayInSecs: number = 86400
 
     beforeEach(async () => {
       mockERC20Token = await MockERC20Token.new()
-      // TODO EN: consdier moving this into the transfer specific cases,
-      // then have a mint & transfer helper
-      await mockERC20Token.mint(sender, aValue)
     })
+
+    const mintAndTransfer = async (
+      escrowSender: string,
+      identifier: string,
+      value: number,
+      expirySeconds: number,
+      paymentId: string,
+      minAttestations: number
+    ) => {
+      await mockERC20Token.mint(escrowSender, value)
+      await escrow.transfer(
+        identifier,
+        mockERC20Token.address,
+        value,
+        expirySeconds,
+        paymentId,
+        minAttestations,
+        {
+          from: escrowSender,
+        }
+      )
+    }
 
     describe('#transfer()', async () => {
       const transferAndCheckState = async (
@@ -196,6 +207,10 @@ contract('Escrow', (accounts: string[]) => {
         )
       }
 
+      beforeEach(async () => {
+        await mockERC20Token.mint(sender, aValue)
+      })
+
       it('should allow users to transfer tokens to any user', async () => {
         await transferAndCheckState(
           sender,
@@ -225,7 +240,7 @@ contract('Escrow', (accounts: string[]) => {
       it('should allow transfer when no identifier is provided', async () => {
         await transferAndCheckState(
           sender,
-          '0x0',
+          NULL_BYTES32,
           aValue,
           oneDayInSecs,
           withdrawKeyAddress,
@@ -236,10 +251,17 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should allow transfers from same sender with different paymentIds', async () => {
-        await mintAndTransfer(sender, '0x0', aValue, oneDayInSecs, anotherWithdrawKeyAddress, 0)
+        await mintAndTransfer(
+          sender,
+          NULL_BYTES32,
+          aValue,
+          oneDayInSecs,
+          anotherWithdrawKeyAddress,
+          0
+        )
         await transferAndCheckState(
           sender,
-          '0x0',
+          NULL_BYTES32,
           aValue,
           oneDayInSecs,
           withdrawKeyAddress,
@@ -313,7 +335,7 @@ contract('Escrow', (accounts: string[]) => {
       xit('should not allow a transfer if identifier is empty but minAttestations is > 0', async () => {
         await assertRevertWithReason(
           escrow.transfer(
-            '0x0',
+            NULL_BYTES32,
             mockERC20Token.address,
             aValue,
             oneDayInSecs,
@@ -328,30 +350,6 @@ contract('Escrow', (accounts: string[]) => {
       })
     })
 
-    // TODO EN: move somewhere more sensible
-    const mintAndTransfer = async (
-      escrowSender: string,
-      identifier: string,
-      value: number,
-      expirySeconds: number,
-      paymentId: string,
-      minAttestations: number
-    ) => {
-      await mockERC20Token.mint(escrowSender, value)
-      await escrow.transfer(
-        identifier,
-        mockERC20Token.address,
-        value,
-        expirySeconds,
-        paymentId,
-        minAttestations,
-        {
-          from: escrowSender,
-        }
-      )
-    }
-
-    // TODO EN: move somewhere more sensible
     const checkStateAfterDeletingPayment = async (
       deletedPaymentId: string,
       deletedPayment: EscrowedPayment,
@@ -420,7 +418,9 @@ contract('Escrow', (accounts: string[]) => {
 
         // Mock completed attestations
         for (let i = 0; i < attestationsToComplete; i++) {
-          await mockAttestations.complete(identifier, 0, '0x0', '0x0', { from: escrowReceiver })
+          await mockAttestations.complete(identifier, 0, NULL_BYTES32, NULL_BYTES32, {
+            from: escrowReceiver,
+          })
         }
         const parsedSig = await getParsedSignatureOfAddress(web3, escrowReceiver, paymentId)
         await escrow.withdraw(paymentId, parsedSig.v, parsedSig.r, parsedSig.s, {
@@ -466,17 +466,13 @@ contract('Escrow', (accounts: string[]) => {
 
       describe('when first payment from sender is escrowed without an identifier', () => {
         beforeEach(async () => {
-          // TODO EN: switch to mintAndTransfer after removing first mint from bigger beforeAll
-          await escrow.transfer(
-            '0x0',
-            mockERC20Token.address,
+          await mintAndTransfer(
+            sender,
+            NULL_BYTES32,
             aValue,
             oneDayInSecs,
             uniquePaymentIDWithdraw,
-            0,
-            {
-              from: sender,
-            }
+            0
           )
         })
 
@@ -484,7 +480,7 @@ contract('Escrow', (accounts: string[]) => {
           await withdrawAndCheckState(
             sender,
             receiver,
-            '0x0',
+            NULL_BYTES32,
             aValue,
             uniquePaymentIDWithdraw,
             0,
@@ -494,11 +490,18 @@ contract('Escrow', (accounts: string[]) => {
         })
 
         it('should withdraw properly when second payment escrowed with empty identifier', async () => {
-          await mintAndTransfer(sender, '0x0', aValue, oneDayInSecs, anotherWithdrawKeyAddress, 0)
+          await mintAndTransfer(
+            sender,
+            NULL_BYTES32,
+            aValue,
+            oneDayInSecs,
+            anotherWithdrawKeyAddress,
+            0
+          )
           await withdrawAndCheckState(
             sender,
             receiver,
-            '0x0',
+            NULL_BYTES32,
             aValue,
             uniquePaymentIDWithdraw,
             0,
@@ -518,7 +521,7 @@ contract('Escrow', (accounts: string[]) => {
           await withdrawAndCheckState(
             sender,
             receiver,
-            '0x0',
+            NULL_BYTES32,
             aValue,
             uniquePaymentIDWithdraw,
             0,
@@ -545,17 +548,13 @@ contract('Escrow', (accounts: string[]) => {
       describe('when first payment is escrowed by a sender for an identifier && minAttestations', () => {
         const minAttestations = 3
         beforeEach(async () => {
-          // TODO EN: revisit once mint is taken out of top-level function
-          await escrow.transfer(
+          await mintAndTransfer(
+            sender,
             aPhoneHash,
-            mockERC20Token.address,
             aValue,
             oneDayInSecs,
             uniquePaymentIDWithdraw,
-            minAttestations,
-            {
-              from: sender,
-            }
+            minAttestations
           )
         })
 
@@ -613,9 +612,11 @@ contract('Escrow', (accounts: string[]) => {
       let uniquePaymentIDRevoke: string
       let parsedSig1: any
 
-      const identifiers = ['0x0', aPhoneHash]
+      const identifiers = [NULL_BYTES32, aPhoneHash]
       identifiers.forEach((identifier) => {
-        describe(`when identifier is ${identifier == '0x0' ? '' : 'not'} empty`, async () => {
+        describe(`when identifier is ${
+          identifier === NULL_BYTES32 ? '' : 'not'
+        } empty`, async () => {
           beforeEach(async () => {
             await mintAndTransfer(sender, identifier, aValue, oneDayInSecs, withdrawKeyAddress, 0)
             await mintAndTransfer(
@@ -700,9 +701,11 @@ contract('Escrow', (accounts: string[]) => {
 
     // TODO EN: direction for future refactor but for now it's redundant with transfer test
     describe('#getReceivedPaymentIds', () => {
-      const identifiers = ['0x0', aPhoneHash]
+      const identifiers = [NULL_BYTES32, aPhoneHash]
       identifiers.forEach((identifier) => {
-        describe(`when identifier is ${identifier == '0x0' ? '' : 'not'} empty`, async () => {
+        describe(`when identifier is ${
+          identifier === NULL_BYTES32 ? '' : 'not'
+        } empty`, async () => {
           it('should return empty list if no payments are escrowed for paymentId', async () => {
             const receivedPaymentIds = await escrow.getReceivedPaymentIds(identifier)
             assert.deepEqual(receivedPaymentIds, [])
@@ -729,9 +732,11 @@ contract('Escrow', (accounts: string[]) => {
       })
     })
     describe('#getSentPaymentIds', () => {
-      const identifiers = ['0x0', aPhoneHash]
+      const identifiers = [NULL_BYTES32, aPhoneHash]
       identifiers.forEach((identifier) => {
-        describe(`when identifier is ${identifier == '0x0' ? '' : 'not'} empty`, async () => {
+        describe(`when identifier is ${
+          identifier === NULL_BYTES32 ? '' : 'not'
+        } empty`, async () => {
           it('should return empty list if no payments are escrowed for paymentId', async () => {
             const sentPaymentIds = await escrow.getSentPaymentIds(sender)
             assert.deepEqual(sentPaymentIds, [])
@@ -745,7 +750,14 @@ contract('Escrow', (accounts: string[]) => {
       })
       it('should display sent paymentIds in sent order with multiple identifiers', async () => {
         await mintAndTransfer(sender, aPhoneHash, aValue, oneDayInSecs, withdrawKeyAddress, 1)
-        await mintAndTransfer(sender, '0x0', aValue, oneDayInSecs, anotherWithdrawKeyAddress, 1)
+        await mintAndTransfer(
+          sender,
+          NULL_BYTES32,
+          aValue,
+          oneDayInSecs,
+          anotherWithdrawKeyAddress,
+          1
+        )
         const sentPaymentIds = await escrow.getSentPaymentIds(sender)
         assert.deepEqual(sentPaymentIds, [withdrawKeyAddress, anotherWithdrawKeyAddress])
       })
