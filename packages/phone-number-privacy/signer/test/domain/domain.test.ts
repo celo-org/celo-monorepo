@@ -1,11 +1,15 @@
 import {
   DisableDomainRequest,
   disableDomainRequestEIP712,
+  domainHash,
   DomainIdentifiers,
   DomainQuotaStatusRequest,
+  domainQuotaStatusRequestEIP712,
   DomainRequestTypeTag,
   DomainRestrictedSignatureRequest,
+  domainRestrictedSignatureRequestEIP712,
   genSessionID,
+  PoprfClient,
   SequentialDelayDomain,
   SignerEndpoint,
   TestUtils,
@@ -25,6 +29,8 @@ config.db.type = SupportedDatabase.Sqlite
 config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
 config.api.domains.enabled = true
 
+// DO NOT MERGE: Add checking of values beyond the return code.
+
 describe('domainService', () => {
   // DO NOT MERGE(victor): Should this be refactored to pass key provider, database, and config?
   const app = createServer()
@@ -33,48 +39,60 @@ describe('domainService', () => {
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
   const walletAddress = wallet.getAccounts()[0]!
 
-  const authenticatedDomain: SequentialDelayDomain = {
+  const authenticatedDomain = (): SequentialDelayDomain => ({
     name: DomainIdentifiers.SequentialDelay,
     version: '1',
     stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
     address: defined(walletAddress),
     salt: defined('himalayanPink'),
-  }
+  })
 
-  /*
   const signatureRequest = async (): Promise<
-    DomainRestrictedSignatureRequest<SequentialDelayDomain>
+    [DomainRestrictedSignatureRequest<SequentialDelayDomain>, PoprfClient]
   > => {
-    const blsBlindingClient = new WasmBlsBlindingClient(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY)
+    const poprfClient = new PoprfClient(
+      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'base64'),
+      domainHash(authenticatedDomain()),
+      Buffer.from('test message', 'utf8')
+    )
 
-    return {
+    const req: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
       type: DomainRequestTypeTag.SIGN,
-      domain: authenticatedDomain,
+      domain: authenticatedDomain(),
       options: {
         signature: noString,
         nonce: defined(0),
       },
-      blindedMessage: await blsBlindingClient.blindMessage('test message'),
+      blindedMessage: poprfClient.blindedMessage.toString('base64'),
       sessionID: defined(genSessionID()),
     }
+    req.options.signature = defined(
+      await wallet.signTypedData(walletAddress, domainRestrictedSignatureRequestEIP712(req))
+    )
+    return [req, poprfClient]
   }
-  */
 
-  const quotaRequest = (): DomainQuotaStatusRequest<SequentialDelayDomain> => ({
-    type: DomainRequestTypeTag.QUOTA,
-    domain: authenticatedDomain,
-    options: {
-      signature: noString,
-      nonce: defined(0),
-    },
-    sessionID: defined(genSessionID()),
-  })
+  const quotaRequest = async (): Promise<DomainQuotaStatusRequest<SequentialDelayDomain>> => {
+    const req: DomainQuotaStatusRequest<SequentialDelayDomain> = {
+      type: DomainRequestTypeTag.QUOTA,
+      domain: authenticatedDomain(),
+      options: {
+        signature: noString,
+        nonce: noNumber,
+      },
+      sessionID: defined(genSessionID()),
+    }
+    req.options.signature = defined(
+      await wallet.signTypedData(walletAddress, domainQuotaStatusRequestEIP712(req))
+    )
+    return req
+  }
 
   // Build an sign an example disable domain request.
   const disableRequest = async (): Promise<DisableDomainRequest<SequentialDelayDomain>> => {
-    const req: DisableDomainRequest = {
+    const req: DisableDomainRequest<SequentialDelayDomain> = {
       type: DomainRequestTypeTag.DISABLE,
-      domain: authenticatedDomain,
+      domain: authenticatedDomain(),
       options: {
         signature: noString,
         nonce: noNumber,
@@ -146,27 +164,23 @@ describe('domainService', () => {
     })
   })
 
-  /* DO NOT MERGE: Uncomment these tests
   describe('.handleGetDomainQuotaStatus', () => {
     it('Should respond with 200 on valid request', async () => {
-      when(authServiceMock.authCheck()).thenReturn(true)
+      const { status } = await request(app)
+        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
+        .send(await quotaRequest())
 
-      when(requestMock.body).thenReturn(quotaRequest())
-      await domainService.handleGetDomainQuotaStatus(request, response)
-
-      verify(responseMock.status(200)).once()
+      expect(status).toBe(200)
     })
   })
 
   describe('.handleGetDomainRestrictedSignature', () => {
     it('Should respond with 200 on valid request', async () => {
-      when(authServiceMock.authCheck()).thenReturn(true)
+      const [req, _] = await signatureRequest()
 
-      when(requestMock.body).thenReturn(await signatureRequest())
-      await domainService.handleGetDomainRestrictedSignature(request, response)
+      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
 
-      verify(responseMock.status(200)).once()
+      expect(status).toBe(200)
     })
   })
-*/
 })

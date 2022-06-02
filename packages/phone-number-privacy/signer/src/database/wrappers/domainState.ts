@@ -119,7 +119,7 @@ export async function updateDomainStateRecord<D extends Domain>(
   }
 }
 
-export async function insertDomainStateRecord<D extends Domain>(
+export async function insertDomainStateRecord(
   domainState: DomainStateRecord,
   trx: Knex.Transaction<DomainStateRecord>,
   logger: Logger

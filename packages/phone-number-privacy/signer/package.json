@@ -32,8 +32,9 @@
   "dependencies": {
     "@celo/base": "2.0.1-dev",
     "@celo/contractkit": "2.0.1-dev",
-    "@celo/phone-number-privacy-common": "1.0.39",
     "@celo/identity": "2.0.1-dev",
+    "@celo/phone-number-privacy-common": "1.0.39",
+    "@celo/poprf": "^0.1.8",
     "@celo/utils": "2.0.1-dev",
     "@celo/wallet-hsm-azure": "2.0.1-dev",
     "@google-cloud/secret-manager": "3.0.0",
