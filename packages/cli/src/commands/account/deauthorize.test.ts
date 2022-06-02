@@ -22,4 +22,13 @@ testWithGanache('account:deauthorize cmd', (web3: Web3) => {
     ])
     await Deauthorize.run(['--from', accounts[0], '--role', 'attestation', '--signer', accounts[1]])
   })
+
+  test('cannot deauthorize a non-authorized signer', async () => {
+    const accounts = await web3.eth.getAccounts()
+    await Register.run(['--from', accounts[0]])
+
+    await expect(
+      Deauthorize.run(['--from', accounts[0], '--role', 'attestation', '--signer', accounts[1]])
+    ).rejects.toThrow()
+  })
 })
