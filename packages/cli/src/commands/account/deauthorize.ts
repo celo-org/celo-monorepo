@@ -38,7 +38,9 @@ export default class Deauthorize extends BaseCommand {
     const attestationSigner = await accounts.getAttestationSigner(res.flags.from)
 
     if (res.flags.signer !== attestationSigner) {
-      this.error(`Invalid signer provided`)
+      this.error(
+        `Invalid signer argument: ${res.flags.signer}. The current signer for this role is: ${attestationSigner}`
+      )
       return
     }
 
