@@ -1,9 +1,11 @@
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { displaySendTx } from '../../utils/cli'
+import { Flags } from '../../utils/command'
 
 export default class Deauthorize extends BaseCommand {
-  static description = 'Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer'
+  static description =
+    'Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer'
 
   static flags = {
     ...BaseCommand.flags,
@@ -27,7 +29,7 @@ export default class Deauthorize extends BaseCommand {
     const res = this.parse(Deauthorize)
 
     const accounts = await this.kit.contracts.getAccounts()
-    
+
     if (res.flags.role !== 'attestation') {
       this.error(`Invalid role provided`)
       return
@@ -35,7 +37,7 @@ export default class Deauthorize extends BaseCommand {
 
     let attestationSigner = await accounts.getAttestationSigner(res.flags.from)
 
-    if(res.flags.signer != attestationSigner){
+    if (res.flags.signer != attestationSigner) {
       this.error(`Invalid signer provided`)
       return
     }
