@@ -4,18 +4,18 @@ import {
   hashMessageWithPrefix,
   LocalSigner,
   parseSignature,
-  signedMessageToPublicKey
+  signedMessageToPublicKey,
 } from '@celo/utils/lib/signatureUtils'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { authorizeSigner as buildAuthorizeSignerTypedData } from '@celo/utils/lib/typed-data-constructors'
-import BN from 'bn.js'; // just the types
+import BN from 'bn.js' // just the types
 import { Accounts } from '../generated/Accounts'
 import { newContractVersion } from '../versions'
 import {
   proxyCall,
   proxySend,
   solidityBytesToString,
-  stringToSolidityBytes
+  stringToSolidityBytes,
 } from '../wrappers/BaseWrapper'
 import { BaseWrapper } from './BaseWrapper'
 interface AccountSummary {
@@ -329,10 +329,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @returns A CeloTransactionObject
    */
   async removeAttestationSigner(): Promise<CeloTransactionObject<void>> {
-    return toTransactionObject(
-      this.connection,
-      this.contract.methods.removeAttestationSigner()
-    )
+    return toTransactionObject(this.connection, this.contract.methods.removeAttestationSigner())
   }
 
   async generateProofOfKeyPossession(account: Address, signer: Address) {
