@@ -5,7 +5,7 @@ import { Flags } from '../../utils/command'
 
 export default class Deauthorize extends BaseCommand {
   static description =
-    'Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer'
+    'Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer. Please note that Attestation Services are important to the health of the Celo network, and validators should only use this command when troubleshooting their service is not an option.'
 
   static flags = {
     ...BaseCommand.flags,

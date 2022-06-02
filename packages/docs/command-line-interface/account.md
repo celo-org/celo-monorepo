@@ -303,10 +303,10 @@ _See code: [src/commands/account/create-metadata.ts](https://github.com/celo-org
 
 ## `celocli account:deauthorize`
 
-Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer
+Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer. Please note that Attestation Services are important to the health of the Celo network, and validators should only use this command when troubleshooting their service is not an option.
 
 ```
-Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer
+Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer. Please note that Attestation Services are important to the health of the Celo network, and validators should only use this command when troubleshooting their service is not an option.
 
 USAGE
   $ celocli account:deauthorize
