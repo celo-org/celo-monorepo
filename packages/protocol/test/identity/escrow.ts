@@ -380,6 +380,54 @@ contract('Escrow', (accounts: string[]) => {
       )
     }
 
+    // TODO EN: move somewhere more sensible
+    const checkStateAfterDeletingPayment = async (
+      deletedPaymentId: string,
+      deletedPayment: EscrowedPayment,
+      escrowSender: string,
+      identifier: string,
+      expectedSentPaymentIds: string[],
+      expectedReceivedPaymentIds: string[]
+    ) => {
+      const sentPaymentIds = await escrow.getSentPaymentIds(escrowSender)
+      const receivedPaymentIds = await escrow.getReceivedPaymentIds(identifier)
+      assert.deepEqual(sentPaymentIds, expectedSentPaymentIds, 'unexpected sentPaymentIds')
+      assert.deepEqual(
+        receivedPaymentIds,
+        expectedReceivedPaymentIds,
+        'unexpected receivedPaymentIds'
+      )
+      // Check that indices of last payment structs in previous lists are properly updated
+      if (expectedSentPaymentIds.length) {
+        const sendersLastPaymentAfterDelete = await getEscrowedPayment(
+          expectedSentPaymentIds[expectedSentPaymentIds.length - 1],
+          escrow
+        )
+        assert.equal(
+          sendersLastPaymentAfterDelete.sentIndex,
+          deletedPayment.sentIndex,
+          "sentIndex of last payment in sender's sentPaymentIds not updated properly"
+        )
+      }
+      if (expectedReceivedPaymentIds.length) {
+        const receiversLastPaymentAfterDelete = await getEscrowedPayment(
+          expectedReceivedPaymentIds[expectedReceivedPaymentIds.length - 1],
+          escrow
+        )
+        assert.equal(
+          receiversLastPaymentAfterDelete.receivedIndex,
+          deletedPayment.receivedIndex,
+          "receivedIndex of last payment in receiver's receivedPaymentIds not updated properly"
+        )
+      }
+      const deletedEscrowedPayment = await getEscrowedPayment(deletedPaymentId, escrow)
+      assert.deepEqual(
+        deletedEscrowedPayment,
+        NULL_ESCROWED_PAYMENT,
+        'escrowedPayment not zeroed out'
+      )
+    }
+
     describe('#withdraw()', () => {
       const uniquePaymentIDWithdraw = withdrawKeyAddress
 
@@ -389,19 +437,15 @@ contract('Escrow', (accounts: string[]) => {
         identifier: string,
         value: number,
         paymentId: string,
-        attestationsToComplete: number
+        attestationsToComplete: number,
+        expectedSentPaymentIds: string[],
+        expectedReceivedPaymentIds: string[]
       ) => {
         const receiverBalanceBefore = (await mockERC20Token.balanceOf(escrowReceiver)).toNumber()
         const escrowContractBalanceBefore = (
           await mockERC20Token.balanceOf(escrow.address)
         ).toNumber()
-        const receivedPaymentsBefore = await escrow.getReceivedPaymentIds(identifier)
-        const sentPaymentsBefore = await escrow.getSentPaymentIds(escrowSender)
         const paymentBefore = await getEscrowedPayment(paymentId, escrow)
-
-        // If there are existing payments, check that indices are updated appropriately
-        const checkLastSentPayment = sentPaymentsBefore.length > 1
-        const checkLastReceivedPayment = receivedPaymentsBefore.length > 1
 
         // Mock completed attestations
         for (let i = 0; i < attestationsToComplete; i++) {
@@ -423,117 +467,14 @@ contract('Escrow', (accounts: string[]) => {
           'incorrect final Escrow contract balance'
         )
 
-        const receivedPaymentsAfterWithdraw = await escrow.getReceivedPaymentIds(identifier)
-        const sentPaymentsAfterWithdraw = await escrow.getSentPaymentIds(escrowSender)
-        console.log(receivedPaymentsAfterWithdraw)
-        console.log(sentPaymentsAfterWithdraw)
-        assert.notInclude(
-          receivedPaymentsAfterWithdraw,
+        await checkStateAfterDeletingPayment(
           paymentId,
-          "paymentId still in receiver's receivedPaymentIds list after withdraw"
+          paymentBefore,
+          escrowSender,
+          identifier,
+          expectedSentPaymentIds,
+          expectedReceivedPaymentIds
         )
-        assert.notInclude(
-          sentPaymentsAfterWithdraw,
-          paymentId,
-          "paymentId still in sender's sentPaymentIds list after withdraw"
-        )
-
-        // Note: these are actually checks for `deletePayment` which is a private function
-        // Check that indices of last payment structs in previous lists are properly updated
-        if (checkLastSentPayment) {
-          const sendersLastPaymentAfterWithdraw = await getEscrowedPayment(
-            sentPaymentsBefore[sentPaymentsBefore.length - 1],
-            escrow
-          )
-          assert.equal(
-            sendersLastPaymentAfterWithdraw.sentIndex,
-            paymentBefore.sentIndex,
-            "sentIndex of last payment in sender's sentPaymentIds not updated properly"
-          )
-        }
-
-        if (checkLastReceivedPayment) {
-          const receiversLastPaymentAfterWithdraw = await getEscrowedPayment(
-            receivedPaymentsBefore[receivedPaymentsBefore.length - 1],
-            escrow
-          )
-          assert.equal(
-            receiversLastPaymentAfterWithdraw.receivedIndex,
-            paymentBefore.receivedIndex,
-            "receivedIndex of last payment in receiver's receivedPaymentIds not updated properly"
-          )
-        }
-      }
-
-      const checkStateAfterDeletingPayment = async (
-        deletedPayment: EscrowedPayment,
-        escrowSender: string,
-        escrowReceiver: string,
-        identifier: string,
-        value: number,
-        paymentId: string,
-        expectedSentPaymentIds: string[],
-        expectedReceivedPaymentIds: string[]
-      ) => {
-        const receivedPaymentIds = await escrow.getReceivedPaymentIds(identifier)
-        const sentPaymentIds = await escrow.getSentPaymentIds(escrowSender)
-        // console.log(receivedPaymentIds)
-        // console.log(sentPaymentIds)
-        // assert.notInclude(
-        //   receivedPaymentIds,
-        //   paymentId,
-        //   "paymentId still in receiver's receivedPaymentIds list after withdraw"
-        // )
-        // assert.notInclude(
-        //   sentPaymentIds,
-        //   paymentId,
-        //   "paymentId still in sender's sentPaymentIds list after withdraw"
-        // )
-        assert.deepEqual(
-          receivedPaymentIds,
-          expectedReceivedPaymentIds,
-          'unexpected receivedPaymentIds'
-        )
-        assert.deepEqual(sentPaymentIds, expectedSentPaymentIds, 'unexpected sentPaymentIds')
-
-        if (expectedSentPaymentIds.length) {
-          const sendersLastPaymentAfterDelete = await getEscrowedPayment(
-            expectedSentPaymentIds[expectedSentPaymentIds.length - 1],
-            escrow
-          )
-          assert.equal(sendersLastPaymentAfterDelete.sentIndex, deletedPayment.sentIndex)
-        }
-        if (expectedReceivedPaymentIds.length) {
-          const receiversLastPaymentAfterDelete = await getEscrowedPayment(
-            expectedReceivedPaymentIds[expectedReceivedPaymentIds.length - 1],
-            escrow
-          )
-        }
-        // Note: these are actually checks for `deletePayment` which is a private function
-        // Check that indices of last payment structs in previous lists are properly updated
-        if (checkLastSentPayment) {
-          const sendersLastPaymentAfterWithdraw = await getEscrowedPayment(
-            sentPaymentsBefore[sentPaymentsBefore.length - 1],
-            escrow
-          )
-          assert.equal(
-            sendersLastPaymentAfterWithdraw.sentIndex,
-            paymentBefore.sentIndex,
-            "sentIndex of last payment in sender's sentPaymentIds not updated properly"
-          )
-        }
-
-        if (checkLastReceivedPayment) {
-          const receiversLastPaymentAfterWithdraw = await getEscrowedPayment(
-            receivedPaymentsBefore[receivedPaymentsBefore.length - 1],
-            escrow
-          )
-          assert.equal(
-            receiversLastPaymentAfterWithdraw.receivedIndex,
-            paymentBefore.receivedIndex,
-            "receivedIndex of last payment in receiver's receivedPaymentIds not updated properly"
-          )
-        }
       }
 
       describe('when no payment has been escrowed', () => {
@@ -569,12 +510,30 @@ contract('Escrow', (accounts: string[]) => {
         })
 
         it('should allow withdrawal with possession of PK and no attestations', async () => {
-          await withdrawAndCheckState(sender, receiver, '0x0', aValue, uniquePaymentIDWithdraw, 0)
+          await withdrawAndCheckState(
+            sender,
+            receiver,
+            '0x0',
+            aValue,
+            uniquePaymentIDWithdraw,
+            0,
+            [],
+            []
+          )
         })
 
         it('should withdraw properly when second payment escrowed with empty identifier', async () => {
           await mintAndTransfer(sender, '0x0', aValue, oneDayInSecs, anotherWithdrawKeyAddress, 0)
-          await withdrawAndCheckState(sender, receiver, '0x0', aValue, uniquePaymentIDWithdraw, 0)
+          await withdrawAndCheckState(
+            sender,
+            receiver,
+            '0x0',
+            aValue,
+            uniquePaymentIDWithdraw,
+            0,
+            [anotherWithdrawKeyAddress],
+            [anotherWithdrawKeyAddress]
+          )
         })
         it("should withdraw properly when sender's second payment has an identifier with attestations", async () => {
           await mintAndTransfer(
@@ -585,7 +544,16 @@ contract('Escrow', (accounts: string[]) => {
             anotherWithdrawKeyAddress,
             3
           )
-          await withdrawAndCheckState(sender, receiver, '0x0', aValue, uniquePaymentIDWithdraw, 0)
+          await withdrawAndCheckState(
+            sender,
+            receiver,
+            '0x0',
+            aValue,
+            uniquePaymentIDWithdraw,
+            0,
+            [anotherWithdrawKeyAddress],
+            []
+          )
         })
         it('should not allow withdrawing without a valid signature using the withdraw key', async () => {
           // The signature is invalidated if it's sent from a different address
@@ -627,7 +595,9 @@ contract('Escrow', (accounts: string[]) => {
             aPhoneHash,
             aValue,
             uniquePaymentIDWithdraw,
-            minAttestations
+            minAttestations,
+            [],
+            []
           )
         })
         it('should not allow a user to withdraw a payment if they have fewer than minAttestations', async () => {
@@ -638,7 +608,9 @@ contract('Escrow', (accounts: string[]) => {
               aPhoneHash,
               aValue,
               uniquePaymentIDWithdraw,
-              minAttestations - 1
+              minAttestations - 1,
+              [],
+              []
             ),
             'This account does not have enough attestations to withdraw this payment.'
           )
@@ -658,7 +630,9 @@ contract('Escrow', (accounts: string[]) => {
             aPhoneHash,
             aValue,
             uniquePaymentIDWithdraw,
-            minAttestations
+            minAttestations,
+            [anotherWithdrawKeyAddress],
+            [anotherWithdrawKeyAddress]
           )
         })
       })
@@ -694,6 +668,7 @@ contract('Escrow', (accounts: string[]) => {
         const escrowContractBalanceBefore = (
           await mockERC20Token.balanceOf(escrow.address)
         ).toNumber()
+        const paymentBefore = await getEscrowedPayment(uniquePaymentIDRevoke, escrow)
 
         await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
 
@@ -708,26 +683,13 @@ contract('Escrow', (accounts: string[]) => {
           'incorrect final Escrow contract balance'
         )
 
-        const sentPaymentsAfterRevoke = await escrow.getSentPaymentIds(sender)
-        const receivedPaymentsAfterRevoke = await escrow.getReceivedPaymentIds(aPhoneHash)
-
-        // TODO EN: extract this out from common withdraw & revoke check -- check delete basically?
-        assert.deepEqual(
-          receivedPaymentsAfterRevoke,
+        await checkStateAfterDeletingPayment(
+          uniquePaymentIDRevoke,
+          paymentBefore,
+          sender,
+          aPhoneHash,
           [anotherWithdrawKeyAddress],
-          'unexpected receivedPaymentIds'
-        )
-        assert.deepEqual(
-          sentPaymentsAfterRevoke,
-          [anotherWithdrawKeyAddress],
-          'unexpected sentPaymentIds'
-        )
-
-        const escrowedPaymentAfter = await getEscrowedPayment(uniquePaymentIDRevoke, escrow)
-        assert.deepEqual(
-          escrowedPaymentAfter,
-          NULL_ESCROWED_PAYMENT,
-          'escrowedPayment not zeroed out'
+          [anotherWithdrawKeyAddress]
         )
       })
 
