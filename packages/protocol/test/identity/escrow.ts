@@ -1,6 +1,11 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert, assertRevertWithReason, timeTravel } from '@celo/protocol/lib/test-utils'
+import {
+  assertLogMatches2,
+  assertRevert,
+  assertRevertWithReason,
+  timeTravel,
+} from '@celo/protocol/lib/test-utils'
 import {
   EscrowContract,
   EscrowInstance,
@@ -271,6 +276,31 @@ contract('Escrow', (accounts: string[]) => {
         )
       })
 
+      it('should emit the Transfer event', async () => {
+        const receipt = await escrow.transfer(
+          aPhoneHash,
+          mockERC20Token.address,
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          2,
+          {
+            from: sender,
+          }
+        )
+        assertLogMatches2(receipt.logs[0], {
+          event: 'Transfer',
+          args: {
+            from: sender,
+            identifier: aPhoneHash,
+            token: mockERC20Token.address,
+            value: aValue,
+            paymentId: withdrawKeyAddress,
+            minAttestations: 2,
+          },
+        })
+      })
+
       it('should not allow two transfers with same paymentId', async () => {
         await escrow.transfer(
           aPhoneHash,
@@ -489,6 +519,32 @@ contract('Escrow', (accounts: string[]) => {
           )
         })
 
+        it('should emit the Withdrawal event', async () => {
+          const parsedSig = await getParsedSignatureOfAddress(
+            web3,
+            receiver,
+            uniquePaymentIDWithdraw
+          )
+          const receipt = await escrow.withdraw(
+            uniquePaymentIDWithdraw,
+            parsedSig.v,
+            parsedSig.r,
+            parsedSig.s,
+            { from: receiver }
+          )
+          assertLogMatches2(receipt.logs[0], {
+            event: 'Withdrawal',
+            args: {
+              identifier: NULL_BYTES32,
+              // This is intentional (`to`); weird naming in original Escrow contract.
+              to: sender,
+              token: mockERC20Token.address,
+              value: aValue,
+              paymentId: uniquePaymentIDWithdraw,
+            },
+          })
+        })
+
         it('should withdraw properly when second payment escrowed with empty identifier', async () => {
           await mintAndTransfer(
             sender,
@@ -662,6 +718,21 @@ contract('Escrow', (accounts: string[]) => {
               [anotherWithdrawKeyAddress],
               [anotherWithdrawKeyAddress]
             )
+          })
+
+          it('should emit the Revocation event', async () => {
+            await timeTravel(oneDayInSecs, web3)
+            const receipt = await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
+            assertLogMatches2(receipt.logs[0], {
+              event: 'Revocation',
+              args: {
+                identifier,
+                by: sender,
+                token: mockERC20Token.address,
+                value: aValue,
+                paymentId: withdrawKeyAddress,
+              },
+            })
           })
 
           it('should not allow sender to revoke payment after receiver withdraws', async () => {

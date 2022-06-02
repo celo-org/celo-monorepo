@@ -33,6 +33,7 @@ contract Escrow is
 
   event Withdrawal(
     bytes32 indexed identifier,
+    // Note that `to` currently references the original sender of the payment
     address indexed to,
     address indexed token,
     uint256 value,
