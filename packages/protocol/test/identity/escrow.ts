@@ -1,4 +1,5 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
+import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertLogMatches2,
@@ -115,8 +116,7 @@ contract('Escrow', (accounts: string[]) => {
     const sender: string = accounts[1]
     const receiver: string = accounts[2]
 
-    // @ts-ignore
-    const aPhoneHash: string = web3.utils.soliditySha3({ t: 'string', v: '+18005555555' })
+    const aPhoneHash = getPhoneHash('+18005555555')
     const withdrawKeyAddress: string = accounts[3]
     const anotherWithdrawKeyAddress: string = accounts[4]
     const oneDayInSecs: number = 86400
