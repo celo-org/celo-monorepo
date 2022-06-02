@@ -328,35 +328,6 @@ contract('Escrow', (accounts: string[]) => {
       })
     })
 
-    // async function doubleTransfer() {
-    //   // EN TODO: refactor this into a single transfer
-    //   // this is super confusing --> the second mint happens outside, in the main function
-    //   await mockERC20Token.mint(sender, aValue)
-    //   await escrow.transfer(
-    //     aPhoneHash,
-    //     mockERC20Token.address,
-    //     aValue,
-    //     oneDayInSecs,
-    //     withdrawKeyAddress,
-    //     0,
-    //     {
-    //       from: sender,
-    //     }
-    //   )
-    //   await timeTravel(10, web3)
-    //   await escrow.transfer(
-    //     aPhoneHash,
-    //     mockERC20Token.address,
-    //     aValue,
-    //     oneDayInSecs,
-    //     anotherWithdrawKeyAddress,
-    //     1,
-    //     {
-    //       from: sender,
-    //     }
-    //   )
-    // }
-
     // TODO EN: move somewhere more sensible
     const mintAndTransfer = async (
       escrowSender: string,
@@ -642,86 +613,88 @@ contract('Escrow', (accounts: string[]) => {
       let uniquePaymentIDRevoke: string
       let parsedSig1: any
 
-      beforeEach(async () => {
-        // await doubleTransfer()
-        // console.log(doubleTransfer)
-        await mintAndTransfer(sender, aPhoneHash, aValue, oneDayInSecs, withdrawKeyAddress, 0)
-        // TODO this timetravel seems unnecessary here
-        await timeTravel(10, web3)
-        await mintAndTransfer(
-          sender,
-          aPhoneHash,
-          aValue,
-          oneDayInSecs,
-          anotherWithdrawKeyAddress,
-          0
-        )
+      const identifiers = ['0x0', aPhoneHash]
+      identifiers.forEach((identifier) => {
+        describe(`when identifier is ${identifier == '0x0' ? '' : 'not'} empty`, async () => {
+          beforeEach(async () => {
+            await mintAndTransfer(sender, identifier, aValue, oneDayInSecs, withdrawKeyAddress, 0)
+            await mintAndTransfer(
+              sender,
+              identifier,
+              aValue,
+              oneDayInSecs,
+              anotherWithdrawKeyAddress,
+              0
+            )
 
-        uniquePaymentIDRevoke = withdrawKeyAddress
-        parsedSig1 = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
-      })
-
-      it('should allow sender to redeem payment after payment has expired', async () => {
-        await timeTravel(oneDayInSecs, web3)
-
-        const senderBalanceBefore = (await mockERC20Token.balanceOf(sender)).toNumber()
-        const escrowContractBalanceBefore = (
-          await mockERC20Token.balanceOf(escrow.address)
-        ).toNumber()
-        const paymentBefore = await getEscrowedPayment(uniquePaymentIDRevoke, escrow)
-
-        await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
-
-        assert.equal(
-          (await mockERC20Token.balanceOf(sender)).toNumber(),
-          senderBalanceBefore + aValue,
-          'incorrect final sender balance'
-        )
-        assert.equal(
-          (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
-          escrowContractBalanceBefore - aValue,
-          'incorrect final Escrow contract balance'
-        )
-
-        await checkStateAfterDeletingPayment(
-          uniquePaymentIDRevoke,
-          paymentBefore,
-          sender,
-          aPhoneHash,
-          [anotherWithdrawKeyAddress],
-          [anotherWithdrawKeyAddress]
-        )
-      })
-
-      it('should not allow sender to revoke payment after receiver withdraws', async () => {
-        await escrow.withdraw(uniquePaymentIDRevoke, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
-          from: receiver,
-        })
-        await assertRevert(escrow.revoke(uniquePaymentIDRevoke, { from: sender }))
-      })
-
-      it('should not allow receiver to redeem payment after sender revokes it', async () => {
-        await timeTravel(oneDayInSecs, web3)
-        await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
-        await assertRevert(
-          escrow.withdraw(uniquePaymentIDRevoke, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
-            from: receiver,
+            uniquePaymentIDRevoke = withdrawKeyAddress
+            parsedSig1 = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
           })
-        )
-      })
 
-      it('should not allow sender to revoke payment before payment has expired', async () => {
-        await assertRevert(escrow.revoke(uniquePaymentIDRevoke, { from: sender }))
-      })
+          it('should allow sender to redeem payment after payment has expired', async () => {
+            await timeTravel(oneDayInSecs, web3)
 
-      it('should not allow receiver to use revoke function', async () => {
-        await timeTravel(oneDayInSecs, web3)
-        await assertRevert(escrow.revoke(uniquePaymentIDRevoke, { from: receiver }))
-      })
+            const senderBalanceBefore = (await mockERC20Token.balanceOf(sender)).toNumber()
+            const escrowContractBalanceBefore = (
+              await mockERC20Token.balanceOf(escrow.address)
+            ).toNumber()
+            const paymentBefore = await getEscrowedPayment(uniquePaymentIDRevoke, escrow)
 
-      it('should not allow any account who is not the sender to use revoke function', async () => {
-        await timeTravel(oneDayInSecs, web3)
-        await assertRevert(escrow.revoke(uniquePaymentIDRevoke, { from: accounts[4] }))
+            await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
+
+            assert.equal(
+              (await mockERC20Token.balanceOf(sender)).toNumber(),
+              senderBalanceBefore + aValue,
+              'incorrect final sender balance'
+            )
+            assert.equal(
+              (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
+              escrowContractBalanceBefore - aValue,
+              'incorrect final Escrow contract balance'
+            )
+
+            await checkStateAfterDeletingPayment(
+              uniquePaymentIDRevoke,
+              paymentBefore,
+              sender,
+              identifier,
+              [anotherWithdrawKeyAddress],
+              [anotherWithdrawKeyAddress]
+            )
+          })
+
+          it('should not allow sender to revoke payment after receiver withdraws', async () => {
+            await escrow.withdraw(uniquePaymentIDRevoke, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
+              from: receiver,
+            })
+            await assertRevert(escrow.revoke(uniquePaymentIDRevoke, { from: sender }))
+          })
+
+          it('should not allow receiver to redeem payment after sender revokes it', async () => {
+            await timeTravel(oneDayInSecs, web3)
+            await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
+            await assertRevert(
+              escrow.withdraw(uniquePaymentIDRevoke, parsedSig1.v, parsedSig1.r, parsedSig1.s, {
+                from: receiver,
+              })
+            )
+          })
+
+          it('should not allow sender to revoke payment before payment has expired', async () => {
+            await assertRevertWithReason(
+              escrow.revoke(uniquePaymentIDRevoke, { from: sender }),
+              'Transaction not redeemable for sender yet.'
+            )
+          })
+
+          it('should not allow receiver to use revoke function', async () => {
+            await timeTravel(oneDayInSecs, web3)
+            await assertRevertWithReason(
+              escrow.revoke(uniquePaymentIDRevoke, { from: receiver }),
+              'Only sender of payment can attempt to revoke payment.'
+            )
+          })
+        })
       })
     })
 
