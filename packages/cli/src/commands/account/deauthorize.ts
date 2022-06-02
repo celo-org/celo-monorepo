@@ -35,14 +35,14 @@ export default class Deauthorize extends BaseCommand {
       return
     }
 
-    let attestationSigner = await accounts.getAttestationSigner(res.flags.from)
+    const attestationSigner = await accounts.getAttestationSigner(res.flags.from)
 
-    if (res.flags.signer != attestationSigner) {
+    if (res.flags.signer !== attestationSigner) {
       this.error(`Invalid signer provided`)
       return
     }
 
-    let tx = await accounts.removeAttestationSigner()
+    const tx = await accounts.removeAttestationSigner()
 
     await displaySendTx('deauthorizeTx', tx)
   }
