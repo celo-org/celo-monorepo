@@ -53,14 +53,9 @@ export class LedgerSigner implements Signer {
       await this.checkForKnownToken(encodedTx)
       const signature = await this.ledger.signTransaction(
         validatedDerivationPath,
-        trimLeading0x(encodedTx.rlpEncode) // the ledger requires the rlpEncode without the leading 0x
+        trimLeading0x(encodedTx.rlpEncode), // the ledger requires the rlpEncode without the leading 0x
+        null
       )
-      // EIP155 support. check/recalc signature v value.
-      const rv = parseInt(signature.v, 16)
-      // tslint:disable-next-line: no-bitwise
-      if (rv !== addToV && (rv & addToV) !== rv) {
-        addToV += 1 // add signature v bit.
-      }
       signature.v = addToV.toString(10)
       return {
         v: parseInt(signature.v, 10),
