@@ -8,7 +8,7 @@ import {
 import { EIP712Optional } from '@celo/utils/lib/sign-typed-data-utils'
 import { Config } from '../../config'
 import { getDatabase } from '../../database/database'
-import { DomainStateRecord } from '../../database/models/domainState'
+import { DomainStateRecord, toSequentialDelayDomainState } from '../../database/models/domainState'
 import { DefaultKeyName, Key } from '../../key-management/key-provider-base'
 import { SignAbstract } from '../sign.abstract'
 import { DomainQuotaService } from './quota.service'
@@ -109,7 +109,7 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
           session.response,
           res.key,
           res.signature,
-          res.domainStateRecord.toSequentialDelayDomainState()
+          toSequentialDelayDomainState(res.domainStateRecord)
         )
       } else {
         this.io.sendFailure(res.error, res.status, session.response)

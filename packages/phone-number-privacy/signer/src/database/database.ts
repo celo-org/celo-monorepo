@@ -59,7 +59,7 @@ export async function initDatabase(doTestQuery = true) {
     client,
     useNullAsDefault: type === SupportedDatabase.Sqlite,
     connection,
-    debug: DEV_MODE,
+    debug: false && DEV_MODE,
   })
 
   logger.info('Running Migrations')
