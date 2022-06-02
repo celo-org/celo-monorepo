@@ -118,7 +118,7 @@ contract Escrow is
   ) external nonReentrant returns (bool) {
     require(token != address(0) && value > 0 && expirySeconds > 0, "Invalid transfer inputs.");
     require(
-      !(identifier.length <= 0 && !(minAttestations == 0)),
+      !(identifier == 0 && !(minAttestations == 0)),
       "Invalid privacy inputs: Can't require attestations if no identifier"
     );
 
@@ -168,7 +168,9 @@ contract Escrow is
     EscrowedPayment memory payment = escrowedPayments[paymentId];
     require(payment.token != address(0) && payment.value > 0, "Invalid withdraw value.");
 
-    if (payment.recipientIdentifier.length > 0) {
+    // Due to an old bug, there may exist payments with no identifier and minAttestations > 0
+    // So ensure that these fail the attestations check, as they previously would have
+    if (!(payment.recipientIdentifier == 0) || payment.minAttestations > 0) {
       IAttestations attestations = IAttestations(registry.getAddressFor(ATTESTATIONS_REGISTRY_ID));
       (uint64 completedAttestations, ) = attestations.getAttestationStats(
         payment.recipientIdentifier,

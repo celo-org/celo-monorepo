@@ -361,8 +361,7 @@ contract('Escrow', (accounts: string[]) => {
         )
       })
 
-      // TODO EN: this one should fail until bugfix; include after tests refactored
-      xit('should not allow a transfer if identifier is empty but minAttestations is > 0', async () => {
+      it('should not allow a transfer if identifier is empty but minAttestations is > 0', async () => {
         await assertRevertWithReason(
           escrow.transfer(
             NULL_BYTES32,
