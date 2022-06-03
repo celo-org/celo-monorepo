@@ -34,7 +34,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!this.getRequestKeyVersion(request, logger)) {
+    if (!this.requestHasValidKeyVersion(request, logger)) {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }

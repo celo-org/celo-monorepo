@@ -30,7 +30,7 @@ export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!this.getRequestKeyVersion(request, response.locals.logger)) {
+    if (!this.requestHasValidKeyVersion(request, response.locals.logger)) {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
