@@ -366,7 +366,7 @@ contract FederatedAttestations is
    * @param identifier Hash of the identifier to be revoked
    * @param issuer Address of the attestation issuer
    * @param account Address of the account mapped to the identifier
-   * @dev Throws if sender is not TODO
+   * @dev Throws if sender is not the issuer, signer, or account
    */
   // TODO should we pass in the issuedOn/signer parameter? ie. only revoke if the sender knows
   // the issuedOn/signer for the unique attestation
@@ -378,7 +378,7 @@ contract FederatedAttestations is
         address signer = attestation.signer;
         uint64 issuedOn = attestation.issuedOn;
         require(
-          signer == msg.sender || issuer == msg.sender,
+          signer == msg.sender || issuer == msg.sender || account == msg.sender,
           "Sender does not have permission to revoke this attestation"
         );
         // This is meant to delete the attestation in the array
@@ -408,6 +408,8 @@ contract FederatedAttestations is
           signer,
           issuedOn
         );
+        // Should never be able to re-revoke an attestation
+        assert(!revokedAttestations[attestationHash]);
         revokedAttestations[attestationHash] = true;
 
         emit AttestationRevoked(identifier, issuer, account, signer, issuedOn);
