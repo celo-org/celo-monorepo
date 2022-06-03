@@ -283,7 +283,7 @@ contract FederatedAttestations is
    * @dev Throws if attestation has been revoked
    * @dev Throws if signer is not an authorized AttestationSigner of the issuer
    */
-  function isValidAttestation(
+  function validateAttestation(
     bytes32 identifier,
     address issuer,
     address account,
@@ -293,10 +293,6 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) public view returns (bool) {
-    require(
-      !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
-      "Attestation has been revoked"
-    );
     require(
       getAccounts().attestationSignerToAccount(signer) == issuer,
       "Signer has not been authorized as an AttestationSigner by the issuer"
@@ -337,7 +333,15 @@ contract FederatedAttestations is
     bytes32 s
   ) external {
     // TODO allow for updating existing attestation by only updating signer and publishedOn
-    isValidAttestation(identifier, issuer, account, issuedOn, signer, v, r, s);
+    require(
+      !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
+      "Attestation has been revoked"
+    );
+
+    if (issuer != msg.sender) {
+      validateAttestation(identifier, issuer, account, issuedOn, signer, v, r, s);
+    }
+
     for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
       // This enforces only one attestation to be uploaded
       // for a given set of (identifier, issuer, account)
