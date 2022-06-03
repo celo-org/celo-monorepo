@@ -99,18 +99,28 @@ testWithGanache('Accounts Wrapper', (web3) => {
   test('SBAT authorize validator key when not a validator', async () => {
     const account = accounts[0]
     const signer = accounts[1]
-    await accountsInstance.createAccount()
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     const sig = await getParsedSignatureOfAddress(account, signer)
-    await accountsInstance.authorizeValidatorSigner(signer, sig, validators)
+    await (
+      await accountsInstance.authorizeValidatorSigner(signer, sig, validators)
+    ).sendAndWaitForReceipt({ from: account })
+
+    const validatorSigner = await accountsInstance.getValidatorSigner(account)
+    expect(validatorSigner).toEqual(signer)
   })
 
   test('SBAT authorize validator key when a validator', async () => {
     const account = accounts[0]
     const signer = accounts[1]
-    await accountsInstance.createAccount()
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     await setupValidator(account)
     const sig = await getParsedSignatureOfAddress(account, signer)
-    await accountsInstance.authorizeValidatorSigner(signer, sig, validators)
+    await (
+      await accountsInstance.authorizeValidatorSigner(signer, sig, validators)
+    ).sendAndWaitForReceipt({ from: account })
+
+    const validatorSigner = await accountsInstance.getValidatorSigner(account)
+    expect(validatorSigner).toEqual(signer)
   })
 
   test('SBAT authorize validator key and change BLS key atomically', async () => {
@@ -118,24 +128,43 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const newBlsPoP = web3.utils.randomHex(48)
     const account = accounts[0]
     const signer = accounts[1]
-    await accountsInstance.createAccount()
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     await setupValidator(account)
     const sig = await getParsedSignatureOfAddress(account, signer)
-    await accountsInstance.authorizeValidatorSignerAndBls(signer, sig, newBlsPublicKey, newBlsPoP)
+    await (
+      await accountsInstance.authorizeValidatorSignerAndBls(signer, sig, newBlsPublicKey, newBlsPoP)
+    ).sendAndWaitForReceipt({ from: account })
+
+    const validatorSigner = await accountsInstance.getValidatorSigner(account)
+    expect(validatorSigner).toEqual(signer)
   })
 
   test('SBAT set the wallet address to the caller', async () => {
-    await accountsInstance.createAccount()
-    await accountsInstance.setWalletAddress(accounts[0])
+    const account = accounts[0]
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    await accountsInstance.setWalletAddress(account).sendAndWaitForReceipt({ from: account })
+
+    const walletAddress = await accountsInstance.getWalletAddress(account)
+    expect(walletAddress).toEqual(account)
   })
 
   test('SBAT set the wallet address to a different wallet address', async () => {
-    await accountsInstance.createAccount()
-    const signature = await accountsInstance.generateProofOfKeyPossession(accounts[0], accounts[1])
-    await accountsInstance.setWalletAddress(accounts[1], signature)
+    const account = accounts[0]
+    const wallet = accounts[1]
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    const signature = await accountsInstance.generateProofOfKeyPossession(account, wallet)
+    await accountsInstance
+      .setWalletAddress(wallet, signature)
+      .sendAndWaitForReceipt({ from: account })
+
+    const walletAddress = await accountsInstance.getWalletAddress(account)
+    expect(walletAddress).toEqual(wallet)
   })
 
   test('SNBAT to set to a different wallet address without a signature', async () => {
-    await expect(accountsInstance.setWalletAddress(accounts[1])).rejects
+    const account = accounts[0]
+    const wallet = accounts[1]
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    await expect(accountsInstance.setWalletAddress(wallet)).rejects
   })
 })
