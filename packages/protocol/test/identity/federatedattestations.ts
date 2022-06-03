@@ -902,6 +902,22 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
     })
 
+    const newAttestation = [
+      [0, 'identifier', identifier2],
+      // skipping issuer as it requires a different signer as well
+      [2, 'account', accounts[3]],
+      [3, 'issuedOn', nowUnixTime + 1],
+      [4, 'signer', accounts[3]],
+    ]
+    newAttestation.forEach(([index, arg, newVal]) => {
+      it(`after revoking an attestation, should succeed in registering new attestation with different ${arg}`, async () => {
+        await federatedAttestations.revokeAttestation(identifier1, issuer1, account1)
+        const args = [identifier1, issuer1, account1, nowUnixTime, signer1]
+        args[index] = newVal
+        assert.isOk(signAndRegisterAttestation.apply(this, args))
+      })
+    })
+
     it('should revert if an invalid user attempts to revoke the attestation', async () => {
       await assertRevert(
         federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
@@ -909,19 +925,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
         })
       )
     })
-
-    // it('should revert if a revoked signer attempts to delete the attestation', async () => {
-    //   await federatedAttestations.revokeSigner(signer1)
-    //   await assertRevert(
-    //     federatedAttestations.revokeAttestation(identifier1, issuer1, account1, { from: signer1 })
-    //   )
-    // })
-
-    // it('should successfully delete an attestation with a revoked signer', async () => {
-    //   await federatedAttestations.revokeSigner(signer1)
-    //   await federatedAttestations.revokeAttestation(identifier1, issuer1, account1)
-    //   await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 1)
-    // })
 
     it('should fail registering same attestation and fail again after revoking it', async () => {
       await assertRevert(

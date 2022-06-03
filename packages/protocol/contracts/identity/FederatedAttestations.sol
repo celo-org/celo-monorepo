@@ -155,6 +155,8 @@ contract FederatedAttestations is
    */
   // TODO reviewers: is it preferable to return an array of `trustedIssuer` indices
   // (indicating issuer per attestation) instead of counts per attestation?
+  // TODO: change issuedOn type, change the order of return values to match across the file,
+  // add publishedOn to returned lookups
   function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
     external
     view
@@ -179,6 +181,8 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
+  // TODO: change issuedOn type, change the order of return values to match across the file,
+  // add publishedOn to returned lookups
   function _lookupAttestations(bytes32 identifier, address[] memory trustedIssuers)
     internal
     view
@@ -338,7 +342,7 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) external {
-    // TODO allow for updating existing attestation by only updating signer and publishedOn
+    // TODO allow for updating existing attestation by only updating signer/publishedOn/issuedOn
     validateAttestation(identifier, issuer, account, issuedOn, signer, v, r, s);
     for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
       // This enforces only one attestation to be uploaded
