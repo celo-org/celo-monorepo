@@ -255,7 +255,7 @@ export async function notifyDeployment(celoEnv: string, tag: string, suffix: str
       environment: celoEnv,
       commitsh: tag,
       suffix: suffix,
-      github_link: 'https://github.com/celo-org/blockscout/commit/' + tag,
+      github_link: `https://github.com/celo-org/blockscout/commit/${tag}`,
     },
   }
 

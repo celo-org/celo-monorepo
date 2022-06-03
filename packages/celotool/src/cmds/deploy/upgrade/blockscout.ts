@@ -4,9 +4,9 @@ import {
   createGrafanaTagAnnotation,
   getInstanceName,
   getReleaseName,
+  notifyDeployment,
   removeHelmRelease,
   upgradeHelmChart,
-  notifyDeployment,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
