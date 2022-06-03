@@ -1,16 +1,19 @@
 import {
+  Domain,
   domainHash,
   DomainRestrictedSignatureRequest,
   ErrorMessage,
   ErrorType,
+  ThresholdPoprfServer,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { EIP712Optional } from '@celo/utils/lib/sign-typed-data-utils'
 import { Config } from '../../config'
 import { getDatabase } from '../../database/database'
 import { DomainStateRecord, toSequentialDelayDomainState } from '../../database/models/domainState'
+import { getKeyProvider } from '../../key-management/key-provider'
 import { DefaultKeyName, Key } from '../../key-management/key-provider-base'
-import { SignAbstract } from '../sign.abstract'
+import { IAction, Session } from '../action.interface'
 import { DomainQuotaService } from './quota.service'
 import { DomainSession } from './session'
 import { DomainSignIO } from './sign.io'
@@ -31,14 +34,12 @@ type TrxResult =
       signature: string
     }
 
-export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequest> {
+export class DomainSignAction implements IAction<DomainRestrictedSignatureRequest> {
   constructor(
     readonly config: Config,
     readonly quota: DomainQuotaService,
     readonly io: DomainSignIO
-  ) {
-    super()
-  }
+  ) {}
 
   public async perform(session: DomainSession<DomainRestrictedSignatureRequest>): Promise<void> {
     const domain = session.request.body.domain
@@ -91,15 +92,20 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
           name: DefaultKeyName.DOMAINS,
         }
 
-        // Compute signature inside transaction so it will rollback on error.
-        const signature = await this.sign(session.request.body.blindedMessage, key, session)
+        // Compute evaluation inside transaction so it will rollback on error.
+        const evaluation = await this.eval(
+          domain,
+          session.request.body.blindedMessage,
+          key,
+          session
+        )
 
         return {
           success: true,
           status: 200,
           domainStateRecord: quotaStatus.state,
           key,
-          signature,
+          signature: evaluation.toString('base64'),
         }
       })
 
@@ -120,7 +126,7 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
     }
   }
 
-  nonceCheck(
+  private nonceCheck(
     domainStateRecord: DomainStateRecord,
     session: DomainSession<DomainRestrictedSignatureRequest>
   ): boolean {
@@ -130,5 +136,23 @@ export class DomainSignAction extends SignAbstract<DomainRestrictedSignatureRequ
       return false
     }
     return nonce.value >= domainStateRecord.counter
+  }
+
+  private async eval(
+    domain: Domain,
+    blindedMessage: string,
+    key: Key,
+    session: Session<DomainRestrictedSignatureRequest>
+  ): Promise<Buffer> {
+    let privateKey: string
+    try {
+      privateKey = await getKeyProvider().getPrivateKeyOrFetchFromStore(key)
+    } catch (err) {
+      session.logger.error({ key }, 'Requested key version not supported')
+      throw err
+    }
+
+    const server = new ThresholdPoprfServer(Buffer.from(privateKey, 'base64'))
+    return server.blindPartialEval(domainHash(domain), Buffer.from(blindedMessage, 'base64'))
   }
 }
