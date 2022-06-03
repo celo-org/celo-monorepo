@@ -97,9 +97,8 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     blockscoutDBConnectionName
   )
 
-  await notifyDeployment(argv.celoEnv, imageTag, argv.suffix)
-
   if (!isCelotoolHelmDryRun()) {
+    await notifyDeployment(argv.celoEnv, imageTag, argv.suffix)
     await createGrafanaTagAnnotation(argv.celoEnv, imageTag, dbSuffix)
     await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
   }
