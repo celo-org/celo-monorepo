@@ -254,7 +254,7 @@ export async function notifyDeployment(celoEnv: string, tag: string, suffix: str
       user: currentGcloudAccount,
       environment: celoEnv,
       commitsh: tag,
-      suffix: suffix,
+      suffix,
       github_link: `https://github.com/celo-org/blockscout/commit/${tag}`,
     },
   }
