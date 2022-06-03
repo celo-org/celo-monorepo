@@ -2,7 +2,7 @@ import fs from 'fs'
 import fetch from 'node-fetch'
 import { execCmdWithExitOnFailure } from './cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from './env-utils'
-import { accessSecretVersion, getCurrentGcloudAccount } from './gcloud_utils'
+import { accessSecretVersion, getCurrentGcloudAccount, publishPubsub } from './gcloud_utils'
 import {
   installGenericHelmChart,
   removeGenericHelmChart,
@@ -242,4 +242,22 @@ export async function createGrafanaTagAnnotation(celoEnv: string, tag: string, s
       tags: ['deployment', celoEnv],
     }),
   })
+}
+
+export async function notifyDeployment(celoEnv: string, tag: string, suffix: string) {
+  const currentGcloudAccount = await getCurrentGcloudAccount()
+
+  const message = {
+    source: 'blockscout',
+    tags: ['deployment', 'celotool'],
+    content: {
+      user: currentGcloudAccount,
+      environment: celoEnv,
+      commitsh: tag,
+      suffix: suffix,
+      github_link: 'https://github.com/celo-org/blockscout/commit/' + tag,
+    },
+  }
+
+  await publishPubsub('celo-testnet', 'seal_abs', JSON.stringify(message))
 }

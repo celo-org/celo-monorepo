@@ -149,3 +149,9 @@ export async function accessSecretVersion(
     console.info('Error retrieving key')
   }
 }
+
+export async function publishPubsub(projectId: string, topic: string, message: string) {
+  await execCmd(
+    `gcloud pubsub topics publish ${topic} --project=${projectId} --message='${message}'`
+  )
+}

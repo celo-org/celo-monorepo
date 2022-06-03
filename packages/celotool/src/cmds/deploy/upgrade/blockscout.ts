@@ -6,6 +6,7 @@ import {
   getReleaseName,
   removeHelmRelease,
   upgradeHelmChart,
+  notifyDeployment,
 } from 'src/lib/blockscout'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
@@ -95,6 +96,8 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     blockscoutDBPassword,
     blockscoutDBConnectionName
   )
+
+  await notifyDeployment(argv.celoEnv, imageTag, argv.suffix)
 
   if (!isCelotoolHelmDryRun()) {
     await createGrafanaTagAnnotation(argv.celoEnv, imageTag, dbSuffix)
