@@ -96,7 +96,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     signer: string,
     identifierIndex: number
   ) => {
-    const attestation = await federatedAttestations.identifierToAddresses(
+    const attestation = await federatedAttestations.identifierToAttestations(
       identifier,
       issuer,
       attestationIndex
@@ -120,7 +120,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     identifierIndex: number
   ) => {
     await assertThrowsAsync(
-      federatedAttestations.identifierToAddresses(identifier, issuer, addressIndex)
+      federatedAttestations.identifierToAttestations(identifier, issuer, addressIndex)
     )
     await assertThrowsAsync(
       federatedAttestations.addressToIdentifiers(account, issuer, identifierIndex)
@@ -1071,7 +1071,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       )
     })
 
-    it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
+    it('should modify identifierToAttestations and addresstoIdentifiers accordingly', async () => {
       await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 0)
       await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, signer1)
       await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
@@ -1092,7 +1092,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       })
 
-      it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
+      it('should modify identifierToAttestations and addresstoIdentifiers accordingly', async () => {
         const account2 = accounts[3]
         await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
         await assertAttestationNotInStorage(identifier1, issuer1, account2, 1, 0)
@@ -1287,7 +1287,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
     })
 
-    it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
+    it('should modify identifierToAttestations and addresstoIdentifiers accordingly', async () => {
       await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
       await federatedAttestations.deleteAttestation(identifier1, issuer1, account1)
       await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 0)
