@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["wallet"](_wallet_.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["wallet"](_wallet_.md)
 
 # Module: "wallet"
 

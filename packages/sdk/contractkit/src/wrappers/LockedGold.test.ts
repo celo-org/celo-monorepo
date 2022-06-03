@@ -3,7 +3,7 @@ import { newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
 import { LockedGoldWrapper } from './LockedGold'
 
-testWithGanache('Validators Wrapper', (web3) => {
+testWithGanache('LockedGold Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
   let accounts: AccountsWrapper
   let lockedGold: LockedGoldWrapper

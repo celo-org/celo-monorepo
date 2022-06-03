@@ -1,4 +1,4 @@
-[@celo/connect](../README.md) › ["connection"](_connection_.md)
+[@celo/connect](../README.md) › [Globals](../globals.md) › ["connection"](_connection_.md)
 
 # Module: "connection"
 

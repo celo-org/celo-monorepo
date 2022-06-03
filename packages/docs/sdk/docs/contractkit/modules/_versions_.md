@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["versions"](_versions_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["versions"](_versions_.md)
 
 # Module: "versions"
 
@@ -18,7 +18,9 @@
 
 ▸ **newContractVersion**(`storage`: number, `major`: number, `minor`: number, `patch`: number): *[ContractVersion](../classes/_versions_.contractversion.md)‹›*
 
-*Defined in [packages/sdk/contractkit/src/versions.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L18)*
+*Defined in [packages/sdk/contractkit/src/versions.ts:20](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/versions.ts#L20)*
+
+**`internal`** 
 
 **Parameters:**
 

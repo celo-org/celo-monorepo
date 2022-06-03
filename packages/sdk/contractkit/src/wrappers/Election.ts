@@ -10,7 +10,6 @@ import { Address, CeloTransactionObject, EventLog, toTransactionObject } from '@
 import BigNumber from 'bignumber.js'
 import { Election } from '../generated/Election'
 import {
-  BaseWrapper,
   fixidityValueToBigNumber,
   identity,
   proxyCall,
@@ -19,6 +18,7 @@ import {
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
+import { BaseWrapperForGoverning } from './BaseWrapperForGoverning'
 import { Validator, ValidatorGroup } from './Validators'
 
 export interface ValidatorGroupVote {
@@ -69,7 +69,7 @@ export interface ElectionConfig {
 /**
  * Contract for voting for validators and managing validator groups.
  */
-export class ElectionWrapper extends BaseWrapper<Election> {
+export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
   /**
    * Returns the minimum and maximum number of validators that can be elected.
    * @returns The minimum and maximum number of validators that can be elected.
@@ -306,7 +306,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const votes = await this.contract.methods.getTotalVotesForGroup(address).call()
     const eligible = await this.contract.methods.getGroupEligibility(address).call()
     const numVotesReceivable = await this.contract.methods.getNumVotesReceivable(address).call()
-    const accounts = await this.kit.contracts.getAccounts()
+    const accounts = await this.contracts.getAccounts()
     const name = (await accounts.getName(address)) || ''
     return {
       address,
@@ -320,12 +320,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * Returns the current registered validator groups and their total votes and eligibility.
    */
   async getValidatorGroupsVotes(): Promise<ValidatorGroupVote[]> {
-    const validators = await this.kit.contracts.getValidators()
+    const validators = await this.contracts.getValidators()
     const groups = await validators.getRegisteredValidatorGroupsAddresses()
-    return concurrentMap(5, groups, (g) => this.getValidatorGroupVotes(g))
+    return concurrentMap(5, groups, (g) => this.getValidatorGroupVotes(g as string))
   }
 
-  private _activate = proxySend(this.kit, this.contract.methods.activate)
+  private _activate = proxySend(this.connection, this.contract.methods.activate)
 
   /**
    * Activates any activatable pending votes.
@@ -350,7 +350,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.revokePending(group, value.toFixed(), lesser, greater, index)
     )
   }
@@ -365,7 +365,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
 
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
     )
   }
@@ -400,7 +400,7 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(validatorGroup, value)
 
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.vote(validatorGroup, value.toFixed(), lesser, greater)
     )
   }
@@ -453,9 +453,10 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param epochNumber The epoch to retrieve the elected validator set at.
    */
   async getElectedValidators(epochNumber: number): Promise<Validator[]> {
-    const blockNumber = await this.kit.getFirstBlockNumberForEpoch(epochNumber)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+    const blockNumber = await blockchainParamsWrapper.getFirstBlockNumberForEpoch(epochNumber)
     const signers = await this.getValidatorSigners(blockNumber)
-    const validators = await this.kit.contracts.getValidators()
+    const validators = await this.contracts.getValidators()
     return concurrentMap(10, signers, (addr) => validators.getValidatorFromSigner(addr))
   }
 
@@ -464,12 +465,14 @@ export class ElectionWrapper extends BaseWrapper<Election> {
    * @param epochNumber The epoch to retrieve GroupVoterRewards at.
    */
   async getGroupVoterRewards(epochNumber: number): Promise<GroupVoterReward[]> {
-    const blockNumber = await this.kit.getLastBlockNumberForEpoch(epochNumber)
+    const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
+
+    const blockNumber = await blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber)
     const events = await this.getPastEvents('EpochRewardsDistributedToVoters', {
       fromBlock: blockNumber,
       toBlock: blockNumber,
     })
-    const validators = await this.kit.contracts.getValidators()
+    const validators = await this.contracts.getValidators()
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
       validators.getValidatorGroup(e.returnValues.group, false)
     )
@@ -495,7 +498,12 @@ export class ElectionWrapper extends BaseWrapper<Election> {
   ): Promise<VoterReward[]> {
     const activeVoteShare =
       voterShare ||
-      (await this.getVoterShare(address, await this.kit.getLastBlockNumberForEpoch(epochNumber)))
+      (await this.getVoterShare(
+        address,
+        await (await this.contracts.getBlockchainParameters()).getLastBlockNumberForEpoch(
+          epochNumber
+        )
+      ))
     const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)
     const voterRewards = groupVoterRewards.filter(
       (e: GroupVoterReward) => normalizeAddressWith0x(e.group.address) in activeVoteShare
@@ -533,3 +541,5 @@ export class ElectionWrapper extends BaseWrapper<Election> {
     )
   }
 }
+
+export type ElectionWrapperType = ElectionWrapper

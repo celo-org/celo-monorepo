@@ -31,7 +31,7 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
    * Setting the extra intrinsic gas for transactions, where gas is paid using non-gold currency.
    */
   setIntrinsicGasForAlternativeFeeCurrency = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.setIntrinsicGasForAlternativeFeeCurrency
   )
 
@@ -43,7 +43,7 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
   /**
    * Setting the block gas limit.
    */
-  setBlockGasLimit = proxySend(this.kit, this.contract.methods.setBlockGasLimit)
+  setBlockGasLimit = proxySend(this.connection, this.contract.methods.setBlockGasLimit)
 
   /**
    * Get minimum client version.
@@ -60,7 +60,10 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
   /**
    * Set minimum client version.
    */
-  setMinimumClientVersion = proxySend(this.kit, this.contract.methods.setMinimumClientVersion)
+  setMinimumClientVersion = proxySend(
+    this.connection,
+    this.contract.methods.setMinimumClientVersion
+  )
 
   /**
    * Returns current configuration parameters.
@@ -84,5 +87,51 @@ export class BlockchainParametersWrapper extends BaseWrapper<BlockchainParameter
   /**
    * Setting the uptime lookback window.
    */
-  setUptimeLookbackWindow = proxySend(this.kit, this.contract.methods.setUptimeLookbackWindow)
+  setUptimeLookbackWindow = proxySend(
+    this.connection,
+    this.contract.methods.setUptimeLookbackWindow
+  )
+
+  async getEpochSizeNumber(): Promise<number> {
+    const epochSize = await this.getEpochSize()
+
+    return epochSize.toNumber()
+  }
+
+  async getFirstBlockNumberForEpoch(epochNumber: number): Promise<number> {
+    const epochSize = await this.getEpochSizeNumber()
+    // Follows GetEpochFirstBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+    if (epochNumber === 0) {
+      // No first block for epoch 0
+      return 0
+    }
+    return (epochNumber - 1) * epochSize + 1
+  }
+
+  async getLastBlockNumberForEpoch(epochNumber: number): Promise<number> {
+    const epochSize = await this.getEpochSizeNumber()
+    // Follows GetEpochLastBlockNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+    if (epochNumber === 0) {
+      return 0
+    }
+    const firstBlockNumberForEpoch = await this.getFirstBlockNumberForEpoch(epochNumber)
+    return firstBlockNumberForEpoch + (epochSize - 1)
+  }
+
+  async getEpochNumberOfBlock(blockNumber: number): Promise<number> {
+    const epochSize = await this.getEpochSizeNumber()
+    // Follows GetEpochNumber from celo-blockchain/blob/master/consensus/istanbul/utils.go
+    const epochNumber = Math.floor(blockNumber / epochSize)
+    if (blockNumber % epochSize === 0) {
+      return epochNumber
+    } else {
+      return epochNumber + 1
+    }
+  }
+
+  getEpochNumber = proxyCall(this.contract.methods.getEpochNumber, undefined, valueToBigNumber)
+
+  getEpochSize = proxyCall(this.contract.methods.getEpochSize, undefined, valueToBigNumber)
 }
+
+export type BlockchainParametersWrapperType = BlockchainParametersWrapper

@@ -1,12 +1,12 @@
 {
   "name": "@celo/network-utils",
-  "version": "1.5.3-dev",
+  "version": "2.0.1-dev",
   "description": "Utilities for fetching static information about the Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "author": "Celo",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/network-utils",
+  "homepage": "https://celo-sdk-docs.readthedocs.io/en/latest/network-utils",
   "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/network-utils",
   "keywords": [
     "celo",

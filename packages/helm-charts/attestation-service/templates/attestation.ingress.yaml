@@ -1,8 +1,4 @@
-{{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1beta1" }}
-apiVersion: networking.k8s.io/v1beta1
-{{ else }}
-apiVersion: extensions/v1beta1
-{{ end -}}
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
@@ -15,8 +11,10 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     kubernetes.io/tls-acme: "true"
-    kubernetes.io/ingress.class: nginx
 spec:
+  {{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+  {{- end }}
   tls:
   - hosts:
     - {{ .Release.Name }}.{{ .Values.domain.name }}.org
@@ -27,7 +25,10 @@ spec:
       paths:
       {{ range $index, $e := until (.Values.geth.validators | int) }}
       - path: /{{ $index | toString }}/(.*)
+        pathType: Prefix
         backend:
-          serviceName: {{ $.Release.Name }}-{{ $index | toString }}
-          servicePort: 3000
+          service:
+            name: {{ $.Release.Name }}-{{ $index | toString }}
+            port: 
+              number: 3000
       {{ end }}

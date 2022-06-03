@@ -1,12 +1,13 @@
 {
   "name": "@celo/contractkit",
-  "version": "1.5.3-dev",
+  "version": "2.0.1-dev",
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "sideEffects": false,
   "author": "Celo",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit",
+  "homepage": "https://docs.celo.org/developer-guide/contractkit",
   "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit",
   "keywords": [
     "celo",
@@ -27,10 +28,11 @@
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "1.5.3-dev",
-    "@celo/connect": "1.5.3-dev",
-    "@celo/utils": "1.5.3-dev",
-    "@celo/wallet-local": "1.5.3-dev",
+    "@celo/base": "2.0.1-dev",
+    "@celo/connect": "2.0.1-dev",
+    "@celo/utils": "2.0.1-dev",
+    "@celo/wallet-local": "2.0.1-dev",
+    "@types/bn.js": "^5.1.0",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "cross-fetch": "^3.0.6",
@@ -41,6 +43,7 @@
     "web3": "1.3.6"
   },
   "devDependencies": {
+    "@celo/phone-utils": "2.0.1-dev",
     "@celo/dev-utils": "0.0.1-dev",
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da",

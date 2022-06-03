@@ -1,12 +1,11 @@
 import { NULL_ADDRESS } from '@celo/base'
-import { CeloTxObject } from '@celo/connect'
+import { CeloTxObject, Connection } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import {
   ICeloVersionedContract,
   newICeloVersionedContract,
 } from '../generated/ICeloVersionedContract'
-import { newKitFromWeb3 } from '../kit'
 import { ContractVersion, newContractVersion } from '../versions'
 import { BaseWrapper, unixSecondsTimestampToDateString } from './BaseWrapper'
 
@@ -20,7 +19,7 @@ mockContract.methods.getVersionNumber = (): CeloTxObject<any> => ({
 
 class TestWrapper extends BaseWrapper<ICeloVersionedContract> {
   constructor() {
-    super(newKitFromWeb3(web3), mockContract)
+    super(new Connection(web3), mockContract)
   }
 
   async protectedFunction(v: ContractVersion) {

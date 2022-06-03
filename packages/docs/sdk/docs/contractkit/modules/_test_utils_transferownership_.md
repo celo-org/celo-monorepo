@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["test-utils/transferownership"](_test_utils_transferownership_.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["test-utils/transferownership"](_test_utils_transferownership_.md)
 
 # Module: "test-utils/transferownership"
 

@@ -1,4 +1,5 @@
 import debugFactory from 'debug'
+import { AddressRegistry } from './address-registry'
 import { CeloContract, ProxyContracts } from './base'
 import { StableToken } from './celo-tokens'
 import { newAccounts } from './generated/Accounts'
@@ -31,7 +32,6 @@ import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
 import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
-import { ContractKit } from './kit'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
@@ -69,6 +69,18 @@ export const ContractFactories = {
   [CeloContract.Validators]: newValidators,
 }
 
+const StableToContract = {
+  [StableToken.cEUR]: CeloContract.StableTokenEUR,
+  [StableToken.cUSD]: CeloContract.StableToken,
+  [StableToken.cREAL]: CeloContract.StableTokenBRL,
+}
+
+const StableToExchange = {
+  [StableToken.cEUR]: CeloContract.ExchangeEUR,
+  [StableToken.cUSD]: CeloContract.Exchange,
+  [StableToken.cREAL]: CeloContract.ExchangeBRL,
+}
+
 export type CFType = typeof ContractFactories
 type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
 
@@ -82,8 +94,8 @@ type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
  */
 export class Web3ContractCache {
   private cacheMap: ContractCacheMap = {}
-
-  constructor(readonly kit: ContractKit) {}
+  /** core contract's address registry */
+  constructor(readonly registry: AddressRegistry) {}
   getAccounts() {
     return this.getContract(CeloContract.Accounts)
   }
@@ -112,7 +124,7 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.Escrow)
   }
   getExchange(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getExchangeContract(stableToken))
+    return this.getContract(StableToExchange[stableToken])
   }
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)
@@ -157,7 +169,7 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.SortedOracles)
   }
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getContract(stableToken))
+    return this.getContract(StableToContract[stableToken])
   }
   getTransferWhitelist() {
     return this.getContract(CeloContract.TransferWhitelist)
@@ -173,11 +185,14 @@ export class Web3ContractCache {
     if (this.cacheMap[contract] == null || address !== undefined) {
       // core contract in the registry
       if (!address) {
-        address = await this.kit.registry.addressFor(contract)
+        address = await this.registry.addressFor(contract)
       }
       debug('Initiating contract %s', contract)
       const createFn = ProxyContracts.includes(contract) ? newProxy : ContractFactories[contract]
-      this.cacheMap[contract] = createFn(this.kit.connection.web3, address) as ContractCacheMap[C]
+      this.cacheMap[contract] = createFn(
+        this.registry.connection.web3,
+        address
+      ) as ContractCacheMap[C]
     }
     // we know it's defined (thus the !)
     return this.cacheMap[contract]!

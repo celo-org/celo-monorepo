@@ -324,6 +324,21 @@ contract('ReleaseGold', (accounts: string[]) => {
       assertEqualBN(endBalanceTo, startBalanceTo.plus(transferAmount))
     })
 
+    it('should emit safeTransfer logs on erc20 revert', async () => {
+      const startBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
+      await assertRevert(
+        releaseGoldInstance.genericTransfer(
+          mockStableToken.address,
+          receiver,
+          startBalanceFrom.plus(1),
+          {
+            from: beneficiary,
+          }
+        ),
+        'SafeERC20: ERC20 operation did not succeed'
+      )
+    })
+
     it('should revert when attempting transfer of goldtoken from the release gold instance', async () => {
       await assertRevert(
         releaseGoldInstance.genericTransfer(goldTokenInstance.address, receiver, transferAmount, {

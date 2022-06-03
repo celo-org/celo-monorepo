@@ -1,6 +1,6 @@
 import { concurrentMap } from '@celo/base'
 import { CeloTokenType, StableToken, Token } from '@celo/contractkit'
-import { generateKeys } from '@celo/utils/lib/account'
+import { generateKeys } from '@celo/cryptographic-utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from './context'

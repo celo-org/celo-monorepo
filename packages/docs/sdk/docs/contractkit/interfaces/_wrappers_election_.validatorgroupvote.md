@@ -1,4 +1,4 @@
-[@celo/contractkit](../README.md) › ["wrappers/Election"](../modules/_wrappers_election_.md) › [ValidatorGroupVote](_wrappers_election_.validatorgroupvote.md)
+[@celo/contractkit](../README.md) › [Globals](../globals.md) › ["wrappers/Election"](../modules/_wrappers_election_.md) › [ValidatorGroupVote](_wrappers_election_.validatorgroupvote.md)
 
 # Interface: ValidatorGroupVote
 
