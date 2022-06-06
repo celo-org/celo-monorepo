@@ -34,7 +34,7 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: core-contracts.v5
+    RELEASE_TAG: core-contracts.v6
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -232,11 +232,6 @@ jobs:
   # other script
   pre-protocol-test-release:
     <<: *contract-defaults
-    docker:
-      # We override the default docker image here because this job builds the
-      # previous release and requires node 10 rather than node 12 to build
-      # properly.
-      - image: celohq/node10-gcloud:v3
     resource_class: large
     steps:
       - attach_workspace:

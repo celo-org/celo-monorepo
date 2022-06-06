@@ -18,6 +18,7 @@ geth:
   in_memory_discovery_table: false
   syncmode: full
   gcmode: full
+  rpc_gascap: 10000000
   verbosity: 2
   public_ips:
   - 52.149.51.48
