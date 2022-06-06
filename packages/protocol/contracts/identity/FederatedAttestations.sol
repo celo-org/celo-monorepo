@@ -61,6 +61,7 @@ contract FederatedAttestations is
     bytes32 indexed identifier,
     address indexed issuer,
     address indexed account,
+    address signer,
     uint64 issuedOn
   );
 
@@ -139,7 +140,7 @@ contract FederatedAttestations is
 
   /**
    * @notice Returns info about up to `maxAttestations` attestations for
-   *   `identifier` produced signers of `trustedIssuers`
+   *   `identifier` produced by signers of `trustedIssuers`
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @return [0] Array of number of attestations returned per issuer
@@ -152,6 +153,10 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
+  // TODO reviewers: is it preferable to return an array of `trustedIssuer` indices
+  // (indicating issuer per attestation) instead of counts per attestation?
+  // TODO: change issuedOn type, change the order of return values to match across the file,
+  // add publishedOn to returned lookups
   function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
     external
     view
@@ -176,6 +181,8 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
+  // TODO: change issuedOn type, change the order of return values to match across the file,
+  // add publishedOn to returned lookups
   function _lookupAttestations(bytes32 identifier, address[] memory trustedIssuers)
     internal
     view
@@ -337,7 +344,7 @@ contract FederatedAttestations is
         "Attestation for this account already exists"
       );
     }
-    uint64 publishedOn = uint64(now);
+    uint64 publishedOn = uint64(block.timestamp);
     OwnershipAttestation memory attestation = OwnershipAttestation(
       account,
       signer,
@@ -402,7 +409,7 @@ contract FederatedAttestations is
    * @param identifier Hash of the identifier to be revoked
    * @param issuer Address of the attestation issuer
    * @param account Address of the account mapped to the identifier
-   * @dev Throws if sender is not TODO
+   * @dev Throws if sender is not the issuer, signer, or account
    */
   // TODO should we pass in the issuedOn/signer parameter? ie. only revoke if the sender knows
   // the issuedOn/signer for the unique attestation
@@ -414,7 +421,7 @@ contract FederatedAttestations is
         address signer = attestation.signer;
         uint64 issuedOn = attestation.issuedOn;
         require(
-          signer == msg.sender || issuer == msg.sender,
+          signer == msg.sender || issuer == msg.sender || account == msg.sender,
           "Sender does not have permission to revoke this attestation"
         );
         // This is meant to delete the attestation in the array
@@ -444,9 +451,11 @@ contract FederatedAttestations is
           signer,
           issuedOn
         );
+        // Should never be able to re-revoke an attestation
+        assert(!revokedAttestations[attestationHash]);
         revokedAttestations[attestationHash] = true;
 
-        emit AttestationRevoked(identifier, issuer, account, issuedOn);
+        emit AttestationRevoked(identifier, issuer, account, signer, issuedOn);
         return;
       }
     }
