@@ -301,6 +301,29 @@ EXAMPLE
 
 _See code: [src/commands/account/create-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/create-metadata.ts)_
 
+## `celocli account:deauthorize`
+
+Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer. Please note that Attestation Services are important to the health of the Celo network, and validators should only use this command when troubleshooting their service is not an option.
+
+```
+Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer. Please note that Attestation Services are important to the health of the Celo network, and validators should only use this command when troubleshooting their service is not an option.
+
+USAGE
+  $ celocli account:deauthorize
+
+OPTIONS
+  -r, --role=attestation                               (required) Role to remove
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d    (required) Account Address
+  --globalHelp                                         View all available global flags
+  --signer=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+
+EXAMPLE
+  deauthorize --from 0x5409ED021D9299bf6814279A6A1411A7e866A631 --role attestation
+  --signer 0x6ecbe1db9ef729cbe972c83fb886247691fb6beb
+```
+
+_See code: [src/commands/account/deauthorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/deauthorize.ts)_
+
 ## `celocli account:get-metadata ADDRESS`
 
 Show information about an address. Retreives the metadata URL for an account from the on-chain, then fetches the metadata file off-chain and verifies proofs as able.
