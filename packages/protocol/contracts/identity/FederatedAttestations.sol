@@ -283,7 +283,7 @@ contract FederatedAttestations is
    * @dev Throws if attestation has been revoked
    * @dev Throws if signer is not an authorized AttestationSigner of the issuer
    */
-  function validateAttestation(
+  function validateAttestationSig(
     bytes32 identifier,
     address issuer,
     address account,
@@ -293,10 +293,6 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) public view returns (bool) {
-    require(
-      !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
-      "Attestation has been revoked"
-    );
     require(
       getAccounts().attestationSignerToAccount(signer) == issuer,
       "Signer has not been authorized as an AttestationSigner by the issuer"
@@ -329,6 +325,10 @@ contract FederatedAttestations is
     uint64 issuedOn,
     address signer
   ) private {
+    require(
+      !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
+      "Attestation has been revoked"
+    );
     for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
       // This enforces only one attestation to be uploaded
       // for a given set of (identifier, issuer, account)
@@ -359,7 +359,7 @@ contract FederatedAttestations is
    * @param signer Address of the signer of the attestation
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
-  function registerIssuerAttestation(
+  function registerAttestationAsIssuer(
     bytes32 identifier,
     address issuer,
     address account,
@@ -367,10 +367,6 @@ contract FederatedAttestations is
     address signer
   ) external {
     // TODO allow for updating existing attestation by only updating signer and publishedOn
-    require(
-      !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
-      "Attestation has been revoked"
-    );
     require(issuer == msg.sender);
     _registerAttestation(identifier, issuer, account, issuedOn, signer);
   }
@@ -398,7 +394,7 @@ contract FederatedAttestations is
     bytes32 s
   ) external {
     // TODO allow for updating existing attestation by only updating signer and publishedOn
-    validateAttestation(identifier, issuer, account, issuedOn, signer, v, r, s);
+    validateAttestationSig(identifier, issuer, account, issuedOn, signer, v, r, s);
     _registerAttestation(identifier, issuer, account, issuedOn, signer);
   }
 
