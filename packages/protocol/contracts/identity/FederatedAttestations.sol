@@ -279,7 +279,6 @@ contract FederatedAttestations is
    * @param v The recovery id of the incoming ECDSA signature
    * @param r Output value r of the ECDSA signature
    * @param s Output value s of the ECDSA signature
-   * @return Whether the signature is valid and the signer is authorized to make attestations.
    * @dev Throws if attestation has been revoked
    * @dev Throws if signer is not an authorized AttestationSigner of the issuer
    */
@@ -292,7 +291,7 @@ contract FederatedAttestations is
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) public view returns (bool) {
+  ) public view {
     require(
       getAccounts().attestationSignerToAccount(signer) == issuer,
       "Signer has not been authorized as an AttestationSigner by the issuer"
@@ -311,7 +310,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for registering attestations
+   * @notice Registers an attestation
    * @param identifier Hash of the identifier to be attested
    * @param issuer Address of the attestation issuer
    * @param account Address of the account being mapped to the identifier
@@ -359,7 +358,7 @@ contract FederatedAttestations is
    * @param signer Address of the signer of the attestation
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
-  function registerAttestationAsIssuer(
+  function registerAttestation(
     bytes32 identifier,
     address issuer,
     address account,
