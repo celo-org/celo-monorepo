@@ -1182,6 +1182,30 @@ contract('FederatedAttestations', (accounts: string[]) => {
       )
       await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
     })
+
+    it('should succeed if the issuer submits the attestation directly', async () => {
+      await federatedAttestations.registerAttestation(
+        identifier1,
+        issuer1,
+        account1,
+        nowUnixTime,
+        issuer1,
+        { from: issuer1 }
+      )
+      await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, issuer1, 0)
+    })
+
+    it('should revert if a non-issuer submits an attestation with no signature', async () => {
+      await federatedAttestations.registerAttestation(
+        identifier1,
+        issuer1,
+        account1,
+        nowUnixTime,
+        signer1,
+        { from: signer1 }
+      )
+      await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 0)
+    })
   })
 
   describe('#deleteAttestation', () => {
