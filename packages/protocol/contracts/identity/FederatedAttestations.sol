@@ -365,7 +365,7 @@ contract FederatedAttestations is
    * @param signer Address of the signer of the attestation
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
-  function registerAttestation(
+  function registerAttestationAsIssuer(
     bytes32 identifier,
     address issuer,
     address account,
