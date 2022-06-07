@@ -62,7 +62,8 @@ contract FederatedAttestations is
     address indexed issuer,
     address indexed account,
     address signer,
-    uint64 issuedOn
+    uint64 issuedOn,
+    uint64 publishedOn
   );
 
   /**
@@ -242,7 +243,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Returns up to `maxIdentifiers` identifiers mapped to `account` 
+   * @notice Returns up to `maxIdentifiers` identifiers mapped to `account`
    *   by signers of `trustedIssuers`
    * @param account Address of the account
    * @param trustedIssuers Array of n issuers whose identifier mappings will be used
@@ -293,8 +294,8 @@ contract FederatedAttestations is
     bytes32 identifier,
     address issuer,
     address account,
-    uint64 issuedOn,
     address signer,
+    uint64 issuedOn,
     uint8 v,
     bytes32 r,
     bytes32 s
@@ -305,7 +306,7 @@ contract FederatedAttestations is
     );
     require(
       getAccounts().attestationSignerToAccount(signer) == issuer,
-      "Signer has not been authorized as an AttestationSigner by the issuer"
+      "Signer is not a currently authorized AttestationSigner for the issuer"
     );
     bytes32 structHash = keccak256(
       abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
@@ -343,7 +344,7 @@ contract FederatedAttestations is
     bytes32 s
   ) external {
     // TODO allow for updating existing attestation by only updating signer/publishedOn/issuedOn
-    validateAttestation(identifier, issuer, account, issuedOn, signer, v, r, s);
+    validateAttestation(identifier, issuer, account, signer, issuedOn, v, r, s);
     for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
       // This enforces only one attestation to be uploaded
       // for a given set of (identifier, issuer, account)
@@ -381,6 +382,8 @@ contract FederatedAttestations is
       if (attestation.account == account) {
         address signer = attestation.signer;
         uint64 issuedOn = attestation.issuedOn;
+        uint64 publishedOn = attestation.publishedOn;
+        // TODO: allow any currently-registered attestation signer
         require(
           signer == msg.sender || issuer == msg.sender || account == msg.sender,
           "Sender does not have permission to revoke this attestation"
@@ -416,7 +419,7 @@ contract FederatedAttestations is
         assert(!revokedAttestations[attestationHash]);
         revokedAttestations[attestationHash] = true;
 
-        emit AttestationRevoked(identifier, issuer, account, signer, issuedOn);
+        emit AttestationRevoked(identifier, issuer, account, signer, issuedOn, publishedOn);
         return;
       }
     }
