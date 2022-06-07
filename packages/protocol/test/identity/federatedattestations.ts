@@ -76,8 +76,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       identifier,
       issuer,
       account,
-      signer,
       issuedOn,
+      signer,
       attestationSignature.v,
       attestationSignature.r,
       attestationSignature.s,
@@ -665,8 +665,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         identifier1,
         issuer1,
         account1,
-        signer1,
         nowUnixTime,
+        signer1,
         sig.v,
         sig.r,
         sig.s
@@ -705,8 +705,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           identifier1,
           issuer1,
           account1,
-          signer1,
           nowUnixTime,
+          signer1,
           sig2.v,
           sig2.r,
           sig2.s
@@ -722,8 +722,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           identifier1,
           issuer1,
           account1,
-          signer1,
           nowUnixTime,
+          signer1,
           sig.v,
           sig.r,
           sig.s
@@ -745,8 +745,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           identifier1,
           issuer1,
           account1,
-          signer1,
           nowUnixTime,
+          signer1,
           sig.v,
           sig.r,
           sig.s
@@ -781,8 +781,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
             identifier1,
             issuer1,
             account1,
-            signer2,
             nowUnixTime,
+            signer2,
             sig2.v,
             sig2.r,
             sig2.s
@@ -816,8 +816,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           identifier1,
           issuer1,
           account1,
-          signer1,
           nowUnixTime,
+          signer1,
           sig.v,
           sig.r,
           sig.s,
@@ -834,8 +834,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         identifier1,
         issuer1,
         account1,
-        signer1,
         nowUnixTime,
+        signer1,
         sig.v,
         sig.r,
         sig.s,
@@ -845,7 +845,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should succeed if the issuer submits the attestation directly', async () => {
-      await federatedAttestations.registerAttestation(
+      await federatedAttestations.registerAttestationAsIssuer(
         identifier1,
         issuer1,
         account1,
@@ -857,7 +857,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should revert if a non-issuer submits an attestation with no signature', async () => {
-      await federatedAttestations.registerAttestation(
+      await federatedAttestations.registerAttestationAsIssuer(
         identifier1,
         issuer1,
         account1,
@@ -877,8 +877,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         identifier1,
         issuer1,
         account1,
-        signer1,
         nowUnixTime,
+        signer1,
         sig.v,
         sig.r,
         sig.s
@@ -956,8 +956,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           identifier1,
           issuer1,
           account1,
-          signer1,
           nowUnixTime,
+          signer1,
           sig.v,
           sig.r,
           sig.s
@@ -969,8 +969,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           identifier1,
           issuer1,
           account1,
-          signer1,
           nowUnixTime,
+          signer1,
           sig.v,
           sig.r,
           sig.s
