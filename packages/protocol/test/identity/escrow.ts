@@ -108,6 +108,8 @@ contract('Escrow', (accounts: string[]) => {
     const aPhoneHash = getPhoneHash('+18005555555')
     const withdrawKeyAddress: string = accounts[3]
     const anotherWithdrawKeyAddress: string = accounts[4]
+    const trustedIssuer1 = accounts[5]
+    const trustedIssuer2 = accounts[6]
     const oneDayInSecs: number = 86400
 
     beforeEach(async () => {
@@ -199,6 +201,10 @@ contract('Escrow', (accounts: string[]) => {
           paymentId,
           "expected paymentId not found in escrowSender's sent payments list"
         )
+
+        const trustedIssuersPerPayment = await escrow.getTrustedIssuersPerPayment(paymentId)
+        // TODO EN: change this when we set trusted issuers to some set list by default
+        assert.deepEqual(trustedIssuersPerPayment, [])
       }
 
       beforeEach(async () => {
@@ -290,6 +296,27 @@ contract('Escrow', (accounts: string[]) => {
         })
       })
 
+      it('should emit the TrustedIssuersSet event', async () => {
+        const receipt = await escrow.transfer(
+          aPhoneHash,
+          mockERC20Token.address,
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          2,
+          {
+            from: sender,
+          }
+        )
+        assertLogMatches2(receipt.logs[1], {
+          event: 'TrustedIssuersSet',
+          args: {
+            paymentId: withdrawKeyAddress,
+            trustedIssuers: [],
+          },
+        })
+      })
+
       it('should not allow two transfers with same paymentId', async () => {
         await escrow.transfer(
           aPhoneHash,
@@ -365,6 +392,41 @@ contract('Escrow', (accounts: string[]) => {
           ),
           "Invalid privacy inputs: Can't require attestations if no identifier"
         )
+      })
+
+      describe('#transferWithTrustedIssuers', () => {
+        let receipt
+        const trustedIssuers = [trustedIssuer1, trustedIssuer2]
+
+        beforeEach(async () => {
+          receipt = await escrow.transferWithTrustedIssuers(
+            aPhoneHash,
+            mockERC20Token.address,
+            aValue,
+            oneDayInSecs,
+            withdrawKeyAddress,
+            2,
+            trustedIssuers,
+            {
+              from: sender,
+            }
+          )
+        })
+
+        it('should emit the TrustedIssuersSet event', async () => {
+          assertLogMatches2(receipt.logs[1], {
+            event: 'TrustedIssuersSet',
+            args: {
+              paymentId: withdrawKeyAddress,
+              trustedIssuers: trustedIssuers,
+            },
+          })
+        })
+
+        it('should set trustedIssuersPerPaymentId', async () => {
+          const actualTrustedIssuers = await escrow.getTrustedIssuersPerPayment(withdrawKeyAddress)
+          assert.deepEqual(actualTrustedIssuers, trustedIssuers)
+        })
       })
     })
 
