@@ -294,12 +294,16 @@ export function assertLogMatches(
   assert.deepEqual(logArgs, Object.keys(args).sort(), `Argument names do not match for ${event}`)
 
   for (const k of logArgs) {
+    const errorMsg = `Event ${event}, arg: ${k} do not match`
     if (typeof args[k] === 'function') {
-      args[k](log.args[k], `Event ${event}, arg: ${k} do not match`)
+      args[k](log.args[k], errorMsg)
     } else if (isNumber(log.args[k]) || isNumber(args[k])) {
-      assertEqualBN(log.args[k], args[k], `Event ${event}, arg: ${k} do not match`)
-    } else {
-      assert.equal(log.args[k], args[k], `Event ${event}, arg: ${k} do not match`)
+      assertEqualBN(log.args[k], args[k], errorMsg)
+    } else if (Array.isArray(log.args[k])) {
+      assert.deepEqual(log.args[k], args[k], errorMsg)
+    }
+     else {
+      assert.equal(log.args[k], args[k], errorMsg)
     }
   }
 }
