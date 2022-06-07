@@ -58,6 +58,14 @@ spec:
                   - celo-fullnode
               topologyKey: failure-domain.beta.kubernetes.io/zone
             weight: 100
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+      {{- end }}
       initContainers:
 {{- if .Values.geth.use_gstorage_data | default false }}
 {{ include "common.remove-old-chaindata" . | indent 6 }}
