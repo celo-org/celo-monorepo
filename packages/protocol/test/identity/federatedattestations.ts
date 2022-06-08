@@ -807,7 +807,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should revert if a non-issuer submits an attestation with no signature', async () => {
-      assertRevert(
+      await assertRevert(
         federatedAttestations.registerAttestationAsIssuer(
           identifier1,
           issuer1,
