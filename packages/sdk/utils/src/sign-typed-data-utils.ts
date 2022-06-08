@@ -43,7 +43,9 @@ export const EIP712_ATOMIC_TYPES = [
   'bytes1',
   'bytes32',
   'uint8',
+  'uint64',
   'uint256',
+  // This list should technically include all types from uint8 to uint256, and int8 to int256
   'int8',
   'int256',
   'bool',
