@@ -386,7 +386,7 @@ contract FederatedAttestations is
         // TODO reviewers: is there a risk that compromised signers could revoke legitimate
         // attestations before they have been unauthorized?
         require(
-          getAccounts().attestationSignerToAccount(msg.sender) == issuer || account == msg.sender,
+          account == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
           "Sender does not have permission to revoke this attestation"
         );
         // This is meant to delete the attestation in the array

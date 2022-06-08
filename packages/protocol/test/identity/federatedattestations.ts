@@ -631,7 +631,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           publishedOn,
         },
       })
-      assert(publishedOn >= nowUnixTime)
+      assert.isAtLeast(parseInt(publishedOn), nowUnixTime)
     })
 
     it('should succeed if issuer == signer', async () => {
