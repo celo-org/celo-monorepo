@@ -290,7 +290,7 @@ contract FederatedAttestations is
    * @dev Throws if attestation has been revoked
    * @dev Throws if signer is not an authorized AttestationSigner of the issuer
    */
-  function validateAttestation(
+  function validateAttestationSig(
     bytes32 identifier,
     address issuer,
     address account,
@@ -300,10 +300,6 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) public view {
-    require(
-      !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
-      "Attestation has been revoked"
-    );
     require(
       getAccounts().attestationSignerToAccount(signer) == issuer,
       "Signer is not a currently authorized AttestationSigner for the issuer"
@@ -319,6 +315,67 @@ contract FederatedAttestations is
       s
     );
     require(guessedSigner == signer, "Signature is invalid");
+  }
+
+  /**
+   * @notice Registers an attestation
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param signer Address of the signer of the attestation
+   */
+  function _registerAttestation(
+    bytes32 identifier,
+    address issuer,
+    address account,
+    address signer,
+    uint64 issuedOn
+  ) private {
+    require(
+      !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
+      "Attestation has been revoked"
+    );
+    for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
+      // This enforces only one attestation to be uploaded
+      // for a given set of (identifier, issuer, account)
+      // Editing/upgrading an attestation requires that it be revoked before a new one is registered
+      require(
+        identifierToAttestations[identifier][issuer][i].account != account,
+        "Attestation for this account already exists"
+      );
+    }
+    uint64 publishedOn = uint64(block.timestamp);
+    OwnershipAttestation memory attestation = OwnershipAttestation(
+      account,
+      signer,
+      issuedOn,
+      publishedOn
+    );
+    identifierToAttestations[identifier][issuer].push(attestation);
+    addressToIdentifiers[account][issuer].push(identifier);
+    emit AttestationRegistered(identifier, issuer, account, signer, issuedOn, publishedOn);
+  }
+
+  /**
+   * @notice Registers an attestation directly from the issuer
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param signer Address of the signer of the attestation
+   * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
+   */
+  function registerAttestationAsIssuer(
+    bytes32 identifier,
+    address issuer,
+    address account,
+    address signer,
+    uint64 issuedOn
+  ) external {
+    // TODO allow for updating existing attestation by only updating signer and publishedOn
+    require(issuer == msg.sender);
+    _registerAttestation(identifier, issuer, account, signer, issuedOn);
   }
 
   /**
@@ -343,27 +400,9 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) external {
-    // TODO allow for updating existing attestation by only updating signer/publishedOn/issuedOn
-    validateAttestation(identifier, issuer, account, signer, issuedOn, v, r, s);
-    for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
-      // This enforces only one attestation to be uploaded
-      // for a given set of (identifier, issuer, account)
-      // Editing/upgrading an attestation requires that it be revoked before a new one is registered
-      require(
-        identifierToAttestations[identifier][issuer][i].account != account,
-        "Attestation for this account already exists"
-      );
-    }
-    uint64 publishedOn = uint64(block.timestamp);
-    OwnershipAttestation memory attestation = OwnershipAttestation(
-      account,
-      signer,
-      issuedOn,
-      publishedOn
-    );
-    identifierToAttestations[identifier][issuer].push(attestation);
-    addressToIdentifiers[account][issuer].push(identifier);
-    emit AttestationRegistered(identifier, issuer, account, signer, issuedOn, publishedOn);
+    // TODO allow for updating existing attestation by only updating signer and publishedOn
+    validateAttestationSig(identifier, issuer, account, signer, issuedOn, v, r, s);
+    _registerAttestation(identifier, issuer, account, signer, issuedOn);
   }
 
   /**
