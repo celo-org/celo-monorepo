@@ -329,8 +329,8 @@ contract FederatedAttestations is
     bytes32 identifier,
     address issuer,
     address account,
-    uint64 issuedOn,
-    address signer
+    address signer,
+    uint64 issuedOn
   ) private {
     require(
       !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
@@ -370,12 +370,12 @@ contract FederatedAttestations is
     bytes32 identifier,
     address issuer,
     address account,
-    uint64 issuedOn,
-    address signer
+    address signer,
+    uint64 issuedOn
   ) external {
     // TODO allow for updating existing attestation by only updating signer and publishedOn
     require(issuer == msg.sender);
-    _registerAttestation(identifier, issuer, account, issuedOn, signer);
+    _registerAttestation(identifier, issuer, account, signer, issuedOn);
   }
 
   /**
@@ -394,15 +394,15 @@ contract FederatedAttestations is
     bytes32 identifier,
     address issuer,
     address account,
-    uint64 issuedOn,
     address signer,
+    uint64 issuedOn,
     uint8 v,
     bytes32 r,
     bytes32 s
   ) external {
     // TODO allow for updating existing attestation by only updating signer and publishedOn
-    validateAttestationSig(identifier, issuer, account, issuedOn, signer, v, r, s);
-    _registerAttestation(identifier, issuer, account, issuedOn, signer);
+    validateAttestationSig(identifier, issuer, account, signer, issuedOn, v, r, s);
+    _registerAttestation(identifier, issuer, account, signer, issuedOn);
   }
 
   /**

@@ -489,7 +489,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
       it('should return successfully if a valid signature is used', async () => {
         assert.isOk(
-          await federatedAttestations.validateAttestation(
+          await federatedAttestations.validateAttestationSig(
             identifier1,
             issuer1,
             account1,
@@ -513,7 +513,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           federatedAttestations.address
         )
         await assertRevert(
-          federatedAttestations.validateAttestation(
+          federatedAttestations.validateAttestationSig(
             identifier1,
             issuer1,
             account1,
@@ -537,31 +537,14 @@ contract('FederatedAttestations', (accounts: string[]) => {
         it(`should fail if the provided ${arg} is different from the attestation`, async () => {
           const args = [identifier1, issuer1, account1, signer1, nowUnixTime, sig.v, sig.r, sig.s]
           args[index] = wrongValue
-          await assertRevert(federatedAttestations.validateAttestation.apply(this, args))
+          await assertRevert(federatedAttestations.validateAttestationSig.apply(this, args))
         })
-      })
-
-      it('should revert if the attestation is revoked', async () => {
-        await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, signer1)
-        await federatedAttestations.revokeAttestation(identifier1, issuer1, account1)
-        await assertRevert(
-          federatedAttestations.validateAttestation(
-            identifier1,
-            issuer1,
-            account1,
-            signer1,
-            nowUnixTime,
-            sig.v,
-            sig.r,
-            sig.s
-          )
-        )
       })
     })
 
     it('should revert if the signer is not authorized as an AttestationSigner by the issuer', async () => {
       await assertRevert(
-        federatedAttestations.validateAttestation(
+        federatedAttestations.validateAttestationSig(
           identifier1,
           issuer1,
           account1,
@@ -580,7 +563,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await accountsInstance.completeSignerAuthorization(issuer1, role, { from: signer1 })
 
       await assertRevert(
-        federatedAttestations.validateAttestation(
+        federatedAttestations.validateAttestationSig(
           identifier1,
           issuer1,
           account1,
@@ -632,6 +615,23 @@ contract('FederatedAttestations', (accounts: string[]) => {
         },
       })
       assert.isAtLeast(publishedOn.toNumber(), nowUnixTime)
+    })
+
+    it('should revert if the attestation is revoked', async () => {
+      await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, signer1)
+      await federatedAttestations.revokeAttestation(identifier1, issuer1, account1)
+      await assertRevert(
+        federatedAttestations.registerAttestation(
+          identifier1,
+          issuer1,
+          account1,
+          signer1,
+          nowUnixTime,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+      )
     })
 
     it('should succeed if issuer == signer', async () => {
@@ -794,27 +794,29 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should succeed if the issuer submits the attestation directly', async () => {
-      await federatedAttestations.registerAttestationAsIssuer(
-        identifier1,
-        issuer1,
-        account1,
-        nowUnixTime,
-        issuer1,
-        { from: issuer1 }
+      assert.isOk(
+        await federatedAttestations.registerAttestationAsIssuer(
+          identifier1,
+          issuer1,
+          account1,
+          issuer1,
+          nowUnixTime,
+          { from: issuer1 }
+        )
       )
-      await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, issuer1, 0)
     })
 
     it('should revert if a non-issuer submits an attestation with no signature', async () => {
-      await federatedAttestations.registerAttestationAsIssuer(
-        identifier1,
-        issuer1,
-        account1,
-        nowUnixTime,
-        signer1,
-        { from: signer1 }
+      assertRevert(
+        federatedAttestations.registerAttestationAsIssuer(
+          identifier1,
+          issuer1,
+          account1,
+          signer1,
+          nowUnixTime,
+          { from: signer1 }
+        )
       )
-      await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 0)
     })
   })
 
