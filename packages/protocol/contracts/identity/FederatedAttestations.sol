@@ -383,9 +383,10 @@ contract FederatedAttestations is
         address signer = attestation.signer;
         uint64 issuedOn = attestation.issuedOn;
         uint64 publishedOn = attestation.publishedOn;
-        // TODO: allow any currently-registered attestation signer
+        // TODO reviewers: is there a risk that compromised signers could revoke legitimate
+        // attestations before they have been unauthorized?
         require(
-          signer == msg.sender || issuer == msg.sender || account == msg.sender,
+          getAccounts().attestationSignerToAccount(msg.sender) == issuer || account == msg.sender,
           "Sender does not have permission to revoke this attestation"
         );
         // This is meant to delete the attestation in the array

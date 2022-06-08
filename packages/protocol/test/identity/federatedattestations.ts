@@ -611,6 +611,9 @@ contract('FederatedAttestations', (accounts: string[]) => {
         sig.r,
         sig.s
       )
+
+      // fetching onchain publishedOn value as expected test value to avoid testing for a specific value
+      // as it would be a very flaky test
       const attestation = await federatedAttestations.identifierToAttestations(
         identifier1,
         issuer1,
@@ -628,6 +631,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           publishedOn,
         },
       })
+      assert(publishedOn >= nowUnixTime)
     })
 
     it('should succeed if issuer == signer', async () => {
@@ -818,6 +822,9 @@ contract('FederatedAttestations', (accounts: string[]) => {
         issuer1,
         0
       )
+
+      // fetching onchain publishedOn value as expected test value to avoid testing for a specific value
+      // as it would be a very flaky test to try and predict the value
       const publishedOn = attestation['publishedOn']
       const revokeAttestation = await federatedAttestations.revokeAttestation(
         identifier1,
