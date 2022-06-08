@@ -62,7 +62,8 @@ contract FederatedAttestations is
     address indexed issuer,
     address indexed account,
     address signer,
-    uint64 issuedOn
+    uint64 issuedOn,
+    uint64 publishedOn
   );
 
   /**
@@ -242,7 +243,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Returns up to `maxIdentifiers` identifiers mapped to `account` 
+   * @notice Returns up to `maxIdentifiers` identifiers mapped to `account`
    *   by signers of `trustedIssuers`
    * @param account Address of the account
    * @param trustedIssuers Array of n issuers whose identifier mappings will be used
@@ -293,15 +294,15 @@ contract FederatedAttestations is
     bytes32 identifier,
     address issuer,
     address account,
-    uint64 issuedOn,
     address signer,
+    uint64 issuedOn,
     uint8 v,
     bytes32 r,
     bytes32 s
   ) public view {
     require(
       getAccounts().attestationSignerToAccount(signer) == issuer,
-      "Signer has not been authorized as an AttestationSigner by the issuer"
+      "Signer is not a currently authorized AttestationSigner for the issuer"
     );
     bytes32 structHash = keccak256(
       abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
@@ -420,8 +421,11 @@ contract FederatedAttestations is
       if (attestation.account == account) {
         address signer = attestation.signer;
         uint64 issuedOn = attestation.issuedOn;
+        uint64 publishedOn = attestation.publishedOn;
+        // TODO reviewers: is there a risk that compromised signers could revoke legitimate
+        // attestations before they have been unauthorized?
         require(
-          signer == msg.sender || issuer == msg.sender || account == msg.sender,
+          account == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
           "Sender does not have permission to revoke this attestation"
         );
         // This is meant to delete the attestation in the array
@@ -455,7 +459,7 @@ contract FederatedAttestations is
         assert(!revokedAttestations[attestationHash]);
         revokedAttestations[attestationHash] = true;
 
-        emit AttestationRevoked(identifier, issuer, account, signer, issuedOn);
+        emit AttestationRevoked(identifier, issuer, account, signer, issuedOn, publishedOn);
         return;
       }
     }
