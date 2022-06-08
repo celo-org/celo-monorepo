@@ -22,7 +22,7 @@ spec:
         - |
            trap "touch /tmp/pod/main-terminated" EXIT
            [ ${DROP_DB} == "true" ] && mix do ecto.drop, ecto.create
-           mix do ecto.migrate
+           mix do ecto.migrate --no-compile
         resources:
           requests:
             memory: 250M
