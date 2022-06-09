@@ -42,7 +42,6 @@ const DefaultConstitution = {
   },
   Escrow: {
     default: 0.6,
-    setRegistry: 0.9,
   },
   Exchange: {
     default: 0.8,

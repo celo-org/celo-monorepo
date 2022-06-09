@@ -23,7 +23,7 @@ import "../stability/interfaces/IStableToken.sol";
 
 contract UsingRegistryV2 {
   address constant registryAddress = 0x000000000000000000000000000000000000ce10;
-  IRegistry public constant registry = IRegistry(registryAddress);
+  IRegistry public constant registryContract = IRegistry(registryAddress);
 
   // solhint-disable state-visibility
   bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
@@ -57,29 +57,40 @@ contract UsingRegistryV2 {
   // solhint-enable state-visibility
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
-    require(registry.getAddressForOrDie(identifierHash) == msg.sender, "only registered contract");
+    require(
+      registryContract.getAddressForOrDie(identifierHash) == msg.sender,
+      "only registered contract"
+    );
     _;
   }
 
   modifier onlyRegisteredContracts(bytes32[] memory identifierHashes) {
-    require(registry.isOneOf(identifierHashes, msg.sender), "only registered contracts");
+    require(registryContract.isOneOf(identifierHashes, msg.sender), "only registered contracts");
     _;
   }
 
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 1, 0);
+  }
+
   function getAccounts() internal view returns (IAccounts) {
-    return IAccounts(registry.getAddressForOrDie(ACCOUNTS_REGISTRY_ID));
+    return IAccounts(registryContract.getAddressForOrDie(ACCOUNTS_REGISTRY_ID));
   }
 
   function getAttestations() internal view returns (IAttestations) {
-    return IAttestations(registry.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID));
+    return IAttestations(registryContract.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID));
   }
 
   function getElection() internal view returns (IElection) {
-    return IElection(registry.getAddressForOrDie(ELECTION_REGISTRY_ID));
+    return IElection(registryContract.getAddressForOrDie(ELECTION_REGISTRY_ID));
   }
 
   function getExchange() internal view returns (IExchange) {
-    return IExchange(registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID));
+    return IExchange(registryContract.getAddressForOrDie(EXCHANGE_REGISTRY_ID));
   }
 
   function getExchangeDollar() internal view returns (IExchange) {
@@ -87,47 +98,50 @@ contract UsingRegistryV2 {
   }
 
   function getExchangeEuro() internal view returns (IExchange) {
-    return IExchange(registry.getAddressForOrDie(EXCHANGE_EURO_REGISTRY_ID));
+    return IExchange(registryContract.getAddressForOrDie(EXCHANGE_EURO_REGISTRY_ID));
   }
 
   function getExchangeREAL() internal view returns (IExchange) {
-    return IExchange(registry.getAddressForOrDie(EXCHANGE_REAL_REGISTRY_ID));
+    return IExchange(registryContract.getAddressForOrDie(EXCHANGE_REAL_REGISTRY_ID));
   }
 
   function getFeeCurrencyWhitelistRegistry() internal view returns (IFeeCurrencyWhitelist) {
-    return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
+    return
+      IFeeCurrencyWhitelist(
+        registryContract.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID)
+      );
   }
 
   function getFreezer() internal view returns (IFreezer) {
-    return IFreezer(registry.getAddressForOrDie(FREEZER_REGISTRY_ID));
+    return IFreezer(registryContract.getAddressForOrDie(FREEZER_REGISTRY_ID));
   }
 
   function getGoldToken() internal view returns (IERC20) {
-    return IERC20(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+    return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
   function getGovernance() internal view returns (IGovernance) {
-    return IGovernance(registry.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
+    return IGovernance(registryContract.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
   }
 
   function getLockedGold() internal view returns (ILockedGold) {
-    return ILockedGold(registry.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
+    return ILockedGold(registryContract.getAddressForOrDie(LOCKED_GOLD_REGISTRY_ID));
   }
 
   function getRandom() internal view returns (IRandom) {
-    return IRandom(registry.getAddressForOrDie(RANDOM_REGISTRY_ID));
+    return IRandom(registryContract.getAddressForOrDie(RANDOM_REGISTRY_ID));
   }
 
   function getReserve() internal view returns (IReserve) {
-    return IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
+    return IReserve(registryContract.getAddressForOrDie(RESERVE_REGISTRY_ID));
   }
 
   function getSortedOracles() internal view returns (ISortedOracles) {
-    return ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
+    return ISortedOracles(registryContract.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID));
   }
 
   function getStableToken() internal view returns (IStableToken) {
-    return IStableToken(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID));
+    return IStableToken(registryContract.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID));
   }
 
   function getStableDollarToken() internal view returns (IStableToken) {
@@ -135,14 +149,14 @@ contract UsingRegistryV2 {
   }
 
   function getStableEuroToken() internal view returns (IStableToken) {
-    return IStableToken(registry.getAddressForOrDie(STABLE_EURO_TOKEN_REGISTRY_ID));
+    return IStableToken(registryContract.getAddressForOrDie(STABLE_EURO_TOKEN_REGISTRY_ID));
   }
 
   function getStableRealToken() internal view returns (IStableToken) {
-    return IStableToken(registry.getAddressForOrDie(STABLE_REAL_TOKEN_REGISTRY_ID));
+    return IStableToken(registryContract.getAddressForOrDie(STABLE_REAL_TOKEN_REGISTRY_ID));
   }
 
   function getValidators() internal view returns (IValidators) {
-    return IValidators(registry.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
+    return IValidators(registryContract.getAddressForOrDie(VALIDATORS_REGISTRY_ID));
   }
 }

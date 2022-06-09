@@ -8,7 +8,7 @@ import "./interfaces/IAttestations.sol";
 import "./interfaces/IEscrow.sol";
 import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/UsingRegistry.sol";
+import "../common/UsingRegistryV2WithStorageSlot.sol";
 import "../common/Signatures.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
@@ -18,7 +18,8 @@ contract Escrow is
   ReentrancyGuard,
   Ownable,
   Initializable,
-  UsingRegistry
+  // Maintain storage alignment since Escrow was initially deployed with UsingRegistry.sol
+  UsingRegistryV2WithStorageSlot
 {
   using SafeMath for uint256;
 
@@ -76,7 +77,7 @@ contract Escrow is
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 2);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -87,11 +88,10 @@ contract Escrow is
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param registryAddress The address of the registry core smart contract.
    */
-  function initialize(address registryAddress) external initializer {
+  // TODO EN: this could be causing problems with the compatibility tests
+  function initialize() external initializer {
     _transferOwnership(msg.sender);
-    setRegistry(registryAddress);
   }
 
   /**
@@ -123,7 +123,7 @@ contract Escrow is
       "Invalid privacy inputs: Can't require attestations if no identifier"
     );
 
-    IAttestations attestations = IAttestations(registry.getAddressFor(ATTESTATIONS_REGISTRY_ID));
+    IAttestations attestations = getAttestations();
     require(
       minAttestations <= attestations.getMaxAttestations(),
       "minAttestations larger than limit"
@@ -172,7 +172,7 @@ contract Escrow is
     // Due to an old bug, there may exist payments with no identifier and minAttestations > 0
     // So ensure that these fail the attestations check, as they previously would have
     if (payment.minAttestations > 0) {
-      IAttestations attestations = IAttestations(registry.getAddressFor(ATTESTATIONS_REGISTRY_ID));
+      IAttestations attestations = getAttestations();
       (uint64 completedAttestations, ) = attestations.getAttestationStats(
         payment.recipientIdentifier,
         msg.sender
