@@ -152,7 +152,7 @@ export class DomainSignAction implements IAction<DomainRestrictedSignatureReques
       throw err
     }
 
-    const server = new ThresholdPoprfServer(Buffer.from(privateKey, 'base64'))
+    const server = new ThresholdPoprfServer(Buffer.from(privateKey, 'hex'))
     return server.blindPartialEval(domainHash(domain), Buffer.from(blindedMessage, 'base64'))
   }
 }

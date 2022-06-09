@@ -140,7 +140,7 @@ export class PoprfCombiner {
 
   /**
    * If there are enough responses provided, aggregates the collection of partial evaluations
-   * to a single PORF evaluation.
+   * to a single POPRF evaluation.
    *
    * @param response An array of partial evaluation responses.
    * @returns A buffer with a POPRF evaluation, or undefined if there are less than the threshold
