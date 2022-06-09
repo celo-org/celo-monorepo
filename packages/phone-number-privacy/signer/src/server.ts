@@ -72,36 +72,31 @@ export function createServer() {
   const pnpQuotaService = new PnpQuotaService()
   const domainQuotaService = new DomainQuotaService()
 
-  const pnpQuota = new PnpQuotaAction(
-    config,
-    pnpQuotaService,
-    new PnpQuotaIO(config.api.phoneNumberPrivacy.enabled)
+  const pnpQuota = new Controller(
+    new PnpQuotaAction(
+      config,
+      pnpQuotaService,
+      new PnpQuotaIO(config.api.phoneNumberPrivacy.enabled)
+    )
   )
-  const pnpSign = new PnpSignAction(
-    config,
-    pnpQuotaService,
-    new PnpSignIO(config.api.phoneNumberPrivacy.enabled)
+  const pnpSign = new Controller(
+    new PnpSignAction(config, pnpQuotaService, new PnpSignIO(config.api.phoneNumberPrivacy.enabled))
   )
-  const domainQuota = new DomainQuotaAction(
-    config,
-    domainQuotaService,
-    new DomainQuotaIO(config.api.domains.enabled)
+  const domainQuota = new Controller(
+    new DomainQuotaAction(config, domainQuotaService, new DomainQuotaIO(config.api.domains.enabled))
   )
-  const domainSign = new DomainSignAction(
-    config,
-    domainQuotaService,
-    new DomainSignIO(config.api.domains.enabled)
+  const domainSign = new Controller(
+    new DomainSignAction(config, domainQuotaService, new DomainSignIO(config.api.domains.enabled))
   )
-  const domainDisable = new DomainDisableAction(
-    config,
-    new DomainDisableIO(config.api.domains.enabled)
+  const domainDisable = new Controller(
+    new DomainDisableAction(config, new DomainDisableIO(config.api.domains.enabled))
   )
 
-  addMeteredSignerEndpoint(SignerEndpoint.PARTIAL_SIGN_MESSAGE, new Controller(pnpSign).handle)
-  addMeteredSignerEndpoint(SignerEndpoint.GET_QUOTA, new Controller(pnpQuota).handle)
-  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, new Controller(domainQuota).handle)
-  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_SIGN, new Controller(domainSign).handle)
-  addMeteredSignerEndpoint(SignerEndpoint.DISABLE_DOMAIN, new Controller(domainDisable).handle)
+  addMeteredSignerEndpoint(SignerEndpoint.PARTIAL_SIGN_MESSAGE, pnpSign.handle.bind(pnpSign))
+  addMeteredSignerEndpoint(SignerEndpoint.GET_QUOTA, pnpQuota.handle.bind(pnpQuota))
+  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
+  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
+  addMeteredSignerEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
 
   const sslOptions = getSslOptions()
   if (sslOptions) {

@@ -5,8 +5,12 @@ import {
   ErrorMessage,
   isSequentialDelayDomain,
 } from '@celo/phone-number-privacy-common'
-import { Transaction } from 'knex'
-import { DomainStateRecord } from '../../database/models/domainState'
+import { Knex } from 'knex'
+import {
+  DomainStateRecord,
+  toDomainStateRecord,
+  toSequentialDelayDomainState,
+} from '../../database/models/domainState'
 import {
   getDomainStateRecordOrEmpty,
   updateDomainStateRecord,
@@ -22,7 +26,7 @@ export class DomainQuotaService implements IQuotaService<QuotaDependentDomainReq
   async checkAndUpdateQuotaStatus(
     state: DomainStateRecord,
     session: DomainSession<QuotaDependentDomainRequest>,
-    trx: Transaction<DomainStateRecord>,
+    trx: Knex.Transaction<DomainStateRecord>,
     attemptTime?: number
   ): Promise<OdisQuotaStatusResult<QuotaDependentDomainRequest>> {
     const { domain } = session.request.body
@@ -32,10 +36,10 @@ export class DomainQuotaService implements IQuotaService<QuotaDependentDomainReq
       const result = checkSequentialDelayRateLimit(
         domain,
         attemptTime,
-        state.toSequentialDelayDomainState(attemptTime)
+        toSequentialDelayDomainState(state, attemptTime)
       )
       if (result.accepted) {
-        const newState = new DomainStateRecord(domain, result.state)
+        const newState = toDomainStateRecord(domain, result.state)
         // Persist the updated domain quota to the database.
         // This will trigger an insert if its the first update to the domain instance.
         await updateDomainStateRecord(domain, newState, trx, session.logger)
@@ -50,7 +54,7 @@ export class DomainQuotaService implements IQuotaService<QuotaDependentDomainReq
 
   async getQuotaStatus(
     session: DomainSession<QuotaDependentDomainRequest>,
-    trx?: Transaction<DomainStateRecord>
+    trx?: Knex.Transaction<DomainStateRecord>
   ): Promise<DomainStateRecord> {
     return getDomainStateRecordOrEmpty(session.request.body.domain, session.logger, trx)
   }

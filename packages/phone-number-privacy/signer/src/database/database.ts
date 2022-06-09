@@ -1,6 +1,5 @@
 import { rootLogger } from '@celo/phone-number-privacy-common'
-import knex from 'knex'
-import Knex from 'knex/types'
+import { Knex, knex } from 'knex'
 import config, { DEV_MODE, SupportedDatabase } from '../config'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
@@ -60,7 +59,7 @@ export async function initDatabase(doTestQuery = true) {
     client,
     useNullAsDefault: type === SupportedDatabase.Sqlite,
     connection,
-    debug: DEV_MODE,
+    debug: false && DEV_MODE,
   })
 
   logger.info('Running Migrations')

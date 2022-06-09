@@ -1,4 +1,4 @@
-import * as Knex from 'knex'
+import { Knex } from 'knex'
 import { DOMAIN_REQUESTS_COLUMNS, DOMAIN_REQUESTS_TABLE } from '../database/models/domainRequest'
 
 export async function up(knex: Knex): Promise<any> {

@@ -39,13 +39,30 @@ export abstract class IOAbstract<R extends OdisRequest> {
     ...args: unknown[]
   ): void
 
+  requestHasValidKeyVersion(request: Request<{}, {}, R>, logger: Logger): boolean {
+    const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
+    if (keyVersionHeader === undefined) {
+      return true
+    }
+    const requestedKeyVersion = Number(keyVersionHeader)
+
+    const isValid = !Number.isNaN(requestedKeyVersion)
+    if (!isValid) {
+      logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
+    }
+    return isValid
+  }
+
   getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
-    logger.info({ keyVersionHeader })
+    if (keyVersionHeader === undefined) {
+      return undefined
+    }
+
     const requestedKeyVersion = Number(keyVersionHeader)
     if (Number.isNaN(requestedKeyVersion)) {
-      logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
-      return undefined
+      logger.error({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
+      throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
     return requestedKeyVersion
   }

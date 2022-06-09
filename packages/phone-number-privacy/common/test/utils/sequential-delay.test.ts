@@ -40,14 +40,14 @@ describe('Sequential Delay Test Suite', () => {
           expectedResult: {
             accepted: false,
             notBefore: 0,
-            state: undefined,
+            state: { timer: 0, counter: 0, disabled: false, now: t - 1 },
           },
         },
         {
           timestamp: t,
           expectedResult: {
             accepted: true,
-            state: { timer: t, counter: 1, disabled: false },
+            state: { timer: t, counter: 1, disabled: false, now: t },
           },
         },
       ]
@@ -71,14 +71,14 @@ describe('Sequential Delay Test Suite', () => {
           timestamp: t + 1,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 1, counter: 1, disabled: false },
+            state: { timer: t + 1, counter: 1, disabled: false, now: t + 1 },
           },
         },
         {
           timestamp: t + 1,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 1, counter: 2, disabled: false },
+            state: { timer: t + 1, counter: 2, disabled: false, now: t + 1 },
           },
         },
         {
@@ -86,7 +86,7 @@ describe('Sequential Delay Test Suite', () => {
           expectedResult: {
             accepted: false,
             notBefore: undefined,
-            state: { timer: t + 1, counter: 2, disabled: false },
+            state: { timer: t + 1, counter: 2, disabled: false, now: t + 1 },
           },
         },
       ]
@@ -109,7 +109,7 @@ describe('Sequential Delay Test Suite', () => {
       result = checkSequentialDelayRateLimit(domain, t + 1, result?.state)
       expect(result).toEqual({
         accepted: true,
-        state: { timer: t + 1, counter: 1, disabled: false },
+        state: { timer: t + 1, counter: 1, disabled: false, now: t + 1 },
       })
 
       // Set the domain to disabled and attempt to make another reqeust.
@@ -118,7 +118,7 @@ describe('Sequential Delay Test Suite', () => {
       expect(result).toEqual({
         accepted: false,
         notBefore: undefined,
-        state: { timer: t + 1, counter: 1, disabled: true },
+        state: { timer: t + 1, counter: 1, disabled: true, now: t + 1 },
       })
     })
 
@@ -143,28 +143,28 @@ describe('Sequential Delay Test Suite', () => {
           timestamp: t + 3,
           expectedResult: {
             accepted: true,
-            state: { timer: t, counter: 1, disabled: false },
+            state: { timer: t, counter: 1, disabled: false, now: t + 3 },
           },
         },
         {
           timestamp: t + 3,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 1, counter: 2, disabled: false },
+            state: { timer: t + 1, counter: 2, disabled: false, now: t + 3 },
           },
         },
         {
           timestamp: t + 3,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 2, counter: 3, disabled: false },
+            state: { timer: t + 2, counter: 3, disabled: false, now: t + 3 },
           },
         },
         {
           timestamp: t + 3,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 3, counter: 4, disabled: false },
+            state: { timer: t + 3, counter: 4, disabled: false, now: t + 3 },
           },
         },
         {
@@ -172,7 +172,7 @@ describe('Sequential Delay Test Suite', () => {
           expectedResult: {
             accepted: false,
             notBefore: undefined,
-            state: { timer: t + 3, counter: 4, disabled: false },
+            state: { timer: t + 3, counter: 4, disabled: false, now: t + 3 },
           },
         },
       ]
@@ -199,7 +199,7 @@ describe('Sequential Delay Test Suite', () => {
           timestamp: t + 2,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 2, counter: 1, disabled: false },
+            state: { timer: t + 2, counter: 1, disabled: false, now: t + 2 },
           },
         },
         {
@@ -207,14 +207,14 @@ describe('Sequential Delay Test Suite', () => {
           expectedResult: {
             accepted: false,
             notBefore: t + 3,
-            state: { timer: t + 2, counter: 1, disabled: false },
+            state: { timer: t + 2, counter: 1, disabled: false, now: t + 2 },
           },
         },
         {
           timestamp: t + 3,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 3, counter: 2, disabled: false },
+            state: { timer: t + 3, counter: 2, disabled: false, now: t + 3 },
           },
         },
       ]
@@ -223,13 +223,13 @@ describe('Sequential Delay Test Suite', () => {
     })
 
     it('should return he correct results in the example sequence', () => {
-      const t = 0 // initial delay
+      const t = 10 // initial delay
 
       const domain: SequentialDelayDomain = {
         name: DomainIdentifiers.SequentialDelay,
         version: '1',
         stages: [
-          { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: noNumber },
+          { delay: t, resetTimer: noBool, batchSize: defined(2), repetitions: noNumber },
           { delay: 1, resetTimer: defined(false), batchSize: noNumber, repetitions: noNumber },
           { delay: 1, resetTimer: defined(true), batchSize: noNumber, repetitions: noNumber },
           { delay: 2, resetTimer: defined(false), batchSize: noNumber, repetitions: defined(1) },
@@ -245,42 +245,42 @@ describe('Sequential Delay Test Suite', () => {
           expectedResult: {
             accepted: false,
             notBefore: t,
-            state: undefined,
+            state: { timer: 0, counter: 0, disabled: false, now: t - 1 },
           },
         },
         {
           timestamp: t,
           expectedResult: {
             accepted: true,
-            state: { timer: t, counter: 1, disabled: false },
+            state: { timer: t, counter: 1, disabled: false, now: t },
           },
         },
         {
           timestamp: t + 1,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 1, counter: 2, disabled: false },
+            state: { timer: t + 1, counter: 2, disabled: false, now: t + 1 },
           },
         },
         {
           timestamp: t + 3,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 2, counter: 3, disabled: false },
+            state: { timer: t + 2, counter: 3, disabled: false, now: t + 3 },
           },
         },
         {
           timestamp: t + 3,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 3, counter: 4, disabled: false },
+            state: { timer: t + 3, counter: 4, disabled: false, now: t + 3 },
           },
         },
         {
           timestamp: t + 6,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 5, counter: 5, disabled: false },
+            state: { timer: t + 5, counter: 5, disabled: false, now: t + 6 },
           },
         },
         {
@@ -288,35 +288,35 @@ describe('Sequential Delay Test Suite', () => {
           expectedResult: {
             accepted: false,
             notBefore: t + 9,
-            state: { timer: t + 5, counter: 5, disabled: false },
+            state: { timer: t + 5, counter: 5, disabled: false, now: t + 8 },
           },
         },
         {
           timestamp: t + 9,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 9, counter: 6, disabled: false },
+            state: { timer: t + 9, counter: 6, disabled: false, now: t + 9 },
           },
         },
         {
           timestamp: t + 10,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 10, counter: 7, disabled: false },
+            state: { timer: t + 10, counter: 7, disabled: false, now: t + 10 },
           },
         },
         {
           timestamp: t + 14,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 14, counter: 8, disabled: false },
+            state: { timer: t + 14, counter: 8, disabled: false, now: t + 14 },
           },
         },
         {
           timestamp: t + 15,
           expectedResult: {
             accepted: true,
-            state: { timer: t + 15, counter: 9, disabled: false },
+            state: { timer: t + 15, counter: 9, disabled: false, now: t + 15 },
           },
         },
       ]

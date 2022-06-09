@@ -1,19 +1,19 @@
 import { SignMessageRequest } from '@celo/identity/lib/odis/query'
 import { WarningMessage } from '@celo/phone-number-privacy-common'
+import { computeBlindedSignature } from '../../bls/bls-cryptography-client'
 import { Counters } from '../../common/metrics'
 import { Config } from '../../config'
 import { getDatabase } from '../../database/database'
 import { getRequestExists } from '../../database/wrappers/request'
 import { DefaultKeyName, Key } from '../../key-management/key-provider-base'
-import { SignAbstract } from '../sign.abstract'
+import { getKeyProvider } from '../../key-management/key-provider'
+import { IAction, Session } from '../action.interface'
 import { PnpQuotaService } from './quota.service'
 import { PnpSession } from './session'
 import { PnpSignIO } from './sign.io'
 
-export class PnpSignAction extends SignAbstract<SignMessageRequest> {
-  constructor(readonly config: Config, readonly quota: PnpQuotaService, readonly io: PnpSignIO) {
-    super()
-  }
+export class PnpSignAction implements IAction<SignMessageRequest> {
+  constructor(readonly config: Config, readonly quota: PnpQuotaService, readonly io: PnpSignIO) {}
 
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
     await getDatabase().transaction(async (trx) => {
@@ -84,5 +84,20 @@ export class PnpSignAction extends SignAbstract<SignMessageRequest> {
         session.errors
       )
     })
+  }
+
+  private async sign(
+    blindedMessage: string,
+    key: Key,
+    session: Session<SignMessageRequest>
+  ): Promise<string> {
+    let privateKey: string
+    try {
+      privateKey = await getKeyProvider().getPrivateKeyOrFetchFromStore(key)
+    } catch (err) {
+      session.logger.error({ key }, 'Requested key version not supported')
+      throw err
+    }
+    return computeBlindedSignature(blindedMessage, privateKey, session.logger)
   }
 }

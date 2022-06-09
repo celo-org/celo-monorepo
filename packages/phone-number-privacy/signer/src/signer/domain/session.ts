@@ -9,6 +9,6 @@ export class DomainSession<R extends DomainRequest> {
     readonly request: Request<{}, {}, R>,
     readonly response: Response<OdisResponse<R>>
   ) {
-    this.logger = response.locals.logger()
+    this.logger = response.locals.logger
   }
 }

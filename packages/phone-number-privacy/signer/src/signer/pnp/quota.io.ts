@@ -31,7 +31,7 @@ export class PnpQuotaIO extends IOAbstract<PnpQuotaRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!(await this.authenticate(request, response.locals.logger()))) {
+    if (!(await this.authenticate(request, response.locals.logger))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
@@ -70,7 +70,7 @@ export class PnpQuotaIO extends IOAbstract<PnpQuotaRequest> {
         warnings,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
@@ -94,7 +94,7 @@ export class PnpQuotaIO extends IOAbstract<PnpQuotaRequest> {
         blockNumber,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }

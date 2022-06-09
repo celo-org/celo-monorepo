@@ -1,6 +1,7 @@
 import { DisableDomainRequest, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Config } from '../../config'
 import { getDatabase } from '../../database/database'
+import { toSequentialDelayDomainState } from '../../database/models/domainState'
 import {
   createEmptyDomainStateRecord,
   getDomainStateRecord,
@@ -28,6 +29,7 @@ export class DomainDisableAction implements IAction<DisableDomainRequest> {
         const domainStateRecord =
           (await getDomainStateRecord(domain, session.logger, trx)) ??
           (await insertDomainStateRecord(createEmptyDomainStateRecord(domain), trx, session.logger))
+        // DO NOT MERGE: Is the the return value going to has disabled = true or false?
         if (!domainStateRecord.disabled) {
           await setDomainDisabled(domain, trx, session.logger)
         }
@@ -41,7 +43,7 @@ export class DomainDisableAction implements IAction<DisableDomainRequest> {
       this.io.sendSuccess(
         res.status,
         session.response,
-        res.domainStateRecord.toSequentialDelayDomainState()
+        toSequentialDelayDomainState(res.domainStateRecord)
       )
     } catch (error) {
       session.logger.error('Error while disabling domain', error)

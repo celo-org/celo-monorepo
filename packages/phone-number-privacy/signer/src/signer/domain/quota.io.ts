@@ -58,7 +58,7 @@ export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
         status: domainState,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
@@ -78,7 +78,7 @@ export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
         status: domainState,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }

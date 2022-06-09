@@ -1,4 +1,4 @@
-import * as Knex from 'knex'
+import { Knex } from 'knex'
 import { DOMAIN_STATE_COLUMNS, DOMAIN_STATE_TABLE } from '../database/models/domainState'
 
 export async function up(knex: Knex): Promise<any> {

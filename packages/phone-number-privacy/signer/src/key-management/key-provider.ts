@@ -40,7 +40,7 @@ export async function initKeyProvider() {
     throw new Error('Valid keystore type must be provided')
   }
   logger.info(`Fetching keys: ${JSON.stringify(keysToPrefetch)}`)
-  await Promise.all(keysToPrefetch.map(keyProvider.fetchPrivateKeyFromStore))
+  await Promise.all(keysToPrefetch.map(keyProvider.fetchPrivateKeyFromStore.bind(keyProvider)))
   logger.info('Done fetching key. Key provider initialized successfully.')
 }
 

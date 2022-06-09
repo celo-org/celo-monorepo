@@ -30,11 +30,11 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
   ): Promise<PnpSession<SignMessageRequest> | null> {
-    const logger = response.locals.logger()
+    const logger = response.locals.logger
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!this.getRequestKeyVersion(request, logger)) {
+    if (!this.requestHasValidKeyVersion(request, logger)) {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
@@ -85,7 +85,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
         warnings, // TODO(Alec)(pnp): update handling of these types in combiner
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
@@ -109,7 +109,7 @@ export class PnpSignIO extends IOAbstract<SignMessageRequest> {
         blockNumber,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }

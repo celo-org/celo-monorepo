@@ -1,4 +1,4 @@
-import { toBool, toNum } from '@celo/phone-number-privacy-common'
+import { toBool } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 
 require('dotenv').config()
@@ -98,20 +98,20 @@ export interface Config {
 const env = process.env as any
 const config: Config = {
   server: {
-    port: toNum(env.SERVER_PORT) || 8080,
+    port: Number(env.SERVER_PORT ?? 8080),
     sslKeyPath: env.SERVER_SSL_KEY_PATH,
     sslCertPath: env.SERVER_SSL_CERT_PATH,
   },
   quota: {
-    unverifiedQueryMax: toNum(env.UNVERIFIED_QUERY_MAX) || 10,
-    additionalVerifiedQueryMax: toNum(env.ADDITIONAL_VERIFIED_QUERY_MAX) || 30,
-    queryPerTransaction: toNum(env.QUERY_PER_TRANSACTION) || 2,
+    unverifiedQueryMax: Number(env.UNVERIFIED_QUERY_MAX ?? 10),
+    additionalVerifiedQueryMax: Number(env.ADDITIONAL_VERIFIED_QUERY_MAX ?? 30),
+    queryPerTransaction: Number(env.QUERY_PER_TRANSACTION ?? 2),
     // Min balance is .01 cUSD
-    minDollarBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 1e16),
+    minDollarBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 1e16),
     // Min balance is .01 cEUR
-    minEuroBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 1e16),
+    minEuroBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 1e16),
     // Min balance is .005 CELO
-    minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE || 5e15),
+    minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 5e15),
   },
   api: {
     domains: {
@@ -122,7 +122,7 @@ const config: Config = {
     },
   },
   attestations: {
-    numberAttestationsRequired: toNum(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED) || 3,
+    numberAttestationsRequired: Number(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED ?? 3),
   },
   blockchain: {
     provider: env.BLOCKCHAIN_PROVIDER,
@@ -134,20 +134,20 @@ const config: Config = {
     password: env.DB_PASSWORD,
     database: env.DB_DATABASE,
     host: env.DB_HOST,
-    port: env.DB_PORT ? toNum(env.DB_PORT) : undefined,
+    port: env.DB_PORT ? Number(env.DB_PORT) : undefined,
     ssl: toBool(env.DB_USE_SSL, true),
-    poolMaxSize: env.DB_POOL_MAX_SIZE || 50,
+    poolMaxSize: env.DB_POOL_MAX_SIZE ?? 50,
   },
   keystore: {
     type: env.KEYSTORE_TYPE,
     keys: {
       phoneNumberPrivacy: {
         name: env.PHONE_NUMBER_PRIVACY_KEY_NAME_BASE,
-        latest: toNum(env.PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION) ?? 2,
+        latest: Number(env.PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION ?? 2),
       },
       domains: {
         name: env.DOMAINS_KEY_NAME_BASE,
-        latest: toNum(env.DOMAINS_LATEST_KEY_VERSION) ?? 1,
+        latest: Number(env.DOMAINS_LATEST_KEY_VERSION ?? 1),
       },
     },
     azure: {
@@ -160,7 +160,7 @@ const config: Config = {
     google: {
       projectId: env.KEYSTORE_GOOGLE_PROJECT_ID,
       secretName: env.KEYSTORE_GOOGLE_SECRET_NAME,
-      secretVersion: env.KEYSTORE_GOOGLE_SECRET_VERSION || 'latest',
+      secretVersion: env.KEYSTORE_GOOGLE_SECRET_VERSION ?? 'latest',
     },
     aws: {
       region: env.KEYSTORE_AWS_REGION,
@@ -168,7 +168,7 @@ const config: Config = {
       secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },
-  timeout: toNum(env.ODIS_SIGNER_TIMEOUT) ?? 5000,
-  test_quota_bypass_percentage: toNum(env.TEST_QUOTA_BYPASS_PERCENTAGE) ?? 0,
+  timeout: Number(env.ODIS_SIGNER_TIMEOUT ?? 5000),
+  test_quota_bypass_percentage: Number(env.TEST_QUOTA_BYPASS_PERCENTAGE ?? 0),
 }
 export default config

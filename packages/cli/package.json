@@ -42,7 +42,7 @@
     "@celo/wallet-hsm-azure": "2.0.1-dev",
     "@celo/wallet-ledger": "2.0.1-dev",
     "@celo/wallet-local": "2.0.1-dev",
-    "@ledgerhq/hw-transport-node-hid": "~5.11.0",
+    "@ledgerhq/hw-transport-node-hid": "~5.51.1",
     "@oclif/command": "^1.6.0",
     "@oclif/config": "^1.6.0",
     "@oclif/plugin-autocomplete": "^0.1.5",
