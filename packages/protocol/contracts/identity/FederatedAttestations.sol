@@ -28,8 +28,10 @@ contract FederatedAttestations is
 
   struct OwnershipAttestation {
     address account;
-    uint256 issuedOn;
     address signer;
+    uint64 issuedOn;
+    uint64 publishedOn;
+    // using uint64 to allow for extra space to add parameters
   }
 
   // TODO ASv2 revisit linting issues & all solhint-disable-next-line max-line-length
@@ -38,11 +40,11 @@ contract FederatedAttestations is
   mapping(bytes32 => mapping(address => OwnershipAttestation[])) public identifierToAttestations;
   // account -> issuer -> identifiers
   mapping(address => mapping(address => bytes32[])) public addressToIdentifiers;
-  // signer => isRevoked
-  mapping(address => bool) public revokedSigners;
+  // unique attestation hash -> isRevoked
+  mapping(bytes32 => bool) public revokedAttestations;
 
   bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
-    "OwnershipAttestation(bytes32 identifier,address issuer,address account,uint256 issuedOn)"
+    "OwnershipAttestation(bytes32 identifier,address issuer,address account,uint64 issuedOn)"
   );
   bytes32 public eip712DomainSeparator;
 
@@ -51,13 +53,17 @@ contract FederatedAttestations is
     bytes32 indexed identifier,
     address indexed issuer,
     address indexed account,
-    uint256 issuedOn,
-    address signer
+    address signer,
+    uint64 issuedOn,
+    uint64 publishedOn
   );
-  event AttestationDeleted(
+  event AttestationRevoked(
     bytes32 indexed identifier,
     address indexed issuer,
-    address indexed account
+    address indexed account,
+    address signer,
+    uint64 issuedOn,
+    uint64 publishedOn
   );
 
   /**
@@ -110,37 +116,6 @@ contract FederatedAttestations is
   /**
    * @notice Helper function for _lookupAttestations to calculate the
              total number of attestations completed for an identifier
-             by each trusted issuer, from unrevoked signers only
-   * @param identifier Hash of the identifier
-   * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @return [0] Sum total of attestations found
-   *         [1] Array of number of attestations found per issuer
-   */
-  function getNumUnrevokedAttestations(bytes32 identifier, address[] memory trustedIssuers)
-    internal
-    view
-    returns (uint256, uint256[] memory)
-  {
-    uint256 totalAttestations = 0;
-    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
-
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      // solhint-disable-next-line max-line-length
-      OwnershipAttestation[] storage attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
-      for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
-        if (revokedSigners[attestationsPerIssuer[j].signer]) {
-          continue;
-        }
-        totalAttestations = totalAttestations.add(1);
-        countsPerIssuer[i] = countsPerIssuer[i].add(1);
-      }
-    }
-    return (totalAttestations, countsPerIssuer);
-  }
-
-  /**
-   * @notice Helper function for _lookupAttestations to calculate the
-             total number of attestations completed for an identifier
              by each trusted issuer
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
@@ -166,12 +141,11 @@ contract FederatedAttestations is
 
   /**
    * @notice Returns info about up to `maxAttestations` attestations for
-   *   `identifier` produced by unrevoked signers of `trustedIssuers`
+   *   `identifier` produced by signers of `trustedIssuers`
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @param maxAttestations Limit the number of attestations that will be returned
    * @return [0] Array of number of attestations returned per issuer
-   * @return [1 - 3] for m (== sum([0])) found attestations, m <= maxAttestations:
+   * @return [1 - 3] for m (== sum([0])) found attestations:
    *         [
    *           Array of m accounts,
    *           Array of m issuedOns,
@@ -182,115 +156,22 @@ contract FederatedAttestations is
    */
   // TODO reviewers: is it preferable to return an array of `trustedIssuer` indices
   // (indicating issuer per attestation) instead of counts per attestation?
-  function lookupUnrevokedAttestations(
-    bytes32 identifier,
-    address[] calldata trustedIssuers,
-    uint256 maxAttestations
-  ) external view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
+  // TODO: change issuedOn type, change the order of return values to match across the file,
+  // add publishedOn to returned lookups
+  function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
+    external
+    view
+    returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory)
+  {
     // TODO reviewers: this is to get around a stack too deep error;
     // are there better ways of dealing with this?
-    return _lookupUnrevokedAttestations(identifier, trustedIssuers, maxAttestations);
-  }
-
-  /**
-   * @notice Helper function for lookupUnrevokedAttestations to get around stack too deep
-   * @param identifier Hash of the identifier
-   * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @param maxAttestations Limit the number of attestations that will be returned
-   * @return [0] Array of number of attestations returned per issuer
-   * @return [1 - 3] for m (== sum([0])) found attestations, m <= maxAttestations:
-   *         [
-   *           Array of m accounts,
-   *           Array of m issuedOns,
-   *           Array of m signers
-   *         ]; index corresponds to the same attestation
-   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
-   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
-   */
-  function _lookupUnrevokedAttestations(
-    bytes32 identifier,
-    address[] memory trustedIssuers,
-    uint256 maxAttestations
-  ) internal view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
-    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
-
-    // Pre-computing length of unrevoked attestations requires many storage lookups.
-    // Allow users to call that first and pass this in as maxAttestations.
-    // Same index corresponds to same attestation
-    address[] memory accounts = new address[](maxAttestations);
-    uint256[] memory issuedOns = new uint256[](maxAttestations);
-    address[] memory signers = new address[](maxAttestations);
-
-    uint256 currIndex = 0;
-    OwnershipAttestation[] memory attestationsPerIssuer;
-
-    for (uint256 i = 0; i < trustedIssuers.length && currIndex < maxAttestations; i = i.add(1)) {
-      attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
-      for (
-        uint256 j = 0;
-        j < attestationsPerIssuer.length && currIndex < maxAttestations;
-        j = j.add(1)
-      ) {
-        if (revokedSigners[attestationsPerIssuer[j].signer]) {
-          continue;
-        }
-        accounts[currIndex] = attestationsPerIssuer[j].account;
-        issuedOns[currIndex] = attestationsPerIssuer[j].issuedOn;
-        signers[currIndex] = attestationsPerIssuer[j].signer;
-        currIndex = currIndex.add(1);
-        countsPerIssuer[i] = countsPerIssuer[i].add(1);
-      }
-    }
-
-    if (currIndex >= maxAttestations) {
-      return (countsPerIssuer, accounts, issuedOns, signers);
-    }
-
-    // Trim returned structs if necessary
-    address[] memory trimmedAccounts = new address[](currIndex);
-    uint256[] memory trimmedIssuedOns = new uint256[](currIndex);
-    address[] memory trimmedSigners = new address[](currIndex);
-
-    for (uint256 i = 0; i < currIndex; i = i.add(1)) {
-      trimmedAccounts[i] = accounts[i];
-      trimmedIssuedOns[i] = issuedOns[i];
-      trimmedSigners[i] = signers[i];
-    }
-    return (countsPerIssuer, trimmedAccounts, trimmedIssuedOns, trimmedSigners);
-  }
-
-  /**
-   * @notice Similar to lookupUnrevokedAttestations but returns all attestations
-   *   for `identifier` produced by `trustedIssuers`,
-   *   either including or excluding attestations from revoked signers
-   * @param identifier Hash of the identifier
-   * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @param includeRevoked Whether to include attestations produced by revoked signers
-   * @return [0] Array of number of attestations returned per issuer
-   * @return [1 - 3] for m (== sum([0])) found attestations:
-   *         [
-   *           Array of m accounts,
-   *           Array of m issuedOns,
-   *           Array of m signers
-   *         ]; index corresponds to the same attestation
-   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
-   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
-   */
-  function lookupAttestations(
-    bytes32 identifier,
-    address[] calldata trustedIssuers,
-    bool includeRevoked
-  ) external view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
-    // TODO reviewers: this is to get around a stack too deep error;
-    // are there better ways of dealing with this?
-    return _lookupAttestations(identifier, trustedIssuers, includeRevoked);
+    return _lookupAttestations(identifier, trustedIssuers);
   }
 
   /**
    * @notice Helper function for lookupAttestations to get around stack too deep
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @param includeRevoked Whether to include attestations produced by revoked signers
    * @return [0] Array of number of attestations returned per issuer
    * @return [1 - 3] for m (== sum([0])) found attestations:
    *         [
@@ -301,17 +182,17 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function _lookupAttestations(
-    bytes32 identifier,
-    address[] memory trustedIssuers,
-    bool includeRevoked
-  ) internal view returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory) {
+  // TODO: change issuedOn type, change the order of return values to match across the file,
+  // add publishedOn to returned lookups
+  function _lookupAttestations(bytes32 identifier, address[] memory trustedIssuers)
+    internal
+    view
+    returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory)
+  {
     uint256 totalAttestations;
     uint256[] memory countsPerIssuer;
 
-    (totalAttestations, countsPerIssuer) = includeRevoked
-      ? getNumAttestations(identifier, trustedIssuers)
-      : getNumUnrevokedAttestations(identifier, trustedIssuers);
+    (totalAttestations, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
 
     address[] memory accounts = new address[](totalAttestations);
     uint256[] memory issuedOns = new uint256[](totalAttestations);
@@ -326,9 +207,6 @@ contract FederatedAttestations is
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
       for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
-        if (!includeRevoked && revokedSigners[attestationsPerIssuer[j].signer]) {
-          continue;
-        }
         accounts[totalAttestations] = attestationsPerIssuer[j].account;
         issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
         signers[totalAttestations] = attestationsPerIssuer[j].signer;
@@ -336,47 +214,6 @@ contract FederatedAttestations is
       }
     }
     return (countsPerIssuer, accounts, issuedOns, signers);
-  }
-
-  /**
-    * @notice Helper function for lookupIdentifiers to calculate the
-             total number of identifiers completed for an identifier
-             by each trusted issuer, from unrevoked signers only
-   * @param account Address of the account
-   * @param trustedIssuers Array of n issuers whose identifiers will be included
-   * @return [0] Sum total of identifiers found
-   *         [1] Array of number of identifiers found per issuer
-   */
-  function getNumUnrevokedIdentifiers(address account, address[] memory trustedIssuers)
-    internal
-    view
-    returns (uint256, uint256[] memory)
-  {
-    uint256 totalIdentifiers = 0;
-    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
-
-    OwnershipAttestation[] memory attestationsPerIssuer;
-    bytes32[] memory identifiersPerIssuer;
-
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
-      for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
-        bytes32 identifier = identifiersPerIssuer[j];
-        // Check if the mapping was produced by a revoked signer
-        attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
-        for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
-          OwnershipAttestation memory attestation = attestationsPerIssuer[k];
-          // (identifier, account, issuer) tuples are checked for uniqueness on registration
-          if (!(attestation.account == account) || revokedSigners[attestation.signer]) {
-            continue;
-          }
-          totalIdentifiers = totalIdentifiers.add(1);
-          countsPerIssuer[i] = countsPerIssuer[i].add(1);
-          break;
-        }
-      }
-    }
-    return (totalIdentifiers, countsPerIssuer);
   }
 
   /**
@@ -407,87 +244,23 @@ contract FederatedAttestations is
 
   /**
    * @notice Returns up to `maxIdentifiers` identifiers mapped to `account`
-   *   by unrevoked signers of `trustedIssuers`
+   *   by signers of `trustedIssuers`
    * @param account Address of the account
    * @param trustedIssuers Array of n issuers whose identifier mappings will be used
-   * @param maxIdentifiers Limit the number of identifiers that will be returned
-   * @return [0] Array of number of identifiers returned per issuer
-   * @return [1] Array (length == sum([0]) <= maxIdentifiers) of identifiers
-   * @dev Adds identifier info to the arrays in order of provided trustedIssuers
-   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
-   */
-  function lookupUnrevokedIdentifiers(
-    address account,
-    address[] calldata trustedIssuers,
-    uint256 maxIdentifiers
-  ) external view returns (uint256[] memory, bytes32[] memory) {
-    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
-    // Same as for the other lookup, preallocate and then trim for now
-    uint256 currIndex = 0;
-    bytes32[] memory identifiers = new bytes32[](maxIdentifiers);
-
-    OwnershipAttestation[] memory attestationsPerIssuer;
-    bytes32[] memory identifiersPerIssuer;
-
-    for (uint256 i = 0; i < trustedIssuers.length && currIndex < maxIdentifiers; i = i.add(1)) {
-      identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
-      for (
-        uint256 j = 0;
-        j < identifiersPerIssuer.length && currIndex < maxIdentifiers;
-        j = j.add(1)
-      ) {
-        bytes32 identifier = identifiersPerIssuer[j];
-        // Check if the mapping was produced by a revoked signer
-        attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
-        for (uint256 k = 0; k < attestationsPerIssuer.length; k = k.add(1)) {
-          // (identifier, account, issuer) tuples are checked for uniqueness on registration
-          if (
-            !(attestationsPerIssuer[k].account == account) ||
-            revokedSigners[attestationsPerIssuer[k].signer]
-          ) {
-            continue;
-          }
-          identifiers[currIndex] = identifier;
-          currIndex = currIndex.add(1);
-          countsPerIssuer[i] = countsPerIssuer[i].add(1);
-          break;
-        }
-      }
-    }
-    if (currIndex >= maxIdentifiers) {
-      return (countsPerIssuer, identifiers);
-    }
-    // Allocate and fill properly-sized array
-    bytes32[] memory trimmedIdentifiers = new bytes32[](currIndex);
-    for (uint256 i = 0; i < currIndex; i = i.add(1)) {
-      trimmedIdentifiers[i] = identifiers[i];
-    }
-    return (countsPerIssuer, trimmedIdentifiers);
-  }
-
-  /**
-   * @notice Similar to lookupUnrevokedIdentifiers but returns all identifiers
-   *   mapped to an address with attestations from a list of issuers,
-   *   either including or excluding attestations from revoked signers
-   * @param account Address of the account
-   * @param trustedIssuers Array of n issuers whose identifier mappings will be used
-   * @param includeRevoked Whether to include identifiers attested by revoked signers
    * @return [0] Array of number of identifiers returned per issuer
    * @return [1] Array (length == sum([0])) of identifiers
    * @dev Adds identifier info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function lookupIdentifiers(
-    address account,
-    address[] calldata trustedIssuers,
-    bool includeRevoked
-  ) external view returns (uint256[] memory, bytes32[] memory) {
+  function lookupIdentifiers(address account, address[] calldata trustedIssuers)
+    external
+    view
+    returns (uint256[] memory, bytes32[] memory)
+  {
     uint256 totalIdentifiers;
     uint256[] memory countsPerIssuer;
 
-    (totalIdentifiers, countsPerIssuer) = includeRevoked
-      ? getNumIdentifiers(account, trustedIssuers)
-      : getNumUnrevokedIdentifiers(account, trustedIssuers);
+    (totalIdentifiers, countsPerIssuer) = getNumIdentifiers(account, trustedIssuers);
 
     bytes32[] memory identifiers = new bytes32[](totalIdentifiers);
     bytes32[] memory identifiersPerIssuer;
@@ -497,53 +270,11 @@ contract FederatedAttestations is
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
       for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
-        if (
-          !includeRevoked &&
-          !foundUnrevokedAttestation(account, identifiersPerIssuer[j], trustedIssuers[i])
-        ) {
-          continue;
-        }
         identifiers[currIndex] = identifiersPerIssuer[j];
         currIndex = currIndex.add(1);
       }
     }
     return (countsPerIssuer, identifiers);
-  }
-
-  /**
-   * @notice Helper function for lookupIdentifiers to search through the
-   *   attestations from `issuer` for one with an unrevoked signer
-   *   that maps `account` -> `identifier
-   * @param account Address of the account
-   * @param identifier Hash of the identifier
-   * @param issuer Issuer whose attestations to search
-   * @return Whether or not an unrevoked attestation is found establishing the mapping
-   */
-  function foundUnrevokedAttestation(address account, bytes32 identifier, address issuer)
-    internal
-    view
-    returns (bool)
-  {
-    OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
-    for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
-      if (attestations[i].account == account && !revokedSigners[attestations[i].signer]) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // TODO do we want to restrict permissions, or should anyone
-  // with a valid signature be able to register an attestation?
-  modifier isValidUser(address issuer, address account) {
-    require(
-      msg.sender == account ||
-        msg.sender == issuer ||
-        getAccounts().attestationSignerToAccount(msg.sender) == issuer,
-      "User does not have permission to perform this action"
-    );
-    require(!revokedSigners[msg.sender], "User has been revoked ");
-    _;
   }
 
   /**
@@ -556,24 +287,22 @@ contract FederatedAttestations is
    * @param v The recovery id of the incoming ECDSA signature
    * @param r Output value r of the ECDSA signature
    * @param s Output value s of the ECDSA signature
-   * @return Whether the signature is valid
-   * @dev Throws if signer is revoked
+   * @dev Throws if attestation has been revoked
    * @dev Throws if signer is not an authorized AttestationSigner of the issuer
    */
-  function isValidAttestation(
+  function validateAttestationSig(
     bytes32 identifier,
     address issuer,
     address account,
-    uint256 issuedOn,
     address signer,
+    uint64 issuedOn,
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) public view returns (bool) {
-    require(!revokedSigners[signer], "Signer has been revoked");
+  ) public view {
     require(
       getAccounts().attestationSignerToAccount(signer) == issuer,
-      "Signer has not been authorized as an AttestationSigner by the issuer"
+      "Signer is not a currently authorized AttestationSigner for the issuer"
     );
     bytes32 structHash = keccak256(
       abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
@@ -585,7 +314,68 @@ contract FederatedAttestations is
       r,
       s
     );
-    return guessedSigner == signer;
+    require(guessedSigner == signer, "Signature is invalid");
+  }
+
+  /**
+   * @notice Registers an attestation
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param signer Address of the signer of the attestation
+   */
+  function _registerAttestation(
+    bytes32 identifier,
+    address issuer,
+    address account,
+    address signer,
+    uint64 issuedOn
+  ) private {
+    require(
+      !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
+      "Attestation has been revoked"
+    );
+    for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
+      // This enforces only one attestation to be uploaded
+      // for a given set of (identifier, issuer, account)
+      // Editing/upgrading an attestation requires that it be revoked before a new one is registered
+      require(
+        identifierToAttestations[identifier][issuer][i].account != account,
+        "Attestation for this account already exists"
+      );
+    }
+    uint64 publishedOn = uint64(block.timestamp);
+    OwnershipAttestation memory attestation = OwnershipAttestation(
+      account,
+      signer,
+      issuedOn,
+      publishedOn
+    );
+    identifierToAttestations[identifier][issuer].push(attestation);
+    addressToIdentifiers[account][issuer].push(identifier);
+    emit AttestationRegistered(identifier, issuer, account, signer, issuedOn, publishedOn);
+  }
+
+  /**
+   * @notice Registers an attestation directly from the issuer
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param signer Address of the signer of the attestation
+   * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
+   */
+  function registerAttestationAsIssuer(
+    bytes32 identifier,
+    address issuer,
+    address account,
+    address signer,
+    uint64 issuedOn
+  ) external {
+    // TODO allow for updating existing attestation by only updating signer and publishedOn
+    require(issuer == msg.sender);
+    _registerAttestation(identifier, issuer, account, signer, issuedOn);
   }
 
   /**
@@ -598,62 +388,54 @@ contract FederatedAttestations is
    * @param v The recovery id of the incoming ECDSA signature
    * @param r Output value r of the ECDSA signature
    * @param s Output value s of the ECDSA signature
-   * @dev Throws if sender is not the issuer, account, or an authorized AttestationSigner
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
   function registerAttestation(
     bytes32 identifier,
     address issuer,
     address account,
-    uint256 issuedOn,
     address signer,
+    uint64 issuedOn,
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) public isValidUser(issuer, account) {
-    require(
-      isValidAttestation(identifier, issuer, account, issuedOn, signer, v, r, s),
-      "Signature is invalid"
-    );
-    for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
-      // This enforces only one attestation to be uploaded
-      // for a given set of (identifier, issuer, account)
-      // Editing/upgrading an attestation requires that it be deleted before a new one is registered
-      require(
-        identifierToAttestations[identifier][issuer][i].account != account,
-        "Attestation for this account already exists"
-      );
-    }
-    OwnershipAttestation memory attestation = OwnershipAttestation(account, issuedOn, signer);
-    identifierToAttestations[identifier][issuer].push(attestation);
-    addressToIdentifiers[account][issuer].push(identifier);
-    emit AttestationRegistered(identifier, issuer, account, issuedOn, signer);
+  ) external {
+    // TODO allow for updating existing attestation by only updating signer and publishedOn
+    validateAttestationSig(identifier, issuer, account, signer, issuedOn, v, r, s);
+    _registerAttestation(identifier, issuer, account, signer, issuedOn);
   }
 
   /**
-   * @notice Deletes an attestation 
-   * @param identifier Hash of the identifier to be deleted
+   * @notice Revokes an attestation 
+   * @param identifier Hash of the identifier to be revoked
    * @param issuer Address of the attestation issuer
    * @param account Address of the account mapped to the identifier
-   * @dev Throws if sender is not the issuer, account, or an authorized AttestationSigner
+   * @dev Throws if sender is not the issuer, signer, or account
    */
-  function deleteAttestation(bytes32 identifier, address issuer, address account)
-    public
-    isValidUser(issuer, account)
-  {
+  // TODO should we pass in the issuedOn/signer parameter? ie. only revoke if the sender knows
+  // the issuedOn/signer for the unique attestation
+  function revokeAttestation(bytes32 identifier, address issuer, address account) external {
     OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
     for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
       OwnershipAttestation memory attestation = attestations[i];
       if (attestation.account == account) {
+        address signer = attestation.signer;
+        uint64 issuedOn = attestation.issuedOn;
+        uint64 publishedOn = attestation.publishedOn;
+        // TODO reviewers: is there a risk that compromised signers could revoke legitimate
+        // attestations before they have been unauthorized?
+        require(
+          account == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
+          "Sender does not have permission to revoke this attestation"
+        );
         // This is meant to delete the attestation in the array
         // and then move the last element in the array to that empty spot,
         // to avoid having empty elements in the array
-        // TODO reviewers: is there a better way of doing this?
+        // TODO benchmark gas cost saving to check if array is of length 1
         identifierToAttestations[identifier][issuer][i] = attestations[attestations.length - 1];
         identifierToAttestations[identifier][issuer].pop();
 
         bool deletedIdentifier = false;
-
         bytes32[] memory identifiers = addressToIdentifiers[account][issuer];
         for (uint256 j = 0; j < identifiers.length; j = j.add(1)) {
           if (identifiers[j] == identifier) {
@@ -666,17 +448,31 @@ contract FederatedAttestations is
         // Should never be false - both mappings should always be updated in unison
         assert(deletedIdentifier);
 
-        emit AttestationDeleted(identifier, issuer, account);
+        bytes32 attestationHash = getUniqueAttestationHash(
+          identifier,
+          issuer,
+          account,
+          signer,
+          issuedOn
+        );
+        // Should never be able to re-revoke an attestation
+        assert(!revokedAttestations[attestationHash]);
+        revokedAttestations[attestationHash] = true;
+
+        emit AttestationRevoked(identifier, issuer, account, signer, issuedOn, publishedOn);
         return;
       }
     }
-    revert("Attestion to be deleted does not exist");
+    revert("Attestion to be revoked does not exist");
   }
 
-  function revokeSigner(address signer) public {
-    // TODO ASv2 add constraints on who has permissions to revoke a signer
-    // TODO ASv2 consider whether to check if the signer is an authorized signer
-    // or to allow any address to be revoked
-    revokedSigners[signer] = true;
+  function getUniqueAttestationHash(
+    bytes32 identifier,
+    address issuer,
+    address account,
+    address signer,
+    uint64 issuedOn
+  ) public pure returns (bytes32) {
+    return keccak256(abi.encode(identifier, issuer, account, signer, issuedOn));
   }
 }

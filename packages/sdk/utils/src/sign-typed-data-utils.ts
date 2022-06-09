@@ -43,7 +43,9 @@ export const EIP712_ATOMIC_TYPES = [
   'bytes1',
   'bytes32',
   'uint8',
+  'uint64',
   'uint256',
+  // This list should technically include all types from uint8 to uint256, and int8 to int256
   'int8',
   'int256',
   'bool',
@@ -153,6 +155,7 @@ function findDependencies(primaryType: string, types: EIP712Types, found: string
 
   // If this is not a builtin and is not defined, we cannot correctly construct a type encoding.
   if (types[primaryType] === undefined) {
+    console.log(types)
     throw new Error(`Unrecognized type ${primaryType} is not included in the EIP-712 type list`)
   }
 
