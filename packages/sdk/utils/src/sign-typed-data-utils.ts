@@ -155,7 +155,6 @@ function findDependencies(primaryType: string, types: EIP712Types, found: string
 
   // If this is not a builtin and is not defined, we cannot correctly construct a type encoding.
   if (types[primaryType] === undefined) {
-    console.log(types)
     throw new Error(`Unrecognized type ${primaryType} is not included in the EIP-712 type list`)
   }
 
