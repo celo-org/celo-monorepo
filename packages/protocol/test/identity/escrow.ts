@@ -79,7 +79,6 @@ contract('Escrow', (accounts: string[]) => {
   })
 
   beforeEach(async () => {
-    // registry = await Registry.new(true)
     escrow = await Escrow.new(true, { from: owner })
     await escrow.initialize()
     mockAttestations = await MockAttestations.new({ from: owner })
@@ -91,12 +90,6 @@ contract('Escrow', (accounts: string[]) => {
       const actualOwner: string = await escrow.owner()
       assert.equal(actualOwner, owner)
     })
-
-    // TODO EN: failing because registry itself is now a null var (set in URV2)
-    // it('should have set the registry address', async () => {
-    //   const registryAddress: string = await escrow.registry()
-    //   assert.equal(registryAddress, registry.address)
-    // })
 
     it('should not be callable again', async () => {
       await assertRevert(escrow.initialize())

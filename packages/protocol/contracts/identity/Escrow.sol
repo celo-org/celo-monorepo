@@ -89,7 +89,6 @@ contract Escrow is
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
-  // TODO EN: this could be causing problems with the compatibility tests
   function initialize() external initializer {
     _transferOwnership(msg.sender);
   }
