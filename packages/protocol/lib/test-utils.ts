@@ -11,7 +11,7 @@ import chai from 'chai'
 import chaiSubset from 'chai-subset'
 import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
-import { AccountsInstance, GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
+import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
 
 // tslint:disable-next-line: ordered-imports
@@ -462,11 +462,8 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, prop
 		artifacts
 	)
 	const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
-  const accounts: AccountsInstance = await getDeployedProxiedContract('Accounts', artifacts)
   // Enough to pass the governance proposal unilaterally (and then some).
   const tenMillionCELO = '10000000000000000000000000'
-  // Must be registered account to lock CELO
-  await accounts.createAccount()
 	// @ts-ignore
 	await lockedGold.lock({ value: tenMillionCELO })
   // Any contract's `transferOwnership` function will work here as the function signatures are all the same.
