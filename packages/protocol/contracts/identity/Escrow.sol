@@ -33,7 +33,8 @@ contract Escrow is
 
   event Withdrawal(
     bytes32 indexed identifier,
-    // Note that `to` currently references the original sender of the payment
+    // Note that in previous versions of Escrow.sol, `to` referenced
+    // the original sender of the payment
     address indexed to,
     address indexed token,
     uint256 value,
@@ -188,7 +189,7 @@ contract Escrow is
 
     emit Withdrawal(
       payment.recipientIdentifier,
-      payment.sender,
+      msg.sender,
       payment.token,
       payment.value,
       paymentId

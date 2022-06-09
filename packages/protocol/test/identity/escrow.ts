@@ -535,8 +535,7 @@ contract('Escrow', (accounts: string[]) => {
             event: 'Withdrawal',
             args: {
               identifier: NULL_BYTES32,
-              // This is intentional (`to`); weird naming in original Escrow contract.
-              to: sender,
+              to: receiver,
               token: mockERC20Token.address,
               value: aValue,
               paymentId: uniquePaymentIDWithdraw,
