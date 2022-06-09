@@ -681,7 +681,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       )
     })
 
-    it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
+    it('should modify identifierToAttestations and addresstoIdentifiers accordingly', async () => {
       await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 0)
       await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, signer1)
       await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
@@ -702,7 +702,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       })
 
-      it('should modify identifierToAddresses and addresstoIdentifiers accordingly', async () => {
+      it('should modify identifierToAttestations and addresstoIdentifiers accordingly', async () => {
         const account2 = accounts[3]
         await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, signer1, 0)
         await assertAttestationNotInStorage(identifier1, issuer1, account2, 1, 0)
