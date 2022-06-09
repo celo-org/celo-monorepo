@@ -1,4 +1,4 @@
-FROM circleci/node:12
+FROM circleci/node:12.22
 
 RUN sudo apt-get update -y
 RUN sudo apt-get install lsb-release libudev-dev libusb-dev libusb-1.0-0 rsync -y

@@ -26,7 +26,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+    - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -726,7 +726,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -739,7 +739,7 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -752,7 +752,7 @@ jobs:
   test-contractkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -768,7 +768,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
