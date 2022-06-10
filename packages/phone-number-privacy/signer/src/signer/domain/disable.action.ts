@@ -29,14 +29,14 @@ export class DomainDisableAction implements IAction<DisableDomainRequest> {
         const domainStateRecord =
           (await getDomainStateRecord(domain, session.logger, trx)) ??
           (await insertDomainStateRecord(createEmptyDomainStateRecord(domain), trx, session.logger))
-        // DO NOT MERGE: Is the the return value going to has disabled = true or false?
         if (!domainStateRecord.disabled) {
           await setDomainDisabled(domain, trx, session.logger)
         }
         return {
           success: true,
           status: 200,
-          domainStateRecord,
+          // DO NOT MERGE: Does this say disabled == true or false?
+          domainStateRecord, // might need to modify disabled field b4 returning here (test this)
         }
       })
 

@@ -71,6 +71,7 @@ if (DEV_MODE) {
     phoneNumberPrivacy: {
       enabled: true,
       odisServices: {
+        // TODO(Alec): For testing, use app.listen(3000)
         signers:
           '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
         timeoutMilliSeconds: 5 * 1000,
@@ -97,8 +98,8 @@ if (DEV_MODE) {
       },
     },
     cloudFunction: {
-      minInstances: 0
-    }
+      minInstances: 0,
+    },
   }
 } else {
   const functionConfig = functions.config()
@@ -145,7 +146,7 @@ if (DEV_MODE) {
       // Keep instances warm for mainnet functions
       // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
       minInstances: functionConfig.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
-    }
+    },
   }
 }
 export default config

@@ -223,6 +223,7 @@ async function handleSuccessResponse(
 
   // @ts-ignore: DO NOT MERGE: signature may be included to allow permissive error cases. This is an
   // inconsistency between the types and the actual system behavior and should be addressed.
+  // (add signature as an optional field in the failure use case)
   if (!signResponse.signature) {
     throw new Error(`Signature is missing from signer ${serviceUrl}`)
   }

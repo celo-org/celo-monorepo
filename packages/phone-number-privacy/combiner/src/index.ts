@@ -92,7 +92,13 @@ export const getBlindedMessageSig = functions
   .region('us-central1', 'europe-west3')
   .runWith(config.cloudFunction)
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    return meterResponse(pnpSignHandler.handle, req, res, Endpoint.SIGN_MESSAGE)
+    // TODO(Alec): look for other places where 'bind' is needed
+    return meterResponse(
+      pnpSignHandler.handle.bind(pnpSignHandler),
+      req,
+      res,
+      Endpoint.SIGN_MESSAGE
+    )
   })
 
 const domainSignHandler = new Controller(
@@ -106,7 +112,7 @@ const domainSignHandler = new Controller(
     new DomainStateCombinerService(config.domains)
   )
 )
-export const domainSign = functions
+export const domainSign = functions // TODO(Alec): For integration tests, can call these functions directly rather than using supertest pkg
   .region('us-central1', 'europe-west3')
   .runWith(config.cloudFunction)
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {

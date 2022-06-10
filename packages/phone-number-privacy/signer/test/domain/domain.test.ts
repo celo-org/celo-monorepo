@@ -14,7 +14,7 @@ import {
   SignerEndpoint,
   TestUtils,
 } from '@celo/phone-number-privacy-common'
-import { defined, noBool, noString, noNumber } from '@celo/utils/lib/sign-typed-data-utils'
+import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import request from 'supertest'
 import config, { SupportedDatabase, SupportedKeystore } from '../../src/config'
@@ -33,11 +33,12 @@ config.api.domains.enabled = true
 
 describe('domainService', () => {
   // DO NOT MERGE(victor): Should this be refactored to pass key provider, database, and config?
+  // (global config makes it harder to test things, we should pass it as a parameter)
   const app = createServer()
 
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
-  const walletAddress = wallet.getAccounts()[0]!
+  const walletAddress = wallet.getAccounts()[0]! // TODO(Alec): do we need this?
 
   const authenticatedDomain = (): SequentialDelayDomain => ({
     name: DomainIdentifiers.SequentialDelay,
@@ -88,7 +89,7 @@ describe('domainService', () => {
     return req
   }
 
-  // Build an sign an example disable domain request.
+  // Build and sign an example disable domain request.
   const disableRequest = async (): Promise<DisableDomainRequest<SequentialDelayDomain>> => {
     const req: DisableDomainRequest<SequentialDelayDomain> = {
       type: DomainRequestTypeTag.DISABLE,
@@ -121,7 +122,7 @@ describe('domainService', () => {
     await closeDatabase()
   })
 
-  describe('.handleDisableDomain', () => {
+  describe(`${SignerEndpoint.DISABLE_DOMAIN}`, () => {
     it('Should respond with 200 on valid request', async () => {
       const { status } = await request(app)
         .post(SignerEndpoint.DISABLE_DOMAIN)
@@ -142,14 +143,24 @@ describe('domainService', () => {
       expect(response2.status).toBe(200)
     })
 
-    it('Should respond with 401 on failed auth', async () => {
-      // Create a manipulated request, which will have a bad signature.
+    it('Should respond with 200 on extra request fields', async () => {
+      const req = await disableRequest()
+      // @ts-ignore Intentionally adding an extra field to the request type
+      req.options.extraField = noString
+
+      const { status } = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
+
+      expect(status).toBe(200)
+    })
+
+    it('Should respond with 400 on missing request fields', async () => {
       const badRequest = await disableRequest()
-      badRequest.domain.salt = defined('badSalt')
+      // @ts-ignore Intentionally deleting required field
+      delete badRequest.domain.version
 
       const { status } = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(badRequest)
 
-      expect(status).toBe(401)
+      expect(status).toBe(400)
     })
 
     it('Should respond with 400 on unknown domain', async () => {
@@ -162,9 +173,39 @@ describe('domainService', () => {
 
       expect(status).toBe(400)
     })
+
+    it('Should respond with 400 on bad encoding', async () => {
+      const badRequest1 = await disableRequest()
+      // @ts-ignore Intentionally not JSON
+      badRequest1.domain = 'Freddy'
+
+      const res1 = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(badRequest1)
+
+      expect(res1.status).toBe(400)
+
+      const badRequest2 = ''
+
+      const res2 = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(badRequest2)
+
+      expect(res2.status).toBe(400)
+    })
+
+    it('Should respond with 401 on failed auth', async () => {
+      // Create a manipulated request, which will have a bad signature.
+      const badRequest = await disableRequest()
+      badRequest.domain.salt = defined('badSalt')
+
+      const { status } = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(badRequest)
+
+      expect(status).toBe(401)
+    })
+
+    xit('Should respond with 503 on disabled api', async () => {
+      // TODO
+    })
   })
 
-  describe('.handleGetDomainQuotaStatus', () => {
+  describe(`${SignerEndpoint.DOMAIN_QUOTA_STATUS}`, () => {
     it('Should respond with 200 on valid request', async () => {
       const { status } = await request(app)
         .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
@@ -172,9 +213,80 @@ describe('domainService', () => {
 
       expect(status).toBe(200)
     })
+
+    xit('Should respond with 200 on repeated valid requests', async () => {
+      // TODO
+    })
+
+    it('Should respond with 200 on extra request fields', async () => {
+      const req = await quotaRequest()
+      // @ts-ignore Intentionally adding an extra field to the request type
+      req.options.extraField = noString
+
+      const { status } = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(req)
+
+      expect(status).toBe(200)
+    })
+
+    it('Should respond with 400 on missing request fields', async () => {
+      const badRequest = await quotaRequest()
+      // @ts-ignore Intentionally deleting required field
+      delete badRequest.domain.version
+
+      const { status } = await request(app)
+        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
+        .send(badRequest)
+
+      expect(status).toBe(400)
+    })
+
+    it('Should respond with 400 on unknown domain', async () => {
+      // Create a requests with an invalid domain identifier.
+      const unknownRequest = await quotaRequest()
+      // @ts-ignore UnknownDomain is (intentionally) not a valid domain identifier.
+      unknownRequest.domain.name = 'UnknownDomain'
+
+      const { status } = await request(app)
+        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
+        .send(unknownRequest)
+
+      expect(status).toBe(400)
+    })
+
+    it('Should respond with 400 on bad encoding', async () => {
+      const badRequest1 = await quotaRequest()
+      // @ts-ignore Intentionally not JSON
+      badRequest1.domain = 'Freddy'
+
+      const res1 = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(badRequest1)
+
+      expect(res1.status).toBe(400)
+
+      const badRequest2 = ''
+
+      const res2 = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(badRequest2)
+
+      expect(res2.status).toBe(400)
+    })
+
+    it('Should respond with 401 on failed auth', async () => {
+      // Create a manipulated request, which will have a bad signature.
+      const badRequest = await quotaRequest()
+      badRequest.domain.salt = defined('badSalt')
+
+      const { status } = await request(app)
+        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
+        .send(badRequest)
+
+      expect(status).toBe(401)
+    })
+
+    xit('Should respond with 503 on disabled api', async () => {
+      // TODO
+    })
   })
 
-  describe('.handleGetDomainRestrictedSignature', () => {
+  describe(`${SignerEndpoint.DOMAIN_SIGN}`, () => {
     it('Should respond with 200 on valid request', async () => {
       const [req, _] = await signatureRequest()
 
@@ -182,5 +294,126 @@ describe('domainService', () => {
 
       expect(status).toBe(200)
     })
+
+    it('Should respond with 200 on valid request with key version header', async () => {
+      const [req, _] = await signatureRequest()
+
+      const { status } = await request(app)
+        .post(SignerEndpoint.DOMAIN_SIGN)
+        .set('keyVersion', '1')
+        .send(req)
+
+      expect(status).toBe(200)
+    })
+
+    xit('Should respond with 200 on repeated valid requests', async () => {
+      // TODO
+    })
+
+    it('Should respond with 200 on extra request fields', async () => {
+      const [req, _] = await signatureRequest()
+      // @ts-ignore Intentionally adding an extra field to the request type
+      req.options.extraField = noString
+
+      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
+
+      expect(status).toBe(200)
+    })
+
+    it('Should respond with 400 on missing request fields', async () => {
+      const [badRequest, _] = await signatureRequest()
+      // @ts-ignore Intentionally deleting required field
+      delete badRequest.domain.version
+
+      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
+
+      expect(status).toBe(400)
+    })
+
+    it('Should respond with 400 on unknown domain', async () => {
+      // Create a requests with an invalid domain identifier.
+      const [unknownRequest, _] = await signatureRequest()
+      // @ts-ignore UnknownDomain is (intentionally) not a valid domain identifier.
+      unknownRequest.domain.name = 'UnknownDomain'
+
+      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(unknownRequest)
+
+      expect(status).toBe(400)
+    })
+
+    it('Should respond with 400 on bad encoding', async () => {
+      const [badRequest1, _] = await signatureRequest()
+      // @ts-ignore Intentionally not JSON
+      badRequest1.domain = 'Freddy'
+
+      const res1 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest1)
+
+      expect(res1.status).toBe(400)
+
+      const badRequest2 = ''
+
+      const res2 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest2)
+
+      expect(res2.status).toBe(400)
+    })
+
+    xit('Should respond with 400 on invalid key version', async () => {
+      // TODO(Alec): Fix this test
+      const [badRequest, _] = await signatureRequest()
+
+      const { status } = await request(app)
+        .post(SignerEndpoint.DOMAIN_SIGN)
+        .set('keyVersion', 'a')
+        .send(badRequest)
+
+      expect(status).toBe(400)
+    })
+
+    it('Should respond with 401 on failed auth', async () => {
+      // Create a manipulated request, which will have a bad signature.
+      const [badRequest, _] = await signatureRequest()
+      badRequest.domain.salt = defined('badSalt')
+
+      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
+
+      expect(status).toBe(401)
+    })
+
+    it('Should respond with 401 on invalid nonce', async () => {
+      const [badRequest, _] = await signatureRequest()
+      badRequest.options.nonce = defined(1)
+
+      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
+
+      expect(status).toBe(401)
+    })
+
+    xit('Should respond with 429 on out of quota', async () => {
+      // TODO
+    })
+
+    xit('Should respond with 429 on request too early', async () => {
+      // TODO
+    })
+
+    xit('Should respond with 503 on disabled api', async () => {
+      // TODO
+    })
   })
+
+  /* 
+
+  TODO: also check response content 
+  
+  [ ] Add TODOs for all ODIS tests that remain to be written
+[ ] Bad signature (combiner + signer)
+[ ] Bad encoding (combiner + signer)
+[ ] Undefined domain (combiner + signer)
+[ ] Extra fields? -> should reject / use t.strict (combiner + signer)
+[ ] Valid key versions (combiner + signer)
+[ ] Invalid key versions (combiner + signer)
+[ ] Out of quota (combiner + signer)
+[ ] Bad nonce (combiner + signer)
+[ ] Request too early for rate limiting (both)
+  */
 })

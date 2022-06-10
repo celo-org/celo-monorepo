@@ -71,7 +71,8 @@ export abstract class IOAbstract<R extends OdisRequest> {
     return res
   }
 
-  // DO NOT MERGE: Differentiate between receiving and invalid key version and no key version.
+  // DO NOT MERGE: Differentiate between receiving an invalid key version and no key version.
+  // (follow pattern used in signer)
   getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
     const requestedKeyVersion = Number(keyVersionHeader)
