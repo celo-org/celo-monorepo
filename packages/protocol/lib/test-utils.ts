@@ -301,8 +301,7 @@ export function assertLogMatches(
       assertEqualBN(log.args[k], args[k], errorMsg)
     } else if (Array.isArray(log.args[k])) {
       assert.deepEqual(log.args[k], args[k], errorMsg)
-    }
-     else {
+    } else {
       assert.equal(log.args[k], args[k], errorMsg)
     }
   }

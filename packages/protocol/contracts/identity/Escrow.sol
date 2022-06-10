@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 import "./interfaces/IAttestations.sol";
+import "./interfaces/IFederatedAttestations.sol";
 import "./interfaces/IEscrow.sol";
 import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
@@ -122,6 +123,8 @@ contract Escrow is
     uint256 minAttestations
   ) external nonReentrant returns (bool) {
     // TODO ASv2 EN use more sensible trustedIssuers defaults
+    // TODO ASv2 EN when setting defaults, make sure to add logic for
+    // setting to empty list if minAttestations == 0 (to not fail require)
     address[] memory trustedIssuers;
     _transfer(identifier, token, value, expirySeconds, paymentId, minAttestations, trustedIssuers);
   }
@@ -153,6 +156,8 @@ contract Escrow is
     address[] calldata trustedIssuers
   ) external nonReentrant returns (bool) {
     // TODO EN: is there a better way to fix stack too deep here?
+    // TODO EN: revisit: is it preferable to enforce that identifier cannot be zero here?
+    // as opposed to within the _transfer function
     _transfer(identifier, token, value, expirySeconds, paymentId, minAttestations, trustedIssuers);
   }
 
@@ -188,6 +193,13 @@ contract Escrow is
       !(identifier == 0 && minAttestations > 0),
       "Invalid privacy inputs: Can't require attestations if no identifier"
     );
+    // Withdraw logic with trustedIssuers in FederatedAttestations disregards
+    // minAttestations, so ensure that this is not set to 0 to prevent confusing behavior
+    // This also implies: if identifier == 0 => trustedIssuers.length == 0
+    require(
+      !(minAttestations == 0 && trustedIssuers.length > 0),
+      "trustedIssuers may only be set when attestations are required"
+    );
 
     // TODO EN: revisit whether there needs to be a requirement in place for minAttestations
     // with trustedIssuers set
@@ -216,7 +228,10 @@ contract Escrow is
     newPayment.expirySeconds = expirySeconds;
     newPayment.minAttestations = minAttestations;
 
-    trustedIssuersPerPayment[paymentId] = trustedIssuers;
+    // Avoid unnecessary storage write
+    if (trustedIssuers.length > 0) {
+      trustedIssuersPerPayment[paymentId] = trustedIssuers;
+    }
 
     require(ERC20(token).transferFrom(msg.sender, address(this), value), "Transfer unsuccessful.");
     emit Transfer(msg.sender, identifier, token, value, paymentId, minAttestations);
@@ -247,15 +262,63 @@ contract Escrow is
     // Due to an old bug, there may exist payments with no identifier and minAttestations > 0
     // So ensure that these fail the attestations check, as they previously would have
     if (payment.minAttestations > 0) {
-      IAttestations attestations = getAttestations();
-      (uint64 completedAttestations, ) = attestations.getAttestationStats(
-        payment.recipientIdentifier,
-        msg.sender
-      );
-      require(
-        uint256(completedAttestations) >= payment.minAttestations,
-        "This account does not have enough attestations to withdraw this payment."
-      );
+      address[] memory trustedIssuers = trustedIssuersPerPayment[paymentId];
+      // NOTE EN: this changes from getAddressFor -> getAddressForOrDie
+      address attestationsAddress = registryContract.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID);
+      // TODO EN: need to handle case where trustedIssuers.length == 0;
+      if (trustedIssuers.length > 0) {
+        bool passedCheck = false;
+        // TODO EN: maybe can do this differently -- lookup takes in entire list of trustedIssuers...
+        // maybe first check trustedIssuers
+        for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+          if (trustedIssuers[i] == attestationsAddress) {
+            // Old logic
+            IAttestations attestations = IAttestations(attestationsAddress);
+            (uint64 completedAttestations, ) = attestations.getAttestationStats(
+              payment.recipientIdentifier,
+              msg.sender
+            );
+            // This can be false; one of the several trustedIssuers listed needs to prove attestations
+            passedCheck = (uint256(completedAttestations) >= payment.minAttestations);
+            break;
+          }
+        }
+        if (!passedCheck) {
+          // Check for an attestation from a trusted issuer
+          // TODO EN -- may be necessary to split this into its own separate helper function as well
+          IFederatedAttestations federatedAttestations = getFederatedAttestations();
+          // TODO EN: this lookup signature will change
+          (, address[] memory accounts, , ) = federatedAttestations.lookupAttestations(
+            payment.recipientIdentifier,
+            trustedIssuers
+          );
+          // Check if one of the accounts == msg.sender
+          for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
+            if (accounts[i] == msg.sender) {
+              passedCheck = true;
+              break;
+            }
+          }
+        }
+        // TODO EN: revisit whether it's ok to change this require statement; probably fine to just use this at the end?
+        require(
+          passedCheck,
+          "This account does not have the required attestations to withdraw this payment."
+        );
+      } else {
+        // } else {
+        // TODO EN extract out into a helper function
+        IAttestations attestations = IAttestations(attestationsAddress);
+        (uint64 completedAttestations, ) = attestations.getAttestationStats(
+          payment.recipientIdentifier,
+          msg.sender
+        );
+        // passedCheck = uint256(completedAttestations) >= payment.minAttestations;
+        require(
+          uint256(completedAttestations) >= payment.minAttestations,
+          "This account does not have enough attestations to withdraw this payment."
+        );
+      }
     }
 
     deletePayment(paymentId);
@@ -340,6 +403,7 @@ contract Escrow is
   * @param paymentId The ID of the payment to be deleted.
   */
   function deletePayment(address paymentId) private {
+    // TODO EN: look into possible gas savings here by copying payment into memory?
     EscrowedPayment storage payment = escrowedPayments[paymentId];
     address[] storage received = receivedPaymentIds[payment.recipientIdentifier];
     address[] storage sent = sentPaymentIds[payment.sender];
@@ -353,5 +417,6 @@ contract Escrow is
     sent.length = sent.length.sub(1);
 
     delete escrowedPayments[paymentId];
+    delete trustedIssuersPerPayment[paymentId];
   }
 }
