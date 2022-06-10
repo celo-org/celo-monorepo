@@ -1,7 +1,7 @@
 import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
 import {
   getDomainDigest,
-  getSignatureForAttestation,
+  getSignatureForAttestation
 } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
@@ -10,7 +10,7 @@ import {
   assertRevert,
   assertRevertWithReason,
   assertThrowsAsync,
-  assumeOwnership,
+  assumeOwnership
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
@@ -19,7 +19,7 @@ import {
   AccountsInstance,
   FederatedAttestationsContract,
   FederatedAttestationsInstance,
-  RegistryInstance,
+  RegistryInstance
 } from 'types'
 import { encodePacked, keccak256 } from 'web3-utils'
 
