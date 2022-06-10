@@ -145,58 +145,60 @@ contract FederatedAttestations is
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
    * @return [0] Array of number of attestations returned per issuer
-   * @return [1 - 3] for m (== sum([0])) found attestations:
+   * @return [1 - 4] for m (== sum([0])) found attestations:
    *         [
    *           Array of m accounts,
+   *           Array of m signers,
    *           Array of m issuedOns,
-   *           Array of m signers
+   *           Array of m publishedOns
    *         ]; index corresponds to the same attestation
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
   // TODO reviewers: is it preferable to return an array of `trustedIssuer` indices
   // (indicating issuer per attestation) instead of counts per attestation?
-  // TODO: change issuedOn type, change the order of return values to match across the file,
-  // add publishedOn to returned lookups
   function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
     external
     view
-    returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory)
+    returns (uint256[] memory, address[] memory, address[] memory, uint64[] memory, uint64[] memory)
   {
     // TODO reviewers: this is to get around a stack too deep error;
     // are there better ways of dealing with this?
-    return _lookupAttestations(identifier, trustedIssuers);
+    uint256[] memory countsPerIssuer;
+    (, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
+    (address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = _lookupAttestations(
+      identifier,
+      trustedIssuers
+    );
+    return (countsPerIssuer, accounts, signers, issuedOns, publishedOns);
   }
 
   /**
    * @notice Helper function for lookupAttestations to get around stack too deep
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @return [0] Array of number of attestations returned per issuer
-   * @return [1 - 3] for m (== sum([0])) found attestations:
+   * @return [0 - 3] for m (== sum([0])) found attestations:
    *         [
    *           Array of m accounts,
+   *           Array of m signers,
    *           Array of m issuedOns,
-   *           Array of m signers
+   *           Array of m publishedOns
    *         ]; index corresponds to the same attestation
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  // TODO: change issuedOn type, change the order of return values to match across the file,
-  // add publishedOn to returned lookups
   function _lookupAttestations(bytes32 identifier, address[] memory trustedIssuers)
     internal
     view
-    returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory)
+    returns (address[] memory, address[] memory, uint64[] memory, uint64[] memory)
   {
     uint256 totalAttestations;
-    uint256[] memory countsPerIssuer;
-
-    (totalAttestations, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
+    (totalAttestations, ) = getNumAttestations(identifier, trustedIssuers);
 
     address[] memory accounts = new address[](totalAttestations);
-    uint256[] memory issuedOns = new uint256[](totalAttestations);
     address[] memory signers = new address[](totalAttestations);
+    uint64[] memory issuedOns = new uint64[](totalAttestations);
+    uint64[] memory publishedOns = new uint64[](totalAttestations);
 
     OwnershipAttestation[] memory attestationsPerIssuer;
     // Reset this and use as current index to get around stack-too-deep
@@ -208,12 +210,13 @@ contract FederatedAttestations is
       attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
       for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
         accounts[totalAttestations] = attestationsPerIssuer[j].account;
-        issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
         signers[totalAttestations] = attestationsPerIssuer[j].signer;
+        issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
+        publishedOns[totalAttestations] = attestationsPerIssuer[j].publishedOn;
         totalAttestations = totalAttestations.add(1);
       }
     }
-    return (countsPerIssuer, accounts, issuedOns, signers);
+    return (accounts, signers, issuedOns, publishedOns);
   }
 
   /**
