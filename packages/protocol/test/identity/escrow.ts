@@ -16,6 +16,8 @@ import {
   MockAttestationsInstance,
   MockERC20TokenContract,
   MockERC20TokenInstance,
+  MockFederatedAttestationsContract,
+  MockFederatedAttestationsInstance,
   RegistryInstance,
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
@@ -23,6 +25,9 @@ import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 const Escrow: EscrowContract = artifacts.require('Escrow')
 const MockERC20Token: MockERC20TokenContract = artifacts.require('MockERC20Token')
 const MockAttestations: MockAttestationsContract = artifacts.require('MockAttestations')
+const MockFederatedAttestations: MockFederatedAttestationsContract = artifacts.require(
+  'MockFederatedAttestations'
+)
 
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
 const NULL_ESCROWED_PAYMENT: EscrowedPayment = {
@@ -69,6 +74,7 @@ const getEscrowedPayment = async (
 contract('Escrow', (accounts: string[]) => {
   let escrow: EscrowInstance
   let mockAttestations: MockAttestationsInstance
+  let mockFederatedAttestations: MockFederatedAttestationsInstance
   const owner = accounts[0]
   let registry: RegistryInstance
 
@@ -83,6 +89,11 @@ contract('Escrow', (accounts: string[]) => {
     await escrow.initialize()
     mockAttestations = await MockAttestations.new({ from: owner })
     await registry.setAddressFor(CeloContractName.Attestations, mockAttestations.address)
+    mockFederatedAttestations = await MockFederatedAttestations.new({ from: owner })
+    await registry.setAddressFor(
+      CeloContractName.FederatedAttestations,
+      mockFederatedAttestations.address
+    )
   })
 
   describe('#initialize()', () => {
@@ -580,14 +591,6 @@ contract('Escrow', (accounts: string[]) => {
           await mockERC20Token.balanceOf(escrow.address)
         ).toNumber()
         const paymentBefore = await getEscrowedPayment(paymentId, escrow)
-
-        // TODO EN: maybe extract out attestation completion step
-        // Mock completed attestations
-        // for (let i = 0; i < attestationsToComplete; i++) {
-        //   await mockAttestations.complete(identifier, 0, NULL_BYTES32, NULL_BYTES32, {
-        //     from: escrowReceiver,
-        //   })
-        // }
         const parsedSig = await getParsedSignatureOfAddress(web3, escrowReceiver, paymentId)
         await escrow.withdraw(paymentId, parsedSig.v, parsedSig.r, parsedSig.s, {
           from: escrowReceiver,
@@ -736,7 +739,7 @@ contract('Escrow', (accounts: string[]) => {
         })
       })
 
-      describe('when first payment is escrowed by a sender for an identifier && minAttestations', () => {
+      describe('when first payment is escrowed by a sender for identifier && minAttestations', () => {
         const minAttestations = 3
         beforeEach(async () => {
           await mintAndTransfer(
@@ -799,6 +802,123 @@ contract('Escrow', (accounts: string[]) => {
           )
         })
       })
+
+      describe('when trustedIssuers are set for payment', () => {
+        describe('when Attestations.sol is a trustedIssuer', () => {
+          const minAttestations = 3
+          beforeEach(async () => {
+            await mintAndTransfer(
+              sender,
+              aPhoneHash,
+              aValue,
+              oneDayInSecs,
+              uniquePaymentIDWithdraw,
+              minAttestations,
+              [mockAttestations.address, trustedIssuer1, trustedIssuer2]
+            )
+          })
+
+          it('should allow withdraw after completing attestations', async () => {
+            await completeAttestations(receiver, aPhoneHash, minAttestations)
+            await withdrawAndCheckState(
+              sender,
+              receiver,
+              aPhoneHash,
+              aValue,
+              uniquePaymentIDWithdraw,
+              [],
+              []
+            )
+          })
+          describe('when < minAttestations have been completed', () => {
+            it('should not allow withdrawal if no attestations exist in FederatedAttestations', async () => {
+              await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
+              await assertRevertWithReason(
+                withdrawAndCheckState(
+                  sender,
+                  receiver,
+                  aPhoneHash,
+                  aValue,
+                  uniquePaymentIDWithdraw,
+                  [],
+                  []
+                ),
+                'This account does not have the required attestations to withdraw this payment.'
+              )
+            })
+            it('should allow users to withdraw if attestation is found in FederatedAttestations', async () => {
+              await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
+              await mockFederatedAttestations.registerAttestation(
+                aPhoneHash,
+                trustedIssuer2,
+                receiver,
+                NULL_ADDRESS,
+                0,
+                0,
+                NULL_BYTES32,
+                NULL_BYTES32
+              )
+              await withdrawAndCheckState(
+                sender,
+                receiver,
+                aPhoneHash,
+                aValue,
+                uniquePaymentIDWithdraw,
+                [],
+                []
+              )
+            })
+          })
+        })
+        describe('when Attestations.sol is not a trusted issuer', () => {
+          beforeEach(async () => {
+            await mintAndTransfer(
+              sender,
+              aPhoneHash,
+              aValue,
+              oneDayInSecs,
+              uniquePaymentIDWithdraw,
+              2,
+              testTrustedIssuers
+            )
+          })
+          it('should allow users to withdraw if attestation is found in FederatedAttestations', async () => {
+            await mockFederatedAttestations.registerAttestation(
+              aPhoneHash,
+              trustedIssuer2,
+              receiver,
+              NULL_ADDRESS,
+              0,
+              0,
+              NULL_BYTES32,
+              NULL_BYTES32
+            )
+            await withdrawAndCheckState(
+              sender,
+              receiver,
+              aPhoneHash,
+              aValue,
+              uniquePaymentIDWithdraw,
+              [],
+              []
+            )
+          })
+          it('should not allow a user to withdraw a payment if no attestations exist for trustedIssuers', async () => {
+            await assertRevertWithReason(
+              withdrawAndCheckState(
+                sender,
+                receiver,
+                aPhoneHash,
+                aValue,
+                uniquePaymentIDWithdraw,
+                [],
+                []
+              ),
+              'This account does not have the required attestations to withdraw this payment.'
+            )
+          })
+        })
+      })
     })
 
     describe('#revoke()', () => {
@@ -844,6 +964,18 @@ contract('Escrow', (accounts: string[]) => {
 
             uniquePaymentIDRevoke = withdrawKeyAddress
             parsedSig1 = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
+            if (trustedIssuers.length) {
+              await mockFederatedAttestations.registerAttestation(
+                identifier,
+                trustedIssuers[0],
+                receiver,
+                NULL_ADDRESS,
+                0,
+                0,
+                NULL_BYTES32,
+                NULL_BYTES32
+              )
+            }
           })
 
           it('should allow sender to redeem payment after payment has expired', async () => {

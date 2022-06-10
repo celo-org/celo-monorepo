@@ -109,6 +109,7 @@ contract Escrow is
   * @param paymentId The address of the temporary wallet associated with this payment. Users must
   *        prove ownership of the corresponding private key to withdraw from escrow.
   * @param minAttestations The min number of attestations required to withdraw the payment.
+  * @return True if transfer succeeded.
   * @dev Throws if 'token' or 'value' is 0.
   * @dev msg.sender needs to have already approved this contract to transfer
   * @dev If no identifier is given, then minAttestations must be 0.
@@ -126,7 +127,16 @@ contract Escrow is
     // TODO ASv2 EN when setting defaults, make sure to add logic for
     // setting to empty list if minAttestations == 0 (to not fail require)
     address[] memory trustedIssuers;
-    _transfer(identifier, token, value, expirySeconds, paymentId, minAttestations, trustedIssuers);
+    return
+      _transfer(
+        identifier,
+        token,
+        value,
+        expirySeconds,
+        paymentId,
+        minAttestations,
+        trustedIssuers
+      );
   }
 
   /**
@@ -142,6 +152,7 @@ contract Escrow is
   * @param minAttestations The min number of attestations required to withdraw the payment.
   * @param trustedIssuers Array of issuers whose attestations in FederatedAttestations.sol
   *        will be accepted to prove ownership over an identifier.
+  * @return True if transfer succeeded.
   * @dev Throws if 'token' or 'value' is 0.
   * @dev msg.sender needs to have already approved this contract to transfer
   * @dev If no identifier is given, then minAttestations must be 0.
@@ -158,7 +169,16 @@ contract Escrow is
     // TODO EN: is there a better way to fix stack too deep here?
     // TODO EN: revisit: is it preferable to enforce that identifier cannot be zero here?
     // as opposed to within the _transfer function
-    _transfer(identifier, token, value, expirySeconds, paymentId, minAttestations, trustedIssuers);
+    return
+      _transfer(
+        identifier,
+        token,
+        value,
+        expirySeconds,
+        paymentId,
+        minAttestations,
+        trustedIssuers
+      );
   }
 
   /**
@@ -175,6 +195,7 @@ contract Escrow is
   * @param minAttestations The min number of attestations required to withdraw the payment.
   * @param trustedIssuers Array of issuers whose attestations in FederatedAttestations.sol
   *        will be accepted to prove ownership over an identifier.
+  * @return True if transfer succeeded.
   * @dev Throws if 'token' or 'value' is 0.
   * @dev msg.sender needs to have already approved this contract to transfer
   * @dev If no identifier is given, then minAttestations must be 0.
@@ -200,9 +221,6 @@ contract Escrow is
       !(minAttestations == 0 && trustedIssuers.length > 0),
       "trustedIssuers may only be set when attestations are required"
     );
-
-    // TODO EN: revisit whether there needs to be a requirement in place for minAttestations
-    // with trustedIssuers set
     IAttestations attestations = getAttestations();
 
     // TODO EN NOTE: fine to leave as is for now, since trustedIssuers maxAttestations
@@ -246,6 +264,7 @@ contract Escrow is
   * @param v The recovery id of the incoming ECDSA signature.
   * @param r Output value r of the ECDSA signature.
   * @param s Output value s of the ECDSA signature.
+  * @return True if withdraw succeeded.
   * @dev Throws if 'token' or 'value' is 0.
   * @dev Throws if msg.sender does not prove ownership of the withdraw key.
   */
@@ -265,24 +284,24 @@ contract Escrow is
       address[] memory trustedIssuers = trustedIssuersPerPayment[paymentId];
       // NOTE EN: this changes from getAddressFor -> getAddressForOrDie
       address attestationsAddress = registryContract.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID);
-      // TODO EN: need to handle case where trustedIssuers.length == 0;
       if (trustedIssuers.length > 0) {
         bool passedCheck = false;
-        // TODO EN: maybe can do this differently -- lookup takes in entire list of trustedIssuers...
+        // TODO EN: revisit checking trustedIssuers list first
         // maybe first check trustedIssuers
         for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-          if (trustedIssuers[i] == attestationsAddress) {
-            // Old logic
-            IAttestations attestations = IAttestations(attestationsAddress);
-            (uint64 completedAttestations, ) = attestations.getAttestationStats(
-              payment.recipientIdentifier,
-              msg.sender
-            );
-            // This can be false; one of the several trustedIssuers listed needs to prove attestations
-            passedCheck = (uint256(completedAttestations) >= payment.minAttestations);
-            break;
+          if (trustedIssuers[i] != attestationsAddress) {
+            continue;
           }
+          // This can be false; one of the several trustedIssuers listed needs to prove attestations
+          passedCheck = hasCompletedV1Attestations(
+            attestationsAddress,
+            payment.recipientIdentifier,
+            msg.sender,
+            payment.minAttestations
+          );
+          break;
         }
+
         if (!passedCheck) {
           // Check for an attestation from a trusted issuer
           // TODO EN -- may be necessary to split this into its own separate helper function as well
@@ -292,7 +311,7 @@ contract Escrow is
             payment.recipientIdentifier,
             trustedIssuers
           );
-          // Check if one of the accounts == msg.sender
+          // Check if an attestation was found for recipientIdentifier -> msg.sender
           for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
             if (accounts[i] == msg.sender) {
               passedCheck = true;
@@ -306,16 +325,14 @@ contract Escrow is
           "This account does not have the required attestations to withdraw this payment."
         );
       } else {
-        // } else {
-        // TODO EN extract out into a helper function
-        IAttestations attestations = IAttestations(attestationsAddress);
-        (uint64 completedAttestations, ) = attestations.getAttestationStats(
-          payment.recipientIdentifier,
-          msg.sender
-        );
-        // passedCheck = uint256(completedAttestations) >= payment.minAttestations;
+        // Backwards compatibility
         require(
-          uint256(completedAttestations) >= payment.minAttestations,
+          hasCompletedV1Attestations(
+            attestationsAddress,
+            payment.recipientIdentifier,
+            msg.sender,
+            payment.minAttestations
+          ),
           "This account does not have enough attestations to withdraw this payment."
         );
       }
@@ -334,6 +351,28 @@ contract Escrow is
     );
 
     return true;
+  }
+
+  /**
+  * @notice Revokes tokens for a sender who is redeeming a payment after it has expired.
+  * @param attestationsAddress The address of Attestations.sol.
+  * @param identifier The hash of an identifier for which to look up attestations.
+  * @param account The account for which to look up attestations.
+  * @param minAttestations The minimum number of attestations to have completed.
+  * @return Whether or not attestations in Attestations.sol
+  *         exceeds minAttestations for (identifier, account)
+  * @dev Throws if 'token' or 'value' is 0.
+  */
+  function hasCompletedV1Attestations(
+    address attestationsAddress,
+    bytes32 identifier,
+    address account,
+    uint256 minAttestations
+  ) internal view returns (bool) {
+    IAttestations attestations = IAttestations(attestationsAddress);
+    (uint64 completedAttestations, ) = attestations.getAttestationStats(identifier, account);
+    return (uint256(completedAttestations) >= minAttestations);
+
   }
 
   /**
