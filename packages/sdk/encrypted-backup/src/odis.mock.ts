@@ -124,6 +124,7 @@ export class MockOdis {
         body: {
           success: false,
           version: 'mock',
+          status: undefined,
           error: (error as Error).toString(),
         },
       }
@@ -134,6 +135,7 @@ export class MockOdis {
       body: {
         success: true,
         version: 'mock',
+        status: limitCheck.state,
         signature,
       },
     }

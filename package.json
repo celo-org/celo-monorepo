@@ -111,7 +111,7 @@
     "minimist": "^1.2.5",
     "mixin-deep": "^2.0.1",
     "node-forge": "^0.10.0",
-    "node-gyp": "9.0.0",
+    "node-gyp": "5.0.1",
     "node-libs-react-native": "^1.2.0",
     "node-notifier": "^8.0.2",
     "normalize-url": "4.5.1",
