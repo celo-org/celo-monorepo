@@ -75,8 +75,20 @@ contract('Escrow', (accounts: string[]) => {
   let escrow: EscrowInstance
   let mockAttestations: MockAttestationsInstance
   let mockFederatedAttestations: MockFederatedAttestationsInstance
-  const owner = accounts[0]
   let registry: RegistryInstance
+
+  const owner = accounts[0]
+  const sender: string = accounts[1]
+  const receiver: string = accounts[2]
+  const withdrawKeyAddress: string = accounts[3]
+  const anotherWithdrawKeyAddress: string = accounts[4]
+  const trustedIssuer1 = accounts[5]
+  const trustedIssuer2 = accounts[6]
+  const testTrustedIssuers = [trustedIssuer1, trustedIssuer2]
+
+  const aValue: number = 10
+  const aPhoneHash = getPhoneHash('+18005555555')
+  const oneDayInSecs: number = 86400
 
   before(async () => {
     registry = await getDeployedProxiedContract('Registry', artifacts)
@@ -107,20 +119,100 @@ contract('Escrow', (accounts: string[]) => {
     })
   })
 
+  describe('#addDefaultTrustedIssuer', () => {
+    it('allows owner to add trustedIssuer', async () => {
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [])
+      await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer1])
+    })
+
+    it('reverts if non-owner attempts to add trustedIssuer', async () => {
+      await assertRevert(escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: trustedIssuer1 }))
+    })
+
+    it('should emit the DefaultTrustedIssuerAdded event', async () => {
+      const receipt = await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+      assertLogMatches2(receipt.logs[0], {
+        event: 'DefaultTrustedIssuerAdded',
+        args: {
+          trustedIssuer: trustedIssuer1,
+        },
+      })
+    })
+
+    it('should not allow an empty address to be set as a trustedIssuer', async () => {
+      await assertRevertWithReason(
+        escrow.addDefaultTrustedIssuer(NULL_ADDRESS, { from: owner }),
+        "trustedIssuer can't be null"
+      )
+    })
+
+    it('should not allow a trustedIssuer to be added twice', async () => {
+      await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+      await assertRevertWithReason(
+        escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner }),
+        'trustedIssuer already in defaultTrustedIssuers'
+      )
+    })
+
+    it('should a second trustedIssuer to be added', async () => {
+      await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+      await escrow.addDefaultTrustedIssuer(trustedIssuer2, { from: owner })
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer1, trustedIssuer2])
+    })
+  })
+
+  describe('#removeDefaultTrustedIssuer', () => {
+    beforeEach(async () => {
+      await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+    })
+
+    it('allows owner to remove trustedIssuer', async () => {
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer1])
+      await escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: owner })
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [])
+    })
+
+    it('reverts if non-owner attempts to remove trustedIssuer', async () => {
+      await assertRevert(
+        escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: trustedIssuer1 })
+      )
+    })
+
+    it('should emit the DefaultTrustedIssuerRemoved event', async () => {
+      const receipt = await escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: owner })
+      assertLogMatches2(receipt.logs[0], {
+        event: 'DefaultTrustedIssuerRemoved',
+        args: {
+          trustedIssuer: trustedIssuer1,
+        },
+      })
+    })
+
+    it('should revert if index is invalid', async () => {
+      await assertRevertWithReason(
+        escrow.removeDefaultTrustedIssuer(trustedIssuer1, 1, { from: owner }),
+        'index is invalid'
+      )
+    })
+
+    it('should revert if trusted issuer does not match index', async () => {
+      await assertRevertWithReason(
+        escrow.removeDefaultTrustedIssuer(trustedIssuer2, 0, { from: owner }),
+        'trustedIssuer does not match address found at defaultTrustedIssuers[index]'
+      )
+    })
+
+    it('allows owner to remove trustedIssuer when two are present', async () => {
+      await escrow.addDefaultTrustedIssuer(trustedIssuer2, { from: owner })
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer1, trustedIssuer2])
+      await escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: owner })
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer2])
+    })
+  })
+
   describe('tests with tokens', () => {
     let mockERC20Token: MockERC20TokenInstance
-    const aValue: number = 10
-    const sender: string = accounts[1]
-    const receiver: string = accounts[2]
-
-    const aPhoneHash = getPhoneHash('+18005555555')
-    const withdrawKeyAddress: string = accounts[3]
-    const anotherWithdrawKeyAddress: string = accounts[4]
-    const trustedIssuer1 = accounts[5]
-    const trustedIssuer2 = accounts[6]
-    // TODO EN: revisit scoping
-    const testTrustedIssuers = [trustedIssuer1, trustedIssuer2]
-    const oneDayInSecs: number = 86400
 
     beforeEach(async () => {
       mockERC20Token = await MockERC20Token.new()
@@ -216,7 +308,6 @@ contract('Escrow', (accounts: string[]) => {
         )
 
         const trustedIssuersPerPayment = await escrow.getTrustedIssuersPerPayment(paymentId)
-        // TODO EN: change this when we set trusted issuers to some set list by default
         assert.deepEqual(
           trustedIssuersPerPayment,
           trustedIssuers,
@@ -333,7 +424,6 @@ contract('Escrow', (accounts: string[]) => {
         })
       })
 
-      // TODO EN: redundant, probably remove
       it('should emit the TrustedIssuersSet event', async () => {
         const receipt = await escrow.transferWithTrustedIssuers(
           aPhoneHash,
@@ -494,20 +584,67 @@ contract('Escrow', (accounts: string[]) => {
       describe('#transfer', () => {
         // transfer and transferWithTrustedIssuers both rely on _transfer
         // and transfer is a restricted version of transferWithTrustedIssuers
-        it('should set trustedIssuersPerPaymentId to empty list', async () => {
-          await escrow.transfer(
-            aPhoneHash,
-            mockERC20Token.address,
-            aValue,
-            oneDayInSecs,
-            withdrawKeyAddress,
-            2,
-            {
-              from: sender,
-            }
-          )
-          const actualTrustedIssuers = await escrow.getTrustedIssuersPerPayment(withdrawKeyAddress)
-          assert.deepEqual(actualTrustedIssuers, [])
+        describe('when no defaut trustedIssuers are set', async () => {
+          it('should set trustedIssuersPerPaymentId to empty list', async () => {
+            await escrow.transfer(
+              aPhoneHash,
+              mockERC20Token.address,
+              aValue,
+              oneDayInSecs,
+              withdrawKeyAddress,
+              2,
+              {
+                from: sender,
+              }
+            )
+            const actualTrustedIssuers = await escrow.getTrustedIssuersPerPayment(
+              withdrawKeyAddress
+            )
+            assert.deepEqual(actualTrustedIssuers, [])
+          })
+        })
+
+        describe('when default trustedIssuers are set', async () => {
+          beforeEach(async () => {
+            await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+            await escrow.addDefaultTrustedIssuer(trustedIssuer2, { from: owner })
+          })
+
+          it('should set trustedIssuersPerPaymentId to default when minAttestations>0', async () => {
+            await escrow.transfer(
+              aPhoneHash,
+              mockERC20Token.address,
+              aValue,
+              oneDayInSecs,
+              withdrawKeyAddress,
+              2,
+              {
+                from: sender,
+              }
+            )
+            const actualTrustedIssuers = await escrow.getTrustedIssuersPerPayment(
+              withdrawKeyAddress
+            )
+            assert.deepEqual(actualTrustedIssuers, [trustedIssuer1, trustedIssuer2])
+          })
+
+          it('should set trustedIssuersPerPaymentId to empty list when minAttestations==0', async () => {
+            await escrow.transfer(
+              aPhoneHash,
+              mockERC20Token.address,
+              aValue,
+              oneDayInSecs,
+              withdrawKeyAddress,
+              0,
+              {
+                from: sender,
+              }
+            )
+            const actualTrustedIssuers = await escrow.getTrustedIssuersPerPayment(
+              withdrawKeyAddress
+            )
+            assert.deepEqual(actualTrustedIssuers, [])
+          })
         })
       })
     })
@@ -561,7 +698,7 @@ contract('Escrow', (accounts: string[]) => {
       assert.deepEqual(trustedIssuersPerPayment, [], 'trustedIssuersPerPayment not zeroed out')
     }
 
-    describe('#withdraw()', () => {
+    describe('#withdraw', () => {
       const uniquePaymentIDWithdraw = withdrawKeyAddress
 
       const completeAttestations = async (
@@ -921,11 +1058,10 @@ contract('Escrow', (accounts: string[]) => {
       })
     })
 
-    describe('#revoke()', () => {
+    describe('#revoke', () => {
       let uniquePaymentIDRevoke: string
       let parsedSig1: any
 
-      // TODO EN: most likely move to higher scope for use within withdraw as well
       interface TransferParams {
         identifier: string
         minAttestations: number

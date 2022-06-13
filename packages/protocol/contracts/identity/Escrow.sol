@@ -24,6 +24,9 @@ contract Escrow is
 {
   using SafeMath for uint256;
 
+  event DefaultTrustedIssuerAdded(address indexed trustedIssuer);
+  event DefaultTrustedIssuerRemoved(address indexed trustedIssuer);
+
   event Transfer(
     address indexed from,
     bytes32 indexed identifier,
@@ -34,6 +37,7 @@ contract Escrow is
   );
 
   event TrustedIssuersSet(address indexed paymentId, address[] trustedIssuers);
+  event TrustedIssuersUnset(address indexed paymentId);
 
   event Withdrawal(
     bytes32 indexed identifier,
@@ -78,6 +82,9 @@ contract Escrow is
   // Maps payment ID to a list of issuers whose attestations will be accepted.
   mapping(address => address[]) public trustedIssuersPerPayment;
 
+  // Governable list of trustedIssuers to set for payments by default.
+  address[] public defaultTrustedIssuers;
+
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
@@ -97,6 +104,46 @@ contract Escrow is
    */
   function initialize() external initializer {
     _transferOwnership(msg.sender);
+  }
+
+  /**
+   * @notice Add an address to the defaultTrustedIssuers list.
+   * @param trustedIssuer Address of the trustedIssuer to add.
+   * @dev Throws if trustedIssuer is null or already in defaultTrustedIssuers.
+   */
+  function addDefaultTrustedIssuer(address trustedIssuer) external onlyOwner {
+    require(address(0) != trustedIssuer, "trustedIssuer can't be null");
+    // Ensure list of trusted issuers is unique
+    for (uint256 i = 0; i < defaultTrustedIssuers.length; i = i.add(1)) {
+      require(
+        defaultTrustedIssuers[i] != trustedIssuer,
+        "trustedIssuer already in defaultTrustedIssuers"
+      );
+    }
+    defaultTrustedIssuers.push(trustedIssuer);
+    emit DefaultTrustedIssuerAdded(trustedIssuer);
+  }
+
+  /**
+   * @notice Add an address to the defaultTrustedIssuers list.
+   * @param trustedIssuer Address of the trustedIssuer to remove.
+   * @param index Index of trustedIssuer in defaultTrustedIssuers.
+   * @dev Throws if trustedIssuer is not in defaultTrustedIssuers.
+   * @dev Throws if trustedIssuer is not in defaultTrustedIssuers.
+   */
+  function removeDefaultTrustedIssuer(address trustedIssuer, uint256 index) external onlyOwner {
+    uint256 numDefaultTrustedIssuers = defaultTrustedIssuers.length;
+    require(index < numDefaultTrustedIssuers, "index is invalid");
+    require(
+      defaultTrustedIssuers[index] == trustedIssuer,
+      "trustedIssuer does not match address found at defaultTrustedIssuers[index]"
+    );
+    if (index != numDefaultTrustedIssuers - 1) {
+      // Swap last index with index-to-remove
+      defaultTrustedIssuers[index] = defaultTrustedIssuers[numDefaultTrustedIssuers - 1];
+    }
+    defaultTrustedIssuers.pop();
+    emit DefaultTrustedIssuerRemoved(trustedIssuer);
   }
 
   /**
@@ -123,10 +170,11 @@ contract Escrow is
     address paymentId,
     uint256 minAttestations
   ) external nonReentrant returns (bool) {
-    // TODO ASv2 EN use more sensible trustedIssuers defaults
-    // TODO ASv2 EN when setting defaults, make sure to add logic for
-    // setting to empty list if minAttestations == 0 (to not fail require)
     address[] memory trustedIssuers;
+    // If minAttestations == 0, trustedIssuers should remain empty
+    if (minAttestations > 0) {
+      trustedIssuers = getDefaultTrustedIssuers();
+    }
     return
       _transfer(
         identifier,
@@ -434,12 +482,19 @@ contract Escrow is
   }
 
   /**
+  * @notice Gets trusted issuers set as default for payments by `transfer` function.
+  * @return An array of addresses of trusted issuers.
+  */
+  function getDefaultTrustedIssuers() public view returns (address[] memory) {
+    return defaultTrustedIssuers;
+  }
+
+  /**
   * @notice Deletes the payment from its receiver's and sender's lists of payments,
   * and zeroes out all the data in the struct.
   * @param paymentId The ID of the payment to be deleted.
   */
   function deletePayment(address paymentId) private {
-    // TODO EN: look into possible gas savings here by copying payment into memory?
     EscrowedPayment storage payment = escrowedPayments[paymentId];
     address[] storage received = receivedPaymentIds[payment.recipientIdentifier];
     address[] storage sent = sentPaymentIds[payment.sender];
