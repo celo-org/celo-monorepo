@@ -158,8 +158,11 @@ contract Escrow is
   * @param minAttestations The min number of attestations required to withdraw the payment.
   * @return True if transfer succeeded.
   * @dev Throws if 'token' or 'value' is 0.
+  * @dev Throws if identifier is null and minAttestations > 0.
+  * @dev If minAttestations is 0, trustedIssuers will be set to empty list.
   * @dev msg.sender needs to have already approved this contract to transfer
-  * @dev If no identifier is given, then minAttestations must be 0.
+
+
   */
   // solhint-disable-next-line no-simple-event-func-name
   function transfer(
@@ -202,8 +205,9 @@ contract Escrow is
   *        will be accepted to prove ownership over an identifier.
   * @return True if transfer succeeded.
   * @dev Throws if 'token' or 'value' is 0.
-  * @dev msg.sender needs to have already approved this contract to transfer
-  * @dev If no identifier is given, then minAttestations must be 0.
+  * @dev Throws if identifier is null and minAttestations > 0.
+  * @dev Throws if minAttestations == 0 but trustedIssuers are provided.
+  * @dev msg.sender needs to have already approved this contract to transfer.
   */
   function transferWithTrustedIssuers(
     bytes32 identifier,
@@ -214,8 +218,6 @@ contract Escrow is
     uint256 minAttestations,
     address[] calldata trustedIssuers
   ) external nonReentrant returns (bool) {
-    // TODO EN: revisit: is it preferable to enforce that identifier cannot be zero here?
-    // as opposed to within the _transfer function
     return
       _transfer(
         identifier,
@@ -244,8 +246,9 @@ contract Escrow is
   *        will be accepted to prove ownership over an identifier.
   * @return True if transfer succeeded.
   * @dev Throws if 'token' or 'value' is 0.
-  * @dev msg.sender needs to have already approved this contract to transfer
-  * @dev If no identifier is given, then minAttestations must be 0.
+  * @dev Throws if identifier is null and minAttestations > 0.
+  * @dev Throws if minAttestations == 0 but trustedIssuers are provided.
+  * @dev msg.sender needs to have already approved this contract to transfer.
    */
   function _transfer(
     bytes32 identifier,
@@ -323,6 +326,7 @@ contract Escrow is
     EscrowedPayment memory payment = escrowedPayments[paymentId];
     require(payment.token != address(0) && payment.value > 0, "Invalid withdraw value.");
 
+    bool passedCheck = false;
     // Due to an old bug, there may exist payments with no identifier and minAttestations > 0
     // So ensure that these fail the attestations check, as they previously would have
     if (payment.minAttestations > 0) {
@@ -330,7 +334,6 @@ contract Escrow is
       // NOTE EN: this changes from getAddressFor -> getAddressForOrDie
       address attestationsAddress = registryContract.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID);
       if (trustedIssuers.length > 0) {
-        bool passedCheck = false;
         // TODO EN: revisit checking trustedIssuers list first
         // maybe first check trustedIssuers
         for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
@@ -363,24 +366,19 @@ contract Escrow is
             }
           }
         }
-        // TODO EN: revisit whether it's ok to change this require statement;
-        // probably fine to just use this at the end?
-        require(
-          passedCheck,
-          "This account does not have the required attestations to withdraw this payment."
-        );
       } else {
-        // Backwards compatibility
-        require(
-          hasCompletedV1Attestations(
-            attestationsAddress,
-            payment.recipientIdentifier,
-            msg.sender,
-            payment.minAttestations
-          ),
-          "This account does not have enough attestations to withdraw this payment."
+        // This is for backwards compatibility, not default behavior
+        passedCheck = hasCompletedV1Attestations(
+          attestationsAddress,
+          payment.recipientIdentifier,
+          msg.sender,
+          payment.minAttestations
         );
       }
+      require(
+        passedCheck,
+        "This account does not have the required attestations to withdraw this payment."
+      );
     }
 
     deletePayment(paymentId);
@@ -509,5 +507,8 @@ contract Escrow is
 
     delete escrowedPayments[paymentId];
     delete trustedIssuersPerPayment[paymentId];
+    // TODO ASv2 reviewers: adding trustedIssuers to event requires an additional
+    // storage lookup, but we can add this in if it's still best pratice to do so!
+    emit TrustedIssuersUnset(paymentId);
   }
 }
