@@ -11,6 +11,7 @@ import {
   genSessionID,
   PoprfClient,
   SequentialDelayDomain,
+  SequentialDelayStage,
   SignerEndpoint,
   TestUtils,
 } from '@celo/phone-number-privacy-common'
@@ -34,35 +35,41 @@ config.api.domains.enabled = true
 describe('domainService', () => {
   // DO NOT MERGE(victor): Should this be refactored to pass key provider, database, and config?
   // (global config makes it harder to test things, we should pass it as a parameter)
-  const app = createServer()
+  const app = createServer(config)
 
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
   const walletAddress = wallet.getAccounts()[0]! // TODO(Alec): do we need this?
 
-  const authenticatedDomain = (): SequentialDelayDomain => ({
+  const domainStages = (): SequentialDelayStage[] => [
+    { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) },
+  ]
+
+  const authenticatedDomain = (_stages?: SequentialDelayStage[]): SequentialDelayDomain => ({
     name: DomainIdentifiers.SequentialDelay,
     version: '1',
-    stages: [{ delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) }],
+    stages: _stages ?? domainStages(),
     address: defined(walletAddress),
     salt: defined('himalayanPink'),
   })
 
-  const signatureRequest = async (): Promise<
-    [DomainRestrictedSignatureRequest<SequentialDelayDomain>, PoprfClient]
-  > => {
+  const signatureRequest = async (
+    _domain?: SequentialDelayDomain,
+    _nonce?: number
+  ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, PoprfClient]> => {
+    const domain = _domain ?? authenticatedDomain()
     const poprfClient = new PoprfClient(
       Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'base64'),
-      domainHash(authenticatedDomain()),
+      domainHash(domain),
       Buffer.from('test message', 'utf8')
     )
 
     const req: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
       type: DomainRequestTypeTag.SIGN,
-      domain: authenticatedDomain(),
+      domain: domain,
       options: {
         signature: noString,
-        nonce: defined(0),
+        nonce: defined(_nonce ?? 0),
       },
       blindedMessage: poprfClient.blindedMessage.toString('base64'),
       sessionID: defined(genSessionID()),
@@ -200,8 +207,18 @@ describe('domainService', () => {
       expect(status).toBe(401)
     })
 
-    xit('Should respond with 503 on disabled api', async () => {
-      // TODO
+    it('Should respond with 503 on disabled api', async () => {
+      const configWithApiDisabled = { ...config }
+      configWithApiDisabled.api.domains.enabled = false
+      const appWithApiDisabled = createServer(configWithApiDisabled)
+
+      const req = await disableRequest()
+
+      const { status } = await request(appWithApiDisabled)
+        .post(SignerEndpoint.DISABLE_DOMAIN)
+        .send(req)
+
+      expect(status).toBe(503)
     })
   })
 
@@ -214,8 +231,16 @@ describe('domainService', () => {
       expect(status).toBe(200)
     })
 
-    xit('Should respond with 200 on repeated valid requests', async () => {
-      // TODO
+    it('Should respond with 200 on repeated valid requests', async () => {
+      const response1 = await request(app)
+        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
+        .send(await quotaRequest())
+      expect(response1.status).toBe(200)
+
+      const response2 = await request(app)
+        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
+        .send(await quotaRequest())
+      expect(response2.status).toBe(200)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
@@ -281,12 +306,22 @@ describe('domainService', () => {
       expect(status).toBe(401)
     })
 
-    xit('Should respond with 503 on disabled api', async () => {
-      // TODO
+    it('Should respond with 503 on disabled api', async () => {
+      const configWithApiDisabled = { ...config }
+      configWithApiDisabled.api.domains.enabled = false
+      const appWithApiDisabled = createServer(configWithApiDisabled)
+
+      const req = await quotaRequest()
+
+      const { status } = await request(appWithApiDisabled)
+        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
+        .send(req)
+
+      expect(status).toBe(503)
     })
   })
 
-  describe(`${SignerEndpoint.DOMAIN_SIGN}`, () => {
+  describe.only(`${SignerEndpoint.DOMAIN_SIGN}`, () => {
     it('Should respond with 200 on valid request', async () => {
       const [req, _] = await signatureRequest()
 
@@ -306,8 +341,24 @@ describe('domainService', () => {
       expect(status).toBe(200)
     })
 
-    xit('Should respond with 200 on repeated valid requests', async () => {
-      // TODO
+    it('Should respond with 200 on repeated valid requests', async () => {
+      const req1 = (await signatureRequest())[0]
+
+      const response1 = await request(app)
+        .post(SignerEndpoint.DOMAIN_SIGN)
+        .set('keyVersion', '1')
+        .send(req1)
+
+      expect(response1.status).toBe(200)
+
+      // submit identical request with nonce set to 1
+      const req2 = (await signatureRequest(undefined, 1))[0]
+      const response2 = await request(app)
+        .post(SignerEndpoint.DOMAIN_SIGN)
+        .set('keyVersion', '1')
+        .send(req2)
+
+      expect(response2.status).toBe(200)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
@@ -358,7 +409,7 @@ describe('domainService', () => {
     })
 
     xit('Should respond with 400 on invalid key version', async () => {
-      // TODO(Alec): Fix this test
+      // TODO(Alec): Implement new error for unsupported key versions
       const [badRequest, _] = await signatureRequest()
 
       const { status } = await request(app)
@@ -388,22 +439,55 @@ describe('domainService', () => {
       expect(status).toBe(401)
     })
 
-    xit('Should respond with 429 on out of quota', async () => {
-      // TODO
+    it('Should respond with 429 on out of quota', async () => {
+      const noQuotaDomain = authenticatedDomain([
+        // TODO(Alec): add better spec tests for rate limiting algorithm
+        { delay: 0, resetTimer: noBool, batchSize: defined(0), repetitions: defined(0) },
+      ])
+      const [badRequest, _] = await signatureRequest(noQuotaDomain)
+
+      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
+
+      expect(status).toBe(429)
     })
 
-    xit('Should respond with 429 on request too early', async () => {
-      // TODO
+    it('Should respond with 429 on request too early', async () => {
+      // This domain won't accept requests until ~10 seconds after test execution
+      const noQuotaDomain = authenticatedDomain([
+        {
+          delay: Math.floor(Date.now() / 1000) + 10,
+          resetTimer: noBool,
+          batchSize: defined(2),
+          repetitions: defined(1),
+        },
+      ])
+      const [badRequest, _] = await signatureRequest(noQuotaDomain)
+
+      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
+
+      expect(status).toBe(429)
     })
 
-    xit('Should respond with 503 on disabled api', async () => {
-      // TODO
+    it('Should respond with 503 on disabled api', async () => {
+      const configWithApiDisabled = { ...config }
+      configWithApiDisabled.api.domains.enabled = false
+      const appWithApiDisabled = createServer(configWithApiDisabled)
+
+      const [req, _] = await signatureRequest()
+
+      const { status } = await request(appWithApiDisabled)
+        .post(SignerEndpoint.DOMAIN_SIGN)
+        .send(req)
+
+      expect(status).toBe(503)
     })
   })
 
   /* 
 
   TODO: also check response content 
+
+  TODO(Alec): check code coverage
   
   [ ] Add TODOs for all ODIS tests that remain to be written
 [ ] Bad signature (combiner + signer)

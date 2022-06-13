@@ -44,9 +44,10 @@ export abstract class IOAbstract<R extends OdisRequest> {
     if (keyVersionHeader === undefined) {
       return true
     }
+
     const requestedKeyVersion = Number(keyVersionHeader)
 
-    const isValid = !Number.isNaN(requestedKeyVersion)
+    const isValid = !Number.isInteger(requestedKeyVersion)
     if (!isValid) {
       logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
@@ -60,7 +61,8 @@ export abstract class IOAbstract<R extends OdisRequest> {
     }
 
     const requestedKeyVersion = Number(keyVersionHeader)
-    if (Number.isNaN(requestedKeyVersion)) {
+
+    if (Number.isInteger(requestedKeyVersion)) {
       logger.error({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
       throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }

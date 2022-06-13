@@ -10,7 +10,7 @@ async function start() {
   await initDatabase()
   await initKeyProvider()
 
-  const server = createServer()
+  const server = createServer(config)
   logger.info('Starting server')
   const port = config.server.port
   const backupTimeout = config.timeout * 1.2

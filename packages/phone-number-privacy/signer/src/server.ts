@@ -6,7 +6,7 @@ import fs from 'fs'
 import https from 'https'
 import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
-import config, { getVersion } from './config'
+import { Config, getVersion } from './config'
 import { Controller } from './signer/controller'
 import { DomainDisableAction } from './signer/domain/disable.action'
 import { DomainDisableIO } from './signer/domain/disable.io'
@@ -23,7 +23,7 @@ import { PnpSignIO } from './signer/pnp/sign.io'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function createServer() {
+export function createServer(config: Config) {
   const logger = rootLogger()
 
   logger.info('Creating express server')
@@ -98,7 +98,7 @@ export function createServer() {
   addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
   addMeteredSignerEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
 
-  const sslOptions = getSslOptions()
+  const sslOptions = getSslOptions(config)
   if (sslOptions) {
     return https.createServer(sslOptions, app)
   } else {
@@ -106,7 +106,7 @@ export function createServer() {
   }
 }
 
-function getSslOptions() {
+function getSslOptions(config: Config) {
   const logger = rootLogger()
   const { sslKeyPath, sslCertPath } = config.server
 
