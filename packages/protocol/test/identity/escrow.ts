@@ -242,7 +242,7 @@ contract('Escrow', (accounts: string[]) => {
       )
     }
 
-    describe('#transferWithTrustedIssuers()', async () => {
+    describe('#transferWithTrustedIssuers', async () => {
       const transferAndCheckState = async (
         escrowSender: string,
         identifier: string,
@@ -795,7 +795,7 @@ contract('Escrow', (accounts: string[]) => {
           )
         })
 
-        it('should emit the Withdrawal event', async () => {
+        it('should emit the TrustedIssuersUnset event', async () => {
           const parsedSig = await getParsedSignatureOfAddress(
             web3,
             receiver,
@@ -809,6 +809,27 @@ contract('Escrow', (accounts: string[]) => {
             { from: receiver }
           )
           assertLogMatches2(receipt.logs[0], {
+            event: 'TrustedIssuersUnset',
+            args: {
+              paymentId: uniquePaymentIDWithdraw,
+            },
+          })
+        })
+
+        it('should emit the Withdrawal event', async () => {
+          const parsedSig = await getParsedSignatureOfAddress(
+            web3,
+            receiver,
+            uniquePaymentIDWithdraw
+          )
+          const receipt = await escrow.withdraw(
+            uniquePaymentIDWithdraw,
+            parsedSig.v,
+            parsedSig.r,
+            parsedSig.s,
+            { from: receiver }
+          )
+          assertLogMatches2(receipt.logs[1], {
             event: 'Withdrawal',
             args: {
               identifier: NULL_BYTES32,
@@ -914,7 +935,7 @@ contract('Escrow', (accounts: string[]) => {
               [],
               []
             ),
-            'This account does not have enough attestations to withdraw this payment.'
+            'This account does not have the required attestations to withdraw this payment.'
           )
         })
         it("should withdraw properly when sender's second payment has an identifier", async () => {
@@ -1148,10 +1169,21 @@ contract('Escrow', (accounts: string[]) => {
             )
           })
 
-          it('should emit the Revocation event', async () => {
+          it('should emit the TrustedIssuersUnset event', async () => {
             await timeTravel(oneDayInSecs, web3)
             const receipt = await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
             assertLogMatches2(receipt.logs[0], {
+              event: 'TrustedIssuersUnset',
+              args: {
+                paymentId: withdrawKeyAddress,
+              },
+            })
+          })
+
+          it('should emit the Revocation event', async () => {
+            await timeTravel(oneDayInSecs, web3)
+            const receipt = await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
+            assertLogMatches2(receipt.logs[1], {
               event: 'Revocation',
               args: {
                 identifier,
