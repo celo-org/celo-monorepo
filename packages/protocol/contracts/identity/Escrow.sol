@@ -166,7 +166,6 @@ contract Escrow is
     uint256 minAttestations,
     address[] calldata trustedIssuers
   ) external nonReentrant returns (bool) {
-    // TODO EN: is there a better way to fix stack too deep here?
     // TODO EN: revisit: is it preferable to enforce that identifier cannot be zero here?
     // as opposed to within the _transfer function
     return
@@ -221,10 +220,8 @@ contract Escrow is
       !(minAttestations == 0 && trustedIssuers.length > 0),
       "trustedIssuers may only be set when attestations are required"
     );
-    IAttestations attestations = getAttestations();
 
-    // TODO EN NOTE: fine to leave as is for now, since trustedIssuers maxAttestations
-    // will not really be considered anyways
+    IAttestations attestations = getAttestations();
     require(
       minAttestations <= attestations.getMaxAttestations(),
       "minAttestations larger than limit"
@@ -253,7 +250,7 @@ contract Escrow is
 
     require(ERC20(token).transferFrom(msg.sender, address(this), value), "Transfer unsuccessful.");
     emit Transfer(msg.sender, identifier, token, value, paymentId, minAttestations);
-    // TODO EN: revisit; for now, split into a second event for ABI-backwards compatibility
+    // Split into a second event for ABI backwards compatibility
     emit TrustedIssuersSet(paymentId, trustedIssuers);
     return true;
   }
@@ -304,7 +301,6 @@ contract Escrow is
 
         if (!passedCheck) {
           // Check for an attestation from a trusted issuer
-          // TODO EN -- may be necessary to split this into its own separate helper function as well
           IFederatedAttestations federatedAttestations = getFederatedAttestations();
           // TODO EN: this lookup signature will change
           (, address[] memory accounts, , ) = federatedAttestations.lookupAttestations(
@@ -319,7 +315,8 @@ contract Escrow is
             }
           }
         }
-        // TODO EN: revisit whether it's ok to change this require statement; probably fine to just use this at the end?
+        // TODO EN: revisit whether it's ok to change this require statement;
+        // probably fine to just use this at the end?
         require(
           passedCheck,
           "This account does not have the required attestations to withdraw this payment."
