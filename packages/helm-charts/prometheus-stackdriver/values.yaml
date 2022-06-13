@@ -6,6 +6,8 @@ gcloud:
 
 namespace: prometheus
 
+jobs: {}
+
 prometheus:
   imageTag: v2.27.1
   retention_time: 7d

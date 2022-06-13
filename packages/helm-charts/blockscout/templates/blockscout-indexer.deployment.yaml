@@ -89,6 +89,8 @@ spec:
           value: {{ .Values.blockscout.indexer.pool_size | quote }}
         - name: METRICS_ENABLED
           value: "{{.Values.blockscout.metrics.enabled}}"
+        - name: INDEXER_DISABLE_EMPTY_BLOCK_SANITIZER
+          value: "true"
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.indexer.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
