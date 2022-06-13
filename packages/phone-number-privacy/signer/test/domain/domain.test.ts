@@ -1,19 +1,23 @@
 import {
   DisableDomainRequest,
   disableDomainRequestEIP712,
+  DisableDomainResponse,
   domainHash,
   DomainIdentifiers,
   DomainQuotaStatusRequest,
   domainQuotaStatusRequestEIP712,
+  DomainQuotaStatusResponse,
   DomainRequestTypeTag,
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
+  DomainRestrictedSignatureResponse,
   genSessionID,
   PoprfClient,
   SequentialDelayDomain,
   SequentialDelayStage,
   SignerEndpoint,
   TestUtils,
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
@@ -131,23 +135,39 @@ describe('domainService', () => {
 
   describe(`${SignerEndpoint.DISABLE_DOMAIN}`, () => {
     it('Should respond with 200 on valid request', async () => {
-      const { status } = await request(app)
+      const res = await request(app)
         .post(SignerEndpoint.DISABLE_DOMAIN)
         .send(await disableRequest())
 
-      expect(status).toBe(200)
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<DisableDomainResponse>({
+        success: true,
+        version: res.body.version,
+      })
     })
 
-    it('Should respond with 200 on repeated valid requests', async () => {
-      const response1 = await request(app)
+    xit('Should respond with 200 on repeated valid requests', async () => {
+      const res1 = await request(app)
         .post(SignerEndpoint.DISABLE_DOMAIN)
         .send(await disableRequest())
-      expect(response1.status).toBe(200)
+      expect(res1.status).toBe(200)
+      expect(res1.body).toMatchObject<DisableDomainResponse>({
+        success: true,
+        version: res1.body.version,
+      })
 
-      const response2 = await request(app)
+      console.log(res1.body)
+
+      const res2 = await request(app)
         .post(SignerEndpoint.DISABLE_DOMAIN)
         .send(await disableRequest())
-      expect(response2.status).toBe(200)
+      expect(res2.status).toBe(200)
+      expect(res2.body).toMatchObject<DisableDomainResponse>({
+        success: true,
+        version: res2.body.version,
+      })
+
+      console.log(res2.body)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
@@ -155,9 +175,13 @@ describe('domainService', () => {
       // @ts-ignore Intentionally adding an extra field to the request type
       req.options.extraField = noString
 
-      const { status } = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
+      const res = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
 
-      expect(status).toBe(200)
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<DisableDomainResponse>({
+        success: true,
+        version: res.body.version,
+      })
     })
 
     it('Should respond with 400 on missing request fields', async () => {
@@ -165,9 +189,14 @@ describe('domainService', () => {
       // @ts-ignore Intentionally deleting required field
       delete badRequest.domain.version
 
-      const { status } = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(badRequest)
+      const res = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(badRequest)
 
-      expect(status).toBe(400)
+      expect(res.status).toBe(400)
+      expect(res.body).toMatchObject<DisableDomainResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
     })
 
     it('Should respond with 400 on unknown domain', async () => {
@@ -176,9 +205,14 @@ describe('domainService', () => {
       // @ts-ignore UnknownDomain is (intentionally) not a valid domain identifier.
       unknownRequest.domain.name = 'UnknownDomain'
 
-      const { status } = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(unknownRequest)
+      const res = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(unknownRequest)
 
-      expect(status).toBe(400)
+      expect(res.status).toBe(400)
+      expect(res.body).toMatchObject<DisableDomainResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
     })
 
     it('Should respond with 400 on bad encoding', async () => {
@@ -189,12 +223,22 @@ describe('domainService', () => {
       const res1 = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(badRequest1)
 
       expect(res1.status).toBe(400)
+      expect(res1.body).toMatchObject<DisableDomainResponse>({
+        success: false,
+        version: res1.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
 
       const badRequest2 = ''
 
       const res2 = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(badRequest2)
 
       expect(res2.status).toBe(400)
+      expect(res2.body).toMatchObject<DisableDomainResponse>({
+        success: false,
+        version: res2.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
     })
 
     it('Should respond with 401 on failed auth', async () => {
@@ -202,9 +246,14 @@ describe('domainService', () => {
       const badRequest = await disableRequest()
       badRequest.domain.salt = defined('badSalt')
 
-      const { status } = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(badRequest)
+      const res = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(badRequest)
 
-      expect(status).toBe(401)
+      expect(res.status).toBe(401)
+      expect(res.body).toMatchObject<DisableDomainResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.UNAUTHENTICATED_USER,
+      })
     })
 
     it('Should respond with 503 on disabled api', async () => {
@@ -214,33 +263,51 @@ describe('domainService', () => {
 
       const req = await disableRequest()
 
-      const { status } = await request(appWithApiDisabled)
-        .post(SignerEndpoint.DISABLE_DOMAIN)
-        .send(req)
+      const res = await request(appWithApiDisabled).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
 
-      expect(status).toBe(503)
+      expect(res.status).toBe(503)
+      expect(res.body).toMatchObject<DisableDomainResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.API_UNAVAILABLE,
+      })
     })
   })
 
   describe(`${SignerEndpoint.DOMAIN_QUOTA_STATUS}`, () => {
     it('Should respond with 200 on valid request', async () => {
-      const { status } = await request(app)
+      const res = await request(app)
         .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
         .send(await quotaRequest())
 
-      expect(status).toBe(200)
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+        success: true,
+        version: res.body.version,
+        status: { disabled: false, counter: 0, timer: 0, now: res.body.status.now },
+      })
     })
 
     it('Should respond with 200 on repeated valid requests', async () => {
-      const response1 = await request(app)
+      const res1 = await request(app)
         .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
         .send(await quotaRequest())
-      expect(response1.status).toBe(200)
+      expect(res1.status).toBe(200)
+      expect(res1.body).toMatchObject<DomainQuotaStatusResponse>({
+        success: true,
+        version: res1.body.version,
+        status: { disabled: false, counter: 0, timer: 0, now: res1.body.status.now },
+      })
 
-      const response2 = await request(app)
+      const res2 = await request(app)
         .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
         .send(await quotaRequest())
-      expect(response2.status).toBe(200)
+      expect(res2.status).toBe(200)
+      expect(res2.body).toMatchObject<DomainQuotaStatusResponse>({
+        success: true,
+        version: res2.body.version,
+        status: { disabled: false, counter: 0, timer: 0, now: res2.body.status.now },
+      })
     })
 
     it('Should respond with 200 on extra request fields', async () => {
@@ -248,9 +315,14 @@ describe('domainService', () => {
       // @ts-ignore Intentionally adding an extra field to the request type
       req.options.extraField = noString
 
-      const { status } = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(req)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(req)
 
-      expect(status).toBe(200)
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+        success: true,
+        version: res.body.version,
+        status: { disabled: false, counter: 0, timer: 0, now: res.body.status.now },
+      })
     })
 
     it('Should respond with 400 on missing request fields', async () => {
@@ -258,11 +330,14 @@ describe('domainService', () => {
       // @ts-ignore Intentionally deleting required field
       delete badRequest.domain.version
 
-      const { status } = await request(app)
-        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
-        .send(badRequest)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(badRequest)
 
-      expect(status).toBe(400)
+      expect(res.status).toBe(400)
+      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
     })
 
     it('Should respond with 400 on unknown domain', async () => {
@@ -271,11 +346,14 @@ describe('domainService', () => {
       // @ts-ignore UnknownDomain is (intentionally) not a valid domain identifier.
       unknownRequest.domain.name = 'UnknownDomain'
 
-      const { status } = await request(app)
-        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
-        .send(unknownRequest)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(unknownRequest)
 
-      expect(status).toBe(400)
+      expect(res.status).toBe(400)
+      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
     })
 
     it('Should respond with 400 on bad encoding', async () => {
@@ -286,12 +364,22 @@ describe('domainService', () => {
       const res1 = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(badRequest1)
 
       expect(res1.status).toBe(400)
+      expect(res1.body).toMatchObject<DomainQuotaStatusResponse>({
+        success: false,
+        version: res1.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
 
       const badRequest2 = ''
 
       const res2 = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(badRequest2)
 
       expect(res2.status).toBe(400)
+      expect(res2.body).toMatchObject<DomainQuotaStatusResponse>({
+        success: false,
+        version: res2.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
     })
 
     it('Should respond with 401 on failed auth', async () => {
@@ -299,11 +387,14 @@ describe('domainService', () => {
       const badRequest = await quotaRequest()
       badRequest.domain.salt = defined('badSalt')
 
-      const { status } = await request(app)
-        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
-        .send(badRequest)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(badRequest)
 
-      expect(status).toBe(401)
+      expect(res.status).toBe(401)
+      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.UNAUTHENTICATED_USER,
+      })
     })
 
     it('Should respond with 503 on disabled api', async () => {
@@ -313,52 +404,105 @@ describe('domainService', () => {
 
       const req = await quotaRequest()
 
-      const { status } = await request(appWithApiDisabled)
+      const res = await request(appWithApiDisabled)
         .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
         .send(req)
 
-      expect(status).toBe(503)
+      expect(res.status).toBe(503)
+      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.API_UNAVAILABLE,
+      })
     })
   })
 
-  describe.only(`${SignerEndpoint.DOMAIN_SIGN}`, () => {
+  describe(`${SignerEndpoint.DOMAIN_SIGN}`, () => {
     it('Should respond with 200 on valid request', async () => {
       const [req, _] = await signatureRequest()
 
-      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
 
-      expect(status).toBe(200)
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: true,
+        version: res.body.version,
+        signature: res.body.signature,
+        status: {
+          disabled: false,
+          counter: 1,
+          timer: res.body.status.timer,
+          now: res.body.status.now,
+        },
+      })
     })
 
     it('Should respond with 200 on valid request with key version header', async () => {
       const [req, _] = await signatureRequest()
 
-      const { status } = await request(app)
+      const res = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
         .set('keyVersion', '1')
         .send(req)
 
-      expect(status).toBe(200)
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: true,
+        version: res.body.version,
+        signature: res.body.signature,
+        status: {
+          disabled: false,
+          counter: 1,
+          timer: res.body.status.timer,
+          now: res.body.status.now,
+        },
+      })
     })
 
-    it('Should respond with 200 on repeated valid requests', async () => {
+    xit('Should respond with 200 on repeated valid requests', async () => {
       const req1 = (await signatureRequest())[0]
 
-      const response1 = await request(app)
+      const res1 = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
         .set('keyVersion', '1')
         .send(req1)
 
-      expect(response1.status).toBe(200)
+      console.log(res1.body)
+
+      expect(res1.status).toBe(200)
+      expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: true,
+        version: res1.body.version,
+        signature: res1.body.signature,
+        status: {
+          disabled: false,
+          counter: 1,
+          timer: res1.body.status.timer,
+          now: res1.body.status.now,
+        },
+      })
 
       // submit identical request with nonce set to 1
       const req2 = (await signatureRequest(undefined, 1))[0]
-      const response2 = await request(app)
+      const res2 = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
         .set('keyVersion', '1')
         .send(req2)
 
-      expect(response2.status).toBe(200)
+      console.log(res2.body)
+
+      expect(res2.status).toBe(200)
+      expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: true,
+        version: res2.body.version,
+        signature: res2.body.signature,
+        status: {
+          disabled: false,
+          counter: 2,
+          timer: res2.body.status.timer,
+          now: res2.body.status.now,
+        },
+      })
     })
 
     it('Should respond with 200 on extra request fields', async () => {
@@ -366,9 +510,20 @@ describe('domainService', () => {
       // @ts-ignore Intentionally adding an extra field to the request type
       req.options.extraField = noString
 
-      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
 
-      expect(status).toBe(200)
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: true,
+        version: res.body.version,
+        signature: res.body.signature,
+        status: {
+          disabled: false,
+          counter: 1,
+          timer: res.body.status.timer,
+          now: res.body.status.now,
+        },
+      })
     })
 
     it('Should respond with 400 on missing request fields', async () => {
@@ -376,9 +531,15 @@ describe('domainService', () => {
       // @ts-ignore Intentionally deleting required field
       delete badRequest.domain.version
 
-      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
 
-      expect(status).toBe(400)
+      expect(res.status).toBe(400)
+      // @ts-ignore res.body.status is expected to be undefined
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
     })
 
     it('Should respond with 400 on unknown domain', async () => {
@@ -387,9 +548,15 @@ describe('domainService', () => {
       // @ts-ignore UnknownDomain is (intentionally) not a valid domain identifier.
       unknownRequest.domain.name = 'UnknownDomain'
 
-      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(unknownRequest)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(unknownRequest)
 
-      expect(status).toBe(400)
+      expect(res.status).toBe(400)
+      // @ts-ignore res.body.status is expected to be undefined
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
     })
 
     it('Should respond with 400 on bad encoding', async () => {
@@ -400,24 +567,42 @@ describe('domainService', () => {
       const res1 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest1)
 
       expect(res1.status).toBe(400)
+      // @ts-ignore res.body.status is expected to be undefined
+      expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res1.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
 
       const badRequest2 = ''
 
       const res2 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest2)
 
       expect(res2.status).toBe(400)
+      // @ts-ignore res.body.status is expected to be undefined
+      expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res2.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
     })
 
     xit('Should respond with 400 on invalid key version', async () => {
       // TODO(Alec): Implement new error for unsupported key versions
       const [badRequest, _] = await signatureRequest()
 
-      const { status } = await request(app)
+      const res = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
         .set('keyVersion', 'a')
         .send(badRequest)
 
-      expect(status).toBe(400)
+      expect(res.status).toBe(400)
+      // @ts-ignore res.body.status is expected to be undefined
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.INVALID_INPUT,
+      })
     })
 
     it('Should respond with 401 on failed auth', async () => {
@@ -425,18 +610,30 @@ describe('domainService', () => {
       const [badRequest, _] = await signatureRequest()
       badRequest.domain.salt = defined('badSalt')
 
-      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
 
-      expect(status).toBe(401)
+      expect(res.status).toBe(401)
+      // @ts-ignore res.body.status is expected to be undefined
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.UNAUTHENTICATED_USER,
+      })
     })
 
     it('Should respond with 401 on invalid nonce', async () => {
       const [badRequest, _] = await signatureRequest()
       badRequest.options.nonce = defined(1)
 
-      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
 
-      expect(status).toBe(401)
+      expect(res.status).toBe(401)
+      // @ts-ignore res.body.status is expected to be undefined
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.UNAUTHENTICATED_USER, // TODO: is this right?
+      })
     })
 
     it('Should respond with 429 on out of quota', async () => {
@@ -446,9 +643,15 @@ describe('domainService', () => {
       ])
       const [badRequest, _] = await signatureRequest(noQuotaDomain)
 
-      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
 
-      expect(status).toBe(429)
+      expect(res.status).toBe(429)
+      // @ts-ignore res.body.status is expected to be undefined
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.EXCEEDED_QUOTA,
+      })
     })
 
     it('Should respond with 429 on request too early', async () => {
@@ -463,9 +666,15 @@ describe('domainService', () => {
       ])
       const [badRequest, _] = await signatureRequest(noQuotaDomain)
 
-      const { status } = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
+      const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(badRequest)
 
-      expect(status).toBe(429)
+      expect(res.status).toBe(429)
+      // @ts-ignore res.body.status is expected to be undefined // TODO(Alec): is status ever provided on failure?
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.EXCEEDED_QUOTA,
+      })
     })
 
     it('Should respond with 503 on disabled api', async () => {
@@ -475,17 +684,19 @@ describe('domainService', () => {
 
       const [req, _] = await signatureRequest()
 
-      const { status } = await request(appWithApiDisabled)
-        .post(SignerEndpoint.DOMAIN_SIGN)
-        .send(req)
+      const res = await request(appWithApiDisabled).post(SignerEndpoint.DOMAIN_SIGN).send(req)
 
-      expect(status).toBe(503)
+      expect(res.status).toBe(503)
+      // @ts-ignore res.body.status is expected to be undefined
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.API_UNAVAILABLE,
+      })
     })
   })
 
   /* 
-
-  TODO: also check response content 
 
   TODO(Alec): check code coverage
   
