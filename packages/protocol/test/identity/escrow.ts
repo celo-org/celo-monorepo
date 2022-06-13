@@ -474,7 +474,7 @@ contract('Escrow', (accounts: string[]) => {
       })
 
       it('should not allow setting trustedIssuers without minAttestations', async () => {
-        assertRevertWithReason(
+        await assertRevertWithReason(
           escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
@@ -830,7 +830,7 @@ contract('Escrow', (accounts: string[]) => {
               []
             )
           })
-          describe('when < minAttestations have been completed', () => {
+          describe('when <minAttestations have been completed', () => {
             it('should not allow withdrawal if no attestations exist in FederatedAttestations', async () => {
               await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
               await assertRevertWithReason(
@@ -940,8 +940,10 @@ contract('Escrow', (accounts: string[]) => {
 
       transferParams.forEach(({ identifier, trustedIssuers, minAttestations }) => {
         describe(`when identifier is ${
-          identifier === NULL_BYTES32 ? '' : 'not'
-        } empty, trustedIssuers = ${trustedIssuers}, and minAttestations = ${minAttestations}`, async () => {
+          identifier === NULL_BYTES32 ? '' : 'not '
+        }empty, trustedIssuers.length=${
+          trustedIssuers.length
+        }, and minAttestations=${minAttestations}`, async () => {
           beforeEach(async () => {
             await mintAndTransfer(
               sender,
