@@ -255,11 +255,8 @@ contract Escrow is
     // So ensure that these fail the attestations check, as they previously would have
     if (payment.minAttestations > 0) {
       address[] memory trustedIssuers = trustedIssuersPerPayment[paymentId];
-      // NOTE EN: this changes from getAddressFor -> getAddressForOrDie
       address attestationsAddress = registryContract.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID);
       if (trustedIssuers.length > 0) {
-        // TODO EN: revisit checking trustedIssuers list first
-        // maybe first check trustedIssuers
         for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
           if (trustedIssuers[i] != attestationsAddress) {
             continue;
@@ -277,7 +274,6 @@ contract Escrow is
         if (!passedCheck) {
           // Check for an attestation from a trusted issuer
           IFederatedAttestations federatedAttestations = getFederatedAttestations();
-          // TODO EN: this lookup signature will change
           (, address[] memory accounts, , ) = federatedAttestations.lookupAttestations(
             payment.recipientIdentifier,
             trustedIssuers
