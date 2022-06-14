@@ -136,6 +136,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       CeloContractName.FederatedAttestations,
       federatedAttestations.address
     )
+    await accountsInstance.initialize(registry.address)
     initialize = await federatedAttestations.initialize(registry.address)
 
     await accountsInstance.createAccount({ from: issuer1 })
@@ -937,7 +938,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
   })
 
-  describe.only('#batchRevokeAttestations', () => {
+  describe('#batchRevokeAttestations', () => {
     // benchmarking
     // interface BenchmarkAttestationCase {
     //   identifier: string
@@ -1060,7 +1061,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
         console.log(tx.receipt.gasUsed)
       })
-      it.only('how much gas does it take to revoke 100 attestations?', async () => {
+      it('how much gas does it take to revoke 100 attestations?', async () => {
         // Gas: 3691143, 3691102, 3691114
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
           100,
@@ -1075,7 +1076,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
         console.log(tx.receipt.gasUsed)
       })
-      it.only('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
+      it('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
         // Gas: 3690089, 3690047
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
           100,
@@ -1150,7 +1151,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
         console.log(tx.receipt.gasUsed)
       })
-      it.only('how much gas does it take to revoke 100 attestations?', async () => {
+      it('how much gas does it take to revoke 100 attestations?', async () => {
         // Gas: 3691137, 3691137, 3691125, 3691138
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
           100,
@@ -1165,7 +1166,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
         console.log(tx.receipt.gasUsed)
       })
-      it.only('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
+      it('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
         // Gas: 3690071
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
           100,
@@ -1183,11 +1184,26 @@ contract('FederatedAttestations', (accounts: string[]) => {
       it('how many attestations can we revoke until we hit 5 million gas?', async () => {
         // Gas: 4980802, 4980790
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
-          135,
+          148,
           [batchIssuer1, batchIssuer2, batchIssuer3],
           corruptSigner
         )
         const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+      it('[optimized] how many attestations can we revoke until we hit 5 million gas?', async () => {
+        // Gas:
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
+          158,
+          [batchIssuer1, batchIssuer2, batchIssuer3],
+          corruptSigner
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations2(
           batchIssuer1,
           benchmarkIdentifiers,
           benchmarkAccounts,
@@ -1205,7 +1221,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         await accountsInstance.createAccount({ from: batchIssuer1 })
       })
 
-      it.only('how much gas does it take to revoke 100 attestations?', async () => {
+      it('how much gas does it take to revoke 100 attestations?', async () => {
         // Gas:
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant3(
           10,
@@ -1222,7 +1238,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         console.log(tx.receipt.gasUsed)
       })
 
-      it.only('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
+      it('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
         // Gas:
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant3(
           10,

@@ -415,54 +415,69 @@ contract FederatedAttestations is
   // TODO should we pass in the issuedOn/signer parameter? ie. only revoke if the sender knows
   // the issuedOn/signer for the unique attestation
   function revokeAttestation(bytes32 identifier, address issuer, address account) public {
+    require(
+      account == msg.sender ||
+        // Minor gas optimization to prevent storage lookup in Accounts.sol if issuer == msg.sender
+        issuer == msg.sender || // TODO EN: this should make it easier for smart contracts as issuers
+        getAccounts().attestationSignerToAccount(msg.sender) == issuer,
+      "Sender does not have permission to revoke this attestation"
+    );
+    _revokeAttestation(identifier, issuer, account);
+  }
+
+  function _revokeAttestation(bytes32 identifier, address issuer, address account) private {
     OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
     for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
       OwnershipAttestation memory attestation = attestations[i];
-      if (attestation.account == account) {
-        // TODO EN: maybe removing this will bring some gas savings?
-        address signer = attestation.signer;
-        uint64 issuedOn = attestation.issuedOn;
-        uint64 publishedOn = attestation.publishedOn;
-        // TODO reviewers: is there a risk that compromised signers could revoke legitimate
-        // attestations before they have been unauthorized?
-        require(
-          account == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
-          "Sender does not have permission to revoke this attestation"
-        );
-        // This is meant to delete the attestation in the array
-        // and then move the last element in the array to that empty spot,
-        // to avoid having empty elements in the array
-        // TODO benchmark gas cost saving to check if array is of length 1
-        identifierToAttestations[identifier][issuer][i] = attestations[attestations.length - 1];
-        identifierToAttestations[identifier][issuer].pop();
-
-        bool deletedIdentifier = false;
-        bytes32[] memory identifiers = addressToIdentifiers[account][issuer];
-        for (uint256 j = 0; j < identifiers.length; j = j.add(1)) {
-          if (identifiers[j] == identifier) {
-            addressToIdentifiers[account][issuer][j] = identifiers[identifiers.length - 1];
-            addressToIdentifiers[account][issuer].pop();
-            deletedIdentifier = true;
-            break;
-          }
-        }
-        // Should never be false - both mappings should always be updated in unison
-        assert(deletedIdentifier);
-
-        bytes32 attestationHash = getUniqueAttestationHash(
-          identifier,
-          issuer,
-          account,
-          signer,
-          issuedOn
-        );
-        // Should never be able to re-revoke an attestation
-        assert(!revokedAttestations[attestationHash]);
-        revokedAttestations[attestationHash] = true;
-
-        emit AttestationRevoked(identifier, issuer, account, signer, issuedOn, publishedOn);
-        return;
+      if (attestation.account != account) {
+        continue;
       }
+
+      // This is meant to delete the attestation in the array
+      // and then move the last element in the array to that empty spot,
+      // to avoid having empty elements in the array
+      if (i != attestations.length - 1) {
+        identifierToAttestations[identifier][issuer][i] = attestations[attestations.length - 1];
+      }
+      identifierToAttestations[identifier][issuer].pop();
+
+      bool deletedIdentifier = false;
+      bytes32[] memory identifiers = addressToIdentifiers[account][issuer];
+      for (uint256 j = 0; j < identifiers.length; j = j.add(1)) {
+        if (identifiers[j] != identifier) {
+          continue;
+        }
+        if (j != identifiers.length - 1) {
+          addressToIdentifiers[account][issuer][j] = identifiers[identifiers.length - 1];
+        }
+        addressToIdentifiers[account][issuer].pop();
+        deletedIdentifier = true;
+        break;
+      }
+      // Should never be false - both mappings should always be updated in unison
+      assert(deletedIdentifier);
+
+      bytes32 attestationHash = getUniqueAttestationHash(
+        identifier,
+        issuer,
+        account,
+        attestation.signer,
+        attestation.issuedOn
+      );
+      // Should never be able to re-revoke an attestation
+      // TODO reviewers: removing this storage lookup saves about 20k gas for 100 batch-deleted attestations
+      assert(!revokedAttestations[attestationHash]);
+      revokedAttestations[attestationHash] = true;
+
+      emit AttestationRevoked(
+        identifier,
+        issuer,
+        account,
+        attestation.signer,
+        attestation.issuedOn,
+        attestation.publishedOn
+      );
+      return;
     }
     revert("Attestion to be revoked does not exist");
   }
@@ -509,6 +524,8 @@ contract FederatedAttestations is
         // uint64 publishedOn = attestation.publishedOn;
         // TODO reviewers: is there a risk that compromised signers could revoke legitimate
         // attestations before they have been unauthorized?
+        // TODO EN: this can be moved out of this loop as well? -- only makes sense for single attestations?
+        // could make this a boolean parameter; then check once per account and once per issuer?
         require(
           account == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
           "Sender does not have permission to revoke this attestation"
@@ -557,6 +574,7 @@ contract FederatedAttestations is
         );
         // Should never be able to re-revoke an attestation
         // EN: adds a storage access, check out removing this -- reduces gas by a ton; ~20k for 100 deleted attestations
+        // TODO reviewers: removing this storage lookup saves about 20k gas for 100 batch-deleted attestations
         assert(!revokedAttestations[attestationHash]);
         revokedAttestations[attestationHash] = true;
 
@@ -574,15 +592,43 @@ contract FederatedAttestations is
     revert("Attestion to be revoked does not exist");
   }
 
+  // TODO EN redo this with an actual clean helper function and that kind of thing
   function batchRevokeAttestations2(
     address issuer,
     bytes32[] calldata identifiers,
     address[] calldata accounts
   ) external {
     require(identifiers.length == accounts.length, "mismatch in identifiers and accounts lengths");
+
+    require(
+      issuer == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
+      "Sender does not have permission to revoke attestations from this issuer"
+    );
+
     for (uint256 i = 0; i < identifiers.length; i = i.add(1)) {
-      revokeAttestation2(identifiers[i], issuer, accounts[i]);
+      _revokeAttestation(identifiers[i], issuer, accounts[i]);
     }
   }
+
+  // function batchRevokeAttestations2(
+  //   address issuer,
+  //   bytes32[] calldata identifiers,
+  //   address[] calldata accounts
+  // ) external {
+  //   require(identifiers.length == accounts.length, "mismatch in identifiers and accounts lengths");
+  //   for (uint256 i = 0; i < identifiers.length; i = i.add(1)) {
+  //     revokeAttestation2(identifiers[i], issuer, accounts[i]);
+  //   }
+  // }
+
+  function batchRevokeAttestationsClean(
+    address issuer,
+    bytes32[] calldata identifiers,
+    address[] calldata accounts
+  ) external {
+    require(identifiers.length == accounts.length, "mismatch in identifiers and accounts lengths");
+
+  }
+
 }
 
