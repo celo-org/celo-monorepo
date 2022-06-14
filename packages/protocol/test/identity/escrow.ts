@@ -1,14 +1,12 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
-import { CeloContractName } from '@celo/protocol/lib/registry-utils'
+import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import {
   assertLogMatches2,
   assertRevert,
   assertRevertWithReason,
-  assumeOwnership,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
-import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import {
   EscrowContract,
   EscrowInstance,
@@ -18,10 +16,12 @@ import {
   MockAttestationsInstance,
   MockERC20TokenContract,
   MockERC20TokenInstance,
+  RegistryContract,
   RegistryInstance,
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
+const Registry: RegistryContract = artifacts.require('Registry')
 const Escrow: EscrowContract = artifacts.require('Escrow')
 const MockERC20Token: MockERC20TokenContract = artifacts.require('MockERC20Token')
 const MockAttestations: MockAttestationsContract = artifacts.require('MockAttestations')
@@ -91,9 +91,7 @@ contract('Escrow', (accounts: string[]) => {
   const oneDayInSecs: number = 86400
 
   before(async () => {
-    registry = await getDeployedProxiedContract('Registry', artifacts)
-    // Take ownership of the registry contract to point it to the mocks
-    await assumeOwnership(['Registry'], owner)
+    registry = Registry.at(celoRegistryAddress)
   })
 
   beforeEach(async () => {
