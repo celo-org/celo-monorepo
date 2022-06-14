@@ -274,7 +274,7 @@ contract Escrow is
         if (!passedCheck) {
           // Check for an attestation from a trusted issuer
           IFederatedAttestations federatedAttestations = getFederatedAttestations();
-          (, address[] memory accounts, , ) = federatedAttestations.lookupAttestations(
+          (, address[] memory accounts, , , ) = federatedAttestations.lookupAttestations(
             payment.recipientIdentifier,
             trustedIssuers
           );

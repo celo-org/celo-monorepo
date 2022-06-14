@@ -6,5 +6,11 @@ interface IFederatedAttestations {
   function lookupAttestations(bytes32, address[] calldata)
     external
     view
-    returns (uint256[] memory, address[] memory, uint256[] memory, address[] memory);
+    returns (
+      uint256[] memory,
+      address[] memory,
+      address[] memory,
+      uint64[] memory,
+      uint64[] memory
+    );
 }
