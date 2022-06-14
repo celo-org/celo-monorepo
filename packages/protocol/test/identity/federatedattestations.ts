@@ -936,4 +936,309 @@ contract('FederatedAttestations', (accounts: string[]) => {
       )
     })
   })
+
+  describe.only('#batchRevokeAttestations', () => {
+    // benchmarking
+    // interface BenchmarkAttestationCase {
+    //   identifier: string
+    //   account: string
+    // }
+
+    // Variant 1 == register (1 account, identifier) up to maxN
+    const registerAttestationsVariant1 = async (maxN: number, issuer: string, signer: string) => {
+      const benchmarkIdentifiers: string[] = []
+      const benchmarkAccounts: string[] = []
+
+      for (let i = 0; i < maxN; i++) {
+        // TODO may need to write a batchRegister function for testing...
+
+        const pnIdentifier = getPhoneHash(phoneNumber, `salt${i}`)
+        const newAccount = await web3.eth.accounts.create().address
+        await federatedAttestations.registerAttestationAsIssuer(
+          pnIdentifier,
+          issuer,
+          newAccount,
+          signer,
+          nowUnixTime,
+          { from: issuer }
+        )
+        benchmarkIdentifiers.push(pnIdentifier)
+        benchmarkAccounts.push(newAccount)
+      }
+      return [benchmarkIdentifiers, benchmarkAccounts]
+    }
+
+    const shuffleArray = (arr: Array<any>) => {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[arr[i], arr[j]] = [arr[j], arr[i]]
+      }
+      return arr
+    }
+
+    // Variant 2 == register (1 account, identifier) with multiple issuers (random order registered)
+    const registerAttestationsVariant2 = async (
+      maxN: number,
+      issuersToRandomize: string[],
+      signer: string
+    ) => {
+      const benchmarkIdentifiers: string[] = []
+      const benchmarkAccounts: string[] = []
+
+      for (let i = 0; i < maxN; i++) {
+        // Randomize issuerToRevoke order
+        issuersToRandomize = shuffleArray(issuersToRandomize)
+
+        // TODO may need to write a batchRegister function for testing...
+        const pnIdentifier = getPhoneHash(phoneNumber, `salt${i}`)
+        const newAccount = await web3.eth.accounts.create().address
+        for (let randomIssuer of issuersToRandomize) {
+          await federatedAttestations.registerAttestationAsIssuer(
+            pnIdentifier,
+            randomIssuer,
+            newAccount,
+            signer, // We don't really care about signers for now
+            nowUnixTime,
+            { from: randomIssuer }
+          )
+        }
+        // Add once (i.e. revoke only for `issuerToRevoke`)
+        benchmarkIdentifiers.push(pnIdentifier)
+        benchmarkAccounts.push(newAccount)
+      }
+      return [benchmarkIdentifiers, benchmarkAccounts]
+    }
+
+    // Variant 3 == register (1 account, a bunch of identifiers) with one issuer
+    const registerAttestationsVariant3 = async (
+      numAccounts: number,
+      issuer: string,
+      signer: string,
+      identifiersPerAccount: number
+    ) => {
+      const benchmarkIdentifiers: string[] = []
+      const benchmarkAccounts: string[] = []
+
+      for (let i = 0; i < numAccounts; i++) {
+        const newAccount = await web3.eth.accounts.create().address
+        for (let j = 0; j < identifiersPerAccount; j++) {
+          const pnIdentifier = getPhoneHash(phoneNumber, `salt${i}${j}`)
+          await federatedAttestations.registerAttestationAsIssuer(
+            pnIdentifier,
+            issuer,
+            newAccount,
+            signer,
+            nowUnixTime,
+            { from: issuer }
+          )
+          benchmarkIdentifiers.push(pnIdentifier)
+          benchmarkAccounts.push(newAccount)
+        }
+      }
+      return [benchmarkIdentifiers, benchmarkAccounts]
+    }
+
+    describe('unique account <-> identifier, one issuer', () => {
+      let batchIssuer1 = accounts[1]
+      const corruptSigner = accounts[2]
+
+      beforeEach(async () => {
+        await accountsInstance.createAccount({ from: batchIssuer1 })
+      })
+      it('how much gas does it take to revoke 10 attestations?', async () => {
+        // Gas: 379038
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
+          10,
+          batchIssuer1,
+          corruptSigner
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+      it.only('how much gas does it take to revoke 100 attestations?', async () => {
+        // Gas: 3691143, 3691102, 3691114
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
+          100,
+          batchIssuer1,
+          corruptSigner
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+      it.only('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
+        // Gas: 3690089, 3690047
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
+          100,
+          batchIssuer1,
+          corruptSigner
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations2(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+      xit('how much gas does it take to revoke 1000 attestations?', async () => {
+        // Hits out of gas error
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
+          1000,
+          batchIssuer1,
+          corruptSigner
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+      it('how many attestations can we revoke until we hit 5 million gas?', async () => {
+        // Takes 4980778 gas with 135
+        // 4980766
+        // 4980754
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
+          135,
+          batchIssuer1,
+          corruptSigner
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+    })
+    describe('1 account per identifier; 3 issuers per (account, identifier) in random order', () => {
+      const batchIssuer1 = accounts[1]
+      const batchIssuer2 = accounts[2]
+      const batchIssuer3 = accounts[3]
+      const corruptSigner = accounts[4]
+
+      beforeEach(async () => {
+        // Setup
+        await accountsInstance.createAccount({ from: batchIssuer1 })
+        await accountsInstance.createAccount({ from: batchIssuer2 })
+        await accountsInstance.createAccount({ from: batchIssuer3 })
+      })
+      it('how much gas does it take to revoke 10 attestations?', async () => {
+        // Gas: 379044, 379038, 379038
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
+          10,
+          [batchIssuer1, batchIssuer2, batchIssuer3],
+          corruptSigner
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+      it.only('how much gas does it take to revoke 100 attestations?', async () => {
+        // Gas: 3691137, 3691137, 3691125, 3691138
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
+          100,
+          [batchIssuer1, batchIssuer2, batchIssuer3],
+          corruptSigner
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+      it.only('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
+        // Gas: 3690071
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
+          100,
+          [batchIssuer1, batchIssuer2, batchIssuer3],
+          corruptSigner
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations2(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+      it('how many attestations can we revoke until we hit 5 million gas?', async () => {
+        // Gas: 4980802, 4980790
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
+          135,
+          [batchIssuer1, batchIssuer2, batchIssuer3],
+          corruptSigner
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+    })
+    describe('10 accounts, a bunch of identifiers per account', () => {
+      const batchIssuer1 = accounts[1]
+      const corruptSigner = accounts[2]
+
+      beforeEach(async () => {
+        // Setup
+        await accountsInstance.createAccount({ from: batchIssuer1 })
+      })
+
+      it.only('how much gas does it take to revoke 100 attestations?', async () => {
+        // Gas:
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant3(
+          10,
+          batchIssuer1,
+          corruptSigner,
+          10
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+
+      it.only('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
+        // Gas:
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant3(
+          10,
+          batchIssuer1,
+          corruptSigner,
+          10
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations2(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+    })
+    // TODO: optimized version of batchRevoke?
+  })
 })
