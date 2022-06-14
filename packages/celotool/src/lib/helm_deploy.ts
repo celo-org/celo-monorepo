@@ -145,6 +145,62 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   return [blockscoutDBUsername, blockscoutDBPassword, blockscoutDBConnectionName.trim()]
 }
 
+export async function cloneCloudSQLInstance(
+  celoEnv: string,
+  instanceName: string,
+  cloneInstanceName: string
+) {
+  await ensureAuthenticatedGcloudAccount()
+  console.info('Cloning Cloud SQL database, this might take a minute or two ...')
+
+  await failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
+
+  try {
+    await execCmd(`gcloud sql instances describe ${cloneInstanceName}`)
+    // if we get to here, that means the instance already exists
+    console.warn(
+      `A Cloud SQL instance named ${cloneInstanceName} already exists, so in all likelihood you cannot deploy cloning with ${cloneInstanceName}`
+    )
+  } catch (error: any) {
+    if (
+      error.message.trim() !==
+      `Command failed: gcloud sql instances describe ${cloneInstanceName}\nERROR: (gcloud.sql.instances.describe) HTTPError 404: The Cloud SQL instance does not exist.`
+    ) {
+      console.error(error.message.trim())
+      process.exit(1)
+    }
+  }
+
+  try {
+    await execCmdWithExitOnFailure(
+      `gcloud sql instances clone ${instanceName} ${cloneInstanceName} `
+    )
+  } catch (error: any) {
+    console.error(error.message.trim())
+  }
+
+  await execCmdWithExitOnFailure(
+    `gcloud sql instances patch ${cloneInstanceName} --backup-start-time 17:00`
+  )
+
+  const blockscoutDBUsername = Math.random().toString(36).slice(-8)
+  const blockscoutDBPassword = Math.random().toString(36).slice(-8)
+
+  console.info('Creating SQL user')
+  await execCmdWithExitOnFailure(
+    `gcloud sql users create ${blockscoutDBUsername} -i ${cloneInstanceName} --password ${blockscoutDBPassword}`
+  )
+
+  console.info('Copying blockscout service account secret to namespace')
+  await copySecret(CLOUDSQL_SECRET_NAME, 'default', celoEnv)
+
+  const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
+    `gcloud sql instances describe ${cloneInstanceName} --format="value(connectionName)"`
+  )
+
+  return [blockscoutDBUsername, blockscoutDBPassword, blockscoutDBConnectionName.trim()]
+}
+
 async function createAndUploadKubernetesSecretIfNotExists(
   secretName: string,
   serviceAccountName: string,
