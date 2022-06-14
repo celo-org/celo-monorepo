@@ -12,12 +12,12 @@ import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import {
   EscrowContract,
   EscrowInstance,
+  FederatedAttestationsContract,
+  FederatedAttestationsInstance,
   MockAttestationsContract,
   MockAttestationsInstance,
   MockERC20TokenContract,
   MockERC20TokenInstance,
-  MockFederatedAttestationsContract,
-  MockFederatedAttestationsInstance,
   RegistryInstance,
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
@@ -25,8 +25,8 @@ import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 const Escrow: EscrowContract = artifacts.require('Escrow')
 const MockERC20Token: MockERC20TokenContract = artifacts.require('MockERC20Token')
 const MockAttestations: MockAttestationsContract = artifacts.require('MockAttestations')
-const MockFederatedAttestations: MockFederatedAttestationsContract = artifacts.require(
-  'MockFederatedAttestations'
+const FederatedAttestations: FederatedAttestationsContract = artifacts.require(
+  'FederatedAttestations'
 )
 
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -74,7 +74,7 @@ const getEscrowedPayment = async (
 contract('Escrow', (accounts: string[]) => {
   let escrow: EscrowInstance
   let mockAttestations: MockAttestationsInstance
-  let mockFederatedAttestations: MockFederatedAttestationsInstance
+  let federatedAttestations: FederatedAttestationsInstance
   let registry: RegistryInstance
 
   const owner = accounts[0]
@@ -100,11 +100,12 @@ contract('Escrow', (accounts: string[]) => {
     escrow = await Escrow.new(true, { from: owner })
     await escrow.initialize()
     mockAttestations = await MockAttestations.new({ from: owner })
+    federatedAttestations = await FederatedAttestations.new(true, { from: owner })
+    await federatedAttestations.initialize()
     await registry.setAddressFor(CeloContractName.Attestations, mockAttestations.address)
-    mockFederatedAttestations = await MockFederatedAttestations.new({ from: owner })
     await registry.setAddressFor(
       CeloContractName.FederatedAttestations,
-      mockFederatedAttestations.address
+      federatedAttestations.address
     )
   })
 
@@ -1006,15 +1007,13 @@ contract('Escrow', (accounts: string[]) => {
             })
             it('should allow users to withdraw if attestation is found in FederatedAttestations', async () => {
               await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
-              await mockFederatedAttestations.registerAttestation(
+              await federatedAttestations.registerAttestationAsIssuer(
                 aPhoneHash,
                 trustedIssuer2,
                 receiver,
                 NULL_ADDRESS,
                 0,
-                0,
-                NULL_BYTES32,
-                NULL_BYTES32
+                { from: trustedIssuer2 }
               )
               await withdrawAndCheckState(
                 sender,
@@ -1041,15 +1040,13 @@ contract('Escrow', (accounts: string[]) => {
             )
           })
           it('should allow users to withdraw if attestation is found in FederatedAttestations', async () => {
-            await mockFederatedAttestations.registerAttestation(
+            await federatedAttestations.registerAttestationAsIssuer(
               aPhoneHash,
               trustedIssuer2,
               receiver,
               NULL_ADDRESS,
               0,
-              0,
-              NULL_BYTES32,
-              NULL_BYTES32
+              { from: trustedIssuer2 }
             )
             await withdrawAndCheckState(
               sender,
@@ -1124,15 +1121,13 @@ contract('Escrow', (accounts: string[]) => {
             uniquePaymentIDRevoke = withdrawKeyAddress
             parsedSig1 = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
             if (trustedIssuers.length) {
-              await mockFederatedAttestations.registerAttestation(
+              await federatedAttestations.registerAttestationAsIssuer(
                 identifier,
                 trustedIssuers[0],
                 receiver,
                 NULL_ADDRESS,
                 0,
-                0,
-                NULL_BYTES32,
-                NULL_BYTES32
+                { from: trustedIssuers[0] }
               )
             }
           })

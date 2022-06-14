@@ -136,13 +136,14 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
   beforeEach('FederatedAttestations setup', async () => {
     accountsInstance = await Accounts.new(true)
+    await accountsInstance.initialize(registry.address)
     federatedAttestations = await FederatedAttestations.new(true)
+    initialize = await federatedAttestations.initialize()
     await registry.setAddressFor(CeloContractName.Accounts, accountsInstance.address)
     await registry.setAddressFor(
       CeloContractName.FederatedAttestations,
       federatedAttestations.address
     )
-    initialize = await federatedAttestations.initialize()
 
     await accountsInstance.createAccount({ from: issuer1 })
     sig = await getSignatureForAttestation(
