@@ -77,7 +77,7 @@ ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http.timeout.read 600 --http.timeout.wri
 */}}
 {{- define "celo-fullnode.health-checker-server" -}}
 - name: health-checker-server-{{ .protocol_name }}
-  image: gcr.io/celo-testnet/health-checker:0.0.5
+  image: us.gcr.io/celo-testnet/health-checker:0.0.5
   imagePullPolicy: IfNotPresent
   args:
   - --script=/health-check.sh
@@ -90,4 +90,6 @@ ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --http.timeout.read 600 --http.timeout.wri
   - name: health-check
     mountPath: /health-check.sh
     subPath: health-check.sh
+  - name: data-shared
+    mountPath: /data-shared
 {{- end -}}

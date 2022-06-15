@@ -16,7 +16,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus
-  namespace: {{ .Values.namespace }}
   labels:
 {{ include "prometheus-stackdriver.labels" .  | indent 4 }}
 spec:
@@ -40,9 +39,7 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
-{{- if not (kindIs "invalid" .Values.serviceAccount.name) }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
-{{- end }}
       containers:
         - name: prometheus
           image: prom/prometheus:{{ .Values.prometheus.imageTag }}
