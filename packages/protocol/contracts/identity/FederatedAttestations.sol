@@ -415,9 +415,7 @@ contract FederatedAttestations is
     require(
       account == msg.sender ||
         // Minor gas optimization to prevent storage lookup in Accounts.sol if issuer == msg.sender
-        issuer == msg.sender || // TODO EN: this should make it easier for smart contracts as issuers
-        // TODO EN: maybe safer/clearer to also switch to getAccounts().getAttestationSigner(issuer) == msg.sender;
-        // getAccounts().attestationSignerToAccount(msg.sender) == issuer,
+        issuer == msg.sender ||
         getAccounts().attestationSignerToAccount(msg.sender) == issuer,
       "Sender does not have permission to revoke this attestation"
     );
