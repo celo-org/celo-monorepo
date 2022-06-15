@@ -507,7 +507,8 @@ contract FederatedAttestations is
         attestation.issuedOn
       );
       // Should never be able to re-revoke an attestation
-      // TODO reviewers: removing this storage lookup saves about 20k gas for 100 batch-deleted attestations
+      // TODO reviewers: removing this storage lookup saves about 20k gas
+      // for 100 batch-deleted attestations
       assert(!revokedAttestations[attestationHash]);
       revokedAttestations[attestationHash] = true;
 
