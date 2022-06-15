@@ -98,12 +98,14 @@ async function main(buildTargets: typeof _buildTargets) {
         body: formData,
       })
         .then((res) => res.json())
-        .then((json) => {
-          if (!json.result) throw new Error(json.error)
+        .then(async (json) => {
+          if (!json.result) {
+            throw new Error(json.error)
+          }
           if (network === 'mainnet') {
-            fetch(`https://explorer.celo.org/address/${json.result[0].address}/contracts`)
+            await fetch(`https://explorer.celo.org/address/${json.result[0].address}/contracts`)
           } else {
-            fetch(
+            await fetch(
               `https://${network}-blockscout.celo-testnet.org/address/${json.result[0].address}/contracts`
             )
           }
