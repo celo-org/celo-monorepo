@@ -12,7 +12,7 @@ const returnSTContractNames = (contractsHex: string, lengths: string[]): string[
   const contracts = Web3.utils.hexToUtf8(contractsHex)
   let currentIndex = 0
   const contractsArr = []
-  for (let i = 0; i < lengths.length - 1; i++) {
+  for (let i = 0; i < lengths.length; i++) {
     const contract = contracts.slice(currentIndex, currentIndex + Number(lengths[i]))
     currentIndex += Number(lengths[i])
     contractsArr.push(contract)
@@ -29,9 +29,9 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
    * @return string array containing contract names
    */
   async getContractInstances(): Promise<string[]> {
-    const values = await Promise.resolve(this.contract.methods.getContractInstances())
-    const concatenatedContracts = Object.keys(values)[0]
-    const contractLengths = Object.keys(values)
+    const values = await this.contract.methods.getContractInstances().call()
+    const concatenatedContracts = values[0]
+    const contractLengths = values[1]
     return returnSTContractNames(concatenatedContracts, contractLengths)
   }
 
@@ -44,7 +44,7 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
         index++
       }
     } catch (error) {
-      console.error(error)
+      return convertedToHex
     }
     return convertedToHex
   }
@@ -54,7 +54,7 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
    * @return queried stableTokenContractName
    */
   async queryStableTokenContractNames(fiatTicker: string): Promise<string> {
-    Web3.utils.utf8ToHex(fiatTicker)
-    return Promise.resolve(this.stableTokens(fiatTicker))
+    const res = await this.stableTokens(Web3.utils.utf8ToHex(fiatTicker))
+    return Web3.utils.hexToUtf8(res)
   }
 }

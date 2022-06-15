@@ -16,18 +16,17 @@ testWithGanache('StableTokenRegistry Wrapper', (web3: Web3) => {
   })
 
   describe('Verifying that it always has correct values', () => {
-    it('has the correct list of fiatTicker', () => {
-      expect(stableTokenRegistry.FiatTickers()).toEqual(['USD', 'EUR', 'BRL'])
+    it('has the correct list of fiatTicker', async () => {
+      const fiatTickers = await stableTokenRegistry.FiatTickers()
+      expect(fiatTickers).toEqual(['USD', 'EUR', 'BRL'])
     })
-    it('has the correct list of stable token contracts', () => {
-      expect(stableTokenRegistry.getContractInstances()).toEqual([
-        'StableToken',
-        'StableTokenEUR',
-        'StableTokenBRL',
-      ])
+    it('has the correct list of stable token contracts', async () => {
+      const contractInstances = await stableTokenRegistry.getContractInstances()
+      expect(contractInstances).toEqual(['StableToken', 'StableTokenEUR', 'StableTokenBRL'])
     })
-    it('can query stable token contract names', () => {
-      expect(stableTokenRegistry.queryStableTokenContractNames('USD')).toEqual('StableToken')
+    it('can query stable token contract names', async () => {
+      const stableTokenContractName = await stableTokenRegistry.queryStableTokenContractNames('USD')
+      expect(stableTokenContractName).toEqual('StableToken')
     })
   })
 })
