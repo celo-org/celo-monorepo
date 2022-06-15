@@ -19,7 +19,7 @@ import {
   RegistryContract,
   RegistryInstance,
 } from 'types'
-import { keccak256 } from 'web3-utils'
+import { encodePacked, keccak256 } from 'web3-utils'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
 const FederatedAttestations: FederatedAttestationsContract = artifacts.require(
@@ -45,7 +45,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
   const nowUnixTime = Math.floor(Date.now() / 1000)
 
-  const signerRole = keccak256('celo.org/core/attestation')
+  const signerRole = keccak256(encodePacked('celo.org/core/attestation'))
   let sig
 
   const signAndRegisterAttestation = async (
@@ -105,8 +105,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
     assert.equal(attestation['issuedOn'], issuedOn)
     assert.equal(attestation['signer'], signer)
     const storedIdentifier = await federatedAttestations.addressToIdentifiers(
-      account1,
-      issuer1,
+      account,
+      issuer,
       identifierIndex
     )
     assert.equal(identifier, storedIdentifier)
@@ -125,6 +125,33 @@ contract('FederatedAttestations', (accounts: string[]) => {
     await assertThrowsAsync(
       federatedAttestations.addressToIdentifiers(account, issuer, identifierIndex)
     )
+  }
+
+  interface AttestationTestCase {
+    account: string
+    issuedOn: number
+    signer: string
+  }
+
+  const checkAgainstExpectedAttestations = (
+    expectedCountsPerIssuer: number[],
+    expectedAttestations: AttestationTestCase[],
+    actualCountsPerIssuer: BigNumber[],
+    actualAddresses: string[],
+    actualIssuedOns: BigNumber[],
+    actualSigners: string[]
+  ) => {
+    expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
+
+    assert.lengthOf(actualAddresses, expectedAttestations.length)
+    assert.lengthOf(actualIssuedOns, expectedAttestations.length)
+    assert.lengthOf(actualSigners, expectedAttestations.length)
+
+    expectedAttestations.forEach((expectedAttestation, index) => {
+      assert.equal(actualAddresses[index], expectedAttestation.account)
+      assert.equal(actualIssuedOns[index].toNumber(), expectedAttestation.issuedOn)
+      assert.equal(actualSigners[index], expectedAttestation.signer)
+    })
   }
 
   beforeEach('FederatedAttestations setup', async () => {
@@ -196,33 +223,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('looking up attestations', () => {
-    interface AttestationTestCase {
-      account: string
-      issuedOn: number
-      signer: string
-    }
-
-    const checkAgainstExpectedAttestations = (
-      expectedCountsPerIssuer: number[],
-      expectedAttestations: AttestationTestCase[],
-      actualCountsPerIssuer: BigNumber[],
-      actualAddresses: string[],
-      actualIssuedOns: BigNumber[],
-      actualSigners: string[]
-    ) => {
-      expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
-
-      assert.lengthOf(actualAddresses, expectedAttestations.length)
-      assert.lengthOf(actualIssuedOns, expectedAttestations.length)
-      assert.lengthOf(actualSigners, expectedAttestations.length)
-
-      expectedAttestations.forEach((expectedAttestation, index) => {
-        assert.equal(actualAddresses[index], expectedAttestation.account)
-        assert.equal(actualIssuedOns[index].toNumber(), expectedAttestation.issuedOn)
-        assert.equal(actualSigners[index], expectedAttestation.signer)
-      })
-    }
-
     describe('when identifier has not been registered', () => {
       describe('#lookupAttestations', () => {
         it('should return empty list', async () => {
@@ -800,9 +800,22 @@ contract('FederatedAttestations', (accounts: string[]) => {
           identifier1,
           issuer1,
           account1,
-          issuer1,
           nowUnixTime,
           { from: issuer1 }
+        )
+      )
+    })
+
+    it('should succeed if issuer is not registered in Accounts.sol', async () => {
+      const issuer2 = accounts[3]
+      assert.isFalse(await accountsInstance.isAccount(issuer2))
+      assert.isOk(
+        await federatedAttestations.registerAttestationAsIssuer(
+          identifier1,
+          issuer2,
+          account1,
+          nowUnixTime,
+          { from: issuer2 }
         )
       )
     })
@@ -813,7 +826,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
           identifier1,
           issuer1,
           account1,
-          signer1,
           nowUnixTime,
           { from: signer1 }
         )
@@ -843,6 +855,29 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 0)
     })
 
+    it('should succeed when revoked by a current signer of issuer', async () => {
+      await federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
+        from: signer1,
+      })
+      await assertAttestationNotInStorage(identifier1, issuer1, account1, 0, 0)
+    })
+
+    it('should revert when signer has been deregistered', async () => {
+      await accountsInstance.removeSigner(signer1, signerRole, { from: issuer1 })
+      await assertRevert(
+        federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
+          from: signer1,
+        })
+      )
+      // TODO EN: go to this one ideally
+      // await assertRevertWithReason(
+      //   federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
+      //     from: signer1,
+      //   }),
+      //   'Sender does not have permission to revoke this attestation'
+      // )
+    })
+
     it('should emit an AttestationRevoked event after successfully revoking', async () => {
       const attestation = await federatedAttestations.identifierToAttestations(
         identifier1,
@@ -869,6 +904,23 @@ contract('FederatedAttestations', (accounts: string[]) => {
           publishedOn,
         },
       })
+    })
+
+    it('should succeed if issuer is not registered in Accounts.sol', async () => {
+      const issuer2 = accounts[3]
+      assert.isFalse(await accountsInstance.isAccount(issuer2))
+      await federatedAttestations.registerAttestationAsIssuer(
+        identifier1,
+        issuer2,
+        account1,
+        nowUnixTime,
+        { from: issuer2 }
+      )
+      await assertAttestationInStorage(identifier1, issuer2, 0, account1, nowUnixTime, issuer2, 0)
+      await federatedAttestations.revokeAttestation(identifier1, issuer2, account1, {
+        from: issuer2,
+      })
+      await assertAttestationNotInStorage(identifier1, issuer2, account1, 0, 0)
     })
 
     it("should revert when revoking an attestation that doesn't exist", async () => {
@@ -939,6 +991,155 @@ contract('FederatedAttestations', (accounts: string[]) => {
   })
 
   describe('#batchRevokeAttestations', () => {
+    const account2 = accounts[3]
+    const signer2 = accounts[4]
+
+    beforeEach(async () => {
+      await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, signer1)
+      await signAndRegisterAttestation(identifier1, issuer1, account2, nowUnixTime, signer2)
+      await signAndRegisterAttestation(identifier2, issuer1, account2, nowUnixTime, signer1)
+    })
+    it('should succeed if issuer batch revokes attestations', async () => {
+      await federatedAttestations.batchRevokeAttestations(
+        issuer1,
+        [identifier1, identifier2],
+        [account1, account2]
+      )
+      const [
+        countsPerIssuer1,
+        addresses1,
+        issuedOns1,
+        signers1,
+      ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+      checkAgainstExpectedAttestations(
+        [1],
+        [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
+        countsPerIssuer1,
+        addresses1,
+        issuedOns1,
+        signers1
+      )
+      const [
+        countsPerIssuer2,
+        addresses2,
+        issuedOns2,
+        signers2,
+      ] = await federatedAttestations.lookupAttestations(identifier2, [issuer1])
+      checkAgainstExpectedAttestations([0], [], countsPerIssuer2, addresses2, issuedOns2, signers2)
+    })
+    it('should succeed regardless of order of (attestations, identifiers)', async () => {
+      await federatedAttestations.batchRevokeAttestations(
+        issuer1,
+        [identifier2, identifier1],
+        [account2, account1]
+      )
+      const [
+        countsPerIssuer1,
+        addresses1,
+        issuedOns1,
+        signers1,
+      ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+      checkAgainstExpectedAttestations(
+        [1],
+        [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
+        countsPerIssuer1,
+        addresses1,
+        issuedOns1,
+        signers1
+      )
+      const [
+        countsPerIssuer2,
+        addresses2,
+        issuedOns2,
+        signers2,
+      ] = await federatedAttestations.lookupAttestations(identifier2, [issuer1])
+      checkAgainstExpectedAttestations([0], [], countsPerIssuer2, addresses2, issuedOns2, signers2)
+    })
+
+    it('should succeed if currently registered signer of issuer batch revokes attestations', async () => {
+      await federatedAttestations.batchRevokeAttestations(
+        issuer1,
+        [identifier2, identifier1],
+        [account2, account1],
+        { from: signer1 }
+      )
+      const [
+        countsPerIssuer1,
+        addresses1,
+        issuedOns1,
+        signers1,
+      ] = await federatedAttestations.lookupAttestations(identifier1, [issuer1])
+      checkAgainstExpectedAttestations(
+        [1],
+        [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
+        countsPerIssuer1,
+        addresses1,
+        issuedOns1,
+        signers1
+      )
+      const [
+        countsPerIssuer2,
+        addresses2,
+        issuedOns2,
+        signers2,
+      ] = await federatedAttestations.lookupAttestations(identifier2, [issuer1])
+      checkAgainstExpectedAttestations([0], [], countsPerIssuer2, addresses2, issuedOns2, signers2)
+    })
+
+    it('should succeed if issuer is not registered in Accounts.sol', async () => {
+      const issuer2 = accounts[5]
+      assert.isFalse(await accountsInstance.isAccount(issuer2))
+      await federatedAttestations.registerAttestationAsIssuer(
+        identifier1,
+        issuer2,
+        account1,
+        nowUnixTime,
+        { from: issuer2 }
+      )
+      await assertAttestationInStorage(identifier1, issuer2, 0, account1, nowUnixTime, issuer2, 0)
+      await federatedAttestations.batchRevokeAttestations(issuer2, [identifier1], [account1], {
+        from: issuer2,
+      })
+      await assertAttestationNotInStorage(identifier1, issuer2, account1, 0, 0)
+    })
+
+    it('should revert if deregistered signer of issuer batch revokes attestations', async () => {
+      await accountsInstance.removeSigner(signer1, signerRole, { from: issuer1 })
+      await assertRevert(
+        federatedAttestations.batchRevokeAttestations(
+          issuer1,
+          [identifier2, identifier1],
+          [account2, account1],
+          { from: signer1 }
+        )
+      )
+      // TODO EN add reason
+    })
+    it('should revert if identifiers.length != accounts.length', async () => {
+      await assertRevert(
+        federatedAttestations.batchRevokeAttestations(
+          issuer1,
+          [identifier2],
+          [account2, account1],
+          { from: signer1 }
+        )
+      )
+    })
+    it('should revert if one of the (identifier, account) pairs is invalid', async () => {
+      await assertRevertWithReason(
+        federatedAttestations.batchRevokeAttestations(
+          issuer1,
+          // (identifier2, account1) does not exist
+          [identifier2, identifier2],
+          [account2, account1],
+          { from: signer1 }
+        ),
+        'Attestion to be revoked does not exist'
+      )
+    })
+  })
+
+  xdescribe('#batchRevokeAttestations benchmarking', () => {
     // benchmarking
     // interface BenchmarkAttestationCase {
     //   identifier: string
@@ -946,7 +1147,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     // }
 
     // Variant 1 == register (1 account, identifier) up to maxN
-    const registerAttestationsVariant1 = async (maxN: number, issuer: string, signer: string) => {
+    const registerAttestationsVariant1 = async (maxN: number, issuer: string) => {
       const benchmarkIdentifiers: string[] = []
       const benchmarkAccounts: string[] = []
 
@@ -959,7 +1160,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
           pnIdentifier,
           issuer,
           newAccount,
-          signer,
           nowUnixTime,
           { from: issuer }
         )
@@ -978,11 +1178,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     }
 
     // Variant 2 == register (1 account, identifier) with multiple issuers (random order registered)
-    const registerAttestationsVariant2 = async (
-      maxN: number,
-      issuersToRandomize: string[],
-      signer: string
-    ) => {
+    const registerAttestationsVariant2 = async (maxN: number, issuersToRandomize: string[]) => {
       const benchmarkIdentifiers: string[] = []
       const benchmarkAccounts: string[] = []
 
@@ -998,7 +1194,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
             pnIdentifier,
             randomIssuer,
             newAccount,
-            signer, // We don't really care about signers for now
             nowUnixTime,
             { from: randomIssuer }
           )
@@ -1014,7 +1209,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
     const registerAttestationsVariant3 = async (
       numAccounts: number,
       issuer: string,
-      signer: string,
       identifiersPerAccount: number
     ) => {
       const benchmarkIdentifiers: string[] = []
@@ -1028,7 +1222,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
             pnIdentifier,
             issuer,
             newAccount,
-            signer,
             nowUnixTime,
             { from: issuer }
           )
@@ -1041,7 +1234,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
     describe('unique account <-> identifier, one issuer', () => {
       let batchIssuer1 = accounts[1]
-      const corruptSigner = accounts[2]
 
       beforeEach(async () => {
         await accountsInstance.createAccount({ from: batchIssuer1 })
@@ -1050,8 +1242,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         // Gas: 379038
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
           10,
-          batchIssuer1,
-          corruptSigner
+          batchIssuer1
         )
         const tx = await federatedAttestations.batchRevokeAttestations(
           batchIssuer1,
@@ -1065,8 +1256,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         // Gas: 3691143, 3691102, 3691114
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
           100,
-          batchIssuer1,
-          corruptSigner
+          batchIssuer1
         )
         const tx = await federatedAttestations.batchRevokeAttestations(
           batchIssuer1,
@@ -1076,27 +1266,25 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
         console.log(tx.receipt.gasUsed)
       })
-      it('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
-        // Gas: 3690089, 3690047
-        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
-          100,
-          batchIssuer1,
-          corruptSigner
-        )
-        const tx = await federatedAttestations.batchRevokeAttestations2(
-          batchIssuer1,
-          benchmarkIdentifiers,
-          benchmarkAccounts,
-          { from: batchIssuer1 }
-        )
-        console.log(tx.receipt.gasUsed)
-      })
+      // it('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
+      //   // Gas: 3690089, 3690047
+      //   const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
+      //     100,
+      //     batchIssuer1
+      //   )
+      //   const tx = await federatedAttestations.batchRevokeAttestations2(
+      //     batchIssuer1,
+      //     benchmarkIdentifiers,
+      //     benchmarkAccounts,
+      //     { from: batchIssuer1 }
+      //   )
+      //   console.log(tx.receipt.gasUsed)
+      // })
       xit('how much gas does it take to revoke 1000 attestations?', async () => {
         // Hits out of gas error
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
           1000,
-          batchIssuer1,
-          corruptSigner
+          batchIssuer1
         )
         const tx = await federatedAttestations.batchRevokeAttestations(
           batchIssuer1,
@@ -1112,8 +1300,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         // 4980754
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant1(
           135,
-          batchIssuer1,
-          corruptSigner
+          batchIssuer1
         )
         const tx = await federatedAttestations.batchRevokeAttestations(
           batchIssuer1,
@@ -1128,7 +1315,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
       const batchIssuer1 = accounts[1]
       const batchIssuer2 = accounts[2]
       const batchIssuer3 = accounts[3]
-      const corruptSigner = accounts[4]
 
       beforeEach(async () => {
         // Setup
@@ -1138,11 +1324,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
       it('how much gas does it take to revoke 10 attestations?', async () => {
         // Gas: 379044, 379038, 379038
-        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
-          10,
-          [batchIssuer1, batchIssuer2, batchIssuer3],
-          corruptSigner
-        )
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(10, [
+          batchIssuer1,
+          batchIssuer2,
+          batchIssuer3,
+        ])
         const tx = await federatedAttestations.batchRevokeAttestations(
           batchIssuer1,
           benchmarkIdentifiers,
@@ -1153,11 +1339,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
       it('how much gas does it take to revoke 100 attestations?', async () => {
         // Gas: 3691137, 3691137, 3691125, 3691138
-        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
-          100,
-          [batchIssuer1, batchIssuer2, batchIssuer3],
-          corruptSigner
-        )
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(100, [
+          batchIssuer1,
+          batchIssuer2,
+          batchIssuer3,
+        ])
         const tx = await federatedAttestations.batchRevokeAttestations(
           batchIssuer1,
           benchmarkIdentifiers,
@@ -1166,28 +1352,27 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
         console.log(tx.receipt.gasUsed)
       })
-      it('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
-        // Gas: 3690071
-        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
-          100,
-          [batchIssuer1, batchIssuer2, batchIssuer3],
-          corruptSigner
-        )
-        const tx = await federatedAttestations.batchRevokeAttestations2(
-          batchIssuer1,
-          benchmarkIdentifiers,
-          benchmarkAccounts,
-          { from: batchIssuer1 }
-        )
-        console.log(tx.receipt.gasUsed)
-      })
+      // it('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
+      //   // Gas: 3690071
+      //   const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
+      //     100,
+      //     [batchIssuer1, batchIssuer2, batchIssuer3],
+      //   )
+      //   const tx = await federatedAttestations.batchRevokeAttestations2(
+      //     batchIssuer1,
+      //     benchmarkIdentifiers,
+      //     benchmarkAccounts,
+      //     { from: batchIssuer1 }
+      //   )
+      //   console.log(tx.receipt.gasUsed)
+      // })
       it('how many attestations can we revoke until we hit 5 million gas?', async () => {
         // Gas: 4980802, 4980790
-        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
-          148,
-          [batchIssuer1, batchIssuer2, batchIssuer3],
-          corruptSigner
-        )
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(148, [
+          batchIssuer1,
+          batchIssuer2,
+          batchIssuer3,
+        ])
         const tx = await federatedAttestations.batchRevokeAttestations(
           batchIssuer1,
           benchmarkIdentifiers,
@@ -1196,25 +1381,23 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
         console.log(tx.receipt.gasUsed)
       })
-      it('[optimized] how many attestations can we revoke until we hit 5 million gas?', async () => {
-        // Gas:
-        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
-          158,
-          [batchIssuer1, batchIssuer2, batchIssuer3],
-          corruptSigner
-        )
-        const tx = await federatedAttestations.batchRevokeAttestations2(
-          batchIssuer1,
-          benchmarkIdentifiers,
-          benchmarkAccounts,
-          { from: batchIssuer1 }
-        )
-        console.log(tx.receipt.gasUsed)
-      })
+      // it('[optimized] how many attestations can we revoke until we hit 5 million gas?', async () => {
+      //   // Gas:
+      //   const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant2(
+      //     158,
+      //     [batchIssuer1, batchIssuer2, batchIssuer3],
+      //   )
+      //   const tx = await federatedAttestations.batchRevokeAttestations2(
+      //     batchIssuer1,
+      //     benchmarkIdentifiers,
+      //     benchmarkAccounts,
+      //     { from: batchIssuer1 }
+      //   )
+      //   console.log(tx.receipt.gasUsed)
+      // })
     })
     describe('10 accounts, a bunch of identifiers per account', () => {
       const batchIssuer1 = accounts[1]
-      const corruptSigner = accounts[2]
 
       beforeEach(async () => {
         // Setup
@@ -1226,7 +1409,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant3(
           10,
           batchIssuer1,
-          corruptSigner,
           10
         )
         const tx = await federatedAttestations.batchRevokeAttestations(
@@ -1238,22 +1420,21 @@ contract('FederatedAttestations', (accounts: string[]) => {
         console.log(tx.receipt.gasUsed)
       })
 
-      it('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
-        // Gas:
-        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant3(
-          10,
-          batchIssuer1,
-          corruptSigner,
-          10
-        )
-        const tx = await federatedAttestations.batchRevokeAttestations2(
-          batchIssuer1,
-          benchmarkIdentifiers,
-          benchmarkAccounts,
-          { from: batchIssuer1 }
-        )
-        console.log(tx.receipt.gasUsed)
-      })
+      // it('[optimized] how much gas does it take to revoke 100 attestations?', async () => {
+      //   // Gas:
+      //   const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant3(
+      //     10,
+      //     batchIssuer1,
+      //     10
+      //   )
+      //   const tx = await federatedAttestations.batchRevokeAttestations2(
+      //     batchIssuer1,
+      //     benchmarkIdentifiers,
+      //     benchmarkAccounts,
+      //     { from: batchIssuer1 }
+      //   )
+      //   console.log(tx.receipt.gasUsed)
+      // })
     })
     // TODO: optimized version of batchRevoke?
   })

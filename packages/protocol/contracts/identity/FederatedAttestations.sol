@@ -363,19 +363,18 @@ contract FederatedAttestations is
    * @param issuer Address of the attestation issuer
    * @param account Address of the account being mapped to the identifier
    * @param issuedOn Time at which the issuer issued the attestation in Unix time 
-   * @param signer Address of the signer of the attestation
+   * @dev Attestation signer in storage is set to issuer
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
   function registerAttestationAsIssuer(
     bytes32 identifier,
     address issuer,
     address account,
-    address signer,
     uint64 issuedOn
   ) external {
     // TODO allow for updating existing attestation by only updating signer and publishedOn
     require(issuer == msg.sender);
-    _registerAttestation(identifier, issuer, account, signer, issuedOn);
+    _registerAttestation(identifier, issuer, account, issuer, issuedOn);
   }
 
   /**
@@ -412,18 +411,63 @@ contract FederatedAttestations is
    * @param account Address of the account mapped to the identifier
    * @dev Throws if sender is not the issuer, signer, or account
    */
-  // TODO should we pass in the issuedOn/signer parameter? ie. only revoke if the sender knows
-  // the issuedOn/signer for the unique attestation
-  function revokeAttestation(bytes32 identifier, address issuer, address account) public {
+  function revokeAttestation(bytes32 identifier, address issuer, address account) external {
     require(
       account == msg.sender ||
         // Minor gas optimization to prevent storage lookup in Accounts.sol if issuer == msg.sender
         issuer == msg.sender || // TODO EN: this should make it easier for smart contracts as issuers
+        // TODO EN: maybe safer/clearer to also switch to getAccounts().getAttestationSigner(issuer) == msg.sender;
+        // getAccounts().attestationSignerToAccount(msg.sender) == issuer,
         getAccounts().attestationSignerToAccount(msg.sender) == issuer,
       "Sender does not have permission to revoke this attestation"
     );
     _revokeAttestation(identifier, issuer, account);
   }
+
+  /**
+   * @notice Revokes attestations [identifiers <-> accounts] from issuer
+   * @param issuer Address of the issuer of all attestations to be revoked
+   * @param identifiers Hash of the identifiers
+   * @param accounts Addresses of the accounts mapped to the identifiers
+   *   at the same indices
+   * @dev Throws if the number of identifiers and accounts is not the same
+   * @dev Throws if sender is not the issuer or currently registered signer of issuer
+   * @dev Throws if an attestation is not found for identifiers[i] <-> accounts[i]
+   */
+  function batchRevokeAttestations(
+    address issuer,
+    bytes32[] calldata identifiers,
+    address[] calldata accounts
+  ) external {
+    require(identifiers.length == accounts.length, "Unequal number of identifiers and accounts");
+    require(
+      issuer == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
+      "Sender does not have permission to revoke attestations from this issuer"
+    );
+
+    for (uint256 i = 0; i < identifiers.length; i = i.add(1)) {
+      _revokeAttestation(identifiers[i], issuer, accounts[i]);
+    }
+  }
+
+  function getUniqueAttestationHash(
+    bytes32 identifier,
+    address issuer,
+    address account,
+    address signer,
+    uint64 issuedOn
+  ) public pure returns (bytes32) {
+    return keccak256(abi.encode(identifier, issuer, account, signer, issuedOn));
+  }
+
+  /**
+   * @notice Revokes an attestation:
+   *  helper function for revokeAttestation and batchRevokeAttestations
+   * @param identifier Hash of the identifier to be revoked
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account mapped to the identifier
+   * @dev Reverts if attestation is not found mapping identifier <-> account
+   */
 
   function _revokeAttestation(bytes32 identifier, address issuer, address account) private {
     OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
@@ -481,154 +525,4 @@ contract FederatedAttestations is
     }
     revert("Attestion to be revoked does not exist");
   }
-
-  function getUniqueAttestationHash(
-    bytes32 identifier,
-    address issuer,
-    address account,
-    address signer,
-    uint64 issuedOn
-  ) public pure returns (bytes32) {
-    return keccak256(abi.encode(identifier, issuer, account, signer, issuedOn));
-  }
-  /**
-  Assumes:
-  - user has a list of attestation data to revoke [(issuer, account, identifier)]
-  - this use case is probably for the same issuer to do this, so test with this in mind
-  - index in identifiers & accounts should match
-  - do a "basic" version of this
-  - do an "optimized" version of this (i.e. look up issuers once)
-  */
-  function batchRevokeAttestations(
-    address issuer,
-    bytes32[] calldata identifiers,
-    address[] calldata accounts
-  ) external {
-    require(identifiers.length == accounts.length, "mismatch in identifiers and accounts lengths");
-    for (uint256 i = 0; i < identifiers.length; i = i.add(1)) {
-      revokeAttestation(identifiers[i], issuer, accounts[i]);
-    }
-  }
-
-  // For trying out optimizations
-  function revokeAttestation2(bytes32 identifier, address issuer, address account) public {
-    OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
-    for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
-      // TODO EN: check if removing this copy also changes things or not
-      // --> yes, weirdly increases gas usage, very weird
-      OwnershipAttestation memory attestation = attestations[i];
-      if (attestation.account == account) {
-        // TODO EN: maybe removing this will bring some gas savings? -- yes but minimal, for 100 attestations (batch), looks like around 1000 gas
-        // address signer = attestation.signer;
-        // uint64 issuedOn = attestation.issuedOn;
-        // uint64 publishedOn = attestation.publishedOn;
-        // TODO reviewers: is there a risk that compromised signers could revoke legitimate
-        // attestations before they have been unauthorized?
-        // TODO EN: this can be moved out of this loop as well? -- only makes sense for single attestations?
-        // could make this a boolean parameter; then check once per account and once per issuer?
-        require(
-          account == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
-          "Sender does not have permission to revoke this attestation"
-        );
-        // This is meant to delete the attestation in the array
-        // and then move the last element in the array to that empty spot,
-        // to avoid having empty elements in the array
-        // TODO benchmark gas cost saving to check if array is of length 1
-        // EN NOTE: this optimization takes off so much (300k gas for 100 attestations)
-        // that we need to check that this doesn't break the logic :thinking:...
-        if (i != attestations.length - 1) {
-          identifierToAttestations[identifier][issuer][i] = attestations[attestations.length - 1];
-        }
-        identifierToAttestations[identifier][issuer].pop();
-
-        bool deletedIdentifier = false;
-        bytes32[] memory identifiers = addressToIdentifiers[account][issuer];
-        for (uint256 j = 0; j < identifiers.length; j = j.add(1)) {
-          if (identifiers[j] != identifier) {
-            continue;
-          }
-          if (j != identifiers.length - 1) {
-            addressToIdentifiers[account][issuer][j] = identifiers[identifiers.length - 1];
-          }
-          addressToIdentifiers[account][issuer].pop();
-          deletedIdentifier = true;
-          break;
-
-          // if (identifiers[j] == identifier) {
-          //   addressToIdentifiers[account][issuer][j] = identifiers[identifiers.length - 1];
-          //   addressToIdentifiers[account][issuer].pop();
-          //   deletedIdentifier = true;
-          //   break;
-          // }
-
-        }
-        // Should never be false - both mappings should always be updated in unison
-        assert(deletedIdentifier);
-
-        bytes32 attestationHash = getUniqueAttestationHash(
-          identifier,
-          issuer,
-          account,
-          attestation.signer,
-          attestation.issuedOn
-        );
-        // Should never be able to re-revoke an attestation
-        // EN: adds a storage access, check out removing this -- reduces gas by a ton; ~20k for 100 deleted attestations
-        // TODO reviewers: removing this storage lookup saves about 20k gas for 100 batch-deleted attestations
-        assert(!revokedAttestations[attestationHash]);
-        revokedAttestations[attestationHash] = true;
-
-        emit AttestationRevoked(
-          identifier,
-          issuer,
-          account,
-          attestation.signer,
-          attestation.issuedOn,
-          attestation.publishedOn
-        );
-        return;
-      }
-    }
-    revert("Attestion to be revoked does not exist");
-  }
-
-  // TODO EN redo this with an actual clean helper function and that kind of thing
-  function batchRevokeAttestations2(
-    address issuer,
-    bytes32[] calldata identifiers,
-    address[] calldata accounts
-  ) external {
-    require(identifiers.length == accounts.length, "mismatch in identifiers and accounts lengths");
-
-    require(
-      issuer == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
-      "Sender does not have permission to revoke attestations from this issuer"
-    );
-
-    for (uint256 i = 0; i < identifiers.length; i = i.add(1)) {
-      _revokeAttestation(identifiers[i], issuer, accounts[i]);
-    }
-  }
-
-  // function batchRevokeAttestations2(
-  //   address issuer,
-  //   bytes32[] calldata identifiers,
-  //   address[] calldata accounts
-  // ) external {
-  //   require(identifiers.length == accounts.length, "mismatch in identifiers and accounts lengths");
-  //   for (uint256 i = 0; i < identifiers.length; i = i.add(1)) {
-  //     revokeAttestation2(identifiers[i], issuer, accounts[i]);
-  //   }
-  // }
-
-  function batchRevokeAttestationsClean(
-    address issuer,
-    bytes32[] calldata identifiers,
-    address[] calldata accounts
-  ) external {
-    require(identifiers.length == accounts.length, "mismatch in identifiers and accounts lengths");
-
-  }
-
 }
-
