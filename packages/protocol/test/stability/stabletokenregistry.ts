@@ -71,7 +71,7 @@ contract('StableTokenRegistry', (accounts: string[]) => {
 
     it('has the right list of fiat tickers after removing one', async () => {
       await strc.removeStableToken(fiatTicker, 0)
-      const updatedFiatTickers = await strc.getFiatTickers()
+      const updatedFiatTickers = await getFiatTickers()
       assert.deepEqual(updatedFiatTickers, ['GBP', 'EUR', 'BRL', 'GEL'])
     })
 
