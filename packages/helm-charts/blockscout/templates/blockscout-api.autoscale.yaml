@@ -21,7 +21,7 @@ spec:
         averageUtilization: {{ .Values.blockscout.api.autoscaling.target.cpu }}
   behavior:
     scaleDown:
-      stabilizationWindowSeconds: 600
+      stabilizationWindowSeconds: 3600
       policies:
       - type: Percent
         value: 20

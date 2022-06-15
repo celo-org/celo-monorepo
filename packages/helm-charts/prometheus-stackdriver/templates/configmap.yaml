@@ -18,7 +18,6 @@ metadata:
   name: prometheus-server-conf
   labels:
 {{ include "prometheus-stackdriver.labels" .  | indent 4 }}
-  namespace: {{ .Values.namespace }}
 data:
   prometheus.yml: |-
     global:
@@ -41,11 +40,14 @@ data:
     {{- end }}
 
     scrape_configs:
+      {{- if .Values.jobs.prometheus | default true }}
       - job_name: 'prometheus'
         scrape_interval: 20s
         static_configs:
           - targets: ['localhost:9090']
+      {{- end }}
 
+      {{- if .Values.jobs.kubernetes_apiservers | default true }}
       - job_name: 'kubernetes-apiservers'
         kubernetes_sd_configs:
         - role: endpoints
@@ -57,7 +59,9 @@ data:
         - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
           action: keep
           regex: default;kubernetes;https
+      {{- end }}
 
+      {{- if .Values.jobs.kubernetes_nodes | default true }}
       - job_name: 'kubernetes-nodes'
         scheme: https
         tls_config:
@@ -74,7 +78,9 @@ data:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/${1}/proxy/metrics
+      {{- end }}
 
+      {{- if .Values.jobs.kubernetes_pods | default true }}
       - job_name: 'kubernetes-pods'
         kubernetes_sd_configs:
         - role: pod
@@ -99,7 +105,9 @@ data:
         - source_labels: [__meta_kubernetes_pod_name]
           action: replace
           target_label: kubernetes_pod_name
+      {{- end }}
 
+      {{- if .Values.jobs.kubernetes_cadvisor | default true }}
       - job_name: 'kubernetes-cadvisor'
         scheme: https
         tls_config:
@@ -116,7 +124,9 @@ data:
           regex: (.+)
           target_label: __metrics_path__
           replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+      {{- end }}
 
+      {{- if .Values.jobs.kubernetes_service_endpoints | default true }}
       - job_name: 'kubernetes-service-endpoints'
         kubernetes_sd_configs:
         - role: endpoints
@@ -145,6 +155,8 @@ data:
         - source_labels: [__meta_kubernetes_service_name]
           action: replace
           target_label: kubernetes_name
+      {{- end }}
+
 {{- if .Values.scrapeJob }}
   {{- if .Values.scrapeJob.Name }}
       - job_name: {{ .Values.scrapeJob.Name }}
