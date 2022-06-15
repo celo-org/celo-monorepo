@@ -56,9 +56,7 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
 
   if (!isCelotoolHelmDryRun()) {
     // Create cloud SQL account with 'Cloud SQL Client' permissions.
-    const cloudSqlServiceAccountName = await getServiceAccountName('cloud-sql-for')
-    // await createServiceAccountIfNotExists(cloudSqlServiceAccountName)
-    console.info(`Getting service account ${cloudSqlServiceAccountName}`)
+    const cloudSqlServiceAccountName = getServiceAccountName('cloud-sql-for')
     await grantRoles(cloudSqlServiceAccountName, 'roles/cloudsql.client')
 
     await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName, argv.celoEnv)
