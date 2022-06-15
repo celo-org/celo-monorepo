@@ -33,16 +33,16 @@ import Web3 from 'web3'
  *
  */
 
-interface BuildOptions {
-  network: string
-  buildArtifactsPath: string
-  proposalPath: string
+const _buildTargets = {
+  network: undefined,
+  build_artifacts_path: undefined,
+  proposal_path: undefined,
 }
 
-async function main(buildTargets: BuildOptions) {
-  const artifactBasePath = buildTargets.buildArtifactsPath || './build/contracts'
+async function main(buildTargets: typeof _buildTargets) {
+  const artifactBasePath = buildTargets.build_artifacts_path || './build/contracts'
   const artifactPaths = fs.readdirSync(artifactBasePath)
-  const reportPath = buildTargets.proposalPath || './proposal.json'
+  const reportPath = buildTargets.proposal_path || './proposal.json'
   const report = require(path.join(process.cwd(), reportPath))
   const network = buildTargets.network
   const web3 = new Web3('http://localhost:8545')
@@ -50,24 +50,8 @@ async function main(buildTargets: BuildOptions) {
 
   console.log('Uploading sources & metadata')
   console.log('============================')
-  console.log(artifactPaths)
 
   const artifacts = artifactPaths.map((a) => require(path.join(process.cwd(), artifactBasePath, a)))
-
-  if (
-    !isEqual(
-      artifacts.map((a) => a.contractName),
-      report.map((a) => a.contract)
-    )
-  ) {
-    if (report.length !== artifactPaths.length) {
-      throw new Error(
-        `There are ${report.length} addresses to publish, but there are ${artifactPaths.length} artifacts.`
-      )
-    } else {
-      throw new Error(`Contracts names are not equal`)
-    }
-  }
 
   for (const r of report) {
     const artifact = artifacts.find((a) => a.contractName === r.contract)
@@ -77,33 +61,64 @@ async function main(buildTargets: BuildOptions) {
     console.log('-'.repeat(artifact.contractName.length))
 
     const address = r.contract.includes('Proxy') ? r.args[0] : r.args[1]
+    const implementationName = r.contract.includes('Proxy')
+      ? artifact.contractName.replace('Proxy', '')
+      : artifact.contractName
+
     const formData = new FormData()
     formData.append(
       'files',
-      fs.createReadStream(artifactBasePath + '/' + artifact.contractName + '.json')
+      fs.createReadStream(artifactBasePath + '/' + implementationName + '.json')
     )
     formData.append('address', address)
     formData.append('chain', chainId)
 
-    await fetch('https://sourcify.dev/server', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((json) =>
-        fetch(
-          `https://${network}-blockscout.celo-testnet.org/address/${json.result[0].address}/contracts`
-        )
-      )
+    const mainContract = artifacts.find((a) => a.contractName === implementationName)
+    const sourcesfilesNeeded = Object.keys(JSON.parse(mainContract.metadata).sources)
+
+    const p = sourcesfilesNeeded.find((f) => f.includes(implementationName))
+    // Interface contract needs the parent implementation as well
+    if (p.endsWith('BRL.sol')) {
+      const e = p.replace('BRL.sol', '.sol')
+      formData.append('files', fs.createReadStream('.' + e.split('protocol')[1]))
+    }
+    if (p.endsWith('USD.sol')) {
+      const e = p.replace('USD.sol', '.sol')
+      formData.append('files', fs.createReadStream('.' + e.split('protocol')[1]))
+    }
+    if (p.endsWith('EUR.sol')) {
+      const e = p.replace('EUR.sol', '.sol')
+      formData.append('files', fs.createReadStream('.' + e.split('protocol')[1]))
+    }
+    formData.append('files', fs.createReadStream('.' + p.split('protocol')[1]))
+
+    try {
+      await fetch('https://sourcify.dev/server', {
+        method: 'POST',
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          if (!json.result) throw new Error(json.error)
+          if (network === 'mainnet') {
+            fetch(`https://explorer.celo.org/address/${json.result[0].address}/contracts`)
+          } else {
+            fetch(
+              `https://${network}-blockscout.celo-testnet.org/address/${json.result[0].address}/contracts`
+            )
+          }
+        })
+    } catch (error) {
+      console.log(error.message)
+      continue
+    }
   }
   console.log('Finished.')
 }
 
-const isEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b)
-
 const minimist = require('minimist')
-const argv = minimist(process.argv.slice(3), {
-  string: ['network', 'build_artifacts_path', 'proposal_path'],
+const argv = minimist(process.argv.slice(2), {
+  string: ['network', 'proposal_path', 'celo_network'],
 })
 
 main(argv)
