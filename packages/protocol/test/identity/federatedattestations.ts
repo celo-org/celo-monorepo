@@ -223,7 +223,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         assert.equal(actualAddresses[index], expectedAttestation.account)
         assert.equal(actualSigners[index], expectedAttestation.signer)
         assert.equal(actualIssuedOns[index].toNumber(), expectedAttestation.issuedOn)
-        assert.isAtMost(Math.abs(actualPublishedOns[index].toNumber() - expectedPublishedOn), 10)
+        assert.isAtLeast(actualPublishedOns[index].toNumber(), actualIssuedOns[index].toNumber())
+        assert.isAtMost(actualPublishedOns[index].toNumber(), expectedPublishedOn + 10)
       })
     }
 
@@ -289,7 +290,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
       beforeEach(async () => {
         // Require consistent order for test cases
         await accountsInstance.createAccount({ from: issuer2 })
-        expectedPublishedOn = Math.floor(Date.now() / 1000)
         for (const { issuer, attestationsPerIssuer } of [
           { issuer: issuer1, attestationsPerIssuer: issuer1Attestations },
           { issuer: issuer2, attestationsPerIssuer: issuer2Attestations },
@@ -304,6 +304,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
             )
           }
         }
+        expectedPublishedOn = Math.floor(Date.now() / 1000)
       })
 
       it('should return empty count and list if no issuers specified', async () => {
