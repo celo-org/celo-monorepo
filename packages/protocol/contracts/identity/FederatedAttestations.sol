@@ -165,10 +165,12 @@ contract FederatedAttestations is
     // TODO reviewers: this is to get around a stack too deep error;
     // are there better ways of dealing with this?
     uint256[] memory countsPerIssuer;
-    (, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
+    uint256 totalAttestations;
+    (totalAttestations, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
     (address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = _lookupAttestations(
       identifier,
-      trustedIssuers
+      trustedIssuers,
+      totalAttestations
     );
     return (countsPerIssuer, accounts, signers, issuedOns, publishedOns);
   }
@@ -187,14 +189,11 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  function _lookupAttestations(bytes32 identifier, address[] memory trustedIssuers)
-    internal
-    view
-    returns (address[] memory, address[] memory, uint64[] memory, uint64[] memory)
-  {
-    uint256 totalAttestations;
-    (totalAttestations, ) = getNumAttestations(identifier, trustedIssuers);
-
+  function _lookupAttestations(
+    bytes32 identifier,
+    address[] memory trustedIssuers,
+    uint256 totalAttestations
+  ) internal view returns (address[] memory, address[] memory, uint64[] memory, uint64[] memory) {
     address[] memory accounts = new address[](totalAttestations);
     address[] memory signers = new address[](totalAttestations);
     uint64[] memory issuedOns = new uint64[](totalAttestations);
