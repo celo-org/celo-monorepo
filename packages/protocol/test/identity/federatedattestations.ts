@@ -664,6 +664,22 @@ contract('FederatedAttestations', (accounts: string[]) => {
       )
     })
 
+    it('should revert if signer has been deregistered', async () => {
+      await accountsInstance.removeSigner(signer1, signerRole, { from: issuer1 })
+      await assertRevert(
+        federatedAttestations.registerAttestation(
+          identifier1,
+          issuer1,
+          account1,
+          signer1,
+          nowUnixTime,
+          sig.v,
+          sig.r,
+          sig.s
+        )
+      )
+    })
+
     it('should revert if attestation has been revoked', async () => {
       await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, signer1)
       await federatedAttestations.revokeAttestation(identifier1, issuer1, account1)
