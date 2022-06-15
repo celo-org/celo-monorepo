@@ -167,6 +167,7 @@ contract FederatedAttestations is
     uint256[] memory countsPerIssuer;
     uint256 totalAttestations;
     (totalAttestations, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
+    // solhint-disable-next-line max-line-length
     (address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = _lookupAttestations(
       identifier,
       trustedIssuers,
