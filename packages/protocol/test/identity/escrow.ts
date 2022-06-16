@@ -12,6 +12,8 @@ import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import {
   EscrowContract,
   EscrowInstance,
+  FederatedAttestationsContract,
+  FederatedAttestationsInstance,
   MockAttestationsContract,
   MockAttestationsInstance,
   MockERC20TokenContract,
@@ -23,6 +25,9 @@ import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 const Escrow: EscrowContract = artifacts.require('Escrow')
 const MockERC20Token: MockERC20TokenContract = artifacts.require('MockERC20Token')
 const MockAttestations: MockAttestationsContract = artifacts.require('MockAttestations')
+const FederatedAttestations: FederatedAttestationsContract = artifacts.require(
+  'FederatedAttestations'
+)
 
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
 const NULL_ESCROWED_PAYMENT: EscrowedPayment = {
@@ -69,12 +74,24 @@ const getEscrowedPayment = async (
 contract('Escrow', (accounts: string[]) => {
   let escrow: EscrowInstance
   let mockAttestations: MockAttestationsInstance
-  const owner = accounts[0]
+  let federatedAttestations: FederatedAttestationsInstance
   let registry: RegistryInstance
+
+  const owner = accounts[0]
+  const sender: string = accounts[1]
+  const receiver: string = accounts[2]
+  const withdrawKeyAddress: string = accounts[3]
+  const anotherWithdrawKeyAddress: string = accounts[4]
+  const trustedIssuer1 = accounts[5]
+  const trustedIssuer2 = accounts[6]
+  const testTrustedIssuers = [trustedIssuer1, trustedIssuer2]
+
+  const aValue: number = 10
+  const aPhoneHash = getPhoneHash('+18005555555')
+  const oneDayInSecs: number = 86400
 
   before(async () => {
     registry = await getDeployedProxiedContract('Registry', artifacts)
-    // Take ownership of the registry contract to point it to the mocks
     if ((await registry.owner()) !== owner) {
       // In CI we need to assume ownership, locally using quicktest we don't
       await assumeOwnership(['Registry'], owner)
@@ -85,7 +102,13 @@ contract('Escrow', (accounts: string[]) => {
     escrow = await Escrow.new(true, { from: owner })
     await escrow.initialize()
     mockAttestations = await MockAttestations.new({ from: owner })
+    federatedAttestations = await FederatedAttestations.new(true, { from: owner })
+    await federatedAttestations.initialize()
     await registry.setAddressFor(CeloContractName.Attestations, mockAttestations.address)
+    await registry.setAddressFor(
+      CeloContractName.FederatedAttestations,
+      federatedAttestations.address
+    )
   })
 
   describe('#initialize()', () => {
@@ -99,16 +122,100 @@ contract('Escrow', (accounts: string[]) => {
     })
   })
 
+  describe('#addDefaultTrustedIssuer', () => {
+    it('allows owner to add trustedIssuer', async () => {
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [])
+      await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer1])
+    })
+
+    it('reverts if non-owner attempts to add trustedIssuer', async () => {
+      await assertRevert(escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: trustedIssuer1 }))
+    })
+
+    it('should emit the DefaultTrustedIssuerAdded event', async () => {
+      const receipt = await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+      assertLogMatches2(receipt.logs[0], {
+        event: 'DefaultTrustedIssuerAdded',
+        args: {
+          trustedIssuer: trustedIssuer1,
+        },
+      })
+    })
+
+    it('should not allow an empty address to be set as a trustedIssuer', async () => {
+      await assertRevertWithReason(
+        escrow.addDefaultTrustedIssuer(NULL_ADDRESS, { from: owner }),
+        "trustedIssuer can't be null"
+      )
+    })
+
+    it('should not allow a trustedIssuer to be added twice', async () => {
+      await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+      await assertRevertWithReason(
+        escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner }),
+        'trustedIssuer already in defaultTrustedIssuers'
+      )
+    })
+
+    it('should allow a second trustedIssuer to be added', async () => {
+      await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+      await escrow.addDefaultTrustedIssuer(trustedIssuer2, { from: owner })
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer1, trustedIssuer2])
+    })
+  })
+
+  describe('#removeDefaultTrustedIssuer', () => {
+    beforeEach(async () => {
+      await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+    })
+
+    it('allows owner to remove trustedIssuer', async () => {
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer1])
+      await escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: owner })
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [])
+    })
+
+    it('reverts if non-owner attempts to remove trustedIssuer', async () => {
+      await assertRevert(
+        escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: trustedIssuer1 })
+      )
+    })
+
+    it('should emit the DefaultTrustedIssuerRemoved event', async () => {
+      const receipt = await escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: owner })
+      assertLogMatches2(receipt.logs[0], {
+        event: 'DefaultTrustedIssuerRemoved',
+        args: {
+          trustedIssuer: trustedIssuer1,
+        },
+      })
+    })
+
+    it('should revert if index is invalid', async () => {
+      await assertRevertWithReason(
+        escrow.removeDefaultTrustedIssuer(trustedIssuer1, 1, { from: owner }),
+        'index is invalid'
+      )
+    })
+
+    it('should revert if trusted issuer does not match index', async () => {
+      await assertRevertWithReason(
+        escrow.removeDefaultTrustedIssuer(trustedIssuer2, 0, { from: owner }),
+        'trustedIssuer does not match address found at defaultTrustedIssuers[index]'
+      )
+    })
+
+    it('allows owner to remove trustedIssuer when two are present', async () => {
+      await escrow.addDefaultTrustedIssuer(trustedIssuer2, { from: owner })
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer1, trustedIssuer2])
+      await escrow.removeDefaultTrustedIssuer(trustedIssuer1, 0, { from: owner })
+      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer2])
+    })
+  })
+
   describe('tests with tokens', () => {
     let mockERC20Token: MockERC20TokenInstance
-    const aValue: number = 10
-    const sender: string = accounts[1]
-    const receiver: string = accounts[2]
-
-    const aPhoneHash = getPhoneHash('+18005555555')
-    const withdrawKeyAddress: string = accounts[3]
-    const anotherWithdrawKeyAddress: string = accounts[4]
-    const oneDayInSecs: number = 86400
 
     beforeEach(async () => {
       mockERC20Token = await MockERC20Token.new()
@@ -120,23 +227,25 @@ contract('Escrow', (accounts: string[]) => {
       value: number,
       expirySeconds: number,
       paymentId: string,
-      minAttestations: number
+      minAttestations: number,
+      trustedIssuers: string[]
     ) => {
       await mockERC20Token.mint(escrowSender, value)
-      await escrow.transfer(
+      await escrow.transferWithTrustedIssuers(
         identifier,
         mockERC20Token.address,
         value,
         expirySeconds,
         paymentId,
         minAttestations,
+        trustedIssuers,
         {
           from: escrowSender,
         }
       )
     }
 
-    describe('#transfer()', async () => {
+    describe('#transferWithTrustedIssuers', async () => {
       const transferAndCheckState = async (
         escrowSender: string,
         identifier: string,
@@ -144,6 +253,7 @@ contract('Escrow', (accounts: string[]) => {
         expirySeconds: number,
         paymentId: string,
         minAttestations: number,
+        trustedIssuers: string[],
         expectedSentPaymentIds: string[],
         expectedReceivedPaymentIds: string[]
       ) => {
@@ -151,14 +261,14 @@ contract('Escrow', (accounts: string[]) => {
           await mockERC20Token.balanceOf(escrow.address)
         ).toNumber()
         const startingSenderBalance = (await mockERC20Token.balanceOf(escrowSender)).toNumber()
-
-        await escrow.transfer(
+        await escrow.transferWithTrustedIssuers(
           identifier,
           mockERC20Token.address,
           value,
           expirySeconds,
           paymentId,
           minAttestations,
+          trustedIssuers,
           { from: escrowSender }
         )
         const escrowedPayment = await getEscrowedPayment(paymentId, escrow)
@@ -199,6 +309,13 @@ contract('Escrow', (accounts: string[]) => {
           paymentId,
           "expected paymentId not found in escrowSender's sent payments list"
         )
+
+        const trustedIssuersPerPayment = await escrow.getTrustedIssuersPerPayment(paymentId)
+        assert.deepEqual(
+          trustedIssuersPerPayment,
+          trustedIssuers,
+          'unexpected trustedIssuersPerPayment'
+        )
       }
 
       beforeEach(async () => {
@@ -213,6 +330,7 @@ contract('Escrow', (accounts: string[]) => {
           oneDayInSecs,
           withdrawKeyAddress,
           0,
+          [],
           [withdrawKeyAddress],
           [withdrawKeyAddress]
         )
@@ -226,6 +344,21 @@ contract('Escrow', (accounts: string[]) => {
           oneDayInSecs,
           withdrawKeyAddress,
           3,
+          [],
+          [withdrawKeyAddress],
+          [withdrawKeyAddress]
+        )
+      })
+
+      it('should allow transfer when trustedIssuers are provided', async () => {
+        await transferAndCheckState(
+          sender,
+          aPhoneHash,
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          3,
+          testTrustedIssuers,
           [withdrawKeyAddress],
           [withdrawKeyAddress]
         )
@@ -239,6 +372,7 @@ contract('Escrow', (accounts: string[]) => {
           oneDayInSecs,
           withdrawKeyAddress,
           0,
+          [],
           [withdrawKeyAddress],
           [withdrawKeyAddress]
         )
@@ -251,7 +385,8 @@ contract('Escrow', (accounts: string[]) => {
           aValue,
           oneDayInSecs,
           anotherWithdrawKeyAddress,
-          0
+          0,
+          []
         )
         await transferAndCheckState(
           sender,
@@ -260,19 +395,21 @@ contract('Escrow', (accounts: string[]) => {
           oneDayInSecs,
           withdrawKeyAddress,
           0,
+          [],
           [anotherWithdrawKeyAddress, withdrawKeyAddress],
           [anotherWithdrawKeyAddress, withdrawKeyAddress]
         )
       })
 
       it('should emit the Transfer event', async () => {
-        const receipt = await escrow.transfer(
+        const receipt = await escrow.transferWithTrustedIssuers(
           aPhoneHash,
           mockERC20Token.address,
           aValue,
           oneDayInSecs,
           withdrawKeyAddress,
           2,
+          [],
           {
             from: sender,
           }
@@ -290,26 +427,50 @@ contract('Escrow', (accounts: string[]) => {
         })
       })
 
+      it('should emit the TrustedIssuersSet event', async () => {
+        const receipt = await escrow.transferWithTrustedIssuers(
+          aPhoneHash,
+          mockERC20Token.address,
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          2,
+          testTrustedIssuers,
+          {
+            from: sender,
+          }
+        )
+        assertLogMatches2(receipt.logs[1], {
+          event: 'TrustedIssuersSet',
+          args: {
+            paymentId: withdrawKeyAddress,
+            trustedIssuers: testTrustedIssuers,
+          },
+        })
+      })
+
       it('should not allow two transfers with same paymentId', async () => {
-        await escrow.transfer(
+        await escrow.transferWithTrustedIssuers(
           aPhoneHash,
           mockERC20Token.address,
           aValue,
           oneDayInSecs,
           withdrawKeyAddress,
           0,
+          [],
           {
             from: sender,
           }
         )
         await assertRevertWithReason(
-          escrow.transfer(
+          escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
             aValue,
             oneDayInSecs,
             withdrawKeyAddress,
             0,
+            [],
             {
               from: sender,
             }
@@ -320,21 +481,31 @@ contract('Escrow', (accounts: string[]) => {
 
       it('should not allow a transfer if token is 0', async () => {
         await assertRevert(
-          escrow.transfer(aPhoneHash, NULL_ADDRESS, aValue, oneDayInSecs, withdrawKeyAddress, 0, {
-            from: sender,
-          })
+          escrow.transferWithTrustedIssuers(
+            aPhoneHash,
+            NULL_ADDRESS,
+            aValue,
+            oneDayInSecs,
+            withdrawKeyAddress,
+            0,
+            [],
+            {
+              from: sender,
+            }
+          )
         )
       })
 
       it('should not allow a transfer if value is 0', async () => {
         await assertRevert(
-          escrow.transfer(
+          escrow.transferWithTrustedIssuers(
             aPhoneHash,
             mockERC20Token.address,
             0,
             oneDayInSecs,
             withdrawKeyAddress,
             0,
+            [],
             {
               from: sender,
             }
@@ -344,27 +515,140 @@ contract('Escrow', (accounts: string[]) => {
 
       it('should not allow a transfer if expirySeconds is 0', async () => {
         await assertRevert(
-          escrow.transfer(aPhoneHash, mockERC20Token.address, aValue, 0, withdrawKeyAddress, 0, {
-            from: sender,
-          })
+          escrow.transferWithTrustedIssuers(
+            aPhoneHash,
+            mockERC20Token.address,
+            aValue,
+            0,
+            withdrawKeyAddress,
+            0,
+            [],
+            {
+              from: sender,
+            }
+          )
         )
       })
 
       it('should not allow a transfer if identifier is empty but minAttestations is > 0', async () => {
         await assertRevertWithReason(
-          escrow.transfer(
+          escrow.transferWithTrustedIssuers(
             NULL_BYTES32,
             mockERC20Token.address,
             aValue,
             oneDayInSecs,
             withdrawKeyAddress,
             1,
+            [],
             {
               from: sender,
             }
           ),
           "Invalid privacy inputs: Can't require attestations if no identifier"
         )
+      })
+
+      it('should not allow a transfer if identifier is empty but trustedIssuers are provided', async () => {
+        await assertRevertWithReason(
+          escrow.transferWithTrustedIssuers(
+            NULL_BYTES32,
+            mockERC20Token.address,
+            aValue,
+            oneDayInSecs,
+            withdrawKeyAddress,
+            0,
+            testTrustedIssuers,
+            {
+              from: sender,
+            }
+          ),
+          'trustedIssuers may only be set when attestations are required'
+        )
+      })
+
+      it('should not allow setting trustedIssuers without minAttestations', async () => {
+        await assertRevertWithReason(
+          escrow.transferWithTrustedIssuers(
+            aPhoneHash,
+            mockERC20Token.address,
+            aValue,
+            oneDayInSecs,
+            withdrawKeyAddress,
+            0,
+            testTrustedIssuers,
+            {
+              from: sender,
+            }
+          ),
+          'trustedIssuers may only be set when attestations are required'
+        )
+      })
+
+      describe('#transfer', () => {
+        // transfer and transferWithTrustedIssuers both rely on _transfer
+        // and transfer is a restricted version of transferWithTrustedIssuers
+        describe('when no defaut trustedIssuers are set', async () => {
+          it('should set trustedIssuersPerPaymentId to empty list', async () => {
+            await escrow.transfer(
+              aPhoneHash,
+              mockERC20Token.address,
+              aValue,
+              oneDayInSecs,
+              withdrawKeyAddress,
+              2,
+              {
+                from: sender,
+              }
+            )
+            const actualTrustedIssuers = await escrow.getTrustedIssuersPerPayment(
+              withdrawKeyAddress
+            )
+            assert.deepEqual(actualTrustedIssuers, [])
+          })
+        })
+
+        describe('when default trustedIssuers are set', async () => {
+          beforeEach(async () => {
+            await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
+            await escrow.addDefaultTrustedIssuer(trustedIssuer2, { from: owner })
+          })
+
+          it('should set trustedIssuersPerPaymentId to default when minAttestations>0', async () => {
+            await escrow.transfer(
+              aPhoneHash,
+              mockERC20Token.address,
+              aValue,
+              oneDayInSecs,
+              withdrawKeyAddress,
+              2,
+              {
+                from: sender,
+              }
+            )
+            const actualTrustedIssuers = await escrow.getTrustedIssuersPerPayment(
+              withdrawKeyAddress
+            )
+            assert.deepEqual(actualTrustedIssuers, [trustedIssuer1, trustedIssuer2])
+          })
+
+          it('should set trustedIssuersPerPaymentId to empty list when minAttestations==0', async () => {
+            await escrow.transfer(
+              aPhoneHash,
+              mockERC20Token.address,
+              aValue,
+              oneDayInSecs,
+              withdrawKeyAddress,
+              0,
+              {
+                from: sender,
+              }
+            )
+            const actualTrustedIssuers = await escrow.getTrustedIssuersPerPayment(
+              withdrawKeyAddress
+            )
+            assert.deepEqual(actualTrustedIssuers, [])
+          })
+        })
       })
     })
 
@@ -413,10 +697,25 @@ contract('Escrow', (accounts: string[]) => {
         NULL_ESCROWED_PAYMENT,
         'escrowedPayment not zeroed out'
       )
+      const trustedIssuersPerPayment = await escrow.getTrustedIssuersPerPayment(deletedPaymentId)
+      assert.deepEqual(trustedIssuersPerPayment, [], 'trustedIssuersPerPayment not zeroed out')
     }
 
-    describe('#withdraw()', () => {
+    describe('#withdraw', () => {
       const uniquePaymentIDWithdraw = withdrawKeyAddress
+
+      const completeAttestations = async (
+        account: string,
+        identifier: string,
+        attestationsToComplete: number
+      ) => {
+        // Mock completed attestations
+        for (let i = 0; i < attestationsToComplete; i++) {
+          await mockAttestations.complete(identifier, 0, NULL_BYTES32, NULL_BYTES32, {
+            from: account,
+          })
+        }
+      }
 
       const withdrawAndCheckState = async (
         escrowSender: string,
@@ -424,7 +723,6 @@ contract('Escrow', (accounts: string[]) => {
         identifier: string,
         value: number,
         paymentId: string,
-        attestationsToComplete: number,
         expectedSentPaymentIds: string[],
         expectedReceivedPaymentIds: string[]
       ) => {
@@ -433,13 +731,6 @@ contract('Escrow', (accounts: string[]) => {
           await mockERC20Token.balanceOf(escrow.address)
         ).toNumber()
         const paymentBefore = await getEscrowedPayment(paymentId, escrow)
-
-        // Mock completed attestations
-        for (let i = 0; i < attestationsToComplete; i++) {
-          await mockAttestations.complete(identifier, 0, NULL_BYTES32, NULL_BYTES32, {
-            from: escrowReceiver,
-          })
-        }
         const parsedSig = await getParsedSignatureOfAddress(web3, escrowReceiver, paymentId)
         await escrow.withdraw(paymentId, parsedSig.v, parsedSig.r, parsedSig.s, {
           from: escrowReceiver,
@@ -490,7 +781,8 @@ contract('Escrow', (accounts: string[]) => {
             aValue,
             oneDayInSecs,
             uniquePaymentIDWithdraw,
-            0
+            0,
+            []
           )
         })
 
@@ -501,10 +793,30 @@ contract('Escrow', (accounts: string[]) => {
             NULL_BYTES32,
             aValue,
             uniquePaymentIDWithdraw,
-            0,
             [],
             []
           )
+        })
+
+        it('should emit the TrustedIssuersUnset event', async () => {
+          const parsedSig = await getParsedSignatureOfAddress(
+            web3,
+            receiver,
+            uniquePaymentIDWithdraw
+          )
+          const receipt = await escrow.withdraw(
+            uniquePaymentIDWithdraw,
+            parsedSig.v,
+            parsedSig.r,
+            parsedSig.s,
+            { from: receiver }
+          )
+          assertLogMatches2(receipt.logs[0], {
+            event: 'TrustedIssuersUnset',
+            args: {
+              paymentId: uniquePaymentIDWithdraw,
+            },
+          })
         })
 
         it('should emit the Withdrawal event', async () => {
@@ -520,7 +832,7 @@ contract('Escrow', (accounts: string[]) => {
             parsedSig.s,
             { from: receiver }
           )
-          assertLogMatches2(receipt.logs[0], {
+          assertLogMatches2(receipt.logs[1], {
             event: 'Withdrawal',
             args: {
               identifier: NULL_BYTES32,
@@ -539,7 +851,8 @@ contract('Escrow', (accounts: string[]) => {
             aValue,
             oneDayInSecs,
             anotherWithdrawKeyAddress,
-            0
+            0,
+            []
           )
           await withdrawAndCheckState(
             sender,
@@ -547,7 +860,6 @@ contract('Escrow', (accounts: string[]) => {
             NULL_BYTES32,
             aValue,
             uniquePaymentIDWithdraw,
-            0,
             [anotherWithdrawKeyAddress],
             [anotherWithdrawKeyAddress]
           )
@@ -559,7 +871,8 @@ contract('Escrow', (accounts: string[]) => {
             aValue,
             oneDayInSecs,
             anotherWithdrawKeyAddress,
-            3
+            3,
+            []
           )
           await withdrawAndCheckState(
             sender,
@@ -567,7 +880,6 @@ contract('Escrow', (accounts: string[]) => {
             NULL_BYTES32,
             aValue,
             uniquePaymentIDWithdraw,
-            0,
             [anotherWithdrawKeyAddress],
             []
           )
@@ -588,7 +900,7 @@ contract('Escrow', (accounts: string[]) => {
         })
       })
 
-      describe('when first payment is escrowed by a sender for an identifier && minAttestations', () => {
+      describe('when first payment is escrowed by a sender for identifier && minAttestations', () => {
         const minAttestations = 3
         beforeEach(async () => {
           await mintAndTransfer(
@@ -597,23 +909,25 @@ contract('Escrow', (accounts: string[]) => {
             aValue,
             oneDayInSecs,
             uniquePaymentIDWithdraw,
-            minAttestations
+            minAttestations,
+            []
           )
         })
 
         it('should allow users to withdraw after completing attestations', async () => {
+          await completeAttestations(receiver, aPhoneHash, minAttestations)
           await withdrawAndCheckState(
             sender,
             receiver,
             aPhoneHash,
             aValue,
             uniquePaymentIDWithdraw,
-            minAttestations,
             [],
             []
           )
         })
         it('should not allow a user to withdraw a payment if they have fewer than minAttestations', async () => {
+          await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
           await assertRevertWithReason(
             withdrawAndCheckState(
               sender,
@@ -621,11 +935,10 @@ contract('Escrow', (accounts: string[]) => {
               aPhoneHash,
               aValue,
               uniquePaymentIDWithdraw,
-              minAttestations - 1,
               [],
               []
             ),
-            'This account does not have enough attestations to withdraw this payment.'
+            'This account does not have the required attestations to withdraw this payment.'
           )
         })
         it("should withdraw properly when sender's second payment has an identifier", async () => {
@@ -635,44 +948,187 @@ contract('Escrow', (accounts: string[]) => {
             aValue,
             oneDayInSecs,
             anotherWithdrawKeyAddress,
-            0
+            0,
+            []
           )
+          await completeAttestations(receiver, aPhoneHash, minAttestations)
           await withdrawAndCheckState(
             sender,
             receiver,
             aPhoneHash,
             aValue,
             uniquePaymentIDWithdraw,
-            minAttestations,
             [anotherWithdrawKeyAddress],
             [anotherWithdrawKeyAddress]
           )
         })
       })
+
+      describe('when trustedIssuers are set for payment', () => {
+        describe('when Attestations.sol is a trustedIssuer', () => {
+          const minAttestations = 3
+          beforeEach(async () => {
+            await mintAndTransfer(
+              sender,
+              aPhoneHash,
+              aValue,
+              oneDayInSecs,
+              uniquePaymentIDWithdraw,
+              minAttestations,
+              [mockAttestations.address, trustedIssuer1, trustedIssuer2]
+            )
+          })
+
+          it('should allow withdraw after completing attestations', async () => {
+            await completeAttestations(receiver, aPhoneHash, minAttestations)
+            await withdrawAndCheckState(
+              sender,
+              receiver,
+              aPhoneHash,
+              aValue,
+              uniquePaymentIDWithdraw,
+              [],
+              []
+            )
+          })
+          describe('when <minAttestations have been completed', () => {
+            it('should not allow withdrawal if no attestations exist in FederatedAttestations', async () => {
+              await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
+              await assertRevertWithReason(
+                withdrawAndCheckState(
+                  sender,
+                  receiver,
+                  aPhoneHash,
+                  aValue,
+                  uniquePaymentIDWithdraw,
+                  [],
+                  []
+                ),
+                'This account does not have the required attestations to withdraw this payment.'
+              )
+            })
+            it('should allow users to withdraw if attestation is found in FederatedAttestations', async () => {
+              await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
+              await federatedAttestations.registerAttestationAsIssuer(
+                aPhoneHash,
+                trustedIssuer2,
+                receiver,
+                0,
+                { from: trustedIssuer2 }
+              )
+              await withdrawAndCheckState(
+                sender,
+                receiver,
+                aPhoneHash,
+                aValue,
+                uniquePaymentIDWithdraw,
+                [],
+                []
+              )
+            })
+          })
+        })
+        describe('when Attestations.sol is not a trusted issuer', () => {
+          beforeEach(async () => {
+            await mintAndTransfer(
+              sender,
+              aPhoneHash,
+              aValue,
+              oneDayInSecs,
+              uniquePaymentIDWithdraw,
+              2,
+              testTrustedIssuers
+            )
+          })
+          it('should allow users to withdraw if attestation is found in FederatedAttestations', async () => {
+            await federatedAttestations.registerAttestationAsIssuer(
+              aPhoneHash,
+              trustedIssuer2,
+              receiver,
+              0,
+              { from: trustedIssuer2 }
+            )
+            await withdrawAndCheckState(
+              sender,
+              receiver,
+              aPhoneHash,
+              aValue,
+              uniquePaymentIDWithdraw,
+              [],
+              []
+            )
+          })
+          it('should not allow a user to withdraw a payment if no attestations exist for trustedIssuers', async () => {
+            await assertRevertWithReason(
+              withdrawAndCheckState(
+                sender,
+                receiver,
+                aPhoneHash,
+                aValue,
+                uniquePaymentIDWithdraw,
+                [],
+                []
+              ),
+              'This account does not have the required attestations to withdraw this payment.'
+            )
+          })
+        })
+      })
     })
 
-    describe('#revoke()', () => {
+    describe('#revoke', () => {
       let uniquePaymentIDRevoke: string
       let parsedSig1: any
 
-      const identifiers = [NULL_BYTES32, aPhoneHash]
-      identifiers.forEach((identifier) => {
+      interface TransferParams {
+        identifier: string
+        minAttestations: number
+        trustedIssuers: string[]
+      }
+
+      const transferParams: TransferParams[] = [
+        { identifier: NULL_BYTES32, minAttestations: 0, trustedIssuers: [] },
+        { identifier: aPhoneHash, minAttestations: 0, trustedIssuers: [] },
+        { identifier: aPhoneHash, minAttestations: 1, trustedIssuers: testTrustedIssuers },
+      ]
+
+      transferParams.forEach(({ identifier, trustedIssuers, minAttestations }) => {
         describe(`when identifier is ${
-          identifier === NULL_BYTES32 ? '' : 'not'
-        } empty`, async () => {
+          identifier === NULL_BYTES32 ? '' : 'not '
+        }empty, trustedIssuers.length=${
+          trustedIssuers.length
+        }, and minAttestations=${minAttestations}`, async () => {
           beforeEach(async () => {
-            await mintAndTransfer(sender, identifier, aValue, oneDayInSecs, withdrawKeyAddress, 0)
+            await mintAndTransfer(
+              sender,
+              identifier,
+              aValue,
+              oneDayInSecs,
+              withdrawKeyAddress,
+              minAttestations,
+              trustedIssuers
+            )
             await mintAndTransfer(
               sender,
               identifier,
               aValue,
               oneDayInSecs,
               anotherWithdrawKeyAddress,
-              0
+              minAttestations,
+              trustedIssuers
             )
 
             uniquePaymentIDRevoke = withdrawKeyAddress
             parsedSig1 = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
+            if (trustedIssuers.length) {
+              await federatedAttestations.registerAttestationAsIssuer(
+                identifier,
+                trustedIssuers[0],
+                receiver,
+                0,
+                { from: trustedIssuers[0] }
+              )
+            }
           })
 
           it('should allow sender to redeem payment after payment has expired', async () => {
@@ -707,10 +1163,21 @@ contract('Escrow', (accounts: string[]) => {
             )
           })
 
-          it('should emit the Revocation event', async () => {
+          it('should emit the TrustedIssuersUnset event', async () => {
             await timeTravel(oneDayInSecs, web3)
             const receipt = await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
             assertLogMatches2(receipt.logs[0], {
+              event: 'TrustedIssuersUnset',
+              args: {
+                paymentId: withdrawKeyAddress,
+              },
+            })
+          })
+
+          it('should emit the Revocation event', async () => {
+            await timeTravel(oneDayInSecs, web3)
+            const receipt = await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
+            assertLogMatches2(receipt.logs[1], {
               event: 'Revocation',
               args: {
                 identifier,

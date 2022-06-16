@@ -42,6 +42,8 @@ const DefaultConstitution = {
   },
   Escrow: {
     default: 0.6,
+    addDefaultTrustedIssuer: 0.6,
+    removeDefaultTrustedIssuer: 0.6,
   },
   Exchange: {
     default: 0.8,
