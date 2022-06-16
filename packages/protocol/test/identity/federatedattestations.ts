@@ -155,8 +155,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       assert.equal(actualAddresses[index], expectedAttestation.account)
       assert.equal(actualSigners[index], expectedAttestation.signer)
       assert.equal(actualIssuedOns[index].toNumber(), expectedAttestation.issuedOn)
-      assert.isAtLeast(actualPublishedOns[index].toNumber(), actualIssuedOns[index].toNumber())
       // Check bounds for publishedOn, not exact values, as it is set onchain
+      assert.isAtLeast(actualPublishedOns[index].toNumber(), actualIssuedOns[index].toNumber())
       assert.isAtMost(actualPublishedOns[index].toNumber(), expectedPublishedOn + 10)
     })
   }
