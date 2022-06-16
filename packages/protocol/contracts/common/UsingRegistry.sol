@@ -15,6 +15,7 @@ import "../governance/interfaces/IValidators.sol";
 
 import "../identity/interfaces/IRandom.sol";
 import "../identity/interfaces/IAttestations.sol";
+import "../identity/interfaces/IFederatedAttestations.sol";
 
 import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/IReserve.sol";
@@ -35,6 +36,9 @@ contract UsingRegistry is Ownable {
   bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
   bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
     abi.encodePacked("FeeCurrencyWhitelist")
+  );
+  bytes32 constant FEDERATED_ATTESTATIONS_REGISTRY_ID = keccak256(
+    abi.encodePacked("FederatedAttestations")
   );
   bytes32 constant FREEZER_REGISTRY_ID = keccak256(abi.encodePacked("Freezer"));
   bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
@@ -90,6 +94,10 @@ contract UsingRegistry is Ownable {
 
   function getFeeCurrencyWhitelistRegistry() internal view returns (IFeeCurrencyWhitelist) {
     return IFeeCurrencyWhitelist(registry.getAddressForOrDie(FEE_CURRENCY_WHITELIST_REGISTRY_ID));
+  }
+
+  function getFederatedAttestations() internal view returns (IFederatedAttestations) {
+    return IFederatedAttestations(registry.getAddressForOrDie(FEDERATED_ATTESTATIONS_REGISTRY_ID));
   }
 
   function getFreezer() internal view returns (IFreezer) {
