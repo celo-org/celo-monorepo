@@ -8,7 +8,7 @@ import "./interfaces/IAttestations.sol";
 import "./interfaces/IEscrow.sol";
 import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
-import "../common/UsingRegistryV2WithStorageSlot.sol";
+import "../common/UsingRegistryV2BackwardsCompatible.sol";
 import "../common/Signatures.sol";
 import "../common/libraries/ReentrancyGuard.sol";
 
@@ -19,7 +19,7 @@ contract Escrow is
   Ownable,
   Initializable,
   // Maintain storage alignment since Escrow was initially deployed with UsingRegistry.sol
-  UsingRegistryV2WithStorageSlot
+  UsingRegistryV2BackwardsCompatible
 {
   using SafeMath for uint256;
 
