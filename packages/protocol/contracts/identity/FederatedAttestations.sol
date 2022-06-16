@@ -10,7 +10,7 @@ import "../common/interfaces/IAccounts.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/Initializable.sol";
-import "../common/UsingRegistry.sol";
+import "../common/UsingRegistryV2.sol";
 import "../common/Signatures.sol";
 
 /**
@@ -21,7 +21,7 @@ contract FederatedAttestations is
   ICeloVersionedContract,
   Ownable,
   Initializable,
-  UsingRegistry
+  UsingRegistryV2
 {
   using SafeMath for uint256;
   using SafeCast for uint256;
@@ -74,11 +74,9 @@ contract FederatedAttestations is
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param registryAddress The address of the registry core smart contract.
    */
-  function initialize(address registryAddress) external initializer {
+  function initialize() external initializer {
     _transferOwnership(msg.sender);
-    setRegistry(registryAddress);
     setEip712DomainSeparator();
   }
 
