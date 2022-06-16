@@ -46,6 +46,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
   const identifier2 = getPhoneHash(phoneNumber, 'dummySalt')
 
   const nowUnixTime = Math.floor(Date.now() / 1000)
+  // Set lower bound to (now - 1 hour) in seconds
+  const expectedPublishedOnLowerBound = nowUnixTime - 60 * 60
 
   const signerRole = keccak256(encodePacked('celo.org/core/attestation'))
   let sig
@@ -139,7 +141,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
   const checkAgainstExpectedAttestations = (
     expectedCountsPerIssuer: number[],
     expectedAttestations: AttestationTestCase[],
-    expectedPublishedOn: number,
+    expectedPublishedOnLowerBound: number,
     actualCountsPerIssuer: BigNumber[],
     actualAddresses: string[],
     actualSigners: string[],
@@ -156,9 +158,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       assert.equal(actualAddresses[index], expectedAttestation.account)
       assert.equal(actualSigners[index], expectedAttestation.signer)
       assert.equal(actualIssuedOns[index].toNumber(), expectedAttestation.issuedOn)
-      // Check bounds for publishedOn, not exact values, as it is set onchain
-      assert.isAtLeast(actualPublishedOns[index].toNumber(), actualIssuedOns[index].toNumber())
-      assert.isAtMost(actualPublishedOns[index].toNumber(), expectedPublishedOn + 10)
+      // Check min bounds for publishedOn
+      assert.isAtLeast(actualPublishedOns[index].toNumber(), expectedPublishedOnLowerBound)
     })
   }
 
@@ -288,8 +289,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
         },
       ]
 
-      let expectedPublishedOn
-
       beforeEach(async () => {
         // Require consistent order for test cases
         await accountsInstance.createAccount({ from: issuer2 })
@@ -307,7 +306,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
             )
           }
         }
-        expectedPublishedOn = Math.floor(Date.now() / 1000)
       })
 
       it('should return empty count and list if no issuers specified', async () => {
@@ -341,7 +339,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         checkAgainstExpectedAttestations(
           [issuer1Attestations.length],
           issuer1Attestations,
-          expectedPublishedOn,
+          expectedPublishedOnLowerBound,
           countsPerIssuer,
           addresses,
           signers,
@@ -383,7 +381,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         checkAgainstExpectedAttestations(
           expectedCountsPerIssuer,
           expectedAttestations,
-          expectedPublishedOn,
+          expectedPublishedOnLowerBound,
           countsPerIssuer,
           addresses,
           signers,
@@ -691,7 +689,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           publishedOn,
         },
       })
-      assert.isAtLeast(publishedOn.toNumber(), nowUnixTime)
+      assert.isAtLeast(publishedOn.toNumber(), expectedPublishedOnLowerBound)
     })
 
     it('should revert if the attestation is revoked', async () => {
@@ -1096,14 +1094,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
   describe('#batchRevokeAttestations', () => {
     const account2 = accounts[4]
     const signer2 = accounts[5]
-    let publishedOn
+
     beforeEach(async () => {
       await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, signer1)
       await signAndRegisterAttestation(identifier1, issuer1, account2, nowUnixTime, signer2)
       await signAndRegisterAttestation(identifier2, issuer1, account2, nowUnixTime, signer1)
-      publishedOn = (await federatedAttestations.identifierToAttestations(identifier2, issuer1, 0))[
-        'publishedOn'
-      ].toNumber()
     })
     it('should succeed if issuer batch revokes attestations', async () => {
       await federatedAttestations.batchRevokeAttestations(
@@ -1122,7 +1117,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
-        publishedOn,
+        expectedPublishedOnLowerBound,
         countsPerIssuer1,
         addresses1,
         signers1,
@@ -1139,7 +1134,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [0],
         [],
-        publishedOn,
+        expectedPublishedOnLowerBound,
         countsPerIssuer2,
         addresses2,
         signers2,
@@ -1165,7 +1160,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
-        publishedOn,
+        expectedPublishedOnLowerBound,
         countsPerIssuer1,
         addresses1,
         signers1,
@@ -1182,7 +1177,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [0],
         [],
-        publishedOn,
+        expectedPublishedOnLowerBound,
         countsPerIssuer2,
         addresses2,
         signers2,
@@ -1208,7 +1203,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
-        publishedOn,
+        expectedPublishedOnLowerBound,
         countsPerIssuer1,
         addresses1,
         signers1,
@@ -1225,7 +1220,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [0],
         [],
-        publishedOn,
+        expectedPublishedOnLowerBound,
         countsPerIssuer2,
         addresses2,
         signers2,
