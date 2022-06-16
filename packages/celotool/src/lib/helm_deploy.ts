@@ -148,7 +148,8 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
 export async function cloneCloudSQLInstance(
   celoEnv: string,
   instanceName: string,
-  cloneInstanceName: string
+  cloneInstanceName: string,
+  dbSuffix: string
 ) {
   await ensureAuthenticatedGcloudAccount()
   console.info('Cloning Cloud SQL database, this might take a minute or two ...')
@@ -183,12 +184,10 @@ export async function cloneCloudSQLInstance(
     `gcloud sql instances patch ${cloneInstanceName} --backup-start-time 17:00`
   )
 
-  const blockscoutDBUsername = Math.random().toString(36).slice(-8)
-  const blockscoutDBPassword = Math.random().toString(36).slice(-8)
-
-  console.info('Creating SQL user')
-  await execCmdWithExitOnFailure(
-    `gcloud sql users create ${blockscoutDBUsername} -i ${cloneInstanceName} --password ${blockscoutDBPassword}`
+  const [blockscoutDBUsername, blockscoutDBPassword] = await retrieveCloudSQLConnectionInfo(
+    celoEnv,
+    instanceName,
+    dbSuffix
   )
 
   console.info('Copying blockscout service account secret to namespace')

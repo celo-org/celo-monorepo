@@ -61,7 +61,12 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
 
     await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName, argv.celoEnv)
 
-    blockscoutCredentials = await cloneCloudSQLInstance(argv.celoEnv, instanceName, newInstanceName)
+    blockscoutCredentials = await cloneCloudSQLInstance(
+      argv.celoEnv,
+      instanceName,
+      newInstanceName,
+      dbSuffix
+    )
   } else {
     console.info(
       `Skipping Cloud SQL Database creation and IAM setup. Please check if you can execute the skipped steps.`
@@ -76,9 +81,4 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     blockscoutCredentials[1],
     blockscoutCredentials[2]
   )
-
-  // if (!isCelotoolHelmDryRun()) {
-  //   await createGrafanaTagAnnotation(argv.celoEnv, imageTag, newSuffix)
-  //   await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)
-  // }
 }
