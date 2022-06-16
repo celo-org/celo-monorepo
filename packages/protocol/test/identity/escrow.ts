@@ -159,7 +159,7 @@ contract('Escrow', (accounts: string[]) => {
       )
     })
 
-    it('should a second trustedIssuer to be added', async () => {
+    it('should allow a second trustedIssuer to be added', async () => {
       await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
       await escrow.addDefaultTrustedIssuer(trustedIssuer2, { from: owner })
       assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer1, trustedIssuer2])

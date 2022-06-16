@@ -125,11 +125,10 @@ contract Escrow is
   }
 
   /**
-   * @notice Add an address to the defaultTrustedIssuers list.
+   * @notice Remove an address from the defaultTrustedIssuers list.
    * @param trustedIssuer Address of the trustedIssuer to remove.
    * @param index Index of trustedIssuer in defaultTrustedIssuers.
-   * @dev Throws if trustedIssuer is not in defaultTrustedIssuers.
-   * @dev Throws if trustedIssuer is not in defaultTrustedIssuers.
+   * @dev Throws if trustedIssuer is not in defaultTrustedIssuers at index.
    */
   function removeDefaultTrustedIssuer(address trustedIssuer, uint256 index) external onlyOwner {
     uint256 numDefaultTrustedIssuers = defaultTrustedIssuers.length;
@@ -250,44 +249,25 @@ contract Escrow is
     EscrowedPayment memory payment = escrowedPayments[paymentId];
     require(payment.token != address(0) && payment.value > 0, "Invalid withdraw value.");
 
-    bool passedCheck = false;
     // Due to an old bug, there may exist payments with no identifier and minAttestations > 0
     // So ensure that these fail the attestations check, as they previously would have
     if (payment.minAttestations > 0) {
+      bool passedCheck = false;
       address[] memory trustedIssuers = trustedIssuersPerPayment[paymentId];
       address attestationsAddress = registryContract.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID);
+
       if (trustedIssuers.length > 0) {
-        for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-          if (trustedIssuers[i] != attestationsAddress) {
-            continue;
-          }
-          // This can be false; one of the several trustedIssuers listed needs to prove attestations
-          passedCheck = hasCompletedV1Attestations(
+        passedCheck =
+          hasCompletedV1AttestationsAsTrustedIssuer(
             attestationsAddress,
             payment.recipientIdentifier,
             msg.sender,
-            payment.minAttestations
-          );
-          break;
-        }
-
-        if (!passedCheck) {
-          // Check for an attestation from a trusted issuer
-          IFederatedAttestations federatedAttestations = getFederatedAttestations();
-          (, address[] memory accounts, , , ) = federatedAttestations.lookupAttestations(
-            payment.recipientIdentifier,
+            payment.minAttestations,
             trustedIssuers
-          );
-          // Check if an attestation was found for recipientIdentifier -> msg.sender
-          for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
-            if (accounts[i] == msg.sender) {
-              passedCheck = true;
-              break;
-            }
-          }
-        }
+          ) ||
+          hasCompletedV2Attestations(payment.recipientIdentifier, msg.sender, trustedIssuers);
       } else {
-        // This is for backwards compatibility, not default behavior
+        // This is for backwards compatibility, not default/fallback behavior
         passedCheck = hasCompletedV1Attestations(
           attestationsAddress,
           payment.recipientIdentifier,
@@ -386,14 +366,13 @@ contract Escrow is
   }
 
   /**
-  * @notice Revokes tokens for a sender who is redeeming a payment after it has expired.
+  * @notice Checks if account has completed minAttestations for identifier in Attestations.sol.
   * @param attestationsAddress The address of Attestations.sol.
   * @param identifier The hash of an identifier for which to look up attestations.
   * @param account The account for which to look up attestations.
   * @param minAttestations The minimum number of attestations to have completed.
   * @return Whether or not attestations in Attestations.sol
-  *         exceeds minAttestations for (identifier, account)
-  * @dev Throws if 'token' or 'value' is 0.
+  *         exceeds minAttestations for (identifier, account).
   */
   function hasCompletedV1Attestations(
     address attestationsAddress,
@@ -404,7 +383,63 @@ contract Escrow is
     IAttestations attestations = IAttestations(attestationsAddress);
     (uint64 completedAttestations, ) = attestations.getAttestationStats(identifier, account);
     return (uint256(completedAttestations) >= minAttestations);
+  }
 
+  /**
+  * @notice Helper function that checks if one of the trustedIssuers is the old Attestations.sol
+  *         contract and applies the escrow V1 check against minAttestations.
+  * @param attestationsAddress The address of Attestations.sol.
+  * @param identifier The hash of an identifier for which to look up attestations.
+  * @param account The account for which to look up attestations.
+  * @param minAttestations The minimum number of attestations to have completed.
+  * @param trustedIssuers The trustedIssuer addresses to search through.
+  * @return Whether or not a trustedIssuer is Attestations.sol & attestations
+  *         exceed minAttestations for (identifier, account).
+  */
+  function hasCompletedV1AttestationsAsTrustedIssuer(
+    address attestationsAddress,
+    bytes32 identifier,
+    address account,
+    uint256 minAttestations,
+    address[] memory trustedIssuers
+  ) internal view returns (bool) {
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      if (trustedIssuers[i] != attestationsAddress) {
+        continue;
+      }
+      // This can be false; one of the several trustedIssuers listed needs to prove attestations
+      return hasCompletedV1Attestations(attestationsAddress, identifier, account, minAttestations);
+    }
+    return false;
+  }
+
+  /**
+  * @notice Checks if there are attestations for account <-> identifier from
+  *         any of trustedIssuers in FederatedAttestations.sol.
+  * @param identifier The hash of an identifier for which to look up attestations.
+  * @param account The account for which to look up attestations.
+  * @param trustedIssuers Issuer addresses whose attestations to trust.
+  * @return Whether or not attestations exist in FederatedAttestations.sol
+  *         for (identifier, account).
+  */
+  function hasCompletedV2Attestations(
+    bytes32 identifier,
+    address account,
+    address[] memory trustedIssuers
+  ) internal view returns (bool) {
+    // Check for an attestation from a trusted issuer
+    IFederatedAttestations federatedAttestations = getFederatedAttestations();
+    (, address[] memory accounts, , , ) = federatedAttestations.lookupAttestations(
+      identifier,
+      trustedIssuers
+    );
+    // Check if an attestation was found for recipientIdentifier -> account
+    for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
+      if (accounts[i] == account) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
