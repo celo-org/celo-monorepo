@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 import "./interfaces/IAttestations.sol";
+import "./interfaces/IFederatedAttestations.sol";
 import "./interfaces/IEscrow.sol";
 import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
@@ -23,6 +24,9 @@ contract Escrow is
 {
   using SafeMath for uint256;
 
+  event DefaultTrustedIssuerAdded(address indexed trustedIssuer);
+  event DefaultTrustedIssuerRemoved(address indexed trustedIssuer);
+
   event Transfer(
     address indexed from,
     bytes32 indexed identifier,
@@ -31,6 +35,9 @@ contract Escrow is
     address paymentId,
     uint256 minAttestations
   );
+
+  event TrustedIssuersSet(address indexed paymentId, address[] trustedIssuers);
+  event TrustedIssuersUnset(address indexed paymentId);
 
   event Withdrawal(
     bytes32 indexed identifier,
@@ -72,6 +79,12 @@ contract Escrow is
   // Maps senders' addresses to a list of sent escrowed payment IDs.
   mapping(address => address[]) public sentPaymentIds;
 
+  // Maps payment ID to a list of issuers whose attestations will be accepted.
+  mapping(address => address[]) public trustedIssuersPerPayment;
+
+  // Governable list of trustedIssuers to set for payments by default.
+  address[] public defaultTrustedIssuers;
+
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
@@ -94,6 +107,45 @@ contract Escrow is
   }
 
   /**
+   * @notice Add an address to the defaultTrustedIssuers list.
+   * @param trustedIssuer Address of the trustedIssuer to add.
+   * @dev Throws if trustedIssuer is null or already in defaultTrustedIssuers.
+   */
+  function addDefaultTrustedIssuer(address trustedIssuer) external onlyOwner {
+    require(address(0) != trustedIssuer, "trustedIssuer can't be null");
+    // Ensure list of trusted issuers is unique
+    for (uint256 i = 0; i < defaultTrustedIssuers.length; i = i.add(1)) {
+      require(
+        defaultTrustedIssuers[i] != trustedIssuer,
+        "trustedIssuer already in defaultTrustedIssuers"
+      );
+    }
+    defaultTrustedIssuers.push(trustedIssuer);
+    emit DefaultTrustedIssuerAdded(trustedIssuer);
+  }
+
+  /**
+   * @notice Remove an address from the defaultTrustedIssuers list.
+   * @param trustedIssuer Address of the trustedIssuer to remove.
+   * @param index Index of trustedIssuer in defaultTrustedIssuers.
+   * @dev Throws if trustedIssuer is not in defaultTrustedIssuers at index.
+   */
+  function removeDefaultTrustedIssuer(address trustedIssuer, uint256 index) external onlyOwner {
+    uint256 numDefaultTrustedIssuers = defaultTrustedIssuers.length;
+    require(index < numDefaultTrustedIssuers, "index is invalid");
+    require(
+      defaultTrustedIssuers[index] == trustedIssuer,
+      "trustedIssuer does not match address found at defaultTrustedIssuers[index]"
+    );
+    if (index != numDefaultTrustedIssuers - 1) {
+      // Swap last index with index-to-remove
+      defaultTrustedIssuers[index] = defaultTrustedIssuers[numDefaultTrustedIssuers - 1];
+    }
+    defaultTrustedIssuers.pop();
+    emit DefaultTrustedIssuerRemoved(trustedIssuer);
+  }
+
+  /**
   * @notice Transfer tokens to a specific user. Supports both identity with privacy (an empty
   *         identifier and 0 minAttestations) and without (with identifier and minAttestations).
   * @param identifier The hashed identifier of a user to transfer to.
@@ -103,9 +155,13 @@ contract Escrow is
   * @param paymentId The address of the temporary wallet associated with this payment. Users must
   *        prove ownership of the corresponding private key to withdraw from escrow.
   * @param minAttestations The min number of attestations required to withdraw the payment.
+  * @return True if transfer succeeded.
   * @dev Throws if 'token' or 'value' is 0.
+  * @dev Throws if identifier is null and minAttestations > 0.
+  * @dev If minAttestations is 0, trustedIssuers will be set to empty list.
   * @dev msg.sender needs to have already approved this contract to transfer
-  * @dev If no identifier is given, then minAttestations must be 0.
+
+
   */
   // solhint-disable-next-line no-simple-event-func-name
   function transfer(
@@ -116,37 +172,61 @@ contract Escrow is
     address paymentId,
     uint256 minAttestations
   ) external nonReentrant returns (bool) {
-    require(token != address(0) && value > 0 && expirySeconds > 0, "Invalid transfer inputs.");
-    require(
-      !(identifier == 0 && minAttestations > 0),
-      "Invalid privacy inputs: Can't require attestations if no identifier"
-    );
+    address[] memory trustedIssuers;
+    // If minAttestations == 0, trustedIssuers should remain empty
+    if (minAttestations > 0) {
+      trustedIssuers = getDefaultTrustedIssuers();
+    }
+    return
+      _transfer(
+        identifier,
+        token,
+        value,
+        expirySeconds,
+        paymentId,
+        minAttestations,
+        trustedIssuers
+      );
+  }
 
-    IAttestations attestations = getAttestations();
-    require(
-      minAttestations <= attestations.getMaxAttestations(),
-      "minAttestations larger than limit"
-    );
-
-    uint256 sentIndex = sentPaymentIds[msg.sender].push(paymentId).sub(1);
-    uint256 receivedIndex = receivedPaymentIds[identifier].push(paymentId).sub(1);
-
-    EscrowedPayment storage newPayment = escrowedPayments[paymentId];
-    require(newPayment.timestamp == 0, "paymentId already used");
-    newPayment.recipientIdentifier = identifier;
-    newPayment.sender = msg.sender;
-    newPayment.token = token;
-    newPayment.value = value;
-    newPayment.sentIndex = sentIndex;
-    newPayment.receivedIndex = receivedIndex;
-    // solhint-disable-next-line not-rely-on-time
-    newPayment.timestamp = now;
-    newPayment.expirySeconds = expirySeconds;
-    newPayment.minAttestations = minAttestations;
-
-    require(ERC20(token).transferFrom(msg.sender, address(this), value), "Transfer unsuccessful.");
-    emit Transfer(msg.sender, identifier, token, value, paymentId, minAttestations);
-    return true;
+  /**
+  * @notice Transfer tokens to a specific user. Supports both identity with privacy (an empty
+  *         identifier and 0 minAttestations) and without (with identifier
+  *         and attestations completed by trustedIssuers).
+  * @param identifier The hashed identifier of a user to transfer to.
+  * @param token The token to be transferred.
+  * @param value The amount to be transferred.
+  * @param expirySeconds The number of seconds before the sender can revoke the payment.
+  * @param paymentId The address of the temporary wallet associated with this payment. Users must
+  *        prove ownership of the corresponding private key to withdraw from escrow.
+  * @param minAttestations The min number of attestations required to withdraw the payment.
+  * @param trustedIssuers Array of issuers whose attestations in FederatedAttestations.sol
+  *        will be accepted to prove ownership over an identifier.
+  * @return True if transfer succeeded.
+  * @dev Throws if 'token' or 'value' is 0.
+  * @dev Throws if identifier is null and minAttestations > 0.
+  * @dev Throws if minAttestations == 0 but trustedIssuers are provided.
+  * @dev msg.sender needs to have already approved this contract to transfer.
+  */
+  function transferWithTrustedIssuers(
+    bytes32 identifier,
+    address token,
+    uint256 value,
+    uint256 expirySeconds,
+    address paymentId,
+    uint256 minAttestations,
+    address[] calldata trustedIssuers
+  ) external nonReentrant returns (bool) {
+    return
+      _transfer(
+        identifier,
+        token,
+        value,
+        expirySeconds,
+        paymentId,
+        minAttestations,
+        trustedIssuers
+      );
   }
 
   /**
@@ -155,6 +235,7 @@ contract Escrow is
   * @param v The recovery id of the incoming ECDSA signature.
   * @param r Output value r of the ECDSA signature.
   * @param s Output value s of the ECDSA signature.
+  * @return True if withdraw succeeded.
   * @dev Throws if 'token' or 'value' is 0.
   * @dev Throws if msg.sender does not prove ownership of the withdraw key.
   */
@@ -171,14 +252,32 @@ contract Escrow is
     // Due to an old bug, there may exist payments with no identifier and minAttestations > 0
     // So ensure that these fail the attestations check, as they previously would have
     if (payment.minAttestations > 0) {
-      IAttestations attestations = getAttestations();
-      (uint64 completedAttestations, ) = attestations.getAttestationStats(
-        payment.recipientIdentifier,
-        msg.sender
-      );
+      bool passedCheck = false;
+      address[] memory trustedIssuers = trustedIssuersPerPayment[paymentId];
+      address attestationsAddress = registryContract.getAddressForOrDie(ATTESTATIONS_REGISTRY_ID);
+
+      if (trustedIssuers.length > 0) {
+        passedCheck =
+          hasCompletedV1AttestationsAsTrustedIssuer(
+            attestationsAddress,
+            payment.recipientIdentifier,
+            msg.sender,
+            payment.minAttestations,
+            trustedIssuers
+          ) ||
+          hasCompletedV2Attestations(payment.recipientIdentifier, msg.sender, trustedIssuers);
+      } else {
+        // This is for backwards compatibility, not default/fallback behavior
+        passedCheck = hasCompletedV1Attestations(
+          attestationsAddress,
+          payment.recipientIdentifier,
+          msg.sender,
+          payment.minAttestations
+        );
+      }
       require(
-        uint256(completedAttestations) >= payment.minAttestations,
-        "This account does not have enough attestations to withdraw this payment."
+        passedCheck,
+        "This account does not have the required attestations to withdraw this payment."
       );
     }
 
@@ -250,6 +349,176 @@ contract Escrow is
   }
 
   /**
+  * @notice Gets array of all trusted issuers set per paymentId.
+  * @param paymentId The ID of the payment to be deleted.
+  * @return An array of addresses of trusted issuers set for an escrowed payment.
+  */
+  function getTrustedIssuersPerPayment(address paymentId) external view returns (address[] memory) {
+    return trustedIssuersPerPayment[paymentId];
+  }
+
+  /**
+  * @notice Gets trusted issuers set as default for payments by `transfer` function.
+  * @return An array of addresses of trusted issuers.
+  */
+  function getDefaultTrustedIssuers() public view returns (address[] memory) {
+    return defaultTrustedIssuers;
+  }
+
+  /**
+  * @notice Checks if account has completed minAttestations for identifier in Attestations.sol.
+  * @param attestationsAddress The address of Attestations.sol.
+  * @param identifier The hash of an identifier for which to look up attestations.
+  * @param account The account for which to look up attestations.
+  * @param minAttestations The minimum number of attestations to have completed.
+  * @return Whether or not attestations in Attestations.sol
+  *         exceeds minAttestations for (identifier, account).
+  */
+  function hasCompletedV1Attestations(
+    address attestationsAddress,
+    bytes32 identifier,
+    address account,
+    uint256 minAttestations
+  ) internal view returns (bool) {
+    IAttestations attestations = IAttestations(attestationsAddress);
+    (uint64 completedAttestations, ) = attestations.getAttestationStats(identifier, account);
+    return (uint256(completedAttestations) >= minAttestations);
+  }
+
+  /**
+  * @notice Helper function that checks if one of the trustedIssuers is the old Attestations.sol
+  *         contract and applies the escrow V1 check against minAttestations.
+  * @param attestationsAddress The address of Attestations.sol.
+  * @param identifier The hash of an identifier for which to look up attestations.
+  * @param account The account for which to look up attestations.
+  * @param minAttestations The minimum number of attestations to have completed.
+  * @param trustedIssuers The trustedIssuer addresses to search through.
+  * @return Whether or not a trustedIssuer is Attestations.sol & attestations
+  *         exceed minAttestations for (identifier, account).
+  */
+  function hasCompletedV1AttestationsAsTrustedIssuer(
+    address attestationsAddress,
+    bytes32 identifier,
+    address account,
+    uint256 minAttestations,
+    address[] memory trustedIssuers
+  ) internal view returns (bool) {
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      if (trustedIssuers[i] != attestationsAddress) {
+        continue;
+      }
+      // This can be false; one of the several trustedIssuers listed needs to prove attestations
+      return hasCompletedV1Attestations(attestationsAddress, identifier, account, minAttestations);
+    }
+    return false;
+  }
+
+  /**
+  * @notice Checks if there are attestations for account <-> identifier from
+  *         any of trustedIssuers in FederatedAttestations.sol.
+  * @param identifier The hash of an identifier for which to look up attestations.
+  * @param account The account for which to look up attestations.
+  * @param trustedIssuers Issuer addresses whose attestations to trust.
+  * @return Whether or not attestations exist in FederatedAttestations.sol
+  *         for (identifier, account).
+  */
+  function hasCompletedV2Attestations(
+    bytes32 identifier,
+    address account,
+    address[] memory trustedIssuers
+  ) internal view returns (bool) {
+    // Check for an attestation from a trusted issuer
+    IFederatedAttestations federatedAttestations = getFederatedAttestations();
+    (, address[] memory accounts, , , ) = federatedAttestations.lookupAttestations(
+      identifier,
+      trustedIssuers
+    );
+    // Check if an attestation was found for recipientIdentifier -> account
+    for (uint256 i = 0; i < accounts.length; i = i.add(1)) {
+      if (accounts[i] == account) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+  * @notice Helper function for `transferWithTrustedIssuers` and `transfer`, to
+  *         enable backwards-compatible function signature for `transfer`,
+  *         and since `transfer` cannot directly call `transferWithTrustedIssuers`
+  *         due to reentrancy guard.
+  * @param identifier The hashed identifier of a user to transfer to.
+  * @param token The token to be transferred.
+  * @param value The amount to be transferred.
+  * @param expirySeconds The number of seconds before the sender can revoke the payment.
+  * @param paymentId The address of the temporary wallet associated with this payment. Users must
+  *        prove ownership of the corresponding private key to withdraw from escrow.
+  * @param minAttestations The min number of attestations required to withdraw the payment.
+  * @param trustedIssuers Array of issuers whose attestations in FederatedAttestations.sol
+  *        will be accepted to prove ownership over an identifier.
+  * @return True if transfer succeeded.
+  * @dev Throws if 'token' or 'value' is 0.
+  * @dev Throws if identifier is null and minAttestations > 0.
+  * @dev Throws if minAttestations == 0 but trustedIssuers are provided.
+  * @dev msg.sender needs to have already approved this contract to transfer.
+   */
+  function _transfer(
+    bytes32 identifier,
+    address token,
+    uint256 value,
+    uint256 expirySeconds,
+    address paymentId,
+    uint256 minAttestations,
+    address[] memory trustedIssuers
+  ) private returns (bool) {
+    require(token != address(0) && value > 0 && expirySeconds > 0, "Invalid transfer inputs.");
+    require(
+      !(identifier == 0 && minAttestations > 0),
+      "Invalid privacy inputs: Can't require attestations if no identifier"
+    );
+    // Withdraw logic with trustedIssuers in FederatedAttestations disregards
+    // minAttestations, so ensure that this is not set to 0 to prevent confusing behavior
+    // This also implies: if identifier == 0 => trustedIssuers.length == 0
+    require(
+      !(minAttestations == 0 && trustedIssuers.length > 0),
+      "trustedIssuers may only be set when attestations are required"
+    );
+
+    IAttestations attestations = getAttestations();
+    require(
+      minAttestations <= attestations.getMaxAttestations(),
+      "minAttestations larger than limit"
+    );
+
+    uint256 sentIndex = sentPaymentIds[msg.sender].push(paymentId).sub(1);
+    uint256 receivedIndex = receivedPaymentIds[identifier].push(paymentId).sub(1);
+
+    EscrowedPayment storage newPayment = escrowedPayments[paymentId];
+    require(newPayment.timestamp == 0, "paymentId already used");
+    newPayment.recipientIdentifier = identifier;
+    newPayment.sender = msg.sender;
+    newPayment.token = token;
+    newPayment.value = value;
+    newPayment.sentIndex = sentIndex;
+    newPayment.receivedIndex = receivedIndex;
+    // solhint-disable-next-line not-rely-on-time
+    newPayment.timestamp = now;
+    newPayment.expirySeconds = expirySeconds;
+    newPayment.minAttestations = minAttestations;
+
+    // Avoid unnecessary storage write
+    if (trustedIssuers.length > 0) {
+      trustedIssuersPerPayment[paymentId] = trustedIssuers;
+    }
+
+    require(ERC20(token).transferFrom(msg.sender, address(this), value), "Transfer unsuccessful.");
+    emit Transfer(msg.sender, identifier, token, value, paymentId, minAttestations);
+    // Split into a second event for ABI backwards compatibility
+    emit TrustedIssuersSet(paymentId, trustedIssuers);
+    return true;
+  }
+
+  /**
   * @notice Deletes the payment from its receiver's and sender's lists of payments,
   * and zeroes out all the data in the struct.
   * @param paymentId The ID of the payment to be deleted.
@@ -268,5 +537,9 @@ contract Escrow is
     sent.length = sent.length.sub(1);
 
     delete escrowedPayments[paymentId];
+    delete trustedIssuersPerPayment[paymentId];
+    // TODO ASv2 reviewers: adding trustedIssuers to event requires an additional
+    // storage lookup, but we can add this in if it's still best pratice to do so!
+    emit TrustedIssuersUnset(paymentId);
   }
 }
