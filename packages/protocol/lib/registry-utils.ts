@@ -42,7 +42,6 @@ export enum CeloContractName {
 }
 
 export const usesRegistry = [
-  CeloContractName.Escrow,
   CeloContractName.Reserve,
   CeloContractName.StableToken,
 ]
@@ -56,7 +55,6 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Election,
   CeloContractName.Escrow,
   CeloContractName.Exchange,
-  // TODO ASv2 revisit this
   CeloContractName.FederatedAttestations,
   CeloContractName.FeeCurrencyWhitelist,
   CeloContractName.Freezer,
