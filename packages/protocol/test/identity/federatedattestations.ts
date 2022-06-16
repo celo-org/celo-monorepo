@@ -5,6 +5,7 @@ import {
 } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
+  assertEqualBNArray,
   assertLogMatches2,
   assertRevert,
   assertRevertWithReason,
@@ -141,7 +142,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     actualIssuedOns: BigNumber[],
     actualSigners: string[]
   ) => {
-    expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
+    assertEqualBNArray(actualCountsPerIssuer, expectedCountsPerIssuer)
 
     assert.lengthOf(actualAddresses, expectedAttestations.length)
     assert.lengthOf(actualIssuedOns, expectedAttestations.length)
@@ -371,8 +372,11 @@ contract('FederatedAttestations', (accounts: string[]) => {
       actualCountsPerIssuer: BigNumber[],
       actualIdentifiers: string[]
     ) => {
-      expect(actualCountsPerIssuer.map((count) => count.toNumber())).to.eql(expectedCountsPerIssuer)
-      expect(actualIdentifiers).to.eql(expectedIdentifiers.map((idCase) => idCase.identifier))
+      assertEqualBNArray(actualCountsPerIssuer, expectedCountsPerIssuer)
+      assert.deepEqual(
+        actualIdentifiers,
+        expectedIdentifiers.map((idCase) => idCase.identifier)
+      )
     }
 
     describe('when address has not been registered', () => {
@@ -935,7 +939,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it("should revert when revoking an attestation that doesn't exist", async () => {
       await assertRevertWithReason(
         federatedAttestations.revokeAttestation(identifier1, issuer1, accounts[4]),
-        'Attestion to be revoked does not exist'
+        'Attestation to be revoked does not exist'
       )
     })
 
@@ -1142,7 +1146,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           [account2, account1],
           { from: signer1 }
         ),
-        'Attestion to be revoked does not exist'
+        'Attestation to be revoked does not exist'
       )
     })
   })

@@ -437,6 +437,8 @@ contract FederatedAttestations is
     bytes32[] calldata identifiers,
     address[] calldata accounts
   ) external {
+    // TODO ASv2 Reviewers: we are planning to provide sensible limits in the SDK
+    // to prevent out of gas errors -- is that sufficient or should we limit here as well?
     require(identifiers.length == accounts.length, "Unequal number of identifiers and accounts");
     require(
       issuer == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
@@ -522,6 +524,6 @@ contract FederatedAttestations is
       );
       return;
     }
-    revert("Attestion to be revoked does not exist");
+    revert("Attestation to be revoked does not exist");
   }
 }
