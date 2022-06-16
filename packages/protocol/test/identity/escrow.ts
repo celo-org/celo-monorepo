@@ -92,7 +92,6 @@ contract('Escrow', (accounts: string[]) => {
 
   before(async () => {
     registry = await getDeployedProxiedContract('Registry', artifacts)
-    // Take ownership of the registry contract to point it to the mocks
     if ((await registry.owner()) !== owner) {
       // In CI we need to assume ownership, locally using quicktest we don't
       await assumeOwnership(['Registry'], owner)
