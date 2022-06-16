@@ -47,7 +47,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
 
   const nowUnixTime = Math.floor(Date.now() / 1000)
   // Set lower bound to (now - 1 hour) in seconds
-  const expectedPublishedOnLowerBound = nowUnixTime - 60 * 60
+  const publishedOnLowerBound = nowUnixTime - 60 * 60
 
   const signerRole = keccak256(encodePacked('celo.org/core/attestation'))
   let sig
@@ -339,7 +339,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         checkAgainstExpectedAttestations(
           [issuer1Attestations.length],
           issuer1Attestations,
-          expectedPublishedOnLowerBound,
+          publishedOnLowerBound,
           countsPerIssuer,
           addresses,
           signers,
@@ -381,7 +381,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         checkAgainstExpectedAttestations(
           expectedCountsPerIssuer,
           expectedAttestations,
-          expectedPublishedOnLowerBound,
+          publishedOnLowerBound,
           countsPerIssuer,
           addresses,
           signers,
@@ -689,7 +689,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           publishedOn,
         },
       })
-      assert.isAtLeast(publishedOn.toNumber(), expectedPublishedOnLowerBound)
+      assert.isAtLeast(publishedOn.toNumber(), publishedOnLowerBound)
     })
 
     it('should revert if the attestation is revoked', async () => {
@@ -1117,7 +1117,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
-        expectedPublishedOnLowerBound,
+        publishedOnLowerBound,
         countsPerIssuer1,
         addresses1,
         signers1,
@@ -1134,7 +1134,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [0],
         [],
-        expectedPublishedOnLowerBound,
+        publishedOnLowerBound,
         countsPerIssuer2,
         addresses2,
         signers2,
@@ -1160,7 +1160,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
-        expectedPublishedOnLowerBound,
+        publishedOnLowerBound,
         countsPerIssuer1,
         addresses1,
         signers1,
@@ -1177,7 +1177,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [0],
         [],
-        expectedPublishedOnLowerBound,
+        publishedOnLowerBound,
         countsPerIssuer2,
         addresses2,
         signers2,
@@ -1203,7 +1203,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [1],
         [{ account: account2, issuedOn: nowUnixTime, signer: signer2 }],
-        expectedPublishedOnLowerBound,
+        publishedOnLowerBound,
         countsPerIssuer1,
         addresses1,
         signers1,
@@ -1220,7 +1220,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       checkAgainstExpectedAttestations(
         [0],
         [],
-        expectedPublishedOnLowerBound,
+        publishedOnLowerBound,
         countsPerIssuer2,
         addresses2,
         signers2,
