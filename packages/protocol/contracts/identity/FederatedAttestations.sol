@@ -83,7 +83,7 @@ contract FederatedAttestations is
   /**
    * @notice Sets the EIP712 domain separator for the Celo FederatedAttestations abstraction.
    */
-  function setEip712DomainSeparator() public {
+  function setEip712DomainSeparator() external {
     uint256 chainId;
     assembly {
       chainId := chainid
@@ -109,253 +109,6 @@ contract FederatedAttestations is
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
-  }
-
-  /**
-   * @notice Helper function for _lookupAttestations to calculate the
-             total number of attestations completed for an identifier
-             by each trusted issuer
-   * @param identifier Hash of the identifier
-   * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @return [0] Sum total of attestations found
-   *         [1] Array of number of attestations found per issuer
-   */
-  function getNumAttestations(bytes32 identifier, address[] memory trustedIssuers)
-    internal
-    view
-    returns (uint256, uint256[] memory)
-  {
-    uint256 totalAttestations = 0;
-    uint256 numAttestationsForIssuer;
-    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
-
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      numAttestationsForIssuer = identifierToAttestations[identifier][trustedIssuers[i]].length;
-      totalAttestations = totalAttestations.add(numAttestationsForIssuer);
-      countsPerIssuer[i] = numAttestationsForIssuer;
-    }
-    return (totalAttestations, countsPerIssuer);
-  }
-
-  /**
-   * @notice Returns info about up to `maxAttestations` attestations for
-   *   `identifier` produced by signers of `trustedIssuers`
-   * @param identifier Hash of the identifier
-   * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @return [0] Array of number of attestations returned per issuer
-   * @return [1 - 4] for m (== sum([0])) found attestations:
-   *         [
-   *           Array of m accounts,
-   *           Array of m signers,
-   *           Array of m issuedOns,
-   *           Array of m publishedOns
-   *         ]; index corresponds to the same attestation
-   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
-   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
-   */
-  // TODO reviewers: is it preferable to return an array of `trustedIssuer` indices
-  // (indicating issuer per attestation) instead of counts per attestation?
-  function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
-    external
-    view
-    returns (uint256[] memory, address[] memory, address[] memory, uint64[] memory, uint64[] memory)
-  {
-    // TODO reviewers: this is to get around a stack too deep error;
-    // are there better ways of dealing with this?
-    uint256[] memory countsPerIssuer;
-    uint256 totalAttestations;
-    (totalAttestations, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
-    // solhint-disable-next-line max-line-length
-    (address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = _lookupAttestations(
-      identifier,
-      trustedIssuers,
-      totalAttestations
-    );
-    return (countsPerIssuer, accounts, signers, issuedOns, publishedOns);
-  }
-
-  /**
-   * @notice Helper function for lookupAttestations to get around stack too deep
-   * @param identifier Hash of the identifier
-   * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @return [0 - 3] for m (== sum([0])) found attestations:
-   *         [
-   *           Array of m accounts,
-   *           Array of m signers,
-   *           Array of m issuedOns,
-   *           Array of m publishedOns
-   *         ]; index corresponds to the same attestation
-   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
-   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
-   */
-  function _lookupAttestations(
-    bytes32 identifier,
-    address[] memory trustedIssuers,
-    uint256 totalAttestations
-  ) internal view returns (address[] memory, address[] memory, uint64[] memory, uint64[] memory) {
-    address[] memory accounts = new address[](totalAttestations);
-    address[] memory signers = new address[](totalAttestations);
-    uint64[] memory issuedOns = new uint64[](totalAttestations);
-    uint64[] memory publishedOns = new uint64[](totalAttestations);
-
-    OwnershipAttestation[] memory attestationsPerIssuer;
-    // Reset this and use as current index to get around stack-too-deep
-    // TODO reviewers: is it preferable to pack two uint256 counters into a struct
-    // and use one for total (above) & one for currIndex (below)?
-    totalAttestations = 0;
-
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
-      for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
-        accounts[totalAttestations] = attestationsPerIssuer[j].account;
-        signers[totalAttestations] = attestationsPerIssuer[j].signer;
-        issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
-        publishedOns[totalAttestations] = attestationsPerIssuer[j].publishedOn;
-        totalAttestations = totalAttestations.add(1);
-      }
-    }
-    return (accounts, signers, issuedOns, publishedOns);
-  }
-
-  /**
-   * @notice Helper function for lookupIdentifiers to calculate the
-             total number of identifiers completed for an identifier
-             by each trusted issuer
-   * @param account Address of the account
-   * @param trustedIssuers Array of n issuers whose identifiers will be included
-   * @return [0] Sum total of identifiers found
-   *         [1] Array of number of identifiers found per issuer
-   */
-  function getNumIdentifiers(address account, address[] memory trustedIssuers)
-    internal
-    view
-    returns (uint256, uint256[] memory)
-  {
-    uint256 totalIdentifiers = 0;
-    uint256 numIdentifiersForIssuer;
-    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
-
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      numIdentifiersForIssuer = addressToIdentifiers[account][trustedIssuers[i]].length;
-      totalIdentifiers = totalIdentifiers.add(numIdentifiersForIssuer);
-      countsPerIssuer[i] = numIdentifiersForIssuer;
-    }
-    return (totalIdentifiers, countsPerIssuer);
-  }
-
-  /**
-   * @notice Returns up to `maxIdentifiers` identifiers mapped to `account`
-   *   by signers of `trustedIssuers`
-   * @param account Address of the account
-   * @param trustedIssuers Array of n issuers whose identifier mappings will be used
-   * @return [0] Array of number of identifiers returned per issuer
-   * @return [1] Array (length == sum([0])) of identifiers
-   * @dev Adds identifier info to the arrays in order of provided trustedIssuers
-   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
-   */
-  function lookupIdentifiers(address account, address[] calldata trustedIssuers)
-    external
-    view
-    returns (uint256[] memory, bytes32[] memory)
-  {
-    uint256 totalIdentifiers;
-    uint256[] memory countsPerIssuer;
-
-    (totalIdentifiers, countsPerIssuer) = getNumIdentifiers(account, trustedIssuers);
-
-    bytes32[] memory identifiers = new bytes32[](totalIdentifiers);
-    bytes32[] memory identifiersPerIssuer;
-
-    uint256 currIndex = 0;
-
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
-      for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
-        identifiers[currIndex] = identifiersPerIssuer[j];
-        currIndex = currIndex.add(1);
-      }
-    }
-    return (countsPerIssuer, identifiers);
-  }
-
-  /**
-   * @notice Validates the given attestation and signature
-   * @param identifier Hash of the identifier to be attested
-   * @param issuer Address of the attestation issuer
-   * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
-   * @param signer Address of the signer of the attestation
-   * @param v The recovery id of the incoming ECDSA signature
-   * @param r Output value r of the ECDSA signature
-   * @param s Output value s of the ECDSA signature
-   * @dev Throws if attestation has been revoked
-   * @dev Throws if signer is not an authorized AttestationSigner of the issuer
-   */
-  function validateAttestationSig(
-    bytes32 identifier,
-    address issuer,
-    address account,
-    address signer,
-    uint64 issuedOn,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) public view {
-    require(
-      getAccounts().attestationSignerToAccount(signer) == issuer,
-      "Signer is not a currently authorized AttestationSigner for the issuer"
-    );
-    bytes32 structHash = keccak256(
-      abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
-    );
-    address guessedSigner = Signatures.getSignerOfTypedDataHash(
-      eip712DomainSeparator,
-      structHash,
-      v,
-      r,
-      s
-    );
-    require(guessedSigner == signer, "Signature is invalid");
-  }
-
-  /**
-   * @notice Registers an attestation
-   * @param identifier Hash of the identifier to be attested
-   * @param issuer Address of the attestation issuer
-   * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
-   * @param signer Address of the signer of the attestation
-   */
-  function _registerAttestation(
-    bytes32 identifier,
-    address issuer,
-    address account,
-    address signer,
-    uint64 issuedOn
-  ) private {
-    require(
-      !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
-      "Attestation has been revoked"
-    );
-    for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
-      // This enforces only one attestation to be uploaded
-      // for a given set of (identifier, issuer, account)
-      // Editing/upgrading an attestation requires that it be revoked before a new one is registered
-      require(
-        identifierToAttestations[identifier][issuer][i].account != account,
-        "Attestation for this account already exists"
-      );
-    }
-    uint64 publishedOn = uint64(block.timestamp);
-    OwnershipAttestation memory attestation = OwnershipAttestation(
-      account,
-      signer,
-      issuedOn,
-      publishedOn
-    );
-    identifierToAttestations[identifier][issuer].push(attestation);
-    addressToIdentifiers[account][issuer].push(identifier);
-    emit AttestationRegistered(identifier, issuer, account, signer, issuedOn, publishedOn);
   }
 
   /**
@@ -451,6 +204,118 @@ contract FederatedAttestations is
     }
   }
 
+  /**
+   * @notice Returns info about up to `maxAttestations` attestations for
+   *   `identifier` produced by signers of `trustedIssuers`
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @return [0] Array of number of attestations returned per issuer
+   * @return [1 - 4] for m (== sum([0])) found attestations:
+   *         [
+   *           Array of m accounts,
+   *           Array of m signers,
+   *           Array of m issuedOns,
+   *           Array of m publishedOns
+   *         ]; index corresponds to the same attestation
+   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
+   */
+  // TODO reviewers: is it preferable to return an array of `trustedIssuer` indices
+  // (indicating issuer per attestation) instead of counts per attestation?
+  function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
+    external
+    view
+    returns (uint256[] memory, address[] memory, address[] memory, uint64[] memory, uint64[] memory)
+  {
+    // TODO reviewers: this is to get around a stack too deep error;
+    // are there better ways of dealing with this?
+    uint256[] memory countsPerIssuer;
+    uint256 totalAttestations;
+    (totalAttestations, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
+    // solhint-disable-next-line max-line-length
+    (address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = _lookupAttestations(
+      identifier,
+      trustedIssuers,
+      totalAttestations
+    );
+    return (countsPerIssuer, accounts, signers, issuedOns, publishedOns);
+  }
+
+  /**
+   * @notice Returns up to `maxIdentifiers` identifiers mapped to `account`
+   *   by signers of `trustedIssuers`
+   * @param account Address of the account
+   * @param trustedIssuers Array of n issuers whose identifier mappings will be used
+   * @return [0] Array of number of identifiers returned per issuer
+   * @return [1] Array (length == sum([0])) of identifiers
+   * @dev Adds identifier info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
+   */
+  function lookupIdentifiers(address account, address[] calldata trustedIssuers)
+    external
+    view
+    returns (uint256[] memory, bytes32[] memory)
+  {
+    uint256 totalIdentifiers;
+    uint256[] memory countsPerIssuer;
+
+    (totalIdentifiers, countsPerIssuer) = getNumIdentifiers(account, trustedIssuers);
+
+    bytes32[] memory identifiers = new bytes32[](totalIdentifiers);
+    bytes32[] memory identifiersPerIssuer;
+
+    uint256 currIndex = 0;
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      identifiersPerIssuer = addressToIdentifiers[account][trustedIssuers[i]];
+      for (uint256 j = 0; j < identifiersPerIssuer.length; j = j.add(1)) {
+        identifiers[currIndex] = identifiersPerIssuer[j];
+        currIndex = currIndex.add(1);
+      }
+    }
+    return (countsPerIssuer, identifiers);
+  }
+
+  /**
+   * @notice Validates the given attestation and signature
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param signer Address of the signer of the attestation
+   * @param v The recovery id of the incoming ECDSA signature
+   * @param r Output value r of the ECDSA signature
+   * @param s Output value s of the ECDSA signature
+   * @dev Throws if attestation has been revoked
+   * @dev Throws if signer is not an authorized AttestationSigner of the issuer
+   */
+  function validateAttestationSig(
+    bytes32 identifier,
+    address issuer,
+    address account,
+    address signer,
+    uint64 issuedOn,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) public view {
+    require(
+      getAccounts().attestationSignerToAccount(signer) == issuer,
+      "Signer is not a currently authorized AttestationSigner for the issuer"
+    );
+    bytes32 structHash = keccak256(
+      abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
+    );
+    address guessedSigner = Signatures.getSignerOfTypedDataHash(
+      eip712DomainSeparator,
+      structHash,
+      v,
+      r,
+      s
+    );
+    require(guessedSigner == signer, "Signature is invalid");
+  }
+
   function getUniqueAttestationHash(
     bytes32 identifier,
     address issuer,
@@ -459,6 +324,141 @@ contract FederatedAttestations is
     uint64 issuedOn
   ) public pure returns (bytes32) {
     return keccak256(abi.encode(identifier, issuer, account, signer, issuedOn));
+  }
+
+  /**
+   * @notice Helper function for lookupAttestations to get around stack too deep
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @return [0 - 3] for m (== sum([0])) found attestations:
+   *         [
+   *           Array of m accounts,
+   *           Array of m signers,
+   *           Array of m issuedOns,
+   *           Array of m publishedOns
+   *         ]; index corresponds to the same attestation
+   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
+   */
+  function _lookupAttestations(
+    bytes32 identifier,
+    address[] memory trustedIssuers,
+    uint256 totalAttestations
+  ) internal view returns (address[] memory, address[] memory, uint64[] memory, uint64[] memory) {
+    address[] memory accounts = new address[](totalAttestations);
+    address[] memory signers = new address[](totalAttestations);
+    uint64[] memory issuedOns = new uint64[](totalAttestations);
+    uint64[] memory publishedOns = new uint64[](totalAttestations);
+
+    OwnershipAttestation[] memory attestationsPerIssuer;
+    // Reset this and use as current index to get around stack-too-deep
+    // TODO reviewers: is it preferable to pack two uint256 counters into a struct
+    // and use one for total (above) & one for currIndex (below)?
+    totalAttestations = 0;
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
+      for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
+        accounts[totalAttestations] = attestationsPerIssuer[j].account;
+        signers[totalAttestations] = attestationsPerIssuer[j].signer;
+        issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
+        publishedOns[totalAttestations] = attestationsPerIssuer[j].publishedOn;
+        totalAttestations = totalAttestations.add(1);
+      }
+    }
+    return (accounts, signers, issuedOns, publishedOns);
+  }
+
+  /**
+   * @notice Helper function for lookupIdentifiers to calculate the
+             total number of identifiers completed for an identifier
+             by each trusted issuer
+   * @param account Address of the account
+   * @param trustedIssuers Array of n issuers whose identifiers will be included
+   * @return [0] Sum total of identifiers found
+   *         [1] Array of number of identifiers found per issuer
+   */
+  function getNumIdentifiers(address account, address[] memory trustedIssuers)
+    internal
+    view
+    returns (uint256, uint256[] memory)
+  {
+    uint256 totalIdentifiers = 0;
+    uint256 numIdentifiersForIssuer;
+    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      numIdentifiersForIssuer = addressToIdentifiers[account][trustedIssuers[i]].length;
+      totalIdentifiers = totalIdentifiers.add(numIdentifiersForIssuer);
+      countsPerIssuer[i] = numIdentifiersForIssuer;
+    }
+    return (totalIdentifiers, countsPerIssuer);
+  }
+
+  /**
+   * @notice Helper function for _lookupAttestations to calculate the
+             total number of attestations completed for an identifier
+             by each trusted issuer
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @return [0] Sum total of attestations found
+   *         [1] Array of number of attestations found per issuer
+   */
+  function getNumAttestations(bytes32 identifier, address[] memory trustedIssuers)
+    internal
+    view
+    returns (uint256, uint256[] memory)
+  {
+    uint256 totalAttestations = 0;
+    uint256 numAttestationsForIssuer;
+    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      numAttestationsForIssuer = identifierToAttestations[identifier][trustedIssuers[i]].length;
+      totalAttestations = totalAttestations.add(numAttestationsForIssuer);
+      countsPerIssuer[i] = numAttestationsForIssuer;
+    }
+    return (totalAttestations, countsPerIssuer);
+  }
+
+  /**
+   * @notice Registers an attestation
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time 
+   * @param signer Address of the signer of the attestation
+   */
+  function _registerAttestation(
+    bytes32 identifier,
+    address issuer,
+    address account,
+    address signer,
+    uint64 issuedOn
+  ) private {
+    require(
+      !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
+      "Attestation has been revoked"
+    );
+    for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
+      // This enforces only one attestation to be uploaded
+      // for a given set of (identifier, issuer, account)
+      // Editing/upgrading an attestation requires that it be revoked before a new one is registered
+      require(
+        identifierToAttestations[identifier][issuer][i].account != account,
+        "Attestation for this account already exists"
+      );
+    }
+    uint64 publishedOn = uint64(block.timestamp);
+    OwnershipAttestation memory attestation = OwnershipAttestation(
+      account,
+      signer,
+      issuedOn,
+      publishedOn
+    );
+    identifierToAttestations[identifier][issuer].push(attestation);
+    addressToIdentifiers[account][issuer].push(identifier);
+    emit AttestationRegistered(identifier, issuer, account, signer, issuedOn, publishedOn);
   }
 
   /**
