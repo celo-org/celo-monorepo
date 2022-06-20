@@ -1,0 +1,116 @@
+0xeae57ce9cc1984f202e15e038b964bb8bdf7229a
+0xeae57ce9cc1984f202e15e038b964bb8bdf7229a
+POST /wallet/merchant/v2/payments/partner/data HTTP/1.1
+Host: sandbox.test-simplexcc.com
+Content-Type: application/json
+Authorization: ApiKey XXXXXXXX
+
+{
+	"account_details": {
+		"app_provider_id": "partner_name",
+		"app_version_id": "1.3.1",
+		"app_end_user_id": "11b111d1-161e-32d9-6bda-8dd2b5c8af17",
+		"app_install_date": "2018-01-03T15:23:12Z",
+        "email": "example.cohen@simplex.com",
+        "phone":"+972509123456",
+		"signup_login": {
+			"location": "36.848460,-174.763332",
+			"uaid": "IBAnKPg1bdxRiT6EDkIgo24Ri8akYQpsITRKIueg+3XjxWqZlmXin7YJtQzuY4K73PWTZOvmuhIHu + ee8m4Cs4WLEqd2SvQS9jW59pMDcYu + Tpl16U / Ss3SrcFKnriEn4VUVKG9QnpAJGYB3JUAPx1y7PbAugNoC8LX0Daqg66E = ",AR 
+			"accept_language": "de,en-US;q=0.7,en;q=0.3",
+			"http_accept_language": "de,en-US;q=0.7,en;q=0.3",
+			"user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0",
+			"cookie_session_id": "7r7rz_VfGC_viXTp5XPh5Bm--rWM6RyU",
+			"timestamp": "2018-01-15T09:27:34.431Z",
+            "ip": "176.12.200.206"
+		}
+	},
+	"transaction_details": {
+		"payment_details": {
+            "quote_id": "1111cb8e-98fe-4808-b275-ade81ff95d08",
+            "payment_id": "2222cb8e-98fe-4808-b275-ade81ff95d08",
+            "order_id": "609b9976-5617-4513-9560-dcfe68b2330b",
+            "destination_wallet": {
+                "currency": "BTC",
+                "address": "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
+                "tag": ""
+            },
+            "original_http_ref_url": "https://www.partner.com/"
+        }
+	}
+
+POST /wallet/merchant/v2/payments/partner/data HTTP/1.1
+Host: sandbox.test-simplexcc.com
+Content-Type: application/json
+Authorization: ApiKey XXXXXXXX
+
+{
+	"account_details": {
+		"app_provider_id": "partner_name",
+		"app_version_id": "1.3.1",
+		"app_end_user_id": "11b111d1-161e-32d9-6bda-8dd2b5c8af17",
+		"app_install_date": "2018-01-03T15:23:12Z",
+        "email": "example.cohen@simplex.com",
+        "phone":"+972509123456",
+		"signup_login": {
+			"location": "36.848460,-174.763332",
+			"uaid": "IBAnKPg1bdxRiT6EDkIgo24Ri8akYQpsITRKIueg+3XjxWqZlmXin7YJtQzuY4K73PWTZOvmuhIHu + ee8m4Cs4WLEqd2SvQS9jW59pMDcYu + Tpl16U / Ss3SrcFKnriEn4VUVKG9QnpAJGYB3JUAPx1y7PbAugNoC8LX0Daqg66E = ",
+			"accept_language": "de,en-US;q=0.7,en;q=0.3",
+			"http_accept_language": "de,en-US;q=0.7,en;q=0.3",
+			"user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0",
+			"cookie_session_id": "7r7rz_VfGC_viXTp5XPh5Bm--rWM6RyU",
+			"timestamp": "2018-01-15T09:27:34.431Z",
+            "ip": "176.12.200.206"
+		}
+	},
+	"transaction_details": {
+		"payment_details": {
+            "quote_id": "1111cb8e-98fe-4808-b275-ade81ff95d08",
+            "payment_id": "2222cb8e-98fe-4808-b275-ade81ff95d08",
+            "order_id": "609b9976-5617-4513-9560-dcfe68b2330b",
+            "destination_wallet": {
+                "currency": "BTC",
+                "address": "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
+                "tag": ""
+            },
+            "original_http_ref_url": "https://www.partner.com/"
+        }
+	}
+} html>
+<body>
+<form id="payment_form" action="https://sandbox.test-simplexcc.com/payments/new" method="post">
+<input type="hidden" name="version" value="1">
+<input type="hidden" name="partner" value="partner_name">
+<input type="hidden" name="payment_flow_type" value="wallet">
+<input type="hidden" name="return_url_success" value="https://www.partner.com">
+<input type="hidden" name="return_url_fail" value="https://www.partner.com/support">
+<input type="hidden" name="payment_id" value="2222cb8e-98fe-4808-b275-ade81ff95d08">
+</form>
+
+<script type="text/javascript">
+document.forms["payment_form"].submit();
+</script>
+
+</body>
+
+<!-- Sandbox Example -->
+------------------------
+<head>
+    <script>
+        window.simplexAsyncFunction = function () {
+            Simplex.init({public_key: '<partner_public_key>'})
+        };
+    </script>
+    <script src="https://cdn.test-simplexcc.com/sdk/v1/js/sdk.js" async></script>
+</head>
+======================================================================================
+<!-- Production Example -->
+---------------------------
+<head>
+    <script>
+        window.simplexAsyncFunction = function () {
+            Simplex.init({public_key: '<partner_public_key>'})
+        };
+    </script>
+    <script src="https://cdn.simplex.com/sdk/v1/js/sdk.js" async></script>
+</head>
+
