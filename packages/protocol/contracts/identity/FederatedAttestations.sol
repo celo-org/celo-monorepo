@@ -34,6 +34,13 @@ contract FederatedAttestations is
     // using uint64 to allow for extra space to add parameters
   }
 
+  struct AttestationLookupValues {
+    address[] accounts;
+    address[] signers;
+    uint64[] issuedOns;
+    uint64[] publishedOns;
+  }
+
   // TODO ASv2 revisit linting issues & all solhint-disable-next-line max-line-length
 
   // identifier -> issuer -> attestations
@@ -225,18 +232,30 @@ contract FederatedAttestations is
     view
     returns (uint256[] memory, address[] memory, address[] memory, uint64[] memory, uint64[] memory)
   {
-    // TODO reviewers: this is to get around a stack too deep error;
-    // are there better ways of dealing with this?
     uint256[] memory countsPerIssuer;
     uint256 totalAttestations;
     (totalAttestations, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
-    // solhint-disable-next-line max-line-length
-    (address[] memory accounts, address[] memory signers, uint64[] memory issuedOns, uint64[] memory publishedOns) = _lookupAttestations(
-      identifier,
-      trustedIssuers,
-      totalAttestations
+    AttestationLookupValues memory res = AttestationLookupValues(
+      new address[](totalAttestations),
+      new address[](totalAttestations),
+      new uint64[](totalAttestations),
+      new uint64[](totalAttestations)
     );
-    return (countsPerIssuer, accounts, signers, issuedOns, publishedOns);
+
+    totalAttestations = 0;
+    OwnershipAttestation[] memory attestationsPerIssuer;
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
+      for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
+        res.accounts[totalAttestations] = attestationsPerIssuer[j].account;
+        res.signers[totalAttestations] = attestationsPerIssuer[j].signer;
+        res.issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
+        res.publishedOns[totalAttestations] = attestationsPerIssuer[j].publishedOn;
+        totalAttestations = totalAttestations.add(1);
+      }
+    }
+    return (countsPerIssuer, res.accounts, res.signers, res.issuedOns, res.publishedOns);
   }
 
   /**
@@ -324,47 +343,6 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for lookupAttestations to get around stack too deep
-   * @param identifier Hash of the identifier
-   * @param trustedIssuers Array of n issuers whose attestations will be included
-   *         For m (== sum([0])) found attestations: 
-   * @return accounts Array of m accounts 
-   * @return signers Array of m signers
-   * @return issuedOns Array of m issuedOns
-   * @return publishedOns Array of m publishedOns
-   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
-   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
-   */
-  function _lookupAttestations(
-    bytes32 identifier,
-    address[] memory trustedIssuers,
-    uint256 totalAttestations
-  ) internal view returns (address[] memory, address[] memory, uint64[] memory, uint64[] memory) {
-    address[] memory accounts = new address[](totalAttestations);
-    address[] memory signers = new address[](totalAttestations);
-    uint64[] memory issuedOns = new uint64[](totalAttestations);
-    uint64[] memory publishedOns = new uint64[](totalAttestations);
-
-    OwnershipAttestation[] memory attestationsPerIssuer;
-    // Reset this and use as current index to get around stack-too-deep
-    // TODO reviewers: is it preferable to pack two uint256 counters into a struct
-    // and use one for total (above) & one for currIndex (below)?
-    totalAttestations = 0;
-
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
-      for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
-        accounts[totalAttestations] = attestationsPerIssuer[j].account;
-        signers[totalAttestations] = attestationsPerIssuer[j].signer;
-        issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
-        publishedOns[totalAttestations] = attestationsPerIssuer[j].publishedOn;
-        totalAttestations = totalAttestations.add(1);
-      }
-    }
-    return (accounts, signers, issuedOns, publishedOns);
-  }
-
-  /**
    * @notice Helper function for lookupIdentifiers to calculate the
              total number of identifiers completed for an identifier
              by each trusted issuer
@@ -391,7 +369,7 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for _lookupAttestations to calculate the
+   * @notice Helper function for lookupAttestations to calculate the
              total number of attestations completed for an identifier
              by each trusted issuer
    * @param identifier Hash of the identifier
