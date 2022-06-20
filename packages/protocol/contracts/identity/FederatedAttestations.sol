@@ -83,7 +83,7 @@ contract FederatedAttestations is
   /**
    * @notice Sets the EIP712 domain separator for the Celo FederatedAttestations abstraction.
    */
-  function setEip712DomainSeparator() external {
+  function setEip712DomainSeparator() internal {
     uint256 chainId;
     assembly {
       chainId := chainid
