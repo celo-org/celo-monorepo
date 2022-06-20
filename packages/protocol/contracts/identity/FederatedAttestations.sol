@@ -43,7 +43,7 @@ contract FederatedAttestations is
   // unique attestation hash -> isRevoked
   mapping(bytes32 => bool) public revokedAttestations;
 
-  bytes32 public constant EIP712_VALIDATE_ATTESTATION_TYPEHASH = keccak256(
+  bytes32 public constant EIP712_OWNERSHIP_ATTESTATION_TYPEHASH = keccak256(
     "OwnershipAttestation(bytes32 identifier,address issuer,address account,uint64 issuedOn)"
   );
   bytes32 public eip712DomainSeparator;
@@ -205,18 +205,16 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Returns info about up to `maxAttestations` attestations for
-   *   `identifier` produced by signers of `trustedIssuers`
+   * @notice Returns info about attestations for `identifier` produced by 
+   *    signers of `trustedIssuers`
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @return [0] Array of number of attestations returned per issuer
-   * @return [1 - 4] for m (== sum([0])) found attestations:
-   *         [
-   *           Array of m accounts,
-   *           Array of m signers,
-   *           Array of m issuedOns,
-   *           Array of m publishedOns
-   *         ]; index corresponds to the same attestation
+   * @return countsPerIssuer Array of number of attestations returned per issuer
+   *          For m (== sum([0])) found attestations: 
+   * @return accounts Array of m accounts 
+   * @return signers Array of m signers
+   * @return issuedOns Array of m issuedOns
+   * @return publishedOns Array of m publishedOns
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
@@ -242,12 +240,11 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Returns up to `maxIdentifiers` identifiers mapped to `account`
-   *   by signers of `trustedIssuers`
+   * @notice Returns identifiers mapped to `account` by signers of `trustedIssuers`
    * @param account Address of the account
    * @param trustedIssuers Array of n issuers whose identifier mappings will be used
-   * @return [0] Array of number of identifiers returned per issuer
-   * @return [1] Array (length == sum([0])) of identifiers
+   * @return countsPerIssuer Array of number of identifiers returned per issuer
+   * @return identifiers Array (length == sum([0])) of identifiers
    * @dev Adds identifier info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
@@ -304,7 +301,7 @@ contract FederatedAttestations is
       "Signer is not a currently authorized AttestationSigner for the issuer"
     );
     bytes32 structHash = keccak256(
-      abi.encode(EIP712_VALIDATE_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
+      abi.encode(EIP712_OWNERSHIP_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
     );
     address guessedSigner = Signatures.getSignerOfTypedDataHash(
       eip712DomainSeparator,
@@ -330,13 +327,11 @@ contract FederatedAttestations is
    * @notice Helper function for lookupAttestations to get around stack too deep
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @return [0 - 3] for m (== sum([0])) found attestations:
-   *         [
-   *           Array of m accounts,
-   *           Array of m signers,
-   *           Array of m issuedOns,
-   *           Array of m publishedOns
-   *         ]; index corresponds to the same attestation
+   *         For m (== sum([0])) found attestations: 
+   * @return accounts Array of m accounts 
+   * @return signers Array of m signers
+   * @return issuedOns Array of m issuedOns
+   * @return publishedOns Array of m publishedOns
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
@@ -375,8 +370,8 @@ contract FederatedAttestations is
              by each trusted issuer
    * @param account Address of the account
    * @param trustedIssuers Array of n issuers whose identifiers will be included
-   * @return [0] Sum total of identifiers found
-   *         [1] Array of number of identifiers found per issuer
+   * @return totalIdentifiers Sum total of identifiers found
+   * @return countsPerIssuer Array of number of identifiers found per issuer
    */
   function getNumIdentifiers(address account, address[] memory trustedIssuers)
     internal
@@ -401,8 +396,8 @@ contract FederatedAttestations is
              by each trusted issuer
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @return [0] Sum total of attestations found
-   *         [1] Array of number of attestations found per issuer
+   * @return totalAttestations Sum total of attestations found
+   * @return countsPerIssuer Array of number of attestations found per issuer
    */
   function getNumAttestations(bytes32 identifier, address[] memory trustedIssuers)
     internal
@@ -509,10 +504,8 @@ contract FederatedAttestations is
         attestation.signer,
         attestation.issuedOn
       );
-      // Should never be able to re-revoke an attestation
       // TODO reviewers: removing this storage lookup saves about 20k gas
       // for 100 batch-deleted attestations
-      assert(!revokedAttestations[attestationHash]);
       revokedAttestations[attestationHash] = true;
 
       emit AttestationRevoked(
