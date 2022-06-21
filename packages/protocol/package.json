@@ -42,7 +42,8 @@
     "truffle:migrate": "truffle migrate",
     "devchain": "ts-node scripts/devchain.ts",
     "set-exchange-rate": "./scripts/bash/set_exchange_rate.sh",
-    "view-tags": "git for-each-ref 'refs/tags/core-contracts.*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'"
+    "view-tags": "git for-each-ref 'refs/tags/core-contracts.*' --sort=-committerdate --format='%(color:magenta)%(committerdate:short) %(color:blue)%(tree) %(color:green)github.com/celo-org/celo-monorepo/releases/tag/%(color:yellow)%(refname:short)'",
+    "generate-stabletoken-files": "ts-node ./scripts/generate-stabletoken-files.ts"
   },
   "dependencies": {
     "@0x/sol-compiler": "^3.1.11",

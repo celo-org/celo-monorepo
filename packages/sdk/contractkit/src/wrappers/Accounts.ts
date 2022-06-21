@@ -324,6 +324,14 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     )
   }
 
+  /**
+   * Removes the currently authorized attestation signer for the account
+   * @returns A CeloTransactionObject
+   */
+  async removeAttestationSigner(): Promise<CeloTransactionObject<void>> {
+    return toTransactionObject(this.connection, this.contract.methods.removeAttestationSigner())
+  }
+
   async generateProofOfKeyPossession(account: Address, signer: Address) {
     return this.getParsedSignatureOfAddress(
       account,
