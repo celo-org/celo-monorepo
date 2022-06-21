@@ -477,8 +477,6 @@ contract FederatedAttestations is
         attestation.signer,
         attestation.issuedOn
       );
-      // TODO reviewers: removing this storage lookup saves about 20k gas
-      // for 100 batch-deleted attestations
       revokedAttestations[attestationHash] = true;
 
       emit AttestationRevoked(
