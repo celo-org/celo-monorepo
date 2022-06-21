@@ -73,42 +73,19 @@ contract FederatedAttestations is
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   */
-  function initialize() external initializer {
-    _transferOwnership(msg.sender);
-    setEip712DomainSeparator();
-  }
-
-  /**
-   * @notice Sets the EIP712 domain separator for the Celo FederatedAttestations abstraction.
-   */
-  function setEip712DomainSeparator() internal {
-    uint256 chainId;
-    assembly {
-      chainId := chainid
-    }
-
-    eip712DomainSeparator = keccak256(
-      abi.encode(
-        keccak256(
-          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-        ),
-        keccak256(bytes("FederatedAttestations")),
-        keccak256("1.0"),
-        chainId,
-        address(this)
-      )
-    );
-    emit EIP712DomainSeparatorSet(eip712DomainSeparator);
-  }
-
-  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
+  }
+
+  /**
+   * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   */
+  function initialize() external initializer {
+    _transferOwnership(msg.sender);
+    setEip712DomainSeparator();
   }
 
   /**
@@ -338,29 +315,26 @@ contract FederatedAttestations is
   }
 
   /**
-   * @notice Helper function for lookupIdentifiers to calculate the
-             total number of identifiers completed for an identifier
-             by each trusted issuer
-   * @param account Address of the account
-   * @param trustedIssuers Array of n issuers whose identifiers will be included
-   * @return totalIdentifiers Sum total of identifiers found
-   * @return countsPerIssuer Array of number of identifiers found per issuer
+   * @notice Sets the EIP712 domain separator for the Celo FederatedAttestations abstraction.
    */
-  function getNumIdentifiers(address account, address[] memory trustedIssuers)
-    internal
-    view
-    returns (uint256 totalIdentifiers, uint256[] memory countsPerIssuer)
-  {
-    totalIdentifiers = 0;
-    uint256 numIdentifiersForIssuer;
-    countsPerIssuer = new uint256[](trustedIssuers.length);
-
-    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
-      numIdentifiersForIssuer = addressToIdentifiers[account][trustedIssuers[i]].length;
-      totalIdentifiers = totalIdentifiers.add(numIdentifiersForIssuer);
-      countsPerIssuer[i] = numIdentifiersForIssuer;
+  function setEip712DomainSeparator() internal {
+    uint256 chainId;
+    assembly {
+      chainId := chainid
     }
-    return (totalIdentifiers, countsPerIssuer);
+
+    eip712DomainSeparator = keccak256(
+      abi.encode(
+        keccak256(
+          "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        ),
+        keccak256(bytes("FederatedAttestations")),
+        keccak256("1.0"),
+        chainId,
+        address(this)
+      )
+    );
+    emit EIP712DomainSeparatorSet(eip712DomainSeparator);
   }
 
   /**
@@ -387,6 +361,32 @@ contract FederatedAttestations is
       countsPerIssuer[i] = numAttestationsForIssuer;
     }
     return (totalAttestations, countsPerIssuer);
+  }
+
+  /**
+   * @notice Helper function for lookupIdentifiers to calculate the
+             total number of identifiers completed for an identifier
+             by each trusted issuer
+   * @param account Address of the account
+   * @param trustedIssuers Array of n issuers whose identifiers will be included
+   * @return totalIdentifiers Sum total of identifiers found
+   * @return countsPerIssuer Array of number of identifiers found per issuer
+   */
+  function getNumIdentifiers(address account, address[] memory trustedIssuers)
+    internal
+    view
+    returns (uint256 totalIdentifiers, uint256[] memory countsPerIssuer)
+  {
+    totalIdentifiers = 0;
+    uint256 numIdentifiersForIssuer;
+    countsPerIssuer = new uint256[](trustedIssuers.length);
+
+    for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
+      numIdentifiersForIssuer = addressToIdentifiers[account][trustedIssuers[i]].length;
+      totalIdentifiers = totalIdentifiers.add(numIdentifiersForIssuer);
+      countsPerIssuer[i] = numIdentifiersForIssuer;
+    }
+    return (totalIdentifiers, countsPerIssuer);
   }
 
   /**
