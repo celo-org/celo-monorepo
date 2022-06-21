@@ -1,7 +1,7 @@
+import { OdisUtils } from '@celo/identity/lib/odis'
+import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import { ensureLeading0x } from '@celo/utils/lib/address'
 import 'isomorphic-fetch'
-import { OdisUtils } from '../../../../sdk/identity/lib/odis'
-import { ErrorMessages } from '../../../../sdk/identity/lib/odis/query'
 import { E2E_TEST_ACCOUNTS, E2E_TEST_PHONE_NUMBERS_RAW } from '../../src/config'
 import {
   ACCOUNT_ADDRESS,
