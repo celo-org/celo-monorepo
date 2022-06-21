@@ -34,13 +34,6 @@ contract FederatedAttestations is
     // using uint64 to allow for extra space to add parameters
   }
 
-  struct AttestationLookupValues {
-    address[] accounts;
-    address[] signers;
-    uint64[] issuedOns;
-    uint64[] publishedOns;
-  }
-
   // TODO ASv2 revisit linting issues & all solhint-disable-next-line max-line-length
 
   // identifier -> issuer -> attestations
@@ -230,17 +223,21 @@ contract FederatedAttestations is
   function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
     external
     view
-    returns (uint256[] memory, address[] memory, address[] memory, uint64[] memory, uint64[] memory)
+    returns (
+      uint256[] memory countsPerIssuer,
+      address[] memory accounts,
+      address[] memory signers,
+      uint64[] memory issuedOns,
+      uint64[] memory publishedOns
+    )
   {
-    uint256[] memory countsPerIssuer;
     uint256 totalAttestations;
     (totalAttestations, countsPerIssuer) = getNumAttestations(identifier, trustedIssuers);
-    AttestationLookupValues memory res = AttestationLookupValues(
-      new address[](totalAttestations),
-      new address[](totalAttestations),
-      new uint64[](totalAttestations),
-      new uint64[](totalAttestations)
-    );
+
+    accounts = new address[](totalAttestations);
+    signers = new address[](totalAttestations);
+    issuedOns = new uint64[](totalAttestations);
+    publishedOns = new uint64[](totalAttestations);
 
     totalAttestations = 0;
     OwnershipAttestation[] memory attestationsPerIssuer;
@@ -248,14 +245,14 @@ contract FederatedAttestations is
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       attestationsPerIssuer = identifierToAttestations[identifier][trustedIssuers[i]];
       for (uint256 j = 0; j < attestationsPerIssuer.length; j = j.add(1)) {
-        res.accounts[totalAttestations] = attestationsPerIssuer[j].account;
-        res.signers[totalAttestations] = attestationsPerIssuer[j].signer;
-        res.issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
-        res.publishedOns[totalAttestations] = attestationsPerIssuer[j].publishedOn;
+        accounts[totalAttestations] = attestationsPerIssuer[j].account;
+        signers[totalAttestations] = attestationsPerIssuer[j].signer;
+        issuedOns[totalAttestations] = attestationsPerIssuer[j].issuedOn;
+        publishedOns[totalAttestations] = attestationsPerIssuer[j].publishedOn;
         totalAttestations = totalAttestations.add(1);
       }
     }
-    return (countsPerIssuer, res.accounts, res.signers, res.issuedOns, res.publishedOns);
+    return (countsPerIssuer, accounts, signers, issuedOns, publishedOns);
   }
 
   /**
@@ -270,14 +267,12 @@ contract FederatedAttestations is
   function lookupIdentifiers(address account, address[] calldata trustedIssuers)
     external
     view
-    returns (uint256[] memory, bytes32[] memory)
+    returns (uint256[] memory countsPerIssuer, bytes32[] memory identifiers)
   {
     uint256 totalIdentifiers;
-    uint256[] memory countsPerIssuer;
-
     (totalIdentifiers, countsPerIssuer) = getNumIdentifiers(account, trustedIssuers);
 
-    bytes32[] memory identifiers = new bytes32[](totalIdentifiers);
+    identifiers = new bytes32[](totalIdentifiers);
     bytes32[] memory identifiersPerIssuer;
 
     uint256 currIndex = 0;
@@ -354,11 +349,11 @@ contract FederatedAttestations is
   function getNumIdentifiers(address account, address[] memory trustedIssuers)
     internal
     view
-    returns (uint256, uint256[] memory)
+    returns (uint256 totalIdentifiers, uint256[] memory countsPerIssuer)
   {
-    uint256 totalIdentifiers = 0;
+    totalIdentifiers = 0;
     uint256 numIdentifiersForIssuer;
-    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
+    countsPerIssuer = new uint256[](trustedIssuers.length);
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       numIdentifiersForIssuer = addressToIdentifiers[account][trustedIssuers[i]].length;
@@ -380,11 +375,11 @@ contract FederatedAttestations is
   function getNumAttestations(bytes32 identifier, address[] memory trustedIssuers)
     internal
     view
-    returns (uint256, uint256[] memory)
+    returns (uint256 totalAttestations, uint256[] memory countsPerIssuer)
   {
-    uint256 totalAttestations = 0;
+    totalAttestations = 0;
     uint256 numAttestationsForIssuer;
-    uint256[] memory countsPerIssuer = new uint256[](trustedIssuers.length);
+    countsPerIssuer = new uint256[](trustedIssuers.length);
 
     for (uint256 i = 0; i < trustedIssuers.length; i = i.add(1)) {
       numAttestationsForIssuer = identifierToAttestations[identifier][trustedIssuers[i]].length;
