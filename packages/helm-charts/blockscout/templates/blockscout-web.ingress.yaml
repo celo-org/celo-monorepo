@@ -45,7 +45,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: {{ .Release.Name }}-api
+            name: {{ .Release.Name }}-web
             port: 
               number: 4000
       - path: /
