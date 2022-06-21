@@ -958,7 +958,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
         'Max attestations already registered for identifier'
       )
     })
-    it('should revert if MAX_ATTESTATIONS_PER_IDENTIFIER have already been registered', async () => {
+    it('should revert if MAX_IDENTIFIERS_PER_ADDRESS have already been registered', async () => {
       for (
         let i = 0;
         i < (await federatedAttestations.MAX_IDENTIFIERS_PER_ADDRESS()).toNumber();
