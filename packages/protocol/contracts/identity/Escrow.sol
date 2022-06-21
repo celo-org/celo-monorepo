@@ -86,6 +86,12 @@ contract Escrow is
   address[] public defaultTrustedIssuers;
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
+
+  /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
    * @return Major version of the contract.
@@ -95,12 +101,6 @@ contract Escrow is
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 2, 0, 0);
   }
-
-  /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
-   */
-  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
