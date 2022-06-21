@@ -43,10 +43,13 @@ contract FederatedAttestations is
   // unique attestation hash -> isRevoked
   mapping(bytes32 => bool) public revokedAttestations;
 
+  bytes32 public eip712DomainSeparator;
   bytes32 public constant EIP712_OWNERSHIP_ATTESTATION_TYPEHASH = keccak256(
     "OwnershipAttestation(bytes32 identifier,address issuer,address account,uint64 issuedOn)"
   );
-  bytes32 public eip712DomainSeparator;
+
+  uint256 public constant MAX_ATTESTATIONS_PER_IDENTIFIER = 10;
+  uint256 public constant MAX_IDENTIFIERS_PER_ADDRESS = 10;
 
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
   event AttestationRegistered(
@@ -408,7 +411,17 @@ contract FederatedAttestations is
       !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
       "Attestation has been revoked"
     );
-    for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
+    uint256 numExistingAttestations = identifierToAttestations[identifier][issuer].length;
+    require(
+      numExistingAttestations.add(1) <= MAX_ATTESTATIONS_PER_IDENTIFIER,
+      "Max attestations already registered for identifier"
+    );
+    require(
+      addressToIdentifiers[account][issuer].length.add(1) <= MAX_IDENTIFIERS_PER_ADDRESS,
+      "Max identifiers already registered for account"
+    );
+
+    for (uint256 i = 0; i < numExistingAttestations; i = i.add(1)) {
       // This enforces only one attestation to be uploaded
       // for a given set of (identifier, issuer, account)
       // Editing/upgrading an attestation requires that it be revoked before a new one is registered
@@ -437,7 +450,6 @@ contract FederatedAttestations is
    * @param account Address of the account mapped to the identifier
    * @dev Reverts if attestation is not found mapping identifier <-> account
    */
-
   function _revokeAttestation(bytes32 identifier, address issuer, address account) private {
     OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
     for (uint256 i = 0; i < attestations.length; i = i.add(1)) {

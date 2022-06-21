@@ -930,6 +930,60 @@ contract('FederatedAttestations', (accounts: string[]) => {
         )
       )
     })
+
+    it('should revert if MAX_ATTESTATIONS_PER_IDENTIFIER have already been registered', async () => {
+      for (
+        let i = 0;
+        i < (await federatedAttestations.MAX_ATTESTATIONS_PER_IDENTIFIER()).toNumber();
+        i++
+      ) {
+        // accounts[n] is limited
+        const newAccount = await web3.eth.accounts.create().address
+        await federatedAttestations.registerAttestationAsIssuer(
+          identifier1,
+          issuer1,
+          newAccount,
+          nowUnixTime,
+          { from: issuer1 }
+        )
+      }
+      await assertRevertWithReason(
+        federatedAttestations.registerAttestationAsIssuer(
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime,
+          { from: issuer1 }
+        ),
+        'Max attestations already registered for identifier'
+      )
+    })
+    it('should revert if MAX_ATTESTATIONS_PER_IDENTIFIER have already been registered', async () => {
+      for (
+        let i = 0;
+        i < (await federatedAttestations.MAX_IDENTIFIERS_PER_ADDRESS()).toNumber();
+        i++
+      ) {
+        const newIdentifier = getPhoneHash(phoneNumber, `dummysalt-${i}`)
+        await federatedAttestations.registerAttestationAsIssuer(
+          newIdentifier,
+          issuer1,
+          account1,
+          nowUnixTime,
+          { from: issuer1 }
+        )
+      }
+      await assertRevertWithReason(
+        federatedAttestations.registerAttestationAsIssuer(
+          identifier1,
+          issuer1,
+          account1,
+          nowUnixTime,
+          { from: issuer1 }
+        ),
+        'Max identifiers already registered for account'
+      )
+    })
   })
 
   describe('#revokeAttestation', () => {
