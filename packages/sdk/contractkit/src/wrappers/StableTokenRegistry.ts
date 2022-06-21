@@ -12,7 +12,7 @@ const returnSTContractNames = (contractsHex: string, lengths: string[]): string[
   const contracts = Web3.utils.hexToUtf8(contractsHex)
   let currentIndex = 0
   const contractsArr = []
-  for (let length of lengths) {
+  for (const length of lengths) {
     const contract = contracts.slice(currentIndex, currentIndex + Number(length))
     currentIndex += Number(length)
     contractsArr.push(contract)
