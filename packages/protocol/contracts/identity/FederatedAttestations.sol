@@ -450,6 +450,118 @@ contract FederatedAttestations is
    * @param account Address of the account mapped to the identifier
    * @dev Reverts if attestation is not found mapping identifier <-> account
    */
+  // OLD VERSION
+  // function _revokeAttestation(bytes32 identifier, address issuer, address account) private {
+  //   OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
+  //   for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
+  //     OwnershipAttestation memory attestation = attestations[i];
+  //     if (attestation.account != account) {
+  //       continue;
+  //     }
+
+  //     // This is meant to delete the attestation in the array
+  //     // and then move the last element in the array to that empty spot,
+  //     // to avoid having empty elements in the array
+  //     if (i != attestations.length - 1) {
+  //       identifierToAttestations[identifier][issuer][i] = attestations[attestations.length - 1];
+  //     }
+  //     identifierToAttestations[identifier][issuer].pop();
+
+  //     bool deletedIdentifier = false;
+  //     bytes32[] memory identifiers = addressToIdentifiers[account][issuer];
+  //     for (uint256 j = 0; j < identifiers.length; j = j.add(1)) {
+  //       if (identifiers[j] != identifier) {
+  //         continue;
+  //       }
+  //       if (j != identifiers.length - 1) {
+  //         addressToIdentifiers[account][issuer][j] = identifiers[identifiers.length - 1];
+  //       }
+  //       addressToIdentifiers[account][issuer].pop();
+  //       deletedIdentifier = true;
+  //       break;
+  //     }
+  //     // Should never be false - both mappings should always be updated in unison
+  //     assert(deletedIdentifier);
+
+  //     bytes32 attestationHash = getUniqueAttestationHash(
+  //       identifier,
+  //       issuer,
+  //       account,
+  //       attestation.signer,
+  //       attestation.issuedOn
+  //     );
+  //     revokedAttestations[attestationHash] = true;
+
+  //     emit AttestationRevoked(
+  //       identifier,
+  //       issuer,
+  //       account,
+  //       attestation.signer,
+  //       attestation.issuedOn,
+  //       attestation.publishedOn
+  //     );
+  //     return;
+  //   }
+  //   revert("Attestation to be revoked does not exist");
+  // }
+
+  // STORAGE but only identifierToAttestations
+  // function _revokeAttestation(bytes32 identifier, address issuer, address account) private {
+  //   OwnershipAttestation[] storage attestations = identifierToAttestations[identifier][issuer];
+  //   uint256 numAttestations = attestations.length;
+  //   for (uint256 i = 0; i < numAttestations; i = i.add(1)) {
+  //     if (attestations[i].account != account) {
+  //       continue;
+  //     }
+
+  //     OwnershipAttestation memory attestation = attestations[i];
+  //     // This is meant to delete the attestations[i] in the array
+  //     // and then move the last element in the array to that empty spot,
+  //     // to avoid having empty elements in the array
+  //     if (i != numAttestations - 1) {
+  //       attestations[i] = attestations[numAttestations - 1];
+  //     }
+  //     attestations.pop();
+
+  //     bool deletedIdentifier = false;
+  //     bytes32[] memory identifiers = addressToIdentifiers[account][issuer];
+  //     for (uint256 j = 0; j < identifiers.length; j = j.add(1)) {
+  //       if (identifiers[j] != identifier) {
+  //         continue;
+  //       }
+  //       if (j != identifiers.length - 1) {
+  //         addressToIdentifiers[account][issuer][j] = identifiers[identifiers.length - 1];
+  //       }
+  //       addressToIdentifiers[account][issuer].pop();
+  //       deletedIdentifier = true;
+  //       break;
+  //     }
+  //     // Should never be false - both mappings should always be updated in unison
+  //     assert(deletedIdentifier);
+
+  //     bytes32 attestationHash = getUniqueAttestationHash(
+  //       identifier,
+  //       issuer,
+  //       account,
+  //       attestation.signer,
+  //       attestation.issuedOn
+  //     );
+  //     revokedAttestations[attestationHash] = true;
+
+  //     emit AttestationRevoked(
+  //       identifier,
+  //       issuer,
+  //       account,
+  //       attestation.signer,
+  //       attestation.issuedOn,
+  //       attestation.publishedOn
+  //     );
+  //     return;
+  //   }
+  //   revert("Attestation to be revoked does not exist");
+  // }
+
+  // STORAGE for both versions
   function _revokeAttestation(bytes32 identifier, address issuer, address account) private {
     OwnershipAttestation[] storage attestations = identifierToAttestations[identifier][issuer];
     uint256 numAttestations = attestations.length;
@@ -457,26 +569,28 @@ contract FederatedAttestations is
       if (attestations[i].account != account) {
         continue;
       }
-      OwnershipAttestation memory attestation = attestations[i];
 
+      OwnershipAttestation memory attestation = attestations[i];
       // This is meant to delete the attestations[i] in the array
       // and then move the last element in the array to that empty spot,
       // to avoid having empty elements in the array
       if (i != numAttestations - 1) {
-        identifierToAttestations[identifier][issuer][i] = attestations[numAttestations - 1];
+        attestations[i] = attestations[numAttestations - 1];
       }
-      identifierToAttestations[identifier][issuer].pop();
+      attestations.pop();
 
       bool deletedIdentifier = false;
-      bytes32[] memory identifiers = addressToIdentifiers[account][issuer];
-      for (uint256 j = 0; j < identifiers.length; j = j.add(1)) {
+      bytes32[] storage identifiers = addressToIdentifiers[account][issuer];
+      uint256 lenIdentifiers = addressToIdentifiers[account][issuer].length;
+
+      for (uint256 j = 0; j < lenIdentifiers; j = j.add(1)) {
         if (identifiers[j] != identifier) {
           continue;
         }
-        if (j != identifiers.length - 1) {
-          addressToIdentifiers[account][issuer][j] = identifiers[identifiers.length - 1];
+        if (j != lenIdentifiers - 1) {
+          identifiers[j] = identifiers[lenIdentifiers - 1];
         }
-        addressToIdentifiers[account][issuer].pop();
+        identifiers.pop();
         deletedIdentifier = true;
         break;
       }
@@ -504,4 +618,5 @@ contract FederatedAttestations is
     }
     revert("Attestation to be revoked does not exist");
   }
+
 }

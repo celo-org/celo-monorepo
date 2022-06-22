@@ -1364,8 +1364,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       await accountsInstance.createAccount({ from: batchIssuer1 })
     })
 
-    // const numIdsPerAccount = [1, 10, 20, 40, 50, 100]
-    const numIdsPerAccount = [150, 200]
+    const numIdsPerAccount = [1, 2, 3, 5, 7, 10, 20]
+    // const numIdsPerAccount = [150, 200]
     numIdsPerAccount.forEach(async (numAccounts) => {
       it(`revoke with numAccounts: ${numAccounts}`, async () => {
         const [testPnIdentifier, benchmarkAccounts] = await registerAttestationsVariant4(
@@ -1385,7 +1385,55 @@ contract('FederatedAttestations', (accounts: string[]) => {
       })
     })
   })
-  describe.only('benchmark revoke variant5 -- batch revoke', () => {
+  describe.only('benchmark revoke variant7 (identifiers)', () => {
+    // Variant 4 == register (a bunch of identifiers, some accounts) with one issuer
+
+    const registerAttestationsVariant7 = async (issuer: string, accountsPerIdentifier: number) => {
+      const benchmarkIdentifiers: string[] = []
+
+      const newAccount = await web3.eth.accounts.create().address
+      for (let i = 0; i < accountsPerIdentifier; i++) {
+        const pnIdentifier = getPhoneHash(phoneNumber, `dummy-salt${i}`)
+        await federatedAttestations.registerAttestationAsIssuer(
+          pnIdentifier,
+          issuer,
+          newAccount,
+          nowUnixTime,
+          { from: issuer }
+        )
+        benchmarkIdentifiers.push(pnIdentifier)
+      }
+      return [newAccount, benchmarkIdentifiers]
+    }
+
+    const batchIssuer1 = accounts[2]
+    beforeEach(async () => {
+      // Setup
+      await accountsInstance.createAccount({ from: batchIssuer1 })
+    })
+
+    const numIdsPerAccount = [1, 2, 3, 5, 7, 10, 20]
+    // const numIdsPerAccount = [150, 200]
+    numIdsPerAccount.forEach(async (numIds) => {
+      it(`revoke with numIds: ${numIds}`, async () => {
+        const [testAccount, benchmarkIdentifiers] = await registerAttestationsVariant7(
+          batchIssuer1,
+          numIds
+        )
+        // console.log('benchmarkIdentifiers: ', testAccount)
+        // console.log('benchmarkIdentifiers: ', benchmarkIdentifiers)
+        const tx = await federatedAttestations.revokeAttestation(
+          // @ts-ignore
+          benchmarkIdentifiers[numIds - 1],
+          batchIssuer1,
+          testAccount,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+    })
+  })
+  describe('benchmark revoke variant5 -- batch revoke', () => {
     const registerAttestationsVariant5 = async (
       issuer: string,
       accountsPerIdentifier: number,
@@ -1395,7 +1443,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       const benchmarkAccounts: string[] = []
 
       for (let j = 0; j < nRounds; j++) {
-        const pnIdentifier = getPhoneHash(phoneNumber, `dummy-salt`)
+        const pnIdentifier = getPhoneHash(phoneNumber, `dummy-salt${j}`)
         for (let i = 0; i < accountsPerIdentifier; i++) {
           const newAccount = await web3.eth.accounts.create().address
           await federatedAttestations.registerAttestationAsIssuer(
@@ -1429,9 +1477,9 @@ contract('FederatedAttestations', (accounts: string[]) => {
       // [5, 20],
       // [5, 30],
       // [5, 40],
-      [5, 28],
-      [5, 30],
-      [5, 32],
+      // [5, 28],
+      // [5, 30],
+      // [5, 32],
       // [10, 1],
       // [10, 2],
       // [10, 5],
@@ -1439,7 +1487,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
       [10, 14],
       [10, 15],
       [10, 16],
-      [10, 17],
+      // [10, 17],
       // [15, 4],
       // [10, 10],
       // [20, 1],
@@ -1450,15 +1498,14 @@ contract('FederatedAttestations', (accounts: string[]) => {
       // [20, 6],
       [20, 7], //6005956
       [20, 8],
+      // [20, 9],
       // [40, 3],
-      [40, 4],
-
+      // [40, 4],
       // [20, 5],
     ]
     // const numIdsPerAccount = [150, 200]
     numIdsPerAccount.forEach(async ([numAccounts, numIds]) => {
       it(`revoke with numAccounts: ${numAccounts}, numIds: ${numIds}`, async () => {
-        console.log('registering attestations')
         const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant5(
           batchIssuer1,
           numAccounts,
@@ -1470,6 +1517,104 @@ contract('FederatedAttestations', (accounts: string[]) => {
           // TODO EN: what about if you do this in reverse order?
           // benchmarkIdentifiers.reverse(),
           // benchmarkAccounts.reverse(),
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+    })
+  })
+  describe('benchmark revoke variant5 -- batch revoke (worst worst case)', () => {
+    // TODO!!!
+    const registerAttestationsVariant5 = async (
+      issuer: string,
+      accountsPerIdentifier: number,
+      arrayLength: number
+    ) => {
+      const benchmarkIdentifiers: string[] = []
+      const benchmarkAccounts: string[] = []
+
+      let pnIdentifier: string
+      let newAccount: string
+
+      for (let j = 0; j < arrayLength; j++) {
+        pnIdentifier = getPhoneHash(phoneNumber, `dummy-salt${j}`)
+        for (let i = 0; i < accountsPerIdentifier; i++) {
+          newAccount = await web3.eth.accounts.create().address
+          await federatedAttestations.registerAttestationAsIssuer(
+            pnIdentifier,
+            issuer,
+            newAccount,
+            nowUnixTime,
+            { from: issuer }
+          )
+        }
+        // Only store the last (account, identifier) pushed
+        benchmarkIdentifiers.push(pnIdentifier)
+        benchmarkAccounts.push(newAccount)
+      }
+      return [benchmarkIdentifiers, benchmarkAccounts]
+    }
+
+    const batchIssuer1 = accounts[2]
+    beforeEach(async () => {
+      await accountsInstance.createAccount({ from: batchIssuer1 })
+    })
+
+    const numIdsPerAccount = [
+      // [1, 1],
+      // [1, 10],
+      // [1, 90],
+      // [1, 100],
+      // [1, 140],
+      // [1, 150],
+      // [1, 160],
+      // [5, 10],
+      // [5, 20],
+      // [5, 30],
+      // [5, 40],
+      // [5, 28],
+      // [5, 30],
+      // [5, 32],
+      // [10, 1],
+      // [10, 2],
+      // [10, 5],
+      // [10, 8],
+      // [10, 14],
+      // [10, 15],
+      // [10, 16],
+      // [10, 17],
+      // [15, 4],
+      // [10, 10],
+      // [20, 1],
+      // [20, 2],
+      // [20, 3],
+      // [20, 4],
+      // [20, 5],
+      // [20, 6],
+      // [20, 7], //6005956
+      // [20, 8],
+      // [20, 9],
+      // [40, 3],
+      // [40, 4],
+      // [20, 5],
+      [20, 10],
+      [20, 50],
+      [20, 100],
+      // [20, 150],
+    ]
+    // const numIdsPerAccount = [150, 200]
+    numIdsPerAccount.forEach(async ([numAccounts, numIds]) => {
+      it(`revoke with numAccounts: ${numAccounts}, numIds: ${numIds}`, async () => {
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant5(
+          batchIssuer1,
+          numAccounts,
+          numIds
+        )
+        console.log('beginning batch revocation, length:', benchmarkAccounts.length)
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
           benchmarkIdentifiers,
           benchmarkAccounts,
           { from: batchIssuer1 }
@@ -1517,6 +1662,82 @@ contract('FederatedAttestations', (accounts: string[]) => {
           benchmarkIdentifiers[numIds - 1],
           batchIssuer1,
           testAccount,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+    })
+  })
+
+  describe('benchmark revoke variant6 -- batch revoke', () => {
+    // Variant 3 == register (an account with many identifiers) with one issuer
+    const registerAttestationsVariant6 = async (
+      issuer: string,
+      identifiersPerAccount: number,
+      numAccounts: number
+    ) => {
+      const benchmarkIdentifiers: string[] = []
+      const benchmarkAccounts: string[] = []
+
+      for (let j = 0; j < numAccounts; j++) {
+        const newAccount = await web3.eth.accounts.create().address
+        for (let i = 0; i < identifiersPerAccount; i++) {
+          const pnIdentifier = getPhoneHash(phoneNumber, `salt${i}${j}`)
+          await federatedAttestations.registerAttestationAsIssuer(
+            pnIdentifier,
+            issuer,
+            newAccount,
+            nowUnixTime,
+            { from: issuer }
+          )
+          benchmarkIdentifiers.push(pnIdentifier)
+          benchmarkAccounts.push(newAccount)
+        }
+      }
+      return [benchmarkAccounts, benchmarkIdentifiers]
+    }
+
+    const batchIssuer1 = accounts[2]
+    beforeEach(async () => {
+      // Setup
+      await accountsInstance.createAccount({ from: batchIssuer1 })
+    })
+
+    const numIdsPerAccount = [
+      [1, 10],
+      [1, 140],
+      [1, 150],
+      [1, 160],
+      [10, 14],
+      [10, 15],
+      [10, 16],
+      // [10, 17],
+      // [15, 4],
+      // [10, 10],
+      // [20, 1],
+      // [20, 2],
+      // [20, 3],
+      // [20, 4],
+      // [20, 5],
+      // [20, 6],
+      [20, 7],
+      [20, 8],
+      // [20, 9],
+      // [40, 3],
+      // [40, 4],
+      // [20, 5],
+    ]
+    numIdsPerAccount.forEach(async ([numIds, numAccounts]) => {
+      it(`revoke with numIds: ${numIds}, numAccounts: ${numAccounts}`, async () => {
+        const [benchmarkAccounts, benchmarkIdentifiers] = await registerAttestationsVariant6(
+          batchIssuer1,
+          numIds,
+          numAccounts
+        )
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          benchmarkIdentifiers,
+          benchmarkAccounts,
           { from: batchIssuer1 }
         )
         console.log(tx.receipt.gasUsed)
