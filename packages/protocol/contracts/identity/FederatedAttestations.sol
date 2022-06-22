@@ -452,18 +452,18 @@ contract FederatedAttestations is
    */
   function _revokeAttestation(bytes32 identifier, address issuer, address account) private {
     OwnershipAttestation[] storage attestations = identifierToAttestations[identifier][issuer];
-    uint256 numAttestations = attestations.length;
-    for (uint256 i = 0; i < numAttestations; i = i.add(1)) {
+    uint256 lenAttestations = attestations.length;
+    for (uint256 i = 0; i < lenAttestations; i = i.add(1)) {
       if (attestations[i].account != account) {
         continue;
       }
 
       OwnershipAttestation memory attestation = attestations[i];
-      // This is meant to delete the attestations[i] in the array
+      // This is meant to delete the attestations in the array
       // and then move the last element in the array to that empty spot,
       // to avoid having empty elements in the array
-      if (i != numAttestations - 1) {
-        attestations[i] = attestations[numAttestations - 1];
+      if (i != lenAttestations - 1) {
+        attestations[i] = attestations[lenAttestations - 1];
       }
       attestations.pop();
 
