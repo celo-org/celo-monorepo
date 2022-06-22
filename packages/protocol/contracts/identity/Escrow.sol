@@ -175,7 +175,7 @@ contract Escrow is
     address[] memory trustedIssuers;
     // If minAttestations == 0, trustedIssuers should remain empty
     if (minAttestations > 0) {
-      trustedIssuers = getDefaultTrustedIssuers();
+      trustedIssuers = defaultTrustedIssuers;
     }
     return
       _transfer(
