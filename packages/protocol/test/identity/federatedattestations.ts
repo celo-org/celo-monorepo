@@ -1336,4 +1336,191 @@ contract('FederatedAttestations', (accounts: string[]) => {
       )
     })
   })
+
+  describe('benchmark revoke variant4', () => {
+    // Variant 4 == register (a bunch of identifiers, some accounts) with one issuer
+
+    const registerAttestationsVariant4 = async (issuer: string, accountsPerIdentifier: number) => {
+      const benchmarkAccounts: string[] = []
+
+      const pnIdentifier = getPhoneHash(phoneNumber, `dummy-salt`)
+      for (let i = 0; i < accountsPerIdentifier; i++) {
+        const newAccount = await web3.eth.accounts.create().address
+        await federatedAttestations.registerAttestationAsIssuer(
+          pnIdentifier,
+          issuer,
+          newAccount,
+          nowUnixTime,
+          { from: issuer }
+        )
+        benchmarkAccounts.push(newAccount)
+      }
+      return [pnIdentifier, benchmarkAccounts]
+    }
+
+    const batchIssuer1 = accounts[2]
+    beforeEach(async () => {
+      // Setup
+      await accountsInstance.createAccount({ from: batchIssuer1 })
+    })
+
+    // const numIdsPerAccount = [1, 10, 20, 40, 50, 100]
+    const numIdsPerAccount = [150, 200]
+    numIdsPerAccount.forEach(async (numAccounts) => {
+      it(`revoke with numAccounts: ${numAccounts}`, async () => {
+        const [testPnIdentifier, benchmarkAccounts] = await registerAttestationsVariant4(
+          batchIssuer1,
+          numAccounts
+        )
+        // console.log('benchmarkIdentifiers: ', testPnIdentifier)
+        // console.log('benchmarkAccounts: ', benchmarkAccounts)
+        const tx = await federatedAttestations.revokeAttestation(
+          // @ts-ignore
+          testPnIdentifier,
+          batchIssuer1,
+          benchmarkAccounts[numAccounts - 1],
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+    })
+  })
+  describe.only('benchmark revoke variant5 -- batch revoke', () => {
+    const registerAttestationsVariant5 = async (
+      issuer: string,
+      accountsPerIdentifier: number,
+      nRounds: number
+    ) => {
+      const benchmarkIdentifiers: string[] = []
+      const benchmarkAccounts: string[] = []
+
+      for (let j = 0; j < nRounds; j++) {
+        const pnIdentifier = getPhoneHash(phoneNumber, `dummy-salt`)
+        for (let i = 0; i < accountsPerIdentifier; i++) {
+          const newAccount = await web3.eth.accounts.create().address
+          await federatedAttestations.registerAttestationAsIssuer(
+            pnIdentifier,
+            issuer,
+            newAccount,
+            nowUnixTime,
+            { from: issuer }
+          )
+          benchmarkIdentifiers.push(pnIdentifier)
+          benchmarkAccounts.push(newAccount)
+        }
+      }
+      return [benchmarkIdentifiers, benchmarkAccounts]
+    }
+
+    const batchIssuer1 = accounts[2]
+    beforeEach(async () => {
+      await accountsInstance.createAccount({ from: batchIssuer1 })
+    })
+
+    const numIdsPerAccount = [
+      // [1, 1],
+      // [1, 10],
+      // [1, 90],
+      // [1, 100],
+      [1, 140],
+      [1, 150],
+      [1, 160],
+      // [5, 10],
+      // [5, 20],
+      // [5, 30],
+      // [5, 40],
+      [5, 28],
+      [5, 30],
+      [5, 32],
+      // [10, 1],
+      // [10, 2],
+      // [10, 5],
+      // [10, 8],
+      [10, 14],
+      [10, 15],
+      [10, 16],
+      [10, 17],
+      // [15, 4],
+      // [10, 10],
+      // [20, 1],
+      // [20, 2],
+      // [20, 3],
+      // [20, 4],
+      // [20, 5],
+      // [20, 6],
+      [20, 7], //6005956
+      [20, 8],
+      // [40, 3],
+      [40, 4],
+
+      // [20, 5],
+    ]
+    // const numIdsPerAccount = [150, 200]
+    numIdsPerAccount.forEach(async ([numAccounts, numIds]) => {
+      it(`revoke with numAccounts: ${numAccounts}, numIds: ${numIds}`, async () => {
+        console.log('registering attestations')
+        const [benchmarkIdentifiers, benchmarkAccounts] = await registerAttestationsVariant5(
+          batchIssuer1,
+          numAccounts,
+          numIds
+        )
+        console.log('beginning batch revocation, length:', benchmarkAccounts.length)
+        const tx = await federatedAttestations.batchRevokeAttestations(
+          batchIssuer1,
+          // TODO EN: what about if you do this in reverse order?
+          // benchmarkIdentifiers.reverse(),
+          // benchmarkAccounts.reverse(),
+          benchmarkIdentifiers,
+          benchmarkAccounts,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+    })
+  })
+  describe('benchmark revoke variant3', () => {
+    // Variant 3 == register (an account with many identifiers) with one issuer
+    const registerAttestationsVariant3 = async (issuer: string, identifiersPerAccount: number) => {
+      const benchmarkIdentifiers: string[] = []
+
+      const newAccount = await web3.eth.accounts.create().address
+      for (let i = 0; i < identifiersPerAccount; i++) {
+        const pnIdentifier = getPhoneHash(phoneNumber, `salt${i}`)
+        await federatedAttestations.registerAttestationAsIssuer(
+          pnIdentifier,
+          issuer,
+          newAccount,
+          nowUnixTime,
+          { from: issuer }
+        )
+        benchmarkIdentifiers.push(pnIdentifier)
+      }
+      return [newAccount, benchmarkIdentifiers]
+    }
+
+    const batchIssuer1 = accounts[2]
+    beforeEach(async () => {
+      // Setup
+      await accountsInstance.createAccount({ from: batchIssuer1 })
+    })
+
+    // const numIdsPerAccount = [1, 10, 20, 40, 50, 100]
+    const numIdsPerAccount = [150, 200]
+    numIdsPerAccount.forEach(async (numIds) => {
+      it(`revoke with numIds: ${numIds}`, async () => {
+        const [testAccount, benchmarkIdentifiers] = await registerAttestationsVariant3(
+          batchIssuer1,
+          numIds
+        )
+        // console.log('benchmarkIdentifiers: ', benchmarkIdentifiers)
+        const tx = await federatedAttestations.revokeAttestation(
+          benchmarkIdentifiers[numIds - 1],
+          batchIssuer1,
+          testAccount,
+          { from: batchIssuer1 }
+        )
+        console.log(tx.receipt.gasUsed)
+      })
+    })
+  })
 })

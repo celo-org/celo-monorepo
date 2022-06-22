@@ -451,18 +451,19 @@ contract FederatedAttestations is
    * @dev Reverts if attestation is not found mapping identifier <-> account
    */
   function _revokeAttestation(bytes32 identifier, address issuer, address account) private {
-    OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
-    for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
-      OwnershipAttestation memory attestation = attestations[i];
-      if (attestation.account != account) {
+    OwnershipAttestation[] storage attestations = identifierToAttestations[identifier][issuer];
+    uint256 numAttestations = attestations.length;
+    for (uint256 i = 0; i < numAttestations; i = i.add(1)) {
+      if (attestations[i].account != account) {
         continue;
       }
+      OwnershipAttestation memory attestation = attestations[i];
 
-      // This is meant to delete the attestation in the array
+      // This is meant to delete the attestations[i] in the array
       // and then move the last element in the array to that empty spot,
       // to avoid having empty elements in the array
-      if (i != attestations.length - 1) {
-        identifierToAttestations[identifier][issuer][i] = attestations[attestations.length - 1];
+      if (i != numAttestations - 1) {
+        identifierToAttestations[identifier][issuer][i] = attestations[numAttestations - 1];
       }
       identifierToAttestations[identifier][issuer].pop();
 
