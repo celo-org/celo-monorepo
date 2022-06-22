@@ -28,22 +28,23 @@ contract PriceDeviationFilter is IFilterCondition, UsingRegistry {
    * @notice  Max percentage deviation of prices to be used when checking new report
    *          against existing reports.
    */
-  uint256 public maxPercentageDeviation;
+  FixidityLib.Fraction public maxPercentageDeviation;
 
   /**
    * @dev Constructor
    */
   constructor(uint256 _maxPercentageDeviation) public {
     _transferOwnership(msg.sender);
-    maxPercentageDeviation = _maxPercentageDeviation;
+    updateMaxPercentageDeviation(_maxPercentageDeviation);
   }
 
   /**
    * @dev Updates the max percentage deviation value.
    * @param _maxPercentageDeviation The new max percentage deviation to be used.
    */
-  function updateMaxPercentageDeviation(uint256 _maxPercentageDeviation) external onlyOwner {
-    maxPercentageDeviation = _maxPercentageDeviation;
+  function updateMaxPercentageDeviation(uint256 _maxPercentageDeviation) public onlyOwner {
+    maxPercentageDeviation = FixidityLib.wrap(_maxPercentageDeviation);
+    require(maxPercentageDeviation.lt(FixidityLib.fixed1()), "max deviation must be less than 1");
     emit maxDeviationUpdated(_maxPercentageDeviation);
   }
 
@@ -65,6 +66,7 @@ contract PriceDeviationFilter is IFilterCondition, UsingRegistry {
     for (uint256 i = 0; i < values.length; ++i) {
       if (oracleAddresses[i] == msg.sender) {
         // If this is the index of the oracle that made the new report, use the new value.
+        values[i] = value;
         sum += value;
         shouldAppendNewValue = false;
       } else {
@@ -81,18 +83,17 @@ contract PriceDeviationFilter is IFilterCondition, UsingRegistry {
       FixidityLib.newFixed(values.length)
     );
 
-    FixidityLib.Fraction[] memory arrNormalizedAbsMeanDev = new FixidityLib.Fraction[](
-      values.length
-    );
+    FixidityLib.Fraction memory maxDeviation = FixidityLib.newFixed(0);
 
     for (uint256 i = 0; i < values.length; ++i) {
-      arrNormalizedAbsMeanDev[i] = (FixidityLib.newFixed(values[i]).divide(mean)).subtract(
+      FixidityLib.Fraction memory deviation = (FixidityLib.newFixed(values[i]).divide(mean))
+        .subtract(
         FixidityLib.fixed1() //TODO: absolute diff
       );
+
+      maxDeviation = deviation.gt(maxDeviation) ? deviation : maxDeviation;
     }
 
-    //TODO: get max
-
-    return false;
+    return maxDeviation.gt(maxPercentageDeviation);
   }
 }
