@@ -1,0 +1,13 @@
+[default]
+src = 'src'
+out = 'out'
+libs = [
+    'lib',
+    'node_modules',
+]
+remappings = [
+    'openzeppelin-solidity/=node_modules/openzeppelin-solidity/',
+    'solidity-bytes-utils/=node_modules/solidity-bytes-utils/',
+]
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config
