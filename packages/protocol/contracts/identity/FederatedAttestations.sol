@@ -482,7 +482,7 @@ contract FederatedAttestations is
         identifier,
         issuer,
         account,
-        signer,
+        attestation.signer,
         attestation.issuedOn
       );
       revokedAttestations[attestationHash] = true;
