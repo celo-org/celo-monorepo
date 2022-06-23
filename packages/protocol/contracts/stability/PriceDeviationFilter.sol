@@ -83,17 +83,20 @@ contract PriceDeviationFilter is IFilterCondition, UsingRegistry {
       FixidityLib.newFixed(values.length)
     );
 
-    FixidityLib.Fraction memory maxDeviation = FixidityLib.newFixed(0);
+    FixidityLib.Fraction memory largestDeviation = FixidityLib.newFixed(0);
 
     for (uint256 i = 0; i < values.length; ++i) {
-      FixidityLib.Fraction memory deviation = (FixidityLib.newFixed(values[i]).divide(mean))
-        .subtract(
-        FixidityLib.fixed1() //TODO: absolute diff
-      );
+      FixidityLib.Fraction memory normalizedValue = FixidityLib.newFixed(values[i]).divide(mean);
 
-      maxDeviation = deviation.gt(maxDeviation) ? deviation : maxDeviation;
+      FixidityLib.Fraction memory absoluteDeviation = normalizedValue.lt(FixidityLib.fixed1())
+        ? FixidityLib.fixed1().subtract(normalizedValue)
+        : normalizedValue.subtract(FixidityLib.fixed1());
+
+      if (absoluteDeviation.gt(largestDeviation)) {
+        largestDeviation = absoluteDeviation;
+      }
     }
 
-    return maxDeviation.gt(maxPercentageDeviation);
+    return largestDeviation.gte(maxPercentageDeviation);
   }
 }
