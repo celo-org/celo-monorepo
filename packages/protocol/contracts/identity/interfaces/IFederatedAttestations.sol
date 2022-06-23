@@ -50,4 +50,11 @@ interface IFederatedAttestations {
     bytes32 r,
     bytes32 s
   ) external view;
+  function getUniqueAttestationHash(
+    bytes32 identifier,
+    address issuer,
+    address account,
+    address signer,
+    uint64 issuedOn
+  ) external pure returns (bytes32);
 }
