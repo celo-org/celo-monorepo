@@ -694,25 +694,6 @@ contract('FederatedAttestations', (accounts: string[]) => {
       assert.isAtLeast(publishedOn.toNumber(), publishedOnLowerBound)
     })
 
-    it('should revert if the attestation is revoked', async () => {
-      await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, signer1)
-      await federatedAttestations.revokeAttestation(identifier1, issuer1, account1, {
-        from: issuer1,
-      })
-      await assertRevert(
-        federatedAttestations.registerAttestation(
-          identifier1,
-          issuer1,
-          account1,
-          signer1,
-          nowUnixTime,
-          sig.v,
-          sig.r,
-          sig.s
-        )
-      )
-    })
-
     it('should succeed if issuer == signer', async () => {
       await signAndRegisterAttestation(identifier1, issuer1, account1, nowUnixTime, issuer1)
       await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, issuer1, 0)
