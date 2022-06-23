@@ -17,7 +17,7 @@ interface IFederatedAttestations {
     bytes32 r,
     bytes32 s
   ) external;
-  function revokeAttestation(bytes32, address, address) external;
+  function revokeAttestation(bytes32 identifier, address issuer, address account) external;
   function batchRevokeAttestations(
     address issuer,
     bytes32[] calldata identifiers,
@@ -25,7 +25,7 @@ interface IFederatedAttestations {
   ) external;
 
   // view functions
-  function lookupAttestations(bytes32, address[] calldata)
+  function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
     external
     view
     returns (
@@ -35,7 +35,7 @@ interface IFederatedAttestations {
       uint64[] memory,
       uint64[] memory
     );
-  function lookupIdentifiers(address, address[] calldata)
+  function lookupIdentifiers(address account, address[] calldata trustedIssuers)
     external
     view
     returns (uint256[] memory, bytes32[] memory);
