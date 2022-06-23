@@ -45,7 +45,10 @@ contract FederatedAttestations is
 
   bytes32 public eip712DomainSeparator;
   bytes32 public constant EIP712_OWNERSHIP_ATTESTATION_TYPEHASH = keccak256(
-    "OwnershipAttestation(bytes32 identifier,address issuer,address account,uint64 issuedOn)"
+    abi.encodePacked(
+      "OwnershipAttestation(bytes32 identifier,address issuer,",
+      "address account,address signer,uint64 issuedOn)"
+    )
   );
 
   uint256 public constant MAX_ATTESTATIONS_PER_IDENTIFIER = 20;
@@ -294,9 +297,7 @@ contract FederatedAttestations is
       getAccounts().attestationSignerToAccount(signer) == issuer,
       "Signer is not a currently authorized AttestationSigner for the issuer"
     );
-    bytes32 structHash = keccak256(
-      abi.encode(EIP712_OWNERSHIP_ATTESTATION_TYPEHASH, identifier, issuer, account, issuedOn)
-    );
+    bytes32 structHash = getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn);
     address guessedSigner = Signatures.getSignerOfTypedDataHash(
       eip712DomainSeparator,
       structHash,
@@ -314,7 +315,17 @@ contract FederatedAttestations is
     address signer,
     uint64 issuedOn
   ) public pure returns (bytes32) {
-    return keccak256(abi.encode(identifier, issuer, account, signer, issuedOn));
+    return
+      keccak256(
+        abi.encode(
+          EIP712_OWNERSHIP_ATTESTATION_TYPEHASH,
+          identifier,
+          issuer,
+          account,
+          signer,
+          issuedOn
+        )
+      );
   }
 
   /**
