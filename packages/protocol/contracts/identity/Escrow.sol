@@ -151,6 +151,8 @@ contract Escrow is
   /**
   * @notice Transfer tokens to a specific user. Supports both identity with privacy (an empty
   *         identifier and 0 minAttestations) and without (with identifier and minAttestations).
+  *         Sets trustedIssuers to the issuers listed in `defaultTrustedIssuers`.
+  *         (To override this and set custom trusted issuers, use `transferWithTrustedIssuers`.)
   * @param identifier The hashed identifier of a user to transfer to.
   * @param token The token to be transferred.
   * @param value The amount to be transferred.
@@ -163,8 +165,6 @@ contract Escrow is
   * @dev Throws if identifier is null and minAttestations > 0.
   * @dev If minAttestations is 0, trustedIssuers will be set to empty list.
   * @dev msg.sender needs to have already approved this contract to transfer
-
-
   */
   // solhint-disable-next-line no-simple-event-func-name
   function transfer(
@@ -178,7 +178,7 @@ contract Escrow is
     address[] memory trustedIssuers;
     // If minAttestations == 0, trustedIssuers should remain empty
     if (minAttestations > 0) {
-      trustedIssuers = getDefaultTrustedIssuers();
+      trustedIssuers = defaultTrustedIssuers;
     }
     return
       _transfer(
@@ -310,7 +310,6 @@ contract Escrow is
     EscrowedPayment memory payment = escrowedPayments[paymentId];
     require(payment.sender == msg.sender, "Only sender of payment can attempt to revoke payment.");
     require(
-      // solhint-disable-next-line not-rely-on-time
       now >= (payment.timestamp.add(payment.expirySeconds)),
       "Transaction not redeemable for sender yet."
     );
@@ -353,7 +352,7 @@ contract Escrow is
 
   /**
   * @notice Gets array of all trusted issuers set per paymentId.
-  * @param paymentId The ID of the payment to be deleted.
+  * @param paymentId The ID of the payment to get.
   * @return An array of addresses of trusted issuers set for an escrowed payment.
   */
   function getTrustedIssuersPerPayment(address paymentId) external view returns (address[] memory) {
@@ -504,8 +503,7 @@ contract Escrow is
     newPayment.value = value;
     newPayment.sentIndex = sentIndex;
     newPayment.receivedIndex = receivedIndex;
-    // solhint-disable-next-line not-rely-on-time
-    newPayment.timestamp = now;
+    newPayment.timestamp = block.timestamp;
     newPayment.expirySeconds = expirySeconds;
     newPayment.minAttestations = minAttestations;
 
