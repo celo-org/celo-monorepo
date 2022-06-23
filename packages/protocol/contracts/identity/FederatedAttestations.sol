@@ -43,13 +43,16 @@ contract FederatedAttestations is
   // unique attestation hash -> isRevoked
   mapping(bytes32 => bool) public revokedAttestations;
 
+  bytes32 public eip712DomainSeparator;
   bytes32 public constant EIP712_OWNERSHIP_ATTESTATION_TYPEHASH = keccak256(
     abi.encodePacked(
       "OwnershipAttestation(bytes32 identifier,address issuer,",
       "address account,address signer,uint64 issuedOn)"
     )
   );
-  bytes32 public eip712DomainSeparator;
+
+  uint256 public constant MAX_ATTESTATIONS_PER_IDENTIFIER = 20;
+  uint256 public constant MAX_IDENTIFIERS_PER_ADDRESS = 20;
 
   event EIP712DomainSeparatorSet(bytes32 eip712DomainSeparator);
   event AttestationRegistered(
@@ -419,7 +422,17 @@ contract FederatedAttestations is
       !revokedAttestations[getUniqueAttestationHash(identifier, issuer, account, signer, issuedOn)],
       "Attestation has been revoked"
     );
-    for (uint256 i = 0; i < identifierToAttestations[identifier][issuer].length; i = i.add(1)) {
+    uint256 numExistingAttestations = identifierToAttestations[identifier][issuer].length;
+    require(
+      numExistingAttestations.add(1) <= MAX_ATTESTATIONS_PER_IDENTIFIER,
+      "Max attestations already registered for identifier"
+    );
+    require(
+      addressToIdentifiers[account][issuer].length.add(1) <= MAX_IDENTIFIERS_PER_ADDRESS,
+      "Max identifiers already registered for account"
+    );
+
+    for (uint256 i = 0; i < numExistingAttestations; i = i.add(1)) {
       // This enforces only one attestation to be uploaded
       // for a given set of (identifier, issuer, account)
       // Editing/upgrading an attestation requires that it be revoked before a new one is registered
@@ -448,33 +461,35 @@ contract FederatedAttestations is
    * @param account Address of the account mapped to the identifier
    * @dev Reverts if attestation is not found mapping identifier <-> account
    */
-
   function _revokeAttestation(bytes32 identifier, address issuer, address account) private {
-    OwnershipAttestation[] memory attestations = identifierToAttestations[identifier][issuer];
-    for (uint256 i = 0; i < attestations.length; i = i.add(1)) {
-      OwnershipAttestation memory attestation = attestations[i];
-      if (attestation.account != account) {
+    OwnershipAttestation[] storage attestations = identifierToAttestations[identifier][issuer];
+    uint256 lenAttestations = attestations.length;
+    for (uint256 i = 0; i < lenAttestations; i = i.add(1)) {
+      if (attestations[i].account != account) {
         continue;
       }
 
-      // This is meant to delete the attestation in the array
+      OwnershipAttestation memory attestation = attestations[i];
+      // This is meant to delete the attestations in the array
       // and then move the last element in the array to that empty spot,
       // to avoid having empty elements in the array
-      if (i != attestations.length - 1) {
-        identifierToAttestations[identifier][issuer][i] = attestations[attestations.length - 1];
+      if (i != lenAttestations - 1) {
+        attestations[i] = attestations[lenAttestations - 1];
       }
-      identifierToAttestations[identifier][issuer].pop();
+      attestations.pop();
 
       bool deletedIdentifier = false;
-      bytes32[] memory identifiers = addressToIdentifiers[account][issuer];
-      for (uint256 j = 0; j < identifiers.length; j = j.add(1)) {
+      bytes32[] storage identifiers = addressToIdentifiers[account][issuer];
+      uint256 lenIdentifiers = identifiers.length;
+
+      for (uint256 j = 0; j < lenIdentifiers; j = j.add(1)) {
         if (identifiers[j] != identifier) {
           continue;
         }
-        if (j != identifiers.length - 1) {
-          addressToIdentifiers[account][issuer][j] = identifiers[identifiers.length - 1];
+        if (j != lenIdentifiers - 1) {
+          identifiers[j] = identifiers[lenIdentifiers - 1];
         }
-        addressToIdentifiers[account][issuer].pop();
+        identifiers.pop();
         deletedIdentifier = true;
         break;
       }
