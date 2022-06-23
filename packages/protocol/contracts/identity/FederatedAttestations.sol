@@ -44,7 +44,8 @@ contract FederatedAttestations is
   mapping(bytes32 => bool) public revokedAttestations;
 
   bytes32 public constant EIP712_OWNERSHIP_ATTESTATION_TYPEHASH = keccak256(
-    "OwnershipAttestation(bytes32 identifier,address issuer,address account,address signer,uint64 issuedOn)"
+    "OwnershipAttestation(bytes32 identifier,address issuer,\
+    address account,address signer,uint64 issuedOn)"
   );
   bytes32 public eip712DomainSeparator;
 
