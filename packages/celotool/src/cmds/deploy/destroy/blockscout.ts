@@ -5,17 +5,28 @@ import { execCmdWithExitOnFailure } from 'src/lib/cmd-utils'
 import { envVar, fetchEnvOrFallback } from 'src/lib/env-utils'
 import { deleteCloudSQLInstance, exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { outputIncludes } from 'src/lib/utils'
+import yargs from 'yargs'
 
 export const command = 'blockscout'
 export const describe = 'upgrade an existing deploy of the blockscout package'
 
-export const builder = {}
+export const builder = (argv: yargs.Argv) => {
+  return argv.option('suffix', {
+    type: 'string',
+    description: 'Instance suffix',
+    default: '',
+  })
+}
 
-export const handler = async (argv: DestroyArgv) => {
+type BlockscoutDestroyArgv = DestroyArgv & {
+  suffix: string
+}
+
+export const handler = async (argv: BlockscoutDestroyArgv) => {
   exitIfCelotoolHelmDryRun()
   await switchToClusterFromEnv(argv.celoEnv)
 
-  const dbSuffix = fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
+  const dbSuffix = argv.suffix || fetchEnvOrFallback(envVar.BLOCKSCOUT_DB_SUFFIX, '')
   const instanceName = getInstanceName(argv.celoEnv, dbSuffix)
   const helmReleaseName = getReleaseName(argv.celoEnv, dbSuffix)
 
