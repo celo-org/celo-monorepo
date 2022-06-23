@@ -44,8 +44,14 @@ OLD_BRANCH_BUILD_DIR=$BUILD_DIR
 build_tag $NEW_BRANCH $LOG_FILE
 NEW_BRANCH_BUILD_DIR=$BUILD_DIR
 
+# check-backward script uses migrationsConfig
+echo " - Checkout migrationsConfig.js at $NEW_BRANCH"
+git checkout $NEW_BRANCH -- migrationsConfig.js
+
 yarn ts-node scripts/check-backward.ts sem_check \
   --old_contracts $OLD_BRANCH_BUILD_DIR/contracts \
   --new_contracts $NEW_BRANCH_BUILD_DIR/contracts \
   --exclude $CONTRACT_EXCLUSION_REGEX \
   $REPORT_FLAG
+
+git checkout - -- migrationsConfig.js
