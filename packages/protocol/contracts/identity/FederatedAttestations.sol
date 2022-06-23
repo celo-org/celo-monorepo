@@ -34,10 +34,16 @@ contract FederatedAttestations is
     // using uint64 to allow for extra space to add parameters
   }
 
+  // Mappings from identifier <-> attestation are separated by issuer,
+  // *requiring* users to specify issuers when retrieving attestations.
+  // Maintaining bidirectional mappings (vs. in Attestations.sol) makes it possible
+  // to perform lookups by identifier or account without indexing event data.
+
   // identifier -> issuer -> attestations
   mapping(bytes32 => mapping(address => OwnershipAttestation[])) public identifierToAttestations;
   // account -> issuer -> identifiers
   mapping(address => mapping(address => bytes32[])) public addressToIdentifiers;
+
   // unique attestation hash -> isRevoked
   mapping(bytes32 => bool) public revokedAttestations;
 
