@@ -5,10 +5,7 @@ import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { IFilterCondition } from "./interfaces/IFilterCondition.sol";
 import { ISortedOracles } from "./interfaces/ISortedOracles.sol";
 
-import { SortedLinkedListWithMedian } from "../common/linkedlists/SortedLinkedListWithMedian.sol";
 import { UsingRegistry } from "../common/UsingRegistry.sol";
-import { Exchange } from "./Exchange.sol";
-
 import { FixidityLib } from "../common/FixidityLib.sol";
 
 /**
