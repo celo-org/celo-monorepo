@@ -34,8 +34,6 @@ contract FederatedAttestations is
     // using uint64 to allow for extra space to add parameters
   }
 
-  // TODO ASv2 revisit linting issues & all solhint-disable-next-line max-line-length
-
   // identifier -> issuer -> attestations
   mapping(bytes32 => mapping(address => OwnershipAttestation[])) public identifierToAttestations;
   // account -> issuer -> identifiers
@@ -174,8 +172,6 @@ contract FederatedAttestations is
     bytes32[] calldata identifiers,
     address[] calldata accounts
   ) external {
-    // TODO ASv2 Reviewers: we are planning to provide sensible limits in the SDK
-    // to prevent out of gas errors -- is that sufficient or should we limit here as well?
     require(identifiers.length == accounts.length, "Unequal number of identifiers and accounts");
     require(
       issuer == msg.sender || getAccounts().attestationSignerToAccount(msg.sender) == issuer,
@@ -201,8 +197,6 @@ contract FederatedAttestations is
    * @dev Adds attestation info to the arrays in order of provided trustedIssuers
    * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
-  // TODO reviewers: is it preferable to return an array of `trustedIssuer` indices
-  // (indicating issuer per attestation) instead of counts per attestation?
   function lookupAttestations(bytes32 identifier, address[] calldata trustedIssuers)
     external
     view
