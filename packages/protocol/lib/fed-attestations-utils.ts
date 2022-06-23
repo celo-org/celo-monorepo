@@ -8,6 +8,7 @@ export interface AttestationDetails{
   identifier: string,
   issuer: string,
   account: string,
+  signer: string,
   issuedOn: number,
 }
 
@@ -24,6 +25,7 @@ const getTypedData = (chainId: number, contractAddress: Address, message?: Attes
           { name: 'identifier', type: 'bytes32' },
           { name: 'issuer', type: 'address'},
           { name: 'account', type: 'address' },
+          { name: 'signer', type: 'address' },
           { name: 'issuedOn', type: 'uint64' },
       ],
     },
@@ -48,7 +50,7 @@ export const getSignatureForAttestation = async (
   chainId: number,
   contractAddress: string
 ) => {
-  const typedData = getTypedData(chainId, contractAddress, { identifier,issuer,account, issuedOn})
+  const typedData = getTypedData(chainId, contractAddress, { identifier,issuer,account, signer, issuedOn})
 
   const signature = await new Promise<string>((resolve, reject) => {
     web3.currentProvider.send(
