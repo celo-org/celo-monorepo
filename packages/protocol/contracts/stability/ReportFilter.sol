@@ -44,6 +44,7 @@ contract ReportFilter is IReportFilter, Ownable {
     for (uint256 i = 0; i < _filterConditions.length; ++i) {
       conditionMet = IFilterCondition(_filterConditions[i]).isConditionMet(token, value);
       if (conditionMet) {
+        //TODO: log info
         break;
       }
     }

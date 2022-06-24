@@ -4,6 +4,8 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/ISortedOracles.sol";
+import "./interfaces/IReportFilter.sol";
+
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/FixidityLib.sol";
@@ -20,6 +22,8 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 private constant FIXED1_UINT = 1000000000000000000000000;
+
+  address public reportFilter;
 
   // Maps a token address to a sorted list of report values.
   mapping(address => SortedLinkedListWithMedian.List) private rates;
@@ -48,9 +52,15 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
+  event ReportFilterUpdated(address indexed reportFilter);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
+    _;
+  }
+
+  modifier checkReport(address token, uint256 value) {
+    _checkReport(token, value);
     _;
   }
 
@@ -142,6 +152,16 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   }
 
   /**
+   * @notice Sets the address of the ReportFilter.
+   * @param _reportFilter The new ReportFilter address.
+   */
+  function setReportFilter(address _reportFilter) external onlyOwner {
+    require(_reportFilter != address(0), "Report filter address cannot be zero address");
+    reportFilter = _reportFilter;
+    emit ReportFilterUpdated(_reportFilter);
+  }
+
+  /**
    * @notice Removes a report that is expired.
    * @param token The address of the token for which the CELO exchange rate is being reported.
    * @param n The number of expired reports to remove, at most (deterministic upper gas bound).
@@ -188,6 +208,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   function report(address token, uint256 value, address lesserKey, address greaterKey)
     external
     onlyOracle(token)
+    checkReport(token, value)
   {
     uint256 originalMedian = rates[token].getMedianValue();
     if (rates[token].contains(msg.sender)) {
@@ -331,5 +352,14 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     if (newMedian != originalMedian) {
       emit MedianUpdated(token, newMedian);
     }
+  }
+
+  /**
+   * @notice Check whether or not a specified price report should be filtered.
+   * @param token The address of the token for which the report is being made.
+   * @param value The new report value for the token specified.
+   */
+  function _checkReport(address token, uint256 value) private view {
+    require(!IReportFilter(reportFilter).shouldFilter(token, value), "report was filtered out");
   }
 }

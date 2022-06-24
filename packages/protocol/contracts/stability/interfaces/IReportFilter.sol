@@ -12,6 +12,14 @@ interface IReportFilter {
   event UpdatedFilterConditions(address[] newFilterConditions);
 
   /**
+   * @notice Emitted when a filter condition is met
+   * @param token The address of the token for which the report is being made.
+   * @param value The new report value for the token specified.
+   * @param filterCondition The address of the filter condition that was met.
+   */
+  event ConditionMet(address indexed token, uint256 value, address indexed filterCondition);
+
+  /**
    * @notice Check whether or not a specified price report meets any of the filter conditions.
    * @param token The address of the token for which the report is being made.
    * @param value The new report value for the token specified.
