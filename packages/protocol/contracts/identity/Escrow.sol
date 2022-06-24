@@ -536,8 +536,6 @@ contract Escrow is
 
     delete escrowedPayments[paymentId];
     delete trustedIssuersPerPayment[paymentId];
-    // TODO ASv2 reviewers: adding trustedIssuers to event requires an additional
-    // storage lookup, but we can add this in if it's still best pratice to do so!
     emit TrustedIssuersUnset(paymentId);
   }
 }
