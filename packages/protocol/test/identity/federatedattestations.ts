@@ -5,7 +5,9 @@ import {
 } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
+  assertEqualBN,
   assertEqualBNArray,
+  assertGteBN,
   assertLogMatches2,
   assertRevert,
   assertRevertWithReason,
@@ -157,9 +159,9 @@ contract('FederatedAttestations', (accounts: string[]) => {
     expectedAttestations.forEach((expectedAttestation, index) => {
       assert.equal(actualAddresses[index], expectedAttestation.account)
       assert.equal(actualSigners[index], expectedAttestation.signer)
-      assert.equal(actualIssuedOns[index].toNumber(), expectedAttestation.issuedOn)
+      assertEqualBN(actualIssuedOns[index], expectedAttestation.issuedOn)
       // Check min bounds for publishedOn
-      assert.isAtLeast(actualPublishedOns[index].toNumber(), expectedPublishedOnLowerBound)
+      assertGteBN(actualPublishedOns[index], expectedPublishedOnLowerBound)
     })
   }
 
@@ -691,7 +693,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           publishedOn,
         },
       })
-      assert.isAtLeast(publishedOn.toNumber(), publishedOnLowerBound)
+      assertGteBN(publishedOn, publishedOnLowerBound)
     })
 
     it('should succeed if issuer == signer', async () => {
@@ -915,6 +917,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should revert if MAX_ATTESTATIONS_PER_IDENTIFIER have already been registered', async () => {
       for (
         let i = 0;
+        // This should not overflow and if it does, the test should fail anyways
         i < (await federatedAttestations.MAX_ATTESTATIONS_PER_IDENTIFIER()).toNumber();
         i++
       ) {
@@ -942,6 +945,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should revert if MAX_IDENTIFIERS_PER_ADDRESS have already been registered', async () => {
       for (
         let i = 0;
+        // This should not overflow and if it does, the test should fail anyways
         i < (await federatedAttestations.MAX_IDENTIFIERS_PER_ADDRESS()).toNumber();
         i++
       ) {

@@ -2,13 +2,16 @@ import { NULL_ADDRESS } from '@celo/base/lib/address'
 import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
+  assertEqualBN,
   assertLogMatches2,
+  assertObjectWithBNEqual,
   assertRevert,
   assertRevertWithReason,
   assumeOwnership,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import BN from 'bn.js'
 import {
   EscrowContract,
   EscrowInstance,
@@ -34,7 +37,7 @@ const NULL_ESCROWED_PAYMENT: EscrowedPayment = {
   recipientIdentifier: NULL_BYTES32,
   sender: NULL_ADDRESS,
   token: NULL_ADDRESS,
-  value: 0,
+  value: new BN(0),
   sentIndex: 0,
   receivedIndex: 0,
   timestamp: 0,
@@ -45,7 +48,7 @@ interface EscrowedPayment {
   recipientIdentifier: string
   sender: string
   token: string
-  value: number
+  value: BN
   sentIndex: number
   receivedIndex: number
   timestamp: number
@@ -62,10 +65,11 @@ const getEscrowedPayment = async (
     recipientIdentifier: payment[0],
     sender: payment[1],
     token: payment[2],
-    value: payment[3].toNumber(),
+    // numbers expected to be small such as indices are directly casted to numbers
+    value: web3.utils.toBN(payment[3]),
     sentIndex: payment[4].toNumber(),
     receivedIndex: payment[5].toNumber(),
-    timestamp: payment[6].toNumber(),
+    timestamp: web3.utils.toBN(payment[6].toNumber()),
     expirySeconds: payment[7].toNumber(),
     minAttestations: payment[8].toNumber(),
   }
@@ -257,11 +261,14 @@ contract('Escrow', (accounts: string[]) => {
         expectedSentPaymentIds: string[],
         expectedReceivedPaymentIds: string[]
       ) => {
-        const startingEscrowContractBalance = (
+        const startingEscrowContractBalance: BN = web3.utils.toBN(
           await mockERC20Token.balanceOf(escrow.address)
-        ).toNumber()
-        const startingSenderBalance = (await mockERC20Token.balanceOf(escrowSender)).toNumber()
-        await escrow.transferWithTrustedIssuers(
+        )
+        const startingSenderBalance: BN = web3.utils.toBN(
+          await mockERC20Token.balanceOf(escrowSender)
+        )
+
+        await await escrow.transferWithTrustedIssuers(
           identifier,
           mockERC20Token.address,
           value,
@@ -272,20 +279,19 @@ contract('Escrow', (accounts: string[]) => {
           { from: escrowSender }
         )
         const escrowedPayment = await getEscrowedPayment(paymentId, escrow)
-        assert.equal(
+        assertEqualBN(
           escrowedPayment.value,
           value,
           'incorrect escrowedPayment.value in payment struct'
         )
-
-        assert.equal(
-          (await mockERC20Token.balanceOf(escrowSender)).toNumber(),
-          startingSenderBalance - value,
+        assertEqualBN(
+          await mockERC20Token.balanceOf(escrowSender),
+          startingSenderBalance.subn(value),
           'incorrect final sender balance'
         )
-        assert.equal(
-          (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
-          startingEscrowContractBalance + value,
+        assertEqualBN(
+          await mockERC20Token.balanceOf(escrow.address),
+          startingEscrowContractBalance.addn(value),
           'incorrect final Escrow contract balance'
         )
 
@@ -692,10 +698,10 @@ contract('Escrow', (accounts: string[]) => {
         )
       }
       const deletedEscrowedPayment = await getEscrowedPayment(deletedPaymentId, escrow)
-      assert.deepEqual(
+      assertObjectWithBNEqual(
         deletedEscrowedPayment,
         NULL_ESCROWED_PAYMENT,
-        'escrowedPayment not zeroed out'
+        (field) => `escrowedPayment not zeroed out for field: ${field}`
       )
       const trustedIssuersPerPayment = await escrow.getTrustedIssuersPerPayment(deletedPaymentId)
       assert.deepEqual(trustedIssuersPerPayment, [], 'trustedIssuersPerPayment not zeroed out')
@@ -721,32 +727,31 @@ contract('Escrow', (accounts: string[]) => {
         escrowSender: string,
         escrowReceiver: string,
         identifier: string,
-        value: number,
         paymentId: string,
         expectedSentPaymentIds: string[],
         expectedReceivedPaymentIds: string[]
       ) => {
-        const receiverBalanceBefore = (await mockERC20Token.balanceOf(escrowReceiver)).toNumber()
-        const escrowContractBalanceBefore = (
+        const receiverBalanceBefore: BN = web3.utils.toBN(
+          await mockERC20Token.balanceOf(escrowReceiver)
+        )
+        const escrowContractBalanceBefore: BN = web3.utils.toBN(
           await mockERC20Token.balanceOf(escrow.address)
-        ).toNumber()
+        )
         const paymentBefore = await getEscrowedPayment(paymentId, escrow)
         const parsedSig = await getParsedSignatureOfAddress(web3, escrowReceiver, paymentId)
         await escrow.withdraw(paymentId, parsedSig.v, parsedSig.r, parsedSig.s, {
           from: escrowReceiver,
         })
-        assert.equal(
-          (await mockERC20Token.balanceOf(escrowReceiver)).toNumber(),
-          receiverBalanceBefore + value,
+        assertEqualBN(
+          await mockERC20Token.balanceOf(escrowReceiver),
+          receiverBalanceBefore.add(paymentBefore.value),
           'incorrect final receiver balance'
         )
-
-        assert.equal(
-          (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
-          escrowContractBalanceBefore - value,
+        assertEqualBN(
+          await mockERC20Token.balanceOf(escrow.address),
+          escrowContractBalanceBefore.sub(paymentBefore.value),
           'incorrect final Escrow contract balance'
         )
-
         await checkStateAfterDeletingPayment(
           paymentId,
           paymentBefore,
@@ -791,7 +796,6 @@ contract('Escrow', (accounts: string[]) => {
             sender,
             receiver,
             NULL_BYTES32,
-            aValue,
             uniquePaymentIDWithdraw,
             [],
             []
@@ -858,7 +862,6 @@ contract('Escrow', (accounts: string[]) => {
             sender,
             receiver,
             NULL_BYTES32,
-            aValue,
             uniquePaymentIDWithdraw,
             [anotherWithdrawKeyAddress],
             [anotherWithdrawKeyAddress]
@@ -878,7 +881,6 @@ contract('Escrow', (accounts: string[]) => {
             sender,
             receiver,
             NULL_BYTES32,
-            aValue,
             uniquePaymentIDWithdraw,
             [anotherWithdrawKeyAddress],
             []
@@ -916,28 +918,12 @@ contract('Escrow', (accounts: string[]) => {
 
         it('should allow users to withdraw after completing attestations', async () => {
           await completeAttestations(receiver, aPhoneHash, minAttestations)
-          await withdrawAndCheckState(
-            sender,
-            receiver,
-            aPhoneHash,
-            aValue,
-            uniquePaymentIDWithdraw,
-            [],
-            []
-          )
+          await withdrawAndCheckState(sender, receiver, aPhoneHash, uniquePaymentIDWithdraw, [], [])
         })
         it('should not allow a user to withdraw a payment if they have fewer than minAttestations', async () => {
           await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
           await assertRevertWithReason(
-            withdrawAndCheckState(
-              sender,
-              receiver,
-              aPhoneHash,
-              aValue,
-              uniquePaymentIDWithdraw,
-              [],
-              []
-            ),
+            withdrawAndCheckState(sender, receiver, aPhoneHash, uniquePaymentIDWithdraw, [], []),
             'This account does not have the required attestations to withdraw this payment.'
           )
         })
@@ -956,7 +942,6 @@ contract('Escrow', (accounts: string[]) => {
             sender,
             receiver,
             aPhoneHash,
-            aValue,
             uniquePaymentIDWithdraw,
             [anotherWithdrawKeyAddress],
             [anotherWithdrawKeyAddress]
@@ -985,7 +970,6 @@ contract('Escrow', (accounts: string[]) => {
               sender,
               receiver,
               aPhoneHash,
-              aValue,
               uniquePaymentIDWithdraw,
               [],
               []
@@ -999,7 +983,6 @@ contract('Escrow', (accounts: string[]) => {
                   sender,
                   receiver,
                   aPhoneHash,
-                  aValue,
                   uniquePaymentIDWithdraw,
                   [],
                   []
@@ -1020,7 +1003,6 @@ contract('Escrow', (accounts: string[]) => {
                 sender,
                 receiver,
                 aPhoneHash,
-                aValue,
                 uniquePaymentIDWithdraw,
                 [],
                 []
@@ -1052,7 +1034,6 @@ contract('Escrow', (accounts: string[]) => {
               sender,
               receiver,
               aPhoneHash,
-              aValue,
               uniquePaymentIDWithdraw,
               [],
               []
@@ -1060,15 +1041,7 @@ contract('Escrow', (accounts: string[]) => {
           })
           it('should not allow a user to withdraw a payment if no attestations exist for trustedIssuers', async () => {
             await assertRevertWithReason(
-              withdrawAndCheckState(
-                sender,
-                receiver,
-                aPhoneHash,
-                aValue,
-                uniquePaymentIDWithdraw,
-                [],
-                []
-              ),
+              withdrawAndCheckState(sender, receiver, aPhoneHash, uniquePaymentIDWithdraw, [], []),
               'This account does not have the required attestations to withdraw this payment.'
             )
           })
@@ -1134,22 +1107,22 @@ contract('Escrow', (accounts: string[]) => {
           it('should allow sender to redeem payment after payment has expired', async () => {
             await timeTravel(oneDayInSecs, web3)
 
-            const senderBalanceBefore = (await mockERC20Token.balanceOf(sender)).toNumber()
-            const escrowContractBalanceBefore = (
+            const senderBalanceBefore: BN = web3.utils.BN(await mockERC20Token.balanceOf(sender))
+            const escrowContractBalanceBefore: BN = web3.utils.BN(
               await mockERC20Token.balanceOf(escrow.address)
-            ).toNumber()
+            )
             const paymentBefore = await getEscrowedPayment(uniquePaymentIDRevoke, escrow)
 
             await escrow.revoke(uniquePaymentIDRevoke, { from: sender })
 
-            assert.equal(
-              (await mockERC20Token.balanceOf(sender)).toNumber(),
-              senderBalanceBefore + aValue,
+            assertEqualBN(
+              await mockERC20Token.balanceOf(sender),
+              senderBalanceBefore.addn(aValue),
               'incorrect final sender balance'
             )
-            assert.equal(
-              (await mockERC20Token.balanceOf(escrow.address)).toNumber(),
-              escrowContractBalanceBefore - aValue,
+            assertEqualBN(
+              await mockERC20Token.balanceOf(escrow.address),
+              escrowContractBalanceBefore.subn(aValue),
               'incorrect final Escrow contract balance'
             )
 
