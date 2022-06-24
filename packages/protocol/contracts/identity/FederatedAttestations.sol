@@ -293,6 +293,7 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) public view {
+    // attestationSignerToAccount instead of isSigner allows the issuer to act as its own signer
     require(
       getAccounts().attestationSignerToAccount(signer) == issuer,
       "Signer is not a currently authorized AttestationSigner for the issuer"
