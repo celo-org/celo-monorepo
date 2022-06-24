@@ -39,6 +39,16 @@ interface BuildOptions {
   proposal_path: string
 }
 
+function checkInheritance(contractCode, formData) {
+  const stableContracts = ['BRL.sol', 'USD.sol', 'EUR.sol']
+  for (const s of stableContracts) {
+    if (contractCode.endsWith(s)) {
+      const e = contractCode.replace(s, '.sol')
+      formData.append('files', fs.createReadStream('.' + e.split('protocol')[1]))
+    }
+  }
+}
+
 async function main(buildTargets: BuildOptions) {
   const artifactBasePath = buildTargets.build_artifacts_path || './build/contracts'
   const artifactPaths = fs.readdirSync(artifactBasePath)
@@ -80,18 +90,8 @@ async function main(buildTargets: BuildOptions) {
 
     const contractCode = sourcesfilesNeeded.find((f) => f.includes(implementationName))
     // Interface contract needs the parent implementation as well
-    if (contractCode.endsWith('BRL.sol')) {
-      const e = contractCode.replace('BRL.sol', '.sol')
-      formData.append('files', fs.createReadStream('.' + e.split('protocol')[1]))
-    }
-    if (contractCode.endsWith('USD.sol')) {
-      const e = contractCode.replace('USD.sol', '.sol')
-      formData.append('files', fs.createReadStream('.' + e.split('protocol')[1]))
-    }
-    if (contractCode.endsWith('EUR.sol')) {
-      const e = contractCode.replace('EUR.sol', '.sol')
-      formData.append('files', fs.createReadStream('.' + e.split('protocol')[1]))
-    }
+    checkInheritance(contractCode, formData)
+
     formData.append('files', fs.createReadStream('.' + contractCode.split('protocol')[1]))
 
     try {
