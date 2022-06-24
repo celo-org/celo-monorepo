@@ -917,6 +917,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should revert if MAX_ATTESTATIONS_PER_IDENTIFIER have already been registered', async () => {
       for (
         let i = 0;
+        // This should not overflow and if it does, the test should fail anyways
         i < (await federatedAttestations.MAX_ATTESTATIONS_PER_IDENTIFIER()).toNumber();
         i++
       ) {
@@ -944,6 +945,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should revert if MAX_IDENTIFIERS_PER_ADDRESS have already been registered', async () => {
       for (
         let i = 0;
+        // This should not overflow and if it does, the test should fail anyways
         i < (await federatedAttestations.MAX_IDENTIFIERS_PER_ADDRESS()).toNumber();
         i++
       ) {

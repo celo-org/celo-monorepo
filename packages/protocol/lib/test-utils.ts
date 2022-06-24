@@ -280,7 +280,6 @@ export function assertLogMatches2(
   assertLogMatches(log, expected.event, expected.args)
 }
 
-
 export function assertLogMatches(
   log: Truffle.TransactionLog,
   event: string,
@@ -290,7 +289,8 @@ export function assertLogMatches(
   assertObjectWithBNEqual(log.args, args, (arg) => `Event ${event}, arg: ${arg} do not match`)
 }
 
-
+// Compares objects' properties, using assertBNEqual to compare BN fields.
+// Extracted out of previous `assertLogMatches`.
 export function assertObjectWithBNEqual(
   actual: object,
   expected: Record<string, any>,
