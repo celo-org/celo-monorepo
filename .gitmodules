@@ -4,3 +4,6 @@
 [submodule "packages/protocol/lib/solidity-bytes-utils"]
 	path = packages/protocol/lib/solidity-bytes-utils
 	url = https://github.com/GNSPS/solidity-bytes-utils
+[submodule "packages/protocol/lib/openzeppelin-contracts"]
+	path = packages/protocol/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
