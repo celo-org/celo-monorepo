@@ -7,8 +7,8 @@ libs = [
     'node_modules',
 ]
 remappings = [
-    'openzeppelin-solidity/=node_modules/openzeppelin-solidity/',
-    'solidity-bytes-utils/=node_modules/solidity-bytes-utils/',
+    'openzeppelin-solidity/=lib/openzeppelin-contracts/',
+    'solidity-bytes-utils/=lib/solidity-bytes-utils/',
     'forge-std/=lib/celo-foundry/lib/forge-std/src/',
     'ds-test/=lib/celo-foundry/lib/forge-std/lib/ds-test/src/',
     'celo-foundry/=lib/celo-foundry/src/'

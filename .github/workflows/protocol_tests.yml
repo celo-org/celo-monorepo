@@ -21,8 +21,5 @@ jobs:
       - name: Install forge dependencies
         run: forge install
 
-      - name: Install npm dependencies
-        run: npm install
-
       - name: Run tests
         run: forge test -vvv --use solc:0.5.13
