@@ -3,6 +3,9 @@ on: [push, pull_request]
 
 jobs:
   check:
+    defaults:
+      run:
+        working-directory: packages/protocol
     name: Run tests
     runs-on: ubuntu-latest
     steps:
