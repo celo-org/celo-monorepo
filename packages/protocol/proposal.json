@@ -1,0 +1,66 @@
+[
+  {
+    "contract": "AccountsProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x893120B08e86ACF40998BB16880ACB0B8efC25F0"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "ExchangeProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x8070f183662d577Ab258d81eA18723EDece53F54"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "ExchangeBRLProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0xEB80459DFb30594d501d459D6bDFFC4DE6840F20"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "ExchangeEURProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0xE20cf87413917D9751BFCDa9b88B8D758f75777e"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "GrandaMentoProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x574b52707FA5353AE05685010d22A7eDea71625C"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "LockedGoldProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x13eaAC84d79a776D498968c8e1b4262823C26dA0"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "ReserveProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x315F17F403A7207ed090C80BbcFbdAF6c5d3CEDA"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "ValidatorsProxy",
+    "function": "_setImplementation",
+    "args": [
+      "0x3024f64D591745Ed051b34806E808C12Af015B14"
+    ],
+    "value": "0"
+  }
+]

@@ -33,17 +33,17 @@ import Web3 from 'web3'
  *
  */
 
-const _buildTargets = {
-  network: undefined,
-  build_artifacts_path: undefined,
-  proposal_path: undefined,
+interface BuildOptions {
+  network: string
+  build_artifacts_path: string
+  proposal_path: string
 }
 
-async function main(buildTargets: typeof _buildTargets) {
+async function main(buildTargets: BuildOptions) {
   const artifactBasePath = buildTargets.build_artifacts_path || './build/contracts'
   const artifactPaths = fs.readdirSync(artifactBasePath)
-  const reportPath = buildTargets.proposal_path || './proposal.json'
-  const report = require(path.join(process.cwd(), reportPath))
+  const proposalPath = buildTargets.proposal_path || './proposal.json'
+  const proposal = require(path.join(process.cwd(), proposalPath))
   const network = buildTargets.network
   const web3 = new Web3('http://localhost:8545')
   const chainId = await web3.eth.getChainId()
@@ -53,15 +53,17 @@ async function main(buildTargets: typeof _buildTargets) {
 
   const artifacts = artifactPaths.map((a) => require(path.join(process.cwd(), artifactBasePath, a)))
 
-  for (const r of report) {
-    const artifact = artifacts.find((a) => a.contractName === r.contract)
+  for (const proposalItem of proposal) {
+    const artifact = artifacts.find((a) => a.contractName === proposalItem.contract)
 
     console.log()
     console.log(artifact.contractName)
     console.log('-'.repeat(artifact.contractName.length))
 
-    const address = r.contract.includes('Proxy') ? r.args[0] : r.args[1]
-    const implementationName = r.contract.includes('Proxy')
+    const address = proposalItem.contract.includes('Proxy')
+      ? proposalItem.args[0]
+      : proposalItem.args[1]
+    const implementationName = proposalItem.contract.includes('Proxy')
       ? artifact.contractName.replace('Proxy', '')
       : artifact.contractName
 
@@ -76,21 +78,21 @@ async function main(buildTargets: typeof _buildTargets) {
     const mainContract = artifacts.find((a) => a.contractName === implementationName)
     const sourcesfilesNeeded = Object.keys(JSON.parse(mainContract.metadata).sources)
 
-    const p = sourcesfilesNeeded.find((f) => f.includes(implementationName))
+    const contractCode = sourcesfilesNeeded.find((f) => f.includes(implementationName))
     // Interface contract needs the parent implementation as well
-    if (p.endsWith('BRL.sol')) {
-      const e = p.replace('BRL.sol', '.sol')
+    if (contractCode.endsWith('BRL.sol')) {
+      const e = contractCode.replace('BRL.sol', '.sol')
       formData.append('files', fs.createReadStream('.' + e.split('protocol')[1]))
     }
-    if (p.endsWith('USD.sol')) {
-      const e = p.replace('USD.sol', '.sol')
+    if (contractCode.endsWith('USD.sol')) {
+      const e = contractCode.replace('USD.sol', '.sol')
       formData.append('files', fs.createReadStream('.' + e.split('protocol')[1]))
     }
-    if (p.endsWith('EUR.sol')) {
-      const e = p.replace('EUR.sol', '.sol')
+    if (contractCode.endsWith('EUR.sol')) {
+      const e = contractCode.replace('EUR.sol', '.sol')
       formData.append('files', fs.createReadStream('.' + e.split('protocol')[1]))
     }
-    formData.append('files', fs.createReadStream('.' + p.split('protocol')[1]))
+    formData.append('files', fs.createReadStream('.' + contractCode.split('protocol')[1]))
 
     try {
       await fetch('https://sourcify.dev/server', {
