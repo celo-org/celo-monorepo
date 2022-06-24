@@ -8,7 +8,7 @@ import {
   assertRevert,
   assertRevertWithReason,
   assumeOwnership,
-  timeTravel
+  timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import BN from 'bn.js'
@@ -21,7 +21,7 @@ import {
   MockAttestationsInstance,
   MockERC20TokenContract,
   MockERC20TokenInstance,
-  RegistryInstance
+  RegistryInstance,
 } from 'types'
 import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 
@@ -65,10 +65,11 @@ const getEscrowedPayment = async (
     recipientIdentifier: payment[0],
     sender: payment[1],
     token: payment[2],
+    // numbers expected to be small such as indices are directly casted to numbers
     value: web3.utils.toBN(payment[3]),
     sentIndex: payment[4].toNumber(),
     receivedIndex: payment[5].toNumber(),
-    timestamp: payment[6].toNumber(),
+    timestamp: web3.utils.toBN(payment[6].toNumber()),
     expirySeconds: payment[7].toNumber(),
     minAttestations: payment[8].toNumber(),
   }
@@ -917,26 +918,12 @@ contract('Escrow', (accounts: string[]) => {
 
         it('should allow users to withdraw after completing attestations', async () => {
           await completeAttestations(receiver, aPhoneHash, minAttestations)
-          await withdrawAndCheckState(
-            sender,
-            receiver,
-            aPhoneHash,
-            uniquePaymentIDWithdraw,
-            [],
-            []
-          )
+          await withdrawAndCheckState(sender, receiver, aPhoneHash, uniquePaymentIDWithdraw, [], [])
         })
         it('should not allow a user to withdraw a payment if they have fewer than minAttestations', async () => {
           await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
           await assertRevertWithReason(
-            withdrawAndCheckState(
-              sender,
-              receiver,
-              aPhoneHash,
-              uniquePaymentIDWithdraw,
-              [],
-              []
-            ),
+            withdrawAndCheckState(sender, receiver, aPhoneHash, uniquePaymentIDWithdraw, [], []),
             'This account does not have the required attestations to withdraw this payment.'
           )
         })
@@ -983,7 +970,6 @@ contract('Escrow', (accounts: string[]) => {
               sender,
               receiver,
               aPhoneHash,
-              aValue,
               uniquePaymentIDWithdraw,
               [],
               []
@@ -997,7 +983,6 @@ contract('Escrow', (accounts: string[]) => {
                   sender,
                   receiver,
                   aPhoneHash,
-                  aValue,
                   uniquePaymentIDWithdraw,
                   [],
                   []
@@ -1018,7 +1003,6 @@ contract('Escrow', (accounts: string[]) => {
                 sender,
                 receiver,
                 aPhoneHash,
-                aValue,
                 uniquePaymentIDWithdraw,
                 [],
                 []
@@ -1050,7 +1034,6 @@ contract('Escrow', (accounts: string[]) => {
               sender,
               receiver,
               aPhoneHash,
-              aValue,
               uniquePaymentIDWithdraw,
               [],
               []
@@ -1058,15 +1041,7 @@ contract('Escrow', (accounts: string[]) => {
           })
           it('should not allow a user to withdraw a payment if no attestations exist for trustedIssuers', async () => {
             await assertRevertWithReason(
-              withdrawAndCheckState(
-                sender,
-                receiver,
-                aPhoneHash,
-                aValue,
-                uniquePaymentIDWithdraw,
-                [],
-                []
-              ),
+              withdrawAndCheckState(sender, receiver, aPhoneHash, uniquePaymentIDWithdraw, [], []),
               'This account does not have the required attestations to withdraw this payment.'
             )
           })

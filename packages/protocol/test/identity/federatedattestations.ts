@@ -1,16 +1,18 @@
 import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
 import {
   getDomainDigest,
-  getSignatureForAttestation
+  getSignatureForAttestation,
 } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
+  assertEqualBN,
   assertEqualBNArray,
+  assertGteBN,
   assertLogMatches2,
   assertRevert,
   assertRevertWithReason,
   assertThrowsAsync,
-  assumeOwnership
+  assumeOwnership,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import BigNumber from 'bignumber.js'
@@ -19,7 +21,7 @@ import {
   AccountsInstance,
   FederatedAttestationsContract,
   FederatedAttestationsInstance,
-  RegistryInstance
+  RegistryInstance,
 } from 'types'
 import { encodePacked, keccak256 } from 'web3-utils'
 
@@ -157,9 +159,9 @@ contract('FederatedAttestations', (accounts: string[]) => {
     expectedAttestations.forEach((expectedAttestation, index) => {
       assert.equal(actualAddresses[index], expectedAttestation.account)
       assert.equal(actualSigners[index], expectedAttestation.signer)
-      assert.equal(actualIssuedOns[index].toNumber(), expectedAttestation.issuedOn)
+      assertEqualBN(actualIssuedOns[index], expectedAttestation.issuedOn)
       // Check min bounds for publishedOn
-      assert.isAtLeast(actualPublishedOns[index].toNumber(), expectedPublishedOnLowerBound)
+      assertGteBN(actualPublishedOns[index], expectedPublishedOnLowerBound)
     })
   }
 
@@ -691,7 +693,7 @@ contract('FederatedAttestations', (accounts: string[]) => {
           publishedOn,
         },
       })
-      assert.isAtLeast(publishedOn.toNumber(), publishedOnLowerBound)
+      assertGteBN(publishedOn, publishedOnLowerBound)
     })
 
     it('should succeed if issuer == signer', async () => {
