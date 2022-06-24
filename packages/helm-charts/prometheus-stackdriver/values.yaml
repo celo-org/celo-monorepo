@@ -136,6 +136,7 @@ remote_write:
               |coredns.*\
               |cortex.*\
               |csi_operations.*\
+              |eksportisto_step_duration_bucket\
               |erlang_.+\
               |etcd_.+\
               |go_gc_.*\
@@ -163,6 +164,9 @@ remote_write:
               |kube_node_status_condition\
               |kube_persistentvolume.*\
               |kube_pod_[^cs].+\
+              |kube_pod_status_ready\
+              |kube_pod_status_scheduled\
+              |kube_pod_status_scheduled_time\
               |kube_pod_status_phase\
               |kube_pod_container_[^r].+\
               |kube_pod_container_status_last_terminated_reason\
@@ -181,6 +185,10 @@ remote_write:
               |nginx_.+\
               |nodejs_active_.*\
               |nodejs_gc_.*\
+              |oracle_action_duration_bucket\
+              |oracle_exchange_api_request_duration_seconds_bucket\
+              |oracle_exchange_api_request_error_count\
+              |oracle_ticker_property\
               |phoenix_.+\
               |process_cpu_system.*\
               |process_cpu_user.*\
