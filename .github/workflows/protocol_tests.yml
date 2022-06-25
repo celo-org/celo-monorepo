@@ -12,6 +12,18 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+      - name: Foundry cache
+        id: foundry-cache
+        uses: actions/cache@v3
+        with:
+          path: ./cache
+          key: ${{ runner.os }}-foundry-cache
+      - name: Foundry out
+        id: foundry-out
+        uses: actions/cache@v3
+        with:
+          path: ./out
+          key: ${{ runner.os }}-foundry-out
 
       - name: Install Foundry
         uses: onbjerg/foundry-toolchain@v1
@@ -22,4 +34,4 @@ jobs:
         run: forge install
 
       - name: Run tests
-        run: forge test -vvv --use solc:0.5.17
+        run: forge test -vvv
