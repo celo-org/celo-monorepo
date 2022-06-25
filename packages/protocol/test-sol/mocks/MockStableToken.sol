@@ -2,7 +2,6 @@
 pragma solidity ^0.5.13;
 
 import "contracts/stability/StableToken.sol";
-import "contracts/common/Registry.sol";
 import "forge-std/Vm.sol";
 
 contract MockStableToken is StableToken(true) {

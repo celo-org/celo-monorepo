@@ -34,8 +34,8 @@ contract ExchangeTest is Test, WithRegistry(0x1) {
   address rando;
 
   Exchange exchange;
-  Freezer freezer;
   MockStableToken stableToken;
+  Freezer freezer;
   MockGoldToken celoToken;
   MockReserve reserve;
   MockSortedOracles sortedOracles;
@@ -47,7 +47,7 @@ contract ExchangeTest is Test, WithRegistry(0x1) {
     .newFixed(initialReserveBalance)
     .multiply(reserveFraction)
     .fromFixed();
-  uint256 constant amountForRate = 1000000000000000000000000;
+  uint256 constant celoAmountForRate = 1000000000000000000000000;
   uint256 constant stableAmountForRate = 2000000000000000000000000;
   uint256 initialStableBucket = initialCeloBucket * 2;
   FixidityLib.Fraction spread = FixidityLib.newFixedFraction(3, 1000);
@@ -302,14 +302,14 @@ contract ExchangeTest_buyAndSellValues is ExchangeTest_stableActivated {
   }
 
   function test_getBuyAndSellBuckets_afterOracelUpdate_isTheSameIfNotStale() public {
-    sortedOracles.setMedianRate(address(stableToken), amountForRate.mul(4));
+    sortedOracles.setMedianRate(address(stableToken), celoAmountForRate.mul(4));
     (uint256 buyBucketSize, uint256 sellBucketSize) = exchange.getBuyAndSellBuckets(true);
     assert(buyBucketSize == initialStableBucket);
     assert(sellBucketSize == initialCeloBucket);
   }
 
   function test_getBuyAndSellBuckets_afterOracelUpdate_updatesIfTimeHasPassed() public {
-    sortedOracles.setMedianRate(address(stableToken), amountForRate.mul(4));
+    sortedOracles.setMedianRate(address(stableToken), celoAmountForRate.mul(4));
     vm.warp(block.timestamp + bucketUpdateFrequency);
     sortedOracles.setMedianTimestampToNow(address(stableToken));
 
@@ -374,60 +374,24 @@ contract ExchangeTest_sell is ExchangeTest_stableActivated {
     received = sell(amount, expected, sellCelo);
   }
 
-  function test_celoForStables_increasesStableBalance(uint256 amount) public {
+  function test_sellCelo_executesTrade(uint256 amount) public {
     vm.assume(amount <= sellerCeloBalance && amount > 10);
-    (uint256 expected, ) = approveAndSell(amount, true);
-    assertEq(stableToken.balanceOf(seller), sellerStableBalance + expected);
-  }
-
-  function test_celoForStables_decreasesCeloBalance(uint256 amount) public {
-    vm.assume(amount <= sellerCeloBalance);
-    approveAndSell(amount, true);
-    assertEq(celoToken.balanceOf(seller), sellerCeloBalance - amount);
-  }
-
-  function test_celoForStables_removesAllowance(uint256 amount) public {
-    vm.assume(amount <= sellerCeloBalance);
-    approveAndSell(amount, true);
-    assertEq(celoToken.allowance(seller, address(exchange)), 0);
-  }
-
-  function test_celoForStables_increasesReserveBalance(uint256 amount) public {
-    vm.assume(amount <= sellerCeloBalance);
-    approveAndSell(amount, true);
-    assertEq(celoToken.balanceOf(address(reserve)), initialReserveBalance + amount);
-  }
-
-  function test_celoForStables_increasesStableTokenSupply(uint256 amount) public {
-    vm.assume(amount <= sellerCeloBalance);
     uint256 stableSupply = stableToken.totalSupply();
-    (uint256 expected, ) = approveAndSell(amount, true);
+    uint256 expected = getBuyTokenAmount(amount, initialCeloBucket, initialStableBucket);
+    vm.expectEmit(true, true, true, true, address(exchange));
+    emit Exchanged(seller, amount, expected, true);
+    approveAndSell(amount, true);
+    assertEq(stableToken.balanceOf(seller), sellerStableBalance + expected);
+    assertEq(celoToken.balanceOf(seller), sellerCeloBalance - amount);
+    assertEq(celoToken.allowance(seller, address(exchange)), 0);
+    assertEq(celoToken.balanceOf(address(reserve)), initialReserveBalance + amount);
     assertEq(stableToken.totalSupply(), stableSupply + expected);
-  }
-
-  function test_celoForStables_affectsBuckets(uint256 amount) public {
-    vm.assume(amount <= sellerCeloBalance);
-    (uint256 expected, ) = approveAndSell(amount, true);
     (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
     assertEq(mintableStable, initialStableBucket - expected);
     assertEq(tradableCelo, initialCeloBucket + amount);
   }
 
-  function test_celoForStables_emitsExchangedEvent(uint256 amount) public {
-    vm.assume(amount <= sellerCeloBalance);
-    uint256 expectedStableAmount = getBuyTokenAmount(
-      amount,
-      initialCeloBucket,
-      initialStableBucket
-    );
-
-    vm.expectEmit(true, true, true, true, address(exchange));
-    emit Exchanged(seller, amount, expectedStableAmount, true);
-    approveExchange(amount, true);
-    sell(amount, expectedStableAmount, true);
-  }
-
-  function test_celoForStables_revertsIfApprovalIsWrong(uint256 amount) public {
+  function test_sellCelo_revertsIfApprovalIsWrong(uint256 amount) public {
     vm.assume(amount <= sellerCeloBalance);
     approveExchange(amount, true);
     uint256 expectedStableAmount = getBuyTokenAmount(
@@ -439,7 +403,7 @@ contract ExchangeTest_sell is ExchangeTest_stableActivated {
     sell(amount + 1, expectedStableAmount, true);
   }
 
-  function test_celoForStables_revertsIfMinBuyAmountUnsatisfied(uint256 amount) public {
+  function test_sellCelo_revertsIfMinBuyAmountUnsatisfied(uint256 amount) public {
     vm.assume(amount <= sellerCeloBalance);
     approveExchange(amount, true);
     uint256 expectedStableAmount = getBuyTokenAmount(
@@ -452,64 +416,56 @@ contract ExchangeTest_sell is ExchangeTest_stableActivated {
     sell(amount, expectedStableAmount + 1, true);
   }
 
-  function test_celoForStables_whenBucketsStale_whenOldestReportNotExpired_exchangeSucceeds()
-    public
-  {
+  function test_sellCelo_whenBucketsStaleandReportFresh_updatesBuckets() public {
     uint256 amount = 1000;
+    celoToken.mint(address(reserve), initialReserveBalance);
+    vm.warp(block.timestamp + bucketUpdateFrequency);
+    sortedOracles.setMedianTimestampToNow(address(stableToken));
+
+    uint256 updatedCeloBucket = initialCeloBucket.mul(2);
+    uint256 updatedStableBucket = updatedCeloBucket.mul(stableAmountForRate).div(celoAmountForRate);
+
+    vm.expectEmit(true, true, true, true, address(exchange));
+    emit BucketsUpdated(updatedCeloBucket, updatedStableBucket);
     (uint256 expected, ) = approveAndSell(amount, true);
     assertEq(stableToken.balanceOf(seller), sellerStableBalance + expected);
+    (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
+    assertEq(mintableStable, updatedStableBucket - expected);
+    assertEq(tradableCelo, updatedCeloBucket + amount);
   }
 
-  function test_stableForCelo_decreasesStableBalance(uint256 amount) public {
+  function test_sellCelo_whenBucketsStaleandReportStale_doesNotUpdateBuckets() public {
+    uint256 amount = 1000;
+    celoToken.mint(address(reserve), initialReserveBalance);
+    vm.warp(block.timestamp + bucketUpdateFrequency);
+    sortedOracles.setOldestReportExpired(address(stableToken));
+
+    (uint256 expected, ) = approveAndSell(amount, true);
+    assertEq(stableToken.balanceOf(seller), sellerStableBalance + expected);
+    (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
+    assertEq(mintableStable, initialStableBucket - expected);
+    assertEq(tradableCelo, initialCeloBucket + amount);
+  }
+
+  function test_sellStable_executesTrade(uint256 amount) public {
     vm.assume(amount < sellerStableBalance && amount > 10);
+    uint256 stableTokenSupplyBefore = stableToken.totalSupply();
+    vm.expectEmit(true, true, false, true, address(exchange));
+    uint256 expected = getBuyTokenAmount(amount, initialStableBucket, initialCeloBucket);
+    emit Exchanged(seller, amount, expected, false);
     approveAndSell(amount, false);
+
     assertEq(stableToken.balanceOf(seller), sellerStableBalance - amount);
-  }
-
-  function test_stableForCelo_increasesCeloBalance(uint256 amount) public {
-    vm.assume(amount < sellerStableBalance && amount > 10);
-    (uint256 expected, ) = approveAndSell(amount, false);
     assertEq(celoToken.balanceOf(seller), sellerCeloBalance + expected);
-  }
-
-  function test_stableForCelo_removesAllowance(uint256 amount) public {
-    vm.assume(amount < sellerStableBalance && amount > 10);
-    approveAndSell(amount, false);
     assertEq(stableToken.allowance(seller, address(exchange)), 0);
-  }
-
-  function test_stableForCelo_decreasesReserveBalance(uint256 amount) public {
-    vm.assume(amount < sellerStableBalance);
-    (uint256 expected, ) = approveAndSell(amount, false);
     assertEq(celoToken.balanceOf(address(reserve)), initialReserveBalance - expected);
-  }
-
-  function test_stableForCelo_decreasesStableTokenSupply(uint256 amount) public {
-    vm.assume(amount < sellerStableBalance);
-    uint256 supplyBefore = stableToken.totalSupply();
-    approveAndSell(amount, false);
-    assertEq(stableToken.totalSupply(), supplyBefore - amount);
-  }
-
-  function test_stableForCelo_affectsBuckets(uint256 amount) public {
-    vm.assume(amount < sellerStableBalance && amount > 10000);
-    (uint256 expected, ) = approveAndSell(amount, false);
+    assertEq(stableToken.totalSupply(), stableTokenSupplyBefore - amount);
     (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
     assertEq(mintableStable, initialStableBucket + amount);
     assertEq(tradableCelo, initialCeloBucket - expected);
   }
 
-  function test_stableForCelo_emitExchangedEvent(uint256 amount) public {
-    vm.assume(amount < sellerStableBalance);
-    uint256 expectedCelo = getBuyTokenAmount(amount, initialStableBucket, initialCeloBucket);
-    changePrank(seller);
-    approveExchange(amount, false);
-    vm.expectEmit(true, true, true, true, address(exchange));
-    emit Exchanged(seller, amount, expectedCelo, false);
-    sell(amount, expectedCelo, false);
-  }
-
-  function test_stableForCelo_revertWithoutApproval(uint256 amount) public {
+  function test_sellStable_revertWithoutApproval(uint256 amount) public {
     vm.assume(amount < sellerStableBalance);
     uint256 expectedCelo = getBuyTokenAmount(amount, initialStableBucket, initialCeloBucket);
     changePrank(seller);
@@ -518,7 +474,7 @@ contract ExchangeTest_sell is ExchangeTest_stableActivated {
     sell(amount + 1, expectedCelo, false);
   }
 
-  function test_stableForCelo_revertIfMinBuyAmountUnsatisfied(uint256 amount) public {
+  function test_sellStable_revertIfMinBuyAmountUnsatisfied(uint256 amount) public {
     vm.assume(amount < sellerStableBalance);
     uint256 expectedCelo = getBuyTokenAmount(amount, initialStableBucket, initialCeloBucket);
     changePrank(seller);
@@ -526,11 +482,228 @@ contract ExchangeTest_sell is ExchangeTest_stableActivated {
     vm.expectRevert("Calculated buyAmount was less than specified minBuyAmount");
     sell(amount, expectedCelo + 1, false);
   }
+
+  function test_sellStable_whenBucketsStaleandReportFresh_updatesBuckets() public {
+    uint256 amount = 1000;
+    celoToken.mint(address(reserve), initialReserveBalance);
+    vm.warp(block.timestamp + bucketUpdateFrequency);
+    sortedOracles.setMedianTimestampToNow(address(stableToken));
+
+    uint256 updatedCeloBucket = initialCeloBucket.mul(2);
+    uint256 updatedStableBucket = updatedCeloBucket.mul(stableAmountForRate).div(celoAmountForRate);
+
+    vm.expectEmit(true, true, true, true, address(exchange));
+    emit BucketsUpdated(updatedCeloBucket, updatedStableBucket);
+    (uint256 expected, ) = approveAndSell(amount, false);
+    assertEq(celoToken.balanceOf(seller), sellerCeloBalance + expected);
+    (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
+    assertEq(mintableStable, updatedStableBucket + amount);
+    assertEq(tradableCelo, updatedCeloBucket - expected);
+  }
+
+  function test_sellStable_whenBucketsStaleandReportStale_doesNotUpdateBuckets() public {
+    uint256 amount = 1000;
+    celoToken.mint(address(reserve), initialReserveBalance);
+    vm.warp(block.timestamp + bucketUpdateFrequency);
+    sortedOracles.setOldestReportExpired(address(stableToken));
+
+    (uint256 expected, ) = approveAndSell(amount, false);
+    assertEq(celoToken.balanceOf(seller), sellerCeloBalance + expected);
+    (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
+    assertEq(mintableStable, initialStableBucket + amount);
+    assertEq(tradableCelo, initialCeloBucket - expected);
+  }
+
+  function test_whenContractIsFrozen_reverts() public {
+    freezer.freeze(address(exchange));
+    vm.expectRevert("can't call when contract is frozen");
+    sell(1000, 0, false);
+  }
 }
 
 contract ExchangeTest_exchange is ExchangeTest_sell {
   function sell(uint256 amount, uint256 minBuyAmount, bool sellCelo) internal returns (uint256) {
     changePrank(seller);
     return exchange.exchange(amount, minBuyAmount, sellCelo);
+  }
+}
+
+contract ExchangeTest_buy is ExchangeTest_stableActivated {
+  address buyer;
+  uint256 constant buyerCeloBalance = 100000000000000000000;
+  uint256 constant buyerStableBalance = 100000000000000000000;
+
+  function setUp() public {
+    super.setUp();
+    buyer = vm.addr(2);
+    vm.label(buyer, "buyer");
+    celoToken.mint(buyer, buyerCeloBalance);
+    stableToken.mint(buyer, buyerStableBalance);
+  }
+
+  function approveExchange(uint256 amount, bool buyCelo) internal returns (uint256 expected) {
+    changePrank(buyer);
+    if (buyCelo) {
+      expected = getSellTokenAmount(amount, initialStableBucket, initialCeloBucket);
+      stableToken.approve(address(exchange), expected);
+    } else {
+      expected = getSellTokenAmount(amount, initialCeloBucket, initialStableBucket);
+      celoToken.approve(address(exchange), expected);
+    }
+  }
+
+  function approveAndBuy(uint256 amount, bool buyCelo)
+    internal
+    returns (uint256 expected, uint256 received)
+  {
+    expected = approveExchange(amount, buyCelo);
+    received = exchange.buy(amount, expected, buyCelo);
+  }
+
+  function test_buyCelo_executesTrade(uint256 amount) public {
+    vm.assume(amount < buyerCeloBalance);
+    uint256 stableSupply = stableToken.totalSupply();
+    uint256 expected = getSellTokenAmount(amount, initialStableBucket, initialCeloBucket);
+    vm.assume(expected <= buyerStableBalance);
+    vm.expectEmit(true, true, true, true, address(exchange));
+    emit Exchanged(buyer, expected, amount, false);
+    approveAndBuy(amount, true);
+    assertEq(stableToken.balanceOf(buyer), buyerStableBalance - expected);
+    assertEq(celoToken.balanceOf(buyer), buyerCeloBalance + amount);
+    assertEq(stableToken.allowance(buyer, address(exchange)), 0);
+    assertEq(celoToken.balanceOf(address(reserve)), initialReserveBalance - amount);
+    assertEq(stableToken.totalSupply(), stableSupply - expected);
+    (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
+    assertEq(mintableStable, initialStableBucket + expected);
+    assertEq(tradableCelo, initialCeloBucket - amount);
+  }
+
+  function test_buyCelo_revertsIfApprovalIsWrong(uint256 amount) public {
+    vm.assume(amount <= buyerCeloBalance);
+    approveExchange(amount, true);
+    uint256 expectedStableAmount = getBuyTokenAmount(
+      amount,
+      initialCeloBucket,
+      initialStableBucket
+    );
+    vm.expectRevert("transfer value exceeded sender's allowance for recipient");
+    exchange.buy(amount + 1, expectedStableAmount, true);
+  }
+
+  function test_buyCelo_revertsIfMinBuyAmountUnsatisfied(uint256 amount) public {
+    vm.assume(amount <= buyerCeloBalance);
+    approveExchange(amount, true);
+    uint256 expectedStableAmount = getBuyTokenAmount(
+      amount,
+      initialCeloBucket,
+      initialStableBucket
+    );
+
+    vm.expectRevert("Calculated buyAmount was less than specified minBuyAmount");
+    exchange.buy(amount, expectedStableAmount + 1, true);
+  }
+
+  function test_buyCelo_whenBucketsStaleSndReportFresh_updatesBuckets() public {
+    uint256 amount = 1000;
+    celoToken.mint(address(reserve), initialReserveBalance);
+    vm.warp(block.timestamp + bucketUpdateFrequency);
+    sortedOracles.setMedianTimestampToNow(address(stableToken));
+
+    uint256 updatedCeloBucket = initialCeloBucket.mul(2);
+    uint256 updatedStableBucket = updatedCeloBucket.mul(stableAmountForRate).div(celoAmountForRate);
+
+    vm.expectEmit(true, true, true, true, address(exchange));
+    emit BucketsUpdated(updatedCeloBucket, updatedStableBucket);
+    (uint256 expected, ) = approveAndBuy(amount, true);
+    assertEq(stableToken.balanceOf(buyer), buyerStableBalance + expected);
+    (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
+    assertEq(mintableStable, updatedStableBucket - expected);
+    assertEq(tradableCelo, updatedCeloBucket + amount);
+  }
+
+  function test_buyCelo_whenBucketsStaleAndReportStale_doesNotUpdateBuckets() public {
+    uint256 amount = 1000;
+    celoToken.mint(address(reserve), initialReserveBalance);
+    vm.warp(block.timestamp + bucketUpdateFrequency);
+    sortedOracles.setOldestReportExpired(address(stableToken));
+
+    (uint256 expected, ) = approveAndBuy(amount, true);
+    assertEq(stableToken.balanceOf(buyer), buyerStableBalance + expected);
+    (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
+    assertEq(mintableStable, initialStableBucket - expected);
+    assertEq(tradableCelo, initialCeloBucket + amount);
+  }
+
+  function test_buyStable_executesTrade(uint256 amount) public {
+    vm.assume(amount < buyerStableBalance && amount > 10);
+    uint256 stableTokenSupplyBefore = stableToken.totalSupply();
+    vm.expectEmit(true, true, false, true, address(exchange));
+    uint256 expected = getSellTokenAmount(amount, initialStableBucket, initialCeloBucket);
+    emit Exchanged(buyer, amount, expected, false);
+    approveAndBuy(amount, false);
+
+    assertEq(stableToken.balanceOf(buyer), buyerStableBalance - amount);
+    assertEq(celoToken.balanceOf(buyer), buyerCeloBalance + expected);
+    assertEq(stableToken.allowance(buyer, address(exchange)), 0);
+    assertEq(celoToken.balanceOf(address(reserve)), initialReserveBalance - expected);
+    assertEq(stableToken.totalSupply(), stableTokenSupplyBefore - amount);
+    (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
+    assertEq(mintableStable, initialStableBucket + amount);
+    assertEq(tradableCelo, initialCeloBucket - expected);
+  }
+
+  function test_buyStable_revertWithoutApproval(uint256 amount) public {
+    vm.assume(amount < buyerStableBalance);
+    uint256 expectedCelo = getSellTokenAmount(amount, initialStableBucket, initialCeloBucket);
+    changePrank(buyer);
+    approveExchange(amount, false);
+    vm.expectRevert("transfer value exceeded sender's allowance for recipient");
+    exchange.buy(amount + 1, expectedCelo, false);
+  }
+
+  function test_buyStable_revertIfMinBuyAmountUnsatisfied(uint256 amount) public {
+    vm.assume(amount < buyerStableBalance);
+    uint256 expectedCelo = getSellTokenAmount(amount, initialStableBucket, initialCeloBucket);
+    changePrank(buyer);
+    approveExchange(amount, false);
+    vm.expectRevert("Calculated buyAmount was less than specified minBuyAmount");
+    exchange.buy(amount, expectedCelo + 1, false);
+  }
+
+  function test_buyStable_whenBucketsStaleAndReportFresh_updatesBuckets() public {
+    uint256 amount = 1000;
+    celoToken.mint(address(reserve), initialReserveBalance);
+    vm.warp(block.timestamp + bucketUpdateFrequency);
+    sortedOracles.setMedianTimestampToNow(address(stableToken));
+
+    uint256 updatedCeloBucket = initialCeloBucket.mul(2);
+    uint256 updatedStableBucket = updatedCeloBucket.mul(stableAmountForRate).div(celoAmountForRate);
+
+    vm.expectEmit(true, true, true, true, address(exchange));
+    emit BucketsUpdated(updatedCeloBucket, updatedStableBucket);
+    (uint256 expected, ) = approveAndBuy(amount, false);
+    assertEq(celoToken.balanceOf(buyer), buyerCeloBalance + expected);
+    (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
+    assertEq(mintableStable, updatedStableBucket + amount);
+    assertEq(tradableCelo, updatedCeloBucket - expected);
+  }
+
+  function test_buyStable_whenBucketsStaleandReportStale_doesNotUpdateBuckets() public {
+    uint256 amount = 1000;
+    celoToken.mint(address(reserve), initialReserveBalance);
+    vm.warp(block.timestamp + bucketUpdateFrequency);
+    sortedOracles.setOldestReportExpired(address(stableToken));
+
+    (uint256 expected, ) = approveAndBuy(amount, false);
+    assertEq(celoToken.balanceOf(buyer), buyerCeloBalance + expected);
+    (uint256 mintableStable, uint256 tradableCelo) = exchange.getBuyAndSellBuckets(true);
+    assertEq(mintableStable, initialStableBucket + amount);
+    assertEq(tradableCelo, initialCeloBucket - expected);
+  }
+
+  function test_whenContractIsFrozen_reverts() public {
+    freezer.freeze(address(exchange));
+    vm.expectRevert("can't call when contract is frozen");
+    exchange.buy(1000, 0, false);
   }
 }
