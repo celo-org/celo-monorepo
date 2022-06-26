@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import "contracts/stability/StableToken.sol";
 import "forge-std/Vm.sol";
+import "contracts/stability/StableToken.sol";
 
 contract MockStableToken is StableToken(true) {
   address private constant VM_ADDRESS = address(

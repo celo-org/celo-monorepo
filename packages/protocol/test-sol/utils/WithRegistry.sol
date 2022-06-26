@@ -8,11 +8,13 @@ import "./GetCode.sol";
 contract WithRegistry is Test {
   address constant registryAddress = 0x000000000000000000000000000000000000ce10;
   IRegistry public constant registry = IRegistry(registryAddress);
+  address registryOwner;
 
-  constructor(uint256 ownerPK) public {
+  constructor() public {
     vm.etch(registryAddress, GetCode.at(address(new Registry(true))));
     vm.label(registryAddress, "Registry");
-    vm.prank(vm.addr(ownerPK));
+    registryOwner = actor("registryOwner");
+    vm.prank(registryOwner);
     Registry(registryAddress).initialize();
   }
 }

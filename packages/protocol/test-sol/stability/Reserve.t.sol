@@ -11,7 +11,7 @@ import "contracts/stability/Reserve.sol";
 import "contracts/stability/test/MockSortedOracles.sol";
 import "contracts/common/FixidityLib.sol";
 
-contract ReserveTest is Test, WithRegistry(0x1) {
+contract ReserveTest is Test, WithRegistry {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -185,4 +185,14 @@ contract ReserveTest_initAndSetters is ReserveTest {
   }
 }
 
-contract ReserveTest_transferAndSpenders is ReserveTest {}
+contract ReserveTest_transferAndSpenders is ReserveTest {
+  uint256 constant reserveCeloBalance = 100000;
+  address constant otherReserveAddress = address(0x1234);
+  address spender;
+
+  function setUp() public {
+    spender = vm.addr(0x3);
+    vm.deal(address(reserve), reserveCeloBalance);
+    reserve.addOtherReserveAddress(otherReserveAddress);
+  }
+}

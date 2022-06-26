@@ -15,7 +15,7 @@ import "contracts/stability/test/MockSortedOracles.sol";
 import "contracts/common/FixidityLib.sol";
 import "contracts/common/Freezer.sol";
 
-contract ExchangeTest is Test, WithRegistry(0x1) {
+contract ExchangeTest is Test, WithRegistry {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -32,8 +32,8 @@ contract ExchangeTest is Test, WithRegistry(0x1) {
   address rando;
 
   Exchange exchange;
-  MockStableToken stableToken;
   Freezer freezer;
+  MockStableToken stableToken;
   MockGoldToken celoToken;
   MockReserve reserve;
   MockSortedOracles sortedOracles;
@@ -51,10 +51,8 @@ contract ExchangeTest is Test, WithRegistry(0x1) {
   FixidityLib.Fraction spread = FixidityLib.newFixedFraction(3, 1000);
 
   function setUp() public {
-    deployer = vm.addr(0x1);
-    vm.label(deployer, "Deployer");
-    rando = vm.addr(0x2);
-    vm.label(rando, "Rando");
+    deployer = actor("deployer");
+    rando = actor("rando");
     // Go somwehre in the future
     vm.warp(60 * 60 * 24 * 7 * 100);
     vm.startPrank(deployer);
@@ -64,14 +62,23 @@ contract ExchangeTest is Test, WithRegistry(0x1) {
     exchange = new Exchange(true);
     stableToken = new MockStableToken();
 
+    changePrank(registryOwner);
     registry.setAddressFor("Freezer", address(freezer));
     registry.setAddressFor("GoldToken", address(celoToken));
     registry.setAddressFor("Reserve", address(reserve));
     registry.setAddressFor("StableToken", address(stableToken));
     registry.setAddressFor("GrandaMento", address(0x1));
     registry.setAddressFor("Exchange", address(exchange));
+    changePrank(deployer);
     reserve.setGoldToken(address(celoToken));
-    celoToken.mint(address(reserve), initialReserveBalance);
+    celoToken.initialize(address(registry));
+
+    // (, bytes memory retSymbol) = address(celoToken).call(abi.encodeWithSelector(0x1f1b7586));
+    // console2.logBytes(retSymbol);
+    // console2.logBytes32(keccak256(retSymbol));
+    // string memory symbol = abi.decode(retSymbol, (string));
+    // console2.log(symbol);
+    // deal(address(reserve), address(celoToken), initialReserveBalance);
 
     address[] memory initialAddresses = new address[](0);
     uint256[] memory initialBalances = new uint256[](0);
