@@ -10,12 +10,10 @@ import "../mocks/MockStableToken.sol";
 import "../utils/WithRegistry.sol";
 
 import "contracts/stability/Exchange.sol";
-import "contracts/stability/StableToken.sol";
 import "contracts/stability/test/MockReserve.sol";
 import "contracts/stability/test/MockSortedOracles.sol";
 import "contracts/common/FixidityLib.sol";
 import "contracts/common/Freezer.sol";
-import "contracts/common/Registry.sol";
 
 contract ExchangeTest is Test, WithRegistry(0x1) {
   using SafeMath for uint256;
