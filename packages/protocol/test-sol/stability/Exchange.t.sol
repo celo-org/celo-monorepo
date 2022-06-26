@@ -5,17 +5,20 @@ pragma experimental ABIEncoderV2;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "celo-foundry/Test.sol";
 
-import "../mocks/MockGoldToken.sol";
-import "../mocks/MockStableToken.sol";
+// import "../mocks/MockGoldToken.sol";
+// import "../mocks/MockStableToken.sol";
 import "../utils/WithRegistry.sol";
+import "../utils/TokenHelpers.sol";
 
 import "contracts/stability/Exchange.sol";
+import "contracts/stability/StableToken.sol";
 import "contracts/stability/test/MockReserve.sol";
 import "contracts/stability/test/MockSortedOracles.sol";
 import "contracts/common/FixidityLib.sol";
 import "contracts/common/Freezer.sol";
+import "contracts/common/GoldToken.sol";
 
-contract ExchangeTest is Test, WithRegistry {
+contract ExchangeTest is Test, WithRegistry, TokenHelpers {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -33,8 +36,8 @@ contract ExchangeTest is Test, WithRegistry {
 
   Exchange exchange;
   Freezer freezer;
-  MockStableToken stableToken;
-  MockGoldToken celoToken;
+  StableToken stableToken;
+  GoldToken celoToken;
   MockReserve reserve;
   MockSortedOracles sortedOracles;
 
@@ -57,10 +60,11 @@ contract ExchangeTest is Test, WithRegistry {
     vm.warp(60 * 60 * 24 * 7 * 100);
     vm.startPrank(deployer);
     freezer = new Freezer(true);
-    celoToken = new MockGoldToken();
+    celoToken = new GoldToken(true);
     reserve = new MockReserve();
     exchange = new Exchange(true);
-    stableToken = new MockStableToken();
+    stableToken = new StableToken(true);
+    sortedOracles = new MockSortedOracles();
 
     changePrank(registryOwner);
     registry.setAddressFor("Freezer", address(freezer));
@@ -69,16 +73,12 @@ contract ExchangeTest is Test, WithRegistry {
     registry.setAddressFor("StableToken", address(stableToken));
     registry.setAddressFor("GrandaMento", address(0x1));
     registry.setAddressFor("Exchange", address(exchange));
+    registry.setAddressFor("SortedOracles", address(sortedOracles));
     changePrank(deployer);
     reserve.setGoldToken(address(celoToken));
     celoToken.initialize(address(registry));
 
-    // (, bytes memory retSymbol) = address(celoToken).call(abi.encodeWithSelector(0x1f1b7586));
-    // console2.logBytes(retSymbol);
-    // console2.logBytes32(keccak256(retSymbol));
-    // string memory symbol = abi.decode(retSymbol, (string));
-    // console2.log(symbol);
-    // deal(address(reserve), address(celoToken), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
 
     address[] memory initialAddresses = new address[](0);
     uint256[] memory initialBalances = new uint256[](0);
@@ -94,8 +94,6 @@ contract ExchangeTest is Test, WithRegistry {
       "Exchange"
     );
 
-    sortedOracles = new MockSortedOracles();
-    registry.setAddressFor("SortedOracles", address(sortedOracles));
     sortedOracles.setMedianRate(address(stableToken), stableAmountForRate);
     sortedOracles.setMedianTimestampToNow(address(stableToken));
     sortedOracles.setNumRates(address(stableToken), 2);
@@ -289,7 +287,7 @@ contract ExchangeTest_buyAndSellValues is ExchangeTest_stableActivated {
   }
 
   function test_getBuyAndSellBuckets_afterReserveChange_isTheSameIfNotStale() public {
-    celoToken.mint(address(reserve), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
 
     (uint256 buyBucketSize, uint256 sellBucketSize) = exchange.getBuyAndSellBuckets(true);
     assert(buyBucketSize == initialStableBucket);
@@ -297,7 +295,7 @@ contract ExchangeTest_buyAndSellValues is ExchangeTest_stableActivated {
   }
 
   function test_getBuyAndSellBuckets_afterReserveChange_updatesIfTimeHasPassed() public {
-    celoToken.mint(address(reserve), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
     vm.warp(block.timestamp + bucketUpdateFrequency);
     sortedOracles.setMedianTimestampToNow(address(stableToken));
 
@@ -347,8 +345,8 @@ contract ExchangeTest_sell is ExchangeTest_stableActivated {
     super.setUp();
     seller = vm.addr(2);
     vm.label(seller, "Seller");
-    celoToken.mint(seller, sellerCeloBalance);
-    stableToken.mint(seller, sellerStableBalance);
+    mint(celoToken, seller, sellerCeloBalance);
+    mint(stableToken, seller, sellerStableBalance);
   }
 
   // This function will be overriden to test both `sell` and `exchange` functions
@@ -423,7 +421,7 @@ contract ExchangeTest_sell is ExchangeTest_stableActivated {
 
   function test_sellCelo_whenBucketsStaleandReportFresh_updatesBuckets() public {
     uint256 amount = 1000;
-    celoToken.mint(address(reserve), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
     vm.warp(block.timestamp + bucketUpdateFrequency);
     sortedOracles.setMedianTimestampToNow(address(stableToken));
 
@@ -441,7 +439,7 @@ contract ExchangeTest_sell is ExchangeTest_stableActivated {
 
   function test_sellCelo_whenBucketsStaleandReportStale_doesNotUpdateBuckets() public {
     uint256 amount = 1000;
-    celoToken.mint(address(reserve), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
     vm.warp(block.timestamp + bucketUpdateFrequency);
     sortedOracles.setOldestReportExpired(address(stableToken));
 
@@ -490,7 +488,7 @@ contract ExchangeTest_sell is ExchangeTest_stableActivated {
 
   function test_sellStable_whenBucketsStaleandReportFresh_updatesBuckets() public {
     uint256 amount = 1000;
-    celoToken.mint(address(reserve), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
     vm.warp(block.timestamp + bucketUpdateFrequency);
     sortedOracles.setMedianTimestampToNow(address(stableToken));
 
@@ -508,7 +506,7 @@ contract ExchangeTest_sell is ExchangeTest_stableActivated {
 
   function test_sellStable_whenBucketsStaleandReportStale_doesNotUpdateBuckets() public {
     uint256 amount = 1000;
-    celoToken.mint(address(reserve), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
     vm.warp(block.timestamp + bucketUpdateFrequency);
     sortedOracles.setOldestReportExpired(address(stableToken));
 
@@ -542,8 +540,8 @@ contract ExchangeTest_buy is ExchangeTest_stableActivated {
     super.setUp();
     buyer = vm.addr(2);
     vm.label(buyer, "buyer");
-    celoToken.mint(buyer, buyerCeloBalance);
-    stableToken.mint(buyer, buyerStableBalance);
+    mint(celoToken, buyer, buyerCeloBalance);
+    mint(stableToken, buyer, buyerStableBalance);
   }
 
   function approveExchange(uint256 amount, bool buyCelo) internal returns (uint256 expected) {
@@ -601,7 +599,7 @@ contract ExchangeTest_buy is ExchangeTest_stableActivated {
 
   function test_buyCelo_whenBucketsStaleAndReportFresh_updatesBuckets() public {
     uint256 amount = 1000;
-    celoToken.mint(address(reserve), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
     vm.warp(block.timestamp + bucketUpdateFrequency);
     sortedOracles.setMedianTimestampToNow(address(stableToken));
 
@@ -619,7 +617,7 @@ contract ExchangeTest_buy is ExchangeTest_stableActivated {
 
   function test_buyCelo_whenBucketsStaleAndReportStale_doesNotUpdateBuckets() public {
     uint256 amount = 1000;
-    celoToken.mint(address(reserve), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
     vm.warp(block.timestamp + bucketUpdateFrequency);
     sortedOracles.setOldestReportExpired(address(stableToken));
 
@@ -668,7 +666,7 @@ contract ExchangeTest_buy is ExchangeTest_stableActivated {
 
   function test_buyStable_whenBucketsStaleAndReportFresh_updatesBuckets() public {
     uint256 amount = 1000;
-    celoToken.mint(address(reserve), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
     vm.warp(block.timestamp + bucketUpdateFrequency);
     sortedOracles.setMedianTimestampToNow(address(stableToken));
 
@@ -686,7 +684,7 @@ contract ExchangeTest_buy is ExchangeTest_stableActivated {
 
   function test_buyStable_whenBucketsStaleandReportStale_doesNotUpdateBuckets() public {
     uint256 amount = 1000;
-    celoToken.mint(address(reserve), initialReserveBalance);
+    mint(celoToken, address(reserve), initialReserveBalance);
     vm.warp(block.timestamp + bucketUpdateFrequency);
     sortedOracles.setOldestReportExpired(address(stableToken));
 

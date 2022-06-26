@@ -6,12 +6,13 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "celo-foundry/Test.sol";
 
 import "../utils/WithRegistry.sol";
+import "../utils/TokenHelpers.sol";
 
 import "contracts/stability/Reserve.sol";
 import "contracts/stability/test/MockSortedOracles.sol";
 import "contracts/common/FixidityLib.sol";
 
-contract ReserveTest is Test, WithRegistry {
+contract ReserveTest is Test, WithRegistry, TokenHelpers {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -44,13 +45,15 @@ contract ReserveTest is Test, WithRegistry {
   MockSortedOracles sortedOracles;
 
   function setUp() public {
-    deployer = vm.addr(0x1);
+    deployer = actor("deployer");
     changePrank(deployer);
     reserve = new Reserve(true);
     sortedOracles = new MockSortedOracles();
 
+    changePrank(registryOwner);
     registry.setAddressFor("SortedOracles", address(sortedOracles));
     registry.setAddressFor("Exchange", exchangeAddress);
+    changePrank(deployer);
 
     bytes32[] memory initialAssetAllocationSymbols = new bytes32[](1);
     initialAssetAllocationSymbols[0] = bytes32("cGLD");
@@ -185,14 +188,15 @@ contract ReserveTest_initAndSetters is ReserveTest {
   }
 }
 
-contract ReserveTest_transferAndSpenders is ReserveTest {
-  uint256 constant reserveCeloBalance = 100000;
-  address constant otherReserveAddress = address(0x1234);
-  address spender;
+// contract ReserveTest_transferAndSpenders is ReserveTest {
+//   uint256 constant reserveCeloBalance = 100000;
+//   address constant otherReserveAddress = address(0x1234);
+//   address spender;
+//
+//   function setUp() public {
+//     spender = vm.addr(0x3);
+//     vm.deal(address(reserve), reserveCeloBalance);
+//     reserve.addOtherReserveAddress(otherReserveAddress);
+//   }
+// }
 
-  function setUp() public {
-    spender = vm.addr(0x3);
-    vm.deal(address(reserve), reserveCeloBalance);
-    reserve.addOtherReserveAddress(otherReserveAddress);
-  }
-}
