@@ -56,7 +56,7 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
     rando = actor("rando");
     // Go somwehre in the future
     vm.warp(60 * 60 * 24 * 7 * 100);
-    vm.startPrank(deployer);
+    changePrank(deployer);
     freezer = new Freezer(true);
     celoToken = new GoldToken(true);
     reserve = new MockReserve();
@@ -64,7 +64,6 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
     stableToken = new StableToken(true);
     sortedOracles = new MockSortedOracles();
 
-    changePrank(registryOwner);
     registry.setAddressFor("Freezer", address(freezer));
     registry.setAddressFor("GoldToken", address(celoToken));
     registry.setAddressFor("Reserve", address(reserve));
@@ -72,7 +71,7 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
     registry.setAddressFor("GrandaMento", address(0x1));
     registry.setAddressFor("Exchange", address(exchange));
     registry.setAddressFor("SortedOracles", address(sortedOracles));
-    changePrank(deployer);
+
     reserve.setGoldToken(address(celoToken));
     celoToken.initialize(address(registry));
 

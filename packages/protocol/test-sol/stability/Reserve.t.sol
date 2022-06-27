@@ -52,10 +52,8 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
     reserve = new Reserve(true);
     sortedOracles = new MockSortedOracles();
 
-    changePrank(registryOwner);
     registry.setAddressFor("SortedOracles", address(sortedOracles));
     registry.setAddressFor("Exchange", exchangeAddress);
-    changePrank(deployer);
 
     bytes32[] memory initialAssetAllocationSymbols = new bytes32[](1);
     initialAssetAllocationSymbols[0] = bytes32("cGLD");
