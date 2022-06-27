@@ -5,8 +5,6 @@ pragma experimental ABIEncoderV2;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "celo-foundry/Test.sol";
 
-// import "../mocks/MockGoldToken.sol";
-// import "../mocks/MockStableToken.sol";
 import "../utils/WithRegistry.sol";
 import "../utils/TokenHelpers.sol";
 

@@ -182,6 +182,96 @@ contract ReserveTest_initAndSetters is ReserveTest {
     vm.expectRevert("Ownable: caller is not the owner");
     reserve.setTobinTaxStalenessThreshold(newThreshold);
   }
+
+  function test_addOtherReserveAddress() public {
+    address[] memory otherReserveAddresses = new address[](2);
+    otherReserveAddresses[0] = address(0x1111);
+    otherReserveAddresses[1] = address(0x2222);
+
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit OtherReserveAddressAdded(otherReserveAddresses[0]);
+    reserve.addOtherReserveAddress(otherReserveAddresses[0]);
+
+    vm.expectRevert("reserve addr already added");
+    reserve.addOtherReserveAddress(otherReserveAddresses[0]);
+
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    reserve.addOtherReserveAddress(otherReserveAddresses[1]);
+    changePrank(deployer);
+
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit OtherReserveAddressAdded(otherReserveAddresses[1]);
+    reserve.addOtherReserveAddress(otherReserveAddresses[1]);
+
+    address[] memory recordedAddresses = reserve.getOtherReserveAddresses();
+    assertEq(recordedAddresses, otherReserveAddresses);
+
+    deal(otherReserveAddresses[0], 100000);
+    deal(otherReserveAddresses[1], 100000);
+    deal(address(reserve), 100000);
+    assertEq(reserve.getReserveGoldBalance(), uint256(300000));
+  }
+
+  function test_removeOtherReserveAddress() public {
+    address[] memory otherReserveAddresses = new address[](3);
+    otherReserveAddresses[0] = address(0x1111);
+    otherReserveAddresses[1] = address(0x2222);
+
+    vm.expectRevert("reserve addr was never added");
+    reserve.removeOtherReserveAddress(otherReserveAddresses[0], 0);
+
+    reserve.addOtherReserveAddress(otherReserveAddresses[0]);
+    reserve.addOtherReserveAddress(otherReserveAddresses[1]);
+
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    reserve.removeOtherReserveAddress(otherReserveAddresses[0], 0);
+    changePrank(deployer);
+
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit OtherReserveAddressRemoved(otherReserveAddresses[0], 0);
+    reserve.removeOtherReserveAddress(otherReserveAddresses[0], 0);
+    address[] memory recordedAddresses = reserve.getOtherReserveAddresses();
+    assertEq(recordedAddresses.length, 1);
+    assertEq(recordedAddresses[0], otherReserveAddresses[1]);
+  }
+
+  function test_setAssetAllocations() public {
+    bytes32[] memory assetAllocationSymbols = new bytes32[](3);
+    assetAllocationSymbols[0] = bytes32("cGLD");
+    assetAllocationSymbols[1] = bytes32("BTC");
+    assetAllocationSymbols[2] = bytes32("ETH");
+    uint256[] memory assetAllocationWeights = new uint256[](3);
+    assetAllocationWeights[0] = FixidityLib.newFixedFraction(1, 3).unwrap();
+    assetAllocationWeights[1] = FixidityLib.newFixedFraction(1, 3).unwrap();
+    assetAllocationWeights[2] = FixidityLib.newFixedFraction(1, 3).unwrap().add(1);
+
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit AssetAllocationSet(assetAllocationSymbols, assetAllocationWeights);
+    reserve.setAssetAllocations(assetAllocationSymbols, assetAllocationWeights);
+    assertEq(reserve.getAssetAllocationSymbols(), assetAllocationSymbols);
+    assertEq(reserve.getAssetAllocationWeights(), assetAllocationWeights);
+
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    reserve.setAssetAllocations(assetAllocationSymbols, assetAllocationWeights);
+    changePrank(deployer);
+
+    assetAllocationWeights[2] = FixidityLib.newFixedFraction(1, 3).unwrap().add(100);
+    vm.expectRevert("Sum of asset allocation must be 1");
+    reserve.setAssetAllocations(assetAllocationSymbols, assetAllocationWeights);
+    assetAllocationWeights[2] = FixidityLib.newFixedFraction(1, 3).unwrap().add(1);
+
+    assetAllocationSymbols[2] = bytes32("BTC");
+    vm.expectRevert("Cannot set weight twice");
+    reserve.setAssetAllocations(assetAllocationSymbols, assetAllocationWeights);
+    assetAllocationSymbols[2] = bytes32("ETH");
+
+    assetAllocationSymbols[0] = bytes32("DAI");
+    vm.expectRevert("Must set cGLD asset weight");
+    reserve.setAssetAllocations(assetAllocationSymbols, assetAllocationWeights);
+  }
 }
 
 contract ReserveTest_transfers is ReserveTest {
