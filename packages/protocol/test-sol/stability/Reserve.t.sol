@@ -10,6 +10,7 @@ import "../utils/TokenHelpers.sol";
 
 import "contracts/stability/Reserve.sol";
 import "contracts/stability/test/MockSortedOracles.sol";
+import "contracts/stability/test/MockStableToken.sol";
 import "contracts/common/FixidityLib.sol";
 
 contract ReserveTest is Test, WithRegistry, TokenHelpers {
@@ -45,6 +46,7 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   MockSortedOracles sortedOracles;
 
   function setUp() public {
+    rando = actor("rando");
     deployer = actor("deployer");
     changePrank(deployer);
     reserve = new Reserve(true);
@@ -79,78 +81,64 @@ contract ReserveTest_initAndSetters is ReserveTest {
     assertEq(reserve.owner(), deployer);
     assertEq(address(reserve.registry()), address(registry));
     assertEq(reserve.tobinTaxStalenessThreshold(), tobinTaxStalenessThreshold);
-  }
 
-  function test_init_onlyCallableOnce() public {
     vm.expectRevert("contract already initialized");
     reserve.initialize(address(registry), 0, 0, 0, 0, new bytes32[](0), new uint256[](0), 0, 0);
   }
 
-  function test_tobinTax_canBeSetByOwner() public {
+  function test_tobinTax() public {
     uint256 newValue = 123;
     vm.expectEmit(true, true, true, true, address(reserve));
     emit TobinTaxSet(newValue);
     reserve.setTobinTax(newValue);
     assertEq(reserve.tobinTax(), newValue);
-  }
 
-  function test_tobinTax_canNotBeSetByRando() public {
+    vm.expectRevert("tobin tax cannot be larger than 1");
+    reserve.setTobinTax(FixidityLib.newFixed(1).unwrap().add(1));
+
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
     reserve.setTobinTax(100);
   }
 
-  function test_tobinTax_canNotBeGt1() public {
-    vm.expectRevert("tobin tax cannot be larger than 1");
-    reserve.setTobinTax(FixidityLib.newFixed(1).unwrap().add(1));
-  }
-
-  function test_tobinTaxReserveRation_canBeSetByOwner() public {
+  function test_tobinTaxReserveRation() public {
     uint256 newValue = 123;
     vm.expectEmit(true, true, true, true, address(reserve));
     emit TobinTaxReserveRatioSet(newValue);
     reserve.setTobinTaxReserveRatio(newValue);
     assertEq(reserve.tobinTaxReserveRatio(), newValue);
-  }
 
-  function test_tobinTaxReserveRatio_canNotBeSetByRando() public {
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
     reserve.setTobinTaxReserveRatio(100);
   }
 
-  function test_dailySpendingRatio_canBeSetByOwner() public {
+  function test_dailySpendingRatio() public {
     uint256 newValue = 123;
     vm.expectEmit(true, true, true, true, address(reserve));
     emit DailySpendingRatioSet(newValue);
     reserve.setDailySpendingRatio(newValue);
     assertEq(reserve.getDailySpendingRatio(), newValue);
-  }
 
-  function test_dailySpendingRatio_canNotBeSetByRando() public {
+    vm.expectRevert("spending ratio cannot be larger than 1");
+    reserve.setDailySpendingRatio(FixidityLib.newFixed(1).unwrap().add(1));
+
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
     reserve.setDailySpendingRatio(100);
   }
 
-  function test_dailySpendingRatio_canNotBeGt1() public {
-    vm.expectRevert("spending ratio cannot be larger than 1");
-    reserve.setDailySpendingRatio(FixidityLib.newFixed(1).unwrap().add(1));
-  }
-
-  function test_registry_canBeSetByOwner() public {
+  function test_registry() public {
     address newValue = address(0x1234);
     reserve.setRegistry(newValue);
     assertEq(address(reserve.registry()), newValue);
-  }
 
-  function test_registry_canNotBeSetByRando() public {
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
     reserve.setRegistry(address(0x1234));
   }
 
-  function test_addToken_addsATokenOnce() public {
+  function test_addToken() public {
     address token = address(0x1234);
     sortedOracles.setMedianRate(token, sortedOraclesDenominator);
     vm.expectEmit(true, true, true, true, address(reserve));
@@ -159,15 +147,13 @@ contract ReserveTest_initAndSetters is ReserveTest {
     assert(reserve.isToken(token));
     vm.expectRevert("token addr already registered");
     reserve.addToken(token);
-  }
 
-  function test_addToken_canNotBeCalledByRando() public {
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
     reserve.addToken(address(0x1234));
   }
 
-  function test_removeToken_removesTokenIfExists() public {
+  function test_removeToken() public {
     address token = address(0x1234);
 
     vm.expectRevert("token addr was never registered");
@@ -179,24 +165,262 @@ contract ReserveTest_initAndSetters is ReserveTest {
     vm.expectEmit(true, true, true, true, address(reserve));
     emit TokenRemoved(token, 0);
     reserve.removeToken(token, 0);
-  }
 
-  function test_removeToken_canNotBeCalledByRando() public {
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
     reserve.removeToken(address(0x1234), 0);
   }
+
+  function test_tobinTaxStalenessThreshold() public {
+    uint256 newThreshold = 1;
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit TobinTaxStalenessThresholdSet(newThreshold);
+    reserve.setTobinTaxStalenessThreshold(newThreshold);
+    assertEq(reserve.tobinTaxStalenessThreshold(), newThreshold);
+
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    reserve.setTobinTaxStalenessThreshold(newThreshold);
+  }
 }
 
-// contract ReserveTest_transferAndSpenders is ReserveTest {
-//   uint256 constant reserveCeloBalance = 100000;
-//   address constant otherReserveAddress = address(0x1234);
-//   address spender;
-//
-//   function setUp() public {
-//     spender = vm.addr(0x3);
-//     vm.deal(address(reserve), reserveCeloBalance);
-//     reserve.addOtherReserveAddress(otherReserveAddress);
-//   }
-// }
+contract ReserveTest_transfers is ReserveTest {
+  uint256 constant reserveCeloBalance = 100000;
+  address payable constant otherReserveAddress = address(0x1234);
+  address spender;
 
+  function setUp() public {
+    super.setUp();
+    spender = actor("spender");
+    deal(address(reserve), reserveCeloBalance);
+    reserve.addOtherReserveAddress(otherReserveAddress);
+    reserve.addSpender(spender);
+    reserve.setDailySpendingRatio(FixidityLib.newFixedFraction(2, 10).unwrap());
+    vm.warp(100 * 24 * 3600 + 445);
+  }
+
+  function test_transferGold() public {
+    changePrank(spender);
+    uint256 amount = reserveCeloBalance.div(10);
+
+    reserve.transferGold(otherReserveAddress, amount);
+    assertEq(otherReserveAddress.balance, amount);
+    assertEq(address(reserve).balance, reserveCeloBalance - amount);
+
+    vm.expectRevert("Exceeding spending limit");
+    reserve.transferGold(otherReserveAddress, amount.mul(2));
+
+    vm.warp(block.timestamp + 24 * 3600);
+    reserve.transferGold(otherReserveAddress, amount.mul(2));
+    assertEq(otherReserveAddress.balance, 3 * amount);
+
+    vm.expectRevert("can only transfer to other reserve address");
+    reserve.transferGold(address(0x234), amount);
+
+    changePrank(deployer);
+    reserve.removeSpender(spender);
+    changePrank(spender);
+    vm.warp(block.timestamp + 24 * 3600);
+    vm.expectRevert("sender not allowed to transfer Reserve funds");
+    reserve.transferGold(otherReserveAddress, amount);
+  }
+
+  function test_addExchangeSpender() public {
+    address exchangeSpender0 = address(0x22222);
+    address exchangeSpender1 = address(0x33333);
+
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    reserve.addExchangeSpender(exchangeSpender0);
+
+    changePrank(deployer);
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit ExchangeSpenderAdded(exchangeSpender0);
+    reserve.addExchangeSpender(exchangeSpender0);
+
+    vm.expectRevert("Spender can't be null");
+    reserve.addExchangeSpender(address(0x0));
+
+    reserve.addExchangeSpender(exchangeSpender1);
+    address[] memory spenders = reserve.getExchangeSpenders();
+    assertEq(spenders[0], exchangeSpender0);
+    assertEq(spenders[1], exchangeSpender1);
+  }
+
+  function test_removeExchangeSpender() public {
+    address exchangeSpender0 = address(0x22222);
+    address exchangeSpender1 = address(0x33333);
+    reserve.addExchangeSpender(exchangeSpender0);
+
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    reserve.removeExchangeSpender(exchangeSpender0, 0);
+
+    changePrank(deployer);
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit ExchangeSpenderRemoved(exchangeSpender0);
+    reserve.removeExchangeSpender(exchangeSpender0, 0);
+
+    vm.expectRevert("Index is invalid");
+    reserve.removeExchangeSpender(exchangeSpender0, 0);
+
+    reserve.addExchangeSpender(exchangeSpender0);
+    reserve.addExchangeSpender(exchangeSpender1);
+
+    vm.expectRevert("Index is invalid");
+    reserve.removeExchangeSpender(exchangeSpender0, 3);
+    vm.expectRevert("Index does not match spender");
+    reserve.removeExchangeSpender(exchangeSpender1, 0);
+
+    reserve.removeExchangeSpender(exchangeSpender0, 0);
+    address[] memory spenders = reserve.getExchangeSpenders();
+    assertEq(spenders[0], exchangeSpender1);
+  }
+
+  function test_addSpender() public {
+    address _spender = address(0x4444);
+
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    reserve.addSpender(_spender);
+
+    changePrank(deployer);
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit SpenderAdded(_spender);
+    reserve.addSpender(_spender);
+
+    vm.expectRevert("Spender can't be null");
+    reserve.addSpender(address(0x0));
+  }
+
+  function test_removeSpender() public {
+    address _spender = address(0x4444);
+
+    reserve.addSpender(_spender);
+
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    reserve.removeSpender(_spender);
+
+    changePrank(deployer);
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit SpenderRemoved(_spender);
+    reserve.removeSpender(_spender);
+  }
+
+  function test_transferExchangeGold_asExchangeFromRegistry() public {
+    transferExchangeGoldSpecs(exchangeAddress);
+  }
+
+  function test_transferExchangeGold_asRegisteredExchange() public {
+    address additionalExchange = address(0x6666);
+    reserve.addExchangeSpender(additionalExchange);
+    transferExchangeGoldSpecs(exchangeAddress);
+
+    changePrank(deployer);
+    reserve.removeExchangeSpender(additionalExchange, 0);
+
+    changePrank(additionalExchange);
+    vm.expectRevert("Address not allowed to spend");
+    reserve.transferExchangeGold(address(0x1111), 1000);
+  }
+
+  function transferExchangeGoldSpecs(address caller) public {
+    changePrank(caller);
+    address payable dest = address(0x1111);
+    reserve.transferExchangeGold(dest, 1000);
+    assertEq(dest.balance, 1000);
+
+    changePrank(spender);
+    vm.expectRevert("Address not allowed to spend");
+    reserve.transferExchangeGold(dest, 1000);
+
+    changePrank(rando);
+    vm.expectRevert("Address not allowed to spend");
+    reserve.transferExchangeGold(dest, 1000);
+  }
+
+  function test_frozenGold() public {
+    reserve.setDailySpendingRatio(FixidityLib.fixed1().unwrap());
+    vm.expectRevert("Cannot freeze more than balance");
+    reserve.setFrozenGold(reserveCeloBalance + 1, 1);
+    uint256 dailyUnlock = reserveCeloBalance.div(3);
+
+    reserve.setFrozenGold(reserveCeloBalance, 3);
+    changePrank(spender);
+    vm.expectRevert("Exceeding spending limit");
+    reserve.transferGold(otherReserveAddress, 1);
+    vm.warp(block.timestamp + 3600 * 24);
+    assertEq(reserve.getUnfrozenBalance(), dailyUnlock);
+    reserve.transferGold(otherReserveAddress, dailyUnlock);
+    vm.warp(block.timestamp + 3600 * 24);
+    assertEq(reserve.getUnfrozenBalance(), dailyUnlock);
+    reserve.transferGold(otherReserveAddress, dailyUnlock);
+    vm.warp(block.timestamp + 3600 * 24);
+    assertEq(reserve.getUnfrozenBalance(), dailyUnlock + 1);
+    reserve.transferGold(otherReserveAddress, dailyUnlock);
+  }
+}
+
+contract ReserveTest_tobinTax is ReserveTest {
+  MockStableToken stableToken0;
+  MockStableToken stableToken1;
+
+  function setUp() public {
+    super.setUp();
+
+    bytes32[] memory assetAllocationSymbols = new bytes32[](2);
+    assetAllocationSymbols[0] = bytes32("cGLD");
+    assetAllocationSymbols[1] = bytes32("BTC");
+    uint256[] memory assetAllocationWeights = new uint256[](2);
+    assetAllocationWeights[0] = FixidityLib.newFixedFraction(1, 2).unwrap();
+    assetAllocationWeights[1] = FixidityLib.newFixedFraction(1, 2).unwrap();
+
+    reserve.setAssetAllocations(assetAllocationSymbols, assetAllocationWeights);
+
+    stableToken0 = new MockStableToken();
+    sortedOracles.setMedianRate(address(stableToken0), sortedOraclesDenominator.mul(10));
+
+    stableToken1 = new MockStableToken();
+    sortedOracles.setMedianRate(address(stableToken1), sortedOraclesDenominator.mul(10));
+
+    reserve.addToken(address(stableToken0));
+    reserve.addToken(address(stableToken1));
+  }
+
+  function setValues(uint256 reserveBalance, uint256 stableToken0Supply, uint256 stableToken1Supply)
+    internal
+  {
+    deal(address(reserve), reserveBalance);
+    stableToken0.setTotalSupply(stableToken0Supply);
+    stableToken1.setTotalSupply(stableToken1Supply);
+  }
+
+  function getOrComputeTobinTaxFraction() internal returns (uint256) {
+    (uint256 num, uint256 den) = reserve.getOrComputeTobinTax();
+    return FixidityLib.newFixedFraction(num, den).unwrap();
+  }
+
+  function test_getReserveRatio() public {
+    uint256 expected;
+
+    setValues(1000000, 10000, 0);
+    expected = FixidityLib.newFixed(2000000).divide(FixidityLib.newFixed(1000)).unwrap();
+    assertEq(reserve.getReserveRatio(), expected);
+
+    setValues(1000000, 10000, 30000);
+    expected = FixidityLib.newFixed(2000000).divide(FixidityLib.newFixed(4000)).unwrap();
+    assertEq(reserve.getReserveRatio(), expected);
+  }
+
+  function test_tobinTax() public {
+    setValues(1000000, 400000, 500000);
+    assertEq(getOrComputeTobinTaxFraction(), 0);
+    setValues(1000000, 50000000, 50000000);
+    // Is the same unless threshold passed
+    assertEq(getOrComputeTobinTaxFraction(), 0);
+    // Changes
+    vm.warp(block.timestamp + tobinTaxStalenessThreshold);
+    assertEq(getOrComputeTobinTaxFraction(), tobinTax);
+  }
+}
