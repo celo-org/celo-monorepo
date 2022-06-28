@@ -1,6 +1,6 @@
 {
-  "oldArtifactsFolder": "/Users/ninabarbakadze_1/Desktop/celo2/celo-monorepo/packages/protocol/build/core-contracts.v6/contracts",
-  "newArtifactsFolder": "/Users/ninabarbakadze_1/Desktop/celo2/celo-monorepo/packages/protocol/build/core-contracts.v7/contracts",
+  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/core-contracts.v5/contracts",
+  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/core-contracts.v6/contracts",
   "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles/",
   "report": {
     "contracts": {
