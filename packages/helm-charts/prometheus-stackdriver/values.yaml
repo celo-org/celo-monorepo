@@ -26,7 +26,7 @@ serviceAccount:
   name: null
 
 stackdriver:
-  disabled: false
+  disabled: true
   # When sending metrics from outside GCP to GCP Stackdriver.
   gcloudServiceAccountKeyBase64: null
   # To save $, don't send metrics to SD that probably won't be used.
