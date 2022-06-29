@@ -2274,7 +2274,7 @@ contract('Validators', (accounts: string[]) => {
           expectedDelegatedPayment = new BigNumber(0)
           expectedValidatorPayment = expectedTotalPayment.minus(expectedGroupPayment)
 
-          await accountsInstance.setPaymentDelegation(NULL_ADDRESS, toFixed(0))
+          await accountsInstance.deletePaymentDelegation()
 
           ret = await validators.distributeEpochPaymentsFromSigner.call(validator, maxPayment)
           await validators.distributeEpochPaymentsFromSigner(validator, maxPayment)
