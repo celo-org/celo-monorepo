@@ -44,7 +44,7 @@ const hostPort = parseInt(process.env.CELO_NODE_PORT || '8545')
 const defaultConfig = {
   host: hostAddress,
   port: hostPort,
-  network_id: 42220,
+  network_id: 1101,
   from: OG_FROM,
   gas: gasLimit,
   gasPrice: 100000000000,
