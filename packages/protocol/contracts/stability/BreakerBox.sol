@@ -24,16 +24,23 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    */
   LinkedList.List public breakers;
 
-  constructor() public {}
+  /**
+   * @dev Constructor
+   * @param breaker Address of a breaker to be added to the breaker list
+   * @param exchanges Exchanges to be added to the mapping of exchange-tradingModes
+   */
+  constructor(address breaker, address[] memory exchanges) public {
+    _transferOwnership(msg.sender);
+    addBreaker(breaker);
+    addExchanges(exchanges);
+  }
 
   /**
    * @notice Adds a breaker to the end of the list of breakers.
    * @param breaker The address of the breaker to be added.
    */
-  function addBreaker(address breaker) external onlyOwner {
-    require(breaker != address(0), "Breaker address cannot be zero address");
-    require(!breakers.contains(breakers, breaker), "Breaker has already been added");
-    breakers.push(breakers, breaker);
+  function addBreaker(address breaker) public onlyOwner {
+    breakers.push(breaker);
     emit BreakerAdded(breaker);
   }
 
@@ -42,9 +49,7 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    * @param breaker The address of the breaker to be removed.
    */
   function removeBreaker(address breaker) external onlyOwner {
-    require(breaker != address(0), "Breaker address cannot be zero address");
-    require(breakers.contains(breakers, breaker), "Breaker has not been added");
-    breakers.remove(breakers, breaker);
+    breakers.remove(breaker);
     emit BreakerRemoved(breaker);
   }
 
@@ -58,10 +63,7 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
     external
     onlyOwner
   {
-    require(breaker != address(0), "Breaker address cannot be zero address");
-    require(!breakers.contains(breakers, breaker), "Breaker has already been added");
-    // TODO
-    breakers.insert(breakers, breaker, prevBreaker, nextBreaker);
+    breakers.insert(breaker, prevBreaker, nextBreaker);
     emit BreakerAdded(breaker);
   }
 
@@ -69,18 +71,29 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    * @notice Adds an exchange to the mapping of monitored exchanges.
    * @param exchange The address of the exchange to be added.
    */
-  function addExchange(address exchange) external onlyOwner {
+  function addExchange(address exchange) public onlyOwner {
     require(exchange != address(0), "Exchange address cannot be zero address");
 
     TradingModeInfo memory info = exchangeTradingModes[exchange];
     require(info.lastUpdated == 0, "Exchange already exists");
-    // TODO: Check address is reserve exchange spender??  require(reserve.isExchangeSpender[spender], "Address is not an exchange");)
+    // TODO: Check address is reserve exchange spender?? CUSD exchange is not spender :(
+    // require(reserve.isExchangeSpender[spender], "Address is not an exchange");)
 
     info.tradingMode = 0; // Default trading mode (Bi-directional).
     info.lastUpdated = block.timestamp;
     exchangeTradingModes[exchange] = info;
 
     emit ExchangeAdded(exchange);
+  }
+
+  /**
+   * @notice Adds the specified exchanges to the mapping of monitored exchanges.
+   * @param exchanges The array of exchange addresses to be added
+   */
+  function addExchanges(address[] memory exchanges) public onlyOwner {
+    for (uint256 i = 0; i < exchanges.length; i++) {
+      addExchange(exchanges[i]);
+    }
   }
 
   /**
