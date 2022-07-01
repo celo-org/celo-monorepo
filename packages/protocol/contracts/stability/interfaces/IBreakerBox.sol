@@ -37,6 +37,7 @@ interface IBreakerBox {
   /**
    * @notice Checkes breakers for a specified exchange to determine the trading mode.
    * @param exchange The address of the exchange to run the checks for.
+   * @return currentTradingMode Returns an int representing the current trading mode for the specified exchange.
    */
-  function checkBreakers(address exchange) external returns (uint256 tradingMode);
+  function checkBreakers(address exchange) external returns (uint256 currentTradingMode);
 }
