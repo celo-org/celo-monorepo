@@ -1,4 +1,4 @@
-pragma solidity 0.5.13;
+pragma solidity ^0.5.13;
 
 import { IBreakerBox } from "./interfaces/IBreakerBox.sol";
 import { IBreaker } from "./interfaces/IBreaker.sol";
