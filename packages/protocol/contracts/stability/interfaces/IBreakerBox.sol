@@ -35,7 +35,19 @@ interface IBreakerBox {
   event ExchangeRemoved(address indexed exchange);
 
   /**
-   * @notice Checkes breakers for a specified exchange to determine the trading mode.
+   * @notice Retrives an ordered array of all breaker addresses.
+   */
+  function getBreakers() external view returns (address[] memory);
+
+  /**
+   * @notice Checks if a breaker with the specified address has been added to the breaker box.
+   * @param breaker The address of the breaker to check;
+   * @return A bool indicating whether or not the breaker has been added.
+   */
+  function isBreaker(address breaker) external view returns (bool);
+
+  /**
+   * @notice Checks breakers for a specified exchange to determine the trading mode.
    * @param exchange The address of the exchange to run the checks for.
    * @return currentTradingMode Returns an int representing the current trading mode for the specified exchange.
    */

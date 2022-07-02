@@ -28,7 +28,7 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
   /**
    * @notice List of breakers to be checked.
    */
-  LinkedList.List public breakers;
+  LinkedList.List private breakers;
 
   /**
    * @dev Constructor
@@ -46,6 +46,13 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    * @param breaker The address of the breaker to be added.
    */
   function addBreaker(IBreaker breaker) public onlyOwner {
+    require(
+      tradingModeBreaker[breaker.getTradingMode()] == address(0),
+      "There is already a breaker added with the same trading mode"
+    );
+    require(!isBreaker(address(breaker)), "This breaker has already been added");
+
+    tradingModeBreaker[breaker.getTradingMode()] = address(breaker);
     breakers.push(address(breaker));
     emit BreakerAdded(address(breaker));
   }
@@ -54,9 +61,20 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    * @notice Removes the specified breaker from the list of breakers.
    * @param breaker The address of the breaker to be removed.
    */
-  function removeBreaker(address breaker) external onlyOwner {
-    breakers.remove(breaker);
-    emit BreakerRemoved(breaker);
+  function removeBreaker(IBreaker breaker) external onlyOwner {
+    require(isBreaker(address(breaker)), "This breaker has not been added");
+
+    uint256 tradingMode = breaker.getTradingMode();
+    require(
+      tradingModeBreaker[tradingMode] == address(breaker),
+      "This breaker does not match stored trading mode"
+    );
+
+    // TODO: Check if any exchanges are using breaker
+
+    delete tradingModeBreaker[tradingMode];
+    breakers.remove(address(breaker));
+    emit BreakerRemoved(address(breaker));
   }
 
   /**
@@ -117,33 +135,28 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
     emit ExchangeRemoved(exchange);
   }
 
+  /**
+   * @notice Returns an array of breaker addresses from start to end.
+   * @return An ordered list of breakers.
+   */
+  function getBreakers() external view returns (address[] memory) {
+    return breakers.getKeys();
+  }
+
+  /**
+   * @notice Checks whether a breaker with the specifed address has been added.
+   */
+  function isBreaker(address breaker) public view returns (bool) {
+    return breakers.contains(breaker);
+  }
+
   function checkBreakers(address exchangeAddress) external returns (uint256 currentTradingMode) {
     require(exchangeAddress != address(0), "Exchange address cannot be zero address");
 
     TradingModeInfo memory info = exchangeTradingModes[exchangeAddress];
     require(info.lastUpdated > 0, "Exchange has not been added to BreakerBox"); //Last updated should always have a value.
 
-    // Check if the exchange is not set to the default trading mode
-    // if(info.tradingMode > 0) {
-    //   uint256 cooldown memory
-    //   uint256 timeSinceTrigger = block.timestamp
-
-    // }
-
-    // Check trading mode
-    // - If trading mode is !0 check
-    //    - Check last triggered
-    //    - If last triggered - now is not greater than cooldown then return current trading mode
-    //    - If last triggered - now is greater than cooldown then check if breaker can reset
-    //    - If breaker can
-
-    // - If trading mode is 0 then run checks for other breakers
-
     address[] memory _breakers = breakers.getKeys();
-
-    // TradingInfo info = exchangeTradingModes[exchange];
-
-    // Check if this exchange is not in the
 
     for (uint256 i = 0; i < _breakers.length; i++) {
       IBreaker breaker = IBreaker(_breakers[i]);
