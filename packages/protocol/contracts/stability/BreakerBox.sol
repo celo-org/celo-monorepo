@@ -15,19 +15,13 @@ import { Exchange } from "./Exchange.sol";
 contract BreakerBox is IBreakerBox, UsingRegistry {
   using AddressLinkedList for LinkedList.List;
 
-  /**
-   * @notice Tracks known exchanges and the trading modes they are in.
-   */
+  // Maps exchange address to its current trading mode info
   mapping(address => TradingModeInfo) public exchangeTradingModes;
 
-  /**
-   * @notice Tracks trading modes and their respective breakers.
-   */
+  // Maps a trading mode to a breaker
   mapping(uint256 => address) public tradingModeBreaker;
 
-  /**
-   * @notice List of breakers to be checked.
-   */
+  // List of breakers to be checked.
   LinkedList.List private breakers;
 
   /**
@@ -150,16 +144,51 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
     return breakers.contains(breaker);
   }
 
+  /**
+   * @notice Checks breakers for a specified exchange to determine the trading mode. If an exchange
+   * @param exchange The address of the exchange to run the checks for.
+   * @return currentTradingMode Returns an int representing the current trading mode for the specified exchange.
+   */
   function checkBreakers(address exchangeAddress) external returns (uint256 currentTradingMode) {
     require(exchangeAddress != address(0), "Exchange address cannot be zero address");
 
     TradingModeInfo memory info = exchangeTradingModes[exchangeAddress];
     require(info.lastUpdated > 0, "Exchange has not been added to BreakerBox"); //Last updated should always have a value.
 
+    // Check if a breaker has already been tripped & try to reset
+    if (info.tradingMode != 0) {
+      IBreaker breaker = IBreaker(tradingModeBreaker[info.tradingMode]);
+      bool tryReset = (breaker.getCooldown() + info.lastUpdated) >= block.timestamp ? true : false;
+      if (tryReset) {
+        bool canReset = breaker.shouldReset(exchangeAddress);
+
+        if (canReset) {
+          info.tradingMode = 0;
+          info.lastUpdated = block.timestamp;
+          exchangeTradingModes[exchangeAddress] = info;
+          return 0;
+        } else {
+          return info.tradingMode;
+        }
+      } else {
+        return info.tradingMode;
+      }
+    }
+
     address[] memory _breakers = breakers.getKeys();
 
+    // Check all breakers
     for (uint256 i = 0; i < _breakers.length; i++) {
       IBreaker breaker = IBreaker(_breakers[i]);
+      bool tripBreaker = breaker.shouldTrigger(exchangeAddress);
+      if (tripBreaker) {
+        info.tradingMode = breaker.getTradingMode();
+        info.lastUpdated = block.timestamp;
+        exchangeTradingModes[exchangeAddress] = info;
+        return info.tradingMode;
+      }
     }
+
+    return info.tradingMode;
   }
 }
