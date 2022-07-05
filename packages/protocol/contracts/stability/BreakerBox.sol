@@ -100,8 +100,6 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    * @param exchange The address of the exchange to be added.
    */
   function addExchange(address exchange) public onlyOwner {
-    require(exchange != address(0), "Exchange address cannot be zero address");
-
     TradingModeInfo memory info = exchangeTradingModes[exchange];
     require(info.lastUpdatedTime == 0, "Exchange already exists");
     // TODO: Check address is reserve exchange spender?? CUSD exchange is not spender :(
