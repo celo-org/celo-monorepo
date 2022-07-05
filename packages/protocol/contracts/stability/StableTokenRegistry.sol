@@ -29,8 +29,8 @@ contract StableTokenRegistry is Initializable, Ownable {
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param fiatTicker Collection of fiat currencies issued already.
-   * @param stableTokenContractName Collection of stable token smart contract names.
+   * @param fiatTicker fiat currency issued.
+   * @param stableTokenContractName stable token smart contract name.
    */
   function initialize(bytes calldata fiatTicker, bytes calldata stableTokenContractName)
     external
