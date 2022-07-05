@@ -14,6 +14,14 @@ contract StableTokenRegistry is Initializable, Ownable {
   bytes[] public fiatTickers;
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 1, 0, 0);
+  }
+
+  /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
@@ -21,8 +29,8 @@ contract StableTokenRegistry is Initializable, Ownable {
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
-   * @param fiatTicker Collection of fiat currencies issued already.
-   * @param stableTokenContractName Collection of stable token smart contract names.
+   * @param fiatTicker fiat currency issued.
+   * @param stableTokenContractName stable token smart contract name.
    */
   function initialize(bytes calldata fiatTicker, bytes calldata stableTokenContractName)
     external
