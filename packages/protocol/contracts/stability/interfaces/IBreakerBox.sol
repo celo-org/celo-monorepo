@@ -6,8 +6,9 @@ pragma solidity ^0.5.13;
  */
 interface IBreakerBox {
   struct TradingModeInfo {
-    uint256 tradingMode;
-    uint256 lastUpdated;
+    uint256 hasCooledDown;
+    uint256 lastUpdatedTime;
+    uint256 lastUpdatedBlock;
   }
 
   /**

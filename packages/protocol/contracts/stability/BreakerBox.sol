@@ -10,22 +10,19 @@ import { Exchange } from "./Exchange.sol";
 /**
  * @title   BreakerBox
  * @notice  The BreakerBox stores references to Mento exchanges and breakers.
- *
  */
 contract BreakerBox is IBreakerBox, UsingRegistry {
   using AddressLinkedList for LinkedList.List;
 
-  // Maps exchange address to its current trading mode info
-  mapping(address => TradingModeInfo) public exchangeTradingModes;
+  /* ==================== Storage Variables ==================== */
 
-  // Maps a trading mode to a breaker
-  mapping(uint256 => address) public tradingModeBreaker;
+  mapping(address => TradingModeInfo) public exchangeTradingModes; // Maps exchange address to its current trading mode info
+  mapping(uint256 => address) public tradingModeBreaker; // Maps a trading mode to a breaker
+  LinkedList.List private breakers; // Ordered list of breakers to be checked.
 
-  // List of breakers to be checked.
-  LinkedList.List private breakers;
+  /* ==================== Constructor ==================== */
 
   /**
-   * @dev Constructor
    * @param breaker Address of a breaker to be added to the breaker list
    * @param exchanges Exchanges to be added to the mapping of exchange-tradingModes
    */
@@ -34,6 +31,10 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
     addBreaker(breaker);
     addExchanges(exchanges);
   }
+
+  /* ==================== Restricted Functions ==================== */
+
+  /* ---------- Breakers ---------- */
 
   /**
    * @notice Adds a breaker to the end of the list of breakers & the tradingMode-Breaker mapping.
@@ -81,9 +82,17 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
     external
     onlyOwner
   {
+    require(!isBreaker(address(breaker)), "This breaker has already been added");
+    require(
+      tradingModeBreaker[breaker.getTradingMode()] == address(0),
+      "There is already a breaker added with the same trading mode"
+    );
+
     breakers.insert(breaker, prevBreaker, nextBreaker);
     emit BreakerAdded(breaker);
   }
+
+  /* ---------- Exchanges ---------- */
 
   /**
    * @notice Adds an exchange to the mapping of monitored exchanges.
@@ -93,12 +102,13 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
     require(exchange != address(0), "Exchange address cannot be zero address");
 
     TradingModeInfo memory info = exchangeTradingModes[exchange];
-    require(info.lastUpdated == 0, "Exchange already exists");
+    require(info.lastUpdatedTime == 0, "Exchange already exists");
     // TODO: Check address is reserve exchange spender?? CUSD exchange is not spender :(
     // require(reserve.isExchangeSpender[spender], "Address is not an exchange");)
 
     info.tradingMode = 0; // Default trading mode (Bi-directional).
-    info.lastUpdated = block.timestamp;
+    info.lastUpdatedTime = block.timestamp;
+    info.lastUpdatedBlock = block.number;
     exchangeTradingModes[exchange] = info;
 
     emit ExchangeAdded(exchange);
@@ -120,14 +130,35 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    */
   function removeExchange(address exchange) external onlyOwner {
     require(exchange != address(0), "Exchange address cannot be zero address");
-
-    TradingModeInfo memory info = exchangeTradingModes[exchange];
-    require(info.lastUpdated > 0, "Exchange has not been added");
-
     delete exchangeTradingModes[exchange];
-
     emit ExchangeRemoved(exchange);
   }
+
+  /**
+   * @notice Sets the trading mode for the specified exchange.
+   * @param exchange The address of the exchange.
+   * @param tradingMode The trading mode that should be set.
+   */
+  function setExchangeTradingMode(address exchange, uint256 tradingMode) external onlyOwner {
+    require(exchange != address(0), "Exchange address cannot be zero address");
+    require(
+      tradingMode == 0 || tradingModeBreaker[tradingMode] != address(0),
+      "Trading mode must be default or have a breaker set"
+    );
+
+    TradingModeInfo memory info = exchangeTradingModes[exchange];
+    require(info.lastUpdatedTime > 0, "Exchange has not been added");
+
+    info.tradingMode = 0;
+    info.lastUpdatedTime = block.timestamp;
+    info.lastUpdatedBlock = block.number;
+    exchangeTradingModes[exchange] = info;
+
+    //TODO: log
+
+  }
+
+  /* ==================== View Functions ==================== */
 
   /**
    * @notice Returns an array of breaker addresses from start to end.
@@ -144,46 +175,54 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
     return breakers.contains(breaker);
   }
 
+  /* ==================== Check Breakers ==================== */
+
   /**
    * @notice Checks breakers for a specified exchange to determine the trading mode. If an exchange
-   * @param exchange The address of the exchange to run the checks for.
+   * @param exchangeAddress The address of the exchange to run the checks for.
    * @return currentTradingMode Returns an int representing the current trading mode for the specified exchange.
    */
   function checkBreakers(address exchangeAddress) external returns (uint256 currentTradingMode) {
     require(exchangeAddress != address(0), "Exchange address cannot be zero address");
 
     TradingModeInfo memory info = exchangeTradingModes[exchangeAddress];
-    require(info.lastUpdated > 0, "Exchange has not been added to BreakerBox"); //Last updated should always have a value.
+    require(info.lastUpdatedTime > 0, "Exchange has not been added to BreakerBox"); //Last updated should always have a value.
 
-    // Check if a breaker has already been tripped & try to reset
+    // Skip check if last check was in the same block
+    if (info.lastUpdatedBlock == block.number) {
+      return info.tradingMode;
+    }
+
+    // Check if a breaker has non default trading mode & try to reset
     if (info.tradingMode != 0) {
       IBreaker breaker = IBreaker(tradingModeBreaker[info.tradingMode]);
-      bool tryReset = (breaker.getCooldown() + info.lastUpdated) >= block.timestamp ? true : false;
+      bool tryReset = (breaker.getCooldown() + info.lastUpdatedTime) >= block.timestamp;
       if (tryReset) {
         bool canReset = breaker.shouldReset(exchangeAddress);
-
         if (canReset) {
           info.tradingMode = 0;
-          info.lastUpdated = block.timestamp;
+          info.lastUpdatedTime = block.timestamp;
+          info.lastUpdatedBlock = block.number;
           exchangeTradingModes[exchangeAddress] = info;
-          return 0;
-        } else {
           return info.tradingMode;
+        } else {
+          return info.tradingMode; // Exchange cannot be reset
         }
       } else {
-        return info.tradingMode;
+        return info.tradingMode; // Cooldown time has not passed
       }
     }
 
     address[] memory _breakers = breakers.getKeys();
 
     // Check all breakers
-    for (uint256 i = 0; i < _breakers.length; i++) {
+    for (uint256 i = 0; i < _breakers.length; ++i) {
       IBreaker breaker = IBreaker(_breakers[i]);
       bool tripBreaker = breaker.shouldTrigger(exchangeAddress);
       if (tripBreaker) {
         info.tradingMode = breaker.getTradingMode();
-        info.lastUpdated = block.timestamp;
+        info.lastUpdatedTime = block.timestamp;
+        info.lastUpdatedBlock = block.number;
         exchangeTradingModes[exchangeAddress] = info;
         return info.tradingMode;
       }
