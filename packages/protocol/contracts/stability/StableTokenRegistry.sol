@@ -14,6 +14,14 @@ contract StableTokenRegistry is Initializable, Ownable {
   bytes[] public fiatTickers;
 
   /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return The storage, major, minor, and patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 0, 0, 0);
+  }
+
+  /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
