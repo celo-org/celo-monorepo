@@ -36,6 +36,13 @@ interface IBreakerBox {
   event ExchangeRemoved(address indexed exchange);
 
   /**
+   * @notice Emitted when the trading mode for an exchange is updated
+   * @param exchange The address of the exchange.
+   * @param tradingMode The new trading mode of the exchange.
+   */
+  event TradingModeUpdated(address indexed exchange, uint256 tradingMode);
+
+  /**
    * @notice Retrives an ordered array of all breaker addresses.
    */
   function getBreakers() external view returns (address[] memory);

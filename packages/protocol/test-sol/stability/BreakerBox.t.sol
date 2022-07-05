@@ -14,6 +14,7 @@ contract BreakerBoxTest is Test, WithRegistry {
   address deployer;
   address exchangeA;
   address exchangeB;
+  address exchangeC;
 
   FakeBreaker fakeBreakerA;
   FakeBreaker fakeBreakerB;
@@ -25,11 +26,13 @@ contract BreakerBoxTest is Test, WithRegistry {
   event BreakerRemoved(address indexed breaker);
   event ExchangeAdded(address indexed exchange);
   event ExchangeRemoved(address indexed exchange);
+  event TradingModeUpdated(address indexed exchange, uint256 tradingMode);
 
   function setUp() public {
     deployer = actor("deployer");
     exchangeA = actor("exchangeA");
     exchangeB = actor("exchangeB");
+    exchangeC = actor("exchangeC");
 
     address[] memory testExchanges = new address[](2);
     testExchanges[0] = exchangeA;
@@ -100,7 +103,7 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
   }
 
   // TODO:  It's possible for the trading mode of a breaker to be changed after it has been added to the breaker box.
-  //        This could cause issues when removing a breaker, as we need to switch exchanges to the default mode as part of the removal function.
+  //        This could cause issues when removing a breaker, as we need to switch exchanges to the default mode to cleanup as part of the removal function.
   //        If a breaker is added, then it's trading mode changed, an exchange could be stuck in a trading mode or potentially be reset under the wrong conditions.
   //        To mitigate this we could remove knowledge of trading modes from the breakers and instead only store this in the breaker box
   //        So a trading mode is only set when it's added to the breaker box and can only be changed upon removal, which will be cleaner.
@@ -167,5 +170,65 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
   }
 
   /* ---------- Exchanges ---------- */
+  function test_addExchange_whenExchangeHasAlreadyBeenAdded_shouldRevert() public {
+    vm.expectRevert("Exchange has already been added");
+    breakerBox.addExchange(exchangeA);
+  }
 
+  // TODO: 0 address check probably unnecessary
+  function test_removeExchange_whenExchangeAddressIsZero_shouldRevert() public {
+    vm.expectRevert("Exchange address cannot be zero address");
+    breakerBox.removeExchange(address(0));
+  }
+
+  function test_removeExchange_shouldResetTradingModeInfoAndEmit() public {
+    breakerBox.setExchangeTradingMode(exchangeA, 1);
+    vm.expectEmit(true, false, false, false);
+    emit ExchangeRemoved(exchangeA);
+
+    (uint256 tradingModeBefore, uint256 lastUpdatedTimeBefore, uint256 lastUpdatedBlockBefore) = breakerBox
+      .exchangeTradingModes(exchangeA);
+    assert(tradingModeBefore == 1);
+    assert(lastUpdatedTimeBefore > 0);
+    assert(lastUpdatedBlockBefore > 0);
+
+    breakerBox.removeExchange(exchangeA);
+
+    (uint256 tradingModeAfter, uint256 lastUpdatedTimeAfter, uint256 lastUpdatedBlockAfter) = breakerBox
+      .exchangeTradingModes(exchangeA);
+    assert(tradingModeAfter == 0);
+    assert(lastUpdatedTimeAfter == 0);
+    assert(lastUpdatedBlockAfter == 0);
+  }
+
+  function test_setExchangeTradingMode_whenExchangeHasNotBeenAdded_ShouldRevert() public {
+    vm.expectRevert("Exchange has not been added");
+    breakerBox.setExchangeTradingMode(exchangeC, 1);
+  }
+
+  function test_setExchangeTradingMode_whenSpecifiedTradingModeHasNoBreaker_ShouldRevert() public {
+    vm.expectRevert("Trading mode must be default or have a breaker set");
+    breakerBox.setExchangeTradingMode(exchangeA, 9);
+  }
+
+  function test_setExchangeTradingMode_whenUsingDefaultTradingMode_ShouldUpdateAndEmit() public {
+    (uint256 tradingModeBefore, uint256 lastUpdatedTimeBefore, uint256 lastUpdatedBlockBefore) = breakerBox
+      .exchangeTradingModes(exchangeA);
+    assert(tradingModeBefore == 0);
+    assert(lastUpdatedTimeBefore > 0);
+    assert(lastUpdatedBlockBefore > 0);
+
+    //Fake time skip
+    skip(5 * 60);
+    vm.roll(5);
+    vm.expectEmit(true, false, false, true);
+    emit TradingModeUpdated(exchangeA, 1);
+
+    breakerBox.setExchangeTradingMode(exchangeA, 1);
+    (uint256 tradingModeAfter, uint256 lastUpdatedTimeAfter, uint256 lastUpdatedBlockAfter) = breakerBox
+      .exchangeTradingModes(exchangeA);
+    assert(tradingModeAfter == 1);
+    assert(lastUpdatedTimeAfter > lastUpdatedTimeBefore);
+    assert(lastUpdatedBlockAfter > lastUpdatedBlockBefore);
+  }
 }

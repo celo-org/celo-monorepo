@@ -101,7 +101,7 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    */
   function addExchange(address exchange) public onlyOwner {
     TradingModeInfo memory info = exchangeTradingModes[exchange];
-    require(info.lastUpdatedTime == 0, "Exchange already exists");
+    require(info.lastUpdatedTime == 0, "Exchange has already been added");
     // TODO: Check address is reserve exchange spender?? CUSD exchange is not spender :(
     // require(reserve.isExchangeSpender[spender], "Address is not an exchange");)
 
@@ -139,7 +139,6 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    * @param tradingMode The trading mode that should be set.
    */
   function setExchangeTradingMode(address exchange, uint256 tradingMode) external onlyOwner {
-    require(exchange != address(0), "Exchange address cannot be zero address");
     require(
       tradingMode == 0 || tradingModeBreaker[tradingMode] != address(0),
       "Trading mode must be default or have a breaker set"
@@ -148,13 +147,12 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
     TradingModeInfo memory info = exchangeTradingModes[exchange];
     require(info.lastUpdatedTime > 0, "Exchange has not been added");
 
-    info.tradingMode = 0;
+    info.tradingMode = tradingMode;
     info.lastUpdatedTime = block.timestamp;
     info.lastUpdatedBlock = block.number;
     exchangeTradingModes[exchange] = info;
 
-    //TODO: log
-
+    emit TradingModeUpdated(exchange, tradingMode);
   }
 
   /* ==================== View Functions ==================== */
