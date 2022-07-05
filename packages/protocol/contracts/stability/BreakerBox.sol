@@ -14,7 +14,7 @@ import { Exchange } from "./Exchange.sol";
 contract BreakerBox is IBreakerBox, UsingRegistry {
   using AddressLinkedList for LinkedList.List;
 
-  /* ==================== Storage Variables ==================== */
+  /* ==================== State Variables ==================== */
 
   mapping(address => TradingModeInfo) public exchangeTradingModes; // Maps exchange address to its current trading mode info
   mapping(uint256 => address) public tradingModeBreaker; // Maps a trading mode to a breaker
@@ -78,7 +78,7 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    * @param prevBreaker The address of the breaker that should come before the new breaker.
    * @param nextBreaker The address of the breaker that should come after the new breaker.
    */
-  function insertBreaker(address breaker, address prevBreaker, address nextBreaker)
+  function insertBreaker(IBreaker breaker, address prevBreaker, address nextBreaker)
     external
     onlyOwner
   {
@@ -88,8 +88,9 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
       "There is already a breaker added with the same trading mode"
     );
 
-    breakers.insert(breaker, prevBreaker, nextBreaker);
-    emit BreakerAdded(breaker);
+    tradingModeBreaker[breaker.getTradingMode()] = address(breaker);
+    breakers.insert(address(breaker), prevBreaker, nextBreaker);
+    emit BreakerAdded(address(breaker));
   }
 
   /* ---------- Exchanges ---------- */

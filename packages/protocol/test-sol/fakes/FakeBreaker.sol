@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 
 import { IBreaker } from "contracts/stability/interfaces/IBreaker.sol";
 
-contract BreakerMock is IBreaker {
+contract FakeBreaker is IBreaker {
   uint256 public cooldown;
   uint256 public tradingMode;
   bool public trigger;

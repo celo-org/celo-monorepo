@@ -37,9 +37,9 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
 
   /**
    * @notice The trading mode that should be used when this breaker is triggered.
-   * @dev 0 for no trading.
+   * @dev 1 for no trading.
    */
-  uint256 public constant TRADING_MODE = 0;
+  uint256 public constant TRADING_MODE = 1;
 
   /**
    * @notice The amount of time that must pass before the breaker can be reset for an exchange.
