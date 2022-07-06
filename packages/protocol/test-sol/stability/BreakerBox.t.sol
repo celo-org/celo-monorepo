@@ -4,6 +4,7 @@ pragma solidity ^0.5.13;
 import { Test, console2 as console } from "celo-foundry/Test.sol";
 
 import { FakeBreaker } from "../fakes/FakeBreaker.sol";
+import { MockReserve } from "contracts/stability/test/MockReserve.sol";
 
 import { WithRegistry } from "../utils/WithRegistry.sol";
 
@@ -20,6 +21,7 @@ contract BreakerBoxTest is Test, WithRegistry {
   FakeBreaker fakeBreakerB;
   FakeBreaker fakeBreakerC;
   FakeBreaker fakeBreakerD;
+  MockReserve mockReserve;
   BreakerBox breakerBox;
 
   event BreakerAdded(address indexed breaker);
@@ -43,23 +45,31 @@ contract BreakerBoxTest is Test, WithRegistry {
     fakeBreakerB = new FakeBreaker(0, 1, false, false);
     fakeBreakerC = new FakeBreaker(0, 1, false, false);
     fakeBreakerD = new FakeBreaker(0, 1, false, false);
-    breakerBox = new BreakerBox(fakeBreakerA, testExchanges);
+    mockReserve = new MockReserve();
+
+    mockReserve.setReserveSpender(true);
+
+    registry.setAddressFor("Reserve", address(mockReserve));
+    registry.setAddressFor("Exchange", address(exchangeA));
+
+    breakerBox = new BreakerBox(true);
+    breakerBox.initilize(fakeBreakerA, testExchanges, address(registry));
   }
 }
 
 contract BreakerBox_constructorAndSetters is BreakerBoxTest {
-  /* ---------- Constructor ---------- */
+  /* ---------- Initilizer ---------- */
 
-  function test_constructor_shouldSetOwner() public {
+  function test_initilize_shouldSetOwner() public {
     assert(breakerBox.owner() == deployer);
   }
 
-  function test_constructor_shouldSetInitialBreaker() public {
+  function test_initilize_shouldSetInitialBreaker() public {
     assert(breakerBox.tradingModeBreaker(1) == address(fakeBreakerA));
     assert(breakerBox.isBreaker(address(fakeBreakerA)));
   }
 
-  function test_constructor_shouldAddExchangesWithDefaultMode() public {
+  function test_initilize_shouldAddExchangesWithDefaultMode() public {
     (uint256 tradingModeA, uint256 lastUpdatedA, uint256 lastUpdatedBlockA) = breakerBox
       .exchangeTradingModes(exchangeA);
     assert(tradingModeA == 0);
@@ -170,15 +180,41 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
   }
 
   /* ---------- Exchanges ---------- */
+
   function test_addExchange_whenExchangeHasAlreadyBeenAdded_shouldRevert() public {
     vm.expectRevert("Exchange has already been added");
     breakerBox.addExchange(exchangeA);
   }
 
-  // TODO: 0 address check probably unnecessary
-  function test_removeExchange_whenExchangeAddressIsZero_shouldRevert() public {
-    vm.expectRevert("Exchange address cannot be zero address");
-    breakerBox.removeExchange(address(0));
+  function test_addExchange_whenExchangeIsNotReserveSpender_shouldRevert() public {
+    mockReserve.setReserveSpender(false);
+
+    vm.expectRevert("Exchange is not a reserve spender");
+    breakerBox.addExchange(exchangeC);
+  }
+
+  function test_addExchange_whenExchangeIsReserveSpender_shouldSetDefaultModeAndEmit() public {
+    mockReserve.setReserveSpender(true);
+    vm.expectEmit(true, false, false, false);
+    emit ExchangeAdded(exchangeC);
+
+    (uint256 tradingModeBefore, uint256 lastUpdatedTimeBefore, uint256 lastUpdatedBlockBefore) = breakerBox
+      .exchangeTradingModes(exchangeC);
+
+    assert(tradingModeBefore == 0);
+    assert(lastUpdatedTimeBefore == 0);
+    assert(lastUpdatedBlockBefore == 0);
+
+    skip(5);
+    vm.roll(block.number + 1);
+    breakerBox.addExchange(exchangeC);
+
+    (uint256 tradingModeAfter, uint256 lastUpdatedTimeAfter, uint256 lastUpdatedBlockAfter) = breakerBox
+      .exchangeTradingModes(exchangeC);
+
+    assert(tradingModeAfter == 0);
+    assert(lastUpdatedTimeAfter > lastUpdatedTimeBefore);
+    assert(lastUpdatedBlockAfter > lastUpdatedBlockBefore);
   }
 
   function test_removeExchange_shouldResetTradingModeInfoAndEmit() public {

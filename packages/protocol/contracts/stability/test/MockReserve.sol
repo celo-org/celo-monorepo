@@ -11,6 +11,8 @@ contract MockReserve {
 
   IERC20 public goldToken;
 
+  bool public reserveSpender;
+
   // solhint-disable-next-line no-empty-blocks
   function() external payable {}
 
@@ -39,5 +41,13 @@ contract MockReserve {
 
   function getUnfrozenReserveGoldBalance() external view returns (uint256) {
     return address(this).balance;
+  }
+
+  function setReserveSpender(bool _reserveSpender) external {
+    reserveSpender = _reserveSpender;
+  }
+
+  function isExchangeSpender(address exchange) external view returns (bool) {
+    return reserveSpender;
   }
 }

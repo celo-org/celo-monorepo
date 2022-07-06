@@ -15,4 +15,5 @@ interface IReserve {
   function removeExchangeSpender(address, uint256) external;
   function addSpender(address) external;
   function removeSpender(address) external;
+  function isExchangeSpender(address exchange) external view returns (bool);
 }
