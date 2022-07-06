@@ -2,20 +2,23 @@ pragma solidity ^0.5.13;
 
 import { IBreakerBox } from "./interfaces/IBreakerBox.sol";
 import { IBreaker } from "./interfaces/IBreaker.sol";
+import { IReserve } from "./interfaces/IReserve.sol";
 
 import { AddressLinkedList, LinkedList } from "../common/linkedlists/AddressLinkedList.sol";
 import { UsingRegistry } from "../common/UsingRegistry.sol";
+import { Initializable } from "../common/Initializable.sol";
 import { Exchange } from "./Exchange.sol";
 
 /**
  * @title   BreakerBox
  * @notice  The BreakerBox stores references to Mento exchanges and breakers.
  */
-contract BreakerBox is IBreakerBox, UsingRegistry {
+contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   using AddressLinkedList for LinkedList.List;
 
   /* ==================== State Variables ==================== */
 
+  address[] public exchanges;
   mapping(address => TradingModeInfo) public exchangeTradingModes; // Maps exchange address to its current trading mode info
   mapping(uint256 => address) public tradingModeBreaker; // Maps a trading mode to a breaker
   LinkedList.List private breakers; // Ordered list of breakers to be checked.
@@ -23,13 +26,24 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
   /* ==================== Constructor ==================== */
 
   /**
-   * @param breaker Address of a breaker to be added to the breaker list
-   * @param exchanges Exchanges to be added to the mapping of exchange-tradingModes
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
    */
-  constructor(IBreaker breaker, address[] memory exchanges) public {
+  constructor(bool test) public Initializable(test) {}
+
+  /**
+   * @param breaker Address of a breaker to be added to the breaker list
+   * @param _exchanges Exchanges to be added to the mapping of exchange-tradingModes
+   * @param registryAddress The address of the registry contract
+   */
+  function initilize(IBreaker breaker, address[] calldata _exchanges, address registryAddress)
+    external
+    initializer
+  {
     _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
     addBreaker(breaker);
-    addExchanges(exchanges);
+    addExchanges(_exchanges);
   }
 
   /* ==================== Restricted Functions ==================== */
@@ -55,19 +69,29 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
   /**
    * @notice Removes the specified breaker from the list of breakers.
    * @param breaker The address of the breaker to be removed.
+   * @dev Will set any exchange using this breakers trading mode to the default trading mode
    */
   function removeBreaker(IBreaker breaker) external onlyOwner {
     require(isBreaker(address(breaker)), "This breaker has not been added");
 
-    uint256 tradingMode = breaker.getTradingMode();
+    uint256 breakerTradingMode = breaker.getTradingMode();
     require(
-      tradingModeBreaker[tradingMode] == address(breaker),
+      tradingModeBreaker[breakerTradingMode] == address(breaker),
       "This breaker does not match stored trading mode"
     );
 
-    // TODO: Check if any exchanges are using breaker
+    // Set any exchanges using this breakers trading mode to the default mode
+    address[] memory activeExchanges = exchanges;
+    TradingModeInfo memory tradingModeInfo;
 
-    delete tradingModeBreaker[tradingMode];
+    for (uint256 i = 0; i < activeExchanges.length; ++i) {
+      tradingModeInfo = exchangeTradingModes[activeExchanges[i]];
+      if (tradingModeInfo.tradingMode == breakerTradingMode) {
+        setExchangeTradingMode(activeExchanges[i], 0);
+      }
+    }
+
+    delete tradingModeBreaker[breakerTradingMode];
     breakers.remove(address(breaker));
     emit BreakerRemoved(address(breaker));
   }
@@ -102,24 +126,30 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
   function addExchange(address exchange) public onlyOwner {
     TradingModeInfo memory info = exchangeTradingModes[exchange];
     require(info.lastUpdatedTime == 0, "Exchange has already been added");
-    // TODO: Check address is reserve exchange spender?? CUSD exchange is not spender :(
-    // require(reserve.isExchangeSpender[spender], "Address is not an exchange");)
+
+    IReserve reserve = IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
+    require(
+      reserve.isExchangeSpender(exchange) ||
+        registry.getAddressForOrDie(EXCHANGE_REGISTRY_ID) == exchange,
+      "Exchange is not a reserve spender"
+    );
 
     info.tradingMode = 0; // Default trading mode (Bi-directional).
     info.lastUpdatedTime = block.timestamp;
     info.lastUpdatedBlock = block.number;
     exchangeTradingModes[exchange] = info;
+    exchanges.push(exchange);
 
     emit ExchangeAdded(exchange);
   }
 
   /**
    * @notice Adds the specified exchanges to the mapping of monitored exchanges.
-   * @param exchanges The array of exchange addresses to be added
+   * @param newExchanges The array of exchange addresses to be added
    */
-  function addExchanges(address[] memory exchanges) public onlyOwner {
-    for (uint256 i = 0; i < exchanges.length; i++) {
-      addExchange(exchanges[i]);
+  function addExchanges(address[] memory newExchanges) public onlyOwner {
+    for (uint256 i = 0; i < newExchanges.length; i++) {
+      addExchange(newExchanges[i]);
     }
   }
 
@@ -128,7 +158,23 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    * @param exchange The address of the exchange to be removed.
    */
   function removeExchange(address exchange) external onlyOwner {
-    require(exchange != address(0), "Exchange address cannot be zero address");
+    uint256 exchangeIndex;
+    for (uint256 i = 0; i < exchanges.length; ++i) {
+      if (exchanges[i] == exchange) {
+        exchangeIndex = i;
+        break;
+      }
+    }
+
+    require(exchanges[exchangeIndex] == exchange, "Exchange address was not found added addresses");
+
+    uint256 lastIndex = exchanges.length - 1;
+    if (exchangeIndex != lastIndex) {
+      exchanges[exchangeIndex] = exchanges[lastIndex];
+    }
+
+    exchanges.pop();
+
     delete exchangeTradingModes[exchange];
     emit ExchangeRemoved(exchange);
   }
@@ -138,7 +184,7 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    * @param exchange The address of the exchange.
    * @param tradingMode The trading mode that should be set.
    */
-  function setExchangeTradingMode(address exchange, uint256 tradingMode) external onlyOwner {
+  function setExchangeTradingMode(address exchange, uint256 tradingMode) public onlyOwner {
     require(
       tradingMode == 0 || tradingModeBreaker[tradingMode] != address(0),
       "Trading mode must be default or have a breaker set"
@@ -180,15 +226,8 @@ contract BreakerBox is IBreakerBox, UsingRegistry {
    * @return currentTradingMode Returns an int representing the current trading mode for the specified exchange.
    */
   function checkBreakers(address exchangeAddress) external returns (uint256 currentTradingMode) {
-    require(exchangeAddress != address(0), "Exchange address cannot be zero address");
-
     TradingModeInfo memory info = exchangeTradingModes[exchangeAddress];
     require(info.lastUpdatedTime > 0, "Exchange has not been added to BreakerBox"); //Last updated should always have a value.
-
-    // Skip check if last check was in the same block
-    if (info.lastUpdatedBlock == block.number) {
-      return info.tradingMode;
-    }
 
     // Check if a breaker has non default trading mode & try to reset
     if (info.tradingMode != 0) {
