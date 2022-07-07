@@ -12,6 +12,7 @@ import "contracts/stability/Exchange.sol";
 import "contracts/stability/StableToken.sol";
 import "contracts/stability/test/MockReserve.sol";
 import "contracts/stability/test/MockSortedOracles.sol";
+import "contracts/stability/test/FakeBreakerBox.sol";
 import "contracts/common/FixidityLib.sol";
 import "contracts/common/Freezer.sol";
 import "contracts/common/GoldToken.sol";
@@ -38,6 +39,7 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
   GoldToken celoToken;
   MockReserve reserve;
   MockSortedOracles sortedOracles;
+  FakeBreakerBox breakerBox;
 
   uint256 constant bucketUpdateFrequency = 60 * 60;
   uint256 constant initialReserveBalance = 10000000000000000000000;
@@ -63,6 +65,7 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
     exchange = new Exchange(true);
     stableToken = new StableToken(true);
     sortedOracles = new MockSortedOracles();
+    breakerBox = new FakeBreakerBox();
 
     registry.setAddressFor("Freezer", address(freezer));
     registry.setAddressFor("GoldToken", address(celoToken));
@@ -101,7 +104,8 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
       FixidityLib.unwrap(spread),
       FixidityLib.unwrap(reserveFraction),
       bucketUpdateFrequency,
-      2
+      2,
+      breakerBox
     );
   }
 
@@ -171,7 +175,8 @@ contract Exchange_initializeAndSetters is ExchangeTest {
       FixidityLib.unwrap(FixidityLib.newFixedFraction(3, 1000)),
       FixidityLib.unwrap(FixidityLib.newFixedFraction(5, 100)),
       60 * 60,
-      2
+      2,
+      breakerBox
     );
   }
 

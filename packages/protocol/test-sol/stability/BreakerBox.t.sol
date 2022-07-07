@@ -3,8 +3,8 @@ pragma solidity ^0.5.13;
 
 import { Test, console2 as console } from "celo-foundry/Test.sol";
 
-import { FakeBreaker } from "../fakes/FakeBreaker.sol";
 import { MockReserve } from "contracts/stability/test/MockReserve.sol";
+import { FakeBreaker } from "contracts/stability/test/FakeBreaker.sol";
 
 import { WithRegistry } from "../utils/WithRegistry.sol";
 
