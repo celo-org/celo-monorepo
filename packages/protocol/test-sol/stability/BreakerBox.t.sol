@@ -112,7 +112,8 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
     breakerBox.removeBreaker(fakeBreakerB);
   }
 
-  // TODO:  It's possible for the trading mode of a breaker to be changed after it has been added to the breaker box.
+  // TODO:  TradingModeMisMatch
+  //        It's possible for the trading mode of a breaker to be changed after it has been added to the breaker box.
   //        This could cause issues when removing a breaker, as we need to switch exchanges to the default mode to cleanup as part of the removal function.
   //        If a breaker is added, then it's trading mode changed, an exchange could be stuck in a trading mode or potentially be reset under the wrong conditions.
   //        To mitigate this we could remove knowledge of trading modes from the breakers and instead only store this in the breaker box
@@ -122,6 +123,23 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
     vm.expectRevert("This breaker does not match stored trading mode");
 
     breakerBox.removeBreaker(fakeBreakerA);
+  }
+
+  function test_removeBreaker_whenBreakerTradingModeInUse_shouldSetDefaultMode() public {
+    fakeBreakerC.setTradingMode(3);
+
+    breakerBox.addBreaker(fakeBreakerC);
+    breakerBox.addExchange(exchangeC);
+
+    breakerBox.setExchangeTradingMode(exchangeC, 3);
+
+    (uint256 tradingModeBefore, , ) = breakerBox.exchangeTradingModes(exchangeC);
+    assertEq(tradingModeBefore, 3);
+
+    breakerBox.removeBreaker(fakeBreakerC);
+
+    (uint256 tradingModeAfter, , ) = breakerBox.exchangeTradingModes(exchangeC);
+    assertEq(tradingModeAfter, 0);
   }
 
   function test_removeBreaker_shouldUpdateStorageAndEmit() public {
