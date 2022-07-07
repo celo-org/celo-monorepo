@@ -6,6 +6,7 @@ import "./interfaces/IExchange.sol";
 import "./interfaces/ISortedOracles.sol";
 import "./interfaces/IReserve.sol";
 import "./interfaces/IStableToken.sol";
+import "./interfaces/IBreakerBox.sol";
 import "../common/Initializable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Freezable.sol";
@@ -36,6 +37,7 @@ contract Exchange is
   event SpreadSet(uint256 spread);
   event ReserveFractionSet(uint256 reserveFraction);
   event BucketsUpdated(uint256 goldBucket, uint256 stableBucket);
+  event BreakerBoxUpdated(address indexed newBreakerBox);
 
   FixidityLib.Fraction public spread;
 
@@ -44,6 +46,7 @@ contract Exchange is
   FixidityLib.Fraction public reserveFraction;
 
   address public stable;
+  IBreakerBox public breakerBox;
 
   // Size of the Uniswap gold bucket
   uint256 public goldBucket;
@@ -58,6 +61,11 @@ contract Exchange is
 
   modifier updateBucketsIfNecessary() {
     _updateBucketsIfNecessary();
+    _;
+  }
+
+  modifier checkTradingMode() {
+    require(breakerBox.checkBreakers(address(this)) == 0, "Trading is suspended for this exchange");
     _;
   }
 
@@ -86,6 +94,7 @@ contract Exchange is
    * present in the oracle to update buckets
    * commit to the gold bucket
    * @param stableTokenIdentifier String identifier of stabletoken in registry
+   * @param _breakerBox The address of the breaker box smart contract
    */
   function initialize(
     address registryAddress,
@@ -93,7 +102,8 @@ contract Exchange is
     uint256 _spread,
     uint256 _reserveFraction,
     uint256 _updateFrequency,
-    uint256 _minimumReports
+    uint256 _minimumReports,
+    IBreakerBox _breakerBox
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -102,6 +112,7 @@ contract Exchange is
     setReserveFraction(_reserveFraction);
     setUpdateFrequency(_updateFrequency);
     setMinimumReports(_minimumReports);
+    setBreakerBox(_breakerBox);
   }
 
   /**
@@ -127,6 +138,7 @@ contract Exchange is
   function sell(uint256 sellAmount, uint256 minBuyAmount, bool sellGold)
     public
     onlyWhenNotFrozen
+    checkTradingMode
     updateBucketsIfNecessary
     nonReentrant
     returns (uint256)
@@ -171,6 +183,7 @@ contract Exchange is
   function buy(uint256 buyAmount, uint256 maxSellAmount, bool buyGold)
     external
     onlyWhenNotFrozen
+    checkTradingMode
     updateBucketsIfNecessary
     nonReentrant
     returns (uint256)
@@ -301,6 +314,15 @@ contract Exchange is
       "the value of spread must be less than or equal to 1"
     );
     emit SpreadSet(newSpread);
+  }
+
+  /**
+   * @notice Sets the address of the BreakerBox.
+   * @param newBreakerBox The new BreakerBox address.
+   */
+  function setBreakerBox(IBreakerBox newBreakerBox) public onlyOwner {
+    breakerBox = newBreakerBox;
+    emit BreakerBoxUpdated(address(newBreakerBox));
   }
 
   /**
