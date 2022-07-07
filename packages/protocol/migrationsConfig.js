@@ -240,6 +240,10 @@ const DefaultConfig = {
     commission: 0.1,
     votesRatioOfLastVsFirstGroup: 2.0,
   },
+  stableTokenRegistry: {
+    fiatTicker: [], // empty array resambles empty bytes
+    stableTokenContractName: [], // empty array resambles empty bytes
+  },
 }
 
 const NetworkConfigs = {

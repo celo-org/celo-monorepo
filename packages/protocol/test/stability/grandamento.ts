@@ -3,6 +3,7 @@ import {
   assertEqualBN,
   assertEqualBNArray,
   assertLogMatches2,
+  assertRevert,
   assertRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
@@ -1085,10 +1086,10 @@ contract('GrandaMento', (accounts: string[]) => {
       })
     })
 
-    it('reverts when the spread is greater than 1', async () => {
-      await assertRevertWithReason(
-        grandaMento.setSpread(toFixed(1.0001)),
-        'Spread must be smaller than 1'
+    it('reverts when the spread is more than 1', async () => {
+      await assertRevert(
+        grandaMento.setSpread(toFixed(1001 / 1000)),
+        'Spread must be less than or equal to 1'
       )
     })
 
@@ -1167,7 +1168,7 @@ contract('GrandaMento', (accounts: string[]) => {
   })
 
   describe('#setVetoPeriodSeconds', () => {
-    const newVetoPeriodSeconds = 60 * 60 * 24 * 7 // 7 days
+    const newVetoPeriodSeconds = SECONDS_IN_A_WEEK
     it('sets the spread', async () => {
       await grandaMento.setVetoPeriodSeconds(newVetoPeriodSeconds)
       assertEqualBN(await grandaMento.vetoPeriodSeconds(), newVetoPeriodSeconds)
@@ -1184,7 +1185,7 @@ contract('GrandaMento', (accounts: string[]) => {
     })
 
     it('reverts when the veto period is greater than 4 weeks', async () => {
-      const fourWeeks = 60 * 60 * 24 * 7 * 4
+      const fourWeeks = SECONDS_IN_A_WEEK * 4
       await assertRevertWithReason(
         grandaMento.setVetoPeriodSeconds(fourWeeks + 1),
         'Veto period cannot exceed 4 weeks'
