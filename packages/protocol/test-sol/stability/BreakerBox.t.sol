@@ -55,6 +55,16 @@ contract BreakerBoxTest is Test, WithRegistry {
     breakerBox = new BreakerBox(true);
     breakerBox.initilize(fakeBreakerA, testExchanges, address(registry));
   }
+
+  function isExchange(address exchange) public returns (bool exchangeFound) {
+    address[] memory allExchanges = breakerBox.getExchanges();
+    for (uint256 i = 0; i < allExchanges.length; i++) {
+      if (allExchanges[i] == exchange) {
+        exchangeFound = true;
+        break;
+      }
+    }
+  }
 }
 
 contract BreakerBox_constructorAndSetters is BreakerBoxTest {
@@ -233,6 +243,17 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
     assert(tradingModeAfter == 0);
     assert(lastUpdatedTimeAfter > lastUpdatedTimeBefore);
     assert(lastUpdatedBlockAfter > lastUpdatedBlockBefore);
+  }
+
+  function test_removeExchange_whenExchangeHasNotBeenAdded_shouldRevert() public {
+    vm.expectRevert("Exchange has not been added");
+    breakerBox.removeExchange(exchangeC);
+  }
+
+  function test_removeExchange_shouldRemoveExchangeFromArray() public {
+    assertTrue(isExchange(exchangeA));
+    breakerBox.removeExchange(exchangeA);
+    assertFalse(isExchange(exchangeA));
   }
 
   function test_removeExchange_shouldResetTradingModeInfoAndEmit() public {

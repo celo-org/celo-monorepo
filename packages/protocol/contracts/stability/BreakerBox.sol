@@ -74,6 +74,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   function removeBreaker(IBreaker breaker) external onlyOwner {
     require(isBreaker(address(breaker)), "This breaker has not been added");
 
+    // TODO:  TradingModeMisMatch
     uint256 breakerTradingMode = breaker.getTradingMode();
     require(
       tradingModeBreaker[breakerTradingMode] == address(breaker),
@@ -166,7 +167,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
       }
     }
 
-    require(exchanges[exchangeIndex] == exchange, "Exchange address was not found added addresses");
+    require(exchanges[exchangeIndex] == exchange, "Exchange has not been added");
 
     uint256 lastIndex = exchanges.length - 1;
     if (exchangeIndex != lastIndex) {
@@ -216,6 +217,13 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
    */
   function isBreaker(address breaker) public view returns (bool) {
     return breakers.contains(breaker);
+  }
+
+  /**
+   * @notice Returns addresses of exchanges that have been added.
+   */
+  function getExchanges() external view returns (address[] memory) {
+    return exchanges;
   }
 
   /* ==================== Check Breakers ==================== */

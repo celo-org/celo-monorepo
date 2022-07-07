@@ -10,6 +10,7 @@ interface IBreakerBox {
     uint256 lastUpdatedTime;
     uint256 lastUpdatedBlock;
   }
+  // TODO: Think about storing ref to breaker here then removing the mapping
 
   /**
    * @notice Emitted when a new breaker is added to the breaker box.
