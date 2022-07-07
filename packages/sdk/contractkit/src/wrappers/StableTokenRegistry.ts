@@ -8,7 +8,7 @@ import { BaseWrapper, proxyCall } from './BaseWrapper'
  * @param lengths their lengths
  * @return string array containing contract names
  */
-const returnSTContractNames = (contractsHex: string, lengths: string[]): string[] => {
+const splitContractNamesByLength = (contractsHex: string, lengths: string[]): string[] => {
   const contracts = Web3.utils.hexToUtf8(contractsHex)
   let currentIndex = 0
   const contractsArr = []
@@ -32,7 +32,7 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
     const values = await this.contract.methods.getContractInstances().call()
     const concatenatedContracts = values[0]
     const contractLengths = values[1]
-    return returnSTContractNames(concatenatedContracts, contractLengths)
+    return splitContractNamesByLength(concatenatedContracts, contractLengths)
   }
 
   async FiatTickers(): Promise<string[]> {
