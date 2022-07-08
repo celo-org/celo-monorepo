@@ -25,7 +25,7 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
   stableTokens = proxyCall(this.contract.methods.stableTokens)
 
   /**
-   * Returns the contatenated contracts and each of their lengths
+   * Returns a stringified array of stable token contracts
    * @return string array containing contract names
    */
   async getContractInstances(): Promise<string[]> {
@@ -39,12 +39,13 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
     const convertedToHex = []
     try {
       let index = 0
-      while (await this.fiatTickers(index)) {
-        convertedToHex.push(Web3.utils.hexToUtf8(await this.fiatTickers(index)))
+      const fiatTicker = await this.fiatTickers(index)
+      while (fiatTicker) {
+        convertedToHex.push(Web3.utils.hexToUtf8(fiatTicker))
         index++
       }
     } catch (error) {
-      return convertedToHex
+      return Promise.reject(error)
     }
     return convertedToHex
   }

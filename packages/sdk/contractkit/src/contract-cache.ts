@@ -68,7 +68,6 @@ const WrapperFactoriesWhichNeedCache = {
   [CeloContract.Governance]: GovernanceWrapper,
   [CeloContract.LockedGold]: LockedGoldWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
-  [CeloContract.StableTokenRegistry]: StableTokenRegistryWrapper,
 }
 
 type CFType = typeof WrapperFactories
