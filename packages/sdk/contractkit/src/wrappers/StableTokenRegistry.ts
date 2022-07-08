@@ -3,8 +3,8 @@ import { StableTokenRegistry } from '../generated/StableTokenRegistry'
 import { BaseWrapper, proxyCall } from './BaseWrapper'
 
 /**
- * Returns the contatenated contracts and each of their lengths
- * @param contractHex concatenated contracts
+ * Splits a string with concatenated contract names into each individual name.
+ * @param contractHex concatenated contract names
  * @param lengths their lengths
  * @return string array containing contract names
  */
