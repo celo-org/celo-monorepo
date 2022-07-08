@@ -44,6 +44,27 @@ interface IBreakerBox {
   event TradingModeUpdated(address indexed exchange, uint256 tradingMode);
 
   /**
+   * @notice Emitted after a reset attempt is successful.
+   * @param exchange The address of the exchange.
+   * @param breaker The address of the breaker.
+   */
+  event ResetSuccessful(address indexed exchange, address indexed breaker);
+
+  /**
+   * @notice Emitted after a reset attempt fails when the exchange fails the breakers reset criteria.
+   * @param exchange The address of the exchange.
+   * @param breaker The address of the breaker.
+   */
+  event ResetAttemptCriteriaFail(address indexed exchange, address indexed breaker);
+
+  /**
+   * @notice Emitted after a reset attempt fails when cooldown time has not elapsed.
+   * @param exchange The address of the exchange.
+   * @param breaker The address of the breaker.
+   */
+  event ResetAttemptNotCool(address indexed exchange, address indexed breaker);
+
+  /**
    * @notice Retrives an ordered array of all breaker addresses.
    */
   function getBreakers() external view returns (address[] memory);

@@ -235,12 +235,12 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
    */
   function checkBreakers(address exchangeAddress) external returns (uint256 currentTradingMode) {
     TradingModeInfo memory info = exchangeTradingModes[exchangeAddress];
-    require(info.lastUpdatedTime > 0, "Exchange has not been added to BreakerBox"); //Last updated should always have a value.
+    require(info.lastUpdatedTime > 0, "Exchange has not been added"); //Last updated should always have a value.
 
     // Check if a breaker has non default trading mode & try to reset
     if (info.tradingMode != 0) {
       IBreaker breaker = IBreaker(tradingModeBreaker[info.tradingMode]);
-      bool tryReset = (breaker.getCooldown() + info.lastUpdatedTime) >= block.timestamp;
+      bool tryReset = (breaker.getCooldown() + info.lastUpdatedTime) <= block.timestamp;
       if (tryReset) {
         bool canReset = breaker.shouldReset(exchangeAddress);
         if (canReset) {
@@ -248,11 +248,14 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
           info.lastUpdatedTime = block.timestamp;
           info.lastUpdatedBlock = block.number;
           exchangeTradingModes[exchangeAddress] = info;
+          emit ResetSuccessful(exchangeAddress, address(breaker));
           return info.tradingMode;
         } else {
+          emit ResetAttemptCriteriaFail(exchangeAddress, address(breaker));
           return info.tradingMode; // Exchange cannot be reset
         }
       } else {
+        emit ResetAttemptNotCool(exchangeAddress, address(breaker));
         return info.tradingMode; // Cooldown time has not passed
       }
     }
