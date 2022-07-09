@@ -252,11 +252,11 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
           return info.tradingMode;
         } else {
           emit ResetAttemptCriteriaFail(exchangeAddress, address(breaker));
-          return info.tradingMode; // Exchange cannot be reset
+          return info.tradingMode;
         }
       } else {
         emit ResetAttemptNotCool(exchangeAddress, address(breaker));
-        return info.tradingMode; // Cooldown time has not passed
+        return info.tradingMode;
       }
     }
 
@@ -271,6 +271,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
         info.lastUpdatedTime = block.timestamp;
         info.lastUpdatedBlock = block.number;
         exchangeTradingModes[exchangeAddress] = info;
+        emit BreakerTripped(address(breaker), exchangeAddress);
         return info.tradingMode;
       }
     }

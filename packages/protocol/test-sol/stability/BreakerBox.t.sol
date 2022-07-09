@@ -26,9 +26,13 @@ contract BreakerBoxTest is Test, WithRegistry {
 
   event BreakerAdded(address indexed breaker);
   event BreakerRemoved(address indexed breaker);
+  event BreakerTripped(address indexed breaker, address indexed exchange);
   event ExchangeAdded(address indexed exchange);
   event ExchangeRemoved(address indexed exchange);
   event TradingModeUpdated(address indexed exchange, uint256 tradingMode);
+  event ResetSuccessful(address indexed exchange, address indexed breaker);
+  event ResetAttemptCriteriaFail(address indexed exchange, address indexed breaker);
+  event ResetAttemptNotCool(address indexed exchange, address indexed breaker);
 
   function setUp() public {
     deployer = actor("deployer");
@@ -56,7 +60,7 @@ contract BreakerBoxTest is Test, WithRegistry {
     breakerBox.initilize(fakeBreakerA, testExchanges, address(registry));
   }
 
-  function isExchange(address exchange) public returns (bool exchangeFound) {
+  function isExchange(address exchange) public view returns (bool exchangeFound) {
     address[] memory allExchanges = breakerBox.getExchanges();
     for (uint256 i = 0; i < allExchanges.length; i++) {
       if (allExchanges[i] == exchange) {
@@ -65,21 +69,69 @@ contract BreakerBoxTest is Test, WithRegistry {
       }
     }
   }
+
+  /**
+   * @notice Setup a breaker with the given values and add the specified exchange to the breaker box with the specified trading mode
+   */
+  function setupBreakerAndExchange(
+    uint256 tradingMode,
+    uint256 cooldown,
+    bool reset,
+    bool trigger,
+    FakeBreaker breaker,
+    address exchange
+  ) public {
+    vm.mockCall(
+      address(breaker),
+      abi.encodeWithSelector(breaker.getTradingMode.selector),
+      abi.encode(tradingMode)
+    );
+
+    vm.mockCall(
+      address(breaker),
+      abi.encodeWithSelector(breaker.getCooldown.selector),
+      abi.encode(cooldown)
+    );
+
+    vm.mockCall(
+      address(breaker),
+      abi.encodeWithSelector(breaker.shouldReset.selector),
+      abi.encode(reset)
+    );
+
+    vm.mockCall(
+      address(breaker),
+      abi.encodeWithSelector(breaker.shouldTrigger.selector),
+      abi.encode(trigger)
+    );
+
+    breakerBox.addBreaker(breaker);
+    assertTrue(breakerBox.isBreaker(address(breaker)));
+
+    if (exchange != address(0)) {
+      breakerBox.addExchange(exchange);
+      assertTrue(isExchange(exchange));
+
+      breakerBox.setExchangeTradingMode(exchange, breaker.getTradingMode());
+      (uint256 tradingMode, , ) = breakerBox.exchangeTradingModes(exchange);
+      assertEq(tradingMode, breaker.getTradingMode());
+    }
+  }
 }
 
 contract BreakerBox_constructorAndSetters is BreakerBoxTest {
   /* ---------- Initilizer ---------- */
 
-  function test_initilize_shouldSetOwner() public {
+  function test_initilize_shouldSetOwner() public view {
     assert(breakerBox.owner() == deployer);
   }
 
-  function test_initilize_shouldSetInitialBreaker() public {
+  function test_initilize_shouldSetInitialBreaker() public view {
     assert(breakerBox.tradingModeBreaker(1) == address(fakeBreakerA));
     assert(breakerBox.isBreaker(address(fakeBreakerA)));
   }
 
-  function test_initilize_shouldAddExchangesWithDefaultMode() public {
+  function test_initilize_shouldAddExchangesWithDefaultMode() public view {
     (uint256 tradingModeA, uint256 lastUpdatedA, uint256 lastUpdatedBlockA) = breakerBox
       .exchangeTradingModes(exchangeA);
     assert(tradingModeA == 0);
@@ -101,7 +153,11 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
   }
 
   function test_addBreaker_whenAddingDuplicateBreaker_shouldRevert() public {
-    fakeBreakerA.setTradingMode(3);
+    vm.mockCall(
+      address(fakeBreakerA),
+      abi.encodeWithSelector(fakeBreakerA.getTradingMode.selector),
+      abi.encode(3)
+    );
     vm.expectRevert("This breaker has already been added");
     breakerBox.addBreaker(fakeBreakerA);
   }
@@ -109,7 +165,11 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
   function test_addBreaker_shouldUpdateMappingAndEmit() public {
     vm.expectEmit(true, false, false, false);
     emit BreakerAdded(address(fakeBreakerB));
-    fakeBreakerB.setTradingMode(2);
+    vm.mockCall(
+      address(fakeBreakerB),
+      abi.encodeWithSelector(fakeBreakerB.getTradingMode.selector),
+      abi.encode(2)
+    );
 
     breakerBox.addBreaker(fakeBreakerB);
 
@@ -129,14 +189,22 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
   //        To mitigate this we could remove knowledge of trading modes from the breakers and instead only store this in the breaker box
   //        So a trading mode is only set when it's added to the breaker box and can only be changed upon removal, which will be cleaner.
   function test_removeBreaker_whenBreakerTradingModeDoesNotMatch_shouldRevert() public {
-    fakeBreakerA.setTradingMode(3);
+    vm.mockCall(
+      address(fakeBreakerA),
+      abi.encodeWithSelector(fakeBreakerA.getTradingMode.selector),
+      abi.encode(3)
+    );
     vm.expectRevert("This breaker does not match stored trading mode");
 
     breakerBox.removeBreaker(fakeBreakerA);
   }
 
   function test_removeBreaker_whenBreakerTradingModeInUse_shouldSetDefaultMode() public {
-    fakeBreakerC.setTradingMode(3);
+    vm.mockCall(
+      address(fakeBreakerC),
+      abi.encodeWithSelector(fakeBreakerC.getTradingMode.selector),
+      abi.encode(3)
+    );
 
     breakerBox.addBreaker(fakeBreakerC);
     breakerBox.addExchange(exchangeC);
@@ -177,8 +245,16 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
 
   function test_insertBreaker_shouldInsertBreakerAtCorrectPositionAndEmit() public {
     assert(breakerBox.getBreakers().length == 1);
-    fakeBreakerB.setTradingMode(2);
-    fakeBreakerC.setTradingMode(3);
+    vm.mockCall(
+      address(fakeBreakerB),
+      abi.encodeWithSelector(fakeBreakerB.getTradingMode.selector),
+      abi.encode(2)
+    );
+    vm.mockCall(
+      address(fakeBreakerC),
+      abi.encodeWithSelector(fakeBreakerC.getTradingMode.selector),
+      abi.encode(3)
+    );
     breakerBox.addBreaker(fakeBreakerB);
     breakerBox.addBreaker(fakeBreakerC);
 
@@ -191,7 +267,11 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
     vm.expectEmit(true, false, false, false);
     emit BreakerAdded(address(fakeBreakerD));
 
-    fakeBreakerD.setTradingMode(4);
+    vm.mockCall(
+      address(fakeBreakerD),
+      abi.encodeWithSelector(fakeBreakerD.getTradingMode.selector),
+      abi.encode(4)
+    );
     breakerBox.insertBreaker(fakeBreakerD, address(fakeBreakerB), address(fakeBreakerA));
 
     address[] memory breakersAfter = breakerBox.getBreakers();
@@ -305,5 +385,112 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
     assert(tradingModeAfter == 1);
     assert(lastUpdatedTimeAfter > lastUpdatedTimeBefore);
     assert(lastUpdatedBlockAfter > lastUpdatedBlockBefore);
+  }
+}
+
+contract BreakerBox_checkBreakers is BreakerBoxTest {
+  function test_checkBreakers_whenExchangeIsNotAdded_shouldRevert() public {
+    vm.expectRevert("Exchange has not been added");
+    breakerBox.checkBreakers(exchangeC);
+  }
+
+  function test_checkBreakers_whenExchangeIsNotInDefaultModeAndCooldownNotPassed_shouldEmitNotCool()
+    public
+  {
+    setupBreakerAndExchange(6, 3600, false, false, fakeBreakerC, exchangeC);
+
+    skip(3599);
+
+    vm.expectCall(address(fakeBreakerC), abi.encodeWithSelector(fakeBreakerC.getCooldown.selector));
+    vm.expectEmit(true, true, false, false);
+    emit ResetAttemptNotCool(exchangeC, address(fakeBreakerC));
+
+    assertEq(breakerBox.checkBreakers(exchangeC), fakeBreakerC.getTradingMode());
+  }
+
+  function test_checkBreakers_whenExchangeIsNotInDefaultModeAndCantReset_shouldEmitCriteriaFail()
+    public
+  {
+    setupBreakerAndExchange(6, 3600, false, false, fakeBreakerC, exchangeC);
+
+    skip(3600);
+    vm.expectCall(address(fakeBreakerC), abi.encodeWithSelector(fakeBreakerC.getCooldown.selector));
+    vm.expectCall(
+      address(fakeBreakerC),
+      abi.encodeWithSelector(fakeBreakerC.shouldReset.selector, exchangeC)
+    );
+    vm.expectEmit(true, true, false, false);
+    emit ResetAttemptCriteriaFail(exchangeC, address(fakeBreakerC));
+
+    assertEq(breakerBox.checkBreakers(exchangeC), fakeBreakerC.getTradingMode());
+  }
+
+  function test_checkBreakers_whenExchangeIsNotInDefaultModeAndCanReset_shouldResetMode() public {
+    setupBreakerAndExchange(6, 3600, true, false, fakeBreakerC, exchangeC);
+    skip(3600);
+
+    vm.expectCall(address(fakeBreakerC), abi.encodeWithSelector(fakeBreakerC.getCooldown.selector));
+    vm.expectCall(
+      address(fakeBreakerC),
+      abi.encodeWithSelector(fakeBreakerC.shouldReset.selector, exchangeC)
+    );
+    vm.expectEmit(true, true, false, false);
+    emit ResetSuccessful(exchangeC, address(fakeBreakerC));
+
+    assertEq(breakerBox.checkBreakers(exchangeC), 0);
+  }
+
+  function test_checkBreakers_whenNoBreakersAreTripped_shouldReturnDefaultMode() public {
+    setupBreakerAndExchange(6, 3600, true, false, fakeBreakerC, address(0));
+    breakerBox.addExchange(exchangeC);
+    assertTrue(isExchange(exchangeC));
+
+    (uint256 tradingMode, , ) = breakerBox.exchangeTradingModes(exchangeC);
+    assertEq(tradingMode, 0);
+
+    vm.expectCall(
+      address(fakeBreakerC),
+      abi.encodeWithSelector(fakeBreakerC.shouldTrigger.selector, address(exchangeC))
+    );
+    vm.expectCall(
+      address(fakeBreakerA),
+      abi.encodeWithSelector(fakeBreakerA.shouldTrigger.selector, address(exchangeC))
+    );
+
+    assertEq(breakerBox.checkBreakers(exchangeC), 0);
+  }
+
+  function test_checkBreakers_whenABreakerIsTripped_shouldSetModeAndEmit() public {
+    setupBreakerAndExchange(6, 3600, true, true, fakeBreakerC, address(0));
+
+    breakerBox.addExchange(exchangeC);
+    assertTrue(isExchange(exchangeC));
+
+    (uint256 tradingMode, , ) = breakerBox.exchangeTradingModes(exchangeC);
+    assertEq(tradingMode, 0);
+
+    vm.expectCall(
+      address(fakeBreakerA),
+      abi.encodeWithSelector(fakeBreakerA.shouldTrigger.selector, address(exchangeC))
+    );
+
+    vm.expectCall(
+      address(fakeBreakerC),
+      abi.encodeWithSelector(fakeBreakerC.shouldTrigger.selector, address(exchangeC))
+    );
+
+    vm.expectEmit(true, true, false, false);
+    emit BreakerTripped(address(fakeBreakerC), exchangeC);
+
+    skip(3600);
+    vm.roll(5);
+
+    assertEq(breakerBox.checkBreakers(exchangeC), fakeBreakerC.getTradingMode());
+
+    (, uint256 lastUpdatedTime, uint256 lastUpdatedBlock) = breakerBox.exchangeTradingModes(
+      exchangeC
+    );
+    assertEq(lastUpdatedTime, 3601);
+    assertEq(lastUpdatedBlock, 5);
   }
 }

@@ -25,6 +25,13 @@ interface IBreakerBox {
   event BreakerRemoved(address indexed breaker);
 
   /**
+   * @notice Emitted when a breaker is tripped by an exchange.
+   * @param breaker The address of the breaker that was tripped.
+   * @param exchange The address of the exchange.
+   */
+  event BreakerTripped(address indexed breaker, address indexed exchange);
+
+  /**
    * @notice Emitted when a new exchange is added to the breaker box.
    * @param exchange The address of the exchange that was added.
    */
