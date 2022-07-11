@@ -65,7 +65,7 @@ contract Exchange is
   }
 
   modifier checkTradingMode() {
-    require(breakerBox.checkBreakers(address(this)) == 0, "Trading is suspended for this exchange");
+    //require(breakerBox.checkBreakers(address(this)) == 0, "Trading is suspended for this exchange");
     _;
   }
 
@@ -94,7 +94,6 @@ contract Exchange is
    * present in the oracle to update buckets
    * commit to the gold bucket
    * @param stableTokenIdentifier String identifier of stabletoken in registry
-   * @param _breakerBox The address of the breaker box smart contract
    */
   function initialize(
     address registryAddress,
@@ -102,8 +101,7 @@ contract Exchange is
     uint256 _spread,
     uint256 _reserveFraction,
     uint256 _updateFrequency,
-    uint256 _minimumReports,
-    IBreakerBox _breakerBox
+    uint256 _minimumReports
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -112,7 +110,6 @@ contract Exchange is
     setReserveFraction(_reserveFraction);
     setUpdateFrequency(_updateFrequency);
     setMinimumReports(_minimumReports);
-    setBreakerBox(_breakerBox);
   }
 
   /**

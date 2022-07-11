@@ -104,8 +104,7 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
       FixidityLib.unwrap(spread),
       FixidityLib.unwrap(reserveFraction),
       bucketUpdateFrequency,
-      2,
-      breakerBox
+      2
     );
   }
 
@@ -175,8 +174,7 @@ contract Exchange_initializeAndSetters is ExchangeTest {
       FixidityLib.unwrap(FixidityLib.newFixedFraction(3, 1000)),
       FixidityLib.unwrap(FixidityLib.newFixedFraction(5, 100)),
       60 * 60,
-      2,
-      breakerBox
+      2
     );
   }
 
