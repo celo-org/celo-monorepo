@@ -1,9 +1,8 @@
 pragma solidity ^0.5.13;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "../common/Initializable.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "../common/interfaces/IRegistry.sol";
+import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import { Initializable } from "../common/Initializable.sol";
+import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
  * @title contract that lists what stable coins are deployed as part of Celo's Stability protocol.
