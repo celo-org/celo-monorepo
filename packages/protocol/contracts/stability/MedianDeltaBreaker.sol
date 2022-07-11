@@ -4,6 +4,7 @@ import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import { IBreaker } from "./interfaces/IBreaker.sol";
 import { ISortedOracles } from "./interfaces/ISortedOracles.sol";
+import { IExchange } from "./interfaces/IExchange.sol";
 
 import { UsingRegistry } from "../common/UsingRegistry.sol";
 import { FixidityLib } from "../common/FixidityLib.sol";
@@ -139,5 +140,5 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
 
   function shouldReset(address exchange) external view returns (bool resetBreaker) {}
 
-  function getPriceChangeThreshold() private view returns (uint256 threshold) {}
+  function getPriceChangeThreshold(address stable) private view returns (uint256 threshold) {}
 }
