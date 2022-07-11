@@ -17,7 +17,7 @@ testWithGanache('StableTokenRegistry Wrapper', (web3: Web3) => {
 
   describe('Verifying that it always has correct values', () => {
     it('has the correct list of fiatTicker', async () => {
-      const fiatTickers = await stableTokenRegistry.FiatTickers()
+      const fiatTickers = await stableTokenRegistry.getFiatTickers()
       expect(fiatTickers).toEqual(['USD', 'EUR', 'BRL'])
     })
     it('has the correct list of stable token contracts', async () => {

@@ -35,19 +35,19 @@ export class StableTokenRegistryWrapper extends BaseWrapper<StableTokenRegistry>
     return splitContractNamesByLength(concatenatedContracts, contractLengths)
   }
 
-  async FiatTickers(): Promise<string[]> {
-    const convertedToHex = []
-    try {
-      let index = 0
-      const fiatTicker = await this.fiatTickers(index)
-      while (fiatTicker) {
-        convertedToHex.push(Web3.utils.hexToUtf8(fiatTicker))
-        index++
+  async getFiatTickers(): Promise<string[]> {
+    const convertedToHex: string[] = []
+    let index = 0
+    while (true) {
+      let fiatTicker
+      try {
+        fiatTicker = await this.fiatTickers(index)
+      } catch (error) {
+        return convertedToHex
       }
-    } catch (error) {
-      return Promise.reject(error)
+      convertedToHex.push(Web3.utils.hexToUtf8(fiatTicker))
+      index++
     }
-    return convertedToHex
   }
 
   /**
