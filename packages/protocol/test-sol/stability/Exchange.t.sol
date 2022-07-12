@@ -278,9 +278,7 @@ contract Exchange_initializeAndSetters is ExchangeTest {
     vm.expectRevert("Ownable: caller is not the owner");
     exchange.setReserveFraction(0);
   }
-}
 
-contract ExchangeTest_setStableBucketMaxFractionAndSupply is ExchangeTest {
   function test_StableBucketMaxFraction_setsValueAndEmits() public {
     uint256 newStableBucketMaxFraction = 90909090909090910000000;
     vm.expectEmit(true, true, true, true, address(exchange));
