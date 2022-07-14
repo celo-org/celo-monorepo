@@ -19,52 +19,21 @@ import { FixidityLib } from "../common/FixidityLib.sol";
 contract MedianDeltaBreaker is IBreaker, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
 
-  /**
-   * @notice Emitted after the minPriceChangeThreshold is updated.
-   * @param newMinPriceChangeThreshold The new minPriceChangeThreshold.
-   */
+  /* ==================== State Variables ==================== */
+
+  uint256 public constant TRADING_MODE = 1; // The trading mode that should be used when this breaker is triggered. 1 == no trading.
+  uint256 public cooldownTime; // The amount of time that must pass before the breaker can be reset for an exchange.
+  FixidityLib.Fraction public minPriceChangeThreshold; // The min threshold for the median price change. Multiplied by 10^24
+  FixidityLib.Fraction public maxPriceChangeThreshold; // The min threshold for the median price change. Multiplied by 10^24
+  FixidityLib.Fraction public priceChangeThresholdTimeMultiplier; // Determines how quickly the calculated price change threshold scales in respect to time that has elapsed since the last report. Multiplied by 10^24
+
+  /* ==================== Events ==================== */
+
   event MinPriceChangeUpdated(uint256 newMinPriceChangeThreshold);
-
-  /**
-   * @notice Emitted after the maxPriceChangeThreshold is updated.
-   * @param newMaxPriceChangeThreshold The new maxPriceChangeThreshold.
-   */
   event MaxPriceChangeUpdated(uint256 newMaxPriceChangeThreshold);
-
-  /**
-   * @notice Emitted after the priceChangeMultiplier is updated.
-   * @param newPriceChangeMultiplier The new priceChangeMultiplier.
-   */
   event PriceChangeMultiplierUpdated(uint256 newPriceChangeMultiplier);
 
-  /**
-   * @notice The trading mode that should be used when this breaker is triggered.
-   * @dev 1 for no trading.
-   */
-  uint256 public constant TRADING_MODE = 1;
-
-  /**
-   * @notice The amount of time that must pass before the breaker can be reset for an exchange.
-   */
-  uint256 public cooldownTime;
-
-  /**
-   * @notice The min threshold for the median price change.
-   * @dev Multiplied by 10^24
-   */
-  FixidityLib.Fraction public minPriceChangeThreshold;
-
-  /**
-   * @notice The max threshold for the median price change.
-   * @dev Multiplied by 10^24
-   */
-  FixidityLib.Fraction public maxPriceChangeThreshold;
-
-  /**
-   * @notice Determines how quickly the calculated price change threshold scales in respect to time that has elapsed since the last report.
-   * @dev Multiplied by 10^24
-   */
-  FixidityLib.Fraction public priceChangeThresholdTimeMultiplier;
+  /* ==================== Constructor ==================== */
 
   constructor(
     address registryAddress,
@@ -80,6 +49,8 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     setMaxPriceChangeThreshold(_maxPriceChangeThreshold);
     setPriceChangeMultiplier(_priceChangeThresholdTimeMultiplier);
   }
+
+  /* ==================== Restricted Functions ==================== */
 
   /**
    * @notice Sets the cooldownTime to the specified value.
@@ -138,6 +109,14 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
   }
 
   /**
+   * @notice Gets the cooldown time for the breaker.
+   * @return Returns the time in seconds.
+   */
+  function getCooldown() external view returns (uint256) {
+    return cooldownTime;
+  }
+
+  /**
    * @notice  Check if the current median report price change, for an exchange, relative to the last median report is greater
    *          than a calculated threshold. If the change is greater than the threshold the breaker will trip.
    * @param exchange The exchange to be checked.
@@ -154,7 +133,6 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     uint256 lastReportTimestamp = reportTimestamps[0];
 
     uint256 allowedThreshold = getPriceChangeThreshold(lastReportTimestamp);
-
     uint256 lastMedian = sortedOracles.lastMedianRate(stableToken);
     (uint256 currentMedian, ) = sortedOracles.medianRate(stableToken);
 
@@ -162,12 +140,12 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     triggerBreaker = !isWithinThreshold(lastMedian, currentMedian, allowedThreshold);
   }
 
+  /**
+   * @notice Checks whether or not the conditions have been met for the specifed exchange to be reset.
+   * @return resetBreaker A bool indicating whether or not this breaker can be reset for the given exchange.
+   */
   function shouldReset(address exchange) external view returns (bool resetBreaker) {
     return !shouldTrigger(exchange);
-  }
-
-  function getCooldown() external view returns (uint256) {
-    return cooldownTime;
   }
 
   /**
@@ -181,12 +159,14 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     }
 
     // TODO: Calculate time based multiplier
-    // uint256 timeElapsed = ((block.timestamp - lastTimestamp) / 1 minutes) * 10**24; // Minutes since last report * 10^24
+    // uint256 timeElapsed = ((block.timestamp - lastTimestamp) / 1 minutes); // Minutes since last report
     // uint256 calculatedThreshold = minPriceChangeThreshold.unwrap() *
-    //   (BabylonianMath.sqrt(priceChangeThresholdTimeMultiplier.unwrap() * timeElapsed) +
+    //   (BabylonianMath.sqrt((priceChangeThresholdTimeMultiplier.unwrap() * timeElapsed)) +
     //     (1 * 10**24));
 
-    uint256 calculatedThreshold;
+    if (calculatedThreshold == 0) {
+      return maxPriceChangeThreshold.unwrap();
+    }
 
     return OzMath.min(maxPriceChangeThreshold.unwrap(), calculatedThreshold);
   }
@@ -199,7 +179,7 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
    * @return Returns a bool indicating whether or not the current rate is within the given threshold.
    */
   function isWithinThreshold(uint256 lastRate, uint256 currentRate, uint256 allowedThreshold)
-    public
+    private
     pure
     returns (bool)
   {
