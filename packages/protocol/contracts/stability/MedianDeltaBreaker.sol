@@ -1,12 +1,13 @@
 pragma solidity ^0.5.13;
 
-import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-
 import { IBreaker } from "./interfaces/IBreaker.sol";
 import { ISortedOracles } from "./interfaces/ISortedOracles.sol";
 import { IExchange } from "./interfaces/IExchange.sol";
 
 import { UsingRegistry } from "../common/UsingRegistry.sol";
+
+import { Math as OzMath } from "openzeppelin-solidity/contracts/math/Math.sol";
+import { BabylonianMath } from "../common/libraries/BabylonianMath.sol";
 import { FixidityLib } from "../common/FixidityLib.sol";
 
 /**
@@ -66,12 +67,14 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
   FixidityLib.Fraction public priceChangeThresholdTimeMultiplier;
 
   constructor(
+    address registryAddress,
     uint256 _cooldownTime,
     uint256 _minPriceChangeThreshold,
     uint256 _maxPriceChangeThreshold,
     uint256 _priceChangeThresholdTimeMultiplier
   ) public {
     _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
     setCooldownTime(_cooldownTime);
     setMinPriceChangeThreshold(_minPriceChangeThreshold);
     setMaxPriceChangeThreshold(_maxPriceChangeThreshold);
@@ -134,11 +137,78 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     tradingMode = TRADING_MODE;
   }
 
-  // TODO
+  /**
+   * @notice  Check if the current median report price change, for an exchange, relative to the last median report is greater
+   *          than a calculated threshold. If the change is greater than the threshold the breaker will trip.
+   * @param exchange The exchange to be checked.
+   * @return triggerBreaker A bool indicating whether or not this breaker should be tripped for the exchange.
+   */
+  function shouldTrigger(address exchange) public view returns (bool triggerBreaker) {
+    ISortedOracles sortedOracles = ISortedOracles(
+      registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
+    );
 
-  function shouldTrigger(address exchange) external view returns (bool triggerBreaker) {}
+    address stableToken = IExchange(exchange).stable();
 
-  function shouldReset(address exchange) external view returns (bool resetBreaker) {}
+    (, uint256[] memory reportTimestamps, ) = sortedOracles.getTimestamps(stableToken);
+    uint256 lastReportTimestamp = reportTimestamps[0];
 
-  function getPriceChangeThreshold(address stable) private view returns (uint256 threshold) {}
+    uint256 allowedThreshold = getPriceChangeThreshold(lastReportTimestamp);
+
+    uint256 lastMedian = sortedOracles.lastMedianRate(stableToken);
+    (uint256 currentMedian, ) = sortedOracles.medianRate(stableToken);
+
+    // Check if current median is within allowed threshold of last median
+    triggerBreaker = !isWithinThreshold(lastMedian, currentMedian, allowedThreshold);
+  }
+
+  function shouldReset(address exchange) external view returns (bool resetBreaker) {
+    return !shouldTrigger(exchange);
+  }
+
+  function getCooldown() external view returns (uint256) {
+    return cooldownTime;
+  }
+
+  /**
+   * @notice Gets the allowed median price change threshold.
+   * @param lastTimestamp The timestamp of the last oracle report.
+   * @return threshold The allowed threshold to be used to determine of the breaker should trip.
+   */
+  function getPriceChangeThreshold(uint256 lastTimestamp) public view returns (uint256 threshold) {
+    if (lastTimestamp == 0) {
+      return maxPriceChangeThreshold.unwrap();
+    }
+
+    // TODO: Calculate time based multiplier
+    // uint256 timeElapsed = ((block.timestamp - lastTimestamp) / 1 minutes) * 10**24; // Minutes since last report * 10^24
+    // uint256 calculatedThreshold = minPriceChangeThreshold.unwrap() *
+    //   (BabylonianMath.sqrt(priceChangeThresholdTimeMultiplier.unwrap() * timeElapsed) +
+    //     (1 * 10**24));
+
+    uint256 calculatedThreshold;
+
+    return OzMath.min(maxPriceChangeThreshold.unwrap(), calculatedThreshold);
+  }
+
+  /**
+   * @notice Checks if the specified current median rate is within the allowed threshold.
+   * @param lastRate The last median rate.
+   * @param currentRate The current median rate.
+   * @param allowedThreshold The allowed threshold to be used to determine of the breaker should trip.
+   * @return Returns a bool indicating whether or not the current rate is within the given threshold.
+   */
+  function isWithinThreshold(uint256 lastRate, uint256 currentRate, uint256 allowedThreshold)
+    public
+    pure
+    returns (bool)
+  {
+    uint256 maxPercent = (1 * 10**24) + allowedThreshold;
+    uint256 maxValue = (lastRate * maxPercent) / 10**24;
+
+    uint256 minPercent = (1 * 10**24) - allowedThreshold;
+    uint256 minValue = (lastRate * minPercent) / 10**24;
+
+    return (currentRate >= minValue && currentRate <= maxValue);
+  }
 }

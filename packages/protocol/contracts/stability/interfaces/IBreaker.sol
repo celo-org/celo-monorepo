@@ -44,6 +44,7 @@ interface IBreaker {
 
   /**
    * @notice Check if the criteria to automatically reset the breaker has been met.
+   * @dev Allows the definition of additional critera to check before reset. If no additional criteria is needed set to !shouldTrigger();
    * @param exchange The exchange the criteria should be checked against.
    * @return resetBreaker A boolean indicating whether the breaker should be reset for the given exchange.
    */
