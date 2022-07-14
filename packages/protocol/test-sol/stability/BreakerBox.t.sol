@@ -119,7 +119,7 @@ contract BreakerBoxTest is Test, WithRegistry {
   }
 }
 
-contract BreakerBox_constructorAndSetters is BreakerBoxTest {
+contract BreakerBoxTest_constructorAndSetters is BreakerBoxTest {
   /* ---------- Initilizer ---------- */
 
   function test_initilize_shouldSetOwner() public view {
@@ -388,7 +388,7 @@ contract BreakerBox_constructorAndSetters is BreakerBoxTest {
   }
 }
 
-contract BreakerBox_checkBreakers is BreakerBoxTest {
+contract BreakerBoxTest_checkBreakers is BreakerBoxTest {
   function test_checkBreakers_whenExchangeIsNotAdded_shouldRevert() public {
     vm.expectRevert("Exchange has not been added");
     breakerBox.checkBreakers(exchangeC);
