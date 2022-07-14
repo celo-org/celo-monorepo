@@ -57,10 +57,10 @@ contract Exchange is
   uint256 public updateFrequency;
   uint256 public minimumReports;
 
+  bytes32 public stableTokenRegistryId;
+  
   uint256 public minSupplyForStableBucketCap;
   FixidityLib.Fraction public stableBucketMaxFraction;
-
-  bytes32 public stableTokenRegistryId;
 
   modifier updateBucketsIfNecessary() {
     _updateBucketsIfNecessary();
