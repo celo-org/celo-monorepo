@@ -1,5 +1,9 @@
 pragma solidity ^0.5.13;
 
+import {
+  SortedLinkedListWithMedian
+} from "../../common/linkedlists/SortedLinkedListWithMedian.sol";
+
 /**
  * @title A mock SortedOracles for testing.
  */
@@ -41,5 +45,13 @@ contract MockSortedOracles {
 
   function setOldestReportExpired(address token) public {
     expired[token] = true;
+  }
+
+  function getTimestamps(address token)
+    external
+    view
+    returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
+  {
+    return (new address[](1), new uint256[](1), new SortedLinkedListWithMedian.MedianRelation[](1));
   }
 }

@@ -23,6 +23,16 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   mapping(uint256 => address) public tradingModeBreaker; // Maps a trading mode to a breaker
   LinkedList.List private breakers; // Ordered list of breakers to be checked.
 
+  modifier validateBreaker(IBreaker breaker) {
+    require(!isBreaker(address(breaker)), "This breaker has already been added");
+    require(
+      tradingModeBreaker[breaker.getTradingMode()] == address(0),
+      "There is already a breaker added with the same trading mode"
+    );
+    require(breaker.getTradingMode() != 0, "The default trading mode can not have a breaker");
+    _;
+  }
+
   /* ==================== Constructor ==================== */
 
   /**
@@ -54,15 +64,25 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
    * @notice Adds a breaker to the end of the list of breakers & the tradingMode-Breaker mapping.
    * @param breaker The address of the breaker to be added.
    */
-  function addBreaker(IBreaker breaker) public onlyOwner {
-    require(
-      tradingModeBreaker[breaker.getTradingMode()] == address(0),
-      "There is already a breaker added with the same trading mode"
-    );
-    require(!isBreaker(address(breaker)), "This breaker has already been added");
-
+  function addBreaker(IBreaker breaker) public onlyOwner validateBreaker(breaker) {
     tradingModeBreaker[breaker.getTradingMode()] = address(breaker);
     breakers.push(address(breaker));
+    emit BreakerAdded(address(breaker));
+  }
+
+  /**
+   * @notice Adds a breaker to the list of breakers at a specified position.
+   * @param breaker The address of the breaker to be added.
+   * @param prevBreaker The address of the breaker that should come before the new breaker.
+   * @param nextBreaker The address of the breaker that should come after the new breaker.
+   */
+  function insertBreaker(IBreaker breaker, address prevBreaker, address nextBreaker)
+    external
+    onlyOwner
+    validateBreaker(breaker)
+  {
+    tradingModeBreaker[breaker.getTradingMode()] = address(breaker);
+    breakers.insert(address(breaker), prevBreaker, nextBreaker);
     emit BreakerAdded(address(breaker));
   }
 
@@ -95,27 +115,6 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
     delete tradingModeBreaker[breakerTradingMode];
     breakers.remove(address(breaker));
     emit BreakerRemoved(address(breaker));
-  }
-
-  /**
-   * @notice Adds a breaker to the list of breakers at a specified position.
-   * @param breaker The address of the breaker to be added.
-   * @param prevBreaker The address of the breaker that should come before the new breaker.
-   * @param nextBreaker The address of the breaker that should come after the new breaker.
-   */
-  function insertBreaker(IBreaker breaker, address prevBreaker, address nextBreaker)
-    external
-    onlyOwner
-  {
-    require(!isBreaker(address(breaker)), "This breaker has already been added");
-    require(
-      tradingModeBreaker[breaker.getTradingMode()] == address(0),
-      "There is already a breaker added with the same trading mode"
-    );
-
-    tradingModeBreaker[breaker.getTradingMode()] = address(breaker);
-    breakers.insert(address(breaker), prevBreaker, nextBreaker);
-    emit BreakerAdded(address(breaker));
   }
 
   /* ---------- Exchanges ---------- */

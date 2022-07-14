@@ -153,7 +153,7 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
    * @param lastTimestamp The timestamp of the last oracle report.
    * @return threshold The allowed threshold to be used to determine of the breaker should trip.
    */
-  function getPriceChangeThreshold(uint256 lastTimestamp) public view returns (uint256 threshold) {
+  function getPriceChangeThreshold(uint256 lastTimestamp) private view returns (uint256 threshold) {
     if (lastTimestamp == 0) {
       return maxPriceChangeThreshold.unwrap();
     }
@@ -163,6 +163,8 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     // uint256 calculatedThreshold = minPriceChangeThreshold.unwrap() *
     //   (BabylonianMath.sqrt((priceChangeThresholdTimeMultiplier.unwrap() * timeElapsed)) +
     //     (1 * 10**24));
+
+    uint256 calculatedThreshold;
 
     if (calculatedThreshold == 0) {
       return maxPriceChangeThreshold.unwrap();
