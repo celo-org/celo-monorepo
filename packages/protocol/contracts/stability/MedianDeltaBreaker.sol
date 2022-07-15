@@ -104,7 +104,7 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
   /**
    * @notice Returns the trading mode.
    */
-  function getTradingMode() public view returns (uint256 tradingMode) {
+  function getTradingMode() external view returns (uint256 tradingMode) {
     tradingMode = TRADING_MODE;
   }
 
