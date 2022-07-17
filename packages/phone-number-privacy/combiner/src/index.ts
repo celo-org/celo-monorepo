@@ -25,7 +25,7 @@ import { DomainQuotaAction } from './refactor/domain/endpoints/quota/action'
 import { DomainQuotaIO } from './refactor/domain/endpoints/quota/io'
 import { DomainSignAction } from './refactor/domain/endpoints/sign/action'
 import { DomainSignIO } from './refactor/domain/endpoints/sign/io'
-import { DomainStateCombinerService } from './refactor/domain/services/thresholdState'
+import { DomainThresholdStateService } from './refactor/domain/services/thresholdState'
 import { PnpSignAction } from './refactor/pnp/endpoints/sign/action'
 import { PnpSignIO } from './refactor/pnp/endpoints/sign/io'
 
@@ -109,7 +109,7 @@ const domainSignHandler = new Controller(
       domainRestrictedSignatureRequestSchema(DomainSchema),
       domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema)
     ),
-    new DomainStateCombinerService(config.domains)
+    new DomainThresholdStateService(config.domains)
   )
 )
 export const domainSign = functions // TODO(Alec): For integration tests, can call these functions directly rather than using supertest pkg
@@ -127,7 +127,7 @@ const domainQuotaStatusHandler = new Controller(
       domainQuotaStatusRequestSchema(DomainSchema),
       domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
     ),
-    new DomainStateCombinerService(config.domains)
+    new DomainThresholdStateService(config.domains)
   )
 )
 export const domainQuotaStatus = functions
