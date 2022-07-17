@@ -54,10 +54,8 @@ export class DomainThresholdStateService<
     const domainStatesAscendingByTimestampRestrictiveness = domainStatesWithThresholdCounter.sort(
       (a, b) => a.timer - a.now - (b.timer - b.now)
       /**
-       * This name is "intentionally" confusing. There's some nuance to how this works, and you
-       * should review the code in '@celo/phone-number-privacy-common/src/domains/sequential-delay.ts'
-       * as well as the spec in https://github.com/celo-org/celo-proposals/blob/master/CIPs/CIP-0040/sequentialDelayDomain.md
-       * for a full understanding.
+       * Please see '@celo/phone-number-privacy-common/src/domains/sequential-delay.ts'
+       * and https://github.com/celo-org/celo-proposals/blob/master/CIPs/CIP-0040/sequentialDelayDomain.md
        *
        * For a given DomainState, it is always the case that 'now' >= 'timer'. This ordering ensures
        * that we take the 'timer' and 'date' from the same DomainState while still returning a reasonable
