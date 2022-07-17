@@ -5,11 +5,11 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../../../../config'
-import { Combine } from '../../../base/combine'
+import { CombineAction } from '../../../base/combine'
 import { IO } from '../../../base/io'
 import { Session } from '../../../session'
 
-export class DomainDisableAction extends Combine<DisableDomainRequest> {
+export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
   constructor(readonly config: OdisConfig, readonly io: IO<DisableDomainRequest>) {
     super(config, io)
   }

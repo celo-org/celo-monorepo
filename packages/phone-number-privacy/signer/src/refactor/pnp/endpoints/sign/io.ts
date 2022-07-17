@@ -20,10 +20,10 @@ import { Counters } from '../../../../common/metrics'
 import { getVersion } from '../../../../config'
 import { Key } from '../../../../key-management/key-provider-base'
 import { getContractKit } from '../../../../web3/contracts'
-import { IOAbstract } from '../../../base/io'
+import { IO } from '../../../base/io'
 import { PnpSession } from '../../session'
 
-export class PnpSignIO extends IOAbstract<SignMessageRequest> {
+export class PnpSignIO extends IO<SignMessageRequest> {
   readonly endpoint = SignerEndpoint.PARTIAL_SIGN_MESSAGE
 
   async init(

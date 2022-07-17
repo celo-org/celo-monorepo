@@ -15,7 +15,7 @@ export interface Signer {
   fallbackUrl?: string
 }
 
-export abstract class Combine<R extends OdisRequest> implements Action<R> {
+export abstract class CombineAction<R extends OdisRequest> implements Action<R> {
   readonly signers: Signer[]
   public constructor(readonly config: OdisConfig, readonly io: IO<R>) {
     this.signers = JSON.parse(config.odisServices.signers)

@@ -7,12 +7,12 @@ import { getDatabase } from '../../../../database/database'
 import { getRequestExists } from '../../../../database/wrappers/request'
 import { getKeyProvider } from '../../../../key-management/key-provider'
 import { DefaultKeyName, Key } from '../../../../key-management/key-provider-base'
-import { IAction, Session } from '../../../base/action'
-import { PnpQuotaService } from '../../services/calculateQuota'
+import { Action, Session } from '../../../base/action'
+import { PnpQuotaService } from '../../services/quota'
 import { PnpSession } from '../../session'
 import { PnpSignIO } from './io'
 
-export class PnpSignAction implements IAction<SignMessageRequest> {
+export class PnpSignAction implements Action<SignMessageRequest> {
   constructor(readonly config: Config, readonly quota: PnpQuotaService, readonly io: PnpSignIO) {}
 
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {

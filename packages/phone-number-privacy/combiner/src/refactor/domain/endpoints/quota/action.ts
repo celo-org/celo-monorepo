@@ -1,15 +1,15 @@
 import { DomainQuotaStatusRequest, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { OdisConfig } from '../../../../config'
-import { Combine } from '../../../base/combine'
+import { CombineAction } from '../../../base/combine'
 import { IO } from '../../../base/io'
 import { Session } from '../../../session'
-import { DomainStateCombinerService } from '../../services/thresholdState'
+import { DomainThresholdStateService } from '../../services/thresholdState'
 
-export class DomainQuotaAction extends Combine<DomainQuotaStatusRequest> {
+export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
   constructor(
     readonly config: OdisConfig,
     readonly io: IO<DomainQuotaStatusRequest>,
-    readonly stateService: DomainStateCombinerService<DomainQuotaStatusRequest>
+    readonly stateService: DomainThresholdStateService<DomainQuotaStatusRequest>
   ) {
     super(config, io)
   }

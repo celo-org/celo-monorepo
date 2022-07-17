@@ -21,7 +21,7 @@ import {
   getWalletAddress,
   meter,
 } from '../../../web3/contracts'
-import { IQuotaService, OdisQuotaStatusResult } from '../../base/calculateQuota'
+import { OdisQuotaStatusResult, QuotaService } from '../../base/quota'
 import { PnpSession } from '../session'
 export interface PnpQuotaStatus {
   queryCount: number
@@ -29,7 +29,7 @@ export interface PnpQuotaStatus {
   blockNumber: number
 }
 
-export class PnpQuotaService implements IQuotaService<SignMessageRequest | PnpQuotaRequest> {
+export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
     session: PnpSession<SignMessageRequest>,

@@ -15,10 +15,10 @@ import {
 import { Request, Response } from 'express'
 import { Counters } from '../../../../common/metrics'
 import { getVersion } from '../../../../config'
-import { IOAbstract } from '../../../base/io'
+import { IO } from '../../../base/io'
 import { DomainSession } from '../../session'
 
-export class DomainQuotaIO extends IOAbstract<DomainQuotaStatusRequest> {
+export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
   readonly endpoint = SignerEndpoint.DOMAIN_QUOTA_STATUS
 
   async init(

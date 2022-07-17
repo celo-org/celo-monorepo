@@ -8,11 +8,11 @@ import {
   insertDomainStateRecord,
   setDomainDisabled,
 } from '../../../../database/wrappers/domainState'
-import { IAction } from '../../../base/action'
+import { Action } from '../../../base/action'
 import { DomainSession } from '../../session'
 import { DomainDisableIO } from './io'
 
-export class DomainDisableAction implements IAction<DisableDomainRequest> {
+export class DomainDisableAction implements Action<DisableDomainRequest> {
   constructor(readonly config: Config, readonly io: DomainDisableIO) {}
 
   public async perform(session: DomainSession<DisableDomainRequest>): Promise<void> {

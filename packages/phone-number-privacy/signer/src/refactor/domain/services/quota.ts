@@ -15,14 +15,14 @@ import {
   getDomainStateRecordOrEmpty,
   updateDomainStateRecord,
 } from '../../../database/wrappers/domainState'
-import { IQuotaService, OdisQuotaStatusResult } from '../../base/calculateQuota'
+import { OdisQuotaStatusResult, QuotaService } from '../../base/quota'
 import { DomainSession } from '../session'
 
 declare type QuotaDependentDomainRequest =
   | DomainQuotaStatusRequest
   | DomainRestrictedSignatureRequest
 
-export class DomainQuotaService implements IQuotaService<QuotaDependentDomainRequest> {
+export class DomainQuotaService implements QuotaService<QuotaDependentDomainRequest> {
   async checkAndUpdateQuotaStatus(
     state: DomainStateRecord,
     session: DomainSession<QuotaDependentDomainRequest>,

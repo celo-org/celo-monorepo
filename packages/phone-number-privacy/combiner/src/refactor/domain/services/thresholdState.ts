@@ -7,7 +7,7 @@ import {
 import { OdisConfig } from '../../../config'
 import { Session } from '../../session'
 
-export class DomainStateCombinerService<
+export class DomainThresholdStateService<
   R extends DomainQuotaStatusRequest | DomainRestrictedSignatureRequest
 > {
   constructor(readonly config: OdisConfig) {}

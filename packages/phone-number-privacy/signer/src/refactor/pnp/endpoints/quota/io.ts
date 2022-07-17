@@ -18,10 +18,10 @@ import { Request, Response } from 'express'
 import { Counters } from '../../../../common/metrics'
 import { getVersion } from '../../../../config'
 import { getContractKit } from '../../../../web3/contracts'
-import { IOAbstract } from '../../../base/io'
+import { IO } from '../../../base/io'
 import { PnpSession } from '../../session'
 
-export class PnpQuotaIO extends IOAbstract<PnpQuotaRequest> {
+export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly endpoint = SignerEndpoint.GET_QUOTA
 
   async init(

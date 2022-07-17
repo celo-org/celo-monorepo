@@ -17,10 +17,10 @@ import { Request, Response } from 'express'
 import { Counters } from '../../../../common/metrics'
 import { getVersion } from '../../../../config'
 import { Key } from '../../../../key-management/key-provider-base'
-import { IOAbstract } from '../../../base/io'
+import { IO } from '../../../base/io'
 import { DomainSession } from '../../session'
 
-export class DomainSignIO extends IOAbstract<DomainRestrictedSignatureRequest> {
+export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
   readonly endpoint = SignerEndpoint.DOMAIN_SIGN
 
   async init(

@@ -12,7 +12,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Session } from './action'
 
-export abstract class IOAbstract<R extends OdisRequest> {
+export abstract class IO<R extends OdisRequest> {
   abstract readonly endpoint: SignerEndpoint
 
   constructor(readonly enabled: boolean) {}

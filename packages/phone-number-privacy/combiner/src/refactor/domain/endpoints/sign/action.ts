@@ -6,18 +6,18 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { OdisConfig } from '../../../../config'
 import { IO } from '../../../base/io'
-import { Sign } from '../../../base/sign'
+import { SignAction } from '../../../base/sign'
 import { Session } from '../../../session'
-import { DomainStateCombinerService } from '../../services/thresholdState'
+import { DomainThresholdStateService } from '../../services/thresholdState'
 
-export class DomainSignAction extends Sign<DomainRestrictedSignatureRequest> {
+export class DomainSignAction extends SignAction<DomainRestrictedSignatureRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_SIGN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
 
   constructor(
     readonly config: OdisConfig,
     readonly io: IO<DomainRestrictedSignatureRequest>,
-    readonly stateCombiner: DomainStateCombinerService<DomainRestrictedSignatureRequest>
+    readonly stateCombineActionr: DomainThresholdStateService<DomainRestrictedSignatureRequest>
   ) {
     super(config, io)
   }
@@ -36,7 +36,7 @@ export class DomainSignAction extends Sign<DomainRestrictedSignatureRequest> {
           session.response,
           session.logger,
           combinedSignature,
-          this.stateCombiner.findThresholdDomainState(session)
+          this.stateCombineActionr.findThresholdDomainState(session)
         )
       } catch {
         // May fail upon combining signatures if too many sigs are invalid

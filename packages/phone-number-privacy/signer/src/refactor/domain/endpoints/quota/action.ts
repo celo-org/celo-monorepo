@@ -5,12 +5,12 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Config } from '../../../../config'
 import { toSequentialDelayDomainState } from '../../../../database/models/domainState'
-import { IAction } from '../../../base/action'
-import { DomainQuotaService } from '../../services/calculateQuota'
+import { Action } from '../../../base/action'
+import { DomainQuotaService } from '../../services/quota'
 import { DomainSession } from '../../session'
 import { DomainQuotaIO } from './io'
 
-export class DomainQuotaAction implements IAction<DomainQuotaStatusRequest> {
+export class DomainQuotaAction implements Action<DomainQuotaStatusRequest> {
   constructor(
     readonly config: Config,
     readonly quotaService: DomainQuotaService,

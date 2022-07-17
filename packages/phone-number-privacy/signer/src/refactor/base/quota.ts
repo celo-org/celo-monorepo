@@ -7,7 +7,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { DomainStateRecord } from '../../database/models/domainState'
-import { PnpQuotaStatus } from '../pnp/services/calculateQuota'
+import { PnpQuotaStatus } from '../pnp/services/quota'
 import { Session } from './action'
 
 // prettier-ignore
@@ -20,7 +20,7 @@ export interface OdisQuotaStatusResult<R extends OdisRequest> {
   state: OdisQuotaStatus<R>
 }
 
-export interface IQuotaService<R extends OdisRequest> {
+export interface QuotaService<R extends OdisRequest> {
   checkAndUpdateQuotaStatus(
     state: OdisQuotaStatus<R>,
     session: Session<R>,

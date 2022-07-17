@@ -16,8 +16,8 @@ import {
 } from '../../../../database/models/domainState'
 import { getKeyProvider } from '../../../../key-management/key-provider'
 import { DefaultKeyName, Key } from '../../../../key-management/key-provider-base'
-import { IAction, Session } from '../../../base/action'
-import { DomainQuotaService } from '../../services/calculateQuota'
+import { Action, Session } from '../../../base/action'
+import { DomainQuotaService } from '../../services/quota'
 import { DomainSession } from '../../session'
 import { DomainSignIO } from './io'
 
@@ -37,7 +37,7 @@ type TrxResult =
       signature: string
     }
 
-export class DomainSignAction implements IAction<DomainRestrictedSignatureRequest> {
+export class DomainSignAction implements Action<DomainRestrictedSignatureRequest> {
   constructor(
     readonly config: Config,
     readonly quota: DomainQuotaService,

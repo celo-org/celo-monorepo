@@ -15,10 +15,10 @@ import {
 import { Request, Response } from 'express'
 import { Counters } from '../../../../common/metrics'
 import { getVersion } from '../../../../config'
-import { IOAbstract } from '../../../base/io'
+import { IO } from '../../../base/io'
 import { DomainSession } from '../../session'
 
-export class DomainDisableIO extends IOAbstract<DisableDomainRequest> {
+export class DomainDisableIO extends IO<DisableDomainRequest> {
   readonly endpoint = SignerEndpoint.DISABLE_DOMAIN
 
   async init(

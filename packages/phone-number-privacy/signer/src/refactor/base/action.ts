@@ -6,7 +6,7 @@ import {
 import { Config } from '../../config'
 import { DomainSession } from '../domain/session'
 import { PnpSession } from '../pnp/session'
-import { IOAbstract } from './io'
+import { IO } from './io'
 
 export type Session<R extends OdisRequest> = R extends DomainRequest
   ? DomainSession<R>
@@ -14,8 +14,8 @@ export type Session<R extends OdisRequest> = R extends DomainRequest
   ? PnpSession<R>
   : never
 
-export interface IAction<R extends OdisRequest> {
+export interface Action<R extends OdisRequest> {
   readonly config: Config
-  readonly io: IOAbstract<R>
+  readonly io: IO<R>
   perform(session: Session<R>): Promise<void>
 }

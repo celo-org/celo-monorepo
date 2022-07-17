@@ -1,10 +1,10 @@
 import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { Counters } from '../common/metrics'
-import { IAction } from './base/action'
+import { Action } from './base/action'
 
 export class Controller<R extends OdisRequest> {
-  constructor(readonly action: IAction<R>) {}
+  constructor(readonly action: Action<R>) {}
 
   public async handle(
     request: Request<{}, {}, unknown>,

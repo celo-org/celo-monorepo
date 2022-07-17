@@ -14,12 +14,12 @@ import { DomainQuotaAction } from './refactor/domain/endpoints/quota/action'
 import { DomainQuotaIO } from './refactor/domain/endpoints/quota/io'
 import { DomainSignAction } from './refactor/domain/endpoints/sign/action'
 import { DomainSignIO } from './refactor/domain/endpoints/sign/io'
-import { DomainQuotaService } from './refactor/domain/services/calculateQuota'
+import { DomainQuotaService } from './refactor/domain/services/quota'
 import { PnpQuotaAction } from './refactor/pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './refactor/pnp/endpoints/quota/io'
 import { PnpSignAction } from './refactor/pnp/endpoints/sign/action'
 import { PnpSignIO } from './refactor/pnp/endpoints/sign/io'
-import { PnpQuotaService } from './refactor/pnp/services/calculateQuota'
+import { PnpQuotaService } from './refactor/pnp/services/quota'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 

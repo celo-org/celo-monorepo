@@ -11,7 +11,7 @@ import {
 import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../../config'
 import { Session } from '../session'
-import { Combine } from './combine'
+import { CombineAction } from './combine'
 import { IO } from './io'
 
 // prettier-ignore
@@ -23,7 +23,7 @@ export type OdisSignatureResponse<R extends OdisSignatureRequest> = R extends Si
   : never
 
 // tslint:disable-next-line: max-classes-per-file
-export abstract class Sign<R extends OdisSignatureRequest> extends Combine<R> {
+export abstract class SignAction<R extends OdisSignatureRequest> extends CombineAction<R> {
   constructor(readonly config: OdisConfig, readonly io: IO<R>) {
     super(config, io)
   }
