@@ -4,9 +4,11 @@ import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'
 import https from 'https'
+import { Knex } from 'knex'
 import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
 import { Config, getVersion } from './config'
+import { KeyProvider } from './key-management/key-provider-base'
 import { Controller } from './refactor/controller'
 import { DomainDisableAction } from './refactor/domain/endpoints/disable/action'
 import { DomainDisableIO } from './refactor/domain/endpoints/disable/io'
@@ -23,7 +25,7 @@ import { PnpQuotaService } from './refactor/pnp/services/quota'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function createServer(config: Config) {
+export function startSigner(config: Config, db: Knex, keyProvider: KeyProvider) {
   const logger = rootLogger()
 
   logger.info('Creating express server')
@@ -69,8 +71,8 @@ export function createServer(config: Config) {
       .finally(end)
   }
 
-  const pnpQuotaService = new PnpQuotaService()
-  const domainQuotaService = new DomainQuotaService()
+  const pnpQuotaService = new PnpQuotaService(db) // TODO(Alec): change accesses over to use this
+  const domainQuotaService = new DomainQuotaService(db)
 
   const pnpQuota = new Controller(
     new PnpQuotaAction(
@@ -80,13 +82,23 @@ export function createServer(config: Config) {
     )
   )
   const pnpSign = new Controller(
-    new PnpSignAction(config, pnpQuotaService, new PnpSignIO(config.api.phoneNumberPrivacy.enabled))
+    new PnpSignAction(
+      config,
+      pnpQuotaService,
+      keyProvider,
+      new PnpSignIO(config.api.phoneNumberPrivacy.enabled)
+    )
   )
   const domainQuota = new Controller(
     new DomainQuotaAction(config, domainQuotaService, new DomainQuotaIO(config.api.domains.enabled))
   )
   const domainSign = new Controller(
-    new DomainSignAction(config, domainQuotaService, new DomainSignIO(config.api.domains.enabled))
+    new DomainSignAction(
+      config,
+      domainQuotaService,
+      keyProvider,
+      new DomainSignIO(config.api.domains.enabled)
+    )
   )
   const domainDisable = new Controller(
     new DomainDisableAction(config, new DomainDisableIO(config.api.domains.enabled))

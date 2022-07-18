@@ -1,6 +1,6 @@
 import { rootLogger } from '@celo/phone-number-privacy-common'
 import { Knex, knex } from 'knex'
-import config, { DEV_MODE, SupportedDatabase } from '../config'
+import { config, DEV_MODE, SupportedDatabase } from '../config'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
 let db: Knex | undefined
@@ -77,14 +77,14 @@ export async function initDatabase(doTestQuery = true) {
   return db
 }
 
-// Closes the connections to the database.
-// If the database is sqlite in-memory database, the database will be destroyed.
-export async function closeDatabase() {
-  // NOTE: If this operation is stuck (e.g. if you tests are failing because this operation causes
-  // them to time out) it is likely because a connection is being held open e.g. by a transaction.
-  await db?.destroy()
-  db = undefined
-}
+// // Closes the connections to the database.
+// // If the database is sqlite in-memory database, the database will be destroyed.
+// export async function closeDatabase() {
+//   // NOTE: If this operation is stuck (e.g. if you tests are failing because this operation causes
+//   // them to time out) it is likely because a connection is being held open e.g. by a transaction.
+//   await db?.destroy()
+//   db = undefined
+// }
 
 async function executeTestQuery(_db: Knex) {
   const logger = rootLogger()

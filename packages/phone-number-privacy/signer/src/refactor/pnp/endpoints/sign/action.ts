@@ -5,15 +5,19 @@ import { Counters } from '../../../../common/metrics'
 import { Config } from '../../../../config'
 import { getDatabase } from '../../../../database/database'
 import { getRequestExists } from '../../../../database/wrappers/request'
-import { getKeyProvider } from '../../../../key-management/key-provider'
-import { DefaultKeyName, Key } from '../../../../key-management/key-provider-base'
+import { DefaultKeyName, Key, KeyProvider } from '../../../../key-management/key-provider-base'
 import { Action, Session } from '../../../base/action'
 import { PnpQuotaService } from '../../services/quota'
 import { PnpSession } from '../../session'
 import { PnpSignIO } from './io'
 
 export class PnpSignAction implements Action<SignMessageRequest> {
-  constructor(readonly config: Config, readonly quota: PnpQuotaService, readonly io: PnpSignIO) {}
+  constructor(
+    readonly config: Config,
+    readonly quota: PnpQuotaService,
+    readonly keyProvider: KeyProvider,
+    readonly io: PnpSignIO
+  ) {}
 
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
     await getDatabase().transaction(async (trx) => {
@@ -93,7 +97,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
   ): Promise<string> {
     let privateKey: string
     try {
-      privateKey = await getKeyProvider().getPrivateKeyOrFetchFromStore(key)
+      privateKey = await this.keyProvider.getPrivateKeyOrFetchFromStore(key)
     } catch (err) {
       session.logger.error({ key }, 'Requested key version not supported')
       throw err

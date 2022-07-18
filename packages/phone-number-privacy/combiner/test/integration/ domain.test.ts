@@ -19,24 +19,31 @@
 //   TestUtils,
 //   WarningMessage
 // } from '@celo/phone-number-privacy-common'
-// import { closeDatabase, initDatabase, initKeyProvider, startSigner, SupportedDatabase, SupportedKeystore } from '@celo/phone-number-privacy-signer'
+// import { closeDatabase, config, initDatabase, initKeyProvider, startSigner, SupportedDatabase, SupportedKeystore } from '@celo/phone-number-privacy-signer'
 // import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 // import { LocalWallet } from '@celo/wallet-local'
 // import request from 'supertest'
 
-// // Configurations are currently handled through a global object. As a result, we need to set the
-// // right parameters here before the tests start.
-// // We will be using a Sqlite in-memory database for tests.
-// config.db.type = SupportedDatabase.Sqlite
-// config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
-// config.api.domains.enabled = true
-
 // // DO NOT MERGE: Add checking of values beyond the return code.
 
 // describe('domainService', () => {
-//   // DO NOT MERGE(victor): Should this be refactored to pass key provider, database, and config?
-//   // (global config makes it harder to test things, we should pass it as a parameter)
-//   const app = startSigner()
+
+//   // Configurations are currently handled through a global object. As a result, we need to set the
+//   // right parameters here before the tests start.
+//   // We will be using a Sqlite in-memory database for tests.
+//   config.db.type = SupportedDatabase.Sqlite
+//   config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
+//   config.api.domains.enabled = true
+
+//   const db1 = await initDatabase()
+//   const keyProvider1 = await initKeyProvider()
+//   const signer1 = startSigner(config, db1, keyProvider1)
+//   const db2 = await initDatabase()
+//   const keyProvider2 = await initKeyProvider()
+//   const signer2 = startSigner(config, db2, keyProvider2)
+//   const db3 = await initDatabase()
+//   const keyProvider3 = await initKeyProvider()
+//   const signer3 = startSigner(config, db3, keyProvider3)
 
 //   const wallet = new LocalWallet()
 //   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')

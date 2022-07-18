@@ -96,7 +96,7 @@ export interface Config {
 }
 
 const env = process.env as any
-const config: Config = {
+export const config: Config = {
   server: {
     port: Number(env.SERVER_PORT ?? 8080),
     sslKeyPath: env.SERVER_SSL_KEY_PATH,
@@ -171,4 +171,3 @@ const config: Config = {
   timeout: Number(env.ODIS_SIGNER_TIMEOUT ?? 5000),
   test_quota_bypass_percentage: Number(env.TEST_QUOTA_BYPASS_PERCENTAGE ?? 0),
 }
-export default config

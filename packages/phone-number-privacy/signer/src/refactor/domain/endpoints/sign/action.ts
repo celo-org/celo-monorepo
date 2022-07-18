@@ -14,8 +14,7 @@ import {
   DomainStateRecord,
   toSequentialDelayDomainState,
 } from '../../../../database/models/domainState'
-import { getKeyProvider } from '../../../../key-management/key-provider'
-import { DefaultKeyName, Key } from '../../../../key-management/key-provider-base'
+import { DefaultKeyName, Key, KeyProvider } from '../../../../key-management/key-provider-base'
 import { Action, Session } from '../../../base/action'
 import { DomainQuotaService } from '../../services/quota'
 import { DomainSession } from '../../session'
@@ -41,6 +40,7 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
   constructor(
     readonly config: Config,
     readonly quota: DomainQuotaService,
+    readonly keyProvider: KeyProvider,
     readonly io: DomainSignIO
   ) {}
 
@@ -149,7 +149,7 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
   ): Promise<Buffer> {
     let privateKey: string
     try {
-      privateKey = await getKeyProvider().getPrivateKeyOrFetchFromStore(key)
+      privateKey = await this.keyProvider.getPrivateKeyOrFetchFromStore(key)
     } catch (err) {
       session.logger.error({ key }, 'Requested key version not supported')
       throw err

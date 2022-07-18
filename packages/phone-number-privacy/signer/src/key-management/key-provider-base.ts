@@ -1,4 +1,4 @@
-import config from '../config'
+import { config } from '../config'
 
 export enum DefaultKeyName {
   PHONE_NUMBER_PRIVACY = 'phoneNumberPrivacy',

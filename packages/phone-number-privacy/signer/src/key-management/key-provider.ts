@@ -1,5 +1,5 @@
 import { rootLogger } from '@celo/phone-number-privacy-common'
-import config, { SupportedKeystore } from '../config'
+import { config, SupportedKeystore } from '../config'
 import { AWSKeyProvider } from './aws-key-provider'
 import { AzureKeyProvider } from './azure-key-provider'
 import { GoogleKeyProvider } from './google-key-provider'
@@ -7,8 +7,6 @@ import { DefaultKeyName, Key, KeyProvider } from './key-provider-base'
 import { MockKeyProvider } from './mock-key-provider'
 
 const logger = rootLogger()
-
-let keyProvider: KeyProvider
 
 export const keysToPrefetch: Key[] = [
   {
@@ -21,9 +19,12 @@ export const keysToPrefetch: Key[] = [
   },
 ]
 
-export async function initKeyProvider() {
+export async function initKeyProvider(): Promise<KeyProvider> {
   logger.info('Initializing keystore')
   const type = config.keystore.type
+
+  let keyProvider: KeyProvider
+
   if (type === SupportedKeystore.AZURE_KEY_VAULT) {
     logger.info('Using Azure key vault')
     keyProvider = new AzureKeyProvider()
@@ -39,15 +40,18 @@ export async function initKeyProvider() {
   } else {
     throw new Error('Valid keystore type must be provided')
   }
+
   logger.info(`Fetching keys: ${JSON.stringify(keysToPrefetch)}`)
   await Promise.all(keysToPrefetch.map(keyProvider.fetchPrivateKeyFromStore.bind(keyProvider)))
   logger.info('Done fetching key. Key provider initialized successfully.')
-}
-
-export function getKeyProvider() {
-  if (!keyProvider) {
-    throw new Error('Key provider has not been properly initialized')
-  }
 
   return keyProvider
 }
+
+// export function getKeyProvider() {
+//   if (!keyProvider) {
+//     throw new Error('Key provider has not been properly initialized')
+//   }
+
+//   return keyProvider
+// }

@@ -23,6 +23,8 @@ declare type QuotaDependentDomainRequest =
   | DomainRestrictedSignatureRequest
 
 export class DomainQuotaService implements QuotaService<QuotaDependentDomainRequest> {
+  constructor(readonly db: Knex) {}
+
   async checkAndUpdateQuotaStatus(
     state: DomainStateRecord,
     session: DomainSession<QuotaDependentDomainRequest>,

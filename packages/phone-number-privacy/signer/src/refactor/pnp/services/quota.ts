@@ -9,7 +9,7 @@ import {
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Counters, Histograms } from '../../../common/metrics'
-import config from '../../../config'
+import { config } from '../../../config'
 import { getPerformedQueryCount, incrementQueryCount } from '../../../database/wrappers/account'
 import { storeRequest } from '../../../database/wrappers/request'
 import {
@@ -30,6 +30,8 @@ export interface PnpQuotaStatus {
 }
 
 export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
+  constructor(readonly db: Knex) {}
+
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
     session: PnpSession<SignMessageRequest>,

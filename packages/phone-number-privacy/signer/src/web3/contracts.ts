@@ -9,7 +9,7 @@ import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
 import { Histogram } from 'prom-client'
 import { Counters, Histograms, Labels } from '../common/metrics'
-import config from '../config'
+import { config } from '../config'
 
 const contractKit = config.blockchain.apiKey
   ? newKitWithApiKey(config.blockchain.provider, config.blockchain.apiKey)

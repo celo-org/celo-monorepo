@@ -22,10 +22,11 @@ import {
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import request from 'supertest'
-import config, { SupportedDatabase, SupportedKeystore } from '../../src/config'
-import { closeDatabase, initDatabase } from '../../src/database/database'
+import { KeyProvider } from '../../dist/key-management/key-provider-base'
+import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
+import { initDatabase } from '../../src/database/database'
 import { initKeyProvider } from '../../src/key-management/key-provider'
-import { createServer } from '../../src/server'
+import { startSigner } from '../../src/server'
 
 // Configurations are currently handled through a global object. As a result, we need to set the
 // right parameters here before the tests start.
@@ -36,10 +37,10 @@ config.api.domains.enabled = true
 
 // DO NOT MERGE: Add checking of values beyond the return code.
 
-describe('domainService', () => {
+describe('domainService', async () => {
   // DO NOT MERGE(victor): Should this be refactored to pass key provider, database, and config?
   // (global config makes it harder to test things, we should pass it as a parameter)
-  const app = createServer(config)
+  // const app = startSigner(config, await initDatabase(), await initKeyProvider())
 
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
@@ -117,20 +118,27 @@ describe('domainService', () => {
     return req
   }
 
+  let keyProvider: KeyProvider
+  let app
+  let db
+
   beforeAll(async () => {
-    await initKeyProvider()
+    keyProvider = await initKeyProvider()
   })
 
   beforeEach(async () => {
     // Create a new in-memory database for each test.
-    await initDatabase()
+    db = await initDatabase()
+    app = startSigner(config, db, keyProvider)
   })
 
   afterEach(async () => {
     // Close and destroy the in-memory database.
     // Note: If tests start to be too slow, this could be replaced with more complicated logic to
     // reset the database state without destroying and recreting it for each test.
-    await closeDatabase()
+
+    // await closeDatabase()
+    await db.destroy()
   })
 
   describe(`${SignerEndpoint.DISABLE_DOMAIN}`, () => {
@@ -259,7 +267,7 @@ describe('domainService', () => {
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled = { ...config }
       configWithApiDisabled.api.domains.enabled = false
-      const appWithApiDisabled = createServer(configWithApiDisabled)
+      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
 
       const req = await disableRequest()
 
@@ -400,7 +408,7 @@ describe('domainService', () => {
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled = { ...config }
       configWithApiDisabled.api.domains.enabled = false
-      const appWithApiDisabled = createServer(configWithApiDisabled)
+      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
 
       const req = await quotaRequest()
 
@@ -680,7 +688,7 @@ describe('domainService', () => {
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled = { ...config }
       configWithApiDisabled.api.domains.enabled = false
-      const appWithApiDisabled = createServer(configWithApiDisabled)
+      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
 
       const [req, _] = await signatureRequest()
 

@@ -153,3 +153,5 @@ export const domainDisable = functions
   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
     return meterResponse(domainDisableHandler.handle, req, res, Endpoint.DISABLE_DOMAIN)
   })
+
+export * from './config'

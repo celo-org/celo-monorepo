@@ -1,6 +1,6 @@
 import { ErrorMessage, rootLogger } from '@celo/phone-number-privacy-common'
 import { SecretsManager } from 'aws-sdk'
-import config from '../config'
+import { config } from '../config'
 import { Key, KeyProviderBase } from './key-provider-base'
 
 interface SecretStringResult {
