@@ -26,6 +26,7 @@ interface IBreaker {
   /**
    * @notice Retrieve the cooldown time for the breaker.
    * @return cooldown The amount of time that must pass before the breaker can reset.
+   * @dev when cooldown is 0 auto reset will not be attempted.
    */
   function getCooldown() external view returns (uint256 cooldown);
 

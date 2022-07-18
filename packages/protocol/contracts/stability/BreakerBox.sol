@@ -239,7 +239,10 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
     // Check if a breaker has non default trading mode & try to reset
     if (info.tradingMode != 0) {
       IBreaker breaker = IBreaker(tradingModeBreaker[info.tradingMode]);
-      bool tryReset = (breaker.getCooldown() + info.lastUpdatedTime) <= block.timestamp;
+
+      uint256 cooldown = breaker.getCooldown();
+      bool tryReset = ((cooldown > 0) && (cooldown + info.lastUpdatedTime) <= block.timestamp);
+
       if (tryReset) {
         bool canReset = breaker.shouldReset(exchangeAddress);
         if (canReset) {

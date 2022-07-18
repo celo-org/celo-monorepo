@@ -113,8 +113,8 @@ contract BreakerBoxTest is Test, WithRegistry {
       assertTrue(isExchange(exchange));
 
       breakerBox.setExchangeTradingMode(exchange, breaker.getTradingMode());
-      (uint256 tradingMode, , ) = breakerBox.exchangeTradingModes(exchange);
-      assertEq(tradingMode, breaker.getTradingMode());
+      (uint256 savedTradingMode, , ) = breakerBox.exchangeTradingModes(exchange);
+      assertEq(savedTradingMode, breaker.getTradingMode());
     }
   }
 }
@@ -438,6 +438,19 @@ contract BreakerBoxTest_checkBreakers is BreakerBoxTest {
     emit ResetSuccessful(exchangeC, address(fakeBreakerC));
 
     assertEq(breakerBox.checkBreakers(exchangeC), 0);
+  }
+
+  function test_checkBreakers_whenExchangeIsNotInDefaultModeAndNoBreakerCooldown_shouldReturnCorrectModeAndEmit()
+    public
+  {
+    setupBreakerAndExchange(6, 0, true, false, fakeBreakerC, exchangeC);
+    skip(3600);
+
+    vm.expectCall(address(fakeBreakerC), abi.encodeWithSelector(fakeBreakerC.getCooldown.selector));
+    vm.expectEmit(true, true, false, false);
+    emit ResetAttemptNotCool(exchangeC, address(fakeBreakerC));
+
+    assertEq(breakerBox.checkBreakers(exchangeC), 6);
   }
 
   function test_checkBreakers_whenNoBreakersAreTripped_shouldReturnDefaultMode() public {
