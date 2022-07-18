@@ -129,7 +129,7 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
 
     address stableToken = IExchange(exchange).stable();
 
-    (, uint256[] memory reportTimestamps, ) = sortedOracles.getTimestamps(stableToken);
+    (, uint256[] memory reportTimestamps, ) = sortedOracles.getTimestamps(exchange);
     uint256 lastReportTimestamp = reportTimestamps[0];
 
     uint256 allowedThreshold = getPriceChangeThreshold(lastReportTimestamp);
@@ -153,11 +153,7 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
    * @param lastTimestamp The timestamp of the last oracle report.
    * @return threshold The allowed threshold to be used to determine of the breaker should trip.
    */
-  function getPriceChangeThreshold(uint256 lastTimestamp) private view returns (uint256 threshold) {
-    if (lastTimestamp == 0) {
-      return maxPriceChangeThreshold.unwrap();
-    }
-
+  function getPriceChangeThreshold(uint256 lastTimestamp) public view returns (uint256 threshold) {
     // TODO: Calculate time based multiplier
     // uint256 timeElapsed = ((block.timestamp - lastTimestamp) / 1 minutes); // Minutes since last report
     // uint256 calculatedThreshold = minPriceChangeThreshold.unwrap() *

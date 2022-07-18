@@ -2,19 +2,22 @@
 pragma solidity ^0.5.13;
 
 import { Test, console2 as console } from "celo-foundry/Test.sol";
-
 import { WithRegistry } from "../utils/WithRegistry.sol";
 
-import { MockSortedOracles } from "contracts/stability/test/MockSortedOracles.sol";
-import { MedianDeltaBreaker } from "contracts/stability/MedianDeltaBreaker.sol";
 import {
   SortedLinkedListWithMedian
 } from "contracts/common/linkedlists/SortedLinkedListWithMedian.sol";
+import { MedianDeltaBreaker } from "contracts/stability/MedianDeltaBreaker.sol";
+
+import { MockSortedOracles } from "contracts/stability/test/MockSortedOracles.sol";
+import { MockExchange } from "contracts/stability/test/MockExchange.sol";
 
 contract MedianDeltaBreakerTest is Test, WithRegistry {
   address deployer;
-  address someGuy;
+  address normalAccount;
+  address testStable;
 
+  MockExchange testExchange;
   MockSortedOracles sortedOracles;
   MedianDeltaBreaker breaker;
 
@@ -32,10 +35,21 @@ contract MedianDeltaBreakerTest is Test, WithRegistry {
 
   function setUp() public {
     deployer = actor("deployer");
-    someGuy = actor("someGuy");
+    normalAccount = actor("normalAccount");
+    testStable = actor("testStable");
 
     changePrank(deployer);
-    setupSortedOracles();
+
+    testExchange = new MockExchange();
+    sortedOracles = new MockSortedOracles();
+
+    registry.setAddressFor("SortedOracles", address(sortedOracles));
+
+    vm.mockCall(
+      address(testExchange),
+      abi.encodeWithSelector(testExchange.stable.selector),
+      abi.encode(testStable)
+    );
 
     breaker = new MedianDeltaBreaker(
       address(registry),
@@ -46,17 +60,34 @@ contract MedianDeltaBreakerTest is Test, WithRegistry {
     );
   }
 
-  function setupSortedOracles() public {
-    sortedOracles = new MockSortedOracles();
-    registry.setAddressFor("SortedOracles", address(sortedOracles));
-    setupGetTimestamps(new uint256[](1));
-  }
+  function setupSortedOracles(
+    uint256 lastReportTimestamp,
+    uint256 currentMedianRate,
+    uint256 lastMedianRate
+  ) public {
+    uint256[] memory reportTimestamps = new uint256[](1);
+    reportTimestamps[0] = lastReportTimestamp;
 
-  function setupGetTimestamps(uint256[] memory timestamps) public {
     vm.mockCall(
       address(sortedOracles),
       abi.encodeWithSelector(sortedOracles.getTimestamps.selector),
-      abi.encode(new address[](1), timestamps, new SortedLinkedListWithMedian.MedianRelation[](1))
+      abi.encode(
+        new address[](1),
+        reportTimestamps,
+        new SortedLinkedListWithMedian.MedianRelation[](1)
+      )
+    );
+
+    vm.mockCall(
+      address(sortedOracles),
+      abi.encodeWithSelector(sortedOracles.lastMedianRate.selector),
+      abi.encode(lastMedianRate)
+    );
+
+    vm.mockCall(
+      address(sortedOracles),
+      abi.encodeWithSelector(sortedOracles.medianRate.selector),
+      abi.encode(currentMedianRate, 1)
     );
   }
 }
@@ -92,7 +123,7 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
 
   function test_setCooldownTime_whenCallerIsNotOwner_shouldRevert() public {
     vm.expectRevert("Ownable: caller is not the owner");
-    changePrank(someGuy);
+    changePrank(normalAccount);
     breaker.setCooldownTime(2 minutes);
   }
 
@@ -108,7 +139,7 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
 
   function test_setMinThreshold_whenCallerIsNotOwner_shouldRevert() public {
     vm.expectRevert("Ownable: caller is not the owner");
-    changePrank(someGuy);
+    changePrank(normalAccount);
 
     breaker.setMinPriceChangeThreshold(123456);
   }
@@ -131,7 +162,7 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
 
   function test_setMaxThreshold_whenCallerIsNotOwner_shouldRevert() public {
     vm.expectRevert("Ownable: caller is not the owner");
-    changePrank(someGuy);
+    changePrank(normalAccount);
 
     breaker.setMaxPriceChangeThreshold(123456);
   }
@@ -154,7 +185,7 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
 
   function test_setPriceChangeMultiplier_whenCallerIsNotOwner_shouldRevert() public {
     vm.expectRevert("Ownable: caller is not the owner");
-    changePrank(someGuy);
+    changePrank(normalAccount);
 
     breaker.setPriceChangeMultiplier(123456);
   }
@@ -183,5 +214,35 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
 
   function test_getCooldown_shouldReturnCooldown() public {
     assertEq(breaker.getCooldown(), coolDownTime);
+  }
+}
+
+contract MedianDeltaBreakerTest_shouldTrigger is MedianDeltaBreakerTest {
+  function verifyCalls() public {
+    vm.expectCall(address(testExchange), abi.encodeWithSelector(testExchange.stable.selector));
+    vm.expectCall(
+      address(sortedOracles),
+      abi.encodeWithSelector(sortedOracles.getTimestamps.selector, testExchange)
+    );
+    vm.expectCall(
+      address(sortedOracles),
+      abi.encodeWithSelector(sortedOracles.lastMedianRate.selector, testStable)
+    );
+    vm.expectCall(
+      address(sortedOracles),
+      abi.encodeWithSelector(sortedOracles.medianRate.selector, testStable)
+    );
+  }
+
+  function test_shouldTrigger_whenMedianDrops30Percent_shouldReturnTrue() public {
+    uint256 medianChangeScaleFactor = 0.7 * 10**24;
+
+    uint256 lastMedianRate = 0.98 * 10**24;
+    uint256 currentMedianRate = (lastMedianRate * medianChangeScaleFactor) / 10**24;
+
+    setupSortedOracles(block.timestamp, currentMedianRate, lastMedianRate);
+    verifyCalls();
+
+    assertTrue(breaker.shouldTrigger(address(testExchange)));
   }
 }
