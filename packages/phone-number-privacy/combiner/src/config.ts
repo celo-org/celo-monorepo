@@ -73,7 +73,7 @@ if (DEV_MODE) {
       odisServices: {
         // TODO(Alec): For testing, use app.listen(3000)
         signers:
-          '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
+          '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}, {"url": "http://localhost:3001", "fallbackUrl": "http://localhost:3001/fallback"}, {"url": "http://localhost:3002", "fallbackUrl": "http://localhost:3002/fallback"}]',
         timeoutMilliSeconds: 5 * 1000,
       },
       keys: {
@@ -87,7 +87,7 @@ if (DEV_MODE) {
       enabled: true,
       odisServices: {
         signers:
-          '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}]',
+          '[{"url": "http://localhost:3000", "fallbackUrl": "http://localhost:3000/fallback"}, {"url": "http://localhost:3001", "fallbackUrl": "http://localhost:3001/fallback"}, {"url": "http://localhost:3002", "fallbackUrl": "http://localhost:3002/fallback"}]',
         timeoutMilliSeconds: 5 * 1000,
       },
       keys: {
