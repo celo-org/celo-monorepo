@@ -29,6 +29,8 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
   event SpreadSet(uint256 spread);
   event ReserveFractionSet(uint256 reserveFraction);
   event BucketsUpdated(uint256 celoBucket, uint256 stableBucket);
+  event StableBucketMaxFractionSet(uint256 stableBucketMaxFraction);
+  event MinSupplyForStableBucketCapSet(uint256 minSupplyForStableBucketCap);
 
   address deployer;
   address rando;
@@ -52,6 +54,8 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
   uint256 constant stableAmountForRate = 2000000000000000000000000;
   uint256 initialStableBucket = initialCeloBucket * 2;
   FixidityLib.Fraction spread = FixidityLib.newFixedFraction(3, 1000);
+  uint256 constant minSupplyForStableBucketCap = 1e24;
+  uint256 constant stableBucketMaxFraction = 45454545454545456000000;
 
   function setUp() public {
     deployer = actor("deployer");
@@ -104,7 +108,9 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
       FixidityLib.unwrap(spread),
       FixidityLib.unwrap(reserveFraction),
       bucketUpdateFrequency,
-      2
+      2,
+      minSupplyForStableBucketCap,
+      stableBucketMaxFraction
     );
   }
 
@@ -174,7 +180,9 @@ contract Exchange_initializeAndSetters is ExchangeTest {
       FixidityLib.unwrap(FixidityLib.newFixedFraction(3, 1000)),
       FixidityLib.unwrap(FixidityLib.newFixedFraction(5, 100)),
       60 * 60,
-      2
+      2,
+      minSupplyForStableBucketCap,
+      stableBucketMaxFraction
     );
   }
 
@@ -270,12 +278,91 @@ contract Exchange_initializeAndSetters is ExchangeTest {
     vm.expectRevert("Ownable: caller is not the owner");
     exchange.setReserveFraction(0);
   }
+
+  function test_StableBucketMaxFraction_setsValueAndEmits() public {
+    uint256 newStableBucketMaxFraction = 90909090909090910000000;
+    vm.expectEmit(true, true, true, true, address(exchange));
+    emit StableBucketMaxFractionSet(newStableBucketMaxFraction);
+    exchange.setStableBucketMaxFraction(newStableBucketMaxFraction);
+    assert(exchange.stableBucketMaxFraction() == newStableBucketMaxFraction);
+  }
+
+  function test_StableBucketMaxFraction_NeverMoreThan1_AlwaysLessThan0() public {
+    vm.expectRevert("Bucket fraction must be smaller than 1");
+    exchange.setStableBucketMaxFraction(1e24);
+    vm.expectRevert("bucket fraction must be greather than 0");
+    exchange.setStableBucketMaxFraction(0);
+  }
+
+  function test_setstableBucketMaxFraction_isOnlyCallableByOwner() public {
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    exchange.setStableBucketMaxFraction(0);
+  }
+
+  function test_StableBucketMinSupply_setsValueAndEmits() public {
+    uint256 newMinSupplyForStableBucketCap = 2e24;
+    vm.expectEmit(true, true, true, true, address(exchange));
+    emit MinSupplyForStableBucketCapSet(newMinSupplyForStableBucketCap);
+    exchange.setMinSupplyForStableBucketCap(newMinSupplyForStableBucketCap);
+    assert(exchange.minSupplyForStableBucketCap() == newMinSupplyForStableBucketCap);
+  }
+
+  function test_setMinSupplyForStableBucketCap_NeverSetTo0() public {
+    vm.expectRevert("Min supply for stable bucket cap must be greather than 0");
+    exchange.setMinSupplyForStableBucketCap(0);
+  }
+
+  function test_setMinSupplyForStableBucketCap_isOnlyCallableByOwner() public {
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    exchange.setMinSupplyForStableBucketCap(0);
+  }
 }
 
 contract ExchangeTest_stableActivated is ExchangeTest {
   function setUp() public {
     super.setUp();
     exchange.activateStable();
+  }
+}
+
+contract ExchangeTest_stableBucket_hasBeenCapped is ExchangeTest {
+  function setUp() public {
+    super.setUp();
+    sortedOracles.setMedianRate(address(stableToken), SafeMath.mul(2e24, 2000)); // bump the price by 2000, leaving with 4K CELO per dollar
+    exchange.activateStable();
+  }
+
+  function test_itHasTheRightPrice_AfterTheCap() public {
+    (uint256 tradableGold, uint256 mintableStable) = exchange.getBuyAndSellBuckets(false);
+    assertEq(SafeMath.div(mintableStable, tradableGold), 4000);
+  }
+}
+
+contract ExchangeTest_stableBucket_needsToBeCapped is ExchangeTest {
+  function setUp() public {
+    super.setUp();
+    registry.setAddressFor("Exchange", exchange.owner());
+    sortedOracles.setMedianRate(address(stableToken), 2e24);
+    stableToken.mint(deployer, 61e24); // 6M
+    registry.setAddressFor("Exchange", address(exchange));
+    exchange.activateStable();
+  }
+  function test_hasCorrect_stableBucketMaxFraction() public {
+    assertEq(exchange.stableBucketMaxFraction(), 45454545454545456000000);
+  }
+
+  function test_DoesntHitTheCap_shouldNotResize() public {
+    (uint256 tradableGold, uint256 mintableStable) = exchange.getBuyAndSellBuckets(false);
+    assertEq(mintableStable, 1e21);
+    assertEq(tradableGold, 5e20);
+    // the buckets hold the price
+    assertEq(SafeMath.div(mintableStable, tradableGold), 2);
+  }
+
+  function test_HasCorrectGetStableBucketCap() public {
+    assert(exchange.getStableBucketCap() == 2772727272727272816000000);
   }
 }
 
