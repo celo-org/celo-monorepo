@@ -208,10 +208,6 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
 
   /* ---------- Getters ---------- */
 
-  function test_getTradingMode_shouldReturnTradingMode() public {
-    assertEq(breaker.getTradingMode(), 1);
-  }
-
   function test_getCooldown_shouldReturnCooldown() public {
     assertEq(breaker.getCooldown(), coolDownTime);
   }
