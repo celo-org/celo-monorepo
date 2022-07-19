@@ -5,19 +5,16 @@ pragma experimental ABIEncoderV2;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "celo-foundry/Test.sol";
 
-import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import { Test } from "celo-foundry/Test.sol";
+import "../utils/WithRegistry.sol";
+import "../utils/TokenHelpers.sol";
 
-import { WithRegistry } from "../utils/WithRegistry.sol";
-import { TokenHelpers } from "../utils/TokenHelpers.sol";
-
-import { Exchange } from "contracts/stability/Exchange.sol";
-import { StableToken } from "contracts/stability/StableToken.sol";
-import { MockReserve } from "contracts/stability/test/MockReserve.sol";
-import { MockSortedOracles } from "contracts/stability/test/MockSortedOracles.sol";
-import { FixidityLib } from "contracts/common/FixidityLib.sol";
-import { Freezer } from "contracts/common/Freezer.sol";
-import { GoldToken } from "contracts/common/GoldToken.sol";
+import "contracts/stability/Exchange.sol";
+import "contracts/stability/StableToken.sol";
+import "contracts/stability/test/MockReserve.sol";
+import "contracts/stability/test/MockSortedOracles.sol";
+import "contracts/common/FixidityLib.sol";
+import "contracts/common/Freezer.sol";
+import "contracts/common/GoldToken.sol";
 
 contract ExchangeTest is Test, WithRegistry, TokenHelpers {
   using SafeMath for uint256;
