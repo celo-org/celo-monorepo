@@ -31,12 +31,6 @@ interface IBreaker {
   function getCooldown() external view returns (uint256 cooldown);
 
   /**
-   * @notice Retrieve the trading mode this breaker will set when triggered.
-   * @return tradingMode The trading mode for the breaker.
-   */
-  function getTradingMode() external view returns (uint256 tradingMode);
-
-  /**
    * @notice Check if the criteria has been met, by a specified exchange, to trigger the breaker.
    * @param exchange The address of the exchange to run the check against.
    * @return triggerBreaker A boolean indicating whether or not the breaker shoulf be triggered for the given exchange.

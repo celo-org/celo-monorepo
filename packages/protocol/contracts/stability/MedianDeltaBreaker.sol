@@ -21,7 +21,6 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
 
   /* ==================== State Variables ==================== */
 
-  uint256 public constant TRADING_MODE = 1; // The trading mode that should be used when this breaker is triggered. 1 == no trading.
   uint256 public cooldownTime; // The amount of time that must pass before the breaker can be reset for an exchange.
   FixidityLib.Fraction public minPriceChangeThreshold; // The min threshold for the median price change. Multiplied by 10^24
   FixidityLib.Fraction public maxPriceChangeThreshold; // The min threshold for the median price change. Multiplied by 10^24
@@ -99,13 +98,6 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     );
     priceChangeThresholdTimeMultiplier = FixidityLib.wrap(_priceChangeThresholdTimeMultiplier);
     emit PriceChangeMultiplierUpdated(_priceChangeThresholdTimeMultiplier);
-  }
-
-  /**
-   * @notice Returns the trading mode.
-   */
-  function getTradingMode() external view returns (uint256 tradingMode) {
-    tradingMode = TRADING_MODE;
   }
 
   /**
