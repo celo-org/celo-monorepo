@@ -243,7 +243,11 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
    */
   function checkBreakers(address exchangeAddress) external returns (uint256 currentTradingMode) {
     TradingModeInfo memory info = exchangeTradingModes[exchangeAddress];
-    require(info.lastUpdatedTime > 0, "Exchange has not been added"); //Last updated should always have a value.
+
+    // Last updated should always have a value gt 0, if it doesn't we can assume this exchange has not been added.
+    if (info.lastUpdatedTime == 0) {
+      return 0;
+    }
 
     // Check if a breaker has non default trading mode & try to reset
     if (info.tradingMode != 0) {
