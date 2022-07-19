@@ -99,6 +99,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'StableTokenEUR',
       'Validators',
       'StableTokenRegistry',
+      'GigaMento',
     ]
 
     if (!config.governance.skipTransferOwnership) {

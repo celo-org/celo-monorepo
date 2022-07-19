@@ -242,6 +242,7 @@ const DefaultConfig = {
     fiatTicker: [], // empty array resambles empty bytes
     stableTokenContractName: [], // empty array resambles empty bytes
   },
+  gigaMento: {},
 }
 
 const NetworkConfigs = {
