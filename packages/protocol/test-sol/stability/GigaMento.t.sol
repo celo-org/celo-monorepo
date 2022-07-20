@@ -25,7 +25,7 @@ contract GigamentoTest is Test, WithRegistry, TokenHelpers {
     gigamento = new GigaMento(true);
 
     registry.setAddressFor("GigaMento", address(gigamento));
-
-    gigamento.initialize(address(registry));
+    // the second argument - 2 is a placeholder
+    gigamento.initialize(address(registry), 2);
   }
 }

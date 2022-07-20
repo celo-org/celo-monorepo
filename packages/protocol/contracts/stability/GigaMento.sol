@@ -15,6 +15,7 @@ contract GigaMento is Ownable, Initializable, UsingRegistry {
   using SafeMath for uint256;
 
   address private _multisig;
+  uint256 private placeholderForMigrations;
 
   /**
    * @notice Sets initialized == true on implementation contracts.
@@ -33,11 +34,13 @@ contract GigaMento is Ownable, Initializable, UsingRegistry {
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param _registry The address of the registry.
+   * @param _placeholderForMigrations this is a temporary placeholder to make migrations work, please remove.
    */
-  function initialize(address _registry) external initializer {
+  function initialize(address _registry, uint256 _placeholderForMigrations) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(_registry);
     _multisig = msg.sender;
+    placeholderForMigrations = _placeholderForMigrations;
   }
 
   /**
