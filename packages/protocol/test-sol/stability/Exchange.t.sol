@@ -102,15 +102,8 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
     sortedOracles.setMedianTimestampToNow(address(stableToken));
     sortedOracles.setNumRates(address(stableToken), 2);
 
-    vm.mockCall(
-      address(breakerBox),
-      abi.encodeWithSelector(breakerBox.checkBreakers.selector),
-      abi.encode(0)
-    );
-
     exchange.initialize(
       address(registry),
-      breakerBox,
       "StableToken",
       FixidityLib.unwrap(spread),
       FixidityLib.unwrap(reserveFraction),
@@ -183,7 +176,6 @@ contract Exchange_initializeAndSetters is ExchangeTest {
     vm.expectRevert("contract already initialized");
     exchange.initialize(
       address(registry),
-      breakerBox,
       "StableToken",
       FixidityLib.unwrap(FixidityLib.newFixedFraction(3, 1000)),
       FixidityLib.unwrap(FixidityLib.newFixedFraction(5, 100)),
