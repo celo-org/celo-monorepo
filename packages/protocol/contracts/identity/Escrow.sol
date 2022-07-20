@@ -87,6 +87,10 @@ contract Escrow is
   // Governable list of trustedIssuers to set for payments by default.
   address[] public defaultTrustedIssuers;
 
+  // Based on benchmarking of FederatedAttestations lookup gas consumption
+  // in the worst case (with a significant amount of buffer).
+  uint256 public constant MAX_TRUSTED_ISSUERS_PER_PAYMENT = 100;
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -112,9 +116,15 @@ contract Escrow is
    * @notice Add an address to the defaultTrustedIssuers list.
    * @param trustedIssuer Address of the trustedIssuer to add.
    * @dev Throws if trustedIssuer is null or already in defaultTrustedIssuers.
+   * @dev Throws if defaultTrustedIssuers is already at max allowed length.
    */
   function addDefaultTrustedIssuer(address trustedIssuer) external onlyOwner {
     require(address(0) != trustedIssuer, "trustedIssuer can't be null");
+    require(
+      defaultTrustedIssuers.length.add(1) <= MAX_TRUSTED_ISSUERS_PER_PAYMENT,
+      "defaultTrustedIssuers.length can't exceed allowed number of trustedIssuers"
+    );
+
     // Ensure list of trusted issuers is unique
     for (uint256 i = 0; i < defaultTrustedIssuers.length; i = i.add(1)) {
       require(
@@ -483,6 +493,13 @@ contract Escrow is
     require(
       !(minAttestations == 0 && trustedIssuers.length > 0),
       "trustedIssuers may only be set when attestations are required"
+    );
+
+    // Ensure that withdrawal will not fail due to exceeding trustedIssuer limit
+    // in FederatedAttestations.lookupAttestations
+    require(
+      trustedIssuers.length <= MAX_TRUSTED_ISSUERS_PER_PAYMENT,
+      "Too many trustedIssuers provided"
     );
 
     IAttestations attestations = getAttestations();

@@ -55,6 +55,9 @@ contract FederatedAttestations is
     )
   );
 
+  // Changing any of these constraints will require re-benchmarking
+  // and checking assumptions for batch revocation.
+  // These can only be modified by releasing a new version of this contract.
   uint256 public constant MAX_ATTESTATIONS_PER_IDENTIFIER = 20;
   uint256 public constant MAX_IDENTIFIERS_PER_ADDRESS = 20;
 
