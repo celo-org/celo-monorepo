@@ -106,6 +106,7 @@ contract Exchange is
    */
   function initialize(
     address registryAddress,
+    IBreakerBox breakerBox,
     string calldata stableTokenIdentifier,
     uint256 _spread,
     uint256 _reserveFraction,
@@ -116,6 +117,7 @@ contract Exchange is
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
+    setBreakerBox(breakerBox);
     stableTokenRegistryId = keccak256(abi.encodePacked(stableTokenIdentifier));
     setSpread(_spread);
     setReserveFraction(_reserveFraction);
