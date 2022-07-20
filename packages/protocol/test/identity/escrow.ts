@@ -590,6 +590,23 @@ contract('Escrow', (accounts: string[]) => {
         )
       })
 
+      it('should revert if transfer value exceeds balance', async () => {
+        await assertRevert(
+          escrow.transferWithTrustedIssuers(
+            aPhoneHash,
+            mockERC20Token.address,
+            aValue + 1,
+            oneDayInSecs,
+            withdrawKeyAddress,
+            2,
+            [],
+            {
+              from: sender,
+            }
+          )
+        )
+      })
+
       describe('#transfer', () => {
         // transfer and transferWithTrustedIssuers both rely on _transfer
         // and transfer is a restricted version of transferWithTrustedIssuers

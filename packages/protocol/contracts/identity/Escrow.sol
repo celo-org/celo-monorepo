@@ -3,6 +3,7 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 
 import "./interfaces/IAttestations.sol";
 import "./interfaces/IFederatedAttestations.sol";
@@ -23,6 +24,7 @@ contract Escrow is
   UsingRegistryV2BackwardsCompatible
 {
   using SafeMath for uint256;
+  using SafeERC20 for ERC20;
 
   event DefaultTrustedIssuerAdded(address indexed trustedIssuer);
   event DefaultTrustedIssuerRemoved(address indexed trustedIssuer);
@@ -283,7 +285,7 @@ contract Escrow is
 
     deletePayment(paymentId);
 
-    require(ERC20(payment.token).transfer(msg.sender, payment.value), "Transfer not successful.");
+    ERC20(payment.token).safeTransfer(msg.sender, payment.value);
 
     emit Withdrawal(
       payment.recipientIdentifier,
@@ -313,7 +315,7 @@ contract Escrow is
 
     deletePayment(paymentId);
 
-    require(ERC20(payment.token).transfer(msg.sender, payment.value), "Transfer not successful.");
+    ERC20(payment.token).safeTransfer(msg.sender, payment.value);
 
     emit Revocation(
       payment.recipientIdentifier,
@@ -509,7 +511,7 @@ contract Escrow is
       trustedIssuersPerPayment[paymentId] = trustedIssuers;
     }
 
-    require(ERC20(token).transferFrom(msg.sender, address(this), value), "Transfer unsuccessful.");
+    ERC20(token).safeTransferFrom(msg.sender, address(this), value);
     emit Transfer(msg.sender, identifier, token, value, paymentId, minAttestations);
     // Split into a second event for ABI backwards compatibility
     emit TrustedIssuersSet(paymentId, trustedIssuers);
