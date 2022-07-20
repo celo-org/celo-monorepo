@@ -34,7 +34,8 @@ contract GigaMento is Ownable, Initializable, UsingRegistry {
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param _registry The address of the registry.
-   * @param _placeholderForMigrations this is a temporary placeholder to make migrations work, please remove.
+   * @param _placeholderForMigrations this is a temporary placeholder
+    to make migrations work please remove.
    */
   function initialize(address _registry, uint256 _placeholderForMigrations) external initializer {
     _transferOwnership(msg.sender);
@@ -44,8 +45,8 @@ contract GigaMento is Ownable, Initializable, UsingRegistry {
   }
 
   /**
-     * @dev Throws if called by any account other than the owner.
-     */
+   * @dev Throws if called by any account other than the owner.
+   */
   modifier onlyMultiSig() {
     require(_multisig == _msgSender(), "Ownable::caller is not multisig");
     _;
@@ -76,5 +77,4 @@ contract GigaMento is Ownable, Initializable, UsingRegistry {
   function allowOracle(address addressOfStable, address oracleAddress) public {}
 
   function setResetCircuitBreakerAddress(address resetCircuitBreakerAddress) public {}
-
 }
