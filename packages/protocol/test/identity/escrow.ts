@@ -162,10 +162,39 @@ contract('Escrow', (accounts: string[]) => {
       )
     })
 
-    it('should allow a second trustedIssuer to be added', async () => {
-      await escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner })
-      await escrow.addDefaultTrustedIssuer(trustedIssuer2, { from: owner })
-      assert.deepEqual(await escrow.getDefaultTrustedIssuers(), [trustedIssuer1, trustedIssuer2])
+    describe('when max trusted issuers have been added', async () => {
+      let expectedTrustedIssuers: string[]
+
+      beforeEach(async () => {
+        const maxTrustedIssuers = (await escrow.MAX_TRUSTED_ISSUERS_PER_PAYMENT()).toNumber()
+        expectedTrustedIssuers = []
+        for (let i = 0; i < maxTrustedIssuers; i++) {
+          const newIssuer = await web3.eth.accounts.create().address
+          await escrow.addDefaultTrustedIssuer(newIssuer, { from: owner })
+          expectedTrustedIssuers.push(newIssuer)
+        }
+      })
+
+      it('should have set expected default trusted issuers', async () => {
+        assert.deepEqual(await escrow.getDefaultTrustedIssuers(), expectedTrustedIssuers)
+      })
+
+      it('should not allow more trusted issuers to be added', async () => {
+        await assertRevertWithReason(
+          escrow.addDefaultTrustedIssuer(trustedIssuer1, { from: owner }),
+          "defaultTrustedIssuers.length can't exceed allowed number of trustedIssuers"
+        )
+      })
+
+      it('should allow removing and adding an issuer', async () => {
+        await escrow.removeDefaultTrustedIssuer(expectedTrustedIssuers[0], 0, { from: owner })
+        await escrow.addDefaultTrustedIssuer(trustedIssuer1)
+        expectedTrustedIssuers.push(trustedIssuer1)
+        assert.deepEqual(
+          (await escrow.getDefaultTrustedIssuers()).sort(),
+          expectedTrustedIssuers.slice(1).sort()
+        )
+      })
     })
   })
 
@@ -370,6 +399,23 @@ contract('Escrow', (accounts: string[]) => {
         )
       })
 
+      it('should allow transfer when max trustedIssuers are provided', async () => {
+        const repeatedTrustedIssuers = Array.from<string>({
+          length: (await escrow.MAX_TRUSTED_ISSUERS_PER_PAYMENT()).toNumber(),
+        }).fill(trustedIssuer1)
+        await transferAndCheckState(
+          sender,
+          aPhoneHash,
+          aValue,
+          oneDayInSecs,
+          withdrawKeyAddress,
+          3,
+          repeatedTrustedIssuers,
+          [withdrawKeyAddress],
+          [withdrawKeyAddress]
+        )
+      })
+
       it('should allow transfer when no identifier is provided', async () => {
         await transferAndCheckState(
           sender,
@@ -482,6 +528,25 @@ contract('Escrow', (accounts: string[]) => {
             }
           ),
           'paymentId already used'
+        )
+      })
+
+      it('should not allow a transfer when too many trustedIssuers are provided', async () => {
+        const repeatedTrustedIssuers = Array.from<string>({
+          length: (await escrow.MAX_TRUSTED_ISSUERS_PER_PAYMENT()).toNumber() + 1,
+        }).fill(trustedIssuer1)
+        await assertRevertWithReason(
+          escrow.transferWithTrustedIssuers(
+            aPhoneHash,
+            mockERC20Token.address,
+            aValue,
+            oneDayInSecs,
+            withdrawKeyAddress,
+            3,
+            repeatedTrustedIssuers,
+            { from: sender }
+          ),
+          'Too many trustedIssuers provided'
         )
       })
 

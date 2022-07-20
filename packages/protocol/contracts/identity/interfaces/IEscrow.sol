@@ -26,6 +26,7 @@ interface IEscrow {
   function getSentPaymentIds(address sender) external view returns (address[] memory);
   function getTrustedIssuersPerPayment(address paymentId) external view returns (address[] memory);
   function getDefaultTrustedIssuers() external view returns (address[] memory);
+  function MAX_TRUSTED_ISSUERS_PER_PAYMENT() external view returns (uint256);
 
   // onlyOwner functions
   function addDefaultTrustedIssuer(address trustedIssuer) external;
