@@ -1,9 +1,9 @@
 import { SignMessageRequest } from '@celo/identity/lib/odis/query'
 import { WarningMessage } from '@celo/phone-number-privacy-common'
+import { Knex } from 'knex'
 import { computeBlindedSignature } from '../../../../bls/bls-cryptography-client'
 import { Counters } from '../../../../common/metrics'
 import { Config } from '../../../../config'
-import { getDatabase } from '../../../../database/database'
 import { getRequestExists } from '../../../../database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../../key-management/key-provider-base'
 import { Action, Session } from '../../../base/action'
@@ -13,6 +13,7 @@ import { PnpSignIO } from './io'
 
 export class PnpSignAction implements Action<SignMessageRequest> {
   constructor(
+    readonly db: Knex,
     readonly config: Config,
     readonly quota: PnpQuotaService,
     readonly keyProvider: KeyProvider,
@@ -20,9 +21,9 @@ export class PnpSignAction implements Action<SignMessageRequest> {
   ) {}
 
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
-    await getDatabase().transaction(async (trx) => {
+    await this.db.transaction(async (trx) => {
       let queryCount, totalQuota, blockNumber
-      if (await getRequestExists(session.request.body, session.logger, trx)) {
+      if (await getRequestExists(this.db, session.request.body, session.logger, trx)) {
         Counters.duplicateRequests.inc()
         session.logger.debug(
           'Request already exists in db. Will service request without charging quota.'

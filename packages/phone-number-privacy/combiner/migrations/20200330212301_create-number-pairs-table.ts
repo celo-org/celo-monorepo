@@ -1,4 +1,4 @@
-import * as Knex from 'knex'
+import { Knex } from 'knex'
 import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../src/database/models/numberPair'
 
 export async function up(knex: Knex): Promise<any> {

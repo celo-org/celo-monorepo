@@ -20,6 +20,7 @@ import {
 import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/key-management/key-provider-base'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
+import { Server } from 'http'
 import { Knex } from 'knex'
 import request from 'supertest'
 import config from '../../src/config'
@@ -119,9 +120,13 @@ describe('domainService', () => {
   let signerDB1: Knex
   let signerDB2: Knex
   let signerDB3: Knex
+  let signer1: Server | Server
+  let signer2: Server | Server
+  let signer3: Server | Server
   let app: any
 
   beforeAll(async () => {
+    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     keyProvider1 = await initKeyProvider()
     keyProvider2 = await initKeyProvider()
     keyProvider3 = await initKeyProvider()
@@ -130,21 +135,31 @@ describe('domainService', () => {
   })
 
   beforeEach(async () => {
+    console.log('*******************')
+
     signerDB1 = await initDatabase()
+    console.log(signerDB1)
     signerDB2 = await initDatabase()
     signerDB3 = await initDatabase()
-    const signer1 = startSigner(signerConfig, signerDB1, keyProvider1)
-    signer1.listen(3000)
-    const signer2 = startSigner(signerConfig, signerDB2, keyProvider2)
-    signer2.listen(3001)
-    const signer3 = startSigner(signerConfig, signerDB3, keyProvider3)
-    signer3.listen(3002)
+
+    signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3000)
+    signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3001)
+    signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3002)
   })
 
   afterEach(async () => {
-    await signerDB1.destroy()
-    await signerDB2.destroy()
-    await signerDB3.destroy()
+    // TODO: close out express app. Meaning
+
+    // console.log("&&&&&&&&&&&&&&&&&&&&&")
+    // console.log(signerDB1)
+
+    await signerDB1?.destroy()
+    await signerDB2?.destroy()
+    await signerDB3?.destroy()
+
+    signer1?.close()
+    signer2?.close()
+    signer3?.close()
   })
 
   describe(`${CombinerEndpoint.DISABLE_DOMAIN}`, () => {

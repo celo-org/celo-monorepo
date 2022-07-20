@@ -1,8 +1,6 @@
-import { CombinerEndpoint as Endpoint } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 import config from './config'
-import { handleGetContactMatches } from './match-making/get-contact-matches'
-import { meterResponse, startCombiner } from './server'
+import { startCombiner } from './server'
 
 require('dotenv').config()
 
@@ -11,12 +9,12 @@ export const combiner = functions
   .runWith(config.cloudFunction)
   .https.onRequest(startCombiner(config))
 
-export const getContactMatches = functions
-  .region('us-central1', 'europe-west3')
-  .runWith(config.cloudFunction)
-  .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    return meterResponse(handleGetContactMatches, req, res, Endpoint.MATCHMAKING)
-  })
+// export const getContactMatches = functions
+//   .region('us-central1', 'europe-west3')
+//   .runWith(config.cloudFunction)
+//   .https.onRequest(async (req: functions.Request, res: functions.Response) => {
+//     return meterResponse(handleGetContactMatches, req, res, Endpoint.MATCHMAKING)
+//   })
 
 // const pnpSignHandler = new Controller(
 //   new PnpSignAction(

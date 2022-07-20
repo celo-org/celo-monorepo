@@ -8,8 +8,8 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { EIP712Optional } from '@celo/utils/lib/sign-typed-data-utils'
+import { Knex } from 'knex'
 import { Config } from '../../../../config'
-import { getDatabase } from '../../../../database/database'
 import {
   DomainStateRecord,
   toSequentialDelayDomainState,
@@ -38,6 +38,7 @@ type TrxResult =
 
 export class DomainSignAction implements Action<DomainRestrictedSignatureRequest> {
   constructor(
+    readonly db: Knex,
     readonly config: Config,
     readonly quota: DomainQuotaService,
     readonly keyProvider: KeyProvider,
@@ -53,7 +54,7 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
     })
 
     try {
-      const res: TrxResult = await getDatabase().transaction(async (trx) => {
+      const res: TrxResult = await this.db.transaction(async (trx) => {
         // Get the current domain state record, or use an empty record if one does not exist.
         const domainStateRecord = await this.quota.getQuotaStatus(session, trx)
 

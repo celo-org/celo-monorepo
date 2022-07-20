@@ -1,6 +1,6 @@
 import { DisableDomainRequest, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { Knex } from 'knex'
 import { Config } from '../../../../config'
-import { getDatabase } from '../../../../database/database'
 import { toSequentialDelayDomainState } from '../../../../database/models/domainState'
 import {
   createEmptyDomainStateRecord,
@@ -13,7 +13,7 @@ import { DomainSession } from '../../session'
 import { DomainDisableIO } from './io'
 
 export class DomainDisableAction implements Action<DisableDomainRequest> {
-  constructor(readonly config: Config, readonly io: DomainDisableIO) {}
+  constructor(readonly config: Config, readonly io: DomainDisableIO, readonly db: Knex) {}
 
   public async perform(session: DomainSession<DisableDomainRequest>): Promise<void> {
     const domain = session.request.body.domain
@@ -25,12 +25,17 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
 
     try {
       // Inside a database transaction, update or create the domain to mark it disabled.
-      const res = await getDatabase().transaction(async (trx) => {
+      const res = await this.db.transaction(async (trx) => {
         const domainStateRecord =
-          (await getDomainStateRecord(domain, session.logger, trx)) ??
-          (await insertDomainStateRecord(createEmptyDomainStateRecord(domain), trx, session.logger))
+          (await getDomainStateRecord(this.db, domain, session.logger, trx)) ??
+          (await insertDomainStateRecord(
+            this.db,
+            createEmptyDomainStateRecord(domain),
+            trx,
+            session.logger
+          ))
         if (!domainStateRecord.disabled) {
-          await setDomainDisabled(domain, trx, session.logger)
+          await setDomainDisabled(this.db, domain, trx, session.logger)
         }
         return {
           success: true,

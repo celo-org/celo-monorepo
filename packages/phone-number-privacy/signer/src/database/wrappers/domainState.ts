@@ -3,7 +3,6 @@ import { Domain, domainHash } from '@celo/phone-number-privacy-common/lib/domain
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
-import { getDatabase } from '../database'
 import {
   DomainStateRecord,
   DOMAIN_STATE_COLUMNS,
@@ -11,11 +10,12 @@ import {
   toDomainStateRecord,
 } from '../models/domainState'
 
-function domainStates() {
-  return getDatabase()<DomainStateRecord>(DOMAIN_STATE_TABLE)
+function domainStates(db: Knex) {
+  return db<DomainStateRecord>(DOMAIN_STATE_TABLE)
 }
 
 export async function setDomainDisabled<D extends Domain>(
+  db: Knex,
   domain: D,
   trx: Knex.Transaction<DomainStateRecord>,
   logger: Logger
@@ -24,7 +24,7 @@ export async function setDomainDisabled<D extends Domain>(
   const hash = domainHash(domain).toString('hex')
   logger.debug({ hash, domain }, 'Disabling domain')
   try {
-    await domainStates()
+    await domainStates(db)
       .transacting(trx)
       .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
       .update(DOMAIN_STATE_COLUMNS.disabled, true)
@@ -39,11 +39,14 @@ export async function setDomainDisabled<D extends Domain>(
 }
 
 export async function getDomainStateRecordOrEmpty(
+  db: Knex,
   domain: Domain,
   logger: Logger,
   trx?: Knex.Transaction
 ): Promise<DomainStateRecord> {
-  return (await getDomainStateRecord(domain, logger, trx)) ?? createEmptyDomainStateRecord(domain)
+  return (
+    (await getDomainStateRecord(db, domain, logger, trx)) ?? createEmptyDomainStateRecord(domain)
+  )
 }
 
 export function createEmptyDomainStateRecord(domain: Domain) {
@@ -56,6 +59,7 @@ export function createEmptyDomainStateRecord(domain: Domain) {
 }
 
 export async function getDomainStateRecord<D extends Domain>(
+  db: Knex,
   domain: D,
   logger: Logger,
   trx?: Knex.Transaction<DomainStateRecord>
@@ -65,13 +69,13 @@ export async function getDomainStateRecord<D extends Domain>(
   logger.debug({ hash, domain }, 'Getting domain state from db')
   try {
     const result = trx
-      ? await domainStates()
+      ? await domainStates(db)
           .transacting(trx)
           .forUpdate()
           .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
           .first()
           .timeout(DB_TIMEOUT)
-      : await domainStates()
+      : await domainStates(db)
           .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
           .first()
           .timeout(DB_TIMEOUT)
@@ -86,6 +90,7 @@ export async function getDomainStateRecord<D extends Domain>(
 }
 
 export async function updateDomainStateRecord<D extends Domain>(
+  db: Knex,
   domain: D,
   domainState: DomainStateRecord,
   trx: Knex.Transaction<DomainStateRecord>,
@@ -98,13 +103,13 @@ export async function updateDomainStateRecord<D extends Domain>(
     // Check whether the domain is already in the database.
     // TODO(victor): Usage of this in the signature flow results in redudant queries of the current
     // state. It would be good to refactor this to avoid making more than one SELECT.
-    const result = await getDomainStateRecord(domain, logger, trx)
+    const result = await getDomainStateRecord(db, domain, logger, trx)
 
     // Insert or update the domain state record.
     if (!result) {
-      await insertDomainStateRecord(domainState, trx, logger)
+      await insertDomainStateRecord(db, domainState, trx, logger)
     } else {
-      await domainStates()
+      await domainStates(db)
         .transacting(trx)
         .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
         .update(domainState)
@@ -120,6 +125,7 @@ export async function updateDomainStateRecord<D extends Domain>(
 }
 
 export async function insertDomainStateRecord(
+  db: Knex,
   domainState: DomainStateRecord,
   trx: Knex.Transaction<DomainStateRecord>,
   logger: Logger
@@ -129,7 +135,7 @@ export async function insertDomainStateRecord(
     .startTimer()
   logger.debug({ domainState }, 'Insert domain state')
   try {
-    await domainStates().transacting(trx).insert(domainState).timeout(DB_TIMEOUT)
+    await domainStates(db).transacting(trx).insert(domainState).timeout(DB_TIMEOUT)
     return domainState
   } catch (error) {
     Counters.databaseErrors.labels(Labels.insert).inc()

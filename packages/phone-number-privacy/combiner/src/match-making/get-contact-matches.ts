@@ -15,6 +15,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
+import { Knex } from 'knex'
 import config, {
   E2E_TEST_ACCOUNTS,
   E2E_TEST_PHONE_NUMBERS,
@@ -51,7 +52,7 @@ function sendFailureResponse(response: Response, error: ErrorType, status: numbe
   )
 }
 
-export async function handleGetContactMatches(request: Request, response: Response) {
+export async function handleGetContactMatches(db: Knex, request: Request, response: Response) {
   const logger: Logger = response.locals.logger
   try {
     if (!isValidGetContactMatchesInput(request.body)) {
@@ -143,6 +144,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
     }
 
     const invalidReplay = await isInvalidReplay(
+      db,
       account,
       userPhoneNumber,
       logger,
@@ -159,6 +161,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
     }
 
     await finishMatchmaking(
+      db,
       account,
       userPhoneNumber,
       contactPhoneNumbers,
@@ -174,6 +177,7 @@ export async function handleGetContactMatches(request: Request, response: Respon
 }
 
 async function finishMatchmaking(
+  db: Knex,
   account: string,
   userPhoneNumber: string,
   contactPhoneNumbers: string[],
@@ -182,7 +186,7 @@ async function finishMatchmaking(
   verifiedPhoneNumberDekSig?: VerifiedPhoneNumberDekSignature
 ) {
   const matchedContacts: ContactMatch[] = (
-    await getNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
+    await getNumberPairContacts(db, userPhoneNumber, contactPhoneNumbers, logger)
   ).map((numberPair) => ({ phoneNumber: numberPair }))
   logger.info(
     {
@@ -190,25 +194,26 @@ async function finishMatchmaking(
     },
     'measured percentage of contacts covered by matchmaking'
   )
-  await setNumberPairContacts(userPhoneNumber, contactPhoneNumbers, logger)
-  await setDidMatchmaking(account, logger, verifiedPhoneNumberDekSig)
+  await setNumberPairContacts(db, userPhoneNumber, contactPhoneNumbers, logger)
+  await setDidMatchmaking(db, account, logger, verifiedPhoneNumberDekSig)
   response.json({ success: true, matchedContacts, version: VERSION })
 }
 
-async function isReplay(account: string, logger: Logger): Promise<boolean> {
-  return getDidMatchmaking(account, logger).catch((err) => {
+async function isReplay(db: Knex, account: string, logger: Logger): Promise<boolean> {
+  return getDidMatchmaking(db, account, logger).catch((err) => {
     logger.warn('Failed to determine if user has performed matchmaking.')
     throw err
   })
 }
 
 async function isInvalidReplay(
+  db: Knex,
   account: string,
   userPhoneNumber: string,
   logger: Logger,
   signedUserPhoneNumber?: string
 ) {
-  if (!(await isReplay(account, logger))) {
+  if (!(await isReplay(db, account, logger))) {
     return false
   }
   if (!signedUserPhoneNumber) {
@@ -221,6 +226,7 @@ async function isInvalidReplay(
     return true
   }
   const signedUserPhoneNumberRecord = await getAccountSignedUserPhoneNumberRecord(
+    db,
     account,
     logger
   ).catch((err) => {
@@ -238,7 +244,7 @@ async function isInvalidReplay(
     return false
   }
   if (signedUserPhoneNumberRecord !== signedUserPhoneNumber) {
-    if (await userHasNewDek(account, userPhoneNumber, signedUserPhoneNumberRecord, logger)) {
+    if (await userHasNewDek(db, account, userPhoneNumber, signedUserPhoneNumberRecord, logger)) {
       logger.info({ account }, 'Allowing account to requery matches after key rotation.')
       return false
     }
@@ -256,12 +262,13 @@ async function isInvalidReplay(
 }
 
 async function userHasNewDek(
+  db: Knex,
   account: string,
   userPhoneNumber: string,
   signedUserPhoneNumberRecord: string,
   logger: Logger
 ): Promise<boolean> {
-  const dekSignerRecord = await getDekSignerRecord(account, logger)
+  const dekSignerRecord = await getDekSignerRecord(db, account, logger)
   const isKeyRotation =
     !!dekSignerRecord &&
     verifyDEKSignature(userPhoneNumber, signedUserPhoneNumberRecord, dekSignerRecord, logger, {

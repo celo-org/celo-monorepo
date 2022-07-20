@@ -86,6 +86,7 @@ export function startSigner(config: Config, db: Knex, keyProvider: KeyProvider) 
   )
   const pnpSign = new Controller(
     new PnpSignAction(
+      db,
       config,
       pnpQuotaService,
       keyProvider,
@@ -97,6 +98,7 @@ export function startSigner(config: Config, db: Knex, keyProvider: KeyProvider) 
   )
   const domainSign = new Controller(
     new DomainSignAction(
+      db,
       config,
       domainQuotaService,
       keyProvider,
@@ -104,7 +106,7 @@ export function startSigner(config: Config, db: Knex, keyProvider: KeyProvider) 
     )
   )
   const domainDisable = new Controller(
-    new DomainDisableAction(config, new DomainDisableIO(config.api.domains.enabled))
+    new DomainDisableAction(config, new DomainDisableIO(config.api.domains.enabled), db) // TODO: param ordering
   )
 
   addMeteredSignerEndpoint(SignerEndpoint.PARTIAL_SIGN_MESSAGE, pnpSign.handle.bind(pnpSign))

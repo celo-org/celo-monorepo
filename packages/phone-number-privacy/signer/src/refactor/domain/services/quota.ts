@@ -44,7 +44,7 @@ export class DomainQuotaService implements QuotaService<QuotaDependentDomainRequ
         const newState = toDomainStateRecord(domain, result.state)
         // Persist the updated domain quota to the database.
         // This will trigger an insert if its the first update to the domain instance.
-        await updateDomainStateRecord(domain, newState, trx, session.logger)
+        await updateDomainStateRecord(this.db, domain, newState, trx, session.logger)
         return { sufficient: true, state: newState }
       }
       // If the result was rejected, the domainStateRecord does not change
@@ -58,6 +58,6 @@ export class DomainQuotaService implements QuotaService<QuotaDependentDomainRequ
     session: DomainSession<QuotaDependentDomainRequest>,
     trx?: Knex.Transaction<DomainStateRecord>
   ): Promise<DomainStateRecord> {
-    return getDomainStateRecordOrEmpty(session.request.body.domain, session.logger, trx)
+    return getDomainStateRecordOrEmpty(this.db, session.request.body.domain, session.logger, trx)
   }
 }

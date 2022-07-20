@@ -2,14 +2,14 @@ import { DB_TIMEOUT, ErrorMessage, SignMessageRequest } from '@celo/phone-number
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../common/metrics'
-import { getDatabase } from '../database'
 import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
 
-function requests() {
-  return getDatabase()<Request>(REQUESTS_TABLE)
+function requests(db: Knex) {
+  return db<Request>(REQUESTS_TABLE)
 }
 
 export async function getRequestExists(
+  db: Knex,
   request: SignMessageRequest,
   logger: Logger,
   trx: Knex.Transaction
@@ -19,7 +19,7 @@ export async function getRequestExists(
     .labels('getRequestExists')
     .startTimer()
   try {
-    const existingRequest = await requests()
+    const existingRequest = await requests(db)
       .transacting(trx)
       .where({
         [REQUESTS_COLUMNS.address]: request.account,
@@ -39,6 +39,7 @@ export async function getRequestExists(
 }
 
 export async function storeRequest(
+  db: Knex,
   request: SignMessageRequest,
   logger: Logger,
   trx: Knex.Transaction
@@ -46,7 +47,7 @@ export async function storeRequest(
   const storeRequestMeter = Histograms.dbOpsInstrumentation.labels('storeRequest').startTimer()
   logger.debug({ request }, 'Storing salt request')
   try {
-    await requests().transacting(trx).insert(new Request(request)).timeout(DB_TIMEOUT)
+    await requests(db).transacting(trx).insert(new Request(request)).timeout(DB_TIMEOUT)
     return true
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()

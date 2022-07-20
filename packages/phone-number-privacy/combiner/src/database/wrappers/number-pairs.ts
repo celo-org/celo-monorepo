@@ -1,22 +1,23 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { getDatabase } from '../database'
-import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/numberPair'
+import { Knex } from 'knex'
+import { NumberPair, NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/numberPair'
 
-function numberPairs() {
-  return getDatabase()<NumberPair>(NUMBER_PAIRS_TABLE)
+function numberPairs(db: Knex) {
+  return db<NumberPair>(NUMBER_PAIRS_TABLE)
 }
 
 /*
  * Returns contacts who have already matched with the user (a contact-->user mapping exists).
  */
 export async function getNumberPairContacts(
+  db: Knex,
   userPhone: string,
   contactPhones: string[],
   logger: Logger
 ): Promise<string[]> {
   try {
-    const contentPairs = await numberPairs()
+    const contentPairs = await numberPairs(db)
       .select(NUMBER_PAIRS_COLUMN.userPhoneHash)
       .where(NUMBER_PAIRS_COLUMN.contactPhoneHash, userPhone)
       .timeout(DB_TIMEOUT)
@@ -35,6 +36,7 @@ export async function getNumberPairContacts(
  * Add record for user-->contact mapping,
  */
 export async function setNumberPairContacts(
+  db: Knex,
   userPhone: string,
   contactPhones: string[],
   logger: Logger
@@ -45,7 +47,7 @@ export async function setNumberPairContacts(
     rows.push(data)
   }
   try {
-    await getDatabase().batchInsert(NUMBER_PAIRS_TABLE, rows)
+    await db.batchInsert(NUMBER_PAIRS_TABLE, rows)
   } catch (err: any) {
     // ignore duplicate insertion error (23505)
     if (err.code !== '23505') {

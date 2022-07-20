@@ -1,19 +1,21 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
+import { Knex } from 'knex'
 import { VerifiedPhoneNumberDekSignature } from '../../match-making/get-contact-matches'
-import { getDatabase, getTransaction } from '../database'
+import { getTransaction } from '../database'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
 
-function accounts() {
-  return getDatabase()<Account>(ACCOUNTS_TABLE)
+function accounts(db: Knex) {
+  return db<Account>(ACCOUNTS_TABLE)
 }
 
 export async function getAccountSignedUserPhoneNumberRecord(
+  db: Knex,
   account: string,
   logger: Logger
 ): Promise<string | undefined> {
   try {
-    const signedUserPhoneNumberRecord = await accounts()
+    const signedUserPhoneNumberRecord = await accounts(db)
       .where(ACCOUNTS_COLUMNS.address, account)
       .select(ACCOUNTS_COLUMNS.signedUserPhoneNumber)
       .first()
@@ -29,11 +31,12 @@ export async function getAccountSignedUserPhoneNumberRecord(
 }
 
 export async function getDekSignerRecord(
+  db: Knex,
   account: string,
   logger: Logger
 ): Promise<string | undefined> {
   try {
-    const dekSignerRecord = await accounts()
+    const dekSignerRecord = await accounts(db)
       .where(ACCOUNTS_COLUMNS.address, account)
       .select(ACCOUNTS_COLUMNS.dekSigner)
       .first()
@@ -49,9 +52,13 @@ export async function getDekSignerRecord(
 /*
  * Returns whether account has already performed matchmaking
  */
-export async function getDidMatchmaking(account: string, logger: Logger): Promise<boolean> {
+export async function getDidMatchmaking(
+  db: Knex,
+  account: string,
+  logger: Logger
+): Promise<boolean> {
   try {
-    const didMatchmaking = await accounts()
+    const didMatchmaking = await accounts(db)
       .where(ACCOUNTS_COLUMNS.address, account)
       .select(ACCOUNTS_COLUMNS.didMatchmaking)
       .first()
@@ -68,14 +75,15 @@ export async function getDidMatchmaking(account: string, logger: Logger): Promis
  * Set did matchmaking to true in database.  If record doesn't exist, create one.
  */
 export async function setDidMatchmaking(
+  db: Knex,
   account: string,
   logger: Logger,
   verifiedPhoneNumberDekSig?: VerifiedPhoneNumberDekSignature
 ) {
   logger.debug({ account }, 'Setting did matchmaking')
-  const trx = await getTransaction()
+  const trx = await getTransaction(db)
   const accountTrxBase = () =>
-    accounts().transacting(trx).timeout(DB_TIMEOUT).where(ACCOUNTS_COLUMNS.address, account)
+    accounts(db).transacting(trx).timeout(DB_TIMEOUT).where(ACCOUNTS_COLUMNS.address, account)
   return accountTrxBase()
     .then(async (res) => {
       if (res.length) {
@@ -98,7 +106,7 @@ export async function setDidMatchmaking(
       } else {
         const newAccount = new Account(account, verifiedPhoneNumberDekSig)
         newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
-        await accounts().transacting(trx).timeout(DB_TIMEOUT).insert(newAccount)
+        await accounts(db).transacting(trx).timeout(DB_TIMEOUT).insert(newAccount)
       }
       trx.commit()
     })

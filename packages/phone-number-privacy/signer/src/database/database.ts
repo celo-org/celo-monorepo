@@ -3,9 +3,7 @@ import { Knex, knex } from 'knex'
 import { config, DEV_MODE, SupportedDatabase } from '../config'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
-let db: Knex | undefined
-
-export async function initDatabase(doTestQuery = true) {
+export async function initDatabase(doTestQuery = true): Promise<Knex> {
   const logger = rootLogger()
   logger.info({ config: config.db }, 'Initializing database connection')
   const { type, host, port, user, password, database, ssl, poolMaxSize } = config.db
@@ -55,7 +53,7 @@ export async function initDatabase(doTestQuery = true) {
     throw new Error(`Unsupported database type: ${type}`)
   }
 
-  db = knex({
+  const db = knex({
     client,
     useNullAsDefault: type === SupportedDatabase.Sqlite,
     connection,
@@ -65,8 +63,8 @@ export async function initDatabase(doTestQuery = true) {
   logger.info('Running Migrations')
 
   await db.migrate.latest({
-    directory: './dist/migrations',
-    loadExtensions: ['.js'],
+    directory: './migrations', // TODO(Alec)
+    loadExtensions: ['.ts'],
   })
 
   if (doTestQuery) {
@@ -77,19 +75,10 @@ export async function initDatabase(doTestQuery = true) {
   return db
 }
 
-// // Closes the connections to the database.
-// // If the database is sqlite in-memory database, the database will be destroyed.
-// export async function closeDatabase() {
-//   // NOTE: If this operation is stuck (e.g. if you tests are failing because this operation causes
-//   // them to time out) it is likely because a connection is being held open e.g. by a transaction.
-//   await db?.destroy()
-//   db = undefined
-// }
-
-async function executeTestQuery(_db: Knex) {
+async function executeTestQuery(db: Knex) {
   const logger = rootLogger()
   logger.info('Counting accounts')
-  const result = await _db(ACCOUNTS_TABLE).count(ACCOUNTS_COLUMNS.address).first()
+  const result = await db(ACCOUNTS_TABLE).count(ACCOUNTS_COLUMNS.address).first()
 
   if (!result) {
     throw new Error('No result from count, have migrations been run?')
@@ -101,12 +90,4 @@ async function executeTestQuery(_db: Knex) {
   }
 
   logger.info(`Found ${count} accounts`)
-}
-
-export function getDatabase() {
-  if (!db) {
-    throw new Error('Database not yet initialized')
-  }
-
-  return db
 }

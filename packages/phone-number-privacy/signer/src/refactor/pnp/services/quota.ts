@@ -67,7 +67,7 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
           // TODO(Alec)(pnp)
           // Note: The database read of the user's queryCount
           // included here resolves to 0 on error
-          getPerformedQueryCount(account, session.logger, trx),
+          getPerformedQueryCount(this.db, account, session.logger, trx),
           this.getTotalQuota(_session),
           getBlockNumber(this.kit),
         ]),
@@ -114,8 +114,8 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
   ) {
     // TODO(Alec)(pnp): Review db error handling
     const [requestStored, queryCountIncremented] = await Promise.all([
-      storeRequest(session.request.body, session.logger, trx),
-      incrementQueryCount(session.request.body.account, session.logger, trx),
+      storeRequest(this.db, session.request.body, session.logger, trx),
+      incrementQueryCount(this.db, session.request.body.account, session.logger, trx),
     ])
     if (!requestStored) {
       session.logger.debug('Did not store request.')
