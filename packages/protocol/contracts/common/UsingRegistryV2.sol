@@ -23,42 +23,48 @@ import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
 contract UsingRegistryV2 {
-  address constant registryAddress = 0x000000000000000000000000000000000000ce10;
+  address internal constant registryAddress = 0x000000000000000000000000000000000000ce10;
   IRegistry public constant registryContract = IRegistry(registryAddress);
 
-  // solhint-disable state-visibility
-  bytes32 constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
-  bytes32 constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
-  bytes32 constant DOWNTIME_SLASHER_REGISTRY_ID = keccak256(abi.encodePacked("DowntimeSlasher"));
-  bytes32 constant DOUBLE_SIGNING_SLASHER_REGISTRY_ID = keccak256(
+  bytes32 internal constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
+  bytes32 internal constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
+  bytes32 internal constant DOWNTIME_SLASHER_REGISTRY_ID = keccak256(
+    abi.encodePacked("DowntimeSlasher")
+  );
+  bytes32 internal constant DOUBLE_SIGNING_SLASHER_REGISTRY_ID = keccak256(
     abi.encodePacked("DoubleSigningSlasher")
   );
-  bytes32 constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
-  bytes32 constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
-  bytes32 constant EXCHANGE_EURO_REGISTRY_ID = keccak256(abi.encodePacked("ExchangeEUR"));
-  bytes32 constant EXCHANGE_REAL_REGISTRY_ID = keccak256(abi.encodePacked("ExchangeBRL"));
+  bytes32 internal constant ELECTION_REGISTRY_ID = keccak256(abi.encodePacked("Election"));
+  bytes32 internal constant EXCHANGE_REGISTRY_ID = keccak256(abi.encodePacked("Exchange"));
+  bytes32 internal constant EXCHANGE_EURO_REGISTRY_ID = keccak256(abi.encodePacked("ExchangeEUR"));
+  bytes32 internal constant EXCHANGE_REAL_REGISTRY_ID = keccak256(abi.encodePacked("ExchangeBRL"));
 
-  bytes32 constant FEE_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
+  bytes32 internal constant FEE_CURRENCY_WHITELIST_REGISTRY_ID = keccak256(
     abi.encodePacked("FeeCurrencyWhitelist")
   );
-  bytes32 constant FEDERATED_ATTESTATIONS_REGISTRY_ID = keccak256(
+  bytes32 internal constant FEDERATED_ATTESTATIONS_REGISTRY_ID = keccak256(
     abi.encodePacked("FederatedAttestations")
   );
-  bytes32 constant FREEZER_REGISTRY_ID = keccak256(abi.encodePacked("Freezer"));
-  bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
-  bytes32 constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
-  bytes32 constant GOVERNANCE_SLASHER_REGISTRY_ID = keccak256(
+  bytes32 internal constant FREEZER_REGISTRY_ID = keccak256(abi.encodePacked("Freezer"));
+  bytes32 internal constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
+  bytes32 internal constant GOVERNANCE_REGISTRY_ID = keccak256(abi.encodePacked("Governance"));
+  bytes32 internal constant GOVERNANCE_SLASHER_REGISTRY_ID = keccak256(
     abi.encodePacked("GovernanceSlasher")
   );
-  bytes32 constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
-  bytes32 constant RESERVE_REGISTRY_ID = keccak256(abi.encodePacked("Reserve"));
-  bytes32 constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
-  bytes32 constant SORTED_ORACLES_REGISTRY_ID = keccak256(abi.encodePacked("SortedOracles"));
-  bytes32 constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
-  bytes32 constant STABLE_EURO_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableTokenEUR"));
-  bytes32 constant STABLE_REAL_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableTokenBRL"));
-  bytes32 constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
-  // solhint-enable state-visibility
+  bytes32 internal constant LOCKED_GOLD_REGISTRY_ID = keccak256(abi.encodePacked("LockedGold"));
+  bytes32 internal constant RESERVE_REGISTRY_ID = keccak256(abi.encodePacked("Reserve"));
+  bytes32 internal constant RANDOM_REGISTRY_ID = keccak256(abi.encodePacked("Random"));
+  bytes32 internal constant SORTED_ORACLES_REGISTRY_ID = keccak256(
+    abi.encodePacked("SortedOracles")
+  );
+  bytes32 internal constant STABLE_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("StableToken"));
+  bytes32 internal constant STABLE_EURO_TOKEN_REGISTRY_ID = keccak256(
+    abi.encodePacked("StableTokenEUR")
+  );
+  bytes32 internal constant STABLE_REAL_TOKEN_REGISTRY_ID = keccak256(
+    abi.encodePacked("StableTokenBRL")
+  );
+  bytes32 internal constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(
