@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: prometheus-server
   labels:
-{{ include "prometheus-stackdriver.labels" .  | indent 4 }}
+{{ include "prometheus.labels" .  | indent 4 }}
 spec:
   ports:
   - name: web

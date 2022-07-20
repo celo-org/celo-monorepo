@@ -17,7 +17,7 @@ kind: ConfigMap
 metadata:
   name: prometheus-server-conf
   labels:
-{{ include "prometheus-stackdriver.labels" .  | indent 4 }}
+{{ include "prometheus.labels" .  | indent 4 }}
 data:
   prometheus.yml: |-
     global:

@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: prometheus
   labels:
-{{ include "prometheus-stackdriver.labels" .  | indent 4 }}
+{{ include "prometheus.labels" .  | indent 4 }}
 spec:
   replicas: 1
   strategy:
@@ -32,7 +32,7 @@ spec:
         prometheus.io/path:  "/metrics"
         prometheus.io/port: "9090"
       labels:
-{{ include "prometheus-stackdriver.labels" .  | indent 8 }}
+{{ include "prometheus.labels" .  | indent 8 }}
         app: prometheus-server
     spec:
       securityContext:
