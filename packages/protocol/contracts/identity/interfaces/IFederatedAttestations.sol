@@ -1,12 +1,8 @@
 pragma solidity ^0.5.13;
 
 interface IFederatedAttestations {
-  function registerAttestationAsIssuer(
-    bytes32 identifier,
-    address issuer,
-    address account,
-    uint64 issuedOn
-  ) external;
+  function registerAttestationAsIssuer(bytes32 identifier, address account, uint64 issuedOn)
+    external;
   function registerAttestation(
     bytes32 identifier,
     address issuer,
@@ -39,7 +35,6 @@ interface IFederatedAttestations {
     external
     view
     returns (uint256[] memory, bytes32[] memory);
-
   function validateAttestationSig(
     bytes32 identifier,
     address issuer,
