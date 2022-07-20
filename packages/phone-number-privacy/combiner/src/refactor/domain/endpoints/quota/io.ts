@@ -1,18 +1,24 @@
 import {
   CombinerEndpoint,
   DomainQuotaStatusRequest,
+  domainQuotaStatusRequestSchema,
+  DomainQuotaStatusResponse,
   DomainQuotaStatusResponseFailure,
+  domainQuotaStatusResponseSchema,
   DomainQuotaStatusResponseSuccess,
+  DomainSchema,
   DomainState,
   ErrorType,
   getSignerEndpoint,
   OdisResponse,
   send,
+  SequentialDelayDomainStateSchema,
   SignerEndpoint,
   verifyDomainQuotaStatusRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
+import * as t from 'io-ts'
 import { VERSION } from '../../../../config'
 import { IO } from '../../../base/io'
 import { Session } from '../../../session'
@@ -20,6 +26,16 @@ import { Session } from '../../../session'
 export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
+  readonly requestSchema: t.Type<
+    DomainQuotaStatusRequest,
+    DomainQuotaStatusRequest,
+    unknown
+  > = domainQuotaStatusRequestSchema(DomainSchema)
+  readonly responseSchema: t.Type<
+    DomainQuotaStatusResponse,
+    DomainQuotaStatusResponse,
+    unknown
+  > = domainQuotaStatusResponseSchema(SequentialDelayDomainStateSchema)
 
   async init(
     request: Request<{}, {}, unknown>,

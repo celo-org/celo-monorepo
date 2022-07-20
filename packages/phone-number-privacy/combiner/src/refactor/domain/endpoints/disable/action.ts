@@ -34,7 +34,7 @@ export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
   ): Promise<DisableDomainResponse> {
     const res = await super.receiveSuccess(signerResponse, url, session)
     if (this.checkThresholdDisabled(session)) {
-      session.controller.abort()
+      session.abort.abort()
     }
     return res
   }

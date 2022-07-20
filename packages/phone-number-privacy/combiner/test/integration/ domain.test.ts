@@ -1,6 +1,16 @@
-import { SignerEndpoint } from '@celo/phone-number-privacy-common'
 import {
-  config,
+  CombinerEndpoint,
+  DisableDomainRequest,
+  disableDomainRequestEIP712,
+  DisableDomainResponse,
+  DomainIdentifiers,
+  DomainRequestTypeTag,
+  genSessionID,
+  SequentialDelayDomain,
+  SequentialDelayStage,
+} from '@celo/phone-number-privacy-common'
+import {
+  config as signerConfig,
   initDatabase,
   initKeyProvider,
   startSigner,
@@ -8,8 +18,14 @@ import {
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
 import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/key-management/key-provider-base'
+import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import { Knex } from 'knex'
+import request from 'supertest'
+import config from '../../src/config'
+import { startCombiner } from '../../src/server'
+
+const combinerConfig = config
 
 // DO NOT MERGE: Add checking of values beyond the return code.
 
@@ -17,25 +33,25 @@ describe('domainService', () => {
   // Configurations are currently handled through a global object. As a result, we need to set the
   // right parameters here before the tests start.
   // We will be using a Sqlite in-memory database for tests.
-  config.db.type = SupportedDatabase.Sqlite
-  config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
-  config.api.domains.enabled = true
+  signerConfig.db.type = SupportedDatabase.Sqlite
+  signerConfig.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
+  signerConfig.api.domains.enabled = true
 
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
-  // const walletAddress = wallet.getAccounts()[0]! // TODO(Alec): do we need this?
+  const walletAddress = wallet.getAccounts()[0]! // TODO(Alec): do we need this?
 
-  // const domainStages = (): SequentialDelayStage[] => [
-  //   { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) },
-  // ]
+  const domainStages = (): SequentialDelayStage[] => [
+    { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) },
+  ]
 
-  // const authenticatedDomain = (_stages?: SequentialDelayStage[]): SequentialDelayDomain => ({
-  //   name: DomainIdentifiers.SequentialDelay,
-  //   version: '1',
-  //   stages: _stages ?? domainStages(),
-  //   address: defined(walletAddress),
-  //   salt: defined('himalayanPink'),
-  // })
+  const authenticatedDomain = (_stages?: SequentialDelayStage[]): SequentialDelayDomain => ({
+    name: DomainIdentifiers.SequentialDelay,
+    version: '1',
+    stages: _stages ?? domainStages(),
+    address: defined(walletAddress),
+    salt: defined('himalayanPink'),
+  })
 
   // const signatureRequest = async (
   //   _domain?: SequentialDelayDomain,
@@ -80,22 +96,22 @@ describe('domainService', () => {
   //   return req
   // }
 
-  // // Build and sign an example disable domain request.
-  // const disableRequest = async (): Promise<DisableDomainRequest<SequentialDelayDomain>> => {
-  //   const req: DisableDomainRequest<SequentialDelayDomain> = {
-  //     type: DomainRequestTypeTag.DISABLE,
-  //     domain: authenticatedDomain(),
-  //     options: {
-  //       signature: noString,
-  //       nonce: noNumber,
-  //     },
-  //     sessionID: defined(genSessionID()),
-  //   }
-  //   req.options.signature = defined(
-  //     await wallet.signTypedData(walletAddress, disableDomainRequestEIP712(req))
-  //   )
-  //   return req
-  // }
+  // Build and sign an example disable domain request.
+  const disableRequest = async (): Promise<DisableDomainRequest<SequentialDelayDomain>> => {
+    const req: DisableDomainRequest<SequentialDelayDomain> = {
+      type: DomainRequestTypeTag.DISABLE,
+      domain: authenticatedDomain(),
+      options: {
+        signature: noString,
+        nonce: noNumber,
+      },
+      sessionID: defined(genSessionID()),
+    }
+    req.options.signature = defined(
+      await wallet.signTypedData(walletAddress, disableDomainRequestEIP712(req))
+    )
+    return req
+  }
 
   let keyProvider1: KeyProvider
   let keyProvider2: KeyProvider
@@ -103,29 +119,25 @@ describe('domainService', () => {
   let signerDB1: Knex
   let signerDB2: Knex
   let signerDB3: Knex
+  let app: any
 
   beforeAll(async () => {
-    // Configurations are currently handled through a global object. As a result, we need to set the
-    // right parameters here before the tests start.
-    // We will be using a Sqlite in-memory database for tests.
-    config.db.type = SupportedDatabase.Sqlite
-    config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
-    config.api.domains.enabled = true
-
     keyProvider1 = await initKeyProvider()
     keyProvider2 = await initKeyProvider()
     keyProvider3 = await initKeyProvider()
+
+    app = startCombiner(combinerConfig)
   })
 
   beforeEach(async () => {
     signerDB1 = await initDatabase()
     signerDB2 = await initDatabase()
     signerDB3 = await initDatabase()
-    const signer1 = startSigner(config, signerDB1, keyProvider1)
+    const signer1 = startSigner(signerConfig, signerDB1, keyProvider1)
     signer1.listen(3000)
-    const signer2 = startSigner(config, signerDB2, keyProvider2)
+    const signer2 = startSigner(signerConfig, signerDB2, keyProvider2)
     signer2.listen(3001)
-    const signer3 = startSigner(config, signerDB3, keyProvider3)
+    const signer3 = startSigner(signerConfig, signerDB3, keyProvider3)
     signer3.listen(3002)
   })
 
@@ -135,9 +147,20 @@ describe('domainService', () => {
     await signerDB3.destroy()
   })
 
-  describe(`${SignerEndpoint.DISABLE_DOMAIN}`, () => {
+  describe(`${CombinerEndpoint.DISABLE_DOMAIN}`, () => {
     it('Should pass', async () => {
       expect(true)
+    })
+
+    it('Should respond with 200 on repeated valid requests', async () => {
+      const res1 = await request(app)
+        .post(CombinerEndpoint.DISABLE_DOMAIN)
+        .send(await disableRequest())
+      expect(res1.status).toBe(200)
+      expect(res1.body).toMatchObject<DisableDomainResponse>({
+        success: true,
+        version: res1.body.version,
+      })
     })
 
     //     xit('Should respond with 200 on repeated valid requests', async () => {

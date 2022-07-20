@@ -22,11 +22,13 @@ async function start() {
     .setTimeout(backupTimeout)
 }
 
-start().catch((err) => {
-  const logger = rootLogger()
-  logger.error({ err }, 'Fatal error occured. Exiting')
-  process.exit(1)
-})
+if (!DEV_MODE) {
+  start().catch((err) => {
+    const logger = rootLogger()
+    logger.error({ err }, 'Fatal error occured. Exiting')
+    process.exit(1)
+  })
+}
 
 export { config, SupportedDatabase, SupportedKeystore } from './config'
 export { initDatabase } from './database/database'

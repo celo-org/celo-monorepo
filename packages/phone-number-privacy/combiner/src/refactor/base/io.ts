@@ -28,12 +28,10 @@ export type SignerResponse<R extends OdisRequest> = {
 export abstract class IO<R extends OdisRequest> {
   abstract readonly endpoint: CombinerEndpoint
   abstract readonly signerEndpoint: SignerEndpoint
+  abstract readonly requestSchema: t.Type<R, R, unknown>
+  abstract readonly responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>
 
-  constructor(
-    readonly config: OdisConfig,
-    readonly requestSchema: t.Type<R, R, unknown>,
-    readonly responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>
-  ) {}
+  constructor(readonly config: OdisConfig) {}
 
   abstract init(
     request: Request<{}, {}, unknown>,
@@ -123,7 +121,7 @@ export abstract class IO<R extends OdisRequest> {
     signerUrl: string,
     session: Session<R>
   ): Promise<FetchResponse> {
-    const { request, logger, controller } = session
+    const { request, logger, abort } = session
     const url = signerUrl + this.signerEndpoint
     logger.debug({ url }, `Sending signer request`)
     // prettier-ignore
@@ -141,7 +139,7 @@ export abstract class IO<R extends OdisRequest> {
         (this.getRequestKeyVersion(request, logger) ?? this.config.keys.version).toString(),
       },
       body: JSON.stringify(request.body),
-      signal: controller.signal,
+      signal: abort.signal,
     })
   }
 

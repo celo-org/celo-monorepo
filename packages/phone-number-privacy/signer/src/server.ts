@@ -22,6 +22,7 @@ import { PnpQuotaIO } from './refactor/pnp/endpoints/quota/io'
 import { PnpSignAction } from './refactor/pnp/endpoints/sign/action'
 import { PnpSignIO } from './refactor/pnp/endpoints/sign/io'
 import { PnpQuotaService } from './refactor/pnp/services/quota'
+import { getContractKit } from './web3/contracts'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -71,14 +72,16 @@ export function startSigner(config: Config, db: Knex, keyProvider: KeyProvider) 
       .finally(end)
   }
 
-  const pnpQuotaService = new PnpQuotaService(db) // TODO(Alec): change accesses over to use this
+  const kit = getContractKit(config)
+
+  const pnpQuotaService = new PnpQuotaService(db, kit) // TODO(Alec): change accesses over to use this
   const domainQuotaService = new DomainQuotaService(db)
 
   const pnpQuota = new Controller(
     new PnpQuotaAction(
       config,
       pnpQuotaService,
-      new PnpQuotaIO(config.api.phoneNumberPrivacy.enabled)
+      new PnpQuotaIO(config.api.phoneNumberPrivacy.enabled, kit)
     )
   )
   const pnpSign = new Controller(
@@ -86,7 +89,7 @@ export function startSigner(config: Config, db: Knex, keyProvider: KeyProvider) 
       config,
       pnpQuotaService,
       keyProvider,
-      new PnpSignIO(config.api.phoneNumberPrivacy.enabled)
+      new PnpSignIO(config.api.phoneNumberPrivacy.enabled, kit)
     )
   )
   const domainQuota = new Controller(

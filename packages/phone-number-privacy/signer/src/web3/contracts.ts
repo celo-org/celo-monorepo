@@ -9,18 +9,17 @@ import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
 import { Histogram } from 'prom-client'
 import { Counters, Histograms, Labels } from '../common/metrics'
-import { config } from '../config'
+import { Config } from '../config'
 
-const contractKit = config.blockchain.apiKey
-  ? newKitWithApiKey(config.blockchain.provider, config.blockchain.apiKey)
-  : newKit(config.blockchain.provider)
-
-export function getContractKit(): ContractKit {
-  return contractKit
+export function getContractKit(config: Config): ContractKit {
+  return config.blockchain.apiKey
+    ? newKitWithApiKey(config.blockchain.provider, config.blockchain.apiKey)
+    : newKit(config.blockchain.provider)
 }
 
 declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
 
+// TODO(Alec): use this elsewhere
 export async function meter<T extends any[], U>(
   inFunction: InFunction<T, U>,
   params: T,
@@ -34,11 +33,11 @@ export async function meter<T extends any[], U>(
     .finally(_meter)
 }
 
-export async function getBlockNumber(): Promise<number> {
+export async function getBlockNumber(kit: ContractKit): Promise<number> {
   return meter(
     retryAsyncWithBackOffAndTimeout,
     [
-      () => getContractKit().connection.getBlockNumber(),
+      () => kit.connection.getBlockNumber(),
       RETRY_COUNT,
       [],
       RETRY_DELAY_IN_MS,
@@ -54,14 +53,18 @@ export async function getBlockNumber(): Promise<number> {
   )
 }
 
-export async function getTransactionCount(logger: Logger, ...addresses: string[]): Promise<number> {
+export async function getTransactionCount(
+  kit: ContractKit,
+  logger: Logger,
+  ...addresses: string[]
+): Promise<number> {
   const _getTransactionCount = (...params: string[]) =>
     Promise.all(
       params
         .filter((address) => address !== NULL_ADDRESS)
         .map((address) =>
           retryAsyncWithBackOffAndTimeout(
-            () => getContractKit().connection.getTransactionCount(address),
+            () => kit.connection.getTransactionCount(address),
             RETRY_COUNT,
             [],
             RETRY_DELAY_IN_MS,
@@ -88,6 +91,7 @@ export async function getTransactionCount(logger: Logger, ...addresses: string[]
 }
 
 export async function getStableTokenBalance(
+  kit: ContractKit,
   stableToken: StableToken,
   logger: Logger,
   ...addresses: string[]
@@ -98,8 +102,7 @@ export async function getStableTokenBalance(
         .filter((address) => address !== NULL_ADDRESS)
         .map((address) =>
           retryAsyncWithBackOffAndTimeout(
-            async () =>
-              (await getContractKit().contracts.getStableToken(stableToken)).balanceOf(address),
+            async () => (await kit.contracts.getStableToken(stableToken)).balanceOf(address),
             RETRY_COUNT,
             [],
             RETRY_DELAY_IN_MS,
@@ -128,14 +131,18 @@ export async function getStableTokenBalance(
   )
 }
 
-export async function getCeloBalance(logger: Logger, ...addresses: string[]): Promise<BigNumber> {
+export async function getCeloBalance(
+  kit: ContractKit,
+  logger: Logger,
+  ...addresses: string[]
+): Promise<BigNumber> {
   const _getCeloBalance = (...params: string[]) =>
     Promise.all(
       params
         .filter((address) => address !== NULL_ADDRESS)
         .map((address) =>
           retryAsyncWithBackOffAndTimeout(
-            async () => (await getContractKit().contracts.getGoldToken()).balanceOf(address),
+            async () => (await kit.contracts.getGoldToken()).balanceOf(address),
             RETRY_COUNT,
             [],
             RETRY_DELAY_IN_MS,
@@ -164,11 +171,15 @@ export async function getCeloBalance(logger: Logger, ...addresses: string[]): Pr
   )
 }
 
-export async function getWalletAddress(logger: Logger, account: string): Promise<string> {
+export async function getWalletAddress(
+  kit: ContractKit,
+  logger: Logger,
+  account: string
+): Promise<string> {
   return meter(
     retryAsyncWithBackOffAndTimeout,
     [
-      async () => (await getContractKit().contracts.getAccounts()).getWalletAddress(account),
+      async () => (await kit.contracts.getAccounts()).getWalletAddress(account),
       RETRY_COUNT,
       [],
       RETRY_DELAY_IN_MS,

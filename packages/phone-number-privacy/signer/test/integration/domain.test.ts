@@ -21,6 +21,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
+import { Knex } from 'knex'
 import request from 'supertest'
 import { KeyProvider } from '../../dist/key-management/key-provider-base'
 import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
@@ -119,8 +120,8 @@ describe('domainService', async () => {
   }
 
   let keyProvider: KeyProvider
-  let app
-  let db
+  let app: any
+  let db: Knex
 
   beforeAll(async () => {
     keyProvider = await initKeyProvider()
@@ -137,7 +138,6 @@ describe('domainService', async () => {
     // Note: If tests start to be too slow, this could be replaced with more complicated logic to
     // reset the database state without destroying and recreting it for each test.
 
-    // await closeDatabase()
     await db.destroy()
   })
 

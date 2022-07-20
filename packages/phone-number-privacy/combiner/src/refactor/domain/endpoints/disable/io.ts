@@ -1,9 +1,12 @@
 import {
   CombinerEndpoint,
   DisableDomainRequest,
+  disableDomainRequestSchema,
   DisableDomainResponse,
   DisableDomainResponseFailure,
+  DisableDomainResponseSchema,
   DisableDomainResponseSuccess,
+  DomainSchema,
   DomainState,
   ErrorType,
   getSignerEndpoint,
@@ -13,6 +16,7 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
+import * as t from 'io-ts'
 import { VERSION } from '../../../../config'
 import { IO } from '../../../base/io'
 import { Session } from '../../../session'
@@ -20,6 +24,16 @@ import { Session } from '../../../session'
 export class DomainDisableIO extends IO<DisableDomainRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DISABLE_DOMAIN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
+  readonly requestSchema: t.Type<
+    DisableDomainRequest,
+    DisableDomainRequest,
+    unknown
+  > = disableDomainRequestSchema(DomainSchema)
+  readonly responseSchema: t.Type<
+    DisableDomainResponse,
+    DisableDomainResponse,
+    unknown
+  > = DisableDomainResponseSchema
 
   async init(
     request: Request<{}, {}, unknown>,

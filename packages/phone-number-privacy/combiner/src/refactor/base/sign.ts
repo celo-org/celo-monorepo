@@ -64,7 +64,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
             this.parseBlindedMessage(session.request.body)
           )
           // Close outstanding requests
-          session.controller.abort()
+          session.abort.abort()
         } catch {
           // One or more signatures failed verification and were discarded.
           // Error has already been logged, continue to collect signatures.

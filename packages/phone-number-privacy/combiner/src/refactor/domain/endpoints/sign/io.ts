@@ -1,17 +1,22 @@
 import {
   CombinerEndpoint,
   DomainRestrictedSignatureRequest,
+  domainRestrictedSignatureRequestSchema,
   DomainRestrictedSignatureResponse,
   DomainRestrictedSignatureResponseFailure,
+  domainRestrictedSignatureResponseSchema,
   DomainRestrictedSignatureResponseSuccess,
+  DomainSchema,
   DomainState,
   ErrorType,
   getSignerEndpoint,
   send,
+  SequentialDelayDomainStateSchema,
   verifyDomainRestrictedSignatureRequestAuthenticity,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
+import * as t from 'io-ts'
 import { BLSCryptographyClient } from '../../../../bls/bls-cryptography-client'
 import { VERSION } from '../../../../config'
 import { IO } from '../../../base/io'
@@ -20,6 +25,16 @@ import { Session } from '../../../session'
 export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
   readonly endpoint = CombinerEndpoint.DOMAIN_SIGN
   readonly signerEndpoint = getSignerEndpoint(this.endpoint)
+  readonly requestSchema: t.Type<
+    DomainRestrictedSignatureRequest,
+    DomainRestrictedSignatureRequest,
+    unknown
+  > = domainRestrictedSignatureRequestSchema(DomainSchema)
+  readonly responseSchema: t.Type<
+    DomainRestrictedSignatureResponse,
+    DomainRestrictedSignatureResponse,
+    unknown
+  > = domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema)
 
   async init(
     request: Request<{}, {}, unknown>,

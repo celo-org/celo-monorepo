@@ -16,8 +16,8 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
 
   constructor(
     readonly config: OdisConfig,
-    readonly io: IO<DomainRestrictedSignatureRequest>,
-    readonly stateCombineActionr: DomainThresholdStateService<DomainRestrictedSignatureRequest>
+    readonly stateCombineActionr: DomainThresholdStateService<DomainRestrictedSignatureRequest>,
+    readonly io: IO<DomainRestrictedSignatureRequest>
   ) {
     super(config, io)
   }

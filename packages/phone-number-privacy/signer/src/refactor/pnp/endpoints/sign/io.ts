@@ -1,3 +1,4 @@
+import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
   hasValidAccountParam,
@@ -19,12 +20,15 @@ import { Request, Response } from 'express'
 import { Counters } from '../../../../common/metrics'
 import { getVersion } from '../../../../config'
 import { Key } from '../../../../key-management/key-provider-base'
-import { getContractKit } from '../../../../web3/contracts'
 import { IO } from '../../../base/io'
 import { PnpSession } from '../../session'
 
 export class PnpSignIO extends IO<SignMessageRequest> {
   readonly endpoint = SignerEndpoint.PARTIAL_SIGN_MESSAGE
+
+  constructor(enabled: boolean, readonly kit: ContractKit) {
+    super(enabled)
+  }
 
   async init(
     request: Request<{}, {}, unknown>,
@@ -59,7 +63,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, SignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, getContractKit(), logger)
+    return authenticateUser(request, this.kit, logger)
   }
 
   sendSuccess(

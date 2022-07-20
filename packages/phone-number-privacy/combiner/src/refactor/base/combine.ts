@@ -40,7 +40,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
 
     const timeout = setTimeout(() => {
       session.timedOut = true
-      session.controller.abort()
+      session.abort.abort()
     }, this.config.odisServices.timeoutMilliSeconds)
 
     // Forward request to signers
@@ -60,7 +60,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
       signerFetchResult = await this.io.fetchSignerResponseWithFallback(signer, session)
     } catch (err) {
       session.logger.debug({ err }, 'signer request failure')
-      if (err instanceof Error && err.name === 'AbortError' && session.controller.signal.aborted) {
+      if (err instanceof Error && err.name === 'AbortError' && session.abort.signal.aborted) {
         if (session.timedOut) {
           session.logger.error({ signer }, ErrorMessage.TIMEOUT_FROM_SIGNER)
         } else {
@@ -127,7 +127,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     }
     if (this.signers.length - session.failedSigners.size < this.config.keys.threshold) {
       session.logger.info('Not possible to reach a threshold of signer responses. Failing fast')
-      session.controller.abort()
+      session.abort.abort()
     }
   }
 }

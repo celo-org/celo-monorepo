@@ -10,13 +10,16 @@ import {
   send,
   SignerEndpoint,
   SignMessageRequest,
+  SignMessageRequestSchema,
   SignMessageResponse,
   SignMessageResponseFailure,
+  SignMessageResponseSchema,
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
+import * as t from 'io-ts'
 import { BLSCryptographyClient } from '../../../../bls/bls-cryptography-client'
 import { VERSION } from '../../../../config'
 import { getContractKit } from '../../../../web3/contracts'
@@ -26,6 +29,16 @@ import { Session } from '../../../session'
 export class PnpSignIO extends IO<SignMessageRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.SIGN_MESSAGE
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
+  readonly requestSchema: t.Type<
+    SignMessageRequest,
+    SignMessageRequest,
+    unknown
+  > = SignMessageRequestSchema
+  readonly responseSchema: t.Type<
+    SignMessageResponse,
+    SignMessageResponse,
+    unknown
+  > = SignMessageResponseSchema
 
   async init(
     request: Request<{}, {}, unknown>,

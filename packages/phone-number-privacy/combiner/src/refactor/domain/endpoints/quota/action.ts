@@ -8,8 +8,8 @@ import { DomainThresholdStateService } from '../../services/thresholdState'
 export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
   constructor(
     readonly config: OdisConfig,
-    readonly io: IO<DomainQuotaStatusRequest>,
-    readonly stateService: DomainThresholdStateService<DomainQuotaStatusRequest>
+    readonly stateService: DomainThresholdStateService<DomainQuotaStatusRequest>,
+    readonly io: IO<DomainQuotaStatusRequest>
   ) {
     super(config, io)
   }

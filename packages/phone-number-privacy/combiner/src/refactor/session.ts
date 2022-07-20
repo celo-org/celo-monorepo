@@ -20,7 +20,7 @@ export type CryptoClient<R extends OdisRequest> =
 export class Session<R extends OdisRequest> {
   public timedOut: boolean = false
   readonly logger: Logger
-  readonly controller: AbortController = new AbortController()
+  readonly abort: AbortController = new AbortController()
   readonly failedSigners: Set<string> = new Set<string>()
   readonly errorCodes: Map<number, number> = new Map<number, number>()
   readonly responses: Array<SignerResponse<R>> = new Array<SignerResponse<R>>()

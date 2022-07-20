@@ -1,3 +1,4 @@
+import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
   ErrorType,
@@ -17,12 +18,15 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Counters } from '../../../../common/metrics'
 import { getVersion } from '../../../../config'
-import { getContractKit } from '../../../../web3/contracts'
 import { IO } from '../../../base/io'
 import { PnpSession } from '../../session'
 
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly endpoint = SignerEndpoint.GET_QUOTA
+
+  constructor(enabled: boolean, readonly kit: ContractKit) {
+    super(enabled)
+  }
 
   async init(
     request: Request<{}, {}, unknown>,
@@ -48,7 +52,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   }
 
   async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
-    return authenticateUser(request, getContractKit(), logger)
+    return authenticateUser(request, this.kit, logger)
   }
 
   sendSuccess(

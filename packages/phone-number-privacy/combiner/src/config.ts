@@ -45,7 +45,7 @@ export interface CloudFunctionConfig {
   minInstances: number
 }
 
-interface Config {
+export interface Config {
   blockchain: BlockchainConfig
   db: DatabaseConfig
   phoneNumberPrivacy: OdisConfig

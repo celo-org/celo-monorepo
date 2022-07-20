@@ -1,5 +1,5 @@
 import { NULL_ADDRESS } from '@celo/base'
-import { StableToken } from '@celo/contractkit'
+import { ContractKit, StableToken } from '@celo/contractkit'
 import {
   ErrorMessage,
   isVerified,
@@ -15,7 +15,6 @@ import { storeRequest } from '../../../database/wrappers/request'
 import {
   getBlockNumber,
   getCeloBalance,
-  getContractKit,
   getStableTokenBalance,
   getTransactionCount,
   getWalletAddress,
@@ -30,7 +29,7 @@ export interface PnpQuotaStatus {
 }
 
 export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
-  constructor(readonly db: Knex) {}
+  constructor(readonly db: Knex, readonly kit: ContractKit) {}
 
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
@@ -70,7 +69,7 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
           // included here resolves to 0 on error
           getPerformedQueryCount(account, session.logger, trx),
           this.getTotalQuota(_session),
-          getBlockNumber(),
+          getBlockNumber(this.kit),
         ]),
       [session],
       (err: any) => {
@@ -136,9 +135,9 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     const [walletAddressResult, isVerifiedResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
-          getWalletAddress(session.logger, account),
+          getWalletAddress(this.kit, session.logger, account),
           hashedPhoneNumber
-            ? isVerified(account, hashedPhoneNumber, getContractKit(), session.logger)
+            ? isVerified(account, hashedPhoneNumber, this.kit, session.logger)
             : Promise.resolve(false),
         ]),
       [session],
@@ -187,9 +186,9 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     ] = await meter(
       (logger: Logger, ..._addresses: string[]) =>
         Promise.allSettled([
-          getStableTokenBalance(StableToken.cUSD, logger, ..._addresses),
-          getStableTokenBalance(StableToken.cEUR, logger, ..._addresses),
-          getCeloBalance(logger, ..._addresses),
+          getStableTokenBalance(this.kit, StableToken.cUSD, logger, ..._addresses),
+          getStableTokenBalance(this.kit, StableToken.cEUR, logger, ..._addresses),
+          getCeloBalance(this.kit, logger, ..._addresses),
         ]),
       [session.logger, ...addresses],
       (err: any) => {
@@ -266,6 +265,7 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     }
 
     const transactionCount = await getTransactionCount(
+      this.kit,
       session.logger,
       account,
       walletAddress // TODO(Alec)(pnp): Make sure we filter out null address in getTransactionCount
