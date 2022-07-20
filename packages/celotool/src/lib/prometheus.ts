@@ -76,9 +76,10 @@ function getK8sContextVars(
   clusterConfig?: BaseClusterConfig,
   context?: string
 ): [string, string, string, boolean] {
+  const cloudProvider = clusterConfig ? getCloudProviderPrefix(clusterConfig!) : 'gcp'
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
   let clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
-  let gcloudProject, gcloudRegion
+  let gcloudProject, gcloudRegion, stackdriverDisabled
 
   if (context) {
     gcloudProject = getDynamicEnvVarValue(
@@ -101,7 +102,7 @@ function getK8sContextVars(
     gcloudRegion = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
   }
 
-  return [clusterName, gcloudProject, gcloudRegion, usingGCP]
+  return [cloudProvider, clusterName, gcloudProject, gcloudRegion, usingGCP]
 }
 
 function getRemoteWriteParameters(context?: string): string[] {
@@ -176,6 +177,15 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
   }
 
   return params
+}
+
+function getCloudProviderPrefix(clusterConfig: BaseClusterConfig) {
+  const prefixByCloudProvider: { [key in CloudProvider]: string } = {
+    [CloudProvider.AWS]: 'aws',
+    [CloudProvider.AZURE]: 'aks',
+    [CloudProvider.GCP]: 'gcp',
+  }
+  return prefixByCloudProvider[clusterConfig.cloudProvider]
 }
 
 export async function installGrafanaIfNotExists(
