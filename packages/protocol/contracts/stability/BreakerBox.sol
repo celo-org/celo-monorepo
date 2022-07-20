@@ -19,10 +19,12 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   /* ==================== State Variables ==================== */
 
   address[] public exchanges;
-  mapping(address => TradingModeInfo) public exchangeTradingModes; // Maps exchange address to its current trading mode info
-  mapping(uint256 => address) public tradingModeBreaker; // Maps a trading mode to a breaker
-  mapping(address => uint256) public breakerTradingMode; // Maps a breaker to a trading mode
-  LinkedList.List private breakers; // Ordered list of breakers to be checked.
+  // Maps exchange address to its current trading mode info
+  mapping(address => TradingModeInfo) public exchangeTradingModes;
+  mapping(uint256 => address) public tradingModeBreaker;
+  mapping(address => uint256) public breakerTradingMode;
+  // Ordered list of breakers to be checked.
+  LinkedList.List private breakers;
 
   modifier validateBreaker(address breaker, uint256 tradingMode) {
     require(!isBreaker(breaker), "This breaker has already been added");
@@ -237,14 +239,16 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   /* ==================== Check Breakers ==================== */
 
   /**
-   * @notice Checks breakers for a specified exchange to determine the trading mode. If an exchange
+   * @notice Checks breakers for a specified exchange to determine the trading mode.
    * @param exchangeAddress The address of the exchange to run the checks for.
-   * @return currentTradingMode Returns an int representing the current trading mode for the specified exchange.
+   * @return currentTradingMode Returns an int representing the current trading mode
+   *                            for the specified exchange.
    */
   function checkBreakers(address exchangeAddress) external returns (uint256 currentTradingMode) {
     TradingModeInfo memory info = exchangeTradingModes[exchangeAddress];
 
-    // Last updated should always have a value gt 0, if it doesn't we can assume this exchange has not been added.
+    // Last updated should always have a value gt 0
+    // if it doesn't we can assume this exchange has not been added.
     if (info.lastUpdatedTime == 0) {
       return 0;
     }

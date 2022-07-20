@@ -71,7 +71,7 @@ contract Exchange is
   }
 
   modifier checkTradingMode() {
-    //require(breakerBox.checkBreakers(address(this)) == 0, "Trading is suspended for this exchange");
+    require(breakerBox.checkBreakers(address(this)) == 0, "Trading is suspended for this exchange");
     _;
   }
 

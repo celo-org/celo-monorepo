@@ -33,15 +33,18 @@ interface IBreaker {
   /**
    * @notice Check if the criteria has been met, by a specified exchange, to trigger the breaker.
    * @param exchange The address of the exchange to run the check against.
-   * @return triggerBreaker A boolean indicating whether or not the breaker shoulf be triggered for the given exchange.
+   * @return triggerBreaker A boolean indicating whether or not the breaker
+   *                        should be triggered for the given exchange.
    */
   function shouldTrigger(address exchange) external view returns (bool triggerBreaker);
 
   /**
    * @notice Check if the criteria to automatically reset the breaker has been met.
-   * @dev Allows the definition of additional critera to check before reset. If no additional criteria is needed set to !shouldTrigger();
    * @param exchange The exchange the criteria should be checked against.
-   * @return resetBreaker A boolean indicating whether the breaker should be reset for the given exchange.
+   * @return resetBreaker A boolean indicating whether the breaker
+   *                      should be reset for the given exchange.
+   * @dev Allows the definition of additional critera to check before reset.
+   *      If no additional criteria is needed set to !shouldTrigger();
    */
   function shouldReset(address exchange) external view returns (bool resetBreaker);
 }

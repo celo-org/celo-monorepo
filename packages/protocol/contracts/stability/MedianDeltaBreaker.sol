@@ -77,10 +77,12 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
   }
 
   /**
-   * @notice  Check if the current median report price change, for an exchange, relative to the last median report is greater
-   *          than a calculated threshold. If the change is greater than the threshold the breaker will trip.
-   * @param exchange The exchange to be checked.
-   * @return triggerBreaker A bool indicating whether or not this breaker should be tripped for the exchange.
+   * @notice  Check if the current median report price change, for an exchange, relative 
+   *          to the last median report is greater than a calculated threshold. 
+   *          If the change is greater than the threshold the breaker will trip.
+   * @param   exchange The exchange to be checked.
+   * @return  triggerBreaker  A bool indicating whether or not this breaker 
+   *                          should be tripped for the exchange.
    */
   function shouldTrigger(address exchange) public view returns (bool triggerBreaker) {
     ISortedOracles sortedOracles = ISortedOracles(
@@ -96,8 +98,10 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
   }
 
   /**
-   * @notice Checks whether or not the conditions have been met for the specifed exchange to be reset.
-   * @return resetBreaker A bool indicating whether or not this breaker can be reset for the given exchange.
+   * @notice  Checks whether or not the conditions have been met 
+   *          for the specifed exchange to be reset.
+   * @return  resetBreaker A bool indicating whether or not 
+   *          this breaker can be reset for the given exchange.
    */
   function shouldReset(address exchange) external view returns (bool resetBreaker) {
     return !shouldTrigger(exchange);
@@ -107,7 +111,8 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
    * @notice Checks if the specified current median rate is within the allowed threshold.
    * @param lastRate The last median rate.
    * @param currentRate The current median rate.
-   * @return Returns a bool indicating whether or not the current rate is within the given threshold.
+   * @return  Returns a bool indicating whether or not the current rate 
+   *          is within the given threshold.
    */
   function isWithinThreshold(uint256 lastRate, uint256 currentRate, uint256 allowedThreshold)
     private

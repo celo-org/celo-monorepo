@@ -58,7 +58,8 @@ interface IBreakerBox {
   event ResetSuccessful(address indexed exchange, address indexed breaker);
 
   /**
-   * @notice Emitted after a reset attempt fails when the exchange fails the breakers reset criteria.
+   * @notice  Emitted after a reset attempt fails when the
+   *          exchange fails the breakers reset criteria.
    * @param exchange The address of the exchange.
    * @param breaker The address of the breaker.
    */
@@ -84,9 +85,11 @@ interface IBreakerBox {
   function isBreaker(address breaker) external view returns (bool);
 
   /**
-   * @notice Checks breakers for a specified exchange to determine the trading mode.
-   * @param exchange The address of the exchange to run the checks for.
-   * @return currentTradingMode Returns an int representing the current trading mode for the specified exchange.
+   * @notice  Checks breakers for a specified exchange
+   *          to determine the trading mode.
+   * @param   exchange The address of the exchange to run the checks for.
+   * @return  currentTradingMode Returns an int representing
+   *          the current trading mode for the specified exchange.
    */
   function checkBreakers(address exchange) external returns (uint256 currentTradingMode);
 }

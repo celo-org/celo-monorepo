@@ -1,8 +1,6 @@
 pragma solidity ^0.5.13;
 
-import {
-  SortedLinkedListWithMedian
-} from "../../common/linkedlists/SortedLinkedListWithMedian.sol";
+import "../../common/linkedlists/SortedLinkedListWithMedian.sol";
 
 /**
  * @title A mock SortedOracles for testing.
