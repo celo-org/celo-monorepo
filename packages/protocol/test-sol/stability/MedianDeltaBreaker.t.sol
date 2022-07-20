@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import { Test, console2 as console } from "celo-foundry/Test.sol";
+import { Test } from "celo-foundry/Test.sol";
 import { WithRegistry } from "../utils/WithRegistry.sol";
+
+import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import {
   SortedLinkedListWithMedian
@@ -14,28 +16,24 @@ import { MockExchange } from "contracts/stability/test/MockExchange.sol";
 
 contract MedianDeltaBreakerTest is Test, WithRegistry {
   address deployer;
-  address normalAccount;
+  address nonDeployer;
   address testStable;
 
   MockExchange testExchange;
   MockSortedOracles sortedOracles;
   MedianDeltaBreaker breaker;
 
-  uint256 minThreshold = 0.15 * 10**24; // 15%
-  uint256 maxThreshold = 0.25 * 10**24; // 25%
-  uint256 timeMultiplier = 0.0075 * 10**24;
+  uint256 threshold = 0.15 * 10**24; // 15%
   uint256 coolDownTime = 5 minutes;
 
   event BreakerTriggered(address indexed exchange);
   event BreakerReset(address indexed exchange);
   event CooldownTimeUpdated(uint256 newCooldownTime);
-  event MinPriceChangeUpdated(uint256 newMinPriceChangeThreshold);
-  event MaxPriceChangeUpdated(uint256 newMaxPriceChangeThreshold);
-  event PriceChangeMultiplierUpdated(uint256 newPriceChangeMultiplier);
+  event priceChangeThresholdUpdated(uint256 newMinPriceChangeThreshold);
 
   function setUp() public {
     deployer = actor("deployer");
-    normalAccount = actor("normalAccount");
+    nonDeployer = actor("nonDeployer");
     testStable = actor("testStable");
 
     changePrank(deployer);
@@ -51,33 +49,10 @@ contract MedianDeltaBreakerTest is Test, WithRegistry {
       abi.encode(testStable)
     );
 
-    breaker = new MedianDeltaBreaker(
-      address(registry),
-      coolDownTime,
-      minThreshold,
-      maxThreshold,
-      timeMultiplier
-    );
+    breaker = new MedianDeltaBreaker(address(registry), coolDownTime, threshold);
   }
 
-  function setupSortedOracles(
-    uint256 lastReportTimestamp,
-    uint256 currentMedianRate,
-    uint256 lastMedianRate
-  ) public {
-    uint256[] memory reportTimestamps = new uint256[](1);
-    reportTimestamps[0] = lastReportTimestamp;
-
-    vm.mockCall(
-      address(sortedOracles),
-      abi.encodeWithSelector(sortedOracles.getTimestamps.selector),
-      abi.encode(
-        new address[](1),
-        reportTimestamps,
-        new SortedLinkedListWithMedian.MedianRelation[](1)
-      )
-    );
-
+  function setupSortedOracles(uint256 currentMedianRate, uint256 lastMedianRate) public {
     vm.mockCall(
       address(sortedOracles),
       abi.encodeWithSelector(sortedOracles.lastMedianRate.selector),
@@ -107,23 +82,15 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
     assertEq(breaker.cooldownTime(), coolDownTime);
   }
 
-  function test_constructor_shouldSetMinThreshold() public {
-    assertEq(breaker.minPriceChangeThreshold(), minThreshold);
-  }
-
-  function test_constructor_shouldSetMaxThreshold() public {
-    assertEq(breaker.maxPriceChangeThreshold(), maxThreshold);
-  }
-
-  function test_constructor_shouldSetTimeMultiplier() public {
-    assertEq(breaker.priceChangeThresholdTimeMultiplier(), timeMultiplier);
+  function test_constructor_shouldSetPriceChangeThreshold() public {
+    assertEq(breaker.priceChangeThreshold(), threshold);
   }
 
   /* ---------- Setters ---------- */
 
   function test_setCooldownTime_whenCallerIsNotOwner_shouldRevert() public {
     vm.expectRevert("Ownable: caller is not the owner");
-    changePrank(normalAccount);
+    changePrank(nonDeployer);
     breaker.setCooldownTime(2 minutes);
   }
 
@@ -137,73 +104,26 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
     assertEq(breaker.cooldownTime(), testCooldown);
   }
 
-  function test_setMinThreshold_whenCallerIsNotOwner_shouldRevert() public {
+  function test_setPriceChangeThreshold_whenCallerIsNotOwner_shouldRevert() public {
     vm.expectRevert("Ownable: caller is not the owner");
-    changePrank(normalAccount);
+    changePrank(nonDeployer);
 
-    breaker.setMinPriceChangeThreshold(123456);
+    breaker.setPriceChangeThreshold(123456);
   }
 
-  function test_setMinThreshold_whenValueGreaterThanOne_shouldRevert() public {
-    vm.expectRevert("min price change threshold must be less than 1");
-
-    breaker.setMinPriceChangeThreshold(1.01 * 10**24);
+  function test_setPriceChangeThreshold_whenValueGreaterThanOne_shouldRevert() public {
+    vm.expectRevert("price change threshold must be less than 1");
+    breaker.setPriceChangeThreshold(1 * 10**24);
   }
 
-  function test_setMinThreshold_whenCallerIsOwner_shouldUpdateAndEmit() public {
+  function test_setPriceChangeThreshold_whenCallerIsOwner_shouldUpdateAndEmit() public {
     uint256 testThreshold = 0.1 * 10**24;
     vm.expectEmit(false, false, false, true);
-    emit MinPriceChangeUpdated(testThreshold);
+    emit priceChangeThresholdUpdated(testThreshold);
 
-    breaker.setMinPriceChangeThreshold(testThreshold);
+    breaker.setPriceChangeThreshold(testThreshold);
 
-    assertEq(breaker.minPriceChangeThreshold(), testThreshold);
-  }
-
-  function test_setMaxThreshold_whenCallerIsNotOwner_shouldRevert() public {
-    vm.expectRevert("Ownable: caller is not the owner");
-    changePrank(normalAccount);
-
-    breaker.setMaxPriceChangeThreshold(123456);
-  }
-
-  function test_setMaxThreshold_whenValueGreaterThanOne_shouldRevert() public {
-    vm.expectRevert("max price change threshold must be less than 1");
-
-    breaker.setMaxPriceChangeThreshold(5 * 10**24);
-  }
-
-  function test_setMaxThreshold_whenCallerIsOwner_shouldUpdateAndEmit() public {
-    uint256 testThreshold = 0.1 * 10**24;
-    vm.expectEmit(false, false, false, true);
-    emit MaxPriceChangeUpdated(testThreshold);
-
-    breaker.setMaxPriceChangeThreshold(testThreshold);
-
-    assertEq(breaker.maxPriceChangeThreshold(), testThreshold);
-  }
-
-  function test_setPriceChangeMultiplier_whenCallerIsNotOwner_shouldRevert() public {
-    vm.expectRevert("Ownable: caller is not the owner");
-    changePrank(normalAccount);
-
-    breaker.setPriceChangeMultiplier(123456);
-  }
-
-  function test_setPriceChangeMultiplier_whenValueIsZero_shouldRevert() public {
-    vm.expectRevert("price change multiplier must be greater than 0");
-
-    breaker.setPriceChangeMultiplier(0);
-  }
-
-  function test_setPriceChangeMultiplier_whenCallerIsOwner_shouldUpdateAndEmit() public {
-    uint256 testMultiplier = 2 * 10**24;
-    vm.expectEmit(false, false, false, true);
-    emit PriceChangeMultiplierUpdated(testMultiplier);
-
-    breaker.setPriceChangeMultiplier(testMultiplier);
-
-    assertEq(breaker.priceChangeThresholdTimeMultiplier(), testMultiplier);
+    assertEq(breaker.priceChangeThreshold(), testThreshold);
   }
 
   /* ---------- Getters ---------- */
@@ -214,12 +134,12 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
 }
 
 contract MedianDeltaBreakerTest_shouldTrigger is MedianDeltaBreakerTest {
-  function verifyCalls() public {
+  function updateMedianByPercent(uint256 medianChangeScaleFactor) public {
+    uint256 lastMedianRate = 0.98 * 10**24;
+    uint256 currentMedianRate = (lastMedianRate * medianChangeScaleFactor) / 10**24;
+    setupSortedOracles(currentMedianRate, lastMedianRate);
+
     vm.expectCall(address(testExchange), abi.encodeWithSelector(testExchange.stable.selector));
-    vm.expectCall(
-      address(sortedOracles),
-      abi.encodeWithSelector(sortedOracles.getTimestamps.selector, testExchange)
-    );
     vm.expectCall(
       address(sortedOracles),
       abi.encodeWithSelector(sortedOracles.lastMedianRate.selector, testStable)
@@ -231,14 +151,22 @@ contract MedianDeltaBreakerTest_shouldTrigger is MedianDeltaBreakerTest {
   }
 
   function test_shouldTrigger_whenMedianDrops30Percent_shouldReturnTrue() public {
-    uint256 medianChangeScaleFactor = 0.7 * 10**24;
+    updateMedianByPercent(0.7 * 10**24);
+    assertTrue(breaker.shouldTrigger(address(testExchange)));
+  }
 
-    uint256 lastMedianRate = 0.98 * 10**24;
-    uint256 currentMedianRate = (lastMedianRate * medianChangeScaleFactor) / 10**24;
+  function test_shouldTrigger_whenMedianDrops10Percent_shouldReturnFalse() public {
+    updateMedianByPercent(0.9 * 10**24);
+    assertFalse(breaker.shouldTrigger(address(testExchange)));
+  }
 
-    setupSortedOracles(block.timestamp, currentMedianRate, lastMedianRate);
-    verifyCalls();
+  function test_shouldTrigger_whenMedianIncreases10Percent_shouldReturnFalse() public {
+    updateMedianByPercent(1.1 * 10**24);
+    assertFalse(breaker.shouldTrigger(address(testExchange)));
+  }
 
+  function test_shouldTrigger_whenMedianIncreases20Percent_shouldReturnTrue() public {
+    updateMedianByPercent(1.2 * 10**24);
     assertTrue(breaker.shouldTrigger(address(testExchange)));
   }
 }

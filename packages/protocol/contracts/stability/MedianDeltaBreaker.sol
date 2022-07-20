@@ -6,8 +6,7 @@ import { IExchange } from "./interfaces/IExchange.sol";
 
 import { UsingRegistry } from "../common/UsingRegistry.sol";
 
-import { Math as OzMath } from "openzeppelin-solidity/contracts/math/Math.sol";
-import { BabylonianMath } from "../common/libraries/BabylonianMath.sol";
+import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import { FixidityLib } from "../common/FixidityLib.sol";
 
 /**
@@ -17,88 +16,57 @@ import { FixidityLib } from "../common/FixidityLib.sol";
  *          breaker is triggered for an exchange it should be set to no trading mode.
  */
 contract MedianDeltaBreaker is IBreaker, UsingRegistry {
+  using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
   /* ==================== State Variables ==================== */
 
-  uint256 public cooldownTime; // The amount of time that must pass before the breaker can be reset for an exchange.
-  FixidityLib.Fraction public minPriceChangeThreshold; // The min threshold for the median price change. Multiplied by 10^24
-  FixidityLib.Fraction public maxPriceChangeThreshold; // The min threshold for the median price change. Multiplied by 10^24
-  FixidityLib.Fraction public priceChangeThresholdTimeMultiplier; // Determines how quickly the calculated price change threshold scales in respect to time that has elapsed since the last report. Multiplied by 10^24
+  // The amount of time that must pass before the breaker can be reset for an exchange.
+  uint256 public cooldownTime;
+  // The allowed threshold for the median price change. Multiplied by 10^24
+  FixidityLib.Fraction public priceChangeThreshold;
 
   /* ==================== Events ==================== */
 
-  event MinPriceChangeUpdated(uint256 newMinPriceChangeThreshold);
-  event MaxPriceChangeUpdated(uint256 newMaxPriceChangeThreshold);
-  event PriceChangeMultiplierUpdated(uint256 newPriceChangeMultiplier);
+  event priceChangeThresholdUpdated(uint256 newPriceChangeThreshold);
 
   /* ==================== Constructor ==================== */
 
-  constructor(
-    address registryAddress,
-    uint256 _cooldownTime,
-    uint256 _minPriceChangeThreshold,
-    uint256 _maxPriceChangeThreshold,
-    uint256 _priceChangeThresholdTimeMultiplier
-  ) public {
+  constructor(address registryAddress, uint256 _cooldownTime, uint256 _priceChangeThreshold)
+    public
+  {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setCooldownTime(_cooldownTime);
-    setMinPriceChangeThreshold(_minPriceChangeThreshold);
-    setMaxPriceChangeThreshold(_maxPriceChangeThreshold);
-    setPriceChangeMultiplier(_priceChangeThresholdTimeMultiplier);
+    setPriceChangeThreshold(_priceChangeThreshold);
   }
 
   /* ==================== Restricted Functions ==================== */
 
   /**
    * @notice Sets the cooldownTime to the specified value.
-   * @param newCooldownTime The new cooldownTime value.
+   * @param _cooldownTime The new cooldownTime value.
    * @dev Should be set to 0 to force a manual reset.
    */
-  function setCooldownTime(uint256 newCooldownTime) public onlyOwner {
-    cooldownTime = newCooldownTime;
-    emit CooldownTimeUpdated(newCooldownTime);
+  function setCooldownTime(uint256 _cooldownTime) public onlyOwner {
+    cooldownTime = _cooldownTime;
+    emit CooldownTimeUpdated(_cooldownTime);
   }
 
   /**
-   * @notice Sets the minPriceChangeThreshold.
-   * @param _minPriceChangeThreshold The new minPriceChangeThreshold value.
+   * @notice Sets priceChangeThreshold.
+   * @param _priceChangeThreshold The new priceChangeThreshold value.
    */
-  function setMinPriceChangeThreshold(uint256 _minPriceChangeThreshold) public onlyOwner {
-    minPriceChangeThreshold = FixidityLib.wrap(_minPriceChangeThreshold);
+  function setPriceChangeThreshold(uint256 _priceChangeThreshold) public onlyOwner {
+    priceChangeThreshold = FixidityLib.wrap(_priceChangeThreshold);
     require(
-      minPriceChangeThreshold.lt(FixidityLib.fixed1()),
-      "min price change threshold must be less than 1"
+      priceChangeThreshold.lt(FixidityLib.fixed1()),
+      "price change threshold must be less than 1"
     );
-    emit MinPriceChangeUpdated(_minPriceChangeThreshold);
+    emit priceChangeThresholdUpdated(_priceChangeThreshold);
   }
 
-  /**
-   * @notice Sets the maxPriceChangeThreshold.
-   * @param _maxPriceChangeThreshold The new maxPriceChangeThreshold value.
-   */
-  function setMaxPriceChangeThreshold(uint256 _maxPriceChangeThreshold) public onlyOwner {
-    maxPriceChangeThreshold = FixidityLib.wrap(_maxPriceChangeThreshold);
-    require(
-      maxPriceChangeThreshold.lt(FixidityLib.fixed1()),
-      "max price change threshold must be less than 1"
-    );
-    emit MaxPriceChangeUpdated(_maxPriceChangeThreshold);
-  }
-
-  /**
-   * @notice Sets the priceChangeMiltiplier.
-   * @param _priceChangeThresholdTimeMultiplier The new priceChangeThresholdTimeMultiplier value.
-   */
-  function setPriceChangeMultiplier(uint256 _priceChangeThresholdTimeMultiplier) public onlyOwner {
-    require(
-      _priceChangeThresholdTimeMultiplier > 0,
-      "price change multiplier must be greater than 0"
-    );
-    priceChangeThresholdTimeMultiplier = FixidityLib.wrap(_priceChangeThresholdTimeMultiplier);
-    emit PriceChangeMultiplierUpdated(_priceChangeThresholdTimeMultiplier);
-  }
+  /* ==================== View Functions ==================== */
 
   /**
    * @notice Gets the cooldown time for the breaker.
@@ -120,16 +88,11 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     );
 
     address stableToken = IExchange(exchange).stable();
-
-    (, uint256[] memory reportTimestamps, ) = sortedOracles.getTimestamps(exchange);
-    uint256 lastReportTimestamp = reportTimestamps[0];
-
-    uint256 allowedThreshold = getPriceChangeThreshold(lastReportTimestamp);
     uint256 lastMedian = sortedOracles.lastMedianRate(stableToken);
     (uint256 currentMedian, ) = sortedOracles.medianRate(stableToken);
 
     // Check if current median is within allowed threshold of last median
-    triggerBreaker = !isWithinThreshold(lastMedian, currentMedian, allowedThreshold);
+    triggerBreaker = !isWithinThreshold(lastMedian, currentMedian, priceChangeThreshold.unwrap());
   }
 
   /**
@@ -141,31 +104,9 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
   }
 
   /**
-   * @notice Gets the allowed median price change threshold.
-   * @param lastTimestamp The timestamp of the last oracle report.
-   * @return threshold The allowed threshold to be used to determine of the breaker should trip.
-   */
-  function getPriceChangeThreshold(uint256 lastTimestamp) public view returns (uint256 threshold) {
-    // TODO: Calculate time based multiplier
-    // uint256 timeElapsed = ((block.timestamp - lastTimestamp) / 1 minutes); // Minutes since last report
-    // uint256 calculatedThreshold = minPriceChangeThreshold.unwrap() *
-    //   (BabylonianMath.sqrt((priceChangeThresholdTimeMultiplier.unwrap() * timeElapsed)) +
-    //     (1 * 10**24));
-
-    uint256 calculatedThreshold;
-
-    if (calculatedThreshold == 0) {
-      return maxPriceChangeThreshold.unwrap();
-    }
-
-    return OzMath.min(maxPriceChangeThreshold.unwrap(), calculatedThreshold);
-  }
-
-  /**
    * @notice Checks if the specified current median rate is within the allowed threshold.
    * @param lastRate The last median rate.
    * @param currentRate The current median rate.
-   * @param allowedThreshold The allowed threshold to be used to determine of the breaker should trip.
    * @return Returns a bool indicating whether or not the current rate is within the given threshold.
    */
   function isWithinThreshold(uint256 lastRate, uint256 currentRate, uint256 allowedThreshold)
@@ -173,11 +114,11 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     pure
     returns (bool)
   {
-    uint256 maxPercent = (1 * 10**24) + allowedThreshold;
-    uint256 maxValue = (lastRate * maxPercent) / 10**24;
+    uint256 maxPercent = uint256(1 * 10**24).add(allowedThreshold);
+    uint256 maxValue = (lastRate.mul(maxPercent)).div(10**24);
 
-    uint256 minPercent = (1 * 10**24) - allowedThreshold;
-    uint256 minValue = (lastRate * minPercent) / 10**24;
+    uint256 minPercent = uint256(1 * 10**24).sub(allowedThreshold);
+    uint256 minValue = (lastRate.mul(minPercent)).div(10**24);
 
     return (currentRate >= minValue && currentRate <= maxValue);
   }

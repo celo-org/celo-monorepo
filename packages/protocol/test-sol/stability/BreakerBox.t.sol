@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 
-import { Test, console2 as console } from "celo-foundry/Test.sol";
+import { Test } from "celo-foundry/Test.sol";
 
 import { MockReserve } from "contracts/stability/test/MockReserve.sol";
 import { FakeBreaker } from "contracts/stability/test/FakeBreaker.sol";
