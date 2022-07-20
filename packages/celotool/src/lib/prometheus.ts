@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { createNamespaceIfNotExists } from './cluster'
-import { execCmd, execCmdWithExitOnFailure } from './cmd-utils'
+import { execCmdWithExitOnFailure } from './cmd-utils'
 import {
   DynamicEnvVar,
   envVar,
@@ -17,23 +17,13 @@ import {
 } from './helm_deploy'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { GCPClusterConfig } from './k8s-cluster/gcp'
-import {
-  createServiceAccountIfNotExists,
-  getServiceAccountEmail,
-  getServiceAccountKey,
-  setupGKEWorkloadIdentities,
-} from './service-account-utils'
-import { outputIncludes, switchToGCPProject } from './utils'
+import { outputIncludes } from './utils'
 const yaml = require('js-yaml')
 
 const helmChartPath = '../helm-charts/prometheus-stackdriver'
 const releaseName = 'prometheus-stackdriver'
 const kubeNamespace = 'prometheus'
 const kubeServiceAccountName = releaseName
-// stackdriver-prometheus-sidecar relevant links:
-// GitHub: https://github.com/Stackdriver/stackdriver-prometheus-sidecar
-// Container registry with latest tags: https://console.cloud.google.com/gcr/images/stackdriver-prometheus/GLOBAL/stackdriver-prometheus-sidecar?gcrImageListsize=30
-const sidecarImageTag = '0.8.2'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.27.1'
 
@@ -85,11 +75,10 @@ export async function upgradePrometheus(context?: string, clusterConfig?: BaseCl
 function getK8sContextVars(
   clusterConfig?: BaseClusterConfig,
   context?: string
-): [string, string, string, string, string, boolean] {
-  const cloudProvider = clusterConfig ? getCloudProviderPrefix(clusterConfig!) : 'gcp'
+): [string, string, string, boolean] {
   const usingGCP = !clusterConfig || clusterConfig.cloudProvider === CloudProvider.GCP
   let clusterName = usingGCP ? fetchEnv(envVar.KUBERNETES_CLUSTER_NAME) : clusterConfig!.clusterName
-  let gcloudProject, gcloudRegion, stackdriverDisabled
+  let gcloudProject, gcloudRegion
 
   if (context) {
     gcloudProject = getDynamicEnvVarValue(
@@ -107,18 +96,12 @@ function getK8sContextVars(
       { context },
       clusterName
     )
-    stackdriverDisabled = getDynamicEnvVarValue(
-      DynamicEnvVar.PROM_SIDECAR_DISABLED,
-      { context },
-      clusterName
-    )
   } else {
     gcloudProject = fetchEnv(envVar.TESTNET_PROJECT_NAME)
     gcloudRegion = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
-    stackdriverDisabled = fetchEnvOrFallback(envVar.PROMETHEUS_DISABLE_STACKDRIVER_SIDECAR, 'false')
   }
 
-  return [cloudProvider, clusterName, gcloudProject, gcloudRegion, stackdriverDisabled, usingGCP]
+  return [clusterName, gcloudProject, gcloudRegion, usingGCP]
 }
 
 function getRemoteWriteParameters(context?: string): string[] {
@@ -145,14 +128,10 @@ function getRemoteWriteParameters(context?: string): string[] {
 }
 
 async function helmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
-  const [
-    cloudProvider,
-    clusterName,
-    gcloudProject,
-    gcloudRegion,
-    stackdriverDisabled,
-    usingGCP,
-  ] = getK8sContextVars(clusterConfig, context)
+  const [clusterName, gcloudProject, gcloudRegion, usingGCP] = getK8sContextVars(
+    clusterConfig,
+    context
+  )
 
   const params = [
     `--set namespace=${kubeNamespace}`,
@@ -173,39 +152,6 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
     params.push(`--set storageClassName=ssd`)
   } else if (context?.startsWith('AZURE_ODIS')) {
     params.push(`--set storageClassName=default`)
-  }
-
-  if (stackdriverDisabled.toLowerCase() === 'false') {
-    params.push(
-      // Disable stackdriver sidecar env wide. TODO: Update to a contexted variable if needed
-      `--set stackdriver.disabled=false`,
-      `--set stackdriver.sidecar.imageTag=${sidecarImageTag}`,
-      `--set stackdriver.gcloudServiceAccountKeyBase64=${await getPrometheusGcloudServiceAccountKeyBase64(
-        clusterName,
-        cloudProvider,
-        gcloudProject
-      )}`
-    )
-
-    // Metrics prefix for non-ODIS clusters.
-    if (!context?.startsWith('AZURE_ODIS')) {
-      params.push(
-        `--set stackdriver.metricsPrefix=external.googleapis.com/prometheus/${clusterName}`
-      )
-    }
-
-    if (usingGCP) {
-      const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
-      await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProject)
-      console.info(serviceAccountName)
-      const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-      params.push(
-        `--set serviceAccount.annotations.'iam\\\.gke\\\.io/gcp-service-account'=${serviceAccountEmail}`
-      )
-    }
-  } else {
-    // Stackdriver disabled
-    params.push(`--set stackdriver.disabled=true`)
   }
 
   // Set scrape job if set for the context
@@ -230,88 +176,6 @@ async function helmParameters(context?: string, clusterConfig?: BaseClusterConfi
   }
 
   return params
-}
-
-async function getPrometheusGcloudServiceAccountKeyBase64(
-  clusterName: string,
-  cloudProvider: string,
-  gcloudProjectName: string
-) {
-  // First check if value already exist in helm release. If so we pass the same value
-  // and we avoid creating a new key for the service account
-  const gcloudServiceAccountKeyBase64 = await getPrometheusGcloudServiceAccountKeyBase64FromHelm()
-  if (gcloudServiceAccountKeyBase64) {
-    return gcloudServiceAccountKeyBase64
-  } else {
-    // We do not have the service account key in helm so we need to create the SA (if it does not exist)
-    // and create a new key for the service account in any case
-    await switchToGCPProject(gcloudProjectName)
-    const serviceAccountName = getServiceAccountName(clusterName, cloudProvider)
-    await createPrometheusGcloudServiceAccount(serviceAccountName, gcloudProjectName)
-    const serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-    const serviceAccountKeyPath = `/tmp/gcloud-key-${serviceAccountName}.json`
-    await getServiceAccountKey(serviceAccountEmail, serviceAccountKeyPath)
-    return fs.readFileSync(serviceAccountKeyPath).toString('base64')
-  }
-}
-
-async function getPrometheusGcloudServiceAccountKeyBase64FromHelm() {
-  const prometheusInstalled = await outputIncludes(
-    `helm list -n ${kubeNamespace}`,
-    `${releaseName}`
-  )
-  if (prometheusInstalled) {
-    const [output] = await execCmd(`helm get values -n ${kubeNamespace} ${releaseName}`)
-    const prometheusValues: any = yaml.safeLoad(output)
-    return prometheusValues.gcloudServiceAccountKeyBase64
-  }
-}
-
-// createPrometheusGcloudServiceAccount creates a gcloud service account with a given
-// name and the proper permissions for writing metrics to stackdriver
-async function createPrometheusGcloudServiceAccount(
-  serviceAccountName: string,
-  gcloudProjectName: string
-) {
-  await execCmdWithExitOnFailure(`gcloud config set project ${gcloudProjectName}`)
-  const accountCreated = await createServiceAccountIfNotExists(
-    serviceAccountName,
-    gcloudProjectName
-  )
-  if (accountCreated) {
-    let serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-    while (!serviceAccountEmail) {
-      serviceAccountEmail = await getServiceAccountEmail(serviceAccountName)
-    }
-    await execCmdWithExitOnFailure(
-      `gcloud projects add-iam-policy-binding ${gcloudProjectName} --role roles/monitoring.metricWriter --member serviceAccount:${serviceAccountEmail}`
-    )
-
-    // Setup workload identity IAM permissions
-    await setupGKEWorkloadIdentities(
-      serviceAccountName,
-      gcloudProjectName,
-      kubeNamespace,
-      kubeServiceAccountName
-    )
-  }
-}
-
-function getCloudProviderPrefix(clusterConfig: BaseClusterConfig) {
-  const prefixByCloudProvider: { [key in CloudProvider]: string } = {
-    [CloudProvider.AWS]: 'aws',
-    [CloudProvider.AZURE]: 'aks',
-    [CloudProvider.GCP]: 'gcp',
-  }
-  return prefixByCloudProvider[clusterConfig.cloudProvider]
-}
-
-function getServiceAccountName(clusterName: string, cloudProvider: string) {
-  // Ensure the service account name is within the length restriction
-  // and ends with an alphanumeric character
-  return `prometheus-${cloudProvider}-${clusterName}`
-    .substring(0, 30)
-    .replace(/[^a-zA-Z0-9]+$/g, '')
 }
 
 export async function installGrafanaIfNotExists(
@@ -364,7 +228,7 @@ export async function removeGrafanaHelmRelease() {
 
 async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClusterConfig) {
   // Grafana chart is a copy from source. No changes done directly on the chart.
-  const [_, k8sClusterName] = getK8sContextVars(clusterConfig, context)
+  const [k8sClusterName] = getK8sContextVars(clusterConfig, context)
   const k8sDomainName = fetchEnv(envVar.CLUSTER_DOMAIN_NAME)
   // Rename baklavastaging -> baklava
   const grafanaUrl =
