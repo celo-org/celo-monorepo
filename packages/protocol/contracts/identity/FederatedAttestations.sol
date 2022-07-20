@@ -101,21 +101,15 @@ contract FederatedAttestations is
   /**
    * @notice Registers an attestation directly from the issuer
    * @param identifier Hash of the identifier to be attested
-   * @param issuer Address of the attestation issuer
    * @param account Address of the account being mapped to the identifier
    * @param issuedOn Time at which the issuer issued the attestation in Unix time 
-   * @dev Attestation signer in storage is set to issuer
+   * @dev Attestation signer and issuer in storage is set to msg.sender
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
-  function registerAttestationAsIssuer(
-    bytes32 identifier,
-    address issuer,
-    address account,
-    uint64 issuedOn
-  ) external {
-    // TODO allow for updating existing attestation by only updating signer and publishedOn
-    require(issuer == msg.sender);
-    _registerAttestation(identifier, issuer, account, issuer, issuedOn);
+  function registerAttestationAsIssuer(bytes32 identifier, address account, uint64 issuedOn)
+    external
+  {
+    _registerAttestation(identifier, msg.sender, account, msg.sender, issuedOn);
   }
 
   /**
@@ -140,7 +134,6 @@ contract FederatedAttestations is
     bytes32 r,
     bytes32 s
   ) external {
-    // TODO allow for updating existing attestation by only updating signer and publishedOn
     validateAttestationSig(identifier, issuer, account, signer, issuedOn, v, r, s);
     _registerAttestation(identifier, issuer, account, signer, issuedOn);
   }

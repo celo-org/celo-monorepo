@@ -1009,13 +1009,9 @@ contract('Escrow', (accounts: string[]) => {
             })
             it('should allow users to withdraw if attestation is found in FederatedAttestations', async () => {
               await completeAttestations(receiver, aPhoneHash, minAttestations - 1)
-              await federatedAttestations.registerAttestationAsIssuer(
-                aPhoneHash,
-                trustedIssuer2,
-                receiver,
-                0,
-                { from: trustedIssuer2 }
-              )
+              await federatedAttestations.registerAttestationAsIssuer(aPhoneHash, receiver, 0, {
+                from: trustedIssuer2,
+              })
               await withdrawAndCheckState(
                 sender,
                 receiver,
@@ -1040,13 +1036,9 @@ contract('Escrow', (accounts: string[]) => {
             )
           })
           it('should allow users to withdraw if attestation is found in FederatedAttestations', async () => {
-            await federatedAttestations.registerAttestationAsIssuer(
-              aPhoneHash,
-              trustedIssuer2,
-              receiver,
-              0,
-              { from: trustedIssuer2 }
-            )
+            await federatedAttestations.registerAttestationAsIssuer(aPhoneHash, receiver, 0, {
+              from: trustedIssuer2,
+            })
             await withdrawAndCheckState(
               sender,
               receiver,
@@ -1111,13 +1103,9 @@ contract('Escrow', (accounts: string[]) => {
             uniquePaymentIDRevoke = withdrawKeyAddress
             parsedSig1 = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
             if (trustedIssuers.length) {
-              await federatedAttestations.registerAttestationAsIssuer(
-                identifier,
-                trustedIssuers[0],
-                receiver,
-                0,
-                { from: trustedIssuers[0] }
-              )
+              await federatedAttestations.registerAttestationAsIssuer(identifier, receiver, 0, {
+                from: trustedIssuers[0],
+              })
             }
           })
 

@@ -877,41 +877,19 @@ contract('FederatedAttestations', (accounts: string[]) => {
     })
 
     it('should succeed if the issuer submits the attestation directly', async () => {
-      assert.isOk(
-        await federatedAttestations.registerAttestationAsIssuer(
-          identifier1,
-          issuer1,
-          account1,
-          nowUnixTime,
-          { from: issuer1 }
-        )
-      )
+      await federatedAttestations.registerAttestationAsIssuer(identifier1, account1, nowUnixTime, {
+        from: issuer1,
+      })
+      await assertAttestationInStorage(identifier1, issuer1, 0, account1, nowUnixTime, issuer1, 0)
     })
 
     it('should succeed if issuer is not registered in Accounts.sol', async () => {
       const issuer2 = accounts[5]
       assert.isFalse(await accountsInstance.isAccount(issuer2))
-      assert.isOk(
-        await federatedAttestations.registerAttestationAsIssuer(
-          identifier1,
-          issuer2,
-          account1,
-          nowUnixTime,
-          { from: issuer2 }
-        )
-      )
-    })
-
-    it('should revert if a non-issuer submits an attestation with no signature', async () => {
-      await assertRevert(
-        federatedAttestations.registerAttestationAsIssuer(
-          identifier1,
-          issuer1,
-          account1,
-          nowUnixTime,
-          { from: signer1 }
-        )
-      )
+      await federatedAttestations.registerAttestationAsIssuer(identifier1, account1, nowUnixTime, {
+        from: issuer2,
+      })
+      await assertAttestationInStorage(identifier1, issuer2, 0, account1, nowUnixTime, issuer2, 0)
     })
 
     it('should revert if MAX_ATTESTATIONS_PER_IDENTIFIER have already been registered', async () => {
@@ -925,20 +903,15 @@ contract('FederatedAttestations', (accounts: string[]) => {
         const newAccount = await web3.eth.accounts.create().address
         await federatedAttestations.registerAttestationAsIssuer(
           identifier1,
-          issuer1,
           newAccount,
           nowUnixTime,
           { from: issuer1 }
         )
       }
       await assertRevertWithReason(
-        federatedAttestations.registerAttestationAsIssuer(
-          identifier1,
-          issuer1,
-          account1,
-          nowUnixTime,
-          { from: issuer1 }
-        ),
+        federatedAttestations.registerAttestationAsIssuer(identifier1, account1, nowUnixTime, {
+          from: issuer1,
+        }),
         'Max attestations already registered for identifier'
       )
     })
@@ -952,20 +925,15 @@ contract('FederatedAttestations', (accounts: string[]) => {
         const newIdentifier = getPhoneHash(phoneNumber, `dummysalt-${i}`)
         await federatedAttestations.registerAttestationAsIssuer(
           newIdentifier,
-          issuer1,
           account1,
           nowUnixTime,
           { from: issuer1 }
         )
       }
       await assertRevertWithReason(
-        federatedAttestations.registerAttestationAsIssuer(
-          identifier1,
-          issuer1,
-          account1,
-          nowUnixTime,
-          { from: issuer1 }
-        ),
+        federatedAttestations.registerAttestationAsIssuer(identifier1, account1, nowUnixTime, {
+          from: issuer1,
+        }),
         'Max identifiers already registered for account'
       )
     })
@@ -1044,13 +1012,9 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should succeed if issuer is not registered in Accounts.sol', async () => {
       const issuer2 = accounts[4]
       assert.isFalse(await accountsInstance.isAccount(issuer2))
-      await federatedAttestations.registerAttestationAsIssuer(
-        identifier1,
-        issuer2,
-        account1,
-        nowUnixTime,
-        { from: issuer2 }
-      )
+      await federatedAttestations.registerAttestationAsIssuer(identifier1, account1, nowUnixTime, {
+        from: issuer2,
+      })
       await assertAttestationInStorage(identifier1, issuer2, 0, account1, nowUnixTime, issuer2, 0)
       await federatedAttestations.revokeAttestation(identifier1, issuer2, account1, {
         from: issuer2,
@@ -1273,13 +1237,9 @@ contract('FederatedAttestations', (accounts: string[]) => {
     it('should succeed if issuer is not registered in Accounts.sol', async () => {
       const issuer2 = accounts[6]
       assert.isFalse(await accountsInstance.isAccount(issuer2))
-      await federatedAttestations.registerAttestationAsIssuer(
-        identifier1,
-        issuer2,
-        account1,
-        nowUnixTime,
-        { from: issuer2 }
-      )
+      await federatedAttestations.registerAttestationAsIssuer(identifier1, account1, nowUnixTime, {
+        from: issuer2,
+      })
       await assertAttestationInStorage(identifier1, issuer2, 0, account1, nowUnixTime, issuer2, 0)
       await federatedAttestations.batchRevokeAttestations(issuer2, [identifier1], [account1], {
         from: issuer2,
