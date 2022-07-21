@@ -203,11 +203,6 @@ describe('domainService', () => {
   let app: any
 
   beforeAll(async () => {
-    // tslint:disable: no-console
-    console.log('Combiner beforeAll')
-    console.log(signerConfig)
-
-    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     keyProvider1 = await initKeyProvider(signerConfig)
     keyProvider2 = await initKeyProvider(signerConfig)
     keyProvider3 = await initKeyProvider(signerConfig)
@@ -216,10 +211,7 @@ describe('domainService', () => {
   })
 
   beforeEach(async () => {
-    console.log('*******************')
-
     signerDB1 = await initDatabase()
-    // console.log(signerDB1)
     signerDB2 = await initDatabase()
     signerDB3 = await initDatabase()
 

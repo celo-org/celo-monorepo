@@ -138,7 +138,7 @@ describe('domainService', async () => {
     // Note: If tests start to be too slow, this could be replaced with more complicated logic to
     // reset the database state without destroying and recreting it for each test.
 
-    await db.destroy()
+    await db?.destroy()
   })
 
   describe(`${SignerEndpoint.DISABLE_DOMAIN}`, () => {

@@ -12,9 +12,6 @@ import { Counters, Histograms, Labels } from '../common/metrics'
 import { SignerConfig } from '../config'
 
 export function getContractKit(config: SignerConfig): ContractKit {
-  // tslint:disable: no-console
-  console.log('Signer getContractKit')
-  console.log(config)
   return config.blockchain.apiKey
     ? newKitWithApiKey(config.blockchain.provider, config.blockchain.apiKey)
     : newKit(config.blockchain.provider)

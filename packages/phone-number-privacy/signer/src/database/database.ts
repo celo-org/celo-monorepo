@@ -63,7 +63,7 @@ export async function initDatabase(doTestQuery = true): Promise<Knex> {
   logger.info('Running Migrations')
 
   await db.migrate.latest({
-    directory: './migrations', // TODO(Alec)
+    directory: './src/migrations', // TODO(Alec)
     loadExtensions: ['.ts'],
   })
 

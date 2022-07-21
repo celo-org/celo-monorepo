@@ -72,9 +72,6 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
       .finally(end)
   }
 
-  // tslint:disable: no-console
-  console.log('startSigner() &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
-  console.log(config)
   const kit = getContractKit(config)
 
   const pnpQuotaService = new PnpQuotaService(db, kit) // TODO(Alec): change accesses over to use this
