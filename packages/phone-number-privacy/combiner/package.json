@@ -20,6 +20,7 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
+    "test:integration": "jest --runInBand test/integration",
     "test:e2e": "jest test/end-to-end --verbose",
     "test:e2e:staging": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net yarn test:e2e",
     "test:e2e:alfajores": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy.cloudfunctions.net yarn test:e2e",
