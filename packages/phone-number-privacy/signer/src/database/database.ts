@@ -3,7 +3,7 @@ import { Knex, knex } from 'knex'
 import { config, DEV_MODE, SupportedDatabase } from '../config'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
-export async function initDatabase(doTestQuery = true): Promise<Knex> {
+export async function initDatabase(migrationsPath?: string, doTestQuery = true): Promise<Knex> {
   const logger = rootLogger()
   logger.info({ config: config.db }, 'Initializing database connection')
   const { type, host, port, user, password, database, ssl, poolMaxSize } = config.db
@@ -63,8 +63,8 @@ export async function initDatabase(doTestQuery = true): Promise<Knex> {
   logger.info('Running Migrations')
 
   await db.migrate.latest({
-    directory: './src/migrations', // TODO(Alec)
-    loadExtensions: ['.ts'],
+    directory: migrationsPath ?? './src/migrations',
+    loadExtensions: ['.ts', '.js'],
   })
 
   if (doTestQuery) {

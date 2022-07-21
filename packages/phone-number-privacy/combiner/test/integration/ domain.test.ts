@@ -192,47 +192,44 @@ describe('domainService', () => {
   }
 
   let keyProvider1: KeyProvider
-  let keyProvider2: KeyProvider
-  let keyProvider3: KeyProvider
+  // let keyProvider2: KeyProvider
+  // let keyProvider3: KeyProvider
   let signerDB1: Knex
-  let signerDB2: Knex
-  let signerDB3: Knex
+  // let signerDB2: Knex
+  // let signerDB3: Knex
   let signer1: Server | Server
-  let signer2: Server | Server
-  let signer3: Server | Server
+  // let signer2: Server | Server
+  // let signer3: Server | Server
   let app: any
+
+  const signerMigrationsPath = '../signer/src/migrations'
 
   beforeAll(async () => {
     keyProvider1 = await initKeyProvider(signerConfig)
-    keyProvider2 = await initKeyProvider(signerConfig)
-    keyProvider3 = await initKeyProvider(signerConfig)
+    // keyProvider2 = await initKeyProvider(signerConfig)
+    // keyProvider3 = await initKeyProvider(signerConfig)
 
     app = startCombiner(combinerConfig)
   })
 
   beforeEach(async () => {
-    signerDB1 = await initDatabase()
-    signerDB2 = await initDatabase()
-    signerDB3 = await initDatabase()
+    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+    signerDB1 = await initDatabase(signerMigrationsPath) // TODO(Alec): this is throwing ECONNREFUSED 127.0.0.1:5432
+    // signerDB2 = await initDatabase(signerMigrationsPath)
+    // signerDB3 = await initDatabase(signerMigrationsPath)
 
     signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3000)
-    signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3001)
-    signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3002)
+    // signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3001)
+    // signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3002)
   })
 
   afterEach(async () => {
-    // TODO: close out express app. Meaning
-
-    // console.log(signerDB1)
-
-    await signerDB1.destroy()
-    await signerDB2.destroy()
-    await signerDB3.destroy()
-
+    await signerDB1?.destroy()
+    // await signerDB2?.destroy()
+    // await signerDB3?.destroy()
     signer1?.close()
-    signer2?.close()
-    signer3?.close()
-    console.log('&&&&&&&&&&&&&&&&&&&&&')
+    // signer2?.close()
+    // signer3?.close()
   })
 
   describe(`${CombinerEndpoint.DISABLE_DOMAIN}`, () => {
