@@ -29,13 +29,6 @@ import { initDatabase } from '../../src/database/database'
 import { initKeyProvider } from '../../src/key-management/key-provider'
 import { startSigner } from '../../src/server'
 
-// Configurations are currently handled through a global object. As a result, we need to set the
-// right parameters here before the tests start.
-// We will be using a Sqlite in-memory database for tests.
-config.db.type = SupportedDatabase.Sqlite
-config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
-config.api.domains.enabled = true
-
 // DO NOT MERGE: Add checking of values beyond the return code.
 
 describe('domainService', async () => {
@@ -123,14 +116,21 @@ describe('domainService', async () => {
   let app: any
   let db: Knex
 
+  const _config = config
+
   beforeAll(async () => {
-    keyProvider = await initKeyProvider(config)
+    _config.db.type = SupportedDatabase.Sqlite
+    _config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
+    console.log(_config)
+    keyProvider = await initKeyProvider(_config)
   })
 
   beforeEach(async () => {
     // Create a new in-memory database for each test.
+    _config.api.domains.enabled = true
     db = await initDatabase()
-    app = startSigner(config, db, keyProvider)
+    console.log(_config)
+    app = startSigner(_config, db, keyProvider)
   })
 
   afterEach(async () => {
@@ -265,9 +265,8 @@ describe('domainService', async () => {
     })
 
     it('Should respond with 503 on disabled api', async () => {
-      const configWithApiDisabled = { ...config }
-      configWithApiDisabled.api.domains.enabled = false
-      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+      _config.api.domains.enabled = false
+      const appWithApiDisabled = startSigner(_config, db, keyProvider)
 
       const req = await disableRequest()
 
@@ -406,9 +405,8 @@ describe('domainService', async () => {
     })
 
     it('Should respond with 503 on disabled api', async () => {
-      const configWithApiDisabled = { ...config }
-      configWithApiDisabled.api.domains.enabled = false
-      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+      _config.api.domains.enabled = false
+      const appWithApiDisabled = startSigner(_config, db, keyProvider)
 
       const req = await quotaRequest()
 
