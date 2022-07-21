@@ -26,7 +26,7 @@ serviceAccount:
   name: null
 
 stackdriver:
-  disabled: false
+  disabled: true
   # When sending metrics from outside GCP to GCP Stackdriver.
   gcloudServiceAccountKeyBase64: null
   # To save $, don't send metrics to SD that probably won't be used.
@@ -107,11 +107,15 @@ remote_write:
   write_relabel_configs:
     - action: drop
       regex: "(aadpodidentity.*\
+              |aggregator_.*\
               |apiserver_.+\
               |authentication.*\
+              |cadvisor_version_info\
               |certmanager.*\
+              |cloudprovider_gce.*\
               |configconnector.*\
               |container_blkio.*\
+              |container_cpu_cfs_throttled_seconds_total\
               |container_cpu_load_average_10s\
               |container_cpu_system_seconds_total\
               |container_cpu_user_seconds_total\
@@ -121,6 +125,7 @@ remote_write:
               |container_last_.+\
               |container_network_.+\
               |container_processes\
+              |container_scrape_error\
               |container_sockets\
               |container_spec_.+\
               |container_start_.+\
@@ -129,21 +134,39 @@ remote_write:
               |container_threads_max\
               |container_ulimits.*\
               |coredns.*\
+              |cortex.*\
               |csi_operations.*\
+              |eksportisto_step_duration_bucket\
               |erlang_.+\
               |etcd_.+\
               |go_gc_.*\
-              |go_memstats_gc_.*\
-              |go_memstats_last_gc_time_seconds\
-              |go_memstats_next_gc_bytes\
+              |go_memstats_.*\
+              |go_threads.*\
+              |go_info.*\
+              |grpc_client_.*\
+              |jaeger_.*\
               |kubedns.*\
               |kube_configmap.*\
+              |kube_deployment_created\
+              |kube_deployment_labels\
+              |kube_deployment_metadata_generation\
+              |kube_deployment_spec_paused\
+              |kube_deployment_spec_replicas\
+              |kube_deployment_spec_strategy_rollingupdate_max_surge\
+              |kube_deployment_spec_strategy_rollingupdate_max_unavailable\
+              |kube_deployment_status_condition\
+              |kube_deployment_status_observed_generation\
+              |kube_deployment_status_replicas_unavailable\
+              |kube_deployment_status_replicas_updated\
               |kube_endpoint.*\
               |kube_job.*\
               |kube_namespace.*\
               |kube_node_status_condition\
               |kube_persistentvolume.*\
               |kube_pod_[^cs].+\
+              |kube_pod_status_ready\
+              |kube_pod_status_scheduled\
+              |kube_pod_status_scheduled_time\
               |kube_pod_status_phase\
               |kube_pod_container_[^r].+\
               |kube_pod_container_status_last_terminated_reason\
@@ -154,11 +177,40 @@ remote_write:
               |kube_secret_.+\
               |kube_service.*\
               |kubelet_[^v].+\
+              |loki.*\
+              |machine_cpu_sockets\
+              |machine_cpu_physical_cores\
+              |machine_scrape.*\
               |net_conntrack_.*\
               |nginx_.+\
+              |nodejs_active_.*\
               |nodejs_gc_.*\
+              |oracle_action_duration_bucket\
+              |oracle_exchange_api_request_duration_seconds_bucket\
+              |oracle_exchange_api_request_error_count\
+              |oracle_ticker_property\
               |phoenix_.+\
+              |process_cpu_system.*\
+              |process_cpu_user.*\
+              |process_disk_reads_total\
+              |process_disk_writes_total\
+              |process_heap_bytes\
+              |process_involuntary_context_switches_total\
+              |process_io_pagefaults_total\
+              |process_max_fds\
+              |process_max_resident_memory_bytes\
+              |process_noio_pagefaults_total\
+              |process_open_fds\
+              |process_signals_delivered_total\
+              |process_start_time_seconds\
+              |process_swaps_total\
+              |process_threads_total\
+              |process_uptime_seconds\
+              |process_virtual_memory_bytes\
+              |process_virtual_memory_max_bytes\
+              |process_voluntary_context_switches_total\
               |prometheus.*\
+              |promhttp_.*\
               |python.*\
               |relay_nodejs_gc_.*\
               |rest_client_.+\

@@ -34,7 +34,7 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: core-contracts.v6
+    RELEASE_TAG: core-contracts.v7
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -151,6 +151,7 @@ jobs:
             # Verify that following commands work, they are later called in the incremental testing script
             # There output does not matter here, the fact that they finish successfully does.
             git rev-parse --abbrev-ref HEAD
+            git fetch --all --tags
 
       - attach_workspace:
           at: ~/app
