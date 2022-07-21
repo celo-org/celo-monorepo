@@ -4,7 +4,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { GigaMentoInstance } from 'types'
 
 const initializeArgs = async (): Promise<any[]> => {
-  return [config.registry.predeployedProxyAddress, config.gigaMento._placeholderForMigrations]
+  return [config.registry.predeployedProxyAddress]
 }
 
 module.exports = deploymentForCoreContract<GigaMentoInstance>(
