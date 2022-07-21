@@ -1,8 +1,7 @@
 import knex, { Knex } from 'knex'
-import { Config } from '..'
-import { DEV_MODE } from '../config'
+import { CombinerConfig, DEV_MODE } from '../config'
 
-export function initDatabase(config: Config): Knex {
+export function initDatabase(config: CombinerConfig): Knex {
   return knex({
     client: 'pg',
     connection: config.db,

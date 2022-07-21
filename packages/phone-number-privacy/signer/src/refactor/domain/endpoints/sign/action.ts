@@ -9,7 +9,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { EIP712Optional } from '@celo/utils/lib/sign-typed-data-utils'
 import { Knex } from 'knex'
-import { Config } from '../../../../config'
+import { SignerConfig } from '../../../../config'
 import {
   DomainStateRecord,
   toSequentialDelayDomainState,
@@ -39,7 +39,7 @@ type TrxResult =
 export class DomainSignAction implements Action<DomainRestrictedSignatureRequest> {
   constructor(
     readonly db: Knex,
-    readonly config: Config,
+    readonly config: SignerConfig,
     readonly quota: DomainQuotaService,
     readonly keyProvider: KeyProvider,
     readonly io: DomainSignIO

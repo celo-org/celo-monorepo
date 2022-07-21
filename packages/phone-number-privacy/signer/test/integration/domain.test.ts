@@ -124,7 +124,7 @@ describe('domainService', async () => {
   let db: Knex
 
   beforeAll(async () => {
-    keyProvider = await initKeyProvider()
+    keyProvider = await initKeyProvider(config)
   })
 
   beforeEach(async () => {

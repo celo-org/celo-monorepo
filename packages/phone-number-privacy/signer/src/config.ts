@@ -22,9 +22,9 @@ export enum SupportedKeystore {
   MOCK_SECRET_MANAGER = 'MockSecretManager',
 }
 
-export interface Config {
+export interface SignerConfig {
   server: {
-    port: string | number
+    port: string | number | undefined
     sslKeyPath?: string
     sslCertPath?: string
   }
@@ -96,7 +96,7 @@ export interface Config {
 }
 
 const env = process.env as any
-export const config: Config = {
+export const config: SignerConfig = {
   server: {
     port: Number(env.SERVER_PORT ?? 8080),
     sslKeyPath: env.SERVER_SSL_KEY_PATH,
@@ -125,7 +125,7 @@ export const config: Config = {
     numberAttestationsRequired: Number(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED ?? 3),
   },
   blockchain: {
-    provider: env.BLOCKCHAIN_PROVIDER,
+    provider: env.BLOCKCHAIN_PROVIDER, // TODO(Alec)
     apiKey: env.BLOCKCHAIN_API_KEY,
   },
   db: {

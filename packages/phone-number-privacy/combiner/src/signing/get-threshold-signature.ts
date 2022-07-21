@@ -67,7 +67,7 @@ export async function handleGetBlindedMessageSig(request: Request, response: Res
       sendFailureResponse(response, WarningMessage.INVALID_INPUT, 400, logger)
       return
     }
-    if (!(await authenticateUser(request, getContractKit(), logger))) {
+    if (!(await authenticateUser(request, getContractKit(config.blockchain), logger))) {
       sendFailureResponse(response, WarningMessage.UNAUTHENTICATED_USER, 401, logger)
       return
     }

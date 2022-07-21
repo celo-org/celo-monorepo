@@ -10,23 +10,100 @@ import {
   SequentialDelayStage,
 } from '@celo/phone-number-privacy-common'
 import {
-  config as signerConfig,
   initDatabase,
   initKeyProvider,
   startSigner,
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
+import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
 import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/key-management/key-provider-base'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
+import BigNumber from 'bignumber.js'
 import { Server } from 'http'
 import { Knex } from 'knex'
 import request from 'supertest'
-import config from '../../src/config'
+import config, { CombinerConfig } from '../../src/config'
 import { startCombiner } from '../../src/server'
 
-const combinerConfig = config
+const combinerConfig: CombinerConfig = config
+
+const signerConfig: SignerConfig = {
+  server: {
+    port: undefined,
+    sslKeyPath: undefined,
+    sslCertPath: undefined,
+  },
+  quota: {
+    unverifiedQueryMax: 10,
+    additionalVerifiedQueryMax: 30,
+    queryPerTransaction: 2,
+    // Min balance is .01 cUSD
+    minDollarBalance: new BigNumber(1e16),
+    // Min balance is .01 cEUR
+    minEuroBalance: new BigNumber(1e16),
+    // Min balance is .005 CELO
+    minCeloBalance: new BigNumber(5e15),
+  },
+  api: {
+    domains: {
+      enabled: true,
+    },
+    phoneNumberPrivacy: {
+      enabled: false,
+    },
+  },
+  attestations: {
+    numberAttestationsRequired: 3,
+  },
+  blockchain: {
+    provider: 'https://alfajores-forno.celo-testnet.org',
+    apiKey: undefined,
+  },
+  db: {
+    type: SupportedDatabase.Sqlite,
+    user: '',
+    password: '',
+    database: '',
+    host: 'http://localhost',
+    port: undefined,
+    ssl: true,
+    poolMaxSize: 50,
+  },
+  keystore: {
+    type: SupportedKeystore.MOCK_SECRET_MANAGER,
+    keys: {
+      phoneNumberPrivacy: {
+        name: 'phoneNumberPrivacy',
+        latest: 2,
+      },
+      domains: {
+        name: 'domains',
+        latest: 1,
+      },
+    },
+    azure: {
+      clientID: '',
+      clientSecret: '',
+      tenant: '',
+      vaultName: '',
+      secretName: '',
+    },
+    google: {
+      projectId: '',
+      secretName: '',
+      secretVersion: 'latest',
+    },
+    aws: {
+      region: '',
+      secretName: '',
+      secretKey: '',
+    },
+  },
+  timeout: 5000,
+  test_quota_bypass_percentage: 0,
+}
 
 // DO NOT MERGE: Add checking of values beyond the return code.
 
@@ -126,10 +203,14 @@ describe('domainService', () => {
   let app: any
 
   beforeAll(async () => {
+    // tslint:disable: no-console
+    console.log('Combiner beforeAll')
+    console.log(signerConfig)
+
     console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    keyProvider1 = await initKeyProvider()
-    keyProvider2 = await initKeyProvider()
-    keyProvider3 = await initKeyProvider()
+    keyProvider1 = await initKeyProvider(signerConfig)
+    keyProvider2 = await initKeyProvider(signerConfig)
+    keyProvider3 = await initKeyProvider(signerConfig)
 
     app = startCombiner(combinerConfig)
   })
@@ -138,7 +219,7 @@ describe('domainService', () => {
     console.log('*******************')
 
     signerDB1 = await initDatabase()
-    console.log(signerDB1)
+    // console.log(signerDB1)
     signerDB2 = await initDatabase()
     signerDB3 = await initDatabase()
 
@@ -150,16 +231,16 @@ describe('domainService', () => {
   afterEach(async () => {
     // TODO: close out express app. Meaning
 
-    // console.log("&&&&&&&&&&&&&&&&&&&&&")
     // console.log(signerDB1)
 
-    await signerDB1?.destroy()
-    await signerDB2?.destroy()
-    await signerDB3?.destroy()
+    await signerDB1.destroy()
+    await signerDB2.destroy()
+    await signerDB3.destroy()
 
     signer1?.close()
     signer2?.close()
     signer3?.close()
+    console.log('&&&&&&&&&&&&&&&&&&&&&')
   })
 
   describe(`${CombinerEndpoint.DISABLE_DOMAIN}`, () => {

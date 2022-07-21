@@ -45,7 +45,7 @@ export interface CloudFunctionConfig {
   minInstances: number
 }
 
-export interface Config {
+export interface CombinerConfig {
   blockchain: BlockchainConfig
   db: DatabaseConfig
   phoneNumberPrivacy: OdisConfig
@@ -53,7 +53,7 @@ export interface Config {
   cloudFunction: CloudFunctionConfig
 }
 
-let config: Config
+let config: CombinerConfig
 
 if (DEV_MODE) {
   logger().debug('Running in dev mode')

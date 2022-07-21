@@ -1,3 +1,4 @@
+import { ContractKit } from '@celo/contractkit'
 import {
   CombinerEndpoint,
   Endpoint,
@@ -7,7 +8,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
-import { Config } from './config'
+import { CombinerConfig } from '.'
 import { Controller } from './refactor/controller'
 import { DomainDisableAction } from './refactor/domain/endpoints/disable/action'
 import { DomainDisableIO } from './refactor/domain/endpoints/disable/io'
@@ -18,10 +19,11 @@ import { DomainSignIO } from './refactor/domain/endpoints/sign/io'
 import { DomainThresholdStateService } from './refactor/domain/services/thresholdState'
 import { PnpSignAction } from './refactor/pnp/endpoints/sign/action'
 import { PnpSignIO } from './refactor/pnp/endpoints/sign/io'
+import { getContractKit } from './web3/contracts'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function startCombiner(config: Config) {
+export function startCombiner(config: CombinerConfig) {
   const logger = rootLogger()
 
   logger.info('Creating combiner express server')
@@ -38,8 +40,10 @@ export function startCombiner(config: Config) {
   //   res.send(PromClient.register.metrics())
   // })
 
+  const kit: ContractKit = getContractKit(config.blockchain)
+
   const pnpSign = new Controller(
-    new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy))
+    new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy, kit))
   )
   app.post(CombinerEndpoint.SIGN_MESSAGE, (req, res) =>
     meterResponse(pnpSign.handle, req, res, CombinerEndpoint.SIGN_MESSAGE)

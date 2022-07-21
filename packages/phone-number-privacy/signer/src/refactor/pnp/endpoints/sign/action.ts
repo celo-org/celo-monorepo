@@ -3,7 +3,7 @@ import { WarningMessage } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { computeBlindedSignature } from '../../../../bls/bls-cryptography-client'
 import { Counters } from '../../../../common/metrics'
-import { Config } from '../../../../config'
+import { SignerConfig } from '../../../../config'
 import { getRequestExists } from '../../../../database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../../key-management/key-provider-base'
 import { Action, Session } from '../../../base/action'
@@ -14,7 +14,7 @@ import { PnpSignIO } from './io'
 export class PnpSignAction implements Action<SignMessageRequest> {
   constructor(
     readonly db: Knex,
-    readonly config: Config,
+    readonly config: SignerConfig,
     readonly quota: PnpQuotaService,
     readonly keyProvider: KeyProvider,
     readonly io: PnpSignIO

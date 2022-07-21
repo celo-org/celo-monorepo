@@ -7,7 +7,7 @@ import https from 'https'
 import { Knex } from 'knex'
 import * as PromClient from 'prom-client'
 import { Counters, Histograms } from './common/metrics'
-import { Config, getVersion } from './config'
+import { getVersion, SignerConfig } from './config'
 import { KeyProvider } from './key-management/key-provider-base'
 import { Controller } from './refactor/controller'
 import { DomainDisableAction } from './refactor/domain/endpoints/disable/action'
@@ -26,10 +26,10 @@ import { getContractKit } from './web3/contracts'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function startSigner(config: Config, db: Knex, keyProvider: KeyProvider) {
+export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProvider) {
   const logger = rootLogger()
 
-  logger.info('Creating express server')
+  logger.info('Creating signer express server')
   const app = express()
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware)
 
@@ -72,6 +72,9 @@ export function startSigner(config: Config, db: Knex, keyProvider: KeyProvider) 
       .finally(end)
   }
 
+  // tslint:disable: no-console
+  console.log('startSigner() &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+  console.log(config)
   const kit = getContractKit(config)
 
   const pnpQuotaService = new PnpQuotaService(db, kit) // TODO(Alec): change accesses over to use this
@@ -123,7 +126,7 @@ export function startSigner(config: Config, db: Knex, keyProvider: KeyProvider) 
   }
 }
 
-function getSslOptions(config: Config) {
+function getSslOptions(config: SignerConfig) {
   const logger = rootLogger()
   const { sslKeyPath, sslCertPath } = config.server
 

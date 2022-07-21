@@ -64,7 +64,7 @@ export async function handleGetContactMatches(db: Knex, request: Request, respon
     // error handling. Remove this or refactor once that bug is resolved.
     let isAuthenticated = true // We assume user is authenticated on Forno errors
     try {
-      isAuthenticated = await authenticateUser(request, getContractKit(), logger)
+      isAuthenticated = await authenticateUser(request, getContractKit(config.blockchain), logger)
     } catch {
       logger.error('Forno error caught in handleGetContactMatches line 57') // Temporary for debugging
       logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
@@ -87,7 +87,12 @@ export async function handleGetContactMatches(db: Knex, request: Request, respon
       // error handling. Remove this or refactor once that bug is resolved.
       let _isVerified = true // We assume user is authenticated on Forno errors
       try {
-        _isVerified = await isVerified(account, hashedPhoneNumber, getContractKit(), logger)
+        _isVerified = await isVerified(
+          account,
+          hashedPhoneNumber,
+          getContractKit(config.blockchain),
+          logger
+        )
       } catch {
         logger.error('Forno error caught in handleGetContactMatches line 80') // Temporary for debugging
         logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
@@ -117,7 +122,7 @@ export async function handleGetContactMatches(db: Knex, request: Request, respon
       // error handling. Remove this or refactor once that bug is resolved.
       let dekSigner = ''
       try {
-        dekSigner = await getDataEncryptionKey(account, getContractKit(), logger)
+        dekSigner = await getDataEncryptionKey(account, getContractKit(config.blockchain), logger)
       } catch {
         logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
         logger.warn(

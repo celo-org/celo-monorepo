@@ -1,3 +1,4 @@
+import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
   CombinerEndpoint,
@@ -20,9 +21,9 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
+import { OdisConfig } from '../../../..'
 import { BLSCryptographyClient } from '../../../../bls/bls-cryptography-client'
 import { VERSION } from '../../../../config'
-import { getContractKit } from '../../../../web3/contracts'
 import { IO } from '../../../base/io'
 import { Session } from '../../../session'
 
@@ -39,6 +40,10 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     SignMessageResponse,
     unknown
   > = SignMessageResponseSchema
+
+  constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
+    super(config)
+  }
 
   async init(
     request: Request<{}, {}, unknown>,
@@ -78,7 +83,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, SignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, getContractKit(), logger)
+    return authenticateUser(request, this.kit, logger)
   }
 
   sendSuccess(

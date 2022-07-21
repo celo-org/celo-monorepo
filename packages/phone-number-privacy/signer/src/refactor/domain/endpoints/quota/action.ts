@@ -3,7 +3,7 @@ import {
   DomainQuotaStatusRequest,
   ErrorMessage,
 } from '@celo/phone-number-privacy-common'
-import { Config } from '../../../../config'
+import { SignerConfig } from '../../../../config'
 import { toSequentialDelayDomainState } from '../../../../database/models/domainState'
 import { Action } from '../../../base/action'
 import { DomainQuotaService } from '../../services/quota'
@@ -12,7 +12,7 @@ import { DomainQuotaIO } from './io'
 
 export class DomainQuotaAction implements Action<DomainQuotaStatusRequest> {
   constructor(
-    readonly config: Config,
+    readonly config: SignerConfig,
     readonly quotaService: DomainQuotaService,
     readonly io: DomainQuotaIO
   ) {}

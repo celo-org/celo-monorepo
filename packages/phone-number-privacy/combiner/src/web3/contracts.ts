@@ -1,10 +1,9 @@
 import { ContractKit, newKit, newKitWithApiKey } from '@celo/contractkit'
-import config from '../config'
+import { BlockchainConfig } from '..'
 
-const contractKit = config.blockchain.apiKey
-  ? newKitWithApiKey(config.blockchain.provider, config.blockchain.apiKey)
-  : newKit(config.blockchain.provider)
-
-export function getContractKit(): ContractKit {
-  return contractKit
+export function getContractKit(config: BlockchainConfig): ContractKit {
+  // tslint:disable: no-console
+  console.log('Combiner getContractKit')
+  console.log(config)
+  return config.apiKey ? newKitWithApiKey(config.provider, config.apiKey) : newKit(config.provider)
 }

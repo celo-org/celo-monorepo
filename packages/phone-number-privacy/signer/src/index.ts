@@ -5,15 +5,17 @@ import { initKeyProvider } from './key-management/key-provider'
 import { KeyProvider } from './key-management/key-provider-base'
 import { startSigner } from './server'
 
+require('dotenv').config()
+
 async function start() {
   const logger = rootLogger()
   logger.info(`Starting. Dev mode: ${DEV_MODE}`)
   const db = await initDatabase()
-  const keyProvider: KeyProvider = await initKeyProvider()
+  const keyProvider: KeyProvider = await initKeyProvider(config)
 
   const server = startSigner(config, db, keyProvider)
   logger.info('Starting server')
-  const port = config.server.port
+  const port = config.server.port ?? 0
   const backupTimeout = config.timeout * 1.2
   server
     .listen(port, () => {

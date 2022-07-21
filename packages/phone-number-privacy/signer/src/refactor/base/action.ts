@@ -3,7 +3,7 @@ import {
   OdisRequest,
   PhoneNumberPrivacyRequest,
 } from '@celo/phone-number-privacy-common'
-import { Config } from '../../config'
+import { SignerConfig } from '../../config'
 import { DomainSession } from '../domain/session'
 import { PnpSession } from '../pnp/session'
 import { IO } from './io'
@@ -15,7 +15,7 @@ export type Session<R extends OdisRequest> = R extends DomainRequest
   : never
 
 export interface Action<R extends OdisRequest> {
-  readonly config: Config
+  readonly config: SignerConfig
   readonly io: IO<R>
   perform(session: Session<R>): Promise<void>
 }
