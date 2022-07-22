@@ -8,6 +8,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
+import { performance, PerformanceObserver } from 'perf_hooks'
 import { CombinerConfig } from '.'
 import { Controller } from './refactor/controller'
 import { DomainDisableAction } from './refactor/domain/endpoints/disable/action'

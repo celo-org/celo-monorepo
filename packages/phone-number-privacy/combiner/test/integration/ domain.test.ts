@@ -107,6 +107,8 @@ const signerConfig: SignerConfig = {
 
 // DO NOT MERGE: Add checking of values beyond the return code.
 
+// jest.setTimeout(30000) // TODO(Alec): why are these tests timing out?
+
 describe('domainService', () => {
   // Configurations are currently handled through a global object. As a result, we need to set the
   // right parameters here before the tests start.
@@ -192,43 +194,44 @@ describe('domainService', () => {
   }
 
   let keyProvider1: KeyProvider
-  let keyProvider2: KeyProvider
-  let keyProvider3: KeyProvider
+  // let keyProvider2: KeyProvider
+  // let keyProvider3: KeyProvider
   let signerDB1: Knex
-  let signerDB2: Knex
-  let signerDB3: Knex
+  // let signerDB2: Knex
+  // let signerDB3: Knex
   let signer1: Server | Server
-  let signer2: Server | Server
-  let signer3: Server | Server
+  // let signer2: Server | Server
+  // let signer3: Server | Server
   let app: any
 
   const signerMigrationsPath = '../signer/src/migrations'
 
   beforeAll(async () => {
     keyProvider1 = await initKeyProvider(signerConfig)
-    keyProvider2 = await initKeyProvider(signerConfig)
-    keyProvider3 = await initKeyProvider(signerConfig)
+    // keyProvider2 = await initKeyProvider(signerConfig)
+    // keyProvider3 = await initKeyProvider(signerConfig)
 
     app = startCombiner(combinerConfig)
   })
 
   beforeEach(async () => {
     signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
-    signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
-    signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
+    // signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
+    // signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
 
     signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3000)
-    signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3001)
-    signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3002)
+    // signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3001)
+    // signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3002)
   })
 
   afterEach(async () => {
     await signerDB1?.destroy()
-    await signerDB2?.destroy()
-    await signerDB3?.destroy()
+    // await signerDB2?.destroy()
+    // await signerDB3?.destroy()
     signer1?.close()
-    signer2?.close()
-    signer3?.close()
+    // signer2?.close()
+    // signer3?.close()
+    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
   })
 
   describe(`${CombinerEndpoint.DISABLE_DOMAIN}`, () => {
@@ -236,10 +239,11 @@ describe('domainService', () => {
       expect(true)
     })
 
-    xit('Should respond with 200 on repeated valid requests', async () => {
+    it('Should respond with 200 on repeated valid requests', async () => {
       const res1 = await request(app)
         .post(CombinerEndpoint.DISABLE_DOMAIN)
         .send(await disableRequest())
+      console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$') // @victor We're never getting here
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DisableDomainResponse>({
         success: true,

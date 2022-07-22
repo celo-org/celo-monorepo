@@ -5,6 +5,7 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
+import { performance, PerformanceObserver } from 'perf_hooks'
 import { OdisConfig } from '../../config'
 import { Session } from '../session'
 import { Action } from './action'
