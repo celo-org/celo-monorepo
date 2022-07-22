@@ -83,7 +83,7 @@ contract BreakerBoxTest is Test, WithRegistry {
    */
   function setupBreakerAndExchange(
     FakeBreaker breaker,
-    uint256 tradingMode,
+    uint64 tradingMode,
     uint256 cooldown,
     bool reset,
     bool trigger,

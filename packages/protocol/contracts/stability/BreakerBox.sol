@@ -11,11 +11,11 @@ import { Exchange } from "./Exchange.sol";
 
 /**
  * @title   BreakerBox
- * @notice  The BreakerBox checks the criteria defined in separate breaker contracts  
- *          to determine whether or not buying or selling should be allowed for a 
- *          specified exchange. The contract stores references to all breakers 
+ * @notice  The BreakerBox checks the criteria defined in separate breaker contracts
+ *          to determine whether or not buying or selling should be allowed for a
+ *          specified exchange. The contract stores references to all breakers
  *          that hold criteria to be checked, exchanges that
- *          can make use of the BreakerBox & their current trading  
+ *          can make use of the BreakerBox & their current trading
  */
 contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   using AddressLinkedList for LinkedList.List;
@@ -25,12 +25,12 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   address[] public exchanges;
   // Maps exchange address to its current trading mode info
   mapping(address => TradingModeInfo) public exchangeTradingModes;
-  mapping(uint256 => address) public tradingModeBreaker;
-  mapping(address => uint256) public breakerTradingMode;
+  mapping(uint64 => address) public tradingModeBreaker;
+  mapping(address => uint64) public breakerTradingMode;
   // Ordered list of breakers to be checked.
   LinkedList.List private breakers;
 
-  modifier validateBreaker(address breaker, uint256 tradingMode) {
+  modifier validateBreaker(address breaker, uint64 tradingMode) {
     require(!isBreaker(breaker), "This breaker has already been added");
     require(
       tradingModeBreaker[tradingMode] == address(0),
@@ -56,7 +56,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
    */
   function initilize(
     address breaker,
-    uint256 tradingMode,
+    uint64 tradingMode,
     address[] calldata _exchanges,
     address registryAddress
   ) external initializer {
@@ -75,7 +75,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
    * @param breaker The address of the breaker to be added.
    * @param tradingMode The trading mode of the breaker to be added.
    */
-  function addBreaker(address breaker, uint256 tradingMode)
+  function addBreaker(address breaker, uint64 tradingMode)
     public
     onlyOwner
     validateBreaker(breaker, tradingMode)
@@ -95,7 +95,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
    */
   function insertBreaker(
     address breaker,
-    uint256 tradingMode,
+    uint64 tradingMode,
     address prevBreaker,
     address nextBreaker
   ) external onlyOwner validateBreaker(breaker, tradingMode) {
@@ -113,7 +113,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   function removeBreaker(address breaker) external onlyOwner {
     require(isBreaker(breaker), "This breaker has not been added");
 
-    uint256 tradingMode = breakerTradingMode[breaker];
+    uint64 tradingMode = breakerTradingMode[breaker];
 
     // Set any exchanges using this breakers trading mode to the default mode
     address[] memory activeExchanges = exchanges;
@@ -151,8 +151,8 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
     );
 
     info.tradingMode = 0; // Default trading mode (Bi-directional).
-    info.lastUpdatedTime = block.timestamp;
-    info.lastUpdatedBlock = block.number;
+    info.lastUpdatedTime = uint64(block.timestamp);
+    info.lastUpdatedBlock = uint128(block.number);
     exchangeTradingModes[exchange] = info;
     exchanges.push(exchange);
 
@@ -200,7 +200,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
    * @param exchange The address of the exchange.
    * @param tradingMode The trading mode that should be set.
    */
-  function setExchangeTradingMode(address exchange, uint256 tradingMode) public onlyOwner {
+  function setExchangeTradingMode(address exchange, uint64 tradingMode) public onlyOwner {
     require(
       tradingMode == 0 || tradingModeBreaker[tradingMode] != address(0),
       "Trading mode must be default or have a breaker set"
@@ -210,8 +210,8 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
     require(info.lastUpdatedTime > 0, "Exchange has not been added");
 
     info.tradingMode = tradingMode;
-    info.lastUpdatedTime = block.timestamp;
-    info.lastUpdatedBlock = block.number;
+    info.lastUpdatedTime = uint64(block.timestamp);
+    info.lastUpdatedBlock = uint128(block.number);
     exchangeTradingModes[exchange] = info;
 
     emit TradingModeUpdated(exchange, tradingMode);
@@ -269,8 +269,8 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
         bool canReset = breaker.shouldReset(exchangeAddress);
         if (canReset) {
           info.tradingMode = 0;
-          info.lastUpdatedTime = block.timestamp;
-          info.lastUpdatedBlock = block.number;
+          info.lastUpdatedTime = uint64(block.timestamp);
+          info.lastUpdatedBlock = uint128(block.number);
           exchangeTradingModes[exchangeAddress] = info;
           emit ResetSuccessful(exchangeAddress, address(breaker));
           return info.tradingMode;
@@ -292,8 +292,8 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
       bool tripBreaker = breaker.shouldTrigger(exchangeAddress);
       if (tripBreaker) {
         info.tradingMode = breakerTradingMode[address(breaker)];
-        info.lastUpdatedTime = block.timestamp;
-        info.lastUpdatedBlock = block.number;
+        info.lastUpdatedTime = uint64(block.timestamp);
+        info.lastUpdatedBlock = uint128(block.number);
         exchangeTradingModes[exchangeAddress] = info;
         emit BreakerTripped(address(breaker), exchangeAddress);
         return info.tradingMode;

@@ -5,12 +5,17 @@ pragma solidity ^0.5.13;
  * @notice Defines the basic interface for the Breaker Box
  */
 interface IBreakerBox {
+  /**
+   * @dev Used to track additional info about
+   *      the current trading mode an exchange is in.
+   *      LastUpdatedTime helps to check cooldown.
+   *      LastUpdatedBlock helps to determine if check should be executed.
+   */
   struct TradingModeInfo {
-    uint256 tradingMode;
-    uint256 lastUpdatedTime;
-    uint256 lastUpdatedBlock;
+    uint64 tradingMode;
+    uint64 lastUpdatedTime;
+    uint128 lastUpdatedBlock;
   }
-  // TODO: Think about storing ref to breaker here then removing the mapping
 
   /**
    * @notice Emitted when a new breaker is added to the breaker box.
