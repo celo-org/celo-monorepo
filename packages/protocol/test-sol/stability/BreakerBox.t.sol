@@ -59,7 +59,8 @@ contract BreakerBoxTest is Test, WithRegistry {
     registry.setAddressFor("Exchange", address(exchangeA));
 
     breakerBox = new BreakerBox(true);
-    breakerBox.initilize(address(fakeBreakerA), 1, testExchanges, address(registry));
+    breakerBox.initilize(testExchanges, address(registry));
+    breakerBox.addBreaker(address(fakeBreakerA), 1);
   }
 
   function isExchange(address exchange) public view returns (bool exchangeFound) {

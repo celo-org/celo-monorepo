@@ -15,7 +15,7 @@ import { Exchange } from "./Exchange.sol";
  *          to determine whether or not buying or selling should be allowed for a
  *          specified exchange. The contract stores references to all breakers
  *          that hold criteria to be checked, exchanges that
- *          can make use of the BreakerBox & their current trading
+ *          can make use of the BreakerBox & their current trading.
  */
 contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   using AddressLinkedList for LinkedList.List;
@@ -23,9 +23,11 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   /* ==================== State Variables ==================== */
 
   address[] public exchanges;
-  // Maps exchange address to its current trading mode info
+  // Maps exchange address to its current trading mode info.
   mapping(address => TradingModeInfo) public exchangeTradingModes;
+  // Maps a trading mode to the associated breaker.
   mapping(uint64 => address) public tradingModeBreaker;
+  // Maps a breaker to the associated trading mode.
   mapping(address => uint64) public breakerTradingMode;
   // Ordered list of breakers to be checked.
   LinkedList.List private breakers;
@@ -43,26 +45,18 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   /* ==================== Constructor ==================== */
 
   /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
+   * @notice Sets initialized == true on implementation contracts.
+   * @param test Set to true to skip implementation initialization.
    */
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @param breaker The address of a breaker to be added
-   * @param tradingMode The trading mode of the breaker to be added
-   * @param _exchanges Exchanges to be added
-   * @param registryAddress The address of the Celo registry contract
+   * @param _exchanges Exchanges to be added.
+   * @param registryAddress The address of the Celo registry contract.
    */
-  function initilize(
-    address breaker,
-    uint64 tradingMode,
-    address[] calldata _exchanges,
-    address registryAddress
-  ) external initializer {
+  function initilize(address[] calldata _exchanges, address registryAddress) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    addBreaker(breaker, tradingMode);
     addExchanges(_exchanges);
   }
 
@@ -108,14 +102,14 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   /**
    * @notice Removes the specified breaker from the list of breakers.
    * @param breaker The address of the breaker to be removed.
-   * @dev Will set any exchange using this breakers trading mode to the default trading mode
+   * @dev Will set any exchange using this breakers trading mode to the default trading mode.
    */
   function removeBreaker(address breaker) external onlyOwner {
     require(isBreaker(breaker), "This breaker has not been added");
 
     uint64 tradingMode = breakerTradingMode[breaker];
 
-    // Set any exchanges using this breakers trading mode to the default mode
+    // Set any exchanges using this breakers trading mode to the default mode.
     address[] memory activeExchanges = exchanges;
     TradingModeInfo memory tradingModeInfo;
 
@@ -161,7 +155,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
 
   /**
    * @notice Adds the specified exchanges to the mapping of monitored exchanges.
-   * @param newExchanges The array of exchange addresses to be added
+   * @param newExchanges The array of exchange addresses to be added.
    */
   function addExchanges(address[] memory newExchanges) public onlyOwner {
     for (uint256 i = 0; i < newExchanges.length; i++) {
@@ -252,22 +246,21 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   function checkBreakers(address exchangeAddress) external returns (uint256 currentTradingMode) {
     TradingModeInfo memory info = exchangeTradingModes[exchangeAddress];
 
-    // Last updated should always have a value gt 0
+    // Last updated should always have a value gt 0.
     // if it doesn't we can assume this exchange has not been added.
     if (info.lastUpdatedTime == 0) {
       return 0;
     }
 
-    // Check if a breaker has non default trading mode & try to reset
+    // Check if a breaker has non default trading mode and reset if we should.
     if (info.tradingMode != 0) {
       IBreaker breaker = IBreaker(tradingModeBreaker[info.tradingMode]);
 
       uint256 cooldown = breaker.getCooldown();
-      bool tryReset = ((cooldown > 0) && (cooldown + info.lastUpdatedTime) <= block.timestamp);
 
-      if (tryReset) {
-        bool canReset = breaker.shouldReset(exchangeAddress);
-        if (canReset) {
+      // If the cooldown == 0, then a manual reset is required.
+      if (((cooldown > 0) && (cooldown + info.lastUpdatedTime) <= block.timestamp)) {
+        if (breaker.shouldReset(exchangeAddress)) {
           info.tradingMode = 0;
           info.lastUpdatedTime = uint64(block.timestamp);
           info.lastUpdatedBlock = uint128(block.number);
@@ -286,7 +279,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
 
     address[] memory _breakers = breakers.getKeys();
 
-    // Check all breakers
+    // Check all breakers.
     for (uint256 i = 0; i < _breakers.length; ++i) {
       IBreaker breaker = IBreaker(_breakers[i]);
       bool tripBreaker = breaker.shouldTrigger(exchangeAddress);
