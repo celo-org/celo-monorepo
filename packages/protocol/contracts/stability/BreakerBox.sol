@@ -11,7 +11,11 @@ import { Exchange } from "./Exchange.sol";
 
 /**
  * @title   BreakerBox
- * @notice  The BreakerBox stores references to Mento exchanges and breakers.
+ * @notice  The BreakerBox checks the criteria defined in separate breaker contracts  
+ *          to determine whether or not buying or selling should be allowed for a 
+ *          specified exchange. The contract stores references to all breakers 
+ *          that hold criteria to be checked, exchanges that
+ *          can make use of the BreakerBox & their current trading  
  */
 contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   using AddressLinkedList for LinkedList.List;
@@ -45,9 +49,10 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   constructor(bool test) public Initializable(test) {}
 
   /**
-   * @param breaker Address of a breaker to be added to the breaker list
-   * @param _exchanges Exchanges to be added to the mapping of exchange-tradingModes
-   * @param registryAddress The address of the registry contract
+   * @param breaker The address of a breaker to be added
+   * @param tradingMode The trading mode of the breaker to be added
+   * @param _exchanges Exchanges to be added
+   * @param registryAddress The address of the Celo registry contract
    */
   function initilize(
     address breaker,
