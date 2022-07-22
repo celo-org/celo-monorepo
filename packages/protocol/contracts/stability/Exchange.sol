@@ -63,6 +63,8 @@ contract Exchange is
   bytes32 public stableTokenRegistryId;
 
   uint256 public minSupplyForStableBucketCap;
+
+  uint256 constant TRADING_MODE_BIDIRECTIONAL = 0;
   FixidityLib.Fraction public stableBucketMaxFraction;
 
   modifier updateBucketsIfNecessary() {
@@ -74,7 +76,7 @@ contract Exchange is
   modifier checkTradingMode() {
     if (address(breakerBox) != address(0)) {
       require(
-        breakerBox.checkBreakers(address(this)) == 0,
+        breakerBox.checkBreakers(address(this)) == TRADING_MODE_BIDIRECTIONAL,
         "Trading is suspended for this exchange"
       );
       _;
