@@ -113,7 +113,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
     address[] memory activeExchanges = exchanges;
     TradingModeInfo memory tradingModeInfo;
 
-    for (uint256 i = 0; i < activeExchanges.length; ++i) {
+    for (uint256 i = 0; i < activeExchanges.length; i++) {
       tradingModeInfo = exchangeTradingModes[activeExchanges[i]];
       if (tradingModeInfo.tradingMode == tradingMode) {
         setExchangeTradingMode(activeExchanges[i], 0);
@@ -169,7 +169,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
    */
   function removeExchange(address exchange) external onlyOwner {
     uint256 exchangeIndex;
-    for (uint256 i = 0; i < exchanges.length; ++i) {
+    for (uint256 i = 0; i < exchanges.length; i++) {
       if (exchanges[i] == exchange) {
         exchangeIndex = i;
         break;
@@ -280,7 +280,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
     address[] memory _breakers = breakers.getKeys();
 
     // Check all breakers.
-    for (uint256 i = 0; i < _breakers.length; ++i) {
+    for (uint256 i = 0; i < _breakers.length; i++) {
       IBreaker breaker = IBreaker(_breakers[i]);
       bool tripBreaker = breaker.shouldTrigger(exchangeAddress);
       if (tripBreaker) {
