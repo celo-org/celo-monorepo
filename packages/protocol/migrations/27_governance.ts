@@ -91,6 +91,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'GovernanceSlasher',
       'GrandaMento',
       'LockedGold',
+      'OdisBalance',
       'Random',
       'Registry',
       'Reserve',
