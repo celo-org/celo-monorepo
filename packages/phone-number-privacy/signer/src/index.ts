@@ -10,7 +10,7 @@ require('dotenv').config()
 async function start() {
   const logger = rootLogger()
   logger.info(`Starting. Dev mode: ${DEV_MODE}`)
-  const db = await initDatabase()
+  const db = await initDatabase(config)
   const keyProvider: KeyProvider = await initKeyProvider(config)
 
   const server = startSigner(config, db, keyProvider)

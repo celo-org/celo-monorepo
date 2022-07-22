@@ -1,9 +1,13 @@
 import { rootLogger } from '@celo/phone-number-privacy-common'
 import { Knex, knex } from 'knex'
-import { config, DEV_MODE, SupportedDatabase } from '../config'
+import { DEV_MODE, SignerConfig, SupportedDatabase } from '../config'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
-export async function initDatabase(migrationsPath?: string, doTestQuery = true): Promise<Knex> {
+export async function initDatabase(
+  config: SignerConfig,
+  migrationsPath?: string,
+  doTestQuery = true
+): Promise<Knex> {
   const logger = rootLogger()
   logger.info({ config: config.db }, 'Initializing database connection')
   const { type, host, port, user, password, database, ssl, poolMaxSize } = config.db

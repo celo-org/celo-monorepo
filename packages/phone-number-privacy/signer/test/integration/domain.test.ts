@@ -128,7 +128,7 @@ describe('domainService', async () => {
   beforeEach(async () => {
     // Create a new in-memory database for each test.
     _config.api.domains.enabled = true
-    db = await initDatabase()
+    db = await initDatabase(_config)
     console.log(_config)
     app = startSigner(_config, db, keyProvider)
   })
