@@ -24,7 +24,7 @@ import { IO } from '../../../base/io'
 import { PnpSession } from '../../session'
 
 export class PnpSignIO extends IO<SignMessageRequest> {
-  readonly endpoint = SignerEndpoint.PARTIAL_SIGN_MESSAGE
+  readonly endpoint = SignerEndpoint.PNP_SIGN
 
   constructor(enabled: boolean, readonly kit: ContractKit) {
     super(enabled)

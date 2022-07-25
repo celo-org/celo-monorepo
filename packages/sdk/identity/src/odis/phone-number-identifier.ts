@@ -127,7 +127,7 @@ export async function getBlindedPhoneNumberSignature(
     signer,
     body,
     context,
-    CombinerEndpoint.SIGN_MESSAGE
+    CombinerEndpoint.LEGACY_PNP_SIGN
   )
   return response.combinedSignature
 }

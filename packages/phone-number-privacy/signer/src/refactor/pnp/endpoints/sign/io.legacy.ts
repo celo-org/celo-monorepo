@@ -1,77 +1,57 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
-  CombinerEndpoint,
-  ErrorType,
-  getSignerEndpoint,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
+  KEY_VERSION_HEADER,
   send,
   SignerEndpoint,
   SignMessageRequest,
   SignMessageRequestSchema,
   SignMessageResponse,
   SignMessageResponseFailure,
-  SignMessageResponseSchema,
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import * as t from 'io-ts'
-import { OdisConfig } from '../../../..'
-import { BLSCryptographyClient } from '../../../../bls/bls-cryptography-client'
-import { VERSION } from '../../../../config'
+import { Counters } from '../../../../common/metrics'
+import { getVersion } from '../../../../config'
+import { Key } from '../../../../key-management/key-provider-base'
 import { IO } from '../../../base/io'
-import { Session } from '../../../session'
+import { PnpSession } from '../../session'
 
-export class PnpSignIO extends IO<SignMessageRequest> {
-  readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_SIGN
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-  readonly requestSchema: t.Type<
-    SignMessageRequest,
-    SignMessageRequest,
-    unknown
-  > = SignMessageRequestSchema
-  readonly responseSchema: t.Type<
-    SignMessageResponse,
-    SignMessageResponse,
-    unknown
-  > = SignMessageResponseSchema
+export class LegacyPnpSignIO extends IO<SignMessageRequest> {
+  readonly endpoint = SignerEndpoint.LEGACY_PNP_SIGN
 
-  constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
-    super(config)
+  constructor(enabled: boolean, readonly kit: ContractKit) {
+    super(enabled)
   }
 
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
-  ): Promise<Session<SignMessageRequest> | null> {
+  ): Promise<PnpSession<SignMessageRequest> | null> {
+    const logger = response.locals.logger
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!(await this.authenticate(request, response.locals.logger()))) {
+    if (!this.requestHasValidKeyVersion(request, logger)) {
+      this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+      return null
+    }
+    if (!(await this.authenticate(request, logger))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(
-      request,
-      response,
-      new BLSCryptographyClient(
-        this.config.keys.threshold,
-        this.config.keys.pubKey,
-        this.config.keys.polynomial
-      )
-    )
+    return new PnpSession(request, response)
   }
 
-  validateClientRequest(
-    request: Request<{}, {}, unknown>
-  ): request is Request<{}, {}, SignMessageRequest> {
+  validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, SignMessageRequest> {
     return (
-      super.validateClientRequest(request) &&
+      SignMessageRequestSchema.is(request.body) &&
       hasValidAccountParam(request.body) &&
       hasValidBlindedPhoneNumberParam(request.body) &&
       identifierIsValidIfExists(request.body) &&
@@ -89,50 +69,52 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   sendSuccess(
     status: number,
     response: Response<SignMessageResponseSuccess>,
+    key: Key,
     signature: string,
     performedQueryCount?: number,
     totalQuota?: number,
     blockNumber?: number,
     warnings?: string[]
   ) {
+    response.set(KEY_VERSION_HEADER, key.version.toString())
     send(
       response,
       {
         success: true,
-        version: VERSION,
+        version: getVersion(),
         signature,
         performedQueryCount,
         totalQuota,
         blockNumber,
-        warnings,
+        warnings, // TODO(Alec)(pnp): update handling of these types in combiner
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(
-    error: ErrorType,
+    error: string,
     status: number,
     response: Response<SignMessageResponseFailure>,
     queryCount?: number,
     totalQuota?: number,
-    blockNumber?: number,
-    signature?: string
+    blockNumber?: number
   ) {
     send(
       response,
       {
         success: false,
-        version: VERSION,
+        version: getVersion(),
         error,
         performedQueryCount: queryCount,
         totalQuota,
         blockNumber,
-        signature,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

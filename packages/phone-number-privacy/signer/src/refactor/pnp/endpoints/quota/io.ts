@@ -22,7 +22,7 @@ import { IO } from '../../../base/io'
 import { PnpSession } from '../../session'
 
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
-  readonly endpoint = SignerEndpoint.GET_QUOTA
+  readonly endpoint = SignerEndpoint.PNP_QUOTA
 
   constructor(enabled: boolean, readonly kit: ContractKit) {
     super(enabled)

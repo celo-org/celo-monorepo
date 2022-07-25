@@ -2,13 +2,14 @@ import { PnpQuotaRequest } from '@celo/phone-number-privacy-common'
 import { SignerConfig } from '../../../../config'
 import { Action } from '../../../base/action'
 import { PnpQuotaService } from '../../services/quota'
+import { LegacyPnpQuotaService } from '../../services/quota.legacy'
 import { PnpSession } from '../../session'
 import { PnpQuotaIO } from './io'
 
 export class PnpQuotaAction implements Action<PnpQuotaRequest> {
   constructor(
     readonly config: SignerConfig,
-    readonly quota: PnpQuotaService,
+    readonly quota: PnpQuotaService | LegacyPnpQuotaService,
     readonly io: PnpQuotaIO
   ) {}
 

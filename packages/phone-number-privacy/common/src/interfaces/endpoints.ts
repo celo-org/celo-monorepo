@@ -1,12 +1,15 @@
 export enum SignerEndpointPNP {
-  PARTIAL_SIGN_MESSAGE = '/getBlindedMessagePartialSig',
-  GET_QUOTA = '/getQuota',
+  LEGACY_PNP_SIGN = '/getBlindedMessagePartialSig',
+  LEGACY_PNP_QUOTA = '/getQuota',
+  PNP_QUOTA = '/quotaStatus',
+  PNP_SIGN = '/sign',
   METRICS = '/metrics',
   STATUS = '/status',
 }
 
 export enum CombinerEndpointPNP {
-  SIGN_MESSAGE = '/getBlindedMessageSig',
+  LEGACY_PNP_SIGN = '/getBlindedMessageSig',
+  PNP_SIGN = '/sign',
   MATCHMAKING = '/getContactMatches',
 }
 
@@ -33,8 +36,8 @@ export function getSignerEndpoint(endpoint: CombinerEndpoint): SignerEndpoint {
       return SignerEndpoint.DOMAIN_QUOTA_STATUS
     case CombinerEndpoint.DOMAIN_SIGN:
       return SignerEndpoint.DOMAIN_SIGN
-    case CombinerEndpoint.SIGN_MESSAGE:
-      return SignerEndpoint.PARTIAL_SIGN_MESSAGE
+    case CombinerEndpoint.LEGACY_PNP_SIGN:
+      return SignerEndpoint.LEGACY_PNP_SIGN
     default:
       throw new Error(`No corresponding signer endpoint exists for combiner endpoint ${endpoint}`)
   }
@@ -48,8 +51,8 @@ export function getCombinerEndpoint(endpoint: SignerEndpoint): CombinerEndpoint 
       return CombinerEndpoint.DOMAIN_QUOTA_STATUS
     case SignerEndpoint.DOMAIN_SIGN:
       return CombinerEndpoint.DOMAIN_SIGN
-    case SignerEndpoint.PARTIAL_SIGN_MESSAGE:
-      return CombinerEndpoint.SIGN_MESSAGE
+    case SignerEndpoint.LEGACY_PNP_SIGN:
+      return CombinerEndpoint.LEGACY_PNP_SIGN
     default:
       throw new Error(`No corresponding combiner endpoint exists for signer endpoint ${endpoint}`)
   }

@@ -1,9 +1,9 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import {
-  Endpoints,
-  GetQuotaResponse,
   KEY_VERSION_HEADER,
+  PnpQuotaResponse,
   rootLogger as logger,
+  SignerEndpoint,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
   TestUtils,
@@ -15,8 +15,8 @@ import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
-import config, { getVersion } from '../../src/config'
-import { getWalletAddress } from '../../src/signing/query-quota'
+import { config, getVersion } from '../../src/config'
+import { getWalletAddress } from '../../src/web3/contracts'
 
 require('dotenv').config()
 
@@ -61,7 +61,7 @@ describe('Running against a deployed service', () => {
   })
 
   it('Service is deployed at correct version', async () => {
-    const response = await fetch(ODIS_SIGNER + Endpoints.STATUS, { method: 'GET' })
+    const response = await fetch(ODIS_SIGNER + SignerEndpoint.STATUS, { method: 'GET' })
     const body = await response.json()
     // This checks against local package.json version, change if necessary
     expect(body.version).toBe(getVersion())
@@ -204,7 +204,7 @@ describe('Running against a deployed service', () => {
 
     it('Check that accounts are set up correctly', async () => {
       expect(await getQuota(ACCOUNT_ADDRESS2, IDENTIFIER)).toBeLessThan(initialQuota)
-      expect(await getWalletAddress(logger(), ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
+      expect(await getWalletAddress(contractkit, logger(), ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
     })
 
     // Note: Use this test to check the signers' key configuration. Modify .env to try out different
@@ -265,7 +265,7 @@ async function queryQuotaEndpoint(
   account: string,
   hashedPhoneNumber?: string,
   authHeader?: string
-): Promise<GetQuotaResponse> {
+): Promise<PnpQuotaResponse> {
   const body = JSON.stringify({
     account,
     hashedPhoneNumber,

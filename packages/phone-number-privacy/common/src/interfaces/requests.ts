@@ -35,24 +35,28 @@ export interface GetBlindedMessageSigRequest {
   /** Query message. A blinded elliptic curve point encoded in base64. */
   blindedQueryPhoneNumber: string
   /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod: string | undefined
+  authenticationMethod?: string
   /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
-  hashedPhoneNumber: string | undefined
+  hashedPhoneNumber?: string
   /** Client-specified session ID for the request. */
-  sessionID: string | undefined
+  sessionID?: string
   /** Client-specified version string */
-  version: string | undefined
+  version?: string
 }
 export declare type SignMessageRequest = GetBlindedMessageSigRequest
 
-export const SignMessageRequestSchema: t.Type<SignMessageRequest> = t.type({
-  account: t.string,
-  blindedQueryPhoneNumber: t.string,
-  authenticationMethod: t.union([t.string, t.undefined]),
-  hashedPhoneNumber: t.union([t.string, t.undefined]),
-  sessionID: t.union([t.string, t.undefined]),
-  version: t.union([t.string, t.undefined]),
-})
+export const SignMessageRequestSchema: t.Type<SignMessageRequest> = t.intersection([
+  t.type({
+    account: t.string,
+    blindedQueryPhoneNumber: t.string,
+  }),
+  t.partial({
+    authenticationMethod: t.union([t.string, t.undefined]),
+    hashedPhoneNumber: t.union([t.string, t.undefined]),
+    sessionID: t.union([t.string, t.undefined]),
+    version: t.union([t.string, t.undefined]),
+  }),
+])
 
 export interface GetContactMatchesRequest {
   /** Celo account address of the user */
@@ -64,47 +68,55 @@ export interface GetContactMatchesRequest {
   /** User's ODIS generated on-chain identifier */
   hashedPhoneNumber: string
   /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod: string | undefined
+  authenticationMethod?: string
   /** DEK signature over the user's phone number */
-  signedUserPhoneNumber: string | undefined
+  signedUserPhoneNumber?: string
   /** Client-specified session ID for the request. */
-  sessionID: string | undefined
+  sessionID?: string
   /** Client-specified version string */
-  version: string | undefined
+  version?: string
 }
 export declare type MatchmakingRequest = GetContactMatchesRequest
 
-export const MatchmakingRequestSchema: t.Type<MatchmakingRequest> = t.type({
-  account: t.string,
-  userPhoneNumber: t.string,
-  contactPhoneNumbers: t.array(t.string),
-  hashedPhoneNumber: t.string,
-  authenticationMethod: t.union([t.string, t.undefined]),
-  signedUserPhoneNumber: t.union([t.string, t.undefined]),
-  sessionID: t.union([t.string, t.undefined]),
-  version: t.union([t.string, t.undefined]),
-})
+export const MatchmakingRequestSchema: t.Type<MatchmakingRequest> = t.intersection([
+  t.type({
+    account: t.string,
+    userPhoneNumber: t.string,
+    contactPhoneNumbers: t.array(t.string),
+    hashedPhoneNumber: t.string,
+  }),
+  t.partial({
+    authenticationMethod: t.union([t.string, t.undefined]),
+    signedUserPhoneNumber: t.union([t.string, t.undefined]),
+    sessionID: t.union([t.string, t.undefined]),
+    version: t.union([t.string, t.undefined]),
+  }),
+])
 
 export interface GetQuotaRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod: string | undefined
+  authenticationMethod?: string
   /** User's ODIS generated on-chain identifier */
-  hashedPhoneNumber: string | undefined
+  hashedPhoneNumber?: string
   /** Client-specified session ID for the request. */
-  sessionID: string | undefined
+  sessionID?: string
   /** Client-specified version string */
-  version: string | undefined
+  version?: string
 }
 export declare type PnpQuotaRequest = GetQuotaRequest
 
-export const PnpQuotaRequestSchema: t.Type<PnpQuotaRequest> = t.type({
-  account: t.string,
-  authenticationMethod: t.union([t.string, t.undefined]),
-  hashedPhoneNumber: t.union([t.string, t.undefined]),
-  sessionID: t.union([t.string, t.undefined]),
-  version: t.union([t.string, t.undefined]),
-})
+export const PnpQuotaRequestSchema: t.Type<PnpQuotaRequest> = t.intersection([
+  t.type({
+    account: t.string,
+  }),
+  t.partial({
+    authenticationMethod: t.union([t.string, t.undefined]),
+    hashedPhoneNumber: t.union([t.string, t.undefined]),
+    sessionID: t.union([t.string, t.undefined]),
+    version: t.union([t.string, t.undefined]),
+  }),
+])
 
 export type PhoneNumberPrivacyRequest = SignMessageRequest | MatchmakingRequest | PnpQuotaRequest
 

@@ -245,5 +245,4 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
     })
   })
-})
-*/
+}) */

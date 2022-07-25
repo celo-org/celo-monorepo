@@ -8,16 +8,18 @@ import { getRequestExists } from '../../../../database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../../key-management/key-provider-base'
 import { Action, Session } from '../../../base/action'
 import { PnpQuotaService } from '../../services/quota'
+import { LegacyPnpQuotaService } from '../../services/quota.legacy'
 import { PnpSession } from '../../session'
 import { PnpSignIO } from './io'
+import { LegacyPnpSignIO } from './io.legacy'
 
 export class PnpSignAction implements Action<SignMessageRequest> {
   constructor(
     readonly db: Knex,
     readonly config: SignerConfig,
-    readonly quota: PnpQuotaService,
+    readonly quota: PnpQuotaService | LegacyPnpQuotaService,
     readonly keyProvider: KeyProvider,
-    readonly io: PnpSignIO
+    readonly io: PnpSignIO | LegacyPnpSignIO
   ) {}
 
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {

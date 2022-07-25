@@ -22,6 +22,7 @@ import { PnpQuotaIO } from './refactor/pnp/endpoints/quota/io'
 import { PnpSignAction } from './refactor/pnp/endpoints/sign/action'
 import { PnpSignIO } from './refactor/pnp/endpoints/sign/io'
 import { PnpQuotaService } from './refactor/pnp/services/quota'
+import { LegacyPnpQuotaService } from './refactor/pnp/services/quota.legacy'
 import { getContractKit } from './web3/contracts'
 
 require('events').EventEmitter.defaultMaxListeners = 15
@@ -74,7 +75,8 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
 
   const kit = getContractKit(config)
 
-  const pnpQuotaService = new PnpQuotaService(db, kit) // TODO(Alec): change accesses over to use this
+  const pnpQuotaService = new PnpQuotaService(db, kit)
+  const legacyPnpQuotaService = new LegacyPnpQuotaService(db, kit)
   const domainQuotaService = new DomainQuotaService(db)
 
   const pnpQuota = new Controller(
@@ -93,6 +95,22 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
       new PnpSignIO(config.api.phoneNumberPrivacy.enabled, kit)
     )
   )
+  const legacyPnpSign = new Controller(
+    new PnpSignAction(
+      db,
+      config,
+      legacyPnpQuotaService,
+      keyProvider,
+      new PnpSignIO(config.api.phoneNumberPrivacy.enabled, kit)
+    )
+  )
+  const legacyPnpQuota = new Controller(
+    new PnpQuotaAction(
+      config,
+      legacyPnpQuotaService,
+      new PnpQuotaIO(config.api.phoneNumberPrivacy.enabled, kit)
+    )
+  )
   const domainQuota = new Controller(
     new DomainQuotaAction(config, domainQuotaService, new DomainQuotaIO(config.api.domains.enabled))
   )
@@ -109,11 +127,17 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
     new DomainDisableAction(config, new DomainDisableIO(config.api.domains.enabled), db) // TODO: param ordering
   )
 
-  addMeteredSignerEndpoint(SignerEndpoint.PARTIAL_SIGN_MESSAGE, pnpSign.handle.bind(pnpSign))
-  addMeteredSignerEndpoint(SignerEndpoint.GET_QUOTA, pnpQuota.handle.bind(pnpQuota))
+  addMeteredSignerEndpoint(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))
+  addMeteredSignerEndpoint(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota))
   addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
   addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
   addMeteredSignerEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
+
+  addMeteredSignerEndpoint(SignerEndpoint.LEGACY_PNP_SIGN, legacyPnpSign.handle.bind(legacyPnpSign))
+  addMeteredSignerEndpoint(
+    SignerEndpoint.LEGACY_PNP_QUOTA,
+    legacyPnpQuota.handle.bind(legacyPnpQuota)
+  )
 
   const sslOptions = getSslOptions(config)
   if (sslOptions) {

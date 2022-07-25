@@ -7,7 +7,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { DomainStateRecord } from '../../database/models/domainState'
-import { PnpQuotaStatus } from '../pnp/services/quota'
+import { PnpQuotaStatus } from '../pnp/services/quota.legacy'
 import { Session } from './action'
 
 // prettier-ignore

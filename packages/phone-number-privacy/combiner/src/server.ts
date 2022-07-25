@@ -37,17 +37,20 @@ export function startCombiner(config: CombinerConfig) {
   //   })
   // })
 
-  // app.get(CombinerEndpoint.METRICS, (_req, res) => {
-  //   res.send(PromClient.register.metrics())
-  // })
-
   const kit: ContractKit = getContractKit(config.blockchain)
+
+  const legacyPnpSign = new Controller(
+    new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy, kit))
+  )
+  app.post(CombinerEndpoint.LEGACY_PNP_SIGN, (req, res) =>
+    meterResponse(legacyPnpSign.handle, req, res, CombinerEndpoint.LEGACY_PNP_SIGN)
+  )
 
   const pnpSign = new Controller(
     new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy, kit))
   )
-  app.post(CombinerEndpoint.SIGN_MESSAGE, (req, res) =>
-    meterResponse(pnpSign.handle, req, res, CombinerEndpoint.SIGN_MESSAGE)
+  app.post(CombinerEndpoint.PNP_SIGN, (req, res) =>
+    meterResponse(pnpSign.handle, req, res, CombinerEndpoint.PNP_SIGN)
   )
 
   const domainThresholdStateService = new DomainThresholdStateService(config.domains)
