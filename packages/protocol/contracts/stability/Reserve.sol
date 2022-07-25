@@ -68,6 +68,7 @@ contract Reserve is
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
+  event ReserveArbTokenTransferred(address indexed spender, address indexed to, uint256 value);
   event TobinTaxSet(uint256 value);
   event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
@@ -395,6 +396,37 @@ contract Reserve is
   }
 
   /**
+   * @notice Transfer stable to a whitelisted address subject to reserve spending limits.
+   * @param to The address that will receive the stable.
+   * @param value The amount of stable to transfer.
+   * @return Returns true if the transaction succeeds.
+   */
+  function transferArbToken(address payable to, uint256 value) external returns (bool) {
+    require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
+    require(isOtherReserveAddress[to], "can only transfer to other reserve address");
+    uint256 currentDay = now / 1 days;
+    if (currentDay > lastSpendingDay) {
+      uint256 balance = getUnfrozenReserveGoldBalance();
+      lastSpendingDay = currentDay;
+      spendingLimit = spendingRatio.multiply(FixidityLib.newFixed(balance)).fromFixed();
+    }
+    require(spendingLimit >= value, "Exceeding spending limit");
+    spendingLimit = spendingLimit.sub(value);
+    return _transferArbToken(to, value);
+  }
+
+  /**
+   * @notice Transfer unfrozen stable to any address.
+   * @param to The address that will receive the stable.
+   * @param value The amount of stable to transfer.
+   * @return Returns true if the transaction succeeds.
+   */
+  function _transferArbToken(address payable to, uint256 value) internal returns (bool) {
+    emit ReserveArbTokenTransferred(msg.sender, to, value);
+    return true;
+  }
+
+  /**
    * @notice Transfer unfrozen gold to any address.
    * @param to The address that will receive the gold.
    * @param value The amount of gold to transfer.
@@ -420,6 +452,21 @@ contract Reserve is
     returns (bool)
   {
     return _transferGold(to, value);
+  }
+
+  /**
+   * @notice Transfer stable to any address.
+   * @dev Transfers are not subject to a daily spending limit.
+   * @param to The address that will receive the stable.
+   * @param value The amount of stable to transfer.
+   * @return Returns true if the transaction succeeds.
+   */
+  function transferExchangeArbToken(address payable to, uint256 value)
+    external
+    isAllowedToSpendExchange(msg.sender)
+    returns (bool)
+  {
+    return _transferArbToken(to, value);
   }
 
   /**
