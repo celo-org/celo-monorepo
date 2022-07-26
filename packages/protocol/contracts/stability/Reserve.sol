@@ -396,9 +396,9 @@ contract Reserve is
   }
 
   /**
-   * @notice Transfer stable to a whitelisted address subject to reserve spending limits.
-   * @param to The address that will receive the stable.
-   * @param value The amount of stable to transfer.
+   * @notice Transfer ERC20 token to a whitelisted address subject to reserve spending limits.
+   * @param to The address that will receive the ERC20 token.
+   * @param value The amount of ERC20 token to transfer.
    * @return Returns true if the transaction succeeds.
    */
   function transferErc20Token(address payable to, uint256 value) external returns (bool) {
@@ -418,12 +418,12 @@ contract Reserve is
   }
 
   /**
-   * @notice Transfer unfrozen stable to any address.
-   * @param to The address that will receive the stable.
-   * @param value The amount of stable to transfer.
+   * @notice Transfer unfrozen ERC20 token to any address.
+   * @param to The address that will receive the ERC20 token.
+   * @param value The amount of ERC20 token to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function _transferArbToken(address payable to, uint256 value) internal returns (bool) {
+  function _transferErc20Token(address payable to, uint256 value) internal returns (bool) {
     // get lockederc20 token value that it doesn't acceed the value that reserve has
     to.sendValue(value);
     emit ReserveArbTokenTransferred(msg.sender, to, value);
@@ -459,10 +459,10 @@ contract Reserve is
   }
 
   /**
-   * @notice Transfer stable to any address.
+   * @notice Transfer ERC20 token to any address.
    * @dev Transfers are not subject to a daily spending limit.
-   * @param to The address that will receive the stable.
-   * @param value The amount of stable to transfer.
+   * @param to The address that will receive the staERC20 token.
+   * @param value The amount of ERC20 token to transfer.
    * @return Returns true if the transaction succeeds.
    */
   function transferExchangeErc20Token(address payable to, uint256 value)
