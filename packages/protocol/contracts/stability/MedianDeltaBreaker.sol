@@ -22,13 +22,14 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
   /* ==================== State Variables ==================== */
 
   // The amount of time that must pass before the breaker can be reset for an exchange.
+  // Should be set to 0 to force a manual reset.
   uint256 public cooldownTime;
-  // The allowed threshold for the median price change. Multiplied by 10^24
+  // The allowed threshold for the median price change as a Fixidity fraction.
   FixidityLib.Fraction public priceChangeThreshold;
 
   /* ==================== Events ==================== */
 
-  event priceChangeThresholdUpdated(uint256 newPriceChangeThreshold);
+  event PriceChangeThresholdUpdated(uint256 newPriceChangeThreshold);
 
   /* ==================== Constructor ==================== */
 
@@ -63,7 +64,7 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
       priceChangeThreshold.lt(FixidityLib.fixed1()),
       "price change threshold must be less than 1"
     );
-    emit priceChangeThresholdUpdated(_priceChangeThreshold);
+    emit PriceChangeThresholdUpdated(_priceChangeThreshold);
   }
 
   /* ==================== View Functions ==================== */
@@ -77,11 +78,11 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
   }
 
   /**
-   * @notice  Check if the current median report price change, for an exchange, relative 
-   *          to the last median report is greater than a calculated threshold. 
+   * @notice  Check if the current median report price change, for an exchange, relative
+   *          to the last median report is greater than a calculated threshold.
    *          If the change is greater than the threshold the breaker will trip.
    * @param   exchange The exchange to be checked.
-   * @return  triggerBreaker  A bool indicating whether or not this breaker 
+   * @return  triggerBreaker  A bool indicating whether or not this breaker
    *                          should be tripped for the exchange.
    */
   function shouldTrigger(address exchange) public view returns (bool triggerBreaker) {
@@ -91,8 +92,8 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
 
     address stableToken = IExchange(exchange).stable();
 
-    uint256 lastMedian = sortedOracles.lastMedianRate(stableToken);
-    if (lastMedian == 0) {
+    uint256 previousMedian = sortedOracles.previousMedianRate(stableToken);
+    if (previousMedian == 0) {
       // Last median will be 0 if this exchange is new and has not had a median update yet.
       return false;
     }
@@ -100,13 +101,17 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     (uint256 currentMedian, ) = sortedOracles.medianRate(stableToken);
 
     // Check if current median is within allowed threshold of last median
-    triggerBreaker = !isWithinThreshold(lastMedian, currentMedian, priceChangeThreshold.unwrap());
+    triggerBreaker = !isWithinThreshold(
+      previousMedian,
+      currentMedian,
+      priceChangeThreshold.unwrap()
+    );
   }
 
   /**
-   * @notice  Checks whether or not the conditions have been met 
+   * @notice  Checks whether or not the conditions have been met
    *          for the specifed exchange to be reset.
-   * @return  resetBreaker A bool indicating whether or not 
+   * @return  resetBreaker A bool indicating whether or not
    *          this breaker can be reset for the given exchange.
    */
   function shouldReset(address exchange) external view returns (bool resetBreaker) {
@@ -117,7 +122,7 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
    * @notice Checks if the specified current median rate is within the allowed threshold.
    * @param lastRate The last median rate.
    * @param currentRate The current median rate.
-   * @return  Returns a bool indicating whether or not the current rate 
+   * @return  Returns a bool indicating whether or not the current rate
    *          is within the given threshold.
    */
   function isWithinThreshold(uint256 lastRate, uint256 currentRate, uint256 allowedThreshold)
@@ -125,6 +130,9 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     pure
     returns (bool)
   {
+    // uint256 maxPercent = FixidityLib.newFixed(1).add(allowedThreshold);
+    // uint256 maxValue = (FixidityLib.newFixed(lastRate).multiply(maxPercent)).fromFixed();
+
     uint256 maxPercent = uint256(1 * 10**24).add(allowedThreshold);
     uint256 maxValue = (lastRate.mul(maxPercent)).div(10**24);
 

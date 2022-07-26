@@ -366,8 +366,9 @@ contract BreakerBoxTest_constructorAndSetters is BreakerBoxTest {
 }
 
 contract BreakerBoxTest_checkBreakers is BreakerBoxTest {
-  function test_checkBreakers_whenExchangeIsNotAdded_shouldReturnDefaultMode() public {
-    assertEq(breakerBox.checkBreakers(exchangeC), 0);
+  function test_checkBreakers_whenExchangeIsNotAdded_shouldRevert() public {
+    vm.expectRevert("This exchange has not been added");
+    breakerBox.checkBreakers(exchangeC);
   }
 
   function test_checkBreakers_whenExchangeIsNotInDefaultModeAndCooldownNotPassed_shouldEmitNotCool()

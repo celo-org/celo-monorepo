@@ -53,7 +53,7 @@ contract MockSortedOracles {
     return (new address[](1), new uint256[](1), new SortedLinkedListWithMedian.MedianRelation[](1));
   }
 
-  function lastMedianRate(address token) public returns (uint256) {
+  function previousMedianRate(address token) public returns (uint256) {
     return 0;
   }
 }

@@ -29,7 +29,7 @@ contract MedianDeltaBreakerTest is Test, WithRegistry {
   event BreakerTriggered(address indexed exchange);
   event BreakerReset(address indexed exchange);
   event CooldownTimeUpdated(uint256 newCooldownTime);
-  event priceChangeThresholdUpdated(uint256 newMinPriceChangeThreshold);
+  event PriceChangeThresholdUpdated(uint256 newMinPriceChangeThreshold);
 
   function setUp() public {
     deployer = actor("deployer");
@@ -52,11 +52,11 @@ contract MedianDeltaBreakerTest is Test, WithRegistry {
     breaker = new MedianDeltaBreaker(address(registry), coolDownTime, threshold);
   }
 
-  function setupSortedOracles(uint256 currentMedianRate, uint256 lastMedianRate) public {
+  function setupSortedOracles(uint256 currentMedianRate, uint256 previousMedianRate) public {
     vm.mockCall(
       address(sortedOracles),
-      abi.encodeWithSelector(sortedOracles.lastMedianRate.selector),
-      abi.encode(lastMedianRate)
+      abi.encodeWithSelector(sortedOracles.previousMedianRate.selector),
+      abi.encode(previousMedianRate)
     );
 
     vm.mockCall(
@@ -119,7 +119,7 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
   function test_setPriceChangeThreshold_whenCallerIsOwner_shouldUpdateAndEmit() public {
     uint256 testThreshold = 0.1 * 10**24;
     vm.expectEmit(false, false, false, true);
-    emit priceChangeThresholdUpdated(testThreshold);
+    emit PriceChangeThresholdUpdated(testThreshold);
 
     breaker.setPriceChangeThreshold(testThreshold);
 
@@ -135,14 +135,14 @@ contract MedianDeltaBreakerTest_constructorAndSetters is MedianDeltaBreakerTest 
 
 contract MedianDeltaBreakerTest_shouldTrigger is MedianDeltaBreakerTest {
   function updateMedianByPercent(uint256 medianChangeScaleFactor) public {
-    uint256 lastMedianRate = 0.98 * 10**24;
-    uint256 currentMedianRate = (lastMedianRate * medianChangeScaleFactor) / 10**24;
-    setupSortedOracles(currentMedianRate, lastMedianRate);
+    uint256 previousMedianRate = 0.98 * 10**24;
+    uint256 currentMedianRate = (previousMedianRate * medianChangeScaleFactor) / 10**24;
+    setupSortedOracles(currentMedianRate, previousMedianRate);
 
     vm.expectCall(address(testExchange), abi.encodeWithSelector(testExchange.stable.selector));
     vm.expectCall(
       address(sortedOracles),
-      abi.encodeWithSelector(sortedOracles.lastMedianRate.selector, testStable)
+      abi.encodeWithSelector(sortedOracles.previousMedianRate.selector, testStable)
     );
     vm.expectCall(
       address(sortedOracles),

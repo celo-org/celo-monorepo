@@ -27,7 +27,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   mapping(address => SortedLinkedListWithMedian.List) private timestamps;
   mapping(address => mapping(address => bool)) public isOracle;
   mapping(address => address[]) public oracles;
-  mapping(address => uint256) public lastMedianRate;
+  mapping(address => uint256) public previousMedianRate;
 
   // `reportExpirySeconds` is the fallback value used to determine reporting
   // frequency. Initially it was the _only_ value but we later introduced
@@ -218,7 +218,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     emit OracleReported(token, msg.sender, now, value);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
-      lastMedianRate[token] = originalMedian;
+      previousMedianRate[token] = originalMedian;
       emit MedianUpdated(token, newMedian);
     }
   }
@@ -331,7 +331,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     emit OracleReportRemoved(token, oracle);
     uint256 newMedian = rates[token].getMedianValue();
     if (newMedian != originalMedian) {
-      lastMedianRate[token] = newMedian;
+      previousMedianRate[token] = newMedian;
       emit MedianUpdated(token, newMedian);
     }
   }

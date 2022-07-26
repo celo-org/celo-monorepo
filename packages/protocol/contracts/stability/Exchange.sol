@@ -72,7 +72,6 @@ contract Exchange is
     _;
   }
 
-  // TODO: Exchange migrations need to be initilised with BB address.
   modifier checkTradingMode() {
     if (address(breakerBox) != address(0)) {
       require(

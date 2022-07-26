@@ -32,7 +32,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   // Ordered list of breakers to be checked.
   LinkedList.List private breakers;
 
-  modifier validateBreaker(address breaker, uint64 tradingMode) {
+  modifier onlyValidBreaker(address breaker, uint64 tradingMode) {
     require(!isBreaker(breaker), "This breaker has already been added");
     require(
       tradingModeBreaker[tradingMode] == address(0),
@@ -72,7 +72,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   function addBreaker(address breaker, uint64 tradingMode)
     public
     onlyOwner
-    validateBreaker(breaker, tradingMode)
+    onlyValidBreaker(breaker, tradingMode)
   {
     tradingModeBreaker[tradingMode] = breaker;
     breakerTradingMode[breaker] = tradingMode;
@@ -92,7 +92,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
     uint64 tradingMode,
     address prevBreaker,
     address nextBreaker
-  ) external onlyOwner validateBreaker(breaker, tradingMode) {
+  ) external onlyOwner onlyValidBreaker(breaker, tradingMode) {
     tradingModeBreaker[tradingMode] = breaker;
     breakerTradingMode[breaker] = tradingMode;
     breakers.insert(breaker, prevBreaker, nextBreaker);
@@ -246,11 +246,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
   function checkBreakers(address exchangeAddress) external returns (uint256 currentTradingMode) {
     TradingModeInfo memory info = exchangeTradingModes[exchangeAddress];
 
-    // Last updated should always have a value gt 0.
-    // if it doesn't we can assume this exchange has not been added.
-    if (info.lastUpdatedTime == 0) {
-      return 0;
-    }
+    require(info.lastUpdatedTime > 0, "This exchange has not been added");
 
     // Check if a breaker has non default trading mode and reset if we should.
     if (info.tradingMode != 0) {

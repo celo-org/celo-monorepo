@@ -31,7 +31,7 @@ interface IBreaker {
   function getCooldown() external view returns (uint256 cooldown);
 
   /**
-   * @notice Check if the criteria has been met, by a specified exchange, to trigger the breaker.
+   * @notice Check if the criteria have been met, by a specified exchange, to trigger the breaker.
    * @param exchange The address of the exchange to run the check against.
    * @return triggerBreaker A boolean indicating whether or not the breaker
    *                        should be triggered for the given exchange.
@@ -39,7 +39,7 @@ interface IBreaker {
   function shouldTrigger(address exchange) external view returns (bool triggerBreaker);
 
   /**
-   * @notice Check if the criteria to automatically reset the breaker has been met.
+   * @notice Check if the criteria to automatically reset the breaker have been met.
    * @param exchange The exchange the criteria should be checked against.
    * @return resetBreaker A boolean indicating whether the breaker
    *                      should be reset for the given exchange.
