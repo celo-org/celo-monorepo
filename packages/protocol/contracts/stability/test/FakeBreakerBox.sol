@@ -11,7 +11,7 @@ contract FakeBreakerBox is IBreakerBox {
     tradingMode = _tradingMode;
   }
 
-  function checkBreakers(address exchange) external returns (uint256 currentTradingMode) {
+  function checkBreakers(address) external view returns (uint256) {
     return tradingMode;
   }
 
@@ -19,13 +19,13 @@ contract FakeBreakerBox is IBreakerBox {
     return new address[](0);
   }
 
-  function isBreaker(address breaker) external view returns (bool) {
+  function isBreaker(address) external view returns (bool) {
     return true;
   }
 
-  function getTradingMode(address exchange) external returns (uint256) {
+  function getTradingMode(address) external returns (uint256) {
     return 0;
   }
 
-  function checkBreakers(bytes32 exchangeRegistryId) external {}
+  function checkBreakers(bytes32) external {}
 }

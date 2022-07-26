@@ -45,15 +45,15 @@ contract MockSortedOracles {
     expired[token] = true;
   }
 
-  function getTimestamps(address token)
+  function getTimestamps(address)
     external
-    view
+    pure
     returns (address[] memory, uint256[] memory, SortedLinkedListWithMedian.MedianRelation[] memory)
   {
     return (new address[](1), new uint256[](1), new SortedLinkedListWithMedian.MedianRelation[](1));
   }
 
-  function previousMedianRate(address token) public returns (uint256) {
+  function previousMedianRate(address) public pure returns (uint256) {
     return 0;
   }
 }

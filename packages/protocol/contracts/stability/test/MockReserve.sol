@@ -47,7 +47,7 @@ contract MockReserve {
     reserveSpender = _reserveSpender;
   }
 
-  function isExchangeSpender(address exchange) external view returns (bool) {
+  function isExchangeSpender(address) external view returns (bool) {
     return reserveSpender;
   }
 }

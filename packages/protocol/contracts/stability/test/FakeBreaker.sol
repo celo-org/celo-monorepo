@@ -2,9 +2,7 @@
 
 pragma solidity ^0.5.13;
 
-import { IBreaker } from "contracts/stability/interfaces/IBreaker.sol";
-
-contract FakeBreaker is IBreaker {
+contract FakeBreaker {
   uint256 public cooldown;
   bool public trigger;
   bool public reset;
@@ -19,23 +17,17 @@ contract FakeBreaker is IBreaker {
     return cooldown;
   }
 
-  function setCooldown(uint256 _cooldown) external {
-    cooldown = _cooldown;
-  }
+  function setCooldown(uint256) external {}
 
-  function shouldTrigger(address exchange) external view returns (bool) {
+  function shouldTrigger(address) external view returns (bool) {
     return trigger;
   }
 
-  function setTrigger(bool _trigger) external {
-    trigger = _trigger;
-  }
+  function setTrigger(bool) external {}
 
-  function shouldReset(address exchange) external view returns (bool) {
+  function shouldReset(address) external view returns (bool) {
     return reset;
   }
 
-  function setReset(bool _reset) external {
-    reset = _reset;
-  }
+  function setReset(bool) external {}
 }
