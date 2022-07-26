@@ -52,7 +52,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!(await this.authenticate(request, response.locals.logger()))) {
+    if (!(await this.authenticate(request, response.locals.logger))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
@@ -107,7 +107,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
         warnings,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
   }
 
@@ -132,7 +132,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
         signature,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
   }
 }

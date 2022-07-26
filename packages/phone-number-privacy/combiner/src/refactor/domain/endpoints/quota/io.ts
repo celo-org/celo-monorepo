@@ -68,7 +68,7 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
         status: domainState,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
   }
 
@@ -87,7 +87,7 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
         status: domainState,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
   }
 }

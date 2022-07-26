@@ -30,7 +30,7 @@ export class Session<R extends OdisRequest> {
     readonly response: Response<OdisResponse<R>>,
     readonly crypto: CryptoClient<R>
   ) {
-    this.logger = response.locals.logger()
+    this.logger = response.locals.logger
   }
 
   incrementErrorCodeCount(errorCode: number) {

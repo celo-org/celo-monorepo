@@ -1,8 +1,8 @@
 import {
   Domain,
   DomainOptions,
-  SignerEndpoint as Endpoint,
   SequentialDelayDomain,
+  SignerEndpoint as Endpoint,
 } from '@celo/phone-number-privacy-common'
 import { defined, noBool, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { ACCOUNT_ADDRESS2 } from '@celo/wallet-rpc/lib/rpc-wallet.test'

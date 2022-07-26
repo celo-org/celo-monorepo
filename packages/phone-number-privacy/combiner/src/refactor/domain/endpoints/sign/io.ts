@@ -80,7 +80,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
         status: domainState,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
   }
 
@@ -99,7 +99,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
         status: domainState,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
   }
 }

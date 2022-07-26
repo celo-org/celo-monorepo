@@ -14,7 +14,7 @@ export function rootLogger(): Logger {
 
   const logLevel = fetchEnvOrDefault('LOG_LEVEL', 'info') as LogLevelString
   const logFormat = fetchEnvOrDefault('LOG_FORMAT', 'human')
-  const serviceName = fetchEnv('SERVICE_NAME')
+  const serviceName = fetchEnv('SERVICE_NAME') // TODO(Alec)
 
   let stream: any
   switch (logFormat) {

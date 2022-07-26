@@ -66,7 +66,7 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
         status: domainState,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
   }
 
@@ -85,7 +85,7 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
         status: domainState,
       },
       status,
-      response.locals.logger()
+      response.locals.logger
     )
   }
 }

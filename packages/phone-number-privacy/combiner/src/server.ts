@@ -47,14 +47,19 @@ export function startCombiner(config: CombinerConfig) {
     )
   )
   app.post(CombinerEndpoint.LEGACY_PNP_SIGN, (req, res) =>
-    meterResponse(legacyPnpSign.handle, req, res, CombinerEndpoint.LEGACY_PNP_SIGN)
+    meterResponse(
+      legacyPnpSign.handle.bind(legacyPnpSign),
+      req,
+      res,
+      CombinerEndpoint.LEGACY_PNP_SIGN
+    )
   )
 
   const pnpSign = new Controller(
     new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy, kit))
   )
   app.post(CombinerEndpoint.PNP_SIGN, (req, res) =>
-    meterResponse(pnpSign.handle, req, res, CombinerEndpoint.PNP_SIGN)
+    meterResponse(pnpSign.handle.bind(pnpSign), req, res, CombinerEndpoint.PNP_SIGN)
   )
 
   const domainThresholdStateService = new DomainThresholdStateService(config.domains)
@@ -67,7 +72,12 @@ export function startCombiner(config: CombinerConfig) {
     )
   )
   app.get(CombinerEndpoint.DOMAIN_QUOTA_STATUS, (req, res) =>
-    meterResponse(domainQuota.handle, req, res, CombinerEndpoint.DOMAIN_QUOTA_STATUS)
+    meterResponse(
+      domainQuota.handle.bind(domainQuota),
+      req,
+      res,
+      CombinerEndpoint.DOMAIN_QUOTA_STATUS
+    )
   )
   const domainSign = new Controller(
     new DomainSignAction(
@@ -77,13 +87,18 @@ export function startCombiner(config: CombinerConfig) {
     )
   )
   app.post(CombinerEndpoint.DOMAIN_SIGN, (req, res) =>
-    meterResponse(domainSign.handle, req, res, CombinerEndpoint.DOMAIN_SIGN)
+    meterResponse(domainSign.handle.bind(domainSign), req, res, CombinerEndpoint.DOMAIN_SIGN)
   )
   const domainDisable = new Controller(
     new DomainDisableAction(config.domains, new DomainDisableIO(config.domains))
   )
   app.post(CombinerEndpoint.DISABLE_DOMAIN, (req, res) =>
-    meterResponse(domainDisable.handle, req, res, CombinerEndpoint.DISABLE_DOMAIN)
+    meterResponse(
+      domainDisable.handle.bind(domainDisable),
+      req,
+      res,
+      CombinerEndpoint.DISABLE_DOMAIN
+    )
   )
 
   return app
