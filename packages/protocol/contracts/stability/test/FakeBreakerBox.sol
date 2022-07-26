@@ -22,4 +22,10 @@ contract FakeBreakerBox is IBreakerBox {
   function isBreaker(address breaker) external view returns (bool) {
     return true;
   }
+
+  function getTradingMode(address exchange) external returns (uint256) {
+    return 0;
+  }
+
+  function checkBreakers(bytes32 exchangeRegistryId) external {}
 }

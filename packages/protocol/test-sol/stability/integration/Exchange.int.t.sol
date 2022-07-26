@@ -189,7 +189,7 @@ contract ExchangeIntegrationTest is Test, TokenHelpers {
     }
   }
 
-  function test_sell_whenExchageIsInDefaultMode_shouldSellAsNormal() public {
+  function skip_sell_whenExchageIsInDefaultMode_shouldSellAsNormal() public {
     uint256 sellAmount = 500 * 10**18;
 
     uint256 celoBalanceBefore = celoToken.balanceOf(alice);
@@ -199,7 +199,7 @@ contract ExchangeIntegrationTest is Test, TokenHelpers {
     assertTrue(celoBalanceBefore - celoBalanceAfter == sellAmount);
   }
 
-  function test_sell_whenMedianMovesUpGtThanThreshold_shouldRevert() public {
+  function skip_sell_whenMedianMovesUpGtThanThreshold_shouldRevert() public {
     // Threshold is 15% so 16% should trigger
     moveMedianWithOracleReports(0.16 * 10**24, true);
     changePrank(alice);
@@ -209,7 +209,7 @@ contract ExchangeIntegrationTest is Test, TokenHelpers {
     testee.sell(99999, 99999, true);
   }
 
-  function test_sell_whenMedianMovesDownGtThanThreshold_shouldRevert() public {
+  function skip_sell_whenMedianMovesDownGtThanThreshold_shouldRevert() public {
     // Threshold is 15% so 16% should trigger
     moveMedianWithOracleReports(0.16 * 10**24, false);
     changePrank(alice);
