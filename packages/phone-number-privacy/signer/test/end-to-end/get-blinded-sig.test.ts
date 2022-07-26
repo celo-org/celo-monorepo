@@ -220,9 +220,11 @@ describe('Running against a deployed service', () => {
       const data = await response.text()
       const signResponse = JSON.parse(data) as SignerResponse
       expect(signResponse.success).toBeTruthy()
-      const sigBuffer = Buffer.from(signResponse.signature as string, 'base64')
-      const isValid = isValidSignature(sigBuffer, blindedPhoneNumber, ODIS_PUBLIC_POLYNOMIAL)
-      expect(isValid).toBeTruthy()
+      if (signResponse.success) {
+        const sigBuffer = Buffer.from(signResponse.signature as string, 'base64')
+        const isValid = isValidSignature(sigBuffer, blindedPhoneNumber, ODIS_PUBLIC_POLYNOMIAL)
+        expect(isValid).toBeTruthy()
+      }
     })
 
     it('Returns count when querying with unused request increments query count', async () => {
@@ -249,7 +251,7 @@ async function getQuota(
   authHeader?: string
 ): Promise<number> {
   const res = await queryQuotaEndpoint(account, hashedPhoneNumber, authHeader)
-  return res.totalQuota
+  return res.success ? res.totalQuota ?? 0 : 0
 }
 
 async function getQueryCount(
@@ -258,7 +260,7 @@ async function getQueryCount(
   authHeader?: string
 ): Promise<number> {
   const res = await queryQuotaEndpoint(account, hashedPhoneNumber, authHeader)
-  return res.performedQueryCount
+  return res.success ? res.performedQueryCount ?? 0 : 0
 }
 
 async function queryQuotaEndpoint(

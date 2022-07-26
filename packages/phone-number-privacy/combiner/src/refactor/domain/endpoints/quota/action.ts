@@ -8,7 +8,7 @@ import { DomainThresholdStateService } from '../../services/thresholdState'
 export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
   constructor(
     readonly config: OdisConfig,
-    readonly stateService: DomainThresholdStateService<DomainQuotaStatusRequest>,
+    readonly thresholdStateService: DomainThresholdStateService<DomainQuotaStatusRequest>,
     readonly io: IO<DomainQuotaStatusRequest>
   ) {
     super(config, io)
@@ -17,7 +17,7 @@ export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
   async combine(session: Session<DomainQuotaStatusRequest>): Promise<void> {
     if (session.responses.length >= this.config.keys.threshold) {
       try {
-        const domainQuotaStatus = this.stateService.findThresholdDomainState(session)
+        const domainQuotaStatus = this.thresholdStateService.findThresholdDomainState(session)
         this.io.sendSuccess(200, session.response, session.logger, domainQuotaStatus)
         return
       } catch (error) {

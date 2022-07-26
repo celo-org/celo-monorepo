@@ -20,6 +20,7 @@ import { DomainSignIO } from './refactor/domain/endpoints/sign/io'
 import { DomainThresholdStateService } from './refactor/domain/services/thresholdState'
 import { PnpSignAction } from './refactor/pnp/endpoints/sign/action'
 import { PnpSignIO } from './refactor/pnp/endpoints/sign/io'
+import { LegacyPnpSignIO } from './refactor/pnp/endpoints/sign/io.legacy'
 import { getContractKit } from './web3/contracts'
 
 require('events').EventEmitter.defaultMaxListeners = 15
@@ -40,7 +41,10 @@ export function startCombiner(config: CombinerConfig) {
   const kit: ContractKit = getContractKit(config.blockchain)
 
   const legacyPnpSign = new Controller(
-    new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy, kit))
+    new PnpSignAction(
+      config.phoneNumberPrivacy,
+      new LegacyPnpSignIO(config.phoneNumberPrivacy, kit)
+    )
   )
   app.post(CombinerEndpoint.LEGACY_PNP_SIGN, (req, res) =>
     meterResponse(legacyPnpSign.handle, req, res, CombinerEndpoint.LEGACY_PNP_SIGN)

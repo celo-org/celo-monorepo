@@ -16,7 +16,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
 
   constructor(
     readonly config: OdisConfig,
-    readonly stateCombineActionr: DomainThresholdStateService<DomainRestrictedSignatureRequest>,
+    readonly thresholdStateService: DomainThresholdStateService<DomainRestrictedSignatureRequest>,
     readonly io: IO<DomainRestrictedSignatureRequest>
   ) {
     super(config, io)
@@ -36,7 +36,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
           session.response,
           session.logger,
           combinedSignature,
-          this.stateCombineActionr.findThresholdDomainState(session)
+          this.thresholdStateService.findThresholdDomainState(session)
         )
       } catch {
         // May fail upon combining signatures if too many sigs are invalid

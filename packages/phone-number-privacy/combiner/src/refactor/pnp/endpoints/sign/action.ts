@@ -1,9 +1,15 @@
 import { SignMessageRequest } from '@celo/identity/lib/odis/query'
 import { MAX_BLOCK_DISCREPANCY_THRESHOLD, WarningMessage } from '@celo/phone-number-privacy-common'
+import { OdisConfig } from '../../../../config'
+import { IO } from '../../../base/io'
 import { SignAction } from '../../../base/sign'
 import { Session } from '../../../session'
 
 export class PnpSignAction extends SignAction<SignMessageRequest> {
+  constructor(readonly config: OdisConfig, readonly io: IO<SignMessageRequest>) {
+    super(config, io)
+  }
+
   async combine(session: Session<SignMessageRequest>): Promise<void> {
     this.logResponseDiscrepancies(session)
 
