@@ -121,7 +121,6 @@ describe('domainService', async () => {
   beforeAll(async () => {
     _config.db.type = SupportedDatabase.Sqlite
     _config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
-    console.log(_config)
     keyProvider = await initKeyProvider(_config)
   })
 
@@ -129,7 +128,6 @@ describe('domainService', async () => {
     // Create a new in-memory database for each test.
     _config.api.domains.enabled = true
     db = await initDatabase(_config)
-    console.log(_config)
     app = startSigner(_config, db, keyProvider)
   })
 
@@ -154,28 +152,18 @@ describe('domainService', async () => {
       })
     })
 
-    xit('Should respond with 200 on repeated valid requests', async () => {
-      const res1 = await request(app)
-        .post(SignerEndpoint.DISABLE_DOMAIN)
-        .send(await disableRequest())
+    it('Should respond with 200 on repeated valid requests', async () => {
+      const req = await disableRequest()
+      const res1 = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DisableDomainResponse>({
         success: true,
         version: res1.body.version,
       })
 
-      console.log(res1.body)
-
-      const res2 = await request(app)
-        .post(SignerEndpoint.DISABLE_DOMAIN)
-        .send(await disableRequest())
+      const res2 = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
       expect(res2.status).toBe(200)
-      expect(res2.body).toMatchObject<DisableDomainResponse>({
-        success: true,
-        version: res2.body.version,
-      })
-
-      console.log(res2.body)
+      expect(res2.body).toMatchObject<DisableDomainResponse>(res1.body)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
@@ -465,7 +453,7 @@ describe('domainService', async () => {
       })
     })
 
-    xit('Should respond with 200 on repeated valid requests', async () => {
+    it('Should respond with 200 on repeated valid requests', async () => {
       const req1 = (await signatureRequest())[0]
 
       const res1 = await request(app)

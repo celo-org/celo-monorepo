@@ -79,6 +79,12 @@ export async function getDomainStateRecord<D extends Domain>(
           .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
           .first()
           .timeout(DB_TIMEOUT)
+
+    // bools are stored in db as ints (1 or 0), so we must cast them back
+    if (result) {
+      result.disabled = !!result.disabled
+    }
+
     return result ?? null
   } catch (error) {
     Counters.databaseErrors.labels(Labels.read).inc()

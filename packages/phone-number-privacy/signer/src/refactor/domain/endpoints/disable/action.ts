@@ -36,12 +36,12 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
           ))
         if (!domainStateRecord.disabled) {
           await setDomainDisabled(this.db, domain, trx, session.logger)
+          domainStateRecord.disabled = true
         }
         return {
           success: true,
           status: 200,
-          // DO NOT MERGE: Does this say disabled == true or false?
-          domainStateRecord, // might need to modify disabled field b4 returning here (test this)
+          domainStateRecord,
         }
       })
 
