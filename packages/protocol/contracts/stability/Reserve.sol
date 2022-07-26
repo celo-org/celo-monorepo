@@ -401,7 +401,9 @@ contract Reserve is
    * @param value The amount of stable to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function transferArbToken(address payable to, uint256 value) external returns (bool) {
+  function transferErc20Token(address payable to, uint256 value) external returns (bool) {
+    require(address() != address(), "token address should not equal to celo");
+    // check with roman that the spending limit here is for celo and we don't know if we want the same spending limit for other tokens
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(isOtherReserveAddress[to], "can only transfer to other reserve address");
     uint256 currentDay = now / 1 days;
@@ -412,7 +414,7 @@ contract Reserve is
     }
     require(spendingLimit >= value, "Exceeding spending limit");
     spendingLimit = spendingLimit.sub(value);
-    return _transferArbToken(to, value);
+    return _transferErc20Token(to, value);
   }
 
   /**
@@ -422,6 +424,8 @@ contract Reserve is
    * @return Returns true if the transaction succeeds.
    */
   function _transferArbToken(address payable to, uint256 value) internal returns (bool) {
+    // get lockederc20 token value that it doesn't acceed the value that reserve has
+    to.sendValue(value);
     emit ReserveArbTokenTransferred(msg.sender, to, value);
     return true;
   }
@@ -461,12 +465,12 @@ contract Reserve is
    * @param value The amount of stable to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function transferExchangeArbToken(address payable to, uint256 value)
+  function transferExchangeErc20Token(address payable to, uint256 value)
     external
     isAllowedToSpendExchange(msg.sender)
     returns (bool)
   {
-    return _transferArbToken(to, value);
+    return _transferErc20Token(to, value);
   }
 
   /**
