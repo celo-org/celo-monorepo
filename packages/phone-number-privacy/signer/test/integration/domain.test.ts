@@ -135,7 +135,7 @@ describe('domainService', () => {
   afterEach(async () => {
     // Close and destroy the in-memory database.
     // Note: If tests start to be too slow, this could be replaced with more complicated logic to
-    // reset the database state without destroying and recreting it for each test.
+    // reset the database state without destroying and recreating it for each test.
 
     await db?.destroy()
   })
