@@ -12,6 +12,7 @@ import {
   domainRestrictedSignatureRequestEIP712,
   DomainRestrictedSignatureResponse,
   genSessionID,
+  KEY_VERSION_HEADER,
   PoprfClient,
   SequentialDelayDomain,
   SequentialDelayStage,
@@ -31,7 +32,7 @@ import { startSigner } from '../../src/server'
 
 // DO NOT MERGE: Add checking of values beyond the return code.
 
-describe('domainService', async () => {
+describe('domainService', () => {
   // DO NOT MERGE(victor): Should this be refactored to pass key provider, database, and config?
   // (global config makes it harder to test things, we should pass it as a parameter)
   // const app = startSigner(config, await initDatabase(), await initKeyProvider())
@@ -581,13 +582,12 @@ describe('domainService', async () => {
       })
     })
 
-    xit('Should respond with 400 on invalid key version', async () => {
-      // TODO(Alec): Implement new error for unsupported key versions
+    it('Should respond with 400 on invalid key version', async () => {
       const [badRequest, _] = await signatureRequest()
 
       const res = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', 'a')
+        .set(KEY_VERSION_HEADER, 'a')
         .send(badRequest)
 
       expect(res.status).toBe(400)
@@ -595,7 +595,7 @@ describe('domainService', async () => {
       expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,
-        error: WarningMessage.INVALID_INPUT,
+        error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
       })
     })
 

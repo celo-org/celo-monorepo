@@ -47,7 +47,7 @@ export abstract class IO<R extends OdisRequest> {
 
     const requestedKeyVersion = Number(keyVersionHeader)
 
-    const isValid = !Number.isInteger(requestedKeyVersion)
+    const isValid = Number.isInteger(requestedKeyVersion)
     if (!isValid) {
       logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
@@ -62,7 +62,7 @@ export abstract class IO<R extends OdisRequest> {
 
     const requestedKeyVersion = Number(keyVersionHeader)
 
-    if (Number.isInteger(requestedKeyVersion)) {
+    if (!Number.isInteger(requestedKeyVersion)) {
       logger.error({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
       throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
