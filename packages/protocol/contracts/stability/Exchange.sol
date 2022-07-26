@@ -75,7 +75,7 @@ contract Exchange is
   modifier checkTradingMode() {
     if (address(breakerBox) != address(0)) {
       require(
-        breakerBox.checkBreakers(address(this)) == TRADING_MODE_BIDIRECTIONAL,
+        breakerBox.getTradingMode(address(this)) == TRADING_MODE_BIDIRECTIONAL,
         "Trading is suspended for this exchange"
       );
       _;

@@ -235,18 +235,29 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
     return exchanges;
   }
 
+  /**
+   * @notice Returns the trading mode for the specified exchange.
+   * @param exchange The address of the exchange to retrieve the trading mode for.
+   */
+  function getTradingMode(address exchange) external returns (uint256 tradingMode) {
+    TradingModeInfo memory info = exchangeTradingModes[exchange];
+    return info.tradingMode;
+  }
+
   /* ==================== Check Breakers ==================== */
 
   /**
-   * @notice Checks breakers for a specified exchange to determine the trading mode.
-   * @param exchangeAddress The address of the exchange to run the checks for.
-   * @return currentTradingMode Returns an int representing the current trading mode
-   *                            for the specified exchange.
+   * @notice Checks breakers for the exchange with the specified id.
+   * @param exchangeRegistryId The registryId of the exchange to run checks for.
    */
-  function checkBreakers(address exchangeAddress) external returns (uint256 currentTradingMode) {
+  function checkBreakers(bytes32 exchangeRegistryId) external {
+    address exchangeAddress = registry.getAddressForOrDie(exchangeRegistryId);
     TradingModeInfo memory info = exchangeTradingModes[exchangeAddress];
 
-    require(info.lastUpdatedTime > 0, "This exchange has not been added");
+    // This exchange has not been added. So do nothing.
+    if (info.lastUpdatedTime == 0) {
+      return;
+    }
 
     // Check if a breaker has non default trading mode and reset if we should.
     if (info.tradingMode != 0) {
@@ -262,14 +273,11 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
           info.lastUpdatedBlock = uint128(block.number);
           exchangeTradingModes[exchangeAddress] = info;
           emit ResetSuccessful(exchangeAddress, address(breaker));
-          return info.tradingMode;
         } else {
           emit ResetAttemptCriteriaFail(exchangeAddress, address(breaker));
-          return info.tradingMode;
         }
       } else {
         emit ResetAttemptNotCool(exchangeAddress, address(breaker));
-        return info.tradingMode;
       }
     }
 
@@ -285,10 +293,7 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
         info.lastUpdatedBlock = uint128(block.number);
         exchangeTradingModes[exchangeAddress] = info;
         emit BreakerTripped(address(breaker), exchangeAddress);
-        return info.tradingMode;
       }
     }
-
-    return info.tradingMode;
   }
 }

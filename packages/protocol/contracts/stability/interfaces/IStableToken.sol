@@ -11,6 +11,7 @@ interface IStableToken {
   function valueToUnits(uint256) external view returns (uint256);
   function unitsToValue(uint256) external view returns (uint256);
   function getInflationParameters() external view returns (uint256, uint256, uint256, uint256);
+  function getExchangeRegistryId() external view returns (bytes32);
 
   // NOTE: duplicated with IERC20.sol, remove once interface inheritance is supported.
   function balanceOf(address) external view returns (uint256);

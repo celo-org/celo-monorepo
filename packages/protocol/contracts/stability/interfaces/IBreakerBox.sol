@@ -90,11 +90,14 @@ interface IBreakerBox {
   function isBreaker(address breaker) external view returns (bool);
 
   /**
-   * @notice  Checks breakers for a specified exchange
-   *          to determine the trading mode.
-   * @param   exchange The address of the exchange to run the checks for.
-   * @return  currentTradingMode Returns an int representing
-   *          the current trading mode for the specified exchange.
+   * @notice  Checks breakers for the exchange with the specified id.
+   * @param   exchangeRegistryId The registryId of the exchange to run checks for.
    */
-  function checkBreakers(address exchange) external returns (uint256 currentTradingMode);
+  function checkBreakers(bytes32 exchangeRegistryId) external;
+
+  /**
+   * @notice  Gets the trading mode for the specified exchange.
+   * @param   exchange The address of the exchange to retrieve the trading mode for.
+   */
+  function getTradingMode(address exchange) external returns (uint256 tradingMode);
 }

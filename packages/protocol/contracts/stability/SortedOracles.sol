@@ -10,6 +10,8 @@ import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/linkedlists/AddressSortedLinkedListWithMedian.sol";
 import "../common/linkedlists/SortedLinkedListWithMedian.sol";
+import "./interfaces/IBreakerBox.sol";
+import "./interfaces/IStableToken.sol";
 
 /**
  * @title Maintains a sorted list of oracle exchange rates between CELO and other currencies.
@@ -37,6 +39,8 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   uint256 public reportExpirySeconds;
   mapping(address => uint256) public tokenReportExpirySeconds;
 
+  IBreakerBox public breakerBox;
+
   event OracleAdded(address indexed token, address indexed oracleAddress);
   event OracleRemoved(address indexed token, address indexed oracleAddress);
   event OracleReported(
@@ -49,6 +53,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
+  event BreakerBoxUpdated(address indexed newBreakerBox);
 
   modifier onlyOracle(address token) {
     require(isOracle[token][msg.sender], "sender was not an oracle for token addr");
@@ -102,6 +107,15 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
     );
     tokenReportExpirySeconds[_token] = _reportExpirySeconds;
     emit TokenReportExpirySet(_token, _reportExpirySeconds);
+  }
+
+  /**
+   * @notice Sets the address of the BreakerBox.
+   * @param newBreakerBox The new BreakerBox address.
+   */
+  function setBreakerBox(IBreakerBox newBreakerBox) public onlyOwner {
+    breakerBox = newBreakerBox;
+    emit BreakerBoxUpdated(address(newBreakerBox));
   }
 
   /**
@@ -221,6 +235,10 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
       previousMedianRate[token] = originalMedian;
       emit MedianUpdated(token, newMedian);
     }
+
+    // TODO: Try catch emit would be very nice here.
+    // How can we make this more resilliant against downstream failures
+    breakerBox.checkBreakers(IStableToken(token).getExchangeRegistryId());
   }
 
   /**
