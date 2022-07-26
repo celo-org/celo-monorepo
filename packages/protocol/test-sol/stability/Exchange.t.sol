@@ -318,6 +318,18 @@ contract Exchange_initializeAndSetters is ExchangeTest {
     vm.expectRevert("Ownable: caller is not the owner");
     exchange.setMinSupplyForStableBucketCap(0);
   }
+
+  function test_setBreakerBox_isOnlyCallableByOwner() public {
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    exchange.setBreakerBox(breakerBox);
+  }
+
+  function test_setBreakerBox_shouldUpdateAndEmit() public {
+    assertTrue(address(exchange.breakerBox()) == address(0));
+    exchange.setBreakerBox(breakerBox);
+    assertTrue(address(exchange.breakerBox()) == address(breakerBox));
+  }
 }
 
 contract ExchangeTest_stableActivated is ExchangeTest {
@@ -349,6 +361,7 @@ contract ExchangeTest_stableBucket_needsToBeCapped is ExchangeTest {
     registry.setAddressFor("Exchange", address(exchange));
     exchange.activateStable();
   }
+
   function test_hasCorrect_stableBucketMaxFraction() public {
     assertEq(exchange.stableBucketMaxFraction(), 45454545454545456000000);
   }

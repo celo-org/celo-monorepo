@@ -90,7 +90,13 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     );
 
     address stableToken = IExchange(exchange).stable();
+
     uint256 lastMedian = sortedOracles.lastMedianRate(stableToken);
+    if (lastMedian == 0) {
+      // Last median will be 0 if this exchange is new and has not had a median update yet.
+      return false;
+    }
+
     (uint256 currentMedian, ) = sortedOracles.medianRate(stableToken);
 
     // Check if current median is within allowed threshold of last median
