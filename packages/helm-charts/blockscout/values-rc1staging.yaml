@@ -57,7 +57,7 @@ blockscout:
   metadata_crawler:
     schedule: "0 */2 * * *"
   epoch_rewards:
-    enabled: false
+    enabled: true
 
 db:
   drop: false
