@@ -82,14 +82,7 @@ const commands = [
     explanation:
       'This links to the Google Cloud Console that lists all the Kubernetes Workloads running in the specified CELO_ENV. That currently includes things like our geth nodes, Blockscout, EthStats, CronJobs that check healthiness of the network etc. This is a good first place to check that workloads are running as we expect',
   },
-  {
-    command: 'stackdriver-dashboard',
-    description: 'Stackdriver Dashboard',
-    url: (_argv: LinkArgEnv) =>
-      fetchEnvOrFallback(envVar.STACKDRIVER_MONITORING_DASHBOARD, 'No Dashboard'),
-    explanation:
-      'The Stackdriver Monitoring Dashboard contains graphs for all the relevant alerts that we have setup and should give you a way of determining which metrics are out of order and what possible other correlations in time one could deduce from the metrics.',
-  },
+
   {
     command: 'geth-logs',
     description: 'logs of all geth nodes',
