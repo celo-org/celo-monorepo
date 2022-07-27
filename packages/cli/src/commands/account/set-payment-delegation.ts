@@ -11,6 +11,7 @@ export default class SetPaymentDelegation extends BaseCommand {
 
   static flags = {
     ...BaseCommand.flags,
+    account: Flags.address({ required: true }),
     beneficiary: Flags.address({ required: true }),
     fraction: flags.string({ required: true }),
   }
@@ -18,18 +19,21 @@ export default class SetPaymentDelegation extends BaseCommand {
   static args = []
 
   static examples = [
-    'set-payment-delegation --beneficiary 0x5409ed021d9299bf6814279a6a1411a7e866a631 --fraction 0.1',
+    'set-payment-delegation --account 0x5409ed021d9299bf6814279a6a1411a7e866a631 --beneficiary 0x5409ed021d9299bf6814279a6a1411a7e866a631 --fraction 0.1',
   ]
 
   async run() {
     const res = this.parse(SetPaymentDelegation)
-    this.kit.defaultAccount = res.flags.beneficiary
+    this.kit.defaultAccount = res.flags.account
     const accounts = await this.kit.contracts.getAccounts()
 
     await newCheckBuilder(this).isAccount(res.flags.beneficiary).runChecks()
     await displaySendTx(
       'setPaymentDelegation',
-      accounts.setPaymentDelgation(res.flags.beneficiary, valueToFixidityString(res.flags.fraction))
+      accounts.setPaymentDelegation(
+        res.flags.beneficiary,
+        valueToFixidityString(res.flags.fraction)
+      )
     )
   }
 }
