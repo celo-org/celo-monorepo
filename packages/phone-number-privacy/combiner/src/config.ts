@@ -84,7 +84,7 @@ if (DEV_MODE) {
       },
       keys: {
         version: 1,
-        threshold: 1,
+        threshold: 2,
         polynomial: TestUtils.Values.PNP_DEV_ODIS_POLYNOMIAL,
         pubKey: TestUtils.Values.PNP_DEV_ODIS_PUBLIC_KEY,
       },
@@ -99,7 +99,7 @@ if (DEV_MODE) {
       },
       keys: {
         version: 1,
-        threshold: 1,
+        threshold: 2,
         polynomial: TestUtils.Values.DOMAINS_DEV_ODIS_POLYNOMIAL,
         pubKey: TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY,
       },

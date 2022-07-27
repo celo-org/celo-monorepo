@@ -53,17 +53,12 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
     return Promise.resolve(verifyDisableDomainRequestAuthenticity(request.body))
   }
 
-  sendSuccess(
-    status: number,
-    response: Response<DisableDomainResponseSuccess>,
-    domainState: DomainState
-  ) {
+  sendSuccess(status: number, response: Response<DisableDomainResponseSuccess>) {
     send(
       response,
       {
         success: true,
         version: VERSION,
-        status: domainState,
       },
       status,
       response.locals.logger

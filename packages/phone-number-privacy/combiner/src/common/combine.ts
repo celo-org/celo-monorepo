@@ -25,7 +25,8 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
   abstract combine(session: Session<R>): Promise<void>
 
   async perform(session: Session<R>) {
-    await this.distribute(session).then(this.combine)
+    await this.distribute(session)
+    await this.combine(session)
   }
 
   async distribute(session: Session<R>): Promise<Session<R>> {
@@ -83,6 +84,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
       try {
         // Throws if response is not actually successful
         await this.receiveSuccess(signerFetchResult, signer.url, session)
+        return
       } catch (err) {
         session.logger.error(err)
       }
@@ -96,9 +98,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     session: Session<R>
   ): Promise<OdisResponse<R>> {
     if (!signerFetchResult.ok) {
-      throw new Error(
-        `Implementation Error: handleSuccessResponse should only receive 'OK' responses`
-      )
+      throw new Error(`Implementation Error: receiveSuccess should only receive 'OK' responses`)
     }
     const { status } = signerFetchResult
     const data: string = await signerFetchResult.text()

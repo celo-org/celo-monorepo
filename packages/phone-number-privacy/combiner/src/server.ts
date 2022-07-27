@@ -30,7 +30,7 @@ export function startCombiner(config: CombinerConfig) {
 
   logger.info('Creating combiner express server')
   const app = express()
-  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware)
+  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName)) // TODO(Alec): get logger to show accurate serviceName
 
   // app.get(CombinerEndpoint.STATUS, (_req, res) => {
   //   res.status(200).json({

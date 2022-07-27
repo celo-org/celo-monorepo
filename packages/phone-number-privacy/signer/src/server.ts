@@ -1,5 +1,5 @@
 import { timeout } from '@celo/base'
-import { rootLogger, SignerEndpoint } from '@celo/phone-number-privacy-common'
+import { loggerMiddleware, rootLogger, SignerEndpoint } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'
@@ -32,8 +32,7 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
 
   logger.info('Creating signer express server')
   const app = express()
-  // app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
-  app.use(express.json({ limit: '0.2mb' }))
+  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
 
   app.get(SignerEndpoint.STATUS, (_req, res) => {
     res.status(200).json({
