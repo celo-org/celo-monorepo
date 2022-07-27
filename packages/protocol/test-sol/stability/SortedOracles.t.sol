@@ -11,7 +11,9 @@ import { SortedOracles } from "contracts/stability/SortedOracles.sol";
 contract SortedOraclesTest is Test {
   address deployer;
   address notOwner;
-  address oracle;
+  address oracleA;
+  address oracleB;
+  address oracleC;
 
   uint256 aReportExpiry = 3600;
 
@@ -20,6 +22,7 @@ contract SortedOraclesTest is Test {
 
   bytes32 constant MOCK_EXCHANGE_ID = keccak256(abi.encodePacked("mockExchange"));
 
+  event MedianUpdated(address indexed token, uint256 value);
   event ReportExpirySet(uint256 reportExpiry);
   event TokenReportExpirySet(address token, uint256 reportExpiry);
   event BreakerBoxUpdated(address indexed newBreakerBox);
@@ -29,7 +32,9 @@ contract SortedOraclesTest is Test {
   function setUp() public {
     deployer = actor("deployer");
     notOwner = actor("notOwner");
-    oracle = actor("oracle");
+    oracleA = actor("oracleA");
+    oracleB = actor("oracleB");
+    oracleC = actor("oracleC");
 
     changePrank(deployer);
 
@@ -111,7 +116,7 @@ contract SortedOraclesTest_initializeAndSetters is SortedOraclesTest {
 
 contract SortedOraclesTest_report is SortedOraclesTest {
   function test_report_shouldCallBreakerBoxWithExchangeId() public {
-    testee.addOracle(address(mockStableToken), oracle);
+    testee.addOracle(address(mockStableToken), oracleA);
     testee.setBreakerBox(mockBreakerBox);
 
     vm.expectCall(
@@ -119,8 +124,64 @@ contract SortedOraclesTest_report is SortedOraclesTest {
       abi.encodeWithSelector(mockBreakerBox.checkBreakers.selector, MOCK_EXCHANGE_ID)
     );
 
-    changePrank(oracle);
+    changePrank(oracleA);
 
     testee.report(address(mockStableToken), 9999, address(0), address(0));
+  }
+
+  function test_report_whenMedianChanges_shouldUpdatePreviousMedian() public {
+    testee.setBreakerBox(mockBreakerBox);
+
+    // Initially we have no rates, so no prevMediasn or currentMedian
+    uint256 prevMedianBefore = testee.previousMedianRate(address(mockStableToken));
+    (uint256 currentMedianBefore, ) = testee.medianRate(address(mockStableToken));
+    assertTrue((prevMedianBefore == 0) && (currentMedianBefore == 0));
+
+    testee.addOracle(address(mockStableToken), oracleA);
+    testee.addOracle(address(mockStableToken), oracleB);
+
+    changePrank(oracleA);
+    vm.expectEmit(true, false, false, false);
+    // Actual value doesn't matter, just that it was changed
+    emit MedianUpdated(address(mockStableToken), 0);
+    testee.report(address(mockStableToken), 9999, address(0), address(0));
+
+    // Now we have a report, current median is set but prev median should still be 0
+    (uint256 currentMedianAfterFirstReport, ) = testee.medianRate(address(mockStableToken));
+    uint256 prevMedianAfterFirstReport = testee.previousMedianRate(address(mockStableToken));
+    assertEq(prevMedianAfterFirstReport, 0);
+
+    changePrank(oracleB);
+    vm.expectEmit(true, false, false, false);
+    // Actual value doesn't matter, just that it was changed
+    emit MedianUpdated(address(mockStableToken), 0);
+    testee.report(address(mockStableToken), 23012, oracleA, address(0));
+
+    // Now we have another median changing report, prev median should be the current median before this update
+    uint256 prevMedianAfter = testee.previousMedianRate(address(mockStableToken));
+    assertEq(prevMedianAfter, currentMedianAfterFirstReport);
+  }
+
+  function test_report_whenMedianDoesNotChange_shouldNotUpdatePreviousMedian() public {
+    test_report_whenMedianChanges_shouldUpdatePreviousMedian(); //¯\_(ツ)_/¯
+
+    // Get the current median & prev median
+    (uint256 currentMedianBefore, ) = testee.medianRate(address(mockStableToken));
+    uint256 prevMedianBefore = testee.previousMedianRate(address(mockStableToken));
+
+    // Submit a report using the current median, so we don't get a change
+    changePrank(deployer);
+    testee.addOracle(address(mockStableToken), oracleC);
+    changePrank(oracleC);
+    testee.report(address(mockStableToken), currentMedianBefore, oracleA, address(0));
+
+    // Check median values are unchanged
+    (uint256 currentMedianAfter, ) = testee.medianRate(address(mockStableToken));
+    assertEq(currentMedianBefore, currentMedianAfter);
+
+    uint256 prevMedianAfter = testee.previousMedianRate(address(mockStableToken));
+
+    // Check prev median is unchanged
+    assertEq(prevMedianAfter, prevMedianBefore);
   }
 }

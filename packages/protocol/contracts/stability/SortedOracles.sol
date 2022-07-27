@@ -236,8 +236,6 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
       emit MedianUpdated(token, newMedian);
     }
 
-    // TODO: Try catch emit would be very nice here.
-    // How can we make this more resilliant against downstream failures
     breakerBox.checkBreakers(IStableToken(token).getExchangeRegistryId());
   }
 
