@@ -79,6 +79,10 @@ contract ExchangeIntegrationTest is Test, TokenHelpers {
     emit BreakerBoxUpdated(address(breakerBox));
     testee.setBreakerBox(breakerBox);
 
+    vm.expectEmit(true, false, false, false);
+    emit BreakerBoxUpdated(address(breakerBox));
+    sortedOracles.setBreakerBox(breakerBox);
+
     // Get tokens
     uint256 oneK = 1000 * 10**18;
     mint(celoToken, alice, oneK);
@@ -142,6 +146,7 @@ contract ExchangeIntegrationTest is Test, TokenHelpers {
 
   function getLesserAndGreaterKeys(address stable, uint256 reportValue, address oracle)
     public
+    view
     returns (address lesser, address greater)
   {
     (address[] memory oracles, uint256[] memory oracleRates, ) = sortedOracles.getRates(stable);
@@ -189,33 +194,107 @@ contract ExchangeIntegrationTest is Test, TokenHelpers {
     }
   }
 
-  function skip_sell_whenExchageIsInDefaultMode_shouldSellAsNormal() public {
+  function test_sell_whenExchageIsInDefaultMode_shouldSellAsNormal() public {
     uint256 sellAmount = 500 * 10**18;
-
     uint256 celoBalanceBefore = celoToken.balanceOf(alice);
+
+    vm.expectCall(
+      address(breakerBox),
+      abi.encodeWithSelector(breakerBox.getTradingMode.selector, address(testee))
+    );
+
     testee.sell(sellAmount, testee.getBuyTokenAmount(sellAmount, true), true);
     uint256 celoBalanceAfter = celoToken.balanceOf(alice);
 
     assertTrue(celoBalanceBefore - celoBalanceAfter == sellAmount);
   }
 
-  function skip_sell_whenMedianMovesUpGtThanThreshold_shouldRevert() public {
+  function test_sell_whenMedianMovesUpGtThanThreshold_shouldRevert() public {
     // Threshold is 15% so 16% should trigger
     moveMedianWithOracleReports(0.16 * 10**24, true);
     changePrank(alice);
 
     vm.expectRevert("Trading is suspended for this exchange");
-    //Check happens before sell attempt so input & expected out are irrelevant
     testee.sell(99999, 99999, true);
   }
 
-  function skip_sell_whenMedianMovesDownGtThanThreshold_shouldRevert() public {
+  function test_sell_whenMedianMovesDownGtThanThreshold_shouldRevert() public {
     // Threshold is 15% so 16% should trigger
     moveMedianWithOracleReports(0.16 * 10**24, false);
     changePrank(alice);
 
     vm.expectRevert("Trading is suspended for this exchange");
-    //Check happens before sell attempt so input & expected out are irrelevant
+    testee.sell(99999, 99999, true);
+  }
+
+  function test_sell_whenBreakerHasTrippedButMedianChangeIsNormal_shouldRevert() public {
+    // Threshold is 15% so 16% should trigger
+    moveMedianWithOracleReports(0.16 * 10**24, false);
+    changePrank(alice);
+
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.sell(99999, 99999, true);
+
+    //Now move the median down within threshold.
+    moveMedianWithOracleReports(0.10 * 10**24, false);
+
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.sell(99999, 99999, true);
+  }
+
+  function test_sell_whenBreakerHasTrippedThenResetAndMedianChangeIsNormal_shouldSellAsNormal()
+    public
+  {
+    // Threshold is 15% so 16% should trigger.
+    moveMedianWithOracleReports(0.16 * 10**24, false);
+    changePrank(alice);
+
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.sell(99999, 99999, true);
+
+    // Now move the median down within threshold.
+    moveMedianWithOracleReports(0.10 * 10**24, false);
+
+    // Whilst the median change is normal, this breaker requires a manual reset.
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.sell(99999, 99999, true);
+
+    // Reset the trading mode.
+    changePrank(governance);
+    breakerBox.setExchangeTradingMode(address(testee), 0);
+
+    // Try to sell again.
+    changePrank(alice);
+    uint256 sellAmount = 500 * 10**18;
+    uint256 celoBalanceBefore = celoToken.balanceOf(alice);
+
+    testee.sell(sellAmount, testee.getBuyTokenAmount(sellAmount, true), true);
+    uint256 celoBalanceAfter = celoToken.balanceOf(alice);
+
+    assertTrue(celoBalanceBefore - celoBalanceAfter == sellAmount);
+  }
+
+  function test_sell_whenBreakerHasTrippedThenResetAndNewMedianChangeNotNormal_shouldRevert()
+    public
+  {
+    // Threshold is 15% so 16% should trigger.
+    moveMedianWithOracleReports(0.16 * 10**24, false);
+    changePrank(alice);
+
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.sell(99999, 99999, true);
+
+    // Reset the trading mode.
+    changePrank(governance);
+    breakerBox.setExchangeTradingMode(address(testee), 0);
+
+    // Confirm trading should be allowed
+    assertEq(breakerBox.getTradingMode(address(testee)), 0);
+
+    // Now move the median down gt threshold.
+    moveMedianWithOracleReports(0.17 * 10**24, false);
+
+    vm.expectRevert("Trading is suspended for this exchange");
     testee.sell(99999, 99999, true);
   }
 }
