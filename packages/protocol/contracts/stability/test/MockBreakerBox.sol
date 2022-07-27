@@ -11,10 +11,6 @@ contract MockBreakerBox is IBreakerBox {
     tradingMode = _tradingMode;
   }
 
-  function checkBreakers(address) external view returns (uint256) {
-    return tradingMode;
-  }
-
   function getBreakers() external view returns (address[] memory) {
     return new address[](0);
   }

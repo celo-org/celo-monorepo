@@ -78,4 +78,6 @@ contract MockStableToken {
   function valueToUnits(uint256 value) public view returns (uint256) {
     return inflationFactor.multiply(FixidityLib.newFixed(value)).fromFixed();
   }
+
+  function getExchangeRegistryId() public view returns (bytes32) {}
 }
