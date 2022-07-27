@@ -23,6 +23,7 @@ export enum SupportedKeystore {
 }
 
 export interface SignerConfig {
+  serviceName: string
   server: {
     port: string | number | undefined
     sslKeyPath?: string
@@ -97,6 +98,7 @@ export interface SignerConfig {
 
 const env = process.env as any
 export const config: SignerConfig = {
+  serviceName: env.SERVICE_NAME ?? 'odis-signer',
   server: {
     port: Number(env.SERVER_PORT ?? 8080),
     sslKeyPath: env.SERVER_SSL_KEY_PATH,

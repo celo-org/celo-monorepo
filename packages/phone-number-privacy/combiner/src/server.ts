@@ -10,23 +10,23 @@ import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { CombinerConfig } from '.'
-import { Controller } from './refactor/controller'
-import { DomainDisableAction } from './refactor/domain/endpoints/disable/action'
-import { DomainDisableIO } from './refactor/domain/endpoints/disable/io'
-import { DomainQuotaAction } from './refactor/domain/endpoints/quota/action'
-import { DomainQuotaIO } from './refactor/domain/endpoints/quota/io'
-import { DomainSignAction } from './refactor/domain/endpoints/sign/action'
-import { DomainSignIO } from './refactor/domain/endpoints/sign/io'
-import { DomainThresholdStateService } from './refactor/domain/services/thresholdState'
-import { PnpSignAction } from './refactor/pnp/endpoints/sign/action'
-import { PnpSignIO } from './refactor/pnp/endpoints/sign/io'
-import { LegacyPnpSignIO } from './refactor/pnp/endpoints/sign/io.legacy'
-import { getContractKit } from './web3/contracts'
+import { Controller } from './common/controller'
+import { getContractKit } from './common/web3/contracts'
+import { DomainDisableAction } from './domain/endpoints/disable/action'
+import { DomainDisableIO } from './domain/endpoints/disable/io'
+import { DomainQuotaAction } from './domain/endpoints/quota/action'
+import { DomainQuotaIO } from './domain/endpoints/quota/io'
+import { DomainSignAction } from './domain/endpoints/sign/action'
+import { DomainSignIO } from './domain/endpoints/sign/io'
+import { DomainThresholdStateService } from './domain/services/thresholdState'
+import { PnpSignAction } from './pnp/endpoints/sign/action'
+import { PnpSignIO } from './pnp/endpoints/sign/io'
+import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
 export function startCombiner(config: CombinerConfig) {
-  const logger = rootLogger()
+  const logger = rootLogger(config.serviceName)
 
   logger.info('Creating combiner express server')
   const app = express()
@@ -51,7 +51,8 @@ export function startCombiner(config: CombinerConfig) {
       legacyPnpSign.handle.bind(legacyPnpSign),
       req,
       res,
-      CombinerEndpoint.LEGACY_PNP_SIGN
+      CombinerEndpoint.LEGACY_PNP_SIGN,
+      config
     )
   )
 
@@ -59,7 +60,7 @@ export function startCombiner(config: CombinerConfig) {
     new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy, kit))
   )
   app.post(CombinerEndpoint.PNP_SIGN, (req, res) =>
-    meterResponse(pnpSign.handle.bind(pnpSign), req, res, CombinerEndpoint.PNP_SIGN)
+    meterResponse(pnpSign.handle.bind(pnpSign), req, res, CombinerEndpoint.PNP_SIGN, config)
   )
 
   const domainThresholdStateService = new DomainThresholdStateService(config.domains)
@@ -76,7 +77,8 @@ export function startCombiner(config: CombinerConfig) {
       domainQuota.handle.bind(domainQuota),
       req,
       res,
-      CombinerEndpoint.DOMAIN_QUOTA_STATUS
+      CombinerEndpoint.DOMAIN_QUOTA_STATUS,
+      config
     )
   )
   const domainSign = new Controller(
@@ -87,7 +89,13 @@ export function startCombiner(config: CombinerConfig) {
     )
   )
   app.post(CombinerEndpoint.DOMAIN_SIGN, (req, res) =>
-    meterResponse(domainSign.handle.bind(domainSign), req, res, CombinerEndpoint.DOMAIN_SIGN)
+    meterResponse(
+      domainSign.handle.bind(domainSign),
+      req,
+      res,
+      CombinerEndpoint.DOMAIN_SIGN,
+      config
+    )
   )
   const domainDisable = new Controller(
     new DomainDisableAction(config.domains, new DomainDisableIO(config.domains))
@@ -97,7 +105,8 @@ export function startCombiner(config: CombinerConfig) {
       domainDisable.handle.bind(domainDisable),
       req,
       res,
-      CombinerEndpoint.DISABLE_DOMAIN
+      CombinerEndpoint.DISABLE_DOMAIN,
+      config
     )
   )
 
@@ -108,12 +117,13 @@ export async function meterResponse(
   handler: (req: Request, res: Response) => Promise<void>,
   req: Request,
   res: Response,
-  endpoint: Endpoint
+  endpoint: Endpoint,
+  config: CombinerConfig
 ) {
   if (!res.locals) {
     res.locals = {}
   }
-  const logger: Logger = loggerMiddleware(req, res) // TODO(Alec)
+  const logger: Logger = loggerMiddleware(config.serviceName)(req, res)
   logger.fields.endpoint = endpoint
   logger.info({ req: req.body }, 'Request received')
   const eventLoopLagMeasurementStart = Date.now()

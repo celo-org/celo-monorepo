@@ -1,5 +1,5 @@
 import { Knex } from 'knex'
-import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../src/database/models/account'
+import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../src/services/database/models/account'
 
 export async function up(knex: Knex): Promise<any> {
   if (!(await knex.schema.hasTable(ACCOUNTS_TABLE))) {

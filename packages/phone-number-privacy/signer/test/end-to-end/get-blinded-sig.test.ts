@@ -16,7 +16,7 @@ import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
 import { config, getVersion } from '../../src/config'
-import { getWalletAddress } from '../../src/web3/contracts'
+import { getWalletAddress } from '../../src/services/web3/contracts'
 
 require('dotenv').config()
 

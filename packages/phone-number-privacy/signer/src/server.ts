@@ -1,38 +1,39 @@
 import { timeout } from '@celo/base'
-import { loggerMiddleware, rootLogger, SignerEndpoint } from '@celo/phone-number-privacy-common'
+import { rootLogger, SignerEndpoint } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'
 import https from 'https'
 import { Knex } from 'knex'
 import * as PromClient from 'prom-client'
+import { Controller } from './common/controller'
+import { KeyProvider } from './common/key-management/key-provider-base'
 import { Counters, Histograms } from './common/metrics'
+import { getContractKit } from './common/web3/contracts'
 import { getVersion, SignerConfig } from './config'
-import { KeyProvider } from './key-management/key-provider-base'
-import { Controller } from './refactor/controller'
-import { DomainDisableAction } from './refactor/domain/endpoints/disable/action'
-import { DomainDisableIO } from './refactor/domain/endpoints/disable/io'
-import { DomainQuotaAction } from './refactor/domain/endpoints/quota/action'
-import { DomainQuotaIO } from './refactor/domain/endpoints/quota/io'
-import { DomainSignAction } from './refactor/domain/endpoints/sign/action'
-import { DomainSignIO } from './refactor/domain/endpoints/sign/io'
-import { DomainQuotaService } from './refactor/domain/services/quota'
-import { PnpQuotaAction } from './refactor/pnp/endpoints/quota/action'
-import { PnpQuotaIO } from './refactor/pnp/endpoints/quota/io'
-import { PnpSignAction } from './refactor/pnp/endpoints/sign/action'
-import { PnpSignIO } from './refactor/pnp/endpoints/sign/io'
-import { PnpQuotaService } from './refactor/pnp/services/quota'
-import { LegacyPnpQuotaService } from './refactor/pnp/services/quota.legacy'
-import { getContractKit } from './web3/contracts'
+import { DomainDisableAction } from './domain/endpoints/disable/action'
+import { DomainDisableIO } from './domain/endpoints/disable/io'
+import { DomainQuotaAction } from './domain/endpoints/quota/action'
+import { DomainQuotaIO } from './domain/endpoints/quota/io'
+import { DomainSignAction } from './domain/endpoints/sign/action'
+import { DomainSignIO } from './domain/endpoints/sign/io'
+import { DomainQuotaService } from './domain/services/quota'
+import { PnpQuotaAction } from './pnp/endpoints/quota/action'
+import { PnpQuotaIO } from './pnp/endpoints/quota/io'
+import { PnpSignAction } from './pnp/endpoints/sign/action'
+import { PnpSignIO } from './pnp/endpoints/sign/io'
+import { PnpQuotaService } from './pnp/services/quota'
+import { LegacyPnpQuotaService } from './pnp/services/quota.legacy'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
 export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProvider) {
-  const logger = rootLogger()
+  const logger = rootLogger(config.serviceName)
 
   logger.info('Creating signer express server')
   const app = express()
-  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware)
+  // app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
+  app.use(express.json({ limit: '0.2mb' }))
 
   app.get(SignerEndpoint.STATUS, (_req, res) => {
     res.status(200).json({
@@ -148,7 +149,7 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
 }
 
 function getSslOptions(config: SignerConfig) {
-  const logger = rootLogger()
+  const logger = rootLogger(config.serviceName)
   const { sslKeyPath, sslCertPath } = config.server
 
   if (!sslKeyPath || !sslCertPath) {

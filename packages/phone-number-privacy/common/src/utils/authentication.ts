@@ -7,7 +7,7 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import Logger from 'bunyan'
 import crypto from 'crypto'
 import { Request } from 'express'
-import { rootLogger } from '..'
+import { fetchEnv, rootLogger } from '..'
 import { AuthenticationMethod, ErrorMessage, WarningMessage } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
@@ -72,7 +72,7 @@ export function verifyDEKSignature(
     insecureAllowIncorrectlyGeneratedSignature: false,
   }
 ) {
-  logger = logger ?? rootLogger()
+  logger = logger ?? rootLogger(fetchEnv('SERVICE_NAME'))
   try {
     const msgDigest = crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex')
 

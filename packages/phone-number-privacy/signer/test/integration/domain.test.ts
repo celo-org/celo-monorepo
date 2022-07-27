@@ -25,9 +25,9 @@ import { LocalWallet } from '@celo/wallet-local'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { KeyProvider } from '../../dist/key-management/key-provider-base'
+import { initDatabase } from '../../src/common/database/database'
+import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
-import { initDatabase } from '../../src/database/database'
-import { initKeyProvider } from '../../src/key-management/key-provider'
 import { startSigner } from '../../src/server'
 
 // DO NOT MERGE: Add checking of values beyond the return code.

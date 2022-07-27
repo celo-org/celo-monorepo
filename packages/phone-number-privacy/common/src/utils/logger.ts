@@ -3,18 +3,17 @@ import bunyanDebugStream from 'bunyan-debug-stream'
 import { createStream } from 'bunyan-gke-stackdriver'
 import { NextFunction, Request, Response } from 'express'
 import { WarningMessage } from '../interfaces/errors'
-import { fetchEnv, fetchEnvOrDefault } from './config.utils'
+import { fetchEnvOrDefault } from './config.utils'
 
 let _rootLogger: Logger | undefined
 
-export function rootLogger(): Logger {
+export function rootLogger(serviceName: string): Logger {
   if (_rootLogger !== undefined) {
     return _rootLogger
   }
 
   const logLevel = fetchEnvOrDefault('LOG_LEVEL', 'info') as LogLevelString
   const logFormat = fetchEnvOrDefault('LOG_FORMAT', 'human')
-  const serviceName = fetchEnv('SERVICE_NAME') // TODO(Alec)
 
   let stream: any
   switch (logFormat) {
@@ -30,28 +29,32 @@ export function rootLogger(): Logger {
   }
 
   _rootLogger = createLogger({
-    name: serviceName,
+    name: serviceName ?? '',
     serializers: stdSerializers,
     streams: [stream],
   })
   return _rootLogger
 }
 
-export function loggerMiddleware(req: Request, res: Response, next?: NextFunction): Logger {
-  const requestLogger = rootLogger().child({
-    endpoint: req.path,
-    sessionID: req.body.sessionID, // May be undefined
-  })
-  res.locals.logger = requestLogger
+export function loggerMiddleware(
+  serviceName: string
+): (req: Request, res: Response, next?: NextFunction) => Logger {
+  return (req, res, next) => {
+    const requestLogger = rootLogger(serviceName).child({
+      endpoint: req.path,
+      sessionID: req.body.sessionID, // May be undefined
+    })
+    res.locals.logger = requestLogger
 
-  if (!req.body.sessionID && req.path !== '/metrics' && req.path !== '/status') {
-    requestLogger.info(WarningMessage.MISSING_SESSION_ID)
-  }
+    if (!req.body.sessionID && req.path !== '/metrics' && req.path !== '/status') {
+      requestLogger.info(WarningMessage.MISSING_SESSION_ID)
+    }
 
-  if (next) {
-    next()
+    if (next) {
+      next()
+    }
+    return requestLogger
   }
-  return requestLogger
 }
 
 export function genSessionID() {

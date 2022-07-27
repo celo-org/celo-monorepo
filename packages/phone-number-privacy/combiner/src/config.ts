@@ -1,5 +1,5 @@
 import { OdisUtils } from '@celo/identity'
-import { rootLogger as logger, TestUtils, toBool } from '@celo/phone-number-privacy-common'
+import { rootLogger, TestUtils, toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 export const VERSION = process.env.npm_package_version ?? ''
 export const DEV_MODE =
@@ -28,6 +28,7 @@ export interface DatabaseConfig {
 }
 
 export interface OdisConfig {
+  serviceName: string
   enabled: boolean
   odisServices: {
     signers: string
@@ -46,6 +47,7 @@ export interface CloudFunctionConfig {
 }
 
 export interface CombinerConfig {
+  serviceName: string
   blockchain: BlockchainConfig
   db: DatabaseConfig
   phoneNumberPrivacy: OdisConfig
@@ -55,9 +57,12 @@ export interface CombinerConfig {
 
 let config: CombinerConfig
 
+const defaultServiceName = 'odis-combiner'
+
 if (DEV_MODE) {
-  logger().debug('Running in dev mode')
+  rootLogger(defaultServiceName).debug('Running in dev mode')
   config = {
+    serviceName: defaultServiceName,
     blockchain: {
       provider: FORNO_ALFAJORES,
     },
@@ -69,6 +74,7 @@ if (DEV_MODE) {
       ssl: false,
     },
     phoneNumberPrivacy: {
+      serviceName: defaultServiceName,
       enabled: true,
       odisServices: {
         // TODO(Alec): For testing, use app.listen(3000)
@@ -84,6 +90,7 @@ if (DEV_MODE) {
       },
     },
     domains: {
+      serviceName: defaultServiceName,
       enabled: true,
       odisServices: {
         signers:
@@ -104,6 +111,7 @@ if (DEV_MODE) {
 } else {
   const functionConfig = functions.config()
   config = {
+    serviceName: functionConfig.service_name ?? defaultServiceName,
     blockchain: {
       provider: functionConfig.blockchain.provider,
       apiKey: functionConfig.blockchain.api_key,
@@ -116,6 +124,7 @@ if (DEV_MODE) {
       ssl: toBool(functionConfig.db.ssl, true),
     },
     phoneNumberPrivacy: {
+      serviceName: functionConfig.phoneNumberPrivacy.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.phoneNumberPrivacy.enabled, false),
       odisServices: {
         signers: functionConfig.phoneNumberPrivacy.odisservices.signers,
@@ -130,6 +139,7 @@ if (DEV_MODE) {
       },
     },
     domains: {
+      serviceName: functionConfig.domains.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.domains.enabled, false),
       odisServices: {
         signers: functionConfig.domains.odisservices.signers,
