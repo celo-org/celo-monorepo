@@ -26,6 +26,8 @@ export default class GetPaymentDelegation extends BaseCommand {
     const retval = await accounts.getPaymentDelegation(res.flags.account)
 
     const beneficiary = retval[0]
+
+    // translate fixidity value to human readable fraction
     const fraction = new BigNumber(retval[1]).shiftedBy(-24).toNumber()
 
     console.log(beneficiary, fraction)

@@ -438,7 +438,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   setMetadataURL = proxySend(this.connection, this.contract.methods.setMetadataURL)
 
   /**
-   * Sets validator payment delegation settings.
+   * Set a validator's payment delegation settings.
    * @param beneficiary The address that should receive a portion of validator
    * payments.
    * @param fraction The fraction of the validator's payment that should be
@@ -446,10 +446,10 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * be greater than 1.
    * @dev Use `deletePaymentDelegation` to unset the payment delegation.
    */
-  setPaymentDelgation = proxySend(this.connection, this.contract.methods.setPaymentDelegation)
+  setPaymentDelegation = proxySend(this.connection, this.contract.methods.setPaymentDelegation)
 
   /**
-   * Removes a validator's payment delegation by setting benficiary and
+   * Remove a validator's payment delegation by setting benficiary and
    * fraction to 0.
    */
   deletePaymentDelegation = proxySend(
@@ -458,7 +458,7 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
   )
 
   /**
-   * Gets validator payment delegation settings.
+   * Get a validator's payment delegation settings.
    * @param account Account of the validator.
    * @return Beneficiary address and fraction of payment delegated.
    */
