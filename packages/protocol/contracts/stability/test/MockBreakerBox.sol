@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 
 import { IBreakerBox } from "contracts/stability/interfaces/IBreakerBox.sol";
 
-contract FakeBreakerBox is IBreakerBox {
+contract MockBreakerBox is IBreakerBox {
   uint256 public tradingMode;
 
   function setTradingMode(uint256 _tradingMode) external {

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.5.13;
 
-contract FakeBreaker {
+contract MockBreaker {
   uint256 public cooldown;
   bool public trigger;
   bool public reset;
