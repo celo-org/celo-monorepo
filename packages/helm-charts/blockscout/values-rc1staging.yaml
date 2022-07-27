@@ -56,6 +56,8 @@ blockscout:
   jsonrpc_ws_url: ws://rc1staging-archivenodes-rpc:8545
   metadata_crawler:
     schedule: "0 */2 * * *"
+  epoch_rewards:
+    enabled: false
 
 db:
   drop: false

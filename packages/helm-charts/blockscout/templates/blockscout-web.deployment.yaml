@@ -120,6 +120,8 @@ spec:
           value: {{ .Values.blockscout.web.appsMenu.resourcesList | quote }}
         - name: LEARNING_MENU_LIST
           value: {{ .Values.blockscout.web.appsMenu.learningList | quote }}
+        - name: DISPLAY_REWARDS
+          value: "{{.Values.blockscout.epoch_rewards.enabled}}"
         - name: RE_CAPTCHA_PROJECT_ID
           valueFrom:
             secretKeyRef:
