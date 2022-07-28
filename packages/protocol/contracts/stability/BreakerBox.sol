@@ -277,9 +277,11 @@ contract BreakerBox is IBreakerBox, Initializable, UsingRegistry {
           emit ResetSuccessful(exchangeAddress, address(breaker));
         } else {
           emit ResetAttemptCriteriaFail(exchangeAddress, address(breaker));
+          return;
         }
       } else {
         emit ResetAttemptNotCool(exchangeAddress, address(breaker));
+        return;
       }
     }
 
