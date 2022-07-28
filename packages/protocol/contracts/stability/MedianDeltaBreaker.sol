@@ -94,7 +94,7 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
 
     uint256 previousMedian = sortedOracles.previousMedianRate(stableToken);
     if (previousMedian == 0) {
-      // Last median will be 0 if this exchange is new and has not had a median update yet.
+      // Previous median will be 0 if this exchange is new and has not had at least two median updates yet.
       return false;
     }
 
