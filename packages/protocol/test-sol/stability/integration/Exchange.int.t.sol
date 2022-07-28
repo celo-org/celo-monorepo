@@ -319,7 +319,7 @@ contract ExchangeIntegrationTest_MedianMovedGtThreshold is ExchangeIntegrationTe
     changePrank(alice);
   }
 
-  function moveMedianWithinNormalRangeThenSell(bool sellCelo) public {
+  function moveMedianWithinNormalRangeThenSell() public {
     //Now move the median down within threshold.
     moveMedianWithOracleReports(0.10 * 10**24, false);
 
@@ -328,7 +328,7 @@ contract ExchangeIntegrationTest_MedianMovedGtThreshold is ExchangeIntegrationTe
     testee.sell(99999, 99999, true);
   }
 
-  function moveMedianWithinNormalRangeThenBuy(bool buyCelo) public {
+  function moveMedianWithinNormalRangeThenBuy() public {
     //Now move the median down within threshold.
     moveMedianWithOracleReports(0.10 * 10**24, false);
 
@@ -351,14 +351,14 @@ contract ExchangeIntegrationTest_MedianMovedGtThreshold is ExchangeIntegrationTe
     vm.expectRevert("Trading is suspended for this exchange");
     testee.sell(99999, 99999, true);
 
-    moveMedianWithinNormalRangeThenSell(true);
+    moveMedianWithinNormalRangeThenSell();
   }
 
   function test_buy_whenBreakerHasTrippedThenMedianMovesWithinThreshold_shouldRevert() public {
     vm.expectRevert("Trading is suspended for this exchange");
     testee.buy(99999, 99999, true);
 
-    moveMedianWithinNormalRangeThenBuy(true);
+    moveMedianWithinNormalRangeThenBuy();
   }
 
   function test_sellCelo_whenBreakerHasTrippedThenResetAndMedianChangeIsNormal_shouldSellAsNormal()
@@ -367,7 +367,7 @@ contract ExchangeIntegrationTest_MedianMovedGtThreshold is ExchangeIntegrationTe
     vm.expectRevert("Trading is suspended for this exchange");
     testee.sell(99999, 99999, true);
 
-    moveMedianWithinNormalRangeThenSell(true);
+    moveMedianWithinNormalRangeThenSell();
 
     // Reset the trading mode.
     changePrank(governance);
@@ -384,7 +384,7 @@ contract ExchangeIntegrationTest_MedianMovedGtThreshold is ExchangeIntegrationTe
     vm.expectRevert("Trading is suspended for this exchange");
     testee.sell(99999, 99999, false);
 
-    moveMedianWithinNormalRangeThenSell(false);
+    moveMedianWithinNormalRangeThenSell();
 
     // Reset the trading mode.
     changePrank(governance);
@@ -401,7 +401,7 @@ contract ExchangeIntegrationTest_MedianMovedGtThreshold is ExchangeIntegrationTe
     vm.expectRevert("Trading is suspended for this exchange");
     testee.buy(99999, 99999, false);
 
-    moveMedianWithinNormalRangeThenBuy(false);
+    moveMedianWithinNormalRangeThenBuy();
 
     // Reset the trading mode.
     changePrank(governance);
@@ -418,7 +418,7 @@ contract ExchangeIntegrationTest_MedianMovedGtThreshold is ExchangeIntegrationTe
     vm.expectRevert("Trading is suspended for this exchange");
     testee.buy(99999, 99999, true);
 
-    moveMedianWithinNormalRangeThenBuy(true);
+    moveMedianWithinNormalRangeThenBuy();
 
     // Reset the trading mode.
     changePrank(governance);
