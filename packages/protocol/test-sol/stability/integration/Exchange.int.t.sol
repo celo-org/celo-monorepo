@@ -17,7 +17,7 @@ import { Proxy } from "contracts/common/Proxy.sol";
 import { GoldToken } from "contracts/common/GoldToken.sol";
 import { StableToken } from "contracts/stability/StableToken.sol";
 
-// TODO:
+// TODO: Remove after merge https://github.com/bowd/forge-std/pull/1
 interface Cheats {
   function createFork(string calldata) external returns (uint256);
 
@@ -27,7 +27,7 @@ interface Cheats {
 }
 
 contract ExchangeIntegrationTest is Test, TokenHelpers {
-  // TODO: Remove
+  // TODO: Remove after merge https://github.com/bowd/forge-std/pull/1
   Cheats constant cheats = Cheats(address(vm));
 
   IRegistry registry = IRegistry(0x000000000000000000000000000000000000ce10);
@@ -56,7 +56,6 @@ contract ExchangeIntegrationTest is Test, TokenHelpers {
   Exchange testee;
 
   function setUp() public {
-    // TODO: Default to fork for integration tests profile & remove
     // Setup fork
     cheats.selectFork(cheats.createFork(cheats.rpcUrl("celo_mainnet")));
 
@@ -117,8 +116,6 @@ contract ExchangeIntegrationTest is Test, TokenHelpers {
   function updateProxyImplementations() public {
     // Proxies
     Proxy exchangeProxy;
-    Proxy exchangeBRLProxy;
-    Proxy exchangeEURProxy;
     Proxy sortedOraclesProxy;
 
     // Get references to existing proxies
@@ -194,70 +191,183 @@ contract ExchangeIntegrationTest is Test, TokenHelpers {
     }
   }
 
-  function test_sell_whenExchageIsInDefaultMode_shouldSellAsNormal() public {
+  function sell(bool sellCelo) public {
     uint256 sellAmount = 500 * 10**18;
-    uint256 celoBalanceBefore = celoToken.balanceOf(alice);
+    uint256 expectedOut = testee.getBuyTokenAmount(sellAmount, sellCelo);
 
+    uint256 celoBalanceBefore = celoToken.balanceOf(alice);
+    uint256 cUSDBalanceBefore = cUSD.balanceOf(alice);
+
+    testee.sell(sellAmount, expectedOut, sellCelo);
+
+    uint256 celoBalanceAfter = celoToken.balanceOf(alice);
+    uint256 cUSDBalanceAfter = cUSD.balanceOf(alice);
+
+    if (sellCelo) {
+      assertTrue(celoBalanceBefore - celoBalanceAfter == sellAmount);
+      assertTrue(cUSDBalanceAfter - cUSDBalanceBefore >= expectedOut);
+    } else {
+      assertTrue(cUSDBalanceBefore - cUSDBalanceAfter == sellAmount);
+      assertTrue(celoBalanceAfter - celoBalanceBefore >= expectedOut);
+    }
+  }
+
+  function buy(bool buyCelo) public {
+    uint256 celoBalanceBefore = celoToken.balanceOf(alice);
+    uint256 cUSDBalanceBefore = cUSD.balanceOf(alice);
+
+    uint256 sellAmount = 500 * 10**18;
+    uint256 expectedOut = testee.getBuyTokenAmount(sellAmount, !buyCelo);
+
+    testee.buy(expectedOut, sellAmount, buyCelo);
+
+    uint256 cUSDBalanceAfter = cUSD.balanceOf(alice);
+    uint256 celoBalanceAfter = celoToken.balanceOf(alice);
+
+    if (buyCelo) {
+      assertTrue(celoBalanceAfter - celoBalanceBefore == expectedOut);
+      assertTrue(cUSDBalanceBefore - cUSDBalanceAfter <= sellAmount);
+    } else {
+      assertTrue(cUSDBalanceAfter - cUSDBalanceBefore == expectedOut);
+      assertTrue(celoBalanceBefore - celoBalanceAfter <= sellAmount);
+    }
+  }
+}
+
+/* ---------- When breaker box is not set for exchange ---------- */
+contract ExchangeIntegrationTest_BreakerBoxNotSet is ExchangeIntegrationTest {
+  function setUp() public {
+    super.setUp();
+
+    changePrank(governance);
+    vm.expectEmit(true, false, false, false);
+    emit BreakerBoxUpdated(address(0));
+    testee.setBreakerBox(BreakerBox(address(0)));
+    changePrank(alice);
+
+    // Mock this call to the actual breaker box
+    // so if for some reason it does recieve the call we'll get a revert
+    vm.mockCall(
+      address(breakerBox),
+      abi.encodeWithSelector(breakerBox.getTradingMode.selector),
+      abi.encode(1)
+    );
+  }
+
+  function test_sellCelo_whenBreakerBoxNotSetForExchange_shouldSellAsNormal() public {
+    sell(true);
+  }
+
+  function test_sellStable_whenBreakerBoxNotSetForExchange_shouldSellAsNormal() public {
+    sell(false);
+  }
+
+  function test_buyCelo_whenBreakerBoxNotSetForExchange_shouldBuyAsNormal() public {
+    buy(true);
+  }
+
+  function test_buyStable_whenBreakerBoxNotSetForExchange_shouldBuyAsNormal() public {
+    buy(false);
+  }
+}
+
+/* ---------- When breaker box is set and exchange is in default mode(Bidirectional trading)  ---------- */
+contract ExchangeIntegrationTest_DefaultMode is ExchangeIntegrationTest {
+  function test_sellCelo_whenExchageIsInDefaultMode_shouldSellAsNormal() public {
     vm.expectCall(
       address(breakerBox),
       abi.encodeWithSelector(breakerBox.getTradingMode.selector, address(testee))
     );
 
-    testee.sell(sellAmount, testee.getBuyTokenAmount(sellAmount, true), true);
-    uint256 celoBalanceAfter = celoToken.balanceOf(alice);
-
-    assertTrue(celoBalanceBefore - celoBalanceAfter == sellAmount);
+    sell(true);
   }
 
-  function test_sell_whenMedianMovesUpGtThanThreshold_shouldRevert() public {
+  function test_sellStable_whenExchageIsInDefaultMode_shouldSellAsNormal() public {
+    vm.expectCall(
+      address(breakerBox),
+      abi.encodeWithSelector(breakerBox.getTradingMode.selector, address(testee))
+    );
+
+    sell(false);
+  }
+
+  function test_buyCelo_whenExchangeIsInDefaultMode_shouldBuyAsNormal() public {
+    vm.expectCall(
+      address(breakerBox),
+      abi.encodeWithSelector(breakerBox.getTradingMode.selector, address(testee))
+    );
+
+    buy(true);
+  }
+
+  function test_buyStable_whenExchangeIsInDefaultMode_shouldBuyAsNormal() public {
+    vm.expectCall(
+      address(breakerBox),
+      abi.encodeWithSelector(breakerBox.getTradingMode.selector, address(testee))
+    );
+
+    buy(false);
+  }
+}
+
+/* ---------- When median has moved GT threshold so median delta breaker has tripped == no trading  ---------- */
+contract ExchangeIntegrationTest_MedianMovedGtThreshold is ExchangeIntegrationTest {
+  function setUp() public {
+    super.setUp();
     // Threshold is 15% so 16% should trigger
     moveMedianWithOracleReports(0.16 * 10**24, true);
     changePrank(alice);
-
-    vm.expectRevert("Trading is suspended for this exchange");
-    testee.sell(99999, 99999, true);
   }
 
-  function test_sell_whenMedianMovesDownGtThanThreshold_shouldRevert() public {
-    // Threshold is 15% so 16% should trigger
-    moveMedianWithOracleReports(0.16 * 10**24, false);
-    changePrank(alice);
-
-    vm.expectRevert("Trading is suspended for this exchange");
-    testee.sell(99999, 99999, true);
-  }
-
-  function test_sell_whenBreakerHasTrippedButMedianChangeIsNormal_shouldRevert() public {
-    // Threshold is 15% so 16% should trigger
-    moveMedianWithOracleReports(0.16 * 10**24, false);
-    changePrank(alice);
-
-    vm.expectRevert("Trading is suspended for this exchange");
-    testee.sell(99999, 99999, true);
-
+  function moveMedianWithinNormalRangeThenSell(bool sellCelo) public {
     //Now move the median down within threshold.
     moveMedianWithOracleReports(0.10 * 10**24, false);
 
+    // Should still revert as we require manual reset
     vm.expectRevert("Trading is suspended for this exchange");
     testee.sell(99999, 99999, true);
   }
 
-  function test_sell_whenBreakerHasTrippedThenResetAndMedianChangeIsNormal_shouldSellAsNormal()
-    public
-  {
-    // Threshold is 15% so 16% should trigger.
-    moveMedianWithOracleReports(0.16 * 10**24, false);
-    changePrank(alice);
-
-    vm.expectRevert("Trading is suspended for this exchange");
-    testee.sell(99999, 99999, true);
-
-    // Now move the median down within threshold.
+  function moveMedianWithinNormalRangeThenBuy(bool buyCelo) public {
+    //Now move the median down within threshold.
     moveMedianWithOracleReports(0.10 * 10**24, false);
 
-    // Whilst the median change is normal, this breaker requires a manual reset.
+    // Should still revert as we require manual reset
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.buy(99999, 99999, true);
+  }
+
+  function test_sell_whenBreakerHasTripped_shouldRevert() public {
     vm.expectRevert("Trading is suspended for this exchange");
     testee.sell(99999, 99999, true);
+  }
+
+  function test_buy_whenBreakerHasTripped_shouldRevert() public {
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.buy(99999, 99999, true);
+  }
+
+  function test_sell_whenBreakerHasTrippedThenMedianMovesWithinThreshold_shouldRevert() public {
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.sell(99999, 99999, true);
+
+    moveMedianWithinNormalRangeThenSell(true);
+  }
+
+  function test_buy_whenBreakerHasTrippedThenMedianMovesWithinThreshold_shouldRevert() public {
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.buy(99999, 99999, true);
+
+    moveMedianWithinNormalRangeThenBuy(true);
+  }
+
+  function test_sellCelo_whenBreakerHasTrippedThenResetAndMedianChangeIsNormal_shouldSellAsNormal()
+    public
+  {
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.sell(99999, 99999, true);
+
+    moveMedianWithinNormalRangeThenSell(true);
 
     // Reset the trading mode.
     changePrank(governance);
@@ -265,36 +375,57 @@ contract ExchangeIntegrationTest is Test, TokenHelpers {
 
     // Try to sell again.
     changePrank(alice);
-    uint256 sellAmount = 500 * 10**18;
-    uint256 celoBalanceBefore = celoToken.balanceOf(alice);
-
-    testee.sell(sellAmount, testee.getBuyTokenAmount(sellAmount, true), true);
-    uint256 celoBalanceAfter = celoToken.balanceOf(alice);
-
-    assertTrue(celoBalanceBefore - celoBalanceAfter == sellAmount);
+    sell(true);
   }
 
-  function test_sell_whenBreakerHasTrippedThenResetAndNewMedianChangeNotNormal_shouldRevert()
+  function test_sellStable_whenBreakerHasTrippedThenResetAndMedianChangeIsNormal_shouldSellAsNormal()
     public
   {
-    // Threshold is 15% so 16% should trigger.
-    moveMedianWithOracleReports(0.16 * 10**24, false);
-    changePrank(alice);
-
     vm.expectRevert("Trading is suspended for this exchange");
-    testee.sell(99999, 99999, true);
+    testee.sell(99999, 99999, false);
+
+    moveMedianWithinNormalRangeThenSell(false);
 
     // Reset the trading mode.
     changePrank(governance);
     breakerBox.setExchangeTradingMode(address(testee), 0);
 
-    // Confirm trading should be allowed
-    assertEq(breakerBox.getTradingMode(address(testee)), 0);
+    // Try to sell again.
+    changePrank(alice);
+    sell(false);
+  }
 
-    // Now move the median down gt threshold.
-    moveMedianWithOracleReports(0.17 * 10**24, false);
-
+  function test_buyStable_whenBreakerHasTrippedThenResetAndMedianChangeIsNormal_shouldSellAsNormal()
+    public
+  {
     vm.expectRevert("Trading is suspended for this exchange");
-    testee.sell(99999, 99999, true);
+    testee.buy(99999, 99999, false);
+
+    moveMedianWithinNormalRangeThenBuy(false);
+
+    // Reset the trading mode.
+    changePrank(governance);
+    breakerBox.setExchangeTradingMode(address(testee), 0);
+
+    // Try to buy again.
+    changePrank(alice);
+    buy(false);
+  }
+
+  function test_buyCelo_whenBreakerHasTrippedThenResetAndMedianChangeIsNormal_shouldSellAsNormal()
+    public
+  {
+    vm.expectRevert("Trading is suspended for this exchange");
+    testee.buy(99999, 99999, true);
+
+    moveMedianWithinNormalRangeThenBuy(true);
+
+    // Reset the trading mode.
+    changePrank(governance);
+    breakerBox.setExchangeTradingMode(address(testee), 0);
+
+    // Try to buy again.
+    changePrank(alice);
+    buy(true);
   }
 }
