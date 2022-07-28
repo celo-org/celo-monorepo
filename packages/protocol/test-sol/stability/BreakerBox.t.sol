@@ -371,8 +371,8 @@ contract BreakerBoxTest_constructorAndSetters is BreakerBoxTest {
   }
 }
 
-contract BreakerBoxTest_checkBreakers is BreakerBoxTest {
-  function test_checkBreakers_whenExchangeIsNotInDefaultModeAndCooldownNotPassed_shouldEmitNotCool()
+contract BreakerBoxTest_checkAndSetBreakers is BreakerBoxTest {
+  function test_checkAndSetBreakers_whenExchangeIsNotInDefaultModeAndCooldownNotPassed_shouldEmitNotCool()
     public
   {
     setupBreakerAndExchange(mockBreakerC, 6, 3600, false, false, exchangeC);
@@ -383,11 +383,11 @@ contract BreakerBoxTest_checkBreakers is BreakerBoxTest {
     vm.expectEmit(true, true, false, false);
     emit ResetAttemptNotCool(exchangeC, address(mockBreakerC));
 
-    breakerBox.checkBreakers(EXCHANGE_C_ID);
+    breakerBox.checkAndSetBreakers(EXCHANGE_C_ID);
     assertEq(breakerBox.getTradingMode(exchangeC), 6);
   }
 
-  function test_checkBreakers_whenExchangeIsNotInDefaultModeAndCantReset_shouldEmitCriteriaFail()
+  function test_checkAndSetBreakers_whenExchangeIsNotInDefaultModeAndCantReset_shouldEmitCriteriaFail()
     public
   {
     setupBreakerAndExchange(mockBreakerC, 6, 3600, false, false, exchangeC);
@@ -401,11 +401,13 @@ contract BreakerBoxTest_checkBreakers is BreakerBoxTest {
     vm.expectEmit(true, true, false, false);
     emit ResetAttemptCriteriaFail(exchangeC, address(mockBreakerC));
 
-    breakerBox.checkBreakers(EXCHANGE_C_ID);
+    breakerBox.checkAndSetBreakers(EXCHANGE_C_ID);
     assertEq(breakerBox.getTradingMode(exchangeC), 6);
   }
 
-  function test_checkBreakers_whenExchangeIsNotInDefaultModeAndCanReset_shouldResetMode() public {
+  function test_checkAndSetBreakers_whenExchangeIsNotInDefaultModeAndCanReset_shouldResetMode()
+    public
+  {
     setupBreakerAndExchange(mockBreakerC, 6, 3600, true, false, exchangeC);
     skip(3600);
 
@@ -417,11 +419,11 @@ contract BreakerBoxTest_checkBreakers is BreakerBoxTest {
     vm.expectEmit(true, true, false, false);
     emit ResetSuccessful(exchangeC, address(mockBreakerC));
 
-    breakerBox.checkBreakers(EXCHANGE_C_ID);
+    breakerBox.checkAndSetBreakers(EXCHANGE_C_ID);
     assertEq(breakerBox.getTradingMode(exchangeC), 0);
   }
 
-  function test_checkBreakers_whenExchangeIsNotInDefaultModeAndNoBreakerCooldown_shouldReturnCorrectModeAndEmit()
+  function test_checkAndSetBreakers_whenExchangeIsNotInDefaultModeAndNoBreakerCooldown_shouldReturnCorrectModeAndEmit()
     public
   {
     setupBreakerAndExchange(mockBreakerC, 6, 0, true, false, exchangeC);
@@ -431,11 +433,11 @@ contract BreakerBoxTest_checkBreakers is BreakerBoxTest {
     vm.expectEmit(true, true, false, false);
     emit ResetAttemptNotCool(exchangeC, address(mockBreakerC));
 
-    breakerBox.checkBreakers(EXCHANGE_C_ID);
+    breakerBox.checkAndSetBreakers(EXCHANGE_C_ID);
     assertEq(breakerBox.getTradingMode(exchangeC), 6);
   }
 
-  function test_checkBreakers_whenNoBreakersAreTripped_shouldReturnDefaultMode() public {
+  function test_checkAndSetBreakers_whenNoBreakersAreTripped_shouldReturnDefaultMode() public {
     setupBreakerAndExchange(mockBreakerC, 6, 3600, true, false, address(0));
     breakerBox.addExchange(exchangeC);
     assertTrue(isExchange(exchangeC));
@@ -452,11 +454,11 @@ contract BreakerBoxTest_checkBreakers is BreakerBoxTest {
       abi.encodeWithSelector(mockBreakerA.shouldTrigger.selector, address(exchangeC))
     );
 
-    breakerBox.checkBreakers(EXCHANGE_C_ID);
+    breakerBox.checkAndSetBreakers(EXCHANGE_C_ID);
     assertEq(breakerBox.getTradingMode(exchangeC), 0);
   }
 
-  function test_checkBreakers_whenABreakerIsTripped_shouldSetModeAndEmit() public {
+  function test_checkAndSetBreakers_whenABreakerIsTripped_shouldSetModeAndEmit() public {
     setupBreakerAndExchange(mockBreakerC, 6, 3600, true, true, address(0));
 
     breakerBox.addExchange(exchangeC);
@@ -481,7 +483,7 @@ contract BreakerBoxTest_checkBreakers is BreakerBoxTest {
     skip(3600);
     vm.roll(5);
 
-    breakerBox.checkBreakers(EXCHANGE_C_ID);
+    breakerBox.checkAndSetBreakers(EXCHANGE_C_ID);
     assertEq(breakerBox.getTradingMode(exchangeC), 6);
 
     (, uint256 lastUpdatedTime, uint256 lastUpdatedBlock) = breakerBox.exchangeTradingModes(

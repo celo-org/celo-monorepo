@@ -6,18 +6,6 @@ pragma solidity ^0.5.13;
  */
 interface IBreaker {
   /**
-   * @notice Emitted after an exchange triggers a breaker.
-   * @param exchange The address of the exchange that triggered the breaker.
-   */
-  event BreakerTriggered(address indexed exchange);
-
-  /**
-   * @notice Emitted after a breaker has been reset for an exchange.
-   * @param exchange The address of the exchange.
-   */
-  event BreakerReset(address indexed exchange);
-
-  /**
    * @notice Emitted after the cooldownTime has been updated.
    * @param newCooldownTime The new cooldownTime of the breaker.
    */

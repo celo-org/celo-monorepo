@@ -31,6 +31,7 @@ contract ExchangeTest is Test, WithRegistry, TokenHelpers {
   event BucketsUpdated(uint256 celoBucket, uint256 stableBucket);
   event StableBucketMaxFractionSet(uint256 stableBucketMaxFraction);
   event MinSupplyForStableBucketCapSet(uint256 minSupplyForStableBucketCap);
+  event BreakerBoxUpdated(address indexed newBreakerBox);
 
   address deployer;
   address rando;
@@ -327,6 +328,9 @@ contract Exchange_initializeAndSetters is ExchangeTest {
 
   function test_setBreakerBox_shouldUpdateAndEmit() public {
     assertTrue(address(exchange.breakerBox()) == address(0));
+    vm.expectEmit(true, false, false, false);
+    emit BreakerBoxUpdated(address(breakerBox));
+
     exchange.setBreakerBox(breakerBox);
     assertTrue(address(exchange.breakerBox()) == address(breakerBox));
   }

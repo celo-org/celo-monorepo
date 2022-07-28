@@ -101,11 +101,7 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
     (uint256 currentMedian, ) = sortedOracles.medianRate(stableToken);
 
     // Check if current median is within allowed threshold of last median
-    triggerBreaker = !isWithinThreshold(
-      previousMedian,
-      currentMedian,
-      priceChangeThreshold.unwrap()
-    );
+    triggerBreaker = !isWithinThreshold(previousMedian, currentMedian);
   }
 
   /**
@@ -120,24 +116,20 @@ contract MedianDeltaBreaker is IBreaker, UsingRegistry {
 
   /**
    * @notice Checks if the specified current median rate is within the allowed threshold.
-   * @param lastRate The last median rate.
+   * @param prevRate The previous median rate.
    * @param currentRate The current median rate.
    * @return  Returns a bool indicating whether or not the current rate
-   *          is within the given threshold.
+   *          is within the allowed threshold.
    */
-  function isWithinThreshold(uint256 lastRate, uint256 currentRate, uint256 allowedThreshold)
-    private
-    pure
-    returns (bool)
-  {
-    // uint256 maxPercent = FixidityLib.newFixed(1).add(allowedThreshold);
-    // uint256 maxValue = (FixidityLib.newFixed(lastRate).multiply(maxPercent)).fromFixed();
+  function isWithinThreshold(uint256 prevRate, uint256 currentRate) public view returns (bool) {
+    uint256 allowedThreshold = priceChangeThreshold.unwrap();
+    uint256 fixed1 = FixidityLib.fixed1().unwrap();
 
-    uint256 maxPercent = uint256(1 * 10**24).add(allowedThreshold);
-    uint256 maxValue = (lastRate.mul(maxPercent)).div(10**24);
+    uint256 maxPercent = uint256(fixed1).add(allowedThreshold);
+    uint256 maxValue = (prevRate.mul(maxPercent)).div(10**24);
 
-    uint256 minPercent = uint256(1 * 10**24).sub(allowedThreshold);
-    uint256 minValue = (lastRate.mul(minPercent)).div(10**24);
+    uint256 minPercent = uint256(fixed1).sub(allowedThreshold);
+    uint256 minValue = (prevRate.mul(minPercent)).div(10**24);
 
     return (currentRate >= minValue && currentRate <= maxValue);
   }

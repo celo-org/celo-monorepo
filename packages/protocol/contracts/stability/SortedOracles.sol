@@ -236,7 +236,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
       emit MedianUpdated(token, newMedian);
     }
 
-    breakerBox.checkBreakers(IStableToken(token).getExchangeRegistryId());
+    breakerBox.checkAndSetBreakers(IStableToken(token).getExchangeRegistryId());
   }
 
   /**
