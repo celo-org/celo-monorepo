@@ -5,7 +5,7 @@ import { Flags } from '../../utils/command'
 
 export default class GetPaymentDelegation extends BaseCommand {
   static description =
-    "Get the payment delegation account beneficiary and fraction allocated from a validator's payment each epoch. The fraction is given as FixidityLib value and cannot be greater than 1."
+    "Get the payment delegation account beneficiary and fraction allocated from a validator's payment each epoch. The fraction cannot be greater than 1."
 
   static flags = {
     ...BaseCommand.flags,

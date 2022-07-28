@@ -194,10 +194,6 @@ export class WrapperCache implements ContractCacheType {
     return this.getContract(CeloContract.MultiSig, address)
   }
 
-  getPaymentDelegation() {
-    return this.getContract(CeloContract.Accounts)
-  }
-
   getReserve() {
     return this.getContract(CeloContract.Reserve)
   }

@@ -22,7 +22,6 @@ export default class DeletePaymentDelegation extends BaseCommand {
     this.kit.defaultAccount = res.flags.account
     const accounts = await this.kit.contracts.getAccounts()
 
-    // await accounts.deletePaymentDelegation()
     await displaySendTx('deletePaymentDelegation', accounts.deletePaymentDelegation())
 
     console.log('Deleted payment delegation.')
