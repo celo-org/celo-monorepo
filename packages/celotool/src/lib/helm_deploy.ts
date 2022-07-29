@@ -271,7 +271,8 @@ export async function installCertManagerAndNginx(
   celoEnv: string,
   clusterConfig?: BaseClusterConfig
 ) {
-  const nginxChartVersion = '3.9.0'
+  // k8s version >=1.20.0-0
+  const nginxChartVersion = '4.2.0'
   const nginxChartNamespace = 'default'
 
   // Check if cert-manager is installed in any namespace
@@ -328,8 +329,6 @@ async function nginxHelmParameters(
 controller:
   autoscaling:
     enabled: "true"
-    minReplicas: 1
-    maxReplicas: 10
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
   config:

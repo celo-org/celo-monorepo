@@ -17,7 +17,7 @@ import { outputIncludes, switchToProjectFromEnv } from './utils'
 import { networkName } from './vm-testnet-utils'
 
 const SYSTEM_HELM_RELEASES = [
-  'nginx-ingress-release',
+  'nginx-ingress-release', // TODO: rename to nginx-ingress
   'kube-lego-release',
   'cert-manager-cluster-issuers',
 ]
