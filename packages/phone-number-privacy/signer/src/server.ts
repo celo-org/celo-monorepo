@@ -128,15 +128,20 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
   )
 
   addMeteredSignerEndpoint(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))
-  addMeteredSignerEndpoint(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota))
-  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
+  addMeteredSignerEndpoint(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota), 'get')
+  addMeteredSignerEndpoint(
+    SignerEndpoint.DOMAIN_QUOTA_STATUS,
+    domainQuota.handle.bind(domainQuota),
+    'get'
+  )
   addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
   addMeteredSignerEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
 
   addMeteredSignerEndpoint(SignerEndpoint.LEGACY_PNP_SIGN, legacyPnpSign.handle.bind(legacyPnpSign))
   addMeteredSignerEndpoint(
     SignerEndpoint.LEGACY_PNP_QUOTA,
-    legacyPnpQuota.handle.bind(legacyPnpQuota)
+    legacyPnpQuota.handle.bind(legacyPnpQuota),
+    'get'
   )
 
   const sslOptions = getSslOptions(config)

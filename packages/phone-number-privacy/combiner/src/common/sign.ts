@@ -29,7 +29,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
   }
 
   // Throws if response is not actually successful
-  protected async receiveSuccessResponse(
+  protected async receiveSuccess(
     signerResponse: FetchResponse,
     url: string,
     session: Session<R>
@@ -80,7 +80,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
     if (majorityErrorCode === 403 || majorityErrorCode === 429) {
       error = WarningMessage.EXCEEDED_QUOTA
     }
-    this.io.sendFailure(error, majorityErrorCode ?? 500, session.response, session.logger)
+    this.io.sendFailure(error, majorityErrorCode ?? 500, session.response)
   }
 
   protected abstract parseBlindedMessage(req: OdisSignatureRequest): string

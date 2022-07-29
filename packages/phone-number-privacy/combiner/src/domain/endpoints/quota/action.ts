@@ -18,7 +18,7 @@ export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
     if (session.responses.length >= this.config.keys.threshold) {
       try {
         const domainQuotaStatus = this.thresholdStateService.findThresholdDomainState(session)
-        this.io.sendSuccess(200, session.response, session.logger, domainQuotaStatus)
+        this.io.sendSuccess(200, session.response, domainQuotaStatus)
         return
       } catch (error) {
         session.logger.error({ error }, 'Error combining signer quota status responses')

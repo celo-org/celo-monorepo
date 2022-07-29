@@ -23,7 +23,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
   }
 
   async combine(session: Session<DomainRestrictedSignatureRequest>): Promise<void> {
-    this.logResponseDiscrepancies(session)
+    // this.logResponseDiscrepancies(session) // TODO(Alec)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
@@ -31,10 +31,10 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
+
         return this.io.sendSuccess(
           200,
           session.response,
-          session.logger,
           combinedSignature,
           this.thresholdStateService.findThresholdDomainState(session)
         )

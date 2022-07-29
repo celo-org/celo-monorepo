@@ -27,6 +27,8 @@ export class BLSCryptographyClient {
   }
 
   public addSignature(serviceResponse: ServicePartialSignature) {
+    // tslint:disable: no-console
+    console.log('*************************************************')
     this.unverifiedSignatures.push(serviceResponse)
   }
 
@@ -34,6 +36,11 @@ export class BLSCryptographyClient {
    * Returns true if the number of valid signatures is enough to perform a combination
    */
   public hasSufficientSignatures(): boolean {
+    // tslint:disable: no-console
+    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+    console.log(this.allSignaturesLength)
+    console.log(this.config.keys.threshold)
+    console.log(this.allSignaturesLength >= this.config.keys.threshold)
     return this.allSignaturesLength >= this.config.keys.threshold
   }
 
@@ -60,7 +67,7 @@ export class BLSCryptographyClient {
     // If combination or verification fails, iterate through each signature and remove invalid ones
     // We do this since partial signature verification incurs higher latencies
     try {
-      const result = threshold_bls.combine(this.config.keys.threshold, this.allSignatures)
+      const result = threshold_bls.combine(this.config.keys.threshold, this.allSignatures) // TODO(Alec)(Next): This is throwing an error. We probably need to import in and use the new crypto client
       this.verifyCombinedSignature(blindedMessage, result, logger)
       return Buffer.from(result).toString('base64')
     } catch (error) {
@@ -103,6 +110,8 @@ export class BLSCryptographyClient {
     const sigBuffer = Buffer.from(unverifiedSignature.signature, 'base64')
     if (this.isValidPartialSignature(sigBuffer, blindedMessage)) {
       // We move it to the verified set so that we don't need to re-verify in the future
+      // tslint:disable: no-console
+      console.log('#################################')
       this.verifiedSignatures.push(unverifiedSignature)
     } else {
       logger.error({ url: unverifiedSignature.url }, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)
