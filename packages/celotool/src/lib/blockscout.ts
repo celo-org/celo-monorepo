@@ -164,8 +164,10 @@ export async function createDefaultIngressIfNotExists(celoEnv: string, ingressNa
   if (!ingressExists) {
     console.info(`Creating ingress ${celoEnv}-blockscout-web-ingress`)
     const ingressFilePath = `/tmp/${celoEnv}-blockscout-web-ingress.yaml`
+    // TODO: the ingress needs a spec.ingressClassName fiedl set to nginx when
+    // the nginx ingress gets updated to 4.2.0
     const ingressResource = `
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
