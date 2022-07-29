@@ -355,14 +355,26 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     )
   }
 
+  /**
+   * Creates a transaction object for revoking active votes.
+   * @dev In cases where `revokeActive` transaction object will be executed right after
+   * a `revokePending` transaction object, one must use the total revoke amount to account
+   * for any removed pending votes when obtaining the `findLesserAndGreaterAfterVote`.
+   * @param value Amount to be removed from active votes.
+   * @param totalValue Amount used to obtain the lesser and greater addresses.
+   */
   async revokeActive(
     account: Address,
     group: Address,
-    value: BigNumber
+    value: BigNumber,
+    totalValue: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const index = findAddressIndex(group, groups)
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(
+      group,
+      totalValue.times(-1)
+    )
 
     return toTransactionObject(
       this.connection,
@@ -386,7 +398,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     }
     if (pendingValue.lt(value)) {
       const activeValue = value.minus(pendingValue)
-      txos.push(await this.revokeActive(account, group, activeValue))
+      txos.push(await this.revokeActive(account, group, activeValue, value))
     }
     return txos
   }
