@@ -195,3 +195,25 @@ export async function getWalletAddress(
     'getWalletAddress'
   )
 }
+
+export async function getOnChainOdisBalance(kit: ContractKit, account: string): Promise<BigNumber> {
+  // TODO EN add in logging?
+  return meter(
+    retryAsyncWithBackOffAndTimeout,
+    [
+      async () => await (await kit.contracts.getOdisBalance()).totalPaidCUSD(account),
+      RETRY_COUNT,
+      [],
+      RETRY_DELAY_IN_MS,
+      undefined,
+      FULL_NODE_TIMEOUT_IN_MS,
+    ],
+    (err: any) => {
+      // logger.error({ error: err, account }, 'failed to get on-chain odis balance for account')
+      Counters.blockchainErrors.labels(Labels.read).inc()
+      throw err
+    },
+    Histograms.getRemainingQueryCountInstrumentation,
+    'getOnChainOdisBalance'
+  )
+}

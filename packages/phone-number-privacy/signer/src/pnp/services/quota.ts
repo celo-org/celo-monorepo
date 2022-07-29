@@ -1,13 +1,19 @@
+// import { retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import {
   ErrorMessage,
   PnpQuotaRequest,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
+import BigNumber from 'bignumber.js'
+// import { config } from '../../config'
 import { Knex } from 'knex'
-import { incrementQueryCount } from '../../common/database/wrappers/account'
+// import { Histograms } from '../../../common/metrics'
+import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
 import { storeRequest } from '../../common/database/wrappers/request'
+import { Histograms } from '../../common/metrics'
 import { OdisQuotaStatusResult, QuotaService } from '../../common/quota'
+import { getBlockNumber, getOnChainOdisBalance, meter } from '../../common/web3/contracts'
 import { PnpSession } from '../session'
 export interface PnpQuotaStatus {
   queryCount: number
@@ -15,8 +21,90 @@ export interface PnpQuotaStatus {
   blockNumber: number
 }
 
+// TODO extract this into config ?
+// const QUOTA_PRICE_IN_CUSD = 0.1 // new BigNumber(1 / 0.1)
+// const QUOTA_PER_WEI_CUSD = new BigNumber(0.1).div(new BigNumber(1e18))
+const QUOTA_PER_WEI_CUSD = new BigNumber(1).div(new BigNumber(0.1).times(new BigNumber(1e18)))
+
 export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
   constructor(readonly db: Knex, readonly kit: ContractKit) {}
+
+  // public async checkAndUpdateQuotaStatus_old(
+  //   state: PnpQuotaStatus,
+  //   session: PnpSession<SignMessageRequest>,
+  //   trx: Knex.Transaction
+  // ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
+  //   const remainingQuota = state.totalQuota - state.queryCount
+  //   Histograms.userRemainingQuotaAtRequest.observe(remainingQuota)
+  //   let sufficient = remainingQuota > 0
+  //   if (!sufficient) {
+  //     session.logger.debug({ ...state }, 'No remaining quota')
+  //     if (this.bypassQuotaForE2ETesting(session.request.body)) {
+  //       Counters.testQuotaBypassedRequests.inc()
+  //       session.logger.info(
+  //         { request: session.request.body },
+  //         'Request will bypass quota check for e2e testing'
+  //       )
+  //       sufficient = true
+  //     }
+  //   } else {
+  //     await this.updateQuotaStatus(trx, session)
+  //     state.queryCount++
+  //   }
+  //   return { sufficient, state }
+  // }
+
+  // public async getQuotaStatus_old(
+  //   session: PnpSession<SignMessageRequest | PnpQuotaRequest>,
+  //   trx?: Knex.Transaction
+  // ): Promise<PnpQuotaStatus> {
+  //   const { account } = session.request.body
+  //   const [queryCountResult, totalQuotaResult, blockNumberResult] = await meter(
+  //     (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
+  //       Promise.allSettled([
+  //         // TODO(Alec)(pnp)
+  //         // Note: The database read of the user's queryCount
+  //         // included here resolves to 0 on error
+  //         getPerformedQueryCount(this.db, account, session.logger, trx),
+  //         this.getTotalQuota(_session),
+  //         getBlockNumber(this.kit),
+  //       ]),
+  //     [session],
+  //     (err: any) => {
+  //       throw err
+  //     },
+  //     Histograms.getRemainingQueryCountInstrumentation,
+  //     'getQuotaStatus'
+  //   )
+
+  //   let hadBlockchainError = false
+  //   let queryCount = -1
+  //   let totalQuota = -1
+  //   let blockNumber = -1
+  //   if (queryCountResult.status === 'fulfilled') {
+  //     queryCount = queryCountResult.value
+  //   } else {
+  //     session.logger.error(queryCountResult.reason)
+  //     session.errors.push(ErrorMessage.DATABASE_GET_FAILURE)
+  //   }
+  //   if (totalQuotaResult.status === 'fulfilled') {
+  //     totalQuota = totalQuotaResult.value
+  //   } else {
+  //     session.logger.error(totalQuotaResult.reason)
+  //     hadBlockchainError = true
+  //   }
+  //   if (blockNumberResult.status === 'fulfilled') {
+  //     blockNumber = blockNumberResult.value
+  //   } else {
+  //     session.logger.error(blockNumberResult.reason)
+  //     hadBlockchainError = true
+  //   }
+  //   if (hadBlockchainError) {
+  //     session.errors.push(ErrorMessage.CONTRACT_GET_FAILURE)
+  //   }
+
+  //   return { queryCount, totalQuota, blockNumber }
+  // }
 
   public async checkAndUpdateQuotaStatus(
     _state: PnpQuotaStatus,
@@ -30,7 +118,45 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     _session: PnpSession<SignMessageRequest | PnpQuotaRequest>,
     _trx?: Knex.Transaction
   ): Promise<PnpQuotaStatus> {
-    throw new Error('Method not implemented.')
+    // TODO EN: ideally this would just subclass the Legacy Service and change the getTotalQuota function ...?
+    const { account } = _session.request.body
+    const [queryCountResult, totalQuotaResult, blockNumberResult] = await Promise.allSettled([
+      // TODO(Alec)(pnp)
+      // Note: The database read of the user's queryCount
+      // included here resolves to 0 on error
+      getPerformedQueryCount(this.db, account, _session.logger, _trx),
+      this.getTotalQuota(_session),
+      getBlockNumber(this.kit),
+    ])
+
+    let hadBlockchainError = false
+    let queryCount = -1
+    let totalQuota = -1
+    let blockNumber = -1
+    if (queryCountResult.status === 'fulfilled') {
+      queryCount = queryCountResult.value
+    } else {
+      _session.logger.error(queryCountResult.reason)
+      _session.errors.push(ErrorMessage.DATABASE_GET_FAILURE)
+    }
+    if (totalQuotaResult.status === 'fulfilled') {
+      totalQuota = totalQuotaResult.value
+    } else {
+      _session.logger.error(totalQuotaResult.reason)
+      hadBlockchainError = true
+    }
+    if (blockNumberResult.status === 'fulfilled') {
+      blockNumber = blockNumberResult.value
+    } else {
+      _session.logger.error(blockNumberResult.reason)
+      hadBlockchainError = true
+    }
+    if (hadBlockchainError) {
+      _session.errors.push(ErrorMessage.CONTRACT_GET_FAILURE)
+    }
+
+    // TODO EN: what to do in case of integer overflow of quota?
+    return { queryCount, totalQuota, blockNumber }
   }
 
   protected async updateQuotaStatus(
@@ -51,4 +177,52 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
       session.errors.push(ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT)
     }
   }
+
+  protected async getTotalQuota(
+    session: PnpSession<SignMessageRequest | PnpQuotaRequest>
+  ): Promise<number> {
+    return meter(
+      // TODO EN: test the old version of this as this may not work there?
+      this.getTotalQuotaWithoutMeter.bind(this),
+      [session],
+      (err: any) => {
+        throw err
+      },
+      Histograms.getRemainingQueryCountInstrumentation,
+      'getTotalQuota'
+    )
+  }
+
+  /*
+   * Calculates how many queries the caller has unlocked based on the algorithm
+   * unverifiedQueryCount + verifiedQueryCount + (queryPerTransaction * transactionCount)
+   * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
+   */
+  private async getTotalQuotaWithoutMeter(
+    session: PnpSession<SignMessageRequest | PnpQuotaRequest>
+  ): Promise<number> {
+    // TODO EN: look at adding the price per query to this config?
+
+    // const {
+    //   unverifiedQueryMax,
+    //   additionalVerifiedQueryMax,
+    //   queryPerTransaction,
+    //   minDollarBalance,
+    //   minEuroBalance,
+    //   minCeloBalance,
+    // } = config.quota
+
+    const { account } = session.request.body
+    const totalPaid = await getOnChainOdisBalance(this.kit, account)
+    const totalQuota = totalPaid.times(QUOTA_PER_WEI_CUSD).integerValue(BigNumber.ROUND_DOWN)
+
+    // TODO EN: think about overflow logic here in going from BigNumber -> number
+    return totalQuota.toNumber()
+  }
+
+  // TODO EN: revisit if this is necessary? what does Alec envision about this being different?
+  // private bypassQuotaForE2ETesting(requestBody: SignMessageRequest): boolean {
+  //   const sessionID = Number(requestBody.sessionID)
+  //   return !Number.isNaN(sessionID) && sessionID % 100 < config.test_quota_bypass_percentage
+  // }
 }

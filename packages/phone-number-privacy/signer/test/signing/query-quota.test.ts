@@ -18,6 +18,8 @@ const {
 } = TestUtils.Utils
 const { mockAccount, mockPhoneNumber } = TestUtils.Values
 
+const testBlockNumber = 100000
+
 jest.mock('../../src/web3/contracts')
 const mockGetContractKit = getContractKit as jest.Mock
 jest.mock('../../src/database/wrappers/account')
@@ -38,7 +40,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
-      createMockWeb3(5)
+      createMockWeb3(5, testBlockNumber)
     )
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(2)))
     mockIsVerified.mockReturnValue(true)
@@ -56,7 +58,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
-      createMockWeb3(0)
+      createMockWeb3(0, testBlockNumber)
     )
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
@@ -74,7 +76,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
-      createMockWeb3(100)
+      createMockWeb3(100, testBlockNumber)
     )
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(10)))
     mockIsVerified.mockReturnValue(true)
@@ -92,7 +94,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
-      createMockWeb3(100)
+      createMockWeb3(100, testBlockNumber)
     )
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockIsVerified.mockReturnValue(false)
@@ -110,7 +112,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(0)),
         [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
-      createMockWeb3(100)
+      createMockWeb3(100, testBlockNumber)
     )
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockIsVerified.mockReturnValue(false)
@@ -128,7 +130,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(0)),
         [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
-      createMockWeb3(0)
+      createMockWeb3(0, testBlockNumber)
     )
     contractKitVerifiedNoTx.contracts[ContractRetrieval.getStableToken] = jest.fn(
       (stableToken: StableToken) => {
@@ -153,7 +155,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(0)),
         [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
-      createMockWeb3(0)
+      createMockWeb3(0, testBlockNumber)
     )
     contractKitVerifiedNoTx.contracts[ContractRetrieval.getStableToken] = jest.fn(
       (stableToken: StableToken) => {
@@ -178,7 +180,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
-      createMockWeb3(0)
+      createMockWeb3(0, testBlockNumber)
     )
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(1)))
     mockIsVerified.mockReturnValue(false)
@@ -196,7 +198,7 @@ describe(getRemainingQueryCount, () => {
         [ContractRetrieval.getGoldToken]: createMockToken(new BigNumber(200000000000000000)),
         [ContractRetrieval.getAccounts]: createMockAccounts('0x0'),
       },
-      createMockWeb3(0)
+      createMockWeb3(0, testBlockNumber)
     )
     mockPerformedQueryCount.mockImplementation(() => new Promise((resolve) => resolve(0)))
     mockGetContractKit.mockImplementation(() => contractKitVerifiedNoTx)

@@ -1,22 +1,44 @@
 import {
+  genSessionID,
   PnpQuotaRequest,
   PnpQuotaResponseSuccess,
   SignerEndpoint,
+  TestUtils,
 } from '@celo/phone-number-privacy-common'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
+import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { KeyProvider } from '../../dist/key-management/key-provider-base'
+import { initDatabase } from '../../src/common/database/database'
+import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
-import { initDatabase } from '../../src/database/database'
-import { initKeyProvider } from '../../src/key-management/key-provider'
 import { startSigner } from '../../src/server'
 
-// TODO EN: revisit name?
-describe('pnp', async () => {
+const {
+  ContractRetrieval,
+  createMockContractKit,
+  createMockOdisBalance,
+  createMockWeb3,
+} = TestUtils.Utils
+
+const testBlockNumber = 1000000
+
+const mockOdisBalanceTotalPaidCUSD = jest.fn<BigNumber, []>()
+const mockContractKit = createMockContractKit(
+  {
+    [ContractRetrieval.getOdisBalance]: createMockOdisBalance(mockOdisBalanceTotalPaidCUSD),
+  },
+  createMockWeb3(5, testBlockNumber)
+)
+jest.mock('../../src/common/web3/contracts', () => ({
+  ...jest.requireActual('../../src/common/web3/contracts'),
+  getContractKit: jest.fn().mockImplementation(() => mockContractKit),
+}))
+
+describe('pnp', () => {
   const testPk = '0x00000000000000000000000000000000000000000000000000000000deadbeef'
-  const testAddress = privateKeyToAddress(testPk)
 
   let keyProvider: KeyProvider
   let app: any
@@ -35,6 +57,7 @@ describe('pnp', async () => {
     _config.api.phoneNumberPrivacy.enabled = true
     db = await initDatabase(_config)
     app = startSigner(_config, db, keyProvider)
+    mockOdisBalanceTotalPaidCUSD.mockReset()
   })
 
   afterEach(async () => {
@@ -54,31 +77,36 @@ describe('pnp', async () => {
     })
   })
 
+  const sendPnpQuotaRequest = async (pk: string) => {
+    const account = privateKeyToAddress(pk)
+    const req: PnpQuotaRequest = {
+      account,
+      sessionID: genSessionID(),
+    }
+    const authorization = serializeSignature(signMessage(JSON.stringify(req), pk, account))
+    return request(app).get(SignerEndpoint.PNP_QUOTA).send(req).set('Authorization', authorization)
+  }
+
   describe(`${SignerEndpoint.PNP_QUOTA}`, () => {
-    it('Should return 200', async () => {
-      const req: PnpQuotaRequest = {
-        account: testAddress,
-      }
-
-      const authorization = serializeSignature(
-        signMessage(JSON.stringify(req), testPk, testAddress)
-      )
-
-      const res = await request(app)
-        .post(SignerEndpoint.PNP_QUOTA)
-        .send(req)
-        .set('Authorization', authorization)
-
-      expect(res.status).toBe(200)
-
-      // TODO EN: Possibly mock on-chain call to prevent the error message??
-      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
-        success: true,
-        version: res.body.version,
-        performedQueryCount: 0,
-        totalQuota: 0,
-        blockNumber: 0,
-        warnings: [],
+    // TODO EN: case for super large (implement + test overflow logic)
+    const cusdQuotaParams: [BigNumber, number][] = [
+      [new BigNumber(0), 0],
+      [new BigNumber(1), 0],
+      [new BigNumber(1.56e18), 15],
+    ]
+    cusdQuotaParams.forEach(([cusdWei, expectedTotalQuota]) => {
+      it(`Should get totalQuota=${expectedTotalQuota} for ${cusdWei.toString()} cUSD (wei)`, async () => {
+        mockOdisBalanceTotalPaidCUSD.mockReturnValue(cusdWei)
+        const res = await sendPnpQuotaRequest(testPk)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          performedQueryCount: 0,
+          totalQuota: expectedTotalQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
       })
     })
   })
