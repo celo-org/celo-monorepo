@@ -367,8 +367,11 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     account: Address,
     group: Address,
     value: BigNumber,
-    totalValue: BigNumber
+    totalValue?: BigNumber
   ): Promise<CeloTransactionObject<boolean>> {
+    if (totalValue === undefined) {
+      totalValue = value
+    }
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const index = findAddressIndex(group, groups)
     const { lesser, greater } = await this.findLesserAndGreaterAfterVote(
