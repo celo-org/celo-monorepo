@@ -1,3 +1,4 @@
+ingressClassName: nginx
 blockscout:
   indexer:
     db:
