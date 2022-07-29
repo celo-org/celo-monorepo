@@ -23,6 +23,8 @@ grafana.ini:
     token_url: https://accounts.google.com/o/oauth2/token
 ingress:
   annotations:
+    # convert to spec.ingressClassName in the future (needs a version upgrade)
+    kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
   enabled: true
   path: /
