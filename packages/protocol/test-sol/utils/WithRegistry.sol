@@ -9,10 +9,14 @@ contract WithRegistry is Test {
   address constant registryAddress = 0x000000000000000000000000000000000000ce10;
   IRegistry public constant registry = IRegistry(registryAddress);
 
-  constructor() public {
-    vm.etch(registryAddress, GetCode.at(address(new Registry(true))));
-    vm.label(registryAddress, "Registry");
-    vm.prank(actor("deployer"));
-    Registry(registryAddress).initialize();
+  // @param useExisting - don't deploy a new registry contract
+  // this is useful for integration testing via forks
+  constructor(bool useExisting) public {
+    if (!useExisting) {
+      vm.etch(registryAddress, GetCode.at(address(new Registry(true))));
+      vm.label(registryAddress, "Registry");
+      vm.prank(actor("deployer"));
+      Registry(registryAddress).initialize();
+    }
   }
 }
