@@ -6,8 +6,8 @@ import {
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
-// import { config } from '../../config'
 import { Knex } from 'knex'
+import { config } from '../../config'
 // import { Histograms } from '../../../common/metrics'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
 import { storeRequest } from '../../common/database/wrappers/request'
@@ -20,11 +20,6 @@ export interface PnpQuotaStatus {
   totalQuota: number
   blockNumber: number
 }
-
-// TODO extract this into config ?
-// const QUOTA_PRICE_IN_CUSD = 0.1 // new BigNumber(1 / 0.1)
-// const QUOTA_PER_WEI_CUSD = new BigNumber(0.1).div(new BigNumber(1e18))
-const QUOTA_PER_WEI_CUSD = new BigNumber(1).div(new BigNumber(0.1).times(new BigNumber(1e18)))
 
 export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
   constructor(readonly db: Knex, readonly kit: ContractKit) {}
@@ -201,20 +196,12 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
   private async getTotalQuotaWithoutMeter(
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<number> {
-    // TODO EN: look at adding the price per query to this config?
-
-    // const {
-    //   unverifiedQueryMax,
-    //   additionalVerifiedQueryMax,
-    //   queryPerTransaction,
-    //   minDollarBalance,
-    //   minEuroBalance,
-    //   minCeloBalance,
-    // } = config.quota
-
+    const { queryPriceInCUSD } = config.quota
     const { account } = session.request.body
     const totalPaid = await getOnChainOdisBalance(this.kit, account)
-    const totalQuota = totalPaid.times(QUOTA_PER_WEI_CUSD).integerValue(BigNumber.ROUND_DOWN)
+    const totalQuota = totalPaid
+      .div(queryPriceInCUSD.times(new BigNumber(1e18)))
+      .integerValue(BigNumber.ROUND_DOWN)
 
     // TODO EN: think about overflow logic here in going from BigNumber -> number
     return totalQuota.toNumber()

@@ -57,6 +57,8 @@ const signerConfig: SignerConfig = {
     minEuroBalance: new BigNumber(1e16),
     // Min balance is .005 CELO
     minCeloBalance: new BigNumber(5e15),
+    // Equivalent to 0.1 cUSD/query
+    queryPriceInCUSD: new BigNumber(0.1),
   },
   api: {
     domains: {

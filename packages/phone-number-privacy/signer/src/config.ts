@@ -36,6 +36,7 @@ export interface SignerConfig {
     minDollarBalance: BigNumber
     minEuroBalance: BigNumber
     minCeloBalance: BigNumber
+    queryPriceInCUSD: BigNumber
   }
   api: {
     domains: {
@@ -114,6 +115,8 @@ export const config: SignerConfig = {
     minEuroBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 1e16),
     // Min balance is .005 CELO
     minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 5e15),
+    // Equivalent to 0.1 cUSD/query
+    queryPriceInCUSD: new BigNumber(env.QUERY_PRICE_PER_CUSD ?? 0.1),
   },
   api: {
     domains: {
