@@ -20,8 +20,8 @@ import { GCPClusterConfig } from './k8s-cluster/gcp'
 import { outputIncludes } from './utils'
 const yaml = require('js-yaml')
 
-const helmChartPath = '../helm-charts/prometheus-stackdriver'
-const releaseName = 'prometheus-stackdriver'
+const helmChartPath = '../helm-charts/prometheus'
+const releaseName = 'prometheus'
 const kubeNamespace = 'prometheus'
 const kubeServiceAccountName = releaseName
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
@@ -40,10 +40,10 @@ export async function installPrometheusIfNotExists(
   const prometheusExists = await outputIncludes(
     `helm list -n prometheus`,
     releaseName,
-    `prometheus-stackdriver exists, skipping install`
+    `prometheus exists, skipping install`
   )
   if (!prometheusExists) {
-    console.info('Installing prometheus-stackdriver')
+    console.info('Installing prometheus')
     await installPrometheus(context, clusterConfig)
   }
 }
