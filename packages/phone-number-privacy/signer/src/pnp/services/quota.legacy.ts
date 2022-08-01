@@ -18,7 +18,7 @@ import {
 } from '../../common/web3/contracts'
 import { config } from '../../config'
 import { PnpSession } from '../session'
-import { PnpQuotaServiceCommonRename } from './quota_common_rename'
+import { PnpQuotaService } from './quota'
 export interface PnpQuotaStatus {
   queryCount: number
   totalQuota: number
@@ -26,7 +26,7 @@ export interface PnpQuotaStatus {
 }
 
 export class LegacyPnpQuotaService
-  extends PnpQuotaServiceCommonRename
+  extends PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
   protected readonly metricsPrefix = 'LegacyPnpQuotaService.'
 
