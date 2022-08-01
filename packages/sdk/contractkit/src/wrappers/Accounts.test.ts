@@ -3,6 +3,7 @@ import { addressToPublicKey, parseSignature } from '@celo/utils/lib/signatureUti
 import Web3 from 'web3'
 import { ContractKit, newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
+import { valueToBigNumber, valueToFixidityString } from './BaseWrapper'
 import { LockedGoldWrapper } from './LockedGold'
 import { ValidatorsWrapper } from './Validators'
 
@@ -166,5 +167,54 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const wallet = accounts[1]
     await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     await expect(accountsInstance.setWalletAddress(wallet)).rejects
+  })
+
+  test('SNBAT fraction greater than 1', async () => {
+    const account = accounts[0]
+    const beneficiary = accounts[1]
+    const fractionInvalid = valueToFixidityString(valueToBigNumber('2.5'))
+
+    kit.defaultAccount = account
+
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    await expect(
+      accountsInstance.setPaymentDelegation(beneficiary, fractionInvalid).sendAndWaitForReceipt({})
+    ).rejects.toEqual(
+      new Error(
+        'Error: VM Exception while processing transaction: revert Fraction must not be greater than 1'
+      )
+    )
+  })
+
+  test('SNBAT beneficiary and fraction', async () => {
+    const account = accounts[0]
+    const beneficiary = accounts[1]
+    const fractionValid = valueToFixidityString(valueToBigNumber('.25'))
+    const expectedRetval = { 0: beneficiary, 1: fractionValid }
+
+    kit.defaultAccount = account
+
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    await accountsInstance.setPaymentDelegation(beneficiary, fractionValid).sendAndWaitForReceipt()
+
+    const retval = await accountsInstance.getPaymentDelegation(account)
+    expect(retval).toEqual(expectedRetval)
+  })
+
+  test('SNBAT delete expected to clear beneficiary and fraction', async () => {
+    const account = accounts[0]
+    const beneficiary = accounts[1]
+    const fractionValid = valueToFixidityString(valueToBigNumber('.25'))
+    const expectedRetval = { 0: '0x0000000000000000000000000000000000000000', 1: '0' }
+
+    kit.defaultAccount = account
+
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    await accountsInstance.setPaymentDelegation(beneficiary, fractionValid).sendAndWaitForReceipt()
+
+    await accountsInstance.deletePaymentDelegation().sendAndWaitForReceipt()
+
+    const retval = await accountsInstance.getPaymentDelegation(account)
+    expect(retval).toEqual(expectedRetval)
   })
 })
