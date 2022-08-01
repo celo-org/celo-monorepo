@@ -88,11 +88,13 @@ describe('pnp', () => {
   }
 
   describe(`${SignerEndpoint.PNP_QUOTA}`, () => {
-    // TODO EN: case for super large (implement + test overflow logic)
     const cusdQuotaParams: [BigNumber, number][] = [
       [new BigNumber(0), 0],
       [new BigNumber(1), 0],
       [new BigNumber(1.56e18), 15],
+      [new BigNumber(1.56e18), 15],
+      // Unrealistically large amount paid for ODIS quota
+      [new BigNumber(1.23456789e26), 1234567890],
     ]
     cusdQuotaParams.forEach(([cusdWei, expectedTotalQuota]) => {
       it(`Should get totalQuota=${expectedTotalQuota} for ${cusdWei.toString()} cUSD (wei)`, async () => {

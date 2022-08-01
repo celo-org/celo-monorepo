@@ -202,8 +202,8 @@ export class PnpQuotaService implements QuotaService<SignMessageRequest | PnpQuo
     const totalQuota = totalPaid
       .div(queryPriceInCUSD.times(new BigNumber(1e18)))
       .integerValue(BigNumber.ROUND_DOWN)
-
-    // TODO EN: think about overflow logic here in going from BigNumber -> number
+    // If any account hits an overflow here, we need to redesign how
+    // quota/queries are computed anyways.
     return totalQuota.toNumber()
   }
 
