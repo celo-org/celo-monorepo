@@ -7,6 +7,7 @@ import { Test, console2 as console } from "celo-foundry/Test.sol";
 import "../utils/GovernanceHelpers.sol";
 
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+// import "mobius/contracts/Swap.sol";
 
 import "contracts/common/Registry.sol";
 import "contracts/common/Proxy.sol";
@@ -31,6 +32,7 @@ contract PremintExample is GovernanceHelpers {
   address stableTokenImplementationAddress;
   address constant USDC = 0x37f750B7cC259A2f741AF45294f6a16572CF5cAd;
   address constant MOBIUS_POOL = 0xC0BA93D4aaf90d39924402162EE4a213300d1d60;
+  // address constant MOBIUS_POOL = 0x2dd18f0a6B680e190cE7FeD271Ddf6cF2A14cFE6;
   uint256 constant amountToDeposit_cUSD = 2_000_000_000_000_000_000_000_000;
   uint256 constant amountToDeposit_USDC = 2_000_000_000_000;
   address governanceAddr;
@@ -47,11 +49,21 @@ contract PremintExample is GovernanceHelpers {
     poolLpToken = MobiusSwapPool(MOBIUS_POOL).getLpToken();
   }
 
-  function test_simulateProposals() external {
-    executeProposal(mintAndAddLiquidity(), "mint_and_add_liquidity");
+  function test_simulateProposals_bothSides() external {
+    executeProposal(mintAndAddLiquidity_bothSides(), "mint_and_add_liquidity_bothSides");
     address USDC_dest = vm.addr(0x222);
     executeProposal(removeLiquidityAndBurn(USDC_dest), "remove_liquidity_and_burn");
     require(IERC20(USDC).balanceOf(USDC_dest) == amountToDeposit_USDC - 2000000000);
+    console.log(IERC20(poolLpToken).balanceOf(governanceAddr));
+  }
+
+  function test_simulateProposals_cUSD() external {
+    executeProposal(mintAndAddLiquidity_cUSD(), "mint_and_add_liquidity_cUSD");
+    console.log(IERC20(poolLpToken).balanceOf(governanceAddr));
+  }
+
+  function test_simulateProposals_USDC() external {
+    executeProposal(mintAndAddLiquidity_USDC(), "mint_and_add_liquidity_USDC");
     console.log(IERC20(poolLpToken).balanceOf(governanceAddr));
   }
 
@@ -67,7 +79,64 @@ contract PremintExample is GovernanceHelpers {
     MobiusSwapPool(MOBIUS_POOL).addLiquidity(amounts, 0, now + 10000);
   }
 
-  function mintAndAddLiquidity()
+  function mintAndAddLiquidity_USDC()
+    internal
+    view
+    returns (Proposals.Transaction[] memory transactions)
+  {
+    transactions = new Proposals.Transaction[](2);
+    transactions[0] = Proposals.Transaction(
+      0,
+      USDC,
+      abi.encodeWithSignature("approve(address,uint256)", MOBIUS_POOL, amountToDeposit_USDC)
+    );
+    uint256[] memory amounts = new uint256[](2);
+    amounts[0] = 0;
+    amounts[1] = amountToDeposit_USDC;
+    transactions[1] = Proposals.Transaction(
+      0,
+      MOBIUS_POOL,
+      abi.encodeWithSignature("addLiquidity(uint256[],uint256,uint256)", amounts, 0, now + 1000000)
+    );
+  }
+
+  function mintAndAddLiquidity_cUSD()
+    internal
+    view
+    returns (Proposals.Transaction[] memory transactions)
+  {
+    transactions = new Proposals.Transaction[](5);
+    transactions[0] = Proposals.Transaction(
+      0,
+      stableTokenProxyAddress,
+      abi.encodeWithSignature("_setImplementation(address)", address(stableTokenMintableByOwner))
+    );
+    transactions[1] = Proposals.Transaction(
+      0,
+      stableTokenProxyAddress,
+      abi.encodeWithSignature("mint(address,uint256)", governanceAddr, amountToDeposit_cUSD)
+    );
+    transactions[2] = Proposals.Transaction(
+      0,
+      stableTokenProxyAddress,
+      abi.encodeWithSignature("_setImplementation(address)", stableTokenImplementationAddress)
+    );
+    transactions[3] = Proposals.Transaction(
+      0,
+      stableTokenProxyAddress,
+      abi.encodeWithSignature("approve(address,uint256)", MOBIUS_POOL, amountToDeposit_cUSD)
+    );
+    uint256[] memory amounts = new uint256[](2);
+    amounts[0] = amountToDeposit_cUSD;
+    amounts[1] = 0;
+    transactions[4] = Proposals.Transaction(
+      0,
+      MOBIUS_POOL,
+      abi.encodeWithSignature("addLiquidity(uint256[],uint256,uint256)", amounts, 0, now + 1000000)
+    );
+  }
+
+  function mintAndAddLiquidity_bothSides()
     internal
     view
     returns (Proposals.Transaction[] memory transactions)

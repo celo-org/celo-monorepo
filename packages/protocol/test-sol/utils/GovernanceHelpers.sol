@@ -68,10 +68,26 @@ contract GovernanceHelpers is Test, WithRegistry, WithForks {
     console.log(vm.activeFork());
     console.log(whales.length);
 
+    uint256 lesser = 0;
+    uint256 greater = 0;
+    bool found = false;
     uint256 i = 0;
+
+    (uint256[] memory queue, ) = governance.getQueue();
+    for (i = 0; i < queue.length; i++) {
+      if (queue[i] == proposalId) {
+        found = true;
+      } else if (found == false) {
+        lesser = queue[i];
+      } else if (found == true) {
+        greater = queue[i];
+        break;
+      }
+    }
+
     for (i = 0; i < whales.length; i++) {
       changePrank(whales[i]);
-      governance.upvote(proposalId, 0, 0);
+      governance.upvote(proposalId, lesser, greater);
     }
 
     vm.warp(now + governance.dequeueFrequency() + 10);
