@@ -7,8 +7,7 @@ import { getRequestExists } from '../../../common/database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { Counters } from '../../../common/metrics'
 import { SignerConfig } from '../../../config'
-import { PnpQuotaService } from '../../services/quota'
-import { LegacyPnpQuotaService } from '../../services/quota.legacy'
+import { PnpQuotaServiceCommonRename } from '../../services/quota_common_rename'
 import { PnpSession } from '../../session'
 import { PnpSignIO } from './io'
 import { LegacyPnpSignIO } from './io.legacy'
@@ -17,7 +16,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
   constructor(
     readonly db: Knex,
     readonly config: SignerConfig,
-    readonly quota: PnpQuotaService | LegacyPnpQuotaService,
+    readonly quota: PnpQuotaServiceCommonRename,
     readonly keyProvider: KeyProvider,
     readonly io: PnpSignIO | LegacyPnpSignIO
   ) {}

@@ -10,6 +10,7 @@ import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
+// TODO EN: copied from domain.test.ts, but is this the correct import path (from dist)?
 import { KeyProvider } from '../../dist/key-management/key-provider-base'
 import { initDatabase } from '../../src/common/database/database'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
@@ -112,20 +113,4 @@ describe('pnp', () => {
       })
     })
   })
-
-  /* 
-
-  TODO(Alec): check code coverage
-  
-  [ ] Add TODOs for all ODIS tests that remain to be written
-[ ] Bad signature (combiner + signer)
-[ ] Bad encoding (combiner + signer)
-[ ] Undefined domain (combiner + signer)
-[ ] Extra fields? -> should reject / use t.strict (combiner + signer)
-[ ] Valid key versions (combiner + signer)
-[ ] Invalid key versions (combiner + signer)
-[ ] Out of quota (combiner + signer)
-[ ] Bad nonce (combiner + signer)
-[ ] Request too early for rate limiting (both)
-  */
 })
