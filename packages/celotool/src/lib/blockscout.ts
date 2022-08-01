@@ -184,7 +184,7 @@ metadata:
       }
       location ~ /address/(.*)/coin_balances {
         return 301 /address/$1/coin-balances;
-      }git 
+      }
   labels:
     app: blockscout
     chart: blockscout
