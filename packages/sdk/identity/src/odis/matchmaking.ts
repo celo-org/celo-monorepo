@@ -1,91 +1,78 @@
-import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
-import { E164Number } from '@celo/phone-utils/lib/io'
 import crypto from 'crypto'
-import debugFactory from 'debug'
-import {
-  AuthenticationMethod,
-  AuthSigner,
-  EncryptionKeySigner,
-  MatchmakingRequest,
-  MatchmakingResponse,
-  queryOdis,
-  ServiceContext,
-  signWithDEK,
-} from './query'
 
-const debug = debugFactory('kit:odis:matchmaking')
+// const debug = debugFactory('kit:odis:matchmaking')
 
 // Eventually, the matchmaking process will use blinded numbers same as salt lookups
 // But for now numbers are simply hashed using this static salt
 const SALT = '__celo__'
 
-// Uses the phone number privacy service to find mutual matches between Celo users
-export async function getContactMatches(
-  e164NumberCaller: E164Number,
-  e164NumberContacts: E164Number[],
-  account: string,
-  phoneNumberIdentifier: string,
-  signer: AuthSigner,
-  context: ServiceContext,
-  dekSigner?: EncryptionKeySigner,
-  clientVersion?: string,
-  sessionID?: string
-): Promise<E164Number[]> {
-  const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(e164NumberCaller)
-  const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberContacts)
+// // Uses the phone number privacy service to find mutual matches between Celo users
+// export async function getContactMatches(
+//   e164NumberCaller: E164Number,
+//   e164NumberContacts: E164Number[],
+//   account: string,
+//   phoneNumberIdentifier: string,
+//   signer: AuthSigner,
+//   context: ServiceContext,
+//   dekSigner?: EncryptionKeySigner,
+//   clientVersion?: string,
+//   sessionID?: string
+// ): Promise<E164Number[]> {
+//   const selfPhoneNumObfuscated = obfuscateNumberForMatchmaking(e164NumberCaller)
+//   const obfucsatedNumToE164Number = getContactNumsObfuscated(e164NumberContacts)
 
-  const body: MatchmakingRequest = {
-    account,
-    userPhoneNumber: selfPhoneNumObfuscated,
-    contactPhoneNumbers: Object.keys(obfucsatedNumToE164Number),
-    hashedPhoneNumber: phoneNumberIdentifier,
-    version: clientVersion ? clientVersion : 'unknown',
-    authenticationMethod: signer.authenticationMethod,
-  }
+//   const body: MatchmakingRequest = {
+//     account,
+//     userPhoneNumber: selfPhoneNumObfuscated,
+//     contactPhoneNumbers: Object.keys(obfucsatedNumToE164Number),
+//     hashedPhoneNumber: phoneNumberIdentifier,
+//     version: clientVersion ? clientVersion : 'unknown',
+//     authenticationMethod: signer.authenticationMethod,
+//   }
 
-  if (sessionID) {
-    body.sessionID = sessionID
-  }
+//   if (sessionID) {
+//     body.sessionID = sessionID
+//   }
 
-  if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    dekSigner = signer as EncryptionKeySigner
-  }
+//   if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
+//     dekSigner = signer as EncryptionKeySigner
+//   }
 
-  if (dekSigner) {
-    body.signedUserPhoneNumber = signWithDEK(selfPhoneNumObfuscated, dekSigner)
-  } else {
-    console.warn('Failure to provide DEK will prevent users from requerying their matches')
-  }
+//   if (dekSigner) {
+//     body.signedUserPhoneNumber = signWithDEK(selfPhoneNumObfuscated, dekSigner)
+//   } else {
+//     console.warn('Failure to provide DEK will prevent users from requerying their matches')
+//   }
 
-  const response = await queryOdis<MatchmakingResponse>(
-    signer,
-    body,
-    context,
-    CombinerEndpoint.MATCHMAKING
-  )
+//   const response = await queryOdis<MatchmakingResponse>(
+//     signer,
+//     body,
+//     context,
+//     CombinerEndpoint.MATCHMAKING
+//   )
 
-  const matchHashes: string[] = response.matchedContacts.map(
-    (match: { phoneNumber: string }) => match.phoneNumber
-  )
+//   const matchHashes: string[] = response.matchedContacts.map(
+//     (match: { phoneNumber: string }) => match.phoneNumber
+//   )
 
-  if (!matchHashes || !matchHashes.length) {
-    debug('No matches found')
-    return []
-  }
+//   if (!matchHashes || !matchHashes.length) {
+//     debug('No matches found')
+//     return []
+//   }
 
-  return getMatchedContacts(obfucsatedNumToE164Number, matchHashes)
-}
+//   return getMatchedContacts(obfucsatedNumToE164Number, matchHashes)
+// }
 
-function getContactNumsObfuscated(e164NumberMatches: E164Number[]) {
-  const hashes: Record<string, string> = {}
-  for (const e164Number of e164NumberMatches) {
-    // TODO For large contact lists, would be faster to these hashes
-    // in a native module.
-    const hash = obfuscateNumberForMatchmaking(e164Number)
-    hashes[hash] = e164Number
-  }
-  return hashes
-}
+// function getContactNumsObfuscated(e164NumberMatches: E164Number[]) {
+//   const hashes: Record<string, string> = {}
+//   for (const e164Number of e164NumberMatches) {
+//     // TODO For large contact lists, would be faster to these hashes
+//     // in a native module.
+//     const hash = obfuscateNumberForMatchmaking(e164Number)
+//     hashes[hash] = e164Number
+//   }
+//   return hashes
+// }
 
 // Hashes the phone number using a static salt
 // This is different than the phone + unique salt hashing that
@@ -98,23 +85,23 @@ export function obfuscateNumberForMatchmaking(e164Number: string) {
     .digest('base64')
 }
 
-/**
- * Constructs a mapping between contact's phone numbers and
- * their on-chain identifier
- * @param obfucsatedNumToE164Number map of obfuscated number to original number
- * @param matchHashes list of obfuscated numbers that are matched
- */
-function getMatchedContacts(
-  obfucsatedNumToE164Number: Record<string, string>,
-  matchHashes: string[]
-): E164Number[] {
-  const matches: E164Number[] = []
-  for (const match of matchHashes) {
-    const e164Number = obfucsatedNumToE164Number[match]
-    if (!e164Number) {
-      throw new Error('Number missing in hash map, should never happen')
-    }
-    matches.push(e164Number)
-  }
-  return matches
-}
+// /**
+//  * Constructs a mapping between contact's phone numbers and
+//  * their on-chain identifier
+//  * @param obfucsatedNumToE164Number map of obfuscated number to original number
+//  * @param matchHashes list of obfuscated numbers that are matched
+//  */
+// function getMatchedContacts(
+//   obfucsatedNumToE164Number: Record<string, string>,
+//   matchHashes: string[]
+// ): E164Number[] {
+//   const matches: E164Number[] = []
+//   for (const match of matchHashes) {
+//     const e164Number = obfucsatedNumToE164Number[match]
+//     if (!e164Number) {
+//       throw new Error('Number missing in hash map, should never happen')
+//     }
+//     matches.push(e164Number)
+//   }
+//   return matches
+// }
