@@ -49,6 +49,7 @@ contract Reserve is
 
   uint256 public lastSpendingDay;
   uint256 public spendingLimit;
+  mapping(address => uint256) public erc20SpendingLimit;
   FixidityLib.Fraction private spendingRatio;
 
   uint256 public frozenReserveGoldStartBalance;
@@ -68,7 +69,12 @@ contract Reserve is
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
-  event ReserveArbTokenTransferred(address indexed spender, address indexed to, uint256 value);
+  event ReserveErc20TokenTransferred(
+    address indexed spender,
+    address indexed to,
+    uint256 value,
+    address token
+  );
   event TobinTaxSet(uint256 value);
   event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
@@ -401,20 +407,32 @@ contract Reserve is
    * @param value The amount of ERC20 token to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function transferErc20Token(address payable to, uint256 value) external returns (bool) {
-    require(address() != address(), "token address should not equal to celo");
-    // check with roman that the spending limit here is for celo and we don't know if we want the same spending limit for other tokens
+  function transferErc20Token(address payable to, uint256 value, address erc20Token)
+    external
+    returns (bool)
+  {
+    require(
+      erc20Token != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+      "token address should not equal to celo"
+    );
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(isOtherReserveAddress[to], "can only transfer to other reserve address");
-    uint256 currentDay = now / 1 days;
-    if (currentDay > lastSpendingDay) {
-      uint256 balance = getUnfrozenReserveGoldBalance();
-      lastSpendingDay = currentDay;
-      spendingLimit = spendingRatio.multiply(FixidityLib.newFixed(balance)).fromFixed();
+    uint256 spendingLimitForThisToken = erc20SpendingLimit[erc20Token];
+    if (spendingLimitForThisToken > 0) {
+      uint256 currentDay = now / 1 days;
+      if (currentDay > lastSpendingDay) {
+        uint256 balance = getErc20TokenBalance(erc20Token);
+        lastSpendingDay = currentDay;
+        spendingLimitForThisToken = spendingRatio
+          .multiply(FixidityLib.newFixed(balance))
+          .fromFixed();
+      }
+      require(spendingLimitForThisToken >= value, "Exceeding spending limit");
+      spendingLimitForThisToken = spendingLimitForThisToken.sub(value);
+      return _transferErc20Token(to, value, erc20Token);
+    } else {
+      return _transferErc20Token(to, value, erc20Token);
     }
-    require(spendingLimit >= value, "Exceeding spending limit");
-    spendingLimit = spendingLimit.sub(value);
-    return _transferErc20Token(to, value);
   }
 
   /**
@@ -423,11 +441,30 @@ contract Reserve is
    * @param value The amount of ERC20 token to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function _transferErc20Token(address payable to, uint256 value) internal returns (bool) {
-    // get lockederc20 token value that it doesn't acceed the value that reserve has
+  function _transferErc20Token(address payable to, uint256 value, address erc20Token)
+    internal
+    returns (bool)
+  {
+    require(value <= getErc20TokenBalance(erc20Token), "Exceeding the amount reserve holds");
     to.sendValue(value);
-    emit ReserveArbTokenTransferred(msg.sender, to, value);
+    emit ReserveErc20TokenTransferred(msg.sender, to, value, erc20Token);
     return true;
+  }
+
+  /**
+   * @notice Transfer ERC20 token to any address.
+   * @dev Transfers are not subject to a daily spending limit.
+   * @param to The address that will receive the staERC20 token.
+   * @param value The amount of ERC20 token to transfer.
+   * @param erc20Token The amount of ERC20 token to transfer.
+   * @return Returns true if the transaction succeeds.
+   */
+  function transferExchangeErc20Token(address payable to, uint256 value, address erc20Token)
+    external
+    isAllowedToSpendExchange(msg.sender)
+    returns (bool)
+  {
+    return _transferErc20Token(to, value, erc20Token);
   }
 
   /**
@@ -456,21 +493,6 @@ contract Reserve is
     returns (bool)
   {
     return _transferGold(to, value);
-  }
-
-  /**
-   * @notice Transfer ERC20 token to any address.
-   * @dev Transfers are not subject to a daily spending limit.
-   * @param to The address that will receive the staERC20 token.
-   * @param value The amount of ERC20 token to transfer.
-   * @return Returns true if the transaction succeeds.
-   */
-  function transferExchangeErc20Token(address payable to, uint256 value)
-    external
-    isAllowedToSpendExchange(msg.sender)
-    returns (bool)
-  {
-    return _transferErc20Token(to, value);
   }
 
   /**
@@ -558,6 +580,14 @@ contract Reserve is
    */
   function getUnfrozenReserveGoldBalance() public view returns (uint256) {
     return getUnfrozenBalance().add(getOtherReserveAddressesGoldBalance());
+  }
+
+  /**
+   * @notice Returns the amount of particular ERC20 token included in the reserve.
+   * @return The amount of particular ERC20 token included in the reserve.
+   */
+  function getErc20TokenBalance(address erc20TokenAddress) public view returns (uint256) {
+    return IERC20(erc20TokenAddress).balanceOf(address(this));
   }
 
   /**
