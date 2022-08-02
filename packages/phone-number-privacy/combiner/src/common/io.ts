@@ -58,6 +58,7 @@ export abstract class IO<R extends OdisRequest> {
     return this.requestSchema.is(request.body)
   }
 
+  // TODO(Alec): why is session sometimes passed in and logger other times?
   validateSignerResponse(data: string, url: string, session: Session<R>): OdisResponse<R> {
     const res: unknown = JSON.parse(data)
     if (!this.responseSchema.is(res)) {
@@ -71,7 +72,7 @@ export abstract class IO<R extends OdisRequest> {
   }
 
   // DO NOT MERGE: Differentiate between receiving an invalid key version and no key version.
-  // (follow pattern used in signer)
+  // (follow pattern used in signer) TODO(Alec)(Next)
   getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
     const requestedKeyVersion = Number(keyVersionHeader)

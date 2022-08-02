@@ -27,8 +27,6 @@ export class BLSCryptographyClient {
   }
 
   public addSignature(serviceResponse: ServicePartialSignature) {
-    // tslint:disable: no-console
-    console.log('*************************************************')
     this.unverifiedSignatures.push(serviceResponse)
   }
 
@@ -36,11 +34,6 @@ export class BLSCryptographyClient {
    * Returns true if the number of valid signatures is enough to perform a combination
    */
   public hasSufficientSignatures(): boolean {
-    // tslint:disable: no-console
-    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
-    console.log(this.allSignaturesLength)
-    console.log(this.config.keys.threshold)
-    console.log(this.allSignaturesLength >= this.config.keys.threshold)
     return this.allSignaturesLength >= this.config.keys.threshold
   }
 
@@ -110,8 +103,6 @@ export class BLSCryptographyClient {
     const sigBuffer = Buffer.from(unverifiedSignature.signature, 'base64')
     if (this.isValidPartialSignature(sigBuffer, blindedMessage)) {
       // We move it to the verified set so that we don't need to re-verify in the future
-      // tslint:disable: no-console
-      console.log('#################################')
       this.verifiedSignatures.push(unverifiedSignature)
     } else {
       logger.error({ url: unverifiedSignature.url }, ErrorMessage.VERIFY_PARITAL_SIGNATURE_ERROR)

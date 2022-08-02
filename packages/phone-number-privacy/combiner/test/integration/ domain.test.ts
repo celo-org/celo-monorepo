@@ -13,6 +13,7 @@ import {
   domainRestrictedSignatureRequestEIP712,
   DomainRestrictedSignatureResponse,
   genSessionID,
+  KEY_VERSION_HEADER,
   PoprfClient,
   SequentialDelayDomain,
   SequentialDelayStage,
@@ -677,13 +678,13 @@ describe('domainService', () => {
       })
     })
 
-    xit('Should respond with 400 on invalid key version', async () => {
+    it('Should respond with 400 on invalid key version', async () => {
       // TODO(Alec): Implement new error for unsupported key versions
       const [badRequest, _] = await signatureRequest()
 
       const res = await request(app)
         .post(CombinerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', 'a')
+        .set(KEY_VERSION_HEADER, 'a')
         .send(badRequest)
 
       expect(res.status).toBe(400)
