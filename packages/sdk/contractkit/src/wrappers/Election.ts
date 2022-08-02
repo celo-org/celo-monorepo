@@ -362,6 +362,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
    * @param value Amount to be removed from active votes.
    * @param lesserAfterVote First group address with less vote than `account`.
    * @param greaterAfterVote First group address with more vote than `account`.
+   * @dev Must pass both `lesserAfterVote` and `greaterAfterVote` or neither.
    */
   async revokeActive(
     account: Address,
@@ -372,7 +373,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
   ): Promise<CeloTransactionObject<boolean>> {
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const index = findAddressIndex(group, groups)
-    if (lesserAfterVote && greaterAfterVote !== undefined) {
+    if (lesserAfterVote !== undefined && greaterAfterVote !== undefined) {
       lesser = lesserAfterVote
       greater = greaterAfterVote
     } else {
