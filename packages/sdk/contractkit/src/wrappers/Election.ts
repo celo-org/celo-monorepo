@@ -357,28 +357,27 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
 
   /**
    * Creates a transaction object for revoking active votes.
-   * @dev In cases where `revokeActive` transaction object will be executed right after
-   * a `revokePending` transaction object, one must use the total revoke amount to account
-   * for any removed pending votes when obtaining the `findLesserAndGreaterAfterVote`.
+   * @param account Account to revoke votes for.
+   * @param group Validator group to revoke votes from.
    * @param value Amount to be removed from active votes.
-   * @param totalValue Amount used to obtain the lesser and greater addresses.
+   * @param lesserAfterVote First group address with less vote than `account`.
+   * @param greaterAfterVote First group address with more vote than `account`.
    */
   async revokeActive(
     account: Address,
     group: Address,
     value: BigNumber,
-    totalValue?: BigNumber
+    lesserAfterVote?: Address,
+    greaterAfterVote?: Address
   ): Promise<CeloTransactionObject<boolean>> {
-    if (totalValue === undefined) {
-      totalValue = value
-    }
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const index = findAddressIndex(group, groups)
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(
-      group,
-      totalValue.times(-1)
-    )
-
+    if (lesserAfterVote && greaterAfterVote !== undefined) {
+      lesser = lesserAfterVote
+      greater = greaterAfterVote
+    } else {
+      var { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+    }
     return toTransactionObject(
       this.connection,
       this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
@@ -401,7 +400,8 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     }
     if (pendingValue.lt(value)) {
       const activeValue = value.minus(pendingValue)
-      txos.push(await this.revokeActive(account, group, activeValue, value))
+      const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+      txos.push(await this.revokeActive(account, group, activeValue, lesser, greater))
     }
     return txos
   }
