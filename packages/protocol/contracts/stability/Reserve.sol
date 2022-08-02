@@ -402,9 +402,10 @@ contract Reserve is
   }
 
   /**
-   * @notice Transfer ERC20 token to a whitelisted address subject to reserve spending limits.
+   * @notice Transfer ERC20 token to a whitelisted address subject to reserve spending limits is the limit is set, othersise the limit is 100%.
    * @param to The address that will receive the ERC20 token.
    * @param value The amount of ERC20 token to transfer.
+   * @param erc20Token The token address you're transferring.
    * @return Returns true if the transaction succeeds.
    */
   function transferErc20Token(address payable to, uint256 value, address erc20Token)
@@ -439,6 +440,7 @@ contract Reserve is
    * @notice Transfer unfrozen ERC20 token to any address.
    * @param to The address that will receive the ERC20 token.
    * @param value The amount of ERC20 token to transfer.
+   * @param erc20Token The token address you're transferring.
    * @return Returns true if the transaction succeeds.
    */
   function _transferErc20Token(address payable to, uint256 value, address erc20Token)
@@ -456,7 +458,7 @@ contract Reserve is
    * @dev Transfers are not subject to a daily spending limit.
    * @param to The address that will receive the staERC20 token.
    * @param value The amount of ERC20 token to transfer.
-   * @param erc20Token The amount of ERC20 token to transfer.
+   * @param erc20Token The token address you're transferring.
    * @return Returns true if the transaction succeeds.
    */
   function transferExchangeErc20Token(address payable to, uint256 value, address erc20Token)
