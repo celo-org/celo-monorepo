@@ -28,9 +28,9 @@ contract GovernanceHelpers is Test, WithRegistry, WithForks {
   {
     governance = Governance(address(uint160(registry.getAddressForString("Governance"))));
     proposalId = createProposal(transactions, id);
-    uint256 proposalIndex = passProposal(proposalId);
-    governance.execute(proposalId, proposalIndex);
-    changePrank(address(this));
+    // uint256 proposalIndex = passProposal(proposalId);
+    // governance.execute(proposalId, proposalIndex);
+    // changePrank(address(this));
   }
 
   function createProposal(Proposals.Transaction[] memory transactions, string memory id)
@@ -42,7 +42,6 @@ contract GovernanceHelpers is Test, WithRegistry, WithForks {
     );
 
     deal(address(this), governance.minDeposit());
-    console.log(gasleft());
     (bool success, bytes memory returnData) = address(governance).call.value(
       governance.minDeposit()
     )(

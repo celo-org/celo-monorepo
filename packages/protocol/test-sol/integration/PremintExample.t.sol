@@ -16,14 +16,14 @@ import "contracts/governance/Proposals.sol";
 import "contracts/governance/interfaces/ILockedGold.sol";
 import "contracts/stability/StableTokenMintableByOwner.sol";
 
-interface MobiusSwapPool {
-  function addLiquidity(uint256[] calldata amounts, uint256 minToMint, uint256 deadline)
-    external
-    returns (uint256);
-  function removeLiquidityImbalance(uint256[] calldata amounts, uint256 maxToBurn, uint256 deadline)
+interface Pool {
+  function addLiquidity(uint256[] calldata amounts, uint256 minToMint) external returns (uint256);
+  function removeLiquidity(uint256 amount, uint256[] calldata minAmounts, uint256 deadline)
     external
     returns (uint256);
   function getLpToken() external returns (address);
+  function pause() external;
+  function transferOwnership(address newOwner) external;
 }
 
 contract PremintExample is GovernanceHelpers {
@@ -31,29 +31,36 @@ contract PremintExample is GovernanceHelpers {
   address payable stableTokenProxyAddress;
   address stableTokenImplementationAddress;
   address constant USDC = 0x37f750B7cC259A2f741AF45294f6a16572CF5cAd;
-  address constant MOBIUS_POOL = 0xC0BA93D4aaf90d39924402162EE4a213300d1d60;
-  // address constant MOBIUS_POOL = 0x2dd18f0a6B680e190cE7FeD271Ddf6cF2A14cFE6;
+  address constant StableTokenMintableByOwnerAddr = 0x41a2887d4C4D96C9E1a3505CF4553Fd0b1380F13;
+  // address constant MOBIUS_POOL = 0xC0BA93D4aaf90d39924402162EE4a213300d1d60;
+  address constant MOBIUS_POOL = 0x2D3f58f8020761369f5c324ea7e35b149f2aBEb5;
   uint256 constant amountToDeposit_cUSD = 2_000_000_000_000_000_000_000_000;
-  uint256 constant amountToDeposit_USDC = 2_000_000_000_000;
+  uint256 constant amountToDeposit_USDC = 1_000_000_000_000;
   address governanceAddr;
   address poolLpToken;
+  Pool pool;
 
   function setUp() public {
+    vm.label(USDC, "USDC");
+    vm.label(MOBIUS_POOL, "MOBIUS_POOL");
     vm.selectFork(mainnetForkId);
     governanceAddr = registry.getAddressForString("Governance");
+    vm.label(governanceAddr, "Governance");
+    pool = Pool(MOBIUS_POOL);
 
-    stableTokenMintableByOwner = new StableTokenMintableByOwner(false);
+    stableTokenMintableByOwner = StableTokenMintableByOwner(StableTokenMintableByOwnerAddr);
     stableTokenProxyAddress = address(uint160(registry.getAddressForString("StableToken")));
     stableTokenImplementationAddress = Proxy(stableTokenProxyAddress)._getImplementation();
     deal(USDC, governanceAddr, amountToDeposit_USDC);
-    poolLpToken = MobiusSwapPool(MOBIUS_POOL).getLpToken();
+    poolLpToken = pool.getLpToken();
   }
 
   function test_simulateProposals_bothSides() external {
     executeProposal(mintAndAddLiquidity_bothSides(), "mint_and_add_liquidity_bothSides");
     address USDC_dest = vm.addr(0x222);
+    changePrank(governanceAddr);
     executeProposal(removeLiquidityAndBurn(USDC_dest), "remove_liquidity_and_burn");
-    require(IERC20(USDC).balanceOf(USDC_dest) == amountToDeposit_USDC - 2000000000);
+    require(IERC20(USDC).balanceOf(USDC_dest) == amountToDeposit_USDC);
     console.log(IERC20(poolLpToken).balanceOf(governanceAddr));
   }
 
@@ -73,10 +80,11 @@ contract PremintExample is GovernanceHelpers {
     StableTokenMintableByOwner(stableTokenProxyAddress).mint(governanceAddr, amountToDeposit_cUSD);
     IERC20(stableTokenProxyAddress).approve(MOBIUS_POOL, amountToDeposit_cUSD);
     IERC20(USDC).approve(MOBIUS_POOL, amountToDeposit_USDC);
+    uint256 lpTokens = IERC20(poolLpToken).balanceOf(governanceAddr);
     uint256[] memory amounts = new uint256[](2);
     amounts[0] = amountToDeposit_cUSD;
     amounts[1] = amountToDeposit_USDC;
-    MobiusSwapPool(MOBIUS_POOL).addLiquidity(amounts, 0, now + 10000);
+    pool.addLiquidity(amounts, 0);
   }
 
   function mintAndAddLiquidity_USDC()
@@ -96,7 +104,7 @@ contract PremintExample is GovernanceHelpers {
     transactions[1] = Proposals.Transaction(
       0,
       MOBIUS_POOL,
-      abi.encodeWithSignature("addLiquidity(uint256[],uint256,uint256)", amounts, 0, now + 1000000)
+      abi.encodeWithSignature("addLiquidity(uint256[],uint256)", amounts, 0)
     );
   }
 
@@ -132,7 +140,7 @@ contract PremintExample is GovernanceHelpers {
     transactions[4] = Proposals.Transaction(
       0,
       MOBIUS_POOL,
-      abi.encodeWithSignature("addLiquidity(uint256[],uint256,uint256)", amounts, 0, now + 1000000)
+      abi.encodeWithSignature("addLiquidity(uint256[],uint256)", amounts, 0)
     );
   }
 
@@ -173,7 +181,7 @@ contract PremintExample is GovernanceHelpers {
     transactions[5] = Proposals.Transaction(
       0,
       MOBIUS_POOL,
-      abi.encodeWithSignature("addLiquidity(uint256[],uint256,uint256)", amounts, 0, now + 1000000)
+      abi.encodeWithSignature("addLiquidity(uint256[],uint256)", amounts, 0)
     );
   }
 
@@ -185,8 +193,8 @@ contract PremintExample is GovernanceHelpers {
     uint256 lpTokens = IERC20(poolLpToken).balanceOf(governanceAddr);
     transactions = new Proposals.Transaction[](6);
     uint256[] memory amounts = new uint256[](2);
-    amounts[0] = amountToDeposit_cUSD - 2000000000000000000000;
-    amounts[1] = amountToDeposit_USDC - 2000000000;
+    amounts[0] = amountToDeposit_cUSD;
+    amounts[1] = amountToDeposit_USDC;
     transactions[0] = Proposals.Transaction(
       0,
       poolLpToken,
@@ -196,9 +204,9 @@ contract PremintExample is GovernanceHelpers {
       0,
       MOBIUS_POOL,
       abi.encodeWithSignature(
-        "removeLiquidityImbalance(uint256[],uint256,uint256)",
-        amounts,
+        "removeLiquidity(uint256,uint256[],uint256)",
         lpTokens,
+        amounts,
         now + 1000000
       )
     );
@@ -210,7 +218,7 @@ contract PremintExample is GovernanceHelpers {
     transactions[3] = Proposals.Transaction(
       0,
       stableTokenProxyAddress,
-      abi.encodeWithSignature("burn(uint256)", amountToDeposit_cUSD - 2000000000000000000000)
+      abi.encodeWithSignature("burn(uint256)", amountToDeposit_cUSD)
     );
     transactions[4] = Proposals.Transaction(
       0,
@@ -220,11 +228,7 @@ contract PremintExample is GovernanceHelpers {
     transactions[5] = Proposals.Transaction(
       0,
       USDC,
-      abi.encodeWithSignature(
-        "transfer(address,uint256)",
-        USDC_dest,
-        amountToDeposit_USDC - 2000000000
-      )
+      abi.encodeWithSignature("transfer(address,uint256)", USDC_dest, amountToDeposit_USDC)
     );
   }
 }

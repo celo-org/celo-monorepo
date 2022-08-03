@@ -9,6 +9,7 @@ libs = [
 ]
 remappings = [
     'openzeppelin-solidity/=lib/openzeppelin-contracts/',
+    '@openzeppelin/=lib/OpenSum/node_modules/@openzeppelin/',
     'solidity-bytes-utils/=lib/solidity-bytes-utils/',
     'forge-std/=lib/celo-foundry/lib/forge-std/src/',
     'ds-test/=lib/celo-foundry/lib/forge-std/lib/ds-test/src/',
