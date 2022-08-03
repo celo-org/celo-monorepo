@@ -7,6 +7,7 @@ import "celo-foundry/Test.sol";
 
 import "../utils/WithRegistry.sol";
 import "../utils/TokenHelpers.sol";
+import "../utils/DummyErc20.sol";
 
 import "contracts/stability/Reserve.sol";
 import "contracts/stability/test/MockSortedOracles.sol";
@@ -48,8 +49,8 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   address deployer;
   address rando;
 
-  Reserve reserve;
-  MockSortedOracles sortedOracles;
+  Reserve reserve = new Reserve(true);
+  MockSortedOracles sortedOracles = new MockSortedOracles();
   DummyERC20 dummyToken1 = new DummyERC20();
   DummyERC20 dummyToken2 = new DummyERC20();
 
@@ -57,8 +58,6 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
     rando = actor("rando");
     deployer = actor("deployer");
     changePrank(deployer);
-    reserve = new Reserve(true);
-    sortedOracles = new MockSortedOracles();
 
     registry.setAddressFor("SortedOracles", address(sortedOracles));
     registry.setAddressFor("Exchange", exchangeAddress);
@@ -326,7 +325,7 @@ contract ReserveTest_transfers is ReserveTest {
     //erc20 token balance
     uint256 amount = reserveCeloBalance.div(10);
     //dummyerc20 token address
-    reserve.test_transferErc20Token(otherReserveAddress, amount, address(dummyerc20));
+    reserve.test_transferErc20Token(otherReserveAddress, amount, address(dummyToken1));
     assertEq(otherReserveAddress.balance, amount);
     assertEq(address(reserve).balance, reserveCeloBalance - amount);
 
@@ -334,8 +333,6 @@ contract ReserveTest_transfers is ReserveTest {
     reserve.transferGold(otherReserveAddress, amount.mul(2));
 
     vm.warp(block.timestamp + 24 * 3600);
-    reserve.transferGold(otherReserveAddress, amount.mul(2));
-    assertEq(otherReserveAddress.balance, 3 * amount);
 
     vm.expectRevert("can only transfer to other reserve address");
     reserve.transferGold(address(0x234), amount);

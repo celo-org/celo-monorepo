@@ -106,7 +106,7 @@ contract Reserve is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
-   * @param _spendingRatio The relative daily spending limit for the reserve spender.
+   * @param _spendingRatios The relative daily spending limit for the reserve spender.
    * @param _frozenGold The balance of reserve gold that is frozen.
    * @param _frozenDays The number of days during which the frozen gold thaws.
    * @param _assetAllocationSymbols The symbols of the reserve assets.
@@ -178,7 +178,7 @@ contract Reserve is
       "token addresses and spending ratio lengths have to be the same"
     );
     for (uint256 i = 1; i < tokenAddresses.length; i++) {
-      tokenDailySpendingRatio[tokenAddresses[i]] = FixidityLib.wrap(ratios[i]);
+      tokenDailySpendingRatio[tokenAddresses[i]] = FixidityLib.wrap(spendingRatios[i]);
       require(
         tokenDailySpendingRatio[tokenAddresses[i]].lte(FixidityLib.fixed1()),
         "spending ratio cannot be larger than 1"
@@ -437,22 +437,21 @@ contract Reserve is
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(isOtherReserveAddress[to], "can only transfer to other reserve address");
     uint256 spendingLimitForThisToken;
-    // I need to double check how to make sure whether spending limit was set for erc20 tokens or not
-    // if (tokenDailySpendingRatio[tokenAddress] > 0) {
-    uint256 currentDay = now / 1 days;
-    if (currentDay > lastSpendingDay) {
-      uint256 balance = getErc20TokenBalance(erc20TokenAddress);
-      lastSpendingDay = currentDay;
-      spendingLimitForThisToken = tokenDailySpendingRatio[erc20TokenAddress]
-        .multiply(FixidityLib.newFixed(balance))
-        .fromFixed();
+    if (FixidityLib.unwrap(tokenDailySpendingRatio[erc20TokenAddress]) > 0) {
+      uint256 currentDay = now / 1 days;
+      if (currentDay > lastSpendingDay) {
+        uint256 balance = getErc20TokenBalance(erc20TokenAddress);
+        lastSpendingDay = currentDay;
+        spendingLimitForThisToken = tokenDailySpendingRatio[erc20TokenAddress]
+          .multiply(FixidityLib.newFixed(balance))
+          .fromFixed();
+      }
+      require(spendingLimitForThisToken >= value, "Exceeding spending limit");
+      spendingLimitForThisToken = spendingLimitForThisToken.sub(value);
+      return _transferErc20Token(to, value, erc20TokenAddress);
+    } else {
+      return _transferErc20Token(to, value, erc20TokenAddress);
     }
-    require(spendingLimitForThisToken >= value, "Exceeding spending limit");
-    spendingLimitForThisToken = spendingLimitForThisToken.sub(value);
-    return _transferErc20Token(to, value, erc20TokenAddress);
-    // } else {
-    // return _transferErc20Token(to, value, erc20TokenAddress);
-    // }
   }
 
   /**
