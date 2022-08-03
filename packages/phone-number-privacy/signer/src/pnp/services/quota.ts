@@ -66,8 +66,6 @@ export abstract class PnpQuotaService
       (err: any) => {
         throw err
       },
-      // TODO EN: check if better naming for these functions is required, i.e. class name + func ?
-      // if so, make sure to update CK accessor functions to also take in a prefix
       Histograms.getRemainingQueryCountInstrumentation,
       ['getQuotaStatus', session.request.url]
     )
