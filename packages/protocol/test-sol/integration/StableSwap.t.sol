@@ -44,6 +44,8 @@ contract StableSwapExperiment is Test, TokenHelpers, WithForks, WithRegistry {
   address david;
   IERC20 lpToken;
 
+  mapping(address => string) actors;
+
   constructor() public WithRegistry(true) {}
 
   function setUp() public {
@@ -53,37 +55,79 @@ contract StableSwapExperiment is Test, TokenHelpers, WithForks, WithRegistry {
     stableToken = StableToken(registry.getAddressForString("StableToken"));
     lpToken = IERC20(pool.getLpToken());
 
-    alice = setupActor("alice", cusd(1000), usdc(1000));
-    bob = setupActor("bob", cusd(1000), usdc(1000));
+    alice = setupActor("alice", cusd(20000000), usdc(20000000));
+    bob = setupActor("bob", cusd(20000000), usdc(20000000));
     charlie = setupActor("charlie", cusd(1000), usdc(1000));
     david = setupActor("david", cusd(1000), usdc(1000));
   }
 
   function test_depositSwapDeposit() public {
-    changePrank(alice);
-    pool.addLiquidity(amounts(cusd(1000), usdc(1000)), 0, now + 1);
-    console.log("Alice LP", lpToken.balanceOf(alice));
+    deposit(alice, amounts(cusd(5000000), usdc(5000000)));
 
-    changePrank(bob);
-    uint256 swapResult = pool.swap(0, 1, cusd(500), usdc(499), now + 1);
-    console.log("Swap result 500 cUSD for:", swapResult);
+    sell_cUSD(bob, cusd(5000000));
     logPoolBalances();
 
-    changePrank(charlie);
-    pool.addLiquidity(amounts(cusd(1000), 0), 0, now + 1);
-    console.log("Charlie LP", lpToken.balanceOf(charlie));
+    deposit(alice, amounts(cusd(5000000), usdc(5000000)));
+
+    sell_cUSD(bob, cusd(5000000));
+    logActorBalances(bob);
     logPoolBalances();
 
-    changePrank(david);
-    pool.addLiquidity(amounts(cusd(1000), usdc(1000)), 0, now + 1);
-    console.log("David LP", lpToken.balanceOf(david));
+    deposit(alice, amounts(cusd(5000000), usdc(5000000)));
+
+    sell_cUSD(bob, cusd(5000000));
+    logActorBalances(bob);
     logPoolBalances();
+
+    deposit(alice, amounts(cusd(5000000), usdc(5000000)));
+
+    sell_cUSD(bob, cusd(5000000));
+    logActorBalances(bob);
+    logPoolBalances();
+
+    withdrawAll(alice);
+  }
+
+  function deposit(address actor, uint256[] memory amounts) internal {
+    changePrank(actor);
+    console.log(actors[actor], "deposit cUSD: ", amounts[0] / cusd(1));
+    console.log(actors[actor], "deposit USDC: ", amounts[1] / usdc(1));
+    uint256 lpTokens = pool.addLiquidity(amounts, 0, now + 1);
+    console.log(actors[actor], "receives LP: ", lpTokens);
+  }
+
+  function withdrawAll(address actor) internal {
+    changePrank(actor);
+    logActorBalances(actor);
+    console.log(actors[actor], "withdraws all liquidity");
+    pool.removeLiquidity(lpToken.balanceOf(actor), amounts(0, 0), now + 1);
+    logActorBalances(actor);
   }
 
   function logPoolBalances() internal view {
     uint256[] memory balances = pool.getBalances();
-    console.log("Pool cUSD", balances[0]);
-    console.log("Pool USDC", balances[1]);
+    console.log("-----------");
+    console.log("Pool cUSD balance:", balances[0] / cusd(1));
+    console.log("Pool USDC balance:", balances[1] / usdc(1));
+  }
+
+  function logActorBalances(address actor) internal view {
+    console.log(actors[actor], "cUSD balance:", stableToken.balanceOf(actor) / cusd(1));
+    console.log(actors[actor], "USDC balance:", IERC20(USDC).balanceOf(actor) / usdc(1));
+  }
+
+  function sell_cUSD(address actor, uint256 amount) internal {
+    changePrank(actor);
+    uint256 swapResult = pool.swap(0, 1, amount, 0, now + 1);
+    console.log(actors[actor], "sells cUSD:", amount / cusd(1));
+    console.log(actors[actor], "gets USDC:", swapResult / usdc(1));
+  }
+
+  function sell_USDC(address actor, uint256 amount) internal {
+    changePrank(actor);
+    uint256 swapResult = pool.swap(1, 0, amount, 0, now + 1);
+    console.log(actors[actor], "sells USDC:", amount / usdc(1));
+    console.log(actors[actor], "gets cUSD:", swapResult / cusd(1));
   }
 
   function usdc(uint256 amount) internal pure returns (uint256) {
@@ -110,12 +154,14 @@ contract StableSwapExperiment is Test, TokenHelpers, WithForks, WithRegistry {
     returns (address)
   {
     address addr = actor(name);
+    actors[addr] = name;
     mint(stableToken, addr, cUSD_balance);
     deal(USDC, addr, USDC_balance);
     deal(addr, 1000_000000000000000000);
 
     changePrank(addr);
     IERC20(USDC).approve(MOBIUS_POOL, uint256(-1));
+    lpToken.approve(MOBIUS_POOL, uint256(-1));
     stableToken.approve(MOBIUS_POOL, uint256(-1));
     changePrank(address(this));
     return addr;
