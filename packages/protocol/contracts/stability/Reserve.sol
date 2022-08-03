@@ -466,7 +466,7 @@ contract Reserve is
     internal
     returns (bool)
   {
-    // this code is intentionally dublicated from celo token
+    // this code is intentionally duplicated from celo token
     require(value <= getErc20TokenBalance(erc20TokenAddress), "Exceeding the amount reserve holds");
     to.sendValue(value);
     emit ReserveErc20TokenTransferred(msg.sender, to, value, erc20TokenAddress);
