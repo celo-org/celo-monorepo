@@ -3,4 +3,4 @@ forge-std/=packages/protocol/lib/celo-foundry/lib/forge-std/src/
 celo-foundry/=packages/protocol/lib/celo-foundry/src/
 openzeppelin-solidity/=packages/protocol/lib/openzeppelin-contracts/
 solidity-bytes-utils/=packages/protocol/lib/solidity-bytes-utils/
-contracts=packages/protocol/contracts/
+contracts/=packages/protocol/contracts/

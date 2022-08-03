@@ -7,6 +7,3 @@
 [submodule "packages/protocol/lib/openzeppelin-contracts"]
 	path = packages/protocol/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
-[submodule "packages/protocol/lib/mobiusV1"]
-	path = packages/protocol/lib/mobiusV1
-	url = https://github.com/mobiusAMM/mobiusV1

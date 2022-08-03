@@ -2,6 +2,7 @@
 src = 'contracts'
 out = 'out'
 test = 'test-sol'
+scripts = "scripts-sol"
 libs = [
     'lib',
     'node_modules',
