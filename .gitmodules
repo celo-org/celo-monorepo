@@ -10,3 +10,6 @@
 [submodule "packages/protocol/lib/OpenSum"]
 	path = packages/protocol/lib/OpenSum
 	url = https://github.com/Node-Fi/OpenSum
+[submodule "packages/protocol/lib/mobiusV1"]
+	path = packages/protocol/lib/mobiusV1
+	url = https://github.com/mobiusAMM/mobiusV1
