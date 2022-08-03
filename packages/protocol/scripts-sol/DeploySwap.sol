@@ -27,7 +27,7 @@ contract DeployOpenSwap is Script {
       decimals,
       "mento-cUSD-USDC",
       "McUSDC",
-      2000,
+      10**6 - 1,
       2000000,
       0,
       0,

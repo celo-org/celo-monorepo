@@ -31,7 +31,9 @@ interface Pool {
 
 contract StableSwapExperiment is Test, TokenHelpers, WithForks, WithRegistry {
   address constant USDC = 0x37f750B7cC259A2f741AF45294f6a16572CF5cAd;
-  address constant MOBIUS_POOL = 0xb88d9a72b192C4b5C043EDA1E152a0BeC2f94212;
+  // address constant MOBIUS_POOL = 0xb88d9a72b192C4b5C043EDA1E152a0BeC2f94212; // a = 2000
+  address constant MOBIUS_POOL = 0xB52124467cBa3ef335F03272EA8C045F390deaCe; // a = 10**6 - 1
+
   Pool constant pool = Pool(MOBIUS_POOL);
 
   StableToken stableToken;
@@ -51,29 +53,29 @@ contract StableSwapExperiment is Test, TokenHelpers, WithForks, WithRegistry {
     stableToken = StableToken(registry.getAddressForString("StableToken"));
     lpToken = IERC20(pool.getLpToken());
 
-    alice = setupActor("alice", 1000_000000000000000000, 1000_000000);
-    bob = setupActor("bob", 1000_000000000000000000, 1000_000000);
-    charlie = setupActor("charlie", 1000_000000000000000000, 1000_000000);
-    david = setupActor("david", 1000_000000000000000000, 1000_000000);
+    alice = setupActor("alice", cusd(1000), usdc(1000));
+    bob = setupActor("bob", cusd(1000), usdc(1000));
+    charlie = setupActor("charlie", cusd(1000), usdc(1000));
+    david = setupActor("david", cusd(1000), usdc(1000));
   }
 
   function test_depositSwapDeposit() public {
     changePrank(alice);
-    pool.addLiquidity(amounts(1000_000000000000000000, 1000_000000), 0, now + 1);
+    pool.addLiquidity(amounts(cusd(1000), usdc(1000)), 0, now + 1);
     console.log("Alice LP", lpToken.balanceOf(alice));
 
     changePrank(bob);
-    uint256 swapResult = pool.swap(0, 1, 1000_000000000000000000, 900_000000, now + 1);
-    console.log("Swap result 1000 cUSD for:", swapResult);
+    uint256 swapResult = pool.swap(0, 1, cusd(500), usdc(499), now + 1);
+    console.log("Swap result 500 cUSD for:", swapResult);
     logPoolBalances();
 
     changePrank(charlie);
-    pool.addLiquidity(amounts(1000_000000000000000000, 0), 0, now + 1);
+    pool.addLiquidity(amounts(cusd(1000), 0), 0, now + 1);
     console.log("Charlie LP", lpToken.balanceOf(charlie));
     logPoolBalances();
 
     changePrank(david);
-    pool.addLiquidity(amounts(1000_000000000000000000, 1000_000000), 0, now + 1);
+    pool.addLiquidity(amounts(cusd(1000), usdc(1000)), 0, now + 1);
     console.log("David LP", lpToken.balanceOf(david));
     logPoolBalances();
   }
@@ -82,6 +84,14 @@ contract StableSwapExperiment is Test, TokenHelpers, WithForks, WithRegistry {
     uint256[] memory balances = pool.getBalances();
     console.log("Pool cUSD", balances[0]);
     console.log("Pool USDC", balances[1]);
+  }
+
+  function usdc(uint256 amount) internal pure returns (uint256) {
+    return amount * 10**6;
+  }
+
+  function cusd(uint256 amount) internal pure returns (uint256) {
+    return amount * 10**18;
   }
 
   function amounts(uint256 cUSD_amount, uint256 USDC_amount)
