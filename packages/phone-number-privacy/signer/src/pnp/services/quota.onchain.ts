@@ -9,7 +9,6 @@ import { PnpQuotaService } from './quota'
 export class OnChainPnpQuotaService
   extends PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
-  protected readonly metricsPrefix = 'OnChainPnpQuotaService.'
   /*
    * Calculates how many queries the caller has unlocked based on the total
    * amount of funds paid to the OdisBalance.sol contract on-chain.
@@ -19,7 +18,7 @@ export class OnChainPnpQuotaService
   ): Promise<number> {
     const { queryPriceInCUSD } = config.quota
     const { account } = session.request.body
-    const totalPaid = await getOnChainOdisBalance(this.kit, account)
+    const totalPaid = await getOnChainOdisBalance(this.kit, account, session.request.url)
     const totalQuota = totalPaid
       .div(queryPriceInCUSD.times(new BigNumber(1e18)))
       .integerValue(BigNumber.ROUND_DOWN)

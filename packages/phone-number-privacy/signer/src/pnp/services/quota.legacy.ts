@@ -23,8 +23,6 @@ import { PnpQuotaService } from './quota'
 export class LegacyPnpQuotaService
   extends PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
-  protected readonly metricsPrefix = 'LegacyPnpQuotaService.'
-
   protected async getWalletAddressAndIsVerified(
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<{ walletAddress: string; isAccountVerified: boolean }> {
@@ -32,7 +30,7 @@ export class LegacyPnpQuotaService
     const [walletAddressResult, isVerifiedResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
-          getWalletAddress(this.kit, session.logger, account),
+          getWalletAddress(this.kit, session.logger, account, session.request.url),
           hashedPhoneNumber
             ? isVerified(account, hashedPhoneNumber, this.kit, session.logger)
             : Promise.resolve(false),
@@ -42,7 +40,7 @@ export class LegacyPnpQuotaService
         throw err
       },
       Histograms.getRemainingQueryCountInstrumentation,
-      'getWalletAddressAndIsVerified'
+      ['getWalletAddressAndIsVerified', session.request.url]
     )
     let hadBlockchainError = false,
       isAccountVerified = false,
@@ -82,16 +80,28 @@ export class LegacyPnpQuotaService
     ] = await meter(
       (logger: Logger, ..._addresses: string[]) =>
         Promise.allSettled([
-          getStableTokenBalance(this.kit, StableToken.cUSD, logger, ..._addresses),
-          getStableTokenBalance(this.kit, StableToken.cEUR, logger, ..._addresses),
-          getCeloBalance(this.kit, logger, ..._addresses),
+          getStableTokenBalance(
+            this.kit,
+            StableToken.cUSD,
+            logger,
+            session.request.url,
+            ..._addresses
+          ),
+          getStableTokenBalance(
+            this.kit,
+            StableToken.cEUR,
+            logger,
+            session.request.url,
+            ..._addresses
+          ),
+          getCeloBalance(this.kit, logger, session.request.url, ..._addresses),
         ]),
       [session.logger, ...addresses],
       (err: any) => {
         throw err
       },
       Histograms.getRemainingQueryCountInstrumentation,
-      'getBalances'
+      ['getBalances', session.request.url]
     )
 
     let hadBlockchainError = false
@@ -149,6 +159,7 @@ export class LegacyPnpQuotaService
     const transactionCount = await getTransactionCount(
       this.kit,
       session.logger,
+      session.request.url,
       account,
       walletAddress // TODO(Alec)(pnp): Make sure we filter out null address in getTransactionCount
     )

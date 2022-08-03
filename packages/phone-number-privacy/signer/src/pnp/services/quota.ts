@@ -22,9 +22,6 @@ export abstract class PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
   constructor(readonly db: Knex, readonly kit: ContractKit) {}
 
-  // Differentiating prefix for metering functions
-  protected abstract readonly metricsPrefix: string
-
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
     session: PnpSession<SignMessageRequest>,
@@ -72,7 +69,7 @@ export abstract class PnpQuotaService
       // TODO EN: check if better naming for these functions is required, i.e. class name + func ?
       // if so, make sure to update CK accessor functions to also take in a prefix
       Histograms.getRemainingQueryCountInstrumentation,
-      `${this.metricsPrefix}getQuotaStatus`
+      ['getQuotaStatus', session.request.url]
     )
 
     let hadBlockchainError = false
@@ -133,7 +130,7 @@ export abstract class PnpQuotaService
         throw err
       },
       Histograms.getRemainingQueryCountInstrumentation,
-      `${this.metricsPrefix}getTotalQuota`
+      ['getTotalQuota', session.request.url]
     )
   }
 
