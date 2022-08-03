@@ -31,6 +31,12 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
+  event ReserveErc20TokenTransferred(
+    address indexed spender,
+    address indexed to,
+    uint256 value,
+    address token
+  );
 
   address constant exchangeAddress = address(0xe7c45fa);
   uint256 constant tobinTaxStalenessThreshold = 600;
@@ -44,6 +50,8 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
 
   Reserve reserve;
   MockSortedOracles sortedOracles;
+  DummyERC20 dummyToken1 = new DummyERC20();
+  DummyERC20 dummyToken2 = new DummyERC20();
 
   function setUp() public {
     rando = actor("rando");
@@ -304,6 +312,35 @@ contract ReserveTest_transfers is ReserveTest {
 
     vm.expectRevert("can only transfer to other reserve address");
     reserve.transferGold(address(0x234), amount);
+
+    changePrank(deployer);
+    reserve.removeSpender(spender);
+    changePrank(spender);
+    vm.warp(block.timestamp + 24 * 3600);
+    vm.expectRevert("sender not allowed to transfer Reserve funds");
+    reserve.transferGold(otherReserveAddress, amount);
+  }
+
+  function test_transferErc20Token() public {
+    changePrank(spender);
+    //erc20 token balance
+    uint256 amount = reserveCeloBalance.div(10);
+    //dummyerc20 token address
+    reserve.test_transferErc20Token(otherReserveAddress, amount, address(dummyerc20));
+    assertEq(otherReserveAddress.balance, amount);
+    assertEq(address(reserve).balance, reserveCeloBalance - amount);
+
+    vm.expectRevert("Exceeding spending limit");
+    reserve.transferGold(otherReserveAddress, amount.mul(2));
+
+    vm.warp(block.timestamp + 24 * 3600);
+    reserve.transferGold(otherReserveAddress, amount.mul(2));
+    assertEq(otherReserveAddress.balance, 3 * amount);
+
+    vm.expectRevert("can only transfer to other reserve address");
+    reserve.transferGold(address(0x234), amount);
+
+    //test that if the spending limit was not set for the token, no limit applies
 
     changePrank(deployer);
     reserve.removeSpender(spender);
