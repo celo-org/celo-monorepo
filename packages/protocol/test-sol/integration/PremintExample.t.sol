@@ -17,7 +17,9 @@ import "contracts/governance/interfaces/ILockedGold.sol";
 import "contracts/stability/StableTokenMintableByOwner.sol";
 
 interface Pool {
-  function addLiquidity(uint256[] calldata amounts, uint256 minToMint) external returns (uint256);
+  function addLiquidity(uint256[] calldata amounts, uint256 minToMint, uint256 deadline)
+    external
+    returns (uint256);
   function removeLiquidity(uint256 amount, uint256[] calldata minAmounts, uint256 deadline)
     external
     returns (uint256);
@@ -33,9 +35,9 @@ contract PremintExample is GovernanceHelpers {
   address constant USDC = 0x37f750B7cC259A2f741AF45294f6a16572CF5cAd;
   address constant StableTokenMintableByOwnerAddr = 0x41a2887d4C4D96C9E1a3505CF4553Fd0b1380F13;
   // address constant MOBIUS_POOL = 0xC0BA93D4aaf90d39924402162EE4a213300d1d60;
-  address constant MOBIUS_POOL = 0x2D3f58f8020761369f5c324ea7e35b149f2aBEb5;
-  uint256 constant amountToDeposit_cUSD = 2_000_000_000_000_000_000_000_000;
-  uint256 constant amountToDeposit_USDC = 1_000_000_000_000;
+  address constant MOBIUS_POOL = 0xb88d9a72b192C4b5C043EDA1E152a0BeC2f94212;
+  uint256 constant amountToDeposit_cUSD = 5_000_000_000_000_000_000_000_000;
+  uint256 constant amountToDeposit_USDC = 5_000_000_000_000;
   address governanceAddr;
   address poolLpToken;
   Pool pool;
@@ -51,7 +53,7 @@ contract PremintExample is GovernanceHelpers {
     stableTokenMintableByOwner = StableTokenMintableByOwner(StableTokenMintableByOwnerAddr);
     stableTokenProxyAddress = address(uint160(registry.getAddressForString("StableToken")));
     stableTokenImplementationAddress = Proxy(stableTokenProxyAddress)._getImplementation();
-    deal(USDC, governanceAddr, amountToDeposit_USDC);
+    deal(USDC, governanceAddr, amountToDeposit_USDC * 2);
     poolLpToken = pool.getLpToken();
   }
 
@@ -65,16 +67,18 @@ contract PremintExample is GovernanceHelpers {
   }
 
   function test_simulateProposals_cUSD() external {
+    mintAndAddLiquiditySimulated();
     executeProposal(mintAndAddLiquidity_cUSD(), "mint_and_add_liquidity_cUSD");
     console.log(IERC20(poolLpToken).balanceOf(governanceAddr));
   }
 
   function test_simulateProposals_USDC() external {
+    mintAndAddLiquiditySimulated();
     executeProposal(mintAndAddLiquidity_USDC(), "mint_and_add_liquidity_USDC");
     console.log(IERC20(poolLpToken).balanceOf(governanceAddr));
   }
 
-  function mintAndAddLiquditiySimulated() internal {
+  function mintAndAddLiquiditySimulated() internal {
     changePrank(governanceAddr);
     Proxy(stableTokenProxyAddress)._setImplementation(address(stableTokenMintableByOwner));
     StableTokenMintableByOwner(stableTokenProxyAddress).mint(governanceAddr, amountToDeposit_cUSD);
@@ -84,7 +88,7 @@ contract PremintExample is GovernanceHelpers {
     uint256[] memory amounts = new uint256[](2);
     amounts[0] = amountToDeposit_cUSD;
     amounts[1] = amountToDeposit_USDC;
-    pool.addLiquidity(amounts, 0);
+    pool.addLiquidity(amounts, 0, now + 100);
   }
 
   function mintAndAddLiquidity_USDC()
@@ -104,7 +108,7 @@ contract PremintExample is GovernanceHelpers {
     transactions[1] = Proposals.Transaction(
       0,
       MOBIUS_POOL,
-      abi.encodeWithSignature("addLiquidity(uint256[],uint256)", amounts, 0)
+      abi.encodeWithSignature("addLiquidity(uint256[],uint256,uint256)", amounts, 0, now + 1000000)
     );
   }
 
@@ -140,7 +144,7 @@ contract PremintExample is GovernanceHelpers {
     transactions[4] = Proposals.Transaction(
       0,
       MOBIUS_POOL,
-      abi.encodeWithSignature("addLiquidity(uint256[],uint256)", amounts, 0)
+      abi.encodeWithSignature("addLiquidity(uint256[],uint256,uint256)", amounts, 0, now + 1000000)
     );
   }
 
@@ -181,7 +185,7 @@ contract PremintExample is GovernanceHelpers {
     transactions[5] = Proposals.Transaction(
       0,
       MOBIUS_POOL,
-      abi.encodeWithSignature("addLiquidity(uint256[],uint256)", amounts, 0)
+      abi.encodeWithSignature("addLiquidity(uint256[],uint256,uint256)", amounts, 0, now + 1000000)
     );
   }
 
