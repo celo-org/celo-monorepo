@@ -60,9 +60,6 @@ contract PremintExample is GovernanceHelpers {
   function test_simulateProposals_bothSides() external {
     executeProposal(mintAndAddLiquidity_bothSides(), "mint_and_add_liquidity_bothSides");
     address USDC_dest = vm.addr(0x222);
-    changePrank(governanceAddr);
-    executeProposal(removeLiquidityAndBurn(USDC_dest), "remove_liquidity_and_burn");
-    require(IERC20(USDC).balanceOf(USDC_dest) == amountToDeposit_USDC);
     console.log(IERC20(poolLpToken).balanceOf(governanceAddr));
   }
 

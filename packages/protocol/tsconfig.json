@@ -16,6 +16,6 @@
     "target": "es5",
     "downlevelIteration": true
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "./lib/OpenSum", "./lib/mobiusV1"],
   "references": [{ "path": "../sdk/utils" }]
 }
