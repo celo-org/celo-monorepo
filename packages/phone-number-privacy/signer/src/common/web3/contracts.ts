@@ -191,7 +191,7 @@ export async function getWalletAddress(
       FULL_NODE_TIMEOUT_IN_MS,
     ],
     (err: any) => {
-      logger.error({ error: err, account }, 'failed to get wallet address for account')
+      logger.error({ err, account }, 'failed to get wallet address for account')
       Counters.blockchainErrors.labels(Labels.read).inc()
       return NULL_ADDRESS
     },
@@ -202,10 +202,10 @@ export async function getWalletAddress(
 
 export async function getOnChainOdisBalance(
   kit: ContractKit,
+  logger: Logger,
   account: string,
   endpoint: string
 ): Promise<BigNumber> {
-  // TODO EN add in logging?
   return meter(
     retryAsyncWithBackOffAndTimeout,
     [
@@ -217,7 +217,7 @@ export async function getOnChainOdisBalance(
       FULL_NODE_TIMEOUT_IN_MS,
     ],
     (err: any) => {
-      // logger.error({ error: err, account }, 'failed to get on-chain odis balance for account')
+      logger.error({ err, account }, 'failed to get on-chain odis balance for account')
       Counters.blockchainErrors.labels(Labels.read).inc()
       throw err
     },

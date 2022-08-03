@@ -18,7 +18,12 @@ export class OnChainPnpQuotaService
   ): Promise<number> {
     const { queryPriceInCUSD } = config.quota
     const { account } = session.request.body
-    const totalPaid = await getOnChainOdisBalance(this.kit, account, session.request.url)
+    const totalPaid = await getOnChainOdisBalance(
+      this.kit,
+      session.logger,
+      account,
+      session.request.url
+    )
     const totalQuota = totalPaid
       .div(queryPriceInCUSD.times(new BigNumber(1e18)))
       .integerValue(BigNumber.ROUND_DOWN)

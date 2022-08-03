@@ -1,4 +1,5 @@
 import {
+  ErrorMessage,
   PnpQuotaRequest,
   PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
@@ -116,6 +117,25 @@ describe('pnp', () => {
             blockNumber: testBlockNumber,
             warnings: [],
           })
+        })
+      })
+
+      it('Should warning if on-chain state cannot be fetched', async () => {
+        mockOdisBalanceTotalPaidCUSD.mockImplementation(() => {
+          throw new Error('dummy error')
+        })
+        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
+        const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const res = await sendPnpQuotaRequest(req, authorization)
+
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          performedQueryCount: 0,
+          totalQuota: -1,
+          blockNumber: testBlockNumber,
+          warnings: [ErrorMessage.CONTRACT_GET_FAILURE],
         })
       })
     })
