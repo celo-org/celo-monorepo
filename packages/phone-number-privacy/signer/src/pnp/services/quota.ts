@@ -18,8 +18,6 @@ export interface PnpQuotaStatus {
   blockNumber: number
 }
 
-// TODO EN: possibly name this OnChainPnpQuotaService, then have LegacyQuotaService & OnChainQuotaService?
-
 export abstract class PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
   constructor(readonly db: Knex, readonly kit: ContractKit) {}
@@ -129,7 +127,6 @@ export abstract class PnpQuotaService
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<number> {
     return meter(
-      // TODO EN: test the old version of this as this may not work there?
       this.getTotalQuotaWithoutMeter.bind(this),
       [session],
       (err: any) => {

@@ -19,11 +19,6 @@ import {
 import { config } from '../../config'
 import { PnpSession } from '../session'
 import { PnpQuotaService } from './quota'
-export interface PnpQuotaStatus {
-  queryCount: number
-  totalQuota: number
-  blockNumber: number
-}
 
 export class LegacyPnpQuotaService
   extends PnpQuotaService
@@ -34,7 +29,6 @@ export class LegacyPnpQuotaService
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<{ walletAddress: string; isAccountVerified: boolean }> {
     const { account, hashedPhoneNumber } = session.request.body
-
     const [walletAddressResult, isVerifiedResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
@@ -50,7 +44,6 @@ export class LegacyPnpQuotaService
       Histograms.getRemainingQueryCountInstrumentation,
       'getWalletAddressAndIsVerified'
     )
-
     let hadBlockchainError = false,
       isAccountVerified = false,
       walletAddress = NULL_ADDRESS

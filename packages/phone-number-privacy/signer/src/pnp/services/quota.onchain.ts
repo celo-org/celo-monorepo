@@ -5,11 +5,6 @@ import { getOnChainOdisBalance } from '../../common/web3/contracts'
 import { config } from '../../config'
 import { PnpSession } from '../session'
 import { PnpQuotaService } from './quota'
-export interface PnpQuotaStatus {
-  queryCount: number
-  totalQuota: number
-  blockNumber: number
-}
 
 export class OnChainPnpQuotaService
   extends PnpQuotaService

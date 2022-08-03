@@ -1,5 +1,4 @@
 import {
-  genSessionID,
   PnpQuotaRequest,
   PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
@@ -7,15 +6,12 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
-import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
-// TODO EN: copied from domain.test.ts, but is this the correct import path (from dist)?
-import { KeyProvider } from '../../dist/key-management/key-provider-base'
 import { initDatabase } from '../../src/common/database/database'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
+import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
@@ -24,7 +20,10 @@ const {
   createMockContractKit,
   createMockOdisBalance,
   createMockWeb3,
+  getPnpQuotaRequest,
+  getPnpQuotaRequestAuthorization,
 } = TestUtils.Utils
+const { PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
 
 const testBlockNumber = 1000000
 
@@ -41,9 +40,6 @@ jest.mock('../../src/common/web3/contracts', () => ({
 }))
 
 describe('pnp', () => {
-  const testPk = '0x00000000000000000000000000000000000000000000000000000000deadbeef'
-  const testAccount = privateKeyToAddress(testPk)
-
   let keyProvider: KeyProvider
   let app: any
   let db: Knex
@@ -82,17 +78,6 @@ describe('pnp', () => {
     })
   })
 
-  const getPnpQuotaRequest = (account: string) => {
-    return {
-      account,
-      sessionID: genSessionID(),
-    } as PnpQuotaRequest
-  }
-
-  const getAuthorization = (req: PnpQuotaRequest, account: string, pk: string) => {
-    return serializeSignature(signMessage(JSON.stringify(req), pk, account))
-  }
-
   const sendPnpQuotaRequest = async (
     req: PnpQuotaRequest,
     authorization: string,
@@ -118,8 +103,8 @@ describe('pnp', () => {
       cusdQuotaParams.forEach(([cusdWei, expectedTotalQuota]) => {
         it(`Should get totalQuota=${expectedTotalQuota} for ${cusdWei.toString()} cUSD (wei)`, async () => {
           mockOdisBalanceTotalPaidCUSD.mockReturnValue(cusdWei)
-          const req = getPnpQuotaRequest(testAccount)
-          const authorization = getAuthorization(req, testAccount, testPk)
+          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
+          const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
           const res = await sendPnpQuotaRequest(req, authorization)
 
           expect(res.status).toBe(200)
@@ -142,8 +127,8 @@ describe('pnp', () => {
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {
-        const req = getPnpQuotaRequest(testAccount)
-        const authorization = getAuthorization(req, testAccount, testPk)
+        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
+        const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
 
         const res1 = await sendPnpQuotaRequest(req, authorization)
         expect(res1.status).toBe(200)
@@ -161,10 +146,10 @@ describe('pnp', () => {
       })
 
       it('Should respond with 200 on extra request fields', async () => {
-        const req = getPnpQuotaRequest(testAccount)
+        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
-        const authorization = getAuthorization(req, testAccount, testPk)
+        const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization)
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
@@ -178,10 +163,14 @@ describe('pnp', () => {
       })
 
       it('Should respond with 400 on missing request fields', async () => {
-        const badRequest = getPnpQuotaRequest(testAccount)
+        const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         // @ts-ignore Intentionally deleting required field
         delete badRequest.account
-        const authorization = getAuthorization(badRequest, testAccount, testPk)
+        const authorization = getPnpQuotaRequestAuthorization(
+          badRequest,
+          ACCOUNT_ADDRESS1,
+          PRIVATE_KEY1
+        )
         const res = await sendPnpQuotaRequest(badRequest, authorization)
 
         expect(res.status).toBe(400)
@@ -194,12 +183,11 @@ describe('pnp', () => {
 
       it('Should respond with 401 on failed auth', async () => {
         // Request from one account, signed by another account
-        const badRequest = getPnpQuotaRequest(testAccount)
-        const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
-        const authorization = getAuthorization(
+        const badRequest = getPnpQuotaRequest(mockAccount)
+        const authorization = getPnpQuotaRequestAuthorization(
           badRequest,
-          privateKeyToAddress(differentPk),
-          differentPk
+          ACCOUNT_ADDRESS1,
+          PRIVATE_KEY1
         )
         const res = await sendPnpQuotaRequest(badRequest, authorization)
 
@@ -214,8 +202,8 @@ describe('pnp', () => {
       it('Should respond with 503 on disabled api', async () => {
         _config.api.phoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startSigner(_config, db, keyProvider)
-        const req = getPnpQuotaRequest(testAccount)
-        const authorization = getAuthorization(req, testAccount, testPk)
+        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
+        const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization, appWithApiDisabled)
         expect(res.status).toBe(503)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({

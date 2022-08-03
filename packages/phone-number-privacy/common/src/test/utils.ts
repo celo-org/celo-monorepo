@@ -1,8 +1,10 @@
-import { Signature } from '@celo/utils/lib/signatureUtils'
+import { serializeSignature, Signature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
 import Web3 from 'web3'
+import { PnpQuotaRequest } from '../interfaces'
+import { genSessionID } from '../utils/logger'
 
 export function createMockAttestation(completed: number, total: number) {
   return {
@@ -10,9 +12,9 @@ export function createMockAttestation(completed: number, total: number) {
   }
 }
 
-export function createMockToken(balance: BigNumber) {
+export function createMockToken(balanceOf: jest.Mock<BigNumber, []>) {
   return {
-    balanceOf: jest.fn(() => balance),
+    balanceOf,
   }
 }
 
@@ -110,4 +112,16 @@ export async function registerWalletAddress(
   await accounts
     .setWalletAddress(walletAddress, pop as Signature)
     .sendAndWaitForReceipt({ from: accountAddress } as any)
+}
+
+export function getPnpQuotaRequest(account: string, hashedPhoneNumber?: string) {
+  return {
+    account,
+    hashedPhoneNumber,
+    sessionID: genSessionID(),
+  } as PnpQuotaRequest
+}
+
+export function getPnpQuotaRequestAuthorization(req: PnpQuotaRequest, account: string, pk: string) {
+  return serializeSignature(signMessage(JSON.stringify(req), pk, account))
 }
