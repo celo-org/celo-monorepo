@@ -45,6 +45,8 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   uint256 constant sortedOraclesDenominator = 1000000000000000000000000;
   uint256 tobinTax = FixidityLib.newFixedFraction(5, 1000).unwrap();
   uint256 tobinTaxReserveRatio = FixidityLib.newFixedFraction(2, 1).unwrap();
+  bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
+  address celoToken = registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
 
   address deployer;
   address rando;
@@ -119,18 +121,22 @@ contract ReserveTest_initAndSetters is ReserveTest {
   }
 
   function test_dailySpendingRatio() public {
-    uint256 newValue = 123;
+    address[] tokenAddresses = [celoToken, address(dummyToken1)];
+    uint256[] newValues = [123, 124];
     vm.expectEmit(true, true, true, true, address(reserve));
-    emit DailySpendingRatioSet(newValue);
-    reserve.setDailySpendingRatio(newValue);
-    assertEq(reserve.getDailySpendingRatio(), newValue);
+    emit DailySpendingRatioSet(tokenAddresses, newValues);
+    reserve.setDailySpendingRatio(tokenAddresses, newValues);
+    //have to pass a token address to get daily spending ratio
+    //I'll change this
+    assertEq(reserve.getDailySpendingRatio(goldTokenAddress), newValues[0]);
+    assertEq(reserve.getDailySpendingRatio(address(dummyToken1), newValues[1]));
 
     vm.expectRevert("spending ratio cannot be larger than 1");
-    reserve.setDailySpendingRatio(FixidityLib.newFixed(1).unwrap().add(1));
+    reserve.setDailySpendingRatio([celoToken], [FixidityLib.newFixed(1).unwrap().add(1)]);
 
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
-    reserve.setDailySpendingRatio(100);
+    reserve.setDailySpendingRatio([celoToken], [100]);
   }
 
   function test_registry() public {
