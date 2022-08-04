@@ -371,7 +371,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     lesserAfterVote?: Address,
     greaterAfterVote?: Address
   ): Promise<CeloTransactionObject<boolean>> {
-    let lesser: string, greater: string
+    let lesser: Address, greater: Address
 
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const index = findAddressIndex(group, groups)
