@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "celo-foundry/Test.sol";
+import { Test, console2 as console } from "celo-foundry/Test.sol";
 
 import "../utils/WithRegistry.sol";
 import "../utils/TokenHelpers.sol";
@@ -13,6 +13,7 @@ import "contracts/stability/Reserve.sol";
 import "contracts/stability/test/MockSortedOracles.sol";
 import "contracts/stability/test/MockStableToken.sol";
 import "contracts/common/FixidityLib.sol";
+import "contracts/common/GoldToken.sol";
 
 contract ReserveTest is Test, WithRegistry, TokenHelpers {
   using SafeMath for uint256;
@@ -46,7 +47,7 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   uint256 tobinTax = FixidityLib.newFixedFraction(5, 1000).unwrap();
   uint256 tobinTaxReserveRatio = FixidityLib.newFixedFraction(2, 1).unwrap();
   bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
-  address goldTokenAddress = registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
+  // address goldTokenAddress = registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
 
   address deployer;
   address rando;
@@ -55,14 +56,15 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   MockSortedOracles sortedOracles = new MockSortedOracles();
   DummyERC20 dummyToken1 = new DummyERC20();
   DummyERC20 dummyToken2 = new DummyERC20();
+  GoldToken goldToken = new GoldToken(true);
 
   function setUp() public {
     rando = actor("rando");
     deployer = actor("deployer");
     changePrank(deployer);
-
     registry.setAddressFor("SortedOracles", address(sortedOracles));
     registry.setAddressFor("Exchange", exchangeAddress);
+    registry.setAddressFor("GoldToken", address(goldToken));
 
     bytes32[] memory initialAssetAllocationSymbols = new bytes32[](1);
     initialAssetAllocationSymbols[0] = bytes32("cGLD");
@@ -73,7 +75,7 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
     dailySpendingRatios[1] = 1e24;
     dailySpendingRatios[2] = 1e24;
     address[] memory tokenAddresses = new address[](3);
-    tokenAddresses[0] = goldTokenAddress;
+    tokenAddresses[0] = registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
     tokenAddresses[1] = address(dummyToken1);
     tokenAddresses[2] = address(dummyToken2);
 
@@ -142,7 +144,7 @@ contract ReserveTest_initAndSetters is ReserveTest {
 
   function test_dailySpendingRatio() public {
     address[] memory tokenAddresses = new address[](2);
-    tokenAddresses[0] = goldTokenAddress;
+    tokenAddresses[0] = registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
     tokenAddresses[1] = address(dummyToken1);
     uint256[] memory newValues = new uint256[](2);
     newValues[0] = 123;
@@ -150,10 +152,11 @@ contract ReserveTest_initAndSetters is ReserveTest {
     vm.expectEmit(true, true, true, true, address(reserve));
     emit DailySpendingRatioSet(tokenAddresses, newValues);
     reserve.setDailySpendingRatio(tokenAddresses, newValues);
-    //have to pass a token address to get daily spending ratio
-    //I'll change this
-    assert(reserve.getDailySpendingRatio(goldTokenAddress) == newValues[0]);
-    assert(reserve.getDailySpendingRatio(address(dummyToken1)) == newValues[1]);
+    assert(
+      reserve.getDailySpendingRatio(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)) ==
+        newValues[0]
+    );
+    assertEq(reserve.getDailySpendingRatio(address(dummyToken1)), newValues[1]);
 
     newValues[0] = FixidityLib.newFixed(1).unwrap().add(1);
     newValues[1] = FixidityLib.newFixed(1).unwrap().add(1);
@@ -315,7 +318,10 @@ contract ReserveTest_transfers is ReserveTest {
   uint256 constant reserveCeloBalance = 100000;
   address payable constant otherReserveAddress = address(0x1234);
   address spender;
-  address[] tokenAddresses = [goldTokenAddress, address(dummyToken2)];
+  address[] tokenAddresses = [
+    registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
+    address(dummyToken2)
+  ];
   uint256[] spendingRatios = [
     FixidityLib.newFixedFraction(2, 10).unwrap(),
     FixidityLib.newFixedFraction(1, 11).unwrap()
@@ -501,7 +507,7 @@ contract ReserveTest_transfers is ReserveTest {
 
   function test_frozenGold() public {
     address[] memory tokenAddresses = new address[](1);
-    tokenAddresses[0] = goldTokenAddress;
+    tokenAddresses[0] = registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
     uint256[] memory dailySpendingRatios = new uint256[](1);
     dailySpendingRatios[0] = FixidityLib.fixed1().unwrap();
     reserve.setDailySpendingRatio(tokenAddresses, dailySpendingRatios);
