@@ -34,7 +34,7 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: core-contracts.v7
+    RELEASE_TAG: core-contracts-v8.pre-audit
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
