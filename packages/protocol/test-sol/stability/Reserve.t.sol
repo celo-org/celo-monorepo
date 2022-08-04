@@ -19,7 +19,7 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   using FixidityLib for FixidityLib.Fraction;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
-  event DailySpendingRatioSet(uint256 ratio);
+  event DailySpendingRatioSet(address[] tokenAddresses, uint256[] dailySpendingRatio);
   event TokenAdded(address indexed token);
   event TokenRemoved(address indexed token, uint256 index);
   event SpenderAdded(address indexed spender);
@@ -46,7 +46,7 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   uint256 tobinTax = FixidityLib.newFixedFraction(5, 1000).unwrap();
   uint256 tobinTaxReserveRatio = FixidityLib.newFixedFraction(2, 1).unwrap();
   bytes32 constant GOLD_TOKEN_REGISTRY_ID = keccak256(abi.encodePacked("GoldToken"));
-  address celoToken = registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
+  address goldTokenAddress = registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
 
   address deployer;
   address rando;
@@ -68,11 +68,20 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
     initialAssetAllocationSymbols[0] = bytes32("cGLD");
     uint256[] memory initialAssetAllocationWeights = new uint256[](1);
     initialAssetAllocationWeights[0] = FixidityLib.newFixed(1).unwrap();
+    uint256[] memory dailySpendingRatios = new uint256[](3);
+    dailySpendingRatios[0] = 1e24;
+    dailySpendingRatios[1] = 1e24;
+    dailySpendingRatios[2] = 1e24;
+    address[] memory tokenAddresses = new address[](3);
+    tokenAddresses[0] = goldTokenAddress;
+    tokenAddresses[1] = address(dummyToken1);
+    tokenAddresses[2] = address(dummyToken2);
 
     reserve.initialize(
       address(registry),
       tobinTaxStalenessThreshold,
-      dailySpendingRatio,
+      dailySpendingRatios,
+      tokenAddresses,
       0,
       0,
       initialAssetAllocationSymbols,
@@ -90,7 +99,18 @@ contract ReserveTest_initAndSetters is ReserveTest {
     assertEq(reserve.tobinTaxStalenessThreshold(), tobinTaxStalenessThreshold);
 
     vm.expectRevert("contract already initialized");
-    reserve.initialize(address(registry), 0, 0, 0, 0, new bytes32[](0), new uint256[](0), 0, 0);
+    reserve.initialize(
+      address(registry),
+      0,
+      new uint256[](0),
+      new address[](0),
+      0,
+      0,
+      new bytes32[](0),
+      new uint256[](0),
+      0,
+      0
+    );
   }
 
   function test_tobinTax() public {
@@ -121,22 +141,28 @@ contract ReserveTest_initAndSetters is ReserveTest {
   }
 
   function test_dailySpendingRatio() public {
-    address[] tokenAddresses = [celoToken, address(dummyToken1)];
-    uint256[] newValues = [123, 124];
+    address[] memory tokenAddresses = new address[](2);
+    tokenAddresses[0] = goldTokenAddress;
+    tokenAddresses[1] = address(dummyToken1);
+    uint256[] memory newValues = new uint256[](2);
+    newValues[0] = 123;
+    newValues[1] = 124;
     vm.expectEmit(true, true, true, true, address(reserve));
     emit DailySpendingRatioSet(tokenAddresses, newValues);
     reserve.setDailySpendingRatio(tokenAddresses, newValues);
     //have to pass a token address to get daily spending ratio
     //I'll change this
-    assertEq(reserve.getDailySpendingRatio(goldTokenAddress), newValues[0]);
-    assertEq(reserve.getDailySpendingRatio(address(dummyToken1), newValues[1]));
+    assert(reserve.getDailySpendingRatio(goldTokenAddress) == newValues[0]);
+    assert(reserve.getDailySpendingRatio(address(dummyToken1)) == newValues[1]);
 
+    newValues[0] = FixidityLib.newFixed(1).unwrap().add(1);
+    newValues[1] = FixidityLib.newFixed(1).unwrap().add(1);
     vm.expectRevert("spending ratio cannot be larger than 1");
-    reserve.setDailySpendingRatio([celoToken], [FixidityLib.newFixed(1).unwrap().add(1)]);
+    reserve.setDailySpendingRatio(tokenAddresses, newValues);
 
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
-    reserve.setDailySpendingRatio([celoToken], [100]);
+    reserve.setDailySpendingRatio(tokenAddresses, newValues);
   }
 
   function test_registry() public {
@@ -289,6 +315,11 @@ contract ReserveTest_transfers is ReserveTest {
   uint256 constant reserveCeloBalance = 100000;
   address payable constant otherReserveAddress = address(0x1234);
   address spender;
+  address[] tokenAddresses = [goldTokenAddress, address(dummyToken2)];
+  uint256[] spendingRatios = [
+    FixidityLib.newFixedFraction(2, 10).unwrap(),
+    FixidityLib.newFixedFraction(1, 11).unwrap()
+  ];
 
   function setUp() public {
     super.setUp();
@@ -296,7 +327,7 @@ contract ReserveTest_transfers is ReserveTest {
     deal(address(reserve), reserveCeloBalance);
     reserve.addOtherReserveAddress(otherReserveAddress);
     reserve.addSpender(spender);
-    reserve.setDailySpendingRatio(FixidityLib.newFixedFraction(2, 10).unwrap());
+    reserve.setDailySpendingRatio(tokenAddresses, spendingRatios);
     vm.warp(100 * 24 * 3600 + 445);
   }
 
@@ -331,7 +362,7 @@ contract ReserveTest_transfers is ReserveTest {
     //erc20 token balance
     uint256 amount = reserveCeloBalance.div(10);
     //dummyerc20 token address
-    reserve.test_transferErc20Token(otherReserveAddress, amount, address(dummyToken1));
+    reserve.transferErc20Token(address(dummyToken1), otherReserveAddress, amount);
     assertEq(otherReserveAddress.balance, amount);
     assertEq(address(reserve).balance, reserveCeloBalance - amount);
 
@@ -469,7 +500,11 @@ contract ReserveTest_transfers is ReserveTest {
   }
 
   function test_frozenGold() public {
-    reserve.setDailySpendingRatio(FixidityLib.fixed1().unwrap());
+    address[] memory tokenAddresses = new address[](1);
+    tokenAddresses[0] = goldTokenAddress;
+    uint256[] memory dailySpendingRatios = new uint256[](1);
+    dailySpendingRatios[0] = FixidityLib.fixed1().unwrap();
+    reserve.setDailySpendingRatio(tokenAddresses, dailySpendingRatios);
     vm.expectRevert("Cannot freeze more than balance");
     reserve.setFrozenGold(reserveCeloBalance + 1, 1);
     uint256 dailyUnlock = reserveCeloBalance.div(3);
