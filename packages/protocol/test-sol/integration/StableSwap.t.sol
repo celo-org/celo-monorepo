@@ -27,9 +27,11 @@ interface Pool {
     uint256 deadline
   ) external returns (uint256);
   function getBalances() external view returns (uint256[] memory);
+  function setAdminFee(uint256) external;
 }
 
 contract StableSwapExperiment is Test, TokenHelpers, WithForks, WithRegistry {
+  address constant governance = 0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972;
   address constant USDC = 0x37f750B7cC259A2f741AF45294f6a16572CF5cAd;
   // address constant MOBIUS_POOL = 0xb88d9a72b192C4b5C043EDA1E152a0BeC2f94212; // a = 2000
   address constant MOBIUS_POOL = 0xB52124467cBa3ef335F03272EA8C045F390deaCe; // a = 10**6 - 1
@@ -59,15 +61,20 @@ contract StableSwapExperiment is Test, TokenHelpers, WithForks, WithRegistry {
     bob = setupActor("bob", cusd(20000000), usdc(20000000));
     charlie = setupActor("charlie", cusd(1000), usdc(1000));
     david = setupActor("david", cusd(1000), usdc(1000));
+
+    changePrank(governance);
+    // pool.setAdminFee(5000000000);
   }
 
   function test_depositSwapDeposit() public {
     deposit(alice, amounts(cusd(5000000), usdc(5000000)));
+    logPoolBalances();
 
     sell_cUSD(bob, cusd(5000000));
     logPoolBalances();
 
     deposit(alice, amounts(cusd(5000000), usdc(5000000)));
+    logPoolBalances();
 
     sell_cUSD(bob, cusd(5000000));
     logActorBalances(bob);

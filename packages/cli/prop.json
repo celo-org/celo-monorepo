@@ -1,0 +1,58 @@
+[
+  {
+    "contract": "StableToken",
+    "function": "_setImplementation",
+    "args": [
+      "0x41a2887d4C4D96C9E1a3505CF4553Fd0b1380F13"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "StableToken",
+    "function": "mint",
+    "args": [
+      "0xd533ca259b330c7a88f74e000a3faea2d63b7972",
+      "5000000000000000000000000"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "StableToken",
+    "function": "_setImplementation",
+    "args": [
+      "0x18e6bfdc909063f7445e410a5495264619495bcb"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "StableToken",
+    "function": "approve",
+    "args": [
+      "0x2D3f58f8020761369f5c324ea7e35b149f2aBEb5",
+      "5000000000000000000000000"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "0x37f750B7cC259A2f741AF45294f6a16572CF5cAd",
+    "function": "approve(address,uint256)",
+    "args": [
+      "0x2D3f58f8020761369f5c324ea7e35b149f2aBEb5",
+      "5000000000000"
+    ],
+    "value": "0"
+  },
+  {
+    "contract": "0x2D3f58f8020761369f5c324ea7e35b149f2aBEb5",
+    "function": "addLiquidity(uint256[],uint256,uint256)",
+    "args": [
+      [
+        "5000000000000000000000000",
+        "5000000000000"
+      ],
+      0,
+      0
+    ],
+    "value": "0"
+  }
+]
