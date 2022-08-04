@@ -1,4 +1,11 @@
-import { ABIDefinition, Address, Block, CeloTxPending, parseDecodedParams } from '@celo/connect'
+import {
+  ABIDefinition,
+  Address,
+  Block,
+  CeloTxPending,
+  parseDecodedParams,
+  signatureToAbiDefinition,
+} from '@celo/connect'
 import { CeloContract, ContractKit } from '@celo/contractkit'
 import { PROXY_ABI } from '@celo/contractkit/lib/proxy'
 import { fromFixed } from '@celo/utils/lib/fixidity'
@@ -114,23 +121,28 @@ export class BlockExplorer {
     }
   }
 
-  async tryParseTxInput(address: string, input: string): Promise<null | CallDetails> {
-    const callSignature = input.slice(0, 10)
-    const { contract: contractName, abi: matchedAbi } = this.getContractMethodAbi(
-      address,
-      callSignature
-    )
-    if (!contractName || !matchedAbi) {
-      return null
+  getKnownFunction(selector: string): ABIDefinition | undefined {
+    // TODO(bogdan): This could be replaced with a call to 4byte.directory
+    // or a local database of common functions.
+    const knownFunctions: { [k: string]: string } = {
+      '0x095ea7b3': 'approve(address to, uint256 value)',
+      '0x4d49e87d': 'addLiquidity(uint256[] amounts, uint256 minLPToMint, uint256 deadline)',
     }
+    const signature = knownFunctions[selector]
+    if (signature) {
+      return signatureToAbiDefinition(signature)
+    }
+    return undefined
+  }
 
+  buildCallDetails(contract: string, abi: ABIDefinition, input: string): CallDetails {
     const encodedParameters = input.slice(10)
     const { args, params } = parseDecodedParams(
-      this.kit.connection.getAbiCoder().decodeParameters(matchedAbi.inputs!, encodedParameters)
+      this.kit.connection.getAbiCoder().decodeParameters(abi.inputs!, encodedParameters)
     )
 
     // transform numbers to big numbers in params
-    matchedAbi.inputs!.forEach((abiInput, idx) => {
+    abi.inputs!.forEach((abiInput, idx) => {
       if (abiInput.type === 'uint256') {
         debug('transforming number param')
         params[abiInput.name] = new BigNumber(args[idx])
@@ -146,10 +158,41 @@ export class BlockExplorer {
       })
 
     return {
-      contract: contractName,
-      function: matchedAbi.name!,
+      contract,
+      function: abi.name!,
       paramMap: params,
       argList: args,
     }
+  }
+
+  tryParseAsCoreContractCall(address: string, input: string): CallDetails | null {
+    const selector = input.slice(0, 10)
+    const { contract: contractName, abi: matchedAbi } = this.getContractMethodAbi(address, selector)
+
+    if (matchedAbi == undefined || contractName == undefined) {
+      return null
+    }
+
+    return this.buildCallDetails(contractName, matchedAbi, input)
+  }
+
+  tryParseAsExternalContractCall(address: string, input: string): CallDetails | null {
+    const selector = input.slice(0, 10)
+    const matchedAbi = this.getKnownFunction(selector)
+    if (matchedAbi == undefined) {
+      return null
+    }
+
+    return this.buildCallDetails(address, matchedAbi, input)
+  }
+
+  async tryParseTxInput(address: string, input: string): Promise<CallDetails | null> {
+    let callDetails = this.tryParseAsCoreContractCall(address, input)
+    if (callDetails == null) {
+      callDetails = this.tryParseAsExternalContractCall(address, input)
+    }
+    console.log(input)
+    console.log(callDetails)
+    return callDetails
   }
 }

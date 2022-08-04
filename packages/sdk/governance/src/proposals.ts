@@ -8,6 +8,7 @@ import {
   Contract,
   getAbiByName,
   parseDecodedParams,
+  signatureToAbiDefinition,
 } from '@celo/connect'
 import {
   CeloContract,
@@ -152,7 +153,7 @@ export const proposalToJSON = async (
     }
 
     debug(`decoding tx ${JSON.stringify(tx)}`)
-    const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
+    let parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${JSON.stringify(tx)} with block explorer`)
     }
@@ -290,6 +291,14 @@ export class ProposalBuilder {
     RegisteredContracts.includes(stripProxy(contract)) ||
     this.getRegistryAddition(contract) !== undefined
 
+  buildFunctionCallToExternalContract = async (
+    tx: ProposalTransactionJSON
+  ): Promise<ProposalTransaction> => {
+    const methodABI = signatureToAbiDefinition(tx.function)
+    const input = this.kit.connection.getAbiCoder().encodeFunctionCall(methodABI, tx.args)
+    return { input, to: tx.contract, value: tx.value }
+  }
+
   fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
     if (isRegistryRepoint(tx)) {
       // Update canonical registry addresses
@@ -304,9 +313,7 @@ export class ProposalBuilder {
           `Transaction to unregistered contract ${tx.contract} only supported by address`
         )
       } else if (tx.function !== '' || tx.args !== []) {
-        throw new Error(
-          `Function ${tx.function} call with args ${tx.args} to unregistered contract not currently supported`
-        )
+        return this.buildFunctionCallToExternalContract(tx)
       }
       return { input: '', to: tx.contract, value: tx.value }
     }
@@ -324,7 +331,15 @@ export class ProposalBuilder {
 
     const contract = await this.kit._web3Contracts.getContract(tx.contract, address)
     const methodName = tx.function
-    const method = (contract.methods as Contract['methods'])[methodName]
+    let method = (contract.methods as Contract['methods'])[methodName]
+    if (!method && /Proxy/.exec(tx.contract) == null) {
+      const proxy = await this.kit._web3Contracts.getContract(
+        `${tx.contract}Proxy` as CeloContract,
+        address
+      )
+      method = (proxy.methods as Contract['methods'])[methodName]
+    }
+
     if (!method) {
       throw new Error(`Method ${methodName} not found on ${tx.contract}`)
     }
