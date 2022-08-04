@@ -1,4 +1,11 @@
-import { ABIDefinition, Address, Block, CeloTxPending, parseDecodedParams } from '@celo/connect'
+import {
+  ABIDefinition,
+  Address,
+  Block,
+  CeloTxPending,
+  parseDecodedParams,
+  signatureToAbiDefinition,
+} from '@celo/connect'
 import { CeloContract, ContractKit } from '@celo/contractkit'
 import { PROXY_ABI } from '@celo/contractkit/lib/proxy'
 import { fromFixed } from '@celo/utils/lib/fixidity'
@@ -114,13 +121,31 @@ export class BlockExplorer {
     }
   }
 
+  getKnownFunction(identifier: string): ABIDefinition | undefined {
+    const knownFunctions: { [k: string]: string } = {
+      '0x095ea7b3': 'approve(address to, uint256 value)',
+      '0xc5bb3168': 'addLiquidity(uint256[] amounts, uint256 minLPToMint, uint256 deadline)',
+    }
+    const signature = knownFunctions[identifier]
+    if (signature) {
+      return signatureToAbiDefinition(signature)
+    }
+    return undefined
+  }
+
   async tryParseTxInput(address: string, input: string): Promise<null | CallDetails> {
     const callSignature = input.slice(0, 10)
-    const { contract: contractName, abi: matchedAbi } = this.getContractMethodAbi(
+    let { contract: contractName, abi: matchedAbi } = this.getContractMethodAbi(
       address,
       callSignature
     )
+
     if (!contractName || !matchedAbi) {
+      contractName = address
+      matchedAbi = this.getKnownFunction(callSignature)
+    }
+
+    if (!matchedAbi) {
       return null
     }
 
