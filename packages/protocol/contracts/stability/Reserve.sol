@@ -49,8 +49,6 @@ contract Reserve is
 
   uint256 public lastSpendingDay;
   uint256 public spendingLimit;
-  mapping(address => uint256) public erc20SpendingLimit;
-  mapping(address => FixidityLib.Fraction) private tokenDailySpendingRatio;
   FixidityLib.Fraction private spendingRatio;
 
   uint256 public frozenReserveGoldStartBalance;
@@ -59,9 +57,10 @@ contract Reserve is
 
   mapping(address => bool) public isExchangeSpender;
   address[] public exchangeSpenderAddresses;
+  mapping(address => FixidityLib.Fraction) private erc20DailySpendingRatio;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
-  event SpendingDailyRatioSet(address[] tokenAddresses, uint256[] ratios);
+  event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address indexed token);
   event TokenRemoved(address indexed token, uint256 index);
   event SpenderAdded(address indexed spender);
@@ -80,6 +79,10 @@ contract Reserve is
   event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
+  event DailySpendingRatioForErc20TokenSet(
+    address erc20TokenAddress,
+    uint256 erc20DailySpendingRatio
+  );
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -106,7 +109,7 @@ contract Reserve is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
-   * @param _spendingRatios The relative daily spending limit for the reserve spender.
+   * @param _spendingRatio The relative daily spending limit for the reserve spender.
    * @param _frozenGold The balance of reserve gold that is frozen.
    * @param _frozenDays The number of days during which the frozen gold thaws.
    * @param _assetAllocationSymbols The symbols of the reserve assets.
@@ -117,8 +120,7 @@ contract Reserve is
   function initialize(
     address registryAddress,
     uint256 _tobinTaxStalenessThreshold,
-    uint256[] calldata _spendingRatios,
-    address[] calldata _tokenAddresses,
+    uint256 _spendingRatio,
     uint256 _frozenGold,
     uint256 _frozenDays,
     bytes32[] calldata _assetAllocationSymbols,
@@ -129,7 +131,7 @@ contract Reserve is
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
-    setDailySpendingRatio(_tokenAddresses, _spendingRatios);
+    setDailySpendingRatio(_spendingRatio);
     setFrozenGold(_frozenGold, _frozenDays);
     setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
     setTobinTax(_tobinTax);
@@ -165,35 +167,40 @@ contract Reserve is
     emit TobinTaxReserveRatioSet(value);
   }
 
+  function setDailySpendingRatio(uint256 ratio) public onlyOwner {
+    spendingRatio = FixidityLib.wrap(ratio);
+    require(spendingRatio.lte(FixidityLib.fixed1()), "spending ratio cannot be larger than 1");
+    emit DailySpendingRatioSet(ratio);
+  }
+
   /**
-   * @notice Set the ratio of reserve that is spendable per day.
-   * @param spendingRatios Spending ratio as unwrapped Fraction.
+   * @notice Set the ratio of reserve for a given ERC20 token that is spendable per day.
+   * @param erc20SpendingRatio Spending ratio as unwrapped Fraction.
    */
-  function setDailySpendingRatio(address[] memory tokenAddresses, uint256[] memory spendingRatios)
-    public
-    onlyOwner
-  {
-    require(
-      tokenAddresses.length == spendingRatios.length,
-      "token addresses and spending ratio lengths have to be the same"
-    );
-    for (uint256 i = 0; i < tokenAddresses.length; i++) {
-      tokenDailySpendingRatio[tokenAddresses[i]] = FixidityLib.Fraction(spendingRatios[i]);
-      require(
-        tokenDailySpendingRatio[tokenAddresses[i]].lte(FixidityLib.fixed1()),
-        "spending ratio cannot be larger than 1"
-      );
-    }
-    emit SpendingDailyRatioSet(tokenAddresses, spendingRatios);
+  function setDailySpendingRatioForErc20Tokens(
+    address erc20TokenAddress,
+    uint256 erc20SpendingRatio
+  ) public onlyOwner {
+    erc20DailySpendingRatio[erc20TokenAddress] = FixidityLib.wrap(erc20SpendingRatio);
+    require(spendingRatio.lte(FixidityLib.fixed1()), "spending ratio cannot be larger than 1");
+    emit DailySpendingRatioForErc20TokenSet(erc20TokenAddress, erc20SpendingRatio);
   }
 
   /**
    * @notice Get daily spending ratio.
-   * @param tokenAddress The address of a token we're getting a spending ratio for
    * @return Spending ratio as unwrapped Fraction.
    */
-  function getDailySpendingRatio(address tokenAddress) public view returns (uint256) {
-    return tokenDailySpendingRatio[tokenAddress].unwrap();
+  function getDailySpendingRatio() public view returns (uint256) {
+    return spendingRatio.unwrap();
+  }
+
+  /**
+   * @notice Get daily spending ratio of an ERC20 token.
+   * @param erc20TokenAddress The address of a token we're getting a spending ratio for
+   * @return Daily spending ratio for an ERC20 token as unwrapped Fraction.
+   */
+  function getDailySpendingRatioForErc20(address erc20TokenAddress) public view returns (uint256) {
+    return erc20DailySpendingRatio[erc20TokenAddress].unwrap();
   }
 
   /**
@@ -403,16 +410,13 @@ contract Reserve is
    * @return Returns true if the transaction succeeds.
    */
   function transferGold(address payable to, uint256 value) external returns (bool) {
-    address goldTokenAddress = registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(isOtherReserveAddress[to], "can only transfer to other reserve address");
     uint256 currentDay = now / 1 days;
     if (currentDay > lastSpendingDay) {
       uint256 balance = getUnfrozenReserveGoldBalance();
       lastSpendingDay = currentDay;
-      spendingLimit = tokenDailySpendingRatio[goldTokenAddress]
-        .multiply(FixidityLib.newFixed(balance))
-        .fromFixed();
+      spendingLimit = spendingRatio.multiply(FixidityLib.newFixed(balance)).fromFixed();
     }
     require(spendingLimit >= value, "Exceeding spending limit");
     spendingLimit = spendingLimit.sub(value);
@@ -437,12 +441,12 @@ contract Reserve is
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(isOtherReserveAddress[to], "can only transfer to other reserve address");
     uint256 spendingLimitForThisToken;
-    if (FixidityLib.unwrap(tokenDailySpendingRatio[erc20TokenAddress]) > 0) {
+    if (FixidityLib.unwrap(erc20DailySpendingRatio[erc20TokenAddress]) > 0) {
       uint256 currentDay = now / 1 days;
       if (currentDay > lastSpendingDay) {
         uint256 balance = getErc20TokenBalance(erc20TokenAddress);
         lastSpendingDay = currentDay;
-        spendingLimitForThisToken = tokenDailySpendingRatio[erc20TokenAddress]
+        spendingLimitForThisToken = erc20DailySpendingRatio[erc20TokenAddress]
           .multiply(FixidityLib.newFixed(balance))
           .fromFixed();
       }
