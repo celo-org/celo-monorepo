@@ -43,6 +43,10 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
+    if (!this.requestHasValidKeyVersion(request, response.locals.logger)) {
+      this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+      return null
+    }
     if (!(await this.authenticate(request))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null

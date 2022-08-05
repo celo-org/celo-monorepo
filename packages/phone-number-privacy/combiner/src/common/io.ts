@@ -71,24 +71,62 @@ export abstract class IO<R extends OdisRequest> {
     return res
   }
 
-  // DO NOT MERGE: Differentiate between receiving an invalid key version and no key version.
-  // (follow pattern used in signer) TODO(Alec)(Next)
+  requestHasValidKeyVersion(request: Request<{}, {}, R>, logger: Logger): boolean {
+    const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
+    if (keyVersionHeader === undefined) {
+      return true
+    }
+
+    const requestedKeyVersion = Number(keyVersionHeader)
+
+    const isValid = Number.isInteger(requestedKeyVersion)
+    if (!isValid) {
+      logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
+    }
+    return isValid
+  }
+
   getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
-    const requestedKeyVersion = Number(keyVersionHeader)
-    if (Number.isNaN(requestedKeyVersion)) {
-      logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
+    if (keyVersionHeader === undefined) {
       return undefined
     }
-    logger.info({ requestedKeyVersion }, 'Client request has valid key version')
+
+    const requestedKeyVersion = Number(keyVersionHeader)
+
+    if (!Number.isInteger(requestedKeyVersion)) {
+      logger.error({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
+      throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
+    }
     return requestedKeyVersion
+  }
+
+  responseHasValidKeyVersion(response: FetchResponse, session: Session<R>): boolean {
+    const responseKeyVersion = this.getResponseKeyVersion(response, session.logger)
+    const requestKeyVersion =
+      this.getRequestKeyVersion(session.request, session.logger) ?? this.config.keys.version
+
+    const isValid = responseKeyVersion === requestKeyVersion
+    if (!isValid) {
+      session.logger.error(
+        { requestKeyVersion, responseKeyVersion },
+        ErrorMessage.INVALID_KEY_VERSION_RESPONSE
+      )
+    }
+
+    return isValid
   }
 
   getResponseKeyVersion(response: FetchResponse, logger: Logger): number | undefined {
     const keyVersionHeader = response.headers.get(KEY_VERSION_HEADER)
+    if (keyVersionHeader === undefined) {
+      return undefined
+    }
+
     const responseKeyVersion = Number(keyVersionHeader)
-    if (Number.isNaN(responseKeyVersion)) {
-      logger.warn({ keyVersionHeader }, ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
+
+    if (!Number.isInteger(responseKeyVersion)) {
+      logger.error({ keyVersionHeader }, ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
       return undefined
     }
     logger.info({ responseKeyVersion }, 'Signer response has valid key version')

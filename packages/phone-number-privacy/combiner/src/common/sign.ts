@@ -34,11 +34,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
     url: string,
     session: Session<R>
   ): Promise<OdisResponse<R>> {
-    // Check key version header
-    const responseKeyVersion = this.io.getResponseKeyVersion(signerResponse, session.logger)
-    const requestKeyVersion =
-      this.io.getRequestKeyVersion(session.request, session.logger) ?? this.config.keys.version
-    if (responseKeyVersion !== requestKeyVersion) {
+    if (!this.io.responseHasValidKeyVersion(signerResponse, session)) {
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
 

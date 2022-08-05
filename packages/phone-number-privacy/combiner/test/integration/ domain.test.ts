@@ -692,7 +692,7 @@ describe('domainService', () => {
       expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,
-        error: WarningMessage.INVALID_INPUT,
+        error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
       })
     })
 
