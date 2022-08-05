@@ -618,7 +618,7 @@ contract Attestations is
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers.
    * @param identifiersToLookup Array of n identifiers.
-   * @return numbers Array of n numbers that indicate the number of matching addresses per identifier.
+   * @return numbers Array of numbers that indicate the number of matching addresses per identifier.
    * @return addresses Array of addresses preallocated for total number of matches.
    */
   function batchlookupAccountsForIdentifier(bytes32[] memory identifiersToLookup)
