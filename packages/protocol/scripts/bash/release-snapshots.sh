@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-N=`echo -n $RELEASE_TAG | tail -c -1`
+N=$LAST_RELEASE
 
 for i in `eval echo {1..$N}`
 do

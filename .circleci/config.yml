@@ -34,7 +34,15 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
+    # This should be the tag of the latest cut release branch, so that version
+    # checking on master is done against either the currently released
+    # contracts, or the current pending release if there is one.
     RELEASE_TAG: core-contracts-v8.pre-audit
+    # This should be the number of the latest full release that's been deployed
+    # onchain. I.e. if the above tag is of a finalized release, it will
+    # correspond to the tag's version, if the above tag is a pre-release one, it
+    # should be one lower.
+    LAST_RELEASE: 7
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
