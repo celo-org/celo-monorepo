@@ -60,7 +60,9 @@ export class BlockExplorer {
 
   constructor(private kit: ContractKit, readonly contractDetails: ContractDetails[]) {
     this.addressMapping = mapFromPairs(
-      contractDetails.map((cd) => [cd.address, getContractMappingFromDetails(cd)])
+      contractDetails
+        .filter((cd) => /Proxy/.exec(cd.name) == null)
+        .map((cd) => [cd.address, getContractMappingFromDetails(cd)])
     )
   }
 
@@ -191,8 +193,6 @@ export class BlockExplorer {
     if (callDetails == null) {
       callDetails = this.tryParseAsExternalContractCall(address, input)
     }
-    console.log(input)
-    console.log(callDetails)
     return callDetails
   }
 }

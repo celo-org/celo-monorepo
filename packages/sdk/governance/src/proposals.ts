@@ -133,6 +133,8 @@ export const proposalToJSON = async (
     await blockExplorer.updateContractDetailsMapping(stripProxy(name), address)
   }
 
+  console.log(proposal)
+
   if (registryAdditions) {
     // Update the registry mapping with registry additions prior to processing the proposal.
     for (const nameStr of Object.keys(registryAdditions)) {
@@ -332,14 +334,6 @@ export class ProposalBuilder {
     const contract = await this.kit._web3Contracts.getContract(tx.contract, address)
     const methodName = tx.function
     let method = (contract.methods as Contract['methods'])[methodName]
-    if (!method && /Proxy/.exec(tx.contract) == null) {
-      const proxy = await this.kit._web3Contracts.getContract(
-        `${tx.contract}Proxy` as CeloContract,
-        address
-      )
-      method = (proxy.methods as Contract['methods'])[methodName]
-    }
-
     if (!method) {
       throw new Error(`Method ${methodName} not found on ${tx.contract}`)
     }
