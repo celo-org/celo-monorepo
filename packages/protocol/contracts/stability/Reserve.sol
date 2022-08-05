@@ -177,8 +177,8 @@ contract Reserve is
       tokenAddresses.length == spendingRatios.length,
       "token addresses and spending ratio lengths have to be the same"
     );
-    for (uint256 i = 1; i < tokenAddresses.length; i++) {
-      tokenDailySpendingRatio[tokenAddresses[i]] = FixidityLib.wrap(spendingRatios[i]);
+    for (uint256 i = 0; i < tokenAddresses.length; i++) {
+      tokenDailySpendingRatio[tokenAddresses[i]] = FixidityLib.Fraction(spendingRatios[i]);
       require(
         tokenDailySpendingRatio[tokenAddresses[i]].lte(FixidityLib.fixed1()),
         "spending ratio cannot be larger than 1"

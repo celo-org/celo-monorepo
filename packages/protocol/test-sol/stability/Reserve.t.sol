@@ -149,14 +149,11 @@ contract ReserveTest_initAndSetters is ReserveTest {
     uint256[] memory newValues = new uint256[](2);
     newValues[0] = 123;
     newValues[1] = 124;
-    vm.expectEmit(true, true, true, true, address(reserve));
+    // vm.expectEmit(true, true, true, true, address(reserve));
     emit DailySpendingRatioSet(tokenAddresses, newValues);
     reserve.setDailySpendingRatio(tokenAddresses, newValues);
-    assert(
-      reserve.getDailySpendingRatio(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID)) ==
-        newValues[0]
-    );
-    assertEq(reserve.getDailySpendingRatio(address(dummyToken1)), newValues[1]);
+    assertEq(reserve.getDailySpendingRatio(tokenAddresses[0]), newValues[0]);
+    assertEq(reserve.getDailySpendingRatio(tokenAddresses[1]), newValues[1]);
 
     newValues[0] = FixidityLib.newFixed(1).unwrap().add(1);
     newValues[1] = FixidityLib.newFixed(1).unwrap().add(1);
