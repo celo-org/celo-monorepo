@@ -174,10 +174,10 @@ contract Attestations is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return storage Storage version of the contract.
-   * @return major Major version of the contract.
-   * @return minor Minor version of the contract.
-   * @return patch Patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 1, 2);
@@ -457,10 +457,10 @@ contract Attestations is
     * @notice Returns the state of all attestations that are completable
     * @param identifier Hash of the identifier.
     * @param account Address of the account.
-    * @return blockNumbers[] Block number of request/completion the attestation.
-    * @return issuers[] Address of the issuer.
-    * @return stringLengths[] The length of each metadataURL string for each issuer.
-    * @return stringData All strings concatenated.
+    * @return Block number of request/completion the attestation.
+    * @return Address of the issuer.
+    * @return The length of each metadataURL string for each issuer.
+    * @return All strings concatenated.
     */
   function getCompletableAttestations(bytes32 identifier, address account)
     external
@@ -618,8 +618,8 @@ contract Attestations is
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers.
    * @param identifiersToLookup Array of n identifiers.
-   * @return numbers Array of numbers that indicate the number of matching addresses per identifier.
-   * @return addresses Array of addresses preallocated for total number of matches.
+   * @return Array of numbers that indicate the number of matching addresses per identifier.
+   * @return Array of addresses preallocated for total number of matches.
    */
   function batchlookupAccountsForIdentifier(bytes32[] memory identifiersToLookup)
     internal

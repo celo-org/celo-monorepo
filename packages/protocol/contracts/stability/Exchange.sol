@@ -69,10 +69,10 @@ contract Exchange is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return storage Storage version of the contract.
-   * @return major Major version of the contract.
-   * @return minor Minor version of the contract.
-   * @return patch Patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 3, 0, 0);
@@ -497,9 +497,10 @@ contract Exchange is
     return FixidityLib.fixed1().subtract(spread).multiply(FixidityLib.newFixed(sellAmount));
   }
 
-  /*
+  /**
    * @notice Checks conditions required for bucket updates.
-   * @return Whether or not buckets should be updated.
+   * @return The Rate numerator - whether or not buckets should be updated.
+   * @return The rate denominator - whether or not buckets should be updated.
    */
   function shouldUpdateBuckets() private view returns (bool) {
     ISortedOracles sortedOracles = ISortedOracles(

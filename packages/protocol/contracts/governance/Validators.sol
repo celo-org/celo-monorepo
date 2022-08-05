@@ -160,10 +160,10 @@ contract Validators is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return storage Storage version of the contract.
-   * @return major Major version of the contract.
-   * @return minor Minor version of the contract.
-   * @return patch Patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 2, 0, 3);
@@ -377,8 +377,8 @@ contract Validators is
 
   /**
    * @notice Returns the parameters that govern how a validator's score is calculated.
-   * @return exponent The exponent that goven how a validator's score is calculated.
-   * @return adjustment The adjustment speed goven how a validator's score is calculated.
+   * @return The exponent that goven how a validator's score is calculated.
+   * @return The adjustment speed goven how a validator's score is calculated.
    */
   function getValidatorScoreParameters() external view returns (uint256, uint256) {
     return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
@@ -388,9 +388,9 @@ contract Validators is
    * @notice Returns the group membership history of a validator.
    * @param account The validator whose membership history to return.
    * @return epochs The epochs of a validator.
-   * @return groups The membership groups of a validator.
-   * @return timestamp The last removed from group timestamp of a validator.
-   * @return tail The tail of a validator.
+   * @return The membership groups of a validator.
+   * @return The last removed from group timestamp of a validator.
+   * @return The tail of a validator.
    */
   function getMembershipHistory(address account)
     external
@@ -1078,8 +1078,8 @@ contract Validators is
 
   /**
    * @notice Returns the Locked Gold requirements for validators.
-   * @return value The Locked Gold value.
-   * @return duration The Locked Gold duration.
+   * @return The Locked Gold value.
+   * @return The Locked Gold duration.
    */
   function getValidatorLockedGoldRequirements() external view returns (uint256, uint256) {
     return (validatorLockedGoldRequirements.value, validatorLockedGoldRequirements.duration);
@@ -1087,8 +1087,8 @@ contract Validators is
 
   /**
    * @notice Returns the Locked Gold requirements for validator groups.
-   * @return value The Locked Gold value.
-   * @return duration The Locked Gold duration.
+   * @return The Locked Gold value.
+   * @return The Locked Gold duration.
    */
   function getGroupLockedGoldRequirements() external view returns (uint256, uint256) {
     return (groupLockedGoldRequirements.value, groupLockedGoldRequirements.duration);

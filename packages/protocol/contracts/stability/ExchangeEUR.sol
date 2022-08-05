@@ -12,10 +12,10 @@ contract ExchangeEUR is Exchange {
   /**
   * @notice Returns the storage, major, minor, and patch version of the contract.
   * @dev This function is overloaded to maintain a distinct version from Exchange.sol.
-  * @return storage Storage version of the contract.
-  * @return major Major version of the contract.
-  * @return minor Minor version of the contract.
-  * @return patch Patch version of the contract.
+  * @return Storage version of the contract.
+  * @return Major version of the contract.
+  * @return Minor version of the contract.
+  * @return Patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 3, 0, 0);

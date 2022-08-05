@@ -14,10 +14,10 @@ contract StableTokenRegistry is Initializable, Ownable {
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return storage Storage version of the contract.
-   * @return major Major version of the contract.
-   * @return minor Minor version of the contract.
-   * @return patch Patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 0);
@@ -49,8 +49,8 @@ contract StableTokenRegistry is Initializable, Ownable {
 
   /**
    * @notice Returns all the contract instances created.
-   * @return collection Collection of stable token contracts.
-   * @return lengths Lengths of stable token contracts.
+   * @return Collection of stable token contracts.
+   * @return Lengths of stable token contracts.
    */
   function getContractInstances() external view returns (bytes memory, uint256[] memory) {
     uint256 totalLength = 0;

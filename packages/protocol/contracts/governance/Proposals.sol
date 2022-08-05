@@ -281,9 +281,9 @@ library Proposals {
    * @notice Returns a specified transaction in a proposal.
    * @param proposal The proposal struct.
    * @param index The index of the specified transaction in the proposal's transaction list.
-   * @return value Transaction value.
-   * @return destination Transaction destination.
-   * @return data Transaction data.
+   * @return Transaction value.
+   * @return Transaction destination.
+   * @return Transaction data.
    */
   function getTransaction(Proposal storage proposal, uint256 index)
     public
@@ -321,9 +321,9 @@ library Proposals {
   /**
    * @notice Returns the referendum vote totals for a proposal.
    * @param proposal The proposal struct.
-   * @return yes The yes vote totals.
-   * @return no The no vote totals.
-   * @return abstrain The abstain vote totals.
+   * @return The yes vote totals.
+   * @return The no vote totals.
+   * @return The abstain vote totals.
    */
   function getVoteTotals(Proposal storage proposal)
     internal

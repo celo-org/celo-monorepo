@@ -164,10 +164,10 @@ contract GrandaMento is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return storage Storage version of the contract.
-   * @return major Major version of the contract.
-   * @return minor Minor version of the contract.
-   * @return patch Patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 1);
@@ -397,8 +397,8 @@ contract GrandaMento is
    * @dev For stable token sell amounts that are stored as units, the value
    * is returned. Ensures sell amount is not greater than this contract's balance.
    * @param proposal The proposal to get the sell token and sell amount for.
-   * @return token The IERC20 sell token.
-   * @return amount The value sell amount.
+   * @return The IERC20 sell token.
+   * @return The value sell amount.
    */
   function getSellTokenAndSellAmount(ExchangeProposal memory proposal)
     private
@@ -537,8 +537,8 @@ contract GrandaMento is
    * involved in a single exchange.
    * @dev Reverts if there is no explicit exchange limit for the stable token.
    * @param stableTokenRegistryId The string registry ID for the stable token.
-   * @return minimum Minimum exchange amount.
-   * @return maximum Maximum exchange amount.
+   * @return Minimum exchange amount.
+   * @return Maximum exchange amount.
    */
   function getStableTokenExchangeLimits(string memory stableTokenRegistryId)
     public

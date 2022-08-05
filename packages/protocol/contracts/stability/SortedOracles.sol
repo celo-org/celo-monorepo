@@ -56,10 +56,10 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return storage Storage version of the contract.
-   * @return major Major version of the contract.
-   * @return minor Minor version of the contract.
-   * @return patch Patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 2, 1);
@@ -168,7 +168,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @notice Check if last report is expired.
    * @param token The address of the token for which the CELO exchange rate is being reported.
    * @return isExpired
-   * @return address The address of the last report.
+   * @return The address of the last report.
    */
   function isOldestReportExpired(address token) public view returns (bool, address) {
     require(token != address(0));
@@ -237,7 +237,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Returns the median rate.
    * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @return median The median exchange rate for `token`.
+   * @return The median exchange rate for `token`.
    * @return fixidity
    */
   function medianRate(address token) external view returns (uint256, uint256) {

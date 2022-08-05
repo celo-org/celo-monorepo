@@ -197,10 +197,10 @@ contract Governance is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return storage Storage version of the contract.
-   * @return major Major version of the contract.
-   * @return minor Minor version of the contract.
-   * @return patch Patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 2, 1, 1);
@@ -494,8 +494,8 @@ contract Governance is
   /**
    * @notice Requires a proposal is dequeued and removes it if expired.
    * @param proposalId The ID of the proposal.
-   * @return storage The proposal storage struct corresponding to `proposalId`.
-   * @return stage The proposal stage corresponding to `proposalId`.
+   * @return The proposal storage struct corresponding to `proposalId`.
+   * @return The proposal stage corresponding to `proposalId`.
    */
   function requireDequeuedAndDeleteExpired(uint256 proposalId, uint256 index)
     private
@@ -946,8 +946,8 @@ contract Governance is
    * @param account The address of the account to get the record for.
    * @param index The index in `dequeued`.
    * @return The corresponding proposal ID, vote value, and weight.
-   * @return vote The corresponding vote value.
-   * @return weight The corresponding weight.
+   * @return The corresponding vote value.
+   * @return The corresponding weight.
    */
   function getVoteRecord(address account, uint256 index)
     external
@@ -998,8 +998,8 @@ contract Governance is
   /**
    * @notice Returns the ID of the proposal upvoted by `account` and the weight of that upvote.
    * @param account The address of the account.
-   * @return proposalID The ID of the proposal upvoted by `account`.
-   * @return weight The weight of that upvote.
+   * @return The ID of the proposal upvoted by `account`.
+   * @return The weight of that upvote.
    */
   function getUpvoteRecord(address account) external view returns (uint256, uint256) {
     UpvoteRecord memory upvoteRecord = voters[account].upvote;
@@ -1049,9 +1049,9 @@ contract Governance is
   /**
    * @notice Gets information about a hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return approved Hotfix approved.
-   * @return executed Hotfix executed.
-   * @return preparedEpoch Hotfix preparedEpoch.
+   * @return Hotfix approved.
+   * @return Hotfix executed.
+   * @return Hotfix preparedEpoch.
    */
   function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
     return (hotfixes[hash].approved, hotfixes[hash].executed, hotfixes[hash].preparedEpoch);

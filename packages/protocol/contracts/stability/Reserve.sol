@@ -86,10 +86,10 @@ contract Reserve is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return storage Storage version of the contract.
-   * @return major Major version of the contract.
-   * @return minor Minor version of the contract.
-   * @return patch Patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 2, 2);
@@ -427,8 +427,8 @@ contract Reserve is
 
   /**
    * @notice Returns the tobin tax, recomputing it if it's stale.
-   * @return numerator Tobin tax amount as a fraction.
-   * @return denominator Tobin tax amount as a fraction.
+   * @return The numerator - tobin tax amount as a fraction.
+   * @return The denominator - tobin tax amount as a fraction.
    */
   function getOrComputeTobinTax() external nonReentrant returns (uint256, uint256) {
     // solhint-disable-next-line not-rely-on-time

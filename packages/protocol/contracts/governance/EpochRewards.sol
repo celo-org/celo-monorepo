@@ -86,10 +86,10 @@ contract EpochRewards is
 
   /**
   * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return storage Storage version of the contract.
-  * @return major Major version of the contract.
-  * @return minor Minor version of the contract.
-  * @return patch Patch version of the contract.
+  * @return Storage version of the contract.
+  * @return Major version of the contract.
+  * @return Minor version of the contract.
+  * @return Patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 1, 0);
@@ -151,9 +151,9 @@ contract EpochRewards is
 
   /**
    * @notice Returns the target voting yield parameters.
-   * @return target The target factor for target voting yield.
-   * @return max The max factor for target voting yield.
-   * @return adjustment The adjustment factor for target voting yield.
+   * @return The target factor for target voting yield.
+   * @return The max factor for target voting yield.
+   * @return The adjustment factor for target voting yield.
    */
   function getTargetVotingYieldParameters() external view returns (uint256, uint256, uint256) {
     TargetVotingYieldParameters storage params = targetVotingYieldParams;

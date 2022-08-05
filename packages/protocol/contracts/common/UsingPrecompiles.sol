@@ -25,8 +25,8 @@ contract UsingPrecompiles {
    * @param bDenominator Denominator of exponentiated fraction
    * @param exponent exponent to raise b to
    * @param _decimals precision
-   * @return numerator Numerator of the computed quantity (not reduced).
-   * @return denominator Denominator of the computed quantity (not reduced).
+   * @return Numerator of the computed quantity (not reduced).
+   * @return Denominator of the computed quantity (not reduced).
    */
   function fractionMulExp(
     uint256 aNumerator,
