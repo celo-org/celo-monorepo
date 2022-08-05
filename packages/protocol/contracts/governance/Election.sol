@@ -932,9 +932,9 @@ contract Election is
   }
 
   /**
-   * @notice Returns lists of all validator groups and the number of votes they've received.
-   * @return lists Lists of all validator groups
-   * @return number Number of votes each validator group received.
+   * @notice Returns list of all validator groups and the number of votes they've received.
+   * @return List of all validator groups
+   * @return Number of votes each validator group received.
    */
   function getTotalVotesForEligibleValidatorGroups()
     external

@@ -377,8 +377,8 @@ contract Validators is
 
   /**
    * @notice Returns the parameters that govern how a validator's score is calculated.
-   * @return The exponent that goven how a validator's score is calculated.
-   * @return The adjustment speed goven how a validator's score is calculated.
+   * @return The exponent that governs how a validator's score is calculated.
+   * @return The adjustment speed that governs how a validator's score is calculated.
    */
   function getValidatorScoreParameters() external view returns (uint256, uint256) {
     return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());

@@ -293,7 +293,7 @@ contract LockedGold is
    * @param account The address of the account.
    * @param index The index of the pending withdrawal.
    * @return The value of the pending withdrawal.
-   * @return The timestamp of the pending withdrawal.   
+   * @return The timestamp of the pending withdrawal.
    */
   function getPendingWithdrawal(address account, uint256 index)
     external
