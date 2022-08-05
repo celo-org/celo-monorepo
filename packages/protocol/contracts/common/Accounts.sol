@@ -290,8 +290,8 @@ contract Accounts is
   /**
    * @notice Returns the full list of offchain storage roots for an account.
    * @param account The account whose storage roots to return.
-   * @return Bytes of list of storage root URLs.
-   * @return Length of list of storage root URLs.
+   * @return Concatenated storage root URLs.
+   * @return Lengths of storage root URLs.
    */
   function getOffchainStorageRoots(address account)
     external
