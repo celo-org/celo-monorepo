@@ -70,7 +70,10 @@ contract MetaTransactionWallet is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return storage Storage version of the contract.
+   * @return major Major version of the contract.
+   * @return minor Minor version of the contract.
+   * @return patch Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 1, 1);
@@ -260,7 +263,8 @@ contract MetaTransactionWallet is
    * @param values The CELO value to be sent with each transaction.
    * @param data The concatenated data to be sent in each transaction.
    * @param dataLengths The length of each transaction's data.
-   * @return The return values of all transactions appended as bytes and an array of the length
+   * @return All transactions appended as bytes
+   * @return An array of the length
    *         of each transaction output which will be 0 if a transaction had no output 
    */
   function executeTransactions(

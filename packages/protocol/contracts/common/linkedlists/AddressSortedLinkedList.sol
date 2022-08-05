@@ -88,7 +88,8 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Gets all elements from the doubly linked list.
-   * @return An unpacked list of elements from largest to smallest.
+   * @return keys Keys of nn unpacked list of elements from largest to smallest.
+   * @return values Values of an unpacked list of elements from largest to smallest.
    */
   function getElements(SortedLinkedList.List storage list)
     public

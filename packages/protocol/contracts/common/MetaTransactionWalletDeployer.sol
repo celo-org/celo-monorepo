@@ -8,8 +8,11 @@ contract MetaTransactionWalletDeployer is IMetaTransactionWalletDeployer, ICeloV
   event WalletDeployed(address indexed owner, address indexed wallet, address implementation);
 
   /**
-     * @notice Returns the storage, major, minor, and patch version of the contract.
-     * @return The storage, major, minor, and patch version of the contract.
+     * @notice Returns the storage, major, minor, and patch version of the contract.     
+     * @return storage Storage version of the contract.
+     * @return major Major version of the contract.
+     * @return minor Minor version of the contract.
+     * @return patch Patch version of the contract.
      */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 0, 1);

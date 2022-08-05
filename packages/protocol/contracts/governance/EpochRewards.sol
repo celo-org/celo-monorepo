@@ -86,7 +86,10 @@ contract EpochRewards is
 
   /**
   * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return The storage, major, minor, and patch version of the contract.
+  * @return storage Storage version of the contract.
+  * @return major Major version of the contract.
+  * @return minor Minor version of the contract.
+  * @return patch Patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 1, 0);
@@ -148,7 +151,9 @@ contract EpochRewards is
 
   /**
    * @notice Returns the target voting yield parameters.
-   * @return The target, max, and adjustment factor for target voting yield.
+   * @return target The target factor for target voting yield.
+   * @return max The max factor for target voting yield.
+   * @return adjustment The adjustment factor for target voting yield.
    */
   function getTargetVotingYieldParameters() external view returns (uint256, uint256, uint256) {
     TargetVotingYieldParameters storage params = targetVotingYieldParams;
@@ -157,7 +162,9 @@ contract EpochRewards is
 
   /**
    * @notice Returns the rewards multiplier parameters.
-   * @return The max multiplier and under/over spend adjustment factors.
+   * @return max The max multiplier.
+   * @return under The under spend adjustment factors.
+   * @return over The over spend adjustment factors.
    */
   function getRewardsMultiplierParameters() external view returns (uint256, uint256, uint256) {
     RewardsMultiplierParameters storage params = rewardsMultiplierParams;
@@ -514,8 +521,10 @@ contract EpochRewards is
 
   /**
    * @notice Calculates the per validator epoch payment and the total rewards to voters.
-   * @return The per validator epoch reward, the total rewards to voters, the total community
-   * reward, and the total carbon offsetting partner reward.
+   * @return epochReward The per validator epoch reward.
+   * @return voterReward The total rewards to voters
+   * @return comunityReward The total community reward
+   * @return partnerReward The total carbon offsetting partner reward.
    */
   function calculateTargetEpochRewards()
     external

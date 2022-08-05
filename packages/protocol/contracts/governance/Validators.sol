@@ -160,7 +160,10 @@ contract Validators is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return storage Storage version of the contract.
+   * @return major Major version of the contract.
+   * @return minor Minor version of the contract.
+   * @return patch Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 2, 0, 3);
@@ -374,7 +377,8 @@ contract Validators is
 
   /**
    * @notice Returns the parameters that govern how a validator's score is calculated.
-   * @return The parameters that goven how a validator's score is calculated.
+   * @return exponent The exponent that goven how a validator's score is calculated.
+   * @return adjustment The adjustment speed goven how a validator's score is calculated.
    */
   function getValidatorScoreParameters() external view returns (uint256, uint256) {
     return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
@@ -383,7 +387,10 @@ contract Validators is
   /**
    * @notice Returns the group membership history of a validator.
    * @param account The validator whose membership history to return.
-   * @return The group membership history of a validator.
+   * @return epochs The epochs of a validator.
+   * @return groups The membership groups of a validator.
+   * @return timestamp The last removed from group timestamp of a validator.
+   * @return tail The tail of a validator.
    */
   function getMembershipHistory(address account)
     external
@@ -989,7 +996,13 @@ contract Validators is
   /**
    * @notice Returns validator group information.
    * @param account The account that registered the validator group.
-   * @return The unpacked validator group struct.
+   * @return keys The Keys.
+   * @return commision The commision.
+   * @return nextCommision The next commision.
+   * @return nextCommisionBlock The next commision block.
+   * @return size The Size history.
+   * @return multiplier The multiplier.
+   * @return lastSlashed The last slashed.
    */
   function getValidatorGroup(address account)
     external
@@ -1065,7 +1078,8 @@ contract Validators is
 
   /**
    * @notice Returns the Locked Gold requirements for validators.
-   * @return The Locked Gold requirements for validators.
+   * @return value The Locked Gold value.
+   * @return duration The Locked Gold duration.
    */
   function getValidatorLockedGoldRequirements() external view returns (uint256, uint256) {
     return (validatorLockedGoldRequirements.value, validatorLockedGoldRequirements.duration);
@@ -1073,7 +1087,8 @@ contract Validators is
 
   /**
    * @notice Returns the Locked Gold requirements for validator groups.
-   * @return The Locked Gold requirements for validator groups.
+   * @return value The Locked Gold value.
+   * @return duration The Locked Gold duration.
    */
   function getGroupLockedGoldRequirements() external view returns (uint256, uint256) {
     return (groupLockedGoldRequirements.value, groupLockedGoldRequirements.duration);

@@ -219,7 +219,9 @@ library SortedLinkedListWithMedian {
   /**
    * @notice Gets all elements from the doubly linked list.
    * @param list A storage pointer to the underlying list.
-   * @return An unpacked list of elements from largest to smallest.
+   * @return keys Keys of nn unpacked list of elements from largest to smallest.
+   * @return values Values of an unpacked list of elements from largest to smallest.
+   * @return relations Relations of an unpacked list of elements from largest to smallest.
    */
   function getElements(List storage list)
     internal
