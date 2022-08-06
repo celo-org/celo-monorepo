@@ -133,8 +133,6 @@ export const proposalToJSON = async (
     await blockExplorer.updateContractDetailsMapping(stripProxy(name), address)
   }
 
-  console.log(proposal)
-
   if (registryAdditions) {
     // Update the registry mapping with registry additions prior to processing the proposal.
     for (const nameStr of Object.keys(registryAdditions)) {
