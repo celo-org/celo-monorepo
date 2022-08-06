@@ -27,8 +27,8 @@ export const signatureToAbiDefinition = (fnSignature: string): ABIDefinition => 
   if (matches == null) {
     throw new Error(`${fnSignature} is malformed`)
   }
-  const method = matches.groups!['method']
-  const args = matches.groups!['args'].split(',')
+  const method = matches.groups!.method
+  const args = matches.groups!.args.split(',')
 
   return {
     name: method,
