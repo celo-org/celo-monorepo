@@ -61,7 +61,7 @@ export class BlockExplorer {
   constructor(private kit: ContractKit, readonly contractDetails: ContractDetails[]) {
     this.addressMapping = mapFromPairs(
       contractDetails
-        .filter((cd) => /Proxy/.exec(cd.name) == null)
+        .filter((cd) => /Proxy$/.exec(cd.name) == null)
         .map((cd) => [cd.address, getContractMappingFromDetails(cd)])
     )
   }
