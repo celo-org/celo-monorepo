@@ -171,7 +171,7 @@ export class BlockExplorer {
     const selector = input.slice(0, 10)
     const { contract: contractName, abi: matchedAbi } = this.getContractMethodAbi(address, selector)
 
-    if (matchedAbi == undefined || contractName == undefined) {
+    if (matchedAbi === undefined || contractName === undefined) {
       return null
     }
 
@@ -181,7 +181,7 @@ export class BlockExplorer {
   tryParseAsExternalContractCall(address: string, input: string): CallDetails | null {
     const selector = input.slice(0, 10)
     const matchedAbi = this.getKnownFunction(selector)
-    if (matchedAbi == undefined) {
+    if (matchedAbi === undefined) {
       return null
     }
 
