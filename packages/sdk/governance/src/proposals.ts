@@ -153,7 +153,7 @@ export const proposalToJSON = async (
     }
 
     debug(`decoding tx ${JSON.stringify(tx)}`)
-    let parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
+    const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${JSON.stringify(tx)} with block explorer`)
     }
@@ -331,7 +331,7 @@ export class ProposalBuilder {
 
     const contract = await this.kit._web3Contracts.getContract(tx.contract, address)
     const methodName = tx.function
-    let method = (contract.methods as Contract['methods'])[methodName]
+    const method = (contract.methods as Contract['methods'])[methodName]
     if (!method) {
       throw new Error(`Method ${methodName} not found on ${tx.contract}`)
     }
