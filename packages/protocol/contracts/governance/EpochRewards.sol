@@ -163,8 +163,8 @@ contract EpochRewards is
   /**
    * @notice Returns the rewards multiplier parameters.
    * @return The max multiplier.
-   * @return The under spend adjustment factors.
-   * @return The over spend adjustment factors.
+   * @return The underspend adjustment factors.
+   * @return The overspend adjustment factors.
    */
   function getRewardsMultiplierParameters() external view returns (uint256, uint256, uint256) {
     RewardsMultiplierParameters storage params = rewardsMultiplierParams;
@@ -522,8 +522,8 @@ contract EpochRewards is
   /**
    * @notice Calculates the per validator epoch payment and the total rewards to voters.
    * @return The per validator epoch reward.
-   * @return The total rewards to voters
-   * @return The total community reward
+   * @return The total rewards to voters.
+   * @return The total community reward.
    * @return The total carbon offsetting partner reward.
    */
   function calculateTargetEpochRewards()
