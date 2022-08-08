@@ -151,9 +151,9 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
 
   /**
    * @notice Query minimum client version.   
-   * @return Return major version numbers.
-   * @return Return minor version numbers.
-   * @return Return patch version numbers.
+   * @return Major version number.
+   * @return Minor version number.
+   * @return Patch version number.
    */
   function getMinimumClientVersion()
     external
