@@ -21,7 +21,7 @@ export enum CeloContract {
   MetaTransactionWallet = 'MetaTransactionWallet',
   MetaTransactionWalletDeployer = 'MetaTransactionWalletDeployer',
   MultiSig = 'MultiSig',
-  OdisBalance = 'OdisBalance',
+  OdisPayments = 'OdisPayments',
   Random = 'Random',
   Registry = 'Registry',
   Reserve = 'Reserve',

@@ -19,7 +19,7 @@ import { startSigner } from '../../src/server'
 const {
   ContractRetrieval,
   createMockContractKit,
-  createMockOdisBalance,
+  createMockOdisPayments,
   createMockWeb3,
   getPnpQuotaRequest,
   getPnpQuotaRequestAuthorization,
@@ -28,10 +28,10 @@ const { PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
 
 const testBlockNumber = 1000000
 
-const mockOdisBalanceTotalPaidCUSD = jest.fn<BigNumber, []>()
+const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
 const mockContractKit = createMockContractKit(
   {
-    [ContractRetrieval.getOdisBalance]: createMockOdisBalance(mockOdisBalanceTotalPaidCUSD),
+    [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
   },
   createMockWeb3(5, testBlockNumber)
 )
@@ -62,7 +62,7 @@ describe('pnp', () => {
     _config.api.phoneNumberPrivacy.enabled = true
     db = await initDatabase(_config)
     app = startSigner(_config, db, keyProvider)
-    mockOdisBalanceTotalPaidCUSD.mockReset()
+    mockOdisPaymentsTotalPaidCUSD.mockReset()
   })
 
   afterEach(async () => {
@@ -105,7 +105,7 @@ describe('pnp', () => {
       ]
       cusdQuotaParams.forEach(([cusdWei, expectedTotalQuota]) => {
         it(`Should get totalQuota=${expectedTotalQuota} for ${cusdWei.toString()} cUSD (wei)`, async () => {
-          mockOdisBalanceTotalPaidCUSD.mockReturnValue(cusdWei)
+          mockOdisPaymentsTotalPaidCUSD.mockReturnValue(cusdWei)
           const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
           const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
           const res = await sendPnpQuotaRequest(req, authorization)
@@ -123,7 +123,7 @@ describe('pnp', () => {
       })
 
       it('Should return warning if on-chain state cannot be fetched', async () => {
-        mockOdisBalanceTotalPaidCUSD.mockImplementation(() => {
+        mockOdisPaymentsTotalPaidCUSD.mockImplementation(() => {
           throw new Error('dummy error')
         })
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
@@ -145,7 +145,7 @@ describe('pnp', () => {
     describe('endpoint functionality', () => {
       // Use values already tested in quota logic tests, [onChainBalance, expectedQuota]
       beforeEach(async () => {
-        mockOdisBalanceTotalPaidCUSD.mockReturnValue(onChainBalance)
+        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainBalance)
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {

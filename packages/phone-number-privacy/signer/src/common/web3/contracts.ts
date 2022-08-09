@@ -200,7 +200,7 @@ export async function getWalletAddress(
   )
 }
 
-export async function getOnChainOdisBalance(
+export async function getOnChainOdisPayments(
   kit: ContractKit,
   logger: Logger,
   account: string,
@@ -209,7 +209,7 @@ export async function getOnChainOdisBalance(
   return meter(
     retryAsyncWithBackOffAndTimeout,
     [
-      async () => await (await kit.contracts.getOdisBalance()).totalPaidCUSD(account),
+      async () => await (await kit.contracts.getOdisPayments()).totalPaidCUSD(account),
       RETRY_COUNT,
       [],
       RETRY_DELAY_IN_MS,
@@ -222,6 +222,6 @@ export async function getOnChainOdisBalance(
       throw err
     },
     Histograms.getRemainingQueryCountInstrumentation,
-    ['getOnChainOdisBalance', endpoint]
+    ['getOnChainOdisPayments', endpoint]
   )
 }

@@ -26,7 +26,7 @@ export function createMockAccounts(walletAddress: string) {
 
 // Take in jest.Mock to enable individual tests to spy on function calls
 // and more easily set return values
-export function createMockOdisBalance(totalPaidCUSDFunc: jest.Mock<BigNumber, []>) {
+export function createMockOdisPayments(totalPaidCUSDFunc: jest.Mock<BigNumber, []>) {
   return {
     totalPaidCUSD: totalPaidCUSDFunc,
   }
@@ -66,7 +66,7 @@ export enum ContractRetrieval {
   getStableToken = 'getStableToken',
   getGoldToken = 'getGoldToken',
   getAccounts = 'getAccounts',
-  getOdisBalance = 'getOdisBalance',
+  getOdisPayments = 'getOdisPayments',
 }
 
 export function createMockWeb3(txCount: number, blockNumber: number) {

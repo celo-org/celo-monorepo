@@ -129,7 +129,7 @@ const DefaultConstitution = {
     addSlasher: 0.9,
     removeSlasher: 0.8,
   },
-  OdisBalance: {
+  OdisPayments: {
     default: 0.6,
   },
   // Values for all proxied contracts.

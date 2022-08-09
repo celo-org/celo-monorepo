@@ -1,7 +1,7 @@
 import { PnpQuotaRequest, SignMessageRequest } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import { QuotaService } from '../../common/quota'
-import { getOnChainOdisBalance } from '../../common/web3/contracts'
+import { getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
 import { PnpSession } from '../session'
 import { PnpQuotaService } from './quota'
@@ -11,14 +11,14 @@ export class OnChainPnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
   /*
    * Calculates how many queries the caller has unlocked based on the total
-   * amount of funds paid to the OdisBalance.sol contract on-chain.
+   * amount of funds paid to the OdisPayments.sol contract on-chain.
    */
   protected async getTotalQuotaWithoutMeter(
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>
   ): Promise<number> {
     const { queryPriceInCUSD } = config.quota
     const { account } = session.request.body
-    const totalPaidInWei = await getOnChainOdisBalance(
+    const totalPaidInWei = await getOnChainOdisPayments(
       this.kit,
       session.logger,
       account,

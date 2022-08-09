@@ -24,7 +24,7 @@ import { newLockedGold } from './generated/LockedGold'
 import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
 import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
 import { newMultiSig } from './generated/MultiSig'
-import { newOdisBalance } from './generated/OdisBalance'
+import { newOdisPayments } from './generated/OdisPayments'
 import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
@@ -60,7 +60,7 @@ export const ContractFactories = {
   [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
   [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
   [CeloContract.MultiSig]: newMultiSig,
-  [CeloContract.OdisBalance]: newOdisBalance,
+  [CeloContract.OdisPayments]: newOdisPayments,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
@@ -160,8 +160,8 @@ export class Web3ContractCache {
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)
   }
-  getOdisBalance() {
-    return this.getContract(CeloContract.OdisBalance)
+  getOdisPayments() {
+    return this.getContract(CeloContract.OdisPayments)
   }
   getRandom() {
     return this.getContract(CeloContract.Random)

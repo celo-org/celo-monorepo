@@ -1,14 +1,14 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
-import { OdisBalanceInstance } from 'types'
+import { OdisPaymentsInstance } from 'types'
 
 const initializeArgs = async () => {
   return []
 }
 
-module.exports = deploymentForCoreContract<OdisBalanceInstance>(
+module.exports = deploymentForCoreContract<OdisPaymentsInstance>(
   web3,
   artifacts,
-  CeloContractName.OdisBalance,
+  CeloContractName.OdisPayments,
   initializeArgs
 )

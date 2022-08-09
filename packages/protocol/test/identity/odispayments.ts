@@ -10,22 +10,22 @@ import { fixed1 } from '@celo/utils/src/fixidity'
 import {
   FreezerContract,
   FreezerInstance,
-  OdisBalanceContract,
-  OdisBalanceInstance,
+  OdisPaymentsContract,
+  OdisPaymentsInstance,
   RegistryInstance,
   StableTokenContract,
   StableTokenInstance,
 } from 'types'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
-const OdisBalance: OdisBalanceContract = artifacts.require('OdisBalance')
+const OdisPayments: OdisPaymentsContract = artifacts.require('OdisPayments')
 const StableTokenCUSD: StableTokenContract = artifacts.require('StableToken')
 
 const SECONDS_IN_A_DAY = 60 * 60 * 24
 
-contract('OdisBalance', (accounts: string[]) => {
+contract('OdisPayments', (accounts: string[]) => {
   let freezer: FreezerInstance
-  let odisBalance: OdisBalanceInstance
+  let odisPayments: OdisPaymentsInstance
   let registry: RegistryInstance
   let stableTokenCUSD: StableTokenInstance
 
@@ -43,9 +43,9 @@ contract('OdisBalance', (accounts: string[]) => {
   })
 
   beforeEach(async () => {
-    odisBalance = await OdisBalance.new(true, { from: owner })
-    await registry.setAddressFor(CeloContractName.OdisBalance, odisBalance.address)
-    await odisBalance.initialize()
+    odisPayments = await OdisPayments.new(true, { from: owner })
+    await registry.setAddressFor(CeloContractName.OdisPayments, odisPayments.address)
+    await odisPayments.initialize()
 
     stableTokenCUSD = await StableTokenCUSD.new(true, { from: owner })
     await registry.setAddressFor(CeloContractName.StableToken, stableTokenCUSD.address)
@@ -70,12 +70,12 @@ contract('OdisBalance', (accounts: string[]) => {
 
   describe('#initialize()', () => {
     it('should have set the owner', async () => {
-      const actualOwner: string = await odisBalance.owner()
+      const actualOwner: string = await odisPayments.owner()
       assert.equal(actualOwner, owner)
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(odisBalance.initialize())
+      await assertRevert(odisPayments.initialize())
     })
   })
 
@@ -92,12 +92,12 @@ contract('OdisBalance', (accounts: string[]) => {
         'cusdSender balance'
       )
       assertEqualBN(
-        await stableTokenCUSD.balanceOf(odisBalance.address),
+        await stableTokenCUSD.balanceOf(odisPayments.address),
         valueSent,
-        'odisBalance.address balance'
+        'odisPayments.address balance'
       )
       assertEqualBN(
-        await odisBalance.totalPaidCUSD(odisPaymentReceiver),
+        await odisPayments.totalPaidCUSD(odisPaymentReceiver),
         valueSent,
         'odisPaymentReceiver balance'
       )
@@ -107,26 +107,28 @@ contract('OdisBalance', (accounts: string[]) => {
     const receiver = accounts[2]
 
     beforeEach(async () => {
-      await stableTokenCUSD.approve(odisBalance.address, valueApprovedForTransfer, { from: sender })
+      await stableTokenCUSD.approve(odisPayments.address, valueApprovedForTransfer, {
+        from: sender,
+      })
       assertEqualBN(await stableTokenCUSD.balanceOf(sender), startingBalanceCUSD)
     })
 
     it('should allow sender to make a payment on their behalf', async () => {
-      await odisBalance.payInCUSD(sender, valueApprovedForTransfer, { from: sender })
+      await odisPayments.payInCUSD(sender, valueApprovedForTransfer, { from: sender })
       await checkStateCUSD(sender, sender, startingBalanceCUSD, valueApprovedForTransfer)
     })
 
     it('should allow sender to make a payment for another account', async () => {
-      await odisBalance.payInCUSD(receiver, valueApprovedForTransfer, { from: sender })
+      await odisPayments.payInCUSD(receiver, valueApprovedForTransfer, { from: sender })
       await checkStateCUSD(sender, receiver, startingBalanceCUSD, valueApprovedForTransfer)
     })
 
-    it('should emit the BalanceIncremented event', async () => {
-      const receipt = await odisBalance.payInCUSD(receiver, valueApprovedForTransfer, {
+    it('should emit the PaymentMade event', async () => {
+      const receipt = await odisPayments.payInCUSD(receiver, valueApprovedForTransfer, {
         from: sender,
       })
       assertLogMatches2(receipt.logs[0], {
-        event: 'BalanceIncremented',
+        event: 'PaymentMade',
         args: {
           account: receiver,
           valueInCUSD: valueApprovedForTransfer,
@@ -136,9 +138,9 @@ contract('OdisBalance', (accounts: string[]) => {
 
     it('should revert if transfer fails', async () => {
       await assertRevert(
-        odisBalance.payInCUSD(sender, valueApprovedForTransfer + 1, { from: sender })
+        odisPayments.payInCUSD(sender, valueApprovedForTransfer + 1, { from: sender })
       )
-      assertEqualBN(await odisBalance.totalPaidCUSD(sender), 0)
+      assertEqualBN(await odisPayments.totalPaidCUSD(sender), 0)
     })
   })
 })

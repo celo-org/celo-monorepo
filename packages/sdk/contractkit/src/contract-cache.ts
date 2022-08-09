@@ -24,7 +24,7 @@ import { LockedGoldWrapper } from './wrappers/LockedGold'
 import { MetaTransactionWalletWrapper } from './wrappers/MetaTransactionWallet'
 import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransactionWalletDeployer'
 import { MultiSigWrapper } from './wrappers/MultiSig'
-import { OdisBalanceWrapper } from './wrappers/OdisBalance'
+import { OdisPaymentsWrapper } from './wrappers/OdisPayments'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenRegistryWrapper } from './wrappers/StableTokenRegistry'
@@ -45,7 +45,7 @@ const WrapperFactories = {
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
   [CeloContract.GoldToken]: GoldTokenWrapper,
   [CeloContract.GrandaMento]: GrandaMentoWrapper,
-  [CeloContract.OdisBalance]: OdisBalanceWrapper,
+  [CeloContract.OdisPayments]: OdisPaymentsWrapper,
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
   [CeloContract.MetaTransactionWallet]: MetaTransactionWalletWrapper,
@@ -105,7 +105,7 @@ interface WrapperCacheMap {
   [CeloContract.MetaTransactionWallet]?: MetaTransactionWalletWrapper
   [CeloContract.MetaTransactionWalletDeployer]?: MetaTransactionWalletDeployerWrapper
   [CeloContract.MultiSig]?: MultiSigWrapper
-  [CeloContract.OdisBalance]?: OdisBalanceWrapper
+  [CeloContract.OdisPayments]?: OdisPaymentsWrapper
   // [CeloContract.Random]?: RandomWrapper,
   // [CeloContract.Registry]?: RegistryWrapper,
   [CeloContract.Reserve]?: ReserveWrapper
@@ -196,8 +196,8 @@ export class WrapperCache implements ContractCacheType {
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)
   }
-  getOdisBalance() {
-    return this.getContract(CeloContract.OdisBalance)
+  getOdisPayments() {
+    return this.getContract(CeloContract.OdisPayments)
   }
   getReserve() {
     return this.getContract(CeloContract.Reserve)

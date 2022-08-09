@@ -1,9 +1,9 @@
-import { OdisBalance } from '../generated/OdisBalance'
+import { OdisPayments } from '../generated/OdisPayments'
 import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'
 
-export class OdisBalanceWrapper extends BaseWrapper<OdisBalance> {
+export class OdisPaymentsWrapper extends BaseWrapper<OdisPayments> {
   totalPaidCUSD = proxyCall(this.contract.methods.totalPaidCUSD, undefined, valueToBigNumber)
   payInCUSD = proxySend(this.connection, this.contract.methods.payInCUSD)
 }
 
-export type OdisBalanceWrapperType = OdisBalanceWrapper
+export type OdisPaymentsWrapperType = OdisPaymentsWrapper

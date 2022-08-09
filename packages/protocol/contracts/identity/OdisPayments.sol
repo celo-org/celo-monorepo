@@ -5,7 +5,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import "./interfaces/IOdisBalance.sol";
+import "./interfaces/IOdisPayments.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/Initializable.sol";
@@ -15,8 +15,8 @@ import "../common/libraries/ReentrancyGuard.sol";
 /**
  * @title Stores balance to be used for ODIS quota calculation.
  */
-contract OdisBalance is
-  IOdisBalance,
+contract OdisPayments is
+  IOdisPayments,
   ICeloVersionedContract,
   ReentrancyGuard,
   Ownable,
@@ -26,7 +26,7 @@ contract OdisBalance is
   using SafeMath for uint256;
   using SafeERC20 for IERC20;
 
-  event BalanceIncremented(address indexed account, uint256 indexed valueInCUSD);
+  event PaymentMade(address indexed account, uint256 indexed valueInCUSD);
 
   // Store amount sent (all time) from account to this contract.
   // Values in totalPaidCUSD should only ever be incremented, since ODIS relies
@@ -67,6 +67,6 @@ contract OdisBalance is
       value
     );
     totalPaidCUSD[account] = totalPaidCUSD[account].add(value);
-    emit BalanceIncremented(account, value);
+    emit PaymentMade(account, value);
   }
 }
