@@ -2594,7 +2594,7 @@ contract('Governance', (accounts: string[]) => {
   })
 
   describe('#dequeueProposalsIfReady()', () => {
-    it('should not update lastDequed when no queued proposal(s)', async () => {
+    it('should not update lastDequeue when there are no queued proposals', async () => {
       const originalLastDequeue = await governance.lastDequeue()
       await timeTravel(dequeueFrequency, web3)
       await governance.dequeueProposalsIfReady()
