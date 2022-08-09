@@ -970,7 +970,9 @@ contract('Governance', (accounts: string[]) => {
     })
 
     describe('when it has been more than dequeueFrequency since the last dequeue', () => {
+      let originalLastDequeue: BigNumber
       beforeEach(async () => {
+        originalLastDequeue = await governance.lastDequeue()
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -985,7 +987,6 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should dequeue queued proposal(s)', async () => {
-        const originalLastDequeue = await governance.lastDequeue()
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -999,11 +1000,11 @@ contract('Governance', (accounts: string[]) => {
         assert.isFalse(await governance.isQueued(proposalId))
         assert.equal((await governance.getQueueLength()).toNumber(), 1)
         assert.equal((await governance.dequeued(0)).toNumber(), proposalId)
-        assert.isTrue(originalLastDequeue.toNumber() < (await governance.lastDequeue()).toNumber())
+        assert.isBelow(originalLastDequeue.toNumber(), (await governance.lastDequeue()).toNumber())
       })
     })
 
-    it('should not update lastDequed when no queued proposal(s)', async () => {
+    it('should not update lastDequeue when no queued proposal(s)', async () => {
       const originalLastDequeue = await governance.lastDequeue()
       await timeTravel(dequeueFrequency, web3)
 
@@ -1149,7 +1150,9 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when it has been more than dequeueFrequency since the last dequeue', () => {
       const upvotedProposalId = 2
+      let originalLastDequeue: BigNumber
       beforeEach(async () => {
+        originalLastDequeue = await governance.lastDequeue()
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -1164,7 +1167,6 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should dequeue queued proposal(s)', async () => {
-        const originalLastDequeue = await governance.lastDequeue()
         const queueLength = await governance.getQueueLength()
         await governance.upvote(upvotedProposalId, 0, 0)
         assert.isFalse(await governance.isQueued(proposalId))
@@ -1173,7 +1175,7 @@ contract('Governance', (accounts: string[]) => {
           queueLength.minus(concurrentProposals).toNumber()
         )
         assertEqualBN(await governance.dequeued(0), proposalId)
-        assert.isTrue(originalLastDequeue.toNumber() < (await governance.lastDequeue()).toNumber())
+        assert.isBelow(originalLastDequeue.toNumber(), (await governance.lastDequeue()).toNumber())
       })
 
       it('should revert when upvoting a proposal that will be dequeued', async () => {
@@ -1332,17 +1334,18 @@ contract('Governance', (accounts: string[]) => {
     })
 
     describe('when it has been more than dequeueFrequency since the last dequeue', () => {
+      let originalLastDequeue: BigNumber
       beforeEach(async () => {
+        originalLastDequeue = await governance.lastDequeue()
         await timeTravel(dequeueFrequency, web3)
       })
 
       it('should dequeue the proposal', async () => {
-        const originalLastDequeue = await governance.lastDequeue()
         await governance.revokeUpvote(0, 0)
         assert.isFalse(await governance.isQueued(proposalId))
         assert.equal((await governance.getQueueLength()).toNumber(), 0)
         assertEqualBN(await governance.dequeued(0), proposalId)
-        assert.isTrue(originalLastDequeue.toNumber() < (await governance.lastDequeue()).toNumber())
+        assert.isBelow(originalLastDequeue.toNumber(), (await governance.lastDequeue()).toNumber())
       })
 
       it('should mark the account as not having upvoted a proposal', async () => {
@@ -2626,7 +2629,7 @@ contract('Governance', (accounts: string[]) => {
         assert.isTrue((await governance.lastDequeue()).toNumber() > originalLastDequeue.toNumber())
       })
 
-      it('should not update lastDequed when only expired proposal queued', async () => {
+      it('should not update lastDequeue when only expired proposal queued', async () => {
         const originalLastDequeue = await governance.lastDequeue()
 
         await timeTravel(queueExpiry, web3)
