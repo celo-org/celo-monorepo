@@ -1,8 +1,10 @@
-import { Signature } from '@celo/utils/lib/signatureUtils'
+import { serializeSignature, Signature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
 import Web3 from 'web3'
+import { PnpQuotaRequest } from '../interfaces'
+import { genSessionID } from '../utils/logger'
 
 export function createMockAttestation(completed: number, total: number) {
   return {
@@ -10,9 +12,9 @@ export function createMockAttestation(completed: number, total: number) {
   }
 }
 
-export function createMockToken(balance: BigNumber) {
+export function createMockToken(balanceOf: jest.Mock<BigNumber, []>) {
   return {
-    balanceOf: jest.fn(() => balance),
+    balanceOf,
   }
 }
 
@@ -22,8 +24,16 @@ export function createMockAccounts(walletAddress: string) {
   }
 }
 
+// Take in jest.Mock to enable individual tests to spy on function calls
+// and more easily set return values
+export function createMockOdisPayments(totalPaidCUSDFunc: jest.Mock<BigNumber, []>) {
+  return {
+    totalPaidCUSD: totalPaidCUSDFunc,
+  }
+}
+
 export function createMockContractKit(
-  c: { [contractName in ContractRetrieval]: any },
+  c: { [contractName in ContractRetrieval]?: any },
   mockWeb3?: any
 ) {
   const contracts: any = {}
@@ -45,6 +55,9 @@ export function createMockConnection(mockWeb3?: any) {
   return {
     web3: mockWeb3,
     getTransactionCount: jest.fn(() => mockWeb3.eth.getTransactionCount()),
+    getBlockNumber: jest.fn(() => {
+      return mockWeb3.eth.getBlockNumber()
+    }),
   }
 }
 
@@ -53,12 +66,14 @@ export enum ContractRetrieval {
   getStableToken = 'getStableToken',
   getGoldToken = 'getGoldToken',
   getAccounts = 'getAccounts',
+  getOdisPayments = 'getOdisPayments',
 }
 
-export function createMockWeb3(txCount: number) {
+export function createMockWeb3(txCount: number, blockNumber: number) {
   return {
     eth: {
       getTransactionCount: jest.fn(() => txCount),
+      getBlockNumber: jest.fn(() => blockNumber),
     },
   }
 }
@@ -97,4 +112,16 @@ export async function registerWalletAddress(
   await accounts
     .setWalletAddress(walletAddress, pop as Signature)
     .sendAndWaitForReceipt({ from: accountAddress } as any)
+}
+
+export function getPnpQuotaRequest(account: string, hashedPhoneNumber?: string) {
+  return {
+    account,
+    hashedPhoneNumber,
+    sessionID: genSessionID(),
+  } as PnpQuotaRequest
+}
+
+export function getPnpQuotaRequestAuthorization(req: PnpQuotaRequest, account: string, pk: string) {
+  return serializeSignature(signMessage(JSON.stringify(req), pk, account))
 }

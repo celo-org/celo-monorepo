@@ -24,10 +24,10 @@ export async function meter<T extends any[], U>(
   inFunction: InFunction<T, U>,
   params: T,
   onError: (err: any) => U,
-  prometheus: Histogram<'codeSegment'>,
-  name: string
+  prometheus: Histogram<string>,
+  labels: string[]
 ): Promise<U> {
-  const _meter = prometheus.labels(name).startTimer()
+  const _meter = prometheus.labels(...labels).startTimer()
   return inFunction(...params)
     .catch(onError)
     .finally(_meter)
@@ -49,13 +49,14 @@ export async function getBlockNumber(kit: ContractKit): Promise<number> {
       throw err
     },
     Histograms.getBlindedSigInstrumentation,
-    'getBlockNumber'
+    ['getBlockNumber']
   )
 }
 
 export async function getTransactionCount(
   kit: ContractKit,
   logger: Logger,
+  endpoint: string,
   ...addresses: string[]
 ): Promise<number> {
   const _getTransactionCount = (...params: string[]) =>
@@ -86,7 +87,7 @@ export async function getTransactionCount(
       throw err
     },
     Histograms.getRemainingQueryCountInstrumentation,
-    'getTransactionCount'
+    ['getTransactionCount', endpoint]
   )
 }
 
@@ -94,6 +95,7 @@ export async function getStableTokenBalance(
   kit: ContractKit,
   stableToken: StableToken,
   logger: Logger,
+  endpoint: string,
   ...addresses: string[]
 ): Promise<BigNumber> {
   const _getStableTokenBalance = (...params: string[]) =>
@@ -127,13 +129,14 @@ export async function getStableTokenBalance(
       throw err
     },
     Histograms.getRemainingQueryCountInstrumentation,
-    'getStableTokenBalance'
+    ['getStableTokenBalance', endpoint]
   )
 }
 
 export async function getCeloBalance(
   kit: ContractKit,
   logger: Logger,
+  endpoint: string,
   ...addresses: string[]
 ): Promise<BigNumber> {
   const _getCeloBalance = (...params: string[]) =>
@@ -167,14 +170,15 @@ export async function getCeloBalance(
       throw err
     },
     Histograms.getRemainingQueryCountInstrumentation,
-    'getStableTokenBalance'
+    ['getStableTokenBalance', endpoint]
   )
 }
 
 export async function getWalletAddress(
   kit: ContractKit,
   logger: Logger,
-  account: string
+  account: string,
+  endpoint: string
 ): Promise<string> {
   return meter(
     retryAsyncWithBackOffAndTimeout,
@@ -187,11 +191,37 @@ export async function getWalletAddress(
       FULL_NODE_TIMEOUT_IN_MS,
     ],
     (err: any) => {
-      logger.error({ error: err, account }, 'failed to get wallet address for account')
+      logger.error({ err, account }, 'failed to get wallet address for account')
       Counters.blockchainErrors.labels(Labels.read).inc()
       return NULL_ADDRESS
     },
     Histograms.getRemainingQueryCountInstrumentation,
-    'getWalletAddress'
+    ['getWalletAddress', endpoint]
+  )
+}
+
+export async function getOnChainOdisPayments(
+  kit: ContractKit,
+  logger: Logger,
+  account: string,
+  endpoint: string
+): Promise<BigNumber> {
+  return meter(
+    retryAsyncWithBackOffAndTimeout,
+    [
+      async () => await (await kit.contracts.getOdisPayments()).totalPaidCUSD(account),
+      RETRY_COUNT,
+      [],
+      RETRY_DELAY_IN_MS,
+      undefined,
+      FULL_NODE_TIMEOUT_IN_MS,
+    ],
+    (err: any) => {
+      logger.error({ err, account }, 'failed to get on-chain odis balance for account')
+      Counters.blockchainErrors.labels(Labels.read).inc()
+      throw err
+    },
+    Histograms.getRemainingQueryCountInstrumentation,
+    ['getOnChainOdisPayments', endpoint]
   )
 }

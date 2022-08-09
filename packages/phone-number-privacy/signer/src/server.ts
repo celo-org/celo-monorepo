@@ -22,8 +22,8 @@ import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
-import { PnpQuotaService } from './pnp/services/quota'
 import { LegacyPnpQuotaService } from './pnp/services/quota.legacy'
+import { OnChainPnpQuotaService } from './pnp/services/quota.onchain'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -75,7 +75,7 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
 
   const kit = getContractKit(config)
 
-  const pnpQuotaService = new PnpQuotaService(db, kit)
+  const pnpQuotaService = new OnChainPnpQuotaService(db, kit)
   const legacyPnpQuotaService = new LegacyPnpQuotaService(db, kit)
   const domainQuotaService = new DomainQuotaService(db)
 

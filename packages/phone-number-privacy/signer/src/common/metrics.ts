@@ -108,7 +108,7 @@ export const Histograms = {
   getRemainingQueryCountInstrumentation: new Histogram({
     name: 'get_remaining_query_count_instrumentation',
     help: 'Histogram tracking latency of getRemainingQueryCount function by code segment',
-    labelNames: ['codeSegment'],
+    labelNames: ['codeSegment', 'endpoint'],
     buckets,
   }),
   dbOpsInstrumentation: new Histogram({
@@ -120,6 +120,7 @@ export const Histograms = {
   userRemainingQuotaAtRequest: new Histogram({
     name: 'user_remaining_quota_at_request',
     help: 'Histogram tracking remaining quota of users at time of request',
+    labelNames: ['endpoint'],
     buckets,
   }),
 }
