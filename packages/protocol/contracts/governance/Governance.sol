@@ -1046,6 +1046,7 @@ contract Governance is
     if (now >= lastDequeue.add(dequeueFrequency)) {
       uint256 numProposalsToDequeue = Math.min(concurrentProposals, queue.list.numElements);
       uint256[] memory dequeuedIds = queue.popN(numProposalsToDequeue);
+      bool wasAnyProposalDequeued = false;
       for (uint256 i = 0; i < numProposalsToDequeue; i = i.add(1)) {
         uint256 proposalId = dequeuedIds[i];
         Proposals.Proposal storage proposal = proposals[proposalId];
@@ -1068,9 +1069,12 @@ contract Governance is
         }
         // solhint-disable-next-line not-rely-on-time
         emit ProposalDequeued(proposalId, now);
+        wasAnyProposalDequeued = true;
       }
-      // solhint-disable-next-line not-rely-on-time
-      lastDequeue = now;
+      if (wasAnyProposalDequeued) {
+        // solhint-disable-next-line not-rely-on-time
+        lastDequeue = now;
+      }
     }
   }
 
