@@ -2616,7 +2616,7 @@ contract('Governance', (accounts: string[]) => {
         )
       })
 
-      it('should update lastDequed when proposal queued', async () => {
+      it('should update lastDequeue', async () => {
         const originalLastDequeue = await governance.lastDequeue()
 
         await timeTravel(dequeueFrequency, web3)
