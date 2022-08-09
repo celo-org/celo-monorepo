@@ -2603,7 +2603,7 @@ contract('Governance', (accounts: string[]) => {
       assert.equal((await governance.lastDequeue()).toNumber(), originalLastDequeue.toNumber())
     })
 
-    describe('when proposal exists', () => {
+    describe('when a proposal exists', () => {
       beforeEach(async () => {
         await governance.propose(
           [transactionSuccess1.value],
