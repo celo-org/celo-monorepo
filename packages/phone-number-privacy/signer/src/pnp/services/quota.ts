@@ -28,7 +28,7 @@ export abstract class PnpQuotaService
     trx: Knex.Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
     const remainingQuota = state.totalQuota - state.queryCount
-    Histograms.userRemainingQuotaAtRequest.observe(remainingQuota)
+    Histograms.userRemainingQuotaAtRequest.labels(session.request.url).observe(remainingQuota)
     let sufficient = remainingQuota > 0
     if (!sufficient) {
       session.logger.debug({ ...state }, 'No remaining quota')

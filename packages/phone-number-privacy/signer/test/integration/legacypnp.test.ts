@@ -16,7 +16,7 @@ import { initDatabase } from '../../src/common/database/database'
 import { getPerformedQueryCount } from '../../src/common/database/wrappers/account'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
-import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
+import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
 const {
@@ -79,6 +79,7 @@ describe('legacyPNP', () => {
   let app: any
   let db: Knex
 
+  const expectedVersion = getVersion()
   const _config = config
 
   beforeAll(async () => {
@@ -103,9 +104,10 @@ describe('legacyPNP', () => {
   })
 
   describe(`${SignerEndpoint.STATUS}`, () => {
-    it('Should provide signature and return 200 on valid request', async () => {
+    it('Should return 200 on valid request', async () => {
       const res = await request(app).get(SignerEndpoint.STATUS)
       expect(res.status).toBe(200)
+      expect(res.body.version).toBe(expectedVersion)
     })
   })
 
@@ -179,7 +181,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: expectedPerformedQueryCount,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
@@ -351,7 +353,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: performedQueryCount,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -373,7 +375,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(400)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -392,7 +394,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(401)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
         })
       })
@@ -406,7 +408,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(503)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
         })
       })

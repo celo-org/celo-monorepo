@@ -120,6 +120,7 @@ export const Histograms = {
   userRemainingQuotaAtRequest: new Histogram({
     name: 'user_remaining_quota_at_request',
     help: 'Histogram tracking remaining quota of users at time of request',
+    labelNames: ['endpoint'],
     buckets,
   }),
 }

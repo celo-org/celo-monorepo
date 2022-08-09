@@ -24,7 +24,7 @@ export async function meter<T extends any[], U>(
   inFunction: InFunction<T, U>,
   params: T,
   onError: (err: any) => U,
-  prometheus: Histogram<any>,
+  prometheus: Histogram<string>,
   labels: string[]
 ): Promise<U> {
   const _meter = prometheus.labels(...labels).startTimer()

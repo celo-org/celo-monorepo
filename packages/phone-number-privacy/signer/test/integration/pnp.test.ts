@@ -13,7 +13,7 @@ import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
-import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
+import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
 const {
@@ -47,6 +47,7 @@ describe('pnp', () => {
 
   const onChainBalance = new BigNumber(1e18)
   const expectedQuota = 10
+  const expectedVersion = getVersion()
 
   const _config = config
 
@@ -73,9 +74,10 @@ describe('pnp', () => {
   })
 
   describe(`${SignerEndpoint.STATUS}`, () => {
-    it('Should provide signature and return 200 on valid request', async () => {
+    it('Should return 200 on valid request', async () => {
       const res = await request(app).get(SignerEndpoint.STATUS)
       expect(res.status).toBe(200)
+      expect(res.body.version).toBe(expectedVersion)
     })
   })
 
@@ -111,7 +113,7 @@ describe('pnp', () => {
           expect(res.status).toBe(200)
           expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: 0,
             totalQuota: expectedTotalQuota,
             blockNumber: testBlockNumber,
@@ -120,7 +122,7 @@ describe('pnp', () => {
         })
       })
 
-      it('Should warning if on-chain state cannot be fetched', async () => {
+      it('Should return warning if on-chain state cannot be fetched', async () => {
         mockOdisBalanceTotalPaidCUSD.mockImplementation(() => {
           throw new Error('dummy error')
         })
@@ -131,7 +133,7 @@ describe('pnp', () => {
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: 0,
           totalQuota: -1,
           blockNumber: testBlockNumber,
@@ -174,7 +176,7 @@ describe('pnp', () => {
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: 0,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -196,7 +198,7 @@ describe('pnp', () => {
         expect(res.status).toBe(400)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -228,7 +230,7 @@ describe('pnp', () => {
         expect(res.status).toBe(503)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
         })
       })
