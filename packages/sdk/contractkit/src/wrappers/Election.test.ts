@@ -56,4 +56,22 @@ testWithGanache('Election Wrapper', (web3) => {
         from: validatorAccount,
       })
   }
+
+  test('SBAT activate vote', async () => {
+    const account = accounts[0]
+    const signer = accounts[1]
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    const votes = await election.getValidatorGroupsVotes()
+    console.log(votes)
+  })
+  //TODO:
+  //getElectabilityThreshold
+  // getElectableValidators
+  // Activate test
+  // active for account
+  // has activatable pending votes
+  // vote test
+  // revoke ative
+  // revoke pending
+  // revoke
 })
