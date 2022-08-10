@@ -61,7 +61,7 @@ contract OdisPayments is
    * @dev Throws if cUSD transfer fails.
    */
   function payInCUSD(address account, uint256 value) external nonReentrant {
-    IERC20(registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID)).safeTransferFrom(
+    IERC20(registryContract.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID)).safeTransferFrom(
       msg.sender,
       address(this),
       value
