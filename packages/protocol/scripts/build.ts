@@ -30,6 +30,7 @@ export const ProxyContracts = [
   'LockedGoldProxy',
   'MetaTransactionWalletProxy',
   'MetaTransactionWalletDeployerProxy',
+  'OdisPaymentsProxy',
   'RegistryProxy',
   'ReserveProxy',
   'ReserveSpenderMultiSigProxy',
@@ -69,6 +70,7 @@ export const CoreContracts = [
   'Escrow',
   'FederatedAttestations',
   'Random',
+  'OdisPayments',
 
   // stability
   'Exchange',
