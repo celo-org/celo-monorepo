@@ -2,7 +2,7 @@ import threshold_bls from 'blind-threshold-bls'
 import {
   BLSCryptographyClient,
   ServicePartialSignature,
-} from '../../src/bls/bls-cryptography-client'
+} from '../../src/common/bls/bls-cryptography-client'
 import config from '../../src/config'
 
 const PUBLIC_KEY =
@@ -19,7 +19,7 @@ const COMBINED_SIGNATURE = '16RcENpbLgq5pIkcPWdgnMofeLqSyuUVin9h4jof9/I8GRsmt5iR
 const INVALID_SIGNATURE =
   'MAAAAAAAAACanrA73tApLu+j569ICcXrEBRLi4czWJtInJPSUpoZUOVDc1667hvMq1ESncFzlgEHAAAA'
 
-config.keys.phoneNumberPrivacy = {
+config.phoneNumberPrivacy.keys = {
   version: 1,
   threshold: 3,
   polynomial: PUBLIC_POLYNOMIAL,

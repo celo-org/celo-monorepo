@@ -1,6 +1,6 @@
 import { rootLogger, TestUtils } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
-import { computeBlindedSignature } from '../../src/bls/bls-cryptography-client'
+import { computeBlindedSignature } from '../../src/common/bls/bls-cryptography-client'
 
 describe(`BLS service computes signature`, () => {
   it('provides blinded signature', async () => {
@@ -16,7 +16,7 @@ describe(`BLS service computes signature`, () => {
     const actual = await computeBlindedSignature(
       blindedMsg,
       TestUtils.Values.PNP_DEV_SIGNER_PRIVATE_KEY,
-      rootLogger()
+      rootLogger('odis-signer')
     )
     expect(actual).toEqual(
       'MAAAAAAAAADDilSaA/xvbtE4NV3agMzHIf8PGPQ83Cu8gQy5E2mRWyUIges8bjE4EBe1L7pcY4AAAAAA'
@@ -44,7 +44,11 @@ describe(`BLS service computes signature`, () => {
 
     expect.assertions(1)
     await expect(() =>
-      computeBlindedSignature(blindedMsg, TestUtils.Values.PNP_DEV_SIGNER_PRIVATE_KEY, rootLogger())
+      computeBlindedSignature(
+        blindedMsg,
+        TestUtils.Values.PNP_DEV_SIGNER_PRIVATE_KEY,
+        rootLogger('odis-signer')
+      )
     ).toThrow()
   })
 })

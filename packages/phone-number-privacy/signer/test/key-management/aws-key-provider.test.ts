@@ -1,5 +1,5 @@
-import { AWSKeyProvider } from '../../src/key-management/aws-key-provider'
-import { DefaultKeyName, Key } from '../../src/key-management/key-provider-base'
+import { AWSKeyProvider } from '../../src/common/key-management/aws-key-provider'
+import { DefaultKeyName, Key } from '../../src/common/key-management/key-provider-base'
 
 const mockKey = '010101010101010101010101010101010101010101010101010101010101010101010101'
 const mockResponse = { SecretString: `{"mockSecretKey":"${mockKey}"}` }
