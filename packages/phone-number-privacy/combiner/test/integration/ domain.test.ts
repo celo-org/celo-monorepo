@@ -120,9 +120,7 @@ const signerConfig: SignerConfig = {
   test_quota_bypass_percentage: 0,
 }
 
-// DO NOT MERGE: Add checking of values beyond the return code.
-
-// jest.setTimeout(30000) // TODO(Alec): why are these tests timing out?
+// TODO: Add checking of values beyond the return code.
 
 describe('domainService', () => {
   const wallet = new LocalWallet()
