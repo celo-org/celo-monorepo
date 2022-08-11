@@ -217,7 +217,7 @@ async function handleSuccessResponse(
     )
   }
 
-  // TODO: signature may be included to allow permissive error cases. This is an
+  // @ts-ignore TODO: signature may be included to allow permissive error cases. This is an
   // inconsistency between the types and the actual system behavior and should be addressed.
   // (add signature as an optional field in the failure use case)
   if (!signResponse.signature) {
@@ -225,7 +225,7 @@ async function handleSuccessResponse(
   }
 
   responses.push({ url: serviceUrl, signMessageResponse: signResponse, status })
-  // TODO: signature may be included to allow permissive error cases. This is an
+  // @ts-ignore TODO: signature may be included to allow permissive error cases. This is an
   // inconsistency between the types and the actual system behavior and should be addressed.
   const partialSig = { url: serviceUrl, signature: signResponse.signature }
   logger.info({ signer: serviceUrl }, 'Add signature')
