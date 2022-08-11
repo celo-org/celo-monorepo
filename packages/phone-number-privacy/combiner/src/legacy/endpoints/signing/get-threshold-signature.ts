@@ -270,7 +270,7 @@ function handleFailedResponse(
   // double counting the same failed request by mistake
   failedRequests.add(service.url)
   const shouldFailFast = signerCount - failedRequests.size < _config.keys.threshold
-  logger.info(`Recieved failure from ${failedRequests.size}/${signerCount} signers.`)
+  logger.info(`Received failure from ${failedRequests.size}/${signerCount} signers.`)
   if (shouldFailFast) {
     logger.info('Not possible to reach a sufficient number of signatures. Failing fast.')
     controller.abort()
