@@ -1066,17 +1066,12 @@ contract Governance is
     // solhint-disable-next-line not-rely-on-time
     if (now >= lastDequeue.add(dequeueFrequency)) {
       uint256 numProposalsToDequeue = Math.min(concurrentProposals, queue.list.numElements);
-      (uint256[] memory keys, ) = queue.getElements();
+      uint256[] memory dequeuedIds = queue.popN(numProposalsToDequeue);
 
       bool wasAnyProposalDequeued = false;
       for (uint256 i = 0; i < numProposalsToDequeue; i = i.add(1)) {
-        uint256 proposalId = keys[i];
+        uint256 proposalId = dequeuedIds[i];
         Proposals.Proposal storage proposal = proposals[proposalId];
-
-        if (now < proposal.timestamp.add(dequeueFrequency)) {
-          break;
-        }
-        queue.remove(proposalId);
 
         if (_isQueuedProposalExpired(proposal)) {
           emit ProposalExpired(proposalId);
