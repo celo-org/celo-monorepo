@@ -39,12 +39,12 @@
     "dependencies": [
       "@celo/contractkit",
       "@celo/cryptographic-utils",
-      "@celo/phone-utils",
       "@celo/dev-utils",
       "@celo/explorer",
       "@celo/flake-tracker",
       "@celo/governance",
       "@celo/identity",
+      "@celo/phone-utils",
       "@celo/utils",
       "@celo/wallet-hsm-azure",
       "@celo/wallet-ledger",
