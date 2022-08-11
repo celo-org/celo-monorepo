@@ -4,9 +4,9 @@ import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../../common/metrics'
 import {
-  DomainStateRecord,
   DOMAIN_STATE_COLUMNS,
   DOMAIN_STATE_TABLE,
+  DomainStateRecord,
   toDomainStateRecord,
 } from '../models/domainState'
 

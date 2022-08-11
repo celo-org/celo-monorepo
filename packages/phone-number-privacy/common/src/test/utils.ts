@@ -114,12 +114,12 @@ export async function registerWalletAddress(
     .sendAndWaitForReceipt({ from: accountAddress } as any)
 }
 
-export function getPnpQuotaRequest(account: string, hashedPhoneNumber?: string) {
+export function getPnpQuotaRequest(account: string, hashedPhoneNumber?: string): PnpQuotaRequest {
   return {
     account,
     hashedPhoneNumber,
     sessionID: genSessionID(),
-  } as PnpQuotaRequest
+  }
 }
 
 export function getPnpQuotaRequestAuthorization(req: PnpQuotaRequest, account: string, pk: string) {

@@ -3,9 +3,9 @@ import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../../common/metrics'
 import {
-  DomainRequestRecord,
   DOMAIN_REQUESTS_COLUMNS,
   DOMAIN_REQUESTS_TABLE,
+  DomainRequestRecord,
 } from '../models/domainRequest'
 
 function domainRequests(db: Knex) {
