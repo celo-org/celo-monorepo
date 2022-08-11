@@ -39,6 +39,7 @@
     "dependencies": [
       "@celo/contractkit",
       "@celo/cryptographic-utils",
+      "@celo/phone-utils",
       "@celo/dev-utils",
       "@celo/explorer",
       "@celo/flake-tracker",
