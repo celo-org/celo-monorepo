@@ -117,7 +117,7 @@ describe('legacyPNP', () => {
     signerApp: any = app
   ) => {
     return request(signerApp)
-      .get(SignerEndpoint.LEGACY_PNP_QUOTA)
+      .post(SignerEndpoint.LEGACY_PNP_QUOTA)
       .set('Authorization', authorization)
       .send(req)
   }
