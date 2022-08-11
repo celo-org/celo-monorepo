@@ -30,13 +30,9 @@ import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
-// DO NOT MERGE: Add checking of values beyond the return code.
+// TODO: Add checking of values beyond the return code.
 
 describe('domainService', () => {
-  // DO NOT MERGE(victor): Should this be refactored to pass key provider, database, and config?
-  // (global config makes it harder to test things, we should pass it as a parameter)
-  // const app = startSigner(config, await initDatabase(), await initKeyProvider())
-
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
   const walletAddress = wallet.getAccounts()[0]! // TODO(Alec): do we need this?

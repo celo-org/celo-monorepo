@@ -1,4 +1,4 @@
-/* DO NOT MERGE: Create new tests to cover this functionality.
+/* TODO: Create new tests to cover this functionality.
 import { authenticateUser, ErrorMessage, WarningMessage } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import request from 'supertest'
