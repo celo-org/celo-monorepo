@@ -17,9 +17,8 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
-import { BLSCryptographyClient } from '../../../common/bls/bls-cryptography-client'
 import { IO } from '../../../common/io'
-import { Session } from '../../../common/session'
+import { DomainCryptoClient, Session } from '../../../common/session'
 import { VERSION } from '../../../config'
 
 export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
@@ -51,7 +50,8 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response, new BLSCryptographyClient(this.config))
+    return new Session(request, response, new DomainCryptoClient(this.config))
+    // return new Session(request, response, new BLSCryptographyClient(this.config))
   }
 
   authenticate(request: Request<{}, {}, DomainRestrictedSignatureRequest>): Promise<boolean> {

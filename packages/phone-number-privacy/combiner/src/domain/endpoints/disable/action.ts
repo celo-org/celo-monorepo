@@ -19,7 +19,6 @@ export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
       this.io.sendSuccess(200, session.response)
       return
     }
-
     this.io.sendFailure(
       ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE,
       session.getMajorityErrorCode() ?? 500,

@@ -376,10 +376,11 @@ describe('domainService', () => {
 
   describe(`${CombinerEndpoint.DOMAIN_QUOTA_STATUS}`, () => {
     it('Should respond with 200 on valid request', async () => {
+      // console.log('app: ', app)
       const res = await request(app)
         .get(CombinerEndpoint.DOMAIN_QUOTA_STATUS)
         .send(await quotaRequest())
-
+      // console.log('res: ', res)
       expect(res.status).toBe(200)
       expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
         success: true,
@@ -510,8 +511,8 @@ describe('domainService', () => {
     })
   })
 
-  describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
-    xit('Should respond with 200 on valid request', async () => {
+  describe.only(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
+    it('Should respond with 200 on valid request', async () => {
       const [req, _] = await signatureRequest()
 
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
@@ -530,7 +531,7 @@ describe('domainService', () => {
       })
     })
 
-    xit('Should respond with 200 on valid request with key version header', async () => {
+    it('Should respond with 200 on valid request with key version header', async () => {
       const [req, _] = await signatureRequest()
 
       const res = await request(app)
@@ -552,7 +553,7 @@ describe('domainService', () => {
       })
     })
 
-    xit('Should respond with 200 on repeated valid requests', async () => {
+    it('Should respond with 200 on repeated valid requests', async () => {
       const req1 = (await signatureRequest())[0]
 
       const res1 = await request(app)
@@ -598,7 +599,7 @@ describe('domainService', () => {
       })
     })
 
-    xit('Should respond with 200 on extra request fields', async () => {
+    it('Should respond with 200 on extra request fields', async () => {
       const [req, _] = await signatureRequest()
       // @ts-ignore Intentionally adding an extra field to the request type
       req.options.extraField = noString
@@ -617,6 +618,7 @@ describe('domainService', () => {
           now: res.body.status.now,
         },
       })
+      console.log('res.body: ', res.body)
     })
 
     it('Should respond with 400 on missing request fields', async () => {

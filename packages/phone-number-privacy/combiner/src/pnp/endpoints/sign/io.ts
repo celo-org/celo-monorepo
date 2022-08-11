@@ -23,7 +23,10 @@ import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import { BLSCryptographyClient } from '../../../common/bls/bls-cryptography-client'
 import { IO } from '../../../common/io'
-import { Session } from '../../../common/session'
+import {
+  // PNPCryptoClient,
+  Session,
+} from '../../../common/session'
 import { OdisConfig, VERSION } from '../../../config'
 
 export class PnpSignIO extends IO<SignMessageRequest> {
@@ -55,6 +58,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
+    // return new Session(request, response, new PNPCryptoClient(this.config))
     return new Session(request, response, new BLSCryptographyClient(this.config))
   }
 
