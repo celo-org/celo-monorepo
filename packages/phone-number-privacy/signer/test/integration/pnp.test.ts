@@ -87,7 +87,7 @@ describe('pnp', () => {
     signerApp: any = app
   ) => {
     return request(signerApp)
-      .get(SignerEndpoint.PNP_QUOTA)
+      .post(SignerEndpoint.PNP_QUOTA)
       .set('Authorization', authorization)
       .send(req)
   }
