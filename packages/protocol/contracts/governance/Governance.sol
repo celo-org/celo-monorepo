@@ -1072,7 +1072,6 @@ contract Governance is
       for (uint256 i = 0; i < numProposalsToDequeue; i = i.add(1)) {
         uint256 proposalId = dequeuedIds[i];
         Proposals.Proposal storage proposal = proposals[proposalId];
-
         if (_isQueuedProposalExpired(proposal)) {
           emit ProposalExpired(proposalId);
           continue;
