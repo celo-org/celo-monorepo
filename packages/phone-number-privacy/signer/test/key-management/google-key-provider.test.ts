@@ -1,5 +1,5 @@
-import { GoogleKeyProvider } from '../../src/key-management/google-key-provider'
-import { DefaultKeyName, Key } from '../../src/key-management/key-provider-base'
+import { GoogleKeyProvider } from '../../src/common/key-management/google-key-provider'
+import { DefaultKeyName, Key } from '../../src/common/key-management/key-provider-base'
 
 const mockKey = '020202020202020202020202020202020202020202020202020202020202020202020202'
 const mockResponse = [{ payload: { data: `${mockKey}` } }]

@@ -24,7 +24,7 @@ import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-
 import { LocalWallet } from '@celo/wallet-local'
 import { Knex } from 'knex'
 import request from 'supertest'
-import { KeyProvider } from '../../dist/key-management/key-provider-base'
+import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { initDatabase } from '../../src/common/database/database'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
