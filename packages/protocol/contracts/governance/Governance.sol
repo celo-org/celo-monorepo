@@ -197,7 +197,10 @@ contract Governance is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 2, 1, 1);
@@ -491,7 +494,8 @@ contract Governance is
   /**
    * @notice Requires a proposal is dequeued and removes it if expired.
    * @param proposalId The ID of the proposal.
-   * @return The proposal storage struct and stage corresponding to `proposalId`.
+   * @return The proposal storage struct corresponding to `proposalId`.
+   * @return The proposal stage corresponding to `proposalId`.
    */
   function requireDequeuedAndDeleteExpired(uint256 proposalId, uint256 index)
     private
@@ -861,7 +865,10 @@ contract Governance is
 
   /**
    * @notice Returns the participation parameters.
-   * @return The participation parameters.
+   * @return baseline The participation baseline parameter.
+   * @return baselineFloor The participation baseline floor parameter.
+   * @return baselineUpdateFactor The participation baseline update factor parameter.
+   * @return baselineQuorumFactor The participation baseline quorum factor parameter.
    */
   function getParticipationParameters() external view returns (uint256, uint256, uint256, uint256) {
     return (
@@ -884,7 +891,11 @@ contract Governance is
   /**
    * @notice Returns an unpacked proposal struct with its transaction count.
    * @param proposalId The ID of the proposal to unpack.
-   * @return The unpacked proposal with its transaction count.
+   * @return proposer
+   * @return deposit
+   * @return timestamp
+   * @return transaction Transaction count.
+   * @return description Description url.
    */
   function getProposal(uint256 proposalId)
     external
@@ -898,7 +909,9 @@ contract Governance is
    * @notice Returns a specified transaction in a proposal.
    * @param proposalId The ID of the proposal to query.
    * @param index The index of the specified transaction in the proposal's transaction list.
-   * @return The specified transaction.
+   * @return value Transaction value.
+   * @return destination Transaction destination.
+   * @return data Transaction data.
    */
   function getProposalTransaction(uint256 proposalId, uint256 index)
     external
@@ -920,7 +933,9 @@ contract Governance is
   /**
    * @notice Returns the referendum vote totals for a proposal.
    * @param proposalId The ID of the proposal.
-   * @return The yes, no, and abstain vote totals.
+   * @return yes The yes vote totals.
+   * @return no The no vote totals.
+   * @return abstain The abstain vote totals.
    */
   function getVoteTotals(uint256 proposalId) external view returns (uint256, uint256, uint256) {
     return proposals[proposalId].getVoteTotals();
@@ -931,6 +946,8 @@ contract Governance is
    * @param account The address of the account to get the record for.
    * @param index The index in `dequeued`.
    * @return The corresponding proposal ID, vote value, and weight.
+   * @return The corresponding vote value.
+   * @return The corresponding weight.
    */
   function getVoteRecord(address account, uint256 index)
     external
@@ -961,7 +978,8 @@ contract Governance is
 
   /**
    * @notice Returns the proposal ID and upvote total for all queued proposals.
-   * @return The proposal ID and upvote total for all queued proposals.
+   * @return proposalID The proposal ID for all queued proposals.
+   * @return total The upvote total for all queued proposals.
    * @dev Note that this includes expired proposals that have yet to be removed from the queue.
    */
   function getQueue() external view returns (uint256[] memory, uint256[] memory) {
@@ -980,7 +998,8 @@ contract Governance is
   /**
    * @notice Returns the ID of the proposal upvoted by `account` and the weight of that upvote.
    * @param account The address of the account.
-   * @return The ID of the proposal upvoted by `account` and the weight of that upvote.
+   * @return The ID of the proposal upvoted by `account`.
+   * @return The weight of that upvote.
    */
   function getUpvoteRecord(address account) external view returns (uint256, uint256) {
     UpvoteRecord memory upvoteRecord = voters[account].upvote;
@@ -1030,7 +1049,9 @@ contract Governance is
   /**
    * @notice Gets information about a hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Hotfix tuple of (approved, executed, preparedEpoch)
+   * @return Hotfix approved.
+   * @return Hotfix executed.
+   * @return Hotfix preparedEpoch.
    */
   function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
     return (hotfixes[hash].approved, hotfixes[hash].executed, hotfixes[hash].preparedEpoch);
