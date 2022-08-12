@@ -511,7 +511,7 @@ describe('domainService', () => {
     })
   })
 
-  describe.only(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
+  describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
     it('Should respond with 200 on valid request', async () => {
       const [req, _] = await signatureRequest()
 
