@@ -46,7 +46,7 @@ export class BLSCryptographyClient {
     blindedMessage: string,
     logger?: Logger
   ): Promise<string> {
-    logger = logger ?? rootLogger(this.config.serviceName)
+    logger = logger ?? rootLogger(this.config.serviceName) // TODO: Should this be passed in during initialization?
     if (!this.hasSufficientSignatures()) {
       logger.error(
         { signatures: this.allSignaturesLength, required: this.config.keys.threshold },

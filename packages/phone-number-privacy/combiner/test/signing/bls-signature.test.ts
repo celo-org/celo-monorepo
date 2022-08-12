@@ -56,7 +56,7 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const blsCryptoClient = new BLSCryptographyClient()
+    const blsCryptoClient = new BLSCryptographyClient(config.phoneNumberPrivacy)
     for (let i = 0; i < signatures.length; i++) {
       await blsCryptoClient.addSignature(signatures[i])
       if (i >= 2) {
@@ -66,13 +66,7 @@ describe(`BLS service computes signature`, () => {
       }
     }
 
-    const { pubKey, threshold } = config.keys.phoneNumberPrivacy
-
-    const actual = await blsCryptoClient.combinePartialBlindedSignatures(
-      blindedMsg,
-      pubKey,
-      threshold
-    )
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
@@ -111,16 +105,11 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const blsCryptoClient = new BLSCryptographyClient()
+    const blsCryptoClient = new BLSCryptographyClient(config.phoneNumberPrivacy)
     await signatures.forEach(async (signature) => {
       await blsCryptoClient.addSignature(signature)
     })
-    const { pubKey, threshold } = config.keys.phoneNumberPrivacy
-    const actual = await blsCryptoClient.combinePartialBlindedSignatures(
-      blindedMsg,
-      pubKey,
-      threshold
-    )
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
@@ -159,13 +148,12 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const blsCryptoClient = new BLSCryptographyClient()
+    const blsCryptoClient = new BLSCryptographyClient(config.phoneNumberPrivacy)
     await signatures.forEach(async (signature) => {
       await blsCryptoClient.addSignature(signature)
     })
     try {
-      const { pubKey, threshold } = config.keys.phoneNumberPrivacy
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg, pubKey, threshold)
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
       throw new Error('Expected failure with missing signatures')
     } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
@@ -200,7 +188,7 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const blsCryptoClient = new BLSCryptographyClient()
+    const blsCryptoClient = new BLSCryptographyClient(config.phoneNumberPrivacy)
     // Add sigs one-by-one and verify intermediary states
     await blsCryptoClient.addSignature(signatures[0])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeFalsy()
@@ -210,8 +198,7 @@ describe(`BLS service computes signature`, () => {
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
     // Should fail since 1/3 sigs are invalid
     try {
-      const { pubKey, threshold } = config.keys.phoneNumberPrivacy
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg, pubKey, threshold)
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
@@ -220,12 +207,7 @@ describe(`BLS service computes signature`, () => {
 
     await blsCryptoClient.addSignature(signatures[3])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
-    const { pubKey, threshold } = config.keys.phoneNumberPrivacy
-    const actual = await blsCryptoClient.combinePartialBlindedSignatures(
-      blindedMsg,
-      pubKey,
-      threshold
-    )
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
@@ -264,7 +246,7 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const blsCryptoClient = new BLSCryptographyClient()
+    const blsCryptoClient = new BLSCryptographyClient(config.phoneNumberPrivacy)
     // Add sigs one-by-one and verify intermediary states
     await blsCryptoClient.addSignature(signatures[0])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeFalsy()
@@ -274,8 +256,7 @@ describe(`BLS service computes signature`, () => {
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
     // Should fail since signature from url3 was generated with the wrong key version
     try {
-      const { pubKey, threshold } = config.keys.phoneNumberPrivacy
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg, pubKey, threshold)
+      await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
@@ -285,12 +266,7 @@ describe(`BLS service computes signature`, () => {
 
     await blsCryptoClient.addSignature(signatures[3])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
-    const { pubKey, threshold } = config.keys.phoneNumberPrivacy
-    const actual = await blsCryptoClient.combinePartialBlindedSignatures(
-      blindedMsg,
-      pubKey,
-      threshold
-    )
+    const actual = await blsCryptoClient.combinePartialBlindedSignatures(blindedMsg)
     expect(actual).toEqual(COMBINED_SIGNATURE)
 
     const unblindedSignedMessage = threshold_bls.unblind(
