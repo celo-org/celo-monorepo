@@ -14,21 +14,24 @@ const key: Key = {
 }
 
 jest.mock('../../src/config', () => ({
-  keystore: {
-    keys: {
-      phoneNumberPrivacy: {
-        name: 'phoneNumberPrivacy',
-        latest: 1,
+  config: {
+    serviceName: 'odis-signer',
+    keystore: {
+      keys: {
+        phoneNumberPrivacy: {
+          name: 'phoneNumberPrivacy',
+          latest: 1,
+        },
+        domains: {
+          name: 'domains',
+          latest: 1,
+        },
       },
-      domains: {
-        name: 'domains',
-        latest: 1,
+      aws: {
+        region: 'mockRegion',
+        secretKey: 'mockSecretKey',
+        secretName: 'mockSecretName',
       },
-    },
-    aws: {
-      region: 'mockRegion',
-      secretKey: 'mockSecretKey',
-      secretName: 'mockSecretName',
     },
   },
 }))
