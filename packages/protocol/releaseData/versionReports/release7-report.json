@@ -1,6 +1,6 @@
 {
-  "oldArtifactsFolder": "/Users/martinvol/celo/celo-monorepo/packages/protocol/build/core-contracts.v6/contracts",
-  "newArtifactsFolder": "/Users/martinvol/celo/celo-monorepo/packages/protocol/build/celo-core-contracts-v7/contracts",
+  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/core-contracts.v6/contracts",
+  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/core-contracts.v7/contracts",
   "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles/",
   "report": {
     "contracts": {
@@ -145,6 +145,69 @@
           "major": "=",
           "minor": "+1",
           "patch": "0"
+        }
+      },
+      "LockedGold": {
+        "changes": {
+          "storage": [],
+          "major": [],
+          "minor": [
+            {
+              "contract": "LockedGold",
+              "signature": "getPendingWithdrawal(address,uint256)",
+              "type": "MethodAdded"
+            }
+          ],
+          "patch": [
+            {
+              "contract": "LockedGold",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "=",
+          "minor": "+1",
+          "patch": "0"
+        }
+      },
+      "GrandaMento": {
+        "changes": {
+          "storage": [],
+          "major": [],
+          "minor": [],
+          "patch": [
+            {
+              "contract": "GrandaMento",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "=",
+          "minor": "=",
+          "patch": "+1"
+        }
+      },
+      "Reserve": {
+        "changes": {
+          "storage": [],
+          "major": [],
+          "minor": [],
+          "patch": [
+            {
+              "contract": "Reserve",
+              "type": "DeployedBytecode"
+            }
+          ]
+        },
+        "versionDelta": {
+          "storage": "=",
+          "major": "=",
+          "minor": "=",
+          "patch": "+1"
         }
       },
       "Validators": {
