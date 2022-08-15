@@ -236,6 +236,7 @@ module.exports = async (callback: (error?: any) => number) => {
         'network',
         'from',
         'grants',
+        // TODO add beneficiary, months, oneTimePaymentUSD, monthlyPaymentUSD, numberOfNodes
         'start_gold',
         'deployed_grants',
         'output_file',
@@ -256,18 +257,23 @@ module.exports = async (callback: (error?: any) => number) => {
     const months = 12
     const oneTimePaymentUSD = 3000
     const monthlyPaymentUSD = 700
+    const numberOfNodes = 1
 
     const celoPrice = await fetchCeloPrice()
+    console.log()
     console.log(`Celo Price is $${celoPrice} (double check this number)`)
 
     const period = 2628000 // one month
 
     const zeros = new BigNumber('1e18')
+
     const oneTimePaymentCELO = new BigNumber(oneTimePaymentUSD)
       .multipliedBy(zeros)
+      .multipliedBy(numberOfNodes)
       .dividedBy(celoPrice)
+
     const monthlyPaymentCELO = new BigNumber(monthlyPaymentUSD)
-      .multipliedBy(zeros)
+      .multipliedBy(numberOfNodes)
       .dividedBy(celoPrice)
 
     const kit = newKitFromWeb3(web3)
@@ -303,11 +309,14 @@ module.exports = async (callback: (error?: any) => number) => {
     const RGInfo = await handleGrant(config, 1)
     if (RGInfo) {
       const RGAddress = RGInfo.ContractAddress
-      // const RGAddress = 'RGAddress'
 
+      console.log("Here's the snippet that should be added to the proposal for this ")
       printfundingProposal(oneTimePaymentCELO.toFixed(0), beneficiary)
       console.log(',')
-      printfundingProposal(monthlyPaymentCELO.multipliedBy(months).toFixed(0), RGAddress)
+      printfundingProposal(
+        monthlyPaymentCELO.multipliedBy(months).multipliedBy(zeros).toFixed(0),
+        RGAddress
+      )
       console.log('')
     } else {
       console.log('Contract not deployed')
