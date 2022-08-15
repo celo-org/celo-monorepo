@@ -172,7 +172,6 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       },
       ...contractInitializationArgs
     )
-    console.info('TODO: Governance proposal should send X CELO')
   } catch (e) {
     console.info(
       'Something went wrong! Consider using the recover-funds.ts script with the below address'
@@ -194,7 +193,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
 
   // Send starting gold amount to the beneficiary so they can perform transactions.
   console.info(
-    '  Not Sending beneficiary any starting gold, as it is deployed in the one-time payment'
+    '  Not Sending beneficiary any starting CELO, as it is deployed in the one-time payment in the proposal'
   )
 
   const record = {
