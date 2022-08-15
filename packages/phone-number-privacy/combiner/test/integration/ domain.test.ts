@@ -147,7 +147,7 @@ describe('domainService', () => {
   ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, PoprfClient]> => {
     const domain = _domain ?? authenticatedDomain()
     const poprfClient = new PoprfClient(
-      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'base64'),
+      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'hex'),
       domainHash(domain),
       Buffer.from('test message', 'utf8')
     )
@@ -512,9 +512,10 @@ describe('domainService', () => {
   })
 
   describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
-    it('Should respond with 200 on valid request', async () => {
-      const [req, _] = await signatureRequest()
+    const expectedEval = '+8VmIugxAuBkdRnKRJ3udlnzCPMADNwMZRfV7Loy6Vs='
 
+    it('Should respond with 200 on valid request', async () => {
+      const [req, poprfClient] = await signatureRequest()
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
 
       expect(res.status).toBe(200)
@@ -529,10 +530,12 @@ describe('domainService', () => {
           now: res.body.status.now,
         },
       })
+      const evaluation = poprfClient.unblindResponse(Buffer.from(res.body.signature, 'base64'))
+      expect(evaluation.toString('base64')).toEqual(expectedEval)
     })
 
     it('Should respond with 200 on valid request with key version header', async () => {
-      const [req, _] = await signatureRequest()
+      const [req, poprfClient] = await signatureRequest()
 
       const res = await request(app)
         .post(CombinerEndpoint.DOMAIN_SIGN)
@@ -551,18 +554,17 @@ describe('domainService', () => {
           now: res.body.status.now,
         },
       })
+      const evaluation = poprfClient.unblindResponse(Buffer.from(res.body.signature, 'base64'))
+      expect(evaluation.toString('base64')).toEqual(expectedEval)
     })
 
     it('Should respond with 200 on repeated valid requests', async () => {
-      const req1 = (await signatureRequest())[0]
+      const [req1, poprfClient] = await signatureRequest()
 
       const res1 = await request(app)
         .post(CombinerEndpoint.DOMAIN_SIGN)
         .set('keyVersion', '1')
         .send(req1)
-
-      console.log(res1.body)
-
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: true,
@@ -575,6 +577,8 @@ describe('domainService', () => {
           now: res1.body.status.now,
         },
       })
+      const eval1 = poprfClient.unblindResponse(Buffer.from(res1.body.signature, 'base64'))
+      expect(eval1.toString('base64')).toEqual(expectedEval)
 
       // submit identical request with nonce set to 1
       const req2 = (await signatureRequest(undefined, 1))[0]
@@ -582,9 +586,6 @@ describe('domainService', () => {
         .post(CombinerEndpoint.DOMAIN_SIGN)
         .set('keyVersion', '1')
         .send(req2)
-
-      console.log(res2.body)
-
       expect(res2.status).toBe(200)
       expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: true,
@@ -597,10 +598,12 @@ describe('domainService', () => {
           now: res2.body.status.now,
         },
       })
+      const eval2 = poprfClient.unblindResponse(Buffer.from(res1.body.signature, 'base64'))
+      expect(eval2).toEqual(eval1)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
-      const [req, _] = await signatureRequest()
+      const [req, poprfClient] = await signatureRequest()
       // @ts-ignore Intentionally adding an extra field to the request type
       req.options.extraField = noString
 
@@ -618,7 +621,8 @@ describe('domainService', () => {
           now: res.body.status.now,
         },
       })
-      console.log('res.body: ', res.body)
+      const evaluation = poprfClient.unblindResponse(Buffer.from(res.body.signature, 'base64'))
+      expect(evaluation.toString('base64')).toEqual(expectedEval)
     })
 
     it('Should respond with 400 on missing request fields', async () => {

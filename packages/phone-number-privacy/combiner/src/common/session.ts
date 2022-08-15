@@ -115,13 +115,10 @@ export class DomainCryptoClient extends RenameCombinerCryptoClient implements Co
 
   // TODO EN: rename if no abstract class factoring out
   private get allSigsAsArray(): Uint8Array[] {
-    // TODO EN double check this logic, make sure this is doing what we want this to do
-    return this.unverifiedSignatures.map((response) =>
-      Uint8Array.from(Buffer.from(response.signature, 'base64'))
-    )
+    return this.unverifiedSignatures.map((response) => Buffer.from(response.signature, 'base64'))
   }
 
-  // TODO EN: note that this does not seem to need to be async -- same with bls-crypto client???
+  // TODO EN question: does this actually need to be async -- same with bls-crypto client???
   protected async _combinePartialBlindedSignatures(
     _blindedMessage: string, // TODO EN: fix this and find better solution for this
     logger: Logger
@@ -130,7 +127,6 @@ export class DomainCryptoClient extends RenameCombinerCryptoClient implements Co
     try {
       const result = this.cryptoClient.blindAggregate(this.allSigsAsArray)
       if (result !== undefined) {
-        // TODO EN fix this and function sigs appropriately
         return result.toString('base64')
       }
     } catch (error) {

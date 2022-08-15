@@ -59,6 +59,7 @@ describe('domainService', () => {
   ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, PoprfClient]> => {
     const domain = _domain ?? authenticatedDomain()
     const poprfClient = new PoprfClient(
+      // TODO EN: I think this should also be 'hex'; double check this
       Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'base64'),
       domainHash(domain),
       Buffer.from('test message', 'utf8')
