@@ -17,8 +17,9 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
+import { DomainCryptoClient } from '../../../common/crypto-clients/domain-crypto-client'
 import { IO } from '../../../common/io'
-import { DomainCryptoClient, Session } from '../../../common/session'
+import { Session } from '../../../common/session'
 import { VERSION } from '../../../config'
 
 export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {

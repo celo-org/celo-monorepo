@@ -21,7 +21,7 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
-import { BLSCryptographyClient } from '../../../common/bls/bls-cryptography-client'
+import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-cryptography-client'
 import { IO } from '../../../common/io'
 import {
   // PNPCryptoClient,
