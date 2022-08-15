@@ -1,9 +1,10 @@
+import { newKitFromWeb3 } from '@celo/contractkit'
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
 import { retryTx, _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { Address } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
-import fs from 'fs'
+import fetch from 'node-fetch'
 import prompts from 'prompts'
 import {
   ReleaseGoldContract,
@@ -13,10 +14,7 @@ import {
 } from 'types'
 
 let argv: any
-let releases: any
 let fromAddress: any
-let deployedGrants: any
-let deployedGrantsFile: string
 let ReleaseGoldMultiSig: ReleaseGoldMultiSigContract
 let ReleaseGoldMultiSigProxy: ReleaseGoldMultiSigProxyContract
 let ReleaseGold: ReleaseGoldContract
@@ -47,17 +45,20 @@ interface ReleaseGoldConfig {
 // @ts-ignore
 async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   console.info('Processing grant number ' + currGrant)
+  console.info(config.releaseStartTime)
 
   // Sentinel MAINNET dictates a start time of mainnet launch, April 22 2020 16:00 UTC in this case
   const releaseStartTime = config.releaseStartTime.startsWith('MAINNET')
     ? MAINNET_START_TIME
     : new Date(config.releaseStartTime).getTime() / 1000
 
+  console.info(releaseStartTime)
+
   const weiAmountReleasedPerPeriod = new BigNumber(
     web3.utils.toWei(config.amountReleasedPerPeriod.toString())
   )
 
-  let totalValue = weiAmountReleasedPerPeriod.multipliedBy(config.numReleasePeriods)
+  // let totalValue = weiAmountReleasedPerPeriod.multipliedBy(config.numReleasePeriods)
 
   const contractInitializationArgs = [
     Math.round(releaseStartTime),
@@ -131,6 +132,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     false,
     { from: fromAddress },
   ])
+  console.log([config.releaseOwner, config.beneficiary])
   const multiSigTxHash = await _setInitialProxyImplementation(
     // here is where the multisig get transfered
     web3,
@@ -166,7 +168,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       'ReleaseGold',
       {
         from: fromAddress,
-        value: totalValue.toFixed(), // here this shuold be zero, but printing the amounts in the terminal
+        value: '0', // here this shuold be zero, but printing the amounts in the terminal
       },
       ...contractInitializationArgs
     )
@@ -205,27 +207,26 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     ReleaseGoldTxHash: releaseGoldTxHash,
   }
 
-  deployedGrants.push(config.identifier)
-  releases.push(record)
   console.info('Deployed grant', record)
-  // Must write to file after every grant to avoid losing info on crash.
-  fs.writeFileSync(deployedGrantsFile, JSON.stringify(deployedGrants, null, 1))
-  fs.writeFileSync(argv.output_file, JSON.stringify(releases, null, 2))
-
   return record
 }
 
-function printfundingProposal(amount: number, recipientAccount: Address) {
+function printfundingProposal(amount: string, recipientAccount: Address) {
   const proposal = [
     '{',
-    `  "contract": "GolsToken",`,
-    `"function": "transfer"`,
+    `  "contract": "GoldToken"`,
+    `  "function": "transfer"`,
     // function transfer(address to, uint256 value) external returns (bool) {
-    `"args": ["${recipientAccount}", "${amount}"],`,
-    `"value": "0"`,
+    `  "args": ["${recipientAccount}", "${amount}"]`,
+    `  "value": "0"`,
     `}`,
-  ].join()
-  console.log(proposal)
+  ].join('\r\n')
+  process.stdout.write(proposal)
+}
+
+async function fetchCeloPrice() {
+  const response = await (await fetch('https://api.coinbase.com/v2/prices/CGLD-USD/buy')).json()
+  return response['data']['amount']
 }
 
 module.exports = async (callback: (error?: any) => number) => {
@@ -248,32 +249,47 @@ module.exports = async (callback: (error?: any) => number) => {
     ReleaseGold = artifacts.require('ReleaseGold')
     ReleaseGoldProxy = artifacts.require('ReleaseGoldProxy')
 
-    releases = [] // unused
-
     fromAddress = argv.from
 
-    const beneficiary = '0x'
-    // @ts-ignore
-    const celoPrice = 1
+    // inputs to be added by the terminal
+    let beneficiary = '0x'
     const months = 12
-    // @ts-ignore
-    const period = '1 month'
+    const oneTimePaymentUSD = 3000
+    const monthlyPaymentUSD = 700
 
-    // todo convert to CELO
-    const oneTimePayment = 3000
-    const monthlyPayment = 700
-    const governanceProxyAddress = '0x' // Community fund address
+    const celoPrice = await fetchCeloPrice()
+    console.log(`Celo Price is $${celoPrice} (double check this number)`)
 
-    const totalCeloContract = monthlyPayment * months
+    const period = 2628000 // one month
 
-    // @ts-ignore
-    const config = {
-      identifier: '',
-      releaseStartTime: 'string',
-      releaseCliffTime: 1,
-      numReleasePeriods: 1,
-      releasePeriod: 1,
-      amountReleasedPerPeriod: 1,
+    const zeros = new BigNumber('1e18')
+    const oneTimePaymentCELO = new BigNumber(oneTimePaymentUSD)
+      .multipliedBy(zeros)
+      .dividedBy(celoPrice)
+    const monthlyPaymentCELO = new BigNumber(monthlyPaymentUSD)
+      .multipliedBy(zeros)
+      .dividedBy(celoPrice)
+
+    const kit = newKitFromWeb3(web3)
+    let governanceContract = await kit.contracts.getGovernance()
+    const governanceProxyAddress = governanceContract.address
+
+    console.log(`Using address for Community fund (Governance Proxy) ${governanceProxyAddress}`)
+    // const governanceProxyAddress = '0xAA963FC97281d9632d96700aB62A4D1340F9a28a'
+
+    beneficiary = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA' // todo Changethis
+
+    const now = new Date()
+
+    const grantStartDay = new Date(now.getTime() + 60 * 60 * 24 * 10 * 1000) // 10 days from now
+
+    const config: ReleaseGoldConfig = {
+      identifier: beneficiary,
+      releaseStartTime: grantStartDay.toISOString(), // one week from deploy time
+      releaseCliffTime: 0,
+      numReleasePeriods: months,
+      releasePeriod: period,
+      amountReleasedPerPeriod: Math.floor(monthlyPaymentCELO.toNumber()),
       revocable: true,
       beneficiary: beneficiary,
       releaseOwner: governanceProxyAddress,
@@ -284,12 +300,18 @@ module.exports = async (callback: (error?: any) => number) => {
       canVote: false,
     }
 
-    // const RGInfo = await handleGrant(config, 1)
-    // const RGAddress = RGInfo.ContractAddress
-    const RGAddress = 'RGAddress'
+    const RGInfo = await handleGrant(config, 1)
+    if (RGInfo) {
+      const RGAddress = RGInfo.ContractAddress
+      // const RGAddress = 'RGAddress'
 
-    printfundingProposal(oneTimePayment, beneficiary)
-    printfundingProposal(totalCeloContract, RGAddress)
+      printfundingProposal(oneTimePaymentCELO.toFixed(0), beneficiary)
+      console.log(',')
+      printfundingProposal(monthlyPaymentCELO.multipliedBy(months).toFixed(0), RGAddress)
+      console.log('')
+    } else {
+      console.log('Contract not deployed')
+    }
   } catch (error) {
     callback(error)
   }
