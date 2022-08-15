@@ -2,7 +2,6 @@ import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-priv
 import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { CryptoClient } from './crypto-clients/crypto-client'
 import { SignerResponse } from './io'
 
 export class Session<R extends OdisRequest> {
@@ -15,10 +14,7 @@ export class Session<R extends OdisRequest> {
 
   public constructor(
     readonly request: Request<{}, {}, R>,
-    readonly response: Response<OdisResponse<R>>,
-    // TODO EN figure out typing locks to ensure that correct session <-> correct CryptoClient
-    // readonly crypto: CombinerCryptoClient
-    readonly crypto: CryptoClient<R>
+    readonly response: Response<OdisResponse<R>>
   ) {
     this.logger = response.locals.logger
   }

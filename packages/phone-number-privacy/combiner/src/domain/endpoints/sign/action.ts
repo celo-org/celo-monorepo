@@ -4,8 +4,8 @@ import {
   getSignerEndpoint,
   SignerEndpoint,
 } from '@celo/phone-number-privacy-common'
+import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
-import { Session } from '../../../common/session'
 import { SignAction } from '../../../common/sign'
 import { OdisConfig } from '../../../config'
 import { DomainThresholdStateService } from '../../services/thresholdState'
@@ -22,7 +22,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
     super(config, io)
   }
 
-  async combine(session: Session<DomainRestrictedSignatureRequest>): Promise<void> {
+  async combine(session: CryptoSession<DomainRestrictedSignatureRequest>): Promise<void> {
     // this.logResponseDiscrepancies(session) // TODO(Alec)
 
     if (session.crypto.hasSufficientSignatures()) {
@@ -51,7 +51,9 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
     return req.blindedMessage
   }
 
-  protected logResponseDiscrepancies(_session: Session<DomainRestrictedSignatureRequest>): void {
+  protected logResponseDiscrepancies(
+    _session: CryptoSession<DomainRestrictedSignatureRequest>
+  ): void {
     // TODO
     throw new Error('Method not implemented.')
   }

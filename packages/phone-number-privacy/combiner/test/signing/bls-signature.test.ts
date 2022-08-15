@@ -55,7 +55,7 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const blsCryptoClient = new BLSCryptographyClient()
+    const blsCryptoClient = new BLSCryptographyClient(config)
     for (let i = 0; i < signatures.length; i++) {
       await blsCryptoClient.addSignature(signatures[i])
       if (i >= 2) {

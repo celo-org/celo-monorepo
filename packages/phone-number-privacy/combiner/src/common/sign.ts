@@ -11,8 +11,8 @@ import {
 import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
 import { CombineAction } from './combine'
+import { CryptoSession } from './crypto-session'
 import { IO } from './io'
-import { Session } from './session'
 
 // prettier-ignore
 export type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
@@ -32,7 +32,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
   protected async receiveSuccess(
     signerResponse: FetchResponse,
     url: string,
-    session: Session<R>
+    session: CryptoSession<R>
   ): Promise<OdisResponse<R>> {
     if (!this.io.responseHasValidKeyVersion(signerResponse, session)) {
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
@@ -70,7 +70,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
     return res
   }
 
-  protected handleMissingSignatures(session: Session<R>) {
+  protected handleMissingSignatures(session: CryptoSession<R>) {
     let error: ErrorType = ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
     const majorityErrorCode = session.getMajorityErrorCode()
     if (majorityErrorCode === 403 || majorityErrorCode === 429) {
