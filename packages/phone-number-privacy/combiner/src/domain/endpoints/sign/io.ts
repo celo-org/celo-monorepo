@@ -52,7 +52,6 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       return null
     }
     return new CryptoSession(request, response, new DomainCryptoClient(this.config))
-    // return new Session(request, response, new BLSCryptographyClient(this.config))
   }
 
   authenticate(request: Request<{}, {}, DomainRestrictedSignatureRequest>): Promise<boolean> {

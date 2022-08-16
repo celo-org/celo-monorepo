@@ -56,7 +56,6 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    // return new Session(request, response, new PNPCryptoClient(this.config))
     return new CryptoSession(request, response, new BLSCryptographyClient(this.config))
   }
 
