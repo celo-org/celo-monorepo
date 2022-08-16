@@ -110,7 +110,7 @@ contract Reserve is
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
-   * @param _spendingRatio The relative daily spending limit for the reserve spender.
+   * @param _spendingRatioForCelo The relative daily spending limit for the reserve spender.
    * @param _frozenGold The balance of reserve gold that is frozen.
    * @param _frozenDays The number of days during which the frozen gold thaws.
    * @param _assetAllocationSymbols The symbols of the reserve assets.
@@ -123,7 +123,7 @@ contract Reserve is
   function initialize(
     address registryAddress,
     uint256 _tobinTaxStalenessThreshold,
-    uint256 _spendingRatio,
+    uint256 _spendingRatioForCelo,
     uint256 _frozenGold,
     uint256 _frozenDays,
     bytes32[] calldata _assetAllocationSymbols,
@@ -136,7 +136,7 @@ contract Reserve is
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
-    setDailySpendingRatio(_spendingRatio);
+    setDailySpendingRatio(_spendingRatioForCelo);
     setFrozenGold(_frozenGold, _frozenDays);
     setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
     setTobinTax(_tobinTax);

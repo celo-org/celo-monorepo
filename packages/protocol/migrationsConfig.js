@@ -160,6 +160,8 @@ const DefaultConfig = {
     ],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
+    erc20TokenDailySpendingLimit: 0,
+    erc20TokenAddress: '0x0000000000000000000000000000000000000000',
   },
   reserveSpenderMultiSig: {
     signatories: [network.from],
