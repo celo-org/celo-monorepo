@@ -376,11 +376,9 @@ describe('domainService', () => {
 
   describe(`${CombinerEndpoint.DOMAIN_QUOTA_STATUS}`, () => {
     it('Should respond with 200 on valid request', async () => {
-      // console.log('app: ', app)
       const res = await request(app)
         .post(CombinerEndpoint.DOMAIN_QUOTA_STATUS)
         .send(await quotaRequest())
-      // console.log('res: ', res)
       expect(res.status).toBe(200)
       expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
         success: true,

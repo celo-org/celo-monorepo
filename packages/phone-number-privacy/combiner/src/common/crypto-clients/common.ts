@@ -13,15 +13,14 @@ export abstract class CryptoClient {
   constructor(protected readonly config: OdisConfig) {}
 
   /**
-   * Returns total number of signatures received; must be implemented by subclass.
-   */
-  protected abstract get allSignaturesLength(): number
-
-  /**
    * Returns true if the number of valid signatures is enough to perform a combination
    */
   public hasSufficientSignatures(): boolean {
     return this.allSignaturesLength >= this.config.keys.threshold
+  }
+
+  public addSignature(serviceResponse: ServicePartialSignature): void {
+    this.unverifiedSignatures.push(serviceResponse)
   }
 
   /*
@@ -54,7 +53,8 @@ export abstract class CryptoClient {
     logger: Logger
   ): Promise<string>
 
-  public addSignature(serviceResponse: ServicePartialSignature): void {
-    this.unverifiedSignatures.push(serviceResponse)
-  }
+  /**
+   * Returns total number of signatures received; must be implemented by subclass.
+   */
+  protected abstract get allSignaturesLength(): number
 }
