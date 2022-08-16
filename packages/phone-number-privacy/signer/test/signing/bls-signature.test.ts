@@ -1,6 +1,7 @@
 import { rootLogger, TestUtils } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
-import { computeBlindedSignature } from '../../src/bls/bls-cryptography-client'
+import { computeBlindedSignature } from '../../src/common/bls/bls-cryptography-client'
+import { config } from '../../src/config'
 
 describe(`BLS service computes signature`, () => {
   it('provides blinded signature', async () => {
@@ -13,10 +14,10 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const actual = await computeBlindedSignature(
+    const actual = computeBlindedSignature(
       blindedMsg,
       TestUtils.Values.PNP_DEV_SIGNER_PRIVATE_KEY,
-      rootLogger()
+      rootLogger(config.serviceName)
     )
     expect(actual).toEqual(
       'MAAAAAAAAADDilSaA/xvbtE4NV3agMzHIf8PGPQ83Cu8gQy5E2mRWyUIges8bjE4EBe1L7pcY4AAAAAA'
@@ -43,8 +44,12 @@ describe(`BLS service computes signature`, () => {
     const blindedMsg = Buffer.from('invalid blinded message').toString('base64')
 
     expect.assertions(1)
-    await expect(() =>
-      computeBlindedSignature(blindedMsg, TestUtils.Values.PNP_DEV_SIGNER_PRIVATE_KEY, rootLogger())
+    expect(() =>
+      computeBlindedSignature(
+        blindedMsg,
+        TestUtils.Values.PNP_DEV_SIGNER_PRIVATE_KEY,
+        rootLogger(config.serviceName)
+      )
     ).toThrow()
   })
 })
