@@ -121,7 +121,7 @@ remote_write:
               |container_cpu_user_seconds_total\
               |container_file_.+\
               |container_fs_.+\
-              |container_memory_[^w].*\
+              |container_memory_[^wu].*\
               |container_last_.+\
               |container_network_.+\
               |container_processes\
