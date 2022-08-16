@@ -117,7 +117,8 @@ contract Reserve is
    * @param _assetAllocationWeights The reserve asset weights.
    * @param _tobinTax The tobin tax value as a fixidity fraction.
    * @param _tobinTaxReserveRatio When to turn on the tobin tax, as a fixidity fraction.
-   * @param _erc20TokenDailySpendingRatio The relative daily spending limit of an ERC20 token for the reserve spender.
+   * @param _erc20TokenDailySpendingRatio The relative daily spending limit
+   * of an ERC20 token for the reserve spender.
    * @param _erc20TokenAddress The address of an ERC20 token we're setting a limit for.
    */
   function initialize(
@@ -186,13 +187,15 @@ contract Reserve is
   /**
    * @notice Set the ratio of reserve for a given ERC20 token that is spendable per day.
    * @param erc20TokenAddress The address of an ERC20 token we're setting a limit for.
-   * @param erc20TokenDailySpendingRatio The relative daily spending limit of an ERC20 token for the reserve spender.
+   * @param erc20TokenDailySpendingRatio The relative daily spending limit
+   * of an ERC20 token for the reserve spender.
    */
   function setDailySpendingRatioForErc20Tokens(
     address erc20TokenAddress,
     uint256 erc20TokenDailySpendingRatio
   ) public onlyOwner {
-    // we want to be able to initialize 0 values but we don't want to set it in the mapping just in case
+    // we want to be able to initialize 0 values
+    // but we don't want to set it in the mapping just in case
     if (erc20TokenAddress != address(0) && erc20TokenDailySpendingRatio != 0) {
       erc20DailySpendingRatio[erc20TokenAddress] = FixidityLib.wrap(erc20TokenDailySpendingRatio);
       require(
@@ -441,7 +444,8 @@ contract Reserve is
   }
 
   /**
-   * @notice Transfer ERC20 token to a whitelisted address subject to reserve spending limits is the limit is set, othersise the limit is 100%.
+   * @notice Transfer ERC20 token to a whitelisted address subject to reserve spending limits
+   * if the limit is set, othersise the limit is 100%.
    * @param erc20TokenAddress The token address you're transferring.
    * @param to The address that will receive the ERC20 token.
    * @param value The amount of ERC20 token to transfer.
