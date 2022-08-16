@@ -1,12 +1,12 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import Logger from 'bunyan'
-import { CombinerCryptoClient, ServicePartialSignature } from './crypto-client'
+import { CryptoClient, ServicePartialSignature } from './common'
 
 function flattenSigsArray(sigs: Uint8Array[]) {
   return Uint8Array.from(sigs.reduce((a, b) => a.concat(Array.from(b)), [] as any))
 }
-export class BLSCryptographyClient extends CombinerCryptoClient {
+export class BLSCryptographyClient extends CryptoClient {
   // Signatures can be verified server-side without knowledge of the blinding factor
   private verifiedSignatures: ServicePartialSignature[] = []
 

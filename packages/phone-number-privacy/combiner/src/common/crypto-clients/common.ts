@@ -1,36 +1,13 @@
-import {
-  DomainRestrictedSignatureRequest,
-  ErrorMessage,
-  OdisRequest,
-  rootLogger,
-  SignMessageRequest,
-} from '@celo/phone-number-privacy-common'
+import { ErrorMessage, rootLogger } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { OdisConfig } from '../../config'
-
-// TODO EN: could have both DomainRestrictedSignatureRequest and SignMessageRequest
-// TODO EN if we go with this, move to requests common
-export type SignatureRequest = DomainRestrictedSignatureRequest | SignMessageRequest
-export type CryptoClient<R extends OdisRequest> = R extends SignatureRequest
-  ? CombinerCryptoClient
-  : never | undefined
-
-// TODO EN rename and factor out possibly into its own file
-// possibly move towards abstract class instead of interface depending on shared code
-// export interface CryptoClientInterface<R extends OdisRequest> {
-// export interface CombinerCryptoClient {
-//   hasSufficientSignatures(): boolean
-//   combinePartialBlindedSignatures(blindedMessage: string, logger?: Logger): Promise<string>
-//   addSignature(serviceResponse: ServicePartialSignature): void // TODO EN: if this stays, reorganize where the ServicePartialSignature should go
-// }
 
 export interface ServicePartialSignature {
   url: string
   signature: string
 }
 
-// TODO EN rename
-export abstract class CombinerCryptoClient {
+export abstract class CryptoClient {
   protected unverifiedSignatures: ServicePartialSignature[] = []
 
   constructor(protected readonly config: OdisConfig) {}
