@@ -58,6 +58,7 @@ contract Reserve is
   mapping(address => bool) public isExchangeSpender;
   address[] public exchangeSpenderAddresses;
   mapping(address => FixidityLib.Fraction) private erc20DailySpendingRatio;
+  mapping(address => uint256) public lastSpendingDays;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
@@ -443,9 +444,9 @@ contract Reserve is
     uint256 spendingLimitForThisToken;
     if (FixidityLib.unwrap(erc20DailySpendingRatio[erc20TokenAddress]) > 0) {
       uint256 currentDay = now / 1 days;
-      if (currentDay > lastSpendingDay) {
+      if (currentDay > lastSpendingDays[erc20TokenAddress]) {
         uint256 balance = getErc20TokenBalance(erc20TokenAddress);
-        lastSpendingDay = currentDay;
+        lastSpendingDays[erc20TokenAddress] = currentDay;
         spendingLimitForThisToken = erc20DailySpendingRatio[erc20TokenAddress]
           .multiply(FixidityLib.newFixed(balance))
           .fromFixed();

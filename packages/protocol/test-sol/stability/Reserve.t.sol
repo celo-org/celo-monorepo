@@ -20,7 +20,7 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   using FixidityLib for FixidityLib.Fraction;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
-  event SpendingDailyRatioSet(address[] tokenAddresses, uint256[] dailySpendingRatio);
+  event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address indexed token);
   event TokenRemoved(address indexed token, uint256 index);
   event SpenderAdded(address indexed spender);
@@ -33,12 +33,12 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
-  event ReserveErc20TokenTransferred(
-    address indexed spender,
-    address indexed to,
-    uint256 value,
-    address token
-  );
+  // event ReserveErc20TokenTransferred(
+  //   address indexed spender,
+  //   address indexed to,
+  //   uint256 value,
+  //   address token
+  // );
 
   address constant exchangeAddress = address(0xe7c45fa);
   uint256 constant tobinTaxStalenessThreshold = 600;
