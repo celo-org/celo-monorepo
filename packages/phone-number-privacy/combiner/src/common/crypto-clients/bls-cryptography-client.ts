@@ -22,8 +22,8 @@ export class BLSCryptographyClient extends CryptoClient {
 
   /*
    * Computes the BLS signature for the blinded phone number.
-   * Throws an exception if not enough valid signatures
-   * and drops the invalid signature for future requests using this instance
+   * On error, logs and throws exception for not enough signatures,
+   * and drops the invalid signature for future requests using this instance.
    */
   protected async _combinePartialBlindedSignatures(
     blindedMessage: string,

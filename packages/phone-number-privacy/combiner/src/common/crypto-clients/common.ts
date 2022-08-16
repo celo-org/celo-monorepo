@@ -24,7 +24,13 @@ export abstract class CryptoClient {
     return this.allSignaturesLength >= this.config.keys.threshold
   }
 
-  // TODO EN: comments & docstrings if this structure stays
+  /*
+   * Computes the signature for the blinded phone number using subclass-specific
+   * logic defined in _combinePartialBlindedSignatures.
+   * Throws an exception if not enough valid signatures.
+   */
+  // TODO EN (+ reviewers) this function is async for historical reasons,
+  //  but does either threshold_bls or poprf require this?
   public combinePartialBlindedSignatures(blindedMessage: string, logger?: Logger): Promise<string> {
     logger = logger ?? rootLogger(this.config.serviceName)
     if (!this.hasSufficientSignatures()) {
@@ -39,7 +45,10 @@ export abstract class CryptoClient {
     return this._combinePartialBlindedSignatures(blindedMessage, logger)
   }
 
-  // TODO EN QUESTION: why does combinePartialBlindedSignatures in bls-cryptography-client return a promise??
+  /*
+   * Computes the signature for the blinded phone number.
+   * Must be implemented by subclass.
+   */
   protected abstract _combinePartialBlindedSignatures(
     blindedMessage: string,
     logger: Logger

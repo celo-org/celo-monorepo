@@ -16,17 +16,20 @@ export class DomainCryptoClient extends CryptoClient {
     return this.unverifiedSignatures.length
   }
 
-  // TODO EN: rename if no abstract class factoring out
   private get allSigsAsArray(): Uint8Array[] {
     return this.unverifiedSignatures.map((response) => Buffer.from(response.signature, 'base64'))
   }
 
-  // TODO EN question: does this actually need to be async -- same with bls-crypto client???
+  /*
+   * Aggregates blind partial signatures into a blind aggregated POPRF evaluation.
+   * On error, logs and throws exception for not enough signatures.
+   * Verification of partial signatures is not possible server-side
+   * (i.e. without the client's blinding factor).
+   */
   protected async _combinePartialBlindedSignatures(
-    _blindedMessage: string, // TODO EN: fix this and find better solution for this
+    _blindedMessage: string,
     logger: Logger
   ): Promise<string> {
-    // TODO EN: is this extra try/catch handling required here? -> TODO pOPRF blindaggregate failure test case
     try {
       const result = this.cryptoClient.blindAggregate(this.allSigsAsArray)
       if (result !== undefined) {
