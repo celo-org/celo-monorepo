@@ -70,7 +70,7 @@ contract Reserve is
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
-  event ReserveErc20TokenTransferred(
+  event ReserveCollateralAssetsTransferred(
     address indexed spender,
     address indexed to,
     uint256 value,
@@ -513,7 +513,7 @@ contract Reserve is
       "Exceeding the amount reserve holds"
     );
     IERC20(collateralAssetAddress).transfer(to, value);
-    emit ReserveErc20TokenTransferred(msg.sender, to, value, collateralAssetAddress);
+    emit ReserveCollateralAssetsTransferred(msg.sender, to, value, collateralAssetAddress);
     return true;
   }
 
