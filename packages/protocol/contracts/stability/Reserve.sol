@@ -478,7 +478,7 @@ contract Reserve is
     address payable to,
     uint256 value
   ) external returns (bool) {
-    require(msg.sender != address(0), "sender should not be a zero address");
+    require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(to != address(0), "can not transfer to 0 address");
     uint256 spendingLimitForThisAsset;
     if (FixidityLib.unwrap(collateralAssetDailySpendingRatio[collateralAssetAddress]) > 0) {
