@@ -390,16 +390,20 @@ describe('domainService', () => {
     it('Should respond with 200 on repeated valid requests', async () => {
       const req = await quotaRequest()
       const res1 = await request(app).post(CombinerEndpoint.DOMAIN_QUOTA_STATUS).send(req)
-      expect(res1.status).toBe(200)
-      expect(res1.body).toMatchObject<DomainQuotaStatusResponse>({
+      const expectedResponse: DomainQuotaStatusResponse = {
         success: true,
         version: res1.body.version,
         status: { disabled: false, counter: 0, timer: 0, now: res1.body.status.now },
-      })
+      }
+
+      expect(res1.status).toBe(200)
+      expect(res1.body).toMatchObject<DomainQuotaStatusResponse>(expectedResponse)
 
       const res2 = await request(app).post(CombinerEndpoint.DOMAIN_QUOTA_STATUS).send(req)
       expect(res2.status).toBe(200)
-      expect(res2.body).toMatchObject<DomainQuotaStatusResponse>(res1.body)
+      // Prevent flakiness due to slight timing inconsistencies
+      expectedResponse.status.now = res2.body.status.now
+      expect(res2.body).toMatchObject<DomainQuotaStatusResponse>(expectedResponse)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
