@@ -11,18 +11,42 @@ interface IPairManager {
   struct Pair {
     address stableAsset;
     address collateralAsset;
-    address mentoExchange; // TODO: Switch to IMentoExchange after merge
+    address mentoExchange;
     uint256 stableBucket;
     uint256 collateralBucket;
     uint256 bucketUpdateFrequency;
     uint256 lastBucketUpdate;
-    FixidityLib.Fraction reserveCollateralFraction;
-    FixidityLib.Fraction spread;
+    FixidityLib.Fraction collateralBucketFraction;
     FixidityLib.Fraction stableBucketMaxFraction;
+    FixidityLib.Fraction spread;
     uint256 minimumReports;
     uint256 minSupplyForStableBucketCap;
     bytes32 stableTokenRegistryId;
   }
+
+  /**
+   * @notice Emitted when a new virtual pair has been created.
+   * @param stableAsset The address of the stable asset.
+   * @param collateralAsset The address of the collateral asset.
+   * @param mentoExchange The address of the Mento exchange.
+   */
+  event PairCreated(
+    address indexed stableAsset,
+    address indexed collateralAsset,
+    address indexed mentoExchange
+  );
+
+  /**
+   * @notice Emitted when a virtual pair has been destroyed.
+   * @param stableAsset The address of the stable asset.
+   * @param collateralAsset The address of the collateral asset.
+   * @param mentoExchange The address of the Mento exchange.
+   */
+  event PairDestroyed(
+    address indexed stableAsset,
+    address indexed collateralAsset,
+    address indexed mentoExchange
+  );
 
   /**
    * @notice Retrieves the pair with the specified pairId.

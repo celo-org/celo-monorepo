@@ -574,4 +574,12 @@ contract Reserve is
       return FixidityLib.wrap(tobinTax);
     }
   }
+
+  function isStableAsset(address) external view returns (bool) {
+    return true;
+  }
+
+  function isCollateralAsset(address) external view returns (bool) {
+    return true;
+  }
 }
