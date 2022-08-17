@@ -50,6 +50,19 @@ spec:
           - "indexer"
           - "--config=/var/config/config.yaml"
           - "--celo-node-uri=http://rc1-fullnodes-rpc-internal-lb:8545"
+        livenessProbe:
+          exec:
+            # "eksportisto monitor" expects more parameters and will always
+            # fail when invoked like this. This is on purpose, as the
+            # livenessProbe is being used to restart the container every
+            # initialDelaySeconds seconds. The eksportisto binary is being
+            # used as it's the only binary present on the container image
+            # (regular user-space tools are not available).
+            command:
+              - /app/eksportisto
+              - monitor
+          initialDelaySeconds: 1800
+          failureThreshold: 1
         env:
         - name: GOOGLE_APPLICATION_CREDENTIALS
           value: "/var/config/service-account.json"

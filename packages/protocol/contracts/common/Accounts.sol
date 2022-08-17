@@ -123,7 +123,10 @@ contract Accounts is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 4, 0);
@@ -287,7 +290,8 @@ contract Accounts is
   /**
    * @notice Returns the full list of offchain storage roots for an account.
    * @param account The account whose storage roots to return.
-   * @return List of storage root URLs.
+   * @return Concatenated storage root URLs.
+   * @return Lengths of storage root URLs.
    */
   function getOffchainStorageRoots(address account)
     external
@@ -347,7 +351,8 @@ contract Accounts is
   /**
    * @notice Gets validator payment delegation settings.
    * @param account Account of the validator.
-   * @return Beneficiary address and fraction of payment delegated.
+   * @return Beneficiary address of payment delegated.
+   * @return Fraction of payment delegated.
    */
   function getPaymentDelegation(address account) external view returns (address, uint256) {
     PaymentDelegation storage delegation = paymentDelegations[account];
@@ -946,9 +951,8 @@ contract Accounts is
   /**
    * @notice Getter for the metadata of multiple accounts.
    * @param accountsToQuery The addresses of the accounts to get the metadata for.
-   * @return (stringLengths[] - the length of each string in bytes
-   *          data - all strings concatenated
-   *         )
+   * @return The length of each string in bytes.
+   * @return All strings concatenated.
    */
   function batchGetMetadataURL(address[] calldata accountsToQuery)
     external

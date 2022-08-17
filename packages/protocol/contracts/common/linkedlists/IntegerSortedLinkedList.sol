@@ -104,7 +104,8 @@ library IntegerSortedLinkedList {
   /**
    * @notice Gets all elements from the doubly linked list.
    * @param list A storage pointer to the underlying list.
-   * @return An unpacked list of elements from largest to smallest.
+   * @return Array of all keys in the list.
+   * @return Values corresponding to keys, which will be ordered largest to smallest.
    */
   function getElements(SortedLinkedList.List storage list)
     public
