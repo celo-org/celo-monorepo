@@ -13,11 +13,11 @@ import {
   DomainRestrictedSignatureResponse,
   genSessionID,
   KEY_VERSION_HEADER,
-  PoprfClient,
   SequentialDelayDomain,
   SequentialDelayStage,
   SignerEndpoint,
   TestUtils,
+  ThresholdPoprfClient,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
@@ -56,10 +56,11 @@ describe('domainService', () => {
   const signatureRequest = async (
     _domain?: SequentialDelayDomain,
     _nonce?: number
-  ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, PoprfClient]> => {
+  ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, ThresholdPoprfClient]> => {
     const domain = _domain ?? authenticatedDomain()
-    const poprfClient = new PoprfClient(
+    const thresholdPoprfClient = new ThresholdPoprfClient(
       Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'hex'),
+      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_POLYNOMIAL, 'hex'),
       domainHash(domain),
       Buffer.from('test message', 'utf8')
     )
@@ -71,13 +72,13 @@ describe('domainService', () => {
         signature: noString,
         nonce: defined(_nonce ?? 0),
       },
-      blindedMessage: poprfClient.blindedMessage.toString('base64'),
+      blindedMessage: thresholdPoprfClient.blindedMessage.toString('base64'),
       sessionID: defined(genSessionID()),
     }
     req.options.signature = defined(
       await wallet.signTypedData(walletAddress, domainRestrictedSignatureRequestEIP712(req))
     )
-    return [req, poprfClient]
+    return [req, thresholdPoprfClient]
   }
 
   const quotaRequest = async (): Promise<DomainQuotaStatusRequest<SequentialDelayDomain>> => {
@@ -413,8 +414,11 @@ describe('domainService', () => {
   })
 
   describe(`${SignerEndpoint.DOMAIN_SIGN}`, () => {
+    const expectedEval =
+      'AQAAADOLyMxriQz1lPksXKDan0zfWippSmq3a1st9Hk+k7ad/wKZQHgaoHtCkJucKgdeAe/BCnXDGeArwmXrdLp8ArM41S2b148ebYEhOL6nqI6HGJ7xO15sCk+eZEf/RSfdAJJDj99oz65j7fgUPJQlHl74Bf+zk78xhlFFzAliHhGxe1a4uWKaa541WqY4OqQHAPnnu9X+DKcjR9/u+gH0VWLnZi/kB3gthhB6sYcGnslkTQbSIHcTbDyNs5GN8wjzAPL2/fD/2yqZfmfupeB8dQ1/PlCJJzwS/oKfeZqh9Z61zwELfkfHVAL8lGvWEjtXANbcUZ+2KoT+XVDJc+CxpPaaGavshKQFgiVLO4cxY5g8auai4P+SkolQVUjEYjYnAKr5ZzN0l53OpqfzJy5fRlLYN+Ks+VLy+2bUxS4gUD0iLMgM1ZbdD19tXnWDSycEAEJNZPxLivV5jHB/gsq19saWdVnhGDOs4hieyUrRF0kEHTkmTbgZAsnwGcEjXtGSALQU218BFPRW79gRMC9TUCzPc970GcLqMiKMugadALpgD360KoIy/xBwai1JEScAAMWAOBxn1CcRmqWBi7bdcTcGZfPdS281G+Ua1y0q7yenU3UFk+9MW/efZVbEqtQTANYW08+nOBf8KRuXEz9BCO9F8+0Kpxwk9DQ4K5O6J/1+4uQlODjyXafvEgG9eAUaACT876ljZDQm72i3TWYacJyVSneK5L+9q81qd9krXDr1sO+4wCs0RuOKzWB1PDXzAA=='
+
     it('Should respond with 200 on valid request', async () => {
-      const [req, _] = await signatureRequest()
+      const [req, thresholdPoprfClient] = await signatureRequest()
 
       const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
 
@@ -430,10 +434,14 @@ describe('domainService', () => {
           now: res.body.status.now,
         },
       })
+      const evaluation = thresholdPoprfClient.unblindPartialResponse(
+        Buffer.from(res.body.signature, 'base64')
+      )
+      expect(evaluation.toString('base64')).toEqual(expectedEval)
     })
 
     it('Should respond with 200 on valid request with key version header', async () => {
-      const [req, _] = await signatureRequest()
+      const [req, thresholdPoprfClient] = await signatureRequest()
 
       const res = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
@@ -452,17 +460,19 @@ describe('domainService', () => {
           now: res.body.status.now,
         },
       })
+      const evaluation = thresholdPoprfClient.unblindPartialResponse(
+        Buffer.from(res.body.signature, 'base64')
+      )
+      expect(evaluation.toString('base64')).toEqual(expectedEval)
     })
 
     it('Should respond with 200 on repeated valid requests', async () => {
-      const req1 = (await signatureRequest())[0]
+      const [req1, thresholdPoprfClient] = await signatureRequest()
 
       const res1 = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
         .set('keyVersion', '1')
         .send(req1)
-
-      console.log(res1.body)
 
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
@@ -476,16 +486,21 @@ describe('domainService', () => {
           now: res1.body.status.now,
         },
       })
+      const eval1 = thresholdPoprfClient.unblindPartialResponse(
+        Buffer.from(res1.body.signature, 'base64')
+      )
+      expect(eval1.toString('base64')).toEqual(expectedEval)
 
       // submit identical request with nonce set to 1
-      const req2 = (await signatureRequest(undefined, 1))[0]
+      req1.options.nonce = defined(1)
+      req1.options.signature = noString
+      req1.options.signature = defined(
+        await wallet.signTypedData(walletAddress, domainRestrictedSignatureRequestEIP712(req1))
+      )
       const res2 = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
         .set('keyVersion', '1')
-        .send(req2)
-
-      console.log(res2.body)
-
+        .send(req1)
       expect(res2.status).toBe(200)
       expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: true,
@@ -498,10 +513,14 @@ describe('domainService', () => {
           now: res2.body.status.now,
         },
       })
+      const eval2 = thresholdPoprfClient.unblindPartialResponse(
+        Buffer.from(res2.body.signature, 'base64')
+      )
+      expect(eval2).toEqual(eval1)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
-      const [req, _] = await signatureRequest()
+      const [req, thresholdPoprfClient] = await signatureRequest()
       // @ts-ignore Intentionally adding an extra field to the request type
       req.options.extraField = noString
 
@@ -519,6 +538,10 @@ describe('domainService', () => {
           now: res.body.status.now,
         },
       })
+      const evaluation = thresholdPoprfClient.unblindPartialResponse(
+        Buffer.from(res.body.signature, 'base64')
+      )
+      expect(evaluation.toString('base64')).toEqual(expectedEval)
     })
 
     it('Should respond with 400 on missing request fields', async () => {
