@@ -4,4 +4,5 @@ certoraRun specs/harnesses/GovernanceHarness.sol contracts/common/Accounts.sol \
   --optimistic_loop \
   --solc_args "['--evm-version', 'istanbul']" \
   --short_output \
-  --msg "Governance"
+  --msg "Governance" \
+  --staging release/14Jul2022 # Temporary fix
