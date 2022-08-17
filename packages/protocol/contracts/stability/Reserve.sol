@@ -59,6 +59,8 @@ contract Reserve is
   address[] public exchangeSpenderAddresses;
   mapping(address => FixidityLib.Fraction) private collateralAssetDailySpendingRatio;
   mapping(address => uint256) public collateralAssetLastSpendingDay;
+  address[] public collateralAssets;
+  mapping(address => bool) public isCollateralAsset;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
@@ -633,11 +635,45 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the amount of particular ERC20 token included in the reserve.
-   * @return The amount of particular ERC20 token included in the reserve.
+   * @notice Returns the amount of particular asset included in the reserve.
+   * @return The amount of particular asset included in the reserve.
    */
   function getCollateralAssetBalance(address collateralAssetAddress) public view returns (uint256) {
     return IERC20(collateralAssetAddress).balanceOf(address(this));
+  }
+
+  /**
+   * @notice Returns the amount of particular collateral asset included in other reserve addresses.
+   * @return The particular collateral asset amount included in other reserve addresses.
+   */
+  function getReserveAddressesCollateralAssetBalance(address collateralAssetAddress)
+    public
+    view
+    returns (uint256)
+  {
+    uint256 reserveCollateralAssetBalance = 0;
+    for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
+      reserveCollateralAssetBalance = reserveCollateralAssetBalance.add(
+        IERC20(collateralAssetAddress).balanceOf(otherReserveAddresses[i])
+      );
+    }
+    return reserveCollateralAssetBalance;
+  }
+
+  function addCollateralAsset(address collateralAssetAddress) onlyOwner {
+    require(
+      getCollateralAssetBalance(collateralAssetAddress) > 0,
+      "Token Address specified is not a reserve collateral asset"
+    );
+    isCollateralAsset[collateralAssetAddress] = true;
+  }
+
+  function removeCollateralAsset(address collateralAssetAddress) onlyOwner {
+    delete isCollateralAsset[collateralAssetAddress];
+  }
+
+  function isCollateralAsset(address collateralAssetAddress) public view returns (bool) {
+    isCollateralAsset[collateralAssetAddress] ? true : false;
   }
 
   /**
