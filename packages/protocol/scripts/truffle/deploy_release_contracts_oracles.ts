@@ -235,11 +235,7 @@ module.exports = async (callback: (error?: any) => number) => {
         'network',
         'from',
         'grants',
-        // TODO add beneficiary, months, oneTimePaymentUSD, monthlyPaymentUSD, numberOfNodes
-        'start_gold',
-        'deployed_grants',
-        'output_file',
-        'really',
+        // TODO add beneficiary, months, oneTimePaymentUSD, monthlyPaymentUSD, numberOfNodes, delayStartTime
         'debug',
       ],
     })
@@ -252,7 +248,7 @@ module.exports = async (callback: (error?: any) => number) => {
     fromAddress = argv.from
 
     // inputs to be added by the terminal
-    let beneficiary = '0x'
+    const beneficiary = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA' // todo Changethis
     const months = 12
     const oneTimePaymentUSD = 3000
     const monthlyPaymentUSD = 700
@@ -280,12 +276,8 @@ module.exports = async (callback: (error?: any) => number) => {
     const governanceProxyAddress = governanceContract.address
 
     console.log(`Using address for Community fund (Governance Proxy) ${governanceProxyAddress}`)
-    // const governanceProxyAddress = '0xAA963FC97281d9632d96700aB62A4D1340F9a28a'
-
-    beneficiary = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA' // todo Changethis
 
     const now = new Date()
-
     const grantStartDay = new Date(now.getTime() + 60 * 60 * 24 * 10 * 1000) // 10 days from now
 
     const config: ReleaseGoldConfig = {
