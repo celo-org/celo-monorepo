@@ -57,8 +57,8 @@ contract Reserve is
 
   mapping(address => bool) public isExchangeSpender;
   address[] public exchangeSpenderAddresses;
-  mapping(address => FixidityLib.Fraction) private erc20DailySpendingRatio;
-  mapping(address => uint256) public lastSpendingDays;
+  mapping(address => FixidityLib.Fraction) private collateralAssetDailySpendingRatio;
+  mapping(address => uint256) public collateralAssetLastSpendingDay;
 
   event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
@@ -82,7 +82,7 @@ contract Reserve is
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
   event DailySpendingRatioForErc20TokenSet(
     address erc20TokenAddress,
-    uint256 erc20DailySpendingRatio
+    uint256 collateralAssetDailySpendingRatios
   );
 
   /**
@@ -197,9 +197,11 @@ contract Reserve is
     // we want to be able to initialize 0 values
     // but we don't want to set it in the mapping just in case
     if (erc20TokenAddress != address(0) && erc20TokenDailySpendingRatio != 0) {
-      erc20DailySpendingRatio[erc20TokenAddress] = FixidityLib.wrap(erc20TokenDailySpendingRatio);
+      collateralAssetDailySpendingRatios[erc20TokenAddress] = FixidityLib.wrap(
+        erc20TokenDailySpendingRatio
+      );
       require(
-        erc20DailySpendingRatio[erc20TokenAddress].lte(FixidityLib.fixed1()),
+        collateralAssetDailySpendingRatios[erc20TokenAddress].lte(FixidityLib.fixed1()),
         "spending ratio cannot be larger than 1"
       );
       emit DailySpendingRatioForErc20TokenSet(erc20TokenAddress, erc20TokenDailySpendingRatio);
@@ -220,7 +222,7 @@ contract Reserve is
    * @return Daily spending ratio for an ERC20 token as unwrapped Fraction.
    */
   function getDailySpendingRatioForErc20(address erc20TokenAddress) public view returns (uint256) {
-    return erc20DailySpendingRatio[erc20TokenAddress].unwrap();
+    return collateralAssetDailySpendingRatios[erc20TokenAddress].unwrap();
   }
 
   /**
@@ -455,19 +457,15 @@ contract Reserve is
     external
     returns (bool)
   {
-    require(
-      erc20TokenAddress != registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID),
-      "token address should not equal to celo"
-    );
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(isOtherReserveAddress[to], "can only transfer to other reserve address");
     uint256 spendingLimitForThisToken;
-    if (FixidityLib.unwrap(erc20DailySpendingRatio[erc20TokenAddress]) > 0) {
+    if (FixidityLib.unwrap(collateralAssetDailySpendingRatios[erc20TokenAddress]) > 0) {
       uint256 currentDay = now / 1 days;
-      if (currentDay > lastSpendingDays[erc20TokenAddress]) {
+      if (currentDay > collateralAssetLastSpendingDay[erc20TokenAddress]) {
         uint256 balance = getErc20TokenBalance(erc20TokenAddress);
-        lastSpendingDays[erc20TokenAddress] = currentDay;
-        spendingLimitForThisToken = erc20DailySpendingRatio[erc20TokenAddress]
+        collateralAssetLastSpendingDay[erc20TokenAddress] = currentDay;
+        spendingLimitForThisToken = collateralAssetDailySpendingRatios[erc20TokenAddress]
           .multiply(FixidityLib.newFixed(balance))
           .fromFixed();
       }

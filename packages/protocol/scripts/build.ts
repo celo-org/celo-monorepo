@@ -37,7 +37,6 @@ export const ProxyContracts = [
   'StableTokenProxy',
   'SortedOraclesProxy',
   'StableTokenRegistryProxy',
-  'GigaMentoProxy',
 ]
 export const CoreContracts = [
   // common
@@ -84,7 +83,6 @@ export const CoreContracts = [
 
   // liquidity
   'GrandaMento',
-  'GigaMento',
 ]
 
 const OtherContracts = [
