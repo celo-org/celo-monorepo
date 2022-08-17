@@ -84,7 +84,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
     error: ErrorType,
     status: number,
     response: Response<DomainRestrictedSignatureResponseFailure>,
-    domainState?: DomainState
+    domainState?: DomainState // TODO: is status ever provided on failure?
   ) {
     send(
       response,

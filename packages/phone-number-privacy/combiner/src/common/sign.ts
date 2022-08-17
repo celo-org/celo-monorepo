@@ -71,10 +71,19 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
   }
 
   protected handleMissingSignatures(session: CryptoSession<R>) {
-    let error: ErrorType = ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
+    let error: ErrorType
     const majorityErrorCode = session.getMajorityErrorCode()
-    if (majorityErrorCode === 403 || majorityErrorCode === 429) {
-      error = WarningMessage.EXCEEDED_QUOTA
+    switch (majorityErrorCode) {
+      case 403:
+      case 429:
+        error = WarningMessage.EXCEEDED_QUOTA
+        break
+      case 401:
+        // Authentication is checked in the combiner, but invalid nonces are passed through
+        error = WarningMessage.INVALID_NONCE
+        break
+      default:
+        error = ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
     }
     this.io.sendFailure(error, majorityErrorCode ?? 500, session.response)
   }
