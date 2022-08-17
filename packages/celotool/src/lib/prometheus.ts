@@ -40,7 +40,8 @@ const prometheusImageTag = 'v2.27.1'
 const GKEWorkloadMetricsHelmChartPath = '../helm-charts/gke-workload-metrics'
 const GKEWorkloadMetricsReleaseName = 'gke-workload-metrics'
 
-const grafanaHelmChartPath = '../helm-charts/grafana'
+const grafanaHelmRepo = 'grafana/grafana'
+const grafanaChartVersion = '6.32.3'
 const grafanaReleaseName = 'grafana'
 
 export async function installPrometheusIfNotExists(
@@ -334,11 +335,10 @@ async function installGrafana(context?: string, clusterConfig?: BaseClusterConfi
   return installGenericHelmChart(
     kubeNamespace,
     grafanaReleaseName,
-    grafanaHelmChartPath,
+    grafanaHelmRepo,
     await grafanaHelmParameters(context, clusterConfig),
-    // Adding this file and clabs' default values file.
-    true,
-    'values-clabs.yaml'
+    false,
+    '../helm-charts/grafana/values-clabs.yaml'
   )
 }
 
@@ -347,10 +347,11 @@ export async function upgradeGrafana(context?: string, clusterConfig?: BaseClust
   return upgradeGenericHelmChart(
     kubeNamespace,
     grafanaReleaseName,
-    grafanaHelmChartPath,
+    grafanaHelmRepo,
     await grafanaHelmParameters(context, clusterConfig),
+    false,
     // Adding this file and clabs' default values file.
-    'values-clabs.yaml'
+    '../helm-charts/grafana/values-clabs.yaml'
   )
 }
 
@@ -397,7 +398,7 @@ async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClust
   fs.writeFileSync(valuesFile, yaml.safeDump(values))
 
   // Adding this file and clabs' default values file.
-  const params = [`-f ${valuesFile}`]
+  const params = [`-f ${valuesFile} --version ${grafanaChartVersion}`]
   return params
 }
 

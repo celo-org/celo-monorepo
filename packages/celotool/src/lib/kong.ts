@@ -34,6 +34,7 @@ export async function upgradeKong(celoEnv: string) {
     kongReleaseName,
     kongChartPath,
     await kongHelmParamenters(celoEnv),
+    true,
     `values-clabs.yaml`
   )
 }
