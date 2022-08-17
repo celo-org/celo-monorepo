@@ -83,9 +83,11 @@ contract Reserve is
   event ExchangeSpenderAdded(address indexed exchangeSpender);
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
   event DailySpendingRatioForCollateralAssetSet(
-    address collateralAssetAddress,
+    address collateralAsset,
     uint256 collateralAssetDailySpendingRatios
   );
+  event CollateralAssetRemoved(address collateralAsset);
+  event CollateralAssetAdded(address collateralAsset);
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -121,7 +123,7 @@ contract Reserve is
    * @param _tobinTaxReserveRatio When to turn on the tobin tax, as a fixidity fraction.
    * @param _erc20TokenDailySpendingRatio The relative daily spending limit
    * of an ERC20 token for the reserve spender.
-   * @param _collateralAssetAddress The address of an ERC20 token we're setting a limit for.
+   * @param _collateralAsset The address of an ERC20 token we're setting a limit for.
    */
   function initialize(
     address registryAddress,
@@ -133,7 +135,7 @@ contract Reserve is
     uint256[] calldata _assetAllocationWeights,
     uint256 _tobinTax,
     uint256 _tobinTaxReserveRatio,
-    address[] calldata _collateralAssetAddresses,
+    address[] calldata _collateralAssetes,
     uint256[] calldata _collateralAssetDailySpendingRatios
   ) external initializer {
     _transferOwnership(msg.sender);
@@ -145,7 +147,7 @@ contract Reserve is
     setTobinTax(_tobinTax);
     setTobinTaxReserveRatio(_tobinTaxReserveRatio);
     setDailySpendingRatioForCollateralAssets(
-      _collateralAssetAddresses,
+      _collateralAssetes,
       _collateralAssetDailySpendingRatios
     );
   }
@@ -191,33 +193,33 @@ contract Reserve is
 
   /**
    * @notice Set the ratio of reserve for a given collateral asset that is spendable per day.
-   * @param collateralAssetAddresses Collection of the addresses of collateral assets we're setting a limit for.
+   * @param collateralAssetes Collection of the addresses of collateral assets we're setting a limit for.
    * @param collateralAssetDailySpendingRatios Collection of the relative daily spending limits
    * of collateral assets.
    */
   function setDailySpendingRatioForCollateralAssets(
-    address[] memory collateralAssetAddresses,
+    address[] memory collateralAssetes,
     uint256[] memory collateralAssetDailySpendingRatios
   ) public onlyOwner {
     require(
-      collateralAssetAddresses.length == collateralAssetDailySpendingRatios.length,
+      collateralAssetes.length == collateralAssetDailySpendingRatios.length,
       "token addresses and spending ratio lengths have to be the same"
     );
-    for (uint256 i = 1; i < collateralAssetAddresses.length; i++) {
-      if (collateralAssetAddresses[i] != address(0) && collateralAssetDailySpendingRatios[i] != 0) {
+    for (uint256 i = 1; i < collateralAssetes.length; i++) {
+      if (collateralAssetes[i] != address(0) && collateralAssetDailySpendingRatios[i] != 0) {
         require(
-          getCollateralAssetBalance(collateralAssetAddresses[i]) > 0,
-          "Token Address specified is not a reserve collateral asset"
+          checkIsCollateralAsset(collateralAssets[i]),
+          "the address specified is not a reserve collateral asset"
         );
         require(
-          collateralAssetDailySpendingRatio[collateralAssetAddresses[i]].lte(FixidityLib.fixed1()),
+          collateralAssetDailySpendingRatio[collateralAssetes[i]].lte(FixidityLib.fixed1()),
           "spending ratio cannot be larger than 1"
         );
-        collateralAssetDailySpendingRatio[collateralAssetAddresses[i]] = FixidityLib.wrap(
+        collateralAssetDailySpendingRatio[collateralAssetes[i]] = FixidityLib.wrap(
           collateralAssetDailySpendingRatios[i]
         );
         emit DailySpendingRatioForCollateralAssetSet(
-          collateralAssetAddresses[i],
+          collateralAssetes[i],
           collateralAssetDailySpendingRatios[i]
         );
       }
@@ -234,15 +236,15 @@ contract Reserve is
 
   /**
    * @notice Get daily spending ratio of a collateral asset.
-   * @param collateralAssetAddress The address of a collateral asset we're getting a spending ratio for.
+   * @param collateralAsset The address of a collateral asset we're getting a spending ratio for.
    * @return Daily spending ratio for the collateral asset as unwrapped Fraction.
    */
-  function getDailySpendingRatioForCollateralAsset(address collateralAssetAddress)
+  function getDailySpendingRatioForCollateralAsset(address collateralAsset)
     public
     view
     returns (uint256)
   {
-    return collateralAssetDailySpendingRatio[collateralAssetAddress].unwrap();
+    return collateralAssetDailySpendingRatio[collateralAsset].unwrap();
   }
 
   /**
@@ -468,54 +470,52 @@ contract Reserve is
   /**
    * @notice Transfer collateral asset subject to reserve spending limits to the trader,
    * if the limit is set, othersise the limit is 100%.
-   * @param collateralAssetAddress The token address you're transferring.
+   * @param collateralAsset The token address you're transferring.
    * @param to The address that will receive the funds.
    * @param value The amount of collateral assets to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function transferCollateralAsset(
-    address collateralAssetAddress,
-    address payable to,
-    uint256 value
-  ) external returns (bool) {
+  function transferCollateralAsset(address collateralAsset, address payable to, uint256 value)
+    external
+    returns (bool)
+  {
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(to != address(0), "can not transfer to 0 address");
+    require(
+      collateralAssetDailySpendingRatio[collateralAsset].unwrap() > 0,
+      "this asset has no spending ratio, therefore can't be transferred"
+    );
     uint256 spendingLimitForThisAsset;
-    if (FixidityLib.unwrap(collateralAssetDailySpendingRatio[collateralAssetAddress]) > 0) {
-      uint256 currentDay = now / 1 days;
-      if (currentDay > collateralAssetLastSpendingDay[collateralAssetAddress]) {
-        uint256 balance = getCollateralAssetBalance(collateralAssetAddress);
-        collateralAssetLastSpendingDay[collateralAssetAddress] = currentDay;
-        spendingLimitForThisAsset = collateralAssetDailySpendingRatio[collateralAssetAddress]
-          .multiply(FixidityLib.newFixed(balance))
-          .fromFixed();
-      }
-      require(spendingLimitForThisAsset >= value, "Exceeding spending limit");
-      spendingLimitForThisAsset = spendingLimitForThisAsset.sub(value);
-      return _transferCollateralAsset(collateralAssetAddress, to, value);
-    } else {
-      return _transferCollateralAsset(collateralAssetAddress, to, value);
+    uint256 currentDay = now / 1 days;
+    if (currentDay > collateralAssetLastSpendingDay[collateralAsset]) {
+      uint256 balance = getReserveAddressesCollateralAssetBalance(collateralAsset);
+      collateralAssetLastSpendingDay[collateralAsset] = currentDay;
+      spendingLimitForThisAsset = collateralAssetDailySpendingRatio[collateralAsset]
+        .multiply(FixidityLib.newFixed(balance))
+        .fromFixed();
     }
+    require(spendingLimitForThisAsset >= value, "Exceeding spending limit");
+    spendingLimitForThisAsset = spendingLimitForThisAsset.sub(value);
+    return _transferCollateralAsset(collateralAsset, to, value);
   }
 
   /**
    * @notice Transfer collateral asset to any address.
-   * @param collateralAssetAddress The token address you're transferring.
+   * @param collateralAsset The token address you're transferring.
    * @param to The address that will receive the funds.
    * @param value The amount of collateral assets to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function _transferCollateralAsset(
-    address collateralAssetAddress,
-    address payable to,
-    uint256 value
-  ) internal returns (bool) {
+  function _transferCollateralAsset(address collateralAsset, address payable to, uint256 value)
+    internal
+    returns (bool)
+  {
     require(
-      value <= getCollateralAssetBalance(collateralAssetAddress),
+      value <= getReserveAddressesCollateralAssetBalance(collateralAsset),
       "Exceeding the amount reserve holds"
     );
-    IERC20(collateralAssetAddress).transfer(to, value);
-    emit ReserveCollateralAssetsTransferred(msg.sender, to, value, collateralAssetAddress);
+    IERC20(collateralAsset).transfer(to, value);
+    emit ReserveCollateralAssetsTransferred(msg.sender, to, value, collateralAsset);
     return true;
   }
 
@@ -635,45 +635,53 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the amount of particular asset included in the reserve.
-   * @return The amount of particular asset included in the reserve.
-   */
-  function getCollateralAssetBalance(address collateralAssetAddress) public view returns (uint256) {
-    return IERC20(collateralAssetAddress).balanceOf(address(this));
-  }
-
-  /**
    * @notice Returns the amount of particular collateral asset included in other reserve addresses.
    * @return The particular collateral asset amount included in other reserve addresses.
    */
-  function getReserveAddressesCollateralAssetBalance(address collateralAssetAddress)
+  // getReserbeCollateralAssetBalance rename
+  function getReserveAddressesCollateralAssetBalance(address collateralAsset)
     public
     view
     returns (uint256)
   {
+    require(checkIsCollateralAsset(collateralAsset), "specified address is not a collateral asset");
     uint256 reserveCollateralAssetBalance = 0;
     for (uint256 i = 0; i < otherReserveAddresses.length; i++) {
       reserveCollateralAssetBalance = reserveCollateralAssetBalance.add(
-        IERC20(collateralAssetAddress).balanceOf(otherReserveAddresses[i])
+        IERC20(collateralAsset).balanceOf(otherReserveAddresses[i])
       );
     }
+    // check this with nadiem or roman
+    reserveCollateralAssetBalance.add(IERC20(collateralAsset).balanceOf(address(this)));
     return reserveCollateralAssetBalance;
   }
 
-  function addCollateralAsset(address collateralAssetAddress) onlyOwner {
+  function addCollateralAsset(address collateralAsset) onlyOwner {
     require(
-      getCollateralAssetBalance(collateralAssetAddress) > 0,
-      "Token Address specified is not a reserve collateral asset"
+      checkIsCollateralAsset(collateralAsset) == false,
+      "specified address is already added as a collateral asset"
     );
-    isCollateralAsset[collateralAssetAddress] = true;
+    require(collateralAsset != address(0), "can't be a zero address");
+    isCollateralAsset[collateralAsset] = true;
+    collateralAssets.push(collateralAsset);
+    emit CollateralAssetAdded(collateralAsset);
   }
 
-  function removeCollateralAsset(address collateralAssetAddress) onlyOwner {
-    delete isCollateralAsset[collateralAssetAddress];
+  function removeCollateralAsset(address collateralAsset, uint256 index) onlyOwner {
+    require(checkIsCollateralAsset(collateralAsset), "specified address is not a collateral asset");
+    require(index < collateralAssets.length, "index is out of range");
+    require(
+      collateralAssets[index] == collateralAsset,
+      "property on given index doesn't match the one we're trying to remove"
+    );
+    collateralAssets[index] = collateralAssets[collateralAssets.length - 1];
+    collateralAssets.pop();
+    delete isCollateralAsset[collateralAsset];
+    emit CollateralAssetRemoved(collateralAsset);
   }
 
-  function isCollateralAsset(address collateralAssetAddress) public view returns (bool) {
-    isCollateralAsset[collateralAssetAddress] ? true : false;
+  function checkIsCollateralAsset(address collateralAsset) public view returns (bool) {
+    return isCollateralAsset[collateralAsset];
   }
 
   /**
