@@ -80,8 +80,8 @@ contract Reserve is
   event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
-  event DailySpendingRatioForErc20TokenSet(
-    address erc20TokenAddress,
+  event DailySpendingRatioForCollateralAssetSet(
+    address collateralAssetAddress,
     uint256 collateralAssetDailySpendingRatios
   );
 
@@ -119,7 +119,7 @@ contract Reserve is
    * @param _tobinTaxReserveRatio When to turn on the tobin tax, as a fixidity fraction.
    * @param _erc20TokenDailySpendingRatio The relative daily spending limit
    * of an ERC20 token for the reserve spender.
-   * @param _erc20TokenAddress The address of an ERC20 token we're setting a limit for.
+   * @param _collateralAssetAddress The address of an ERC20 token we're setting a limit for.
    */
   function initialize(
     address registryAddress,
@@ -131,8 +131,8 @@ contract Reserve is
     uint256[] calldata _assetAllocationWeights,
     uint256 _tobinTax,
     uint256 _tobinTaxReserveRatio,
-    uint256 _erc20TokenDailySpendingRatio,
-    address _erc20TokenAddress
+    address[] calldata _collateralAssetAddresses,
+    uint256[] calldata _collateralAssetDailySpendingRatios
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
@@ -142,7 +142,10 @@ contract Reserve is
     setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
     setTobinTax(_tobinTax);
     setTobinTaxReserveRatio(_tobinTaxReserveRatio);
-    setDailySpendingRatioForErc20Tokens(_erc20TokenAddress, _erc20TokenDailySpendingRatio);
+    setDailySpendingRatioForCollateralAssets(
+      _collateralAssetAddresses,
+      _collateralAssetDailySpendingRatios
+    );
   }
 
   /**
@@ -185,26 +188,37 @@ contract Reserve is
   }
 
   /**
-   * @notice Set the ratio of reserve for a given ERC20 token that is spendable per day.
-   * @param erc20TokenAddress The address of an ERC20 token we're setting a limit for.
-   * @param erc20TokenDailySpendingRatio The relative daily spending limit
-   * of an ERC20 token for the reserve spender.
+   * @notice Set the ratio of reserve for a given collateral asset that is spendable per day.
+   * @param collateralAssetAddresses Collection of the addresses of collateral assets we're setting a limit for.
+   * @param collateralAssetDailySpendingRatios Collection of the relative daily spending limits
+   * of collateral assets.
    */
-  function setDailySpendingRatioForErc20Tokens(
-    address erc20TokenAddress,
-    uint256 erc20TokenDailySpendingRatio
+  function setDailySpendingRatioForCollateralAssets(
+    address[] memory collateralAssetAddresses,
+    uint256[] memory collateralAssetDailySpendingRatios
   ) public onlyOwner {
-    // we want to be able to initialize 0 values
-    // but we don't want to set it in the mapping just in case
-    if (erc20TokenAddress != address(0) && erc20TokenDailySpendingRatio != 0) {
-      collateralAssetDailySpendingRatios[erc20TokenAddress] = FixidityLib.wrap(
-        erc20TokenDailySpendingRatio
-      );
-      require(
-        collateralAssetDailySpendingRatios[erc20TokenAddress].lte(FixidityLib.fixed1()),
-        "spending ratio cannot be larger than 1"
-      );
-      emit DailySpendingRatioForErc20TokenSet(erc20TokenAddress, erc20TokenDailySpendingRatio);
+    require(
+      collateralAssetAddresses.length == collateralAssetDailySpendingRatios.length,
+      "token addresses and spending ratio lengths have to be the same"
+    );
+    for (uint256 i = 1; i < collateralAssetAddresses.length; i++) {
+      if (collateralAssetAddresses[i] != address(0) && collateralAssetDailySpendingRatios[i] != 0) {
+        require(
+          getCollateralAssetBalance(collateralAssetAddresses[i]) > 0,
+          "Token Address specified is not a reserve collateral asset"
+        );
+        require(
+          collateralAssetDailySpendingRatio[collateralAssetAddresses[i]].lte(FixidityLib.fixed1()),
+          "spending ratio cannot be larger than 1"
+        );
+        collateralAssetDailySpendingRatio[collateralAssetAddresses[i]] = FixidityLib.wrap(
+          collateralAssetDailySpendingRatios[i]
+        );
+        emit DailySpendingRatioForCollateralAssetSet(
+          collateralAssetAddresses[i],
+          collateralAssetDailySpendingRatios[i]
+        );
+      }
     }
   }
 
@@ -217,12 +231,16 @@ contract Reserve is
   }
 
   /**
-   * @notice Get daily spending ratio of an ERC20 token.
-   * @param erc20TokenAddress The address of a token we're getting a spending ratio for.
-   * @return Daily spending ratio for an ERC20 token as unwrapped Fraction.
+   * @notice Get daily spending ratio of a collateral asset.
+   * @param collateralAssetAddress The address of a collateral asset we're getting a spending ratio for.
+   * @return Daily spending ratio for the collateral asset as unwrapped Fraction.
    */
-  function getDailySpendingRatioForErc20(address erc20TokenAddress) public view returns (uint256) {
-    return collateralAssetDailySpendingRatios[erc20TokenAddress].unwrap();
+  function getDailySpendingRatioForCollateralAsset(address collateralAssetAddress)
+    public
+    view
+    returns (uint256)
+  {
+    return collateralAssetDailySpendingRatio[collateralAssetAddress].unwrap();
   }
 
   /**
@@ -446,70 +464,59 @@ contract Reserve is
   }
 
   /**
-   * @notice Transfer ERC20 token to a whitelisted address subject to reserve spending limits
+   * @notice Transfer collateral asset subject to reserve spending limits to the trader,
    * if the limit is set, othersise the limit is 100%.
-   * @param erc20TokenAddress The token address you're transferring.
-   * @param to The address that will receive the ERC20 token.
-   * @param value The amount of ERC20 token to transfer.
+   * @param collateralAssetAddress The token address you're transferring.
+   * @param to The address that will receive the funds.
+   * @param value The amount of collateral assets to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function transferErc20Token(address erc20TokenAddress, address payable to, uint256 value)
-    external
-    returns (bool)
-  {
-    require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
-    require(isOtherReserveAddress[to], "can only transfer to other reserve address");
-    uint256 spendingLimitForThisToken;
-    if (FixidityLib.unwrap(collateralAssetDailySpendingRatios[erc20TokenAddress]) > 0) {
+  function transferCollateralAsset(
+    address collateralAssetAddress,
+    address payable to,
+    uint256 value
+  ) external returns (bool) {
+    require(msg.sender != address(0), "sender should not be a zero address");
+    require(to != address(0), "can not transfer to 0 address");
+    uint256 spendingLimitForThisAsset;
+    if (FixidityLib.unwrap(collateralAssetDailySpendingRatio[collateralAssetAddress]) > 0) {
       uint256 currentDay = now / 1 days;
-      if (currentDay > collateralAssetLastSpendingDay[erc20TokenAddress]) {
-        uint256 balance = getErc20TokenBalance(erc20TokenAddress);
-        collateralAssetLastSpendingDay[erc20TokenAddress] = currentDay;
-        spendingLimitForThisToken = collateralAssetDailySpendingRatios[erc20TokenAddress]
+      if (currentDay > collateralAssetLastSpendingDay[collateralAssetAddress]) {
+        uint256 balance = getCollateralAssetBalance(collateralAssetAddress);
+        collateralAssetLastSpendingDay[collateralAssetAddress] = currentDay;
+        spendingLimitForThisAsset = collateralAssetDailySpendingRatio[collateralAssetAddress]
           .multiply(FixidityLib.newFixed(balance))
           .fromFixed();
       }
-      require(spendingLimitForThisToken >= value, "Exceeding spending limit");
-      spendingLimitForThisToken = spendingLimitForThisToken.sub(value);
-      return _transferErc20Token(erc20TokenAddress, to, value);
+      require(spendingLimitForThisAsset >= value, "Exceeding spending limit");
+      spendingLimitForThisAsset = spendingLimitForThisAsset.sub(value);
+      return _transferCollateralAsset(collateralAssetAddress, to, value);
     } else {
-      return _transferErc20Token(erc20TokenAddress, to, value);
+      return _transferCollateralAsset(collateralAssetAddress, to, value);
     }
   }
 
   /**
-   * @notice Transfer unfrozen ERC20 token to any address.
-   * @param erc20TokenAddress The token address you're transferring.
-   * @param to The address that will receive the ERC20 token.
-   * @param value The amount of ERC20 token to transfer.
+   * @notice Transfer collateral asset to any address.
+   * @param collateralAssetAddress The token address you're transferring.
+   * @param to The address that will receive the funds.
+   * @param value The amount of collateral assets to transfer.
    * @return Returns true if the transaction succeeds.
    */
-  function _transferErc20Token(address erc20TokenAddress, address payable to, uint256 value)
-    internal
-    returns (bool)
-  {
+  function _transferCollateralAsset(
+    address collateralAssetAddress,
+    address payable to,
+    uint256 value
+  ) internal returns (bool) {
     // this code is intentionally duplicated from celo token _transferGold()
-    require(value <= getErc20TokenBalance(erc20TokenAddress), "Exceeding the amount reserve holds");
+    require(
+      value <= getCollateralAssetBalance(collateralAssetAddress),
+      "Exceeding the amount reserve holds"
+    );
     // couldn't use sendValue() in this case but I'm suggesting alternative
-    IERC20(erc20TokenAddress).transfer(to, value);
-    emit ReserveErc20TokenTransferred(msg.sender, to, value, erc20TokenAddress);
+    IERC20(collateralAssetAddress).transfer(to, value);
+    emit ReserveErc20TokenTransferred(msg.sender, to, value, collateralAssetAddress);
     return true;
-  }
-
-  /**
-   * @notice Transfer ERC20 token to any address.
-   * @dev Transfers are not subject to a daily spending limit.
-   * @param erc20TokenAddress The token address you're transferring.
-   * @param to The address that will receive the staERC20 token.
-   * @param value The amount of ERC20 token to transfer.
-   * @return Returns true if the transaction succeeds.
-   */
-  function transferExchangeErc20Token(address erc20TokenAddress, address payable to, uint256 value)
-    external
-    isAllowedToSpendExchange(msg.sender)
-    returns (bool)
-  {
-    return _transferErc20Token(erc20TokenAddress, to, value);
   }
 
   /**
@@ -631,8 +638,8 @@ contract Reserve is
    * @notice Returns the amount of particular ERC20 token included in the reserve.
    * @return The amount of particular ERC20 token included in the reserve.
    */
-  function getErc20TokenBalance(address erc20TokenAddress) public view returns (uint256) {
-    return IERC20(erc20TokenAddress).balanceOf(address(this));
+  function getCollateralAssetBalance(address collateralAssetAddress) public view returns (uint256) {
+    return IERC20(collateralAssetAddress).balanceOf(address(this));
   }
 
   /**
