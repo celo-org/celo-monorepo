@@ -1481,11 +1481,6 @@
     elliptic "^6.5.4"
     is-base64 "^1.1.0"
 
-"@celo/poprf@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@celo/poprf/-/poprf-0.1.8.tgz#00d38aeb20993dae1c50d23f3293afe7a8abebc2"
-  integrity sha512-gWyl37lqLXwo44tTBJIVVyOD/Qec02T0ndKKpr1ms073frcLMBvcdNOfXgQ0/ROEhl9ewOALx5hxMm+RHy5XNw==
-
 "@celo/poprf@^0.1.9":
   version "0.1.9"
   resolved "https://registry.yarnpkg.com/@celo/poprf/-/poprf-0.1.9.tgz#38c514ce0f572b80edeb9dc280b6cf5e9d7c2a75"
