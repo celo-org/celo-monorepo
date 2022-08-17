@@ -9,6 +9,7 @@ import {
   getDynamicEnvVarValue,
 } from './env-utils'
 import {
+  helmAddRepoAndUpdate,
   installGenericHelmChart,
   isCelotoolHelmDryRun,
   removeGenericHelmChart,
@@ -331,6 +332,7 @@ export async function installGrafanaIfNotExists(
 }
 
 async function installGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
+  await helmAddRepoAndUpdate('https://grafana.github.io/helm-charts', 'grafana')
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
@@ -343,6 +345,7 @@ async function installGrafana(context?: string, clusterConfig?: BaseClusterConfi
 }
 
 export async function upgradeGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
+  await helmAddRepoAndUpdate('https://grafana.github.io/helm-charts', 'grafana')
   await createNamespaceIfNotExists(kubeNamespace)
   return upgradeGenericHelmChart(
     kubeNamespace,

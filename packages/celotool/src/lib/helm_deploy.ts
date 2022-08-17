@@ -384,7 +384,6 @@ export async function helmAddRepoAndUpdate(repository: string, name?: string) {
 export async function helmAddAndUpdateRepos() {
   await helmAddRepoAndUpdate('https://kubernetes.github.io/ingress-nginx')
   await helmAddRepoAndUpdate('https://charts.helm.sh/stable')
-  await helmAddRepoAndUpdate('https://grafana.github.io/helm-charts', 'grafana')
   await execCmdWithExitOnFailure(`helm repo update`)
 }
 
