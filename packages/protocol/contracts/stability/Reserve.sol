@@ -508,12 +508,10 @@ contract Reserve is
     address payable to,
     uint256 value
   ) internal returns (bool) {
-    // this code is intentionally duplicated from celo token _transferGold()
     require(
       value <= getCollateralAssetBalance(collateralAssetAddress),
       "Exceeding the amount reserve holds"
     );
-    // couldn't use sendValue() in this case but I'm suggesting alternative
     IERC20(collateralAssetAddress).transfer(to, value);
     emit ReserveErc20TokenTransferred(msg.sender, to, value, collateralAssetAddress);
     return true;
