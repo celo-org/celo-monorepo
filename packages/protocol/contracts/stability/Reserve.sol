@@ -121,9 +121,9 @@ contract Reserve is
    * @param _assetAllocationWeights The reserve asset weights.
    * @param _tobinTax The tobin tax value as a fixidity fraction.
    * @param _tobinTaxReserveRatio When to turn on the tobin tax, as a fixidity fraction.
-   * @param _erc20TokenDailySpendingRatio The relative daily spending limit
+   * @param _collateralAssetes The relative daily spending limit
    * of an ERC20 token for the reserve spender.
-   * @param _collateralAsset The address of an ERC20 token we're setting a limit for.
+   * @param _collateralAssetDailySpendingRatios The address of an ERC20 token we're setting a limit for.
    */
   function initialize(
     address registryAddress,
@@ -656,30 +656,51 @@ contract Reserve is
     return reserveCollateralAssetBalance;
   }
 
-  function addCollateralAsset(address collateralAsset) onlyOwner {
+  /**
+   * @notice Add a collateral asset in the reserve.
+   * @param collateralAsset The address of the token being added.
+   * @return Returns true if the transaction succeeds.
+   */
+  function addCollateralAsset(address collateralAsset) external onlyOwner returns (bool) {
     require(
-      checkIsCollateralAsset(collateralAsset) == false,
+      !checkIsCollateralAsset(collateralAsset),
       "specified address is already added as a collateral asset"
     );
     require(collateralAsset != address(0), "can't be a zero address");
     isCollateralAsset[collateralAsset] = true;
     collateralAssets.push(collateralAsset);
     emit CollateralAssetAdded(collateralAsset);
+    return true;
   }
 
-  function removeCollateralAsset(address collateralAsset, uint256 index) onlyOwner {
+  /**
+   * @notice Remove a collateral asset in the reserve.
+   * @param collateralAsset The address of the token being removed.
+   * @param index The index of the token being removed.
+   * @return Returns true if the transaction succeeds.
+   */
+  function removeCollateralAsset(address collateralAsset, uint256 index)
+    external
+    onlyOwner
+    returns (bool)
+  {
     require(checkIsCollateralAsset(collateralAsset), "specified address is not a collateral asset");
-    require(index < collateralAssets.length, "index is out of range");
     require(
-      collateralAssets[index] == collateralAsset,
-      "property on given index doesn't match the one we're trying to remove"
+      index < collateralAssets.length && collateralAssets[index] == collateralAsset,
+      "index into collateralAssets list not mapped to token"
     );
     collateralAssets[index] = collateralAssets[collateralAssets.length - 1];
     collateralAssets.pop();
     delete isCollateralAsset[collateralAsset];
     emit CollateralAssetRemoved(collateralAsset);
+    return true;
   }
 
+  /**
+   * @notice Check if a collateral asset is added to the reserve.
+   * @param collateralAsset The address of the token being checked.
+   * @return Returns true if the token was added as a collateral asset.
+   */
   function checkIsCollateralAsset(address collateralAsset) public view returns (bool) {
     return isCollateralAsset[collateralAsset];
   }
