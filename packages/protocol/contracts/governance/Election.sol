@@ -133,7 +133,10 @@ contract Election is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 2, 1);
@@ -188,7 +191,8 @@ contract Election is
 
   /**
    * @notice Returns the minimum and maximum number of validators that can be elected.
-   * @return The minimum and maximum number of validators that can be elected.
+   * @return The minimum number of validators that can be elected.
+   * @return The maximum number of validators that can be elected.
    */
   function getElectableValidators() external view returns (uint256, uint256) {
     return (electableValidators.min, electableValidators.max);
@@ -928,8 +932,9 @@ contract Election is
   }
 
   /**
-   * @notice Returns lists of all validator groups and the number of votes they've received.
-   * @return Lists of all validator groups and the number of votes they've received.
+   * @notice Returns list of all validator groups and the number of votes they've received.
+   * @return List of all validator groups
+   * @return Number of votes each validator group received.
    */
   function getTotalVotesForEligibleValidatorGroups()
     external

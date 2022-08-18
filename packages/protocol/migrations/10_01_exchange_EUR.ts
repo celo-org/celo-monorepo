@@ -17,6 +17,8 @@ const initializeArgs = async (): Promise<any[]> => {
     toFixed(config.exchange.reserveFraction).toString(),
     config.exchange.updateFrequency,
     config.exchange.minimumReports,
+    config.exchange.minSupplyForStableBucketCap,
+    toFixed(config.exchange.stableBucketFractionCap).toString(),
   ]
 }
 

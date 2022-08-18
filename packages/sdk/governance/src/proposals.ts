@@ -8,6 +8,7 @@ import {
   Contract,
   getAbiByName,
   parseDecodedParams,
+  signatureToAbiDefinition,
 } from '@celo/connect'
 import {
   CeloContract,
@@ -290,6 +291,14 @@ export class ProposalBuilder {
     RegisteredContracts.includes(stripProxy(contract)) ||
     this.getRegistryAddition(contract) !== undefined
 
+  buildFunctionCallToExternalContract = async (
+    tx: ProposalTransactionJSON
+  ): Promise<ProposalTransaction> => {
+    const methodABI = signatureToAbiDefinition(tx.function)
+    const input = this.kit.connection.getAbiCoder().encodeFunctionCall(methodABI, tx.args)
+    return { input, to: tx.contract, value: tx.value }
+  }
+
   fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
     if (isRegistryRepoint(tx)) {
       // Update canonical registry addresses
@@ -304,9 +313,7 @@ export class ProposalBuilder {
           `Transaction to unregistered contract ${tx.contract} only supported by address`
         )
       } else if (tx.function !== '' || tx.args !== []) {
-        throw new Error(
-          `Function ${tx.function} call with args ${tx.args} to unregistered contract not currently supported`
-        )
+        return this.buildFunctionCallToExternalContract(tx)
       }
       return { input: '', to: tx.contract, value: tx.value }
     }
