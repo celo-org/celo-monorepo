@@ -19,6 +19,7 @@ import { DomainQuotaIO } from './domain/endpoints/quota/io'
 import { DomainSignAction } from './domain/endpoints/sign/action'
 import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainThresholdStateService } from './domain/services/thresholdState'
+import { PnPQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
@@ -61,6 +62,13 @@ export function startCombiner(config: CombinerConfig) {
   )
   app.post(CombinerEndpoint.PNP_SIGN, (req, res) =>
     meterResponse(pnpSign.handle.bind(pnpSign), req, res, CombinerEndpoint.PNP_SIGN, config)
+  )
+
+  const pnpQuota = new Controller(
+    new PnPQuotaAction(config, new PnpQuotaIO(config.phoneNumberPrivacy, kit))
+  )
+  app.get(CombinerEndpoint.PNP_QUOTA, (req, res) =>
+    meterResponse(pnpQuota.handle.bind(pnpQuota), req, res, CombinerEndpoint.PNP_QUOTA, config)
   )
 
   const domainThresholdStateService = new DomainThresholdStateService(config.domains)
