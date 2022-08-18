@@ -46,6 +46,7 @@ NEW_BRANCH_BUILD_DIR=$BUILD_DIR
 
 # check-backward script uses migrationsConfig
 echo " - Checkout migrationsConfig.js at $NEW_BRANCH"
+CURRENT_HASH=`git log -n 1 --oneline | cut -c 1-9`
 git checkout $NEW_BRANCH -- migrationsConfig.js
 
 yarn ts-node scripts/check-backward.ts sem_check \
@@ -54,4 +55,4 @@ yarn ts-node scripts/check-backward.ts sem_check \
   --exclude $CONTRACT_EXCLUSION_REGEX \
   $REPORT_FLAG
 
-git checkout - -- migrationsConfig.js
+git checkout $CURRENT_HASH -- migrationsConfig.js
