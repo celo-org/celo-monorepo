@@ -168,6 +168,8 @@ spec:
       volumes:
       - name: data
         emptyDir: {}
+      - name: data-shared
+        emptyDir: {}
       - name: config
         configMap:
           name: {{ template "common.fullname" . }}-geth-config
