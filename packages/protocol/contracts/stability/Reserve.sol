@@ -205,14 +205,14 @@ contract Reserve is
       collateralAssetes.length == collateralAssetDailySpendingRatios.length,
       "token addresses and spending ratio lengths have to be the same"
     );
-    for (uint256 i = 1; i < collateralAssetes.length; i++) {
+    for (uint256 i = 0; i < collateralAssetes.length; i++) {
       if (collateralAssetes[i] != address(0) && collateralAssetDailySpendingRatios[i] != 0) {
         require(
-          checkIsCollateralAsset(collateralAssets[i]),
+          checkIsCollateralAsset(collateralAssetes[i]),
           "the address specified is not a reserve collateral asset"
         );
         require(
-          collateralAssetDailySpendingRatio[collateralAssetes[i]].lte(FixidityLib.fixed1()),
+          FixidityLib.wrap(collateralAssetDailySpendingRatios[i]).lte(FixidityLib.fixed1()),
           "spending ratio cannot be larger than 1"
         );
         collateralAssetDailySpendingRatio[collateralAssetes[i]] = FixidityLib.wrap(
@@ -482,7 +482,7 @@ contract Reserve is
     require(isSpender[msg.sender], "sender not allowed to transfer Reserve funds");
     require(to != address(0), "can not transfer to 0 address");
     require(
-      collateralAssetDailySpendingRatio[collateralAsset].unwrap() > 0,
+      getDailySpendingRatioForCollateralAsset(collateralAsset) > 0,
       "this asset has no spending ratio, therefore can't be transferred"
     );
     uint256 spendingLimitForThisAsset;
@@ -641,7 +641,6 @@ contract Reserve is
   // getReserbeCollateralAssetBalance rename
   function getReserveAddressesCollateralAssetBalance(address collateralAsset)
     public
-    view
     returns (uint256)
   {
     require(checkIsCollateralAsset(collateralAsset), "specified address is not a collateral asset");
@@ -652,8 +651,8 @@ contract Reserve is
       );
     }
     // check this with nadiem or roman
-    reserveCollateralAssetBalance.add(IERC20(collateralAsset).balanceOf(address(this)));
-    return reserveCollateralAssetBalance;
+    // reserveCollateralAssetBalance.add(IERC20(collateralAsset).balanceOf(address(this)));
+    return reserveCollateralAssetBalance.add(IERC20(collateralAsset).balanceOf(address(this)));
   }
 
   /**

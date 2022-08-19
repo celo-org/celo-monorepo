@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import { Test } from "celo-foundry/Test.sol";
+import { Test, console2 as console } from "celo-foundry/Test.sol";
 
 import "../utils/WithRegistry.sol";
 import "../utils/TokenHelpers.sol";
@@ -13,7 +13,6 @@ import "contracts/stability/Reserve.sol";
 import "contracts/stability/test/MockSortedOracles.sol";
 import "contracts/stability/test/MockStableToken.sol";
 import "contracts/common/FixidityLib.sol";
-import "contracts/common/GoldToken.sol";
 
 contract ReserveTest is Test, WithRegistry, TokenHelpers {
   using SafeMath for uint256;
@@ -33,9 +32,9 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
-  event DailySpendingRatioForErc20TokenSet(
-    address erc20TokenAddress,
-    uint256 erc20DailySpendingRatio
+  event DailySpendingRatioForCollateralAssetSet(
+    address collateralAsset,
+    uint256 collateralAssetDailySpendingRatios
   );
 
   address constant exchangeAddress = address(0xe7c45fa);
@@ -48,24 +47,33 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   address deployer;
   address rando;
 
-  Reserve reserve = new Reserve(true);
-  MockSortedOracles sortedOracles = new MockSortedOracles();
+  Reserve reserve;
+  MockSortedOracles sortedOracles;
   DummyERC20 dummyToken1 = new DummyERC20();
   DummyERC20 dummyToken2 = new DummyERC20();
-  GoldToken goldToken = new GoldToken(true);
 
   function setUp() public {
     rando = actor("rando");
     deployer = actor("deployer");
     changePrank(deployer);
+    reserve = new Reserve(true);
+    sortedOracles = new MockSortedOracles();
+
     registry.setAddressFor("SortedOracles", address(sortedOracles));
     registry.setAddressFor("Exchange", exchangeAddress);
-    registry.setAddressFor("GoldToken", address(goldToken));
 
     bytes32[] memory initialAssetAllocationSymbols = new bytes32[](1);
     initialAssetAllocationSymbols[0] = bytes32("cGLD");
     uint256[] memory initialAssetAllocationWeights = new uint256[](1);
     initialAssetAllocationWeights[0] = FixidityLib.newFixed(1).unwrap();
+
+    reserve.addCollateralAsset(address(dummyToken1));
+    reserve.addCollateralAsset(address(dummyToken2));
+
+    address[] memory collateralAssets = new address[](1);
+    uint256[] memory collateralAssetDailySpendingRatios = new uint256[](1);
+    collateralAssets[0] = address(dummyToken1);
+    collateralAssetDailySpendingRatios[0] = 100000000000000000000000;
 
     reserve.initialize(
       address(registry),
@@ -77,8 +85,8 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
       initialAssetAllocationWeights,
       tobinTax,
       tobinTaxReserveRatio,
-      1e24,
-      address(dummyToken1)
+      collateralAssets,
+      collateralAssetDailySpendingRatios
     );
   }
 }
@@ -100,8 +108,8 @@ contract ReserveTest_initAndSetters is ReserveTest {
       new uint256[](0),
       0,
       0,
-      0,
-      address(0)
+      new address[](0),
+      new uint256[](0)
     );
   }
 
@@ -147,22 +155,73 @@ contract ReserveTest_initAndSetters is ReserveTest {
     reserve.setDailySpendingRatio(100);
   }
 
-  function test_dailySpendingRatioForErc20Tokens() public {
+  function test_setDailySpendingRatioForCollateralAssets_whenRatioIsSetWithCorrectParams_shouldEmitAndUpdate()
+    public
+  {
+    address[] memory collateralAssets = new address[](1);
+    uint256[] memory collateralAssetDailySpendingRatios = new uint256[](1);
     uint256 newValue = 123;
+    collateralAssetDailySpendingRatios[0] = newValue;
+    collateralAssets[0] = address(dummyToken1);
     vm.expectEmit(true, true, true, true, address(reserve));
-    emit DailySpendingRatioForErc20TokenSet(address(dummyToken1), newValue);
-    reserve.setDailySpendingRatioForErc20Tokens(address(dummyToken1), newValue);
-    assertEq(reserve.getDailySpendingRatioForErc20(address(dummyToken1)), newValue);
-
-    vm.expectRevert("spending ratio cannot be larger than 1");
-    reserve.setDailySpendingRatioForErc20Tokens(
-      address(dummyToken1),
-      FixidityLib.newFixed(1).unwrap().add(1)
+    emit DailySpendingRatioForCollateralAssetSet(address(dummyToken1), newValue);
+    reserve.setDailySpendingRatioForCollateralAssets(
+      collateralAssets,
+      collateralAssetDailySpendingRatios
     );
+    assertEq(reserve.getDailySpendingRatioForCollateralAsset(address(dummyToken1)), newValue);
+  }
 
+  function test_setDailySpendingRatioForCollateralAssets_whenArraysAreDifferentLengths_shouldRevert()
+    public
+  {
+    address[] memory collateralAssetsLocal = new address[](2);
+    uint256[] memory collateralAssetDailySpendingRatiosLocal = new uint256[](1);
+    collateralAssetsLocal[0] = address(dummyToken1);
+    collateralAssetsLocal[1] = address(dummyToken2);
+    collateralAssetDailySpendingRatiosLocal[0] = 1;
+    vm.expectRevert("token addresses and spending ratio lengths have to be the same");
+    reserve.setDailySpendingRatioForCollateralAssets(
+      collateralAssetsLocal,
+      collateralAssetDailySpendingRatiosLocal
+    );
+  }
+
+  function test_setDailySpendingRatioForCollateralAssets_whenAddressIsNotCollateralAsset_shouldRevert()
+    public
+  {
+    address[] memory collateralAssets = new address[](1);
+    uint256[] memory collateralAssetDailySpendingRatios = new uint256[](1);
+    collateralAssets[0] = address(dummyToken1);
+    collateralAssetDailySpendingRatios[0] = 123;
+    reserve.removeCollateralAsset(address(dummyToken1), 0);
+    vm.expectRevert("the address specified is not a reserve collateral asset");
+    reserve.setDailySpendingRatioForCollateralAssets(
+      collateralAssets,
+      collateralAssetDailySpendingRatios
+    );
+  }
+
+  function test_setDailySpendingRatioForCollateralAssets_whenRatioIsLargerThanOne_shouldRevert()
+    public
+  {
+    address[] memory collateralAssets = new address[](1);
+    uint256[] memory collateralAssetDailySpendingRatios = new uint256[](1);
+    collateralAssets[0] = address(dummyToken1);
+    collateralAssetDailySpendingRatios[0] = FixidityLib.newFixed(1).unwrap().add(1);
+    vm.expectRevert("spending ratio cannot be larger than 1");
+    reserve.setDailySpendingRatioForCollateralAssets(
+      collateralAssets,
+      collateralAssetDailySpendingRatios
+    );
+  }
+
+  function test_setDailySpendingRatioForCollateralAssets_whenSenderIsNotOwner_shouldRevert()
+    public
+  {
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
-    reserve.setDailySpendingRatioForErc20Tokens(address(dummyToken1), 100);
+    reserve.setDailySpendingRatioForCollateralAssets(new address[](0), new uint256[](0));
   }
 
   function test_registry() public {
@@ -316,20 +375,27 @@ contract ReserveTest_transfers is ReserveTest {
   uint256 constant reserveDummyToken1Balance = 10000000;
   uint256 constant reserveDummyToken2Balance = 20000000;
   address payable constant otherReserveAddress = address(0x1234);
+  address payable constant trader = address(0x1245);
   address spender;
 
   function setUp() public {
     super.setUp();
     spender = actor("spender");
+
+    address[] memory collateralAssets = new address[](1);
+    uint256[] memory collateralAssetDailySpendingRatios = new uint256[](1);
+    collateralAssets[0] = address(dummyToken1);
+    collateralAssetDailySpendingRatios[0] = FixidityLib.newFixedFraction(2, 10).unwrap();
+
     deal(address(reserve), reserveCeloBalance);
     deal(address(dummyToken1), address(reserve), reserveDummyToken1Balance);
     deal(address(dummyToken2), address(reserve), reserveDummyToken2Balance);
     reserve.addOtherReserveAddress(otherReserveAddress);
     reserve.addSpender(spender);
     reserve.setDailySpendingRatio(FixidityLib.newFixedFraction(2, 10).unwrap());
-    reserve.setDailySpendingRatioForErc20Tokens(
-      address(dummyToken1),
-      FixidityLib.newFixedFraction(2, 10).unwrap()
+    reserve.setDailySpendingRatioForCollateralAssets(
+      collateralAssets,
+      collateralAssetDailySpendingRatios
     );
     vm.warp(100 * 24 * 3600 + 445);
   }
@@ -360,43 +426,44 @@ contract ReserveTest_transfers is ReserveTest {
     reserve.transferGold(otherReserveAddress, amount);
   }
 
-  function test_transferErc20Token() public {
+  function test_transferCollateralAsset_whenParametersAreCorrect_shouldUpdate() public {
     changePrank(spender);
-    //erc20 token balance
-    uint256 amount = reserveDummyToken1Balance.div(100);
-    reserve.transferErc20Token(address(dummyToken1), otherReserveAddress, amount);
-    //checking token balance on this reserve address
+    uint256 amount = reserveDummyToken1Balance.div(10);
+    reserve.transferCollateralAsset(address(dummyToken1), otherReserveAddress, amount);
     assertEq(dummyToken1.balanceOf(otherReserveAddress), amount);
-    //checking that reserve has updated the token balance
     assertEq(dummyToken1.balanceOf(address(reserve)), reserveDummyToken1Balance - amount);
+  }
 
+  function test_transferCollateralAsset_whenItExceedsSpendingLimit_shouldRevert() public {
+    changePrank(spender);
     vm.expectRevert("Exceeding spending limit");
-    reserve.transferErc20Token(address(dummyToken1), otherReserveAddress, amount.mul(2));
+    reserve.transferCollateralAsset(address(dummyToken1), trader, reserveDummyToken1Balance.add(2));
 
     vm.warp(block.timestamp + 24 * 3600);
+  }
 
-    vm.expectRevert("can only transfer to other reserve address");
-    reserve.transferErc20Token(address(dummyToken1), address(0x234), amount);
+  function test_transferCollateralAsset_whenItTransfersToZeroAddress_shouldRevert() public {
+    uint256 amount = reserveDummyToken1Balance.div(100);
+    changePrank(spender);
+    vm.expectRevert("can not transfer to 0 address");
+    reserve.transferCollateralAsset(address(dummyToken1), address(0), amount);
+  }
 
-    //test that if the spending limit was not set for the token, no limit applies
-    reserve.transferErc20Token(
-      address(dummyToken2),
-      otherReserveAddress,
-      reserveDummyToken2Balance
-    );
-    vm.expectRevert("Exceeding the amount reserve holds");
-    reserve.transferErc20Token(
-      address(dummyToken2),
-      otherReserveAddress,
-      reserveDummyToken2Balance.add(1)
-    );
+  function test_transferCollateralAsset_whenSpendingRatioWasNotSet_shouldRevert() public {
+    console.log(reserve.getDailySpendingRatioForCollateralAsset(address(dummyToken2)));
+    changePrank(spender);
+    vm.expectRevert("this asset has no spending ratio, therefore can't be transferred");
+    reserve.transferCollateralAsset(address(dummyToken2), trader, reserveDummyToken2Balance);
+  }
 
+  function test_transferCollateralAsset_whenSpenderWasRemoved_shouldRevert() public {
+    uint256 amount = reserveDummyToken1Balance.div(100);
     changePrank(deployer);
     reserve.removeSpender(spender);
     changePrank(spender);
     vm.warp(block.timestamp + 24 * 3600);
     vm.expectRevert("sender not allowed to transfer Reserve funds");
-    reserve.transferErc20Token(address(dummyToken1), otherReserveAddress, amount);
+    reserve.transferCollateralAsset(address(dummyToken1), address(0x234), amount);
   }
 
   function test_addExchangeSpender() public {
