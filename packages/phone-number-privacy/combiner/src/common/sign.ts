@@ -6,7 +6,6 @@ import {
   OdisResponse,
   SignMessageRequest,
   SignMessageResponse,
-  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
@@ -71,22 +70,12 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
   }
 
   protected handleMissingSignatures(session: CryptoSession<R>) {
-    let error: ErrorType
-    const majorityErrorCode = session.getMajorityErrorCode()
-    switch (majorityErrorCode) {
-      case 403:
-      case 429:
-        error = WarningMessage.EXCEEDED_QUOTA
-        break
-      case 401:
-        // Authentication is checked in the combiner, but invalid nonces are passed through
-        error = WarningMessage.INVALID_NONCE
-        break
-      default:
-        error = ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
-    }
-    this.io.sendFailure(error, majorityErrorCode ?? 500, session.response)
+    const errorCode = session.getMajorityErrorCode() ?? 500
+    const error = this.errorCodeToError(errorCode)
+    this.io.sendFailure(error, errorCode, session.response)
   }
+
+  protected abstract errorCodeToError(errorCode: number): ErrorType
 
   protected abstract parseBlindedMessage(req: OdisSignatureRequest): string
 }
