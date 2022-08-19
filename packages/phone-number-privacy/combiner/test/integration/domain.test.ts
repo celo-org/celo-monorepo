@@ -561,7 +561,7 @@ describe('domainService', () => {
     })
 
     it('Should respond with 200 if nonce > domainState', async () => {
-      const [req, poprfClient] = await signatureRequest(undefined, 1)
+      const [req, poprfClient] = await signatureRequest(undefined, 2)
 
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
 
@@ -572,7 +572,7 @@ describe('domainService', () => {
         signature: res.body.signature,
         status: {
           disabled: false,
-          counter: 1,
+          counter: 1, // counter gets incremented, not set to nonce value
           timer: res.body.status.timer,
           now: res.body.status.now,
         },
