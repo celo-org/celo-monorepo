@@ -22,7 +22,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
     super(config, io)
   }
 
-  async combine(session: CryptoSession<DomainRestrictedSignatureRequest>): Promise<void> {
+  combine(session: CryptoSession<DomainRestrictedSignatureRequest>): void {
     // this.logResponseDiscrepancies(session) // TODO(Alec)
 
     if (session.crypto.hasSufficientSignatures()) {

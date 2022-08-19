@@ -10,7 +10,7 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
     super(config, io)
   }
 
-  async combine(session: CryptoSession<SignMessageRequest>): Promise<void> {
+  combine(session: CryptoSession<SignMessageRequest>): void {
     this.logResponseDiscrepancies(session)
 
     if (session.crypto.hasSufficientSignatures()) {
