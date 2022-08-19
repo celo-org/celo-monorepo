@@ -324,6 +324,26 @@ EXAMPLE
 
 _See code: [src/commands/account/deauthorize.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/deauthorize.ts)_
 
+## `celocli account:delete-payment-delegation`
+
+Removes a validator's payment delegation by setting benficiary and fraction to 0.
+
+```
+Removes a validator's payment delegation by setting benficiary and fraction to 0.
+
+USAGE
+  $ celocli account:delete-payment-delegation
+
+OPTIONS
+  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --globalHelp                                          View all available global flags
+
+EXAMPLE
+  delete-payment-delegation --account 0x5409ED021D9299bf6814279A6A1411A7e866A631
+```
+
+_See code: [src/commands/account/delete-payment-delegation.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/delete-payment-delegation.ts)_
+
 ## `celocli account:get-metadata ADDRESS`
 
 Show information about an address. Retreives the metadata URL for an account from the on-chain, then fetches the metadata file off-chain and verifies proofs as able.
@@ -353,6 +373,48 @@ EXAMPLE
 ```
 
 _See code: [src/commands/account/get-metadata.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/get-metadata.ts)_
+
+## `celocli account:get-payment-delegation`
+
+Get the payment delegation account beneficiary and fraction allocated from a validator's payment each epoch. The fraction cannot be greater than 1.
+
+```
+Get the payment delegation account beneficiary and fraction allocated from a validator's payment each epoch. The fraction cannot be greater than 1.
+
+USAGE
+  $ celocli account:get-payment-delegation
+
+OPTIONS
+  -x, --extended                                        show extra columns
+  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+
+  --columns=columns                                     only show provided columns
+                                                        (comma-separated)
+
+  --csv                                                 output is csv format [alias:
+                                                        --output=csv]
+
+  --filter=filter                                       filter property by partial
+                                                        string matching, ex: name=foo
+
+  --globalHelp                                          View all available global flags
+
+  --no-header                                           hide table header from output
+
+  --no-truncate                                         do not truncate output to fit
+                                                        screen
+
+  --output=csv|json|yaml                                output in a more machine
+                                                        friendly format
+
+  --sort=sort                                           property to sort by (prepend '-'
+                                                        for descending)
+
+EXAMPLE
+  get-payment-delegation --account 0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [src/commands/account/get-payment-delegation.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/get-payment-delegation.ts)_
 
 ## `celocli account:list`
 
@@ -728,6 +790,31 @@ EXAMPLE
 ```
 
 _See code: [src/commands/account/set-name.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/set-name.ts)_
+
+## `celocli account:set-payment-delegation`
+
+Sets a payment delegation beneficiary, an account address to receive a fraction of the validator's payment every epoch. The fraction must not be greater than 1.
+
+```
+Sets a payment delegation beneficiary, an account address to receive a fraction of the validator's payment every epoch. The fraction must not be greater than 1.
+
+USAGE
+  $ celocli account:set-payment-delegation
+
+OPTIONS
+  --account=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d      (required) Account Address
+  --beneficiary=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Account Address
+  --fraction=fraction                                       (required)
+
+  --globalHelp                                              View all available global
+                                                            flags
+
+EXAMPLE
+  set-payment-delegation --account 0x5409ed021d9299bf6814279a6a1411a7e866a631
+  --beneficiary 0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb --fraction 0.1
+```
+
+_See code: [src/commands/account/set-payment-delegation.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/set-payment-delegation.ts)_
 
 ## `celocli account:set-wallet`
 
