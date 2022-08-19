@@ -9,6 +9,7 @@ export enum SignerEndpointPNP {
 
 export enum CombinerEndpointPNP {
   LEGACY_PNP_SIGN = '/getBlindedMessageSig',
+  PNP_QUOTA = '/quotaStatus',
   PNP_SIGN = '/sign',
   MATCHMAKING = '/getContactMatches',
 }
