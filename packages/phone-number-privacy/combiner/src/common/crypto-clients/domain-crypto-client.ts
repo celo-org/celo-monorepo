@@ -26,10 +26,7 @@ export class DomainCryptoClient extends CryptoClient {
    * Verification of partial signatures is not possible server-side
    * (i.e. without the client's blinding factor).
    */
-  protected async _combinePartialBlindedSignatures(
-    _blindedMessage: string,
-    logger: Logger
-  ): Promise<string> {
+  protected _combinePartialBlindedSignatures(_blindedMessage: string, logger: Logger): string {
     try {
       const result = this.poprfCombiner.blindAggregate(this.allSigsAsArray)
       if (result !== undefined) {

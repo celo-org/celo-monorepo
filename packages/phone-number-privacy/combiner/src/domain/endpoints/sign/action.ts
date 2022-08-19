@@ -27,7 +27,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
-        const combinedSignature = await session.crypto.combinePartialBlindedSignatures(
+        const combinedSignature = session.crypto.combinePartialBlindedSignatures(
           this.parseBlindedMessage(session.request.body),
           session.logger
         )

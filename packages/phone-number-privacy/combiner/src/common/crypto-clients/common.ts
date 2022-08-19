@@ -28,9 +28,7 @@ export abstract class CryptoClient {
    * logic defined in _combinePartialBlindedSignatures.
    * Throws an exception if not enough valid signatures.
    */
-  // TODO EN (+ reviewers) this function is async for historical reasons,
-  //  but does either threshold_bls or poprf require this?
-  public combinePartialBlindedSignatures(blindedMessage: string, logger?: Logger): Promise<string> {
+  public combinePartialBlindedSignatures(blindedMessage: string, logger?: Logger): string {
     logger = logger ?? rootLogger(this.config.serviceName)
     if (!this.hasSufficientSignatures()) {
       logger.error(
@@ -51,7 +49,7 @@ export abstract class CryptoClient {
   protected abstract _combinePartialBlindedSignatures(
     blindedMessage: string,
     logger: Logger
-  ): Promise<string>
+  ): string
 
   /**
    * Returns total number of signatures received; must be implemented by subclass.
