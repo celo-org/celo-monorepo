@@ -640,6 +640,7 @@ contract Reserve is
    */
   function getReserveAddressesCollateralAssetBalance(address collateralAsset)
     public
+    view
     returns (uint256)
   {
     require(checkIsCollateralAsset(collateralAsset), "specified address is not a collateral asset");

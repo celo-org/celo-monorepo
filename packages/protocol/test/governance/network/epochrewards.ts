@@ -93,6 +93,8 @@ contract('EpochRewards', (accounts: string[]) => {
   }
   const initialAssetAllocationSymbols = [web3.utils.padRight(web3.utils.utf8ToHex('cGLD'), 64)]
   const initialAssetAllocationWeights = [toFixed(1)]
+  const collateralAssetAddresses: string[] = ['0x0000000000000000000000000000000000000000']
+  const collateralAssetDailySpendingRatios = [0]
 
   beforeEach(async () => {
     epochRewards = await EpochRewards.new()
@@ -594,8 +596,8 @@ contract('EpochRewards', (accounts: string[]) => {
         initialAssetAllocationWeights,
         toFixed(0.005),
         toFixed(2),
-        0,
-        '0x0000000000000000000000000000000000000000'
+        collateralAssetAddresses,
+        collateralAssetDailySpendingRatios
       )
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
@@ -1036,8 +1038,8 @@ contract('EpochRewards', (accounts: string[]) => {
         initialAssetAllocationWeights,
         toFixed(0.005),
         toFixed(2),
-        0,
-        '0x0000000000000000000000000000000000000000'
+        collateralAssetAddresses,
+        collateralAssetDailySpendingRatios
       )
       await reserve.addToken(mockStableToken.address)
       await mockGoldToken.setTotalSupply(totalSupply)
