@@ -467,12 +467,12 @@ describe('domainService', () => {
     })
 
     it('Should respond with 200 on repeated valid requests with nonce updated', async () => {
-      const [req1, thresholdPoprfClient] = await signatureRequest()
+      const [req, thresholdPoprfClient] = await signatureRequest()
 
       const res1 = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
         .set('keyVersion', '1')
-        .send(req1)
+        .send(req)
 
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
@@ -492,15 +492,16 @@ describe('domainService', () => {
       expect(eval1.toString('base64')).toEqual(expectedEval)
 
       // submit identical request with nonce set to 1
-      req1.options.nonce = defined(1)
-      req1.options.signature = noString
-      req1.options.signature = defined(
-        await wallet.signTypedData(walletAddress, domainRestrictedSignatureRequestEIP712(req1))
+      req.options.nonce = defined(1)
+      // This is how
+      req.options.signature = noString
+      req.options.signature = defined(
+        await wallet.signTypedData(walletAddress, domainRestrictedSignatureRequestEIP712(req))
       )
       const res2 = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
         .set('keyVersion', '1')
-        .send(req1)
+        .send(req)
       expect(res2.status).toBe(200)
       expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: true,
