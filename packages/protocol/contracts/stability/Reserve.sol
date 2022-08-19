@@ -635,10 +635,9 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the amount of particular collateral asset included in other reserve addresses.
-   * @return The particular collateral asset amount included in other reserve addresses.
+   * @notice Returns the amount of particular collateral asset in reserve including other reserve addresses.
+   * @return The balance of particular collateral asset.
    */
-  // getReserbeCollateralAssetBalance rename
   function getReserveAddressesCollateralAssetBalance(address collateralAsset)
     public
     returns (uint256)
@@ -651,7 +650,6 @@ contract Reserve is
       );
     }
     // check this with nadiem or roman
-    // reserveCollateralAssetBalance.add(IERC20(collateralAsset).balanceOf(address(this)));
     return reserveCollateralAssetBalance.add(IERC20(collateralAsset).balanceOf(address(this)));
   }
 

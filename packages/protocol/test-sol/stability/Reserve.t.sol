@@ -3,7 +3,7 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import { Test, console2 as console } from "celo-foundry/Test.sol";
+import { Test } from "celo-foundry/Test.sol";
 
 import "../utils/WithRegistry.sol";
 import "../utils/TokenHelpers.sol";
@@ -36,6 +36,8 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
     address collateralAsset,
     uint256 collateralAssetDailySpendingRatios
   );
+  event CollateralAssetAdded(address collateralAsset);
+  event CollateralAssetRemoved(address collateralAsset);
 
   address constant exchangeAddress = address(0xe7c45fa);
   uint256 constant tobinTaxStalenessThreshold = 600;
@@ -163,6 +165,7 @@ contract ReserveTest_initAndSetters is ReserveTest {
     uint256 newValue = 123;
     collateralAssetDailySpendingRatios[0] = newValue;
     collateralAssets[0] = address(dummyToken1);
+
     vm.expectEmit(true, true, true, true, address(reserve));
     emit DailySpendingRatioForCollateralAssetSet(address(dummyToken1), newValue);
     reserve.setDailySpendingRatioForCollateralAssets(
@@ -180,6 +183,7 @@ contract ReserveTest_initAndSetters is ReserveTest {
     collateralAssetsLocal[0] = address(dummyToken1);
     collateralAssetsLocal[1] = address(dummyToken2);
     collateralAssetDailySpendingRatiosLocal[0] = 1;
+
     vm.expectRevert("token addresses and spending ratio lengths have to be the same");
     reserve.setDailySpendingRatioForCollateralAssets(
       collateralAssetsLocal,
@@ -195,6 +199,7 @@ contract ReserveTest_initAndSetters is ReserveTest {
     collateralAssets[0] = address(dummyToken1);
     collateralAssetDailySpendingRatios[0] = 123;
     reserve.removeCollateralAsset(address(dummyToken1), 0);
+
     vm.expectRevert("the address specified is not a reserve collateral asset");
     reserve.setDailySpendingRatioForCollateralAssets(
       collateralAssets,
@@ -209,6 +214,7 @@ contract ReserveTest_initAndSetters is ReserveTest {
     uint256[] memory collateralAssetDailySpendingRatios = new uint256[](1);
     collateralAssets[0] = address(dummyToken1);
     collateralAssetDailySpendingRatios[0] = FixidityLib.newFixed(1).unwrap().add(1);
+
     vm.expectRevert("spending ratio cannot be larger than 1");
     reserve.setDailySpendingRatioForCollateralAssets(
       collateralAssets,
@@ -222,6 +228,53 @@ contract ReserveTest_initAndSetters is ReserveTest {
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
     reserve.setDailySpendingRatioForCollateralAssets(new address[](0), new uint256[](0));
+  }
+
+  function test_addCollateralAsset_whenAssetShouldBeAdded_shouldUpdateAndEmit() public {
+    address token = address(0x1122);
+
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit CollateralAssetAdded(token);
+    reserve.addCollateralAsset(token);
+    assertEq(reserve.checkIsCollateralAsset(token), true);
+  }
+
+  function test_addCollateralAsset_whenAlreadyAdded_shouldRevert() public {
+    vm.expectRevert("specified address is already added as a collateral asset");
+    reserve.addCollateralAsset(address(dummyToken1));
+  }
+
+  function test_addCollateralAsset_withZeroAddress_shouldRevert() public {
+    vm.expectRevert("can't be a zero address");
+    reserve.addCollateralAsset(address(0));
+  }
+
+  function test_addCollateralAsset_whenNotOwner_shouldRevert() public {
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    reserve.addCollateralAsset(address(0x1234));
+  }
+
+  function test_removeCollateralAsset_whenAssetShouldBeRemoved_shouldUpdateAndEmit() public {
+    vm.expectEmit(true, true, true, true, address(reserve));
+    emit CollateralAssetRemoved(address(dummyToken1));
+    reserve.removeCollateralAsset(address(dummyToken1), 0);
+    assertEq(reserve.checkIsCollateralAsset(address(dummyToken1)), false);
+  }
+
+  function test_removeCollateralAsset_whenNotCollateralAsset_shouldRevert() public {
+    vm.expectRevert("specified address is not a collateral asset");
+    reserve.removeCollateralAsset(address(0x1234), 1);
+  }
+  function test_removeCollateralAsset_whenIndexOutOfRange_shouldRevert() public {
+    vm.expectRevert("index into collateralAssets list not mapped to token");
+    reserve.removeCollateralAsset(address(dummyToken1), 3);
+  }
+
+  function test_removeCollateralAsset_whenNotOwner_shouldRevert() public {
+    changePrank(rando);
+    vm.expectRevert("Ownable: caller is not the owner");
+    reserve.removeCollateralAsset(address(dummyToken1), 0);
   }
 
   function test_registry() public {
@@ -450,20 +503,22 @@ contract ReserveTest_transfers is ReserveTest {
   }
 
   function test_transferCollateralAsset_whenSpendingRatioWasNotSet_shouldRevert() public {
-    console.log(reserve.getDailySpendingRatioForCollateralAsset(address(dummyToken2)));
     changePrank(spender);
     vm.expectRevert("this asset has no spending ratio, therefore can't be transferred");
     reserve.transferCollateralAsset(address(dummyToken2), trader, reserveDummyToken2Balance);
   }
 
   function test_transferCollateralAsset_whenSpenderWasRemoved_shouldRevert() public {
-    uint256 amount = reserveDummyToken1Balance.div(100);
     changePrank(deployer);
     reserve.removeSpender(spender);
     changePrank(spender);
     vm.warp(block.timestamp + 24 * 3600);
     vm.expectRevert("sender not allowed to transfer Reserve funds");
-    reserve.transferCollateralAsset(address(dummyToken1), address(0x234), amount);
+    reserve.transferCollateralAsset(
+      address(dummyToken1),
+      address(0x234),
+      reserveDummyToken1Balance
+    );
   }
 
   function test_addExchangeSpender() public {
