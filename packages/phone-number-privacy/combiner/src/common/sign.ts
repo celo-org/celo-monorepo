@@ -56,7 +56,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
       // BLS threshold signatures can be combined without all partial signatures
       if (session.crypto.hasSufficientSignatures()) {
         try {
-          await session.crypto.combinePartialBlindedSignatures(
+          session.crypto.combinePartialBlindedSignatures(
             this.parseBlindedMessage(session.request.body)
           )
           // Close outstanding requests

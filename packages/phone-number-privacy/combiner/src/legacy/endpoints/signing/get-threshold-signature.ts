@@ -118,7 +118,7 @@ async function requestSignatures(request: Request, response: Response) {
           'received requestSignature response from signer'
         )
         if (res.ok) {
-          await handleSuccessResponse(
+          handleSuccessResponse(
             data,
             res.status,
             response,
@@ -180,7 +180,7 @@ async function requestSignatures(request: Request, response: Response) {
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
   if (blsCryptoClient.hasSufficientSignatures()) {
     try {
-      const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
+      const combinedSignature = blsCryptoClient.combinePartialBlindedSignatures(
         request.body.blindedQueryPhoneNumber,
         logger
       )
@@ -194,7 +194,7 @@ async function requestSignatures(request: Request, response: Response) {
   handleMissingSignatures(majorityErrorCode, response, logger)
 }
 
-async function handleSuccessResponse(
+function handleSuccessResponse(
   data: string,
   status: number,
   response: Response,
@@ -230,7 +230,7 @@ async function handleSuccessResponse(
   const partialSig = { url: serviceUrl, signature: signResponse.signature }
   logger.info({ signer: serviceUrl }, 'Add signature')
   const signatureAdditionStart = Date.now()
-  await blsCryptoClient.addSignature(partialSig)
+  blsCryptoClient.addSignature(partialSig)
   logger.info(
     {
       signer: serviceUrl,
@@ -243,7 +243,7 @@ async function handleSuccessResponse(
   // BLS threshold signatures can be combined without all partial signatures
   if (blsCryptoClient.hasSufficientSignatures()) {
     try {
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedQueryPhoneNumber, logger)
+      blsCryptoClient.combinePartialBlindedSignatures(blindedQueryPhoneNumber, logger)
       // Close outstanding requests
       controller.abort()
     } catch {
