@@ -4,11 +4,11 @@ import { OdisConfig } from '../../config'
 import { CryptoClient } from './common'
 
 export class DomainCryptoClient extends CryptoClient {
-  private cryptoClient: PoprfCombiner
+  private poprfCombiner: PoprfCombiner
 
   constructor(protected readonly config: OdisConfig) {
     super(config)
-    this.cryptoClient = new PoprfCombiner(this.config.keys.threshold)
+    this.poprfCombiner = new PoprfCombiner(this.config.keys.threshold)
   }
 
   protected get allSignaturesLength(): number {
@@ -31,7 +31,7 @@ export class DomainCryptoClient extends CryptoClient {
     logger: Logger
   ): Promise<string> {
     try {
-      const result = this.cryptoClient.blindAggregate(this.allSigsAsArray)
+      const result = this.poprfCombiner.blindAggregate(this.allSigsAsArray)
       if (result !== undefined) {
         return result.toString('base64')
       }
