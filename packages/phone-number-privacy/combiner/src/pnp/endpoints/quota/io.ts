@@ -1,7 +1,9 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
+  CombinerEndpoint,
   ErrorType,
+  getSignerEndpoint,
   hasValidAccountParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
@@ -9,6 +11,7 @@ import {
   PnpQuotaRequestSchema,
   PnpQuotaResponse,
   PnpQuotaResponseFailure,
+  PnpQuotaResponseSchema,
   PnpQuotaResponseSuccess,
   send,
   SignerEndpoint,
@@ -16,22 +19,29 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
+import * as t from 'io-ts'
 import { IO } from '../../../common/io'
-import { Counters } from '../../../common/metrics'
-import { getVersion } from '../../../config'
-import { PnpSession } from '../../session'
+import { Session } from '../../../common/session'
+import { OdisConfig, VERSION } from '../../../config'
 
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
-  readonly endpoint = SignerEndpoint.PNP_QUOTA
+  readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_QUOTA
+  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
+  readonly requestSchema: t.Type<PnpQuotaRequest, PnpQuotaRequest, unknown> = PnpQuotaRequestSchema
+  readonly responseSchema: t.Type<
+    PnpQuotaResponse,
+    PnpQuotaResponse,
+    unknown
+  > = PnpQuotaResponseSchema
 
-  constructor(enabled: boolean, readonly kit: ContractKit) {
-    super(enabled)
+  constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
+    super(config)
   }
 
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<PnpQuotaResponse>
-  ): Promise<PnpSession<PnpQuotaRequest> | null> {
+  ): Promise<Session<PnpQuotaRequest> | null> {
     if (!super.inputChecks(request, response)) {
       return null
     }
@@ -39,12 +49,15 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new PnpSession(request, response)
+    // TODO: refactor so crypto client doesn't need to be passed here
+    return new Session(request, response, undefined)
   }
 
-  validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, PnpQuotaRequest> {
+  validateClientRequest(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, PnpQuotaRequest> {
     return (
-      PnpQuotaRequestSchema.is(request.body) &&
+      super.validateClientRequest(request) &&
       hasValidAccountParam(request.body) &&
       identifierIsValidIfExists(request.body) &&
       isBodyReasonablySized(request.body)
@@ -67,7 +80,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       response,
       {
         success: true,
-        version: getVersion(),
+        version: VERSION,
         performedQueryCount,
         totalQuota,
         blockNumber,
@@ -76,7 +89,6 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       status,
       response.locals.logger
     )
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(error: ErrorType, status: number, response: Response<PnpQuotaResponseFailure>) {
@@ -84,12 +96,11 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       response,
       {
         success: false,
-        version: getVersion(),
+        version: VERSION,
         error,
       },
       status,
       response.locals.logger
     )
-    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }
