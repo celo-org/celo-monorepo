@@ -3,12 +3,18 @@ pragma experimental ABIEncoderV2;
 
 import { IPairManager } from "./interfaces/IPairManager.sol";
 import { IReserve } from "./interfaces/IReserve.sol";
+import { IMentoExchange } from "./interfaces/IMentoExchange.sol";
 
 import { StableToken } from "./StableToken.sol";
 
 import { UsingRegistry } from "../common/UsingRegistry.sol";
 import { Initializable } from "../common/Initializable.sol";
 import { FixidityLib } from "../common/FixidityLib.sol";
+
+// TODO: Remove when migrating to mento-core. Newer versions of OZ-contracts have this interface
+interface IERC20Metadata {
+  function symbol() external view returns (string memory);
+}
 
 /**
  * @title PairManager
@@ -18,6 +24,9 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
 
   /* ==================== State Variables ==================== */
+
+  // Address of the broker contract.
+  address broker;
 
   // Maps a pair id to the corresponding pair struct.
   // pairId is in the format "stableSymbol:collateralSymbol:exchangeName"
@@ -43,37 +52,155 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
 
   /**
    * @notice Allows the contract to be upgradable via the proxy.
+   * @param _broker The address of the broker contract.
    */
-  function initilize() external initializer {
+  function initilize(address _broker) external initializer {
     _transferOwnership(msg.sender);
+    setBroker(_broker);
+  }
+
+  modifier onlyBroker() {
+    require(msg.sender == broker, "Caller is not the Broker");
+    _;
   }
 
   /* ==================== Restricted Functions ==================== */
 
   /**
+   * @notice Sets the address of the broker contract.
+   * @param _broker The new address of the broker contract.
+   */
+  function setBroker(address _broker) public onlyOwner {
+    require(_broker != address(0), "Broker address must be set");
+    _broker = broker;
+    emit BrokerUpdated(_broker);
+  }
+
+  /**
    * @notice Creates a new pair using the given parameters.
-   * @param pairInfo The information required to create the pair.
+   * @param pair The information required to create the pair.
    * @return pairId The id of the newly created pair.
    */
-  function createPair(Pair calldata pairInfo) external onlyOwner returns (bytes32 pairId) {
+  function createPair(Pair calldata pair) external onlyOwner returns (bytes32 pairId) {
+    Pair memory pairInfo = pair;
+
     validatePairInfo(pairInfo);
 
-    // TODO: Erc20 does not have definition for symbol
-    // TODO: Need IMentoExchange.name()
-    pairId = keccak256(abi.encodePacked(StableToken(pairInfo.stableAsset).symbol(), ":"));
+    // TODO: OZ Erc20 does not have definition for symbol -____-
+    pairId = keccak256(
+      abi.encodePacked(
+        IERC20Metadata(pairInfo.stableAsset).symbol(),
+        IERC20Metadata(pairInfo.collateralAsset).symbol(),
+        pairInfo.mentoExchange.name()
+      )
+    );
     require(!isPair[pairId], "A pair with the specified assets and exchange exists");
 
-    // Initilize buckets
-    // TODO: Add call to
-    // IMentoExchange.getUpdatedBuckets()
-    // (uint256 newStableBucket, uint256 newCollateralBucket) = IMentoExchange(pairInfo.mentoExchange).getUpdatedBuckets(...);
-    // pairInfo.stableBucket = newStableBucket;
-    // pairInfo.collateralBucket = newCollateralBucket;
+    // TODO: getUpdatedBuckets Function sig should change. May not need amounts
+    // but instead pass minSupplyForStableBucketCap & stableBucketMaxFraction
+    (uint256 tokenInBucket, uint256 tokenOutBucket) = pairInfo.mentoExchange.getUpdatedBuckets(
+      pairInfo.stableAsset,
+      pairInfo.collateralAsset,
+      0,
+      0,
+      pairId
+    );
+
+    pairInfo.stableBucket = tokenInBucket;
+    pairInfo.collateralBucket = tokenOutBucket;
+
+    // Update allocated collateral fraction
+    allocatedCollateralFractions[pairInfo.collateralAsset] = allocatedCollateralFractions[pairInfo
+      .collateralAsset]
+      .add(pairInfo.collateralBucketFraction);
+
+    // Update allocated stable bucket fraction
+    allocatedStableFractions[pairInfo.stableAsset] = allocatedStableFractions[pairInfo.stableAsset]
+      .add(pairInfo.stableBucketMaxFraction);
 
     pairs[pairId] = pairInfo;
     isPair[pairId] = true;
-    emit PairCreated(pairInfo.stableAsset, pairInfo.collateralAsset, pairInfo.mentoExchange);
+
+    emit PairCreated(
+      pairInfo.stableAsset,
+      pairInfo.collateralAsset,
+      address(pairInfo.mentoExchange)
+    );
   }
+
+  /**
+   * @notice Destroys a pair with the given parameters if it exists and frees up
+   *         the collateral and stable allocation it was using.
+   * @param stableAsset The stable asset of the pair.
+   * @param collateralAsset The collateral asset of the pair.
+   * @return destroyed A boolean indicating whether or not the pair was successfully destroyed.
+   */
+  function destroyPair(address stableAsset, address collateralAsset, IMentoExchange mentoExchange)
+    external
+    onlyOwner
+    returns (bool destroyed)
+  {
+    require(stableAsset != address(0), "Stable asset address must be specified");
+    require(collateralAsset != address(0), "Collateral asset address must be specified");
+
+    bytes32 pairId = keccak256(
+      abi.encodePacked(
+        IERC20Metadata(stableAsset).symbol(),
+        IERC20Metadata(collateralAsset).symbol(),
+        mentoExchange.name()
+      )
+    );
+    require(isPair[pairId], "A pair with the specified assets and exchange does not exist");
+
+    Pair memory pair = pairs[pairId];
+
+    // Update allocated collateral fraction
+    allocatedCollateralFractions[pair.collateralAsset] = allocatedCollateralFractions[pair
+      .collateralAsset]
+      .subtract(pair.collateralBucketFraction);
+
+    // Update allocated stable bucket fraction
+    allocatedStableFractions[pair.stableAsset] = allocatedStableFractions[pair.stableAsset]
+      .subtract(pair.stableBucketMaxFraction);
+
+    isPair[pairId] = false;
+    delete pairs[pairId];
+
+    destroyed = true;
+
+    emit PairDestroyed(stableAsset, collateralAsset, address(mentoExchange));
+  }
+
+  /**
+   * @notice Updates the bucket sizes for the virtual pair with the specified pairId.
+   * @param pairId The id of the pair to be updated.
+   * @param stableBucket The new stable bucket size.
+   * @param collateralBucket The new collateral bucket size.
+   */
+  function updateBuckets(bytes32 pairId, uint256 stableBucket, uint256 collateralBucket)
+    external
+    onlyBroker
+  {
+    require(isPair[pairId], "A pair with the specified id does not exist");
+
+    Pair memory pair = pairs[pairId];
+    pair.collateralBucket = collateralBucket;
+    pair.stableBucket = stableBucket;
+
+    pairs[pairId] = pair;
+
+    // TODO: Emit asset addresses & exchange
+    emit BucketsUpdated(pairId, collateralBucket, stableBucket);
+  }
+
+  /* ==================== View Functions ==================== */
+
+  function getPair(bytes32 pairId) external view returns (Pair memory pair) {
+    require(isPair[pairId], "A pair with the specified id does not exist");
+    pair = pairs[pairId];
+  }
+
+  /* ==================== Private Functions ==================== */
 
   /**
    * @notice Valitates a virtual pair with the given information.
@@ -101,7 +228,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
       ),
       "Collateral asset fraction must be less than available collateral fraction"
     );
-    require(pairInfo.mentoExchange != address(0), "Mento exchange must be set");
+    require(address(pairInfo.mentoExchange) != address(0), "Mento exchange must be set");
 
     require(
       pairInfo.stableBucketMaxFraction.unwrap() > 0,
@@ -123,8 +250,6 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
 
     isValid = true; //TODO: Necessary?
   }
-
-  /* ==================== Private Functions ==================== */
 
   /**
    * @notice Retrieve the availble fraction of the reserve collateral that can be allocated to a virtual pair.

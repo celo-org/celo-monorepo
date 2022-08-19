@@ -39,4 +39,10 @@ interface IMentoExchange {
     uint256 amountOut,
     bytes32 pairId
   ) external view returns (uint256 tokenInBucketSize, uint256 tokenOutBucketSize);
+
+  /**
+   * @notice Retrieve the name of this exchange.
+   * @return exchangeName The name of the exchange.
+   */
+  function name() external pure returns (string memory exchangeName);
 }
