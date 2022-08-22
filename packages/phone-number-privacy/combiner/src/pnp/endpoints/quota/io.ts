@@ -5,41 +5,34 @@ import {
   ErrorType,
   getSignerEndpoint,
   hasValidAccountParam,
-  hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
+  PnpQuotaRequest,
+  PnpQuotaRequestSchema,
+  PnpQuotaResponse,
+  PnpQuotaResponseFailure,
+  PnpQuotaResponseSchema,
+  PnpQuotaResponseSuccess,
   send,
   SignerEndpoint,
-  SignMessageRequest,
-  SignMessageRequestSchema,
-  SignMessageResponse,
-  SignMessageResponseFailure,
-  SignMessageResponseSchema,
-  SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
-import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-cryptography-client'
-import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { OdisConfig, VERSION } from '../../../config'
 
-export class PnpSignIO extends IO<SignMessageRequest> {
-  readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_SIGN
+export class PnpQuotaIO extends IO<PnpQuotaRequest> {
+  readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_QUOTA
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-  readonly requestSchema: t.Type<
-    SignMessageRequest,
-    SignMessageRequest,
-    unknown
-  > = SignMessageRequestSchema
+  readonly requestSchema: t.Type<PnpQuotaRequest, PnpQuotaRequest, unknown> = PnpQuotaRequestSchema
   readonly responseSchema: t.Type<
-    SignMessageResponse,
-    SignMessageResponse,
+    PnpQuotaResponse,
+    PnpQuotaResponse,
     unknown
-  > = SignMessageResponseSchema
+  > = PnpQuotaResponseSchema
 
   constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
     super(config)
@@ -47,8 +40,8 @@ export class PnpSignIO extends IO<SignMessageRequest> {
 
   async init(
     request: Request<{}, {}, unknown>,
-    response: Response<SignMessageResponse>
-  ): Promise<Session<SignMessageRequest> | null> {
+    response: Response<PnpQuotaResponse>
+  ): Promise<Session<PnpQuotaRequest> | null> {
     if (!super.inputChecks(request, response)) {
       return null
     }
@@ -56,34 +49,29 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new CryptoSession(request, response, new BLSCryptographyClient(this.config))
+    return new Session(request, response)
   }
 
   validateClientRequest(
     request: Request<{}, {}, unknown>
-  ): request is Request<{}, {}, SignMessageRequest> {
+  ): request is Request<{}, {}, PnpQuotaRequest> {
     return (
       super.validateClientRequest(request) &&
       hasValidAccountParam(request.body) &&
-      hasValidBlindedPhoneNumberParam(request.body) &&
       identifierIsValidIfExists(request.body) &&
       isBodyReasonablySized(request.body)
     )
   }
 
-  async authenticate(
-    request: Request<{}, {}, SignMessageRequest>,
-    logger: Logger
-  ): Promise<boolean> {
+  async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
     return authenticateUser(request, this.kit, logger)
   }
 
   sendSuccess(
     status: number,
-    response: Response<SignMessageResponseSuccess>,
-    signature: string,
-    performedQueryCount?: number,
-    totalQuota?: number,
+    response: Response<PnpQuotaResponseSuccess>,
+    performedQueryCount: number,
+    totalQuota: number,
     blockNumber?: number,
     warnings?: string[]
   ) {
@@ -92,7 +80,6 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       {
         success: true,
         version: VERSION,
-        signature,
         performedQueryCount,
         totalQuota,
         blockNumber,
@@ -103,25 +90,13 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     )
   }
 
-  sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<SignMessageResponseFailure>,
-    queryCount?: number,
-    totalQuota?: number,
-    blockNumber?: number,
-    signature?: string
-  ) {
+  sendFailure(error: ErrorType, status: number, response: Response<PnpQuotaResponseFailure>) {
     send(
       response,
       {
         success: false,
         version: VERSION,
         error,
-        performedQueryCount: queryCount,
-        totalQuota,
-        blockNumber,
-        signature,
       },
       status,
       response.locals.logger

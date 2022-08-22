@@ -1,7 +1,12 @@
 import { SignMessageRequest } from '@celo/identity/lib/odis/query'
-import { MAX_BLOCK_DISCREPANCY_THRESHOLD, WarningMessage } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessage,
+  ErrorType,
+  MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
+import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
-import { Session } from '../../../common/session'
 import { SignAction } from '../../../common/sign'
 import { OdisConfig } from '../../../config'
 
@@ -10,12 +15,12 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
     super(config, io)
   }
 
-  async combine(session: Session<SignMessageRequest>): Promise<void> {
+  combine(session: CryptoSession<SignMessageRequest>): void {
     this.logResponseDiscrepancies(session)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
-        const combinedSignature = await session.crypto.combinePartialBlindedSignatures(
+        const combinedSignature = session.crypto.combinePartialBlindedSignatures(
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
@@ -33,7 +38,7 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
     return req.blindedQueryPhoneNumber
   }
 
-  protected logResponseDiscrepancies(session: Session<SignMessageRequest>): void {
+  protected logResponseDiscrepancies(session: CryptoSession<SignMessageRequest>): void {
     // Only compare responses which have values for the quota fields
     const successes = session.responses.filter(
       (signerResponse) =>
@@ -85,6 +90,16 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
       if (discrepancyFound) {
         return
       }
+    }
+  }
+
+  protected errorCodeToError(errorCode: number): ErrorType {
+    switch (errorCode) {
+      case 403:
+      case 429:
+        return WarningMessage.EXCEEDED_QUOTA
+      default:
+        return ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
     }
   }
 }

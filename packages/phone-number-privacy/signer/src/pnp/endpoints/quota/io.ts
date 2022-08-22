@@ -58,8 +58,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   sendSuccess(
     status: number,
     response: Response<PnpQuotaResponseSuccess>,
-    performedQueryCount?: number,
-    totalQuota?: number,
+    performedQueryCount: number,
+    totalQuota: number,
     blockNumber?: number,
     warnings?: string[]
   ) {
@@ -79,23 +79,13 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
-  sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<PnpQuotaResponseFailure>,
-    performedQueryCount?: number,
-    totalQuota?: number,
-    blockNumber?: number
-  ) {
+  sendFailure(error: ErrorType, status: number, response: Response<PnpQuotaResponseFailure>) {
     send(
       response,
       {
         success: false,
         version: getVersion(),
         error,
-        performedQueryCount,
-        totalQuota,
-        blockNumber,
       },
       status,
       response.locals.logger

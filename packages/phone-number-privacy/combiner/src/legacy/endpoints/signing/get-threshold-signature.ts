@@ -20,7 +20,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import { BLSCryptographyClient } from '../../../common/bls/bls-cryptography-client'
+import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-cryptography-client'
 import { getContractKit } from '../../../common/web3/contracts'
 import config, { VERSION } from '../../../config'
 
@@ -118,7 +118,7 @@ async function requestSignatures(request: Request, response: Response) {
           'received requestSignature response from signer'
         )
         if (res.ok) {
-          await handleSuccessResponse(
+          handleSuccessResponse(
             data,
             res.status,
             response,
@@ -180,7 +180,7 @@ async function requestSignatures(request: Request, response: Response) {
   const majorityErrorCode = getMajorityErrorCode(errorCodes, logger)
   if (blsCryptoClient.hasSufficientSignatures()) {
     try {
-      const combinedSignature = await blsCryptoClient.combinePartialBlindedSignatures(
+      const combinedSignature = blsCryptoClient.combinePartialBlindedSignatures(
         request.body.blindedQueryPhoneNumber,
         logger
       )
@@ -194,7 +194,7 @@ async function requestSignatures(request: Request, response: Response) {
   handleMissingSignatures(majorityErrorCode, response, logger)
 }
 
-async function handleSuccessResponse(
+function handleSuccessResponse(
   data: string,
   status: number,
   response: Response,
@@ -230,7 +230,7 @@ async function handleSuccessResponse(
   const partialSig = { url: serviceUrl, signature: signResponse.signature }
   logger.info({ signer: serviceUrl }, 'Add signature')
   const signatureAdditionStart = Date.now()
-  await blsCryptoClient.addSignature(partialSig)
+  blsCryptoClient.addSignature(partialSig)
   logger.info(
     {
       signer: serviceUrl,
@@ -243,7 +243,7 @@ async function handleSuccessResponse(
   // BLS threshold signatures can be combined without all partial signatures
   if (blsCryptoClient.hasSufficientSignatures()) {
     try {
-      await blsCryptoClient.combinePartialBlindedSignatures(blindedQueryPhoneNumber, logger)
+      blsCryptoClient.combinePartialBlindedSignatures(blindedQueryPhoneNumber, logger)
       // Close outstanding requests
       controller.abort()
     } catch {
@@ -270,7 +270,7 @@ function handleFailedResponse(
   // double counting the same failed request by mistake
   failedRequests.add(service.url)
   const shouldFailFast = signerCount - failedRequests.size < _config.keys.threshold
-  logger.info(`Recieved failure from ${failedRequests.size}/${signerCount} signers.`)
+  logger.info(`Received failure from ${failedRequests.size}/${signerCount} signers.`)
   if (shouldFailFast) {
     logger.info('Not possible to reach a sufficient number of signatures. Failing fast.')
     controller.abort()

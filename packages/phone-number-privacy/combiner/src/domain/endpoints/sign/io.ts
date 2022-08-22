@@ -17,9 +17,9 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
-import { BLSCryptographyClient } from '../../../common/bls/bls-cryptography-client'
+import { DomainCryptoClient } from '../../../common/crypto-clients/domain-crypto-client'
+import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
-import { Session } from '../../../common/session'
 import { VERSION } from '../../../config'
 
 export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
@@ -39,7 +39,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<DomainRestrictedSignatureResponse>
-  ): Promise<Session<DomainRestrictedSignatureRequest> | null> {
+  ): Promise<CryptoSession<DomainRestrictedSignatureRequest> | null> {
     if (!super.inputChecks(request, response)) {
       return null
     }
@@ -51,7 +51,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response, new BLSCryptographyClient(this.config))
+    return new CryptoSession(request, response, new DomainCryptoClient(this.config))
   }
 
   authenticate(request: Request<{}, {}, DomainRestrictedSignatureRequest>): Promise<boolean> {
@@ -84,7 +84,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
     error: ErrorType,
     status: number,
     response: Response<DomainRestrictedSignatureResponseFailure>,
-    domainState?: DomainState
+    domainState?: DomainState // TODO: is status ever provided on failure?
   ) {
     send(
       response,

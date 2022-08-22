@@ -57,8 +57,9 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
 export interface PnpQuotaResponseSuccess {
   success: true
   version: string
-  performedQueryCount: number | undefined
-  totalQuota: number | undefined
+  performedQueryCount: number
+  // all time total quota
+  totalQuota: number
   blockNumber: number | undefined
   warnings: string[] | undefined
 }
@@ -75,8 +76,8 @@ export const PnpQuotaResponseSchema: t.Type<PnpQuotaResponse> = t.union([
   t.type({
     success: t.literal(true),
     version: t.string,
-    performedQueryCount: t.union([t.number, t.undefined]),
-    totalQuota: t.union([t.number, t.undefined]),
+    performedQueryCount: t.number,
+    totalQuota: t.number,
     blockNumber: t.union([t.number, t.undefined]),
     warnings: t.union([t.array(t.string), t.undefined]),
   }),
@@ -195,7 +196,12 @@ export function domainRestrictedSignatureResponseSchema<D extends Domain>(
       success: t.literal(false),
       version: t.string,
       error: t.string,
-      status: t.union([state, t.undefined]),
+      status: state,
+    }),
+    t.type({
+      success: t.literal(false),
+      version: t.string,
+      error: t.string,
     }),
   ])
 }

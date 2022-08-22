@@ -9,6 +9,7 @@ export enum SignerEndpointPNP {
 
 export enum CombinerEndpointPNP {
   LEGACY_PNP_SIGN = '/getBlindedMessageSig',
+  PNP_QUOTA = '/quotaStatus',
   PNP_SIGN = '/sign',
   MATCHMAKING = '/getContactMatches',
 }
@@ -36,6 +37,8 @@ export function getSignerEndpoint(endpoint: CombinerEndpoint): SignerEndpoint {
       return SignerEndpoint.DOMAIN_QUOTA_STATUS
     case CombinerEndpoint.DOMAIN_SIGN:
       return SignerEndpoint.DOMAIN_SIGN
+    case CombinerEndpoint.PNP_QUOTA:
+      return SignerEndpoint.PNP_QUOTA
     case CombinerEndpoint.PNP_SIGN:
       return SignerEndpoint.PNP_SIGN
     case CombinerEndpoint.LEGACY_PNP_SIGN:
@@ -53,6 +56,8 @@ export function getCombinerEndpoint(endpoint: SignerEndpoint): CombinerEndpoint 
       return CombinerEndpoint.DOMAIN_QUOTA_STATUS
     case SignerEndpoint.DOMAIN_SIGN:
       return CombinerEndpoint.DOMAIN_SIGN
+    case SignerEndpoint.PNP_QUOTA:
+      return CombinerEndpoint.PNP_QUOTA
     case SignerEndpoint.PNP_SIGN:
       return CombinerEndpoint.PNP_SIGN
     case SignerEndpoint.LEGACY_PNP_SIGN:

@@ -1,11 +1,14 @@
 import {
   CombinerEndpoint,
   DomainRestrictedSignatureRequest,
+  ErrorMessage,
+  ErrorType,
   getSignerEndpoint,
   SignerEndpoint,
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
-import { Session } from '../../../common/session'
 import { SignAction } from '../../../common/sign'
 import { OdisConfig } from '../../../config'
 import { DomainThresholdStateService } from '../../services/thresholdState'
@@ -22,12 +25,12 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
     super(config, io)
   }
 
-  async combine(session: Session<DomainRestrictedSignatureRequest>): Promise<void> {
+  combine(session: CryptoSession<DomainRestrictedSignatureRequest>): void {
     // this.logResponseDiscrepancies(session) // TODO(Alec)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
-        const combinedSignature = await session.crypto.combinePartialBlindedSignatures(
+        const combinedSignature = session.crypto.combinePartialBlindedSignatures(
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
@@ -51,8 +54,23 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
     return req.blindedMessage
   }
 
-  protected logResponseDiscrepancies(_session: Session<DomainRestrictedSignatureRequest>): void {
+  protected logResponseDiscrepancies(
+    _session: CryptoSession<DomainRestrictedSignatureRequest>
+  ): void {
     // TODO
     throw new Error('Method not implemented.')
+  }
+
+  protected errorCodeToError(errorCode: number): ErrorType {
+    switch (errorCode) {
+      case 403:
+      case 429:
+        return WarningMessage.EXCEEDED_QUOTA
+      case 401:
+        // Authentication is checked in the combiner, but invalid nonces are passed through
+        return WarningMessage.INVALID_NONCE
+      default:
+        return ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
+    }
   }
 }

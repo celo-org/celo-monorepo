@@ -22,6 +22,7 @@ export enum ErrorMessage {
   INVALID_KEY_VERSION_RESPONSE = `CELO_ODIS_ERR_20 SIG_ERR Signer response key version header is invalid`,
   INVALID_SIGNER_RESPONSE = `CELO_ODIS_ERR_21 SIG_ERR Signer response body is invalid`,
   SIGNER_RESPONSE_FAILED_WITH_OK_STATUS = `CELO_ODIS_ERR_22 SIG_ERR Signer response failed with 200 status`,
+  THRESHOLD_PNP_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_23 SIG_ERR Failed to get PNP quota status from a threshold of signers`,
 }
 
 export enum WarningMessage {
@@ -43,6 +44,7 @@ export enum WarningMessage {
   INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES = `CELO_ODIS_WARN_15 SIGNER Discrepency found in signer domain disabled states`,
   INVALID_AUTH_SIGNATURE = `CELO_ODIS_WARN_12 BAD_INPUT Authorization signature was incorrectly generated. Request will be rejected in a future version.`,
   INVALID_NONCE = `CELO_ODIS_WARN_13 BAD_INPUT SequentialDelayDomain nonce check failed on Signer request`,
+  INCONSISTENT_TOTAL_QUOTA = `CELO_ODIS_WARN_14 QUOTA Inconsistent totalQuota value from signers`,
 }
 
 export type ErrorType = ErrorMessage | WarningMessage

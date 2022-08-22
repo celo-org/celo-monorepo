@@ -6,13 +6,12 @@ import {
   OdisResponse,
   SignMessageRequest,
   SignMessageResponse,
-  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
 import { CombineAction } from './combine'
+import { CryptoSession } from './crypto-session'
 import { IO } from './io'
-import { Session } from './session'
 
 // prettier-ignore
 export type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
@@ -32,7 +31,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
   protected async receiveSuccess(
     signerResponse: FetchResponse,
     url: string,
-    session: Session<R>
+    session: CryptoSession<R>
   ): Promise<OdisResponse<R>> {
     if (!this.io.responseHasValidKeyVersion(signerResponse, session)) {
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
@@ -56,7 +55,7 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
       // BLS threshold signatures can be combined without all partial signatures
       if (session.crypto.hasSufficientSignatures()) {
         try {
-          await session.crypto.combinePartialBlindedSignatures(
+          session.crypto.combinePartialBlindedSignatures(
             this.parseBlindedMessage(session.request.body)
           )
           // Close outstanding requests
@@ -70,14 +69,13 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
     return res
   }
 
-  protected handleMissingSignatures(session: Session<R>) {
-    let error: ErrorType = ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
-    const majorityErrorCode = session.getMajorityErrorCode()
-    if (majorityErrorCode === 403 || majorityErrorCode === 429) {
-      error = WarningMessage.EXCEEDED_QUOTA
-    }
-    this.io.sendFailure(error, majorityErrorCode ?? 500, session.response)
+  protected handleMissingSignatures(session: CryptoSession<R>) {
+    const errorCode = session.getMajorityErrorCode() ?? 500
+    const error = this.errorCodeToError(errorCode)
+    this.io.sendFailure(error, errorCode, session.response)
   }
+
+  protected abstract errorCodeToError(errorCode: number): ErrorType
 
   protected abstract parseBlindedMessage(req: OdisSignatureRequest): string
 }

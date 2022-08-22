@@ -22,11 +22,11 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     this.signers = JSON.parse(config.odisServices.signers)
   }
 
-  abstract combine(session: Session<R>): Promise<void>
+  abstract combine(session: Session<R>): void
 
   async perform(session: Session<R>) {
     await this.distribute(session)
-    await this.combine(session)
+    this.combine(session)
   }
 
   async distribute(session: Session<R>): Promise<Session<R>> {
@@ -118,7 +118,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
 
   private addFailureToSession(signer: Signer, errorCode: number | undefined, session: Session<R>) {
     session.logger.info(
-      `Recieved failure from ${session.failedSigners.size}/${this.signers.length} signers`
+      `Received failure from ${session.failedSigners.size}/${this.signers.length} signers`
     )
     // Tracking failed request count via signer url prevents
     // double counting the same failed request by mistake

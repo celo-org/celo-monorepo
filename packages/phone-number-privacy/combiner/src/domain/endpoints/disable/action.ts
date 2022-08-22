@@ -14,7 +14,7 @@ export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
     super(config, io)
   }
 
-  async combine(session: Session<DisableDomainRequest>): Promise<void> {
+  combine(session: Session<DisableDomainRequest>): void {
     if (this.checkThresholdDisabled(session)) {
       this.io.sendSuccess(200, session.response)
       return
