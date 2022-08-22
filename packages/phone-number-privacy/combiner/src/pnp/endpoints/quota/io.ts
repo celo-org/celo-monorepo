@@ -49,8 +49,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    // TODO: refactor so crypto client doesn't need to be passed here
-    return new Session(request, response, undefined)
+    return new Session(request, response)
   }
 
   validateClientRequest(
