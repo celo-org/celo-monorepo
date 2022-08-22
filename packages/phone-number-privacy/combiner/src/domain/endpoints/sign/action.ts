@@ -1,8 +1,11 @@
 import {
   CombinerEndpoint,
   DomainRestrictedSignatureRequest,
+  ErrorMessage,
+  ErrorType,
   getSignerEndpoint,
   SignerEndpoint,
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
@@ -56,5 +59,18 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
   ): void {
     // TODO
     throw new Error('Method not implemented.')
+  }
+
+  protected errorCodeToError(errorCode: number): ErrorType {
+    switch (errorCode) {
+      case 403:
+      case 429:
+        return WarningMessage.EXCEEDED_QUOTA
+      case 401:
+        // Authentication is checked in the combiner, but invalid nonces are passed through
+        return WarningMessage.INVALID_NONCE
+      default:
+        return ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
+    }
   }
 }

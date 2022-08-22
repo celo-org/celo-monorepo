@@ -1,5 +1,10 @@
 import { SignMessageRequest } from '@celo/identity/lib/odis/query'
-import { MAX_BLOCK_DISCREPANCY_THRESHOLD, WarningMessage } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessage,
+  ErrorType,
+  MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
 import { SignAction } from '../../../common/sign'
@@ -85,6 +90,16 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
       if (discrepancyFound) {
         return
       }
+    }
+  }
+
+  protected errorCodeToError(errorCode: number): ErrorType {
+    switch (errorCode) {
+      case 403:
+      case 429:
+        return WarningMessage.EXCEEDED_QUOTA
+      default:
+        return ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
     }
   }
 }

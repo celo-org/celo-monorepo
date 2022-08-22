@@ -137,7 +137,7 @@ export interface DomainRestrictedSignatureResponseFailure<D extends Domain = Dom
   success: false
   version: string
   error: string
-  status: DomainState<D> | undefined
+  status?: DomainState<D>
 }
 
 export type DomainRestrictedSignatureResponse<D extends Domain = Domain> =
@@ -196,7 +196,12 @@ export function domainRestrictedSignatureResponseSchema<D extends Domain>(
       success: t.literal(false),
       version: t.string,
       error: t.string,
-      status: t.union([state, t.undefined]),
+      status: state,
+    }),
+    t.type({
+      success: t.literal(false),
+      version: t.string,
+      error: t.string,
     }),
   ])
 }
