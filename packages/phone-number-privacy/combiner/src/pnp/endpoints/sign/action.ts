@@ -98,7 +98,6 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
   protected errorCodeToError(errorCode: number): ErrorType {
     switch (errorCode) {
       case 403:
-      case 429:
         return WarningMessage.EXCEEDED_QUOTA
       default:
         return ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES

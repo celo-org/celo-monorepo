@@ -406,8 +406,7 @@ describe('pnpService', () => {
       })
     })
 
-    // TODO EN: debug what's going on, likely the failing open error
-    xit('Should respond with 429 on out of quota', async () => {
+    it('Should respond with 403 on out of quota', async () => {
       mockOdisPaymentsTotalPaidCUSD.mockReturnValue(new BigNumber(0))
 
       const [req, _] = pnpSignMessageRequest(userSeed)
@@ -418,7 +417,7 @@ describe('pnpService', () => {
         .set('Authorization', authorization)
         .send(req)
 
-      expect(res.status).toBe(429)
+      expect(res.status).toBe(403)
       expect(res.body).toMatchObject<SignMessageResponse>({
         success: false,
         version: expectedVersion,
