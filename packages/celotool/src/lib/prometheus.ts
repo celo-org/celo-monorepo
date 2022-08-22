@@ -36,7 +36,7 @@ const kubeServiceAccountName = releaseName
 // Container registry with latest tags: https://console.cloud.google.com/gcr/images/stackdriver-prometheus/GLOBAL/stackdriver-prometheus-sidecar?gcrImageListsize=30
 const sidecarImageTag = '0.8.2'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
-const prometheusImageTag = 'v2.27.1'
+const prometheusImageTag = 'v2.38.0'
 
 const GKEWorkloadMetricsHelmChartPath = '../helm-charts/gke-workload-metrics'
 const GKEWorkloadMetricsReleaseName = 'gke-workload-metrics'
