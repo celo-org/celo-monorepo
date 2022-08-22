@@ -34,7 +34,7 @@
     "@celo/contractkit": "2.0.1-dev",
     "@celo/identity": "2.0.1-dev",
     "@celo/phone-number-privacy-common": "1.0.42-dev",
-    "@celo/poprf": "^0.1.8",
+    "@celo/poprf": "^0.1.9",
     "@celo/utils": "2.0.1-dev",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "express": "^4.17.1",
