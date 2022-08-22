@@ -3,6 +3,7 @@ import {
   ErrorMessage,
   ErrorType,
   GetContactMatchesRequest,
+  getContractKit,
   getDataEncryptionKey,
   hasValidAccountParam,
   hasValidContactPhoneNumbersParam,
@@ -26,7 +27,6 @@ import {
   getNumberPairContacts,
   setNumberPairContacts,
 } from '../../../common/database/wrappers/number-pairs'
-import { getContractKit } from '../../../common/web3/contracts'
 import config, {
   E2E_TEST_ACCOUNTS,
   E2E_TEST_PHONE_NUMBERS,

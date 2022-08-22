@@ -122,6 +122,6 @@ export function getPnpQuotaRequest(account: string, hashedPhoneNumber?: string) 
   } as PnpQuotaRequest
 }
 
-export function getPnpQuotaRequestAuthorization(req: PnpQuotaRequest, account: string, pk: string) {
+export function getPnpRequestAuthorization(req: PnpQuotaRequest, account: string, pk: string) {
   return serializeSignature(signMessage(JSON.stringify(req), pk, account))
 }

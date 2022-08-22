@@ -1,5 +1,5 @@
 import { OdisUtils } from '@celo/identity'
-import { rootLogger, TestUtils, toBool } from '@celo/phone-number-privacy-common'
+import { BlockchainConfig, rootLogger, TestUtils, toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 export const VERSION = process.env.npm_package_version ?? ''
 export const DEV_MODE =
@@ -13,11 +13,6 @@ export const E2E_TEST_PHONE_NUMBERS: string[] = E2E_TEST_PHONE_NUMBERS_RAW.map((
   OdisUtils.Matchmaking.obfuscateNumberForMatchmaking(num)
 )
 export const E2E_TEST_ACCOUNTS: string[] = ['0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb']
-
-export interface BlockchainConfig {
-  provider: string
-  apiKey?: string
-}
 
 export interface DatabaseConfig {
   user: string

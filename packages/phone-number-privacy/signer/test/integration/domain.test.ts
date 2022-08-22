@@ -1,3 +1,4 @@
+import { newKit } from '@celo/contractkit'
 import {
   DisableDomainRequest,
   disableDomainRequestEIP712,
@@ -30,8 +31,12 @@ import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
-// DO NOT MERGE: Add checking of values beyond the return code.
+jest.mock('@celo/contractkit', () => ({
+  ...jest.requireActual('@celo/contractkit'),
+  newKit: jest.fn(),
+}))
 
+// DO NOT MERGE: Add checking of values beyond the return code.
 describe('domainService', () => {
   // DO NOT MERGE(victor): Should this be refactored to pass key provider, database, and config?
   // (global config makes it harder to test things, we should pass it as a parameter)
@@ -130,7 +135,7 @@ describe('domainService', () => {
     // Create a new in-memory database for each test.
     _config.api.domains.enabled = true
     db = await initDatabase(_config)
-    app = startSigner(_config, db, keyProvider)
+    app = startSigner(_config, db, keyProvider, newKit('dummyKit'))
   })
 
   afterEach(async () => {
@@ -256,7 +261,7 @@ describe('domainService', () => {
 
     it('Should respond with 503 on disabled api', async () => {
       _config.api.domains.enabled = false
-      const appWithApiDisabled = startSigner(_config, db, keyProvider)
+      const appWithApiDisabled = startSigner(_config, db, keyProvider, newKit('dummyKit'))
 
       const req = await disableRequest()
 
@@ -396,7 +401,7 @@ describe('domainService', () => {
 
     it('Should respond with 503 on disabled api', async () => {
       _config.api.domains.enabled = false
-      const appWithApiDisabled = startSigner(_config, db, keyProvider)
+      const appWithApiDisabled = startSigner(_config, db, keyProvider, newKit('dummyKit'))
 
       const req = await quotaRequest()
 
@@ -728,7 +733,12 @@ describe('domainService', () => {
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled = { ...config }
       configWithApiDisabled.api.domains.enabled = false
-      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+      const appWithApiDisabled = startSigner(
+        configWithApiDisabled,
+        db,
+        keyProvider,
+        newKit('dummyKit')
+      )
 
       const [req, _] = await signatureRequest()
 
