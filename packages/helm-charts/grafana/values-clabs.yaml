@@ -11,6 +11,10 @@ datasources:
       name: Prometheus
       type: prometheus
       url: http://prometheus-server.prometheus:9090
+    - access: proxy
+      name: Loki
+      type: loki
+      url: http://local-loki:3100
 deploymentStrategy:
   type: Recreate
 grafana.ini:
