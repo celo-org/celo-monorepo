@@ -1,11 +1,11 @@
+import * as poprf from '@celo/poprf'
 import {
-  PoprfCombiner,
   PoprfClient,
+  PoprfCombiner,
   PoprfServer,
   ThresholdPoprfClient,
   ThresholdPoprfServer,
 } from '../src/poprf'
-import * as poprf from '@celo/poprf'
 
 const TEST_POPRF_KEYPAIR = poprf.keygen(Buffer.from('TEST POPRF KEYPAIR SEED'))
 const TEST_THRESHOLD_N = 3
@@ -87,9 +87,7 @@ describe('end-to-end', () => {
     expect(() => client.unblindResponse(response)).toThrow(/verification failed/)
   })
 
-  // TODO(Alec): Fix these two tests
-
-  it.skip('successfully completes client-server exchange with combiner', () => {
+  it('successfully completes client-server exchange with combiner', () => {
     const servers = [...Array(TEST_THRESHOLD_N).keys()].map(
       (i) => new ThresholdPoprfServer(TEST_THRESHOLD_POPRF_KEYS.getShare(i))
     )
@@ -115,7 +113,7 @@ describe('end-to-end', () => {
     expect(evaluation.toString('base64')).toEqual('C1jKGStMWC3lNpYDV61D+3waetY0bHlD4ElYzV+Isqc=')
   })
 
-  it.skip('successfully completes client-server exchange with threshold client and server', () => {
+  it('successfully completes client-server exchange with threshold client and server', () => {
     const servers = [...Array(TEST_THRESHOLD_N).keys()].map(
       (i) => new ThresholdPoprfServer(TEST_THRESHOLD_POPRF_KEYS.getShare(i))
     )
