@@ -1,6 +1,6 @@
 import threshold_bls from 'blind-threshold-bls'
-import { ServicePartialSignature } from '../../src/common/common/crypto-clients/common'
 import { BLSCryptographyClient } from '../../src/common/crypto-clients/bls-cryptography-client'
+import { ServicePartialSignature } from '../../src/common/crypto-clients/common'
 import config from '../../src/config'
 
 const PUBLIC_KEY =

@@ -5,7 +5,6 @@ import {
   PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
   SignerEndpoint,
-  SignMessageRequest,
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'

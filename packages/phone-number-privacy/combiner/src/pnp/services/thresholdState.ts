@@ -24,7 +24,7 @@ export class CombinerThresholdStateService<R extends PnpQuotaRequest> {
     }
 
     sortedResponses.forEach((res) => {
-      if (res.totalQuota != sortedResponses[0].totalQuota) {
+      if (res.totalQuota !== sortedResponses[0].totalQuota) {
         session.logger.error(WarningMessage.INCONSISTENT_TOTAL_QUOTA)
       }
     })

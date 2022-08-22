@@ -5,7 +5,6 @@ import {
   PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
   SignerEndpoint,
-  SignMessageRequest,
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -416,16 +415,16 @@ describe('legacyPNP', () => {
     })
   })
 
-  const sendLegacyPnpSignatureRequest = async (
-    req: SignMessageRequest,
-    authorization: string,
-    signerApp: any = app
-  ) => {
-    return request(signerApp)
-      .get(SignerEndpoint.LEGACY_PNP_SIGN)
-      .set('Authorization', authorization)
-      .send(req)
-  }
+  // const sendLegacyPnpSignatureRequest = async (
+  //   req: SignMessageRequest,
+  //   authorization: string,
+  //   signerApp: any = app
+  // ) => {
+  //   return request(signerApp)
+  //     .get(SignerEndpoint.LEGACY_PNP_SIGN)
+  //     .set('Authorization', authorization)
+  //     .send(req)
+  // }
 
   // // TODO: add signature tests
   // describe(`${SignerEndpoint.LEGACY_PNP_SIGN}`, () => {
