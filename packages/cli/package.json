@@ -33,6 +33,7 @@
     "test": "TZ=UTC jest --runInBand"
   },
   "dependencies": {
+    "@celo/bls12377js": "0.1.1",
     "@celo/contractkit": "2.1.1-dev",
     "@celo/explorer": "2.1.1-dev",
     "@celo/governance": "2.1.1-dev",
@@ -55,7 +56,6 @@
     "@oclif/plugin-plugins": "^1.9.4",
     "bip32": "2.0.5",
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
-    "bls12377js": "https://github.com/celo-org/bls12377js#cee721830e78bffcc03a660649b12c62386fb4bc",
     "chalk": "^2.4.2",
     "cli-table": "^0.3.1",
     "cli-ux": "^5.4.9",

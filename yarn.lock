@@ -1329,6 +1329,14 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-2.1.0.tgz#069b47d6a9d5522d448669a30eb0afbd5e837f5c"
   integrity sha512-sNwzeFKSNWj4K67HourcHSD9ihXcFfFuhNp4E9FbXpA1WWmEQx0RK7sqa0ep5nMiIFfEEsjttXKxrZwNe8h9rA==
 
+"@celo/bls12377js@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@celo/bls12377js/-/bls12377js-0.1.1.tgz#ba3574f41697cdba96c10ae96bb1aac057285798"
+  integrity sha512-hQjTIegg1+ZX5lPyeBYUEHYW7ktG0xkWxf4tcj//bK+tzyeQd6mMrne7C4+tBZgn+I35HtxYIo+YOLYJxXBg7A==
+  dependencies:
+    "@stablelib/blake2xs" "0.10.4"
+    big-integer "^1.6.44"
+
 "@celo/connect@2.1.0":
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-2.1.0.tgz#5858c619d7e1d2f9c09b398600fd2cbc9fc56c1a"
@@ -7421,13 +7429,6 @@ blakejs@^1.1.0:
     mocha "^6.2.2"
     ts-node "^8.4.1"
     typescript "^3.6.4"
-
-"bls12377js@https://github.com/celo-org/bls12377js#cee721830e78bffcc03a660649b12c62386fb4bc":
-  version "0.1.0"
-  resolved "https://github.com/celo-org/bls12377js#cee721830e78bffcc03a660649b12c62386fb4bc"
-  dependencies:
-    "@stablelib/blake2xs" "0.10.4"
-    big-integer "^1.6.44"
 
 bluebird@^2.9.33:
   version "2.11.0"
