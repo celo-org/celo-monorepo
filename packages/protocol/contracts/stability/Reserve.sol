@@ -72,12 +72,6 @@ contract Reserve is
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
-  event ReserveCollateralAssetsTransferred(
-    address indexed spender,
-    address indexed to,
-    uint256 value,
-    address token
-  );
   event TobinTaxSet(uint256 value);
   event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
@@ -85,6 +79,12 @@ contract Reserve is
   event DailySpendingRatioForCollateralAssetSet(
     address collateralAsset,
     uint256 collateralAssetDailySpendingRatios
+  );
+  event ReserveCollateralAssetsTransferred(
+    address indexed spender,
+    address indexed to,
+    uint256 value,
+    address token
   );
   event CollateralAssetRemoved(address collateralAsset);
   event CollateralAssetAdded(address collateralAsset);
@@ -125,8 +125,8 @@ contract Reserve is
    * @param _tobinTax The tobin tax value as a fixidity fraction.
    * @param _tobinTaxReserveRatio When to turn on the tobin tax, as a fixidity fraction.
    * @param _collateralAssetes The relative daily spending limit
-   * of an ERC20 token for the reserve spender.
-   * @param _collateralAssetDailySpendingRatios The address of an ERC20 token we're setting a limit for.
+    * of an ERC20 collateral asset for the reserve spender.
+   * @param _collateralAssetDailySpendingRatios The address of an ERC20 collateral asset
    */
   function initialize(
     address registryAddress,
@@ -195,8 +195,10 @@ contract Reserve is
   }
 
   /**
-   * @notice Set the ratio of reserve for a given collateral asset that is spendable per day.
-   * @param collateralAssetes Collection of the addresses of collateral assets we're setting a limit for.
+   * @notice Set the ratio of reserve for a given collateral asset
+   * that is spendable per day.
+   * @param collateralAssetes Collection of the addresses of collateral assets
+   * we're setting a limit for.
    * @param collateralAssetDailySpendingRatios Collection of the relative daily spending limits
    * of collateral assets.
    */
@@ -639,7 +641,9 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the amount of particular collateral asset in reserve including other reserve addresses.
+   * @notice Returns the amount of particular collateral asset
+   * in reserve including other reserve addresses.
+   * @param collateralAsset the asset we're checking a balance of
    * @return The balance of particular collateral asset.
    */
   function getReserveAddressesCollateralAssetBalance(address collateralAsset)
