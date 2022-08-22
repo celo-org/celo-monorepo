@@ -92,7 +92,11 @@ describe('end-to-end', () => {
       (i) => new ThresholdPoprfServer(TEST_THRESHOLD_POPRF_KEYS.getShare(i))
     )
     const combiner = new PoprfCombiner(TEST_THRESHOLD_T)
-    const client = new PoprfClient(TEST_POPRF_KEYPAIR.publicKey, TEST_TAG_A, TEST_MESSAGE_A)
+    const client = new PoprfClient(
+      TEST_THRESHOLD_POPRF_KEYS.thresholdPublicKey,
+      TEST_TAG_A,
+      TEST_MESSAGE_A
+    )
 
     const blindedPartials = servers.map((s) =>
       s.blindPartialEval(client.tag, client.blindedMessage)
@@ -106,7 +110,7 @@ describe('end-to-end', () => {
 
     // POPRF hashed outputs should be 32 bytes.
     expect(evaluation.length).toEqual(32)
-    expect(evaluation.toString('base64')).toEqual('5xHueBbMK1wfm7VyrPYJJAhOrV8X0rP0hz7gRxTLEcA=')
+    expect(evaluation.toString('base64')).toEqual('C1jKGStMWC3lNpYDV61D+3waetY0bHlD4ElYzV+Isqc=')
   })
 
   it('successfully completes client-server exchange with threshold client and server', () => {
@@ -139,6 +143,6 @@ describe('end-to-end', () => {
 
     // POPRF hashed outputs should be 32 bytes.
     expect(evaluation.length).toEqual(32)
-    expect(evaluation.toString('base64')).toEqual('5xHueBbMK1wfm7VyrPYJJAhOrV8X0rP0hz7gRxTLEcA=')
+    expect(evaluation.toString('base64')).toEqual('C1jKGStMWC3lNpYDV61D+3waetY0bHlD4ElYzV+Isqc=')
   })
 })
