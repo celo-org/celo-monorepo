@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
 import Web3 from 'web3'
-import { PnpQuotaRequest } from '../interfaces'
+import { PhoneNumberPrivacyRequest, PnpQuotaRequest } from '../interfaces'
 import { genSessionID } from '../utils/logger'
 
 export function createMockAttestation(completed: number, total: number) {
@@ -122,6 +122,10 @@ export function getPnpQuotaRequest(account: string, hashedPhoneNumber?: string) 
   } as PnpQuotaRequest
 }
 
-export function getPnpRequestAuthorization(req: PnpQuotaRequest, account: string, pk: string) {
+export function getPnpRequestAuthorization(
+  req: PhoneNumberPrivacyRequest,
+  account: string,
+  pk: string
+) {
   return serializeSignature(signMessage(JSON.stringify(req), pk, account))
 }
