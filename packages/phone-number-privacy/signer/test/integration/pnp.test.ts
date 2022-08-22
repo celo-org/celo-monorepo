@@ -59,8 +59,8 @@ describe('pnp', () => {
   })
 
   beforeEach(async () => {
-    // Create a new in-memory database for each test.
     _config.api.phoneNumberPrivacy.enabled = true
+    // Create a new in-memory database for each test.
     db = await initDatabase(_config)
     app = startSigner(_config, db, keyProvider, newKit('dummyKit'))
     mockOdisPaymentsTotalPaidCUSD.mockReset()
@@ -215,8 +215,14 @@ describe('pnp', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        _config.api.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(_config, db, keyProvider, newKit('dummyKit'))
+        const configWithApiDisabled = { ..._config }
+        configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
+        const appWithApiDisabled = startSigner(
+          configWithApiDisabled,
+          db,
+          keyProvider,
+          newKit('dummyKit')
+        )
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization, appWithApiDisabled)
