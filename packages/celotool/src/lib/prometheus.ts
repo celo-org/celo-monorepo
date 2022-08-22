@@ -9,14 +9,13 @@ import {
   getDynamicEnvVarValue,
 } from './env-utils'
 import {
+  helmAddRepoAndUpdate,
   installGenericHelmChart,
-  isCelotoolHelmDryRun,
   removeGenericHelmChart,
   setHelmArray,
   upgradeGenericHelmChart,
 } from './helm_deploy'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
-import { GCPClusterConfig } from './k8s-cluster/gcp'
 import {
   createServiceAccountIfNotExists,
   getServiceAccountEmail,
@@ -37,10 +36,8 @@ const sidecarImageTag = '0.8.2'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.27.1'
 
-const GKEWorkloadMetricsHelmChartPath = '../helm-charts/gke-workload-metrics'
-const GKEWorkloadMetricsReleaseName = 'gke-workload-metrics'
-
-const grafanaHelmChartPath = '../helm-charts/grafana'
+const grafanaHelmRepo = 'grafana/grafana'
+const grafanaChartVersion = '6.32.3'
 const grafanaReleaseName = 'grafana'
 
 export async function installPrometheusIfNotExists(
@@ -330,27 +327,29 @@ export async function installGrafanaIfNotExists(
 }
 
 async function installGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
+  await helmAddRepoAndUpdate('https://grafana.github.io/helm-charts', 'grafana')
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
     grafanaReleaseName,
-    grafanaHelmChartPath,
+    grafanaHelmRepo,
     await grafanaHelmParameters(context, clusterConfig),
-    // Adding this file and clabs' default values file.
-    true,
-    'values-clabs.yaml'
+    false,
+    '../helm-charts/grafana/values-clabs.yaml'
   )
 }
 
 export async function upgradeGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
+  await helmAddRepoAndUpdate('https://grafana.github.io/helm-charts', 'grafana')
   await createNamespaceIfNotExists(kubeNamespace)
   return upgradeGenericHelmChart(
     kubeNamespace,
     grafanaReleaseName,
-    grafanaHelmChartPath,
+    grafanaHelmRepo,
     await grafanaHelmParameters(context, clusterConfig),
+    false,
     // Adding this file and clabs' default values file.
-    'values-clabs.yaml'
+    '../helm-charts/grafana/values-clabs.yaml'
   )
 }
 
@@ -397,108 +396,6 @@ async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClust
   fs.writeFileSync(valuesFile, yaml.safeDump(values))
 
   // Adding this file and clabs' default values file.
-  const params = [`-f ${valuesFile}`]
+  const params = [`-f ${valuesFile} --version ${grafanaChartVersion}`]
   return params
-}
-
-// See https://cloud.google.com/stackdriver/docs/solutions/gke/managing-metrics#enable-workload-metrics
-async function enableGKESystemAndWorkloadMetrics(
-  clusterID: string,
-  zone: string,
-  gcloudProjectName: string
-) {
-  const GKEWMEnabled = await outputIncludes(
-    `gcloud beta container clusters describe ${clusterID} --zone=${zone} --project=${gcloudProjectName} --format="value(monitoringConfig.componentConfig.enableComponents)"`,
-    'WORKLOADS',
-    `GKE cluster ${clusterID} in zone ${zone} and project ${gcloudProjectName} has GKE workload metrics enabled, skipping gcloud beta container clusters update`
-  )
-
-  if (!GKEWMEnabled) {
-    if (isCelotoolHelmDryRun()) {
-      console.info(
-        `Skipping enabling GKE workload metrics for cluster ${clusterID} in zone ${zone} and project ${gcloudProjectName} due to --helmdryrun`
-      )
-    } else {
-      await execCmdWithExitOnFailure(
-        `gcloud beta container clusters update ${clusterID} --zone=${zone} --project=${gcloudProjectName} --monitoring=SYSTEM,WORKLOAD`
-      )
-    }
-  }
-}
-
-async function GKEWorkloadMetricsHelmParameters(clusterConfig?: BaseClusterConfig) {
-  // Abandon if not using GCP, it's GKE specific.
-  if (clusterConfig && clusterConfig.cloudProvider !== CloudProvider.GCP) {
-    console.error('Cannot create gke-workload-metrics in a non GCP k8s cluster, skipping')
-    process.exit(1)
-  }
-
-  const clusterName = clusterConfig
-    ? clusterConfig!.clusterName
-    : fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
-
-  const params = [`--set cluster=${clusterName}`]
-  return params
-}
-
-export async function installGKEWorkloadMetricsIfNotExists(clusterConfig?: BaseClusterConfig) {
-  const GKEWMExists = await outputIncludes(
-    `helm list -A`,
-    GKEWorkloadMetricsReleaseName,
-    `gke-workload-metrics exists, skipping install`
-  )
-  if (!GKEWMExists) {
-    console.info('Installing gke-workload-metrics')
-    await installGKEWorkloadMetrics(clusterConfig)
-  }
-}
-
-async function installGKEWorkloadMetrics(clusterConfig?: BaseClusterConfig) {
-  // Abandon if not using GCP, it's GKE specific.
-  if (clusterConfig && clusterConfig.cloudProvider !== CloudProvider.GCP) {
-    console.error('Cannot create gke-workload-metrics in a non GCP k8s cluster, skipping')
-    process.exit(1)
-  }
-
-  let k8sClusterName, k8sClusterZone, gcpProjectName
-  if (clusterConfig) {
-    const configGCP = clusterConfig as GCPClusterConfig
-    k8sClusterName = configGCP!.clusterName
-    k8sClusterZone = configGCP!.zone
-    gcpProjectName = configGCP!.projectName
-  } else {
-    k8sClusterName = fetchEnv(envVar.KUBERNETES_CLUSTER_NAME)
-    k8sClusterZone = fetchEnv(envVar.KUBERNETES_CLUSTER_ZONE)
-    gcpProjectName = fetchEnv(envVar.TESTNET_PROJECT_NAME)
-  }
-
-  await enableGKESystemAndWorkloadMetrics(k8sClusterName, k8sClusterZone, gcpProjectName)
-
-  await createNamespaceIfNotExists(kubeNamespace)
-  return installGenericHelmChart(
-    kubeNamespace,
-    GKEWorkloadMetricsReleaseName,
-    GKEWorkloadMetricsHelmChartPath,
-    await GKEWorkloadMetricsHelmParameters(clusterConfig)
-  )
-}
-
-export async function upgradeGKEWorkloadMetrics(clusterConfig?: BaseClusterConfig) {
-  const params = await GKEWorkloadMetricsHelmParameters(clusterConfig)
-
-  await createNamespaceIfNotExists(kubeNamespace)
-  return upgradeGenericHelmChart(
-    kubeNamespace,
-    GKEWorkloadMetricsReleaseName,
-    GKEWorkloadMetricsHelmChartPath,
-    params
-  )
-}
-
-export async function removeGKEWorkloadMetrics() {
-  const GKEWMExists = await outputIncludes(`helm list -A`, GKEWorkloadMetricsReleaseName)
-  if (GKEWMExists) {
-    console.info('Removing gke-workload-metrics')
-    await removeGenericHelmChart(GKEWorkloadMetricsReleaseName, kubeNamespace)
-  }
 }
