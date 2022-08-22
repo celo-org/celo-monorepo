@@ -1,5 +1,5 @@
-import { AzureKeyProvider } from '../../src/key-management/azure-key-provider'
-import { DefaultKeyName, Key } from '../../src/key-management/key-provider-base'
+import { AzureKeyProvider } from '../../src/common/key-management/azure-key-provider'
+import { DefaultKeyName, Key } from '../../src/common/key-management/key-provider-base'
 
 const mockKey = '030303030303030303030303030303030303030303030303030303030303030303030303'
 
@@ -9,23 +9,26 @@ const key: Key = {
 }
 
 jest.mock('../../src/config', () => ({
-  keystore: {
-    keys: {
-      phoneNumberPrivacy: {
-        name: 'phoneNumberPrivacy',
-        latest: 1,
+  config: {
+    serviceName: 'odis-signer',
+    keystore: {
+      keys: {
+        phoneNumberPrivacy: {
+          name: 'phoneNumberPrivacy',
+          latest: 1,
+        },
+        domains: {
+          name: 'domains',
+          latest: 1,
+        },
       },
-      domains: {
-        name: 'domains',
-        latest: 1,
+      azure: {
+        clientID: 'mockClientID',
+        clientSecret: 'mockClientSecret',
+        tenant: 'mockTenant',
+        vaultName: 'mockVaultName',
+        secretName: 'mockSecretName',
       },
-    },
-    azure: {
-      clientID: 'mockClientID',
-      clientSecret: 'mockClientSecret',
-      tenant: 'mockTenant',
-      vaultName: 'mockVaultName',
-      secretName: 'mockSecretName',
     },
   },
 }))

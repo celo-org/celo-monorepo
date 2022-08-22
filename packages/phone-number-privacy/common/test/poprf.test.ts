@@ -1,11 +1,11 @@
+import * as poprf from '@celo/poprf'
 import {
-  PoprfCombiner,
   PoprfClient,
+  PoprfCombiner,
   PoprfServer,
   ThresholdPoprfClient,
   ThresholdPoprfServer,
 } from '../src/poprf'
-import * as poprf from '@celo/poprf'
 
 const TEST_POPRF_KEYPAIR = poprf.keygen(Buffer.from('TEST POPRF KEYPAIR SEED'))
 const TEST_THRESHOLD_N = 3

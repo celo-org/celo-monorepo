@@ -222,7 +222,7 @@ describe('Sequential Delay Test Suite', () => {
       checkTestAttempts(t, domain, attempts)
     })
 
-    it('should return he correct results in the example sequence', () => {
+    it('should return the correct results in the example sequence', () => {
       const t = 10 // initial delay
 
       const domain: SequentialDelayDomain = {

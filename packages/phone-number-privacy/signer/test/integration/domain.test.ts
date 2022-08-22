@@ -24,22 +24,20 @@ import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-
 import { LocalWallet } from '@celo/wallet-local'
 import { Knex } from 'knex'
 import request from 'supertest'
-import { KeyProvider } from '../../dist/key-management/key-provider-base'
+import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { initDatabase } from '../../src/common/database/database'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
-import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
+import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
-// DO NOT MERGE: Add checking of values beyond the return code.
+// TODO: Add checking of values beyond the return code.
 
-describe('domainService', () => {
-  // DO NOT MERGE(victor): Should this be refactored to pass key provider, database, and config?
-  // (global config makes it harder to test things, we should pass it as a parameter)
-  // const app = startSigner(config, await initDatabase(), await initKeyProvider())
-
+describe('domain', () => {
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
   const walletAddress = wallet.getAccounts()[0]! // TODO(Alec): do we need this?
+
+  const expectedVersion = getVersion()
 
   const domainStages = (): SequentialDelayStage[] => [
     { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) },
@@ -139,6 +137,14 @@ describe('domainService', () => {
     // reset the database state without destroying and recreating it for each test.
 
     await db?.destroy()
+  })
+
+  describe(`${SignerEndpoint.STATUS}`, () => {
+    it('Should return 200 and correct version', async () => {
+      const res = await request(app).get(SignerEndpoint.STATUS)
+      expect(res.status).toBe(200)
+      expect(res.body.version).toBe(expectedVersion)
+    })
   })
 
   describe(`${SignerEndpoint.DISABLE_DOMAIN}`, () => {

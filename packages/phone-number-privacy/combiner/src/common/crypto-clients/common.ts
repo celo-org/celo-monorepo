@@ -2,6 +2,8 @@ import { ErrorMessage, rootLogger } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { OdisConfig } from '../../config'
 
+// TODO: Consider the naming of these files
+
 export interface ServicePartialSignature {
   url: string
   signature: string

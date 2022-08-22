@@ -209,7 +209,7 @@ export async function getOnChainOdisPayments(
   return meter(
     retryAsyncWithBackOffAndTimeout,
     [
-      async () => await (await kit.contracts.getOdisPayments()).totalPaidCUSD(account),
+      async () => (await kit.contracts.getOdisPayments()).totalPaidCUSD(account),
       RETRY_COUNT,
       [],
       RETRY_DELAY_IN_MS,

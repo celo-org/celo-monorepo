@@ -1,4 +1,5 @@
 import { timeout } from '@celo/base'
+import { ContractKit } from '@celo/contractkit'
 import { loggerMiddleware, rootLogger, SignerEndpoint } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
@@ -27,8 +28,15 @@ import { OnChainPnpQuotaService } from './pnp/services/quota.onchain'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProvider) {
+export function startSigner(
+  config: SignerConfig,
+  db: Knex,
+  keyProvider: KeyProvider,
+  kit?: ContractKit
+) {
   const logger = rootLogger(config.serviceName)
+
+  kit = kit ?? getContractKit(config)
 
   logger.info('Creating signer express server')
   const app = express()
@@ -71,8 +79,6 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
       })
       .finally(end)
   }
-
-  const kit = getContractKit(config)
 
   const pnpQuotaService = new OnChainPnpQuotaService(db, kit)
   const legacyPnpQuotaService = new LegacyPnpQuotaService(db, kit)

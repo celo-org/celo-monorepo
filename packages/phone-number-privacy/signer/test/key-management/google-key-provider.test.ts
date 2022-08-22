@@ -1,5 +1,5 @@
-import { GoogleKeyProvider } from '../../src/key-management/google-key-provider'
-import { DefaultKeyName, Key } from '../../src/key-management/key-provider-base'
+import { GoogleKeyProvider } from '../../src/common/key-management/google-key-provider'
+import { DefaultKeyName, Key } from '../../src/common/key-management/key-provider-base'
 
 const mockKey = '020202020202020202020202020202020202020202020202020202020202020202020202'
 const mockResponse = [{ payload: { data: `${mockKey}` } }]
@@ -11,21 +11,24 @@ const key: Key = {
 }
 
 jest.mock('../../src/config', () => ({
-  keystore: {
-    keys: {
-      phoneNumberPrivacy: {
-        name: 'phoneNumberPrivacy',
-        latest: 1,
+  config: {
+    serviceName: 'odis-signer',
+    keystore: {
+      keys: {
+        phoneNumberPrivacy: {
+          name: 'phoneNumberPrivacy',
+          latest: 1,
+        },
+        domains: {
+          name: 'domains',
+          latest: 1,
+        },
       },
-      domains: {
-        name: 'domains',
-        latest: 1,
+      google: {
+        projectId: 'mockProject',
+        secretVersion: 'mockSecretVersion',
+        secretName: 'mockSecretName',
       },
-    },
-    google: {
-      projectId: 'mockProject',
-      secretVersion: 'mockSecretVersion',
-      secretName: 'mockSecretName',
     },
   },
 }))
