@@ -202,7 +202,14 @@ contract('LockedGold', (accounts: string[]) => {
           )
         })
 
-        it('should add a pending withdrawal', async () => {
+        it('should add a pending withdrawal #getPendingWithdrawal()', async () => {
+          const [val, timestamp] = await lockedGold.getPendingWithdrawal(account, 0)
+          assertEqualBN(val, value)
+          assertEqualBN(timestamp, availabilityTime)
+          await assertRevert(lockedGold.getPendingWithdrawal(account, 1))
+        })
+
+        it('should add a pending withdrawal #getPendingWithdrawals()', async () => {
           const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
           assert.equal(values.length, 1)
           assert.equal(timestamps.length, 1)

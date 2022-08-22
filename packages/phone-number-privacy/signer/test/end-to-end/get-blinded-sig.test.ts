@@ -1,5 +1,6 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import {
+  Endpoints,
   GetQuotaResponse,
   rootLogger as logger,
   SignMessageResponseFailure,
@@ -13,7 +14,7 @@ import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
-import config from '../../src/config'
+import config, { getVersion } from '../../src/config'
 import { getWalletAddress } from '../../src/signing/query-quota'
 
 require('dotenv').config()
@@ -54,6 +55,13 @@ describe('Running against a deployed service', () => {
     console.log('FORNO_URL: ' + DEFAULT_FORNO_URL)
     console.log('ODIS_SIGNER: ' + ODIS_SIGNER)
     console.log('ODIS_PUBLIC_POLYNOMIAL: ' + ODIS_PUBLIC_POLYNOMIAL)
+  })
+
+  it('Service is deployed at correct version', async () => {
+    const response = await fetch(ODIS_SIGNER + Endpoints.STATUS, { method: 'GET' })
+    const body = await response.json()
+    // This checks against local package.json version, change if necessary
+    expect(body.version).toBe(getVersion())
   })
 
   describe('Returns status 400 with invalid input', () => {
@@ -193,7 +201,7 @@ describe('Running against a deployed service', () => {
 
     it('Check that accounts are set up correctly', async () => {
       expect(await getQuota(ACCOUNT_ADDRESS2, IDENTIFIER)).toBeLessThan(initialQuota)
-      expect(await getWalletAddress(logger, ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
+      expect(await getWalletAddress(logger(), ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
     })
 
     it('Returns sig when querying succeeds with unused request', async () => {

@@ -15,14 +15,7 @@ import {
   spawnCmd,
   spawnCmdWithExitOnFailure,
 } from './cmd-utils'
-import {
-  EnvTypes,
-  envVar,
-  fetchEnv,
-  fetchEnvOrFallback,
-  isProduction,
-  monorepoRoot,
-} from './env-utils'
+import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
 import {
@@ -147,6 +140,61 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
 
   const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
     `gcloud sql instances describe ${instanceName} --format="value(connectionName)"`
+  )
+
+  return [blockscoutDBUsername, blockscoutDBPassword, blockscoutDBConnectionName.trim()]
+}
+
+export async function cloneCloudSQLInstance(
+  celoEnv: string,
+  instanceName: string,
+  cloneInstanceName: string,
+  dbSuffix: string
+) {
+  await ensureAuthenticatedGcloudAccount()
+  console.info('Cloning Cloud SQL database, this might take a minute or two ...')
+
+  await failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
+
+  try {
+    await execCmd(`gcloud sql instances describe ${cloneInstanceName}`)
+    // if we get to here, that means the instance already exists
+    console.warn(
+      `A Cloud SQL instance named ${cloneInstanceName} already exists, so in all likelihood you cannot deploy cloning with ${cloneInstanceName}`
+    )
+  } catch (error: any) {
+    if (
+      error.message.trim() !==
+      `Command failed: gcloud sql instances describe ${cloneInstanceName}\nERROR: (gcloud.sql.instances.describe) HTTPError 404: The Cloud SQL instance does not exist.`
+    ) {
+      console.error(error.message.trim())
+      process.exit(1)
+    }
+  }
+
+  try {
+    await execCmdWithExitOnFailure(
+      `gcloud sql instances clone ${instanceName} ${cloneInstanceName} `
+    )
+  } catch (error: any) {
+    console.error(error.message.trim())
+  }
+
+  await execCmdWithExitOnFailure(
+    `gcloud sql instances patch ${cloneInstanceName} --backup-start-time 17:00`
+  )
+
+  const [blockscoutDBUsername, blockscoutDBPassword] = await retrieveCloudSQLConnectionInfo(
+    celoEnv,
+    instanceName,
+    dbSuffix
+  )
+
+  console.info('Copying blockscout service account secret to namespace')
+  await copySecret(CLOUDSQL_SECRET_NAME, 'default', celoEnv)
+
+  const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
+    `gcloud sql instances describe ${cloneInstanceName} --format="value(connectionName)"`
   )
 
   return [blockscoutDBUsername, blockscoutDBPassword, blockscoutDBConnectionName.trim()]
@@ -451,9 +499,13 @@ export async function registerIPAddress(name: string, zone?: string) {
 export async function deleteIPAddress(name: string, zone?: string) {
   console.info(`Deleting IP address ${name}`)
   try {
-    await execCmd(
-      `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
-    )
+    if (isCelotoolVerbose()) {
+      console.info(`IP Address ${name} would be deleted`)
+    } else {
+      await execCmd(
+        `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
+      )
+    }
   } catch (error: any) {
     if (!error.toString().includes('was not found')) {
       console.error(error)
@@ -817,11 +869,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
-    // Disable by default block age check in fullnode readinessProbe except for production envs
-    `--set geth.fullnodeCheckBlockAge=${fetchEnvOrFallback(
-      envVar.FULL_NODE_READINESS_CHECK_BLOCK_AGE,
-      `${isProduction()}`
-    )}`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
     `--set geth.private_tx_nodes="${fetchEnv(envVar.PRIVATE_TX_NODES)}"`,
     `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,
@@ -920,7 +967,7 @@ export async function upgradeGenericHelmChart(
     )
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm diff upgrade --install -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`,
       true
@@ -928,7 +975,7 @@ export async function upgradeGenericHelmChart(
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm upgrade --install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )

@@ -1,12 +1,13 @@
 {
   "name": "@celo/contractkit",
-  "version": "1.3.3-dev",
+  "version": "2.1.1-dev",
   "description": "Celo's ContractKit to interact with Celo network",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "sideEffects": false,
   "author": "Celo",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit",
+  "homepage": "https://docs.celo.org/developer-guide/contractkit",
   "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/contractkit",
   "keywords": [
     "celo",
@@ -20,17 +21,18 @@
     "clean": "tsc -b . --clean",
     "clean:all": "yarn clean && rm -rf src/generated",
     "prepublishOnly": "yarn build",
-    "docs": "typedoc && ts-node ../utils/scripts/linkdocs.ts contractkit",
-    "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 25",
+    "docs": "typedoc",
+    "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 26",
     "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
     "test": "jest --runInBand",
     "lint": "tslint -c tslint.json --project ."
   },
   "dependencies": {
-    "@celo/base": "1.3.3-dev",
-    "@celo/connect": "1.3.3-dev",
-    "@celo/utils": "1.3.3-dev",
-    "@celo/wallet-local": "1.3.3-dev",
+    "@celo/base": "2.1.1-dev",
+    "@celo/connect": "2.1.1-dev",
+    "@celo/utils": "2.1.1-dev",
+    "@celo/wallet-local": "2.1.1-dev",
+    "@types/bn.js": "^5.1.0",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "cross-fetch": "^3.0.6",
@@ -41,6 +43,7 @@
     "web3": "1.3.6"
   },
   "devDependencies": {
+    "@celo/phone-utils": "2.1.1-dev",
     "@celo/dev-utils": "0.0.1-dev",
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da",
@@ -50,7 +53,8 @@
     "jest": "^26.6.3",
     "ts-node": "8.3.0",
     "typedoc": "^0.19.2",
-    "typedoc-plugin-markdown": "^2.2.16"
+    "typedoc-plugin-markdown": "^2.2.16",
+    "xhr2-cookies": "1.1.0"
   },
   "resolutions": {
     "**/elliptic": "^6.5.4"

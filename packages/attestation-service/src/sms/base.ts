@@ -1,4 +1,4 @@
-import { E164Number } from '@celo/utils/lib/io'
+import { E164Number } from '@celo/phone-utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import { fetchEnvOrDefault } from '../env'

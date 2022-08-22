@@ -32,8 +32,9 @@ export abstract class ReleaseGoldBaseCommand extends BaseCommand {
     await super.init()
     if (!this._releaseGoldWrapper) {
       this._releaseGoldWrapper = new ReleaseGoldWrapper(
-        this.kit,
-        newReleaseGold(this.kit.connection.web3, this.contractAddress as string)
+        this.kit.connection,
+        newReleaseGold(this.kit.connection.web3, this.contractAddress as string),
+        this.kit.contracts
       )
       // Call arbitrary release gold fn to verify `contractAddress` is a releasegold contract.
       try {

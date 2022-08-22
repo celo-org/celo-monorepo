@@ -16,7 +16,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus
-  namespace: {{ .Values.namespace }}
   labels:
 {{ include "prometheus-stackdriver.labels" .  | indent 4 }}
 spec:
@@ -40,9 +39,7 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
-{{- if not (kindIs "invalid" .Values.serviceAccount.name) }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
-{{- end }}
       containers:
         - name: prometheus
           image: prom/prometheus:{{ .Values.prometheus.imageTag }}
@@ -61,21 +58,21 @@ spec:
               mountPath: /etc/prometheus/
             - name: prometheus-storage-volume
               mountPath: /prometheus/
-{{- if not .Values.disableStackDriverMetrics }}
+{{- if not .Values.stackdriver.disabled }}
         - name: sidecar
-          image: gcr.io/stackdriver-prometheus/stackdriver-prometheus-sidecar:{{ .Values.sidecar.imageTag }}
+          image: gcr.io/stackdriver-prometheus/stackdriver-prometheus-sidecar:{{ .Values.stackdriver.sidecar.imageTag }}
           imagePullPolicy: Always
           args:
             - --stackdriver.project-id={{ .Values.gcloud.project }}
             - --prometheus.wal-directory=/prometheus/wal
             - --stackdriver.kubernetes.location={{ .Values.gcloud.region }}
             - --stackdriver.kubernetes.cluster-name={{ .Values.cluster }}
-{{ if .Values.includeFilter -}}
-{{ indent 12 (printf "- --include=%s" .Values.includeFilter) }}
+{{ if .Values.stackdriver.includeFilter -}}
+{{ indent 12 (printf "- --include=%s" .Values.stackdriver.includeFilter) }}
 {{- end -}}
 {{/* This used to be enabled, but now is not. Enable this for oracle clusters only. */}}
-{{- if (and false .Values.stackdriver_metrics_prefix) }}
-            - --stackdriver.metrics-prefix={{ .Values.stackdriver_metrics_prefix }}
+{{- if (and true .Values.stackdriver.metricsPrefix) }}
+            - --stackdriver.metrics-prefix={{ .Values.stackdriver.metricsPrefix }}
 {{- end }}
           ports:
             - name: sidecar
@@ -83,7 +80,7 @@ spec:
           volumeMounts:
             - name: prometheus-storage-volume
               mountPath: /prometheus
-{{- if not (kindIs "invalid" .Values.gcloudServiceAccountKeyBase64) }}
+{{- if not (kindIs "invalid" .Values.stackdriver.gcloudServiceAccountKeyBase64) }}
             - name: prometheus-service-account-key
               mountPath: /var/secrets/google
           env:
@@ -99,7 +96,7 @@ spec:
         - name: prometheus-storage-volume
           persistentVolumeClaim:
             claimName: prometheus
-{{- if not (kindIs "invalid" .Values.gcloudServiceAccountKeyBase64) }}
+{{- if not (kindIs "invalid" .Values.stackdriver.gcloudServiceAccountKeyBase64) }}
         - name: prometheus-service-account-key
           secret:
             secretName: prometheus-service-account-key

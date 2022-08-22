@@ -47,13 +47,13 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
         !transaction.executed
       ) {
         return toTransactionObject(
-          this.kit.connection,
+          this.connection,
           this.contract.methods.confirmTransaction(transactionId)
         )
       }
     }
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.submitTransaction(destination, value, data)
     )
   }
@@ -69,7 +69,7 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
   totalTransactionCount = proxyCall(this.contract.methods.transactionCount, undefined, valueToInt)
   getTransactionCount = proxyCall(this.contract.methods.getTransactionCount, undefined, valueToInt)
   replaceOwner: (owner: Address, newOwner: Address) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.replaceOwner,
     tupleParser(stringIdentity, stringIdentity)
   )
@@ -119,3 +119,5 @@ export class MultiSigWrapper extends BaseWrapper<MultiSig> {
     return res
   }
 }
+
+export type MultiSigWrapperType = MultiSigWrapper

@@ -1,4 +1,5 @@
 import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
+import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import { createHash } from 'crypto'
@@ -7,10 +8,11 @@ import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthenticationMethod,
   AuthSigner,
+  CombinerSignMessageResponse,
+  EncryptionKeySigner,
   queryOdis,
   ServiceContext,
   SignMessageRequest,
-  SignMessageResponse,
 } from './query'
 
 // ODIS minimum dollar balance for sig retrieval
@@ -22,12 +24,12 @@ const debug = debugFactory('kit:odis:phone-number-identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
-const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSig'
 
 export interface PhoneNumberHashDetails {
   e164Number: string
   phoneHash: string
   pepper: string
+  unblindedSignature?: string
 }
 
 /**
@@ -55,7 +57,7 @@ export async function getPhoneNumberIdentifier(
   if (blindingFactor) {
     seed = Buffer.from(blindingFactor)
   } else if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    seed = Buffer.from(signer.rawKey)
+    seed = Buffer.from((signer as EncryptionKeySigner).rawKey)
   }
 
   // Fallback to using Wasm version if not specified
@@ -120,11 +122,11 @@ export async function getBlindedPhoneNumberSignature(
     body.sessionID = sessionID
   }
 
-  const response = await queryOdis<SignMessageResponse>(
+  const response = await queryOdis<CombinerSignMessageResponse>(
     signer,
     body,
     context,
-    SIGN_MESSAGE_ENDPOINT
+    CombinerEndpoint.SIGN_MESSAGE
   )
   return response.combinedSignature
 }
@@ -144,7 +146,7 @@ export async function getPhoneNumberIdentifierFromSignature(
   debug('Converting sig to pepper')
   const pepper = getPepperFromThresholdSignature(sigBuf)
   const phoneHash = getPhoneHash(sha3, e164Number, pepper)
-  return { e164Number, phoneHash, pepper }
+  return { e164Number, phoneHash, pepper, unblindedSignature: base64UnblindedSig }
 }
 
 // This is the algorithm that creates a pepper from the unblinded message signatures

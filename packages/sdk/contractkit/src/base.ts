@@ -30,11 +30,18 @@ export enum CeloContract {
   StableTokenBRL = 'StableTokenBRL',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
+  StableTokenRegistry = 'StableTokenRegistry',
 }
 
-export type StableTokenContract = CeloContract.StableToken | CeloContract.StableTokenEUR
+export type StableTokenContract =
+  | CeloContract.StableToken
+  | CeloContract.StableTokenEUR
+  | CeloContract.StableTokenBRL
 
-export type ExchangeContract = CeloContract.Exchange | CeloContract.ExchangeEUR
+export type ExchangeContract =
+  | CeloContract.Exchange
+  | CeloContract.ExchangeEUR
+  | CeloContract.ExchangeBRL
 
 export type CeloTokenContract = StableTokenContract | CeloContract.GoldToken
 /**
@@ -52,8 +59,10 @@ const AuxiliaryContracts = [
 ]
 export const RegisteredContracts = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 
+/** @internal */
 export const stripProxy = (contract: CeloContract) => contract.replace('Proxy', '') as CeloContract
 
+/** @internal */
 export const suffixProxy = (contract: CeloContract) =>
   contract.endsWith('Proxy') ? contract : (`${contract}Proxy` as CeloContract)
 

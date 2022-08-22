@@ -4,11 +4,12 @@ metadata:
   labels:
 {{ include "prometheus-stackdriver.labels" .  | indent 4 }}
   name: prometheus
-  namespace: {{ .Values.namespace }}
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.storageSize }}
+{{- if .Values.storageClassName }}
   storageClassName: {{ .Values.storageClassName }}
+{{- end }}

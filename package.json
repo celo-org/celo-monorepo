@@ -17,7 +17,6 @@
     "reset-yarn": "yarn cache clean",
     "test": "yarn run lerna run test",
     "build": "yarn run lerna run build",
-    "build:wallet": "yarn build --scope @celo/mobile --include-filtered-dependencies && cd packages/mobile/ios && bundle exec pod install && cd ../../..",
     "docs": "yarn run lerna run docs",
     "check-licenses": "yarn licenses list --prod | grep '\\(─ GPL\\|─ (GPL-[1-9]\\.[0-9]\\+ OR GPL-[1-9]\\.[0-9]\\+)\\)' && echo 'Found GPL license(s). Use 'yarn licenses list --prod' to look up the offending package' || echo 'No GPL licenses found'",
     "report-coverage": "yarn run lerna run test-coverage",
@@ -29,7 +28,8 @@
     "celotool": "yarn --cwd packages/celotool run --silent cli",
     "celocli": "yarn --cwd packages/cli run --silent celocli",
     "update-dependency-graph": "ts-node ./scripts/update_dependency_graph.ts",
-    "deploy-sdks": "ts-node ./scripts/deploy-sdks.ts"
+    "deploy-sdks": "ts-node ./scripts/deploy-sdks.ts",
+    "deprecate-sdks": "ts-node ./scripts/unpublish-sdks.ts"
   },
   "husky": {
     "hooks": {
@@ -82,7 +82,7 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "resolutions": {
-    "@celo/ganache-core": "git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0",
+    "@celo/ganache-core": "git+https://github.com/celo-org/ganache-core.git#e7099c4713c415ab24b8056fbf6e1034fa913a8b",
     "@grpc/grpc-js": "^1.1.8",
     "@types/prettier": "^2.2.1",
     "**/axios": "0.21.1",
@@ -98,7 +98,7 @@
     "dot-prop": "^5.2.0",
     "elliptic": "^6.5.4",
     "eslint-utils": "^1.4.1",
-    "ganache-core": "git+https://github.com/celo-org/ganache-core.git#d1d179769edb71d910aab1423b7778f7b3e047a0",
+    "ganache-core": "git+https://github.com/celo-org/ganache-core.git#e7099c4713c415ab24b8056fbf6e1034fa913a8b",
     "handlebars": "^4.7.7",
     "https-proxy-agent": "^5.0.0",
     "hoek": "^6.1.3",

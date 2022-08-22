@@ -5,7 +5,7 @@ import {
   ServiceContext,
   WalletKeySigner,
 } from '@celo/identity/lib/odis/query'
-import { PhoneNumberUtils } from '@celo/utils'
+import { PhoneNumberUtils } from '@celo/phone-utils'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,
@@ -55,7 +55,13 @@ contractKit.addAccount(PRIVATE_KEY_NO_QUOTA)
 contractKit.addAccount(PRIVATE_KEY)
 contractKit.defaultAccount = ACCOUNT_ADDRESS
 
-export const deks = [
+interface DEK {
+  privateKey: string
+  publicKey: string
+  address: string
+}
+
+export const deks: DEK[] = [
   {
     privateKey: 'bf8a2b73baf8402f8fe906ad3f42b560bf14b39f7df7797ece9e293d6f162188',
     publicKey: '034846bc781cacdafc66f3a77aa9fc3c56a9dadcd683c72be3c446fee8da041070',

@@ -14,23 +14,6 @@ export const E164PhoneNumberType = new t.Type<string, string, unknown>(
     ),
   String
 )
-export const AttestationServiceStatusResponseType = t.type({
-  status: t.literal('ok'),
-  smsProviders: t.array(t.string),
-  blacklistedRegionCodes: t.union([t.array(t.string), t.undefined]),
-  accountAddress: AddressType,
-  signature: t.union([SignatureType, t.undefined]),
-  version: t.string,
-  latestBlock: t.number,
-  ageOfLatestBlock: t.number,
-  isNodeSyncing: t.boolean,
-  appSignature: t.string,
-  smsProvidersRandomized: t.boolean,
-  maxDeliveryAttempts: t.number,
-  maxRerequestMins: t.number,
-  twilioVerifySidProvided: t.boolean,
-})
-
 export const AttestationServiceTestRequestType = t.type({
   phoneNumber: E164PhoneNumberType,
   message: t.string,
@@ -51,6 +34,8 @@ export const AttestationRequestType = t.type({
   // if specified, the message sent will be short random number prefixed by this string
   securityCodePrefix: t.union([t.undefined, t.string]),
   language: t.union([t.undefined, t.string]),
+  // unblinded signature
+  phoneNumberSignature: t.union([t.undefined, t.string]),
 })
 
 export type AttestationRequest = t.TypeOf<typeof AttestationRequestType>

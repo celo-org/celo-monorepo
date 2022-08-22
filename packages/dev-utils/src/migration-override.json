@@ -7,7 +7,9 @@
   },
   "exchange": {
     "frozen": false,
-    "minimumReports": 1
+    "minimumReports": 1,
+    "minSupplyForStableBucketCap": "1000000000000000000000000",
+    "stableBucketFractionCap": 0.04545454545
   },
   "exchangeEUR": {
     "frozen": false,
@@ -74,6 +76,30 @@
     "frozen": false
   },
   "stableTokenEUR": {
+    "goldPrice": 1,
+    "initialBalances": {
+      "addresses": [
+        "0x5409ED021D9299bf6814279A6A1411A7e866A631",
+        "0x6Ecbe1DB9EF729CBe972C83Fb886247691Fb6beb",
+        "0xE36Ea790bc9d7AB70C55260C66D52b1eca985f84",
+        "0xE834EC434DABA538cd1b9Fe1582052B880BD7e63"
+      ],
+      "values": [
+        "50000000000000000000000",
+        "50000000000000000000000",
+        "50000000000000000000000",
+        "50000000000000000000000"
+      ]
+    },
+    "oracles": [
+      "0x5409ED021D9299bf6814279A6A1411A7e866A631",
+      "0xE36Ea790bc9d7AB70C55260C66D52b1eca985f84",
+      "0x06cEf8E666768cC40Cc78CF93d9611019dDcB628",
+      "0x7457d5E02197480Db681D3fdF256c7acA21bDc12"
+    ],
+    "frozen": false
+  },
+  "stableTokenBRL": {
     "goldPrice": 1,
     "initialBalances": {
       "addresses": [
