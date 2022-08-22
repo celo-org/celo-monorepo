@@ -271,7 +271,7 @@ export async function installCertManagerAndNginx(
   celoEnv: string,
   clusterConfig?: BaseClusterConfig
 ) {
-  const nginxChartVersion = '3.9.0'
+  const nginxChartVersion = '4.2.1'
   const nginxChartNamespace = 'default'
 
   // Check if cert-manager is installed in any namespace
@@ -395,7 +395,7 @@ export async function installCertManager() {
 
   console.info('Installing cert-manager CustomResourceDefinitions')
   await execCmdWithExitOnFailure(
-    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.crds.yaml`
+    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml`
   )
   console.info('Updating cert-manager-cluster-issuers chart dependencies')
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
@@ -1000,7 +1000,7 @@ export async function upgradeGenericHelmChart(
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade --install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm upgrade --install ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
