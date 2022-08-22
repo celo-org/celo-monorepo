@@ -1486,6 +1486,11 @@
   resolved "https://registry.yarnpkg.com/@celo/poprf/-/poprf-0.1.8.tgz#00d38aeb20993dae1c50d23f3293afe7a8abebc2"
   integrity sha512-gWyl37lqLXwo44tTBJIVVyOD/Qec02T0ndKKpr1ms073frcLMBvcdNOfXgQ0/ROEhl9ewOALx5hxMm+RHy5XNw==
 
+"@celo/poprf@^0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@celo/poprf/-/poprf-0.1.9.tgz#38c514ce0f572b80edeb9dc280b6cf5e9d7c2a75"
+  integrity sha512-+993EA/W+TBCZyY5G0B2EVdXnPX6t2AldgRAIMaT9WIqTwZKi/TcdJDUQl8mj7HEHMPHlpgCBOVgaHkUcwo/5A==
+
 "@celo/typechain-target-web3-v1-celo@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@celo/typechain-target-web3-v1-celo/-/typechain-target-web3-v1-celo-0.2.0.tgz#2560b470e348d2628debe899885724ce5b218bc3"
