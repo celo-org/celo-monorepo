@@ -19,3 +19,5 @@ celostats:
 
 domain:
   name: celo-testnet
+
+ingressClassName: nginx

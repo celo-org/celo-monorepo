@@ -1,5 +1,5 @@
 name: eksportisto
-version: 3.0
+version: "3.0"
 description: Chart which is used to run eksportisto
 keywords:
 - ethereum
