@@ -14,7 +14,7 @@ export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
     super(config, io)
   }
 
-  async combine(session: Session<DomainQuotaStatusRequest>): Promise<void> {
+  combine(session: Session<DomainQuotaStatusRequest>): void {
     if (session.responses.length >= this.config.keys.threshold) {
       try {
         const domainQuotaStatus = this.thresholdStateService.findThresholdDomainState(session)

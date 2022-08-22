@@ -1,21 +1,8 @@
-import {
-  DomainRestrictedSignatureRequest,
-  ErrorMessage,
-  OdisRequest,
-  OdisResponse,
-  SignMessageRequest,
-} from '@celo/phone-number-privacy-common'
+import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { BLSCryptographyClient } from './bls/bls-cryptography-client'
 import { SignerResponse } from './io'
-
-// prettier-ignore
-export type CryptoClient<R extends OdisRequest> = 
- | R extends DomainRestrictedSignatureRequest ? BLSCryptographyClient : never
- | R extends SignMessageRequest ? BLSCryptographyClient : never 
- | undefined
 
 export class Session<R extends OdisRequest> {
   public timedOut: boolean = false
@@ -27,8 +14,7 @@ export class Session<R extends OdisRequest> {
 
   public constructor(
     readonly request: Request<{}, {}, R>,
-    readonly response: Response<OdisResponse<R>>,
-    readonly crypto: CryptoClient<R>
+    readonly response: Response<OdisResponse<R>>
   ) {
     this.logger = response.locals.logger
   }

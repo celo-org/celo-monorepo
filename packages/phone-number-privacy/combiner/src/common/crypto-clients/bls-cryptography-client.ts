@@ -1,61 +1,31 @@
-import { ErrorMessage, rootLogger } from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import Logger from 'bunyan'
-import { OdisConfig } from '../../config'
-
-export interface ServicePartialSignature {
-  url: string
-  signature: string
-}
+import { CryptoClient, ServicePartialSignature } from './common'
 
 function flattenSigsArray(sigs: Uint8Array[]) {
   return Uint8Array.from(sigs.reduce((a, b) => a.concat(Array.from(b)), [] as any))
 }
-export class BLSCryptographyClient {
-  private unverifiedSignatures: ServicePartialSignature[] = []
+export class BLSCryptographyClient extends CryptoClient {
+  // Signatures can be verified server-side without knowledge of the blinding factor
   private verifiedSignatures: ServicePartialSignature[] = []
 
-  constructor(private readonly config: OdisConfig) {}
-
-  private get allSignaturesLength(): number {
+  protected get allSignaturesLength(): number {
     return this.unverifiedSignatures.length + this.verifiedSignatures.length
   }
+
   private get allSignatures(): Uint8Array {
     const allSigs = this.verifiedSignatures.concat(this.unverifiedSignatures)
     const sigBuffers = allSigs.map((response) => Buffer.from(response.signature, 'base64'))
     return flattenSigsArray(sigBuffers)
   }
 
-  public addSignature(serviceResponse: ServicePartialSignature) {
-    this.unverifiedSignatures.push(serviceResponse)
-  }
-
-  /**
-   * Returns true if the number of valid signatures is enough to perform a combination
-   */
-  public hasSufficientSignatures(): boolean {
-    return this.allSignaturesLength >= this.config.keys.threshold
-  }
-
   /*
    * Computes the BLS signature for the blinded phone number.
-   * Throws an exception if not enough valid signatures
-   * and drops the invalid signature for future requests using this instance
+   * On error, logs and throws exception for not enough signatures,
+   * and drops the invalid signature for future requests using this instance.
    */
-  public async combinePartialBlindedSignatures(
-    blindedMessage: string,
-    logger?: Logger
-  ): Promise<string> {
-    logger = logger ?? rootLogger(this.config.serviceName)
-    if (!this.hasSufficientSignatures()) {
-      logger.error(
-        { signatures: this.allSignaturesLength, required: this.config.keys.threshold },
-        ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
-      )
-      throw new Error(
-        `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.allSignaturesLength}/${this.config.keys.threshold}`
-      )
-    }
+  protected _combinePartialBlindedSignatures(blindedMessage: string, logger: Logger): string {
     // Optimistically attempt to combine unverified signatures
     // If combination or verification fails, iterate through each signature and remove invalid ones
     // We do this since partial signature verification incurs higher latencies

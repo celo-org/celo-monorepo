@@ -86,7 +86,7 @@ export function startCombiner(config: CombinerConfig) {
       new DomainQuotaIO(config.domains)
     )
   )
-  app.get(CombinerEndpoint.DOMAIN_QUOTA_STATUS, (req, res) =>
+  app.post(CombinerEndpoint.DOMAIN_QUOTA_STATUS, (req, res) =>
     meterResponse(
       domainQuota.handle.bind(domainQuota),
       req,

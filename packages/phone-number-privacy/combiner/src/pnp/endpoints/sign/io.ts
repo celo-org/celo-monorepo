@@ -21,7 +21,8 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
-import { BLSCryptographyClient } from '../../../common/bls/bls-cryptography-client'
+import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-cryptography-client'
+import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { OdisConfig, VERSION } from '../../../config'
@@ -55,7 +56,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response, new BLSCryptographyClient(this.config))
+    return new CryptoSession(request, response, new BLSCryptographyClient(this.config))
   }
 
   validateClientRequest(
