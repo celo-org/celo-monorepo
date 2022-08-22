@@ -1,4 +1,5 @@
 import { timeout } from '@celo/base'
+import { ContractKit } from '@celo/contractkit'
 import { loggerMiddleware, rootLogger, SignerEndpoint } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
@@ -27,8 +28,15 @@ import { OnChainPnpQuotaService } from './pnp/services/quota.onchain'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProvider) {
+export function startSigner(
+  config: SignerConfig,
+  db: Knex,
+  keyProvider: KeyProvider,
+  kit?: ContractKit
+) {
   const logger = rootLogger(config.serviceName)
+
+  kit = kit ?? getContractKit(config)
 
   logger.info('Creating signer express server')
   const app = express()
@@ -47,10 +55,9 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
   // TODO: Clean this up / maybe roll into to Controller class
   const addMeteredSignerEndpoint = (
     endpoint: SignerEndpoint,
-    handler: (req: Request, res: Response) => Promise<void>,
-    method: 'post' | 'get' = 'post'
+    handler: (req: Request, res: Response) => Promise<void>
   ) =>
-    app[method](endpoint, async (req, res) => {
+    app.post(endpoint, async (req, res) => {
       await callAndMeterLatency(endpoint, handler, req, res)
     })
 
@@ -72,8 +79,6 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
       })
       .finally(end)
   }
-
-  const kit = getContractKit(config)
 
   const pnpQuotaService = new OnChainPnpQuotaService(db, kit)
   const legacyPnpQuotaService = new LegacyPnpQuotaService(db, kit)
@@ -128,20 +133,15 @@ export function startSigner(config: SignerConfig, db: Knex, keyProvider: KeyProv
   )
 
   addMeteredSignerEndpoint(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))
-  addMeteredSignerEndpoint(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota), 'get')
-  addMeteredSignerEndpoint(
-    SignerEndpoint.DOMAIN_QUOTA_STATUS,
-    domainQuota.handle.bind(domainQuota),
-    'get'
-  )
+  addMeteredSignerEndpoint(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota))
+  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
   addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
   addMeteredSignerEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
 
   addMeteredSignerEndpoint(SignerEndpoint.LEGACY_PNP_SIGN, legacyPnpSign.handle.bind(legacyPnpSign))
   addMeteredSignerEndpoint(
     SignerEndpoint.LEGACY_PNP_QUOTA,
-    legacyPnpQuota.handle.bind(legacyPnpQuota),
-    'get'
+    legacyPnpQuota.handle.bind(legacyPnpQuota)
   )
 
   const sslOptions = getSslOptions(config)

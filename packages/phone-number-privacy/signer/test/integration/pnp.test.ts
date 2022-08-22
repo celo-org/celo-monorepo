@@ -1,9 +1,11 @@
+import { ContractKit } from '@celo/contractkit'
 import {
   ErrorMessage,
   PnpQuotaRequest,
   PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
   SignerEndpoint,
+  SignMessageRequest,
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -35,10 +37,10 @@ const mockContractKit = createMockContractKit(
   },
   createMockWeb3(5, testBlockNumber)
 )
-jest.mock('../../src/common/web3/contracts', () => ({
-  ...jest.requireActual('../../src/common/web3/contracts'),
-  getContractKit: jest.fn().mockImplementation(() => mockContractKit),
-}))
+// jest.mock('../../src/common/web3/contracts', () => ({
+//   ...jest.requireActual('../../src/common/web3/contracts'),
+//   getContractKit: jest.fn().mockImplementation(() => mockContractKit),
+// }))
 
 describe('pnp', () => {
   let keyProvider: KeyProvider
@@ -61,7 +63,7 @@ describe('pnp', () => {
     // Create a new in-memory database for each test.
     _config.api.phoneNumberPrivacy.enabled = true
     db = await initDatabase(_config)
-    app = startSigner(_config, db, keyProvider)
+    app = startSigner(_config, db, keyProvider, (mockContractKit as unknown) as ContractKit)
     mockOdisPaymentsTotalPaidCUSD.mockReset()
   })
 
@@ -74,7 +76,7 @@ describe('pnp', () => {
   })
 
   describe(`${SignerEndpoint.STATUS}`, () => {
-    it('Should return 200 on valid request', async () => {
+    it('Should return 200 and correct version', async () => {
       const res = await request(app).get(SignerEndpoint.STATUS)
       expect(res.status).toBe(200)
       expect(res.body.version).toBe(expectedVersion)
@@ -236,4 +238,23 @@ describe('pnp', () => {
       })
     })
   })
+
+  // const sendPnpSignatureRequest = async (
+  //   req: SignMessageRequest,
+  //   authorization: string,
+  //   signerApp: any = app
+  // ) => {
+  //   return request(signerApp)
+  //     .get(SignerEndpoint.PNP_SIGN)
+  //     .set('Authorization', authorization)
+  //     .send(req)
+  // }
+  // // TODO: add signature tests
+  // describe(`${SignerEndpoint.PNP_SIGN}`, () => {
+  //   // it('Should return 200 and correct version', async () => {
+  //   //   const res = await request(app).get(SignerEndpoint.STATUS)
+  //   //   expect(res.status).toBe(200)
+  //   //   expect(res.body.version).toBe(expectedVersion)
+  //   // })
+  // })
 })

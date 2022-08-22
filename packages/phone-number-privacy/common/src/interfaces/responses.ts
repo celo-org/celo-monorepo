@@ -136,7 +136,7 @@ export interface DomainRestrictedSignatureResponseFailure<D extends Domain = Dom
   success: false
   version: string
   error: string
-  status: DomainState<D> | undefined
+  status: DomainState<D> | undefined // TODO: encode optional fields in a standardized way (requests.ts does this differently)
 }
 
 export type DomainRestrictedSignatureResponse<D extends Domain = Domain> =

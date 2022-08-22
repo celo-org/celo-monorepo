@@ -1,10 +1,11 @@
-import { StableToken } from '@celo/contractkit'
+import { ContractKit, StableToken } from '@celo/contractkit'
 import {
   isVerified,
   PnpQuotaRequest,
   PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
   SignerEndpoint,
+  SignMessageRequest,
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -92,7 +93,7 @@ describe('legacyPNP', () => {
     // Create a new in-memory database for each test.
     _config.api.phoneNumberPrivacy.enabled = true
     db = await initDatabase(_config)
-    app = startSigner(_config, db, keyProvider)
+    app = startSigner(_config, db, keyProvider, (mockContractKit as unknown) as ContractKit)
   })
 
   afterEach(async () => {
@@ -104,7 +105,7 @@ describe('legacyPNP', () => {
   })
 
   describe(`${SignerEndpoint.STATUS}`, () => {
-    it('Should return 200 on valid request', async () => {
+    it('Should return 200 and correct version', async () => {
       const res = await request(app).get(SignerEndpoint.STATUS)
       expect(res.status).toBe(200)
       expect(res.body.version).toBe(expectedVersion)
@@ -414,4 +415,212 @@ describe('legacyPNP', () => {
       })
     })
   })
+
+  const sendLegacyPnpSignatureRequest = async (
+    req: SignMessageRequest,
+    authorization: string,
+    signerApp: any = app
+  ) => {
+    return request(signerApp)
+      .get(SignerEndpoint.LEGACY_PNP_SIGN)
+      .set('Authorization', authorization)
+      .send(req)
+  }
+
+  // // TODO: add signature tests
+  // describe(`${SignerEndpoint.LEGACY_PNP_SIGN}`, () => {
+  //   // it('Should return 200 and correct version', async () => {
+  //   //   const res = await request(app).get(SignerEndpoint.STATUS)
+  //   //   expect(res.status).toBe(200)
+  //   //   expect(res.body.version).toBe(expectedVersion)
+  //   // })
+
+  //   // TODO: delete this test if duplicated in integration tests
+  //   it('provides signature', async () => {
+  //     // mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+  //     // mockGetBlockNumber.mockResolvedValue(10000)
+
+  //     await sendLegacyPnpSignatureRequest(
+
+  //     )
+
+  //     const res = await request(app).get(SignerEndpoint.STATUS)
+  //     expect(res.status).toBe(200)
+  //     expect(res.body.version).toBe(expectedVersion)
+
+  //     request(app)
+  //       .post('/getBlindedMessagePartialSig')
+  //       .send(validRequest)
+  //       .expect('Content-Type', /json/)
+  //       .expect(
+  //         200,
+  //         {
+  //           success: true,
+  //           signature: BLS_SIGNATURE,
+  //           version: getVersion(),
+  //           performedQueryCount: 1,
+  //           totalQuota: 10,
+  //           blockNumber: 10000,
+  //         },
+  //         done
+  //       )
+  //   })
+  //   // TODO: delete this test if duplicated in integration tests
+  //   // Backwards compatibility check
+  //   it('provides signature w/ expired timestamp', (done) => {
+  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+  //     mockGetBlockNumber.mockResolvedValue(10000)
+  //     request(app)
+  //       .post('/getBlindedMessagePartialSig')
+  //       .send({ ...validRequest, timestamp: Date.now() - 10 * 60 * 1000 }) // 10 minutes ago
+  //       .expect('Content-Type', /json/)
+  //       .expect(
+  //         200,
+  //         {
+  //           success: true,
+  //           signature: BLS_SIGNATURE,
+  //           version: getVersion(),
+  //           performedQueryCount: 1,
+  //           totalQuota: 10,
+  //           blockNumber: 10000,
+  //         },
+  //         done
+  //       )
+  //   })
+
+  //   // TODO: delete this test if duplicated in integration tests
+  //   it('returns 403 on query count 0', (done) => {
+  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 10, totalQuota: 10 })
+  //     request(app)
+  //       .post('/getBlindedMessagePartialSig')
+  //       .send(validRequest)
+  //       .expect('Content-Type', /json/)
+  //       .expect(403, done)
+  //   })
+
+  //   // TODO: preserve this test
+  //   // We don't want to block the user on DB or blockchain query failure
+  //   it('returns 200 on DB query failure', (done) => {
+  //     mockGetRemainingQueryCount.mockRejectedValue(undefined)
+  //     request(app)
+  //       .post('/getBlindedMessagePartialSig')
+  //       .send(validRequest)
+  //       .expect('Content-Type', /json/)
+  //       .expect(200, done)
+  //   })
+
+  //   // TODO: preserve this test
+  //   it('returns 500 on bls error', (done) => {
+  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+  //     mockComputeBlindedSignature.mockImplementation(() => {
+  //       throw Error()
+  //     })
+  //     request(app)
+  //       .post('/getBlindedMessagePartialSig')
+  //       .send(validRequest)
+  //       .expect('Content-Type', /json/)
+  //       .expect(500, done)
+  //   })
+
+  //   // TODO: preserve this test
+  //   it('returns 200 with warning on replayed request', (done) => {
+  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+  //     mockGetRequestExists.mockReturnValue(true)
+  //     request(app)
+  //       .post('/getBlindedMessagePartialSig')
+  //       .send(validRequest)
+  //       .expect('Content-Type', /json/)
+  //       .expect(
+  //         200,
+  //         {
+  //           success: false,
+  //           signature: BLS_SIGNATURE,
+  //           version: getVersion(),
+  //           performedQueryCount: 0,
+  //           error: WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG,
+  //           totalQuota: 10,
+  //           blockNumber: 10000,
+  //         },
+  //         done
+  //       )
+  //   })
+
+  //   // TODO: preserve this test
+  //   it('returns 200 with warning on failure to increment query count', (done) => {
+  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+  //     mockIncrementQueryCount.mockReturnValue(false)
+  //     request(app)
+  //       .post('/getBlindedMessagePartialSig')
+  //       .send(validRequest)
+  //       .expect('Content-Type', /json/)
+  //       .expect(
+  //         200,
+  //         {
+  //           success: false,
+  //           signature: BLS_SIGNATURE,
+  //           version: getVersion(),
+  //           performedQueryCount: 0,
+  //           error: ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
+  //           totalQuota: 10,
+  //           blockNumber: 10000,
+  //         },
+  //         done
+  //       )
+  //   })
+
+  //   // TODO: preserve this test
+  //   it('returns 200 with warning on failure to store request', (done) => {
+  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+  //     mockStoreRequest.mockReturnValue(false)
+  //     request(app)
+  //       .post('/getBlindedMessagePartialSig')
+  //       .send(validRequest)
+  //       .expect('Content-Type', /json/)
+  //       .expect(
+  //         200,
+  //         {
+  //           success: false,
+  //           signature: BLS_SIGNATURE,
+  //           version: getVersion(),
+  //           performedQueryCount: 1,
+  //           error: ErrorMessage.FAILURE_TO_STORE_REQUEST,
+  //           totalQuota: 10,
+  //           blockNumber: 10000,
+  //         },
+  //         done
+  //       )
+  //   })
+  // })
+
+  // describe('with invalid input', () => {
+  //   // TODO: preserve this test
+  //   it('invalid address returns 400', (done) => {
+  //     const mockRequestData = {
+  //       ...validRequest,
+  //       account: 'd31509C31d654056A45185ECb6',
+  //     }
+
+  //     request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
+  //   })
+
+  //   // TODO: preserve this test
+  //   it('invalid hashedPhoneNumber returns 400', (done) => {
+  //     const mockRequestData = {
+  //       ...validRequest,
+  //       hashedPhoneNumber: '+1234567890',
+  //     }
+
+  //     request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
+  //   })
+
+  //   // TODO: preserve this test
+  //   it('invalid blinded phone number returns 400', (done) => {
+  //     const mockRequestData = {
+  //       ...validRequest,
+  //       blindedQueryPhoneNumber: '1234567890',
+  //     }
+
+  //     request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
+  //   })
+  // })
 })

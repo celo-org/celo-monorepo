@@ -1,4 +1,3 @@
-/* TODO: Create new tests to cover this functionality.
 import { authenticateUser, ErrorMessage, WarningMessage } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import request from 'supertest'
@@ -11,11 +10,11 @@ import {
   createMockWeb3,
 } from '../../common/src/test/utils'
 import { BLINDED_PHONE_NUMBER } from '../../common/src/test/values'
-import { computeBlindedSignature } from '../src/bls/bls-cryptography-client'
+import { computeBlindedSignature } from '../src/common/bls/bls-cryptography-client'
 import { DEV_PRIVATE_KEY, getVersion } from '../src/config'
-import { incrementQueryCount } from '../src/database/wrappers/account'
-import { getRequestExists, storeRequest } from '../src/database/wrappers/request'
-import { getKeyProvider } from '../src/key-management/key-provider'
+import { incrementQueryCount } from '../src/common/database/wrappers/account'
+import { getRequestExists, storeRequest } from '../src/common/database/wrappers/request'
+import { getKeyProvider } from '../src/common/key-management/key-provider'
 import { createServer } from '../src/server'
 import { getRemainingQueryCount, getWalletAddress } from '../src/signing/query-quota'
 import { getBlockNumber, getContractKit } from '../src/web3/contracts'
@@ -84,6 +83,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
   }
 
   describe('with valid input', () => {
+    // TODO: delete this test if duplicated in integration tests
     it('provides signature', (done) => {
       mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
       mockGetBlockNumber.mockResolvedValue(10000)
@@ -104,6 +104,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
           done
         )
     })
+    // TODO: delete this test if duplicated in integration tests
     // Backwards compatibility check
     it('provides signature w/ expired timestamp', (done) => {
       mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
@@ -125,6 +126,8 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
           done
         )
     })
+
+    // TODO: delete this test if duplicated in integration tests
     it('returns 403 on query count 0', (done) => {
       mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 10, totalQuota: 10 })
       request(app)
@@ -133,6 +136,8 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         .expect('Content-Type', /json/)
         .expect(403, done)
     })
+
+    // TODO: preserve this test
     // We don't want to block the user on DB or blockchain query failure
     it('returns 200 on DB query failure', (done) => {
       mockGetRemainingQueryCount.mockRejectedValue(undefined)
@@ -142,6 +147,8 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         .expect('Content-Type', /json/)
         .expect(200, done)
     })
+
+    // TODO: preserve this test
     it('returns 500 on bls error', (done) => {
       mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
       mockComputeBlindedSignature.mockImplementation(() => {
@@ -153,6 +160,8 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         .expect('Content-Type', /json/)
         .expect(500, done)
     })
+
+    // TODO: preserve this test
     it('returns 200 with warning on replayed request', (done) => {
       mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
       mockGetRequestExists.mockReturnValue(true)
@@ -174,6 +183,8 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
           done
         )
     })
+
+    // TODO: preserve this test
     it('returns 200 with warning on failure to increment query count', (done) => {
       mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
       mockIncrementQueryCount.mockReturnValue(false)
@@ -195,6 +206,8 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
           done
         )
     })
+
+    // TODO: preserve this test
     it('returns 200 with warning on failure to store request', (done) => {
       mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
       mockStoreRequest.mockReturnValue(false)
@@ -217,7 +230,9 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
         )
     })
   })
+
   describe('with invalid input', () => {
+    // TODO: preserve this test
     it('invalid address returns 400', (done) => {
       const mockRequestData = {
         ...validRequest,
@@ -227,6 +242,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
     })
 
+    // TODO: preserve this test
     it('invalid hashedPhoneNumber returns 400', (done) => {
       const mockRequestData = {
         ...validRequest,
@@ -236,6 +252,7 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
     })
 
+    // TODO: preserve this test
     it('invalid blinded phone number returns 400', (done) => {
       const mockRequestData = {
         ...validRequest,
@@ -245,4 +262,4 @@ describe(`POST /getBlindedMessageSignature endpoint`, () => {
       request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
     })
   })
-}) */
+})

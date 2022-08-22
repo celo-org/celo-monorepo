@@ -27,15 +27,17 @@ import request from 'supertest'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { initDatabase } from '../../src/common/database/database'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
-import { config, SupportedDatabase, SupportedKeystore } from '../../src/config'
+import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
 // TODO: Add checking of values beyond the return code.
 
-describe('domainService', () => {
+describe('domain', () => {
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
   const walletAddress = wallet.getAccounts()[0]! // TODO(Alec): do we need this?
+
+  const expectedVersion = getVersion()
 
   const domainStages = (): SequentialDelayStage[] => [
     { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) },
@@ -134,6 +136,14 @@ describe('domainService', () => {
     // reset the database state without destroying and recreating it for each test.
 
     await db?.destroy()
+  })
+
+  describe(`${SignerEndpoint.STATUS}`, () => {
+    it('Should return 200 and correct version', async () => {
+      const res = await request(app).get(SignerEndpoint.STATUS)
+      expect(res.status).toBe(200)
+      expect(res.body.version).toBe(expectedVersion)
+    })
   })
 
   describe(`${SignerEndpoint.DISABLE_DOMAIN}`, () => {

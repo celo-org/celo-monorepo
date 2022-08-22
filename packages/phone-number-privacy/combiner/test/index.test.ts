@@ -1,17 +1,19 @@
 import { signWithDEK } from '@celo/identity/lib/odis/query'
 import { getDataEncryptionKey, isVerified, SignerEndpoint } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
-import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
+import { BLSCryptographyClient } from '../src/common/bls/bls-cryptography-client'
 import config, { E2E_TEST_ACCOUNTS, E2E_TEST_PHONE_NUMBERS, VERSION } from '../src/config'
-import { getTransaction } from '../src/database/database'
+import { getTransaction } from '../src/common/database/database'
 import {
   getAccountSignedUserPhoneNumberRecord,
   getDekSignerRecord,
   getDidMatchmaking,
   setDidMatchmaking,
-} from '../src/database/wrappers/account'
-import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
-import { getBlindedMessageSig, getContactMatches } from '../src/index'
+} from '../src/common/database/wrappers/account'
+import {
+  getNumberPairContacts,
+  setNumberPairContacts,
+} from '../src/common/database/wrappers/number-pairs'
 import { BLINDED_PHONE_NUMBER, dekAuthSigner, deks } from './end-to-end/resources'
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
