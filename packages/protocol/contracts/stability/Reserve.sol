@@ -125,7 +125,7 @@ contract Reserve is
    * @param _tobinTax The tobin tax value as a fixidity fraction.
    * @param _tobinTaxReserveRatio When to turn on the tobin tax, as a fixidity fraction.
    * @param _collateralAssetes The relative daily spending limit
-    * of an ERC20 collateral asset for the reserve spender.
+   * of an ERC20 collateral asset for the reserve spender.
    * @param _collateralAssetDailySpendingRatios The address of an ERC20 collateral asset
    */
   function initialize(
