@@ -1,9 +1,9 @@
 // @ts-ignore
+import * as bls12377js from '@celo/bls12377js'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/cryptographic-utils/lib/bls'
 import BigNumber from 'bignumber.js'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
-import * as bls12377js from 'bls12377js'
 import fs from 'fs'
 import { merge, range, repeat } from 'lodash'
 import { tmpdir } from 'os'
