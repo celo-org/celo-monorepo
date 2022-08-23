@@ -615,7 +615,10 @@ contract Governance is
     }
 
     require(!proposal.isApproved(), "Proposal already approved");
-    require(stage == Proposals.Stage.Approval, "Proposal not in approval stage");
+    require(
+      stage == Proposals.Stage.Approval || stage == Proposals.Stage.Referendum,
+      "Proposal not in approval stage"
+    );
     proposal.approved = true;
     // Ensures networkWeight is set by the end of the Referendum stage, even if 0 votes are cast.
     proposal.networkWeight = getLockedGold().getTotalLockedGold();
@@ -648,8 +651,10 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
-    require(proposal.isApproved(), "Proposal not approved");
-    require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
+    require(
+      stage == Proposals.Stage.Approval || stage == Proposals.Stage.Referendum,
+      "Incorrect proposal state"
+    );
     require(value != Proposals.VoteValue.None, "Vote value unset");
     require(weight > 0, "Voter weight zero");
     VoteRecord storage voteRecord = voter.referendumVotes[index];
@@ -730,6 +735,7 @@ contract Governance is
     );
     bool notExpired = proposal.exists();
     if (notExpired) {
+      require(proposal.isApproved(), "Proposal not approved");
       require(
         stage == Proposals.Stage.Execution && _isProposalPassing(proposal),
         "Proposal not in execution stage or not passing"
@@ -1187,12 +1193,12 @@ contract Governance is
     returns (bool)
   {
     // The proposal is considered expired under the following conditions:
-    //   1. Past the approval stage and not approved.
+    //   1. Past the referendum stage and not approved.
     //   2. Past the referendum stage and not passing.
     //   3. Past the execution stage.
     return ((stage > Proposals.Stage.Execution) ||
       (stage > Proposals.Stage.Referendum && !_isProposalPassing(proposal)) ||
-      (stage > Proposals.Stage.Approval && !proposal.isApproved()));
+      (stage > Proposals.Stage.Referendum && !proposal.isApproved()));
   }
 
   /**
