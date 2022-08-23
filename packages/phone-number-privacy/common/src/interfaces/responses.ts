@@ -35,7 +35,6 @@ export interface SignMessageResponseFailure {
 export type SignMessageResponse = SignMessageResponseSuccess | SignMessageResponseFailure
 
 export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
-  // TODO EN: revisit
   t.intersection([
     t.type({
       success: t.literal(true),
@@ -69,8 +68,8 @@ export interface PnpQuotaResponseSuccess {
   performedQueryCount: number
   // all time total quota
   totalQuota: number
-  blockNumber: number | undefined
-  warnings: string[] | undefined
+  blockNumber?: number
+  warnings?: string[]
 }
 
 export interface PnpQuotaResponseFailure {
@@ -82,14 +81,18 @@ export interface PnpQuotaResponseFailure {
 export type PnpQuotaResponse = PnpQuotaResponseSuccess | PnpQuotaResponseFailure
 
 export const PnpQuotaResponseSchema: t.Type<PnpQuotaResponse> = t.union([
-  t.type({
-    success: t.literal(true),
-    version: t.string,
-    performedQueryCount: t.number,
-    totalQuota: t.number,
-    blockNumber: t.union([t.number, t.undefined]),
-    warnings: t.union([t.array(t.string), t.undefined]),
-  }),
+  t.intersection([
+    t.type({
+      success: t.literal(true),
+      version: t.string,
+      performedQueryCount: t.number,
+      totalQuota: t.number,
+    }),
+    t.partial({
+      blockNumber: t.union([t.number, t.undefined]),
+      warnings: t.union([t.array(t.string), t.undefined]),
+    }),
+  ]),
   t.type({
     success: t.literal(false),
     version: t.string,
@@ -201,17 +204,16 @@ export function domainRestrictedSignatureResponseSchema<D extends Domain>(
       signature: t.string,
       status: state,
     }),
-    t.type({
-      success: t.literal(false),
-      version: t.string,
-      error: t.string,
-      status: state,
-    }),
-    t.type({
-      success: t.literal(false),
-      version: t.string,
-      error: t.string,
-    }),
+    t.intersection([
+      t.type({
+        success: t.literal(false),
+        version: t.string,
+        error: t.string,
+      }),
+      t.partial({
+        status: t.union([state, t.undefined]),
+      }),
+    ]),
   ])
 }
 

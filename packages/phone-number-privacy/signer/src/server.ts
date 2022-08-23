@@ -1,6 +1,11 @@
 import { timeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
-import { loggerMiddleware, rootLogger, SignerEndpoint } from '@celo/phone-number-privacy-common'
+import {
+  getContractKit,
+  loggerMiddleware,
+  rootLogger,
+  SignerEndpoint,
+} from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'
@@ -31,9 +36,11 @@ export function startSigner(
   config: SignerConfig,
   db: Knex,
   keyProvider: KeyProvider,
-  kit: ContractKit
+  kit?: ContractKit
 ) {
   const logger = rootLogger(config.serviceName)
+
+  kit = kit ?? getContractKit(config.blockchain)
 
   logger.info('Creating signer express server')
   const app = express()

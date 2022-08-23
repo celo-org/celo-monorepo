@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-signer",
-  "version": "1.1.10-dev",
+  "version": "2.0.0-dev",
   "description": "Signing participator of ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -35,7 +35,7 @@
     "@celo/contractkit": "2.0.1-dev",
     "@celo/identity": "2.0.1-dev",
     "@celo/phone-number-privacy-common": "1.0.42-dev",
-    "@celo/poprf": "^0.1.8",
+    "@celo/poprf": "^0.1.9",
     "@celo/utils": "2.0.1-dev",
     "@celo/wallet-hsm-azure": "2.0.1-dev",
     "@google-cloud/secret-manager": "3.0.0",

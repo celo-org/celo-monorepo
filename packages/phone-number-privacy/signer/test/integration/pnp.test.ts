@@ -75,7 +75,7 @@ describe('pnp', () => {
   })
 
   describe(`${SignerEndpoint.STATUS}`, () => {
-    it('Should return 200 on valid request', async () => {
+    it('Should return 200 and correct version', async () => {
       const res = await request(app).get(SignerEndpoint.STATUS)
       expect(res.status).toBe(200)
       expect(res.body.version).toBe(expectedVersion)
@@ -235,4 +235,23 @@ describe('pnp', () => {
       })
     })
   })
+
+  // const sendPnpSignatureRequest = async (
+  //   req: SignMessageRequest,
+  //   authorization: string,
+  //   signerApp: any = app
+  // ) => {
+  //   return request(signerApp)
+  //     .get(SignerEndpoint.PNP_SIGN)
+  //     .set('Authorization', authorization)
+  //     .send(req)
+  // }
+  // // TODO: add signature tests
+  // describe(`${SignerEndpoint.PNP_SIGN}`, () => {
+  //   // it('Should return 200 and correct version', async () => {
+  //   //   const res = await request(app).get(SignerEndpoint.STATUS)
+  //   //   expect(res.status).toBe(200)
+  //   //   expect(res.body.version).toBe(expectedVersion)
+  //   // })
+  // })
 })

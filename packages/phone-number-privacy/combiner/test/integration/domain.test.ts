@@ -28,8 +28,8 @@ import {
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
+import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
 import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
-import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/key-management/key-provider-base'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import BigNumber from 'bignumber.js'
@@ -126,9 +126,7 @@ const signerConfig: SignerConfig = {
   test_quota_bypass_percentage: 0,
 }
 
-// DO NOT MERGE: Add checking of values beyond the return code.
-
-// jest.setTimeout(30000) // TODO(Alec): why are these tests timing out?
+// TODO: Add checking of values beyond the return code.
 
 describe('domainService', () => {
   const wallet = new LocalWallet()

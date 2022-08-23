@@ -782,7 +782,7 @@ jobs:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
 
-  phone-number-privacy-test:
+  odis-test:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -790,7 +790,10 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner,@celo/phone-number-privacy-common
+      - run:
+          name: Run Tests for common package
+          command: yarn --cwd=packages/phone-number-privacy/common test
       - run:
           name: Run Tests for combiner
           command: yarn --cwd=packages/phone-number-privacy/combiner test
@@ -975,7 +978,7 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      - phone-number-privacy-test:
+      - odis-test:
           requires:
             - lint-checks
       - flakey-test-summary:
@@ -995,7 +998,7 @@ workflows:
             - end-to-end-geth-sync-test
             - end-to-end-geth-validator-order-test
             - end-to-end-cip35-eth-compatibility-test
-            - phone-number-privacy-test
+            - odis-test
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:

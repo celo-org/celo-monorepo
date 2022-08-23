@@ -12,9 +12,7 @@ async function start() {
   logger.info(`Starting. Dev mode: ${DEV_MODE}`)
   const db = await initDatabase(config)
   const keyProvider: KeyProvider = await initKeyProvider(config)
-  const kit = getContractKit(config.blockchain)
-
-  const server = startSigner(config, db, keyProvider, kit)
+  const server = startSigner(config, db, keyProvider, getContractKit(config.blockchain))
   logger.info('Starting server')
   const port = config.server.port ?? 0
   const backupTimeout = config.timeout * 1.2
