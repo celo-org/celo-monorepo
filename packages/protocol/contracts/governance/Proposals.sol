@@ -254,12 +254,7 @@ library Proposals {
     if (now >= stageStartTime) {
       return Stage.Execution;
     }
-    stageStartTime = stageStartTime.sub(stageDurations.referendum);
-    // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime && isApproved(proposal)) {
-      return Stage.Referendum;
-    }
-    return Stage.Approval;
+    return Stage.Referendum;
   }
 
   /**

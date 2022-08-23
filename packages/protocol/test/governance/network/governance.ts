@@ -2752,29 +2752,14 @@ contract('Governance', (accounts: string[]) => {
           assert.isTrue(dequeued, 'proposal not dequeued')
         })
 
-        describe('when in approval stage', () => {
-          it('should return Approval when not expired', () =>
-            expectStage(Stage.Approval, proposalId))
-
-          it('should return Approval when it is not approved, passed approval duration but still within referendum duration', async () => {
-            await timeTravel(approvalStageDuration, web3)
-            await expectStage(Stage.Approval, proposalId)
-          })
-
-          it('should return Expiration when expired - passed both approval and referendum duration', async () => {
-            await timeTravel(approvalStageDuration + referendumStageDuration, web3)
-            await expectStage(Stage.Expiration, proposalId)
-          })
-        })
-
         describe('when in referendum stage', () => {
           describe('when not approved', () => {
             beforeEach(async () => {
               await timeTravel(approvalStageDuration + 1, web3)
             })
 
-            it('should return Approval when not voted and not expired', () =>
-              expectStage(Stage.Approval, proposalId))
+            it('should return Referendum when not voted and not expired', () =>
+              expectStage(Stage.Referendum, proposalId))
 
             it('should return Referendum when voted and not expired', async () => {
               await governance.approve(proposalId, index)
