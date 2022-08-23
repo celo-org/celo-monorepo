@@ -108,7 +108,7 @@ contract Reserve is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 2, 2);
+    return (1, 2, 0, 0);
   }
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -124,7 +124,7 @@ contract Reserve is
    * @param _assetAllocationWeights The reserve asset weights.
    * @param _tobinTax The tobin tax value as a fixidity fraction.
    * @param _tobinTaxReserveRatio When to turn on the tobin tax, as a fixidity fraction.
-   * @param _collateralAssetes The relative daily spending limit
+   * @param _collateralAssets The relative daily spending limit
    * of an ERC20 collateral asset for the reserve spender.
    * @param _collateralAssetDailySpendingRatios The address of an ERC20 collateral asset
    */
@@ -138,7 +138,7 @@ contract Reserve is
     uint256[] calldata _assetAllocationWeights,
     uint256 _tobinTax,
     uint256 _tobinTaxReserveRatio,
-    address[] calldata _collateralAssetes,
+    address[] calldata _collateralAssets,
     uint256[] calldata _collateralAssetDailySpendingRatios
   ) external initializer {
     _transferOwnership(msg.sender);
@@ -150,7 +150,7 @@ contract Reserve is
     setTobinTax(_tobinTax);
     setTobinTaxReserveRatio(_tobinTaxReserveRatio);
     setDailySpendingRatioForCollateralAssets(
-      _collateralAssetes,
+      _collateralAssets,
       _collateralAssetDailySpendingRatios
     );
   }
@@ -197,34 +197,34 @@ contract Reserve is
   /**
    * @notice Set the ratio of reserve for a given collateral asset
    * that is spendable per day.
-   * @param collateralAssetes Collection of the addresses of collateral assets
+   * @param collateralAssets Collection of the addresses of collateral assets
    * we're setting a limit for.
    * @param collateralAssetDailySpendingRatios Collection of the relative daily spending limits
    * of collateral assets.
    */
   function setDailySpendingRatioForCollateralAssets(
-    address[] memory collateralAssetes,
+    address[] memory collateralAssets,
     uint256[] memory collateralAssetDailySpendingRatios
   ) public onlyOwner {
     require(
-      collateralAssetes.length == collateralAssetDailySpendingRatios.length,
+      collateralAssets.length == collateralAssetDailySpendingRatios.length,
       "token addresses and spending ratio lengths have to be the same"
     );
-    for (uint256 i = 0; i < collateralAssetes.length; i++) {
-      if (collateralAssetes[i] != address(0) && collateralAssetDailySpendingRatios[i] != 0) {
+    for (uint256 i = 0; i < collateralAssets.length; i++) {
+      if (collateralAssets[i] != address(0) && collateralAssetDailySpendingRatios[i] != 0) {
         require(
-          checkIsCollateralAsset(collateralAssetes[i]),
+          checkIsCollateralAsset(collateralAssets[i]),
           "the address specified is not a reserve collateral asset"
         );
         require(
           FixidityLib.wrap(collateralAssetDailySpendingRatios[i]).lte(FixidityLib.fixed1()),
           "spending ratio cannot be larger than 1"
         );
-        collateralAssetDailySpendingRatio[collateralAssetes[i]] = FixidityLib.wrap(
+        collateralAssetDailySpendingRatio[collateralAssets[i]] = FixidityLib.wrap(
           collateralAssetDailySpendingRatios[i]
         );
         emit DailySpendingRatioForCollateralAssetSet(
-          collateralAssetes[i],
+          collateralAssets[i],
           collateralAssetDailySpendingRatios[i]
         );
       }
@@ -658,7 +658,6 @@ contract Reserve is
         IERC20(collateralAsset).balanceOf(otherReserveAddresses[i])
       );
     }
-    // check this with nadiem or roman
     return reserveCollateralAssetBalance.add(IERC20(collateralAsset).balanceOf(address(this)));
   }
 
