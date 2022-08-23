@@ -73,6 +73,7 @@ export async function upgradeHelmChart(
     helmReleaseName,
     helmChartPath,
     params,
+    true,
     `values-${celoEnv}.yaml`
   )
 

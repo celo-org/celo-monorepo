@@ -37,6 +37,7 @@ geth:
     #   memory: "4Gi"
     #   cpu: "4"
   ws_port: 8546
+  rpc_gascap: 10000000
   validatorExtraSnippet: |
     echo "Validator"
   secondayExtraSnippet: |
