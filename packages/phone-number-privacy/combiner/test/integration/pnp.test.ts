@@ -369,8 +369,7 @@ describe('pnpService', () => {
       })
     })
 
-    // TODO EN: debug what's going on here -- failing with a 502 instead of 400
-    xit('Should respond with 400 on invalid key version', async () => {
+    it('Should respond with 400 on invalid key version', async () => {
       const [req, _] = pnpSignMessageRequest(userSeed)
       const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
 

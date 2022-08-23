@@ -52,6 +52,11 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
+    // TODO: revisit extracting out duplicate init/validation code between sign/non-sign IO
+    if (!this.requestHasValidKeyVersion(request, response.locals.logger)) {
+      this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
+      return null
+    }
     if (!(await this.authenticate(request, response.locals.logger))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
