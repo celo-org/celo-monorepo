@@ -26,7 +26,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   /* ==================== State Variables ==================== */
 
   // Address of the broker contract.
-  address broker;
+  address public broker;
 
   // Maps a pair id to the corresponding pair struct.
   // pairId is in the format "stableSymbol:collateralSymbol:exchangeName"
@@ -53,18 +53,29 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   /**
    * @notice Allows the contract to be upgradable via the proxy.
    * @param _broker The address of the broker contract.
+   * @param registryAddress The address of the Celo registry.
    */
-  function initilize(address _broker) external initializer {
+  function initilize(address _broker, address registryAddress) external initializer {
     _transferOwnership(msg.sender);
+    setRegistry(registryAddress);
     setBroker(_broker);
   }
+
+  /* ==================== Modifiers ==================== */
 
   modifier onlyBroker() {
     require(msg.sender == broker, "Caller is not the Broker");
     _;
   }
 
-  /* ==================== Restricted Functions ==================== */
+  /* ==================== View Functions ==================== */
+
+  function getPair(bytes32 pairId) external view returns (Pair memory pair) {
+    require(isPair[pairId], "A pair with the specified id does not exist");
+    pair = pairs[pairId];
+  }
+
+  /* ==================== Mutative Functions ==================== */
 
   /**
    * @notice Sets the address of the broker contract.
@@ -72,7 +83,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
    */
   function setBroker(address _broker) public onlyOwner {
     require(_broker != address(0), "Broker address must be set");
-    _broker = broker;
+    broker = _broker;
     emit BrokerUpdated(_broker);
   }
 
@@ -84,9 +95,6 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   function createPair(Pair calldata pair) external onlyOwner returns (bytes32 pairId) {
     Pair memory pairInfo = pair;
 
-    validatePairInfo(pairInfo);
-
-    // TODO: OZ Erc20 does not have definition for symbol -____-
     pairId = keccak256(
       abi.encodePacked(
         IERC20Metadata(pairInfo.stableAsset).symbol(),
@@ -95,6 +103,8 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
       )
     );
     require(!isPair[pairId], "A pair with the specified assets and exchange exists");
+
+    validatePairInfo(pairInfo);
 
     // TODO: getUpdatedBuckets Function sig should change. May not need amounts
     // but instead pass minSupplyForStableBucketCap & stableBucketMaxFraction
@@ -193,13 +203,6 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
     emit BucketsUpdated(pairId, collateralBucket, stableBucket);
   }
 
-  /* ==================== View Functions ==================== */
-
-  function getPair(bytes32 pairId) external view returns (Pair memory pair) {
-    require(isPair[pairId], "A pair with the specified id does not exist");
-    pair = pairs[pairId];
-  }
-
   /* ==================== Private Functions ==================== */
 
   /**
@@ -207,7 +210,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
    * @param pairInfo The information on the virtual pair to be validated.
    * @return isValid A bool indicating whether or not the pair information provided is valid.
    */
-  function validatePairInfo(Pair memory pairInfo) private returns (bool isValid) {
+  function validatePairInfo(Pair memory pairInfo) private view returns (bool isValid) {
     IReserve reserve = IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
 
     require(
@@ -258,6 +261,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
    */
   function getAvailableCollateralFraction(address collateralAsset)
     private
+    view
     returns (FixidityLib.Fraction memory availableFraction)
   {
     return FixidityLib.fixed1().subtract(allocatedCollateralFractions[collateralAsset]);
@@ -270,6 +274,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
    */
   function getAvailableStableFraction(address stableAsset)
     private
+    view
     returns (FixidityLib.Fraction memory availableFraction)
   {
     return FixidityLib.fixed1().subtract(allocatedStableFractions[stableAsset]);

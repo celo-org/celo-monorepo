@@ -23,7 +23,6 @@ interface IPairManager {
     FixidityLib.Fraction spread;
     uint256 minimumReports;
     uint256 minSupplyForStableBucketCap;
-    bytes32 stableTokenRegistryId;
   }
 
   /**
