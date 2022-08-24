@@ -30,12 +30,6 @@ import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
-// TODO EN delete
-// jest.mock('@celo/contractkit', () => ({
-//   ...jest.requireActual('@celo/contractkit'),
-//   newKit: jest.fn(),
-// }))
-
 // TODO: Add checking of values beyond the return code.
 describe('domain', () => {
   const wallet = new LocalWallet()

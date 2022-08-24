@@ -1,5 +1,3 @@
-console.log('importing from signer web3 contracts')
-
 import { NULL_ADDRESS, retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { ContractKit, StableToken } from '@celo/contractkit'
 import {
