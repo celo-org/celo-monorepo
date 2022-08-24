@@ -58,6 +58,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           }
           queryCount = state.queryCount
         } else {
+          // TODO(2.0.0, refactor) this logic is all wrong, revisit
           // If queryCount or totalQuota are undefined,
           // we fail open and service the request to not block the user.
           // Error messages are stored in the session and included along
