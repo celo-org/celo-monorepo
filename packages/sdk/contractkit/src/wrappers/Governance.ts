@@ -30,6 +30,7 @@ import { BaseWrapperForGoverning } from './BaseWrapperForGoverning'
 export enum ProposalStage {
   None = 'None',
   Queued = 'Queued',
+  Approval = 'Approval',
   Referendum = 'Referendum',
   Execution = 'Execution',
   Expiration = 'Expiration',
