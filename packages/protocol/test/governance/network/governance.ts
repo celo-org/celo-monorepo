@@ -2792,14 +2792,12 @@ contract('Governance', (accounts: string[]) => {
 
         describe('when in referendum stage', () => {
           describe('when not approved', () => {
-            beforeEach(async () => {})
-
             it('should return Referendum when not voted and not expired', () =>
               expectStage(Stage.Referendum, proposalId))
 
             it('should return Referendum when voted and not expired', async () => {
               await governance.approve(proposalId, index)
-              expectStage(Stage.Referendum, proposalId)
+              await expectStage(Stage.Referendum, proposalId)
             })
 
             it('should return Expiration when expired', async () => {
