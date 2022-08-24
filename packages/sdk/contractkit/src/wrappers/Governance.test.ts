@@ -66,7 +66,6 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     expect(config.dequeueFrequency).toEqBigNumber(expConfig.dequeueFrequency)
     expect(config.minDeposit).toEqBigNumber(minDeposit)
     expect(config.queueExpiry).toEqBigNumber(expConfig.queueExpiry)
-    expect(config.stageDurations.Approval).toEqBigNumber(expConfig.approvalStageDuration)
     expect(config.stageDurations.Referendum).toEqBigNumber(expConfig.referendumStageDuration)
     expect(config.stageDurations.Execution).toEqBigNumber(expConfig.executionStageDuration)
   })
@@ -103,7 +102,6 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
         tx.txo
       )
       await multisigTx.sendAndWaitForReceipt({ from: accounts[0] })
-      await timeTravel(expConfig.approvalStageDuration, web3)
     }
 
     const voteFn = async (voter: Address) => {
