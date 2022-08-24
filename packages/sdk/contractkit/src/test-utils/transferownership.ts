@@ -38,6 +38,11 @@ export async function assumeOwnership(web3: Web3, to: string) {
   }
   const proposal: Proposal = [ownershiptx]
 
+  await governance.propose(proposal, 'URL').sendAndWaitForReceipt({
+    from: accounts[0],
+    value: (await governance.getConfig()).minDeposit.toNumber(),
+  })
+
   const proposalReceipt = await governance.propose(proposal, 'URL').sendAndWaitForReceipt({
     from: accounts[0],
     value: (await governance.getConfig()).minDeposit.toNumber(),

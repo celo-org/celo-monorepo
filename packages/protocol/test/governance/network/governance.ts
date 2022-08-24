@@ -930,7 +930,9 @@ contract('Governance', (accounts: string[]) => {
     })
 
     describe('when it has been more than dequeueFrequency since the last dequeue', () => {
+      let originalLastDequeue: BigNumber
       beforeEach(async () => {
+        originalLastDequeue = await governance.lastDequeue()
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -958,7 +960,27 @@ contract('Governance', (accounts: string[]) => {
         assert.isFalse(await governance.isQueued(proposalId))
         assert.equal((await governance.getQueueLength()).toNumber(), 1)
         assert.equal((await governance.dequeued(0)).toNumber(), proposalId)
+        assert.isBelow(originalLastDequeue.toNumber(), (await governance.lastDequeue()).toNumber())
       })
+    })
+
+    it('should not update lastDequeue when no queued proposal(s)', async () => {
+      const originalLastDequeue = await governance.lastDequeue()
+      await timeTravel(dequeueFrequency, web3)
+
+      await governance.propose(
+        [transactionSuccess1.value],
+        [transactionSuccess1.destination],
+        // @ts-ignore bytes type
+        transactionSuccess1.data,
+        [transactionSuccess1.data.length],
+        descriptionUrl,
+        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+        { value: minDeposit }
+      )
+
+      assert.equal((await governance.getQueueLength()).toNumber(), 1)
+      assert.equal((await governance.lastDequeue()).toNumber(), originalLastDequeue.toNumber())
     })
   })
 
@@ -1088,7 +1110,9 @@ contract('Governance', (accounts: string[]) => {
 
     describe('when it has been more than dequeueFrequency since the last dequeue', () => {
       const upvotedProposalId = 2
+      let originalLastDequeue: BigNumber
       beforeEach(async () => {
+        originalLastDequeue = await governance.lastDequeue()
         await governance.propose(
           [transactionSuccess1.value],
           [transactionSuccess1.destination],
@@ -1111,6 +1135,7 @@ contract('Governance', (accounts: string[]) => {
           queueLength.minus(concurrentProposals).toNumber()
         )
         assertEqualBN(await governance.dequeued(0), proposalId)
+        assert.isBelow(originalLastDequeue.toNumber(), (await governance.lastDequeue()).toNumber())
       })
 
       it('should revert when upvoting a proposal that will be dequeued', async () => {
@@ -1269,7 +1294,9 @@ contract('Governance', (accounts: string[]) => {
     })
 
     describe('when it has been more than dequeueFrequency since the last dequeue', () => {
+      let originalLastDequeue: BigNumber
       beforeEach(async () => {
+        originalLastDequeue = await governance.lastDequeue()
         await timeTravel(dequeueFrequency, web3)
       })
 
@@ -1278,6 +1305,7 @@ contract('Governance', (accounts: string[]) => {
         assert.isFalse(await governance.isQueued(proposalId))
         assert.equal((await governance.getQueueLength()).toNumber(), 0)
         assertEqualBN(await governance.dequeued(0), proposalId)
+        assert.isBelow(originalLastDequeue.toNumber(), (await governance.lastDequeue()).toNumber())
       })
 
       it('should mark the account as not having upvoted a proposal', async () => {
@@ -2735,6 +2763,51 @@ contract('Governance', (accounts: string[]) => {
       it('should return false', async () => {
         const passing = await governance.isProposalPassing(proposalId)
         assert.isFalse(passing)
+      })
+    })
+  })
+
+  describe('#dequeueProposalsIfReady()', () => {
+    it('should not update lastDequeue when there are no queued proposals', async () => {
+      const originalLastDequeue = await governance.lastDequeue()
+      await timeTravel(dequeueFrequency, web3)
+      await governance.dequeueProposalsIfReady()
+
+      assert.equal((await governance.getQueueLength()).toNumber(), 0)
+      assert.equal((await governance.lastDequeue()).toNumber(), originalLastDequeue.toNumber())
+    })
+
+    describe('when a proposal exists', () => {
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          { value: minDeposit }
+        )
+      })
+
+      it('should update lastDequeue', async () => {
+        const originalLastDequeue = await governance.lastDequeue()
+
+        await timeTravel(dequeueFrequency, web3)
+        await governance.dequeueProposalsIfReady()
+
+        assert.equal((await governance.getQueueLength()).toNumber(), 0)
+        assert.isTrue((await governance.lastDequeue()).toNumber() > originalLastDequeue.toNumber())
+      })
+
+      it('should not update lastDequeue when only expired proposal queued', async () => {
+        const originalLastDequeue = await governance.lastDequeue()
+
+        await timeTravel(queueExpiry, web3)
+        await governance.dequeueProposalsIfReady()
+
+        assert.equal((await governance.getQueueLength()).toNumber(), 0)
+        assert.equal((await governance.lastDequeue()).toNumber(), originalLastDequeue.toNumber())
       })
     })
   })
