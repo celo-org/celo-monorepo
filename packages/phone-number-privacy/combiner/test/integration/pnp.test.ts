@@ -172,6 +172,9 @@ describe('pnpService', () => {
   const expectedSig = 'xgFMQtcgAMHJAEX/m9B4VFopYtxqPFSw0024sWzRYvQDvnmFqhXOPdnRDfa8WCEA'
   const expectedUnblindedMsg = 'lOASnDJNbJBTMYfkbU4fMiK7FcNwSyqZo8iQSM95X8YK+/158be4S1A+jcQsCUYA'
 
+  // In current setup, the same mocked kit is used for the combiner and signers
+  const mockKit = newKit('dummyKit')
+
   beforeAll(async () => {
     keyProvider1 = new MockKeyProvider(BLS_THRESHOLD_PK_SHARE_1)
     keyProvider2 = new MockKeyProvider(BLS_THRESHOLD_PK_SHARE_2)
@@ -185,7 +188,7 @@ describe('pnpService', () => {
     ).toString('base64')
     combinerConfig.phoneNumberPrivacy.keys.polynomial = BLS_POLYNOMIAL
 
-    app = startCombiner(combinerConfig)
+    app = startCombiner(combinerConfig, mockKit)
   })
 
   beforeEach(async () => {
@@ -229,8 +232,6 @@ describe('pnpService', () => {
 
   describe('when all signers return correct signatures', () => {
     beforeEach(async () => {
-      const mockKit = newKit('dummyKit')
-
       signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
       signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
       signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
@@ -425,7 +426,6 @@ describe('pnpService', () => {
         '000000002e50aa714ef6b865b5de89c56969ef9f8f27b6b0a6d157c9cc01c574ac9df604'
 
       const badKeyProvider1: KeyProvider = new MockKeyProvider(badBlsShare1)
-      const mockKit = newKit('dummyKit')
 
       signer1 = startSigner(signerConfig, signerDB1, badKeyProvider1, mockKit).listen(3001)
       signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
@@ -467,8 +467,6 @@ describe('pnpService', () => {
         '01000000b8f0ef841dcf8d7bd1da5e8025e47d729eb67f513335784183b8fa227a0b9a0b'
       const badKeyProvider1: KeyProvider = new MockKeyProvider(badBlsShare1)
       const badKeyProvider2: KeyProvider = new MockKeyProvider(badBlsShare2)
-
-      const mockKit = newKit('dummyKit')
 
       signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
       signer2 = startSigner(signerConfig, signerDB2, badKeyProvider1, mockKit).listen(3002)
