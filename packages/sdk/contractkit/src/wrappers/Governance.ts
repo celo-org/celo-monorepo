@@ -30,7 +30,6 @@ import { BaseWrapperForGoverning } from './BaseWrapperForGoverning'
 export enum ProposalStage {
   None = 'None',
   Queued = 'Queued',
-  Approval = 'Approval',
   Referendum = 'Referendum',
   Execution = 'Execution',
   Expiration = 'Expiration',
@@ -42,7 +41,7 @@ type StageDurations<V> = {
 
 type DequeuedStageDurations = Pick<
   StageDurations<BigNumber>,
-  ProposalStage.Approval | ProposalStage.Referendum | ProposalStage.Execution
+  ProposalStage.Referendum | ProposalStage.Execution
 >
 
 export interface ParticipationParameters {
@@ -185,9 +184,8 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   async stageDurations(): Promise<DequeuedStageDurations> {
     const res = await this.contract.methods.stageDurations().call()
     return {
-      [ProposalStage.Approval]: valueToBigNumber(res[0]),
-      [ProposalStage.Referendum]: valueToBigNumber(res[1]),
-      [ProposalStage.Execution]: valueToBigNumber(res[2]),
+      [ProposalStage.Referendum]: valueToBigNumber(res[0]),
+      [ProposalStage.Execution]: valueToBigNumber(res[1]),
     }
   }
 
@@ -285,9 +283,6 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   async getHumanReadableConfig() {
     const config = await this.getConfig()
     const stageDurations = {
-      [ProposalStage.Approval]: secondsToDurationString(
-        config.stageDurations[ProposalStage.Approval]
-      ),
       [ProposalStage.Referendum]: secondsToDurationString(
         config.stageDurations[ProposalStage.Referendum]
       ),
@@ -413,12 +408,11 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     }
 
     const durations = await this.stageDurations()
-    const referendum = meta.timestamp.plus(durations.Approval)
+    const referendum = meta.timestamp
     const execution = referendum.plus(durations.Referendum)
     const expiration = execution.plus(durations.Execution)
 
     return {
-      [ProposalStage.Approval]: meta.timestamp,
       [ProposalStage.Referendum]: referendum,
       [ProposalStage.Execution]: execution,
       [ProposalStage.Expiration]: expiration,
@@ -477,13 +471,12 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
 
     if (stage === ProposalStage.Queued) {
       record.upvotes = await this.getUpvotes(proposalID)
-    } else if (stage === ProposalStage.Approval) {
-      record.approved = await this.isApproved(proposalID)
-      record.approvals = await this.getApprovalStatus(proposalID)
     } else if (stage === ProposalStage.Referendum || stage === ProposalStage.Execution) {
       record.approved = true
       record.passed = await this.isProposalPassing(proposalID)
       record.votes = await this.getVotes(proposalID)
+      record.approved = await this.isApproved(proposalID)
+      record.approvals = await this.getApprovalStatus(proposalID)
     }
 
     return record

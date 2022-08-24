@@ -2097,6 +2097,29 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
+      describe('when the proposal cannot execute successfully because it is not approved', () => {
+        beforeEach(async () => {
+          await governance.propose(
+            [transactionFail.value],
+            [transactionFail.destination],
+            // @ts-ignore bytes type
+            transactionFail.data,
+            [transactionFail.data.length],
+            descriptionUrl,
+            // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+            { value: minDeposit }
+          )
+          await timeTravel(dequeueFrequency, web3)
+          await mockLockedGold.setAccountTotalLockedGold(account, weight)
+          await governance.vote(proposalId, index, value)
+          await timeTravel(referendumStageDuration, web3)
+        })
+
+        it('should revert', async () => {
+          await assertRevert(governance.execute(proposalId, index))
+        })
+      })
+
       describe('when the proposal cannot execute successfully', () => {
         beforeEach(async () => {
           await governance.propose(
