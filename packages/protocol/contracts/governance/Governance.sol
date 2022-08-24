@@ -599,8 +599,10 @@ contract Governance is
 
     require(!proposal.isApproved(), "Proposal already approved");
     require(
-      stage == Proposals.Stage.Approval || stage == Proposals.Stage.Referendum,
-      "Proposal not in approval stage"
+      stage == Proposals.Stage.Approval ||
+        stage == Proposals.Stage.Referendum ||
+        stage == Proposals.Stage.Execution,
+      "Proposal not in correct stage"
     );
     proposal.approved = true;
     // Ensures networkWeight is set by the end of the Referendum stage, even if 0 votes are cast.
@@ -1172,8 +1174,7 @@ contract Governance is
     //   2. Past the referendum stage and not passing.
     //   3. Past the execution stage.
     return ((stage > Proposals.Stage.Execution) ||
-      (stage > Proposals.Stage.Referendum && !_isProposalPassing(proposal)) ||
-      (stage > Proposals.Stage.Referendum && !proposal.isApproved()));
+      (stage > Proposals.Stage.Referendum && !_isProposalPassing(proposal)));
   }
 
   /**
