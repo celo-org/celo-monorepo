@@ -81,13 +81,20 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     let proposal: Proposal
     beforeAll(() => (proposal = registryRepointProposal(repoints)))
 
-    const proposeFn = async (proposer: Address) =>
-      governance
+    const proposeFn = async (proposer: Address, proposeTwice = false) => {
+      if (proposeTwice) {
+        await governance
+          .propose(proposal, 'URL')
+          .sendAndWaitForReceipt({ from: proposer, value: minDeposit })
+      }
+
+      await governance
         .propose(proposal, 'URL')
         .sendAndWaitForReceipt({ from: proposer, value: minDeposit })
+    }
 
-    const upvoteFn = async (upvoter: Address, shouldTimeTravel = true) => {
-      const tx = await governance.upvote(proposalID, upvoter)
+    const upvoteFn = async (upvoter: Address, shouldTimeTravel = true, proposalId?: BigNumber) => {
+      const tx = await governance.upvote(proposalId ?? proposalID, upvoter)
       await tx.sendAndWaitForReceipt({ from: upvoter })
       if (shouldTimeTravel) {
         await timeTravel(expConfig.dequeueFrequency, web3)
@@ -123,34 +130,41 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     })
 
     it('#upvote', async () => {
-      await proposeFn(accounts[0])
+      const proposalId = new BigNumber(2)
+      await proposeFn(accounts[0], true)
       // shouldTimeTravel is false so getUpvotes isn't on dequeued proposal
-      await upvoteFn(accounts[1], false)
+      await upvoteFn(accounts[1], false, proposalId)
 
       const voteWeight = await governance.getVoteWeight(accounts[1])
-      const upvotes = await governance.getUpvotes(proposalID)
+      const upvotes = await governance.getUpvotes(proposalId)
       expect(upvotes).toEqBigNumber(voteWeight)
       expect(upvotes).toEqBigNumber(ONE_CGLD)
+
+      const upvoter = await governance.getVoter(accounts[1])
+      const expectedUpvoteRecord = { proposalID: proposalId, upvotes: new BigNumber(ONE_CGLD) }
+      expect(upvoter.upvote).toEqual(expectedUpvoteRecord)
     })
 
     it('#revokeUpvote', async () => {
-      await proposeFn(accounts[0])
+      const proposalId = new BigNumber(2)
+      await proposeFn(accounts[0], true)
       // shouldTimeTravel is false so revoke isn't on dequeued proposal
-      await upvoteFn(accounts[1], false)
+      await upvoteFn(accounts[1], false, proposalId)
 
-      const before = await governance.getUpvotes(proposalID)
+      const before = await governance.getUpvotes(proposalId)
       const upvoteRecord = await governance.getUpvoteRecord(accounts[1])
 
       const tx = await governance.revokeUpvote(accounts[1])
       await tx.sendAndWaitForReceipt({ from: accounts[1] })
 
-      const after = await governance.getUpvotes(proposalID)
+      const after = await governance.getUpvotes(proposalId)
       expect(after).toEqBigNumber(before.minus(upvoteRecord.upvotes))
     })
 
     it('#approve', async () => {
       await proposeFn(accounts[0])
-      await upvoteFn(accounts[1])
+      await timeTravel(expConfig.dequeueFrequency, web3)
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
       await approveFn()
 
       const approved = await governance.isApproved(proposalID)
@@ -159,7 +173,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
 
     it('#vote', async () => {
       await proposeFn(accounts[0])
-      await upvoteFn(accounts[1])
+      await timeTravel(expConfig.dequeueFrequency, web3)
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
       await approveFn()
       await voteFn(accounts[2])
 
@@ -172,7 +187,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       '#execute',
       async () => {
         await proposeFn(accounts[0])
-        await upvoteFn(accounts[1])
+        await timeTravel(expConfig.dequeueFrequency, web3)
+        await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
         await approveFn()
         await voteFn(accounts[2])
 
@@ -189,16 +205,13 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
 
     it('#getVoter', async () => {
       await proposeFn(accounts[0])
-      await upvoteFn(accounts[1])
+      await timeTravel(expConfig.dequeueFrequency, web3)
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
       await approveFn()
       await voteFn(accounts[2])
 
       const proposer = await governance.getVoter(accounts[0])
       expect(proposer.refundedDeposits).toEqBigNumber(minDeposit)
-
-      const upvoter = await governance.getVoter(accounts[1])
-      const expectedUpvoteRecord = { proposalID, upvotes: new BigNumber(ONE_CGLD) }
-      expect(upvoter.upvote).toEqual(expectedUpvoteRecord)
 
       const voter = await governance.getVoter(accounts[2])
       const expectedVoteRecord = { proposalID, votes: new BigNumber(ONE_CGLD), value: 'Yes' }
