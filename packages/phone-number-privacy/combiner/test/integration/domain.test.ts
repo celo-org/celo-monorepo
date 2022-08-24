@@ -151,7 +151,7 @@ describe('domainService', () => {
   ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, PoprfClient]> => {
     const domain = _domain ?? authenticatedDomain()
     const poprfClient = new PoprfClient(
-      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'hex'),
+      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'base64'),
       domainHash(domain),
       Buffer.from('test message', 'utf8')
     )
