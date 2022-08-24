@@ -38,7 +38,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   // that has been allocated to existing virtual pairs.
   mapping(address => FixidityLib.Fraction) public allocatedCollateralFractions;
 
-  // TODO: Confirm total allocations with Nadiem
+  // TODO: https://github.com/mento-protocol/mento-general/issues/60
   // Tracks the total fraction of reserve stable that has been allocated to existing virtual pairs.
   mapping(address => FixidityLib.Fraction) public allocatedStableFractions;
 
@@ -93,6 +93,10 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
    * @return pairId The id of the newly created pair.
    */
   function createPair(Pair calldata pair) external onlyOwner returns (bytes32 pairId) {
+    require(address(pair.mentoExchange) != address(0), "Mento exchange must be set");
+    require(address(pair.stableAsset) != address(0), "Stable asset must be set");
+    require(address(pair.collateralAsset) != address(0), "Collateral asset must be set");
+
     Pair memory pairInfo = pair;
 
     pairId = keccak256(
@@ -119,14 +123,15 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
     pairInfo.stableBucket = tokenInBucket;
     pairInfo.collateralBucket = tokenOutBucket;
 
+    // TODO: https://github.com/mento-protocol/mento-general/issues/60
     // Update allocated collateral fraction
-    allocatedCollateralFractions[pairInfo.collateralAsset] = allocatedCollateralFractions[pairInfo
-      .collateralAsset]
-      .add(pairInfo.collateralBucketFraction);
+    // allocatedCollateralFractions[pairInfo.collateralAsset] = allocatedCollateralFractions[
+    //   pairInfo.collateralAsset
+    // ].add(pairInfo.collateralBucketFraction);
 
-    // Update allocated stable bucket fraction
-    allocatedStableFractions[pairInfo.stableAsset] = allocatedStableFractions[pairInfo.stableAsset]
-      .add(pairInfo.stableBucketMaxFraction);
+    // // Update allocated stable bucket fraction
+    // allocatedStableFractions[pairInfo.stableAsset] = allocatedStableFractions[pairInfo.stableAsset]
+    //   .add(pairInfo.stableBucketMaxFraction);
 
     pairs[pairId] = pairInfo;
     isPair[pairId] = true;
@@ -164,14 +169,15 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
 
     Pair memory pair = pairs[pairId];
 
+    // TODO: https://github.com/mento-protocol/mento-general/issues/60
     // Update allocated collateral fraction
-    allocatedCollateralFractions[pair.collateralAsset] = allocatedCollateralFractions[pair
-      .collateralAsset]
-      .subtract(pair.collateralBucketFraction);
+    // allocatedCollateralFractions[pair.collateralAsset] = allocatedCollateralFractions[
+    //   pair.collateralAsset
+    // ].subtract(pair.collateralBucketFraction);
 
-    // Update allocated stable bucket fraction
-    allocatedStableFractions[pair.stableAsset] = allocatedStableFractions[pair.stableAsset]
-      .subtract(pair.stableBucketMaxFraction);
+    // // Update allocated stable bucket fraction
+    // allocatedStableFractions[pair.stableAsset] = allocatedStableFractions[pair.stableAsset]
+    //   .subtract(pair.stableBucketMaxFraction);
 
     isPair[pairId] = false;
     delete pairs[pairId];
@@ -225,13 +231,14 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
       pairInfo.collateralBucketFraction.lt(FixidityLib.fixed1()),
       "Collateral asset fraction must be smaller than 1"
     );
-    require(
-      pairInfo.collateralBucketFraction.lt(
-        getAvailableCollateralFraction(pairInfo.collateralAsset)
-      ),
-      "Collateral asset fraction must be less than available collateral fraction"
-    );
-    require(address(pairInfo.mentoExchange) != address(0), "Mento exchange must be set");
+
+    // TODO: https://github.com/mento-protocol/mento-general/issues/60
+    // require(
+    //   pairInfo.collateralBucketFraction.lt(
+    //     getAvailableCollateralFraction(pairInfo.collateralAsset)
+    //   ),
+    //   "Collateral asset fraction must be less than available collateral fraction"
+    // );
 
     require(
       pairInfo.stableBucketMaxFraction.unwrap() > 0,

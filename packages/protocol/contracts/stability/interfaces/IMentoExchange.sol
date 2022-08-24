@@ -44,5 +44,5 @@ interface IMentoExchange {
    * @notice Retrieve the name of this exchange.
    * @return exchangeName The name of the exchange.
    */
-  function name() external pure returns (string memory exchangeName);
+  function name() external view returns (string memory exchangeName);
 }
