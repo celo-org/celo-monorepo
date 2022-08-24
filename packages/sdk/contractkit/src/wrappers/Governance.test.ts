@@ -81,8 +81,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
     let proposal: Proposal
     beforeAll(() => (proposal = registryRepointProposal(repoints)))
 
-    const proposeFn = async (proposer: Address, proposeSecond = false) => {
-      if (proposeSecond) {
+    const proposeFn = async (proposer: Address, proposeTwice = false) => {
+      if (proposeTwice) {
         await governance
           .propose(proposal, 'URL')
           .sendAndWaitForReceipt({ from: proposer, value: minDeposit })
