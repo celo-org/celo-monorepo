@@ -19,7 +19,6 @@ library Proposals {
   enum VoteValue { None, Abstain, No, Yes }
 
   struct StageDurations {
-    uint256 approval;
     uint256 referendum;
     uint256 execution;
   }
@@ -240,11 +239,9 @@ library Proposals {
     view
     returns (Stage)
   {
-    uint256 stageStartTime = proposal
-      .timestamp
-      .add(stageDurations.approval)
-      .add(stageDurations.referendum)
-      .add(stageDurations.execution);
+    uint256 stageStartTime = proposal.timestamp.add(stageDurations.referendum).add(
+      stageDurations.execution
+    );
     // solhint-disable-next-line not-rely-on-time
     if (now >= stageStartTime) {
       return Stage.Expiration;

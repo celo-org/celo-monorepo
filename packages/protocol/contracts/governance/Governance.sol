@@ -113,8 +113,6 @@ contract Governance is
 
   event DequeueFrequencySet(uint256 dequeueFrequency);
 
-  event ApprovalStageDurationSet(uint256 approvalStageDuration);
-
   event ReferendumStageDurationSet(uint256 referendumStageDuration);
 
   event ExecutionStageDurationSet(uint256 executionStageDuration);
@@ -215,8 +213,6 @@ contract Governance is
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
    * @param _dequeueFrequency The number of seconds before the next batch of proposals can be
    *   dequeued.
-   * @param approvalStageDuration The number of seconds the approver has to approve a proposal
-   *   after it is dequeued.
    * @param referendumStageDuration The number of seconds users have to vote on a dequeued proposal
    *   after the approval stage ends.
    * @param executionStageDuration The number of seconds users have to execute a passed proposal
@@ -234,7 +230,6 @@ contract Governance is
     uint256 _minDeposit,
     uint256 _queueExpiry,
     uint256 _dequeueFrequency,
-    uint256 approvalStageDuration,
     uint256 referendumStageDuration,
     uint256 executionStageDuration,
     uint256 participationBaseline,
@@ -249,7 +244,6 @@ contract Governance is
     setMinDeposit(_minDeposit);
     setQueueExpiry(_queueExpiry);
     setDequeueFrequency(_dequeueFrequency);
-    setApprovalStageDuration(approvalStageDuration);
     setReferendumStageDuration(referendumStageDuration);
     setExecutionStageDuration(executionStageDuration);
     setParticipationBaseline(participationBaseline);
@@ -315,17 +309,6 @@ contract Governance is
     require(_dequeueFrequency != dequeueFrequency, "dequeueFrequency unchanged");
     dequeueFrequency = _dequeueFrequency;
     emit DequeueFrequencySet(_dequeueFrequency);
-  }
-
-  /**
-   * @notice Updates the number of seconds proposals stay in the approval stage.
-   * @param approvalStageDuration The number of seconds proposals stay in the approval stage.
-   */
-  function setApprovalStageDuration(uint256 approvalStageDuration) public onlyOwner {
-    require(approvalStageDuration > 0, "Duration must be larger than 0");
-    require(approvalStageDuration != stageDurations.approval, "Duration unchanged");
-    stageDurations.approval = approvalStageDuration;
-    emit ApprovalStageDurationSet(approvalStageDuration);
   }
 
   /**
@@ -843,14 +826,6 @@ contract Governance is
     bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
       Proposals.Stage.Referendum);
     return isVotingQueue || isVotingReferendum;
-  }
-
-  /**
-   * @notice Returns the number of seconds proposals stay in approval stage.
-   * @return The number of seconds proposals stay in approval stage.
-   */
-  function getApprovalStageDuration() external view returns (uint256) {
-    return stageDurations.approval;
   }
 
   /**

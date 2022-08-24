@@ -101,7 +101,6 @@ contract('Governance', (accounts: string[]) => {
   const minDeposit = 5
   const queueExpiry = 60 * 60 // 1 hour
   const dequeueFrequency = 10 * 60 // 10 minutes
-  const approvalStageDuration = 1 * 60 // 1 minute
   const referendumStageDuration = 5 * 60 // 5 minutes
   const executionStageDuration = 1 * 60 // 1 minute
   const participationBaseline = toFixed(5 / 10)
@@ -134,7 +133,6 @@ contract('Governance', (accounts: string[]) => {
       minDeposit,
       queueExpiry,
       dequeueFrequency,
-      approvalStageDuration,
       referendumStageDuration,
       executionStageDuration,
       participationBaseline,
@@ -225,10 +223,8 @@ contract('Governance', (accounts: string[]) => {
     })
 
     it('should have set stageDurations', async () => {
-      const actualApprovalStageDuration = await governance.getApprovalStageDuration()
       const actualReferendumStageDuration = await governance.getReferendumStageDuration()
       const actualExecutionStageDuration = await governance.getExecutionStageDuration()
-      assertEqualBN(actualApprovalStageDuration, approvalStageDuration)
       assertEqualBN(actualReferendumStageDuration, referendumStageDuration)
       assertEqualBN(actualExecutionStageDuration, executionStageDuration)
     })
@@ -256,7 +252,6 @@ contract('Governance', (accounts: string[]) => {
           minDeposit,
           queueExpiry,
           dequeueFrequency,
-          approvalStageDuration,
           referendumStageDuration,
           executionStageDuration,
           participationBaseline,
@@ -423,41 +418,6 @@ contract('Governance', (accounts: string[]) => {
 
     it('should revert when called by anyone other than the owner', async () => {
       await assertRevert(governance.setDequeueFrequency(newDequeueFrequency, { from: nonOwner }))
-    })
-  })
-
-  describe('#setApprovalStageDuration', () => {
-    const newApprovalStageDuration = 2
-    it('should set the approval stage duration', async () => {
-      await governance.setApprovalStageDuration(newApprovalStageDuration)
-      const actualApprovalStageDuration = await governance.getApprovalStageDuration()
-      assertEqualBN(actualApprovalStageDuration, newApprovalStageDuration)
-    })
-
-    it('should emit the ApprovalStageDurationSet event', async () => {
-      const resp = await governance.setApprovalStageDuration(newApprovalStageDuration)
-      assert.equal(resp.logs.length, 1)
-      const log = resp.logs[0]
-      assertLogMatches2(log, {
-        event: 'ApprovalStageDurationSet',
-        args: {
-          approvalStageDuration: new BigNumber(newApprovalStageDuration),
-        },
-      })
-    })
-
-    it('should revert when approval stage duration is 0', async () => {
-      await assertRevert(governance.setApprovalStageDuration(0))
-    })
-
-    it('should revert when approval stage duration is unchanged', async () => {
-      await assertRevert(governance.setApprovalStageDuration(approvalStageDuration))
-    })
-
-    it('should revert when called by anyone other than the owner', async () => {
-      await assertRevert(
-        governance.setApprovalStageDuration(newApprovalStageDuration, { from: nonOwner })
-      )
     })
   })
 
@@ -1474,7 +1434,6 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
-        await timeTravel(approvalStageDuration + 1, web3)
       })
 
       it('should return true', async () => {
@@ -1502,7 +1461,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe('when the proposal is past the approval and referendum stage', () => {
+    describe('when the proposal is past the referendum stage', () => {
       beforeEach(async () => {
         // Dequeue the other proposal.
         await governance.propose(
@@ -1515,7 +1474,7 @@ contract('Governance', (accounts: string[]) => {
           // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
-        await timeTravel(approvalStageDuration + referendumStageDuration + 1, web3)
+        await timeTravel(referendumStageDuration + 1, web3)
       })
 
       it('should return false', async () => {
@@ -1587,7 +1546,6 @@ contract('Governance', (accounts: string[]) => {
       await governance.approve(1, 0)
       await governance.approve(2, 1)
       await governance.approve(3, 2)
-      await timeTravel(approvalStageDuration, web3)
       await mockLockedGold.setAccountTotalLockedGold(account, weight)
     })
 
@@ -1655,7 +1613,6 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await timeTravel(approvalStageDuration, web3)
         await mockLockedGold.setAccountTotalLockedGold(account, weight)
       })
 
@@ -1761,7 +1718,6 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(newDequeueFrequency, web3)
           await governance.approve(proposalId2, index2)
-          await timeTravel(approvalStageDuration, web3)
           await mockLockedGold.setAccountTotalLockedGold(account, weight)
         })
 
@@ -1921,7 +1877,6 @@ contract('Governance', (accounts: string[]) => {
           { value: minDeposit }
         )
         await timeTravel(dequeueFrequency, web3)
-        await timeTravel(approvalStageDuration, web3)
         await mockLockedGold.setAccountTotalLockedGold(account, weight)
       })
 
@@ -2018,7 +1973,6 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await timeTravel(approvalStageDuration, web3)
           await mockLockedGold.setAccountTotalLockedGold(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
@@ -2088,7 +2042,6 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await timeTravel(approvalStageDuration, web3)
           await mockLockedGold.setAccountTotalLockedGold(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
@@ -2113,7 +2066,6 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await timeTravel(approvalStageDuration, web3)
           await mockLockedGold.setAccountTotalLockedGold(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
@@ -2140,7 +2092,6 @@ contract('Governance', (accounts: string[]) => {
           )
           await timeTravel(dequeueFrequency, web3)
           await governance.approve(proposalId, index)
-          await timeTravel(approvalStageDuration, web3)
           await mockLockedGold.setAccountTotalLockedGold(account, weight)
           await governance.vote(proposalId, index, value)
           await timeTravel(referendumStageDuration, web3)
@@ -2208,7 +2159,6 @@ contract('Governance', (accounts: string[]) => {
             )
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
-            await timeTravel(approvalStageDuration, web3)
             await mockLockedGold.setAccountTotalLockedGold(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
@@ -2233,7 +2183,6 @@ contract('Governance', (accounts: string[]) => {
             )
             await timeTravel(dequeueFrequency, web3)
             await governance.approve(proposalId, index)
-            await timeTravel(approvalStageDuration, web3)
             await mockLockedGold.setAccountTotalLockedGold(account, weight)
             await governance.vote(proposalId, index, value)
             await timeTravel(referendumStageDuration, web3)
@@ -2260,7 +2209,6 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await timeTravel(approvalStageDuration, web3)
         await mockLockedGold.setAccountTotalLockedGold(account, weight)
         await governance.vote(proposalId, index, value)
         await timeTravel(referendumStageDuration, web3)
@@ -2631,7 +2579,6 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         await governance.approve(proposalId, index)
-        await timeTravel(approvalStageDuration, web3)
         await mockLockedGold.setAccountTotalLockedGold(account, weight)
         await governance.vote(proposalId, index, value)
       })
@@ -2669,7 +2616,6 @@ contract('Governance', (accounts: string[]) => {
       )
       await timeTravel(dequeueFrequency, web3)
       await governance.approve(proposalId, index)
-      await timeTravel(approvalStageDuration, web3)
     })
 
     describe('when the adjusted support is greater than threshold', () => {
@@ -2754,9 +2700,7 @@ contract('Governance', (accounts: string[]) => {
 
         describe('when in referendum stage', () => {
           describe('when not approved', () => {
-            beforeEach(async () => {
-              await timeTravel(approvalStageDuration + 1, web3)
-            })
+            beforeEach(async () => {})
 
             it('should return Referendum when not voted and not expired', () =>
               expectStage(Stage.Referendum, proposalId))
@@ -2775,7 +2719,6 @@ contract('Governance', (accounts: string[]) => {
           describe('when approved', () => {
             beforeEach(async () => {
               await governance.approve(proposalId, index)
-              await timeTravel(approvalStageDuration, web3)
             })
 
             it('should return Referendum when not expired', () =>
@@ -2791,7 +2734,6 @@ contract('Governance', (accounts: string[]) => {
         describe('when in execution stage', () => {
           beforeEach(async () => {
             await governance.approve(proposalId, index)
-            await timeTravel(approvalStageDuration, web3)
             await governance.vote(proposalId, index, VoteValue.Yes)
             const passing = await governance.isProposalPassing(proposalId)
             assert.isTrue(passing, 'proposal not passing')
