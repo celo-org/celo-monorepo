@@ -184,8 +184,8 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   async stageDurations(): Promise<DequeuedStageDurations> {
     const res = await this.contract.methods.stageDurations().call()
     return {
-      [ProposalStage.Referendum]: valueToBigNumber(res[0]),
-      [ProposalStage.Execution]: valueToBigNumber(res[1]),
+      [ProposalStage.Referendum]: valueToBigNumber(res[1]),
+      [ProposalStage.Execution]: valueToBigNumber(res[2]),
     }
   }
 

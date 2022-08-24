@@ -19,6 +19,7 @@ library Proposals {
   enum VoteValue { None, Abstain, No, Yes }
 
   struct StageDurations {
+    uint256 approval;
     uint256 referendum;
     uint256 execution;
   }
