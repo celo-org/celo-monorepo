@@ -1,9 +1,16 @@
+export enum SignerEndpointCommon {
+  METRICS = '/metrics',
+  STATUS = '/status',
+}
+
 export enum SignerEndpointPNP {
   LEGACY_PNP_SIGN = '/getBlindedMessagePartialSig',
   LEGACY_PNP_QUOTA = '/getQuota',
   PNP_QUOTA = '/quotaStatus',
   PNP_SIGN = '/sign',
-  METRICS = '/metrics',
+}
+
+export enum CombinerEndpointCommon {
   STATUS = '/status',
 }
 
@@ -12,6 +19,7 @@ export enum CombinerEndpointPNP {
   PNP_QUOTA = '/quotaStatus',
   PNP_SIGN = '/sign',
   MATCHMAKING = '/getContactMatches',
+  STATUS = '/status',
 }
 
 export enum DomainEndpoint {
@@ -20,11 +28,15 @@ export enum DomainEndpoint {
   DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
 }
 
-export type SignerEndpoint = SignerEndpointPNP | DomainEndpoint
-export const SignerEndpoint = { ...SignerEndpointPNP, ...DomainEndpoint }
+export type SignerEndpoint = SignerEndpointCommon | SignerEndpointPNP | DomainEndpoint
+export const SignerEndpoint = { ...SignerEndpointCommon, ...SignerEndpointPNP, ...DomainEndpoint }
 
-export type CombinerEndpoint = CombinerEndpointPNP | DomainEndpoint
-export const CombinerEndpoint = { ...CombinerEndpointPNP, ...DomainEndpoint }
+export type CombinerEndpoint = CombinerEndpointCommon | CombinerEndpointPNP | DomainEndpoint
+export const CombinerEndpoint = {
+  ...CombinerEndpointCommon,
+  ...CombinerEndpointPNP,
+  ...DomainEndpoint,
+}
 
 export type Endpoint = SignerEndpoint | CombinerEndpoint
 export const Endpoint = { ...SignerEndpoint, ...CombinerEndpoint }

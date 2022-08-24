@@ -19,7 +19,7 @@ export function getContractKit(config: SignerConfig): ContractKit {
 
 declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
 
-// TODO(Alec): use this elsewhere
+// TODO(2.0.0, metering): use this elsewhere
 export async function meter<T extends any[], U>(
   inFunction: InFunction<T, U>,
   params: T,

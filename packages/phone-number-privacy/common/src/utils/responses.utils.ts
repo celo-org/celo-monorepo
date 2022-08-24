@@ -2,7 +2,7 @@ import Logger from 'bunyan'
 import { Response } from 'express'
 import { FailureResponse, OdisRequest, OdisResponse, WarningMessage } from '..'
 
-// TODO: remove this once it is no longer being used by matchmaking
+// TODO(2.0.0, deployment) remove this once it is no longer being used by matchmaking
 export function respondWithError(
   response: Response,
   body: FailureResponse,

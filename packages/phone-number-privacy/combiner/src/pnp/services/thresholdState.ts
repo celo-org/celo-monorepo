@@ -32,7 +32,7 @@ export class CombinerThresholdStateService<R extends PnpQuotaRequest> {
     const thresholdSigner = sortedResponses[threshold - 1]
     return {
       performedQueryCount: thresholdSigner.performedQueryCount,
-      // TODO: address scenario where total quota is inconsistent between signers
+      // TODO(2.0.0, refactor) address scenario where total quota is inconsistent between signers
       totalQuota: thresholdSigner.totalQuota,
       blockNumber: thresholdSigner.blockNumber,
     }

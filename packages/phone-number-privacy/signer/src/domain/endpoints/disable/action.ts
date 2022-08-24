@@ -13,7 +13,7 @@ import { DomainSession } from '../../session'
 import { DomainDisableIO } from './io'
 
 export class DomainDisableAction implements Action<DisableDomainRequest> {
-  constructor(readonly config: SignerConfig, readonly io: DomainDisableIO, readonly db: Knex) {}
+  constructor(readonly db: Knex, readonly config: SignerConfig, readonly io: DomainDisableIO) {}
 
   public async perform(session: DomainSession<DisableDomainRequest>): Promise<void> {
     const domain = session.request.body.domain

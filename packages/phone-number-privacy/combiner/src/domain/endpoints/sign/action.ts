@@ -26,7 +26,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
   }
 
   combine(session: CryptoSession<DomainRestrictedSignatureRequest>): void {
-    // this.logResponseDiscrepancies(session) // TODO(Alec)
+    // this.logResponseDiscrepancies(session) // TODO(2.0.0, logging)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
@@ -57,7 +57,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
   protected logResponseDiscrepancies(
     _session: CryptoSession<DomainRestrictedSignatureRequest>
   ): void {
-    // TODO
+    // TODO(2.0.0, logging)
     throw new Error('Method not implemented.')
   }
 

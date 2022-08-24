@@ -58,11 +58,10 @@ export abstract class IO<R extends OdisRequest> {
     return this.requestSchema.is(request.body)
   }
 
-  // TODO(Alec): why is session sometimes passed in and logger other times?
-  validateSignerResponse(data: string, url: string, session: Session<R>): OdisResponse<R> {
+  validateSignerResponse(data: string, url: string, logger: Logger): OdisResponse<R> {
     const res: unknown = JSON.parse(data)
     if (!this.responseSchema.is(res)) {
-      session.logger.error(
+      logger.error(
         { data, signer: url },
         `Signer request to ${url + this.signerEndpoint} returned malformed response`
       )
@@ -71,6 +70,7 @@ export abstract class IO<R extends OdisRequest> {
     return res
   }
 
+  // TODO(2.0.0, refactor) move to common pkg??
   requestHasValidKeyVersion(request: Request<{}, {}, R>, logger: Logger): boolean {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
     if (keyVersionHeader === undefined) {
@@ -86,6 +86,7 @@ export abstract class IO<R extends OdisRequest> {
     return isValid
   }
 
+  // TODO(2.0.0, refactor) move to common pkg??
   getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
     if (keyVersionHeader === undefined) {
@@ -117,6 +118,7 @@ export abstract class IO<R extends OdisRequest> {
     return isValid
   }
 
+  // TODO(2.0.0, refactor) move to common pkg??
   getResponseKeyVersion(response: FetchResponse, logger: Logger): number | undefined {
     const keyVersionHeader = response.headers.get(KEY_VERSION_HEADER)
     if (keyVersionHeader === undefined) {
@@ -137,7 +139,7 @@ export abstract class IO<R extends OdisRequest> {
     signer: Signer,
     session: Session<R>
   ): Promise<FetchResponse> {
-    // TODO: Factor out this metering code
+    // TODO(2.0.0, metering) Factor out this metering code
     const start = `Start ${signer.url + this.signerEndpoint}`
     const end = `End ${signer.url + this.signerEndpoint}`
     performance.mark(start)

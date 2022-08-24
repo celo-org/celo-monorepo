@@ -130,7 +130,7 @@ export const config: SignerConfig = {
     numberAttestationsRequired: Number(env.ATTESTATIONS_NUMBER_ATTESTATIONS_REQUIRED ?? 3),
   },
   blockchain: {
-    provider: env.BLOCKCHAIN_PROVIDER, // TODO(Alec)
+    provider: env.BLOCKCHAIN_PROVIDER,
     apiKey: env.BLOCKCHAIN_API_KEY,
   },
   db: {

@@ -86,7 +86,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
         performedQueryCount,
         totalQuota,
         blockNumber,
-        warnings, // TODO(Alec)(pnp): update handling of these types in combiner
+        warnings, // TODO(2.0.0): update handling of these types in combiner
       },
       status,
       response.locals.logger

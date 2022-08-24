@@ -9,7 +9,7 @@ import {
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import { CombinerConfig } from '.'
+import { CombinerConfig, VERSION } from '.'
 import { Controller } from './common/controller'
 import { getContractKit } from './common/web3/contracts'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
@@ -33,13 +33,13 @@ export function startCombiner(config: CombinerConfig) {
 
   logger.info('Creating combiner express server')
   const app = express()
-  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName)) // TODO(Alec): get logger to show accurate serviceName
+  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName)) // TODO(2.0.0, logging) get logger to show accurate serviceName
 
-  // app.get(CombinerEndpoint.STATUS, (_req, res) => {
-  //   res.status(200).json({
-  //     version: getVersion(),
-  //   })
-  // })
+  app.get(CombinerEndpoint.STATUS, (_req, res) => {
+    res.status(200).json({
+      version: VERSION,
+    })
+  })
 
   const kit: ContractKit = getContractKit(config.blockchain)
 

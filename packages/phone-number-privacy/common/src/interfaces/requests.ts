@@ -28,7 +28,7 @@ export enum AuthenticationMethod {
   ENCRYPTION_KEY = 'encryption_key',
 }
 
-// TODO(Alec): investigate alias in sdk/identity
+// TODO(2.0.0, refactor): investigate alias in sdk/identity
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */
   account: string

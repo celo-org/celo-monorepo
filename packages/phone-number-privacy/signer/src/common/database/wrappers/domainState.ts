@@ -4,9 +4,9 @@ import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../../common/metrics'
 import {
+  DomainStateRecord,
   DOMAIN_STATE_COLUMNS,
   DOMAIN_STATE_TABLE,
-  DomainStateRecord,
   toDomainStateRecord,
 } from '../models/domainState'
 
@@ -107,7 +107,7 @@ export async function updateDomainStateRecord<D extends Domain>(
   logger.debug({ hash, domain, domainState }, 'Update domain state')
   try {
     // Check whether the domain is already in the database.
-    // TODO(victor): Usage of this in the signature flow results in redudant queries of the current
+    // TODO(2.0.0, refactor): Usage of this in the signature flow results in redudant queries of the current
     // state. It would be good to refactor this to avoid making more than one SELECT.
     const result = await getDomainStateRecord(db, domain, logger, trx)
 

@@ -20,7 +20,7 @@ import { DomainQuotaService } from '../../services/quota'
 import { DomainSession } from '../../session'
 import { DomainSignIO } from './io'
 
-// TODO(Alec): find a cleaner way to do this
+// TODO(2.0.0, refactor): find a cleaner way to do this
 type TrxResult =
   | {
       success: false

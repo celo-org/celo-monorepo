@@ -120,12 +120,12 @@ const signerConfig: SignerConfig = {
   test_quota_bypass_percentage: 0,
 }
 
-// TODO: Add checking of values beyond the return code.
+// TODO(2.0.0, testing) Add checking of values beyond the return code.
 
 describe('domainService', () => {
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
-  const walletAddress = wallet.getAccounts()[0]! // TODO(Alec): do we need this?
+  const walletAddress = wallet.getAccounts()[0]!
 
   const domainStages = (): SequentialDelayStage[] => [
     { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) },
@@ -353,7 +353,7 @@ describe('domainService', () => {
       })
     })
 
-    // TODO: test this with signers disabled too
+    // TODO(2.0.0, testing) test this with signers disabled too
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled = combinerConfig
       configWithApiDisabled.domains.enabled = false
@@ -709,7 +709,7 @@ describe('domainService', () => {
     })
 
     it('Should respond with 400 on invalid key version', async () => {
-      // TODO(Alec): Implement new error for unsupported key versions
+      // TODO(2.0.0, refactor): Implement new error for unsupported key versions
       const [badRequest, _] = await signatureRequest()
 
       const res = await request(app)
@@ -768,7 +768,6 @@ describe('domainService', () => {
 
     it('Should respond with 429 on out of quota', async () => {
       const noQuotaDomain = authenticatedDomain([
-        // TODO(Alec): add better spec tests for rate limiting algorithm
         { delay: 0, resetTimer: noBool, batchSize: defined(0), repetitions: defined(0) },
       ])
       const [badRequest, _] = await signatureRequest(noQuotaDomain)
@@ -826,9 +825,8 @@ describe('domainService', () => {
 
   /*
 
-  TODO(Alec): check code coverage
+  TODO(2.0.0): check code coverage
 
-  [ ] Add TODOs for all ODIS tests that remain to be written
 [ ] Bad signature (combiner + signer)
 [ ] Bad encoding (combiner + signer)
 [ ] Undefined domain (combiner + signer)

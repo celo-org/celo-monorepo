@@ -30,7 +30,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
   }
 
   async distribute(session: Session<R>): Promise<Session<R>> {
-    // TODO: Factor out this metering code
+    // TODO(2.0.0, metering) Factor out this metering code
     const obs = new PerformanceObserver((list) => {
       const entry = list.getEntries()[0]
       session.logger.info(
@@ -103,7 +103,11 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     const { status } = signerFetchResult
     const data: string = await signerFetchResult.text()
     session.logger.info({ signer: url, res: data, status }, `received 'OK' response from signer`)
-    const signerResponse: OdisResponse<R> = this.io.validateSignerResponse(data, url, session)
+    const signerResponse: OdisResponse<R> = this.io.validateSignerResponse(
+      data,
+      url,
+      session.logger
+    )
     if (!signerResponse.success) {
       session.logger.error(
         { error: signerResponse.error, signer: url, status },

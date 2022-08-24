@@ -39,6 +39,7 @@ export abstract class IO<R extends OdisRequest> {
     ...args: unknown[]
   ): void
 
+  // TODO(2.0.0, refactor) move to common pkg??
   requestHasValidKeyVersion(request: Request<{}, {}, R>, logger: Logger): boolean {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
     if (keyVersionHeader === undefined) {
@@ -54,6 +55,7 @@ export abstract class IO<R extends OdisRequest> {
     return isValid
   }
 
+  // TODO(2.0.0, refactor) move to common pkg??
   getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
     if (keyVersionHeader === undefined) {

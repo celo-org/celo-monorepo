@@ -30,7 +30,7 @@ export class BLSCryptographyClient extends CryptoClient {
     // If combination or verification fails, iterate through each signature and remove invalid ones
     // We do this since partial signature verification incurs higher latencies
     try {
-      const result = threshold_bls.combine(this.config.keys.threshold, this.allSignatures) // TODO(Alec)(Next): This is throwing an error. We probably need to import in and use the new crypto client
+      const result = threshold_bls.combine(this.config.keys.threshold, this.allSignatures)
       this.verifyCombinedSignature(blindedMessage, result, logger)
       return Buffer.from(result).toString('base64')
     } catch (error) {

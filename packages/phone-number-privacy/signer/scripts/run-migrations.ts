@@ -1,10 +1,12 @@
 // tslint:disable: no-console
-import { initDatabase } from '../src/database/database'
+
+import { initDatabase } from '../src/common/database/database'
+import { config } from '../src/config'
 
 async function start() {
   console.info('Running migrations')
   console.warn('It is no longer necessary to run db migrations seperately prior to startup')
-  await initDatabase(false)
+  await initDatabase(config, undefined, false)
 }
 
 start()

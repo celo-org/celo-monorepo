@@ -62,7 +62,7 @@ export async function initDatabase(
     client,
     useNullAsDefault: type === SupportedDatabase.Sqlite,
     connection,
-    debug: false && DEV_MODE,
+    debug: false && DEV_MODE, // TODO(2.0.0, refactor) why is this 'false' here
   })
 
   logger.info('Running Migrations')

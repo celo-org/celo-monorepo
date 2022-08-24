@@ -1,5 +1,4 @@
 // tslint:disable: no-console
-// TODO de-dupe with signer script
 import knex from 'knex'
 import config from '../src/config'
 
