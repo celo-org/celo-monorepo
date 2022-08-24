@@ -121,7 +121,7 @@ remote_write:
               |container_cpu_user_seconds_total\
               |container_file_.+\
               |container_fs_.+\
-              |container_memory_[^w].*\
+              |container_memory_[^wu].*\
               |container_last_.+\
               |container_network_.+\
               |container_processes\
@@ -167,10 +167,14 @@ remote_write:
               |kube_pod_status_ready\
               |kube_pod_status_scheduled\
               |kube_pod_status_scheduled_time\
-              |kube_pod_status_phase\
-              |kube_pod_container_[^r].+\
+              |kube_pod_container_[^rs].+\
+              |kube_pod_container_state.+\
               |kube_pod_container_status_last_terminated_reason\
+              |kube_pod_container_status_ready\
+              |kube_pod_container_status_running\
+              |kube_pod_container_status_terminated\
               |kube_pod_container_status_terminated_reason\
+              |kube_pod_container_status_waiting\
               |kube_pod_container_status_waiting_reason\
               |kube_replicaset.*\
               |kube_resourcequota.*\
