@@ -196,7 +196,7 @@ contract('Governance', (accounts: string[]) => {
     hotfixHashStr = '0x' + hotfixHash.toString('hex')
   })
 
-  describe.skip('#initialize()', () => {
+  describe('#initialize()', () => {
     it('should have set the owner', async () => {
       const owner: string = await governance.owner()
       assert.equal(owner, accounts[0])
@@ -263,7 +263,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setApprover', () => {
+  describe('#setApprover', () => {
     const newApprover = accounts[2]
     it('should set the approver', async () => {
       await governance.setApprover(newApprover)
@@ -295,7 +295,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setMinDeposit', () => {
+  describe('#setMinDeposit', () => {
     const newMinDeposit = 1
     it('should set the minimum deposit', async () => {
       await governance.setMinDeposit(newMinDeposit)
@@ -323,7 +323,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setConcurrentProposals', () => {
+  describe('#setConcurrentProposals', () => {
     const newConcurrentProposals = 2
     it('should set the concurrent proposals', async () => {
       await governance.setConcurrentProposals(newConcurrentProposals)
@@ -357,7 +357,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setQueueExpiry', () => {
+  describe('#setQueueExpiry', () => {
     const newQueueExpiry = 2
     it('should set the queue expiry', async () => {
       await governance.setQueueExpiry(newQueueExpiry)
@@ -389,7 +389,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setDequeueFrequency', () => {
+  describe('#setDequeueFrequency', () => {
     const newDequeueFrequency = 2
     it('should set the dequeue frequency', async () => {
       await governance.setDequeueFrequency(newDequeueFrequency)
@@ -421,7 +421,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setReferendumStageDuration', () => {
+  describe('#setReferendumStageDuration', () => {
     const newReferendumStageDuration = 2
     it('should set the referendum stage duration', async () => {
       await governance.setReferendumStageDuration(newReferendumStageDuration)
@@ -456,7 +456,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setExecutionStageDuration', () => {
+  describe('#setExecutionStageDuration', () => {
     const newExecutionStageDuration = 2
     it('should set the execution stage duration', async () => {
       await governance.setExecutionStageDuration(newExecutionStageDuration)
@@ -491,7 +491,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setParticipationFloor', () => {
+  describe('#setParticipationFloor', () => {
     const differentParticipationFloor = toFixed(2 / 100)
 
     it('should set the participation floor', async () => {
@@ -523,7 +523,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setBaselineUpdateFactor', () => {
+  describe('#setBaselineUpdateFactor', () => {
     const differentBaselineUpdateFactor = toFixed(2 / 5)
 
     it('should set the participation update coefficient', async () => {
@@ -555,7 +555,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#setBaselineQuorumFactor', () => {
+  describe('#setBaselineQuorumFactor', () => {
     const differentBaselineQuorumFactor = toFixed(8 / 10)
 
     it('should set the critical baseline level', async () => {
@@ -588,7 +588,7 @@ contract('Governance', (accounts: string[]) => {
   })
 
   // TODO(asa): Verify that when we set the constitution for a function ID then the proper constitution is applied to a proposal.
-  describe.skip('#setConstitution', () => {
+  describe('#setConstitution', () => {
     const threshold = toFixed(2 / 3)
     let functionId
     let differentFunctionId
@@ -598,7 +598,7 @@ contract('Governance', (accounts: string[]) => {
       destination = governance.address
     })
 
-    describe.skip('when the function id is 0', () => {
+    describe('when the function id is 0', () => {
       beforeEach(() => {
         functionId = nullFunctionId
         differentFunctionId = '0x12345678'
@@ -628,7 +628,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when the function id is not 0', () => {
+    describe('when the function id is not 0', () => {
       beforeEach(() => {
         functionId = '0x87654321'
         differentFunctionId = '0x12345678'
@@ -688,7 +688,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#propose()', () => {
+  describe('#propose()', () => {
     const proposalId = 1
 
     it('should return the proposal id', async () => {
@@ -736,7 +736,7 @@ contract('Governance', (accounts: string[]) => {
       assertEqualBN(upvotes[0], 0)
     })
 
-    describe.skip('when making a proposal with zero transactions', () => {
+    describe('when making a proposal with zero transactions', () => {
       it('should register the proposal', async () => {
         // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
         await governance.propose([], [], [], [], descriptionUrl, { value: minDeposit })
@@ -768,7 +768,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when making a proposal with one transaction', () => {
+    describe('when making a proposal with one transaction', () => {
       it('should register the proposal', async () => {
         await governance.propose(
           [transactionSuccess1.value],
@@ -852,7 +852,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when making a proposal with two transactions', () => {
+    describe('when making a proposal with two transactions', () => {
       it('should register the proposal', async () => {
         await governance.propose(
           [transactionSuccess1.value, transactionSuccess2.value],
@@ -929,7 +929,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when it has been more than dequeueFrequency since the last dequeue', () => {
+    describe('when it has been more than dequeueFrequency since the last dequeue', () => {
       beforeEach(async () => {
         await governance.propose(
           [transactionSuccess1.value],
@@ -962,7 +962,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#upvote()', () => {
+  describe('#upvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
       await mockLockedGold.setAccountTotalLockedGold(account, weight)
@@ -1013,7 +1013,7 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.upvote(proposalId.plus(1), 0, 0))
     })
 
-    describe.skip('when the upvoted proposal is at the end of the queue', () => {
+    describe('when the upvoted proposal is at the end of the queue', () => {
       const upvotedProposalId = 2
       beforeEach(async () => {
         await governance.propose(
@@ -1036,7 +1036,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when the upvoted proposal is expired', () => {
+    describe('when the upvoted proposal is expired', () => {
       const otherProposalId = 2
       beforeEach(async () => {
         // Prevent dequeues for the sake of this test.
@@ -1086,7 +1086,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when it has been more than dequeueFrequency since the last dequeue', () => {
+    describe('when it has been more than dequeueFrequency since the last dequeue', () => {
       const upvotedProposalId = 2
       beforeEach(async () => {
         await governance.propose(
@@ -1118,7 +1118,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when the previously upvoted proposal is in the queue and expired', () => {
+    describe('when the previously upvoted proposal is in the queue and expired', () => {
       const upvotedProposalId = 2
       // Expire the upvoted proposal without dequeueing it.
       const queueExpiry1 = 60
@@ -1182,7 +1182,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#revokeUpvote()', () => {
+  describe('#revokeUpvote()', () => {
     const proposalId = new BigNumber(1)
     beforeEach(async () => {
       await mockLockedGold.setAccountTotalLockedGold(account, weight)
@@ -1235,7 +1235,7 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.revokeUpvote(0, 0))
     })
 
-    describe.skip('when the upvoted proposal has expired', () => {
+    describe('when the upvoted proposal has expired', () => {
       beforeEach(async () => {
         await timeTravel(queueExpiry, web3)
       })
@@ -1268,7 +1268,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when it has been more than dequeueFrequency since the last dequeue', () => {
+    describe('when it has been more than dequeueFrequency since the last dequeue', () => {
       beforeEach(async () => {
         await timeTravel(dequeueFrequency, web3)
       })
@@ -1289,7 +1289,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#withdraw()', () => {
+  describe('#withdraw()', () => {
     const proposalId = 1
     const index = 0
     beforeEach(async () => {
@@ -1307,7 +1307,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.approve(proposalId, index)
     })
 
-    describe.skip('when the caller was the proposer of a dequeued proposal', () => {
+    describe('when the caller was the proposer of a dequeued proposal', () => {
       it('should return true', async () => {
         // @ts-ignore
         const success = await governance.withdraw.call()
@@ -1421,7 +1421,7 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.approve(proposalId, index))
     })
 
-    describe.skip('when the proposal is within referendum stage', () => {
+    describe('when the proposal is within referendum stage', () => {
       beforeEach(async () => {
         // Dequeue the other proposal.
         await governance.propose(
@@ -1509,7 +1509,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#revokeVotes()', () => {
+  describe('#revokeVotes()', () => {
     beforeEach(async () => {
       await governance.setConcurrentProposals(3)
       await governance.propose(
@@ -1550,7 +1550,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     for (let numVoted = 0; numVoted < 3; numVoted++) {
-      describe.skip(`when account has voted on ${numVoted} proposals`, () => {
+      describe(`when account has voted on ${numVoted} proposals`, () => {
         const value = VoteValue.Yes
         beforeEach(async () => {
           for (let i = 0; i < numVoted; i++) {
@@ -1594,12 +1594,12 @@ contract('Governance', (accounts: string[]) => {
     }
   })
 
-  describe.skip('#vote()', () => {
+  describe('#vote()', () => {
     const proposalId = 1
     const index = 0
     const value = VoteValue.Yes
 
-    describe.skip('when proposal is approved', () => {
+    describe('when proposal is approved', () => {
       beforeEach(async () => {
         await governance.propose(
           [transactionSuccess1.value],
@@ -1686,7 +1686,7 @@ contract('Governance', (accounts: string[]) => {
         await assertRevert(governance.vote(otherProposalId, index, value))
       })
 
-      describe.skip('when voting on two proposals', () => {
+      describe('when voting on two proposals', () => {
         const proposalId1 = 2
         const proposalId2 = 3
         const index1 = 1
@@ -1735,7 +1735,7 @@ contract('Governance', (accounts: string[]) => {
           assert.isTrue(voting)
         })
 
-        describe.skip('after the first proposal expires', () => {
+        describe('after the first proposal expires', () => {
           beforeEach(async () => {
             await governance.vote(proposalId2, index2, value)
             await governance.vote(proposalId1, index1, value)
@@ -1755,7 +1755,7 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      describe.skip('when the account has already voted on this proposal', () => {
+      describe('when the account has already voted on this proposal', () => {
         const revoteTests = (oldValue, newValue) => {
           it('should decrement the vote total from the previous vote', async () => {
             await governance.vote(proposalId, index, newValue)
@@ -1777,7 +1777,7 @@ contract('Governance', (accounts: string[]) => {
           })
         }
 
-        describe.skip('when the account has already voted yes on this proposal', () => {
+        describe('when the account has already voted yes on this proposal', () => {
           beforeEach(async () => {
             await governance.vote(proposalId, index, VoteValue.Yes)
           })
@@ -1785,7 +1785,7 @@ contract('Governance', (accounts: string[]) => {
           revoteTests(VoteValue.Yes, VoteValue.No)
         })
 
-        describe.skip('when the account has already voted no on this proposal', () => {
+        describe('when the account has already voted no on this proposal', () => {
           beforeEach(async () => {
             await governance.vote(proposalId, index, VoteValue.No)
           })
@@ -1793,7 +1793,7 @@ contract('Governance', (accounts: string[]) => {
           revoteTests(VoteValue.No, VoteValue.Abstain)
         })
 
-        describe.skip('when the account has already voted abstain on this proposal', () => {
+        describe('when the account has already voted abstain on this proposal', () => {
           beforeEach(async () => {
             await governance.vote(proposalId, index, VoteValue.Abstain)
           })
@@ -1802,7 +1802,7 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      describe.skip('when the proposal is past the referendum stage and passing', () => {
+      describe('when the proposal is past the referendum stage and passing', () => {
         beforeEach(async () => {
           await governance.vote(proposalId, index, VoteValue.Yes)
           await timeTravel(referendumStageDuration, web3)
@@ -1813,7 +1813,7 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      describe.skip('when the proposal is past the referendum stage and failing', () => {
+      describe('when the proposal is past the referendum stage and failing', () => {
         beforeEach(async () => {
           await governance.vote(proposalId, index, VoteValue.No)
           await timeTravel(referendumStageDuration, web3)
@@ -1864,7 +1864,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when proposal is not approved', () => {
+    describe('when proposal is not approved', () => {
       beforeEach(async () => {
         await governance.propose(
           [transactionSuccess1.value],
@@ -1959,7 +1959,7 @@ contract('Governance', (accounts: string[]) => {
     const value = VoteValue.Yes
 
     describe('when executing a proposal with one transaction', () => {
-      describe.skip('when the proposal can execute successfully', () => {
+      describe('when the proposal can execute successfully', () => {
         beforeEach(async () => {
           await governance.propose(
             [transactionSuccess1.value],
@@ -2097,7 +2097,7 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      describe.skip('when the proposal cannot execute successfully', () => {
+      describe('when the proposal cannot execute successfully', () => {
         beforeEach(async () => {
           await governance.propose(
             [transactionFail.value],
@@ -2121,7 +2121,7 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      describe.skip('when the proposal cannot execute because it is not a contract address', () => {
+      describe('when the proposal cannot execute because it is not a contract address', () => {
         beforeEach(async () => {
           await governance.propose(
             [transactionSuccess1.value],
@@ -2146,8 +2146,8 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when executing a proposal with two transactions', () => {
-      describe.skip('when the proposal can execute successfully', () => {
+    describe('when executing a proposal with two transactions', () => {
+      describe('when the proposal can execute successfully', () => {
         beforeEach(async () => {
           await governance.propose(
             [transactionSuccess1.value, transactionSuccess2.value],
@@ -2213,8 +2213,8 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      describe.skip('when the proposal cannot execute successfully', () => {
-        describe.skip('when the first transaction cannot execute', () => {
+      describe('when the proposal cannot execute successfully', () => {
+        describe('when the first transaction cannot execute', () => {
           beforeEach(async () => {
             await governance.propose(
               [transactionSuccess1.value, transactionFail.value],
@@ -2238,7 +2238,7 @@ contract('Governance', (accounts: string[]) => {
           })
         })
 
-        describe.skip('when the second transaction cannot execute', () => {
+        describe('when the second transaction cannot execute', () => {
           beforeEach(async () => {
             await governance.propose(
               [transactionFail.value, transactionSuccess1.value],
@@ -2264,7 +2264,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when the proposal is past the execution stage', () => {
+    describe('when the proposal is past the execution stage', () => {
       beforeEach(async () => {
         await governance.propose(
           [transactionSuccess1.value],
@@ -2329,7 +2329,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#approveHotfix()', () => {
+  describe('#approveHotfix()', () => {
     it('should mark the hotfix record approved when called by approver', async () => {
       await governance.approveHotfix(hotfixHashStr, { from: approver })
       const [approved, ,] = await governance.getHotfixRecord.call(hotfixHashStr)
@@ -2354,7 +2354,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#whitelistHotfix()', () => {
+  describe('#whitelistHotfix()', () => {
     beforeEach(async () => {
       // from GovernanceTest
       await governance.addValidator(accounts[2])
@@ -2376,7 +2376,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#hotfixWhitelistValidatorTally', () => {
+  describe('#hotfixWhitelistValidatorTally', () => {
     const newHotfixHash = '0x' + keccak256('celo bug fix').toString('hex')
 
     const validators = zip(
@@ -2432,7 +2432,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#isHotfixPassing', () => {
+  describe('#isHotfixPassing', () => {
     beforeEach(async () => {
       await governance.addValidator(accounts[2])
       await governance.addValidator(accounts[3])
@@ -2459,7 +2459,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#prepareHotfix()', () => {
+  describe('#prepareHotfix()', () => {
     beforeEach(async () => {
       await governance.addValidator(accounts[2])
       await accountsInstance.createAccount({ from: accounts[2] })
@@ -2469,7 +2469,7 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(governance.prepareHotfix(hotfixHashStr))
     })
 
-    describe.skip('when hotfix is passing', () => {
+    describe('when hotfix is passing', () => {
       beforeEach(async () => {
         await mineToNextEpoch(web3)
         await governance.whitelistHotfix(hotfixHashStr, { from: accounts[2] })
@@ -2510,7 +2510,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#executeHotfix()', () => {
+  describe('#executeHotfix()', () => {
     const executeHotfixTx = () =>
       governance.executeHotfix(
         [transactionSuccess1.value],
@@ -2541,7 +2541,7 @@ contract('Governance', (accounts: string[]) => {
       await assertRevert(executeHotfixTx())
     })
 
-    describe.skip('when hotfix is approved and prepared for current epoch', () => {
+    describe('when hotfix is approved and prepared for current epoch', () => {
       beforeEach(async () => {
         await governance.approveHotfix(hotfixHashStr, { from: approver })
         await mineToNextEpoch(web3)
@@ -2582,14 +2582,14 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#isVoting()', () => {
-    describe.skip('when the account has never acted on a proposal', () => {
+  describe('#isVoting()', () => {
+    describe('when the account has never acted on a proposal', () => {
       it('should return false', async () => {
         assert.isFalse(await governance.isVoting(account))
       })
     })
 
-    describe.skip('when the account has upvoted a proposal', () => {
+    describe('when the account has upvoted a proposal', () => {
       const proposalId = 1
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(account, weight)
@@ -2610,7 +2610,7 @@ contract('Governance', (accounts: string[]) => {
         assert.isTrue(await governance.isVoting(account))
       })
 
-      describe.skip('when that upvote has been revoked', () => {
+      describe('when that upvote has been revoked', () => {
         beforeEach(async () => {
           await governance.revokeUpvote(0, 0)
         })
@@ -2620,7 +2620,7 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      describe.skip('when that proposal has expired from the queue', () => {
+      describe('when that proposal has expired from the queue', () => {
         beforeEach(async () => {
           await timeTravel(queueExpiry, web3)
         })
@@ -2631,7 +2631,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when the account has voted on a proposal', () => {
+    describe('when the account has voted on a proposal', () => {
       const proposalId = 1
       const index = 0
       const value = VoteValue.Abstain
@@ -2656,7 +2656,7 @@ contract('Governance', (accounts: string[]) => {
         assert.isTrue(await governance.isVoting(account))
       })
 
-      describe.skip('when that proposal is no longer in the referendum stage', () => {
+      describe('when that proposal is no longer in the referendum stage', () => {
         beforeEach(async () => {
           await timeTravel(referendumStageDuration, web3)
         })
@@ -2668,7 +2668,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#isProposalPassing()', () => {
+  describe('#isProposalPassing()', () => {
     const proposalId = 1
     const index = 0
     beforeEach(async () => {
@@ -2687,7 +2687,7 @@ contract('Governance', (accounts: string[]) => {
       await governance.approve(proposalId, index)
     })
 
-    describe.skip('when the adjusted support is greater than threshold', () => {
+    describe('when the adjusted support is greater than threshold', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(account, (weight * 51) / 100)
         await mockLockedGold.setAccountTotalLockedGold(otherAccount, (weight * 49) / 100)
@@ -2701,7 +2701,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe.skip('when the adjusted support is less than or equal to threshold', () => {
+    describe('when the adjusted support is less than or equal to threshold', () => {
       beforeEach(async () => {
         await mockLockedGold.setAccountTotalLockedGold(account, (weight * 50) / 100)
         await mockLockedGold.setAccountTotalLockedGold(otherAccount, (weight * 50) / 100)
@@ -2716,7 +2716,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe.skip('#getProposalStage()', () => {
+  describe('#getProposalStage()', () => {
     const expectStage = async (expected: Stage, _proposalId: number) => {
       const stage = await governance.getProposalStage(_proposalId)
       assertEqualBN(stage, expected)
@@ -2727,7 +2727,7 @@ contract('Governance', (accounts: string[]) => {
       await expectStage(Stage.None, 1)
     })
 
-    describe.skip('when proposal exists', () => {
+    describe('when proposal exists', () => {
       let proposalId: number
       beforeEach(async () => {
         await governance.propose(
@@ -2744,7 +2744,7 @@ contract('Governance', (accounts: string[]) => {
         assert.isTrue(exists, 'proposal does not exist')
       })
 
-      describe.skip('when proposal is queued', () => {
+      describe('when proposal is queued', () => {
         beforeEach(async () => {
           const queued = await governance.isQueued(proposalId)
           assert.isTrue(queued, 'proposal not queued')
@@ -2758,7 +2758,7 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      describe.skip('when proposal is dequeued', () => {
+      describe('when proposal is dequeued', () => {
         const index = 0
         beforeEach(async () => {
           await timeTravel(dequeueFrequency, web3)
@@ -2767,8 +2767,8 @@ contract('Governance', (accounts: string[]) => {
           assert.isTrue(dequeued, 'proposal not dequeued')
         })
 
-        describe.skip('when in referendum stage', () => {
-          describe.skip('when not approved', () => {
+        describe('when in referendum stage', () => {
+          describe('when not approved', () => {
             beforeEach(async () => {})
 
             it('should return Referendum when not voted and not expired', () =>
@@ -2785,7 +2785,7 @@ contract('Governance', (accounts: string[]) => {
             })
           })
 
-          describe.skip('when approved', () => {
+          describe('when approved', () => {
             beforeEach(async () => {
               await governance.approve(proposalId, index)
             })
@@ -2800,7 +2800,7 @@ contract('Governance', (accounts: string[]) => {
           })
         })
 
-        describe.skip('when in execution stage', () => {
+        describe('when in execution stage', () => {
           beforeEach(async () => {
             await governance.approve(proposalId, index)
             await governance.vote(proposalId, index, VoteValue.Yes)
