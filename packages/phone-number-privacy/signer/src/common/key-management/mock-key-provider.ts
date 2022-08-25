@@ -5,13 +5,11 @@ import {
 import { DefaultKeyName, Key, KeyProviderBase } from './key-provider-base'
 
 export class MockKeyProvider extends KeyProviderBase {
-  private pnpKey: string
-  private domainsKey: string
-
-  constructor(pnpKey?: string, domainsKey?: string) {
+  constructor(
+    private pnpKey: string = PNP_DEV_SIGNER_PRIVATE_KEY,
+    private domainsKey: string = DOMAINS_DEV_SIGNER_PRIVATE_KEY
+  ) {
     super()
-    this.pnpKey = pnpKey ?? PNP_DEV_SIGNER_PRIVATE_KEY
-    this.domainsKey = domainsKey ?? DOMAINS_DEV_SIGNER_PRIVATE_KEY
   }
 
   public async fetchPrivateKeyFromStore(key: Key) {

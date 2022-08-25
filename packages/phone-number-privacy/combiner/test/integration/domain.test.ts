@@ -1,4 +1,3 @@
-import { newKit } from '@celo/contractkit'
 import {
   CombinerEndpoint,
   DisableDomainRequest,
@@ -39,11 +38,6 @@ import { Server } from 'net'
 import request from 'supertest'
 import config, { CombinerConfig } from '../../src/config'
 import { startCombiner } from '../../src/server'
-
-jest.mock('@celo/contractkit', () => ({
-  ...jest.requireActual('@celo/contractkit'),
-  newKit: jest.fn(),
-}))
 
 const combinerConfig: CombinerConfig = { ...config }
 
@@ -233,9 +227,9 @@ describe('domainService', () => {
     signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
 
-    signer1 = startSigner(signerConfig, signerDB1, keyProvider1, newKit('dummyKit')).listen(3001)
-    signer2 = startSigner(signerConfig, signerDB2, keyProvider2, newKit('dummyKit')).listen(3002)
-    signer3 = startSigner(signerConfig, signerDB3, keyProvider3, newKit('dummyKit')).listen(3003)
+    signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
+    signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3002)
+    signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3003)
   })
 
   afterEach(async () => {

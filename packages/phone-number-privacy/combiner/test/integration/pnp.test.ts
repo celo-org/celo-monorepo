@@ -180,7 +180,7 @@ describe('pnpService', () => {
     keyProvider2 = new MockKeyProvider(BLS_THRESHOLD_PK_SHARE_2)
     keyProvider3 = new MockKeyProvider(BLS_THRESHOLD_PK_SHARE_3)
 
-    // TODO EN: consider updating these directly in the combiner dev config and values
+    // TODO(2.0.0): consider updating these directly in the combiner dev config and values
     // if these are used in the legacy tests as well
     combinerConfig.phoneNumberPrivacy.keys.pubKey = Buffer.from(
       BLS_THRESHOLD_PUBKEY,
@@ -215,11 +215,20 @@ describe('pnpService', () => {
     signer3?.close()
   })
 
-  const sendPnpSignRequest = async (req: SignMessageRequest, authorization: string, app: any) => {
-    return await request(app)
+  const sendPnpSignRequest = async (
+    req: SignMessageRequest,
+    authorization: string,
+    app: any,
+    keyVersionHeader?: string
+  ) => {
+    let reqWithHeaders = request(app)
       .post(CombinerEndpoint.PNP_SIGN)
       .set('Authorization', authorization)
-      .send(req)
+
+    if (keyVersionHeader) {
+      reqWithHeaders = reqWithHeaders.set(KEY_VERSION_HEADER, keyVersionHeader)
+    }
+    return reqWithHeaders.send(req)
   }
 
   const getSignRequest = (_blindedMsgResult: threshold_bls.BlindedMessage): SignMessageRequest => {
@@ -265,11 +274,7 @@ describe('pnpService', () => {
 
       it('Should respond with 200 on valid request with key version header', async () => {
         const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
-        const res = await request(app)
-          .post(CombinerEndpoint.PNP_SIGN)
-          .set('Authorization', authorization)
-          .set(KEY_VERSION_HEADER, '1')
-          .send(req)
+        const res = await sendPnpSignRequest(req, authorization, app, '1')
 
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<SignMessageResponseSuccess>({
@@ -361,12 +366,7 @@ describe('pnpService', () => {
 
       it('Should respond with 400 on invalid key version', async () => {
         const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
-        const res = await request(app)
-          .post(CombinerEndpoint.PNP_SIGN)
-          .set('Authorization', authorization)
-          .set(KEY_VERSION_HEADER, 'a')
-          .send(req)
-
+        const res = await sendPnpSignRequest(req, authorization, app, 'a')
         expect(res.status).toBe(400)
         expect(res.body).toMatchObject<SignMessageResponseFailure>({
           success: false,

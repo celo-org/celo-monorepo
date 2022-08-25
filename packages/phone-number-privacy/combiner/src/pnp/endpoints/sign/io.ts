@@ -52,7 +52,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    // TODO: revisit extracting out duplicate init/validation code between sign/non-sign IO
+    // TODO(2.0.0): revisit extracting out duplicate init/validation code between sign/non-sign IO
     if (!this.requestHasValidKeyVersion(request, response.locals.logger)) {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null

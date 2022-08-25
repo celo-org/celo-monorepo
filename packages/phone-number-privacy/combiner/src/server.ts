@@ -28,8 +28,6 @@ import { CombinerThresholdStateService } from './pnp/services/thresholdState'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-// TODO EN revisit separating out contractKit from combiner config
-// and what this means for cloud function setup
 export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   const logger = rootLogger(config.serviceName)
 
