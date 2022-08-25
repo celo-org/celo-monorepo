@@ -1,6 +1,6 @@
 import { execCmd, execCmdWithExitOnFailure } from '../cmd-utils'
 import { envVar, fetchEnv, fetchEnvOrFallback } from '../env-utils'
-import { isCelotoolHelmDryRun } from '../helm_deploy'
+import { helmAddRepoAndUpdate, isCelotoolHelmDryRun } from '../helm_deploy'
 import { outputIncludes } from '../utils'
 import { BaseClusterConfig, BaseClusterManager, CloudProvider } from './base'
 
@@ -55,8 +55,9 @@ export class AksClusterManager extends BaseClusterManager {
         console.info('Skipping aad-pod-identity deployment due to --helmdryrun')
       } else {
         console.info('Adding aad-pod-identity helm repository to local helm')
-        await execCmdWithExitOnFailure(
-          `helm repo add aad-pod-identity https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts`
+        await helmAddRepoAndUpdate(
+          'https://raw.githubusercontent.com/Azure/aad-pod-identity/master/charts',
+          'aad-pod-identity'
         )
         console.info('Installing aad-pod-identity')
         await execCmdWithExitOnFailure(
