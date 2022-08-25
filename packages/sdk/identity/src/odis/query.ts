@@ -1,4 +1,3 @@
-import { hexToBuffer } from '@celo/base/lib/address'
 import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { ContractKit } from '@celo/contractkit'
 import {
@@ -12,9 +11,9 @@ import {
   GetContactMatchesRequest,
   GetContactMatchesResponse,
   PhoneNumberPrivacyRequest,
+  signWithRawDEK,
 } from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
-import crypto from 'crypto'
 import debugFactory from 'debug'
 import { isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
@@ -98,19 +97,8 @@ export function signWithDEK(msg: string, signer: EncryptionKeySigner) {
 }
 
 export function signWithRawKey(msg: string, rawKey: string) {
-  // NOTE: Elliptic will truncate the raw msg to 64 bytes before signing,
-  // so make sure to always pass the hex encoded msgDigest instead.
-  const msgDigest = crypto.createHash('sha256').update(JSON.stringify(msg)).digest('hex')
-
-  // NOTE: elliptic is disabled elsewhere in this library to prevent
-  // accidental signing of truncated messages.
-  // tslint:disable-next-line:import-blacklist
-  const EC = require('elliptic').ec
-  const ec = new EC('secp256k1')
-
-  // Sign
-  const key = ec.keyFromPrivate(hexToBuffer(rawKey))
-  return JSON.stringify(key.sign(msgDigest).toDER())
+  // For backwards compatibility
+  return signWithRawDEK(msg, rawKey)
 }
 
 /**

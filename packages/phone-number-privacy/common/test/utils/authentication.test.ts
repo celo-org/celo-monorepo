@@ -2,7 +2,6 @@ import { hexToBuffer } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import Logger from 'bunyan'
 import { Request } from 'express'
-import { signWithRawKey } from '../../../../sdk/identity/src/odis/query'
 import { AuthenticationMethod } from '../../src/interfaces/requests'
 import * as auth from '../../src/utils/authentication'
 
@@ -110,7 +109,7 @@ describe('Authentication test suite', () => {
         account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
         authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
       }
-      const sig = signWithRawKey(JSON.stringify(body), rawKey)
+      const sig = auth.signWithRawDEK(JSON.stringify(body), rawKey)
       const sampleRequest: Request = {
         get: (name: string) => (name === 'Authorization' ? sig : ''),
         body,
@@ -152,7 +151,7 @@ describe('Authentication test suite', () => {
           message.slice(0, i) +
           String.fromCharCode(message.charCodeAt(i) + 1) +
           message.slice(i + 1)
-        const sig = signWithRawKey(modified, rawKey)
+        const sig = auth.signWithRawDEK(modified, rawKey)
         const sampleRequest: Request = {
           get: (name: string) => (name === 'Authorization' ? sig : ''),
           body,
@@ -187,7 +186,7 @@ describe('Authentication test suite', () => {
         account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
         authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
       }
-      const sig = signWithRawKey(JSON.stringify(body), rawKey)
+      const sig = auth.signWithRawDEK(JSON.stringify(body), rawKey)
       const sampleRequest: Request = {
         get: (name: string) => (name === 'Authorization' ? sig : ''),
         body,
@@ -224,7 +223,7 @@ describe('Authentication test suite', () => {
         authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
       }
       // Manipulate the signature.
-      const sig = signWithRawKey(JSON.stringify(body), rawKey)
+      const sig = auth.signWithRawDEK(JSON.stringify(body), rawKey)
       const modified = JSON.stringify([0] + JSON.parse(sig))
       const sampleRequest: Request = {
         get: (name: string) => (name === 'Authorization' ? modified : ''),
