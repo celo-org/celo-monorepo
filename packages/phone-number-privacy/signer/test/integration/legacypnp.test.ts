@@ -8,7 +8,6 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
@@ -175,7 +174,7 @@ describe('legacyPNP', () => {
         )
 
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, identifier)
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization)
 
         expect(res.status).toBe(200)
@@ -327,7 +326,7 @@ describe('legacyPNP', () => {
 
       it('Should respond with 200 on repeated valid requests', async () => {
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
 
         const res1 = await sendPnpQuotaRequest(req, authorization)
         expect(res1.status).toBe(200)
@@ -348,7 +347,7 @@ describe('legacyPNP', () => {
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization)
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
@@ -365,7 +364,7 @@ describe('legacyPNP', () => {
         const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         // @ts-ignore Intentionally deleting required field
         delete badRequest.account
-        const authorization = getPnpRequestAuthorization(badRequest, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(badRequest, authorization)
 
         expect(res.status).toBe(400)
@@ -380,11 +379,7 @@ describe('legacyPNP', () => {
         // Request from one account, signed by another account
         const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
-        const authorization = getPnpRequestAuthorization(
-          badRequest,
-          privateKeyToAddress(differentPk),
-          differentPk
-        )
+        const authorization = getPnpRequestAuthorization(badRequest, differentPk)
         const res = await sendPnpQuotaRequest(badRequest, authorization)
 
         expect(res.status).toBe(401)
@@ -399,7 +394,7 @@ describe('legacyPNP', () => {
         _config.api.phoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startSigner(_config, db, keyProvider, newKit('dummyKit'))
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization, appWithApiDisabled)
         expect.assertions(2)
         expect(res.status).toBe(503)

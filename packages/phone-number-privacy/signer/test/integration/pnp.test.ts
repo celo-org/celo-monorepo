@@ -108,7 +108,7 @@ describe('pnp', () => {
         it(`Should get totalQuota=${expectedTotalQuota} for ${cusdWei.toString()} cUSD (wei)`, async () => {
           mockOdisPaymentsTotalPaidCUSD.mockReturnValue(cusdWei)
           const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
-          const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendPnpQuotaRequest(req, authorization)
 
           expect(res.status).toBe(200)
@@ -128,7 +128,7 @@ describe('pnp', () => {
           throw new Error('dummy error')
         })
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization)
 
         expect(res.status).toBe(200)
@@ -151,7 +151,7 @@ describe('pnp', () => {
 
       it('Should respond with 200 on repeated valid requests', async () => {
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
 
         const res1 = await sendPnpQuotaRequest(req, authorization)
         expect(res1.status).toBe(200)
@@ -172,7 +172,7 @@ describe('pnp', () => {
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization)
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
@@ -189,7 +189,7 @@ describe('pnp', () => {
         const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         // @ts-ignore Intentionally deleting required field
         delete badRequest.account
-        const authorization = getPnpRequestAuthorization(badRequest, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(badRequest, authorization)
 
         expect(res.status).toBe(400)
@@ -203,7 +203,7 @@ describe('pnp', () => {
       it('Should respond with 401 on failed auth', async () => {
         // Request from one account, signed by another account
         const badRequest = getPnpQuotaRequest(mockAccount)
-        const authorization = getPnpRequestAuthorization(badRequest, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(badRequest, authorization)
 
         expect(res.status).toBe(401)
@@ -224,7 +224,7 @@ describe('pnp', () => {
           newKit('dummyKit')
         )
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization, appWithApiDisabled)
         expect(res.status).toBe(503)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({

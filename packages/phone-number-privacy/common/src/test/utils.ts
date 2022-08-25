@@ -1,4 +1,5 @@
 import { EncryptionKeySigner, signWithDEK } from '@celo/identity/lib/odis/query'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, Signature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import * as threshold from 'blind-threshold-bls'
@@ -124,11 +125,7 @@ export function getPnpQuotaRequest(account: string, hashedPhoneNumber?: string):
   }
 }
 
-export function getPnpRequestAuthorization(
-  req: PhoneNumberPrivacyRequest,
-  account: string,
-  pk: string
-) {
+export function getPnpRequestAuthorization(req: PhoneNumberPrivacyRequest, pk: string) {
   const msg = JSON.stringify(req)
   if (req.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
     const dekSigner: EncryptionKeySigner = {
@@ -137,6 +134,6 @@ export function getPnpRequestAuthorization(
     }
     return signWithDEK(JSON.stringify(req), dekSigner)
   }
-  // const account = privateKeyToAddress(pk)
+  const account = privateKeyToAddress(pk)
   return serializeSignature(signMessage(msg, pk, account))
 }
