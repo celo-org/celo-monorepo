@@ -401,6 +401,7 @@ describe('legacyPNP', () => {
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization, appWithApiDisabled)
+        expect.assertions(2)
         expect(res.status).toBe(503)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
           success: false,
