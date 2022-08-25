@@ -1,4 +1,6 @@
 import { newKit } from '@celo/contractkit'
+import { PnpQuotaResponseSuccess } from '@celo/phone-number-privacy-common'
+import { SignerEndpoint } from '@celo/phone-number-privacy-common'
 import {
   CombinerEndpoint,
   genSessionID,
@@ -8,6 +10,7 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { BLINDED_PHONE_NUMBER } from '@celo/phone-number-privacy-common/lib/test/values'
 import {
   initDatabase as initSignerDatabase,
   initKeyProvider,
@@ -441,6 +444,79 @@ describe('pnpService', () => {
         success: false,
         version: expectedVersion,
         error: WarningMessage.API_UNAVAILABLE,
+      })
+    })
+  })
+
+  describe.only(`${CombinerEndpoint.PNP_QUOTA}`, () => {
+    const useQuery = async (signer: Server | HttpsServer) => {
+      const req = {
+        account: ACCOUNT_ADDRESS1,
+        blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
+      }
+      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      await request(signer)
+        .post(SignerEndpoint.PNP_SIGN)
+        .set('Authorization', authorization)
+        .send(req)
+    }
+
+    const getCombinerQuotaResponse = async () => {
+      const req = {
+        account: ACCOUNT_ADDRESS1,
+      }
+      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const res = await request(app)
+        .get(CombinerEndpoint.PNP_QUOTA)
+        .set('Authorization', authorization)
+        .send(req)
+      return res
+    }
+
+    const totalQuota = 10
+    beforeAll(async () => {
+      let weiTocusd = new BigNumber(1e17)
+      mockOdisPaymentsTotalPaidCUSD.mockReturnValue(weiTocusd.multipliedBy(totalQuota))
+    })
+
+    it('should return 0 performedQueryCount when no queries performed', async () => {
+      const res = await getCombinerQuotaResponse()
+
+      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        success: true,
+        version: res.body.version,
+        performedQueryCount: 0,
+        totalQuota,
+        blockNumber: testBlockNumber,
+      })
+    })
+
+    it('should return 0 performedQueryCount when <threshold of signers show quota usage', async () => {
+      await useQuery(signer1)
+
+      const res = await getCombinerQuotaResponse()
+
+      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        success: true,
+        version: res.body.version,
+        performedQueryCount: 0,
+        totalQuota,
+        blockNumber: testBlockNumber,
+      })
+    })
+
+    it('should reflect quota usage when >threshold # of signers show quota usage', async () => {
+      await useQuery(signer1)
+      await useQuery(signer2)
+
+      const res = await getCombinerQuotaResponse()
+
+      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        success: true,
+        version: res.body.version,
+        performedQueryCount: 1,
+        totalQuota,
+        blockNumber: testBlockNumber,
       })
     })
   })
