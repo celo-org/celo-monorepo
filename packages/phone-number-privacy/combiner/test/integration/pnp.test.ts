@@ -1,5 +1,6 @@
 import { newKit } from '@celo/contractkit'
 import {
+  AuthenticationMethod,
   CombinerEndpoint,
   ErrorMessage,
   genSessionID,
@@ -31,11 +32,18 @@ import { startCombiner } from '../../src/server'
 const {
   ContractRetrieval,
   createMockContractKit,
+  createMockAccounts,
   createMockOdisPayments,
   createMockWeb3,
   getPnpRequestAuthorization,
 } = TestUtils.Utils
-const { PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
+const {
+  PRIVATE_KEY1,
+  ACCOUNT_ADDRESS1,
+  mockAccount,
+  DEK_PRIVATE_KEY,
+  DEK_PUBLIC_KEY,
+} = TestUtils.Values
 
 const combinerConfig: CombinerConfig = { ...config }
 
@@ -123,6 +131,7 @@ const testBlockNumber = 1000000
 const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
 const mockContractKit = createMockContractKit(
   {
+    [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount, DEK_PUBLIC_KEY),
     [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
   },
   createMockWeb3(5, testBlockNumber)
@@ -304,6 +313,19 @@ describe('pnpService', () => {
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
         const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+        })
+      })
+
+      it('Should respond with 200 when authenticated with DEK', async () => {
+        req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
+        const authorization = getPnpRequestAuthorization(req, '', DEK_PRIVATE_KEY)
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)

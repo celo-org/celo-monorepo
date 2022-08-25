@@ -33,6 +33,7 @@
     "is-base64": "^1.1.0"
   },
   "devDependencies": {
+    "@celo/identity": "2.0.1-dev",
     "@celo/poprf": "^0.1.9",
     "@celo/wallet-local": "2.0.1-dev",
     "@types/btoa": "^1.2.3",

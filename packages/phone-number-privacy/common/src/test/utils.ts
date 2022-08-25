@@ -1,9 +1,10 @@
+import { EncryptionKeySigner, signWithDEK } from '@celo/identity/lib/odis/query'
 import { serializeSignature, Signature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
 import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
 import Web3 from 'web3'
-import { PhoneNumberPrivacyRequest, PnpQuotaRequest } from '../interfaces'
+import { AuthenticationMethod, PhoneNumberPrivacyRequest, PnpQuotaRequest } from '../interfaces'
 import { genSessionID } from '../utils/logger'
 
 export function createMockAttestation(completed: number, total: number) {
@@ -18,9 +19,10 @@ export function createMockToken(balanceOf: jest.Mock<BigNumber, []>) {
   }
 }
 
-export function createMockAccounts(walletAddress: string) {
+export function createMockAccounts(walletAddress: string, dataEncryptionKey?: string) {
   return {
     getWalletAddress: jest.fn(() => walletAddress),
+    getDataEncryptionKey: jest.fn(() => dataEncryptionKey),
   }
 }
 
@@ -127,5 +129,14 @@ export function getPnpRequestAuthorization(
   account: string,
   pk: string
 ) {
-  return serializeSignature(signMessage(JSON.stringify(req), pk, account))
+  const msg = JSON.stringify(req)
+  if (req.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
+    const dekSigner: EncryptionKeySigner = {
+      authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+      rawKey: pk,
+    }
+    return signWithDEK(JSON.stringify(req), dekSigner)
+  }
+  // const account = privateKeyToAddress(pk)
+  return serializeSignature(signMessage(msg, pk, account))
 }
