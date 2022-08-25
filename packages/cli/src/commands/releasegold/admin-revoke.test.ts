@@ -137,7 +137,10 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
           await governance
             .propose([], 'URL')
             .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
-          await GovernanceUpvote.run(['--from', voteSigner, '--proposalID', '2'])
+          await governance
+            .propose([], 'URL')
+            .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
+          await GovernanceUpvote.run(['--from', voteSigner, '--proposalID', '3'])
 
           // const validators = await kit.contracts.getValidators()
           // const groups = await validators.getRegisteredValidatorGroupsAddresses()

@@ -24,7 +24,6 @@
     "bignumber.js": "^9.0.0",
     "bip32": "2.0.5",
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
-    "bls12377js": "https://github.com/celo-org/bls12377js#cee721830e78bffcc03a660649b12c62386fb4bc",
     "bunyan": "1.8.12",
     "bunyan-gke-stackdriver": "0.1.2",
     "compare-versions": "^3.5.1",

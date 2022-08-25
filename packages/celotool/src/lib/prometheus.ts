@@ -9,6 +9,7 @@ import {
   getDynamicEnvVarValue,
 } from './env-utils'
 import {
+  helmAddRepoAndUpdate,
   installGenericHelmChart,
   removeGenericHelmChart,
   setHelmArray,
@@ -35,7 +36,8 @@ const sidecarImageTag = '0.8.2'
 // Prometheus container registry with latest tags: https://hub.docker.com/r/prom/prometheus/tags
 const prometheusImageTag = 'v2.27.1'
 
-const grafanaHelmChartPath = '../helm-charts/grafana'
+const grafanaHelmRepo = 'grafana/grafana'
+const grafanaChartVersion = '6.32.3'
 const grafanaReleaseName = 'grafana'
 
 export async function installPrometheusIfNotExists(
@@ -325,27 +327,29 @@ export async function installGrafanaIfNotExists(
 }
 
 async function installGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
+  await helmAddRepoAndUpdate('https://grafana.github.io/helm-charts', 'grafana')
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart(
     kubeNamespace,
     grafanaReleaseName,
-    grafanaHelmChartPath,
+    grafanaHelmRepo,
     await grafanaHelmParameters(context, clusterConfig),
-    // Adding this file and clabs' default values file.
-    true,
-    'values-clabs.yaml'
+    false,
+    '../helm-charts/grafana/values-clabs.yaml'
   )
 }
 
 export async function upgradeGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
+  await helmAddRepoAndUpdate('https://grafana.github.io/helm-charts', 'grafana')
   await createNamespaceIfNotExists(kubeNamespace)
   return upgradeGenericHelmChart(
     kubeNamespace,
     grafanaReleaseName,
-    grafanaHelmChartPath,
+    grafanaHelmRepo,
     await grafanaHelmParameters(context, clusterConfig),
+    false,
     // Adding this file and clabs' default values file.
-    'values-clabs.yaml'
+    '../helm-charts/grafana/values-clabs.yaml'
   )
 }
 
@@ -392,6 +396,6 @@ async function grafanaHelmParameters(context?: string, clusterConfig?: BaseClust
   fs.writeFileSync(valuesFile, yaml.safeDump(values))
 
   // Adding this file and clabs' default values file.
-  const params = [`-f ${valuesFile}`]
+  const params = [`-f ${valuesFile} --version ${grafanaChartVersion}`]
   return params
 }
