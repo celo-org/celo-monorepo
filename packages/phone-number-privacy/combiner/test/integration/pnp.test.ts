@@ -43,6 +43,9 @@ const {
   mockAccount,
   DEK_PRIVATE_KEY,
   DEK_PUBLIC_KEY,
+  BLS_THRESHOLD_DEV_PK_SHARE_1,
+  BLS_THRESHOLD_DEV_PK_SHARE_2,
+  BLS_THRESHOLD_DEV_PK_SHARE_3,
 } = TestUtils.Values
 
 const combinerConfig: CombinerConfig = { ...config }
@@ -144,19 +147,6 @@ jest.mock('@celo/contractkit', () => ({
   newKit: jest.fn().mockImplementation(() => mockContractKit),
 }))
 
-// Generated with 2/3 ratio
-const BLS_THRESHOLD_PK_SHARE_1 =
-  '000000000e7e1a2fad3b54deb2b1b32cf4c7b084842d50bbb5c6143b9d9577d16e050f03'
-const BLS_THRESHOLD_PK_SHARE_2 =
-  '01000000e43f10f7778e238e1ed58d5fad9363d7439d2b5a8eeda6073d68ba87c0b10011'
-const BLS_THRESHOLD_PK_SHARE_3 =
-  '02000000b90106bf4261e13389f867c267e86bd0015dcf9c48c784738695d0a3b3f8460c'
-
-const BLS_THRESHOLD_PUBKEY =
-  'eb569eb8701d831a0a9ffe5df325eed2ac7f5693c758c02aad5804009fcca42ece73f7f560b3e237b60a6b0f5e0d6501516b38b0f9fa20dd944c66edf798cfea73bc232983e0885b04e3632dc125b2ad63c13676723b931d5f686d2c83165d81'
-const BLS_POLYNOMIAL =
-  '0200000000000000eb569eb8701d831a0a9ffe5df325eed2ac7f5693c758c02aad5804009fcca42ece73f7f560b3e237b60a6b0f5e0d6501516b38b0f9fa20dd944c66edf798cfea73bc232983e0885b04e3632dc125b2ad63c13676723b931d5f686d2c83165d817aaff1f84d0b008ad218eff19db698f343168cf931ba8347640123a2f826f62b66ff084273f494d4647758e9a9f889009d573705824a0e74e1f49ed234462058e53bbb4fef370b55f78da89df070c661782a84239b8c7623d09e34b9f91f7781'
-
 describe('pnpService', () => {
   let keyProvider1: KeyProvider
   let keyProvider2: KeyProvider
@@ -185,18 +175,9 @@ describe('pnpService', () => {
   const mockKit = newKit('dummyKit')
 
   beforeAll(async () => {
-    keyProvider1 = new MockKeyProvider(BLS_THRESHOLD_PK_SHARE_1)
-    keyProvider2 = new MockKeyProvider(BLS_THRESHOLD_PK_SHARE_2)
-    keyProvider3 = new MockKeyProvider(BLS_THRESHOLD_PK_SHARE_3)
-
-    // TODO(2.0.0): consider updating these directly in the combiner dev config and values
-    // if these are used in the legacy tests as well
-    combinerConfig.phoneNumberPrivacy.keys.pubKey = Buffer.from(
-      BLS_THRESHOLD_PUBKEY,
-      'hex'
-    ).toString('base64')
-    combinerConfig.phoneNumberPrivacy.keys.polynomial = BLS_POLYNOMIAL
-
+    keyProvider1 = new MockKeyProvider(BLS_THRESHOLD_DEV_PK_SHARE_1)
+    keyProvider2 = new MockKeyProvider(BLS_THRESHOLD_DEV_PK_SHARE_2)
+    keyProvider3 = new MockKeyProvider(BLS_THRESHOLD_DEV_PK_SHARE_3)
     app = startCombiner(combinerConfig, mockKit)
   })
 
