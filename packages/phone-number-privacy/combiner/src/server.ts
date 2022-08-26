@@ -3,6 +3,7 @@ import {
   CombinerEndpoint,
   Endpoint,
   ErrorMessage,
+  getContractKit,
   loggerMiddleware,
   rootLogger,
 } from '@celo/phone-number-privacy-common'
@@ -11,7 +12,6 @@ import express, { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { CombinerConfig } from '.'
 import { Controller } from './common/controller'
-import { getContractKit } from './common/web3/contracts'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
 import { DomainQuotaAction } from './domain/endpoints/quota/action'
@@ -28,7 +28,7 @@ import { CombinerThresholdStateService } from './pnp/services/thresholdState'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function startCombiner(config: CombinerConfig) {
+export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   const logger = rootLogger(config.serviceName)
 
   logger.info('Creating combiner express server')
@@ -41,7 +41,7 @@ export function startCombiner(config: CombinerConfig) {
   //   })
   // })
 
-  const kit: ContractKit = getContractKit(config.blockchain)
+  kit = kit ?? getContractKit(config.blockchain)
 
   const legacyPnpSign = new Controller(
     new PnpSignAction(

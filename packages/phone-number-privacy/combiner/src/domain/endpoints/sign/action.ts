@@ -63,7 +63,6 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
 
   protected errorCodeToError(errorCode: number): ErrorType {
     switch (errorCode) {
-      case 403:
       case 429:
         return WarningMessage.EXCEEDED_QUOTA
       case 401:

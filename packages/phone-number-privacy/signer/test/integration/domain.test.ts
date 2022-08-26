@@ -24,14 +24,13 @@ import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-
 import { LocalWallet } from '@celo/wallet-local'
 import { Knex } from 'knex'
 import request from 'supertest'
-import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { initDatabase } from '../../src/common/database/database'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
+import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
-// TODO: Add checking of values beyond the return code.
-
+// TODO(2.0.0): Add checking of values beyond the return code.
 describe('domain', () => {
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')

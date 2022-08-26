@@ -1,4 +1,4 @@
-import { ContractKit } from '@celo/contractkit'
+import { newKit } from '@celo/contractkit'
 import {
   ErrorMessage,
   PnpQuotaRequest,
@@ -23,7 +23,7 @@ const {
   createMockOdisPayments,
   createMockWeb3,
   getPnpQuotaRequest,
-  getPnpQuotaRequestAuthorization,
+  getPnpRequestAuthorization,
 } = TestUtils.Utils
 const { PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
 
@@ -36,10 +36,10 @@ const mockContractKit = createMockContractKit(
   },
   createMockWeb3(5, testBlockNumber)
 )
-// jest.mock('../../src/common/web3/contracts', () => ({
-//   ...jest.requireActual('../../src/common/web3/contracts'),
-//   getContractKit: jest.fn().mockImplementation(() => mockContractKit),
-// }))
+jest.mock('@celo/contractkit', () => ({
+  ...jest.requireActual('@celo/contractkit'),
+  newKit: jest.fn().mockImplementation(() => mockContractKit),
+}))
 
 describe('pnp', () => {
   let keyProvider: KeyProvider
@@ -59,10 +59,10 @@ describe('pnp', () => {
   })
 
   beforeEach(async () => {
-    // Create a new in-memory database for each test.
     _config.api.phoneNumberPrivacy.enabled = true
+    // Create a new in-memory database for each test.
     db = await initDatabase(_config)
-    app = startSigner(_config, db, keyProvider, (mockContractKit as unknown) as ContractKit)
+    app = startSigner(_config, db, keyProvider, newKit('dummyKit'))
     mockOdisPaymentsTotalPaidCUSD.mockReset()
   })
 
@@ -108,7 +108,7 @@ describe('pnp', () => {
         it(`Should get totalQuota=${expectedTotalQuota} for ${cusdWei.toString()} cUSD (wei)`, async () => {
           mockOdisPaymentsTotalPaidCUSD.mockReturnValue(cusdWei)
           const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
-          const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+          const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
           const res = await sendPnpQuotaRequest(req, authorization)
 
           expect(res.status).toBe(200)
@@ -128,7 +128,7 @@ describe('pnp', () => {
           throw new Error('dummy error')
         })
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
-        const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization)
 
         expect(res.status).toBe(200)
@@ -151,7 +151,7 @@ describe('pnp', () => {
 
       it('Should respond with 200 on repeated valid requests', async () => {
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
-        const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
 
         const res1 = await sendPnpQuotaRequest(req, authorization)
         expect(res1.status).toBe(200)
@@ -172,7 +172,7 @@ describe('pnp', () => {
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
-        const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization)
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
@@ -189,11 +189,7 @@ describe('pnp', () => {
         const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         // @ts-ignore Intentionally deleting required field
         delete badRequest.account
-        const authorization = getPnpQuotaRequestAuthorization(
-          badRequest,
-          ACCOUNT_ADDRESS1,
-          PRIVATE_KEY1
-        )
+        const authorization = getPnpRequestAuthorization(badRequest, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(badRequest, authorization)
 
         expect(res.status).toBe(400)
@@ -207,11 +203,7 @@ describe('pnp', () => {
       it('Should respond with 401 on failed auth', async () => {
         // Request from one account, signed by another account
         const badRequest = getPnpQuotaRequest(mockAccount)
-        const authorization = getPnpQuotaRequestAuthorization(
-          badRequest,
-          ACCOUNT_ADDRESS1,
-          PRIVATE_KEY1
-        )
+        const authorization = getPnpRequestAuthorization(badRequest, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(badRequest, authorization)
 
         expect(res.status).toBe(401)
@@ -223,10 +215,16 @@ describe('pnp', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        _config.api.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(_config, db, keyProvider)
+        const configWithApiDisabled = { ..._config }
+        configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
+        const appWithApiDisabled = startSigner(
+          configWithApiDisabled,
+          db,
+          keyProvider,
+          newKit('dummyKit')
+        )
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
-        const authorization = getPnpQuotaRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
         const res = await sendPnpQuotaRequest(req, authorization, appWithApiDisabled)
         expect(res.status).toBe(503)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
