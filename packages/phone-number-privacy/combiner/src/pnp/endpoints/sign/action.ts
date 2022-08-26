@@ -1,8 +1,8 @@
-import { SignMessageRequest } from '@celo/identity/lib/odis/query'
 import {
   ErrorMessage,
   ErrorType,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
