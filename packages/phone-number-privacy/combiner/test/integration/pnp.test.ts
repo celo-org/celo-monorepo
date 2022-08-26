@@ -535,7 +535,7 @@ describe('pnpService', () => {
           account: ACCOUNT_ADDRESS1,
           blindedQueryPhoneNumber: blindedNumber,
         }
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         await request(signer)
           .post(SignerEndpoint.PNP_SIGN)
           .set('Authorization', authorization)
@@ -557,6 +557,12 @@ describe('pnpService', () => {
       mockOdisPaymentsTotalPaidCUSD.mockReturnValue(weiTocusd.multipliedBy(totalQuota))
     })
 
+    beforeEach(async () => {
+      signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+      signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
+      signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
+    })
+
     const queryCountParams = [
       { signerQueries: [0, 0, 0], expectedQueryCount: 0 },
       { signerQueries: [1, 0, 0], expectedQueryCount: 0 }, // does not reach threshold
@@ -573,7 +579,7 @@ describe('pnpService', () => {
         const req = {
           account: ACCOUNT_ADDRESS1,
         }
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await getCombinerQuotaResponse(req, authorization)
 
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
@@ -590,7 +596,7 @@ describe('pnpService', () => {
       const req = {
         account: ACCOUNT_ADDRESS1,
       }
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res1 = await getCombinerQuotaResponse(req, authorization)
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<PnpQuotaResponseSuccess>({
@@ -610,7 +616,25 @@ describe('pnpService', () => {
         account: ACCOUNT_ADDRESS1,
         extraField: 'dummy',
       }
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+      const res = await getCombinerQuotaResponse(req, authorization)
+
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        success: true,
+        version: expectedVersion,
+        performedQueryCount: 0,
+        totalQuota,
+        blockNumber: testBlockNumber,
+      })
+    })
+
+    it('Should respond with 200 when authenticated with DEK', async () => {
+      const req = {
+        account: ACCOUNT_ADDRESS1,
+        authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+      }
+      const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(200)
@@ -626,7 +650,7 @@ describe('pnpService', () => {
     it('Should respond with 400 on missing request fields', async () => {
       const req = {}
       // @ts-ignore Intentionally deleting required field
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       // @ts-ignore Intentionally deleting required field
       const res = await getCombinerQuotaResponse(req, authorization)
 
@@ -642,7 +666,7 @@ describe('pnpService', () => {
       const req = {
         account: 'not an address',
       }
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(400)
@@ -658,7 +682,7 @@ describe('pnpService', () => {
       const req = {
         account: ACCOUNT_ADDRESS2,
       }
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(401)
@@ -678,7 +702,7 @@ describe('pnpService', () => {
       const req = {
         account: ACCOUNT_ADDRESS1,
       }
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(502)
@@ -696,7 +720,7 @@ describe('pnpService', () => {
       const req = {
         account: ACCOUNT_ADDRESS1,
       }
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await request(appWithApiDisabled)
         .get(CombinerEndpoint.PNP_QUOTA)
         .set('Authorization', authorization)
