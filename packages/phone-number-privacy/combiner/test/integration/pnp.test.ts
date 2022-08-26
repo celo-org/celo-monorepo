@@ -327,7 +327,7 @@ describe('pnpService', () => {
 
         const secondUserSeed = new Uint8Array(userSeed)
         secondUserSeed[0]++
-        // Ensure message is identical except for message
+        // Ensure message is identical except for seed
         const req2 = { ...req }
         const blindedMsgResult2 = threshold_bls.blind(message, secondUserSeed)
         req2.blindedQueryPhoneNumber = Buffer.from(blindedMsgResult2.message).toString('base64')
