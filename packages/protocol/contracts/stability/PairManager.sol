@@ -34,6 +34,8 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   // Tracks whether or not a pair with the given pairId exists.
   mapping(bytes32 => bool) public isPair;
 
+  // TODO: Implement getPairs that takes in asset addresses & not exchange
+
   // Tracks the total fraction of reserve collateral
   // that has been allocated to existing virtual pairs.
   mapping(address => FixidityLib.Fraction) public allocatedCollateralFractions;
@@ -70,7 +72,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
 
   /* ==================== View Functions ==================== */
 
-  function getPair(bytes32 pairId) external view returns (Pair memory pair) {
+  function getPair(bytes32 pairId) public view returns (Pair memory pair) {
     require(isPair[pairId], "A pair with the specified id does not exist");
     pair = pairs[pairId];
   }
@@ -157,6 +159,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   {
     require(stableAsset != address(0), "Stable asset address must be specified");
     require(collateralAsset != address(0), "Collateral asset address must be specified");
+    require(address(mentoExchange) != address(0), "Mento exchange must be set");
 
     bytes32 pairId = keccak256(
       abi.encodePacked(
@@ -197,9 +200,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
     external
     onlyBroker
   {
-    require(isPair[pairId], "A pair with the specified id does not exist");
-
-    Pair memory pair = pairs[pairId];
+    Pair memory pair = getPair(pairId);
     pair.collateralBucket = collateralBucket;
     pair.stableBucket = stableBucket;
 

@@ -2,7 +2,7 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import { Test } from "celo-foundry/Test.sol";
+import { Test, console2 as console } from "celo-foundry/Test.sol";
 
 import { IMentoExchange } from "contracts/stability/interfaces/IMentoExchange.sol";
 import { PairManager } from "contracts/stability/PairManager.sol";
@@ -16,6 +16,7 @@ import { FixidityLib } from "contracts/common/FixidityLib.sol";
 
 // forge test --match-contract PairManager -vvv
 contract PairManagerTest is Test, WithRegistry {
+  using FixidityLib for FixidityLib.Fraction;
   struct UpdatedBuckets {
     uint256 stableBucket;
     uint256 collateralBucket;
@@ -33,8 +34,14 @@ contract PairManagerTest is Test, WithRegistry {
   MockReserve mockReserve;
   PairManager testee;
 
+  event BucketsUpdated(bytes32 pairId, uint256 collateralBucket, uint256 stableBucket);
   event BrokerUpdated(address indexed newBroker);
   event PairCreated(
+    address indexed stableAsset,
+    address indexed collateralAsset,
+    address indexed mentoExchange
+  );
+  event PairDestroyed(
     address indexed stableAsset,
     address indexed collateralAsset,
     address indexed mentoExchange
@@ -101,7 +108,7 @@ contract PairManagerTest is Test, WithRegistry {
   }
 }
 
-contract PairManagerTest_initilizerAndSetters is PairManagerTest {
+contract PairManagerTest_initilizerSettersGetters is PairManagerTest {
   /* ---------- Initilizer ---------- */
 
   function test_initilize_shouldSetOwner() public view {
@@ -133,6 +140,91 @@ contract PairManagerTest_initilizerAndSetters is PairManagerTest {
     testee.setBroker(newBroker);
 
     assert(testee.broker() == newBroker);
+  }
+
+  function test_updateBuckets_whenSenderIsNotBroker_shouldRevert() public {
+    bytes32 pairId = keccak256(
+      abi.encodePacked(
+        testStableAsset.symbol(),
+        testCollateralAsset.symbol(),
+        testMentoExchange.name()
+      )
+    );
+
+    vm.expectRevert("Caller is not the Broker");
+    testee.updateBuckets(pairId, 45000000000, 45000000000);
+  }
+
+  function test_updateBuckets_whenPairDoesNotExist_shouldRevert() public {
+    changePrank(broker);
+
+    bytes32 pairId = keccak256(
+      abi.encodePacked(
+        anotherTestStableAsset.symbol(),
+        testCollateralAsset.symbol(),
+        testMentoExchange.name()
+      )
+    );
+
+    vm.expectRevert("A pair with the specified id does not exist");
+    testee.updateBuckets(pairId, 45000000000, 45000000000);
+  }
+
+  function test_updateBuckets_whenSenderIsBroker_shouldUpdateAndEmit() public {
+    changePrank(broker);
+
+    bytes32 pairId = keccak256(
+      abi.encodePacked(
+        testStableAsset.symbol(),
+        testCollateralAsset.symbol(),
+        testMentoExchange.name()
+      )
+    );
+
+    PairManager.Pair memory pairBeforeUpdate = testee.getPair(pairId);
+    assert(pairBeforeUpdate.stableBucket == 250000000000);
+    assert(pairBeforeUpdate.collateralBucket == 250000000000);
+
+    vm.expectEmit(false, false, false, false);
+    emit BucketsUpdated(pairId, 45000000000, 45000000000);
+    testee.updateBuckets(pairId, 45000000000, 45000000000);
+
+    PairManager.Pair memory pairAfterUpdate = testee.getPair(pairId);
+    assert(pairAfterUpdate.stableBucket == 45000000000);
+    assert(pairAfterUpdate.collateralBucket == 45000000000);
+  }
+
+  /* ---------- Getters ---------- */
+
+  function testFail_getPair_whenPairDoesNotExist_shouldRevert() public {
+    bytes32 pairId = keccak256(
+      abi.encodePacked(
+        anotherTestStableAsset.symbol(),
+        testCollateralAsset.symbol(),
+        testMentoExchange.name()
+      )
+    );
+
+    // vm.expectRevert("A pair with the specified id does not exist");
+    testee.getPair(pairId);
+  }
+
+  function test_getPair_whenPairExists_shouldReturnPair() public {
+    bytes32 pairId = keccak256(
+      abi.encodePacked(
+        testStableAsset.symbol(),
+        testCollateralAsset.symbol(),
+        testMentoExchange.name()
+      )
+    );
+
+    PairManager.Pair memory existingPair = testee.getPair(pairId);
+    assert(existingPair.stableAsset == address(testStableAsset));
+    assert(existingPair.collateralAsset == address(testCollateralAsset));
+    assert(existingPair.mentoExchange == testMentoExchange);
+    assert(existingPair.collateralBucketFraction.equals(FixidityLib.wrap(0.1 * 10**24)));
+    assert(existingPair.stableBucketMaxFraction.equals(FixidityLib.wrap(0.1 * 10**24)));
+    assert(existingPair.spread.equals(FixidityLib.wrap(0.1 * 10**24)));
   }
 }
 
@@ -289,8 +381,51 @@ contract PairManagerTest_createPair is PairManagerTest {
       address(testMentoExchange)
     );
     testee.createPair(newPair);
+  }
+}
 
-    // Verify pair exists
+contract PairManagerTest_destroyPair is PairManagerTest {
+  function test_destroyPair_whenSenderIsNotOwner_shouldRevert() public {
+    changePrank(notDeployer);
+    vm.expectRevert("Ownable: caller is not the owner");
+    testee.destroyPair(address(testStableAsset), address(testCollateralAsset), testMentoExchange);
+  }
 
+  function test_destroyPair_whenStableAddressIsZero_shouldRevert() public {
+    vm.expectRevert("Stable asset address must be specified");
+    testee.destroyPair(address(0), address(testCollateralAsset), testMentoExchange);
+  }
+
+  function test_destroyPair_whenCollateralAddressIsZero_shouldRevert() public {
+    vm.expectRevert("Collateral asset address must be specified");
+    testee.destroyPair(address(testStableAsset), address(0), testMentoExchange);
+  }
+
+  function test_destroyPair_whenMentoExchangeAddressIsZero_shouldRevert() public {
+    vm.expectRevert("Mento exchange must be set");
+    testee.destroyPair(
+      address(testStableAsset),
+      address(testCollateralAsset),
+      IMentoExchange(address(0))
+    );
+  }
+
+  function test_destroyPair_whenPairDoesNotExist_shouldRevert() public {
+    vm.expectRevert("A pair with the specified assets and exchange does not exist");
+    testee.destroyPair(
+      address(anotherTestStableAsset),
+      address(testCollateralAsset),
+      testMentoExchange
+    );
+  }
+
+  function test_destroyPair_whenPairExists_shouldUpdateAndEmit() public {
+    vm.expectEmit(true, true, true, false);
+    emit PairDestroyed(
+      address(testStableAsset),
+      address(testCollateralAsset),
+      address(testMentoExchange)
+    );
+    testee.destroyPair(address(testStableAsset), address(testCollateralAsset), testMentoExchange);
   }
 }
