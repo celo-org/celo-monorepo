@@ -25,6 +25,20 @@ interface IBroker {
   );
 
   /**
+   * @notice Emitted the PairManager is updated
+   * @param newAddress the new address
+   * @param prevAddress the previous address
+   */
+  event PairManagerUpdated(address indexed newAddress, address indexed prevAddress);
+
+  /**
+   * @notice Emitted the Reserve is updated
+   * @param newAddress the new address
+   * @param prevAddress the previous address
+   */
+  event ReserveUpdated(address indexed newAddress, address indexed prevAddress);
+
+  /**
    * @notice Execute a token swap
    * @param pairId The id of the pair to be swapped
    * @param tokenIn The address of the token to be sold
@@ -50,5 +64,4 @@ interface IBroker {
     external
     view
     returns (address tokenOut, uint256 amountOut);
-
 }

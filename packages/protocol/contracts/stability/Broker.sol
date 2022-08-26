@@ -47,10 +47,10 @@ contract Broker is IBroker, Initializable, Ownable {
    * @param _broker The address of the broker contract.
    * @param registryAddress The address of the Celo registry.
    */
-  function initilize(address _pairManager, address _registry) external initializer {
+  function initilize(address _pairManager, address _reserve) external initializer {
     _transferOwnership(msg.sender);
-    setPairManager(registryAddress);
-    setRegistry(_broker);
+    setPairManager(_pairManager);
+    setReserve(_reserve);
   }
 
   /* ==================== View Functions ==================== */
@@ -90,22 +90,60 @@ contract Broker is IBroker, Initializable, Ownable {
 
   /* ==================== Mutative Functions ==================== */
 
+  /**
+   * @notice Update the PairManager address
+   * @dev only callable by owner
+   * @param _pairManager The new pair manager address
+   */
+  function setPairManager(address _pairManager) external onlyOwner {
+    emit PairManagerUpdated(_pairManager, address(pairManager));
+    pairManager = PairManager(_pairManager);
+  }
+
+  /**
+   * @notice Update the PairManager address
+   * @dev only callable by owner
+   * @param _reserve The new pair manager address
+   */
+  function setReserve(address _reserve) external onlyOwner {
+    emit ReserveUpdated(_reserve, address(reserve));
+    reserve = Reserve(_reserve);
+  }
+
+  /**
+   * @notice Execute a token swap
+   * @param pairId The id of the pair to be swapped
+   * @param tokenIn The address of the token to be sold
+   * @param amountIn The amount of tokenIn to be sold
+   * @param amountOutMin Minimum amountOut to be received - controls slippage
+   * @return tokenOut The token to be bought 
+   * @return amountOut The amount of tokenOut to be bought
+   */
   function swap(bytes32 pairId, address tokenIn, uint256 amountIn, uint256 amountOutMin)
     external
     view
     returns (address tokenOut, uint256 amountOut)
   {
     (address tokenOut, uint256 amountOut) = quote(pairId, tokenIn, amountIn);
-    require(amountOut < amountOutMin, "slippage to low");
+    require(amountOut < amountOutMin, "amountOutMin not met");
 
-    // TODO: adjust bucket
+    uint256 nextStableBucket;
+    uint256 nextCollateralBucket;
+
     if (tokenIn == pair.stableAsset) {
       IERC20(tokenIn).transferFrom(msg.sender, amountIn, address(this));
       IERC20(tokenIn).burn(amountIn);
       reserve.transferToken(tokenOut, msg.sender, amountOut);
+      nextStableBucket = pair.stableBucket + amountIn;
+      nextCollateralBucket = pair.collateralBucket - tokenOut;
     } else {
       IERC20(tokenIn).transferFrom(msg.sender, amountIn, address(reserve));
       IERC20(tokenOut).mint(msg.sender, amountOut);
+      nextStableBucket = pair.stableBucket - amountIn;
+      nextCollateralBucket = pair.collateralBucket + tokenOut;
     }
+
+    pairManager.updateBuckets(pairId, nextStableBucket, nextCollateralBucket);
+    emit Swap(pairId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
   }
 }
