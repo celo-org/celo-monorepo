@@ -69,7 +69,9 @@ export function getMessageDigest(message: string) {
   return crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex')
 }
 
-export function signWithRawDEK(msg: string, rawKey: string) {
+// Used primarily for signing requests with a DEK, counterpart of verifyDEKSignature
+// For general signing, use SignatureUtils in @celo/utils
+export function signWithRawKey(msg: string, rawKey: string) {
   // NOTE: elliptic is disabled elsewhere in this library to prevent
   // accidental signing of truncated messages.
   // tslint:disable-next-line:import-blacklist

@@ -11,7 +11,7 @@ import {
   GetContactMatchesRequest,
   GetContactMatchesResponse,
   PhoneNumberPrivacyRequest,
-  signWithRawDEK,
+  signWithRawKey,
 } from '@celo/phone-number-privacy-common'
 import fetch from 'cross-fetch'
 import debugFactory from 'debug'
@@ -34,7 +34,7 @@ export interface EncryptionKeySigner {
 export type AuthSigner = WalletKeySigner | EncryptionKeySigner
 
 // Re-export types and aliases to maintain backwards compatibility.
-export { AuthenticationMethod, PhoneNumberPrivacyRequest }
+export { AuthenticationMethod, PhoneNumberPrivacyRequest, signWithRawKey }
 export type SignMessageRequest = GetBlindedMessageSigRequest
 export type MatchmakingRequest = GetContactMatchesRequest
 export type MatchmakingResponse = GetContactMatchesResponse
@@ -94,11 +94,6 @@ export function getServiceContext(contextName = 'mainnet') {
 
 export function signWithDEK(msg: string, signer: EncryptionKeySigner) {
   return signWithRawKey(msg, signer.rawKey)
-}
-
-export function signWithRawKey(msg: string, rawKey: string) {
-  // For backwards compatibility
-  return signWithRawDEK(msg, rawKey)
 }
 
 /**

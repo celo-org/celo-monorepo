@@ -5,7 +5,7 @@ import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
 import Web3 from 'web3'
 import { AuthenticationMethod, PhoneNumberPrivacyRequest, PnpQuotaRequest } from '../interfaces'
-import { signWithRawDEK } from '../utils/authentication'
+import { signWithRawKey } from '../utils/authentication'
 import { genSessionID } from '../utils/logger'
 
 export function createMockAttestation(completed: number, total: number) {
@@ -20,10 +20,10 @@ export function createMockToken(balanceOf: jest.Mock<BigNumber, []>) {
   }
 }
 
-export function createMockAccounts(walletAddress: string, dataEncryptionKey?: string) {
+export function createMockAccounts(walletAddress: string, dekPubKey?: string) {
   return {
     getWalletAddress: jest.fn(() => walletAddress),
-    getDataEncryptionKey: jest.fn(() => dataEncryptionKey),
+    getDataEncryptionKey: jest.fn(() => dekPubKey),
   }
 }
 
@@ -128,7 +128,7 @@ export function getPnpQuotaRequest(account: string, hashedPhoneNumber?: string):
 export function getPnpRequestAuthorization(req: PhoneNumberPrivacyRequest, pk: string) {
   const msg = JSON.stringify(req)
   if (req.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    return signWithRawDEK(JSON.stringify(req), pk)
+    return signWithRawKey(JSON.stringify(req), pk)
   }
   const account = privateKeyToAddress(pk)
   return serializeSignature(signMessage(msg, pk, account))
