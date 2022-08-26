@@ -602,7 +602,7 @@ describe('pnpService', () => {
       })
     })
 
-    it('Should respond with 500 when insufficient signer responses', async () => {
+    it('Should respond with 502 when insufficient signer responses', async () => {
       await signerDB1?.destroy()
       await signerDB2?.destroy()
       signer1?.close()
