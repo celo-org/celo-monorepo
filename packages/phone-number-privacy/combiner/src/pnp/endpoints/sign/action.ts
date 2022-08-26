@@ -1,8 +1,8 @@
-import { SignMessageRequest } from '@celo/identity/lib/odis/query'
 import {
   ErrorMessage,
   ErrorType,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
@@ -20,7 +20,6 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
-        console.log('combining signature')
         const combinedSignature = session.crypto.combinePartialBlindedSignatures(
           this.parseBlindedMessage(session.request.body),
           session.logger

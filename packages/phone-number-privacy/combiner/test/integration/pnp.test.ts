@@ -1,5 +1,6 @@
 import { newKit } from '@celo/contractkit'
 import {
+  AuthenticationMethod,
   CombinerEndpoint,
   ErrorMessage,
   genSessionID,
@@ -9,7 +10,8 @@ import {
   PnpQuotaResponseSuccess,
   SignerEndpoint,
   SignMessageRequest,
-  SignMessageResponse,
+  SignMessageResponseFailure,
+  SignMessageResponseSuccess,
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -20,12 +22,12 @@ import {
 } from '@celo/phone-number-privacy-common/lib/test/values'
 import {
   initDatabase as initSignerDatabase,
-  initKeyProvider,
   startSigner,
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
 import { KeyProvider } from '@celo/phone-number-privacy-signer/src/common/key-management/key-provider-base'
+import { MockKeyProvider } from '@celo/phone-number-privacy-signer/src/common/key-management/mock-key-provider'
 import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/src/config'
 import BigNumber from 'bignumber.js'
 import threshold_bls from 'blind-threshold-bls'
@@ -39,11 +41,18 @@ import { startCombiner } from '../../src/server'
 const {
   ContractRetrieval,
   createMockContractKit,
+  createMockAccounts,
   createMockOdisPayments,
   createMockWeb3,
   getPnpRequestAuthorization,
 } = TestUtils.Utils
-const { PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
+const {
+  PRIVATE_KEY1,
+  ACCOUNT_ADDRESS1,
+  mockAccount,
+  DEK_PRIVATE_KEY,
+  DEK_PUBLIC_KEY,
+} = TestUtils.Values
 
 const combinerConfig: CombinerConfig = { ...config }
 
@@ -128,10 +137,10 @@ const signerConfig: SignerConfig = {
 
 const testBlockNumber = 1000000
 
-// TODO EN: simplify this as much as possible
 const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
 const mockContractKit = createMockContractKit(
   {
+    [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount, DEK_PUBLIC_KEY),
     [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
   },
   createMockWeb3(5, testBlockNumber)
@@ -143,6 +152,19 @@ jest.mock('@celo/contractkit', () => ({
   ...jest.requireActual('@celo/contractkit'),
   newKit: jest.fn().mockImplementation(() => mockContractKit),
 }))
+
+// Generated with 2/3 ratio
+const BLS_THRESHOLD_PK_SHARE_1 =
+  '000000000e7e1a2fad3b54deb2b1b32cf4c7b084842d50bbb5c6143b9d9577d16e050f03'
+const BLS_THRESHOLD_PK_SHARE_2 =
+  '01000000e43f10f7778e238e1ed58d5fad9363d7439d2b5a8eeda6073d68ba87c0b10011'
+const BLS_THRESHOLD_PK_SHARE_3 =
+  '02000000b90106bf4261e13389f867c267e86bd0015dcf9c48c784738695d0a3b3f8460c'
+
+const BLS_THRESHOLD_PUBKEY =
+  'eb569eb8701d831a0a9ffe5df325eed2ac7f5693c758c02aad5804009fcca42ece73f7f560b3e237b60a6b0f5e0d6501516b38b0f9fa20dd944c66edf798cfea73bc232983e0885b04e3632dc125b2ad63c13676723b931d5f686d2c83165d81'
+const BLS_POLYNOMIAL =
+  '0200000000000000eb569eb8701d831a0a9ffe5df325eed2ac7f5693c758c02aad5804009fcca42ece73f7f560b3e237b60a6b0f5e0d6501516b38b0f9fa20dd944c66edf798cfea73bc232983e0885b04e3632dc125b2ad63c13676723b931d5f686d2c83165d817aaff1f84d0b008ad218eff19db698f343168cf931ba8347640123a2f826f62b66ff084273f494d4647758e9a9f889009d573705824a0e74e1f49ed234462058e53bbb4fef370b55f78da89df070c661782a84239b8c7623d09e34b9f91f7781'
 
 describe('pnpService', () => {
   let keyProvider1: KeyProvider
@@ -156,25 +178,35 @@ describe('pnpService', () => {
   let signer3: Server | HttpsServer
   let app: any
 
+  // Used by PNP_SIGN tests for various configurations of signers
+  let userSeed: Uint8Array
+  let blindedMsgResult: threshold_bls.BlindedMessage
+
   const signerMigrationsPath = '../signer/src/common/database/migrations'
   const expectedVersion = getVersion()
 
+  const onChainPaymentsDefault = new BigNumber(1e18)
+  const message = Buffer.from('test message', 'utf8')
+  const expectedSig = 'xgFMQtcgAMHJAEX/m9B4VFopYtxqPFSw0024sWzRYvQDvnmFqhXOPdnRDfa8WCEA'
+  const expectedUnblindedMsg = 'lOASnDJNbJBTMYfkbU4fMiK7FcNwSyqZo8iQSM95X8YK+/158be4S1A+jcQsCUYA'
+
+  // In current setup, the same mocked kit is used for the combiner and signers
+  const mockKit = newKit('dummyKit')
+
   beforeAll(async () => {
-    keyProvider1 = await initKeyProvider(signerConfig)
-    keyProvider2 = await initKeyProvider(signerConfig)
-    keyProvider3 = await initKeyProvider(signerConfig)
+    keyProvider1 = new MockKeyProvider(BLS_THRESHOLD_PK_SHARE_1)
+    keyProvider2 = new MockKeyProvider(BLS_THRESHOLD_PK_SHARE_2)
+    keyProvider3 = new MockKeyProvider(BLS_THRESHOLD_PK_SHARE_3)
 
-    // TODO EN fix dev keys
+    // TODO(2.0.0): consider updating these directly in the combiner dev config and values
+    // if these are used in the legacy tests as well
     combinerConfig.phoneNumberPrivacy.keys.pubKey = Buffer.from(
-      TestUtils.Values.PNP_DEV_ODIS_PUBLIC_KEY,
+      BLS_THRESHOLD_PUBKEY,
       'hex'
     ).toString('base64')
-    combinerConfig.phoneNumberPrivacy.keys.polynomial = Buffer.from(
-      TestUtils.Values.PNP_DEV_ODIS_POLYNOMIAL,
-      'hex'
-    ).toString('base64')
+    combinerConfig.phoneNumberPrivacy.keys.polynomial = BLS_POLYNOMIAL
 
-    app = startCombiner(combinerConfig)
+    app = startCombiner(combinerConfig, mockKit)
   })
 
   beforeEach(async () => {
@@ -184,11 +216,12 @@ describe('pnpService', () => {
     signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
 
-    const mockKit = newKit('dummyKit')
+    userSeed = new Uint8Array(32)
+    for (let i = 0; i < userSeed.length - 1; i++) {
+      userSeed[i] = i
+    }
 
-    signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
-    signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
-    signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
+    blindedMsgResult = threshold_bls.blind(message, userSeed)
   })
 
   afterEach(async () => {
@@ -200,257 +233,295 @@ describe('pnpService', () => {
     signer3?.close()
   })
 
-  describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
-    const onChainPayments = new BigNumber(1e18)
-    const expectedSig = 'uaD/zaruDHt6zakSDujYSbzOdFAPqIIUGjT5X9IxN9VNe0xGffJasZUK+HrD9joB'
-    // const expectedTotalQuota = 10
+  const sendPnpSignRequest = async (
+    req: SignMessageRequest,
+    authorization: string,
+    app: any,
+    keyVersionHeader?: string
+  ) => {
+    let reqWithHeaders = request(app)
+      .post(CombinerEndpoint.PNP_SIGN)
+      .set('Authorization', authorization)
 
-    const pnpSignMessageRequest = (userSeed: Uint8Array): [SignMessageRequest, Uint8Array] => {
-      // TODO EN: consider moving the message blinding, etc. into the beforeAll (+ not returning blinding factor)
-      const message = Buffer.from('test message', 'utf8')
-      const blindedMsgResult = threshold_bls.blind(message, userSeed)
-      const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
-
-      return [
-        {
-          account: ACCOUNT_ADDRESS1,
-          blindedQueryPhoneNumber: blindedMsg,
-          sessionID: genSessionID(),
-        },
-        blindedMsgResult.blindingFactor,
-      ]
+    if (keyVersionHeader) {
+      reqWithHeaders = reqWithHeaders.set(KEY_VERSION_HEADER, keyVersionHeader)
     }
-    let userSeed: Uint8Array
+    return reqWithHeaders.send(req)
+  }
 
-    beforeEach(() => {
-      mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainPayments)
-      userSeed = new Uint8Array(32)
-      for (let i = 0; i < userSeed.length - 1; i++) {
-        userSeed[i] = i
-      }
+  const getSignRequest = (_blindedMsgResult: threshold_bls.BlindedMessage): SignMessageRequest => {
+    return {
+      account: ACCOUNT_ADDRESS1,
+      blindedQueryPhoneNumber: Buffer.from(_blindedMsgResult.message).toString('base64'),
+      sessionID: genSessionID(),
+    }
+  }
+
+  describe('when all signers return correct signatures', () => {
+    beforeEach(async () => {
+      signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+      signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
+      signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
     })
 
-    it('Should respond with 200 on valid request', async () => {
-      // TODO EN: possibly combine req, auth
-      const [req, blindingFactor] = pnpSignMessageRequest(userSeed)
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+    describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
+      let req: SignMessageRequest
 
-      const res = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .send(req)
-
-      expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<SignMessageResponse>({
-        success: true,
-        version: expectedVersion,
-        signature: expectedSig,
-      })
-      const unblindedSig = threshold_bls.unblind(
-        Buffer.from(res.body.signature, 'base64'),
-        blindingFactor
-      )
-
-      expect(Buffer.from(unblindedSig).toString('base64')).toEqual(
-        'J8SakytlC1bGuQ2/0+ptB3ysv2MB4ahbtHujgHBqhmP9oSkRWR7173NNxnr+/YOA'
-      )
-    })
-
-    it('Should respond with 200 on valid request with key version header', async () => {
-      const [req, _] = pnpSignMessageRequest(userSeed)
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
-
-      const res = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .set(KEY_VERSION_HEADER, '1')
-        .send(req)
-
-      expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<SignMessageResponse>({
-        success: true,
-        version: expectedVersion,
-        signature: expectedSig,
-      })
-    })
-
-    it('Should respond with 200 on repeated valid requests', async () => {
-      const [req, _] = pnpSignMessageRequest(userSeed)
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
-
-      const res1 = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .send(req)
-
-      expect(res1.status).toBe(200)
-      expect(res1.body).toMatchObject<SignMessageResponse>({
-        success: true,
-        version: expectedVersion,
-        signature: expectedSig,
+      beforeEach(async () => {
+        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainPaymentsDefault)
+        req = getSignRequest(blindedMsgResult)
       })
 
-      const res2 = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .send(req)
-      expect(res2.status).toBe(200)
-      expect(res2.body).toMatchObject<SignMessageResponse>(res1.body)
-    })
+      it('Should respond with 200 on valid request', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
 
-    it('Should respond with 200 on extra request fields', async () => {
-      const [req, _] = pnpSignMessageRequest(userSeed)
-      // @ts-ignore Intentionally adding an extra field to the request type
-      req.extraField = 'dummyString'
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+        })
+        const unblindedSig = threshold_bls.unblind(
+          Buffer.from(res.body.signature, 'base64'),
+          blindedMsgResult.blindingFactor
+        )
 
-      const res = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .send(req)
-
-      expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<SignMessageResponse>({
-        success: true,
-        version: expectedVersion,
-        signature: expectedSig,
-      })
-    })
-
-    it('Should get the same unblinded signatures from the same message (different seed)', async () => {
-      const [req1, blindingFactor1] = pnpSignMessageRequest(userSeed)
-      const authorization1 = getPnpRequestAuthorization(req1, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
-
-      const res1 = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization1)
-        .send(req1)
-
-      expect(res1.status).toBe(200)
-      expect(res1.body).toMatchObject<SignMessageResponse>({
-        success: true,
-        version: expectedVersion,
-        signature: expectedSig,
+        expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedMsg)
       })
 
-      const secondUserSeed = new Uint8Array(userSeed)
-      secondUserSeed[0]++
-      const [req2, blindingFactor2] = pnpSignMessageRequest(secondUserSeed)
+      it('Should respond with 200 on valid request with key version header', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app, '1')
 
-      // Sanity check
-      expect(req2.blindedQueryPhoneNumber).not.toEqual(req1.blindedQueryPhoneNumber)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+        })
+      })
 
-      const authorization2 = getPnpRequestAuthorization(req2, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
-      const res2 = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization2)
-        .send(req2)
-      expect(res2.status).toBe(200)
-      const unblindedSig1 = threshold_bls.unblind(
-        Buffer.from(res1.body.signature, 'base64'),
-        blindingFactor1
-      )
-      const unblindedSig2 = threshold_bls.unblind(
-        Buffer.from(res2.body.signature, 'base64'),
-        blindingFactor2
-      )
-      expect(Buffer.from(unblindedSig1).toString('base64')).toEqual(
-        'J8SakytlC1bGuQ2/0+ptB3ysv2MB4ahbtHujgHBqhmP9oSkRWR7173NNxnr+/YOA'
-      )
-      expect(unblindedSig1).toEqual(unblindedSig2)
-    })
+      it('Should respond with 200 on repeated valid requests', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res1 = await sendPnpSignRequest(req, authorization, app)
 
-    it('Should respond with 400 on missing request fields', async () => {
-      const [req, _] = pnpSignMessageRequest(userSeed)
-      // @ts-ignore Intentionally deleting required field
-      delete req.account
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        expect(res1.status).toBe(200)
+        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+        })
 
-      const res = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .send(req)
+        const res2 = await sendPnpSignRequest(req, authorization, app)
+        expect(res2.status).toBe(200)
+        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(res1.body)
+      })
 
-      expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<SignMessageResponse>({
-        success: false,
-        version: expectedVersion,
-        error: WarningMessage.INVALID_INPUT,
+      it('Should respond with 200 on extra request fields', async () => {
+        // @ts-ignore Intentionally adding an extra field to the request type
+        req.extraField = 'dummyString'
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+        })
+      })
+
+      it('Should respond with 200 when authenticated with DEK', async () => {
+        req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
+        const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+        })
+      })
+
+      it('Should get the same unblinded signatures from the same message (different seed)', async () => {
+        const authorization1 = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res1 = await sendPnpSignRequest(req, authorization1, app)
+
+        expect(res1.status).toBe(200)
+        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+        })
+
+        const secondUserSeed = new Uint8Array(userSeed)
+        secondUserSeed[0]++
+        // Ensure message is identical except for message
+        const req2 = { ...req }
+        const blindedMsgResult2 = threshold_bls.blind(message, secondUserSeed)
+        req2.blindedQueryPhoneNumber = Buffer.from(blindedMsgResult2.message).toString('base64')
+
+        // Sanity check
+        expect(req2.blindedQueryPhoneNumber).not.toEqual(req.blindedQueryPhoneNumber)
+
+        const authorization2 = getPnpRequestAuthorization(req2, PRIVATE_KEY1)
+        const res2 = await sendPnpSignRequest(req2, authorization2, app)
+        expect(res2.status).toBe(200)
+        const unblindedSig1 = threshold_bls.unblind(
+          Buffer.from(res1.body.signature, 'base64'),
+          blindedMsgResult.blindingFactor
+        )
+        const unblindedSig2 = threshold_bls.unblind(
+          Buffer.from(res2.body.signature, 'base64'),
+          blindedMsgResult2.blindingFactor
+        )
+        expect(Buffer.from(unblindedSig1).toString('base64')).toEqual(expectedUnblindedMsg)
+        expect(unblindedSig1).toEqual(unblindedSig2)
+      })
+
+      it('Should respond with 400 on missing request fields', async () => {
+        // @ts-ignore Intentionally deleting required field
+        delete req.account
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
+
+      it('Should respond with 400 on invalid key version', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app, 'a')
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        })
+      })
+
+      it('Should respond with 401 on failed auth', async () => {
+        req.account = mockAccount
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(401)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.UNAUTHENTICATED_USER,
+        })
+      })
+
+      it('Should respond with 403 on out of quota', async () => {
+        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(new BigNumber(0))
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(403)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.EXCEEDED_QUOTA,
+        })
+      })
+
+      it('Should respond with 503 on disabled api', async () => {
+        const configWithApiDisabled = { ...combinerConfig }
+        configWithApiDisabled.phoneNumberPrivacy.enabled = false
+        const appWithApiDisabled = startCombiner(configWithApiDisabled)
+
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, appWithApiDisabled)
+
+        expect(res.status).toBe(503)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.API_UNAVAILABLE,
+        })
       })
     })
+  })
 
-    it('Should respond with 400 on invalid key version', async () => {
-      const [req, _] = pnpSignMessageRequest(userSeed)
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+  // For testing combiner code paths when signers do not behave as expected
+  describe('when 2/3 signers return correct signatures', () => {
+    beforeEach(async () => {
+      const badBlsShare1 =
+        '000000002e50aa714ef6b865b5de89c56969ef9f8f27b6b0a6d157c9cc01c574ac9df604'
 
-      const res = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .set(KEY_VERSION_HEADER, 'a')
-        .send(req)
+      const badKeyProvider1: KeyProvider = new MockKeyProvider(badBlsShare1)
 
-      expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<SignMessageResponse>({
-        success: false,
-        version: expectedVersion,
-        error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
-      })
+      signer1 = startSigner(signerConfig, signerDB1, badKeyProvider1, mockKit).listen(3001)
+      signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
+      signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
     })
 
-    it('Should respond with 401 on failed auth', async () => {
-      const [req, _] = pnpSignMessageRequest(userSeed)
-      req.account = mockAccount
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+    describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
+      let req: SignMessageRequest
 
-      const res = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .send(req)
+      beforeEach(() => {
+        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainPaymentsDefault)
+        req = getSignRequest(blindedMsgResult)
+      })
 
-      expect(res.status).toBe(401)
-      expect(res.body).toMatchObject<SignMessageResponse>({
-        success: false,
-        version: expectedVersion,
-        error: WarningMessage.UNAUTHENTICATED_USER,
+      it('Should respond with 200 on valid request', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+        })
+        const unblindedSig = threshold_bls.unblind(
+          Buffer.from(res.body.signature, 'base64'),
+          blindedMsgResult.blindingFactor
+        )
+        expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedMsg)
       })
     })
+  })
 
-    it('Should respond with 403 on out of quota', async () => {
-      mockOdisPaymentsTotalPaidCUSD.mockReturnValue(new BigNumber(0))
+  describe('when 1/3 signers return correct signatures', () => {
+    beforeEach(async () => {
+      const badBlsShare1 =
+        '000000002e50aa714ef6b865b5de89c56969ef9f8f27b6b0a6d157c9cc01c574ac9df604'
+      const badBlsShare2 =
+        '01000000b8f0ef841dcf8d7bd1da5e8025e47d729eb67f513335784183b8fa227a0b9a0b'
+      const badKeyProvider1: KeyProvider = new MockKeyProvider(badBlsShare1)
+      const badKeyProvider2: KeyProvider = new MockKeyProvider(badBlsShare2)
 
-      const [req, _] = pnpSignMessageRequest(userSeed)
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
-
-      const res = await request(app)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .send(req)
-
-      expect(res.status).toBe(403)
-      expect(res.body).toMatchObject<SignMessageResponse>({
-        success: false,
-        version: expectedVersion,
-        error: WarningMessage.EXCEEDED_QUOTA,
-      })
+      signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+      signer2 = startSigner(signerConfig, signerDB2, badKeyProvider1, mockKit).listen(3002)
+      signer3 = startSigner(signerConfig, signerDB3, badKeyProvider2, mockKit).listen(3003)
     })
 
-    it('Should respond with 503 on disabled api', async () => {
-      const configWithApiDisabled = { ...combinerConfig }
-      configWithApiDisabled.phoneNumberPrivacy.enabled = false
-      const appWithApiDisabled = startCombiner(configWithApiDisabled)
-      const [req, _] = pnpSignMessageRequest(userSeed)
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+    describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
+      let req: SignMessageRequest
 
-      const res = await request(appWithApiDisabled)
-        .post(CombinerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .send(req)
+      beforeEach(() => {
+        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainPaymentsDefault)
+        req = getSignRequest(blindedMsgResult)
+      })
 
-      expect(res.status).toBe(503)
-      expect(res.body).toMatchObject<SignMessageResponse>({
-        success: false,
-        version: expectedVersion,
-        error: WarningMessage.API_UNAVAILABLE,
+      it('Should respond with 500 even if request is valid', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(500)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
+        })
       })
     })
   })

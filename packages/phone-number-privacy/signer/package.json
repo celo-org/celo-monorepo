@@ -12,6 +12,7 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --testPathIgnorePatterns test/end-to-end",
+    "test:debughandles": "jest --watch --runInBand --detectOpenHandles --testPathIgnorePatterns test/end-to-end",
     "test:debug": "node --inspect ../../../node_modules/.bin/jest --runInBand",
     "test:integration": "jest --runInBand test/integration",
     "test:e2e": "jest --runInBand test/end-to-end",
@@ -33,7 +34,6 @@
   "dependencies": {
     "@celo/base": "2.0.1-dev",
     "@celo/contractkit": "2.0.1-dev",
-    "@celo/identity": "2.0.1-dev",
     "@celo/phone-number-privacy-common": "1.0.42-dev",
     "@celo/poprf": "^0.1.9",
     "@celo/utils": "2.0.1-dev",

@@ -33,7 +33,7 @@ export interface OdisConfig {
     version: number
     threshold: number
     polynomial: string
-    pubKey: string
+    pubKey: string // Expected to be encoded in base64
   }
 }
 

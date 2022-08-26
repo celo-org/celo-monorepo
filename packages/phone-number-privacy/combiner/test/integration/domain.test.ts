@@ -1,4 +1,3 @@
-import { newKit } from '@celo/contractkit'
 import {
   CombinerEndpoint,
   DisableDomainRequest,
@@ -28,8 +27,8 @@ import {
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
-import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
-import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
+import { KeyProvider } from '@celo/phone-number-privacy-signer/src/common/key-management/key-provider-base'
+import { SignerConfig } from '@celo/phone-number-privacy-signer/src/config'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import BigNumber from 'bignumber.js'
@@ -39,11 +38,6 @@ import { Server } from 'net'
 import request from 'supertest'
 import config, { CombinerConfig } from '../../src/config'
 import { startCombiner } from '../../src/server'
-
-jest.mock('@celo/contractkit', () => ({
-  ...jest.requireActual('@celo/contractkit'),
-  newKit: jest.fn(),
-}))
 
 const combinerConfig: CombinerConfig = { ...config }
 
@@ -151,7 +145,7 @@ describe('domainService', () => {
   ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, PoprfClient]> => {
     const domain = _domain ?? authenticatedDomain()
     const poprfClient = new PoprfClient(
-      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'hex'),
+      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'base64'),
       domainHash(domain),
       Buffer.from('test message', 'utf8')
     )
@@ -233,9 +227,9 @@ describe('domainService', () => {
     signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
 
-    signer1 = startSigner(signerConfig, signerDB1, keyProvider1, newKit('dummyKit')).listen(3001)
-    signer2 = startSigner(signerConfig, signerDB2, keyProvider2, newKit('dummyKit')).listen(3002)
-    signer3 = startSigner(signerConfig, signerDB3, keyProvider3, newKit('dummyKit')).listen(3003)
+    signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
+    signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3002)
+    signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3003)
   })
 
   afterEach(async () => {

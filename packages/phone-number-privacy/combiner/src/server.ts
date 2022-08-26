@@ -28,9 +28,7 @@ import { CombinerThresholdStateService } from './pnp/services/thresholdState'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-// TODO EN revisit separating out contractKit from combiner config
-// and what this means for cloud function setup
-export function startCombiner(config: CombinerConfig) {
+export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   const logger = rootLogger(config.serviceName)
 
   logger.info('Creating combiner express server')
@@ -43,7 +41,7 @@ export function startCombiner(config: CombinerConfig) {
   //   })
   // })
 
-  const kit: ContractKit = getContractKit(config.blockchain)
+  kit = kit ?? getContractKit(config.blockchain)
 
   const legacyPnpSign = new Controller(
     new PnpSignAction(
