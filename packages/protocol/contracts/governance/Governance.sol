@@ -1175,9 +1175,8 @@ contract Governance is
     returns (bool)
   {
     // The proposal is considered expired under the following conditions:
-    //   1. Past the referendum stage and not approved.
-    //   2. Past the referendum stage and not passing.
-    //   3. Past the execution stage.
+    //   1. Past the referendum stage and not passing.
+    //   2. Past the execution stage.
     return ((stage > Proposals.Stage.Execution) ||
       (stage > Proposals.Stage.Referendum && !_isProposalPassing(proposal)));
   }

@@ -2056,7 +2056,7 @@ contract('Governance', (accounts: string[]) => {
         })
       })
 
-      describe('when the proposal can execute successfully when approved after vote in execution stage', () => {
+      describe('when the proposal can execute successfully - approved in execution stage', () => {
         beforeEach(async () => {
           await governance.propose(
             [transactionSuccess1.value],
