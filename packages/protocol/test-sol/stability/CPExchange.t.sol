@@ -23,7 +23,7 @@ contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
   GoldToken celoToken;
 
   function setUp() public {
-    exchange = new CPExchange();
+    exchange = new CPExchange(true);
   }
 
   function getAmountOut(uint256 tokenInBucketSize, uint256 tokenOutBucketSize, uint256 amountIn)
@@ -38,23 +38,6 @@ contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
         tokenInBucketSize,
         tokenOutBucketSize,
         amountIn
-      );
-  }
-
-  function getUpdatedBuckets(
-    uint256 amountIn,
-    uint256 amountOut,
-    uint256 tokenInBucketSize,
-    uint256 tokenOutBucketSize
-  ) public view returns (uint256, uint256) {
-    return
-      exchange.getUpdatedBuckets(
-        address(celoToken),
-        address(stableToken),
-        amountIn,
-        amountOut,
-        tokenInBucketSize,
-        tokenOutBucketSize
       );
   }
 
