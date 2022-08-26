@@ -1,4 +1,4 @@
-import { hexToBuffer, retryAsyncWithBackOffAndTimeout } from '@celo/base'
+import { retryAsyncWithBackOffAndTimeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import { AccountsWrapper } from '@celo/contractkit/lib/wrappers/Accounts'
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
@@ -63,26 +63,6 @@ export async function authenticateUser(
   return verifySignature(message, messageSignature, signer)
 }
 
-export function getMessageDigest(message: string) {
-  // NOTE: Elliptic will truncate the raw msg to 64 bytes before signing,
-  // so make sure to always pass the hex encoded msgDigest instead.
-  return crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex')
-}
-
-// Used primarily for signing requests with a DEK, counterpart of verifyDEKSignature
-// For general signing, use SignatureUtils in @celo/utils
-export function signWithRawKey(msg: string, rawKey: string) {
-  // NOTE: elliptic is disabled elsewhere in this library to prevent
-  // accidental signing of truncated messages.
-  // tslint:disable-next-line:import-blacklist
-  const EC = require('elliptic').ec
-  const ec = new EC('secp256k1')
-
-  // Sign
-  const key = ec.keyFromPrivate(hexToBuffer(rawKey))
-  return JSON.stringify(key.sign(getMessageDigest(msg)).toDER())
-}
-
 export function verifyDEKSignature(
   message: string,
   messageSignature: string,
@@ -94,6 +74,8 @@ export function verifyDEKSignature(
 ) {
   logger = logger ?? rootLogger(fetchEnv('SERVICE_NAME'))
   try {
+    const msgDigest = crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex')
+
     // NOTE: elliptic is disabled elsewhere in this library to prevent
     // accidental signing of truncated messages.
     // tslint:disable-next-line:import-blacklist
@@ -101,7 +83,7 @@ export function verifyDEKSignature(
     const ec = new EC('secp256k1')
     const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
     const parsedSig = JSON.parse(messageSignature)
-    if (key.verify(getMessageDigest(message), parsedSig)) {
+    if (key.verify(msgDigest, parsedSig)) {
       return true
     }
     // TODO: Remove this once clients upgrade to @celo/identity v1.5.3

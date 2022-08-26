@@ -1,5 +1,4 @@
 import { OdisUtils } from '@celo/identity/lib/odis'
-// TODO(2.0.0, imports) revisit these imports from the identity package (vs. directly from common)
 import {
   AuthenticationMethod,
   ErrorMessages,
