@@ -1,6 +1,9 @@
 import { newKit } from '@celo/contractkit'
 import { PnpQuotaResponseSuccess } from '@celo/phone-number-privacy-common'
 import { SignerEndpoint } from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { PnpQuotaRequest } from '@celo/phone-number-privacy-common'
+import { PnpQuotaResponseFailure } from '@celo/phone-number-privacy-common'
 import {
   CombinerEndpoint,
   genSessionID,
@@ -10,7 +13,11 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { BLINDED_PHONE_NUMBER } from '@celo/phone-number-privacy-common/lib/test/values'
+import { getBlindedPhoneNumber } from '@celo/phone-number-privacy-common/lib/test/utils'
+import {
+  ACCOUNT_ADDRESS2,
+  BLINDING_FACTOR,
+} from '@celo/phone-number-privacy-common/lib/test/values'
 import {
   initDatabase as initSignerDatabase,
   initKeyProvider,
@@ -448,24 +455,24 @@ describe('pnpService', () => {
     })
   })
 
-  describe.only(`${CombinerEndpoint.PNP_QUOTA}`, () => {
-    const useQuery = async (signer: Server | HttpsServer) => {
-      const req = {
-        account: ACCOUNT_ADDRESS1,
-        blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
+  describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {
+    const useQuery = async (queryCount: number, signer: Server | HttpsServer) => {
+      for (let i = 0; i < queryCount; i++) {
+        const phoneNumber = '+1' + Math.floor(Math.random() * 10 ** 10)
+        const blindedNumber = getBlindedPhoneNumber(phoneNumber, BLINDING_FACTOR)
+        const req = {
+          account: ACCOUNT_ADDRESS1,
+          blindedQueryPhoneNumber: blindedNumber,
+        }
+        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        await request(signer)
+          .post(SignerEndpoint.PNP_SIGN)
+          .set('Authorization', authorization)
+          .send(req)
       }
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
-      await request(signer)
-        .post(SignerEndpoint.PNP_SIGN)
-        .set('Authorization', authorization)
-        .send(req)
     }
 
-    const getCombinerQuotaResponse = async () => {
-      const req = {
-        account: ACCOUNT_ADDRESS1,
-      }
-      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+    const getCombinerQuotaResponse = async (req: PnpQuotaRequest, authorization: string) => {
       const res = await request(app)
         .get(CombinerEndpoint.PNP_QUOTA)
         .set('Authorization', authorization)
@@ -479,44 +486,159 @@ describe('pnpService', () => {
       mockOdisPaymentsTotalPaidCUSD.mockReturnValue(weiTocusd.multipliedBy(totalQuota))
     })
 
-    it('should return 0 performedQueryCount when no queries performed', async () => {
-      const res = await getCombinerQuotaResponse()
+    const queryCountParams = [
+      [0, 0, 0, 0],
+      [1, 0, 0, 0], // does not reach threshold
+      [1, 1, 0, 1], // threshold reached
+      [0, 1, 1, 1], // order of signers shouldn't matter
+      [1, 4, 9, 4],
+    ]
+    queryCountParams.forEach(
+      ([signer1queries, signer2queries, signer3queries, expectedQueryCount]) => {
+        it(`should get ${expectedQueryCount} performedQueryCount given signer responses of [${signer1queries}, ${signer2queries}, ${signer3queries}]`, async () => {
+          await useQuery(signer1queries, signer1)
+          await useQuery(signer2queries, signer2)
+          await useQuery(signer3queries, signer3)
 
+          const req = {
+            account: ACCOUNT_ADDRESS1,
+          }
+          const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+          const res = await getCombinerQuotaResponse(req, authorization)
+
+          expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+            success: true,
+            version: expectedVersion,
+            performedQueryCount: expectedQueryCount,
+            totalQuota,
+            blockNumber: testBlockNumber,
+          })
+        })
+      }
+    )
+
+    // TODO: INSUFFICIENT SIGNER RESPONSES
+
+    it('Should respond with 200 on repeated valid requests', async () => {
+      const req = {
+        account: ACCOUNT_ADDRESS1,
+      }
+      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const res1 = await getCombinerQuotaResponse(req, authorization)
+      expect(res1.status).toBe(200)
+      expect(res1.body).toMatchObject<PnpQuotaResponseSuccess>({
+        success: true,
+        version: expectedVersion,
+        performedQueryCount: 0,
+        totalQuota,
+        blockNumber: testBlockNumber,
+      })
+      const res2 = await getCombinerQuotaResponse(req, authorization)
+      expect(res2.status).toBe(200)
+      expect(res2.body).toMatchObject<PnpQuotaResponseSuccess>(res1.body)
+    })
+
+    it('Should respond with 200 on extra request fields', async () => {
+      const req = {
+        account: ACCOUNT_ADDRESS1,
+        extraField: 'dummy',
+      }
+      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const res = await getCombinerQuotaResponse(req, authorization)
+
+      expect(res.status).toBe(200)
       expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
         success: true,
-        version: res.body.version,
+        version: expectedVersion,
         performedQueryCount: 0,
         totalQuota,
         blockNumber: testBlockNumber,
       })
     })
 
-    it('should return 0 performedQueryCount when <threshold of signers show quota usage', async () => {
-      await useQuery(signer1)
+    it('Should respond with 400 on missing request fields', async () => {
+      const req = {}
+      // @ts-ignore Intentionally deleting required field
+      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      // @ts-ignore Intentionally deleting required field
+      const res = await getCombinerQuotaResponse(req, authorization)
 
-      const res = await getCombinerQuotaResponse()
-
-      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
-        success: true,
-        version: res.body.version,
-        performedQueryCount: 0,
-        totalQuota,
-        blockNumber: testBlockNumber,
+      expect(res.status).toBe(400)
+      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.INVALID_INPUT,
       })
     })
 
-    it('should reflect quota usage when >threshold # of signers show quota usage', async () => {
-      await useQuery(signer1)
-      await useQuery(signer2)
+    it('Should respond with 400 with invalid address', async () => {
+      const req = {
+        account: 'not an address',
+      }
+      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const res = await getCombinerQuotaResponse(req, authorization)
 
-      const res = await getCombinerQuotaResponse()
+      expect(res.status).toBe(400)
+      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.INVALID_INPUT,
+      })
+    })
 
-      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
-        success: true,
-        version: res.body.version,
-        performedQueryCount: 1,
-        totalQuota,
-        blockNumber: testBlockNumber,
+    it('Should respond with 401 on failed auth', async () => {
+      // Request from one account, signed by another account
+      const req = {
+        account: ACCOUNT_ADDRESS2,
+      }
+      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const res = await getCombinerQuotaResponse(req, authorization)
+
+      expect(res.status).toBe(401)
+      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.UNAUTHENTICATED_USER,
+      })
+    })
+
+    it('Should respond with 500 when insufficient signer responses', async () => {
+      await signerDB1?.destroy()
+      await signerDB2?.destroy()
+      signer1?.close()
+      signer2?.close()
+
+      const req = {
+        account: ACCOUNT_ADDRESS1,
+      }
+      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const res = await getCombinerQuotaResponse(req, authorization)
+
+      expect(res.status).toBe(502)
+      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: ErrorMessage.THRESHOLD_PNP_QUOTA_STATUS_FAILURE,
+      })
+    })
+
+    it('Should respond with 503 on disabled api', async () => {
+      const configWithApiDisabled = { ...combinerConfig }
+      configWithApiDisabled.phoneNumberPrivacy.enabled = false
+      const appWithApiDisabled = startCombiner(configWithApiDisabled)
+      const req = {
+        account: ACCOUNT_ADDRESS1,
+      }
+      const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+      const res = await request(appWithApiDisabled)
+        .get(CombinerEndpoint.PNP_QUOTA)
+        .set('Authorization', authorization)
+        .send(req)
+      expect(res.status).toBe(503)
+      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.API_UNAVAILABLE,
       })
     })
   })

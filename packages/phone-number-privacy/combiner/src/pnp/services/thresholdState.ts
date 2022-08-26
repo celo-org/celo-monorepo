@@ -21,6 +21,8 @@ export class CombinerThresholdStateService<R extends PnpQuotaRequest> {
     const threshold = this.config.keys.threshold
     if (signerResponses.length < threshold) {
       throw new Error('Insufficient number of successful signer responses')
+      // checking for sufficient number of responses is already done in the action
+      // this is basically checking for sufficient number of successful responses
     }
 
     sortedResponses.forEach((res) => {
