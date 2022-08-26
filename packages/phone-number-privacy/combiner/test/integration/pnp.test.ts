@@ -1,5 +1,6 @@
 import { newKit } from '@celo/contractkit'
 import {
+  AuthenticationMethod,
   CombinerEndpoint,
   ErrorMessage,
   genSessionID,
@@ -31,11 +32,18 @@ import { startCombiner } from '../../src/server'
 const {
   ContractRetrieval,
   createMockContractKit,
+  createMockAccounts,
   createMockOdisPayments,
   createMockWeb3,
   getPnpRequestAuthorization,
 } = TestUtils.Utils
-const { PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
+const {
+  PRIVATE_KEY1,
+  ACCOUNT_ADDRESS1,
+  mockAccount,
+  DEK_PRIVATE_KEY,
+  DEK_PUBLIC_KEY,
+} = TestUtils.Values
 
 const combinerConfig: CombinerConfig = { ...config }
 
@@ -123,6 +131,7 @@ const testBlockNumber = 1000000
 const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
 const mockContractKit = createMockContractKit(
   {
+    [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount, DEK_PUBLIC_KEY),
     [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
   },
   createMockWeb3(5, testBlockNumber)
@@ -255,7 +264,7 @@ describe('pnpService', () => {
       })
 
       it('Should respond with 200 on valid request', async () => {
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
@@ -273,7 +282,7 @@ describe('pnpService', () => {
       })
 
       it('Should respond with 200 on valid request with key version header', async () => {
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app, '1')
 
         expect(res.status).toBe(200)
@@ -285,7 +294,7 @@ describe('pnpService', () => {
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res1 = await sendPnpSignRequest(req, authorization, app)
 
         expect(res1.status).toBe(200)
@@ -303,7 +312,20 @@ describe('pnpService', () => {
       it('Should respond with 200 on extra request fields', async () => {
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+        })
+      })
+
+      it('Should respond with 200 when authenticated with DEK', async () => {
+        req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
+        const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
@@ -315,7 +337,7 @@ describe('pnpService', () => {
       })
 
       it('Should get the same unblinded signatures from the same message (different seed)', async () => {
-        const authorization1 = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization1 = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res1 = await sendPnpSignRequest(req, authorization1, app)
 
         expect(res1.status).toBe(200)
@@ -335,7 +357,7 @@ describe('pnpService', () => {
         // Sanity check
         expect(req2.blindedQueryPhoneNumber).not.toEqual(req.blindedQueryPhoneNumber)
 
-        const authorization2 = getPnpRequestAuthorization(req2, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization2 = getPnpRequestAuthorization(req2, PRIVATE_KEY1)
         const res2 = await sendPnpSignRequest(req2, authorization2, app)
         expect(res2.status).toBe(200)
         const unblindedSig1 = threshold_bls.unblind(
@@ -353,7 +375,7 @@ describe('pnpService', () => {
       it('Should respond with 400 on missing request fields', async () => {
         // @ts-ignore Intentionally deleting required field
         delete req.account
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(400)
@@ -365,7 +387,7 @@ describe('pnpService', () => {
       })
 
       it('Should respond with 400 on invalid key version', async () => {
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app, 'a')
         expect(res.status).toBe(400)
         expect(res.body).toMatchObject<SignMessageResponseFailure>({
@@ -377,7 +399,7 @@ describe('pnpService', () => {
 
       it('Should respond with 401 on failed auth', async () => {
         req.account = mockAccount
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(401)
@@ -390,7 +412,7 @@ describe('pnpService', () => {
 
       it('Should respond with 403 on out of quota', async () => {
         mockOdisPaymentsTotalPaidCUSD.mockReturnValue(new BigNumber(0))
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(403)
@@ -406,7 +428,7 @@ describe('pnpService', () => {
         configWithApiDisabled.phoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startCombiner(configWithApiDisabled)
 
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, appWithApiDisabled)
 
         expect(res.status).toBe(503)
@@ -441,7 +463,7 @@ describe('pnpService', () => {
       })
 
       it('Should respond with 200 on valid request', async () => {
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
@@ -482,7 +504,7 @@ describe('pnpService', () => {
       })
 
       it('Should respond with 500 even if request is valid', async () => {
-        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(500)
