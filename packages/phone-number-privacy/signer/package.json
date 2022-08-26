@@ -12,7 +12,6 @@
     "build": "tsc -b .",
     "lint": "tslint --project .",
     "test": "jest --testPathIgnorePatterns test/end-to-end",
-    "test:debughandles": "jest --watch --runInBand --detectOpenHandles --testPathIgnorePatterns test/end-to-end",
     "test:debug": "node --inspect ../../../node_modules/.bin/jest --runInBand",
     "test:integration": "jest --runInBand test/integration",
     "test:e2e": "jest --runInBand test/end-to-end",

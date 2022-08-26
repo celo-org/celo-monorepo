@@ -24,11 +24,10 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
-        return this.io.sendSuccess(200, session.response, combinedSignature)
-      } catch (error) {
+        return this.io.sendSuccess(200, session.response, session.logger, combinedSignature)
+      } catch {
         // May fail upon combining signatures if too many sigs are invalid
         // Fallback to handleMissingSignatures
-        session.logger.error(error)
       }
     }
 
@@ -97,6 +96,7 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
   protected errorCodeToError(errorCode: number): ErrorType {
     switch (errorCode) {
       case 403:
+      case 429:
         return WarningMessage.EXCEEDED_QUOTA
       default:
         return ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES

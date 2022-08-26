@@ -39,8 +39,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         // may be undefined.
         // In the case of a database connection failure, queryCount
         // may be undefined.
-        // Note that queryCount or totalQuota can be 0 and that should not fail open.
-        if (quotaStatus.queryCount !== undefined && quotaStatus.totalQuota !== undefined) {
+        if (quotaStatus.queryCount && quotaStatus.totalQuota) {
           const { sufficient, state } = await this.quota.checkAndUpdateQuotaStatus(
             quotaStatus,
             session,

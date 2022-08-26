@@ -1,11 +1,6 @@
 import { timeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
-import {
-  getContractKit,
-  loggerMiddleware,
-  rootLogger,
-  SignerEndpoint,
-} from '@celo/phone-number-privacy-common'
+import { loggerMiddleware, rootLogger, SignerEndpoint } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import fs from 'fs'
@@ -15,6 +10,7 @@ import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
 import { KeyProvider } from './common/key-management/key-provider-base'
 import { Counters, Histograms } from './common/metrics'
+import { getContractKit } from './common/web3/contracts'
 import { getVersion, SignerConfig } from './config'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
@@ -40,7 +36,7 @@ export function startSigner(
 ) {
   const logger = rootLogger(config.serviceName)
 
-  kit = kit ?? getContractKit(config.blockchain)
+  kit = kit ?? getContractKit(config)
 
   logger.info('Creating signer express server')
   const app = express()

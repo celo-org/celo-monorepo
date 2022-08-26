@@ -1,4 +1,4 @@
-import { BlockchainConfig, toBool } from '@celo/phone-number-privacy-common'
+import { toBool } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 
 require('dotenv').config()
@@ -49,7 +49,10 @@ export interface SignerConfig {
   attestations: {
     numberAttestationsRequired: number
   }
-  blockchain: BlockchainConfig
+  blockchain: {
+    provider: string
+    apiKey?: string
+  }
   db: {
     type: SupportedDatabase
     user: string

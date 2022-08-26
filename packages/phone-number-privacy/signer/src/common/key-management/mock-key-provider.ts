@@ -5,20 +5,13 @@ import {
 import { DefaultKeyName, Key, KeyProviderBase } from './key-provider-base'
 
 export class MockKeyProvider extends KeyProviderBase {
-  constructor(
-    private pnpKey: string = PNP_DEV_SIGNER_PRIVATE_KEY,
-    private domainsKey: string = DOMAINS_DEV_SIGNER_PRIVATE_KEY
-  ) {
-    super()
-  }
-
   public async fetchPrivateKeyFromStore(key: Key) {
     switch (key.name) {
       case DefaultKeyName.PHONE_NUMBER_PRIVACY:
-        this.setPrivateKey(key, this.pnpKey)
+        this.setPrivateKey(key, PNP_DEV_SIGNER_PRIVATE_KEY)
         break
       case DefaultKeyName.DOMAINS:
-        this.setPrivateKey(key, this.domainsKey)
+        this.setPrivateKey(key, DOMAINS_DEV_SIGNER_PRIVATE_KEY)
         break
       default:
         // Force tests to explicitly set the key name or modify the mock provider
