@@ -1,13 +1,13 @@
 import { newKit } from '@celo/contractkit'
-import { PnpQuotaResponseSuccess } from '@celo/phone-number-privacy-common'
-import { SignerEndpoint } from '@celo/phone-number-privacy-common'
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
-import { PnpQuotaRequest } from '@celo/phone-number-privacy-common'
-import { PnpQuotaResponseFailure } from '@celo/phone-number-privacy-common'
 import {
   CombinerEndpoint,
+  ErrorMessage,
   genSessionID,
   KEY_VERSION_HEADER,
+  PnpQuotaRequest,
+  PnpQuotaResponseFailure,
+  PnpQuotaResponseSuccess,
+  SignerEndpoint,
   SignMessageRequest,
   SignMessageResponse,
   TestUtils,
@@ -487,37 +487,33 @@ describe('pnpService', () => {
     })
 
     const queryCountParams = [
-      [0, 0, 0, 0],
-      [1, 0, 0, 0], // does not reach threshold
-      [1, 1, 0, 1], // threshold reached
-      [0, 1, 1, 1], // order of signers shouldn't matter
-      [1, 4, 9, 4],
+      { signerQueries: [0, 0, 0], expectedQueryCount: 0 },
+      { signerQueries: [1, 0, 0], expectedQueryCount: 0 }, // does not reach threshold
+      { signerQueries: [1, 1, 0], expectedQueryCount: 1 }, // threshold reached
+      { signerQueries: [0, 1, 1], expectedQueryCount: 1 }, // order of signers shouldn't matter
+      { signerQueries: [1, 4, 9], expectedQueryCount: 4 },
     ]
-    queryCountParams.forEach(
-      ([signer1queries, signer2queries, signer3queries, expectedQueryCount]) => {
-        it(`should get ${expectedQueryCount} performedQueryCount given signer responses of [${signer1queries}, ${signer2queries}, ${signer3queries}]`, async () => {
-          await useQuery(signer1queries, signer1)
-          await useQuery(signer2queries, signer2)
-          await useQuery(signer3queries, signer3)
+    queryCountParams.forEach(({ signerQueries, expectedQueryCount }) => {
+      it(`should get ${expectedQueryCount} performedQueryCount given signer responses of ${signerQueries}`, async () => {
+        await useQuery(signerQueries[0], signer1)
+        await useQuery(signerQueries[1], signer2)
+        await useQuery(signerQueries[2], signer3)
 
-          const req = {
-            account: ACCOUNT_ADDRESS1,
-          }
-          const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
-          const res = await getCombinerQuotaResponse(req, authorization)
+        const req = {
+          account: ACCOUNT_ADDRESS1,
+        }
+        const authorization = getPnpRequestAuthorization(req, ACCOUNT_ADDRESS1, PRIVATE_KEY1)
+        const res = await getCombinerQuotaResponse(req, authorization)
 
-          expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
-            success: true,
-            version: expectedVersion,
-            performedQueryCount: expectedQueryCount,
-            totalQuota,
-            blockNumber: testBlockNumber,
-          })
+        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          performedQueryCount: expectedQueryCount,
+          totalQuota,
+          blockNumber: testBlockNumber,
         })
-      }
-    )
-
-    // TODO: INSUFFICIENT SIGNER RESPONSES
+      })
+    })
 
     it('Should respond with 200 on repeated valid requests', async () => {
       const req = {
