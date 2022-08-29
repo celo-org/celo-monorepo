@@ -1486,6 +1486,13 @@ contract('Governance', (accounts: string[]) => {
       it('should emit the ParticipationBaselineUpdated event', async () => {
         const resp = await governance.approve(proposalId, index)
         assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertLogMatches2(log, {
+          event: 'ProposalApproved',
+          args: {
+            proposalId: new BigNumber(proposalId),
+          },
+        })
       })
     })
 
@@ -2867,11 +2874,6 @@ contract('Governance', (accounts: string[]) => {
           describe('when not approved', () => {
             it('should return Referendum when not voted and not expired', () =>
               expectStage(Stage.Referendum, proposalId))
-
-            it('should return Referendum when voted and not expired', async () => {
-              await governance.approve(proposalId, index)
-              await expectStage(Stage.Referendum, proposalId)
-            })
 
             it('should return Expiration when expired', async () => {
               await timeTravel(referendumStageDuration, web3)

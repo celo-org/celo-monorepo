@@ -599,9 +599,7 @@ contract Governance is
 
     require(!proposal.isApproved(), "Proposal already approved");
     require(
-      stage == Proposals.Stage.Approval ||
-        stage == Proposals.Stage.Referendum ||
-        stage == Proposals.Stage.Execution,
+      stage == Proposals.Stage.Referendum || stage == Proposals.Stage.Execution,
       "Proposal not in correct stage"
     );
     proposal.approved = true;
@@ -636,10 +634,7 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
-    require(
-      stage == Proposals.Stage.Approval || stage == Proposals.Stage.Referendum,
-      "Incorrect proposal state"
-    );
+    require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
     require(value != Proposals.VoteValue.None, "Vote value unset");
     require(weight > 0, "Voter weight zero");
     VoteRecord storage voteRecord = voter.referendumVotes[index];
