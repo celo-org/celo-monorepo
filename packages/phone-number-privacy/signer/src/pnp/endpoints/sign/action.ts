@@ -1,5 +1,4 @@
-import { SignMessageRequest } from '@celo/identity/lib/odis/query'
-import { WarningMessage } from '@celo/phone-number-privacy-common'
+import { SignMessageRequest, WarningMessage } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { Action, Session } from '../../../common/action'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
