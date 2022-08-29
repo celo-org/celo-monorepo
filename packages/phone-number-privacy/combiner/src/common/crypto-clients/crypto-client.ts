@@ -3,6 +3,7 @@ import Logger from 'bunyan'
 import { OdisConfig } from '../../config'
 
 // TODO(2.0.0, p2) standardize file naming (camelCase vs. kebab-case)
+// (https://github.com/celo-org/celo-monorepo/issues/9813)
 
 export interface ServicePartialSignature {
   url: string

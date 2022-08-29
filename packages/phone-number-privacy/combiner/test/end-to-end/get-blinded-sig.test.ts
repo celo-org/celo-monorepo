@@ -1,11 +1,12 @@
 import { OdisUtils } from '@celo/identity/lib/odis'
 // TODO(2.0.0, imports) revisit these imports from the identity package (vs. directly from common)
+// https://github.com/celo-org/celo-monorepo/issues/9814
 import {
   AuthenticationMethod,
   ErrorMessages,
   SignMessageRequest,
 } from '@celo/identity/lib/odis/query'
-import { Endpoints } from '@celo/phone-number-privacy-common'
+import { Endpoint } from '@celo/phone-number-privacy-common'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
 import 'isomorphic-fetch'
 import { replenishQuota } from '../../../common/src/test/utils'
@@ -35,7 +36,7 @@ describe('Running against a deployed service', () => {
 
   // This test is disabled because the Combiner status endpoint doesn't work
   xit('Service is deployed at correct version', async () => {
-    const response = await fetch(process.env.ODIS_COMBINER_SERVICE_URL + Endpoints.STATUS, {
+    const response = await fetch(process.env.ODIS_COMBINER_SERVICE_URL + Endpoint.STATUS, {
       method: 'GET',
     })
     const body = await response.json()
@@ -54,7 +55,7 @@ describe('Running against a deployed service', () => {
       }
 
       await expect(
-        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
+        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, Endpoint.LEGACY_PNP_SIGN)
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
 
@@ -67,7 +68,7 @@ describe('Running against a deployed service', () => {
         sessionID: genSessionID(),
       }
       await expect(
-        OdisUtils.Query.queryOdis(walletAuthSigner, body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
+        OdisUtils.Query.queryOdis(walletAuthSigner, body, SERVICE_CONTEXT, Endpoint.LEGACY_PNP_SIGN)
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
   })
@@ -81,7 +82,7 @@ describe('Running against a deployed service', () => {
         version: 'ignore',
       }
       await expect(
-        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, SIGN_MESSAGE_ENDPOINT)
+        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, Endpoint.LEGACY_PNP_SIGN)
       ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
     })
   })
@@ -117,7 +118,7 @@ describe('Running against a deployed service', () => {
           walletAuthSigner,
           body,
           SERVICE_CONTEXT,
-          SIGN_MESSAGE_ENDPOINT
+          Endpoint.LEGACY_PNP_SIGN
         )
         await expect(result).resolves.toMatchObject({ success: true })
       }

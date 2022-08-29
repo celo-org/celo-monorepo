@@ -355,6 +355,7 @@ describe('domainService', () => {
     })
 
     // TODO(2.0.0, testing) test this with signers disabled too
+    // https://github.com/celo-org/celo-monorepo/issues/9811
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled = combinerConfig
       configWithApiDisabled.domains.enabled = false

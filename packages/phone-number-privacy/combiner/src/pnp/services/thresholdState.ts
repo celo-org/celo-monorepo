@@ -8,8 +8,6 @@ import { OdisConfig } from '../../config'
 
 // TODO(2.0.0, testing): add unit tests for this and domains equivalent
 // (https://github.com/celo-org/celo-monorepo/issues/9792)
-
-// TODO(2.0.0) standardize dist vs. src imports
 export class CombinerThresholdStateService<R extends PnpQuotaRequest> {
   constructor(readonly config: OdisConfig) {}
 

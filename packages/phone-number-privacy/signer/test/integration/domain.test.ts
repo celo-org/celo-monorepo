@@ -30,7 +30,6 @@ import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
-// TODO(2.0.0): Add checking of values beyond the return code.
 describe('domain', () => {
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
