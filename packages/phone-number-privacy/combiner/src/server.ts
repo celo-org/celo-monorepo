@@ -10,7 +10,7 @@ import {
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import { CombinerConfig, VERSION } from '.'
+import { CombinerConfig } from '.'
 import { Controller } from './common/controller'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
@@ -36,12 +36,6 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   // TODO(2.0.0, logging) get logger to show accurate serviceName
   // (https://github.com/celo-org/celo-monorepo/issues/9809)
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
-
-  app.get(CombinerEndpoint.STATUS, (_req, res) => {
-    res.status(200).json({
-      version: VERSION,
-    })
-  })
 
   kit = kit ?? getContractKit(config.blockchain)
 
