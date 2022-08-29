@@ -235,16 +235,19 @@ library Proposals {
    * @return The stage of the dequeued proposal.
    * @dev Must be called on a dequeued proposal.
    */
-  function getDequeuedStage(Proposal storage proposal, StageDurations storage stageDurations)
-    internal
-    view
-    returns (Stage)
-  {
+  function getDequeuedStage(
+    Proposal storage proposal,
+    StageDurations storage stageDurations,
+    bool expireProposalWithoutTransactions
+  ) internal view returns (Stage) {
     uint256 stageStartTime = proposal.timestamp.add(stageDurations.referendum).add(
       stageDurations.execution
     );
     // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
+    if (
+      now >= stageStartTime &&
+      (expireProposalWithoutTransactions || proposal.transactions.length > 0)
+    ) {
       return Stage.Expiration;
     }
     stageStartTime = stageStartTime.sub(stageDurations.execution);

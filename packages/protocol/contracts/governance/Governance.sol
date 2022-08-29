@@ -486,8 +486,12 @@ contract Governance is
   {
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(_isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
-    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations, true);
     if (_isDequeuedProposalExpired(proposal, stage)) {
+      if (proposal.transactions.length == 0) {
+        // mark proposals with no transactions as executed
+        emit ProposalExecuted(proposalId);
+      }
       deleteDequeuedProposal(proposal, proposalId, index);
       return (proposal, Proposals.Stage.Expiration);
     }
@@ -547,7 +551,7 @@ contract Governance is
       return
         _isQueuedProposalExpired(proposal) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
-      Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+      Proposals.Stage stage = proposal.getDequeuedStage(stageDurations, false);
       return _isDequeuedProposalExpired(proposal, stage) ? Proposals.Stage.Expiration : stage;
     }
   }
@@ -820,7 +824,7 @@ contract Governance is
       isQueued(upvotedProposal) &&
       !isQueuedProposalExpired(upvotedProposal);
     Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
+    bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations, true) ==
       Proposals.Stage.Referendum);
     return isVotingQueue || isVotingReferendum;
   }
@@ -1156,7 +1160,7 @@ contract Governance is
    */
   function isDequeuedProposalExpired(uint256 proposalId) external view returns (bool) {
     Proposals.Proposal storage proposal = proposals[proposalId];
-    return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations));
+    return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations, false));
   }
 
   /**
