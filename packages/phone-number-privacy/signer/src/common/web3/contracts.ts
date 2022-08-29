@@ -1,5 +1,5 @@
 import { NULL_ADDRESS, retryAsyncWithBackOffAndTimeout } from '@celo/base'
-import { ContractKit, newKit, newKitWithApiKey, StableToken } from '@celo/contractkit'
+import { ContractKit, StableToken } from '@celo/contractkit'
 import {
   FULL_NODE_TIMEOUT_IN_MS,
   RETRY_COUNT,
@@ -9,13 +9,6 @@ import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
 import { Histogram } from 'prom-client'
 import { Counters, Histograms, Labels } from '../../common/metrics'
-import { SignerConfig } from '../../config'
-
-export function getContractKit(config: SignerConfig): ContractKit {
-  return config.blockchain.apiKey
-    ? newKitWithApiKey(config.blockchain.provider, config.blockchain.apiKey)
-    : newKit(config.blockchain.provider)
-}
 
 declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
 

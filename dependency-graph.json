@@ -130,7 +130,6 @@
       "@celo/base",
       "@celo/contractkit",
       "@celo/flake-tracker",
-      "@celo/identity",
       "@celo/phone-number-privacy-common",
       "@celo/utils",
       "@celo/wallet-hsm-azure",

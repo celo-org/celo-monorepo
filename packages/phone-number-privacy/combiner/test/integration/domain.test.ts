@@ -27,8 +27,8 @@ import {
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
-import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
-import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
+import { KeyProvider } from '@celo/phone-number-privacy-signer/src/common/key-management/key-provider-base'
+import { SignerConfig } from '@celo/phone-number-privacy-signer/src/config'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import BigNumber from 'bignumber.js'
@@ -146,7 +146,7 @@ describe('domainService', () => {
   ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, PoprfClient]> => {
     const domain = _domain ?? authenticatedDomain()
     const poprfClient = new PoprfClient(
-      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'hex'),
+      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'base64'),
       domainHash(domain),
       Buffer.from('test message', 'utf8')
     )
@@ -540,7 +540,7 @@ describe('domainService', () => {
 
       const res = await request(app)
         .post(CombinerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
+        .set(KEY_VERSION_HEADER, '1')
         .send(req)
 
       expect(res.status).toBe(200)
@@ -583,10 +583,7 @@ describe('domainService', () => {
     it('Should respond with 200 on repeated valid requests', async () => {
       const [req1, poprfClient] = await signatureRequest()
 
-      const res1 = await request(app)
-        .post(CombinerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
-        .send(req1)
+      const res1 = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req1)
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: true,
@@ -608,10 +605,7 @@ describe('domainService', () => {
       req1.options.signature = defined(
         await wallet.signTypedData(walletAddress, domainRestrictedSignatureRequestEIP712(req1))
       )
-      const res2 = await request(app)
-        .post(CombinerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
-        .send(req1)
+      const res2 = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req1)
 
       expect(res2.status).toBe(200)
       expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({

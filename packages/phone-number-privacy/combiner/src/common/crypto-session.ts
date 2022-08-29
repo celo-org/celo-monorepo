@@ -1,6 +1,6 @@
 import { OdisResponse } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
-import { CryptoClient } from './crypto-clients/common'
+import { CryptoClient } from './crypto-clients/crypto-client'
 import { Session } from './session'
 import { OdisSignatureRequest } from './sign'
 

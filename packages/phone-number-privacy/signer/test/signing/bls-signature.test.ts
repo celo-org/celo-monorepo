@@ -36,7 +36,7 @@ describe(`BLS service computes signature`, () => {
       combinedSignature,
       blindedMsgResult.blindingFactor
     )
-    const publicKey = Buffer.from(TestUtils.Values.PNP_DEV_ODIS_PUBLIC_KEY, 'hex')
+    const publicKey = Buffer.from(TestUtils.Values.PNP_DEV_ODIS_PUBLIC_KEY, 'base64')
     expect(threshold_bls.verify(publicKey, message, unblindedSignedMessage))
   })
 

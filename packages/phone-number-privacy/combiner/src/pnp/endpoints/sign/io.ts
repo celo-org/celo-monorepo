@@ -21,7 +21,7 @@ import {
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import * as t from 'io-ts'
-import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-cryptography-client'
+import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto-client'
 import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
@@ -52,6 +52,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
+    // TODO(2.0.0): revisit extracting out duplicate init/validation code between sign/non-sign IO
     if (!this.requestHasValidKeyVersion(request, response.locals.logger)) {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null

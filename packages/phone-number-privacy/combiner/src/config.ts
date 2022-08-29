@@ -1,5 +1,5 @@
 import { OdisUtils } from '@celo/identity'
-import { rootLogger, TestUtils, toBool } from '@celo/phone-number-privacy-common'
+import { BlockchainConfig, rootLogger, TestUtils, toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
 export const VERSION = process.env.npm_package_version ?? ''
 export const DEV_MODE =
@@ -13,11 +13,6 @@ export const E2E_TEST_PHONE_NUMBERS: string[] = E2E_TEST_PHONE_NUMBERS_RAW.map((
   OdisUtils.Matchmaking.obfuscateNumberForMatchmaking(num)
 )
 export const E2E_TEST_ACCOUNTS: string[] = ['0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb']
-
-export interface BlockchainConfig {
-  provider: string
-  apiKey?: string
-}
 
 export interface DatabaseConfig {
   user: string
@@ -38,7 +33,7 @@ export interface OdisConfig {
     version: number
     threshold: number
     polynomial: string
-    pubKey: string
+    pubKey: string // Expected to be encoded in base64
   }
 }
 
@@ -84,8 +79,8 @@ if (DEV_MODE) {
       keys: {
         version: 1,
         threshold: 2,
-        polynomial: TestUtils.Values.PNP_DEV_ODIS_POLYNOMIAL,
-        pubKey: TestUtils.Values.PNP_DEV_ODIS_PUBLIC_KEY,
+        polynomial: TestUtils.Values.BLS_THRESHOLD_DEV_POLYNOMIAL,
+        pubKey: TestUtils.Values.BLS_THRESHOLD_DEV_PUBKEY,
       },
     },
     domains: {

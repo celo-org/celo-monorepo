@@ -1,7 +1,7 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import Logger from 'bunyan'
-import { CryptoClient, ServicePartialSignature } from './common'
+import { CryptoClient, ServicePartialSignature } from './crypto-client'
 
 function flattenSigsArray(sigs: Uint8Array[]) {
   return Uint8Array.from(sigs.reduce((a, b) => a.concat(Array.from(b)), [] as any))

@@ -1,7 +1,7 @@
 import { ErrorMessage, PoprfCombiner } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { OdisConfig } from '../../config'
-import { CryptoClient } from './common'
+import { CryptoClient } from './crypto-client'
 
 export class DomainCryptoClient extends CryptoClient {
   private poprfCombiner: PoprfCombiner

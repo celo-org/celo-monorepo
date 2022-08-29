@@ -1,5 +1,4 @@
-import { SignMessageRequest } from '@celo/identity/lib/odis/query'
-import { WarningMessage } from '@celo/phone-number-privacy-common'
+import { SignMessageRequest, WarningMessage } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { Action, Session } from '../../../common/action'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
@@ -39,7 +38,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         // may be undefined.
         // In the case of a database connection failure, queryCount
         // may be undefined.
-        if (quotaStatus.queryCount && quotaStatus.totalQuota) {
+        // Note that queryCount or totalQuota can be 0 and that should not fail open.
+        if (quotaStatus.queryCount !== undefined && quotaStatus.totalQuota !== undefined) {
           const { sufficient, state } = await this.quota.checkAndUpdateQuotaStatus(
             quotaStatus,
             session,
