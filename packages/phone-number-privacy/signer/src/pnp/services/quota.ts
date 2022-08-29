@@ -55,7 +55,6 @@ export abstract class PnpQuotaService
     const [queryCountResult, totalQuotaResult, blockNumberResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
-          // TODO(Alec)(pnp)
           // Note: The database read of the user's queryCount
           // included here resolves to 0 on error
           getPerformedQueryCount(this.db, account, session.logger, trx),
@@ -103,7 +102,7 @@ export abstract class PnpQuotaService
     trx: Knex.Transaction,
     session: PnpSession<SignMessageRequest>
   ) {
-    // TODO: Review db error handling
+    // TODO(2.0.0, refactor) Review db error handling (https://github.com/celo-org/celo-monorepo/issues/9795)
     const [requestStored, queryCountIncremented] = await Promise.all([
       storeRequest(this.db, session.request.body, session.logger, trx),
       incrementQueryCount(this.db, session.request.body.account, session.logger, trx),

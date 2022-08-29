@@ -1,7 +1,7 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import Logger from 'bunyan'
-import { CryptoClient, ServicePartialSignature } from './common'
+import { CryptoClient, ServicePartialSignature } from './crypto-client'
 
 function flattenSigsArray(sigs: Uint8Array[]) {
   return Uint8Array.from(sigs.reduce((a, b) => a.concat(Array.from(b)), [] as any))
@@ -30,7 +30,7 @@ export class BLSCryptographyClient extends CryptoClient {
     // If combination or verification fails, iterate through each signature and remove invalid ones
     // We do this since partial signature verification incurs higher latencies
     try {
-      const result = threshold_bls.combine(this.config.keys.threshold, this.allSignatures) // TODO(Alec)(Next): This is throwing an error. We probably need to import in and use the new crypto client
+      const result = threshold_bls.combine(this.config.keys.threshold, this.allSignatures)
       this.verifyCombinedSignature(blindedMessage, result, logger)
       return Buffer.from(result).toString('base64')
     } catch (error) {

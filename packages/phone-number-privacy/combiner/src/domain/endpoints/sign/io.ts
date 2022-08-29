@@ -84,7 +84,9 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
     error: ErrorType,
     status: number,
     response: Response<DomainRestrictedSignatureResponseFailure>,
-    domainState?: DomainState // TODO: is status ever provided on failure?
+    domainState?: DomainState
+    // TODO(2.0.0, refactor) is status ever provided on failure?
+    // https://github.com/celo-org/celo-monorepo/issues/9812
   ) {
     send(
       response,

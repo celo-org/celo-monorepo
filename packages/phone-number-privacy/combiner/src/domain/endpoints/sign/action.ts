@@ -26,7 +26,8 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
   }
 
   combine(session: CryptoSession<DomainRestrictedSignatureRequest>): void {
-    // this.logResponseDiscrepancies(session) // TODO(Alec)
+    // this.logResponseDiscrepancies(session)
+    // TODO(2.0.0, logging) https://github.com/celo-org/celo-monorepo/issues/9793
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
@@ -57,7 +58,8 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
   protected logResponseDiscrepancies(
     _session: CryptoSession<DomainRestrictedSignatureRequest>
   ): void {
-    // TODO
+    // TODO(2.0.0, logging)
+    // (https://github.com/celo-org/celo-monorepo/issues/9793)
     throw new Error('Method not implemented.')
   }
 

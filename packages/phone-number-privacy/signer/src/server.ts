@@ -56,7 +56,7 @@ export function startSigner(
     res.send(PromClient.register.metrics())
   })
 
-  // TODO: Clean this up / maybe roll into to Controller class
+  // TODO(2.0.0, metering) Clean this up / maybe roll into to Controller class
   const addMeteredSignerEndpoint = (
     endpoint: SignerEndpoint,
     handler: (req: Request, res: Response) => Promise<void>
@@ -133,7 +133,7 @@ export function startSigner(
     )
   )
   const domainDisable = new Controller(
-    new DomainDisableAction(config, new DomainDisableIO(config.api.domains.enabled), db) // TODO: param ordering
+    new DomainDisableAction(db, config, new DomainDisableIO(config.api.domains.enabled))
   )
 
   addMeteredSignerEndpoint(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))

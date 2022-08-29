@@ -72,7 +72,6 @@ if (DEV_MODE) {
       serviceName: defaultServiceName,
       enabled: true,
       odisServices: {
-        // TODO(Alec): For testing, use app.listen(3000)
         signers:
           '[{"url": "http://localhost:3001", "fallbackUrl": "http://localhost:3001/fallback"}, {"url": "http://localhost:3002", "fallbackUrl": "http://localhost:3002/fallback"}, {"url": "http://localhost:3003", "fallbackUrl": "http://localhost:3003/fallback"}]',
         timeoutMilliSeconds: 5 * 1000,

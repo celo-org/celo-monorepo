@@ -33,13 +33,9 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
 
   logger.info('Creating combiner express server')
   const app = express()
-  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName)) // TODO(Alec): get logger to show accurate serviceName
-
-  // app.get(CombinerEndpoint.STATUS, (_req, res) => {
-  //   res.status(200).json({
-  //     version: getVersion(),
-  //   })
-  // })
+  // TODO(2.0.0, logging) get logger to show accurate serviceName
+  // (https://github.com/celo-org/celo-monorepo/issues/9809)
+  app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
 
   kit = kit ?? getContractKit(config.blockchain)
 

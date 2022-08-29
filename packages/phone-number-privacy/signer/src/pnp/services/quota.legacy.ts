@@ -161,7 +161,7 @@ export class LegacyPnpQuotaService
       session.logger,
       session.request.url,
       account,
-      walletAddress // TODO(Alec)(pnp): Make sure we filter out null address in getTransactionCount
+      walletAddress // TODO(2.0.0, refactor): Make sure we filter out null address in getTransactionCount
     )
     session.logger.debug({ account, transactionCount })
 

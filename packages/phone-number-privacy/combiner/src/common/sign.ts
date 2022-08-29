@@ -1,11 +1,9 @@
 import {
   DomainRestrictedSignatureRequest,
-  DomainRestrictedSignatureResponse,
   ErrorMessage,
   ErrorType,
   OdisResponse,
   SignMessageRequest,
-  SignMessageResponse,
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
@@ -15,11 +13,6 @@ import { IO } from './io'
 
 // prettier-ignore
 export type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
-export type OdisSignatureResponse<R extends OdisSignatureRequest> = R extends SignMessageRequest
-  ? SignMessageResponse
-  : never | R extends DomainRestrictedSignatureRequest
-  ? DomainRestrictedSignatureResponse
-  : never
 
 // tslint:disable-next-line: max-classes-per-file
 export abstract class SignAction<R extends OdisSignatureRequest> extends CombineAction<R> {
@@ -40,7 +33,6 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
     const res = await super.receiveSuccess(signerResponse, url, session)
 
     if (res.success) {
-      // TODO figure out how to use types to make this check unneccesary
       const signatureAdditionStart = Date.now()
       session.crypto.addSignature({ url, signature: res.signature })
       session.logger.info(
