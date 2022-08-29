@@ -1,7 +1,10 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
+import { console2 as console } from "forge-std/console2.sol";
+
 import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 import { IPairManager } from "./interfaces/IPairManager.sol";
 import { IBroker } from "./interfaces/IBroker.sol";
@@ -10,22 +13,14 @@ import { IMentoExchange } from "./interfaces/IMentoExchange.sol";
 
 import { StableToken } from "./StableToken.sol";
 
-import { UsingRegistry } from "../common/UsingRegistry.sol";
 import { Initializable } from "../common/Initializable.sol";
-import { FixidityLib } from "../common/FixidityLib.sol";
-
-// TODO: Remove when migrating to mento-core. Newer versions of OZ-contracts have this interface
-interface IERC20Metadata {
-  function symbol() external view returns (string memory);
-}
+import { IStableToken } from "./interfaces/IStableToken.sol";
 
 /**
  * @title Broker
  * @notice The broker executes swaps and keeps track of spending limits per pair
  */
 contract Broker is IBroker, Initializable, Ownable {
-  using FixidityLib for FixidityLib.Fraction;
-
   /* ==================== State Variables ==================== */
 
   // Address of the broker contract.
@@ -44,8 +39,8 @@ contract Broker is IBroker, Initializable, Ownable {
 
   /**
    * @notice Allows the contract to be upgradable via the proxy.
-   * @param _broker The address of the broker contract.
-   * @param registryAddress The address of the Celo registry.
+   * @param _pairManager The address of the PairManager contract.
+   * @param _reserve The address of the Rezerve contract.
    */
   function initilize(address _pairManager, address _reserve) external initializer {
     _transferOwnership(msg.sender);
@@ -60,32 +55,7 @@ contract Broker is IBroker, Initializable, Ownable {
     view
     returns (address tokenOut, uint256 amountOut)
   {
-    Pair memory pair = pairManager.getPair(pairId);
-
-    require(
-      tokenIn == pair.stableAsset || tokenIn == pair.collateralAsset,
-      "tokenIn is not in the pair"
-    );
-
-    if (pair.stableAsset == tokenIn) {
-      tokenOut = pair.collateralAsset;
-      amountOut = pair.exchange.getAmountOut(
-        tokenIn,
-        tokenOut,
-        pair.stableBucket,
-        pair.collateralBucket,
-        amountIn
-      );
-    } else {
-      tokenOut = pair.stableAsset;
-      amountOut = pair.exchange.getAmountOut(
-        tokenIn,
-        tokenOut,
-        pair.collateralBucket,
-        pair.stableBucket,
-        amountIn
-      );
-    }
+    (tokenOut, amountOut, , , ) = _quote(pairId, tokenIn, amountIn);
   }
 
   /* ==================== Mutative Functions ==================== */
@@ -95,9 +65,10 @@ contract Broker is IBroker, Initializable, Ownable {
    * @dev only callable by owner
    * @param _pairManager The new pair manager address
    */
-  function setPairManager(address _pairManager) external onlyOwner {
+  function setPairManager(address _pairManager) public onlyOwner {
+    require(_pairManager != address(0), "PairManager address must be set");
     emit PairManagerUpdated(_pairManager, address(pairManager));
-    pairManager = PairManager(_pairManager);
+    pairManager = IPairManager(_pairManager);
   }
 
   /**
@@ -105,9 +76,10 @@ contract Broker is IBroker, Initializable, Ownable {
    * @dev only callable by owner
    * @param _reserve The new pair manager address
    */
-  function setReserve(address _reserve) external onlyOwner {
+  function setReserve(address _reserve) public onlyOwner {
+    require(_reserve != address(0), "Reserve address must be set");
     emit ReserveUpdated(_reserve, address(reserve));
-    reserve = Reserve(_reserve);
+    reserve = IReserve(_reserve);
   }
 
   /**
@@ -121,29 +93,72 @@ contract Broker is IBroker, Initializable, Ownable {
    */
   function swap(bytes32 pairId, address tokenIn, uint256 amountIn, uint256 amountOutMin)
     external
-    view
     returns (address tokenOut, uint256 amountOut)
   {
-    (address tokenOut, uint256 amountOut) = quote(pairId, tokenIn, amountIn);
-    require(amountOut < amountOutMin, "amountOutMin not met");
+    uint256 nextTokenInBucketSize;
+    uint256 nextTokenOutBucketSize;
+    bool tokenInIsStable;
 
-    uint256 nextStableBucket;
-    uint256 nextCollateralBucket;
+    (tokenOut, amountOut, nextTokenInBucketSize, nextTokenOutBucketSize, tokenInIsStable) = _quote(
+      pairId,
+      tokenIn,
+      amountIn
+    );
 
-    if (tokenIn == pair.stableAsset) {
-      IERC20(tokenIn).transferFrom(msg.sender, amountIn, address(this));
-      IERC20(tokenIn).burn(amountIn);
-      reserve.transferToken(tokenOut, msg.sender, amountOut);
-      nextStableBucket = pair.stableBucket + amountIn;
-      nextCollateralBucket = pair.collateralBucket - tokenOut;
-    } else {
-      IERC20(tokenIn).transferFrom(msg.sender, amountIn, address(reserve));
-      IERC20(tokenOut).mint(msg.sender, amountOut);
-      nextStableBucket = pair.stableBucket - amountIn;
-      nextCollateralBucket = pair.collateralBucket + tokenOut;
-    }
-
-    pairManager.updateBuckets(pairId, nextStableBucket, nextCollateralBucket);
+    require(amountOutMin <= amountOut, "amountOutMin not met");
     emit Swap(pairId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
+
+    if (tokenInIsStable) {
+      IERC20(tokenIn).transferFrom(msg.sender, address(this), amountIn);
+      IStableToken(tokenIn).burn(amountIn);
+      reserve.transferCollateralAsset(tokenOut, msg.sender, amountOut);
+      pairManager.updateBuckets(pairId, nextTokenInBucketSize, nextTokenOutBucketSize);
+    } else {
+      IERC20(tokenIn).transferFrom(msg.sender, address(reserve), amountIn);
+      IStableToken(tokenOut).mint(msg.sender, amountOut);
+      pairManager.updateBuckets(pairId, nextTokenOutBucketSize, nextTokenInBucketSize);
+    }
+  }
+
+  /* ==================== Private Functions ==================== */
+
+  function _quote(bytes32 pairId, address tokenIn, uint256 amountIn)
+    internal
+    view
+    returns (
+      address tokenOut,
+      uint256 amountOut,
+      uint256 nextTokenInBucketSize,
+      uint256 nextTokenOutBucketSize,
+      bool tokenInIsStable
+    )
+  {
+    IPairManager.Pair memory pair = pairManager.getPair(pairId);
+
+    require(
+      tokenIn == pair.stableAsset || tokenIn == pair.collateralAsset,
+      "tokenIn is not in the pair"
+    );
+
+    if (pair.stableAsset == tokenIn) {
+      tokenInIsStable = true;
+      tokenOut = pair.collateralAsset;
+      (amountOut, nextTokenInBucketSize, nextTokenOutBucketSize) = pair.mentoExchange.getAmountOut(
+        tokenIn,
+        tokenOut,
+        pair.stableBucket,
+        pair.collateralBucket,
+        amountIn
+      );
+    } else {
+      tokenOut = pair.stableAsset;
+      (amountOut, nextTokenInBucketSize, nextTokenOutBucketSize) = pair.mentoExchange.getAmountOut(
+        tokenIn,
+        tokenOut,
+        pair.collateralBucket,
+        pair.stableBucket,
+        amountIn
+      );
+    }
   }
 }

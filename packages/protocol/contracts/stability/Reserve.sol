@@ -772,11 +772,7 @@ contract Reserve is
     }
   }
 
-  function isStableAsset(address) external view returns (bool) {
-    return true;
-  }
-
-  function isCollateralAsset(address) external view returns (bool) {
-    return true;
+  function isStableAsset(address token) external view returns (bool) {
+    return isToken[token];
   }
 }

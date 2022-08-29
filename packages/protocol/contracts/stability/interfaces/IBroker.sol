@@ -49,7 +49,6 @@ interface IBroker {
    */
   function swap(bytes32 pairId, address tokenIn, uint256 amountIn, uint256 amountOutMin)
     external
-    view
     returns (address tokenOut, uint256 amountOut);
 
   /**
