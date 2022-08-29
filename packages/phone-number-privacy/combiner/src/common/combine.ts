@@ -30,7 +30,6 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
   }
 
   async distribute(session: Session<R>): Promise<Session<R>> {
-    // TODO(2.0.0, metering) Factor out this metering code
     const obs = new PerformanceObserver((list) => {
       const entry = list.getEntries()[0]
       session.logger.info(

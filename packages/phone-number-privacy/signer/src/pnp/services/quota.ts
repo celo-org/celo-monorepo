@@ -102,7 +102,7 @@ export abstract class PnpQuotaService
     trx: Knex.Transaction,
     session: PnpSession<SignMessageRequest>
   ) {
-    // TODO(2.0.0, refactor) Review db error handling
+    // TODO(2.0.0, refactor) Review db error handling (https://github.com/celo-org/celo-monorepo/issues/9795)
     const [requestStored, queryCountIncremented] = await Promise.all([
       storeRequest(this.db, session.request.body, session.logger, trx),
       incrementQueryCount(this.db, session.request.body.account, session.logger, trx),

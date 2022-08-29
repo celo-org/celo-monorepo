@@ -19,7 +19,7 @@ export function getContractKit(config: SignerConfig): ContractKit {
 
 declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
 
-// TODO(2.0.0, metering): use this elsewhere
+// TODO(2.0.0, metering): use this elsewhere (https://github.com/celo-org/celo-monorepo/issues/9796)
 export async function meter<T extends any[], U>(
   inFunction: InFunction<T, U>,
   params: T,

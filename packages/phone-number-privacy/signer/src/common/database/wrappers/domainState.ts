@@ -109,6 +109,7 @@ export async function updateDomainStateRecord<D extends Domain>(
     // Check whether the domain is already in the database.
     // TODO(2.0.0, refactor): Usage of this in the signature flow results in redudant queries of the current
     // state. It would be good to refactor this to avoid making more than one SELECT.
+    // Consider doing this as part of DB audit ticket (https://github.com/celo-org/celo-monorepo/issues/9795)
     const result = await getDomainStateRecord(db, domain, logger, trx)
 
     // Insert or update the domain state record.

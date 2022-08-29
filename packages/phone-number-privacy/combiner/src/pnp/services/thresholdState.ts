@@ -6,6 +6,10 @@ import {
 import { Session } from '../../common/session'
 import { OdisConfig } from '../../config'
 
+// TODO(2.0.0, testing): add unit tests for this and domains equivalent
+// (https://github.com/celo-org/celo-monorepo/issues/9792)
+
+// TODO(2.0.0) standardize dist vs. src imports
 export class CombinerThresholdStateService<R extends PnpQuotaRequest> {
   constructor(readonly config: OdisConfig) {}
 
@@ -33,6 +37,7 @@ export class CombinerThresholdStateService<R extends PnpQuotaRequest> {
     return {
       performedQueryCount: thresholdSigner.performedQueryCount,
       // TODO(2.0.0, refactor) address scenario where total quota is inconsistent between signers
+      // (https://github.com/celo-org/celo-monorepo/issues/9806)
       totalQuota: thresholdSigner.totalQuota,
       blockNumber: thresholdSigner.blockNumber,
     }

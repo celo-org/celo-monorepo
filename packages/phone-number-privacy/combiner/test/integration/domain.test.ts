@@ -120,7 +120,8 @@ const signerConfig: SignerConfig = {
   test_quota_bypass_percentage: 0,
 }
 
-// TODO(2.0.0, testing) Add checking of values beyond the return code.
+// TODO(2.0.0, testing) Add checking of values beyond the return code
+// Part of (https://github.com/celo-org/celo-monorepo/issues/9811)
 
 describe('domainService', () => {
   const wallet = new LocalWallet()
@@ -709,7 +710,8 @@ describe('domainService', () => {
     })
 
     it('Should respond with 400 on invalid key version', async () => {
-      // TODO(2.0.0, refactor): Implement new error for unsupported key versions
+      // TODO(2.0.0, refactor, keys): Implement new error for unsupported key versions
+      // (https://github.com/celo-org/celo-monorepo/issues/9801)
       const [badRequest, _] = await signatureRequest()
 
       const res = await request(app)
@@ -824,9 +826,6 @@ describe('domainService', () => {
   })
 
   /*
-
-  TODO(2.0.0): check code coverage
-
 [ ] Bad signature (combiner + signer)
 [ ] Bad encoding (combiner + signer)
 [ ] Undefined domain (combiner + signer)

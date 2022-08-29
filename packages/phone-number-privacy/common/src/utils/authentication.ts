@@ -74,6 +74,8 @@ export function verifyDEKSignature(
 ) {
   logger = logger ?? rootLogger(fetchEnv('SERVICE_NAME'))
   try {
+    // TODO(2.0.0) why do we use a different signing method instead of SignatureUtils?
+    // (https://github.com/celo-org/celo-monorepo/issues/9803)
     const msgDigest = crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex')
 
     // NOTE: elliptic is disabled elsewhere in this library to prevent
@@ -86,11 +88,12 @@ export function verifyDEKSignature(
     if (key.verify(msgDigest, parsedSig)) {
       return true
     }
-    // TODO(2.0.0): Remove this once clients upgrade to @celo/identity v1.5.3
+    // TODO(2.0.0, deployment, Arthur): Remove this once clients upgrade to @celo/identity v1.5.3
     // Due to an error in the original implementation of the sign and verify functions
     // used here, older clients may generate signatures over the truncated message,
     // instead of its hash. These signatures represent a risk to the signer as they do
     // not protect against modifications of the message past the first 64 characters of the message.
+    // (https://github.com/celo-org/celo-monorepo/issues/9802)
     if (insecureAllowIncorrectlyGeneratedSignature && key.verify(message, parsedSig)) {
       logger.warn(WarningMessage.INVALID_AUTH_SIGNATURE)
       return true

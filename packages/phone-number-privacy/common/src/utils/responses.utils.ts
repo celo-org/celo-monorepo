@@ -3,6 +3,7 @@ import { Response } from 'express'
 import { FailureResponse, OdisRequest, OdisResponse, WarningMessage } from '..'
 
 // TODO(2.0.0, deployment) remove this once it is no longer being used by matchmaking
+// create ticket for commenting out matchmaking code, and another ticket for reviving it later
 export function respondWithError(
   response: Response,
   body: FailureResponse,

@@ -70,7 +70,7 @@ export abstract class IO<R extends OdisRequest> {
     return res
   }
 
-  // TODO(2.0.0, refactor) move to common pkg??
+  // TODO(2.0.0, refactor, keys) move to common pkg (https://github.com/celo-org/celo-monorepo/issues/9801)
   requestHasValidKeyVersion(request: Request<{}, {}, R>, logger: Logger): boolean {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
     if (keyVersionHeader === undefined) {
@@ -86,7 +86,7 @@ export abstract class IO<R extends OdisRequest> {
     return isValid
   }
 
-  // TODO(2.0.0, refactor) move to common pkg??
+  // TODO(2.0.0, refactor, keys) move to common pkg (https://github.com/celo-org/celo-monorepo/issues/9801)
   getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
     const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
     if (keyVersionHeader === undefined) {
@@ -118,7 +118,7 @@ export abstract class IO<R extends OdisRequest> {
     return isValid
   }
 
-  // TODO(2.0.0, refactor) move to common pkg??
+  // TODO(2.0.0, refactor, keys) move to common pkg?? (https://github.com/celo-org/celo-monorepo/issues/9801)
   getResponseKeyVersion(response: FetchResponse, logger: Logger): number | undefined {
     const keyVersionHeader = response.headers.get(KEY_VERSION_HEADER)
     if (keyVersionHeader === undefined) {
@@ -139,7 +139,6 @@ export abstract class IO<R extends OdisRequest> {
     signer: Signer,
     session: Session<R>
   ): Promise<FetchResponse> {
-    // TODO(2.0.0, metering) Factor out this metering code
     const start = `Start ${signer.url + this.signerEndpoint}`
     const end = `End ${signer.url + this.signerEndpoint}`
     performance.mark(start)

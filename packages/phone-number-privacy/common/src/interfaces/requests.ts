@@ -28,6 +28,8 @@ export enum AuthenticationMethod {
   ENCRYPTION_KEY = 'encryption_key',
 }
 
+// (https://github.com/celo-org/celo-monorepo/issues/9804)
+// TODO(2.0.0, refactor) improve pnp request/response types for new vs. legacy endpoints
 // TODO(2.0.0, refactor): investigate alias in sdk/identity
 export interface GetBlindedMessageSigRequest {
   /** Celo account address. Query is charged against this account's quota. */
