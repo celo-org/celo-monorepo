@@ -32,7 +32,7 @@ contract BrokerTest is Test {
 
   IStableToken stableAsset;
   IERC20 collateralAsset;
-  address testRandomAsset;
+  address randomAsset;
   IMentoExchange exchange;
 
   uint256 constant initialStableBucket = 1e24;
@@ -51,7 +51,7 @@ contract BrokerTest is Test {
     pairManager = IPairManager(actor("pairManager"));
     stableAsset = IStableToken(actor("stableAsset"));
     collateralAsset = IERC20(actor("collateralAsset"));
-    testRandomAsset = actor("testRandomAsset");
+    randomAsset = actor("randomAsset");
     exchange = IMentoExchange(actor("exchange"));
     trader = actor("trader");
 
@@ -214,10 +214,10 @@ contract BrokerTest_quote is BrokerTest {
     assertEq(amountOut, 2e18);
   }
 
-  function test_tokenInRandomAsset() public {
+  function test_tokenInNotInPair() public {
     bytes32 pairId = mockGetPair();
     vm.expectRevert("tokenIn is not in the pair");
-    broker.quote(pairId, testRandomAsset, 1e18);
+    broker.quote(pairId, randomAsset, 1e18);
   }
 }
 
@@ -377,5 +377,11 @@ contract BrokerTest_swap is BrokerTest {
 
     vm.expectRevert("amountOutMin not met");
     broker.swap(pairId, address(stableAsset), amountIn, mockAmountOut + 1);
+  }
+
+  function test_assetNotInPair() public {
+    bytes32 pairId = mockGetPair();
+    vm.expectRevert("tokenIn is not in the pair");
+    broker.swap(pairId, randomAsset, 1e18, 0);
   }
 }
