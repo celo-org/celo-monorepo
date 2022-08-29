@@ -4,6 +4,7 @@ import {
   CombinerEndpoint,
   ErrorMessage,
   genSessionID,
+  isVerified,
   KEY_VERSION_HEADER,
   SignMessageRequest,
   SignMessageResponseFailure,
@@ -17,9 +18,10 @@ import {
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
-import { KeyProvider } from '@celo/phone-number-privacy-signer/src/common/key-management/key-provider-base'
-import { MockKeyProvider } from '@celo/phone-number-privacy-signer/src/common/key-management/mock-key-provider'
-import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/src/config'
+// TODO(2.0.0, imports) double check proper import paths (dist vs. src)
+import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
+import { MockKeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/mock-key-provider'
+import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
 import BigNumber from 'bignumber.js'
 import threshold_bls from 'blind-threshold-bls'
 import { Server as HttpsServer } from 'https'
@@ -33,7 +35,7 @@ const {
   ContractRetrieval,
   createMockContractKit,
   createMockAccounts,
-  createMockOdisPayments,
+  createMockToken,
   createMockWeb3,
   getPnpRequestAuthorization,
 } = TestUtils.Utils
@@ -131,11 +133,13 @@ const signerConfig: SignerConfig = {
 
 const testBlockNumber = 1000000
 
-const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
+const mockTokenBalance = jest.fn<BigNumber, []>()
 const mockContractKit = createMockContractKit(
   {
+    // getWalletAddress stays constant across all old query-quota.test.ts unit tests
     [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount, DEK_PUBLIC_KEY),
-    [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
+    [ContractRetrieval.getStableToken]: createMockToken(mockTokenBalance),
+    [ContractRetrieval.getGoldToken]: createMockToken(mockTokenBalance),
   },
   createMockWeb3(5, testBlockNumber)
 )
@@ -147,7 +151,13 @@ jest.mock('@celo/contractkit', () => ({
   newKit: jest.fn().mockImplementation(() => mockContractKit),
 }))
 
-describe('pnpService', () => {
+jest.mock('@celo/phone-number-privacy-common', () => ({
+  ...jest.requireActual('@celo/phone-number-privacy-common'),
+  isVerified: jest.fn(),
+}))
+const mockIsVerified = isVerified as jest.Mock
+
+describe('legacyPnpService', () => {
   let keyProvider1: KeyProvider
   let keyProvider2: KeyProvider
   let keyProvider3: KeyProvider
@@ -166,7 +176,6 @@ describe('pnpService', () => {
   const signerMigrationsPath = '../signer/src/common/database/migrations'
   const expectedVersion = getVersion()
 
-  const onChainPaymentsDefault = new BigNumber(1e18)
   const message = Buffer.from('test message', 'utf8')
   const expectedSig = 'xgFMQtcgAMHJAEX/m9B4VFopYtxqPFSw0024sWzRYvQDvnmFqhXOPdnRDfa8WCEA'
   const expectedUnblindedMsg = 'lOASnDJNbJBTMYfkbU4fMiK7FcNwSyqZo8iQSM95X8YK+/158be4S1A+jcQsCUYA'
@@ -178,6 +187,7 @@ describe('pnpService', () => {
     keyProvider1 = new MockKeyProvider(BLS_THRESHOLD_DEV_PK_SHARE_1)
     keyProvider2 = new MockKeyProvider(BLS_THRESHOLD_DEV_PK_SHARE_2)
     keyProvider3 = new MockKeyProvider(BLS_THRESHOLD_DEV_PK_SHARE_3)
+
     app = startCombiner(combinerConfig, mockKit)
   })
 
@@ -212,7 +222,7 @@ describe('pnpService', () => {
     keyVersionHeader?: string
   ) => {
     let reqWithHeaders = request(app)
-      .post(CombinerEndpoint.PNP_SIGN)
+      .post(CombinerEndpoint.LEGACY_PNP_SIGN)
       .set('Authorization', authorization)
 
     if (keyVersionHeader) {
@@ -229,6 +239,21 @@ describe('pnpService', () => {
     }
   }
 
+  const prepMocks = (hasQuota: boolean) => {
+    const [transactionCount, _isVerified, balanceToken] = hasQuota
+      ? [100, true, new BigNumber(200000000000000000)]
+      : [0, false, new BigNumber(0)]
+    ;[
+      mockContractKit.connection.getTransactionCount,
+      mockIsVerified,
+      mockTokenBalance,
+    ].forEach((mockFn) => mockFn.mockReset())
+
+    mockContractKit.connection.getTransactionCount.mockReturnValue(transactionCount)
+    mockIsVerified.mockReturnValue(_isVerified)
+    mockTokenBalance.mockReturnValue(balanceToken)
+  }
+
   describe('when all signers return correct signatures', () => {
     beforeEach(async () => {
       signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
@@ -236,12 +261,12 @@ describe('pnpService', () => {
       signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
     })
 
-    describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
+    describe(`${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
       let req: SignMessageRequest
 
       beforeEach(async () => {
-        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainPaymentsDefault)
         req = getSignRequest(blindedMsgResult)
+        prepMocks(true)
       })
 
       it('Should respond with 200 on valid request', async () => {
@@ -330,7 +355,7 @@ describe('pnpService', () => {
 
         const secondUserSeed = new Uint8Array(userSeed)
         secondUserSeed[0]++
-        // Ensure request is identical except for blinded message
+        // Ensure message is identical except for message
         const req2 = { ...req }
         const blindedMsgResult2 = threshold_bls.blind(message, secondUserSeed)
         req2.blindedQueryPhoneNumber = Buffer.from(blindedMsgResult2.message).toString('base64')
@@ -392,7 +417,7 @@ describe('pnpService', () => {
       })
 
       it('Should respond with 403 on out of quota', async () => {
-        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(new BigNumber(0))
+        prepMocks(false)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app)
 
@@ -435,11 +460,11 @@ describe('pnpService', () => {
       signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
     })
 
-    describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
+    describe(`${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
       let req: SignMessageRequest
 
       beforeEach(() => {
-        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainPaymentsDefault)
+        prepMocks(true)
         req = getSignRequest(blindedMsgResult)
       })
 
@@ -476,12 +501,12 @@ describe('pnpService', () => {
       signer3 = startSigner(signerConfig, signerDB3, badKeyProvider2, mockKit).listen(3003)
     })
 
-    describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
+    describe(`${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
       let req: SignMessageRequest
 
       beforeEach(() => {
-        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainPaymentsDefault)
         req = getSignRequest(blindedMsgResult)
+        prepMocks(true)
       })
 
       it('Should respond with 500 even if request is valid', async () => {

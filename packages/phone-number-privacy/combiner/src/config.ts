@@ -80,8 +80,8 @@ if (DEV_MODE) {
       keys: {
         version: 1,
         threshold: 2,
-        polynomial: TestUtils.Values.PNP_DEV_ODIS_POLYNOMIAL,
-        pubKey: TestUtils.Values.PNP_DEV_ODIS_PUBLIC_KEY,
+        polynomial: TestUtils.Values.BLS_THRESHOLD_DEV_POLYNOMIAL,
+        pubKey: TestUtils.Values.BLS_THRESHOLD_DEV_PUBKEY,
       },
     },
     domains: {
