@@ -160,6 +160,8 @@ const DefaultConfig = {
     ],
     assetAllocationSymbols: ['cGLD', 'BTC', 'ETH', 'DAI'],
     assetAllocationWeights: [0.5, 0.3, 0.15, 0.05],
+    collateralAssetDailySpendingRatios: [0],
+    collateralAssetAddresses: ['0x0000000000000000000000000000000000000000'],
   },
   reserveSpenderMultiSig: {
     signatories: [network.from],
