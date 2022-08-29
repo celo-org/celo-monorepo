@@ -172,6 +172,10 @@ remote_write:
               |kube_pod_container_status_terminated\
               |kube_pod_container_status_waiting_reason\
               |kube_pod_container_status_waiting\
+              |kube_pod_status_phase\
+              |kube_pod_status_ready\
+              |kube_pod_status_scheduled\
+              |kube_pod_status_scheduled_time\
               |kube_replicaset.*\
               |kube_resourcequota.*\
               |kube_secret_.+\
