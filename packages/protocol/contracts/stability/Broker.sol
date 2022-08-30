@@ -1,8 +1,6 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import { console2 as console } from "forge-std/console2.sol";
-
 import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
