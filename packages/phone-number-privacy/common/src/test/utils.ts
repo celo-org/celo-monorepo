@@ -4,7 +4,12 @@ import BigNumber from 'bignumber.js'
 import * as threshold from 'blind-threshold-bls'
 import btoa from 'btoa'
 import Web3 from 'web3'
-import { AuthenticationMethod, PhoneNumberPrivacyRequest, PnpQuotaRequest } from '../interfaces'
+import {
+  AuthenticationMethod,
+  PhoneNumberPrivacyRequest,
+  PnpQuotaRequest,
+  SignMessageRequest,
+} from '../interfaces'
 import { signWithRawKey } from '../utils/authentication'
 import { genSessionID } from '../utils/logger'
 
@@ -120,6 +125,21 @@ export async function registerWalletAddress(
 export function getPnpQuotaRequest(account: string, hashedPhoneNumber?: string): PnpQuotaRequest {
   return {
     account,
+    hashedPhoneNumber,
+    sessionID: genSessionID(),
+  }
+}
+
+export function getLegacyPnpSignRequest(
+  account: string,
+  blindedQueryPhoneNumber: string,
+  authenticationMethod?: string,
+  hashedPhoneNumber?: string
+): SignMessageRequest {
+  return {
+    account,
+    blindedQueryPhoneNumber,
+    authenticationMethod,
     hashedPhoneNumber,
     sessionID: genSessionID(),
   }

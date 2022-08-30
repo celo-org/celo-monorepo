@@ -449,7 +449,7 @@ describe('domain', () => {
 
       const res = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
+        .set(KEY_VERSION_HEADER, '1')
         .send(req)
 
       expect(res.status).toBe(200)
@@ -475,7 +475,7 @@ describe('domain', () => {
 
       const res1 = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
+        .set(KEY_VERSION_HEADER, '1')
         .send(req)
 
       expect(res1.status).toBe(200)
@@ -504,7 +504,7 @@ describe('domain', () => {
       )
       const res2 = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
+        .set(KEY_VERSION_HEADER, '1')
         .send(req)
       expect(res2.status).toBe(200)
       expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
@@ -663,7 +663,7 @@ describe('domain', () => {
       const [req1, _] = await signatureRequest()
       const res1 = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
+        .set(KEY_VERSION_HEADER, '1')
         .send(req1)
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
@@ -679,7 +679,7 @@ describe('domain', () => {
       })
       const res2 = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
+        .set(KEY_VERSION_HEADER, '1')
         .send(req1)
       expect(res2.status).toBe(401)
 
