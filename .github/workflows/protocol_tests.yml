@@ -28,7 +28,7 @@ jobs:
       - name: Install Foundry
         uses: onbjerg/foundry-toolchain@v1
         with:
-          version: nightly-7e9e6a5d6b30ad3f543857198234edcdbceb724a
+          version: nightly
 
       - name: Install forge dependencies
         run: forge install
