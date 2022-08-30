@@ -6,20 +6,9 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
-import { IO } from '../../../common/io'
 import { SignAction } from '../../../common/sign'
-import { OdisConfig } from '../../../config'
-import { CombinerThresholdStateService } from '../../services/thresholdState'
 
 export class PnpSignAction extends SignAction<SignMessageRequest> {
-  constructor(
-    readonly config: OdisConfig,
-    readonly thresholdStateService: CombinerThresholdStateService<SignMessageRequest>,
-    readonly io: IO<SignMessageRequest>
-  ) {
-    super(config, io)
-  }
-
   combine(session: CryptoSession<SignMessageRequest>): void {
     this.logResponseDiscrepancies(session)
 
