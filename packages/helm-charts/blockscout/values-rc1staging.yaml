@@ -54,6 +54,7 @@ blockscout:
     enabled: true
   jsonrpc_http_url: http://rc1staging-archivenodes-rpc:8545
   jsonrpc_ws_url: ws://rc1staging-archivenodes-rpc:8545
+  jsonrpc_public_http: https://forno.celo.org
   metadata_crawler:
     schedule: "0 */2 * * *"
 
