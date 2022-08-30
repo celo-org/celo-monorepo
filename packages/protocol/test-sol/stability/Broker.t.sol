@@ -170,7 +170,7 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
 }
 
 contract BrokerTest_quote is BrokerTest {
-  function test_tokenInStableAsset() public {
+  function test_quote_tokenInStableAsset_shouldReturnQuote() public {
     bytes32 pairId = mockGetPair();
     uint256 amountIn = 1e18;
 
@@ -192,7 +192,7 @@ contract BrokerTest_quote is BrokerTest {
     assertEq(amountOut, 2e18);
   }
 
-  function test_tokenInCollateralAsset() public {
+  function test_quote_tokenInCollateralAsset_shouldReturnQuote() public {
     bytes32 pairId = mockGetPair();
     uint256 amountIn = 1e18;
 
@@ -214,7 +214,7 @@ contract BrokerTest_quote is BrokerTest {
     assertEq(amountOut, 2e18);
   }
 
-  function test_tokenInNotInPair() public {
+  function test_quote_tokenInNotInPair_shouldRevert() public {
     bytes32 pairId = mockGetPair();
     vm.expectRevert("tokenIn is not in the pair");
     broker.quote(pairId, randomAsset, 1e18);
@@ -222,7 +222,7 @@ contract BrokerTest_quote is BrokerTest {
 }
 
 contract BrokerTest_swap is BrokerTest {
-  function test_tokenInStableAsset() public {
+  function test_swap_tokenInStableAsset_shouldExecuteSwap() public {
     bytes32 pairId = mockGetPair();
     uint256 amountIn = 1e18;
     uint256 mockAmountOut = 2e18;
@@ -291,7 +291,7 @@ contract BrokerTest_swap is BrokerTest {
     assertEq(amountOut, mockAmountOut);
   }
 
-  function test_tokenInCollateralAsset() public {
+  function test_swap_tokenInCollateralAsset_shouldExecuteSwap() public {
     bytes32 pairId = mockGetPair();
     uint256 amountIn = 2e18;
     uint256 mockAmountOut = 1e18;
@@ -355,7 +355,7 @@ contract BrokerTest_swap is BrokerTest {
     assertEq(amountOut, mockAmountOut);
   }
 
-  function test_minAmountNotMet() public {
+  function test_swap_minAmountNotMet_shouldRevert() public {
     bytes32 pairId = mockGetPair();
     uint256 amountIn = 1e18;
     uint256 mockAmountOut = 2e18;
@@ -379,7 +379,7 @@ contract BrokerTest_swap is BrokerTest {
     broker.swap(pairId, address(stableAsset), amountIn, mockAmountOut + 1);
   }
 
-  function test_assetNotInPair() public {
+  function test_swap_assetNotInPair_shouldRevert() public {
     bytes32 pairId = mockGetPair();
     vm.expectRevert("tokenIn is not in the pair");
     broker.swap(pairId, randomAsset, 1e18, 0);

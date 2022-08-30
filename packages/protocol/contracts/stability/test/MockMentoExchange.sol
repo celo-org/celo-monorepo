@@ -16,9 +16,9 @@ contract MockMentoExchange is IMentoExchange {
   function getAmountOut(address, address, uint256, uint256, uint256)
     external
     view
-    returns (uint256)
+    returns (uint256, uint256, uint256)
   {
-    return 0;
+    return (0, 0, 0);
   }
 
   function getUpdatedBuckets(address, address, uint256, uint256, bytes32)
