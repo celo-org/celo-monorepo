@@ -47,6 +47,7 @@ else
   # cp migrations.bak/23_governance_approver_multisig.* migrations/
   # cp migrations.bak/24_grandamento.* migrations/
   # cp migrations.bak/25_federated_attestations.* migrations/
-  # cp migrations.bak/26_governance.* migrations/
-  # cp migrations.bak/27_elect_validators.* migrations/
+  # cp migrations.bak/26_odispayments.* migrations/
+  # cp migrations.bak/27_governance.* migrations/
+  # cp migrations.bak/28_elect_validators.* migrations/
 fi
