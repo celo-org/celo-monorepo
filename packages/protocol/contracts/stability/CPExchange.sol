@@ -116,7 +116,9 @@ contract CPExchange is IMentoExchange, UsingRegistry, ReentrancyGuard, Initializ
     address collateralAsset,
     FixidityLib.Fraction memory collateralFraction
   ) private view returns (uint256) {
-    uint256 reserveCollateralBalance = getReserve().getCollateralBalance(collateralAsset);
+    uint256 reserveCollateralBalance = getReserve().getReserveAddressesCollateralAssetBalance(
+      collateralAsset
+    );
     return collateralFraction.multiply(FixidityLib.newFixed(reserveCollateralBalance)).fromFixed();
   }
 
