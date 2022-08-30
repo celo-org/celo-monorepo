@@ -15,4 +15,9 @@ interface IReserve {
   function removeExchangeSpender(address, uint256) external;
   function addSpender(address) external;
   function removeSpender(address) external;
+  // TODO: Shorten this function name -> getCollateralBalance
+  function getReserveAddressesCollateralAssetBalance(address collateralAsset)
+    external
+    view
+    returns (uint256);
 }

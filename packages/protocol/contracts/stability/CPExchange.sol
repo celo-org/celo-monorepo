@@ -106,5 +106,31 @@ contract CPExchange is IMentoExchange, UsingRegistry, ReentrancyGuard, Initializ
     return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
-  function getUpdatedCollateralBucket(address collateralAsset) private view returns (uint256) {}
+  /**
+   * @notice Returns the size of the collateral bucket to be set during an update.
+   * @param collateralAsset The address of the collateral asset.
+   * @param collateralFraction The fraction of the reserve collateral that is allocated to the pair when updating buckets.
+   * @return Returns the new size of the collateral bucket.
+   */
+  function getUpdatedCollateralBucket(
+    address collateralAsset,
+    FixidityLib.Fraction memory collateralFraction
+  ) private view returns (uint256) {
+    uint256 reserveCollateralBalance = getReserve().getCollateralBalance(collateralAsset);
+    return collateralFraction.multiply(FixidityLib.newFixed(reserveCollateralBalance)).fromFixed();
+  }
+
+  /**
+   * @notice Retrieves the oracle exchange rate for a given stable asset.
+   * @param stable The address of the stable to retrieve the exchange rate for.
+   * @return Returns the exchange rate and the rate denominator.
+   */
+  function getOracleExchangeRate(address stable) private view returns (uint256, uint256) {
+    uint256 medianRate;
+    uint256 numRates;
+    (medianRate, numRates) = ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID))
+      .medianRate(stable);
+    require(numRates > 0, "exchange rate denominator must be greater than 0");
+    return (medianRate, numRates);
+  }
 }
