@@ -44,7 +44,6 @@ contract('OdisPayments', (accounts: string[]) => {
 
   beforeEach(async () => {
     odisPayments = await OdisPayments.new(true, { from: owner })
-    await registry.setAddressFor(CeloContractName.OdisPayments, odisPayments.address)
     await odisPayments.initialize()
 
     stableTokenCUSD = await StableTokenCUSD.new(true, { from: owner })
@@ -83,22 +82,21 @@ contract('OdisPayments', (accounts: string[]) => {
     const checkStateCUSD = async (
       cusdSender: string,
       odisPaymentReceiver: string,
-      senderBalanceStart: number,
-      valueSent: number
+      totalValueSent: number
     ) => {
       assertEqualBN(
         await stableTokenCUSD.balanceOf(cusdSender),
-        senderBalanceStart - valueSent,
+        startingBalanceCUSD - totalValueSent,
         'cusdSender balance'
       )
       assertEqualBN(
         await stableTokenCUSD.balanceOf(odisPayments.address),
-        valueSent,
+        totalValueSent,
         'odisPayments.address balance'
       )
       assertEqualBN(
         await odisPayments.totalPaidCUSD(odisPaymentReceiver),
-        valueSent,
+        totalValueSent,
         'odisPaymentReceiver balance'
       )
     }
@@ -115,12 +113,23 @@ contract('OdisPayments', (accounts: string[]) => {
 
     it('should allow sender to make a payment on their behalf', async () => {
       await odisPayments.payInCUSD(sender, valueApprovedForTransfer, { from: sender })
-      await checkStateCUSD(sender, sender, startingBalanceCUSD, valueApprovedForTransfer)
+      await checkStateCUSD(sender, sender, valueApprovedForTransfer)
     })
 
     it('should allow sender to make a payment for another account', async () => {
       await odisPayments.payInCUSD(receiver, valueApprovedForTransfer, { from: sender })
-      await checkStateCUSD(sender, receiver, startingBalanceCUSD, valueApprovedForTransfer)
+      await checkStateCUSD(sender, receiver, valueApprovedForTransfer)
+    })
+
+    it('should allow sender to make multiple payments to the contract', async () => {
+      const valueForSecondTransfer = 5
+      const valueForFirstTransfer = valueApprovedForTransfer - valueForSecondTransfer
+
+      await odisPayments.payInCUSD(sender, valueForFirstTransfer, { from: sender })
+      await checkStateCUSD(sender, sender, valueForFirstTransfer)
+
+      await odisPayments.payInCUSD(sender, valueForSecondTransfer, { from: sender })
+      await checkStateCUSD(sender, sender, valueApprovedForTransfer)
     })
 
     it('should emit the PaymentMade event', async () => {
