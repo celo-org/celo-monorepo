@@ -71,8 +71,8 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     response: Response<SignMessageResponseSuccess>,
     key: Key,
     signature: string,
-    performedQueryCount?: number,
-    totalQuota?: number,
+    performedQueryCount: number,
+    totalQuota: number,
     blockNumber?: number,
     warnings?: string[]
   ) {

@@ -9,9 +9,14 @@ import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
 import { SignAction } from '../../../common/sign'
 import { OdisConfig } from '../../../config'
+import { CombinerThresholdStateService } from '../../services/thresholdState'
 
 export class PnpSignAction extends SignAction<SignMessageRequest> {
-  constructor(readonly config: OdisConfig, readonly io: IO<SignMessageRequest>) {
+  constructor(
+    readonly config: OdisConfig,
+    readonly thresholdStateService: CombinerThresholdStateService<SignMessageRequest>,
+    readonly io: IO<SignMessageRequest>
+  ) {
     super(config, io)
   }
 
@@ -24,7 +29,16 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
-        return this.io.sendSuccess(200, session.response, combinedSignature)
+
+        const pnpState = this.thresholdStateService.findCombinerQuotaState(session)
+        return this.io.sendSuccess(
+          200,
+          session.response,
+          combinedSignature,
+          pnpState.performedQueryCount,
+          pnpState.totalQuota,
+          pnpState.blockNumber
+        )
       } catch (error) {
         // May fail upon combining signatures if too many sigs are invalid
         // Fallback to handleMissingSignatures

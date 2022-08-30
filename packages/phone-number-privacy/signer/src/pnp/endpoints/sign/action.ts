@@ -22,7 +22,9 @@ export class PnpSignAction implements Action<SignMessageRequest> {
 
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
     await this.db.transaction(async (trx) => {
-      let queryCount, totalQuota, blockNumber
+      const quotaStatus = await this.quota.getQuotaStatus(session, trx)
+      let { queryCount, totalQuota, blockNumber } = quotaStatus
+
       if (await getRequestExists(this.db, session.request.body, session.logger, trx)) {
         Counters.duplicateRequests.inc()
         session.logger.debug(
@@ -30,16 +32,12 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         )
         session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
       } else {
-        const quotaStatus = await this.quota.getQuotaStatus(session, trx)
-        queryCount = quotaStatus.queryCount
-        totalQuota = quotaStatus.totalQuota
-        blockNumber = quotaStatus.blockNumber
         // In the case of a blockchain connection failure, totalQuota and/or blockNumber
         // may be undefined.
         // In the case of a database connection failure, queryCount
         // may be undefined.
         // Note that queryCount or totalQuota can be 0 and that should not fail open.
-        if (quotaStatus.queryCount !== undefined && quotaStatus.totalQuota !== undefined) {
+        if (queryCount !== undefined && totalQuota !== undefined) {
           const { sufficient, state } = await this.quota.checkAndUpdateQuotaStatus(
             quotaStatus,
             session,

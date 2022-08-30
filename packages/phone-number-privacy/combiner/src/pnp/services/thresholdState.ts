@@ -1,6 +1,7 @@
 import {
   PnpQuotaRequest,
-  PnpQuotaResponseSuccess,
+  PnpState,
+  SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
@@ -8,13 +9,13 @@ import { OdisConfig } from '../../config'
 
 // TODO(2.0.0, testing): add unit tests for this and domains equivalent
 // (https://github.com/celo-org/celo-monorepo/issues/9792)
-export class CombinerThresholdStateService<R extends PnpQuotaRequest> {
+export class CombinerThresholdStateService<R extends PnpQuotaRequest | SignMessageRequest> {
   constructor(readonly config: OdisConfig) {}
 
-  findCombinerQuotaState(session: Session<R>) {
+  findCombinerQuotaState(session: Session<R>): PnpState {
     const signerResponses = session.responses
       .map((signerResponse) => signerResponse.res)
-      .filter((res) => res.success) as PnpQuotaResponseSuccess[]
+      .filter((res) => res.success) as PnpState[]
 
     const sortedResponses = signerResponses.sort(
       (a, b) => a.performedQueryCount - b.performedQueryCount

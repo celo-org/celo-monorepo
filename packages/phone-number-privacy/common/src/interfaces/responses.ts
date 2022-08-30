@@ -13,13 +13,27 @@ import {
 import { Domain, DomainState } from '../domains'
 
 // Phone Number Privacy
-export interface SignMessageResponseSuccess {
+export interface PnpState {
+  performedQueryCount: number
+  // all time total quota
+  totalQuota: number
+  blockNumber?: number
+}
+
+const PnpStateSchema: t.Type<PnpState> = t.intersection([
+  t.type({
+    performedQueryCount: t.number,
+    totalQuota: t.number,
+  }),
+  t.partial({
+    blockNumber: t.union([t.number, t.undefined]),
+  }),
+])
+
+export interface SignMessageResponseSuccess extends PnpState {
   success: true
   version: string
   signature: string
-  performedQueryCount?: number
-  totalQuota?: number
-  blockNumber?: number
   warnings?: string[]
 }
 
@@ -42,11 +56,9 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
       signature: t.string,
     }),
     t.partial({
-      performedQueryCount: t.union([t.number, t.undefined]),
-      totalQuota: t.union([t.number, t.undefined]),
-      blockNumber: t.union([t.number, t.undefined]),
       warnings: t.union([t.array(t.string), t.undefined]),
     }),
+    PnpStateSchema,
   ]),
   t.intersection([
     t.type({
@@ -62,13 +74,9 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
   ]),
 ])
 
-export interface PnpQuotaResponseSuccess {
+export interface PnpQuotaResponseSuccess extends PnpState {
   success: true
   version: string
-  performedQueryCount: number
-  // all time total quota
-  totalQuota: number
-  blockNumber?: number
   warnings?: string[]
 }
 
@@ -85,13 +93,11 @@ export const PnpQuotaResponseSchema: t.Type<PnpQuotaResponse> = t.union([
     t.type({
       success: t.literal(true),
       version: t.string,
-      performedQueryCount: t.number,
-      totalQuota: t.number,
     }),
     t.partial({
-      blockNumber: t.union([t.number, t.undefined]),
       warnings: t.union([t.array(t.string), t.undefined]),
     }),
+    PnpStateSchema,
   ]),
   t.type({
     success: t.literal(false),

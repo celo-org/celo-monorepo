@@ -39,9 +39,12 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
 
   kit = kit ?? getContractKit(config.blockchain)
 
+  const combinerThresholdStateService = new CombinerThresholdStateService(config.phoneNumberPrivacy)
+
   const legacyPnpSign = new Controller(
     new PnpSignAction(
       config.phoneNumberPrivacy,
+      combinerThresholdStateService,
       new LegacyPnpSignIO(config.phoneNumberPrivacy, kit)
     )
   )
@@ -55,22 +58,26 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
     )
   )
 
-  const pnpSign = new Controller(
-    new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy, kit))
-  )
-  app.post(CombinerEndpoint.PNP_SIGN, (req, res) =>
-    meterResponse(pnpSign.handle.bind(pnpSign), req, res, CombinerEndpoint.PNP_SIGN, config)
-  )
-
   const pnpQuota = new Controller(
     new PnpQuotaAction(
       config.phoneNumberPrivacy,
-      new CombinerThresholdStateService(config.phoneNumberPrivacy),
+      combinerThresholdStateService,
       new PnpQuotaIO(config.phoneNumberPrivacy, kit)
     )
   )
   app.get(CombinerEndpoint.PNP_QUOTA, (req, res) =>
     meterResponse(pnpQuota.handle.bind(pnpQuota), req, res, CombinerEndpoint.PNP_QUOTA, config)
+  )
+
+  const pnpSign = new Controller(
+    new PnpSignAction(
+      config.phoneNumberPrivacy,
+      combinerThresholdStateService,
+      new PnpSignIO(config.phoneNumberPrivacy, kit)
+    )
+  )
+  app.post(CombinerEndpoint.PNP_SIGN, (req, res) =>
+    meterResponse(pnpSign.handle.bind(pnpSign), req, res, CombinerEndpoint.PNP_SIGN, config)
   )
 
   const domainThresholdStateService = new DomainThresholdStateService(config.domains)
