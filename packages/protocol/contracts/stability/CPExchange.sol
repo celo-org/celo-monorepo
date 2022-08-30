@@ -59,6 +59,22 @@ contract CPExchange is IMentoExchange, UsingRegistry, ReentrancyGuard, Initializ
     return numerator.unwrap().div(denominator.unwrap());
   }
 
+  function getAmountIn(
+    address tokenIn, // TODO(pedro-clabs): do we need the token addresses?
+    address tokenOut, // TODO(pedro-clabs): do we need the token addresses?
+    uint256 tokenInBucketSize,
+    uint256 tokenOutBucketSize,
+    uint256 amountOut
+  ) external view returns (uint256) {
+    FixidityLib.Fraction memory numerator = FixidityLib.newFixed(amountOut.mul(tokenInBucketSize));
+    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(
+      tokenOutBucketSize.sub(amountOut)
+    );
+
+    // See comment in getAmountOut.
+    return numerator.unwrap().div(denominator.unwrap());
+  }
+
   /**
    * @notice Calculates the new size of a given pair's buckets after a price update.
    * @param pair The pair being updated.

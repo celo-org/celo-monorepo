@@ -43,6 +43,23 @@ interface IMentoExchange {
   ) external view returns (uint256 amountOut);
 
   /**
+   * @notice Returns the input amount necessary for a given output amount.
+   * @param tokenIn Address of the token being used to pay for another one.
+   * @param tokenOut Address of the token being exchanged for.
+   * @param tokenInBucketSize Size of the tokenIn bucket.
+   * @param tokenOutBucketSize Size of the tokenOut bucket.
+   * @param amountOut Amount of tokenIn being paid out.
+   * @return amountIn Amount of tokenOut that would have to be paid in.
+   */
+  function getAmountIn(
+    address tokenIn,
+    address tokenOut,
+    uint256 tokenInBucketSize,
+    uint256 tokenOutBucketSize,
+    uint256 amountOut
+  ) external view returns (uint256 amountIn);
+
+  /**
    * @notice Calculates the new size of a given pair's buckets after a price update.
    * @param pair The pair being updated.
    * @return updatedStableBucket Size of the stable bucket after an update.

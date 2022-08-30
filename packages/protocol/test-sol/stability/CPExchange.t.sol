@@ -41,6 +41,21 @@ contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
       );
   }
 
+  function getAmountIn(uint256 tokenInBucketSize, uint256 tokenOutBucketSize, uint256 amountOut)
+    public
+    view
+    returns (uint256)
+  {
+    return
+      exchange.getAmountIn(
+        address(celoToken),
+        address(stableToken),
+        tokenInBucketSize,
+        tokenOutBucketSize,
+        amountOut
+      );
+  }
+
   function diff(uint256 a, uint256 b) public view returns (uint256) {
     return a > b ? a - b : b - a;
   }
@@ -92,22 +107,54 @@ contract CPExchange_getAmountOut is CPExchangeTest {
     // Constrain amountIn to represent amounts of at least 1e-5 tokens, in
     // order to avoid precision issues when amountIn << bucketSizes.
     vm.assume(amountIn >= 1e13);
-    // Constrain bucket sizes to represent amounts of at most 1e12 tokens, for
-    // the same reason as above.
-    //vm.assume(tokenInBucketSize < 1e30);
-    //vm.assume(tokenOutBucketSize < 1e30);
 
     uint256 amountOut = getAmountOut(tokenInBucketSize, tokenOutBucketSize, amountIn);
 
     uint256 kPre = tokenInBucketSize * tokenOutBucketSize;
     uint256 kPost = (tokenInBucketSize + amountIn) * (tokenOutBucketSize - amountOut);
 
-    console.log("K (pre)");
-    console.log(kPre);
-    console.log("K (post)");
-    console.log(kPost);
-    console.log("K diff");
-    console.log(diff(kPre, kPost));
+    // Cannot test exactly for the constant product invariant, as it only holds within an epsilon (abs(k0 - k1) <= eps).
+    // TODO(pedro-clabs): should eps be a function of the inputs?
+    uint256 eps = 1e30;
+    assertLe(diff(kPre, kPost), eps);
+  }
+
+  function test_getAmountIn_InvariantHolds(
+    uint256 tokenInBucketSizeZ,
+    uint256 tokenOutBucketSizeZ,
+    uint256 amountOut
+  ) public {
+    // Map fuzzer values to better conditioned values.
+    // Constrain bucket sizes to represent amounts of at most 1e12 tokens.
+    uint256 tokenInBucketSize = tokenInBucketSizeZ % gwei(1e12);
+    uint256 tokenOutBucketSize = tokenOutBucketSizeZ % gwei(1e12);
+    /*
+    uint256 amountOut = gwei(amountOutZ / gwei(1));
+   */
+    // Buckets must be positive integers.
+    vm.assume(tokenInBucketSize > 0);
+    vm.assume(tokenOutBucketSize > 0);
+    // Constraints to avoid overflows.
+    vm.assume(tokenInBucketSize < FixidityLib.maxNewFixed());
+    vm.assume(tokenOutBucketSize < FixidityLib.maxNewFixed());
+    vm.assume(amountOut * tokenInBucketSize < FixidityLib.maxNewFixed());
+    vm.assume(tokenOutBucketSize - amountOut > 0);
+    // Constrain amountOut to the size of the buckets, in order to avoid
+    // precision issues when amountOut >> bucketSizes.
+    vm.assume(amountOut < tokenInBucketSize);
+    vm.assume(amountOut < tokenOutBucketSize);
+    // Constrain bucket sizes to represent rates in the range [0.1, 10.0],
+    // in order to avoid precision issues when bucketA >> bucketB.
+    vm.assume(tokenInBucketSize < 10 * tokenOutBucketSize);
+    vm.assume(tokenOutBucketSize < 10 * tokenInBucketSize);
+    // Constrain amountOut to represent amounts of at least 1e-5 tokens, in
+    // order to avoid precision issues when amountOut << bucketSizes.
+    vm.assume(amountOut >= 1e13);
+
+    uint256 amountIn = getAmountIn(tokenInBucketSize, tokenOutBucketSize, amountOut);
+
+    uint256 kPre = tokenInBucketSize * tokenOutBucketSize;
+    uint256 kPost = (tokenInBucketSize + amountIn) * (tokenOutBucketSize - amountOut);
 
     // Cannot test exactly for the constant product invariant, as it only holds within an epsilon (abs(k0 - k1) <= eps).
     // TODO(pedro-clabs): should eps be a function of the inputs?
