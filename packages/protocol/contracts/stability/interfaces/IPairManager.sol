@@ -87,3 +87,137 @@ interface IPairManager {
    */
   function updateBuckets(bytes32 pairId, uint256 stableBucket, uint256 collateralBucket) external;
 }
+
+/*
+    pair_cUSD_CELO = IPairManager.Pair(
+      address(cUSDToken),
+      address(celoToken),
+      crossProductExchange,
+      10**24,
+      2 * 10**24,
+      60 * 5,
+      now,
+      FixidityLib.newFixedFraction(50, 100), // collateralBucketFraction
+      FixidityLib.newFixedFraction(30, 100), // stableBucketMaxFraction
+      FixidityLib.newFixedFraction(5, 100), // spread
+      5, // minimumReports
+      10**20 // minSupplyForStableBucketCap
+    );
+
+    pair_cUSD_CELO_ID = pairManager.createPair(pair_cUSD_CELO);
+
+    pair_cUSD_USDCet = IPairManager.Pair(
+      address(cUSDToken),
+      address(usdcToken),
+      crossProductExchange,
+      10**24,
+      2 * 10**24,
+      60 * 5,
+      now,
+      FixidityLib.newFixedFraction(50, 100), // collateralBucketFraction
+      FixidityLib.newFixedFraction(30, 100), // stableBucketMaxFraction
+      FixidityLib.newFixedFraction(5, 100), // spread
+      5, // minimumReports
+      10**20 // minSupplyForStableBucketCap
+    );
+
+    pair_cUSD_USDCet_ID = pairManager.createPair(pair_cUSD_USDCet);
+
+    pair_cEUR_CELO = IPairManager.Pair(
+      address(cEURToken),
+      address(celoToken),
+      crossProductExchange,
+      10**24,
+      2 * 10**24,
+      60 * 5,
+      now,
+      FixidityLib.newFixedFraction(50, 100), // collateralBucketFraction
+      FixidityLib.newFixedFraction(30, 100), // stableBucketMaxFraction
+      FixidityLib.newFixedFraction(5, 100), // spread
+      5, // minimumReports
+      10**20 // minSupplyForStableBucketCap
+    );
+
+    pair_cEUR_CELO_ID = pairManager.createPair(pair_cEUR_CELO);
+
+    pair_cEUR_USDCet = IPairManager.Pair(
+      address(cEURToken),
+      address(usdcToken),
+      crossProductExchange,
+      10**24,
+      2 * 10**24,
+      60 * 5,
+      now,
+      FixidityLib.newFixedFraction(50, 100), // collateralBucketFraction
+      FixidityLib.newFixedFraction(30, 100), // stableBucketMaxFraction
+      FixidityLib.newFixedFraction(5, 100), // spread
+      5, // minimumReports
+      10**20 // minSupplyForStableBucketCap
+    );
+
+    pair_cEUR_CELO_ID = pairManager.createPair(pair_cEUR_USDCet);
+
+
+
+
+    pair_cUSD_CELO.stableAsset = address(cUSDToken);
+    pair_cUSD_CELO.collateralAsset = address(celoToken);
+    pair_cUSD_CELO.mentoExchange = crossProductExchange;
+    pair_cUSD_CELO.stableBucket = 10**24;
+    pair_cUSD_CELO.collateralBucket = 2 * 10**24;
+    pair_cUSD_CELO.bucketUpdateFrequency = 60 * 5;
+    pair_cUSD_CELO.lastBucketUpdate = now;
+    pair_cUSD_CELO.collateralBucketFraction = FixidityLib.newFixedFraction(50, 100);
+    pair_cUSD_CELO.stableBucketMaxFraction = FixidityLib.newFixedFraction(30, 100);
+    pair_cUSD_CELO.spread = FixidityLib.newFixedFraction(5, 100);
+    pair_cUSD_CELO.minimumReports = 5;
+    pair_cUSD_CELO.minSupplyForStableBucketCap = 10**20;
+
+    pair_cUSD_CELO_ID = pairManager.createPair(pair_cUSD_CELO);
+
+    pair_cUSD_USDCet.stableAsset = address(cUSDToken);
+    pair_cUSD_USDCet.collateralAsset = address(usdcToken);
+    pair_cUSD_USDCet.mentoExchange = crossProductExchange;
+    pair_cUSD_USDCet.stableBucket = 10**24;
+    pair_cUSD_USDCet.collateralBucket = 2 * 10**24;
+    pair_cUSD_USDCet.bucketUpdateFrequency = 60 * 5;
+    pair_cUSD_USDCet.lastBucketUpdate = now;
+    pair_cUSD_USDCet.collateralBucketFraction = FixidityLib.newFixedFraction(50, 100);
+    pair_cUSD_USDCet.stableBucketMaxFraction = FixidityLib.newFixedFraction(30, 100);
+    pair_cUSD_USDCet.spread = FixidityLib.newFixedFraction(5, 100);
+    pair_cUSD_USDCet.minimumReports = 5;
+    pair_cUSD_USDCet.minSupplyForStableBucketCap = 10**20;
+
+    pair_cUSD_USDCet_ID = pairManager.createPair(pair_cUSD_USDCet);
+
+    pair_cEUR_CELO.stableAsset = address(cEURToken);
+    pair_cEUR_CELO.collateralAsset = address(celoToken);
+    pair_cEUR_CELO.mentoExchange = crossProductExchange;
+    pair_cEUR_CELO.stableBucket = 10**24;
+    pair_cEUR_CELO.collateralBucket = 2 * 10**24;
+    pair_cEUR_CELO.bucketUpdateFrequency = 60 * 5;
+    pair_cEUR_CELO.lastBucketUpdate = now;
+    pair_cEUR_CELO.collateralBucketFraction = FixidityLib.newFixedFraction(50, 100);
+    pair_cEUR_CELO.stableBucketMaxFraction = FixidityLib.newFixedFraction(30, 100);
+    pair_cEUR_CELO.spread = FixidityLib.newFixedFraction(5, 100);
+    pair_cEUR_CELO.minimumReports = 5;
+    pair_cEUR_CELO.minSupplyForStableBucketCap = 10**20;
+
+    pair_cEUR_CELO_ID = pairManager.createPair(pair_cEUR_CELO);
+
+    pair_cEUR_USDCet.stableAsset = address(cEURToken);
+    pair_cEUR_USDCet.collateralAsset = address(usdcToken);
+    pair_cEUR_USDCet.mentoExchange = crossProductExchange;
+    pair_cEUR_USDCet.stableBucket = 10**24;
+    pair_cEUR_USDCet.collateralBucket = 2 * 10**24;
+    pair_cEUR_USDCet.bucketUpdateFrequency = 60 * 5;
+    pair_cEUR_USDCet.lastBucketUpdate = now;
+    pair_cEUR_USDCet.collateralBucketFraction = FixidityLib.newFixedFraction(50, 100);
+    pair_cEUR_USDCet.stableBucketMaxFraction = FixidityLib.newFixedFraction(30, 100);
+    pair_cEUR_USDCet.spread = FixidityLib.newFixedFraction(5, 100);
+    pair_cEUR_USDCet.minimumReports = 5;
+    pair_cEUR_USDCet.minSupplyForStableBucketCap = 10**20;
+
+    pair_cEUR_CELO_ID = pairManager.createPair(pair_cEUR_USDCet);
+  */
+

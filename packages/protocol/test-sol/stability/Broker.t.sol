@@ -42,6 +42,7 @@ contract BrokerTest is Test {
   IPairManager pairManager;
 
   Broker broker;
+  uint256 spread = 0.1 * 10**24;
 
   function setUp() public {
     /* Dependencies and actors */
@@ -80,7 +81,7 @@ contract BrokerTest is Test {
 
     changePrank(deployer);
     broker = new Broker(true);
-    broker.initilize(address(pairManager), address(reserve));
+    broker.initialize(address(pairManager), address(reserve));
     changePrank(trader);
   }
 
@@ -92,7 +93,7 @@ contract BrokerTest is Test {
     pair.stableBucketMaxFraction = FixidityLib.wrap(0.1 * 10**24);
     pair.stableBucket = initialStableBucket;
     pair.collateralBucket = initialCollateralBucket;
-    pair.spread = FixidityLib.wrap(0.1 * 10**24);
+    pair.spread = FixidityLib.wrap(spread);
     pairId = keccak256(abi.encode(pair));
   }
 
@@ -107,18 +108,18 @@ contract BrokerTest is Test {
   }
 }
 
-contract BrokerTest_initilizerAndSetters is BrokerTest {
-  /* ---------- Initilizer ---------- */
+contract BrokerTest_initializerAndSetters is BrokerTest {
+  /* ---------- initializer ---------- */
 
-  function test_initilize_shouldSetOwner() public {
+  function test_initialize_shouldSetOwner() public {
     assertEq(broker.owner(), deployer);
   }
 
-  function test_initilize_shouldSetPairManager() public {
+  function test_initialize_shouldSetPairManager() public {
     assertEq(address(broker.pairManager()), address(pairManager));
   }
 
-  function test_initilize_shouldSetReserve() public {
+  function test_initialize_shouldSetReserve() public {
     assertEq(address(broker.reserve()), address(reserve));
   }
 
@@ -178,11 +179,10 @@ contract BrokerTest_quote is BrokerTest {
       address(exchange),
       abi.encodeWithSelector(
         exchange.getAmountOut.selector,
-        stableAsset,
-        collateralAsset,
+        amountIn,
         initialStableBucket,
         initialCollateralBucket,
-        amountIn
+        spread
       ),
       abi.encode(2e18, 1e24, 2e24)
     );
@@ -200,11 +200,10 @@ contract BrokerTest_quote is BrokerTest {
       address(exchange),
       abi.encodeWithSelector(
         exchange.getAmountOut.selector,
-        collateralAsset,
-        stableAsset,
+        amountIn,
         initialCollateralBucket,
         initialStableBucket,
-        amountIn
+        spread
       ),
       abi.encode(2e18, 10e18, 20e18)
     );
@@ -233,11 +232,10 @@ contract BrokerTest_swap is BrokerTest {
       address(exchange),
       abi.encodeWithSelector(
         exchange.getAmountOut.selector,
-        stableAsset,
-        collateralAsset,
+        amountIn,
         initialStableBucket,
         initialCollateralBucket,
-        amountIn
+        spread
       ),
       abi.encode(mockAmountOut, nextStableBucket, nextCollateralBucket)
     );
@@ -302,11 +300,10 @@ contract BrokerTest_swap is BrokerTest {
       address(exchange),
       abi.encodeWithSelector(
         exchange.getAmountOut.selector,
-        collateralAsset,
-        stableAsset,
+        amountIn,
         initialCollateralBucket,
         initialStableBucket,
-        amountIn
+        spread
       ),
       abi.encode(mockAmountOut, nextCollateralBucket, nextStableBucket)
     );
@@ -366,11 +363,10 @@ contract BrokerTest_swap is BrokerTest {
       address(exchange),
       abi.encodeWithSelector(
         exchange.getAmountOut.selector,
-        stableAsset,
-        collateralAsset,
+        amountIn,
         initialStableBucket,
         initialCollateralBucket,
-        amountIn
+        spread
       ),
       abi.encode(mockAmountOut, nextStableBucket, nextCollateralBucket)
     );

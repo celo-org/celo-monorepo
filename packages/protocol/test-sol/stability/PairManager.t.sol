@@ -10,7 +10,6 @@ import { PairManager } from "contracts/stability/PairManager.sol";
 
 import { MockReserve } from "contracts/stability/test/MockReserve.sol";
 import { MockERC20 } from "contracts/stability/test/MockERC20.sol";
-import { MockMentoExchange } from "contracts/stability/test/MockMentoExchange.sol";
 
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
 
@@ -29,7 +28,7 @@ contract PairManagerTest is Test {
   MockERC20 testStableAsset;
   MockERC20 anotherTestStableAsset;
   MockERC20 testCollateralAsset;
-  MockMentoExchange testMentoExchange;
+  IMentoExchange testMentoExchange;
 
   MockReserve mockReserve;
   PairManager testee;
@@ -56,7 +55,7 @@ contract PairManagerTest is Test {
     testStableAsset = new MockERC20("Test Stable Asset", "TSA");
     anotherTestStableAsset = new MockERC20("Another Test Stable Asset", "ATSA");
     testCollateralAsset = new MockERC20("Test Collateral Asset", "TCA");
-    testMentoExchange = new MockMentoExchange("TestExchange");
+    testMentoExchange = IMentoExchange(actor("MockExchange"));
 
     mockReserve = new MockReserve();
     testee = new PairManager(true);
@@ -77,7 +76,7 @@ contract PairManagerTest is Test {
 
     changePrank(deployer);
 
-    testee.initilize(broker, IReserve(address(mockReserve)));
+    testee.initialize(broker, address(mockReserve));
 
     initPairs();
   }

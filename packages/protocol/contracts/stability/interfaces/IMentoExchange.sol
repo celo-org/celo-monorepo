@@ -7,43 +7,53 @@ pragma solidity ^0.5.13;
 interface IMentoExchange {
   /**
    * @notice Returns the output amount and new bucket sizes for a given input amount.
-   * @param tokenIn Address of the token being used to pay for another one.
-   * @param tokenOut Address of the token being exchanged for.
-   * @param tokenInBucketSize Size of the tokenIn bucket.
-   * @param tokenOutBucketSize Size of the tokenOut bucket.
-   * @param amountIn Amount of tokenIn being paid in.
-   * @return amountOut Amount of tokenOut that will be paid out.
-   * @return newtokenInBucketSize Size of the tokenIn bucket after the swap.
-   * @return newtokenOutBucketSize Size of the tokenOut bucket after the swap.
+   * @param amountIn Amount of tokens being paid in.
+   * @param inBucketSize Size of the in bucket.
+   * @param outBucketSize Size of the out bucket.
+   * @param spread The spread of the pool.
+   * @return amountOut Amount of tokens that will be paid out.
+   * @return nextInBucketSize Size of the in bucket after the swap.
+   * @return nextOutBucketSize Size of the out bucket after the swap.
    */
   function getAmountOut(
-    address tokenIn,
-    address tokenOut,
-    uint256 tokenInBucketSize,
-    uint256 tokenOutBucketSize,
-    uint256 amountIn
-  )
-    external
-    view
-    returns (uint256 amountOut, uint256 newTokenInBucketSize, uint256 newTokenOutBucketSize);
+    uint256 amountIn,
+    uint256 inBucketSize,
+    uint256 outBucketSize,
+    uint256 spread
+  ) external pure returns (uint256 amountOut, uint256 nextInBucketSize, uint256 nextOutBucketSize);
+
+  /**
+   * @notice Returns the output amount and new bucket sizes for a given input amount.
+   * @param amountOut Amount of tokens desired to be paid out.
+   * @param inBucketSize Size of the in bucket.
+   * @param outBucketSize Size of the out bucket.
+   * @param spread The spread of the pool.
+   * @return amountIn Amount of tokens that have to be paid in.
+   * @return nextInBucketSize Size of the in bucket after the swap.
+   * @return nextOutBucketSize Size of the out bucket after the swap.
+   */
+  function getAmountIn(
+    uint256 amountOut,
+    uint256 inBucketSize,
+    uint256 outBucketSize,
+    uint256 spread
+  ) external pure returns (uint256 amountIn, uint256 nextInBucketSize, uint256 nextOutBucketSize);
 
   /**
    * @notice Returns the size of a pair's buckets after an exchange.
-   * @param tokenIn Address of the token being paid in.
-   * @param tokenOut Address of the token being paid out.
-   * @param amountIn Amount of tokenIn being paid in
-   * @param amountOut Amount of tokenOut being paid out.
-   * @param pairId The ID for the pair which updated buckets are being queried.
-   * @return tokenInBucketSize Size of the tokenIn bucket after an update.
-   * @return tokenOutBucketSize Size of the tokenOut bucket after an update.
+   * @param amountIn Amount of in being paid in
+   * @param amountOut Amount of out being paid out.
+   * @param inBucketSize Size of the in bucket.
+   * @param outBucketSize Size of the out bucket.
+   * @return newinBucketSize Size of the in bucket after the swap.
+   * @return newoutBucketSize Size of the out bucket after the swap.
    */
   function getUpdatedBuckets(
-    address tokenIn,
-    address tokenOut,
     uint256 amountIn,
     uint256 amountOut,
-    bytes32 pairId
-  ) external view returns (uint256 tokenInBucketSize, uint256 tokenOutBucketSize);
+    uint256 inBucketSize,
+    uint256 outBucketSize
+  ) external pure returns (uint256 nextInBucketSize, uint256 nextOutBucketSize);
 
   /**
    * @notice Retrieve the name of this exchange.

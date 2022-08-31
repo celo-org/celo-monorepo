@@ -50,7 +50,7 @@ contract PairManager is IPairManager, Initializable, Ownable {
    * @param _broker The address of the broker contract.
    * @param _reserve The address of the reserve contract.
    */
-  function initilize(address _broker, IReserve _reserve) external initializer {
+  function initialize(address _broker, address _reserve) external initializer {
     _transferOwnership(msg.sender);
     setBroker(_broker);
     setReserve(_reserve);
@@ -86,9 +86,9 @@ contract PairManager is IPairManager, Initializable, Ownable {
    * @notice Sets the address of the reserve contract.
    * @param _reserve The new address of the reserve contract.
    */
-  function setReserve(IReserve _reserve) public onlyOwner {
+  function setReserve(address _reserve) public onlyOwner {
     require(address(_reserve) != address(0), "Reserve address must be set");
-    reserve = _reserve;
+    reserve = IReserve(_reserve);
     emit ReserveUpdated(address(_reserve));
   }
 
@@ -118,18 +118,17 @@ contract PairManager is IPairManager, Initializable, Ownable {
 
     validatePairInfo(pairInfo);
 
-    // TODO: getUpdatedBuckets Function sig should change. May not need amounts
-    // but instead pass minSupplyForStableBucketCap & stableBucketMaxFraction
-    (uint256 tokenInBucket, uint256 tokenOutBucket) = pairInfo.mentoExchange.getUpdatedBuckets(
-      pairInfo.stableAsset,
-      pairInfo.collateralAsset,
-      0,
-      0,
-      pairId
-    );
+    // // TODO: getUpdatedBuckets Function sig should change. May not need amounts
+    // // but instead pass minSupplyForStableBucketCap & stableBucketMaxFraction
+    // (uint256 tokenInBucket, uint256 tokenOutBucket) = pairInfo.mentoExchange.getUpdatedBuckets(
+    //   0,
+    //   0,
+    //   0,
+    //   0,
+    // );
 
-    pairInfo.stableBucket = tokenInBucket;
-    pairInfo.collateralBucket = tokenOutBucket;
+    // pairInfo.stableBucket = tokenInBucket;
+    // pairInfo.collateralBucket = tokenOutBucket;
 
     pairs[pairId] = pairInfo;
 

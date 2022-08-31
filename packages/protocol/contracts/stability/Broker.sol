@@ -12,6 +12,7 @@ import { IMentoExchange } from "./interfaces/IMentoExchange.sol";
 import { StableToken } from "./StableToken.sol";
 
 import { Initializable } from "../common/Initializable.sol";
+import { FixidityLib } from "../common/FixidityLib.sol";
 import { IStableToken } from "./interfaces/IStableToken.sol";
 
 /**
@@ -40,7 +41,7 @@ contract Broker is IBroker, Initializable, Ownable {
    * @param _pairManager The address of the PairManager contract.
    * @param _reserve The address of the Rezerve contract.
    */
-  function initilize(address _pairManager, address _reserve) external initializer {
+  function initialize(address _pairManager, address _reserve) external initializer {
     _transferOwnership(msg.sender);
     setPairManager(_pairManager);
     setReserve(_reserve);
@@ -142,20 +143,18 @@ contract Broker is IBroker, Initializable, Ownable {
       tokenInIsStable = true;
       tokenOut = pair.collateralAsset;
       (amountOut, nextTokenInBucketSize, nextTokenOutBucketSize) = pair.mentoExchange.getAmountOut(
-        tokenIn,
-        tokenOut,
+        amountIn,
         pair.stableBucket,
         pair.collateralBucket,
-        amountIn
+        FixidityLib.unwrap(pair.spread)
       );
     } else {
       tokenOut = pair.stableAsset;
       (amountOut, nextTokenInBucketSize, nextTokenOutBucketSize) = pair.mentoExchange.getAmountOut(
-        tokenIn,
-        tokenOut,
+        amountIn,
         pair.collateralBucket,
         pair.stableBucket,
-        amountIn
+        FixidityLib.unwrap(pair.spread)
       );
     }
   }
