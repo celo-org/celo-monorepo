@@ -15,7 +15,7 @@ import { IO } from './io'
 
 // prettier-ignore
 export type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
-export type ThresholdStateService<R> = R extends SignMessageRequest
+export type ThresholdStateService<R extends OdisSignatureRequest> = R extends SignMessageRequest
   ? PnpThresholdStateService<R>
   : never | R extends DomainRestrictedSignatureRequest
   ? DomainThresholdStateService<R>

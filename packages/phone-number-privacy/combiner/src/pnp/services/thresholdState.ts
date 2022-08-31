@@ -1,6 +1,6 @@
 import {
   PnpQuotaRequest,
-  PnpState,
+  PnpQuotaStatus,
   SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -12,10 +12,10 @@ import { OdisConfig } from '../../config'
 export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageRequest> {
   constructor(readonly config: OdisConfig) {}
 
-  findCombinerQuotaState(session: Session<R>): PnpState {
+  findCombinerQuotaState(session: Session<R>): PnpQuotaStatus {
     const signerResponses = session.responses
       .map((signerResponse) => signerResponse.res)
-      .filter((res) => res.success) as PnpState[]
+      .filter((res) => res.success) as PnpQuotaStatus[]
 
     const sortedResponses = signerResponses.sort(
       (a, b) => a.performedQueryCount - b.performedQueryCount

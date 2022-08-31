@@ -13,14 +13,14 @@ import {
 import { Domain, DomainState } from '../domains'
 
 // Phone Number Privacy
-export interface PnpState {
+export interface PnpQuotaStatus {
   performedQueryCount: number
   // all time total quota
   totalQuota: number
   blockNumber?: number
 }
 
-const PnpStateSchema: t.Type<PnpState> = t.intersection([
+const PnpQuotaStatusSchema: t.Type<PnpQuotaStatus> = t.intersection([
   t.type({
     performedQueryCount: t.number,
     totalQuota: t.number,
@@ -30,7 +30,7 @@ const PnpStateSchema: t.Type<PnpState> = t.intersection([
   }),
 ])
 
-export interface SignMessageResponseSuccess extends PnpState {
+export interface SignMessageResponseSuccess extends PnpQuotaStatus {
   success: true
   version: string
   signature: string
@@ -58,7 +58,7 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
     t.partial({
       warnings: t.union([t.array(t.string), t.undefined]),
     }),
-    PnpStateSchema,
+    PnpQuotaStatusSchema,
   ]),
   t.intersection([
     t.type({
@@ -74,7 +74,7 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
   ]),
 ])
 
-export interface PnpQuotaResponseSuccess extends PnpState {
+export interface PnpQuotaResponseSuccess extends PnpQuotaStatus {
   success: true
   version: string
   warnings?: string[]
@@ -97,7 +97,7 @@ export const PnpQuotaResponseSchema: t.Type<PnpQuotaResponse> = t.union([
     t.partial({
       warnings: t.union([t.array(t.string), t.undefined]),
     }),
-    PnpStateSchema,
+    PnpQuotaStatusSchema,
   ]),
   t.type({
     success: t.literal(false),

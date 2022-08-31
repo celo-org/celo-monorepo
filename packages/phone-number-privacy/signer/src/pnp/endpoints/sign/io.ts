@@ -98,7 +98,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     error: string,
     status: number,
     response: Response<SignMessageResponseFailure>,
-    queryCount?: number,
+    performedQueryCount?: number,
     totalQuota?: number,
     blockNumber?: number
   ) {
@@ -108,7 +108,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
         success: false,
         version: getVersion(),
         error,
-        performedQueryCount: queryCount,
+        performedQueryCount,
         totalQuota,
         blockNumber,
       },

@@ -3,17 +3,21 @@ import {
   DomainRestrictedSignatureRequest,
   OdisRequest,
   PnpQuotaRequest,
+  PnpQuotaStatus,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { DomainStateRecord } from '../common/database/models/domainState'
-import { PnpQuotaStatus } from '../pnp/services/quota'
 import { Session } from './action'
 
 // prettier-ignore
-export type OdisQuotaStatus<R extends OdisRequest> =
-  | R extends DomainQuotaStatusRequest | DomainRestrictedSignatureRequest ? DomainStateRecord : never
-  | R extends SignMessageRequest | PnpQuotaRequest ? PnpQuotaStatus : never
+export type OdisQuotaStatus<R extends OdisRequest> = R extends
+  | DomainQuotaStatusRequest
+  | DomainRestrictedSignatureRequest
+  ? DomainStateRecord
+  : never | R extends SignMessageRequest | PnpQuotaRequest
+  ? PnpQuotaStatus
+  : never
 
 export interface OdisQuotaStatusResult<R extends OdisRequest> {
   sufficient: boolean

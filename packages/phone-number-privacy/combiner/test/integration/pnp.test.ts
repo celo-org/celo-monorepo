@@ -563,8 +563,8 @@ describe('pnpService', () => {
   })
 
   describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {
-    const useQuery = async (queryCount: number, signer: Server | HttpsServer) => {
-      for (let i = 0; i < queryCount; i++) {
+    const useQuery = async (performedQueryCount: number, signer: Server | HttpsServer) => {
+      for (let i = 0; i < performedQueryCount; i++) {
         const phoneNumber = '+1' + Math.floor(Math.random() * 10 ** 10)
         const blindedNumber = getBlindedPhoneNumber(phoneNumber, BLINDING_FACTOR)
         const req = {
