@@ -29,7 +29,6 @@ const initializeArgs = async (networkName: string): Promise<any[]> => {
     web3.utils.toWei(config.governance.minDeposit.toString(), 'ether'),
     config.governance.queueExpiry,
     config.governance.dequeueFrequency,
-    config.governance.approvalStageDuration,
     config.governance.referendumStageDuration,
     config.governance.executionStageDuration,
     toFixed(config.governance.participationBaseline).toString(),

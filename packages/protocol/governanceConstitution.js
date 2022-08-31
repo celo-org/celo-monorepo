@@ -101,7 +101,6 @@ const DefaultConstitution = {
     setMinDeposit: 0.9,
     setQueueExpiry: 0.9,
     setDequeueFrequency: 0.9,
-    setApprovalStageDuration: 0.9,
     setReferendumStageDuration: 0.9,
     setExecutionStageDuration: 0.9,
     setParticipationBaseline: 0.9,

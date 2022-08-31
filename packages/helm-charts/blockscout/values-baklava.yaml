@@ -52,3 +52,4 @@ blockscout:
     recaptchaSecretName: baklava-blockscout-recaptcha
   metrics:
     enabled: true
+  jsonrpc_public_http: https://baklava-forno.celo-testnet.org
