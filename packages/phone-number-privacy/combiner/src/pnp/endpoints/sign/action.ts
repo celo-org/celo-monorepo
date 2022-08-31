@@ -89,7 +89,7 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
         res.performedQueryCount !== expectedRes.performedQueryCount ||
         res.warnings !== expectedRes.warnings
       ) {
-        session.logger.debug({ values }, 'Discrepancies in signer quota responses')
+        session.logger.warn({ values }, 'Discrepancies in signer quota responses')
         return
       }
     })
