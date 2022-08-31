@@ -2,6 +2,7 @@ import { ContractKit } from '@celo/contractkit'
 import {
   ErrorMessage,
   PnpQuotaRequest,
+  PnpQuotaStatus,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
@@ -12,11 +13,6 @@ import { OdisQuotaStatusResult, QuotaService } from '../../common/quota'
 import { getBlockNumber, meter } from '../../common/web3/contracts'
 import { config } from '../../config'
 import { PnpSession } from '../session'
-export interface PnpQuotaStatus {
-  queryCount: number
-  totalQuota: number
-  blockNumber: number
-}
 
 export abstract class PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
@@ -27,7 +23,7 @@ export abstract class PnpQuotaService
     session: PnpSession<SignMessageRequest>,
     trx: Knex.Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
-    const remainingQuota = state.totalQuota - state.queryCount
+    const remainingQuota = state.totalQuota - state.performedQueryCount
     Histograms.userRemainingQuotaAtRequest.labels(session.request.url).observe(remainingQuota)
     let sufficient = remainingQuota > 0
     if (!sufficient) {
@@ -42,7 +38,7 @@ export abstract class PnpQuotaService
       }
     } else {
       await this.updateQuotaStatus(trx, session)
-      state.queryCount++
+      state.performedQueryCount++
     }
     return { sufficient, state }
   }
@@ -52,10 +48,10 @@ export abstract class PnpQuotaService
     trx?: Knex.Transaction
   ): Promise<PnpQuotaStatus> {
     const { account } = session.request.body
-    const [queryCountResult, totalQuotaResult, blockNumberResult] = await meter(
+    const [performedQueryCountResult, totalQuotaResult, blockNumberResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
-          // Note: The database read of the user's queryCount
+          // Note: The database read of the user's performedQueryCount
           // included here resolves to 0 on error
           getPerformedQueryCount(this.db, account, session.logger, trx),
           this.getTotalQuota(_session),
@@ -70,13 +66,13 @@ export abstract class PnpQuotaService
     )
 
     let hadBlockchainError = false
-    let queryCount = -1
+    let performedQueryCount = -1
     let totalQuota = -1
     let blockNumber = -1
-    if (queryCountResult.status === 'fulfilled') {
-      queryCount = queryCountResult.value
+    if (performedQueryCountResult.status === 'fulfilled') {
+      performedQueryCount = performedQueryCountResult.value
     } else {
-      session.logger.error(queryCountResult.reason)
+      session.logger.error(performedQueryCountResult.reason)
       session.errors.push(ErrorMessage.DATABASE_GET_FAILURE)
     }
     if (totalQuotaResult.status === 'fulfilled') {
@@ -95,7 +91,7 @@ export abstract class PnpQuotaService
       session.errors.push(ErrorMessage.CONTRACT_GET_FAILURE)
     }
 
-    return { queryCount, totalQuota, blockNumber }
+    return { performedQueryCount, totalQuota, blockNumber }
   }
 
   protected async updateQuotaStatus(

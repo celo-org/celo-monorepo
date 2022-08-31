@@ -71,8 +71,8 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     response: Response<SignMessageResponseSuccess>,
     key: Key,
     signature: string,
-    performedQueryCount?: number,
-    totalQuota?: number,
+    performedQueryCount: number,
+    totalQuota: number,
     blockNumber?: number,
     warnings?: string[]
   ) {
@@ -98,7 +98,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     error: string,
     status: number,
     response: Response<SignMessageResponseFailure>,
-    queryCount?: number,
+    performedQueryCount?: number,
     totalQuota?: number,
     blockNumber?: number
   ) {
@@ -108,7 +108,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
         success: false,
         version: getVersion(),
         error,
-        performedQueryCount: queryCount,
+        performedQueryCount,
         totalQuota,
         blockNumber,
       },

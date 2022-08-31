@@ -22,7 +22,10 @@ export class PnpSignAction implements Action<SignMessageRequest> {
 
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
     await this.db.transaction(async (trx) => {
-      let queryCount, totalQuota, blockNumber
+      const quotaStatus = await this.quota.getQuotaStatus(session, trx)
+      const { totalQuota, blockNumber } = quotaStatus
+      let { performedQueryCount } = quotaStatus
+
       if (await getRequestExists(this.db, session.request.body, session.logger, trx)) {
         Counters.duplicateRequests.inc()
         session.logger.debug(
@@ -30,16 +33,12 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         )
         session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
       } else {
-        const quotaStatus = await this.quota.getQuotaStatus(session, trx)
-        queryCount = quotaStatus.queryCount
-        totalQuota = quotaStatus.totalQuota
-        blockNumber = quotaStatus.blockNumber
         // In the case of a blockchain connection failure, totalQuota and/or blockNumber
         // may be undefined.
-        // In the case of a database connection failure, queryCount
+        // In the case of a database connection failure, performedQueryCount
         // may be undefined.
-        // Note that queryCount or totalQuota can be 0 and that should not fail open.
-        if (quotaStatus.queryCount !== undefined && quotaStatus.totalQuota !== undefined) {
+        // Note that performedQueryCount or totalQuota can be 0 and that should not fail open.
+        if (performedQueryCount !== undefined && totalQuota !== undefined) {
           const { sufficient, state } = await this.quota.checkAndUpdateQuotaStatus(
             quotaStatus,
             session,
@@ -50,16 +49,16 @@ export class PnpSignAction implements Action<SignMessageRequest> {
               WarningMessage.EXCEEDED_QUOTA,
               403,
               session.response,
-              queryCount,
+              performedQueryCount,
               totalQuota,
               blockNumber
             )
             return
           }
-          queryCount = state.queryCount
+          performedQueryCount = state.performedQueryCount
         } else {
           // TODO(2.0.0, refactor) this logic is all wrong, revisit (https://github.com/celo-org/celo-monorepo/issues/9800)
-          // If queryCount or totalQuota are undefined,
+          // If performedQueryCount or totalQuota are undefined,
           // we fail open and service the request to not block the user.
           // Error messages are stored in the session and included along
           // with the signature in the response.
@@ -85,7 +84,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         session.response,
         key,
         signature,
-        queryCount,
+        performedQueryCount,
         totalQuota,
         blockNumber,
         session.errors
