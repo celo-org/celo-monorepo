@@ -8,7 +8,7 @@ import {
 import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
 import { DomainThresholdStateService } from '../domain/services/thresholdState'
-import { CombinerThresholdStateService } from '../pnp/services/thresholdState'
+import { PnpThresholdStateService } from '../pnp/services/thresholdState'
 import { CombineAction } from './combine'
 import { CryptoSession } from './crypto-session'
 import { IO } from './io'
@@ -16,7 +16,7 @@ import { IO } from './io'
 // prettier-ignore
 export type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
 export type ThresholdStateService<R> = R extends SignMessageRequest
-  ? CombinerThresholdStateService<R>
+  ? PnpThresholdStateService<R>
   : never | R extends DomainRestrictedSignatureRequest
   ? DomainThresholdStateService<R>
   : never

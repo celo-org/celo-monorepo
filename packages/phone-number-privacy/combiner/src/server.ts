@@ -24,7 +24,7 @@ import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
-import { CombinerThresholdStateService } from './pnp/services/thresholdState'
+import { PnpThresholdStateService } from './pnp/services/thresholdState'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -39,12 +39,12 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
 
   kit = kit ?? getContractKit(config.blockchain)
 
-  const combinerThresholdStateService = new CombinerThresholdStateService(config.phoneNumberPrivacy)
+  const pnpThresholdStateService = new PnpThresholdStateService(config.phoneNumberPrivacy)
 
   const legacyPnpSign = new Controller(
     new PnpSignAction(
       config.phoneNumberPrivacy,
-      combinerThresholdStateService,
+      pnpThresholdStateService,
       new LegacyPnpSignIO(config.phoneNumberPrivacy, kit)
     )
   )
@@ -61,7 +61,7 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   const pnpQuota = new Controller(
     new PnpQuotaAction(
       config.phoneNumberPrivacy,
-      combinerThresholdStateService,
+      pnpThresholdStateService,
       new PnpQuotaIO(config.phoneNumberPrivacy, kit)
     )
   )
@@ -72,7 +72,7 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   const pnpSign = new Controller(
     new PnpSignAction(
       config.phoneNumberPrivacy,
-      combinerThresholdStateService,
+      pnpThresholdStateService,
       new PnpSignIO(config.phoneNumberPrivacy, kit)
     )
   )
