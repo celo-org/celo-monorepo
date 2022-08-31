@@ -2,7 +2,6 @@ import {
   PnpQuotaRequest,
   PnpQuotaStatus,
   SignMessageRequest,
-  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
 import { OdisConfig } from '../../config'
@@ -27,12 +26,6 @@ export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageReq
       // checking for sufficient number of responses is already done in the action
       // this is basically checking for sufficient number of successful responses
     }
-
-    sortedResponses.forEach((res) => {
-      if (res.totalQuota !== sortedResponses[0].totalQuota) {
-        session.logger.error(WarningMessage.INCONSISTENT_TOTAL_QUOTA)
-      }
-    })
 
     const thresholdSigner = sortedResponses[threshold - 1]
     return {

@@ -54,6 +54,8 @@ export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
       success: t.literal(true),
       version: t.string,
       signature: t.string,
+      performedQueryCount: t.number,
+      totalQuota: t.number,
     }),
     t.partial({
       warnings: t.union([t.array(t.string), t.undefined]),

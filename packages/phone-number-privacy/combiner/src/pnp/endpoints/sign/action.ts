@@ -3,6 +3,7 @@ import {
   ErrorType,
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
   SignMessageRequest,
+  SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
@@ -43,58 +44,55 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
   }
 
   protected logResponseDiscrepancies(session: CryptoSession<SignMessageRequest>): void {
-    // Only compare responses which have values for the quota fields
-    const successes = session.responses.filter(
-      (signerResponse) =>
-        signerResponse.res &&
-        signerResponse.res.performedQueryCount &&
-        signerResponse.res.totalQuota &&
-        signerResponse.res.blockNumber
-    )
-
-    if (successes.length === 0) {
-      return
-    }
-    // Compare the first response to the rest of the responses
-    const expectedQueryCount = successes[0].res.performedQueryCount
-    const expectedTotalQuota = successes[0].res.totalQuota
-    const expectedBlockNumber = successes[0].res.blockNumber!
-    let discrepancyFound = false
-    for (const signerResponse of successes) {
-      // Performed query count should never diverge; however the totalQuota may
-      // diverge if the queried block number is different
-      if (
-        signerResponse.res.performedQueryCount !== expectedQueryCount ||
-        (signerResponse.res.totalQuota !== expectedTotalQuota &&
-          signerResponse.res.blockNumber === expectedBlockNumber)
-      ) {
-        const values = successes.map((_signerResponse) => {
-          return {
-            signer: _signerResponse.url,
-            performedQueryCount: _signerResponse.res.performedQueryCount,
-            totalQuota: _signerResponse.res.totalQuota,
-          }
-        })
-        session.logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
-        discrepancyFound = true
-      }
-      if (
-        Math.abs(signerResponse.res.blockNumber! - expectedBlockNumber) >
-        MAX_BLOCK_DISCREPANCY_THRESHOLD
-      ) {
-        const values = successes.map((response) => {
-          return {
+    // TODO: responses should all already be successes due to CombineAction receiveSuccess
+    const responses = session.responses
+      .filter((res) => res.res.success)
+      .map((res) => res.res) as SignMessageResponseSuccess[]
+    const values = session.responses
+      .map(
+        (response) =>
+          response.res.success && {
             signer: response.url,
             blockNumber: response.res.blockNumber,
+            totalQuota: response.res.totalQuota,
+            performedQueryCount: response.res.performedQueryCount,
           }
-        })
-        session.logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
-        discrepancyFound = true
-      }
-      if (discrepancyFound) {
+      )
+      .filter((val) => val)
+
+    if (responses.length === 0) {
+      return
+    }
+    const expectedRes = responses[0]
+    responses.forEach((res) => {
+      if (
+        res.blockNumber &&
+        expectedRes.blockNumber &&
+        Math.abs(res.blockNumber - expectedRes.blockNumber) > MAX_BLOCK_DISCREPANCY_THRESHOLD
+      ) {
+        const blockValues = session.responses
+          .map(
+            (response) =>
+              response.res.success && {
+                signer: response.url,
+                blockNumber: response.res.blockNumber,
+                warnings: response.res.warnings,
+              }
+          )
+          .filter((val) => val)
+        session.logger.error({ blockValues }, WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
+        return
+      } else if (res.totalQuota !== expectedRes.totalQuota) {
+        session.logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
+        return
+      } else if (
+        res.performedQueryCount !== expectedRes.performedQueryCount ||
+        res.warnings !== expectedRes.warnings
+      ) {
+        session.logger.debug({ values }, 'Discrepancies in signer quota responses')
         return
       }
-    }
+    })
   }
 
   protected errorCodeToError(errorCode: number): ErrorType {
