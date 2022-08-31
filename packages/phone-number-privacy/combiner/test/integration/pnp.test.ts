@@ -581,7 +581,7 @@ describe('pnpService', () => {
 
     const getCombinerQuotaResponse = async (req: PnpQuotaRequest, authorization: string) => {
       const res = await request(app)
-        .get(CombinerEndpoint.PNP_QUOTA)
+        .post(CombinerEndpoint.PNP_QUOTA)
         .set('Authorization', authorization)
         .send(req)
       return res
@@ -758,7 +758,7 @@ describe('pnpService', () => {
       }
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await request(appWithApiDisabled)
-        .get(CombinerEndpoint.PNP_QUOTA)
+        .post(CombinerEndpoint.PNP_QUOTA)
         .set('Authorization', authorization)
         .send(req)
       expect(res.status).toBe(503)

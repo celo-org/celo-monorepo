@@ -65,7 +65,7 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
       new PnpQuotaIO(config.phoneNumberPrivacy, kit)
     )
   )
-  app.get(CombinerEndpoint.PNP_QUOTA, (req, res) =>
+  app.post(CombinerEndpoint.PNP_QUOTA, (req, res) =>
     meterResponse(pnpQuota.handle.bind(pnpQuota), req, res, CombinerEndpoint.PNP_QUOTA, config)
   )
 
