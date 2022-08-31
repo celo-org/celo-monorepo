@@ -31,6 +31,7 @@ interface IMentoExchange {
    * @param tokenOut Address of the token being exchanged for.
    * @param tokenInBucketSize Size of the tokenIn bucket.
    * @param tokenOutBucketSize Size of the tokenOut bucket.
+   * @param spread Spread charged on exchanges.
    * @param amountIn Amount of tokenIn being paid in.
    * @return amountOut Amount of tokenOut that will be paid out.
    */
@@ -39,6 +40,7 @@ interface IMentoExchange {
     address tokenOut,
     uint256 tokenInBucketSize,
     uint256 tokenOutBucketSize,
+    uint256 spread,
     uint256 amountIn
   ) external view returns (uint256 amountOut);
 
@@ -48,6 +50,7 @@ interface IMentoExchange {
    * @param tokenOut Address of the token being exchanged for.
    * @param tokenInBucketSize Size of the tokenIn bucket.
    * @param tokenOutBucketSize Size of the tokenOut bucket.
+   * @param spread Spread charged on exchanges.
    * @param amountOut Amount of tokenIn being paid out.
    * @return amountIn Amount of tokenOut that would have to be paid in.
    */
@@ -56,6 +59,7 @@ interface IMentoExchange {
     address tokenOut,
     uint256 tokenInBucketSize,
     uint256 tokenOutBucketSize,
+    uint256 spread,
     uint256 amountOut
   ) external view returns (uint256 amountIn);
 

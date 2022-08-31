@@ -37,6 +37,7 @@ contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
         address(stableToken),
         tokenInBucketSize,
         tokenOutBucketSize,
+        0, // Tests currently assume 0 spread.
         amountIn
       );
   }
@@ -52,6 +53,7 @@ contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
         address(stableToken),
         tokenInBucketSize,
         tokenOutBucketSize,
+        0, // Tests currently assume 0 spread.
         amountOut
       );
   }

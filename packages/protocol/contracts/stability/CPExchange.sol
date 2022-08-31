@@ -34,17 +34,23 @@ contract CPExchange is IMentoExchange, UsingRegistry, ReentrancyGuard, Initializ
 
   /* ==================== View Functions ==================== */
 
-  // TODO(pedro-clabs): add spread to getAmount{In,Out}.
   function getAmountOut(
     address tokenIn, // TODO(pedro-clabs): do we need the token addresses?
     address tokenOut, // TODO(pedro-clabs): do we need the token addresses?
     uint256 tokenInBucketSize,
     uint256 tokenOutBucketSize,
+    uint256 spread,
     uint256 amountIn
   ) external view returns (uint256) {
     if (amountIn == 0) return 0;
 
+    FixidityLib.Fraction memory spreadFraction = FixidityLib.wrap(spread);
     FixidityLib.Fraction memory amountInFixed = FixidityLib.newFixed(amountIn);
+    FixidityLib.Fraction memory netAmountIn = FixidityLib
+      .fixed1()
+      .subtract(spreadFraction)
+      .multiply(amountInFixed);
+
     FixidityLib.Fraction memory numerator = amountInFixed.multiply(
       FixidityLib.newFixed(tokenOutBucketSize)
     );
@@ -64,12 +70,15 @@ contract CPExchange is IMentoExchange, UsingRegistry, ReentrancyGuard, Initializ
     address tokenOut, // TODO(pedro-clabs): do we need the token addresses?
     uint256 tokenInBucketSize,
     uint256 tokenOutBucketSize,
+    uint256 spread,
     uint256 amountOut
   ) external view returns (uint256) {
+    FixidityLib.Fraction memory spreadFraction = FixidityLib.wrap(spread);
+
     FixidityLib.Fraction memory numerator = FixidityLib.newFixed(amountOut.mul(tokenInBucketSize));
-    FixidityLib.Fraction memory denominator = FixidityLib.newFixed(
-      tokenOutBucketSize.sub(amountOut)
-    );
+    FixidityLib.Fraction memory denominator = FixidityLib
+      .newFixed(tokenOutBucketSize.sub(amountOut))
+      .multiply(FixidityLib.fixed1().subtract(spreadFraction));
 
     // See comment in getAmountOut.
     return numerator.unwrap().div(denominator.unwrap());
