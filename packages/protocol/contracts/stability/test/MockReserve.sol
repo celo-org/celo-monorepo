@@ -40,4 +40,12 @@ contract MockReserve {
   function getUnfrozenReserveGoldBalance() external view returns (uint256) {
     return address(this).balance;
   }
+
+  function isStableAsset(address) external view returns (bool) {
+    return false;
+  }
+
+  function isCollateralAsset(address) external view returns (bool) {
+    return false;
+  }
 }
