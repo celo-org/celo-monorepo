@@ -56,7 +56,7 @@ contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
       );
   }
 
-  function diff(uint256 a, uint256 b) public view returns (uint256) {
+  function diff(uint256 a, uint256 b) public pure returns (uint256) {
     return a > b ? a - b : b - a;
   }
 
@@ -70,7 +70,7 @@ contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
     assertEq(amountOut, expectedAmountOut);
   }
 
-  function gwei(uint256 x) public view returns (uint256) {
+  function gwei(uint256 x) public pure returns (uint256) {
     return x * 1e18;
   }
 }
