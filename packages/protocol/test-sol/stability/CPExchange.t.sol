@@ -104,10 +104,10 @@ contract CPExchange_getAmountOut is CPExchangeTest {
     // precision issues when amountIn >> bucketSizes.
     vm.assume(amountIn < tokenInBucketSize);
     vm.assume(amountIn < tokenOutBucketSize);
-    // Constrain bucket sizes to represent rates in the range [0.1, 10.0],
+    // Constrain bucket sizes to represent rates in the range [1e-10, 1e10],
     // in order to avoid precision issues when bucketA >> bucketB.
-    vm.assume(tokenInBucketSize < 10 * tokenOutBucketSize);
-    vm.assume(tokenOutBucketSize < 10 * tokenInBucketSize);
+    vm.assume(tokenInBucketSize < 1e10 * tokenOutBucketSize);
+    vm.assume(tokenOutBucketSize < 1e10 * tokenInBucketSize);
     // Constrain amountIn to represent amounts of at least 1e-5 tokens, in
     // order to avoid precision issues when amountIn << bucketSizes.
     vm.assume(amountIn >= 1e13);
@@ -138,10 +138,10 @@ contract CPExchange_getAmountOut is CPExchangeTest {
     // precision issues when amountOut >> bucketSizes.
     vm.assume(amountOut < tokenInBucketSize);
     vm.assume(amountOut < tokenOutBucketSize);
-    // Constrain bucket sizes to represent rates in the range [0.1, 10.0],
+    // Constrain bucket sizes to represent rates in the range [1e-10, 1e10],
     // in order to avoid precision issues when bucketA >> bucketB.
-    vm.assume(tokenInBucketSize < 10 * tokenOutBucketSize);
-    vm.assume(tokenOutBucketSize < 10 * tokenInBucketSize);
+    vm.assume(tokenInBucketSize < 1e10 * tokenOutBucketSize);
+    vm.assume(tokenOutBucketSize < 1e10 * tokenInBucketSize);
     // Constrain amountOut to represent amounts of at least 1e-5 tokens, in
     // order to avoid precision issues when amountOut << bucketSizes.
     vm.assume(amountOut >= 1e13);
