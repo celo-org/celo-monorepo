@@ -1483,7 +1483,7 @@ contract('Governance', (accounts: string[]) => {
         )
       })
 
-      it('should emit the ParticipationBaselineUpdated event', async () => {
+      it('should emit the ProposalApproved event', async () => {
         const resp = await governance.approve(proposalId, index)
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
