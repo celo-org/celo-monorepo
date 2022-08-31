@@ -13,7 +13,16 @@ export class PnpQuotaAction implements Action<PnpQuotaRequest> {
   ) {}
 
   public async perform(session: PnpSession<PnpQuotaRequest>): Promise<void> {
-    const { queryCount, totalQuota, blockNumber } = await this.quota.getQuotaStatus(session)
-    this.io.sendSuccess(200, session.response, queryCount, totalQuota, blockNumber, session.errors)
+    const { performedQueryCount, totalQuota, blockNumber } = await this.quota.getQuotaStatus(
+      session
+    )
+    this.io.sendSuccess(
+      200,
+      session.response,
+      performedQueryCount,
+      totalQuota,
+      blockNumber,
+      session.errors
+    )
   }
 }

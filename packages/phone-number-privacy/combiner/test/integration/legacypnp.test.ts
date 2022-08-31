@@ -254,6 +254,7 @@ describe('legacyPnpService', () => {
     mockIsVerified.mockReturnValue(_isVerified)
     mockTokenBalance.mockReturnValue(balanceToken)
   }
+  const expectedQuota = 410
 
   describe('when all signers return correct signatures', () => {
     beforeEach(async () => {
@@ -279,6 +280,9 @@ describe('legacyPnpService', () => {
           success: true,
           version: expectedVersion,
           signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
         })
         const unblindedSig = threshold_bls.unblind(
           Buffer.from(res.body.signature, 'base64'),
@@ -297,6 +301,9 @@ describe('legacyPnpService', () => {
           success: true,
           version: expectedVersion,
           signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
         })
       })
 
@@ -309,11 +316,47 @@ describe('legacyPnpService', () => {
           success: true,
           version: expectedVersion,
           signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
         })
 
+        // performedQueryCount should remain the same; same request should not
+        // consume any quota
         const res2 = await sendPnpSignRequest(req, authorization, app)
         expect(res2.status).toBe(200)
         expect(res2.body).toMatchObject<SignMessageResponseSuccess>(res1.body)
+      })
+
+      it('Should increment performedQueryCount on request from the same account with a new message', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res1 = await sendPnpSignRequest(req, authorization, app)
+
+        const expectedResponse: SignMessageResponseSuccess = {
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+        }
+
+        expect(res1.status).toBe(200)
+        expect(res1.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
+
+        // Second request for the same account but with new message
+        const message2 = Buffer.from('second test message', 'utf8')
+        const blindedMsg2 = threshold_bls.blind(message2, userSeed)
+        const req2 = getSignRequest(blindedMsg2)
+        const authorization2 = getPnpRequestAuthorization(req2, PRIVATE_KEY1)
+
+        // Expect performedQueryCount to increase
+        expectedResponse.performedQueryCount++
+        expectedResponse.signature =
+          'PWvuSYIA249x1dx+qzgl6PKSkoulXXE/P4WHJvGmtw77pCRilEWTn3xSp+6JS9+A'
+        const res2 = await sendPnpSignRequest(req2, authorization2, app)
+        expect(res2.status).toBe(200)
+        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
       })
 
       it('Should respond with 200 on extra request fields', async () => {
@@ -327,6 +370,9 @@ describe('legacyPnpService', () => {
           success: true,
           version: expectedVersion,
           signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
         })
       })
 
@@ -340,6 +386,9 @@ describe('legacyPnpService', () => {
           success: true,
           version: expectedVersion,
           signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
         })
       })
 
@@ -352,6 +401,9 @@ describe('legacyPnpService', () => {
           success: true,
           version: expectedVersion,
           signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
         })
 
         const secondUserSeed = new Uint8Array(userSeed)
@@ -478,6 +530,9 @@ describe('legacyPnpService', () => {
           success: true,
           version: expectedVersion,
           signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
         })
         const unblindedSig = threshold_bls.unblind(
           Buffer.from(res.body.signature, 'base64'),

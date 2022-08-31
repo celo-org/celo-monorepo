@@ -3,12 +3,12 @@ import { CombineAction } from '../../../common/combine'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { OdisConfig } from '../../../config'
-import { CombinerThresholdStateService } from '../../services/thresholdState'
+import { PnpThresholdStateService } from '../../services/thresholdState'
 
 export class PnpQuotaAction extends CombineAction<PnpQuotaRequest> {
   constructor(
     readonly config: OdisConfig,
-    readonly thresholdStateService: CombinerThresholdStateService<PnpQuotaRequest>,
+    readonly thresholdStateService: PnpThresholdStateService<PnpQuotaRequest>,
     readonly io: IO<PnpQuotaRequest>
   ) {
     super(config, io)

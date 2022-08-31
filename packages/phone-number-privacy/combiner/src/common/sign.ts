@@ -7,16 +7,27 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
 import { OdisConfig } from '../config'
+import { DomainThresholdStateService } from '../domain/services/thresholdState'
+import { PnpThresholdStateService } from '../pnp/services/thresholdState'
 import { CombineAction } from './combine'
 import { CryptoSession } from './crypto-session'
 import { IO } from './io'
 
 // prettier-ignore
 export type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
+export type ThresholdStateService<R extends OdisSignatureRequest> = R extends SignMessageRequest
+  ? PnpThresholdStateService<R>
+  : never | R extends DomainRestrictedSignatureRequest
+  ? DomainThresholdStateService<R>
+  : never
 
 // tslint:disable-next-line: max-classes-per-file
 export abstract class SignAction<R extends OdisSignatureRequest> extends CombineAction<R> {
-  constructor(readonly config: OdisConfig, readonly io: IO<R>) {
+  constructor(
+    readonly config: OdisConfig,
+    readonly thresholdStateService: ThresholdStateService<R>,
+    readonly io: IO<R>
+  ) {
     super(config, io)
   }
 

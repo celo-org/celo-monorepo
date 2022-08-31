@@ -6,15 +6,9 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
-import { IO } from '../../../common/io'
 import { SignAction } from '../../../common/sign'
-import { OdisConfig } from '../../../config'
 
 export class PnpSignAction extends SignAction<SignMessageRequest> {
-  constructor(readonly config: OdisConfig, readonly io: IO<SignMessageRequest>) {
-    super(config, io)
-  }
-
   combine(session: CryptoSession<SignMessageRequest>): void {
     this.logResponseDiscrepancies(session)
 
@@ -24,7 +18,16 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
-        return this.io.sendSuccess(200, session.response, combinedSignature)
+
+        const pnpQuotaStatus = this.thresholdStateService.findCombinerQuotaState(session)
+        return this.io.sendSuccess(
+          200,
+          session.response,
+          combinedSignature,
+          pnpQuotaStatus.performedQueryCount,
+          pnpQuotaStatus.totalQuota,
+          pnpQuotaStatus.blockNumber
+        )
       } catch (error) {
         // May fail upon combining signatures if too many sigs are invalid
         // Fallback to handleMissingSignatures

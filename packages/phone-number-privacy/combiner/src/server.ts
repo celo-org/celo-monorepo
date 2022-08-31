@@ -24,7 +24,7 @@ import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
-import { CombinerThresholdStateService } from './pnp/services/thresholdState'
+import { PnpThresholdStateService } from './pnp/services/thresholdState'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
@@ -39,9 +39,12 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
 
   kit = kit ?? getContractKit(config.blockchain)
 
+  const pnpThresholdStateService = new PnpThresholdStateService(config.phoneNumberPrivacy)
+
   const legacyPnpSign = new Controller(
     new PnpSignAction(
       config.phoneNumberPrivacy,
+      pnpThresholdStateService,
       new LegacyPnpSignIO(config.phoneNumberPrivacy, kit)
     )
   )
@@ -55,22 +58,26 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
     )
   )
 
-  const pnpSign = new Controller(
-    new PnpSignAction(config.phoneNumberPrivacy, new PnpSignIO(config.phoneNumberPrivacy, kit))
-  )
-  app.post(CombinerEndpoint.PNP_SIGN, (req, res) =>
-    meterResponse(pnpSign.handle.bind(pnpSign), req, res, CombinerEndpoint.PNP_SIGN, config)
-  )
-
   const pnpQuota = new Controller(
     new PnpQuotaAction(
       config.phoneNumberPrivacy,
-      new CombinerThresholdStateService(config.phoneNumberPrivacy),
+      pnpThresholdStateService,
       new PnpQuotaIO(config.phoneNumberPrivacy, kit)
     )
   )
-  app.get(CombinerEndpoint.PNP_QUOTA, (req, res) =>
+  app.post(CombinerEndpoint.PNP_QUOTA, (req, res) =>
     meterResponse(pnpQuota.handle.bind(pnpQuota), req, res, CombinerEndpoint.PNP_QUOTA, config)
+  )
+
+  const pnpSign = new Controller(
+    new PnpSignAction(
+      config.phoneNumberPrivacy,
+      pnpThresholdStateService,
+      new PnpSignIO(config.phoneNumberPrivacy, kit)
+    )
+  )
+  app.post(CombinerEndpoint.PNP_SIGN, (req, res) =>
+    meterResponse(pnpSign.handle.bind(pnpSign), req, res, CombinerEndpoint.PNP_SIGN, config)
   )
 
   const domainThresholdStateService = new DomainThresholdStateService(config.domains)

@@ -8,22 +8,11 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
-import { IO } from '../../../common/io'
 import { SignAction } from '../../../common/sign'
-import { OdisConfig } from '../../../config'
-import { DomainThresholdStateService } from '../../services/thresholdState'
 
 export class DomainSignAction extends SignAction<DomainRestrictedSignatureRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_SIGN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-
-  constructor(
-    readonly config: OdisConfig,
-    readonly thresholdStateService: DomainThresholdStateService<DomainRestrictedSignatureRequest>,
-    readonly io: IO<DomainRestrictedSignatureRequest>
-  ) {
-    super(config, io)
-  }
 
   combine(session: CryptoSession<DomainRestrictedSignatureRequest>): void {
     // this.logResponseDiscrepancies(session)
