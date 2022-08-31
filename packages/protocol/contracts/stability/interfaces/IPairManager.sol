@@ -30,11 +30,13 @@ interface IPairManager {
    * @param stableAsset The address of the stable asset.
    * @param collateralAsset The address of the collateral asset.
    * @param mentoExchange The address of the Mento exchange.
+   * @param pairId The id of the newly created pair.
    */
   event PairCreated(
     address indexed stableAsset,
     address indexed collateralAsset,
-    address indexed mentoExchange
+    address indexed mentoExchange,
+    bytes32 pairId
   );
 
   /**
@@ -54,6 +56,12 @@ interface IPairManager {
    * @param newBroker The address of the new broker.
    */
   event BrokerUpdated(address indexed newBroker);
+
+  /**
+   * @notice Emitted when the reserve address is updated.
+   * @param newReserve The address of the new reserve.
+   */
+  event ReserveUpdated(address indexed newReserve);
 
   /**
    * @notice Emitted when the buckets for a specified pair are updated.

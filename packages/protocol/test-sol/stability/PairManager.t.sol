@@ -4,9 +4,9 @@ pragma experimental ABIEncoderV2;
 
 import { Test, console2 as console } from "celo-foundry/Test.sol";
 
+import { IReserve } from "contracts/stability/interfaces/IReserve.sol";
 import { IMentoExchange } from "contracts/stability/interfaces/IMentoExchange.sol";
 import { PairManager } from "contracts/stability/PairManager.sol";
-import { WithRegistry } from "../utils/WithRegistry.sol";
 
 import { MockReserve } from "contracts/stability/test/MockReserve.sol";
 import { MockERC20 } from "contracts/stability/test/MockERC20.sol";
@@ -15,7 +15,7 @@ import { MockMentoExchange } from "contracts/stability/test/MockMentoExchange.so
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
 
 // forge test --match-contract PairManager -vvv
-contract PairManagerTest is Test, WithRegistry {
+contract PairManagerTest is Test {
   using FixidityLib for FixidityLib.Fraction;
   struct UpdatedBuckets {
     uint256 stableBucket;
@@ -39,7 +39,8 @@ contract PairManagerTest is Test, WithRegistry {
   event PairCreated(
     address indexed stableAsset,
     address indexed collateralAsset,
-    address indexed mentoExchange
+    address indexed mentoExchange,
+    bytes32 pairId
   );
   event PairDestroyed(
     address indexed stableAsset,
@@ -76,9 +77,7 @@ contract PairManagerTest is Test, WithRegistry {
 
     changePrank(deployer);
 
-    registry.setAddressFor("Reserve", address(mockReserve));
-
-    testee.initilize(broker, address(registry));
+    testee.initilize(broker, IReserve(address(mockReserve)));
 
     initPairs();
   }
@@ -185,7 +184,7 @@ contract PairManagerTest_initilizerSettersGetters is PairManagerTest {
     assert(pairBeforeUpdate.stableBucket == 250000000000);
     assert(pairBeforeUpdate.collateralBucket == 250000000000);
 
-    vm.expectEmit(false, false, false, false);
+    vm.expectEmit(true, true, true, true);
     emit BucketsUpdated(pairId, 45000000000, 45000000000);
     testee.updateBuckets(pairId, 45000000000, 45000000000);
 
@@ -196,7 +195,7 @@ contract PairManagerTest_initilizerSettersGetters is PairManagerTest {
 
   /* ---------- Getters ---------- */
 
-  function testFail_getPair_whenPairDoesNotExist_shouldRevert() public {
+  function testFail_getPair_whenPairDoesNotExist_shouldRevert() public view {
     bytes32 pairId = keccak256(
       abi.encodePacked(
         anotherTestStableAsset.symbol(),
@@ -209,7 +208,7 @@ contract PairManagerTest_initilizerSettersGetters is PairManagerTest {
     testee.getPair(pairId);
   }
 
-  function test_getPair_whenPairExists_shouldReturnPair() public {
+  function test_getPair_whenPairExists_shouldReturnPair() public view {
     bytes32 pairId = keccak256(
       abi.encodePacked(
         testStableAsset.symbol(),
@@ -378,7 +377,8 @@ contract PairManagerTest_createPair is PairManagerTest {
     emit PairCreated(
       address(anotherTestStableAsset),
       address(testCollateralAsset),
-      address(testMentoExchange)
+      address(testMentoExchange),
+      pairId
     );
     testee.createPair(newPair);
   }
@@ -399,15 +399,6 @@ contract PairManagerTest_destroyPair is PairManagerTest {
   function test_destroyPair_whenCollateralAddressIsZero_shouldRevert() public {
     vm.expectRevert("Collateral asset address must be specified");
     testee.destroyPair(address(testStableAsset), address(0), testMentoExchange);
-  }
-
-  function test_destroyPair_whenMentoExchangeAddressIsZero_shouldRevert() public {
-    vm.expectRevert("Mento exchange must be set");
-    testee.destroyPair(
-      address(testStableAsset),
-      address(testCollateralAsset),
-      IMentoExchange(address(0))
-    );
   }
 
   function test_destroyPair_whenPairDoesNotExist_shouldRevert() public {

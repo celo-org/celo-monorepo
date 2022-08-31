@@ -7,7 +7,7 @@ import { IMentoExchange } from "./interfaces/IMentoExchange.sol";
 
 import { StableToken } from "./StableToken.sol";
 
-import { UsingRegistry } from "../common/UsingRegistry.sol";
+import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { Initializable } from "../common/Initializable.sol";
 import { FixidityLib } from "../common/FixidityLib.sol";
 
@@ -20,7 +20,7 @@ interface IERC20Metadata {
  * @title PairManager
  * @notice The pair manager allows the creation of virtual pairs that are tradeable via Mento.
  */
-contract PairManager is IPairManager, Initializable, UsingRegistry {
+contract PairManager is IPairManager, Initializable, Ownable {
   using FixidityLib for FixidityLib.Fraction;
 
   /* ==================== State Variables ==================== */
@@ -31,18 +31,11 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   // Maps a pair id to the corresponding pair struct.
   // pairId is in the format "stableSymbol:collateralSymbol:exchangeName"
   mapping(bytes32 => Pair) public pairs;
-  // Tracks whether or not a pair with the given pairId exists.
-  mapping(bytes32 => bool) public isPair;
+
+  // Address of the Mento reserve contract
+  IReserve public reserve;
 
   // TODO: Implement getPairs that takes in asset addresses & not exchange
-
-  // Tracks the total fraction of reserve collateral
-  // that has been allocated to existing virtual pairs.
-  mapping(address => FixidityLib.Fraction) public allocatedCollateralFractions;
-
-  // TODO: https://github.com/mento-protocol/mento-general/issues/60
-  // Tracks the total fraction of reserve stable that has been allocated to existing virtual pairs.
-  mapping(address => FixidityLib.Fraction) public allocatedStableFractions;
 
   /* ==================== Constructor ==================== */
 
@@ -55,12 +48,12 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   /**
    * @notice Allows the contract to be upgradable via the proxy.
    * @param _broker The address of the broker contract.
-   * @param registryAddress The address of the Celo registry.
+   * @param _reserve The address of the reserve contract.
    */
-  function initilize(address _broker, address registryAddress) external initializer {
+  function initilize(address _broker, IReserve _reserve) external initializer {
     _transferOwnership(msg.sender);
-    setRegistry(registryAddress);
     setBroker(_broker);
+    setReserve(_reserve);
   }
 
   /* ==================== Modifiers ==================== */
@@ -73,8 +66,8 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   /* ==================== View Functions ==================== */
 
   function getPair(bytes32 pairId) public view returns (Pair memory pair) {
-    require(isPair[pairId], "A pair with the specified id does not exist");
     pair = pairs[pairId];
+    require(pair.stableAsset != address(0), "A pair with the specified id does not exist");
   }
 
   /* ==================== Mutative Functions ==================== */
@@ -87,6 +80,16 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
     require(_broker != address(0), "Broker address must be set");
     broker = _broker;
     emit BrokerUpdated(_broker);
+  }
+
+  /**
+   * @notice Sets the address of the reserve contract.
+   * @param _reserve The new address of the reserve contract.
+   */
+  function setReserve(IReserve _reserve) public onlyOwner {
+    require(address(_reserve) != address(0), "Reserve address must be set");
+    reserve = _reserve;
+    emit ReserveUpdated(address(_reserve));
   }
 
   /**
@@ -108,7 +111,10 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
         pairInfo.mentoExchange.name()
       )
     );
-    require(!isPair[pairId], "A pair with the specified assets and exchange exists");
+    require(
+      pairs[pairId].stableAsset == address(0),
+      "A pair with the specified assets and exchange exists"
+    );
 
     validatePairInfo(pairInfo);
 
@@ -125,23 +131,13 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
     pairInfo.stableBucket = tokenInBucket;
     pairInfo.collateralBucket = tokenOutBucket;
 
-    // TODO: https://github.com/mento-protocol/mento-general/issues/60
-    // Update allocated collateral fraction
-    // allocatedCollateralFractions[pairInfo.collateralAsset] = allocatedCollateralFractions[
-    //   pairInfo.collateralAsset
-    // ].add(pairInfo.collateralBucketFraction);
-
-    // // Update allocated stable bucket fraction
-    // allocatedStableFractions[pairInfo.stableAsset] = allocatedStableFractions[pairInfo.stableAsset]
-    //   .add(pairInfo.stableBucketMaxFraction);
-
     pairs[pairId] = pairInfo;
-    isPair[pairId] = true;
 
     emit PairCreated(
       pairInfo.stableAsset,
       pairInfo.collateralAsset,
-      address(pairInfo.mentoExchange)
+      address(pairInfo.mentoExchange),
+      pairId
     );
   }
 
@@ -159,7 +155,6 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
   {
     require(stableAsset != address(0), "Stable asset address must be specified");
     require(collateralAsset != address(0), "Collateral asset address must be specified");
-    require(address(mentoExchange) != address(0), "Mento exchange must be set");
 
     bytes32 pairId = keccak256(
       abi.encodePacked(
@@ -168,23 +163,15 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
         mentoExchange.name()
       )
     );
-    require(isPair[pairId], "A pair with the specified assets and exchange does not exist");
 
     Pair memory pair = pairs[pairId];
 
-    // TODO: https://github.com/mento-protocol/mento-general/issues/60
-    // Update allocated collateral fraction
-    // allocatedCollateralFractions[pair.collateralAsset] = allocatedCollateralFractions[
-    //   pair.collateralAsset
-    // ].subtract(pair.collateralBucketFraction);
+    require(
+      pair.stableAsset != address(0),
+      "A pair with the specified assets and exchange does not exist"
+    );
 
-    // // Update allocated stable bucket fraction
-    // allocatedStableFractions[pair.stableAsset] = allocatedStableFractions[pair.stableAsset]
-    //   .subtract(pair.stableBucketMaxFraction);
-
-    isPair[pairId] = false;
     delete pairs[pairId];
-
     destroyed = true;
 
     emit PairDestroyed(stableAsset, collateralAsset, address(mentoExchange));
@@ -217,9 +204,7 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
    * @param pairInfo The information on the virtual pair to be validated.
    * @return isValid A bool indicating whether or not the pair information provided is valid.
    */
-  function validatePairInfo(Pair memory pairInfo) private view returns (bool isValid) {
-    IReserve reserve = IReserve(registry.getAddressForOrDie(RESERVE_REGISTRY_ID));
-
+  function validatePairInfo(Pair memory pairInfo) private view {
     require(
       reserve.isStableAsset(pairInfo.stableAsset),
       "Stable asset specified is not registered with reserve"
@@ -232,14 +217,6 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
       pairInfo.collateralBucketFraction.lt(FixidityLib.fixed1()),
       "Collateral asset fraction must be smaller than 1"
     );
-
-    // TODO: https://github.com/mento-protocol/mento-general/issues/60
-    // require(
-    //   pairInfo.collateralBucketFraction.lt(
-    //     getAvailableCollateralFraction(pairInfo.collateralAsset)
-    //   ),
-    //   "Collateral asset fraction must be less than available collateral fraction"
-    // );
 
     require(
       pairInfo.stableBucketMaxFraction.unwrap() > 0,
@@ -259,32 +236,5 @@ contract PairManager is IPairManager, Initializable, UsingRegistry {
     // TODO: Stable bucket max fraction should not exceed available stable bucket fraction.
     // TODO: minSupplyForStableBucketCap gt 0 & is there an aggregated value that needs to be checked
 
-    isValid = true; //TODO: Necessary?
-  }
-
-  /**
-   * @notice Retrieve the availble fraction of the reserve collateral that can be allocated to a virtual pair.
-   * @param collateralAsset The address of the collateral asset.
-   * @return availableFraction The available fraction that can be allocated to a pair with the specified collateral asset.
-   */
-  function getAvailableCollateralFraction(address collateralAsset)
-    private
-    view
-    returns (FixidityLib.Fraction memory availableFraction)
-  {
-    return FixidityLib.fixed1().subtract(allocatedCollateralFractions[collateralAsset]);
-  }
-
-  /**
-   * @notice Retrieve the availble fraction of the reserve stable assets that can be allocated to a virtual pair.
-   * @param stableAsset The address of the stable asset.
-   * @return availableFraction The available fraction that can be allocated to a pair with the specified collateral asset.
-   */
-  function getAvailableStableFraction(address stableAsset)
-    private
-    view
-    returns (FixidityLib.Fraction memory availableFraction)
-  {
-    return FixidityLib.fixed1().subtract(allocatedStableFractions[stableAsset]);
   }
 }
