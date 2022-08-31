@@ -6,6 +6,9 @@ interface IReserve {
   function removeToken(address, uint256) external returns (bool);
   function transferGold(address payable, uint256) external returns (bool);
   function transferExchangeGold(address payable, uint256) external returns (bool);
+  function transferCollateralAsset(address collateralAsset, address payable to, uint256 value)
+    external
+    returns (bool);
   function getReserveGoldBalance() external view returns (uint256);
   function getUnfrozenReserveGoldBalance() external view returns (uint256);
   function getOrComputeTobinTax() external returns (uint256, uint256);

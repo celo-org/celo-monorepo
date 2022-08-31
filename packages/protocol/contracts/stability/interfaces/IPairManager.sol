@@ -78,4 +78,12 @@ interface IPairManager {
    * @return pair The pair information.
    */
   function getPair(bytes32 pairId) external view returns (Pair memory pair);
+
+  /**
+   * @notice Updates the bucket sizes for the virtual pair with the specified pairId.
+   * @param pairId The id of the pair to be updated.
+   * @param stableBucket The new stable bucket size.
+   * @param collateralBucket The new collateral bucket size.
+   */
+  function updateBuckets(bytes32 pairId, uint256 stableBucket, uint256 collateralBucket) external;
 }
