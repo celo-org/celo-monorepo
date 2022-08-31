@@ -23,7 +23,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
     await this.db.transaction(async (trx) => {
       const quotaStatus = await this.quota.getQuotaStatus(session, trx)
-      let { performedQueryCount, totalQuota, blockNumber } = quotaStatus
+      const { totalQuota, blockNumber } = quotaStatus
+      let { performedQueryCount } = quotaStatus
 
       if (await getRequestExists(this.db, session.request.body, session.logger, trx)) {
         Counters.duplicateRequests.inc()
