@@ -35,8 +35,6 @@ contract CPExchange is IMentoExchange, UsingRegistry, ReentrancyGuard, Initializ
   /* ==================== View Functions ==================== */
 
   function getAmountOut(
-    address tokenIn, // TODO(pedro-clabs): do we need the token addresses?
-    address tokenOut, // TODO(pedro-clabs): do we need the token addresses?
     uint256 tokenInBucketSize,
     uint256 tokenOutBucketSize,
     uint256 spread,
@@ -66,8 +64,6 @@ contract CPExchange is IMentoExchange, UsingRegistry, ReentrancyGuard, Initializ
   }
 
   function getAmountIn(
-    address tokenIn, // TODO(pedro-clabs): do we need the token addresses?
-    address tokenOut, // TODO(pedro-clabs): do we need the token addresses?
     uint256 tokenInBucketSize,
     uint256 tokenOutBucketSize,
     uint256 spread,

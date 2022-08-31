@@ -27,8 +27,6 @@ interface IMentoExchange {
 
   /**
    * @notice Returns the output amount for a given input amount.
-   * @param tokenIn Address of the token being used to pay for another one.
-   * @param tokenOut Address of the token being exchanged for.
    * @param tokenInBucketSize Size of the tokenIn bucket.
    * @param tokenOutBucketSize Size of the tokenOut bucket.
    * @param spread Spread charged on exchanges.
@@ -36,8 +34,6 @@ interface IMentoExchange {
    * @return amountOut Amount of tokenOut that will be paid out.
    */
   function getAmountOut(
-    address tokenIn,
-    address tokenOut,
     uint256 tokenInBucketSize,
     uint256 tokenOutBucketSize,
     uint256 spread,
@@ -46,8 +42,6 @@ interface IMentoExchange {
 
   /**
    * @notice Returns the input amount necessary for a given output amount.
-   * @param tokenIn Address of the token being used to pay for another one.
-   * @param tokenOut Address of the token being exchanged for.
    * @param tokenInBucketSize Size of the tokenIn bucket.
    * @param tokenOutBucketSize Size of the tokenOut bucket.
    * @param spread Spread charged on exchanges.
@@ -55,8 +49,6 @@ interface IMentoExchange {
    * @return amountIn Amount of tokenOut that would have to be paid in.
    */
   function getAmountIn(
-    address tokenIn,
-    address tokenOut,
     uint256 tokenInBucketSize,
     uint256 tokenOutBucketSize,
     uint256 spread,

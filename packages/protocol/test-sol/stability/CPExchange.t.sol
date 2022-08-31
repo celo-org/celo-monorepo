@@ -10,17 +10,13 @@ import "../utils/WithRegistry.sol";
 import "../utils/TokenHelpers.sol";
 
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
-import "contracts/common/GoldToken.sol";
 import "contracts/stability/CPExchange.sol";
-import "contracts/stability/StableToken.sol";
 
 contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
   CPExchange exchange;
-  StableToken stableToken;
-  GoldToken celoToken;
 
   function setUp() public {
     exchange = new CPExchange(true);
@@ -33,8 +29,6 @@ contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
   {
     return
       exchange.getAmountOut(
-        address(celoToken),
-        address(stableToken),
         tokenInBucketSize,
         tokenOutBucketSize,
         0, // Tests currently assume 0 spread.
@@ -49,8 +43,6 @@ contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
   {
     return
       exchange.getAmountIn(
-        address(celoToken),
-        address(stableToken),
         tokenInBucketSize,
         tokenOutBucketSize,
         0, // Tests currently assume 0 spread.
