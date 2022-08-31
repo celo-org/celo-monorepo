@@ -130,7 +130,8 @@ contract CPExchange is IMentoExchange, UsingRegistry, ReentrancyGuard, Initializ
   /**
    * @notice Returns the size of the collateral bucket to be set during an update.
    * @param collateralAsset The address of the collateral asset.
-   * @param collateralFraction The fraction of the reserve collateral that is allocated to the pair when updating buckets.
+   * @param collateralFraction The fraction of the reserve collateral that is allocated to the pair
+   *                           when updating buckets.
    * @return Returns the new size of the collateral bucket.
    */
   function getUpdatedCollateralBucket(
