@@ -1,7 +1,7 @@
 {
   "extends": "solhint:default",
   "rules": {
-    "compiler-fixed": false,
+    "compiler-fixed": "off",
     "function-max-lines": 70,
     "indent": ["error", 2],
     "max-line-length": ["error", 100]
