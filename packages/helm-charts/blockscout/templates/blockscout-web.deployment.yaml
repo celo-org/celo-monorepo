@@ -96,6 +96,8 @@ spec:
           value: {{ .Values.blockscout.web.sourcify.repoUrl | quote }}
         - name: CHAIN_ID
           value: {{ .Values.blockscout.networkID | quote }}
+        - name: JSON_RPC
+          value: {{ .Values.blockscout.jsonrpc_public_http | quote }}
         - name: APPS_MENU
           value: {{ .Values.blockscout.web.appsMenu.enabled | quote }}
         - name: DISABLE_STATS
