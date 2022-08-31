@@ -44,7 +44,6 @@ export enum WarningMessage {
   INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES = `CELO_ODIS_WARN_15 SIGNER Discrepency found in signer domain disabled states`,
   INVALID_AUTH_SIGNATURE = `CELO_ODIS_WARN_12 BAD_INPUT Authorization signature was incorrectly generated. Request will be rejected in a future version.`,
   INVALID_NONCE = `CELO_ODIS_WARN_13 BAD_INPUT SequentialDelayDomain nonce check failed on Signer request`,
-  INCONSISTENT_TOTAL_QUOTA = `CELO_ODIS_WARN_14 QUOTA Inconsistent totalQuota value from signers`,
 }
 
 export type ErrorType = ErrorMessage | WarningMessage
