@@ -58,18 +58,23 @@ contract CPExchangeTest is Test, WithRegistry, TokenHelpers {
       );
   }
 
-  function diff(uint256 a, uint256 b) public pure returns (uint256) {
-    return a > b ? a - b : b - a;
+  function checkInvariant(
+    uint256 bucketSizeIn,
+    uint256 bucketSizeOut,
+    uint256 amountIn,
+    uint256 amountOut
+  ) public {
+    uint256 kPre = bucketSizeIn * bucketSizeOut;
+    uint256 kPost = (bucketSizeIn + amountIn) * (bucketSizeOut - amountOut);
+
+    // Cannot test exactly for the constant product invariant, as it only holds within an epsilon (abs(k0 - k1) <= eps).
+    // TODO(pedro-clabs): should eps be a function of the inputs?
+    uint256 eps = 1e30;
+    assertLe(diff(kPre, kPost), eps);
   }
 
-  function checkTradeQuadruplet(
-    uint256 tokenInBucketSize,
-    uint256 tokenOutBucketSize,
-    uint256 amountIn,
-    uint256 expectedAmountOut
-  ) public {
-    uint256 amountOut = getAmountOut(tokenInBucketSize, tokenOutBucketSize, amountIn);
-    assertEq(amountOut, expectedAmountOut);
+  function diff(uint256 a, uint256 b) public pure returns (uint256) {
+    return a > b ? a - b : b - a;
   }
 
   function gwei(uint256 x) public pure returns (uint256) {
@@ -87,9 +92,6 @@ contract CPExchange_getAmountOut is CPExchangeTest {
     // Constrain bucket sizes to represent amounts of at most 1e12 tokens.
     uint256 tokenInBucketSize = tokenInBucketSizeZ % gwei(1e12);
     uint256 tokenOutBucketSize = tokenOutBucketSizeZ % gwei(1e12);
-    /*
-    uint256 amountIn = gwei(amountInZ / gwei(1));
-   */
     // Buckets must be positive integers.
     vm.assume(tokenInBucketSize > 0);
     vm.assume(tokenOutBucketSize > 0);
@@ -112,13 +114,7 @@ contract CPExchange_getAmountOut is CPExchangeTest {
 
     uint256 amountOut = getAmountOut(tokenInBucketSize, tokenOutBucketSize, amountIn);
 
-    uint256 kPre = tokenInBucketSize * tokenOutBucketSize;
-    uint256 kPost = (tokenInBucketSize + amountIn) * (tokenOutBucketSize - amountOut);
-
-    // Cannot test exactly for the constant product invariant, as it only holds within an epsilon (abs(k0 - k1) <= eps).
-    // TODO(pedro-clabs): should eps be a function of the inputs?
-    uint256 eps = 1e30;
-    assertLe(diff(kPre, kPost), eps);
+    checkInvariant(tokenInBucketSize, tokenOutBucketSize, amountIn, amountOut);
   }
 
   function test_getAmountIn_InvariantHolds(
@@ -130,9 +126,6 @@ contract CPExchange_getAmountOut is CPExchangeTest {
     // Constrain bucket sizes to represent amounts of at most 1e12 tokens.
     uint256 tokenInBucketSize = tokenInBucketSizeZ % gwei(1e12);
     uint256 tokenOutBucketSize = tokenOutBucketSizeZ % gwei(1e12);
-    /*
-    uint256 amountOut = gwei(amountOutZ / gwei(1));
-   */
     // Buckets must be positive integers.
     vm.assume(tokenInBucketSize > 0);
     vm.assume(tokenOutBucketSize > 0);
@@ -155,13 +148,7 @@ contract CPExchange_getAmountOut is CPExchangeTest {
 
     uint256 amountIn = getAmountIn(tokenInBucketSize, tokenOutBucketSize, amountOut);
 
-    uint256 kPre = tokenInBucketSize * tokenOutBucketSize;
-    uint256 kPost = (tokenInBucketSize + amountIn) * (tokenOutBucketSize - amountOut);
-
-    // Cannot test exactly for the constant product invariant, as it only holds within an epsilon (abs(k0 - k1) <= eps).
-    // TODO(pedro-clabs): should eps be a function of the inputs?
-    uint256 eps = 1e30;
-    assertLe(diff(kPre, kPost), eps);
+    checkInvariant(tokenInBucketSize, tokenOutBucketSize, amountIn, amountOut);
   }
 }
 
