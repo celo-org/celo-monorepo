@@ -86,7 +86,10 @@ contract EpochRewards is
 
   /**
   * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return The storage, major, minor, and patch version of the contract.
+  * @return Storage version of the contract.
+  * @return Major version of the contract.
+  * @return Minor version of the contract.
+  * @return Patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 1, 0);
@@ -148,7 +151,9 @@ contract EpochRewards is
 
   /**
    * @notice Returns the target voting yield parameters.
-   * @return The target, max, and adjustment factor for target voting yield.
+   * @return The target factor for target voting yield.
+   * @return The max factor for target voting yield.
+   * @return The adjustment factor for target voting yield.
    */
   function getTargetVotingYieldParameters() external view returns (uint256, uint256, uint256) {
     TargetVotingYieldParameters storage params = targetVotingYieldParams;
@@ -157,7 +162,9 @@ contract EpochRewards is
 
   /**
    * @notice Returns the rewards multiplier parameters.
-   * @return The max multiplier and under/over spend adjustment factors.
+   * @return The max multiplier.
+   * @return The underspend adjustment factors.
+   * @return The overspend adjustment factors.
    */
   function getRewardsMultiplierParameters() external view returns (uint256, uint256, uint256) {
     RewardsMultiplierParameters storage params = rewardsMultiplierParams;
@@ -514,8 +521,10 @@ contract EpochRewards is
 
   /**
    * @notice Calculates the per validator epoch payment and the total rewards to voters.
-   * @return The per validator epoch reward, the total rewards to voters, the total community
-   * reward, and the total carbon offsetting partner reward.
+   * @return The per validator epoch reward.
+   * @return The total rewards to voters.
+   * @return The total community reward.
+   * @return The total carbon offsetting partner reward.
    */
   function calculateTargetEpochRewards()
     external

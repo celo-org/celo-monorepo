@@ -108,7 +108,7 @@ export async function getAKSServicePrincipalObjectId(clusterConfig: AksClusterCo
     return ''
   }
   const [rawObjectId] = await execCmdWithExitOnFailure(
-    `az ad sp show --id ${servicePrincipalClientId} --query objectId -o tsv`
+    `az ad sp show --id ${servicePrincipalClientId} --query id -o tsv`
   )
   return rawObjectId.trim()
 }

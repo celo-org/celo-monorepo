@@ -11,6 +11,8 @@ function build_tag() {
   local BRANCH="$1"
   local LOG_FILE="$2"
 
+  local CURRENT_HASH=`git log -n 1 --oneline | cut -c 1-9`
+
   git fetch origin +'refs/tags/core-contracts.v*:refs/tags/core-contracts.v*' >> $LOG_FILE
 
   echo " - Checkout contracts source code at $BRANCH"
@@ -26,5 +28,5 @@ function build_tag() {
   fi
 
   [ -d contracts ] && rm -r contracts
-  git checkout - -- contracts 2>>$LOG_FILE >> $LOG_FILE
+  git checkout $CURRENT_HASH -- contracts 2>>$LOG_FILE >> $LOG_FILE
 }

@@ -30,7 +30,7 @@ spec:
             args:
             - |
               trap "touch /tmp/pod/main-terminated" EXIT
-              iex --name data-migration@0.0.0.0 -S mix data_migrate
+              iex --name data-migration@0.0.0.0 -S mix data_migrate --no-compile
             resources:
               requests:
                 memory: 2Gi
@@ -47,3 +47,4 @@ spec:
 {{ include "celo.blockscout-env-vars" .  | indent 14 }}
 {{ include "celo.blockscout-db-terminating-sidecar" .  | indent 10 }}
           restartPolicy: Never
+      backoffLimit: 0  

@@ -56,7 +56,10 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 2, 1);
@@ -164,7 +167,8 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Check if last report is expired.
    * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @return bool isExpired and the address of the last report
+   * @return isExpired
+   * @return The address of the last report.
    */
   function isOldestReportExpired(address token) public view returns (bool, address) {
     require(token != address(0));
@@ -234,6 +238,7 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
    * @notice Returns the median rate.
    * @param token The address of the token for which the CELO exchange rate is being reported.
    * @return The median exchange rate for `token`.
+   * @return fixidity
    */
   function medianRate(address token) external view returns (uint256, uint256) {
     return (rates[token].getMedianValue(), numRates(token) == 0 ? 0 : FIXED1_UINT);
@@ -242,7 +247,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Gets all elements from the doubly linked list.
    * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @return An unpacked list of elements from largest to smallest.
+   * @return keys Keys of nn unpacked list of elements from largest to smallest.
+   * @return values Values of an unpacked list of elements from largest to smallest.
+   * @return relations Relations of an unpacked list of elements from largest to smallest.
    */
   function getRates(address token)
     external
@@ -273,7 +280,9 @@ contract SortedOracles is ISortedOracles, ICeloVersionedContract, Ownable, Initi
   /**
    * @notice Gets all elements from the doubly linked list.
    * @param token The address of the token for which the CELO exchange rate is being reported.
-   * @return An unpacked list of elements from largest to smallest.
+   * @return keys Keys of nn unpacked list of elements from largest to smallest.
+   * @return values Values of an unpacked list of elements from largest to smallest.
+   * @return relations Relations of an unpacked list of elements from largest to smallest.
    */
   function getTimestamps(address token)
     external
