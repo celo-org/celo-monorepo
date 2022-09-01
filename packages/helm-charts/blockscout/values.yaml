@@ -1,4 +1,5 @@
 imagePullPolicy: IfNotPresent
+ingressClassName: nginx
 blockscout:
   indexer:
     terminationGracePeriodSeconds: 60

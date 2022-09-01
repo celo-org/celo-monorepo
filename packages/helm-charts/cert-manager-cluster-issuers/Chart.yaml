@@ -1,5 +1,6 @@
 name: cert-manager-issuers
-version: 0.1.0
+apiVersion: v2
+version: 0.2.0
 description: Chart which is used to deploy let's encrypt issuers
 keywords:
 - "let's encrypt"
@@ -7,5 +8,5 @@ keywords:
 appVersion: v1.7.3
 dependencies:
   - name: cert-manager
-    version: v1.2.0
+    version: v1.9.1
     repository: https://charts.jetstack.io

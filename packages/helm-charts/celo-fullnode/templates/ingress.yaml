@@ -15,9 +15,7 @@ metadata:
 {{- end }}
 {{- end }}
 spec:
-  {{- if .Values.ingressClassName }}
-  ingressClassName: {{ .Values.ingressClassName }}
-  {{- end }}
+  ingressClassName: {{ default "nginx" .Values.ingress.ingressClassName }}
   {{- if .Values.ingress.tls }}
   tls:
   {{- range .Values.ingress.tls }}
