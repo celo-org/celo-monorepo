@@ -6,15 +6,11 @@ pragma solidity ^0.5.13;
  */
 interface IMentoExchange {
   /**
-   * @notice Returns the output amount and new bucket sizes for a given input amount.
-   * @param tokenIn Address of the token being used to pay for another one.
-   * @param tokenOut Address of the token being exchanged for.
+   * @notice Returns the output amount for a given input amount.
    * @param tokenInBucketSize Size of the tokenIn bucket.
    * @param tokenOutBucketSize Size of the tokenOut bucket.
    * @param amountIn Amount of tokenIn being paid in.
    * @return amountOut Amount of tokenOut that will be paid out.
-   * @return newtokenInBucketSize Size of the tokenIn bucket after the swap.
-   * @return newtokenOutBucketSize Size of the tokenOut bucket after the swap.
    */
   function getAmountOut(
     address tokenIn,
@@ -22,10 +18,7 @@ interface IMentoExchange {
     uint256 tokenInBucketSize,
     uint256 tokenOutBucketSize,
     uint256 amountIn
-  )
-    external
-    view
-    returns (uint256 amountOut, uint256 newTokenInBucketSize, uint256 newTokenOutBucketSize);
+  ) external view returns (uint256 amountOut);
 
   /**
    * @notice Returns the size of a pair's buckets after an exchange.
