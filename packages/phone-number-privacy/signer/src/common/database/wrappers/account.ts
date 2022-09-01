@@ -26,19 +26,17 @@ export async function getPerformedQueryCount(
     .labels('getPerformedQueryCount')
     .startTimer()
   try {
-    const queryCounts = trx
-      ? await accounts(db)
-          .transacting(trx)
-          .forUpdate()
-          .select(ACCOUNTS_COLUMNS.numLookups)
-          .where(ACCOUNTS_COLUMNS.address, account)
-          .first()
-          .timeout(DB_TIMEOUT)
-      : await accounts(db)
-          .select(ACCOUNTS_COLUMNS.numLookups)
-          .where(ACCOUNTS_COLUMNS.address, account)
-          .first()
-          .timeout(DB_TIMEOUT)
+    let baseQuery = accounts(db)
+    if (trx) {
+      // Lock relevant database rows for the duration of the trx
+      baseQuery = baseQuery.transacting(trx).forUpdate()
+    }
+    const queryCounts = await baseQuery
+      .select(ACCOUNTS_COLUMNS.numLookups)
+      .where(ACCOUNTS_COLUMNS.address, account)
+      .first()
+      .timeout(DB_TIMEOUT)
+
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
@@ -59,14 +57,16 @@ async function getAccountExists(
     .labels('getAccountExists')
     .startTimer()
   try {
-    const accountRecord = trx
-      ? await accounts(db)
-          .transacting(trx)
-          .forUpdate()
-          .where(ACCOUNTS_COLUMNS.address, account)
-          .first()
-          .timeout(DB_TIMEOUT)
-      : await accounts(db).where(ACCOUNTS_COLUMNS.address, account).first().timeout(DB_TIMEOUT)
+    let baseQuery = accounts(db)
+    if (trx) {
+      // Lock relevant database rows for the duration of the trx
+      baseQuery = baseQuery.transacting(trx).forUpdate()
+    }
+    const accountRecord = await baseQuery
+      .where(ACCOUNTS_COLUMNS.address, account)
+      .first()
+      .timeout(DB_TIMEOUT)
+
     return !!accountRecord
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()

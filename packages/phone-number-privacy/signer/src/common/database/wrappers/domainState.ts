@@ -4,9 +4,9 @@ import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../../common/metrics'
 import {
+  DomainStateRecord,
   DOMAIN_STATE_COLUMNS,
   DOMAIN_STATE_TABLE,
-  DomainStateRecord,
   toDomainStateRecord,
 } from '../models/domainState'
 
@@ -69,17 +69,15 @@ export async function getDomainStateRecord<D extends Domain>(
   const hash = domainHash(domain).toString('hex')
   logger.debug({ hash, domain }, 'Getting domain state from db')
   try {
-    const result = trx
-      ? await domainStates(db)
-          .transacting(trx)
-          .forUpdate()
-          .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
-          .first()
-          .timeout(DB_TIMEOUT)
-      : await domainStates(db)
-          .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
-          .first()
-          .timeout(DB_TIMEOUT)
+    let baseQuery = domainStates(db)
+    if (trx) {
+      // Lock relevant database rows for the duration of the trx
+      baseQuery = baseQuery.transacting(trx).forUpdate()
+    }
+    const result = await baseQuery
+      .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
+      .first()
+      .timeout(DB_TIMEOUT)
 
     // bools are stored in db as ints (1 or 0), so we must cast them back
     if (result) {
