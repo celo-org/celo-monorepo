@@ -36,9 +36,8 @@ const {
 } = TestUtils.Utils
 const { IDENTIFIER, PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
 
-const BLS_SIGNATURE =
-  'MAAAAAAAAAAEFHu3gWowoNJvvWkINGZR/1no37LPBFYRIHu3h5xYowXo1tlIlrL9CbN0cNqcKIAAAAAA' // TODO(Alec)
-const expectedSignature = BLS_SIGNATURE // TODO(Alec)
+const expectedSignature =
+  'MAAAAAAAAAAEFHu3gWowoNJvvWkINGZR/1no37LPBFYRIHu3h5xYowXo1tlIlrL9CbN0cNqcKIAAAAAA'
 
 const testBlockNumber = 1000000
 
@@ -87,7 +86,7 @@ describe('legacyPNP', () => {
   let db: Knex
 
   const expectedVersion = getVersion()
-  const _config = config // TODO(Alec) do we need to do this
+  const _config = config
 
   beforeAll(async () => {
     _config.db.type = SupportedDatabase.Sqlite
@@ -305,11 +304,13 @@ describe('legacyPNP', () => {
     keyVersionHeader?: string,
     signerApp: any = app
   ) => {
-    return request(signerApp)
-      .post(endpoint)
-      .set('Authorization', authorization)
-      .set(KEY_VERSION_HEADER, keyVersionHeader ?? '')
-      .send(req)
+    const _req = request(signerApp).post(endpoint).set('Authorization', authorization)
+
+    if (keyVersionHeader !== undefined) {
+      _req.set(KEY_VERSION_HEADER, keyVersionHeader)
+    }
+
+    return _req.send(req)
   }
 
   describe(`${SignerEndpoint.LEGACY_PNP_QUOTA}`, () => {
@@ -354,7 +355,7 @@ describe('legacyPNP', () => {
 
       beforeEach(async () => {
         await prepMocks(
-          ACCOUNT_ADDRESS1, // TODO(Alec): use a struct for these params so this is easier to read
+          ACCOUNT_ADDRESS1,
           performedQueryCount,
           0,
           false,
@@ -435,7 +436,13 @@ describe('legacyPNP', () => {
         const appWithApiDisabled = startSigner(_config, db, keyProvider, newKit('dummyKit'))
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+        const res = await sendRequest(
+          req,
+          authorization,
+          SignerEndpoint.LEGACY_PNP_QUOTA,
+          '1',
+          appWithApiDisabled
+        )
         expect.assertions(2)
         expect(res.status).toBe(503)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
@@ -447,7 +454,6 @@ describe('legacyPNP', () => {
     })
   })
 
-  // TODO: add signature tests
   describe(`${SignerEndpoint.LEGACY_PNP_SIGN}`, () => {
     describe('quota calculation logic', () => {
       const runLegacyPnpSignTestCase = async (testCase: legacyPnpQuotaTestCase) => {
@@ -468,18 +474,33 @@ describe('legacyPNP', () => {
           testCase.identifier
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendLegacyPnpSignatureRequest(req, authorization)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
 
-        expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-          success: true,
-          version: expectedVersion,
-          signature: expectedSignature, // TODO(Alec): parameterize this somehow to account for scenarios where signature is not returned
-          performedQueryCount: testCase.expectedPerformedQueryCount + 1, // incremented to account for current signature req
-          totalQuota: testCase.expectedTotalQuota,
-          blockNumber: testBlockNumber,
-          warnings: [],
-        })
+        const { expectedPerformedQueryCount, expectedTotalQuota } = testCase
+        const shouldSucceed = expectedPerformedQueryCount < expectedTotalQuota
+
+        if (shouldSucceed) {
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: expectedVersion,
+            signature: expectedSignature,
+            performedQueryCount: expectedPerformedQueryCount + 1, // incremented for signature request
+            totalQuota: expectedTotalQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+        } else {
+          expect(res.status).toBe(403)
+          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            success: false,
+            version: expectedVersion,
+            performedQueryCount: expectedPerformedQueryCount,
+            totalQuota: expectedTotalQuota,
+            blockNumber: testBlockNumber,
+            error: WarningMessage.EXCEEDED_QUOTA,
+          })
+        }
       }
 
       quotaCalculationTestCases.forEach((testCase) => {
@@ -520,12 +541,11 @@ describe('legacyPNP', () => {
           success: true,
           version: res.body.version,
           signature: expectedSignature,
-          performedQueryCount: performedQueryCount,
+          performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
           warnings: [],
         })
-        // TODO(Alec): add signature verification (and below too)
       })
 
       it('Should respond with 200 on valid request with key version header', async () => {
@@ -542,14 +562,16 @@ describe('legacyPNP', () => {
           success: true,
           version: res1.body.version,
           signature: expectedSignature,
-          performedQueryCount: performedQueryCount,
+          performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
           warnings: [],
         })
+
+        // TODO(Alec) check key version header
       })
 
-      it('Should respond with 200 on repeated valid requests', async () => {
+      it('Should respond with 200 and warning on repeated valid requests', async () => {
         const req = getLegacyPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
@@ -563,13 +585,14 @@ describe('legacyPNP', () => {
           success: true,
           version: res1.body.version,
           signature: expectedSignature,
-          performedQueryCount: performedQueryCount,
+          performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
           warnings: [],
         })
         const res2 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res2.status).toBe(200)
+        res1.body.warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
         expect(res2.body).toMatchObject<SignMessageResponseSuccess>(res1.body)
       })
 
@@ -589,12 +612,11 @@ describe('legacyPNP', () => {
           success: true,
           version: res.body.version,
           signature: expectedSignature,
-          performedQueryCount: performedQueryCount,
+          performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
           warnings: [],
         })
-        // TODO(Alec): add signature verification (and below too)
       })
 
       it('Should respond with 400 on missing request fields', async () => {
@@ -612,9 +634,6 @@ describe('legacyPNP', () => {
         expect(res.body).toMatchObject<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
-          performedQueryCount: expectedQuota,
-          totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -637,10 +656,58 @@ describe('legacyPNP', () => {
         expect(res.body).toMatchObject<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
-          performedQueryCount: expectedQuota,
-          totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        })
+      })
+
+      it('Should respond with 400 on invalid identifier', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          '+1234567890'
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
+
+      it('Should respond with 400 on invalid blinded message', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          '+1234567890',
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
+
+      it('Should respond with 400 on invalid address', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          '0xnotanaddress',
+          '+1234567890',
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
         })
       })
 
@@ -658,9 +725,6 @@ describe('legacyPNP', () => {
         expect(res.body).toMatchObject<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
-          performedQueryCount: expectedQuota,
-          totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
           error: WarningMessage.UNAUTHENTICATED_USER,
         })
       })
@@ -680,7 +744,7 @@ describe('legacyPNP', () => {
           IDENTIFIER
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res1 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN, '1')
+        const res1 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res1.status).toBe(403)
         expect(res1.body).toMatchObject<SignMessageResponseFailure>({
           success: false,
@@ -718,132 +782,114 @@ describe('legacyPNP', () => {
           error: WarningMessage.API_UNAVAILABLE,
         })
       })
+
+      describe('functionality in case of errors', () => {
+        it('Should return 200 on DB query failure', async () => {
+          // deplete user's quota
+          const remainingQuota = expectedQuota - performedQueryCount
+          await db.transaction(async (trx) => {
+            for (let i = 0; i < remainingQuota; i++) {
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            }
+          })
+
+          jest.mock('../../src/common/database/wrappers/account', () => ({
+            ...jest.requireActual('../../src/common/database/wrappers/account'),
+            getPerformedQueryCount: jest.fn(() => undefined),
+          }))
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount + 1, // TODO(Alec): shouldn't this be undefined?
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+        })
+
+        //   // TODO: preserve this test
+        //   // We don't want to block the user on DB or blockchain query failure
+        //   it('returns 200 on DB query failure', (done) => {
+        //     mockGetRemainingQueryCount.mockRejectedValue(undefined)
+        //     request(app)
+        //       .post('/getBlindedMessagePartialSig')
+        //       .send(validRequest)
+        //       .expect('Content-Type', /json/)
+        //       .expect(200, done)
+        //   })
+
+        //   // TODO: preserve this test
+        //   it('returns 500 on bls error', (done) => {
+        //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+        //     mockComputeBlindedSignature.mockImplementation(() => {
+        //       throw Error()
+        //     })
+        //     request(app)
+        //       .post('/getBlindedMessagePartialSig')
+        //       .send(validRequest)
+        //       .expect('Content-Type', /json/)
+        //       .expect(500, done)
+        //   })
+
+        //   // TODO: preserve this test
+        //   it('returns 200 with warning on failure to increment query count', (done) => {
+        //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+        //     mockIncrementQueryCount.mockReturnValue(false)
+        //     request(app)
+        //       .post('/getBlindedMessagePartialSig')
+        //       .send(validRequest)
+        //       .expect('Content-Type', /json/)
+        //       .expect(
+        //         200,
+        //         {
+        //           success: false,
+        //           signature: BLS_SIGNATURE,
+        //           version: getVersion(),
+        //           performedQueryCount: 0,
+        //           error: ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
+        //           totalQuota: 10,
+        //           blockNumber: 10000,
+        //         },
+        //         done
+        //       )
+        //   })
+
+        //   // TODO: preserve this test
+        //   it('returns 200 with warning on failure to store request', (done) => {
+        //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
+        //     mockStoreRequest.mockReturnValue(false)
+        //     request(app)
+        //       .post('/getBlindedMessagePartialSig')
+        //       .send(validRequest)
+        //       .expect('Content-Type', /json/)
+        //       .expect(
+        //         200,
+        //         {
+        //           success: false,
+        //           signature: BLS_SIGNATURE,
+        //           version: getVersion(),
+        //           performedQueryCount: 1,
+        //           error: ErrorMessage.FAILURE_TO_STORE_REQUEST,
+        //           totalQuota: 10,
+        //           blockNumber: 10000,
+        //         },
+        //         done
+        //       )
+        //   })
+        // })
+      })
     })
   })
-
-  //   // TODO: preserve this test
-  //   // We don't want to block the user on DB or blockchain query failure
-  //   it('returns 200 on DB query failure', (done) => {
-  //     mockGetRemainingQueryCount.mockRejectedValue(undefined)
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(200, done)
-  //   })
-
-  //   // TODO: preserve this test
-  //   it('returns 500 on bls error', (done) => {
-  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-  //     mockComputeBlindedSignature.mockImplementation(() => {
-  //       throw Error()
-  //     })
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(500, done)
-  //   })
-
-  //   // TODO: preserve this test
-  //   it('returns 200 with warning on replayed request', (done) => {
-  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-  //     mockGetRequestExists.mockReturnValue(true)
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(
-  //         200,
-  //         {
-  //           success: false,
-  //           signature: BLS_SIGNATURE,
-  //           version: getVersion(),
-  //           performedQueryCount: 0,
-  //           error: WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG,
-  //           totalQuota: 10,
-  //           blockNumber: 10000,
-  //         },
-  //         done
-  //       )
-  //   })
-
-  //   // TODO: preserve this test
-  //   it('returns 200 with warning on failure to increment query count', (done) => {
-  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-  //     mockIncrementQueryCount.mockReturnValue(false)
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(
-  //         200,
-  //         {
-  //           success: false,
-  //           signature: BLS_SIGNATURE,
-  //           version: getVersion(),
-  //           performedQueryCount: 0,
-  //           error: ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
-  //           totalQuota: 10,
-  //           blockNumber: 10000,
-  //         },
-  //         done
-  //       )
-  //   })
-
-  //   // TODO: preserve this test
-  //   it('returns 200 with warning on failure to store request', (done) => {
-  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-  //     mockStoreRequest.mockReturnValue(false)
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(
-  //         200,
-  //         {
-  //           success: false,
-  //           signature: BLS_SIGNATURE,
-  //           version: getVersion(),
-  //           performedQueryCount: 1,
-  //           error: ErrorMessage.FAILURE_TO_STORE_REQUEST,
-  //           totalQuota: 10,
-  //           blockNumber: 10000,
-  //         },
-  //         done
-  //       )
-  //   })
-  // })
-
-  // describe('with invalid input', () => {
-  //   // TODO: preserve this test
-  //   it('invalid address returns 400', (done) => {
-  //     const mockRequestData = {
-  //       ...validRequest,
-  //       account: 'd31509C31d654056A45185ECb6',
-  //     }
-
-  //     request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
-  //   })
-
-  //   // TODO: preserve this test
-  //   it('invalid hashedPhoneNumber returns 400', (done) => {
-  //     const mockRequestData = {
-  //       ...validRequest,
-  //       hashedPhoneNumber: '+1234567890',
-  //     }
-
-  //     request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
-  //   })
-
-  //   // TODO: preserve this test
-  //   it('invalid blinded phone number returns 400', (done) => {
-  //     const mockRequestData = {
-  //       ...validRequest,
-  //       blindedQueryPhoneNumber: '1234567890',
-  //     }
-
-  //     request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
-  //   })
-  // })
 })

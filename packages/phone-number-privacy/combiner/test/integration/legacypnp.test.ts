@@ -202,7 +202,7 @@ describe('legacyPnpService', () => {
     userSeed = new Uint8Array(32)
     for (let i = 0; i < userSeed.length - 1; i++) {
       userSeed[i] = i
-    }
+    } // TODO(2.0.0)(Alec) why are we doing this in a beforeEach hook instead of just once at the top?
 
     blindedMsgResult = threshold_bls.blind(message, userSeed)
   })
@@ -216,6 +216,7 @@ describe('legacyPnpService', () => {
     signer3?.close()
   })
 
+  // TODO(Alec): de-dupe
   const sendPnpSignRequest = async (
     req: SignMessageRequest,
     authorization: string,
