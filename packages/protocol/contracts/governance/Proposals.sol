@@ -240,11 +240,9 @@ library Proposals {
     view
     returns (Stage)
   {
-    uint256 stageStartTime = proposal
-      .timestamp
-      .add(stageDurations.approval)
-      .add(stageDurations.referendum)
-      .add(stageDurations.execution);
+    uint256 stageStartTime = proposal.timestamp.add(stageDurations.referendum).add(
+      stageDurations.execution
+    );
     // solhint-disable-next-line not-rely-on-time
     if (now >= stageStartTime) {
       return Stage.Expiration;
@@ -254,12 +252,7 @@ library Proposals {
     if (now >= stageStartTime) {
       return Stage.Execution;
     }
-    stageStartTime = stageStartTime.sub(stageDurations.referendum);
-    // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
-      return Stage.Referendum;
-    }
-    return Stage.Approval;
+    return Stage.Referendum;
   }
 
   /**
