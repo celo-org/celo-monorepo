@@ -50,3 +50,4 @@ blockscout:
     recaptchaSecretName: alfajores-blockscout-recaptcha
   metrics:
     enabled: true
+  jsonrpc_public_http: https://alfajores-forno.celo-testnet.org

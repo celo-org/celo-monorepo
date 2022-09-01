@@ -57,7 +57,6 @@ export async function assumeOwnership(web3: Web3, to: string) {
   const tx2 = await governance.approve(proposalId)
   const multisigTx = await multiSig.submitOrConfirmTransaction(governance.address, tx2.txo)
   await multisigTx.sendAndWaitForReceipt({ from: accounts[0] })
-  await timeTravel(expConfigGovernance.approvalStageDuration, web3)
 
   const tx3 = await governance.vote(proposalId, 'Yes')
   await tx3.sendAndWaitForReceipt({ from: accounts[0] })
