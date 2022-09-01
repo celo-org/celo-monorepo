@@ -26,6 +26,9 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
     try {
       // Inside a database transaction, update or create the domain to mark it disabled.
       const res = await this.db.transaction(async (trx) => {
+        // TODO EN: hmm is there any way to extract this out? very similar to getDomainStateRecordOrEmpty
+        // NOTE EN: even having it located in the same place may be kinda nice just so it's visually in the same place...
+        // NOTE EN: could alternatively: getDomainStateRecord; if null, insertEmptyAlreadyDisabled; otherwise update and disable
         const domainStateRecord =
           (await getDomainStateRecord(this.db, domain, session.logger, trx)) ??
           (await insertDomainStateRecord(

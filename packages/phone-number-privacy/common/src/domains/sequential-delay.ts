@@ -198,6 +198,7 @@ export const checkSequentialDelayRateLimit = (
   attemptTime: number,
   state?: SequentialDelayDomainState
 ): SequentialDelayResult => {
+  // TODO EN: use a default param here instead?
   state = state ?? INITIAL_SEQUENTIAL_DELAY_DOMAIN_STATE
 
   // If the domain has been disabled, all queries are to be rejected.
@@ -205,6 +206,7 @@ export const checkSequentialDelayRateLimit = (
     return { accepted: false, state: { ...state, now: attemptTime } }
   }
 
+  // NOTE EN: is this comment referencing the state = state?? stuff?
   // If no state is available (i.e. this is the first request against the domain) use the initial state.
   const stage = getIndexedStage(domain, state.counter)
 

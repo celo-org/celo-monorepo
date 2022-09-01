@@ -20,6 +20,7 @@ export async function setDomainDisabled<D extends Domain>(
   trx: Knex.Transaction<DomainStateRecord>,
   logger: Logger
 ): Promise<void> {
+  // TODO EN: for metering stuff, create histograms in separate file?
   const disableDomainMeter = Histograms.dbOpsInstrumentation.labels('disableDomain').startTimer()
   const hash = domainHash(domain).toString('hex')
   logger.debug({ hash, domain }, 'Disabling domain')

@@ -44,6 +44,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
       } else {
         // In the case of a database connection failure, performedQueryCount will be -1
+        // TODO EN REVISIT THIS LOGIC: do we want to rollback here? why not if not?
+
         if (quotaStatus.performedQueryCount === -1) {
           this.io.sendFailure(
             ErrorMessage.DATABASE_GET_FAILURE,

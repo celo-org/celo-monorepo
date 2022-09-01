@@ -13,6 +13,8 @@ import { Counters, Histograms, Labels } from '../../common/metrics'
 declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
 
 // TODO(2.0.0, metering): use this elsewhere (https://github.com/celo-org/celo-monorepo/issues/9796)
+// TODO EN: is there a better home for the metering code than with contracts ?
+// perhaps in metrics?
 export async function meter<T extends any[], U>(
   inFunction: InFunction<T, U>,
   params: T,

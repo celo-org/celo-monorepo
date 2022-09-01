@@ -10,6 +10,10 @@ function accounts(db: Knex) {
 
 /*
  * Returns how many queries the account has already performed.
+ * // TODO EN: minimally add comments about locking DB rows if trx does not exist;
+ * possibly split this into two separate functions otherwise
+ * --> could even do something like split it up into the actual getPerformedQueryCount
+ * that requires a trx, and then a wrapper that has separate logging for failing to obtain the lock & transaction
  */
 export async function getPerformedQueryCount(
   db: Knex,

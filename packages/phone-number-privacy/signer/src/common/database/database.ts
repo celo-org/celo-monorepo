@@ -62,6 +62,7 @@ export async function initDatabase(
     client,
     useNullAsDefault: type === SupportedDatabase.Sqlite,
     connection,
+    // TODO EN: setting this to true allows for accessing knex debug things!!
     debug: false && DEV_MODE, // TODO(2.0.0, refactor) why is this 'false' here
   })
 

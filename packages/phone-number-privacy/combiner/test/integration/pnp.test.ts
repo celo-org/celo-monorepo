@@ -250,6 +250,7 @@ describe('pnpService', () => {
     }
   }
 
+  // TODO EN: can restructure this -- PNP_SIGN and then sub-categories for the signers
   describe('when all signers return correct signatures', () => {
     beforeEach(async () => {
       signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
@@ -263,6 +264,27 @@ describe('pnpService', () => {
       beforeEach(async () => {
         mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainPaymentsDefault)
         req = getSignRequest(blindedMsgResult)
+      })
+
+      it.only('DELETE DB testing', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res1 = await sendPnpSignRequest(req, authorization, app)
+        const expectedResponse: SignMessageResponseSuccess = {
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: expectedTotalQuota,
+          blockNumber: testBlockNumber,
+        }
+
+        expect(res1.status).toBe(200)
+        expect(res1.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
+
+        const res2 = await sendPnpSignRequest(req, authorization, app)
+        expect(res2.status).toBe(200)
+        // Do not expect performedQueryCount to increase since this is a duplicate request
+        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
       })
 
       it('Should respond with 200 on valid request', async () => {

@@ -26,7 +26,7 @@ export class DomainQuotaService implements QuotaService<QuotaDependentDomainRequ
   constructor(readonly db: Knex) {}
 
   async checkAndUpdateQuotaStatus(
-    state: DomainStateRecord,
+    state: DomainStateRecord, // NOTE EN: this var naming is confusing -- it references a record?
     session: DomainSession<QuotaDependentDomainRequest>,
     trx: Knex.Transaction<DomainStateRecord>,
     attemptTime?: number
@@ -41,6 +41,7 @@ export class DomainQuotaService implements QuotaService<QuotaDependentDomainRequ
         toSequentialDelayDomainState(state, attemptTime)
       )
       if (result.accepted) {
+        // NOTE EN: this var naming is confusing again??
         const newState = toDomainStateRecord(domain, result.state)
         // Persist the updated domain quota to the database.
         // This will trigger an insert if its the first update to the domain instance.

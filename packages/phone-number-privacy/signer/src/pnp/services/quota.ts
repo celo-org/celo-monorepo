@@ -64,6 +64,8 @@ export abstract class PnpQuotaService
       ['getQuotaStatus', session.request.url]
     )
 
+    // TODO EN: revisit this logic
+    // OLD NOTE EN: this should never actually reject since the error is caught??
     const quotaStatus: PnpQuotaStatus = {
       totalQuota: -1, // TODO(2.0.0) consider making this undefined (https://github.com/celo-org/celo-monorepo/issues/9804)
       performedQueryCount: -1,

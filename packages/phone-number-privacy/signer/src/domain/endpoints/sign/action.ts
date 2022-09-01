@@ -126,6 +126,9 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
       }
     } catch (error) {
       session.logger.error('Failed to get signature for a domain', error)
+      // NOTE EN: slightly confusing that key version and other eval errors will
+      // also be returned as database update failures, hmmm
+      // possibly do something like define mostLikelyError and change it after DB updates..?
       this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)
     }
   }
