@@ -6,10 +6,10 @@ import { IPricingModule } from "./IPricingModule.sol";
 import { FixidityLib } from "../../common/FixidityLib.sol";
 
 /**
- * @title Pair Manager Interface
- * @notice The pair manager is responsible for managing the state of all Mento virtual pairs.
+ * @title Two Asset Pool Manager
+ * @notice The two asset pool manager is responsible for managing the state of all Mento virtual pairs.
  */
-interface IPairManager {
+interface ITwoAssetPoolManager {
   struct Pair {
     address asset0;
     address asset1;
