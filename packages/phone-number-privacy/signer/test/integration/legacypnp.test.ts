@@ -856,6 +856,70 @@ describe('legacyPNP', () => {
           })
         })
 
+        // TODO(Alec): why are these tests failing?
+
+        it('Should return 200 w/ warning on failure to increment query count', async () => {
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'incrementQueryCount'
+            )
+            .mockRejectedValueOnce(new Error())
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount, // Not incremented
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [
+              ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
+              ErrorMessage.FAILURE_TO_STORE_REQUEST,
+            ],
+          })
+
+          spy.mockRestore()
+        })
+
+        it('Should return 200 w/ warning on failure to store request', async () => {
+          const spy = jest
+            .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
+            .mockRejectedValueOnce(new Error())
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount + 1,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [ErrorMessage.FAILURE_TO_STORE_REQUEST],
+          })
+
+          spy.mockRestore()
+        })
+
         it.skip('Should return 500 on bls error', async () => {
           const spy = jest
             .spyOn(
@@ -882,67 +946,6 @@ describe('legacyPNP', () => {
             totalQuota: Number.MAX_SAFE_INTEGER, // TODO(2.0.0)(https://github.com/celo-org/celo-monorepo/issues/9804) Should this be undefined?
             blockNumber: testBlockNumber,
             error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
-          })
-
-          spy.mockRestore()
-        })
-
-        // TODO(Alec): why are these tests failing?
-
-        it.skip('Should return 200 w/ warning on failure to increment query count', async () => {
-          const spy = jest
-            .spyOn(
-              jest.requireActual('../../src/common/database/wrappers/account'),
-              'incrementQueryCount'
-            )
-            .mockRejectedValueOnce(new Error())
-
-          const req = getLegacyPnpSignRequest(
-            ACCOUNT_ADDRESS1,
-            BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
-          )
-          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
-
-          expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-            success: true,
-            version: res.body.version,
-            signature: expectedSignature,
-            performedQueryCount: performedQueryCount,
-            totalQuota: expectedQuota,
-            blockNumber: testBlockNumber,
-            warnings: [ErrorMessage.DATABASE_UPDATE_FAILURE], // TODO(Alec) more descriptive error message?
-          })
-
-          spy.mockRestore()
-        })
-
-        it.skip('Should return 200 w/ warning on failure to store request', async () => {
-          const spy = jest
-            .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
-            .mockRejectedValueOnce(new Error())
-
-          const req = getLegacyPnpSignRequest(
-            ACCOUNT_ADDRESS1,
-            BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
-          )
-          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
-
-          expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-            success: true,
-            version: res.body.version,
-            signature: expectedSignature,
-            performedQueryCount: performedQueryCount,
-            totalQuota: expectedQuota,
-            blockNumber: testBlockNumber,
-            warnings: [ErrorMessage.DATABASE_UPDATE_FAILURE], // TODO(Alec) more descriptive error message?
           })
 
           spy.mockRestore()

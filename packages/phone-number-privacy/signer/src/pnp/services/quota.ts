@@ -37,8 +37,9 @@ export abstract class PnpQuotaService
         sufficient = true
       }
     } else {
-      await this.updateQuotaStatus(session, trx)
-      state.performedQueryCount++
+      if (await this.updateQuotaStatus(session, trx)) {
+        state.performedQueryCount++
+      }
     }
     return { sufficient, state }
   }
@@ -48,8 +49,6 @@ export abstract class PnpQuotaService
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>,
     trx?: Knex.Transaction
   ): Promise<PnpQuotaStatus> {
-    // tslint:disable-next-line: no-console
-    console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
     const { account } = session.request.body
     const [performedQueryCountResult, totalQuotaResult, blockNumberResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
@@ -109,18 +108,37 @@ export abstract class PnpQuotaService
   protected async updateQuotaStatus(
     session: PnpSession<SignMessageRequest>,
     trx: Knex.Transaction
-  ): Promise<void> {
+  ): Promise<boolean> {
     // TODO(2.0.0, refactor) Review db error handling (https://github.com/celo-org/celo-monorepo/issues/9795)
-    try {
-      await Promise.all([
-        storeRequest(this.db, session.request.body, session.logger, trx),
-        incrementQueryCount(this.db, session.request.body.account, session.logger, trx),
-      ])
-    } catch (error) {
-      session.logger.error({ error }, 'failed to update quota status') // TODO(Alec): check logging one level up
-      session.errors.push(ErrorMessage.FAILURE_TO_UPDATE_QUOTA_STATUS)
-      throw error
+    const [storeRequestResult, incrementQueryCountResult] = await Promise.allSettled([
+      storeRequest(this.db, session.request.body, session.logger, trx),
+      incrementQueryCount(this.db, session.request.body.account, session.logger, trx),
+    ])
+    if (storeRequestResult.status === 'rejected') {
+      session.logger.error(
+        { error: storeRequestResult.reason },
+        ErrorMessage.FAILURE_TO_STORE_REQUEST
+      )
+      session.errors.push(ErrorMessage.FAILURE_TO_STORE_REQUEST)
+      // We don't rollback here bc the user should still be charged quota for the signature
+      // even if the request wasn't stored
     }
+    if (incrementQueryCountResult.status === 'rejected') {
+      session.logger.error(
+        { error: incrementQueryCountResult.reason },
+        ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT
+      )
+      session.errors.push(
+        ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
+        ErrorMessage.FAILURE_TO_STORE_REQUEST
+      )
+      // We rollback storing the request (which would allow for replays) if we can't charge the user quota.
+      // Note that the error is still caught here, which means we will provide the signature ('fail open')
+      // despite not charging the user quota.
+      trx.rollback()
+      return false
+    }
+    return true
   }
 
   protected async getTotalQuota(
