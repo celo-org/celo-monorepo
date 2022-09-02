@@ -552,6 +552,14 @@ contract Reserve is
     return _transferGold(to, value);
   }
 
+  function transferExchangeCollateralAsset(
+    address collateralAsset,
+    address payable to,
+    uint256 value
+  ) external isAllowedToSpendExchange(msg.sender) returns (bool) {
+    return true;
+  }
+
   /**
    * @notice Returns the tobin tax, recomputing it if it's stale.
    * @return The numerator - tobin tax amount as a fraction.
