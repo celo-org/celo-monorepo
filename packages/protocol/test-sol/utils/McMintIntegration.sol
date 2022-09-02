@@ -13,11 +13,12 @@ import { StableToken } from "contracts/stability/StableToken.sol";
 import { Reserve } from "contracts/stability/Reserve.sol";
 
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
+import { Freezer } from "contracts/common/Freezer.sol";
 
 import { WithRegistry } from "./WithRegistry.sol";
 import { Token } from "./Token.sol";
 
-contract McMintIntegration is WithRegistry {
+contract McMintIntegration is Test, WithRegistry {
   using FixidityLib for FixidityLib.Fraction;
 
   uint256 constant tobinTaxStalenessThreshold = 600;
@@ -35,19 +36,17 @@ contract McMintIntegration is WithRegistry {
   Token usdcToken;
   StableToken cUSDToken;
   StableToken cEURToken;
+  Freezer freezer;
 
-  IPairManager.Pair pair_cUSD_CELO;
   bytes32 pair_cUSD_CELO_ID;
-  IPairManager.Pair pair_cEUR_CELO;
   bytes32 pair_cEUR_CELO_ID;
-  IPairManager.Pair pair_cUSD_USDCet;
   bytes32 pair_cUSD_USDCet_ID;
-  IPairManager.Pair pair_cEUR_USDCet;
   bytes32 pair_cEUR_USDCet_ID;
 
-  constructor() public {
+  function setUp_mcMint() public {
     /* ===== Deploy collateral and stable assets ===== */
 
+    changePrank(actor("deployer"));
     celoToken = new Token("Celo", "cGLD", 18);
     usdcToken = new Token("USDCet", "USDCet", 18);
 
@@ -80,6 +79,9 @@ contract McMintIntegration is WithRegistry {
       "Broker"
     );
 
+    vm.label(address(cUSDToken), "cUSD");
+    vm.label(address(cEURToken), "cEUR");
+
     /* ===== Deploy reserve ===== */
 
     bytes32[] memory initialAssetAllocationSymbols = new bytes32[](2);
@@ -111,6 +113,9 @@ contract McMintIntegration is WithRegistry {
       collateralAssetDailySpendingRatios
     );
 
+    reserve.addToken(address(cUSDToken));
+    reserve.addToken(address(cEURToken));
+
     /* ===== Deploy PairManager, Broker and exchange ===== */
 
     crossProductExchange = new CPExchange();
@@ -119,9 +124,12 @@ contract McMintIntegration is WithRegistry {
 
     pairManager.initialize(address(broker), address(reserve));
     broker.initialize(address(pairManager), address(reserve));
+    registry.setAddressFor("Broker", address(broker));
+    reserve.addExchangeSpender(address(broker));
 
     /* ====== Create pairs for all asset combinations ======= */
 
+    IPairManager.Pair memory pair_cUSD_CELO;
     pair_cUSD_CELO.stableAsset = address(cUSDToken);
     pair_cUSD_CELO.collateralAsset = address(celoToken);
     pair_cUSD_CELO.mentoExchange = crossProductExchange;
@@ -137,6 +145,7 @@ contract McMintIntegration is WithRegistry {
 
     pair_cUSD_CELO_ID = pairManager.createPair(pair_cUSD_CELO);
 
+    IPairManager.Pair memory pair_cUSD_USDCet;
     pair_cUSD_USDCet.stableAsset = address(cUSDToken);
     pair_cUSD_USDCet.collateralAsset = address(usdcToken);
     pair_cUSD_USDCet.mentoExchange = crossProductExchange;
@@ -152,6 +161,7 @@ contract McMintIntegration is WithRegistry {
 
     pair_cUSD_USDCet_ID = pairManager.createPair(pair_cUSD_USDCet);
 
+    IPairManager.Pair memory pair_cEUR_CELO;
     pair_cEUR_CELO.stableAsset = address(cEURToken);
     pair_cEUR_CELO.collateralAsset = address(celoToken);
     pair_cEUR_CELO.mentoExchange = crossProductExchange;
@@ -167,6 +177,7 @@ contract McMintIntegration is WithRegistry {
 
     pair_cEUR_CELO_ID = pairManager.createPair(pair_cEUR_CELO);
 
+    IPairManager.Pair memory pair_cEUR_USDCet;
     pair_cEUR_USDCet.stableAsset = address(cEURToken);
     pair_cEUR_USDCet.collateralAsset = address(usdcToken);
     pair_cEUR_USDCet.mentoExchange = crossProductExchange;
@@ -180,6 +191,10 @@ contract McMintIntegration is WithRegistry {
     pair_cEUR_USDCet.minimumReports = 5;
     pair_cEUR_USDCet.minSupplyForStableBucketCap = 10**20;
 
-    pair_cEUR_CELO_ID = pairManager.createPair(pair_cEUR_USDCet);
+    pair_cEUR_USDCet_ID = pairManager.createPair(pair_cEUR_USDCet);
+
+    /* ========== Deploy Freezer =============== */
+    freezer = new Freezer(true);
+    registry.setAddressFor("Freezer", address(freezer));
   }
 }

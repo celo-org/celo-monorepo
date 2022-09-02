@@ -17,10 +17,12 @@ import { IStableToken } from "contracts/stability/interfaces/IStableToken.sol";
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
 
 // forge test --match-contract BrokerIntegration -vvv
-contract BrokerIntegrationTest is McMintIntegration, TokenHelpers {
+contract BrokerIntegrationTest is Test, McMintIntegration, TokenHelpers {
   address trader;
 
   function setUp() public {
+    setUp_mcMint();
+
     trader = actor("trader");
 
     mint(cUSDToken, trader, 10**22);
@@ -34,9 +36,15 @@ contract BrokerIntegrationTest is McMintIntegration, TokenHelpers {
 
   function test_swap_cEURToUSDCet() public {
     changePrank(trader);
-    (address tokenOut, uint256 amountOut) = broker.swap(0x0, address(cEURToken), 10**21, 0);
+    cEURToken.approve(address(broker), 10**21);
+    (address tokenOut, uint256 amountOut) = broker.swap(
+      pair_cEUR_USDCet_ID,
+      address(cEURToken),
+      10**21,
+      0
+    );
 
     assertEq(tokenOut, address(usdcToken));
-    assertEq(amountOut, 0);
+    assertEq(amountOut, 1898196713122533593086);
   }
 }

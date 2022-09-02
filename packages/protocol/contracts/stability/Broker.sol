@@ -22,8 +22,8 @@ import { IStableToken } from "./interfaces/IStableToken.sol";
 contract Broker is IBroker, Initializable, Ownable {
   /* ==================== State Variables ==================== */
 
-  // Address of the broker contract.
-  IPairManager public pairManager;
+  // Address of the pairManagers
+  IPairManager[] public pairManagers;
 
   // Address of the reserve.
   IReserve public reserve;
@@ -41,9 +41,9 @@ contract Broker is IBroker, Initializable, Ownable {
    * @param _pairManager The address of the PairManager contract.
    * @param _reserve The address of the Rezerve contract.
    */
-  function initialize(address _pairManager, address _reserve) external initializer {
+  function initialize(address[] _pairManagers, address _reserve) external initializer {
     _transferOwnership(msg.sender);
-    setPairManager(_pairManager);
+    setPairManagers(_pairManagers);
     setReserve(_reserve);
   }
 
@@ -110,7 +110,7 @@ contract Broker is IBroker, Initializable, Ownable {
     if (tokenInIsStable) {
       IERC20(tokenIn).transferFrom(msg.sender, address(this), amountIn);
       IStableToken(tokenIn).burn(amountIn);
-      reserve.transferCollateralAsset(tokenOut, msg.sender, amountOut);
+      reserve.transferExchangeCollateralAsset(tokenOut, msg.sender, amountOut);
       pairManager.updateBuckets(pairId, nextTokenInBucketSize, nextTokenOutBucketSize);
     } else {
       IERC20(tokenIn).transferFrom(msg.sender, address(reserve), amountIn);

@@ -149,6 +149,9 @@ contract Reserve is
     setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
     setTobinTax(_tobinTax);
     setTobinTaxReserveRatio(_tobinTaxReserveRatio);
+    for (uint256 i = 0; i < _collateralAssets.length; i++) {
+      addCollateralAsset(_collateralAssets[i]);
+    }
     setDailySpendingRatioForCollateralAssets(
       _collateralAssets,
       _collateralAssetDailySpendingRatios
@@ -553,6 +556,22 @@ contract Reserve is
   }
 
   /**
+   * @notice Transfer collateral asset to any address, used for one side of CP-DOTO.
+   * @dev Transfers are not subject to a daily spending limit.
+   * @param collateralAsset The token address you're transferring.
+   * @param to The address that will receive the funds.
+   * @param value The amount of collateral assets to transfer.
+   * @return Returns true if the transaction succeeds.
+   */
+  function transferExchangeCollateralAsset(
+    address collateralAsset,
+    address payable to,
+    uint256 value
+  ) external isAllowedToSpendExchange(msg.sender) returns (bool) {
+    return _transferCollateralAsset(collateralAsset, to, value);
+  }
+
+  /**
    * @notice Returns the tobin tax, recomputing it if it's stale.
    * @return The numerator - tobin tax amount as a fraction.
    * @return The denominator - tobin tax amount as a fraction.
@@ -666,7 +685,7 @@ contract Reserve is
    * @param collateralAsset The address of the token being added.
    * @return Returns true if the transaction succeeds.
    */
-  function addCollateralAsset(address collateralAsset) external onlyOwner returns (bool) {
+  function addCollateralAsset(address collateralAsset) public onlyOwner returns (bool) {
     require(
       !checkIsCollateralAsset(collateralAsset),
       "specified address is already added as a collateral asset"
