@@ -4,10 +4,10 @@ const { Counter, Histogram } = client
 client.collectDefaultMetrics()
 
 // This is just so autocomplete will remind devs what the options are.
-export const Labels = {
-  read: 'read',
-  update: 'update',
-  insert: 'insert',
+export enum Labels {
+  READ = 'read',
+  UPDATE = 'update',
+  INSERT = 'insert',
 }
 
 export const Counters = {

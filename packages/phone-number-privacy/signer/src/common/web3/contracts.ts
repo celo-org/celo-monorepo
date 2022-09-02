@@ -40,7 +40,7 @@ export async function getBlockNumber(kit: ContractKit): Promise<number> {
       FULL_NODE_TIMEOUT_IN_MS,
     ],
     (err: any) => {
-      Counters.blockchainErrors.labels(Labels.read).inc()
+      Counters.blockchainErrors.labels(Labels.READ).inc()
       throw err
     },
     Histograms.getBlindedSigInstrumentation,
@@ -67,7 +67,7 @@ export async function getTransactionCount(
             undefined,
             FULL_NODE_TIMEOUT_IN_MS
           ).catch((err) => {
-            Counters.blockchainErrors.labels(Labels.read).inc()
+            Counters.blockchainErrors.labels(Labels.READ).inc()
             throw err
           })
         )
@@ -106,7 +106,7 @@ export async function getStableTokenBalance(
             undefined,
             FULL_NODE_TIMEOUT_IN_MS
           ).catch((err) => {
-            Counters.blockchainErrors.labels(Labels.read).inc()
+            Counters.blockchainErrors.labels(Labels.READ).inc()
             throw err
           })
         )
@@ -147,7 +147,7 @@ export async function getCeloBalance(
             undefined,
             FULL_NODE_TIMEOUT_IN_MS
           ).catch((err) => {
-            Counters.blockchainErrors.labels(Labels.read).inc()
+            Counters.blockchainErrors.labels(Labels.READ).inc()
             throw err
           })
         )
@@ -187,7 +187,7 @@ export async function getWalletAddress(
     ],
     (err: any) => {
       logger.error({ err, account }, 'failed to get wallet address for account')
-      Counters.blockchainErrors.labels(Labels.read).inc()
+      Counters.blockchainErrors.labels(Labels.READ).inc()
       return NULL_ADDRESS
     },
     Histograms.getRemainingQueryCountInstrumentation,
@@ -213,7 +213,7 @@ export async function getOnChainOdisPayments(
     ],
     (err: any) => {
       logger.error({ err, account }, 'failed to get on-chain odis balance for account')
-      Counters.blockchainErrors.labels(Labels.read).inc()
+      Counters.blockchainErrors.labels(Labels.READ).inc()
       throw err
     },
     Histograms.getRemainingQueryCountInstrumentation,
