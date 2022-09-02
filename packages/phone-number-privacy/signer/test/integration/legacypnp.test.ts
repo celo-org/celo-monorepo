@@ -920,7 +920,7 @@ describe('legacyPNP', () => {
           spy.mockRestore()
         })
 
-        it.skip('Should return 200 w/ warning on failure to increment query count', async () => {
+        it.skip('Should return 200 w/ warning on failure to store request', async () => {
           const spy = jest
             .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
             .mockRejectedValueOnce(new Error())
