@@ -1,6 +1,7 @@
 import { newKit, StableToken } from '@celo/contractkit'
 import {
   AuthenticationMethod,
+  ErrorMessage,
   isVerified,
   KEY_VERSION_HEADER,
   PhoneNumberPrivacyRequest,
@@ -784,7 +785,7 @@ describe('legacyPNP', () => {
       })
 
       describe('functionality in case of errors', () => {
-        it('Should return 200 on DB query failure', async () => {
+        it('Should return 200 w/ warning on DB performedQueryCount query failure', async () => {
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
@@ -793,10 +794,12 @@ describe('legacyPNP', () => {
             }
           })
 
-          jest.mock('../../src/common/database/wrappers/account', () => ({
-            ...jest.requireActual('../../src/common/database/wrappers/account'),
-            getPerformedQueryCount: jest.fn(() => undefined),
-          }))
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'getPerformedQueryCount'
+            )
+            .mockRejectedValueOnce(new Error())
 
           const req = getLegacyPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -812,83 +815,138 @@ describe('legacyPNP', () => {
             success: true,
             version: res.body.version,
             signature: expectedSignature,
-            performedQueryCount: performedQueryCount + 1, // TODO(Alec): shouldn't this be undefined?
+            performedQueryCount: 1, // TODO(2.0.0)(https://github.com/celo-org/celo-monorepo/issues/9804) Should this be undefined?
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
-            warnings: [],
+            warnings: [ErrorMessage.DATABASE_GET_FAILURE], // TODO(Alec) more descriptive error message
+          })
+
+          spy.mockRestore()
+        })
+
+        it('Should return 200 w/ warning on blockchain totalQuota query failure', async () => {
+          // deplete user's quota
+          const remainingQuota = expectedQuota - performedQueryCount
+          await db.transaction(async (trx) => {
+            for (let i = 0; i < remainingQuota; i++) {
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            }
+          })
+
+          mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: 11,
+            totalQuota: Number.MAX_SAFE_INTEGER, // TODO(2.0.0)(https://github.com/celo-org/celo-monorepo/issues/9804) Should this be undefined?
+            blockNumber: testBlockNumber,
+            warnings: [ErrorMessage.CONTRACT_GET_FAILURE],
           })
         })
 
-        //   // TODO: preserve this test
-        //   // We don't want to block the user on DB or blockchain query failure
-        //   it('returns 200 on DB query failure', (done) => {
-        //     mockGetRemainingQueryCount.mockRejectedValue(undefined)
-        //     request(app)
-        //       .post('/getBlindedMessagePartialSig')
-        //       .send(validRequest)
-        //       .expect('Content-Type', /json/)
-        //       .expect(200, done)
-        //   })
+        it.skip('Should return 500 on bls error', async () => {
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/bls/bls-cryptography-client'),
+              'computeBlindedSignature'
+            )
+            .mockRejectedValueOnce(new Error())
 
-        //   // TODO: preserve this test
-        //   it('returns 500 on bls error', (done) => {
-        //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-        //     mockComputeBlindedSignature.mockImplementation(() => {
-        //       throw Error()
-        //     })
-        //     request(app)
-        //       .post('/getBlindedMessagePartialSig')
-        //       .send(validRequest)
-        //       .expect('Content-Type', /json/)
-        //       .expect(500, done)
-        //   })
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
 
-        //   // TODO: preserve this test
-        //   it('returns 200 with warning on failure to increment query count', (done) => {
-        //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-        //     mockIncrementQueryCount.mockReturnValue(false)
-        //     request(app)
-        //       .post('/getBlindedMessagePartialSig')
-        //       .send(validRequest)
-        //       .expect('Content-Type', /json/)
-        //       .expect(
-        //         200,
-        //         {
-        //           success: false,
-        //           signature: BLS_SIGNATURE,
-        //           version: getVersion(),
-        //           performedQueryCount: 0,
-        //           error: ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
-        //           totalQuota: 10,
-        //           blockNumber: 10000,
-        //         },
-        //         done
-        //       )
-        //   })
+          expect(res.status).toBe(500)
+          // TODO(2.0.0)(Alec): investigate whether we have the intended behavior here
+          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            success: false,
+            version: res.body.version,
+            performedQueryCount: 11,
+            totalQuota: Number.MAX_SAFE_INTEGER, // TODO(2.0.0)(https://github.com/celo-org/celo-monorepo/issues/9804) Should this be undefined?
+            blockNumber: testBlockNumber,
+            error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
+          })
 
-        //   // TODO: preserve this test
-        //   it('returns 200 with warning on failure to store request', (done) => {
-        //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-        //     mockStoreRequest.mockReturnValue(false)
-        //     request(app)
-        //       .post('/getBlindedMessagePartialSig')
-        //       .send(validRequest)
-        //       .expect('Content-Type', /json/)
-        //       .expect(
-        //         200,
-        //         {
-        //           success: false,
-        //           signature: BLS_SIGNATURE,
-        //           version: getVersion(),
-        //           performedQueryCount: 1,
-        //           error: ErrorMessage.FAILURE_TO_STORE_REQUEST,
-        //           totalQuota: 10,
-        //           blockNumber: 10000,
-        //         },
-        //         done
-        //       )
-        //   })
-        // })
+          spy.mockRestore()
+        })
+
+        // TODO(Alec): why are these tests failing?
+
+        it.skip('Should return 200 w/ warning on failure to increment query count', async () => {
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'incrementQueryCount'
+            )
+            .mockRejectedValueOnce(new Error())
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [ErrorMessage.DATABASE_UPDATE_FAILURE], // TODO(Alec) more descriptive error message?
+          })
+
+          spy.mockRestore()
+        })
+
+        it.skip('Should return 200 w/ warning on failure to increment query count', async () => {
+          const spy = jest
+            .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
+            .mockRejectedValueOnce(new Error())
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [ErrorMessage.DATABASE_UPDATE_FAILURE], // TODO(Alec) more descriptive error message?
+          })
+
+          spy.mockRestore()
+        })
       })
     })
   })

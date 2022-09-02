@@ -28,11 +28,10 @@ export async function getRequestExists(
       .first()
       .timeout(DB_TIMEOUT)
     return !!existingRequest
-  } catch (err) {
+  } catch (error) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
-    logger.error(err)
-    return false
+    logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
+    throw error
   } finally {
     getRequestExistsMeter()
   }
@@ -43,16 +42,16 @@ export async function storeRequest(
   request: SignMessageRequest,
   logger: Logger,
   trx: Knex.Transaction
-) {
+): Promise<void> {
   const storeRequestMeter = Histograms.dbOpsInstrumentation.labels('storeRequest').startTimer()
   logger.debug({ request }, 'Storing salt request')
   try {
     await requests(db).transacting(trx).insert(new Request(request)).timeout(DB_TIMEOUT)
-    return true
-  } catch (err) {
+  } catch (error) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ error: err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    return null
+    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw error
+    // return null
   } finally {
     storeRequestMeter()
   }

@@ -23,6 +23,7 @@ export enum ErrorMessage {
   INVALID_SIGNER_RESPONSE = `CELO_ODIS_ERR_21 SIG_ERR Signer response body is invalid`,
   SIGNER_RESPONSE_FAILED_WITH_OK_STATUS = `CELO_ODIS_ERR_22 SIG_ERR Signer response failed with 200 status`,
   THRESHOLD_PNP_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_23 SIG_ERR Failed to get PNP quota status from a threshold of signers`,
+  FAILURE_TO_UPDATE_QUOTA_STATUS = `CELO_ODIS_ERR_24 DB_ERR Failed to update PNP quota status in signer db`,
 }
 
 export enum WarningMessage {

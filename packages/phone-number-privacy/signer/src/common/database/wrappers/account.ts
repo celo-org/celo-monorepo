@@ -36,10 +36,11 @@ export async function getPerformedQueryCount(
           .first()
           .timeout(DB_TIMEOUT)
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
-  } catch (err) {
+  } catch (error) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error({ error: err }, ErrorMessage.DATABASE_GET_FAILURE)
-    return 0
+    logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
+    throw error
+    // return 0
   } finally {
     getPerformedQueryCountMeter()
   }
@@ -64,10 +65,11 @@ async function getAccountExists(
           .timeout(DB_TIMEOUT)
       : await accounts(db).where(ACCOUNTS_COLUMNS.address, account).first().timeout(DB_TIMEOUT)
     return !!accountRecord
-  } catch (err) {
+  } catch (error) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error({ error: err }, ErrorMessage.DATABASE_GET_FAILURE)
-    return false
+    logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
+    throw error
+    // return false
   } finally {
     getAccountExistsMeter()
   }
@@ -81,7 +83,7 @@ export async function incrementQueryCount(
   account: string,
   logger: Logger,
   trx: Knex.Transaction
-): Promise<boolean> {
+): Promise<void> {
   const incrementQueryCountMeter = Histograms.dbOpsInstrumentation
     .labels('incrementQueryCount')
     .startTimer()
@@ -93,28 +95,33 @@ export async function incrementQueryCount(
         .where(ACCOUNTS_COLUMNS.address, account)
         .increment(ACCOUNTS_COLUMNS.numLookups, 1)
         .timeout(DB_TIMEOUT)
-      return true
     } else {
       const newAccount = new Account(account)
       newAccount[ACCOUNTS_COLUMNS.numLookups] = 1
-      return insertRecord(db, newAccount, logger, trx)
+      await insertRecord(db, newAccount, logger, trx)
     }
-  } catch (err) {
+  } catch (error) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ error: err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    return false
+    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw error
+    // return false
   } finally {
     incrementQueryCountMeter()
   }
 }
 
-async function insertRecord(db: Knex, data: Account, logger: Logger, trx: Knex.Transaction) {
+async function insertRecord(
+  db: Knex,
+  data: Account,
+  logger: Logger,
+  trx: Knex.Transaction
+): Promise<void> {
   try {
     await accounts(db).transacting(trx).insert(data).timeout(DB_TIMEOUT)
-    return true
-  } catch (err) {
+  } catch (error) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ error: err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    return false
+    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw error
+    // return false
   }
 }
