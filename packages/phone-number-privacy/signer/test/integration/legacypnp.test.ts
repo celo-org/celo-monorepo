@@ -849,7 +849,7 @@ describe('legacyPNP', () => {
             success: true,
             version: res.body.version,
             signature: expectedSignature,
-            performedQueryCount: 11,
+            performedQueryCount: expectedQuota + 1, // bc we depleted the user's quota above
             totalQuota: Number.MAX_SAFE_INTEGER, // TODO(2.0.0)(https://github.com/celo-org/celo-monorepo/issues/9804) Should this be undefined?
             blockNumber: testBlockNumber,
             warnings: [ErrorMessage.CONTRACT_GET_FAILURE],
@@ -920,13 +920,15 @@ describe('legacyPNP', () => {
           spy.mockRestore()
         })
 
-        it.skip('Should return 500 on bls error', async () => {
+        it('Should return 500 on bls signing error', async () => {
           const spy = jest
             .spyOn(
               jest.requireActual('../../src/common/bls/bls-cryptography-client'),
               'computeBlindedSignature'
             )
-            .mockRejectedValueOnce(new Error())
+            .mockImplementationOnce(() => {
+              throw new Error()
+            })
 
           const req = getLegacyPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -942,8 +944,8 @@ describe('legacyPNP', () => {
           expect(res.body).toMatchObject<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
-            performedQueryCount: 11,
-            totalQuota: Number.MAX_SAFE_INTEGER, // TODO(2.0.0)(https://github.com/celo-org/celo-monorepo/issues/9804) Should this be undefined?
+            performedQueryCount: performedQueryCount,
+            totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
             error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
           })

@@ -1,4 +1,4 @@
-import { SignMessageRequest, WarningMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, SignMessageRequest, WarningMessage } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { Action, Session } from '../../../common/action'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
@@ -62,7 +62,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           session.logger.error(
             'Error fetching PNP quota status in servicing a signing request: failing open.' // TODO(Alec): check this logging
           )
-          Counters.requestsFailingOpen.inc()
+          Counters.requestsFailingOpen.inc() // TODO(Alec): add / ensure we have monitoring in the combiner for this too
         }
         const { sufficient, state } = await this.quota.checkAndUpdateQuotaStatus(
           quotaStatus,
@@ -91,9 +91,33 @@ export class PnpSignAction implements Action<SignMessageRequest> {
       }
 
       // Compute signature inside transaction so it will rollback on error.
-      const signature = await this.sign(session.request.body.blindedQueryPhoneNumber, key, session)
+      // const signature = await this.sign(session.request.body.blindedQueryPhoneNumber, key, session)
 
-      this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
+      // this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
+
+      try {
+        const signature = await this.sign(
+          session.request.body.blindedQueryPhoneNumber,
+          key,
+          session
+        )
+        this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
+      } catch (error) {
+        trx.rollback()
+        quotaStatus.performedQueryCount--
+        if (error === ErrorMessage.SIGNATURE_COMPUTATION_FAILURE) {
+          this.io.sendFailure(
+            ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
+            500,
+            session.response,
+            quotaStatus.performedQueryCount, // TODO(2.0.0) consider refactoring to allow quotaStatus to be passed directly here to avoid parameter ordering errors
+            quotaStatus.totalQuota,
+            quotaStatus.blockNumber
+          )
+        } else {
+          throw error
+        }
+      }
     })
   }
 
@@ -109,6 +133,12 @@ export class PnpSignAction implements Action<SignMessageRequest> {
       session.logger.error({ key }, 'Requested key version not supported')
       throw err
     }
-    return computeBlindedSignature(blindedMessage, privateKey, session.logger)
+    // return computeBlindedSignature(blindedMessage, privateKey, session.logger)
+    try {
+      return computeBlindedSignature(blindedMessage, privateKey, session.logger)
+    } catch {
+      // specific error already logged
+      throw ErrorMessage.SIGNATURE_COMPUTATION_FAILURE
+    }
   }
 }
