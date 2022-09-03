@@ -290,6 +290,7 @@ describe('pnpService', () => {
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
         })
+        expect(res.get(KEY_VERSION_HEADER)).toEqual('1')
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {

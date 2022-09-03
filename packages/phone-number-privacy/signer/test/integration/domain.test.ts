@@ -468,6 +468,7 @@ describe('domain', () => {
         Buffer.from(res.body.signature, 'base64')
       )
       expect(evaluation.toString('base64')).toEqual(expectedEval)
+      expect(res.get(KEY_VERSION_HEADER)).toEqual('1')
     })
 
     it('Should respond with 200 on repeated valid requests with nonce updated', async () => {

@@ -407,19 +407,18 @@ describe('pnp', () => {
           IDENTIFIER
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, '1')
-        expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+        const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, '1')
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
           success: true,
-          version: res1.body.version,
+          version: res.body.version,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
           warnings: [],
         })
-
-        // TODO(Alec) check key version header
+        expect(res.get(KEY_VERSION_HEADER)).toEqual('1')
       })
 
       it('Should respond with 200 and warning on repeated valid requests', async () => {

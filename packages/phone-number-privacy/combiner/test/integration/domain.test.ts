@@ -558,6 +558,7 @@ describe('domainService', () => {
       })
       const evaluation = poprfClient.unblindResponse(Buffer.from(res.body.signature, 'base64'))
       expect(evaluation.toString('base64')).toEqual(expectedEval)
+      expect(res.get(KEY_VERSION_HEADER)).toEqual('1')
     })
 
     it('Should respond with 200 if nonce > domainState', async () => {

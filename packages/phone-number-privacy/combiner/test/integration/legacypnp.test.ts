@@ -216,7 +216,6 @@ describe('legacyPnpService', () => {
     signer3?.close()
   })
 
-  // TODO(Alec): de-dupe
   const sendPnpSignRequest = async (
     req: SignMessageRequest,
     authorization: string,
@@ -295,7 +294,7 @@ describe('legacyPnpService', () => {
 
       it('Should respond with 200 on valid request with key version header', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app, '1')
+        const res = await sendPnpSignRequest(req, authorization, app, '2')
 
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<SignMessageResponseSuccess>({
@@ -306,6 +305,7 @@ describe('legacyPnpService', () => {
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
         })
+        expect(res.get(KEY_VERSION_HEADER)).toEqual('2')
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {
