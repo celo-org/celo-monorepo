@@ -33,7 +33,7 @@ import { startSigner } from '../../src/server'
 describe('domain', () => {
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
-  const walletAddress = wallet.getAccounts()[0]! // TODO(Alec): do we need this?
+  const walletAddress = wallet.getAccounts()[0]!
 
   const expectedVersion = getVersion()
 
@@ -692,7 +692,6 @@ describe('domain', () => {
 
     it('Should respond with 429 on out of quota', async () => {
       const noQuotaDomain = authenticatedDomain([
-        // TODO(Alec): add better spec tests for rate limiting algorithm
         { delay: 0, resetTimer: noBool, batchSize: defined(0), repetitions: defined(0) },
       ])
       const [badRequest, _] = await signatureRequest(noQuotaDomain)
@@ -746,20 +745,4 @@ describe('domain', () => {
       })
     })
   })
-
-  /* 
-
-  TODO(Alec): check code coverage
-  
-  [ ] Add TODOs for all ODIS tests that remain to be written
-[ ] Bad signature (combiner + signer)
-[ ] Bad encoding (combiner + signer)
-[ ] Undefined domain (combiner + signer)
-[ ] Extra fields? -> should reject / use t.strict (combiner + signer)
-[ ] Valid key versions (combiner + signer)
-[ ] Invalid key versions (combiner + signer)
-[ ] Out of quota (combiner + signer)
-[ ] Bad nonce (combiner + signer)
-[ ] Request too early for rate limiting (both)
-  */
 })

@@ -45,7 +45,6 @@ export abstract class PnpQuotaService
   }
 
   public async getQuotaStatus(
-    // TODO(Alec)
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>,
     trx?: Knex.Transaction
   ): Promise<PnpQuotaStatus> {

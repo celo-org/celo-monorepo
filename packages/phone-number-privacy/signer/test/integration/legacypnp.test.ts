@@ -496,7 +496,7 @@ describe('legacyPNP', () => {
 
   describe(`${SignerEndpoint.LEGACY_PNP_SIGN}`, () => {
     describe('quota calculation logic', () => {
-      const runLegacyPnpSignTestCase = async (testCase: legacyPnpQuotaTestCase) => {
+      const runLegacyPnpSignQuotaTestCase = async (testCase: legacyPnpQuotaTestCase) => {
         await prepMocks(
           testCase.account,
           testCase.performedQueryCount,
@@ -545,7 +545,7 @@ describe('legacyPNP', () => {
 
       quotaCalculationTestCases.forEach((testCase) => {
         it(testCase.it, async () => {
-          await runLegacyPnpSignTestCase(testCase)
+          await runLegacyPnpSignQuotaTestCase(testCase)
         })
       })
     })

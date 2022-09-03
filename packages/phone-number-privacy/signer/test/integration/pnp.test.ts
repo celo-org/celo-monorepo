@@ -1,5 +1,6 @@
 import { newKit } from '@celo/contractkit'
 import {
+  AuthenticationMethod,
   ErrorMessage,
   KEY_VERSION_HEADER,
   PhoneNumberPrivacyRequest,
@@ -7,9 +8,13 @@ import {
   PnpQuotaResponseSuccess,
   rootLogger,
   SignerEndpoint,
+  SignMessageResponseFailure,
+  SignMessageResponseSuccess,
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { getPnpSignRequest } from '@celo/phone-number-privacy-common/lib/test/utils'
+import { BLINDED_PHONE_NUMBER, IDENTIFIER } from '@celo/phone-number-privacy-common/lib/test/values'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
@@ -44,8 +49,8 @@ jest.mock('@celo/contractkit', () => ({
   newKit: jest.fn().mockImplementation(() => mockContractKit),
 }))
 
-// const expectedSignature =
-//   'MAAAAAAAAAAEFHu3gWowoNJvvWkINGZR/1no37LPBFYRIHu3h5xYowXo1tlIlrL9CbN0cNqcKIAAAAAA'
+const expectedSignature =
+  'MAAAAAAAAAAEFHu3gWowoNJvvWkINGZR/1no37LPBFYRIHu3h5xYowXo1tlIlrL9CbN0cNqcKIAAAAAA'
 
 describe('pnp', () => {
   let keyProvider: KeyProvider
@@ -88,9 +93,6 @@ describe('pnp', () => {
     })
   })
 
-  // const zeroBalance = new BigNumber(0)
-  // const twentyCents = new BigNumber(200000000000000000)
-
   const sendRequest = async (
     req: PhoneNumberPrivacyRequest,
     authorization: string,
@@ -107,20 +109,41 @@ describe('pnp', () => {
     return _req.send(req)
   }
 
+  type pnpQuotaTestCase = {
+    cusdOdisPaymentInWei: BigNumber
+    expectedTotalQuota: number
+  }
+  const quotaCalculationTestCases: pnpQuotaTestCase[] = [
+    {
+      cusdOdisPaymentInWei: new BigNumber(0),
+      expectedTotalQuota: 0,
+    },
+    {
+      cusdOdisPaymentInWei: new BigNumber(1),
+      expectedTotalQuota: 0,
+    },
+    {
+      cusdOdisPaymentInWei: new BigNumber(1.56e18),
+      expectedTotalQuota: 15,
+    },
+    {
+      // Sanity check for the default values to be used in endpoint setup tests
+      cusdOdisPaymentInWei: onChainBalance,
+      expectedTotalQuota: expectedQuota,
+    },
+    {
+      // Unrealistically large amount paid for ODIS quota
+      cusdOdisPaymentInWei: new BigNumber(1.23456789e26),
+      expectedTotalQuota: 1234567890,
+    },
+  ]
+
   describe(`${SignerEndpoint.PNP_QUOTA}`, () => {
     describe('quota calculation logic', () => {
-      const cusdQuotaParams: [BigNumber, number][] = [
-        [new BigNumber(0), 0],
-        [new BigNumber(1), 0],
-        [new BigNumber(1.56e18), 15],
-        // Sanity check for the default values to be used in endpoint setup tests
-        [onChainBalance, expectedQuota],
-        // Unrealistically large amount paid for ODIS quota
-        [new BigNumber(1.23456789e26), 1234567890],
-      ]
-      cusdQuotaParams.forEach(([cusdWei, expectedTotalQuota]) => {
-        it(`Should get totalQuota=${expectedTotalQuota} for ${cusdWei.toString()} cUSD (wei)`, async () => {
-          mockOdisPaymentsTotalPaidCUSD.mockReturnValue(cusdWei)
+      quotaCalculationTestCases.forEach(({ cusdOdisPaymentInWei, expectedTotalQuota }) => {
+        it(`Should get totalQuota=${expectedTotalQuota} 
+           for cUSD (wei) payment=${cusdOdisPaymentInWei.toString()}`, async () => {
+          mockOdisPaymentsTotalPaidCUSD.mockReturnValue(cusdOdisPaymentInWei)
           const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
@@ -257,7 +280,6 @@ describe('pnp', () => {
       })
 
       describe('functionality in case of errors', () => {
-        // TODO(Alec) add these tests to legacy quota endpoint
         it('Should respond with 500 on DB performedQueryCount query failure', async () => {
           const spy = jest
             .spyOn(
@@ -299,505 +321,486 @@ describe('pnp', () => {
     })
   })
 
-  // describe(`${SignerEndpoint.PNP_SIGN}`, () => {
-  //   describe('quota calculation logic', () => {
-  //     const runLegacyPnpSignTestCase = async (testCase: legacyPnpQuotaTestCase) => {
-  //       await prepMocks(
-  //         testCase.account,
-  //         testCase.performedQueryCount,
-  //         testCase.transactionCount,
-  //         testCase.isVerified,
-  //         testCase.balanceCUSD,
-  //         testCase.balanceCEUR,
-  //         testCase.balanceCELO
-  //       )
+  describe(`${SignerEndpoint.PNP_SIGN}`, () => {
+    describe('quota calculation logic', () => {
+      quotaCalculationTestCases.forEach(({ expectedTotalQuota, cusdOdisPaymentInWei }) => {
+        it(`Should get totalQuota=${expectedTotalQuota} 
+           for cUSD (wei) payment=${cusdOdisPaymentInWei.toString()}`, async () => {
+          mockOdisPaymentsTotalPaidCUSD.mockReturnValue(cusdOdisPaymentInWei)
 
-  //       const req = getPnpSignRequest(
-  //         testCase.account,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         testCase.identifier
-  //       )
-  //       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //       const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
-  //       const { expectedPerformedQueryCount, expectedTotalQuota } = testCase
-  //       const shouldSucceed = expectedPerformedQueryCount < expectedTotalQuota
+          const shouldSucceed = expectedTotalQuota > 0
 
-  //       if (shouldSucceed) {
-  //         expect(res.status).toBe(200)
-  //         expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-  //           success: true,
-  //           version: expectedVersion,
-  //           signature: expectedSignature,
-  //           performedQueryCount: expectedPerformedQueryCount + 1, // incremented for signature request
-  //           totalQuota: expectedTotalQuota,
-  //           blockNumber: testBlockNumber,
-  //           warnings: [],
-  //         })
-  //       } else {
-  //         expect(res.status).toBe(403)
-  //         expect(res.body).toMatchObject<SignMessageResponseFailure>({
-  //           success: false,
-  //           version: expectedVersion,
-  //           performedQueryCount: expectedPerformedQueryCount,
-  //           totalQuota: expectedTotalQuota,
-  //           blockNumber: testBlockNumber,
-  //           error: WarningMessage.EXCEEDED_QUOTA,
-  //         })
-  //       }
-  //     }
+          if (shouldSucceed) {
+            expect(res.status).toBe(200)
+            expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+              success: true,
+              version: expectedVersion,
+              signature: expectedSignature,
+              performedQueryCount: 1, // incremented for signature request
+              totalQuota: expectedTotalQuota,
+              blockNumber: testBlockNumber,
+              warnings: [],
+            })
+          } else {
+            expect(res.status).toBe(403)
+            expect(res.body).toMatchObject<SignMessageResponseFailure>({
+              success: false,
+              version: expectedVersion,
+              performedQueryCount: 0,
+              totalQuota: expectedTotalQuota,
+              blockNumber: testBlockNumber,
+              error: WarningMessage.EXCEEDED_QUOTA,
+            })
+          }
+        })
+      })
+    })
 
-  //     quotaCalculationTestCases.forEach((testCase) => {
-  //       it(testCase.it, async () => {
-  //         await runLegacyPnpSignTestCase(testCase)
-  //       })
-  //     })
-  //   })
+    describe('endpoint functionality', () => {
+      // Use values already tested in quota logic tests, [onChainBalance, expectedQuota]
+      const performedQueryCount = 2
 
-  //   describe('endpoint functionality', () => {
-  //     // Use values from 'unverified account with no transactions' logic test case
-  //     const performedQueryCount = 1
-  //     const expectedQuota = 10
+      beforeEach(async () => {
+        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainBalance)
+        await db.transaction(async (trx) => {
+          for (let i = 0; i < performedQueryCount; i++) {
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+          }
+        })
+      })
 
-  //     beforeEach(async () => {
-  //       await prepMocks(
-  //         ACCOUNT_ADDRESS1,
-  //         performedQueryCount,
-  //         0,
-  //         false,
-  //         twentyCents,
-  //         twentyCents,
-  //         twentyCents
-  //       )
-  //     })
+      it('Should respond with 200 on valid request', async () => {
+        const req = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          signature: expectedSignature,
+          performedQueryCount: performedQueryCount + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+      })
 
-  //     it('Should respond with 200 on valid request', async () => {
-  //       const req = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //       const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
-  //       expect(res.status).toBe(200)
-  //       expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-  //         success: true,
-  //         version: res.body.version,
-  //         signature: expectedSignature,
-  //         performedQueryCount: performedQueryCount + 1,
-  //         totalQuota: expectedQuota,
-  //         blockNumber: testBlockNumber,
-  //         warnings: [],
-  //       })
-  //     })
+      it('Should respond with 200 on valid request with key version header', async () => {
+        const req = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, '1')
+        expect(res1.status).toBe(200)
+        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: res1.body.version,
+          signature: expectedSignature,
+          performedQueryCount: performedQueryCount + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
 
-  //     it('Should respond with 200 on valid request with key version header', async () => {
-  //       const req = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //       const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, '1')
-  //       expect(res1.status).toBe(200)
-  //       expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
-  //         success: true,
-  //         version: res1.body.version,
-  //         signature: expectedSignature,
-  //         performedQueryCount: performedQueryCount + 1,
-  //         totalQuota: expectedQuota,
-  //         blockNumber: testBlockNumber,
-  //         warnings: [],
-  //       })
+        // TODO(Alec) check key version header
+      })
 
-  //       // TODO(Alec) check key version header
-  //     })
+      it('Should respond with 200 and warning on repeated valid requests', async () => {
+        const req = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res1.status).toBe(200)
+        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: res1.body.version,
+          signature: expectedSignature,
+          performedQueryCount: performedQueryCount + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+        const res2 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res2.status).toBe(200)
+        res1.body.warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
+        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(res1.body)
+      })
 
-  //     it('Should respond with 200 and warning on repeated valid requests', async () => {
-  //       const req = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //       const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
-  //       expect(res1.status).toBe(200)
-  //       expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
-  //         success: true,
-  //         version: res1.body.version,
-  //         signature: expectedSignature,
-  //         performedQueryCount: performedQueryCount + 1,
-  //         totalQuota: expectedQuota,
-  //         blockNumber: testBlockNumber,
-  //         warnings: [],
-  //       })
-  //       const res2 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
-  //       expect(res2.status).toBe(200)
-  //       res1.body.warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
-  //       expect(res2.body).toMatchObject<SignMessageResponseSuccess>(res1.body)
-  //     })
+      it('Should respond with 200 on extra request fields', async () => {
+        const req = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        // @ts-ignore Intentionally adding an extra field to the request type
+        req.extraField = 'dummyString'
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          signature: expectedSignature,
+          performedQueryCount: performedQueryCount + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+      })
 
-  //     it('Should respond with 200 on extra request fields', async () => {
-  //       const req = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       // @ts-ignore Intentionally adding an extra field to the request type
-  //       req.extraField = 'dummyString'
-  //       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //       const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
-  //       expect(res.status).toBe(200)
-  //       expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-  //         success: true,
-  //         version: res.body.version,
-  //         signature: expectedSignature,
-  //         performedQueryCount: performedQueryCount + 1,
-  //         totalQuota: expectedQuota,
-  //         blockNumber: testBlockNumber,
-  //         warnings: [],
-  //       })
-  //     })
+      it('Should respond with 400 on missing request fields', async () => {
+        const badRequest = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY, // TODO(Alec): what about DEK??
+          IDENTIFIER
+        )
+        // @ts-ignore Intentionally deleting required field
+        delete badRequest.account
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
 
-  //     it('Should respond with 400 on missing request fields', async () => {
-  //       const badRequest = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       // @ts-ignore Intentionally deleting required field
-  //       delete badRequest.account
-  //       const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
-  //       const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
-  //       expect(res.status).toBe(400)
-  //       expect(res.body).toMatchObject<SignMessageResponseFailure>({
-  //         success: false,
-  //         version: res.body.version,
-  //         error: WarningMessage.INVALID_INPUT,
-  //       })
-  //     })
+      it('Should respond with 400 on invalid key version', async () => {
+        const badRequest = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN, 'a')
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        })
+      })
 
-  //     it('Should respond with 400 on invalid key version', async () => {
-  //       const badRequest = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
-  //       const res = await sendRequest(
-  //         badRequest,
-  //         authorization,
-  //         SignerEndpoint.PNP_SIGN,
-  //         'a'
-  //       )
-  //       expect(res.status).toBe(400)
-  //       expect(res.body).toMatchObject<SignMessageResponseFailure>({
-  //         success: false,
-  //         version: res.body.version,
-  //         error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
-  //       })
-  //     })
+      it('Should respond with 400 on invalid identifier', async () => {
+        const badRequest = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          '+1234567890'
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
 
-  //     it('Should respond with 400 on invalid identifier', async () => {
-  //       const badRequest = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         '+1234567890'
-  //       )
-  //       const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
-  //       const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
-  //       expect(res.status).toBe(400)
-  //       expect(res.body).toMatchObject<SignMessageResponseFailure>({
-  //         success: false,
-  //         version: res.body.version,
-  //         error: WarningMessage.INVALID_INPUT,
-  //       })
-  //     })
+      it('Should respond with 400 on invalid blinded message', async () => {
+        const badRequest = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          '+1234567890',
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
 
-  //     it('Should respond with 400 on invalid blinded message', async () => {
-  //       const badRequest = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         '+1234567890',
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
-  //       const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
-  //       expect(res.status).toBe(400)
-  //       expect(res.body).toMatchObject<SignMessageResponseFailure>({
-  //         success: false,
-  //         version: res.body.version,
-  //         error: WarningMessage.INVALID_INPUT,
-  //       })
-  //     })
+      it('Should respond with 400 on invalid address', async () => {
+        const badRequest = getPnpSignRequest(
+          '0xnotanaddress',
+          '+1234567890',
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
 
-  //     it('Should respond with 400 on invalid address', async () => {
-  //       const badRequest = getPnpSignRequest(
-  //         '0xnotanaddress',
-  //         '+1234567890',
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
-  //       const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
-  //       expect(res.status).toBe(400)
-  //       expect(res.body).toMatchObject<SignMessageResponseFailure>({
-  //         success: false,
-  //         version: res.body.version,
-  //         error: WarningMessage.INVALID_INPUT,
-  //       })
-  //     })
+      it('Should respond with 401 on failed auth', async () => {
+        const badRequest = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+        const authorization = getPnpRequestAuthorization(badRequest, differentPk)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res.status).toBe(401)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.UNAUTHENTICATED_USER,
+        })
+      })
 
-  //     it('Should respond with 401 on failed auth', async () => {
-  //       const badRequest = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
-  //       const authorization = getPnpRequestAuthorization(badRequest, differentPk)
-  //       const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
-  //       expect(res.status).toBe(401)
-  //       expect(res.body).toMatchObject<SignMessageResponseFailure>({
-  //         success: false,
-  //         version: res.body.version,
-  //         error: WarningMessage.UNAUTHENTICATED_USER,
-  //       })
-  //     })
+      it('Should respond with 403 on out of quota', async () => {
+        // deplete user's quota
+        const remainingQuota = expectedQuota - performedQueryCount
+        await db.transaction(async (trx) => {
+          for (let i = 0; i < remainingQuota; i++) {
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+          }
+        })
+        const req = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res1.status).toBe(403)
+        expect(res1.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res1.body.version,
+          performedQueryCount: expectedQuota,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          error: WarningMessage.EXCEEDED_QUOTA,
+        })
+      })
 
-  //     it('Should respond with 403 on out of quota', async () => {
-  //       // deplete user's quota
-  //       const remainingQuota = expectedQuota - performedQueryCount
-  //       await db.transaction(async (trx) => {
-  //         for (let i = 0; i < remainingQuota; i++) {
-  //           // TODO(2.0.0): consider using config.serviceName here to debug logger issue
-  //           await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
-  //         }
-  //       })
-  //       const req = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //       const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
-  //       expect(res1.status).toBe(403)
-  //       expect(res1.body).toMatchObject<SignMessageResponseFailure>({
-  //         success: false,
-  //         version: res1.body.version,
-  //         performedQueryCount: expectedQuota,
-  //         totalQuota: expectedQuota,
-  //         blockNumber: testBlockNumber,
-  //         error: WarningMessage.EXCEEDED_QUOTA,
-  //       })
-  //     })
+      it('Should respond with 503 on disabled api', async () => {
+        const configWithApiDisabled = { ...config }
+        configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
+        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
 
-  //     it('Should respond with 503 on disabled api', async () => {
-  //       const configWithApiDisabled = { ...config }
-  //       configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
-  //       const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+        const req = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(
+          req,
+          authorization,
+          SignerEndpoint.PNP_SIGN,
+          '1',
+          appWithApiDisabled
+        )
+        expect(res.status).toBe(503)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.API_UNAVAILABLE,
+        })
+      })
 
-  //       const req = getPnpSignRequest(
-  //         ACCOUNT_ADDRESS1,
-  //         BLINDED_PHONE_NUMBER,
-  //         AuthenticationMethod.WALLET_KEY,
-  //         IDENTIFIER
-  //       )
-  //       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //       const res = await sendRequest(
-  //         req,
-  //         authorization,
-  //         SignerEndpoint.PNP_SIGN,
-  //         '1',
-  //         appWithApiDisabled
-  //       )
-  //       expect(res.status).toBe(503)
-  //       expect(res.body).toMatchObject<SignMessageResponseFailure>({
-  //         success: false,
-  //         version: res.body.version,
-  //         error: WarningMessage.API_UNAVAILABLE,
-  //       })
-  //     })
+      describe('functionality in case of errors', () => {
+        it('Should return 200 w/ warning on DB performedQueryCount query failure', async () => {
+          // deplete user's quota
+          const remainingQuota = expectedQuota - performedQueryCount
+          await db.transaction(async (trx) => {
+            for (let i = 0; i < remainingQuota; i++) {
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            }
+          })
 
-  //     describe('functionality in case of errors', () => {
-  //       it('Should return 200 w/ warning on DB performedQueryCount query failure', async () => {
-  //         // deplete user's quota
-  //         const remainingQuota = expectedQuota - performedQueryCount
-  //         await db.transaction(async (trx) => {
-  //           for (let i = 0; i < remainingQuota; i++) {
-  //             await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
-  //           }
-  //         })
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'getPerformedQueryCount'
+            )
+            .mockRejectedValueOnce(new Error())
 
-  //         const spy = jest
-  //           .spyOn(
-  //             jest.requireActual('../../src/common/database/wrappers/account'),
-  //             'getPerformedQueryCount'
-  //           )
-  //           .mockRejectedValueOnce(new Error())
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
-  //         const req = getPnpSignRequest(
-  //           ACCOUNT_ADDRESS1,
-  //           BLINDED_PHONE_NUMBER,
-  //           AuthenticationMethod.WALLET_KEY,
-  //           IDENTIFIER
-  //         )
-  //         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: 1,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [
+              ErrorMessage.DATABASE_GET_FAILURE,
+              ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
+            ],
+          })
 
-  //         expect(res.status).toBe(200)
-  //         expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-  //           success: true,
-  //           version: res.body.version,
-  //           signature: expectedSignature,
-  //           performedQueryCount: 1, // TODO(2.0.0)(https://github.com/celo-org/celo-monorepo/issues/9804) Should this be undefined?
-  //           totalQuota: expectedQuota,
-  //           blockNumber: testBlockNumber,
-  //           warnings: [ErrorMessage.DATABASE_GET_FAILURE], // TODO(Alec) more descriptive error message
-  //         })
+          spy.mockRestore()
+        })
 
-  //         spy.mockRestore()
-  //       })
+        it('Should return 200 w/ warning on blockchain totalQuota query failure', async () => {
+          // deplete user's quota
+          const remainingQuota = expectedQuota - performedQueryCount
+          await db.transaction(async (trx) => {
+            for (let i = 0; i < remainingQuota; i++) {
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            }
+          })
 
-  //       it('Should return 200 w/ warning on blockchain totalQuota query failure', async () => {
-  //         // deplete user's quota
-  //         const remainingQuota = expectedQuota - performedQueryCount
-  //         await db.transaction(async (trx) => {
-  //           for (let i = 0; i < remainingQuota; i++) {
-  //             await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
-  //           }
-  //         })
+          mockOdisPaymentsTotalPaidCUSD.mockImplementation(() => {
+            throw new Error('dummy error')
+          })
 
-  //         mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
-  //         const req = getPnpSignRequest(
-  //           ACCOUNT_ADDRESS1,
-  //           BLINDED_PHONE_NUMBER,
-  //           AuthenticationMethod.WALLET_KEY,
-  //           IDENTIFIER
-  //         )
-  //         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: expectedQuota + 1, // bc we depleted the user's quota above
+            totalQuota: Number.MAX_SAFE_INTEGER,
+            blockNumber: testBlockNumber,
+            warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA, ErrorMessage.FULL_NODE_ERROR],
+          })
+        })
 
-  //         expect(res.status).toBe(200)
-  //         expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-  //           success: true,
-  //           version: res.body.version,
-  //           signature: expectedSignature,
-  //           performedQueryCount: expectedQuota + 1, // bc we depleted the user's quota above
-  //           totalQuota: Number.MAX_SAFE_INTEGER, // TODO(2.0.0)(https://github.com/celo-org/celo-monorepo/issues/9804) Should this be undefined?
-  //           blockNumber: testBlockNumber,
-  //           warnings: [ErrorMessage.FULL_NODE_ERROR],
-  //         })
-  //       })
+        it('Should return 200 w/ warning on failure to increment query count', async () => {
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'incrementQueryCount'
+            )
+            .mockRejectedValueOnce(new Error())
 
-  //       // TODO(Alec): why are these tests failing?
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
-  //       it('Should return 200 w/ warning on failure to increment query count', async () => {
-  //         const spy = jest
-  //           .spyOn(
-  //             jest.requireActual('../../src/common/database/wrappers/account'),
-  //             'incrementQueryCount'
-  //           )
-  //           .mockRejectedValueOnce(new Error())
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount, // Not incremented
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [
+              ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
+              ErrorMessage.FAILURE_TO_STORE_REQUEST,
+            ],
+          })
 
-  //         const req = getPnpSignRequest(
-  //           ACCOUNT_ADDRESS1,
-  //           BLINDED_PHONE_NUMBER,
-  //           AuthenticationMethod.WALLET_KEY,
-  //           IDENTIFIER
-  //         )
-  //         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          spy.mockRestore()
+        })
 
-  //         expect(res.status).toBe(200)
-  //         expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-  //           success: true,
-  //           version: res.body.version,
-  //           signature: expectedSignature,
-  //           performedQueryCount: performedQueryCount, // Not incremented
-  //           totalQuota: expectedQuota,
-  //           blockNumber: testBlockNumber,
-  //           warnings: [
-  //             ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
-  //             ErrorMessage.FAILURE_TO_STORE_REQUEST,
-  //           ],
-  //         })
+        it('Should return 200 w/ warning on failure to store request', async () => {
+          const spy = jest
+            .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
+            .mockRejectedValueOnce(new Error())
 
-  //         spy.mockRestore()
-  //       })
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
-  //       it('Should return 200 w/ warning on failure to store request', async () => {
-  //         const spy = jest
-  //           .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
-  //           .mockRejectedValueOnce(new Error())
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount + 1,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [ErrorMessage.FAILURE_TO_STORE_REQUEST],
+          })
 
-  //         const req = getPnpSignRequest(
-  //           ACCOUNT_ADDRESS1,
-  //           BLINDED_PHONE_NUMBER,
-  //           AuthenticationMethod.WALLET_KEY,
-  //           IDENTIFIER
-  //         )
-  //         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          spy.mockRestore()
+        })
 
-  //         expect(res.status).toBe(200)
-  //         expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-  //           success: true,
-  //           version: res.body.version,
-  //           signature: expectedSignature,
-  //           performedQueryCount: performedQueryCount + 1,
-  //           totalQuota: expectedQuota,
-  //           blockNumber: testBlockNumber,
-  //           warnings: [ErrorMessage.FAILURE_TO_STORE_REQUEST],
-  //         })
+        it('Should return 500 on bls signing error', async () => {
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/bls/bls-cryptography-client'),
+              'computeBlindedSignature'
+            )
+            .mockImplementationOnce(() => {
+              throw new Error()
+            })
 
-  //         spy.mockRestore()
-  //       })
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
-  //       it('Should return 500 on bls signing error', async () => {
-  //         const spy = jest
-  //           .spyOn(
-  //             jest.requireActual('../../src/common/bls/bls-cryptography-client'),
-  //             'computeBlindedSignature'
-  //           )
-  //           .mockImplementationOnce(() => {
-  //             throw new Error()
-  //           })
+          expect(res.status).toBe(500)
+          // TODO(2.0.0)(Alec): investigate whether we have the intended behavior here
+          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            success: false,
+            version: res.body.version,
+            performedQueryCount: performedQueryCount,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
+          })
 
-  //         const req = getPnpSignRequest(
-  //           ACCOUNT_ADDRESS1,
-  //           BLINDED_PHONE_NUMBER,
-  //           AuthenticationMethod.WALLET_KEY,
-  //           IDENTIFIER
-  //         )
-  //         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-  //         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
-
-  //         expect(res.status).toBe(500)
-  //         // TODO(2.0.0)(Alec): investigate whether we have the intended behavior here
-  //         expect(res.body).toMatchObject<SignMessageResponseFailure>({
-  //           success: false,
-  //           version: res.body.version,
-  //           performedQueryCount: performedQueryCount,
-  //           totalQuota: expectedQuota,
-  //           blockNumber: testBlockNumber,
-  //           error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
-  //         })
-
-  //         spy.mockRestore()
-  //       })
-  //     })
-  //   })
-  // })
+          spy.mockRestore()
+        })
+      })
+    })
+  })
 })
