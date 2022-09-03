@@ -108,7 +108,7 @@ export async function setDidMatchmaking(
         newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
         await accounts(db).transacting(trx).timeout(DB_TIMEOUT).insert(newAccount)
       }
-      trx.commit()
+      await trx.commit()
     })
     .catch((err) => {
       logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)

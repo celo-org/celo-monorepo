@@ -145,6 +145,21 @@ export function getLegacyPnpSignRequest(
   }
 }
 
+export function getPnpSignRequest(
+  account: string,
+  blindedQueryPhoneNumber: string,
+  authenticationMethod?: string,
+  hashedPhoneNumber?: string
+): SignMessageRequest {
+  return {
+    account,
+    blindedQueryPhoneNumber,
+    authenticationMethod,
+    hashedPhoneNumber,
+    sessionID: genSessionID(),
+  }
+}
+
 export function getPnpRequestAuthorization(req: PhoneNumberPrivacyRequest, pk: string) {
   const msg = JSON.stringify(req)
   if (req.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {

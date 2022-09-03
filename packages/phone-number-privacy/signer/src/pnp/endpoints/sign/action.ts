@@ -64,23 +64,19 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           )
           Counters.requestsFailingOpen.inc() // TODO(Alec): add / ensure we have monitoring in the combiner for this too
         }
-        const { sufficient, state } = await this.quota.checkAndUpdateQuotaStatus(
-          quotaStatus,
-          session,
-          trx
-        )
+        const { sufficient } = await this.quota.checkAndUpdateQuotaStatus(quotaStatus, session, trx)
         if (!sufficient) {
           this.io.sendFailure(
             WarningMessage.EXCEEDED_QUOTA,
             403,
             session.response,
-            state.totalQuota,
-            state.performedQueryCount,
-            state.blockNumber
+            quotaStatus.totalQuota,
+            quotaStatus.performedQueryCount,
+            quotaStatus.blockNumber
           )
           return
         }
-        quotaStatus.performedQueryCount = state.performedQueryCount
+        // quotaStatus.performedQueryCount++
       }
 
       const key: Key = {
@@ -91,9 +87,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
       }
 
       // Compute signature inside transaction so it will rollback on error.
-      // const signature = await this.sign(session.request.body.blindedQueryPhoneNumber, key, session)
-
-      // this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
 
       try {
         const signature = await this.sign(
@@ -103,7 +96,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         )
         this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
       } catch (error) {
-        trx.rollback()
+        await trx.rollback()
         quotaStatus.performedQueryCount--
         if (error === ErrorMessage.SIGNATURE_COMPUTATION_FAILURE) {
           this.io.sendFailure(

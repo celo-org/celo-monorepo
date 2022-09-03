@@ -10,7 +10,7 @@ export enum ErrorMessage {
   INCONSISTENT_SIGNER_RESPONSES = `CELO_ODIS_ERR_08 SIG_ERR Inconsistent responses from signers`,
   SIGNER_REQUEST_ERROR = `CELO_ODIS_ERR_09 SIG_ERR Failure in signer request`,
   TIMEOUT_FROM_SIGNER = `CELO_ODIS_ERR_10 SIG_ERR Timeout from signer`,
-  CONTRACT_GET_FAILURE = `CELO_ODIS_ERR_11 SIG_ERR Failed to read contract state`,
+  FULL_NODE_ERROR = `CELO_ODIS_ERR_11 NODE_ERR Failed to read on-chain state`,
   FAILURE_TO_STORE_REQUEST = `CELO_ODIS_ERR_12 DB_ERR Failed to store partial sig request`,
   FAILURE_TO_INCREMENT_QUERY_COUNT = `CELO_ODIS_ERR_13 DB_ERR Failed to increment user query count`,
   DOMAIN_ALREADY_DISABLED_FAILURE = `CELO_ODIS_ERR_14 DB_ERR Domain is already disabled`,
@@ -23,6 +23,8 @@ export enum ErrorMessage {
   INVALID_SIGNER_RESPONSE = `CELO_ODIS_ERR_21 SIG_ERR Signer response body is invalid`,
   SIGNER_RESPONSE_FAILED_WITH_OK_STATUS = `CELO_ODIS_ERR_22 SIG_ERR Signer response failed with 200 status`,
   THRESHOLD_PNP_QUOTA_STATUS_FAILURE = `CELO_ODIS_ERR_23 SIG_ERR Failed to get PNP quota status from a threshold of signers`,
+  FAILURE_TO_GET_PERFORMED_QUERY_COUNT = `CELO_ODIS_ERR_24 DB_ERR Failed to read performedQueryCount from signer db`,
+  FAILURE_TO_GET_TOTAL_QUOTA = `CELO_ODIS_ERR_25 NODE_ERR Failed to read on-chain state to calculate total quota`,
 }
 
 export enum WarningMessage {

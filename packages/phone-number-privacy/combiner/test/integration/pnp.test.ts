@@ -232,6 +232,7 @@ describe('pnpService', () => {
     return reqWithHeaders.send(req)
   }
 
+  // TODO(Alec) de-dupe
   const getSignRequest = (_blindedMsgResult: threshold_bls.BlindedMessage): SignMessageRequest => {
     return {
       account: ACCOUNT_ADDRESS1,

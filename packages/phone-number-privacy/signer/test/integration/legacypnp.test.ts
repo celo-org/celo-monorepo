@@ -288,7 +288,6 @@ describe('legacyPNP', () => {
       for (let i = 0; i < performedQueryCount; i++) {
         await incrementQueryCount(db, account, rootLogger(config.serviceName), trx)
       }
-      await trx.commit()
     })
 
     mockContractKit.connection.getTransactionCount.mockReturnValue(transactionCount)
@@ -298,6 +297,7 @@ describe('legacyPNP', () => {
     mockBalanceOfCELO.mockReturnValue(balanceCELO)
   }
 
+  // TODO(Alec): de-dupe
   const sendRequest = async (
     req: PhoneNumberPrivacyRequest,
     authorization: string,
@@ -441,7 +441,7 @@ describe('legacyPNP', () => {
           req,
           authorization,
           SignerEndpoint.LEGACY_PNP_QUOTA,
-          '1',
+          undefined,
           appWithApiDisabled
         )
         expect.assertions(2)
@@ -450,6 +450,45 @@ describe('legacyPNP', () => {
           success: false,
           version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
+        })
+      })
+
+      describe('functionality in case of errors', () => {
+        it('Should respond with 500 on DB performedQueryCount query failure', async () => {
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'getPerformedQueryCount'
+            )
+            .mockRejectedValueOnce(new Error())
+
+          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+
+          expect(res.status).toBe(500)
+          expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+            success: false,
+            version: expectedVersion,
+            error: ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
+          })
+
+          spy.mockRestore()
+        })
+
+        it('Should respond with 500 on blockchain totalQuota query failure', async () => {
+          mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
+
+          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+
+          expect(res.status).toBe(500)
+          expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+            success: false,
+            version: expectedVersion,
+            error: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
+          })
         })
       })
     })
@@ -815,10 +854,13 @@ describe('legacyPNP', () => {
             success: true,
             version: res.body.version,
             signature: expectedSignature,
-            performedQueryCount: 1, // TODO(2.0.0)(https://github.com/celo-org/celo-monorepo/issues/9804) Should this be undefined?
+            performedQueryCount: 1,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
-            warnings: [ErrorMessage.DATABASE_GET_FAILURE], // TODO(Alec) more descriptive error message
+            warnings: [
+              ErrorMessage.DATABASE_GET_FAILURE,
+              ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
+            ],
           })
 
           spy.mockRestore()
@@ -850,13 +892,11 @@ describe('legacyPNP', () => {
             version: res.body.version,
             signature: expectedSignature,
             performedQueryCount: expectedQuota + 1, // bc we depleted the user's quota above
-            totalQuota: Number.MAX_SAFE_INTEGER, // TODO(2.0.0)(https://github.com/celo-org/celo-monorepo/issues/9804) Should this be undefined?
+            totalQuota: Number.MAX_SAFE_INTEGER,
             blockNumber: testBlockNumber,
-            warnings: [ErrorMessage.CONTRACT_GET_FAILURE],
+            warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA, ErrorMessage.FULL_NODE_ERROR],
           })
         })
-
-        // TODO(Alec): why are these tests failing?
 
         it('Should return 200 w/ warning on failure to increment query count', async () => {
           const spy = jest

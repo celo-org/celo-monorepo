@@ -20,7 +20,7 @@ export abstract class PnpQuotaService
 
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
-    session: PnpSession<SignMessageRequest>, // TODO(Alec): pass in failingOpen var to skip logging / metrics?
+    session: PnpSession<SignMessageRequest>,
     trx: Knex.Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
     const remainingQuota = state.totalQuota - state.performedQueryCount
@@ -77,9 +77,12 @@ export abstract class PnpQuotaService
         { error: performedQueryCountResult.reason },
         'failed to get performedQueryCount from db'
       )
-      session.errors.push(ErrorMessage.DATABASE_GET_FAILURE) // TODO(Alec): should we push a more specific error?
+      session.errors.push(
+        ErrorMessage.DATABASE_GET_FAILURE,
+        ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
+      )
     }
-    let hadBlockchainError = false
+    let hadFullNodeError = false
     if (totalQuotaResult.status === 'fulfilled') {
       quotaStatus.totalQuota = totalQuotaResult.value
     } else {
@@ -87,7 +90,8 @@ export abstract class PnpQuotaService
         { error: totalQuotaResult.reason },
         'failed to get totalQuota from full node'
       )
-      hadBlockchainError = true
+      hadFullNodeError = true
+      session.errors.push(ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA)
     }
     if (blockNumberResult.status === 'fulfilled') {
       quotaStatus.blockNumber = blockNumberResult.value
@@ -96,10 +100,10 @@ export abstract class PnpQuotaService
         { error: blockNumberResult.reason },
         'failed to get blockNumber from full node'
       )
-      hadBlockchainError = true
+      hadFullNodeError = true
     }
-    if (hadBlockchainError) {
-      session.errors.push(ErrorMessage.CONTRACT_GET_FAILURE)
+    if (hadFullNodeError) {
+      session.errors.push(ErrorMessage.FULL_NODE_ERROR)
     }
 
     return quotaStatus

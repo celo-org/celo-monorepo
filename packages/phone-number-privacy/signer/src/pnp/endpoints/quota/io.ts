@@ -10,6 +10,7 @@ import {
   PnpQuotaResponse,
   PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
+  PnpQuotaStatus,
   send,
   SignerEndpoint,
   WarningMessage,
@@ -58,9 +59,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   sendSuccess(
     status: number,
     response: Response<PnpQuotaResponseSuccess>,
-    performedQueryCount: number,
-    totalQuota: number,
-    blockNumber?: number,
+    quotaStatus: PnpQuotaStatus,
     warnings?: string[]
   ) {
     send(
@@ -68,9 +67,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       {
         success: true,
         version: getVersion(),
-        performedQueryCount,
-        totalQuota,
-        blockNumber,
+        ...quotaStatus,
         warnings,
       },
       status,
