@@ -473,7 +473,9 @@ describe('pnp', () => {
         const badRequest = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY, // TODO(Alec): what about DEK??
+          // TODO(2.0.0): Investigate whether we should be testing DEK vs. WALLET_KEY based authentication
+          // (https://github.com/celo-org/celo-monorepo/issues/9837)
+          AuthenticationMethod.WALLET_KEY,
           IDENTIFIER
         )
         // @ts-ignore Intentionally deleting required field

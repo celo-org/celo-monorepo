@@ -1,8 +1,8 @@
+import { AttestationsStatus } from '@celo/base'
 import { newKit, StableToken } from '@celo/contractkit'
 import {
   AuthenticationMethod,
   ErrorMessage,
-  isVerified,
   KEY_VERSION_HEADER,
   PhoneNumberPrivacyRequest,
   PnpQuotaResponseFailure,
@@ -14,7 +14,10 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { getLegacyPnpSignRequest } from '@celo/phone-number-privacy-common/lib/test/utils'
+import {
+  createMockAttestation,
+  getLegacyPnpSignRequest,
+} from '@celo/phone-number-privacy-common/lib/test/utils'
 import { BLINDED_PHONE_NUMBER } from '@celo/phone-number-privacy-common/src/test/values'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
@@ -45,6 +48,7 @@ const testBlockNumber = 1000000
 const mockBalanceOfCUSD = jest.fn<BigNumber, []>()
 const mockBalanceOfCEUR = jest.fn<BigNumber, []>()
 const mockBalanceOfCELO = jest.fn<BigNumber, []>()
+const mockGetVerifiedStatus = jest.fn<AttestationsStatus, []>()
 
 const mockContractKit = createMockContractKit(
   {
@@ -52,6 +56,7 @@ const mockContractKit = createMockContractKit(
     [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount),
     [ContractRetrieval.getStableToken]: jest.fn(),
     [ContractRetrieval.getGoldToken]: createMockToken(mockBalanceOfCELO),
+    [ContractRetrieval.getAttestations]: createMockAttestation(mockGetVerifiedStatus),
   },
   createMockWeb3(5, testBlockNumber)
 )
@@ -74,12 +79,6 @@ jest.mock('@celo/contractkit', () => ({
   ...jest.requireActual('@celo/contractkit'),
   newKit: jest.fn().mockImplementation(() => mockContractKit),
 }))
-
-jest.mock('@celo/phone-number-privacy-common', () => ({
-  ...jest.requireActual('@celo/phone-number-privacy-common'),
-  isVerified: jest.fn(),
-}))
-const mockIsVerified = isVerified as jest.Mock // TODO(Alec) we shouldn't need to mock out this whole thing
 
 describe('legacyPNP', () => {
   let keyProvider: KeyProvider
@@ -271,14 +270,14 @@ describe('legacyPNP', () => {
     account: string,
     performedQueryCount: number,
     transactionCount: number,
-    _isVerified: boolean,
+    isVerified: boolean,
     balanceCUSD: BigNumber,
     balanceCEUR: BigNumber,
     balanceCELO: BigNumber
   ) => {
     ;[
       mockContractKit.connection.getTransactionCount,
-      mockIsVerified,
+      mockGetVerifiedStatus,
       mockBalanceOfCUSD,
       mockBalanceOfCEUR,
       mockBalanceOfCELO,
@@ -291,7 +290,11 @@ describe('legacyPNP', () => {
     })
 
     mockContractKit.connection.getTransactionCount.mockReturnValue(transactionCount)
-    mockIsVerified.mockReturnValue(_isVerified) // TODO: we shouldn't need to mock out this whole top level function, just the on-chain components
+    mockGetVerifiedStatus.mockReturnValue(
+      isVerified
+        ? { isVerified, completed: 3, total: 3, numAttestationsRemaining: 0 }
+        : { isVerified, completed: 2, total: 3, numAttestationsRemaining: 1 }
+    )
     mockBalanceOfCUSD.mockReturnValue(balanceCUSD)
     mockBalanceOfCEUR.mockReturnValue(balanceCEUR)
     mockBalanceOfCELO.mockReturnValue(balanceCELO)

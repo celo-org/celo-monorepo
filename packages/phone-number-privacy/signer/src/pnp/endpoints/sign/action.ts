@@ -60,9 +60,13 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         // with the signature in the response.
         if (failingOpen) {
           session.logger.error(
-            'Error fetching PNP quota status in servicing a signing request: failing open.' // TODO(Alec): check this logging
+            'Error fetching PNP quota status in servicing a signing request: failing open.'
           )
-          Counters.requestsFailingOpen.inc() // TODO(Alec): add / ensure we have monitoring in the combiner for this too
+          Counters.requestsFailingOpen.inc()
+          // TODO(2.0.0) Ensure we have monitoring in the combiner for this too,
+          // since we don't have visibility into prometheus metrics for partner signers. The combiner monitoring
+          // should be based intelligently off of the warning messages returned by signers
+          // (https://github.com/celo-org/celo-monorepo/issues/9836)
         }
         const { sufficient } = await this.quota.checkAndUpdateQuotaStatus(quotaStatus, session, trx)
         if (!sufficient) {
@@ -76,7 +80,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           )
           return
         }
-        // quotaStatus.performedQueryCount++
       }
 
       const key: Key = {

@@ -232,7 +232,6 @@ describe('pnpService', () => {
     return reqWithHeaders.send(req)
   }
 
-  // TODO(Alec) de-dupe
   const getSignRequest = (_blindedMsgResult: threshold_bls.BlindedMessage): SignMessageRequest => {
     return {
       account: ACCOUNT_ADDRESS1,
@@ -290,7 +289,9 @@ describe('pnpService', () => {
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
         })
-        expect(res.get(KEY_VERSION_HEADER)).toEqual('1')
+        // TODO(2.0.0) determine how / whether to forward this to client
+        // (https://github.com/celo-org/celo-monorepo/issues/9801)
+        // expect(res.get(KEY_VERSION_HEADER)).toEqual('1')
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {

@@ -1,3 +1,4 @@
+import { AttestationsStatus } from '@celo/base'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, Signature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
@@ -13,9 +14,11 @@ import {
 import { signWithRawKey } from '../utils/authentication'
 import { genSessionID } from '../utils/logger'
 
-export function createMockAttestation(completed: number, total: number) {
+jest.fn<AttestationsStatus, []>()
+
+export function createMockAttestation(getVerifiedStatus: jest.Mock<AttestationsStatus, []>) {
   return {
-    getVerifiedStatus: jest.fn(() => ({ completed, total })),
+    getVerifiedStatus,
   }
 }
 
