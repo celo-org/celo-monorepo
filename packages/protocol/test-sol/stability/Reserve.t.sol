@@ -10,6 +10,7 @@ import "../utils/TokenHelpers.sol";
 import "../utils/DummyErc20.sol";
 
 import "contracts/stability/Reserve.sol";
+import "contracts/stability/Broker.sol";
 import "contracts/stability/test/MockSortedOracles.sol";
 import "contracts/stability/test/MockStableToken.sol";
 import "contracts/common/FixidityLib.sol";
@@ -40,6 +41,7 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   event CollateralAssetRemoved(address collateralAsset);
 
   address constant exchangeAddress = address(0xe7c45fa);
+  address constant brokerAddress = address(0x8ad159a);
   uint256 constant tobinTaxStalenessThreshold = 600;
   uint256 constant dailySpendingRatio = 1000000000000000000000000;
   uint256 constant sortedOraclesDenominator = 1000000000000000000000000;
@@ -50,6 +52,7 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   address rando;
 
   Reserve reserve;
+  // Broker broker;
   MockSortedOracles sortedOracles;
   DummyERC20 dummyToken1 = new DummyERC20();
   DummyERC20 dummyToken2 = new DummyERC20();
@@ -60,17 +63,16 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
     changePrank(deployer);
     reserve = new Reserve(true);
     sortedOracles = new MockSortedOracles();
+    // broker = new Broker(true, true);
 
     registry.setAddressFor("SortedOracles", address(sortedOracles));
     registry.setAddressFor("Exchange", exchangeAddress);
+    registry.setAddressFor("Broker", brokerAddress);
 
     bytes32[] memory initialAssetAllocationSymbols = new bytes32[](1);
     initialAssetAllocationSymbols[0] = bytes32("cGLD");
     uint256[] memory initialAssetAllocationWeights = new uint256[](1);
     initialAssetAllocationWeights[0] = FixidityLib.newFixed(1).unwrap();
-
-    reserve.addCollateralAsset(address(dummyToken1));
-    reserve.addCollateralAsset(address(dummyToken2));
 
     address[] memory collateralAssets = new address[](1);
     uint256[] memory collateralAssetDailySpendingRatios = new uint256[](1);
@@ -266,6 +268,7 @@ contract ReserveTest_initAndSetters is ReserveTest {
     vm.expectRevert("specified address is not a collateral asset");
     reserve.removeCollateralAsset(address(0x1234), 1);
   }
+
   function test_removeCollateralAsset_whenIndexOutOfRange_shouldRevert() public {
     vm.expectRevert("index into collateralAssets list not mapped to token");
     reserve.removeCollateralAsset(address(dummyToken1), 3);
@@ -604,7 +607,7 @@ contract ReserveTest_transfers is ReserveTest {
     reserve.removeSpender(_spender);
   }
 
-  function test_transferExchangeGold_asExchangeFromRegistry() public {
+  function test_transferExchangeGold_asExchangeSender() public {
     transferExchangeGoldSpecs(exchangeAddress);
   }
 
@@ -634,6 +637,34 @@ contract ReserveTest_transfers is ReserveTest {
     changePrank(rando);
     vm.expectRevert("Address not allowed to spend");
     reserve.transferExchangeGold(dest, 1000);
+  }
+
+  function test_transferExchangeCollateralAsset_asExchangeSender_shouldSpend() public {
+    reserve.addExchangeSpender(brokerAddress);
+    transferExchangeCollateralAssetSpecs(brokerAddress);
+  }
+
+  function test_transferExchangeCollateralAsset_notExchangeSender_shouldRevert() public {
+    address additionalExchange = address(0x6666);
+
+    changePrank(additionalExchange);
+    vm.expectRevert("Address not allowed to spend");
+    reserve.transferExchangeCollateralAsset(address(dummyToken1), address(0x1111), 1000);
+  }
+
+  function transferExchangeCollateralAssetSpecs(address caller) public {
+    changePrank(caller);
+    address payable dest = address(0x1111);
+    reserve.transferExchangeCollateralAsset(address(dummyToken1), dest, 1000);
+    assertEq(dummyToken1.balanceOf(dest), 1000);
+
+    changePrank(spender);
+    vm.expectRevert("Address not allowed to spend");
+    reserve.transferExchangeCollateralAsset(address(dummyToken1), dest, 1000);
+
+    changePrank(rando);
+    vm.expectRevert("Address not allowed to spend");
+    reserve.transferExchangeCollateralAsset(address(dummyToken1), dest, 1000);
   }
 
   function test_frozenGold() public {

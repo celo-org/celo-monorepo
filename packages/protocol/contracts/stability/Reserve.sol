@@ -142,13 +142,19 @@ contract Reserve is
     uint256[] calldata _collateralAssetDailySpendingRatios
   ) external initializer {
     _transferOwnership(msg.sender);
+
     setRegistry(registryAddress);
+
     setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
+    for (uint256 i = 0; i < _collateralAssets.length; i++) {
+      addCollateralAsset(_collateralAssets[i]);
+    }
     setDailySpendingRatio(_spendingRatioForCelo);
     setFrozenGold(_frozenGold, _frozenDays);
     setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
     setTobinTax(_tobinTax);
     setTobinTaxReserveRatio(_tobinTaxReserveRatio);
+
     setDailySpendingRatioForCollateralAssets(
       _collateralAssets,
       _collateralAssetDailySpendingRatios
@@ -552,12 +558,20 @@ contract Reserve is
     return _transferGold(to, value);
   }
 
+  /**
+   * @notice Transfer collateral asset to any address.
+   * @dev Transfers are not subject to a daily spending limit.
+   * @param collateralAsset The address of collateral asset being transferred.
+   * @param to The address that will receive the collateral asset.
+   * @param value The amount of collateral asset to transfer.
+   * @return Returns true if the transaction succeeds.
+   */
   function transferExchangeCollateralAsset(
     address collateralAsset,
     address payable to,
     uint256 value
   ) external isAllowedToSpendExchange(msg.sender) returns (bool) {
-    return true;
+    return _transferCollateralAsset(collateralAsset, to, value);
   }
 
   /**
@@ -674,7 +688,7 @@ contract Reserve is
    * @param collateralAsset The address of the token being added.
    * @return Returns true if the transaction succeeds.
    */
-  function addCollateralAsset(address collateralAsset) external onlyOwner returns (bool) {
+  function addCollateralAsset(address collateralAsset) public onlyOwner returns (bool) {
     require(
       !checkIsCollateralAsset(collateralAsset),
       "specified address is already added as a collateral asset"
