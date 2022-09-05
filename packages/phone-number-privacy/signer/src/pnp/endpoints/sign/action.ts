@@ -129,7 +129,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
       session.logger.error({ key }, 'Requested key version not supported')
       throw err
     }
-    // return computeBlindedSignature(blindedMessage, privateKey, session.logger)
     try {
       return computeBlindedSignature(blindedMessage, privateKey, session.logger)
     } catch {

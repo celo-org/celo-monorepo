@@ -14,10 +14,6 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import {
-  createMockAttestation,
-  getLegacyPnpSignRequest,
-} from '@celo/phone-number-privacy-common/lib/test/utils'
 import { BLINDED_PHONE_NUMBER } from '@celo/phone-number-privacy-common/src/test/values'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
@@ -37,6 +33,8 @@ const {
   createMockWeb3,
   getPnpQuotaRequest,
   getPnpRequestAuthorization,
+  createMockAttestation,
+  getLegacyPnpSignRequest,
 } = TestUtils.Utils
 const { IDENTIFIER, PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
 
@@ -119,7 +117,7 @@ describe('legacyPNP', () => {
   const zeroBalance = new BigNumber(0)
   const twentyCents = new BigNumber(200000000000000000)
 
-  type legacyPnpQuotaTestCase = {
+  type legacyPnpQuotaCalculationTestCase = {
     it: string
     account: string
     performedQueryCount: number
@@ -132,7 +130,7 @@ describe('legacyPNP', () => {
     expectedPerformedQueryCount: number
     expectedTotalQuota: number
   } // To be re-used against both the signature and quota endpoints
-  const quotaCalculationTestCases: legacyPnpQuotaTestCase[] = [
+  const quotaCalculationTestCases: legacyPnpQuotaCalculationTestCase[] = [
     {
       it: 'should calculate correct quota for verified account',
       account: ACCOUNT_ADDRESS1,
@@ -291,9 +289,8 @@ describe('legacyPNP', () => {
 
     mockContractKit.connection.getTransactionCount.mockReturnValue(transactionCount)
     mockGetVerifiedStatus.mockReturnValue(
-      isVerified
-        ? { isVerified, completed: 3, total: 3, numAttestationsRemaining: 0 }
-        : { isVerified, completed: 2, total: 3, numAttestationsRemaining: 1 }
+      // only the isVerified value below matters
+      { isVerified, completed: 1, total: 1, numAttestationsRemaining: 1 }
     )
     mockBalanceOfCUSD.mockReturnValue(balanceCUSD)
     mockBalanceOfCEUR.mockReturnValue(balanceCEUR)
@@ -318,7 +315,7 @@ describe('legacyPNP', () => {
 
   describe(`${SignerEndpoint.LEGACY_PNP_QUOTA}`, () => {
     describe('quota calculation logic', () => {
-      const runLegacyQuotaTestCase = async (testCase: legacyPnpQuotaTestCase) => {
+      const runLegacyQuotaTestCase = async (testCase: legacyPnpQuotaCalculationTestCase) => {
         await prepMocks(
           testCase.account,
           testCase.performedQueryCount,
@@ -498,7 +495,7 @@ describe('legacyPNP', () => {
 
   describe(`${SignerEndpoint.LEGACY_PNP_SIGN}`, () => {
     describe('quota calculation logic', () => {
-      const runLegacyPnpSignQuotaTestCase = async (testCase: legacyPnpQuotaTestCase) => {
+      const runLegacyPnpSignQuotaTestCase = async (testCase: legacyPnpQuotaCalculationTestCase) => {
         await prepMocks(
           testCase.account,
           testCase.performedQueryCount,

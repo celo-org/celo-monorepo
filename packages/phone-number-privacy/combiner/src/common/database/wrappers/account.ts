@@ -110,9 +110,9 @@ export async function setDidMatchmaking(
       }
       await trx.commit()
     })
-    .catch((err) => {
+    .catch(async (err) => {
       logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
       logger.error(err)
-      trx.rollback()
+      await trx.rollback()
     })
 }

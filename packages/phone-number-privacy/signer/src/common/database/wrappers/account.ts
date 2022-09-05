@@ -40,7 +40,6 @@ export async function getPerformedQueryCount(
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
     throw error
-    // return 0
   } finally {
     getPerformedQueryCountMeter()
   }
@@ -69,7 +68,6 @@ async function getAccountExists(
     Counters.databaseErrors.labels(Labels.read).inc()
     logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
     throw error
-    // return false
   } finally {
     getAccountExistsMeter()
   }
@@ -104,7 +102,6 @@ export async function incrementQueryCount(
     Counters.databaseErrors.labels(Labels.update).inc()
     logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
     throw error
-    // return false
   } finally {
     incrementQueryCountMeter()
   }

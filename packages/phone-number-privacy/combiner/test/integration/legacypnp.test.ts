@@ -12,7 +12,6 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { createMockAttestation } from '@celo/phone-number-privacy-common/lib/test/utils'
 import {
   initDatabase as initSignerDatabase,
   startSigner,
@@ -40,6 +39,7 @@ const {
   createMockToken,
   createMockWeb3,
   getPnpRequestAuthorization,
+  createMockAttestation,
 } = TestUtils.Utils
 const {
   PRIVATE_KEY1,
@@ -135,6 +135,11 @@ const signerConfig: SignerConfig = {
 
 const testBlockNumber = 1000000
 
+const userSeed = new Uint8Array(32)
+for (let i = 0; i < userSeed.length - 1; i++) {
+  userSeed[i] = i
+}
+
 const mockTokenBalance = jest.fn<BigNumber, []>()
 const mockGetVerifiedStatus = jest.fn<AttestationsStatus, []>()
 
@@ -197,11 +202,6 @@ describe('legacyPnpService', () => {
     signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
 
-    userSeed = new Uint8Array(32)
-    for (let i = 0; i < userSeed.length - 1; i++) {
-      userSeed[i] = i
-    } // TODO(2.0.0)(Alec) why are we doing this in a beforeEach hook instead of just once at the top?
-
     blindedMsgResult = threshold_bls.blind(message, userSeed)
   })
 
@@ -251,9 +251,8 @@ describe('legacyPnpService', () => {
 
     mockContractKit.connection.getTransactionCount.mockReturnValue(transactionCount)
     mockGetVerifiedStatus.mockReturnValue(
-      isVerified
-        ? { isVerified, completed: 3, total: 3, numAttestationsRemaining: 0 }
-        : { isVerified, completed: 2, total: 3, numAttestationsRemaining: 1 }
+      // only the isVerified value below matters
+      { isVerified, completed: 1, total: 1, numAttestationsRemaining: 1 }
     )
     mockTokenBalance.mockReturnValue(balanceToken)
   }

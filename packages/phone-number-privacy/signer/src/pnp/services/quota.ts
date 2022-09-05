@@ -138,7 +138,7 @@ export abstract class PnpQuotaService
       // We rollback storing the request (which would allow for replays) if we can't charge the user quota.
       // Note that the error is still caught here, which means we will provide the signature ('fail open')
       // despite not charging the user quota.
-      trx.rollback()
+      await trx.rollback()
       return false
     }
     return true

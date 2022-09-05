@@ -51,7 +51,6 @@ export async function storeRequest(
     Counters.databaseErrors.labels(Labels.update).inc()
     logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
     throw error
-    // return null
   } finally {
     storeRequestMeter()
   }
