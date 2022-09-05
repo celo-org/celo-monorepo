@@ -544,7 +544,7 @@ describe('pnp', () => {
       it('Should respond with 400 on invalid address', async () => {
         const badRequest = getPnpSignRequest(
           '0xnotanaddress',
-          '+1234567890',
+          BLINDED_PHONE_NUMBER,
           AuthenticationMethod.WALLET_KEY,
           IDENTIFIER
         )
