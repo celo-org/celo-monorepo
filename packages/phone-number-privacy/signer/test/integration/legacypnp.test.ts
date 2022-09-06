@@ -691,35 +691,6 @@ describe('legacyPNP', () => {
         })
       })
 
-      it('Should respond with 403 if performedQueryCount is greater than totalQuota', async () => {
-        const expectedRemainingQuota = expectedQuota - performedQueryCount
-        await db.transaction(async (trx) => {
-          for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
-          }
-        })
-
-        // It is possible to reach this state due to our fail-open logic
-
-        const req = getLegacyPnpSignRequest(
-          ACCOUNT_ADDRESS1,
-          BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
-        )
-        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
-        expect(res.status).toBe(403)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
-          success: false,
-          version: res.body.version,
-          performedQueryCount: expectedQuota + 1,
-          totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
-          error: WarningMessage.EXCEEDED_QUOTA,
-        })
-      })
-
       it('Should respond with 400 on missing request fields', async () => {
         const badRequest = getLegacyPnpSignRequest(
           ACCOUNT_ADDRESS1,
@@ -845,12 +816,72 @@ describe('legacyPNP', () => {
           IDENTIFIER
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res1 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
-        expect(res1.status).toBe(403)
-        expect(res1.body).toMatchObject<SignMessageResponseFailure>({
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(403)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
           success: false,
-          version: res1.body.version,
+          version: res.body.version,
           performedQueryCount: expectedQuota,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          error: WarningMessage.EXCEEDED_QUOTA,
+        })
+      })
+
+      it('Should respond with 403 if totalQuota and performedQueryCount are zero', async () => {
+        await prepMocks(ACCOUNT_ADDRESS1, 0, 0, false, zeroBalance, zeroBalance, zeroBalance)
+
+        const spy = jest // for convenience so we don't have to refactor or reset the db just for this test
+          .spyOn(
+            jest.requireActual('../../src/common/database/wrappers/account'),
+            'getPerformedQueryCount'
+          )
+          .mockResolvedValueOnce(0)
+
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(403)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          performedQueryCount: 0,
+          totalQuota: 0,
+          blockNumber: testBlockNumber,
+          error: WarningMessage.EXCEEDED_QUOTA,
+        })
+
+        spy.mockRestore()
+      })
+
+      it('Should respond with 403 if performedQueryCount is greater than totalQuota', async () => {
+        const expectedRemainingQuota = expectedQuota - performedQueryCount
+        await db.transaction(async (trx) => {
+          for (let i = 0; i <= expectedRemainingQuota; i++) {
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+          }
+        })
+
+        // It is possible to reach this state due to our fail-open logic
+
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(403)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          performedQueryCount: expectedQuota + 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
           error: WarningMessage.EXCEEDED_QUOTA,
@@ -873,7 +904,7 @@ describe('legacyPNP', () => {
           req,
           authorization,
           SignerEndpoint.LEGACY_PNP_SIGN,
-          '1',
+          undefined,
           appWithApiDisabled
         )
         expect(res.status).toBe(503)

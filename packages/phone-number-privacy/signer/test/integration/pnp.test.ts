@@ -40,6 +40,7 @@ const {
 const { PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
 
 const testBlockNumber = 1000000
+const zeroBalance = new BigNumber(0)
 
 const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
 const mockContractKit = createMockContractKit(
@@ -598,16 +599,46 @@ describe('pnp', () => {
           IDENTIFIER
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
-        expect(res1.status).toBe(403)
-        expect(res1.body).toMatchObject<SignMessageResponseFailure>({
+        const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res.status).toBe(403)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
           success: false,
-          version: res1.body.version,
+          version: res.body.version,
           performedQueryCount: expectedQuota,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
           error: WarningMessage.EXCEEDED_QUOTA,
         })
+      })
+
+      it('Should respond with 403 if totalQuota and performedQueryCount are zero', async () => {
+        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(zeroBalance)
+        const spy = jest // for convenience so we don't have to refactor or reset the db just for this test
+          .spyOn(
+            jest.requireActual('../../src/common/database/wrappers/account'),
+            'getPerformedQueryCount'
+          )
+          .mockResolvedValueOnce(0)
+
+        const req = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res.status).toBe(403)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          performedQueryCount: 0,
+          totalQuota: 0,
+          blockNumber: testBlockNumber,
+          error: WarningMessage.EXCEEDED_QUOTA,
+        })
+
+        spy.mockRestore()
       })
 
       it('Should respond with 403 if performedQueryCount is greater than totalQuota', async () => {
