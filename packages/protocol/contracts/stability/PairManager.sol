@@ -4,12 +4,14 @@ pragma experimental ABIEncoderV2;
 import { IPairManager } from "./interfaces/IPairManager.sol";
 import { IReserve } from "./interfaces/IReserve.sol";
 import { IMentoExchange } from "./interfaces/IMentoExchange.sol";
-
+import { ISortedOracles } from "./interfaces/ISortedOracles.sol";
+import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import { StableToken } from "./StableToken.sol";
 
 import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { Initializable } from "../common/Initializable.sol";
 import { FixidityLib } from "../common/FixidityLib.sol";
+import { UsingRegistry } from "../common/UsingRegistry.sol";
 
 // TODO: Remove when migrating to mento-core. Newer versions of OZ-contracts have this interface
 interface IERC20Metadata {
@@ -20,8 +22,9 @@ interface IERC20Metadata {
  * @title PairManager
  * @notice The pair manager allows the creation of virtual pairs that are tradeable via Mento.
  */
-contract PairManager is IPairManager, Initializable, Ownable {
+contract PairManager is IPairManager, Initializable, Ownable, UsingRegistry {
   using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
 
   /* ==================== State Variables ==================== */
 
@@ -68,6 +71,48 @@ contract PairManager is IPairManager, Initializable, Ownable {
   function getPair(bytes32 pairId) public view returns (Pair memory pair) {
     pair = pairs[pairId];
     require(pair.stableAsset != address(0), "A pair with the specified id does not exist");
+  }
+
+  /**
+   * @notice Calculates the new size of a given pair's buckets after a price update.
+   * @param pair The pair being updated.
+   * @return updatedStableBucket Size of the stable bucket after an update.
+   * @return updatedCollateralBucket Size of the collateral bucket after an update.
+   */
+  function getUpdatedBuckets(Pair calldata pair)
+    external
+    view
+    returns (uint256 updatedStableBucket, uint256 updatedCollateralBucket)
+  {
+    if (
+      shouldUpdateBuckets(
+        pair.stableAsset,
+        pair.bucketUpdateFrequency,
+        pair.minimumReports,
+        pair.lastBucketUpdate
+      )
+    ) {
+      uint256 updatedCollateralBucket = getUpdatedCollateralBucket(
+        pair.collateralAsset,
+        pair.collateralBucketFraction
+      );
+      (uint256 exchangeRateNumerator, uint256 exchangeRateDenominator) = getOracleExchangeRate(
+        address(pair.stableAsset)
+      );
+      uint256 updatedStableBucket = exchangeRateNumerator.mul(updatedCollateralBucket).div(
+        exchangeRateDenominator
+      );
+      uint256 maxStableBucketSize = broker.getStableBucketCap(pair.stableAsset);
+      // Check if the bucket is bigger that the cap
+      if (updatedStableBucket > maxStableBucketSize) {
+        // Resize down CA bucket
+        uint256 cappedUpdatedCollateralBucket = exchangeRateDenominator
+          .mul((maxStableBucketSize))
+          .div(exchangeRateNumerator);
+        return (cappedUpdatedCollateralBucket, maxStableBucketSize);
+      }
+      return (updatedCollateralBucket, updatedStableBucket);
+    }
   }
 
   /* ==================== Mutative Functions ==================== */
@@ -236,5 +281,61 @@ contract PairManager is IPairManager, Initializable, Ownable {
     // TODO: Stable bucket max fraction should not exceed available stable bucket fraction.
     // TODO: minSupplyForStableBucketCap gt 0 & is there an aggregated value that needs to be checked
 
+  }
+
+  /**
+   * @notice Checks if conditions have been met to update the buckets of a pair.
+   * @param stable The address of the mento stable of the pair.
+   * @param updateFrequency The update frequency of the pair.
+   * @param minimumReports The minimum number of reports required for the pair.
+   * @param lastBucketUpdate The timestamp of the last bucket update for the pair.
+   * @return Returns a bool indicating whether or not buckets for the pair should be updated.
+   */
+  function shouldUpdateBuckets(
+    address stable,
+    uint256 updateFrequency,
+    uint256 minimumReports,
+    uint256 lastBucketUpdate
+  ) private view returns (bool) {
+    ISortedOracles sortedOracles = ISortedOracles(
+      registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
+    );
+
+    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(stable);
+    bool timePassed = now >= lastBucketUpdate.add(updateFrequency);
+    bool enoughReports = sortedOracles.numRates(stable) >= minimumReports;
+    bool medianReportRecent = sortedOracles.medianTimestamp(stable) > now.sub(updateFrequency);
+
+    return timePassed && enoughReports && medianReportRecent && !isReportExpired;
+  }
+
+  /**
+   * @notice Returns the size of the collateral bucket to be set during an update.
+   * @param collateralAsset The address of the collateral asset.
+   * @param collateralFraction The fraction of the reserve collateral that is allocated to the pair when updating buckets.
+   * @return Returns the new size of the collateral bucket.
+   */
+  function getUpdatedCollateralBucket(
+    address collateralAsset,
+    FixidityLib.Fraction memory collateralFraction
+  ) private view returns (uint256) {
+    uint256 reserveCollateralBalance = getReserve().getReserveAddressesCollateralAssetBalance(
+      collateralAsset
+    );
+    return collateralFraction.multiply(FixidityLib.newFixed(reserveCollateralBalance)).fromFixed();
+  }
+
+  /**
+   * @notice Retrieves the oracle exchange rate for a given stable asset.
+   * @param stable The address of the stable to retrieve the exchange rate for.
+   * @return Returns the exchange rate and the rate denominator.
+   */
+  function getOracleExchangeRate(address stable) private view returns (uint256, uint256) {
+    uint256 medianRate;
+    uint256 numRates;
+    (medianRate, numRates) = ISortedOracles(registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID))
+      .medianRate(stable);
+    require(numRates > 0, "exchange rate denominator must be greater than 0");
+    return (medianRate, numRates);
   }
 }

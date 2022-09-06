@@ -63,4 +63,7 @@ interface IBroker {
     external
     view
     returns (address tokenOut, uint256 amountOut);
+
+  // here temporarily because getStableBucketCap hasn't been updated
+  function getStableBucketCap(address stableAsset) public view returns (uint256);
 }
