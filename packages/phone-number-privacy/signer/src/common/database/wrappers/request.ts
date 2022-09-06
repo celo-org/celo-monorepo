@@ -12,21 +12,29 @@ export async function getRequestExists(
   db: Knex,
   request: SignMessageRequest,
   logger: Logger,
-  trx: Knex.Transaction
+  trx?: Knex.Transaction
 ): Promise<boolean> {
   logger.debug({ request }, 'Checking if request exists')
   const getRequestExistsMeter = Histograms.dbOpsInstrumentation
     .labels('getRequestExists')
     .startTimer()
   try {
-    const existingRequest = await requests(db)
-      .transacting(trx)
-      .where({
-        [REQUESTS_COLUMNS.address]: request.account,
-        [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
-      })
-      .first()
-      .timeout(DB_TIMEOUT)
+    const existingRequest = trx
+      ? await requests(db)
+          .transacting(trx)
+          .where({
+            [REQUESTS_COLUMNS.address]: request.account,
+            [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
+          })
+          .first()
+          .timeout(DB_TIMEOUT)
+      : await requests(db)
+          .where({
+            [REQUESTS_COLUMNS.address]: request.account,
+            [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
+          })
+          .first()
+          .timeout(DB_TIMEOUT)
     return !!existingRequest
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()

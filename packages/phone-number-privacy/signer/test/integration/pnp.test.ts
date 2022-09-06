@@ -19,7 +19,11 @@ import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
-import { incrementQueryCount } from '../../src/common/database/wrappers/account'
+import {
+  getPerformedQueryCount,
+  incrementQueryCount,
+} from '../../src/common/database/wrappers/account'
+import { getRequestExists } from '../../src/common/database/wrappers/request'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
@@ -671,6 +675,10 @@ describe('pnp', () => {
               await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
             }
           })
+          // sanity check
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(expectedQuota)
 
           const spy = jest
             .spyOn(
@@ -703,6 +711,12 @@ describe('pnp', () => {
           })
 
           spy.mockRestore()
+
+          // check DB state: performedQueryCount was still incremented and request was stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(expectedQuota + 1)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(true)
         })
 
         it('Should return 200 w/ warning on blockchain totalQuota query failure', async () => {
@@ -713,6 +727,10 @@ describe('pnp', () => {
               await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
             }
           })
+          // sanity check
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(expectedQuota)
 
           mockOdisPaymentsTotalPaidCUSD.mockImplementation(() => {
             throw new Error('dummy error')
@@ -737,6 +755,12 @@ describe('pnp', () => {
             blockNumber: testBlockNumber,
             warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA, ErrorMessage.FULL_NODE_ERROR],
           })
+
+          // check DB state: performedQueryCount was incremented and request was stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(expectedQuota + 1)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(true)
         })
 
         it('Should return 200 w/ warning on failure to increment query count', async () => {
@@ -771,6 +795,12 @@ describe('pnp', () => {
           })
 
           spy.mockRestore()
+
+          // check DB state: performedQueryCount was not incremented and request was not stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(performedQueryCount)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
         })
 
         it('Should return 200 w/ warning on failure to store request', async () => {
@@ -799,6 +829,12 @@ describe('pnp', () => {
           })
 
           spy.mockRestore()
+
+          // check DB state: performedQueryCount was incremented and request was not stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(performedQueryCount + 1)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
         })
 
         it('Should return 500 on bls signing error', async () => {
@@ -829,6 +865,12 @@ describe('pnp', () => {
           })
 
           spy.mockRestore()
+
+          // check DB state: performedQueryCount was not incremented and request was not stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(performedQueryCount)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
         })
       })
     })
