@@ -474,10 +474,7 @@ describe('domain', () => {
     it('Should respond with 200 on repeated valid requests with nonce updated', async () => {
       const [req, thresholdPoprfClient] = await signatureRequest()
 
-      const res1 = await request(app)
-        .post(SignerEndpoint.DOMAIN_SIGN)
-        .set(KEY_VERSION_HEADER, '1')
-        .send(req)
+      const res1 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
 
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
@@ -503,10 +500,7 @@ describe('domain', () => {
       req.options.signature = defined(
         await wallet.signTypedData(walletAddress, domainRestrictedSignatureRequestEIP712(req))
       )
-      const res2 = await request(app)
-        .post(SignerEndpoint.DOMAIN_SIGN)
-        .set(KEY_VERSION_HEADER, '1')
-        .send(req)
+      const res2 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
       expect(res2.status).toBe(200)
       expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: true,
@@ -662,10 +656,7 @@ describe('domain', () => {
     it('Should respond 401 on invalid nonce', async () => {
       // Request must be sent first since nonce check is >= 0
       const [req1, _] = await signatureRequest()
-      const res1 = await request(app)
-        .post(SignerEndpoint.DOMAIN_SIGN)
-        .set(KEY_VERSION_HEADER, '1')
-        .send(req1)
+      const res1 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req1)
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: true,
@@ -678,10 +669,7 @@ describe('domain', () => {
           now: res1.body.status.now,
         },
       })
-      const res2 = await request(app)
-        .post(SignerEndpoint.DOMAIN_SIGN)
-        .set(KEY_VERSION_HEADER, '1')
-        .send(req1)
+      const res2 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req1)
       expect(res2.status).toBe(401)
 
       expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({

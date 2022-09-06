@@ -98,10 +98,10 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           session
         )
         this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
-      } catch (error) {
+      } catch (err) {
         await trx.rollback()
         quotaStatus.performedQueryCount--
-        if (error === ErrorMessage.SIGNATURE_COMPUTATION_FAILURE) {
+        if (err === ErrorMessage.SIGNATURE_COMPUTATION_FAILURE) {
           this.io.sendFailure(
             ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
             500,
@@ -111,7 +111,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             quotaStatus.blockNumber
           )
         } else {
-          throw error
+          throw err
         }
       }
     })
@@ -126,14 +126,9 @@ export class PnpSignAction implements Action<SignMessageRequest> {
     try {
       privateKey = await this.keyProvider.getPrivateKeyOrFetchFromStore(key)
     } catch (err) {
-      session.logger.error({ key }, 'Requested key version not supported')
+      session.logger.error({ err, key }, 'Requested key version not supported')
       throw err
     }
-    try {
-      return computeBlindedSignature(blindedMessage, privateKey, session.logger)
-    } catch {
-      // specific error already logged
-      throw ErrorMessage.SIGNATURE_COMPUTATION_FAILURE
-    }
+    return computeBlindedSignature(blindedMessage, privateKey, session.logger)
   }
 }

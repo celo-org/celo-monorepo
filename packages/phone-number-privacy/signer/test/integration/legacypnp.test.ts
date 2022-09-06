@@ -14,7 +14,6 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { BLINDED_PHONE_NUMBER } from '@celo/phone-number-privacy-common/src/test/values'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
@@ -36,7 +35,13 @@ const {
   createMockAttestation,
   getLegacyPnpSignRequest,
 } = TestUtils.Utils
-const { IDENTIFIER, PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
+const {
+  IDENTIFIER,
+  PRIVATE_KEY1,
+  ACCOUNT_ADDRESS1,
+  mockAccount,
+  BLINDED_PHONE_NUMBER,
+} = TestUtils.Values
 
 const expectedSignature =
   'MAAAAAAAAAAEFHu3gWowoNJvvWkINGZR/1no37LPBFYRIHu3h5xYowXo1tlIlrL9CbN0cNqcKIAAAAAA'
@@ -550,7 +555,7 @@ describe('legacyPNP', () => {
     })
 
     describe('endpoint functionality', () => {
-      // Use values from 'unverified account with no transactions' logic test case
+      // Use values from 'unverified account with balance but no transactions' logic test case
       const performedQueryCount = 1
       const expectedQuota = 10
 

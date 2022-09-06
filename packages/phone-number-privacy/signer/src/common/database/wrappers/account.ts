@@ -36,10 +36,10 @@ export async function getPerformedQueryCount(
           .first()
           .timeout(DB_TIMEOUT)
     return queryCounts === undefined ? 0 : queryCounts[ACCOUNTS_COLUMNS.numLookups]
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
+    throw err
   } finally {
     getPerformedQueryCountMeter()
   }
@@ -64,10 +64,10 @@ async function getAccountExists(
           .timeout(DB_TIMEOUT)
       : await accounts(db).where(ACCOUNTS_COLUMNS.address, account).first().timeout(DB_TIMEOUT)
     return !!accountRecord
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
+    throw err
   } finally {
     getAccountExistsMeter()
   }
@@ -98,10 +98,10 @@ export async function incrementQueryCount(
       newAccount[ACCOUNTS_COLUMNS.numLookups] = 1
       await insertRecord(db, newAccount, logger, trx)
     }
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw err
   } finally {
     incrementQueryCountMeter()
   }
@@ -115,10 +115,9 @@ async function insertRecord(
 ): Promise<void> {
   try {
     await accounts(db).transacting(trx).insert(data).timeout(DB_TIMEOUT)
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    throw error
-    // return false
+    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw err
   }
 }

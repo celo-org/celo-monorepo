@@ -296,7 +296,7 @@ describe('legacyPnpService', () => {
 
       it('Should respond with 200 on valid request with key version header', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app, '2')
+        const res = await sendPnpSignRequest(req, authorization, app, '2') // test a value other than '1'
 
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<SignMessageResponseSuccess>({
