@@ -4,7 +4,7 @@ pragma solidity ^0.5.13;
 /*
  * @title ExchangeManager interface
  * @notice The IExchangeManager interface is the interface that the Broker uses
- * to communicate with different listing manager implementations like the BiPoolManager
+ * to communicate with different listing manager implementations like the TwoAssetPoolManager
  */
 interface IExchangeManager {
   /**
