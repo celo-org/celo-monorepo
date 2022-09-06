@@ -8,7 +8,8 @@ pragma solidity ^0.5.13;
 interface IBroker {
   /**
    * @notice Emitted when a swap occurs
-   * @param pairId The id of the pair where the swap occured
+   * @param exchangeManager The exchange manager used
+   * @param exchangeId The id of the exchange used
    * @param trader The user that initiated the swap
    * @param tokenIn The address of the token that was sold
    * @param tokenOut The address of the token that was bought
@@ -17,7 +18,7 @@ interface IBroker {
    */
   event Swap(
     address exchangeManager,
-    bytes32 indexed pairId,
+    bytes32 indexed exchangeId,
     address indexed trader,
     address indexed tokenIn,
     address tokenOut,
@@ -28,7 +29,7 @@ interface IBroker {
   /**
    * @notice Execute a token swap with fixed amountIn
    * @param exchangeManager the address of the exchange manager for the pair
-   * @param pairId The id of the pair to be swapped
+   * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
@@ -37,7 +38,7 @@ interface IBroker {
    */
   function swapIn(
     address exchangeManager,
-    bytes32 pairId,
+    bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
     uint256 amountIn,
@@ -47,7 +48,7 @@ interface IBroker {
   /**
    * @notice Execute a token swap with fixed amountOut
    * @param exchangeManager the address of the exchange manager for the pair
-   * @param pairId The id of the pair to be swapped
+   * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountOut The amount of tokenOut to be bought
@@ -56,7 +57,7 @@ interface IBroker {
    */
   function swapOut(
     address exchangeManager,
-    bytes32 pairId,
+    bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
     uint256 amountOut,
@@ -66,7 +67,7 @@ interface IBroker {
   /**
    * @notice Quote a token swap with fixed amountIn
    * @param exchangeManager the address of the exchange manager for the pair
-   * @param pairId The id of the pair to be swapped
+   * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
@@ -74,7 +75,7 @@ interface IBroker {
    */
   function quoteIn(
     address exchangeManager,
-    bytes32 pairId,
+    bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
     uint256 amountIn
@@ -83,7 +84,7 @@ interface IBroker {
   /**
    * @notice Quote a token swap with fixed amountOut
    * @param exchangeManager the address of the exchange manager for the pair
-   * @param pairId The id of the pair to be swapped
+   * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountOut The amount of tokenOut to be bought
@@ -91,7 +92,7 @@ interface IBroker {
    */
   function quoteOut(
     address exchangeManager,
-    bytes32 pairId,
+    bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
     uint256 amountOut

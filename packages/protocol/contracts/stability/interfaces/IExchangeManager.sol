@@ -9,7 +9,7 @@ pragma solidity ^0.5.13;
 interface IExchangeManager {
   /**
    * @notice Execute a token swap with fixed amountIn
-   * @param pairId The id of the pair to be swapped
+   * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
@@ -17,7 +17,7 @@ interface IExchangeManager {
    * @return amountOut The amount of tokenOut to be bought
    */
   function swapIn(
-    bytes32 pairId,
+    bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
     uint256 amountIn,
@@ -26,15 +26,14 @@ interface IExchangeManager {
 
   /**
    * @notice Execute a token swap with fixed amountOut
-   * @param pairId The id of the pair to be swapped
+   * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountOut The amount of tokenOut to be bought
    * @return amountIn The amount of tokenIn to be sold
    */
   function swapOut(
-    address listingManager,
-    bytes32 pairId,
+    bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
     uint256 amountOut,
@@ -43,25 +42,25 @@ interface IExchangeManager {
 
   /**
    * @notice Quote a token swap with fixed amountIn
-   * @param pairId The id of the pair to be swapped
+   * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
    * @return amountOut The amount of tokenOut to be bought
    */
-  function quoteIn(bytes32 pairId, address tokenIn, address tokenOut, uint256 amountIn)
+  function quoteIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
     external
     returns (uint256 amountOut);
 
   /**
    * @notice Quote a token swap with fixed amountOut
-   * @param pairId The id of the pair to be swapped
+   * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountOut The amount of tokenOut to be bought
    * @return amountIn The amount of tokenIn to be sold
    */
-  function quoteOut(bytes32 pairId, address tokenIn, address tokenOut, uint256 amountOut)
+  function quoteOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
     external
     returns (uint256 amountIn);
 }
