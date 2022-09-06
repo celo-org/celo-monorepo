@@ -170,7 +170,7 @@ describe('pnp', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
 
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
             success: true,
             version: expectedVersion,
             performedQueryCount: 0,
@@ -210,7 +210,7 @@ describe('pnp', () => {
 
         const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res1.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: res1.body.version,
           performedQueryCount: 0,
@@ -220,7 +220,7 @@ describe('pnp', () => {
         })
         const res2 = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
         expect(res2.status).toBe(200)
-        expect(res2.body).toMatchObject<PnpQuotaResponseSuccess>(res1.body)
+        expect(res2.body).toStrictEqual<PnpQuotaResponseSuccess>(res1.body)
       })
 
       it('Should respond with 200 on valid request when authenticated with DEK', async () => {
@@ -246,7 +246,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: expectedVersion,
           performedQueryCount: 0,
@@ -267,7 +267,7 @@ describe('pnp', () => {
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: res.body.version,
           performedQueryCount: expectedQuota + 1,
@@ -285,7 +285,7 @@ describe('pnp', () => {
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_QUOTA)
 
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
@@ -317,7 +317,7 @@ describe('pnp', () => {
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_QUOTA)
 
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -339,7 +339,7 @@ describe('pnp', () => {
           appWithApiDisabled
         )
         expect(res.status).toBe(503)
-        expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
@@ -387,7 +387,7 @@ describe('pnp', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
 
           expect(res.status).toBe(500)
-          expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+          expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
             success: false,
             version: expectedVersion,
             error: ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
@@ -405,7 +405,7 @@ describe('pnp', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
 
           expect(res.status).toBe(500)
-          expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+          expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
             success: false,
             version: expectedVersion,
             error: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
@@ -435,7 +435,7 @@ describe('pnp', () => {
 
           if (shouldSucceed) {
             expect(res.status).toBe(200)
-            expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
               success: true,
               version: expectedVersion,
               signature: expectedSignature,
@@ -446,7 +446,7 @@ describe('pnp', () => {
             })
           } else {
             expect(res.status).toBe(403)
-            expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            expect(res.body).toStrictEqual<SignMessageResponseFailure>({
               success: false,
               version: expectedVersion,
               performedQueryCount: 0,
@@ -527,7 +527,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, '3') // since default is '1' or '2'
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: res.body.version,
           signature: expectedSignature,
@@ -549,7 +549,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: res1.body.version,
           signature: expectedSignature,
@@ -561,7 +561,7 @@ describe('pnp', () => {
         const res2 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
         expect(res2.status).toBe(200)
         res1.body.warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
-        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(res1.body)
+        expect(res2.body).toStrictEqual<SignMessageResponseSuccess>(res1.body)
       })
 
       it('Should respond with 200 on extra request fields', async () => {
@@ -576,7 +576,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: res.body.version,
           signature: expectedSignature,
@@ -601,7 +601,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.INVALID_INPUT,
@@ -618,7 +618,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN, 'a')
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
@@ -635,7 +635,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.INVALID_INPUT,
@@ -652,7 +652,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.INVALID_INPUT,
@@ -669,7 +669,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.INVALID_INPUT,
@@ -705,7 +705,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -729,7 +729,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(403)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           performedQueryCount: expectedQuota,
@@ -757,7 +757,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(403)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           performedQueryCount: 0,
@@ -788,7 +788,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(403)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           performedQueryCount: expectedQuota + 1,
@@ -818,7 +818,7 @@ describe('pnp', () => {
           appWithApiDisabled
         )
         expect(res.status).toBe(503)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.API_UNAVAILABLE,
@@ -856,7 +856,7 @@ describe('pnp', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
           expect(res.status).toBe(500)
-          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
             performedQueryCount: -1,
@@ -896,7 +896,7 @@ describe('pnp', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: res.body.version,
             signature: expectedSignature,
@@ -967,7 +967,7 @@ describe('pnp', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: res.body.version,
             signature: expectedSignature,
@@ -1004,7 +1004,7 @@ describe('pnp', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: res.body.version,
             signature: expectedSignature,
@@ -1040,7 +1040,7 @@ describe('pnp', () => {
           const authorization = getPnpRequestAuthorization(req, differentPk)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: res.body.version,
             signature: expectedSignature,
@@ -1068,7 +1068,7 @@ describe('pnp', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
           expect(res.status).toBe(500)
-          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
             performedQueryCount: performedQueryCount,

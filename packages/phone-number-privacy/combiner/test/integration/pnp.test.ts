@@ -279,12 +279,12 @@ describe('pnpService', () => {
         }
 
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
+        expect(res1.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
 
         const res2 = await sendPnpSignRequest(req, authorization, app)
         expect(res2.status).toBe(200)
         // Do not expect performedQueryCount to increase since this is a duplicate request
-        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
+        expect(res2.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
       })
 
       it('Should respond with 200 on valid request', async () => {
@@ -292,7 +292,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
@@ -313,7 +313,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app, '1')
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
@@ -339,12 +339,12 @@ describe('pnpService', () => {
         }
 
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
+        expect(res1.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
 
         const res2 = await sendPnpSignRequest(req, authorization, app)
         expect(res2.status).toBe(200)
         // Do not expect performedQueryCount to increase since this is a duplicate request
-        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
+        expect(res2.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
       })
 
       it('Should increment performedQueryCount on request from the same account with a new message', async () => {
@@ -360,7 +360,7 @@ describe('pnpService', () => {
         }
 
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
+        expect(res1.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
 
         // Second request for the same account but with new message
         const message2 = Buffer.from('second test message', 'utf8')
@@ -374,7 +374,7 @@ describe('pnpService', () => {
           'PWvuSYIA249x1dx+qzgl6PKSkoulXXE/P4WHJvGmtw77pCRilEWTn3xSp+6JS9+A'
         const res2 = await sendPnpSignRequest(req2, authorization2, app)
         expect(res2.status).toBe(200)
-        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
+        expect(res2.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
       })
 
       it('Should respond with 200 on extra request fields', async () => {
@@ -384,7 +384,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
@@ -400,7 +400,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
@@ -415,7 +415,7 @@ describe('pnpService', () => {
         const res1 = await sendPnpSignRequest(req, authorization1, app)
 
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
@@ -456,7 +456,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
@@ -467,7 +467,7 @@ describe('pnpService', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app, 'a')
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
@@ -495,7 +495,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -508,7 +508,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(403)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.EXCEEDED_QUOTA,
@@ -526,7 +526,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, appWithApiDisabled)
 
         expect(res.status).toBe(503)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
@@ -546,7 +546,7 @@ describe('pnpService', () => {
           const res = await sendPnpSignRequest(req, authorization, app)
 
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: expectedVersion,
             signature: expectedSig,
@@ -590,7 +590,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
@@ -634,7 +634,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(500)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
@@ -699,7 +699,7 @@ describe('pnpService', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await getCombinerQuotaResponse(req, authorization)
 
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: expectedVersion,
           performedQueryCount: expectedQueryCount,
@@ -716,7 +716,7 @@ describe('pnpService', () => {
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await getCombinerQuotaResponse(req, authorization)
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: 0,
@@ -732,7 +732,7 @@ describe('pnpService', () => {
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res1 = await getCombinerQuotaResponse(req, authorization)
       expect(res1.status).toBe(200)
-      expect(res1.body).toMatchObject<PnpQuotaResponseSuccess>({
+      expect(res1.body).toStrictEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: 0,
@@ -741,7 +741,7 @@ describe('pnpService', () => {
       })
       const res2 = await getCombinerQuotaResponse(req, authorization)
       expect(res2.status).toBe(200)
-      expect(res2.body).toMatchObject<PnpQuotaResponseSuccess>(res1.body)
+      expect(res2.body).toStrictEqual<PnpQuotaResponseSuccess>(res1.body)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
@@ -753,7 +753,7 @@ describe('pnpService', () => {
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: 0,
@@ -771,7 +771,7 @@ describe('pnpService', () => {
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: 0,
@@ -788,7 +788,7 @@ describe('pnpService', () => {
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await getCombinerQuotaResponse(req, authorization)
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
         success: true,
         version: expectedVersion,
         performedQueryCount: 0,
@@ -810,7 +810,7 @@ describe('pnpService', () => {
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await getCombinerQuotaResponse(req, authorization)
       expect(res.status).toBe(500)
-      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: ErrorMessage.THRESHOLD_PNP_QUOTA_STATUS_FAILURE,
@@ -825,7 +825,7 @@ describe('pnpService', () => {
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
@@ -872,7 +872,7 @@ describe('pnpService', () => {
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(401)
-      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -892,7 +892,7 @@ describe('pnpService', () => {
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(502)
-      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: ErrorMessage.THRESHOLD_PNP_QUOTA_STATUS_FAILURE,
@@ -914,7 +914,7 @@ describe('pnpService', () => {
         .set('Authorization', authorization)
         .send(req)
       expect(res.status).toBe(503)
-      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.API_UNAVAILABLE,
