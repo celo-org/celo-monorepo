@@ -397,6 +397,7 @@ describe('pnp', () => {
           blockNumber: testBlockNumber,
           warnings: [],
         })
+        expect(res.get(KEY_VERSION_HEADER)).toBeUndefined()
       })
 
       it('Should respond with 200 on valid request with key version header', async () => {
