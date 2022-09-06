@@ -6,11 +6,18 @@ datasources:
   datasources.yaml:
     apiVersion: 1
     datasources:
+    # Local prometheus instance
     - access: proxy
       isDefault: true
       name: Prometheus
       type: prometheus
       url: http://prometheus-server.prometheus:9090
+    # Adding a default loki as datasource because Loki is installed on some cluster (i.e: forno) for local storage of 
+    # high-volume logs. If Loki server is not available it won't cause problems on grafana (requests to that DS won't work)
+    - access: proxy
+      name: Loki
+      type: loki
+      url: http://local-loki:3100
 deploymentStrategy:
   type: Recreate
 grafana.ini:

@@ -1,4 +1,5 @@
 imagePullPolicy: IfNotPresent
+ingressClassName: nginx
 blockscout:
   indexer:
     terminationGracePeriodSeconds: 60
@@ -184,6 +185,7 @@ blockscout:
     drop: "false"
   jsonrpc_http_url: http://tx-nodes-private:8545
   jsonrpc_ws_url: ws://tx-nodes-private:8545
+  jsonrpc_public_http: ""
   metadata_crawler:
     schedule: "*/30 * * * *"
     image:
