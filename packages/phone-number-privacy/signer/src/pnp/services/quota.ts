@@ -65,7 +65,7 @@ export abstract class PnpQuotaService
     )
 
     const quotaStatus: PnpQuotaStatus = {
-      totalQuota: -1,
+      totalQuota: -1, // TODO(2.0.0) consider making this undefined (https://github.com/celo-org/celo-monorepo/issues/9804)
       performedQueryCount: -1,
       blockNumber: undefined,
     }
@@ -73,8 +73,8 @@ export abstract class PnpQuotaService
       quotaStatus.performedQueryCount = performedQueryCountResult.value
     } else {
       session.logger.error(
-        { error: performedQueryCountResult.reason },
-        'failed to get performedQueryCount from db'
+        { err: performedQueryCountResult.reason },
+        ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
       )
       session.errors.push(
         ErrorMessage.DATABASE_GET_FAILURE,
@@ -86,8 +86,8 @@ export abstract class PnpQuotaService
       quotaStatus.totalQuota = totalQuotaResult.value
     } else {
       session.logger.error(
-        { error: totalQuotaResult.reason },
-        'failed to get totalQuota from full node'
+        { err: totalQuotaResult.reason },
+        ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA
       )
       hadFullNodeError = true
       session.errors.push(ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA)
@@ -96,10 +96,11 @@ export abstract class PnpQuotaService
       quotaStatus.blockNumber = blockNumberResult.value
     } else {
       session.logger.error(
-        { error: blockNumberResult.reason },
-        'failed to get blockNumber from full node'
+        { err: blockNumberResult.reason },
+        ErrorMessage.FAILURE_TO_GET_BLOCK_NUMBER
       )
       hadFullNodeError = true
+      session.errors.push(ErrorMessage.FAILURE_TO_GET_BLOCK_NUMBER)
     }
     if (hadFullNodeError) {
       session.errors.push(ErrorMessage.FULL_NODE_ERROR)
