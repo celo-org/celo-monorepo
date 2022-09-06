@@ -20,4 +20,9 @@ interface IReserve {
   function removeSpender(address) external;
   function isStableAsset(address) external view returns (bool);
   function isCollateralAsset(address) external view returns (bool);
+  function transferExchangeCollateralAsset(
+    address collateralAsset,
+    address payable to,
+    uint256 value
+  ) external returns (bool);
 }
