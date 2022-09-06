@@ -603,6 +603,34 @@ describe('pnp', () => {
         })
       })
 
+      it('Should respond with 403 if performedQueryCount is greater than totalQuota', async () => {
+        await db.transaction(async (trx) => {
+          for (let i = 0; i <= expectedQuota; i++) {
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+          }
+        })
+
+        // It is possible to reach this state due to our fail-open logic
+
+        const req = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+        expect(res.status).toBe(403)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          performedQueryCount: expectedQuota + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          error: WarningMessage.EXCEEDED_QUOTA,
+        })
+      })
+
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled = { ...config }
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
