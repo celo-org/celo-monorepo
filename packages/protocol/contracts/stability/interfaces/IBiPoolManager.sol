@@ -10,7 +10,7 @@ import { FixidityLib } from "../../common/FixidityLib.sol";
  * @notice The two asset pool manager is responsible for managing the state of all Mento virtual pools.
  */
 interface IBiPoolManager {
-  struct Pool {
+  struct Pair {
     address asset0;
     address asset1;
     uint256 bucket0;
@@ -26,26 +26,26 @@ interface IBiPoolManager {
   }
 
   /**
-   * @notice Emitted when a new virtual pool has been created.
-   * @param poolId The id of the newly created pool.
+   * @notice Emitted when a new virtual pair has been created.
+   * @param pairId The id of the newly created pair.
    * @param asset0 The address of asset0
    * @param asset1 The address of asset1
    * @param pricingModule the address of the pricingModule
    */
-  event PoolCreated(
-    address indexed poolId,
+  event PairCreated(
+    address indexed pairId,
     address indexed asset0,
     address indexed asset1,
     address pricingModule
   );
 
   /**
-   * @notice Emitted when a virtual pool has been destroyed.
-   * @param poolId The id of the newly created pool.
+   * @notice Emitted when a virtual pair has been destroyed.
+   * @param pairId The id of the newly created pair.
    * @param asset0 The address of asset0
    * @param asset1 The address of asset1
    */
-  event PoolDestroyed(address indexed poolId, address indexed asset0, address indexed asset1);
+  event PairDestroyed(address indexed pairId, address indexed asset0, address indexed asset1);
 
   /**
    * @notice Emitted when the broker address is updated.
@@ -60,17 +60,17 @@ interface IBiPoolManager {
   event ReserveUpdated(address indexed newReserve);
 
   /**
-   * @notice Emitted when the buckets for a specified pool are updated.
-   * @param poolId The id of the pool.
+   * @notice Emitted when the buckets for a specified pair are updated.
+   * @param pairId The id of the pair.
    * @param bucket0 The new bucket0 size
    * @param bucket1 The new bucket1 size
    */
-  event BucketsUpdated(bytes32 poolId, uint256 bucket0, uint256 bucket1);
+  event BucketsUpdated(bytes32 pairId, uint256 bucket0, uint256 bucket1);
 
   /**
-   * @notice Retrieves the pool with the specified poolId.
-   * @param poolId The id of the pool to be retrieved.
-   * @return pool The pool information.
+   * @notice Retrieves the pair with the specified pairId.
+   * @param pairId The id of the pair to be retrieved.
+   * @return pair The pair information.
    */
-  function getPool(bytes32 poolId) external view returns (Pool memory pool);
+  function getPair(bytes32 pairId) external view returns (Pair memory pair);
 }
