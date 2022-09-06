@@ -28,10 +28,10 @@ export async function getRequestExists(
       .first()
       .timeout(DB_TIMEOUT)
     return !!existingRequest
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
+    throw err
   } finally {
     getRequestExistsMeter()
   }
@@ -47,10 +47,10 @@ export async function storeRequest(
   logger.debug({ request }, 'Storing salt request')
   try {
     await requests(db).transacting(trx).insert(new Request(request)).timeout(DB_TIMEOUT)
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw err
   } finally {
     storeRequestMeter()
   }

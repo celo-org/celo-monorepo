@@ -32,8 +32,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           session.logger,
           trx
         )
-      } catch (error) {
-        session.logger.error({ error }, 'Failed to check if request already exists in db')
+      } catch (err) {
+        session.logger.error({ err }, 'Failed to check if request already exists in db')
       }
 
       if (isDuplicateRequest) {

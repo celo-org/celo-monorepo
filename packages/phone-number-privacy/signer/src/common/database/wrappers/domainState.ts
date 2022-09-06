@@ -4,9 +4,9 @@ import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Counters, Histograms, Labels } from '../../../common/metrics'
 import {
+  DomainStateRecord,
   DOMAIN_STATE_COLUMNS,
   DOMAIN_STATE_TABLE,
-  DomainStateRecord,
   toDomainStateRecord,
 } from '../models/domainState'
 
@@ -29,10 +29,10 @@ export async function setDomainDisabled<D extends Domain>(
       .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
       .update(DOMAIN_STATE_COLUMNS.disabled, true)
       .timeout(DB_TIMEOUT)
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw err
   } finally {
     disableDomainMeter()
   }
@@ -86,10 +86,10 @@ export async function getDomainStateRecord<D extends Domain>(
     }
 
     return result ?? null
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
+    throw err
   } finally {
     meter()
   }
@@ -122,10 +122,10 @@ export async function updateDomainStateRecord<D extends Domain>(
         .update(domainState)
         .timeout(DB_TIMEOUT)
     }
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw err
   } finally {
     meter()
   }
@@ -144,10 +144,10 @@ export async function insertDomainStateRecord(
   try {
     await domainStates(db).transacting(trx).insert(domainState).timeout(DB_TIMEOUT)
     return domainState
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.insert).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_INSERT_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_INSERT_FAILURE)
+    throw err
   } finally {
     insertDomainStateRecordMeter()
   }
