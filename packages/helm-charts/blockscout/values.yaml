@@ -48,7 +48,7 @@ blockscout:
       requests:
         memory: 1000Mi
         cpu: 2
-    erlangNodeName: blockscout-indexer
+  erlangNodeName: blockscout
   api:
     port: 4000
     strategy:
