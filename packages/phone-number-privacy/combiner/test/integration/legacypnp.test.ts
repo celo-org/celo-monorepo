@@ -135,11 +135,6 @@ const signerConfig: SignerConfig = {
 
 const testBlockNumber = 1000000
 
-const userSeed = new Uint8Array(32)
-for (let i = 0; i < userSeed.length - 1; i++) {
-  userSeed[i] = i
-}
-
 const mockTokenBalance = jest.fn<BigNumber, []>()
 const mockGetVerifiedStatus = jest.fn<AttestationsStatus, []>()
 
@@ -201,6 +196,12 @@ describe('legacyPnpService', () => {
     signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
+
+    // this needs to be defined here to avoid errors
+    userSeed = new Uint8Array(32)
+    for (let i = 0; i < userSeed.length - 1; i++) {
+      userSeed[i] = i
+    }
 
     blindedMsgResult = threshold_bls.blind(message, userSeed)
   })
@@ -351,7 +352,11 @@ describe('legacyPnpService', () => {
 
         // Second request for the same account but with new message
         const message2 = Buffer.from('second test message', 'utf8')
-        const blindedMsg2 = threshold_bls.blind(message2, userSeed)
+        const newUserSeed = new Uint8Array(32)
+        for (let i = 0; i < userSeed.length - 1; i++) {
+          newUserSeed[i] = i
+        }
+        const blindedMsg2 = threshold_bls.blind(message2, newUserSeed)
         const req2 = getSignRequest(blindedMsg2)
         const authorization2 = getPnpRequestAuthorization(req2, PRIVATE_KEY1)
 
