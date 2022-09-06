@@ -244,13 +244,13 @@ describe('domainService', () => {
 
   describe(`${CombinerEndpoint.DISABLE_DOMAIN}`, () => {
     it('Should respond with 200 on valid request', async () => {
-      const res1 = await request(app)
+      const res = await request(app)
         .post(CombinerEndpoint.DISABLE_DOMAIN)
         .send(await disableRequest())
-      expect(res1.status).toBe(200)
-      expect(res1.body).toMatchObject<DisableDomainResponse>({
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<DisableDomainResponse>({
         success: true,
-        version: res1.body.version,
+        version: res.body.version,
       })
     })
 

@@ -74,8 +74,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             WarningMessage.EXCEEDED_QUOTA,
             403,
             session.response,
-            quotaStatus.totalQuota,
             quotaStatus.performedQueryCount,
+            quotaStatus.totalQuota,
             quotaStatus.blockNumber
           )
           return

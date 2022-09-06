@@ -397,7 +397,9 @@ describe('pnp', () => {
           blockNumber: testBlockNumber,
           warnings: [],
         })
-        expect(res.get(KEY_VERSION_HEADER)).toBeUndefined()
+        expect(res.get(KEY_VERSION_HEADER)).toEqual(
+          _config.keystore.keys.phoneNumberPrivacy.latest.toString()
+        )
       })
 
       it('Should respond with 200 on valid request with key version header', async () => {
@@ -408,7 +410,7 @@ describe('pnp', () => {
           IDENTIFIER
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, '1')
+        const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, '3') // since default is '1' or '2'
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<SignMessageResponseSuccess>({
           success: true,
@@ -419,7 +421,7 @@ describe('pnp', () => {
           blockNumber: testBlockNumber,
           warnings: [],
         })
-        expect(res.get(KEY_VERSION_HEADER)).toEqual('1')
+        expect(res.get(KEY_VERSION_HEADER)).toEqual('3')
       })
 
       it('Should respond with 200 and warning on repeated valid requests', async () => {
@@ -605,8 +607,9 @@ describe('pnp', () => {
       })
 
       it('Should respond with 403 if performedQueryCount is greater than totalQuota', async () => {
+        const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
-          for (let i = 0; i <= expectedQuota; i++) {
+          for (let i = 0; i <= expectedRemainingQuota; i++) {
             await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
           }
         })
@@ -800,10 +803,7 @@ describe('pnp', () => {
 
         it('Should return 500 on bls signing error', async () => {
           const spy = jest
-            .spyOn(
-              jest.requireActual('../../src/common/bls/bls-cryptography-client'),
-              'computeBlindedSignature'
-            )
+            .spyOn(jest.requireActual('blind-threshold-bls'), 'partialSignBlindedMessage')
             .mockImplementationOnce(() => {
               throw new Error()
             })

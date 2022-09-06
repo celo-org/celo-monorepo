@@ -442,6 +442,7 @@ describe('domain', () => {
         Buffer.from(res.body.signature, 'base64')
       )
       expect(evaluation.toString('base64')).toEqual(expectedEval)
+      expect(res.get(KEY_VERSION_HEADER)).toEqual(_config.keystore.keys.domains.latest.toString())
     })
 
     it('Should respond with 200 on valid request with key version header', async () => {
@@ -449,7 +450,7 @@ describe('domain', () => {
 
       const res = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
-        .set(KEY_VERSION_HEADER, '1')
+        .set(KEY_VERSION_HEADER, '3') // since default is '1' or '2'
         .send(req)
 
       expect(res.status).toBe(200)
@@ -468,7 +469,7 @@ describe('domain', () => {
         Buffer.from(res.body.signature, 'base64')
       )
       expect(evaluation.toString('base64')).toEqual(expectedEval)
-      expect(res.get(KEY_VERSION_HEADER)).toEqual('1')
+      expect(res.get(KEY_VERSION_HEADER)).toEqual('3')
     })
 
     it('Should respond with 200 on repeated valid requests with nonce updated', async () => {
