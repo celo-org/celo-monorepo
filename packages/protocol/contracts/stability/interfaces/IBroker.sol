@@ -16,7 +16,7 @@ interface IBroker {
    * @param amountOut The amount of token bought
    */
   event Swap(
-    address listingManager,
+    address exchangeManager,
     bytes32 indexed pairId,
     address indexed trader,
     address indexed tokenIn,
@@ -27,7 +27,7 @@ interface IBroker {
 
   /**
    * @notice Execute a token swap with fixed amountIn
-   * @param listingManager the address of the listing manager for the pair
+   * @param exchangeManager the address of the exchange manager for the pair
    * @param pairId The id of the pair to be swapped
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -36,7 +36,7 @@ interface IBroker {
    * @return amountOut The amount of tokenOut to be bought
    */
   function swapIn(
-    address listingManager,
+    address exchangeManager,
     bytes32 pairId,
     address tokenIn,
     address tokenOut,
@@ -46,7 +46,7 @@ interface IBroker {
 
   /**
    * @notice Execute a token swap with fixed amountOut
-   * @param listingManager the address of the listing manager for the pair
+   * @param exchangeManager the address of the exchange manager for the pair
    * @param pairId The id of the pair to be swapped
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -55,7 +55,7 @@ interface IBroker {
    * @return amountIn The amount of tokenIn to be sold
    */
   function swapOut(
-    address listingManager,
+    address exchangeManager,
     bytes32 pairId,
     address tokenIn,
     address tokenOut,
@@ -65,7 +65,7 @@ interface IBroker {
 
   /**
    * @notice Quote a token swap with fixed amountIn
-   * @param listingManager the address of the listing manager for the pair
+   * @param exchangeManager the address of the exchange manager for the pair
    * @param pairId The id of the pair to be swapped
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -73,7 +73,7 @@ interface IBroker {
    * @return amountOut The amount of tokenOut to be bought
    */
   function quoteIn(
-    address listingManager,
+    address exchangeManager,
     bytes32 pairId,
     address tokenIn,
     address tokenOut,
@@ -82,7 +82,7 @@ interface IBroker {
 
   /**
    * @notice Quote a token swap with fixed amountOut
-   * @param listingManager the address of the listing manager for the pair
+   * @param exchangeManager the address of the exchange manager for the pair
    * @param pairId The id of the pair to be swapped
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -90,7 +90,7 @@ interface IBroker {
    * @return amountIn The amount of tokenIn to be sold
    */
   function quoteOut(
-    address listingManager,
+    address exchangeManager,
     bytes32 pairId,
     address tokenIn,
     address tokenOut,
@@ -98,9 +98,9 @@ interface IBroker {
   ) external returns (uint256 amountIn);
 
   /**
-   * @notice Get the list of registered listing managers.
+   * @notice Get the list of registered exchange managers.
    * @dev This can be used by UI or clients to discover all pairs.
-   * @return listingManagers the addresses of all listing managers.
+   * @return exchangeManagers the addresses of all exchange managers.
    */
-  function getListingManagers() external returns (address[] memory listingManagers);
+  function getExchangeManagers() external returns (address[] memory exchangeManagers);
 }

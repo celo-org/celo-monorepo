@@ -2,11 +2,11 @@
 pragma solidity ^0.5.13;
 
 /*
- * @title ListingManager interface
- * @notice The IListingManager interface is the interface that the Broker uses
+ * @title ExchangeManager interface
+ * @notice The IExchangeManager interface is the interface that the Broker uses
  * to communicate with different listing manager implementations like the TwoAssetPoolManager
  */
-interface IListingManager {
+interface IExchangeManager {
   /**
    * @notice Execute a token swap with fixed amountIn
    * @param pairId The id of the pair to be swapped
