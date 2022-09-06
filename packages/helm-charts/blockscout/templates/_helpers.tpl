@@ -120,6 +120,11 @@ blockscout components.
     secretKeyRef:
       name:  {{ .Release.Name }}
       key: DATABASE_PASSWORD
+- name: ERLANG_COOKIE
+  valueFrom:
+    secretKeyRef:
+      name:  {{ .Values.blockscout.cookieSecretName }}
+      key: ERLANG_COOKIE
 - name: NETWORK
   value: Celo
 - name: SUBNETWORK
