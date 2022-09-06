@@ -8,3 +8,4 @@ export const RETRY_DELAY_IN_MS = 100
 export const MAX_BLOCK_DISCREPANCY_THRESHOLD = 3
 export const KEY_VERSION_HEADER = 'odis-key-version' // headers must be all lower case
 export const MAX_TIMESTAMP_DISCREPANCY_THRESHOLD = 30
+export const MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD = 5
