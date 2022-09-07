@@ -10,8 +10,8 @@ export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
   constructor(
     readonly config: OdisConfig,
     readonly thresholdStateService: DomainThresholdStateService<DomainQuotaStatusRequest>,
-    readonly io: IO<DomainQuotaStatusRequest>,
-    readonly discrepanyLogger: DomainDiscrepanciesLogger
+    readonly discrepanyLogger: DomainDiscrepanciesLogger,
+    readonly io: IO<DomainQuotaStatusRequest>
   ) {
     super(config, io)
   }

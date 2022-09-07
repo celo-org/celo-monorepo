@@ -82,7 +82,7 @@ export class PnpDiscrepanciesLogger {
     ) {
       session.logger.error(
         { sortedDescByTotalQuota: sortedByTotalQuota },
-        WarningMessage.INCONSISTENT_TOTAL_QUOTA
+        WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS
       )
     }
   }
