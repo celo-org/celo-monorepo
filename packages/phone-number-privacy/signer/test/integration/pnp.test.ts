@@ -411,6 +411,48 @@ describe('pnp', () => {
             error: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
           })
         })
+
+        // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
+        // Due to weird timeout handling, the signer continues to return responses
+        // after returning the initial error on timeout.
+        it('Should respond with 500 on signer timeout', async () => {
+          const testTimeoutMS = 200
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'getPerformedQueryCount'
+            )
+            .mockImplementation(async () => {
+              await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + 1200))
+              // TODO EN: use expectedPerformedQueryCount or whatever post rebasing Alec's changes
+              return 10
+            })
+
+          const configWithShortTimeout = { ..._config }
+          configWithShortTimeout.timeout = testTimeoutMS
+          const appWithShortTimeout = startSigner(
+            configWithShortTimeout,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
+          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.PNP_QUOTA,
+            undefined,
+            appWithShortTimeout
+          )
+
+          expect(res.status).toBe(500)
+          expect(res.body).toStrictEqual({
+            success: false,
+            error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+          })
+          spy.mockRestore()
+        })
       })
     })
   })
