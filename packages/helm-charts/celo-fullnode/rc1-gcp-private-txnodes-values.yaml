@@ -13,3 +13,7 @@ geth:
   - "87d3a7ce70fc43db4a070a0db1b69ac78f8db0e10163e34248347966b3a8b072"
   - "e7565adbdfab09dab769148a34da35168ababecbba6a468d21ccd9fcff9b5946"
   - "09e2c8c304c5019c5569f27ceea3f1d6d97facbdf8fe410831cd3c615e5df82f"
+
+extraPodLabels:
+  stack: blockscout
+  mode: archive
