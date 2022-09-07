@@ -48,7 +48,6 @@ blockscout:
       requests:
         memory: 1000Mi
         cpu: 2
-    erlangNodeName: blockscout-indexer
   api:
     port: 4000
     strategy:
@@ -100,7 +99,6 @@ blockscout:
       requests:
         memory: 500Mi
         cpu: 500m
-    erlangNodeName: blockscout-api
   web:
     port: 4000
     strategy:
@@ -156,7 +154,6 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
-    erlangNodeName: blockscout-web
     appsMenu:
       enabled: true
       swapList: '[{"url":"https://ubeswap.org/", "title":"Ubeswap"}, {"url":"https://symmetric.finance/", "title":"Symmetric"}, {"url":"https://www.mobius.money/", "title":"Mobius"}, {"url":"https://mento.finance/", "title":"Mento-fi"}, {"url":"https://swap.bitssa.com/", "title":"Swap Bitssa"}]'
@@ -176,6 +173,8 @@ blockscout:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo
   healthy_blocks_period: 300
+  erlangNodeName: blockscout
+  cookieSecretName: blockscout-erlang-cookie
   db:
     # ip: must be provided at runtime # IP address of the postgres DB
     # connection_name: must be provided at runtime # name of the cloud sql connection
