@@ -50,7 +50,7 @@ spec:
         - -c
         args:
         - |
-           exec mix cmd --app indexer "iex --name {{ .Values.blockscout.indexer.erlangNodeName}}@0.0.0.0 -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix run --no-compile"
+           exec mix cmd --app indexer "iex --cookie $(ERLANG_COOKIE) --name {{ .Values.blockscout.erlangNodeName}}@$(POD_IP) -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix run --no-compile"
         ports:
         - name: health
           containerPort: {{ .Values.blockscout.indexer.port }}
