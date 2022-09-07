@@ -30,7 +30,7 @@ export class DomainDiscrepanciesLogger {
       }
     })
     if (parsedResponses.length === 0) {
-      session.logger.warn('No succesful responses found!')
+      session.logger.warn('No successful responses found!')
       return
     }
 
