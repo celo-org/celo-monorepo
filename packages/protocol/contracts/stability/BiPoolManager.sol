@@ -1,14 +1,17 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
+import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+
 import { IExchangeManager } from "./interfaces/IExchangeManager.sol";
 import { IBiPoolManager } from "./interfaces/IBiPoolManager.sol";
 import { IReserve } from "./interfaces/IReserve.sol";
 import { IPricingModule } from "./interfaces/IPricingModule.sol";
+import { ISortedOracles } from "./interfaces/ISortedOracles.sol";
 
 import { StableToken } from "./StableToken.sol";
 
-import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { Initializable } from "../common/Initializable.sol";
 import { FixidityLib } from "../common/FixidityLib.sol";
 
@@ -23,6 +26,7 @@ interface IERC20Metadata {
  */
 contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownable {
   using FixidityLib for FixidityLib.Fraction;
+  using SafeMath for uint256;
 
   /* ==================== State Variables ==================== */
 
@@ -32,7 +36,7 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
   // Maps a pool id to the corresponding pool struct.
   // poolId is in the format "asset0Symbol:asset1Symbol:pricingModuleName"
   mapping(bytes32 => Pool) public pools;
-  address[] public poolIds;
+  bytes32[] public poolIds;
 
   // Address of the Mento reserve contract
   IReserve public reserve;
@@ -53,7 +57,7 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
    * @param _broker The address of the broker contract.
    * @param _reserve The address of the reserve contract.
    */
-  function initilize(address _broker, IReserve _reserve, ISortedOracles _sortedOracles)
+  function initialize(address _broker, IReserve _reserve, ISortedOracles _sortedOracles)
     external
     initializer
   {
@@ -92,11 +96,122 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     }
   }
 
-  function quoteIn(bytes32 pairId, address tokenIn, address tokenOut, uint256 amountIn)
-    external
-    returns (uint256 amountOut);
+  /**
+   * @notice Quote a token swap with fixed amountIn
+   * @param exchangeId The id of the pool to use
+   * @param tokenIn The token to be sold
+   * @param tokenOut The token to be bought 
+   * @param amountIn The amount of tokenIn to be sold
+   * @return amountOut The amount of tokenOut to be bought
+   */
+  function quoteIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
+    public
+    returns (uint256)
+  {
+    Pool memory pool = pools[exchangeId];
+    require(
+      (tokenIn == pool.asset0 && tokenOut == pool.asset1) ||
+        (tokenIn == pool.asset1 && tokenOut == pool.asset0),
+      "tokenIn and tokenOut must match pool"
+    );
+    if (tokenIn == pool.asset0) {
+      return
+        pool.pricingModule.getAmountOut(pool.bucket0, pool.bucket1, pool.spread.unwrap(), amountIn);
+    } else {
+      return
+        pool.pricingModule.getAmountOut(pool.bucket1, pool.bucket0, pool.spread.unwrap(), amountIn);
+    }
+  }
+
+  /**
+   * @notice Quote a token swap with fixed amountOut
+   * @param exchangeId The id of the pool to use
+   * @param tokenIn The token to be sold
+   * @param tokenOut The token to be bought 
+   * @param amountOut The amount of tokenOut to be bought
+   * @return amountIn The amount of tokenIn to be sold
+   */
+  function quoteOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
+    public
+    returns (uint256)
+  {
+    Pool memory pool = pools[exchangeId];
+    require(
+      (tokenIn == pool.asset0 && tokenOut == pool.asset1) ||
+        (tokenIn == pool.asset1 && tokenOut == pool.asset0),
+      "tokenIn and tokenOut must match pool"
+    );
+    if (tokenIn == pool.asset0) {
+      return
+        pool.pricingModule.getAmountIn(pool.bucket0, pool.bucket1, pool.spread.unwrap(), amountOut);
+    } else {
+      return
+        pool.pricingModule.getAmountIn(pool.bucket1, pool.bucket0, pool.spread.unwrap(), amountOut);
+    }
+  }
 
   /* ==================== Mutative Functions ==================== */
+
+  /**
+   * @notice Execute a token swap with fixed amountIn
+   * @param exchangeId The id of the exchange to use
+   * @param tokenIn The token to be sold
+   * @param tokenOut The token to be bought 
+   * @param amountIn The amount of tokenIn to be sold
+   * @param amountOutMin Minimum amountOut to be received - controls slippage
+   * @return amountOut The amount of tokenOut to be bought
+   */
+  function swapIn(
+    bytes32 exchangeId,
+    address tokenIn,
+    address tokenOut,
+    uint256 amountIn,
+    uint256 amountOutMin
+  ) external returns (uint256 amountOut) {
+    // TODO: Check if buckets should be updated
+    amountOut = quoteIn(exchangeId, tokenIn, tokenOut, amountIn);
+    require(amountOut >= amountOutMin, "amountOutMin not met");
+    Pool memory pool = pools[exchangeId];
+    if (tokenIn == pool.asset0) {
+      pool.bucket0 += amountIn;
+      pool.bucket1 -= amountOut;
+    } else {
+      pool.bucket0 += amountIn;
+      pool.bucket1 -= amountOut;
+    }
+    pools[exchangeId] = pool;
+    return amountOut;
+  }
+
+  /**
+   * @notice Execute a token swap with fixed amountOut
+   * @param exchangeId The id of the exchange to use
+   * @param tokenIn The token to be sold
+   * @param tokenOut The token to be bought 
+   * @param amountOut The amount of tokenOut to be bought
+   * @return amountIn The amount of tokenIn to be sold
+   */
+  function swapOut(
+    bytes32 exchangeId,
+    address tokenIn,
+    address tokenOut,
+    uint256 amountOut,
+    uint256 amountInMax
+  ) external returns (uint256 amountIn) {
+    // TODO: Check if buckets should be updated
+    amountIn = quoteOut(exchangeId, tokenIn, tokenOut, amountOut);
+    require(amountIn <= amountInMax, "amountInMax not met");
+    Pool memory pool = pools[exchangeId];
+    if (tokenIn == pool.asset0) {
+      pool.bucket0 += amountIn;
+      pool.bucket1 -= amountOut;
+    } else {
+      pool.bucket0 += amountIn;
+      pool.bucket1 -= amountOut;
+    }
+    pools[exchangeId] = pool;
+    return amountIn;
+  }
 
   /**
    * @notice Sets the address of the broker contract.
@@ -130,11 +245,12 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
 
   /**
    * @notice Creates a new pool using the given parameters.
-   * @param pool The information required to create the pool.
+   * @param _pool The information required to create the pool.
    * @return poolId The id of the newly created pool.
    */
-  function createPool(Pool calldata pool) external onlyOwner returns (bytes32 poolId) {
-    require(address(pool.pricingModule), "PricingModule must be set");
+  function createPool(Pool calldata _pool) external onlyOwner returns (bytes32 poolId) {
+    Pool memory pool = _pool;
+    require(address(pool.pricingModule) != address(0), "PricingModule must be set");
     require(pool.asset0 != address(0), "Asset0 must be set");
     require(pool.asset1 != address(0), "Asset1 must be set");
 
@@ -142,7 +258,7 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
       abi.encodePacked(
         IERC20Metadata(pool.asset0).symbol(),
         IERC20Metadata(pool.asset1).symbol(),
-        poolInfo.pricingModule.name()
+        pool.pricingModule.name()
       )
     );
     require(
@@ -153,20 +269,20 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     validatePoolInfo(pool);
     (uint256 bucket0, uint256 bucket1) = getUpdatedBuckets(pool);
 
-    pool.bucket0 = tokenInBucket;
-    pool.bucket1 = tokenOutBucket;
+    pool.bucket0 = bucket0;
+    pool.bucket1 = bucket1;
 
     pools[poolId] = pool;
     poolIds.push(poolId);
 
-    emit PoolCreated(pool.asset0, pool.asset1, address(pool.pricingModule), poolId);
+    emit PoolCreated(poolId, pool.asset0, pool.asset1, address(pool.pricingModule));
   }
 
   /**
    * @notice Destroys a pool with the given parameters if it exists and frees up
    *         the collateral and stable allocation it was using.
-   * @param asset0 The stable asset of the pool.
-   * @param asset1 The collateral asset of the pool.
+   * @param poolId the id of the pool to destroy
+   * @param poolIdIndex The index of the poolId in the ids array
    * @return destroyed A boolean indicating whether or not the pool was successfully destroyed.
    */
   function destroyPool(bytes32 poolId, uint256 poolIdIndex)
@@ -183,22 +299,26 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     );
 
     delete pools[poolId];
-    poolIds[poolIdsIndex] = poolIds[poolIds.length - 1];
+    poolIds[poolIdIndex] = poolIds[poolIds.length - 1];
     poolIds.pop();
     destroyed = true;
 
-    emit PoolDestroyed(pool.asset0, asset1, address(mentoExchange));
+    emit PoolDestroyed(poolId, pool.asset0, pool.asset1, address(pool.pricingModule));
   }
 
   /* ==================== Private Functions ==================== */
 
-  function getUpdatedBuckets(Pool pool) private view returns (uint256 bucket0, uint256 bucket1) {
+  function getUpdatedBuckets(Pool memory pool)
+    private
+    view
+    returns (uint256 bucket0, uint256 bucket1)
+  {
     // TODO: Take max fraction/min supply in account when setting the bucket size
-    bucket0 = pool.bucket0TargetSize;
+    bucket0 = pool.bucketUpdateInfo.bucket0TargetSize;
     uint256 exchangeRateNumerator;
     uint256 exchangeRateDenominator;
     (exchangeRateNumerator, exchangeRateDenominator) = getOracleExchangeRate(
-      pool.oracleReportTarget
+      pool.bucketUpdateInfo.oracleReportTarget
     );
 
     bucket1 = exchangeRateDenominator.mul(bucket0).div(exchangeRateNumerator);
@@ -227,10 +347,13 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
       "asset1 mult be a stable or collateral registered with reserve"
     );
 
-    require(poolInfo.bucket0MaxFraction.unwrap() > 0, "bucket0MaxFraction must be greater than 0");
+    require(
+      poolInfo.bucketUpdateInfo.bucket0MaxFraction.unwrap() > 0,
+      "bucket0MaxFraction must be greater than 0"
+    );
 
     require(
-      poolInfo.bucket0MaxFraction.lt(FixidityLib.fixed1()),
+      poolInfo.bucketUpdateInfo.bucket0MaxFraction.lt(FixidityLib.fixed1()),
       "bucket0MaxFraction must be smaller than 1"
     );
 

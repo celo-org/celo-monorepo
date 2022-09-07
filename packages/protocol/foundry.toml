@@ -18,9 +18,11 @@ no_match_contract = "RandomTest"
 verbosity = 3
 
 [profile.integration]
-
 no_match_contract = "RandomTest"
 match_contract = "Integration"
 
 [rpc_endpoints]
 celo_mainnet="https://forno.celo.org"
+
+[profile.default.optimizer_details]
+yul = false

@@ -10,16 +10,28 @@ import { FixidityLib } from "../../common/FixidityLib.sol";
  * @notice The two asset pool manager is responsible for managing the state of all Mento virtual pools.
  */
 interface IBiPoolManager {
+  /** 
+   * @notice Pool - contains all the configuration and state of a virtual pool
+   */
   struct Pool {
     address asset0;
     address asset1;
     uint256 bucket0;
     uint256 bucket1;
-    address oracleReportTarget; // can be a stable address or custom
     IPricingModule pricingModule;
+    FixidityLib.Fraction spread;
+    BucketUpdateInfo bucketUpdateInfo;
+  }
+
+  /** 
+   * @notice Variables related to bucket updates and sizing.
+   * @dev Broken down into a separate struct because the compiler
+   * version doesn't support too large structs.
+   */
+  struct BucketUpdateInfo {
+    address oracleReportTarget; // can be a stable address or custom
     uint256 bucketUpdateFrequency;
     uint256 lastBucketUpdate;
-    FixidityLib.Fraction spread;
     uint256 minimumReports;
     uint256 bucket0TargetSize;
     FixidityLib.Fraction bucket0MaxFraction;
@@ -34,7 +46,7 @@ interface IBiPoolManager {
    * @param pricingModule the address of the pricingModule
    */
   event PoolCreated(
-    address indexed poolId,
+    bytes32 indexed poolId,
     address indexed asset0,
     address indexed asset1,
     address pricingModule
@@ -45,8 +57,14 @@ interface IBiPoolManager {
    * @param poolId The id of the newly created pool.
    * @param asset0 The address of asset0
    * @param asset1 The address of asset1
+   * @param pricingModule the address of the pricingModule
    */
-  event PoolDestroyed(address indexed poolId, address indexed asset0, address indexed asset1);
+  event PoolDestroyed(
+    bytes32 indexed poolId,
+    address indexed asset0,
+    address indexed asset1,
+    address pricingModule
+  );
 
   /**
    * @notice Emitted when the broker address is updated.
