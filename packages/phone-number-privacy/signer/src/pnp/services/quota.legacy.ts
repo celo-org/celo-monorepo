@@ -42,23 +42,23 @@ export class LegacyPnpQuotaService
       Histograms.getRemainingQueryCountInstrumentation,
       ['getWalletAddressAndIsVerified', session.request.url]
     )
-    let hadBlockchainError = false,
+    let hadFullNodeError = false,
       isAccountVerified = false,
       walletAddress = NULL_ADDRESS
     if (walletAddressResult.status === 'fulfilled') {
       walletAddress = walletAddressResult.value
     } else {
       session.logger.error(walletAddressResult.reason)
-      hadBlockchainError = true
+      hadFullNodeError = true
     }
     if (isVerifiedResult.status === 'fulfilled') {
       isAccountVerified = isVerifiedResult.value
     } else {
       session.logger.error(isVerifiedResult.reason)
-      hadBlockchainError = true
+      hadFullNodeError = true
     }
-    if (hadBlockchainError) {
-      session.errors.push(ErrorMessage.CONTRACT_GET_FAILURE)
+    if (hadFullNodeError) {
+      session.errors.push(ErrorMessage.FULL_NODE_ERROR)
     }
 
     if (account.toLowerCase() === walletAddress.toLowerCase()) {
@@ -104,28 +104,28 @@ export class LegacyPnpQuotaService
       ['getBalances', session.request.url]
     )
 
-    let hadBlockchainError = false
+    let hadFullNodeError = false
     let cUSDAccountBalance, cEURAccountBalance, celoAccountBalance
     if (cUSDAccountBalanceResult.status === 'fulfilled') {
       cUSDAccountBalance = cUSDAccountBalanceResult.value
     } else {
       session.logger.error(cUSDAccountBalanceResult.reason)
-      hadBlockchainError = true
+      hadFullNodeError = true
     }
     if (cEURAccountBalanceResult.status === 'fulfilled') {
       cEURAccountBalance = cEURAccountBalanceResult.value
     } else {
       session.logger.error(cEURAccountBalanceResult.reason)
-      hadBlockchainError = true
+      hadFullNodeError = true
     }
     if (celoAccountBalanceResult.status === 'fulfilled') {
       celoAccountBalance = celoAccountBalanceResult.value
     } else {
       session.logger.error(celoAccountBalanceResult.reason)
-      hadBlockchainError = true
+      hadFullNodeError = true
     }
-    if (hadBlockchainError) {
-      session.errors.push(ErrorMessage.CONTRACT_GET_FAILURE)
+    if (hadFullNodeError) {
+      session.errors.push(ErrorMessage.FULL_NODE_ERROR)
     }
 
     return { cUSDAccountBalance, cEURAccountBalance, celoAccountBalance }

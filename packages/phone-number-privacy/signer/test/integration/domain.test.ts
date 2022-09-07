@@ -33,7 +33,7 @@ import { startSigner } from '../../src/server'
 describe('domain', () => {
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
-  const walletAddress = wallet.getAccounts()[0]! // TODO(Alec): do we need this?
+  const walletAddress = wallet.getAccounts()[0]!
 
   const expectedVersion = getVersion()
 
@@ -442,6 +442,7 @@ describe('domain', () => {
         Buffer.from(res.body.signature, 'base64')
       )
       expect(evaluation.toString('base64')).toEqual(expectedEval)
+      expect(res.get(KEY_VERSION_HEADER)).toEqual(_config.keystore.keys.domains.latest.toString())
     })
 
     it('Should respond with 200 on valid request with key version header', async () => {
@@ -449,7 +450,7 @@ describe('domain', () => {
 
       const res = await request(app)
         .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
+        .set(KEY_VERSION_HEADER, '3') // since default is '1' or '2'
         .send(req)
 
       expect(res.status).toBe(200)
@@ -468,15 +469,13 @@ describe('domain', () => {
         Buffer.from(res.body.signature, 'base64')
       )
       expect(evaluation.toString('base64')).toEqual(expectedEval)
+      expect(res.get(KEY_VERSION_HEADER)).toEqual('3')
     })
 
     it('Should respond with 200 on repeated valid requests with nonce updated', async () => {
       const [req, thresholdPoprfClient] = await signatureRequest()
 
-      const res1 = await request(app)
-        .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
-        .send(req)
+      const res1 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
 
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
@@ -502,10 +501,7 @@ describe('domain', () => {
       req.options.signature = defined(
         await wallet.signTypedData(walletAddress, domainRestrictedSignatureRequestEIP712(req))
       )
-      const res2 = await request(app)
-        .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
-        .send(req)
+      const res2 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
       expect(res2.status).toBe(200)
       expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: true,
@@ -661,10 +657,7 @@ describe('domain', () => {
     it('Should respond 401 on invalid nonce', async () => {
       // Request must be sent first since nonce check is >= 0
       const [req1, _] = await signatureRequest()
-      const res1 = await request(app)
-        .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
-        .send(req1)
+      const res1 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req1)
       expect(res1.status).toBe(200)
       expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
         success: true,
@@ -677,10 +670,7 @@ describe('domain', () => {
           now: res1.body.status.now,
         },
       })
-      const res2 = await request(app)
-        .post(SignerEndpoint.DOMAIN_SIGN)
-        .set('keyVersion', '1')
-        .send(req1)
+      const res2 = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req1)
       expect(res2.status).toBe(401)
 
       expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
@@ -692,7 +682,6 @@ describe('domain', () => {
 
     it('Should respond with 429 on out of quota', async () => {
       const noQuotaDomain = authenticatedDomain([
-        // TODO(Alec): add better spec tests for rate limiting algorithm
         { delay: 0, resetTimer: noBool, batchSize: defined(0), repetitions: defined(0) },
       ])
       const [badRequest, _] = await signatureRequest(noQuotaDomain)
@@ -746,20 +735,4 @@ describe('domain', () => {
       })
     })
   })
-
-  /* 
-
-  TODO(Alec): check code coverage
-  
-  [ ] Add TODOs for all ODIS tests that remain to be written
-[ ] Bad signature (combiner + signer)
-[ ] Bad encoding (combiner + signer)
-[ ] Undefined domain (combiner + signer)
-[ ] Extra fields? -> should reject / use t.strict (combiner + signer)
-[ ] Valid key versions (combiner + signer)
-[ ] Invalid key versions (combiner + signer)
-[ ] Out of quota (combiner + signer)
-[ ] Bad nonce (combiner + signer)
-[ ] Request too early for rate limiting (both)
-  */
 })

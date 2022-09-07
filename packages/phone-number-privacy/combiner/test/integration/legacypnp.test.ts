@@ -1,10 +1,10 @@
+import { AttestationsStatus } from '@celo/base'
 import { newKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
   CombinerEndpoint,
   ErrorMessage,
   genSessionID,
-  isVerified,
   KEY_VERSION_HEADER,
   SignMessageRequest,
   SignMessageResponseFailure,
@@ -39,6 +39,7 @@ const {
   createMockToken,
   createMockWeb3,
   getPnpRequestAuthorization,
+  createMockAttestation,
 } = TestUtils.Utils
 const {
   PRIVATE_KEY1,
@@ -135,12 +136,15 @@ const signerConfig: SignerConfig = {
 const testBlockNumber = 1000000
 
 const mockTokenBalance = jest.fn<BigNumber, []>()
+const mockGetVerifiedStatus = jest.fn<AttestationsStatus, []>()
+
 const mockContractKit = createMockContractKit(
   {
     // getWalletAddress stays constant across all old query-quota.test.ts unit tests
     [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount, DEK_PUBLIC_KEY),
     [ContractRetrieval.getStableToken]: createMockToken(mockTokenBalance),
     [ContractRetrieval.getGoldToken]: createMockToken(mockTokenBalance),
+    [ContractRetrieval.getAttestations]: createMockAttestation(mockGetVerifiedStatus),
   },
   createMockWeb3(5, testBlockNumber)
 )
@@ -151,12 +155,6 @@ jest.mock('@celo/contractkit', () => ({
   ...jest.requireActual('@celo/contractkit'),
   newKit: jest.fn().mockImplementation(() => mockContractKit),
 }))
-
-jest.mock('@celo/phone-number-privacy-common', () => ({
-  ...jest.requireActual('@celo/phone-number-privacy-common'),
-  isVerified: jest.fn(),
-}))
-const mockIsVerified = isVerified as jest.Mock
 
 describe('legacyPnpService', () => {
   let keyProvider1: KeyProvider
@@ -199,6 +197,7 @@ describe('legacyPnpService', () => {
     signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
 
+    // this needs to be defined here to avoid errors
     userSeed = new Uint8Array(32)
     for (let i = 0; i < userSeed.length - 1; i++) {
       userSeed[i] = i
@@ -241,17 +240,21 @@ describe('legacyPnpService', () => {
   }
 
   const prepMocks = (hasQuota: boolean) => {
-    const [transactionCount, _isVerified, balanceToken] = hasQuota
+    const [transactionCount, isVerified, balanceToken] = hasQuota
       ? [100, true, new BigNumber(200000000000000000)]
       : [0, false, new BigNumber(0)]
     ;[
       mockContractKit.connection.getTransactionCount,
-      mockIsVerified,
+      mockGetVerifiedStatus,
+      mockGetVerifiedStatus,
       mockTokenBalance,
     ].forEach((mockFn) => mockFn.mockReset())
 
     mockContractKit.connection.getTransactionCount.mockReturnValue(transactionCount)
-    mockIsVerified.mockReturnValue(_isVerified)
+    mockGetVerifiedStatus.mockReturnValue(
+      // only the isVerified value below matters
+      { isVerified, completed: 1, total: 1, numAttestationsRemaining: 1 }
+    )
     mockTokenBalance.mockReturnValue(balanceToken)
   }
   const expectedQuota = 410
@@ -294,7 +297,7 @@ describe('legacyPnpService', () => {
 
       it('Should respond with 200 on valid request with key version header', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app, '1')
+        const res = await sendPnpSignRequest(req, authorization, app, '2') // test a value other than '1'
 
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<SignMessageResponseSuccess>({
@@ -305,6 +308,9 @@ describe('legacyPnpService', () => {
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
         })
+        // TODO(2.0.0) determine how / whether to forward this to client
+        // (https://github.com/celo-org/celo-monorepo/issues/9801)
+        // expect(res.get(KEY_VERSION_HEADER)).toEqual('2')
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {

@@ -1,10 +1,16 @@
+import { AttestationsStatus } from '@celo/base'
 import { newKit, StableToken } from '@celo/contractkit'
 import {
-  isVerified,
-  PnpQuotaRequest,
+  AuthenticationMethod,
+  ErrorMessage,
+  KEY_VERSION_HEADER,
+  PhoneNumberPrivacyRequest,
   PnpQuotaResponseFailure,
   PnpQuotaResponseSuccess,
+  rootLogger,
   SignerEndpoint,
+  SignMessageResponseFailure,
+  SignMessageResponseSuccess,
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -12,7 +18,11 @@ import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
-import { getPerformedQueryCount } from '../../src/common/database/wrappers/account'
+import {
+  getPerformedQueryCount,
+  incrementQueryCount,
+} from '../../src/common/database/wrappers/account'
+import { getRequestExists } from '../../src/common/database/wrappers/request'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
@@ -26,14 +36,26 @@ const {
   createMockWeb3,
   getPnpQuotaRequest,
   getPnpRequestAuthorization,
+  createMockAttestation,
+  getLegacyPnpSignRequest,
 } = TestUtils.Utils
-const { IDENTIFIER, PRIVATE_KEY1, ACCOUNT_ADDRESS1, mockAccount } = TestUtils.Values
+const {
+  IDENTIFIER,
+  PRIVATE_KEY1,
+  ACCOUNT_ADDRESS1,
+  mockAccount,
+  BLINDED_PHONE_NUMBER,
+} = TestUtils.Values
+
+const expectedSignature =
+  'MAAAAAAAAAAEFHu3gWowoNJvvWkINGZR/1no37LPBFYRIHu3h5xYowXo1tlIlrL9CbN0cNqcKIAAAAAA'
 
 const testBlockNumber = 1000000
 
 const mockBalanceOfCUSD = jest.fn<BigNumber, []>()
 const mockBalanceOfCEUR = jest.fn<BigNumber, []>()
 const mockBalanceOfCELO = jest.fn<BigNumber, []>()
+const mockGetVerifiedStatus = jest.fn<AttestationsStatus, []>()
 
 const mockContractKit = createMockContractKit(
   {
@@ -41,6 +63,7 @@ const mockContractKit = createMockContractKit(
     [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount),
     [ContractRetrieval.getStableToken]: jest.fn(),
     [ContractRetrieval.getGoldToken]: createMockToken(mockBalanceOfCELO),
+    [ContractRetrieval.getAttestations]: createMockAttestation(mockGetVerifiedStatus),
   },
   createMockWeb3(5, testBlockNumber)
 )
@@ -63,15 +86,6 @@ jest.mock('@celo/contractkit', () => ({
   ...jest.requireActual('@celo/contractkit'),
   newKit: jest.fn().mockImplementation(() => mockContractKit),
 }))
-
-jest.mock('../../src/common/database/wrappers/account')
-const mockPerformedQueryCount = getPerformedQueryCount as jest.Mock
-
-jest.mock('@celo/phone-number-privacy-common', () => ({
-  ...jest.requireActual('@celo/phone-number-privacy-common'),
-  isVerified: jest.fn(),
-}))
-const mockIsVerified = isVerified as jest.Mock
 
 describe('legacyPNP', () => {
   let keyProvider: KeyProvider
@@ -97,8 +111,7 @@ describe('legacyPNP', () => {
   afterEach(async () => {
     // Close and destroy the in-memory database.
     // Note: If tests start to be too slow, this could be replaced with more complicated logic to
-    // reset the database state without destroying and recreting it for each test.
-
+    // reset the database state without destroying and recreating it for each test.
     await db?.destroy()
   })
 
@@ -110,208 +123,237 @@ describe('legacyPNP', () => {
     })
   })
 
-  const sendPnpQuotaRequest = async (
-    req: PnpQuotaRequest,
+  const zeroBalance = new BigNumber(0)
+  const twentyCents = new BigNumber(200000000000000000)
+
+  type legacyPnpQuotaCalculationTestCase = {
+    it: string
+    account: string
+    performedQueryCount: number
+    transactionCount: number
+    balanceCUSD: BigNumber
+    balanceCEUR: BigNumber
+    balanceCELO: BigNumber
+    isVerified: boolean
+    identifier: string | undefined
+    expectedPerformedQueryCount: number
+    expectedTotalQuota: number
+  } // To be re-used against both the signature and quota endpoints
+  const quotaCalculationTestCases: legacyPnpQuotaCalculationTestCase[] = [
+    {
+      it: 'should calculate correct quota for verified account',
+      account: ACCOUNT_ADDRESS1,
+      performedQueryCount: 2,
+      transactionCount: 5,
+      balanceCUSD: zeroBalance,
+      balanceCEUR: zeroBalance,
+      balanceCELO: zeroBalance,
+      isVerified: true,
+      identifier: IDENTIFIER,
+      expectedPerformedQueryCount: 2,
+      expectedTotalQuota: 60,
+    },
+    {
+      it: 'should calculate correct quota for unverified account with no transactions or balance',
+      account: ACCOUNT_ADDRESS1,
+      performedQueryCount: 0,
+      transactionCount: 0,
+      balanceCUSD: zeroBalance,
+      balanceCEUR: zeroBalance,
+      balanceCELO: zeroBalance,
+      isVerified: false,
+      identifier: IDENTIFIER,
+      expectedPerformedQueryCount: 0,
+      expectedTotalQuota: 0,
+    },
+    {
+      it: 'should calculate correct quota for unverified account with balance but no transactions',
+      account: ACCOUNT_ADDRESS1,
+      performedQueryCount: 1,
+      transactionCount: 0,
+      balanceCUSD: twentyCents,
+      balanceCEUR: twentyCents,
+      balanceCELO: twentyCents,
+      isVerified: false,
+      identifier: IDENTIFIER,
+      expectedPerformedQueryCount: 1,
+      expectedTotalQuota: 10,
+    },
+    {
+      it: 'should calculate correct quota for verified account with many txs and balance',
+      account: ACCOUNT_ADDRESS1,
+      performedQueryCount: 10,
+      transactionCount: 100,
+      balanceCUSD: twentyCents,
+      balanceCEUR: twentyCents,
+      balanceCELO: twentyCents,
+      isVerified: true,
+      identifier: IDENTIFIER,
+      expectedPerformedQueryCount: 10,
+      expectedTotalQuota: 440,
+    },
+    {
+      it: 'should calculate correct quota for unverified account with many txs and balance',
+      account: ACCOUNT_ADDRESS1,
+      performedQueryCount: 0,
+      transactionCount: 100,
+      balanceCUSD: twentyCents,
+      balanceCEUR: twentyCents,
+      balanceCELO: twentyCents,
+      isVerified: false,
+      identifier: IDENTIFIER,
+      expectedPerformedQueryCount: 0,
+      expectedTotalQuota: 410,
+    },
+    {
+      it: 'should calculate correct quota for unverified account without any balance (with txs)',
+      account: ACCOUNT_ADDRESS1,
+      performedQueryCount: 0,
+      transactionCount: 100,
+      balanceCUSD: zeroBalance,
+      balanceCEUR: zeroBalance,
+      balanceCELO: zeroBalance,
+      isVerified: false,
+      identifier: IDENTIFIER,
+      expectedPerformedQueryCount: 0,
+      expectedTotalQuota: 0,
+    },
+    {
+      it: 'should calculate correct quota for unverified account with only cUSD balance (no txs)',
+      account: ACCOUNT_ADDRESS1,
+      performedQueryCount: 1,
+      transactionCount: 0,
+      balanceCUSD: twentyCents,
+      balanceCEUR: zeroBalance,
+      balanceCELO: zeroBalance,
+      isVerified: false,
+      identifier: IDENTIFIER,
+      expectedPerformedQueryCount: 1,
+      expectedTotalQuota: 10,
+    },
+    {
+      it: 'should calculate correct quota for unverified account with only cEUR balance (no txs)',
+      account: ACCOUNT_ADDRESS1,
+      performedQueryCount: 1,
+      transactionCount: 0,
+      balanceCUSD: zeroBalance,
+      balanceCEUR: twentyCents,
+      balanceCELO: zeroBalance,
+      isVerified: false,
+      identifier: IDENTIFIER,
+      expectedPerformedQueryCount: 1,
+      expectedTotalQuota: 10,
+    },
+    {
+      it: 'should calculate correct quota for unverified account with only CELO balance (no txs)',
+      account: ACCOUNT_ADDRESS1,
+      performedQueryCount: 1,
+      transactionCount: 0,
+      balanceCUSD: zeroBalance,
+      balanceCEUR: zeroBalance,
+      balanceCELO: twentyCents,
+      isVerified: false,
+      identifier: IDENTIFIER,
+      expectedPerformedQueryCount: 1,
+      expectedTotalQuota: 10,
+    },
+    {
+      it:
+        'should calculate correct quota for account with min balance when no phone number hash is provided',
+      account: ACCOUNT_ADDRESS1,
+      performedQueryCount: 1,
+      transactionCount: 0,
+      balanceCUSD: twentyCents,
+      balanceCEUR: twentyCents,
+      balanceCELO: twentyCents,
+      isVerified: false,
+      identifier: IDENTIFIER,
+      expectedPerformedQueryCount: 1,
+      expectedTotalQuota: 10,
+    },
+  ]
+
+  const prepMocks = async (
+    account: string,
+    performedQueryCount: number,
+    transactionCount: number,
+    isVerified: boolean,
+    balanceCUSD: BigNumber,
+    balanceCEUR: BigNumber,
+    balanceCELO: BigNumber
+  ) => {
+    ;[
+      mockContractKit.connection.getTransactionCount,
+      mockGetVerifiedStatus,
+      mockBalanceOfCUSD,
+      mockBalanceOfCEUR,
+      mockBalanceOfCELO,
+    ].forEach((mockFn) => mockFn.mockReset())
+
+    await db.transaction(async (trx) => {
+      for (let i = 0; i < performedQueryCount; i++) {
+        await incrementQueryCount(db, account, rootLogger(config.serviceName), trx)
+      }
+    })
+
+    mockContractKit.connection.getTransactionCount.mockReturnValue(transactionCount)
+    mockGetVerifiedStatus.mockReturnValue(
+      // only the isVerified value below matters
+      { isVerified, completed: 1, total: 1, numAttestationsRemaining: 1 }
+    )
+    mockBalanceOfCUSD.mockReturnValue(balanceCUSD)
+    mockBalanceOfCEUR.mockReturnValue(balanceCEUR)
+    mockBalanceOfCELO.mockReturnValue(balanceCELO)
+  }
+
+  const sendRequest = async (
+    req: PhoneNumberPrivacyRequest,
     authorization: string,
+    endpoint: SignerEndpoint,
+    keyVersionHeader?: string,
     signerApp: any = app
   ) => {
-    return request(signerApp)
-      .post(SignerEndpoint.LEGACY_PNP_QUOTA)
-      .set('Authorization', authorization)
-      .send(req)
+    const _req = request(signerApp).post(endpoint).set('Authorization', authorization)
+
+    if (keyVersionHeader !== undefined) {
+      _req.set(KEY_VERSION_HEADER, keyVersionHeader)
+    }
+
+    return _req.send(req)
   }
 
   describe(`${SignerEndpoint.LEGACY_PNP_QUOTA}`, () => {
-    const zeroBalance = new BigNumber(0)
-    const twentyCents = new BigNumber(200000000000000000)
-
-    const prepMocks = (
-      performedQueryCount: number,
-      transactionCount: number,
-      _isVerified: boolean,
-      balanceCUSD: BigNumber,
-      balanceCEUR: BigNumber,
-      balanceCELO: BigNumber
-    ) => {
-      ;[
-        mockPerformedQueryCount,
-        mockContractKit.connection.getTransactionCount,
-        mockIsVerified,
-        mockBalanceOfCUSD,
-        mockBalanceOfCEUR,
-        mockBalanceOfCELO,
-      ].forEach((mockFn) => mockFn.mockReset())
-
-      mockPerformedQueryCount.mockImplementation(
-        () => new Promise((resolve) => resolve(performedQueryCount))
-      )
-      mockContractKit.connection.getTransactionCount.mockReturnValue(transactionCount)
-      mockIsVerified.mockReturnValue(_isVerified)
-      mockBalanceOfCUSD.mockReturnValue(balanceCUSD)
-      mockBalanceOfCEUR.mockReturnValue(balanceCEUR)
-      mockBalanceOfCELO.mockReturnValue(balanceCELO)
-    }
-
-    describe('quota calculation logic: calculates remaining query count', () => {
-      const runLegacyQuotaTestCase = async (
-        performedQueryCount: number,
-        transactionCount: number,
-        _isVerified: boolean,
-        balanceCUSD: BigNumber,
-        balanceCEUR: BigNumber,
-        balanceCELO: BigNumber,
-        identifier: string | undefined,
-        expectedPerformedQueryCount: number,
-        expectedTotalQuota: number
-      ) => {
-        prepMocks(
-          performedQueryCount,
-          transactionCount,
-          _isVerified,
-          balanceCUSD,
-          balanceCEUR,
-          balanceCELO
+    describe('quota calculation logic', () => {
+      const runLegacyQuotaTestCase = async (testCase: legacyPnpQuotaCalculationTestCase) => {
+        await prepMocks(
+          testCase.account,
+          testCase.performedQueryCount,
+          testCase.transactionCount,
+          testCase.isVerified,
+          testCase.balanceCUSD,
+          testCase.balanceCEUR,
+          testCase.balanceCELO
         )
 
-        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, identifier)
+        const req = getPnpQuotaRequest(testCase.account, testCase.identifier)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpQuotaRequest(req, authorization)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
           success: true,
           version: expectedVersion,
-          performedQueryCount: expectedPerformedQueryCount,
-          totalQuota: expectedTotalQuota,
+          performedQueryCount: testCase.expectedPerformedQueryCount,
+          totalQuota: testCase.expectedTotalQuota,
           blockNumber: testBlockNumber,
           warnings: [],
         })
       }
 
-      it('for verified account', async () => {
-        await runLegacyQuotaTestCase(
-          2,
-          5,
-          true,
-          zeroBalance,
-          zeroBalance,
-          zeroBalance,
-          IDENTIFIER,
-          2,
-          60
-        )
-      })
-
-      it('for unverified account with no transactions', async () => {
-        await runLegacyQuotaTestCase(
-          1,
-          0,
-          false,
-          twentyCents,
-          twentyCents,
-          twentyCents,
-          IDENTIFIER,
-          1,
-          10
-        )
-      })
-
-      it('for verified account with many txs and balance', async () => {
-        await runLegacyQuotaTestCase(
-          10,
-          100,
-          true,
-          twentyCents,
-          twentyCents,
-          twentyCents,
-          IDENTIFIER,
-          10,
-          440
-        )
-      })
-
-      it('for unverified account with many txs and balance', async () => {
-        await runLegacyQuotaTestCase(
-          0,
-          100,
-          false,
-          twentyCents,
-          twentyCents,
-          twentyCents,
-          IDENTIFIER,
-          0,
-          410
-        )
-      })
-
-      it('for unverified account without any balance (with txs)', async () => {
-        await runLegacyQuotaTestCase(
-          0,
-          100,
-          false,
-          zeroBalance,
-          zeroBalance,
-          zeroBalance,
-          IDENTIFIER,
-          0,
-          0
-        )
-      })
-
-      it('for unverified account with only cUSD balance (no txs)', async () => {
-        await runLegacyQuotaTestCase(
-          1,
-          0,
-          false,
-          twentyCents,
-          zeroBalance,
-          zeroBalance,
-          IDENTIFIER,
-          1,
-          10
-        )
-      })
-
-      it('for unverified account with only cEUR balance (no txs)', async () => {
-        await runLegacyQuotaTestCase(
-          1,
-          0,
-          false,
-          zeroBalance,
-          twentyCents,
-          zeroBalance,
-          IDENTIFIER,
-          1,
-          10
-        )
-      })
-
-      it('for unverified account with only CELO balance (no txs)', async () => {
-        await runLegacyQuotaTestCase(
-          1,
-          0,
-          false,
-          zeroBalance,
-          zeroBalance,
-          twentyCents,
-          IDENTIFIER,
-          1,
-          10
-        )
-      })
-
-      it('when no phone number hash is provided', async () => {
-        await runLegacyQuotaTestCase(
-          1,
-          0,
-          false,
-          twentyCents,
-          twentyCents,
-          twentyCents,
-          undefined,
-          1,
-          10
-        )
+      quotaCalculationTestCases.forEach((testCase) => {
+        it(testCase.it, async () => {
+          await runLegacyQuotaTestCase(testCase)
+        })
       })
     })
 
@@ -321,14 +363,22 @@ describe('legacyPNP', () => {
       const expectedQuota = 10
 
       beforeEach(async () => {
-        prepMocks(performedQueryCount, 0, false, twentyCents, twentyCents, twentyCents)
+        await prepMocks(
+          ACCOUNT_ADDRESS1,
+          performedQueryCount,
+          0,
+          false,
+          twentyCents,
+          twentyCents,
+          twentyCents
+        )
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
 
-        const res1 = await sendPnpQuotaRequest(req, authorization)
+        const res1 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
         expect(res1.status).toBe(200)
         expect(res1.body).toMatchObject<PnpQuotaResponseSuccess>({
           success: true,
@@ -338,7 +388,7 @@ describe('legacyPNP', () => {
           blockNumber: testBlockNumber,
           warnings: [],
         })
-        const res2 = await sendPnpQuotaRequest(req, authorization)
+        const res2 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
         expect(res2.status).toBe(200)
         expect(res2.body).toMatchObject<PnpQuotaResponseSuccess>(res1.body)
       })
@@ -348,12 +398,34 @@ describe('legacyPNP', () => {
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpQuotaRequest(req, authorization)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
         expect(res.status).toBe(200)
         expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
           success: true,
           version: expectedVersion,
           performedQueryCount: performedQueryCount,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+      })
+
+      it('Should respond with 200 if performedQueryCount is greater than totalQuota', async () => {
+        const expectedRemainingQuota = expectedQuota - performedQueryCount
+        await db.transaction(async (trx) => {
+          for (let i = 0; i <= expectedRemainingQuota; i++) {
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+          }
+        })
+        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          performedQueryCount: expectedQuota + 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
           warnings: [],
@@ -365,7 +437,7 @@ describe('legacyPNP', () => {
         // @ts-ignore Intentionally deleting required field
         delete badRequest.account
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
-        const res = await sendPnpQuotaRequest(badRequest, authorization)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
         expect(res.status).toBe(400)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
@@ -380,7 +452,7 @@ describe('legacyPNP', () => {
         const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
-        const res = await sendPnpQuotaRequest(badRequest, authorization)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
         expect(res.status).toBe(401)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
@@ -395,7 +467,13 @@ describe('legacyPNP', () => {
         const appWithApiDisabled = startSigner(_config, db, keyProvider, newKit('dummyKit'))
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpQuotaRequest(req, authorization, appWithApiDisabled)
+        const res = await sendRequest(
+          req,
+          authorization,
+          SignerEndpoint.LEGACY_PNP_QUOTA,
+          undefined,
+          appWithApiDisabled
+        )
         expect.assertions(2)
         expect(res.status).toBe(503)
         expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
@@ -404,214 +482,643 @@ describe('legacyPNP', () => {
           error: WarningMessage.API_UNAVAILABLE,
         })
       })
+
+      describe('functionality in case of errors', () => {
+        it('Should respond with 500 on DB performedQueryCount query failure', async () => {
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'getPerformedQueryCount'
+            )
+            .mockRejectedValueOnce(new Error())
+
+          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+
+          expect(res.status).toBe(500)
+          expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+            success: false,
+            version: expectedVersion,
+            error: ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
+          })
+
+          spy.mockRestore()
+        })
+
+        it('Should respond with 500 on blockchain totalQuota query failure', async () => {
+          mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
+
+          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+
+          expect(res.status).toBe(500)
+          expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+            success: false,
+            version: expectedVersion,
+            error: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
+          })
+        })
+      })
     })
   })
 
-  // const sendLegacyPnpSignatureRequest = async (
-  //   req: SignMessageRequest,
-  //   authorization: string,
-  //   signerApp: any = app
-  // ) => {
-  //   return request(signerApp)
-  //     .get(SignerEndpoint.LEGACY_PNP_SIGN)
-  //     .set('Authorization', authorization)
-  //     .send(req)
-  // }
+  describe(`${SignerEndpoint.LEGACY_PNP_SIGN}`, () => {
+    describe('quota calculation logic', () => {
+      const runLegacyPnpSignQuotaTestCase = async (testCase: legacyPnpQuotaCalculationTestCase) => {
+        await prepMocks(
+          testCase.account,
+          testCase.performedQueryCount,
+          testCase.transactionCount,
+          testCase.isVerified,
+          testCase.balanceCUSD,
+          testCase.balanceCEUR,
+          testCase.balanceCELO
+        )
 
-  // // TODO: add signature tests
-  // describe(`${SignerEndpoint.LEGACY_PNP_SIGN}`, () => {
-  //   // it('Should return 200 and correct version', async () => {
-  //   //   const res = await request(app).get(SignerEndpoint.STATUS)
-  //   //   expect(res.status).toBe(200)
-  //   //   expect(res.body.version).toBe(expectedVersion)
-  //   // })
+        const req = getLegacyPnpSignRequest(
+          testCase.account,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          testCase.identifier
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
 
-  //   // TODO: delete this test if duplicated in integration tests
-  //   it('provides signature', async () => {
-  //     // mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-  //     // mockGetBlockNumber.mockResolvedValue(10000)
+        const { expectedPerformedQueryCount, expectedTotalQuota } = testCase
+        const shouldSucceed = expectedPerformedQueryCount < expectedTotalQuota
 
-  //     await sendLegacyPnpSignatureRequest(
+        if (shouldSucceed) {
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: expectedVersion,
+            signature: expectedSignature,
+            performedQueryCount: expectedPerformedQueryCount + 1, // incremented for signature request
+            totalQuota: expectedTotalQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+        } else {
+          expect(res.status).toBe(403)
+          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            success: false,
+            version: expectedVersion,
+            performedQueryCount: expectedPerformedQueryCount,
+            totalQuota: expectedTotalQuota,
+            blockNumber: testBlockNumber,
+            error: WarningMessage.EXCEEDED_QUOTA,
+          })
+        }
+      }
 
-  //     )
+      quotaCalculationTestCases.forEach((testCase) => {
+        it(testCase.it, async () => {
+          await runLegacyPnpSignQuotaTestCase(testCase)
+        })
+      })
+    })
 
-  //     const res = await request(app).get(SignerEndpoint.STATUS)
-  //     expect(res.status).toBe(200)
-  //     expect(res.body.version).toBe(expectedVersion)
+    describe('endpoint functionality', () => {
+      // Use values from 'unverified account with balance but no transactions' logic test case
+      const performedQueryCount = 1
+      const expectedQuota = 10
 
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(
-  //         200,
-  //         {
-  //           success: true,
-  //           signature: BLS_SIGNATURE,
-  //           version: getVersion(),
-  //           performedQueryCount: 1,
-  //           totalQuota: 10,
-  //           blockNumber: 10000,
-  //         },
-  //         done
-  //       )
-  //   })
-  //   // TODO: delete this test if duplicated in integration tests
-  //   // Backwards compatibility check
-  //   it('provides signature w/ expired timestamp', (done) => {
-  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-  //     mockGetBlockNumber.mockResolvedValue(10000)
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send({ ...validRequest, timestamp: Date.now() - 10 * 60 * 1000 }) // 10 minutes ago
-  //       .expect('Content-Type', /json/)
-  //       .expect(
-  //         200,
-  //         {
-  //           success: true,
-  //           signature: BLS_SIGNATURE,
-  //           version: getVersion(),
-  //           performedQueryCount: 1,
-  //           totalQuota: 10,
-  //           blockNumber: 10000,
-  //         },
-  //         done
-  //       )
-  //   })
+      beforeEach(async () => {
+        await prepMocks(
+          ACCOUNT_ADDRESS1,
+          performedQueryCount,
+          0,
+          false,
+          twentyCents,
+          twentyCents,
+          twentyCents
+        )
+      })
 
-  //   // TODO: delete this test if duplicated in integration tests
-  //   it('returns 403 on query count 0', (done) => {
-  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 10, totalQuota: 10 })
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(403, done)
-  //   })
+      it('Should respond with 200 on valid request', async () => {
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          signature: expectedSignature,
+          performedQueryCount: performedQueryCount + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+        expect(res.get(KEY_VERSION_HEADER)).toEqual(
+          _config.keystore.keys.phoneNumberPrivacy.latest.toString()
+        )
+      })
 
-  //   // TODO: preserve this test
-  //   // We don't want to block the user on DB or blockchain query failure
-  //   it('returns 200 on DB query failure', (done) => {
-  //     mockGetRemainingQueryCount.mockRejectedValue(undefined)
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(200, done)
-  //   })
+      it('Should respond with 200 on valid request with key version header', async () => {
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN, '3') // since default is '1' or '2'
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          signature: expectedSignature,
+          performedQueryCount: performedQueryCount + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+        expect(res.get(KEY_VERSION_HEADER)).toEqual('3')
+      })
 
-  //   // TODO: preserve this test
-  //   it('returns 500 on bls error', (done) => {
-  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-  //     mockComputeBlindedSignature.mockImplementation(() => {
-  //       throw Error()
-  //     })
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(500, done)
-  //   })
+      it('Should respond with 200 and warning on repeated valid requests', async () => {
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res1 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res1.status).toBe(200)
+        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: res1.body.version,
+          signature: expectedSignature,
+          performedQueryCount: performedQueryCount + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+        const res2 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res2.status).toBe(200)
+        res1.body.warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
+        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(res1.body)
+      })
 
-  //   // TODO: preserve this test
-  //   it('returns 200 with warning on replayed request', (done) => {
-  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-  //     mockGetRequestExists.mockReturnValue(true)
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(
-  //         200,
-  //         {
-  //           success: false,
-  //           signature: BLS_SIGNATURE,
-  //           version: getVersion(),
-  //           performedQueryCount: 0,
-  //           error: WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG,
-  //           totalQuota: 10,
-  //           blockNumber: 10000,
-  //         },
-  //         done
-  //       )
-  //   })
+      it('Should respond with 200 on extra request fields', async () => {
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        // @ts-ignore Intentionally adding an extra field to the request type
+        req.extraField = 'dummyString'
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          signature: expectedSignature,
+          performedQueryCount: performedQueryCount + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+      })
 
-  //   // TODO: preserve this test
-  //   it('returns 200 with warning on failure to increment query count', (done) => {
-  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-  //     mockIncrementQueryCount.mockReturnValue(false)
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(
-  //         200,
-  //         {
-  //           success: false,
-  //           signature: BLS_SIGNATURE,
-  //           version: getVersion(),
-  //           performedQueryCount: 0,
-  //           error: ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
-  //           totalQuota: 10,
-  //           blockNumber: 10000,
-  //         },
-  //         done
-  //       )
-  //   })
+      it('Should respond with 400 on missing request fields', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        // @ts-ignore Intentionally deleting required field
+        delete badRequest.account
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
 
-  //   // TODO: preserve this test
-  //   it('returns 200 with warning on failure to store request', (done) => {
-  //     mockGetRemainingQueryCount.mockResolvedValue({ performedQueryCount: 0, totalQuota: 10 })
-  //     mockStoreRequest.mockReturnValue(false)
-  //     request(app)
-  //       .post('/getBlindedMessagePartialSig')
-  //       .send(validRequest)
-  //       .expect('Content-Type', /json/)
-  //       .expect(
-  //         200,
-  //         {
-  //           success: false,
-  //           signature: BLS_SIGNATURE,
-  //           version: getVersion(),
-  //           performedQueryCount: 1,
-  //           error: ErrorMessage.FAILURE_TO_STORE_REQUEST,
-  //           totalQuota: 10,
-  //           blockNumber: 10000,
-  //         },
-  //         done
-  //       )
-  //   })
-  // })
+      it('Should respond with 400 on invalid key version', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(
+          badRequest,
+          authorization,
+          SignerEndpoint.LEGACY_PNP_SIGN,
+          'a'
+        )
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        })
+      })
 
-  // describe('with invalid input', () => {
-  //   // TODO: preserve this test
-  //   it('invalid address returns 400', (done) => {
-  //     const mockRequestData = {
-  //       ...validRequest,
-  //       account: 'd31509C31d654056A45185ECb6',
-  //     }
+      it('Should respond with 400 on invalid identifier', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          '+1234567890'
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
 
-  //     request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
-  //   })
+      it('Should respond with 400 on invalid blinded message', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          '+1234567890',
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
 
-  //   // TODO: preserve this test
-  //   it('invalid hashedPhoneNumber returns 400', (done) => {
-  //     const mockRequestData = {
-  //       ...validRequest,
-  //       hashedPhoneNumber: '+1234567890',
-  //     }
+      it('Should respond with 400 on invalid address', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          '0xnotanaddress',
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(400)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
 
-  //     request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
-  //   })
+      it('Should respond with 401 on failed auth', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+        const authorization = getPnpRequestAuthorization(badRequest, differentPk)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(401)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.UNAUTHENTICATED_USER,
+        })
+      })
 
-  //   // TODO: preserve this test
-  //   it('invalid blinded phone number returns 400', (done) => {
-  //     const mockRequestData = {
-  //       ...validRequest,
-  //       blindedQueryPhoneNumber: '1234567890',
-  //     }
+      it('Should respond with 403 on out of quota', async () => {
+        // deplete user's quota
+        const remainingQuota = expectedQuota - performedQueryCount
+        await db.transaction(async (trx) => {
+          for (let i = 0; i < remainingQuota; i++) {
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+          }
+        })
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(403)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          performedQueryCount: expectedQuota,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          error: WarningMessage.EXCEEDED_QUOTA,
+        })
+      })
 
-  //     request(app).post('/getBlindedMessagePartialSig').send(mockRequestData).expect(400, done)
-  //   })
-  // })
+      it('Should respond with 403 if totalQuota and performedQueryCount are zero', async () => {
+        await prepMocks(ACCOUNT_ADDRESS1, 0, 0, false, zeroBalance, zeroBalance, zeroBalance)
+
+        const spy = jest // for convenience so we don't have to refactor or reset the db just for this test
+          .spyOn(
+            jest.requireActual('../../src/common/database/wrappers/account'),
+            'getPerformedQueryCount'
+          )
+          .mockResolvedValueOnce(0)
+
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(403)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          performedQueryCount: 0,
+          totalQuota: 0,
+          blockNumber: testBlockNumber,
+          error: WarningMessage.EXCEEDED_QUOTA,
+        })
+
+        spy.mockRestore()
+      })
+
+      it('Should respond with 403 if performedQueryCount is greater than totalQuota', async () => {
+        const expectedRemainingQuota = expectedQuota - performedQueryCount
+        await db.transaction(async (trx) => {
+          for (let i = 0; i <= expectedRemainingQuota; i++) {
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+          }
+        })
+
+        // It is possible to reach this state due to our fail-open logic
+
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(403)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          performedQueryCount: expectedQuota + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          error: WarningMessage.EXCEEDED_QUOTA,
+        })
+      })
+
+      it('Should respond with 503 on disabled api', async () => {
+        const configWithApiDisabled = { ...config }
+        configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
+        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendRequest(
+          req,
+          authorization,
+          SignerEndpoint.LEGACY_PNP_SIGN,
+          undefined,
+          appWithApiDisabled
+        )
+        expect(res.status).toBe(503)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.API_UNAVAILABLE,
+        })
+      })
+
+      describe('functionality in case of errors', () => {
+        it('Should return 200 w/ warning on DB performedQueryCount query failure', async () => {
+          // deplete user's quota
+          const remainingQuota = expectedQuota - performedQueryCount
+          await db.transaction(async (trx) => {
+            for (let i = 0; i < remainingQuota; i++) {
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            }
+          })
+          // sanity check
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(expectedQuota)
+
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'getPerformedQueryCount'
+            )
+            .mockRejectedValueOnce(new Error())
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: 1,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [
+              ErrorMessage.DATABASE_GET_FAILURE,
+              ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
+            ],
+          })
+
+          spy.mockRestore()
+
+          // check DB state: performedQueryCount was still incremented and request was stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(expectedQuota + 1)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(true)
+        })
+
+        it('Should return 200 w/ warning on blockchain totalQuota query failure', async () => {
+          // deplete user's quota
+          const remainingQuota = expectedQuota - performedQueryCount
+          await db.transaction(async (trx) => {
+            for (let i = 0; i < remainingQuota; i++) {
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            }
+          })
+          // sanity check
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(expectedQuota)
+
+          mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: expectedQuota + 1, // bc we depleted the user's quota above
+            totalQuota: Number.MAX_SAFE_INTEGER,
+            blockNumber: testBlockNumber,
+            warnings: [ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA, ErrorMessage.FULL_NODE_ERROR],
+          })
+
+          // check DB state: performedQueryCount was incremented and request was stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(expectedQuota + 1)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(true)
+        })
+
+        it('Should return 200 w/ warning on failure to increment query count', async () => {
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'incrementQueryCount'
+            )
+            .mockRejectedValueOnce(new Error())
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount, // Not incremented
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [
+              ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
+              ErrorMessage.FAILURE_TO_STORE_REQUEST,
+            ],
+          })
+
+          spy.mockRestore()
+
+          // check DB state: performedQueryCount was not incremented and request was not stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(performedQueryCount)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+        })
+
+        it('Should return 200 w/ warning on failure to store request', async () => {
+          const spy = jest
+            .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
+            .mockRejectedValueOnce(new Error())
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount + 1,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [ErrorMessage.FAILURE_TO_STORE_REQUEST],
+          })
+
+          spy.mockRestore()
+
+          // check DB state: performedQueryCount was incremented and request was not stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(performedQueryCount + 1)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+        })
+
+        it('Should return 500 on bls signing error', async () => {
+          const spy = jest
+            .spyOn(jest.requireActual('blind-threshold-bls'), 'partialSignBlindedMessage')
+            .mockImplementationOnce(() => {
+              throw new Error()
+            })
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(500)
+          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            success: false,
+            version: res.body.version,
+            performedQueryCount: performedQueryCount,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
+          })
+
+          spy.mockRestore()
+
+          // check DB state: performedQueryCount was not incremented and request was not stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(performedQueryCount)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+        })
+      })
+    })
+  })
 })

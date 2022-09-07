@@ -6,6 +6,7 @@ import {
   identifierIsValidIfExists,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
+  PnpQuotaStatus,
   send,
   SignerEndpoint,
   SignMessageRequest,
@@ -71,9 +72,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     response: Response<SignMessageResponseSuccess>,
     key: Key,
     signature: string,
-    performedQueryCount: number,
-    totalQuota: number,
-    blockNumber?: number,
+    quotaStatus: PnpQuotaStatus,
     warnings?: string[]
   ) {
     response.set(KEY_VERSION_HEADER, key.version.toString())
@@ -83,9 +82,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
         success: true,
         version: getVersion(),
         signature,
-        performedQueryCount,
-        totalQuota,
-        blockNumber,
+        ...quotaStatus,
         warnings,
       },
       status,

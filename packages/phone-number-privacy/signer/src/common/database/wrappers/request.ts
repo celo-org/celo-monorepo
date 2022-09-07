@@ -12,27 +12,34 @@ export async function getRequestExists(
   db: Knex,
   request: SignMessageRequest,
   logger: Logger,
-  trx: Knex.Transaction
+  trx?: Knex.Transaction
 ): Promise<boolean> {
   logger.debug({ request }, 'Checking if request exists')
   const getRequestExistsMeter = Histograms.dbOpsInstrumentation
     .labels('getRequestExists')
     .startTimer()
   try {
-    const existingRequest = await requests(db)
-      .transacting(trx)
-      .where({
-        [REQUESTS_COLUMNS.address]: request.account,
-        [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
-      })
-      .first()
-      .timeout(DB_TIMEOUT)
+    const existingRequest = trx
+      ? await requests(db)
+          .transacting(trx)
+          .where({
+            [REQUESTS_COLUMNS.address]: request.account,
+            [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
+          })
+          .first()
+          .timeout(DB_TIMEOUT)
+      : await requests(db)
+          .where({
+            [REQUESTS_COLUMNS.address]: request.account,
+            [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
+          })
+          .first()
+          .timeout(DB_TIMEOUT)
     return !!existingRequest
   } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error(ErrorMessage.DATABASE_GET_FAILURE)
-    logger.error(err)
-    return false
+    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
+    throw err
   } finally {
     getRequestExistsMeter()
   }
@@ -43,16 +50,15 @@ export async function storeRequest(
   request: SignMessageRequest,
   logger: Logger,
   trx: Knex.Transaction
-) {
+): Promise<void> {
   const storeRequestMeter = Histograms.dbOpsInstrumentation.labels('storeRequest').startTimer()
   logger.debug({ request }, 'Storing salt request')
   try {
     await requests(db).transacting(trx).insert(new Request(request)).timeout(DB_TIMEOUT)
-    return true
   } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ error: err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    return null
+    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw err
   } finally {
     storeRequestMeter()
   }
