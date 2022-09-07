@@ -176,7 +176,7 @@ describe('legacyPNP', () => {
       balanceCELO: twentyCents,
       isVerified: false,
       identifier: IDENTIFIER,
-      expectedPerformedQueryCount: 0,
+      expectedPerformedQueryCount: 1,
       expectedTotalQuota: 10,
     },
     {
