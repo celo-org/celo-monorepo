@@ -1,6 +1,6 @@
 pragma solidity ^0.5.13;
 
-import { IMentoExchange } from "../interfaces/IMentoExchange.sol";
+import { IMentoExchange } from "../interfaces/deprecate/IMentoExchange.sol";
 
 contract MockMentoExchange is IMentoExchange {
   string private _name;

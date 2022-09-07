@@ -5,8 +5,8 @@ pragma experimental ABIEncoderV2;
 import { Test, console2 as console } from "celo-foundry/Test.sol";
 
 import { IReserve } from "contracts/stability/interfaces/IReserve.sol";
-import { IMentoExchange } from "contracts/stability/interfaces/IMentoExchange.sol";
-import { PairManager } from "contracts/stability/PairManager.sol";
+import { IMentoExchange } from "contracts/stability/interfaces/deprecate/IMentoExchange.sol";
+import { PairManager } from "contracts/stability/PairManager.old.sol";
 
 import { MockReserve } from "contracts/stability/test/MockReserve.sol";
 import { MockERC20 } from "contracts/stability/test/MockERC20.sol";
