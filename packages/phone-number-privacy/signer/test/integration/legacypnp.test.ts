@@ -169,7 +169,7 @@ describe('legacyPNP', () => {
     {
       it: 'should calculate correct quota for unverified account with balance but no transactions',
       account: ACCOUNT_ADDRESS1,
-      performedQueryCount: 0,
+      performedQueryCount: 1,
       transactionCount: 0,
       balanceCUSD: twentyCents,
       balanceCEUR: twentyCents,

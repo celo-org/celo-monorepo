@@ -352,11 +352,7 @@ describe('legacyPnpService', () => {
 
         // Second request for the same account but with new message
         const message2 = Buffer.from('second test message', 'utf8')
-        const newUserSeed = new Uint8Array(32)
-        for (let i = 0; i < userSeed.length - 1; i++) {
-          newUserSeed[i] = i
-        }
-        const blindedMsg2 = threshold_bls.blind(message2, newUserSeed)
+        const blindedMsg2 = threshold_bls.blind(message2, userSeed)
         const req2 = getSignRequest(blindedMsg2)
         const authorization2 = getPnpRequestAuthorization(req2, PRIVATE_KEY1)
 
