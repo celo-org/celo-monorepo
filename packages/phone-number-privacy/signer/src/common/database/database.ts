@@ -1,7 +1,7 @@
 import { rootLogger } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex, knex } from 'knex'
-import { DEV_MODE, SignerConfig, SupportedDatabase } from '../../config'
+import { DEV_MODE, SignerConfig, SupportedDatabase, VERBOSE_DB_LOGGING } from '../../config'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
 
 export async function initDatabase(
@@ -62,8 +62,7 @@ export async function initDatabase(
     client,
     useNullAsDefault: type === SupportedDatabase.Sqlite,
     connection,
-    // TODO EN: setting this to true allows for accessing knex debug things!!
-    debug: false && DEV_MODE, // TODO(2.0.0, refactor) why is this 'false' here
+    debug: DEV_MODE && VERBOSE_DB_LOGGING,
   })
 
   logger.info('Running Migrations')

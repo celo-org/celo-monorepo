@@ -266,27 +266,6 @@ describe('pnpService', () => {
         req = getSignRequest(blindedMsgResult)
       })
 
-      it.only('DELETE DB testing', async () => {
-        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res1 = await sendPnpSignRequest(req, authorization, app)
-        const expectedResponse: SignMessageResponseSuccess = {
-          success: true,
-          version: expectedVersion,
-          signature: expectedSig,
-          performedQueryCount: 1,
-          totalQuota: expectedTotalQuota,
-          blockNumber: testBlockNumber,
-        }
-
-        expect(res1.status).toBe(200)
-        expect(res1.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
-
-        const res2 = await sendPnpSignRequest(req, authorization, app)
-        expect(res2.status).toBe(200)
-        // Do not expect performedQueryCount to increase since this is a duplicate request
-        expect(res2.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
-      })
-
       it('Should respond with 200 on valid request', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app)
