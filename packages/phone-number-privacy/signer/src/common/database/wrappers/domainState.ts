@@ -10,7 +10,7 @@ import {
   DOMAIN_STATE_TABLE,
   toDomainStateRecord,
 } from '../models/domainState'
-import { countAndThrowDBError } from '../utils'
+import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
 function domainStates(db: Knex) {
   return db<DomainStateRecord>(DOMAIN_STATE_TABLE)
@@ -69,12 +69,7 @@ export async function getDomainStateRecord<D extends Domain>(
     async () => {
       const hash = domainHash(domain).toString('hex')
       logger.debug({ hash, domain }, 'Getting domain state from db')
-      let baseQuery = domainStates(db)
-      if (trx) {
-        // Lock relevant database rows for the duration of the trx
-        baseQuery = baseQuery.transacting(trx).forUpdate()
-      }
-      const result = await baseQuery
+      const result = await tableWithLockForTrx(domainStates(db), trx)
         .where(DOMAIN_STATE_COLUMNS.domainHash, hash)
         .first()
         .timeout(DB_TIMEOUT)

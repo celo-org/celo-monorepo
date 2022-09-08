@@ -4,7 +4,7 @@ import { Knex } from 'knex'
 import { Histograms } from '../../../common/metrics'
 import { meter } from '../../web3/contracts'
 import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
-import { countAndThrowDBError } from '../utils'
+import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
 function accounts(db: Knex) {
   return db<Account>(ACCOUNTS_TABLE)
@@ -12,10 +12,6 @@ function accounts(db: Knex) {
 
 /*
  * Returns how many queries the account has already performed.
- * // TODO EN: minimally add comments about locking DB rows if trx does not exist;
- * possibly split this into two separate functions otherwise
- * --> could even do something like split it up into the actual getPerformedQueryCount
- * that requires a trx, and then a wrapper that has separate logging for failing to obtain the lock & transaction
  */
 export async function getPerformedQueryCount(
   db: Knex,
@@ -26,12 +22,7 @@ export async function getPerformedQueryCount(
   return meter(
     async () => {
       logger.debug({ account }, 'Getting performed query count')
-      let baseQuery = accounts(db)
-      if (trx) {
-        // Lock relevant database rows for the duration of the transaction
-        baseQuery = baseQuery.transacting(trx).forUpdate()
-      }
-      const queryCounts = await baseQuery
+      const queryCounts = await tableWithLockForTrx(accounts(db), trx)
         .select(ACCOUNTS_COLUMNS.numLookups)
         .where(ACCOUNTS_COLUMNS.address, account)
         .first()
@@ -53,12 +44,7 @@ async function getAccountExists(
 ): Promise<boolean> {
   return meter(
     async () => {
-      let baseQuery = accounts(db)
-      if (trx) {
-        // Lock relevant database rows for the duration of the trx
-        baseQuery = baseQuery.transacting(trx).forUpdate()
-      }
-      const accountRecord = await baseQuery
+      const accountRecord = await tableWithLockForTrx(accounts(db), trx)
         .where(ACCOUNTS_COLUMNS.address, account)
         .first()
         .timeout(DB_TIMEOUT)

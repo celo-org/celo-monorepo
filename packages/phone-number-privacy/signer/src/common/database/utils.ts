@@ -1,5 +1,6 @@
 import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
+import { Knex } from 'knex'
 import { Counters, Labels } from '../metrics'
 
 export type DatabaseErrorMessage =
@@ -30,4 +31,12 @@ export function countAndThrowDBError<T>(
   Counters.databaseErrors.labels(label).inc()
   logger.error({ err }, errorMsg)
   throw err
+}
+
+export function tableWithLockForTrx(baseQuery: Knex.QueryBuilder, trx?: Knex.Transaction) {
+  if (trx) {
+    // Lock relevant database rows for the duration of the transaction
+    return baseQuery.transacting(trx).forUpdate()
+  }
+  return baseQuery
 }

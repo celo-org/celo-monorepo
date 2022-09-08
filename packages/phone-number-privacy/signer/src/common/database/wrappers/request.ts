@@ -4,7 +4,7 @@ import { Knex } from 'knex'
 import { Histograms } from '../../../common/metrics'
 import { meter } from '../../web3/contracts'
 import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
-import { countAndThrowDBError } from '../utils'
+import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
 function requests(db: Knex) {
   return db<Request>(REQUESTS_TABLE)
@@ -19,11 +19,7 @@ export async function getRequestExists(
   return meter(
     async () => {
       logger.debug({ request }, 'Checking if request exists')
-      let baseQuery = requests(db)
-      if (trx) {
-        baseQuery = baseQuery.transacting(trx)
-      }
-      const existingRequest = await baseQuery
+      const existingRequest = await tableWithLockForTrx(requests(db), trx)
         .where({
           [REQUESTS_COLUMNS.address]: request.account,
           [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
