@@ -44,8 +44,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
       } else {
         // In the case of a database connection failure, performedQueryCount will be -1
-        // TODO EN REVISIT THIS LOGIC: do we want to rollback here? why not if not?
-
         if (quotaStatus.performedQueryCount === -1) {
           this.io.sendFailure(
             ErrorMessage.DATABASE_GET_FAILURE,
@@ -103,7 +101,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
       }
 
       // Compute signature inside transaction so it will rollback on error.
-
       try {
         const signature = await this.sign(
           session.request.body.blindedQueryPhoneNumber,
@@ -112,20 +109,21 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         )
         this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
       } catch (err) {
+        // Explicitly rolling back: don't throw an error after that as this hangs
         await trx.rollback()
         quotaStatus.performedQueryCount--
-        if (err === ErrorMessage.SIGNATURE_COMPUTATION_FAILURE) {
-          this.io.sendFailure(
-            ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
-            500,
-            session.response,
-            quotaStatus.performedQueryCount, // TODO(2.0.0) consider refactoring to allow quotaStatus to be passed directly here to avoid parameter ordering errors
-            quotaStatus.totalQuota,
-            quotaStatus.blockNumber
-          )
-        } else {
-          throw err
-        }
+        const responseErr =
+          err === ErrorMessage.SIGNATURE_COMPUTATION_FAILURE
+            ? ErrorMessage.SIGNATURE_COMPUTATION_FAILURE
+            : ErrorMessage.KEY_FETCH_ERROR // Default; most likely alternative
+        this.io.sendFailure(
+          responseErr,
+          500,
+          session.response,
+          quotaStatus.performedQueryCount, // TODO(2.0.0) consider refactoring to allow quotaStatus to be passed directly here to avoid parameter ordering errors
+          quotaStatus.totalQuota,
+          quotaStatus.blockNumber
+        )
       }
     })
   }
