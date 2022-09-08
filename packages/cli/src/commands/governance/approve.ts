@@ -64,7 +64,7 @@ export default class Approve extends BaseCommand {
 
       await checkBuilder
         .proposalExists(id)
-        .proposalInStage(id, 'Approval')
+        .proposalInStage(id, 'Referendum')
         .addCheck(`${id} not already approved`, async () => !(await governance.isApproved(id)))
         .runChecks()
       governanceTx = await governance.approve(id)
