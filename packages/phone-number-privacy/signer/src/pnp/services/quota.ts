@@ -8,9 +8,9 @@ import {
 import { Knex } from 'knex'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
 import { storeRequest } from '../../common/database/wrappers/request'
-import { Counters, Histograms } from '../../common/metrics'
+import { Counters, Histograms, meter } from '../../common/metrics'
 import { OdisQuotaStatusResult, QuotaService } from '../../common/quota'
-import { getBlockNumber, meter } from '../../common/web3/contracts'
+import { getBlockNumber } from '../../common/web3/contracts'
 import { config } from '../../config'
 import { PnpSession } from '../session'
 

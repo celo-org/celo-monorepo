@@ -7,26 +7,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
-import { Histogram } from 'prom-client'
-import { Counters, Histograms, Labels } from '../../common/metrics'
-
-declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
-
-// TODO(2.0.0, metering): use this elsewhere (https://github.com/celo-org/celo-monorepo/issues/9796)
-// TODO EN: is there a better home for the metering code than with contracts ?
-// perhaps in metrics?
-export async function meter<T extends any[], U>(
-  inFunction: InFunction<T, U>,
-  params: T,
-  onError: (err: any) => U,
-  prometheus: Histogram<string>,
-  labels: string[]
-): Promise<U> {
-  const _meter = prometheus.labels(...labels).startTimer()
-  return inFunction(...params)
-    .catch(onError)
-    .finally(_meter)
-}
+import { Counters, Histograms, Labels, meter } from '../metrics'
 
 export async function getBlockNumber(kit: ContractKit): Promise<number> {
   return meter(

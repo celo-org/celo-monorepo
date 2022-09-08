@@ -1,8 +1,7 @@
 import { DB_TIMEOUT, ErrorMessage, SignMessageRequest } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
-import { Histograms } from '../../../common/metrics'
-import { meter } from '../../web3/contracts'
+import { Histograms, meter } from '../../metrics'
 import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
 import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 

@@ -2,8 +2,7 @@ import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Domain, domainHash } from '@celo/phone-number-privacy-common/lib/domains'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
-import { Histograms } from '../../../common/metrics'
-import { meter } from '../../web3/contracts'
+import { Histograms, meter } from '../../metrics'
 import {
   DomainStateRecord,
   DOMAIN_STATE_COLUMNS,

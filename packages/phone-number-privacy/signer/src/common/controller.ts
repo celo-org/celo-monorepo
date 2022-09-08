@@ -1,8 +1,7 @@
 import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { Action } from './action'
-import { Counters, Histograms } from './metrics'
-import { meter } from './web3/contracts'
+import { Counters, Histograms, meter } from './metrics'
 
 export class Controller<R extends OdisRequest> {
   constructor(readonly action: Action<R>) {}
