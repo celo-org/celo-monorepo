@@ -31,20 +31,14 @@ Follow these steps to get everything that you need installed to build the celo-m
 
 #### Install Go
 
-We need Go for [celo-blockchain], the Go Celo implementation, and `gobind` to build Java language bindings to Go code for the Android Geth client).
+We need Go for [celo-blockchain](https://github.com/celo-org/celo-blockchain), the Go Celo implementation, and `gobind` to build Java language bindings to Go code for the Android Geth client.
 
-Note: We currently use Go 1.13. [Install Go 1.13 manually](https://golang.org/dl/), then run
+For go installation instructions see [celo-blockchain instructions](https://github.com/celo-org/celo-blockchain#building-the-source).
 
-```
-go get golang.org/x/mobile/cmd/gobind
-```
+Once you have go installed run the following to install gobind
 
-Execute the following (and make sure the lines are in your `~/.bash_profile`):
+`go get golang.org/x/mobile/cmd/gobind`
 
-```
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
-```
 
 #### Install Node
 
