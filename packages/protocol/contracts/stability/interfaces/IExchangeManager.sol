@@ -13,16 +13,11 @@ interface IExchangeManager {
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
-   * @param amountOutMin Minimum amountOut to be received - controls slippage
    * @return amountOut The amount of tokenOut to be bought
    */
-  function swapIn(
-    bytes32 exchangeId,
-    address tokenIn,
-    address tokenOut,
-    uint256 amountIn,
-    uint256 amountOutMin
-  ) external returns (uint256 amountOut);
+  function swapIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
+    external
+    returns (uint256 amountOut);
 
   /**
    * @notice Execute a token swap with fixed amountOut
@@ -32,13 +27,9 @@ interface IExchangeManager {
    * @param amountOut The amount of tokenOut to be bought
    * @return amountIn The amount of tokenIn to be sold
    */
-  function swapOut(
-    bytes32 exchangeId,
-    address tokenIn,
-    address tokenOut,
-    uint256 amountOut,
-    uint256 amountInMax
-  ) external returns (uint256 amountIn);
+  function swapOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
+    external
+    returns (uint256 amountIn);
 
   /**
    * @notice Quote a token swap with fixed amountIn

@@ -26,7 +26,8 @@ interface IBiPoolManager {
   /** 
    * @notice Variables related to bucket updates and sizing.
    * @dev Broken down into a separate struct because the compiler
-   * version doesn't support too large structs.
+   * version doesn't support structs with too many members. 
+   * Sad reacts only.
    */
   struct BucketUpdateInfo {
     address oracleReportTarget; // can be a stable address or custom
