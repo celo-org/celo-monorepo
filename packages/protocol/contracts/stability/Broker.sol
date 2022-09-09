@@ -16,7 +16,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   /* ==================== State Variables ==================== */
 
   address[] exchangeManagers;
-  mapping(address => bool) isExchangeManager;
+  mapping(address => bool) public isExchangeManager;
 
   // Address of the reserve.
   IReserve public reserve;
@@ -34,7 +34,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
    * @param _exchangeManagers The addresses of the ExchangeManager contracts.
    * @param _reserve The address of the Reserve contract.
    */
-  function initilize(address[] calldata _exchangeManagers, address _reserve) external initializer {
+  function initialize(address[] calldata _exchangeManagers, address _reserve) external initializer {
     _transferOwnership(msg.sender);
     for (uint256 i = 0; i < _exchangeManagers.length; i++) {
       addExchangeManager(_exchangeManagers[i]);
@@ -50,7 +50,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
    * @return index The index where it was inserted
    */
   function addExchangeManager(address exchangeManager) public onlyOwner returns (uint256 index) {
-    require(!checkIsExchangeManager(exchangeManager), "ExchangeManager already exists in the list");
+    require(!isExchangeManager[exchangeManager], "ExchangeManager already exists in the list");
     require(exchangeManager != address(0), "ExchangeManager address can't be 0");
     exchangeManagers.push(exchangeManager);
     isExchangeManager[exchangeManager] = true;
@@ -106,7 +106,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     address tokenOut,
     uint256 amountOut
   ) external returns (uint256 amountIn) {
-    require(checkIsExchangeManager(exchangeManager), "ExchangeManager does not exist");
+    require(isExchangeManager[exchangeManager], "ExchangeManager does not exist");
     return
       amountOut = IExchangeManager(exchangeManager).getAmountIn(
         exchangeId,
@@ -132,7 +132,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     address tokenOut,
     uint256 amountIn
   ) external returns (uint256 amountOut) {
-    require(checkIsExchangeManager(exchangeManager), "ExchangeManager does not exist");
+    require(isExchangeManager[exchangeManager], "ExchangeManager does not exist");
     return
       amountOut = IExchangeManager(exchangeManager).getAmountOut(
         exchangeId,
@@ -160,16 +160,11 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     uint256 amountIn,
     uint256 amountOutMin
   ) external returns (uint256 amountOut) {
-    require(checkIsExchangeManager(exchangeManager), "ExchangeManager does not exist");
-    return
-      amountOut = IExchangeManager(exchangeManager).swapIn(
-        exchangeId,
-        tokenIn,
-        tokenOut,
-        amountIn,
-        amountOutMin
-      );
+    require(isExchangeManager[exchangeManager], "ExchangeManager does not exist");
+    amountOut = IExchangeManager(exchangeManager).swapIn(exchangeId, tokenIn, tokenOut, amountIn);
+    require(amountOut >= amountOutMin, "amountOutMin not met");
     emit Swap(exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
+    return amountOut;
   }
 
   /**
@@ -190,33 +185,14 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     uint256 amountOut,
     uint256 amountInMax
   ) external returns (uint256 amountIn) {
-    require(checkIsExchangeManager(exchangeManager), "ExchangeManager does not exist");
-    return
-      amountIn = IExchangeManager(exchangeManager).swapOut(
-        exchangeId,
-        tokenIn,
-        tokenOut,
-        amountOut,
-        amountInMax
-      );
+    require(isExchangeManager[exchangeManager], "ExchangeManager does not exist");
+    amountIn = IExchangeManager(exchangeManager).swapOut(exchangeId, tokenIn, tokenOut, amountOut);
+    require(amountIn <= amountInMax, "amountInMax exceeded");
     emit Swap(exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
+    return amountIn;
   }
 
   /* ==================== View Functions ==================== */
-
-  /**
-   * @notice Checks if ExchangeManager exists in the exchangeManagers list
-   * @param exchangeManager the address of the exchange manager for the pair
-   * @return bool Returns true or false
-   */
-  function checkIsExchangeManager(address exchangeManager) public view returns (bool) {
-    for (uint256 i = 0; i < exchangeManagers.length; i++) {
-      if (exchangeManagers[i] == exchangeManager && isExchangeManager[exchangeManagers[i]]) {
-        return true;
-      }
-    }
-    return false;
-  }
 
   /**
    * @notice Get the list of registered exchange managers.
