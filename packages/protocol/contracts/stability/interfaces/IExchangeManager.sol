@@ -32,7 +32,7 @@ interface IExchangeManager {
     returns (uint256 amountIn);
 
   /**
-   * @notice Quote a token swap with fixed amountIn
+   * @notice Calculate amountOut of tokenOut received for a given amountIn of tokenIn
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 

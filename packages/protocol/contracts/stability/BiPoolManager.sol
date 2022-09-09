@@ -106,14 +106,14 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
   }
 
   /**
-   * @notice Quote a token swap with fixed amountIn
+   * @notice Calculate amountOut of tokenOut received for a given amountIn of tokenIn
    * @param exchangeId The id of the exchange i.e Pool to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
    * @return amountOut The amount of tokenOut to be bought
    */
-  function quoteIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
+  function getAmountOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
     public
     returns (uint256)
   {
@@ -134,14 +134,14 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
   }
 
   /**
-   * @notice Quote a token swap with fixed amountOut
+   * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
    * @param exchangeId The id of the exchange i.e Pool to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountOut The amount of tokenOut to be bought
    * @return amountIn The amount of tokenIn to be sold
    */
-  function quoteOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
+  function getAmountIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
     public
     returns (uint256)
   {
@@ -266,7 +266,7 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     returns (uint256 amountOut)
   {
     // TODO: Check if buckets should be updated
-    amountOut = quoteIn(exchangeId, tokenIn, tokenOut, amountIn);
+    amountOut = getAmountOut(exchangeId, tokenIn, tokenOut, amountIn);
     Pool memory pool = pools[exchangeId];
     if (tokenIn == pool.asset0) {
       pool.bucket0 += amountIn;
@@ -293,7 +293,7 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     returns (uint256 amountIn)
   {
     // TODO: Check if buckets should be updated
-    amountIn = quoteOut(exchangeId, tokenIn, tokenOut, amountOut);
+    amountIn = getAmountIn(exchangeId, tokenIn, tokenOut, amountOut);
     Pool memory pool = pools[exchangeId];
     if (tokenIn == pool.asset0) {
       pool.bucket0 += amountIn;

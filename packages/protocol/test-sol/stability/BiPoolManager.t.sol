@@ -464,28 +464,28 @@ contract BiPoolManagerTest_withPool is BiPoolManagerTest {
 }
 
 contract BiPoolManagerTest_quote is BiPoolManagerTest_withPool {
-  /* ---------- quoteIn ---------- */
-  function test_quoteIn_whenPoolDoesntExist_itReverts() public {
+  /* ---------- getAmountOut ---------- */
+  function test_getAmountOut_whenPoolDoesntExist_itReverts() public {
     vm.expectRevert("A pool with the specified id does not exist");
-    biPoolManager.quoteIn(0x0, address(0), address(0), 1e24);
+    biPoolManager.getAmountOut(0x0, address(0), address(0), 1e24);
   }
 
-  function test_quoteIn_whenTokenInNotInPool_itReverts() public {
+  function test_getAmountOut_whenTokenInNotInPool_itReverts() public {
     vm.expectRevert("tokenIn and tokenOut must match pool");
-    biPoolManager.quoteIn(poolId, address(cEUR), address(cUSD), 1e24);
+    biPoolManager.getAmountOut(poolId, address(cEUR), address(cUSD), 1e24);
   }
 
-  function test_quoteIn_whenTokenOutNotInPool_itReverts() public {
+  function test_getAmountOut_whenTokenOutNotInPool_itReverts() public {
     vm.expectRevert("tokenIn and tokenOut must match pool");
-    biPoolManager.quoteIn(poolId, address(cUSD), address(cEUR), 1e24);
+    biPoolManager.getAmountOut(poolId, address(cUSD), address(cEUR), 1e24);
   }
 
-  function test_quoteIn_whenTokenInEqualsTokenOut_itReverts() public {
+  function test_getAmountOut_whenTokenInEqualsTokenOut_itReverts() public {
     vm.expectRevert("tokenIn and tokenOut must match pool");
-    biPoolManager.quoteIn(poolId, address(cUSD), address(cUSD), 1e24);
+    biPoolManager.getAmountOut(poolId, address(cUSD), address(cUSD), 1e24);
   }
 
-  function test_quoteIn_whenTokenInIsAsset0_itDelegatesToThePricingModule() public {
+  function test_getAmountOut_whenTokenInIsAsset0_itDelegatesToThePricingModule() public {
     BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
 
     uint256 amountIn = 1e24;
@@ -503,11 +503,11 @@ contract BiPoolManagerTest_quote is BiPoolManagerTest_withPool {
       abi.encode(mockAmountOut)
     );
 
-    uint256 amountOut = biPoolManager.quoteIn(poolId, address(cUSD), address(CELO), amountIn);
+    uint256 amountOut = biPoolManager.getAmountOut(poolId, address(cUSD), address(CELO), amountIn);
     assertEq(amountOut, mockAmountOut);
   }
 
-  function test_quoteIn_whenTokenInIsAsset1_itDelegatesToThePricingModule() public {
+  function test_getAmountOut_whenTokenInIsAsset1_itDelegatesToThePricingModule() public {
     BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
 
     uint256 amountIn = 1e24;
@@ -525,33 +525,33 @@ contract BiPoolManagerTest_quote is BiPoolManagerTest_withPool {
       abi.encode(mockAmountOut)
     );
 
-    uint256 amountOut = biPoolManager.quoteIn(poolId, address(CELO), address(cUSD), amountIn);
+    uint256 amountOut = biPoolManager.getAmountOut(poolId, address(CELO), address(cUSD), amountIn);
     assertEq(amountOut, mockAmountOut);
   }
 
-  /* ---------- quoteOut ---------- */
+  /* ---------- getAmountIn ---------- */
 
-  function test_quoteOut_whenPoolDoesntExist_itReverts() public {
+  function test_getAmountIn_whenPoolDoesntExist_itReverts() public {
     vm.expectRevert("A pool with the specified id does not exist");
-    biPoolManager.quoteOut(0x0, address(0), address(0), 1e24);
+    biPoolManager.getAmountIn(0x0, address(0), address(0), 1e24);
   }
 
-  function test_quoteOut_whenTokenInNotInPool_itReverts() public {
+  function test_getAmountIn_whenTokenInNotInPool_itReverts() public {
     vm.expectRevert("tokenIn and tokenOut must match pool");
-    biPoolManager.quoteOut(poolId, address(cEUR), address(cUSD), 1e24);
+    biPoolManager.getAmountIn(poolId, address(cEUR), address(cUSD), 1e24);
   }
 
-  function test_quoteOut_whenTokenOutNotInPool_itReverts() public {
+  function test_getAmountIn_whenTokenOutNotInPool_itReverts() public {
     vm.expectRevert("tokenIn and tokenOut must match pool");
-    biPoolManager.quoteOut(poolId, address(cUSD), address(cEUR), 1e24);
+    biPoolManager.getAmountIn(poolId, address(cUSD), address(cEUR), 1e24);
   }
 
-  function test_quoteOut_whenTokenInEqualsTokenOut_itReverts() public {
+  function test_getAmountIn_whenTokenInEqualsTokenOut_itReverts() public {
     vm.expectRevert("tokenIn and tokenOut must match pool");
-    biPoolManager.quoteOut(poolId, address(cUSD), address(cUSD), 1e24);
+    biPoolManager.getAmountIn(poolId, address(cUSD), address(cUSD), 1e24);
   }
 
-  function test_quoteOut_whenTokenInIsAsset0_itDelegatesToThePricingModule() public {
+  function test_getAmountIn_whenTokenInIsAsset0_itDelegatesToThePricingModule() public {
     BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
 
     uint256 amountOut = 1e24;
@@ -569,11 +569,11 @@ contract BiPoolManagerTest_quote is BiPoolManagerTest_withPool {
       abi.encode(mockAmountIn)
     );
 
-    uint256 amountIn = biPoolManager.quoteOut(poolId, address(cUSD), address(CELO), amountOut);
+    uint256 amountIn = biPoolManager.getAmountIn(poolId, address(cUSD), address(CELO), amountOut);
     assertEq(amountIn, mockAmountIn);
   }
 
-  function test_quoteOut_whenTokenInIsAsset1_itDelegatesToThePricingModule() public {
+  function test_getAmountIn_whenTokenInIsAsset1_itDelegatesToThePricingModule() public {
     BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
 
     uint256 amountOut = 1e24;
@@ -591,7 +591,7 @@ contract BiPoolManagerTest_quote is BiPoolManagerTest_withPool {
       abi.encode(mockAmountIn)
     );
 
-    uint256 amountIn = biPoolManager.quoteOut(poolId, address(CELO), address(cUSD), amountOut);
+    uint256 amountIn = biPoolManager.getAmountIn(poolId, address(CELO), address(cUSD), amountOut);
     assertEq(amountIn, mockAmountIn);
   }
 
