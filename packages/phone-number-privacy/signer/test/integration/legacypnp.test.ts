@@ -45,6 +45,8 @@ const {
   ACCOUNT_ADDRESS1,
   mockAccount,
   BLINDED_PHONE_NUMBER,
+  DEK_PRIVATE_KEY,
+  DEK_PUBLIC_KEY,
 } = TestUtils.Values
 
 const expectedSignature =
@@ -56,11 +58,16 @@ const mockBalanceOfCUSD = jest.fn<BigNumber, []>()
 const mockBalanceOfCEUR = jest.fn<BigNumber, []>()
 const mockBalanceOfCELO = jest.fn<BigNumber, []>()
 const mockGetVerifiedStatus = jest.fn<AttestationsStatus, []>()
+const mockGetWalletAddress = jest.fn<string, []>()
+const mockGetDataEncryptionKey = jest.fn<string, []>()
 
 const mockContractKit = createMockContractKit(
   {
     // getWalletAddress stays constant across all old query-quota.test.ts unit tests
-    [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount),
+    [ContractRetrieval.getAccounts]: createMockAccounts(
+      mockGetWalletAddress,
+      mockGetDataEncryptionKey
+    ),
     [ContractRetrieval.getStableToken]: jest.fn(),
     [ContractRetrieval.getGoldToken]: createMockToken(mockBalanceOfCELO),
     [ContractRetrieval.getAttestations]: createMockAttestation(mockGetVerifiedStatus),
@@ -280,7 +287,9 @@ describe('legacyPNP', () => {
     isVerified: boolean,
     balanceCUSD: BigNumber,
     balanceCEUR: BigNumber,
-    balanceCELO: BigNumber
+    balanceCELO: BigNumber,
+    dekPubKey: string = DEK_PUBLIC_KEY,
+    walletAddress: string = mockAccount
   ) => {
     ;[
       mockContractKit.connection.getTransactionCount,
@@ -288,6 +297,8 @@ describe('legacyPNP', () => {
       mockBalanceOfCUSD,
       mockBalanceOfCEUR,
       mockBalanceOfCELO,
+      mockGetWalletAddress,
+      mockGetDataEncryptionKey,
     ].forEach((mockFn) => mockFn.mockReset())
 
     await db.transaction(async (trx) => {
@@ -304,6 +315,8 @@ describe('legacyPNP', () => {
     mockBalanceOfCUSD.mockReturnValue(balanceCUSD)
     mockBalanceOfCEUR.mockReturnValue(balanceCEUR)
     mockBalanceOfCELO.mockReturnValue(balanceCELO)
+    mockGetWalletAddress.mockReturnValue(walletAddress)
+    mockGetDataEncryptionKey.mockReturnValue(dekPubKey)
   }
 
   const sendRequest = async (
@@ -335,7 +348,11 @@ describe('legacyPNP', () => {
           testCase.balanceCELO
         )
 
-        const req = getPnpQuotaRequest(testCase.account, testCase.identifier)
+        const req = getPnpQuotaRequest(
+          testCase.account,
+          AuthenticationMethod.WALLET_KEY,
+          testCase.identifier
+        )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
@@ -372,6 +389,42 @@ describe('legacyPNP', () => {
           twentyCents,
           twentyCents
         )
+      })
+
+      it('Should respond with 200 on valid request', async () => {
+        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          performedQueryCount: performedQueryCount,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+      })
+
+      it('Should respond with 200 on valid request when authenticated with DEK', async () => {
+        const req = getPnpQuotaRequest(
+          ACCOUNT_ADDRESS1,
+          AuthenticationMethod.ENCRYPTION_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
+
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          performedQueryCount: performedQueryCount,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {
@@ -447,9 +500,30 @@ describe('legacyPNP', () => {
         })
       })
 
-      it('Should respond with 401 on failed auth', async () => {
-        // Request from one account, signed by another account
-        const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+      it('Should respond with 401 on failed WALLET_KEY auth', async () => {
+        const badRequest = getPnpQuotaRequest(
+          ACCOUNT_ADDRESS1,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+        const authorization = getPnpRequestAuthorization(badRequest, differentPk)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+
+        expect(res.status).toBe(401)
+        expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.UNAUTHENTICATED_USER,
+        })
+      })
+
+      it('Should respond with 401 on failed DEK auth', async () => {
+        const badRequest = getPnpQuotaRequest(
+          ACCOUNT_ADDRESS1,
+          AuthenticationMethod.ENCRYPTION_KEY,
+          IDENTIFIER
+        )
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
@@ -484,6 +558,33 @@ describe('legacyPNP', () => {
       })
 
       describe('functionality in case of errors', () => {
+        it('Should respond with 200 on failure to fetch DEK', async () => {
+          mockGetDataEncryptionKey.mockImplementation(() => {
+            throw new Error()
+          })
+
+          const req = getPnpQuotaRequest(
+            ACCOUNT_ADDRESS1,
+            AuthenticationMethod.ENCRYPTION_KEY,
+            IDENTIFIER
+          )
+
+          // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
+          const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+          const authorization = getPnpRequestAuthorization(req, differentPk)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            performedQueryCount: performedQueryCount,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+        })
+
         it('Should respond with 500 on DB performedQueryCount query failure', async () => {
           const spy = jest
             .spyOn(
@@ -619,6 +720,27 @@ describe('legacyPNP', () => {
         expect(res.get(KEY_VERSION_HEADER)).toEqual(
           _config.keystore.keys.phoneNumberPrivacy.latest.toString()
         )
+      })
+
+      it('Should respond with 200 on valid request when authenticated with DEK', async () => {
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.ENCRYPTION_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          signature: expectedSignature,
+          performedQueryCount: performedQueryCount + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
       })
 
       it('Should respond with 200 on valid request with key version header', async () => {
@@ -783,11 +905,29 @@ describe('legacyPNP', () => {
         })
       })
 
-      it('Should respond with 401 on failed auth', async () => {
+      it('Should respond with 401 on failed WALLET_KEY auth', async () => {
         const badRequest = getLegacyPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
           AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+        const authorization = getPnpRequestAuthorization(badRequest, differentPk)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(401)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.UNAUTHENTICATED_USER,
+        })
+      })
+
+      it('Should respond with 401 on failed DEK auth', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.ENCRYPTION_KEY,
           IDENTIFIER
         )
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
@@ -1082,6 +1222,34 @@ describe('legacyPNP', () => {
             await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
           ).toBe(performedQueryCount + 1)
           expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+        })
+
+        it('Should return 200 on failure to fetch DEK', async () => {
+          mockGetDataEncryptionKey.mockImplementation(() => {
+            throw new Error()
+          })
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.ENCRYPTION_KEY,
+            IDENTIFIER
+          )
+
+          // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
+          const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+          const authorization = getPnpRequestAuthorization(req, differentPk)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount + 1,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
         })
 
         it('Should return 500 on bls signing error', async () => {

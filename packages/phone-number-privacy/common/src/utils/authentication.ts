@@ -37,7 +37,7 @@ export async function authenticateUser(
     try {
       registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit, logger)
     } catch (error) {
-      logger.warn('Assuming request is authenticated')
+      logger.error(ErrorMessage.FAILURE_TO_GET_DEK) // TODO(2.0.0) add monitoring / alerting for this
       return true
     }
     if (!registeredEncryptionKey) {
@@ -57,9 +57,11 @@ export async function authenticateUser(
 
   // Fallback to previous signing pattern
   logger.info(
-    { account: signer },
+    { account: signer, message, messageSignature },
     'Message was not authenticated with DEK, attempting to authenticate using wallet key'
   )
+  // TODO(2.0.0) This uses signature utils, why doesn't DEK authentication?
+  // (https://github.com/celo-org/celo-monorepo/issues/9803)
   return verifySignature(message, messageSignature, signer)
 }
 
