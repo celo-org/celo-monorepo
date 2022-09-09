@@ -137,11 +137,16 @@ const testBlockNumber = 1000000
 
 const mockTokenBalance = jest.fn<BigNumber, []>()
 const mockGetVerifiedStatus = jest.fn<AttestationsStatus, []>()
+const mockGetWalletAddress = jest.fn<string, []>()
+const mockGetDataEncryptionKey = jest.fn<string, []>()
 
 const mockContractKit = createMockContractKit(
   {
     // getWalletAddress stays constant across all old query-quota.test.ts unit tests
-    [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount, DEK_PUBLIC_KEY),
+    [ContractRetrieval.getAccounts]: createMockAccounts(
+      mockGetWalletAddress,
+      mockGetDataEncryptionKey
+    ),
     [ContractRetrieval.getStableToken]: createMockToken(mockTokenBalance),
     [ContractRetrieval.getGoldToken]: createMockToken(mockTokenBalance),
     [ContractRetrieval.getAttestations]: createMockAttestation(mockGetVerifiedStatus),
@@ -248,6 +253,8 @@ describe('legacyPnpService', () => {
       mockGetVerifiedStatus,
       mockGetVerifiedStatus,
       mockTokenBalance,
+      mockGetDataEncryptionKey,
+      mockGetWalletAddress,
     ].forEach((mockFn) => mockFn.mockReset())
 
     mockContractKit.connection.getTransactionCount.mockReturnValue(transactionCount)
@@ -256,6 +263,8 @@ describe('legacyPnpService', () => {
       { isVerified, completed: 1, total: 1, numAttestationsRemaining: 1 }
     )
     mockTokenBalance.mockReturnValue(balanceToken)
+    mockGetDataEncryptionKey.mockReturnValue(DEK_PUBLIC_KEY)
+    mockGetWalletAddress.mockReturnValue(mockAccount)
   }
   const expectedQuota = 410
 
@@ -462,9 +471,24 @@ describe('legacyPnpService', () => {
         })
       })
 
-      it('Should respond with 401 on failed auth', async () => {
+      it('Should respond with 401 on failed WALLET_KEY auth', async () => {
         req.account = mockAccount
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(401)
+        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.UNAUTHENTICATED_USER,
+        })
+      })
+
+      it('Should respond with 401 on failed DEK auth', async () => {
+        req.account = mockAccount
+        req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
+        const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+        const authorization = getPnpRequestAuthorization(req, differentPk)
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(401)
@@ -501,6 +525,35 @@ describe('legacyPnpService', () => {
           success: false,
           version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
+        })
+      })
+
+      describe('functionality in case of errors', () => {
+        it('Should respond with 200 on failure to fetch DEK', async () => {
+          mockGetDataEncryptionKey.mockImplementation(() => {
+            throw new Error()
+          })
+
+          // Would fail authentication if getDataEncryptionKey succeeded
+          const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+          req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
+          const authorization = getPnpRequestAuthorization(req, differentPk)
+          const res = await sendPnpSignRequest(req, authorization, app)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: expectedVersion,
+            signature: expectedSig,
+            performedQueryCount: 1,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+          })
+          const unblindedSig = threshold_bls.unblind(
+            Buffer.from(res.body.signature, 'base64'),
+            blindedMsgResult.blindingFactor
+          )
+          expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedMsg)
         })
       })
     })
