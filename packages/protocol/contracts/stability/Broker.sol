@@ -14,10 +14,9 @@ import { Initializable } from "../common/Initializable.sol";
  */
 contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   /* ==================== State Variables ==================== */
-  address[] exchangeManagers;
 
-  // Address of the broker contract.
-  IExchangeManager public exchangeManager;
+  address[] exchangeManagers;
+  mapping(address => bool) isExchangeManager;
 
   // Address of the reserve.
   IReserve public reserve;
@@ -32,12 +31,14 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
 
   /**
    * @notice Allows the contract to be upgradable via the proxy.
-   * @param _exchangeManager The address of the PairManager contract.
+   * @param exchangeManager The address of the PairManager contract.
    * @param _reserve The address of the Rezerve contract.
    */
-  function initilize(address _exchangeManager, address _reserve) external initializer {
+  function initilize(address[] _exchangeManagers, address _reserve) external initializer {
     _transferOwnership(msg.sender);
-    addExchangeManager(_exchangeManager);
+    for (uint256 i = 0; i < _exchangeManagers.length; i++) {
+      addExchangeManager(_exchangeManagers[i]);
+    }
     setReserve(_reserve);
   }
 
@@ -45,38 +46,37 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
 
   /**
    * @notice Add exchange manager
-   * @param _exchangeManager The address of the exchange manager to add
+   * @param exchangeManager The address of the exchange manager to add
    * @return index The index where it was inserted
    */
-  function addExchangeManager(address _exchangeManager) public onlyOwner returns (uint256 index) {
-    require(
-      !existsInExchangeManagers(_exchangeManager),
-      "ExchangeManager already exists in the list"
-    );
-    require(_exchangeManager != address(0), "ExchangeManager address can't be 0");
-    exchangeManagers.push(_exchangeManager);
-    emit ExchangeManagerAdded(_exchangeManager);
+  function addExchangeManager(address exchangeManager) public onlyOwner returns (uint256 index) {
+    require(!checkIsExchangeManager(exchangeManager), "ExchangeManager already exists in the list");
+    require(exchangeManager != address(0), "ExchangeManager address can't be 0");
+    exchangeManagers.push(exchangeManager);
+    isExchangeManager[exchangeManager] = true;
+    emit ExchangeManagerAdded(exchangeManager);
     return index = exchangeManagers.length - 1;
   }
 
   /**
    * @notice Remove an exchange manager at an index
-   * @param _exchangeManager The address of the exchange manager to remove
+   * @param exchangeManager The address of the exchange manager to remove
    * @param index The index in the exchange managers array
    * @return bool returns true if successful
    */
-  function removeExchangeManager(address _exchangeManager, uint256 index)
+  function removeExchangeManager(address exchangeManager, uint256 index)
     public
     onlyOwner
     returns (bool)
   {
     require(
-      index < exchangeManagers.length && exchangeManagers[index] == _exchangeManager,
+      index < exchangeManagers.length && exchangeManagers[index] == exchangeManager,
       "index into exchangeManagers list not mapped to token"
     );
     exchangeManagers[index] = exchangeManagers[exchangeManagers.length - 1];
     exchangeManagers.pop();
-    emit ExchangeManagerRemoved(_exchangeManager);
+    delete isExchangeManager[exchangeManager];
+    emit ExchangeManagerRemoved(exchangeManager);
     return true;
   }
 
@@ -92,37 +92,59 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
 
   /**
    * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
+   * @param exchangeManager the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought
    * @param amountOut The amount of tokenOut to be bought
    * @return amountIn The amount of tokenIn to be sold
    */
-  function getAmountIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
-    external
-    returns (uint256 amountIn)
-  {
-    return amountOut = exchangeManager.getAmountIn(exchangeId, tokenIn, tokenOut, amountOut);
+  function getAmountIn(
+    address exchangeManager,
+    bytes32 exchangeId,
+    address tokenIn,
+    address tokenOut,
+    uint256 amountOut
+  ) external returns (uint256 amountIn) {
+    require(checkIsExchangeManager(exchangeManager), "ExchangeManager does not exist");
+    return
+      amountOut = IExchangeManager(exchangeManager).getAmountIn(
+        exchangeId,
+        tokenIn,
+        tokenOut,
+        amountOut
+      );
   }
 
   /**
    * @notice Calculate amountOut of tokenOut for a given amountIn of tokenIn
+   * @param exchangeManager the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
-   * @param tokenOut The token to be bought 
+   * @param tokenOut The token to be bought
    * @param amountIn The amount of tokenIn to be sold
    * @return amountOut The amount of tokenOut to be bought
    */
-  function getAmountOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
-    external
-    returns (uint256 amountOut)
-  {
-    return amountOut = exchangeManager.getAmountOut(exchangeId, tokenIn, tokenOut, amountIn);
+  function getAmountOut(
+    address exchangeManager,
+    bytes32 exchangeId,
+    address tokenIn,
+    address tokenOut,
+    uint256 amountIn
+  ) external returns (uint256 amountOut) {
+    require(checkIsExchangeManager(exchangeManager), "ExchangeManager does not exist");
+    return
+      amountOut = IExchangeManager(exchangeManager).getAmountOut(
+        exchangeId,
+        tokenIn,
+        tokenOut,
+        amountIn
+      );
   }
 
   /**
    * @notice Execute a token swap with fixed amountIn
-   * @param _exchangeManager the address of the exchange manager for the pair
+   * @param exchangeManager the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought
@@ -131,23 +153,28 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
    * @return amountOut The amount of tokenOut to be bought
    */
   function swapIn(
-    address _exchangeManager,
+    address exchangeManager,
     bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
     uint256 amountIn,
     uint256 amountOutMin
   ) external returns (uint256 amountOut) {
-    require(existsInExchangeManagers(_exchangeManager), "ExchangeManager does not exist");
-    exchangeManager = IExchangeManager(_exchangeManager);
+    require(checkIsExchangeManager(exchangeManager), "ExchangeManager does not exist");
     return
-      amountOut = exchangeManager.swapIn(exchangeId, tokenIn, tokenOut, amountIn, amountOutMin);
-    emit Swap(_exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
+      amountOut = IExchangeManager(exchangeManager).swapIn(
+        exchangeId,
+        tokenIn,
+        tokenOut,
+        amountIn,
+        amountOutMin
+      );
+    emit Swap(exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
   }
 
   /**
    * @notice Execute a token swap with fixed amountOut
-   * @param _exchangeManager the address of the exchange manager for the pair
+   * @param exchangeManager the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought
@@ -156,30 +183,35 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
    * @return amountIn The amount of tokenIn to be sold
    */
   function swapOut(
-    address _exchangeManager,
+    address exchangeManager,
     bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
     uint256 amountOut,
     uint256 amountInMax
   ) external returns (uint256 amountIn) {
-    require(existsInExchangeManagers(_exchangeManager), "ExchangeManager does not exist");
-    exchangeManager = IExchangeManager(_exchangeManager);
+    require(checkIsExchangeManager(exchangeManager), "ExchangeManager does not exist");
     return
-      amountIn = exchangeManager.swapOut(exchangeId, tokenIn, tokenOut, amountOut, amountInMax);
-    emit Swap(_exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
+      amountIn = IExchangeManager(exchangeManager).swapOut(
+        exchangeId,
+        tokenIn,
+        tokenOut,
+        amountOut,
+        amountInMax
+      );
+    emit Swap(exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
   }
 
   /* ==================== View Functions ==================== */
 
   /**
    * @notice Checks if ExchangeManager exists in the exchangeManagers list
-   * @param _exchangeManager the address of the exchange manager for the pair
+   * @param exchangeManager the address of the exchange manager for the pair
    * @return bool Returns true or false
    */
-  function existsInExchangeManagers(address _exchangeManager) public view returns (bool) {
+  function checkIsExchangeManager(address exchangeManager) public view returns (bool) {
     for (uint256 i = 0; i < exchangeManagers.length; i++) {
-      if (exchangeManagers[i] == _exchangeManager) {
+      if (exchangeManagers[i] == exchangeManager && isExchangeManager[exchangeManagers[i]]) {
         return true;
       }
     }
