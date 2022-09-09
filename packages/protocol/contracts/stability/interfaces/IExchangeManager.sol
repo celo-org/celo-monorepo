@@ -44,7 +44,7 @@ interface IExchangeManager {
     returns (uint256 amountOut);
 
   /**
-   * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
+   * @notice Calculate amountIn of tokenIn needed for a given amountOut of tokenOut
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
