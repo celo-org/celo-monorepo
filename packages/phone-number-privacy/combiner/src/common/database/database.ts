@@ -9,7 +9,6 @@ export function initDatabase(config: CombinerConfig): Knex {
   })
 }
 
-// TODO EN: consider removing this function?
 export function getTransaction(db: Knex) {
   return db.transaction()
 }

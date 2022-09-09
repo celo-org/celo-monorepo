@@ -64,8 +64,6 @@ export abstract class PnpQuotaService
       ['getQuotaStatus', session.request.url]
     )
 
-    // TODO EN: revisit this logic
-    // OLD NOTE EN: this should never actually reject since the error is caught??
     const quotaStatus: PnpQuotaStatus = {
       totalQuota: -1, // TODO(2.0.0) consider making this undefined (https://github.com/celo-org/celo-monorepo/issues/9804)
       performedQueryCount: -1,
@@ -115,7 +113,6 @@ export abstract class PnpQuotaService
     session: PnpSession<SignMessageRequest>,
     trx: Knex.Transaction
   ): Promise<boolean> {
-    // TODO(2.0.0, refactor) Review db error handling (https://github.com/celo-org/celo-monorepo/issues/9795)
     const [storeRequestResult, incrementQueryCountResult] = await Promise.allSettled([
       storeRequest(this.db, session.request.body, session.logger, trx),
       incrementQueryCount(this.db, session.request.body.account, session.logger, trx),

@@ -192,22 +192,18 @@ interface IndexedSequentialDelayStage extends SequentialDelayStage {
  * and which supplied the rate limiting parameters.
  * @param attemptTime The Unix timestamp in seconds when the request was received.
  * @param state The current state of the domain, including the used quota counter and timer values.
+ * Defaults to initial state if no state is available (i.e. for first request against the domain).
  */
 export const checkSequentialDelayRateLimit = (
   domain: SequentialDelayDomain,
   attemptTime: number,
-  state?: SequentialDelayDomainState
+  state: SequentialDelayDomainState = INITIAL_SEQUENTIAL_DELAY_DOMAIN_STATE
 ): SequentialDelayResult => {
-  // TODO EN: use a default param here instead?
-  state = state ?? INITIAL_SEQUENTIAL_DELAY_DOMAIN_STATE
-
   // If the domain has been disabled, all queries are to be rejected.
   if (state.disabled) {
     return { accepted: false, state: { ...state, now: attemptTime } }
   }
 
-  // NOTE EN: is this comment referencing the state = state?? stuff?
-  // If no state is available (i.e. this is the first request against the domain) use the initial state.
   const stage = getIndexedStage(domain, state.counter)
 
   // If the counter is past the last stage (i.e. the domain is permanently out of quota) return early.

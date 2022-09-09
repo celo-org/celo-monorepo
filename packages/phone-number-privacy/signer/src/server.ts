@@ -70,12 +70,13 @@ export function startSigner(
       } catch (err: any) {
         // Handle any errors that otherwise managed to escape the proper handlers
         let errorMsg: string = ErrorMessage.UNKNOWN_ERROR
+        let errToLog = err
         if (err === timeoutRes) {
           Counters.timeouts.inc()
           errorMsg = ErrorMessage.TIMEOUT_FROM_SIGNER
-          err = new Error(errorMsg)
+          errToLog = new Error(errorMsg)
         }
-        childLogger.error({ err })
+        childLogger.error({ errToLog })
         res.status(500).json({
           success: false,
           error: errorMsg,

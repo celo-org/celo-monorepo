@@ -15,11 +15,6 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { getBlindedPhoneNumber } from '@celo/phone-number-privacy-common/lib/test/utils'
-import {
-  ACCOUNT_ADDRESS2,
-  BLINDING_FACTOR,
-} from '@celo/phone-number-privacy-common/lib/test/values'
 import {
   initDatabase as initSignerDatabase,
   startSigner,
@@ -45,6 +40,7 @@ const {
   createMockOdisPayments,
   createMockWeb3,
   getPnpRequestAuthorization,
+  getBlindedPhoneNumber,
 } = TestUtils.Utils
 const {
   PRIVATE_KEY1,
@@ -55,6 +51,8 @@ const {
   BLS_THRESHOLD_DEV_PK_SHARE_1,
   BLS_THRESHOLD_DEV_PK_SHARE_2,
   BLS_THRESHOLD_DEV_PK_SHARE_3,
+  ACCOUNT_ADDRESS2,
+  BLINDING_FACTOR,
 } = TestUtils.Values
 
 // create deep copy of config
@@ -250,7 +248,10 @@ describe('pnpService', () => {
     }
   }
 
-  // TODO EN: can restructure this -- PNP_SIGN and then sub-categories for the signers
+  // TODO(2.0.0, testing) Optionally reorganize the nesting of this file,
+  // since the quota endpoints don't depend on signer signature configuration,
+  // the sig config describes can be sub-describes under the PNP_SIGN tests.
+  // Part of (https://github.com/celo-org/celo-monorepo/issues/9811)
   describe('when all signers return correct signatures', () => {
     beforeEach(async () => {
       signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
