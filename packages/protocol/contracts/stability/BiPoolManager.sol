@@ -287,6 +287,14 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
 
   /* ==================== Private Functions ==================== */
 
+  /**
+   * @notice Calculate amountOut of tokenOut received for a given amountIn of tokenIn
+   * @param pool The pool to operate on
+   * @param tokenIn The token to be sold
+   * @param tokenOut The token to be bought 
+   * @param amountIn The amount of tokenIn to be sold
+   * @return amountOut The amount of tokenOut to be bought
+   */
   function _getAmountOut(Pool memory pool, address tokenIn, address tokenOut, uint256 amountIn)
     internal
     view
@@ -307,6 +315,14 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     }
   }
 
+  /**
+   * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
+   * @param pool The pool to operate on
+   * @param tokenIn The token to be sold
+   * @param tokenOut The token to be bought 
+   * @param amountOut The amount of tokenOut to be bought
+   * @return amountIn The amount of tokenIn to be sold
+   */
   function _getAmountIn(Pool memory pool, address tokenIn, address tokenOut, uint256 amountOut)
     internal
     view
@@ -328,8 +344,10 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
   }
 
   /**
-   * @notice If conditions are met, updates the Uniswap bucket sizes to track
-   * the price reported by the Oracle.
+   * @notice If conditions are met, update the pool bucket sizes.
+   * @param poolId The id of the pool being updated.
+   * @param pool The pool being updated.
+   * @return poolAfter The updated pool.
    */
   function updateBucketsIfNecessary(bytes32 poolId, Pool memory pool)
     internal
@@ -350,6 +368,12 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     return pool;
   }
 
+  /**
+   * @notice Determine if a pool's buckets should be updated
+   * based on staleness of buckets and oracle rates.
+   * @param pool The pool being updated.
+   * @return shouldUpdate
+   */
   function shouldUpdateBuckets(Pool memory pool) internal view returns (bool) {
     (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(
       pool.bucketUpdateInfo.oracleReportTarget
@@ -367,6 +391,12 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
+  /**
+   * @notice Calculate the new bucket sizes for a pool
+   * @param pool The pool being updated.
+   * @return bucket0 the size of bucket0
+   * @return bucket1 the size of bucket1
+   */
   function getUpdatedBuckets(Pool memory pool)
     internal
     view
@@ -383,6 +413,13 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     bucket1 = exchangeRateDenominator.mul(bucket0).div(exchangeRateNumerator);
   }
 
+  /**
+   * @notice Get the exchange rate as numerator,denominator from sorted oracles
+   * and protect in case of a 0-denominator.
+   * @param target the reportTarget to read from SortedOracles
+   * @return rateNumerator
+   * @return rateDenominator
+   */
   function getOracleExchangeRate(address target) internal view returns (uint256, uint256) {
     uint256 rateNumerator;
     uint256 rateDenominator;
