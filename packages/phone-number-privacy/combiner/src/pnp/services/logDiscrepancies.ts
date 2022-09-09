@@ -8,8 +8,6 @@ import {
 import { Session } from '../../common/session'
 
 export class PnpDiscrepanciesLogger {
-  constructor() {}
-
   logResponseDiscrepancies(session: Session<PnpQuotaRequest> | Session<SignMessageRequest>): void {
     // https://github.com/celo-org/celo-monorepo/issues/9826
     // TODO(2.0.0, logging): responses should all already be successes due to CombineAction receiveSuccess
@@ -62,7 +60,7 @@ export class PnpDiscrepanciesLogger {
       .filter((res) => !!res.values.blockNumber)
       .sort((a, b) => a.values.blockNumber! - b.values.blockNumber!)
     if (
-      !!sortedByBlockNumber.length &&
+      sortedByBlockNumber.length &&
       sortedByBlockNumber[0].values.blockNumber! -
         sortedByBlockNumber[sortedByBlockNumber.length - 1].values.blockNumber! >
         MAX_BLOCK_DISCREPANCY_THRESHOLD

@@ -8,8 +8,6 @@ import {
 import { Session } from '../../common/session'
 
 export class DomainDiscrepanciesLogger {
-  constructor() {}
-
   logResponseDiscrepancies(
     session: Session<DomainRestrictedSignatureRequest> | Session<DomainQuotaStatusRequest>
   ): void {
