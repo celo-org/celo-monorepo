@@ -103,5 +103,5 @@ interface IBroker {
    * @dev This can be used by UI or clients to discover all pairs.
    * @return exchangeManagers the addresses of all exchange managers.
    */
-  function getExchangeManagers() external returns (address[] memory exchangeManagers);
+  function getExchangeManagers() external view returns (address[] memory exchangeManagers);
 }
