@@ -65,7 +65,7 @@ interface IBroker {
   ) external returns (uint256 amountIn);
 
   /**
-   * @notice Quote a token swap with fixed amountIn
+   * @notice Calculate amountOut of tokenOut received for a given amountIn of tokenIn
    * @param exchangeManager the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
@@ -73,7 +73,7 @@ interface IBroker {
    * @param amountIn The amount of tokenIn to be sold
    * @return amountOut The amount of tokenOut to be bought
    */
-  function quoteIn(
+  function getAmountOut(
     address exchangeManager,
     bytes32 exchangeId,
     address tokenIn,
@@ -82,7 +82,7 @@ interface IBroker {
   ) external returns (uint256 amountOut);
 
   /**
-   * @notice Quote a token swap with fixed amountOut
+   * @notice Calculate amountIn of tokenIn needed for a given amountOut of tokenOut
    * @param exchangeManager the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
@@ -90,7 +90,7 @@ interface IBroker {
    * @param amountOut The amount of tokenOut to be bought
    * @return amountIn The amount of tokenIn to be sold
    */
-  function quoteOut(
+  function getAmountIn(
     address exchangeManager,
     bytes32 exchangeId,
     address tokenIn,
