@@ -28,7 +28,8 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
           combinedSignature,
           pnpQuotaStatus.performedQueryCount,
           pnpQuotaStatus.totalQuota,
-          pnpQuotaStatus.blockNumber
+          pnpQuotaStatus.blockNumber,
+          session.warnings
         )
       } catch (error) {
         // May fail upon combining signatures if too many sigs are invalid

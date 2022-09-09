@@ -25,7 +25,14 @@ export class PnpQuotaAction extends CombineAction<PnpQuotaRequest> {
           totalQuota,
           blockNumber,
         } = this.thresholdStateService.findCombinerQuotaState(session)
-        this.io.sendSuccess(200, session.response, performedQueryCount, totalQuota, blockNumber)
+        this.io.sendSuccess(
+          200,
+          session.response,
+          performedQueryCount,
+          totalQuota,
+          blockNumber,
+          session.warnings
+        )
         return
       } catch (error) {
         session.logger.error({ error }, 'Error combining signer quota status responses')

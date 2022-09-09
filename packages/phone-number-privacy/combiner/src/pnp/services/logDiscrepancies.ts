@@ -34,7 +34,8 @@ export class PnpDiscrepanciesLogger {
       }
     })
     if (parsedResponses.length === 0) {
-      session.logger.warn('No succesful responses found!')
+      session.logger.warn('No successful signer responses found!')
+      session.warnings.push('No successful signer responses found!')
       return
     }
 
@@ -43,6 +44,7 @@ export class PnpDiscrepanciesLogger {
     for (let i = 1; i < parsedResponses.length; i++) {
       if (JSON.stringify(parsedResponses[i].values) !== first) {
         session.logger.warn({ parsedResponses }, 'Discrepancies detected in signer responses')
+        session.warnings.push('Discrepancies detected in signer responses')
         break
       }
     }
@@ -69,6 +71,7 @@ export class PnpDiscrepanciesLogger {
         { sortedDescByBlockNumber: sortedByBlockNumber },
         WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS
       )
+      session.warnings.push(WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
     }
 
     // totalQuota
@@ -84,6 +87,7 @@ export class PnpDiscrepanciesLogger {
         { sortedDescByTotalQuota: sortedByTotalQuota },
         WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS
       )
+      session.warnings.push(WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
     }
   }
 }
