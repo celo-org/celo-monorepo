@@ -91,48 +91,33 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice Quote a token swap with fixed amountIn
-   * @param _exchangeManager the address of the exchange manager for the pair
-   * @param exchangeId The id of the exchange to use
-   * @param tokenIn The token to be sold
-   * @param tokenOut The token to be bought
-   * @param amountIn The amount of tokenIn to be sold
-   * @return amountOut The amount of tokenOut to be bought
-   */
-  function quoteIn(
-    address _exchangeManager,
-    bytes32 exchangeId,
-    address tokenIn,
-    address tokenOut,
-    uint256 amountIn
-  ) external returns (uint256 amountOut) {
-    require(existsInExchangeManagers(_exchangeManager), "ExchangeManager does not exist");
-    exchangeManager = IExchangeManager(_exchangeManager);
-    amountOut = exchangeManager.quoteIn(exchangeId, tokenIn, tokenOut, amountIn);
-    return amountOut;
-  }
-
-  /**
-   * @notice Quote a token swap with fixed amountOut
-   * @param _exchangeManager the address of the exchange manager for the pair
+   * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought
    * @param amountOut The amount of tokenOut to be bought
    * @return amountIn The amount of tokenIn to be sold
    */
-  function quoteOut(
-    address _exchangeManager,
-    bytes32 exchangeId,
-    address tokenIn,
-    address tokenOut,
-    uint256 amountOut
-  ) external returns (uint256 amountIn) {
-    require(existsInExchangeManagers(_exchangeManager), "ExchangeManager does not exist");
-    exchangeManager = IExchangeManager(_exchangeManager);
-    amountIn = exchangeManager.quoteOut(exchangeId, tokenIn, tokenOut, amountOut);
-    require(amountIn >= amountOut, "Amount out can't be more than amount in");
-    return amountIn;
+  function getAmountIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
+    external
+    returns (uint256 amountIn)
+  {
+    return amountOut = exchangeManager.getAmountIn(exchangeId, tokenIn, tokenOut, amountOut);
+  }
+
+  /**
+   * @notice Calculate amountOut of tokenOut for a given amountIn of tokenIn
+   * @param exchangeId The id of the exchange to use
+   * @param tokenIn The token to be sold
+   * @param tokenOut The token to be bought 
+   * @param amountIn The amount of tokenIn to be sold
+   * @return amountOut The amount of tokenOut to be bought
+   */
+  function getAmountOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
+    external
+    returns (uint256 amountOut)
+  {
+    return amountOut = exchangeManager.getAmountOut(exchangeId, tokenIn, tokenOut, amountIn);
   }
 
   /**
@@ -157,6 +142,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     exchangeManager = IExchangeManager(_exchangeManager);
     return
       amountOut = exchangeManager.swapIn(exchangeId, tokenIn, tokenOut, amountIn, amountOutMin);
+    emit Swap(_exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
   }
 
   /**
@@ -181,6 +167,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     exchangeManager = IExchangeManager(_exchangeManager);
     return
       amountIn = exchangeManager.swapOut(exchangeId, tokenIn, tokenOut, amountOut, amountInMax);
+    emit Swap(_exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
   }
 
   /* ==================== View Functions ==================== */
@@ -197,5 +184,14 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
       }
     }
     return false;
+  }
+
+  /**
+   * @notice Get the list of registered exchange managers.
+   * @dev This can be used by UI or clients to discover all pairs.
+   * @return exchangeManagers the addresses of all exchange managers.
+   */
+  function getExchangeManagers() external view returns (address[] memory exchangeManagers) {
+    return exchangeManagers;
   }
 }
