@@ -36,6 +36,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         session.logger.error({ err }, 'Failed to check if request already exists in db')
       }
 
+      let dbUpdated
       if (isDuplicateRequest) {
         Counters.duplicateRequests.inc()
         session.logger.debug(
@@ -79,8 +80,10 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             )
           }
         }
-        const { sufficient } = await this.quota.checkAndUpdateQuotaStatus(quotaStatus, session, trx)
-        if (!sufficient) {
+        // quotaStatus is updated in place
+        const quotaUpdateRes = await this.quota.checkAndUpdateQuotaStatus(quotaStatus, session, trx)
+        dbUpdated = quotaUpdateRes.dbUpdated
+        if (!quotaUpdateRes.sufficient) {
           this.io.sendFailure(
             WarningMessage.EXCEEDED_QUOTA,
             403,
@@ -109,9 +112,12 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         )
         this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
       } catch (err) {
-        // Explicitly rolling back: don't throw an error after that as this hangs
-        await trx.rollback()
-        quotaStatus.performedQueryCount--
+        // If the db was never updated, we should not decrease the query count
+        if (dbUpdated) {
+          // Explicitly rolling back: errors thrown after this will hang
+          await trx.rollback()
+          quotaStatus.performedQueryCount--
+        }
         const responseErr =
           err === ErrorMessage.SIGNATURE_COMPUTATION_FAILURE
             ? ErrorMessage.SIGNATURE_COMPUTATION_FAILURE

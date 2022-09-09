@@ -26,6 +26,7 @@ export abstract class PnpQuotaService
     const remainingQuota = state.totalQuota - state.performedQueryCount
     Histograms.userRemainingQuotaAtRequest.labels(session.request.url).observe(remainingQuota)
     let sufficient = remainingQuota > 0
+    let dbUpdated = false
     if (!sufficient) {
       session.logger.debug({ ...state }, 'No remaining quota')
       if (this.bypassQuotaForE2ETesting(session.request.body)) {
@@ -37,11 +38,12 @@ export abstract class PnpQuotaService
         sufficient = true
       }
     } else {
-      if (await this.updateQuotaStatus(session, trx)) {
+      dbUpdated = await this.updateQuotaStatus(session, trx)
+      if (dbUpdated) {
         state.performedQueryCount++
       }
     }
-    return { sufficient, state }
+    return { sufficient, state, dbUpdated }
   }
 
   public async getQuotaStatus(

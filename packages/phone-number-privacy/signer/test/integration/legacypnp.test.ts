@@ -1313,6 +1313,87 @@ describe('legacyPNP', () => {
           ).toBe(performedQueryCount)
           expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
+
+        it('Should return 500 on error non-SIGNATURE_COMPUTATION_FAILURE error in sign', async () => {
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/bls/bls-cryptography-client'),
+              'computeBlindedSignature'
+            )
+            .mockImplementationOnce(() => {
+              // Trigger a generic error in .sign to trigger the default error returned.
+              throw new Error()
+            })
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(500)
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+            success: false,
+            version: res.body.version,
+            performedQueryCount: performedQueryCount,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            error: ErrorMessage.KEY_FETCH_ERROR,
+          })
+
+          spy.mockRestore()
+
+          // check DB state: performedQueryCount was not incremented and request was not stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(performedQueryCount)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+        })
+
+        it('Should return 500 on failure to increment query count AND bls signing error', async () => {
+          const dbSpy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'incrementQueryCount'
+            )
+            .mockRejectedValueOnce(new Error())
+          const blsSpy = jest
+            .spyOn(jest.requireActual('blind-threshold-bls'), 'partialSignBlindedMessage')
+            .mockImplementationOnce(() => {
+              throw new Error()
+            })
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(500)
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+            success: false,
+            version: res.body.version,
+            performedQueryCount: performedQueryCount,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
+          })
+
+          dbSpy.mockRestore()
+          blsSpy.mockRestore()
+
+          // check DB state: performedQueryCount was not incremented and request was not stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(performedQueryCount)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+        })
       })
     })
   })
