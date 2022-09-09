@@ -41,26 +41,26 @@ interface IExchangeManager {
   ) external returns (uint256 amountIn);
 
   /**
-   * @notice Quote a token swap with fixed amountIn
+   * @notice Calculate amountOut of tokenOut for a given amountIn of tokenIn
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
    * @return amountOut The amount of tokenOut to be bought
    */
-  function quoteIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
+  function getAmountOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
     external
     returns (uint256 amountOut);
 
   /**
-   * @notice Quote a token swap with fixed amountOut
+   * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountOut The amount of tokenOut to be bought
    * @return amountIn The amount of tokenIn to be sold
    */
-  function quoteOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
+  function getAmountIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
     external
     returns (uint256 amountIn);
 }
