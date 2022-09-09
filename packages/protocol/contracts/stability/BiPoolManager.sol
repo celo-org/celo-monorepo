@@ -118,19 +118,7 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     returns (uint256)
   {
     Pool memory pool = getPool(exchangeId);
-    require(
-      (tokenIn == pool.asset0 && tokenOut == pool.asset1) ||
-        (tokenIn == pool.asset1 && tokenOut == pool.asset0),
-      "tokenIn and tokenOut must match pool"
-    );
-
-    if (tokenIn == pool.asset0) {
-      return
-        pool.pricingModule.getAmountOut(pool.bucket0, pool.bucket1, pool.spread.unwrap(), amountIn);
-    } else {
-      return
-        pool.pricingModule.getAmountOut(pool.bucket1, pool.bucket0, pool.spread.unwrap(), amountIn);
-    }
+    return _getAmountOut(pool, tokenIn, tokenOut, amountIn);
   }
 
   /**
@@ -146,19 +134,7 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     returns (uint256)
   {
     Pool memory pool = getPool(exchangeId);
-    require(
-      (tokenIn == pool.asset0 && tokenOut == pool.asset1) ||
-        (tokenIn == pool.asset1 && tokenOut == pool.asset0),
-      "tokenIn and tokenOut must match pool"
-    );
-
-    if (tokenIn == pool.asset0) {
-      return
-        pool.pricingModule.getAmountIn(pool.bucket0, pool.bucket1, pool.spread.unwrap(), amountOut);
-    } else {
-      return
-        pool.pricingModule.getAmountIn(pool.bucket1, pool.bucket0, pool.spread.unwrap(), amountOut);
-    }
+    return _getAmountIn(pool, tokenIn, tokenOut, amountOut);
   }
 
   /* ==================== Mutative Functions ==================== */
@@ -266,8 +242,10 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     returns (uint256 amountOut)
   {
     // TODO: Check if buckets should be updated
-    amountOut = getAmountOut(exchangeId, tokenIn, tokenOut, amountIn);
-    Pool memory pool = pools[exchangeId];
+    Pool memory pool = getPool(exchangeId);
+    pool = updateBucketsIfNecessary(exchangeId, pool);
+
+    amountOut = _getAmountOut(pool, tokenIn, tokenOut, amountIn);
     if (tokenIn == pool.asset0) {
       pool.bucket0 += amountIn;
       pool.bucket1 -= amountOut;
@@ -292,9 +270,10 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     onlyBroker
     returns (uint256 amountIn)
   {
-    // TODO: Check if buckets should be updated
-    amountIn = getAmountIn(exchangeId, tokenIn, tokenOut, amountOut);
-    Pool memory pool = pools[exchangeId];
+    Pool memory pool = getPool(exchangeId);
+    pool = updateBucketsIfNecessary(exchangeId, pool);
+
+    amountIn = _getAmountIn(pool, tokenIn, tokenOut, amountOut);
     if (tokenIn == pool.asset0) {
       pool.bucket0 += amountIn;
       pool.bucket1 -= amountOut;
@@ -308,8 +287,88 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
 
   /* ==================== Private Functions ==================== */
 
+  function _getAmountOut(Pool memory pool, address tokenIn, address tokenOut, uint256 amountIn)
+    internal
+    view
+    returns (uint256)
+  {
+    require(
+      (tokenIn == pool.asset0 && tokenOut == pool.asset1) ||
+        (tokenIn == pool.asset1 && tokenOut == pool.asset0),
+      "tokenIn and tokenOut must match pool"
+    );
+
+    if (tokenIn == pool.asset0) {
+      return
+        pool.pricingModule.getAmountOut(pool.bucket0, pool.bucket1, pool.spread.unwrap(), amountIn);
+    } else {
+      return
+        pool.pricingModule.getAmountOut(pool.bucket1, pool.bucket0, pool.spread.unwrap(), amountIn);
+    }
+  }
+
+  function _getAmountIn(Pool memory pool, address tokenIn, address tokenOut, uint256 amountOut)
+    internal
+    view
+    returns (uint256)
+  {
+    require(
+      (tokenIn == pool.asset0 && tokenOut == pool.asset1) ||
+        (tokenIn == pool.asset1 && tokenOut == pool.asset0),
+      "tokenIn and tokenOut must match pool"
+    );
+
+    if (tokenIn == pool.asset0) {
+      return
+        pool.pricingModule.getAmountIn(pool.bucket0, pool.bucket1, pool.spread.unwrap(), amountOut);
+    } else {
+      return
+        pool.pricingModule.getAmountIn(pool.bucket1, pool.bucket0, pool.spread.unwrap(), amountOut);
+    }
+  }
+
+  /**
+   * @notice If conditions are met, updates the Uniswap bucket sizes to track
+   * the price reported by the Oracle.
+   */
+  function updateBucketsIfNecessary(bytes32 poolId, Pool memory pool)
+    internal
+    returns (Pool memory)
+  {
+    if (shouldUpdateBuckets(pool)) {
+      // solhint-disable-next-line not-rely-on-time
+      pool.bucketUpdateInfo.lastBucketUpdate = now;
+
+      (uint256 bucket0, uint256 bucket1) = getUpdatedBuckets(pool);
+
+      pool.bucket0 = bucket0;
+      pool.bucket1 = bucket1;
+
+      pools[poolId] = pool;
+      emit BucketsUpdated(poolId, bucket0, bucket1);
+    }
+    return pool;
+  }
+
+  function shouldUpdateBuckets(Pool memory pool) internal view returns (bool) {
+    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(
+      pool.bucketUpdateInfo.oracleReportTarget
+    );
+    // solhint-disable-next-line not-rely-on-time
+    bool timePassed = now >=
+      pool.bucketUpdateInfo.lastBucketUpdate.add(pool.bucketUpdateInfo.bucketUpdateFrequency);
+    bool enoughReports = (sortedOracles.numRates(pool.bucketUpdateInfo.oracleReportTarget) >=
+      pool.bucketUpdateInfo.minimumReports);
+    // solhint-disable-next-line not-rely-on-time
+    bool medianReportRecent = sortedOracles.medianTimestamp(
+      pool.bucketUpdateInfo.oracleReportTarget
+    ) >
+      now.sub(pool.bucketUpdateInfo.bucketUpdateFrequency);
+    return timePassed && enoughReports && medianReportRecent && !isReportExpired;
+  }
+
   function getUpdatedBuckets(Pool memory pool)
-    private
+    internal
     view
     returns (uint256 bucket0, uint256 bucket1)
   {
