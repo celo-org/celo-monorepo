@@ -7,16 +7,16 @@ pragma solidity ^0.5.13;
  */
 interface IBrokerAdmin {
   /**
-   * @notice Emitted when a ListingManager is added
-   * @param listingManager the address of the ListingManager.
+   * @notice Emitted when a ExchangeManager is added
+   * @param exchangeManager the address of the ExchangeManager.
    */
-  event ListingManagerAdded(address indexed listingManager);
+  event ExchangeManagerAdded(address indexed exchangeManager);
 
   /**
-   * @notice Emitted when a ListingManager is removed
-   * @param listingManager the address of the ListingManager.
+   * @notice Emitted when a ExchangeManager is removed
+   * @param exchangeManager the address of the ExchangeManager.
    */
-  event ListingManagerRemoved(address indexed listingManager);
+  event ExchangeManagerRemoved(address indexed exchangeManager);
 
   /**
    * @notice Emitted the Reserve is updated
@@ -27,17 +27,17 @@ interface IBrokerAdmin {
 
   /**
    * @notice Remove a listing manager at an index
-   * @param listingManager the address of the listing manager to remove
+   * @param exchangeManager the address of the listing manager to remove
    * @param index the index in the listing managers array
    */
-  function removeListingManagers(address listingManager, uint256 index) external;
+  function removeExchangeManagers(address exchangeManager, uint256 index) external;
 
   /**
    * @notice Add listing manager
-   * @param listingManager the address of the listing manager to add
+   * @param exchangeManager the address of the listing manager to add
    * @return index the index where it was inserted
    */
-  function addListingManagers(address listingManager) external returns (uint256 index);
+  function addExchangeManager(address exchangeManager) external returns (uint256 index);
 
   /**
    * @notice Set the reserve
