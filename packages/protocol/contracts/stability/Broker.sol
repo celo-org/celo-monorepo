@@ -31,10 +31,10 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
 
   /**
    * @notice Allows the contract to be upgradable via the proxy.
-   * @param exchangeManager The address of the PairManager contract.
-   * @param _reserve The address of the Rezerve contract.
+   * @param _exchangeManagers The addresses of the ExchangeManager contracts.
+   * @param _reserve The address of the Reserve contract.
    */
-  function initilize(address[] _exchangeManagers, address _reserve) external initializer {
+  function initilize(address[] calldata _exchangeManagers, address _reserve) external initializer {
     _transferOwnership(msg.sender);
     for (uint256 i = 0; i < _exchangeManagers.length; i++) {
       addExchangeManager(_exchangeManagers[i]);
