@@ -49,11 +49,11 @@ export async function getDomainStateRecordOrEmpty(
   )
 }
 
-export function createEmptyDomainStateRecord(domain: Domain) {
+export function createEmptyDomainStateRecord(domain: Domain, disabled: boolean = false) {
   return toDomainStateRecord(domain, {
     timer: 0,
     counter: 0,
-    disabled: false,
+    disabled,
     now: 0,
   })
 }
