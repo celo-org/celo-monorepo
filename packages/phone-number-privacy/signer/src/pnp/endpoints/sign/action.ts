@@ -96,15 +96,17 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         }
       }
 
-      const key: Key = {
-        version:
-          this.io.getRequestKeyVersion(session.request, session.logger) ??
-          this.config.keystore.keys.phoneNumberPrivacy.latest,
-        name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
-      }
-
       // Compute signature inside transaction so it will rollback on error.
+      // Since it's possible that the trx was already rolled back in
+      // checkAndUpdateQuotaStatus, catch and handle any additional errors thrown,
+      // otherwise the signer will hang.
       try {
+        const key: Key = {
+          version:
+            this.io.getRequestKeyVersion(session.request, session.logger) ??
+            this.config.keystore.keys.phoneNumberPrivacy.latest,
+          name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
+        }
         const signature = await this.sign(
           session.request.body.blindedQueryPhoneNumber,
           key,
@@ -114,7 +116,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
       } catch (err) {
         // If the db was never updated, we should not decrease the query count
         if (dbUpdated) {
-          // Explicitly rolling back: errors thrown after this will hang
           await trx.rollback()
           quotaStatus.performedQueryCount--
         }
