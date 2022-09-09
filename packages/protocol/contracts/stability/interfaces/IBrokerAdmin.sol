@@ -7,8 +7,8 @@ pragma solidity ^0.5.13;
  */
 interface IBrokerAdmin {
   /**
-   * @notice Emitted when a ExchangeManager is added
-   * @param exchangeManager the address of the ExchangeManager.
+   * @notice Emitted when an ExchangeManager is added
+   * @param exchangeManager the address of the ExchangeManager that was added.
    */
   event ExchangeManagerAdded(address indexed exchangeManager);
 
@@ -23,25 +23,26 @@ interface IBrokerAdmin {
    * @param newAddress the new address
    * @param prevAddress the previous address
    */
-  event ReserveUpdated(address indexed newAddress, address indexed prevAddress);
+  event ReserveSet(address indexed newAddress, address indexed prevAddress);
 
   /**
-   * @notice Remove a listing manager at an index
-   * @param exchangeManager the address of the listing manager to remove
-   * @param index the index in the listing managers array
+   * @notice Remove an exchange manager at an index
+   * @param exchangeManager the address of the exchange manager to remove
+   * @param index the index in the exchange managers array
+   * @return bool returns true if successful 
    */
-  function removeExchangeManagers(address exchangeManager, uint256 index) external;
+  function removeExchangeManager(address exchangeManager, uint256 index) external returns (bool);
 
   /**
-   * @notice Add listing manager
-   * @param exchangeManager the address of the listing manager to add
+   * @notice Add exchange manager
+   * @param exchangeManager the address of the exchange manager to add
    * @return index the index where it was inserted
    */
   function addExchangeManager(address exchangeManager) external returns (uint256 index);
 
   /**
-   * @notice Set the reserve
-   * @param reserve address
+   * @notice Set the Mento reserve address
+   * @param reserve The Mento reserve address
    */
   function setReserve(address reserve) external;
 }
