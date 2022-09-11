@@ -52,6 +52,7 @@ commands:
       - run:
           name: Create cache checksum files
           command: |
+            echo "Test Puter"
             mkdir -p ~/.tmp/checksumfiles
             # Concatenate package.json so we can use them as a part of the cache key
             find . -maxdepth 5 -type f -name 'package.json' -not -path "*node_modules*" -print0 | sort -z | xargs -0 cat > ~/.tmp/checksumfiles/package.json
@@ -65,7 +66,7 @@ commands:
             - node_modules-<< pipeline.parameters.node-modules-cache-version >>-{{ arch }}-{{ checksum "yarn.lock" }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/patches" }}
       - run:
           name: Extract cached node_modules (if present)
-          command: |
+          command: | 
             if [ -e ~/.tmp/node_modules.tgz ]; then
               tar -xf ~/.tmp/node_modules.tgz
             else
