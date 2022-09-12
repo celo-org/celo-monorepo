@@ -354,15 +354,18 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     returns (Pool memory)
   {
     if (shouldUpdateBuckets(pool)) {
-      // solhint-disable-next-line not-rely-on-time
-      pool.bucketUpdateInfo.lastBucketUpdate = now;
-
       (uint256 bucket0, uint256 bucket1) = getUpdatedBuckets(pool);
 
       pool.bucket0 = bucket0;
       pool.bucket1 = bucket1;
+      // solhint-disable-next-line not-rely-on-time
+      pool.bucketUpdateInfo.lastBucketUpdate = now;
 
-      pools[poolId] = pool;
+      pools[poolId].bucket0 = bucket0;
+      pools[poolId].bucket1 = bucket1;
+      // solhint-disable-next-line not-rely-on-time
+      pools[poolId].bucketUpdateInfo.lastBucketUpdate = now;
+
       emit BucketsUpdated(poolId, bucket0, bucket1);
     }
     return pool;
