@@ -264,16 +264,27 @@ export class Connection {
     )
   }
 
-  signTypedData = async (signer: string, typedData: EIP712TypedData): Promise<Signature> => {
+  /*
+   * @param signer - The address of account signing this data
+   * @param typedData - Structured data to be signed
+   * @param version - Optionally provide a version which will be appended to the method. E.G. (4) becomes 'eth_signTypedData_v4'
+   * Some providers like Metamask treat eth_signTypedData differently from versioned method eth_signTypedData_v4 others alias
+   */
+  signTypedData = async (
+    signer: string,
+    typedData: EIP712TypedData,
+    version?: 1 | 3 | 4 | 5
+  ): Promise<Signature> => {
     // Uses the Provider and not the RpcCaller, because this method should be intercepted
     // by the CeloProvider if there is a local wallet that could sign it. The RpcCaller
     // would just forward it to the node
     const signature = await new Promise<string>((resolve, reject) => {
+      const method = version ? `eth_signTypedData_v${version}` : 'eth_signTypedData'
       ;(this.web3.currentProvider as Provider).send(
         {
           id: getRandomId(),
           jsonrpc: '2.0',
-          method: 'eth_signTypedData',
+          method: method,
           params: [inputAddressFormatter(signer), typedData],
         },
         (error, resp) => {
