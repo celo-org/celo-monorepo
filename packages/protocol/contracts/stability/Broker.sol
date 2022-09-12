@@ -7,6 +7,8 @@ import { IBroker } from "./interfaces/IBroker.sol";
 import { IBrokerAdmin } from "./interfaces/IBrokerAdmin.sol";
 import { IReserve } from "./interfaces/IReserve.sol";
 import { Initializable } from "../common/Initializable.sol";
+import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import { IStableToken } from "./interfaces/IStableToken.sol";
 
 /**
  * @title Broker
@@ -163,6 +165,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     require(isExchangeManager[exchangeManager], "ExchangeManager does not exist");
     amountOut = IExchangeManager(exchangeManager).swapIn(exchangeId, tokenIn, tokenOut, amountIn);
     require(amountOut >= amountOutMin, "amountOutMin not met");
+    transferIn(tokenIn, amountIn);
     emit Swap(exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
     return amountOut;
   }
@@ -188,8 +191,40 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     require(isExchangeManager[exchangeManager], "ExchangeManager does not exist");
     amountIn = IExchangeManager(exchangeManager).swapOut(exchangeId, tokenIn, tokenOut, amountOut);
     require(amountIn <= amountInMax, "amountInMax exceeded");
+    transferOut(msg.sender, tokenOut, amountOut);
     emit Swap(exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
     return amountIn;
+  }
+
+  /* ==================== Private Functions ==================== */
+
+  /**
+   * @notice This method is responsible for minting tokens
+   * @param to The address receiving  
+   * @param token The asset getting minted
+   * @param amount The amount of asset getting minted
+   */
+  function transferOut(address payable to, address token, uint256 amount) private {
+    if (reserve.isStableAsset(token)) {
+      IStableToken(token).mint(to, amount);
+    }
+    if (reserve.isCollateralAsset(token)) {
+      reserve.transferCollateralAsset(token, to, amount);
+    }
+  }
+
+  /**
+   * @notice This method is responsible for burning assets
+   * @param token The asset getting burned
+   * @param amount The amount of asset getting burned
+   */
+  function transferIn(address token, uint256 amount) private {
+    if (reserve.isStableAsset(token)) {
+      IStableToken(token).burn(amount);
+    }
+    if (reserve.isCollateralAsset(token)) {
+      IERC20(token).transferFrom(msg.sender, address(reserve), amount);
+    }
   }
 
   /* ==================== View Functions ==================== */
