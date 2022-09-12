@@ -9,10 +9,10 @@ import { SignAction } from '../../../common/sign'
 import { PnpDiscrepanciesLogger } from '../../services/logDiscrepancies'
 
 export class PnpSignAction extends SignAction<SignMessageRequest> {
-  readonly discrepanyLogger: PnpDiscrepanciesLogger = new PnpDiscrepanciesLogger()
+  readonly discrepancyLogger: PnpDiscrepanciesLogger = new PnpDiscrepanciesLogger()
 
   combine(session: CryptoSession<SignMessageRequest>): void {
-    this.discrepanyLogger.logResponseDiscrepancies(session)
+    this.discrepancyLogger.logResponseDiscrepancies(session)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {

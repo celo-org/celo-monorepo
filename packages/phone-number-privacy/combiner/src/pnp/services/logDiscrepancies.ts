@@ -1,11 +1,14 @@
 import {
-  MAX_BLOCK_DISCREPANCY_THRESHOLD,
-  MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD,
   PnpQuotaRequest,
   SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
+import {
+  MAX_BLOCK_DISCREPANCY_THRESHOLD,
+  MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD,
+  MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD,
+} from '../../config'
 
 export class PnpDiscrepanciesLogger {
   logResponseDiscrepancies(session: Session<PnpQuotaRequest> | Session<SignMessageRequest>): void {
@@ -33,7 +36,6 @@ export class PnpDiscrepanciesLogger {
     })
     if (parsedResponses.length === 0) {
       session.logger.warn('No successful signer responses found!')
-      session.warnings.push('No successful signer responses found!')
       return
     }
 
@@ -41,8 +43,8 @@ export class PnpDiscrepanciesLogger {
     const first = JSON.stringify(parsedResponses[0].values)
     for (let i = 1; i < parsedResponses.length; i++) {
       if (JSON.stringify(parsedResponses[i].values) !== first) {
-        session.logger.warn({ parsedResponses }, 'Discrepancies detected in signer responses')
-        session.warnings.push('Discrepancies detected in signer responses')
+        session.logger.warn({ parsedResponses }, WarningMessage.SIGNER_RESPONSE_DISCREPANCIES)
+        session.warnings.push(WarningMessage.SIGNER_RESPONSE_DISCREPANCIES)
         break
       }
     }
@@ -86,6 +88,22 @@ export class PnpDiscrepanciesLogger {
         WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS
       )
       session.warnings.push(WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
+    }
+
+    // performedQueryCount
+    const sortedByQueryCount = parsedResponses.sort(
+      (a, b) => a.values.performedQueryCount - b.values.performedQueryCount
+    )
+    if (
+      sortedByQueryCount[0].values.performedQueryCount -
+        sortedByQueryCount[sortedByQueryCount.length - 1].values.performedQueryCount >
+      MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD
+    ) {
+      session.logger.error(
+        { sortedDescByPerformedQueryCount: sortedByQueryCount },
+        WarningMessage.INCONSISTENT_SIGNER_QUERY_MEASUREMENTS
+      )
+      session.warnings.push(WarningMessage.INCONSISTENT_SIGNER_QUERY_MEASUREMENTS)
     }
   }
 }

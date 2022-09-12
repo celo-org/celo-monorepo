@@ -9,7 +9,6 @@ import {
   identifierIsValidIfExists,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
-  MAX_BLOCK_DISCREPANCY_THRESHOLD,
   respondWithError,
   SignMessageResponse,
   SignMessageResponseFailure,
@@ -22,7 +21,7 @@ import { Request, Response } from 'firebase-functions'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import { performance, PerformanceObserver } from 'perf_hooks'
 import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto-client'
-import config, { VERSION } from '../../../config'
+import config, { MAX_BLOCK_DISCREPANCY_THRESHOLD, VERSION } from '../../../config'
 
 const PARTIAL_SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 

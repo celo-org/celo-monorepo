@@ -14,10 +14,10 @@ import { DomainDiscrepanciesLogger } from '../../services/logDiscrepancies'
 export class DomainSignAction extends SignAction<DomainRestrictedSignatureRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_SIGN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-  readonly discrepanyLogger: DomainDiscrepanciesLogger = new DomainDiscrepanciesLogger()
+  readonly discrepancyLogger: DomainDiscrepanciesLogger = new DomainDiscrepanciesLogger()
 
   combine(session: CryptoSession<DomainRestrictedSignatureRequest>): void {
-    this.discrepanyLogger.logResponseDiscrepancies(session)
+    this.discrepancyLogger.logResponseDiscrepancies(session)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {

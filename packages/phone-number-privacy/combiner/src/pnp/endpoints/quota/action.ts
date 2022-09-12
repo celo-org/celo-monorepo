@@ -7,17 +7,18 @@ import { PnpDiscrepanciesLogger } from '../../services/logDiscrepancies'
 import { PnpThresholdStateService } from '../../services/thresholdState'
 
 export class PnpQuotaAction extends CombineAction<PnpQuotaRequest> {
+  readonly discrepancyLogger: PnpDiscrepanciesLogger = new PnpDiscrepanciesLogger()
+
   constructor(
     readonly config: OdisConfig,
     readonly thresholdStateService: PnpThresholdStateService<PnpQuotaRequest>,
-    readonly discrepanyLogger: PnpDiscrepanciesLogger,
     readonly io: IO<PnpQuotaRequest>
   ) {
     super(config, io)
   }
 
   async combine(session: Session<PnpQuotaRequest>): Promise<void> {
-    this.discrepanyLogger.logResponseDiscrepancies(session)
+    this.discrepancyLogger.logResponseDiscrepancies(session)
     if (session.responses.length >= this.config.keys.threshold) {
       try {
         const {

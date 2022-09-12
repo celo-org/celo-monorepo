@@ -14,6 +14,10 @@ export const E2E_TEST_PHONE_NUMBERS: string[] = E2E_TEST_PHONE_NUMBERS_RAW.map((
 )
 export const E2E_TEST_ACCOUNTS: string[] = ['0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb']
 
+export const MAX_BLOCK_DISCREPANCY_THRESHOLD = 3
+export const MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD = 5
+export const MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD = 5
+
 export interface DatabaseConfig {
   user: string
   password: string

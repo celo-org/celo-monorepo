@@ -18,14 +18,12 @@ import { DomainQuotaAction } from './domain/endpoints/quota/action'
 import { DomainQuotaIO } from './domain/endpoints/quota/io'
 import { DomainSignAction } from './domain/endpoints/sign/action'
 import { DomainSignIO } from './domain/endpoints/sign/io'
-import { DomainDiscrepanciesLogger } from './domain/services/logDiscrepancies'
 import { DomainThresholdStateService } from './domain/services/thresholdState'
 import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
-import { PnpDiscrepanciesLogger } from './pnp/services/logDiscrepancies'
 import { PnpThresholdStateService } from './pnp/services/thresholdState'
 
 require('events').EventEmitter.defaultMaxListeners = 15
@@ -64,7 +62,6 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
     new PnpQuotaAction(
       config.phoneNumberPrivacy,
       pnpThresholdStateService,
-      new PnpDiscrepanciesLogger(),
       new PnpQuotaIO(config.phoneNumberPrivacy, kit)
     )
   )
@@ -89,7 +86,6 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
     new DomainQuotaAction(
       config.domains,
       domainThresholdStateService,
-      new DomainDiscrepanciesLogger(),
       new DomainQuotaIO(config.domains)
     )
   )
