@@ -66,6 +66,7 @@ contract BiPoolManagerTest is Test {
   }
 
   function setUp() public {
+    vm.warp(60 * 60 * 24 * 30); // if we start at now == 0 we get some underflows
     deployer = actor("deployer");
     notDeployer = actor("notDeployer");
     broker = actor("broker");
@@ -166,10 +167,68 @@ contract BiPoolManagerTest is Test {
     bucketUpdateInfo.oracleReportTarget = oracleReportTarget;
     bucketUpdateInfo.bucket0TargetSize = bucket0TargetSize;
     bucketUpdateInfo.bucket0MaxFraction = bucket0MaxFraction;
+    bucketUpdateInfo.bucketUpdateFrequency = 60 * 5; // 5 minutes
+    bucketUpdateInfo.minimumReports = 5;
 
     pool.bucketUpdateInfo = bucketUpdateInfo;
 
     return biPoolManager.createPool(pool);
+  }
+
+  function mockGetAmountIn(bytes32 _poolId, address tokenIn, uint256 amountIn, uint256 amountOut)
+    internal
+  {
+    BiPoolManager.Pool memory pool = biPoolManager.getPool(_poolId);
+    uint256 bucketIn;
+    uint256 bucketOut;
+
+    if (tokenIn == pool.asset0) {
+      bucketIn = pool.bucket0;
+      bucketOut = pool.bucket1;
+    } else {
+      bucketIn = pool.bucket1;
+      bucketOut = pool.bucket0;
+    }
+
+    vm.mockCall(
+      address(constantProduct),
+      abi.encodeWithSelector(
+        constantProduct.getAmountIn.selector,
+        bucketIn,
+        bucketOut,
+        pool.spread.unwrap(),
+        amountOut
+      ),
+      abi.encode(amountIn)
+    );
+  }
+
+  function mockGetAmountOut(bytes32 _poolId, address tokenIn, uint256 amountIn, uint256 amountOut)
+    internal
+  {
+    BiPoolManager.Pool memory pool = biPoolManager.getPool(_poolId);
+    uint256 bucketIn;
+    uint256 bucketOut;
+
+    if (tokenIn == pool.asset0) {
+      bucketIn = pool.bucket0;
+      bucketOut = pool.bucket1;
+    } else {
+      bucketIn = pool.bucket1;
+      bucketOut = pool.bucket0;
+    }
+
+    vm.mockCall(
+      address(constantProduct),
+      abi.encodeWithSelector(
+        constantProduct.getAmountOut.selector,
+        bucketIn,
+        bucketOut,
+        pool.spread.unwrap(),
+        amountIn
+      ),
+      abi.encode(amountOut)
+    );
   }
 }
 
@@ -486,45 +545,19 @@ contract BiPoolManagerTest_quote is BiPoolManagerTest_withPool {
   }
 
   function test_getAmountOut_whenTokenInIsAsset0_itDelegatesToThePricingModule() public {
-    BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
-
     uint256 amountIn = 1e24;
     uint256 mockAmountOut = 0.5 * 1e24;
 
-    vm.mockCall(
-      address(constantProduct),
-      abi.encodeWithSelector(
-        constantProduct.getAmountOut.selector,
-        pool.bucket0,
-        pool.bucket1,
-        pool.spread.unwrap(),
-        amountIn
-      ),
-      abi.encode(mockAmountOut)
-    );
-
+    mockGetAmountOut(poolId, address(cUSD), amountIn, mockAmountOut);
     uint256 amountOut = biPoolManager.getAmountOut(poolId, address(cUSD), address(CELO), amountIn);
     assertEq(amountOut, mockAmountOut);
   }
 
   function test_getAmountOut_whenTokenInIsAsset1_itDelegatesToThePricingModule() public {
-    BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
-
     uint256 amountIn = 1e24;
     uint256 mockAmountOut = 0.5 * 1e24;
 
-    vm.mockCall(
-      address(constantProduct),
-      abi.encodeWithSelector(
-        constantProduct.getAmountOut.selector,
-        pool.bucket1,
-        pool.bucket0,
-        pool.spread.unwrap(),
-        amountIn
-      ),
-      abi.encode(mockAmountOut)
-    );
-
+    mockGetAmountOut(poolId, address(CELO), amountIn, mockAmountOut);
     uint256 amountOut = biPoolManager.getAmountOut(poolId, address(CELO), address(cUSD), amountIn);
     assertEq(amountOut, mockAmountOut);
   }
@@ -552,49 +585,22 @@ contract BiPoolManagerTest_quote is BiPoolManagerTest_withPool {
   }
 
   function test_getAmountIn_whenTokenInIsAsset0_itDelegatesToThePricingModule() public {
-    BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
-
     uint256 amountOut = 1e24;
     uint256 mockAmountIn = 0.5 * 1e24;
 
-    vm.mockCall(
-      address(constantProduct),
-      abi.encodeWithSelector(
-        constantProduct.getAmountIn.selector,
-        pool.bucket0,
-        pool.bucket1,
-        pool.spread.unwrap(),
-        amountOut
-      ),
-      abi.encode(mockAmountIn)
-    );
-
+    mockGetAmountIn(poolId, address(cUSD), mockAmountIn, amountOut);
     uint256 amountIn = biPoolManager.getAmountIn(poolId, address(cUSD), address(CELO), amountOut);
     assertEq(amountIn, mockAmountIn);
   }
 
   function test_getAmountIn_whenTokenInIsAsset1_itDelegatesToThePricingModule() public {
-    BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
-
     uint256 amountOut = 1e24;
     uint256 mockAmountIn = 0.5 * 1e24;
 
-    vm.mockCall(
-      address(constantProduct),
-      abi.encodeWithSelector(
-        constantProduct.getAmountIn.selector,
-        pool.bucket1,
-        pool.bucket0,
-        pool.spread.unwrap(),
-        amountOut
-      ),
-      abi.encode(mockAmountIn)
-    );
-
+    mockGetAmountIn(poolId, address(CELO), mockAmountIn, amountOut);
     uint256 amountIn = biPoolManager.getAmountIn(poolId, address(CELO), address(cUSD), amountOut);
     assertEq(amountIn, mockAmountIn);
   }
-
 }
 
 contract BiPoolManagerTest_swap is BiPoolManagerTest_withPool {
@@ -636,18 +642,7 @@ contract BiPoolManagerTest_swap is BiPoolManagerTest_withPool {
     uint256 amountIn = 1e24;
     uint256 mockAmountOut = 0.5 * 1e24;
 
-    vm.mockCall(
-      address(constantProduct),
-      abi.encodeWithSelector(
-        constantProduct.getAmountOut.selector,
-        pool.bucket0,
-        pool.bucket1,
-        pool.spread.unwrap(),
-        amountIn
-      ),
-      abi.encode(mockAmountOut)
-    );
-
+    mockGetAmountOut(poolId, address(cUSD), amountIn, mockAmountOut);
     uint256 amountOut = biPoolManager.swapIn(poolId, address(cUSD), address(CELO), amountIn);
 
     BiPoolManager.Pool memory poolAfter = biPoolManager.getPool(poolId);
@@ -662,18 +657,7 @@ contract BiPoolManagerTest_swap is BiPoolManagerTest_withPool {
     uint256 amountIn = 1e24;
     uint256 mockAmountOut = 0.5 * 1e24;
 
-    vm.mockCall(
-      address(constantProduct),
-      abi.encodeWithSelector(
-        constantProduct.getAmountOut.selector,
-        pool.bucket1,
-        pool.bucket0,
-        pool.spread.unwrap(),
-        amountIn
-      ),
-      abi.encode(mockAmountOut)
-    );
-
+    mockGetAmountOut(poolId, address(CELO), amountIn, mockAmountOut);
     uint256 amountOut = biPoolManager.swapIn(poolId, address(CELO), address(cUSD), amountIn);
 
     BiPoolManager.Pool memory poolAfter = biPoolManager.getPool(poolId);
@@ -715,18 +699,7 @@ contract BiPoolManagerTest_swap is BiPoolManagerTest_withPool {
     uint256 amountOut = 1e24;
     uint256 mockAmountIn = 0.5 * 1e24;
 
-    vm.mockCall(
-      address(constantProduct),
-      abi.encodeWithSelector(
-        constantProduct.getAmountIn.selector,
-        pool.bucket0,
-        pool.bucket1,
-        pool.spread.unwrap(),
-        amountOut
-      ),
-      abi.encode(mockAmountIn)
-    );
-
+    mockGetAmountIn(poolId, address(cUSD), mockAmountIn, amountOut);
     uint256 amountIn = biPoolManager.swapOut(poolId, address(cUSD), address(CELO), amountOut);
 
     BiPoolManager.Pool memory poolAfter = biPoolManager.getPool(poolId);
@@ -741,18 +714,7 @@ contract BiPoolManagerTest_swap is BiPoolManagerTest_withPool {
     uint256 amountOut = 1e24;
     uint256 mockAmountIn = 0.6 * 1e24;
 
-    vm.mockCall(
-      address(constantProduct),
-      abi.encodeWithSelector(
-        constantProduct.getAmountIn.selector,
-        pool.bucket1,
-        pool.bucket0,
-        pool.spread.unwrap(),
-        amountOut
-      ),
-      abi.encode(mockAmountIn)
-    );
-
+    mockGetAmountIn(poolId, address(CELO), mockAmountIn, amountOut);
     uint256 amountIn = biPoolManager.swapOut(poolId, address(CELO), address(cUSD), amountOut);
 
     BiPoolManager.Pool memory poolAfter = biPoolManager.getPool(poolId);
@@ -760,5 +722,130 @@ contract BiPoolManagerTest_swap is BiPoolManagerTest_withPool {
     assertEq(poolAfter.bucket0, pool.bucket0 - amountOut);
     assertEq(poolAfter.bucket1, pool.bucket1 + amountIn);
   }
+}
 
+contract BiPoolManagerTest_bucketUpdates is BiPoolManagerTest_withPool {
+  function setUp() public {
+    super.setUp();
+    changePrank(broker);
+  }
+
+  function swap(bytes32 poolId, uint256 amountIn, uint256 amountOut) internal {
+    BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
+    mockGetAmountOut(poolId, pool.asset0, amountIn, amountOut);
+    biPoolManager.swapIn(poolId, pool.asset0, pool.asset1, amountIn);
+  }
+
+  function test_swapIn_whenBucketsAreStale_updatesBuckets() public {
+    BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
+    swap(poolId, pool.bucket0 / 2, pool.bucket1 / 2); // debalance pool
+
+    vm.warp(pool.bucketUpdateInfo.bucketUpdateFrequency + 1);
+    sortedOracles.setNumRates(address(cUSD), 10);
+    sortedOracles.setMedianTimestamp(address(cUSD), now);
+
+    vm.expectEmit(true, true, true, true);
+    uint256 bucket0TargetSize = pool.bucketUpdateInfo.bucket0TargetSize;
+    emit BucketsUpdated(
+      poolId,
+      bucket0TargetSize,
+      bucket0TargetSize / 2 // due to sortedOracles exchange rate 2:1
+    );
+
+    uint256 amountIn = 1e24;
+    uint256 amountOut = biPoolManager.swapIn(poolId, pool.asset0, pool.asset1, 1e24);
+
+    // Refresh pool
+    pool = biPoolManager.getPool(poolId);
+
+    assertEq(bucket0TargetSize + amountIn, pool.bucket0);
+    assertEq((bucket0TargetSize / 2) - amountOut, pool.bucket1);
+  }
+
+  function test_swapIn_whenBucketsAreNotStale_doesNotUpdateBuckets() public {
+    BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
+    swap(poolId, pool.bucket0 / 2, pool.bucket1 / 2); // debalance pool
+    pool = biPoolManager.getPool(poolId); // Refresh pool
+    uint256 bucket0BeforeSwap = pool.bucket0;
+    uint256 bucket1BeforeSwap = pool.bucket1;
+
+    uint256 amountIn = 1e24;
+    uint256 amountOut = biPoolManager.swapIn(poolId, pool.asset0, pool.asset1, 1e24);
+
+    pool = biPoolManager.getPool(poolId); // Refresh pool
+
+    /*
+     * XXX: Because forge doesn't support an inverse to `expectEmit` we
+     * can't verify that calling swap doesn't emit BucketsUpdated
+     * but we can verify that the buckets were not reset before
+     * the swap, but are based on the "debalanced" pool.
+     */
+
+    assertEq(bucket0BeforeSwap + amountIn, pool.bucket0);
+    assertEq(bucket1BeforeSwap - amountOut, pool.bucket1);
+  }
+
+  function test_swapIn_whenBucketsAreStale_butMinReportsNotMet_doesNotUpdateBuckets() public {
+    BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
+    swap(poolId, pool.bucket0 / 2, pool.bucket1 / 2); // debalance pool
+    pool = biPoolManager.getPool(poolId); // Refresh pool
+    uint256 bucket0BeforeSwap = pool.bucket0;
+    uint256 bucket1BeforeSwap = pool.bucket1;
+
+    vm.warp(pool.bucketUpdateInfo.bucketUpdateFrequency + 1);
+    sortedOracles.setNumRates(address(cUSD), 4);
+    sortedOracles.setMedianTimestampToNow(address(cUSD));
+
+    uint256 amountIn = 1e24;
+    uint256 amountOut = biPoolManager.swapIn(poolId, pool.asset0, pool.asset1, 1e24);
+
+    pool = biPoolManager.getPool(poolId); // Refresh pool
+
+    assertEq(bucket0BeforeSwap + amountIn, pool.bucket0);
+    assertEq(bucket1BeforeSwap - amountOut, pool.bucket1);
+  }
+
+  function test_swapIn_whenBucketsAreStale_butReportIsExpired_doesNotUpdateBuckets() public {
+    BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
+    swap(poolId, pool.bucket0 / 2, pool.bucket1 / 2); // debalance pool
+    pool = biPoolManager.getPool(poolId); // Refresh pool
+    uint256 bucket0BeforeSwap = pool.bucket0;
+    uint256 bucket1BeforeSwap = pool.bucket1;
+
+    vm.warp(pool.bucketUpdateInfo.bucketUpdateFrequency + 1);
+    sortedOracles.setOldestReportExpired(address(cUSD));
+    sortedOracles.setNumRates(address(cUSD), 10);
+    sortedOracles.setMedianTimestampToNow(address(cUSD));
+
+    uint256 amountIn = 1e24;
+    uint256 amountOut = biPoolManager.swapIn(poolId, pool.asset0, pool.asset1, 1e24);
+
+    pool = biPoolManager.getPool(poolId); // Refresh pool
+
+    assertEq(bucket0BeforeSwap + amountIn, pool.bucket0);
+    assertEq(bucket1BeforeSwap - amountOut, pool.bucket1);
+  }
+
+  function test_swapIn_whenBucketsAreStale_butMedianTimestampIsOld_doesNotUpdateBuckets() public {
+    BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
+    swap(poolId, pool.bucket0 / 2, pool.bucket1 / 2); // debalance pool
+    pool = biPoolManager.getPool(poolId); // Refresh pool
+    uint256 bucket0BeforeSwap = pool.bucket0;
+    uint256 bucket1BeforeSwap = pool.bucket1;
+
+    vm.warp(pool.bucketUpdateInfo.bucketUpdateFrequency + 1);
+    sortedOracles.setNumRates(address(cUSD), 10);
+    sortedOracles.setMedianTimestamp(
+      address(cUSD),
+      now - pool.bucketUpdateInfo.bucketUpdateFrequency
+    );
+
+    uint256 amountIn = 1e24;
+    uint256 amountOut = biPoolManager.swapIn(poolId, pool.asset0, pool.asset1, 1e24);
+
+    pool = biPoolManager.getPool(poolId); // Refresh pool
+
+    assertEq(bucket0BeforeSwap + amountIn, pool.bucket0);
+    assertEq(bucket1BeforeSwap - amountOut, pool.bucket1);
+  }
 }

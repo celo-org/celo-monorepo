@@ -91,7 +91,7 @@ interface IBiPoolManager {
    * @param bucket0 The new bucket0 size
    * @param bucket1 The new bucket1 size
    */
-  event BucketsUpdated(bytes32 poolId, uint256 bucket0, uint256 bucket1);
+  event BucketsUpdated(bytes32 indexed poolId, uint256 bucket0, uint256 bucket1);
 
   /**
    * @notice Retrieves the pool with the specified poolId.
