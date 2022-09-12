@@ -18,6 +18,11 @@ enum InterceptedMethods {
   sign = 'eth_sign',
   personalSign = 'personal_sign',
   signTypedData = 'eth_signTypedData',
+  signTypedDataV1 = 'eth_signTypedData_v1',
+  signTypedDataV2 = 'eth_signTypedData_v2',
+  signTypedDataV3 = 'eth_signTypedData_v3',
+  signTypedDataV4 = 'eth_signTypedData_v4',
+  signTypedDataV5 = 'eth_signTypedData_v5',
 }
 
 export function assertIsCeloProvider(provider: any): asserts provider is CeloProvider {
@@ -121,7 +126,12 @@ export class CeloProvider implements Provider {
 
         return
       }
-      case InterceptedMethods.signTypedData: {
+      case InterceptedMethods.signTypedData:
+      case InterceptedMethods.signTypedDataV1:
+      case InterceptedMethods.signTypedDataV2:
+      case InterceptedMethods.signTypedDataV3:
+      case InterceptedMethods.signTypedDataV4:
+      case InterceptedMethods.signTypedDataV5: {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         address = payload.params[0]
 
