@@ -161,16 +161,16 @@ contract BiPoolManagerTest is Test {
     pool.asset0 = address(asset0);
     pool.asset1 = address(asset1);
     pool.pricingModule = pricingModule;
-    pool.spread = spread;
 
-    BiPoolManager.BucketUpdateInfo memory bucketUpdateInfo;
-    bucketUpdateInfo.oracleReportTarget = oracleReportTarget;
-    bucketUpdateInfo.bucket0TargetSize = bucket0TargetSize;
-    bucketUpdateInfo.bucket0MaxFraction = bucket0MaxFraction;
-    bucketUpdateInfo.bucketUpdateFrequency = 60 * 5; // 5 minutes
-    bucketUpdateInfo.minimumReports = 5;
+    BiPoolManager.PoolConfig memory config;
+    config.oracleReportTarget = oracleReportTarget;
+    config.bucket0TargetSize = bucket0TargetSize;
+    config.bucket0MaxFraction = bucket0MaxFraction;
+    config.bucketUpdateFrequency = 60 * 5; // 5 minutes
+    config.minimumReports = 5;
+    config.spread = spread;
 
-    pool.bucketUpdateInfo = bucketUpdateInfo;
+    pool.config = config;
 
     return biPoolManager.createPool(pool);
   }
@@ -196,7 +196,7 @@ contract BiPoolManagerTest is Test {
         constantProduct.getAmountIn.selector,
         bucketIn,
         bucketOut,
-        pool.spread.unwrap(),
+        pool.config.spread.unwrap(),
         amountOut
       ),
       abi.encode(amountIn)
@@ -224,7 +224,7 @@ contract BiPoolManagerTest is Test {
         constantProduct.getAmountOut.selector,
         bucketIn,
         bucketOut,
-        pool.spread.unwrap(),
+        pool.config.spread.unwrap(),
         amountIn
       ),
       abi.encode(amountOut)
@@ -740,12 +740,12 @@ contract BiPoolManagerTest_bucketUpdates is BiPoolManagerTest_withPool {
     BiPoolManager.Pool memory pool = biPoolManager.getPool(poolId);
     swap(poolId, pool.bucket0 / 2, pool.bucket1 / 2); // debalance pool
 
-    vm.warp(pool.bucketUpdateInfo.bucketUpdateFrequency + 1);
+    vm.warp(pool.config.bucketUpdateFrequency + 1);
     sortedOracles.setNumRates(address(cUSD), 10);
     sortedOracles.setMedianTimestamp(address(cUSD), now);
 
     vm.expectEmit(true, true, true, true);
-    uint256 bucket0TargetSize = pool.bucketUpdateInfo.bucket0TargetSize;
+    uint256 bucket0TargetSize = pool.config.bucket0TargetSize;
     emit BucketsUpdated(
       poolId,
       bucket0TargetSize,
@@ -792,7 +792,7 @@ contract BiPoolManagerTest_bucketUpdates is BiPoolManagerTest_withPool {
     uint256 bucket0BeforeSwap = pool.bucket0;
     uint256 bucket1BeforeSwap = pool.bucket1;
 
-    vm.warp(pool.bucketUpdateInfo.bucketUpdateFrequency + 1);
+    vm.warp(pool.config.bucketUpdateFrequency + 1);
     sortedOracles.setNumRates(address(cUSD), 4);
     sortedOracles.setMedianTimestampToNow(address(cUSD));
 
@@ -812,7 +812,7 @@ contract BiPoolManagerTest_bucketUpdates is BiPoolManagerTest_withPool {
     uint256 bucket0BeforeSwap = pool.bucket0;
     uint256 bucket1BeforeSwap = pool.bucket1;
 
-    vm.warp(pool.bucketUpdateInfo.bucketUpdateFrequency + 1);
+    vm.warp(pool.config.bucketUpdateFrequency + 1);
     sortedOracles.setOldestReportExpired(address(cUSD));
     sortedOracles.setNumRates(address(cUSD), 10);
     sortedOracles.setMedianTimestampToNow(address(cUSD));
@@ -833,12 +833,9 @@ contract BiPoolManagerTest_bucketUpdates is BiPoolManagerTest_withPool {
     uint256 bucket0BeforeSwap = pool.bucket0;
     uint256 bucket1BeforeSwap = pool.bucket1;
 
-    vm.warp(pool.bucketUpdateInfo.bucketUpdateFrequency + 1);
+    vm.warp(pool.config.bucketUpdateFrequency + 1);
     sortedOracles.setNumRates(address(cUSD), 10);
-    sortedOracles.setMedianTimestamp(
-      address(cUSD),
-      now - pool.bucketUpdateInfo.bucketUpdateFrequency
-    );
+    sortedOracles.setMedianTimestamp(address(cUSD), now - pool.config.bucketUpdateFrequency);
 
     uint256 amountIn = 1e24;
     uint256 amountOut = biPoolManager.swapIn(poolId, pool.asset0, pool.asset1, 1e24);

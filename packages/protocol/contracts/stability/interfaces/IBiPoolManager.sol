@@ -16,11 +16,11 @@ interface IBiPoolManager {
   struct Pool {
     address asset0;
     address asset1;
+    IPricingModule pricingModule;
     uint256 bucket0;
     uint256 bucket1;
-    IPricingModule pricingModule;
-    FixidityLib.Fraction spread;
-    BucketUpdateInfo bucketUpdateInfo;
+    uint256 lastBucketUpdate;
+    PoolConfig config;
   }
 
   /** 
@@ -29,10 +29,10 @@ interface IBiPoolManager {
    * version doesn't support structs with too many members. 
    * Sad reacts only.
    */
-  struct BucketUpdateInfo {
+  struct PoolConfig {
+    FixidityLib.Fraction spread;
     address oracleReportTarget; // can be a stable address or custom
     uint256 bucketUpdateFrequency;
-    uint256 lastBucketUpdate;
     uint256 minimumReports;
     uint256 bucket0TargetSize;
     FixidityLib.Fraction bucket0MaxFraction;

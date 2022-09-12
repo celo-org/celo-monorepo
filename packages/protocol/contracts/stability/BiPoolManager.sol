@@ -241,19 +241,12 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     onlyBroker
     returns (uint256 amountOut)
   {
-    // TODO: Check if buckets should be updated
     Pool memory pool = getPool(exchangeId);
-    pool = updateBucketsIfNecessary(exchangeId, pool);
+    bool bucketsUpdated;
+    (pool, bucketsUpdated) = updateBucketsIfNecessary(exchangeId, pool);
 
     amountOut = _getAmountOut(pool, tokenIn, tokenOut, amountIn);
-    if (tokenIn == pool.asset0) {
-      pool.bucket0 += amountIn;
-      pool.bucket1 -= amountOut;
-    } else {
-      pool.bucket0 -= amountOut;
-      pool.bucket1 += amountIn;
-    }
-    pools[exchangeId] = pool;
+    executeSwap(exchangeId, pool, tokenIn, amountIn, amountOut, bucketsUpdated);
     return amountOut;
   }
 
@@ -271,21 +264,48 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     returns (uint256 amountIn)
   {
     Pool memory pool = getPool(exchangeId);
-    pool = updateBucketsIfNecessary(exchangeId, pool);
+    bool bucketsUpdated;
+    (pool, bucketsUpdated) = updateBucketsIfNecessary(exchangeId, pool);
 
     amountIn = _getAmountIn(pool, tokenIn, tokenOut, amountOut);
-    if (tokenIn == pool.asset0) {
-      pool.bucket0 += amountIn;
-      pool.bucket1 -= amountOut;
-    } else {
-      pool.bucket0 -= amountOut;
-      pool.bucket1 += amountIn;
-    }
-    pools[exchangeId] = pool;
+    executeSwap(exchangeId, pool, tokenIn, amountIn, amountOut, bucketsUpdated);
     return amountIn;
   }
 
   /* ==================== Private Functions ==================== */
+
+  /**
+   * @notice Execute a swap against the in memory pool and write
+   * the new bucket sizes to storage.
+   * @param poolId The id of the pool
+   * @param pool The pool to operate on
+   * @param tokenIn The token to be sold
+   * @param amountIn The amount of tokenIn to be sold
+   * @param amountOut The amount of tokenOut to be bought
+   * @param bucketsUpdated wether the buckets updated during the swap
+   */
+  function executeSwap(
+    bytes32 poolId,
+    Pool memory pool,
+    address tokenIn,
+    uint256 amountIn,
+    uint256 amountOut,
+    bool bucketsUpdated
+  ) internal {
+    if (tokenIn == pool.asset0) {
+      pools[poolId].bucket0 = pool.bucket0 + amountIn;
+      pools[poolId].bucket1 = pool.bucket1 - amountOut;
+    } else {
+      pools[poolId].bucket0 = pool.bucket0 - amountOut;
+      pools[poolId].bucket1 = pool.bucket1 + amountIn;
+    }
+    // pools[poolId].lastBucketUpdate = pool.lastBucketUpdate;
+
+    if (bucketsUpdated) {
+      // solhint-disable-next-line not-rely-on-time
+      pools[poolId].lastBucketUpdate = now;
+    }
+  }
 
   /**
    * @notice Calculate amountOut of tokenOut received for a given amountIn of tokenIn
@@ -308,10 +328,20 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
 
     if (tokenIn == pool.asset0) {
       return
-        pool.pricingModule.getAmountOut(pool.bucket0, pool.bucket1, pool.spread.unwrap(), amountIn);
+        pool.pricingModule.getAmountOut(
+          pool.bucket0,
+          pool.bucket1,
+          pool.config.spread.unwrap(),
+          amountIn
+        );
     } else {
       return
-        pool.pricingModule.getAmountOut(pool.bucket1, pool.bucket0, pool.spread.unwrap(), amountIn);
+        pool.pricingModule.getAmountOut(
+          pool.bucket1,
+          pool.bucket0,
+          pool.config.spread.unwrap(),
+          amountIn
+        );
     }
   }
 
@@ -336,39 +366,42 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
 
     if (tokenIn == pool.asset0) {
       return
-        pool.pricingModule.getAmountIn(pool.bucket0, pool.bucket1, pool.spread.unwrap(), amountOut);
+        pool.pricingModule.getAmountIn(
+          pool.bucket0,
+          pool.bucket1,
+          pool.config.spread.unwrap(),
+          amountOut
+        );
     } else {
       return
-        pool.pricingModule.getAmountIn(pool.bucket1, pool.bucket0, pool.spread.unwrap(), amountOut);
+        pool.pricingModule.getAmountIn(
+          pool.bucket1,
+          pool.bucket0,
+          pool.config.spread.unwrap(),
+          amountOut
+        );
     }
   }
 
   /**
    * @notice If conditions are met, update the pool bucket sizes.
+   * @dev This doesn't checkpoint the pool, just updates the in-memory one
+   * so it should be used in a context that then checkpoints the pool.
    * @param poolId The id of the pool being updated.
    * @param pool The pool being updated.
    * @return poolAfter The updated pool.
    */
   function updateBucketsIfNecessary(bytes32 poolId, Pool memory pool)
     internal
-    returns (Pool memory)
+    returns (Pool memory, bool updated)
   {
+    updated = false;
     if (shouldUpdateBuckets(pool)) {
-      (uint256 bucket0, uint256 bucket1) = getUpdatedBuckets(pool);
-
-      pool.bucket0 = bucket0;
-      pool.bucket1 = bucket1;
-      // solhint-disable-next-line not-rely-on-time
-      pool.bucketUpdateInfo.lastBucketUpdate = now;
-
-      pools[poolId].bucket0 = bucket0;
-      pools[poolId].bucket1 = bucket1;
-      // solhint-disable-next-line not-rely-on-time
-      pools[poolId].bucketUpdateInfo.lastBucketUpdate = now;
-
-      emit BucketsUpdated(poolId, bucket0, bucket1);
+      (pool.bucket0, pool.bucket1) = getUpdatedBuckets(pool);
+      updated = true;
+      emit BucketsUpdated(poolId, pool.bucket0, pool.bucket1);
     }
-    return pool;
+    return (pool, updated);
   }
 
   /**
@@ -378,19 +411,14 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
    * @return shouldUpdate
    */
   function shouldUpdateBuckets(Pool memory pool) internal view returns (bool) {
-    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(
-      pool.bucketUpdateInfo.oracleReportTarget
-    );
+    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(pool.config.oracleReportTarget);
     // solhint-disable-next-line not-rely-on-time
-    bool timePassed = now >=
-      pool.bucketUpdateInfo.lastBucketUpdate.add(pool.bucketUpdateInfo.bucketUpdateFrequency);
-    bool enoughReports = (sortedOracles.numRates(pool.bucketUpdateInfo.oracleReportTarget) >=
-      pool.bucketUpdateInfo.minimumReports);
+    bool timePassed = now >= pool.lastBucketUpdate.add(pool.config.bucketUpdateFrequency);
+    bool enoughReports = (sortedOracles.numRates(pool.config.oracleReportTarget) >=
+      pool.config.minimumReports);
     // solhint-disable-next-line not-rely-on-time
-    bool medianReportRecent = sortedOracles.medianTimestamp(
-      pool.bucketUpdateInfo.oracleReportTarget
-    ) >
-      now.sub(pool.bucketUpdateInfo.bucketUpdateFrequency);
+    bool medianReportRecent = sortedOracles.medianTimestamp(pool.config.oracleReportTarget) >
+      now.sub(pool.config.bucketUpdateFrequency);
     return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
@@ -406,11 +434,11 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     returns (uint256 bucket0, uint256 bucket1)
   {
     // TODO: Take max fraction/min supply in account when setting the bucket size
-    bucket0 = pool.bucketUpdateInfo.bucket0TargetSize;
+    bucket0 = pool.config.bucket0TargetSize;
     uint256 exchangeRateNumerator;
     uint256 exchangeRateDenominator;
     (exchangeRateNumerator, exchangeRateDenominator) = getOracleExchangeRate(
-      pool.bucketUpdateInfo.oracleReportTarget
+      pool.config.oracleReportTarget
     );
 
     bucket1 = exchangeRateDenominator.mul(bucket0).div(exchangeRateNumerator);
@@ -447,24 +475,21 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     );
 
     require(
-      poolInfo.bucketUpdateInfo.bucket0MaxFraction.unwrap() > 0,
+      poolInfo.config.bucket0MaxFraction.unwrap() > 0,
       "bucket0MaxFraction must be greater than 0"
     );
 
     require(
-      poolInfo.bucketUpdateInfo.bucket0MaxFraction.lt(FixidityLib.fixed1()),
+      poolInfo.config.bucket0MaxFraction.lt(FixidityLib.fixed1()),
       "bucket0MaxFraction must be smaller than 1"
     );
 
     require(
-      FixidityLib.lte(poolInfo.spread, FixidityLib.fixed1()),
+      FixidityLib.lte(poolInfo.config.spread, FixidityLib.fixed1()),
       "Spread must be less than or equal to 1"
     );
 
-    require(
-      poolInfo.bucketUpdateInfo.oracleReportTarget != address(0),
-      "oracleReportTarget must be set"
-    );
+    require(poolInfo.config.oracleReportTarget != address(0), "oracleReportTarget must be set");
 
     // TODO: Stable bucket max fraction should not exceed available stable bucket fraction.
     // TODO: minSupplyForStableBucketCap gt 0 & is there an aggregated value that needs to be checked
