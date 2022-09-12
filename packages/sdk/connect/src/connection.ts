@@ -268,7 +268,8 @@ export class Connection {
    * @param signer - The address of account signing this data
    * @param typedData - Structured data to be signed
    * @param version - Optionally provide a version which will be appended to the method. E.G. (4) becomes 'eth_signTypedData_v4'
-   * Some providers like Metamask treat eth_signTypedData differently from versioned method eth_signTypedData_v4 others alias
+   * @remarks Some providers like Metamask treat eth_signTypedData differently from versioned method eth_signTypedData_v4
+   * @see [Metamask info in signing Typed Data](https://docs.metamask.io/guide/signing-data.html)
    */
   signTypedData = async (
     signer: string,
@@ -284,7 +285,7 @@ export class Connection {
         {
           id: getRandomId(),
           jsonrpc: '2.0',
-          method: method,
+          method,
           params: [inputAddressFormatter(signer), typedData],
         },
         (error, resp) => {
