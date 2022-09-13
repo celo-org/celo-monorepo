@@ -34,10 +34,10 @@ export async function getDomainRequestRecordExists<D extends Domain>(
       .first()
       .timeout(DB_TIMEOUT)
     return !!existingRequest
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_GET_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
+    throw err
   } finally {
     getRequestRecordExistsMeter()
   }
@@ -59,10 +59,10 @@ export async function storeDomainRequestRecord<D extends Domain>(
       .transacting(trx)
       .insert(new DomainRequestRecord(domain, blindedMessage))
       .timeout(DB_TIMEOUT)
-  } catch (error) {
+  } catch (err) {
     Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ error }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    throw error
+    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
+    throw err
   } finally {
     storeRequestRecordMeter()
   }

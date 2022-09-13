@@ -144,7 +144,7 @@ export async function getDataEncryptionKey(
     return res
   } catch (error) {
     logger.error('Failed to retrieve DEK: ' + error)
-    logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
+    logger.error(ErrorMessage.FULL_NODE_ERROR)
     throw error
   }
 }
@@ -184,7 +184,7 @@ export async function isVerified(
     return res
   } catch (error) {
     logger.error('Failed to get verification status: ' + error)
-    logger.error(ErrorMessage.CONTRACT_GET_FAILURE)
+    logger.error(ErrorMessage.FULL_NODE_ERROR)
     logger.warn('Assuming user is verified')
     return true
   }

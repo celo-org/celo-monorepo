@@ -108,11 +108,11 @@ export async function setDidMatchmaking(
         newAccount[ACCOUNTS_COLUMNS.didMatchmaking] = new Date()
         await accounts(db).transacting(trx).timeout(DB_TIMEOUT).insert(newAccount)
       }
-      trx.commit()
+      await trx.commit()
     })
-    .catch((err) => {
+    .catch(async (err) => {
       logger.error(ErrorMessage.DATABASE_UPDATE_FAILURE)
       logger.error(err)
-      trx.rollback()
+      await trx.rollback()
     })
 }

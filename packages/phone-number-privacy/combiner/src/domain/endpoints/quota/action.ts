@@ -24,8 +24,8 @@ export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
         const domainQuotaStatus = this.thresholdStateService.findThresholdDomainState(session)
         this.io.sendSuccess(200, session.response, domainQuotaStatus)
         return
-      } catch (error) {
-        session.logger.error({ error }, 'Error combining signer quota status responses')
+      } catch (err) {
+        session.logger.error({ err }, 'Error combining signer quota status responses')
       }
     }
     this.io.sendFailure(
