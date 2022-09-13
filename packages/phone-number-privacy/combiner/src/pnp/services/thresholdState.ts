@@ -27,6 +27,7 @@ export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageReq
         sortedResponses.length
     )
     if (totalQuotaStDev > MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD) {
+      // TODO(2.0.0): add alerting for this
       throw new Error(WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
     } else if (totalQuotaStDev > 0) {
       session.warnings.push(
