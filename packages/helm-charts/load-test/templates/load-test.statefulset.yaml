@@ -109,6 +109,8 @@ spec:
           ACCOUNT_ADDRESSES=$(cat /root/.celo/address | tr '\n' ',')
           ACCOUNT_ADDRESSES=${ACCOUNT_ADDRESSES::-1}
 
+          ADDITIONAL_FLAGS='--allow-insecure-unlock'
+
 {{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,web3,debug,admin,personal,net" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
 
           exec geth \
@@ -123,6 +125,7 @@ spec:
           --verbosity=1 \
           --unlock=$ACCOUNT_ADDRESSES \
           --password=/root/.celo/account/accountSecret \
+          ${ADDITIONAL_FLAGS} \
           --port 30303
         resources:
           requests:
