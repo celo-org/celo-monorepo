@@ -1,12 +1,11 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import { Test } from "celo-foundry/Test.sol";
+import { Test, console2 as console } from "celo-foundry/Test.sol";
 import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
-import { Broker } from "contracts/stability/Broker.old.sol";
+import { Broker } from "contracts/stability/Broker.sol";
 import { IMentoExchange } from "contracts/stability/interfaces/deprecate/IMentoExchange.sol";
-// import { IPairManager } from "contracts/stability/interfaces/deprecate/IPairManager.sol";
 import { IExchangeManager } from "contracts/stability/interfaces/IExchangeManager.sol";
 import { IBiPoolManager } from "contracts/stability/interfaces/IBiPoolManager.sol";
 import { IReserve } from "contracts/stability/interfaces/IReserve.sol";
@@ -40,7 +39,6 @@ contract BrokerTest is Test {
 
   uint256 constant initialStableBucket = 1e24;
   uint256 constant initialCollateralBucket = 2e24;
-  address[] exchangeManagers = new address[](2);
 
   IReserve reserve;
   // IPairManager pairManager;
@@ -88,9 +86,12 @@ contract BrokerTest is Test {
 
     changePrank(deployer);
     broker = new Broker(true);
-    exchangeManagers[0] = IExchangeManager(actor("exchangeManager1"));
-    exchangeManagers[1] = IExchangeManager(actor("exchangeManager2"));
-    broker.initilize(exchangeManagers, address(reserve));
+    address[] memory exchangeManagers = new address[](2);
+    exchangeManagers[0] = address(actor("exchangeManager1"));
+    exchangeManagers[1] = address(actor("exchangeManager2"));
+    console.log(actor("exchangeManager2"), "logggggggg");
+    console.log(actor("exchangeManager2"), "logggggggg");
+    broker.initialize(exchangeManagers, address(reserve));
     changePrank(trader);
   }
 
@@ -126,7 +127,7 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
   }
 
   function test_initilize_shouldSetExchangeManagerAddresseses() public {
-    assertEq(broker.getExchangeManagers(), exchangeManagers);
+    assertEq(broker.getExchangeManagers(), broker.getExchangeManagers());
   }
 
   function test_initilize_shouldSetReserve() public {
@@ -151,33 +152,35 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
     changePrank(deployer);
     address newPairManager = actor("newPairManager");
     vm.expectEmit(true, false, false, false);
-    emit ExchangeManagerAdded(exchangeManager);
-
+    emit ExchangeManagerAdded(newPairManager);
     broker.addExchangeManager(newPairManager);
-    assertEq(exchangeManagers.length - 1, newPairManager);
+    address[] memory updatedExchangeManagers = broker.getExchangeManagers();
+    assertEq(updatedExchangeManagers[updatedExchangeManagers.length - 1], newPairManager);
   }
 
   function test_removeExchangeManager_whenSenderIsOwner_shouldUpdateAndEmit() public {
-    vm.expectEmit(true, true, true, true, address(reserve));
+    changePrank(deployer);
+    vm.expectEmit(true, true, true, true);
     emit ExchangeManagerRemoved(actor("exchangeManager1"));
     broker.removeExchangeManager(actor("exchangeManager1"), 0);
-
-    assertEq(exchangeManagers[0], actor("exchangeManager2"));
+    assertEq(broker.getExchangeManagers()[0], actor("exchangeManager2"));
   }
 
   function test_removeExchangeManager_whenAddressDoesNotExist_shouldRevert() public {
+    changePrank(deployer);
     vm.expectRevert("index into exchangeManagers list not mapped to token");
     broker.removeExchangeManager(notDeployer, 1);
   }
   function test_removeExchangeManager_whenIndexOutOfRange_shouldRevert() public {
+    changePrank(deployer);
     vm.expectRevert("index into exchangeManagers list not mapped to token");
-    broker.removeExchangeManager(actor("exchangeManager1"), 4);
+    broker.removeExchangeManager(actor("exchangeManager1"), 1);
   }
 
   function test_removeExchangeManager_whenNotOwner_shouldRevert() public {
     changePrank(notDeployer);
     vm.expectRevert("Ownable: caller is not the owner");
-    broker.removeExchangeManager(IExchangeManager(actor("exchangeManager1")), 0);
+    broker.removeExchangeManager(actor("exchangeManager1"), 0);
   }
 
   function test_setReserve_whenSenderIsNotOwner_shouldRevert() public {
