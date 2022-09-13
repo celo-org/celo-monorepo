@@ -57,6 +57,8 @@ blockscout:
   jsonrpc_public_http: https://forno.celo.org
   metadata_crawler:
     schedule: "0 */2 * * *"
+  epoch_rewards:
+    enabled: true
 
 db:
   drop: false
