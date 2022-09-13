@@ -20,8 +20,8 @@ export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageReq
     )
     const threshold = this.config.keys.threshold
 
-    const totalQuotaAvg =
-      sortedResponses.reduce((a, b) => a.totalQuota + b.totalQuota) / sortedResponses.length
+    const totalQuotaAvg: number =
+      sortedResponses.map((r) => r.totalQuota).reduce((a, b) => a + b) / sortedResponses.length
     const totalQuotaStDev = Math.sqrt(
       sortedResponses.map((r) => (r.totalQuota - totalQuotaAvg) ** 2).reduce((a, b) => a + b) /
         sortedResponses.length
