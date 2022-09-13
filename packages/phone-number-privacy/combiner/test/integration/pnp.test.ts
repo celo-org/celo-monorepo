@@ -588,8 +588,8 @@ describe('pnpService', () => {
     }
 
     const totalQuota = 10
+    const weiTocusd = new BigNumber(1e17)
     beforeAll(async () => {
-      let weiTocusd = new BigNumber(1e17)
       mockOdisPaymentsTotalPaidCUSD.mockReturnValue(weiTocusd.multipliedBy(totalQuota))
     })
 
@@ -680,6 +680,42 @@ describe('pnpService', () => {
         performedQueryCount: 0,
         totalQuota,
         blockNumber: testBlockNumber,
+      })
+    })
+
+    it('Should respond with a warning when there are slight discrepancies in total quota', async () => {
+      mockOdisPaymentsTotalPaidCUSD.mockReturnValueOnce(weiTocusd.multipliedBy(totalQuota + 1))
+      const req = {
+        account: ACCOUNT_ADDRESS1,
+      }
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+      const res = await getCombinerQuotaResponse(req, authorization)
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        success: true,
+        version: expectedVersion,
+        performedQueryCount: 0,
+        totalQuota,
+        blockNumber: testBlockNumber,
+        warnings: [
+          WarningMessage.SIGNER_RESPONSE_DISCREPANCIES,
+          'Inconsistent signer total quota responses, using threshold signer as best guess',
+        ],
+      })
+    })
+
+    it('Should respond with 500 when there are large discrepancies in total quota', async () => {
+      mockOdisPaymentsTotalPaidCUSD.mockReturnValueOnce(weiTocusd.multipliedBy(totalQuota + 15))
+      const req = {
+        account: ACCOUNT_ADDRESS1,
+      }
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+      const res = await getCombinerQuotaResponse(req, authorization)
+      expect(res.status).toBe(500)
+      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: ErrorMessage.THRESHOLD_PNP_QUOTA_STATUS_FAILURE,
       })
     })
 
