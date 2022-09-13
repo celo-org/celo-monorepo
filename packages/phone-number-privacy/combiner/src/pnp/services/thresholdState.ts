@@ -2,6 +2,7 @@ import {
   PnpQuotaRequest,
   PnpQuotaStatus,
   SignMessageRequest,
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
 import { MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD, OdisConfig } from '../../config'
@@ -18,19 +19,19 @@ export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageReq
     const sortedResponses = signerResponses.sort(
       (a, b) => a.totalQuota - a.performedQueryCount - (b.totalQuota - b.performedQueryCount)
     )
-    const threshold = this.config.keys.threshold
 
-    const totalQuotaAvg: number =
+    const totalQuotaAvg =
       sortedResponses.map((r) => r.totalQuota).reduce((a, b) => a + b) / sortedResponses.length
     const totalQuotaStDev = Math.sqrt(
       sortedResponses.map((r) => (r.totalQuota - totalQuotaAvg) ** 2).reduce((a, b) => a + b) /
         sortedResponses.length
     )
     if (totalQuotaStDev > MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD) {
-      throw new Error('Signer total quota responses deviate too much to be combined')
+      throw new Error(WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
     } else if (totalQuotaStDev > 0) {
       session.warnings.push(
-        'Inconsistent signer total quota responses, using threshold signer as best guess'
+        WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS +
+          ', using threshold signer as best guess'
       )
     }
 
@@ -41,6 +42,7 @@ export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageReq
     //   throw new Error('Insufficient number of successful signer responses')
     // }
 
+    const threshold = this.config.keys.threshold
     const thresholdSigner = sortedResponses[threshold - 1]
     return {
       performedQueryCount: thresholdSigner.performedQueryCount,

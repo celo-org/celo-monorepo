@@ -699,7 +699,8 @@ describe('pnpService', () => {
         blockNumber: testBlockNumber,
         warnings: [
           WarningMessage.SIGNER_RESPONSE_DISCREPANCIES,
-          'Inconsistent signer total quota responses, using threshold signer as best guess',
+          WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS +
+            ', using threshold signer as best guess',
         ],
       })
     })
