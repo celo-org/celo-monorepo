@@ -3,9 +3,12 @@ import { CombineAction } from '../../../common/combine'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { OdisConfig } from '../../../config'
+import { DomainDiscrepanciesLogger } from '../../services/logDiscrepancies'
 import { DomainThresholdStateService } from '../../services/thresholdState'
 
 export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
+  readonly discrepancyLogger: DomainDiscrepanciesLogger = new DomainDiscrepanciesLogger()
+
   constructor(
     readonly config: OdisConfig,
     readonly thresholdStateService: DomainThresholdStateService<DomainQuotaStatusRequest>,
@@ -15,6 +18,7 @@ export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
   }
 
   combine(session: Session<DomainQuotaStatusRequest>): void {
+    this.discrepancyLogger.logResponseDiscrepancies(session)
     if (session.responses.length >= this.config.keys.threshold) {
       try {
         const domainQuotaStatus = this.thresholdStateService.findThresholdDomainState(session)

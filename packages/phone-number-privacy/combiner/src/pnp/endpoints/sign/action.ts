@@ -1,16 +1,18 @@
 import {
   ErrorMessage,
   ErrorType,
-  MAX_BLOCK_DISCREPANCY_THRESHOLD,
   SignMessageRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
 import { SignAction } from '../../../common/sign'
+import { PnpDiscrepanciesLogger } from '../../services/logDiscrepancies'
 
 export class PnpSignAction extends SignAction<SignMessageRequest> {
+  readonly discrepancyLogger: PnpDiscrepanciesLogger = new PnpDiscrepanciesLogger()
+
   combine(session: CryptoSession<SignMessageRequest>): void {
-    this.logResponseDiscrepancies(session)
+    this.discrepancyLogger.logResponseDiscrepancies(session)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
@@ -26,7 +28,8 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
           combinedSignature,
           pnpQuotaStatus.performedQueryCount,
           pnpQuotaStatus.totalQuota,
-          pnpQuotaStatus.blockNumber
+          pnpQuotaStatus.blockNumber,
+          session.warnings
         )
       } catch (error) {
         // May fail upon combining signatures if too many sigs are invalid
@@ -40,61 +43,6 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
 
   protected parseBlindedMessage(req: SignMessageRequest): string {
     return req.blindedQueryPhoneNumber
-  }
-
-  protected logResponseDiscrepancies(session: CryptoSession<SignMessageRequest>): void {
-    // Only compare responses which have values for the quota fields
-    const successes = session.responses.filter(
-      (signerResponse) =>
-        signerResponse.res &&
-        signerResponse.res.performedQueryCount &&
-        signerResponse.res.totalQuota &&
-        signerResponse.res.blockNumber
-    )
-
-    if (successes.length === 0) {
-      return
-    }
-    // Compare the first response to the rest of the responses
-    const expectedQueryCount = successes[0].res.performedQueryCount
-    const expectedTotalQuota = successes[0].res.totalQuota
-    const expectedBlockNumber = successes[0].res.blockNumber!
-    let discrepancyFound = false
-    for (const signerResponse of successes) {
-      // Performed query count should never diverge; however the totalQuota may
-      // diverge if the queried block number is different
-      if (
-        signerResponse.res.performedQueryCount !== expectedQueryCount ||
-        (signerResponse.res.totalQuota !== expectedTotalQuota &&
-          signerResponse.res.blockNumber === expectedBlockNumber)
-      ) {
-        const values = successes.map((_signerResponse) => {
-          return {
-            signer: _signerResponse.url,
-            performedQueryCount: _signerResponse.res.performedQueryCount,
-            totalQuota: _signerResponse.res.totalQuota,
-          }
-        })
-        session.logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
-        discrepancyFound = true
-      }
-      if (
-        Math.abs(signerResponse.res.blockNumber! - expectedBlockNumber) >
-        MAX_BLOCK_DISCREPANCY_THRESHOLD
-      ) {
-        const values = successes.map((response) => {
-          return {
-            signer: response.url,
-            blockNumber: response.res.blockNumber,
-          }
-        })
-        session.logger.error({ values }, WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
-        discrepancyFound = true
-      }
-      if (discrepancyFound) {
-        return
-      }
-    }
   }
 
   protected errorCodeToError(errorCode: number): ErrorType {

@@ -9,14 +9,15 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
 import { SignAction } from '../../../common/sign'
+import { DomainDiscrepanciesLogger } from '../../services/logDiscrepancies'
 
 export class DomainSignAction extends SignAction<DomainRestrictedSignatureRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_SIGN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
+  readonly discrepancyLogger: DomainDiscrepanciesLogger = new DomainDiscrepanciesLogger()
 
   combine(session: CryptoSession<DomainRestrictedSignatureRequest>): void {
-    // this.logResponseDiscrepancies(session)
-    // TODO(2.0.0, logging) https://github.com/celo-org/celo-monorepo/issues/9793
+    this.discrepancyLogger.logResponseDiscrepancies(session)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
@@ -42,14 +43,6 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
 
   protected parseBlindedMessage(req: DomainRestrictedSignatureRequest): string {
     return req.blindedMessage
-  }
-
-  protected logResponseDiscrepancies(
-    _session: CryptoSession<DomainRestrictedSignatureRequest>
-  ): void {
-    // TODO(2.0.0, logging)
-    // (https://github.com/celo-org/celo-monorepo/issues/9793)
-    throw new Error('Method not implemented.')
   }
 
   protected errorCodeToError(errorCode: number): ErrorType {

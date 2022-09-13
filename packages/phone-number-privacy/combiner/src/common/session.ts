@@ -11,6 +11,7 @@ export class Session<R extends OdisRequest> {
   readonly failedSigners: Set<string> = new Set<string>()
   readonly errorCodes: Map<number, number> = new Map<number, number>()
   readonly responses: Array<SignerResponse<R>> = new Array<SignerResponse<R>>()
+  readonly warnings: string[] = []
 
   public constructor(
     readonly request: Request<{}, {}, R>,

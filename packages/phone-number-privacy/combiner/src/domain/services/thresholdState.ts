@@ -2,7 +2,6 @@ import {
   DomainQuotaStatusRequest,
   DomainRestrictedSignatureRequest,
   DomainState,
-  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
 import { OdisConfig } from '../../config'
@@ -25,10 +24,6 @@ export class DomainThresholdStateService<
     // Check whether the domain is disabled, either by all signers or by some.
     const domainStatesEnabled = domainStates.filter((ds) => !ds.disabled)
     const numDisabled = domainStates.length - domainStatesEnabled.length
-
-    if (numDisabled > 0 && numDisabled < domainStates.length) {
-      session.logger.warn(WarningMessage.INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES)
-    }
 
     if (this.config.odisServices.signers.length - numDisabled < threshold) {
       return { timer: 0, counter: 0, disabled: true, now: 0 }
