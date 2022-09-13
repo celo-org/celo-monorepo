@@ -511,7 +511,7 @@ describe('legacyPNP', () => {
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -575,7 +575,7 @@ describe('legacyPNP', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
             success: true,
             version: res.body.version,
             performedQueryCount: performedQueryCount,
@@ -916,7 +916,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.UNAUTHENTICATED_USER,

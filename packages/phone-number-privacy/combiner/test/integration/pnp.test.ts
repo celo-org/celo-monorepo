@@ -457,7 +457,7 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -778,7 +778,7 @@ describe('pnpService', () => {
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
@@ -794,7 +794,7 @@ describe('pnpService', () => {
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(401)
-      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -873,7 +873,7 @@ describe('pnpService', () => {
         const authorization = getPnpRequestAuthorization(req, differentPk)
         const res = await getCombinerQuotaResponse(req, authorization)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: expectedVersion,
           performedQueryCount: 0,

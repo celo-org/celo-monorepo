@@ -193,7 +193,7 @@ describe('pnp', () => {
 
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: res.body.version,
           performedQueryCount: 0,
@@ -228,7 +228,7 @@ describe('pnp', () => {
 
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: res.body.version,
           performedQueryCount: 0,
@@ -298,7 +298,7 @@ describe('pnp', () => {
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_QUOTA)
 
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -367,7 +367,7 @@ describe('pnp', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_QUOTA)
 
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
             success: true,
             version: res.body.version,
             performedQueryCount: 0,
@@ -485,7 +485,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: res.body.version,
           signature: expectedSignature,
@@ -509,7 +509,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: res.body.version,
           signature: expectedSignature,
@@ -690,7 +690,7 @@ describe('pnp', () => {
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.UNAUTHENTICATED_USER,

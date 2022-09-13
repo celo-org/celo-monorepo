@@ -477,7 +477,7 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
