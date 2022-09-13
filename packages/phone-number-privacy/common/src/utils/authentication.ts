@@ -16,9 +16,10 @@ import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './const
  * Authorization header should contain the EC signed body
  */
 export async function authenticateUser(
-  request: Request,
+  request: Request, // TODO(2.0.0, optional) this could take in a generic for the different request types
   contractKit: ContractKit,
-  logger: Logger
+  logger: Logger,
+  shouldFailOpen: boolean = true
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 
@@ -36,9 +37,18 @@ export async function authenticateUser(
     let registeredEncryptionKey
     try {
       registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit, logger)
-    } catch (error) {
-      logger.error(ErrorMessage.FAILURE_TO_GET_DEK) // TODO(2.0.0) add monitoring / alerting for this
-      return true
+    } catch (err) {
+      // getDataEncryptionKey should only throw if there is a full-node connection issue.
+      // That is, it does not throw if the DEK is undefined or invalid
+      if (shouldFailOpen) {
+        // TODO(2.0.0, optional) consider putting all fail-open logic behind an ENV var, or a request header
+        // TODO(2.0.0, release) add monitoring / alerting for these
+        logger.error({ err }, ErrorMessage.OPEN_FAILURE_TO_GET_DEK)
+        return true
+      } else {
+        logger.error({ err }, ErrorMessage.FAILURE_TO_GET_DEK)
+        return false
+      }
     }
     if (!registeredEncryptionKey) {
       logger.warn({ account: signer }, 'Account does not have registered encryption key')

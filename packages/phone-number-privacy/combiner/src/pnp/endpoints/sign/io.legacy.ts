@@ -78,7 +78,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, SignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger)
+    return authenticateUser(request, this.kit, logger, this.config.authShouldFailOpen)
   }
 
   sendSuccess(

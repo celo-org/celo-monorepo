@@ -44,6 +44,7 @@ export interface SignerConfig {
     }
     phoneNumberPrivacy: {
       enabled: boolean
+      authShouldFailOpen: boolean
     }
   }
   attestations: {
@@ -121,6 +122,7 @@ export const config: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: toBool(env.PHONE_NUMBER_PRIVACY_API_ENABLED, false),
+      authShouldFailOpen: toBool(env.PHONE_NUMBER_PRIVACY_AUTH_SHOULD_FAIL_OPEN, true),
     },
   },
   attestations: {
