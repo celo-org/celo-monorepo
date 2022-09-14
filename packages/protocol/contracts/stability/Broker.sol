@@ -110,7 +110,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   ) external returns (uint256 amountIn) {
     require(isExchangeManager[exchangeManager], "ExchangeManager does not exist");
     return
-      amountOut = IExchangeManager(exchangeManager).getAmountIn(
+      amountIn = IExchangeManager(exchangeManager).getAmountIn(
         exchangeId,
         tokenIn,
         tokenOut,
