@@ -1,12 +1,34 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.5.13;
+pragma experimental ABIEncoderV2;
 
 /*
- * @title ExchangeManager interface
- * @notice The IExchangeManager interface is the interface that the Broker uses
- * to communicate with different listing manager implementations like the TwoAssetPoolManager
+ * @title ExchangeProvider interface
+ * @notice The IExchangeProvider interface is the interface that the Broker uses
+ * to communicate with different exchange manager implementations like the TwoAssetPoolManager
  */
-interface IExchangeManager {
+interface IExchangeProvider {
+  /** 
+   * @notice Exchange - a struct that's used only by UIs (frontends/CLIs)
+   * in order to discover what asset swaps are possible within an 
+   * exchange provider. 
+   * It's up to the specific exchange provider to convert its internal
+   * representation to this universal struct. This conversion should
+   * only happen in view calls used for discovery.
+   * @param exchangeId The ID of the exchange, used to initiate swaps or get quotes.
+   * @param assets An array of addresses of ERC20 tokens that can be swapped.
+   */
+  struct Exchange {
+    bytes32 exchangeId;
+    address[] assets;
+  }
+
+  /**
+   * @notice Get all exchanges supported by the ExchangeProvider.
+   * @return exchanges An array of Exchange structs.
+   */
+  function getExchanges() external view returns (Exchange[] memory exchanges);
+
   /**
    * @notice Execute a token swap with fixed amountIn
    * @param exchangeId The id of the exchange to use

@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import { IExchangeManager } from "./interfaces/IExchangeManager.sol";
+import { IExchangeProvider } from "./interfaces/IExchangeProvider.sol";
 import { IBiPoolManager } from "./interfaces/IBiPoolManager.sol";
 import { IReserve } from "./interfaces/IReserve.sol";
 import { IPricingModule } from "./interfaces/IPricingModule.sol";
@@ -21,10 +21,10 @@ interface IERC20Metadata {
 }
 
 /**
- * @title BiPoolManager 
- * @notice An exchange manager that manages asset pools consisting of two assets
+ * @title BiPoolExchangeManager 
+ * @notice An exchange manager that manages asset exchanges consisting of two assets
  */
-contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownable {
+contract BiPoolManager is IExchangeProvider, IBiPoolManager, Initializable, Ownable {
   using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
@@ -33,10 +33,10 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
   // Address of the broker contract.
   address public broker;
 
-  // Maps a pool id to the corresponding pool struct.
-  // poolId is in the format "asset0Symbol:asset1Symbol:pricingModuleName"
-  mapping(bytes32 => Pool) public pools;
-  bytes32[] public poolIds;
+  // Maps a exchange id to the corresponding PoolExchange struct.
+  // exchangeId is in the format "asset0Symbol:asset1Symbol:pricingModuleName"
+  mapping(bytes32 => PoolExchange) public exchanges;
+  bytes32[] public exchangeIds;
 
   // Address of the Mento reserve contract
   IReserve public reserve;
@@ -77,37 +77,40 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
   /* ==================== View Functions ==================== */
 
   /**
-   * @notice Get a pool from memory
-   * @param poolId the pool id
+   * @notice Get a PoolExchange from storage.
+   * @param exchangeId the exchange id
    */
-  function getPool(bytes32 poolId) public view returns (Pool memory pool) {
-    pool = pools[poolId];
-    require(pool.asset0 != address(0), "A pool with the specified id does not exist");
+  function getPoolExchange(bytes32 exchangeId) public view returns (PoolExchange memory exchange) {
+    exchange = exchanges[exchangeId];
+    require(exchange.asset0 != address(0), "An exchange with the specified id does not exist");
   }
 
   /**
-   * @notice Get all pool Ids
-   * @dev We don't expect the number of pools to grow to
-   * astronomical values so this is safe gas-wise as is.
+   * @notice Get all exchange IDs.
+   * @return exchangeIds List of the exchangeIds.
    */
-  function getPoolIds() public view returns (bytes32[] memory) {
-    return poolIds;
+  function getExchangeIds() external view returns (bytes32[] memory) {
+    return exchangeIds;
   }
 
   /**
-   * @notice Get all pools (used by interfaces)
-   * @dev We don't expect the number of pools to grow to
+   * @notice Get all exchanges (used by interfaces)
+   * @dev We don't expect the number of exchanges to grow to
    * astronomical values so this is safe gas-wise as is.
    */
-  function getPools() public view returns (Pool[] memory _pools) {
-    for (uint256 i = 0; i < poolIds.length; i++) {
-      _pools[i] = pools[poolIds[i]];
+  function getExchanges() public view returns (Exchange[] memory _exchanges) {
+    _exchanges = new Exchange[](exchangeIds.length);
+    for (uint256 i = 0; i < exchangeIds.length; i++) {
+      _exchanges[i].exchangeId = exchangeIds[i];
+      _exchanges[i].assets = new address[](2);
+      _exchanges[i].assets[0] = exchanges[exchangeIds[i]].asset0;
+      _exchanges[i].assets[1] = exchanges[exchangeIds[i]].asset1;
     }
   }
 
   /**
    * @notice Calculate amountOut of tokenOut received for a given amountIn of tokenIn
-   * @param exchangeId The id of the exchange i.e Pool to use
+   * @param exchangeId The id of the exchange i.e PoolExchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
@@ -117,13 +120,13 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     public
     returns (uint256)
   {
-    Pool memory pool = getPool(exchangeId);
-    return _getAmountOut(pool, tokenIn, tokenOut, amountIn);
+    PoolExchange memory exchange = getPoolExchange(exchangeId);
+    return _getAmountOut(exchange, tokenIn, tokenOut, amountIn);
   }
 
   /**
    * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
-   * @param exchangeId The id of the exchange i.e Pool to use
+   * @param exchangeId The id of the exchange i.e PoolExchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountOut The amount of tokenOut to be bought
@@ -133,8 +136,8 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     public
     returns (uint256)
   {
-    Pool memory pool = getPool(exchangeId);
-    return _getAmountIn(pool, tokenIn, tokenOut, amountOut);
+    PoolExchange memory exchange = getPoolExchange(exchangeId);
+    return _getAmountIn(exchange, tokenIn, tokenOut, amountOut);
   }
 
   /* ==================== Mutative Functions ==================== */
@@ -170,67 +173,81 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
   }
 
   /**
-   * @notice Creates a new pool using the given parameters.
-   * @param _pool The information required to create the pool.
-   * @return poolId The id of the newly created pool.
+   * @notice Creates a new exchange using the given parameters.
+   * @param _exchange the PoolExchange to create.
+   * @return exchangeId The id of the newly created exchange.
    */
-  function createPool(Pool calldata _pool) external onlyOwner returns (bytes32 poolId) {
-    Pool memory pool = _pool;
-    require(address(pool.pricingModule) != address(0), "pricingModule must be set");
-    require(pool.asset0 != address(0), "asset0 must be set");
-    require(pool.asset1 != address(0), "asset1 must be set");
+  function createExchange(PoolExchange calldata _exchange)
+    external
+    onlyOwner
+    returns (bytes32 exchangeId)
+  {
+    PoolExchange memory exchange = _exchange;
+    require(address(exchange.pricingModule) != address(0), "pricingModule must be set");
+    require(exchange.asset0 != address(0), "asset0 must be set");
+    require(exchange.asset1 != address(0), "asset1 must be set");
 
-    poolId = keccak256(
+    exchangeId = keccak256(
       abi.encodePacked(
-        IERC20Metadata(pool.asset0).symbol(),
-        IERC20Metadata(pool.asset1).symbol(),
-        pool.pricingModule.name()
+        IERC20Metadata(exchange.asset0).symbol(),
+        IERC20Metadata(exchange.asset1).symbol(),
+        exchange.pricingModule.name()
       )
     );
     require(
-      pools[poolId].asset0 == address(0),
-      "A pool with the specified assets and exchange exists"
+      exchanges[exchangeId].asset0 == address(0),
+      "An exchange with the specified assets and exchange exists"
     );
 
-    validatePoolInfo(pool);
-    (uint256 bucket0, uint256 bucket1) = getUpdatedBuckets(pool);
+    validate(exchange);
+    (uint256 bucket0, uint256 bucket1) = getUpdatedBuckets(exchange);
 
-    pool.bucket0 = bucket0;
-    pool.bucket1 = bucket1;
+    exchange.bucket0 = bucket0;
+    exchange.bucket1 = bucket1;
 
-    pools[poolId] = pool;
-    poolIds.push(poolId);
+    exchanges[exchangeId] = exchange;
+    exchangeIds.push(exchangeId);
 
-    emit PoolCreated(poolId, pool.asset0, pool.asset1, address(pool.pricingModule));
+    emit ExchangeCreated(
+      exchangeId,
+      exchange.asset0,
+      exchange.asset1,
+      address(exchange.pricingModule)
+    );
   }
 
   /**
-   * @notice Destroys a pool with the given parameters if it exists and frees up
+   * @notice Destroys a exchange with the given parameters if it exists and frees up
    *         the collateral and stable allocation it was using.
-   * @param poolId the id of the pool to destroy
-   * @param poolIdIndex The index of the poolId in the ids array
-   * @return destroyed A boolean indicating whether or not the pool was successfully destroyed.
+   * @param exchangeId the id of the exchange to destroy
+   * @param exchangeIdIndex The index of the exchangeId in the ids array
+   * @return destroyed A boolean indicating whether or not the exchange was successfully destroyed.
    */
-  function destroyPool(bytes32 poolId, uint256 poolIdIndex)
+  function destroyExchange(bytes32 exchangeId, uint256 exchangeIdIndex)
     external
     onlyOwner
     returns (bool destroyed)
   {
-    require(poolIdIndex < poolIds.length, "poolIdIndex not in range");
-    require(poolIds[poolIdIndex] == poolId, "poolId at index doesn't match");
-    Pool memory pool = pools[poolId];
+    require(exchangeIdIndex < exchangeIds.length, "exchangeIdIndex not in range");
+    require(exchangeIds[exchangeIdIndex] == exchangeId, "exchangeId at index doesn't match");
+    PoolExchange memory exchange = exchanges[exchangeId];
 
-    delete pools[poolId];
-    poolIds[poolIdIndex] = poolIds[poolIds.length - 1];
-    poolIds.pop();
+    delete exchanges[exchangeId];
+    exchangeIds[exchangeIdIndex] = exchangeIds[exchangeIds.length - 1];
+    exchangeIds.pop();
     destroyed = true;
 
-    emit PoolDestroyed(poolId, pool.asset0, pool.asset1, address(pool.pricingModule));
+    emit ExchangeDestroyed(
+      exchangeId,
+      exchange.asset0,
+      exchange.asset1,
+      address(exchange.pricingModule)
+    );
   }
 
   /**
    * @notice Execute a token swap with fixed amountIn
-   * @param exchangeId The id of exchange, i.e. Pool to use
+   * @param exchangeId The id of exchange, i.e. PoolExchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
@@ -241,18 +258,18 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     onlyBroker
     returns (uint256 amountOut)
   {
-    Pool memory pool = getPool(exchangeId);
+    PoolExchange memory exchange = getPoolExchange(exchangeId);
     bool bucketsUpdated;
-    (pool, bucketsUpdated) = updateBucketsIfNecessary(exchangeId, pool);
+    (exchange, bucketsUpdated) = updateBucketsIfNecessary(exchangeId, exchange);
 
-    amountOut = _getAmountOut(pool, tokenIn, tokenOut, amountIn);
-    executeSwap(exchangeId, pool, tokenIn, amountIn, amountOut, bucketsUpdated);
+    amountOut = _getAmountOut(exchange, tokenIn, tokenOut, amountIn);
+    executeSwap(exchangeId, exchange, tokenIn, amountIn, amountOut, bucketsUpdated);
     return amountOut;
   }
 
   /**
    * @notice Execute a token swap with fixed amountOut
-   * @param exchangeId The id of exchange, i.e. Pool to use
+   * @param exchangeId The id of exchange, i.e. PoolExchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountOut The amount of tokenOut to be bought
@@ -263,83 +280,84 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
     onlyBroker
     returns (uint256 amountIn)
   {
-    Pool memory pool = getPool(exchangeId);
+    PoolExchange memory exchange = getPoolExchange(exchangeId);
     bool bucketsUpdated;
-    (pool, bucketsUpdated) = updateBucketsIfNecessary(exchangeId, pool);
+    (exchange, bucketsUpdated) = updateBucketsIfNecessary(exchangeId, exchange);
 
-    amountIn = _getAmountIn(pool, tokenIn, tokenOut, amountOut);
-    executeSwap(exchangeId, pool, tokenIn, amountIn, amountOut, bucketsUpdated);
+    amountIn = _getAmountIn(exchange, tokenIn, tokenOut, amountOut);
+    executeSwap(exchangeId, exchange, tokenIn, amountIn, amountOut, bucketsUpdated);
     return amountIn;
   }
 
   /* ==================== Private Functions ==================== */
 
   /**
-   * @notice Execute a swap against the in memory pool and write
+   * @notice Execute a swap against the in memory exchange and write
    * the new bucket sizes to storage.
-   * @param poolId The id of the pool
-   * @param pool The pool to operate on
+   * @param exchangeId The id of the exchange
+   * @param exchange The exchange to operate on
    * @param tokenIn The token to be sold
    * @param amountIn The amount of tokenIn to be sold
    * @param amountOut The amount of tokenOut to be bought
    * @param bucketsUpdated wether the buckets updated during the swap
    */
   function executeSwap(
-    bytes32 poolId,
-    Pool memory pool,
+    bytes32 exchangeId,
+    PoolExchange memory exchange,
     address tokenIn,
     uint256 amountIn,
     uint256 amountOut,
     bool bucketsUpdated
   ) internal {
-    if (tokenIn == pool.asset0) {
-      pools[poolId].bucket0 = pool.bucket0 + amountIn;
-      pools[poolId].bucket1 = pool.bucket1 - amountOut;
+    if (tokenIn == exchange.asset0) {
+      exchanges[exchangeId].bucket0 = exchange.bucket0 + amountIn;
+      exchanges[exchangeId].bucket1 = exchange.bucket1 - amountOut;
     } else {
-      pools[poolId].bucket0 = pool.bucket0 - amountOut;
-      pools[poolId].bucket1 = pool.bucket1 + amountIn;
+      exchanges[exchangeId].bucket0 = exchange.bucket0 - amountOut;
+      exchanges[exchangeId].bucket1 = exchange.bucket1 + amountIn;
     }
-    // pools[poolId].lastBucketUpdate = pool.lastBucketUpdate;
+    // exchanges[exchangeId].lastBucketUpdate = exchange.lastBucketUpdate;
 
     if (bucketsUpdated) {
       // solhint-disable-next-line not-rely-on-time
-      pools[poolId].lastBucketUpdate = now;
+      exchanges[exchangeId].lastBucketUpdate = now;
     }
   }
 
   /**
    * @notice Calculate amountOut of tokenOut received for a given amountIn of tokenIn
-   * @param pool The pool to operate on
+   * @param exchange The exchange to operate on
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
    * @return amountOut The amount of tokenOut to be bought
    */
-  function _getAmountOut(Pool memory pool, address tokenIn, address tokenOut, uint256 amountIn)
-    internal
-    view
-    returns (uint256)
-  {
+  function _getAmountOut(
+    PoolExchange memory exchange,
+    address tokenIn,
+    address tokenOut,
+    uint256 amountIn
+  ) internal view returns (uint256) {
     require(
-      (tokenIn == pool.asset0 && tokenOut == pool.asset1) ||
-        (tokenIn == pool.asset1 && tokenOut == pool.asset0),
-      "tokenIn and tokenOut must match pool"
+      (tokenIn == exchange.asset0 && tokenOut == exchange.asset1) ||
+        (tokenIn == exchange.asset1 && tokenOut == exchange.asset0),
+      "tokenIn and tokenOut must match exchange"
     );
 
-    if (tokenIn == pool.asset0) {
+    if (tokenIn == exchange.asset0) {
       return
-        pool.pricingModule.getAmountOut(
-          pool.bucket0,
-          pool.bucket1,
-          pool.config.spread.unwrap(),
+        exchange.pricingModule.getAmountOut(
+          exchange.bucket0,
+          exchange.bucket1,
+          exchange.config.spread.unwrap(),
           amountIn
         );
     } else {
       return
-        pool.pricingModule.getAmountOut(
-          pool.bucket1,
-          pool.bucket0,
-          pool.config.spread.unwrap(),
+        exchange.pricingModule.getAmountOut(
+          exchange.bucket1,
+          exchange.bucket0,
+          exchange.config.spread.unwrap(),
           amountIn
         );
     }
@@ -347,98 +365,101 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
 
   /**
    * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
-   * @param pool The pool to operate on
+   * @param exchange The exchange to operate on
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
    * @param amountOut The amount of tokenOut to be bought
    * @return amountIn The amount of tokenIn to be sold
    */
-  function _getAmountIn(Pool memory pool, address tokenIn, address tokenOut, uint256 amountOut)
-    internal
-    view
-    returns (uint256)
-  {
+  function _getAmountIn(
+    PoolExchange memory exchange,
+    address tokenIn,
+    address tokenOut,
+    uint256 amountOut
+  ) internal view returns (uint256) {
     require(
-      (tokenIn == pool.asset0 && tokenOut == pool.asset1) ||
-        (tokenIn == pool.asset1 && tokenOut == pool.asset0),
-      "tokenIn and tokenOut must match pool"
+      (tokenIn == exchange.asset0 && tokenOut == exchange.asset1) ||
+        (tokenIn == exchange.asset1 && tokenOut == exchange.asset0),
+      "tokenIn and tokenOut must match exchange"
     );
 
-    if (tokenIn == pool.asset0) {
+    if (tokenIn == exchange.asset0) {
       return
-        pool.pricingModule.getAmountIn(
-          pool.bucket0,
-          pool.bucket1,
-          pool.config.spread.unwrap(),
+        exchange.pricingModule.getAmountIn(
+          exchange.bucket0,
+          exchange.bucket1,
+          exchange.config.spread.unwrap(),
           amountOut
         );
     } else {
       return
-        pool.pricingModule.getAmountIn(
-          pool.bucket1,
-          pool.bucket0,
-          pool.config.spread.unwrap(),
+        exchange.pricingModule.getAmountIn(
+          exchange.bucket1,
+          exchange.bucket0,
+          exchange.config.spread.unwrap(),
           amountOut
         );
     }
   }
 
   /**
-   * @notice If conditions are met, update the pool bucket sizes.
-   * @dev This doesn't checkpoint the pool, just updates the in-memory one
-   * so it should be used in a context that then checkpoints the pool.
-   * @param poolId The id of the pool being updated.
-   * @param pool The pool being updated.
-   * @return poolAfter The updated pool.
+   * @notice If conditions are met, update the exchange bucket sizes.
+   * @dev This doesn't checkpoint the exchange, just updates the in-memory one
+   * so it should be used in a context that then checkpoints the exchange.
+   * @param exchangeId The id of the exchange being updated.
+   * @param exchange The exchange being updated.
+   * @return exchangeAfter The updated exchange.
    */
-  function updateBucketsIfNecessary(bytes32 poolId, Pool memory pool)
+  function updateBucketsIfNecessary(bytes32 exchangeId, PoolExchange memory exchange)
     internal
-    returns (Pool memory, bool updated)
+    returns (PoolExchange memory, bool updated)
   {
     updated = false;
-    if (shouldUpdateBuckets(pool)) {
-      (pool.bucket0, pool.bucket1) = getUpdatedBuckets(pool);
+    if (shouldUpdateBuckets(exchange)) {
+      (exchange.bucket0, exchange.bucket1) = getUpdatedBuckets(exchange);
       updated = true;
-      emit BucketsUpdated(poolId, pool.bucket0, pool.bucket1);
+      emit BucketsUpdated(exchangeId, exchange.bucket0, exchange.bucket1);
     }
-    return (pool, updated);
+    return (exchange, updated);
   }
 
   /**
-   * @notice Determine if a pool's buckets should be updated
+   * @notice Determine if a exchange's buckets should be updated
    * based on staleness of buckets and oracle rates.
-   * @param pool The pool being updated.
+   * @param exchange The PoolExchange.
    * @return shouldUpdate
    */
-  function shouldUpdateBuckets(Pool memory pool) internal view returns (bool) {
-    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(pool.config.oracleReportTarget);
+  function shouldUpdateBuckets(PoolExchange memory exchange) internal view returns (bool) {
+    (bool isReportExpired, ) = sortedOracles.isOldestReportExpired(
+      exchange.config.oracleReportTarget
+    );
     // solhint-disable-next-line not-rely-on-time
-    bool timePassed = now >= pool.lastBucketUpdate.add(pool.config.bucketUpdateFrequency);
-    bool enoughReports = (sortedOracles.numRates(pool.config.oracleReportTarget) >=
-      pool.config.minimumReports);
+    bool timePassed = now >= exchange.lastBucketUpdate.add(exchange.config.bucketUpdateFrequency);
+    bool enoughReports = (sortedOracles.numRates(exchange.config.oracleReportTarget) >=
+      exchange.config.minimumReports);
     // solhint-disable-next-line not-rely-on-time
-    bool medianReportRecent = sortedOracles.medianTimestamp(pool.config.oracleReportTarget) >
-      now.sub(pool.config.bucketUpdateFrequency);
+    bool medianReportRecent = sortedOracles.medianTimestamp(exchange.config.oracleReportTarget) >
+      now.sub(exchange.config.bucketUpdateFrequency);
     return timePassed && enoughReports && medianReportRecent && !isReportExpired;
   }
 
   /**
-   * @notice Calculate the new bucket sizes for a pool
-   * @param pool The pool being updated.
-   * @return bucket0 the size of bucket0
-   * @return bucket1 the size of bucket1
+   * @notice Calculate the new bucket sizes for a exchange.
+   * @param exchange The PoolExchange in context.
+   * @return bucket0 The size of bucket0.
+   * @return bucket1 The size of bucket1.
    */
-  function getUpdatedBuckets(Pool memory pool)
+  function getUpdatedBuckets(PoolExchange memory exchange)
     internal
     view
     returns (uint256 bucket0, uint256 bucket1)
   {
     // TODO: Take max fraction/min supply in account when setting the bucket size
-    bucket0 = pool.config.bucket0TargetSize;
+    bucket0 = exchange.config.bucket0TargetSize;
     uint256 exchangeRateNumerator;
     uint256 exchangeRateDenominator;
     (exchangeRateNumerator, exchangeRateDenominator) = getOracleExchangeRate(
-      pool.config.oracleReportTarget
+      exchange.config.oracleReportTarget
     );
 
     bucket1 = exchangeRateDenominator.mul(bucket0).div(exchangeRateNumerator);
@@ -460,36 +481,36 @@ contract BiPoolManager is IExchangeManager, IBiPoolManager, Initializable, Ownab
   }
 
   /**
-   * @notice Valitates a virtual pool with the given information.
-   * @param poolInfo The information on the virtual pool to be validated.
-   * @return isValid A bool indicating whether or not the pool information provided is valid.
+   * @notice Valitates a PoolExchange's parameters and configuration
+   * @dev Reverts if not valid
+   * @param exchange The PoolExchange to validate
    */
-  function validatePoolInfo(Pool memory poolInfo) private view {
+  function validate(PoolExchange memory exchange) private view {
     require(
-      reserve.isStableAsset(poolInfo.asset0),
+      reserve.isStableAsset(exchange.asset0),
       "asset0 must be a stable registered with the reserve"
     );
     require(
-      reserve.isStableAsset(poolInfo.asset1) || reserve.isCollateralAsset(poolInfo.asset1),
+      reserve.isStableAsset(exchange.asset1) || reserve.isCollateralAsset(exchange.asset1),
       "asset1 must be a stable or collateral registered with the reserve"
     );
 
     require(
-      poolInfo.config.bucket0MaxFraction.unwrap() > 0,
+      exchange.config.bucket0MaxFraction.unwrap() > 0,
       "bucket0MaxFraction must be greater than 0"
     );
 
     require(
-      poolInfo.config.bucket0MaxFraction.lt(FixidityLib.fixed1()),
+      exchange.config.bucket0MaxFraction.lt(FixidityLib.fixed1()),
       "bucket0MaxFraction must be smaller than 1"
     );
 
     require(
-      FixidityLib.lte(poolInfo.config.spread, FixidityLib.fixed1()),
+      FixidityLib.lte(exchange.config.spread, FixidityLib.fixed1()),
       "Spread must be less than or equal to 1"
     );
 
-    require(poolInfo.config.oracleReportTarget != address(0), "oracleReportTarget must be set");
+    require(exchange.config.oracleReportTarget != address(0), "oracleReportTarget must be set");
 
     // TODO: Stable bucket max fraction should not exceed available stable bucket fraction.
     // TODO: minSupplyForStableBucketCap gt 0 & is there an aggregated value that needs to be checked

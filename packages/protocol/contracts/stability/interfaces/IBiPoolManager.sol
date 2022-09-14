@@ -2,18 +2,20 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import { IPricingModule } from "./IPricingModule.sol";
-
 import { FixidityLib } from "../../common/FixidityLib.sol";
 
 /**
  * @title BiPool Manager interface 
- * @notice The two asset pool manager is responsible for managing the state of all Mento virtual pools.
+ * @notice The two asset pool manager is responsible for 
+ * managing the state of all two-asset virtual pools.
  */
 interface IBiPoolManager {
   /** 
-   * @notice Pool - contains all the configuration and state of a virtual pool
+   * @title PoolExchange
+   * @notice The PoolExchange is a type of asset exchange that
+   * that implements an AMM with two virtual buckets.
    */
-  struct Pool {
+  struct PoolExchange {
     address asset0;
     address asset1;
     IPricingModule pricingModule;
@@ -40,28 +42,28 @@ interface IBiPoolManager {
   }
 
   /**
-   * @notice Emitted when a new virtual pool has been created.
-   * @param poolId The id of the newly created pool.
+   * @notice Emitted when a new PoolExchange has been created.
+   * @param exchangeId The id of the new PoolExchange
    * @param asset0 The address of asset0
    * @param asset1 The address of asset1
    * @param pricingModule the address of the pricingModule
    */
-  event PoolCreated(
-    bytes32 indexed poolId,
+  event ExchangeCreated(
+    bytes32 indexed exchangeId,
     address indexed asset0,
     address indexed asset1,
     address pricingModule
   );
 
   /**
-   * @notice Emitted when a virtual pool has been destroyed.
-   * @param poolId The id of the newly created pool.
+   * @notice Emitted when a PoolExchange has been destroyed.
+   * @param exchangeId The id of the PoolExchange
    * @param asset0 The address of asset0
    * @param asset1 The address of asset1
    * @param pricingModule the address of the pricingModule
    */
-  event PoolDestroyed(
-    bytes32 indexed poolId,
+  event ExchangeDestroyed(
+    bytes32 indexed exchangeId,
     address indexed asset0,
     address indexed asset1,
     address pricingModule
@@ -86,17 +88,40 @@ interface IBiPoolManager {
   event SortedOraclesUpdated(address indexed newSortedOracles);
 
   /**
-   * @notice Emitted when the buckets for a specified pool are updated.
-   * @param poolId The id of the pool.
+   * @notice Emitted when the buckets for a specified exchange are updated.
+   * @param exchangeId The id of the exchange
    * @param bucket0 The new bucket0 size
    * @param bucket1 The new bucket1 size
    */
-  event BucketsUpdated(bytes32 indexed poolId, uint256 bucket0, uint256 bucket1);
+  event BucketsUpdated(bytes32 indexed exchangeId, uint256 bucket0, uint256 bucket1);
 
   /**
    * @notice Retrieves the pool with the specified poolId.
-   * @param poolId The id of the pool to be retrieved.
-   * @return pool The pool information.
+   * @param exchangeId The id of the pool to be retrieved.
+   * @return exchange The PoolExchange with that ID.
    */
-  function getPool(bytes32 poolId) external view returns (Pool memory pool);
+  function getPoolExchange(bytes32 exchangeId) external view returns (PoolExchange memory exchange);
+
+  /**
+   * @notice Get all exchange IDs.
+   * @return exchangeIds List of the exchangeIds.
+   */
+  function getExchangeIds() external view returns (bytes32[] memory exchangeIds);
+
+  /**
+   * @notice Create a PoolExchange with the provided data.
+   * @param exchange The PoolExchange to be created.
+   * @return exchangeId The id of the exchange.
+   */
+  function createExchange(PoolExchange calldata exchange) external returns (bytes32 exchangeId);
+
+  /**
+   * @notice Delete a PoolExchange.
+   * @param exchangeId The PoolExchange to be created.
+   * @param exchangeIdIndex The index of the exchangeId in the exchangeIds array.
+   * @return destroyed - true on successful delition.
+   */
+  function destroyExchange(bytes32 exchangeId, uint256 exchangeIdIndex)
+    external
+    returns (bool destroyed);
 }
