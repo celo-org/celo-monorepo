@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import { IMentoExchange } from "./IMentoExchange.sol";
 
-import { FixidityLib } from "../../common/FixidityLib.sol";
+import { FixidityLib } from "../../../common/FixidityLib.sol";
 
 /**
  * @title Pair Manager Interface

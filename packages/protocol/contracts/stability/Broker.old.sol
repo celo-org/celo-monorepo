@@ -4,10 +4,10 @@ pragma experimental ABIEncoderV2;
 import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
-import { IPairManager } from "./interfaces/IPairManager.sol";
-import { IBroker } from "./interfaces/IBroker.sol";
+import { IPairManager } from "./interfaces/deprecate/IPairManager.sol";
+import { IBroker } from "./interfaces/deprecate/IBroker.sol";
 import { IReserve } from "./interfaces/IReserve.sol";
-import { IMentoExchange } from "./interfaces/IMentoExchange.sol";
+import { IMentoExchange } from "./interfaces/deprecate/IMentoExchange.sol";
 
 import { StableToken } from "./StableToken.sol";
 

@@ -5,9 +5,9 @@ pragma experimental ABIEncoderV2;
 import { Test } from "celo-foundry/Test.sol";
 import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
-import { Broker } from "contracts/stability/Broker.sol";
-import { IMentoExchange } from "contracts/stability/interfaces/IMentoExchange.sol";
-import { IPairManager } from "contracts/stability/interfaces/IPairManager.sol";
+import { Broker } from "contracts/stability/Broker.old.sol";
+import { IMentoExchange } from "contracts/stability/interfaces/deprecate/IMentoExchange.sol";
+import { IPairManager } from "contracts/stability/interfaces/deprecate/IPairManager.sol";
 import { IReserve } from "contracts/stability/interfaces/IReserve.sol";
 import { IStableToken } from "contracts/stability/interfaces/IStableToken.sol";
 
