@@ -23,7 +23,7 @@ interface IBrokerAdmin {
    * @param newAddress the new address
    * @param prevAddress the previous address
    */
-  event ReserveUpdated(address indexed newAddress, address indexed prevAddress);
+  event ReserveSet(address indexed newAddress, address indexed prevAddress);
 
   /**
    * @notice Remove a exchange manager at an index
@@ -40,8 +40,8 @@ interface IBrokerAdmin {
   function addExchangeProvider(address exchangeProvider) external returns (uint256 index);
 
   /**
-   * @notice Set the reserve
-   * @param reserve address
+   * @notice Set the Mento reserve address
+   * @param reserve The Mento reserve address
    */
   function setReserve(address reserve) external;
 }
