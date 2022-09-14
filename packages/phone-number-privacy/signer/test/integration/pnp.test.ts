@@ -829,7 +829,7 @@ describe('pnp', () => {
       })
 
       describe('functionality in case of errors', () => {
-        it('Should return 200 w/ warning on DB performedQueryCount query failure', async () => {
+        it('Should return 500 on DB performedQueryCount query failure', async () => {
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
@@ -858,27 +858,17 @@ describe('pnp', () => {
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
-          expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-            success: true,
+          expect(res.status).toBe(500)
+          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            success: false,
             version: res.body.version,
-            signature: expectedSignature,
-            performedQueryCount: 1,
+            performedQueryCount: -1,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
-            warnings: [
-              ErrorMessage.DATABASE_GET_FAILURE,
-              ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
-            ],
+            error: ErrorMessage.DATABASE_GET_FAILURE,
           })
 
           spy.mockRestore()
-
-          // check DB state: performedQueryCount was still incremented and request was stored
-          expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
-          ).toBe(expectedQuota + 1)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(true)
         })
 
         it('Should return 200 w/ warning on blockchain totalQuota query failure', async () => {

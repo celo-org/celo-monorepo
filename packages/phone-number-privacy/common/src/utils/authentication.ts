@@ -40,13 +40,13 @@ export async function authenticateUser(
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
+      logger.error({ err, shouldFailOpen }, ErrorMessage.FAILURE_TO_GET_DEK)
       if (shouldFailOpen) {
-        // TODO(2.0.0, optional) (https://github.com/celo-org/celo-monorepo/issues/9863) Put all fail-open logic (not just auth) behind an ENV var
         // TODO(2.0.0, release) add monitoring / alerting for these
-        logger.error({ err }, ErrorMessage.OPEN_FAILURE_TO_GET_DEK)
+        logger.error(ErrorMessage.FAILING_OPEN)
         return true
       } else {
-        logger.error({ err }, ErrorMessage.FAILURE_TO_GET_DEK)
+        logger.error(ErrorMessage.FAILING_CLOSED)
         return false
       }
     }
