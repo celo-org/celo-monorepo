@@ -2,21 +2,13 @@ pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
 import { IPricingModule } from "./interfaces/IPricingModule.sol";
-import { ISortedOracles } from "./interfaces/ISortedOracles.sol";
-import { IReserve } from "./interfaces/IReserve.sol";
 
 import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import { Initializable } from "../common/Initializable.sol";
 import { FixidityLib } from "../common/FixidityLib.sol";
-import { UsingRegistry } from "../common/UsingRegistry.sol";
-import { ReentrancyGuard } from "../common/libraries/ReentrancyGuard.sol";
 
-contract ConstantProductPricingModule is
-  IPricingModule,
-  UsingRegistry,
-  ReentrancyGuard,
-  Initializable
-{
+contract ConstantProductPricingModule is IPricingModule, Initializable, Ownable {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -30,11 +22,9 @@ contract ConstantProductPricingModule is
 
   /**
    * @notice Allows the contract to be upgradable via the proxy.
-   * @param registryAddress The address of the Celo registry.
    */
-  function initilize(address registryAddress) external initializer {
+  function initilize() external initializer {
     _transferOwnership(msg.sender);
-    setRegistry(registryAddress);
   }
 
   /* ==================== View Functions ==================== */
