@@ -4,11 +4,16 @@ pragma experimental ABIEncoderV2;
 
 import { Test } from "celo-foundry/Test.sol";
 
-import { IPairManager } from "contracts/stability/interfaces/IPairManager.sol";
+import { MockSortedOracles } from "contracts/stability/test/MockSortedOracles.sol";
 
-import { PairManager } from "contracts/stability/PairManager.sol";
+import { IExchangeProvider } from "contracts/stability/interfaces/IExchangeProvider.sol";
+import { IPricingModule } from "contracts/stability/interfaces/IPricingModule.sol";
+import { IReserve } from "contracts/stability/interfaces/IReserve.sol";
+import { ISortedOracles } from "contracts/stability/interfaces/ISortedOracles.sol";
+
+import { BiPoolManager } from "contracts/stability/BiPoolManager.sol";
 import { Broker } from "contracts/stability/Broker.sol";
-import { CPExchange } from "contracts/stability/exchanges/CPExchange.sol";
+import { ConstantProductPricingModule } from "contracts/stability/ConstantProductPricingModule.sol";
 import { StableToken } from "contracts/stability/StableToken.sol";
 import { Reserve } from "contracts/stability/Reserve.sol";
 
@@ -28,9 +33,11 @@ contract McMintIntegration is Test, WithRegistry {
   uint256 tobinTaxReserveRatio = FixidityLib.newFixedFraction(2, 1).unwrap();
 
   Broker broker;
-  PairManager pairManager;
+  BiPoolManager biPoolManager;
   Reserve reserve;
-  CPExchange crossProductExchange;
+  IPricingModule constantProduct;
+
+  MockSortedOracles sortedOracles;
 
   Token celoToken;
   Token usdcToken;
@@ -38,12 +45,21 @@ contract McMintIntegration is Test, WithRegistry {
   StableToken cEURToken;
   Freezer freezer;
 
+  address cUSD_CELO_oracleReportTarget;
+  address cEUR_CELO_oracleReportTarget;
+  address cUSD_USDCet_oracleReportTarget;
+  address cEUR_USDCet_oracleReportTarget;
+  address cUSD_cEUR_oracleReportTarget;
+
   bytes32 pair_cUSD_CELO_ID;
   bytes32 pair_cEUR_CELO_ID;
   bytes32 pair_cUSD_USDCet_ID;
   bytes32 pair_cEUR_USDCet_ID;
+  bytes32 pair_cUSD_cEUR_ID;
 
   function setUp_mcMint() public {
+    vm.warp(60 * 60 * 24 * 10); // Start at a non-zero timestamp.
+
     /* ===== Deploy collateral and stable assets ===== */
 
     changePrank(actor("deployer"));
@@ -91,12 +107,12 @@ contract McMintIntegration is Test, WithRegistry {
     initialAssetAllocationSymbols[1] = bytes32("USDCet");
     initialAssetAllocationWeights[1] = FixidityLib.newFixedFraction(1, 2).unwrap();
 
-    address[] memory collateralAssets = new address[](2);
-    uint256[] memory collateralAssetDailySpendingRatios = new uint256[](2);
-    collateralAssets[0] = address(celoToken);
-    collateralAssetDailySpendingRatios[0] = 100000000000000000000000;
-    collateralAssets[1] = address(usdcToken);
-    collateralAssetDailySpendingRatios[0] = 100000000000000000000000;
+    address[] memory asse1s = new address[](2);
+    uint256[] memory asse1DailySpendingRatios = new uint256[](2);
+    asse1s[0] = address(celoToken);
+    asse1DailySpendingRatios[0] = 100000000000000000000000;
+    asse1s[1] = address(usdcToken);
+    asse1DailySpendingRatios[0] = 100000000000000000000000;
 
     reserve = new Reserve(true);
     reserve.initialize(
@@ -109,89 +125,124 @@ contract McMintIntegration is Test, WithRegistry {
       initialAssetAllocationWeights,
       tobinTax,
       tobinTaxReserveRatio,
-      collateralAssets,
-      collateralAssetDailySpendingRatios
+      asse1s,
+      asse1DailySpendingRatios
     );
 
     reserve.addToken(address(cUSDToken));
     reserve.addToken(address(cEURToken));
 
-    /* ===== Deploy PairManager, Broker and exchange ===== */
+    /* ===== Deploy SortedOracles ===== */
 
-    crossProductExchange = new CPExchange();
-    pairManager = new PairManager(true);
+    sortedOracles = new MockSortedOracles();
+
+    cUSD_CELO_oracleReportTarget = address(cUSDToken);
+    cEUR_CELO_oracleReportTarget = address(cEURToken);
+    cUSD_USDCet_oracleReportTarget = address(bytes20(keccak256("USD/USDC")));
+    cEUR_USDCet_oracleReportTarget = address(bytes20(keccak256("EUR/USDC")));
+    cUSD_cEUR_oracleReportTarget = address(bytes20(keccak256("USD/EUR")));
+
+    sortedOracles.setMedianRate(cUSD_CELO_oracleReportTarget, 5e23);
+    sortedOracles.setNumRates(cUSD_CELO_oracleReportTarget, 10);
+    sortedOracles.setMedianRate(cEUR_CELO_oracleReportTarget, 5e23);
+    sortedOracles.setNumRates(cEUR_CELO_oracleReportTarget, 10);
+    sortedOracles.setMedianRate(cUSD_USDCet_oracleReportTarget, 1.02 * 1e24);
+    sortedOracles.setNumRates(cUSD_USDCet_oracleReportTarget, 10);
+    sortedOracles.setMedianRate(cEUR_USDCet_oracleReportTarget, 0.9 * 1e24);
+    sortedOracles.setNumRates(cEUR_USDCet_oracleReportTarget, 10);
+    sortedOracles.setMedianRate(cUSD_cEUR_oracleReportTarget, 1.1 * 1e24);
+    sortedOracles.setNumRates(cUSD_cEUR_oracleReportTarget, 10);
+
+    /* ===== Deploy BiPoolManager & Broker ===== */
+
+    constantProduct = IPricingModule(new ConstantProductPricingModule(true));
+    biPoolManager = new BiPoolManager(true);
+    // biPoolManager = new PairManager(true);
     broker = new Broker(true);
 
-    pairManager.initialize(address(broker), address(reserve));
-    broker.initialize(address(pairManager), address(reserve));
+    biPoolManager.initialize(
+      address(broker),
+      IReserve(reserve),
+      ISortedOracles(address(sortedOracles))
+    );
+    address[] memory exchangeProviders = new address[](1);
+    exchangeProviders[0] = address(biPoolManager);
+
+    broker.initialize(exchangeProviders, address(reserve));
     registry.setAddressFor("Broker", address(broker));
     reserve.addExchangeSpender(address(broker));
 
     /* ====== Create pairs for all asset combinations ======= */
 
-    IPairManager.Pair memory pair_cUSD_CELO;
-    pair_cUSD_CELO.stableAsset = address(cUSDToken);
-    pair_cUSD_CELO.collateralAsset = address(celoToken);
-    pair_cUSD_CELO.mentoExchange = crossProductExchange;
-    pair_cUSD_CELO.stableBucket = 10**24;
-    pair_cUSD_CELO.collateralBucket = 2 * 10**24;
-    pair_cUSD_CELO.bucketUpdateFrequency = 60 * 5;
+    BiPoolManager.PoolExchange memory pair_cUSD_CELO;
+    pair_cUSD_CELO.asset0 = address(cUSDToken);
+    pair_cUSD_CELO.asset1 = address(celoToken);
+    pair_cUSD_CELO.pricingModule = constantProduct;
     pair_cUSD_CELO.lastBucketUpdate = now;
-    pair_cUSD_CELO.collateralBucketFraction = FixidityLib.newFixedFraction(50, 100);
-    pair_cUSD_CELO.stableBucketMaxFraction = FixidityLib.newFixedFraction(30, 100);
-    pair_cUSD_CELO.spread = FixidityLib.newFixedFraction(5, 100);
-    pair_cUSD_CELO.minimumReports = 5;
-    pair_cUSD_CELO.minSupplyForStableBucketCap = 10**20;
+    pair_cUSD_CELO.config.spread = FixidityLib.newFixedFraction(5, 100);
+    pair_cUSD_CELO.config.bucketUpdateFrequency = 60 * 5;
+    pair_cUSD_CELO.config.minimumReports = 5;
+    pair_cUSD_CELO.config.oracleReportTarget = cUSD_CELO_oracleReportTarget;
+    pair_cUSD_CELO.config.bucket0TargetSize = 1e24;
+    pair_cUSD_CELO.config.bucket0MaxFraction = FixidityLib.wrap(5e23);
 
-    pair_cUSD_CELO_ID = pairManager.createPair(pair_cUSD_CELO);
+    pair_cUSD_CELO_ID = biPoolManager.createExchange(pair_cUSD_CELO);
 
-    IPairManager.Pair memory pair_cUSD_USDCet;
-    pair_cUSD_USDCet.stableAsset = address(cUSDToken);
-    pair_cUSD_USDCet.collateralAsset = address(usdcToken);
-    pair_cUSD_USDCet.mentoExchange = crossProductExchange;
-    pair_cUSD_USDCet.stableBucket = 10**24;
-    pair_cUSD_USDCet.collateralBucket = 2 * 10**24;
-    pair_cUSD_USDCet.bucketUpdateFrequency = 60 * 5;
-    pair_cUSD_USDCet.lastBucketUpdate = now;
-    pair_cUSD_USDCet.collateralBucketFraction = FixidityLib.newFixedFraction(50, 100);
-    pair_cUSD_USDCet.stableBucketMaxFraction = FixidityLib.newFixedFraction(30, 100);
-    pair_cUSD_USDCet.spread = FixidityLib.newFixedFraction(5, 100);
-    pair_cUSD_USDCet.minimumReports = 5;
-    pair_cUSD_USDCet.minSupplyForStableBucketCap = 10**20;
-
-    pair_cUSD_USDCet_ID = pairManager.createPair(pair_cUSD_USDCet);
-
-    IPairManager.Pair memory pair_cEUR_CELO;
-    pair_cEUR_CELO.stableAsset = address(cEURToken);
-    pair_cEUR_CELO.collateralAsset = address(celoToken);
-    pair_cEUR_CELO.mentoExchange = crossProductExchange;
-    pair_cEUR_CELO.stableBucket = 10**24;
-    pair_cEUR_CELO.collateralBucket = 2 * 10**24;
-    pair_cEUR_CELO.bucketUpdateFrequency = 60 * 5;
+    BiPoolManager.PoolExchange memory pair_cEUR_CELO;
+    pair_cEUR_CELO.asset0 = address(cEURToken);
+    pair_cEUR_CELO.asset1 = address(celoToken);
+    pair_cEUR_CELO.pricingModule = constantProduct;
     pair_cEUR_CELO.lastBucketUpdate = now;
-    pair_cEUR_CELO.collateralBucketFraction = FixidityLib.newFixedFraction(50, 100);
-    pair_cEUR_CELO.stableBucketMaxFraction = FixidityLib.newFixedFraction(30, 100);
-    pair_cEUR_CELO.spread = FixidityLib.newFixedFraction(5, 100);
-    pair_cEUR_CELO.minimumReports = 5;
-    pair_cEUR_CELO.minSupplyForStableBucketCap = 10**20;
+    pair_cEUR_CELO.config.spread = FixidityLib.newFixedFraction(5, 100);
+    pair_cEUR_CELO.config.bucketUpdateFrequency = 60 * 5;
+    pair_cEUR_CELO.config.minimumReports = 5;
+    pair_cEUR_CELO.config.oracleReportTarget = cEUR_CELO_oracleReportTarget;
+    pair_cEUR_CELO.config.bucket0TargetSize = 1e24;
+    pair_cEUR_CELO.config.bucket0MaxFraction = FixidityLib.wrap(5e23);
 
-    pair_cEUR_CELO_ID = pairManager.createPair(pair_cEUR_CELO);
+    pair_cEUR_CELO_ID = biPoolManager.createExchange(pair_cEUR_CELO);
 
-    IPairManager.Pair memory pair_cEUR_USDCet;
-    pair_cEUR_USDCet.stableAsset = address(cEURToken);
-    pair_cEUR_USDCet.collateralAsset = address(usdcToken);
-    pair_cEUR_USDCet.mentoExchange = crossProductExchange;
-    pair_cEUR_USDCet.stableBucket = 10**24;
-    pair_cEUR_USDCet.collateralBucket = 2 * 10**24;
-    pair_cEUR_USDCet.bucketUpdateFrequency = 60 * 5;
+    BiPoolManager.PoolExchange memory pair_cUSD_USDCet;
+    pair_cUSD_USDCet.asset0 = address(cUSDToken);
+    pair_cUSD_USDCet.asset1 = address(usdcToken);
+    pair_cUSD_USDCet.pricingModule = constantProduct;
+    pair_cUSD_USDCet.lastBucketUpdate = now;
+    pair_cUSD_USDCet.config.spread = FixidityLib.newFixedFraction(5, 100);
+    pair_cUSD_USDCet.config.bucketUpdateFrequency = 60 * 5;
+    pair_cUSD_USDCet.config.minimumReports = 5;
+    pair_cUSD_USDCet.config.oracleReportTarget = cUSD_USDCet_oracleReportTarget;
+    pair_cUSD_USDCet.config.bucket0TargetSize = 1e24;
+    pair_cUSD_USDCet.config.bucket0MaxFraction = FixidityLib.wrap(5e23);
+
+    pair_cUSD_USDCet_ID = biPoolManager.createExchange(pair_cUSD_USDCet);
+
+    BiPoolManager.PoolExchange memory pair_cEUR_USDCet;
+    pair_cEUR_USDCet.asset0 = address(cEURToken);
+    pair_cEUR_USDCet.asset1 = address(usdcToken);
+    pair_cEUR_USDCet.pricingModule = constantProduct;
     pair_cEUR_USDCet.lastBucketUpdate = now;
-    pair_cEUR_USDCet.collateralBucketFraction = FixidityLib.newFixedFraction(50, 100);
-    pair_cEUR_USDCet.stableBucketMaxFraction = FixidityLib.newFixedFraction(30, 100);
-    pair_cEUR_USDCet.spread = FixidityLib.newFixedFraction(5, 100);
-    pair_cEUR_USDCet.minimumReports = 5;
-    pair_cEUR_USDCet.minSupplyForStableBucketCap = 10**20;
+    pair_cEUR_USDCet.config.spread = FixidityLib.newFixedFraction(5, 100);
+    pair_cEUR_USDCet.config.bucketUpdateFrequency = 60 * 5;
+    pair_cEUR_USDCet.config.minimumReports = 5;
+    pair_cEUR_USDCet.config.oracleReportTarget = cEUR_USDCet_oracleReportTarget;
+    pair_cEUR_USDCet.config.bucket0TargetSize = 1e24;
+    pair_cEUR_USDCet.config.bucket0MaxFraction = FixidityLib.wrap(5e23);
 
-    pair_cEUR_USDCet_ID = pairManager.createPair(pair_cEUR_USDCet);
+    pair_cEUR_USDCet_ID = biPoolManager.createExchange(pair_cEUR_USDCet);
+
+    BiPoolManager.PoolExchange memory pair_cUSD_cEUR;
+    pair_cUSD_cEUR.asset0 = address(cUSDToken);
+    pair_cUSD_cEUR.asset1 = address(cEURToken);
+    pair_cUSD_cEUR.pricingModule = constantProduct;
+    pair_cUSD_cEUR.lastBucketUpdate = now;
+    pair_cUSD_cEUR.config.spread = FixidityLib.newFixedFraction(5, 100);
+    pair_cUSD_cEUR.config.bucketUpdateFrequency = 60 * 5;
+    pair_cUSD_cEUR.config.minimumReports = 5;
+    pair_cUSD_cEUR.config.oracleReportTarget = cUSD_cEUR_oracleReportTarget;
+    pair_cUSD_cEUR.config.bucket0TargetSize = 1e24;
+    pair_cUSD_cEUR.config.bucket0MaxFraction = FixidityLib.wrap(5e23);
+
+    pair_cUSD_cEUR_ID = biPoolManager.createExchange(pair_cUSD_cEUR);
 
     /* ========== Deploy Freezer =============== */
     freezer = new Freezer(true);

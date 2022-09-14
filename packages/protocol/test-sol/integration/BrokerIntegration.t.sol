@@ -9,8 +9,6 @@ import { McMintIntegration } from "../utils/McMintIntegration.sol";
 import { TokenHelpers } from "../utils/TokenHelpers.sol";
 
 import { Broker } from "contracts/stability/Broker.sol";
-import { IMentoExchange } from "contracts/stability/interfaces/IMentoExchange.sol";
-import { IPairManager } from "contracts/stability/interfaces/IPairManager.sol";
 import { IReserve } from "contracts/stability/interfaces/IReserve.sol";
 import { IStableToken } from "contracts/stability/interfaces/IStableToken.sol";
 
@@ -30,21 +28,21 @@ contract BrokerIntegrationTest is Test, McMintIntegration, TokenHelpers {
 
     deal(address(celoToken), address(reserve), 10**24);
     deal(address(usdcToken), address(reserve), 10**24);
-    deal(address(celoToken), address(reserve), 10**22);
-    deal(address(usdcToken), address(reserve), 10**22);
   }
 
   function test_swap_cEURToUSDCet() public {
     changePrank(trader);
     cEURToken.approve(address(broker), 10**21);
-    (address tokenOut, uint256 amountOut) = broker.swap(
+    uint256 amountOut = broker.swapIn(
+      address(biPoolManager),
       pair_cEUR_USDCet_ID,
       address(cEURToken),
+      address(usdcToken),
       10**21,
       0
     );
 
-    assertEq(tokenOut, address(usdcToken));
-    assertEq(amountOut, 1898196713122533593086);
+    assertEq(cEURToken.balanceOf(trader), 1e22 - 1e21);
+    assertEq(usdcToken.balanceOf(trader), amountOut);
   }
 }
