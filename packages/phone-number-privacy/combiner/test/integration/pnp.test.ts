@@ -85,7 +85,7 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: true,
-      authShouldFailOpen: true,
+      shouldFailOpen: true,
     },
   },
   attestations: {
@@ -917,6 +917,7 @@ describe('pnpService', () => {
           performedQueryCount: 0,
           totalQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
       })
     })

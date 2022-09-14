@@ -80,7 +80,7 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: true,
-      authShouldFailOpen: true,
+      shouldFailOpen: true,
     },
   },
   attestations: {

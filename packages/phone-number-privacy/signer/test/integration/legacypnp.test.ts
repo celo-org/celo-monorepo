@@ -303,7 +303,7 @@ describe('legacyPNP', () => {
 
     await db.transaction(async (trx) => {
       for (let i = 0; i < performedQueryCount; i++) {
-        await incrementQueryCount(db, account, rootLogger(config.serviceName), trx)
+        await incrementQueryCount(db, account, rootLogger(_config.serviceName), trx)
       }
     })
 
@@ -467,7 +467,7 @@ describe('legacyPNP', () => {
         const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
@@ -946,7 +946,7 @@ describe('legacyPNP', () => {
         const remainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i < remainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
         const req = getLegacyPnpSignRequest(
@@ -1003,7 +1003,7 @@ describe('legacyPNP', () => {
         const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
 
@@ -1029,7 +1029,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        const configWithApiDisabled = { ...config }
+        const configWithApiDisabled = { ..._config }
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
 
@@ -1061,12 +1061,12 @@ describe('legacyPNP', () => {
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(expectedQuota)
 
           const spy = jest
@@ -1098,17 +1098,17 @@ describe('legacyPNP', () => {
           spy.mockRestore()
         })
 
-        it('Should return 200 w/ warning on blockchain totalQuota query failure', async () => {
+        it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(expectedQuota)
 
           mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
@@ -1135,9 +1135,45 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was incremented and request was stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(expectedQuota + 1)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(true)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(true)
+        })
+
+        it('Should return 500 on blockchain totalQuota query failure when shouldFailOpen is false', async () => {
+          mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
+
+          const configWithFailOpenDisabled = { ..._config }
+          configWithFailOpenDisabled.api.phoneNumberPrivacy.shouldFailOpen = false
+          const appWithFailOpenDisabled = startSigner(configWithFailOpenDisabled, db, keyProvider)
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.LEGACY_PNP_SIGN,
+            '1',
+            appWithFailOpenDisabled
+          )
+
+          expect(res.status).toBe(500)
+          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            success: false,
+            version: res.body.version,
+            performedQueryCount: performedQueryCount,
+            totalQuota: -1,
+            blockNumber: testBlockNumber,
+            error: ErrorMessage.FULL_NODE_ERROR,
+          })
+
+          // TODO(2.0.0) (https://github.com/celo-org/celo-monorepo/issues/9811) investigate why removing this line causes tests further down to fail
+          _config.api.phoneNumberPrivacy.shouldFailOpen = true
         })
 
         it('Should return 200 w/ warning on failure to increment query count', async () => {
@@ -1175,9 +1211,9 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
 
         it('Should return 200 w/ warning on failure to store request', async () => {
@@ -1209,9 +1245,9 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount + 1)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
 
         it('Should return 200 on failure to fetch DEK', async () => {
@@ -1272,9 +1308,9 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
       })
     })

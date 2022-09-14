@@ -871,7 +871,7 @@ describe('pnp', () => {
           spy.mockRestore()
         })
 
-        it('Should return 200 w/ warning on blockchain totalQuota query failure', async () => {
+        it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
@@ -913,6 +913,45 @@ describe('pnp', () => {
             await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
           ).toBe(expectedQuota + 1)
           expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(true)
+        })
+
+        it('Should return 500 on blockchain totalQuota query failure when shouldFailOpen is false', async () => {
+          mockOdisPaymentsTotalPaidCUSD.mockImplementation(() => {
+            throw new Error('dummy error')
+          })
+
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+
+          const configWithFailOpenDisabled = { ..._config }
+          configWithFailOpenDisabled.api.phoneNumberPrivacy.shouldFailOpen = false
+          const appWithFailOpenDisabled = startSigner(configWithFailOpenDisabled, db, keyProvider)
+
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.PNP_SIGN,
+            '1',
+            appWithFailOpenDisabled
+          )
+
+          expect(res.status).toBe(500)
+          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            success: false,
+            version: res.body.version,
+            performedQueryCount: performedQueryCount,
+            totalQuota: -1,
+            blockNumber: testBlockNumber,
+            error: ErrorMessage.FULL_NODE_ERROR,
+          })
+
+          // TODO(2.0.0) (https://github.com/celo-org/celo-monorepo/issues/9811) investigate why removing this line causes tests further down to fail
+          _config.api.phoneNumberPrivacy.shouldFailOpen = true
         })
 
         it('Should return 200 w/ warning on failure to increment query count', async () => {
