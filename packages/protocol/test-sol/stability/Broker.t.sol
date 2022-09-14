@@ -3,11 +3,11 @@ pragma experimental ABIEncoderV2;
 
 import { Test, console2 as console } from "celo-foundry/Test.sol";
 import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-
 import { Broker } from "contracts/stability/Broker.sol";
 import { IMentoExchange } from "contracts/stability/interfaces/deprecate/IMentoExchange.sol";
 import { IExchangeManager } from "contracts/stability/interfaces/IExchangeManager.sol";
 import { IBiPoolManager } from "contracts/stability/interfaces/IBiPoolManager.sol";
+import { IPricingModule } from "contracts/stability/interfaces/IPricingModule.sol";
 import { IReserve } from "contracts/stability/interfaces/IReserve.sol";
 import { IStableToken } from "contracts/stability/interfaces/IStableToken.sol";
 
@@ -35,13 +35,13 @@ contract BrokerTest is Test {
   IStableToken stableAsset;
   IERC20 collateralAsset;
   address randomAsset;
-  IMentoExchange exchange;
+  IPricingModule pricingModule;
 
   uint256 constant initialStableBucket = 1e24;
   uint256 constant initialCollateralBucket = 2e24;
 
   IReserve reserve;
-  // IPairManager pairManager;
+
   IExchangeManager exchangeManager;
   IBiPoolManager poolManager;
 
@@ -58,8 +58,8 @@ contract BrokerTest is Test {
     stableAsset = IStableToken(actor("stableAsset"));
     collateralAsset = IERC20(actor("collateralAsset"));
     randomAsset = actor("randomAsset");
-    exchange = IMentoExchange(actor("exchange"));
     trader = actor("trader");
+    pricingModule = IPricingModule(actor("pricingModule"));
 
     /* Mocks for dependent contracts */
     vm.mockCall(
@@ -86,37 +86,32 @@ contract BrokerTest is Test {
 
     changePrank(deployer);
     broker = new Broker(true);
-    address[] memory exchangeManagers = new address[](2);
+    address[] memory exchangeManagers = new address[](3);
     exchangeManagers[0] = address(actor("exchangeManager1"));
     exchangeManagers[1] = address(actor("exchangeManager2"));
-    console.log(actor("exchangeManager2"), "logggggggg");
-    console.log(actor("exchangeManager2"), "logggggggg");
+    exchangeManagers[2] = address(actor("exchangeManager"));
     broker.initialize(exchangeManagers, address(reserve));
     changePrank(trader);
   }
 
-  // function createPool() internal view returns (bytes32 pairId, IBiPoolManager.Pool memory pair) {
-  //   pair.stableAsset = address(stableAsset);
-  //   pair.collateralAsset = address(collateralAsset);
-  //   pair.mentoExchange = IMentoExchange(exchange);
-  //   pair.collateralBucketFraction = FixidityLib.wrap(0.1 * 10**24);
-  //   pair.stableBucketMaxFraction = FixidityLib.wrap(0.1 * 10**24);
-  //   pair.stableBucket = initialStableBucket;
-  //   pair.collateralBucket = initialCollateralBucket;
-  //   pair.spread = FixidityLib.wrap(0.1 * 10**24);
-  //   pairId = keccak256(abi.encode(pair));
-  // }
-
-  // function mockGetPair() internal returns (bytes32 pairId) {
-  //   IPairManager.Pair memory pair;
-  //   (pairId, pair) = createPair();
-  //   vm.mockCall(
-  //     address(pairManager),
-  //     abi.encodeWithSelector(pairManager.getPair.selector, pairId),
-  //     abi.encode(pair)
-  //   );
-  // }
-
+  function createPool()
+    internal
+    view
+    returns (bytes32 exchangeId, IBiPoolManager.Pool memory pool)
+  {
+    pool.asset0 = address(stableAsset);
+    pool.asset1 = address(collateralAsset);
+    pool.bucket0 = 1e24;
+    pool.bucket1 = 2e24;
+    pool.pricingModule = pricingModule;
+    pool.bucketUpdateFrequency = 60 * 60;
+    pool.lastBucketUpdate = 1 days;
+    pool.spread = FixidityLib.wrap(0.1 * 10**24);
+    pool.minimumReports = 1;
+    pool.bucket0TargetSize = 3e24; // double check if this value makes sense
+    pool.bucket0MaxFraction = FixidityLib.wrap(0.1 * 10**24);
+    pool.minSupplyForBucket0Cap = 1e24;
+  }
 }
 
 contract BrokerTest_initilizerAndSetters is BrokerTest {
@@ -163,7 +158,7 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
     vm.expectEmit(true, true, true, true);
     emit ExchangeManagerRemoved(actor("exchangeManager1"));
     broker.removeExchangeManager(actor("exchangeManager1"), 0);
-    assertEq(broker.getExchangeManagers()[0], actor("exchangeManager2"));
+    assert(broker.getExchangeManagers()[0] != actor("exchangeManager1"));
   }
 
   function test_removeExchangeManager_whenAddressDoesNotExist_shouldRevert() public {
@@ -171,6 +166,7 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
     vm.expectRevert("index into exchangeManagers list not mapped to token");
     broker.removeExchangeManager(notDeployer, 1);
   }
+
   function test_removeExchangeManager_whenIndexOutOfRange_shouldRevert() public {
     changePrank(deployer);
     vm.expectRevert("index into exchangeManagers list not mapped to token");
@@ -206,57 +202,128 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
   }
 }
 
-// contract BrokerTest_quote is BrokerTest {
-//   function test_quote_tokenInStableAsset_shouldReturnQuote() public {
-//     bytes32 pairId = mockGetPair();
-//     uint256 amountIn = 1e18;
+contract BrokerTest_quote is BrokerTest {
+  bytes32 exchangeId = keccak256(abi.encode("exhcangeId"));
+  string exchangeAddress3;
+  string token1;
+  string token2;
 
-//     vm.mockCall(
-//       address(exchange),
-//       abi.encodeWithSelector(
-//         exchange.getAmountOut.selector,
-//         stableAsset,
-//         collateralAsset,
-//         initialStableBucket,
-//         initialCollateralBucket,
-//         amountIn
-//       ),
-//       abi.encode(2e18, 1e24, 2e24)
-//     );
+  function test_getAmountIn_whenExchangeManagerWasNotSet_shouldRevert() public {
+    vm.expectRevert("ExchangeManager does not exist");
+    broker.getAmountIn(
+      actor(exchangeAddress3),
+      exchangeId,
+      address(stableAsset),
+      address(collateralAsset),
+      1e24
+    );
+  }
 
-//     (address tokenOut, uint256 amountOut) = broker.quote(pairId, address(stableAsset), amountIn);
-//     assertEq(tokenOut, address(collateralAsset));
-//     assertEq(amountOut, 2e18);
-//   }
+  // broken
+  // function test_getAmountIn_receivedCall() public {
+  //   address exchangeManagerA = actor("exchangeManager");
+  //   address exchangeManagerB = actor("exchangeManager");
+  //   console.log(exchangeManagerA, exchangeManagerB);
+  //   vm.expectCall(
+  //     actor("exchangeManager"),
+  //     abi.encodeWithSelector(
+  //       exchangeManager.getAmountIn.selector
+  //     )
+  //   );
+  //   broker.getAmountIn(actor("exchangeManager"), exchangeId, address(stableAsset), address(collateralAsset), 1e16);
+  // }
 
-//   function test_quote_tokenInCollateralAsset_shouldReturnQuote() public {
-//     bytes32 pairId = mockGetPair();
-//     uint256 amountIn = 1e18;
+  // function test_getAmountIn_whenExchangeManagerWasSet() public {
+  //   broker.setExchangeAddress();
+  //   vm.mockCall(
+  //     actor("exchangeManager"),
+  //     abi.encodeWithSelector(
+  //       address(IExchangeManager(actor("exchangeManager"))).getAmountIn.selector,
+  //       address(exchangeManager),
+  //       exchangeId,
+  //       actor(token1),
+  //       actor(token2),
+  //       1e18
+  //     ),
+  //     abi.encode(2e18)
+  //   );
 
-//     vm.mockCall(
-//       address(exchange),
-//       abi.encodeWithSelector(
-//         exchange.getAmountOut.selector,
-//         collateralAsset,
-//         stableAsset,
-//         initialCollateralBucket,
-//         initialStableBucket,
-//         amountIn
-//       ),
-//       abi.encode(2e18, 10e18, 20e18)
-//     );
+  // uint256 amountIn = broker.getAmountIn(IExchangeManager(actor("exchangeManager")), exchangeId, address(stableAsset), address(collateralAsset), 1e16);
 
-//     (address tokenOut, uint256 amountOut) = broker.quote(pairId, address(collateralAsset), 1e18);
-//     assertEq(tokenOut, address(stableAsset));
-//     assertEq(amountOut, 2e18);
-//   }
+  // console.log(amountIn, "amamamamaa");
+  //   assertEq(amountIn, 2e18);
+  // }
 
-//   function test_quote_tokenInNotInPair_shouldRevert() public {
-//     bytes32 pairId = mockGetPair();
-//     vm.expectRevert("tokenIn is not in the pair");
-//     broker.quote(pairId, randomAsset, 1e18);
-//   }
-// }
+  function test_getAmountOut_whenExchangeManagerWasNotSet_shouldRevert() public {
+    vm.expectRevert("ExchangeManager does not exist");
+    broker.getAmountOut(actor(exchangeAddress3), exchangeId, actor(token1), actor(token2), 1e24);
+  }
+
+  function test_swapIn_whenExchangeManagerWasNotSet_shouldRevert() public {
+    vm.expectRevert("ExchangeManager does not exist");
+    broker.swapIn(actor(exchangeAddress3), exchangeId, actor(token1), actor(token2), 2e24, 1e24);
+  }
+
+  function test_swapOut_whenExchangeManagerWasNotSet_shouldRevert() public {
+    vm.expectRevert("ExchangeManager does not exist");
+    broker.getAmountIn(actor(exchangeAddress3), exchangeId, actor(token1), actor(token2), 1e24);
+  }
+
+  /// mock call to make sure you get something back
+
+  /// check that the exchange received the call
+
+  // function test_quote_tokenInStableAsset_shouldReturnQuote() public {
+  //   bytes32 exchangeId = mockGetPair();
+  //   uint256 amountIn = 1e18;
+
+  //   vm.mockCall(
+  //     address(exchange),
+  //     abi.encodeWithSelector(
+  //       exchange.getAmountOut.selector,
+  //       stableAsset,
+  //       collateralAsset,
+  //       initialStableBucket,
+  //       initialCollateralBucket,
+  //       amountIn
+  //     ),
+  //     abi.encode(2e18, 1e24, 2e24)
+  //   );
+
+  //   (address tokenOut, uint256 amountOut) = broker.quote(pairId, address(stableAsset), amountIn);
+  //   assertEq(tokenOut, address(collateralAsset));
+  //   assertEq(amountOut, 2e18);
+  // }
+
+  // function test_quote_tokenInCollateralAsset_shouldReturnQuote() public {
+  //   bytes32 pairId = mockGetPair();
+  //   uint256 amountIn = 1e18;
+
+  // vm.mockCall(
+  //   address(exchange),
+  //   abi.encodeWithSelector(
+  //     exchange.getAmountOut.selector,
+  //     collateralAsset,
+  //     stableAsset,
+  //     initialCollateralBucket,
+  //     initialStableBucket,
+  //     amountIn
+  //   ),
+  //   abi.encode(2e18, 10e18, 20e18)
+  // );
+
+  //   (address tokenOut, uint256 amountOut) = broker.quote(pairId, address(collateralAsset), 1e18);
+  //   assertEq(tokenOut, address(stableAsset));
+  //   assertEq(amountOut, 2e18);
+  // }
+
+  // function test_quote_tokenInNotInPair_shouldRevert() public {
+  //   bytes32 pairId = mockGetPair();
+  //   vm.expectRevert("tokenIn is not in the pair");
+  //   broker.quote(pairId, randomAsset, 1e18);
+  // }
+
+}
 
 // contract BrokerTest_swap is BrokerTest {
 //   function test_swap_tokenInStableAsset_shouldExecuteSwap() public {
@@ -292,16 +359,6 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
 //     vm.expectCall(
 //       address(stableAsset),
 //       abi.encodeWithSelector(stableAsset.burn.selector, amountIn)
-//     );
-
-//     vm.expectCall(
-//       address(reserve),
-//       abi.encodeWithSelector(
-//         reserve.transferCollateralAsset.selector,
-//         address(collateralAsset),
-//         trader,
-//         mockAmountOut
-//       )
 //     );
 
 //     vm.expectCall(
@@ -392,34 +449,33 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
 //     assertEq(amountOut, mockAmountOut);
 //   }
 
-//   function test_swap_minAmountNotMet_shouldRevert() public {
-//     bytes32 pairId = mockGetPair();
-//     uint256 amountIn = 1e18;
-//     uint256 mockAmountOut = 2e18;
-//     uint256 nextStableBucket = initialStableBucket + amountIn;
-//     uint256 nextCollateralBucket = initialCollateralBucket - mockAmountOut;
+// function test_swap_minAmountNotMet_shouldRevert() public {
+//   bytes32 pairId = mockGetPair();
+//   uint256 amountIn = 1e18;
+//   uint256 mockAmountOut = 2e18;
+//   uint256 nextStableBucket = initialStableBucket + amountIn;
+//   uint256 nextCollateralBucket = initialCollateralBucket - mockAmountOut;
 
-//     vm.mockCall(
-//       address(exchange),
-//       abi.encodeWithSelector(
-//         exchange.getAmountOut.selector,
-//         stableAsset,
-//         collateralAsset,
-//         initialStableBucket,
-//         initialCollateralBucket,
-//         amountIn
-//       ),
-//       abi.encode(mockAmountOut, nextStableBucket, nextCollateralBucket)
-//     );
+//   vm.mockCall(
+//     address(exchange),
+//     abi.encodeWithSelector(
+//       exchange.getAmountOut.selector,
+//       stableAsset,
+//       collateralAsset,
+//       initialStableBucket,
+//       initialCollateralBucket,
+//       amountIn
+//     ),
+//     abi.encode(mockAmountOut, nextStableBucket, nextCollateralBucket)
+//   );
 
-//     vm.expectRevert("amountOutMin not met");
-//     broker.swap(pairId, address(stableAsset), amountIn, mockAmountOut + 1);
-//   }
+//   vm.expectRevert("amountOutMin not met");
+//   broker.swap(pairId, address(stableAsset), amountIn, mockAmountOut + 1);
+// }
 
-//   function test_swap_assetNotInPair_shouldRevert() public {
-//     bytes32 pairId = mockGetPair();
-//     vm.expectRevert("tokenIn is not in the pair");
-//     broker.swap(pairId, randomAsset, 1e18, 0);
-//   }
+// function test_swap_assetNotInPair_shouldRevert() public {
+//   bytes32 pairId = mockGetPair();
+//   vm.expectRevert("tokenIn is not in the pair");
+//   broker.swap(pairId, randomAsset, 1e18, 0);
 // }
 
