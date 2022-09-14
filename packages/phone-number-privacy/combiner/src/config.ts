@@ -25,7 +25,7 @@ export interface DatabaseConfig {
 export interface OdisConfig {
   serviceName: string
   enabled: boolean
-  authShouldFailOpen: boolean // TODO(2.0.0) consider refactoring config, this isn't relevant to domains endpoints
+  authShouldFailOpen: boolean // TODO(2.0.0) (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config, this isn't relevant to domains endpoints
   odisServices: {
     signers: string
     timeoutMilliSeconds: number

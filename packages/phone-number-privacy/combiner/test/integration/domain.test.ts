@@ -67,6 +67,7 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: false,
+      authShouldFailOpen: true,
     },
   },
   attestations: {
