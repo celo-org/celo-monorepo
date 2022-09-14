@@ -4,4 +4,5 @@ module.exports = {
   preset: 'ts-jest',
   ...nodeFlakeTracking,
   setupFilesAfterEnv: ['<rootDir>/jest_setup.ts', ...nodeFlakeTracking.setupFilesAfterEnv],
+  coverageReporters: [['lcov', { projectRoot: '../../../' }], 'text'],
 }

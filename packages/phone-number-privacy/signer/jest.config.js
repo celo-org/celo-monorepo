@@ -4,4 +4,5 @@ module.exports = {
   preset: 'ts-jest',
   ...nodeFlakeTracking,
   setupFiles: ['dotenv/config'],
+  coverageReporters: [['lcov', { projectRoot: '../../../' }], 'text'],
 }
