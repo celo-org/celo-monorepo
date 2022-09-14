@@ -325,12 +325,11 @@ contract BiPoolManagerTest_initilizerSettersGetters is BiPoolManagerTest {
 
   /* ---------- Getters ---------- */
 
-  function test_getPoolExchange_whenExchangeDoesNotExist_shouldRevert() public {
+  function testFail_getPoolExchange_whenExchangeDoesNotExist_shouldRevert() public {
     bytes32 exchangeId = keccak256(
       abi.encodePacked(cUSD.symbol(), USDCet.symbol(), constantProduct.name())
     );
 
-    vm.expectRevert("An exchange with the specified id does not exist");
     biPoolManager.getPoolExchange(exchangeId);
   }
 
