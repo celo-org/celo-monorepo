@@ -917,6 +917,7 @@ describe('pnpService', () => {
           performedQueryCount: 0,
           totalQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
       })
     })

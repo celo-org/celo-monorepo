@@ -793,13 +793,13 @@ jobs:
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner,@celo/phone-number-privacy-common
       - run:
           name: Run Tests for common package
-          command: yarn --cwd=packages/phone-number-privacy/common test
+          command: yarn --cwd=packages/phone-number-privacy/common test:coverage
       - run:
           name: Run Tests for combiner
-          command: yarn --cwd=packages/phone-number-privacy/combiner test
+          command: yarn --cwd=packages/phone-number-privacy/combiner test:coverage
       - run:
           name: Run Tests for signer
-          command: yarn --cwd=packages/phone-number-privacy/signer test
+          command: yarn --cwd=packages/phone-number-privacy/signer test:coverage
 
   certora-test:
     working_directory: ~/app
