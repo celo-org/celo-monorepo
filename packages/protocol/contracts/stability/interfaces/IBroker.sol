@@ -8,7 +8,7 @@ pragma solidity ^0.5.13;
 interface IBroker {
   /**
    * @notice Emitted when a swap occurs
-   * @param exchangeManager The exchange manager used
+   * @param exchangeProvider The exchange manager used
    * @param exchangeId The id of the exchange used
    * @param trader The user that initiated the swap
    * @param tokenIn The address of the token that was sold
@@ -17,7 +17,7 @@ interface IBroker {
    * @param amountOut The amount of token bought
    */
   event Swap(
-    address exchangeManager,
+    address exchangeProvider,
     bytes32 indexed exchangeId,
     address indexed trader,
     address indexed tokenIn,
@@ -28,7 +28,7 @@ interface IBroker {
 
   /**
    * @notice Execute a token swap with fixed amountIn
-   * @param exchangeManager the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -37,7 +37,7 @@ interface IBroker {
    * @return amountOut The amount of tokenOut to be bought
    */
   function swapIn(
-    address exchangeManager,
+    address exchangeProvider,
     bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
@@ -47,7 +47,7 @@ interface IBroker {
 
   /**
    * @notice Execute a token swap with fixed amountOut
-   * @param exchangeManager the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -56,7 +56,7 @@ interface IBroker {
    * @return amountIn The amount of tokenIn to be sold
    */
   function swapOut(
-    address exchangeManager,
+    address exchangeProvider,
     bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
@@ -66,7 +66,7 @@ interface IBroker {
 
   /**
    * @notice Calculate amountOut of tokenOut received for a given amountIn of tokenIn
-   * @param exchangeManager the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -74,7 +74,7 @@ interface IBroker {
    * @return amountOut The amount of tokenOut to be bought
    */
   function getAmountOut(
-    address exchangeManager,
+    address exchangeProvider,
     bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
@@ -83,7 +83,7 @@ interface IBroker {
 
   /**
    * @notice Calculate amountIn of tokenIn needed for a given amountOut of tokenOut
-   * @param exchangeManager the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -91,7 +91,7 @@ interface IBroker {
    * @return amountIn The amount of tokenIn to be sold
    */
   function getAmountIn(
-    address exchangeManager,
+    address exchangeProvider,
     bytes32 exchangeId,
     address tokenIn,
     address tokenOut,
@@ -101,7 +101,7 @@ interface IBroker {
   /**
    * @notice Get the list of registered exchange managers.
    * @dev This can be used by UI or clients to discover all pairs.
-   * @return exchangeManagers the addresses of all exchange managers.
+   * @return exchangeProviders the addresses of all exchange managers.
    */
-  function getExchangeManagers() external returns (address[] memory exchangeManagers);
+  function getExchangeProviders() external returns (address[] memory exchangeProviders);
 }

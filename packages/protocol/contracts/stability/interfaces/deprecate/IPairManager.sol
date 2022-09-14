@@ -65,11 +65,11 @@ interface IPairManager {
 
   /**
    * @notice Emitted when the buckets for a specified pair are updated.
-   * @param pairId The id of the pair.
-   * @param collateralBucket The new collateral bucket size.
-   * @param stableBucket The new stable bucket size.
+   * @param poolId The id of the pair.
+   * @param bucket0 The new collateral bucket size.
+   * @param bucket1 The new stable bucket size.
    */
-  event BucketsUpdated(bytes32 pairId, uint256 collateralBucket, uint256 stableBucket);
+  event BucketsUpdated(bytes32 poolId, uint256 bucket0, uint256 bucket1);
 
   /**
    * @notice Retrieves the pair with the specified pairId.

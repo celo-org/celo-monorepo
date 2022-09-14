@@ -7,16 +7,16 @@ pragma solidity ^0.5.13;
  */
 interface IBrokerAdmin {
   /**
-   * @notice Emitted when a ExchangeManager is added
-   * @param exchangeManager the address of the ExchangeManager.
+   * @notice Emitted when a ExchangeProvider is added
+   * @param exchangeProvider the address of the ExchangeProvider.
    */
-  event ExchangeManagerAdded(address indexed exchangeManager);
+  event ExchangeProviderAdded(address indexed exchangeProvider);
 
   /**
-   * @notice Emitted when a ExchangeManager is removed
-   * @param exchangeManager the address of the ExchangeManager.
+   * @notice Emitted when a ExchangeProvider is removed
+   * @param exchangeProvider the address of the ExchangeProvider.
    */
-  event ExchangeManagerRemoved(address indexed exchangeManager);
+  event ExchangeProviderRemoved(address indexed exchangeProvider);
 
   /**
    * @notice Emitted the Reserve is updated
@@ -26,18 +26,18 @@ interface IBrokerAdmin {
   event ReserveUpdated(address indexed newAddress, address indexed prevAddress);
 
   /**
-   * @notice Remove a listing manager at an index
-   * @param exchangeManager the address of the listing manager to remove
-   * @param index the index in the listing managers array
+   * @notice Remove a exchange manager at an index
+   * @param exchangeProvider the address of the exchange manager to remove
+   * @param index the index in the exchange managers array
    */
-  function removeExchangeManagers(address exchangeManager, uint256 index) external;
+  function removeExchangeProviders(address exchangeProvider, uint256 index) external;
 
   /**
-   * @notice Add listing manager
-   * @param exchangeManager the address of the listing manager to add
+   * @notice Add exchange manager
+   * @param exchangeProvider the address of the exchange manager to add
    * @return index the index where it was inserted
    */
-  function addExchangeManager(address exchangeManager) external returns (uint256 index);
+  function addExchangeProvider(address exchangeProvider) external returns (uint256 index);
 
   /**
    * @notice Set the reserve
