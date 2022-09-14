@@ -220,18 +220,32 @@ contract BrokerTest_quote is BrokerTest {
   }
 
   // broken
-  // function test_getAmountIn_receivedCall() public {
-  //   address exchangeManagerA = actor("exchangeManager");
-  //   address exchangeManagerB = actor("exchangeManager");
-  //   console.log(exchangeManagerA, exchangeManagerB);
-  //   vm.expectCall(
-  //     actor("exchangeManager"),
-  //     abi.encodeWithSelector(
-  //       exchangeManager.getAmountIn.selector
-  //     )
-  //   );
-  //   broker.getAmountIn(actor("exchangeManager"), exchangeId, address(stableAsset), address(collateralAsset), 1e16);
-  // }
+  function test_getAmountIn_receivedCall() public {
+    uint256 amountIn = 1e17;
+    uint256 mockAmountOut = 1e16;
+
+    vm.mockCall(
+      actor("exchangeManager"),
+      abi.encodeWithSelector(
+        exchangeManager.getAmountIn.selector,
+        exchangeId,
+        address(stableAsset),
+        address(collateralAsset),
+        amountIn
+      ),
+      abi.encode(mockAmountOut)
+    );
+
+    uint256 amountOut = broker.getAmountIn(
+      actor("exchangeManager"),
+      exchangeId,
+      address(stableAsset),
+      address(collateralAsset),
+      amountIn
+    );
+
+    assertEq(amountOut, mockAmountOut);
+  }
 
   // function test_getAmountIn_whenExchangeManagerWasSet() public {
   //   broker.setExchangeAddress();
