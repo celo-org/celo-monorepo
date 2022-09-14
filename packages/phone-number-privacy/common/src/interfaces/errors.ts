@@ -26,6 +26,8 @@ export enum ErrorMessage {
   FAILURE_TO_GET_PERFORMED_QUERY_COUNT = `CELO_ODIS_ERR_24 DB_ERR Failed to read performedQueryCount from signer db`,
   FAILURE_TO_GET_TOTAL_QUOTA = `CELO_ODIS_ERR_25 NODE_ERR Failed to read on-chain state to calculate total quota`,
   FAILURE_TO_GET_BLOCK_NUMBER = `CELO_ODIS_ERR_26 NODE_ERR Failed to read block number from full node`,
+  FAILURE_TO_GET_DEK = `CELO_ODIS_ERR_26 NODE_ERR Failed to read user's DEK from full-node, failing closed`,
+  OPEN_FAILURE_TO_GET_DEK = `CELO_ODIS_ERR_27 NODE_ERR Failed to read user's DEK from full-node, failing open`,
 }
 
 export enum WarningMessage {

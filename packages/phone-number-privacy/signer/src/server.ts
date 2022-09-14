@@ -92,7 +92,11 @@ export function startSigner(
     new PnpQuotaAction(
       config,
       pnpQuotaService,
-      new PnpQuotaIO(config.api.phoneNumberPrivacy.enabled, kit)
+      new PnpQuotaIO(
+        config.api.phoneNumberPrivacy.enabled,
+        config.api.phoneNumberPrivacy.authShouldFailOpen, // TODO(2.0.0) (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
+        kit
+      )
     )
   )
   const pnpSign = new Controller(
@@ -101,7 +105,11 @@ export function startSigner(
       config,
       pnpQuotaService,
       keyProvider,
-      new PnpSignIO(config.api.phoneNumberPrivacy.enabled, kit)
+      new PnpSignIO(
+        config.api.phoneNumberPrivacy.enabled,
+        config.api.phoneNumberPrivacy.authShouldFailOpen,
+        kit
+      )
     )
   )
   const legacyPnpSign = new Controller(
@@ -110,14 +118,22 @@ export function startSigner(
       config,
       legacyPnpQuotaService,
       keyProvider,
-      new PnpSignIO(config.api.phoneNumberPrivacy.enabled, kit)
+      new PnpSignIO(
+        config.api.phoneNumberPrivacy.enabled,
+        config.api.phoneNumberPrivacy.authShouldFailOpen,
+        kit
+      )
     )
   )
   const legacyPnpQuota = new Controller(
     new PnpQuotaAction(
       config,
       legacyPnpQuotaService,
-      new PnpQuotaIO(config.api.phoneNumberPrivacy.enabled, kit)
+      new PnpQuotaIO(
+        config.api.phoneNumberPrivacy.enabled,
+        config.api.phoneNumberPrivacy.authShouldFailOpen,
+        kit
+      )
     )
   )
   const domainQuota = new Controller(

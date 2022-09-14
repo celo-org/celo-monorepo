@@ -67,6 +67,7 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: false,
+      authShouldFailOpen: true,
     },
   },
   attestations: {
@@ -248,7 +249,7 @@ describe('domainService', () => {
         .post(CombinerEndpoint.DISABLE_DOMAIN)
         .send(await disableRequest())
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<DisableDomainResponse>({
+      expect(res.body).toStrictEqual<DisableDomainResponse>({
         success: true,
         version: res.body.version,
       })
@@ -380,7 +381,7 @@ describe('domainService', () => {
         .post(CombinerEndpoint.DOMAIN_QUOTA_STATUS)
         .send(await quotaRequest())
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+      expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
         success: true,
         version: res.body.version,
         status: { disabled: false, counter: 0, timer: 0, now: res.body.status.now },
@@ -521,7 +522,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
 
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: true,
         version: res.body.version,
         signature: res.body.signature,

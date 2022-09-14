@@ -28,10 +28,13 @@ export function createMockToken(balanceOf: jest.Mock<BigNumber, []>) {
   }
 }
 
-export function createMockAccounts(walletAddress: string, dekPubKey?: string) {
+export function createMockAccounts(
+  getWalletAddress: jest.Mock<string, []>,
+  getDataEncryptionKey: jest.Mock<string, []>
+) {
   return {
-    getWalletAddress: jest.fn(() => walletAddress),
-    getDataEncryptionKey: jest.fn(() => dekPubKey),
+    getWalletAddress,
+    getDataEncryptionKey,
   }
 }
 
@@ -125,9 +128,14 @@ export async function registerWalletAddress(
     .sendAndWaitForReceipt({ from: accountAddress } as any)
 }
 
-export function getPnpQuotaRequest(account: string, hashedPhoneNumber?: string): PnpQuotaRequest {
+export function getPnpQuotaRequest(
+  account: string,
+  authenticationMethod?: string,
+  hashedPhoneNumber?: string
+): PnpQuotaRequest {
   return {
     account,
+    authenticationMethod,
     hashedPhoneNumber,
     sessionID: genSessionID(),
   }

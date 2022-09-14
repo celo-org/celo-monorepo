@@ -27,7 +27,11 @@ import { PnpSession } from '../../session'
 export class LegacyPnpSignIO extends IO<SignMessageRequest> {
   readonly endpoint = SignerEndpoint.LEGACY_PNP_SIGN
 
-  constructor(enabled: boolean, readonly kit: ContractKit) {
+  constructor(
+    readonly enabled: boolean,
+    readonly authShouldFailOpen: boolean,
+    readonly kit: ContractKit
+  ) {
     super(enabled)
   }
 
@@ -64,7 +68,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, SignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger)
+    return authenticateUser(request, this.kit, logger, this.authShouldFailOpen)
   }
 
   sendSuccess(
