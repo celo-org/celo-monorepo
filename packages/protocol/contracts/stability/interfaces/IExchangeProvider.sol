@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 /*
  * @title ExchangeProvider interface
  * @notice The IExchangeProvider interface is the interface that the Broker uses
- * to communicate with different exchange manager implementations like the TwoAssetPoolManager
+ * to communicate with different exchange manager implementations like the BiPoolManager
  */
 interface IExchangeProvider {
   /** 
