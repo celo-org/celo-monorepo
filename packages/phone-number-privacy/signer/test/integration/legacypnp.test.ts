@@ -1099,6 +1099,7 @@ describe('legacyPNP', () => {
         })
 
         it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
+          expect(_config.api.phoneNumberPrivacy.shouldFailOpen).toBe(true)
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
