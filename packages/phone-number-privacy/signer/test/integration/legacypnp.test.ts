@@ -100,17 +100,19 @@ describe('legacyPNP', () => {
   let db: Knex
 
   const expectedVersion = getVersion()
-  const _config = config
+
+  // create deep copy
+  const _config: typeof config = JSON.parse(JSON.stringify(config))
+  _config.db.type = SupportedDatabase.Sqlite
+  _config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
+  _config.api.phoneNumberPrivacy.enabled = true
 
   beforeAll(async () => {
-    _config.db.type = SupportedDatabase.Sqlite
-    _config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
     keyProvider = await initKeyProvider(_config)
   })
 
   beforeEach(async () => {
     // Create a new in-memory database for each test.
-    _config.api.phoneNumberPrivacy.enabled = true
     db = await initDatabase(_config)
     app = startSigner(_config, db, keyProvider, newKit('dummyKit'))
   })
@@ -537,8 +539,9 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        _config.api.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(_config, db, keyProvider, newKit('dummyKit'))
+        const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
+        configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
+        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(
@@ -1029,7 +1032,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        const configWithApiDisabled = { ..._config }
+        const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
 
@@ -1144,7 +1147,7 @@ describe('legacyPNP', () => {
         it('Should return 500 on blockchain totalQuota query failure when shouldFailOpen is false', async () => {
           mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
 
-          const configWithFailOpenDisabled = { ..._config }
+          const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenDisabled.api.phoneNumberPrivacy.shouldFailOpen = false
           const appWithFailOpenDisabled = startSigner(configWithFailOpenDisabled, db, keyProvider)
 
@@ -1172,9 +1175,6 @@ describe('legacyPNP', () => {
             blockNumber: testBlockNumber,
             error: ErrorMessage.FULL_NODE_ERROR,
           })
-
-          // TODO(2.0.0) (https://github.com/celo-org/celo-monorepo/issues/9811) investigate why removing this line causes tests further down to fail
-          _config.api.phoneNumberPrivacy.shouldFailOpen = true
         })
 
         it('Should return 200 w/ warning on failure to increment query count', async () => {

@@ -80,16 +80,17 @@ describe('pnp', () => {
   const expectedQuota = 10
   const expectedVersion = getVersion()
 
-  const _config = config
+  // create deep copy
+  const _config: typeof config = JSON.parse(JSON.stringify(config))
+  _config.db.type = SupportedDatabase.Sqlite
+  _config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
+  _config.api.phoneNumberPrivacy.enabled = true
 
   beforeAll(async () => {
-    _config.db.type = SupportedDatabase.Sqlite
-    _config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
     keyProvider = await initKeyProvider(_config)
   })
 
   beforeEach(async () => {
-    _config.api.phoneNumberPrivacy.enabled = true
     // Create a new in-memory database for each test.
     db = await initDatabase(_config)
     app = startSigner(_config, db, keyProvider, newKit('dummyKit'))
@@ -324,14 +325,10 @@ describe('pnp', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        const configWithApiDisabled = { ..._config }
+        const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(
-          configWithApiDisabled,
-          db,
-          keyProvider,
-          newKit('dummyKit')
-        )
+        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(
@@ -470,7 +467,7 @@ describe('pnp', () => {
         mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainBalance)
         await db.transaction(async (trx) => {
           for (let i = 0; i < performedQueryCount; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
       })
@@ -720,7 +717,7 @@ describe('pnp', () => {
         const remainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i < remainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
         const req = getPnpSignRequest(
@@ -776,7 +773,7 @@ describe('pnp', () => {
         const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
 
@@ -802,7 +799,7 @@ describe('pnp', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        const configWithApiDisabled = { ...config }
+        const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
 
@@ -834,12 +831,12 @@ describe('pnp', () => {
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(expectedQuota)
 
           const spy = jest
@@ -877,12 +874,12 @@ describe('pnp', () => {
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(expectedQuota)
 
           mockOdisPaymentsTotalPaidCUSD.mockImplementation(() => {
@@ -928,7 +925,7 @@ describe('pnp', () => {
             IDENTIFIER
           )
 
-          const configWithFailOpenDisabled = { ..._config }
+          const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenDisabled.api.phoneNumberPrivacy.shouldFailOpen = false
           const appWithFailOpenDisabled = startSigner(configWithFailOpenDisabled, db, keyProvider)
 
@@ -950,9 +947,6 @@ describe('pnp', () => {
             blockNumber: testBlockNumber,
             error: ErrorMessage.FULL_NODE_ERROR,
           })
-
-          // TODO(2.0.0) (https://github.com/celo-org/celo-monorepo/issues/9811) investigate why removing this line causes tests further down to fail
-          _config.api.phoneNumberPrivacy.shouldFailOpen = true
         })
 
         it('Should return 200 w/ warning on failure to increment query count', async () => {
@@ -990,9 +984,9 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
 
         it('Should return 200 w/ warning on failure to store request', async () => {
@@ -1024,9 +1018,9 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount + 1)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
 
         it('Should return 200 on failure to fetch DEK', async () => {
@@ -1087,9 +1081,9 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
       })
     })
