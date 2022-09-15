@@ -35,7 +35,7 @@ import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
 import { Server } from 'net'
 import request from 'supertest'
-import config, { CombinerConfig } from '../../src/config'
+import config from '../../src/config'
 import { startCombiner } from '../../src/server'
 
 const {
@@ -57,7 +57,9 @@ const {
   BLS_THRESHOLD_DEV_PK_SHARE_3,
 } = TestUtils.Values
 
-const combinerConfig: CombinerConfig = { ...config }
+// create deep copy of config
+const combinerConfig: typeof config = JSON.parse(JSON.stringify(config))
+combinerConfig.phoneNumberPrivacy.enabled = true
 
 const signerConfig: SignerConfig = {
   serviceName: 'odis-signer',
@@ -85,7 +87,7 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: true,
-      authShouldFailOpen: true,
+      shouldFailOpen: true,
     },
   },
   attestations: {
@@ -200,8 +202,6 @@ describe('pnpService', () => {
   })
 
   beforeEach(async () => {
-    config.phoneNumberPrivacy.enabled = true
-
     signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
@@ -494,7 +494,9 @@ describe('pnpService', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        const configWithApiDisabled = { ...combinerConfig }
+        const configWithApiDisabled: typeof combinerConfig = JSON.parse(
+          JSON.stringify(combinerConfig)
+        )
         configWithApiDisabled.phoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startCombiner(configWithApiDisabled)
 
@@ -876,7 +878,9 @@ describe('pnpService', () => {
     })
 
     it('Should respond with 503 on disabled api', async () => {
-      const configWithApiDisabled = { ...combinerConfig }
+      const configWithApiDisabled: typeof combinerConfig = JSON.parse(
+        JSON.stringify(combinerConfig)
+      )
       configWithApiDisabled.phoneNumberPrivacy.enabled = false
       const appWithApiDisabled = startCombiner(configWithApiDisabled)
       const req = {

@@ -29,7 +29,7 @@ export interface DatabaseConfig {
 export interface OdisConfig {
   serviceName: string
   enabled: boolean
-  authShouldFailOpen: boolean // TODO(2.0.0) (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config, this isn't relevant to domains endpoints
+  shouldFailOpen: boolean // TODO(2.0.0) (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config, this isn't relevant to domains endpoints
   odisServices: {
     signers: string
     timeoutMilliSeconds: number
@@ -76,7 +76,7 @@ if (DEV_MODE) {
     phoneNumberPrivacy: {
       serviceName: defaultServiceName,
       enabled: true,
-      authShouldFailOpen: true,
+      shouldFailOpen: true,
       odisServices: {
         signers:
           '[{"url": "http://localhost:3001", "fallbackUrl": "http://localhost:3001/fallback"}, {"url": "http://localhost:3002", "fallbackUrl": "http://localhost:3002/fallback"}, {"url": "http://localhost:3003", "fallbackUrl": "http://localhost:3003/fallback"}]',
@@ -92,7 +92,7 @@ if (DEV_MODE) {
     domains: {
       serviceName: defaultServiceName,
       enabled: true,
-      authShouldFailOpen: false,
+      shouldFailOpen: false,
       odisServices: {
         signers:
           '[{"url": "http://localhost:3001", "fallbackUrl": "http://localhost:3001/fallback"}, {"url": "http://localhost:3002", "fallbackUrl": "http://localhost:3002/fallback"}, {"url": "http://localhost:3003", "fallbackUrl": "http://localhost:3003/fallback"}]',
@@ -127,7 +127,7 @@ if (DEV_MODE) {
     phoneNumberPrivacy: {
       serviceName: functionConfig.phoneNumberPrivacy.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.phoneNumberPrivacy.enabled, false),
-      authShouldFailOpen: toBool(functionConfig.phoneNumberPrivacy.authShouldFailOpen, true),
+      shouldFailOpen: toBool(functionConfig.phoneNumberPrivacy.shouldFailOpen, true),
       odisServices: {
         signers: functionConfig.phoneNumberPrivacy.odisservices.signers,
         timeoutMilliSeconds:
@@ -143,7 +143,7 @@ if (DEV_MODE) {
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.domains.enabled, false),
-      authShouldFailOpen: toBool(functionConfig.domains.authShouldFailOpen, true),
+      shouldFailOpen: toBool(functionConfig.domains.authShouldFailOpen, true),
       odisServices: {
         signers: functionConfig.domains.odisservices.signers,
         timeoutMilliSeconds: functionConfig.domains.odisservices.timeoutMilliSeconds ?? 5 * 1000,

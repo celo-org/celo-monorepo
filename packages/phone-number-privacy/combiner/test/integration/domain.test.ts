@@ -36,10 +36,12 @@ import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
 import { Server } from 'net'
 import request from 'supertest'
-import config, { CombinerConfig } from '../../src/config'
+import config from '../../src/config'
 import { startCombiner } from '../../src/server'
 
-const combinerConfig: CombinerConfig = { ...config }
+// create deep copy of config
+const combinerConfig: typeof config = JSON.parse(JSON.stringify(config))
+combinerConfig.domains.enabled = true
 
 const signerConfig: SignerConfig = {
   serviceName: 'odis-signer',
@@ -67,7 +69,7 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: false,
-      authShouldFailOpen: true,
+      shouldFailOpen: true,
     },
   },
   attestations: {
@@ -223,12 +225,9 @@ describe('domainService', () => {
   })
 
   beforeEach(async () => {
-    config.domains.enabled = true
-
     signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
-
     signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
     signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3002)
     signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3003)
@@ -358,7 +357,9 @@ describe('domainService', () => {
     // TODO(2.0.0, testing) test this with signers disabled too
     // https://github.com/celo-org/celo-monorepo/issues/9811
     it('Should respond with 503 on disabled api', async () => {
-      const configWithApiDisabled = combinerConfig
+      const configWithApiDisabled: typeof combinerConfig = JSON.parse(
+        JSON.stringify(combinerConfig)
+      )
       configWithApiDisabled.domains.enabled = false
       const appWithApiDisabled = startCombiner(configWithApiDisabled)
 
@@ -495,7 +496,9 @@ describe('domainService', () => {
     })
 
     it('Should respond with 503 on disabled api', async () => {
-      const configWithApiDisabled = combinerConfig
+      const configWithApiDisabled: typeof combinerConfig = JSON.parse(
+        JSON.stringify(combinerConfig)
+      )
       configWithApiDisabled.domains.enabled = false
       const appWithApiDisabled = startCombiner(configWithApiDisabled)
 
@@ -805,34 +808,24 @@ describe('domainService', () => {
       })
     })
 
-    // it('Should respond with 503 on disabled api', async () => {
-    //   const configWithApiDisabled = { ...config }
-    //   configWithApiDisabled.api.domains.enabled = false
-    //   const appWithApiDisabled = createServer(configWithApiDisabled)
+    it('Should respond with 503 on disabled api', async () => {
+      const configWithApiDisabled: typeof combinerConfig = JSON.parse(
+        JSON.stringify(combinerConfig)
+      )
+      configWithApiDisabled.domains.enabled = false
+      const appWithApiDisabled = startCombiner(configWithApiDisabled)
 
-    //   const [req, _] = await signatureRequest()
+      const [req, _] = await signatureRequest()
 
-    //   const res = await request(appWithApiDisabled).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
+      const res = await request(appWithApiDisabled).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
 
-    //   expect(res.status).toBe(503)
-    //   // @ts-ignore res.body.status is expected to be undefined
-    //   expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
-    //     success: false,
-    //     version: res.body.version,
-    //     error: WarningMessage.API_UNAVAILABLE,
-    //   })
-    // })
+      expect(res.status).toBe(503)
+      // @ts-ignore res.body.status is expected to be undefined
+      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.API_UNAVAILABLE,
+      })
+    })
   })
-
-  /*
-[ ] Bad signature (combiner + signer)
-[ ] Bad encoding (combiner + signer)
-[ ] Undefined domain (combiner + signer)
-[ ] Extra fields? -> should reject / use t.strict (combiner + signer)
-[ ] Valid key versions (combiner + signer)
-[ ] Invalid key versions (combiner + signer)
-[ ] Out of quota (combiner + signer)
-[ ] Bad nonce (combiner + signer)
-[ ] Request too early for rate limiting (both)
-  */
 })

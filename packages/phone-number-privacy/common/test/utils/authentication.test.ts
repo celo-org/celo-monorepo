@@ -38,7 +38,7 @@ describe('Authentication test suite', () => {
       expect(result).toBe(false)
     })
 
-    it('Should succeed authentication with error in getDataEncryptionKey', async () => {
+    it('Should succeed authentication with error in getDataEncryptionKey when shouldFailOpen is true', async () => {
       const sampleRequest: Request = {
         get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
         body: {
@@ -48,9 +48,24 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger, true)
 
       expect(result).toBe(true)
+    })
+
+    it('Should fail authentication with error in getDataEncryptionKey when shouldFailOpen is false', async () => {
+      const sampleRequest: Request = {
+        get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
+        body: {
+          account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
+          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+        },
+      } as Request
+      const mockContractKit = {} as ContractKit
+
+      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger, false)
+
+      expect(result).toBe(false)
     })
 
     it('Should fail authentication when key is not registered', async () => {

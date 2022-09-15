@@ -43,30 +43,41 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         )
         session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
       } else {
-        let failingOpen = false
         // In the case of a database connection failure, performedQueryCount will be -1
         if (quotaStatus.performedQueryCount === -1) {
-          quotaStatus.performedQueryCount = 0
-          failingOpen = quotaStatus.totalQuota > 0
+          this.io.sendFailure(
+            ErrorMessage.DATABASE_GET_FAILURE,
+            500,
+            session.response,
+            quotaStatus.performedQueryCount,
+            quotaStatus.totalQuota,
+            quotaStatus.blockNumber
+          )
         }
         // In the case of a blockchain connection failure, totalQuota will be -1
         if (quotaStatus.totalQuota === -1) {
-          quotaStatus.totalQuota = Number.MAX_SAFE_INTEGER
-          failingOpen = true
-        }
-        // If performedQueryCount or totalQuota are -1 due to db or blockchain errors
-        // we fail open and service the request to not block the user.
-        // Error messages are stored in the session and included along
-        // with the signature in the response.
-        if (failingOpen) {
-          session.logger.error(
-            'Error fetching PNP quota status in servicing a signing request: failing open.'
-          )
-          Counters.requestsFailingOpen.inc()
-          // TODO(2.0.0) Ensure we have monitoring in the combiner for this too,
-          // since we don't have visibility into prometheus metrics for partner signers. The combiner monitoring
-          // should be based intelligently off of the warning messages returned by signers
-          // (https://github.com/celo-org/celo-monorepo/issues/9836)
+          if (this.config.api.phoneNumberPrivacy.shouldFailOpen) {
+            // We fail open and service requests on full-node errors to not block the user.
+            // Error messages are stored in the session and included along with the signature in the response.
+            quotaStatus.totalQuota = Number.MAX_SAFE_INTEGER
+            session.logger.error(ErrorMessage.FAILING_OPEN)
+            Counters.requestsFailingOpen.inc()
+            // TODO(2.0.0) Ensure we have monitoring in the combiner for this too,
+            // since we don't have visibility into prometheus metrics for partner signers. The combiner monitoring
+            // should be based intelligently off of the warning messages returned by signers
+            // (https://github.com/celo-org/celo-monorepo/issues/9836)
+          } else {
+            session.logger.error(ErrorMessage.FAILING_CLOSED)
+            Counters.requestsFailingClosed.inc()
+            this.io.sendFailure(
+              ErrorMessage.FULL_NODE_ERROR,
+              500,
+              session.response,
+              quotaStatus.performedQueryCount,
+              quotaStatus.totalQuota,
+              quotaStatus.blockNumber
+            )
+          }
         }
         const { sufficient } = await this.quota.checkAndUpdateQuotaStatus(quotaStatus, session, trx)
         if (!sufficient) {

@@ -27,7 +27,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
 
   constructor(
     readonly enabled: boolean,
-    readonly authShouldFailOpen: boolean,
+    readonly shouldFailOpen: boolean,
     readonly kit: ContractKit
   ) {
     super(enabled)
@@ -57,7 +57,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   }
 
   async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.authShouldFailOpen)
+    return authenticateUser(request, this.kit, logger, this.shouldFailOpen)
   }
 
   sendSuccess(

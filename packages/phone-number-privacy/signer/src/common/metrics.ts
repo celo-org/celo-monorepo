@@ -63,7 +63,12 @@ export const Counters = {
   requestsFailingOpen: new Counter({
     name: 'requests_failing_open',
     help:
-      'Counter for the number of requests bypassing quota due to blockchain or db connection failures',
+      'Counter for the number of requests bypassing quota or authentication checks due to full-node errors',
+  }),
+  requestsFailingClosed: new Counter({
+    name: 'requests_failing_closed',
+    help:
+      'Counter for the number of requests failing quota or authentication checks due to full-node errors',
   }),
 }
 const buckets = [

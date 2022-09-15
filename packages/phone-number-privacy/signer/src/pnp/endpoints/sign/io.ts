@@ -29,7 +29,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
 
   constructor(
     readonly enabled: boolean,
-    readonly authShouldFailOpen: boolean,
+    readonly shouldFailOpen: boolean,
     readonly kit: ContractKit
   ) {
     super(enabled)
@@ -68,7 +68,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, SignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.authShouldFailOpen)
+    return authenticateUser(request, this.kit, logger, this.shouldFailOpen)
   }
 
   sendSuccess(
