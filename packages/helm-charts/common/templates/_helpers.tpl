@@ -28,6 +28,10 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" $.Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "common.app" -}}
+{{- default $.Chart.Name .Values.appOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{- define "common.standard.labels" -}}
 {{- include "common.standard.short_labels" . }}
 chart: {{ template "common.chart" . }}
@@ -35,7 +39,7 @@ heritage: {{ .Release.Service }}
 {{- end -}}
 
 {{- define "common.standard.short_labels" -}}
-app: {{ template "common.name" . }}
+app: {{ template "common.app" . }}
 release: {{ .Release.Name }}
 {{- end -}}
 
@@ -486,7 +490,7 @@ metadata:
     component: {{ .component_label }}
 spec:
   selector:
-    app: {{ template "common.name" $ }}
+    app: {{ template "common.app" $ }}
     release: {{ $.Release.Name }}
     component: {{ .component_label }}
 {{ if .extra_selector -}}
