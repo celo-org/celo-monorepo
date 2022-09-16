@@ -22,7 +22,7 @@ import { computeBlindedSignature } from '../bls/bls-cryptography-client'
 import { Counters } from '../common/metrics'
 import { getVersion } from '../config'
 import { getDatabase } from '../database/database'
-import { DomainStateRecord, DOMAINS_STATES_COLUMNS } from '../database/models/domainState'
+import { DOMAINS_STATES_COLUMNS, DomainStateRecord } from '../database/models/domainState'
 import {
   getDomainState,
   getDomainStateWithLock,
