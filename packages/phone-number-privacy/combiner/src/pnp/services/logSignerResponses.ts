@@ -1,4 +1,5 @@
 import {
+  ErrorMessage,
   PnpQuotaRequest,
   SignMessageRequest,
   WarningMessage,
@@ -10,7 +11,7 @@ import {
   MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD,
 } from '../../config'
 
-export class PnpDiscrepanciesLogger {
+export class PnpSignerResponseLogger {
   logResponseDiscrepancies(session: Session<PnpQuotaRequest> | Session<SignMessageRequest>): void {
     // https://github.com/celo-org/celo-monorepo/issues/9826
     // TODO(2.0.0, logging): responses should all already be successes due to CombineAction receiveSuccess
@@ -105,5 +106,25 @@ export class PnpDiscrepanciesLogger {
       )
       session.warnings.push(WarningMessage.INCONSISTENT_SIGNER_QUERY_MEASUREMENTS)
     }
+  }
+
+  logFailOpenResponses(session: Session<PnpQuotaRequest> | Session<SignMessageRequest>): void {
+    session.responses.forEach((response) => {
+      if (response.res.success) {
+        const { warnings } = response.res
+        if (warnings) {
+          warnings.forEach((warning) => {
+            switch (warning) {
+              case ErrorMessage.FAILING_OPEN:
+              case ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA:
+              case ErrorMessage.FAILURE_TO_GET_DEK:
+                session.logger.error({ warning, service: response.url }, ErrorMessage.FAILING_OPEN)
+              default:
+                break
+            }
+          })
+        }
+      }
+    })
   }
 }

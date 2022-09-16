@@ -88,7 +88,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
         session.logger.error(err)
       }
     }
-    return this.addFailureToSession(signer, signerFetchResult?.status ?? 502, session)
+    this.addFailureToSession(signer, signerFetchResult?.status ?? 502, session)
   }
 
   protected async receiveSuccess(

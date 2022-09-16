@@ -21,9 +21,9 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const { success } = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBe(false)
+      expect(success).toBe(false)
     })
 
     it('Should fail authentication with missing signer', async () => {
@@ -33,9 +33,9 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const { success } = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBe(false)
+      expect(success).toBe(false)
     })
 
     it('Should succeed authentication with error in getDataEncryptionKey when shouldFailOpen is true', async () => {
@@ -48,9 +48,15 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger, true)
+      const { success, failedOpen } = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true
+      )
 
-      expect(result).toBe(true)
+      expect(success).toBe(true)
+      expect(failedOpen).toBe(true)
     })
 
     it('Should fail authentication with error in getDataEncryptionKey when shouldFailOpen is false', async () => {
@@ -63,9 +69,15 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger, false)
+      const { success, failedOpen } = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        false
+      )
 
-      expect(result).toBe(false)
+      expect(success).toBe(false)
+      expect(failedOpen).toBe(false)
     })
 
     it('Should fail authentication when key is not registered', async () => {
@@ -88,9 +100,9 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const { success } = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBe(false)
+      expect(success).toBe(false)
     })
 
     it('Should fail authentication when key is registered but not valid', async () => {
@@ -113,9 +125,9 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const { success } = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBe(false)
+      expect(success).toBe(false)
     })
 
     it('Should succeed authentication when key is registered and valid', async () => {
@@ -147,9 +159,9 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const { success } = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBe(true)
+      expect(success).toBe(true)
     })
 
     it('Should fail authentication when the message is manipulated', async () => {
@@ -189,9 +201,9 @@ describe('Authentication test suite', () => {
           },
         } as ContractKit
 
-        const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+        const { success } = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-        expect(result).toBe(false)
+        expect(success).toBe(false)
       }
     })
 
@@ -226,9 +238,9 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const { success } = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBe(false)
+      expect(success).toBe(false)
     })
 
     it('Should fail authentication when the sigature is modified', async () => {
@@ -264,9 +276,9 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const { success } = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBe(false)
+      expect(success).toBe(false)
     })
 
     // Backwards compatibility check
@@ -302,9 +314,9 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const { success } = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
 
-      expect(result).toBe(true)
+      expect(success).toBe(true)
     })
   })
 

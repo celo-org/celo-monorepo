@@ -1,6 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
+  ErrorMessage,
   ErrorType,
   hasValidAccountParam,
   identifierIsValidIfExists,
@@ -37,14 +38,17 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<PnpQuotaResponse>
   ): Promise<PnpSession<PnpQuotaRequest> | null> {
+    const warnings: ErrorType[] = []
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!(await this.authenticate(request, response.locals.logger))) {
+    if (!(await this.authenticate(request, warnings, response.locals.logger))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new PnpSession(request, response)
+    const session = new PnpSession(request, response)
+    session.errors.push(...warnings)
+    return session
   }
 
   validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, PnpQuotaRequest> {
@@ -56,8 +60,24 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     )
   }
 
-  async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.shouldFailOpen)
+  async authenticate(
+    request: Request<{}, {}, PnpQuotaRequest>,
+    warnings: ErrorType[],
+    logger: Logger
+  ): Promise<boolean> {
+    const { success, failedOpen } = await authenticateUser(
+      request,
+      this.kit,
+      logger,
+      this.shouldFailOpen
+    )
+
+    if (failedOpen) {
+      warnings.push(ErrorMessage.FAILURE_TO_GET_DEK)
+      logger.error({ warning: ErrorMessage.FAILURE_TO_GET_DEK }, ErrorMessage.FAILING_OPEN)
+    }
+
+    return success
   }
 
   sendSuccess(

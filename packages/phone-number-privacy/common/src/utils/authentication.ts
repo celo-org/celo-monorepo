@@ -20,7 +20,7 @@ export async function authenticateUser(
   contractKit: ContractKit,
   logger: Logger,
   shouldFailOpen: boolean = true
-): Promise<boolean> {
+): Promise<{ success: boolean; failedOpen: boolean }> {
   logger.debug('Authenticating user')
 
   // https://tools.ietf.org/html/rfc7235#section-4.2
@@ -30,7 +30,7 @@ export async function authenticateUser(
   const authMethod = request.body.authenticationMethod
 
   if (!messageSignature || !signer) {
-    return false
+    return { success: false, failedOpen: false }
   }
 
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
@@ -42,17 +42,14 @@ export async function authenticateUser(
       // That is, it does not throw if the DEK is undefined or invalid
       logger.error({ err, shouldFailOpen }, ErrorMessage.FAILURE_TO_GET_DEK)
       if (shouldFailOpen) {
-        // TODO(2.0.0, release) add monitoring / alerting for these
-        logger.error(ErrorMessage.FAILING_OPEN)
-        return true
+        return { success: true, failedOpen: true }
       } else {
-        logger.error(ErrorMessage.FAILING_CLOSED)
-        return false
+        return { success: false, failedOpen: false }
       }
     }
     if (!registeredEncryptionKey) {
       logger.warn({ account: signer }, 'Account does not have registered encryption key')
-      return false
+      return { success: false, failedOpen: false }
     } else {
       logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
       if (
@@ -60,7 +57,7 @@ export async function authenticateUser(
           insecureAllowIncorrectlyGeneratedSignature: true,
         })
       ) {
-        return true
+        return { success: true, failedOpen: false }
       }
     }
   }
@@ -72,7 +69,10 @@ export async function authenticateUser(
   )
   // TODO(2.0.0) This uses signature utils, why doesn't DEK authentication?
   // (https://github.com/celo-org/celo-monorepo/issues/9803)
-  return verifySignature(message, messageSignature, signer)
+  return {
+    success: verifySignature(message, messageSignature, signer),
+    failedOpen: false,
+  }
 }
 
 export function getMessageDigest(message: string) {

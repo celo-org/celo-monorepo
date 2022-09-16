@@ -1,6 +1,8 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
+  ErrorMessage,
+  ErrorType,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
@@ -40,6 +42,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     response: Response<SignMessageResponse>
   ): Promise<PnpSession<SignMessageRequest> | null> {
     const logger = response.locals.logger
+    const warnings: ErrorType[] = []
     if (!super.inputChecks(request, response)) {
       return null
     }
@@ -47,11 +50,13 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
-    if (!(await this.authenticate(request, logger))) {
+    if (!(await this.authenticate(request, warnings, logger))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new PnpSession(request, response)
+    const session = new PnpSession(request, response)
+    session.errors.push(...warnings)
+    return session
   }
 
   validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, SignMessageRequest> {
@@ -66,9 +71,22 @@ export class PnpSignIO extends IO<SignMessageRequest> {
 
   async authenticate(
     request: Request<{}, {}, SignMessageRequest>,
+    warnings: string[],
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.shouldFailOpen)
+    const { success, failedOpen } = await authenticateUser(
+      request,
+      this.kit,
+      logger,
+      this.shouldFailOpen
+    )
+
+    if (failedOpen) {
+      warnings.push(ErrorMessage.FAILURE_TO_GET_DEK)
+      logger.error({ warning: ErrorMessage.FAILURE_TO_GET_DEK }, ErrorMessage.FAILING_OPEN)
+    }
+
+    return success
   }
 
   sendSuccess(

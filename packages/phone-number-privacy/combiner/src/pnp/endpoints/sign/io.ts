@@ -2,6 +2,7 @@ import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
   CombinerEndpoint,
+  ErrorMessage,
   ErrorType,
   getSignerEndpoint,
   hasValidAccountParam,
@@ -80,7 +81,21 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, SignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.config.shouldFailOpen)
+    const { success, failedOpen } = await authenticateUser(
+      request,
+      this.kit,
+      logger,
+      this.config.shouldFailOpen
+    )
+
+    if (failedOpen) {
+      logger.error(
+        { warning: ErrorMessage.FAILURE_TO_GET_DEK, service: this.config.serviceName },
+        ErrorMessage.FAILING_OPEN
+      )
+    }
+
+    return success
   }
 
   sendSuccess(
