@@ -63,6 +63,7 @@ interface IExchangeProvider {
    */
   function getAmountOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
     external
+    view
     returns (uint256 amountOut);
 
   /**
@@ -75,5 +76,6 @@ interface IExchangeProvider {
    */
   function getAmountIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
     external
+    view
     returns (uint256 amountIn);
 }

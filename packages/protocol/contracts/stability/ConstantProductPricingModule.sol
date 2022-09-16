@@ -38,17 +38,16 @@ contract ConstantProductPricingModule is IPricingModule, Initializable, Ownable 
     if (amountIn == 0) return 0;
 
     FixidityLib.Fraction memory spreadFraction = FixidityLib.wrap(spread);
-    FixidityLib.Fraction memory amountInFixed = FixidityLib.newFixed(amountIn);
     FixidityLib.Fraction memory netAmountIn = FixidityLib
       .fixed1()
       .subtract(spreadFraction)
-      .multiply(amountInFixed);
+      .multiply(FixidityLib.newFixed(amountIn));
 
-    FixidityLib.Fraction memory numerator = amountInFixed.multiply(
+    FixidityLib.Fraction memory numerator = netAmountIn.multiply(
       FixidityLib.newFixed(tokenOutBucketSize)
     );
     FixidityLib.Fraction memory denominator = FixidityLib.newFixed(tokenInBucketSize).add(
-      amountInFixed
+      netAmountIn
     );
 
     // Can't use FixidityLib.divide because denominator can easily be greater
