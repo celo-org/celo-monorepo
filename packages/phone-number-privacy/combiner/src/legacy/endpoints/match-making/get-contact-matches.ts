@@ -67,7 +67,8 @@ export async function handleGetContactMatches(db: Knex, request: Request, respon
     // error handling. Remove this or refactor once that bug is resolved.
     let isAuthenticated = true // We assume user is authenticated on Forno errors
     try {
-      isAuthenticated = await authenticateUser(request, getContractKit(config.blockchain), logger)
+      const { success } = await authenticateUser(request, getContractKit(config.blockchain), logger)
+      isAuthenticated = success
     } catch {
       logger.error('Forno error caught in handleGetContactMatches line 57') // Temporary for debugging
       logger.error(ErrorMessage.FULL_NODE_ERROR)
