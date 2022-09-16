@@ -1,5 +1,6 @@
 /* tslint:disable no-console */
 import { newKit } from '@celo/contractkit'
+import { CeloTokenInfo, StableToken } from '@celo/contractkit/lib/celo-tokens'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { convertToContractDecimals } from 'src/lib/contract-utils'
 import { addCeloEnvMiddleware, CeloEnvArgv, envVar, fetchEnv } from 'src/lib/env-utils'
@@ -11,6 +12,7 @@ import yargs from 'yargs'
 interface FaucetLoadTest extends CeloEnvArgv {
   gold: number
   dollars: number
+  every_stable: number
   replica_from: number
   replica_to: number
   threads_from: number
@@ -32,6 +34,11 @@ export const builder = (argv: yargs.Argv) => {
       .option('dollars', {
         type: 'number',
         description: 'Celo Dollars amount to transfer',
+        default: 0,
+      })
+      .option('every_stable', {
+        type: 'number',
+        description: 'Amount to transfer for every stable',
         default: 10,
       })
       .option('replica_from', {
@@ -68,24 +75,31 @@ export const handler = async (argv: CeloEnvArgv & FaucetLoadTest) => {
     console.log(`Using account: ${account}`)
     kit.defaultAccount = account
 
-    const [goldToken, stableToken] = await Promise.all([
-      kit.contracts.getGoldToken(),
-      kit.contracts.getStableToken(),
-    ])
-
-    const [goldAmount, stableTokenAmount] = await Promise.all([
-      convertToContractDecimals(argv.gold, goldToken),
-      convertToContractDecimals(argv.dollars, stableToken),
-    ])
+    const goldToken = await kit.contracts.getGoldToken()
+    const goldAmount = await convertToContractDecimals(argv.gold, goldToken)
 
     for (let podIndex = argv.replica_from; podIndex <= argv.replica_to; podIndex++) {
       for (let threadIndex = argv.threads_from; threadIndex <= argv.threads_to; threadIndex++) {
         const index = getIndexForLoadTestThread(podIndex, threadIndex)
         const address = generateAddress(mnemonic, accountType, index)
-        console.log(`${index} --> Fauceting ${goldAmount.toFixed()} Gold to ${address}`)
-        await goldToken.transfer(address, goldAmount.toFixed()).send()
-        console.log(`${index} --> Fauceting ${stableTokenAmount.toFixed()} Dollars to ${address}`)
-        await stableToken.transfer(address, stableTokenAmount.toFixed()).send()
+        if (goldAmount.isGreaterThan(0)) {
+          console.log(`${index} --> Fauceting ${goldAmount.toFixed()} Gold to ${address}`)
+          await goldToken.transfer(address, goldAmount.toFixed()).send()
+        }
+        kit.celoTokens.forStableCeloToken(async (info: CeloTokenInfo) => {
+          let amountToTransfer = argv.every_stable
+          if (info.symbol === StableToken.cUSD && argv.dollars > amountToTransfer) {
+            amountToTransfer = argv.dollars
+          }
+          if (amountToTransfer != 0) {
+            const wrapper = await kit.contracts.getContract(info.contract)
+            const stableAmount = await convertToContractDecimals(amountToTransfer, wrapper)
+            console.log(
+              `${index} --> Fauceting ${stableAmount.toFixed()} ${info.symbol} to ${address}`
+            )
+            await wrapper.transfer(address, stableAmount.toFixed()).send()
+          }
+        })
       }
     }
   }

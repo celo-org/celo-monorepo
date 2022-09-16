@@ -1208,12 +1208,13 @@ async function generateMyCeloGenesis(): Promise<string> {
   // Clean up the tmp dir
   await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
   fs.mkdirSync(celoBlockchainDir)
-  const gethTag =
+  const myceloCommit =
     fetchEnvOrFallback(envVar.GETH_MYCELO_COMMIT, '') !== ''
       ? fetchEnv(envVar.GETH_MYCELO_COMMIT)
-      : fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)
-  const celoBlockchainVersion = gethTag.includes('.') ? `v${gethTag}` : gethTag
-  await checkoutGethRepo(celoBlockchainVersion, celoBlockchainDir)
+      : fetchEnvOrFallback(envVar.GETH_NODE_DOCKER_IMAGE_TAG, '') !== ''
+      ? `v${fetchEnv(envVar.GETH_MYCELO_COMMIT)}`
+      : ''
+  await checkoutGethRepo(myceloCommit, celoBlockchainDir)
   await buildGethAll(celoBlockchainDir)
 
   // Generate genesis-config from template
@@ -1235,6 +1236,39 @@ async function generateMyCeloGenesis(): Promise<string> {
     '--blockgaslimit',
     '20000000',
   ]
+
+  // Celo hard fork activation blocks. Default is undefined, which means not activated.
+  // In mycelo that requires to send a -1 as the activation block (we keep it as undefine
+  // to be compatible with the non mycelo option)
+  myceloGenesisConfigArgs.push('--forks.churrito')
+  const churritoBlock = fetchEnvOrFallback(envVar.CHURRITO_BLOCK, '')
+  if (churritoBlock === '') {
+    myceloGenesisConfigArgs.push('-1') // -1 is
+  } else {
+    myceloGenesisConfigArgs.push(churritoBlock)
+  }
+  const donutBlock = fetchEnvOrFallback(envVar.DONUT_BLOCK, '')
+  myceloGenesisConfigArgs.push('--forks.donut')
+  if (donutBlock === '') {
+    myceloGenesisConfigArgs.push('-1') // -1 is
+  } else {
+    myceloGenesisConfigArgs.push(donutBlock)
+  }
+  const espressoBlock = fetchEnvOrFallback(envVar.ESPRESSO_BLOCK, '')
+  myceloGenesisConfigArgs.push('--forks.espresso')
+  if (espressoBlock === '') {
+    myceloGenesisConfigArgs.push('-1') // -1 is
+  } else {
+    myceloGenesisConfigArgs.push(espressoBlock)
+  }
+  // const fHardforkBlock = fetchEnvOrFallback(envVar.F_HARDFORK_BLOCK, '')
+  // myceloGenesisConfigArgs.push('--forks.fhardfork')
+  // if (fHardforkBlock === '') {
+  //   myceloGenesisConfigArgs.push('-1') // -1 is
+  // } else {
+  //   myceloGenesisConfigArgs.push(fHardforkBlock)
+  // }
+
   await spawnCmdWithExitOnFailure(myceloBinary, myceloGenesisConfigArgs, {
     silent: false,
     cwd: celoBlockchainDir,

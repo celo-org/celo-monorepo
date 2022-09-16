@@ -318,6 +318,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
   const churritoBlock = hardForkActivationBlock(envVar.CHURRITO_BLOCK)
   const donutBlock = hardForkActivationBlock(envVar.DONUT_BLOCK)
   const espressoBlock = hardForkActivationBlock(envVar.ESPRESSO_BLOCK)
+  const fHardforkBlock = hardForkActivationBlock(envVar.F_HARDFORK_BLOCK)
 
   // network start timestamp
   const timestamp = parseInt(fetchEnvOrFallback(envVar.TIMESTAMP, '0'), 10)
@@ -336,6 +337,7 @@ export const generateGenesisFromEnv = (enablePetersburg: boolean = true) => {
     churritoBlock,
     donutBlock,
     espressoBlock,
+    fHardforkBlock,
   })
 }
 
@@ -395,6 +397,7 @@ export const generateGenesis = ({
   churritoBlock,
   donutBlock,
   espressoBlock,
+  fHardforkBlock,
 }: GenesisConfig): string => {
   const genesis: any = { ...TEMPLATE }
 
@@ -410,6 +413,9 @@ export const generateGenesis = ({
   }
   if (typeof espressoBlock === 'number') {
     genesis.config.espressoBlock = espressoBlock
+  }
+  if (typeof fHardforkBlock === 'number') {
+    genesis.config.fHardforkBlock = fHardforkBlock
   }
 
   genesis.config.chainId = chainId
@@ -538,6 +544,9 @@ export const generateGenesisWithMigrations = async ({
   }
   if (genesisConfig.espressoBlock !== undefined) {
     mcConfig.hardforks.espressoBlock = genesisConfig.espressoBlock
+  }
+  if (genesisConfig.fHardforkBlock !== undefined) {
+    mcConfig.hardforks.fHardforkBlock = genesisConfig.fHardforkBlock
   }
   if (genesisConfig.timestamp !== undefined) {
     mcConfig.genesisTimestamp = genesisConfig.timestamp
