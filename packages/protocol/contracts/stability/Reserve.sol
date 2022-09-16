@@ -538,9 +538,13 @@ contract Reserve is
       uint256 stableAmount;
       uint256 goldAmount;
       (stableAmount, goldAmount) = sortedOracles.medianRate(_tokens[i]);
-      uint256 stableTokenSupply = IERC20(_tokens[i]).totalSupply();
-      uint256 aStableTokenValueInGold = stableTokenSupply.mul(goldAmount).div(stableAmount);
-      stableTokensValueInGold = stableTokensValueInGold.add(aStableTokenValueInGold);
+
+      if (goldAmount != 0) {
+        // tokens with no oracle reports don't count towards collateralization ratio
+        uint256 stableTokenSupply = IERC20(_tokens[i]).totalSupply();
+        uint256 aStableTokenValueInGold = stableTokenSupply.mul(goldAmount).div(stableAmount);
+        stableTokensValueInGold = stableTokensValueInGold.add(aStableTokenValueInGold);
+      }
     }
     return
       FixidityLib
