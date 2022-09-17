@@ -31,3 +31,6 @@ replicaCount: 2
 storage:
   size: 1500Gi
   storageClass: ssd
+extraPodLabels:
+  stack: blockscout
+  mode: archive
