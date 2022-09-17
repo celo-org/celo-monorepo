@@ -25,7 +25,8 @@ export class DomainThresholdStateService<
     const domainStatesEnabled = domainStates.filter((ds) => !ds.disabled)
     const numDisabled = domainStates.length - domainStatesEnabled.length
 
-    if (this.config.odisServices.signers.length - numDisabled < threshold) {
+    const signersLength = JSON.parse(this.config.odisServices.signers).length
+    if (signersLength - numDisabled < threshold) {
       return { timer: 0, counter: 0, disabled: true, now: 0 }
     }
 
