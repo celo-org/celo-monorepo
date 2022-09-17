@@ -35,7 +35,7 @@ import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
 import { Server } from 'net'
 import request from 'supertest'
-import config, { CombinerConfig } from '../../src/config'
+import config from '../../src/config'
 import { startCombiner } from '../../src/server'
 
 const {
@@ -57,7 +57,9 @@ const {
   BLS_THRESHOLD_DEV_PK_SHARE_3,
 } = TestUtils.Values
 
-const combinerConfig: CombinerConfig = { ...config }
+// create deep copy of config
+const combinerConfig: typeof config = JSON.parse(JSON.stringify(config))
+combinerConfig.phoneNumberPrivacy.enabled = true
 
 const signerConfig: SignerConfig = {
   serviceName: 'odis-signer',
@@ -85,6 +87,7 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: true,
+      shouldFailOpen: true,
     },
   },
   attestations: {
@@ -141,9 +144,15 @@ const signerConfig: SignerConfig = {
 const testBlockNumber = 1000000
 
 const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
+const mockGetWalletAddress = jest.fn<string, []>()
+const mockGetDataEncryptionKey = jest.fn<string, []>()
+
 const mockContractKit = createMockContractKit(
   {
-    [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount, DEK_PUBLIC_KEY),
+    [ContractRetrieval.getAccounts]: createMockAccounts(
+      mockGetWalletAddress,
+      mockGetDataEncryptionKey
+    ),
     [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
   },
   createMockWeb3(5, testBlockNumber)
@@ -193,8 +202,6 @@ describe('pnpService', () => {
   })
 
   beforeEach(async () => {
-    config.phoneNumberPrivacy.enabled = true
-
     signerDB1 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB2 = await initSignerDatabase(signerConfig, signerMigrationsPath)
     signerDB3 = await initSignerDatabase(signerConfig, signerMigrationsPath)
@@ -205,6 +212,9 @@ describe('pnpService', () => {
     }
 
     blindedMsgResult = threshold_bls.blind(message, userSeed)
+
+    mockGetDataEncryptionKey.mockReset().mockReturnValue(DEK_PUBLIC_KEY)
+    mockGetWalletAddress.mockReset().mockReturnValue(mockAccount)
   })
 
   afterEach(async () => {
@@ -442,9 +452,24 @@ describe('pnpService', () => {
         })
       })
 
-      it('Should respond with 401 on failed auth', async () => {
+      it('Should respond with 401 on failed WALLET_KEY auth', async () => {
         req.account = mockAccount
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(401)
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.UNAUTHENTICATED_USER,
+        })
+      })
+
+      it('Should respond with 401 on failed DEK auth', async () => {
+        req.account = mockAccount
+        req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
+        const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+        const authorization = getPnpRequestAuthorization(req, differentPk)
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(401)
@@ -469,7 +494,9 @@ describe('pnpService', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        const configWithApiDisabled = { ...combinerConfig }
+        const configWithApiDisabled: typeof combinerConfig = JSON.parse(
+          JSON.stringify(combinerConfig)
+        )
         configWithApiDisabled.phoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startCombiner(configWithApiDisabled)
 
@@ -481,6 +508,35 @@ describe('pnpService', () => {
           success: false,
           version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
+        })
+      })
+
+      describe('functionality in case of errors', () => {
+        it('Should return 200 on failure to fetch DEK', async () => {
+          mockGetDataEncryptionKey.mockImplementation(() => {
+            throw new Error()
+          })
+
+          req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
+          // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
+          const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+          const authorization = getPnpRequestAuthorization(req, differentPk)
+          const res = await sendPnpSignRequest(req, authorization, app)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: expectedVersion,
+            signature: expectedSig,
+            performedQueryCount: 1,
+            totalQuota: expectedTotalQuota,
+            blockNumber: testBlockNumber,
+          })
+          const unblindedSig = threshold_bls.unblind(
+            Buffer.from(res.body.signature, 'base64'),
+            blindedMsgResult.blindingFactor
+          )
+          expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedMsg)
         })
       })
     })
@@ -631,6 +687,22 @@ describe('pnpService', () => {
       })
     })
 
+    it('Should respond with 200 on valid request', async () => {
+      const req = {
+        account: ACCOUNT_ADDRESS1,
+      }
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+      const res = await getCombinerQuotaResponse(req, authorization)
+      expect(res.status).toBe(200)
+      expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        success: true,
+        version: expectedVersion,
+        performedQueryCount: 0,
+        totalQuota,
+        blockNumber: testBlockNumber,
+      })
+    })
+
     it('Should respond with 200 on repeated valid requests', async () => {
       const req = {
         account: ACCOUNT_ADDRESS1,
@@ -746,17 +818,33 @@ describe('pnpService', () => {
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+      expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
         success: false,
         version: expectedVersion,
         error: WarningMessage.INVALID_INPUT,
       })
     })
 
-    it('Should respond with 401 on failed auth', async () => {
+    it('Should respond with 401 on failed WALLET_KEY auth', async () => {
       // Request from one account, signed by another account
       const req = {
         account: ACCOUNT_ADDRESS2,
+      }
+      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+      const res = await getCombinerQuotaResponse(req, authorization)
+
+      expect(res.status).toBe(401)
+      expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.UNAUTHENTICATED_USER,
+      })
+    })
+
+    it('Should respond with 401 on failed DEK auth', async () => {
+      const req = {
+        account: ACCOUNT_ADDRESS2,
+        AuthenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
       }
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await getCombinerQuotaResponse(req, authorization)
@@ -790,7 +878,9 @@ describe('pnpService', () => {
     })
 
     it('Should respond with 503 on disabled api', async () => {
-      const configWithApiDisabled = { ...combinerConfig }
+      const configWithApiDisabled: typeof combinerConfig = JSON.parse(
+        JSON.stringify(combinerConfig)
+      )
       configWithApiDisabled.phoneNumberPrivacy.enabled = false
       const appWithApiDisabled = startCombiner(configWithApiDisabled)
       const req = {
@@ -806,6 +896,33 @@ describe('pnpService', () => {
         success: false,
         version: expectedVersion,
         error: WarningMessage.API_UNAVAILABLE,
+      })
+    })
+
+    describe('functionality in case of errors', () => {
+      it('Should respond with 200 on failure to fetch DEK', async () => {
+        mockGetDataEncryptionKey.mockReset().mockImplementation(() => {
+          throw new Error()
+        })
+
+        const req = {
+          account: ACCOUNT_ADDRESS1,
+          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+        }
+
+        // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
+        const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+        const authorization = getPnpRequestAuthorization(req, differentPk)
+        const res = await getCombinerQuotaResponse(req, authorization)
+        expect(res.status).toBe(200)
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          performedQueryCount: 0,
+          totalQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
       })
     })
   })

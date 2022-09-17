@@ -45,6 +45,8 @@ const {
   ACCOUNT_ADDRESS1,
   mockAccount,
   BLINDED_PHONE_NUMBER,
+  DEK_PRIVATE_KEY,
+  DEK_PUBLIC_KEY,
 } = TestUtils.Values
 
 const expectedSignature =
@@ -56,11 +58,16 @@ const mockBalanceOfCUSD = jest.fn<BigNumber, []>()
 const mockBalanceOfCEUR = jest.fn<BigNumber, []>()
 const mockBalanceOfCELO = jest.fn<BigNumber, []>()
 const mockGetVerifiedStatus = jest.fn<AttestationsStatus, []>()
+const mockGetWalletAddress = jest.fn<string, []>()
+const mockGetDataEncryptionKey = jest.fn<string, []>()
 
 const mockContractKit = createMockContractKit(
   {
     // getWalletAddress stays constant across all old query-quota.test.ts unit tests
-    [ContractRetrieval.getAccounts]: createMockAccounts(mockAccount),
+    [ContractRetrieval.getAccounts]: createMockAccounts(
+      mockGetWalletAddress,
+      mockGetDataEncryptionKey
+    ),
     [ContractRetrieval.getStableToken]: jest.fn(),
     [ContractRetrieval.getGoldToken]: createMockToken(mockBalanceOfCELO),
     [ContractRetrieval.getAttestations]: createMockAttestation(mockGetVerifiedStatus),
@@ -93,17 +100,19 @@ describe('legacyPNP', () => {
   let db: Knex
 
   const expectedVersion = getVersion()
-  const _config = config
+
+  // create deep copy
+  const _config: typeof config = JSON.parse(JSON.stringify(config))
+  _config.db.type = SupportedDatabase.Sqlite
+  _config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
+  _config.api.phoneNumberPrivacy.enabled = true
 
   beforeAll(async () => {
-    _config.db.type = SupportedDatabase.Sqlite
-    _config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
     keyProvider = await initKeyProvider(_config)
   })
 
   beforeEach(async () => {
     // Create a new in-memory database for each test.
-    _config.api.phoneNumberPrivacy.enabled = true
     db = await initDatabase(_config)
     app = startSigner(_config, db, keyProvider, newKit('dummyKit'))
   })
@@ -280,7 +289,9 @@ describe('legacyPNP', () => {
     isVerified: boolean,
     balanceCUSD: BigNumber,
     balanceCEUR: BigNumber,
-    balanceCELO: BigNumber
+    balanceCELO: BigNumber,
+    dekPubKey: string = DEK_PUBLIC_KEY,
+    walletAddress: string = mockAccount
   ) => {
     ;[
       mockContractKit.connection.getTransactionCount,
@@ -288,11 +299,13 @@ describe('legacyPNP', () => {
       mockBalanceOfCUSD,
       mockBalanceOfCEUR,
       mockBalanceOfCELO,
+      mockGetWalletAddress,
+      mockGetDataEncryptionKey,
     ].forEach((mockFn) => mockFn.mockReset())
 
     await db.transaction(async (trx) => {
       for (let i = 0; i < performedQueryCount; i++) {
-        await incrementQueryCount(db, account, rootLogger(config.serviceName), trx)
+        await incrementQueryCount(db, account, rootLogger(_config.serviceName), trx)
       }
     })
 
@@ -304,6 +317,8 @@ describe('legacyPNP', () => {
     mockBalanceOfCUSD.mockReturnValue(balanceCUSD)
     mockBalanceOfCEUR.mockReturnValue(balanceCEUR)
     mockBalanceOfCELO.mockReturnValue(balanceCELO)
+    mockGetWalletAddress.mockReturnValue(walletAddress)
+    mockGetDataEncryptionKey.mockReturnValue(dekPubKey)
   }
 
   const sendRequest = async (
@@ -335,7 +350,11 @@ describe('legacyPNP', () => {
           testCase.balanceCELO
         )
 
-        const req = getPnpQuotaRequest(testCase.account, testCase.identifier)
+        const req = getPnpQuotaRequest(
+          testCase.account,
+          AuthenticationMethod.WALLET_KEY,
+          testCase.identifier
+        )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
@@ -372,6 +391,42 @@ describe('legacyPNP', () => {
           twentyCents,
           twentyCents
         )
+      })
+
+      it('Should respond with 200 on valid request', async () => {
+        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          performedQueryCount: performedQueryCount,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+      })
+
+      it('Should respond with 200 on valid request when authenticated with DEK', async () => {
+        const req = getPnpQuotaRequest(
+          ACCOUNT_ADDRESS1,
+          AuthenticationMethod.ENCRYPTION_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
+
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          performedQueryCount: performedQueryCount,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {
@@ -414,7 +469,7 @@ describe('legacyPNP', () => {
         const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
@@ -447,9 +502,30 @@ describe('legacyPNP', () => {
         })
       })
 
-      it('Should respond with 401 on failed auth', async () => {
-        // Request from one account, signed by another account
-        const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+      it('Should respond with 401 on failed WALLET_KEY auth', async () => {
+        const badRequest = getPnpQuotaRequest(
+          ACCOUNT_ADDRESS1,
+          AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+        const authorization = getPnpRequestAuthorization(badRequest, differentPk)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+
+        expect(res.status).toBe(401)
+        expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.UNAUTHENTICATED_USER,
+        })
+      })
+
+      it('Should respond with 401 on failed DEK auth', async () => {
+        const badRequest = getPnpQuotaRequest(
+          ACCOUNT_ADDRESS1,
+          AuthenticationMethod.ENCRYPTION_KEY,
+          IDENTIFIER
+        )
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
@@ -463,8 +539,9 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        _config.api.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(_config, db, keyProvider, newKit('dummyKit'))
+        const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
+        configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
+        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(
@@ -484,6 +561,33 @@ describe('legacyPNP', () => {
       })
 
       describe('functionality in case of errors', () => {
+        it('Should respond with 200 on failure to fetch DEK', async () => {
+          mockGetDataEncryptionKey.mockImplementation(() => {
+            throw new Error()
+          })
+
+          const req = getPnpQuotaRequest(
+            ACCOUNT_ADDRESS1,
+            AuthenticationMethod.ENCRYPTION_KEY,
+            IDENTIFIER
+          )
+
+          // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
+          const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+          const authorization = getPnpRequestAuthorization(req, differentPk)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            performedQueryCount: performedQueryCount,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+        })
+
         it('Should respond with 500 on DB performedQueryCount query failure', async () => {
           const spy = jest
             .spyOn(
@@ -619,6 +723,27 @@ describe('legacyPNP', () => {
         expect(res.get(KEY_VERSION_HEADER)).toEqual(
           _config.keystore.keys.phoneNumberPrivacy.latest.toString()
         )
+      })
+
+      it('Should respond with 200 on valid request when authenticated with DEK', async () => {
+        const req = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.ENCRYPTION_KEY,
+          IDENTIFIER
+        )
+        const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
+        const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(200)
+        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          success: true,
+          version: res.body.version,
+          signature: expectedSignature,
+          performedQueryCount: performedQueryCount + 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
       })
 
       it('Should respond with 200 on valid request with key version header', async () => {
@@ -783,11 +908,29 @@ describe('legacyPNP', () => {
         })
       })
 
-      it('Should respond with 401 on failed auth', async () => {
+      it('Should respond with 401 on failed WALLET_KEY auth', async () => {
         const badRequest = getLegacyPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
           AuthenticationMethod.WALLET_KEY,
+          IDENTIFIER
+        )
+        const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+        const authorization = getPnpRequestAuthorization(badRequest, differentPk)
+        const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+        expect(res.status).toBe(401)
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.UNAUTHENTICATED_USER,
+        })
+      })
+
+      it('Should respond with 401 on failed DEK auth', async () => {
+        const badRequest = getLegacyPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.ENCRYPTION_KEY,
           IDENTIFIER
         )
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
@@ -806,7 +949,7 @@ describe('legacyPNP', () => {
         const remainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i < remainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
         const req = getLegacyPnpSignRequest(
@@ -863,7 +1006,7 @@ describe('legacyPNP', () => {
         const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
           }
         })
 
@@ -889,7 +1032,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 503 on disabled api', async () => {
-        const configWithApiDisabled = { ...config }
+        const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
 
@@ -916,17 +1059,17 @@ describe('legacyPNP', () => {
       })
 
       describe('functionality in case of errors', () => {
-        it('Should return 200 w/ warning on DB performedQueryCount query failure', async () => {
+        it('Should return 500 on DB performedQueryCount query failure', async () => {
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(expectedQuota)
 
           const spy = jest
@@ -945,40 +1088,31 @@ describe('legacyPNP', () => {
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
 
-          expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-            success: true,
+          expect(res.status).toBe(500)
+          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            success: false,
             version: res.body.version,
-            signature: expectedSignature,
-            performedQueryCount: 1,
+            performedQueryCount: -1,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
-            warnings: [
-              ErrorMessage.DATABASE_GET_FAILURE,
-              ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
-            ],
+            error: ErrorMessage.DATABASE_GET_FAILURE,
           })
 
           spy.mockRestore()
-
-          // check DB state: performedQueryCount was still incremented and request was stored
-          expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
-          ).toBe(expectedQuota + 1)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(true)
         })
 
-        it('Should return 200 w/ warning on blockchain totalQuota query failure', async () => {
+        it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
+          expect(_config.api.phoneNumberPrivacy.shouldFailOpen).toBe(true)
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(expectedQuota)
 
           mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
@@ -1005,9 +1139,42 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was incremented and request was stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(expectedQuota + 1)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(true)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(true)
+        })
+
+        it('Should return 500 on blockchain totalQuota query failure when shouldFailOpen is false', async () => {
+          mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
+
+          const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
+          configWithFailOpenDisabled.api.phoneNumberPrivacy.shouldFailOpen = false
+          const appWithFailOpenDisabled = startSigner(configWithFailOpenDisabled, db, keyProvider)
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.LEGACY_PNP_SIGN,
+            '1',
+            appWithFailOpenDisabled
+          )
+
+          expect(res.status).toBe(500)
+          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+            success: false,
+            version: res.body.version,
+            performedQueryCount: performedQueryCount,
+            totalQuota: -1,
+            blockNumber: testBlockNumber,
+            error: ErrorMessage.FULL_NODE_ERROR,
+          })
         })
 
         it('Should return 200 w/ warning on failure to increment query count', async () => {
@@ -1045,9 +1212,9 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
 
         it('Should return 200 w/ warning on failure to store request', async () => {
@@ -1079,9 +1246,37 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount + 1)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
+        })
+
+        it('Should return 200 on failure to fetch DEK', async () => {
+          mockGetDataEncryptionKey.mockImplementation(() => {
+            throw new Error()
+          })
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.ENCRYPTION_KEY,
+            IDENTIFIER
+          )
+
+          // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
+          const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
+          const authorization = getPnpRequestAuthorization(req, differentPk)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+          expect(res.status).toBe(200)
+          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount + 1,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
         })
 
         it('Should return 500 on bls signing error', async () => {
@@ -1114,9 +1309,9 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
       })
     })

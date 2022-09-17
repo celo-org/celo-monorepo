@@ -19,7 +19,7 @@ export class Controller<R extends OdisRequest> {
       }
     } catch (err) {
       response.locals.logger.error(
-        { error: err },
+        { err },
         `Unknown error in handler for ${this.action.io.endpoint}`
       )
       this.action.io.sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, response)

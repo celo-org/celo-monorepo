@@ -11,7 +11,7 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "test": "jest --testPathIgnorePatterns test/end-to-end",
-    "test:coverage": "jest --testPathIgnorePatterns test/end-to-end --coverage",
+    "test:coverage": "yarn test --coverage",
     "lint": "tslint -c tslint.json --project ."
   },
   "files": [

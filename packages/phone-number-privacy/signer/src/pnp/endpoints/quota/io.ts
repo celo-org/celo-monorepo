@@ -25,7 +25,11 @@ import { PnpSession } from '../../session'
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly endpoint = SignerEndpoint.PNP_QUOTA
 
-  constructor(enabled: boolean, readonly kit: ContractKit) {
+  constructor(
+    readonly enabled: boolean,
+    readonly shouldFailOpen: boolean,
+    readonly kit: ContractKit
+  ) {
     super(enabled)
   }
 
@@ -53,7 +57,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   }
 
   async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger)
+    return authenticateUser(request, this.kit, logger, this.shouldFailOpen)
   }
 
   sendSuccess(

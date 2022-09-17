@@ -16,9 +16,10 @@ import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './const
  * Authorization header should contain the EC signed body
  */
 export async function authenticateUser(
-  request: Request,
+  request: Request, // TODO(2.0.0, optional) this could take in a generic for the different request types
   contractKit: ContractKit,
-  logger: Logger
+  logger: Logger,
+  shouldFailOpen: boolean = true
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 
@@ -36,9 +37,18 @@ export async function authenticateUser(
     let registeredEncryptionKey
     try {
       registeredEncryptionKey = await getDataEncryptionKey(signer, contractKit, logger)
-    } catch (error) {
-      logger.warn('Assuming request is authenticated')
-      return true
+    } catch (err) {
+      // getDataEncryptionKey should only throw if there is a full-node connection issue.
+      // That is, it does not throw if the DEK is undefined or invalid
+      logger.error({ err, shouldFailOpen }, ErrorMessage.FAILURE_TO_GET_DEK)
+      if (shouldFailOpen) {
+        // TODO(2.0.0, release) add monitoring / alerting for these
+        logger.error(ErrorMessage.FAILING_OPEN)
+        return true
+      } else {
+        logger.error(ErrorMessage.FAILING_CLOSED)
+        return false
+      }
     }
     if (!registeredEncryptionKey) {
       logger.warn({ account: signer }, 'Account does not have registered encryption key')
@@ -57,9 +67,11 @@ export async function authenticateUser(
 
   // Fallback to previous signing pattern
   logger.info(
-    { account: signer },
+    { account: signer, message, messageSignature },
     'Message was not authenticated with DEK, attempting to authenticate using wallet key'
   )
+  // TODO(2.0.0) This uses signature utils, why doesn't DEK authentication?
+  // (https://github.com/celo-org/celo-monorepo/issues/9803)
   return verifySignature(message, messageSignature, signer)
 }
 

@@ -64,7 +64,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   }
 
   async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger)
+    return authenticateUser(request, this.kit, logger, this.config.shouldFailOpen)
   }
 
   sendSuccess(

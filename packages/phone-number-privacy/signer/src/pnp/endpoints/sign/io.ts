@@ -27,7 +27,11 @@ import { PnpSession } from '../../session'
 export class PnpSignIO extends IO<SignMessageRequest> {
   readonly endpoint = SignerEndpoint.PNP_SIGN
 
-  constructor(enabled: boolean, readonly kit: ContractKit) {
+  constructor(
+    readonly enabled: boolean,
+    readonly shouldFailOpen: boolean,
+    readonly kit: ContractKit
+  ) {
     super(enabled)
   }
 
@@ -64,7 +68,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     request: Request<{}, {}, SignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger)
+    return authenticateUser(request, this.kit, logger, this.shouldFailOpen)
   }
 
   sendSuccess(
