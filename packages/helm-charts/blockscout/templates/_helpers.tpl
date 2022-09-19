@@ -120,6 +120,17 @@ blockscout components.
     secretKeyRef:
       name:  {{ .Release.Name }}
       key: DATABASE_PASSWORD
+- name: ERLANG_COOKIE
+  valueFrom:
+    secretKeyRef:
+      name:  {{ .Values.blockscout.cookieSecretName }}
+      key: ERLANG_COOKIE
+- name: POD_IP
+  valueFrom:
+    fieldRef:
+      fieldPath: status.podIP
+- name: EPMD_SERVICE_NAME
+  value: {{ .Release.Name }}-epmd-service
 - name: NETWORK
   value: Celo
 - name: SUBNETWORK

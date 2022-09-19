@@ -28,6 +28,10 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" $.Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "common.app" -}}
+{{- default $.Chart.Name .Values.appOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{- define "common.standard.labels" -}}
 {{- include "common.standard.short_labels" . }}
 chart: {{ template "common.chart" . }}
@@ -35,7 +39,7 @@ heritage: {{ .Release.Service }}
 {{- end -}}
 
 {{- define "common.standard.short_labels" -}}
-app: {{ template "common.name" . }}
+app: {{ template "common.app" . }}
 release: {{ .Release.Name }}
 {{- end -}}
 
@@ -119,6 +123,7 @@ fi
     fi
 
     # Taking local ip for natting (probably this means pod cannot have incomming connection from external LAN peers)
+    set +u
     if [[ -z $NAT_IP ]]; then
       if [[ -f /root/.celo/ipAddress]]; then
         NAT_IP=$(cat /root/.celo/ipAddress)
@@ -127,6 +132,7 @@ fi
       fi
     fi
     NAT_FLAG="--nat=extip:${NAT_IP}"
+    set -u
 
     ADDITIONAL_FLAGS='{{ .geth_flags | default "" }}'
     if [[ -f /root/.celo/pkey ]]; then
@@ -198,7 +204,7 @@ fi
       --nousb \
       --syncmode={{ .syncmode | default .Values.geth.syncmode }} \
       --gcmode={{ .gcmode | default .Values.geth.gcmode }} \
-      --rpc.gascap={{- printf "%v" (default (int .Values.geth.rpc_gascap) (int .rcp_gascap)) -}} \
+      --rpc.gascap={{- printf "%v" (default (int .Values.geth.rpc_gascap) (int .rcp_gascap)) }} \
       ${NAT_FLAG} \
       --consoleformat=json \
       --consoleoutput=stdout \
@@ -484,7 +490,7 @@ metadata:
     component: {{ .component_label }}
 spec:
   selector:
-    app: {{ template "common.name" $ }}
+    app: {{ template "common.app" $ }}
     release: {{ $.Release.Name }}
     component: {{ .component_label }}
 {{ if .extra_selector -}}

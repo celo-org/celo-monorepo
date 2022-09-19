@@ -113,8 +113,6 @@ contract Governance is
 
   event DequeueFrequencySet(uint256 dequeueFrequency);
 
-  event ApprovalStageDurationSet(uint256 approvalStageDuration);
-
   event ReferendumStageDurationSet(uint256 referendumStageDuration);
 
   event ExecutionStageDurationSet(uint256 executionStageDuration);
@@ -197,10 +195,13 @@ contract Governance is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 1, 1);
+    return (1, 3, 0, 0);
   }
 
   /**
@@ -212,8 +213,6 @@ contract Governance is
    * @param _queueExpiry The number of seconds a proposal can stay in the queue before expiring.
    * @param _dequeueFrequency The number of seconds before the next batch of proposals can be
    *   dequeued.
-   * @param approvalStageDuration The number of seconds the approver has to approve a proposal
-   *   after it is dequeued.
    * @param referendumStageDuration The number of seconds users have to vote on a dequeued proposal
    *   after the approval stage ends.
    * @param executionStageDuration The number of seconds users have to execute a passed proposal
@@ -231,7 +230,6 @@ contract Governance is
     uint256 _minDeposit,
     uint256 _queueExpiry,
     uint256 _dequeueFrequency,
-    uint256 approvalStageDuration,
     uint256 referendumStageDuration,
     uint256 executionStageDuration,
     uint256 participationBaseline,
@@ -246,7 +244,6 @@ contract Governance is
     setMinDeposit(_minDeposit);
     setQueueExpiry(_queueExpiry);
     setDequeueFrequency(_dequeueFrequency);
-    setApprovalStageDuration(approvalStageDuration);
     setReferendumStageDuration(referendumStageDuration);
     setExecutionStageDuration(executionStageDuration);
     setParticipationBaseline(participationBaseline);
@@ -312,17 +309,6 @@ contract Governance is
     require(_dequeueFrequency != dequeueFrequency, "dequeueFrequency unchanged");
     dequeueFrequency = _dequeueFrequency;
     emit DequeueFrequencySet(_dequeueFrequency);
-  }
-
-  /**
-   * @notice Updates the number of seconds proposals stay in the approval stage.
-   * @param approvalStageDuration The number of seconds proposals stay in the approval stage.
-   */
-  function setApprovalStageDuration(uint256 approvalStageDuration) public onlyOwner {
-    require(approvalStageDuration > 0, "Duration must be larger than 0");
-    require(approvalStageDuration != stageDurations.approval, "Duration unchanged");
-    stageDurations.approval = approvalStageDuration;
-    emit ApprovalStageDurationSet(approvalStageDuration);
   }
 
   /**
@@ -491,7 +477,8 @@ contract Governance is
   /**
    * @notice Requires a proposal is dequeued and removes it if expired.
    * @param proposalId The ID of the proposal.
-   * @return The proposal storage struct and stage corresponding to `proposalId`.
+   * @return The proposal storage struct corresponding to `proposalId`.
+   * @return The proposal stage corresponding to `proposalId`.
    */
   function requireDequeuedAndDeleteExpired(uint256 proposalId, uint256 index)
     private
@@ -611,7 +598,10 @@ contract Governance is
     }
 
     require(!proposal.isApproved(), "Proposal already approved");
-    require(stage == Proposals.Stage.Approval, "Proposal not in approval stage");
+    require(
+      stage == Proposals.Stage.Referendum || stage == Proposals.Stage.Execution,
+      "Proposal not in correct stage"
+    );
     proposal.approved = true;
     // Ensures networkWeight is set by the end of the Referendum stage, even if 0 votes are cast.
     proposal.networkWeight = getLockedGold().getTotalLockedGold();
@@ -644,7 +634,6 @@ contract Governance is
     address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
-    require(proposal.isApproved(), "Proposal not approved");
     require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
     require(value != Proposals.VoteValue.None, "Vote value unset");
     require(weight > 0, "Voter weight zero");
@@ -726,6 +715,7 @@ contract Governance is
     );
     bool notExpired = proposal.exists();
     if (notExpired) {
+      require(proposal.isApproved(), "Proposal not approved");
       require(
         stage == Proposals.Stage.Execution && _isProposalPassing(proposal),
         "Proposal not in execution stage or not passing"
@@ -836,14 +826,6 @@ contract Governance is
   }
 
   /**
-   * @notice Returns the number of seconds proposals stay in approval stage.
-   * @return The number of seconds proposals stay in approval stage.
-   */
-  function getApprovalStageDuration() external view returns (uint256) {
-    return stageDurations.approval;
-  }
-
-  /**
    * @notice Returns the number of seconds proposals stay in the referendum stage.
    * @return The number of seconds proposals stay in the referendum stage.
    */
@@ -861,7 +843,10 @@ contract Governance is
 
   /**
    * @notice Returns the participation parameters.
-   * @return The participation parameters.
+   * @return baseline The participation baseline parameter.
+   * @return baselineFloor The participation baseline floor parameter.
+   * @return baselineUpdateFactor The participation baseline update factor parameter.
+   * @return baselineQuorumFactor The participation baseline quorum factor parameter.
    */
   function getParticipationParameters() external view returns (uint256, uint256, uint256, uint256) {
     return (
@@ -884,7 +869,11 @@ contract Governance is
   /**
    * @notice Returns an unpacked proposal struct with its transaction count.
    * @param proposalId The ID of the proposal to unpack.
-   * @return The unpacked proposal with its transaction count.
+   * @return proposer
+   * @return deposit
+   * @return timestamp
+   * @return transaction Transaction count.
+   * @return description Description url.
    */
   function getProposal(uint256 proposalId)
     external
@@ -898,7 +887,9 @@ contract Governance is
    * @notice Returns a specified transaction in a proposal.
    * @param proposalId The ID of the proposal to query.
    * @param index The index of the specified transaction in the proposal's transaction list.
-   * @return The specified transaction.
+   * @return value Transaction value.
+   * @return destination Transaction destination.
+   * @return data Transaction data.
    */
   function getProposalTransaction(uint256 proposalId, uint256 index)
     external
@@ -920,7 +911,9 @@ contract Governance is
   /**
    * @notice Returns the referendum vote totals for a proposal.
    * @param proposalId The ID of the proposal.
-   * @return The yes, no, and abstain vote totals.
+   * @return yes The yes vote totals.
+   * @return no The no vote totals.
+   * @return abstain The abstain vote totals.
    */
   function getVoteTotals(uint256 proposalId) external view returns (uint256, uint256, uint256) {
     return proposals[proposalId].getVoteTotals();
@@ -931,6 +924,8 @@ contract Governance is
    * @param account The address of the account to get the record for.
    * @param index The index in `dequeued`.
    * @return The corresponding proposal ID, vote value, and weight.
+   * @return The corresponding vote value.
+   * @return The corresponding weight.
    */
   function getVoteRecord(address account, uint256 index)
     external
@@ -961,7 +956,8 @@ contract Governance is
 
   /**
    * @notice Returns the proposal ID and upvote total for all queued proposals.
-   * @return The proposal ID and upvote total for all queued proposals.
+   * @return proposalID The proposal ID for all queued proposals.
+   * @return total The upvote total for all queued proposals.
    * @dev Note that this includes expired proposals that have yet to be removed from the queue.
    */
   function getQueue() external view returns (uint256[] memory, uint256[] memory) {
@@ -980,7 +976,8 @@ contract Governance is
   /**
    * @notice Returns the ID of the proposal upvoted by `account` and the weight of that upvote.
    * @param account The address of the account.
-   * @return The ID of the proposal upvoted by `account` and the weight of that upvote.
+   * @return The ID of the proposal upvoted by `account`.
+   * @return The weight of that upvote.
    */
   function getUpvoteRecord(address account) external view returns (uint256, uint256) {
     UpvoteRecord memory upvoteRecord = voters[account].upvote;
@@ -1030,7 +1027,9 @@ contract Governance is
   /**
    * @notice Gets information about a hotfix.
    * @param hash The abi encoded keccak256 hash of the hotfix transaction.
-   * @return Hotfix tuple of (approved, executed, preparedEpoch)
+   * @return Hotfix approved.
+   * @return Hotfix executed.
+   * @return Hotfix preparedEpoch.
    */
   function getHotfixRecord(bytes32 hash) public view returns (bool, bool, uint256) {
     return (hotfixes[hash].approved, hotfixes[hash].executed, hotfixes[hash].preparedEpoch);
@@ -1046,6 +1045,8 @@ contract Governance is
     if (now >= lastDequeue.add(dequeueFrequency)) {
       uint256 numProposalsToDequeue = Math.min(concurrentProposals, queue.list.numElements);
       uint256[] memory dequeuedIds = queue.popN(numProposalsToDequeue);
+
+      bool wasAnyProposalDequeued = false;
       for (uint256 i = 0; i < numProposalsToDequeue; i = i.add(1)) {
         uint256 proposalId = dequeuedIds[i];
         Proposals.Proposal storage proposal = proposals[proposalId];
@@ -1068,9 +1069,12 @@ contract Governance is
         }
         // solhint-disable-next-line not-rely-on-time
         emit ProposalDequeued(proposalId, now);
+        wasAnyProposalDequeued = true;
       }
-      // solhint-disable-next-line not-rely-on-time
-      lastDequeue = now;
+      if (wasAnyProposalDequeued) {
+        // solhint-disable-next-line not-rely-on-time
+        lastDequeue = now;
+      }
     }
   }
 
@@ -1166,12 +1170,10 @@ contract Governance is
     returns (bool)
   {
     // The proposal is considered expired under the following conditions:
-    //   1. Past the approval stage and not approved.
-    //   2. Past the referendum stage and not passing.
-    //   3. Past the execution stage.
+    //   1. Past the referendum stage and not passing.
+    //   2. Past the execution stage.
     return ((stage > Proposals.Stage.Execution) ||
-      (stage > Proposals.Stage.Referendum && !_isProposalPassing(proposal)) ||
-      (stage > Proposals.Stage.Approval && !proposal.isApproved()));
+      (stage > Proposals.Stage.Referendum && !_isProposalPassing(proposal)));
   }
 
   /**

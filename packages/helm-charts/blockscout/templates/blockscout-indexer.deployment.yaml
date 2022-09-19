@@ -50,7 +50,7 @@ spec:
         - -c
         args:
         - |
-           exec mix cmd --app indexer "iex --name {{ .Values.blockscout.indexer.erlangNodeName}}@0.0.0.0 -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix run --no-compile"
+           exec mix cmd --app indexer "iex --cookie $(ERLANG_COOKIE) --name {{ .Values.blockscout.erlangNodeName}}@$(POD_IP) -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix run --no-compile"
         ports:
         - name: health
           containerPort: {{ .Values.blockscout.indexer.port }}
@@ -89,6 +89,10 @@ spec:
           value: {{ .Values.blockscout.indexer.pool_size | quote }}
         - name: METRICS_ENABLED
           value: "{{.Values.blockscout.metrics.enabled}}"
+        - name: INDEXER_DISABLE_EMPTY_BLOCK_SANITIZER
+          value: "false"
+        - name: DISPLAY_REWARDS
+          value: "{{.Values.blockscout.epoch_rewards.enabled}}"
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
 {{- $data := dict "Values" .Values "Database" .Values.blockscout.indexer.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}

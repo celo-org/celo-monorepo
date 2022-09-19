@@ -87,6 +87,8 @@ const DefaultConfig = {
     updateFrequency: 5 * MINUTE,
     minimumReports: 1,
     frozen: false,
+    minSupplyForStableBucketCap: '1000000000000000000000000', // 1e24 = 1M
+    stableBucketFractionCap: 1 / 22,
   },
   gasPriceMinimum: {
     minimumFloor: 100000000,
@@ -237,6 +239,10 @@ const DefaultConfig = {
     groupName: 'cLabs',
     commission: 0.1,
     votesRatioOfLastVsFirstGroup: 2.0,
+  },
+  stableTokenRegistry: {
+    fiatTicker: [], // empty array resambles empty bytes
+    stableTokenContractName: [], // empty array resambles empty bytes
   },
 }
 

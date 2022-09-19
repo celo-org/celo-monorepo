@@ -56,6 +56,7 @@ export abstract class BaseOracleDeployer {
       this.releaseName,
       helmChartPath,
       await this.helmParameters(),
+      true,
       `${this.currencyPair}.yaml`
     )
   }

@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { execCmd, execCmdAndParseJson } from 'src/lib/cmd-utils'
-import { envVar, fetchEnv, fetchEnvOrFallback, isVmBased } from 'src/lib/env-utils'
+import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   getConfigMapHashes,
   HelmAction,
@@ -16,10 +16,8 @@ import {
 import { switchToProjectFromEnv } from 'src/lib/utils'
 
 const yaml = require('js-yaml')
-const chartDirForVersion: Record<number, string> = {
-  2: '../helm-charts/eksportisto-2.0',
-  3: '../helm-charts/eksportisto',
-}
+
+const chartDir = '../helm-charts/eksportisto'
 
 function baseName(suffix: string) {
   if (suffix.length > 0) {
@@ -36,24 +34,15 @@ function releaseName(celoEnv: string, suffix: string) {
 interface Context {
   releaseName: string
   suffix: string
-  chartVersion: number
-  chartDir: string
   celoEnv: string
 }
 
 function buildContext(celoEnv: string): Context {
-  const chartVersion = parseInt(fetchEnv(envVar.EKSPORTISTO_CHART_VERSION), 10)
   const suffix = fetchEnvOrFallback(envVar.EKSPORTISTO_SUFFIX, '')
-  const chartDir = chartDirForVersion[chartVersion]
-  if (chartDir === undefined) {
-    throw new Error('version has to be 2 or 3')
-  }
 
   return {
     releaseName: releaseName(celoEnv, suffix),
-    chartDir,
     celoEnv,
-    chartVersion,
     suffix,
   }
 }
@@ -65,7 +54,7 @@ export async function installHelmChart(celoEnv: string) {
   await installGenericHelmChart(
     context.celoEnv,
     context.releaseName,
-    context.chartDir,
+    chartDir,
     params.concat(`--set configHash="${await getConfigMapHash(context, params, 'install')}"`)
   )
 }
@@ -77,7 +66,7 @@ export async function upgradeHelmChart(celoEnv: string) {
   await upgradeGenericHelmChart(
     context.celoEnv,
     context.releaseName,
-    context.chartDir,
+    chartDir,
     params.concat(`--set configHash="${await getConfigMapHash(context, params, 'upgrade')}"`)
   )
 }
@@ -156,7 +145,7 @@ async function getConfigMapHash(context: Context, params: string[], action: Helm
   const hashes = await getConfigMapHashes(
     context.celoEnv,
     context.releaseName,
-    context.chartDir,
+    chartDir,
     params,
     action
   )
@@ -225,47 +214,16 @@ async function helmParameters(context: Context) {
     `--set deploymentSuffix=${suffix}`,
   ]
 
-  if (context.chartVersion === 2) {
-    const serviceAccountKeyBase64 = await getServiceAccountKeyBase64(celoEnv)
-    const serviceAccountEmail = await getServiceAccountEmail(getServiceAccountName(celoEnv))
-    await allowServiceAccountToWriteToBigquery(serviceAccountEmail)
-    params.push(
-      `--set bigquery.dataset=${celoEnv}_eksportisto_${suffix}`,
-      `--set serviceAccountBase64="${serviceAccountKeyBase64}"`
-    )
-  } else if (context.chartVersion === 3) {
-    const serviceAccountKeyBase64 = await getServiceAccountKeyBase64(celoEnv)
-    const serviceAccountEmail = await getServiceAccountEmail(getServiceAccountName(celoEnv))
-    await allowServiceAccountToWriteToBigquery(serviceAccountEmail)
-    params.push(
-      `--set bigquery.dataset=${celoEnv}_eksportisto`,
-      `--set serviceAccountBase64="${serviceAccountKeyBase64}"`
-    )
-  }
+  const serviceAccountKeyBase64 = await getServiceAccountKeyBase64(celoEnv)
+  const serviceAccountEmail = await getServiceAccountEmail(getServiceAccountName(celoEnv))
+  await allowServiceAccountToWriteToBigquery(serviceAccountEmail)
+  params.push(
+    `--set bigquery.dataset=${celoEnv}_eksportisto`,
+    `--set serviceAccountBase64="${serviceAccountKeyBase64}"`
+  )
 
-  // These node parameters are not used by the latest eksportisto release.
-  // TODO(pedro-clabs): remove once eksportisto 14 is decomissioned.
-  if (isVmBased() && context.chartVersion < 3) {
-    const nodes = await getInternalTxNodeIps(context)
-    if (nodes.tip === undefined) {
-      throw new Error(`No nodes in the VM group ar labeled as "eksportisto-${context.suffix}-tip"`)
-    }
-
-    params.push(`--set celoTipNodeIP="${nodes.tip.ip}"`)
-    if (context.chartVersion === 2) {
-      if (nodes.backfill.length === 0) {
-        throw new Error(
-          `No nodes in the VM group are labeled as "eksportisto-${context.suffix}-backfill`
-        )
-      }
-      params.push(
-        ...nodes.backfill.map((node, idx) => `--set celoBackfillNodeIPs[${idx}]="${node.ip}"`)
-      )
-    }
-  } else {
-    params.push(`--set celoTipNodeIP="tx-nodes"`)
-    params.push(`--set celoBackfillNodeIPs[0]="tx-nodes"`)
-  }
+  params.push(`--set celoTipNodeIP="tx-nodes"`)
+  params.push(`--set celoBackfillNodeIPs[0]="tx-nodes"`)
 
   return params
 }

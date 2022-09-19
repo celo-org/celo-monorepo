@@ -1,4 +1,4 @@
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Release.Name }}-web
@@ -16,4 +16,9 @@ spec:
   - type: Resource
     resource:
       name: cpu
-      targetAverageUtilization: {{ .Values.blockscout.web.autoscaling.target.cpu }}
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.blockscout.web.autoscaling.target.cpu }}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 3600

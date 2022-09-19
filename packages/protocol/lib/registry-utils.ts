@@ -38,6 +38,7 @@ export enum CeloContractName {
   StableTokenBRL = 'StableTokenBRL',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
+  StableTokenRegistry = 'StableTokenRegistry',
 }
 
 export const usesRegistry = [

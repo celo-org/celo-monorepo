@@ -324,6 +324,14 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
     )
   }
 
+  /**
+   * Removes the currently authorized attestation signer for the account
+   * @returns A CeloTransactionObject
+   */
+  async removeAttestationSigner(): Promise<CeloTransactionObject<void>> {
+    return toTransactionObject(this.connection, this.contract.methods.removeAttestationSigner())
+  }
+
   async generateProofOfKeyPossession(account: Address, signer: Address) {
     return this.getParsedSignatureOfAddress(
       account,
@@ -428,6 +436,33 @@ export class AccountsWrapper extends BaseWrapper<Accounts> {
    * @param url The url to set
    */
   setMetadataURL = proxySend(this.connection, this.contract.methods.setMetadataURL)
+
+  /**
+   * Set a validator's payment delegation settings.
+   * @param beneficiary The address that should receive a portion of validator
+   * payments.
+   * @param fraction The fraction of the validator's payment that should be
+   * diverted to `beneficiary` every epoch, given as FixidityLib value. Must not
+   * be greater than 1.
+   * @dev Use `deletePaymentDelegation` to unset the payment delegation.
+   */
+  setPaymentDelegation = proxySend(this.connection, this.contract.methods.setPaymentDelegation)
+
+  /**
+   * Remove a validator's payment delegation by setting benficiary and
+   * fraction to 0.
+   */
+  deletePaymentDelegation = proxySend(
+    this.connection,
+    this.contract.methods.deletePaymentDelegation
+  )
+
+  /**
+   * Get a validator's payment delegation settings.
+   * @param account Account of the validator.
+   * @return Beneficiary address and fraction of payment delegated.
+   */
+  getPaymentDelegation = proxyCall(this.contract.methods.getPaymentDelegation)
 
   /**
    * Sets the wallet address for the account

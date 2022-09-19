@@ -149,7 +149,9 @@ library AddressSortedLinkedListWithMedian {
   /**
    * @notice Gets all elements from the doubly linked list.
    * @param list A storage pointer to the underlying list.
-   * @return An unpacked list of elements from largest to smallest.
+   * @return Array of all keys in the list.
+   * @return Values corresponding to keys, which will be ordered largest to smallest.
+   * @return Array of relations to median of corresponding list elements.
    */
   function getElements(SortedLinkedListWithMedian.List storage list)
     public
