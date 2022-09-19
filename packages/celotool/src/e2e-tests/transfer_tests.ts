@@ -2,7 +2,7 @@
 import { CeloTxPending, CeloTxReceipt, TransactionResult } from '@celo/connect'
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
 import { CeloTokenType, EachCeloToken, StableToken, Token } from '@celo/contractkit/lib/celo-tokens'
-import { eqAddress } from '@celo/utils/lib/address'
+import { eqAddress, toChecksumAddress } from '@celo/utils/lib/address'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
@@ -89,10 +89,50 @@ const INTRINSIC_TX_GAS_COST = 21000
 // Additional intrinsic gas for a transaction with fee currency specified
 const ADDITIONAL_INTRINSIC_TX_GAS_COST = 50000
 
-// Gas refund for resetting to the original non-zero value
-const sstoreCleanRefundEIP2200 = 4200
-// Transfer cost of a stable token transfer, accounting for the refund above.
-const stableTokenTransferGasCost = 23653
+// If the To address has zero as the balance, the cost of writting that address is
+const sstoreSetGasEIP2200 = 20000
+const sstoreResetGasEIP2200 = 5000
+const coldSloadCostEIP2929 = 800 // The Eip2929 set this to 2100, but our Cip48 back to 800
+const coldAccountAccessCostEIP2929 = 900 // The Eip2929 set this to 2600, but our Cip48 back to 900
+const warmStorageReadCostEIP2929 = 100 // Eip2929 and Cip48
+
+// This number represent the gasUsed in the execution of the StableToken transfer assuming:
+// - Nothing was preloaded in the state accessList, so the first storage calls will cost:
+//    * ColdSloadCostEIP2929 = 800
+//    * ColdAccountAccessCostEIP2929 = 900
+// - The From and To address
+//     * HAVE funds
+//     * non of those will be zero after the transfer
+//     * non those were modified before (as part of the same tx)
+//     * This means that both SSTORE (From and To) will cost:
+//         SstoreResetGasEIP2200 [5000] - ColdSloadCostEIP2929 [800] => 4200
+// - No intrinsic gas involved BUT 630 gas charged for the amount of bytes sent
+const basicStableTokenTransferGasCost = 31253
+
+// As the basicStableTokenTransferGasCost assumes that the transfer TO have funds, we should
+// only add the difference to calculate the gas (sstoreSetGasEIP2200 - 4200) => 15800
+const emptyFundsBeforeForBasicCalc =
+  sstoreSetGasEIP2200 - (sstoreResetGasEIP2200 - coldSloadCostEIP2929) // 15800
+
+// The StableToken transfer, paid with the same StableToken, preloads a lot of state
+// when the fee is subsctracted from the account, which generates that the basicStableTokenTransferGasCost
+// cost less. The actual differences:
+// - SLOADS ColdSloadCostEIP2929 -> WarmStorageReadCostEIP2929 (-700 each)
+//   * 6 from the stableToken contract
+//   * 2 from the celoRegistry contract
+//   * 2 from the Freeze contract
+// - Account Check ( EXTCODEHASH | EXTCODESIZE | ext BALANCE)
+//          coldAccountAccessCostEIP2929 -> WarmStorageReadCostEIP2929 (-800 each)
+//   * 3 from the stableToken contract
+//   * 1 from the celoRegistry contract
+//   * 1 from the Freeze contract
+// - The From account as already modified the state for that address
+//   * This will make that instead of SstoreResetGasEIP2200 [5000] - ColdSloadCostEIP2929 [800] => 4200
+//     will cost WarmStorageReadCostEIP2929 [100] (-4100)
+const savingGasStableTokenTransferPaidWithSameStable =
+  (coldSloadCostEIP2929 - warmStorageReadCostEIP2929) * 10 +
+  (coldAccountAccessCostEIP2929 - warmStorageReadCostEIP2929) * 5 +
+  (sstoreResetGasEIP2200 - coldSloadCostEIP2929 - warmStorageReadCostEIP2929) // 15100
 
 /** Helper to watch balance changes over accounts */
 interface BalanceWatcher {
@@ -177,6 +217,7 @@ describe('Transfer tests', function (this: any) {
     genesisConfig: {
       churritoBlock: 0,
       donutBlock: 0,
+      espressoBlock: 0,
     },
     instances: [
       {
@@ -465,6 +506,45 @@ describe('Transfer tests', function (this: any) {
     })
   }
 
+  const toTemplate = '0xbBae99F0E1EE565404465638d40827b54D343' // missed the last 3 numbers
+  // Starts with 1, otherwise the address could have the last byte as 00 which would change
+  // the gas consumption
+  let toCounter = 1
+
+  function generateCleanAddress(): string {
+    toCounter += 1
+    // avoid the '00' at the end (check toCounter comment)
+    toCounter = toCounter % 100 == 0 ? toCounter + 1 : toCounter
+
+    return toChecksumAddress(toTemplate + toCounter.toString().padStart(3, '0'))
+  }
+
+  function testTwiceFirstAndSecondFundToANewAddress(testObject: {
+    transferToken: CeloTokenType
+    feeToken: CeloTokenType
+    expectedGas: number
+    expectSuccess?: boolean
+    txOptions?: {
+      gas?: number
+      gatewayFeeRecipient?: string
+      gatewayFee?: string
+    }
+    fromAddress?: string
+    toAddress?: string
+  }) {
+    const expectedGasAux = testObject.expectedGas
+    testObject.toAddress = generateCleanAddress()
+    // Add the fee to save to an empty address
+    testObject.expectedGas += emptyFundsBeforeForBasicCalc
+    describe('first fund to the To account', () => {
+      testTransferToken(testObject)
+    })
+    testObject.expectedGas = expectedGasAux
+    describe('second fund to the To account', () => {
+      testTransferToken(testObject)
+    })
+  }
+
   function testTransferToken({
     transferToken,
     feeToken,
@@ -506,14 +586,6 @@ describe('Transfer tests', function (this: any) {
         ...txOptions,
         feeCurrency,
       })
-
-      // Writing to an empty storage location (e.g. an uninitialized ERC20 account) costs 15k extra gas.
-      if (
-        kit.celoTokens.isStableToken(transferToken) &&
-        balances.initial(toAddress, transferToken).eq(0)
-      ) {
-        expectedGas += 15000
-      }
 
       txRes = await runTestTransaction(txResult, expectedGas, feeCurrency)
 
@@ -695,20 +767,20 @@ describe('Transfer tests', function (this: any) {
 
         describe('Transfer CeloDollars', () => {
           describe('feeCurrency = CeloDollars >', () => {
-            testTransferToken({
+            testTwiceFirstAndSecondFundToANewAddress({
               expectedGas:
-                stableTokenTransferGasCost +
+                basicStableTokenTransferGasCost +
                 INTRINSIC_TX_GAS_COST +
-                ADDITIONAL_INTRINSIC_TX_GAS_COST,
+                ADDITIONAL_INTRINSIC_TX_GAS_COST -
+                savingGasStableTokenTransferPaidWithSameStable,
               transferToken: StableToken.cUSD,
               feeToken: StableToken.cUSD,
             })
           })
 
           describe('feeCurrency = CeloGold >', () => {
-            testTransferToken({
-              expectedGas:
-                stableTokenTransferGasCost + INTRINSIC_TX_GAS_COST + sstoreCleanRefundEIP2200,
+            testTwiceFirstAndSecondFundToANewAddress({
+              expectedGas: basicStableTokenTransferGasCost + INTRINSIC_TX_GAS_COST,
               transferToken: StableToken.cUSD,
               feeToken: Token.CELO,
             })
@@ -763,11 +835,12 @@ describe('Transfer tests', function (this: any) {
 
         describe('Transfer CeloDollars', () => {
           describe('feeCurrency = CeloDollars >', () => {
-            testTransferToken({
+            testTwiceFirstAndSecondFundToANewAddress({
               expectedGas:
-                stableTokenTransferGasCost +
+                basicStableTokenTransferGasCost +
                 changedIntrinsicGasForAlternativeFeeCurrency +
-                INTRINSIC_TX_GAS_COST,
+                INTRINSIC_TX_GAS_COST -
+                savingGasStableTokenTransferPaidWithSameStable,
               transferToken: StableToken.cUSD,
               feeToken: StableToken.cUSD,
             })
