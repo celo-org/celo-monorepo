@@ -514,7 +514,7 @@ describe('Transfer tests', function (this: any) {
   function generateCleanAddress(): string {
     toCounter += 1
     // avoid the '00' at the end (check toCounter comment)
-    toCounter = toCounter % 100 == 0 ? toCounter + 1 : toCounter
+    toCounter = toCounter % 100 === 0 ? toCounter + 1 : toCounter
 
     return toChecksumAddress(toTemplate + toCounter.toString().padStart(3, '0'))
   }
