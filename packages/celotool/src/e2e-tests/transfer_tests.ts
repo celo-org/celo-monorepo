@@ -506,7 +506,7 @@ describe('Transfer tests', function (this: any) {
     })
   }
 
-  const toTemplate = '0xbBae99F0E1EE565404465638d40827b54D343' // missed the last 3 numbers
+  const toTemplate = '0xbBae99F0E1EE565404465638d40827b54D343' // last 3 hex digits trimmed
   // Starts with 1, otherwise the address could have the last byte as 00 which would change
   // the gas consumption
   let toCounter = 1
