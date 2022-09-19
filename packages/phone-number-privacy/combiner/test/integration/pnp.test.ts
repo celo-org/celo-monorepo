@@ -279,6 +279,10 @@ describe('pnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
+          // TODO EN investigate what changed for this to now happen
+          // is it possible for warnings to be undefined? --> possibly investigate this
+          // with the rest of the request types ticket and make it required??
+          warnings: [],
         })
         const unblindedSig = threshold_bls.unblind(
           Buffer.from(res.body.signature, 'base64'),
@@ -300,6 +304,7 @@ describe('pnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
         // TODO(2.0.0) determine how / whether to forward this to client
         // (https://github.com/celo-org/celo-monorepo/issues/9801)
@@ -316,6 +321,7 @@ describe('pnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         }
 
         expect(res1.status).toBe(200)
@@ -337,6 +343,7 @@ describe('pnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         }
 
         expect(res1.status).toBe(200)
@@ -371,6 +378,7 @@ describe('pnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
       })
 
@@ -387,6 +395,7 @@ describe('pnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
       })
 
@@ -402,6 +411,7 @@ describe('pnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
 
         const secondUserSeed = new Uint8Array(userSeed)
@@ -533,6 +543,7 @@ describe('pnpService', () => {
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
             blockNumber: testBlockNumber,
+            warnings: [],
           })
           const unblindedSig = threshold_bls.unblind(
             Buffer.from(res.body.signature, 'base64'),
@@ -577,6 +588,7 @@ describe('pnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
         const unblindedSig = threshold_bls.unblind(
           Buffer.from(res.body.signature, 'base64'),
@@ -661,13 +673,29 @@ describe('pnpService', () => {
     })
 
     const queryCountParams = [
-      { signerQueries: [0, 0, 0], expectedQueryCount: 0 },
-      { signerQueries: [1, 0, 0], expectedQueryCount: 0 }, // does not reach threshold
-      { signerQueries: [1, 1, 0], expectedQueryCount: 1 }, // threshold reached
-      { signerQueries: [0, 1, 1], expectedQueryCount: 1 }, // order of signers shouldn't matter
-      { signerQueries: [1, 4, 9], expectedQueryCount: 4 },
+      { signerQueries: [0, 0, 0], expectedQueryCount: 0, expectedWarnings: [] },
+      {
+        signerQueries: [1, 0, 0],
+        expectedQueryCount: 0,
+        expectedWarnings: [WarningMessage.SIGNER_RESPONSE_DISCREPANCIES],
+      }, // does not reach threshold
+      {
+        signerQueries: [1, 1, 0],
+        expectedQueryCount: 1,
+        expectedWarnings: [WarningMessage.SIGNER_RESPONSE_DISCREPANCIES],
+      }, // threshold reached
+      {
+        signerQueries: [0, 1, 1],
+        expectedQueryCount: 1,
+        expectedWarnings: [WarningMessage.SIGNER_RESPONSE_DISCREPANCIES],
+      }, // order of signers shouldn't matter
+      {
+        signerQueries: [1, 4, 9],
+        expectedQueryCount: 4,
+        expectedWarnings: [WarningMessage.SIGNER_RESPONSE_DISCREPANCIES],
+      },
     ]
-    queryCountParams.forEach(({ signerQueries, expectedQueryCount }) => {
+    queryCountParams.forEach(({ signerQueries, expectedQueryCount, expectedWarnings }) => {
       it(`should get ${expectedQueryCount} performedQueryCount given signer responses of ${signerQueries}`, async () => {
         await useQuery(signerQueries[0], signer1)
         await useQuery(signerQueries[1], signer2)
@@ -685,6 +713,7 @@ describe('pnpService', () => {
           performedQueryCount: expectedQueryCount,
           totalQuota,
           blockNumber: testBlockNumber,
+          warnings: expectedWarnings,
         })
       })
     })
@@ -702,6 +731,7 @@ describe('pnpService', () => {
         performedQueryCount: 0,
         totalQuota,
         blockNumber: testBlockNumber,
+        warnings: [],
       })
     })
 
@@ -718,6 +748,7 @@ describe('pnpService', () => {
         performedQueryCount: 0,
         totalQuota,
         blockNumber: testBlockNumber,
+        warnings: [],
       })
       const res2 = await getCombinerQuotaResponse(req, authorization)
       expect(res2.status).toBe(200)
@@ -739,6 +770,7 @@ describe('pnpService', () => {
         performedQueryCount: 0,
         totalQuota,
         blockNumber: testBlockNumber,
+        warnings: [],
       })
     })
 
@@ -757,6 +789,7 @@ describe('pnpService', () => {
         performedQueryCount: 0,
         totalQuota,
         blockNumber: testBlockNumber,
+        warnings: [],
       })
     })
 

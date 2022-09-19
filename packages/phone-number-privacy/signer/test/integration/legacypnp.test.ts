@@ -1167,7 +1167,7 @@ describe('legacyPNP', () => {
           )
 
           expect(res.status).toBe(500)
-          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
             performedQueryCount: performedQueryCount,

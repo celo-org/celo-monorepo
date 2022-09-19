@@ -77,10 +77,18 @@ export function startSigner(
           errToLog = new Error(errorMsg)
         }
         childLogger.error({ errToLog })
-        res.status(500).json({
-          success: false,
-          error: errorMsg,
-        })
+        if (!res.writableEnded) {
+          res.status(500).json({
+            success: false,
+            error: errorMsg,
+          })
+        } else {
+          // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
+          // TODO(2.0.0, audit responses) https://github.com/celo-org/celo-monorepo/issues/9859
+          // getting to this error indicates that either timeout or `perform` process
+          // does not terminate after sending a response, and then throws an error.
+          childLogger.error('Error in endpoint thrown after response was already sent')
+        }
       }
     })
 

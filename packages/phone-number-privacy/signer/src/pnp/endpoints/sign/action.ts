@@ -54,6 +54,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             quotaStatus.totalQuota,
             quotaStatus.blockNumber
           )
+          return
         }
         // In the case of a blockchain connection failure, totalQuota will be -1
         if (quotaStatus.totalQuota === -1) {
@@ -78,6 +79,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
               quotaStatus.totalQuota,
               quotaStatus.blockNumber
             )
+            return
           }
         }
         // quotaStatus is updated in place
@@ -113,6 +115,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           session
         )
         this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
+        return
       } catch (err) {
         // If the db was never updated, we should not decrease the query count
         if (dbUpdated) {
@@ -131,6 +134,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           quotaStatus.totalQuota,
           quotaStatus.blockNumber
         )
+        return
       }
     })
   }

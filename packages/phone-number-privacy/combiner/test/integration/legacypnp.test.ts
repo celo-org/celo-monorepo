@@ -296,6 +296,7 @@ describe('legacyPnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
         const unblindedSig = threshold_bls.unblind(
           Buffer.from(res.body.signature, 'base64'),
@@ -317,6 +318,7 @@ describe('legacyPnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
         // TODO(2.0.0) determine how / whether to forward this to client
         // (https://github.com/celo-org/celo-monorepo/issues/9801)
@@ -335,6 +337,7 @@ describe('legacyPnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
 
         // performedQueryCount should remain the same; same request should not
@@ -355,6 +358,7 @@ describe('legacyPnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         }
 
         expect(res1.status).toBe(200)
@@ -389,6 +393,7 @@ describe('legacyPnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
       })
 
@@ -405,6 +410,7 @@ describe('legacyPnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
       })
 
@@ -420,6 +426,7 @@ describe('legacyPnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
 
         const secondUserSeed = new Uint8Array(userSeed)
@@ -551,6 +558,7 @@ describe('legacyPnpService', () => {
             performedQueryCount: 1,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
+            warnings: [],
           })
           const unblindedSig = threshold_bls.unblind(
             Buffer.from(res.body.signature, 'base64'),
@@ -595,6 +603,7 @@ describe('legacyPnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
         const unblindedSig = threshold_bls.unblind(
           Buffer.from(res.body.signature, 'base64'),
