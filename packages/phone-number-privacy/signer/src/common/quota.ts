@@ -22,7 +22,6 @@ export type OdisQuotaStatus<R extends OdisRequest> = R extends
 export interface OdisQuotaStatusResult<R extends OdisRequest> {
   sufficient: boolean
   state: OdisQuotaStatus<R>
-  dbUpdated?: boolean
 }
 
 export interface QuotaService<R extends OdisRequest> {

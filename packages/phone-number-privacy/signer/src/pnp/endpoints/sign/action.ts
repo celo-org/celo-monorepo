@@ -21,6 +21,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
   ) {}
 
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
+    // Compute quota lookup, update, and signing within transaction
+    // so that these occur atomically and rollback on error.
     await this.db.transaction(async (trx) => {
       const quotaStatus = await this.quota.getQuotaStatus(session, trx)
 
@@ -36,7 +38,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         session.logger.error({ err }, 'Failed to check if request already exists in db')
       }
 
-      let dbUpdated
       if (isDuplicateRequest) {
         Counters.duplicateRequests.inc()
         session.logger.debug(
@@ -82,10 +83,10 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             return
           }
         }
-        // quotaStatus is updated in place
-        const quotaUpdateRes = await this.quota.checkAndUpdateQuotaStatus(quotaStatus, session, trx)
-        dbUpdated = quotaUpdateRes.dbUpdated
-        if (!quotaUpdateRes.sufficient) {
+
+        // quotaStatus is updated in place; throws on failure to update
+        const { sufficient } = await this.quota.checkAndUpdateQuotaStatus(quotaStatus, session, trx)
+        if (!sufficient) {
           this.io.sendFailure(
             WarningMessage.EXCEEDED_QUOTA,
             403,
@@ -98,17 +99,14 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         }
       }
 
-      // Compute signature inside transaction so it will rollback on error.
-      // Since it's possible that the trx was already rolled back in
-      // checkAndUpdateQuotaStatus, catch and handle any additional errors thrown,
-      // otherwise the signer will hang.
+      const key: Key = {
+        version:
+          this.io.getRequestKeyVersion(session.request, session.logger) ??
+          this.config.keystore.keys.phoneNumberPrivacy.latest,
+        name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
+      }
+
       try {
-        const key: Key = {
-          version:
-            this.io.getRequestKeyVersion(session.request, session.logger) ??
-            this.config.keystore.keys.phoneNumberPrivacy.latest,
-          name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
-        }
         const signature = await this.sign(
           session.request.body.blindedQueryPhoneNumber,
           key,
@@ -117,17 +115,11 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
         return
       } catch (err) {
-        // If the db was never updated, we should not decrease the query count
-        if (dbUpdated) {
-          await trx.rollback()
-          quotaStatus.performedQueryCount--
-        }
-        const responseErr =
-          err === ErrorMessage.SIGNATURE_COMPUTATION_FAILURE
-            ? ErrorMessage.SIGNATURE_COMPUTATION_FAILURE
-            : ErrorMessage.KEY_FETCH_ERROR // Default; most likely alternative
+        // Note that errors thrown after rollback will have no effect
+        await trx.rollback()
+        quotaStatus.performedQueryCount--
         this.io.sendFailure(
-          responseErr,
+          ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
           500,
           session.response,
           quotaStatus.performedQueryCount, // TODO(2.0.0) consider refactoring to allow quotaStatus to be passed directly here to avoid parameter ordering errors
