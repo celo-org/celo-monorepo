@@ -1,6 +1,9 @@
 aws: false
 azure: false
 fullnameOverride: false
+extraPodLabels:
+  stack: blockscout
+  mode: archive
 gcp: true
 genesis:
   epoch_size: 17280

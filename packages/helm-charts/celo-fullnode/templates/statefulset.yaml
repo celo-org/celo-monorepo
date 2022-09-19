@@ -37,7 +37,7 @@ spec:
       labels:
         {{- include "common.standard.labels" .  | nindent 8 }}
         {{- if .Values.extraPodLabels }}
-        {{ toYaml .Values.extraPodLabels | nindent 8 }}
+        {{- toYaml .Values.extraPodLabels | nindent 8 }}
         {{- end }}
         component: celo-fullnode
 {{ if .Values.prometheus | default true }}
