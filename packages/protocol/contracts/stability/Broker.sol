@@ -166,6 +166,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     amountOut = IExchangeManager(exchangeManager).swapIn(exchangeId, tokenIn, tokenOut, amountIn);
     require(amountOut >= amountOutMin, "amountOutMin not met");
     transferIn(tokenIn, amountIn);
+    transferOut(msg.sender, tokenOut, amountOut);
     emit Swap(exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
     return amountOut;
   }
@@ -190,8 +191,9 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   ) external returns (uint256 amountIn) {
     require(isExchangeManager[exchangeManager], "ExchangeManager does not exist");
     amountIn = IExchangeManager(exchangeManager).swapOut(exchangeId, tokenIn, tokenOut, amountOut);
-    require(amountIn <= amountInMax, "amountInMax exceeded");
+    require(amountIn >= amountInMax, "amountInMax exceeded");
     transferOut(msg.sender, tokenOut, amountOut);
+    transferIn(tokenIn, amountIn);
     emit Swap(exchangeManager, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
     return amountIn;
   }
@@ -220,6 +222,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
    */
   function transferIn(address token, uint256 amount) private {
     if (reserve.isStableAsset(token)) {
+      IERC20(token).transferFrom(msg.sender, address(this), amount);
       IStableToken(token).burn(amount);
     }
     if (reserve.isCollateralAsset(token)) {
