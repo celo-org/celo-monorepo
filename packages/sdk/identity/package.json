@@ -41,10 +41,10 @@
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
     "@celo/wallet-local": "2.2.1-dev",
-    "fetch-mock": "9.10.4",
-    "@types/elliptic": "^6.4.12",
     "@celo/flake-tracker": "0.0.1-dev",
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da"
+    "@types/elliptic": "^6.4.12",
+    "fetch-mock": "9.10.4",
+    "ganache": "^7.4.4"
   },
   "engines": {
     "node": ">=12.9.0"

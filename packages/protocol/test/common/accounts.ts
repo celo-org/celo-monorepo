@@ -359,7 +359,7 @@ contract('Accounts', (accounts: string[]) => {
       const [stringLengths, data] = await accountsInstance.batchGetMetadataURL(accounts)
       const strings = parseSolidityStringArray(
         stringLengths.map((x) => x.toNumber()),
-        (data as unknown) as string
+        data as unknown as string
       )
       for (let i = 0; i < accounts.length; i++) {
         assert.equal(strings[i], randomStrings[i])
@@ -824,20 +824,22 @@ contract('Accounts', (accounts: string[]) => {
         let getSignature
 
         beforeEach(async () => {
-          const authorizeSignerFactory = (role: string) => async (signer, v, r, s, ...rest) => {
-            const result1 = await accountsInstance.authorizeSignerWithSignature(
-              signer,
-              role,
-              v,
-              r,
-              s,
-              ...rest
-            )
-            const result2 = await accountsInstance.setIndexedSigner(signer, role, ...rest)
-            return {
-              logs: [...result1.logs, ...result2.logs],
+          const authorizeSignerFactory =
+            (role: string) =>
+            async (signer, v, r, s, ...rest) => {
+              const result1 = await accountsInstance.authorizeSignerWithSignature(
+                signer,
+                role,
+                v,
+                r,
+                s,
+                ...rest
+              )
+              const result2 = await accountsInstance.setIndexedSigner(signer, role, ...rest)
+              return {
+                logs: [...result1.logs, ...result2.logs],
+              }
             }
-          }
 
           getSignature = (_account, signer) => {
             if (genericWrite) {

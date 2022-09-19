@@ -1,4 +1,4 @@
-import ganache from '@celo/ganache-cli'
+import ganache from 'ganache'
 import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs-extra'
@@ -110,11 +110,7 @@ yargs
     (args) => exitOnError(compressChain(args.datadir, args.filename))
   ).argv
 
-async function startGanache(
-  datadir: string,
-  opts: { verbose?: boolean },
-  chainCopy?: tmp.DirResult
-) {
+async function startGanache(datadir: string, opts: { verbose?: boolean }) {
   const logFn = opts.verbose
     ? // tslint:disable-next-line: no-console
       (...args: any[]) => console.log(...args)
@@ -134,31 +130,27 @@ async function startGanache(
     allowUnlimitedContractSize: true,
   })
 
-  await new Promise((resolve, reject) => {
-    server.listen(8545, (err, blockchain) => {
+  await new Promise<void>((resolve, reject) => {
+    server.listen(8545, async (err) => {
       if (err) {
         reject(err)
       } else {
         // tslint:disable-next-line: no-console
         console.log(chalk.red('Ganache STARTED'))
         // console.log(blockchain)
-        resolve(blockchain)
+        resolve()
       }
     })
   })
 
   return () =>
-    new Promise<void>((resolve, reject) => {
-      server.close((err) => {
-        if (chainCopy) {
-          chainCopy.removeCallback()
-        }
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
+    new Promise<void>(async (resolve, reject) => {
+      try {
+        await server.close()
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
     })
 }
 
@@ -251,7 +243,7 @@ async function runDevChainFromTar(filename: string) {
 
   await decompressChain(filename, chainCopy.name)
 
-  const stopGanache = await startGanache(chainCopy.name, { verbose: true }, chainCopy)
+  const stopGanache = await startGanache(chainCopy.name, { verbose: true })
   return stopGanache
 }
 

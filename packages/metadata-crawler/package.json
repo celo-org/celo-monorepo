@@ -23,7 +23,7 @@
     "web3": "1.3.6"
   },
   "devDependencies": {
-    "@types/bunyan": "1.8.4",
+    "@types/bunyan": "1.8.8",
     "@types/dotenv": "^8.2.0",
     "bunyan-debug-stream": "^2.0.0"
   },

@@ -18,7 +18,7 @@
     "celo-cli"
   ],
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=14"
   },
   "scripts": {
     "clean": "tsc -b . --clean",
@@ -45,7 +45,7 @@
     "@celo/wallet-hsm-azure": "2.2.1-dev",
     "@celo/wallet-ledger": "2.2.1-dev",
     "@celo/wallet-local": "2.2.1-dev",
-    "@ledgerhq/hw-transport-node-hid": "~5.11.0",
+    "@ledgerhq/hw-transport-node-hid": "^6.27.4",
     "@oclif/command": "^1.6.0",
     "@oclif/config": "^1.6.0",
     "@oclif/plugin-autocomplete": "^0.1.5",
@@ -55,7 +55,7 @@
     "@oclif/plugin-warn-if-update-available": "^1.7.0",
     "@types/command-exists": "^1.2.0",
     "@oclif/plugin-plugins": "^1.9.4",
-    "bip32": "2.0.5",
+    "bip32": "3.1.0",
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
     "chalk": "^2.4.2",
     "cli-table": "^0.3.1",
@@ -86,7 +86,7 @@
     "@types/inquirer": "^6.5.0",
     "@types/ledgerhq__hw-transport-node-hid": "^4.22.2",
     "@types/mocha": "^7.0.2",
-    "@types/node": "^10",
+    "@types/node": "^18.7.16",
     "@types/web3": "^1.0.18",
     "globby": "^8",
     "prettier": "1.19.1",

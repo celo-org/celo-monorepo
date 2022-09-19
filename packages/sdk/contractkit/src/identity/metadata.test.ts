@@ -45,7 +45,9 @@ testWithGanache('Metadata', (web3) => {
       if (action === 'vote') {
         await (await accounts.authorizeVoteSigner(signer, pop)).send({ from: address })
       } else if (action === 'validator') {
-        await (await accounts.authorizeValidatorSigner(signer, pop, validator)).send({
+        await (
+          await accounts.authorizeValidatorSigner(signer, pop, validator)
+        ).send({
           from: address,
         })
       } else if (action === 'attestation') {

@@ -111,14 +111,12 @@ interface GetCompletableAttestationsResponse {
 function parseGetCompletableAttestations(response: GetCompletableAttestationsResponse) {
   const metadataURLs = parseSolidityStringArray(
     response[2].map(valueToInt),
-    (response[3] as unknown) as string
+    response[3] as unknown as string
   )
 
-  return zip3(
-    response[0].map(valueToInt),
-    response[1],
-    metadataURLs
-  ).map(([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL }))
+  return zip3(response[0].map(valueToInt), response[1], metadataURLs).map(
+    ([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL })
+  )
 }
 
 interface ContractsForAttestation {
@@ -245,14 +243,11 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param identifier Attestation identifier (e.g. phone hash)
    * @param account Address of the account
    */
-  getAttestationStat: (
-    identifier: string,
-    account: Address
-  ) => Promise<AttestationStat> = proxyCall(
-    this.contract.methods.getAttestationStats,
-    undefined,
-    (stat) => ({ completed: valueToInt(stat[0]), total: valueToInt(stat[1]) })
-  )
+  getAttestationStat: (identifier: string, account: Address) => Promise<AttestationStat> =
+    proxyCall(this.contract.methods.getAttestationStats, undefined, (stat) => ({
+      completed: valueToInt(stat[0]),
+      total: valueToInt(stat[1]),
+    }))
 
   /**
    * Returns the verified status of an identifier/account pair indicating whether the attestation

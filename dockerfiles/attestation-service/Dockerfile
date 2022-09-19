@@ -1,7 +1,7 @@
-FROM node:12-alpine
+FROM node:18-alpine
 WORKDIR /celo-monorepo
 
-RUN apk update && apk add python2 git make gcc g++ pkgconfig libusb libusb-dev linux-headers eudev-dev bash
+RUN apk update && apk add python3 git make gcc g++ pkgconfig libusb libusb-dev linux-headers eudev-dev bash
 
 # ensure yarn.lock is evaluated by kaniko cache diff
 COPY lerna.json package.json yarn.lock ./

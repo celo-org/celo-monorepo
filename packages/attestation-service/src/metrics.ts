@@ -15,8 +15,7 @@ export const Counters = {
   }),
   attestationRequestsWOIncompleteAttestation: new Counter({
     name: 'attestation_requests_without_incomplete_attestation',
-    help:
-      'Counter for the number of attestation requests for which no incomplete attestations could be found',
+    help: 'Counter for the number of attestation requests for which no incomplete attestations could be found',
   }),
   attestationRequestsValid: new Counter({
     name: 'attestation_requests_valid',

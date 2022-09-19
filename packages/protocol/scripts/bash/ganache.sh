@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Runs ganache-cli with the mnemonic used in our tests.
+# Runs ganache with the mnemonic used in our tests.
 
-yarn run ganache-cli \
+yarn run ganache \
   --deterministic \
   --mnemonic 'concert load couple harbor equip island argue ramp clarify fence smart topic' \
   --gasPrice 0 \

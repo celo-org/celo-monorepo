@@ -384,7 +384,7 @@ export class Connection {
   }
 
   getAbiCoder(): AbiCoder {
-    return (this.web3.eth.abi as unknown) as AbiCoder
+    return this.web3.eth.abi as unknown as AbiCoder
   }
 
   estimateGasWithInflationFactor = async (

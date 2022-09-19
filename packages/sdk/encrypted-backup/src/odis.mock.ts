@@ -31,9 +31,10 @@ export class MockOdis {
   readonly state: Record<string, SequentialDelayDomainState> = {}
   readonly poprf = new PoprfServer(MOCK_ODIS_KEYPAIR.privateKey)
 
-  quota(
-    req: DomainQuotaStatusRequest<SequentialDelayDomain>
-  ): { status: number; body: DomainQuotaStatusResponse } {
+  quota(req: DomainQuotaStatusRequest<SequentialDelayDomain>): {
+    status: number
+    body: DomainQuotaStatusResponse
+  } {
     const authorized = verifyDomainQuotaStatusRequestSignature(req)
     if (!authorized) {
       return {
@@ -58,9 +59,10 @@ export class MockOdis {
     }
   }
 
-  sign(
-    req: DomainRestrictedSignatureRequest<SequentialDelayDomain>
-  ): { status: number; body: DomainRestrictedSignatureResponse } {
+  sign(req: DomainRestrictedSignatureRequest<SequentialDelayDomain>): {
+    status: number
+    body: DomainRestrictedSignatureResponse
+  } {
     const authorized = verifyDomainRestrictedSignatureRequestSignature(req)
     if (!authorized) {
       return {

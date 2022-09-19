@@ -25,17 +25,18 @@
     "@celo/utils": "2.2.1-dev",
     "@celo/bls12377js": "0.1.1",
     "@celo/base": "2.2.1-dev",
-    "@types/bn.js": "^5.1.0",
+    "@types/bn.js": "4.11.6",
     "@types/elliptic": "^6.4.9",
     "@types/ethereumjs-util": "^5.2.0",
-    "@types/node": "^10.12.18",
+    "@types/node": "^18.7.16",
     "@types/randombytes": "^2.0.0",
-    "bigi": "^1.1.0",
-    "bip32": "^2.0.6",
+    "bigi": "^1.4.2",
+    "bip32": "^3.1.0",
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
     "buffer-reverse": "^1.0.1",
     "elliptic": "^6.5.4",
-    "ethereumjs-util": "^5.2.0"
+    "ethereumjs-util": "^5.2.0",
+    "tiny-secp256k1": "2.2.1"
   },
   "devDependencies": {
     "@celo/flake-tracker": "0.0.1-dev",

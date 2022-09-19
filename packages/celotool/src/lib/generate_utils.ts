@@ -2,7 +2,8 @@
 import * as bls12377js from '@celo/bls12377js'
 import { blsPrivateKeyToProcessedPrivateKey } from '@celo/cryptographic-utils/lib/bls'
 import BigNumber from 'bignumber.js'
-import * as bip32 from 'bip32'
+import { BIP32Factory, BIP32Interface } from 'bip32'
+import * as ecc from 'tiny-secp256k1'
 import * as bip39 from 'bip39'
 import fs from 'fs'
 import { merge, range, repeat } from 'lodash'
@@ -25,6 +26,8 @@ import {
 import { getIndexForLoadTestThread } from './geth'
 import { GenesisConfig } from './interfaces/genesis-config'
 import { ensure0x, strip0x } from './utils'
+
+const bip32 = BIP32Factory(ecc)
 
 export enum AccountType {
   VALIDATOR = 0,
@@ -117,7 +120,7 @@ export const generateOraclePrivateKey = (
 export const generatePrivateKeyWithDerivations = (mnemonic: string, derivations: number[]) => {
   const seed = bip39.mnemonicToSeedSync(mnemonic)
   const node = bip32.fromSeed(seed)
-  const newNode = derivations.reduce((n: bip32.BIP32Interface, derivation: number) => {
+  const newNode = derivations.reduce((n: BIP32Interface, derivation: number) => {
     return n.derive(derivation)
   }, node)
   return newNode.privateKey!.toString('hex')

@@ -26,7 +26,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+    - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -76,6 +76,9 @@ commands:
       - run:
           name: Install dependencies
           command: |
+            # node-gyp needs to know where python is at when installed
+            yarn config set python $(which python3)
+
             if [ ! -e ~/.tmp/yarn_deps_have_changed ]; then
               # Though `yarn install` is instantaneous with up-to-date node_modules which is the case when we've restored cached node_modules,
               # there's currently a bug with the generated node_modules/.yarn-integrity file which is apparently not entirely stable
@@ -89,7 +92,6 @@ commands:
               yarn run postinstall
               exit 0
             fi
-
             # Deals with yarn install flakiness which can come due to yarnpkg.com being
             # unreliable. For example, https://circleci.com/gh/celo-org/celo-monorepo/82685
             yarn install || yarn install || yarn install
@@ -151,7 +153,7 @@ jobs:
             # Verify that following commands work, they are later called in the incremental testing script
             # There output does not matter here, the fact that they finish successfully does.
             git rev-parse --abbrev-ref HEAD
-            git fetch --all --tags
+            git fetch --all --tags -f
 
       - attach_workspace:
           at: ~/app
@@ -727,7 +729,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -740,7 +742,7 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -753,7 +755,7 @@ jobs:
   test-contractkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run
@@ -769,7 +771,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node18:1.0.0
     steps:
       - run:
           name: Check if the test should run

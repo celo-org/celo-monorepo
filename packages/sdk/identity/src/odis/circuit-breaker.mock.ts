@@ -59,9 +59,10 @@ export class MockCircuitBreaker {
     }
   }
 
-  unwrapKey(
-    req: CircuitBreakerUnwrapKeyRequest
-  ): { status: number; body: CircuitBreakerUnwrapKeyResponse } {
+  unwrapKey(req: CircuitBreakerUnwrapKeyRequest): {
+    status: number
+    body: CircuitBreakerUnwrapKeyResponse
+  } {
     const { ciphertext } = req
     if (!ciphertext) {
       return {

@@ -26,8 +26,9 @@ const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
 export const INVALID_SIGNATURE_ERROR = 'Signature is invalid'
 
-const odisPubKey = OdisUtils.Query.getServiceContext(fetchEnvOrDefault('NETWORK', 'mainnet'))
-  .odisPubKey
+const odisPubKey = OdisUtils.Query.getServiceContext(
+  fetchEnvOrDefault('NETWORK', 'mainnet')
+).odisPubKey
 const thresholdBls = require('blind-threshold-bls')
 
 function toBase64(str: string) {

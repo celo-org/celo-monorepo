@@ -1,5 +1,5 @@
 // @ts-ignore
-import * as ganache from '@celo/ganache-cli'
+import * as ganache from 'ganache'
 import * as fs from 'fs-extra'
 import * as path from 'path'
 import * as targz from 'targz'
@@ -78,25 +78,24 @@ async function launchServer(opts: { verbose?: boolean; from_targz?: boolean }, c
     allowUnlimitedContractSize: true,
   })
 
-  await new Promise((resolve, reject) => {
-    server.listen(8545, (err: any, blockchain: any) => {
+  await new Promise<void>((resolve, reject) => {
+    server.listen(8545, async (err: any) => {
       if (err) {
         reject(err)
       } else {
-        resolve(blockchain)
+        resolve()
       }
     })
   })
 
   return () =>
-    new Promise<void>((resolve, reject) => {
-      server.close((err: any) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      })
+    new Promise<void>(async (resolve, reject) => {
+      try {
+        await server.close()
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
     })
 }
 

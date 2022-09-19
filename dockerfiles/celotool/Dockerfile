@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:18
 WORKDIR /celo-monorepo
 
 # Needed for gsutil

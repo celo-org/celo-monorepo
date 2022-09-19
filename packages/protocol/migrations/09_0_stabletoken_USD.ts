@@ -47,10 +47,8 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       await freezer.freeze(stableToken.address)
     }
 
-    const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<SortedOraclesInstance>(
-      'SortedOracles',
-      artifacts
-    )
+    const sortedOracles: SortedOraclesInstance =
+      await getDeployedProxiedContract<SortedOraclesInstance>('SortedOracles', artifacts)
 
     for (const oracle of config.stableToken.oracles) {
       console.info(`Adding ${oracle} as an Oracle for StableToken (USD)`)
@@ -83,10 +81,11 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
     }
 
     console.info('Whitelisting StableToken (USD) as a fee currency')
-    const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract<FeeCurrencyWhitelistInstance>(
-      'FeeCurrencyWhitelist',
-      artifacts
-    )
+    const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance =
+      await getDeployedProxiedContract<FeeCurrencyWhitelistInstance>(
+        'FeeCurrencyWhitelist',
+        artifacts
+      )
     await feeCurrencyWhitelist.addToken(stableToken.address)
   }
 )

@@ -1,4 +1,4 @@
-const ganache = require('@celo/ganache-cli')
+const ganache = require('ganache')
 const glob = require('glob-fs')({
   gitignore: false,
 })

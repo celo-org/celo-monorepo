@@ -36,8 +36,7 @@
     "@celo/utils": "2.2.1-dev",
     "@celo/wallet-hsm-azure": "2.2.1-dev",
     "@google-cloud/secret-manager": "3.0.0",
-    "@types/bunyan": "^1.8.6",
-    "@types/promise.allsettled": "^1.0.3",
+    "@types/bunyan": "^1.8.8",
     "aws-sdk": "^2.705.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "dotenv": "^8.2.0",
@@ -52,6 +51,7 @@
   "devDependencies": {
     "@types/btoa": "^1.2.3",
     "@types/express": "^4.17.6",
+    "@types/promise.allsettled": "^1.0.3",
     "@types/supertest": "^2.0.9",
     "supertest": "^4.0.2",
     "ts-mockito": "^2.6.1",

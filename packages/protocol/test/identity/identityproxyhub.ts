@@ -153,7 +153,7 @@ contract('IdentityProxyHub', (accounts: string[]) => {
         const txData = identityProxyTest.contract.methods.payMe().encodeABI()
         // @ts-ignore
         await identityProxyHub.makeCall(identifier, identityProxyTest.address, txData, {
-          value: 100,
+          value: '100',
         })
         const proxyBalance = await web3.eth.getBalance(address)
         const balanceAfter = await web3.eth.getBalance(identityProxyTest.address)

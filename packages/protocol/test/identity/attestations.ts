@@ -296,11 +296,8 @@ contract('Attestations', (accounts: string[]) => {
       await attestations.request(phoneHash, attestationsRequested, mockERC20Token.address)
       const requestBlock = await web3.eth.getBlock('latest')
 
-      const [
-        blockNumber,
-        actualAttestationsRequested,
-        actualAttestationRequestFeeToken,
-      ] = await attestations.getUnselectedRequest(phoneHash, caller)
+      const [blockNumber, actualAttestationsRequested, actualAttestationRequestFeeToken] =
+        await attestations.getUnselectedRequest(phoneHash, caller)
 
       assertEqualBN(blockNumber, requestBlock.number)
       assertEqualBN(attestationsRequested, actualAttestationsRequested)
@@ -456,16 +453,12 @@ contract('Attestations', (accounts: string[]) => {
             )
           )
           await attestations.selectIssuers(phoneHash)
-          const [
-            attestationBlockNumbers,
-            attestationIssuers,
-            stringLengths,
-            stringData,
-          ] = await attestations.getCompletableAttestations(phoneHash, caller)
+          const [attestationBlockNumbers, attestationIssuers, stringLengths, stringData] =
+            await attestations.getCompletableAttestations(phoneHash, caller)
 
           const urls = parseSolidityStringArray(
             stringLengths.map((x) => x.toNumber()),
-            (stringData as unknown) as string
+            stringData as unknown as string
           )
 
           assert.lengthOf(attestationBlockNumbers, attestationsRequested)
@@ -485,10 +478,8 @@ contract('Attestations', (accounts: string[]) => {
 
         it('should delete the unselected request', async () => {
           await attestations.selectIssuers(phoneHash)
-          const [
-            blockNumber,
-            actualAttestationsRequested,
-          ] = await attestations.getUnselectedRequest(phoneHash, caller)
+          const [blockNumber, actualAttestationsRequested] =
+            await attestations.getUnselectedRequest(phoneHash, caller)
           assertEqualBN(blockNumber, 0)
           assertEqualBN(actualAttestationsRequested, 0)
         })
@@ -629,11 +620,8 @@ contract('Attestations', (accounts: string[]) => {
 
       const expectedBlock = await web3.eth.getBlock('latest')
 
-      const [
-        status,
-        completionBlock,
-        actualAttestationRequestFeeToken,
-      ] = await attestations.getAttestationState(phoneHash, caller, issuer)
+      const [status, completionBlock, actualAttestationRequestFeeToken] =
+        await attestations.getAttestationState(phoneHash, caller, issuer)
 
       assert.equal(status.toNumber(), 2)
       assert.equal(completionBlock.toNumber(), expectedBlock.number)

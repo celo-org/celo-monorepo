@@ -63,7 +63,7 @@
     "yargs": "13.3.0"
   },
   "devDependencies": {
-    "@types/bunyan": "1.8.4",
+    "@types/bunyan": "1.8.8",
     "@types/debug": "^4.1.5",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.12",

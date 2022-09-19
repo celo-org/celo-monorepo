@@ -97,7 +97,7 @@ describe('CeloProvider', () => {
     const web3 = new Web3()
     web3.setProvider(mockProvider as any)
     const connection = new Connection(web3, new MockWallet())
-    celoProvider = (connection.web3.currentProvider as any) as CeloProvider
+    celoProvider = connection.web3.currentProvider as any as CeloProvider
   })
 
   describe("when celo provider don't have any local account", () => {

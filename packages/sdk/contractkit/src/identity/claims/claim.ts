@@ -75,8 +75,10 @@ export type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOM
   : StorageClaim
 
 /** @internal */
-export const isOfType = <K extends ClaimTypes>(type: K) => (data: Claim): data is ClaimPayload<K> =>
-  data.type === type
+export const isOfType =
+  <K extends ClaimTypes>(type: K) =>
+  (data: Claim): data is ClaimPayload<K> =>
+    data.type === type
 
 /**
  * Validates a claim made by an account, i.e. whether the claim is usable

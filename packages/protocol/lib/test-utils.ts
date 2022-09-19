@@ -6,12 +6,20 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
+import assert from 'assert'
 import BigNumber from 'bignumber.js'
 import chai from 'chai'
 import chaiSubset from 'chai-subset'
 import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
-import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
+import {
+  GovernanceApproverMultiSigInstance,
+  GovernanceInstance,
+  LockedGoldInstance,
+  ProxyInstance,
+  RegistryInstance,
+  UsingRegistryInstance,
+} from 'types'
 import Web3 from 'web3'
 
 // tslint:disable-next-line: ordered-imports
@@ -21,8 +29,6 @@ const isNumber = (x: any) =>
   typeof x === 'number' || (BN as any).isBN(x) || BigNumber.isBigNumber(x)
 
 chai.use(chaiSubset)
-
-const assert = chai.assert
 
 // hard coded in ganache
 export const EPOCH = 100
@@ -124,7 +130,7 @@ export const assertThrowsAsync = async (promise: any, errorMessage: string = '')
     failed = true
   }
 
-  assert.isTrue(failed, errorMessage)
+  assert.equal(true, failed, errorMessage)
 }
 
 export async function assertRevertWithReason(promise: any, expectedRevertReason: string = '') {
@@ -139,7 +145,7 @@ export async function assertRevertWithReason(promise: any, expectedRevertReason:
     // `Returned error: VM Exception while processing transaction: revert ${revertMessage} -- Reason given: ${revertMessage}.`
     // Therefore we try to parse the first instance of `${revertMessage}`.
     const foundRevertReason = error.message
-      .split(" -- Reason given: ")[0]
+      .split(' -- Reason given: ')[0]
       .split('Returned error: VM Exception while processing transaction: revert ')[1]
     assert.equal(foundRevertReason, expectedRevertReason, 'Incorrect revert message')
   }
@@ -153,9 +159,10 @@ export async function assertRevert(promise: any, errorMessage: string = '') {
     await promise
     assert.fail('Expected transaction to revert')
   } catch (error) {
-    const revertFound =
+    const revertFound: boolean =
       error.message.search('VM Exception while processing transaction: revert') >= 0
-    const msg = errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
+    const msg: string =
+      errorMessage === '' ? `Expected "revert", got ${error} instead` : errorMessage
     assert(revertFound, msg)
   }
 }
@@ -264,13 +271,7 @@ export const assertFloatEquality = (
   errorMessage: string,
   epsilon = new BigNumber(0.00000001)
 ) => {
-  assert(
-    a
-      .minus(b)
-      .abs()
-      .comparedTo(epsilon) === -1,
-    errorMessage
-  )
+  assert(a.minus(b).abs().comparedTo(epsilon) === -1, errorMessage)
 }
 
 export function assertLogMatches2(
@@ -294,7 +295,7 @@ export function assertLogMatches(
 export function assertObjectWithBNEqual(
   actual: object,
   expected: Record<string, any>,
-  fieldErrorMsg: (field?: string) => string,
+  fieldErrorMsg: (field?: string) => string
 ) {
   const objectFields = Object.keys(actual)
     .filter((k) => k !== '__length__' && isNaN(parseInt(k, 10)))
@@ -308,8 +309,7 @@ export function assertObjectWithBNEqual(
       assertEqualBN(actual[k], expected[k], fieldErrorMsg(k))
     } else if (Array.isArray(actual[k])) {
       assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
-    }
-    else {
+    } else {
       assert.equal(actual[k], expected[k], fieldErrorMsg(k))
     }
   }
@@ -332,10 +332,7 @@ export function assertAlmostEqualBN(
   margin: number | BN | BigNumber,
   msg?: string
 ) {
-  const diff = web3.utils
-    .toBN(actual)
-    .sub(web3.utils.toBN(expected))
-    .abs()
+  const diff = web3.utils.toBN(actual).sub(web3.utils.toBN(expected)).abs()
   assert(
     web3.utils.toBN(margin).gte(diff),
     `expected ${expected.toString(10)} to be within ${margin.toString(10)} of ${actual.toString(
@@ -374,8 +371,9 @@ export function assertGteBN(
 ) {
   assert(
     web3.utils.toBN(value).gte(web3.utils.toBN(expected)),
-    `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${msg ||
-      ''}`
+    `expected ${value.toString()} to be greater than or equal to ${expected.toString()}. ${
+      msg || ''
+    }`
   )
 }
 
@@ -465,50 +463,58 @@ enum VoteValue {
   Yes,
 }
 
-export async function assumeOwnership(contractsToOwn: string[], to: string, proposalId: number = 1, dequeuedIndex: number = 0) {
-	const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
-	const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
-	const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
-		'GovernanceApproverMultiSig',
-		artifacts
-	)
-	const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
+export async function assumeOwnership(
+  contractsToOwn: string[],
+  to: string,
+  proposalId: number = 1,
+  dequeuedIndex: number = 0
+) {
+  const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
+  const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
+  const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
+    'GovernanceApproverMultiSig',
+    artifacts
+  )
+  const registry: RegistryInstance = await getDeployedProxiedContract('Registry', artifacts)
   // Enough to pass the governance proposal unilaterally (and then some).
   const tenMillionCELO = '10000000000000000000000000'
-	// @ts-ignore
-	await lockedGold.lock({ value: tenMillionCELO })
+  // @ts-ignore
+  await lockedGold.lock({ value: tenMillionCELO })
   // Any contract's `transferOwnership` function will work here as the function signatures are all the same.
-	// @ts-ignore
-  const transferOwnershipData = Buffer.from(stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()), 'hex')
-	const proposalTransactions = await Promise.all(
-		contractsToOwn.map(async (contractName: string) => {
-			return {
-				value: 0,
-				destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
-				data: transferOwnershipData,
-			}
-		})
-	)
-	await governance.propose(
-		proposalTransactions.map((tx: any) => tx.value),
-		proposalTransactions.map((tx: any) => tx.destination),
-		// @ts-ignore
-		Buffer.concat(proposalTransactions.map((tx: any) => tx.data)),
-		proposalTransactions.map((tx: any) => tx.data.length),
-		'URL',
-		// @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-		{ value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
-	)
+  // @ts-ignore
+  const transferOwnershipData = Buffer.from(
+    stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()),
+    'hex'
+  )
+  const proposalTransactions = await Promise.all(
+    contractsToOwn.map(async (contractName: string) => {
+      return {
+        value: 0,
+        destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
+        data: transferOwnershipData,
+      }
+    })
+  )
+  await governance.propose(
+    proposalTransactions.map((tx: any) => tx.value),
+    proposalTransactions.map((tx: any) => tx.destination),
+    // @ts-ignore
+    Buffer.concat(proposalTransactions.map((tx: any) => tx.data)),
+    proposalTransactions.map((tx: any) => tx.data.length),
+    'URL',
+    // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+    { value: web3.utils.toWei(config.governance.minDeposit.toString(), 'ether') }
+  )
 
-	await governance.upvote(proposalId, 0, 0)
-	await timeTravel(config.governance.dequeueFrequency, web3)
-	// @ts-ignore
-	const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
-	await multiSig.submitTransaction(governance.address, 0, txData)
-	await timeTravel(config.governance.approvalStageDuration, web3)
-	await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
-	await timeTravel(config.governance.referendumStageDuration, web3)
-	await governance.execute(proposalId, dequeuedIndex)
+  await governance.upvote(proposalId, 0, 0)
+  await timeTravel(config.governance.dequeueFrequency, web3)
+  // @ts-ignore
+  const txData = governance.contract.methods.approve(proposalId, dequeuedIndex).encodeABI()
+  await multiSig.submitTransaction(governance.address, 0, txData)
+  await timeTravel(config.governance.approvalStageDuration, web3)
+  await governance.vote(proposalId, dequeuedIndex, VoteValue.Yes)
+  await timeTravel(config.governance.referendumStageDuration, web3)
+  await governance.execute(proposalId, dequeuedIndex)
 }
 
 /*
@@ -552,7 +558,12 @@ export const getDerivedKey = (offset: number, address: string, accounts: string[
   return '0x' + aKey.toString('hex')
 }
 
-export const unlockAndAuthorizeKey = async (offset: number, authorizeFn: any, account: string, accounts: string[]) => {
+export const unlockAndAuthorizeKey = async (
+  offset: number,
+  authorizeFn: any,
+  account: string,
+  accounts: string[]
+) => {
   const key = getDerivedKey(offset, account, accounts)
   const addr = privateKeyToAddress(key)
   // @ts-ignore

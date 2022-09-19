@@ -7,7 +7,7 @@ import { CeloContractName, celoRegistryAddress } from '@celo/protocol/lib/regist
 import { Address, eqAddress, NULL_ADDRESS } from '@celo/utils/lib/address'
 import { readdirSync, readJsonSync, writeJsonSync } from 'fs-extra'
 import { basename, join } from 'path'
-import { TruffleContract } from 'truffle-contract'
+import { TruffleContract } from '@truffle/contract'
 import { RegistryInstance } from 'types'
 
 /*

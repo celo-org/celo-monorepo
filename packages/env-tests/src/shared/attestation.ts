@@ -127,9 +127,8 @@ async function findValidCode(
         if (!attestationCodeDeepLink) {
           continue
         }
-        attestationCode = AttestationUtils.extractAttestationCodeFromMessage(
-          attestationCodeDeepLink
-        )
+        attestationCode =
+          AttestationUtils.extractAttestationCodeFromMessage(attestationCodeDeepLink)
       } else {
         attestationCode = AttestationUtils.extractAttestationCodeFromMessage(message)
       }

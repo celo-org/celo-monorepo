@@ -328,7 +328,7 @@ export const buildEIP712TypedData = async <DataType>(
       ],
     }
     message = {
-      payload: (data as unknown) as EIP712Object,
+      payload: data as unknown as EIP712Object,
     }
   }
 

@@ -28,9 +28,8 @@ import { getParsedSignatureOfAddress } from '../../lib/signing-utils'
 const Escrow: EscrowContract = artifacts.require('Escrow')
 const MockERC20Token: MockERC20TokenContract = artifacts.require('MockERC20Token')
 const MockAttestations: MockAttestationsContract = artifacts.require('MockAttestations')
-const FederatedAttestations: FederatedAttestationsContract = artifacts.require(
-  'FederatedAttestations'
-)
+const FederatedAttestations: FederatedAttestationsContract =
+  artifacts.require('FederatedAttestations')
 
 const NULL_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
 const NULL_ESCROWED_PAYMENT: EscrowedPayment = {
