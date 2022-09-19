@@ -84,7 +84,7 @@ contract UsingRegistryV2 {
    * @return The storage, major, minor, and patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 1, 1, 0);
   }
 
   function getAccounts() internal view returns (IAccounts) {

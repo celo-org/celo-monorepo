@@ -7,4 +7,10 @@ contract UsingRegistryV2BackwardsCompatible is UsingRegistryV2 {
   // without breaking release tooling.
   // Use `registryContract` (in UsingRegistryV2) for the actual registry address.
   IRegistry public registry;
+
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    revert("disabled");
+    return (0, 0, 0, 0);
+  }
+
 }
