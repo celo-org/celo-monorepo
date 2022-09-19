@@ -427,7 +427,7 @@ describe('pnp', () => {
               return expectedQuota
             })
 
-          const configWithShortTimeout = { ..._config }
+          const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
           configWithShortTimeout.timeout = testTimeoutMS
           const appWithShortTimeout = startSigner(
             configWithShortTimeout,

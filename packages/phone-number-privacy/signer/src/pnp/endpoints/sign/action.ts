@@ -115,6 +115,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
         return
       } catch (err) {
+        session.logger.error({ err })
         // Note that errors thrown after rollback will have no effect
         await trx.rollback()
         quotaStatus.performedQueryCount--
