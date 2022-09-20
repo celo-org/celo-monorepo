@@ -28,9 +28,7 @@ done
 [ -z "$OLD_BRANCH" ] && echo "Need to set the old branch via the -a flag" && exit 1;
 [ -z "$NEW_BRANCH" ] && echo "Need to set the new branch via the -b flag" && exit 1;
 
-# Exclude test contracts, mock contracts, contract interfaces, Proxy contracts, inlined libraries,
-# MultiSig contracts, and the ReleaseGold contract.
-CONTRACT_EXCLUSION_REGEX=".*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles"
+source scripts/bash/contract-exclusion-regex.sh
 
 REPORT_FLAG=""
 if [ ! -z "$REPORT" ]; then
