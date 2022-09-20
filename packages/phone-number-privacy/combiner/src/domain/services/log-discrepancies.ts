@@ -1,4 +1,5 @@
 import {
+  DisableDomainRequest,
   DomainQuotaStatusRequest,
   DomainRestrictedSignatureRequest,
   DomainState,
@@ -7,9 +8,13 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
 
+// TODO EN: no idea why using a type parameter throws errors when building
 export class DomainDiscrepanciesLogger {
   logResponseDiscrepancies(
-    session: Session<DomainRestrictedSignatureRequest> | Session<DomainQuotaStatusRequest>
+    session:
+      | Session<DomainRestrictedSignatureRequest>
+      | Session<DomainQuotaStatusRequest>
+      | Session<DisableDomainRequest>
   ): void {
     const parsedResponses: Array<{
       signerUrl: string

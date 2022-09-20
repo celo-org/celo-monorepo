@@ -182,27 +182,33 @@ export type DomainQuotaStatusResponse<D extends Domain = Domain> =
   | DomainQuotaStatusResponseSuccess<D>
   | DomainQuotaStatusResponseFailure
 
-export interface DisableDomainResponseSuccess {
+export interface DisableDomainResponseSuccess<D extends Domain = Domain> {
   success: true
   version: string
+  status: DomainState<D>
 }
 
 export interface DisableDomainResponseFailure {
   success: false
   version: string
   error: string
+  // TODO EN revisit if we ever pass in a domain status on failure
 }
 
-export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
+export type DisableDomainResponse<D extends Domain = Domain> =
+  | DisableDomainResponseSuccess<D>
+  | DisableDomainResponseFailure
 
 // prettier-ignore
 export type DomainResponse<
   R extends DomainRequest = DomainRequest
-> = 
-  | R extends DomainRestrictedSignatureRequest<infer D> ? DomainRestrictedSignatureResponse<D> : never
-  // tslint:disable-next-line: no-shadowed-variable
-  | R extends DomainQuotaStatusRequest<infer D> ? DomainQuotaStatusResponse<D> : never
-  | R extends DisableDomainRequest ? DisableDomainResponse : never
+> = R extends DomainRestrictedSignatureRequest<infer D>
+  ? DomainRestrictedSignatureResponse<D>
+  : never | R extends DomainQuotaStatusRequest<infer D2>
+  ? DomainQuotaStatusResponse<D2>
+  : never | R extends DisableDomainRequest<infer D3>
+  ? DisableDomainResponse<D3>
+  : never
 
 export function domainRestrictedSignatureResponseSchema<D extends Domain>(
   state: t.Type<DomainState<D>>
@@ -244,17 +250,22 @@ export function domainQuotaStatusResponseSchema<D extends Domain>(
   ])
 }
 
-export const DisableDomainResponseSchema: t.Type<DisableDomainResponse> = t.union([
-  t.type({
-    success: t.literal(true),
-    version: t.string,
-  }),
-  t.type({
-    success: t.literal(false),
-    version: t.string,
-    error: t.string,
-  }),
-])
+export function disableDomainResponseSchema<D extends Domain>(
+  state: t.Type<DomainState<D>>
+): t.Type<DisableDomainResponse<D>> {
+  return t.union([
+    t.type({
+      success: t.literal(true),
+      version: t.string,
+      status: state,
+    }),
+    t.type({
+      success: t.literal(false),
+      version: t.string,
+      error: t.string,
+    }),
+  ])
+}
 
 // General
 

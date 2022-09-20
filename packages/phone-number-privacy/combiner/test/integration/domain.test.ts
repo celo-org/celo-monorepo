@@ -187,10 +187,12 @@ describe('domainService', () => {
   }
 
   // Build and sign an example disable domain request.
-  const disableRequest = async (): Promise<DisableDomainRequest<SequentialDelayDomain>> => {
+  const disableRequest = async (
+    _domain?: SequentialDelayDomain
+  ): Promise<DisableDomainRequest<SequentialDelayDomain>> => {
     const req: DisableDomainRequest<SequentialDelayDomain> = {
       type: DomainRequestTypeTag.DISABLE,
-      domain: authenticatedDomain(),
+      domain: _domain ?? authenticatedDomain(),
       options: {
         signature: noString,
         nonce: noNumber,
@@ -251,6 +253,7 @@ describe('domainService', () => {
       expect(res.body).toStrictEqual<DisableDomainResponse>({
         success: true,
         version: res.body.version,
+        status: { disabled: true, counter: 0, timer: 0, now: res.body.status.now },
       })
     })
 
@@ -258,14 +261,16 @@ describe('domainService', () => {
       const req = await disableRequest()
       const res1 = await request(app).post(CombinerEndpoint.DISABLE_DOMAIN).send(req)
       expect(res1.status).toBe(200)
-      expect(res1.body).toStrictEqual<DisableDomainResponse>({
+      const expectedResponse: DisableDomainResponse = {
         success: true,
         version: res1.body.version,
-      })
-
+        status: { disabled: true, counter: 0, timer: 0, now: res1.body.status.now },
+      }
+      expect(res1.body).toStrictEqual<DisableDomainResponse>(expectedResponse)
       const res2 = await request(app).post(CombinerEndpoint.DISABLE_DOMAIN).send(req)
       expect(res2.status).toBe(200)
-      expect(res2.body).toStrictEqual<DisableDomainResponse>(res1.body)
+      expectedResponse.status.now = res2.body.status.now
+      expect(res2.body).toStrictEqual<DisableDomainResponse>(expectedResponse)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
@@ -279,6 +284,7 @@ describe('domainService', () => {
       expect(res.body).toStrictEqual<DisableDomainResponse>({
         success: true,
         version: res.body.version,
+        status: { disabled: true, counter: 0, timer: 0, now: res.body.status.now },
       })
     })
 
@@ -806,6 +812,23 @@ describe('domainService', () => {
         version: res.body.version,
         error: WarningMessage.EXCEEDED_QUOTA,
       })
+    })
+
+    it('Should respond with 429 when requesting a signature from a disabled domain', async () => {
+      const testDomain = authenticatedDomain()
+      const resDisable = await request(app)
+        .post(CombinerEndpoint.DISABLE_DOMAIN)
+        .send(await disableRequest(testDomain))
+      expect(resDisable.status).toBe(200)
+      expect(resDisable.body).toStrictEqual<DisableDomainResponse>({
+        success: true,
+        version: resDisable.body.version,
+        status: { disabled: true, counter: 0, timer: 0, now: resDisable.body.status.now },
+      })
+
+      const [req, _] = await signatureRequest(testDomain)
+      const resSig = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
+      expect(resSig.status).toBe(429)
     })
 
     it('Should respond with 503 on disabled api', async () => {

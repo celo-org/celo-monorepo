@@ -115,7 +115,11 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
     )
   )
   const domainDisable = new Controller(
-    new DomainDisableAction(config.domains, new DomainDisableIO(config.domains))
+    new DomainDisableAction(
+      config.domains,
+      domainThresholdStateService,
+      new DomainDisableIO(config.domains)
+    )
   )
   app.post(CombinerEndpoint.DISABLE_DOMAIN, (req, res) =>
     meterResponse(

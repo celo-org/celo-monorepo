@@ -1,21 +1,15 @@
-import {
-  DomainQuotaStatusRequest,
-  DomainRestrictedSignatureRequest,
-  DomainState,
-} from '@celo/phone-number-privacy-common'
+import { DomainRequest, DomainState } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
 import { OdisConfig } from '../../config'
 
-export class DomainThresholdStateService<
-  R extends DomainQuotaStatusRequest | DomainRestrictedSignatureRequest
-> {
+export class DomainThresholdStateService<R extends DomainRequest> {
   constructor(readonly config: OdisConfig) {}
 
   findThresholdDomainState(session: Session<R>): DomainState {
     // Get the domain status from the responses, filtering out responses that don't have the status.
     const domainStates = session.responses
       .map((signerResponse) => ('status' in signerResponse.res ? signerResponse.res.status : null))
-      .filter((state) => state ?? false) as DomainState[]
+      .filter((state) => state) as DomainState[]
     const threshold = this.config.keys.threshold
     if (domainStates.length < threshold) {
       throw new Error('Insufficient number of signer responses')
