@@ -74,10 +74,11 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
   sendSuccess(
     status: number,
     response: Response<SignMessageResponseSuccess>,
+    // TODO EN: legacy responses have not had warnings returned
+    warnings: string[],
     key: Key,
     signature: string,
-    quotaStatus: PnpQuotaStatus,
-    warnings?: string[]
+    quotaStatus: PnpQuotaStatus
   ) {
     response.set(KEY_VERSION_HEADER, key.version.toString())
     send(

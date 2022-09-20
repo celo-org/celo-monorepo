@@ -86,11 +86,11 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   sendSuccess(
     status: number,
     response: Response<SignMessageResponseSuccess>,
+    warnings: string[],
     signature: string,
     performedQueryCount: number,
     totalQuota: number,
-    blockNumber?: number,
-    warnings?: string[]
+    blockNumber?: number
   ) {
     send(
       response,

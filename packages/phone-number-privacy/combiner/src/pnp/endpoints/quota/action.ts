@@ -29,10 +29,10 @@ export class PnpQuotaAction extends CombineAction<PnpQuotaRequest> {
         this.io.sendSuccess(
           200,
           session.response,
+          session.warnings,
           performedQueryCount,
           totalQuota,
-          blockNumber,
-          session.warnings
+          blockNumber
         )
         return
       } catch (err) {

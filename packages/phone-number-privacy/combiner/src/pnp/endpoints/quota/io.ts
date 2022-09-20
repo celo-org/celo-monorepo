@@ -70,10 +70,10 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   sendSuccess(
     status: number,
     response: Response<PnpQuotaResponseSuccess>,
+    warnings: string[],
     performedQueryCount: number,
     totalQuota: number,
-    blockNumber?: number,
-    warnings?: string[]
+    blockNumber?: number
   ) {
     send(
       response,

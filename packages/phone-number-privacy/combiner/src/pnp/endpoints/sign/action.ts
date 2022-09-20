@@ -25,11 +25,11 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
         return this.io.sendSuccess(
           200,
           session.response,
+          session.warnings,
           combinedSignature,
           pnpQuotaStatus.performedQueryCount,
           pnpQuotaStatus.totalQuota,
-          pnpQuotaStatus.blockNumber,
-          session.warnings
+          pnpQuotaStatus.blockNumber
         )
       } catch (error) {
         // May fail upon combining signatures if too many sigs are invalid

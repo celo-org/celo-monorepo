@@ -114,7 +114,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           key,
           session
         )
-        this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
+        this.io.sendSuccess(200, session.response, session.errors, key, signature, quotaStatus)
         return
       } catch (err) {
         session.logger.error({ err })
