@@ -117,11 +117,12 @@ contract BiPoolManager is IExchangeProvider, IBiPoolManager, Initializable, Owna
    * @return amountOut The amount of tokenOut to be bought
    */
   function getAmountOut(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountIn)
-    public
-    returns (uint256)
+    external
+    view
+    returns (uint256 amountOut)
   {
     PoolExchange memory exchange = getPoolExchange(exchangeId);
-    return _getAmountOut(exchange, tokenIn, tokenOut, amountIn);
+    (amountOut, ) = _getAmountOut(exchange, tokenIn, tokenOut, amountIn);
   }
 
   /**
@@ -133,11 +134,12 @@ contract BiPoolManager is IExchangeProvider, IBiPoolManager, Initializable, Owna
    * @return amountIn The amount of tokenIn to be sold
    */
   function getAmountIn(bytes32 exchangeId, address tokenIn, address tokenOut, uint256 amountOut)
-    public
-    returns (uint256)
+    external
+    view
+    returns (uint256 amountIn)
   {
     PoolExchange memory exchange = getPoolExchange(exchangeId);
-    return _getAmountIn(exchange, tokenIn, tokenOut, amountOut);
+    (amountIn, ) = _getAmountIn(exchange, tokenIn, tokenOut, amountOut);
   }
 
   /* ==================== Mutative Functions ==================== */
@@ -260,9 +262,8 @@ contract BiPoolManager is IExchangeProvider, IBiPoolManager, Initializable, Owna
   {
     PoolExchange memory exchange = getPoolExchange(exchangeId);
     bool bucketsUpdated;
-    (exchange, bucketsUpdated) = updateBucketsIfNecessary(exchangeId, exchange);
 
-    amountOut = _getAmountOut(exchange, tokenIn, tokenOut, amountIn);
+    (amountOut, bucketsUpdated) = _getAmountOut(exchange, tokenIn, tokenOut, amountIn);
     executeSwap(exchangeId, exchange, tokenIn, amountIn, amountOut, bucketsUpdated);
     return amountOut;
   }
@@ -282,9 +283,8 @@ contract BiPoolManager is IExchangeProvider, IBiPoolManager, Initializable, Owna
   {
     PoolExchange memory exchange = getPoolExchange(exchangeId);
     bool bucketsUpdated;
-    (exchange, bucketsUpdated) = updateBucketsIfNecessary(exchangeId, exchange);
 
-    amountIn = _getAmountIn(exchange, tokenIn, tokenOut, amountOut);
+    (amountIn, bucketsUpdated) = _getAmountIn(exchange, tokenIn, tokenOut, amountOut);
     executeSwap(exchangeId, exchange, tokenIn, amountIn, amountOut, bucketsUpdated);
     return amountIn;
   }
@@ -309,18 +309,18 @@ contract BiPoolManager is IExchangeProvider, IBiPoolManager, Initializable, Owna
     uint256 amountOut,
     bool bucketsUpdated
   ) internal {
+    if (bucketsUpdated) {
+      // solhint-disable-next-line not-rely-on-time
+      exchanges[exchangeId].lastBucketUpdate = now;
+      emit BucketsUpdated(exchangeId, exchange.bucket0, exchange.bucket1);
+    }
+
     if (tokenIn == exchange.asset0) {
       exchanges[exchangeId].bucket0 = exchange.bucket0 + amountIn;
       exchanges[exchangeId].bucket1 = exchange.bucket1 - amountOut;
     } else {
       exchanges[exchangeId].bucket0 = exchange.bucket0 - amountOut;
       exchanges[exchangeId].bucket1 = exchange.bucket1 + amountIn;
-    }
-    // exchanges[exchangeId].lastBucketUpdate = exchange.lastBucketUpdate;
-
-    if (bucketsUpdated) {
-      // solhint-disable-next-line not-rely-on-time
-      exchanges[exchangeId].lastBucketUpdate = now;
     }
   }
 
@@ -331,35 +331,36 @@ contract BiPoolManager is IExchangeProvider, IBiPoolManager, Initializable, Owna
    * @param tokenOut The token to be bought 
    * @param amountIn The amount of tokenIn to be sold
    * @return amountOut The amount of tokenOut to be bought
+   * @return bucketsUpdated Wether the buckets were updated during the quote
    */
   function _getAmountOut(
     PoolExchange memory exchange,
     address tokenIn,
     address tokenOut,
     uint256 amountIn
-  ) internal view returns (uint256) {
+  ) internal view returns (uint256 amountOut, bool bucketsUpdated) {
     require(
       (tokenIn == exchange.asset0 && tokenOut == exchange.asset1) ||
         (tokenIn == exchange.asset1 && tokenOut == exchange.asset0),
       "tokenIn and tokenOut must match exchange"
     );
 
+    (exchange, bucketsUpdated) = updateBucketsIfNecessary(exchange);
+
     if (tokenIn == exchange.asset0) {
-      return
-        exchange.pricingModule.getAmountOut(
-          exchange.bucket0,
-          exchange.bucket1,
-          exchange.config.spread.unwrap(),
-          amountIn
-        );
+      amountOut = exchange.pricingModule.getAmountOut(
+        exchange.bucket0,
+        exchange.bucket1,
+        exchange.config.spread.unwrap(),
+        amountIn
+      );
     } else {
-      return
-        exchange.pricingModule.getAmountOut(
-          exchange.bucket1,
-          exchange.bucket0,
-          exchange.config.spread.unwrap(),
-          amountIn
-        );
+      amountOut = exchange.pricingModule.getAmountOut(
+        exchange.bucket1,
+        exchange.bucket0,
+        exchange.config.spread.unwrap(),
+        amountIn
+      );
     }
   }
 
@@ -370,35 +371,36 @@ contract BiPoolManager is IExchangeProvider, IBiPoolManager, Initializable, Owna
    * @param tokenOut The token to be bought 
    * @param amountOut The amount of tokenOut to be bought
    * @return amountIn The amount of tokenIn to be sold
+   * @return bucketsUpdated Wether the buckets were updated during the quote
    */
   function _getAmountIn(
     PoolExchange memory exchange,
     address tokenIn,
     address tokenOut,
     uint256 amountOut
-  ) internal view returns (uint256) {
+  ) internal view returns (uint256 amountIn, bool bucketsUpdated) {
     require(
       (tokenIn == exchange.asset0 && tokenOut == exchange.asset1) ||
         (tokenIn == exchange.asset1 && tokenOut == exchange.asset0),
       "tokenIn and tokenOut must match exchange"
     );
 
+    (exchange, bucketsUpdated) = updateBucketsIfNecessary(exchange);
+
     if (tokenIn == exchange.asset0) {
-      return
-        exchange.pricingModule.getAmountIn(
-          exchange.bucket0,
-          exchange.bucket1,
-          exchange.config.spread.unwrap(),
-          amountOut
-        );
+      amountIn = exchange.pricingModule.getAmountIn(
+        exchange.bucket0,
+        exchange.bucket1,
+        exchange.config.spread.unwrap(),
+        amountOut
+      );
     } else {
-      return
-        exchange.pricingModule.getAmountIn(
-          exchange.bucket1,
-          exchange.bucket0,
-          exchange.config.spread.unwrap(),
-          amountOut
-        );
+      amountIn = exchange.pricingModule.getAmountIn(
+        exchange.bucket1,
+        exchange.bucket0,
+        exchange.config.spread.unwrap(),
+        amountOut
+      );
     }
   }
 
@@ -406,19 +408,17 @@ contract BiPoolManager is IExchangeProvider, IBiPoolManager, Initializable, Owna
    * @notice If conditions are met, update the exchange bucket sizes.
    * @dev This doesn't checkpoint the exchange, just updates the in-memory one
    * so it should be used in a context that then checkpoints the exchange.
-   * @param exchangeId The id of the exchange being updated.
    * @param exchange The exchange being updated.
    * @return exchangeAfter The updated exchange.
    */
-  function updateBucketsIfNecessary(bytes32 exchangeId, PoolExchange memory exchange)
+  function updateBucketsIfNecessary(PoolExchange memory exchange)
     internal
+    view
     returns (PoolExchange memory, bool updated)
   {
-    updated = false;
     if (shouldUpdateBuckets(exchange)) {
       (exchange.bucket0, exchange.bucket1) = getUpdatedBuckets(exchange);
       updated = true;
-      emit BucketsUpdated(exchangeId, exchange.bucket0, exchange.bucket1);
     }
     return (exchange, updated);
   }
