@@ -28,6 +28,7 @@ describe('governance tests', () => {
       epoch: EPOCH,
       churritoBlock: 0,
       donutBlock: 0,
+      espressoBlock: 0,
     },
   }
 
