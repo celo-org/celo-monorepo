@@ -19,6 +19,7 @@ describe('attestations tests', () => {
     genesisConfig: {
       churritoBlock: 0,
       donutBlock: 0,
+      espressoBlock: 0,
     },
     instances: [
       {
