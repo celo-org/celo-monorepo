@@ -25,6 +25,7 @@ import { newLockedGold } from './generated/LockedGold'
 import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
 import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
 import { newMultiSig } from './generated/MultiSig'
+import { newOdisPayments } from './generated/OdisPayments'
 import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
@@ -60,6 +61,7 @@ export const ContractFactories = {
   [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
   [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
   [CeloContract.MultiSig]: newMultiSig,
+  [CeloContract.OdisPayments]: newOdisPayments,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,

@@ -20,6 +20,7 @@ import { ABI as LockedGoldABI } from './generated/LockedGold'
 import { ABI as MetaTransactionWalletABI } from './generated/MetaTransactionWallet'
 import { ABI as MetaTransactionWalletDeployerABI } from './generated/MetaTransactionWalletDeployer'
 import { ABI as MultiSigABI } from './generated/MultiSig'
+import { ABI as OdisPaymentsABI } from './generated/OdisPayments'
 import { ABI as ProxyABI } from './generated/Proxy'
 import { ABI as RandomABI } from './generated/Random'
 import { ABI as RegistryABI } from './generated/Registry'
@@ -116,6 +117,7 @@ const initializeAbiMap = {
   MetaTransactionWalletProxy: findInitializeAbi(MetaTransactionWalletABI),
   MetaTransactionWalletDeployerProxy: findInitializeAbi(MetaTransactionWalletDeployerABI),
   MultiSigProxy: findInitializeAbi(MultiSigABI),
+  OdisPaymentsProxy: findInitializeAbi(OdisPaymentsABI),
   ProxyProxy: findInitializeAbi(ProxyABI),
   RandomProxy: findInitializeAbi(RandomABI),
   RegistryProxy: findInitializeAbi(RegistryABI),
