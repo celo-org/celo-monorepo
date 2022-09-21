@@ -30,7 +30,11 @@ interface IBrokerAdmin {
    * @param exchangeProvider the address of the exchange manager to remove
    * @param index the index in the exchange managers array
    */
+<<<<<<< HEAD
   function removeExchangeProviders(address exchangeProvider, uint256 index) external;
+=======
+  function removeExchangeProvider(address exchangeProvider, uint256 index) external;
+>>>>>>> 198718d54 (tests pass)
 
   /**
    * @notice Add exchange manager
