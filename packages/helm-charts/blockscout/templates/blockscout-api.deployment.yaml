@@ -92,7 +92,7 @@ spec:
         - name: DISABLE_EXCHANGE_RATES
           value: "true"
         - name: API_RATE_LIMIT
-          value: {{ .Values.blockscout.api.rate_limit | quote }}
+          value: {{ .Values.blockscout.api.rateLimit | quote }}
         - name: POOL_SIZE
           value: {{ .Values.blockscout.api.poolSize | quote }}
         - name: POOL_SIZE_API

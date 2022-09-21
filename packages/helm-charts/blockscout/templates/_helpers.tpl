@@ -143,10 +143,7 @@ blockscout components.
 - name: DATABASE_PASSWORD
   value: {{ .Values.blockscout.secrets.dbPassword }}
 - name: ERLANG_COOKIE
-  valueFrom:
-    secretKeyRef:
-      name:  {{ .Values.blockscout.cookieSecretName }}
-      key: ERLANG_COOKIE
+  value: {{ .Values.blockscout.secrets.erlang.cookie }}
 - name: POD_IP
   valueFrom:
     fieldRef:
