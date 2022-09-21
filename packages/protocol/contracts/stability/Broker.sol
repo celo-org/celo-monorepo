@@ -52,9 +52,9 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   /* ==================== Mutative Functions ==================== */
 
   /**
-   * @notice Add exchange manager
-   * @param exchangeProvider The address of the exchange manager to add
-   * @return index The index where it was inserted
+   * @notice Add an exchange provider to the list of providers.
+   * @param exchangeProvider The address of the exchange provider to add.
+   * @return index The index of the newly added specified exchange provider.
    */
   function addExchangeProvider(address exchangeProvider) public onlyOwner returns (uint256 index) {
     require(!isExchangeProvider[exchangeProvider], "ExchangeProvider already exists in the list");
@@ -204,7 +204,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
 
   /**
    * @notice This method is responsible for minting tokens
-   * @param to The address receiving  
+   * @param to The address receiving
    * @param token The asset getting minted
    * @param amount The amount of asset getting minted
    */
