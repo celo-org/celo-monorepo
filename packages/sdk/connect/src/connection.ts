@@ -286,7 +286,11 @@ export class Connection {
           id: getRandomId(),
           jsonrpc: '2.0',
           method,
-          params: [inputAddressFormatter(signer), typedData],
+          // stringify data for v3 & v4 based on https://github.com/MetaMask/metamask-extension/blob/c72199a1a6e4151c40c22f79d0f3b6ed7a2d59a7/app/scripts/lib/typed-message-manager.js#L185
+          params: [
+            inputAddressFormatter(signer),
+            version && version > 2 ? JSON.stringify(typedData) : typedData,
+          ],
         },
         (error, resp) => {
           if (error) {
