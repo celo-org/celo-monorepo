@@ -8,6 +8,7 @@ import {
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
+  PnpQuotaStatus,
   send,
   SignerEndpoint,
   SignMessageRequest,
@@ -84,11 +85,9 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
   sendSuccess(
     status: number,
     response: Response<SignMessageResponseSuccess>,
-    warnings: string[],
     signature: string,
-    performedQueryCount: number,
-    totalQuota: number,
-    blockNumber?: number
+    quotaStatus: PnpQuotaStatus,
+    warnings: string[]
   ) {
     send(
       response,
@@ -96,9 +95,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
         success: true,
         version: VERSION,
         signature,
-        performedQueryCount,
-        totalQuota,
-        blockNumber,
+        ...quotaStatus,
         warnings,
       },
       status,
@@ -110,10 +107,8 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     error: ErrorType,
     status: number,
     response: Response<SignMessageResponseFailure>,
-    performedQueryCount?: number,
-    totalQuota?: number,
-    blockNumber?: number,
-    signature?: string
+    signature?: string,
+    quotaStatus?: PnpQuotaStatus
   ) {
     send(
       response,
@@ -121,10 +116,8 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
         success: false,
         version: VERSION,
         error,
-        performedQueryCount,
-        totalQuota,
-        blockNumber,
         signature,
+        ...quotaStatus,
       },
       status,
       response.locals.logger

@@ -16,7 +16,7 @@ export class PnpQuotaAction implements Action<PnpQuotaRequest> {
     const quotaStatus = await this.quota.getQuotaStatus(session)
 
     if (quotaStatus.performedQueryCount > -1 && quotaStatus.totalQuota > -1) {
-      this.io.sendSuccess(200, session.response, session.errors, quotaStatus)
+      this.io.sendSuccess(200, session.response, quotaStatus, session.errors)
       return
     }
     this.io.sendFailure(

@@ -63,8 +63,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   sendSuccess(
     status: number,
     response: Response<PnpQuotaResponseSuccess>,
-    warnings: string[],
-    quotaStatus: PnpQuotaStatus
+    quotaStatus: PnpQuotaStatus,
+    warnings: string[]
   ) {
     send(
       response,

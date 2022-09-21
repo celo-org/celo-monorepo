@@ -21,15 +21,13 @@ export class PnpSignAction extends SignAction<SignMessageRequest> {
           session.logger
         )
 
-        const pnpQuotaStatus = this.thresholdStateService.findCombinerQuotaState(session)
+        const quotaStatus = this.thresholdStateService.findCombinerQuotaState(session)
         return this.io.sendSuccess(
           200,
           session.response,
-          session.warnings,
           combinedSignature,
-          pnpQuotaStatus.performedQueryCount,
-          pnpQuotaStatus.totalQuota,
-          pnpQuotaStatus.blockNumber
+          quotaStatus,
+          session.warnings
         )
       } catch (error) {
         // May fail upon combining signatures if too many sigs are invalid

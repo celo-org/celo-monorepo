@@ -74,10 +74,10 @@ export class PnpSignIO extends IO<SignMessageRequest> {
   sendSuccess(
     status: number,
     response: Response<SignMessageResponseSuccess>,
-    warnings: string[],
     key: Key,
     signature: string,
-    quotaStatus: PnpQuotaStatus
+    quotaStatus: PnpQuotaStatus,
+    warnings: string[]
   ) {
     response.set(KEY_VERSION_HEADER, key.version.toString())
     send(
@@ -99,9 +99,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     error: string,
     status: number,
     response: Response<SignMessageResponseFailure>,
-    performedQueryCount?: number,
-    totalQuota?: number,
-    blockNumber?: number
+    quotaStatus?: PnpQuotaStatus
   ) {
     send(
       response,
@@ -109,9 +107,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
         success: false,
         version: getVersion(),
         error,
-        performedQueryCount,
-        totalQuota,
-        blockNumber,
+        ...quotaStatus,
       },
       status,
       response.locals.logger
