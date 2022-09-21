@@ -2,8 +2,9 @@
 pragma solidity ^0.5.13;
 
 /*
- * @title Broker Admin Interface - all these functions should be only callable by the owner
- * @notice The broker is responsible for executing swaps and keeping track of trading limits
+ * @title Broker Admin Interface
+ * @notice Contains admin functions to configure the broker that
+ *         should be only callable by the owner.
  */
 interface IBrokerAdmin {
   /**
