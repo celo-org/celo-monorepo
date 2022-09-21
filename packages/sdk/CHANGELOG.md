@@ -194,4 +194,3 @@ Other Changes
 - Modified version of #6474: Fix dependencies to work on standalone installations and in environments without Git [#6516](https://github.com/celo-org/celo-monorepo/pull/6516)
 
 _Note: Changes before and including 1.0.0 are not documented_
-
