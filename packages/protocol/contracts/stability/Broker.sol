@@ -66,9 +66,9 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice Remove an exchange manager at an index
-   * @param exchangeProvider The address of the exchange manager to remove
-   * @param index The index in the exchange managers array
+   * @notice Remove an exchange provider from the list of providers.
+   * @param exchangeProvider The address of the exchange provider to remove.
+   * @param index The index of the exchange provider being removed.
    */
   function removeExchangeProvider(address exchangeProvider, uint256 index) public onlyOwner {
     require(
