@@ -155,7 +155,7 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
   }
 }
 
-contract BrokerTest_quote is BrokerTest {
+contract BrokerTest_getAmounts is BrokerTest {
   bytes32 exchangeId = keccak256(abi.encode("exhcangeId"));
 
   function test_getAmountIn_whenExchangeProviderWasNotSet_shouldRevert() public {
