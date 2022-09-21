@@ -8,7 +8,7 @@ pragma solidity ^0.5.13;
 interface IBroker {
   /**
    * @notice Emitted when a swap occurs
-   * @param exchangeProvider The exchange manager used
+   * @param exchangeProvider The exchange provider used
    * @param exchangeId The id of the exchange used
    * @param trader The user that initiated the swap
    * @param tokenIn The address of the token that was sold
@@ -28,7 +28,7 @@ interface IBroker {
 
   /**
    * @notice Execute a token swap with fixed amountIn
-   * @param exchangeProvider the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange provider for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -47,7 +47,7 @@ interface IBroker {
 
   /**
    * @notice Execute a token swap with fixed amountOut
-   * @param exchangeProvider the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange provider for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -66,7 +66,7 @@ interface IBroker {
 
   /**
    * @notice Calculate amountOut of tokenOut received for a given amountIn of tokenIn
-   * @param exchangeProvider the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange provider for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -83,7 +83,7 @@ interface IBroker {
 
   /**
    * @notice Calculate amountIn of tokenIn needed for a given amountOut of tokenOut
-   * @param exchangeProvider the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange provider for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought 
@@ -99,9 +99,9 @@ interface IBroker {
   ) external returns (uint256 amountIn);
 
   /**
-   * @notice Get the list of registered exchange managers.
+   * @notice Get the list of registered exchange providers.
    * @dev This can be used by UI or clients to discover all pairs.
-   * @return exchangeProviders the addresses of all exchange managers.
+   * @return exchangeProviders the addresses of all exchange providers.
    */
   function getExchangeProviders() external view returns (address[] memory exchangeProviders);
 }
