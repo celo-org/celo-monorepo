@@ -1,6 +1,3 @@
-aws: false
-azure: false
-fullnameOverride: false
 extraPodLabels:
   stack: blockscout
   mode: archive
@@ -12,26 +9,17 @@ genesis:
   networkId: 42220
   useGenesisFileBase64: false
 geth:
-  azure_mixed_protocols: true
   autoscaling:
     enabled: true
-  create_network_endpoint_group: true
-  debug: false
-  expose_rpc_externally: false
   flags: --txpool.nolocals
-  fullnodeCheckBlockAge: true
   gcmode: archive
-  gstorage_data_bucket: celo-chain-backup/mainnet
   image:
-    imagePullPolicy: IfNotPresent
     repository: us.gcr.io/celo-org/geth
     tag: 1.6.0
-  in_memory_discovery_table: false
   light:
-    maxpeers: 1000
-    serve: 90
-  maxpeers: 1100
-  metrics: false
+    maxpeers: 100
+    serve: 10
+  maxpeers: 300
   node_keys:
   - f4486a87798a9126713c146cd509254facc106dda552bd40962a7082e26d4460
   - 5b21d503b04d249adf9a4e6ce21d44989b2db354f159efee5fd33d561092a002
@@ -83,7 +71,6 @@ geth:
   - 08508d726d3d592e922324eacdcf622480a479c61a0414e47b59e219b7c3c245
   - 0176d2e8d1a3fc60f2cc55265ebe2bfb04074521d52b1fb844e2fe28646f604b
   - 53cc64a704ac5712d1990efd511571d4b22a566c1c184731dda57c04acc815c9
-  ping_ip_from_packet: false
   public_ip_per_node:
   - 34.168.166.173
   - 34.168.53.31
@@ -95,8 +82,6 @@ geth:
   - 34.168.208.61
   - 35.230.20.151
   - 35.203.178.255
-  readiness_probe_max_block_age_seconds: 30
-  readiness_probe_max_block_epoch_age_seconds: 300
   resources:
     requests:
       cpu: "7"
@@ -106,32 +91,16 @@ geth:
   - TCP
   - UDP
   service_type: LoadBalancer
-  syncmode: full
-  updateStrategy:
-    rollingUpdate:
-      partition: 0
-    type: RollingUpdate
   use_gstorage_data: false
-  use_static_ips: true
   verbosity: 2
   ws_port: 8545
 ingress:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    konghq.com/plugins: forno-rate-limit, forno-auth
-    konghq.com/strip-path: "true"
   enabled: false
-  ingressClassName: nginx
-metrics: true
 namespace: blockscout
-nodeSelector:
-  pool: t2d-standard-8-spot
-pprof:
-  enabled: true
-  path: /debug/metrics/prometheus
-  port: 6060
+
+metrics: true
 prometheus: true
-replicaCount: 1
+replicaCount: 2
 storage:
   accessModes: ReadWriteOnce
   enable: true
@@ -141,6 +110,8 @@ storage:
     kind: VolumeSnapshot
     name: snapshot-archive-node-blockscout
   storageClass: premium-rwo
+nodeSelector:
+  pool: t2d-standard-8-spot
 tolerations:
 - effect: NoSchedule
   key: pool
