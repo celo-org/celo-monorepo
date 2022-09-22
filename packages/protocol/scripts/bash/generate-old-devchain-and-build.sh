@@ -34,9 +34,16 @@ git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build contract artifacts"
-rm -rf build/contracts
-yarn install >> $LOG_FILE
+
+echo `pwd`
+
+yarn clean
+cd ../..
+echo `pwd`
+yarn >> $LOG_FILE
 yarn build >> $LOG_FILE
+cd packages/protocol
+echo `pwd`
 
 # TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"
