@@ -84,6 +84,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           }
         }
 
+        // TODO(after 2.0.0) add more specific error messages on DB and key version
+        // https://github.com/celo-org/celo-monorepo/issues/9882
         // quotaStatus is updated in place; throws on failure to update
         const { sufficient } = await this.quota.checkAndUpdateQuotaStatus(quotaStatus, session, trx)
         if (!sufficient) {
@@ -116,8 +118,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         return
       } catch (err) {
         session.logger.error({ err })
-        // Note that errors thrown after rollback will have no effect
-        await trx.rollback()
         quotaStatus.performedQueryCount--
         this.io.sendFailure(
           ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
@@ -127,6 +127,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           quotaStatus.totalQuota,
           quotaStatus.blockNumber
         )
+        // Note that errors thrown after rollback will have no effect, hence doing this last
+        await trx.rollback()
         return
       }
     })

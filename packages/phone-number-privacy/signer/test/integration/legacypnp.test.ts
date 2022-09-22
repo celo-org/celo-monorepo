@@ -49,6 +49,10 @@ const {
   DEK_PUBLIC_KEY,
 } = TestUtils.Values
 
+// TODO(2.0.0, timeout) revisit flake tracker timeouts under the umbrella of
+// https://github.com/celo-org/celo-monorepo/issues/9845
+jest.setTimeout(20000)
+
 const expectedSignature =
   'MAAAAAAAAAAEFHu3gWowoNJvvWkINGZR/1no37LPBFYRIHu3h5xYowXo1tlIlrL9CbN0cNqcKIAAAAAA'
 
@@ -1303,7 +1307,7 @@ describe('legacyPNP', () => {
           expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
 
-        it('Should return 500 on error non-SIGNATURE_COMPUTATION_FAILURE error in sign', async () => {
+        it('Should return 500 on generic error in sign', async () => {
           const spy = jest
             .spyOn(
               jest.requireActual('../../src/common/bls/bls-cryptography-client'),
