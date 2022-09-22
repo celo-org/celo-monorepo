@@ -69,6 +69,9 @@ geth:
   debug: false
   syncmode: full
   gcmode: full
+  fullnodeCheckBlockAge: true
+  use_gstorage_data: false
+  gstorage_data_bucket: celo-chain-backup/mainnet
   ping_ip_from_packet: false
   in_memory_discovery_table: false
   verbosity: 2
@@ -133,8 +136,8 @@ geth:
         stabilizationWindowSeconds: 600
 
 genesis:
-  networkId: 31418
-  network: baklavastaging
+  networkId: 42220
+  network: rc1
   useGenesisFileBase64: false
   genesisFileBase64: ""
   epoch_size: 17280
