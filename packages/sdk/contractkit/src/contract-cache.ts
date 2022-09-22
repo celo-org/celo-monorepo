@@ -176,9 +176,6 @@ export class WrapperCache implements ContractCacheType {
     return this.getContract(CeloContract.FederatedAttestations)
   }
 
-  // getFeeCurrencyWhitelist() {
-  //   return this.getWrapper(CeloContract.FeeCurrencyWhitelist, newFeeCurrencyWhitelist)
-  // }
 
   getGasPriceMinimum() {
     return this.getContract(CeloContract.GasPriceMinimum)

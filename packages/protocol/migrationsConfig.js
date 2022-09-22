@@ -26,7 +26,6 @@ const DAY = 24 * HOUR
 const WEEK = 7 * DAY
 const YEAR = 365 * DAY
 
-// TODO ASv2
 
 const DefaultConfig = {
   attestations: {
