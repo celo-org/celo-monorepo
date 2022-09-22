@@ -21,6 +21,8 @@ export class PnpSignAction implements Action<SignMessageRequest> {
   ) {}
 
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
+    // Compute quota lookup, update, and signing within transaction
+    // so that these occur atomically and rollback on error.
     await this.db.transaction(async (trx) => {
       const quotaStatus = await this.quota.getQuotaStatus(session, trx)
 
@@ -53,6 +55,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             quotaStatus.totalQuota,
             quotaStatus.blockNumber
           )
+          return
         }
         // In the case of a blockchain connection failure, totalQuota will be -1
         if (quotaStatus.totalQuota === -1) {
@@ -77,8 +80,13 @@ export class PnpSignAction implements Action<SignMessageRequest> {
               quotaStatus.totalQuota,
               quotaStatus.blockNumber
             )
+            return
           }
         }
+
+        // TODO(after 2.0.0) add more specific error messages on DB and key version
+        // https://github.com/celo-org/celo-monorepo/issues/9882
+        // quotaStatus is updated in place; throws on failure to update
         const { sufficient } = await this.quota.checkAndUpdateQuotaStatus(quotaStatus, session, trx)
         if (!sufficient) {
           this.io.sendFailure(
@@ -100,8 +108,6 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
       }
 
-      // Compute signature inside transaction so it will rollback on error.
-
       try {
         const signature = await this.sign(
           session.request.body.blindedQueryPhoneNumber,
@@ -109,21 +115,21 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           session
         )
         this.io.sendSuccess(200, session.response, key, signature, quotaStatus, session.errors)
+        return
       } catch (err) {
-        await trx.rollback()
+        session.logger.error({ err })
         quotaStatus.performedQueryCount--
-        if (err === ErrorMessage.SIGNATURE_COMPUTATION_FAILURE) {
-          this.io.sendFailure(
-            ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
-            500,
-            session.response,
-            quotaStatus.performedQueryCount, // TODO(2.0.0) consider refactoring to allow quotaStatus to be passed directly here to avoid parameter ordering errors
-            quotaStatus.totalQuota,
-            quotaStatus.blockNumber
-          )
-        } else {
-          throw err
-        }
+        this.io.sendFailure(
+          ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
+          500,
+          session.response,
+          quotaStatus.performedQueryCount, // TODO(2.0.0) consider refactoring to allow quotaStatus to be passed directly here to avoid parameter ordering errors
+          quotaStatus.totalQuota,
+          quotaStatus.blockNumber
+        )
+        // Note that errors thrown after rollback will have no effect, hence doing this last
+        await trx.rollback()
+        return
       }
     })
   }

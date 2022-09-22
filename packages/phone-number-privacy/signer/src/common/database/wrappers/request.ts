@@ -1,8 +1,9 @@
 import { DB_TIMEOUT, ErrorMessage, SignMessageRequest } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
-import { Counters, Histograms, Labels } from '../../../common/metrics'
+import { Histograms, meter } from '../../metrics'
 import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
+import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
 function requests(db: Knex) {
   return db<Request>(REQUESTS_TABLE)
@@ -14,35 +15,23 @@ export async function getRequestExists(
   logger: Logger,
   trx?: Knex.Transaction
 ): Promise<boolean> {
-  logger.debug({ request }, 'Checking if request exists')
-  const getRequestExistsMeter = Histograms.dbOpsInstrumentation
-    .labels('getRequestExists')
-    .startTimer()
-  try {
-    const existingRequest = trx
-      ? await requests(db)
-          .transacting(trx)
-          .where({
-            [REQUESTS_COLUMNS.address]: request.account,
-            [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
-          })
-          .first()
-          .timeout(DB_TIMEOUT)
-      : await requests(db)
-          .where({
-            [REQUESTS_COLUMNS.address]: request.account,
-            [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
-          })
-          .first()
-          .timeout(DB_TIMEOUT)
-    return !!existingRequest
-  } catch (err) {
-    Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
-    throw err
-  } finally {
-    getRequestExistsMeter()
-  }
+  return meter(
+    async () => {
+      logger.debug({ request }, 'Checking if request exists')
+      const existingRequest = await tableWithLockForTrx(requests(db), trx)
+        .where({
+          [REQUESTS_COLUMNS.address]: request.account,
+          [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
+        })
+        .first()
+        .timeout(DB_TIMEOUT)
+      return !!existingRequest
+    },
+    [],
+    (err: any) => countAndThrowDBError<boolean>(err, logger, ErrorMessage.DATABASE_GET_FAILURE),
+    Histograms.dbOpsInstrumentation,
+    ['getRequestExists']
+  )
 }
 
 export async function storeRequest(
@@ -51,15 +40,14 @@ export async function storeRequest(
   logger: Logger,
   trx: Knex.Transaction
 ): Promise<void> {
-  const storeRequestMeter = Histograms.dbOpsInstrumentation.labels('storeRequest').startTimer()
-  logger.debug({ request }, 'Storing salt request')
-  try {
-    await requests(db).transacting(trx).insert(new Request(request)).timeout(DB_TIMEOUT)
-  } catch (err) {
-    Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    throw err
-  } finally {
-    storeRequestMeter()
-  }
+  return meter(
+    async () => {
+      logger.debug({ request }, 'Storing salt request')
+      await requests(db).transacting(trx).insert(new Request(request)).timeout(DB_TIMEOUT)
+    },
+    [],
+    (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_INSERT_FAILURE),
+    Histograms.dbOpsInstrumentation,
+    ['storeRequest']
+  )
 }
