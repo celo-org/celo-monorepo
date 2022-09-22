@@ -14,7 +14,7 @@ import { Initializable } from "../common/Initializable.sol";
 
 /**
  * @title Broker
- * @notice The broker executes swaps and keeps track of spending limits per pair
+ * @notice The broker executes swaps and keeps track of spending limits per pair.
  */
 contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   /* ==================== State Variables ==================== */
@@ -82,8 +82,8 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice Set the Mento reserve address
-   * @param _reserve The Mento reserve address
+   * @notice Set the Mento reserve address.
+   * @param _reserve The Mento reserve address.
    */
   function setReserve(address _reserve) public onlyOwner {
     require(_reserve != address(0), "Reserve address must be set");
@@ -92,13 +92,13 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
-   * @param exchangeProvider the address of the exchange provider for the pair
-   * @param exchangeId The id of the exchange to use
-   * @param tokenIn The token to be sold
-   * @param tokenOut The token to be bought
-   * @param amountOut The amount of tokenOut to be bought
-   * @return amountIn The amount of tokenIn to be sold
+   * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn.
+   * @param exchangeProvider the address of the exchange provider for the pair.
+   * @param exchangeId The id of the exchange to use.
+   * @param tokenIn The token to be sold.
+   * @param tokenOut The token to be bought.
+   * @param amountOut The amount of tokenOut to be bought.
+   * @return amountIn The amount of tokenIn to be sold.
    */
   function getAmountIn(
     address exchangeProvider,
@@ -118,13 +118,13 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice Calculate amountOut of tokenOut for a given amountIn of tokenIn
-   * @param exchangeProvider the address of the exchange provider for the pair
-   * @param exchangeId The id of the exchange to use
-   * @param tokenIn The token to be sold
-   * @param tokenOut The token to be bought
-   * @param amountIn The amount of tokenIn to be sold
-   * @return amountOut The amount of tokenOut to be bought
+   * @notice Calculate amountOut of tokenOut for a given amountIn of tokenIn.
+   * @param exchangeProvider the address of the exchange provider for the pair.
+   * @param exchangeId The id of the exchange to use.
+   * @param tokenIn The token to be sold.
+   * @param tokenOut The token to be bought.
+   * @param amountIn The amount of tokenIn to be sold.
+   * @return amountOut The amount of tokenOut to be bought.
    */
   function getAmountOut(
     address exchangeProvider,
@@ -144,14 +144,14 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice Execute a token swap with fixed amountIn
-   * @param exchangeProvider the address of the exchange provider for the pair
-   * @param exchangeId The id of the exchange to use
-   * @param tokenIn The token to be sold
-   * @param tokenOut The token to be bought
-   * @param amountIn The amount of tokenIn to be sold
-   * @param amountOutMin Minimum amountOut to be received - controls slippage
-   * @return amountOut The amount of tokenOut to be bought
+   * @notice Execute a token swap with fixed amountIn.
+   * @param exchangeProvider the address of the exchange provider for the pair.
+   * @param exchangeId The id of the exchange to use.
+   * @param tokenIn The token to be sold.
+   * @param tokenOut The token to be bought.
+   * @param amountIn The amount of tokenIn to be sold.
+   * @param amountOutMin Minimum amountOut to be received - controls slippage.
+   * @return amountOut The amount of tokenOut to be bought.
    */
   function swapIn(
     address exchangeProvider,
@@ -170,14 +170,14 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice Execute a token swap with fixed amountOut
-   * @param exchangeProvider the address of the exchange provider for the pair
-   * @param exchangeId The id of the exchange to use
-   * @param tokenIn The token to be sold
-   * @param tokenOut The token to be bought
-   * @param amountOut The amount of tokenOut to be bought
-   * @param amountInMax Maximum amount of tokenIn that can be traded
-   * @return amountIn The amount of tokenIn to be sold
+   * @notice Execute a token swap with fixed amountOut.
+   * @param exchangeProvider the address of the exchange provider for the pair.
+   * @param exchangeId The id of the exchange to use.
+   * @param tokenIn The token to be sold.
+   * @param tokenOut The token to be bought.
+   * @param amountOut The amount of tokenOut to be bought.
+   * @param amountInMax Maximum amount of tokenIn that can be traded.
+   * @return amountIn The amount of tokenIn to be sold.
    */
   function swapOut(
     address exchangeProvider,
@@ -203,10 +203,10 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   /* ==================== Private Functions ==================== */
 
   /**
-   * @notice This method is responsible for minting tokens
-   * @param to The address receiving
-   * @param token The asset getting minted
-   * @param amount The amount of asset getting minted
+   * @notice This method is responsible for minting tokens.
+   * @param to The address receiving.
+   * @param token The asset getting minted.
+   * @param amount The amount of asset getting minted.
    */
   function transferOut(address payable to, address token, uint256 amount) internal {
     if (reserve.isStableAsset(token)) {
@@ -219,10 +219,10 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice This method is responsible for burning assets
-   * @param from The source to transfer from
-   * @param token The asset getting burned
-   * @param amount The amount of asset getting burned
+   * @notice This method is responsible for burning assets.
+   * @param from The source to transfer from.
+   * @param token The asset getting burned.
+   * @param amount The amount of asset getting burned.
    */
   function transferIn(address payable from, address token, uint256 amount) internal {
     if (reserve.isStableAsset(token)) {
