@@ -11,7 +11,7 @@ spec:
   maxReplicas: {{ .Values.geth.autoscaling.maxReplicas }}
   scaleTargetRef:
     apiVersion: apps/v1
-    kind: Statefulset
+    kind: StatefulSet
     name: {{ template "common.fullname" . }}
   metrics:
     {{- toYaml .Values.geth.autoscaling.metrics | nindent 4 }}
