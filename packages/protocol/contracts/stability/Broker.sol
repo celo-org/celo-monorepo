@@ -93,7 +93,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
 
   /**
    * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
-   * @param exchangeProvider the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange provider for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought
@@ -119,7 +119,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
 
   /**
    * @notice Calculate amountOut of tokenOut for a given amountIn of tokenIn
-   * @param exchangeProvider the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange provider for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought
@@ -145,7 +145,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
 
   /**
    * @notice Execute a token swap with fixed amountIn
-   * @param exchangeProvider the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange provider for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought
@@ -171,7 +171,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
 
   /**
    * @notice Execute a token swap with fixed amountOut
-   * @param exchangeProvider the address of the exchange manager for the pair
+   * @param exchangeProvider the address of the exchange provider for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
    * @param tokenOut The token to be bought
@@ -238,9 +238,9 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   /* ==================== View Functions ==================== */
 
   /**
-   * @notice Get the list of registered exchange managers.
+   * @notice Get the list of registered exchange providers.
    * @dev This can be used by UI or clients to discover all pairs.
-   * @return exchangeProviders the addresses of all exchange managers.
+   * @return exchangeProviders the addresses of all exchange providers.
    */
   function getExchangeProviders() external view returns (address[] memory) {
     return exchangeProviders;
