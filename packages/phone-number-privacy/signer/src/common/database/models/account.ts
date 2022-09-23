@@ -1,6 +1,5 @@
-// TODO EN: rename the var to reference that this is legacy
-export const ACCOUNTS_TABLE = 'accounts'
-export const ACCOUNTS_ONCHAIN_TABLE = 'accountsOnChain'
+export const ACCOUNTS_TABLE_LEGACY = 'accounts'
+export const ACCOUNTS_TABLE_ONCHAIN = 'accountsOnChain'
 
 export enum ACCOUNTS_COLUMNS {
   address = 'address',
@@ -8,16 +7,6 @@ export enum ACCOUNTS_COLUMNS {
   numLookups = 'num_lookups',
   didMatchmaking = 'did_matchmaking',
 }
-// export class Account {
-//   [ACCOUNTS_COLUMNS.address]: string;
-//   [ACCOUNTS_COLUMNS.createdAt]: Date = new Date();
-//   [ACCOUNTS_COLUMNS.numLookups]: number = 0;
-//   [ACCOUNTS_COLUMNS.didMatchmaking]: Date | null = null
-
-//   constructor(address: string) {
-//     this.address = address
-//   }
-// }
 
 export interface AccountRecord {
   [ACCOUNTS_COLUMNS.address]: string

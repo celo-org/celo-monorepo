@@ -5,7 +5,6 @@ import { Histograms, meter } from '../../metrics'
 import { PnpSignRequestRecord, REQUESTS_COLUMNS, toPnpSignRequestRecord } from '../models/request'
 import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
-// TODO EN: remove default table params
 function requests(db: Knex, table: string) {
   return db<PnpSignRequestRecord>(table)
 }
@@ -13,12 +12,7 @@ function requests(db: Knex, table: string) {
 export async function getRequestExists(
   db: Knex,
   requestsTable: string,
-  // TODO EN: ideally make these functions not depend on the request format nor the table name
-  // TODO EN: couuld always create a separate interface for the data needed for the request queries
-  // NOTE EN: do thisi later and just do it once later
-  // then could easily have subclasses (legacy/new) create something that transforms a session.body -> DB_FIELDS
-  // account: string,
-  // blindedQuery: string,
+  // TODO EN: revisit passing around specific message objects in the rest of the req/res audit ticket
   request: SignMessageRequest,
   logger: Logger,
   trx?: Knex.Transaction
@@ -26,9 +20,6 @@ export async function getRequestExists(
   return meter(
     async () => {
       logger.debug({ request }, 'Checking if request exists')
-      // logger.debug(
-      //   `Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery} `
-      // )
       const existingRequest = await tableWithLockForTrx(requests(db, requestsTable), trx)
         .where({
           [REQUESTS_COLUMNS.address]: request.account,

@@ -2,7 +2,7 @@ import { rootLogger } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex, knex } from 'knex'
 import { DEV_MODE, SignerConfig, SupportedDatabase, VERBOSE_DB_LOGGING } from '../../config'
-import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from './models/account'
+import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE_LEGACY } from './models/account'
 
 export async function initDatabase(
   config: SignerConfig,
@@ -82,7 +82,7 @@ export async function initDatabase(
 
 async function executeTestQuery(db: Knex, logger: Logger) {
   logger.info('Counting accounts')
-  const result = await db(ACCOUNTS_TABLE).count(ACCOUNTS_COLUMNS.address).first()
+  const result = await db(ACCOUNTS_TABLE_LEGACY).count(ACCOUNTS_COLUMNS.address).first()
 
   if (!result) {
     throw new Error('No result from count, have migrations been run?')

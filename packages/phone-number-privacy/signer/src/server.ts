@@ -14,7 +14,7 @@ import https from 'https'
 import { Knex } from 'knex'
 import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
-import { REQUESTS_ONCHAIN_TABLE, REQUESTS_TABLE } from './common/database/models/request'
+import { REQUESTS_TABLE_LEGACY, REQUESTS_TABLE_ONCHAIN } from './common/database/models/request'
 import { KeyProvider } from './common/key-management/key-provider-base'
 import { Counters } from './common/metrics'
 import { getVersion, SignerConfig } from './config'
@@ -112,7 +112,7 @@ export function startSigner(
   const pnpSign = new Controller(
     new PnpSignAction(
       db,
-      REQUESTS_ONCHAIN_TABLE,
+      REQUESTS_TABLE_ONCHAIN,
       config,
       pnpQuotaService,
       keyProvider,
@@ -126,7 +126,7 @@ export function startSigner(
   const legacyPnpSign = new Controller(
     new PnpSignAction(
       db,
-      REQUESTS_TABLE,
+      REQUESTS_TABLE_LEGACY,
       config,
       legacyPnpQuotaService,
       keyProvider,

@@ -1,9 +1,9 @@
 import { Knex } from 'knex'
-import { REQUESTS_COLUMNS, REQUESTS_ONCHAIN_TABLE } from '../models/request'
+import { REQUESTS_COLUMNS, REQUESTS_TABLE_ONCHAIN } from '../models/request'
 
 export async function up(knex: Knex): Promise<any> {
-  if (!(await knex.schema.hasTable(REQUESTS_ONCHAIN_TABLE))) {
-    return knex.schema.createTable(REQUESTS_ONCHAIN_TABLE, (t) => {
+  if (!(await knex.schema.hasTable(REQUESTS_TABLE_ONCHAIN))) {
+    return knex.schema.createTable(REQUESTS_TABLE_ONCHAIN, (t) => {
       t.string(REQUESTS_COLUMNS.address).notNullable()
       t.dateTime(REQUESTS_COLUMNS.timestamp).notNullable()
       t.string(REQUESTS_COLUMNS.blindedQuery).notNullable()
@@ -18,5 +18,5 @@ export async function up(knex: Knex): Promise<any> {
 }
 
 export async function down(knex: Knex): Promise<any> {
-  return knex.schema.dropTable(REQUESTS_ONCHAIN_TABLE)
+  return knex.schema.dropTable(REQUESTS_TABLE_ONCHAIN)
 }

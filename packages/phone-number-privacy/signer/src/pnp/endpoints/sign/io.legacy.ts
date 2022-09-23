@@ -77,7 +77,6 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     key: Key,
     signature: string,
     quotaStatus: PnpQuotaStatus,
-    // TODO EN: legacy responses have not had warnings returned
     warnings: string[]
   ) {
     response.set(KEY_VERSION_HEADER, key.version.toString())

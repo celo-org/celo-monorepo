@@ -22,8 +22,8 @@ import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
-import { ACCOUNTS_TABLE } from '../../src/common/database/models/account'
-import { REQUESTS_TABLE } from '../../src/common/database/models/request'
+import { ACCOUNTS_TABLE_LEGACY } from '../../src/common/database/models/account'
+import { REQUESTS_TABLE_LEGACY } from '../../src/common/database/models/request'
 import {
   getPerformedQueryCount,
   incrementQueryCount,
@@ -317,7 +317,13 @@ describe('legacyPNP', () => {
 
     await db.transaction(async (trx) => {
       for (let i = 0; i < performedQueryCount; i++) {
-        await incrementQueryCount(db, ACCOUNTS_TABLE, account, rootLogger(_config.serviceName), trx)
+        await incrementQueryCount(
+          db,
+          ACCOUNTS_TABLE_LEGACY,
+          account,
+          rootLogger(_config.serviceName),
+          trx
+        )
       }
     })
 
@@ -483,7 +489,7 @@ describe('legacyPNP', () => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE,
+              ACCOUNTS_TABLE_LEGACY,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -969,7 +975,7 @@ describe('legacyPNP', () => {
           for (let i = 0; i < remainingQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE,
+              ACCOUNTS_TABLE_LEGACY,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -1032,7 +1038,7 @@ describe('legacyPNP', () => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE,
+              ACCOUNTS_TABLE_LEGACY,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -1202,7 +1208,7 @@ describe('legacyPNP', () => {
             for (let i = 0; i < remainingQuota; i++) {
               await incrementQueryCount(
                 db,
-                ACCOUNTS_TABLE,
+                ACCOUNTS_TABLE_LEGACY,
                 ACCOUNT_ADDRESS1,
                 rootLogger(_config.serviceName),
                 trx
@@ -1213,7 +1219,7 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE,
+              ACCOUNTS_TABLE_LEGACY,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -1256,7 +1262,7 @@ describe('legacyPNP', () => {
             for (let i = 0; i < remainingQuota; i++) {
               await incrementQueryCount(
                 db,
-                ACCOUNTS_TABLE,
+                ACCOUNTS_TABLE_LEGACY,
                 ACCOUNT_ADDRESS1,
                 rootLogger(_config.serviceName),
                 trx
@@ -1267,7 +1273,7 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE,
+              ACCOUNTS_TABLE_LEGACY,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -1299,13 +1305,13 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE,
+              ACCOUNTS_TABLE_LEGACY,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
           ).toBe(expectedQuota + 1)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
+            await getRequestExists(db, REQUESTS_TABLE_LEGACY, req, rootLogger(_config.serviceName))
           ).toBe(true)
         })
 
@@ -1372,13 +1378,13 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE,
+              ACCOUNTS_TABLE_LEGACY,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
+            await getRequestExists(db, REQUESTS_TABLE_LEGACY, req, rootLogger(_config.serviceName))
           ).toBe(false)
         })
 
@@ -1409,13 +1415,13 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE,
+              ACCOUNTS_TABLE_LEGACY,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
+            await getRequestExists(db, REQUESTS_TABLE_LEGACY, req, rootLogger(_config.serviceName))
           ).toBe(false)
         })
 
@@ -1479,13 +1485,13 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE,
+              ACCOUNTS_TABLE_LEGACY,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
+            await getRequestExists(db, REQUESTS_TABLE_LEGACY, req, rootLogger(_config.serviceName))
           ).toBe(false)
         })
 
@@ -1525,13 +1531,13 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE,
+              ACCOUNTS_TABLE_LEGACY,
               ACCOUNT_ADDRESS1,
               rootLogger(config.serviceName)
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(config.serviceName))
+            await getRequestExists(db, REQUESTS_TABLE_LEGACY, req, rootLogger(config.serviceName))
           ).toBe(false)
         })
       })

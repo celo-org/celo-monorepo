@@ -18,8 +18,8 @@ import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
-import { ACCOUNTS_ONCHAIN_TABLE } from '../../src/common/database/models/account'
-import { REQUESTS_ONCHAIN_TABLE } from '../../src/common/database/models/request'
+import { ACCOUNTS_TABLE_ONCHAIN } from '../../src/common/database/models/account'
+import { REQUESTS_TABLE_ONCHAIN } from '../../src/common/database/models/request'
 import {
   getPerformedQueryCount,
   incrementQueryCount,
@@ -267,7 +267,7 @@ describe('pnp', () => {
           for (let i = 0; i <= expectedQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(config.serviceName),
               trx
@@ -522,7 +522,7 @@ describe('pnp', () => {
           for (let i = 0; i < performedQueryCount; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -778,7 +778,7 @@ describe('pnp', () => {
           for (let i = 0; i < remainingQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -840,7 +840,7 @@ describe('pnp', () => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -904,7 +904,7 @@ describe('pnp', () => {
             for (let i = 0; i < remainingQuota; i++) {
               await incrementQueryCount(
                 db,
-                ACCOUNTS_ONCHAIN_TABLE,
+                ACCOUNTS_TABLE_ONCHAIN,
                 ACCOUNT_ADDRESS1,
                 rootLogger(_config.serviceName),
                 trx
@@ -915,7 +915,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -958,7 +958,7 @@ describe('pnp', () => {
             for (let i = 0; i < remainingQuota; i++) {
               await incrementQueryCount(
                 db,
-                ACCOUNTS_ONCHAIN_TABLE,
+                ACCOUNTS_TABLE_ONCHAIN,
                 ACCOUNT_ADDRESS1,
                 rootLogger(_config.serviceName),
                 trx
@@ -969,7 +969,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -1003,13 +1003,13 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(config.serviceName)
             )
           ).toBe(expectedQuota + 1)
           expect(
-            await getRequestExists(db, REQUESTS_ONCHAIN_TABLE, req, rootLogger(config.serviceName))
+            await getRequestExists(db, REQUESTS_TABLE_ONCHAIN, req, rootLogger(config.serviceName))
           ).toBe(true)
         })
 
@@ -1079,13 +1079,13 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_ONCHAIN_TABLE, req, rootLogger(_config.serviceName))
+            await getRequestExists(db, REQUESTS_TABLE_ONCHAIN, req, rootLogger(_config.serviceName))
           ).toBe(false)
         })
 
@@ -1116,13 +1116,13 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_ONCHAIN_TABLE, req, rootLogger(_config.serviceName))
+            await getRequestExists(db, REQUESTS_TABLE_ONCHAIN, req, rootLogger(_config.serviceName))
           ).toBe(false)
         })
 
@@ -1186,13 +1186,13 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_ONCHAIN_TABLE, req, rootLogger(_config.serviceName))
+            await getRequestExists(db, REQUESTS_TABLE_ONCHAIN, req, rootLogger(_config.serviceName))
           ).toBe(false)
         })
 
@@ -1232,13 +1232,13 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNTS_TABLE_ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(config.serviceName)
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_ONCHAIN_TABLE, req, rootLogger(config.serviceName))
+            await getRequestExists(db, REQUESTS_TABLE_ONCHAIN, req, rootLogger(config.serviceName))
           ).toBe(false)
         })
       })

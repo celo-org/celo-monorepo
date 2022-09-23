@@ -13,8 +13,6 @@ function accounts(db: Knex, table: string) {
  * Returns how many queries the account has already performed.
  */
 export async function getPerformedQueryCount(
-  // TODO EN: can revisit not passing around db & accountsTable but instead just get the table
-  // in the outer code and then have this take in that accounts table??
   db: Knex,
   accountsTable: string,
   account: string,

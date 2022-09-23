@@ -7,8 +7,8 @@ import {
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { ACCOUNTS_TABLE } from '../../common/database/models/account'
-import { REQUESTS_TABLE } from '../../common/database/models/request'
+import { ACCOUNTS_TABLE_LEGACY } from '../../common/database/models/account'
+import { REQUESTS_TABLE_LEGACY } from '../../common/database/models/request'
 import { Counters, Histograms, meter } from '../../common/metrics'
 import { QuotaService } from '../../common/quota'
 import {
@@ -24,8 +24,8 @@ import { PnpQuotaService } from './quota'
 export class LegacyPnpQuotaService
   extends PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
-  protected readonly requestsTable = REQUESTS_TABLE
-  protected readonly accountsTable = ACCOUNTS_TABLE
+  protected readonly requestsTable = REQUESTS_TABLE_LEGACY
+  protected readonly accountsTable = ACCOUNTS_TABLE_LEGACY
 
   protected async getWalletAddressAndIsVerified(
     session: PnpSession<SignMessageRequest | PnpQuotaRequest>
