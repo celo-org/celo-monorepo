@@ -31,6 +31,7 @@ spec:
         app: blockscout
         release: {{ .Release.Name }}
         component: blockscout-web
+        {{- include "celo.blockscout.elixir.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
       initContainers:
@@ -128,6 +129,8 @@ spec:
           value: {{ .Values.blockscout.web.appsMenu.learningList | quote }}
         - name: DISPLAY_REWARDS
           value: "{{.Values.blockscout.epoch_rewards.enabled}}"
+        - name: DISABLE_WRITE_API
+          value: "true"
         - name: RE_CAPTCHA_PROJECT_ID
           valueFrom:
             secretKeyRef:
@@ -144,7 +147,7 @@ spec:
               name:  {{ .Values.blockscout.web.recaptchaSecretName | quote }}
               key: api_key
 {{ include "celo.blockscout-env-vars" . | indent 8 }}
-{{- $data := dict "Values" .Values "Database" .Values.blockscout.web.db }}
+{{- $data := dict "Values" .Values "DbSuffix" "-replica" "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout-db-sidecar" $data | indent 6 }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
