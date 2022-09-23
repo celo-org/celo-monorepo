@@ -128,6 +128,8 @@ spec:
           value: {{ .Values.blockscout.web.appsMenu.learningList | quote }}
         - name: DISPLAY_REWARDS
           value: "{{.Values.blockscout.epoch_rewards.enabled}}"
+        - name: DISABLE_WRITE_API
+          value: "true"
         - name: RE_CAPTCHA_PROJECT_ID
           valueFrom:
             secretKeyRef:

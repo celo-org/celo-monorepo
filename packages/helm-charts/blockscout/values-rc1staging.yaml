@@ -31,7 +31,7 @@ blockscout:
   web:
     host: rc1staging-blockscout.celo-testnet.org
     autoscaling:
-      maxReplicas: 2
+      maxReplicas: 1
       minReplicas: 1
       target:
         cpu: 70
