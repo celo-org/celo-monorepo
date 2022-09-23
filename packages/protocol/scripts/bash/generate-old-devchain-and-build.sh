@@ -31,8 +31,9 @@ done
 
 echo "- Removing previous build"
 cd ../..
+
 yarn run lerna run clean
-yarn reset
+
 
 echo "- Checkout source code at $BRANCH"
 git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
