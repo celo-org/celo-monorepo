@@ -37,7 +37,7 @@ echo "- Build contract artifacts"
 
 echo `pwd`
 
-yarn clean
+yarn reset
 cd ../..
 echo `pwd`
 yarn >> $LOG_FILE
