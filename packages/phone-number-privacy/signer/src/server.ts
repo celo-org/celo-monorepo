@@ -14,7 +14,6 @@ import https from 'https'
 import { Knex } from 'knex'
 import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
-import { REQUESTS_TABLE_LEGACY, REQUESTS_TABLE_ONCHAIN } from './common/database/models/request'
 import { KeyProvider } from './common/key-management/key-provider-base'
 import { Counters } from './common/metrics'
 import { getVersion, SignerConfig } from './config'
@@ -27,7 +26,8 @@ import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainQuotaService } from './domain/services/quota'
 import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
-import { PnpSignAction } from './pnp/endpoints/sign/action'
+import { LegacyPnpSignAction } from './pnp/endpoints/sign/action.legacy'
+import { OnChainPnpSignAction } from './pnp/endpoints/sign/action.onchain'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
 import { LegacyPnpQuotaService } from './pnp/services/quota.legacy'
@@ -110,9 +110,8 @@ export function startSigner(
     )
   )
   const pnpSign = new Controller(
-    new PnpSignAction(
+    new OnChainPnpSignAction(
       db,
-      REQUESTS_TABLE_ONCHAIN,
       config,
       pnpQuotaService,
       keyProvider,
@@ -124,9 +123,8 @@ export function startSigner(
     )
   )
   const legacyPnpSign = new Controller(
-    new PnpSignAction(
+    new LegacyPnpSignAction(
       db,
-      REQUESTS_TABLE_LEGACY,
       config,
       legacyPnpQuotaService,
       keyProvider,

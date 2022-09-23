@@ -11,17 +11,16 @@ import { PnpSession } from '../../session'
 import { PnpSignIO } from './io'
 import { LegacyPnpSignIO } from './io.legacy'
 
-export class PnpSignAction implements Action<SignMessageRequest> {
+export abstract class PnpSignAction implements Action<SignMessageRequest> {
   constructor(
     readonly db: Knex,
-    // TODO EN: find a better solution to this,
-    // if we move to an abstract class -> make this a property
-    readonly requestsTable: string,
     readonly config: SignerConfig,
     readonly quota: PnpQuotaService,
     readonly keyProvider: KeyProvider,
     readonly io: PnpSignIO | LegacyPnpSignIO
   ) {}
+
+  protected abstract readonly requestsTable: string
 
   public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
     // Compute quota lookup, update, and signing within transaction
