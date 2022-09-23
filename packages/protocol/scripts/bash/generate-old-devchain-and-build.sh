@@ -29,27 +29,15 @@ done
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
-echo "- Removing previous build"
-cd ../..
-
-yarn run lerna run clean
-
-
 echo "- Checkout source code at $BRANCH"
 git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build contract artifacts"
-
-echo `pwd`
-
-echo "Installing"
-yarn >> $LOG_FILE
-echo "Building all packaged"
+# rm -rf build/contracts
+yarn clean
+yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
-
-cd packages/protocol
-echo `pwd`
 
 # TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"
