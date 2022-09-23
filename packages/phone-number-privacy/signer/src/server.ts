@@ -14,6 +14,7 @@ import https from 'https'
 import { Knex } from 'knex'
 import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
+import { REQUESTS_ONCHAIN_TABLE, REQUESTS_TABLE } from './common/database/models/request'
 import { KeyProvider } from './common/key-management/key-provider-base'
 import { Counters } from './common/metrics'
 import { getVersion, SignerConfig } from './config'
@@ -28,6 +29,7 @@ import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
+import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
 import { LegacyPnpQuotaService } from './pnp/services/quota.legacy'
 import { OnChainPnpQuotaService } from './pnp/services/quota.onchain'
 
@@ -110,6 +112,7 @@ export function startSigner(
   const pnpSign = new Controller(
     new PnpSignAction(
       db,
+      REQUESTS_ONCHAIN_TABLE,
       config,
       pnpQuotaService,
       keyProvider,
@@ -123,10 +126,12 @@ export function startSigner(
   const legacyPnpSign = new Controller(
     new PnpSignAction(
       db,
+      REQUESTS_TABLE,
       config,
       legacyPnpQuotaService,
       keyProvider,
-      new PnpSignIO(
+      // TODO EN: double check if this was also causing typing issues earlier in the req/res code
+      new LegacyPnpSignIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
         kit

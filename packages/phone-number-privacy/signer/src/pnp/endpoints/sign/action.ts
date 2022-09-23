@@ -14,6 +14,9 @@ import { LegacyPnpSignIO } from './io.legacy'
 export class PnpSignAction implements Action<SignMessageRequest> {
   constructor(
     readonly db: Knex,
+    // TODO EN: find a better solution to this ideally
+    // ideally if we move to an abstract class -> make this a property
+    readonly requestsTable: string,
     readonly config: SignerConfig,
     readonly quota: PnpQuotaService,
     readonly keyProvider: KeyProvider,
@@ -30,6 +33,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
       try {
         isDuplicateRequest = await getRequestExists(
           this.db,
+          this.requestsTable,
           session.request.body,
           session.logger,
           trx

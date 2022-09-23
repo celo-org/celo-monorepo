@@ -18,6 +18,8 @@ export abstract class PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
   constructor(readonly db: Knex, readonly kit: ContractKit) {}
 
+  protected abstract readonly requestsTable: string
+
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
     session: PnpSession<SignMessageRequest>,
@@ -35,7 +37,7 @@ export abstract class PnpQuotaService
       }
     } else {
       await Promise.all([
-        storeRequest(this.db, session.request.body, session.logger, trx),
+        storeRequest(this.db, this.requestsTable, session.request.body, session.logger, trx),
         incrementQueryCount(this.db, session.request.body.account, session.logger, trx),
       ])
       state.performedQueryCount++

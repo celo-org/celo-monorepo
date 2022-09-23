@@ -2,15 +2,23 @@ import { DB_TIMEOUT, ErrorMessage, SignMessageRequest } from '@celo/phone-number
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Histograms, meter } from '../../metrics'
-import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
+import { PnpSignRequestRecord, REQUESTS_COLUMNS, toPnpSignRequestRecord } from '../models/request'
 import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
-function requests(db: Knex) {
-  return db<Request>(REQUESTS_TABLE)
+// TODO EN: remove default table params
+function requests(db: Knex, table: string) {
+  return db<PnpSignRequestRecord>(table)
 }
 
 export async function getRequestExists(
   db: Knex,
+  requestTable: string,
+  // TODO EN: ideally make these functions not depend on the request format nor the table name
+  // TODO EN: couuld always create a separate interface for the data needed for the request queries
+  // NOTE EN: do thisi later and just do it once later
+  // then could easily have subclasses (legacy/new) create something that transforms a session.body -> DB_FIELDS
+  // account: string,
+  // blindedQuery: string,
   request: SignMessageRequest,
   logger: Logger,
   trx?: Knex.Transaction
@@ -18,7 +26,10 @@ export async function getRequestExists(
   return meter(
     async () => {
       logger.debug({ request }, 'Checking if request exists')
-      const existingRequest = await tableWithLockForTrx(requests(db), trx)
+      // logger.debug(
+      //   `Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery} `
+      // )
+      const existingRequest = await tableWithLockForTrx(requests(db, requestTable), trx)
         .where({
           [REQUESTS_COLUMNS.address]: request.account,
           [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
@@ -36,6 +47,7 @@ export async function getRequestExists(
 
 export async function storeRequest(
   db: Knex,
+  requestTable: string,
   request: SignMessageRequest,
   logger: Logger,
   trx: Knex.Transaction
@@ -43,7 +55,10 @@ export async function storeRequest(
   return meter(
     async () => {
       logger.debug({ request }, 'Storing salt request')
-      await requests(db).transacting(trx).insert(new Request(request)).timeout(DB_TIMEOUT)
+      await requests(db, requestTable)
+        .transacting(trx)
+        .insert(toPnpSignRequestRecord(request.account, request.blindedQueryPhoneNumber))
+        .timeout(DB_TIMEOUT)
     },
     [],
     (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_INSERT_FAILURE),

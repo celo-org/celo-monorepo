@@ -18,6 +18,7 @@ import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
+import { REQUESTS_TABLE } from '../../src/common/database/models/request'
 import {
   getPerformedQueryCount,
   incrementQueryCount,
@@ -1145,7 +1146,9 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(expectedQuota + 1)
-          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(true)
+          expect(
+            await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
+          ).toBe(true)
         })
 
         it('Should return 500 on blockchain totalQuota query failure when shouldFailOpen is false', async () => {
@@ -1211,7 +1214,9 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
+          expect(
+            await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
+          ).toBe(false)
         })
 
         it('Should return 500 on failure to store request', async () => {
@@ -1241,7 +1246,9 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
+          expect(
+            await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
+          ).toBe(false)
         })
 
         it('Should return 200 on failure to fetch DEK', async () => {
@@ -1304,7 +1311,9 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
+          expect(
+            await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
+          ).toBe(false)
         })
 
         it('Should return 500 on generic error in sign', async () => {
@@ -1343,7 +1352,9 @@ describe('legacyPNP', () => {
           expect(
             await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(
+            await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(config.serviceName))
+          ).toBe(false)
         })
       })
     })
