@@ -40,7 +40,7 @@ blockscout:
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet-production:us-west1:baklava3
+      connectionName: celo-testnet-production:us-west1:baklava3-replica
       proxy:
         resources:
           requests:

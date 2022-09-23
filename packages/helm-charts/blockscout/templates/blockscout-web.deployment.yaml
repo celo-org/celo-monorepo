@@ -143,7 +143,7 @@ spec:
           value: {{ .Values.blockscout.secrets.recaptcha.apiKey }}
         - name: SEGMENT_KEY
           value: {{ .Values.blockscout.secrets.segmentKey }}
-{{- $data := dict "Release" .Release "Values" .Values "DbSuffix" "-replica" "Database" .Values.blockscout.web.db }}
+{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}
 {{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
       volumes:
