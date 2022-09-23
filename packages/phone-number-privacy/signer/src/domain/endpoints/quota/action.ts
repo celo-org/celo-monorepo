@@ -28,7 +28,7 @@ export class DomainQuotaAction implements Action<DomainQuotaStatusRequest> {
       const domainStateRecord = await this.quotaService.getQuotaStatus(session)
       this.io.sendSuccess(200, session.response, toSequentialDelayDomainState(domainStateRecord))
     } catch (error) {
-      session.logger.error('Error while getting domain status', error)
+      session.logger.error(error, 'Error while getting domain status')
       this.io.sendFailure(ErrorMessage.DATABASE_GET_FAILURE, 500, session.response)
     }
   }

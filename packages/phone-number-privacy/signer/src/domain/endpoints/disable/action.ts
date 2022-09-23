@@ -17,11 +17,14 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
 
   public async perform(session: DomainSession<DisableDomainRequest>): Promise<void> {
     const domain = session.request.body.domain
-    session.logger.info('Processing request to disable domain', {
-      name: domain.name,
-      version: domain.version,
-      hash: domainHash(domain).toString('hex'),
-    })
+    session.logger.info(
+      {
+        name: domain.name,
+        version: domain.version,
+        hash: domainHash(domain).toString('hex'),
+      },
+      'Processing request to disable domain'
+    )
 
     try {
       // Inside a database transaction, update or create the domain to mark it disabled.
@@ -51,7 +54,7 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
         toSequentialDelayDomainState(res.domainStateRecord)
       )
     } catch (error) {
-      session.logger.error('Error while disabling domain', error)
+      session.logger.error(error, 'Error while disabling domain')
       this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)
     }
   }

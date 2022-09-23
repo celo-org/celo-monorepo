@@ -25,7 +25,7 @@ export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
         this.io.sendSuccess(200, session.response, domainQuotaStatus)
         return
       } catch (err) {
-        session.logger.error({ err }, 'Error combining signer quota status responses')
+        session.logger.error(err, 'Error combining signer quota status responses')
       }
     }
     this.io.sendFailure(

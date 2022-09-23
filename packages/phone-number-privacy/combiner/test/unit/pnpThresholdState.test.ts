@@ -156,4 +156,17 @@ describe('pnp threshold state', () => {
       WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS
     )
   })
+
+  it.only('temp logging debug', () => {
+    const session = getSession([
+      { performedQueryCount, totalQuota: 9 },
+      { performedQueryCount, totalQuota: 9 },
+      { performedQueryCount, totalQuota: 10 },
+    ])
+    // session.logger.warn("test", new Error('Ooxops! Something went wrong :('))
+    session.logger.info(
+      { request: session.request.body },
+      'Request will bypass quota check for e2e testing'
+    )
+  })
 })

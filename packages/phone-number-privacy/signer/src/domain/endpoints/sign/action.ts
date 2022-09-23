@@ -47,11 +47,14 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
 
   public async perform(session: DomainSession<DomainRestrictedSignatureRequest>): Promise<void> {
     const domain = session.request.body.domain
-    session.logger.info('Processing request to get domain signature ', {
-      name: domain.name,
-      version: domain.version,
-      hash: domainHash(domain).toString('hex'),
-    })
+    session.logger.info(
+      {
+        name: domain.name,
+        version: domain.version,
+        hash: domainHash(domain).toString('hex'),
+      },
+      'Processing request to get domain signature '
+    )
 
     try {
       const res: TrxResult = await this.db.transaction(async (trx) => {
@@ -76,11 +79,14 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
         )
 
         if (!quotaStatus.sufficient) {
-          session.logger.warn(`Exceeded quota`, {
-            name: domain.name,
-            version: domain.version,
-            hash: domainHash(domain),
-          })
+          session.logger.warn(
+            {
+              name: domain.name,
+              version: domain.version,
+              hash: domainHash(domain),
+            },
+            `Exceeded quota`
+          )
           return {
             success: false,
             status: 429,
@@ -125,7 +131,7 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
         this.io.sendFailure(res.error, res.status, session.response)
       }
     } catch (error) {
-      session.logger.error('Failed to get signature for a domain', error)
+      session.logger.error(error, 'Failed to get signature for a domain')
       this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)
     }
   }

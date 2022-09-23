@@ -30,10 +30,7 @@ export abstract class PnpQuotaService
       session.logger.debug({ ...state }, 'No remaining quota')
       if (this.bypassQuotaForE2ETesting(session.request.body)) {
         Counters.testQuotaBypassedRequests.inc()
-        session.logger.info(
-          { request: session.request.body },
-          'Request will bypass quota check for e2e testing'
-        )
+        session.logger.info(session.request.body, 'Request will bypass quota check for e2e testing')
         sufficient = true
       }
     } else {

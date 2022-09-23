@@ -36,7 +36,7 @@ export class PnpQuotaAction extends CombineAction<PnpQuotaRequest> {
         )
         return
       } catch (err) {
-        session.logger.error({ err }, 'Error combining signer quota status responses')
+        session.logger.error(err, 'Error combining signer quota status responses')
       }
     }
     this.io.sendFailure(
