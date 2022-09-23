@@ -12,7 +12,7 @@ function requests(db: Knex, table: string) {
 
 export async function getRequestExists(
   db: Knex,
-  requestTable: string,
+  requestsTable: string,
   // TODO EN: ideally make these functions not depend on the request format nor the table name
   // TODO EN: couuld always create a separate interface for the data needed for the request queries
   // NOTE EN: do thisi later and just do it once later
@@ -29,7 +29,7 @@ export async function getRequestExists(
       // logger.debug(
       //   `Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery} `
       // )
-      const existingRequest = await tableWithLockForTrx(requests(db, requestTable), trx)
+      const existingRequest = await tableWithLockForTrx(requests(db, requestsTable), trx)
         .where({
           [REQUESTS_COLUMNS.address]: request.account,
           [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
@@ -47,7 +47,7 @@ export async function getRequestExists(
 
 export async function storeRequest(
   db: Knex,
-  requestTable: string,
+  requestsTable: string,
   request: SignMessageRequest,
   logger: Logger,
   trx: Knex.Transaction
@@ -55,7 +55,7 @@ export async function storeRequest(
   return meter(
     async () => {
       logger.debug({ request }, 'Storing salt request')
-      await requests(db, requestTable)
+      await requests(db, requestsTable)
         .transacting(trx)
         .insert(toPnpSignRequestRecord(request.account, request.blindedQueryPhoneNumber))
         .timeout(DB_TIMEOUT)

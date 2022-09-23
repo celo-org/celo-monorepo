@@ -13,19 +13,12 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import {
-  getBlindedPhoneNumber,
-  getLegacyPnpSignRequest,
-} from '@celo/phone-number-privacy-common/lib/test/utils'
-import {
-  BLINDED_PHONE_NUMBER,
-  BLINDING_FACTOR,
-  IDENTIFIER,
-} from '@celo/phone-number-privacy-common/lib/test/values'
+import { BLINDED_PHONE_NUMBER, IDENTIFIER } from '@celo/phone-number-privacy-common/lib/test/values'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
+import { ACCOUNTS_ONCHAIN_TABLE } from '../../src/common/database/models/account'
 import { REQUESTS_ONCHAIN_TABLE } from '../../src/common/database/models/request'
 import {
   getPerformedQueryCount,
@@ -272,7 +265,13 @@ describe('pnp', () => {
       it('Should respond with 200 if performedQueryCount is greater than totalQuota', async () => {
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(config.serviceName),
+              trx
+            )
           }
         })
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
@@ -521,7 +520,13 @@ describe('pnp', () => {
         mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainBalance)
         await db.transaction(async (trx) => {
           for (let i = 0; i < performedQueryCount; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName),
+              trx
+            )
           }
         })
       })
@@ -546,57 +551,6 @@ describe('pnp', () => {
           warnings: [],
         })
         expect(res.get(KEY_VERSION_HEADER)).toEqual(
-          _config.keystore.keys.phoneNumberPrivacy.latest.toString()
-        )
-      })
-
-      xit('[TODO EN] beep boop zeeeeep', async () => {
-        const req = getPnpSignRequest(
-          ACCOUNT_ADDRESS1,
-          BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
-        )
-        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
-        expect(res.status).toBe(200)
-        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
-          success: true,
-          version: res.body.version,
-          signature: expectedSignature,
-          performedQueryCount: performedQueryCount + 1,
-          totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
-          warnings: [],
-        })
-        expect(res.get(KEY_VERSION_HEADER)).toEqual(
-          _config.keystore.keys.phoneNumberPrivacy.latest.toString()
-        )
-        console.log(getBlindedPhoneNumber('+1234566', BLINDING_FACTOR))
-        const legacyReq = getLegacyPnpSignRequest(
-          ACCOUNT_ADDRESS1,
-          // BLINDED_PHONE_NUMBER,
-          getBlindedPhoneNumber('+1234566', BLINDING_FACTOR),
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
-        )
-        const legacyAuthorization = getPnpRequestAuthorization(legacyReq, PRIVATE_KEY1)
-        const legacyRes = await sendRequest(
-          legacyReq,
-          legacyAuthorization,
-          SignerEndpoint.LEGACY_PNP_SIGN
-        )
-        expect(legacyRes.status).toBe(200)
-        expect(legacyRes.body).toStrictEqual<SignMessageResponseSuccess>({
-          success: true,
-          version: legacyRes.body.version,
-          signature: legacyRes.body.signature,
-          performedQueryCount: performedQueryCount + 1,
-          totalQuota: legacyRes.body.totalQuota,
-          blockNumber: testBlockNumber,
-          warnings: [],
-        })
-        expect(legacyRes.get(KEY_VERSION_HEADER)).toEqual(
           _config.keystore.keys.phoneNumberPrivacy.latest.toString()
         )
       })
@@ -822,7 +776,13 @@ describe('pnp', () => {
         const remainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i < remainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName),
+              trx
+            )
           }
         })
         const req = getPnpSignRequest(
@@ -878,7 +838,13 @@ describe('pnp', () => {
         const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName),
+              trx
+            )
           }
         })
 
@@ -936,12 +902,23 @@ describe('pnp', () => {
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+              await incrementQueryCount(
+                db,
+                ACCOUNTS_ONCHAIN_TABLE,
+                ACCOUNT_ADDRESS1,
+                rootLogger(_config.serviceName),
+                trx
+              )
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(expectedQuota)
 
           const spy = jest
@@ -979,12 +956,23 @@ describe('pnp', () => {
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+              await incrementQueryCount(
+                db,
+                ACCOUNTS_ONCHAIN_TABLE,
+                ACCOUNT_ADDRESS1,
+                rootLogger(_config.serviceName),
+                trx
+              )
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(expectedQuota)
 
           mockOdisPaymentsTotalPaidCUSD.mockImplementation(() => {
@@ -1013,7 +1001,12 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was incremented and request was stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(config.serviceName)
+            )
           ).toBe(expectedQuota + 1)
           expect(
             await getRequestExists(db, REQUESTS_ONCHAIN_TABLE, req, rootLogger(config.serviceName))
@@ -1084,7 +1077,12 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(db, REQUESTS_ONCHAIN_TABLE, req, rootLogger(_config.serviceName))
@@ -1116,7 +1114,12 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(db, REQUESTS_ONCHAIN_TABLE, req, rootLogger(_config.serviceName))
@@ -1181,7 +1184,12 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(db, REQUESTS_ONCHAIN_TABLE, req, rootLogger(_config.serviceName))
@@ -1222,7 +1230,12 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_ONCHAIN_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(config.serviceName)
+            )
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(db, REQUESTS_ONCHAIN_TABLE, req, rootLogger(config.serviceName))

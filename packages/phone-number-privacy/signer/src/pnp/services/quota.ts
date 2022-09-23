@@ -19,6 +19,7 @@ export abstract class PnpQuotaService
   constructor(readonly db: Knex, readonly kit: ContractKit) {}
 
   protected abstract readonly requestsTable: string
+  protected abstract readonly accountsTable: string
 
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
@@ -38,7 +39,13 @@ export abstract class PnpQuotaService
     } else {
       await Promise.all([
         storeRequest(this.db, this.requestsTable, session.request.body, session.logger, trx),
-        incrementQueryCount(this.db, session.request.body.account, session.logger, trx),
+        incrementQueryCount(
+          this.db,
+          this.accountsTable,
+          session.request.body.account,
+          session.logger,
+          trx
+        ),
       ])
       state.performedQueryCount++
     }
@@ -53,7 +60,7 @@ export abstract class PnpQuotaService
     const [performedQueryCountResult, totalQuotaResult, blockNumberResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
-          getPerformedQueryCount(this.db, account, session.logger, trx),
+          getPerformedQueryCount(this.db, this.accountsTable, account, session.logger, trx),
           this.getTotalQuota(_session),
           getBlockNumber(this.kit),
         ]),

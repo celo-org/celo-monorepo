@@ -2,18 +2,21 @@ import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Histograms, meter } from '../../metrics'
-import { Account, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../models/account'
+import { AccountRecord, ACCOUNTS_COLUMNS, toAccountRecord } from '../models/account'
 import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
-function accounts(db: Knex) {
-  return db<Account>(ACCOUNTS_TABLE)
+function accounts(db: Knex, table: string) {
+  return db<AccountRecord>(table)
 }
 
 /*
  * Returns how many queries the account has already performed.
  */
 export async function getPerformedQueryCount(
+  // TODO EN: can revisit not passing around db & accountsTable but instead just get the table
+  // in the outer code and then have this take in that accounts table??
   db: Knex,
+  accountsTable: string,
   account: string,
   logger: Logger,
   trx?: Knex.Transaction
@@ -21,7 +24,7 @@ export async function getPerformedQueryCount(
   return meter(
     async () => {
       logger.debug({ account }, 'Getting performed query count')
-      const queryCounts = await tableWithLockForTrx(accounts(db), trx)
+      const queryCounts = await tableWithLockForTrx(accounts(db, accountsTable), trx)
         .select(ACCOUNTS_COLUMNS.numLookups)
         .where(ACCOUNTS_COLUMNS.address, account)
         .first()
@@ -37,13 +40,14 @@ export async function getPerformedQueryCount(
 
 async function getAccountExists(
   db: Knex,
+  accountsTable: string,
   account: string,
   logger: Logger,
   trx?: Knex.Transaction
 ): Promise<boolean> {
   return meter(
     async () => {
-      const accountRecord = await tableWithLockForTrx(accounts(db), trx)
+      const accountRecord = await tableWithLockForTrx(accounts(db, accountsTable), trx)
         .where(ACCOUNTS_COLUMNS.address, account)
         .first()
         .timeout(DB_TIMEOUT)
@@ -62,6 +66,7 @@ async function getAccountExists(
  */
 export async function incrementQueryCount(
   db: Knex,
+  accountsTable: string,
   account: string,
   logger: Logger,
   trx: Knex.Transaction
@@ -69,16 +74,15 @@ export async function incrementQueryCount(
   return meter(
     async () => {
       logger.debug({ account }, 'Incrementing query count')
-      if (await getAccountExists(db, account, logger, trx)) {
-        await accounts(db)
+      if (await getAccountExists(db, accountsTable, account, logger, trx)) {
+        await accounts(db, accountsTable)
           .transacting(trx)
           .where(ACCOUNTS_COLUMNS.address, account)
           .increment(ACCOUNTS_COLUMNS.numLookups, 1)
           .timeout(DB_TIMEOUT)
       } else {
-        const newAccount = new Account(account)
-        newAccount[ACCOUNTS_COLUMNS.numLookups] = 1
-        await insertRecord(db, newAccount, logger, trx)
+        const newAccountRecord = toAccountRecord(account, 1)
+        await insertRecord(db, accountsTable, newAccountRecord, logger, trx)
       }
     },
     [],
@@ -90,12 +94,13 @@ export async function incrementQueryCount(
 
 async function insertRecord(
   db: Knex,
-  data: Account,
+  accountsTable: string,
+  data: AccountRecord,
   logger: Logger,
   trx: Knex.Transaction
 ): Promise<void> {
   try {
-    await accounts(db).transacting(trx).insert(data).timeout(DB_TIMEOUT)
+    await accounts(db, accountsTable).transacting(trx).insert(data).timeout(DB_TIMEOUT)
   } catch (error) {
     countAndThrowDBError(error, logger, ErrorMessage.DATABASE_INSERT_FAILURE)
   }

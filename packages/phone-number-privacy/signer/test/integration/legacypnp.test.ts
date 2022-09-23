@@ -14,10 +14,15 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import {
+  createMockOdisPayments,
+  getPnpSignRequest,
+} from '@celo/phone-number-privacy-common/lib/test/utils'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
+import { ACCOUNTS_TABLE } from '../../src/common/database/models/account'
 import { REQUESTS_TABLE } from '../../src/common/database/models/request'
 import {
   getPerformedQueryCount,
@@ -65,6 +70,7 @@ const mockBalanceOfCELO = jest.fn<BigNumber, []>()
 const mockGetVerifiedStatus = jest.fn<AttestationsStatus, []>()
 const mockGetWalletAddress = jest.fn<string, []>()
 const mockGetDataEncryptionKey = jest.fn<string, []>()
+const mockOdisPaymentsTotalPaidCUSD = jest.fn<BigNumber, []>()
 
 const mockContractKit = createMockContractKit(
   {
@@ -76,6 +82,7 @@ const mockContractKit = createMockContractKit(
     [ContractRetrieval.getStableToken]: jest.fn(),
     [ContractRetrieval.getGoldToken]: createMockToken(mockBalanceOfCELO),
     [ContractRetrieval.getAttestations]: createMockAttestation(mockGetVerifiedStatus),
+    [ContractRetrieval.getOdisPayments]: createMockOdisPayments(mockOdisPaymentsTotalPaidCUSD),
   },
   createMockWeb3(5, testBlockNumber)
 )
@@ -310,7 +317,7 @@ describe('legacyPNP', () => {
 
     await db.transaction(async (trx) => {
       for (let i = 0; i < performedQueryCount; i++) {
-        await incrementQueryCount(db, account, rootLogger(_config.serviceName), trx)
+        await incrementQueryCount(db, ACCOUNTS_TABLE, account, rootLogger(_config.serviceName), trx)
       }
     })
 
@@ -474,7 +481,13 @@ describe('legacyPNP', () => {
         const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName),
+              trx
+            )
           }
         })
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
@@ -954,7 +967,13 @@ describe('legacyPNP', () => {
         const remainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i < remainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName),
+              trx
+            )
           }
         })
         const req = getLegacyPnpSignRequest(
@@ -1011,7 +1030,13 @@ describe('legacyPNP', () => {
         const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName),
+              trx
+            )
           }
         })
 
@@ -1063,18 +1088,135 @@ describe('legacyPNP', () => {
         })
       })
 
+      describe('interactions between legacy and new endpoints', () => {
+        // Keep both of these cases with the legacy test suite
+        // since once this endpoint is deprecated, these tests will no longer be needed
+        it('Should not be affected by requests and queries from the new endpoint', async () => {
+          mockOdisPaymentsTotalPaidCUSD.mockReturnValue(new BigNumber(1e18))
+          const expectedQuotaOnChain = 10
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          expect(res.status).toBe(200)
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: 1,
+            totalQuota: expectedQuotaOnChain,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+          expect(res.get(KEY_VERSION_HEADER)).toEqual(
+            _config.keystore.keys.phoneNumberPrivacy.latest.toString()
+          )
+          const legacyReq = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const legacyAuthorization = getPnpRequestAuthorization(legacyReq, PRIVATE_KEY1)
+          const legacyRes = await sendRequest(
+            legacyReq,
+            legacyAuthorization,
+            SignerEndpoint.LEGACY_PNP_SIGN
+          )
+          expect(legacyRes.status).toBe(200)
+          expect(legacyRes.body).toStrictEqual<SignMessageResponseSuccess>({
+            success: true,
+            version: legacyRes.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount + 1,
+            totalQuota: legacyRes.body.totalQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+          expect(legacyRes.get(KEY_VERSION_HEADER)).toEqual(
+            _config.keystore.keys.phoneNumberPrivacy.latest.toString()
+          )
+        })
+
+        it('Should affect the requests and queries to the new endpoint', async () => {
+          const legacyReq = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const legacyAuthorization = getPnpRequestAuthorization(legacyReq, PRIVATE_KEY1)
+          const legacyRes = await sendRequest(
+            legacyReq,
+            legacyAuthorization,
+            SignerEndpoint.LEGACY_PNP_SIGN
+          )
+          expect(legacyRes.status).toBe(200)
+          expect(legacyRes.body).toStrictEqual<SignMessageResponseSuccess>({
+            success: true,
+            version: legacyRes.body.version,
+            signature: expectedSignature,
+            performedQueryCount: performedQueryCount + 1,
+            totalQuota: legacyRes.body.totalQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+          expect(legacyRes.get(KEY_VERSION_HEADER)).toEqual(
+            _config.keystore.keys.phoneNumberPrivacy.latest.toString()
+          )
+          mockOdisPaymentsTotalPaidCUSD.mockReturnValue(new BigNumber(1e18))
+          const expectedQuotaOnChain = 10
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          expect(res.status).toBe(200)
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignature,
+            performedQueryCount: 1,
+            totalQuota: expectedQuotaOnChain,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+          expect(res.get(KEY_VERSION_HEADER)).toEqual(
+            _config.keystore.keys.phoneNumberPrivacy.latest.toString()
+          )
+        })
+      })
+
       describe('functionality in case of errors', () => {
         it('Should return 500 on DB performedQueryCount query failure', async () => {
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+              await incrementQueryCount(
+                db,
+                ACCOUNTS_TABLE,
+                ACCOUNT_ADDRESS1,
+                rootLogger(_config.serviceName),
+                trx
+              )
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(expectedQuota)
 
           const spy = jest
@@ -1112,12 +1254,23 @@ describe('legacyPNP', () => {
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+              await incrementQueryCount(
+                db,
+                ACCOUNTS_TABLE,
+                ACCOUNT_ADDRESS1,
+                rootLogger(_config.serviceName),
+                trx
+              )
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(expectedQuota)
 
           mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
@@ -1144,7 +1297,12 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was incremented and request was stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(expectedQuota + 1)
           expect(
             await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
@@ -1212,7 +1370,12 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
@@ -1244,7 +1407,12 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
@@ -1309,7 +1477,12 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(_config.serviceName))
@@ -1350,7 +1523,12 @@ describe('legacyPNP', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE,
+              ACCOUNT_ADDRESS1,
+              rootLogger(config.serviceName)
+            )
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(db, REQUESTS_TABLE, req, rootLogger(config.serviceName))
