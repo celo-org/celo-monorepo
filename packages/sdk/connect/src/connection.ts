@@ -276,6 +276,9 @@ export class Connection {
     typedData: EIP712TypedData,
     version?: 1 | 3 | 4 | 5
   ): Promise<Signature> => {
+    // stringify data for v3 & v4 based on https://github.com/MetaMask/metamask-extension/blob/c72199a1a6e4151c40c22f79d0f3b6ed7a2d59a7/app/scripts/lib/typed-message-manager.js#L185
+    const shouldStringify = version === 3 || version === 4
+
     // Uses the Provider and not the RpcCaller, because this method should be intercepted
     // by the CeloProvider if there is a local wallet that could sign it. The RpcCaller
     // would just forward it to the node
@@ -286,10 +289,9 @@ export class Connection {
           id: getRandomId(),
           jsonrpc: '2.0',
           method,
-          // stringify data for v3 & v4 based on https://github.com/MetaMask/metamask-extension/blob/c72199a1a6e4151c40c22f79d0f3b6ed7a2d59a7/app/scripts/lib/typed-message-manager.js#L185
           params: [
             inputAddressFormatter(signer),
-            version && version > 2 ? JSON.stringify(typedData) : typedData,
+            shouldStringify ? JSON.stringify(typedData) : typedData,
           ],
         },
         (error, resp) => {
