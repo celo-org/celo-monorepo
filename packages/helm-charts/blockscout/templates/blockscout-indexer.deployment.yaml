@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-indexer
   labels:
     {{- include "celo.blockscout.labels" . | nindent 4 }}
+    {{- include "celo.blockscout.elixir.labels" . | nindent 4 }}
     component: blockscout-indexer
   annotations:
     {{- include "celo.blockscout.annotations" . | nindent 4 }}

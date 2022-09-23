@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-epmd-service
   labels:
     {{- include "celo.blockscout.labels" . | nindent 4 }}
+    {{- include "celo.blockscout.elixir.labels" . | nindent 4 }}
 spec:
   selector:
     app: blockscout
