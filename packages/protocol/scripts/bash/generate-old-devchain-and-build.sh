@@ -30,8 +30,8 @@ done
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
 echo "- Removing previous build"
-yarn clean
 cd ../..
+yarn run lerna run clean
 yarn reset
 
 echo "- Checkout source code at $BRANCH"
