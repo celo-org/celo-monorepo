@@ -30,6 +30,7 @@ done
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
 echo "- Removing previous build"
+yarn clean
 cd ../..
 yarn reset
 
