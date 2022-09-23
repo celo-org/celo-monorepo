@@ -9,6 +9,8 @@ import {
 } from '../models/domain-request'
 import { countAndThrowDBError } from '../utils'
 
+// TODO(2.0.0, replay) implement replay handling; this file is currently unused
+
 function domainRequests(db: Knex) {
   return db<DomainRequestRecord<Domain>>(DOMAIN_REQUESTS_TABLE)
 }
