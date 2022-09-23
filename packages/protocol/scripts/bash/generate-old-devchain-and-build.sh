@@ -37,9 +37,9 @@ echo "- Build contract artifacts"
 
 echo `pwd`
 
-yarn reset
 cd ../..
 echo `pwd`
+yarn reset
 yarn >> $LOG_FILE
 yarn build >> $LOG_FILE
 cd packages/protocol
