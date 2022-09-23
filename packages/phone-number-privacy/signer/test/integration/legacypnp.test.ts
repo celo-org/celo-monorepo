@@ -1311,7 +1311,13 @@ describe('legacyPNP', () => {
             )
           ).toBe(expectedQuota + 1)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE_LEGACY, req, rootLogger(_config.serviceName))
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE_LEGACY,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(true)
         })
 
@@ -1384,7 +1390,13 @@ describe('legacyPNP', () => {
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE_LEGACY, req, rootLogger(_config.serviceName))
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE_LEGACY,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(false)
         })
 
@@ -1421,7 +1433,13 @@ describe('legacyPNP', () => {
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE_LEGACY, req, rootLogger(_config.serviceName))
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE_LEGACY,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(false)
         })
 
@@ -1491,7 +1509,13 @@ describe('legacyPNP', () => {
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE_LEGACY, req, rootLogger(_config.serviceName))
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE_LEGACY,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(false)
         })
 
@@ -1537,7 +1561,13 @@ describe('legacyPNP', () => {
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE_LEGACY, req, rootLogger(config.serviceName))
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE_LEGACY,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(config.serviceName)
+            )
           ).toBe(false)
         })
       })

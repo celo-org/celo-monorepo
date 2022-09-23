@@ -33,7 +33,8 @@ export abstract class PnpSignAction implements Action<SignMessageRequest> {
         isDuplicateRequest = await getRequestExists(
           this.db,
           this.requestsTable,
-          session.request.body,
+          session.request.body.account,
+          session.request.body.blindedQueryPhoneNumber,
           session.logger,
           trx
         )

@@ -1,4 +1,4 @@
-import { DB_TIMEOUT, ErrorMessage, SignMessageRequest } from '@celo/phone-number-privacy-common'
+import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Histograms, meter } from '../../metrics'
@@ -12,18 +12,20 @@ function requests(db: Knex, table: string) {
 export async function getRequestExists(
   db: Knex,
   requestsTable: string,
-  // TODO EN: revisit passing around specific message objects in the rest of the req/res audit ticket
-  request: SignMessageRequest,
+  account: string,
+  blindedQuery: string,
   logger: Logger,
   trx?: Knex.Transaction
 ): Promise<boolean> {
   return meter(
     async () => {
-      logger.debug({ request }, 'Checking if request exists')
+      logger.debug(
+        `Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery}`
+      )
       const existingRequest = await tableWithLockForTrx(requests(db, requestsTable), trx)
         .where({
-          [REQUESTS_COLUMNS.address]: request.account,
-          [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
+          [REQUESTS_COLUMNS.address]: account,
+          [REQUESTS_COLUMNS.blindedQuery]: blindedQuery,
         })
         .first()
         .timeout(DB_TIMEOUT)
@@ -39,16 +41,17 @@ export async function getRequestExists(
 export async function storeRequest(
   db: Knex,
   requestsTable: string,
-  request: SignMessageRequest,
+  account: string,
+  blindedQuery: string,
   logger: Logger,
   trx: Knex.Transaction
 ): Promise<void> {
   return meter(
     async () => {
-      logger.debug({ request }, 'Storing salt request')
+      logger.debug(`Storing salt request for: ${account}, blindedQuery: ${blindedQuery}`)
       await requests(db, requestsTable)
         .transacting(trx)
-        .insert(toPnpSignRequestRecord(request.account, request.blindedQueryPhoneNumber))
+        .insert(toPnpSignRequestRecord(account, blindedQuery))
         .timeout(DB_TIMEOUT)
     },
     [],

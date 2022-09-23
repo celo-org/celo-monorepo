@@ -1009,7 +1009,13 @@ describe('pnp', () => {
             )
           ).toBe(expectedQuota + 1)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE_ONCHAIN, req, rootLogger(config.serviceName))
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE_ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(config.serviceName)
+            )
           ).toBe(true)
         })
 
@@ -1085,7 +1091,13 @@ describe('pnp', () => {
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE_ONCHAIN, req, rootLogger(_config.serviceName))
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE_ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(false)
         })
 
@@ -1122,7 +1134,13 @@ describe('pnp', () => {
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE_ONCHAIN, req, rootLogger(_config.serviceName))
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE_ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(false)
         })
 
@@ -1192,7 +1210,13 @@ describe('pnp', () => {
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE_ONCHAIN, req, rootLogger(_config.serviceName))
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE_ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(false)
         })
 
@@ -1238,7 +1262,13 @@ describe('pnp', () => {
             )
           ).toBe(performedQueryCount)
           expect(
-            await getRequestExists(db, REQUESTS_TABLE_ONCHAIN, req, rootLogger(config.serviceName))
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE_ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(config.serviceName)
+            )
           ).toBe(false)
         })
       })

@@ -23,6 +23,7 @@ export abstract class PnpQuotaService
 
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
+    // TODO EN: may need to pass in requests state specifically and then make request generic
     session: PnpSession<SignMessageRequest>,
     trx: Knex.Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {
@@ -38,7 +39,14 @@ export abstract class PnpQuotaService
       }
     } else {
       await Promise.all([
-        storeRequest(this.db, this.requestsTable, session.request.body, session.logger, trx),
+        storeRequest(
+          this.db,
+          this.requestsTable,
+          session.request.body.account,
+          session.request.body.blindedQueryPhoneNumber,
+          session.logger,
+          trx
+        ),
         incrementQueryCount(
           this.db,
           this.accountsTable,
