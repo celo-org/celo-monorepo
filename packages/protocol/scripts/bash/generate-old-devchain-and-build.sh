@@ -29,6 +29,10 @@ done
 [ -z "$BRANCH" ] && echo "Need to set the branch via the -b flag" && exit 1;
 [ -z "$BUILD_DIR" ] && BUILD_DIR=$(echo build/$(echo $BRANCH | sed -e 's/\//_/g'));
 
+echo "- Removing previous build"
+cd ../..
+yarn reset
+
 echo "- Checkout source code at $BRANCH"
 git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
@@ -37,11 +41,11 @@ echo "- Build contract artifacts"
 
 echo `pwd`
 
-cd ../..
-echo `pwd`
-yarn reset
+echo "Installing"
 yarn >> $LOG_FILE
+echo "Building all packaged"
 yarn build >> $LOG_FILE
+
 cd packages/protocol
 echo `pwd`
 
