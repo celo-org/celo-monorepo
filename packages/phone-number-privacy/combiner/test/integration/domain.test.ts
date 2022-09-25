@@ -27,8 +27,8 @@ import {
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
-import { KeyProvider } from '@celo/phone-number-privacy-signer/src/common/key-management/key-provider-base'
-import { SignerConfig } from '@celo/phone-number-privacy-signer/src/config'
+import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
+import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import BigNumber from 'bignumber.js'

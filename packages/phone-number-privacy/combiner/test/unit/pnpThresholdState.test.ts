@@ -5,7 +5,7 @@ import {
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
+import { getVersion } from '@celo/phone-number-privacy-signer/dist/config'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Session } from '../../src/common/session'

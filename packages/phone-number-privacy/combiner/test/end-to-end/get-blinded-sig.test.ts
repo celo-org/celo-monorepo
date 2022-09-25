@@ -1,12 +1,12 @@
-import { OdisUtils } from '@celo/identity/lib/odis'
+import { OdisUtils } from '@celo/identity'
 // TODO(2.0.0, imports) revisit these imports from the identity package (vs. directly from common)
 // https://github.com/celo-org/celo-monorepo/issues/9814
+import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import {
   AuthenticationMethod,
-  ErrorMessages,
+  Endpoint,
   SignMessageRequest,
-} from '@celo/identity/lib/odis/query'
-import { Endpoint } from '@celo/phone-number-privacy-common'
+} from '@celo/phone-number-privacy-common'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
 import 'isomorphic-fetch'
 import { replenishQuota } from '../../../common/src/test/utils'
