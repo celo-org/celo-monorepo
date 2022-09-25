@@ -27,7 +27,7 @@ export abstract class PnpQuotaService
     Histograms.userRemainingQuotaAtRequest.labels(session.request.url).observe(remainingQuota)
     let sufficient = remainingQuota > 0
     if (!sufficient) {
-      session.logger.debug({ ...state }, 'No remaining quota')
+      session.logger.warn({ ...state }, 'No remaining quota')
       if (this.bypassQuotaForE2ETesting(session.request.body)) {
         Counters.testQuotaBypassedRequests.inc()
         session.logger.info(session.request.body, 'Request will bypass quota check for e2e testing')
@@ -117,7 +117,7 @@ export abstract class PnpQuotaService
     ])
     if (storeRequestResult.status === 'rejected') {
       session.logger.error(
-        { error: storeRequestResult.reason },
+        { err: storeRequestResult.reason },
         ErrorMessage.FAILURE_TO_STORE_REQUEST
       )
       session.errors.push(ErrorMessage.FAILURE_TO_STORE_REQUEST)
@@ -126,7 +126,7 @@ export abstract class PnpQuotaService
     }
     if (incrementQueryCountResult.status === 'rejected') {
       session.logger.error(
-        { error: incrementQueryCountResult.reason },
+        { err: incrementQueryCountResult.reason },
         ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT
       )
       session.errors.push(

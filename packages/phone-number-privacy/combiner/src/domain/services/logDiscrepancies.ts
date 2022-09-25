@@ -45,7 +45,7 @@ export class DomainDiscrepanciesLogger {
     const numDisabled = parsedResponses.filter((res) => res.values.status.disabled).length
     if (numDisabled > 0 && numDisabled < parsedResponses.length) {
       session.logger.error(
-        parsedResponses,
+        { parsedResponses },
         WarningMessage.INCONSISTENT_SIGNER_DOMAIN_DISABLED_STATES
       )
     }
