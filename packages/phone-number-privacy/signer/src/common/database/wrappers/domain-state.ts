@@ -2,13 +2,13 @@ import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Domain, domainHash } from '@celo/phone-number-privacy-common/lib/domains'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
-import { Counters, Histograms, Labels } from '../../../common/metrics'
+import { Counters, Histograms, Labels } from '../../metrics'
 import {
+  DomainStateRecord,
   DOMAIN_STATE_COLUMNS,
   DOMAIN_STATE_TABLE,
-  DomainStateRecord,
   toDomainStateRecord,
-} from '../models/domainState'
+} from '../models/domain-state'
 
 function domainStates(db: Knex) {
   return db<DomainStateRecord>(DOMAIN_STATE_TABLE)

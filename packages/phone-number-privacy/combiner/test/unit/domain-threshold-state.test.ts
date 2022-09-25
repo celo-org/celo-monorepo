@@ -8,7 +8,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
-import { DomainThresholdStateService } from '../../src/domain/services/thresholdState'
+import { DomainThresholdStateService } from '../../src/domain/services/threshold-state'
 
 describe('domain threshold state', () => {
   const expectedVersion = getVersion()

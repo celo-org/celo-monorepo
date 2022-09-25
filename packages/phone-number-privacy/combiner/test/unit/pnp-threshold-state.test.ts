@@ -10,7 +10,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
-import { PnpThresholdStateService } from '../../src/pnp/services/thresholdState'
+import { PnpThresholdStateService } from '../../src/pnp/services/threshold-state'
 
 describe('pnp threshold state', () => {
   const expectedVersion = getVersion()

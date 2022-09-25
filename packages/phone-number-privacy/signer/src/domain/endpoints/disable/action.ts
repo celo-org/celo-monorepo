@@ -1,13 +1,13 @@
 import { DisableDomainRequest, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { Action } from '../../../common/action'
-import { toSequentialDelayDomainState } from '../../../common/database/models/domainState'
+import { toSequentialDelayDomainState } from '../../../common/database/models/domain-state'
 import {
   createEmptyDomainStateRecord,
   getDomainStateRecord,
   insertDomainStateRecord,
   setDomainDisabled,
-} from '../../../common/database/wrappers/domainState'
+} from '../../../common/database/wrappers/domain-state'
 import { SignerConfig } from '../../../config'
 import { DomainSession } from '../../session'
 import { DomainDisableIO } from './io'

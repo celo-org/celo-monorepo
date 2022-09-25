@@ -13,7 +13,7 @@ import { Action, Session } from '../../../common/action'
 import {
   DomainStateRecord,
   toSequentialDelayDomainState,
-} from '../../../common/database/models/domainState'
+} from '../../../common/database/models/domain-state'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { SignerConfig } from '../../../config'
 import { DomainQuotaService } from '../../services/quota'

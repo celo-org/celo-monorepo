@@ -1,12 +1,12 @@
 import { DB_TIMEOUT, Domain, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
-import { Counters, Histograms, Labels } from '../../../common/metrics'
+import { Counters, Histograms, Labels } from '../../metrics'
 import {
+  DomainRequestRecord,
   DOMAIN_REQUESTS_COLUMNS,
   DOMAIN_REQUESTS_TABLE,
-  DomainRequestRecord,
-} from '../models/domainRequest'
+} from '../models/domain-request'
 
 function domainRequests(db: Knex) {
   return db<DomainRequestRecord<Domain>>(DOMAIN_REQUESTS_TABLE)

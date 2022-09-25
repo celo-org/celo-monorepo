@@ -6,7 +6,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
 import { SignAction } from '../../../common/sign'
-import { PnpDiscrepanciesLogger } from '../../services/logDiscrepancies'
+import { PnpDiscrepanciesLogger } from '../../services/log-discrepancies'
 
 export class PnpSignAction extends SignAction<SignMessageRequest> {
   readonly discrepancyLogger: PnpDiscrepanciesLogger = new PnpDiscrepanciesLogger()

@@ -3,8 +3,8 @@ import { CombineAction } from '../../../common/combine'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { OdisConfig } from '../../../config'
-import { DomainDiscrepanciesLogger } from '../../services/logDiscrepancies'
-import { DomainThresholdStateService } from '../../services/thresholdState'
+import { DomainDiscrepanciesLogger } from '../../services/log-discrepancies'
+import { DomainThresholdStateService } from '../../services/threshold-state'
 
 export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
   readonly discrepancyLogger: DomainDiscrepanciesLogger = new DomainDiscrepanciesLogger()

@@ -4,7 +4,7 @@ import {
   ErrorMessage,
 } from '@celo/phone-number-privacy-common'
 import { Action } from '../../../common/action'
-import { toSequentialDelayDomainState } from '../../../common/database/models/domainState'
+import { toSequentialDelayDomainState } from '../../../common/database/models/domain-state'
 import { SignerConfig } from '../../../config'
 import { DomainQuotaService } from '../../services/quota'
 import { DomainSession } from '../../session'
