@@ -44,13 +44,14 @@ release: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "common.conditional-init-genesis-container" -}}
-{{- $production_envs := list "rc1" "baklava" "alfajores" -}}
+{{- $production_envs := list "mainnet" "rc1" "baklava" "alfajores" -}}
 {{- if not (has .Values.genesis.network $production_envs) -}}
 {{ include "common.init-genesis-container" . }}
 {{- end -}}
 {{- end -}}
 
 {{- define "common.init-genesis-container" -}}
+{{- $network := ternary "rc1" .Values.genesis.network ( eq .Values.genesis.network "mainnet" ) -}}
 - name: init-genesis
   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
   imagePullPolicy: {{ .Values.geth.image.imagePullPolicy }}
@@ -63,8 +64,8 @@ release: {{ .Release.Name }}
       if [ "{{ .Values.genesis.useGenesisFileBase64 | default false }}" == "true" ]; then
         cp -L /var/geth/genesis.json /root/.celo/
       else
-        wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/{{ .Values.genesis.network }}?alt=media"
-        wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ .Values.genesis.network }}
+        wget -O /root/.celo/genesis.json "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/{{ $network }}?alt=media"
+        wget -O /root/.celo/bootnodeEnode https://storage.googleapis.com/env_bootnodes/{{ $network }}
       fi
       # There are issues with running geth init over existing chaindata around the use of forks.
       # The case that this could cause problems is when a network is set up with Base64 genesis files & chaindata
@@ -98,7 +99,7 @@ release: {{ .Release.Name }}
     readOnly: true
 {{- end -}}
 
-{{- define "common.bootnode-flag-script" }}
+{{- define "common.bootnode-flag-script" -}}
 if [[ "{{ .Values.genesis.network }}" == "alfajores" || "{{ .Values.genesis.network }}" == "baklava" ]]; then
   BOOTNODE_FLAG="--{{ .Values.genesis.network }}"
 else
@@ -106,7 +107,7 @@ else
 fi
 {{- end }}
 
-{{- define "common.full-node-container" }}
+{{- define "common.full-node-container" -}}
 - name: geth
   image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
   imagePullPolicy: {{ .Values.geth.image.imagePullPolicy }}
@@ -195,7 +196,8 @@ fi
 
     exec geth \
       --port $PORT \
-    {{- if not (contains "rc1" .Values.genesis.network) }}
+    {{- $mainnet_envs := list "mainnet" "rc1" -}}
+    {{- if not (has .Values.genesis.network $mainnet_envs) }}
       $BOOTNODE_FLAG \
     {{- end }}
       --light.serve={{- if kindIs "invalid" .light_serve -}}90{{- else -}}{{- .light_serve -}}{{- end }} \

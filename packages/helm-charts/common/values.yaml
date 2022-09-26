@@ -24,8 +24,6 @@ geth:
   - 52.149.51.48
   - 1.1.1.1
   service_type: LoadBalancer
-  use_static_ips: true
-  azure_mixed_protocols: true
   ws_port: 8546
 
 # Genesis
