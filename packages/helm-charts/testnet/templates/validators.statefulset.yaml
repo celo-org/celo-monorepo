@@ -44,7 +44,7 @@ spec:
         {{- include "common.standard.labels" .  | nindent 8 }}
         component: validators
         {{- if .Values.extraPodLabels.validators }}
-        {{ toYaml .Values.extraPodLabels.validators | nindent 8 }}
+        {{- toYaml .Values.extraPodLabels.validators | nindent 8 }}
         {{- end }}
 {{ if .Values.metrics | default false }}
       annotations:
