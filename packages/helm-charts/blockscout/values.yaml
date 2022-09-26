@@ -173,6 +173,7 @@ blockscout:
     stats:
       enabled: false
       reportUrl: ""
+      makerdojo: ""
   image:
     repository: gcr.io/celo-testnet/blockscout
     tag: v2.0.4-beta-celo
