@@ -42,7 +42,8 @@ const DefaultConstitution = {
   },
   Escrow: {
     default: 0.6,
-    setRegistry: 0.9,
+    addDefaultTrustedIssuer: 0.6,
+    removeDefaultTrustedIssuer: 0.6,
   },
   Exchange: {
     default: 0.8,
@@ -70,6 +71,9 @@ const DefaultConstitution = {
     setStableToken: 0.8,
     setSpread: 0.8,
     setReserveFraction: 0.8,
+  },
+  FederatedAttestations: {
+    default: 0.6,
   },
   FeeCurrencyWhitelist: {
     default: 0.8,
@@ -127,6 +131,9 @@ const DefaultConstitution = {
     setUnlockingPeriod: 0.8,
     addSlasher: 0.9,
     removeSlasher: 0.8,
+  },
+  OdisPayments: {
+    default: 0.6,
   },
   // Values for all proxied contracts.
   proxy: {
