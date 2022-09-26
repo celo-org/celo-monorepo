@@ -13,7 +13,6 @@ spec:
     rollingUpdate:
       maxSurge: {{ .Values.blockscout.api.strategy.rollingUpdate.maxSurge }}
       maxUnavailable: {{ .Values.blockscout.api.strategy.rollingUpdate.maxUnavailable }}
-  replicas: 1
   selector:
     matchLabels:
       app: blockscout
