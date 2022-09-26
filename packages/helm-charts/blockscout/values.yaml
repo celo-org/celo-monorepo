@@ -238,4 +238,5 @@ blockscout:
     subnetwork: Celo
     networkID: 1101
   domainName: celo-testnet.org
-  projectId: celo-testnet-production
+  gcp:
+    projectId: celo-testnet-production

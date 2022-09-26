@@ -71,4 +71,5 @@ blockscout:
   chain:
     subnetwork: Celo
     networkID: 42220
-  projectId: celo-testnet
+  gcp:
+    projectId: celo-testnet
