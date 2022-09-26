@@ -109,6 +109,8 @@ spec:
           value: {{ not .Values.blockscout.web.stats.enabled | quote }}
         - name: STATS_REPORT_URL
           value: {{ .Values.blockscout.web.stats.reportUrl | quote }}
+        - name: MAKERDOJO_URL
+          value: {{ .Values.blockscout.web.stats.makerdojo | quote }}
         - name: SWAP_MENU_LIST
           value: {{ .Values.blockscout.web.appsMenu.swapList | quote }}
         - name: DEFI_MENU_LIST
