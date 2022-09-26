@@ -73,6 +73,9 @@ describe('CeloProvider', () => {
     'eth_sign',
     'personal_sign',
     'eth_signTypedData',
+    'eth_signTypedData_v1',
+    'eth_signTypedData_v3',
+    'eth_signTypedData_v4',
   ]
 
   beforeEach(() => {
@@ -143,6 +146,9 @@ describe('CeloProvider', () => {
         case 'personal_sign':
           return ['0x01', from]
         case 'eth_signTypedData':
+        case 'eth_signTypedData_v1':
+        case 'eth_signTypedData_v3':
+        case 'eth_signTypedData_v4':
           return [
             from,
             {
@@ -230,7 +236,7 @@ describe('CeloProvider', () => {
       )
 
       interceptedByCeloProvider
-        .filter((x) => x !== 'eth_sendTransaction' && x !== 'eth_signTypedData')
+        .filter((x) => x !== 'eth_sendTransaction' && !x.startsWith('eth_signTypedData'))
         .forEach((method: string) => {
           test(`call 'send' with '${method}' signs the message and don't call the original provider`, (done) => {
             const payload: JsonRpcPayload = {
