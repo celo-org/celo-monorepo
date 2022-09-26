@@ -1,0 +1,20 @@
+{{- if .Values.geth.autoscaling.enabled -}}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "common.fullname" . }}
+  labels:
+{{ include "common.standard.labels" .  | indent 4 }}
+    component: celo-fullnode
+spec:
+  minReplicas: {{ .Values.geth.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.geth.autoscaling.maxReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: {{ template "common.fullname" . }}
+  metrics:
+    {{- toYaml .Values.geth.autoscaling.metrics | nindent 4 }}
+  behavior:
+    {{- toYaml .Values.geth.autoscaling.behavior | nindent 4 }}
+{{- end -}}
