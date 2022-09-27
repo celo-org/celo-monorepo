@@ -106,6 +106,12 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
     assertEq(updatedExchangeProviders[updatedExchangeProviders.length - 1], newPairManager);
   }
 
+  function test_addExchangeProvider_whenAlreadyAdded_shouldRevert() public {
+    changePrank(deployer);
+    vm.expectRevert("ExchangeProvider already exists in the list");
+    broker.addExchangeProvider(address(exchangeProvider));
+  }
+
   function test_removeExchangeProvider_whenSenderIsOwner_shouldUpdateAndEmit() public {
     changePrank(deployer);
     vm.expectEmit(true, true, true, true);
@@ -116,13 +122,13 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
 
   function test_removeExchangeProvider_whenAddressDoesNotExist_shouldRevert() public {
     changePrank(deployer);
-    vm.expectRevert("index into exchangeProviders list not mapped to token");
+    vm.expectRevert("index into exchangeProviders list not mapped to an exchangeProvider");
     broker.removeExchangeProvider(notDeployer, 1);
   }
 
   function test_removeExchangeProvider_whenIndexOutOfRange_shouldRevert() public {
     changePrank(deployer);
-    vm.expectRevert("index into exchangeProviders list not mapped to token");
+    vm.expectRevert("index into exchangeProviders list not mapped to an exchangeProvider");
     broker.removeExchangeProvider(exchangeProvider1, 1);
   }
 
@@ -155,7 +161,7 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
   }
 }
 
-contract BrokerTest_quote is BrokerTest {
+contract BrokerTest_getAmounts is BrokerTest {
   bytes32 exchangeId = keccak256(abi.encode("exhcangeId"));
 
   function test_getAmountIn_whenExchangeProviderWasNotSet_shouldRevert() public {
@@ -286,7 +292,7 @@ contract BrokerTest_swap is BrokerTest {
     );
   }
 
-  function test_swapIs_tokenInStableAsset_shouldSwap() public {
+  function test_swapIn_tokenInStableAsset_shouldUpdateAndEmit() public {
     deal(address(collateralAsset), address(reserve), 1e16);
     deal(address(collateralAsset), trader, 1e16);
     stableAsset.mint(address(broker), 1e16);
@@ -334,7 +340,7 @@ contract BrokerTest_swap is BrokerTest {
     assertEq(IERC20(collateralAsset).balanceOf(address(reserve)), 0);
   }
 
-  function test_swapIn_tokenInCollateralAsset_shouldSwap() public {
+  function test_swapIn_tokenInCollateralAsset_shouldUpdateAndEmit() public {
     deal(address(collateralAsset), address(reserve), 1e16);
     deal(address(collateralAsset), trader, 1e16);
     stableAsset.mint(address(broker), 1e16);
@@ -382,7 +388,7 @@ contract BrokerTest_swap is BrokerTest {
     assertEq(stableAsset.balanceOf(trader), 2e16);
   }
 
-  function test_swapOut_tokenInStableAsset() public {
+  function test_swapOut_tokenInStableAsset_shoulUpdateAndEmit() public {
     deal(address(collateralAsset), address(reserve), 1e16);
     deal(address(collateralAsset), trader, 1e16);
     stableAsset.mint(address(broker), 1e16);
@@ -431,7 +437,7 @@ contract BrokerTest_swap is BrokerTest {
     assertEq(IERC20(collateralAsset).balanceOf(address(reserve)), 0);
   }
 
-  function test_swapOut_tokenInCollateralAsset_shouldSwap() public {
+  function test_swapOut_tokenInCollateralAsset_shouldUpdateAndEmit() public {
     deal(address(collateralAsset), address(reserve), 1e16);
     deal(address(collateralAsset), trader, 1e16);
     stableAsset.mint(address(broker), 1e16);

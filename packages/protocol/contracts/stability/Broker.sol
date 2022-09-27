@@ -14,12 +14,12 @@ import { Initializable } from "../common/Initializable.sol";
 
 /**
  * @title Broker
- * @notice The broker executes swaps and keeps track of spending limits per pair
+ * @notice The broker executes swaps and keeps track of spending limits per pair.
  */
 contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   /* ==================== State Variables ==================== */
 
-  address[] exchangeProviders;
+  address[] public exchangeProviders;
   mapping(address => bool) public isExchangeProvider;
 
   // Address of the reserve.
@@ -52,9 +52,9 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   /* ==================== Mutative Functions ==================== */
 
   /**
-   * @notice Add exchange manager
-   * @param exchangeProvider The address of the exchange manager to add
-   * @return index The index where it was inserted
+   * @notice Add an exchange provider to the list of providers.
+   * @param exchangeProvider The address of the exchange provider to add.
+   * @return index The index of the newly added specified exchange provider.
    */
   function addExchangeProvider(address exchangeProvider) public onlyOwner returns (uint256 index) {
     require(!isExchangeProvider[exchangeProvider], "ExchangeProvider already exists in the list");
@@ -62,18 +62,18 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     exchangeProviders.push(exchangeProvider);
     isExchangeProvider[exchangeProvider] = true;
     emit ExchangeProviderAdded(exchangeProvider);
-    return index = exchangeProviders.length - 1;
+    index = exchangeProviders.length - 1;
   }
 
   /**
-   * @notice Remove an exchange manager at an index
-   * @param exchangeProvider The address of the exchange manager to remove
-   * @param index The index in the exchange managers array
+   * @notice Remove an exchange provider from the list of providers.
+   * @param exchangeProvider The address of the exchange provider to remove.
+   * @param index The index of the exchange provider being removed.
    */
   function removeExchangeProvider(address exchangeProvider, uint256 index) public onlyOwner {
     require(
       index < exchangeProviders.length && exchangeProviders[index] == exchangeProvider,
-      "index into exchangeProviders list not mapped to token"
+      "index into exchangeProviders list not mapped to an exchangeProvider"
     );
     exchangeProviders[index] = exchangeProviders[exchangeProviders.length - 1];
     exchangeProviders.pop();
@@ -82,8 +82,8 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice Set the Mento reserve address
-   * @param _reserve The Mento reserve address
+   * @notice Set the Mento reserve address.
+   * @param _reserve The Mento reserve address.
    */
   function setReserve(address _reserve) public onlyOwner {
     require(_reserve != address(0), "Reserve address must be set");
@@ -92,7 +92,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice Calculate amountIn of tokenIn for a given amountIn of tokenIn
+   * @notice Calculate the amount of tokenIn to be sold for a given amountOut of tokenOut
    * @param exchangeProvider the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
@@ -108,17 +108,16 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     uint256 amountOut
   ) external returns (uint256 amountIn) {
     require(isExchangeProvider[exchangeProvider], "ExchangeProvider does not exist");
-    return
-      amountIn = IExchangeProvider(exchangeProvider).getAmountIn(
-        exchangeId,
-        tokenIn,
-        tokenOut,
-        amountOut
-      );
+    amountIn = IExchangeProvider(exchangeProvider).getAmountIn(
+      exchangeId,
+      tokenIn,
+      tokenOut,
+      amountOut
+    );
   }
 
   /**
-   * @notice Calculate amountOut of tokenOut for a given amountIn of tokenIn
+   * @notice Calculate the amount of tokenOut to be bought for a given amount of tokenIn to be sold
    * @param exchangeProvider the address of the exchange manager for the pair
    * @param exchangeId The id of the exchange to use
    * @param tokenIn The token to be sold
@@ -134,24 +133,23 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     uint256 amountIn
   ) external returns (uint256 amountOut) {
     require(isExchangeProvider[exchangeProvider], "ExchangeProvider does not exist");
-    return
-      amountOut = IExchangeProvider(exchangeProvider).getAmountOut(
-        exchangeId,
-        tokenIn,
-        tokenOut,
-        amountIn
-      );
+    amountOut = IExchangeProvider(exchangeProvider).getAmountOut(
+      exchangeId,
+      tokenIn,
+      tokenOut,
+      amountIn
+    );
   }
 
   /**
-   * @notice Execute a token swap with fixed amountIn
-   * @param exchangeProvider the address of the exchange manager for the pair
-   * @param exchangeId The id of the exchange to use
-   * @param tokenIn The token to be sold
-   * @param tokenOut The token to be bought
-   * @param amountIn The amount of tokenIn to be sold
-   * @param amountOutMin Minimum amountOut to be received - controls slippage
-   * @return amountOut The amount of tokenOut to be bought
+   * @notice Execute a token swap with fixed amountIn.
+   * @param exchangeProvider the address of the exchange provider for the pair.
+   * @param exchangeId The id of the exchange to use.
+   * @param tokenIn The token to be sold.
+   * @param tokenOut The token to be bought.
+   * @param amountIn The amount of tokenIn to be sold.
+   * @param amountOutMin Minimum amountOut to be received - controls slippage.
+   * @return amountOut The amount of tokenOut to be bought.
    */
   function swapIn(
     address exchangeProvider,
@@ -170,14 +168,14 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice Execute a token swap with fixed amountOut
-   * @param exchangeProvider the address of the exchange manager for the pair
-   * @param exchangeId The id of the exchange to use
-   * @param tokenIn The token to be sold
-   * @param tokenOut The token to be bought
-   * @param amountOut The amount of tokenOut to be bought
-   * @param amountInMax Maximum amount of tokenIn that can be traded
-   * @return amountIn The amount of tokenIn to be sold
+   * @notice Execute a token swap with fixed amountOut.
+   * @param exchangeProvider the address of the exchange provider for the pair.
+   * @param exchangeId The id of the exchange to use.
+   * @param tokenIn The token to be sold.
+   * @param tokenOut The token to be bought.
+   * @param amountOut The amount of tokenOut to be bought.
+   * @param amountInMax Maximum amount of tokenIn that can be traded.
+   * @return amountIn The amount of tokenIn to be sold.
    */
   function swapOut(
     address exchangeProvider,
@@ -203,8 +201,9 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   /* ==================== Private Functions ==================== */
 
   /**
-   * @notice This method is responsible for minting tokens
-   * @param to The address receiving  
+   * @notice This method is responsible for minting stables
+   * and transferring reserve collateral
+   * @param to The address receiving
    * @param token The asset getting minted
    * @param amount The amount of asset getting minted
    */
@@ -214,12 +213,13 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     } else if (reserve.isCollateralAsset(token)) {
       reserve.transferCollateralAsset(token, to, amount);
     } else {
-      revert("Unexpected token type");
+      revert("Token must be stable or collateral assert");
     }
   }
 
   /**
-   * @notice This method is responsible for burning assets
+   * @notice This method is responsible for burning stables
+   * and returning collateral back to reserve
    * @param from The source to transfer from
    * @param token The asset getting burned
    * @param amount The amount of asset getting burned
@@ -231,16 +231,16 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     } else if (reserve.isCollateralAsset(token)) {
       IERC20(token).transferFrom(from, address(reserve), amount);
     } else {
-      revert("Unexpected token type");
+      revert("Token must be stable or collateral assert");
     }
   }
 
   /* ==================== View Functions ==================== */
 
   /**
-   * @notice Get the list of registered exchange managers.
+   * @notice Get the list of registered exchange providers.
    * @dev This can be used by UI or clients to discover all pairs.
-   * @return exchangeProviders the addresses of all exchange managers.
+   * @return exchangeProviders the addresses of all exchange providers.
    */
   function getExchangeProviders() external view returns (address[] memory) {
     return exchangeProviders;
