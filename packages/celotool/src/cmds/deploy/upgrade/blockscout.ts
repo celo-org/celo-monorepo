@@ -61,10 +61,6 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
       await sleep(30000)
       await resetCloudSQLInstance(instanceName)
     }
-  } else {
-    console.info(
-      `Skipping Cloud SQL Database upgrade process (recreation or kubernetes job removal). Please check if you can execute the skipped steps.`
-    )
   }
 
   await upgradeHelmChart(argv.celoEnv, helmReleaseName, imageTag)
