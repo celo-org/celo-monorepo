@@ -1,1 +1,27 @@
-// TODO
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }} in namespace {{ .Release.Namespace }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }} -n {{ .Release.Namespace }}
+  $ helm get all {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+To check the status of the pods, please run:
+
+  $ kubectl get pods -l "app={{ .Chart.Name }}" -n {{ .Release.Namespace }}
+
+{{- if .Values.ingress.enabled }}
+To check the status of the ingress, please run:
+
+  $ kubectl get ingress -l "app={{ .Chart.Name }}" -n {{ .Release.Namespace }}
+
+{{- end }}
+
+Once you have verified that the pods are running, you can check the logs of the pods by running:
+
+  $ kubectl logs <POD-NAME> -n {{ .Release.Namespace }}
+
+And run the following command to get the syncing status of the replica (replace by the geth command you want to run):
+
+  $ kubectl exec -it <POD-NAME> -n {{ .Release.Namespace }} -- geth attach --exec 'eth.syncing'
