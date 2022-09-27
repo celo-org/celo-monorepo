@@ -147,7 +147,7 @@ type Answers = {
     },
   ]
 
-  let successfulPackages = []
+  let successfulPackages: string[] = []
   let otp = ''
   if (shouldPublish) {
     // Here we build and publish all the sdk packages
@@ -161,6 +161,10 @@ type Answers = {
       }
       const packageFolderPath = path.replace('package.json', '')
       try {
+        // copy license file from root to sdk folders so it is included in npm package
+        child_process.execSync(`cp ${__dirname}/../LICENSE ${packageFolderPath}`, {
+          stdio: 'inherit',
+        })
         console.log(`Building ${packageJson.name}`)
         child_process.execSync('yarn build', { cwd: packageFolderPath, stdio: 'ignore' })
 
@@ -181,6 +185,8 @@ type Answers = {
           { cwd: packageFolderPath, stdio: 'ignore' }
         )
         successfulPackages.push(packageJson.name)
+        // remove license files from sdks folders
+        child_process.execSync('rm LICENSE', { cwd: packageFolderPath, stdio: 'inherit' })
       } catch (e) {
         const errorPrompt = [
           {
