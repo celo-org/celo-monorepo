@@ -35,6 +35,10 @@ git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build contract artifacts"
 rm -rf build/contracts
+rm -rf ../sdk/cryptographic-utils/lib
+cd ../sdk/cryptographic-utils
+yarn build
+cd ../../protocol
 yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
 
