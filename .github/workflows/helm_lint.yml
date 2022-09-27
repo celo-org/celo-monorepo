@@ -6,9 +6,12 @@ on:
     branches:
       - master
     paths:
-      - 'packages/helm-charts/**/templates/**'
-      - 'packages/helm-charts/**/values.yaml'
-      - 'packages/helm-charts/**/Chart.yaml'
+      # - 'packages/helm-charts/**/templates/**'
+      # - 'packages/helm-charts/**/values.yaml'
+      # - 'packages/helm-charts/**/Chart.yaml'
+      - 'packages/helm-charts/celo-fullnode/templates'
+      - 'packages/helm-charts/celo-fullnode/Chart.yaml'
+      - 'packages/helm-charts/celo-fullnode/values.yaml'
 
 env:
   HELM_VERSION: "v3.9.4"
