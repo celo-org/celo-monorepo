@@ -20,6 +20,7 @@ export enum CeloContractName {
   Exchange = 'Exchange',
   ExchangeEUR = 'ExchangeEUR',
   ExchangeBRL = 'ExchangeBRL',
+  FederatedAttestations = 'FederatedAttestations',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -29,6 +30,7 @@ export enum CeloContractName {
   GovernanceApproverMultiSig = 'GovernanceApproverMultiSig',
   GrandaMento = 'GrandaMento',
   LockedGold = 'LockedGold',
+  OdisPayments = 'OdisPayments',
   Random = 'Random',
   Reserve = 'Reserve',
   ReserveSpenderMultiSig = 'ReserveSpenderMultiSig',
@@ -42,7 +44,6 @@ export enum CeloContractName {
 }
 
 export const usesRegistry = [
-  CeloContractName.Escrow,
   CeloContractName.Reserve,
   CeloContractName.StableToken,
 ]
@@ -56,12 +57,14 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Election,
   CeloContractName.Escrow,
   CeloContractName.Exchange,
+  CeloContractName.FederatedAttestations,
   CeloContractName.FeeCurrencyWhitelist,
   CeloContractName.Freezer,
   CeloContractName.GasPriceMinimum,
   CeloContractName.GoldToken,
   CeloContractName.GovernanceSlasher,
   CeloContractName.GrandaMento,
+  CeloContractName.OdisPayments,
   CeloContractName.Random,
   CeloContractName.Reserve,
   CeloContractName.SortedOracles,

@@ -31,6 +31,7 @@ spec:
         app: blockscout
         release: {{ .Release.Name }}
         component: blockscout-indexer
+        {{- include "celo.blockscout.elixir.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
       terminationGracePeriodSeconds: {{ .Values.blockscout.indexer.terminationGracePeriodSeconds }}
@@ -87,6 +88,8 @@ spec:
           value: "true"
         - name: POOL_SIZE
           value: {{ .Values.blockscout.indexer.pool_size | quote }}
+        - name: POOL_SIZE_API
+          value: {{ .Values.blockscout.indexer.pool_size_replica | quote }}
         - name: METRICS_ENABLED
           value: "{{.Values.blockscout.metrics.enabled}}"
         - name: INDEXER_DISABLE_EMPTY_BLOCK_SANITIZER

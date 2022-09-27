@@ -31,28 +31,22 @@ Follow these steps to get everything that you need installed to build the celo-m
 
 #### Install Go
 
-We need Go for [celo-blockchain], the Go Celo implementation, and `gobind` to build Java language bindings to Go code for the Android Geth client).
+We need Go for [celo-blockchain](https://github.com/celo-org/celo-blockchain), the Go Celo implementation, and `gobind` to build Java language bindings to Go code for the Android Geth client.
 
-Note: We currently use Go 1.13. [Install Go 1.13 manually](https://golang.org/dl/), then run
+For go installation instructions see [celo-blockchain instructions](https://github.com/celo-org/celo-blockchain#building-the-source).
 
-```
-go get golang.org/x/mobile/cmd/gobind
-```
+Once you have go installed run the following to install gobind
 
-Execute the following (and make sure the lines are in your `~/.bash_profile`):
+`go get golang.org/x/mobile/cmd/gobind`
 
-```
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
-```
 
 #### Install Node
 
 Currently Node.js v12.x is required in order to work with this repo.
 
-Install `nvm` (allows you to manage multiple versions of Node) by following the instructions here: [https://github.com/nvm-sh/nvm].
+Install `nvm` (allows you to manage multiple versions of Node) by following the [instructions here](https://github.com/nvm-sh/nvm).
 
-Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions that [celo-monorepo] will need:
+Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions that [celo-monorepo](https://github.com/celo-org/celo-monorepo) will need:
 
 ```bash
 # restart the terminal after installing nvm
@@ -72,7 +66,7 @@ xcode-select --install
 
 #### Homebrew
 
-Install [Homebrew], the best way of managing packages on OSX:
+Install [Homebrew](https://brew.sh/), the best way of managing packages on OSX:
 
 ```bash
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -90,7 +84,7 @@ brew install yarn
 
 #### Install Yarn
 
-We use Yarn to build all of the [celo-monorepo] repo. Install it by running the following:
+We use Yarn to build all of the [celo-monorepo](https://github.com/celo-org/celo-monorepo) repo. Install it by running the following:
 
 ```bash
 # for documentation on yarn visit https://yarnpkg.com/en/docs/install#debian-stable
@@ -110,7 +104,7 @@ required if you only want use the blockchain, monorepo, and mobile wallet.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-Now lets add Rust to the PATH:
+Now lets add Rust to the `PATH`:
 
 ```
 echo "export PATH=$PATH:~/.cargo/bin/" >> ~/.bashrc
@@ -144,7 +138,7 @@ and run `make ndk_bundle`. This will download the NDK for your platform.
 
 ## Building celo-monorepo
 
-Clone the [celo-monorepo] repo:
+Clone the [celo-monorepo](https://github.com/celo-org/celo-monorepo) repo:
 
 ```bash
 mkdir ~/celo

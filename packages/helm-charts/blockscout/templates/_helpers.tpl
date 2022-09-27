@@ -7,6 +7,9 @@ chart: blockscout
 release: {{ .Release.Name }}
 heritage: {{ .Release.Service }}
 {{- end -}}
+{{- define "celo.blockscout.elixir.labels" -}}
+erlang-cluster: {{ .Release.Name }}
+{{- end -}}
 
 {{- /*
 Defines common annotations across all blockscout components.

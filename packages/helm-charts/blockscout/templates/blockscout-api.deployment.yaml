@@ -31,6 +31,7 @@ spec:
         app: blockscout
         release: {{ .Release.Name }}
         component: blockscout-api
+        {{- include "celo.blockscout.elixir.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
       initContainers:
@@ -88,8 +89,12 @@ spec:
           value: "true"
         - name: DISABLE_EXCHANGE_RATES
           value: "true"
+        - name: API_RATE_LIMIT
+          value: {{ .Values.blockscout.api.rate_limit | quote }}
         - name: POOL_SIZE
           value: {{ .Values.blockscout.api.pool_size | quote }}
+        - name: POOL_SIZE_API
+          value: {{ .Values.blockscout.api.pool_size_replica | quote }}
         - name: BLOCKSCOUT_HOST
           value: {{ .Values.blockscout.web.host | quote }}
         - name: ENABLE_SOURCIFY_INTEGRATION

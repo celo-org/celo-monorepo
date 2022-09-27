@@ -37,10 +37,10 @@ spec:
       labels:
         {{- include "common.standard.labels" .  | nindent 8 }}
         {{- if .Values.extraPodLabels }}
-        {{ toYaml .Values.extraPodLabels | nindent 8 }}
+        {{- toYaml .Values.extraPodLabels | nindent 8 }}
         {{- end }}
         component: celo-fullnode
-{{ if .Values.prometheus | default true }}
+{{- if .Values.prometheus | default true }}
       annotations:
 {{ include "common.prometheus-annotations" . | indent 8 }}
 {{ end }}
@@ -61,6 +61,14 @@ spec:
                   - celo-fullnode
               topologyKey: failure-domain.beta.kubernetes.io/zone
             weight: 100
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+      {{- end }}
       initContainers:
 {{- if .Values.geth.use_gstorage_data | default false }}
 {{ include "common.remove-old-chaindata" . | indent 6 }}

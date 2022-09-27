@@ -13,6 +13,7 @@ import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
 import { newExchangeBrl } from './generated/ExchangeBRL'
 import { newExchangeEur } from './generated/ExchangeEUR'
+import { newFederatedAttestations } from './generated/FederatedAttestations'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
@@ -24,6 +25,7 @@ import { newLockedGold } from './generated/LockedGold'
 import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
 import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
 import { newMultiSig } from './generated/MultiSig'
+import { newOdisPayments } from './generated/OdisPayments'
 import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
@@ -49,6 +51,7 @@ export const ContractFactories = {
   [CeloContract.Exchange]: newExchange,
   [CeloContract.ExchangeEUR]: newExchangeEur,
   [CeloContract.ExchangeBRL]: newExchangeBrl,
+  [CeloContract.FederatedAttestations]: newFederatedAttestations,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
@@ -59,6 +62,7 @@ export const ContractFactories = {
   [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
   [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
   [CeloContract.MultiSig]: newMultiSig,
+  [CeloContract.OdisPayments]: newOdisPayments,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
@@ -127,6 +131,9 @@ export class Web3ContractCache {
   }
   getExchange(stableToken: StableToken = StableToken.cUSD) {
     return this.getContract(StableToExchange[stableToken])
+  }
+  getFederatedAttestations() {
+    return this.getContract(CeloContract.FederatedAttestations)
   }
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)

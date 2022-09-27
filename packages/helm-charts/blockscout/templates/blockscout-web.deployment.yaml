@@ -31,6 +31,7 @@ spec:
         app: blockscout
         release: {{ .Release.Name }}
         component: blockscout-web
+        {{- include "celo.blockscout.elixir.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
       initContainers:
@@ -86,6 +87,10 @@ spec:
           value: "true"
         - name: POOL_SIZE
           value: {{ .Values.blockscout.web.pool_size | quote }}
+        - name: POOL_SIZE_API
+          value: {{ .Values.blockscout.web.pool_size_replica | quote }}
+        - name: DISPLAY_TOKEN_ICONS
+          value: "true"
         - name: BLOCKSCOUT_HOST
           value: {{ .Values.blockscout.web.host | quote }}
         - name: ENABLE_SOURCIFY_INTEGRATION
@@ -104,6 +109,8 @@ spec:
           value: {{ not .Values.blockscout.web.stats.enabled | quote }}
         - name: STATS_REPORT_URL
           value: {{ .Values.blockscout.web.stats.reportUrl | quote }}
+        - name: MAKERDOJO_URL
+          value: {{ .Values.blockscout.web.stats.makerdojo | quote }}
         - name: SWAP_MENU_LIST
           value: {{ .Values.blockscout.web.appsMenu.swapList | quote }}
         - name: DEFI_MENU_LIST
@@ -124,6 +131,8 @@ spec:
           value: {{ .Values.blockscout.web.appsMenu.learningList | quote }}
         - name: DISPLAY_REWARDS
           value: "{{.Values.blockscout.epoch_rewards.enabled}}"
+        - name: DISABLE_WRITE_API
+          value: "false"
         - name: RE_CAPTCHA_PROJECT_ID
           valueFrom:
             secretKeyRef:

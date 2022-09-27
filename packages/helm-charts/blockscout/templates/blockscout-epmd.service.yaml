@@ -8,6 +8,7 @@ spec:
   selector:
     app: blockscout
     release: {{ .Release.Name }}
+    {{- include "celo.blockscout.elixir.labels" . | nindent 4 }}
   spec:
   clusterIP: None
   ports:
