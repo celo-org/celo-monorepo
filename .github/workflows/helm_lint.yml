@@ -52,8 +52,7 @@ jobs:
 
       - name: "Debug"
         run: |
-          echo "${{ steps.updated_files.outputs.all }}" | tr "," "\n" | awk -F\/ '/^packages\/helm-charts/ && /\// && !/^\./ {print $2}' | sort | uniq > changed_charts
-
+          echo "${{ steps.updated_files.outputs.all }}" > changed_charts
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
 
