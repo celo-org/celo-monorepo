@@ -147,6 +147,7 @@
   "@celo/connect": {
     "location": "packages/sdk/connect",
     "dependencies": [
+      "@celo/base",
       "@celo/flake-tracker",
       "@celo/utils"
     ]
