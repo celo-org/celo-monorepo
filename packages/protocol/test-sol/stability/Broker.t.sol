@@ -98,12 +98,13 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
 
   function test_addExchangeProvider_whenSenderIsOwner_shouldUpdateAndEmit() public {
     changePrank(deployer);
-    address newPairManager = actor("newPairManager");
+    address newExchangeProvider = actor("newExchangeProvider");
     vm.expectEmit(true, false, false, false);
-    emit ExchangeProviderAdded(newPairManager);
-    broker.addExchangeProvider(newPairManager);
+    emit ExchangeProviderAdded(newExchangeProvider);
+    broker.addExchangeProvider(newExchangeProvider);
     address[] memory updatedExchangeProviders = broker.getExchangeProviders();
-    assertEq(updatedExchangeProviders[updatedExchangeProviders.length - 1], newPairManager);
+    assertEq(updatedExchangeProviders[updatedExchangeProviders.length - 1], newExchangeProvider);
+    assertEq(broker.isExchangeProvider(newExchangeProvider), true);
   }
 
   function test_addExchangeProvider_whenAlreadyAdded_shouldRevert() public {
