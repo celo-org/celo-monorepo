@@ -95,7 +95,7 @@ jobs:
       - name: "Helm Lint"
         run: |
           while read chart; do
-            if [ -d ${chart} ]; then
+            if [ -d ./packages/helm-charts/${chart} ]; then
               helm lint "./packages/helm-charts/${chart}/" || false
             else
               echo "Skipping packages/helm-charts/${chart} as it seems it has been deleted."
