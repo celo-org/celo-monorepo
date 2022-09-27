@@ -355,15 +355,34 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     )
   }
 
+  /**
+   * Creates a transaction object for revoking active votes.
+   * @param account Account to revoke votes for.
+   * @param group Validator group to revoke votes from.
+   * @param value Amount to be removed from active votes.
+   * @param lesserAfterVote First group address with less vote than `account`.
+   * @param greaterAfterVote First group address with more vote than `account`.
+   * @dev Must pass both `lesserAfterVote` and `greaterAfterVote` or neither.
+   */
   async revokeActive(
     account: Address,
     group: Address,
-    value: BigNumber
+    value: BigNumber,
+    lesserAfterVote?: Address,
+    greaterAfterVote?: Address
   ): Promise<CeloTransactionObject<boolean>> {
+    let lesser: Address, greater: Address
+
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const index = findAddressIndex(group, groups)
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
-
+    if (lesserAfterVote !== undefined && greaterAfterVote !== undefined) {
+      lesser = lesserAfterVote
+      greater = greaterAfterVote
+    } else {
+      const res = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+      lesser = res.lesser
+      greater = res.greater
+    }
     return toTransactionObject(
       this.connection,
       this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
@@ -386,7 +405,8 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     }
     if (pendingValue.lt(value)) {
       const activeValue = value.minus(pendingValue)
-      txos.push(await this.revokeActive(account, group, activeValue))
+      const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+      txos.push(await this.revokeActive(account, group, activeValue, lesser, greater))
     }
     return txos
   }
