@@ -72,8 +72,6 @@ geth:
       memory: "8Gi"
       cpu: "3"
     limits: {}
-    #   memory: "1Gi"
-    #   cpu: "2000m"
   # -- Blockchain sync mode. Valid values are: full, lightest and fast
   syncmode: full
   # -- Blockchain garbage collection mode. Valid values are: full and archive
@@ -125,9 +123,13 @@ geth:
   ws_port: 8546
   # -- HPA configuration for celo-blockchain statefulset. Check official documentation for more info
   autoscaling:
+    # -- Enable HPA for celo-blockchain statefulset
     enabled: false
+    # -- Minimum number of replicas
     minReplicas: 1
+    # -- Maximum number of replicas
     maxReplicas: 5
+    # -- Metric reference for HPA
     metrics:
     - resource:
         name: cpu
@@ -135,6 +137,7 @@ geth:
           averageUtilization: 85
           type: Utilization
       type: Resource
+    # -- HPA behavior configuration
     behavior:
       scaleDown:
         policies:
