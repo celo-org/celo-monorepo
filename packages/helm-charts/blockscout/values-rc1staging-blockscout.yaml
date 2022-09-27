@@ -38,7 +38,7 @@ blockscout:
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet-production:us-west1:rc1staging-replica
+      connectionName: celo-testnet-production:us-west1:rc1staging
       proxy:
         resources:
           requests:

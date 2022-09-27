@@ -38,7 +38,7 @@ blockscout:
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet-production:us-west1:alfajores3-replica
+      connectionName: celo-testnet-production:us-west1:alfajores3
       proxy:
         resources:
           requests:
