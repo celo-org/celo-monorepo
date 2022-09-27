@@ -39,7 +39,7 @@ export const handler = async (argv: InitialArgv) => {
     await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName, argv.celoEnv)
 
     const [dbUser, dbPassword, _] = await createCloudSQLInstance(argv.celoEnv, instanceName)
-    const secretLabels = ['app=blockscout', `env=${argv.celoEnv}`]
+    const secretLabels = ['app=blockscout', 'team=data-services', `env=${argv.celoEnv}`]
 
     await createSecretInSecretManagerIfNotExists(`${helmReleaseName}-dbUser`, secretLabels, dbUser)
 
