@@ -68,6 +68,8 @@ blockscout:
       projectId: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaProjectId
       siteKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaSiteKey
       apiKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaApiKey
+    erlang:
+      cookie: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout2-erlangCookie
   chain:
     subnetwork: Baklava
     networkID: 62320

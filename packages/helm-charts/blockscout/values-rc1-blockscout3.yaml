@@ -73,6 +73,8 @@ blockscout:
       projectId: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaProjectId
       siteKey: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaSiteKey
       apiKey: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaApiKey
+    erlang:
+      cookie: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout3-erlangCookie
   chain:
     subnetwork: Celo
     networkID: 42220

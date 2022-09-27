@@ -65,6 +65,8 @@ blockscout:
       projectId: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaProjectId
       siteKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaSiteKey
       apiKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaApiKey
+    erlang:
+      cookie: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout3-erlangCookie
   chain:
     subnetwork: Alfajores
     networkID: 44787

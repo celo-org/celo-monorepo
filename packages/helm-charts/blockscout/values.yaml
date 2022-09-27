@@ -234,6 +234,8 @@ blockscout:
       projectId: ""
       siteKey: ""
       apiKey: ""
+    erlang:
+      cookie: ""
   chain:
     subnetwork: Celo
     networkID: 1101
