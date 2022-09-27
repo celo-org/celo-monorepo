@@ -1,0 +1,99 @@
+name: Helm Charts Lint
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'packages/helm-charts/**/templates/**'
+      - 'packages/helm-charts/**/values.yaml'
+      - 'packages/helm-charts/**/Chart.yaml'
+
+env:
+  HELM_VERSION: "v3.9.4"
+  GOMPLATE_VERSION: "v3.11.3"
+
+jobs:
+  helm-lint:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: "Checkout current PR"
+        uses: actions/checkout@v2
+
+      - name: "Checkout master branch"
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          path: master
+
+      - name: "Install Helm"
+        uses: azure/setup-helm@v1
+        with:
+          version: "${{ env.HELM_VERSION }}"
+
+      - name: "Install gomplate binary"
+        run: |
+          wget -qO gomplate https://github.com/hairyhenderson/gomplate/releases/download/${{ env.GOMPLATE_VERSION }}/gomplate_linux-amd64-slim
+          chmod u+x gomplate
+
+      - name: "Get Helm Charts changed"
+        uses: jitterbit/get-changed-files@v1
+        id: updated_files
+        with:
+          format: csv
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Dump updated Helm Charts folders and validate semantic versioning"
+        run: |
+          echo "${{ steps.updated_files.outputs.all }}" | tr "," "\n" | awk -F\/ '/^packages\/helm-charts/ && /\// && !/^\./ {print $2}' | sort | uniq > changed_charts
+          while read chart; do
+            # Get Chart version in the current PR branch
+            version=$(awk -F\: '/^version:/ {print $(NF)}' packages/helm-charts/${chart}/Chart.yaml|tr -d " ")
+
+            # Get Chart version in master branch if the chart exists
+            if [[ -f master/packages/helm-charts/${chart}/Chart.yaml ]]; then
+              version_master=$(awk -F\: '/^version:/ {print $(NF)}' master/packages/helm-charts/${chart}/Chart.yaml|tr -d " ")
+
+              # Calculate valid next versions
+              major_master=$(echo ${version_master}| awk -F. '{print $1}')
+              major_master_next=$(echo ${major_master} + 1 | bc).0.0
+              minor_master=$(echo ${version_master}| awk -F. '{print $2}')
+              minor_master_next=${major_master}.$(echo ${minor_master} + 1 | bc).0
+              patch_master=$(echo ${version_master}| awk -F. '{print $3}')
+              patch_master_next=${major_master}.${minor_master}.$(echo ${patch_master} + 1 | bc)
+
+              # Chart version in current PR must be one of the valid versions
+              set +e
+              echo "${major_master_next},${minor_master_next},${patch_master_next}" | tr "," "\n" | grep -w "${version}" > /dev/null
+              rc=$?
+              set -e
+
+              if [ ${rc} -ne 0 ]; then
+                echo "Version specified in packages/helm-charts/${chart}/Chart.yaml is ${version}, which does not follow semantic versioning."
+                echo "It must be a valid next semantic version. For this case, valid semantic versions are:"
+                echo ""
+                echo "- Next valid patch: ${patch_master_next}"
+                echo "- Next valid minor: ${minor_master_next}"
+                echo "- Next valid major: ${major_master_next}"
+                # Allow not semantic versions (this can be caused by releasing helm versions from different branches)
+                # exit 1
+              fi
+            else
+              echo "Chart ${chart} does not exist in branch master, hence skipping semantic version check."
+            fi
+          done <<EOF
+            $(cat changed_charts)
+          EOF
+
+      - name: "Helm Lint"
+        run: |
+          while read chart; do
+            if [ -d ${chart} ]; then
+              helm lint "./packages/helm-charts/${chart}/" || false
+            else
+              echo "Skipping packages/helm-charts/${chart} as it seems it has been deleted."
+            fi
+          done <<EOF
+            $(cat changed_charts)
+          EOF
