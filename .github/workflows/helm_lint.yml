@@ -53,6 +53,7 @@ jobs:
       - name: "Dump updated Helm Charts folders and validate semantic versioning"
         run: |
           echo "${{ steps.updated_files.outputs.all }}" | tr "," "\n" | grep 'packages/helm-charts/' | sed 's#^packages/helm-charts/##' | sed 's#/.*$##' | sort | uniq > changed_charts
+          cat changed_charts
           while read chart; do
             # Get Chart version in the current PR branch
             version=$(awk -F\: '/^version:/ {print $(NF)}' packages/helm-charts/${chart}/Chart.yaml|tr -d " ")
