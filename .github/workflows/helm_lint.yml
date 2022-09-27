@@ -2,6 +2,9 @@ name: Helm Charts Lint
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - jcortejoso/celo-fullnode-chart-refactor
   pull_request:
     branches:
       - master
