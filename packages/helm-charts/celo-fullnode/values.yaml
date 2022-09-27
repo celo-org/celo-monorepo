@@ -1,6 +1,6 @@
 ---
 # -- Number of celo-blockchain statefulset replicas
-replicaCount: 1
+replicaCount: 2
 # -- Override default name format. Use false to use default name format, or a string to override
 fullnameOverride: false
 
@@ -72,7 +72,7 @@ geth:
       memory: "8Gi"
       cpu: "3"
     limits: {}
-  # -- Blockchain sync mode. Valid values are: full, lightest and fast
+  # -- Blockchain sync mode. Valid values are: full, lightest, light and fast
   syncmode: full
   # -- Blockchain garbage collection mode. Valid values are: full and archive
   gcmode: full
@@ -84,6 +84,8 @@ geth:
   verbosity: 2
   # -- Array with Private keys used for as nodekey for the celo-blockchain replicas. Replica 0 will use the first ip, replica 1 the second, etc.
   node_keys: []
+  # - 582849f34c5503110c01ec2b50f0537ca0ba2390674ad763e554762cdb02f314
+  # - f6e3eeddc80be88946536c6d1818b510d4ae18a80a1ff6ef7eeff75ba3a88d4f
   # -- Array with 'public' ip addresses used for `nat=extip:<ip>` option. Replica 0 will use the first ip, replica 1 the second, etc.
   public_ip_per_node: []
   # - 1.2.3.4
