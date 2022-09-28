@@ -73,12 +73,5 @@ export const handler = async (argv: BlockscoutUpgradeArgv) => {
     )
   }
 
-  await installHelmChart(
-    argv.celoEnv,
-    helmReleaseName,
-    imageTag,
-    blockscoutCredentials[0],
-    blockscoutCredentials[1],
-    blockscoutCredentials[2]
-  )
+  await installHelmChart(argv.celoEnv, helmReleaseName, imageTag)
 }
