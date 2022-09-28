@@ -176,7 +176,7 @@ contract BrokerTest_getAmounts is BrokerTest {
     );
   }
 
-  function test_getAmountIn_receivedCall() public {
+  function test_getAmountIn_whenExchangeProviderIsSet_shouldReceiveCall() public {
     uint256 amountOut = 1e17;
     uint256 mockAmountIn = 1e16;
 
@@ -208,7 +208,7 @@ contract BrokerTest_getAmounts is BrokerTest {
     broker.getAmountOut(randomExchangeProvider, exchangeId, randomAsset, randomAsset, 1e24);
   }
 
-  function test_getAmountOut_receivedCall() public {
+  function test_getAmountOut_whenExchangeProviderIsSet_shouldReceiveCall() public {
     uint256 amountIn = 1e17;
     uint256 mockAmountOut = 1e16;
 
@@ -293,7 +293,7 @@ contract BrokerTest_swap is BrokerTest {
     );
   }
 
-  function test_swapIn_tokenInStableAsset_shouldUpdateAndEmit() public {
+  function test_swapIn_whenTokenInStableAsset_shouldUpdateAndEmit() public {
     deal(address(collateralAsset), address(reserve), 1e16);
     deal(address(collateralAsset), trader, 1e16);
     stableAsset.mint(address(broker), 1e16);
@@ -341,7 +341,7 @@ contract BrokerTest_swap is BrokerTest {
     assertEq(IERC20(collateralAsset).balanceOf(address(reserve)), 0);
   }
 
-  function test_swapIn_tokenInCollateralAsset_shouldUpdateAndEmit() public {
+  function test_swapIn_whenTokenInCollateralAsset_shouldUpdateAndEmit() public {
     deal(address(collateralAsset), address(reserve), 1e16);
     deal(address(collateralAsset), trader, 1e16);
     stableAsset.mint(address(broker), 1e16);
@@ -389,7 +389,7 @@ contract BrokerTest_swap is BrokerTest {
     assertEq(stableAsset.balanceOf(trader), 2e16);
   }
 
-  function test_swapOut_tokenInStableAsset_shoulUpdateAndEmit() public {
+  function test_swapOut_whenTokenInStableAsset_shoulUpdateAndEmit() public {
     deal(address(collateralAsset), address(reserve), 1e16);
     deal(address(collateralAsset), trader, 1e16);
     stableAsset.mint(address(broker), 1e16);
@@ -438,7 +438,7 @@ contract BrokerTest_swap is BrokerTest {
     assertEq(IERC20(collateralAsset).balanceOf(address(reserve)), 0);
   }
 
-  function test_swapOut_tokenInCollateralAsset_shouldUpdateAndEmit() public {
+  function test_swapOut_whenTokenInCollateralAsset_shouldUpdateAndEmit() public {
     deal(address(collateralAsset), address(reserve), 1e16);
     deal(address(collateralAsset), trader, 1e16);
     stableAsset.mint(address(broker), 1e16);

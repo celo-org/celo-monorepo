@@ -72,7 +72,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
    */
   function removeExchangeProvider(address exchangeProvider, uint256 index) public onlyOwner {
     require(
-      index < exchangeProviders.length && exchangeProviders[index] == exchangeProvider,
+      exchangeProviders[index] == exchangeProvider,
       "index into exchangeProviders list not mapped to an exchangeProvider"
     );
     exchangeProviders[index] = exchangeProviders[exchangeProviders.length - 1];
@@ -201,11 +201,12 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   /* ==================== Private Functions ==================== */
 
   /**
-   * @notice This method is responsible for minting stables
-   * and transferring reserve collateral
-   * @param to The address receiving
-   * @param token The asset getting minted
-   * @param amount The amount of asset getting minted
+   * @notice Transfer a specified Mento asset to the given address.
+   * If the specified asset is a stable asset it will be minted directly to the address. If
+   * the asset is a collateral asset it will be transferred from the reserve to the given address.
+   * @param to The address receiving the asset.
+   * @param token The asset to transfer.
+   * @param amount The amount of `token` to be transferred.
    */
   function transferOut(address payable to, address token, uint256 amount) internal {
     if (reserve.isStableAsset(token)) {
@@ -218,11 +219,12 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
   }
 
   /**
-   * @notice This method is responsible for burning stables
-   * and returning collateral back to reserve
-   * @param from The source to transfer from
-   * @param token The asset getting burned
-   * @param amount The amount of asset getting burned
+   * @notice Transfer a specified Mento asset into the reserve or the broker. 
+   * If the specified asset is a stable asset it will be transfered to the broker 
+   * and burned. If the asset is a collateral asset it will be transferred to the reserve.
+   * @param from The address to transfer the asset from.
+   * @param token The asset to transfer.
+   * @param amount The amount of `token` to be transferred. 
    */
   function transferIn(address payable from, address token, uint256 amount) internal {
     if (reserve.isStableAsset(token)) {
