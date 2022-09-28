@@ -45,6 +45,8 @@ contract BrokerTest is Test {
   address exchangeProvider1 = actor("exchangeProvider1");
   address exchangeProvider2 = actor("exchangeProvider2");
 
+  address[] public exchangeProviders;
+
   function setUp() public {
     /* Dependencies and actors */
     reserve = new MockReserve();
@@ -58,10 +60,9 @@ contract BrokerTest is Test {
     reserve.addCollateralAsset(address(collateralAsset));
 
     changePrank(deployer);
-    address[] memory exchangeProviders = new address[](3);
-    exchangeProviders[0] = exchangeProvider1;
-    exchangeProviders[1] = exchangeProvider2;
-    exchangeProviders[2] = address(exchangeProvider);
+    exchangeProviders.push(exchangeProvider1);
+    exchangeProviders.push(exchangeProvider2);
+    exchangeProviders.push((address(exchangeProvider)));
     broker.initialize(exchangeProviders, address(reserve));
     changePrank(trader);
   }
@@ -75,7 +76,7 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
   }
 
   function test_initilize_shouldSetExchangeProviderAddresseses() public {
-    assertEq(broker.getExchangeProviders(), broker.getExchangeProviders());
+    assertEq(broker.getExchangeProviders(), exchangeProviders);
   }
 
   function test_initilize_shouldSetReserve() public {
