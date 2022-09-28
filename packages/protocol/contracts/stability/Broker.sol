@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
@@ -9,16 +10,24 @@ import { IReserve } from "./interfaces/IReserve.sol";
 import { Initializable } from "../common/Initializable.sol";
 import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import { IStableToken } from "./interfaces/IStableToken.sol";
+import { TradingLimits } from "./libraries/TradingLimits.sol";
+
+import { console2 as console } from "forge-std/console2.sol";
 
 /**
  * @title Broker
  * @notice The broker executes swaps and keeps track of spending limits per pair
  */
 contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
+  using TradingLimits for TradingLimits.Counts;
   /* ==================== State Variables ==================== */
 
   address[] exchangeProviders;
   mapping(address => bool) public isExchangeProvider;
+  /**
+   * @dev tradingLimits are encoded in two uint256 values using the TradingLimits library
+   */
+  mapping(bytes32 => uint256[2]) tradingLimits;
 
   // Address of the reserve.
   IReserve public reserve;
@@ -163,6 +172,7 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
     require(isExchangeProvider[exchangeProvider], "ExchangeProvider does not exist");
     amountOut = IExchangeProvider(exchangeProvider).swapIn(exchangeId, tokenIn, tokenOut, amountIn);
     require(amountOut >= amountOutMin, "amountOutMin not met");
+    guardTradingLimits(exchangeId, tokenIn, amountIn, tokenOut, amountOut);
     transferIn(msg.sender, tokenIn, amountIn);
     transferOut(msg.sender, tokenOut, amountOut);
     emit Swap(exchangeProvider, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
@@ -195,13 +205,79 @@ contract Broker is IBroker, IBrokerAdmin, Initializable, Ownable {
       amountOut
     );
     require(amountIn <= amountInMax, "amountInMax exceeded");
+    guardTradingLimits(exchangeId, tokenIn, amountIn, tokenOut, amountOut);
     transferIn(msg.sender, tokenIn, amountIn);
     transferOut(msg.sender, tokenOut, amountOut);
     emit Swap(exchangeProvider, exchangeId, msg.sender, tokenIn, tokenOut, amountIn, amountOut);
     return amountIn;
   }
 
+  function setTradingLimits(address _token, TradingLimits.Counts calldata config) external {
+    bytes32 token = bytes32(uint256(uint160(_token)));
+    storeTradingCounts(token, config.setTimestampsToNow());
+  }
+
+  function setTradingLimits(
+    bytes32 exchangeId,
+    address _token,
+    TradingLimits.Counts calldata config
+  ) external onlyOwner {
+    bytes32 token = bytes32(uint256(uint160(_token)));
+    bytes32 id = exchangeId ^ token;
+    storeTradingCounts(id, config.setTimestampsToNow());
+  }
+
   /* ==================== Private Functions ==================== */
+
+  function guardTradingLimits(
+    bytes32 exchangeId,
+    address _tokenIn,
+    uint256 amountIn,
+    address _tokenOut,
+    uint256 amountOut
+  ) internal {
+    bytes32 tokenIn = bytes32(uint256(uint160(_tokenIn)));
+    bytes32 tokenOut = bytes32(uint256(uint160(_tokenOut)));
+
+    bytes32 tcId = exchangeId ^ tokenIn;
+    TradingLimits.Counts memory tc = getTradingCounts(tcId);
+    tc.log();
+    if (tc.anyEnabled()) {
+      storeTradingCounts(tcId, tc.add(amountIn).validate());
+    }
+    tcId = exchangeId ^ tokenOut;
+    tc = getTradingCounts(tcId);
+    tc.log();
+    if (tc.anyEnabled()) {
+      storeTradingCounts(tcId, tc.subtract(amountIn));
+    }
+
+    tc = getTradingCounts(tokenIn);
+    tc.log();
+    if (tc.anyEnabled()) {
+      storeTradingCounts(tokenIn, tc.add(amountIn).validate());
+    }
+
+    tc = getTradingCounts(tokenOut);
+    tc.log();
+    if (tc.anyEnabled()) {
+      storeTradingCounts(tokenOut, tc.subtract(amountOut).validate());
+    }
+  }
+
+  function getTradingCounts(bytes32 id) internal returns (TradingLimits.Counts memory tc) {
+    uint256[2] memory slots = tradingLimits[id];
+    console.log("GetTradingCounts:");
+    console.log(slots[0], slots[1]);
+    return TradingLimits.decode(slots[0], slots[1]);
+  }
+
+  function storeTradingCounts(bytes32 id, TradingLimits.Counts memory tc) internal {
+    (uint256 s0, uint256 s1) = tc.encode();
+    tc.log();
+    console.log(s0, s1);
+    tradingLimits[id] = [s0, s1];
+  }
 
   /**
    * @notice This method is responsible for minting tokens
