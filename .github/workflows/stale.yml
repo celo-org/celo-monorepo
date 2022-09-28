@@ -20,7 +20,6 @@ jobs:
     steps:
     - uses: actions/stale@v3
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
         stale-issue-message: 'This issue is stale and will be closed in 30 days without activity'
         stale-pr-message: 'This PR is stale and will be closed in 30 days without activity'
         stale-issue-label: 'stale'
