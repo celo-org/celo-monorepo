@@ -8,4 +8,8 @@
 
 4. *IMPORTANT* double check version in package.json is correct!
 
-5. run `run npm publish --otp XXXXXX --tag TAG` *you MUST run with --tag and provide alpha | beta for pre release*
+5. run `npm publish --otp XXXXXX --tag TAG` *you MUST run with --tag and provide alpha | beta for pre release*
+
+6. run `yarn install`
+
+7. commit the changes
