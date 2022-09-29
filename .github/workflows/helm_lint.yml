@@ -104,6 +104,9 @@ jobs:
           EOF
           fi
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: "Helm Lint"
         run: |
           if test "$(wc -c < changed_charts)" -gt 2; then
