@@ -64,8 +64,9 @@ jobs:
 
       - name: "Login to Artifact Registry"
         run: |
+          echo "${{ steps.updated_files.outputs.all }}" | tr "," "\n" | grep 'packages/helm-charts/' | sed 's#^packages/helm-charts/##' | sed 's#/.*$##' | sort | uniq > changed_charts_debug
           gcloud auth application-default print-access-token | helm registry login -u oauth2accesstoken \
-          --password-stdin https://us-west1-docker.pkg.dev
+            --password-stdin https://us-west1-docker.pkg.dev
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
