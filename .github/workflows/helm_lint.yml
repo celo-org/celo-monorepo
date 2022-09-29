@@ -9,6 +9,9 @@ on:
       - 'packages/helm-charts/celo-fullnode/templates'
       - 'packages/helm-charts/celo-fullnode/Chart.yaml'
       - 'packages/helm-charts/celo-fullnode/values.yaml'
+      - 'packages/helm-charts/common/templates'
+      - 'packages/helm-charts/common/Chart.yaml'
+      - 'packages/helm-charts/common/values.yaml'
   pull_request:
     branches:
       - master
@@ -19,6 +22,9 @@ on:
       - 'packages/helm-charts/celo-fullnode/templates'
       - 'packages/helm-charts/celo-fullnode/Chart.yaml'
       - 'packages/helm-charts/celo-fullnode/values.yaml'
+      - 'packages/helm-charts/common/templates'
+      - 'packages/helm-charts/common/Chart.yaml'
+      - 'packages/helm-charts/common/values.yaml'
 
 env:
   HELM_VERSION: "v3.9.4"
