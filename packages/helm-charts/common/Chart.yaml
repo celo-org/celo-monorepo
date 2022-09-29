@@ -1,6 +1,7 @@
 apiVersion: v2
 name: common
 version: 0.2.0
+type: library
 home: https://celo.org
 icon: https://pbs.twimg.com/profile_images/1493309659599486986/5ETdHxeE_400x400.jpg
 description: Helm chart with helper templates and functions for Celo nodes.
