@@ -16,6 +16,10 @@ env:
 jobs:
   helm-release:
     runs-on: 'ubuntu-latest'
+    # Add "id-token" with the intended permissions.
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - name: "Checkout main branch"
         uses: actions/checkout@v2
