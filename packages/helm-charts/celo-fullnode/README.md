@@ -1,12 +1,14 @@
 # celo-fullnode
 
-A Helm chart for deploying a Celo fullnode
+Helm chart for deploying a Celo fullnode. More info at https://docs.celo.org
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![AppVersion: 1.0](https://img.shields.io/badge/AppVersion-1.0-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![AppVersion: 1.6.0](https://img.shields.io/badge/AppVersion-1.6.0-informational?style=flat-square)
 
 - [celo-fullnode](#celo-fullnode)
   - [Chart requirements](#chart-requirements)
-  - [Relevant values](#relevant-values)
+  - [Chart releases](#chart-releases)
+  - [More relevant values](#more-relevant-values)
+  - [Ingress setup](#ingress-setup)
   - [Basic chart operation](#basic-chart-operation)
   - [Values](#values)
   - [Chart Potential Improvements](#chart-potential-improvements)
@@ -33,7 +35,7 @@ To install/manage a release named `celo-mainnet-fullnode` connected to `mainnet`
 
 ```bash
 # Select the chart release to use
-CHART_RELEASE="oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci/celo-fullnode --version=0.1.0" # Use remote chart and specific version
+CHART_RELEASE="oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci/celo-fullnode --version=0.2.0" # Use remote chart and specific version
 CHART_RELEASE="./" # Use this local folder
 
 # (Only for local chart) Sync helm dependencies
@@ -90,7 +92,7 @@ helm upgrade celo-mainnet-fullnode -f values-mainnet-node.yaml --namespace=celo 
 | geth.service_node_port_per_full_node | list | `[]` | Used if nodePort service type is specified. This is only intended to be used in AWS. |
 | geth.service_protocols | list | `["TCP","UDP"]` | Create a differente service for each protocol |
 | geth.service_type | string | `"LoadBalancer"` | Type of the LoadBalancer for the service attached to each replica. Each replica of the statefulset will have a service of this type. If type is `LoadBalancer`, it will be created with the `public_ip_per_node` as the `loadBalancerIP` |
-| geth.syncmode | string | `"full"` | Blockchain sync mode. Valid values are: full, lightest and fast |
+| geth.syncmode | string | `"full"` | Blockchain sync mode. Valid values are: full, lightest, light and fast |
 | geth.updateStrategy | object | `{"rollingUpdate":{"partition":0},"type":"RollingUpdate"}` | Celo-blockchain statefulset `updateStrategy` |
 | geth.verbosity | int | `2` | Loggin verbosity. Valid values are: 0-5. 0 is the least verbose |
 | geth.ws_port | int | `8546` | WS-RPC server listening port |
@@ -102,7 +104,7 @@ helm upgrade celo-mainnet-fullnode -f values-mainnet-node.yaml --namespace=celo 
 | metrics | bool | `true` | Enable celo-blockchain metrics and prometheus scraping |
 | nodeSelector | object | `{}` | Labels to add to `nodeSelector` field of the statefulset |
 | pprof | object | `{"enabled":true,"path":"/debug/metrics/prometheus","port":6060}` | Pprof configuration for celo-blockchain |
-| replicaCount | int | `1` | Number of celo-blockchain statefulset replicas |
+| replicaCount | int | `2` | Number of celo-blockchain statefulset replicas |
 | storage.accessModes | string | `"ReadWriteOnce"` | accessMode for the volumes |
 | storage.enable | bool | `true` | Enable persistent storage for the celo-blockchain statefulset |
 | storage.size | string | `"20Gi"` | Size of the persistent volume claim for the celo-blockchain statefulset |

@@ -4,14 +4,13 @@
 {{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
 
 - [celo-fullnode](#celo-fullnode)
-  * [Chart requirements](#chart-requirements)
-  * [Chart releases](#chart-releases)
-    + [DNS Setup](#dns-setup)
-  * [More relevant values](#more-relevant-values)
-  * [Ingress setup](#ingress-setup)
-  * [Basic chart operation](#basic-chart-operation)
-  * [Values](#values)
-  * [Chart Potential Improvements](#chart-potential-improvements)
+  - [Chart requirements](#chart-requirements)
+  - [Chart releases](#chart-releases)
+  - [More relevant values](#more-relevant-values)
+  - [Ingress setup](#ingress-setup)
+  - [Basic chart operation](#basic-chart-operation)
+  - [Values](#values)
+  - [Chart Potential Improvements](#chart-potential-improvements)
 
 ## Chart requirements
 
@@ -37,7 +36,7 @@ To install/manage a release named `celo-mainnet-fullnode` connected to `mainnet`
 
 ```bash
 # Select the chart release to use
-CHART_RELEASE="oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci/celo-fullnode --version=0.1.0" # Use remote chart and specific version
+CHART_RELEASE="oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci/celo-fullnode --version=0.2.0" # Use remote chart and specific version
 CHART_RELEASE="./" # Use this local folder
 
 # (Only for local chart) Sync helm dependencies
