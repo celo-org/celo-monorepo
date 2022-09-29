@@ -20,7 +20,7 @@ Helm chart for deploying a Celo fullnode. More info at https://docs.celo.org
 
 ## Chart releases
 
-Chart is released to oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci/celo-fullnode repository automatically every commit to `master` branch.
+Chart is released to oci://us-west1-docker.pkg.dev/celo-testnet/clabs-public-oci/celo-fullnode repository automatically every commit to `master` branch.
 Just remind yourself to bump the version of the chart in the [Chart.yaml](./Chart.yaml) file.
 This pricess is configured using GitHub Actions in the [.github/workflows/chart-release.yaml](../../.github/workflows/chart-release.yaml)
 and [.github/workflows/pr-helm-lint.yaml](../../.github/workflows/helm-lint.yaml) files.
@@ -35,7 +35,7 @@ To install/manage a release named `celo-mainnet-fullnode` connected to `mainnet`
 
 ```bash
 # Select the chart release to use
-CHART_RELEASE="oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci/celo-fullnode --version=0.2.0" # Use remote chart and specific version
+CHART_RELEASE="oci://us-west1-docker.pkg.dev/celo-testnet/clabs-public-oci/celo-fullnode --version=0.2.0" # Use remote chart and specific version
 CHART_RELEASE="./" # Use this local folder
 
 # (Only for local chart) Sync helm dependencies

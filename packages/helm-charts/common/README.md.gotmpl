@@ -9,7 +9,7 @@
 
 ## Chart releases
 
-Chart is released to oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci/common repository automatically every commit to `master` branch.
+Chart is released to oci://us-west1-docker.pkg.dev/celo-testnet/clabs-public-oci/common repository automatically every commit to `master` branch.
 Just remind yourself to bump the version of the chart in the [Chart.yaml](./Chart.yaml) file.
 This pricess is configured using GitHub Actions in the [.github/workflows/chart-release.yaml](../../.github/workflows/chart-release.yaml)
 and [.github/workflows/pr-helm-lint.yaml](../../.github/workflows/helm-lint.yaml) files.
@@ -21,7 +21,7 @@ To import this chart into your chart, add the following to your `requirements.ya
 ```yaml
 dependencies:
   - name: common
-    repository: oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci
+    repository: oci://us-west1-docker.pkg.dev/celo-testnet/clabs-public-oci
     version: {{ template "chart.version" . }}
 ```
 

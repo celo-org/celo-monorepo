@@ -8,5 +8,5 @@ name: celo-fullnode
 version: 0.2.0
 dependencies:
   - name: common
-    repository: oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci
+    repository: oci://us-west1-docker.pkg.dev/celo-testnet/clabs-public-oci
     version: 0.2.0
