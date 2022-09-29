@@ -4,7 +4,7 @@ import {
   ErrorMessage,
 } from '@celo/phone-number-privacy-common'
 import { Action } from '../../../common/action'
-import { toSequentialDelayDomainState } from '../../../common/database/models/domainState'
+import { toSequentialDelayDomainState } from '../../../common/database/models/domain-state'
 import { SignerConfig } from '../../../config'
 import { DomainQuotaService } from '../../services/quota'
 import { DomainSession } from '../../session'
@@ -28,7 +28,7 @@ export class DomainQuotaAction implements Action<DomainQuotaStatusRequest> {
       const domainStateRecord = await this.quotaService.getQuotaStatus(session)
       this.io.sendSuccess(200, session.response, toSequentialDelayDomainState(domainStateRecord))
     } catch (error) {
-      session.logger.error('Error while getting domain status', error)
+      session.logger.error(error, 'Error while getting domain status')
       this.io.sendFailure(ErrorMessage.DATABASE_GET_FAILURE, 500, session.response)
     }
   }

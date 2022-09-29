@@ -21,9 +21,9 @@ import {
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
-import { KeyProvider } from '@celo/phone-number-privacy-signer/src/common/key-management/key-provider-base'
-import { MockKeyProvider } from '@celo/phone-number-privacy-signer/src/common/key-management/mock-key-provider'
-import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/src/config'
+import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
+import { MockKeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/mock-key-provider'
+import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
 import BigNumber from 'bignumber.js'
 import threshold_bls from 'blind-threshold-bls'
 import { Server as HttpsServer } from 'https'

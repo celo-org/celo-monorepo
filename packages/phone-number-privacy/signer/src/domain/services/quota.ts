@@ -10,11 +10,11 @@ import {
   DomainStateRecord,
   toDomainStateRecord,
   toSequentialDelayDomainState,
-} from '../../common/database/models/domainState'
+} from '../../common/database/models/domain-state'
 import {
   getDomainStateRecordOrEmpty,
   updateDomainStateRecord,
-} from '../../common/database/wrappers/domainState'
+} from '../../common/database/wrappers/domain-state'
 import { OdisQuotaStatusResult, QuotaService } from '../../common/quota'
 import { DomainSession } from '../session'
 

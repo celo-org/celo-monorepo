@@ -7,8 +7,8 @@ import {
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
-import { DomainStateRecord } from '../common/database/models/domainState'
 import { Session } from './action'
+import { DomainStateRecord } from './database/models/domain-state'
 
 // prettier-ignore
 export type OdisQuotaStatus<R extends OdisRequest> = R extends

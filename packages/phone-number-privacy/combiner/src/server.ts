@@ -18,13 +18,13 @@ import { DomainQuotaAction } from './domain/endpoints/quota/action'
 import { DomainQuotaIO } from './domain/endpoints/quota/io'
 import { DomainSignAction } from './domain/endpoints/sign/action'
 import { DomainSignIO } from './domain/endpoints/sign/io'
-import { DomainThresholdStateService } from './domain/services/thresholdState'
+import { DomainThresholdStateService } from './domain/services/threshold-state'
 import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
 import { PnpSignAction } from './pnp/endpoints/sign/action'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
 import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
-import { PnpThresholdStateService } from './pnp/services/thresholdState'
+import { PnpThresholdStateService } from './pnp/services/threshold-state'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 

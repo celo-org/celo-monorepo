@@ -4,7 +4,7 @@ export enum NUMBER_PAIRS_COLUMN {
   contactPhoneHash = 'contact_phone_hash',
 }
 
-export class NumberPair {
+export class NumberPairs {
   [NUMBER_PAIRS_COLUMN.userPhoneHash]: string;
   [NUMBER_PAIRS_COLUMN.contactPhoneHash]: string
 
