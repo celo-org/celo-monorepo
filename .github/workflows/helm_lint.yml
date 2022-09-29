@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - jcortejoso/celo-fullnode-chart-refactor
+      - jcortejoso/celo-fullnode-chart-refactor # testing
     paths:
       - 'packages/helm-charts/celo-fullnode/templates'
       - 'packages/helm-charts/celo-fullnode/Chart.yaml'
