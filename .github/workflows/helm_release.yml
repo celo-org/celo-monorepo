@@ -74,9 +74,9 @@ jobs:
         run: |
           echo "${{ steps.updated_files.outputs.all }}" | tr "," "\n" | grep 'packages/helm-charts/' | sed 's#^packages/helm-charts/##' | sed 's#/.*$##' | sort | uniq > changed_charts
           while read chart; do
-            echo helm dependency update --skip-refresh ./packages/helm-charts/${chart} 
-            echo helm package -u packages/helm-charts/${chart}/
-            echo helm push ./${chart}-*.tgz oci://us-west1-docker.pkg.dev/celo-testnet/clabs-public-oci
+            helm dependency update --skip-refresh ./packages/helm-charts/${chart} 
+            helm package -u packages/helm-charts/${chart}/
+            helm push ./${chart}-*.tgz oci://us-west1-docker.pkg.dev/celo-testnet/clabs-public-oci
           done <<EOF
-            $(cat changed_charts_debug)
+            $(cat changed_charts)
           EOF
