@@ -3,10 +3,10 @@ import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Histograms, meter } from '../../metrics'
 import {
+  DomainRequestRecord,
   DOMAIN_REQUESTS_COLUMNS,
   DOMAIN_REQUESTS_TABLE,
-  DomainRequestRecord,
-} from '../models/domainRequest'
+} from '../models/domain-request'
 import { countAndThrowDBError } from '../utils'
 
 function domainRequests(db: Knex) {

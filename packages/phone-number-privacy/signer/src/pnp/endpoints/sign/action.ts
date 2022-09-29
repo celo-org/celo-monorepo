@@ -35,12 +35,12 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           trx
         )
       } catch (err) {
-        session.logger.error({ err }, 'Failed to check if request already exists in db')
+        session.logger.error(err, 'Failed to check if request already exists in db')
       }
 
       if (isDuplicateRequest) {
         Counters.duplicateRequests.inc()
-        session.logger.debug(
+        session.logger.info(
           'Request already exists in db. Will service request without charging quota.'
         )
         session.errors.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)

@@ -43,7 +43,7 @@ export class PnpDiscrepanciesLogger {
     const first = JSON.stringify(parsedResponses[0].values)
     for (let i = 1; i < parsedResponses.length; i++) {
       if (JSON.stringify(parsedResponses[i].values) !== first) {
-        session.logger.warn({ parsedResponses }, WarningMessage.SIGNER_RESPONSE_DISCREPANCIES)
+        session.logger.warn(parsedResponses, WarningMessage.SIGNER_RESPONSE_DISCREPANCIES)
         session.warnings.push(WarningMessage.SIGNER_RESPONSE_DISCREPANCIES)
         break
       }

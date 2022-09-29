@@ -18,8 +18,6 @@ import {
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
-// TODO(2.0.0, imports) double check proper import paths (dist vs. src)
-// https://github.com/celo-org/celo-monorepo/issues/9814
 import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
 import { MockKeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/mock-key-provider'
 import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'

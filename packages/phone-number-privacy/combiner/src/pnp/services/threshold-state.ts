@@ -17,7 +17,7 @@ export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageReq
       .map((signerResponse) => signerResponse.res)
       .filter((res) => res.success) as PnpQuotaStatus[]
     const sortedResponses = signerResponses.sort(
-      (a, b) => a.totalQuota - a.performedQueryCount - (b.totalQuota - b.performedQueryCount)
+      (a, b) => b.totalQuota - b.performedQueryCount - (a.totalQuota - a.performedQueryCount)
     )
 
     const totalQuotaAvg =
