@@ -1,0 +1,76 @@
+name: Release Helm Chart
+
+on:
+  push:
+    branches:
+      - jcortejoso/celo-fullnode-chart-refactor # testing
+      - master
+    paths:
+      - 'packages/helm-charts/celo-fullnode/templates'
+      - 'packages/helm-charts/celo-fullnode/Chart.yaml'
+      - 'packages/helm-charts/celo-fullnode/values.yaml'
+
+env:
+  HELM_VERSION: "v3.9.4"
+
+jobs:
+  helm-release:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: "Checkout main branch"
+        uses: actions/checkout@v2
+
+      - name: "Install Helm"
+        uses: azure/setup-helm@v1
+        with:
+          version: "${{ env.HELM_VERSION }}"
+
+      - name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@ceee102ec2387dd9e844e01b530ccd4ec87ce955' # v0.8.0
+        with:
+          workload_identity_provider: projects/1094498259535/locations/global/workloadIdentityPools/github-celo-org-celo-monorepo/providers/github-by-repos
+          service_account: 'publish-helm-charts@celo-testnet.iam.gserviceaccount.com'
+
+      # Gcloud CLI required for login to Artifact Registry
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
+      - name: Add Helm repositories
+        run: |
+          # Install yq tool to parse Chart.yaml to identify Helm dependencies repositories
+          wget https://github.com/mikefarah/yq/releases/download/v4.21.1/yq_linux_386 -O /usr/bin/yq && chmod +x /usr/bin/yq
+          # Retrieve all helm dependencies repositories and run `helm repo add` for each of them.
+          # Command explanation follows:
+          #
+          # yq '.dependencies.[].repository' helm/*/Chart.yaml --> Prints repository field for all Chart dependencies.
+          # sed 's:/*$::' --> Trims the trailing forward slash '/' at the end of the repository URL, if any
+          # sort | uniq ----> Removes duplicated entries, for those cases where more than 1 dependency comes
+          #                   from the same Helm repository
+          yq '.dependencies.[].repository' packages/helm-charts/*/Chart.yaml | awk '/^http/' | sed 's:/*$::' | sort | uniq | while read helm_repo; do
+            # Helm repo name is generated from a random string, as it is not persisted between executions.
+            helm repo add $(openssl rand -hex 12) ${helm_repo}
+          done
+
+      - name: "Get Helm Charts changed"
+        uses: jitterbit/get-changed-files@v1
+        id: updated_files
+        with:
+          format: csv
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Dump updated Helm Charts folders and validate semantic versioning"
+        run: |
+          echo "${GCLOUD_SERVICE_ACCOUNT_KEY}" > svc-acc.json
+          cat svc-acc.json | helm registry login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
+          echo "${{ steps.updated_files.outputs.all }}" | tr "," "\n" | grep 'packages/helm-charts/' | sed 's#^packages/helm-charts/##' | sed 's#/.*$##' | sort | uniq > changed_charts
+          while read chart; do
+            helm package -u packages/helm-charts/${chart}/
+            helm push /home/runner/work/k8s-tools/k8s-tools/${chart}-*.tgz oci://us-central1-docker.pkg.dev/devops-dc8e/helm-charts
+          done <<EOF
+            $(cat changed_charts)
+          EOF
+        env:
+          GCLOUD_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_ARTIFACT_REGISTRY }}
