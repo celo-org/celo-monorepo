@@ -26,6 +26,6 @@ export function computeBlindedSignature(
   } catch (err) {
     Counters.signatureComputationErrors.inc()
     logger.error({ err }, ErrorMessage.SIGNATURE_COMPUTATION_FAILURE)
-    throw ErrorMessage.SIGNATURE_COMPUTATION_FAILURE
+    throw new Error(ErrorMessage.SIGNATURE_COMPUTATION_FAILURE)
   }
 }

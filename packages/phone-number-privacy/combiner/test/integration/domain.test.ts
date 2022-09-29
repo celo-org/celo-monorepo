@@ -258,14 +258,14 @@ describe('domainService', () => {
       const req = await disableRequest()
       const res1 = await request(app).post(CombinerEndpoint.DISABLE_DOMAIN).send(req)
       expect(res1.status).toBe(200)
-      expect(res1.body).toMatchObject<DisableDomainResponse>({
+      expect(res1.body).toStrictEqual<DisableDomainResponse>({
         success: true,
         version: res1.body.version,
       })
 
       const res2 = await request(app).post(CombinerEndpoint.DISABLE_DOMAIN).send(req)
       expect(res2.status).toBe(200)
-      expect(res2.body).toMatchObject<DisableDomainResponse>(res1.body)
+      expect(res2.body).toStrictEqual<DisableDomainResponse>(res1.body)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
@@ -276,7 +276,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DISABLE_DOMAIN).send(req)
 
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<DisableDomainResponse>({
+      expect(res.body).toStrictEqual<DisableDomainResponse>({
         success: true,
         version: res.body.version,
       })
@@ -290,7 +290,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DISABLE_DOMAIN).send(badRequest)
 
       expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<DisableDomainResponse>({
+      expect(res.body).toStrictEqual<DisableDomainResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -306,7 +306,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DISABLE_DOMAIN).send(unknownRequest)
 
       expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<DisableDomainResponse>({
+      expect(res.body).toStrictEqual<DisableDomainResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -321,7 +321,7 @@ describe('domainService', () => {
       const res1 = await request(app).post(CombinerEndpoint.DISABLE_DOMAIN).send(badRequest1)
 
       expect(res1.status).toBe(400)
-      expect(res1.body).toMatchObject<DisableDomainResponse>({
+      expect(res1.body).toStrictEqual<DisableDomainResponse>({
         success: false,
         version: res1.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -332,7 +332,7 @@ describe('domainService', () => {
       const res2 = await request(app).post(CombinerEndpoint.DISABLE_DOMAIN).send(badRequest2)
 
       expect(res2.status).toBe(400)
-      expect(res2.body).toMatchObject<DisableDomainResponse>({
+      expect(res2.body).toStrictEqual<DisableDomainResponse>({
         success: false,
         version: res2.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -347,7 +347,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DISABLE_DOMAIN).send(badRequest)
 
       expect(res.status).toBe(401)
-      expect(res.body).toMatchObject<DisableDomainResponse>({
+      expect(res.body).toStrictEqual<DisableDomainResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -368,7 +368,7 @@ describe('domainService', () => {
       const res = await request(appWithApiDisabled).post(CombinerEndpoint.DISABLE_DOMAIN).send(req)
 
       expect(res.status).toBe(503)
-      expect(res.body).toMatchObject<DisableDomainResponse>({
+      expect(res.body).toStrictEqual<DisableDomainResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.API_UNAVAILABLE,
@@ -399,13 +399,13 @@ describe('domainService', () => {
       }
 
       expect(res1.status).toBe(200)
-      expect(res1.body).toMatchObject<DomainQuotaStatusResponse>(expectedResponse)
+      expect(res1.body).toStrictEqual<DomainQuotaStatusResponse>(expectedResponse)
 
       const res2 = await request(app).post(CombinerEndpoint.DOMAIN_QUOTA_STATUS).send(req)
       expect(res2.status).toBe(200)
       // Prevent flakiness due to slight timing inconsistencies
       expectedResponse.status.now = res2.body.status.now
-      expect(res2.body).toMatchObject<DomainQuotaStatusResponse>(expectedResponse)
+      expect(res2.body).toStrictEqual<DomainQuotaStatusResponse>(expectedResponse)
     })
 
     it('Should respond with 200 on extra request fields', async () => {
@@ -416,7 +416,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_QUOTA_STATUS).send(req)
 
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+      expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
         success: true,
         version: res.body.version,
         status: { disabled: false, counter: 0, timer: 0, now: res.body.status.now },
@@ -431,7 +431,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_QUOTA_STATUS).send(badRequest)
 
       expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+      expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -447,7 +447,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_QUOTA_STATUS).send(unknownRequest)
 
       expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+      expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -462,7 +462,7 @@ describe('domainService', () => {
       const res1 = await request(app).post(CombinerEndpoint.DOMAIN_QUOTA_STATUS).send(badRequest1)
 
       expect(res1.status).toBe(400)
-      expect(res1.body).toMatchObject<DomainQuotaStatusResponse>({
+      expect(res1.body).toStrictEqual<DomainQuotaStatusResponse>({
         success: false,
         version: res1.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -473,7 +473,7 @@ describe('domainService', () => {
       const res2 = await request(app).post(CombinerEndpoint.DOMAIN_QUOTA_STATUS).send(badRequest2)
 
       expect(res2.status).toBe(400)
-      expect(res2.body).toMatchObject<DomainQuotaStatusResponse>({
+      expect(res2.body).toStrictEqual<DomainQuotaStatusResponse>({
         success: false,
         version: res2.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -488,7 +488,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_QUOTA_STATUS).send(badRequest)
 
       expect(res.status).toBe(401)
-      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+      expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -509,7 +509,7 @@ describe('domainService', () => {
         .send(req)
 
       expect(res.status).toBe(503)
-      expect(res.body).toMatchObject<DomainQuotaStatusResponse>({
+      expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.API_UNAVAILABLE,
@@ -549,7 +549,7 @@ describe('domainService', () => {
         .send(req)
 
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: true,
         version: res.body.version,
         signature: res.body.signature,
@@ -573,7 +573,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
 
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: true,
         version: res.body.version,
         signature: res.body.signature,
@@ -593,7 +593,7 @@ describe('domainService', () => {
 
       const res1 = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req1)
       expect(res1.status).toBe(200)
-      expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res1.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: true,
         version: res1.body.version,
         signature: res1.body.signature,
@@ -616,7 +616,7 @@ describe('domainService', () => {
       const res2 = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req1)
 
       expect(res2.status).toBe(200)
-      expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res2.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: true,
         version: res2.body.version,
         signature: res2.body.signature,
@@ -639,7 +639,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
 
       expect(res.status).toBe(200)
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: true,
         version: res.body.version,
         signature: res.body.signature,
@@ -662,7 +662,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(badRequest)
 
       expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -678,7 +678,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(unknownRequest)
 
       expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -693,7 +693,7 @@ describe('domainService', () => {
       const res1 = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(badRequest1)
 
       expect(res1.status).toBe(400)
-      expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res1.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res1.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -704,7 +704,7 @@ describe('domainService', () => {
       const res2 = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(badRequest2)
 
       expect(res2.status).toBe(400)
-      expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res2.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res2.body.version,
         error: WarningMessage.INVALID_INPUT,
@@ -722,7 +722,7 @@ describe('domainService', () => {
         .send(badRequest)
 
       expect(res.status).toBe(400)
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
@@ -737,7 +737,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(badRequest)
 
       expect(res.status).toBe(401)
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.UNAUTHENTICATED_USER,
@@ -750,7 +750,7 @@ describe('domainService', () => {
       const res1 = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req1)
 
       expect(res1.status).toBe(200)
-      expect(res1.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res1.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: true,
         version: res1.body.version,
         signature: res1.body.signature,
@@ -763,7 +763,7 @@ describe('domainService', () => {
       })
       const res2 = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req1)
       expect(res2.status).toBe(401)
-      expect(res2.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res2.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res2.body.version,
         error: WarningMessage.INVALID_NONCE,
@@ -779,7 +779,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(badRequest)
 
       expect(res.status).toBe(429)
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.EXCEEDED_QUOTA,
@@ -801,7 +801,7 @@ describe('domainService', () => {
       const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(badRequest)
 
       expect(res.status).toBe(429)
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.EXCEEDED_QUOTA,
@@ -821,7 +821,7 @@ describe('domainService', () => {
 
       expect(res.status).toBe(503)
       // @ts-ignore res.body.status is expected to be undefined
-      expect(res.body).toMatchObject<DomainRestrictedSignatureResponse>({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,
         error: WarningMessage.API_UNAVAILABLE,

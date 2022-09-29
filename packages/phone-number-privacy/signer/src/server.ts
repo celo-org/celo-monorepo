@@ -1,6 +1,7 @@
 import { timeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import {
+  ErrorMessage,
   getContractKit,
   loggerMiddleware,
   rootLogger,
@@ -14,7 +15,7 @@ import { Knex } from 'knex'
 import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
 import { KeyProvider } from './common/key-management/key-provider-base'
-import { Counters, Histograms } from './common/metrics'
+import { Counters } from './common/metrics'
 import { getVersion, SignerConfig } from './config'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
@@ -56,33 +57,40 @@ export function startSigner(
     res.send(PromClient.register.metrics())
   })
 
-  // TODO(2.0.0, metering) Clean this up / maybe roll into to Controller class
-  const addMeteredSignerEndpoint = (
+  const addEndpointWithTimeout = (
     endpoint: SignerEndpoint,
     handler: (req: Request, res: Response) => Promise<void>
   ) =>
     app.post(endpoint, async (req, res) => {
-      await callAndMeterLatency(endpoint, handler, req, res)
-    })
-
-  async function callAndMeterLatency(
-    endpoint: SignerEndpoint,
-    handler: (req: Request, res: Response) => Promise<void>,
-    req: Request,
-    res: Response
-  ) {
-    const childLogger: Logger = res.locals.logger
-    const end = Histograms.responseLatency.labels(endpoint).startTimer()
-    const timeoutRes = Symbol()
-    await timeout(handler, [req, res], config.timeout, timeoutRes)
-      .catch((error: any) => {
-        if (error === timeoutRes) {
+      const childLogger: Logger = res.locals.logger
+      const timeoutRes = Symbol()
+      try {
+        // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
+        await timeout(handler, [req, res], config.timeout, timeoutRes)
+      } catch (err: any) {
+        // Handle any errors that otherwise managed to escape the proper handlers
+        let errorMsg: string = ErrorMessage.UNKNOWN_ERROR
+        let errToLog = err
+        if (err === timeoutRes) {
           Counters.timeouts.inc()
-          childLogger.warn(`Timed out after ${config.timeout}ms`)
+          errorMsg = ErrorMessage.TIMEOUT_FROM_SIGNER
+          errToLog = new Error(errorMsg)
         }
-      })
-      .finally(end)
-  }
+        childLogger.error({ errToLog })
+        if (!res.writableEnded) {
+          res.status(500).json({
+            success: false,
+            error: errorMsg,
+          })
+        } else {
+          // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
+          // TODO(2.0.0, audit responses) https://github.com/celo-org/celo-monorepo/issues/9859
+          // getting to this error indicates that either timeout or `perform` process
+          // does not terminate after sending a response, and then throws an error.
+          childLogger.error('Error in endpoint thrown after response was already sent')
+        }
+      }
+    })
 
   const pnpQuotaService = new OnChainPnpQuotaService(db, kit)
   const legacyPnpQuotaService = new LegacyPnpQuotaService(db, kit)
@@ -151,15 +159,15 @@ export function startSigner(
   const domainDisable = new Controller(
     new DomainDisableAction(db, config, new DomainDisableIO(config.api.domains.enabled))
   )
+  logger.info('Right before adding meteredSignerEndpoints')
+  addEndpointWithTimeout(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))
+  addEndpointWithTimeout(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota))
+  addEndpointWithTimeout(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
+  addEndpointWithTimeout(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
+  addEndpointWithTimeout(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
 
-  addMeteredSignerEndpoint(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))
-  addMeteredSignerEndpoint(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota))
-  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
-  addMeteredSignerEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
-  addMeteredSignerEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
-
-  addMeteredSignerEndpoint(SignerEndpoint.LEGACY_PNP_SIGN, legacyPnpSign.handle.bind(legacyPnpSign))
-  addMeteredSignerEndpoint(
+  addEndpointWithTimeout(SignerEndpoint.LEGACY_PNP_SIGN, legacyPnpSign.handle.bind(legacyPnpSign))
+  addEndpointWithTimeout(
     SignerEndpoint.LEGACY_PNP_QUOTA,
     legacyPnpQuota.handle.bind(legacyPnpQuota)
   )

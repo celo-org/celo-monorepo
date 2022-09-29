@@ -1,12 +1,13 @@
 import { DB_TIMEOUT, Domain, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
-import { Counters, Histograms, Labels } from '../../metrics'
+import { Histograms, meter } from '../../metrics'
 import {
   DomainRequestRecord,
   DOMAIN_REQUESTS_COLUMNS,
   DOMAIN_REQUESTS_TABLE,
 } from '../models/domain-request'
+import { countAndThrowDBError } from '../utils'
 
 function domainRequests(db: Knex) {
   return db<DomainRequestRecord<Domain>>(DOMAIN_REQUESTS_TABLE)
@@ -19,28 +20,25 @@ export async function getDomainRequestRecordExists<D extends Domain>(
   trx: Knex.Transaction<DomainRequestRecord<D>>,
   logger: Logger
 ): Promise<boolean> {
-  const getRequestRecordExistsMeter = Histograms.dbOpsInstrumentation
-    .labels('getDomainRequestRecordExists')
-    .startTimer()
-  const hash = domainHash(domain).toString('hex')
-  logger.debug({ domain, blindedMessage, hash }, 'Checking if domain request exists')
-  try {
-    const existingRequest = await domainRequests(db)
-      .transacting(trx)
-      .where({
-        [DOMAIN_REQUESTS_COLUMNS.domainHash]: hash,
-        [DOMAIN_REQUESTS_COLUMNS.blindedMessage]: blindedMessage,
-      })
-      .first()
-      .timeout(DB_TIMEOUT)
-    return !!existingRequest
-  } catch (err) {
-    Counters.databaseErrors.labels(Labels.read).inc()
-    logger.error({ err }, ErrorMessage.DATABASE_GET_FAILURE)
-    throw err
-  } finally {
-    getRequestRecordExistsMeter()
-  }
+  return meter(
+    async () => {
+      const hash = domainHash(domain).toString('hex')
+      logger.debug({ domain, blindedMessage, hash }, 'Checking if domain request exists')
+      const existingRequest = await domainRequests(db)
+        .transacting(trx)
+        .where({
+          [DOMAIN_REQUESTS_COLUMNS.domainHash]: hash,
+          [DOMAIN_REQUESTS_COLUMNS.blindedMessage]: blindedMessage,
+        })
+        .first()
+        .timeout(DB_TIMEOUT)
+      return !!existingRequest
+    },
+    [],
+    (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_GET_FAILURE),
+    Histograms.dbOpsInstrumentation,
+    ['getDomainRequestRecordExists']
+  )
 }
 
 export async function storeDomainRequestRecord<D extends Domain>(
@@ -50,20 +48,17 @@ export async function storeDomainRequestRecord<D extends Domain>(
   trx: Knex.Transaction<DomainRequestRecord<D>>,
   logger: Logger
 ) {
-  const storeRequestRecordMeter = Histograms.dbOpsInstrumentation
-    .labels('storeDomainRequestRecord')
-    .startTimer()
-  logger.debug({ domain, blindedMessage }, 'Storing domain restricted signature request')
-  try {
-    await domainRequests(db)
-      .transacting(trx)
-      .insert(new DomainRequestRecord(domain, blindedMessage))
-      .timeout(DB_TIMEOUT)
-  } catch (err) {
-    Counters.databaseErrors.labels(Labels.update).inc()
-    logger.error({ err }, ErrorMessage.DATABASE_UPDATE_FAILURE)
-    throw err
-  } finally {
-    storeRequestRecordMeter()
-  }
+  return meter(
+    async () => {
+      logger.debug({ domain, blindedMessage }, 'Storing domain restricted signature request')
+      await domainRequests(db)
+        .transacting(trx)
+        .insert(new DomainRequestRecord(domain, blindedMessage))
+        .timeout(DB_TIMEOUT)
+    },
+    [],
+    (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_INSERT_FAILURE),
+    Histograms.dbOpsInstrumentation,
+    ['storeDomainRequestRecord']
+  )
 }

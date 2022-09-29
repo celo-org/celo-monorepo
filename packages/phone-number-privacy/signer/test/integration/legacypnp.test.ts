@@ -49,6 +49,10 @@ const {
   DEK_PUBLIC_KEY,
 } = TestUtils.Values
 
+// TODO(2.0.0, timeout) revisit flake tracker timeouts under the umbrella of
+// https://github.com/celo-org/celo-monorepo/issues/9845
+jest.setTimeout(20000)
+
 const expectedSignature =
   'MAAAAAAAAAAEFHu3gWowoNJvvWkINGZR/1no37LPBFYRIHu3h5xYowXo1tlIlrL9CbN0cNqcKIAAAAAA'
 
@@ -359,7 +363,7 @@ describe('legacyPNP', () => {
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: expectedVersion,
           performedQueryCount: testCase.expectedPerformedQueryCount,
@@ -399,7 +403,7 @@ describe('legacyPNP', () => {
 
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: res.body.version,
           performedQueryCount: performedQueryCount,
@@ -419,7 +423,7 @@ describe('legacyPNP', () => {
 
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: res.body.version,
           performedQueryCount: performedQueryCount,
@@ -435,7 +439,7 @@ describe('legacyPNP', () => {
 
         const res1 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res1.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: res1.body.version,
           performedQueryCount: performedQueryCount,
@@ -445,7 +449,7 @@ describe('legacyPNP', () => {
         })
         const res2 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
         expect(res2.status).toBe(200)
-        expect(res2.body).toMatchObject<PnpQuotaResponseSuccess>(res1.body)
+        expect(res2.body).toStrictEqual<PnpQuotaResponseSuccess>(res1.body)
       })
 
       it('Should respond with 200 on extra request fields', async () => {
@@ -455,7 +459,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: expectedVersion,
           performedQueryCount: performedQueryCount,
@@ -477,7 +481,7 @@ describe('legacyPNP', () => {
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<PnpQuotaResponseSuccess>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
           success: true,
           version: res.body.version,
           performedQueryCount: expectedQuota + 1,
@@ -495,7 +499,7 @@ describe('legacyPNP', () => {
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
@@ -531,7 +535,7 @@ describe('legacyPNP', () => {
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -553,7 +557,7 @@ describe('legacyPNP', () => {
         )
         expect.assertions(2)
         expect(res.status).toBe(503)
-        expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+        expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
@@ -601,7 +605,7 @@ describe('legacyPNP', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
           expect(res.status).toBe(500)
-          expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+          expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
             success: false,
             version: expectedVersion,
             error: ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT,
@@ -618,7 +622,7 @@ describe('legacyPNP', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
           expect(res.status).toBe(500)
-          expect(res.body).toMatchObject<PnpQuotaResponseFailure>({
+          expect(res.body).toStrictEqual<PnpQuotaResponseFailure>({
             success: false,
             version: expectedVersion,
             error: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
@@ -655,7 +659,7 @@ describe('legacyPNP', () => {
 
         if (shouldSucceed) {
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: expectedVersion,
             signature: expectedSignature,
@@ -666,7 +670,7 @@ describe('legacyPNP', () => {
           })
         } else {
           expect(res.status).toBe(403)
-          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: expectedVersion,
             performedQueryCount: expectedPerformedQueryCount,
@@ -711,7 +715,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: res.body.version,
           signature: expectedSignature,
@@ -735,7 +739,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: res.body.version,
           signature: expectedSignature,
@@ -756,7 +760,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN, '3') // since default is '1' or '2'
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: res.body.version,
           signature: expectedSignature,
@@ -778,7 +782,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res1 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: res1.body.version,
           signature: expectedSignature,
@@ -790,7 +794,7 @@ describe('legacyPNP', () => {
         const res2 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res2.status).toBe(200)
         res1.body.warnings.push(WarningMessage.DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG)
-        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(res1.body)
+        expect(res2.body).toStrictEqual<SignMessageResponseSuccess>(res1.body)
       })
 
       it('Should respond with 200 on extra request fields', async () => {
@@ -805,7 +809,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: res.body.version,
           signature: expectedSignature,
@@ -828,7 +832,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.INVALID_INPUT,
@@ -850,7 +854,7 @@ describe('legacyPNP', () => {
           'a'
         )
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
@@ -867,7 +871,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.INVALID_INPUT,
@@ -884,7 +888,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.INVALID_INPUT,
@@ -901,7 +905,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.INVALID_INPUT,
@@ -937,7 +941,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -961,7 +965,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(403)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           performedQueryCount: expectedQuota,
@@ -990,7 +994,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(403)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           performedQueryCount: 0,
@@ -1021,7 +1025,7 @@ describe('legacyPNP', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
         expect(res.status).toBe(403)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           performedQueryCount: expectedQuota + 1,
@@ -1051,7 +1055,7 @@ describe('legacyPNP', () => {
           appWithApiDisabled
         )
         expect(res.status).toBe(503)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: res.body.version,
           error: WarningMessage.API_UNAVAILABLE,
@@ -1089,7 +1093,7 @@ describe('legacyPNP', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
 
           expect(res.status).toBe(500)
-          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
             performedQueryCount: -1,
@@ -1127,7 +1131,7 @@ describe('legacyPNP', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
 
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: res.body.version,
             signature: expectedSignature,
@@ -1167,7 +1171,7 @@ describe('legacyPNP', () => {
           )
 
           expect(res.status).toBe(500)
-          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
             performedQueryCount: performedQueryCount,
@@ -1177,7 +1181,7 @@ describe('legacyPNP', () => {
           })
         })
 
-        it('Should return 200 w/ warning on failure to increment query count', async () => {
+        it('Should return 500 on failure to increment query count', async () => {
           const spy = jest
             .spyOn(
               jest.requireActual('../../src/common/database/wrappers/account'),
@@ -1194,18 +1198,11 @@ describe('legacyPNP', () => {
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
 
-          expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-            success: true,
+          expect(res.status).toBe(500)
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+            success: false,
             version: res.body.version,
-            signature: expectedSignature,
-            performedQueryCount: performedQueryCount, // Not incremented
-            totalQuota: expectedQuota,
-            blockNumber: testBlockNumber,
-            warnings: [
-              ErrorMessage.FAILURE_TO_INCREMENT_QUERY_COUNT,
-              ErrorMessage.FAILURE_TO_STORE_REQUEST,
-            ],
+            error: ErrorMessage.UNKNOWN_ERROR,
           })
 
           spy.mockRestore()
@@ -1217,7 +1214,7 @@ describe('legacyPNP', () => {
           expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
 
-        it('Should return 200 w/ warning on failure to store request', async () => {
+        it('Should return 500 on failure to store request', async () => {
           const spy = jest
             .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
             .mockRejectedValueOnce(new Error())
@@ -1231,23 +1228,19 @@ describe('legacyPNP', () => {
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
 
-          expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
-            success: true,
+          expect(res.status).toBe(500)
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+            success: false,
             version: res.body.version,
-            signature: expectedSignature,
-            performedQueryCount: performedQueryCount + 1,
-            totalQuota: expectedQuota,
-            blockNumber: testBlockNumber,
-            warnings: [ErrorMessage.FAILURE_TO_STORE_REQUEST],
+            error: ErrorMessage.UNKNOWN_ERROR,
           })
 
           spy.mockRestore()
 
-          // check DB state: performedQueryCount was incremented and request was not stored
+          // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
             await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
-          ).toBe(performedQueryCount + 1)
+          ).toBe(performedQueryCount)
           expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
         })
 
@@ -1268,7 +1261,7 @@ describe('legacyPNP', () => {
           const authorization = getPnpRequestAuthorization(req, differentPk)
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: res.body.version,
             signature: expectedSignature,
@@ -1296,7 +1289,7 @@ describe('legacyPNP', () => {
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
 
           expect(res.status).toBe(500)
-          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
             performedQueryCount: performedQueryCount,
@@ -1312,6 +1305,45 @@ describe('legacyPNP', () => {
             await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
           ).toBe(performedQueryCount)
           expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
+        })
+
+        it('Should return 500 on generic error in sign', async () => {
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/bls/bls-cryptography-client'),
+              'computeBlindedSignature'
+            )
+            .mockImplementationOnce(() => {
+              // Trigger a generic error in .sign to trigger the default error returned.
+              throw new Error()
+            })
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY,
+            IDENTIFIER
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+
+          expect(res.status).toBe(500)
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+            success: false,
+            version: res.body.version,
+            performedQueryCount: performedQueryCount,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
+          })
+
+          spy.mockRestore()
+
+          // check DB state: performedQueryCount was not incremented and request was not stored
+          expect(
+            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+          ).toBe(performedQueryCount)
+          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
         })
       })
     })

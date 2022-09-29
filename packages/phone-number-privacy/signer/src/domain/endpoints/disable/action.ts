@@ -33,7 +33,7 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
           (await getDomainStateRecord(this.db, domain, session.logger, trx)) ??
           (await insertDomainStateRecord(
             this.db,
-            createEmptyDomainStateRecord(domain),
+            createEmptyDomainStateRecord(domain, true),
             trx,
             session.logger
           ))
