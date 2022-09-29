@@ -39,9 +39,6 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v0'
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: Add Helm repositories
         run: |
           # Install yq tool to parse Chart.yaml to identify Helm dependencies repositories
@@ -65,10 +62,16 @@ jobs:
           format: csv
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Dump updated Helm Charts folders and validate semantic versioning"
+      - name: "Login to Artifact Registry"
         run: |
-          echo "${GCLOUD_SERVICE_ACCOUNT_KEY}" > svc-acc.json
-          cat svc-acc.json | helm registry login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
+          gcloud auth application-default print-access-token | helm registry login -u oauth2accesstoken \
+          --password-stdin https://us-west1-docker.pkg.dev
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
+      - name: "Push Helm Charts"
+        run: |
           echo "${{ steps.updated_files.outputs.all }}" | tr "," "\n" | grep 'packages/helm-charts/' | sed 's#^packages/helm-charts/##' | sed 's#/.*$##' | sort | uniq > changed_charts
           while read chart; do
             helm package -u packages/helm-charts/${chart}/
