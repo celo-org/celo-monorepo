@@ -1,11 +1,14 @@
+---
+# Typically these values will be heritaged from the parent chart
 imagePullPolicy: IfNotPresent
 
-# Full-node variables
 geth:
+  # -- Image for the celo-blockchain statefulset
   image:
     repository: us.gcr.io/celo-testnet/geth
     tag: 1b40b25d315bfcd792138e288ea61351d6c44d09
     imagePullPolicy: IfNotPresent
+  # -- Resources for `geth` container
   resources:
     requests:
       memory: "256Mi"
@@ -13,26 +16,40 @@ geth:
     limits:
       memory: "512Mi"
       cpu: "1000m"
-  debug: false
-  ping_ip_from_packet: false
-  in_memory_discovery_table: false
+  # -- Blockchain sync mode. Valid values are: full, lightest, light and fast
   syncmode: full
-  gcmode: full
+  # -- Blockchain garbage collection mode. Valid values are: full and archive
+  gcmode: full  # -- Enable blockchain option `--ping-ip-from-packet`
+  ping_ip_from_packet: false
+  # -- Enable blockchain option `--use-in-memory-discovery-table`
+  in_memory_discovery_table: false
+  # -- Gas cap that can be used in eth_call/estimateGas
   rpc_gascap: 10000000
+  # -- Loggin verbosity. Valid values are: 0-5. 0 is the least verbose
   verbosity: 2
-  public_ips:
-  - 52.149.51.48
-  - 1.1.1.1
+  # -- Array with 'public' ip addresses used for `nat=extip:<ip>` option. Replica 0 will use the first ip, replica 1 the second, etc.
+  public_ip_per_node: []
+  # - 1.2.3.4
+  # - 5.6.7.8
+  # -- Type of the LoadBalancer for the service attached to each replica. Each replica of the statefulset will have a service of this type.
+  # If type is `LoadBalancer`, it will be created with the `public_ip_per_node` as the `loadBalancerIP`
   service_type: LoadBalancer
+  # -- WS-RPC server listening port
   ws_port: 8546
 
-# Genesis
+# -- Blockchain genesis configuration
 genesis:
-  networkId: 31418
-  network: baklavastaging
-  useGenesisFileBase64: true
+  # -- Network ID for custom testnet. Not used in case of mainnet, baklava or alfajores
+  networkId: 42220
+  # -- Network name. Valid values are mainnet, rc1 (both for mainnet), baklava or afajores
+  network: rc1
+  # -- Use a custom genesis shared as part of a configmap. Used for custom networks with small genesis files
+  useGenesisFileBase64: false
+  # -- Base64 encoded genesis file if `useGenesisFileBase64` is set to true
   genesisFileBase64: ""
 
+# -- Celotool image. This image is used to derivate the private keys from the mnemonic. This is just internally used by cLabs and
+# not required to be used for running nodes
 celotool:
   image:
     repository: gcr.io/celo-testnet/celo-monorepo

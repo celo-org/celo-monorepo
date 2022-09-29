@@ -1,6 +1,9 @@
+apiVersion: v2
 name: common
-version: 0.1.1
-description: A chart with common helper templates
+version: 0.2.0
+home: https://celo.org
+icon: https://pbs.twimg.com/profile_images/1493309659599486986/5ETdHxeE_400x400.jpg
+description: Helm chart with helper templates and functions for Celo nodes.
+  Import into your chart with `dependencies` and use the templates and functions
 keywords:
 - celo
-appVersion: v1.7.3

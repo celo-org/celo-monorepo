@@ -217,8 +217,6 @@ fi
       --txlookuplimit {{ .Values.geth.txlookuplimit | default 0 }} \
       ${ADDITIONAL_FLAGS}
   env:
-  - name: GETH_DEBUG
-    value: "{{ default "false" .Values.geth.debug }}"
   - name: NETWORK_ID
     value: "{{ .Values.genesis.networkId }}"
   - name: IP_ADDRESSES
