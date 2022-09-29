@@ -557,7 +557,7 @@ describe('pnpService', () => {
           const res = await sendPnpSignRequest(req, authorization, appWithFailOpenDisabled)
 
           expect(res.status).toBe(401)
-          expect(res.body).toMatchObject<SignMessageResponseFailure>({
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: expectedVersion,
             error: WarningMessage.UNAUTHENTICATED_USER,
@@ -593,13 +593,14 @@ describe('pnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
         const unblindedSig = threshold_bls.unblind(
           Buffer.from(res.body.signature, 'base64'),

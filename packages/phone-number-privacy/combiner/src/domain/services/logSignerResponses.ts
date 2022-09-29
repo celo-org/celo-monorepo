@@ -7,7 +7,8 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
 
-export class DomainDiscrepanciesLogger {
+export class DomainSignerResponseLogger {
+  // TODO(Alec) parse out 'now' field before logging (from slack)
   logResponseDiscrepancies(
     session: Session<DomainRestrictedSignatureRequest> | Session<DomainQuotaStatusRequest>
   ): void {

@@ -8,7 +8,7 @@ import Logger from 'bunyan'
 import crypto from 'crypto'
 import { Request } from 'express'
 import { fetchEnv, rootLogger } from '..'
-import { AuthenticationMethod, ErrorMessage, WarningMessage } from '../interfaces'
+import { AuthenticationMethod, ErrorMessage, ErrorType, WarningMessage } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
 /*
@@ -19,8 +19,9 @@ export async function authenticateUser(
   request: Request, // TODO(2.0.0, optional) this could take in a generic for the different request types
   contractKit: ContractKit,
   logger: Logger,
-  shouldFailOpen: boolean = true
-): Promise<{ success: boolean; failedOpen: boolean }> {
+  shouldFailOpen: boolean = true,
+  warnings: ErrorType[] = []
+): Promise<boolean> {
   logger.debug('Authenticating user')
 
   // https://tools.ietf.org/html/rfc7235#section-4.2
@@ -30,7 +31,7 @@ export async function authenticateUser(
   const authMethod = request.body.authenticationMethod
 
   if (!messageSignature || !signer) {
-    return { success: false, failedOpen: false }
+    return false
   }
 
   if (authMethod && authMethod === AuthenticationMethod.ENCRYPTION_KEY) {
@@ -40,16 +41,19 @@ export async function authenticateUser(
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
-      logger.error({ err, shouldFailOpen }, ErrorMessage.FAILURE_TO_GET_DEK)
-      if (shouldFailOpen) {
-        return { success: true, failedOpen: true }
-      } else {
-        return { success: false, failedOpen: false }
-      }
+      logger.error(
+        { err, warning: ErrorMessage.FAILURE_TO_GET_DEK },
+        shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
+      )
+      warnings.push(
+        ErrorMessage.FAILURE_TO_GET_DEK,
+        shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
+      )
+      return shouldFailOpen
     }
     if (!registeredEncryptionKey) {
       logger.warn({ account: signer }, 'Account does not have registered encryption key')
-      return { success: false, failedOpen: false }
+      return false
     } else {
       logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
       if (
@@ -57,7 +61,7 @@ export async function authenticateUser(
           insecureAllowIncorrectlyGeneratedSignature: true,
         })
       ) {
-        return { success: true, failedOpen: false }
+        return true
       }
     }
   }
@@ -69,10 +73,7 @@ export async function authenticateUser(
   )
   // TODO(2.0.0) This uses signature utils, why doesn't DEK authentication?
   // (https://github.com/celo-org/celo-monorepo/issues/9803)
-  return {
-    success: verifySignature(message, messageSignature, signer),
-    failedOpen: false,
-  }
+  return verifySignature(message, messageSignature, signer)
 }
 
 export function getMessageDigest(message: string) {

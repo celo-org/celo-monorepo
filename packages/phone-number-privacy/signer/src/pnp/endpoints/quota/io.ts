@@ -1,7 +1,6 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
-  ErrorMessage,
   ErrorType,
   hasValidAccountParam,
   identifierIsValidIfExists,
@@ -65,19 +64,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     warnings: ErrorType[],
     logger: Logger
   ): Promise<boolean> {
-    const { success, failedOpen } = await authenticateUser(
-      request,
-      this.kit,
-      logger,
-      this.shouldFailOpen
-    )
-
-    if (failedOpen) {
-      warnings.push(ErrorMessage.FAILURE_TO_GET_DEK)
-      logger.error({ warning: ErrorMessage.FAILURE_TO_GET_DEK }, ErrorMessage.FAILING_OPEN)
-    }
-
-    return success
+    return authenticateUser(request, this.kit, logger, this.shouldFailOpen, warnings)
   }
 
   sendSuccess(

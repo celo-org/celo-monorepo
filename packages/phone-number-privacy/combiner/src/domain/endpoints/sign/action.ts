@@ -9,15 +9,15 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
 import { SignAction } from '../../../common/sign'
-import { DomainDiscrepanciesLogger } from '../../services/logDiscrepancies'
+import { DomainSignerResponseLogger } from '../../services/logSignerResponses'
 
 export class DomainSignAction extends SignAction<DomainRestrictedSignatureRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_SIGN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-  readonly discrepancyLogger: DomainDiscrepanciesLogger = new DomainDiscrepanciesLogger()
+  readonly responseLogger = new DomainSignerResponseLogger()
 
   combine(session: CryptoSession<DomainRestrictedSignatureRequest>): void {
-    this.discrepancyLogger.logResponseDiscrepancies(session)
+    this.responseLogger.logResponseDiscrepancies(session)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {

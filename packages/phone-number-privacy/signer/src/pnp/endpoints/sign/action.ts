@@ -60,7 +60,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             // We fail open and service requests on full-node errors to not block the user.
             // Error messages are stored in the session and included along with the signature in the response.
             quotaStatus.totalQuota = Number.MAX_SAFE_INTEGER
-            session.logger.error(
+            session.logger.warn(
               { warning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA },
               ErrorMessage.FAILING_OPEN
             )
@@ -70,7 +70,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
             // should be based intelligently off of the warning messages returned by signers
             // (https://github.com/celo-org/celo-monorepo/issues/9836)
           } else {
-            session.logger.error(
+            session.logger.warn(
               { warning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA },
               ErrorMessage.FAILING_CLOSED
             )
