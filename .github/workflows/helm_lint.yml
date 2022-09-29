@@ -103,6 +103,7 @@ jobs:
           if test "$(wc -c < changed_charts)" -gt 2; then
             while read chart; do
               if [ -d ./packages/helm-charts/${chart} ]; then
+                helm dependency update --skip-refresh ./packages/helm-charts/${chart}
                 helm lint "./packages/helm-charts/${chart}/" || false
               else
                 echo "Skipping packages/helm-charts/${chart} as it seems it has been deleted."
