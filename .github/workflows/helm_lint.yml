@@ -27,6 +27,10 @@ env:
 jobs:
   helm-lint:
     runs-on: 'ubuntu-latest'
+    # Add "id-token" with the intended permissions.
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - name: "Checkout current PR"
         uses: actions/checkout@v2
