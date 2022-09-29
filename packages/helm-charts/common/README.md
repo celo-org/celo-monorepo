@@ -22,7 +22,7 @@ To import this chart into your chart, add the following to your `requirements.ya
 ```yaml
 dependencies:
   - name: common
-    repository: oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci/celo-fullnode
+    repository: oci://us-central1-docker.pkg.dev/celo-testnet/clabs-public-oci
     version: 0.2.0
 ```
 
