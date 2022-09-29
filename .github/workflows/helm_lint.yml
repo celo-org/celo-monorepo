@@ -53,54 +53,57 @@ jobs:
       - name: "Dump updated Helm Charts folders and validate semantic versioning"
         run: |
           echo "${{ steps.updated_files.outputs.all }}" | tr "," "\n" | grep 'packages/helm-charts/' | sed 's#^packages/helm-charts/##' | sed 's#/.*$##' | sort | uniq > changed_charts
-          cat changed_charts
-          while read chart; do
-            # Get Chart version in the current PR branch
-            version=$(awk -F\: '/^version:/ {print $(NF)}' packages/helm-charts/${chart}/Chart.yaml|tr -d " ")
+          if test "$(wc -c < changed_charts)" -gt 2; then
+            while read chart; do
+              # Get Chart version in the current PR branch
+              version=$(awk -F\: '/^version:/ {print $(NF)}' packages/helm-charts/${chart}/Chart.yaml|tr -d " ")
 
-            # Get Chart version in master branch if the chart exists
-            if [[ -f master/packages/helm-charts/${chart}/Chart.yaml ]]; then
-              version_master=$(awk -F\: '/^version:/ {print $(NF)}' master/packages/helm-charts/${chart}/Chart.yaml|tr -d " ")
+              # Get Chart version in master branch if the chart exists
+              if [[ -f master/packages/helm-charts/${chart}/Chart.yaml ]]; then
+                version_master=$(awk -F\: '/^version:/ {print $(NF)}' master/packages/helm-charts/${chart}/Chart.yaml|tr -d " ")
 
-              # Calculate valid next versions
-              major_master=$(echo ${version_master}| awk -F. '{print $1}')
-              major_master_next=$(echo ${major_master} + 1 | bc).0.0
-              minor_master=$(echo ${version_master}| awk -F. '{print $2}')
-              minor_master_next=${major_master}.$(echo ${minor_master} + 1 | bc).0
-              patch_master=$(echo ${version_master}| awk -F. '{print $3}')
-              patch_master_next=${major_master}.${minor_master}.$(echo ${patch_master} + 1 | bc)
+                # Calculate valid next versions
+                major_master=$(echo ${version_master}| awk -F. '{print $1}')
+                major_master_next=$(echo ${major_master} + 1 | bc).0.0
+                minor_master=$(echo ${version_master}| awk -F. '{print $2}')
+                minor_master_next=${major_master}.$(echo ${minor_master} + 1 | bc).0
+                patch_master=$(echo ${version_master}| awk -F. '{print $3}')
+                patch_master_next=${major_master}.${minor_master}.$(echo ${patch_master} + 1 | bc)
 
-              # Chart version in current PR must be one of the valid versions
-              set +e
-              echo "${major_master_next},${minor_master_next},${patch_master_next}" | tr "," "\n" | grep -w "${version}" > /dev/null
-              rc=$?
-              set -e
+                # Chart version in current PR must be one of the valid versions
+                set +e
+                echo "${major_master_next},${minor_master_next},${patch_master_next}" | tr "," "\n" | grep -w "${version}" > /dev/null
+                rc=$?
+                set -e
 
-              if [ ${rc} -ne 0 ]; then
-                echo "Version specified in packages/helm-charts/${chart}/Chart.yaml is ${version}, which does not follow semantic versioning."
-                echo "It must be a valid next semantic version. For this case, valid semantic versions are:"
-                echo ""
-                echo "- Next valid patch: ${patch_master_next}"
-                echo "- Next valid minor: ${minor_master_next}"
-                echo "- Next valid major: ${major_master_next}"
-                # Allow not semantic versions (this can be caused by releasing helm versions from different branches)
-                # exit 1
+                if [ ${rc} -ne 0 ]; then
+                  echo "Version specified in packages/helm-charts/${chart}/Chart.yaml is ${version}, which does not follow semantic versioning."
+                  echo "It must be a valid next semantic version. For this case, valid semantic versions are:"
+                  echo ""
+                  echo "- Next valid patch: ${patch_master_next}"
+                  echo "- Next valid minor: ${minor_master_next}"
+                  echo "- Next valid major: ${major_master_next}"
+                  # Allow not semantic versions (this can be caused by releasing helm versions from different branches)
+                  # exit 1
+                fi
+              else
+                echo "Chart ${chart} does not exist in branch master, hence skipping semantic version check."
               fi
-            else
-              echo "Chart ${chart} does not exist in branch master, hence skipping semantic version check."
-            fi
-          done <<EOF
-            $(cat changed_charts)
-          EOF
+            done <<EOF
+              $(cat changed_charts)
+            EOF
+          fi
 
       - name: "Helm Lint"
         run: |
-          while read chart; do
-            if [ -d ./packages/helm-charts/${chart} ]; then
-              helm lint "./packages/helm-charts/${chart}/" || false
-            else
-              echo "Skipping packages/helm-charts/${chart} as it seems it has been deleted."
-            fi
-          done <<EOF
-            $(cat changed_charts)
-          EOF
+          if test "$(wc -c < changed_charts)" -gt 2; then
+            while read chart; do
+              if [ -d ./packages/helm-charts/${chart} ]; then
+                helm lint "./packages/helm-charts/${chart}/" || false
+              else
+                echo "Skipping packages/helm-charts/${chart} as it seems it has been deleted."
+              fi
+            done <<EOF
+              $(cat changed_charts)
+            EOF
+          fi
