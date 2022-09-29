@@ -95,7 +95,7 @@ jobs:
               fi
             done <<EOF
               $(cat changed_charts)
-            EOF
+          EOF
           fi
 
       - name: "Helm Lint"
@@ -109,5 +109,5 @@ jobs:
               fi
             done <<EOF
               $(cat changed_charts)
-            EOF
+          EOF
           fi
