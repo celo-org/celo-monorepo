@@ -5,6 +5,10 @@ on:
   push:
     branches:
       - jcortejoso/celo-fullnode-chart-refactor
+    paths:
+      - 'packages/helm-charts/celo-fullnode/templates'
+      - 'packages/helm-charts/celo-fullnode/Chart.yaml'
+      - 'packages/helm-charts/celo-fullnode/values.yaml'
   pull_request:
     branches:
       - master
