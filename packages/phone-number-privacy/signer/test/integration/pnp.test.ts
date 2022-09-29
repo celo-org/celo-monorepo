@@ -13,7 +13,7 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { BLINDED_PHONE_NUMBER, IDENTIFIER } from '@celo/phone-number-privacy-common/lib/test/values'
+import { BLINDED_PHONE_NUMBER } from '@celo/phone-number-privacy-common/lib/test/values'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
@@ -319,11 +319,7 @@ describe('pnp', () => {
       })
 
       it('Should respond with 401 on failed DEK auth', async () => {
-        const badRequest = getPnpQuotaRequest(
-          ACCOUNT_ADDRESS1,
-          AuthenticationMethod.ENCRYPTION_KEY,
-          IDENTIFIER
-        )
+        const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1, AuthenticationMethod.ENCRYPTION_KEY)
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_QUOTA)
@@ -364,11 +360,7 @@ describe('pnp', () => {
             throw new Error()
           })
 
-          const req = getPnpQuotaRequest(
-            ACCOUNT_ADDRESS1,
-            AuthenticationMethod.ENCRYPTION_KEY,
-            IDENTIFIER
-          )
+          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, AuthenticationMethod.ENCRYPTION_KEY)
 
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
@@ -478,8 +470,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -535,8 +526,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -559,8 +549,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.ENCRYPTION_KEY,
-          IDENTIFIER
+          AuthenticationMethod.ENCRYPTION_KEY
         )
         const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -580,8 +569,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, '3') // since default is '1' or '2'
@@ -602,8 +590,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -627,8 +614,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
@@ -652,8 +638,7 @@ describe('pnp', () => {
           BLINDED_PHONE_NUMBER,
           // TODO(2.0.0): Investigate whether we should be testing DEK vs. WALLET_KEY based authentication
           // (https://github.com/celo-org/celo-monorepo/issues/9837)
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         // @ts-ignore Intentionally deleting required field
         delete badRequest.account
@@ -671,8 +656,7 @@ describe('pnp', () => {
         const badRequest = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN, 'a')
@@ -684,29 +668,11 @@ describe('pnp', () => {
         })
       })
 
-      it('Should respond with 400 on invalid identifier', async () => {
-        const badRequest = getPnpSignRequest(
-          ACCOUNT_ADDRESS1,
-          BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          '+1234567890'
-        )
-        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
-        const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
-        expect(res.status).toBe(400)
-        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
-          success: false,
-          version: res.body.version,
-          error: WarningMessage.INVALID_INPUT,
-        })
-      })
-
       it('Should respond with 400 on invalid blinded message', async () => {
         const badRequest = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           '+1234567890',
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
@@ -722,8 +688,7 @@ describe('pnp', () => {
         const badRequest = getPnpSignRequest(
           '0xnotanaddress',
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
@@ -739,8 +704,7 @@ describe('pnp', () => {
         const badRequest = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
@@ -757,8 +721,7 @@ describe('pnp', () => {
         const badRequest = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.ENCRYPTION_KEY,
-          IDENTIFIER
+          AuthenticationMethod.ENCRYPTION_KEY
         )
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
@@ -788,8 +751,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -816,8 +778,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -853,8 +814,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -877,8 +837,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(
@@ -931,8 +890,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -982,8 +940,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -1027,8 +984,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
 
           const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
@@ -1066,8 +1022,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -1109,8 +1064,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -1152,8 +1106,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.ENCRYPTION_KEY,
-            IDENTIFIER
+            AuthenticationMethod.ENCRYPTION_KEY
           )
 
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
@@ -1182,8 +1135,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -1234,8 +1186,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)

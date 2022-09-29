@@ -4,6 +4,8 @@ import {
   GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetQuotaRequest,
+  PnpQuotaRequest,
+  SignMessageRequest,
 } from '../interfaces'
 import { REASONABLE_BODY_CHAR_LIMIT } from './constants'
 
@@ -23,13 +25,12 @@ export function hasValidContactPhoneNumbersParam(requestBody: GetContactMatchesR
   )
 }
 
-export function isBodyReasonablySized(
-  requestBody: GetBlindedMessageSigRequest | GetQuotaRequest
-): boolean {
+// Legacy message signing & quota requests extend the new types
+export function isBodyReasonablySized(requestBody: SignMessageRequest | PnpQuotaRequest): boolean {
   return JSON.stringify(requestBody).length <= REASONABLE_BODY_CHAR_LIMIT
 }
 
-export function hasValidBlindedPhoneNumberParam(requestBody: GetBlindedMessageSigRequest): boolean {
+export function hasValidBlindedPhoneNumberParam(requestBody: SignMessageRequest): boolean {
   return (
     !!requestBody.blindedQueryPhoneNumber &&
     requestBody.blindedQueryPhoneNumber.length === 64 &&

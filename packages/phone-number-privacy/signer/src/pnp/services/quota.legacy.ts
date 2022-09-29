@@ -3,8 +3,8 @@ import { StableToken } from '@celo/contractkit'
 import {
   ErrorMessage,
   isVerified,
-  PnpQuotaRequest,
-  SignMessageRequest,
+  LegacyPnpQuotaRequest,
+  LegacySignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { ACCOUNTS_TABLE_LEGACY } from '../../common/database/models/account'
@@ -23,16 +23,16 @@ import { PnpQuotaService } from './quota'
 
 export class LegacyPnpQuotaService
   extends PnpQuotaService
-  implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
+  implements QuotaService<LegacySignMessageRequest | LegacyPnpQuotaRequest> {
   protected readonly requestsTable = REQUESTS_TABLE_LEGACY
   protected readonly accountsTable = ACCOUNTS_TABLE_LEGACY
 
   protected async getWalletAddressAndIsVerified(
-    session: PnpSession<SignMessageRequest | PnpQuotaRequest>
+    session: PnpSession<LegacySignMessageRequest | LegacyPnpQuotaRequest>
   ): Promise<{ walletAddress: string; isAccountVerified: boolean }> {
     const { account, hashedPhoneNumber } = session.request.body
     const [walletAddressResult, isVerifiedResult] = await meter(
-      (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
+      (_session: PnpSession<LegacySignMessageRequest | LegacyPnpQuotaRequest>) =>
         Promise.allSettled([
           getWalletAddress(this.kit, session.logger, account, session.request.url),
           hashedPhoneNumber
@@ -74,7 +74,7 @@ export class LegacyPnpQuotaService
   }
 
   protected async getBalances(
-    session: PnpSession<SignMessageRequest | PnpQuotaRequest>,
+    session: PnpSession<LegacySignMessageRequest | LegacyPnpQuotaRequest>,
     ...addresses: string[]
   ) {
     const [
@@ -141,7 +141,7 @@ export class LegacyPnpQuotaService
    * If the caller is not verified, they must have a minimum balance to get the unverifiedQueryMax.
    */
   protected async getTotalQuotaWithoutMeter(
-    session: PnpSession<SignMessageRequest | PnpQuotaRequest>
+    session: PnpSession<LegacySignMessageRequest | LegacyPnpQuotaRequest>
   ): Promise<number> {
     const {
       unverifiedQueryMax,

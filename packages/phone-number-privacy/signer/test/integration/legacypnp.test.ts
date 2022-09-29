@@ -40,7 +40,7 @@ const {
   createMockAccounts,
   createMockToken,
   createMockWeb3,
-  getPnpQuotaRequest,
+  getLegacyPnpQuotaRequest,
   getPnpRequestAuthorization,
   createMockAttestation,
   getLegacyPnpSignRequest,
@@ -368,7 +368,7 @@ describe('legacyPNP', () => {
           testCase.balanceCELO
         )
 
-        const req = getPnpQuotaRequest(
+        const req = getLegacyPnpQuotaRequest(
           testCase.account,
           AuthenticationMethod.WALLET_KEY,
           testCase.identifier
@@ -412,7 +412,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 200 on valid request', async () => {
-        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+        const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
 
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
@@ -428,7 +428,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 200 on valid request when authenticated with DEK', async () => {
-        const req = getPnpQuotaRequest(
+        const req = getLegacyPnpQuotaRequest(
           ACCOUNT_ADDRESS1,
           AuthenticationMethod.ENCRYPTION_KEY,
           IDENTIFIER
@@ -448,7 +448,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 200 on repeated valid requests', async () => {
-        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+        const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
 
         const res1 = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
@@ -467,7 +467,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 200 on extra request fields', async () => {
-        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+        const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
@@ -496,7 +496,7 @@ describe('legacyPNP', () => {
             )
           }
         })
-        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
+        const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
@@ -512,7 +512,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 400 on missing request fields', async () => {
-        const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+        const badRequest = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         // @ts-ignore Intentionally deleting required field
         delete badRequest.account
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
@@ -527,7 +527,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 401 on failed WALLET_KEY auth', async () => {
-        const badRequest = getPnpQuotaRequest(
+        const badRequest = getLegacyPnpQuotaRequest(
           ACCOUNT_ADDRESS1,
           AuthenticationMethod.WALLET_KEY,
           IDENTIFIER
@@ -545,7 +545,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 401 on failed DEK auth', async () => {
-        const badRequest = getPnpQuotaRequest(
+        const badRequest = getLegacyPnpQuotaRequest(
           ACCOUNT_ADDRESS1,
           AuthenticationMethod.ENCRYPTION_KEY,
           IDENTIFIER
@@ -566,7 +566,7 @@ describe('legacyPNP', () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
-        const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+        const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(
           req,
@@ -590,7 +590,7 @@ describe('legacyPNP', () => {
             throw new Error()
           })
 
-          const req = getPnpQuotaRequest(
+          const req = getLegacyPnpQuotaRequest(
             ACCOUNT_ADDRESS1,
             AuthenticationMethod.ENCRYPTION_KEY,
             IDENTIFIER
@@ -620,7 +620,7 @@ describe('legacyPNP', () => {
             )
             .mockRejectedValueOnce(new Error())
 
-          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+          const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
@@ -637,7 +637,7 @@ describe('legacyPNP', () => {
         it('Should respond with 500 on blockchain totalQuota query failure', async () => {
           mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
 
-          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
+          const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
 
@@ -1103,8 +1103,7 @@ describe('legacyPNP', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -1179,8 +1178,7 @@ describe('legacyPNP', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)

@@ -26,6 +26,7 @@ import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainQuotaService } from './domain/services/quota'
 import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
+import { LegacyPnpQuotaIO } from './pnp/endpoints/quota/io.legacy'
 import { LegacyPnpSignAction } from './pnp/endpoints/sign/action.legacy'
 import { OnChainPnpSignAction } from './pnp/endpoints/sign/action.onchain'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
@@ -128,7 +129,6 @@ export function startSigner(
       config,
       legacyPnpQuotaService,
       keyProvider,
-      // TODO EN: double check if this was also causing typing issues earlier in the req/res code
       new LegacyPnpSignIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
@@ -140,7 +140,7 @@ export function startSigner(
     new PnpQuotaAction(
       config,
       legacyPnpQuotaService,
-      new PnpQuotaIO(
+      new LegacyPnpQuotaIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
         kit

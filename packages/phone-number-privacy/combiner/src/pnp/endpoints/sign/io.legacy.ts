@@ -8,11 +8,11 @@ import {
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
+  LegacySignMessageRequest,
+  LegacySignMessageRequestSchema,
   PnpQuotaStatus,
   send,
   SignerEndpoint,
-  SignMessageRequest,
-  SignMessageRequestSchema,
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSchema,
@@ -27,14 +27,14 @@ import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
 import { OdisConfig, VERSION } from '../../../config'
 
-export class LegacyPnpSignIO extends IO<SignMessageRequest> {
+export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.LEGACY_PNP_SIGN
   readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
   readonly requestSchema: t.Type<
-    SignMessageRequest,
-    SignMessageRequest,
+    LegacySignMessageRequest,
+    LegacySignMessageRequest,
     unknown
-  > = SignMessageRequestSchema
+  > = LegacySignMessageRequestSchema
   readonly responseSchema: t.Type<
     SignMessageResponse,
     SignMessageResponse,
@@ -48,7 +48,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
-  ): Promise<CryptoSession<SignMessageRequest> | null> {
+  ): Promise<CryptoSession<LegacySignMessageRequest> | null> {
     if (!super.inputChecks(request, response)) {
       return null
     }
@@ -65,7 +65,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
 
   validateClientRequest(
     request: Request<{}, {}, unknown>
-  ): request is Request<{}, {}, SignMessageRequest> {
+  ): request is Request<{}, {}, LegacySignMessageRequest> {
     return (
       super.validateClientRequest(request) &&
       hasValidAccountParam(request.body) &&
@@ -76,7 +76,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
   }
 
   async authenticate(
-    request: Request<{}, {}, SignMessageRequest>,
+    request: Request<{}, {}, LegacySignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
     return authenticateUser(request, this.kit, logger, this.config.shouldFailOpen)

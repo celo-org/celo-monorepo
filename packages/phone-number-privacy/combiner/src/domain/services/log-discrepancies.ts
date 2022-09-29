@@ -8,7 +8,6 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
 
-// TODO EN: no idea why using a type parameter throws errors when building
 export class DomainDiscrepanciesLogger {
   logResponseDiscrepancies(
     session:

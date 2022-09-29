@@ -23,7 +23,6 @@ export abstract class PnpQuotaService
 
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,
-    // TODO EN: may need to pass in requests state specifically and then make request generic
     session: PnpSession<SignMessageRequest>,
     trx: Knex.Transaction
   ): Promise<OdisQuotaStatusResult<SignMessageRequest>> {

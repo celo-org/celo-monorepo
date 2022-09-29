@@ -1,4 +1,9 @@
-import { ErrorMessage, SignMessageRequest, WarningMessage } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessage,
+  LegacySignMessageRequest,
+  SignMessageRequest,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { Action, Session } from '../../../common/action'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
@@ -11,7 +16,8 @@ import { PnpSession } from '../../session'
 import { PnpSignIO } from './io'
 import { LegacyPnpSignIO } from './io.legacy'
 
-export abstract class PnpSignAction implements Action<SignMessageRequest> {
+export abstract class PnpSignAction
+  implements Action<SignMessageRequest | LegacySignMessageRequest> {
   constructor(
     readonly db: Knex,
     readonly config: SignerConfig,
@@ -22,7 +28,9 @@ export abstract class PnpSignAction implements Action<SignMessageRequest> {
 
   protected abstract readonly requestsTable: string
 
-  public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
+  public async perform(
+    session: PnpSession<SignMessageRequest | LegacySignMessageRequest>
+  ): Promise<void> {
     // Compute quota lookup, update, and signing within transaction
     // so that these occur atomically and rollback on error.
     await this.db.transaction(async (trx) => {
@@ -118,7 +126,7 @@ export abstract class PnpSignAction implements Action<SignMessageRequest> {
   private async sign(
     blindedMessage: string,
     key: Key,
-    session: Session<SignMessageRequest>
+    session: Session<SignMessageRequest | LegacySignMessageRequest>
   ): Promise<string> {
     let privateKey: string
     try {

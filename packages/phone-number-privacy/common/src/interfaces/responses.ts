@@ -4,6 +4,8 @@ import {
   DomainQuotaStatusRequest,
   DomainRequest,
   DomainRestrictedSignatureRequest,
+  LegacyPnpQuotaRequest,
+  LegacySignMessageRequest,
   MatchmakingRequest,
   OdisRequest,
   PhoneNumberPrivacyRequest,
@@ -142,9 +144,9 @@ export const GetContactMatchesResponseSchema: t.Type<GetContactMatchesResponse> 
 export type PhoneNumberPrivacyResponse<
   R extends PhoneNumberPrivacyRequest = PhoneNumberPrivacyRequest
 > =
-  | R extends SignMessageRequest ? SignMessageResponse : never
+  | R extends SignMessageRequest | LegacySignMessageRequest ? SignMessageResponse : never
   | R extends MatchmakingRequest ? GetContactMatchesResponse : never
-  | R extends PnpQuotaRequest ? PnpQuotaResponse : never
+  | R extends PnpQuotaRequest | LegacyPnpQuotaRequest ? PnpQuotaResponse : never
 
 // Domains
 

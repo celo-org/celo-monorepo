@@ -3,7 +3,6 @@ import {
   authenticateUser,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
-  identifierIsValidIfExists,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
   PnpQuotaStatus,
@@ -59,7 +58,6 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       SignMessageRequestSchema.is(request.body) &&
       hasValidAccountParam(request.body) &&
       hasValidBlindedPhoneNumberParam(request.body) &&
-      identifierIsValidIfExists(request.body) &&
       isBodyReasonablySized(request.body)
     )
   }
