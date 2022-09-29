@@ -3,18 +3,15 @@ import {
   DomainRestrictedSignatureResponseSuccess,
   SequentialDelayDomainState,
 } from '@celo/phone-number-privacy-common'
-import { getVersion } from '@celo/phone-number-privacy-signer/dist/config'
+import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
-import { DomainThresholdStateService } from '../../src/domain/services/threshold-state'
+import { DomainThresholdStateService } from '../../src/domain/services/threshold-State'
 
 describe('domain threshold state', () => {
-  const expectedVersion = getVersion()
-  const domainThresholdStateService = new DomainThresholdStateService(config.domains)
-
-  // TODO: add tests with failed signer responses, depending on
+  // TODO(2.0.0): add tests with failed signer responses, depending on
   // result of https://github.com/celo-org/celo-monorepo/issues/9826
 
   const getSession = (domainStates: SequentialDelayDomainState[]) => {
@@ -38,6 +35,13 @@ describe('domain threshold state', () => {
     return session
   }
 
+  const domainConfig = config.domains
+  domainConfig.keys.threshold = 3
+  domainConfig.odisServices.signers =
+    '[{"url": "http://localhost:3001", "fallbackUrl": "http://localhost:3001/fallback"}, {"url": "http://localhost:3002", "fallbackUrl": "http://localhost:3002/fallback"}, {"url": "http://localhost:3003", "fallbackUrl": "http://localhost:3003/fallback"}, {"url": "http://localhost:4004", "fallbackUrl": "http://localhost:4004/fallback"}]'
+  const domainThresholdStateService = new DomainThresholdStateService(domainConfig)
+
+  const expectedVersion = getVersion()
   const now = Date.now()
   const timer = now - 1
   const counter = 2
@@ -48,6 +52,7 @@ describe('domain threshold state', () => {
         { timer, counter: 2, disabled: false, now },
         { timer, counter: 2, disabled: false, now },
         { timer, counter: 2, disabled: false, now },
+        { timer, counter: 2, disabled: false, now },
       ],
       expectedCounter: 2,
       expectedTimer: timer,
@@ -55,6 +60,7 @@ describe('domain threshold state', () => {
     {
       statuses: [
         { timer, counter: 1, disabled: false, now },
+        { timer, counter: 2, disabled: false, now },
         { timer, counter: 2, disabled: false, now },
         { timer, counter: 2, disabled: false, now },
       ],
@@ -66,8 +72,9 @@ describe('domain threshold state', () => {
         { timer, counter: 0, disabled: false, now },
         { timer, counter: 1, disabled: false, now },
         { timer, counter: 2, disabled: false, now },
+        { timer, counter: 3, disabled: false, now },
       ],
-      expectedCounter: 1,
+      expectedCounter: 2,
       expectedTimer: timer,
     },
     {
@@ -75,13 +82,15 @@ describe('domain threshold state', () => {
         { timer, counter: 0, disabled: true, now },
         { timer, counter: 1, disabled: false, now },
         { timer, counter: 2, disabled: false, now },
+        { timer, counter: 3, disabled: false, now },
       ],
-      expectedCounter: 2,
+      expectedCounter: 3,
       expectedTimer: timer,
     },
     {
       statuses: [
         { timer: timer - 1, counter, disabled: false, now },
+        { timer, counter, disabled: false, now },
         { timer, counter, disabled: false, now },
         { timer, counter, disabled: false, now },
       ],
@@ -90,6 +99,7 @@ describe('domain threshold state', () => {
     },
     {
       statuses: [
+        { timer: timer - 1, counter, disabled: false, now },
         { timer: timer - 1, counter, disabled: false, now },
         { timer: timer - 1, counter, disabled: false, now },
         { timer, counter, disabled: false, now },
@@ -102,8 +112,9 @@ describe('domain threshold state', () => {
         { timer: timer - 1, counter: 1, disabled: false, now },
         { timer, counter: 1, disabled: false, now },
         { timer, counter: 2, disabled: false, now },
+        { timer, counter: 3, disabled: false, now },
       ],
-      expectedCounter: 1,
+      expectedCounter: 2,
       expectedTimer: timer,
     },
   ]
@@ -127,6 +138,7 @@ describe('domain threshold state', () => {
       { timer, counter: 0, disabled: true, now },
       { timer, counter: 1, disabled: true, now },
       { timer, counter: 2, disabled: false, now },
+      { timer, counter: 2, disabled: false, now },
     ]
     const session = getSession(statuses)
     const thresholdResult = domainThresholdStateService.findThresholdDomainState(session)
@@ -137,6 +149,7 @@ describe('domain threshold state', () => {
   it('should throw an error if not enough signer responses', () => {
     const statuses = [
       { timer, counter: 1, disabled: true, now },
+      { timer, counter: 2, disabled: false, now },
       { timer, counter: 2, disabled: false, now },
     ]
     const session = getSession(statuses)
