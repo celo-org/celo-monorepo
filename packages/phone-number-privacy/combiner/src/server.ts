@@ -168,9 +168,12 @@ export async function meterResponse(
     .catch((err) => {
       logger.error(ErrorMessage.UNKNOWN_ERROR)
       logger.error(err)
+      throw new Error(err)
     })
-  performance.mark(endMark)
-  performance.measure(entryName, startMark, endMark)
-  performance.clearMarks()
-  obs.disconnect()
+    .finally(() => {
+      performance.mark(endMark)
+      performance.measure(entryName, startMark, endMark)
+      performance.clearMarks()
+      obs.disconnect()
+    })
 }

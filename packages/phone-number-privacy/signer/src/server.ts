@@ -89,6 +89,7 @@ export function startSigner(
           // does not terminate after sending a response, and then throws an error.
           childLogger.error('Error in endpoint thrown after response was already sent')
         }
+        throw new Error(errToLog)
       }
     })
 
