@@ -701,6 +701,12 @@ describe('domain', () => {
         success: false,
         version: res2.body.version,
         error: WarningMessage.INVALID_NONCE,
+        status: {
+          disabled: false,
+          counter: 1,
+          timer: res2.body.status.now,
+          now: res2.body.status.now,
+        },
       })
     })
 
@@ -717,6 +723,12 @@ describe('domain', () => {
         success: false,
         version: res.body.version,
         error: WarningMessage.EXCEEDED_QUOTA,
+        status: {
+          disabled: false,
+          counter: 0,
+          timer: 0,
+          now: res.body.status.now,
+        },
       })
     })
 
@@ -739,6 +751,12 @@ describe('domain', () => {
         success: false,
         version: res.body.version,
         error: WarningMessage.EXCEEDED_QUOTA,
+        status: {
+          disabled: false,
+          counter: 0,
+          timer: 0,
+          now: res.body.status.now,
+        },
       })
     })
 

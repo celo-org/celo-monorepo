@@ -71,19 +71,13 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
     )
   }
 
-  sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<DisableDomainResponseFailure>,
-    domainState?: DomainState
-  ) {
+  sendFailure(error: ErrorType, status: number, response: Response<DisableDomainResponseFailure>) {
     send(
       response,
       {
         success: false,
         version: VERSION,
         error,
-        status: domainState,
       },
       status,
       response.locals.logger

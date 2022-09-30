@@ -194,7 +194,6 @@ export interface DisableDomainResponseFailure {
   success: false
   version: string
   error: string
-  // TODO EN revisit if we ever pass in a domain status on failure
 }
 
 export type DisableDomainResponse<D extends Domain = Domain> =
@@ -204,13 +203,10 @@ export type DisableDomainResponse<D extends Domain = Domain> =
 // prettier-ignore
 export type DomainResponse<
   R extends DomainRequest = DomainRequest
-> = R extends DomainRestrictedSignatureRequest<infer D>
-  ? DomainRestrictedSignatureResponse<D>
-  : never | R extends DomainQuotaStatusRequest<infer D2>
-  ? DomainQuotaStatusResponse<D2>
-  : never | R extends DisableDomainRequest<infer D3>
-  ? DisableDomainResponse<D3>
-  : never
+> =
+  | R extends DomainRestrictedSignatureRequest<infer D> ? DomainRestrictedSignatureResponse<D> : never
+  | R extends DomainQuotaStatusRequest<infer D2> ? DomainQuotaStatusResponse<D2> : never
+  | R extends DisableDomainRequest<infer D3> ? DisableDomainResponse<D3> : never
 
 export function domainRestrictedSignatureResponseSchema<D extends Domain>(
   state: t.Type<DomainState<D>>
