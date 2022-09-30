@@ -7,6 +7,8 @@ import { PnpSignAction } from './action'
 import { PnpSignIO } from './io'
 
 export class OnChainPnpSignAction extends PnpSignAction {
+  protected readonly requestsTable = REQUESTS_TABLE_ONCHAIN
+
   constructor(
     readonly db: Knex,
     readonly config: SignerConfig,
@@ -16,5 +18,4 @@ export class OnChainPnpSignAction extends PnpSignAction {
   ) {
     super(db, config, quota, keyProvider, io)
   }
-  protected readonly requestsTable = REQUESTS_TABLE_ONCHAIN
 }

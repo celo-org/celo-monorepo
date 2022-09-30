@@ -16,10 +16,10 @@ import { PnpSession } from '../session'
 
 export abstract class PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
-  constructor(readonly db: Knex, readonly kit: ContractKit) {}
-
   protected abstract readonly requestsTable: string
   protected abstract readonly accountsTable: string
+
+  constructor(readonly db: Knex, readonly kit: ContractKit) {}
 
   public async checkAndUpdateQuotaStatus(
     state: PnpQuotaStatus,

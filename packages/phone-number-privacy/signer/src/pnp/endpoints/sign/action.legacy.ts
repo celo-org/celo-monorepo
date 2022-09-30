@@ -7,6 +7,8 @@ import { PnpSignAction } from './action'
 import { LegacyPnpSignIO } from './io.legacy'
 
 export class LegacyPnpSignAction extends PnpSignAction {
+  protected readonly requestsTable = REQUESTS_TABLE_LEGACY
+
   constructor(
     readonly db: Knex,
     readonly config: SignerConfig,
@@ -16,6 +18,4 @@ export class LegacyPnpSignAction extends PnpSignAction {
   ) {
     super(db, config, quota, keyProvider, io)
   }
-
-  protected readonly requestsTable = REQUESTS_TABLE_LEGACY
 }

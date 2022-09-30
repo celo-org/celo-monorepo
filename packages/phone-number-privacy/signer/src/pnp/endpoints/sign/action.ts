@@ -18,6 +18,8 @@ import { LegacyPnpSignIO } from './io.legacy'
 
 export abstract class PnpSignAction
   implements Action<SignMessageRequest | LegacySignMessageRequest> {
+  protected abstract readonly requestsTable: string
+
   constructor(
     readonly db: Knex,
     readonly config: SignerConfig,
@@ -25,8 +27,6 @@ export abstract class PnpSignAction
     readonly keyProvider: KeyProvider,
     readonly io: PnpSignIO | LegacyPnpSignIO
   ) {}
-
-  protected abstract readonly requestsTable: string
 
   public async perform(
     session: PnpSession<SignMessageRequest | LegacySignMessageRequest>
