@@ -56,6 +56,7 @@ export abstract class BaseFullNodeDeployer {
       chartDir: helmChartPath,
       parameters: await this.helmParameters(context),
       chartVersion: chartVersion,
+      buildDependencies: false,
     })
 
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
@@ -73,6 +74,7 @@ export abstract class BaseFullNodeDeployer {
         chartDir: helmChartPath,
         parameters: await this.helmParameters(context),
         chartVersion: chartVersion,
+        buildDependencies: false,
       })
     } else {
       if (reset) {
@@ -86,6 +88,7 @@ export abstract class BaseFullNodeDeployer {
         chartDir: helmChartPath,
         parameters: await this.helmParameters(context),
         chartVersion: chartVersion,
+        buildDependencies: false,
       })
 
       await scaleResource(
