@@ -70,6 +70,7 @@ blockscout:
       apiKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaApiKey
     erlang:
       cookie: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout2-erlangCookie
+    campaignBannerApiUrl: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-campaignBannerApiUrl
   chain:
     subnetwork: Baklava
     networkID: 62320

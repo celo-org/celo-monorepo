@@ -236,6 +236,7 @@ blockscout:
       apiKey: ""
     erlang:
       cookie: ""
+    campaignBannerApiUrl: ""
   chain:
     subnetwork: Celo
     networkID: 1101
