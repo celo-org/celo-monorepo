@@ -13,7 +13,7 @@ import {
 } from '../helm_deploy'
 import { scaleResource } from '../kubernetes'
 
-const helmChartPath = '../helm-charts/celo-fullnode'
+const helmChartPath = 'oci://us-west1-docker.pkg.dev/devopsre/clabs-public-oci/celo-fullnode'
 const chartVersion = '0.2.0'
 
 export interface NodeKeyGenerationInfo {
@@ -55,6 +55,7 @@ export abstract class BaseFullNodeDeployer {
       releaseName: this.releaseName,
       chartDir: helmChartPath,
       parameters: await this.helmParameters(context),
+      chartVersion: chartVersion,
     })
 
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
@@ -71,6 +72,7 @@ export abstract class BaseFullNodeDeployer {
         releaseName: this.releaseName,
         chartDir: helmChartPath,
         parameters: await this.helmParameters(context),
+        chartVersion: chartVersion,
       })
     } else {
       if (reset) {
@@ -83,6 +85,7 @@ export abstract class BaseFullNodeDeployer {
         releaseName: this.releaseName,
         chartDir: helmChartPath,
         parameters: await this.helmParameters(context),
+        chartVersion: chartVersion,
       })
 
       await scaleResource(
