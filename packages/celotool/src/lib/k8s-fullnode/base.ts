@@ -14,6 +14,7 @@ import {
 import { scaleResource } from '../kubernetes'
 
 const helmChartPath = '../helm-charts/celo-fullnode'
+const chartVersion = '0.2.0'
 
 export interface NodeKeyGenerationInfo {
   mnemonic: string
@@ -49,12 +50,12 @@ export abstract class BaseFullNodeDeployer {
   async installChart(context: string): Promise<string[] | void> {
     await createNamespaceIfNotExists(this.kubeNamespace)
 
-    await installGenericHelmChart(
-      this.kubeNamespace,
-      this.releaseName,
-      helmChartPath,
-      await this.helmParameters(context)
-    )
+    await installGenericHelmChart({
+      namespace: this.kubeNamespace,
+      releaseName: this.releaseName,
+      chartDir: helmChartPath,
+      parameters: await this.helmParameters(context),
+    })
 
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
       return this.getEnodes()
@@ -65,24 +66,24 @@ export abstract class BaseFullNodeDeployer {
   // Otherwise, the enode cannot be calculated deterministically so a Promise<void> is returned.
   async upgradeChart(context: string, reset: boolean): Promise<string[] | void> {
     if (isCelotoolHelmDryRun()) {
-      await upgradeGenericHelmChart(
-        this.kubeNamespace,
-        this.releaseName,
-        helmChartPath,
-        await this.helmParameters(context)
-      )
+      await upgradeGenericHelmChart({
+        namespace: this.kubeNamespace,
+        releaseName: this.releaseName,
+        chartDir: helmChartPath,
+        parameters: await this.helmParameters(context),
+      })
     } else {
       if (reset) {
         await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, 0)
         await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
       }
 
-      await upgradeGenericHelmChart(
-        this.kubeNamespace,
-        this.releaseName,
-        helmChartPath,
-        await this.helmParameters(context)
-      )
+      await upgradeGenericHelmChart({
+        namespace: this.kubeNamespace,
+        releaseName: this.releaseName,
+        chartDir: helmChartPath,
+        parameters: await this.helmParameters(context),
+      })
 
       await scaleResource(
         this.celoEnv,

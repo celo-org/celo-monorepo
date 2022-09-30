@@ -32,20 +32,20 @@ export async function installHelmChart(
   const valuesEnvFile = fs.existsSync(`${helmChartPath}/values-${celoEnv}.yaml`)
     ? `values-${celoEnv}.yaml`
     : `values.yaml`
-  return installGenericHelmChart(
-    celoEnv,
-    releaseName,
-    helmChartPath,
-    await helmParameters(
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName,
+    chartDir: helmChartPath,
+    parameters: await helmParameters(
       celoEnv,
       imageTag,
       blockscoutDBUsername,
       blockscoutDBPassword,
       blockscoutDBConnectionName
     ),
-    true,
-    valuesEnvFile
-  )
+    buildDependencies: true,
+    valuesOverrideFile: valuesEnvFile,
+  })
 }
 
 export async function removeHelmRelease(helmReleaseName: string, celoEnv: string) {
@@ -68,14 +68,14 @@ export async function upgradeHelmChart(
     blockscoutDBPassword,
     blockscoutDBConnectionName
   )
-  await upgradeGenericHelmChart(
-    celoEnv,
-    helmReleaseName,
-    helmChartPath,
-    params,
-    true,
-    `values-${celoEnv}.yaml`
-  )
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: helmReleaseName,
+    chartDir: helmChartPath,
+    parameters: params,
+    buildDependencies: true,
+    valuesOverrideFile: `values-${celoEnv}.yaml`,
+  })
 
   console.info(`Helm release ${helmReleaseName} upgrade successful`)
 }

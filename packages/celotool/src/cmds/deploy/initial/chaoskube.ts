@@ -11,10 +11,10 @@ export const builder = {}
 
 export const handler = async (argv: InitialArgv) => {
   await switchToClusterFromEnv(argv.celoEnv)
-  await installGenericHelmChart(
-    argv.celoEnv,
-    helmReleaseName(argv.celoEnv),
-    helmChartDir,
-    helmParameters(argv.celoEnv)
-  )
+  await installGenericHelmChart({
+    namespace: argv.celoEnv,
+    releaseName: helmReleaseName(argv.celoEnv),
+    chartDir: helmChartDir,
+    parameters: helmParameters(argv.celoEnv),
+  })
 }

@@ -25,7 +25,12 @@ export async function installHelmChart(
   threads: number
 ) {
   const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas, threads)
-  return installGenericHelmChart(celoEnv, releaseName(celoEnv), chartDir, params)
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: chartDir,
+    parameters: params,
+  })
 }
 
 export async function upgradeHelmChart(
@@ -36,7 +41,12 @@ export async function upgradeHelmChart(
   threads: number
 ) {
   const params = await helmParameters(celoEnv, blockscoutProb, delayMs, replicas, threads)
-  await upgradeGenericHelmChart(celoEnv, releaseName(celoEnv), chartDir, params)
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: chartDir,
+    parameters: params,
+  })
 }
 
 // scales down all pods, upgrades, then scales back up

@@ -40,25 +40,25 @@ export abstract class BaseOracleDeployer {
   }
 
   async installChart() {
-    return installGenericHelmChart(
-      this.celoEnv,
-      this.releaseName,
-      helmChartPath,
-      await this.helmParameters(),
-      true,
-      `${this.currencyPair}.yaml`
-    )
+    return installGenericHelmChart({
+      namespace: this.celoEnv,
+      releaseName: this.releaseName,
+      chartDir: helmChartPath,
+      parameters: await this.helmParameters(),
+      buildDependencies: true,
+      valuesOverrideFile: `${this.currencyPair}.yaml`,
+    })
   }
 
   async upgradeChart() {
-    return upgradeGenericHelmChart(
-      this.celoEnv,
-      this.releaseName,
-      helmChartPath,
-      await this.helmParameters(),
-      true,
-      `${this.currencyPair}.yaml`
-    )
+    return upgradeGenericHelmChart({
+      namespace: this.celoEnv,
+      releaseName: this.releaseName,
+      chartDir: helmChartPath,
+      parameters: await this.helmParameters(),
+      buildDependencies: true,
+      valuesOverrideFile: `${this.currencyPair}.yaml`,
+    })
   }
 
   async removeChart() {

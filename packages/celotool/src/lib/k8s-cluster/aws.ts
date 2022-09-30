@@ -37,11 +37,11 @@ export class AwsClusterManager extends BaseClusterManager {
     )
     if (!exists) {
       console.info(`Installing ${releaseName}`)
-      await installGenericHelmChart(
-        'default',
-        releaseName,
-        'stable/kube2iam',
-        [
+      await installGenericHelmChart({
+        namespace: 'default',
+        releaseName: releaseName,
+        chartDir: 'stable/kube2iam',
+        parameters: [
           // Modifies node iptables to have AWS api requests be proxied by kube2iam
           `--set host.iptables=true`,
           // The network interface EKS uses
@@ -49,8 +49,8 @@ export class AwsClusterManager extends BaseClusterManager {
           // enable rbac
           `--set rbac.create=true`,
         ],
-        false
-      )
+        buildDependencies: false,
+      })
     }
   }
 

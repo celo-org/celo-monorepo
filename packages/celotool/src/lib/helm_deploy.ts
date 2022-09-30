@@ -935,34 +935,46 @@ function valuesOverrideArg(chartDir: string, filename: string | undefined) {
   }
 }
 
+interface genericHelmChartParameters {
+  namespace: string
+  releaseName: string
+  chartDir: string
+  parameters: string[]
+  buildDependencies?: boolean
+  chartVersion?: string
+  valuesOverrideFile?: string
+}
 // Install a Helm Chart. chartDir can be the path to the Helm Chart or the name of a remote Helm Chart.
 // If using a remote helm chart, the chart repository has to be added and updated in the local helm config
 // When using a remote helm chart, buildDependencies must be false and valuesOverrideFile the absolute path to the values file
-export async function installGenericHelmChart(
-  namespace: string,
-  releaseName: string,
-  chartDir: string,
-  parameters: string[],
-  buildDependencies: boolean = true,
-  valuesOverrideFile?: string
-) {
+export async function installGenericHelmChart({
+  namespace,
+  releaseName,
+  chartDir,
+  parameters,
+  buildDependencies = true,
+  chartVersion,
+  valuesOverrideFile,
+}: genericHelmChartParameters) {
   if (buildDependencies) {
     await buildHelmChartDependencies(chartDir)
   }
 
   if (isCelotoolHelmDryRun()) {
+    const versionLog = chartVersion ? ` version ${chartVersion}` : ''
+    const valuesOverrideLog = valuesOverrideFile
+      ? `, with values override: ${valuesOverrideFile}`
+      : ''
     console.info(
-      `This would deploy chart ${chartDir} with release name ${releaseName} in namespace ${namespace} with parameters:`
+      `This would deploy chart ${chartDir}${versionLog} with release name ${releaseName} in namespace ${namespace}${valuesOverrideLog} with parameters:`
     )
     console.info(parameters)
-    if (valuesOverrideFile !== undefined) {
-      console.info(`And with values override: ${valuesOverrideFile}`)
-    }
   } else {
     console.info(`Installing helm release ${releaseName}`)
+    const versionArg = chartVersion ? `--version=${chartVersion}` : ''
     const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
     await helmCommand(
-      `helm upgrade --install ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm upgrade --install ${valuesOverride} ${releaseName} ${chartDir} ${versionArg} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
@@ -972,18 +984,20 @@ export async function installGenericHelmChart(
 // Upgrade a Helm Chart. chartDir can be the path to the Helm Chart or the name of a remote Helm Chart.
 // If using a remote helm chart, the chart repository has to be added and updated in the local helm config
 // When using a remote helm chart, buildDependencies must be false and valuesOverrideFile the absolute path to the values file
-export async function upgradeGenericHelmChart(
-  namespace: string,
-  releaseName: string,
-  chartDir: string,
-  parameters: string[],
-  buildDependencies: boolean = true,
-  valuesOverrideFile?: string
-) {
+export async function upgradeGenericHelmChart({
+  namespace,
+  releaseName,
+  chartDir,
+  parameters,
+  buildDependencies = true,
+  chartVersion,
+  valuesOverrideFile,
+}: genericHelmChartParameters) {
   if (buildDependencies) {
     await buildHelmChartDependencies(chartDir)
   }
   const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
+  const versionArg = chartVersion ? `--version=${chartVersion}` : ''
 
   if (isCelotoolHelmDryRun()) {
     console.info(
@@ -991,7 +1005,7 @@ export async function upgradeGenericHelmChart(
     )
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade --install -C 5 ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm diff upgrade --install -C 5 ${valuesOverride} ${versionArg} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`,
       true
@@ -999,7 +1013,7 @@ export async function upgradeGenericHelmChart(
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade --install ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm upgrade --install ${valuesOverride} ${versionArg} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
@@ -1076,28 +1090,28 @@ export async function installHelmChart(celoEnv: string, useExistingGenesis: bool
   await failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
   await copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
   const extraValuesFile = getExtraValuesFile(celoEnv)
-  return installGenericHelmChart(
-    celoEnv,
-    celoEnv,
-    TESTNET_CHART_DIR,
-    await helmParameters(celoEnv, useExistingGenesis),
-    true,
-    extraValuesFile
-  )
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: celoEnv,
+    chartDir: TESTNET_CHART_DIR,
+    parameters: await helmParameters(celoEnv, useExistingGenesis),
+    buildDependencies: true,
+    valuesOverrideFile: extraValuesFile,
+  })
 }
 
 export async function upgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   console.info(`Upgrading helm release ${celoEnv}`)
   const parameters = await helmParameters(celoEnv, useExistingGenesis)
   const extraValuesFile = getExtraValuesFile(celoEnv)
-  await upgradeGenericHelmChart(
-    celoEnv,
-    celoEnv,
-    TESTNET_CHART_DIR,
-    parameters,
-    true,
-    extraValuesFile
-  )
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: celoEnv,
+    chartDir: TESTNET_CHART_DIR,
+    parameters: parameters,
+    buildDependencies: true,
+    valuesOverrideFile: extraValuesFile,
+  })
 }
 
 export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
@@ -1199,7 +1213,7 @@ function useStaticIPsForGethNodes() {
 }
 
 export async function checkHelmVersion() {
-  const requiredMinHelmVersion = '3.4'
+  const requiredMinHelmVersion = '3.8'
   const helmVersionCmd = `helm version --template '{{ .Version }}'`
   const localHelmVersion = (await execCmdWithExitOnFailure(helmVersionCmd))[0].replace('^v', '')
 

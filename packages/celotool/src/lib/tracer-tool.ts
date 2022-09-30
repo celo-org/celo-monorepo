@@ -13,21 +13,21 @@ function releaseName(celoEnv: string) {
 }
 
 export async function installHelmChart(celoEnv: string) {
-  await installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    chartDir,
-    await helmParameters(celoEnv)
-  )
+  await installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: chartDir,
+    parameters: await helmParameters(celoEnv),
+  })
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  await upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    chartDir,
-    await helmParameters(celoEnv)
-  )
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: chartDir,
+    parameters: await helmParameters(celoEnv),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string) {

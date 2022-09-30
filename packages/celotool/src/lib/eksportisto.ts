@@ -51,24 +51,28 @@ export async function installHelmChart(celoEnv: string) {
   const context = buildContext(celoEnv)
   const params = await helmParameters(context)
 
-  await installGenericHelmChart(
-    context.celoEnv,
-    context.releaseName,
-    chartDir,
-    params.concat(`--set configHash="${await getConfigMapHash(context, params, 'install')}"`)
-  )
+  await installGenericHelmChart({
+    namespace: context.celoEnv,
+    releaseName: context.releaseName,
+    chartDir: chartDir,
+    parameters: params.concat(
+      `--set configHash="${await getConfigMapHash(context, params, 'install')}"`
+    ),
+  })
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
   const context = buildContext(celoEnv)
   const params = await helmParameters(context)
 
-  await upgradeGenericHelmChart(
-    context.celoEnv,
-    context.releaseName,
-    chartDir,
-    params.concat(`--set configHash="${await getConfigMapHash(context, params, 'upgrade')}"`)
-  )
+  await upgradeGenericHelmChart({
+    namespace: context.celoEnv,
+    releaseName: context.releaseName,
+    chartDir: chartDir,
+    parameters: params.concat(
+      `--set configHash="${await getConfigMapHash(context, params, 'upgrade')}"`
+    ),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string) {
