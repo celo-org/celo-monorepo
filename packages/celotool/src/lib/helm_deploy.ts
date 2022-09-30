@@ -972,6 +972,14 @@ function valuesOverrideArg(chartDir: string, filename: string | undefined) {
   }
 }
 
+//   namespace: The namespace to install the chart into
+//   releaseName: The name of the release
+//   chartDir: The directory containing the chart or the values.yamls files. By default, it will try to use a custom values file
+//       at ${chartDir}/${valuesOverrideFile}.yaml
+//   parameters: The parameters to pass to the helm install command (e.g. --set geth.replicas=3)
+//   buildDependencies: Whether to build the chart dependencies before installing. When using a remote chart, this must be false.
+//   chartVersion: The version of the chart to install. Used only when chartRemoteReference is set
+//   valuesOverrideFile: The name of the values file to use. In the case of a remote chart, this is assumed to be an absolute path.
 interface genericHelmChartParameters {
   namespace: string
   releaseName: string
@@ -981,8 +989,8 @@ interface genericHelmChartParameters {
   chartVersion?: string
   valuesOverrideFile?: string
 }
-// Install a Helm Chart. chartDir can be the path to the Helm Chart or the name of a remote Helm Chart.
-// If using a remote helm chart, the chart repository has to be added and updated in the local helm config
+// Install a Helm Chart. Look above for the parameters
+
 // When using a remote helm chart, buildDependencies must be false and valuesOverrideFile the absolute path to the values file
 export async function installGenericHelmChart({
   namespace,
