@@ -498,23 +498,19 @@ describe('legacyPnpService', () => {
         })
       })
 
-      // it('Should respond with 400 on invalid identifier', async () => {
-      //   const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-      //   const badRequest = getLegacyPnpSignRequest(
-      //     ACCOUNT_ADDRESS1,
-      //     BLINDED_PHONE_NUMBER,
-      //     AuthenticationMethod.WALLET_KEY,
-      //     '+1234567890'
-      //   )
-      //   const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
-      //   const res = await sendRequest(badRequest, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
-      //   expect(res.status).toBe(400)
-      //   expect(res.body).toStrictEqual<SignMessageResponseFailure>({
-      //     success: false,
-      //     version: res.body.version,
-      //     error: WarningMessage.INVALID_INPUT,
-      //   })
-      // })
+      it('Should respond with 400 on request with invalid identifier', async () => {
+        // Ensure that this gets passed through the combiner to the signer
+        req.hashedPhoneNumber = '+1234567890'
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(400)
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
 
       it('Should respond with 401 on failed WALLET_KEY auth', async () => {
         req.account = mockAccount

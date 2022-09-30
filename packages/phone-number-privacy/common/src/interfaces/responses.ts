@@ -37,9 +37,6 @@ export interface SignMessageResponseSuccess extends PnpQuotaStatus {
   version: string
   signature: string
   warnings?: string[]
-  // TODO(2.0.0) audit req/res types - https://github.com/celo-org/celo-monorepo/issues/9804
-  // - warnings not provided in 1.1.11
-  // TODO EN: add a test case for this.
 }
 
 export interface SignMessageResponseFailure {

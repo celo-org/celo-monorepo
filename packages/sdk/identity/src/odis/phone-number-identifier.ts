@@ -1,5 +1,5 @@
 import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
-import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
+import { CombinerEndpoint, LegacySignMessageRequest } from '@celo/phone-number-privacy-common'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import { createHash } from 'crypto'
@@ -12,7 +12,6 @@ import {
   EncryptionKeySigner,
   queryOdis,
   ServiceContext,
-  SignMessageRequest,
 } from './query'
 
 // ODIS minimum dollar balance for sig retrieval
@@ -110,7 +109,7 @@ export async function getBlindedPhoneNumberSignature(
   clientVersion?: string,
   sessionID?: string
 ): Promise<string> {
-  const body: SignMessageRequest = {
+  const body: LegacySignMessageRequest = {
     account,
     blindedQueryPhoneNumber: base64BlindedMessage,
     hashedPhoneNumber: selfPhoneHash,

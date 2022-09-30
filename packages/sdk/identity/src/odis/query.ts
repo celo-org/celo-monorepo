@@ -35,7 +35,13 @@ export type AuthSigner = WalletKeySigner | EncryptionKeySigner
 
 // Re-export types and aliases to maintain backwards compatibility.
 export { AuthenticationMethod, PhoneNumberPrivacyRequest, signWithRawKey }
+
+/**
+ * @deprecated Exported as SignMessageRequest for backwards compatibility.
+ * This is not the same as `SignMessageRequest` in '@celo/phone-number-privacy-common'.
+ * */
 export type SignMessageRequest = GetBlindedMessageSigRequest
+
 export type MatchmakingRequest = GetContactMatchesRequest
 export type MatchmakingResponse = GetContactMatchesResponse
 
