@@ -10,7 +10,7 @@ import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
 import { Request, Response } from 'express'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
-import { PnpThresholdStateService } from '../../src/pnp/services/threshold-State'
+import { PnpThresholdStateService } from '../../src/pnp/services/threshold-state'
 
 describe('pnp threshold state', () => {
   // TODO(2.0.0): add tests with failed signer responses, depending on
