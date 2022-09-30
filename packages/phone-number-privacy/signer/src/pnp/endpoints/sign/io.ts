@@ -85,7 +85,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
         version: getVersion(),
         signature,
         ...quotaStatus,
-        warnings, // TODO(2.0.0, refactor): update handling of these types in combiner (https://github.com/celo-org/celo-monorepo/issues/9794)
+        warnings,
       },
       status,
       response.locals.logger

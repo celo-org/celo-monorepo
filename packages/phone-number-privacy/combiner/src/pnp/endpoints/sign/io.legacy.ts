@@ -103,21 +103,13 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
     )
   }
 
-  sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<SignMessageResponseFailure>,
-    signature?: string,
-    quotaStatus?: PnpQuotaStatus
-  ) {
+  sendFailure(error: ErrorType, status: number, response: Response<SignMessageResponseFailure>) {
     send(
       response,
       {
         success: false,
         version: VERSION,
         error,
-        signature,
-        ...quotaStatus,
       },
       status,
       response.locals.logger

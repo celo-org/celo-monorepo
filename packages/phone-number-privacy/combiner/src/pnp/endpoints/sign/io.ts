@@ -105,22 +105,13 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     )
   }
 
-  sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<SignMessageResponseFailure>,
-    // TODO EN: revisit whether this is actually being used anywhere in the combiner as is
-    signature?: string,
-    quotaStatus?: PnpQuotaStatus
-  ) {
+  sendFailure(error: ErrorType, status: number, response: Response<SignMessageResponseFailure>) {
     send(
       response,
       {
         success: false,
         version: VERSION,
         error,
-        signature,
-        ...quotaStatus,
       },
       status,
       response.locals.logger

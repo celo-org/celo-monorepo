@@ -80,7 +80,8 @@ export abstract class PnpQuotaService
     )
 
     const quotaStatus: PnpQuotaStatus = {
-      totalQuota: -1, // TODO(2.0.0) consider making this undefined (https://github.com/celo-org/celo-monorepo/issues/9804)
+      // TODO(future) consider making totalQuota,performedQueryCount undefined
+      totalQuota: -1,
       performedQueryCount: -1,
       blockNumber: undefined,
     }
