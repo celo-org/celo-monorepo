@@ -218,6 +218,8 @@ blockscout:
     drop: "false"
   epochRewards:
     enabled: false
+  campaignBanner:
+    refreshInterval: "60"
   grafanaUrl: https://clabs.grafana.net
   secrets:
     # Format:
