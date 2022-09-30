@@ -7,14 +7,13 @@ import {
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { Counters, Histograms } from '../../common/metrics'
+import { Counters, Histograms, meter } from '../../common/metrics'
 import { QuotaService } from '../../common/quota'
 import {
   getCeloBalance,
   getStableTokenBalance,
   getTransactionCount,
   getWalletAddress,
-  meter,
 } from '../../common/web3/contracts'
 import { config } from '../../config'
 import { PnpSession } from '../session'

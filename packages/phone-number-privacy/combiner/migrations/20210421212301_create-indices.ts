@@ -1,6 +1,9 @@
 import { Knex } from 'knex'
 import { ACCOUNTS_COLUMNS, ACCOUNTS_TABLE } from '../src/services/database/models/account'
-import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../src/services/database/models/numberPair'
+import {
+  NUMBER_PAIRS_COLUMN,
+  NUMBER_PAIRS_TABLE,
+} from '../src/services/database/models/number-pairs'
 
 export async function up(knex: Knex): Promise<any> {
   if (!(await knex.schema.hasTable(NUMBER_PAIRS_TABLE))) {

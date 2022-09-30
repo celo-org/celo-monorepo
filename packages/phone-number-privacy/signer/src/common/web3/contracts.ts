@@ -7,24 +7,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { BigNumber } from 'bignumber.js'
 import Logger from 'bunyan'
-import { Histogram } from 'prom-client'
-import { Counters, Histograms, Labels } from '../../common/metrics'
-
-declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
-
-// TODO(2.0.0, metering): use this elsewhere (https://github.com/celo-org/celo-monorepo/issues/9796)
-export async function meter<T extends any[], U>(
-  inFunction: InFunction<T, U>,
-  params: T,
-  onError: (err: any) => U,
-  prometheus: Histogram<string>,
-  labels: string[]
-): Promise<U> {
-  const _meter = prometheus.labels(...labels).startTimer()
-  return inFunction(...params)
-    .catch(onError)
-    .finally(_meter)
-}
+import { Counters, Histograms, Labels, meter } from '../metrics'
 
 export async function getBlockNumber(kit: ContractKit): Promise<number> {
   return meter(
@@ -38,7 +21,7 @@ export async function getBlockNumber(kit: ContractKit): Promise<number> {
       FULL_NODE_TIMEOUT_IN_MS,
     ],
     (err: any) => {
-      Counters.blockchainErrors.labels(Labels.read).inc()
+      Counters.blockchainErrors.labels(Labels.READ).inc()
       throw err
     },
     Histograms.getBlindedSigInstrumentation,
@@ -65,7 +48,7 @@ export async function getTransactionCount(
             undefined,
             FULL_NODE_TIMEOUT_IN_MS
           ).catch((err) => {
-            Counters.blockchainErrors.labels(Labels.read).inc()
+            Counters.blockchainErrors.labels(Labels.READ).inc()
             throw err
           })
         )
@@ -104,7 +87,7 @@ export async function getStableTokenBalance(
             undefined,
             FULL_NODE_TIMEOUT_IN_MS
           ).catch((err) => {
-            Counters.blockchainErrors.labels(Labels.read).inc()
+            Counters.blockchainErrors.labels(Labels.READ).inc()
             throw err
           })
         )
@@ -145,7 +128,7 @@ export async function getCeloBalance(
             undefined,
             FULL_NODE_TIMEOUT_IN_MS
           ).catch((err) => {
-            Counters.blockchainErrors.labels(Labels.read).inc()
+            Counters.blockchainErrors.labels(Labels.READ).inc()
             throw err
           })
         )
@@ -185,7 +168,7 @@ export async function getWalletAddress(
     ],
     (err: any) => {
       logger.error({ err, account }, 'failed to get wallet address for account')
-      Counters.blockchainErrors.labels(Labels.read).inc()
+      Counters.blockchainErrors.labels(Labels.READ).inc()
       return NULL_ADDRESS
     },
     Histograms.getRemainingQueryCountInstrumentation,
@@ -211,7 +194,7 @@ export async function getOnChainOdisPayments(
     ],
     (err: any) => {
       logger.error({ err, account }, 'failed to get on-chain odis balance for account')
-      Counters.blockchainErrors.labels(Labels.read).inc()
+      Counters.blockchainErrors.labels(Labels.READ).inc()
       throw err
     },
     Histograms.getRemainingQueryCountInstrumentation,

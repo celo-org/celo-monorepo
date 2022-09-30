@@ -6,7 +6,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
 import { SignAction } from '../../../common/sign'
-import { PnpSignerResponseLogger } from '../../services/logSignerResponses'
+import { PnpSignerResponseLogger } from '../../services/log-responses'
 
 export class PnpSignAction extends SignAction<SignMessageRequest> {
   readonly responseLogger: PnpSignerResponseLogger = new PnpSignerResponseLogger()

@@ -7,6 +7,7 @@ export function getVersion(): string {
   return process.env.npm_package_version ? process.env.npm_package_version : '0.0.0'
 }
 export const DEV_MODE = process.env.NODE_ENV !== 'production'
+export const VERBOSE_DB_LOGGING = toBool(process.env.VERBOSE_DB_LOGGING, false)
 
 export enum SupportedDatabase {
   Postgres = 'postgres', // PostgresSQL

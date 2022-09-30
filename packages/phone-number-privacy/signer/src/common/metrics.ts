@@ -4,10 +4,10 @@ const { Counter, Histogram } = client
 client.collectDefaultMetrics()
 
 // This is just so autocomplete will remind devs what the options are.
-export const Labels = {
-  read: 'read',
-  update: 'update',
-  insert: 'insert',
+export enum Labels {
+  READ = 'read',
+  UPDATE = 'update',
+  INSERT = 'insert',
 }
 
 export const Counters = {
@@ -128,4 +128,19 @@ export const Histograms = {
     labelNames: ['endpoint'],
     buckets,
   }),
+}
+
+declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
+
+export async function meter<T extends any[], U>(
+  inFunction: InFunction<T, U>,
+  params: T,
+  onError: (err: any) => U,
+  prometheus: client.Histogram<string>,
+  labels: string[]
+): Promise<U> {
+  const _meter = prometheus.labels(...labels).startTimer()
+  return inFunction(...params)
+    .catch(onError)
+    .finally(_meter)
 }

@@ -3,8 +3,8 @@ import { CombineAction } from '../../../common/combine'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { OdisConfig } from '../../../config'
-import { PnpSignerResponseLogger } from '../../services/logSignerResponses'
-import { PnpThresholdStateService } from '../../services/thresholdState'
+import { PnpSignerResponseLogger } from '../../services/log-responses'
+import { PnpThresholdStateService } from '../../services/threshold-state'
 
 export class PnpQuotaAction extends CombineAction<PnpQuotaRequest> {
   readonly responseLogger: PnpSignerResponseLogger = new PnpSignerResponseLogger()
@@ -38,7 +38,7 @@ export class PnpQuotaAction extends CombineAction<PnpQuotaRequest> {
         )
         return
       } catch (err) {
-        session.logger.error({ err }, 'Error combining signer quota status responses')
+        session.logger.error(err, 'Error combining signer quota status responses')
       }
     }
     this.io.sendFailure(

@@ -18,8 +18,6 @@ import {
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
-// TODO(2.0.0, imports) double check proper import paths (dist vs. src)
-// https://github.com/celo-org/celo-monorepo/issues/9814
 import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
 import { MockKeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/mock-key-provider'
 import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
@@ -289,13 +287,14 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
         const unblindedSig = threshold_bls.unblind(
           Buffer.from(res.body.signature, 'base64'),
@@ -310,13 +309,14 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app, '2') // test a value other than '1'
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
         // TODO(2.0.0) determine how / whether to forward this to client
         // (https://github.com/celo-org/celo-monorepo/issues/9801)
@@ -328,20 +328,21 @@ describe('legacyPnpService', () => {
         const res1 = await sendPnpSignRequest(req, authorization, app)
 
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
 
         // performedQueryCount should remain the same; same request should not
         // consume any quota
         const res2 = await sendPnpSignRequest(req, authorization, app)
         expect(res2.status).toBe(200)
-        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(res1.body)
+        expect(res2.body).toStrictEqual<SignMessageResponseSuccess>(res1.body)
       })
 
       it('Should increment performedQueryCount on request from the same account with a new message', async () => {
@@ -355,10 +356,11 @@ describe('legacyPnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         }
 
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
+        expect(res1.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
 
         // Second request for the same account but with new message
         const message2 = Buffer.from('second test message', 'utf8')
@@ -372,7 +374,7 @@ describe('legacyPnpService', () => {
           'PWvuSYIA249x1dx+qzgl6PKSkoulXXE/P4WHJvGmtw77pCRilEWTn3xSp+6JS9+A'
         const res2 = await sendPnpSignRequest(req2, authorization2, app)
         expect(res2.status).toBe(200)
-        expect(res2.body).toMatchObject<SignMessageResponseSuccess>(expectedResponse)
+        expect(res2.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
       })
 
       it('Should respond with 200 on extra request fields', async () => {
@@ -382,13 +384,14 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
       })
 
@@ -398,13 +401,14 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
       })
 
@@ -413,13 +417,14 @@ describe('legacyPnpService', () => {
         const res1 = await sendPnpSignRequest(req, authorization1, app)
 
         expect(res1.status).toBe(200)
-        expect(res1.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
 
         const secondUserSeed = new Uint8Array(userSeed)
@@ -454,7 +459,7 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
@@ -465,7 +470,7 @@ describe('legacyPnpService', () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app, 'a')
         expect(res.status).toBe(400)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
@@ -493,7 +498,7 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(401)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
@@ -506,7 +511,7 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(403)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.EXCEEDED_QUOTA,
@@ -524,7 +529,7 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, appWithApiDisabled)
 
         expect(res.status).toBe(503)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
@@ -544,13 +549,14 @@ describe('legacyPnpService', () => {
           const res = await sendPnpSignRequest(req, authorization, app)
 
           expect(res.status).toBe(200)
-          expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: expectedVersion,
             signature: expectedSig,
             performedQueryCount: 1,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
+            warnings: [],
           })
           const unblindedSig = threshold_bls.unblind(
             Buffer.from(res.body.signature, 'base64'),
@@ -588,13 +594,14 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
-        expect(res.body).toMatchObject<SignMessageResponseSuccess>({
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
           signature: expectedSig,
           performedQueryCount: 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
+          warnings: [],
         })
         const unblindedSig = threshold_bls.unblind(
           Buffer.from(res.body.signature, 'base64'),
@@ -632,7 +639,7 @@ describe('legacyPnpService', () => {
         const res = await sendPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(500)
-        expect(res.body).toMatchObject<SignMessageResponseFailure>({
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
           version: expectedVersion,
           error: ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,

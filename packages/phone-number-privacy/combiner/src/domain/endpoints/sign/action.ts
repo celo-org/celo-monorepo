@@ -9,7 +9,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
 import { SignAction } from '../../../common/sign'
-import { DomainSignerResponseLogger } from '../../services/logSignerResponses'
+import { DomainSignerResponseLogger } from '../../services/log-responses'
 
 export class DomainSignAction extends SignAction<DomainRestrictedSignatureRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_SIGN

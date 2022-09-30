@@ -1,5 +1,5 @@
 import { Knex } from 'knex'
-import { DOMAIN_REQUESTS_COLUMNS, DOMAIN_REQUESTS_TABLE } from '../models/domainRequest'
+import { DOMAIN_REQUESTS_COLUMNS, DOMAIN_REQUESTS_TABLE } from '../models/domain-request'
 
 export async function up(knex: Knex): Promise<any> {
   if (!(await knex.schema.hasTable(DOMAIN_REQUESTS_TABLE))) {

@@ -109,7 +109,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     )
     if (!signerResponse.success) {
       session.logger.error(
-        { error: signerResponse.error, signer: url, status },
+        { err: signerResponse.error, signer: url, status },
         `Signer request to ${url + this.io.signerEndpoint} failed with 'OK' status`
       )
       throw new Error(ErrorMessage.SIGNER_RESPONSE_FAILED_WITH_OK_STATUS)
@@ -120,7 +120,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
   }
 
   private addFailureToSession(signer: Signer, errorCode: number | undefined, session: Session<R>) {
-    session.logger.info(
+    session.logger.warn(
       `Received failure from ${session.failedSigners.size}/${this.signers.length} signers`
     )
     // Tracking failed request count via signer url prevents
@@ -130,7 +130,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
       session.incrementErrorCodeCount(errorCode)
     }
     if (this.signers.length - session.failedSigners.size < this.config.keys.threshold) {
-      session.logger.info('Not possible to reach a threshold of signer responses. Failing fast')
+      session.logger.warn('Not possible to reach a threshold of signer responses. Failing fast')
       session.abort.abort()
     }
   }
