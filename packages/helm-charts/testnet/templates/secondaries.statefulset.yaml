@@ -44,7 +44,7 @@ spec:
         {{- include "common.standard.labels" .  | nindent 8 }}
         component: secondaries
         {{- if .Values.extraPodLabels.secondaries }}
-        {{ toYaml .Values.extraPodLabels.secondaries | nindent 8 }}
+        {{- toYaml .Values.extraPodLabels.secondaries | nindent 8 }}
         {{- end }}
 {{ if .Values.metrics | default false }}
       annotations:

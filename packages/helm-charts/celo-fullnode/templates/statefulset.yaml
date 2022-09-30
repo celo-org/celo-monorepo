@@ -37,10 +37,10 @@ spec:
       labels:
         {{- include "common.standard.labels" .  | nindent 8 }}
         {{- if .Values.extraPodLabels }}
-        {{ toYaml .Values.extraPodLabels | nindent 8 }}
+        {{- toYaml .Values.extraPodLabels | nindent 8 }}
         {{- end }}
         component: celo-fullnode
-{{- if .Values.metrics | default true }}
+{{- if .Values.prometheus | default true }}
       annotations:
 {{ include "common.prometheus-annotations" . | indent 8 }}
 {{ end }}

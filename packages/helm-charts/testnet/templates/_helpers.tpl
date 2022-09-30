@@ -139,8 +139,8 @@ spec:
       labels:
         {{- include "common.standard.labels" .  | nindent 8 }}
         component: {{ .component_label }}
-        {{- if .extraPodLabels }}
-        {{ toYaml .extraPodLabels | nindent 8 }}
+        {{- if .extraPodLabels -}}
+        {{- toYaml .extraPodLabels | nindent 8 }}
         {{- end }}
         {{- if .proxy | default false }}
         {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}

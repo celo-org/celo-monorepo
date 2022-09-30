@@ -642,6 +642,7 @@ const linkedLibraries = {
     'LockedGold',
     'Escrow',
     'MetaTransactionWallet',
+    'FederatedAttestations',
   ],
 }
 

@@ -20,6 +20,7 @@ export const ProxyContracts = [
   'ExchangeBRLProxy',
   'ExchangeEURProxy',
   'ExchangeProxy',
+  'FederatedAttestationsProxy',
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
   'GoldTokenProxy',
@@ -29,6 +30,7 @@ export const ProxyContracts = [
   'LockedGoldProxy',
   'MetaTransactionWalletProxy',
   'MetaTransactionWalletDeployerProxy',
+  'OdisPaymentsProxy',
   'RegistryProxy',
   'ReserveProxy',
   'ReserveSpenderMultiSigProxy',
@@ -67,7 +69,9 @@ export const CoreContracts = [
   // identity
   'Attestations',
   'Escrow',
+  'FederatedAttestations',
   'Random',
+  'OdisPayments',
 
   // stability
   'Exchange',
