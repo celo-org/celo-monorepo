@@ -55,7 +55,7 @@ export abstract class BaseFullNodeDeployer {
       releaseName: this.releaseName,
       chartDir: helmChartPath,
       parameters: await this.helmParameters(context),
-      chartVersion: chartVersion,
+      chartVersion,
       buildDependencies: false,
     })
 
@@ -73,7 +73,7 @@ export abstract class BaseFullNodeDeployer {
         releaseName: this.releaseName,
         chartDir: helmChartPath,
         parameters: await this.helmParameters(context),
-        chartVersion: chartVersion,
+        chartVersion,
         buildDependencies: false,
       })
     } else {
@@ -87,7 +87,7 @@ export abstract class BaseFullNodeDeployer {
         releaseName: this.releaseName,
         chartDir: helmChartPath,
         parameters: await this.helmParameters(context),
-        chartVersion: chartVersion,
+        chartVersion,
         buildDependencies: false,
       })
 

@@ -59,7 +59,7 @@ async function installPrometheus(context?: string, clusterConfig?: BaseClusterCo
   await createNamespaceIfNotExists(kubeNamespace)
   return installGenericHelmChart({
     namespace: kubeNamespace,
-    releaseName: releaseName,
+    releaseName,
     chartDir: helmChartPath,
     parameters: await helmParameters(context, clusterConfig),
   })
@@ -73,7 +73,7 @@ export async function upgradePrometheus(context?: string, clusterConfig?: BaseCl
   await createNamespaceIfNotExists(kubeNamespace)
   return upgradeGenericHelmChart({
     namespace: kubeNamespace,
-    releaseName: releaseName,
+    releaseName,
     chartDir: helmChartPath,
     parameters: await helmParameters(context, clusterConfig),
   })

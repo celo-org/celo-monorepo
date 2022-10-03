@@ -39,7 +39,7 @@ export class AwsClusterManager extends BaseClusterManager {
       console.info(`Installing ${releaseName}`)
       await installGenericHelmChart({
         namespace: 'default',
-        releaseName: releaseName,
+        releaseName,
         chartDir: 'stable/kube2iam',
         parameters: [
           // Modifies node iptables to have AWS api requests be proxied by kube2iam

@@ -17,7 +17,7 @@ export async function installHelmChart(celoEnv: string) {
   await installGenericHelmChart({
     namespace: celoEnv,
     releaseName: releaseName(celoEnv, suffix),
-    chartDir: chartDir,
+    chartDir,
     parameters: await helmParameters(celoEnv),
   })
 }
@@ -27,7 +27,7 @@ export async function upgradeHelmChart(celoEnv: string) {
   await upgradeGenericHelmChart({
     namespace: celoEnv,
     releaseName: releaseName(celoEnv, suffix),
-    chartDir: chartDir,
+    chartDir,
     parameters: await helmParameters(celoEnv),
   })
 }

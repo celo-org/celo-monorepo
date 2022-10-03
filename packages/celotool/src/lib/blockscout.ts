@@ -26,7 +26,7 @@ export async function installHelmChart(celoEnv: string, releaseName: string, ima
 
   return installGenericHelmChart({
     namespace: celoEnv,
-    releaseName: releaseName,
+    releaseName,
     chartDir: helmChartPath,
     parameters: await helmParameters(imageTag),
     buildDependencies: true,

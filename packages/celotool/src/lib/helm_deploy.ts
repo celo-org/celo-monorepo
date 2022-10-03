@@ -980,7 +980,7 @@ function valuesOverrideArg(chartDir: string, filename: string | undefined) {
 //   buildDependencies: Whether to build the chart dependencies before installing. When using a remote chart, this must be false.
 //   chartVersion: The version of the chart to install. Used only when chartRemoteReference is set
 //   valuesOverrideFile: The name of the values file to use. In the case of a remote chart, this is assumed to be an absolute path.
-interface genericHelmChartParameters {
+interface GenericHelmChartParameters {
   namespace: string
   releaseName: string
   chartDir: string
@@ -1000,7 +1000,7 @@ export async function installGenericHelmChart({
   buildDependencies = true,
   chartVersion,
   valuesOverrideFile,
-}: genericHelmChartParameters) {
+}: GenericHelmChartParameters) {
   if (buildDependencies) {
     await buildHelmChartDependencies(chartDir)
   }
@@ -1037,7 +1037,7 @@ export async function upgradeGenericHelmChart({
   buildDependencies = true,
   chartVersion,
   valuesOverrideFile,
-}: genericHelmChartParameters) {
+}: GenericHelmChartParameters) {
   if (buildDependencies) {
     await buildHelmChartDependencies(chartDir)
   }
@@ -1153,7 +1153,7 @@ export async function upgradeHelmChart(celoEnv: string, useExistingGenesis: bool
     namespace: celoEnv,
     releaseName: celoEnv,
     chartDir: TESTNET_CHART_DIR,
-    parameters: parameters,
+    parameters,
     buildDependencies: true,
     valuesOverrideFile: extraValuesFile,
   })

@@ -16,7 +16,7 @@ export async function installWalletConnect() {
   await createNamespaceIfNotExists(releaseNamespace)
   await installGenericHelmChart({
     namespace: releaseNamespace,
-    releaseName: releaseName,
+    releaseName,
     chartDir: helmChartDir,
     parameters: helmParameters(),
   })
@@ -25,7 +25,7 @@ export async function installWalletConnect() {
 export async function upgradeWalletConnect() {
   await upgradeGenericHelmChart({
     namespace: releaseNamespace,
-    releaseName: releaseName,
+    releaseName,
     chartDir: helmChartDir,
     parameters: helmParameters(),
   })

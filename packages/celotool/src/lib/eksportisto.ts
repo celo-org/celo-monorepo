@@ -54,7 +54,7 @@ export async function installHelmChart(celoEnv: string) {
   await installGenericHelmChart({
     namespace: context.celoEnv,
     releaseName: context.releaseName,
-    chartDir: chartDir,
+    chartDir,
     parameters: params.concat(
       `--set configHash="${await getConfigMapHash(context, params, 'install')}"`
     ),
@@ -68,7 +68,7 @@ export async function upgradeHelmChart(celoEnv: string) {
   await upgradeGenericHelmChart({
     namespace: context.celoEnv,
     releaseName: context.releaseName,
-    chartDir: chartDir,
+    chartDir,
     parameters: params.concat(
       `--set configHash="${await getConfigMapHash(context, params, 'upgrade')}"`
     ),
