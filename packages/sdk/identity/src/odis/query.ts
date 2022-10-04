@@ -36,6 +36,8 @@ export type AuthSigner = WalletKeySigner | EncryptionKeySigner
 // Re-export types and aliases to maintain backwards compatibility.
 export { AuthenticationMethod, PhoneNumberPrivacyRequest, signWithRawKey }
 
+// TODO(future, SDK) deprecate this in the next major ODIS SDK release & revisit this
+// as part of ODIS/ASv2 SDK work: https://github.com/celo-org/celo-monorepo/issues/9910
 /**
  * @deprecated Exported as SignMessageRequest for backwards compatibility.
  * This is not the same as `SignMessageRequest` in '@celo/phone-number-privacy-common'.
