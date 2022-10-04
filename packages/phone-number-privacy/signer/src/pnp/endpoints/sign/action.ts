@@ -7,6 +7,7 @@ import {
 import { Knex } from 'knex'
 import { Action, Session } from '../../../common/action'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
+import { REQUESTS_TABLE } from '../../../common/database/models/request'
 import { getRequestExists } from '../../../common/database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { Counters } from '../../../common/metrics'
@@ -18,7 +19,7 @@ import { LegacyPnpSignIO } from './io.legacy'
 
 export abstract class PnpSignAction
   implements Action<SignMessageRequest | LegacySignMessageRequest> {
-  protected abstract readonly requestsTable: string
+  protected abstract readonly requestsTable: REQUESTS_TABLE
 
   constructor(
     readonly db: Knex,

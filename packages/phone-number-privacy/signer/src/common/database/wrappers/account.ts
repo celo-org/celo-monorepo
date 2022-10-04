@@ -2,10 +2,10 @@ import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Histograms, meter } from '../../metrics'
-import { AccountRecord, ACCOUNTS_COLUMNS, toAccountRecord } from '../models/account'
+import { AccountRecord, ACCOUNTS_COLUMNS, ACCOUNTS_TABLE, toAccountRecord } from '../models/account'
 import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
-function accounts(db: Knex, table: string) {
+function accounts(db: Knex, table: ACCOUNTS_TABLE) {
   return db<AccountRecord>(table)
 }
 
@@ -14,7 +14,7 @@ function accounts(db: Knex, table: string) {
  */
 export async function getPerformedQueryCount(
   db: Knex,
-  accountsTable: string,
+  accountsTable: ACCOUNTS_TABLE,
   account: string,
   logger: Logger,
   trx?: Knex.Transaction
@@ -38,7 +38,7 @@ export async function getPerformedQueryCount(
 
 async function getAccountExists(
   db: Knex,
-  accountsTable: string,
+  accountsTable: ACCOUNTS_TABLE,
   account: string,
   logger: Logger,
   trx?: Knex.Transaction
@@ -64,7 +64,7 @@ async function getAccountExists(
  */
 export async function incrementQueryCount(
   db: Knex,
-  accountsTable: string,
+  accountsTable: ACCOUNTS_TABLE,
   account: string,
   logger: Logger,
   trx: Knex.Transaction
@@ -92,7 +92,7 @@ export async function incrementQueryCount(
 
 async function insertRecord(
   db: Knex,
-  accountsTable: string,
+  accountsTable: ACCOUNTS_TABLE,
   data: AccountRecord,
   logger: Logger,
   trx: Knex.Transaction

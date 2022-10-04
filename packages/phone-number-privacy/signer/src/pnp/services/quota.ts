@@ -6,6 +6,8 @@ import {
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
+import { ACCOUNTS_TABLE } from '../../common/database/models/account'
+import { REQUESTS_TABLE } from '../../common/database/models/request'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
 import { storeRequest } from '../../common/database/wrappers/request'
 import { Counters, Histograms, meter } from '../../common/metrics'
@@ -16,8 +18,8 @@ import { PnpSession } from '../session'
 
 export abstract class PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
-  protected abstract readonly requestsTable: string
-  protected abstract readonly accountsTable: string
+  protected abstract readonly requestsTable: REQUESTS_TABLE
+  protected abstract readonly accountsTable: ACCOUNTS_TABLE
 
   constructor(readonly db: Knex, readonly kit: ContractKit) {}
 

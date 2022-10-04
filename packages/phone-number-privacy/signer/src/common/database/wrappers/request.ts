@@ -2,16 +2,21 @@ import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Histograms, meter } from '../../metrics'
-import { PnpSignRequestRecord, REQUESTS_COLUMNS, toPnpSignRequestRecord } from '../models/request'
+import {
+  PnpSignRequestRecord,
+  REQUESTS_COLUMNS,
+  REQUESTS_TABLE,
+  toPnpSignRequestRecord,
+} from '../models/request'
 import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
-function requests(db: Knex, table: string) {
+function requests(db: Knex, table: REQUESTS_TABLE) {
   return db<PnpSignRequestRecord>(table)
 }
 
 export async function getRequestExists(
   db: Knex,
-  requestsTable: string,
+  requestsTable: REQUESTS_TABLE,
   account: string,
   blindedQuery: string,
   logger: Logger,
@@ -40,7 +45,7 @@ export async function getRequestExists(
 
 export async function storeRequest(
   db: Knex,
-  requestsTable: string,
+  requestsTable: REQUESTS_TABLE,
   account: string,
   blindedQuery: string,
   logger: Logger,
