@@ -7,9 +7,9 @@ import {
   DomainEndpoint,
   DomainRequest,
   DomainResponse,
-  GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetContactMatchesResponse,
+  LegacySignMessageRequest,
   PhoneNumberPrivacyRequest,
   signWithRawKey,
 } from '@celo/phone-number-privacy-common'
@@ -40,7 +40,7 @@ export { AuthenticationMethod, PhoneNumberPrivacyRequest, signWithRawKey }
  * @deprecated Exported as SignMessageRequest for backwards compatibility.
  * This is not the same as `SignMessageRequest` in '@celo/phone-number-privacy-common'.
  */
-export type SignMessageRequest = GetBlindedMessageSigRequest
+export type SignMessageRequest = LegacySignMessageRequest
 
 export type MatchmakingRequest = GetContactMatchesRequest
 export type MatchmakingResponse = GetContactMatchesResponse

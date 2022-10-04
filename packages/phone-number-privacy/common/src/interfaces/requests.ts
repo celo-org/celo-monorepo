@@ -40,13 +40,12 @@ export interface SignMessageRequest {
   /** Client-specified version string */
   version?: string
 }
+
+/** previously known as GetBlindedMessageSigRequest */
 export interface LegacySignMessageRequest extends SignMessageRequest {
   /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
   hashedPhoneNumber?: string
 }
-
-// Backwards compatibility
-export declare type GetBlindedMessageSigRequest = LegacySignMessageRequest
 
 export const SignMessageRequestSchema: t.Type<SignMessageRequest> = t.intersection([
   t.type({

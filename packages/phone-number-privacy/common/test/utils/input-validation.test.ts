@@ -1,8 +1,8 @@
 import * as utils from '../../src/utils/input-validation'
 import {
-  GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetQuotaRequest,
+  LegacySignMessageRequest,
 } from '../../src/interfaces'
 import { REASONABLE_BODY_CHAR_LIMIT } from '../../src/utils/constants'
 
@@ -203,7 +203,7 @@ describe('Input Validation test suite', () => {
 
   describe('hasValidBlindedPhoneNumberParam utility', () => {
     it('Should return true for blinded query', () => {
-      const sampleData: GetBlindedMessageSigRequest = {
+      const sampleData: LegacySignMessageRequest = {
         blindedQueryPhoneNumber: Buffer.from(
           '1912fee45d61c87cc5ea59dae31190ff1912fee45d61c8'
         ).toString('base64'),
@@ -216,7 +216,7 @@ describe('Input Validation test suite', () => {
     })
 
     it('Should return false for not base64 query', () => {
-      const sampleData: GetBlindedMessageSigRequest = {
+      const sampleData: LegacySignMessageRequest = {
         blindedQueryPhoneNumber: Buffer.from(
           'JanAdamMickiewicz1234!@JanAdamMickiewicz1234!@123412345678901234'
         ).toString('utf-8'),
@@ -229,7 +229,7 @@ describe('Input Validation test suite', () => {
     })
 
     it('Should return false for too short blinded query', () => {
-      const sampleData: GetBlindedMessageSigRequest = {
+      const sampleData: LegacySignMessageRequest = {
         blindedQueryPhoneNumber: Buffer.from('1912fee45d61c87cc5e').toString('base64'),
         account: 'acc',
       }
@@ -240,7 +240,7 @@ describe('Input Validation test suite', () => {
     })
 
     it('Should return false for missing param in query', () => {
-      const sampleData: GetBlindedMessageSigRequest = {
+      const sampleData: LegacySignMessageRequest = {
         blindedQueryPhoneNumber: '',
         account: 'acc',
       }

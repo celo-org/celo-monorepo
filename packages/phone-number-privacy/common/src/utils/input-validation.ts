@@ -1,9 +1,9 @@
 import { isValidAddress, trimLeading0x } from '@celo/utils/lib/address'
 import isBase64 from 'is-base64'
 import {
-  GetBlindedMessageSigRequest,
   GetContactMatchesRequest,
   GetQuotaRequest,
+  LegacySignMessageRequest,
   PnpQuotaRequest,
   SignMessageRequest,
 } from '../interfaces'
@@ -39,7 +39,7 @@ export function hasValidBlindedPhoneNumberParam(requestBody: SignMessageRequest)
 }
 
 export function identifierIsValidIfExists(
-  requestBody: GetQuotaRequest | GetBlindedMessageSigRequest
+  requestBody: GetQuotaRequest | LegacySignMessageRequest
 ): boolean {
   return !requestBody.hashedPhoneNumber || isByte32(requestBody.hashedPhoneNumber)
 }
