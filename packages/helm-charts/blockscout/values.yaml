@@ -1,4 +1,3 @@
-imagePullPolicy: IfNotPresent
 ingressClassName: nginx
 blockscout:
   indexer:
@@ -9,7 +8,14 @@ blockscout:
         maxSurge: 1
         maxUnavailable: 0
     db:
+      name: blockscout
+      connectionName: project:region:db-name
+      # to be fetched from secrets
+      # username: blockscout
+      # password: password
+      port: 5432
       proxy:
+        host: 127.0.0.1
         port: 5432
         livenessProbe:
           enabled: false
@@ -29,8 +35,8 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 30
-    pool_size_replica: 5
+    poolSize: 30
+    poolSizeReplica: 5
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -61,7 +67,14 @@ blockscout:
         target:
           cpu: 70
     db:
+      name: blockscout
+      connectionName: project:region:db-name
+      # to be fetched from secrets
+      # username: blockscout
+      # password: password
+      port: 5432
       proxy:
+        host: 127.0.0.1
         port: 5432
         livenessProbe:
           enabled: false
@@ -81,9 +94,9 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 30
-    pool_size_replica: 5
-    rate_limit: "1000000"
+    poolSize: 30
+    poolSizeReplica: 5
+    rateLimit: "1000000"
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -114,7 +127,14 @@ blockscout:
       target:
         cpu: 70
     db:
+      name: blockscout
+      connectionName: project:region:db-name
+      # to be fetched from secrets
+      # username: blockscout
+      # password: password
+      port: 5432
       proxy:
+        host: 127.0.0.1
         port: 5432
         livenessProbe:
           enabled: false
@@ -134,8 +154,8 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 30
-    pool_size_replica: 5
+    poolSize: 30
+    poolSizeReplica: 5
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -174,26 +194,51 @@ blockscout:
       enabled: false
       reportUrl: ""
       makerdojo: ""
-  image:
-    repository: gcr.io/celo-testnet/blockscout
-    tag: v2.0.4-beta-celo
-  healthy_blocks_period: 300
-  erlangNodeName: blockscout
-  cookieSecretName: blockscout-erlang-cookie
-  db:
-    # ip: must be provided at runtime # IP address of the postgres DB
-    # connection_name: must be provided at runtime # name of the cloud sql connection
-    # username: blockscout
-    # password: password
-    name: blockscout
-    drop: "false"
-  jsonrpc_http_url: http://tx-nodes-private:8545
-  jsonrpc_ws_url: ws://tx-nodes-private:8545
-  jsonrpc_public_http: ""
-  metadata_crawler:
-    schedule: "*/30 * * * *"
+  metadataCrawler:
+    enabled: false
+    schedule: "0 */2 * * *" # every 2 hours
     image:
       repository: gcr.io/celo-testnet/celo-monorepo
       tag: metadata-crawler-77a392216d4927e85ce4b683508fc0539aa92a34
-  epoch_rewards:
+  archiveNodes:
+    jsonrpcHttpUrl: http://tx-nodes-private:8545
+    jsonrpcWsUrl: ws://tx-nodes-private:8545
+  fullNodes:
+    jsonrpcPublicHttp: ""
+  metrics:
     enabled: false
+  image:
+    repository: gcr.io/celo-testnet/blockscout
+    pullPolicy: IfNotPresent
+    tag: v2.0.4-beta-celo
+  healthyBlocksPeriod: 300
+  erlangNodeName: blockscout
+  cookieSecretName: blockscout-erlang-cookie
+  db:
+    drop: "false"
+  epochRewards:
+    enabled: false
+  grafanaUrl: https://clabs.grafana.net
+  secrets:
+    # Format:
+    # secretName: gcp:secretmanager:projects/<project-id>/secrets/<env>-blockscout-<secret-key>
+    # - <project-id> - numeric project id
+    # - <env> - alfajores|baklava|rc1 etc.
+    # - <secret-key> - name of the secret
+    # Example: segmentKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-segmentKey
+    segmentKey: ""
+    discordWebhookUrl: ""
+    dbUser: ""
+    dbPassword: ""
+    recaptcha:
+      projectId: ""
+      siteKey: ""
+      apiKey: ""
+    erlang:
+      cookie: ""
+  chain:
+    subnetwork: Celo
+    networkID: 1101
+  domainName: celo-testnet.org
+  gcp:
+    projectId: celo-testnet-production
