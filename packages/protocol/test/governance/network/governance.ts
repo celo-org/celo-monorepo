@@ -1615,7 +1615,9 @@ contract('Governance', (accounts: string[]) => {
                 proposalId: i + 1,
                 account,
                 value,
+                values: [value],
                 weight,
+                weights: [weight],
               },
             })
           )
@@ -1652,7 +1654,10 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should return true', async () => {
-        const success = await governance.vote.call(proposalId, index, value)
+        const success = await governance.vote.call(proposalId, index, value, {
+          gas: 7000000,
+          from: account,
+        })
         assert.isTrue(success)
       })
 
@@ -1691,7 +1696,9 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(proposalId),
             account,
             value: new BigNumber(value),
+            values: [new BigNumber(value)],
             weight: new BigNumber(weight),
+            weights: [new BigNumber(weight)],
           },
         })
       })
@@ -1956,7 +1963,9 @@ contract('Governance', (accounts: string[]) => {
             proposalId: new BigNumber(proposalId),
             account,
             value: new BigNumber(value),
+            values: [new BigNumber(value)],
             weight: new BigNumber(weight),
+            weights: [new BigNumber(weight)],
           },
         })
       })

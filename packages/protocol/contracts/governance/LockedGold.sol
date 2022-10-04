@@ -178,11 +178,14 @@ contract LockedGold is
     Balances storage account = balances[msg.sender];
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
-    require(!getGovernance().isVoting(msg.sender), "Account locked");
+    uint256 remainingLockedGold = getAccountTotalLockedGold(msg.sender).sub(value);
+
+    uint256 totalReferendumVotes = getGovernance().getTotalVotesByAccount(msg.sender);
+    require(remainingLockedGold >= totalReferendumVotes, "Account locked");
+
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
-      balanceRequirement == 0 ||
-        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value),
+      balanceRequirement == 0 || balanceRequirement <= remainingLockedGold,
       "Trying to unlock too much gold"
     );
     _decrementNonvotingAccountBalance(msg.sender, value);

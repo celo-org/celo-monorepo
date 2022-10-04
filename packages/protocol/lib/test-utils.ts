@@ -307,7 +307,17 @@ export function assertObjectWithBNEqual(
     } else if (isNumber(actual[k]) || isNumber(expected[k])) {
       assertEqualBN(actual[k], expected[k], fieldErrorMsg(k))
     } else if (Array.isArray(actual[k])) {
-      assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
+      const actualArray = (actual[k] as Array<any>)
+      const expectedArray = (expected[k] as Array<any>)
+      if (actualArray.length === expectedArray.length 
+        && actualArray.every(actual => isNumber(actual)) 
+        && expectedArray.every(expected => isNumber(expected))) {
+        for (let i = 0; i < actualArray.length; i++) {
+          assertEqualBN(actualArray[i], expectedArray[i], fieldErrorMsg(k))
+        }
+      } else  {
+        assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
+      }
     }
     else {
       assert.equal(actual[k], expected[k], fieldErrorMsg(k))

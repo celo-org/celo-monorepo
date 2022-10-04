@@ -137,35 +137,59 @@ library Proposals {
   /**
    * @notice Adds or changes a vote on a proposal.
    * @param proposal The proposal struct.
-   * @param previousWeight The previous weight of the vote.
-   * @param currentWeight The current weight of the vote.
-   * @param previousVote The vote to be removed, or None for a new vote.
-   * @param currentVote The vote to be set.
+   * @param previousVoteValues The previous weight of the vote.
+   * @param previousVoteWeights The current weight of the vote.
+   * @param currentVoteValues The vote to be removed, or None for a new vote.
+   * @param currentVoteWeights The vote to be set.
    */
   function updateVote(
     Proposal storage proposal,
-    uint256 previousWeight,
-    uint256 currentWeight,
-    VoteValue previousVote,
-    VoteValue currentVote
-  ) public {
+    VoteValue[] memory previousVoteValues,
+    uint256[] memory previousVoteWeights,
+    uint256[] memory currentVoteValues,
+    uint256[] memory currentVoteWeights
+  ) public returns (VoteValue[] memory) {
+    require(
+      previousVoteValues.length == previousVoteWeights.length,
+      "incorrect length of previous vote"
+    );
+    require(
+      currentVoteValues.length == currentVoteWeights.length,
+      "incorrect length of current vote"
+    );
+
     // Subtract previous vote.
-    if (previousVote == VoteValue.Abstain) {
-      proposal.votes.abstain = proposal.votes.abstain.sub(previousWeight);
-    } else if (previousVote == VoteValue.Yes) {
-      proposal.votes.yes = proposal.votes.yes.sub(previousWeight);
-    } else if (previousVote == VoteValue.No) {
-      proposal.votes.no = proposal.votes.no.sub(previousWeight);
+    for (uint256 i = 0; i < previousVoteValues.length; i = i.add(1)) {
+      VoteValue previousVote = previousVoteValues[i];
+      uint256 previousWeight = previousVoteWeights[i];
+
+      if (previousVote == VoteValue.Abstain) {
+        proposal.votes.abstain = proposal.votes.abstain.sub(previousWeight);
+      } else if (previousVote == VoteValue.Yes) {
+        proposal.votes.yes = proposal.votes.yes.sub(previousWeight);
+      } else if (previousVote == VoteValue.No) {
+        proposal.votes.no = proposal.votes.no.sub(previousWeight);
+      }
     }
 
+    VoteValue[] memory currentVoteValuesConverted = new VoteValue[](currentVoteValues.length);
+
     // Add new vote.
-    if (currentVote == VoteValue.Abstain) {
-      proposal.votes.abstain = proposal.votes.abstain.add(currentWeight);
-    } else if (currentVote == VoteValue.Yes) {
-      proposal.votes.yes = proposal.votes.yes.add(currentWeight);
-    } else if (currentVote == VoteValue.No) {
-      proposal.votes.no = proposal.votes.no.add(currentWeight);
+    for (uint256 i = 0; i < currentVoteValues.length; i = i.add(1)) {
+      VoteValue currentVote = VoteValue(currentVoteValues[i]);
+      uint256 currentWeight = currentVoteWeights[i];
+      currentVoteValuesConverted[i] = currentVote;
+
+      if (currentVote == VoteValue.Abstain) {
+        proposal.votes.abstain = proposal.votes.abstain.add(currentWeight);
+      } else if (currentVote == VoteValue.Yes) {
+        proposal.votes.yes = proposal.votes.yes.add(currentWeight);
+      } else if (currentVote == VoteValue.No) {
+        proposal.votes.no = proposal.votes.no.add(currentWeight);
+      }
     }
+
+    return currentVoteValuesConverted;
   }
 
   /**

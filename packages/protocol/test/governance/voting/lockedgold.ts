@@ -247,6 +247,7 @@ contract('LockedGold', (accounts: string[]) => {
       describe('when the account is voting in governance', () => {
         beforeEach(async () => {
           await mockGovernance.setVoting(account)
+          await mockGovernance.setTotalVotes(account, '1')
         })
 
         it('should revert', async () => {
