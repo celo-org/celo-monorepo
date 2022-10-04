@@ -17,6 +17,8 @@ export class DomainThresholdStateService<R extends DomainRequest> {
 
     // Check whether the domain is disabled, either by all signers or by some.
     const domainStatesEnabled = domainStates.filter((ds) => !ds.disabled)
+    // TODO EN: if we do want to do the threshold check later, make sure
+    // that numDisabled is calculated independent of domainStates.length
     const numDisabled = domainStates.length - domainStatesEnabled.length
 
     const signersLength = JSON.parse(this.config.odisServices.signers).length
