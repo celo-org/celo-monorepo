@@ -161,7 +161,7 @@ jobs:
       - run:
           name: Build packages
           command: |
-            yarn build --ignore docs
+            yarn build --ignore docs --include-dependencies
 
       - run:
           name: Check licenses
