@@ -1,6 +1,6 @@
 {
   "name": "@celo/celocli",
-  "version": "1.7.1-alpha.1",
+  "version": "1.7.1",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -75,9 +75,9 @@
       }
     },
     "@azure/core-lro": {
-      "version": "2.3.1",
-      "resolved": "https://registry.npmjs.org/@azure/core-lro/-/core-lro-2.3.1.tgz",
-      "integrity": "sha512-nQ+Xnm9g1EWcmbqgxJGmkNHfOHRUmrbYIlRT4KjluzhHQooaGO55m/h6wCX0ho3Jte2ZNBzZPJRmi6yBWeb3yA==",
+      "version": "2.4.0",
+      "resolved": "https://registry.npmjs.org/@azure/core-lro/-/core-lro-2.4.0.tgz",
+      "integrity": "sha512-F65+rYkll1dpw3RGm8/SSiSj+/QkMeYDanzS/QKlM1dmuneVyXbO46C88V1MRHluLGdMP6qfD3vDRYALn0z0tQ==",
       "requires": {
         "@azure/abort-controller": "^1.0.0",
         "@azure/logger": "^1.0.0",
@@ -328,9 +328,9 @@
       }
     },
     "@celo/base": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/base/-/base-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-LAuFdhrPLnLo0YA6Mrv0b4WR9JbTvM4Ag/IzanKtIZvptMG+JocIVHkSPw2yu8LZPfcLnCcUzyNZSFdUMtZdEw=="
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/base/-/base-2.2.0.tgz",
+      "integrity": "sha512-+jo52+er1TV9Qe6nCmzQ2dLt6M8J9STEJDaU+uiPyMVhMBcnYBpWzu9FJJPERmttejOC7hFuudrJI83vJulc4Q=="
     },
     "@celo/bls12377js": {
       "version": "0.1.1",
@@ -342,12 +342,12 @@
       }
     },
     "@celo/connect": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/connect/-/connect-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-otGiBWKr4f8X+CvhEEu++rWik2F+O9JFwHQ63hitoMEMadqo7Y7mFhot86dm0SFP3mvcdeLjxanKx8MYhR3CZg==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/connect/-/connect-2.2.0.tgz",
+      "integrity": "sha512-IAT1f3+ZYMod0H6M8HorZj8bNhfgxjL7GlofdNZRceTo1Cy8iyNr+26K+x5sHeXI8QgTUKdaxLWgmCQCEU7ARw==",
       "requires": {
-        "@celo/base": "2.2.0-alpha.2",
-        "@celo/utils": "2.2.0-alpha.2",
+        "@celo/base": "2.2.0",
+        "@celo/utils": "2.2.0",
         "@types/debug": "^4.1.5",
         "@types/utf8": "^2.1.6",
         "bignumber.js": "^9.0.0",
@@ -356,14 +356,14 @@
       }
     },
     "@celo/contractkit": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/contractkit/-/contractkit-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-5OKBvZZ2jbgGZHzyV4suAC0Qr2N2HUnCKt4CZJ2Hj7R7ZzAaTQKiTzf7MjkDMqL4HYiyY5cMdlCzTFiHtjfMGA==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/contractkit/-/contractkit-2.2.0.tgz",
+      "integrity": "sha512-nIgCGDnOtCG5QtPJFzaDOOk12O6A8Bjk+tey46okeasvcT1uw2mQpLoelQ/PloTSbLQty3/IATNSPrQWqXShFA==",
       "requires": {
-        "@celo/base": "2.2.0-alpha.2",
-        "@celo/connect": "2.2.0-alpha.2",
-        "@celo/utils": "2.2.0-alpha.2",
-        "@celo/wallet-local": "2.2.0-alpha.2",
+        "@celo/base": "2.2.0",
+        "@celo/connect": "2.2.0",
+        "@celo/utils": "2.2.0",
+        "@celo/wallet-local": "2.2.0",
         "@types/bn.js": "^5.1.0",
         "@types/debug": "^4.1.5",
         "bignumber.js": "^9.0.0",
@@ -376,13 +376,13 @@
       }
     },
     "@celo/cryptographic-utils": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/cryptographic-utils/-/cryptographic-utils-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-NunUPW5VrhDTjr1zCpt7SOuB0L3qNxxJWvtPl4gA/gwuuwS9A099DZ3PNInj4IXxHuMIslzjg9IzQ0/1ex3/tA==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/cryptographic-utils/-/cryptographic-utils-2.2.0.tgz",
+      "integrity": "sha512-ju5WxT3qr8HNK1tsgkrVNhFOgXoiDDFpo8ixrsX8EIDYS3yZDnn/X9nMd3PKfpAbOzc2OVW2PmatQc0bJXxI9Q==",
       "requires": {
-        "@celo/base": "2.2.0-alpha.2",
+        "@celo/base": "2.2.0",
         "@celo/bls12377js": "0.1.1",
-        "@celo/utils": "2.2.0-alpha.2",
+        "@celo/utils": "2.2.0",
         "@types/bn.js": "^5.1.0",
         "@types/elliptic": "^6.4.9",
         "@types/ethereumjs-util": "^5.2.0",
@@ -420,28 +420,28 @@
       }
     },
     "@celo/explorer": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/explorer/-/explorer-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-L7AQuOjPXEchmA4X7RP+Hbi9pW8UgVm9ydbGvlD+7Mfbpm58a7iK/HAA/xEJdsr1Iz2n15O6U/sQkm5kUPqHSg==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/explorer/-/explorer-2.2.0.tgz",
+      "integrity": "sha512-i4QzgMbUt0MdypVk4ymNNCkTKoi42DNcPFI03tJRNM2S12knRnqRpJUUr2DP+nXzIuInasdAHu374c2gqKkkgQ==",
       "requires": {
-        "@celo/base": "2.2.0-alpha.2",
-        "@celo/connect": "2.2.0-alpha.2",
-        "@celo/contractkit": "2.2.0-alpha.2",
-        "@celo/utils": "2.2.0-alpha.2",
+        "@celo/base": "2.2.0",
+        "@celo/connect": "2.2.0",
+        "@celo/contractkit": "2.2.0",
+        "@celo/utils": "2.2.0",
         "@types/debug": "^4.1.5",
         "debug": "^4.1.1"
       }
     },
     "@celo/governance": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/governance/-/governance-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-kFWRBoCESUBWF9twdHqMbcDJhF25uvmkSHj0NewsBqG7twuih0depz/4CXg78GxjU2TQQwSUJTLbc32CEXt1vg==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/governance/-/governance-2.2.0.tgz",
+      "integrity": "sha512-b1GZVbkwcWfbqEOX603TGHUgbNhqOdIhrJrHbRRi7mPAjwlgPDVa9EtRrONRMWlbe6sbuLalXqN0oX61t5o2og==",
       "requires": {
-        "@celo/base": "2.2.0-alpha.2",
-        "@celo/connect": "2.2.0-alpha.2",
-        "@celo/contractkit": "2.2.0-alpha.2",
-        "@celo/explorer": "2.2.0-alpha.2",
-        "@celo/utils": "2.2.0-alpha.2",
+        "@celo/base": "2.2.0",
+        "@celo/connect": "2.2.0",
+        "@celo/contractkit": "2.2.0",
+        "@celo/explorer": "2.2.0",
+        "@celo/utils": "2.2.0",
         "@types/debug": "^4.1.5",
         "@types/ethereumjs-util": "^5.2.0",
         "@types/inquirer": "^6.5.0",
@@ -451,14 +451,14 @@
       }
     },
     "@celo/identity": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/identity/-/identity-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-hEgW5w0cyxDyhIK2RZAIYH/RGJDBOevoCkwEMWmpoBBZO/J7tPWHJHprjNkMIy+6fl5wFjcrSjKLFCHZJryz0w==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/identity/-/identity-2.2.0.tgz",
+      "integrity": "sha512-8VrbtC51+7Hw2oiuRzVhNU/HvK8dapUuzl1yN9lWlETgfHsiiJMk8ucw4oqJc137siBRxUdHIxuHgsDXzUzsdQ==",
       "requires": {
-        "@celo/base": "2.2.0-alpha.2",
-        "@celo/contractkit": "2.2.0-alpha.2",
+        "@celo/base": "2.2.0",
+        "@celo/contractkit": "2.2.0",
         "@celo/phone-number-privacy-common": "1.0.39",
-        "@celo/utils": "2.2.0-alpha.2",
+        "@celo/utils": "2.2.0",
         "@types/debug": "^4.1.5",
         "bignumber.js": "^9.0.0",
         "blind-threshold-bls": "git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a",
@@ -612,12 +612,12 @@
       }
     },
     "@celo/phone-utils": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/phone-utils/-/phone-utils-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-qHdJ5rKjCYzY/4VMk1lkUfXyp//Za+e9s7fDszVlPu3g6HWSPZnFnRRCzc9Osky8ulPUlDsqIXtpFgejCCcsCg==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/phone-utils/-/phone-utils-2.2.0.tgz",
+      "integrity": "sha512-5XgHvoZ9zDIddaAUQFClIgSj9dv2bgjyf47vfp7I4wPRXMzECT43Aq1VWsj8cs4Z6bANUpgf7WQThTYoAjkTsA==",
       "requires": {
-        "@celo/base": "2.2.0-alpha.2",
-        "@celo/utils": "2.2.0-alpha.2",
+        "@celo/base": "2.2.0",
+        "@celo/utils": "2.2.0",
         "@types/country-data": "^0.0.0",
         "@types/ethereumjs-util": "^5.2.0",
         "@types/google-libphonenumber": "^7.4.23",
@@ -629,11 +629,11 @@
       }
     },
     "@celo/utils": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/utils/-/utils-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-wQuJHIElXGn4VQ7nu5RycPDGW+hPzkCHzGGnMjh1mG3P1wzjYnd6uSfRfewrBGtAH+G3/lhMM7/hZgryhRxAbQ==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/utils/-/utils-2.2.0.tgz",
+      "integrity": "sha512-oCDZt44Ch30/4m+G+7gcuiKmo/WgptMpmxxSLH+h3Wmc6LUWS/F/9SFcdlTbJF0sH3LOXchczO+HUlATJ+vQNQ==",
       "requires": {
-        "@celo/base": "2.2.0-alpha.2",
+        "@celo/base": "2.2.0",
         "@types/bn.js": "^5.1.0",
         "@types/elliptic": "^6.4.9",
         "@types/ethereumjs-util": "^5.2.0",
@@ -647,13 +647,13 @@
       }
     },
     "@celo/wallet-base": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/wallet-base/-/wallet-base-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-Rsl14+GujP/H9p0l4HaIwqvk1FksBcP2CZEuH9GQkNzJkDWEDxTpqLtHb+f2wpb7kzyiCa9ZkyrdGc9cwgJB4Q==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/wallet-base/-/wallet-base-2.2.0.tgz",
+      "integrity": "sha512-zL05/tJzPWWvGGaQKEkcEYCLJRJwl7PLskJNWCiloGLfmPd7L1g96ulU1ZGffeO+kVIcUvwtQ9AS7ky4CbHybQ==",
       "requires": {
-        "@celo/base": "2.2.0-alpha.2",
-        "@celo/connect": "2.2.0-alpha.2",
-        "@celo/utils": "2.2.0-alpha.2",
+        "@celo/base": "2.2.0",
+        "@celo/connect": "2.2.0",
+        "@celo/utils": "2.2.0",
         "@types/debug": "^4.1.5",
         "@types/ethereumjs-util": "^5.2.0",
         "bignumber.js": "^9.0.0",
@@ -663,11 +663,11 @@
       }
     },
     "@celo/wallet-hsm": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/wallet-hsm/-/wallet-hsm-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-VztZMMSNx8qAPP5WpjCSqkbK4n6sk8pfH5Mj0ZMeoeuSBZLqMQDw8BHIi9Gy06gohVgU8IN4PyWSiCGQd9RMDA==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/wallet-hsm/-/wallet-hsm-2.2.0.tgz",
+      "integrity": "sha512-tMNMQVdwvhjgnKRIFomDXaz6BVMDBbl7K7IJAjpbxMsX8OAuSGWccn1a0bADFvnW0YVTnrLTn8kFqbGF6QafQQ==",
       "requires": {
-        "@celo/base": "2.2.0-alpha.2",
+        "@celo/base": "2.2.0",
         "@types/asn1js": "^0.0.2",
         "@types/debug": "^4.1.5",
         "@types/secp256k1": "^4.0.0",
@@ -679,18 +679,18 @@
       }
     },
     "@celo/wallet-hsm-azure": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/wallet-hsm-azure/-/wallet-hsm-azure-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-TrRtHcXExbZdVh/jCjVEAnjnsVXfWRn1aHeziZT++onfteNVhRCWzGw0pomNC+QH1mL77bQiJRGSelthhXTPjg==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/wallet-hsm-azure/-/wallet-hsm-azure-2.2.0.tgz",
+      "integrity": "sha512-RqYn9LvptCRZLHmQoBe3eq/JWosMfMpwDIxRjR7eSCjHaJk+MSSv/NNbjxEvbOFprOswnDxAhAzTELc/kdyWtA==",
       "requires": {
         "@azure/identity": "^1.1.0",
         "@azure/keyvault-keys": "^4.1.0",
         "@azure/keyvault-secrets": "^4.1.0",
-        "@celo/connect": "2.2.0-alpha.2",
-        "@celo/utils": "2.2.0-alpha.2",
-        "@celo/wallet-base": "2.2.0-alpha.2",
-        "@celo/wallet-hsm": "2.2.0-alpha.2",
-        "@celo/wallet-remote": "2.2.0-alpha.2",
+        "@celo/connect": "2.2.0",
+        "@celo/utils": "2.2.0",
+        "@celo/wallet-base": "2.2.0",
+        "@celo/wallet-hsm": "2.2.0",
+        "@celo/wallet-remote": "2.2.0",
         "@types/secp256k1": "^4.0.0",
         "bignumber.js": "^9.0.0",
         "debug": "^4.1.1",
@@ -700,14 +700,14 @@
       }
     },
     "@celo/wallet-ledger": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/wallet-ledger/-/wallet-ledger-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-MARRHVdWsBqVv6NkE4/hDGp5L6zjBWDSQ133kO/+IujxVG551a1LhmL6llKyEKesJ40G/UdyZFlDX5qSPXXrmA==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/wallet-ledger/-/wallet-ledger-2.2.0.tgz",
+      "integrity": "sha512-/Z833SpQ4Wyq/Zd6rmnQi3C6WHy43Zyhq+UvsnFBYHEvbRyP+DyA13DFs6yciRcRfgGtaht9sTf8iG9bZh2Wvw==",
       "requires": {
-        "@celo/connect": "2.2.0-alpha.2",
-        "@celo/utils": "2.2.0-alpha.2",
-        "@celo/wallet-base": "2.2.0-alpha.2",
-        "@celo/wallet-remote": "2.2.0-alpha.2",
+        "@celo/connect": "2.2.0",
+        "@celo/utils": "2.2.0",
+        "@celo/wallet-base": "2.2.0",
+        "@celo/wallet-remote": "2.2.0",
         "@ledgerhq/hw-app-eth": "~5.11.0",
         "@ledgerhq/hw-transport": "~5.11.0",
         "@types/ethereumjs-util": "^5.2.0",
@@ -717,26 +717,26 @@
       }
     },
     "@celo/wallet-local": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/wallet-local/-/wallet-local-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-zMVjfxQr8eJf/+mBGwfHQtWqUH41c2X/MKsGhj0Pht8pma5pGIcUqgaHeOcEJM8Zn74gZN1WgPagDziXC7w7VA==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/wallet-local/-/wallet-local-2.2.0.tgz",
+      "integrity": "sha512-l+RJkieGlnUT+q39/aGrRnFlhbwQsiPGsLoDebW7OuYncExRGf0Pid48ke+yrl7/0nBxNXDSRuNMW9qI0AlHSw==",
       "requires": {
-        "@celo/connect": "2.2.0-alpha.2",
-        "@celo/utils": "2.2.0-alpha.2",
-        "@celo/wallet-base": "2.2.0-alpha.2",
+        "@celo/connect": "2.2.0",
+        "@celo/utils": "2.2.0",
+        "@celo/wallet-base": "2.2.0",
         "@types/ethereumjs-util": "^5.2.0",
         "eth-lib": "^0.2.8",
         "ethereumjs-util": "^5.2.0"
       }
     },
     "@celo/wallet-remote": {
-      "version": "2.2.0-alpha.2",
-      "resolved": "https://registry.npmjs.org/@celo/wallet-remote/-/wallet-remote-2.2.0-alpha.2.tgz",
-      "integrity": "sha512-UNNkN++24JOqdEKB0eLPfuQLKG0aLUTwgM+zyg8b/GcxET+L/UK2tT4hw5oEDcP1vSCALq00OKAZWUd0ZBmX4A==",
+      "version": "2.2.0",
+      "resolved": "https://registry.npmjs.org/@celo/wallet-remote/-/wallet-remote-2.2.0.tgz",
+      "integrity": "sha512-SEcDJfWf7NITCFOBPIAHkpJFi1dIc2gvkXvde2cqkjBlwa3a7vlp8gZdyA8sQA25jy9WAaGCseOFNrJKgGM6VQ==",
       "requires": {
-        "@celo/connect": "2.2.0-alpha.2",
-        "@celo/utils": "2.2.0-alpha.2",
-        "@celo/wallet-base": "2.2.0-alpha.2",
+        "@celo/connect": "2.2.0",
+        "@celo/utils": "2.2.0",
+        "@celo/wallet-base": "2.2.0",
         "@types/debug": "^4.1.5",
         "@types/ethereumjs-util": "^5.2.0",
         "eth-lib": "^0.2.8",
@@ -2484,9 +2484,9 @@
       }
     },
     "@types/lodash": {
-      "version": "4.14.185",
-      "resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.185.tgz",
-      "integrity": "sha512-evMDG1bC4rgQg4ku9tKpuMh5iBNEwNa3tf9zRHdP1qlv+1WUg44xat4IxCE14gIpZRGUUWAx2VhItCZc25NfMA=="
+      "version": "4.14.186",
+      "resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.186.tgz",
+      "integrity": "sha512-eHcVlLXP0c2FlMPm56ITode2AgLMSa6aJ05JTTbYbI+7EMkCEE5qk2E41d5g2lCVTqRe0GnnRFurmlCsDODrPw=="
     },
     "@types/long": {
       "version": "4.0.2",
@@ -4750,9 +4750,9 @@
       }
     },
     "google-libphonenumber": {
-      "version": "3.2.30",
-      "resolved": "https://registry.npmjs.org/google-libphonenumber/-/google-libphonenumber-3.2.30.tgz",
-      "integrity": "sha512-Kx2/AqmY0P6863vOhkiCFqfAxfY3jagMe916ByU38JRKiRCqSHGJW1qTOZNV4+ag8Xda69dk6w8VwEeswVy44w=="
+      "version": "3.2.31",
+      "resolved": "https://registry.npmjs.org/google-libphonenumber/-/google-libphonenumber-3.2.31.tgz",
+      "integrity": "sha512-l3bzAkfN4ITICKvuqEiY7JN06RxDAviOoKMtD2KfGYjGK3btPO8Xav7k0fgmf1Ud/pEm523yBh1/s/xDtKEvnw=="
     },
     "got": {
       "version": "9.6.0",
