@@ -1,5 +1,7 @@
-export const ACCOUNTS_TABLE_LEGACY = 'accounts'
-export const ACCOUNTS_TABLE_ONCHAIN = 'accountsOnChain'
+export enum ACCOUNTS_TABLE {
+  ONCHAIN = 'accountsOnChain',
+  LEGACY = 'accounts',
+}
 
 export enum ACCOUNTS_COLUMNS {
   address = 'address',

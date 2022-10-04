@@ -1,5 +1,5 @@
 import { Knex } from 'knex'
-import { REQUESTS_TABLE_ONCHAIN } from '../../../common/database/models/request'
+import { REQUESTS_TABLE } from '../../../common/database/models/request'
 import { KeyProvider } from '../../../common/key-management/key-provider-base'
 import { SignerConfig } from '../../../config'
 import { PnpQuotaService } from '../../services/quota'
@@ -7,7 +7,7 @@ import { PnpSignAction } from './action'
 import { PnpSignIO } from './io'
 
 export class OnChainPnpSignAction extends PnpSignAction {
-  protected readonly requestsTable = REQUESTS_TABLE_ONCHAIN
+  protected readonly requestsTable = REQUESTS_TABLE.ONCHAIN
 
   constructor(
     readonly db: Knex,

@@ -18,8 +18,8 @@ import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
-import { ACCOUNTS_TABLE_ONCHAIN } from '../../src/common/database/models/account'
-import { REQUESTS_TABLE_ONCHAIN } from '../../src/common/database/models/request'
+import { ACCOUNTS_TABLE } from '../../src/common/database/models/account'
+import { REQUESTS_TABLE } from '../../src/common/database/models/request'
 import {
   getPerformedQueryCount,
   incrementQueryCount,
@@ -267,7 +267,7 @@ describe('pnp', () => {
           for (let i = 0; i <= expectedQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(config.serviceName),
               trx
@@ -513,7 +513,7 @@ describe('pnp', () => {
           for (let i = 0; i < performedQueryCount; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -741,7 +741,7 @@ describe('pnp', () => {
           for (let i = 0; i < remainingQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -801,7 +801,7 @@ describe('pnp', () => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
             await incrementQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName),
               trx
@@ -863,7 +863,7 @@ describe('pnp', () => {
             for (let i = 0; i < remainingQuota; i++) {
               await incrementQueryCount(
                 db,
-                ACCOUNTS_TABLE_ONCHAIN,
+                ACCOUNTS_TABLE.ONCHAIN,
                 ACCOUNT_ADDRESS1,
                 rootLogger(_config.serviceName),
                 trx
@@ -874,7 +874,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -916,7 +916,7 @@ describe('pnp', () => {
             for (let i = 0; i < remainingQuota; i++) {
               await incrementQueryCount(
                 db,
-                ACCOUNTS_TABLE_ONCHAIN,
+                ACCOUNTS_TABLE.ONCHAIN,
                 ACCOUNT_ADDRESS1,
                 rootLogger(_config.serviceName),
                 trx
@@ -927,7 +927,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -960,7 +960,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(config.serviceName)
             )
@@ -968,7 +968,7 @@ describe('pnp', () => {
           expect(
             await getRequestExists(
               db,
-              REQUESTS_TABLE_ONCHAIN,
+              REQUESTS_TABLE.ONCHAIN,
               req.account,
               req.blindedQueryPhoneNumber,
               rootLogger(config.serviceName)
@@ -1027,6 +1027,7 @@ describe('pnp', () => {
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
+          expect.assertions(4)
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
@@ -1035,12 +1036,11 @@ describe('pnp', () => {
           })
 
           spy.mockRestore()
-
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -1048,7 +1048,7 @@ describe('pnp', () => {
           expect(
             await getRequestExists(
               db,
-              REQUESTS_TABLE_ONCHAIN,
+              REQUESTS_TABLE.ONCHAIN,
               req.account,
               req.blindedQueryPhoneNumber,
               rootLogger(_config.serviceName)
@@ -1082,7 +1082,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -1090,7 +1090,7 @@ describe('pnp', () => {
           expect(
             await getRequestExists(
               db,
-              REQUESTS_TABLE_ONCHAIN,
+              REQUESTS_TABLE.ONCHAIN,
               req.account,
               req.blindedQueryPhoneNumber,
               rootLogger(_config.serviceName)
@@ -1156,7 +1156,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(_config.serviceName)
             )
@@ -1164,7 +1164,7 @@ describe('pnp', () => {
           expect(
             await getRequestExists(
               db,
-              REQUESTS_TABLE_ONCHAIN,
+              REQUESTS_TABLE.ONCHAIN,
               req.account,
               req.blindedQueryPhoneNumber,
               rootLogger(_config.serviceName)
@@ -1207,7 +1207,7 @@ describe('pnp', () => {
           expect(
             await getPerformedQueryCount(
               db,
-              ACCOUNTS_TABLE_ONCHAIN,
+              ACCOUNTS_TABLE.ONCHAIN,
               ACCOUNT_ADDRESS1,
               rootLogger(config.serviceName)
             )
@@ -1215,7 +1215,7 @@ describe('pnp', () => {
           expect(
             await getRequestExists(
               db,
-              REQUESTS_TABLE_ONCHAIN,
+              REQUESTS_TABLE.ONCHAIN,
               req.account,
               req.blindedQueryPhoneNumber,
               rootLogger(config.serviceName)

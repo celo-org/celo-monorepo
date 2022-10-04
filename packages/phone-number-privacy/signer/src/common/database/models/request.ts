@@ -1,5 +1,7 @@
-export const REQUESTS_TABLE_LEGACY = 'requests'
-export const REQUESTS_TABLE_ONCHAIN = 'requestsOnChain'
+export enum REQUESTS_TABLE {
+  LEGACY = 'requests',
+  ONCHAIN = 'requestsOnChain',
+}
 
 export enum REQUESTS_COLUMNS {
   address = 'caller_address',
