@@ -10,6 +10,8 @@
 
 5. run `npm publish --otp XXXXXX --tag TAG` *you MUST run with --tag and provide alpha | beta for pre release*
 
-6. run `yarn install`
+6. add back -dev suffics to @celo/** deps it was removed from in cli package (otherwise ci build will fail)
 
-7. commit the changes
+7. run yarn
+
+8. commit
