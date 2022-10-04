@@ -9,7 +9,7 @@ export class DomainThresholdStateService<R extends DomainRequest> {
     // Get the domain status from the responses, filtering out responses that don't have the status.
     const domainStates = session.responses
       .map((signerResponse) => ('status' in signerResponse.res ? signerResponse.res.status : null))
-      .filter((state) => state) as DomainState[]
+      .filter((state: DomainState | null | undefined): state is DomainState => !!state)
     const threshold = this.config.keys.threshold
     if (domainStates.length < threshold) {
       throw new Error('Insufficient number of signer responses')

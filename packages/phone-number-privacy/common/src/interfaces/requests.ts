@@ -139,6 +139,7 @@ export const LegacyPnpQuotaRequestSchema: t.Type<LegacyPnpQuotaRequest> = t.inte
 
 export type PhoneNumberPrivacyRequest =
   | SignMessageRequest
+  | LegacySignMessageRequest
   | MatchmakingRequest
   | PnpQuotaRequest
   | LegacyPnpQuotaRequest

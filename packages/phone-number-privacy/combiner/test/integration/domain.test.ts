@@ -829,6 +829,11 @@ describe('domainService', () => {
       const [req, _] = await signatureRequest(testDomain)
       const resSig = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
       expect(resSig.status).toBe(429)
+      expect(resSig.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: resSig.body.version,
+        error: WarningMessage.EXCEEDED_QUOTA,
+      })
     })
 
     it('Should respond with 503 on disabled api', async () => {
