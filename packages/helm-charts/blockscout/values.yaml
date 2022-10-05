@@ -56,6 +56,9 @@ blockscout:
         memory: 1000Mi
         cpu: 2
   api:
+    suffix:
+      enabled: false
+      path: ""
     port: 4000
     strategy:
       rollingUpdate:
@@ -116,6 +119,10 @@ blockscout:
         memory: 500Mi
         cpu: 500m
   web:
+    host: ""
+    suffix:
+      enabled: false
+      path: ""
     port: 4000
     strategy:
       rollingUpdate:
