@@ -180,7 +180,7 @@ contract LockedGold is
     // used to vote more than once.
     uint256 remainingLockedGold = getAccountTotalLockedGold(msg.sender).sub(value);
 
-    uint256 totalReferendumVotes = getGovernance().getTotalVotesByAccount(msg.sender);
+    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
     require(remainingLockedGold >= totalReferendumVotes, "Account locked");
 
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);

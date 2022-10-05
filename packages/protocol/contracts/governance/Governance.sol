@@ -646,18 +646,16 @@ contract Governance is
     require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
 
     address account = getAccounts().voteSignerToAccount(msg.sender);
-    Voter storage voter = voters[account];
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(value != Proposals.VoteValue.None, "Vote value unset");
     require(weight > 0, "Voter weight zero");
-    // VoteRecord memory previousVoteRecord = voter.referendumVotes[index];
 
     uint256[] memory currentValues = new uint256[](1);
     currentValues[0] = uint256(value);
     uint256[] memory currentWeights = new uint256[](1);
     currentWeights[0] = weight;
 
-    voteInternal(proposal, proposalId, index, currentValues, currentWeights);
+    voteInternal(proposal, proposalId, index, weight, account, currentValues, currentWeights);
     return true;
   }
 
@@ -677,6 +675,7 @@ contract Governance is
     uint256[] calldata weights
   ) external nonReentrant returns (bool) {
     require(voteValues.length == weights.length, "Incorrect length");
+    require(voteValues.length < 5, "Only values from VoteValue allowed");
 
     dequeueProposalsIfReady();
     (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
@@ -688,7 +687,10 @@ contract Governance is
     }
     require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
 
-    voteInternal(proposal, proposalId, index, voteValues, weights);
+    address account = getAccounts().voteSignerToAccount(msg.sender);
+    uint256 totalLockedGold = getLockedGold().getAccountTotalLockedGold(account);
+    require(totalLockedGold > 0, "Voter weight zero");
+    voteInternal(proposal, proposalId, index, totalLockedGold, account, voteValues, weights);
 
     return true;
   }
@@ -697,25 +699,42 @@ contract Governance is
     Proposals.Proposal storage proposal,
     uint256 proposalId,
     uint256 index,
+    uint256 totalLockedGold,
+    address account,
     uint256[] memory voteValues,
     uint256[] memory weights
   ) private {
-    address account = getAccounts().voteSignerToAccount(msg.sender);
     Voter storage voter = voters[account];
 
     require(
-      getLockedGold().getAccountTotalLockedGold(account) >=
-        getTotalVotesByAccount(account).add(getTotalWeightRequested(weights)),
-      "Voter weight zero"
+      totalLockedGold >= getTotalWeightRequested(weights),
+      "Voter doesn't have enough locked gold"
     );
     VoteRecord storage previousVoteRecord = voter.referendumVotes[index];
+    Proposals.VoteValue[] memory currentVoteValuesConverted;
 
-    Proposals.VoteValue[] memory currentVoteValuesConverted = proposal.updateVote(
-      previousVoteRecord.values,
-      previousVoteRecord.weights,
-      voteValues,
-      weights
-    );
+    if (previousVoteRecord.weights.length == 0 && previousVoteRecord.weight != 0) {
+      // backward compatibility for transition period - this should be deleted later on
+      Proposals.VoteValue[] memory previousValues = new Proposals.VoteValue[](1);
+      previousValues[0] = previousVoteRecord.value;
+      uint256[] memory previousWeights = new uint256[](1);
+      previousWeights[0] = previousVoteRecord.weight;
+
+      currentVoteValuesConverted = proposal.updateVote(
+        previousValues,
+        previousWeights,
+        voteValues,
+        weights
+      );
+    } else {
+      currentVoteValuesConverted = proposal.updateVote(
+        previousVoteRecord.values,
+        previousVoteRecord.weights,
+        voteValues,
+        weights
+      );
+    }
+
     proposal.networkWeight = getLockedGold().getTotalLockedGold();
     voter.referendumVotes[index] = VoteRecord(
       currentVoteValuesConverted[0],
@@ -749,27 +768,55 @@ contract Governance is
 
       // Skip proposals where there was no vote cast by the user AND
       // ensure vote record proposal matches identifier of dequeued index proposal.
-      if (voteRecord.weights.length > 0 && voteRecord.proposalId == dequeued[dequeueIndex]) {
+      if (
+        (voteRecord.weights.length > 0 || voteRecord.weight > 0) &&
+        voteRecord.proposalId == dequeued[dequeueIndex]
+      ) {
         (Proposals.Proposal storage proposal, Proposals.Stage stage) =
           requireDequeuedAndDeleteExpired(voteRecord.proposalId, dequeueIndex); // prettier-ignore
 
         // only revoke from proposals which are still in referendum
         if (stage == Proposals.Stage.Referendum) {
-          proposal.updateVote(
-            voteRecord.values,
-            voteRecord.weights,
-            new uint256[](0),
-            new uint256[](0)
-          );
-          proposal.networkWeight = getLockedGold().getTotalLockedGold();
-          emit ProposalVoteRevoked(
-            voteRecord.proposalId,
-            account,
-            uint256(voteRecord.value),
-            voteRecord.weight,
-            voteRecord.weights,
-            voteRecord.values
-          );
+          if (voteRecord.weights.length == 0 && voteRecord.weight != 0) {
+            // backward compatibility for transition period - this should be deleted later on
+            Proposals.VoteValue[] memory previousValues = new Proposals.VoteValue[](1);
+            previousValues[0] = voteRecord.value;
+            uint256[] memory previousWeights = new uint256[](1);
+            previousWeights[0] = voteRecord.weight;
+
+            proposal.updateVote(
+              previousValues,
+              previousWeights,
+              new uint256[](0),
+              new uint256[](0)
+            );
+
+            proposal.networkWeight = getLockedGold().getTotalLockedGold();
+            emit ProposalVoteRevoked(
+              voteRecord.proposalId,
+              account,
+              uint256(voteRecord.value),
+              voteRecord.weight,
+              previousWeights,
+              previousValues
+            );
+          } else {
+            proposal.updateVote(
+              voteRecord.values,
+              voteRecord.weights,
+              new uint256[](0),
+              new uint256[](0)
+            );
+            proposal.networkWeight = getLockedGold().getTotalLockedGold();
+            emit ProposalVoteRevoked(
+              voteRecord.proposalId,
+              account,
+              uint256(voteRecord.value),
+              voteRecord.weight,
+              voteRecord.weights,
+              voteRecord.values
+            );
+          }
         }
 
         // always delete dequeue vote records for gas refund as they must be expired or revoked
@@ -1012,10 +1059,10 @@ contract Governance is
   function getVoteRecord(address account, uint256 index)
     external
     view
-    returns (uint256, uint256, uint256)
+    returns (uint256, uint256, uint256, uint256[] memory, Proposals.VoteValue[] memory)
   {
     VoteRecord storage record = voters[account].referendumVotes[index];
-    return (record.proposalId, uint256(record.value), record.weight);
+    return (record.proposalId, uint256(record.value), record.weight, record.weights, record.values);
   }
 
   /**
@@ -1352,13 +1399,17 @@ contract Governance is
    * @param account The address of the account.
    * @return The total number of votes cast by an account.
    */
-  function getTotalVotesByAccount(address account) public view returns (uint256) {
+  function getAmountOfGoldUsedForVoting(address account) public view returns (uint256) {
     uint256 total = 0;
     Voter storage voter = voters[account];
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
       VoteRecord storage voteRecord = voter.referendumVotes[index];
+      uint256 subTotal = 0;
       for (uint256 i = 0; i < voteRecord.weights.length; i = i.add(1)) {
-        total = total.add(voteRecord.weights[i]);
+        subTotal = subTotal.add(voteRecord.weights[i]);
+      }
+      if (total < subTotal) {
+        total = subTotal;
       }
     }
     return total;
@@ -1367,20 +1418,9 @@ contract Governance is
   function getTotalWeightRequested(uint256[] memory weights) private pure returns (uint256) {
     uint256 totalVotesRequested = 0;
     for (uint256 i = 0; i < weights.length; i = i.add(1)) {
-      totalVotesRequested.add(weights[i]);
+      totalVotesRequested = totalVotesRequested.add(weights[i]);
     }
 
     return totalVotesRequested;
-  }
-
-  function voteValuesToUintArray(Proposals.VoteValue[] memory voteValues)
-    private
-    returns (uint256[] memory)
-  {
-    uint256[] memory result = new uint256[](voteValues.length);
-    for (uint256 i = 0; i < voteValues.length; i.add(1)) {
-      result[i] = uint256(voteValues[i]);
-    }
-    return result;
   }
 }

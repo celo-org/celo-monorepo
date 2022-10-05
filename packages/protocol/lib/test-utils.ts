@@ -325,6 +325,23 @@ export function assertObjectWithBNEqual(
   }
 }
 
+export function assertBNArrayEqual(
+  actualArray: any[],
+  expectedArray: any[]
+) {
+  assert(Array.isArray(actualArray), `Actual is not an array`)
+  assert(Array.isArray(expectedArray), `Expected is not an array`)
+  assert(actualArray.length === expectedArray.length, `Different array sizes; actual: ${actualArray.length} expected: ${expectedArray.length}`)
+  assert(actualArray.every(actualValue => isNumber(actualValue)) 
+      && expectedArray.every(expectedValue => isNumber(expectedValue)),
+      `Expected all elements to be numbers`)
+      
+  for (let i = 0; i < actualArray.length; i++) {
+    assertEqualBN(actualArray[i], expectedArray[i])
+  }
+}
+
+
 export function assertEqualBN(
   actual: number | BN | BigNumber,
   expected: number | BN | BigNumber,

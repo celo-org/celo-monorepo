@@ -19,7 +19,7 @@ contract MockGovernance is IGovernance {
     totalVotes[voter] = votes;
   }
 
-  function getTotalVotesByAccount(address account) external view returns (uint256) {
+  function getAmountOfGoldUsedForVoting(address account) external view returns (uint256) {
     return totalVotes[account];
   }
 }
