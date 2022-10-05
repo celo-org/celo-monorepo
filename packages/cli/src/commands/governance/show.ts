@@ -1,4 +1,4 @@
-import { proposalToJSON } from '@celo/governance'
+import { ProposalBuilder, proposalToJSON } from '@celo/governance'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { flags } from '@oclif/command'
 import chalk from 'chalk'
@@ -7,6 +7,10 @@ import { writeFileSync } from 'fs'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'
 import { printValueMap, printValueMapRecursive } from '../../utils/cli'
+import {
+  addExistingProposalIDToBuilder,
+  addExistingProposalJSONFileToBuilder,
+} from '../../utils/governance'
 
 export default class Show extends BaseCommand {
   static aliases = [
@@ -50,6 +54,16 @@ export default class Show extends BaseCommand {
       description: 'If set, displays validators that have not whitelisted the hotfix.',
       exclusive: ['whitelisters', 'account', 'proposalID'],
     }),
+    afterExecutingProposal: flags.string({
+      required: false,
+      description: 'Path to proposal which will be executed prior to proposal',
+      exclusive: ['afterExecutingID'],
+    }),
+    afterExecutingID: flags.string({
+      required: false,
+      description: 'Governance proposal identifier which will be executed prior to proposal',
+      exclusive: ['afterExecutingProposal'],
+    }),
   }
 
   static examples = [
@@ -75,8 +89,14 @@ export default class Show extends BaseCommand {
       const record = await governance.getProposalRecord(id)
       const proposal = record.proposal
       if (!raw) {
+        const builder = new ProposalBuilder(this.kit)
+        if (res.flags.afterExecutingID) {
+          await addExistingProposalIDToBuilder(this.kit, builder, res.flags.afterExecutingID)
+        } else if (res.flags.afterExecutingProposal) {
+          await addExistingProposalJSONFileToBuilder(builder, res.flags.afterExecutingProposal)
+        }
         try {
-          const jsonproposal = await proposalToJSON(this.kit, proposal)
+          const jsonproposal = await proposalToJSON(this.kit, proposal, builder.registryAdditions)
           record.proposal = jsonproposal as any
 
           if (res.flags.jsonTransactions) {

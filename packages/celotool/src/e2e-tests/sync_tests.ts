@@ -16,10 +16,11 @@ describe('sync tests', function (this: any) {
     network: 'local',
     runPath: TMP_PATH,
     migrate: true,
-    verbosity: 1,
+    verbosity: 2,
     genesisConfig: {
       churritoBlock: 0,
       donutBlock: 0,
+      espressoBlock: 0,
     },
     instances: [
       {

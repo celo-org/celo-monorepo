@@ -220,6 +220,7 @@ module.exports = {
       version: SOLC_VERSION,
       settings: {
         evmVersion: 'istanbul',
+        metadata: { useLiteralContent: true },
       },
     },
   },
@@ -234,6 +235,7 @@ if (process.argv.includes('--gas')) {
         version: SOLC_VERSION,
         settings: {
           evmVersion: 'istanbul',
+          metadata: { useLiteralContent: true },
         },
       },
     },

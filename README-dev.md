@@ -5,9 +5,10 @@
 Often when developing, it is useful to create a test network localy using the full celo-blockchain binary to go beyond what can be done with other options such as [Ganache](https://www.trufflesuite.com/ganache)
 
 The quickest way to get started with a local testnet is by running `yarn celotool local-testnet` from the `monorepo` root.
+
 This command will create a local testnet with a single validator node and deploy all smart contract migrations to it.
 Once the network is initialized a NodeJS REPL is provided to help interact with the running nodes.
-For more options, consult `yanr celotool local-testnet --help`, which provides an overview of the tool and its options.
+For more options, consult `yarn celotool local-testnet --help`, which provides an overview of the tool and its options.
 
 ## Monorepo inter-package dependencies
 
@@ -16,7 +17,7 @@ Many packages depend on other packages within the monorepo. When this happens, f
 1.  All packages must use **master version** of sibling packages.
 2.  Exception to (1) are packages that represent a GAE/firebase app which must use the last published version.
 3.  To differentiate published vs unpublished version. Master version (in package.json) must end with suffix `-dev` and should not be published.
-4.  If a developer want to publish a version; then after publishing it needs to set master version to next `-dev` version and change all package.json that require on it.
+4.  If a developer wants to publish a version; then after publishing it needs to set master version to next `-dev` version and change all package.json that require on it.
 
 To check which packages need amending, you can run (in the root pkg):
 

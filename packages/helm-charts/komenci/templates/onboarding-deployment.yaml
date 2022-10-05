@@ -27,7 +27,7 @@ spec:
             - bash
             - "-c"
             - |
-              node dist/apps/onboarding/main.js
+              node packages/apps/api/dist/main.js
           resources:
             {{- toYaml .Values.onboarding.resources | nindent 12 }}
           env:

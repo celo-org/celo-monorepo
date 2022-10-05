@@ -71,7 +71,7 @@ describe('retryAsyncWithBackOffAndTimeout()', () => {
     try {
       await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1, 1, 100)
       expect(false).toBeTruthy()
-    } catch (error) {
+    } catch (error: any) {
       expect(error.message).toContain('forced error')
     }
     expect(mockFunction).toHaveBeenCalledTimes(3)
@@ -85,7 +85,7 @@ describe('retryAsyncWithBackOffAndTimeout()', () => {
     try {
       await retryAsyncWithBackOffAndTimeout(mockFunction, 3, [], 1, 1, 100)
       expect(false).toBeTruthy()
-    } catch (error) {
+    } catch (error: any) {
       expect(error.message).toContain('Timed out')
     }
 

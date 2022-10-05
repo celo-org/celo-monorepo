@@ -189,6 +189,7 @@ variable attestation_service_credentials {
     nexmo_unsupported_regions       = "CU,SY,KP,IR,SD"
     twilio_account_sid              = "secret in terraform.tfvars"
     twilio_messaging_service_sid    = "secret in terraform.tfvars"
+    twilio_verify_service_sid       = "secret in terraform.tfvars"
     twilio_auth_token               = "secret in terraform.tfvars"
     twilio_blacklist                = "CU,SY,KP,IR,SD,BY,TD,CZ,EG,ID,IL,CI,JP,JO,KZ,KE,KW,LB,MW,MX,MA,NP,NG,OM,PK,PS,PH,QA,RU,SA,LK,TZ,TH,TN,TR,AE,UA,VN,ZM,ZW"
     twilio_unsupported_regions      = "CU,SY,KP,IR,SD,BY,TD,CZ,EG,ID,IL,CI,JP,JO,KZ,KE,KW,LB,MW,MX,MA,NP,NG,OM,PK,PS,PH,QA,RU,SA,LK,TZ,TH,TN,TR,AE,UA,VN,ZM,ZW"

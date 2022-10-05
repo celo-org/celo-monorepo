@@ -1,6 +1,5 @@
 import { Address, ensureLeading0x } from '@celo/base/lib/address'
 import { BigNumber } from 'bignumber.js'
-import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import { ecdsaRecover } from 'secp256k1'
 
@@ -10,8 +9,6 @@ export const publicKeyPrefix: number = 0x04
 export const sixtyFour: number = 64
 export const thirtyTwo: number = 32
 
-const secp256k1Curve = new EC('secp256k1')
-
 /**
  * If the signature is in the "bottom" of the curve, it is non-canonical
  * Non-canonical signatures are illegal in Ethereum and therefore the S value
@@ -19,6 +16,9 @@ const secp256k1Curve = new EC('secp256k1')
  * https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki#Low_S_values_in_signatures
  */
 export const makeCanonical = (S: BigNumber): BigNumber => {
+  // tslint:disable-next-line:import-blacklist
+  const EC = require('elliptic').ec
+  const secp256k1Curve = new EC('secp256k1')
   const curveN = bufferToBigNumber(secp256k1Curve.curve.n)
   const isCanonical = S.comparedTo(curveN.dividedBy(2)) <= 0
   if (!isCanonical) {

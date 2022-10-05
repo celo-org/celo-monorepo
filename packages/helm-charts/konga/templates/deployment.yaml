@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "konga.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "konga.name" . }}
+    helm.sh/chart: {{ include "konga.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "konga.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "konga.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: {{ include "konga.fullname" . }}-snapshot
+        name: {{ include "konga.fullname" . }}-snapshot
+{{- if .Values.extraVolumes }}
+{{ toYaml .Values.extraVolumes | indent 8 }}
+{{- end }}
+      containers:
+        - name: konga
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 1337
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          envFrom:
+            - configMapRef:
+                name: {{ include "konga.fullname" . }}-config
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /opt/clabs/files/
+            name: {{ include "konga.fullname" . }}-snapshot
+{{- if .Values.extraVolumeMounts }}
+{{ toYaml .Values.extraVolumeMounts | nindent 12 }}
+{{- end }}
+        - name: restore-snapshot
+          image: jcortejoso/httpie-jq:latest
+          imagePullPolicy: IfNotPresent
+          stdin: true
+          tty: true
+          command:
+          - /bin/sh
+          - -c
+          args:
+          - |
+            while :; do
+              # Check if konga api is ready
+              if http HEAD localhost:1337 --follow --check-status >/dev/null 2>&1; then
+                break
+              fi
+            done
+            # Check if snapshot already exists
+            snapshot_name="$(cat /opt/clabs/files/snapshot.json | jq -r '.name')"
+            if http GET localhost:1337/api/snapshot | jq -e -r ".[] | select (.name==\"$snapshot_name\")" >/dev/null 2>&1; then
+              echo "Snapshot already present"
+            else
+              # Upload snapshot
+              http POST localhost:1337/api/snapshot Authorization:'Bearer noauthtoken' 'Content-Type: application/json' < /opt/clabs/files/snapshot.json
+              # Restore snapshot
+              ## Connection id field can be non-unique. It should be 1
+              connection_id=$(http GET localhost:1337/api/kongnode | jq -r '.[] | select (.name=="Kong") | .id' | head -n1)
+              snapshot_id=$(http GET localhost:1337/api/snapshot | jq -e -r ".[] | select (.name==\"$snapshot_name\") | .id")
+              sleep 90
+              http POST localhost:1337/api/snapshots/$snapshot_id/restore Authorization:'Bearer noauthtoken' "Connection-Id:$connection_id" imports\\:='["services","routes","consumers","plugins","acls","upstreams","certificates","snis"]' token=noauthtoken
+              sleep 90
+              http POST localhost:1337/api/snapshots/$snapshot_id/restore Authorization:'Bearer noauthtoken' "Connection-Id:$connection_id" imports\\:='["services","routes","consumers","plugins","acls","upstreams","certificates","snis"]' token=noauthtoken
+            fi
+            tail -f /dev/null
+          volumeMounts:
+          - mountPath: /opt/clabs/files/
+            name: {{ include "konga.fullname" . }}-snapshot
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

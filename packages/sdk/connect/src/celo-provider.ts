@@ -18,6 +18,10 @@ enum InterceptedMethods {
   sign = 'eth_sign',
   personalSign = 'personal_sign',
   signTypedData = 'eth_signTypedData',
+  signTypedDataV1 = 'eth_signTypedData_v1',
+  signTypedDataV3 = 'eth_signTypedData_v3',
+  signTypedDataV4 = 'eth_signTypedData_v4',
+  signTypedDataV5 = 'eth_signTypedData_v5',
 }
 
 export function assertIsCeloProvider(provider: any): asserts provider is CeloProvider {
@@ -28,6 +32,9 @@ export function assertIsCeloProvider(provider: any): asserts provider is CeloPro
   }
 }
 
+/*
+ * CeloProvider wraps a web3.js provider for use with Celo
+ */
 export class CeloProvider implements Provider {
   private alreadyStopped: boolean = false
   // Transaction nonce is calculated as the max of an account's nonce on-chain, and any pending transactions in a node's
@@ -40,17 +47,17 @@ export class CeloProvider implements Provider {
     this.addProviderDelegatedFunctions()
   }
 
-  // Used for backwards compatibility. Use the `addAccount` from the Connection
+  // @deprecated  Use the `addAccount` from the Connection
   addAccount(privateKey: string) {
     this.connection.addAccount(privateKey)
   }
 
-  // Used for backwards compatibility. Use the `removeAccount` from the Connection
+  // @deprecated  Use the `removeAccount` from the Connection
   removeAccount(address: string) {
     this.connection.removeAccount(address)
   }
 
-  // Used for backwards compatibility. Use the `getAccounts` from the Connection
+  // @deprecated  Use the `getAccounts` from the Connection
   async getAccounts(): Promise<string[]> {
     return this.connection.getAccounts()
   }
@@ -118,7 +125,11 @@ export class CeloProvider implements Provider {
 
         return
       }
-      case InterceptedMethods.signTypedData: {
+      case InterceptedMethods.signTypedData:
+      case InterceptedMethods.signTypedDataV1:
+      case InterceptedMethods.signTypedDataV3:
+      case InterceptedMethods.signTypedDataV4:
+      case InterceptedMethods.signTypedDataV5: {
         this.checkPayloadWithAtLeastNParams(payload, 1)
         address = payload.params[0]
 

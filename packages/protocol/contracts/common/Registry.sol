@@ -17,6 +17,12 @@ contract Registry is IRegistry, Ownable, Initializable {
   event RegistryUpdated(string identifier, bytes32 indexed identifierHash, address indexed addr);
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
+
+  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
   function initialize() external initializer {

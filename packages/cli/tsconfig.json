@@ -6,6 +6,6 @@
     "esModuleInterop": true,
     "target": "es6"
   },
-  "include": ["src", "../contractkit/types", "types/hw-transport-node-hid.d.ts"],
+  "include": ["src", "../contractkit/types"],
   "references": [{ "path": "../sdk/utils" }, { "path": "../sdk/contractkit" }]
 }

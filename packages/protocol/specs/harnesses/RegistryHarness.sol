@@ -25,6 +25,8 @@ contract RegistryHarness is IRegistryExtended {
 
   uint256 whoami;
 
+  constructor(bool test) public RegistryHarness(test) {}
+
   function getAddressFor(bytes32 identifier) public returns (address) {
     if (identifier == VALIDATORS_REGISTRY_ID) {
       whoami = iamValidators;

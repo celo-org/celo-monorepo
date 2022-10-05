@@ -82,47 +82,32 @@ export function testWithGanache(name: string, fn: (web3: Web3) => void) {
 
 /**
  * Gets a contract address by parsing blocks and matching event signatures against the given event.
- * `canValidate` actually controls whether we grab the first or second contract associated with
- * the given `eventSignature`. This is to allow for deployment of two contracts with distinct
- * setup parameters for testing.
  */
 export async function getContractFromEvent(
   eventSignature: string,
   web3: Web3,
-  canValidate: boolean
-): Promise<string> {
-  let currBlockNumber = await web3.eth.getBlockNumber()
-  let currBlock: any
-  let contractAddress: any
-  const target = web3.utils.sha3(eventSignature)
-  let found = false
-  while (true) {
-    currBlock = await web3.eth.getBlock(currBlockNumber)
-    for (const tx of currBlock.transactions) {
-      const txFull = await web3.eth.getTransactionReceipt(tx)
-      if (txFull.logs) {
-        for (const log of txFull.logs) {
-          if (log.topics) {
-            for (const topic of log.topics) {
-              if (topic === target) {
-                if (canValidate && !found) {
-                  found = true
-                } else {
-                  contractAddress = log.address
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    currBlockNumber--
-    if (contractAddress !== undefined) {
-      break
-    }
-    if (currBlockNumber < 0) {
-      throw Error('Error: ReleaseGoldInstance could not be found')
-    }
+  filter?: {
+    expectedData?: string
+    index?: number
   }
-  return contractAddress
+): Promise<string> {
+  const logs = await web3.eth.getPastLogs({
+    topics: [web3.utils.sha3(eventSignature)],
+    fromBlock: 'earliest',
+    toBlock: 'latest',
+  })
+  if (logs.length === 0) {
+    throw Error(`Error: contract could not be found matching signature ${eventSignature}`)
+  }
+  const logIndex = filter?.index ?? 0
+  if (!filter?.expectedData) {
+    return logs[logIndex].address
+  }
+  const filteredLogs = logs.filter((log) => log.data === filter.expectedData)
+  if (filteredLogs.length === 0) {
+    throw Error(
+      `Error: contract could not be found matching signature ${eventSignature} with data ${filter.expectedData}`
+    )
+  }
+  return filteredLogs[logIndex ?? 0].address
 }

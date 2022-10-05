@@ -18,6 +18,6 @@ export const handler = async (argv: PrometheusDestroyArgv) => {
   exitIfCelotoolHelmDryRun()
   await switchToClusterFromEnvOrContext(argv, true)
 
-  await removePrometheus()
   await removeGrafanaHelmRelease()
+  await removePrometheus()
 }

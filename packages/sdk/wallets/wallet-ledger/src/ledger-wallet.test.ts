@@ -179,7 +179,7 @@ describe('LedgerWallet class', () => {
         // Use physical ledger if present
         // Recreation of the connection will fail, therefore we use a single object
         if (!hardwareWallet) {
-          const transport: Transport = await TransportNodeHid.open('')
+          const transport = await TransportNodeHid.open('')
           hardwareWallet = new LedgerWallet(undefined, undefined, transport)
         }
       } catch (e) {
@@ -217,7 +217,7 @@ describe('LedgerWallet class', () => {
       try {
         wallet.getAccounts()
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toBe('wallet needs to be initialized first')
       }
     })
@@ -226,7 +226,7 @@ describe('LedgerWallet class', () => {
       try {
         wallet.hasAccount(ACCOUNT_ADDRESS1)
         throw new Error('Expected exception to be thrown')
-      } catch (e) {
+      } catch (e: any) {
         expect(e.message).toBe('wallet needs to be initialized first')
       }
     })

@@ -1,41 +1,49 @@
-import { isVerified } from '@celo/phone-number-privacy-common'
+import { signWithDEK } from '@celo/identity/lib/odis/query'
+import { getDataEncryptionKey, isVerified } from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'firebase-functions'
-import { REQUEST_EXPIRY_WINDOW_MS } from '../../common/src/utils/constants'
 import { BLSCryptographyClient } from '../src/bls/bls-cryptography-client'
-import { VERSION } from '../src/config'
+import config, { E2E_TEST_ACCOUNTS, E2E_TEST_PHONE_NUMBERS, VERSION } from '../src/config'
 import { getTransaction } from '../src/database/database'
-import { getDidMatchmaking, setDidMatchmaking } from '../src/database/wrappers/account'
+import {
+  getAccountSignedUserPhoneNumberRecord,
+  getDekSignerRecord,
+  getDidMatchmaking,
+  setDidMatchmaking,
+} from '../src/database/wrappers/account'
 import { getNumberPairContacts, setNumberPairContacts } from '../src/database/wrappers/number-pairs'
 import { getBlindedMessageSig, getContactMatches } from '../src/index'
-import { BLINDED_PHONE_NUMBER } from './end-to-end/resources'
-
+import { BLINDED_PHONE_NUMBER, dekAuthSigner, deks } from './end-to-end/resources'
 const BLS_SIGNATURE = '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A'
 
 jest.mock('@celo/phone-number-privacy-common', () => ({
   ...jest.requireActual('@celo/phone-number-privacy-common'),
   authenticateUser: jest.fn().mockReturnValue(true),
   isVerified: jest.fn(),
+  getDataEncryptionKey: jest.fn(),
 }))
 const mockIsVerified = isVerified as jest.Mock
+const mockGetDataEncryptionKey = getDataEncryptionKey as jest.Mock
 
 jest.mock('../src/bls/bls-cryptography-client')
 const mockComputeBlindedSignature = jest.fn()
 BLSCryptographyClient.prototype.combinePartialBlindedSignatures = mockComputeBlindedSignature
 mockComputeBlindedSignature.mockResolvedValue(BLS_SIGNATURE)
 const mockSufficientVerifiedSigs = jest.fn()
-BLSCryptographyClient.prototype.hasSufficientVerifiedSignatures = mockSufficientVerifiedSigs
+BLSCryptographyClient.prototype.hasSufficientSignatures = mockSufficientVerifiedSigs
 mockSufficientVerifiedSigs.mockReturnValue(true)
 
 jest.mock('../src/database/wrappers/account')
 const mockGetDidMatchmaking = getDidMatchmaking as jest.Mock
-mockGetDidMatchmaking.mockReturnValue(false)
 const mockSetDidMatchmaking = setDidMatchmaking as jest.Mock
 mockSetDidMatchmaking.mockImplementation()
+const mockGetAccountSignedUserPhoneNumberRecord = getAccountSignedUserPhoneNumberRecord as jest.Mock
+const mockGetDekSignerRecord = getDekSignerRecord as jest.Mock
 
 jest.mock('../src/database/wrappers/number-pairs')
 const mockSetNumberPairContacts = setNumberPairContacts as jest.Mock
 mockSetNumberPairContacts.mockImplementation()
 const mockGetNumberPairContacts = getNumberPairContacts as jest.Mock
+mockGetNumberPairContacts.mockResolvedValue([])
 
 jest.mock('../src/database/database')
 const mockGetTransaction = getTransaction as jest.Mock
@@ -73,7 +81,6 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
     blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
     hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
     account: '0x78dc5D2D739606d31509C31d654056A45185ECb6',
-    timestamp: Date.now(),
   }
 
   beforeEach(() => {
@@ -114,8 +121,29 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
       getBlindedMessageSig(req, validResponseExpected(done, 200))
     })
 
+    it('provides signature from a fallback', (done) => {
+      let numberOfCalls = 0
+      fetchMock.mockClear()
+      fetchMock.mockImplementation((url) => {
+        const primaryUrl =
+          JSON.parse(config.odisServices.signers)[0].url + '/getBlindedMessagePartialSig'
+        numberOfCalls += 1
+        if (url === primaryUrl) {
+          return Promise.reject()
+        }
+        return Promise.resolve(new FetchResponse(defaultResponseJson))
+      })
+      getBlindedMessageSig(
+        req,
+        validResponseExpected(() => {
+          expect(numberOfCalls).toEqual(2)
+          done()
+        }, 200)
+      )
+    })
+
     it('returns 500 on bls error', (done) => {
-      mockSufficientVerifiedSigs.mockReturnValue(false)
+      mockSufficientVerifiedSigs.mockReturnValueOnce(false)
       mockComputeBlindedSignature.mockImplementationOnce(() => {
         throw Error()
       })
@@ -147,17 +175,6 @@ describe(`POST /getBlindedMessageSig endpoint`, () => {
 
       getBlindedMessageSig(req, invalidResponseExpected(done, 400))
     })
-    it('expired timestamp returns 400', (done) => {
-      const req = {
-        body: {
-          ...validRequest,
-          timestamp: Date.now() - REQUEST_EXPIRY_WINDOW_MS,
-        },
-        headers: mockHeaders,
-      } as Request
-
-      getBlindedMessageSig(req, invalidResponseExpected(done, 400))
-    })
     it('invalid blinded phone number returns 400', (done) => {
       const req = {
         body: {
@@ -180,80 +197,297 @@ describe(`POST /getContactMatches endpoint`, () => {
     hashedPhoneNumber: '0x5f6e88c3f724b3a09d3194c0514426494955eff7127c29654e48a361a19b4b96',
   }
 
+  const expectFailure = (req: Request, code: number) => {
+    it(`Rejects request to matchmake with ${code}`, (done) => {
+      getContactMatches(req, invalidResponseExpected(done, code))
+    })
+  }
+  const expectSuccess = (req: Request) => {
+    it('provides matches', (done) => expectMatches(req, req.body.contactPhoneNumbers, done))
+    it('provides matches empty array', (done) => expectMatches(req, [], done))
+  }
+  const expectMatches = (req: Request, numbers: string[], done: jest.DoneCallback) => {
+    mockGetNumberPairContacts.mockResolvedValue(numbers)
+    const res = {
+      json(body: any) {
+        try {
+          expect(body.success).toEqual(true)
+          expect(body.matchedContacts).toEqual(
+            numbers.map((number) => ({
+              phoneNumber: number,
+            }))
+          )
+          done()
+        } catch (e) {
+          done(e)
+        }
+      },
+      status(status: any) {
+        try {
+          expect(status).toEqual(200)
+          done()
+        } catch (e) {
+          done(e)
+        }
+        return {
+          json() {
+            return {}
+          },
+        }
+      },
+    } as Response
+
+    getContactMatches(req, res)
+  }
+  const expectSuccessWithRecord = (req: Request) => {
+    expectSuccess(req)
+    expectSignatureWasRecorded(req)
+  }
+  const expectSuccessWithoutRecord = (req: Request) => {
+    expectSuccess(req)
+    expectSignatureWasNotRecorded()
+  }
+  const expectFirstMatchmakingToSucceed = (req: Request) => {
+    mockGetDidMatchmaking.mockResolvedValue(false)
+    expectSuccess(req)
+  }
+  const expectFirstMatchmakingToSucceedWithoutRecord = (req: Request) => {
+    expectFirstMatchmakingToSucceed(req)
+    expectSignatureWasNotRecorded()
+  }
+  const expectFirstMatchmakingToSucceedWithRecord = (req: Request) => {
+    expectFirstMatchmakingToSucceed(req)
+    expectSignatureWasRecorded(req)
+  }
+  const expectSignatureWasRecorded = (req: Request) => {
+    it('Should have recorded dek phone number signature for the last request', () => {
+      expect(mockSetDidMatchmaking).toHaveBeenLastCalledWith(
+        req.body.account,
+        expect.anything(),
+        expect.anything()
+      )
+    })
+  }
+  const expectSignatureWasNotRecorded = () => {
+    it('Should not have recorded dek phone number signature for the last request', () => {
+      expect(mockSetDidMatchmaking).toHaveBeenLastCalledWith(
+        validInput.account,
+        expect.anything(),
+        undefined
+      )
+    })
+  }
+  const expectReplaysToFail = (req: Request) => {
+    describe('When user has already performed matchmaking', () => {
+      beforeAll(() => {
+        mockGetDidMatchmaking.mockResolvedValueOnce(true)
+      })
+      expectFailure(req, 403)
+    })
+  }
+  const expectPotentialReplaysToSucceedWithoutRecord = (req: Request) => {
+    it('provides matches on getDidMatchmaking error', (done) => {
+      mockGetDidMatchmaking.mockRejectedValueOnce(new Error())
+      expectMatches(req, req.body.contactPhoneNumbers, done)
+    })
+    expectSignatureWasNotRecorded()
+  }
+
   describe('with valid input', () => {
-    const req = {
-      body: validInput,
-      headers: mockHeaders,
-    } as Request
-
-    it('provides matches', (done) => {
-      mockGetNumberPairContacts.mockReturnValue(validInput.contactPhoneNumbers)
-      mockIsVerified.mockReturnValue(true)
-      const res = {
-        json(body: any) {
-          try {
-            expect(body.success).toEqual(true)
-            expect(body.matchedContacts).toEqual([
-              { phoneNumber: validInput.contactPhoneNumbers[0] },
-            ])
-            done()
-          } catch (e) {
-            done(e)
-          }
-        },
-        status(status: any) {
-          try {
-            expect(status).toEqual(200)
-            done()
-          } catch (e) {
-            done(e)
-          }
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      } as Response
-
-      getContactMatches(req, res)
+    beforeAll(() => {
+      mockIsVerified.mockResolvedValue(true)
     })
 
-    it('provides matches empty array', (done) => {
-      mockGetNumberPairContacts.mockReturnValue([])
-      mockIsVerified.mockReturnValue(true)
-      const res = {
-        json(body: any) {
-          try {
-            expect(body.success).toEqual(true)
-            expect(body.matchedContacts).toEqual([])
-            done()
-          } catch (e) {
-            done(e)
-          }
-        },
-        status(status: any) {
-          try {
-            expect(status).toEqual(200)
-            done()
-          } catch (e) {
-            done(e)
-          }
-          return {
-            json() {
-              return {}
-            },
-          }
-        },
-      } as Response
-
-      getContactMatches(req, res)
+    describe('w/o signedUserPhoneNumber', () => {
+      const req = {
+        body: validInput,
+        headers: mockHeaders,
+      } as Request
+      expectFirstMatchmakingToSucceedWithoutRecord(req)
+      expectReplaysToFail(req)
+      expectPotentialReplaysToSucceedWithoutRecord(req)
     })
 
-    it('rejects more than one attempt to matchmake with 403', (done) => {
-      mockGetDidMatchmaking.mockReturnValue(true)
-      mockIsVerified.mockReturnValue(true)
-      getContactMatches(req, invalidResponseExpected(done, 403))
+    describe('w/ signedUserPhoneNumber', () => {
+      const signedUserPhoneNumber = signWithDEK(validInput.userPhoneNumber, dekAuthSigner(0))
+      const req = {
+        body: {
+          ...validInput,
+          signedUserPhoneNumber,
+        },
+        headers: mockHeaders,
+      } as Request
+
+      describe('When DEK is fetched successfully', () => {
+        beforeAll(() => {
+          mockGetDataEncryptionKey.mockResolvedValue(deks[0].publicKey)
+        })
+
+        describe('When DEK signedUserPhoneNumber signature is invalid', () => {
+          beforeAll(() => {
+            req.body.signedUserPhoneNumber = 'fake'
+          })
+          afterAll(() => {
+            req.body.signedUserPhoneNumber = signedUserPhoneNumber
+          })
+          expectFailure(req, 403)
+        })
+
+        describe('When DEK signedUserPhoneNumber signature is valid', () => {
+          expectFirstMatchmakingToSucceedWithRecord(req)
+          expectPotentialReplaysToSucceedWithoutRecord(req)
+
+          describe('With replayed requests', () => {
+            beforeAll(() => {
+              mockGetDidMatchmaking.mockResolvedValue(true)
+            })
+            describe('When signedUserPhoneNumberRecord matches request', () => {
+              beforeAll(() => {
+                mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+                  req.body.signedUserPhoneNumber
+                )
+              })
+              expectSuccessWithRecord(req)
+              describe('Should bypass verification when e2e test phone number and account are provided', () => {
+                beforeAll(() => {
+                  mockIsVerified.mockResolvedValue(false)
+                  req.body.account = E2E_TEST_ACCOUNTS[0]
+                  req.body.userPhoneNumber = E2E_TEST_PHONE_NUMBERS[0]
+                  req.body.signedUserPhoneNumber = signWithDEK(
+                    req.body.userPhoneNumber,
+                    dekAuthSigner(0)
+                  )
+                  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+                    req.body.signedUserPhoneNumber
+                  )
+                })
+                afterAll(() => {
+                  mockIsVerified.mockResolvedValue(true)
+                  req.body.account = validInput.account
+                  req.body.userPhoneNumber = validInput.userPhoneNumber
+                  req.body.signedUserPhoneNumber = signWithDEK(
+                    req.body.userPhoneNumber,
+                    dekAuthSigner(0)
+                  )
+                  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+                    req.body.signedUserPhoneNumber
+                  )
+                })
+                expectSuccessWithRecord(req)
+              })
+            })
+
+            describe('When signedUserPhoneNumberRecord does not match request', () => {
+              describe('When user has not rotated their dek', () => {
+                beforeAll(() => {
+                  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue('fake')
+                })
+                expectFailure(req, 403)
+              })
+
+              describe('When user has rotated their dek', () => {
+                beforeAll(() => {
+                  mockGetDataEncryptionKey.mockResolvedValue(deks[1].publicKey)
+                  req.body.signedUserPhoneNumber = signWithDEK(
+                    validInput.userPhoneNumber,
+                    dekAuthSigner(1)
+                  )
+                  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+                    signWithDEK(validInput.userPhoneNumber, dekAuthSigner(0))
+                  )
+                  mockGetDekSignerRecord.mockResolvedValue(deks[0].publicKey)
+                })
+                expectSuccessWithRecord(req)
+              })
+
+              describe('When we cannot find a dekSignerRecord for the user', () => {
+                beforeAll(() => {
+                  mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue('fake')
+                  mockGetDekSignerRecord.mockResolvedValue(undefined)
+                })
+                expectFailure(req, 403)
+              })
+            })
+
+            describe('When signedUserPhoneNumberRecord does not exist in db', () => {
+              beforeAll(() => {
+                mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(undefined)
+              })
+              expectSuccessWithRecord(req)
+            })
+
+            describe('When GetAccountSignedUserPhoneNumberRecord throws db error', () => {
+              beforeAll(() => {
+                mockGetAccountSignedUserPhoneNumberRecord.mockRejectedValue(new Error())
+              })
+              expectSuccessWithoutRecord(req)
+            })
+          })
+        })
+      })
+
+      describe('When DEK is not fetched succesfully', () => {
+        beforeAll(() => {
+          mockGetDataEncryptionKey.mockRejectedValue(new Error())
+        })
+
+        expectFirstMatchmakingToSucceedWithoutRecord(req)
+        expectPotentialReplaysToSucceedWithoutRecord(req)
+
+        describe('With replayed requests', () => {
+          beforeAll(() => {
+            mockGetDidMatchmaking.mockResolvedValue(true)
+          })
+
+          describe('When signedUserPhoneNumberRecord matches request', () => {
+            beforeAll(() => {
+              req.body.signedUserPhoneNumber = signedUserPhoneNumber
+              mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(signedUserPhoneNumber)
+            })
+            expectSuccessWithoutRecord(req)
+          })
+
+          describe('When signedUserPhoneNumberRecord does not match request', () => {
+            describe('When user has not rotated their dek', () => {
+              beforeAll(() => {
+                mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue('fake')
+              })
+              expectFailure(req, 403)
+            })
+
+            describe('When user has rotated their dek', () => {
+              beforeAll(() => {
+                mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(
+                  signWithDEK(validInput.userPhoneNumber, dekAuthSigner(1))
+                )
+                mockGetDekSignerRecord.mockResolvedValue(deks[1].publicKey)
+              })
+              expectSuccessWithoutRecord(req)
+            })
+
+            describe('When we cannot find a dekSignerRecord for the user', () => {
+              beforeAll(() => {
+                mockGetDekSignerRecord.mockResolvedValue(undefined)
+              })
+              expectFailure(req, 403)
+            })
+          })
+
+          describe('When signedUserPhoneNumberRecord does not exist in db', () => {
+            beforeAll(() => {
+              mockGetAccountSignedUserPhoneNumberRecord.mockResolvedValue(undefined)
+            })
+            expectSuccessWithoutRecord(req)
+          })
+
+          describe('When GetAccountSignedUserPhoneNumberRecord throws db error', () => {
+            beforeAll(() => {
+              mockGetAccountSignedUserPhoneNumberRecord.mockRejectedValue(new Error())
+            })
+            expectSuccessWithoutRecord(req)
+          })
+        })
+      })
     })
   })
 

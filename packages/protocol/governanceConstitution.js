@@ -42,7 +42,8 @@ const DefaultConstitution = {
   },
   Escrow: {
     default: 0.6,
-    setRegistry: 0.9,
+    addDefaultTrustedIssuer: 0.6,
+    removeDefaultTrustedIssuer: 0.6,
   },
   Exchange: {
     default: 0.8,
@@ -61,6 +62,18 @@ const DefaultConstitution = {
     setStableToken: 0.8,
     setSpread: 0.8,
     setReserveFraction: 0.8,
+  },
+  ExchangeBRL: {
+    default: 0.8,
+    setRegistry: 0.9,
+    setUpdateFrequency: 0.8,
+    setMinimumReports: 0.8,
+    setStableToken: 0.8,
+    setSpread: 0.8,
+    setReserveFraction: 0.8,
+  },
+  FederatedAttestations: {
+    default: 0.6,
   },
   FeeCurrencyWhitelist: {
     default: 0.8,
@@ -92,7 +105,6 @@ const DefaultConstitution = {
     setMinDeposit: 0.9,
     setQueueExpiry: 0.9,
     setDequeueFrequency: 0.9,
-    setApprovalStageDuration: 0.9,
     setReferendumStageDuration: 0.9,
     setExecutionStageDuration: 0.9,
     setParticipationBaseline: 0.9,
@@ -105,12 +117,23 @@ const DefaultConstitution = {
     default: 0.7,
     approveSlashing: 0.7,
   },
+  GrandaMento: {
+    default: 0.8,
+    cancelExchangeProposal: 0.6,
+    setApprover: 0.8,
+    setSpread: 0.8,
+    setStableTokenExchangeLimits: 0.8,
+    setVetoPeriodSeconds: 0.8,
+  },
   LockedGold: {
     default: 0.9,
     setRegistry: 0.9,
     setUnlockingPeriod: 0.8,
     addSlasher: 0.9,
     removeSlasher: 0.8,
+  },
+  OdisPayments: {
+    default: 0.6,
   },
   // Values for all proxied contracts.
   proxy: {
@@ -156,6 +179,14 @@ const DefaultConstitution = {
     approve: 0.6,
   },
   StableTokenEUR: {
+    default: 0.8,
+    setRegistry: 0.9,
+    setInflationParameters: 0.9,
+    transfer: 0.6,
+    transferWithComment: 0.6,
+    approve: 0.6,
+  },
+  StableTokenBRL: {
     default: 0.8,
     setRegistry: 0.9,
     setInflationParameters: 0.9,

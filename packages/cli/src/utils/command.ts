@@ -1,8 +1,8 @@
+import { URL_REGEX } from '@celo/base/lib/io'
 import { CeloContract, RegisteredContracts } from '@celo/contractkit'
+import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/cryptographic-utils/lib/bls'
+import { isE164NumberStrict } from '@celo/phone-utils/lib/phoneNumbers'
 import { ensureLeading0x, trimLeading0x } from '@celo/utils/lib/address'
-import { BLS_POP_SIZE, BLS_PUBLIC_KEY_SIZE } from '@celo/utils/lib/bls'
-import { URL_REGEX } from '@celo/utils/lib/io'
-import { isE164NumberStrict } from '@celo/utils/lib/phoneNumbers'
 import { POP_SIZE } from '@celo/utils/lib/signatureUtils'
 import { flags } from '@oclif/command'
 import { CLIError } from '@oclif/errors'
@@ -119,10 +119,10 @@ export const parseIntRange = (input: string) => {
   let end: number
   if (input.endsWith(']')) {
     end = range[1]
-  } else if (input.startsWith(')')) {
+  } else if (input.endsWith(')')) {
     end = range[1] - 1
   } else {
-    throw new Error('range input must end with "[" (inclusive) or "(" (exclusive)')
+    throw new Error('range input must end with "]" (inclusive) or ")" (exclusive)')
   }
 
   return { start, end }

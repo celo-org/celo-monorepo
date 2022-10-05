@@ -8,6 +8,7 @@ import { assertIsCeloProvider, CeloProvider } from './celo-provider'
 import {
   Address,
   Block,
+  BlockHeader,
   BlockNumber,
   CeloTx,
   CeloTxObject,
@@ -25,6 +26,7 @@ import {
   inputSignFormatter,
   outputBigNumberFormatter,
   outputBlockFormatter,
+  outputBlockHeaderFormatter,
   outputCeloTxFormatter,
   outputCeloTxReceiptFormatter,
 } from './utils/formatter'
@@ -36,6 +38,7 @@ import { ReadOnlyWallet } from './wallet'
 
 const debugGasEstimation = debugFactory('connection:gas-estimation')
 
+type BN = ReturnType<Web3['utils']['toBN']>
 export interface ConnectionOptions {
   gasInflationFactor: number
   gasPrice: string
@@ -43,12 +46,18 @@ export interface ConnectionOptions {
   from?: Address
 }
 
+/**
+ * Connection is a Class for connecting to Celo, sending Transactions, etc
+ * @param web3 an instance of web3
+ * @optional wallet a child class of {@link WalletBase}
+ * @optional handleRevert sets handleRevert on the web3.eth instance passed in
+ */
 export class Connection {
   private config: ConnectionOptions
   readonly paramsPopulator: TxParamsNormalizer
   rpcCaller!: RpcCaller
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   private currencyGasPrice: Map<Address, string> = new Map<Address, string>()
 
   constructor(readonly web3: Web3, public wallet?: ReadOnlyWallet, handleRevert = true) {
@@ -82,6 +91,14 @@ export class Connection {
     } catch {
       return false
     }
+  }
+
+  keccak256 = (value: string | BN): string => {
+    return this.web3.utils.keccak256(value)
+  }
+
+  hexToAscii = (hex: string) => {
+    return this.web3.utils.hexToAscii(hex)
   }
 
   /**
@@ -200,7 +217,7 @@ export class Connection {
    * Send a transaction to celo-blockchain.
    *
    * Similar to `web3.eth.sendTransaction()` but with following differences:
-   *  - applies kit tx's defaults
+   *  - applies connections tx's defaults
    *  - estimatesGas before sending
    *  - returns a `TransactionResult` instead of `PromiEvent`
    */
@@ -247,17 +264,35 @@ export class Connection {
     )
   }
 
-  signTypedData = async (signer: string, typedData: EIP712TypedData): Promise<Signature> => {
+  /*
+   * @param signer - The address of account signing this data
+   * @param typedData - Structured data to be signed
+   * @param version - Optionally provide a version which will be appended to the method. E.G. (4) becomes 'eth_signTypedData_v4'
+   * @remarks Some providers like Metamask treat eth_signTypedData differently from versioned method eth_signTypedData_v4
+   * @see [Metamask info in signing Typed Data](https://docs.metamask.io/guide/signing-data.html)
+   */
+  signTypedData = async (
+    signer: string,
+    typedData: EIP712TypedData,
+    version?: 1 | 3 | 4 | 5
+  ): Promise<Signature> => {
+    // stringify data for v3 & v4 based on https://github.com/MetaMask/metamask-extension/blob/c72199a1a6e4151c40c22f79d0f3b6ed7a2d59a7/app/scripts/lib/typed-message-manager.js#L185
+    const shouldStringify = version === 3 || version === 4
+
     // Uses the Provider and not the RpcCaller, because this method should be intercepted
     // by the CeloProvider if there is a local wallet that could sign it. The RpcCaller
     // would just forward it to the node
     const signature = await new Promise<string>((resolve, reject) => {
+      const method = version ? `eth_signTypedData_v${version}` : 'eth_signTypedData'
       ;(this.web3.currentProvider as Provider).send(
         {
           id: getRandomId(),
           jsonrpc: '2.0',
-          method: 'eth_signTypedData',
-          params: [inputAddressFormatter(signer), typedData],
+          method,
+          params: [
+            inputAddressFormatter(signer),
+            shouldStringify ? JSON.stringify(typedData) : typedData,
+          ],
         },
         (error, resp) => {
           if (error) {
@@ -306,7 +341,7 @@ export class Connection {
     return toTxResult(this.web3.eth.sendSignedTransaction(signedTransactionData))
   }
 
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   fillGasPrice(tx: CeloTx): CeloTx {
     if (tx.feeCurrency && tx.gasPrice === '0' && this.currencyGasPrice.has(tx.feeCurrency)) {
       return {
@@ -316,7 +351,7 @@ export class Connection {
     }
     return tx
   }
-  // TODO: remove once cUSD gasPrice is available on minimumClientVersion node rpc
+  /** @deprecated no longer needed since gasPrice is available on minimumClientVersion node rpc */
   async setGasPriceForCurrency(address: Address, gasPrice: string) {
     this.currencyGasPrice.set(address, gasPrice)
   }
@@ -363,7 +398,7 @@ export class Connection {
       )
       debugGasEstimation('estimatedGasWithInflationFactor: %s', gas)
       return gas
-    } catch (e) {
+    } catch (e: any) {
       throw new Error(e)
     }
   }
@@ -407,23 +442,35 @@ export class Connection {
     return hexToNumber(response.result)!
   }
 
+  private isBlockNumberHash = (blockNumber: BlockNumber) =>
+    blockNumber instanceof String && blockNumber.indexOf('0x') === 0
+
   getBlock = async (
     blockHashOrBlockNumber: BlockNumber,
     fullTxObjects: boolean = true
   ): Promise<Block> => {
-    // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByNumber
-    let fnCall = 'eth_getBlockByNumber'
-    if (blockHashOrBlockNumber instanceof String && blockHashOrBlockNumber.indexOf('0x') === 0) {
-      // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByHash
-      fnCall = 'eth_getBlockByHash'
-    }
+    const endpoint = this.isBlockNumberHash(blockHashOrBlockNumber)
+      ? 'eth_getBlockByHash' // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByHash
+      : 'eth_getBlockByNumber' // Reference: https://eth.wiki/json-rpc/API#eth_getBlockByNumber
 
-    const response = await this.rpcCaller.call(fnCall, [
+    const response = await this.rpcCaller.call(endpoint, [
       inputBlockNumberFormatter(blockHashOrBlockNumber),
       fullTxObjects,
     ])
 
     return outputBlockFormatter(response.result)
+  }
+
+  getBlockHeader = async (blockHashOrBlockNumber: BlockNumber): Promise<BlockHeader> => {
+    const endpoint = this.isBlockNumberHash(blockHashOrBlockNumber)
+      ? 'eth_getHeaderByHash'
+      : 'eth_getHeaderByNumber'
+
+    const response = await this.rpcCaller.call(endpoint, [
+      inputBlockNumberFormatter(blockHashOrBlockNumber),
+    ])
+
+    return outputBlockHeaderFormatter(response.result)
   }
 
   getBalance = async (address: Address, defaultBlock?: BlockNumber): Promise<string> => {

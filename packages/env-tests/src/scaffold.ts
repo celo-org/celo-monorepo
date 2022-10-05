@@ -1,24 +1,24 @@
 import { concurrentMap } from '@celo/base'
-import { CeloContract, ContractKit } from '@celo/contractkit'
-import { newExchange } from '@celo/contractkit/lib/generated/Exchange'
-import { newStableToken } from '@celo/contractkit/lib/generated/StableToken'
-import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
-import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
-import { generateKeys } from '@celo/utils/lib/account'
+import { CeloTokenType, StableToken, Token } from '@celo/contractkit'
+import { generateKeys } from '@celo/cryptographic-utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from './context'
 
 BigNumber.config({ EXPONENTIAL_AT: 1e9 })
 
-export const StableTokenToRegistryName: Record<string, CeloContract> = {
-  cUSD: CeloContract.StableToken,
-  cEUR: 'StableTokenEUR' as CeloContract,
+interface KeyInfo {
+  address: string
+  privateKey: string
+  publicKey: string
 }
 
-export const ExchangeToRegistryName: Record<string, CeloContract> = {
-  cUSD: CeloContract.Exchange,
-  cEUR: 'ExchangeEUR' as CeloContract,
+export async function fundAccountWithCELO(
+  context: EnvTestContext,
+  account: TestAccounts,
+  value: BigNumber
+) {
+  return fundAccount(context, account, value, Token.CELO)
 }
 
 export async function fundAccountWithcUSD(
@@ -26,50 +26,72 @@ export async function fundAccountWithcUSD(
   account: TestAccounts,
   value: BigNumber
 ) {
-  await fundAccountWithStableToken(context, account, value, 'cUSD')
+  await fundAccountWithStableToken(context, account, value, StableToken.cUSD)
 }
 
 export async function fundAccountWithStableToken(
   context: EnvTestContext,
   account: TestAccounts,
   value: BigNumber,
-  stableToken: string
+  stableToken: StableToken
 ) {
+  return fundAccount(context, account, value, stableToken)
+}
+
+async function fundAccount(
+  context: EnvTestContext,
+  account: TestAccounts,
+  value: BigNumber,
+  token: CeloTokenType
+) {
+  const tokenWrapper = await context.kit.celoTokens.getWrapper(token)
+
   const root = await getKey(context.mnemonic, TestAccounts.Root)
-  const recipient = await getKey(context.mnemonic, account)
-  const logger = context.logger.child({
-    index: account,
-    account: root.address,
-    value: value.toString(),
-    address: recipient.address,
-  })
   context.kit.connection.addAccount(root.privateKey)
 
-  const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
+  const recipient = await getKey(context.mnemonic, account)
+  const logger = context.logger.child({
+    token,
+    index: account,
+    root: root.address,
+    value: value.toString(),
+    recipient: recipient.address,
+  })
 
-  const rootBalance = await stableTokenInstance.balanceOf(root.address)
+  const rootBalance = await tokenWrapper.balanceOf(root.address)
   if (rootBalance.lte(value)) {
-    logger.error({ rootBalance: rootBalance.toString() }, 'error funding test account')
+    logger.error({ rootBalance: rootBalance.toString() }, 'Error funding test account')
     throw new Error(
-      `Root account ${root.address}'s ${stableToken} balance (${rootBalance.toPrecision(
+      `Root account ${root.address}'s ${token} balance (${rootBalance.toPrecision(
         4
       )}) is not enough for transferring ${value.toPrecision(4)}`
     )
   }
-  const receipt = await stableTokenInstance
+  const receipt = await tokenWrapper
     .transfer(recipient.address, value.toString())
-    .sendAndWaitForReceipt({ from: root.address, feeCurrency: stableTokenInstance.address })
-
-  logger.debug({ stabletoken: stableToken, receipt }, `funded test account with ${stableToken}`)
+    .sendAndWaitForReceipt({
+      from: root.address,
+      feeCurrency: token === Token.CELO ? undefined : tokenWrapper.address,
+    })
+  logger.info({ rootFundingReceipt: receipt, value }, `Root funded recipient`)
 }
 
-export async function getKey(mnemonic: string, account: TestAccounts) {
-  const key = await generateKeys(mnemonic, undefined, 0, account)
+export async function getValidatorKey(mnemonic: string, index: number): Promise<KeyInfo> {
+  return getKey(mnemonic, index, '')
+}
+
+export async function getKey(
+  mnemonic: string,
+  account: TestAccounts,
+  derivationPath?: string
+): Promise<KeyInfo> {
+  const key = await generateKeys(mnemonic, undefined, 0, account, undefined, derivationPath)
   return { ...key, address: privateKeyToAddress(key.privateKey) }
 }
 
 export enum TestAccounts {
   Root,
+  GrandaMentoExchanger,
   TransferFrom,
   TransferTo,
   Exchange,
@@ -81,13 +103,17 @@ export enum TestAccounts {
 
 export const ONE = new BigNumber('1000000000000000000')
 
-export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensToClear: string[]) {
+export async function clearAllFundsToRoot(
+  context: EnvTestContext,
+  stableTokensToClear: StableToken[]
+) {
   const accounts = Array.from(
     new Array(Object.keys(TestAccounts).length / 2),
     (_val, index) => index
   )
+  // Refund all to root
   const root = await getKey(context.mnemonic, TestAccounts.Root)
-  context.logger.debug({ account: root.address }, 'clear test fund accounts')
+  context.logger.debug({ root: root.address }, 'Clearing funds of test accounts back to root')
   const goldToken = await context.kit.contracts.getGoldToken()
   await concurrentMap(5, accounts, async (_val, index) => {
     if (index === 0) {
@@ -103,7 +129,10 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
       await goldToken
         .transfer(
           root.address,
-          celoBalance.times(0.99).integerValue(BigNumber.ROUND_DOWN).toString()
+          celoBalance
+            .minus(maxBalanceBeforeCollecting)
+            .integerValue(BigNumber.ROUND_DOWN)
+            .toString()
         )
         .sendAndWaitForReceipt({ from: account.address, feeCurrency: undefined })
       context.logger.debug(
@@ -116,11 +145,14 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
       )
     }
     for (const stableToken of stableTokensToClear) {
-      const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
+      const stableTokenInstance = await context.kit.celoTokens.getWrapper(stableToken)
       const balance = await stableTokenInstance.balanceOf(account.address)
       if (balance.gt(maxBalanceBeforeCollecting)) {
         await stableTokenInstance
-          .transfer(root.address, balance.times(0.99).integerValue(BigNumber.ROUND_DOWN).toString())
+          .transfer(
+            root.address,
+            balance.minus(maxBalanceBeforeCollecting).integerValue(BigNumber.ROUND_DOWN).toString()
+          )
           .sendAndWaitForReceipt({
             feeCurrency: stableTokenInstance.address,
             from: account.address,
@@ -141,20 +173,14 @@ export async function clearAllFundsToRoot(context: EnvTestContext, stableTokensT
   })
 }
 
-// This function creates an stabletoken instance from a registry address and the StableToken ABI and wraps it with StableTokenWrapper.
-// It is required for cEUR testing until cEUR stabletoken wrapper is included in ContractKit.
-// Function is supposed to be deprecated as soon as cEUR stabletoken is wrapped.
-export async function initStableTokenFromRegistry(stableToken: string, kit: ContractKit) {
-  const stableTokenAddress = await kit.registry.addressFor(StableTokenToRegistryName[stableToken])
-  const stableTokenContract = newStableToken(kit.web3, stableTokenAddress)
-  return new StableTokenWrapper(kit, stableTokenContract)
-}
+export function parseStableTokensList(stableTokenList: string): StableToken[] {
+  const stableTokenStrs = stableTokenList.split(',')
+  const validStableTokens = Object.values(StableToken)
 
-// This function creates an exchange instance from a registry address and the Exchange ABI and wraps it with ExchangeWrapper.
-// It is required for cEUR testing until cEUR exchange wrapper is included in ContractKit.
-// Function is supposed to be deprecated as soon as cEUR exchange is wrapped.
-export async function initExchangeFromRegistry(stableToken: string, kit: ContractKit) {
-  const exchangeAddress = await kit.registry.addressFor(ExchangeToRegistryName[stableToken])
-  const exchangeContract = newExchange(kit.web3, exchangeAddress)
-  return new ExchangeWrapper(kit, exchangeContract)
+  for (const stableTokenStr of stableTokenStrs) {
+    if (!validStableTokens.includes(stableTokenStr as StableToken)) {
+      throw Error(`String ${stableTokenStr} not a valid StableToken`)
+    }
+  }
+  return stableTokenStrs as StableToken[]
 }

@@ -1,6 +1,6 @@
 {
-  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v1.mainnet/contracts",
-  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/celo-core-contracts-v2.mainnet/contracts",
+  "oldArtifactsFolder": "/home/circleci/app/packages/protocol/build/core-contracts.v1/contracts",
+  "newArtifactsFolder": "/home/circleci/app/packages/protocol/build/core-contracts.v2/contracts",
   "exclude": "/.*Test|Mock.*|I[A-Z].*|.*Proxy|MultiSig.*|ReleaseGold|SlasherUtil|UsingPrecompiles/",
   "report": {
     "contracts": {

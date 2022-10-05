@@ -206,6 +206,7 @@ NEXMO_BLACKLIST='${nexmo_blacklist}'
 NEXMO_UNSUPPORTED_REGIONS='${nexmo_unsupported_regions}'
 TWILIO_ACCOUNT_SID='${twilio_account_sid}'
 TWILIO_MESSAGING_SERVICE_SID='${twilio_messaging_service_sid}'
+TWILIO_VERIFY_SERVICE_SID='${twilio_verify_service_sid}'
 TWILIO_AUTH_TOKEN='${twilio_auth_token}'
 TWILIO_BLACKLIST='${twilio_blacklist}'
 TWILIO_UNSUPPORTED_REGIONS='${twilio_unsupported_regions}'
@@ -256,6 +257,7 @@ save_variable "$NEXMO_SECRET" "$DATA_DIR/nexmoSecret"
 save_variable "$NEXMO_BLACKLIST" "$DATA_DIR/nexmoBlacklist"
 save_variable "$TWILIO_ACCOUNT_SID" "$DATA_DIR/twilioAccountSid"
 save_variable "$TWILIO_MESSAGING_SERVICE_SID" "$DATA_DIR/twilioMessagingServiceSid"
+save_variable "$TWILIO_VERIFY_SERVICE_SID" "$DATA_DIR/twilioVerifyServiceSid"
 save_variable "$TWILIO_AUTH_TOKEN" "$DATA_DIR/twilioAuthToken"
 save_variable "$TWILIO_BLACKLIST" "$DATA_DIR/twilioBlacklist"
 save_variable "$TWILIO_UNSUPPORTED_REGIONS" "$DATA_DIR/twilioUnsupportedRegions"
@@ -291,6 +293,7 @@ ExecStart=/usr/bin/docker run \\
   -e NEXMO_UNSUPPORTED_REGIONS="$NEXMO_UNSUPPORTED_REGIONS" \\
   -e TWILIO_ACCOUNT_SID="$TWILIO_ACCOUNT_SID" \\
   -e TWILIO_MESSAGING_SERVICE_SID="$TWILIO_MESSAGING_SERVICE_SID" \\
+  -e TWILIO_VERIFY_SERVICE_SID="$TWILIO_VERIFY_SERVICE_SID" \\
   -e TWILIO_AUTH_TOKEN="$TWILIO_AUTH_TOKEN" \\
   -e TWILIO_BLACKLIST="$TWILIO_BLACKLIST" \\
   -e TWILIO_UNSUPPORTED_REGIONS="$TWILIO_UNSUPPORTED_REGIONS" \\

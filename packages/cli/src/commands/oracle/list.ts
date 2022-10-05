@@ -1,5 +1,4 @@
 import { CeloContract } from '@celo/contractkit'
-import { stableTokenContractArray } from '@celo/contractkit/lib/base'
 import { BaseCommand } from '../../base'
 import { failWith } from '../../utils/cli'
 
@@ -15,7 +14,6 @@ export default class List extends BaseCommand {
       name: 'token',
       required: true,
       description: 'Token to list the oracles for',
-      options: stableTokenContractArray,
       default: CeloContract.StableToken,
     },
   ]
@@ -26,13 +24,7 @@ export default class List extends BaseCommand {
     const res = this.parse(List)
     const sortedOracles = await this.kit.contracts.getSortedOracles()
 
-    try {
-      await this.kit.registry.addressFor(res.args.token)
-    } catch {
-      failWith(`The ${res.args.token} contract was not deployed yet`)
-    }
-
-    const oracles = await sortedOracles.getOracles(res.args.token)
+    const oracles = await sortedOracles.getOracles(res.args.token).catch((e) => failWith(e))
     console.log(oracles)
   }
 }

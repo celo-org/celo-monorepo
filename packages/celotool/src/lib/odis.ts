@@ -32,6 +32,13 @@ interface ODISSignerDatabaseConfig {
 }
 
 /**
+ * Information for the Blockchain provider connection
+ */
+interface ODISSignerBlockchainConfig {
+  blockchainApiKey: string
+}
+
+/**
  * Information for the ODIS logging
  */
 interface ODISSignerLoggingConfig {
@@ -67,6 +74,15 @@ const contextDatabaseConfigDynamicEnvVars: {
 }
 
 /**
+ * Env vars corresponding to each value for the ODISSignerBlockchainConfig for a particular context
+ */
+const contextBlockchainConfigDynamicEnvVars: {
+  [k in keyof ODISSignerBlockchainConfig]: DynamicEnvVar
+} = {
+  blockchainApiKey: DynamicEnvVar.ODIS_SIGNER_BLOCKCHAIN_API_KEY,
+}
+
+/**
  * Env vars corresponding to each value for the logging for a particular context
  */
 const contextLoggingConfigDynamicEnvVars: {
@@ -82,21 +98,21 @@ function releaseName(celoEnv: string, context: string) {
 }
 
 export async function installODISHelmChart(celoEnv: string, context: string) {
-  return installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, context),
-    helmChartPath,
-    await helmParameters(celoEnv, context)
-  )
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv, context),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv, context),
+  })
 }
 
 export async function upgradeODISChart(celoEnv: string, context: string) {
-  return upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, context),
-    helmChartPath,
-    await helmParameters(celoEnv, context)
-  )
+  return upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv, context),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv, context),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string, context: string) {
@@ -114,6 +130,10 @@ export async function removeHelmRelease(celoEnv: string, context: string) {
 }
 
 async function helmParameters(celoEnv: string, context: string) {
+  const blockchainConfig = getContextDynamicEnvVarValues(
+    contextBlockchainConfigDynamicEnvVars,
+    context
+  )
   const databaseConfig = getContextDynamicEnvVarValues(contextDatabaseConfigDynamicEnvVars, context)
   const keyVaultConfig = getContextDynamicEnvVarValues(
     contextODISSignerKeyVaultConfigDynamicEnvVars,
@@ -140,6 +160,7 @@ async function helmParameters(celoEnv: string, context: string) {
     `--set keystore.vaultName=${keyVaultConfig.vaultName}`,
     `--set keystore.secretName=${keyVaultConfig.secretName}`,
     `--set blockchainProvider=${fetchEnv(envVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER)}`,
+    `--set blockchainApiKey=${blockchainConfig.blockchainApiKey}`,
     `--set log.level=${loggingConfig.level}`,
     `--set log.format=${loggingConfig.format}`,
   ].concat(await ODISSignerKeyVaultIdentityHelmParameters(context, keyVaultConfig))

@@ -5,19 +5,19 @@ import { rootLogger as logger } from '@celo/phone-number-privacy-common'
 import { queryOdisForSalt } from './query'
 
 export async function testQuery() {
-  logger.info('Performing test query')
+  logger().info('Performing test query')
   try {
     const odisResponse: PhoneNumberHashDetails = await queryOdisForSalt()
-    logger.info({ odisResponse }, 'ODIS salt request successful. System is healthy.')
+    logger().info({ odisResponse }, 'ODIS salt request successful. System is healthy.')
   } catch (err) {
     if ((err as Error).message === ErrorMessages.ODIS_QUOTA_ERROR) {
-      logger.info(
+      logger().info(
         { error: err },
         'ODIS salt request out of quota. This is expected. System is healthy.'
       )
     } else {
-      logger.error('ODIS salt request failed.')
-      logger.error({ err })
+      logger().error('ODIS salt request failed.')
+      logger().error({ err })
       throw err
     }
   }

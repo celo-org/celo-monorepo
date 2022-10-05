@@ -30,3 +30,8 @@ types/contracts/*
 coverage/*
 
 deployedGrants.json
+
+# Foundry
+cache/
+out/
+

@@ -6,7 +6,7 @@ import initMB, { MessageBird } from 'messagebird'
 import fetch from 'node-fetch'
 import util from 'util'
 import { fetchEnv } from '../env'
-import { AttestationModel, AttestationStatus } from '../models/attestation'
+import { AttestationStatus, SmsFields } from '../models/attestation'
 import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 import { receivedDeliveryReport } from './index'
 
@@ -97,7 +97,7 @@ export class MessageBirdSmsProvider extends SmsProvider {
     }
   }
 
-  async sendSms(attestation: AttestationModel) {
+  async sendSms(attestation: SmsFields) {
     const reference = randomBytes(8).toString('hex')
     const m = await util.promisify(this.messagebird.messages.create)({
       originator: 'Celo',

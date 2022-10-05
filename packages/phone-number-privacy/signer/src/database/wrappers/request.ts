@@ -13,10 +13,6 @@ export async function getRequestExists(
   request: GetBlindedMessagePartialSigRequest,
   logger: Logger
 ): Promise<boolean> {
-  if (!request.timestamp) {
-    logger.debug('request does not have timestamp')
-    return false
-  }
   logger.debug({ request }, 'Checking if request exists')
   const getRequestExistsMeter = Histograms.dbOpsInstrumentation
     .labels('getRequestExists')
@@ -24,7 +20,6 @@ export async function getRequestExists(
   try {
     const existingRequest = await requests()
       .where({
-        [REQUESTS_COLUMNS.timestamp]: new Date(request.timestamp as number),
         [REQUESTS_COLUMNS.address]: request.account,
         [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
       })
@@ -42,10 +37,6 @@ export async function getRequestExists(
 }
 
 export async function storeRequest(request: GetBlindedMessagePartialSigRequest, logger: Logger) {
-  if (!request.timestamp) {
-    logger.debug('request does not have timestamp')
-    return true
-  }
   const storeRequestMeter = Histograms.dbOpsInstrumentation.labels('storeRequest').startTimer()
   logger.debug({ request }, 'Storing salt request')
   try {

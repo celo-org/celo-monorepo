@@ -24,7 +24,7 @@ export class DoubleSigningSlasherWrapper extends BaseSlasher<DoubleSigningSlashe
    * @param headerB Second double signed block header.
    */
   async slashValidator(validatorAddress: Address, headerA: string, headerB: string) {
-    const validators = await this.kit.contracts.getValidators()
+    const validators = await this.contracts.getValidators()
     const validator = await validators.getValidator(validatorAddress)
     return this.slashSigner(validator.signer, headerA, headerB)
   }
@@ -47,3 +47,5 @@ export class DoubleSigningSlasherWrapper extends BaseSlasher<DoubleSigningSlashe
     )
   }
 }
+
+export type DoubleSigningSlasherWrapperType = DoubleSigningSlasherWrapper

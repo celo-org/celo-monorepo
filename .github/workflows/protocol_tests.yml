@@ -1,0 +1,37 @@
+name: Protocol Foundry tests
+on: [push, pull_request]
+
+jobs:
+  check:
+    defaults:
+      run:
+        working-directory: packages/protocol
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Foundry cache
+        id: foundry-cache
+        uses: actions/cache@v3
+        with:
+          path: ./cache
+          key: ${{ runner.os }}-foundry-cache
+      - name: Foundry out
+        id: foundry-out
+        uses: actions/cache@v3
+        with:
+          path: ./out
+          key: ${{ runner.os }}-foundry-out
+
+      - name: Install Foundry
+        uses: onbjerg/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install forge dependencies
+        run: forge install
+
+      - name: Run tests
+        run: forge test -vvv

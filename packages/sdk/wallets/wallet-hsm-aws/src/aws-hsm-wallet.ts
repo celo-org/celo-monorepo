@@ -54,7 +54,7 @@ export class AwsHsmWallet extends RemoteWallet<AwsHsmSigner> implements ReadOnly
         const publicKey = await this.getPublicKeyFromKeyId(KeyId)
         const address = getAddressFromPublicKey(publicKey)
         addressToSigner.set(address, new AwsHsmSigner(this.kms, KeyId, publicKey))
-      } catch (e) {
+      } catch (e: any) {
         // Safely ignore non-secp256k1 keys
         if (e.name === 'UnsupportedOperationException') {
           debug(`Ignoring non-secp256k1 key ${KeyId}`)

@@ -1,6 +1,7 @@
 import { findAddressIndex } from '@celo/base/lib/address'
 import { CeloTxObject, Contract, toTransactionObject } from '@celo/connect'
-import { BaseWrapper, proxyCall, valueToBigNumber } from './BaseWrapper'
+import { proxyCall, valueToBigNumber } from './BaseWrapper'
+import { BaseWrapperForGoverning } from './BaseWrapperForGoverning'
 
 type TrailingSlasherParams = [
   number | string,
@@ -22,10 +23,10 @@ interface SlasherContract extends Contract {
   }
 }
 
-export class BaseSlasher<T extends SlasherContract> extends BaseWrapper<T> {
+export class BaseSlasher<T extends SlasherContract> extends BaseWrapperForGoverning<T> {
   protected async signerIndexAtBlock(address: string, blockNumber: number) {
-    const election = await this.kit.contracts.getElection()
-    const validators = await this.kit.contracts.getValidators()
+    const election = await this.contracts.getElection()
+    const validators = await this.contracts.getValidators()
     const validator = await validators.getValidator(address, blockNumber)
     return findAddressIndex(validator.signer, await election.getValidatorSigners(blockNumber))
   }
@@ -34,11 +35,11 @@ export class BaseSlasher<T extends SlasherContract> extends BaseWrapper<T> {
     address: string,
     blockNumber: number
   ): Promise<TrailingSlasherParams> {
-    const validators = await this.kit.contracts.getValidators()
+    const validators = await this.contracts.getValidators()
     const account = await validators.validatorSignerToAccount(address)
     const membership = await validators.getValidatorMembershipHistoryIndex(account, blockNumber)
     const incentives = await this.slashingIncentives()
-    const lockedGold = await this.kit.contracts.getLockedGold()
+    const lockedGold = await this.contracts.getLockedGold()
     const lockedGoldValidatorSlash = await lockedGold.computeInitialParametersForSlashing(
       account,
       incentives.penalty
@@ -60,7 +61,7 @@ export class BaseSlasher<T extends SlasherContract> extends BaseWrapper<T> {
   }
 
   protected slash = (...args: Parameters<T['methods']['slash']>) =>
-    toTransactionObject(this.kit.connection, this.contract.methods.slash(...args))
+    toTransactionObject(this.connection, this.contract.methods.slash(...args))
 
   /**
    * Returns slashing incentives.

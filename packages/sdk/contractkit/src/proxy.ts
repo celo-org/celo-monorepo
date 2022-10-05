@@ -9,15 +9,18 @@ import { ABI as ElectionABI } from './generated/Election'
 import { ABI as EpochRewardsABI } from './generated/EpochRewards'
 import { ABI as EscrowABI } from './generated/Escrow'
 import { ABI as ExchangeABI } from './generated/Exchange'
+import { ABI as FederatedAttestationsABI } from './generated/FederatedAttestations'
 import { ABI as FeeCurrencyWhitelistABI } from './generated/FeeCurrencyWhitelist'
 import { ABI as FreezerABI } from './generated/Freezer'
 import { ABI as GasPriceMinimumABI } from './generated/GasPriceMinimum'
 import { ABI as GoldTokenABI } from './generated/GoldToken'
 import { ABI as GovernanceABI } from './generated/Governance'
+import { ABI as GrandaMentoABI } from './generated/GrandaMento'
 import { ABI as LockedGoldABI } from './generated/LockedGold'
 import { ABI as MetaTransactionWalletABI } from './generated/MetaTransactionWallet'
 import { ABI as MetaTransactionWalletDeployerABI } from './generated/MetaTransactionWalletDeployer'
 import { ABI as MultiSigABI } from './generated/MultiSig'
+import { ABI as OdisPaymentsABI } from './generated/OdisPayments'
 import { ABI as ProxyABI } from './generated/Proxy'
 import { ABI as RandomABI } from './generated/Random'
 import { ABI as RegistryABI } from './generated/Registry'
@@ -102,15 +105,19 @@ const initializeAbiMap = {
   EscrowProxy: findInitializeAbi(EscrowABI),
   ExchangeProxy: findInitializeAbi(ExchangeABI),
   ExchangeEURProxy: findInitializeAbi(ExchangeABI),
+  ExchangeBRLProxy: findInitializeAbi(ExchangeABI),
+  FederatedAttestationsProxy: findInitializeAbi(FederatedAttestationsABI),
   FeeCurrencyWhitelistProxy: findInitializeAbi(FeeCurrencyWhitelistABI),
   FreezerProxy: findInitializeAbi(FreezerABI),
   GasPriceMinimumProxy: findInitializeAbi(GasPriceMinimumABI),
   GoldTokenProxy: findInitializeAbi(GoldTokenABI),
   GovernanceProxy: findInitializeAbi(GovernanceABI),
+  GrandaMentoProxy: findInitializeAbi(GrandaMentoABI),
   LockedGoldProxy: findInitializeAbi(LockedGoldABI),
   MetaTransactionWalletProxy: findInitializeAbi(MetaTransactionWalletABI),
   MetaTransactionWalletDeployerProxy: findInitializeAbi(MetaTransactionWalletDeployerABI),
   MultiSigProxy: findInitializeAbi(MultiSigABI),
+  OdisPaymentsProxy: findInitializeAbi(OdisPaymentsABI),
   ProxyProxy: findInitializeAbi(ProxyABI),
   RandomProxy: findInitializeAbi(RandomABI),
   RegistryProxy: findInitializeAbi(RegistryABI),
@@ -118,6 +125,7 @@ const initializeAbiMap = {
   SortedOraclesProxy: findInitializeAbi(SortedOraclesABI),
   StableTokenProxy: findInitializeAbi(StableTokenABI),
   StableTokenEURProxy: findInitializeAbi(StableTokenABI),
+  StableTokenBRLProxy: findInitializeAbi(StableTokenABI),
   TransferWhitelistProxy: findInitializeAbi(TransferWhitelistABI),
   ValidatorsProxy: findInitializeAbi(ValidatorsABI),
 }

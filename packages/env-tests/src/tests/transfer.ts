@@ -1,15 +1,10 @@
+import { StableToken } from '@celo/contractkit'
 import { describe, expect, test } from '@jest/globals'
 import BigNumber from 'bignumber.js'
 import { EnvTestContext } from '../context'
-import {
-  fundAccountWithStableToken,
-  getKey,
-  initStableTokenFromRegistry,
-  ONE,
-  TestAccounts,
-} from '../scaffold'
+import { fundAccountWithStableToken, getKey, ONE, TestAccounts } from '../scaffold'
 
-export function runTransfersTest(context: EnvTestContext, stableTokensToTest: string[]) {
+export function runTransfersTest(context: EnvTestContext, stableTokensToTest: StableToken[]) {
   describe('Transfer Test', () => {
     const logger = context.logger.child({ test: 'transfer' })
 
@@ -22,7 +17,7 @@ export function runTransfersTest(context: EnvTestContext, stableTokensToTest: st
           stableTokenAmountToFund,
           stableToken
         )
-        const stableTokenInstance = await initStableTokenFromRegistry(stableToken, context.kit)
+        const stableTokenInstance = await context.kit.celoTokens.getWrapper(stableToken)
 
         const from = await getKey(context.mnemonic, TestAccounts.TransferFrom)
         const to = await getKey(context.mnemonic, TestAccounts.TransferTo)

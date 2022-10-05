@@ -6,13 +6,13 @@ import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "./interfaces/IMetaTransactionWallet.sol";
 import "./ExternalCall.sol";
-import "./InitializableV2.sol";
+import "./Initializable.sol";
 import "./Signatures.sol";
 
 contract MetaTransactionWallet is
   IMetaTransactionWallet,
   ICeloVersionedContract,
-  InitializableV2,
+  Initializable,
   Ownable
 {
   using SafeMath for uint256;
@@ -59,7 +59,7 @@ contract MetaTransactionWallet is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @dev Fallback function allows to deposit ether.
@@ -70,10 +70,13 @@ contract MetaTransactionWallet is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
+    return (1, 1, 1, 1);
   }
 
   /**
@@ -260,7 +263,8 @@ contract MetaTransactionWallet is
    * @param values The CELO value to be sent with each transaction.
    * @param data The concatenated data to be sent in each transaction.
    * @param dataLengths The length of each transaction's data.
-   * @return The return values of all transactions appended as bytes and an array of the length
+   * @return All transactions appended as bytes
+   * @return An array of the length
    *         of each transaction output which will be 0 if a transaction had no output 
    */
   function executeTransactions(

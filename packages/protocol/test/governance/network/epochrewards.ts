@@ -64,9 +64,9 @@ contract('EpochRewards', (accounts: string[]) => {
   const nonOwner = accounts[1]
 
   const targetVotingYieldParams = {
-    initial: toFixed(new BigNumber(1 / 20)),
-    max: toFixed(new BigNumber(1 / 5)),
-    adjustmentFactor: toFixed(new BigNumber(1 / 365)),
+    initial: toFixed(new BigNumber(0.00016)),
+    max: toFixed(new BigNumber(0.0005)),
+    adjustmentFactor: toFixed(new BigNumber(0.00000112799)),
   }
   const rewardsMultiplier = {
     max: toFixed(new BigNumber(2)),
@@ -81,7 +81,7 @@ contract('EpochRewards', (accounts: string[]) => {
   const carbonOffsettingPartner = '0x0000000000000000000000000000000000000000'
   const targetValidatorEpochPayment = new BigNumber(10000000000000)
   const exchangeRate = 7
-  const sortedOraclesDenominator = new BigNumber('0x10000000000000000')
+  const sortedOraclesDenominator = new BigNumber('1000000000000000000000000')
   const timeTravelToDelta = async (timeDelta: BigNumber) => {
     // mine beforehand, just in case
     await jsonRpc(web3, 'evm_mine', [])
@@ -100,8 +100,8 @@ contract('EpochRewards', (accounts: string[]) => {
     mockGoldToken = await MockGoldToken.new()
     mockStableToken = await MockStableToken.new()
     mockSortedOracles = await MockSortedOracles.new()
-    freezer = await Freezer.new()
-    registry = await Registry.new()
+    freezer = await Freezer.new(true)
+    registry = await Registry.new(true)
     await registry.setAddressFor(CeloContractName.Election, mockElection.address)
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
     await registry.setAddressFor(CeloContractName.GoldToken, mockGoldToken.address)
@@ -575,9 +575,9 @@ contract('EpochRewards', (accounts: string[]) => {
   })
 
   describe('#updateTargetVotingYield()', () => {
-    // Arbitrary numbers
-    const totalSupply = new BigNumber(129762987346298761037469283746)
-    const reserveBalance = new BigNumber(2397846127684712867321)
+    // test numbers
+    const totalSupply = new BigNumber(web3.utils.toWei('6000000'))
+    const reserveBalance = new BigNumber(web3.utils.toWei('1000000'))
     const floatingSupply = totalSupply.minus(reserveBalance)
     let reserve: ReserveInstance
 
@@ -651,6 +651,268 @@ contract('EpochRewards', (accounts: string[]) => {
       it('should decrease the target voting yield by 10% times the adjustment factor', async () => {
         const expected = fromFixed(
           targetVotingYieldParams.initial.minus(targetVotingYieldParams.adjustmentFactor.times(0.1))
+        )
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    describe('when the percentage of voting gold is 0%', () => {
+      beforeEach(async () => {
+        const totalVotes = toFixed(new BigNumber(0))
+        await mockElection.setTotalVotes(totalVotes)
+        await epochRewards.updateTargetVotingYield()
+      })
+
+      it('should increase the target voting yield by the target voting gold percentage times adjustment factor', async () => {
+        const expected = fromFixed(
+          targetVotingYieldParams.initial.plus(
+            targetVotingYieldParams.adjustmentFactor.times(fromFixed(targetVotingGoldFraction))
+          )
+        )
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    describe('when the percentage of voting gold is 30%', () => {
+      beforeEach(async () => {
+        const votingFraction = 0.3
+        const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
+        await mockElection.setTotalVotes(totalVotes)
+        await epochRewards.updateTargetVotingYield()
+      })
+
+      it('should decrease the target voting yield by |votingFraction-target voting gold percentage| times adjustment factor', async () => {
+        const votingFraction = 0.3
+        const expected = fromFixed(
+          targetVotingYieldParams.initial.plus(
+            targetVotingYieldParams.adjustmentFactor.times(
+              fromFixed(targetVotingGoldFraction.minus(toFixed(votingFraction)))
+            )
+          )
+        )
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    describe('when the percentage of voting gold is 90%', () => {
+      beforeEach(async () => {
+        const votingFraction = 0.9
+        const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
+        await mockElection.setTotalVotes(totalVotes)
+        await epochRewards.updateTargetVotingYield()
+      })
+
+      it('should decrease the target voting yield by (votingFraction-target voting gold percentage) times adjustment factor', async () => {
+        const votingFraction = 0.9
+        const expected = fromFixed(
+          targetVotingYieldParams.initial.plus(
+            targetVotingYieldParams.adjustmentFactor.times(
+              fromFixed(targetVotingGoldFraction.minus(toFixed(votingFraction)))
+            )
+          )
+        )
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    describe('when the percentage of voting gold is 100%', () => {
+      beforeEach(async () => {
+        const votingFraction = 1.0
+        const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
+
+        await mockElection.setTotalVotes(totalVotes)
+        await epochRewards.updateTargetVotingYield()
+      })
+
+      it('should decrease the target voting yield by (100 - target voting gold percentage) times adjustment factor', async () => {
+        const votingFraction = 1.0
+        const expected = fromFixed(
+          targetVotingYieldParams.initial.plus(
+            targetVotingYieldParams.adjustmentFactor.times(
+              fromFixed(targetVotingGoldFraction.minus(toFixed(votingFraction)))
+            )
+          )
+        )
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    // Maximum target voting yield is enforced
+    describe('When target voting yield is increased by adjustment factor', () => {
+      beforeEach(async () => {
+        const votingFraction = 0.1
+        const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
+        await mockElection.setTotalVotes(totalVotes)
+        // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
+        for (let i = 0; i < 600; i++) {
+          await epochRewards.updateTargetVotingYield()
+        }
+      })
+
+      it('maximum target voting yield should be enforced', async () => {
+        const expected = fromFixed(targetVotingYieldParams.max)
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    // Minimum target voting yield is enforced
+    describe('When target voting yield is decreased by adjustment factor', () => {
+      beforeEach(async () => {
+        const votingFraction = 0.89
+        const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
+        await mockElection.setTotalVotes(totalVotes)
+        // naive time travel: mining takes too long, just repeatedly update target voting yield. One call is one epoch travelled
+        for (let i = 0; i < 800; i++) {
+          await epochRewards.updateTargetVotingYield()
+        }
+      })
+
+      it('minimum target voting yield of 0 should be enforced', async () => {
+        const expected = fromFixed(toFixed(0))
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    // test several epochs of the same adjustment in a row
+    describe('When voting fraction remains below target 5 epochs in a row', () => {
+      beforeEach(async () => {
+        const votingFraction = 0.3
+        const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
+        await mockElection.setTotalVotes(totalVotes)
+        // naive time travel: mining blocks takes too long, just repeatedly update target voting yield. One call is one epoch travelled
+        for (let i = 0; i < 5; i++) {
+          await epochRewards.updateTargetVotingYield()
+        }
+      })
+
+      it('target voting yield should be increased 5 times as expected', async () => {
+        const expected = fromFixed(
+          targetVotingYieldParams.initial.plus(
+            targetVotingYieldParams.adjustmentFactor
+              .times(fromFixed(targetVotingGoldFraction).minus(0.3))
+              .times(fromFixed(toFixed(5)))
+          )
+        )
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    describe('When voting fraction remains above target 5 epochs in a row', () => {
+      beforeEach(async () => {
+        const votingFraction = 0.8
+        const totalVotes = floatingSupply.times(votingFraction).integerValue(BigNumber.ROUND_FLOOR)
+        await mockElection.setTotalVotes(totalVotes)
+        // naive time travel: mining blocks takes too long, just repeatedly update target voting yield. One call is one epoch travelled
+        for (let i = 0; i < 5; i++) {
+          await epochRewards.updateTargetVotingYield()
+        }
+      })
+
+      it('target voting yield should be decreased 5 times as expected', async () => {
+        const votingFraction = toFixed(0.8)
+        const expected = fromFixed(
+          targetVotingYieldParams.initial.minus(
+            targetVotingYieldParams.adjustmentFactor
+              .times(fromFixed(votingFraction).minus(fromFixed(targetVotingGoldFraction)))
+              .times(fromFixed(toFixed(5)))
+          )
+        )
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    // test over several epochs when voting fraction fluctuates around target
+    describe('When votingFraction fluctuates around the target', () => {
+      beforeEach(async () => {
+        const votingFractionArray = [0.8, 0.3, 2 / 3]
+
+        for (const votingFractionElement of votingFractionArray) {
+          const totalVotes = floatingSupply
+            .times(votingFractionElement)
+            .integerValue(BigNumber.ROUND_FLOOR)
+          await mockElection.setTotalVotes(totalVotes)
+          await epochRewards.updateTargetVotingYield()
+        }
+      })
+
+      it('target voting yield should be adjusted as expected', async () => {
+        const votingFractionArray = [0.8, 0.3, 2 / 3]
+
+        let expected = targetVotingYieldParams.initial
+        for (const votingFractionElement of votingFractionArray) {
+          expected = expected.plus(
+            targetVotingYieldParams.adjustmentFactor.times(
+              fromFixed(targetVotingGoldFraction.minus(toFixed(votingFractionElement)))
+            )
+          )
+        }
+        expected = fromFixed(expected)
+
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    describe('When target voting yield is increased over 365 epochs by adjustment factor', () => {
+      beforeEach(async () => {
+        const totalVotes = floatingSupply
+          .times(fromFixed(targetVotingGoldFraction).minus(0.1))
+          .integerValue(BigNumber.ROUND_FLOOR)
+        await mockElection.setTotalVotes(totalVotes)
+        // naive time travel: mining takes to long, just repeatedly update target voting yield. One call is one epoch travelled
+        for (let i = 0; i < 365; i++) {
+          await epochRewards.updateTargetVotingYield()
+        }
+      })
+
+      it('the target voting yield should change as expected', async () => {
+        const expected = fromFixed(
+          targetVotingYieldParams.initial.plus(
+            targetVotingYieldParams.adjustmentFactor.times(0.1).times(365)
+          )
+        )
+        const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
+        // Assert equal to 9 decimal places due to fixidity imprecision.
+        assert.equal(expected.dp(9).toFixed(), actual.dp(9).toFixed())
+      })
+    })
+
+    describe('When target voting yield is decreased over 365 epochs by adjustment factor', () => {
+      beforeEach(async () => {
+        const totalVotes = floatingSupply
+          .times(fromFixed(targetVotingGoldFraction).plus(0.1))
+          .integerValue(BigNumber.ROUND_FLOOR)
+        await mockElection.setTotalVotes(totalVotes)
+        // naive time travel: mining takes to long, just repeatedly update target voting yield. One call is one epoch travelled
+        for (let i = 0; i < 365; i++) {
+          await epochRewards.updateTargetVotingYield()
+        }
+      })
+
+      it('the target voting yield should change as expected', async () => {
+        const expected = fromFixed(
+          targetVotingYieldParams.initial.minus(
+            targetVotingYieldParams.adjustmentFactor.times(0.1).times(365)
+          )
         )
         const actual = fromFixed((await epochRewards.getTargetVotingYieldParameters())[0])
         // Assert equal to 9 decimal places due to fixidity imprecision.

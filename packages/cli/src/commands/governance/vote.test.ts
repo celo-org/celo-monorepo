@@ -1,8 +1,7 @@
 import { Address } from '@celo/connect'
 import { newKitFromWeb3 } from '@celo/contractkit'
-import { GovernanceWrapper, Proposal } from '@celo/contractkit/lib/wrappers/Governance'
+import { GovernanceWrapper } from '@celo/contractkit/lib/wrappers/Governance'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
-import { ProposalBuilder } from '@celo/governance'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
 import Register from '../account/register'
@@ -27,10 +26,8 @@ testWithGanache('governance:vote cmd', (web3: Web3) => {
     accounts = await web3.eth.getAccounts()
     kit.defaultAccount = accounts[0]
     governance = await kit.contracts.getGovernance()
-    let proposal: Proposal
-    proposal = await new ProposalBuilder(kit).build()
     await governance
-      .propose(proposal, 'URL')
+      .propose([], 'URL')
       .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
     await timeTravel(expConfig.dequeueFrequency, web3)
     await Dequeue.run(['--from', accounts[0]])

@@ -1,37 +1,23 @@
-import bodyParser from 'body-parser'
 import Logger from 'bunyan'
 import express from 'express'
 import twilio, { Twilio } from 'twilio'
-import { fetchEnv } from '../env'
-import { AttestationModel, AttestationStatus } from '../models/attestation'
-import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
+import { AttestationStatus, SmsFields } from '../models/attestation'
+import { SmsProvider, SmsProviderType } from './base'
 import { receivedDeliveryReport } from './index'
 
-export class TwilioSmsProvider extends SmsProvider {
-  static fromEnv() {
-    return new TwilioSmsProvider(
-      fetchEnv('TWILIO_ACCOUNT_SID'),
-      fetchEnv('TWILIO_MESSAGING_SERVICE_SID'),
-      fetchEnv('TWILIO_AUTH_TOKEN'),
-      readUnsupportedRegionsFromEnv('TWILIO_UNSUPPORTED_REGIONS', 'TWILIO_BLACKLIST')
-    )
-  }
-
+export abstract class TwilioSmsProvider extends SmsProvider {
   client: Twilio
-  messagingServiceSid: string
   type = SmsProviderType.TWILIO
   deliveryStatusURL: string | undefined
 
-  constructor(
-    twilioSid: string,
-    messagingServiceSid: string,
-    twilioAuthToken: string,
-    unsupportedRegionCodes: string[]
-  ) {
+  constructor(twilioSid: string, twilioAuthToken: string, unsupportedRegionCodes: string[]) {
     super()
     this.client = twilio(twilioSid, twilioAuthToken)
-    this.messagingServiceSid = messagingServiceSid
     this.unsupportedRegionCodes = unsupportedRegionCodes
+  }
+
+  initialize(deliveryStatusURL?: string) {
+    this.deliveryStatusURL = deliveryStatusURL
   }
 
   async receiveDeliveryStatusReport(req: express.Request, logger: Logger) {
@@ -63,28 +49,16 @@ export class TwilioSmsProvider extends SmsProvider {
 
   deliveryStatusHandlers() {
     return [
-      bodyParser.urlencoded({ extended: false }),
+      express.urlencoded({ extended: false }),
       twilio.webhook({ url: this.deliveryStatusURL! }),
     ]
   }
 
-  async initialize(deliveryStatusURL: string) {
-    // Ensure the messaging service exists
-    try {
-      await this.client.messaging.services.get(this.messagingServiceSid).fetch()
-      this.deliveryStatusURL = deliveryStatusURL
-    } catch (error) {
-      throw new Error(`Twilio Messaging Service could not be fetched: ${error}`)
-    }
-  }
-
-  async sendSms(attestation: AttestationModel) {
-    const m = await this.client.messages.create({
-      body: attestation.message,
-      to: attestation.phoneNumber,
-      from: this.messagingServiceSid,
-      statusCallback: this.deliveryStatusURL,
-    })
-    return m.sid
+  async sendSms(_attestation: SmsFields): Promise<string> {
+    throw new Error('Not implemented')
   }
 }
+
+// Importing in index directly from the files causes a circular import error
+export { TwilioMessagingProvider } from './twilioMessaging'
+export { TwilioVerifyProvider } from './twilioVerify'

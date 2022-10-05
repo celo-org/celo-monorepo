@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "rewards-relayer-name" . }}
+  labels:
+{{ include "labels" . | indent 4 }}
+{{ include "komenci-rewards-relayer-component-label" . | indent 4 }}
+spec:
+  ports:
+  - name: http
+    port: 3000
+  clusterIP: None
+  selector:
+{{ include "komenci-rewards-relayer-component-label" . | indent 4 }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "rewards-relayer-name" . }}
+  labels:
+{{ include "labels" . | indent 4 }}
+{{ include "komenci-rewards-relayer-component-label" . | indent 4 }}
+spec:
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  replicas: {{ .Values.rewards.relayer.replicas }}
+  serviceName: relayer
+  selector:
+    matchLabels:
+{{ include "labels" . | indent 6 }}
+{{ include "komenci-rewards-relayer-component-label" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{ include "labels" . | indent 8 }}
+{{ include "komenci-rewards-relayer-component-label" . | indent 8 }}
+      annotations:
+{{ if .Values.rewards.relayer.metrics.enabled }}
+{{ include "metric-annotations" . | indent 8 }}
+{{ end }}
+    spec:
+      initContainers:
+      - name: set-label
+        image: {{ .Values.kubectl.image.repository }}:{{ .Values.kubectl.image.tag }}
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - |
+          RID=${POD_NAME##*-}
+          TOKEN_ENV_VAR_NAME="TOKEN_$RID"
+          kubectl \
+          --namespace "$POD_NAMESPACE" \
+          --server="https://kubernetes.default.svc" \
+          --token="${!TOKEN_ENV_VAR_NAME}" \
+          --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt" \
+          label pod "$POD_NAME" \
+          --overwrite \
+          "aadpodidbinding=$POD_NAME-identity-binding"
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        {{ range $index, $e := .Values.kube.rewardsServiceAccountSecretNames }}
+        - name: TOKEN_{{ $index }}
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: {{ $e }}
+        {{ end }}
+      containers:
+      - name: komenci-rewards-relayer
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: Always
+        ports:
+          - name: prometheus
+            containerPort: {{ .Values.rewards.relayer.metrics.prometheusPort }}
+          - name: relayer
+            containerPort: 3000
+        command:
+          - bash
+          - "-c"
+          - |
+            [[ $REPLICA_NAME =~ -([0-9]+)$ ]] || exit 1
+            RID=${BASH_REMATCH[1]}
+
+            # Get the correct key vault name. If this relayer's identity is not
+            # using Azure HSM signing, the key vault name will be empty and ignored
+            AZURE_KEY_VAULT_NAMES={{- range $index, $identity := .Values.rewards.relayer.identities -}}{{- if (hasKey $identity "azure" ) -}}{{ $identity.azure.keyVaultName | default "" }}{{- end }},{{- end }}
+            export AZURE_KEY_NAME=`echo -n $AZURE_KEY_VAULT_NAMES | cut -d ',' -f $((RID + 1))`
+            export AZURE_VAULT_NAME=`echo -n $AZURE_KEY_VAULT_NAMES | cut -d ',' -f $((RID + 1))`
+
+            # Get the correct relayer account address
+            ADDRESSES={{- range $index, $identity := .Values.rewards.relayer.identities -}}{{ $identity.address }},{{- end }}
+            export WALLET_ADDRESS=`echo -n $ADDRESSES | cut -d ',' -f $((RID + 1))`
+            
+            node packages/apps/relayer/dist/main.js
+        env:
+        - name: REPLICA_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+{{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_TRY_COUNT" "dict" .Values.komenci.azureHsm "value_name" "initTryCount") | indent 8 }}
+{{ include "common.env-var" (dict "name" "AZURE_HSM_INIT_MAX_RETRY_BACKOFF_MS" "dict" .Values.komenci.azureHsm "value_name" "initMaxRetryBackoffMs") | indent 8 }}
+{{ include "common.env-var" (dict "name" "METRICS" "dict" .Values.rewards.relayer.metrics "value_name" "enabled") | indent 8 }}
+{{ include "common.env-var" (dict "name" "OVERRIDE_INDEX" "dict" .Values.rewards.relayer "value_name" "overrideIndex" "optional" true) | indent 8 }}
+{{ include "common.env-var" (dict "name" "PROMETHEUS_PORT" "dict" .Values.rewards.relayer.metrics "value_name" "prometheusPort") | indent 8 }}
+{{ include "common.env-var" (dict "name" "NODE_ENV" "dict" .Values.rewards.relayer "value_name" "node_env") | indent 8 }}
+{{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.rewards.relayer "value_name" "port") | indent 8 }}
+{{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.environment "value_name" "network") | indent 8 }}
+{{ include "common.env-var" (dict "name" "WALLET_TYPE" "dict" .Values.rewards.relayer "value_name" "walletType") | indent 8 }}
+{{ include "common.env-var" (dict "name" "GAS_PRICE_UPDATE_INTERVAL_MS" "dict" .Values.rewards.relayer "value_name" "gasPriceUpdateIntervalMs") | indent 8 }}
+        readinessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 20

@@ -1,11 +1,11 @@
 import {
-  formatNonAccentedCharacters,
   generateKeys,
   generateMnemonic,
   MnemonicLanguages,
   MnemonicStrength,
+  normalizeMnemonic,
   validateMnemonic,
-} from '@celo/utils/lib/account'
+} from '@celo/cryptographic-utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { toChecksumAddress } from 'ethereumjs-util'
@@ -101,7 +101,7 @@ export default class NewAccount extends BaseCommand {
     const res = this.parse(NewAccount)
     let mnemonic = NewAccount.readFile(res.flags.mnemonicPath)
     if (mnemonic) {
-      mnemonic = formatNonAccentedCharacters(mnemonic)
+      mnemonic = normalizeMnemonic(mnemonic)
       if (!validateMnemonic(mnemonic)) {
         throw Error('Invalid mnemonic. Should be a bip39 mnemonic')
       }

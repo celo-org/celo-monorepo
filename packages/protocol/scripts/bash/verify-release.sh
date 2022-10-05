@@ -37,8 +37,6 @@ done
 [ -z "$NETWORK" ] && echo "Need to set the network via the -n flag" && exit 1;
 [ -z "$PROPOSAL" ] && echo "Need to set the proposal via the -p flag" && exit 1;
 
-git fetch origin +'refs/tags/celo-core-contracts*:refs/tags/celo-core-contracts*' >> $LOG_FILE
-
 source scripts/bash/release-lib.sh
 build_tag $BRANCH $LOG_FILE
 

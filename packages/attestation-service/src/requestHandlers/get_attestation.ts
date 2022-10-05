@@ -1,6 +1,6 @@
-import { PhoneNumberUtils } from '@celo/utils'
+import { PhoneNumberUtils } from '@celo/phone-utils'
+import { GetAttestationRequest } from '@celo/phone-utils/lib/io'
 import { isValidAddress, publicKeyToAddress } from '@celo/utils/lib/address'
-import { GetAttestationRequest } from '@celo/utils/lib/io'
 import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import Logger from 'bunyan'
@@ -77,7 +77,12 @@ class GetAttestationRequestHandler {
       }
 
       // Security code is supplied. Check it's correct.
-      if (attestation.securityCode === this.getRequest.securityCode) {
+      // Check with both methods (can remove second method after 1.3.0)
+      if (
+        attestation.securityCode &&
+        (attestation.securityCode.slice(1) === this.getRequest.securityCode ||
+          attestation.securityCode === this.getRequest.securityCode)
+      ) {
         callback(attestation, attestation.attestationCode)
         await transaction.commit()
         return
@@ -132,7 +137,7 @@ export async function handleGetAttestationRequest(
     await handler.withAttestationAndSecurityCodeChecked((attestation, attestationCode) => {
       respondWithAttestation(res, attestation, true, undefined, attestationCode)
     })
-  } catch (error) {
+  } catch (error: any) {
     if (!error.responseCode) {
       res.locals.logger.error({ error })
     } else {

@@ -1,9 +1,11 @@
 import { Provider } from '../types'
 
+/** @internal */
 export function hasProperty<T>(object: any, property: string): object is T {
   return property in object
 }
 
+/** @internal */
 export function stopProvider(defaultProvider: Provider) {
   if (hasProperty<{ stop: () => void }>(defaultProvider, 'stop')) {
     defaultProvider.stop()

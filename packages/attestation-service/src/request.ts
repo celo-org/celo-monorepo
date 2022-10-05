@@ -1,4 +1,4 @@
-import { AttestationResponseType } from '@celo/utils/lib/io'
+import { AttestationResponseType } from '@celo/phone-utils/lib/io'
 import Logger from 'bunyan'
 import express from 'express'
 import { isLeft } from 'fp-ts/lib/Either'
@@ -28,8 +28,8 @@ export function asyncHandler<T>(handler: (req: express.Request, res: Response) =
       handler(req, res)
         .then(() => res.locals.logger.info({ res }))
         .catch(handleUnknownError)
-    } catch (error) {
-      handleUnknownError(error)
+    } catch (error: any) {
+      handleUnknownError(error instanceof Error ? error : new Error(error))
     }
   }
 }

@@ -14,18 +14,21 @@ testWithGanache('releasegold:refund-and-finalize cmd', (web3: Web3) => {
   let kit: ContractKit
 
   beforeEach(async () => {
-    const contractCanValidate = false
     contractAddress = await getContractFromEvent(
       'ReleaseGoldInstanceCreated(address,address)',
       web3,
-      contractCanValidate
+      { index: 1 } // revocable = true
     )
     kit = newKitFromWeb3(web3)
   })
 
   test('can refund gold', async () => {
     await Revoke.run(['--contract', contractAddress, '--yesreally'])
-    const releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
+    const releaseGoldWrapper = new ReleaseGoldWrapper(
+      kit.connection,
+      newReleaseGold(web3, contractAddress),
+      kit.contracts
+    )
     const refundAddress = await releaseGoldWrapper.getRefundAddress()
     const balanceBefore = await kit.getTotalBalance(refundAddress)
     await RefundAndFinalize.run(['--contract', contractAddress])

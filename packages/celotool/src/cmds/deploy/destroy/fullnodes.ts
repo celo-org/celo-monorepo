@@ -16,6 +16,6 @@ export const handler = async (argv: FullNodeDestroyArgv) => {
   exitIfCelotoolHelmDryRun()
   await switchToContextCluster(argv.celoEnv, argv.context)
   await removeFullNodeChart(argv.celoEnv, argv.context)
-  await removeKubectlAnnotateKSA(argv.celoEnv)
-  await delinkSAForWorkloadIdentity(argv.celoEnv)
+  await removeKubectlAnnotateKSA(argv.celoEnv, argv.context)
+  await delinkSAForWorkloadIdentity(argv.celoEnv, argv.context)
 }

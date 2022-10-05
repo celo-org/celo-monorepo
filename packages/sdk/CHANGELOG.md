@@ -1,22 +1,95 @@
 # Changelog
-All notable changes to the [Celo SDK](https://docs.celo.org/developer-guide/sdk-code-reference) will be documented in this file. 
+All notable changes to the [Celo SDK](https://docs.celo.org/developer-guide/sdk-code-reference) will be documented in this file.
 
 This package will follow the release process outlined [here](https://docs.celo.org/community/release-process).
 
-
-## Development (not published yet)
-### **[1.2.2--dev]**
-Features
--  one-line summary - [#](link PR)
 
 Bug Fixes
 -  one-line summary - [#](link PR)
 
 Other Changes
 -  one-line summary - [#](link PR)
+-  migrated @celo/wallet-walletconnect from celo/celo-monorepo to celo/use-contractkit
+
+
+## Development (not published yet)
+
+### **[2.0.0]**
+
+See [Upgrade Guide](https://docs.celo.org/developer-guide/contractkit/migrating-to-contractkit-v2)
+
+Breaking Changes
+
+for detail info see [#9127](https://github.com/celo-org/celo-monorepo/pull/9127)
+
+- @celo/contractkit
+  - AccountsWrapper.authorizeValidatorSigner now requires a ValidatorWrapper as third param
+  - kit is now longer required when constructing WrapperCache, AddressRegistry, Contract Wrappers
+  - proxySend now takes a Connection rather than a Kit
+
+- @celo/utils
+
+  - Removes phone and country related functions from utils. Now in [phone-utils](https://github.com/celo-org/celo-monorepo/pull/8987)
+
+  - comment encryption, bls and mneumonic functions moved to @celo/cryptographic-utils
+
+
+Features
+
+- All Packages Now marked as Side Effect: false
+
+- Bundle Sized Reduced 45%
+
+- Adds the @celo/encrypted-backup package - [#8896] [#9348] [#9413] [#9434]
+
+[#8896]: https://github.com/celo-org/celo-monorepo/pull/8896
+[#9348]: https://github.com/celo-org/celo-monorepo/pull/9348
+[#9413]: https://github.com/celo-org/celo-monorepo/pull/9413
+[#9434]: https://github.com/celo-org/celo-monorepo/pull/9434
+
+Bug Fixes / Package Updates
+
+- Upgrades bls12377, bip32,
+
 
 
 ## Published
+
+### **[1.5.0]**
+Features
+- Adds cREAL support to contract kit [#9040](https://github.com/celo-org/celo-monorepo/pull/9040)
+
+### **[1.4.2]**
+Bug Fixes
+-  Fixes wallet connect issue in @celo/wallet-walletconnect
+
+
+### **[1.2.2]** -- 2021-07-08
+Features
+- new package: JS keystore support [#8096](https://github.com/celo-org/celo-monorepo/pull/8096)
+- Add euro in the currencies enum [#7786](https://github.com/celo-org/celo-monorepo/pull/7786)
+- CIP10 contracts changes [#5913](https://github.com/celo-org/celo-monorepo/pull/5913)
+- Use Node 12 [#7851](https://github.com/celo-org/celo-monorepo/pull/7851)
+- Add token address support to oracle commands [#8010](https://github.com/celo-org/celo-monorepo/pull/8010)
+- Add manual personal_decrypt flow to WalletConnect CLI client [#8037](https://github.com/celo-org/celo-monorepo/pull/8037)
+- Account utilities for normalization and heuristic based correction of mnemonic phrases [#8034] (https://github.com/celo-org/celo-monorepo/pull/8034)
+- Add getBlockHeader utilities to connect package [#8213](https://github.com/celo-org/celo-monorepo/pull/8213)
+- Granda Mento smart contract implementation [#8129](https://github.com/celo-org/celo-monorepo/pull/8129)
+
+Bug Fixes
+- Fix governance:build-proposal bigNumber bug [#8028](https://github.com/celo-org/celo-monorepo/pull/8028)
+- Remove ERC20 from core contracts [#8212](https://github.com/celo-org/celo-monorepo/pull/8212)
+
+Other Changes
+- celocli: transfer:erc20 and balance commands [#7753](https://github.com/celo-org/celo-monorepo/pull/7753)
+- Tutorial: Integrating WalletConnect into your DApp [#7802](https://github.com/celo-org/celo-monorepo/pull/7802)
+- chore: remove @umpirsky/country-list package to save space [#7895](https://github.com/celo-org/celo-monorepo/pull/7895)
+- Add script for running + testing eth_signTypedData [#7951](https://github.com/celo-org/celo-monorepo/pull/7951)
+- Bump walletConnect version [#8012](https://github.com/celo-org/celo-monorepo/pull/8012)
+- Upgrade vulnerable dependencies [#8073](https://github.com/celo-org/celo-monorepo/pull/8073)
+- Add more params to status endpoint [#8125](https://github.com/celo-org/celo-monorepo/pull/8125)
+- Add check for phrase length in mnemonic phrase correction [#8146](https://github.com/celo-org/celo-monorepo/pull/8146)
+- JS Keystore Docs (with updated file structure) [#8185](https://github.com/celo-org/celo-monorepo/pull/8185)
 
 ### **[1.2.1]** (only utils and base) -- 2021-04-22
 
@@ -121,4 +194,3 @@ Other Changes
 - Modified version of #6474: Fix dependencies to work on standalone installations and in environments without Git [#6516](https://github.com/celo-org/celo-monorepo/pull/6516)
 
 _Note: Changes before and including 1.0.0 are not documented_
-

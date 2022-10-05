@@ -1,6 +1,0 @@
-* [Globals](globals.md)
-* [Modules]()
-  * [remote-wallet](modules/_remote_wallet_.md)
-  * [RemoteWallet](classes/_remote_wallet_.remotewallet.md)
-* [Classes]()
-  * [RemoteWallet](classes/_remote_wallet_.remotewallet.md)

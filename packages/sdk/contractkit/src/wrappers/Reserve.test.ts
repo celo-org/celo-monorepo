@@ -1,4 +1,5 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import BigNumber from 'bignumber.js'
 import { newKitFromWeb3 } from '../kit'
 import { MultiSigWrapper } from './MultiSig'
 import { ReserveWrapper } from './Reserve'
@@ -20,6 +21,23 @@ testWithGanache('Reserve Wrapper', (web3) => {
     // assumes that the multisig is the most recent spender in the spenders array
     const multiSigAddress = spenders.length > 0 ? spenders[spenders.length - 1] : ''
     reserveSpenderMultiSig = await kit.contracts.getMultiSig(multiSigAddress)
+  })
+
+  test('can get asset target weights which sum to 100%', async () => {
+    const targets = await reserve.getAssetAllocationWeights()
+    expect(targets.reduce((total, current) => total.plus(current), new BigNumber(0))).toEqual(
+      new BigNumber(100 * 10_000_000_000_000_000_000_000)
+    )
+  })
+
+  test('can get asset target symbols ', async () => {
+    const targets = await reserve.getAssetAllocationSymbols()
+
+    const expectation = ['cGLD', 'BTC', 'ETH', 'DAI']
+
+    targets.forEach((sym, i) => {
+      expect(sym).toEqual(expect.stringMatching(expectation[i]))
+    })
   })
 
   test('can get reserve unfrozen balance ', async () => {

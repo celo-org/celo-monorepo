@@ -19,11 +19,9 @@
 
 This is a living document! Please edit and update it as part of your onboarding process :-)
 
-
 ## Reading
 
-Review the README from each directory in [packages](packages/). The [protocol](packages/protocol) and [mobile](packages/mobile) packages are good starting points.
-
+Review the README from each directory in [packages](packages/). The [protocol](packages/protocol) is a good starting point.
 
 ## Getting everything installed
 
@@ -33,26 +31,22 @@ Follow these steps to get everything that you need installed to build the celo-m
 
 #### Install Go
 
-We need Go for [celo-blockchain], the Go Celo implementation, and `gobind` to build Java language bindings to Go code for the Android Geth client).
+We need Go for [celo-blockchain](https://github.com/celo-org/celo-blockchain), the Go Celo implementation, and `gobind` to build Java language bindings to Go code for the Android Geth client.
 
-Note: We currently use Go 1.13. [Install Go 1.13 manually](https://golang.org/dl/), then run
+For go installation instructions see [celo-blockchain instructions](https://github.com/celo-org/celo-blockchain#building-the-source).
 
-```
-go get golang.org/x/mobile/cmd/gobind
-```
+Once you have go installed run the following to install gobind
 
-Execute the following (and make sure the lines are in your `~/.bash_profile`):
+`go get golang.org/x/mobile/cmd/gobind`
 
-```
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
-```
 
 #### Install Node
 
-Install `nvm` (allows you to manage multiple versions of Node) by following the instructions here: [https://github.com/nvm-sh/nvm].
+Currently Node.js v12.x is required in order to work with this repo.
 
-Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions that [celo-monorepo] will need:
+Install `nvm` (allows you to manage multiple versions of Node) by following the [instructions here](https://github.com/nvm-sh/nvm).
+
+Once `nvm` is successfully installed, restart the terminal and run the following commands to install the `npm` versions that [celo-monorepo](https://github.com/celo-org/celo-monorepo) will need:
 
 ```bash
 # restart the terminal after installing nvm
@@ -72,7 +66,7 @@ xcode-select --install
 
 #### Homebrew
 
-Install [Homebrew], the best way of managing packages on OSX:
+Install [Homebrew](https://brew.sh/), the best way of managing packages on OSX:
 
 ```bash
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -90,7 +84,7 @@ brew install yarn
 
 #### Install Yarn
 
-We use Yarn to build all of the [celo-monorepo] repo. Install it by running the following:
+We use Yarn to build all of the [celo-monorepo](https://github.com/celo-org/celo-monorepo) repo. Install it by running the following:
 
 ```bash
 # for documentation on yarn visit https://yarnpkg.com/en/docs/install#debian-stable
@@ -103,14 +97,14 @@ sudo apt-get update && sudo apt-get install yarn
 
 #### Install Rust
 
-We use Rust for some [cryptography repositories](https://github.com/celo-org?q=&type=&language=rust) This is not 
+We use Rust for some [cryptography repositories](https://github.com/celo-org?q=&type=&language=rust) This is not
 required if you only want use the blockchain, monorepo, and mobile wallet.
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-Now lets add Rust to the PATH:
+Now lets add Rust to the `PATH`:
 
 ```
 echo "export PATH=$PATH:~/.cargo/bin/" >> ~/.bashrc
@@ -127,6 +121,7 @@ rustup default 1.42.0
 If you're building Geth for Android, you need a NDK that has a cross-compilation toolchain. We need version 19.
 
 On Mac (darwin):
+
 ```bash
 brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/a39a95824122da8448dbeb0b0ca1dde78e5a793c/Casks/android-ndk.rb
 
@@ -141,10 +136,9 @@ export NDK_VERSION=android-ndk-r19c
 
 and run `make ndk_bundle`. This will download the NDK for your platform.
 
-
 ## Building celo-monorepo
 
-Clone the [celo-monorepo] repo:
+Clone the [celo-monorepo](https://github.com/celo-org/celo-monorepo) repo:
 
 ```bash
 mkdir ~/celo
@@ -172,16 +166,4 @@ yarn build --ignore docs
 > and the `postinstall` step which uses it is not automatically run after using `yarn remove`.
 
 > The docs package relies on gitbook which has problems off of a fresh install. Running
-> `yarn build --ignore docs` is a known workaround. 
-
-
-## Running the mobile wallet
-
-To build and run the mobile wallet on your iOS or Android devices see the guide in the [mobile](packages/mobile) directory.
-
-
-[celo-monorepo]: https://github.com/celo-org/celo-monorepo
-[celo-blockchain]: https://github.com/celo-org/celo-blockchain
-[celo-bls]: https://github.com/celo-org/celo-bls-go
-[Homebrew]: https://brew.sh
-[https://github.com/nvm-sh/nvm]: https://github.com/nvm-sh/nvm
+> `yarn build --ignore docs` is a known workaround.

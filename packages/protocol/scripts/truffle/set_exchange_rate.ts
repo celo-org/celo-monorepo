@@ -100,7 +100,7 @@ module.exports = async (callback: (error?: any) => number) => {
       let stableValue: string
       const now = Math.floor(Date.now() / 1000)
       // Read the CSV
-      await new Promise((resolve) => {
+      await new Promise<void>((resolve) => {
         fs.createReadStream(argv.csv)
           .pipe(parse())
           .on('data', (csvrow: any) => {

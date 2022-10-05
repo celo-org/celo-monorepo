@@ -13,7 +13,7 @@ export class Request {
 
   constructor(request: GetBlindedMessagePartialSigRequest) {
     this[REQUESTS_COLUMNS.address] = request.account
-    this[REQUESTS_COLUMNS.timestamp] = new Date(request.timestamp as number)
+    this[REQUESTS_COLUMNS.timestamp] = new Date()
     this[REQUESTS_COLUMNS.blindedQuery] = request.blindedQueryPhoneNumber
   }
 }

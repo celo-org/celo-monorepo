@@ -181,20 +181,27 @@ USAGE
   $ celocli releasegold:revoke-votes
 
 OPTIONS
+  --allGroups                                            Revoke all votes from all
+                                                         groups
+
+  --allVotes                                             Revoke all votes
+
   --contract=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the
                                                          ReleaseGold Contract
 
   --globalHelp                                           View all available global flags
 
-  --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     (required) Address of the group
-                                                         to revoke votes from
+  --group=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d     Address of the group to revoke
+                                                         votes from
 
-  --votes=votes                                          (required) The number of votes
-                                                         to revoke
+  --votes=votes                                          The number of votes to revoke
 
-EXAMPLE
+EXAMPLES
   revoke-votes --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --group
   0x5409ED021D9299bf6814279A6A1411A7e866A631 --votes 100
+
+  revoke-votes --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --allVotes
+  --allGroups
 ```
 
 _See code: [src/commands/releasegold/revoke-votes.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/releasegold/revoke-votes.ts)_

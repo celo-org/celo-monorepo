@@ -88,7 +88,7 @@
                   {
                     "server": "celoprod.azurecr.io",
                     "username": "publicpuller",
-                    "password": "RMIToDOdx3llt0cEK/7mlY7kZ8XJL57l"
+                    "password": ""
                   }
                 ],
                 "restartPolicy": "[parameters('restartPolicy')]",

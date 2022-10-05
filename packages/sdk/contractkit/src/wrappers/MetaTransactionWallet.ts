@@ -38,7 +38,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   public executeTransaction(tx: TransactionInput<any>): CeloTransactionObject<string> {
     const rawTx = toRawTransaction(tx)
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.executeTransaction(rawTx.destination, rawTx.value, rawTx.data)
     )
   }
@@ -54,7 +54,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     const { destinations, values, callData, callDataLengths } = toTransactionBatch(txs)
 
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.executeTransactions(destinations, values, callData, callDataLengths)
     )
   }
@@ -72,7 +72,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     const rawTx = toRawTransaction(tx)
 
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.executeMetaTransaction(
         rawTx.destination,
         rawTx.value,
@@ -101,7 +101,7 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
       await this.chainId()
     )
     const signer = await this.signer()
-    return this.kit.connection.signTypedData(signer, typedData)
+    return this.connection.signTypedData(signer, typedData)
   }
 
   /**
@@ -158,17 +158,17 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
   private getSigner = proxyCall(this.contract.methods.signer, undefined, stringIdentity)
 
   transferOwnership: (newOwner: Address) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.transferOwnership
   )
 
   setSigner: (newSigner: Address) => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.setSigner
   )
 
   setEip712DomainSeparator: () => CeloTransactionObject<void> = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.setEip712DomainSeparator
   )
 
@@ -178,9 +178,9 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
    */
   _chainId?: number
   private async chainId(): Promise<number> {
-    this._chainId = this._chainId ?? (await this.kit.connection.chainId())
+    this._chainId = this._chainId ?? (await this.connection.chainId())
     if (this._chainId === undefined) {
-      this._chainId = await this.kit.connection.chainId()
+      this._chainId = await this.connection.chainId()
     }
     return this._chainId!
   }
@@ -197,6 +197,8 @@ export class MetaTransactionWalletWrapper extends BaseWrapper<MetaTransactionWal
     return this._signer
   }
 }
+
+export type MetaTransactionWalletWrapperType = MetaTransactionWalletWrapper
 
 /**
  * Turns any possible way to pass in a transaction into the raw values

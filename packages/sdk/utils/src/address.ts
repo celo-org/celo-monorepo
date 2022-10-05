@@ -7,8 +7,6 @@ import {
   toBuffer,
   toChecksumAddress,
 } from 'ethereumjs-util'
-import * as Web3Utils from 'web3-utils'
-
 // Exports moved to @celo/base, forwarding them
 // here for backwards compatibility
 export {
@@ -43,4 +41,20 @@ export const publicKeyToAddress = (publicKey: string) =>
 export const isValidPrivateKey = (privateKey: string) =>
   privateKey.startsWith('0x') && isValidPrivate(hexToBuffer(privateKey))
 
-export const isValidAddress = (input: string): boolean => Web3Utils.isAddress(input)
+export const isValidAddress = (input: string): boolean => {
+  if ('string' !== typeof input) {
+    return false
+  }
+  if (!/^(0x)?[0-9a-f]{40}$/i.test(input)) {
+    return false
+  }
+  if (/^(0x|0X)?[0-9A-F]{40}$/.test(input.toUpperCase())) {
+    return true
+  }
+
+  if (toChecksumAddress(input) === input) {
+    return true
+  }
+
+  return false
+}

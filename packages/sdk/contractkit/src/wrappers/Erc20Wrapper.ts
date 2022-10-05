@@ -29,7 +29,7 @@ export class Erc20Wrapper<T extends Ierc20> extends BaseWrapper<T> {
    * @param value The amount of the token approved to the spender.
    * @return True if the transaction succeeds.
    */
-  approve = proxySend(this.kit, this.contract.methods.approve)
+  approve = proxySend(this.connection, this.contract.methods.approve)
 
   /**
    * Transfers the token from one address to another.
@@ -37,7 +37,7 @@ export class Erc20Wrapper<T extends Ierc20> extends BaseWrapper<T> {
    * @param value The amount of the token to transfer.
    * @return True if the transaction succeeds.
    */
-  transfer = proxySend(this.kit, this.contract.methods.transfer)
+  transfer = proxySend(this.connection, this.contract.methods.transfer)
 
   /**
    * Transfers the token from one address to another on behalf of a user.
@@ -46,7 +46,7 @@ export class Erc20Wrapper<T extends Ierc20> extends BaseWrapper<T> {
    * @param value The amount of the token to transfer.
    * @return True if the transaction succeeds.
    */
-  transferFrom = proxySend(this.kit, this.contract.methods.transferFrom)
+  transferFrom = proxySend(this.connection, this.contract.methods.transferFrom)
 
   /**
    * Gets the balance of the specified address.
@@ -59,3 +59,5 @@ export class Erc20Wrapper<T extends Ierc20> extends BaseWrapper<T> {
     valueToBigNumber
   )
 }
+
+export type Erc20WrapperType<T extends Ierc20> = Erc20Wrapper<T>

@@ -1,4 +1,4 @@
-import { generateKeys } from '@celo/utils/lib/account'
+import { generateKeys } from '@celo/cryptographic-utils/lib/account'
 import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 import {
   AccountType,

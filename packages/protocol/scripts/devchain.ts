@@ -99,6 +99,15 @@ yargs
           targz: true,
         })
       )
+  )
+  .command(
+    'compress-chain <datadir> <filename>',
+    'Create a devchain.tar.gz from specified datadir',
+    (args) =>
+      args
+        .positional('datadir', { type: 'string', description: 'datadir path' })
+        .positional('filename', { type: 'string', description: 'chain tar filename' }),
+    (args) => exitOnError(compressChain(args.datadir, args.filename))
   ).argv
 
 async function startGanache(
@@ -139,7 +148,7 @@ async function startGanache(
   })
 
   return () =>
-    new Promise((resolve, reject) => {
+    new Promise<void>((resolve, reject) => {
       server.close((err) => {
         if (chainCopy) {
           chainCopy.removeCallback()

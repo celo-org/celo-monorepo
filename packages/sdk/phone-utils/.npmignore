@@ -1,0 +1,7 @@
+/node_modules
+/coverage
+/tslint.json
+/tsconfig.json
+/test
+/src
+**.test.js

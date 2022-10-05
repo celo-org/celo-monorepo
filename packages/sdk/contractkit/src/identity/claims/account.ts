@@ -4,7 +4,10 @@ import { either, isLeft } from 'fp-ts/lib/Either'
 import * as t from 'io-ts'
 import { ClaimTypes, now, TimestampType } from './types'
 
-// Provide the type minus the validation that the public key and address are derived from the same private key
+/**
+ *
+ * Provide the type minus the validation that the public key and address are derived from the same private key
+ */
 export const AccountClaimTypeH = t.type({
   type: t.literal(ClaimTypes.ACCOUNT),
   timestamp: TimestampType,

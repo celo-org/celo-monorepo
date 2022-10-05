@@ -124,7 +124,7 @@ export class RpcSigner implements Signer {
         passphrase,
         duration,
       ])
-    } catch (error) {
+    } catch (error: any) {
       // The callAndCheckResponse will throw an error if the passphrase is incorrect
       if (error?.message?.toLowerCase()?.includes(INCORRECT_PASSWORD_ERROR)) {
         return false

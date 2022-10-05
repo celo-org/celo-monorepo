@@ -1,5 +1,5 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
-import { PhoneNumberUtils } from '@celo/utils'
+import { PhoneNumberUtils } from '@celo/phone-utils'
 import { newKitFromWeb3 } from '../kit'
 import { AttestationsWrapper, getSecurityCodePrefix } from './Attestations'
 

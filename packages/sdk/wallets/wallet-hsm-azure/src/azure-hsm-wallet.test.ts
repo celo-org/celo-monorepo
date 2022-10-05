@@ -181,7 +181,7 @@ describe('AzureHSMWallet class', () => {
             try {
               await wallet.getAddressFromKeyName(unknownKey)
               throw new Error('Expected exception to be thrown')
-            } catch (e) {
+            } catch (e: any) {
               expect(e.message).toContain(
                 `A key with (name/id) ${unknownKey} was not found in this key vault`
               )
@@ -192,7 +192,7 @@ describe('AzureHSMWallet class', () => {
             try {
               await wallet.signTransaction(celoTransaction)
               throw new Error('Expected exception to be thrown')
-            } catch (e) {
+            } catch (e: any) {
               expect(e.message).toBe(`Could not find address ${unknownAddress}`)
             }
           })
@@ -202,7 +202,7 @@ describe('AzureHSMWallet class', () => {
             try {
               await wallet.signPersonalMessage(unknownAddress, hexStr)
               throw new Error('Expected exception to be thrown')
-            } catch (e) {
+            } catch (e: any) {
               expect(e.message).toBe(`Could not find address ${unknownAddress}`)
             }
           })
@@ -211,7 +211,7 @@ describe('AzureHSMWallet class', () => {
             try {
               await wallet.signTypedData(unknownAddress, TYPED_DATA)
               throw new Error('Expected exception to be thrown')
-            } catch (e) {
+            } catch (e: any) {
               expect(e.message).toBe(`Could not find address ${unknownAddress}`)
             }
           })

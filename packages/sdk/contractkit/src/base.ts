@@ -10,29 +10,40 @@ export enum CeloContract {
   Escrow = 'Escrow',
   Exchange = 'Exchange',
   ExchangeEUR = 'ExchangeEUR',
+  ExchangeBRL = 'ExchangeBRL',
+  FederatedAttestations = 'FederatedAttestations',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
   GoldToken = 'GoldToken',
   Governance = 'Governance',
+  GrandaMento = 'GrandaMento',
   LockedGold = 'LockedGold',
   MetaTransactionWallet = 'MetaTransactionWallet',
   MetaTransactionWalletDeployer = 'MetaTransactionWalletDeployer',
   MultiSig = 'MultiSig',
+  OdisPayments = 'OdisPayments',
   Random = 'Random',
   Registry = 'Registry',
   Reserve = 'Reserve',
   SortedOracles = 'SortedOracles',
   StableToken = 'StableToken',
   StableTokenEUR = 'StableTokenEUR',
+  StableTokenBRL = 'StableTokenBRL',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
+  StableTokenRegistry = 'StableTokenRegistry',
 }
 
-export type StableTokenContract = CeloContract.StableToken | CeloContract.StableTokenEUR
-export const stableTokenContractArray = [CeloContract.StableToken, CeloContract.StableTokenEUR]
+export type StableTokenContract =
+  | CeloContract.StableToken
+  | CeloContract.StableTokenEUR
+  | CeloContract.StableTokenBRL
 
-export type ExchangeContract = CeloContract.Exchange | CeloContract.ExchangeEUR
+export type ExchangeContract =
+  | CeloContract.Exchange
+  | CeloContract.ExchangeEUR
+  | CeloContract.ExchangeBRL
 
 export type CeloTokenContract = StableTokenContract | CeloContract.GoldToken
 /**
@@ -46,11 +57,14 @@ const AuxiliaryContracts = [
   CeloContract.MultiSig,
   CeloContract.MetaTransactionWalletDeployer,
   CeloContract.MetaTransactionWallet,
+  CeloContract.ERC20,
 ]
 export const RegisteredContracts = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 
+/** @internal */
 export const stripProxy = (contract: CeloContract) => contract.replace('Proxy', '') as CeloContract
 
+/** @internal */
 export const suffixProxy = (contract: CeloContract) =>
   contract.endsWith('Proxy') ? contract : (`${contract}Proxy` as CeloContract)
 

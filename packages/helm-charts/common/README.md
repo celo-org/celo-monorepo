@@ -1,3 +1,3 @@
 # common
 
-This contains common helper templates to be used across different helm charts.
+Moved to https://github.com/celo-org/charts/tree/main/charts/common

@@ -78,11 +78,20 @@ contract LockedGold is
 
   /**
   * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return The storage, major, minor, and patch version of the contract.
+  * @return Storage version of the contract.
+  * @return Major version of the contract.
+  * @return Minor version of the contract.
+  * @return Patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 1, 2, 0);
   }
+
+  /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
@@ -259,7 +268,8 @@ contract LockedGold is
   /**
    * @notice Returns the pending withdrawals from unlocked gold for an account.
    * @param account The address of the account.
-   * @return The value and timestamp for each pending withdrawal.
+   * @return The value for each pending withdrawal.
+   * @return The timestamp for each pending withdrawal.
    */
   function getPendingWithdrawals(address account)
     external
@@ -276,6 +286,25 @@ contract LockedGold is
       timestamps[i] = pendingWithdrawal.timestamp;
     }
     return (values, timestamps);
+  }
+
+  /**
+   * @notice Returns the pending withdrawal at a given index for a given account.
+   * @param account The address of the account.
+   * @param index The index of the pending withdrawal.
+   * @return The value of the pending withdrawal.
+   * @return The timestamp of the pending withdrawal.
+   */
+  function getPendingWithdrawal(address account, uint256 index)
+    external
+    view
+    returns (uint256, uint256)
+  {
+    require(getAccounts().isAccount(account), "Unknown account");
+    require(index < balances[account].pendingWithdrawals.length, "Bad pending withdrawal index");
+    PendingWithdrawal memory pendingWithdrawal = (balances[account].pendingWithdrawals[index]);
+
+    return (pendingWithdrawal.value, pendingWithdrawal.timestamp);
   }
 
   /**
@@ -364,6 +393,12 @@ contract LockedGold is
   ) external onlySlasher {
     uint256 maxSlash = Math.min(penalty, getAccountTotalLockedGold(account));
     require(maxSlash >= reward, "reward cannot exceed penalty.");
+    // `reporter` receives the reward in locked CELO, so it must be given to an account
+    // There is no reward for slashing via the GovernanceSlasher, and `reporter`
+    // is set to 0x0.
+    if (reporter != address(0)) {
+      reporter = getAccounts().signerToAccount(reporter);
+    }
     // Local scoping is required to avoid Solc "stack too deep" error from too many locals.
     {
       uint256 nonvotingBalance = balances[account].nonvoting;

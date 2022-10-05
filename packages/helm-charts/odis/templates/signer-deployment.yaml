@@ -41,6 +41,7 @@ spec:
 {{ include "common.env-var" (dict "name" "LOG_LEVEL" "dict" .Values.log "value_name" "level") | indent 12 }}
 {{ include "common.env-var" (dict "name" "LOG_FORMAT" "dict" .Values.log "value_name" "format") | indent 12 }}
 {{ include "common.env-var" (dict "name" "BLOCKCHAIN_PROVIDER" "dict" .Values "value_name" "blockchainProvider") | indent 12 }}
+{{ include "common.env-var" (dict "name" "BLOCKCHAIN_API_KEY" "dict" .Values "value_name" "blockchainApiKey") | indent 12 }}
 {{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.db "value_name" "host") | indent 12 }}
 {{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.db "value_name" "port") | indent 12 }}
 {{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.db "value_name" "username") | indent 12 }}

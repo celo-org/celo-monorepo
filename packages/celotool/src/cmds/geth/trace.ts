@@ -51,7 +51,7 @@ export const handler = async (argv: TraceArgv) => {
       } else {
         break outerwhile
       }
-    } catch (ignored) {
+    } catch (ignored: any) {
       console.warn(ignored.toString())
       if (iterations === 0) {
         console.error('Geth start error')

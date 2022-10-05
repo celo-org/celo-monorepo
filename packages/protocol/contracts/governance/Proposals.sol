@@ -48,14 +48,6 @@ library Proposals {
   }
 
   /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
-
-  /**
    * @notice Constructs a proposal.
    * @param proposal The proposal struct to be constructed.
    * @param values The values of CELO to be sent in the proposed transactions.
@@ -248,11 +240,9 @@ library Proposals {
     view
     returns (Stage)
   {
-    uint256 stageStartTime = proposal
-      .timestamp
-      .add(stageDurations.approval)
-      .add(stageDurations.referendum)
-      .add(stageDurations.execution);
+    uint256 stageStartTime = proposal.timestamp.add(stageDurations.referendum).add(
+      stageDurations.execution
+    );
     // solhint-disable-next-line not-rely-on-time
     if (now >= stageStartTime) {
       return Stage.Expiration;
@@ -262,12 +252,7 @@ library Proposals {
     if (now >= stageStartTime) {
       return Stage.Execution;
     }
-    stageStartTime = stageStartTime.sub(stageDurations.referendum);
-    // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
-      return Stage.Referendum;
-    }
-    return Stage.Approval;
+    return Stage.Referendum;
   }
 
   /**
@@ -289,7 +274,9 @@ library Proposals {
    * @notice Returns a specified transaction in a proposal.
    * @param proposal The proposal struct.
    * @param index The index of the specified transaction in the proposal's transaction list.
-   * @return The specified transaction.
+   * @return Transaction value.
+   * @return Transaction destination.
+   * @return Transaction data.
    */
   function getTransaction(Proposal storage proposal, uint256 index)
     public
@@ -304,7 +291,11 @@ library Proposals {
   /**
    * @notice Returns an unpacked proposal struct with its transaction count.
    * @param proposal The proposal struct.
-   * @return The unpacked proposal with its transaction count.
+   * @return proposer
+   * @return deposit
+   * @return timestamp
+   * @return transaction Transaction count.
+   * @return description Description url.
    */
   function unpack(Proposal storage proposal)
     internal
@@ -323,7 +314,9 @@ library Proposals {
   /**
    * @notice Returns the referendum vote totals for a proposal.
    * @param proposal The proposal struct.
-   * @return The yes, no, and abstain vote totals.
+   * @return The yes vote totals.
+   * @return The no vote totals.
+   * @return The abstain vote totals.
    */
   function getVoteTotals(Proposal storage proposal)
     internal

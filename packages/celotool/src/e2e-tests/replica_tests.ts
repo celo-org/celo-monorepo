@@ -35,7 +35,7 @@ const verbose = false
 
 describe('replica swap tests', () => {
   const gethConfig: GethRunConfig = {
-    migrate: false,
+    migrate: true,
     runPath: TMP_PATH,
     verbosity: 4,
     networkId: 1101,
@@ -44,6 +44,7 @@ describe('replica swap tests', () => {
       blockTime: 1,
       churritoBlock: 0,
       donutBlock: 0,
+      espressoBlock: 0,
     },
     instances: [
       {
@@ -200,7 +201,7 @@ describe('replica swap tests', () => {
               missed.push({ idx: i, num: header.number })
             }
           }
-        } catch (e) {
+        } catch (e: any) {
           console.error(e)
           errorMsg = e
         }

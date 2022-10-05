@@ -70,6 +70,10 @@ export const Counters = {
     labelNames: ['country', 'type'],
     help: 'Counter for requests by country and type of phone number',
   }),
+  attestationRequestsDidNotProvideSignature: new Counter({
+    name: 'attestation_requests_did_not_provide_signature',
+    help: 'Counter for the number of requests which did not provide a phone number signature',
+  }),
 }
 
 export const Gauges = {

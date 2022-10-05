@@ -72,7 +72,7 @@ export function repeatTask(
     try {
       ctx.executionNumber++
       await fn(ctx)
-    } catch (err) {
+    } catch (err: any) {
       logger(`Failed with error: ${err.message}`)
       logger(err)
     } finally {

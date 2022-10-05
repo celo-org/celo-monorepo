@@ -28,8 +28,8 @@ testWithGanache('account metadata cmds', (web3: Web3) => {
       writeFileSync(emptyFilePath, IdentityMetadataWrapper.fromEmpty(account))
     }
 
-    const readFile = () => {
-      return IdentityMetadataWrapper.fromFile(kit, emptyFilePath)
+    const readFile = async () => {
+      return IdentityMetadataWrapper.fromFile(await kit.contracts.getAccounts(), emptyFilePath)
     }
 
     test('account:create-metadata cmd', async () => {

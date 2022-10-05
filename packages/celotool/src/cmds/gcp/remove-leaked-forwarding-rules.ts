@@ -50,8 +50,10 @@ export const handler = async (argv: Argv) => {
         )
         return false
       } catch ([error, stdout, stderr]) {
-        const healthyInstances = JSON.parse(stdout).length
-        return healthyInstances === 0
+        if (typeof stdout === 'string') {
+          const healthyInstances = JSON.parse(stdout).length
+          return healthyInstances === 0
+        }
       }
     })
   )

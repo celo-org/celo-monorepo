@@ -17,9 +17,7 @@ export default class Parameters extends BaseCommand {
 
   async run() {
     const res = this.parse(Parameters)
-    const config = res.flags.raw
-      ? this.kit.getNetworkConfig()
-      : this.kit.getHumanReadableNetworkConfig()
-    printValueMapRecursive(await config)
+    const config = await this.kit.getNetworkConfig(!res.flags.raw)
+    printValueMapRecursive(config)
   }
 }

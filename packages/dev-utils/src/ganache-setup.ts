@@ -89,7 +89,7 @@ async function launchServer(opts: { verbose?: boolean; from_targz?: boolean }, c
   })
 
   return () =>
-    new Promise((resolve, reject) => {
+    new Promise<void>((resolve, reject) => {
       server.close((err: any) => {
         if (err) {
           reject(err)

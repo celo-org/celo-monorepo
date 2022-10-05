@@ -12,14 +12,6 @@ library AddressSortedLinkedList {
   using SafeMath for uint256;
   using SortedLinkedList for SortedLinkedList.List;
 
-  /**
-   * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
-   */
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 0);
-  }
-
   function toBytes(address a) public pure returns (bytes32) {
     return bytes32(uint256(a) << 96);
   }
@@ -96,7 +88,8 @@ library AddressSortedLinkedList {
 
   /**
    * @notice Gets all elements from the doubly linked list.
-   * @return An unpacked list of elements from largest to smallest.
+   * @return Array of all keys in the list.
+   * @return Values corresponding to keys, which will be ordered largest to smallest.
    */
   function getElements(SortedLinkedList.List storage list)
     public

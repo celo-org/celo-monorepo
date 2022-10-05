@@ -1,4 +1,4 @@
-import { PhoneNumberUtils } from '@celo/utils'
+import { PhoneNumberUtils } from '@celo/phone-utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 import { getBlindedPhoneNumber } from './utils'
 

@@ -133,6 +133,12 @@ contract Attestations is
   );
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
+
+  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
    * @param _attestationExpiryBlocks The new limit on blocks allowed to come between requesting
@@ -168,10 +174,13 @@ contract Attestations is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 1);
+    return (1, 1, 1, 2);
   }
 
   /**
@@ -331,11 +340,9 @@ contract Attestations is
    * @notice Returns the unselected attestation request for an identifier/account pair, if any.
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
-   * @return [
-   *           Block number at which was requested,
-   *           Number of unselected requests,
-   *           Address of the token with which this attestation request was paid for
-   *         ]
+   * @return block Block number at which was requested.
+   * @return number Number of unselected requests.
+   * @return address Address of the token with which this attestation request was paid for.
    */
   function getUnselectedRequest(bytes32 identifier, address account)
     external
@@ -367,7 +374,8 @@ contract Attestations is
    * @notice Returns attestation stats for a identifier/account pair.
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
-   * @return [Number of completed attestations, Number of total requested attestations]
+   * @return completed Number of completed attestations.
+   * @return requested Number of total requested attestations.
    */
   function getAttestationStats(bytes32 identifier, address account)
     external
@@ -426,11 +434,9 @@ contract Attestations is
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
    * @param issuer Address of the issuer.
-   * @return [
-   *           Status of the attestation,
-   *           Block number of request/completion the attestation,
-   *           Address of the token with which this attestation request was paid for
-   *         ]
+   * @return status Status of the attestation.
+   * @return block Block number of request/completion the attestation.
+   * @return address Address of the token with which this attestation request was paid for.
    */
   function getAttestationState(bytes32 identifier, address account, address issuer)
     external
@@ -451,11 +457,10 @@ contract Attestations is
     * @notice Returns the state of all attestations that are completable
     * @param identifier Hash of the identifier.
     * @param account Address of the account.
-    * @return ( blockNumbers[] - Block number of request/completion the attestation,
-    *           issuers[] - Address of the issuer,
-    *           stringLengths[] - The length of each metadataURL string for each issuer,
-    *           stringData - All strings concatenated
-    *         )
+    * @return Block number of request/completion the attestation.
+    * @return Address of the issuer.
+    * @return The length of each metadataURL string for each issuer.
+    * @return All strings concatenated.
     */
   function getCompletableAttestations(bytes32 identifier, address account)
     external
@@ -613,8 +618,8 @@ contract Attestations is
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers.
    * @param identifiersToLookup Array of n identifiers.
-   * @return Array of n numbers that indicate the number of matching addresses per identifier
-   *         and array of addresses preallocated for total number of matches.
+   * @return Array of numbers that indicate the number of matching addresses per identifier.
+   * @return Array of addresses preallocated for total number of matches.
    */
   function batchlookupAccountsForIdentifier(bytes32[] memory identifiersToLookup)
     internal

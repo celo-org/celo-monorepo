@@ -303,7 +303,7 @@ const mnemonicBasedOracleIdentityConfigDynamicEnvVars: {
  */
 export function addCurrencyPairMiddleware(argv: yargs.Argv) {
   return argv.option('currencyPair', {
-    choices: ['CELOUSD', 'CELOEUR', 'CELOBTC'],
+    choices: ['CELOUSD', 'CELOEUR', 'CELOBRL', 'CELOBTC'],
     description: 'Oracle deployment to target based on currency pair',
     demandOption: true,
     type: 'string',

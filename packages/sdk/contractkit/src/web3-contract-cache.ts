@@ -1,4 +1,5 @@
 import debugFactory from 'debug'
+import { AddressRegistry } from './address-registry'
 import { CeloContract, ProxyContracts } from './base'
 import { StableToken } from './celo-tokens'
 import { newAccounts } from './generated/Accounts'
@@ -10,26 +11,30 @@ import { newElection } from './generated/Election'
 import { newEpochRewards } from './generated/EpochRewards'
 import { newEscrow } from './generated/Escrow'
 import { newExchange } from './generated/Exchange'
+import { newExchangeBrl } from './generated/ExchangeBRL'
 import { newExchangeEur } from './generated/ExchangeEUR'
+import { newFederatedAttestations } from './generated/FederatedAttestations'
 import { newFeeCurrencyWhitelist } from './generated/FeeCurrencyWhitelist'
 import { newFreezer } from './generated/Freezer'
 import { newGasPriceMinimum } from './generated/GasPriceMinimum'
 import { newGoldToken } from './generated/GoldToken'
 import { newGovernance } from './generated/Governance'
+import { newGrandaMento } from './generated/GrandaMento'
 import { newIerc20 } from './generated/IERC20'
 import { newLockedGold } from './generated/LockedGold'
 import { newMetaTransactionWallet } from './generated/MetaTransactionWallet'
 import { newMetaTransactionWalletDeployer } from './generated/MetaTransactionWalletDeployer'
 import { newMultiSig } from './generated/MultiSig'
+import { newOdisPayments } from './generated/OdisPayments'
 import { newProxy } from './generated/Proxy'
 import { newRandom } from './generated/Random'
 import { newRegistry } from './generated/Registry'
 import { newReserve } from './generated/Reserve'
 import { newSortedOracles } from './generated/SortedOracles'
 import { newStableToken } from './generated/StableToken'
+import { newStableTokenRegistry } from './generated/StableTokenRegistry'
 import { newTransferWhitelist } from './generated/TransferWhitelist'
 import { newValidators } from './generated/Validators'
-import { ContractKit } from './kit'
 
 const debug = debugFactory('kit:web3-contract-cache')
 
@@ -45,23 +50,41 @@ export const ContractFactories = {
   [CeloContract.Escrow]: newEscrow,
   [CeloContract.Exchange]: newExchange,
   [CeloContract.ExchangeEUR]: newExchangeEur,
+  [CeloContract.ExchangeBRL]: newExchangeBrl,
+  [CeloContract.FederatedAttestations]: newFederatedAttestations,
   [CeloContract.FeeCurrencyWhitelist]: newFeeCurrencyWhitelist,
   [CeloContract.Freezer]: newFreezer,
   [CeloContract.GasPriceMinimum]: newGasPriceMinimum,
   [CeloContract.GoldToken]: newGoldToken,
   [CeloContract.Governance]: newGovernance,
+  [CeloContract.GrandaMento]: newGrandaMento,
   [CeloContract.LockedGold]: newLockedGold,
   [CeloContract.MetaTransactionWallet]: newMetaTransactionWallet,
   [CeloContract.MetaTransactionWalletDeployer]: newMetaTransactionWalletDeployer,
   [CeloContract.MultiSig]: newMultiSig,
+  [CeloContract.OdisPayments]: newOdisPayments,
   [CeloContract.Random]: newRandom,
   [CeloContract.Registry]: newRegistry,
   [CeloContract.Reserve]: newReserve,
   [CeloContract.SortedOracles]: newSortedOracles,
   [CeloContract.StableToken]: newStableToken,
   [CeloContract.StableTokenEUR]: newStableToken,
+  [CeloContract.StableTokenBRL]: newStableToken,
+  [CeloContract.StableTokenRegistry]: newStableTokenRegistry,
   [CeloContract.TransferWhitelist]: newTransferWhitelist,
   [CeloContract.Validators]: newValidators,
+}
+
+const StableToContract = {
+  [StableToken.cEUR]: CeloContract.StableTokenEUR,
+  [StableToken.cUSD]: CeloContract.StableToken,
+  [StableToken.cREAL]: CeloContract.StableTokenBRL,
+}
+
+const StableToExchange = {
+  [StableToken.cEUR]: CeloContract.ExchangeEUR,
+  [StableToken.cUSD]: CeloContract.Exchange,
+  [StableToken.cREAL]: CeloContract.ExchangeBRL,
 }
 
 export type CFType = typeof ContractFactories
@@ -77,8 +100,8 @@ type ContractCacheMap = { [K in keyof CFType]?: ReturnType<CFType[K]> }
  */
 export class Web3ContractCache {
   private cacheMap: ContractCacheMap = {}
-
-  constructor(readonly kit: ContractKit) {}
+  /** core contract's address registry */
+  constructor(readonly registry: AddressRegistry) {}
   getAccounts() {
     return this.getContract(CeloContract.Accounts)
   }
@@ -107,7 +130,10 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.Escrow)
   }
   getExchange(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getExchangeContract(stableToken))
+    return this.getContract(StableToExchange[stableToken])
+  }
+  getFederatedAttestations() {
+    return this.getContract(CeloContract.FederatedAttestations)
   }
   getFeeCurrencyWhitelist() {
     return this.getContract(CeloContract.FeeCurrencyWhitelist)
@@ -123,6 +149,9 @@ export class Web3ContractCache {
   }
   getGovernance() {
     return this.getContract(CeloContract.Governance)
+  }
+  getGrandaMento() {
+    return this.getContract(CeloContract.GrandaMento)
   }
   getLockedGold() {
     return this.getContract(CeloContract.LockedGold)
@@ -149,13 +178,16 @@ export class Web3ContractCache {
     return this.getContract(CeloContract.SortedOracles)
   }
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getContract(stableToken))
+    return this.getContract(StableToContract[stableToken])
   }
   getTransferWhitelist() {
     return this.getContract(CeloContract.TransferWhitelist)
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)
+  }
+  getStableTokenRegistry() {
+    return this.getContract(CeloContract.StableTokenRegistry)
   }
 
   /**
@@ -165,28 +197,20 @@ export class Web3ContractCache {
     if (this.cacheMap[contract] == null || address !== undefined) {
       // core contract in the registry
       if (!address) {
-        try {
-          address = await this.kit.registry.addressFor(contract)
-        } catch (e) {
-          throw new Error(`${contract} not yet deployed for this chain`)
-        }
+        address = await this.registry.addressFor(contract)
       }
       debug('Initiating contract %s', contract)
-      const createFn = ProxyContracts.includes(contract)
-        ? newProxy
-        : ContractFactories[contract]
-        ? (ContractFactories[contract] as CFType[C])
-        : newProxy
-      // @ts-ignore: Too complex union type
-      this.cacheMap[contract] = createFn(this.kit.connection.web3, address) as NonNullable<
-        ContractCacheMap[C]
-      >
+      const createFn = ProxyContracts.includes(contract) ? newProxy : ContractFactories[contract]
+      this.cacheMap[contract] = createFn(
+        this.registry.connection.web3,
+        address
+      ) as ContractCacheMap[C]
     }
     // we know it's defined (thus the !)
     return this.cacheMap[contract]!
   }
 
   public invalidateContract<C extends keyof typeof ContractFactories>(contract: C) {
-    ;(this.cacheMap[contract] as any) = null
+    this.cacheMap[contract] = undefined
   }
 }

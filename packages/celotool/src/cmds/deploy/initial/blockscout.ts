@@ -9,6 +9,7 @@ import { envVar, fetchEnv, fetchEnvOrFallback } from 'src/lib/env-utils'
 import {
   createAndUploadCloudSQLSecretIfNotExists,
   createCloudSQLInstance,
+  createSecretInSecretManagerIfNotExists,
   getServiceAccountName,
   grantRoles,
   isCelotoolHelmDryRun,
@@ -27,11 +28,6 @@ export const handler = async (argv: InitialArgv) => {
   const instanceName = getInstanceName(argv.celoEnv, dbSuffix)
   const helmReleaseName = getReleaseName(argv.celoEnv, dbSuffix)
   await switchToClusterFromEnv(argv.celoEnv)
-  let blockscoutCredentials: string[] = [
-    'dummyUser',
-    'dummyPassword',
-    'dummy-project:region:instance',
-  ]
 
   if (!isCelotoolHelmDryRun()) {
     // Create cloud SQL account with 'Cloud SQL Client' permissions.
@@ -42,21 +38,23 @@ export const handler = async (argv: InitialArgv) => {
 
     await createAndUploadCloudSQLSecretIfNotExists(cloudSqlServiceAccountName, argv.celoEnv)
 
-    blockscoutCredentials = await createCloudSQLInstance(argv.celoEnv, instanceName)
+    const [dbUser, dbPassword, _] = await createCloudSQLInstance(argv.celoEnv, instanceName)
+    const secretLabels = ['app=blockscout', 'team=data-services', `env=${argv.celoEnv}`]
+
+    await createSecretInSecretManagerIfNotExists(`${helmReleaseName}-dbUser`, secretLabels, dbUser)
+
+    await createSecretInSecretManagerIfNotExists(
+      `${helmReleaseName}-dbPassword`,
+      secretLabels,
+      dbPassword
+    )
   } else {
     console.info(
       `Skipping Cloud SQL Database creation and IAM setup. Please check if you can execute the skipped steps.`
     )
   }
 
-  await installHelmChart(
-    argv.celoEnv,
-    helmReleaseName,
-    imageTag,
-    blockscoutCredentials[0],
-    blockscoutCredentials[1],
-    blockscoutCredentials[2]
-  )
+  await installHelmChart(argv.celoEnv, helmReleaseName, imageTag)
 
   if (!isCelotoolHelmDryRun()) {
     await createDefaultIngressIfNotExists(argv.celoEnv, helmReleaseName)

@@ -10,6 +10,8 @@ contract LockedGoldHarness is LockedGold {
 
   GoldTokenHarness goldToken;
 
+  constructor(bool test) public LockedGold(test) {}
+
   /* solhint-disable-next-line no-empty-blocks */
   function init_state() public {}
 

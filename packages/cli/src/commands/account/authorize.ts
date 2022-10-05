@@ -83,7 +83,8 @@ export default class Authorize extends BaseCommand {
         res.flags.blsPop
       )
     } else if (res.flags.role === 'validator') {
-      tx = await accounts.authorizeValidatorSigner(res.flags.signer, sig)
+      const validatorsWrapper = await this.kit.contracts.getValidators()
+      tx = await accounts.authorizeValidatorSigner(res.flags.signer, sig, validatorsWrapper)
     } else if (res.flags.role === 'attestation') {
       tx = await accounts.authorizeAttestationSigner(res.flags.signer, sig)
     } else {

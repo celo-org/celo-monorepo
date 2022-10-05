@@ -146,7 +146,7 @@ export abstract class BaseNodePortFullNodeDeployer extends BaseFullNodeDeployer 
     return portNumber >= NODE_PORT_MIN && portNumber <= NODE_PORT_MAX
   }
 
-  abstract async setIngressRulesTCPAndUDP(nodePorts: number[], authorize: boolean): Promise<void>
+  abstract setIngressRulesTCPAndUDP(nodePorts: number[], authorize: boolean): Promise<void>
 
   get deploymentConfig(): BaseFullNodeDeploymentConfig {
     return this._deploymentConfig

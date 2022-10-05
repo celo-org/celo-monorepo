@@ -35,5 +35,5 @@ export class CeloTokenWrapper<T extends Ierc20 & ICeloToken> extends Erc20Wrappe
    * @param comment The transfer comment
    * @return True if the transaction succeeds.
    */
-  transferWithComment = proxySend(this.kit, this.contract.methods.transferWithComment)
+  transferWithComment = proxySend(this.connection, this.contract.methods.transferWithComment)
 }

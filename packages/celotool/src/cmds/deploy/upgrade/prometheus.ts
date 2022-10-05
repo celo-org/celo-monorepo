@@ -24,7 +24,8 @@ export const handler = async (argv: PrometheusUpgradeArgv) => {
   const clusterConfig = await switchToClusterFromEnvOrContext(argv, true)
 
   await upgradePrometheus(argv.context, clusterConfig)
+
   if (argv.deployGrafana) {
-    await upgradeGrafana()
+    await upgradeGrafana(argv.context, clusterConfig)
   }
 }

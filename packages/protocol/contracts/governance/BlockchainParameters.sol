@@ -37,6 +37,12 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   event UptimeLookbackWindowSet(uint256 window, uint256 activationEpoch);
 
   /**
+   * @notice Sets initialized == true on implementation contracts
+   * @param test Set to true to skip implementation initialization
+   */
+  constructor(bool test) public Initializable(test) {}
+
+  /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param major Minimum client version that can be used in the chain, major version.
    * @param minor Minimum client version that can be used in the chain, minor version.
@@ -62,7 +68,10 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 2, 0, 0);
@@ -141,8 +150,10 @@ contract BlockchainParameters is Ownable, Initializable, UsingPrecompiles {
   }
 
   /**
-   * @notice Query minimum client version.
-   * @return Returns major, minor, and patch version numbers.
+   * @notice Query minimum client version.   
+   * @return Major version number.
+   * @return Minor version number.
+   * @return Patch version number.
    */
   function getMinimumClientVersion()
     external

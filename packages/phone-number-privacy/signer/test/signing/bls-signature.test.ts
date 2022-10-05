@@ -14,7 +14,7 @@ describe(`BLS service computes signature`, () => {
     const blindedMsgResult = threshold_bls.blind(message, userSeed)
     const blindedMsg = Buffer.from(blindedMsgResult.message).toString('base64')
 
-    const actual = await computeBlindedSignature(blindedMsg, DEV_PRIVATE_KEY, rootLogger)
+    const actual = await computeBlindedSignature(blindedMsg, DEV_PRIVATE_KEY, rootLogger())
     expect(actual).toEqual(
       'MAAAAAAAAADDilSaA/xvbtE4NV3agMzHIf8PGPQ83Cu8gQy5E2mRWyUIges8bjE4EBe1L7pcY4AAAAAA'
     )
@@ -40,6 +40,6 @@ describe(`BLS service computes signature`, () => {
     const blindedMsg = Buffer.from('invalid blinded message').toString('base64')
 
     expect.assertions(1)
-    await expect(() => computeBlindedSignature(blindedMsg, DEV_PRIVATE_KEY, rootLogger)).toThrow()
+    await expect(() => computeBlindedSignature(blindedMsg, DEV_PRIVATE_KEY, rootLogger())).toThrow()
   })
 })

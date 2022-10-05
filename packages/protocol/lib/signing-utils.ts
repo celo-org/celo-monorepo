@@ -5,7 +5,7 @@ import { parseSignature } from '@celo/utils/lib/signatureUtils'
 import { account as Account, bytes, hash, nat, RLP } from 'eth-lib'
 import _ from 'underscore'
 import Web3 from 'web3'
-import utils from 'web3-utils'
+import { numberToHex } from 'web3-utils'
 
 function isNot(value: any) {
   return _.isUndefined(value) || _.isNull(value)
@@ -54,7 +54,7 @@ export async function signTransaction(web3: Web3, txn: any, privateKey: string) 
       transaction.to = tx.to || '0x'
       transaction.data = tx.data || '0x'
       transaction.value = tx.value || '0x'
-      transaction.chainId = utils.numberToHex(tx.chainId)
+      transaction.chainId = numberToHex(tx.chainId)
       transaction.feeCurrency = tx.feeCurrency || '0x'
       transaction.gatewayFeeRecipient = tx.gatewayFeeRecipient || '0x'
       transaction.gatewayFee = tx.gatewayFee || '0x'

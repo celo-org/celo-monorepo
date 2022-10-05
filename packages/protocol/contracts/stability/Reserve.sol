@@ -8,7 +8,7 @@ import "./interfaces/IReserve.sol";
 import "./interfaces/ISortedOracles.sol";
 
 import "../common/FixidityLib.sol";
-import "../common/InitializableV2.sol";
+import "../common/Initializable.sol";
 import "../common/UsingRegistry.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/libraries/ReentrancyGuard.sol";
@@ -20,7 +20,7 @@ contract Reserve is
   IReserve,
   ICeloVersionedContract,
   Ownable,
-  InitializableV2,
+  Initializable,
   UsingRegistry,
   ReentrancyGuard
 {
@@ -77,7 +77,7 @@ contract Reserve is
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
    */
-  constructor(bool test) public InitializableV2(test) {}
+  constructor(bool test) public Initializable(test) {}
 
   modifier isStableToken(address token) {
     require(isToken[token], "token addr was never registered");
@@ -86,10 +86,13 @@ contract Reserve is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 1);
+    return (1, 1, 2, 2);
   }
 
   function() external payable {} // solhint-disable no-empty-blocks
@@ -225,13 +228,6 @@ contract Reserve is
    */
   function addToken(address token) external onlyOwner nonReentrant returns (bool) {
     require(!isToken[token], "token addr already registered");
-    // Require an exchange rate between the new token and Gold exists.
-    address sortedOraclesAddress = registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID);
-    ISortedOracles sortedOracles = ISortedOracles(sortedOraclesAddress);
-    uint256 tokenAmount;
-    uint256 goldAmount;
-    (tokenAmount, goldAmount) = sortedOracles.medianRate(token);
-    require(goldAmount > 0, "median rate returned 0 gold");
     isToken[token] = true;
     _tokens.push(token);
     emit TokenAdded(token);
@@ -416,6 +412,7 @@ contract Reserve is
 
   /**
    * @notice Transfer unfrozen gold to any address, used for one side of CP-DOTO.
+   * @dev Transfers are not subject to a daily spending limit.
    * @param to The address that will receive the gold.
    * @param value The amount of gold to transfer.
    * @return Returns true if the transaction succeeds.
@@ -430,7 +427,8 @@ contract Reserve is
 
   /**
    * @notice Returns the tobin tax, recomputing it if it's stale.
-   * @return The tobin tax amount as a fraction.
+   * @return The numerator - tobin tax amount as a fraction.
+   * @return The denominator - tobin tax amount as a fraction.
    */
   function getOrComputeTobinTax() external nonReentrant returns (uint256, uint256) {
     // solhint-disable-next-line not-rely-on-time
@@ -544,9 +542,13 @@ contract Reserve is
       uint256 stableAmount;
       uint256 goldAmount;
       (stableAmount, goldAmount) = sortedOracles.medianRate(_tokens[i]);
-      uint256 stableTokenSupply = IERC20(_tokens[i]).totalSupply();
-      uint256 aStableTokenValueInGold = stableTokenSupply.mul(goldAmount).div(stableAmount);
-      stableTokensValueInGold = stableTokensValueInGold.add(aStableTokenValueInGold);
+
+      if (goldAmount != 0) {
+        // tokens with no oracle reports don't count towards collateralization ratio
+        uint256 stableTokenSupply = IERC20(_tokens[i]).totalSupply();
+        uint256 aStableTokenValueInGold = stableTokenSupply.mul(goldAmount).div(stableAmount);
+        stableTokensValueInGold = stableTokensValueInGold.add(aStableTokenValueInGold);
+      }
     }
     return
       FixidityLib

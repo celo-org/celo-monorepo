@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "komenci-rewards-fullname" . }}
+  labels:
+{{- include "komenci-rewards-component-label" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.rewards.replicaCount }}
+  selector:
+    matchLabels: 
+    {{- include "komenci-rewards-component-label" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+{{- include "komenci-rewards-component-label" . | nindent 8 }}
+    spec:
+      containers:
+        - name: komenci-rewards
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+          command:
+            - bash
+            - "-c"
+            - |
+              node packages/apps/rewards/dist/main.js
+          env:
+          - name: REPLICA_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+{{ include "common.env-var" (dict "name" "DB_HOST" "dict" .Values.rewards.db "value_name" "host" "optional" true) | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_PORT" "dict" .Values.rewards.db "value_name" "port" "optional" true) | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_USERNAME" "dict" .Values.rewards.db "value_name" "username") | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_PASSWORD" "dict" .Values.rewards.db "value_name" "password") | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_DATABASE" "dict" .Values.rewards.db "value_name" "database") | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_SYNCHRONIZE" "dict" .Values.rewards.db "value_name" "synchronize") | indent 10 }}
+{{ include "common.env-var" (dict "name" "DB_SSL" "dict" .Values.rewards.db "value_name" "ssl") | indent 10 }}
+{{ include "common.env-var" (dict "name" "RELAYER_HOST" "dict" .Values.rewards.relayer "value_name" "host") | indent 10 }}
+{{ include "common.env-var" (dict "name" "RELAYER_PORT" "dict" .Values.rewards.relayer "value_name" "port") | indent 10 }}
+{{ include "common.env-var" (dict "name" "NETWORK" "dict" .Values.environment "value_name" "network") | indent 10 }}
+{{ include "common.env-var" (dict "name" "SEGMENT_API_KEY" "dict" .Values.rewards "value_name" "segmentApiKey") | indent 10 }}
+{{ include "common.env-var" (dict "name" "SHOULD_SEND_REWARDS" "dict" .Values.rewards "value_name" "shouldSendRewards") | indent 10 }}

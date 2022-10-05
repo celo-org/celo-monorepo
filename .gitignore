@@ -97,6 +97,10 @@ packages/reserve-site/*
 packages/blockchain-api/*
 packages/komencikit/*
 packages/mobile/*
+packages/faucet/*
 packages/moonpay-auth/*
 packages/notification-service/*
 packages/react-components/*
+
+# temp json file for deploy-sdks script
+scripts/failedSDKs.json

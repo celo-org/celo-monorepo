@@ -98,8 +98,10 @@ export async function createNamespaceIfNotExists(namespace: string) {
     `Namespace ${namespace} exists, skipping creation`
   )
   if (!namespaceExists) {
-    console.info('Creating kubernetes namespace')
-    await execCmdWithExitOnFailure(`kubectl create namespace ${namespace}`)
+    const cmd = `kubectl create namespace ${namespace} ${
+      isCelotoolHelmDryRun() ? ' --dry-run=server' : ''
+    }`
+    await execCmdWithExitOnFailure(cmd)
   }
 }
 

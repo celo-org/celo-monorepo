@@ -31,6 +31,11 @@ defaults: &defaults
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
 
+contract-defaults: &contract-defaults
+  <<: *defaults
+  environment:
+    RELEASE_TAG: core-contracts.v8
+
 e2e-defaults: &e2e-defaults
   <<: *defaults
   docker:
@@ -146,6 +151,7 @@ jobs:
             # Verify that following commands work, they are later called in the incremental testing script
             # There output does not matter here, the fact that they finish successfully does.
             git rev-parse --abbrev-ref HEAD
+            git fetch --all --tags
 
       - attach_workspace:
           at: ~/app
@@ -155,7 +161,7 @@ jobs:
       - run:
           name: Build packages
           command: |
-            yarn build --ignore docs
+            yarn build --ignore docs --include-dependencies
 
       - run:
           name: Check licenses
@@ -185,13 +191,6 @@ jobs:
       # `./node_modules/.bin/prettier --config .prettierrc.js --write '**/*.+(ts|tsx|js|jsx)'`
       - run: yarn run prettify:diff
       - run: yarn run lint
-
-  vulnerability-checks:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/app
-      - run: ./scripts/ci_check_vulnerabilities.sh
 
   general-test:
     <<: *defaults
@@ -233,15 +232,8 @@ jobs:
   # This pre script, generates the build and devchain, and adds it to the workspace to be used for the
   # other script
   pre-protocol-test-release:
-    <<: *defaults
-    docker:
-      # We override the default docker image here because this job builds the
-      # previous release and requires node 10 rather than node 12 to build
-      # properly.
-      - image: celohq/node10-gcloud:v3
+    <<: *contract-defaults
     resource_class: large
-    environment:
-      RELEASE_TAG: celo-core-contracts-v3.rc0
     steps:
       - attach_workspace:
           at: ~/app
@@ -258,6 +250,9 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
             echo "Comparing against $RELEASE_TAG"
+            # Github has phased out the git protocol so we ensure that we use
+            # https for all git operations that yarn may perform.
+            git config --global url."https://github.com".insteadOf git://github.com
             yarn --cwd packages/protocol test:generate-old-devchain-and-build -b $RELEASE_TAG -d .tmp/released_chain -l /dev/stdout -g scripts/truffle/releaseGoldExampleConfigs.json
       - persist_to_workspace:
           root: .
@@ -265,10 +260,8 @@ jobs:
             - 'packages/protocol/.tmp/released_chain/*'
 
   protocol-test-release:
-    <<: *defaults
+    <<: *contract-defaults
     resource_class: large
-    environment:
-      RELEASE_TAG: celo-core-contracts-v3.rc0
     steps:
       - attach_workspace:
           at: ~/app
@@ -291,7 +284,7 @@ jobs:
             yarn --cwd packages/protocol test:devchain-release -b $RELEASE_TAG -d $BUILD_AND_DEVCHAIN_DIR -l /dev/stdout
 
   protocol-test-release-snapshots:
-    <<: *defaults
+    <<: *contract-defaults
     resource_class: large
     steps:
       - attach_workspace:
@@ -809,6 +802,7 @@ jobs:
     working_directory: ~/app
     docker:
       - image: circleci/openjdk:11-jdk-node
+    parallelism: 5
     steps:
       - attach_workspace:
           at: ~/app
@@ -816,6 +810,10 @@ jobs:
           name: Check if the test should run
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+            # Disabling certora until the license is figured out
+            echo "Certora tests are disabled"
+            circleci step halt
+            exit 0
       - run:
           name: Certora dependencies
           command: |
@@ -827,16 +825,48 @@ jobs:
             wget https://github.com/ethereum/solidity/releases/download/v0.5.13/solc-static-linux
             chmod +x solc-static-linux
             sudo mv solc-static-linux /usr/bin/solc
+      - run: echo ${CIRCLE_NODE_INDEX}
       - run:
           name: Build and run - Locked Gold
           command: |
-            cd packages/protocol
-            certoraRun specs/harnesses/GoldTokenHarness.sol specs/harnesses/LockedGoldHarness.sol --link LockedGoldHarness:goldToken=GoldTokenHarness --verify LockedGoldHarness:specs/lockedGold.spec --settings -assumeUnwindCond --solc_args "['--evm-version', 'istanbul']"
+            if [ ${CIRCLE_NODE_INDEX} == "0" ];
+            then
+              cd packages/protocol
+              ./specs/scripts/lockedgold.sh
+            fi
       - run:
           name: Build and run - Accounts
           command: |
-            cd packages/protocol
-            certoraRun specs/harnesses/AccountsHarness.sol --verify AccountsHarness:specs/accounts.spec --settings -assumeUnwindCond --solc_args "['--evm-version', 'istanbul']"
+            if [ ${CIRCLE_NODE_INDEX} == "1" ];
+            then
+              cd packages/protocol
+              ./specs/scripts/accounts.sh
+            fi
+      - run:
+          name: Build and run - Accounts privileged check
+          command: |
+            if [ ${CIRCLE_NODE_INDEX} == "2" ];
+            then
+              cd packages/protocol
+              ./specs/scripts/accountsPrivileged.sh
+            fi
+      - run:
+          name: Build and run - Governance
+          command: |
+            if [ ${CIRCLE_NODE_INDEX} == "3" ];
+            then
+              cd packages/protocol
+              ./specs/scripts/applyHarness.sh
+              ./specs/scripts/governance.sh
+            fi
+      - run:
+          name: Build and run - Reserve
+          command: |
+            if [ ${CIRCLE_NODE_INDEX} == "4" ];
+            then
+              cd packages/protocol
+              ./specs/scripts/reserve.sh
+            fi
 
   flakey-test-summary:
     <<: *defaults
@@ -857,9 +887,6 @@ workflows:
           requires:
             - install_dependencies
       - lint-checks:
-          requires:
-            - install_dependencies
-      - vulnerability-checks:
           requires:
             - install_dependencies
       - general-test:

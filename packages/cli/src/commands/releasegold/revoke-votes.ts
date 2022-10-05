@@ -1,3 +1,4 @@
+import { CeloTransactionObject } from '@celo/connect'
 import { flags } from '@oclif/command'
 import BigNumber from 'bignumber.js'
 import { newCheckBuilder } from '../../utils/checks'
@@ -12,37 +13,62 @@ export default class RevokeVotes extends ReleaseGoldBaseCommand {
   static flags = {
     ...ReleaseGoldBaseCommand.flags,
     group: Flags.address({
-      required: true,
+      required: false,
+      exclusive: ['allGroups'],
       description: 'Address of the group to revoke votes from',
     }),
-    votes: flags.string({ required: true, description: 'The number of votes to revoke' }),
+    votes: flags.string({
+      required: false,
+      exclusive: ['allVotes', 'allGroups'],
+      description: 'The number of votes to revoke',
+    }),
+    allVotes: flags.boolean({
+      required: false,
+      exclusive: ['votes'],
+      description: 'Revoke all votes',
+    }),
+    allGroups: flags.boolean({
+      required: false,
+      exclusive: ['group', 'votes'],
+      description: 'Revoke all votes from all groups',
+    }),
   }
 
   static examples = [
     'revoke-votes --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --group 0x5409ED021D9299bf6814279A6A1411A7e866A631 --votes 100',
+    'revoke-votes --contract 0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95 --allVotes --allGroups',
   ]
 
   async run() {
     // tslint:disable-next-line
     const { flags } = this.parse(RevokeVotes)
 
+    await newCheckBuilder(this).isAccount(this.releaseGoldWrapper.address).runChecks()
+
     const isRevoked = await this.releaseGoldWrapper.isRevoked()
     const beneficiary = await this.releaseGoldWrapper.getBeneficiary()
     const releaseOwner = await this.releaseGoldWrapper.getReleaseOwner()
-    const votes = new BigNumber(flags.votes)
-    await newCheckBuilder(this)
-      .isAccount(this.releaseGoldWrapper.address)
-      .isValidatorGroup(flags.group)
-      .runChecks()
 
     this.kit.defaultAccount = isRevoked ? releaseOwner : beneficiary
-    const txos = await this.releaseGoldWrapper.revoke(
-      this.releaseGoldWrapper.address,
-      flags.group,
-      votes
-    )
+
+    let txos: Array<CeloTransactionObject<void>>
+    if (flags.allVotes && flags.allGroups) {
+      txos = await this.releaseGoldWrapper.revokeAllVotesForAllGroups()
+    } else if (flags.allVotes && flags.group) {
+      txos = await this.releaseGoldWrapper.revokeAllVotesForGroup(flags.group)
+    } else if (flags.votes && flags.group) {
+      txos = await this.releaseGoldWrapper.revokeValueFromVotes(
+        flags.group,
+        new BigNumber(flags.votes)
+      )
+    } else {
+      throw new Error(
+        'Must provide --votes amount and --group address or --allVotes --allGroups flags'
+      )
+    }
+
     for (const txo of txos) {
-      await displaySendTx('revoke', txo)
+      await displaySendTx('revokeVotes', txo)
     }
   }
 }

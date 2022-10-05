@@ -1,6 +1,6 @@
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
 import { StableTokenWrapper } from '@celo/contractkit/lib/wrappers/StableTokenWrapper'
-import { generateKeys, generateMnemonic } from '@celo/utils/lib/account'
+import { generateKeys, generateMnemonic } from '@celo/cryptographic-utils/lib/account'
 import { Address, privateKeyToAddress } from '@celo/utils/lib/address'
 import { sleep } from '@celo/utils/lib/async'
 import { describe, test } from '@jest/globals'

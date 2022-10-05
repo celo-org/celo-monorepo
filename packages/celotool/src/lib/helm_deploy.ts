@@ -2,13 +2,28 @@ import { concurrentMap } from '@celo/utils/lib/async'
 import compareVersions from 'compare-versions'
 import fs from 'fs'
 import { entries, range } from 'lodash'
+import os from 'os'
+import path from 'path'
 import sleep from 'sleep-promise'
+import { GCPClusterConfig } from 'src/lib/k8s-cluster/gcp'
+import stringHash from 'string-hash'
 import { getKubernetesClusterRegion, switchToClusterFromEnv } from './cluster'
-import { execCmd, execCmdWithExitOnFailure, outputIncludes } from './cmd-utils'
-import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, isProduction } from './env-utils'
+import {
+  execCmd,
+  execCmdWithExitOnFailure,
+  outputIncludes,
+  spawnCmd,
+  spawnCmdWithExitOnFailure,
+} from './cmd-utils'
+import { EnvTypes, envVar, fetchEnv, fetchEnvOrFallback, monorepoRoot } from './env-utils'
 import { ensureAuthenticatedGcloudAccount } from './gcloud_utils'
 import { generateGenesisFromEnv } from './generate_utils'
-import { retrieveBootnodeIPAddress } from './geth'
+import {
+  buildGethAll,
+  checkoutGethRepo,
+  getEnodesWithExternalIPAddresses,
+  retrieveBootnodeIPAddress,
+} from './geth'
 import { BaseClusterConfig, CloudProvider } from './k8s-cluster/base'
 import { getStatefulSetReplicas, scaleResource } from './kubernetes'
 import { installPrometheusIfNotExists } from './prometheus'
@@ -16,12 +31,19 @@ import {
   getGenesisBlockFromGoogleStorage,
   getProxiesPerValidator,
   getProxyName,
+  uploadGenesisBlockToGoogleStorage,
 } from './testnet-utils'
+import { stringToBoolean } from './utils'
+
+const generator = require('generate-password')
 
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
 const TIMEOUT_FOR_LOAD_BALANCER_POLL = 1000 * 60 * 25 // 25 minutes
 const LOAD_BALANCER_POLL_INTERVAL = 1000 * 10 // 10 seconds
+
+const TESTNET_CHART_DIR = '../helm-charts/testnet'
+export type HelmAction = 'install' | 'upgrade'
 
 async function validateExistingCloudSQLInstance(instanceName: string) {
   await ensureAuthenticatedGcloudAccount()
@@ -65,7 +87,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
     console.warn(
       `A Cloud SQL instance named ${instanceName} already exists, so in all likelihood you cannot deploy initial with ${instanceName}`
     )
-  } catch (error) {
+  } catch (error: any) {
     if (
       error.message.trim() !==
       `Command failed: gcloud sql instances describe ${instanceName}\nERROR: (gcloud.sql.instances.describe) HTTPError 404: The Cloud SQL instance does not exist.`
@@ -83,7 +105,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
         envVar.KUBERNETES_CLUSTER_ZONE
       )} --database-version POSTGRES_9_6 --cpu 1 --memory 4G`
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error(error.message.trim())
   }
 
@@ -95,7 +117,7 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
           envVar.KUBERNETES_CLUSTER_ZONE
         )}`
       )
-    } catch (error) {
+    } catch (error: any) {
       console.error(error.message.trim())
     }
   }
@@ -104,8 +126,17 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
     `gcloud sql instances patch ${instanceName} --backup-start-time 17:00`
   )
 
-  const blockscoutDBUsername = Math.random().toString(36).slice(-8)
-  const blockscoutDBPassword = Math.random().toString(36).slice(-8)
+  const passwordOptions = {
+    length: 22,
+    numbers: true,
+    symbols: false,
+    lowercase: true,
+    uppercase: true,
+    strict: true,
+  }
+
+  const blockscoutDBUsername = generator.generate(passwordOptions)
+  const blockscoutDBPassword = generator.generate(passwordOptions)
 
   console.info('Creating SQL user')
   await execCmdWithExitOnFailure(
@@ -123,6 +154,87 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
   )
 
   return [blockscoutDBUsername, blockscoutDBPassword, blockscoutDBConnectionName.trim()]
+}
+
+export async function cloneCloudSQLInstance(
+  celoEnv: string,
+  instanceName: string,
+  cloneInstanceName: string,
+  dbSuffix: string
+) {
+  await ensureAuthenticatedGcloudAccount()
+  console.info('Cloning Cloud SQL database, this might take a minute or two ...')
+
+  await failIfSecretMissing(CLOUDSQL_SECRET_NAME, 'default')
+
+  try {
+    await execCmd(`gcloud sql instances describe ${cloneInstanceName}`)
+    // if we get to here, that means the instance already exists
+    console.warn(
+      `A Cloud SQL instance named ${cloneInstanceName} already exists, so in all likelihood you cannot deploy cloning with ${cloneInstanceName}`
+    )
+  } catch (error: any) {
+    if (
+      error.message.trim() !==
+      `Command failed: gcloud sql instances describe ${cloneInstanceName}\nERROR: (gcloud.sql.instances.describe) HTTPError 404: The Cloud SQL instance does not exist.`
+    ) {
+      console.error(error.message.trim())
+      process.exit(1)
+    }
+  }
+
+  try {
+    await execCmdWithExitOnFailure(
+      `gcloud sql instances clone ${instanceName} ${cloneInstanceName} `
+    )
+  } catch (error: any) {
+    console.error(error.message.trim())
+  }
+
+  await execCmdWithExitOnFailure(
+    `gcloud sql instances patch ${cloneInstanceName} --backup-start-time 17:00`
+  )
+
+  const [blockscoutDBUsername, blockscoutDBPassword] = await retrieveCloudSQLConnectionInfo(
+    celoEnv,
+    instanceName,
+    dbSuffix
+  )
+
+  console.info('Copying blockscout service account secret to namespace')
+  await copySecret(CLOUDSQL_SECRET_NAME, 'default', celoEnv)
+
+  const [blockscoutDBConnectionName] = await execCmdWithExitOnFailure(
+    `gcloud sql instances describe ${cloneInstanceName} --format="value(connectionName)"`
+  )
+
+  return [blockscoutDBUsername, blockscoutDBPassword, blockscoutDBConnectionName.trim()]
+}
+
+export async function createSecretInSecretManagerIfNotExists(
+  secretId: string,
+  secretLabels: string[],
+  secretValue: string
+) {
+  try {
+    await execCmd(`gcloud secrets describe ${secretId}`)
+
+    console.info(`Secret ${secretId} already exists, skipping creation...`)
+  } catch (error) {
+    await execCmd(
+      `echo -n "${secretValue}" | gcloud secrets create ${secretId} --data-file=- --replication-policy="automatic" --labels ${secretLabels.join(
+        ','
+      )}`
+    )
+  }
+}
+
+export async function deleteSecretFromSecretManager(secretId: string) {
+  try {
+    await execCmd(`gcloud secrets delete ${secretId}`)
+  } catch {
+    console.info(`Couldn't delete secret ${secretId} -- skipping`)
+  }
 }
 
 async function createAndUploadKubernetesSecretIfNotExists(
@@ -196,7 +308,7 @@ export async function installCertManagerAndNginx(
   celoEnv: string,
   clusterConfig?: BaseClusterConfig
 ) {
-  const nginxChartVersion = '3.9.0'
+  const nginxChartVersion = '4.2.1'
   const nginxChartNamespace = 'default'
 
   // Check if cert-manager is installed in any namespace
@@ -221,7 +333,7 @@ export async function installCertManagerAndNginx(
     const valueFilePath = `/tmp/${celoEnv}-nginx-testnet-values.yaml`
     await nginxHelmParameters(valueFilePath, celoEnv, clusterConfig)
 
-    await helmUpdateNginxRepo()
+    await helmAddAndUpdateRepos()
     await execCmdWithExitOnFailure(`helm install \
       -n ${nginxChartNamespace} \
       --version ${nginxChartVersion} \
@@ -243,16 +355,20 @@ async function nginxHelmParameters(
   "$request_length", "responseSize": "$upstream_response_length", "userAgent":
   "$http_user_agent", "remoteIp": "$remote_addr", "referer": "$http_referer",
   "latency": "$upstream_response_time s", "protocol":"$server_protocol"}}`
+
   let loadBalancerIP = ''
-  if (clusterConfig?.cloudProvider === CloudProvider.GCP) {
-    loadBalancerIP = await getOrCreateNginxStaticIp(celoEnv)
+  if (clusterConfig == null || clusterConfig?.cloudProvider === CloudProvider.GCP) {
+    loadBalancerIP = await getOrCreateNginxStaticIp(celoEnv, clusterConfig)
   }
 
   const valueFileContent = `
 controller:
   autoscaling:
     enabled: "true"
-    targetMemoryUtilizationPercentage: 85
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
   config:
     log-format-escape-json: "true"
     log-format-upstream: '${logFormat}'
@@ -266,25 +382,45 @@ controller:
     loadBalancerIP: ${loadBalancerIP}
   resources:
     requests:
-      cpu: 200m
-      memory: 400Mi
+      cpu: 300m
+      memory: 600Mi
 `
   fs.writeFileSync(valueFilePath, valueFileContent)
 }
 
-async function getOrCreateNginxStaticIp(celoEnv: string) {
-  const staticIpName = `${celoEnv}-nginx`
-  await registerIPAddress(staticIpName)
-  const staticIpAddress = await retrieveIPAddress(staticIpName)
-  console.info(staticIpAddress)
+async function getOrCreateNginxStaticIp(celoEnv: string, clusterConfig?: BaseClusterConfig) {
+  const staticIpName = clusterConfig?.clusterName
+    ? `${clusterConfig?.clusterName}-nginx`
+    : `${celoEnv}-nginx`
+  let staticIpAddress
+  if (clusterConfig !== undefined && clusterConfig.hasOwnProperty('zone')) {
+    const zone = (clusterConfig as GCPClusterConfig).zone
+    await registerIPAddress(staticIpName, zone)
+    staticIpAddress = await retrieveIPAddress(staticIpName, zone)
+  } else {
+    await registerIPAddress(staticIpName)
+    staticIpAddress = await retrieveIPAddress(staticIpName)
+  }
+  console.info(`nginx-ingress static ip --> ${staticIpName}: ${staticIpAddress}`)
   return staticIpAddress
 }
 
-export async function helmUpdateNginxRepo() {
-  await execCmdWithExitOnFailure(
-    `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
-  )
-  await execCmdWithExitOnFailure(`helm repo add stable https://charts.helm.sh/stable`)
+// Add a Helm repository and updates the local cache. If repository already exists, it is executed
+// without error.
+export async function helmAddRepoAndUpdate(repository: string, name?: string) {
+  if (name === undefined) {
+    const repoArray = repository.split('/')
+    name = repoArray[repoArray.length - 1]
+  }
+  console.info(`Adding Helm repository ${name} with URL ${repository}`)
+  await execCmdWithExitOnFailure(`helm repo add ${name} ${repository}`)
+  await execCmdWithExitOnFailure(`helm repo update`)
+}
+
+// Add common helm repositories
+export async function helmAddAndUpdateRepos() {
+  await helmAddRepoAndUpdate('https://kubernetes.github.io/ingress-nginx')
+  await helmAddRepoAndUpdate('https://charts.helm.sh/stable')
   await execCmdWithExitOnFailure(`helm repo update`)
 }
 
@@ -296,7 +432,7 @@ export async function installCertManager() {
 
   console.info('Installing cert-manager CustomResourceDefinitions')
   await execCmdWithExitOnFailure(
-    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.crds.yaml`
+    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml`
   )
   console.info('Updating cert-manager-cluster-issuers chart dependencies')
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
@@ -399,7 +535,7 @@ export async function registerIPAddress(name: string, zone?: string) {
     await execCmd(
       `gcloud compute addresses create ${name} --region ${getKubernetesClusterRegion(zone)}`
     )
-  } catch (error) {
+  } catch (error: any) {
     if (!error.toString().includes('already exists')) {
       console.error(error)
       process.exit(1)
@@ -410,10 +546,14 @@ export async function registerIPAddress(name: string, zone?: string) {
 export async function deleteIPAddress(name: string, zone?: string) {
   console.info(`Deleting IP address ${name}`)
   try {
-    await execCmd(
-      `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
-    )
-  } catch (error) {
+    if (isCelotoolVerbose()) {
+      console.info(`IP Address ${name} would be deleted`)
+    } else {
+      await execCmd(
+        `gcloud compute addresses delete ${name} --region ${getKubernetesClusterRegion(zone)} -q`
+      )
+    }
+  } catch (error: any) {
     if (!error.toString().includes('was not found')) {
       console.error(error)
       process.exit(1)
@@ -422,10 +562,9 @@ export async function deleteIPAddress(name: string, zone?: string) {
 }
 
 export async function retrieveIPAddress(name: string, zone?: string) {
+  const regionFlag = zone === 'global' ? '--global' : `--region ${getKubernetesClusterRegion(zone)}`
   const [address] = await execCmdWithExitOnFailure(
-    `gcloud compute addresses describe ${name} --region ${getKubernetesClusterRegion(
-      zone
-    )} --format="value(address)"`
+    `gcloud compute addresses describe ${name} ${regionFlag} --format="value(address)"`
   )
   return address.replace(/\n*$/, '')
 }
@@ -455,7 +594,7 @@ export async function createStaticIPs(celoEnv: string) {
   console.info(`Creating static IPs for ${celoEnv}`)
 
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
-  await Promise.all(range(numTxNodes).map((i) => registerIPAddress(`${celoEnv}-tx-nodes-${i}`)))
+  await concurrentMap(5, range(numTxNodes), (i) => registerIPAddress(`${celoEnv}-tx-nodes-${i}`))
 
   if (useStaticIPsForGethNodes()) {
     await registerIPAddress(`${celoEnv}-bootnode`)
@@ -480,8 +619,8 @@ export async function createStaticIPs(celoEnv: string) {
 
     // Create IPs for the private tx nodes
     const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
-    await Promise.all(
-      range(numPrivateTxNodes).map((i) => registerIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+    await concurrentMap(5, range(numPrivateTxNodes), (i) =>
+      registerIPAddress(`${celoEnv}-tx-nodes-private-${i}`)
     )
   }
 }
@@ -599,12 +738,12 @@ export async function deleteStaticIPs(celoEnv: string) {
   console.info(`Deleting static IPs for ${celoEnv}`)
 
   const numTxNodes = parseInt(fetchEnv(envVar.TX_NODES), 10)
-  await Promise.all(range(numTxNodes).map((i) => deleteIPAddress(`${celoEnv}-tx-nodes-${i}`)))
+  await concurrentMap(5, range(numTxNodes), (i) => deleteIPAddress(`${celoEnv}-tx-nodes-${i}`))
 
   await deleteIPAddress(`${celoEnv}-bootnode`)
 
   const numValidators = parseInt(fetchEnv(envVar.VALIDATORS), 10)
-  await Promise.all(range(numValidators).map((i) => deleteIPAddress(`${celoEnv}-validators-${i}`)))
+  await concurrentMap(5, range(numValidators), (i) => deleteIPAddress(`${celoEnv}-validators-${i}`))
 
   const proxiesPerValidator = getProxiesPerValidator()
   for (let valIndex = 0; valIndex < numValidators; valIndex++) {
@@ -614,8 +753,8 @@ export async function deleteStaticIPs(celoEnv: string) {
   }
 
   const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
-  await Promise.all(
-    range(numPrivateTxNodes).map((i) => deleteIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+  await concurrentMap(5, range(numPrivateTxNodes), (i) =>
+    deleteIPAddress(`${celoEnv}-tx-nodes-private-${i}`)
   )
 }
 
@@ -638,7 +777,7 @@ export async function deletePersistentVolumeClaimsCustomLabels(
       `kubectl delete pvc --selector='${label}=${value}' --namespace ${namespace}`
     )
     console.info(output)
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
     if (!error.toString().includes('not found')) {
       process.exit(1)
@@ -707,8 +846,8 @@ async function helmIPParameters(celoEnv: string) {
     ipAddressParameters.push(...proxyIpAddressesParams)
 
     const numPrivateTxNodes = parseInt(fetchEnv(envVar.PRIVATE_TX_NODES), 10)
-    const privateTxAddresses = await Promise.all(
-      range(numPrivateTxNodes).map((i) => retrieveIPAddress(`${celoEnv}-tx-nodes-private-${i}`))
+    const privateTxAddresses = await concurrentMap(5, range(numPrivateTxNodes), (i) =>
+      retrieveIPAddress(`${celoEnv}-tx-nodes-private-${i}`)
     )
     const privateTxAddressParameters = privateTxAddresses.map(
       (address, i) => `--set geth.private_tx_nodes_${i}IpAddress=${address}`
@@ -724,6 +863,9 @@ async function helmIPParameters(celoEnv: string) {
 }
 
 async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
+  const valueFilePath = `/tmp/${celoEnv}-testnet-values.yaml`
+  await saveHelmValuesFile(celoEnv, valueFilePath, useExistingGenesis, false)
+
   const gethMetricsOverrides =
     fetchEnvOrFallback('GETH_ENABLE_METRICS', 'false') === 'true'
       ? [
@@ -734,9 +876,8 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
         ]
       : [`--set metrics="false"`, `--set pprof.enabled="false"`]
 
-  const genesisContent = useExistingGenesis
-    ? await getGenesisBlockFromGoogleStorage(celoEnv)
-    : generateGenesisFromEnv()
+  const useMyCelo = stringToBoolean(fetchEnvOrFallback(envVar.GETH_USE_MYCELO, 'false'))
+  await createAndPushGenesis(celoEnv, !useExistingGenesis, useMyCelo)
 
   const bootnodeOverwritePkey =
     fetchEnvOrFallback(envVar.GETH_BOOTNODE_OVERWRITE_PKEY, '') !== ''
@@ -753,15 +894,15 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
   )
 
   return [
+    `-f ${valueFilePath}`,
     `--set bootnode.image.repository=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_REPOSITORY')}`,
     `--set bootnode.image.tag=${fetchEnv('GETH_BOOTNODE_DOCKER_IMAGE_TAG')}`,
     `--set celotool.image.repository=${fetchEnv('CELOTOOL_DOCKER_IMAGE_REPOSITORY')}`,
     `--set celotool.image.tag=${fetchEnv('CELOTOOL_DOCKER_IMAGE_TAG')}`,
     `--set domain.name=${fetchEnv('CLUSTER_DOMAIN_NAME')}`,
-    `--set genesis.genesisFileBase64=${Buffer.from(genesisContent).toString('base64')}`,
+    `--set genesis.useGenesisFileBase64="false"`,
     `--set genesis.network=${celoEnv}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
-    `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.vmodule=${fetchEnvOrFallback('GETH_VMODULE', '')}`,
     `--set geth.resources.requests.cpu=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
@@ -774,11 +915,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,
     `--set geth.faultyValidators="${fetchEnvOrFallback('FAULTY_VALIDATORS', '0')}"`,
     `--set geth.faultyValidatorType="${fetchEnvOrFallback('FAULTY_VALIDATOR_TYPE', '0')}"`,
-    // Disable by default block age check in fullnode readinessProbe except for production envs
-    `--set geth.fullnodeCheckBlockAge=${fetchEnvOrFallback(
-      envVar.FULL_NODE_READINESS_CHECK_BLOCK_AGE,
-      `${isProduction()}`
-    )}`,
     `--set geth.tx_nodes="${fetchEnv('TX_NODES')}"`,
     `--set geth.private_tx_nodes="${fetchEnv(envVar.PRIVATE_TX_NODES)}"`,
     `--set geth.ssd_disks="${fetchEnvOrFallback(envVar.GETH_NODES_SSD_DISKS, 'true')}"`,
@@ -800,10 +936,9 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
 }
 
 async function helmCommand(command: string, pipeOutput = false) {
-  if (isCelotoolVerbose() && !command.includes(' dep build ')) {
-    await execCmdWithExitOnFailure(command + ' --dry-run --debug')
-  } else if (isCelotoolVerbose()) {
-    await execCmdWithExitOnFailure(command + ' --debug')
+  // "helm diff" is a plugin and doesn't support "--debug"
+  if (isCelotoolVerbose() && !command.startsWith('helm diff')) {
+    command += ' --debug'
   }
 
   await execCmdWithExitOnFailure(command, {}, pipeOutput)
@@ -814,7 +949,7 @@ function buildHelmChartDependencies(chartDir: string) {
   return helmCommand(`helm dep build ${chartDir}`)
 }
 
-async function installHelmDiffPlugin() {
+export async function installHelmDiffPlugin() {
   try {
     await execCmd(`helm diff version`, {}, false)
   } catch (error) {
@@ -823,54 +958,91 @@ async function installHelmDiffPlugin() {
   }
 }
 
+// Return the values file arg if file exists If values file reference is defined and file not found,
+// throw an error. When chartDir is a remote chart, the values file is assumed to be an abslute path.
 function valuesOverrideArg(chartDir: string, filename: string | undefined) {
   if (filename === undefined) {
     return ''
+  } else if (fs.existsSync(filename)) {
+    return `-f ${filename}`
+  } else if (fs.existsSync(path.join(chartDir, filename))) {
+    return `-f ${path.join(chartDir, filename)}`
+  } else {
+    console.error(`Values override file ${filename} not found`)
   }
-
-  return `-f ${chartDir}/${filename}`
 }
 
-export async function installGenericHelmChart(
-  celoEnv: string,
-  releaseName: string,
-  chartDir: string,
-  parameters: string[],
-  buildDependencies: boolean = true,
+//   namespace: The namespace to install the chart into
+//   releaseName: The name of the release
+//   chartDir: The directory containing the chart or the values.yamls files. By default, it will try to use a custom values file
+//       at ${chartDir}/${valuesOverrideFile}.yaml
+//   parameters: The parameters to pass to the helm install command (e.g. --set geth.replicas=3)
+//   buildDependencies: Whether to build the chart dependencies before installing. When using a remote chart, this must be false.
+//   chartVersion: The version of the chart to install. Used only when chartRemoteReference is set
+//   valuesOverrideFile: The name of the values file to use. In the case of a remote chart, this is assumed to be an absolute path.
+interface GenericHelmChartParameters {
+  namespace: string
+  releaseName: string
+  chartDir: string
+  parameters: string[]
+  buildDependencies?: boolean
+  chartVersion?: string
   valuesOverrideFile?: string
-) {
+}
+// Install a Helm Chart. Look above for the parameters
+
+// When using a remote helm chart, buildDependencies must be false and valuesOverrideFile the absolute path to the values file
+export async function installGenericHelmChart({
+  namespace,
+  releaseName,
+  chartDir,
+  parameters,
+  buildDependencies = true,
+  chartVersion,
+  valuesOverrideFile,
+}: GenericHelmChartParameters) {
   if (buildDependencies) {
     await buildHelmChartDependencies(chartDir)
   }
 
   if (isCelotoolHelmDryRun()) {
+    const versionLog = chartVersion ? ` version ${chartVersion}` : ''
+    const valuesOverrideLog = valuesOverrideFile
+      ? `, with values override: ${valuesOverrideFile}`
+      : ''
     console.info(
-      `This would deploy chart ${chartDir} with release name ${releaseName} in namespace ${celoEnv} with parameters:`
+      `This would deploy chart ${chartDir}${versionLog} with release name ${releaseName} in namespace ${namespace}${valuesOverrideLog} with parameters:`
     )
     console.info(parameters)
-    if (valuesOverrideFile !== undefined) {
-      console.info(`And with values override: ${valuesOverrideFile}`)
-    }
   } else {
     console.info(`Installing helm release ${releaseName}`)
+    const versionArg = chartVersion ? `--version=${chartVersion}` : ''
     const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
     await helmCommand(
-      `helm install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+      `helm upgrade --install ${valuesOverride} ${releaseName} ${chartDir} ${versionArg} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
   }
 }
 
-export async function upgradeGenericHelmChart(
-  celoEnv: string,
-  releaseName: string,
-  chartDir: string,
-  parameters: string[],
-  valuesOverrideFile?: string
-) {
-  await buildHelmChartDependencies(chartDir)
+// Upgrade a Helm Chart. chartDir can be the path to the Helm Chart or the name of a remote Helm Chart.
+// If using a remote helm chart, the chart repository has to be added and updated in the local helm config
+// When using a remote helm chart, buildDependencies must be false and valuesOverrideFile the absolute path to the values file
+export async function upgradeGenericHelmChart({
+  namespace,
+  releaseName,
+  chartDir,
+  parameters,
+  buildDependencies = true,
+  chartVersion,
+  valuesOverrideFile,
+}: GenericHelmChartParameters) {
+  if (buildDependencies) {
+    await buildHelmChartDependencies(chartDir)
+  }
   const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
+  const versionArg = chartVersion ? `--version=${chartVersion}` : ''
 
   if (isCelotoolHelmDryRun()) {
     console.info(
@@ -878,7 +1050,7 @@ export async function upgradeGenericHelmChart(
     )
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+      `helm diff upgrade --install -C 5 ${valuesOverride} ${versionArg} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`,
       true
@@ -886,12 +1058,46 @@ export async function upgradeGenericHelmChart(
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+      `helm upgrade --install ${valuesOverride} ${versionArg} ${releaseName} ${chartDir} --timeout 120h --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
     console.info(`Upgraded helm release ${releaseName} successful`)
   }
+}
+
+export async function getConfigMapHashes(
+  celoEnv: string,
+  releaseName: string,
+  chartDir: string,
+  parameters: string[],
+  action: HelmAction,
+  valuesOverrideFile?: string
+): Promise<Record<string, string>> {
+  const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
+  const [output] = await execCmd(
+    `helm ${action} -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${celoEnv} ${parameters.join(
+      ' '
+    )} --dry-run`,
+    {},
+    false,
+    false
+  )
+
+  return output
+    .split('---')
+    .filter((section) => {
+      return /kind: ConfigMap/.exec(section)
+    })
+    .reduce<Record<string, string>>((configHashes, section) => {
+      const matchSource = /Source: (.*)/.exec(section)
+      if (matchSource === null) {
+        throw new Error('Can not extract Source from config section')
+      }
+
+      configHashes[matchSource[1]] = stringHash(section).toString()
+      return configHashes
+    }, {})
 }
 
 export function isCelotoolVerbose() {
@@ -918,21 +1124,39 @@ export async function removeGenericHelmChart(releaseName: string, namespace: str
   }
 }
 
+function getExtraValuesFile(celoEnv: string) {
+  const extraValuesFile = fs.existsSync(`${TESTNET_CHART_DIR}/values-${celoEnv}.yaml`)
+    ? `values-${celoEnv}.yaml`
+    : undefined
+  return extraValuesFile
+}
+
 export async function installHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   await failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
   await copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
-  return installGenericHelmChart(
-    celoEnv,
-    celoEnv,
-    '../helm-charts/testnet',
-    await helmParameters(celoEnv, useExistingGenesis)
-  )
+  const extraValuesFile = getExtraValuesFile(celoEnv)
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: celoEnv,
+    chartDir: TESTNET_CHART_DIR,
+    parameters: await helmParameters(celoEnv, useExistingGenesis),
+    buildDependencies: true,
+    valuesOverrideFile: extraValuesFile,
+  })
 }
 
 export async function upgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   console.info(`Upgrading helm release ${celoEnv}`)
   const parameters = await helmParameters(celoEnv, useExistingGenesis)
-  await upgradeGenericHelmChart(celoEnv, celoEnv, '../helm-charts/testnet', parameters)
+  const extraValuesFile = getExtraValuesFile(celoEnv)
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: celoEnv,
+    chartDir: TESTNET_CHART_DIR,
+    parameters,
+    buildDependencies: true,
+    valuesOverrideFile: extraValuesFile,
+  })
 }
 
 export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
@@ -1034,7 +1258,7 @@ function useStaticIPsForGethNodes() {
 }
 
 export async function checkHelmVersion() {
-  const requiredMinHelmVersion = '3.4'
+  const requiredMinHelmVersion = '3.8'
   const helmVersionCmd = `helm version --template '{{ .Version }}'`
   const localHelmVersion = (await execCmdWithExitOnFailure(helmVersionCmd))[0].replace('^v', '')
 
@@ -1072,4 +1296,105 @@ function rollingUpdateHelmVariables() {
       '0'
     )}`,
   ]
+}
+
+export async function saveHelmValuesFile(
+  celoEnv: string,
+  valueFilePath: string,
+  useExistingGenesis: boolean,
+  skipGenesisValue = false
+) {
+  const genesisContent = useExistingGenesis
+    ? await getGenesisBlockFromGoogleStorage(celoEnv)
+    : generateGenesisFromEnv()
+
+  const enodes = await getEnodesWithExternalIPAddresses(celoEnv)
+
+  let valueFileContent = `
+staticnodes:
+  staticnodesBase64: ${Buffer.from(JSON.stringify(enodes)).toString('base64')}
+`
+  if (!skipGenesisValue) {
+    valueFileContent += `
+  genesis:
+    genesisFileBase64: ${Buffer.from(genesisContent).toString('base64')}
+`
+  }
+  fs.writeFileSync(valueFilePath, valueFileContent)
+}
+
+const celoBlockchainDir: string = path.join(os.tmpdir(), 'celo-blockchain-celotool')
+
+export async function createAndPushGenesis(celoEnv: string, reset: boolean, useMyCelo: boolean) {
+  let genesis: string = ''
+  try {
+    genesis = await getGenesisBlockFromGoogleStorage(celoEnv)
+  } catch {
+    console.debug(`Genesis file not found in GCP. Creating a new one`)
+  }
+  if (genesis === '' || reset === true) {
+    genesis = useMyCelo ? await generateMyCeloGenesis() : generateGenesisFromEnv()
+  }
+  // Upload the new genesis file to gcp
+  if (!isCelotoolHelmDryRun()) {
+    await uploadGenesisBlockToGoogleStorage(celoEnv, genesis)
+  }
+}
+
+async function generateMyCeloGenesis(): Promise<string> {
+  // Clean up the tmp dir
+  await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
+  fs.mkdirSync(celoBlockchainDir)
+  const gethTag =
+    fetchEnvOrFallback(envVar.GETH_MYCELO_COMMIT, '') !== ''
+      ? fetchEnv(envVar.GETH_MYCELO_COMMIT)
+      : fetchEnv(envVar.GETH_NODE_DOCKER_IMAGE_TAG)
+  const celoBlockchainVersion = gethTag.includes('.') ? `v${gethTag}` : gethTag
+  await checkoutGethRepo(celoBlockchainVersion, celoBlockchainDir)
+  await buildGethAll(celoBlockchainDir)
+
+  // Generate genesis-config from template
+  const myceloBinary = path.join(celoBlockchainDir, 'build/bin/mycelo')
+  const myceloGenesisConfigArgs = [
+    'genesis-config',
+    '--template',
+    'monorepo',
+    '--mnemonic',
+    fetchEnv(envVar.MNEMONIC),
+    '--validators',
+    fetchEnv(envVar.VALIDATORS),
+    '--dev.accounts',
+    fetchEnv(envVar.LOAD_TEST_CLIENTS),
+    '--blockperiod',
+    fetchEnv(envVar.BLOCK_TIME),
+    '--epoch',
+    fetchEnv(envVar.EPOCH),
+    '--blockgaslimit',
+    '20000000',
+  ]
+  await spawnCmdWithExitOnFailure(myceloBinary, myceloGenesisConfigArgs, {
+    silent: false,
+    cwd: celoBlockchainDir,
+  })
+
+  // TODO: Load config to customize migrations...
+
+  // Generate genesis from config
+
+  const myceloGenesisFromConfigArgs = [
+    'genesis-from-config',
+    celoBlockchainDir,
+    '--buildpath',
+    path.join(monorepoRoot, 'packages/protocol/build/contracts'),
+  ]
+  await spawnCmdWithExitOnFailure(myceloBinary, myceloGenesisFromConfigArgs, {
+    silent: false,
+    cwd: celoBlockchainDir,
+  })
+  const genesisPath = path.join(celoBlockchainDir, 'genesis.json')
+  const genesisContent = fs.readFileSync(genesisPath).toString()
+
+  // Clean up the tmp dir as it's no longer needed
+  await spawnCmd('rm', ['-rf', celoBlockchainDir], { silent: true })
+  return genesisContent
 }

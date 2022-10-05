@@ -4,7 +4,7 @@ import express from 'express'
 import fetch from 'node-fetch'
 import { receivedDeliveryReport } from '.'
 import { fetchEnv, fetchEnvOrDefault } from '../env'
-import { AttestationModel, AttestationStatus } from '../models/attestation'
+import { AttestationStatus, SmsFields } from '../models/attestation'
 import { readUnsupportedRegionsFromEnv, SmsProvider, SmsProviderType } from './base'
 
 export class TelekomSmsProvider extends SmsProvider {
@@ -71,7 +71,7 @@ export class TelekomSmsProvider extends SmsProvider {
     this.deliveryStatusURL = deliveryStatusURL
   }
 
-  async sendSms(attestation: AttestationModel) {
+  async sendSms(attestation: SmsFields) {
     const response = await fetch(this.serviceURL, {
       method: 'POST',
       headers: {

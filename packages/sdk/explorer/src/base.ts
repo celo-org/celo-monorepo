@@ -1,6 +1,6 @@
 import { concurrentMap } from '@celo/base/lib/async'
 import { AbiItem, Address } from '@celo/connect'
-import { CeloContract, ContractKit, RegisteredContracts } from '@celo/contractkit'
+import { CeloContract, ContractKit } from '@celo/contractkit'
 
 export interface ContractDetails {
   name: string
@@ -22,8 +22,9 @@ export const getContractDetailsFromContract = async (
 }
 
 export async function obtainKitContractDetails(kit: ContractKit): Promise<ContractDetails[]> {
-  return concurrentMap(5, RegisteredContracts, (celoContract) =>
-    getContractDetailsFromContract(kit, celoContract)
+  const registry = await kit.registry.addressMapping()
+  return concurrentMap(5, Array.from(registry.entries()), ([celoContract, address]) =>
+    getContractDetailsFromContract(kit, celoContract, address)
   )
 }
 
