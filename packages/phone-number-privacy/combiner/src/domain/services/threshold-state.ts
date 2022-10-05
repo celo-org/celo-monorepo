@@ -11,14 +11,19 @@ export class DomainThresholdStateService<R extends DomainRequest> {
       .map((signerResponse) => ('status' in signerResponse.res ? signerResponse.res.status : null))
       .filter((state: DomainState | null | undefined): state is DomainState => !!state)
     const threshold = this.config.keys.threshold
+
+    // Note: when the threshold > # total signers - threshold, it's possible that we
+    // throw an error here when the domain is disabled. While the domain is technically disabled,
+    // the hope is to increase the "safety margin" of the number of signers that have
+    // also disabled this domain.This can be changed in the future (if we think that
+    // the safety margin is no longer needed) by simply checking if the domain is disabled
+    // before checking if the threshold of enabled responses has been met.
     if (domainStates.length < threshold) {
       throw new Error('Insufficient number of signer responses')
     }
 
     // Check whether the domain is disabled, either by all signers or by some.
     const domainStatesEnabled = domainStates.filter((ds) => !ds.disabled)
-    // TODO EN: if we do want to do the threshold check later, make sure
-    // that numDisabled is calculated independent of domainStates.length
     const numDisabled = domainStates.length - domainStatesEnabled.length
 
     const signersLength = JSON.parse(this.config.odisServices.signers).length
@@ -26,6 +31,7 @@ export class DomainThresholdStateService<R extends DomainRequest> {
       return { timer: 0, counter: 0, disabled: true, now: 0 }
     }
 
+    // Ideally users will resubmit the request in this case.
     if (domainStatesEnabled.length < threshold) {
       throw new Error('Insufficient number of signer responses. Domain may be disabled')
     }
