@@ -31,6 +31,10 @@ import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
+// TODO(2.0.0, timeout) revisit flake tracker timeouts under the umbrella of
+// https://github.com/celo-org/celo-monorepo/issues/9845
+jest.setTimeout(20000)
+
 describe('domain', () => {
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
@@ -704,7 +708,7 @@ describe('domain', () => {
         status: {
           disabled: false,
           counter: 1,
-          timer: res2.body.status.now,
+          timer: res1.body.status.timer, // Timer should be same as from first request
           now: res2.body.status.now,
         },
       })
