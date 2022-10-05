@@ -1637,7 +1637,7 @@ contract('Governance', (accounts: string[]) => {
         const weights = [10, 30]
         beforeEach(async () => {
           for (let i = 0; i < numVoted; i++) {
-            await governance.voteWeighted(i + 1, i, values, weights)
+            await governance.votePartially(i + 1, i, values, weights)
           }
         })
 
@@ -2047,7 +2047,7 @@ contract('Governance', (accounts: string[]) => {
     })
   })
 
-  describe('#voteWeighted()', () => {
+  describe('#votePartially()', () => {
     const proposalId = 1
     const index = 0
     const value = VoteValue.Yes
@@ -2070,7 +2070,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should return true', async () => {
-        const success = await governance.voteWeighted.call(proposalId, index, [value], [weight], {
+        const success = await governance.votePartially.call(proposalId, index, [value], [weight], {
           gas: 7000000,
           from: account,
         })
@@ -2078,7 +2078,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should increment the vote totals', async () => {
-        await governance.voteWeighted(proposalId, index, [value], [weight])
+        await governance.votePartially(proposalId, index, [value], [weight])
         const [yes, ,] = await governance.getVoteTotals(proposalId)
         assert.equal(yes.toNumber(), weight)
       })
@@ -2088,7 +2088,7 @@ contract('Governance', (accounts: string[]) => {
         const noVotes = 50
         const abstainVotes = 30
         const noneVotes = 10
-        await governance.voteWeighted(
+        await governance.votePartially(
           proposalId,
           index,
           [VoteValue.Yes, VoteValue.No, VoteValue.Abstain, VoteValue.None],
@@ -2101,7 +2101,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it("should set the voter's vote record", async () => {
-        await governance.voteWeighted(proposalId, index, [value], [weight])
+        await governance.votePartially(proposalId, index, [value], [weight])
         const [
           recordProposalId,
           recordValue,
@@ -2117,7 +2117,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should set the most recent referendum proposal voted on', async () => {
-        await governance.voteWeighted(proposalId, index, [value], [weight])
+        await governance.votePartially(proposalId, index, [value], [weight])
         assert.equal(
           (await governance.getMostRecentReferendumProposal(account)).toNumber(),
           proposalId
@@ -2125,7 +2125,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should emit the ProposalVoted event', async () => {
-        const resp = await governance.voteWeighted(proposalId, index, [value], [weight])
+        const resp = await governance.votePartially(proposalId, index, [value], [weight])
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -2143,16 +2143,16 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalLockedGold(account, 0)
-        await assertRevert(governance.voteWeighted(proposalId, index, [value], [weight]))
+        await assertRevert(governance.votePartially(proposalId, index, [value], [weight]))
       })
 
       it('should revert when the account does not have enough gold', async () => {
-        await assertRevert(governance.voteWeighted(proposalId, index, [value], [weight + 1]))
+        await assertRevert(governance.votePartially(proposalId, index, [value], [weight + 1]))
       })
 
       it('should revert when the account does not have enough gold when voting partially', async () => {
         await assertRevert(
-          governance.voteWeighted(
+          governance.votePartially(
             proposalId,
             index,
             [VoteValue.Yes, VoteValue.No],
@@ -2163,7 +2163,7 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the when passing bigger array than VoteValue enum length', async () => {
         await assertRevert(
-          governance.voteWeighted(
+          governance.votePartially(
             proposalId,
             index,
             [VoteValue.Yes, VoteValue.No, VoteValue.Abstain, VoteValue.None, VoteValue.Yes],
@@ -2173,7 +2173,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should revert when the index is out of bounds', async () => {
-        await assertRevert(governance.voteWeighted(proposalId, index + 1, [value], [weight]))
+        await assertRevert(governance.votePartially(proposalId, index + 1, [value], [weight]))
       })
 
       it('should revert if the proposal id does not match the index', async () => {
@@ -2189,7 +2189,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         const otherProposalId = 2
-        await assertRevert(governance.voteWeighted(otherProposalId, index, [value], [weight]))
+        await assertRevert(governance.votePartially(otherProposalId, index, [value], [weight]))
       })
 
       describe('when voting on two proposals', () => {
@@ -2228,23 +2228,23 @@ contract('Governance', (accounts: string[]) => {
         })
 
         it('should set mostRecentReferendumProposal to the youngest proposal voted on', async () => {
-          await governance.voteWeighted(proposalId2, index2, [value], [weight])
-          await governance.voteWeighted(proposalId1, index1, [value], [weight])
+          await governance.votePartially(proposalId2, index2, [value], [weight])
+          await governance.votePartially(proposalId1, index1, [value], [weight])
           const mostRecent = await governance.getMostRecentReferendumProposal(accounts[0])
           assert.equal(mostRecent.toNumber(), proposalId2)
         })
 
         it('should return true on `isVoting`', async () => {
-          await governance.voteWeighted(proposalId2, index2, [value], [weight])
-          await governance.voteWeighted(proposalId1, index1, [value], [weight])
+          await governance.votePartially(proposalId2, index2, [value], [weight])
+          await governance.votePartially(proposalId1, index1, [value], [weight])
           const voting = await governance.isVoting(accounts[0])
           assert.isTrue(voting)
         })
 
         describe('after the first proposal expires', () => {
           beforeEach(async () => {
-            await governance.voteWeighted(proposalId2, index2, [value], [weight])
-            await governance.voteWeighted(proposalId1, index1, [value], [weight])
+            await governance.votePartially(proposalId2, index2, [value], [weight])
+            await governance.votePartially(proposalId1, index1, [value], [weight])
             await timeTravel(referendumStageDuration - 10, web3)
           })
 
@@ -2264,14 +2264,14 @@ contract('Governance', (accounts: string[]) => {
       describe('when the account has already voted partially on this proposal', () => {
         const revoteTests = (newValues: VoteValue[], newWeights: number[]) => {
           it('should set vote total correctly', async () => {
-            await governance.voteWeighted(proposalId, index, newValues, newWeights)
+            await governance.votePartially(proposalId, index, newValues, newWeights)
             const voteTotals = await governance.getVoteTotals(proposalId)
 
             const newVoteNormalized = [0, 0, 0]
 
             for (let i = 0; i < newValues.length; i++) {
-              const index = newValues[i] as number
-              newVoteNormalized[3 - index] = newWeights[i]
+              const voteIndex = newValues[i] as number
+              newVoteNormalized[3 - voteIndex] = newWeights[i]
             }
             const voteTotalsNormalized = [voteTotals[0], voteTotals[1], voteTotals[2]]
 
@@ -2279,7 +2279,7 @@ contract('Governance', (accounts: string[]) => {
           })
 
           it("should set the voter's vote record", async () => {
-            await governance.voteWeighted(proposalId, index, newValues, newWeights)
+            await governance.votePartially(proposalId, index, newValues, newWeights)
             const [
               recordProposalId,
               ,
@@ -2298,7 +2298,7 @@ contract('Governance', (accounts: string[]) => {
           const oldValues = [VoteValue.No, VoteValue.Yes]
           const oldWeights = [30, 70]
           beforeEach(async () => {
-            await governance.voteWeighted(proposalId, index, oldValues, oldWeights)
+            await governance.votePartially(proposalId, index, oldValues, oldWeights)
           })
 
           revoteTests([VoteValue.Yes, VoteValue.No], [30, 70])
@@ -2308,7 +2308,7 @@ contract('Governance', (accounts: string[]) => {
           const oldValues = [VoteValue.Abstain, VoteValue.No]
           const oldWeights = [30, 70]
           beforeEach(async () => {
-            await governance.voteWeighted(proposalId, index, oldValues, oldWeights)
+            await governance.votePartially(proposalId, index, oldValues, oldWeights)
           })
 
           revoteTests([VoteValue.Abstain, VoteValue.Yes], [20, 30])
@@ -2318,19 +2318,19 @@ contract('Governance', (accounts: string[]) => {
       describe('when the account has already voted on this proposal', () => {
         const revoteTests = (oldValue, newValue) => {
           it('should decrement the vote total from the previous vote', async () => {
-            await governance.voteWeighted(proposalId, index, [newValue], [weight])
+            await governance.votePartially(proposalId, index, [newValue], [weight])
             const voteTotals = await governance.getVoteTotals(proposalId)
             assert.equal(voteTotals[3 - oldValue].toNumber(), 0)
           })
 
           it('should increment the vote total for the new vote', async () => {
-            await governance.voteWeighted(proposalId, index, [newValue], [weight])
+            await governance.votePartially(proposalId, index, [newValue], [weight])
             const voteTotals = await governance.getVoteTotals(proposalId)
             assert.equal(voteTotals[3 - newValue].toNumber(), weight)
           })
 
           it("should set the voter's vote record", async () => {
-            await governance.voteWeighted(proposalId, index, [newValue], [weight])
+            await governance.votePartially(proposalId, index, [newValue], [weight])
             const [recordProposalId, recordValue] = await governance.getVoteRecord(account, index)
             assert.equal(recordProposalId.toNumber(), proposalId)
             assert.equal(recordValue.toNumber(), newValue)
@@ -2339,7 +2339,7 @@ contract('Governance', (accounts: string[]) => {
 
         describe('when the account has already voted yes on this proposal', () => {
           beforeEach(async () => {
-            await governance.voteWeighted(proposalId, index, [VoteValue.Yes], [weight])
+            await governance.votePartially(proposalId, index, [VoteValue.Yes], [weight])
           })
 
           revoteTests(VoteValue.Yes, VoteValue.No)
@@ -2347,7 +2347,7 @@ contract('Governance', (accounts: string[]) => {
 
         describe('when the account has already voted no on this proposal', () => {
           beforeEach(async () => {
-            await governance.voteWeighted(proposalId, index, [VoteValue.No], [weight])
+            await governance.votePartially(proposalId, index, [VoteValue.No], [weight])
           })
 
           revoteTests(VoteValue.No, VoteValue.Abstain)
@@ -2355,7 +2355,7 @@ contract('Governance', (accounts: string[]) => {
 
         describe('when the account has already voted abstain on this proposal', () => {
           beforeEach(async () => {
-            await governance.voteWeighted(proposalId, index, [VoteValue.Abstain], [weight])
+            await governance.votePartially(proposalId, index, [VoteValue.Abstain], [weight])
           })
 
           revoteTests(VoteValue.Abstain, VoteValue.Yes)
@@ -2364,33 +2364,33 @@ contract('Governance', (accounts: string[]) => {
 
       describe('when the proposal is past the referendum stage and passing', () => {
         beforeEach(async () => {
-          await governance.voteWeighted(proposalId, index, [VoteValue.Yes], [weight])
+          await governance.votePartially(proposalId, index, [VoteValue.Yes], [weight])
           await timeTravel(referendumStageDuration, web3)
         })
 
         it('should revert', async () => {
-          await assertRevert(governance.voteWeighted.call(proposalId, index, [value], [weight]))
+          await assertRevert(governance.votePartially.call(proposalId, index, [value], [weight]))
         })
       })
 
       describe('when the proposal is past the referendum stage and failing', () => {
         beforeEach(async () => {
-          await governance.voteWeighted(proposalId, index, [VoteValue.No], [weight])
+          await governance.votePartially(proposalId, index, [VoteValue.No], [weight])
           await timeTravel(referendumStageDuration, web3)
         })
 
         it('should return false', async () => {
-          const success = await governance.voteWeighted.call(proposalId, index, [value], [weight])
+          const success = await governance.votePartially.call(proposalId, index, [value], [weight])
           assert.isFalse(success)
         })
 
         it('should delete the proposal', async () => {
-          await governance.voteWeighted(proposalId, index, [value], [weight])
+          await governance.votePartially(proposalId, index, [value], [weight])
           assert.isFalse(await governance.proposalExists(proposalId))
         })
 
         it('should remove the proposal ID from dequeued', async () => {
-          await governance.voteWeighted(proposalId, index, [value], [weight])
+          await governance.votePartially(proposalId, index, [value], [weight])
           const dequeued = await governance.getDequeue()
           assert.notInclude(
             dequeued.map((x) => x.toNumber()),
@@ -2399,19 +2399,19 @@ contract('Governance', (accounts: string[]) => {
         })
 
         it('should add the index to empty indices', async () => {
-          await governance.voteWeighted(proposalId, index, [value], [weight])
+          await governance.votePartially(proposalId, index, [value], [weight])
           const emptyIndex = await governance.emptyIndices(0)
           assert.equal(emptyIndex.toNumber(), index)
         })
 
         it('should update the participation baseline', async () => {
-          await governance.voteWeighted(proposalId, index, [value], [weight])
+          await governance.votePartially(proposalId, index, [value], [weight])
           const [actualParticipationBaseline, , ,] = await governance.getParticipationParameters()
           assertEqualBN(actualParticipationBaseline, expectedParticipationBaseline)
         })
 
         it('should emit the ParticipationBaselineUpdated event', async () => {
-          const resp = await governance.voteWeighted(proposalId, index, [value], [weight])
+          const resp = await governance.votePartially(proposalId, index, [value], [weight])
           assert.equal(resp.logs.length, 1)
           const log = resp.logs[0]
           assertLogMatches2(log, {
@@ -2441,18 +2441,18 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should return true', async () => {
-        const success = await governance.voteWeighted.call(proposalId, index, [value], [weight])
+        const success = await governance.votePartially.call(proposalId, index, [value], [weight])
         assert.isTrue(success)
       })
 
       it('should increment the vote totals', async () => {
-        await governance.voteWeighted(proposalId, index, [value], [weight])
+        await governance.votePartially(proposalId, index, [value], [weight])
         const [yes, ,] = await governance.getVoteTotals(proposalId)
         assert.equal(yes.toNumber(), weight)
       })
 
       it("should set the voter's vote record", async () => {
-        await governance.voteWeighted(proposalId, index, [value], [weight])
+        await governance.votePartially(proposalId, index, [value], [weight])
         const [recordProposalId, recordValue, recordWeight] = await governance.getVoteRecord(
           account,
           index
@@ -2463,7 +2463,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       it('should set the most recent referendum proposal voted on', async () => {
-        await governance.voteWeighted(proposalId, index, [value], [weight])
+        await governance.votePartially(proposalId, index, [value], [weight])
         assert.equal(
           (await governance.getMostRecentReferendumProposal(account)).toNumber(),
           proposalId
@@ -2472,7 +2472,7 @@ contract('Governance', (accounts: string[]) => {
 
       it('should emit the ProposalVoted event', async () => {
         await governance.dequeueProposalsIfReady()
-        const resp = await governance.voteWeighted(proposalId, index, [value], [weight])
+        const resp = await governance.votePartially(proposalId, index, [value], [weight])
         assert.equal(resp.logs.length, resp.logs.length)
         const log = resp.logs[0]
         assertLogMatches2(log, {
@@ -2490,11 +2490,11 @@ contract('Governance', (accounts: string[]) => {
 
       it('should revert when the account weight is 0', async () => {
         await mockLockedGold.setAccountTotalLockedGold(account, 0)
-        await assertRevert(governance.voteWeighted(proposalId, index, [value], [weight]))
+        await assertRevert(governance.votePartially(proposalId, index, [value], [weight]))
       })
 
       it('should revert when the index is out of bounds', async () => {
-        await assertRevert(governance.voteWeighted(proposalId, index + 1, [value], [weight]))
+        await assertRevert(governance.votePartially(proposalId, index + 1, [value], [weight]))
       })
 
       it('should revert if the proposal id does not match the index', async () => {
@@ -2510,7 +2510,7 @@ contract('Governance', (accounts: string[]) => {
         )
         await timeTravel(dequeueFrequency, web3)
         const otherProposalId = 2
-        await assertRevert(governance.voteWeighted(otherProposalId, index, [value], [weight]))
+        await assertRevert(governance.votePartially(otherProposalId, index, [value], [weight]))
       })
     })
   })
@@ -3490,14 +3490,14 @@ contract('Governance', (accounts: string[]) => {
         const weights = [10, 30]
         beforeEach(async () => {
           for (let i = 0; i < numVoted; i++) {
-            await governance.voteWeighted(i + 1, i, values, weights)
+            await governance.votePartially(i + 1, i, values, weights)
           }
         })
 
         it('Should return correct number of votes', async () => {
           const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
           const expectedArraySum =
-            numVoted == 0
+            numVoted === 0
               ? 0
               : weights.reduce((previousValue, currentValue) => previousValue + currentValue, 0)
 

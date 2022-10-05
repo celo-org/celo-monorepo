@@ -660,15 +660,15 @@ contract Governance is
   }
 
   /**
-   * @notice Votes on a proposal in the referendum stage.
+   * @notice Votes partially on a proposal in the referendum stage.
    * @param proposalId The ID of the proposal to vote on.
    * @param index The index of the proposal ID in `dequeued`.
    * @param voteValues Whether to vote yes, no, or abstain.
-   * @param weights Whether to vote yes, no, or abstain.
+   * @param weights Weights of vote choices.
    * @return Whether or not the vote was cast successfully.
    */
   /* solhint-disable code-complexity */
-  function voteWeighted(
+  function votePartially(
     uint256 proposalId,
     uint256 index,
     uint256[] calldata voteValues,
@@ -695,6 +695,17 @@ contract Governance is
     return true;
   }
 
+  /**
+   * @notice Votes on a proposal in the referendum stage.
+   * @param proposal The proposal struct.
+   * @param proposalId The ID of the proposal to vote on.
+   * @param index The index of the proposal ID in `dequeued`.
+   * @param totalLockedGold Total locked gold owned by account.
+   * @param account Account based on signer.
+   * @param voteValues Whether to vote yes, no, or abstain.
+   * @param weights Weights of vote choices.
+   * @return Whether or not the proposal is passing.
+   */
   function voteInternal(
     Proposals.Proposal storage proposal,
     uint256 proposalId,
@@ -1415,6 +1426,11 @@ contract Governance is
     return total;
   }
 
+  /**
+   * @notice Returns sum of input weights.
+   * @param weights The weights to sum up.
+   * @return The sum of input weights.
+   */
   function getTotalWeightRequested(uint256[] memory weights) private pure returns (uint256) {
     uint256 totalVotesRequested = 0;
     for (uint256 i = 0; i < weights.length; i = i.add(1)) {
