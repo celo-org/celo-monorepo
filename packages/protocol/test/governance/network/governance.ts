@@ -6,7 +6,6 @@ import {
   assertBNArrayEqual,
   assertEqualBN,
   assertLogMatches2,
-  assertObjectWithBNEqual,
   assertRevert,
   matchAny,
   mineToNextEpoch,
@@ -2263,12 +2262,7 @@ contract('Governance', (accounts: string[]) => {
       })
 
       describe('when the account has already voted partially on this proposal', () => {
-        const revoteTests = (
-          oldValues: VoteValue[],
-          newValues: VoteValue[],
-          oldWeights: number[],
-          newWeights: number[]
-        ) => {
+        const revoteTests = (newValues: VoteValue[], newWeights: number[]) => {
           it('should set vote total correctly', async () => {
             await governance.voteWeighted(proposalId, index, newValues, newWeights)
             const voteTotals = await governance.getVoteTotals(proposalId)
@@ -2307,7 +2301,7 @@ contract('Governance', (accounts: string[]) => {
             await governance.voteWeighted(proposalId, index, oldValues, oldWeights)
           })
 
-          revoteTests(oldValues, [VoteValue.Yes, VoteValue.No], oldWeights, [30, 70])
+          revoteTests([VoteValue.Yes, VoteValue.No], [30, 70])
         })
 
         describe('when the account has already voted abstain and yes on this proposal', () => {
@@ -2317,7 +2311,7 @@ contract('Governance', (accounts: string[]) => {
             await governance.voteWeighted(proposalId, index, oldValues, oldWeights)
           })
 
-          revoteTests(oldValues, [VoteValue.Abstain, VoteValue.Yes], oldWeights, [20, 30])
+          revoteTests([VoteValue.Abstain, VoteValue.Yes], [20, 30])
         })
       })
 
