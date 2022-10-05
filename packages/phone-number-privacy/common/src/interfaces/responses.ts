@@ -44,6 +44,10 @@ export interface SignMessageResponseFailure {
   version: string
   error: string
   // These fields are occasionally provided by the signer but not the combiner
+  // because the combiner separates failure/success responses before processing states.
+  // => If the signer response fails, then it's irrelevant if that signer returned quota values,
+  // since these won't be used in the quota calculation anyways.
+  // Changing this is more involved; TODO(future) https://github.com/celo-org/celo-monorepo/issues/9826
   performedQueryCount?: number
   totalQuota?: number
   blockNumber?: number

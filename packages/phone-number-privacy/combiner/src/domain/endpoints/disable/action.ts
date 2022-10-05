@@ -21,7 +21,10 @@ export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
     this.discrepancyLogger.logResponseDiscrepancies(session)
     try {
       const disableDomainStatus = this.thresholdStateService.findThresholdDomainState(session)
-      this.io.sendSuccess(200, session.response, disableDomainStatus)
+      if (disableDomainStatus.disabled) {
+        this.io.sendSuccess(200, session.response, disableDomainStatus)
+        return
+      }
       return
     } catch (err) {
       session.logger.error({ err }, 'Error combining signer disable domain status responses')
