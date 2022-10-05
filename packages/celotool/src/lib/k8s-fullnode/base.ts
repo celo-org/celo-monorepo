@@ -13,7 +13,8 @@ import {
 } from '../helm_deploy'
 import { scaleResource } from '../kubernetes'
 
-const helmChartPath = '../helm-charts/celo-fullnode'
+const helmChartPath = 'oci://us-west1-docker.pkg.dev/devopsre/clabs-public-oci/celo-fullnode'
+const chartVersion = '0.2.0'
 
 export interface NodeKeyGenerationInfo {
   mnemonic: string
@@ -49,12 +50,14 @@ export abstract class BaseFullNodeDeployer {
   async installChart(context: string): Promise<string[] | void> {
     await createNamespaceIfNotExists(this.kubeNamespace)
 
-    await installGenericHelmChart(
-      this.kubeNamespace,
-      this.releaseName,
-      helmChartPath,
-      await this.helmParameters(context)
-    )
+    await installGenericHelmChart({
+      namespace: this.kubeNamespace,
+      releaseName: this.releaseName,
+      chartDir: helmChartPath,
+      parameters: await this.helmParameters(context),
+      chartVersion,
+      buildDependencies: false,
+    })
 
     if (this._deploymentConfig.nodeKeyGenerationInfo) {
       return this.getEnodes()
@@ -65,24 +68,28 @@ export abstract class BaseFullNodeDeployer {
   // Otherwise, the enode cannot be calculated deterministically so a Promise<void> is returned.
   async upgradeChart(context: string, reset: boolean): Promise<string[] | void> {
     if (isCelotoolHelmDryRun()) {
-      await upgradeGenericHelmChart(
-        this.kubeNamespace,
-        this.releaseName,
-        helmChartPath,
-        await this.helmParameters(context)
-      )
+      await upgradeGenericHelmChart({
+        namespace: this.kubeNamespace,
+        releaseName: this.releaseName,
+        chartDir: helmChartPath,
+        parameters: await this.helmParameters(context),
+        chartVersion,
+        buildDependencies: false,
+      })
     } else {
       if (reset) {
         await scaleResource(this.celoEnv, 'StatefulSet', `${this.celoEnv}-fullnodes`, 0)
         await deletePersistentVolumeClaims(this.celoEnv, ['celo-fullnode'])
       }
 
-      await upgradeGenericHelmChart(
-        this.kubeNamespace,
-        this.releaseName,
-        helmChartPath,
-        await this.helmParameters(context)
-      )
+      await upgradeGenericHelmChart({
+        namespace: this.kubeNamespace,
+        releaseName: this.releaseName,
+        chartDir: helmChartPath,
+        parameters: await this.helmParameters(context),
+        chartVersion,
+        buildDependencies: false,
+      })
 
       await scaleResource(
         this.celoEnv,
@@ -130,7 +137,6 @@ export abstract class BaseFullNodeDeployer {
       `--set geth.metrics=${fetchEnvOrFallback(envVar.GETH_ENABLE_METRICS, 'false')}`,
       `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
       `--set genesis.network=${this.celoEnv}`,
-      `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
       `--set geth.use_gstorage_data=${this._deploymentConfig.useGstoreData}`,
       `--set geth.ws_port=${this._deploymentConfig.wsPort}`,
       `--set geth.gstorage_data_bucket=${fetchEnvOrFallback('GSTORAGE_DATA_BUCKET', '')}`,

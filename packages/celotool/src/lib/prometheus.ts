@@ -57,12 +57,12 @@ export async function installPrometheusIfNotExists(
 
 async function installPrometheus(context?: string, clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
-  return installGenericHelmChart(
-    kubeNamespace,
+  return installGenericHelmChart({
+    namespace: kubeNamespace,
     releaseName,
-    helmChartPath,
-    await helmParameters(context, clusterConfig)
-  )
+    chartDir: helmChartPath,
+    parameters: await helmParameters(context, clusterConfig),
+  })
 }
 
 export async function removePrometheus() {
@@ -71,12 +71,12 @@ export async function removePrometheus() {
 
 export async function upgradePrometheus(context?: string, clusterConfig?: BaseClusterConfig) {
   await createNamespaceIfNotExists(kubeNamespace)
-  return upgradeGenericHelmChart(
-    kubeNamespace,
+  return upgradeGenericHelmChart({
+    namespace: kubeNamespace,
     releaseName,
-    helmChartPath,
-    await helmParameters(context, clusterConfig)
-  )
+    chartDir: helmChartPath,
+    parameters: await helmParameters(context, clusterConfig),
+  })
 }
 
 function getK8sContextVars(
@@ -329,28 +329,28 @@ export async function installGrafanaIfNotExists(
 async function installGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
   await helmAddRepoAndUpdate('https://grafana.github.io/helm-charts', 'grafana')
   await createNamespaceIfNotExists(kubeNamespace)
-  return installGenericHelmChart(
-    kubeNamespace,
-    grafanaReleaseName,
-    grafanaHelmRepo,
-    await grafanaHelmParameters(context, clusterConfig),
-    false,
-    '../helm-charts/grafana/values-clabs.yaml'
-  )
+  return installGenericHelmChart({
+    namespace: kubeNamespace,
+    releaseName: grafanaReleaseName,
+    chartDir: grafanaHelmRepo,
+    parameters: await grafanaHelmParameters(context, clusterConfig),
+    buildDependencies: false,
+    valuesOverrideFile: '../helm-charts/grafana/values-clabs.yaml',
+  })
 }
 
 export async function upgradeGrafana(context?: string, clusterConfig?: BaseClusterConfig) {
   await helmAddRepoAndUpdate('https://grafana.github.io/helm-charts', 'grafana')
   await createNamespaceIfNotExists(kubeNamespace)
-  return upgradeGenericHelmChart(
-    kubeNamespace,
-    grafanaReleaseName,
-    grafanaHelmRepo,
-    await grafanaHelmParameters(context, clusterConfig),
-    false,
+  return upgradeGenericHelmChart({
+    namespace: kubeNamespace,
+    releaseName: grafanaReleaseName,
+    chartDir: grafanaHelmRepo,
+    parameters: await grafanaHelmParameters(context, clusterConfig),
+    buildDependencies: false,
     // Adding this file and clabs' default values file.
-    '../helm-charts/grafana/values-clabs.yaml'
-  )
+    valuesOverrideFile: '../helm-charts/grafana/values-clabs.yaml',
+  })
 }
 
 export async function removeGrafanaHelmRelease() {
