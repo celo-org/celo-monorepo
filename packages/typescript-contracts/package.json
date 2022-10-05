@@ -1,0 +1,34 @@
+{
+  "name": "@celo/web3-contracts",
+  "version": "0.1.0",
+  "description": "Generated Typescript for Celo Core Contracts",
+  "author": "cLabs",
+  "license": "Apache-2.0",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "scripts": {
+    "build:web3": "BUILD_DIR=./build/$RELEASE_TAG yarn --cwd ../protocol ts-node ./scripts/build.ts --web3Types ../typescript-contracts/src",
+    "build:ts": "tsc -b .",
+    "build": "yarn build:web3 && yarn build:ts",
+    "clean": "tsc -b . --clean"
+  },
+  "devDependencies": {
+    "ts-node": "8.3.0"
+  },
+  "files": [
+    "lib/*.js",
+    "lib/*.d.ts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/celo-org/celo-monorepo.git"
+  },
+  "keywords": [
+    "celo",
+    "contracts"
+  ],
+  "bugs": {
+    "url": "https://github.com/celo-org/celo-monorepo/issues"
+  },
+  "homepage": "https://github.com/celo-org/celo-monorepo#readme"
+}
