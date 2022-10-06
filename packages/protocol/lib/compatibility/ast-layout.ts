@@ -118,7 +118,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
       }
     }).filter(error => error)
 
-    if (expandableErrors.length == 0) {
+    if (expandableErrors.length === 0) {
       return {
         same: true,
         errors: []
@@ -162,16 +162,12 @@ const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLay
   let compatible = true
   let errors = []
 
-  console.log("oldLayout", JSON.stringify(oldLayout))
-  console.log("newLayout", JSON.stringify(newLayout))
-
   Object.keys(newLayout.types).forEach(typeName => {
     const newType = newLayout.types[typeName]
     const oldType = oldLayout.types[typeName]
 
     if (newType.kind === 'struct' && oldType !== undefined) {
       const structExpandable = isStructExpandable(oldType, oldLayout)
-      console.log("structExpandable " + oldType.label, structExpandable) 
       const structReport = compareStructDefinitions(oldType, newType, structExpandable)
       if (!structReport.same) {
         compatible = false
