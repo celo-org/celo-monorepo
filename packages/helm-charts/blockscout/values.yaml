@@ -225,6 +225,8 @@ blockscout:
     drop: "false"
   epochRewards:
     enabled: false
+  campaignBanner:
+    refreshInterval: "60"
   grafanaUrl: https://clabs.grafana.net
   secrets:
     # Format:
@@ -243,6 +245,7 @@ blockscout:
       apiKey: ""
     erlang:
       cookie: ""
+    campaignBannerApiUrl: ""
   chain:
     subnetwork: Celo
     networkID: 1101
