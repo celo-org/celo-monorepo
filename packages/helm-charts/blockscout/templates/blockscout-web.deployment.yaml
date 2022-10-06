@@ -142,6 +142,10 @@ spec:
           value: {{ .Values.blockscout.secrets.recaptcha.apiKey }}
         - name: SEGMENT_KEY
           value: {{ .Values.blockscout.secrets.segmentKey }}
+        - name: CAMPAIGN_BANNER_BACKEND_URL
+          value: {{ .Values.blockscout.secrets.campaignBannerApiUrl }}
+        - name: CAMPAIGN_BANNER_REFRESH_INTERVAL
+          value: "{{.Values.blockscout.campaignBanner.refreshInterval}}"
         {{- if .Values.blockscout.web.suffix.enabled }}
         - name: NETWORK_PATH
           value: /{{ .Values.blockscout.web.suffix.path }}
