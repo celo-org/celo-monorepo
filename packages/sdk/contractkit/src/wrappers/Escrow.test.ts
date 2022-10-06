@@ -8,6 +8,7 @@ import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 testWithGanache('Escrow Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
   const TEN_CUSD = kit.web3.utils.toWei('10', 'ether')
+  const TIMESTAMP = 1665080820
 
   let accounts: string[] = []
   let escrow: EscrowWrapper
@@ -31,14 +32,8 @@ testWithGanache('Escrow Wrapper', (web3) => {
 
   it('transfer with trusted issuers should set TrustedIssuersPerPayment', async () => {
     const testPaymentId = kit.web3.eth.accounts.create().address
-    const testIssuedOnTimestamp = Math.floor(new Date().getTime() / 1000)
-
     await federatedAttestations
-      .registerAttestationAsIssuer(
-        identifier as string,
-        kit.defaultAccount as string,
-        testIssuedOnTimestamp
-      )
+      .registerAttestationAsIssuer(identifier as string, kit.defaultAccount as string, TIMESTAMP)
       .send()
 
     const approveTx = await stableTokenContract.approve(escrow.address as string, TEN_CUSD).send()
@@ -67,9 +62,8 @@ testWithGanache('Escrow Wrapper', (web3) => {
     const uniquePaymentIDWithdraw = withdrawKeyAddress
     const parsedSig = await getParsedSignatureOfAddress(web3, receiver, uniquePaymentIDWithdraw)
 
-    const testIssuedOnTimestamp = Math.floor(new Date().getTime() / 1000)
     await federatedAttestations
-      .registerAttestationAsIssuer(identifier as string, receiver, testIssuedOnTimestamp)
+      .registerAttestationAsIssuer(identifier as string, receiver, TIMESTAMP)
       .send()
 
     const senderBalanceBefore = await stableTokenContract.balanceOf(sender)
