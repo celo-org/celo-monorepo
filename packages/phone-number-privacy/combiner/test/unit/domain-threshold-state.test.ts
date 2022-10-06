@@ -8,7 +8,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
-import { DomainThresholdStateService } from '../../src/domain/services/threshold-State'
+import { DomainThresholdStateService } from '../../src/domain/services/threshold-state'
 
 describe('domain threshold state', () => {
   // TODO(2.0.0): add tests with failed signer responses, depending on

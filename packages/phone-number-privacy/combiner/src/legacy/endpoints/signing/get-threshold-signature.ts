@@ -2,13 +2,13 @@ import {
   authenticateUser,
   ErrorMessage,
   ErrorType,
-  GetBlindedMessageSigRequest,
   getContractKit,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
+  LegacySignMessageRequest,
   respondWithError,
   SignMessageResponse,
   SignMessageResponseFailure,
@@ -393,7 +393,7 @@ function getMajorityErrorCode(errorCodes: Map<number, number>, logger: Logger) {
   return maxErrorCode > 0 ? maxErrorCode : null
 }
 
-function isValidGetSignatureInput(requestBody: GetBlindedMessageSigRequest): boolean {
+function isValidGetSignatureInput(requestBody: LegacySignMessageRequest): boolean {
   return (
     hasValidAccountParam(requestBody) &&
     hasValidBlindedPhoneNumberParam(requestBody) &&

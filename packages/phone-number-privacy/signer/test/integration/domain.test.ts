@@ -2,6 +2,7 @@ import {
   DisableDomainRequest,
   disableDomainRequestEIP712,
   DisableDomainResponse,
+  DisableDomainResponseSuccess,
   domainHash,
   DomainIdentifiers,
   DomainQuotaStatusRequest,
@@ -29,6 +30,10 @@ import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
+
+// TODO(2.0.0, timeout) revisit flake tracker timeouts under the umbrella of
+// https://github.com/celo-org/celo-monorepo/issues/9845
+jest.setTimeout(20000)
 
 describe('domain', () => {
   const wallet = new LocalWallet()
@@ -147,35 +152,47 @@ describe('domain', () => {
   })
 
   describe(`${SignerEndpoint.DISABLE_DOMAIN}`, () => {
-    // TODO(2.0.0) discrepancy in returned and expected response:
-    // address as part of https://github.com/celo-org/celo-monorepo/issues/9804
-    xit('Should respond with 200 on valid request', async () => {
+    it('Should respond with 200 on valid request', async () => {
       const res = await request(app)
         .post(SignerEndpoint.DISABLE_DOMAIN)
         .send(await disableRequest())
 
       expect(res.status).toBe(200)
-      expect(res.body).toStrictEqual<DisableDomainResponse>({
+      expect(res.body).toStrictEqual<DisableDomainResponseSuccess>({
         success: true,
         version: res.body.version,
+        status: {
+          disabled: true,
+          counter: 0,
+          timer: 0,
+          now: res.body.status.now,
+        },
       })
     })
 
-    xit('Should respond with 200 on repeated valid requests', async () => {
+    it('Should respond with 200 on repeated valid requests', async () => {
       const req = await disableRequest()
       const res1 = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
       expect(res1.status).toBe(200)
-      expect(res1.body).toStrictEqual<DisableDomainResponse>({
+      const expectedResponse: DisableDomainResponseSuccess = {
         success: true,
         version: res1.body.version,
-      })
-      console.log(res1.body)
+        status: {
+          disabled: true,
+          counter: 0,
+          timer: 0,
+          now: res1.body.status.now,
+        },
+      }
+      expect(res1.body).toStrictEqual<DisableDomainResponseSuccess>(expectedResponse)
       const res2 = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
       expect(res2.status).toBe(200)
-      expect(res2.body).toStrictEqual<DisableDomainResponse>(res1.body)
+      // Avoid flakiness due to mismatching times between res1 & res2
+      expectedResponse.status.now = res2.body.status.now
+      expect(res2.body).toStrictEqual<DisableDomainResponseSuccess>(expectedResponse)
     })
 
-    xit('Should respond with 200 on extra request fields', async () => {
+    it('Should respond with 200 on extra request fields', async () => {
       const req = await disableRequest()
       // @ts-ignore Intentionally adding an extra field to the request type
       req.options.extraField = noString
@@ -186,6 +203,12 @@ describe('domain', () => {
       expect(res.body).toStrictEqual<DisableDomainResponse>({
         success: true,
         version: res.body.version,
+        status: {
+          disabled: true,
+          counter: 0,
+          timer: 0,
+          now: res.body.status.now,
+        },
       })
     })
 
@@ -682,6 +705,12 @@ describe('domain', () => {
         success: false,
         version: res2.body.version,
         error: WarningMessage.INVALID_NONCE,
+        status: {
+          disabled: false,
+          counter: 1,
+          timer: res1.body.status.timer, // Timer should be same as from first request
+          now: res2.body.status.now,
+        },
       })
     })
 
@@ -698,6 +727,12 @@ describe('domain', () => {
         success: false,
         version: res.body.version,
         error: WarningMessage.EXCEEDED_QUOTA,
+        status: {
+          disabled: false,
+          counter: 0,
+          timer: 0,
+          now: res.body.status.now,
+        },
       })
     })
 
@@ -720,6 +755,12 @@ describe('domain', () => {
         success: false,
         version: res.body.version,
         error: WarningMessage.EXCEEDED_QUOTA,
+        status: {
+          disabled: false,
+          counter: 0,
+          timer: 0,
+          now: res.body.status.now,
+        },
       })
     })
 

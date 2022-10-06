@@ -28,24 +28,24 @@ export enum AuthenticationMethod {
   ENCRYPTION_KEY = 'encryption_key',
 }
 
-// (https://github.com/celo-org/celo-monorepo/issues/9804)
-// TODO(2.0.0, refactor) improve pnp request/response types for new vs. legacy endpoints
-// TODO(2.0.0, refactor): investigate alias in sdk/identity
-export interface GetBlindedMessageSigRequest {
+export interface SignMessageRequest {
   /** Celo account address. Query is charged against this account's quota. */
   account: string
   /** Query message. A blinded elliptic curve point encoded in base64. */
   blindedQueryPhoneNumber: string
   /** Authentication method to use for verifying the signature in the Authorization header */
   authenticationMethod?: string
-  /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
-  hashedPhoneNumber?: string
   /** Client-specified session ID for the request. */
   sessionID?: string
   /** Client-specified version string */
   version?: string
 }
-export declare type SignMessageRequest = GetBlindedMessageSigRequest
+
+/** previously known as GetBlindedMessageSigRequest */
+export interface LegacySignMessageRequest extends SignMessageRequest {
+  /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
+  hashedPhoneNumber?: string
+}
 
 export const SignMessageRequestSchema: t.Type<SignMessageRequest> = t.intersection([
   t.type({
@@ -54,9 +54,15 @@ export const SignMessageRequestSchema: t.Type<SignMessageRequest> = t.intersecti
   }),
   t.partial({
     authenticationMethod: t.union([t.string, t.undefined]),
-    hashedPhoneNumber: t.union([t.string, t.undefined]),
     sessionID: t.union([t.string, t.undefined]),
     version: t.union([t.string, t.undefined]),
+  }),
+])
+
+export const LegacySignMessageRequestSchema: t.Type<LegacySignMessageRequest> = t.intersection([
+  SignMessageRequestSchema,
+  t.partial({
+    hashedPhoneNumber: t.union([t.string, t.undefined]),
   }),
 ])
 
@@ -95,18 +101,22 @@ export const MatchmakingRequestSchema: t.Type<MatchmakingRequest> = t.intersecti
   }),
 ])
 
-export interface GetQuotaRequest {
+export interface PnpQuotaRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
   authenticationMethod?: string
-  /** User's ODIS generated on-chain identifier */
-  hashedPhoneNumber?: string
   /** Client-specified session ID for the request. */
   sessionID?: string
   /** Client-specified version string */
   version?: string
 }
-export declare type PnpQuotaRequest = GetQuotaRequest
+export interface LegacyPnpQuotaRequest extends PnpQuotaRequest {
+  /** User's ODIS generated on-chain identifier */
+  hashedPhoneNumber?: string
+}
+
+// Backwards compatibility
+export declare type GetQuotaRequest = LegacyPnpQuotaRequest
 
 export const PnpQuotaRequestSchema: t.Type<PnpQuotaRequest> = t.intersection([
   t.type({
@@ -114,13 +124,24 @@ export const PnpQuotaRequestSchema: t.Type<PnpQuotaRequest> = t.intersection([
   }),
   t.partial({
     authenticationMethod: t.union([t.string, t.undefined]),
-    hashedPhoneNumber: t.union([t.string, t.undefined]),
     sessionID: t.union([t.string, t.undefined]),
     version: t.union([t.string, t.undefined]),
   }),
 ])
 
-export type PhoneNumberPrivacyRequest = SignMessageRequest | MatchmakingRequest | PnpQuotaRequest
+export const LegacyPnpQuotaRequestSchema: t.Type<LegacyPnpQuotaRequest> = t.intersection([
+  PnpQuotaRequestSchema,
+  t.partial({
+    hashedPhoneNumber: t.union([t.string, t.undefined]),
+  }),
+])
+
+export type PhoneNumberPrivacyRequest =
+  | SignMessageRequest
+  | LegacySignMessageRequest
+  | MatchmakingRequest
+  | PnpQuotaRequest
+  | LegacyPnpQuotaRequest
 
 export enum DomainRequestTypeTag {
   SIGN = 'DomainRestrictedSignatureRequest',

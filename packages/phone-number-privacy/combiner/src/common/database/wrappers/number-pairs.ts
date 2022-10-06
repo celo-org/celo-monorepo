@@ -1,7 +1,7 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
-import { NumberPairs, NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../models/number-pairs'
+import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPairs } from '../models/number-pairs'
 
 function numberPairs(db: Knex) {
   return db<NumberPairs>(NUMBER_PAIRS_TABLE)

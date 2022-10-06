@@ -3,7 +3,6 @@ import {
   authenticateUser,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
-  identifierIsValidIfExists,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
   PnpQuotaStatus,
@@ -59,7 +58,6 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       SignMessageRequestSchema.is(request.body) &&
       hasValidAccountParam(request.body) &&
       hasValidBlindedPhoneNumberParam(request.body) &&
-      identifierIsValidIfExists(request.body) &&
       isBodyReasonablySized(request.body)
     )
   }
@@ -77,7 +75,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     key: Key,
     signature: string,
     quotaStatus: PnpQuotaStatus,
-    warnings?: string[]
+    warnings: string[]
   ) {
     response.set(KEY_VERSION_HEADER, key.version.toString())
     send(
@@ -87,7 +85,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
         version: getVersion(),
         signature,
         ...quotaStatus,
-        warnings, // TODO(2.0.0, refactor): update handling of these types in combiner (https://github.com/celo-org/celo-monorepo/issues/9794)
+        warnings,
       },
       status,
       response.locals.logger
@@ -99,9 +97,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     error: string,
     status: number,
     response: Response<SignMessageResponseFailure>,
-    performedQueryCount?: number,
-    totalQuota?: number,
-    blockNumber?: number
+    quotaStatus?: PnpQuotaStatus
   ) {
     send(
       response,
@@ -109,9 +105,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
         success: false,
         version: getVersion(),
         error,
-        performedQueryCount,
-        totalQuota,
-        blockNumber,
+        ...quotaStatus,
       },
       status,
       response.locals.logger

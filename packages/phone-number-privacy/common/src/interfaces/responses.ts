@@ -4,6 +4,8 @@ import {
   DomainQuotaStatusRequest,
   DomainRequest,
   DomainRestrictedSignatureRequest,
+  LegacyPnpQuotaRequest,
+  LegacySignMessageRequest,
   MatchmakingRequest,
   OdisRequest,
   PhoneNumberPrivacyRequest,
@@ -35,19 +37,20 @@ export interface SignMessageResponseSuccess extends PnpQuotaStatus {
   version: string
   signature: string
   warnings?: string[]
-  // TODO(2.0.0) audit req/res types - https://github.com/celo-org/celo-monorepo/issues/9804
-  // - warnings not provided in 1.1.11
 }
 
 export interface SignMessageResponseFailure {
   success: false
   version: string
   error: string
+  // These fields are occasionally provided by the signer but not the combiner
+  // because the combiner separates failure/success responses before processing states.
+  // => If the signer response fails, then it's irrelevant if that signer returned quota values,
+  // since these won't be used in the quota calculation anyways.
+  // Changing this is more involved; TODO(future) https://github.com/celo-org/celo-monorepo/issues/9826
   performedQueryCount?: number
   totalQuota?: number
   blockNumber?: number
-  // TODO(2.0.0) audit req/res types - https://github.com/celo-org/celo-monorepo/issues/9804
-  // - signature was previously optionally provided on failure, check sdk for backwards compatibility
 }
 
 export type SignMessageResponse = SignMessageResponseSuccess | SignMessageResponseFailure
@@ -142,9 +145,9 @@ export const GetContactMatchesResponseSchema: t.Type<GetContactMatchesResponse> 
 export type PhoneNumberPrivacyResponse<
   R extends PhoneNumberPrivacyRequest = PhoneNumberPrivacyRequest
 > =
-  | R extends SignMessageRequest ? SignMessageResponse : never
+  | R extends SignMessageRequest | LegacySignMessageRequest ? SignMessageResponse : never
   | R extends MatchmakingRequest ? GetContactMatchesResponse : never
-  | R extends PnpQuotaRequest ? PnpQuotaResponse : never
+  | R extends PnpQuotaRequest | LegacyPnpQuotaRequest ? PnpQuotaResponse : never
 
 // Domains
 
@@ -182,9 +185,10 @@ export type DomainQuotaStatusResponse<D extends Domain = Domain> =
   | DomainQuotaStatusResponseSuccess<D>
   | DomainQuotaStatusResponseFailure
 
-export interface DisableDomainResponseSuccess {
+export interface DisableDomainResponseSuccess<D extends Domain = Domain> {
   success: true
   version: string
+  status: DomainState<D>
 }
 
 export interface DisableDomainResponseFailure {
@@ -193,16 +197,17 @@ export interface DisableDomainResponseFailure {
   error: string
 }
 
-export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
+export type DisableDomainResponse<D extends Domain = Domain> =
+  | DisableDomainResponseSuccess<D>
+  | DisableDomainResponseFailure
 
 // prettier-ignore
 export type DomainResponse<
   R extends DomainRequest = DomainRequest
-> = 
+> =
   | R extends DomainRestrictedSignatureRequest<infer D> ? DomainRestrictedSignatureResponse<D> : never
-  // tslint:disable-next-line: no-shadowed-variable
-  | R extends DomainQuotaStatusRequest<infer D> ? DomainQuotaStatusResponse<D> : never
-  | R extends DisableDomainRequest ? DisableDomainResponse : never
+  | R extends DomainQuotaStatusRequest<infer D2> ? DomainQuotaStatusResponse<D2> : never
+  | R extends DisableDomainRequest<infer D3> ? DisableDomainResponse<D3> : never
 
 export function domainRestrictedSignatureResponseSchema<D extends Domain>(
   state: t.Type<DomainState<D>>
@@ -244,17 +249,22 @@ export function domainQuotaStatusResponseSchema<D extends Domain>(
   ])
 }
 
-export const DisableDomainResponseSchema: t.Type<DisableDomainResponse> = t.union([
-  t.type({
-    success: t.literal(true),
-    version: t.string,
-  }),
-  t.type({
-    success: t.literal(false),
-    version: t.string,
-    error: t.string,
-  }),
-])
+export function disableDomainResponseSchema<D extends Domain>(
+  state: t.Type<DomainState<D>>
+): t.Type<DisableDomainResponse<D>> {
+  return t.union([
+    t.type({
+      success: t.literal(true),
+      version: t.string,
+      status: state,
+    }),
+    t.type({
+      success: t.literal(false),
+      version: t.string,
+      error: t.string,
+    }),
+  ])
+}
 
 // General
 

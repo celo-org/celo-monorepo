@@ -6,11 +6,11 @@ import {
   identifierIsValidIfExists,
   isBodyReasonablySized,
   KEY_VERSION_HEADER,
+  LegacySignMessageRequest,
+  LegacySignMessageRequestSchema,
   PnpQuotaStatus,
   send,
   SignerEndpoint,
-  SignMessageRequest,
-  SignMessageRequestSchema,
   SignMessageResponse,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
@@ -24,7 +24,7 @@ import { Counters } from '../../../common/metrics'
 import { getVersion } from '../../../config'
 import { PnpSession } from '../../session'
 
-export class LegacyPnpSignIO extends IO<SignMessageRequest> {
+export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
   readonly endpoint = SignerEndpoint.LEGACY_PNP_SIGN
 
   constructor(
@@ -38,7 +38,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<SignMessageResponse>
-  ): Promise<PnpSession<SignMessageRequest> | null> {
+  ): Promise<PnpSession<LegacySignMessageRequest> | null> {
     const logger = response.locals.logger
     if (!super.inputChecks(request, response)) {
       return null
@@ -54,9 +54,11 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     return new PnpSession(request, response)
   }
 
-  validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, SignMessageRequest> {
+  validate(
+    request: Request<{}, {}, unknown>
+  ): request is Request<{}, {}, LegacySignMessageRequest> {
     return (
-      SignMessageRequestSchema.is(request.body) &&
+      LegacySignMessageRequestSchema.is(request.body) &&
       hasValidAccountParam(request.body) &&
       hasValidBlindedPhoneNumberParam(request.body) &&
       identifierIsValidIfExists(request.body) &&
@@ -65,7 +67,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
   }
 
   async authenticate(
-    request: Request<{}, {}, SignMessageRequest>,
+    request: Request<{}, {}, LegacySignMessageRequest>,
     logger: Logger
   ): Promise<boolean> {
     return authenticateUser(request, this.kit, logger, this.shouldFailOpen)
@@ -77,7 +79,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     key: Key,
     signature: string,
     quotaStatus: PnpQuotaStatus,
-    warnings?: string[]
+    warnings: string[]
   ) {
     response.set(KEY_VERSION_HEADER, key.version.toString())
     send(
@@ -99,9 +101,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
     error: string,
     status: number,
     response: Response<SignMessageResponseFailure>,
-    performedQueryCount?: number,
-    totalQuota?: number,
-    blockNumber?: number
+    quotaStatus?: PnpQuotaStatus
   ) {
     send(
       response,
@@ -109,9 +109,7 @@ export class LegacyPnpSignIO extends IO<SignMessageRequest> {
         success: false,
         version: getVersion(),
         error,
-        performedQueryCount,
-        totalQuota,
-        blockNumber,
+        ...quotaStatus,
       },
       status,
       response.locals.logger

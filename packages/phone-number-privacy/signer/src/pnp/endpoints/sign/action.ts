@@ -1,7 +1,13 @@
-import { ErrorMessage, SignMessageRequest, WarningMessage } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessage,
+  LegacySignMessageRequest,
+  SignMessageRequest,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { Action, Session } from '../../../common/action'
 import { computeBlindedSignature } from '../../../common/bls/bls-cryptography-client'
+import { REQUESTS_TABLE } from '../../../common/database/models/request'
 import { getRequestExists } from '../../../common/database/wrappers/request'
 import { DefaultKeyName, Key, KeyProvider } from '../../../common/key-management/key-provider-base'
 import { Counters } from '../../../common/metrics'
@@ -11,7 +17,10 @@ import { PnpSession } from '../../session'
 import { PnpSignIO } from './io'
 import { LegacyPnpSignIO } from './io.legacy'
 
-export class PnpSignAction implements Action<SignMessageRequest> {
+export abstract class PnpSignAction
+  implements Action<SignMessageRequest | LegacySignMessageRequest> {
+  protected abstract readonly requestsTable: REQUESTS_TABLE
+
   constructor(
     readonly db: Knex,
     readonly config: SignerConfig,
@@ -20,7 +29,9 @@ export class PnpSignAction implements Action<SignMessageRequest> {
     readonly io: PnpSignIO | LegacyPnpSignIO
   ) {}
 
-  public async perform(session: PnpSession<SignMessageRequest>): Promise<void> {
+  public async perform(
+    session: PnpSession<SignMessageRequest | LegacySignMessageRequest>
+  ): Promise<void> {
     // Compute quota lookup, update, and signing within transaction
     // so that these occur atomically and rollback on error.
     await this.db.transaction(async (trx) => {
@@ -30,7 +41,9 @@ export class PnpSignAction implements Action<SignMessageRequest> {
       try {
         isDuplicateRequest = await getRequestExists(
           this.db,
-          session.request.body,
+          this.requestsTable,
+          session.request.body.account,
+          session.request.body.blindedQueryPhoneNumber,
           session.logger,
           trx
         )
@@ -47,14 +60,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
       } else {
         // In the case of a database connection failure, performedQueryCount will be -1
         if (quotaStatus.performedQueryCount === -1) {
-          this.io.sendFailure(
-            ErrorMessage.DATABASE_GET_FAILURE,
-            500,
-            session.response,
-            quotaStatus.performedQueryCount,
-            quotaStatus.totalQuota,
-            quotaStatus.blockNumber
-          )
+          this.io.sendFailure(ErrorMessage.DATABASE_GET_FAILURE, 500, session.response, quotaStatus)
           return
         }
         // In the case of a blockchain connection failure, totalQuota will be -1
@@ -72,14 +78,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           } else {
             session.logger.error(ErrorMessage.FAILING_CLOSED)
             Counters.requestsFailingClosed.inc()
-            this.io.sendFailure(
-              ErrorMessage.FULL_NODE_ERROR,
-              500,
-              session.response,
-              quotaStatus.performedQueryCount,
-              quotaStatus.totalQuota,
-              quotaStatus.blockNumber
-            )
+            this.io.sendFailure(ErrorMessage.FULL_NODE_ERROR, 500, session.response, quotaStatus)
             return
           }
         }
@@ -89,14 +88,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
         // quotaStatus is updated in place; throws on failure to update
         const { sufficient } = await this.quota.checkAndUpdateQuotaStatus(quotaStatus, session, trx)
         if (!sufficient) {
-          this.io.sendFailure(
-            WarningMessage.EXCEEDED_QUOTA,
-            403,
-            session.response,
-            quotaStatus.performedQueryCount,
-            quotaStatus.totalQuota,
-            quotaStatus.blockNumber
-          )
+          this.io.sendFailure(WarningMessage.EXCEEDED_QUOTA, 403, session.response, quotaStatus)
           return
         }
       }
@@ -123,9 +115,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
           ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
           500,
           session.response,
-          quotaStatus.performedQueryCount, // TODO(2.0.0) consider refactoring to allow quotaStatus to be passed directly here to avoid parameter ordering errors
-          quotaStatus.totalQuota,
-          quotaStatus.blockNumber
+          quotaStatus
         )
         // Note that errors thrown after rollback will have no effect, hence doing this last
         await trx.rollback()
@@ -137,7 +127,7 @@ export class PnpSignAction implements Action<SignMessageRequest> {
   private async sign(
     blindedMessage: string,
     key: Key,
-    session: Session<SignMessageRequest>
+    session: Session<SignMessageRequest | LegacySignMessageRequest>
   ): Promise<string> {
     let privateKey: string
     try {

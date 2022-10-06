@@ -1,4 +1,5 @@
 import {
+  DisableDomainRequest,
   DomainQuotaStatusRequest,
   DomainRestrictedSignatureRequest,
   DomainState,
@@ -9,7 +10,10 @@ import { Session } from '../../common/session'
 
 export class DomainDiscrepanciesLogger {
   logResponseDiscrepancies(
-    session: Session<DomainRestrictedSignatureRequest> | Session<DomainQuotaStatusRequest>
+    session:
+      | Session<DomainRestrictedSignatureRequest>
+      | Session<DomainQuotaStatusRequest>
+      | Session<DisableDomainRequest>
   ): void {
     const parsedResponses: Array<{
       signerUrl: string

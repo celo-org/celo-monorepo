@@ -1,17 +1,14 @@
 import { ContractKit } from '@celo/contractkit'
 import {
   authenticateUser,
-  CombinerEndpoint,
   ErrorType,
-  getSignerEndpoint,
   hasValidAccountParam,
   identifierIsValidIfExists,
   isBodyReasonablySized,
-  PnpQuotaRequest,
-  PnpQuotaRequestSchema,
+  LegacyPnpQuotaRequest,
+  LegacyPnpQuotaRequestSchema,
   PnpQuotaResponse,
   PnpQuotaResponseFailure,
-  PnpQuotaResponseSchema,
   PnpQuotaResponseSuccess,
   PnpQuotaStatus,
   send,
@@ -20,29 +17,26 @@ import {
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import * as t from 'io-ts'
 import { IO } from '../../../common/io'
-import { Session } from '../../../common/session'
-import { OdisConfig, VERSION } from '../../../config'
+import { Counters } from '../../../common/metrics'
+import { getVersion } from '../../../config'
+import { PnpSession } from '../../session'
 
-export class PnpQuotaIO extends IO<PnpQuotaRequest> {
-  readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_QUOTA
-  readonly signerEndpoint: SignerEndpoint = getSignerEndpoint(this.endpoint)
-  readonly requestSchema: t.Type<PnpQuotaRequest, PnpQuotaRequest, unknown> = PnpQuotaRequestSchema
-  readonly responseSchema: t.Type<
-    PnpQuotaResponse,
-    PnpQuotaResponse,
-    unknown
-  > = PnpQuotaResponseSchema
+export class LegacyPnpQuotaIO extends IO<LegacyPnpQuotaRequest> {
+  readonly endpoint = SignerEndpoint.LEGACY_PNP_QUOTA
 
-  constructor(readonly config: OdisConfig, readonly kit: ContractKit) {
-    super(config)
+  constructor(
+    readonly enabled: boolean,
+    readonly shouldFailOpen: boolean,
+    readonly kit: ContractKit
+  ) {
+    super(enabled)
   }
 
   async init(
     request: Request<{}, {}, unknown>,
     response: Response<PnpQuotaResponse>
-  ): Promise<Session<PnpQuotaRequest> | null> {
+  ): Promise<PnpSession<LegacyPnpQuotaRequest> | null> {
     if (!super.inputChecks(request, response)) {
       return null
     }
@@ -50,22 +44,23 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response)
+    return new PnpSession(request, response)
   }
 
-  validateClientRequest(
-    request: Request<{}, {}, unknown>
-  ): request is Request<{}, {}, PnpQuotaRequest> {
+  validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, LegacyPnpQuotaRequest> {
     return (
-      super.validateClientRequest(request) &&
+      LegacyPnpQuotaRequestSchema.is(request.body) &&
       hasValidAccountParam(request.body) &&
       identifierIsValidIfExists(request.body) &&
       isBodyReasonablySized(request.body)
     )
   }
 
-  async authenticate(request: Request<{}, {}, PnpQuotaRequest>, logger: Logger): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.config.shouldFailOpen)
+  async authenticate(
+    request: Request<{}, {}, LegacyPnpQuotaRequest>,
+    logger: Logger
+  ): Promise<boolean> {
+    return authenticateUser(request, this.kit, logger, this.shouldFailOpen)
   }
 
   sendSuccess(
@@ -78,13 +73,14 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       response,
       {
         success: true,
-        version: VERSION,
+        version: getVersion(),
         ...quotaStatus,
         warnings,
       },
       status,
       response.locals.logger
     )
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 
   sendFailure(error: ErrorType, status: number, response: Response<PnpQuotaResponseFailure>) {
@@ -92,11 +88,12 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       response,
       {
         success: false,
-        version: VERSION,
+        version: getVersion(),
         error,
       },
       status,
       response.locals.logger
     )
+    Counters.responses.labels(this.endpoint, status.toString()).inc()
   }
 }

@@ -7,6 +7,8 @@ import btoa from 'btoa'
 import Web3 from 'web3'
 import {
   AuthenticationMethod,
+  LegacyPnpQuotaRequest,
+  LegacySignMessageRequest,
   PhoneNumberPrivacyRequest,
   PnpQuotaRequest,
   SignMessageRequest,
@@ -130,9 +132,19 @@ export async function registerWalletAddress(
 
 export function getPnpQuotaRequest(
   account: string,
+  authenticationMethod?: string
+): PnpQuotaRequest {
+  return {
+    account,
+    authenticationMethod,
+    sessionID: genSessionID(),
+  }
+}
+export function getLegacyPnpQuotaRequest(
+  account: string,
   authenticationMethod?: string,
   hashedPhoneNumber?: string
-): PnpQuotaRequest {
+): LegacyPnpQuotaRequest {
   return {
     account,
     authenticationMethod,
@@ -146,7 +158,7 @@ export function getLegacyPnpSignRequest(
   blindedQueryPhoneNumber: string,
   authenticationMethod?: string,
   hashedPhoneNumber?: string
-): SignMessageRequest {
+): LegacySignMessageRequest {
   return {
     account,
     blindedQueryPhoneNumber,
@@ -159,14 +171,12 @@ export function getLegacyPnpSignRequest(
 export function getPnpSignRequest(
   account: string,
   blindedQueryPhoneNumber: string,
-  authenticationMethod?: string,
-  hashedPhoneNumber?: string
+  authenticationMethod?: string
 ): SignMessageRequest {
   return {
     account,
     blindedQueryPhoneNumber,
     authenticationMethod,
-    hashedPhoneNumber,
     sessionID: genSessionID(),
   }
 }

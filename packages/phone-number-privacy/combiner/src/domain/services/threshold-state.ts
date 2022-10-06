@@ -1,22 +1,23 @@
-import {
-  DomainQuotaStatusRequest,
-  DomainRestrictedSignatureRequest,
-  DomainState,
-} from '@celo/phone-number-privacy-common'
+import { DomainRequest, DomainState } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
 import { OdisConfig } from '../../config'
 
-export class DomainThresholdStateService<
-  R extends DomainQuotaStatusRequest | DomainRestrictedSignatureRequest
-> {
+export class DomainThresholdStateService<R extends DomainRequest> {
   constructor(readonly config: OdisConfig) {}
 
   findThresholdDomainState(session: Session<R>): DomainState {
     // Get the domain status from the responses, filtering out responses that don't have the status.
     const domainStates = session.responses
       .map((signerResponse) => ('status' in signerResponse.res ? signerResponse.res.status : null))
-      .filter((state) => state ?? false) as DomainState[]
+      .filter((state: DomainState | null | undefined): state is DomainState => !!state)
     const threshold = this.config.keys.threshold
+
+    // Note: when the threshold > # total signers - threshold, it's possible that we
+    // throw an error here when the domain is disabled. While the domain is technically disabled,
+    // the hope is to increase the "safety margin" of the number of signers that have
+    // also disabled this domain.This can be changed in the future (if we think that
+    // the safety margin is no longer needed) by simply checking if the domain is disabled
+    // before checking if the threshold of enabled responses has been met.
     if (domainStates.length < threshold) {
       throw new Error('Insufficient number of signer responses')
     }
@@ -30,6 +31,7 @@ export class DomainThresholdStateService<
       return { timer: 0, counter: 0, disabled: true, now: 0 }
     }
 
+    // Ideally users will resubmit the request in this case.
     if (domainStatesEnabled.length < threshold) {
       throw new Error('Insufficient number of signer responses. Domain may be disabled')
     }

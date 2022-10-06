@@ -3,11 +3,14 @@ import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Histograms, meter } from '../../metrics'
 import {
-  DomainRequestRecord,
   DOMAIN_REQUESTS_COLUMNS,
   DOMAIN_REQUESTS_TABLE,
+  DomainRequestRecord,
 } from '../models/domain-request'
 import { countAndThrowDBError } from '../utils'
+
+// TODO(2.0.0, replay) implement replay handling; this file is currently unused
+// issue: https://github.com/celo-org/celo-monorepo/issues/9909
 
 function domainRequests(db: Knex) {
   return db<DomainRequestRecord<Domain>>(DOMAIN_REQUESTS_TABLE)

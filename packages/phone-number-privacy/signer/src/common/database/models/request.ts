@@ -1,19 +1,27 @@
-import { SignMessageRequest } from '@celo/phone-number-privacy-common'
+export enum REQUESTS_TABLE {
+  LEGACY = 'requests',
+  ONCHAIN = 'requestsOnChain',
+}
 
-export const REQUESTS_TABLE = 'requests'
 export enum REQUESTS_COLUMNS {
   address = 'caller_address',
   timestamp = 'timestamp',
   blindedQuery = 'blinded_query',
 }
-export class Request {
-  [REQUESTS_COLUMNS.address]: string;
-  [REQUESTS_COLUMNS.timestamp]: Date;
-  [REQUESTS_COLUMNS.blindedQuery]: string
 
-  constructor(request: SignMessageRequest) {
-    this[REQUESTS_COLUMNS.address] = request.account
-    this[REQUESTS_COLUMNS.timestamp] = new Date()
-    this[REQUESTS_COLUMNS.blindedQuery] = request.blindedQueryPhoneNumber
+export interface PnpSignRequestRecord {
+  [REQUESTS_COLUMNS.address]: string
+  [REQUESTS_COLUMNS.timestamp]: Date
+  [REQUESTS_COLUMNS.blindedQuery]: string
+}
+
+export function toPnpSignRequestRecord(
+  account: string,
+  blindedQuery: string
+): PnpSignRequestRecord {
+  return {
+    [REQUESTS_COLUMNS.address]: account,
+    [REQUESTS_COLUMNS.timestamp]: new Date(),
+    [REQUESTS_COLUMNS.blindedQuery]: blindedQuery,
   }
 }
