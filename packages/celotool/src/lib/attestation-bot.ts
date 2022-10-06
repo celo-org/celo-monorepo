@@ -9,16 +9,21 @@ const helmChartPath = '../helm-charts/attestation-bot'
 
 export async function installHelmChart(celoEnv: string) {
   const params = await helmParameters(celoEnv)
-  return installGenericHelmChart(celoEnv, releaseName(celoEnv), helmChartPath, params)
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: helmChartPath,
+    parameters: params,
+  })
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  await upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    helmChartPath,
-    helmParameters(celoEnv)
-  )
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: helmChartPath,
+    parameters: helmParameters(celoEnv),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string) {

@@ -18,3 +18,11 @@
 /.tmp/
 
 /scripts
+
+
+# exclude ts files and sourcemaps
+*.map
+*.ts
+
+# include the .d.ts files
+!lib/**/*.d.ts

@@ -4,6 +4,6 @@ description: A Helm chart for the ODIS app
 name: odis
 version: 0.1.0
 dependencies:
-- name: common
-  version: 0.1.0
-  repository: file://../common
+  - name: common
+    repository: oci://us-west1-docker.pkg.dev/devopsre/clabs-public-oci
+    version: 0.2.0

@@ -22,22 +22,22 @@ const rbacHelmChartPath = '../helm-charts/oracle-rbac'
  */
 export abstract class RbacOracleDeployer extends BaseOracleDeployer {
   async installChart() {
-    await installGenericHelmChart(
-      this.celoEnv,
-      this.rbacReleaseName(),
-      rbacHelmChartPath,
-      this.rbacHelmParameters()
-    )
+    await installGenericHelmChart({
+      namespace: this.celoEnv,
+      releaseName: this.rbacReleaseName(),
+      chartDir: rbacHelmChartPath,
+      parameters: this.rbacHelmParameters(),
+    })
     return super.installChart()
   }
 
   async upgradeChart() {
-    await upgradeGenericHelmChart(
-      this.celoEnv,
-      this.rbacReleaseName(),
-      rbacHelmChartPath,
-      this.rbacHelmParameters()
-    )
+    await upgradeGenericHelmChart({
+      namespace: this.celoEnv,
+      releaseName: this.rbacReleaseName(),
+      chartDir: rbacHelmChartPath,
+      parameters: this.rbacHelmParameters(),
+    })
     return super.upgradeChart()
   }
 
