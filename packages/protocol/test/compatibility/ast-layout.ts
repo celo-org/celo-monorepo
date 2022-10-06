@@ -27,6 +27,10 @@ const testCases = {
   mapping_source_changed: getTestArtifacts('mapping_source_changed'),
   internal_mapping_source_changed: getTestArtifacts('internal_mapping_source_changed'),
   mapping_target_changed: getTestArtifacts('mapping_target_changed'),
+
+  original_struct_in_mapping: getTestArtifacts('original_struct_in_mapping'),
+  inserted_in_struct_mapping: getTestArtifacts('inserted_in_struct_mapping'),
+  inserted_in_library_struct_mapping: getTestArtifacts('inserted_in_library_struct_mapping'),
 }
 
 const assertCompatible = (report) => {
@@ -129,6 +133,26 @@ describe('#reportLayoutIncompatibilities()', () => {
       )
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
+    })
+  })
+
+  describe('when a field is added to a struct in mapping', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_in_mapping,
+        testCases.inserted_in_struct_mapping
+      )
+      assertCompatible(report)
+    })
+  })
+
+  describe('when a field is added to a library struct in mapping', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_in_mapping,
+        testCases.inserted_in_library_struct_mapping
+      )
+      assertCompatible(report)
     })
   })
 

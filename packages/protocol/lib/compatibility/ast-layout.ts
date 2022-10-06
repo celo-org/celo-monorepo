@@ -97,11 +97,32 @@ const generateLayoutCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayo
   }
 }
 
-const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
+const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structExpandable: boolean) => {
   if (oldType.kind !== 'struct') {
     return {
       same: false,
       errors: [`${newType.label} wasn't a struct type, now is`]
+    }
+  }
+
+  if (structExpandable && oldType.members.length < newType.members.length) {
+    const expandableErrors = oldType.members.map((oldMember, i) => {
+      const newMember = newType.members[i]
+
+      if (oldMember.label !== newMember.label) {
+        return `struct ${newType.label} had ${oldMember.label} in slot ${i}, now has ${newMember.label}`
+      }
+  
+      if (oldMember.type !== newMember.type) {
+        return `struct ${newType.label}'s member ${newMember.label} changed type from ${oldMember.type} to ${newMember.type}`
+      }
+    }).filter(error => error)
+
+    if (expandableErrors.length == 0) {
+      return {
+        same: true,
+        errors: []
+      }
     }
   }
 
@@ -131,16 +152,27 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
   }
 }
 
+// Struct is expandable only if used in mappings or arrays
+const isStructExpandable = (oldType: TypeInfo, oldLayout: StorageLayoutInfo) => {
+  const structString = `t_struct<${oldType.label}>`
+  return !oldLayout.storage.some(storage => storage.type === structString)
+}
+
 const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo) => {
   let compatible = true
   let errors = []
+
+  console.log("oldLayout", JSON.stringify(oldLayout))
+  console.log("newLayout", JSON.stringify(newLayout))
 
   Object.keys(newLayout.types).forEach(typeName => {
     const newType = newLayout.types[typeName]
     const oldType = oldLayout.types[typeName]
 
     if (newType.kind === 'struct' && oldType !== undefined) {
-      const structReport = compareStructDefinitions(oldType, newType)
+      const structExpandable = isStructExpandable(oldType, oldLayout)
+      console.log("structExpandable " + oldType.label, structExpandable) 
+      const structReport = compareStructDefinitions(oldType, newType, structExpandable)
       if (!structReport.same) {
         compatible = false
         errors = errors.concat(structReport.errors)
