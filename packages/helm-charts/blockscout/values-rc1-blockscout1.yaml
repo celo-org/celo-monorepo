@@ -13,6 +13,9 @@ blockscout:
         memory: 12Gi
         cpu: 5
   api:
+    suffix:
+      enabled: true
+      path: "mainnet"
     autoscaling:
         maxReplicas: 5
         minReplicas: 2
@@ -32,6 +35,9 @@ blockscout:
         cpu: 1500m
   web:
     host: explorer.celo.org
+    suffix:
+      enabled: true
+      path: "mainnet"
     autoscaling:
       maxReplicas: 5
       minReplicas: 2

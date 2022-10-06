@@ -106,6 +106,14 @@ spec:
           value: {{ .Values.blockscout.web.sourcify.repoUrl | quote }}
         - name: CHAIN_ID
           value: {{ .Values.blockscout.chain.networkID | quote }}
+        {{- if .Values.blockscout.api.suffix.enabled }}
+        - name: NETWORK_PATH
+          value: /{{ .Values.blockscout.api.suffix.path }}
+        - name: API_PATH
+          value: /{{ .Values.blockscout.api.suffix.path }}
+        - name: API_URL
+          value: /{{ .Values.blockscout.api.suffix.path }}
+        {{- end }}
 {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.api.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}
 {{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
