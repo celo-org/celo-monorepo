@@ -25,12 +25,12 @@ import { LockedGoldWrapper } from './wrappers/LockedGold'
 import { MetaTransactionWalletWrapper } from './wrappers/MetaTransactionWallet'
 import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransactionWalletDeployer'
 import { MultiSigWrapper } from './wrappers/MultiSig'
+import { OdisPaymentsWrapper } from './wrappers/OdisPayments'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenRegistryWrapper } from './wrappers/StableTokenRegistry'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
-import { OdisPaymentsWrapper } from './wrappers/OdisPayments'
 
 const WrapperFactories = {
   [CeloContract.Accounts]: AccountsWrapper,
