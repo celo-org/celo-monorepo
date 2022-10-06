@@ -1,9 +1,9 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
+import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { newKitFromWeb3 } from '../kit'
 import { EscrowWrapper } from './Escrow'
 import { FederatedAttestationsWrapper } from './FederatedAttestations'
 import { StableTokenWrapper } from './StableTokenWrapper'
-import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 
 testWithGanache('Escrow Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)

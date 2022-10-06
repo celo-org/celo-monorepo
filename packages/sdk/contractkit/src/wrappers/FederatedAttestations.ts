@@ -1,6 +1,6 @@
+import { CeloTransactionObject } from '@celo/connect'
 import { FederatedAttestations } from '../generated/FederatedAttestations'
 import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
-import { CeloTransactionObject } from '@celo/connect'
 
 type Address = string
 type Identifier = string | number[]
@@ -26,14 +26,13 @@ export class FederatedAttestationsWrapper extends BaseWrapper<FederatedAttestati
   }> = proxyCall(this.contract.methods.lookupIdentifiers)
 
   /**
-     * @notice Helper function for lookupAttestations to calculate the
-     total number of attestations completed for an identifier
-     by each trusted issuer
-     * @param identifier Hash of the identifier
-     * @param trustedIssuers Array of n issuers whose attestations will be included
-     * @return totalAttestations Sum total of attestations found
-     * @return countsPerIssuer Array of number of attestations found per issuer
-     */
+   * @notice Helper function for lookupAttestations to calculate the total number of
+   * attestations completed for an identifier by each trusted issuer
+   * @param identifier Hash of the identifier
+   * @param trustedIssuers Array of n issuers whose attestations will be included
+   * @return totalAttestations Sum total of attestations found
+   * @return countsPerIssuer Array of number of attestations found per issuer
+   */
   lookupAttestations: (
     identifier: Identifier,
     trustedIssuers: Address[]
@@ -121,7 +120,7 @@ export class FederatedAttestationsWrapper extends BaseWrapper<FederatedAttestati
    */
   batchRevokeAttestations: (
     issuer: Address,
-    identifiers: Array<Identifier>,
+    identifiers: Identifier[],
     accounts: Address[]
   ) => CeloTransactionObject<void> = proxySend(
     this.connection,

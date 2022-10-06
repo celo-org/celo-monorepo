@@ -1,6 +1,6 @@
-import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
 import { CeloTransactionObject } from '@celo/connect'
 import { OdisPayments } from '../generated/OdisPayments'
+import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
 
 type Address = string
 

@@ -9,8 +9,9 @@ type Identifier = string | number[]
  * Contract for handling reserve for stable currencies
  */
 export class EscrowWrapper extends BaseWrapper<Escrow> {
-  /** @notice Gets unique escrowed payments for unique payment ID.
-   *  @param paymentId The ID of the payment to get.
+  /**
+   * @notice Gets unique escrowed payments for unique payment ID.
+   * @param paymentId The ID of the payment to get.
    */
   escrowedPayments = proxyCall(this.contract.methods.escrowedPayments)
 
@@ -140,7 +141,7 @@ export class EscrowWrapper extends BaseWrapper<Escrow> {
     expirySeconds: number | string,
     paymentId: string,
     minAttestations: number | string,
-    trustedIssuers: Array<Address>
+    trustedIssuers: Address[]
   ) => CeloTransactionObject<boolean> = proxySend(
     this.connection,
     this.contract.methods.transferWithTrustedIssuers
