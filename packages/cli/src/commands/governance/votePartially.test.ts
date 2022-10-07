@@ -50,9 +50,9 @@ testWithGanache('governance:vote-partially cmd', (web3: Web3) => {
       '--proposalID',
       proposalID.toString(10),
       '--values',
-      'Yes, No',
+      'Yes,No',
       '--weights',
-      '10, 20',
+      '10,20',
     ])
     const votes = await governance.getVotes(proposalID)
     expect(votes.Yes.toNumber()).toEqual(10)
