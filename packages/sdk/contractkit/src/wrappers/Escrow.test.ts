@@ -59,8 +59,7 @@ testWithGanache('Escrow Wrapper', (web3) => {
     const receiver: string = accounts[2]
     const withdrawKeyAddress: string = accounts[3]
     const oneDayInSecs: number = 86400
-    const uniquePaymentIDWithdraw = withdrawKeyAddress
-    const parsedSig = await getParsedSignatureOfAddress(web3, receiver, uniquePaymentIDWithdraw)
+    const parsedSig = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
 
     await federatedAttestations
       .registerAttestationAsIssuer(identifier, receiver, TIMESTAMP)
@@ -79,14 +78,14 @@ testWithGanache('Escrow Wrapper', (web3) => {
         stableTokenContract.address,
         TEN_CUSD,
         oneDayInSecs,
-        uniquePaymentIDWithdraw,
+        withdrawKeyAddress,
         1,
         [kit.defaultAccount as string]
       )
       .send({ from: sender })
 
     await escrow
-      .withdraw(uniquePaymentIDWithdraw, parsedSig.v, parsedSig.r, parsedSig.s)
+      .withdraw(withdrawKeyAddress, parsedSig.v, parsedSig.r, parsedSig.s)
       .sendAndWaitForReceipt({ from: receiver })
 
     const senderBalanceAfter = await stableTokenContract.balanceOf(sender)
@@ -94,5 +93,34 @@ testWithGanache('Escrow Wrapper', (web3) => {
 
     expect(senderBalanceBefore.minus(+TEN_CUSD)).toEqual(senderBalanceAfter)
     expect(receiverBalanceBefore.plus(+TEN_CUSD)).toEqual(receiverBalanceAfter)
+  })
+  it('withdraw should revert if attestation is not registered', async () => {
+    const sender: string = accounts[1]
+    const receiver: string = accounts[2]
+    const withdrawKeyAddress: string = accounts[3]
+    const oneDayInSecs: number = 86400
+    const parsedSig = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
+
+    await stableTokenContract
+      .approve(escrow.address, TEN_CUSD)
+      .sendAndWaitForReceipt({ from: sender })
+
+    await escrow
+      .transferWithTrustedIssuers(
+        identifier,
+        stableTokenContract.address,
+        TEN_CUSD,
+        oneDayInSecs,
+        withdrawKeyAddress,
+        1,
+        [kit.defaultAccount as string]
+      )
+      .send({ from: sender })
+
+    await expect(
+      escrow
+        .withdraw(withdrawKeyAddress, parsedSig.v, parsedSig.r, parsedSig.s)
+        .sendAndWaitForReceipt()
+    ).rejects.toThrow()
   })
 })
