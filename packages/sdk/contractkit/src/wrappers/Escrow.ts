@@ -10,26 +10,12 @@ type Identifier = string | number[]
  */
 export class EscrowWrapper extends BaseWrapper<Escrow> {
   /**
-   * @notice Gets unique escrowed payments for unique payment ID.
+   * @notice Gets the unique escrowed payment for a given payment ID
    * @param paymentId The ID of the payment to get.
+   * @return An EscrowedPayment struct which holds information such
+   * as; recipient identifier, sender address, token address, value, etc.
    */
   escrowedPayments = proxyCall(this.contract.methods.escrowedPayments)
-
-  /**
-   * @notice Gets array of all Escrowed Payments received by identifier.
-   * @param identifier The hash of an identifier of the receiver of the escrowed payment.
-   * @return An array containing all the IDs of the Escrowed Payments that were received
-   * by the specified receiver.
-   */
-  receivedPaymentIds = proxyCall(this.contract.methods.receivedPaymentIds)
-
-  /**
-   * @notice Gets array of all Escrowed Payment IDs sent by sender.
-   * @param sender The address of the sender of the escrowed payments.
-   * @return An array containing all the IDs of the Escrowed Payments that were sent by the
-   * specified sender.
-   */
-  sentPaymentIds = proxyCall(this.contract.methods.sentPaymentIds)
 
   /**
    * @notice Gets array of all Escrowed Payments received by identifier.
@@ -40,9 +26,10 @@ export class EscrowWrapper extends BaseWrapper<Escrow> {
   getReceivedPaymentIds = proxyCall(this.contract.methods.getReceivedPaymentIds)
 
   /**
-   * @notice Gets array of all trusted issuers set per paymentId.
-   * @param paymentId The ID of the payment to get.
-   * @return An array of addresses of trusted issuers set for an escrowed payment.
+   * @notice Gets array of all Escrowed Payment IDs sent by sender.
+   * @param sender The address of the sender of the escrowed payments.
+   * @return An array containing all the IDs of the Escrowed Payments that were sent by the
+   * specified sender.
    */
   getSentPaymentIds = proxyCall(this.contract.methods.getSentPaymentIds)
 
@@ -84,7 +71,7 @@ export class EscrowWrapper extends BaseWrapper<Escrow> {
     expirySeconds: number | string,
     paymentId: string,
     minAttestations: number | string
-  ) => CeloTransactionObject<unknown> = proxySend(this.connection, this.contract.methods.transfer)
+  ) => CeloTransactionObject<boolean> = proxySend(this.connection, this.contract.methods.transfer)
 
   /**
    * @notice Withdraws tokens for a verified user.

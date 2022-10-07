@@ -6,110 +6,121 @@ testWithGanache('FederatedAttestations Wrapper', (web3) => {
   const kit = newKitFromWeb3(web3)
   let accounts: string[] = []
   let federatedAttestations: FederatedAttestationsWrapper
+  let testIdentifierBytes32: string
+  let plainTextIdentifier: string
+  let testAccountAddress: string
 
   beforeAll(async () => {
     accounts = await web3.eth.getAccounts()
     kit.defaultAccount = accounts[0]
+    federatedAttestations = await kit.contracts.getFederatedAttestations()
+    testAccountAddress = kit.web3.eth.accounts.create().address
+    plainTextIdentifier = '221B Baker St., London'
+    testIdentifierBytes32 = kit.web3.utils.soliditySha3({
+      t: 'bytes32',
+      v: plainTextIdentifier,
+    }) as string
   })
 
   it('no identifiers should exist if none were registered', async () => {
-    federatedAttestations = await kit.contracts.getFederatedAttestations()
-    const testAccount = kit.web3.eth.accounts.create()
     const testIssuer = kit.web3.eth.accounts.create()
-    const identifiers = await federatedAttestations.lookupIdentifiers(testAccount.address, [
+    const identifiers = await federatedAttestations.lookupIdentifiers(testAccountAddress, [
       testIssuer.address,
     ])
 
-    expect(identifiers).toEqual({
-      '0': ['0'],
-      '1': [],
-      countsPerIssuer: ['0'],
-      identifiers: [],
-    })
+    expect(identifiers.countsPerIssuer).toEqual(['0'])
+    expect(identifiers.identifiers).toEqual([])
   })
 
   it('no attestations should exist if none were registered', async () => {
-    federatedAttestations = await kit.contracts.getFederatedAttestations()
-    const testIdentifierAddress = kit.web3.eth.accounts.create().address
-    const testIdentifierBytes32 = kit.web3.utils.soliditySha3({
-      t: 'bytes32',
-      v: testIdentifierAddress,
-    })
+    const attestations = await federatedAttestations.lookupAttestations(testIdentifierBytes32, [
+      kit.defaultAccount as string,
+    ])
 
-    const attestations = await federatedAttestations.lookupAttestations(
-      testIdentifierBytes32 as string,
+    expect(attestations.countsPerIssuer).toEqual(['0'])
+    expect(attestations.accounts).toEqual([])
+    expect(attestations.signers).toEqual([])
+    expect(attestations.issuedOns).toEqual([])
+    expect(attestations.publishedOns).toEqual([])
+  })
+  it('attestation should exist when registered and not when revoked', async () => {
+    const testIssuedOnTimestamp = Math.floor(new Date().getTime() / 1000)
+
+    await federatedAttestations
+      .registerAttestationAsIssuer(testIdentifierBytes32, testAccountAddress, testIssuedOnTimestamp)
+      .send()
+
+    const attestationsAfterRegistration = await federatedAttestations.lookupAttestations(
+      testIdentifierBytes32,
       [kit.defaultAccount as string]
     )
 
-    expect(attestations).toEqual({
-      '0': ['0'],
-      '1': [],
-      '2': [],
-      '3': [],
-      '4': [],
-      accounts: [],
-      countsPerIssuer: ['0'],
-      issuedOns: [],
-      publishedOns: [],
-      signers: [],
-    })
+    const identifiersAfterRegistration = await federatedAttestations.lookupIdentifiers(
+      testAccountAddress,
+      [kit.defaultAccount as string]
+    )
+
+    expect(attestationsAfterRegistration.countsPerIssuer).toEqual(['1'])
+    expect(attestationsAfterRegistration.accounts).toEqual([testAccountAddress])
+    expect(attestationsAfterRegistration.signers).toEqual([kit.defaultAccount])
+    expect(attestationsAfterRegistration.issuedOns).toEqual([`${testIssuedOnTimestamp}`])
+    expect(attestationsAfterRegistration.publishedOns[0]).toBeDefined()
+
+    expect(identifiersAfterRegistration.countsPerIssuer).toEqual(['1'])
+    expect(identifiersAfterRegistration.identifiers).toEqual([testIdentifierBytes32])
+
+    await federatedAttestations
+      .revokeAttestation(testIdentifierBytes32, kit.defaultAccount as string, testAccountAddress)
+      .send()
+
+    const attestationsAfterRevocation = await federatedAttestations.lookupAttestations(
+      testIdentifierBytes32,
+      [kit.defaultAccount as string]
+    )
+
+    const identifiersAfterRevocation = await federatedAttestations.lookupIdentifiers(
+      testAccountAddress,
+      [kit.defaultAccount as string]
+    )
+
+    expect(attestationsAfterRevocation.countsPerIssuer).toEqual(['0'])
+    expect(attestationsAfterRevocation.accounts).toEqual([])
+    expect(attestationsAfterRevocation.signers).toEqual([])
+    expect(attestationsAfterRevocation.issuedOns).toEqual([])
+    expect(attestationsAfterRevocation.publishedOns).toEqual([])
+
+    expect(identifiersAfterRevocation.countsPerIssuer).toEqual(['0'])
+    expect(identifiersAfterRevocation.identifiers).toEqual([])
   })
-  it('attestation should exist when registered and not when revoked', async () => {
-    federatedAttestations = await kit.contracts.getFederatedAttestations()
-    const testIdentifierAddress = kit.web3.eth.accounts.create().address
-    const testAccount = kit.web3.eth.accounts.create().address
+  it('batch revoke attestations should remove all attestations specified ', async () => {
     const testIssuedOnTimestamp = Math.floor(new Date().getTime() / 1000)
-    const testIdentifierBytes32 = kit.web3.utils.soliditySha3({
+
+    const secondIdentifierBytes32 = kit.web3.utils.soliditySha3({
       t: 'bytes32',
-      v: testIdentifierAddress,
-    })
+      v: '1600 Pennsylvania Avenue, Washington, D.C., USA',
+    }) as string
+
+    await federatedAttestations
+      .registerAttestationAsIssuer(testIdentifierBytes32, testAccountAddress, testIssuedOnTimestamp)
+      .send()
 
     await federatedAttestations
       .registerAttestationAsIssuer(
-        testIdentifierBytes32 as string,
-        testAccount,
+        secondIdentifierBytes32,
+        testAccountAddress,
         testIssuedOnTimestamp
       )
       .send()
 
-    const attestations = await federatedAttestations.lookupAttestations(
-      testIdentifierBytes32 as string,
+    const identifiersAfterRegistration = await federatedAttestations.lookupIdentifiers(
+      testAccountAddress,
       [kit.defaultAccount as string]
     )
 
-    const identifiers = await federatedAttestations.lookupIdentifiers(testAccount as string, [
-      kit.defaultAccount as string,
+    expect(identifiersAfterRegistration.countsPerIssuer).toEqual(['2'])
+    expect(identifiersAfterRegistration.identifiers).toEqual([
+      testIdentifierBytes32,
+      secondIdentifierBytes32,
     ])
-
-    expect(attestations[1]).toEqual([testAccount])
-    expect(attestations[2]).toEqual([kit.defaultAccount])
-    expect(identifiers[0]).toEqual(['1'])
-    expect(identifiers[1]).toEqual([testIdentifierBytes32])
-
-    await federatedAttestations
-      .revokedAttestations(
-        testIdentifierBytes32 as string,
-        kit.defaultAccount as string,
-        testAccount
-      )
-      .send()
-
-    const attestationsAfterRevocation = await federatedAttestations.lookupAttestations(
-      testIdentifierBytes32 as string,
-      [kit.defaultAccount as string]
-    )
-
-    expect(attestationsAfterRevocation).toEqual({
-      '0': ['0'],
-      '1': [],
-      '2': [],
-      '3': [],
-      '4': [],
-      accounts: [],
-      countsPerIssuer: ['0'],
-      issuedOns: [],
-      publishedOns: [],
-      signers: [],
-    })
   })
 })
