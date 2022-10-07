@@ -48,7 +48,7 @@ testWithGanache('FederatedAttestations Wrapper', (web3) => {
 
     await federatedAttestations
       .registerAttestationAsIssuer(testIdentifierBytes32, testAccountAddress, testIssuedOnTimestamp)
-      .send()
+      .sendAndWaitForReceipt()
 
     const attestationsAfterRegistration = await federatedAttestations.lookupAttestations(
       testIdentifierBytes32,
@@ -71,7 +71,7 @@ testWithGanache('FederatedAttestations Wrapper', (web3) => {
 
     await federatedAttestations
       .revokeAttestation(testIdentifierBytes32, kit.defaultAccount as string, testAccountAddress)
-      .send()
+      .sendAndWaitForReceipt()
 
     const attestationsAfterRevocation = await federatedAttestations.lookupAttestations(
       testIdentifierBytes32,
@@ -102,7 +102,7 @@ testWithGanache('FederatedAttestations Wrapper', (web3) => {
 
     await federatedAttestations
       .registerAttestationAsIssuer(testIdentifierBytes32, testAccountAddress, testIssuedOnTimestamp)
-      .send()
+      .sendAndWaitForReceipt()
 
     await federatedAttestations
       .registerAttestationAsIssuer(
@@ -110,7 +110,7 @@ testWithGanache('FederatedAttestations Wrapper', (web3) => {
         testAccountAddress,
         testIssuedOnTimestamp
       )
-      .send()
+      .sendAndWaitForReceipt()
 
     const identifiersAfterRegistration = await federatedAttestations.lookupIdentifiers(
       testAccountAddress,

@@ -34,10 +34,10 @@ testWithGanache('Escrow Wrapper', (web3) => {
     const testPaymentId = kit.web3.eth.accounts.create().address
     await federatedAttestations
       .registerAttestationAsIssuer(identifier, kit.defaultAccount as string, TIMESTAMP)
-      .send()
+      .sendAndWaitForReceipt()
 
-    const approveTx = await stableTokenContract.approve(escrow.address, TEN_CUSD).send()
-    await approveTx.waitReceipt()
+    await stableTokenContract.approve(escrow.address, TEN_CUSD).sendAndWaitForReceipt()
+
     await escrow
       .transferWithTrustedIssuers(
         identifier,
@@ -46,9 +46,9 @@ testWithGanache('Escrow Wrapper', (web3) => {
         1000,
         testPaymentId,
         1,
-        [kit.defaultAccount as string]
+        accounts
       )
-      .send()
+      .sendAndWaitForReceipt()
 
     const trustedIssuersPerPayment = await escrow.getTrustedIssuersPerPayment(testPaymentId)
 
@@ -62,15 +62,16 @@ testWithGanache('Escrow Wrapper', (web3) => {
     const uniquePaymentIDWithdraw = withdrawKeyAddress
     const parsedSig = await getParsedSignatureOfAddress(web3, receiver, uniquePaymentIDWithdraw)
 
-    await federatedAttestations.registerAttestationAsIssuer(identifier, receiver, TIMESTAMP).send()
+    await federatedAttestations
+      .registerAttestationAsIssuer(identifier, receiver, TIMESTAMP)
+      .sendAndWaitForReceipt()
 
     const senderBalanceBefore = await stableTokenContract.balanceOf(sender)
     const receiverBalanceBefore = await stableTokenContract.balanceOf(receiver)
 
-    const approveTx = await stableTokenContract
+    await stableTokenContract
       .approve(escrow.address, TEN_CUSD)
-      .send({ from: sender })
-    await approveTx.waitReceipt()
+      .sendAndWaitForReceipt({ from: sender })
 
     await escrow
       .transferWithTrustedIssuers(
@@ -86,7 +87,7 @@ testWithGanache('Escrow Wrapper', (web3) => {
 
     await escrow
       .withdraw(uniquePaymentIDWithdraw, parsedSig.v, parsedSig.r, parsedSig.s)
-      .send({ from: receiver })
+      .sendAndWaitForReceipt({ from: receiver })
 
     const senderBalanceAfter = await stableTokenContract.balanceOf(sender)
     const receiverBalanceAfter = await stableTokenContract.balanceOf(receiver)

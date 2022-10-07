@@ -22,14 +22,12 @@ testWithGanache('OdisPayments Wrapper', (web3) => {
 
     const payAndCheckState = async (sender: string, receiver: string, transferValue: number) => {
       // Approve cUSD that OdisPayments contract may transfer from sender
-      const approveTx = await stableToken
+      await stableToken
         .approve(odisPayments.address, transferValue)
-        .send({ from: sender })
-      await approveTx.waitReceipt()
+        .sendAndWaitForReceipt({ from: sender })
 
       const senderBalanceBefore = await stableToken.balanceOf(sender)
-      const tx = await odisPayments.payInCUSD(receiver, transferValue).send({ from: sender })
-      await tx.waitReceipt()
+      await odisPayments.payInCUSD(receiver, transferValue).sendAndWaitForReceipt({ from: sender })
       const balanceAfter = await stableToken.balanceOf(sender)
       expect(senderBalanceBefore.minus(balanceAfter)).toEqBigNumber(transferValue)
       expect(await stableToken.balanceOf(odisPayments.address)).toEqBigNumber(transferValue)
@@ -45,10 +43,11 @@ testWithGanache('OdisPayments Wrapper', (web3) => {
     })
 
     it('should revert if transfer fails', async () => {
-      const approveTx = await stableToken.approve(odisPayments.address, testValue).send()
-      await approveTx.waitReceipt()
+      await stableToken.approve(odisPayments.address, testValue).sendAndWaitForReceipt()
       expect.assertions(2)
-      await expect(odisPayments.payInCUSD(accounts[0], testValue + 1).send()).rejects.toThrow()
+      await expect(
+        odisPayments.payInCUSD(accounts[0], testValue + 1).sendAndWaitForReceipt()
+      ).rejects.toThrow()
       expect(await odisPayments.totalPaidCUSD(accounts[0])).toEqBigNumber(0)
     })
   })
