@@ -421,13 +421,14 @@ describe('pnp', () => {
         // after returning the initial error on timeout.
         it('Should respond with 500 on signer timeout', async () => {
           const testTimeoutMS = 200
+          const delay = 100
           const spy = jest
             .spyOn(
               jest.requireActual('../../src/common/database/wrappers/account'),
               'getPerformedQueryCount'
             )
             .mockImplementation(async () => {
-              await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + 1200))
+              await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
               return expectedQuota
             })
 
@@ -455,6 +456,8 @@ describe('pnp', () => {
             error: ErrorMessage.TIMEOUT_FROM_SIGNER,
           })
           spy.mockRestore()
+          // Allow time for non-killed processes to finish
+          await new Promise((resolve) => setTimeout(resolve, delay))
         })
       })
     })
@@ -906,6 +909,70 @@ describe('pnp', () => {
           })
 
           spy.mockRestore()
+        })
+
+        it('Should respond with 500 on signer timeout', async () => {
+          const testTimeoutMS = 200
+          const delay = 200
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'getPerformedQueryCount'
+            )
+            .mockImplementationOnce(async () => {
+              await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
+              return performedQueryCount
+            })
+
+          const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
+          configWithShortTimeout.timeout = testTimeoutMS
+          const appWithShortTimeout = startSigner(
+            configWithShortTimeout,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
+
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.PNP_SIGN,
+            undefined,
+            appWithShortTimeout
+          )
+
+          expect(res.status).toBe(500)
+          expect(res.body).toStrictEqual({
+            success: false,
+            error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+          })
+          spy.mockRestore()
+          // Allow time for non-killed processes to finish
+          await new Promise((resolve) => setTimeout(resolve, delay))
+          // Check that DB was not updated
+          expect(
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(config.serviceName)
+            )
+          ).toBe(performedQueryCount)
+          expect(
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE.ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(config.serviceName)
+            )
+          ).toBe(false)
         })
 
         it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {

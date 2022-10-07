@@ -79,8 +79,9 @@ export function startSigner(
           errorMsg = ErrorMessage.TIMEOUT_FROM_SIGNER
           errToLog = new Error(errorMsg)
         }
-        childLogger.error({ errToLog })
-        if (!res.writableEnded) {
+        childLogger.error({ err: errToLog }, 'Caught error in outer endpoint handler')
+        if (!res.writableEnded && !res.headersSent) {
+          childLogger.info('Responding with error in outer endpoint handler')
           res.status(500).json({
             success: false,
             error: errorMsg,

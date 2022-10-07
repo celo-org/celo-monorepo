@@ -12,8 +12,10 @@ import {
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
   DomainRestrictedSignatureResponse,
+  ErrorMessage,
   genSessionID,
   KEY_VERSION_HEADER,
+  rootLogger,
   SequentialDelayDomain,
   SequentialDelayStage,
   SignerEndpoint,
@@ -26,6 +28,10 @@ import { LocalWallet } from '@celo/wallet-local'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
+import {
+  createEmptyDomainStateRecord,
+  getDomainStateRecord,
+} from '../../src/common/database/wrappers/domain-state'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
@@ -762,6 +768,40 @@ describe('domain', () => {
           now: res.body.status.now,
         },
       })
+    })
+
+    it('Should respond with 500 on signer timeout', async () => {
+      const [req, _] = await signatureRequest()
+      const testTimeoutMS = 200
+      const delay = 200
+
+      const spy = jest
+        .spyOn(
+          jest.requireActual('../../src/common/database/wrappers/domain-state'),
+          'getDomainStateRecordOrEmpty'
+        )
+        .mockImplementationOnce(async () => {
+          await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
+          const x = createEmptyDomainStateRecord(req.domain)
+          console.log(x)
+          return x
+        })
+
+      const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
+      configWithShortTimeout.timeout = testTimeoutMS
+      const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
+
+      const res = await request(appWithShortTimeout).post(SignerEndpoint.DOMAIN_SIGN).send(req)
+      expect(res.status).toBe(500)
+      expect(res.body).toStrictEqual({
+        success: false,
+        error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+      })
+      spy.mockRestore()
+      // Allow time for non-killed processes to finish
+      await new Promise((resolve) => setTimeout(resolve, delay))
+      // Check that DB state was not updated on timeout
+      expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(null)
     })
 
     it('Should respond with 503 on disabled api', async () => {
