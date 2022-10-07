@@ -17,7 +17,7 @@ export class OdisPaymentsWrapper extends BaseWrapper<OdisPayments> {
    * @param value The amount in cUSD to pay.
    * @dev Throws if cUSD transfer fails.
    */
-  payInCUSD: (account: Address, value: number | string) => CeloTransactionObject<void> = proxySend(
+  payInCUSD: (account: Address, value: number) => CeloTransactionObject<void> = proxySend(
     this.connection,
     this.contract.methods.payInCUSD
   )
