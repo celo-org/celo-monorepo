@@ -797,6 +797,30 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     )
   }
 
+  /**
+   * Applies `sender`'s vote choice to a given proposal.
+   * @param proposalID Governance proposal UUID
+   * @param votes Choices to apply (yes, no, abstain)
+   * @param weights Weights to apply to particular votes
+   */
+  async votePartially(
+    proposalID: BigNumber.Value,
+    votes: Array<keyof typeof VoteValue>,
+    weights: number[]
+  ) {
+    const proposalIndex = await this.getDequeueIndex(proposalID)
+    const voteNum = votes.map((vote) => Object.keys(VoteValue).indexOf(vote))
+    return toTransactionObject(
+      this.connection,
+      this.contract.methods.votePartially(
+        valueToString(proposalID),
+        proposalIndex,
+        voteNum,
+        weights
+      )
+    )
+  }
+
   revokeVotes = proxySend(this.connection, this.contract.methods.revokeVotes)
 
   /**

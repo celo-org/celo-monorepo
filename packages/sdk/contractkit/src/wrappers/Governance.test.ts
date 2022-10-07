@@ -181,6 +181,26 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       expect(yesVotes).toEqBigNumber(voteWeight)
     })
 
+    it('#votePartially', async () => {
+      await proposeFn(accounts[0])
+      await timeTravel(expConfig.dequeueFrequency, web3)
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+      await approveFn()
+
+      const yes = 10
+      const no = 20
+
+      const tx = await governance.votePartially(proposalID, ['Yes', 'No'], [yes, no])
+      await tx.sendAndWaitForReceipt({ from: accounts[2] })
+      await timeTravel(expConfig.referendumStageDuration, web3)
+
+      const votes = await governance.getVotes(proposalID)
+      const yesVotes = votes[VoteValue.Yes]
+      const noVotes = votes[VoteValue.No]
+      expect(yesVotes).toEqBigNumber(yes)
+      expect(noVotes).toEqBigNumber(no)
+    })
+
     it(
       '#execute',
       async () => {
