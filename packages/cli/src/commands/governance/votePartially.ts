@@ -14,7 +14,6 @@ export default class VotePartially extends BaseCommand {
     ...BaseCommand.flags,
     proposalID: flags.string({ required: true, description: 'UUID of proposal to vote on' }),
     values: flags.string({
-      options: VotePartially.voteOptions,
       required: true,
       description: "Array of votes split by ','",
     }),
