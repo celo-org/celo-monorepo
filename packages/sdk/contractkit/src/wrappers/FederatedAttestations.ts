@@ -1,9 +1,6 @@
-import { CeloTransactionObject } from '@celo/connect'
+import { Address, CeloTransactionObject } from '@celo/connect'
 import { FederatedAttestations } from '../generated/FederatedAttestations'
 import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
-
-type Address = string
-type Identifier = string | number[]
 
 export class FederatedAttestationsWrapper extends BaseWrapper<FederatedAttestations> {
   /**
@@ -21,33 +18,67 @@ export class FederatedAttestationsWrapper extends BaseWrapper<FederatedAttestati
   ) => Promise<{
     countsPerIssuer: string[]
     identifiers: string[]
-    '0': string[]
-    '1': string[]
   }> = proxyCall(this.contract.methods.lookupIdentifiers)
 
   /**
-   * @notice Helper function for lookupAttestations to calculate the total number of
-   * attestations completed for an identifier by each trusted issuer
+   * @notice Returns info about attestations for `identifier` produced by
+   *    signers of `trustedIssuers`
    * @param identifier Hash of the identifier
    * @param trustedIssuers Array of n issuers whose attestations will be included
-   * @return totalAttestations Sum total of attestations found
-   * @return countsPerIssuer Array of number of attestations found per issuer
+   * @return countsPerIssuer Array of number of attestations returned per issuer
+   *          For m (== sum([0])) found attestations:
+   * @return accounts Array of m accounts
+   * @return signers Array of m signers
+   * @return issuedOns Array of m issuedOns
+   * @return publishedOns Array of m publishedOns
+   * @dev Adds attestation info to the arrays in order of provided trustedIssuers
+   * @dev Expectation that only one attestation exists per (identifier, issuer, account)
    */
   lookupAttestations: (
-    identifier: Identifier,
+    identifier: string,
     trustedIssuers: Address[]
   ) => Promise<{
     countsPerIssuer: string[]
-    accounts: string[]
-    signers: string[]
+    accounts: Address[]
+    signers: Address[]
     issuedOns: string[]
     publishedOns: string[]
-    '0': string[]
-    '1': string[]
-    '2': string[]
-    '3': string[]
-    '4': string[]
   }> = proxyCall(this.contract.methods.lookupAttestations)
+
+  /**
+   * @notice Validates the given attestation and signature
+   * @param identifier Hash of the identifier to be attested
+   * @param issuer Address of the attestation issuer
+   * @param account Address of the account being mapped to the identifier
+   * @param issuedOn Time at which the issuer issued the attestation in Unix time
+   * @param signer Address of the signer of the attestation
+   * @param v The recovery id of the incoming ECDSA signature
+   * @param r Output value r of the ECDSA signature
+   * @param s Output value s of the ECDSA signature
+   * @dev Throws if attestation has been revoked
+   * @dev Throws if signer is not an authorized AttestationSigner of the issuer
+   */
+  validateAttestationSig: (
+    identifier: string,
+    issuer: Address,
+    account: Address,
+    signer: Address,
+    issuedOn: number,
+    v: number | string,
+    r: string | number[],
+    s: string | number[]
+  ) => Promise<void> = proxyCall(this.contract.methods.validateAttestationSig)
+
+  /**
+   * @return keccak 256 of abi encoded parameters
+   */
+  getUniqueAttestationHash: (
+    identifier: string,
+    issuer: Address,
+    account: Address,
+    signer: Address,
+    issuedOn: number
+  ) => Promise<string> = proxyCall(this.contract.methods.getUniqueAttestationHash)
 
   /**
    * @notice Registers an attestation directly from the issuer
@@ -58,9 +89,9 @@ export class FederatedAttestationsWrapper extends BaseWrapper<FederatedAttestati
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
   registerAttestationAsIssuer: (
-    identifier: Identifier,
+    identifier: string,
     account: Address,
-    issuedOn: number | string
+    issuedOn: number
   ) => CeloTransactionObject<void> = proxySend(
     this.connection,
     this.contract.methods.registerAttestationAsIssuer
@@ -79,11 +110,11 @@ export class FederatedAttestationsWrapper extends BaseWrapper<FederatedAttestati
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
   registerAttestation: (
-    identifier: Identifier,
+    identifier: string,
     issuer: Address,
     account: Address,
     signer: Address,
-    issuedOn: number | string,
+    issuedOn: number,
     v: number | string,
     r: string | number[],
     s: string | number[]
@@ -99,8 +130,8 @@ export class FederatedAttestationsWrapper extends BaseWrapper<FederatedAttestati
    * @param account Address of the account mapped to the identifier
    * @dev Throws if sender is not the issuer, signer, or account
    */
-  revokedAttestations: (
-    identifier: Identifier,
+  revokeAttestation: (
+    identifier: string,
     issuer: Address,
     account: Address
   ) => CeloTransactionObject<void> = proxySend(
@@ -120,51 +151,10 @@ export class FederatedAttestationsWrapper extends BaseWrapper<FederatedAttestati
    */
   batchRevokeAttestations: (
     issuer: Address,
-    identifiers: Identifier[],
+    identifiers: string[],
     accounts: Address[]
   ) => CeloTransactionObject<void> = proxySend(
     this.connection,
     this.contract.methods.batchRevokeAttestations
-  )
-
-  /**
-   * @notice Validates the given attestation and signature
-   * @param identifier Hash of the identifier to be attested
-   * @param issuer Address of the attestation issuer
-   * @param account Address of the account being mapped to the identifier
-   * @param issuedOn Time at which the issuer issued the attestation in Unix time
-   * @param signer Address of the signer of the attestation
-   * @param v The recovery id of the incoming ECDSA signature
-   * @param r Output value r of the ECDSA signature
-   * @param s Output value s of the ECDSA signature
-   * @dev Throws if attestation has been revoked
-   * @dev Throws if signer is not an authorized AttestationSigner of the issuer
-   */
-  validateAttestationSig: (
-    identifier: Identifier,
-    issuer: Address,
-    account: Address,
-    signer: Address,
-    issuedOn: string | number,
-    v: string | number,
-    r: string | number[],
-    s: string | number[]
-  ) => CeloTransactionObject<void> = proxySend(
-    this.connection,
-    this.contract.methods.validateAttestationSig
-  )
-
-  /**
-   * @return keccak 256 of abi encoded parameters
-   */
-  getUniqueAttestationHash: (
-    identifier: Identifier,
-    issuer: Address,
-    account: Address,
-    signer: Address,
-    issuedOn: number | string
-  ) => CeloTransactionObject<string> = proxySend(
-    this.connection,
-    this.contract.methods.getUniqueAttestationHash
   )
 }

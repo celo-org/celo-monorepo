@@ -1,13 +1,11 @@
-import { CeloTransactionObject } from '@celo/connect'
+import { Address, CeloTransactionObject } from '@celo/connect'
 import { OdisPayments } from '../generated/OdisPayments'
 import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
-
-type Address = string
 
 export class OdisPaymentsWrapper extends BaseWrapper<OdisPayments> {
   /**
    * @notice Fetches total amount sent (all-time) for given account to odisPayments
-   * @param account The account to fetch all-time quota for
+   * @param account The account to fetch total amount of funds sent
    */
   totalPaidCUSD: (account: Address) => Promise<string> = proxyCall(
     this.contract.methods.totalPaidCUSD

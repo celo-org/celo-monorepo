@@ -34,10 +34,10 @@ testWithGanache('Escrow Wrapper', (web3) => {
     const testPaymentId = kit.web3.eth.accounts.create().address
     await federatedAttestations
       .registerAttestationAsIssuer(identifier, kit.defaultAccount as string, TIMESTAMP)
-      .send()
+      .sendAndWaitForReceipt()
 
-    const approveTx = await stableTokenContract.approve(escrow.address, TEN_CUSD).send()
-    await approveTx.waitReceipt()
+    await stableTokenContract.approve(escrow.address, TEN_CUSD).sendAndWaitForReceipt()
+
     await escrow
       .transferWithTrustedIssuers(
         identifier,
@@ -46,9 +46,9 @@ testWithGanache('Escrow Wrapper', (web3) => {
         1000,
         testPaymentId,
         1,
-        [kit.defaultAccount as string]
+        accounts
       )
-      .send()
+      .sendAndWaitForReceipt()
 
     const trustedIssuersPerPayment = await escrow.getTrustedIssuersPerPayment(testPaymentId)
 
@@ -59,18 +59,18 @@ testWithGanache('Escrow Wrapper', (web3) => {
     const receiver: string = accounts[2]
     const withdrawKeyAddress: string = accounts[3]
     const oneDayInSecs: number = 86400
-    const uniquePaymentIDWithdraw = withdrawKeyAddress
-    const parsedSig = await getParsedSignatureOfAddress(web3, receiver, uniquePaymentIDWithdraw)
+    const parsedSig = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
 
-    await federatedAttestations.registerAttestationAsIssuer(identifier, receiver, TIMESTAMP).send()
+    await federatedAttestations
+      .registerAttestationAsIssuer(identifier, receiver, TIMESTAMP)
+      .sendAndWaitForReceipt()
 
     const senderBalanceBefore = await stableTokenContract.balanceOf(sender)
     const receiverBalanceBefore = await stableTokenContract.balanceOf(receiver)
 
-    const approveTx = await stableTokenContract
+    await stableTokenContract
       .approve(escrow.address, TEN_CUSD)
-      .send({ from: sender })
-    await approveTx.waitReceipt()
+      .sendAndWaitForReceipt({ from: sender })
 
     await escrow
       .transferWithTrustedIssuers(
@@ -78,20 +78,49 @@ testWithGanache('Escrow Wrapper', (web3) => {
         stableTokenContract.address,
         TEN_CUSD,
         oneDayInSecs,
-        uniquePaymentIDWithdraw,
+        withdrawKeyAddress,
         1,
-        [kit.defaultAccount as string]
+        accounts
       )
       .send({ from: sender })
 
     await escrow
-      .withdraw(uniquePaymentIDWithdraw, parsedSig.v, parsedSig.r, parsedSig.s)
-      .send({ from: receiver })
+      .withdraw(withdrawKeyAddress, parsedSig.v, parsedSig.r, parsedSig.s)
+      .sendAndWaitForReceipt({ from: receiver })
 
     const senderBalanceAfter = await stableTokenContract.balanceOf(sender)
     const receiverBalanceAfter = await stableTokenContract.balanceOf(receiver)
 
     expect(senderBalanceBefore.minus(+TEN_CUSD)).toEqual(senderBalanceAfter)
     expect(receiverBalanceBefore.plus(+TEN_CUSD)).toEqual(receiverBalanceAfter)
+  })
+  it('withdraw should revert if attestation is not registered', async () => {
+    const sender: string = accounts[1]
+    const receiver: string = accounts[2]
+    const withdrawKeyAddress: string = accounts[3]
+    const oneDayInSecs: number = 86400
+    const parsedSig = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
+
+    await stableTokenContract
+      .approve(escrow.address, TEN_CUSD)
+      .sendAndWaitForReceipt({ from: sender })
+
+    await escrow
+      .transferWithTrustedIssuers(
+        identifier,
+        stableTokenContract.address,
+        TEN_CUSD,
+        oneDayInSecs,
+        withdrawKeyAddress,
+        1,
+        accounts
+      )
+      .send({ from: sender })
+
+    await expect(
+      escrow
+        .withdraw(withdrawKeyAddress, parsedSig.v, parsedSig.r, parsedSig.s)
+        .sendAndWaitForReceipt()
+    ).rejects.toThrow()
   })
 })
