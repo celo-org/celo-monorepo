@@ -64,7 +64,7 @@ export class EscrowWrapper extends BaseWrapper<Escrow> {
   transfer: (
     identifier: string,
     token: Address,
-    value: number,
+    value: number | string,
     expirySeconds: number,
     paymentId: Address,
     minAttestations: number
@@ -121,7 +121,7 @@ export class EscrowWrapper extends BaseWrapper<Escrow> {
   transferWithTrustedIssuers: (
     identifier: string,
     token: Address,
-    value: number,
+    value: number | string,
     expirySeconds: number,
     paymentId: Address,
     minAttestations: number,
