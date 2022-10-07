@@ -26,8 +26,11 @@ import { DomainSignIO } from './domain/endpoints/sign/io'
 import { DomainQuotaService } from './domain/services/quota'
 import { PnpQuotaAction } from './pnp/endpoints/quota/action'
 import { PnpQuotaIO } from './pnp/endpoints/quota/io'
-import { PnpSignAction } from './pnp/endpoints/sign/action'
+import { LegacyPnpQuotaIO } from './pnp/endpoints/quota/io.legacy'
+import { LegacyPnpSignAction } from './pnp/endpoints/sign/action.legacy'
+import { OnChainPnpSignAction } from './pnp/endpoints/sign/action.onchain'
 import { PnpSignIO } from './pnp/endpoints/sign/io'
+import { LegacyPnpSignIO } from './pnp/endpoints/sign/io.legacy'
 import { LegacyPnpQuotaService } from './pnp/services/quota.legacy'
 import { OnChainPnpQuotaService } from './pnp/services/quota.onchain'
 
@@ -108,7 +111,7 @@ export function startSigner(
     )
   )
   const pnpSign = new Controller(
-    new PnpSignAction(
+    new OnChainPnpSignAction(
       db,
       config,
       pnpQuotaService,
@@ -121,12 +124,12 @@ export function startSigner(
     )
   )
   const legacyPnpSign = new Controller(
-    new PnpSignAction(
+    new LegacyPnpSignAction(
       db,
       config,
       legacyPnpQuotaService,
       keyProvider,
-      new PnpSignIO(
+      new LegacyPnpSignIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
         kit
@@ -137,7 +140,7 @@ export function startSigner(
     new PnpQuotaAction(
       config,
       legacyPnpQuotaService,
-      new PnpQuotaIO(
+      new LegacyPnpQuotaIO(
         config.api.phoneNumberPrivacy.enabled,
         config.api.phoneNumberPrivacy.shouldFailOpen,
         kit

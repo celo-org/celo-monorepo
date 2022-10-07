@@ -6,12 +6,13 @@ import {
   ErrorMessage,
   genSessionID,
   KEY_VERSION_HEADER,
-  SignMessageRequest,
+  LegacySignMessageRequest,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { IDENTIFIER } from '@celo/phone-number-privacy-common/lib/test/values'
 import {
   initDatabase as initSignerDatabase,
   startSigner,
@@ -219,8 +220,8 @@ describe('legacyPnpService', () => {
     signer3?.close()
   })
 
-  const sendPnpSignRequest = async (
-    req: SignMessageRequest,
+  const sendLegacyPnpSignRequest = async (
+    req: LegacySignMessageRequest,
     authorization: string,
     app: any,
     keyVersionHeader?: string
@@ -235,7 +236,9 @@ describe('legacyPnpService', () => {
     return reqWithHeaders.send(req)
   }
 
-  const getSignRequest = (_blindedMsgResult: threshold_bls.BlindedMessage): SignMessageRequest => {
+  const getLegacySignRequest = (
+    _blindedMsgResult: threshold_bls.BlindedMessage
+  ): LegacySignMessageRequest => {
     return {
       account: ACCOUNT_ADDRESS1,
       blindedQueryPhoneNumber: Buffer.from(_blindedMsgResult.message).toString('base64'),
@@ -275,16 +278,16 @@ describe('legacyPnpService', () => {
     })
 
     describe(`${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
-      let req: SignMessageRequest
+      let req: LegacySignMessageRequest
 
       beforeEach(async () => {
-        req = getSignRequest(blindedMsgResult)
+        req = getLegacySignRequest(blindedMsgResult)
         prepMocks(true)
       })
 
       it('Should respond with 200 on valid request', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -306,7 +309,7 @@ describe('legacyPnpService', () => {
 
       it('Should respond with 200 on valid request with key version header', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app, '2') // test a value other than '1'
+        const res = await sendLegacyPnpSignRequest(req, authorization, app, '2') // test a value other than '1'
 
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -323,9 +326,27 @@ describe('legacyPnpService', () => {
         // expect(res.get(KEY_VERSION_HEADER)).toEqual('2')
       })
 
+      it('Should respond with 200 on valid request with identifier', async () => {
+        // Ensure that this gets passed through the combiner to the signer
+        req.hashedPhoneNumber = IDENTIFIER
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(200)
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: 440, // Additional quota gets unlocked with an identifier
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+      })
+
       it('Should respond with 200 on repeated valid requests', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res1 = await sendPnpSignRequest(req, authorization, app)
+        const res1 = await sendLegacyPnpSignRequest(req, authorization, app)
 
         expect(res1.status).toBe(200)
         expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -340,14 +361,14 @@ describe('legacyPnpService', () => {
 
         // performedQueryCount should remain the same; same request should not
         // consume any quota
-        const res2 = await sendPnpSignRequest(req, authorization, app)
+        const res2 = await sendLegacyPnpSignRequest(req, authorization, app)
         expect(res2.status).toBe(200)
         expect(res2.body).toStrictEqual<SignMessageResponseSuccess>(res1.body)
       })
 
       it('Should increment performedQueryCount on request from the same account with a new message', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res1 = await sendPnpSignRequest(req, authorization, app)
+        const res1 = await sendLegacyPnpSignRequest(req, authorization, app)
 
         const expectedResponse: SignMessageResponseSuccess = {
           success: true,
@@ -365,14 +386,14 @@ describe('legacyPnpService', () => {
         // Second request for the same account but with new message
         const message2 = Buffer.from('second test message', 'utf8')
         const blindedMsg2 = threshold_bls.blind(message2, userSeed)
-        const req2 = getSignRequest(blindedMsg2)
+        const req2 = getLegacySignRequest(blindedMsg2)
         const authorization2 = getPnpRequestAuthorization(req2, PRIVATE_KEY1)
 
         // Expect performedQueryCount to increase
         expectedResponse.performedQueryCount++
         expectedResponse.signature =
           'PWvuSYIA249x1dx+qzgl6PKSkoulXXE/P4WHJvGmtw77pCRilEWTn3xSp+6JS9+A'
-        const res2 = await sendPnpSignRequest(req2, authorization2, app)
+        const res2 = await sendLegacyPnpSignRequest(req2, authorization2, app)
         expect(res2.status).toBe(200)
         expect(res2.body).toStrictEqual<SignMessageResponseSuccess>(expectedResponse)
       })
@@ -381,7 +402,7 @@ describe('legacyPnpService', () => {
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -398,7 +419,7 @@ describe('legacyPnpService', () => {
       it('Should respond with 200 when authenticated with DEK', async () => {
         req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
         const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
-        const res = await sendPnpSignRequest(req, authorization, app)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -414,7 +435,7 @@ describe('legacyPnpService', () => {
 
       it('Should get the same unblinded signatures from the same message (different seed)', async () => {
         const authorization1 = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res1 = await sendPnpSignRequest(req, authorization1, app)
+        const res1 = await sendLegacyPnpSignRequest(req, authorization1, app)
 
         expect(res1.status).toBe(200)
         expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -438,7 +459,7 @@ describe('legacyPnpService', () => {
         expect(req2.blindedQueryPhoneNumber).not.toEqual(req.blindedQueryPhoneNumber)
 
         const authorization2 = getPnpRequestAuthorization(req2, PRIVATE_KEY1)
-        const res2 = await sendPnpSignRequest(req2, authorization2, app)
+        const res2 = await sendLegacyPnpSignRequest(req2, authorization2, app)
         expect(res2.status).toBe(200)
         const unblindedSig1 = threshold_bls.unblind(
           Buffer.from(res1.body.signature, 'base64'),
@@ -456,7 +477,7 @@ describe('legacyPnpService', () => {
         // @ts-ignore Intentionally deleting required field
         delete req.account
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
@@ -468,7 +489,7 @@ describe('legacyPnpService', () => {
 
       it('Should respond with 400 on invalid key version', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app, 'a')
+        const res = await sendLegacyPnpSignRequest(req, authorization, app, 'a')
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
@@ -477,10 +498,24 @@ describe('legacyPnpService', () => {
         })
       })
 
+      it('Should respond with 400 on request with invalid identifier', async () => {
+        // Ensure that this gets passed through the combiner to the signer
+        req.hashedPhoneNumber = '+1234567890'
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(400)
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.INVALID_INPUT,
+        })
+      })
+
       it('Should respond with 401 on failed WALLET_KEY auth', async () => {
         req.account = mockAccount
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(401)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
@@ -495,7 +530,7 @@ describe('legacyPnpService', () => {
         req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         const authorization = getPnpRequestAuthorization(req, differentPk)
-        const res = await sendPnpSignRequest(req, authorization, app)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(401)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
@@ -508,7 +543,7 @@ describe('legacyPnpService', () => {
       it('Should respond with 403 on out of quota', async () => {
         prepMocks(false)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(403)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
@@ -526,7 +561,7 @@ describe('legacyPnpService', () => {
         const appWithApiDisabled = startCombiner(configWithApiDisabled)
 
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, appWithApiDisabled)
+        const res = await sendLegacyPnpSignRequest(req, authorization, appWithApiDisabled)
 
         expect(res.status).toBe(503)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
@@ -546,7 +581,7 @@ describe('legacyPnpService', () => {
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
           req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
           const authorization = getPnpRequestAuthorization(req, differentPk)
-          const res = await sendPnpSignRequest(req, authorization, app)
+          const res = await sendLegacyPnpSignRequest(req, authorization, app)
 
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -582,16 +617,16 @@ describe('legacyPnpService', () => {
     })
 
     describe(`${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
-      let req: SignMessageRequest
+      let req: LegacySignMessageRequest
 
       beforeEach(() => {
         prepMocks(true)
-        req = getSignRequest(blindedMsgResult)
+        req = getLegacySignRequest(blindedMsgResult)
       })
 
       it('Should respond with 200 on valid request', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -627,16 +662,16 @@ describe('legacyPnpService', () => {
     })
 
     describe(`${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
-      let req: SignMessageRequest
+      let req: LegacySignMessageRequest
 
       beforeEach(() => {
-        req = getSignRequest(blindedMsgResult)
+        req = getLegacySignRequest(blindedMsgResult)
         prepMocks(true)
       })
 
       it('Should respond with 500 even if request is valid', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
 
         expect(res.status).toBe(500)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({

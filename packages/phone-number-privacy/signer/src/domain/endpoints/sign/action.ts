@@ -128,7 +128,12 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
           toSequentialDelayDomainState(res.domainStateRecord)
         )
       } else {
-        this.io.sendFailure(res.error, res.status, session.response)
+        this.io.sendFailure(
+          res.error,
+          res.status,
+          session.response,
+          toSequentialDelayDomainState(res.domainStateRecord)
+        )
       }
     } catch (error) {
       session.logger.error(error, 'Failed to get signature for a domain')

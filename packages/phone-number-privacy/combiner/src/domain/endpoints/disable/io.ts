@@ -4,13 +4,14 @@ import {
   disableDomainRequestSchema,
   DisableDomainResponse,
   DisableDomainResponseFailure,
-  DisableDomainResponseSchema,
+  disableDomainResponseSchema,
   DisableDomainResponseSuccess,
   DomainSchema,
   DomainState,
   ErrorType,
   getSignerEndpoint,
   send,
+  SequentialDelayDomainStateSchema,
   SignerEndpoint,
   verifyDisableDomainRequestAuthenticity,
   WarningMessage,
@@ -33,7 +34,7 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
     DisableDomainResponse,
     DisableDomainResponse,
     unknown
-  > = DisableDomainResponseSchema
+  > = disableDomainResponseSchema(SequentialDelayDomainStateSchema)
 
   async init(
     request: Request<{}, {}, unknown>,
@@ -53,31 +54,30 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
     return Promise.resolve(verifyDisableDomainRequestAuthenticity(request.body))
   }
 
-  sendSuccess(status: number, response: Response<DisableDomainResponseSuccess>) {
+  sendSuccess(
+    status: number,
+    response: Response<DisableDomainResponseSuccess>,
+    domainState: DomainState
+  ) {
     send(
       response,
       {
         success: true,
         version: VERSION,
+        status: domainState,
       },
       status,
       response.locals.logger
     )
   }
 
-  sendFailure(
-    error: ErrorType,
-    status: number,
-    response: Response<DisableDomainResponseFailure>,
-    domainState?: DomainState
-  ) {
+  sendFailure(error: ErrorType, status: number, response: Response<DisableDomainResponseFailure>) {
     send(
       response,
       {
         success: false,
         version: VERSION,
         error,
-        status: domainState,
       },
       status,
       response.locals.logger

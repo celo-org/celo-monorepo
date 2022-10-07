@@ -1,5 +1,7 @@
 import { PnpQuotaRequest, SignMessageRequest } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
+import { ACCOUNTS_TABLE } from '../../common/database/models/account'
+import { REQUESTS_TABLE } from '../../common/database/models/request'
 import { QuotaService } from '../../common/quota'
 import { getOnChainOdisPayments } from '../../common/web3/contracts'
 import { config } from '../../config'
@@ -9,6 +11,8 @@ import { PnpQuotaService } from './quota'
 export class OnChainPnpQuotaService
   extends PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
+  protected readonly requestsTable = REQUESTS_TABLE.ONCHAIN
+  protected readonly accountsTable = ACCOUNTS_TABLE.ONCHAIN
   /*
    * Calculates how many queries the caller has unlocked based on the total
    * amount of funds paid to the OdisPayments.sol contract on-chain.

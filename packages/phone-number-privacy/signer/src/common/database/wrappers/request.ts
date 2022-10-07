@@ -1,27 +1,36 @@
-import { DB_TIMEOUT, ErrorMessage, SignMessageRequest } from '@celo/phone-number-privacy-common'
+import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
 import { Histograms, meter } from '../../metrics'
-import { Request, REQUESTS_COLUMNS, REQUESTS_TABLE } from '../models/request'
+import {
+  PnpSignRequestRecord,
+  REQUESTS_COLUMNS,
+  REQUESTS_TABLE,
+  toPnpSignRequestRecord,
+} from '../models/request'
 import { countAndThrowDBError, tableWithLockForTrx } from '../utils'
 
-function requests(db: Knex) {
-  return db<Request>(REQUESTS_TABLE)
+function requests(db: Knex, table: REQUESTS_TABLE) {
+  return db<PnpSignRequestRecord>(table)
 }
 
 export async function getRequestExists(
   db: Knex,
-  request: SignMessageRequest,
+  requestsTable: REQUESTS_TABLE,
+  account: string,
+  blindedQuery: string,
   logger: Logger,
   trx?: Knex.Transaction
 ): Promise<boolean> {
   return meter(
     async () => {
-      logger.debug({ request }, 'Checking if request exists')
-      const existingRequest = await tableWithLockForTrx(requests(db), trx)
+      logger.debug(
+        `Checking if request exists for account: ${account}, blindedQuery: ${blindedQuery}`
+      )
+      const existingRequest = await tableWithLockForTrx(requests(db, requestsTable), trx)
         .where({
-          [REQUESTS_COLUMNS.address]: request.account,
-          [REQUESTS_COLUMNS.blindedQuery]: request.blindedQueryPhoneNumber,
+          [REQUESTS_COLUMNS.address]: account,
+          [REQUESTS_COLUMNS.blindedQuery]: blindedQuery,
         })
         .first()
         .timeout(DB_TIMEOUT)
@@ -36,14 +45,19 @@ export async function getRequestExists(
 
 export async function storeRequest(
   db: Knex,
-  request: SignMessageRequest,
+  requestsTable: REQUESTS_TABLE,
+  account: string,
+  blindedQuery: string,
   logger: Logger,
   trx: Knex.Transaction
 ): Promise<void> {
   return meter(
     async () => {
-      logger.debug({ request }, 'Storing salt request')
-      await requests(db).transacting(trx).insert(new Request(request)).timeout(DB_TIMEOUT)
+      logger.debug(`Storing salt request for: ${account}, blindedQuery: ${blindedQuery}`)
+      await requests(db, requestsTable)
+        .transacting(trx)
+        .insert(toPnpSignRequestRecord(account, blindedQuery))
+        .timeout(DB_TIMEOUT)
     },
     [],
     (err: any) => countAndThrowDBError(err, logger, ErrorMessage.DATABASE_INSERT_FAILURE),

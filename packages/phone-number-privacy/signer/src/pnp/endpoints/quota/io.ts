@@ -3,7 +3,6 @@ import {
   authenticateUser,
   ErrorType,
   hasValidAccountParam,
-  identifierIsValidIfExists,
   isBodyReasonablySized,
   PnpQuotaRequest,
   PnpQuotaRequestSchema,
@@ -54,7 +53,6 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     return (
       PnpQuotaRequestSchema.is(request.body) &&
       hasValidAccountParam(request.body) &&
-      identifierIsValidIfExists(request.body) &&
       isBodyReasonablySized(request.body)
     )
   }
@@ -71,7 +69,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
     status: number,
     response: Response<PnpQuotaResponseSuccess>,
     quotaStatus: PnpQuotaStatus,
-    warnings?: string[]
+    warnings: string[]
   ) {
     send(
       response,

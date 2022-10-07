@@ -2,6 +2,7 @@ import {
   DomainRestrictedSignatureRequest,
   ErrorMessage,
   ErrorType,
+  LegacySignMessageRequest,
   OdisResponse,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
@@ -14,7 +15,10 @@ import { CryptoSession } from './crypto-session'
 import { IO } from './io'
 
 // prettier-ignore
-export type OdisSignatureRequest = SignMessageRequest | DomainRestrictedSignatureRequest
+export type OdisSignatureRequest =
+  | SignMessageRequest
+  | LegacySignMessageRequest
+  | DomainRestrictedSignatureRequest
 export type ThresholdStateService<R extends OdisSignatureRequest> = R extends SignMessageRequest
   ? PnpThresholdStateService<R>
   : never | R extends DomainRestrictedSignatureRequest

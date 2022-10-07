@@ -13,11 +13,13 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { BLINDED_PHONE_NUMBER, IDENTIFIER } from '@celo/phone-number-privacy-common/lib/test/values'
+import { BLINDED_PHONE_NUMBER } from '@celo/phone-number-privacy-common/lib/test/values'
 import BigNumber from 'bignumber.js'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
+import { ACCOUNTS_TABLE } from '../../src/common/database/models/account'
+import { REQUESTS_TABLE } from '../../src/common/database/models/request'
 import {
   getPerformedQueryCount,
   incrementQueryCount,
@@ -263,7 +265,13 @@ describe('pnp', () => {
       it('Should respond with 200 if performedQueryCount is greater than totalQuota', async () => {
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(config.serviceName),
+              trx
+            )
           }
         })
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
@@ -311,11 +319,7 @@ describe('pnp', () => {
       })
 
       it('Should respond with 401 on failed DEK auth', async () => {
-        const badRequest = getPnpQuotaRequest(
-          ACCOUNT_ADDRESS1,
-          AuthenticationMethod.ENCRYPTION_KEY,
-          IDENTIFIER
-        )
+        const badRequest = getPnpQuotaRequest(ACCOUNT_ADDRESS1, AuthenticationMethod.ENCRYPTION_KEY)
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_QUOTA)
@@ -356,11 +360,7 @@ describe('pnp', () => {
             throw new Error()
           })
 
-          const req = getPnpQuotaRequest(
-            ACCOUNT_ADDRESS1,
-            AuthenticationMethod.ENCRYPTION_KEY,
-            IDENTIFIER
-          )
+          const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1, AuthenticationMethod.ENCRYPTION_KEY)
 
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
@@ -470,8 +470,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -512,7 +511,13 @@ describe('pnp', () => {
         mockOdisPaymentsTotalPaidCUSD.mockReturnValue(onChainBalance)
         await db.transaction(async (trx) => {
           for (let i = 0; i < performedQueryCount; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName),
+              trx
+            )
           }
         })
       })
@@ -521,8 +526,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -545,8 +549,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.ENCRYPTION_KEY,
-          IDENTIFIER
+          AuthenticationMethod.ENCRYPTION_KEY
         )
         const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -566,8 +569,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, '3') // since default is '1' or '2'
@@ -588,8 +590,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res1 = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -613,8 +614,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         // @ts-ignore Intentionally adding an extra field to the request type
         req.extraField = 'dummyString'
@@ -638,8 +638,7 @@ describe('pnp', () => {
           BLINDED_PHONE_NUMBER,
           // TODO(2.0.0): Investigate whether we should be testing DEK vs. WALLET_KEY based authentication
           // (https://github.com/celo-org/celo-monorepo/issues/9837)
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         // @ts-ignore Intentionally deleting required field
         delete badRequest.account
@@ -657,8 +656,7 @@ describe('pnp', () => {
         const badRequest = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN, 'a')
@@ -670,29 +668,11 @@ describe('pnp', () => {
         })
       })
 
-      it('Should respond with 400 on invalid identifier', async () => {
-        const badRequest = getPnpSignRequest(
-          ACCOUNT_ADDRESS1,
-          BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          '+1234567890'
-        )
-        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
-        const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
-        expect(res.status).toBe(400)
-        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
-          success: false,
-          version: res.body.version,
-          error: WarningMessage.INVALID_INPUT,
-        })
-      })
-
       it('Should respond with 400 on invalid blinded message', async () => {
         const badRequest = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           '+1234567890',
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
@@ -708,8 +688,7 @@ describe('pnp', () => {
         const badRequest = getPnpSignRequest(
           '0xnotanaddress',
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
         const res = await sendRequest(badRequest, authorization, SignerEndpoint.PNP_SIGN)
@@ -725,8 +704,7 @@ describe('pnp', () => {
         const badRequest = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
@@ -743,8 +721,7 @@ describe('pnp', () => {
         const badRequest = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.ENCRYPTION_KEY,
-          IDENTIFIER
+          AuthenticationMethod.ENCRYPTION_KEY
         )
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         const authorization = getPnpRequestAuthorization(badRequest, differentPk)
@@ -762,14 +739,19 @@ describe('pnp', () => {
         const remainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i < remainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName),
+              trx
+            )
           }
         })
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -796,8 +778,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -818,7 +799,13 @@ describe('pnp', () => {
         const expectedRemainingQuota = expectedQuota - performedQueryCount
         await db.transaction(async (trx) => {
           for (let i = 0; i <= expectedRemainingQuota; i++) {
-            await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+            await incrementQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName),
+              trx
+            )
           }
         })
 
@@ -827,8 +814,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -851,8 +837,7 @@ describe('pnp', () => {
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY,
-          IDENTIFIER
+          AuthenticationMethod.WALLET_KEY
         )
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(
@@ -876,12 +861,23 @@ describe('pnp', () => {
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+              await incrementQueryCount(
+                db,
+                ACCOUNTS_TABLE.ONCHAIN,
+                ACCOUNT_ADDRESS1,
+                rootLogger(_config.serviceName),
+                trx
+              )
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(expectedQuota)
 
           const spy = jest
@@ -894,8 +890,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -919,12 +914,23 @@ describe('pnp', () => {
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
             for (let i = 0; i < remainingQuota; i++) {
-              await incrementQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName), trx)
+              await incrementQueryCount(
+                db,
+                ACCOUNTS_TABLE.ONCHAIN,
+                ACCOUNT_ADDRESS1,
+                rootLogger(_config.serviceName),
+                trx
+              )
             }
           })
           // sanity check
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(expectedQuota)
 
           mockOdisPaymentsTotalPaidCUSD.mockImplementation(() => {
@@ -934,8 +940,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -953,9 +958,22 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was incremented and request was stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(config.serviceName)
+            )
           ).toBe(expectedQuota + 1)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(true)
+          expect(
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE.ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(config.serviceName)
+            )
+          ).toBe(true)
         })
 
         it('Should return 500 on blockchain totalQuota query failure when shouldFailOpen is false', async () => {
@@ -966,8 +984,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
 
           const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
@@ -1005,12 +1022,12 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
 
+          expect.assertions(4)
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
@@ -1019,12 +1036,24 @@ describe('pnp', () => {
           })
 
           spy.mockRestore()
-
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
+          expect(
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE.ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(_config.serviceName)
+            )
+          ).toBe(false)
         })
 
         it('Should return 500 on failure to store request', async () => {
@@ -1035,8 +1064,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -1052,9 +1080,22 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
+          expect(
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE.ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(_config.serviceName)
+            )
+          ).toBe(false)
         })
 
         it('Should return 200 on failure to fetch DEK', async () => {
@@ -1065,8 +1106,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.ENCRYPTION_KEY,
-            IDENTIFIER
+            AuthenticationMethod.ENCRYPTION_KEY
           )
 
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
@@ -1095,8 +1135,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -1115,9 +1154,22 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(_config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(_config.serviceName)
+            )
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(_config.serviceName))).toBe(false)
+          expect(
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE.ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(_config.serviceName)
+            )
+          ).toBe(false)
         })
 
         it('Should return 500 on generic error in sign', async () => {
@@ -1134,8 +1186,7 @@ describe('pnp', () => {
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
-            AuthenticationMethod.WALLET_KEY,
-            IDENTIFIER
+            AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
@@ -1154,9 +1205,22 @@ describe('pnp', () => {
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(db, ACCOUNT_ADDRESS1, rootLogger(config.serviceName))
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(config.serviceName)
+            )
           ).toBe(performedQueryCount)
-          expect(await getRequestExists(db, req, rootLogger(config.serviceName))).toBe(false)
+          expect(
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE.ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(config.serviceName)
+            )
+          ).toBe(false)
         })
       })
     })

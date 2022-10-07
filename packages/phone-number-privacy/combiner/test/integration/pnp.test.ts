@@ -279,9 +279,6 @@ describe('pnpService', () => {
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
-          // TODO(2.0.0, refactor) investigate what change caused empty warnings to now appear
-          // (not attributable to toStrictEqual alone) as part of request type audit ticket
-          // (https://github.com/celo-org/celo-monorepo/issues/9804)
           warnings: [],
         })
         const unblindedSig = threshold_bls.unblind(

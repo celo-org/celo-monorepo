@@ -1,23 +1,32 @@
-import {
-  DisableDomainRequest,
-  DisableDomainResponse,
-  ErrorMessage,
-} from '@celo/phone-number-privacy-common'
-import { Response as FetchResponse } from 'node-fetch'
+import { DisableDomainRequest, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { CombineAction } from '../../../common/combine'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { OdisConfig } from '../../../config'
+import { DomainSignerResponseLogger } from '../../services/log-responses'
+import { DomainThresholdStateService } from '../../services/threshold-state'
 
 export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
-  constructor(readonly config: OdisConfig, readonly io: IO<DisableDomainRequest>) {
+  readonly responseLogger: DomainSignerResponseLogger = new DomainSignerResponseLogger()
+
+  constructor(
+    readonly config: OdisConfig,
+    readonly thresholdStateService: DomainThresholdStateService<DisableDomainRequest>,
+    readonly io: IO<DisableDomainRequest>
+  ) {
     super(config, io)
   }
 
   combine(session: Session<DisableDomainRequest>): void {
-    if (this.checkThresholdDisabled(session)) {
-      this.io.sendSuccess(200, session.response)
-      return
+    this.responseLogger.logResponseDiscrepancies(session)
+    try {
+      const disableDomainStatus = this.thresholdStateService.findThresholdDomainState(session)
+      if (disableDomainStatus.disabled) {
+        this.io.sendSuccess(200, session.response, disableDomainStatus)
+        return
+      }
+    } catch (err) {
+      session.logger.error({ err }, 'Error combining signer disable domain status responses')
     }
 
     this.io.sendFailure(
@@ -26,26 +35,5 @@ export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
       session.response,
       session.logger
     )
-  }
-
-  protected async receiveSuccess(
-    signerResponse: FetchResponse,
-    url: string,
-    session: Session<DisableDomainRequest>
-  ): Promise<DisableDomainResponse> {
-    const res = await super.receiveSuccess(signerResponse, url, session)
-    if (this.checkThresholdDisabled(session)) {
-      session.abort.abort()
-    }
-    return res
-  }
-
-  private checkThresholdDisabled(session: Session<DisableDomainRequest>): boolean {
-    // If we have received a threshold of responses return immediately.
-    // With a t of n threshold, the domain is disabled as long as n-t+1 disable the domain.
-    // When the threshold is greater than half the signers, t > n-t+1.
-    // When that is the case, wait for a full threshold of responses before responding OK to add to the safety margin.
-    const threshold = this.config.keys.threshold
-    return session.responses.length >= Math.max(threshold, this.signers.length - threshold + 1)
   }
 }

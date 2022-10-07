@@ -75,8 +75,7 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
   sendFailure(
     error: ErrorType,
     status: number,
-    response: Response<DomainQuotaStatusResponseFailure>,
-    domainState?: DomainState
+    response: Response<DomainQuotaStatusResponseFailure>
   ) {
     send(
       response,
@@ -84,7 +83,6 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
         success: false,
         version: VERSION,
         error,
-        status: domainState,
       },
       status,
       response.locals.logger

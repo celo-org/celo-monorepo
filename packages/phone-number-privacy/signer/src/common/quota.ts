@@ -12,12 +12,8 @@ import { DomainStateRecord } from './database/models/domain-state'
 
 // prettier-ignore
 export type OdisQuotaStatus<R extends OdisRequest> = R extends
-  | DomainQuotaStatusRequest
-  | DomainRestrictedSignatureRequest
-  ? DomainStateRecord
-  : never | R extends SignMessageRequest | PnpQuotaRequest
-  ? PnpQuotaStatus
-  : never
+  | DomainQuotaStatusRequest | DomainRestrictedSignatureRequest ? DomainStateRecord : never
+  | R extends SignMessageRequest | PnpQuotaRequest ? PnpQuotaStatus: never
 
 export interface OdisQuotaStatusResult<R extends OdisRequest> {
   sufficient: boolean

@@ -1,4 +1,5 @@
 import {
+  DisableDomainRequest,
   DomainQuotaStatusRequest,
   DomainRestrictedSignatureRequest,
   DomainState,
@@ -10,7 +11,10 @@ import { Session } from '../../common/session'
 export class DomainSignerResponseLogger {
   // TODO(Alec) parse out 'now' field before logging (from slack)
   logResponseDiscrepancies(
-    session: Session<DomainRestrictedSignatureRequest> | Session<DomainQuotaStatusRequest>
+    session:
+      | Session<DomainRestrictedSignatureRequest>
+      | Session<DomainQuotaStatusRequest>
+      | Session<DisableDomainRequest>
   ): void {
     const parsedResponses: Array<{
       signerUrl: string

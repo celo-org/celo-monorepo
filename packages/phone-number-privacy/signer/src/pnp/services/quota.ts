@@ -6,6 +6,8 @@ import {
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
+import { ACCOUNTS_TABLE } from '../../common/database/models/account'
+import { REQUESTS_TABLE } from '../../common/database/models/request'
 import { getPerformedQueryCount, incrementQueryCount } from '../../common/database/wrappers/account'
 import { storeRequest } from '../../common/database/wrappers/request'
 import { Counters, Histograms, meter } from '../../common/metrics'
@@ -16,6 +18,9 @@ import { PnpSession } from '../session'
 
 export abstract class PnpQuotaService
   implements QuotaService<SignMessageRequest | PnpQuotaRequest> {
+  protected abstract readonly requestsTable: REQUESTS_TABLE
+  protected abstract readonly accountsTable: ACCOUNTS_TABLE
+
   constructor(readonly db: Knex, readonly kit: ContractKit) {}
 
   public async checkAndUpdateQuotaStatus(
@@ -35,8 +40,21 @@ export abstract class PnpQuotaService
       }
     } else {
       await Promise.all([
-        storeRequest(this.db, session.request.body, session.logger, trx),
-        incrementQueryCount(this.db, session.request.body.account, session.logger, trx),
+        storeRequest(
+          this.db,
+          this.requestsTable,
+          session.request.body.account,
+          session.request.body.blindedQueryPhoneNumber,
+          session.logger,
+          trx
+        ),
+        incrementQueryCount(
+          this.db,
+          this.accountsTable,
+          session.request.body.account,
+          session.logger,
+          trx
+        ),
       ])
       state.performedQueryCount++
     }
@@ -51,7 +69,7 @@ export abstract class PnpQuotaService
     const [performedQueryCountResult, totalQuotaResult, blockNumberResult] = await meter(
       (_session: PnpSession<SignMessageRequest | PnpQuotaRequest>) =>
         Promise.allSettled([
-          getPerformedQueryCount(this.db, account, session.logger, trx),
+          getPerformedQueryCount(this.db, this.accountsTable, account, session.logger, trx),
           this.getTotalQuota(_session),
           getBlockNumber(this.kit),
         ]),
@@ -64,7 +82,8 @@ export abstract class PnpQuotaService
     )
 
     const quotaStatus: PnpQuotaStatus = {
-      totalQuota: -1, // TODO(2.0.0) consider making this undefined (https://github.com/celo-org/celo-monorepo/issues/9804)
+      // TODO(future) consider making totalQuota,performedQueryCount undefined
+      totalQuota: -1,
       performedQueryCount: -1,
       blockNumber: undefined,
     }
