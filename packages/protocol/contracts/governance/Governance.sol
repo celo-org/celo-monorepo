@@ -146,10 +146,6 @@ contract Governance is
   event ProposalVoted(
     uint256 indexed proposalId,
     address indexed account,
-    // obsolete
-    uint256 value,
-    // obsolete
-    uint256 weight,
     uint256[] weights,
     uint256[] values
   );
@@ -157,10 +153,6 @@ contract Governance is
   event ProposalVoteRevoked(
     uint256 indexed proposalId,
     address indexed account,
-    // obsolete
-    uint256 value,
-    // obsolete
-    uint256 weight,
     uint256[] weights,
     Proposals.VoteValue[] values
   );
@@ -675,7 +667,7 @@ contract Governance is
     uint256[] calldata weights
   ) external nonReentrant returns (bool) {
     require(voteValues.length == weights.length, "Incorrect length");
-    require(voteValues.length < 5, "Only values from VoteValue allowed");
+    require(voteValues.length <= 3, "Only values from VoteValue allowed");
 
     dequeueProposalsIfReady();
     (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
@@ -689,7 +681,6 @@ contract Governance is
 
     address account = getAccounts().voteSignerToAccount(msg.sender);
     uint256 totalLockedGold = getLockedGold().getAccountTotalLockedGold(account);
-    require(totalLockedGold > 0, "Voter weight zero");
     voteInternal(proposal, proposalId, index, totalLockedGold, account, voteValues, weights);
 
     return true;
@@ -758,7 +749,7 @@ contract Governance is
       voter.mostRecentReferendumProposal = proposalId;
     }
 
-    emit ProposalVoted(proposalId, account, voteValues[0], weights[0], weights, voteValues);
+    emit ProposalVoted(proposalId, account, weights, voteValues);
   }
 
   /* solhint-enable code-complexity */
@@ -806,8 +797,6 @@ contract Governance is
             emit ProposalVoteRevoked(
               voteRecord.proposalId,
               account,
-              uint256(voteRecord.value),
-              voteRecord.weight,
               previousWeights,
               previousValues
             );
@@ -822,8 +811,6 @@ contract Governance is
             emit ProposalVoteRevoked(
               voteRecord.proposalId,
               account,
-              uint256(voteRecord.value),
-              voteRecord.weight,
               voteRecord.weights,
               voteRecord.values
             );

@@ -1615,9 +1615,7 @@ contract('Governance', (accounts: string[]) => {
               args: {
                 proposalId: i + 1,
                 account,
-                value,
                 values: [value],
-                weight,
                 weights: [weight],
               },
             })
@@ -1664,9 +1662,7 @@ contract('Governance', (accounts: string[]) => {
               args: {
                 proposalId: i + 1,
                 account,
-                value: values[0],
                 values,
-                weight: weights[0],
                 weights,
               },
             })
@@ -1745,9 +1741,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             proposalId: new BigNumber(proposalId),
             account,
-            value: new BigNumber(value),
             values: [new BigNumber(value)],
-            weight: new BigNumber(weight),
             weights: [new BigNumber(weight)],
           },
         })
@@ -2012,9 +2006,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             proposalId: new BigNumber(proposalId),
             account,
-            value: new BigNumber(value),
             values: [new BigNumber(value)],
-            weight: new BigNumber(weight),
             weights: [new BigNumber(weight)],
           },
         })
@@ -2087,12 +2079,11 @@ contract('Governance', (accounts: string[]) => {
         const yesVotes = 10
         const noVotes = 50
         const abstainVotes = 30
-        const noneVotes = 10
         await governance.votePartially(
           proposalId,
           index,
-          [VoteValue.Yes, VoteValue.No, VoteValue.Abstain, VoteValue.None],
-          [yesVotes, noVotes, abstainVotes, noneVotes]
+          [VoteValue.Yes, VoteValue.No, VoteValue.Abstain],
+          [yesVotes, noVotes, abstainVotes]
         )
         const [yes, no, abstain] = await governance.getVoteTotals(proposalId)
         assert.equal(yes.toNumber(), yesVotes)
@@ -2133,9 +2124,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             proposalId: new BigNumber(proposalId),
             account,
-            value: new BigNumber(value),
             values: [new BigNumber(value)],
-            weight: new BigNumber(weight),
             weights: [new BigNumber(weight)],
           },
         })
@@ -2480,9 +2469,7 @@ contract('Governance', (accounts: string[]) => {
           args: {
             proposalId: new BigNumber(proposalId),
             account,
-            value: new BigNumber(value),
             values: [new BigNumber(value)],
-            weight: new BigNumber(weight),
             weights: [new BigNumber(weight)],
           },
         })
