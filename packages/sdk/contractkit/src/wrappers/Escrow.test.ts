@@ -80,7 +80,7 @@ testWithGanache('Escrow Wrapper', (web3) => {
         oneDayInSecs,
         withdrawKeyAddress,
         1,
-        [kit.defaultAccount as string]
+        accounts
       )
       .send({ from: sender })
 
@@ -113,7 +113,7 @@ testWithGanache('Escrow Wrapper', (web3) => {
         oneDayInSecs,
         withdrawKeyAddress,
         1,
-        [kit.defaultAccount as string]
+        accounts
       )
       .send({ from: sender })
 
