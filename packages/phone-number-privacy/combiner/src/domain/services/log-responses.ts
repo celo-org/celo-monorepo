@@ -2,14 +2,11 @@ import {
   DisableDomainRequest,
   DomainQuotaStatusRequest,
   DomainRestrictedSignatureRequest,
-  DomainState,
-  SequentialDelayDomain,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
 
 export class DomainSignerResponseLogger {
-  // TODO(Alec) parse out 'now' field before logging (from slack)
   logResponseDiscrepancies(
     session:
       | Session<DomainRestrictedSignatureRequest>
@@ -20,7 +17,9 @@ export class DomainSignerResponseLogger {
       signerUrl: string
       values: {
         version: string
-        status: DomainState<SequentialDelayDomain>
+        counter: number
+        disabled: boolean
+        timer: number
       }
     }> = []
     session.responses.forEach((response) => {
@@ -28,7 +27,12 @@ export class DomainSignerResponseLogger {
         const { version, status } = response.res
         parsedResponses.push({
           signerUrl: response.url,
-          values: { version, status },
+          values: {
+            version,
+            counter: status.counter,
+            disabled: status.disabled,
+            timer: status.timer,
+          },
         })
       }
     })
@@ -47,7 +51,7 @@ export class DomainSignerResponseLogger {
     }
 
     // disabled
-    const numDisabled = parsedResponses.filter((res) => res.values.status.disabled).length
+    const numDisabled = parsedResponses.filter((res) => res.values.disabled).length
     if (numDisabled > 0 && numDisabled < parsedResponses.length) {
       session.logger.error(
         { parsedResponses },
