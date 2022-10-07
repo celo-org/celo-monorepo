@@ -33,7 +33,7 @@ export default class VotePartially extends BaseCommand {
     const voteValues = res.flags.values.split(',').map((vote) => vote.trim()) as Array<
       keyof typeof VoteValue
     >
-    const weightValues = res.flags.weights.split(',').map((number) => parseInt(number))
+    const weightValues = res.flags.weights.split(',').map((number) => parseInt(number, 10))
 
     if (voteValues.length !== weightValues.length) {
       throw new Error('values and weights need to be of same length')
