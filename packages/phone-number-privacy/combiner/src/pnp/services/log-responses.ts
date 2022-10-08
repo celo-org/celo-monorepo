@@ -44,7 +44,7 @@ export class PnpSignerResponseLogger {
     const first = JSON.stringify(parsedResponses[0].values)
     for (let i = 1; i < parsedResponses.length; i++) {
       if (JSON.stringify(parsedResponses[i].values) !== first) {
-        session.logger.warn(parsedResponses, WarningMessage.SIGNER_RESPONSE_DISCREPANCIES)
+        session.logger.warn({ parsedResponses }, WarningMessage.SIGNER_RESPONSE_DISCREPANCIES)
         session.warnings.push(WarningMessage.SIGNER_RESPONSE_DISCREPANCIES)
         break
       }
@@ -64,12 +64,12 @@ export class PnpSignerResponseLogger {
       .sort((a, b) => a.values.blockNumber! - b.values.blockNumber!)
     if (
       sortedByBlockNumber.length &&
-      sortedByBlockNumber[0].values.blockNumber! -
-        sortedByBlockNumber[sortedByBlockNumber.length - 1].values.blockNumber! >
+      sortedByBlockNumber[sortedByBlockNumber.length - 1].values.blockNumber! -
+        sortedByBlockNumber[0].values.blockNumber! >=
         MAX_BLOCK_DISCREPANCY_THRESHOLD
     ) {
       session.logger.error(
-        { sortedDescByBlockNumber: sortedByBlockNumber },
+        { sortedByBlockNumber },
         WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS
       )
       session.warnings.push(WarningMessage.INCONSISTENT_SIGNER_BLOCK_NUMBERS)
@@ -80,12 +80,12 @@ export class PnpSignerResponseLogger {
       (a, b) => a.values.totalQuota - b.values.totalQuota
     )
     if (
-      sortedByTotalQuota[0].values.totalQuota -
-        sortedByTotalQuota[sortedByTotalQuota.length - 1].values.totalQuota >
+      sortedByTotalQuota[sortedByTotalQuota.length - 1].values.totalQuota -
+        sortedByTotalQuota[0].values.totalQuota >=
       MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD
     ) {
       session.logger.error(
-        { sortedDescByTotalQuota: sortedByTotalQuota },
+        { sortedByTotalQuota },
         WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS
       )
       session.warnings.push(WarningMessage.INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS)
@@ -96,12 +96,12 @@ export class PnpSignerResponseLogger {
       (a, b) => a.values.performedQueryCount - b.values.performedQueryCount
     )
     if (
-      sortedByQueryCount[0].values.performedQueryCount -
-        sortedByQueryCount[sortedByQueryCount.length - 1].values.performedQueryCount >
+      sortedByQueryCount[sortedByQueryCount.length - 1].values.performedQueryCount -
+        sortedByQueryCount[0].values.performedQueryCount >=
       MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD
     ) {
       session.logger.error(
-        { sortedDescByPerformedQueryCount: sortedByQueryCount },
+        { sortedByQueryCount },
         WarningMessage.INCONSISTENT_SIGNER_QUERY_MEASUREMENTS
       )
       session.warnings.push(WarningMessage.INCONSISTENT_SIGNER_QUERY_MEASUREMENTS)

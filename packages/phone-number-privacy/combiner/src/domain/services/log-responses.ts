@@ -1,17 +1,14 @@
 import {
-  DisableDomainRequest,
-  DomainQuotaStatusRequest,
+  DomainRequest,
   DomainRestrictedSignatureRequest,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { CryptoSession } from '../../common/crypto-session'
 import { Session } from '../../common/session'
 
 export class DomainSignerResponseLogger {
   logResponseDiscrepancies(
-    session:
-      | Session<DomainRestrictedSignatureRequest>
-      | Session<DomainQuotaStatusRequest>
-      | Session<DisableDomainRequest>
+    session: Session<DomainRequest> | CryptoSession<DomainRestrictedSignatureRequest>
   ): void {
     const parsedResponses: Array<{
       signerUrl: string
@@ -37,7 +34,7 @@ export class DomainSignerResponseLogger {
       }
     })
     if (parsedResponses.length === 0) {
-      session.logger.warn('No successful responses found!')
+      session.logger.warn('No successful signer responses found!')
       return
     }
 
@@ -45,7 +42,7 @@ export class DomainSignerResponseLogger {
     const first = JSON.stringify(parsedResponses[0].values)
     for (let i = 1; i < parsedResponses.length; i++) {
       if (JSON.stringify(parsedResponses[i].values) !== first) {
-        session.logger.warn({ parsedResponses }, 'Discrepancies detected in signer responses')
+        session.logger.warn({ parsedResponses }, WarningMessage.SIGNER_RESPONSE_DISCREPANCIES)
         break
       }
     }
