@@ -521,7 +521,9 @@ describe('pnpService', () => {
       })
 
       describe('functionality in case of errors', () => {
-        it('Should return 200 on failure to fetch DEK', async () => {
+        it('Should return 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
+          expect(combinerConfig.phoneNumberPrivacy.shouldFailOpen).toBe(true)
+
           mockGetDataEncryptionKey.mockImplementation(() => {
             throw new Error()
           })
@@ -547,6 +549,29 @@ describe('pnpService', () => {
             blindedMsgResult.blindingFactor
           )
           expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedMsg)
+        })
+
+        it('Should return 401 on failure to fetch DEK when shouldFailOpen is false', async () => {
+          mockGetDataEncryptionKey.mockImplementation(() => {
+            throw new Error()
+          })
+
+          req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+
+          const combinerConfigWithFailOpenDisabled: typeof combinerConfig = JSON.parse(
+            JSON.stringify(combinerConfig)
+          )
+          combinerConfigWithFailOpenDisabled.phoneNumberPrivacy.shouldFailOpen = false
+          const appWithFailOpenDisabled = startCombiner(combinerConfigWithFailOpenDisabled)
+          const res = await sendPnpSignRequest(req, authorization, appWithFailOpenDisabled)
+
+          expect(res.status).toBe(401)
+          expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+            success: false,
+            version: expectedVersion,
+            error: WarningMessage.UNAUTHENTICATED_USER,
+          })
         })
       })
     })
@@ -689,7 +714,10 @@ describe('pnpService', () => {
       {
         signerQueries: [1, 4, 9],
         expectedQueryCount: 4,
-        expectedWarnings: [WarningMessage.SIGNER_RESPONSE_DISCREPANCIES],
+        expectedWarnings: [
+          WarningMessage.SIGNER_RESPONSE_DISCREPANCIES,
+          WarningMessage.INCONSISTENT_SIGNER_QUERY_MEASUREMENTS,
+        ],
       },
     ]
     queryCountParams.forEach(({ signerQueries, expectedQueryCount, expectedWarnings }) => {

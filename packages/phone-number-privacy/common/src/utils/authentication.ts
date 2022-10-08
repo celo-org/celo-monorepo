@@ -8,7 +8,7 @@ import Logger from 'bunyan'
 import crypto from 'crypto'
 import { Request } from 'express'
 import { fetchEnv, rootLogger } from '..'
-import { AuthenticationMethod, ErrorMessage, WarningMessage } from '../interfaces'
+import { AuthenticationMethod, ErrorMessage, ErrorType, WarningMessage } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
 /*
@@ -19,7 +19,8 @@ export async function authenticateUser(
   request: Request, // TODO(2.0.0, optional) this could take in a generic for the different request types
   contractKit: ContractKit,
   logger: Logger,
-  shouldFailOpen: boolean = true
+  shouldFailOpen: boolean = true,
+  warnings: ErrorType[] = []
 ): Promise<boolean> {
   logger.debug('Authenticating user')
 
@@ -40,15 +41,15 @@ export async function authenticateUser(
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
-      logger.error({ err, shouldFailOpen }, ErrorMessage.FAILURE_TO_GET_DEK)
-      if (shouldFailOpen) {
-        // TODO(2.0.0, release) add monitoring / alerting for these
-        logger.error(ErrorMessage.FAILING_OPEN)
-        return true
-      } else {
-        logger.error(ErrorMessage.FAILING_CLOSED)
-        return false
-      }
+      logger.error(
+        { err, warning: ErrorMessage.FAILURE_TO_GET_DEK },
+        shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
+      )
+      warnings.push(
+        ErrorMessage.FAILURE_TO_GET_DEK,
+        shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
+      )
+      return shouldFailOpen
     }
     if (!registeredEncryptionKey) {
       logger.warn({ account: signer }, 'Account does not have registered encryption key')

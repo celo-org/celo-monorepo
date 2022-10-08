@@ -3,11 +3,11 @@ import { CombineAction } from '../../../common/combine'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { OdisConfig } from '../../../config'
-import { PnpDiscrepanciesLogger } from '../../services/log-discrepancies'
+import { PnpSignerResponseLogger } from '../../services/log-responses'
 import { PnpThresholdStateService } from '../../services/threshold-state'
 
 export class PnpQuotaAction extends CombineAction<PnpQuotaRequest> {
-  readonly discrepancyLogger: PnpDiscrepanciesLogger = new PnpDiscrepanciesLogger()
+  readonly responseLogger: PnpSignerResponseLogger = new PnpSignerResponseLogger()
 
   constructor(
     readonly config: OdisConfig,
@@ -18,7 +18,9 @@ export class PnpQuotaAction extends CombineAction<PnpQuotaRequest> {
   }
 
   async combine(session: Session<PnpQuotaRequest>): Promise<void> {
-    this.discrepancyLogger.logResponseDiscrepancies(session)
+    this.responseLogger.logResponseDiscrepancies(session)
+    this.responseLogger.logFailOpenResponses(session)
+
     if (session.responses.length >= this.config.keys.threshold) {
       try {
         const quotaStatus = this.thresholdStateService.findCombinerQuotaState(session)

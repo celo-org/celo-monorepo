@@ -7,13 +7,14 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { CryptoSession } from '../../../common/crypto-session'
 import { SignAction } from '../../../common/sign'
-import { PnpDiscrepanciesLogger } from '../../services/log-discrepancies'
+import { PnpSignerResponseLogger } from '../../services/log-responses'
 
-export class PnpSignAction extends SignAction<SignMessageRequest | LegacySignMessageRequest> {
-  readonly discrepancyLogger: PnpDiscrepanciesLogger = new PnpDiscrepanciesLogger()
+export class PnpSignAction extends SignAction<SignMessageRequest> {
+  readonly responseLogger: PnpSignerResponseLogger = new PnpSignerResponseLogger()
 
   combine(session: CryptoSession<SignMessageRequest | LegacySignMessageRequest>): void {
-    this.discrepancyLogger.logResponseDiscrepancies(session)
+    this.responseLogger.logResponseDiscrepancies(session)
+    this.responseLogger.logFailOpenResponses(session)
 
     if (session.crypto.hasSufficientSignatures()) {
       try {

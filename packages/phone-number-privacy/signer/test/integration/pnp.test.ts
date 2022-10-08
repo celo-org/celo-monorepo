@@ -374,7 +374,7 @@ describe('pnp', () => {
             performedQueryCount: 0,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
-            warnings: [],
+            warnings: [ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN],
           })
         })
 
@@ -1121,7 +1121,7 @@ describe('pnp', () => {
             performedQueryCount: performedQueryCount + 1,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
-            warnings: [],
+            warnings: [ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN],
           })
         })
 
