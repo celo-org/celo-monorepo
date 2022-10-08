@@ -714,7 +714,10 @@ describe('pnpService', () => {
       {
         signerQueries: [1, 4, 9],
         expectedQueryCount: 4,
-        expectedWarnings: [WarningMessage.SIGNER_RESPONSE_DISCREPANCIES],
+        expectedWarnings: [
+          WarningMessage.SIGNER_RESPONSE_DISCREPANCIES,
+          WarningMessage.INCONSISTENT_SIGNER_QUERY_MEASUREMENTS,
+        ],
       },
     ]
     queryCountParams.forEach(({ signerQueries, expectedQueryCount, expectedWarnings }) => {
