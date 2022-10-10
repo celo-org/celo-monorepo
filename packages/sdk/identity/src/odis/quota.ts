@@ -1,7 +1,5 @@
 import { Address } from '@celo/base'
-import { ContractKit } from '@celo/contractkit'
 import {
-  AuthenticationMethod,
   CombinerEndpoint,
   PnpQuotaRequest,
   PnpQuotaResponse,
@@ -10,16 +8,11 @@ import { AuthSigner, ErrorMessages, queryOdis, ServiceContext } from './query'
 
 export async function getQuotaStatus(
   account: Address,
+  signer: AuthSigner,
   context: ServiceContext,
-  kit: ContractKit,
   clientVersion?: string,
   sessionID?: string
 ): Promise<number> {
-  const signer: AuthSigner = {
-    authenticationMethod: AuthenticationMethod.WALLET_KEY,
-    contractKit: kit,
-  }
-
   const body: PnpQuotaRequest = {
     account,
     version: clientVersion ? clientVersion : 'unknown',
