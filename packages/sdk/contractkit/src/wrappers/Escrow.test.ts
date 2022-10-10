@@ -82,7 +82,7 @@ testWithGanache('Escrow Wrapper', (web3) => {
         1,
         accounts
       )
-      .send({ from: sender })
+      .sendAndWaitForReceipt({ from: sender })
 
     await escrow
       .withdraw(withdrawKeyAddress, parsedSig.v, parsedSig.r, parsedSig.s)
@@ -115,7 +115,7 @@ testWithGanache('Escrow Wrapper', (web3) => {
         1,
         accounts
       )
-      .send({ from: sender })
+      .sendAndWaitForReceipt({ from: sender })
 
     await expect(
       escrow
