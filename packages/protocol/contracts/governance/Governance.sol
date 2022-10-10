@@ -714,7 +714,9 @@ contract Governance is
     );
     VoteRecord storage previousVoteRecord = voter.referendumVotes[index];
 
-    if (previousVoteRecord.weights.length == 0 && previousVoteRecord.weight != 0) {
+    if (previousVoteRecord.proposalId != proposalId) {
+      proposal.updateVote(new Proposals.VoteValue[](0), new uint256[](0), voteValues, weights);
+    } else if (previousVoteRecord.weights.length == 0 && previousVoteRecord.weight != 0) {
       // backward compatibility for transition period - this should be deleted later on
       Proposals.VoteValue[] memory previousValues = new Proposals.VoteValue[](1);
       previousValues[0] = previousVoteRecord.value;

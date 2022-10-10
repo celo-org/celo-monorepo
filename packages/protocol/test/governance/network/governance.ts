@@ -2039,6 +2039,72 @@ contract('Governance', (accounts: string[]) => {
         await assertRevert(governance.vote(otherProposalId, index, value))
       })
     })
+
+    describe('When voting on different proposal with same index', () => {
+      const proposalId = 1
+      const proposalId2 = 2
+      const index = 0
+      const value = VoteValue.Yes
+      const otherAccountWeight = 100
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
+        await governance.vote(proposalId, index, value)
+        await timeTravel(referendumStageDuration, web3)
+        await timeTravel(executionStageDuration, web3)
+      })
+
+      it('should ignore votes from previous proposal', async () => {
+        const dequeuedProposal1Dequeued = await governance.dequeued(index)
+        assertEqualBN(dequeuedProposal1Dequeued, proposalId)
+
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await governance.execute(proposalId, index)
+        assert.isFalse(await governance.proposalExists(proposalId))
+
+        await timeTravel(dequeueFrequency + 1, web3)
+        await governance.dequeueProposalsIfReady()
+        await governance.approve.call(proposalId2, index)
+        assert.isTrue(await governance.proposalExists(proposalId2))
+
+        const dequeuedProposal2 = await governance.dequeued(index)
+        assertEqualBN(dequeuedProposal2, proposalId2)
+        await governance.getVoteTotals(proposalId2)
+
+        const otherAccount1 = accounts[1]
+        await accountsInstance.createAccount({ from: otherAccount1 })
+        await mockLockedGold.setAccountTotalLockedGold(otherAccount1, otherAccountWeight)
+        await governance.vote(proposalId2, index, value, { from: otherAccount1 })
+
+        await governance.vote(proposalId2, index, VoteValue.No)
+
+        const [yesVotes, noVotes, abstainVotes] = await governance.getVoteTotals(proposalId2)
+
+        assertEqualBN(yesVotes, otherAccountWeight)
+        assertEqualBN(noVotes, weight)
+        assertEqualBN(abstainVotes, 0)
+      })
+    })
   })
 
   describe('#votePartially()', () => {
@@ -2500,6 +2566,74 @@ contract('Governance', (accounts: string[]) => {
         await timeTravel(dequeueFrequency, web3)
         const otherProposalId = 2
         await assertRevert(governance.votePartially(otherProposalId, index, [value], [weight]))
+      })
+    })
+
+    describe('When voting on different proposal with same index', () => {
+      const proposalId = 1
+      const proposalId2 = 2
+      const index = 0
+      const value = VoteValue.Yes
+      const otherAccountWeight = 100
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(proposalId, index)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
+        await governance.votePartially(proposalId, index, [value], [weight])
+        await timeTravel(referendumStageDuration, web3)
+        await timeTravel(executionStageDuration, web3)
+      })
+
+      it('should ignore votes from previous proposal', async () => {
+        const dequeuedProposal1Dequeued = await governance.dequeued(index)
+        assertEqualBN(dequeuedProposal1Dequeued, proposalId)
+
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await governance.execute(proposalId, index)
+        assert.isFalse(await governance.proposalExists(proposalId))
+
+        await timeTravel(dequeueFrequency + 1, web3)
+        await governance.dequeueProposalsIfReady()
+        await governance.approve.call(proposalId2, index)
+        assert.isTrue(await governance.proposalExists(proposalId2))
+
+        const dequeuedProposal2 = await governance.dequeued(index)
+        assertEqualBN(dequeuedProposal2, proposalId2)
+        await governance.getVoteTotals(proposalId2)
+
+        const otherAccount1 = accounts[1]
+        await accountsInstance.createAccount({ from: otherAccount1 })
+        await mockLockedGold.setAccountTotalLockedGold(otherAccount1, otherAccountWeight)
+        await governance.votePartially(proposalId2, index, [value], [otherAccountWeight], {
+          from: otherAccount1,
+        })
+
+        await governance.votePartially(proposalId2, index, [VoteValue.No], [weight])
+
+        const [yesVotes, noVotes, abstainVotes] = await governance.getVoteTotals(proposalId2)
+
+        assertEqualBN(yesVotes, otherAccountWeight)
+        assertEqualBN(noVotes, weight)
+        assertEqualBN(abstainVotes, 0)
       })
     })
   })
