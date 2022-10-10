@@ -1624,7 +1624,8 @@ contract('Governance', (accounts: string[]) => {
 
         it('should not revert when proposals are not in the Referendum stage', async () => {
           await timeTravel(referendumStageDuration, web3)
-          await governance.revokeVotes()
+          const success = await governance.revokeVotes.call()
+          assert.isTrue(success)
         })
       })
     }
@@ -1671,7 +1672,8 @@ contract('Governance', (accounts: string[]) => {
 
         it('should not revert when proposals are not in the Referendum stage', async () => {
           await timeTravel(referendumStageDuration, web3)
-          await governance.revokeVotes()
+          const success = await governance.revokeVotes.call()
+          assert.isTrue(success)
         })
       })
     }
