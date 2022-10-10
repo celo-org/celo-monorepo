@@ -147,7 +147,7 @@ contract Governance is
     uint256 indexed proposalId,
     address indexed account,
     uint256[] weights,
-    uint256[] values
+    Proposals.VoteValue[] values
   );
 
   event ProposalVoteRevoked(
@@ -642,8 +642,8 @@ contract Governance is
     require(value != Proposals.VoteValue.None, "Vote value unset");
     require(weight > 0, "Voter weight zero");
 
-    uint256[] memory currentValues = new uint256[](1);
-    currentValues[0] = uint256(value);
+    Proposals.VoteValue[] memory currentValues = new Proposals.VoteValue[](1);
+    currentValues[0] = value;
     uint256[] memory currentWeights = new uint256[](1);
     currentWeights[0] = weight;
 
@@ -663,7 +663,7 @@ contract Governance is
   function votePartially(
     uint256 proposalId,
     uint256 index,
-    uint256[] calldata voteValues,
+    Proposals.VoteValue[] calldata voteValues,
     uint256[] calldata weights
   ) external nonReentrant returns (bool) {
     require(voteValues.length == weights.length, "Incorrect length");
@@ -703,7 +703,7 @@ contract Governance is
     uint256 index,
     uint256 totalLockedGold,
     address account,
-    uint256[] memory voteValues,
+    Proposals.VoteValue[] memory voteValues,
     uint256[] memory weights
   ) private {
     Voter storage voter = voters[account];
@@ -713,7 +713,6 @@ contract Governance is
       "Voter doesn't have enough locked gold"
     );
     VoteRecord storage previousVoteRecord = voter.referendumVotes[index];
-    Proposals.VoteValue[] memory currentVoteValuesConverted;
 
     if (previousVoteRecord.weights.length == 0 && previousVoteRecord.weight != 0) {
       // backward compatibility for transition period - this should be deleted later on
@@ -722,14 +721,9 @@ contract Governance is
       uint256[] memory previousWeights = new uint256[](1);
       previousWeights[0] = previousVoteRecord.weight;
 
-      currentVoteValuesConverted = proposal.updateVote(
-        previousValues,
-        previousWeights,
-        voteValues,
-        weights
-      );
+      proposal.updateVote(previousValues, previousWeights, voteValues, weights);
     } else {
-      currentVoteValuesConverted = proposal.updateVote(
+      proposal.updateVote(
         previousVoteRecord.values,
         previousVoteRecord.weights,
         voteValues,
@@ -739,11 +733,11 @@ contract Governance is
 
     proposal.networkWeight = getLockedGold().getTotalLockedGold();
     voter.referendumVotes[index] = VoteRecord(
-      currentVoteValuesConverted[0],
+      voteValues[0],
       proposalId,
       weights[0],
       weights,
-      currentVoteValuesConverted
+      voteValues
     );
     if (proposal.timestamp > proposals[voter.mostRecentReferendumProposal].timestamp) {
       voter.mostRecentReferendumProposal = proposalId;
@@ -789,7 +783,7 @@ contract Governance is
             proposal.updateVote(
               previousValues,
               previousWeights,
-              new uint256[](0),
+              new Proposals.VoteValue[](0),
               new uint256[](0)
             );
 
@@ -804,7 +798,7 @@ contract Governance is
             proposal.updateVote(
               voteRecord.values,
               voteRecord.weights,
-              new uint256[](0),
+              new Proposals.VoteValue[](0),
               new uint256[](0)
             );
             proposal.networkWeight = getLockedGold().getTotalLockedGold();

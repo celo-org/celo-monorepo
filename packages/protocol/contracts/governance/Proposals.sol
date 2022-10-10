@@ -146,9 +146,9 @@ library Proposals {
     Proposal storage proposal,
     VoteValue[] memory previousVoteValues,
     uint256[] memory previousVoteWeights,
-    uint256[] memory currentVoteValues,
+    VoteValue[] memory currentVoteValues,
     uint256[] memory currentVoteWeights
-  ) public returns (VoteValue[] memory) {
+  ) public {
     require(
       previousVoteValues.length == previousVoteWeights.length,
       "incorrect length of previous vote"
@@ -172,13 +172,10 @@ library Proposals {
       }
     }
 
-    VoteValue[] memory currentVoteValuesConverted = new VoteValue[](currentVoteValues.length);
-
     // Add new vote.
     for (uint256 i = 0; i < currentVoteValues.length; i = i.add(1)) {
-      VoteValue currentVote = VoteValue(currentVoteValues[i]);
+      VoteValue currentVote = currentVoteValues[i]; //VoteValue(currentVoteValues[i]);
       uint256 currentWeight = currentVoteWeights[i];
-      currentVoteValuesConverted[i] = currentVote;
 
       if (currentVote == VoteValue.Abstain) {
         proposal.votes.abstain = proposal.votes.abstain.add(currentWeight);
@@ -188,8 +185,6 @@ library Proposals {
         proposal.votes.no = proposal.votes.no.add(currentWeight);
       }
     }
-
-    return currentVoteValuesConverted;
   }
 
   /**
