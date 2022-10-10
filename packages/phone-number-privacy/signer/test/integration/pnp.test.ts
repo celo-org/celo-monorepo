@@ -449,15 +449,19 @@ describe('pnp', () => {
             undefined,
             appWithShortTimeout
           )
-
+          // TODO EN: maybe reset mocks in the beforeEach??
+          // Ensure that this is restored before test can fail on assertions
+          // to prevent failures in other tests
+          spy.mockRestore()
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual({
             success: false,
             error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+            version: expectedVersion,
           })
-          spy.mockRestore()
           // Allow time for non-killed processes to finish
           await new Promise((resolve) => setTimeout(resolve, delay))
+          console.log('leaving first timeout test')
         })
       })
     })
@@ -951,6 +955,7 @@ describe('pnp', () => {
           expect(res.body).toStrictEqual({
             success: false,
             error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+            version: expectedVersion,
           })
           spy.mockRestore()
           // Allow time for non-killed processes to finish

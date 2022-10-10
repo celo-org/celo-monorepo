@@ -1,4 +1,3 @@
-import { timeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import {
   ErrorMessage,
@@ -69,11 +68,14 @@ export function startSigner(
       const timeoutRes = Symbol()
       try {
         // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
-        await timeout(handler, [req, res], config.timeout, timeoutRes)
+        // console.log(timeout)
+        await handler(req, res)
+        // await timeout(handler, [req, res], config.timeout, timeoutRes)
       } catch (err: any) {
         // Handle any errors that otherwise managed to escape the proper handlers
         let errorMsg: string = ErrorMessage.UNKNOWN_ERROR
         let errToLog = err
+        // TODO EN: remove this code as well
         if (err === timeoutRes) {
           Counters.timeouts.inc()
           errorMsg = ErrorMessage.TIMEOUT_FROM_SIGNER

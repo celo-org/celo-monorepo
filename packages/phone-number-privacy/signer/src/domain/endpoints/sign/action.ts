@@ -1,3 +1,4 @@
+import { timeout } from '@celo/base'
 import {
   Domain,
   domainHash,
@@ -55,68 +56,71 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
       },
       'Processing request to get domain signature '
     )
-
+    const timeoutRes = Symbol()
     try {
       const res: TrxResult = await this.db.transaction(async (trx) => {
-        // Get the current domain state record, or use an empty record if one does not exist.
-        const domainStateRecord = await this.quota.getQuotaStatus(session, trx)
+        const domainSignHandler = async (): Promise<TrxResult> => {
+          // Get the current domain state record, or use an empty record if one does not exist.
+          const domainStateRecord = await this.quota.getQuotaStatus(session, trx)
 
-        // Note that this action occurs in the same transaction as the remainder of the siging
-        // action. As a result, this is included here rather than in the authentication function.
-        if (!this.nonceCheck(domainStateRecord, session)) {
-          return {
-            success: false,
-            status: 401,
+          // Note that this action occurs in the same transaction as the remainder of the siging
+          // action. As a result, this is included here rather than in the authentication function.
+          if (!this.nonceCheck(domainStateRecord, session)) {
+            return {
+              success: false,
+              status: 401,
+              domainStateRecord,
+              error: WarningMessage.INVALID_NONCE,
+            }
+          }
+
+          const quotaStatus = await this.quota.checkAndUpdateQuotaStatus(
             domainStateRecord,
-            error: WarningMessage.INVALID_NONCE,
-          }
-        }
-
-        const quotaStatus = await this.quota.checkAndUpdateQuotaStatus(
-          domainStateRecord,
-          session,
-          trx
-        )
-
-        if (!quotaStatus.sufficient) {
-          session.logger.warn(
-            {
-              name: domain.name,
-              version: domain.version,
-              hash: domainHash(domain),
-            },
-            `Exceeded quota`
+            session,
+            trx
           )
+
+          if (!quotaStatus.sufficient) {
+            session.logger.warn(
+              {
+                name: domain.name,
+                version: domain.version,
+                hash: domainHash(domain),
+              },
+              `Exceeded quota`
+            )
+            return {
+              success: false,
+              status: 429,
+              domainStateRecord: quotaStatus.state,
+              error: WarningMessage.EXCEEDED_QUOTA,
+            }
+          }
+
+          const key: Key = {
+            version:
+              this.io.getRequestKeyVersion(session.request, session.logger) ??
+              this.config.keystore.keys.domains.latest,
+            name: DefaultKeyName.DOMAINS,
+          }
+
+          // Compute evaluation inside transaction so it will rollback on error.
+          const evaluation = await this.eval(
+            domain,
+            session.request.body.blindedMessage,
+            key,
+            session
+          )
+
           return {
-            success: false,
-            status: 429,
+            success: true,
+            status: 200,
             domainStateRecord: quotaStatus.state,
-            error: WarningMessage.EXCEEDED_QUOTA,
+            key,
+            signature: evaluation.toString('base64'),
           }
         }
-
-        const key: Key = {
-          version:
-            this.io.getRequestKeyVersion(session.request, session.logger) ??
-            this.config.keystore.keys.domains.latest,
-          name: DefaultKeyName.DOMAINS,
-        }
-
-        // Compute evaluation inside transaction so it will rollback on error.
-        const evaluation = await this.eval(
-          domain,
-          session.request.body.blindedMessage,
-          key,
-          session
-        )
-
-        return {
-          success: true,
-          status: 200,
-          domainStateRecord: quotaStatus.state,
-          key,
-          signature: evaluation.toString('base64'),
-        }
+        return await timeout(domainSignHandler, [], this.config.timeout, timeoutRes)
       })
 
       if (res.success) {
@@ -136,6 +140,10 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
         )
       }
     } catch (error) {
+      if (error === timeoutRes) {
+        this.io.sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, session.response)
+        return
+      }
       session.logger.error(error, 'Failed to get signature for a domain')
       this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)
     }

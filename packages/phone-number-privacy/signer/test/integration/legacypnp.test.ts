@@ -648,6 +648,50 @@ describe('legacyPNP', () => {
             error: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
           })
         })
+
+        it('Should respond with 500 on signer timeout', async () => {
+          const testTimeoutMS = 200
+          const delay = 100
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'getPerformedQueryCount'
+            )
+            .mockImplementation(async () => {
+              await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
+              return expectedQuota
+            })
+
+          const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
+          configWithShortTimeout.timeout = testTimeoutMS
+          const appWithShortTimeout = startSigner(
+            configWithShortTimeout,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
+          const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1)
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.LEGACY_PNP_QUOTA,
+            undefined,
+            appWithShortTimeout
+          )
+          // TODO EN: maybe reset mocks in the beforeEach??
+          // Ensure that this is restored before test can fail on assertions
+          // to prevent failures in other tests
+          spy.mockRestore()
+          expect(res.status).toBe(500)
+          expect(res.body).toStrictEqual({
+            success: false,
+            error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+            version: expectedVersion,
+          })
+          // Allow time for non-killed processes to finish
+          await new Promise((resolve) => setTimeout(resolve, delay))
+        })
       })
     })
   })
@@ -1550,6 +1594,71 @@ describe('legacyPNP', () => {
           spy.mockRestore()
 
           // check DB state: performedQueryCount was not incremented and request was not stored
+          expect(
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE.LEGACY,
+              ACCOUNT_ADDRESS1,
+              rootLogger(config.serviceName)
+            )
+          ).toBe(performedQueryCount)
+          expect(
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE.LEGACY,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(config.serviceName)
+            )
+          ).toBe(false)
+        })
+
+        it('Should respond with 500 on signer timeout', async () => {
+          const testTimeoutMS = 200
+          const delay = 200
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'getPerformedQueryCount'
+            )
+            .mockImplementationOnce(async () => {
+              await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
+              return performedQueryCount
+            })
+
+          const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
+          configWithShortTimeout.timeout = testTimeoutMS
+          const appWithShortTimeout = startSigner(
+            configWithShortTimeout,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
+
+          const req = getLegacyPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.LEGACY_PNP_SIGN,
+            undefined,
+            appWithShortTimeout
+          )
+
+          expect(res.status).toBe(500)
+          expect(res.body).toStrictEqual({
+            success: false,
+            error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+            version: expectedVersion,
+          })
+          spy.mockRestore()
+          // Allow time for non-killed processes to finish
+          await new Promise((resolve) => setTimeout(resolve, delay))
+          // Check that DB was not updated
           expect(
             await getPerformedQueryCount(
               db,

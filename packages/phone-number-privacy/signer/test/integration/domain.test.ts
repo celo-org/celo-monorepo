@@ -290,6 +290,41 @@ describe('domain', () => {
       })
     })
 
+    it('Should respond with 500 on signer timeout', async () => {
+      const testTimeoutMS = 200
+      const delay = 200
+
+      const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
+      configWithShortTimeout.timeout = testTimeoutMS
+      const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
+
+      const req = await disableRequest()
+      // TODO EN: double check that this works & why doesn't mocking this function work for the other tests?
+      const spy = jest
+        .spyOn(
+          jest.requireActual('../../src/common/database/wrappers/domain-state'),
+          'getDomainStateRecord'
+        )
+        .mockImplementationOnce(async () => {
+          await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
+          return null
+        })
+
+      const res = await request(appWithShortTimeout).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
+      spy.mockRestore()
+
+      expect(res.status).toBe(500)
+      expect(res.body).toStrictEqual<DisableDomainResponse>({
+        success: false,
+        error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+        version: expectedVersion,
+      })
+      // Allow time for non-killed processes to finish
+      await new Promise((resolve) => setTimeout(resolve, delay))
+      // Check that DB state was not updated on timeout
+      expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(null)
+    })
+
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
       configWithApiDisabled.api.domains.enabled = false
@@ -429,6 +464,41 @@ describe('domain', () => {
         version: res.body.version,
         error: WarningMessage.UNAUTHENTICATED_USER,
       })
+    })
+
+    it('Should respond with 500 on signer timeout', async () => {
+      const testTimeoutMS = 200
+      const delay = 200
+
+      const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
+      configWithShortTimeout.timeout = testTimeoutMS
+      const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
+
+      const req = await quotaRequest()
+      const spy = jest
+        .spyOn(
+          jest.requireActual('../../src/common/database/wrappers/domain-state'),
+          'getDomainStateRecordOrEmpty'
+        )
+        .mockImplementationOnce(async () => {
+          await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
+          return createEmptyDomainStateRecord(req.domain)
+        })
+
+      const res = await request(appWithShortTimeout)
+        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
+        .send(req)
+
+      spy.mockRestore()
+
+      expect(res.status).toBe(500)
+      expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
+        success: false,
+        error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+        version: expectedVersion,
+      })
+      // Allow time for non-killed processes to finish
+      await new Promise((resolve) => setTimeout(resolve, delay))
     })
 
     it('Should respond with 503 on disabled api', async () => {
@@ -782,9 +852,7 @@ describe('domain', () => {
         )
         .mockImplementationOnce(async () => {
           await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
-          const x = createEmptyDomainStateRecord(req.domain)
-          console.log(x)
-          return x
+          return createEmptyDomainStateRecord(req.domain)
         })
 
       const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
@@ -793,9 +861,10 @@ describe('domain', () => {
 
       const res = await request(appWithShortTimeout).post(SignerEndpoint.DOMAIN_SIGN).send(req)
       expect(res.status).toBe(500)
-      expect(res.body).toStrictEqual({
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+        version: expectedVersion,
       })
       spy.mockRestore()
       // Allow time for non-killed processes to finish
