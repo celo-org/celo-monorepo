@@ -10,6 +10,8 @@ import {
   GetContactMatchesRequest,
   GetContactMatchesResponse,
   LegacySignMessageRequest,
+  OdisRequest,
+  OdisResponse,
   PhoneNumberPrivacyRequest,
   signWithRawKey,
 } from '@celo/phone-number-privacy-common'
@@ -111,12 +113,12 @@ export function signWithDEK(msg: string, signer: EncryptionKeySigner) {
  * @param context Contains service URL and public to determine which instance to contact.
  * @param endpoint Endpoint to query (e.g. '/getBlindedMessagePartialSig', '/getContactMatches').
  */
-export async function queryOdis<ResponseType>(
+export async function queryOdis<RequestType extends OdisRequest>(
   signer: AuthSigner,
   body: PhoneNumberPrivacyRequest,
   context: ServiceContext,
   endpoint: CombinerEndpoint
-): Promise<ResponseType> {
+): Promise<OdisResponse<RequestType>> {
   debug(`Posting to ${endpoint}`)
 
   const bodyString = JSON.stringify(body)
@@ -160,7 +162,7 @@ export async function queryOdis<ResponseType>(
       if (res.ok) {
         debug('Response ok. Parsing.')
         const response = await res.json()
-        return response as ResponseType
+        return response as OdisResponse<RequestType>
       }
 
       debug(`Response not okay. Status ${res.status}`)
