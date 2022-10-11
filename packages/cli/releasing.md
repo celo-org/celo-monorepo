@@ -8,10 +8,12 @@
 
 4. *IMPORTANT* double check version in package.json is correct!
 
-5. run `npm publish --otp XXXXXX --tag TAG` *you MUST run with --tag and provide alpha | beta for pre release*
+5. commit the the package.json and shrinkwrap
 
-6. add back -dev suffics to @celo/** deps it was removed from in cli package (otherwise ci build will fail)
+6. run `npm publish --otp XXXXXX --tag TAG` *you MUST run with --tag and provide alpha | beta for pre release*
 
-7. run yarn
+7. add back -dev suffics to @celo/** deps it was removed from in cli package (otherwise ci build will fail)
 
-8. commit
+8. run yarn
+
+9. commit
