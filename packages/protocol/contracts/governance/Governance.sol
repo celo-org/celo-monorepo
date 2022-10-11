@@ -46,11 +46,9 @@ contract Governance is
   }
 
   struct VoteRecord {
-    // obsolete
-    Proposals.VoteValue value;
+    Proposals.VoteValue value; // obsolete
     uint256 proposalId;
-    // obsolete
-    uint256 weight;
+    uint256 weight; // obsolete
     uint256[] weights;
     Proposals.VoteValue[] values;
   }

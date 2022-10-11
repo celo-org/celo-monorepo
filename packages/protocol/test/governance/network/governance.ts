@@ -2041,10 +2041,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     describe('When voting on different proposal with same index', () => {
-      const proposalId = 1
       const proposalId2 = 2
-      const index = 0
-      const value = VoteValue.Yes
       const otherAccountWeight = 100
       beforeEach(async () => {
         await governance.propose(
@@ -2570,10 +2567,7 @@ contract('Governance', (accounts: string[]) => {
     })
 
     describe('When voting on different proposal with same index', () => {
-      const proposalId = 1
       const proposalId2 = 2
-      const index = 0
-      const value = VoteValue.Yes
       const otherAccountWeight = 100
       beforeEach(async () => {
         await governance.propose(
