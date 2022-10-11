@@ -123,6 +123,18 @@ blockscout:
     suffix:
       enabled: false
       path: ""
+    extraEnvironments:
+      # format:
+      # -
+      #  environment: alfajores|baklava|rc1 etc.
+      #  suffix: alfajores|baklava|mainnet etc, must match the suffix
+      #          value configured for those environments
+      #  ingressIp: x.x.x.x
+      source: []
+      # format:
+      # -
+      #  sourceHost: ""
+      target: []
     port: 4000
     strategy:
       rollingUpdate:

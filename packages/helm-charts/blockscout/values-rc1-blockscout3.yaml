@@ -38,6 +38,16 @@ blockscout:
     suffix:
       enabled: true
       path: "mainnet"
+    extraEnvironments:
+      source:
+      -
+        environment: alfajores
+        suffix: alfajores
+        ingressIp: 35.197.27.191
+      -
+        environment: baklava
+        suffix: baklava
+        ingressIp: 35.247.36.118
     autoscaling:
       maxReplicas: 5
       minReplicas: 2
