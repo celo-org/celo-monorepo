@@ -19,35 +19,25 @@ export class PnpQuotaAction implements Action<PnpQuotaRequest | LegacyPnpQuotaRe
   ) {}
 
   public async perform(
-    session: PnpSession<PnpQuotaRequest | LegacyPnpQuotaRequest>
+    session: PnpSession<PnpQuotaRequest | LegacyPnpQuotaRequest>,
+    timeoutError: Symbol
   ): Promise<void> {
-    const timeoutRes = Symbol()
-    try {
-      const quotaStatus = await timeout(
-        () => this.quota.getQuotaStatus(session),
-        [],
-        this.config.timeout,
-        timeoutRes
-      )
-      if (quotaStatus.performedQueryCount > -1 && quotaStatus.totalQuota > -1) {
-        this.io.sendSuccess(200, session.response, quotaStatus, session.errors)
-        return
-      }
-      this.io.sendFailure(
-        quotaStatus.performedQueryCount === -1
-          ? ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
-          : ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
-        500,
-        session.response
-      )
-    } catch (error) {
-      // TODO EN: move this try catch to the controller instead of the action class if possible
-      if (error === timeoutRes) {
-        this.io.sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, session.response)
-        return
-      }
-      // TODO EN TEMPORARY, move to controller
-      throw error
+    const quotaStatus = await timeout(
+      () => this.quota.getQuotaStatus(session),
+      [],
+      this.config.timeout,
+      timeoutError
+    )
+    if (quotaStatus.performedQueryCount > -1 && quotaStatus.totalQuota > -1) {
+      this.io.sendSuccess(200, session.response, quotaStatus, session.errors)
+      return
     }
+    this.io.sendFailure(
+      quotaStatus.performedQueryCount === -1
+        ? ErrorMessage.FAILURE_TO_GET_PERFORMED_QUERY_COUNT
+        : ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
+      500,
+      session.response
+    )
   }
 }

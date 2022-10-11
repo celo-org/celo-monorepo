@@ -16,7 +16,10 @@ import { DomainDisableIO } from './io'
 export class DomainDisableAction implements Action<DisableDomainRequest> {
   constructor(readonly db: Knex, readonly config: SignerConfig, readonly io: DomainDisableIO) {}
 
-  public async perform(session: DomainSession<DisableDomainRequest>): Promise<void> {
+  public async perform(
+    session: DomainSession<DisableDomainRequest>,
+    timeoutError: Symbol
+  ): Promise<void> {
     const domain = session.request.body.domain
     session.logger.info(
       {
@@ -26,7 +29,6 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
       },
       'Processing request to disable domain'
     )
-    const timeoutRes = Symbol()
     try {
       // Inside a database transaction, update or create the domain to mark it disabled.
       const res = await this.db.transaction(async (trx) => {
@@ -49,7 +51,7 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
             domainStateRecord,
           }
         }
-        return await timeout(disableDomainHandler, [], this.config.timeout, timeoutRes)
+        return await timeout(disableDomainHandler, [], this.config.timeout, timeoutError)
       })
 
       this.io.sendSuccess(
@@ -59,9 +61,9 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
       )
     } catch (error) {
       // TODO EN: try to move this into outer controller class
-      if (error === timeoutRes) {
-        this.io.sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, session.response)
-        return
+      // TODO EN: same here, try to clean this up a bit
+      if (error === timeoutError) {
+        throw error
       }
       session.logger.error(error, 'Error while disabling domain')
       this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)

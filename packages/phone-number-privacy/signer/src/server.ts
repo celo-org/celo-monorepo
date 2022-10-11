@@ -14,7 +14,6 @@ import { Knex } from 'knex'
 import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
 import { KeyProvider } from './common/key-management/key-provider-base'
-import { Counters } from './common/metrics'
 import { getVersion, SignerConfig } from './config'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
@@ -65,22 +64,13 @@ export function startSigner(
   ) =>
     app.post(endpoint, async (req, res) => {
       const childLogger: Logger = res.locals.logger
-      const timeoutRes = Symbol()
       try {
         // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
-        // console.log(timeout)
         await handler(req, res)
-        // await timeout(handler, [req, res], config.timeout, timeoutRes)
       } catch (err: any) {
         // Handle any errors that otherwise managed to escape the proper handlers
         let errorMsg: string = ErrorMessage.UNKNOWN_ERROR
         let errToLog = err
-        // TODO EN: remove this code as well
-        if (err === timeoutRes) {
-          Counters.timeouts.inc()
-          errorMsg = ErrorMessage.TIMEOUT_FROM_SIGNER
-          errToLog = new Error(errorMsg)
-        }
         childLogger.error({ err: errToLog }, 'Caught error in outer endpoint handler')
         if (!res.writableEnded && !res.headersSent) {
           childLogger.info('Responding with error in outer endpoint handler')

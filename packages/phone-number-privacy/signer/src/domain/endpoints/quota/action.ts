@@ -18,27 +18,28 @@ export class DomainQuotaAction implements Action<DomainQuotaStatusRequest> {
     readonly io: DomainQuotaIO
   ) {}
 
-  public async perform(session: DomainSession<DomainQuotaStatusRequest>): Promise<void> {
+  public async perform(
+    session: DomainSession<DomainQuotaStatusRequest>,
+    timeoutError: Symbol
+  ): Promise<void> {
     const domain = session.request.body.domain
     session.logger.info('Processing request to get domain quota status', {
       name: domain.name,
       version: domain.version,
       hash: domainHash(domain).toString('hex'),
     })
-    const timeoutRes = Symbol()
     try {
       const domainStateRecord = await timeout(
         () => this.quotaService.getQuotaStatus(session),
         [],
         this.config.timeout,
-        timeoutRes
+        timeoutError
       )
       this.io.sendSuccess(200, session.response, toSequentialDelayDomainState(domainStateRecord))
     } catch (error) {
       // TODO EN: try to move this into outer controller class
-      if (error === timeoutRes) {
-        this.io.sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, session.response)
-        return
+      if (error === timeoutError) {
+        throw error
       }
       session.logger.error(error, 'Error while getting domain status')
       this.io.sendFailure(ErrorMessage.DATABASE_GET_FAILURE, 500, session.response)

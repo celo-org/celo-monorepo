@@ -46,7 +46,10 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
     readonly io: DomainSignIO
   ) {}
 
-  public async perform(session: DomainSession<DomainRestrictedSignatureRequest>): Promise<void> {
+  public async perform(
+    session: DomainSession<DomainRestrictedSignatureRequest>,
+    timeoutError: Symbol
+  ): Promise<void> {
     const domain = session.request.body.domain
     session.logger.info(
       {
@@ -56,7 +59,6 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
       },
       'Processing request to get domain signature '
     )
-    const timeoutRes = Symbol()
     try {
       const res: TrxResult = await this.db.transaction(async (trx) => {
         const domainSignHandler = async (): Promise<TrxResult> => {
@@ -120,7 +122,7 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
             signature: evaluation.toString('base64'),
           }
         }
-        return await timeout(domainSignHandler, [], this.config.timeout, timeoutRes)
+        return await timeout(domainSignHandler, [], this.config.timeout, timeoutError)
       })
 
       if (res.success) {
@@ -141,9 +143,9 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
       }
     } catch (error) {
       // TODO EN: try to move this into outer controller class
-      if (error === timeoutRes) {
-        this.io.sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, session.response)
-        return
+      // TODO EN: try to clean this up to not need to re-throw the timeout error?
+      if (error === timeoutError) {
+        throw error
       }
       session.logger.error(error, 'Failed to get signature for a domain')
       this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)

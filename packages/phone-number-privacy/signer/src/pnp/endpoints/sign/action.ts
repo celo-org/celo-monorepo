@@ -31,8 +31,8 @@ export abstract class PnpSignAction
   ) {}
 
   public async perform(
-    session: PnpSession<SignMessageRequest | LegacySignMessageRequest>
-    // timeoutError: any,
+    session: PnpSession<SignMessageRequest | LegacySignMessageRequest>,
+    timeoutError: Symbol
   ): Promise<void> {
     // Compute quota lookup, update, and signing within transaction
     // so that these occur atomically and rollback on error.
@@ -134,16 +134,7 @@ export abstract class PnpSignAction
           return
         }
       }
-      const timeoutRes = Symbol()
-      try {
-        await timeout(pnpSignHandler, [], this.config.timeout, timeoutRes)
-      } catch (error) {
-        if (error === timeoutRes) {
-          this.io.sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, session.response)
-          return
-        }
-        throw error
-      }
+      await timeout(pnpSignHandler, [], this.config.timeout, timeoutError)
     })
   }
 
