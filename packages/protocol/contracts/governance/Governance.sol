@@ -647,7 +647,7 @@ contract Governance is
     uint256[] memory currentWeights = new uint256[](1);
     currentWeights[0] = weight;
 
-    voteInternal(proposal, proposalId, index, weight, account, currentValues, currentWeights);
+    _vote(proposal, proposalId, index, weight, account, currentValues, currentWeights);
     return true;
   }
 
@@ -681,7 +681,7 @@ contract Governance is
 
     address account = getAccounts().voteSignerToAccount(msg.sender);
     uint256 totalLockedGold = getLockedGold().getAccountTotalLockedGold(account);
-    voteInternal(proposal, proposalId, index, totalLockedGold, account, voteValues, weights);
+    _vote(proposal, proposalId, index, totalLockedGold, account, voteValues, weights);
 
     return true;
   }
@@ -697,7 +697,7 @@ contract Governance is
    * @param weights Weights of vote choices.
    * @return Whether or not the proposal is passing.
    */
-  function voteInternal(
+  function _vote(
     Proposals.Proposal storage proposal,
     uint256 proposalId,
     uint256 index,
@@ -715,6 +715,12 @@ contract Governance is
     VoteRecord storage previousVoteRecord = voter.referendumVotes[index];
 
     if (previousVoteRecord.proposalId != proposalId) {
+      // VoteRecord is being stored based on index (in `dequeued`) rather than proposalId.
+      // It can happen that user voted on proposal that later gets deleted.
+      // VoteRecord will still stay in `referendumVotes` mapping.
+      // Once new proposal is created it might get same index as previous proposal.
+      // In such case we need to check whether existing VoteRecord is relevant to new
+      // proposal of whether it is just left over data.
       proposal.updateVote(new Proposals.VoteValue[](0), new uint256[](0), voteValues, weights);
     } else if (previousVoteRecord.weights.length == 0 && previousVoteRecord.weight != 0) {
       // backward compatibility for transition period - this should be deleted later on
