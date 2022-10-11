@@ -41,7 +41,8 @@ export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
 }
 
 const selectIncompatibleOperations = (diff: Operation[]) =>
-  diff.filter(operation => operation.action !== 'append')
+  diff.filter(operation => operation.action !== 'append'
+  && !(operation.action === 'rename' && `deprecated_${operation.original.label}` === operation.updated.label))
 
 export interface ASTStorageCompatibilityReport {
   contract: string
@@ -70,6 +71,9 @@ const operationToDescription = (operation: Operation) => {
       break
     case 'rename':
       message = `variable ${updated.label} was renamed from ${original.label}`
+      break
+    case 'replace':
+      message = `variable ${updated.label} was replaced from ${original.label}`
       break
     case 'append':
       message = `variable ${updated.label} was appended`
@@ -109,7 +113,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
     const expandableErrors = oldType.members.map((oldMember, i) => {
       const newMember = newType.members[i]
 
-      if (oldMember.label !== newMember.label) {
+      if (oldMember.label !== newMember.label && `deprecated_${oldMember.label}` !== newMember.label) {
         return `struct ${newType.label} had ${oldMember.label} in slot ${i}, now has ${newMember.label}`
       }
   
@@ -135,7 +139,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
 
   const memberErrors = newType.members.map((newMember, i) => {
     const oldMember = oldType.members[i]
-    if (oldMember.label !== newMember.label) {
+    if (oldMember.label !== newMember.label && `deprecated_${oldMember.label}` !== newMember.label) {
       return `struct ${newType.label} had ${oldMember.label} in slot ${i}, now has ${newMember.label}`
     }
 

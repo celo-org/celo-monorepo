@@ -46,9 +46,9 @@ contract Governance is
   }
 
   struct VoteRecord {
-    Proposals.VoteValue value; // obsolete
+    Proposals.VoteValue deprecated_value; // obsolete
     uint256 proposalId;
-    uint256 weight; // obsolete
+    uint256 deprecated_weight; // obsolete
     uint256[] weights;
     Proposals.VoteValue[] values;
   }
@@ -720,12 +720,14 @@ contract Governance is
       // In such case we need to check whether existing VoteRecord is relevant to new
       // proposal of whether it is just left over data.
       proposal.updateVote(new Proposals.VoteValue[](0), new uint256[](0), voteValues, weights);
-    } else if (previousVoteRecord.weights.length == 0 && previousVoteRecord.weight != 0) {
+    } else if (
+      previousVoteRecord.weights.length == 0 && previousVoteRecord.deprecated_weight != 0
+    ) {
       // backward compatibility for transition period - this should be deleted later on
       Proposals.VoteValue[] memory previousValues = new Proposals.VoteValue[](1);
-      previousValues[0] = previousVoteRecord.value;
+      previousValues[0] = previousVoteRecord.deprecated_value;
       uint256[] memory previousWeights = new uint256[](1);
-      previousWeights[0] = previousVoteRecord.weight;
+      previousWeights[0] = previousVoteRecord.deprecated_weight;
 
       proposal.updateVote(previousValues, previousWeights, voteValues, weights);
     } else {
@@ -771,7 +773,7 @@ contract Governance is
       // Skip proposals where there was no vote cast by the user AND
       // ensure vote record proposal matches identifier of dequeued index proposal.
       if (
-        (voteRecord.weights.length > 0 || voteRecord.weight > 0) &&
+        (voteRecord.weights.length > 0 || voteRecord.deprecated_weight > 0) &&
         voteRecord.proposalId == dequeued[dequeueIndex]
       ) {
         (Proposals.Proposal storage proposal, Proposals.Stage stage) =
@@ -779,12 +781,12 @@ contract Governance is
 
         // only revoke from proposals which are still in referendum
         if (stage == Proposals.Stage.Referendum) {
-          if (voteRecord.weights.length == 0 && voteRecord.weight != 0) {
+          if (voteRecord.weights.length == 0 && voteRecord.deprecated_weight != 0) {
             // backward compatibility for transition period - this should be deleted later on
             Proposals.VoteValue[] memory previousValues = new Proposals.VoteValue[](1);
-            previousValues[0] = voteRecord.value;
+            previousValues[0] = voteRecord.deprecated_value;
             uint256[] memory previousWeights = new uint256[](1);
-            previousWeights[0] = voteRecord.weight;
+            previousWeights[0] = voteRecord.deprecated_weight;
 
             proposal.updateVote(
               previousValues,
@@ -1060,7 +1062,13 @@ contract Governance is
     returns (uint256, uint256, uint256, uint256[] memory, Proposals.VoteValue[] memory)
   {
     VoteRecord storage record = voters[account].referendumVotes[index];
-    return (record.proposalId, uint256(record.value), record.weight, record.weights, record.values);
+    return (
+      record.proposalId,
+      uint256(record.deprecated_value),
+      record.deprecated_weight,
+      record.weights,
+      record.values
+    );
   }
 
   /**
