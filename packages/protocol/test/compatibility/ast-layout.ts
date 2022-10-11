@@ -167,7 +167,6 @@ describe('#reportLayoutIncompatibilities()', () => {
         testCases.original_struct_in_mapping,
         testCases.deprecated_prefixed_in_library_struct_mapping
       )
-      console.log('report', JSON.stringify(report))
       assertCompatible(report)
     })
   })
@@ -178,7 +177,6 @@ describe('#reportLayoutIncompatibilities()', () => {
         testCases.original,
         testCases.deprecated_prefixed_in_struct
       )
-      console.log('report', JSON.stringify(report))
       assertCompatible(report)
     })
   })
@@ -189,7 +187,6 @@ describe('#reportLayoutIncompatibilities()', () => {
         testCases.original,
         testCases.deprecated_prefixed_variable
       )
-      console.log('report', JSON.stringify(report))
       assertCompatible(report)
     })
   })
