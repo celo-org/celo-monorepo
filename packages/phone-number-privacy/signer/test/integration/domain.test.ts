@@ -28,6 +28,7 @@ import { LocalWallet } from '@celo/wallet-local'
 import { Knex } from 'knex'
 import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
+import { countAndThrowDBError } from '../../src/common/database/utils'
 import {
   createEmptyDomainStateRecord,
   getDomainStateRecord,
@@ -290,41 +291,6 @@ describe('domain', () => {
       })
     })
 
-    it('Should respond with 500 on signer timeout', async () => {
-      const testTimeoutMS = 200
-      const delay = 200
-
-      const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
-      configWithShortTimeout.timeout = testTimeoutMS
-      const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
-
-      const req = await disableRequest()
-      // TODO EN: double check that this works & why doesn't mocking this function work for the other tests?
-      const spy = jest
-        .spyOn(
-          jest.requireActual('../../src/common/database/wrappers/domain-state'),
-          'getDomainStateRecord'
-        )
-        .mockImplementationOnce(async () => {
-          await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
-          return null
-        })
-
-      const res = await request(appWithShortTimeout).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
-      spy.mockRestore()
-
-      expect(res.status).toBe(500)
-      expect(res.body).toStrictEqual<DisableDomainResponse>({
-        success: false,
-        error: ErrorMessage.TIMEOUT_FROM_SIGNER,
-        version: expectedVersion,
-      })
-      // Allow time for non-killed processes to finish
-      await new Promise((resolve) => setTimeout(resolve, delay))
-      // Check that DB state was not updated on timeout
-      expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(null)
-    })
-
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
       configWithApiDisabled.api.domains.enabled = false
@@ -339,6 +305,73 @@ describe('domain', () => {
         success: false,
         version: res.body.version,
         error: WarningMessage.API_UNAVAILABLE,
+      })
+    })
+
+    describe('functionality in case of errors', () => {
+      it('Should respond with 500 on DB insertDomainStateRecord failure', async () => {
+        const req = await disableRequest()
+        const spy = jest
+          .spyOn(
+            jest.requireActual('../../src/common/database/wrappers/domain-state'),
+            'insertDomainStateRecord'
+          )
+          .mockImplementationOnce(() => {
+            // Handle errors in the same way as in insertDomainStateRecord
+            countAndThrowDBError(
+              new Error(),
+              rootLogger(_config.serviceName),
+              ErrorMessage.DATABASE_INSERT_FAILURE
+            )
+          })
+        const res = await request(app).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
+        spy.mockRestore()
+        expect(res.status).toBe(500)
+        expect(res.body).toStrictEqual<DisableDomainResponse>({
+          success: false,
+          version: expectedVersion,
+          error: ErrorMessage.DATABASE_INSERT_FAILURE,
+        })
+        expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(
+          null
+        )
+      })
+
+      it('Should respond with 500 on signer timeout', async () => {
+        const testTimeoutMS = 200
+        const delay = 200
+
+        const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
+        configWithShortTimeout.timeout = testTimeoutMS
+        const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
+
+        const req = await disableRequest()
+        // TODO EN: double check that this works & why doesn't mocking this function work for the other tests?
+        const spy = jest
+          .spyOn(
+            jest.requireActual('../../src/common/database/wrappers/domain-state'),
+            'getDomainStateRecord'
+          )
+          .mockImplementationOnce(async () => {
+            await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
+            return null
+          })
+
+        const res = await request(appWithShortTimeout).post(SignerEndpoint.DISABLE_DOMAIN).send(req)
+        spy.mockRestore()
+
+        expect(res.status).toBe(500)
+        expect(res.body).toStrictEqual<DisableDomainResponse>({
+          success: false,
+          error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+          version: expectedVersion,
+        })
+        // Allow time for non-killed processes to finish
+        await new Promise((resolve) => setTimeout(resolve, delay))
+        // Check that DB state was not updated on timeout
+        expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(
+          null
+        )
       })
     })
   })
@@ -466,6 +499,58 @@ describe('domain', () => {
       })
     })
 
+    it('Should respond with 503 on disabled api', async () => {
+      const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
+      configWithApiDisabled.api.domains.enabled = false
+      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+
+      const req = await quotaRequest()
+
+      const res = await request(appWithApiDisabled)
+        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
+        .send(req)
+
+      expect(res.status).toBe(503)
+      expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.API_UNAVAILABLE,
+      })
+    })
+
+    describe('functionality in case of errors', () => {
+      it('Should respond with 500 on DB getDomainStateRecordOrEmpty failure', async () => {
+        const req = await quotaRequest()
+        // Mocking getDomainStateRecord directly but requiring the real version of
+        // getDomainStateRecordOrEmpty does not easily work,
+        // which is why we mock the outer call here & use the countAndThrowDBError
+        // helper to get as close as possible to testing a real error.
+        const spy = jest
+          .spyOn(
+            jest.requireActual('../../src/common/database/wrappers/domain-state'),
+            'getDomainStateRecordOrEmpty'
+          )
+          .mockImplementationOnce(() => {
+            countAndThrowDBError(
+              new Error(),
+              rootLogger(_config.serviceName),
+              ErrorMessage.DATABASE_GET_FAILURE
+            )
+          })
+        const res = await request(app).post(SignerEndpoint.DOMAIN_QUOTA_STATUS).send(req)
+        spy.mockRestore()
+        expect(res.status).toBe(500)
+        expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
+          success: false,
+          version: expectedVersion,
+          error: ErrorMessage.DATABASE_GET_FAILURE,
+        })
+        expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(
+          null
+        )
+      })
+    })
+
     it('Should respond with 500 on signer timeout', async () => {
       const testTimeoutMS = 200
       const delay = 200
@@ -499,25 +584,6 @@ describe('domain', () => {
       })
       // Allow time for non-killed processes to finish
       await new Promise((resolve) => setTimeout(resolve, delay))
-    })
-
-    it('Should respond with 503 on disabled api', async () => {
-      const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
-      configWithApiDisabled.api.domains.enabled = false
-      const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
-
-      const req = await quotaRequest()
-
-      const res = await request(appWithApiDisabled)
-        .post(SignerEndpoint.DOMAIN_QUOTA_STATUS)
-        .send(req)
-
-      expect(res.status).toBe(503)
-      expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
-        success: false,
-        version: res.body.version,
-        error: WarningMessage.API_UNAVAILABLE,
-      })
     })
   })
 
@@ -840,39 +906,6 @@ describe('domain', () => {
       })
     })
 
-    it('Should respond with 500 on signer timeout', async () => {
-      const [req, _] = await signatureRequest()
-      const testTimeoutMS = 200
-      const delay = 200
-
-      const spy = jest
-        .spyOn(
-          jest.requireActual('../../src/common/database/wrappers/domain-state'),
-          'getDomainStateRecordOrEmpty'
-        )
-        .mockImplementationOnce(async () => {
-          await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
-          return createEmptyDomainStateRecord(req.domain)
-        })
-
-      const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
-      configWithShortTimeout.timeout = testTimeoutMS
-      const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
-
-      const res = await request(appWithShortTimeout).post(SignerEndpoint.DOMAIN_SIGN).send(req)
-      expect(res.status).toBe(500)
-      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
-        success: false,
-        error: ErrorMessage.TIMEOUT_FROM_SIGNER,
-        version: expectedVersion,
-      })
-      spy.mockRestore()
-      // Allow time for non-killed processes to finish
-      await new Promise((resolve) => setTimeout(resolve, delay))
-      // Check that DB state was not updated on timeout
-      expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(null)
-    })
-
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
       configWithApiDisabled.api.domains.enabled = false
@@ -887,6 +920,104 @@ describe('domain', () => {
         success: false,
         version: res.body.version,
         error: WarningMessage.API_UNAVAILABLE,
+      })
+    })
+
+    describe('functionality in case of errors', () => {
+      it('Should respond with 500 on DB getDomainStateRecord query failure', async () => {
+        const [req, _] = await signatureRequest()
+        // Mocking getDomainStateRecord directly but requiring the real version of
+        // getDomainStateRecordOrEmpty does not easily work,
+        // which is why we mock the outer call here & use the countAndThrowDBError
+        // helper to get as close as possible to testing a real error.
+        const spy = jest
+          .spyOn(
+            jest.requireActual('../../src/common/database/wrappers/domain-state'),
+            'getDomainStateRecordOrEmpty'
+          )
+          .mockImplementationOnce(() => {
+            countAndThrowDBError(
+              new Error(),
+              rootLogger(_config.serviceName),
+              ErrorMessage.DATABASE_GET_FAILURE
+            )
+          })
+        const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
+        spy.mockRestore()
+        expect(res.status).toBe(500)
+        expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+          success: false,
+          version: expectedVersion,
+          error: ErrorMessage.DATABASE_GET_FAILURE, // TODO EN: this should ideally be DB GET FAILURE
+        })
+        expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(
+          null
+        )
+      })
+
+      it('Should respond with 500 on DB updateDomainStateRecord failure', async () => {
+        const [req, _] = await signatureRequest()
+        // Same as above (re: getDomainStateRecord, but with insertDomainStateRecord)
+        // which is why we mock the outer call here & use the countAndThrowDBError
+        // helper to get as close as possible to testing a real error.
+        const spy = jest
+          .spyOn(
+            jest.requireActual('../../src/common/database/wrappers/domain-state'),
+            'updateDomainStateRecord'
+          )
+          .mockImplementationOnce(() => {
+            countAndThrowDBError(
+              new Error(),
+              rootLogger(_config.serviceName),
+              ErrorMessage.DATABASE_UPDATE_FAILURE
+            )
+          })
+        const res = await request(app).post(SignerEndpoint.DOMAIN_SIGN).send(req)
+        spy.mockRestore()
+        expect(res.status).toBe(500)
+        expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+          success: false,
+          version: expectedVersion,
+          error: ErrorMessage.DATABASE_UPDATE_FAILURE,
+        })
+        expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(
+          null
+        )
+      })
+
+      it('Should respond with 500 on signer timeout', async () => {
+        const [req, _] = await signatureRequest()
+        const testTimeoutMS = 200
+        const delay = 200
+
+        const spy = jest
+          .spyOn(
+            jest.requireActual('../../src/common/database/wrappers/domain-state'),
+            'getDomainStateRecordOrEmpty'
+          )
+          .mockImplementationOnce(async () => {
+            await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
+            return createEmptyDomainStateRecord(req.domain)
+          })
+
+        const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
+        configWithShortTimeout.timeout = testTimeoutMS
+        const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
+
+        const res = await request(appWithShortTimeout).post(SignerEndpoint.DOMAIN_SIGN).send(req)
+        expect(res.status).toBe(500)
+        expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+          success: false,
+          error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+          version: expectedVersion,
+        })
+        spy.mockRestore()
+        // Allow time for non-killed processes to finish
+        await new Promise((resolve) => setTimeout(resolve, delay))
+        // Check that DB state was not updated on timeout
+        expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(
+          null
+        )
       })
     })
   })

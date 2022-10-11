@@ -1,5 +1,5 @@
 import { timeout } from '@celo/base'
-import { DisableDomainRequest, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { DisableDomainRequest, domainHash } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { Action } from '../../../common/action'
 import { toSequentialDelayDomainState } from '../../../common/database/models/domain-state'
@@ -29,44 +29,35 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
       },
       'Processing request to disable domain'
     )
-    try {
-      // Inside a database transaction, update or create the domain to mark it disabled.
-      const res = await this.db.transaction(async (trx) => {
-        const disableDomainHandler = async () => {
-          const domainStateRecord =
-            (await getDomainStateRecord(this.db, domain, session.logger, trx)) ??
-            (await insertDomainStateRecord(
-              this.db,
-              createEmptyDomainStateRecord(domain, true),
-              trx,
-              session.logger
-            ))
-          if (!domainStateRecord.disabled) {
-            await setDomainDisabled(this.db, domain, trx, session.logger)
-            domainStateRecord.disabled = true
-          }
-          return {
-            success: true,
-            status: 200,
-            domainStateRecord,
-          }
+    // Inside a database transaction, update or create the domain to mark it disabled.
+    const res = await this.db.transaction(async (trx) => {
+      const disableDomainHandler = async () => {
+        const domainStateRecord =
+          (await getDomainStateRecord(this.db, domain, session.logger, trx)) ??
+          (await insertDomainStateRecord(
+            this.db,
+            createEmptyDomainStateRecord(domain, true),
+            trx,
+            session.logger
+          ))
+        if (!domainStateRecord.disabled) {
+          await setDomainDisabled(this.db, domain, trx, session.logger)
+          domainStateRecord.disabled = true
         }
-        return await timeout(disableDomainHandler, [], this.config.timeout, timeoutError)
-      })
-
-      this.io.sendSuccess(
-        res.status,
-        session.response,
-        toSequentialDelayDomainState(res.domainStateRecord)
-      )
-    } catch (error) {
-      // TODO EN: try to move this into outer controller class
-      // TODO EN: same here, try to clean this up a bit
-      if (error === timeoutError) {
-        throw error
+        return {
+          success: true,
+          status: 200,
+          domainStateRecord,
+        }
       }
-      session.logger.error(error, 'Error while disabling domain')
-      this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)
-    }
+      // Ensure timeouts roll back DB trx
+      return await timeout(disableDomainHandler, [], this.config.timeout, timeoutError)
+    })
+
+    this.io.sendSuccess(
+      res.status,
+      session.response,
+      toSequentialDelayDomainState(res.domainStateRecord)
+    )
   }
 }

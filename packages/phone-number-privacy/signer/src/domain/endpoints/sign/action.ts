@@ -3,7 +3,6 @@ import {
   Domain,
   domainHash,
   DomainRestrictedSignatureRequest,
-  ErrorMessage,
   ErrorType,
   ThresholdPoprfServer,
   WarningMessage,
@@ -59,96 +58,87 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
       },
       'Processing request to get domain signature '
     )
-    try {
-      const res: TrxResult = await this.db.transaction(async (trx) => {
-        const domainSignHandler = async (): Promise<TrxResult> => {
-          // Get the current domain state record, or use an empty record if one does not exist.
-          const domainStateRecord = await this.quota.getQuotaStatus(session, trx)
+    const res: TrxResult = await this.db.transaction(async (trx) => {
+      const domainSignHandler = async (): Promise<TrxResult> => {
+        // Get the current domain state record, or use an empty record if one does not exist.
+        const domainStateRecord = await this.quota.getQuotaStatus(session, trx)
 
-          // Note that this action occurs in the same transaction as the remainder of the siging
-          // action. As a result, this is included here rather than in the authentication function.
-          if (!this.nonceCheck(domainStateRecord, session)) {
-            return {
-              success: false,
-              status: 401,
-              domainStateRecord,
-              error: WarningMessage.INVALID_NONCE,
-            }
-          }
-
-          const quotaStatus = await this.quota.checkAndUpdateQuotaStatus(
-            domainStateRecord,
-            session,
-            trx
-          )
-
-          if (!quotaStatus.sufficient) {
-            session.logger.warn(
-              {
-                name: domain.name,
-                version: domain.version,
-                hash: domainHash(domain),
-              },
-              `Exceeded quota`
-            )
-            return {
-              success: false,
-              status: 429,
-              domainStateRecord: quotaStatus.state,
-              error: WarningMessage.EXCEEDED_QUOTA,
-            }
-          }
-
-          const key: Key = {
-            version:
-              this.io.getRequestKeyVersion(session.request, session.logger) ??
-              this.config.keystore.keys.domains.latest,
-            name: DefaultKeyName.DOMAINS,
-          }
-
-          // Compute evaluation inside transaction so it will rollback on error.
-          const evaluation = await this.eval(
-            domain,
-            session.request.body.blindedMessage,
-            key,
-            session
-          )
-
+        // Note that this action occurs in the same transaction as the remainder of the siging
+        // action. As a result, this is included here rather than in the authentication function.
+        if (!this.nonceCheck(domainStateRecord, session)) {
           return {
-            success: true,
-            status: 200,
-            domainStateRecord: quotaStatus.state,
-            key,
-            signature: evaluation.toString('base64'),
+            success: false,
+            status: 401,
+            domainStateRecord,
+            error: WarningMessage.INVALID_NONCE,
           }
         }
-        return await timeout(domainSignHandler, [], this.config.timeout, timeoutError)
-      })
 
-      if (res.success) {
-        this.io.sendSuccess(
-          res.status,
-          session.response,
-          res.key,
-          res.signature,
-          toSequentialDelayDomainState(res.domainStateRecord)
+        const quotaStatus = await this.quota.checkAndUpdateQuotaStatus(
+          domainStateRecord,
+          session,
+          trx
         )
-      } else {
-        this.io.sendFailure(
-          res.error,
-          res.status,
-          session.response,
-          toSequentialDelayDomainState(res.domainStateRecord)
+
+        if (!quotaStatus.sufficient) {
+          session.logger.warn(
+            {
+              name: domain.name,
+              version: domain.version,
+              hash: domainHash(domain),
+            },
+            `Exceeded quota`
+          )
+          return {
+            success: false,
+            status: 429,
+            domainStateRecord: quotaStatus.state,
+            error: WarningMessage.EXCEEDED_QUOTA,
+          }
+        }
+
+        const key: Key = {
+          version:
+            this.io.getRequestKeyVersion(session.request, session.logger) ??
+            this.config.keystore.keys.domains.latest,
+          name: DefaultKeyName.DOMAINS,
+        }
+
+        // Compute evaluation inside transaction so it will rollback on error.
+        const evaluation = await this.eval(
+          domain,
+          session.request.body.blindedMessage,
+          key,
+          session
         )
+
+        return {
+          success: true,
+          status: 200,
+          domainStateRecord: quotaStatus.state,
+          key,
+          signature: evaluation.toString('base64'),
+        }
       }
-    } catch (error) {
-      // TODO EN: try to move this into outer controller class
-      // TODO EN: try to clean this up to not need to re-throw the timeout error?
-      if (error === timeoutError) {
-        throw error
-      }
-      session.logger.error(error, 'Failed to get signature for a domain')
-      this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)
+      // Ensure timeouts roll back DB trx
+      return await timeout(domainSignHandler, [], this.config.timeout, timeoutError)
+    })
+
+    if (res.success) {
+      this.io.sendSuccess(
+        res.status,
+        session.response,
+        res.key,
+        res.signature,
+        toSequentialDelayDomainState(res.domainStateRecord)
+      )
+    } else {
+      this.io.sendFailure(
+        res.error,
+        res.status,
+        session.response,
+        toSequentialDelayDomainState(res.domainStateRecord)
+      )
     }
   }
 

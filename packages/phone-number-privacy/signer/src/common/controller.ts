@@ -23,18 +23,24 @@ export class Controller<R extends OdisRequest> {
       },
       [],
       (err: any) => {
-        // TODO EN: can reduce duplication here a bit more (i.e. just change error)
-        // TODO EN: can consider adding generic DB error handling here
-        if (err === timeoutError) {
-          Counters.timeouts.inc()
-          this.action.io.sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, response)
-          return
+        response.locals.logger.error({ err }, `Error in handler for ${this.action.io.endpoint}`)
+        let errMsg: any
+        switch (err) {
+          case timeoutError: {
+            Counters.timeouts.inc()
+            errMsg = ErrorMessage.TIMEOUT_FROM_SIGNER
+            break
+          }
+          case ErrorMessage.DATABASE_GET_FAILURE:
+          case ErrorMessage.DATABASE_INSERT_FAILURE:
+          case ErrorMessage.DATABASE_UPDATE_FAILURE:
+            errMsg = err
+            break
+          default:
+            errMsg = ErrorMessage.UNKNOWN_ERROR
+            break
         }
-        response.locals.logger.error(
-          { err },
-          `Unknown error in handler for ${this.action.io.endpoint}`
-        )
-        this.action.io.sendFailure(ErrorMessage.UNKNOWN_ERROR, 500, response)
+        this.action.io.sendFailure(errMsg, 500, response)
       },
       Histograms.responseLatency,
       [this.action.io.endpoint]
