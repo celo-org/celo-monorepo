@@ -140,6 +140,7 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
         )
       }
     } catch (error) {
+      // TODO EN: try to move this into outer controller class
       if (error === timeoutRes) {
         this.io.sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, session.response)
         return

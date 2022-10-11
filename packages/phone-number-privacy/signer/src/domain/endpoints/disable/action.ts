@@ -1,3 +1,4 @@
+import { timeout } from '@celo/base'
 import { DisableDomainRequest, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { Action } from '../../../common/action'
@@ -25,27 +26,30 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
       },
       'Processing request to disable domain'
     )
-
+    const timeoutRes = Symbol()
     try {
       // Inside a database transaction, update or create the domain to mark it disabled.
       const res = await this.db.transaction(async (trx) => {
-        const domainStateRecord =
-          (await getDomainStateRecord(this.db, domain, session.logger, trx)) ??
-          (await insertDomainStateRecord(
-            this.db,
-            createEmptyDomainStateRecord(domain, true),
-            trx,
-            session.logger
-          ))
-        if (!domainStateRecord.disabled) {
-          await setDomainDisabled(this.db, domain, trx, session.logger)
-          domainStateRecord.disabled = true
+        const disableDomainHandler = async () => {
+          const domainStateRecord =
+            (await getDomainStateRecord(this.db, domain, session.logger, trx)) ??
+            (await insertDomainStateRecord(
+              this.db,
+              createEmptyDomainStateRecord(domain, true),
+              trx,
+              session.logger
+            ))
+          if (!domainStateRecord.disabled) {
+            await setDomainDisabled(this.db, domain, trx, session.logger)
+            domainStateRecord.disabled = true
+          }
+          return {
+            success: true,
+            status: 200,
+            domainStateRecord,
+          }
         }
-        return {
-          success: true,
-          status: 200,
-          domainStateRecord,
-        }
+        return await timeout(disableDomainHandler, [], this.config.timeout, timeoutRes)
       })
 
       this.io.sendSuccess(
@@ -54,6 +58,11 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
         toSequentialDelayDomainState(res.domainStateRecord)
       )
     } catch (error) {
+      // TODO EN: try to move this into outer controller class
+      if (error === timeoutRes) {
+        this.io.sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, session.response)
+        return
+      }
       session.logger.error(error, 'Error while disabling domain')
       this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)
     }

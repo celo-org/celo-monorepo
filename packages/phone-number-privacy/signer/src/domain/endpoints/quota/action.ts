@@ -1,3 +1,4 @@
+import { timeout } from '@celo/base'
 import {
   domainHash,
   DomainQuotaStatusRequest,
@@ -24,10 +25,21 @@ export class DomainQuotaAction implements Action<DomainQuotaStatusRequest> {
       version: domain.version,
       hash: domainHash(domain).toString('hex'),
     })
+    const timeoutRes = Symbol()
     try {
-      const domainStateRecord = await this.quotaService.getQuotaStatus(session)
+      const domainStateRecord = await timeout(
+        () => this.quotaService.getQuotaStatus(session),
+        [],
+        this.config.timeout,
+        timeoutRes
+      )
       this.io.sendSuccess(200, session.response, toSequentialDelayDomainState(domainStateRecord))
     } catch (error) {
+      // TODO EN: try to move this into outer controller class
+      if (error === timeoutRes) {
+        this.io.sendFailure(ErrorMessage.TIMEOUT_FROM_SIGNER, 500, session.response)
+        return
+      }
       session.logger.error(error, 'Error while getting domain status')
       this.io.sendFailure(ErrorMessage.DATABASE_GET_FAILURE, 500, session.response)
     }
