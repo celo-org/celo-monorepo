@@ -40,7 +40,6 @@ testWithGanache('governance:vote-partially cmd', (web3: Web3) => {
     ])
     await Register.run(['--from', accounts[0]])
     await Lock.run(['--from', accounts[0], '--value', '100'])
-    await timeTravel(expConfig.approvalStageDuration, web3)
   })
 
   test('can vote partially yes and no', async () => {
