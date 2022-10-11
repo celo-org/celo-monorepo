@@ -494,7 +494,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     })
     const validators = await this.contracts.getValidators()
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      validators.getValidatorGroup(e.returnValues.group, false)
+      validators.getValidatorGroup(e.returnValues.group, false, blockNumber)
     )
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
@@ -524,7 +524,9 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
           epochNumber
         )
       ))
+    //console.warn("About to get group rewards")
     const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)
+    //console.warn("Got group rewards")
     const voterRewards = groupVoterRewards.filter(
       (e: GroupVoterReward) => normalizeAddressWith0x(e.group.address) in activeVoteShare
     )

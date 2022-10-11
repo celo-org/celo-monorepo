@@ -49,7 +49,8 @@ export default class Show extends BaseCommand {
     const lockedGold = await this.kit.contracts.getLockedGold()
     const currentEpoch = (await validators.getEpochNumber()).toNumber()
     const checkBuilder = newCheckBuilder(this)
-    const epochs = Math.max(1, res.flags.epochs || 1)
+    //const epochs = Math.max(1, res.flags.epochs || 1)
+    const epochs = res.flags.epochs
 
     if (res.flags.validator) {
       if (res.flags.voter || res.flags.group) {
@@ -73,13 +74,17 @@ export default class Show extends BaseCommand {
 
     cli.action.start(`Calculating rewards`)
     // Accumulate the rewards from each epoch
-    for (
+    /* for (
       let epochNumber = Math.max(0, currentEpoch - epochs);
       epochNumber < currentEpoch;
       epochNumber++
-    ) {
+    ) */
+    for (let epochNumber = epochs; epochNumber < currentEpoch; epochNumber++) {
+      console.warn(`The epoch is ${epochNumber}`)
       if (!filter || res.flags.voter) {
+        console.warn('Test 1')
         const electedValidators = await election.getElectedValidators(epochNumber)
+        console.warn('Test 2')
         if (!filter) {
           const epochGroupVoterRewards = await election.getGroupVoterRewards(epochNumber)
           groupVoterRewards = groupVoterRewards.concat(
@@ -90,14 +95,18 @@ export default class Show extends BaseCommand {
               })
             )
           )
+          console.warn('Test 3')
         } else if (res.flags.voter) {
+          console.warn('Test 4')
           const address = res.flags.voter
           try {
+            console.warn('Test A')
             const epochVoterRewards = await election.getVoterRewards(
               address,
               epochNumber,
               res.flags.estimate ? await election.getVoterShare(address) : undefined
             )
+            console.warn('Test 5')
             voterRewards = voterRewards.concat(
               epochVoterRewards.map(
                 (e: VoterReward): ExplainedVoterReward => ({
@@ -106,6 +115,7 @@ export default class Show extends BaseCommand {
                 })
               )
             )
+            console.warn('Test 6')
           } catch (error: any) {
             if (error.message.includes('missing trie node')) {
               throw new Error(
@@ -113,17 +123,22 @@ export default class Show extends BaseCommand {
                   'Supply --estimate to estimate rewards based on current votes, or use an archive node.'
               )
             } else {
-              throw error
+              console.warn(`failed the epoch with ${error}`)
+              //throw error
             }
           }
         }
       }
-
+      let epochValidatorRewards: ValidatorReward[] = []
+      console.warn('Test 7')
       if (!filter || res.flags.validator || res.flags.group) {
-        const epochValidatorRewards: ValidatorReward[] = await validators.getValidatorRewards(
-          epochNumber
-        )
+        try {
+          epochValidatorRewards = await validators.getValidatorRewards(epochNumber)
+        } catch (error: any) {
+          console.warn(`failed the epoch with ${error}`)
+        }
 
+        console.warn('Test 8')
         if (!filter || res.flags.validator) {
           const address = res.flags.validator
           validatorRewards = validatorRewards.concat(
@@ -134,6 +149,7 @@ export default class Show extends BaseCommand {
               : epochValidatorRewards
           )
         }
+        console.warn('Test 9')
 
         if (!filter || res.flags.group) {
           const address = res.flags.group
@@ -146,6 +162,7 @@ export default class Show extends BaseCommand {
           )
         }
       }
+      console.warn('Test 10')
 
       if (res.flags.slashing) {
         const epochAccountsSlashed = await lockedGold.getAccountsSlashed(epochNumber)
@@ -155,6 +172,7 @@ export default class Show extends BaseCommand {
         )
       }
     }
+    console.warn('Test 11')
 
     // Slashing rewards are available before the current epoch ends
     if (res.flags.slashing) {
@@ -164,6 +182,7 @@ export default class Show extends BaseCommand {
         address ? filterAccountsSlashed(epochAccountsSlashed, address) : epochAccountsSlashed
       )
     }
+    console.warn('Test 12')
 
     cli.action.stop()
 

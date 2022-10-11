@@ -286,10 +286,14 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
 
   /** Get Validator information */
   async getValidator(address: Address, blockNumber?: number): Promise<Validator> {
+    //console.warn(`about to get validator ${ address } for blockNumber ${ blockNumber }`)
     // @ts-ignore: Expected 0-1 arguments, but got 2
     const res = await this.contract.methods.getValidator(address).call({}, blockNumber)
+    // console.warn("got the validator")
     const accounts = await this.contracts.getAccounts()
+    //console.warn("got the accounts")
     const name = (await accounts.getName(address, blockNumber)) || ''
+    //console.warn("got the name")
 
     return {
       name,
@@ -600,16 +604,20 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
    * @param epochNumber The epoch to retrieve ValidatorRewards at.
    */
   async getValidatorRewards(epochNumber: number): Promise<ValidatorReward[]> {
+    //console.warn("getting validator rewards")
     const blockNumber = await this.getLastBlockNumberForEpoch(epochNumber)
     const events = await this.getPastEvents('ValidatorEpochPaymentDistributed', {
       fromBlock: blockNumber,
       toBlock: blockNumber,
     })
-    const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidator(e.returnValues.validator)
-    )
+    //console.warn("about to get validator")
+    const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) => {
+      //						       console.warn(`about to get validator ${ e.returnValues.validator }`)
+      return this.getValidator(e.returnValues.validator, blockNumber)
+    })
+    //   console.log("about to get validator group")
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, false)
+      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
     )
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({
