@@ -5,6 +5,7 @@ import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import Execute from './execute'
 import Propose from './propose'
 
@@ -25,7 +26,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
 
   const createExchangeProposal = () => {
     // create mock proposal
-    return Propose.run([
+    return testLocally(Propose, [
       '--from',
       accounts[0],
       '--sellCelo',
@@ -73,7 +74,7 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
 
   describe('execute', () => {
     it('executes the proposal', async () => {
-      await Execute.run(['--from', accounts[0], '--proposalID', '1'])
+      await testLocally(Execute, ['--from', accounts[0], '--proposalID', '1'])
       const activeProposals = await grandaMento.getActiveProposalIds()
       expect(activeProposals).toEqual([])
     })
@@ -82,7 +83,9 @@ testWithGanache('grandamento:execute cmd', (web3: Web3) => {
       // Create a proposal with proposalID 2, but don't wait the veto period
       await createExchangeProposal()
       await approveExchangeProposal(2)
-      await expect(Execute.run(['--from', accounts[0], '--proposalID', '2'])).rejects.toThrow()
+      await expect(
+        testLocally(Execute, ['--from', accounts[0], '--proposalID', '2'])
+      ).rejects.toThrow()
     })
   })
 })
