@@ -710,7 +710,7 @@ contract Governance is
 
     require(
       totalLockedGold >= getTotalWeightRequested(weights),
-      "Voter doesn't have enough locked gold"
+      "Voter doesn't have enough locked Celo (formerly known as Celo Gold) "
     );
     VoteRecord storage previousVoteRecord = voter.referendumVotes[index];
 
