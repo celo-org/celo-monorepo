@@ -1,6 +1,7 @@
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { addressToPublicKey } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import Lock from '../lockedgold/lock'
 import ValidatorRegister from '../validator/register'
 import Authorize from './authorize'
@@ -11,8 +12,8 @@ process.env.NO_SYNCCHECK = 'true'
 testWithGanache('account:authorize cmd', (web3: Web3) => {
   test('can authorize vote signer', async () => {
     const accounts = await web3.eth.getAccounts()
-    await Register.run(['--from', accounts[0]])
-    await Authorize.run([
+    await testLocally(Register, ['--from', accounts[0]])
+    await testLocally(Authorize, [
       '--from',
       accounts[0],
       '--role',
@@ -26,8 +27,8 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
 
   test('can authorize attestation signer', async () => {
     const accounts = await web3.eth.getAccounts()
-    await Register.run(['--from', accounts[0]])
-    await Authorize.run([
+    await testLocally(Register, ['--from', accounts[0]])
+    await testLocally(Authorize, [
       '--from',
       accounts[0],
       '--role',
@@ -41,8 +42,8 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
 
   test('can authorize validator signer before validator is registered', async () => {
     const accounts = await web3.eth.getAccounts()
-    await Register.run(['--from', accounts[0]])
-    await Authorize.run([
+    await testLocally(Register, ['--from', accounts[0]])
+    await testLocally(Authorize, [
       '--from',
       accounts[0],
       '--role',
@@ -59,9 +60,9 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
     const newBlsPublicKey = web3.utils.randomHex(96)
     const newBlsPoP = web3.utils.randomHex(48)
     const ecdsaPublicKey = await addressToPublicKey(accounts[0], web3.eth.sign)
-    await Register.run(['--from', accounts[0]])
-    await Lock.run(['--from', accounts[0], '--value', '10000000000000000000000'])
-    await ValidatorRegister.run([
+    await testLocally(Register, ['--from', accounts[0]])
+    await testLocally(Lock, ['--from', accounts[0], '--value', '10000000000000000000000'])
+    await testLocally(ValidatorRegister, [
       '--from',
       accounts[0],
       '--ecdsaKey',
@@ -72,7 +73,7 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
       '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900',
       '--yes',
     ])
-    await Authorize.run([
+    await testLocally(Authorize, [
       '--from',
       accounts[0],
       '--role',
@@ -91,9 +92,9 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
   test('cannot authorize validator signer without BLS after validator is registered', async () => {
     const accounts = await web3.eth.getAccounts()
     const ecdsaPublicKey = await addressToPublicKey(accounts[0], web3.eth.sign)
-    await Register.run(['--from', accounts[0]])
-    await Lock.run(['--from', accounts[0], '--value', '10000000000000000000000'])
-    await ValidatorRegister.run([
+    await testLocally(Register, ['--from', accounts[0]])
+    await testLocally(Lock, ['--from', accounts[0], '--value', '10000000000000000000000'])
+    await testLocally(ValidatorRegister, [
       '--from',
       accounts[0],
       '--ecdsaKey',
@@ -105,7 +106,7 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
       '--yes',
     ])
     await expect(
-      Authorize.run([
+      testLocally(Authorize, [
         '--from',
         accounts[0],
         '--role',
@@ -121,9 +122,9 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
   test('can force authorize validator signer without BLS after validator is registered', async () => {
     const accounts = await web3.eth.getAccounts()
     const ecdsaPublicKey = await addressToPublicKey(accounts[0], web3.eth.sign)
-    await Register.run(['--from', accounts[0]])
-    await Lock.run(['--from', accounts[0], '--value', '10000000000000000000000'])
-    await ValidatorRegister.run([
+    await testLocally(Register, ['--from', accounts[0]])
+    await testLocally(Lock, ['--from', accounts[0], '--value', '10000000000000000000000'])
+    await testLocally(ValidatorRegister, [
       '--from',
       accounts[0],
       '--ecdsaKey',
@@ -134,7 +135,7 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
       '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900',
       '--yes',
     ])
-    await Authorize.run([
+    await testLocally(Authorize, [
       '--from',
       accounts[0],
       '--role',
@@ -150,7 +151,7 @@ testWithGanache('account:authorize cmd', (web3: Web3) => {
   test('fails if from is not an account', async () => {
     const accounts = await web3.eth.getAccounts()
     await expect(
-      Authorize.run([
+      testLocally(Authorize, [
         '--from',
         accounts[0],
         '--role',
