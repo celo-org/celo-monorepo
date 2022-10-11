@@ -356,6 +356,36 @@ EXAMPLE
 
 _See code: [src/commands/governance/vote.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/vote.ts)_
 
+## `celocli governance:votePartially`
+
+Vote partially on an approved governance proposal
+
+```
+Vote partially on an approved governance proposal
+
+USAGE
+  $ celocli governance:votePartially
+
+OPTIONS
+  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
+  --globalHelp                                       View all available global flags
+
+  --proposalID=proposalID                            (required) UUID of proposal to vote
+                                                     on
+
+  --values=values                                    (required) Array of votes split by
+                                                     ','
+
+  --weights=weights                                  (required) Array of weights split
+                                                     by ','
+
+EXAMPLE
+  vote-partially --proposalID 99 --values Yes,No --weights 10,20 --from
+  0x5409ed021d9299bf6814279a6a1411a7e866a631
+```
+
+_See code: [src/commands/governance/votePartially.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/governance/votePartially.ts)_
+
 ## `celocli governance:whitelisthotfix`
 
 Whitelist a governance hotfix
