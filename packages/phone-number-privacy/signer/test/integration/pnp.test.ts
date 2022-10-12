@@ -49,8 +49,6 @@ const {
   DEK_PUBLIC_KEY,
 } = TestUtils.Values
 
-// TODO(2.0.0, timeout) revisit flake tracker timeouts under the umbrella of
-// https://github.com/celo-org/celo-monorepo/issues/9845
 jest.setTimeout(20000)
 
 const testBlockNumber = 1000000
@@ -417,9 +415,6 @@ describe('pnp', () => {
           })
         })
 
-        // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
-        // Due to weird timeout handling, the signer continues to return responses
-        // after returning the initial error on timeout.
         it('Should respond with 500 on signer timeout', async () => {
           const testTimeoutMS = 200
           const delay = 100
@@ -450,7 +445,6 @@ describe('pnp', () => {
             undefined,
             appWithShortTimeout
           )
-          // TODO EN: maybe reset mocks in the beforeEach??
           // Ensure that this is restored before test can fail on assertions
           // to prevent failures in other tests
           spy.mockRestore()

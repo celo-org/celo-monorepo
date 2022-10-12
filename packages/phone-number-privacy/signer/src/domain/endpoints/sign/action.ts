@@ -47,7 +47,7 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
 
   public async perform(
     session: DomainSession<DomainRestrictedSignatureRequest>,
-    timeoutError: Symbol
+    timeoutError: symbol
   ): Promise<void> {
     const domain = session.request.body.domain
     session.logger.info(
@@ -121,7 +121,7 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
         }
       }
       // Ensure timeouts roll back DB trx
-      return await timeout(domainSignHandler, [], this.config.timeout, timeoutError)
+      return timeout(domainSignHandler, [], this.config.timeout, timeoutError)
     })
 
     if (res.success) {

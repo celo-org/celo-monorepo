@@ -56,8 +56,6 @@ const {
   DEK_PUBLIC_KEY,
 } = TestUtils.Values
 
-// TODO(2.0.0, timeout) revisit flake tracker timeouts under the umbrella of
-// https://github.com/celo-org/celo-monorepo/issues/9845
 jest.setTimeout(20000)
 
 const expectedSignature =
@@ -680,7 +678,6 @@ describe('legacyPNP', () => {
             undefined,
             appWithShortTimeout
           )
-          // TODO EN: maybe reset mocks in the beforeEach??
           // Ensure that this is restored before test can fail on assertions
           // to prevent failures in other tests
           spy.mockRestore()

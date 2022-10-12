@@ -38,8 +38,6 @@ import { KeyProvider } from '../../src/common/key-management/key-provider-base'
 import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
-// TODO(2.0.0, timeout) revisit flake tracker timeouts under the umbrella of
-// https://github.com/celo-org/celo-monorepo/issues/9845
 jest.setTimeout(20000)
 
 describe('domain', () => {
@@ -346,7 +344,6 @@ describe('domain', () => {
         const appWithShortTimeout = startSigner(configWithShortTimeout, db, keyProvider)
 
         const req = await disableRequest()
-        // TODO EN: double check that this works & why doesn't mocking this function work for the other tests?
         const spy = jest
           .spyOn(
             jest.requireActual('../../src/common/database/wrappers/domain-state'),
@@ -948,7 +945,7 @@ describe('domain', () => {
         expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
           success: false,
           version: expectedVersion,
-          error: ErrorMessage.DATABASE_GET_FAILURE, // TODO EN: this should ideally be DB GET FAILURE
+          error: ErrorMessage.DATABASE_GET_FAILURE,
         })
         expect(await getDomainStateRecord(db, req.domain, rootLogger(_config.serviceName))).toBe(
           null

@@ -16,7 +16,7 @@ export class DomainQuotaAction implements Action<DomainQuotaStatusRequest> {
 
   public async perform(
     session: DomainSession<DomainQuotaStatusRequest>,
-    timeoutError: Symbol
+    timeoutError: symbol
   ): Promise<void> {
     const domain = session.request.body.domain
     session.logger.info('Processing request to get domain quota status', {

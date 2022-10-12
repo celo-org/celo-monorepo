@@ -65,23 +65,18 @@ export function startSigner(
     app.post(endpoint, async (req, res) => {
       const childLogger: Logger = res.locals.logger
       try {
-        // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
         await handler(req, res)
       } catch (err: any) {
         // Handle any errors that otherwise managed to escape the proper handlers
-        let errorMsg: string = ErrorMessage.UNKNOWN_ERROR
-        let errToLog = err
-        childLogger.error({ err: errToLog }, 'Caught error in outer endpoint handler')
+        childLogger.error({ err }, 'Caught error in outer endpoint handler')
         if (!res.writableEnded && !res.headersSent) {
           childLogger.info('Responding with error in outer endpoint handler')
           res.status(500).json({
             success: false,
-            error: errorMsg,
+            error: ErrorMessage.UNKNOWN_ERROR,
           })
         } else {
-          // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
-          // TODO(2.0.0, audit responses) https://github.com/celo-org/celo-monorepo/issues/9859
-          // getting to this error indicates that either timeout or `perform` process
+          // Getting to this error likely indicates that the `perform` process
           // does not terminate after sending a response, and then throws an error.
           childLogger.error('Error in endpoint thrown after response was already sent')
         }

@@ -20,7 +20,7 @@ export class PnpQuotaAction implements Action<PnpQuotaRequest | LegacyPnpQuotaRe
 
   public async perform(
     session: PnpSession<PnpQuotaRequest | LegacyPnpQuotaRequest>,
-    timeoutError: Symbol
+    timeoutError: symbol
   ): Promise<void> {
     const quotaStatus = await timeout(
       () => this.quota.getQuotaStatus(session),

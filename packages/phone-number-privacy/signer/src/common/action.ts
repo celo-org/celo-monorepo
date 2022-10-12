@@ -17,5 +17,5 @@ export type Session<R extends OdisRequest> = R extends DomainRequest
 export interface Action<R extends OdisRequest> {
   readonly config: SignerConfig
   readonly io: IO<R>
-  perform(session: Session<R>, timeoutError: Symbol): Promise<void>
+  perform(session: Session<R>, timeoutError: symbol): Promise<void>
 }

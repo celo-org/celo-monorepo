@@ -32,7 +32,7 @@ export abstract class PnpSignAction
 
   public async perform(
     session: PnpSession<SignMessageRequest | LegacySignMessageRequest>,
-    timeoutError: Symbol
+    timeoutError: symbol
   ): Promise<void> {
     // Compute quota lookup, update, and signing within transaction
     // so that these occur atomically and rollback on error.

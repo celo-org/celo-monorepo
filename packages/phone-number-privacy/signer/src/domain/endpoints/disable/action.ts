@@ -18,7 +18,7 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
 
   public async perform(
     session: DomainSession<DisableDomainRequest>,
-    timeoutError: Symbol
+    timeoutError: symbol
   ): Promise<void> {
     const domain = session.request.body.domain
     session.logger.info(
@@ -51,7 +51,7 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
         }
       }
       // Ensure timeouts roll back DB trx
-      return await timeout(disableDomainHandler, [], this.config.timeout, timeoutError)
+      return timeout(disableDomainHandler, [], this.config.timeout, timeoutError)
     })
 
     this.io.sendSuccess(
