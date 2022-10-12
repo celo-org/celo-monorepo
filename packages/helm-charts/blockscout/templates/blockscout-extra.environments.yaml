@@ -8,6 +8,7 @@ metadata:
     component: blockscout-web
   annotations:
     {{- include "celo.blockscout.annotations" (dict "Values" $.Values "Release" $.Release ) | nindent 4 }}
+    "helm.sh/resource-policy": keep
 spec:
   externalName: {{ .ingressIp }}
   ports:
@@ -31,6 +32,7 @@ metadata:
     {{- include "celo.blockscout.labels" . | nindent 4 }}
     component: blockscout-web-ingress
   annotations:
+    "helm.sh/resource-policy": keep
     nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: 8m

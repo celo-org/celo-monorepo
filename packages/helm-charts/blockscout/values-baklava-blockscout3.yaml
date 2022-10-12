@@ -37,9 +37,6 @@ blockscout:
     suffix:
       enabled: true
       path: "baklava"
-    extraEnvironments:
-      target:
-      - sourceHost: explorer.celo.org
     autoscaling:
       maxReplicas: 3
       minReplicas: 2
