@@ -1,5 +1,6 @@
 pragma solidity ^0.5.13;
 
+import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
@@ -788,5 +789,16 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
     uint256 index
   ) external nonReentrant onlyWhenInProperState {
     getElection().revokePending(group, value, lesser, greater, index);
+  }
+
+  /**
+   * Returns currently withdrawable amount.
+  */
+  function getWithdrawableAmount() public view returns (uint256) {
+    return
+      Math.min(
+        Math.min(maxDistribution, getCurrentReleasedTotalAmount()).sub(totalWithdrawn),
+        getRemainingUnlockedBalance()
+      );
   }
 }

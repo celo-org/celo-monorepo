@@ -2049,4 +2049,83 @@ contract('ReleaseGold', (accounts: string[]) => {
       )
     })
   })
+
+  describe('#getWithdrawableAmount', () => {
+    let initialreleaseGoldAmount: any
+
+    beforeEach(async () => {
+      const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
+      releaseGoldSchedule.canValidate = true
+      releaseGoldSchedule.revocable = false
+      releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
+      releaseGoldSchedule.releaseStartTime = Math.round(Date.now() / 1000)
+      releaseGoldSchedule.initialDistributionRatio = 500
+      await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
+      initialreleaseGoldAmount = releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
+        releaseGoldSchedule.numReleasePeriods
+      )
+
+      await releaseGoldInstance.createAccount({ from: beneficiary })
+    })
+
+    describe('should return 50% the released amount of gold right after the beginning of the second quarter', async () => {
+      beforeEach(async () => {
+        await releaseGoldInstance.setMaxDistribution(1000, { from: releaseOwner })
+
+        const timeToTravel = 6 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+      })
+
+      it('should return full amount', async () => {
+        const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
+        const withdrawableAmount = await releaseGoldInstance.getWithdrawableAmount()
+        assertEqualBN(withdrawableAmount, expectedWithdrawalAmount)
+      })
+
+      it('should return only only amount not yet withdrawn', async () => {
+        const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
+        await releaseGoldInstance.withdraw(expectedWithdrawalAmount.div(2), { from: beneficiary })
+
+        const afterWithdrawal = await releaseGoldInstance.getWithdrawableAmount()
+        await releaseGoldInstance.getWithdrawableAmount()
+        assertEqualBN(afterWithdrawal, expectedWithdrawalAmount.div(2))
+      })
+    })
+
+    it('should return only up to its own balance', async () => {
+      await releaseGoldInstance.setMaxDistribution(1000, { from: releaseOwner })
+      const timeToTravel = 6 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
+
+      const authorized = accounts[4]
+      const ecdsaPublicKey = await addressToPublicKey(authorized, web3.eth.sign)
+      const sig = await getParsedSignatureOfAddress(web3, releaseGoldInstance.address, authorized)
+      // this will send 1 CELO from release gold balance to authorized
+      await releaseGoldInstance.authorizeValidatorSignerWithPublicKey(
+        authorized,
+        sig.v,
+        sig.r,
+        sig.s,
+        ecdsaPublicKey as any,
+        { from: beneficiary }
+      )
+
+      const signerFund = new BigNumber('1000000000000000000')
+
+      const withdrawableAmount = await releaseGoldInstance.getWithdrawableAmount()
+      assertEqualBN(withdrawableAmount, expectedWithdrawalAmount.minus(signerFund.div(2)))
+    })
+
+    it('should return only up to distribution', async () => {
+      const timeToTravel = 6 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
+
+      await releaseGoldInstance.setMaxDistribution(250, { from: releaseOwner })
+
+      const withdrawableAmount = await releaseGoldInstance.getWithdrawableAmount()
+      assertEqualBN(withdrawableAmount, expectedWithdrawalAmount.div(2))
+    })
+  })
 })
