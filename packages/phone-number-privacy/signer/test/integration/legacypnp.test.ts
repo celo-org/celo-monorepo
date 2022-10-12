@@ -24,6 +24,7 @@ import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
 import { ACCOUNTS_TABLE } from '../../src/common/database/models/account'
 import { REQUESTS_TABLE } from '../../src/common/database/models/request'
+import { countAndThrowDBError } from '../../src/common/database/utils'
 import {
   getPerformedQueryCount,
   incrementQueryCount,
@@ -1397,12 +1398,15 @@ describe('legacyPNP', () => {
         })
 
         it('Should return 500 on failure to increment query count', async () => {
+          const logger = rootLogger(_config.serviceName)
           const spy = jest
             .spyOn(
               jest.requireActual('../../src/common/database/wrappers/account'),
               'incrementQueryCount'
             )
-            .mockRejectedValueOnce(new Error())
+            .mockImplementationOnce(() => {
+              countAndThrowDBError(new Error(), logger, ErrorMessage.DATABASE_UPDATE_FAILURE)
+            })
 
           const req = getLegacyPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -1417,19 +1421,14 @@ describe('legacyPNP', () => {
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
-            error: ErrorMessage.UNKNOWN_ERROR,
+            error: ErrorMessage.DATABASE_UPDATE_FAILURE,
           })
 
           spy.mockRestore()
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(
-              db,
-              ACCOUNTS_TABLE.LEGACY,
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName)
-            )
+            await getPerformedQueryCount(db, ACCOUNTS_TABLE.LEGACY, ACCOUNT_ADDRESS1, logger)
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(
@@ -1437,15 +1436,18 @@ describe('legacyPNP', () => {
               REQUESTS_TABLE.LEGACY,
               req.account,
               req.blindedQueryPhoneNumber,
-              rootLogger(_config.serviceName)
+              logger
             )
           ).toBe(false)
         })
 
         it('Should return 500 on failure to store request', async () => {
+          const logger = rootLogger(_config.serviceName)
           const spy = jest
             .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
-            .mockRejectedValueOnce(new Error())
+            .mockImplementationOnce(() => {
+              countAndThrowDBError(new Error(), logger, ErrorMessage.DATABASE_INSERT_FAILURE)
+            })
 
           const req = getLegacyPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -1460,19 +1462,14 @@ describe('legacyPNP', () => {
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
-            error: ErrorMessage.UNKNOWN_ERROR,
+            error: ErrorMessage.DATABASE_INSERT_FAILURE,
           })
 
           spy.mockRestore()
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(
-              db,
-              ACCOUNTS_TABLE.LEGACY,
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName)
-            )
+            await getPerformedQueryCount(db, ACCOUNTS_TABLE.LEGACY, ACCOUNT_ADDRESS1, logger)
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(
@@ -1480,7 +1477,7 @@ describe('legacyPNP', () => {
               REQUESTS_TABLE.LEGACY,
               req.account,
               req.blindedQueryPhoneNumber,
-              rootLogger(_config.serviceName)
+              logger
             )
           ).toBe(false)
         })

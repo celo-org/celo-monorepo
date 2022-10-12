@@ -20,6 +20,7 @@ import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
 import { ACCOUNTS_TABLE } from '../../src/common/database/models/account'
 import { REQUESTS_TABLE } from '../../src/common/database/models/request'
+import { countAndThrowDBError } from '../../src/common/database/utils'
 import {
   getPerformedQueryCount,
   incrementQueryCount,
@@ -461,7 +462,6 @@ describe('pnp', () => {
           })
           // Allow time for non-killed processes to finish
           await new Promise((resolve) => setTimeout(resolve, delay))
-          console.log('leaving first timeout test')
         })
       })
     })
@@ -1084,12 +1084,15 @@ describe('pnp', () => {
         })
 
         it('Should return 500 on failure to increment query count', async () => {
+          const logger = rootLogger(_config.serviceName)
           const spy = jest
             .spyOn(
               jest.requireActual('../../src/common/database/wrappers/account'),
               'incrementQueryCount'
             )
-            .mockRejectedValueOnce(new Error())
+            .mockImplementationOnce(() => {
+              countAndThrowDBError(new Error(), logger, ErrorMessage.DATABASE_UPDATE_FAILURE)
+            })
 
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -1098,24 +1101,19 @@ describe('pnp', () => {
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          spy.mockRestore()
 
           expect.assertions(4)
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
-            error: ErrorMessage.UNKNOWN_ERROR,
+            error: ErrorMessage.DATABASE_UPDATE_FAILURE,
           })
 
-          spy.mockRestore()
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(
-              db,
-              ACCOUNTS_TABLE.ONCHAIN,
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName)
-            )
+            await getPerformedQueryCount(db, ACCOUNTS_TABLE.ONCHAIN, ACCOUNT_ADDRESS1, logger)
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(
@@ -1123,15 +1121,18 @@ describe('pnp', () => {
               REQUESTS_TABLE.ONCHAIN,
               req.account,
               req.blindedQueryPhoneNumber,
-              rootLogger(_config.serviceName)
+              logger
             )
           ).toBe(false)
         })
 
         it('Should return 500 on failure to store request', async () => {
+          const logger = rootLogger(_config.serviceName)
           const spy = jest
             .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
-            .mockRejectedValueOnce(new Error())
+            .mockImplementationOnce(() => {
+              countAndThrowDBError(new Error(), logger, ErrorMessage.DATABASE_INSERT_FAILURE)
+            })
 
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -1140,24 +1141,18 @@ describe('pnp', () => {
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          spy.mockRestore()
 
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
-            error: ErrorMessage.UNKNOWN_ERROR,
+            error: ErrorMessage.DATABASE_INSERT_FAILURE,
           })
-
-          spy.mockRestore()
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(
-              db,
-              ACCOUNTS_TABLE.ONCHAIN,
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName)
-            )
+            await getPerformedQueryCount(db, ACCOUNTS_TABLE.ONCHAIN, ACCOUNT_ADDRESS1, logger)
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(
@@ -1165,7 +1160,7 @@ describe('pnp', () => {
               REQUESTS_TABLE.ONCHAIN,
               req.account,
               req.blindedQueryPhoneNumber,
-              rootLogger(_config.serviceName)
+              logger
             )
           ).toBe(false)
         })

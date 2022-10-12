@@ -1,4 +1,10 @@
-import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessage,
+  ErrorType,
+  OdisRequest,
+  OdisResponse,
+  WarningMessage,
+} from '@celo/phone-number-privacy-common'
 import { Request, Response } from 'express'
 import { Action } from './action'
 import { Counters, Histograms, meter } from './metrics'
@@ -24,21 +30,18 @@ export class Controller<R extends OdisRequest> {
       [],
       (err: any) => {
         response.locals.logger.error({ err }, `Error in handler for ${this.action.io.endpoint}`)
-        let errMsg: any
-        switch (err) {
-          case timeoutError: {
-            Counters.timeouts.inc()
-            errMsg = ErrorMessage.TIMEOUT_FROM_SIGNER
-            break
-          }
-          case ErrorMessage.DATABASE_GET_FAILURE:
-          case ErrorMessage.DATABASE_INSERT_FAILURE:
-          case ErrorMessage.DATABASE_UPDATE_FAILURE:
-            errMsg = err
-            break
-          default:
-            errMsg = ErrorMessage.UNKNOWN_ERROR
-            break
+
+        let errMsg: ErrorType = ErrorMessage.UNKNOWN_ERROR
+        if (err === timeoutError) {
+          Counters.timeouts.inc()
+          errMsg = ErrorMessage.TIMEOUT_FROM_SIGNER
+        } else if (
+          err instanceof Error &&
+          // Propagate standard error & warning messages thrown during endpoint handling
+          (Object.values(ErrorMessage).includes(err.message as ErrorMessage) ||
+            Object.values(WarningMessage).includes(err.message as WarningMessage))
+        ) {
+          errMsg = err.message as ErrorType
         }
         this.action.io.sendFailure(errMsg, 500, response)
       },

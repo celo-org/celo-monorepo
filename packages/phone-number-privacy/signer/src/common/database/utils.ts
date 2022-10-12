@@ -30,7 +30,7 @@ export function countAndThrowDBError<T>(
 
   Counters.databaseErrors.labels(label).inc()
   logger.error({ err }, errorMsg)
-  throw errorMsg
+  throw new Error(errorMsg)
 }
 
 export function tableWithLockForTrx(baseQuery: Knex.QueryBuilder, trx?: Knex.Transaction) {
