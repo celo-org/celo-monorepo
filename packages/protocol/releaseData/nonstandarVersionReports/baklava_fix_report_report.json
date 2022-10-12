@@ -70,7 +70,7 @@
         },
         "versionDelta": {
           "storage": "=",
-          "major": "+3",
+          "major": "+1",
           "minor": "0",
           "patch": "0"
         }
@@ -205,9 +205,9 @@
         },
         "versionDelta": {
           "storage": "=",
-          "major": "+1",
+          "major": "0",
           "minor": "0",
-          "patch": "0"
+          "patch": "+1"
         }
       },
       "OdisPayments": {
@@ -245,7 +245,7 @@
           "storage": "=",
           "major": "+1",
           "minor": "0",
-          "patch": "0"
+          "patch": "+1"
         }
       },
       "UsingRegistryV2": {
