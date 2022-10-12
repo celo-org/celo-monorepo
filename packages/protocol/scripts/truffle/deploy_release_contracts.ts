@@ -1,5 +1,5 @@
 import { celoRegistryAddress } from '@celo/protocol/lib/registry-utils'
-import { _setInitialProxyImplementation, retryTx } from '@celo/protocol/lib/web3-utils'
+import { retryTx, _setInitialProxyImplementation } from '@celo/protocol/lib/web3-utils'
 import { Address, isValidAddress } from '@celo/utils/lib/address'
 import BigNumber from 'bignumber.js'
 import chalk from 'chalk'
@@ -42,6 +42,7 @@ interface ReleaseGoldConfig {
   initialDistributionRatio: number
   canValidate: boolean
   canVote: boolean
+  fundGrant: boolean
 }
 
 type ReleaseGoldTemplate = Partial<ReleaseGoldConfig>
@@ -103,10 +104,14 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   const message =
     'Please review this grant before you deploy:\n\tTotal Grant Value: ' +
     Number(config.numReleasePeriods) * Number(config.amountReleasedPerPeriod) +
+    '\n\tGrant Actually Funded: ' +
+    (config.fundGrant ? 'YES' : 'NO') +
     '\n\tGrant Recipient ID: ' +
     config.identifier +
     '\n\tGrant Beneficiary address: ' +
     config.beneficiary +
+    '\n\tGrant Release owner: ' +
+    config.releaseOwner +
     '\n\tGrant Start Date (Unix timestamp): ' +
     Math.floor(releaseStartTime) +
     '\n\tGrant Cliff time (in seconds): ' +
@@ -175,7 +180,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       'ReleaseGold',
       {
         from: fromAddress,
-        value: totalValue.toFixed(),
+        value: config.fundGrant ? totalValue.toFixed() : null,
       },
       ...contractInitializationArgs
     )
@@ -231,7 +236,7 @@ async function checkBalance(config: ReleaseGoldConfig) {
     web3.utils.toWei(config.amountReleasedPerPeriod.toString())
   )
   const grantDeploymentCost = weiAmountReleasedPerPeriod
-    .multipliedBy(config.numReleasePeriods)
+    .multipliedBy(config.fundGrant ? config.numReleasePeriods : 0)
     .plus(ONE_CELO) // Tx Fees
     .toFixed()
   while (true) {
@@ -512,6 +517,7 @@ async function handleJSONFile(data) {
   // We check the first grant here and use that as a template for all grants
   // to verify the grant file is uniformly typed to hopefully avoid user errors.
   const template = {
+    fundGrant: grants[0].fundGrant,
     revocable: grants[0].revocable,
     canVote: grants[0].canVote,
     canValidate: grants[0].canValidate,
@@ -521,6 +527,7 @@ async function handleJSONFile(data) {
   if (!argv.yesreally) {
     grants.map((grant) => {
       if (
+        grant.fundGrant !== template.fundGrant ||
         grant.revocable !== template.revocable ||
         grant.canVote !== template.canVote ||
         grant.canValidate !== template.canValidate ||
@@ -529,7 +536,7 @@ async function handleJSONFile(data) {
       ) {
         console.error(
           chalk.red(
-            'Grants are not uniformly typed.\nWe expect all grants of a given JSON to have the same boolean values for `revocable`, `canVote`, `canValidate`, and `subjectToLiquidityProvision`, as well as having the same value for `initialDistributionRatio`.\nExiting'
+            'Grants are not uniformly typed.\nWe expect all grants of a given JSON to have the same boolean values for `fundGrant`, `revocable`, `canVote`, `canValidate`, and `subjectToLiquidityProvision`, as well as having the same value for `initialDistributionRatio`.\nExiting'
           )
         )
         process.exit(0)
@@ -538,7 +545,11 @@ async function handleJSONFile(data) {
   }
 
   const totalValue = grants.reduce((sum: number, curr: any) => {
-    return sum + Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods)
+    return (
+      sum +
+      1 +
+      (curr.fundGrant ? Number(curr.amountReleasedPerPeriod) * Number(curr.numReleasePeriods) : 0)
+    )
   }, 0)
   const fromBalance = new BigNumber(await web3.eth.getBalance(fromAddress))
   if (!argv.yesreally) {
