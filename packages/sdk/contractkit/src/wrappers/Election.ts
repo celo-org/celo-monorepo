@@ -484,7 +484,10 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
    * Retrieves GroupVoterRewards at epochNumber.
    * @param epochNumber The epoch to retrieve GroupVoterRewards at.
    */
-  async getGroupVoterRewards(epochNumber: number): Promise<GroupVoterReward[]> {
+  async getGroupVoterRewards(
+    epochNumber: number,
+    useBlockNumber: boolean
+  ): Promise<GroupVoterReward[]> {
     const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
 
     const blockNumber = await blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber)
@@ -493,9 +496,13 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
       toBlock: blockNumber,
     })
     const validators = await this.contracts.getValidators()
-    const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      validators.getValidatorGroup(e.returnValues.group, false, blockNumber)
-    )
+    const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) => {
+      if (useBlockNumber) {
+        return validators.getValidatorGroup(e.returnValues.group, false, blockNumber)
+      } else {
+        return validators.getValidatorGroup(e.returnValues.group, false)
+      }
+    })
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
         epochNumber,
@@ -524,9 +531,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
           epochNumber
         )
       ))
-    //console.warn("About to get group rewards")
-    const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)
-    //console.warn("Got group rewards")
+    const groupVoterRewards = await this.getGroupVoterRewards(epochNumber, true)
     const voterRewards = groupVoterRewards.filter(
       (e: GroupVoterReward) => normalizeAddressWith0x(e.group.address) in activeVoteShare
     )

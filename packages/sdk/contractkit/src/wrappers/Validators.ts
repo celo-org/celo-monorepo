@@ -286,14 +286,10 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
 
   /** Get Validator information */
   async getValidator(address: Address, blockNumber?: number): Promise<Validator> {
-    //console.warn(`about to get validator ${ address } for blockNumber ${ blockNumber }`)
     // @ts-ignore: Expected 0-1 arguments, but got 2
     const res = await this.contract.methods.getValidator(address).call({}, blockNumber)
-    // console.warn("got the validator")
     const accounts = await this.contracts.getAccounts()
-    //console.warn("got the accounts")
     const name = (await accounts.getName(address, blockNumber)) || ''
-    //console.warn("got the name")
 
     return {
       name,
@@ -603,22 +599,29 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
    * Retrieves ValidatorRewards for epochNumber.
    * @param epochNumber The epoch to retrieve ValidatorRewards at.
    */
-  async getValidatorRewards(epochNumber: number): Promise<ValidatorReward[]> {
-    //console.warn("getting validator rewards")
+  async getValidatorRewards(
+    epochNumber: number,
+    useBlockNumber: boolean
+  ): Promise<ValidatorReward[]> {
     const blockNumber = await this.getLastBlockNumberForEpoch(epochNumber)
     const events = await this.getPastEvents('ValidatorEpochPaymentDistributed', {
       fromBlock: blockNumber,
       toBlock: blockNumber,
     })
-    //console.warn("about to get validator")
     const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) => {
-      //						       console.warn(`about to get validator ${ e.returnValues.validator }`)
-      return this.getValidator(e.returnValues.validator, blockNumber)
+      if (useBlockNumber) {
+        return this.getValidator(e.returnValues.validator, blockNumber)
+      } else {
+        return this.getValidator(e.returnValues.validator)
+      }
     })
-    //   console.log("about to get validator group")
-    const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      this.getValidatorGroup(e.returnValues.group, false, blockNumber)
-    )
+    const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) => {
+      if (useBlockNumber) {
+        return this.getValidatorGroup(e.returnValues.group, false, blockNumber)
+      } else {
+        return this.getValidatorGroup(e.returnValues.group, false)
+      }
+    })
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({
         epochNumber,
