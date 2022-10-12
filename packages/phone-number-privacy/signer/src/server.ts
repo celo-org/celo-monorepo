@@ -58,7 +58,7 @@ export function startSigner(
     res.send(PromClient.register.metrics())
   })
 
-  const addEndpointWithTimeout = (
+  const addEndpoint = (
     endpoint: SignerEndpoint,
     handler: (req: Request, res: Response) => Promise<void>
   ) =>
@@ -151,17 +151,14 @@ export function startSigner(
     new DomainDisableAction(db, config, new DomainDisableIO(config.api.domains.enabled))
   )
   logger.info('Right before adding meteredSignerEndpoints')
-  addEndpointWithTimeout(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))
-  addEndpointWithTimeout(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota))
-  addEndpointWithTimeout(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
-  addEndpointWithTimeout(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
-  addEndpointWithTimeout(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
+  addEndpoint(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))
+  addEndpoint(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota))
+  addEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
+  addEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
+  addEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
 
-  addEndpointWithTimeout(SignerEndpoint.LEGACY_PNP_SIGN, legacyPnpSign.handle.bind(legacyPnpSign))
-  addEndpointWithTimeout(
-    SignerEndpoint.LEGACY_PNP_QUOTA,
-    legacyPnpQuota.handle.bind(legacyPnpQuota)
-  )
+  addEndpoint(SignerEndpoint.LEGACY_PNP_SIGN, legacyPnpSign.handle.bind(legacyPnpSign))
+  addEndpoint(SignerEndpoint.LEGACY_PNP_QUOTA, legacyPnpQuota.handle.bind(legacyPnpQuota))
 
   const sslOptions = getSslOptions(config)
   if (sslOptions) {
