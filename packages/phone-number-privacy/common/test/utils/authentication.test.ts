@@ -2,6 +2,7 @@ import { hexToBuffer } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import Logger from 'bunyan'
 import { Request } from 'express'
+import { ErrorMessage, ErrorType } from '../../lib'
 import { AuthenticationMethod } from '../../src/interfaces/requests'
 import * as auth from '../../src/utils/authentication'
 
@@ -21,9 +22,18 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should fail authentication with missing signer', async () => {
@@ -33,9 +43,18 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should succeed authentication with error in getDataEncryptionKey when shouldFailOpen is true', async () => {
@@ -48,9 +67,18 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger, true)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(true)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(true)
+      expect(warnings).toEqual([ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN])
     })
 
     it('Should fail authentication with error in getDataEncryptionKey when shouldFailOpen is false', async () => {
@@ -63,9 +91,18 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger, false)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        false,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_CLOSED])
     })
 
     it('Should fail authentication when key is not registered', async () => {
@@ -88,9 +125,18 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should fail authentication when key is registered but not valid', async () => {
@@ -113,9 +159,12 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should succeed authentication when key is registered and valid', async () => {
@@ -147,9 +196,18 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(true)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(true)
+      expect(warnings).toEqual([])
     })
 
     it('Should fail authentication when the message is manipulated', async () => {
@@ -189,9 +247,18 @@ describe('Authentication test suite', () => {
           },
         } as ContractKit
 
-        const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+        const warnings: ErrorType[] = []
 
-        expect(result).toBe(false)
+        const success = await auth.authenticateUser(
+          sampleRequest,
+          mockContractKit,
+          logger,
+          true,
+          warnings
+        )
+
+        expect(success).toBe(false)
+        expect(warnings).toEqual([])
       }
     })
 
@@ -226,9 +293,18 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should fail authentication when the sigature is modified', async () => {
@@ -264,9 +340,18 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     // Backwards compatibility check
@@ -302,9 +387,18 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(true)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(true)
+      expect(warnings).toEqual([])
     })
   })
 

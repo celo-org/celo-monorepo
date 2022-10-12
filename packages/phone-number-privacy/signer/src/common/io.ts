@@ -24,7 +24,11 @@ export abstract class IO<R extends OdisRequest> {
 
   abstract validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, R>
 
-  abstract authenticate(request: Request<{}, {}, R>, logger?: Logger): Promise<boolean>
+  abstract authenticate(
+    request: Request<{}, {}, R>,
+    warnings?: string[],
+    logger?: Logger
+  ): Promise<boolean>
 
   abstract sendFailure(
     error: ErrorType,

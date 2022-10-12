@@ -37,14 +37,17 @@ export class LegacyPnpQuotaIO extends IO<LegacyPnpQuotaRequest> {
     request: Request<{}, {}, unknown>,
     response: Response<PnpQuotaResponse>
   ): Promise<PnpSession<LegacyPnpQuotaRequest> | null> {
+    const warnings: ErrorType[] = []
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!(await this.authenticate(request, response.locals.logger))) {
+    if (!(await this.authenticate(request, warnings, response.locals.logger))) {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new PnpSession(request, response)
+    const session = new PnpSession(request, response)
+    session.errors.push(...warnings)
+    return session
   }
 
   validate(request: Request<{}, {}, unknown>): request is Request<{}, {}, LegacyPnpQuotaRequest> {
@@ -58,9 +61,10 @@ export class LegacyPnpQuotaIO extends IO<LegacyPnpQuotaRequest> {
 
   async authenticate(
     request: Request<{}, {}, LegacyPnpQuotaRequest>,
+    warnings: ErrorType[],
     logger: Logger
   ): Promise<boolean> {
-    return authenticateUser(request, this.kit, logger, this.shouldFailOpen)
+    return authenticateUser(request, this.kit, logger, this.shouldFailOpen, warnings)
   }
 
   sendSuccess(

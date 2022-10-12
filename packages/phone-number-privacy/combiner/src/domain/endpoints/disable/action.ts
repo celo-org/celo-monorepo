@@ -3,11 +3,11 @@ import { CombineAction } from '../../../common/combine'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
 import { OdisConfig } from '../../../config'
-import { DomainDiscrepanciesLogger } from '../../services/log-discrepancies'
+import { DomainSignerResponseLogger } from '../../services/log-responses'
 import { DomainThresholdStateService } from '../../services/threshold-state'
 
 export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
-  readonly discrepancyLogger: DomainDiscrepanciesLogger = new DomainDiscrepanciesLogger()
+  readonly responseLogger: DomainSignerResponseLogger = new DomainSignerResponseLogger()
 
   constructor(
     readonly config: OdisConfig,
@@ -18,7 +18,7 @@ export class DomainDisableAction extends CombineAction<DisableDomainRequest> {
   }
 
   combine(session: Session<DisableDomainRequest>): void {
-    this.discrepancyLogger.logResponseDiscrepancies(session)
+    this.responseLogger.logResponseDiscrepancies(session)
     try {
       const disableDomainStatus = this.thresholdStateService.findThresholdDomainState(session)
       if (disableDomainStatus.disabled) {

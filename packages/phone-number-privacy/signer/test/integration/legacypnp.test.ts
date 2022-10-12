@@ -607,7 +607,7 @@ describe('legacyPNP', () => {
             performedQueryCount: performedQueryCount,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
-            warnings: [],
+            warnings: [ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN],
           })
         })
 
@@ -1503,7 +1503,7 @@ describe('legacyPNP', () => {
             performedQueryCount: performedQueryCount + 1,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
-            warnings: [],
+            warnings: [ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN],
           })
         })
 
