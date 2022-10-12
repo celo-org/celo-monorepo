@@ -33,7 +33,13 @@ blockscout:
         memory: 250Mi
         cpu: 500m
   web:
-    host: baklava-blockscout.celo-testnet.org
+    host: explorer.celo.org
+    suffix:
+      enabled: true
+      path: "baklava"
+    extraEnvironments:
+      target:
+      - sourceHost: explorer.celo.org
     autoscaling:
       maxReplicas: 3
       minReplicas: 2
