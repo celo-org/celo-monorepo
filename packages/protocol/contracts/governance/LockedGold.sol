@@ -186,7 +186,7 @@ contract LockedGold is
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
       balanceRequirement == 0 || balanceRequirement <= remainingLockedGold,
-      "Trying to unlock too much gold"
+      "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);

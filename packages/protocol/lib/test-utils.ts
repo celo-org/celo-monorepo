@@ -312,6 +312,9 @@ export function assertObjectWithBNEqual(
       if (actualArray.length === expectedArray.length 
         && actualArray.every(actualValue => isNumber(actualValue)) 
         && expectedArray.every(expectedValue => isNumber(expectedValue))) {
+        // if this is array of BNs, deepEqual will not work
+        // since it is not able to compare number/string/BN
+        // with each other and we have to compare it manually
         for (let i = 0; i < actualArray.length; i++) {
           assertEqualBN(actualArray[i], expectedArray[i], fieldErrorMsg(k))
         }
