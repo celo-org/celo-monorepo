@@ -2082,7 +2082,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         assertEqualBN(withdrawableAmount, expectedWithdrawalAmount)
       })
 
-      it('should return only only amount not yet withdrawn', async () => {
+      it('should return only amount not yet withdrawn', async () => {
         const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
         await releaseGoldInstance.withdraw(expectedWithdrawalAmount.div(2), { from: beneficiary })
 
@@ -2117,7 +2117,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       assertEqualBN(withdrawableAmount, expectedWithdrawalAmount.minus(signerFund.div(2)))
     })
 
-    it('should return only up to distribution', async () => {
+    it('should return only up to max distribution', async () => {
       const timeToTravel = 6 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
       const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
