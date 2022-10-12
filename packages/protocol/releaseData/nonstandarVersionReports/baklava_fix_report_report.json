@@ -248,12 +248,12 @@
           "patch": "+1"
         }
       },
-      "UsingRegistryV2BackwardsCompatible": {
+      "UsingRegistryV2": {
         "changes": {
           "storage": [],
           "major": [
             {
-              "contract": "UsingRegistryV2BackwardsCompatible",
+              "contract": "UsingRegistryV2",
               "type": "NewContract"
             }
           ],
