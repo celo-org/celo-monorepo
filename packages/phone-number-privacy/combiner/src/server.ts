@@ -170,11 +170,21 @@ export async function meterResponse(
       logger.info({ res }, 'Response sent')
     })
     .catch((err) => {
-      logger.error(ErrorMessage.UNKNOWN_ERROR)
-      logger.error(err)
+      logger.error({ err }, 'Caught error in outer endpoint handler')
+      if (!res.finished && !res.headersSent) {
+        logger.info('Responding with error in outer endpoint handler')
+        res.status(500).json({
+          success: false,
+          error: ErrorMessage.UNKNOWN_ERROR,
+        })
+      } else {
+        logger.error('Error in endpoint thrown after response was already sent')
+      }
     })
-  performance.mark(endMark)
-  performance.measure(entryName, startMark, endMark)
-  performance.clearMarks()
-  obs.disconnect()
+    .finally(() => {
+      performance.mark(endMark)
+      performance.measure(entryName, startMark, endMark)
+      performance.clearMarks()
+      obs.disconnect()
+    })
 }
