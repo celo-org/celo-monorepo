@@ -123,6 +123,8 @@ blockscout:
     suffix:
       enabled: false
       path: ""
+    # used once to create additional resources for proper routing
+    # of multiple environments on the same domain
     extraEnvironments:
       # format:
       # -
