@@ -248,25 +248,6 @@
           "patch": "+1"
         }
       },
-      "UsingRegistryV2": {
-        "changes": {
-          "storage": [],
-          "major": [
-            {
-              "contract": "UsingRegistryV2",
-              "type": "NewContract"
-            }
-          ],
-          "minor": [],
-          "patch": []
-        },
-        "versionDelta": {
-          "storage": "=",
-          "major": "+1",
-          "minor": "0",
-          "patch": "0"
-        }
-      },
       "UsingRegistryV2BackwardsCompatible": {
         "changes": {
           "storage": [],
