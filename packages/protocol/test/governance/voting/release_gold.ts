@@ -2061,7 +2061,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       releaseGoldSchedule.releaseStartTime = Math.round(Date.now() / 1000)
       releaseGoldSchedule.initialDistributionRatio = 500
       await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
-      initialreleaseGoldAmount = releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
+      initialReleaseGoldAmount = releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
         releaseGoldSchedule.numReleasePeriods
       )
 
@@ -2077,13 +2077,13 @@ contract('ReleaseGold', (accounts: string[]) => {
       })
 
       it('should return the full amount available for this release period', async () => {
-        const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
+        const expectedWithdrawalAmount = initialReleaseGoldAmount.div(2)
         const withdrawableAmount = await releaseGoldInstance.getWithdrawableAmount()
         assertEqualBN(withdrawableAmount, expectedWithdrawalAmount)
       })
 
       it('should return only amount not yet withdrawn', async () => {
-        const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
+        const expectedWithdrawalAmount = initialReleaseGoldAmount.div(2)
         await releaseGoldInstance.withdraw(expectedWithdrawalAmount.div(2), { from: beneficiary })
 
         const afterWithdrawal = await releaseGoldInstance.getWithdrawableAmount()
@@ -2096,7 +2096,8 @@ contract('ReleaseGold', (accounts: string[]) => {
       await releaseGoldInstance.setMaxDistribution(1000, { from: releaseOwner })
       const timeToTravel = 6 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
-      const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
+      const signerFund = new BigNumber('1000000000000000000')
+      const expectedWithdrawalAmount = initialReleaseGoldAmount.minus(signerFund).div(2)
 
       const authorized = accounts[4]
       const ecdsaPublicKey = await addressToPublicKey(authorized, web3.eth.sign)
@@ -2111,16 +2112,14 @@ contract('ReleaseGold', (accounts: string[]) => {
         { from: beneficiary }
       )
 
-      const signerFund = new BigNumber('1000000000000000000')
-
       const withdrawableAmount = await releaseGoldInstance.getWithdrawableAmount()
-      assertEqualBN(withdrawableAmount, expectedWithdrawalAmount.minus(signerFund.div(2)))
+      assertEqualBN(withdrawableAmount, expectedWithdrawalAmount)
     })
 
     it('should return only up to max distribution', async () => {
       const timeToTravel = 6 * MONTH + 1 * DAY
       await timeTravel(timeToTravel, web3)
-      const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
+      const expectedWithdrawalAmount = initialReleaseGoldAmount.div(2)
 
       await releaseGoldInstance.setMaxDistribution(250, { from: releaseOwner })
 
