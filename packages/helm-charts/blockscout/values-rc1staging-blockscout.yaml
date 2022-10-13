@@ -32,6 +32,9 @@ blockscout:
         cpu: 500m
   web:
     host: rc1staging-blockscout.celo-testnet.org
+    suffix:
+      enabled: true
+      path: "rc1staging"
     autoscaling:
       maxReplicas: 1
       minReplicas: 1
