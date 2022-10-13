@@ -1401,22 +1401,35 @@ contract Governance is
   }
 
   /**
-   * @notice Returns the total number of votes cast by an account.
+   * @notice Returns max number of votes cast by an account.
    * @param account The address of the account.
    * @return The total number of votes cast by an account.
    */
   function getAmountOfGoldUsedForVoting(address account) public view returns (uint256) {
-    uint256 total = 0;
     Voter storage voter = voters[account];
+
+    uint256 upvotedProposalId = voter.upvote.proposalId;
+    bool isVotingQueue = upvotedProposalId != 0 &&
+      isQueued(upvotedProposalId) &&
+      !isQueuedProposalExpired(upvotedProposalId);
+
+    if (isVotingQueue) {
+      uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
+      return weight;
+    }
+
+    uint256 total = 0;
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
+      Proposals.Proposal storage proposal = proposals[dequeued[index]];
+      bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
+        Proposals.Stage.Referendum);
+
+      if (!isVotingReferendum) {
+        continue;
+      }
+
       VoteRecord storage voteRecord = voter.referendumVotes[index];
-      uint256 subTotal = 0;
-      for (uint256 i = 0; i < voteRecord.weights.length; i = i.add(1)) {
-        subTotal = subTotal.add(voteRecord.weights[i]);
-      }
-      if (total < subTotal) {
-        total = subTotal;
-      }
+      total = Math.max(total, getTotalWeightRequested(voteRecord.weights));
     }
     return total;
   }

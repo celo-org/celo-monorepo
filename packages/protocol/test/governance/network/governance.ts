@@ -3562,65 +3562,141 @@ contract('Governance', (accounts: string[]) => {
   })
 
   describe('#getAmountOfGoldUsedForVoting()', () => {
-    beforeEach(async () => {
-      await governance.setConcurrentProposals(3)
-      await governance.propose(
-        [transactionSuccess1.value],
-        [transactionSuccess1.destination],
-        // @ts-ignore bytes type
-        transactionSuccess1.data,
-        [transactionSuccess1.data.length],
-        descriptionUrl,
-        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        { value: minDeposit }
-      )
-      await governance.propose(
-        [transactionSuccess2.value],
-        [transactionSuccess2.destination],
-        // @ts-ignore bytes type
-        transactionSuccess2.data,
-        [transactionSuccess2.data.length],
-        descriptionUrl,
-        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        { value: minDeposit }
-      )
-      await governance.propose(
-        [transactionSuccess1.value],
-        [transactionSuccess1.destination],
-        // @ts-ignore bytes type
-        transactionSuccess1.data,
-        [transactionSuccess1.data.length],
-        descriptionUrl,
-        // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
-        { value: minDeposit }
-      )
-      await timeTravel(dequeueFrequency, web3)
-      await governance.approve(1, 0)
-      await governance.approve(2, 1)
-      await governance.approve(3, 2)
-      await mockLockedGold.setAccountTotalLockedGold(account, weight)
+    describe('3 concurrent proposals dequeued', () => {
+      beforeEach(async () => {
+        await governance.setConcurrentProposals(3)
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await governance.propose(
+          [transactionSuccess2.value],
+          [transactionSuccess2.destination],
+          // @ts-ignore bytes type
+          transactionSuccess2.data,
+          [transactionSuccess2.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(1, 0)
+        await governance.approve(2, 1)
+        await governance.approve(3, 2)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
+      })
+
+      for (let numVoted = 0; numVoted < 3; numVoted++) {
+        describe(`when account has partially voted on ${numVoted} proposals`, () => {
+          const values = [VoteValue.Yes, VoteValue.No]
+          const weights = [10, 30]
+          beforeEach(async () => {
+            for (let i = 0; i < numVoted; i++) {
+              await governance.votePartially(i + 1, i, values, weights)
+            }
+          })
+
+          it('Should return correct number of votes', async () => {
+            const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
+            const expectedArraySum =
+              numVoted === 0
+                ? 0
+                : weights.reduce((previousValue, currentValue) => previousValue + currentValue, 0)
+
+            assertEqualBN(totalVotesByAccount, expectedArraySum)
+          })
+        })
+      }
     })
 
-    for (let numVoted = 0; numVoted < 3; numVoted++) {
-      describe(`when account has partially voted on ${numVoted} proposals`, () => {
+    describe('proposal dequeued', () => {
+      beforeEach(async () => {
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await governance.approve(1, 0)
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
+      })
+
+      describe(`when account has partially voted on proposal`, () => {
         const values = [VoteValue.Yes, VoteValue.No]
         const weights = [10, 30]
         beforeEach(async () => {
-          for (let i = 0; i < numVoted; i++) {
-            await governance.votePartially(i + 1, i, values, weights)
-          }
+          await governance.votePartially(1, 0, values, weights)
         })
 
         it('Should return correct number of votes', async () => {
           const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
-          const expectedArraySum =
-            numVoted === 0
-              ? 0
-              : weights.reduce((previousValue, currentValue) => previousValue + currentValue, 0)
+          const expectedArraySum = weights.reduce(
+            (previousValue, currentValue) => previousValue + currentValue,
+            0
+          )
 
           assertEqualBN(totalVotesByAccount, expectedArraySum)
         })
+
+        it('Should return 0 votes since expired', async () => {
+          await timeTravel(executionStageDuration + referendumStageDuration + 1, web3)
+          const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
+
+          assertEqualBN(totalVotesByAccount, 0)
+        })
       })
-    }
+    })
+
+    describe('proposal in queue', () => {
+      beforeEach(async () => {
+        const proposalId1 = 1
+
+        await governance.setConcurrentProposals(3)
+        await governance.propose(
+          [transactionSuccess1.value],
+          [transactionSuccess1.destination],
+          // @ts-ignore bytes type
+          transactionSuccess1.data,
+          [transactionSuccess1.data.length],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await mockLockedGold.setAccountTotalLockedGold(account, weight)
+        await governance.upvote(proposalId1, 0, 0)
+      })
+
+      it('should return full weight when upvoting', async () => {
+        const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
+        assertEqualBN(totalVotesByAccount, weight)
+      })
+
+      it('should return 0 since proposal is already expired', async () => {
+        await timeTravel(queueExpiry, web3)
+        const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
+        assertEqualBN(totalVotesByAccount, 0)
+      })
+    })
   })
 })
