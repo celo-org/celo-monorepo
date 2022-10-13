@@ -792,7 +792,7 @@ contract ReleaseGold is UsingRegistry, ReentrancyGuard, IReleaseGold, Initializa
   }
 
   /**
-   * Returns currently withdrawable amount.
+   * @return The currently withdrawable release amount.
   */
   function getWithdrawableAmount() public view returns (uint256) {
     return
