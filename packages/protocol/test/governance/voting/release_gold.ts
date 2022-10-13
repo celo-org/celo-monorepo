@@ -2076,7 +2076,7 @@ contract('ReleaseGold', (accounts: string[]) => {
         await timeTravel(timeToTravel, web3)
       })
 
-      it('should return full amount', async () => {
+      it('should return the full amount available for this release period', async () => {
         const expectedWithdrawalAmount = initialreleaseGoldAmount.div(2)
         const withdrawableAmount = await releaseGoldInstance.getWithdrawableAmount()
         assertEqualBN(withdrawableAmount, expectedWithdrawalAmount)
