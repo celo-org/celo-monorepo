@@ -42,12 +42,13 @@ export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
 
 const selectIncompatibleOperations = (diff: Operation[]) =>
   diff.filter(operation => operation.action !== 'append'
-  && !(operation.action === 'rename' && `deprecated_${operation.original.label}` === operation.updated.label))
+  && !(operation.action === 'rename' && (`deprecated_${operation.original.label}` === operation.updated.label && operation.original.type === operation.updated.type)))
 
 export interface ASTStorageCompatibilityReport {
   contract: string
   compatible: boolean
   errors: string[]
+  expanded: boolean
 }
 
 const operationToDescription = (operation: Operation) => {
@@ -105,6 +106,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
   if (oldType.kind !== 'struct') {
     return {
       same: false,
+      expanded: false,
       errors: [`${newType.label} wasn't a struct type, now is`]
     }
   }
@@ -125,6 +127,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
     if (expandableErrors.length === 0) {
       return {
         same: true,
+        expanded: true,
         errors: []
       }
     }
@@ -133,6 +136,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
   if (oldType.members.length !== newType.members.length) {
     return {
       same: false,
+      expanded: false,
       errors: [`struct ${newType.label} has changed members`]
     }
   }
@@ -152,6 +156,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
 
   return {
     same: memberErrors.length === 0,
+    expanded: false,
     errors: memberErrors
   }
 }
@@ -165,6 +170,7 @@ const isStructExpandable = (oldType: TypeInfo, oldLayout: StorageLayoutInfo) => 
 const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo) => {
   let compatible = true
   let errors = []
+  let expanded = false
 
   Object.keys(newLayout.types).forEach(typeName => {
     const newType = newLayout.types[typeName]
@@ -177,12 +183,14 @@ const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLay
         compatible = false
         errors = errors.concat(structReport.errors)
       }
+      expanded = structReport.expanded
     }
   })
 
   return {
     compatible,
-    errors
+    errors,
+    expanded
   }
 }
 
@@ -195,7 +203,8 @@ export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts
       return {
         contract: newArtifact.contractName,
         compatible: layoutReport.compatible && structsReport.compatible,
-        errors: layoutReport.errors.concat(structsReport.errors)
+        errors: layoutReport.errors.concat(structsReport.errors),
+        expanded: structsReport.expanded
       }
 }
 
@@ -210,6 +219,7 @@ export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newA
       return {
         contract: newArtifact.contractName,
         compatible: true,
+        expanded: false,
         errors: []
       }
     }
