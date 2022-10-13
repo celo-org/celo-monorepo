@@ -521,6 +521,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
   async getVoterRewards(
     address: Address,
     epochNumber: number,
+    useBlockNumber: boolean,
     voterShare?: Record<Address, BigNumber>
   ): Promise<VoterReward[]> {
     const activeVoteShare =
@@ -531,7 +532,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
           epochNumber
         )
       ))
-    const groupVoterRewards = await this.getGroupVoterRewards(epochNumber, true)
+    const groupVoterRewards = await this.getGroupVoterRewards(epochNumber, useBlockNumber)
     const voterRewards = groupVoterRewards.filter(
       (e: GroupVoterReward) => normalizeAddressWith0x(e.group.address) in activeVoteShare
     )
