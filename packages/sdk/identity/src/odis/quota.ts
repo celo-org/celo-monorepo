@@ -1,9 +1,5 @@
 import { Address } from '@celo/base'
-import {
-  CombinerEndpoint,
-  PnpQuotaRequest,
-  PnpQuotaResponse,
-} from '@celo/phone-number-privacy-common'
+import { CombinerEndpoint, PnpQuotaRequest } from '@celo/phone-number-privacy-common'
 import { AuthSigner, ErrorMessages, queryOdis, ServiceContext } from './query'
 
 export async function getQuotaStatus(
@@ -20,7 +16,7 @@ export async function getQuotaStatus(
     sessionID,
   }
 
-  const response = await queryOdis<PnpQuotaResponse>(
+  const response = await queryOdis<PnpQuotaRequest>(
     signer,
     body,
     context,

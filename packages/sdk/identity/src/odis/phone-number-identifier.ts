@@ -8,7 +8,6 @@ import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthenticationMethod,
   AuthSigner,
-  CombinerSignMessageResponse,
   EncryptionKeySigner,
   queryOdis,
   ServiceContext,
@@ -122,12 +121,15 @@ export async function getBlindedPhoneNumberSignature(
     body.sessionID = sessionID
   }
 
-  const response = await queryOdis<CombinerSignMessageResponse>(
+  const response = await queryOdis<LegacySignMessageRequest>(
     signer,
     body,
     context,
     CombinerEndpoint.LEGACY_PNP_SIGN
   )
+
+  // @ts-ignore this should be updates to reflect new request/response types after new version of ODIS as deployed
+  // https://github.com/celo-org/celo-monorepo/issues/9910
   return response.combinedSignature
 }
 
