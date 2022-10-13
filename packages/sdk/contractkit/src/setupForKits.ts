@@ -1,4 +1,3 @@
-import net from 'net'
 import Web3 from 'web3'
 import { HttpProviderOptions as Web3HttpProviderOptions } from 'web3-providers-http'
 export type HttpProviderOptions = Web3HttpProviderOptions
@@ -25,6 +24,7 @@ export function ensureCurrentProvider(web3: Web3) {
 export function getWeb3ForKit(url: string, options: Web3HttpProviderOptions | undefined) {
   let web3: Web3
   if (url.endsWith('.ipc')) {
+    const net = require('net')
     web3 = new Web3(new Web3.providers.IpcProvider(url, net))
   } else if (url.toLowerCase().startsWith('http')) {
     web3 = new Web3(new Web3.providers.HttpProvider(url, options))
