@@ -27,7 +27,7 @@ export default class SetPaymentDelegation extends BaseCommand {
     this.kit.defaultAccount = res.flags.account
     const accounts = await this.kit.contracts.getAccounts()
 
-    await newCheckBuilder(this).isAccount(res.flags.beneficiary).runChecks()
+    await newCheckBuilder(this).runChecks()
     await displaySendTx(
       'setPaymentDelegation',
       accounts.setPaymentDelegation(
