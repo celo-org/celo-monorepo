@@ -7,7 +7,6 @@ import {
   AuthSigner,
   EncryptionKeySigner,
   MatchmakingRequest,
-  MatchmakingResponse,
   queryOdis,
   ServiceContext,
   signWithDEK,
@@ -56,7 +55,7 @@ export async function getContactMatches(
     dekSigner = signer as EncryptionKeySigner
   }
 
-  const response = await queryOdis<MatchmakingResponse>(
+  const response = await queryOdis<MatchmakingRequest>(
     signer,
     body,
     context,
