@@ -2068,7 +2068,7 @@ contract('ReleaseGold', (accounts: string[]) => {
       await releaseGoldInstance.createAccount({ from: beneficiary })
     })
 
-    describe('should return 50% the released amount of gold right after the beginning of the second quarter', async () => {
+    describe('should return 50% of the released amount of gold right after the beginning of the second quarter', async () => {
       beforeEach(async () => {
         await releaseGoldInstance.setMaxDistribution(1000, { from: releaseOwner })
 
