@@ -171,7 +171,7 @@ export async function meterResponse(
     })
     .catch((err) => {
       logger.error({ err }, 'Caught error in outer endpoint handler')
-      if (!res.finished && !res.headersSent) {
+      if (!res.headersSent) {
         logger.info('Responding with error in outer endpoint handler')
         res.status(500).json({
           success: false,

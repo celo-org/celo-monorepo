@@ -69,7 +69,7 @@ export function startSigner(
       } catch (err: any) {
         // Handle any errors that otherwise managed to escape the proper handlers
         childLogger.error({ err }, 'Caught error in outer endpoint handler')
-        if (!res.writableEnded && !res.headersSent) {
+        if (!res.headersSent) {
           childLogger.info('Responding with error in outer endpoint handler')
           res.status(500).json({
             success: false,
