@@ -2051,7 +2051,7 @@ contract('ReleaseGold', (accounts: string[]) => {
   })
 
   describe('#getWithdrawableAmount', () => {
-    let initialreleaseGoldAmount: any
+    let initialReleaseGoldAmount: any
 
     beforeEach(async () => {
       const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
