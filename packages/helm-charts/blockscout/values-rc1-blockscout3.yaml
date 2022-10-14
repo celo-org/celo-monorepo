@@ -13,6 +13,9 @@ blockscout:
         memory: 12Gi
         cpu: 5
   api:
+    suffix:
+      enabled: true
+      path: "mainnet"
     autoscaling:
         maxReplicas: 5
         minReplicas: 2
@@ -32,6 +35,9 @@ blockscout:
         cpu: 1500m
   web:
     host: explorer.celo.org
+    suffix:
+      enabled: true
+      path: "mainnet"
     autoscaling:
       maxReplicas: 5
       minReplicas: 2
@@ -75,6 +81,7 @@ blockscout:
       apiKey: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaApiKey
     erlang:
       cookie: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout3-erlangCookie
+    campaignBannerApiUrl: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-campaignBannerApiUrl
   chain:
     subnetwork: Celo
     networkID: 42220

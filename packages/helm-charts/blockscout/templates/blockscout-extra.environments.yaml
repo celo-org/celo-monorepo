@@ -1,0 +1,84 @@
+{{- range .Values.blockscout.web.extraEnvironments.source }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ext-{{ .environment }}-blockscout-web
+  labels:
+    {{- include "celo.blockscout.labels" (dict "Values" $.Values "Release" $.Release ) | nindent 4 }}
+    component: blockscout-web
+  annotations:
+    {{- include "celo.blockscout.annotations" (dict "Values" $.Values "Release" $.Release ) | nindent 4 }}
+    "helm.sh/resource-policy": keep
+spec:
+  externalName: {{ .ingressIp }}
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  type: ExternalName
+---
+{{- end }}
+{{- if gt (len .Values.blockscout.web.extraEnvironments.target) 0 }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Namespace }}-blockscout-external-ingress
+  labels:
+    {{- include "celo.blockscout.labels" . | nindent 4 }}
+    component: blockscout-web-ingress
+  annotations:
+    "helm.sh/resource-policy": keep
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 8m
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location ~ /admin/.* {
+        deny all;
+      }
+      location ~ /wobserver/.* {
+        deny all;
+      }
+      location ~ /address/(.*)/token_transfers {
+        return 301 /address/$1/token-transfers;
+      }
+      location ~ /address/(.*)/coin_balances {
+        return 301 /address/$1/coin-balances;
+      }
+spec:
+  ingressClassName: {{ default "nginx" .Values.ingressClassName }}
+  rules:
+  {{- range .Values.blockscout.web.extraEnvironments.target }}
+  - host: {{ .sourceHost }}
+    http:
+      paths:
+      -
+        path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ $.Release.Name }}-web
+            port:
+              number: 4000
+      -
+        path: /(graphql|graphiql|api)(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ $.Release.Name }}-api
+            port:
+              number: 4000
+      -
+        path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ $.Release.Name }}-web
+            port:
+              number: 4000
+  {{- end }}
+{{- end}}

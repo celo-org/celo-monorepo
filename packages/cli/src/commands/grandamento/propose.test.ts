@@ -8,6 +8,7 @@ import {
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import { setGrandaMentoLimits } from '../../test-utils/grandaMento'
 import Propose from './propose'
 
@@ -29,7 +30,7 @@ testWithGanache('grandamento:propose cmd', (web3: Web3) => {
 
   describe('proposes', () => {
     it('can sell Celo', async () => {
-      await Propose.run([
+      await testLocally(Propose, [
         '--from',
         accounts[0],
         '--sellCelo',
@@ -54,7 +55,7 @@ testWithGanache('grandamento:propose cmd', (web3: Web3) => {
     })
 
     it('can buy Celo', async () => {
-      await Propose.run([
+      await testLocally(Propose, [
         '--from',
         accounts[0],
         '--sellCelo',
@@ -81,7 +82,7 @@ testWithGanache('grandamento:propose cmd', (web3: Web3) => {
       let activeProposals
 
       await expect(
-        Propose.run([
+        testLocally(Propose, [
           '--from',
           accounts[0],
           '--sellCelo',
@@ -96,7 +97,7 @@ testWithGanache('grandamento:propose cmd', (web3: Web3) => {
       expect(activeProposals).toEqual([])
 
       await expect(
-        Propose.run([
+        testLocally(Propose, [
           '--from',
           accounts[0],
           '--sellCelo',

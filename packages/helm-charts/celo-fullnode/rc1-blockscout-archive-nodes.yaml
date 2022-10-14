@@ -3,9 +3,7 @@ extraPodLabels:
   mode: archive
 gcp: true
 genesis:
-  epoch_size: 17280
-  genesisFileBase64: ""
-  network: rc1
+  network: mainnet
   networkId: 42220
   useGenesisFileBase64: false
 geth:

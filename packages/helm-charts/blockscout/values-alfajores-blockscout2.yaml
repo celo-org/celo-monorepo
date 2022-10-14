@@ -31,7 +31,10 @@ blockscout:
         memory: 250Mi
         cpu: 500m
   web:
-    host: alfajores-blockscout.celo-testnet.org
+    host: explorer.celo.org
+    suffix:
+      enabled: true
+      path: "alfajores"
     autoscaling:
       maxReplicas: 3
       minReplicas: 2
@@ -67,6 +70,7 @@ blockscout:
       apiKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaApiKey
     erlang:
       cookie: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout2-erlangCookie
+    campaignBannerApiUrl: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-campaignBannerApiUrl
   chain:
     subnetwork: Alfajores
     networkID: 44787

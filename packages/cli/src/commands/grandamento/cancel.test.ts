@@ -5,6 +5,7 @@ import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import Cancel from './cancel'
 import Propose from './propose'
 
@@ -31,7 +32,7 @@ testWithGanache('grandamento:cancel cmd', (web3: Web3) => {
     await assumeOwnership(web3, accounts[0])
     await increaseLimits()
     // create mock proposal
-    await Propose.run([
+    await testLocally(Propose, [
       '--from',
       accounts[0],
       '--sellCelo',
@@ -45,7 +46,7 @@ testWithGanache('grandamento:cancel cmd', (web3: Web3) => {
 
   describe('cancel', () => {
     it('left no proposal', async () => {
-      await Cancel.run(['--from', accounts[0], '--proposalID', '1'])
+      await testLocally(Cancel, ['--from', accounts[0], '--proposalID', '1'])
       const activeProposals = await grandaMento.getActiveProposalIds()
       expect(activeProposals).toEqual([])
     })

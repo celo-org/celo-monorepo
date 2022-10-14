@@ -34,6 +34,9 @@ blockscout:
         cpu: 500m
   web:
     host: blockscoutstagingrc1-blockscout1.celo-testnet.org
+    suffix:
+      enabled: true
+      path: "blockscoutstagingrc1"
     autoscaling:
       maxReplicas: 2
       minReplicas: 1
@@ -56,6 +59,8 @@ blockscout:
   archiveNodes:
     jsonrpcHttpUrl: http://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
     jsonrpcWsUrl: ws://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
+  fullNodes:
+    jsonrpcPublicHttp: https://forno.celo.org
   metrics:
     enabled: false
   secrets:
