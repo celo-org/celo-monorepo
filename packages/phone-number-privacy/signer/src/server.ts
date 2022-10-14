@@ -14,6 +14,7 @@ import { Knex } from 'knex'
 import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
 import { KeyProvider } from './common/key-management/key-provider-base'
+import { Counters } from './common/metrics'
 import { getVersion, SignerConfig } from './config'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
@@ -68,7 +69,9 @@ export function startSigner(
         await handler(req, res)
       } catch (err: any) {
         // Handle any errors that otherwise managed to escape the proper handlers
-        childLogger.error({ err }, 'Caught error in outer endpoint handler')
+        childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
+        childLogger.error(err)
+        Counters.errorsCaughtInEndpointHandler.inc()
         if (!res.headersSent) {
           childLogger.info('Responding with error in outer endpoint handler')
           res.status(500).json({
@@ -78,7 +81,8 @@ export function startSigner(
         } else {
           // Getting to this error likely indicates that the `perform` process
           // does not terminate after sending a response, and then throws an error.
-          childLogger.error('Error in endpoint thrown after response was already sent')
+          childLogger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
+          Counters.errorsThrownAfterResponseSent.inc()
         }
       }
     })

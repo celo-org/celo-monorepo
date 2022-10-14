@@ -170,7 +170,8 @@ export async function meterResponse(
       logger.info({ res }, 'Response sent')
     })
     .catch((err) => {
-      logger.error({ err }, 'Caught error in outer endpoint handler')
+      logger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
+      logger.error(err)
       if (!res.headersSent) {
         logger.info('Responding with error in outer endpoint handler')
         res.status(500).json({
@@ -178,7 +179,7 @@ export async function meterResponse(
           error: ErrorMessage.UNKNOWN_ERROR,
         })
       } else {
-        logger.error('Error in endpoint thrown after response was already sent')
+        logger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
       }
     })
     .finally(() => {
