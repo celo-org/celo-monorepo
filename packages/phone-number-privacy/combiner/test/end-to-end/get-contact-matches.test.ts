@@ -15,7 +15,7 @@ import {
   walletAuthSigner,
 } from './resources'
 
-// TODO(Alec) decide what to do with matchmaking code
+// TODO(2.0.0) decide what to do with matchmaking code
 
 require('dotenv').config()
 

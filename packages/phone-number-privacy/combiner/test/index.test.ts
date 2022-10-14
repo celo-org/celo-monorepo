@@ -4,7 +4,7 @@ describe('placeholder', () => {
   })
 })
 
-// TODO(Alec) delete these tests
+// TODO(2.0.0) delete / figure out what to do about these tests
 
 // import { signWithDEK } from '@celo/identity/lib/odis/query'
 // import { getDataEncryptionKey, isVerified, SignerEndpoint } from '@celo/phone-number-privacy-common'
