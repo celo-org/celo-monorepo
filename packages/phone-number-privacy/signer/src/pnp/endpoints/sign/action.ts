@@ -1,5 +1,6 @@
 import {
   ErrorMessage,
+  getRequestKeyVersion,
   LegacySignMessageRequest,
   SignMessageRequest,
   WarningMessage,
@@ -101,7 +102,7 @@ export abstract class PnpSignAction
 
       const key: Key = {
         version:
-          this.io.getRequestKeyVersion(session.request, session.logger) ??
+          getRequestKeyVersion(session.request, session.logger) ??
           this.config.keystore.keys.phoneNumberPrivacy.latest,
         name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
       }

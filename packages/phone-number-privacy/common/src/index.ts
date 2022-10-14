@@ -14,5 +14,6 @@ export { fetchEnv, fetchEnvOrDefault, toBool, toNum } from './utils/config.utils
 export * from './utils/constants'
 export { BlockchainConfig, getContractKit } from './utils/contracts'
 export * from './utils/input-validation'
+export * from './utils/key-version'
 export { genSessionID, loggerMiddleware, rootLogger } from './utils/logger'
 export * from './utils/responses.utils'

@@ -3,13 +3,15 @@ import { ContractKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
   CombinerEndpoint,
-  Domain,
   DomainEndpoint,
   DomainRequest,
+  DomainRequestHeader,
   DomainResponse,
   GetContactMatchesRequest,
   GetContactMatchesResponse,
-  LegacySignMessageRequest,
+  OdisRequest,
+  OdisRequestHeader,
+  OdisResponse,
   PhoneNumberPrivacyRequest,
   signWithRawKey,
 } from '@celo/phone-number-privacy-common'
@@ -36,25 +38,26 @@ export type AuthSigner = WalletKeySigner | EncryptionKeySigner
 // Re-export types and aliases to maintain backwards compatibility.
 export { AuthenticationMethod, PhoneNumberPrivacyRequest, signWithRawKey }
 
-// TODO(future, SDK) deprecate this in the next major ODIS SDK release & revisit this
-// as part of ODIS/ASv2 SDK work: https://github.com/celo-org/celo-monorepo/issues/9910
-/**
- * @deprecated Exported as SignMessageRequest for backwards compatibility.
- * This is not the same as `SignMessageRequest` in '@celo/phone-number-privacy-common'.
- */
-export type SignMessageRequest = LegacySignMessageRequest
+// // TODO(future, SDK) deprecate this in the next major ODIS SDK release & revisit this
+// // as part of ODIS/ASv2 SDK work: https://github.com/celo-org/celo-monorepo/issues/9910
+// /**
+//  * @deprecated Exported as SignMessageRequest for backwards compatibility.
+//  * This is not the same as `SignMessageRequest` in '@celo/phone-number-privacy-common'.
+//  */
+// export type SignMessageRequest = LegacySignMessageRequest
 
 export type MatchmakingRequest = GetContactMatchesRequest
 export type MatchmakingResponse = GetContactMatchesResponse
 
+// // TODO(Alec) why is this here?
 // Combiner returns a response inconsistent with the SignMessageResponse defined in
-// @celo/phone-number-privacy-common. Combiner response type is defined here as a result.
-export interface CombinerSignMessageResponse {
-  success: boolean
-  combinedSignature: string
-}
-/** @deprecated Exported as SignMessageResponse for backwards compatibility. */
-export type SignMessageResponse = CombinerSignMessageResponse
+// // @celo/phone-number-privacy-common. Combiner response type is defined here as a result.
+// export interface CombinerSignMessageResponse {
+//   success: boolean
+//   combinedSignature: string
+// }
+// /** @deprecated Exported as SignMessageResponse for backwards compatibility. */
+// export type SignMessageResponse = CombinerSignMessageResponse
 
 export enum ErrorMessages {
   ODIS_QUOTA_ERROR = 'odisQuotaError',
@@ -104,6 +107,21 @@ export function signWithDEK(msg: string, signer: EncryptionKeySigner) {
   return signWithRawKey(msg, signer.rawKey)
 }
 
+export async function getOdisPnpRequestAuth(
+  body: PhoneNumberPrivacyRequest,
+  signer: AuthSigner
+): Promise<string> {
+  // Sign payload using provided account and authentication method.
+  const bodyString = JSON.stringify(body)
+  if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
+    return signWithDEK(bodyString, signer as EncryptionKeySigner)
+  }
+  if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
+    return signer.contractKit.connection.sign(bodyString, body.account)
+  }
+  throw new Error('AuthenticationMethod not supported')
+}
+
 /**
  * Make a request to lookup the phone number identifier or perform matchmaking
  * @param signer Type of key to sign with. May be undefined if the request is presigned.
@@ -111,26 +129,14 @@ export function signWithDEK(msg: string, signer: EncryptionKeySigner) {
  * @param context Contains service URL and public to determine which instance to contact.
  * @param endpoint Endpoint to query (e.g. '/getBlindedMessagePartialSig', '/getContactMatches').
  */
-export async function queryOdis<ResponseType>(
-  signer: AuthSigner,
-  body: PhoneNumberPrivacyRequest,
+export async function queryOdis<R extends OdisRequest>(
+  body: R,
   context: ServiceContext,
-  endpoint: CombinerEndpoint
-): Promise<ResponseType> {
+  endpoint: CombinerEndpoint,
+  responseSchema: t.Type<OdisResponse<R>>,
+  headers: OdisRequestHeader<R>
+): Promise<OdisResponse<R>> {
   debug(`Posting to ${endpoint}`)
-
-  const bodyString = JSON.stringify(body)
-
-  // Sign payload using provided account and authentication method.
-  let signature: string
-  if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    signature = signWithDEK(bodyString, signer as EncryptionKeySigner)
-  } else if (signer.authenticationMethod === AuthenticationMethod.WALLET_KEY) {
-    const account = body.account
-    signature = await signer.contractKit.connection.sign(bodyString, account)
-  }
-
-  const { odisUrl } = context
 
   const dontRetry = [
     ErrorMessages.ODIS_QUOTA_ERROR,
@@ -144,89 +150,14 @@ export async function queryOdis<ResponseType>(
     async () => {
       let res: Response
       try {
-        res = await fetch(odisUrl + endpoint, {
+        res = await fetch(context.odisUrl + endpoint, {
           method: 'POST',
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            Authorization: signature,
+            ...headers,
           },
-          body: bodyString,
-        })
-      } catch (error) {
-        throw new Error(`${ErrorMessages.ODIS_FETCH_ERROR}: ${error}`)
-      }
-
-      if (res.ok) {
-        debug('Response ok. Parsing.')
-        const response = await res.json()
-        return response as ResponseType
-      }
-
-      debug(`Response not okay. Status ${res.status}`)
-
-      switch (res.status) {
-        case 403:
-          throw new Error(ErrorMessages.ODIS_QUOTA_ERROR)
-        case 429:
-          throw new Error(ErrorMessages.ODIS_RATE_LIMIT_ERROR)
-        case 400:
-          throw new Error(ErrorMessages.ODIS_INPUT_ERROR)
-        case 401:
-          throw new Error(ErrorMessages.ODIS_AUTH_ERROR)
-        default:
-          if (res.status >= 400 && res.status < 500) {
-            // Don't retry error codes in 400s
-            throw new Error(`${ErrorMessages.ODIS_CLIENT_ERROR} ${res.status}`)
-          }
-          throw new Error(`Unknown failure ${res.status}`)
-      }
-    },
-    3,
-    dontRetry,
-    []
-  )
-}
-
-/**
- * Send the given domain request to ODIS (e.g. to get a POPRF evaluation or check quota).
- *
- * @param body Request to send in the body of the HTTP request.
- * @param context Contains service URL and public to determine which instance to contact.
- * @param endpoint Endpoint to query (e.g. '/domain/sign', '/domain/quotaStatus').
- * @param responseSchema io-ts type for the expected response type. Provided to ensure type safety.
- */
-export async function sendOdisDomainRequest<RequestType extends DomainRequest<Domain>>(
-  body: RequestType,
-  context: ServiceContext,
-  endpoint: DomainEndpoint,
-  responseSchema: t.Type<DomainResponse<RequestType>>
-): Promise<DomainResponse<RequestType>> {
-  debug(`Posting to ${endpoint}`)
-
-  const bodyString = JSON.stringify(body)
-
-  const { odisUrl } = context
-
-  const dontRetry = [
-    ErrorMessages.ODIS_QUOTA_ERROR,
-    ErrorMessages.ODIS_RATE_LIMIT_ERROR,
-    ErrorMessages.ODIS_AUTH_ERROR,
-    ErrorMessages.ODIS_INPUT_ERROR,
-    ErrorMessages.ODIS_CLIENT_ERROR,
-  ]
-
-  return selectiveRetryAsyncWithBackOff(
-    async () => {
-      let res: Response
-      try {
-        res = await fetch(odisUrl + endpoint, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: bodyString,
+          body: JSON.stringify(body),
         })
       } catch (error) {
         throw new Error(`${ErrorMessages.ODIS_FETCH_ERROR}: ${error}`)
@@ -267,4 +198,29 @@ export async function sendOdisDomainRequest<RequestType extends DomainRequest<Do
     dontRetry,
     []
   )
+}
+
+/**
+ * Send the given domain request to ODIS (e.g. to get a POPRF evaluation or check quota).
+ *
+ * @param body Request to send in the body of the HTTP request.
+ * @param context Contains service URL and public to determine which instance to contact.
+ * @param endpoint Endpoint to query (e.g. '/domain/sign', '/domain/quotaStatus').
+ * @param responseSchema io-ts type for the expected response type. Provided to ensure type safety.
+ * @param keyVersion optional version of the POPRF key to use for evaluation, provided only for '/domain/sign'
+ */
+export async function sendOdisDomainRequest<R extends DomainRequest>(
+  body: R,
+  context: ServiceContext,
+  endpoint: DomainEndpoint,
+  responseSchema: t.Type<OdisResponse<R>>,
+  headers?: DomainRequestHeader<R>
+): Promise<DomainResponse<R>> {
+  return queryOdis(
+    body,
+    context,
+    endpoint,
+    responseSchema,
+    headers as OdisRequestHeader<R>
+  ) as Promise<DomainResponse<R>>
 }

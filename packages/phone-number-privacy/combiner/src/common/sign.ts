@@ -4,6 +4,7 @@ import {
   ErrorType,
   LegacySignMessageRequest,
   OdisResponse,
+  responseHasValidKeyVersion,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
@@ -41,7 +42,14 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
     url: string,
     session: CryptoSession<R>
   ): Promise<OdisResponse<R>> {
-    if (!this.io.responseHasValidKeyVersion(signerResponse, session)) {
+    if (
+      !responseHasValidKeyVersion(
+        session.request,
+        signerResponse,
+        this.config.keys.version,
+        session.logger
+      )
+    ) {
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
 

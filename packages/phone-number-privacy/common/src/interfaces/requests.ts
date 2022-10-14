@@ -9,6 +9,7 @@ import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import { chain, isRight } from 'fp-ts/lib/Either'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
+import { KEY_VERSION_HEADER } from '..'
 import {
   Domain,
   domainEIP712Types,
@@ -534,3 +535,47 @@ export function verifyDisableDomainRequestAuthenticity(
 ): boolean {
   return verifyRequestSignature(disableDomainRequestEIP712, request)
 }
+
+interface PnpAuthHeader {
+  Authorization: string
+}
+
+interface KeyVersionHeader {
+  [KEY_VERSION_HEADER]?: string
+}
+
+export type DomainRestrictedSignatureRequestHeader = KeyVersionHeader
+export type DisableDomainRequestHeader = undefined
+export type DomainQuotaStatusRequestHeader = undefined
+
+export type DomainRequestHeader<
+  R extends DomainRequest
+> = R extends DomainRestrictedSignatureRequest
+  ? DomainRestrictedSignatureRequestHeader
+  : never | R extends DisableDomainRequest
+  ? DisableDomainRequestHeader
+  : never | R extends DomainQuotaStatusRequest
+  ? DomainQuotaStatusRequestHeader
+  : never
+
+export type SignMessageRequestHeader = KeyVersionHeader & PnpAuthHeader
+
+export type PnpQuotaRequestHeader = PnpAuthHeader
+
+export type GetContactMatchesRequestHeader = PnpAuthHeader
+
+export type PhoneNumberPrivacyRequestHeader<R extends PhoneNumberPrivacyRequest> = R extends
+  | SignMessageRequest
+  | LegacySignMessageRequest
+  ? SignMessageRequestHeader
+  : never | R extends PnpQuotaRequest
+  ? PnpQuotaRequestHeader
+  : never | R extends GetContactMatchesRequest
+  ? GetContactMatchesRequestHeader
+  : never
+
+export type OdisRequestHeader<R extends OdisRequest> = R extends DomainRequest
+  ? DomainRequestHeader<R>
+  : never | R extends PhoneNumberPrivacyRequest
+  ? PhoneNumberPrivacyRequestHeader<R>
+  : never

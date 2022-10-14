@@ -3,6 +3,7 @@ import {
   ErrorMessage,
   ErrorType,
   FailureResponse,
+  getRequestKeyVersion,
   KEY_VERSION_HEADER,
   OdisRequest,
   OdisResponse,
@@ -70,71 +71,6 @@ export abstract class IO<R extends OdisRequest> {
     return res
   }
 
-  // TODO(2.0.0, refactor, keys) move to common pkg (https://github.com/celo-org/celo-monorepo/issues/9801)
-  requestHasValidKeyVersion(request: Request<{}, {}, R>, logger: Logger): boolean {
-    const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
-    if (keyVersionHeader === undefined) {
-      return true
-    }
-
-    const requestedKeyVersion = Number(keyVersionHeader)
-
-    const isValid = Number.isInteger(requestedKeyVersion)
-    if (!isValid) {
-      logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
-    }
-    return isValid
-  }
-
-  // TODO(2.0.0, refactor, keys) move to common pkg (https://github.com/celo-org/celo-monorepo/issues/9801)
-  getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
-    const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
-    if (keyVersionHeader === undefined) {
-      return undefined
-    }
-
-    const requestedKeyVersion = Number(keyVersionHeader)
-
-    if (!Number.isInteger(requestedKeyVersion)) {
-      logger.error({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
-      throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
-    }
-    return requestedKeyVersion
-  }
-
-  responseHasValidKeyVersion(response: FetchResponse, session: Session<R>): boolean {
-    const responseKeyVersion = this.getResponseKeyVersion(response, session.logger)
-    const requestKeyVersion =
-      this.getRequestKeyVersion(session.request, session.logger) ?? this.config.keys.version
-
-    const isValid = responseKeyVersion === requestKeyVersion
-    if (!isValid) {
-      session.logger.error(
-        { requestKeyVersion, responseKeyVersion },
-        ErrorMessage.INVALID_KEY_VERSION_RESPONSE
-      )
-    }
-
-    return isValid
-  }
-
-  // TODO(2.0.0, refactor, keys) move to common pkg?? (https://github.com/celo-org/celo-monorepo/issues/9801)
-  getResponseKeyVersion(response: FetchResponse, logger: Logger): number | undefined {
-    const keyVersionHeader = response.headers.get(KEY_VERSION_HEADER)
-    if (keyVersionHeader === undefined) {
-      return undefined
-    }
-
-    const responseKeyVersion = Number(keyVersionHeader)
-
-    if (!Number.isInteger(responseKeyVersion)) {
-      logger.error({ keyVersionHeader }, ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
-      return undefined
-    }
-    logger.info({ responseKeyVersion }, 'Signer response has valid key version')
-    return responseKeyVersion
-  }
-
   async fetchSignerResponseWithFallback(
     signer: Signer,
     session: Session<R>
@@ -174,11 +110,11 @@ export abstract class IO<R extends OdisRequest> {
         // Pnp requests provide authorization in the request header
         ...(request.headers.authorization ? { Authorization: request.headers.authorization } : {}),
         [KEY_VERSION_HEADER]: 
-        // Forward requested keyVersion if provided by client,
-        // otherwise use default keyVersion.
+        // Forward requested keyVersion if provided by client, otherwise use default keyVersion.
         // This will be ignored for non-signing requests.
-        (this.getRequestKeyVersion(request, logger) ?? this.config.keys.version).toString(),
-      },
+        (getRequestKeyVersion(request, logger) ?? this.config.keys.version).toString(),
+        // TODO(Alec) consider using request header types here 
+      }, 
       body: JSON.stringify(request.body),
       signal: abort.signal,
     })

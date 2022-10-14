@@ -11,6 +11,7 @@ import {
   LegacySignMessageRequest,
   LegacySignMessageRequestSchema,
   PnpQuotaStatus,
+  requestHasValidKeyVersion,
   send,
   SignerEndpoint,
   SignMessageResponse,
@@ -52,7 +53,7 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!this.requestHasValidKeyVersion(request, response.locals.logger)) {
+    if (!requestHasValidKeyVersion(request, response.locals.logger)) {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }

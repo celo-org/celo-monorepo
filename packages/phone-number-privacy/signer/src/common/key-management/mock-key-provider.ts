@@ -6,23 +6,27 @@ import { DefaultKeyName, Key, KeyProviderBase } from './key-provider-base'
 
 export class MockKeyProvider extends KeyProviderBase {
   constructor(
-    private pnpKey: string = PNP_DEV_SIGNER_PRIVATE_KEY,
-    private domainsKey: string = DOMAINS_DEV_SIGNER_PRIVATE_KEY
+    private keyMocks: Map<Key, string> = new Map([
+      [{ name: DefaultKeyName.PHONE_NUMBER_PRIVACY, version: 1 }, PNP_DEV_SIGNER_PRIVATE_KEY],
+      [
+        { name: DefaultKeyName.PHONE_NUMBER_PRIVACY, version: 2 },
+        PNP_DEV_SIGNER_PRIVATE_KEY, // TODO(Alec) create new key shares?
+      ],
+      [{ name: DefaultKeyName.DOMAINS, version: 1 }, DOMAINS_DEV_SIGNER_PRIVATE_KEY],
+      [
+        { name: DefaultKeyName.DOMAINS, version: 2 },
+        DOMAINS_DEV_SIGNER_PRIVATE_KEY, // TODO(Alec) create new key shares?
+      ],
+    ])
   ) {
     super()
   }
 
   public async fetchPrivateKeyFromStore(key: Key) {
-    switch (key.name) {
-      case DefaultKeyName.PHONE_NUMBER_PRIVACY:
-        this.setPrivateKey(key, this.pnpKey)
-        break
-      case DefaultKeyName.DOMAINS:
-        this.setPrivateKey(key, this.domainsKey)
-        break
-      default:
-        // Force tests to explicitly set the key name or modify the mock provider
-        throw new Error('unknown key name for MockKeyProvider')
+    const keyString = this.keyMocks.get(key)
+    if (keyString) {
+      return this.setPrivateKey(key, keyString)
     }
+    throw new Error('unknown key for MockKeyProvider')
   }
 }

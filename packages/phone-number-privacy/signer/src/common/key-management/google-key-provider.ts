@@ -19,7 +19,7 @@ export class GoogleKeyProvider extends KeyProviderBase {
           key.version.toString()
         )
       } catch (err) {
-        logger.info(`Error retrieving key: ${JSON.stringify(key)}`)
+        logger.info(`Error retrieving key: ${key}`)
         logger.error(err)
         logger.error(ErrorMessage.KEY_FETCH_ERROR)
         privateKey = await this.fetch(client, projectId, secretName, secretVersion)

@@ -4,6 +4,7 @@ import {
   DomainRestrictedSignatureRequest,
   ErrorMessage,
   ErrorType,
+  getRequestKeyVersion,
   ThresholdPoprfServer,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -97,7 +98,7 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
 
         const key: Key = {
           version:
-            this.io.getRequestKeyVersion(session.request, session.logger) ??
+            getRequestKeyVersion(session.request, session.logger) ??
             this.config.keystore.keys.domains.latest,
           name: DefaultKeyName.DOMAINS,
         }

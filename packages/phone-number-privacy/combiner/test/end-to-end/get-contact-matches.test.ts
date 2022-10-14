@@ -15,6 +15,8 @@ import {
   walletAuthSigner,
 } from './resources'
 
+// TODO(Alec) decide what to do with matchmaking code
+
 require('dotenv').config()
 
 jest.setTimeout(60000)

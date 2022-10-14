@@ -26,14 +26,14 @@ export abstract class KeyProviderBase implements KeyProvider {
   public getPrivateKey(key: Key) {
     const privateKey = this.privateKeys.get(key)
     if (!privateKey) {
-      throw new Error(`Private key is unavailable: ${JSON.stringify(key)}`)
+      throw new Error(`Private key is unavailable: ${key}`)
     }
     return privateKey
   }
 
   public async getPrivateKeyOrFetchFromStore(key: Key): Promise<string> {
-    if (key.version < 1) {
-      throw new Error('Invalid private key version')
+    if (key.version < 0) {
+      throw new Error('Invalid private key version. Key version must be a positive integer.')
     }
     try {
       return this.getPrivateKey(key)
