@@ -167,7 +167,7 @@ const isStructExpandable = (oldType: TypeInfo, oldLayout: StorageLayoutInfo) => 
 const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo): {compatible: boolean, errors: any[], expanded?: boolean} => {
   let compatible = true
   let errors = []
-  let expanded: boolean = undefined
+  let expanded: boolean
 
   Object.keys(newLayout.types).forEach(typeName => {
     const newType = newLayout.types[typeName]
