@@ -1,8 +1,8 @@
+import { timeout } from '@celo/base'
 import {
   Domain,
   domainHash,
   DomainRestrictedSignatureRequest,
-  ErrorMessage,
   ErrorType,
   ThresholdPoprfServer,
   WarningMessage,
@@ -45,7 +45,10 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
     readonly io: DomainSignIO
   ) {}
 
-  public async perform(session: DomainSession<DomainRestrictedSignatureRequest>): Promise<void> {
+  public async perform(
+    session: DomainSession<DomainRestrictedSignatureRequest>,
+    timeoutError: symbol
+  ): Promise<void> {
     const domain = session.request.body.domain
     session.logger.info(
       {
@@ -55,9 +58,8 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
       },
       'Processing request to get domain signature '
     )
-
-    try {
-      const res: TrxResult = await this.db.transaction(async (trx) => {
+    const res: TrxResult = await this.db.transaction(async (trx) => {
+      const domainSignHandler = async (): Promise<TrxResult> => {
         // Get the current domain state record, or use an empty record if one does not exist.
         const domainStateRecord = await this.quota.getQuotaStatus(session, trx)
 
@@ -117,27 +119,26 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
           key,
           signature: evaluation.toString('base64'),
         }
-      })
-
-      if (res.success) {
-        this.io.sendSuccess(
-          res.status,
-          session.response,
-          res.key,
-          res.signature,
-          toSequentialDelayDomainState(res.domainStateRecord)
-        )
-      } else {
-        this.io.sendFailure(
-          res.error,
-          res.status,
-          session.response,
-          toSequentialDelayDomainState(res.domainStateRecord)
-        )
       }
-    } catch (error) {
-      session.logger.error(error, 'Failed to get signature for a domain')
-      this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)
+      // Ensure timeouts roll back DB trx
+      return timeout(domainSignHandler, [], this.config.timeout, timeoutError)
+    })
+
+    if (res.success) {
+      this.io.sendSuccess(
+        res.status,
+        session.response,
+        res.key,
+        res.signature,
+        toSequentialDelayDomainState(res.domainStateRecord)
+      )
+    } else {
+      this.io.sendFailure(
+        res.error,
+        res.status,
+        session.response,
+        toSequentialDelayDomainState(res.domainStateRecord)
+      )
     }
   }
 

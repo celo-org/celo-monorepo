@@ -1,3 +1,4 @@
+import { timeout } from '@celo/base'
 import {
   ErrorMessage,
   LegacyPnpQuotaRequest,
@@ -18,10 +19,15 @@ export class PnpQuotaAction implements Action<PnpQuotaRequest | LegacyPnpQuotaRe
   ) {}
 
   public async perform(
-    session: PnpSession<PnpQuotaRequest | LegacyPnpQuotaRequest>
+    session: PnpSession<PnpQuotaRequest | LegacyPnpQuotaRequest>,
+    timeoutError: symbol
   ): Promise<void> {
-    const quotaStatus = await this.quota.getQuotaStatus(session)
-
+    const quotaStatus = await timeout(
+      () => this.quota.getQuotaStatus(session),
+      [],
+      this.config.timeout,
+      timeoutError
+    )
     if (quotaStatus.performedQueryCount > -1 && quotaStatus.totalQuota > -1) {
       this.io.sendSuccess(200, session.response, quotaStatus, session.errors)
       return

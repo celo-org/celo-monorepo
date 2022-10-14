@@ -1,4 +1,5 @@
-import { DisableDomainRequest, domainHash, ErrorMessage } from '@celo/phone-number-privacy-common'
+import { timeout } from '@celo/base'
+import { DisableDomainRequest, domainHash } from '@celo/phone-number-privacy-common'
 import { Knex } from 'knex'
 import { Action } from '../../../common/action'
 import { toSequentialDelayDomainState } from '../../../common/database/models/domain-state'
@@ -15,7 +16,10 @@ import { DomainDisableIO } from './io'
 export class DomainDisableAction implements Action<DisableDomainRequest> {
   constructor(readonly db: Knex, readonly config: SignerConfig, readonly io: DomainDisableIO) {}
 
-  public async perform(session: DomainSession<DisableDomainRequest>): Promise<void> {
+  public async perform(
+    session: DomainSession<DisableDomainRequest>,
+    timeoutError: symbol
+  ): Promise<void> {
     const domain = session.request.body.domain
     session.logger.info(
       {
@@ -25,10 +29,9 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
       },
       'Processing request to disable domain'
     )
-
-    try {
-      // Inside a database transaction, update or create the domain to mark it disabled.
-      const res = await this.db.transaction(async (trx) => {
+    // Inside a database transaction, update or create the domain to mark it disabled.
+    const res = await this.db.transaction(async (trx) => {
+      const disableDomainHandler = async () => {
         const domainStateRecord =
           (await getDomainStateRecord(this.db, domain, session.logger, trx)) ??
           (await insertDomainStateRecord(
@@ -46,16 +49,15 @@ export class DomainDisableAction implements Action<DisableDomainRequest> {
           status: 200,
           domainStateRecord,
         }
-      })
+      }
+      // Ensure timeouts roll back DB trx
+      return timeout(disableDomainHandler, [], this.config.timeout, timeoutError)
+    })
 
-      this.io.sendSuccess(
-        res.status,
-        session.response,
-        toSequentialDelayDomainState(res.domainStateRecord)
-      )
-    } catch (error) {
-      session.logger.error(error, 'Error while disabling domain')
-      this.io.sendFailure(ErrorMessage.DATABASE_UPDATE_FAILURE, 500, session.response)
-    }
+    this.io.sendSuccess(
+      res.status,
+      session.response,
+      toSequentialDelayDomainState(res.domainStateRecord)
+    )
   }
 }

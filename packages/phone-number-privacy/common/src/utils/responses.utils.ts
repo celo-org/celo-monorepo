@@ -32,4 +32,5 @@ export function send<
     logger.info({ status, body }, 'Responding with success')
   }
   response.status(status).json(body)
+  logger.info('Completed send')
 }

@@ -20,6 +20,7 @@ import request from 'supertest'
 import { initDatabase } from '../../src/common/database/database'
 import { ACCOUNTS_TABLE } from '../../src/common/database/models/account'
 import { REQUESTS_TABLE } from '../../src/common/database/models/request'
+import { countAndThrowDBError } from '../../src/common/database/utils'
 import {
   getPerformedQueryCount,
   incrementQueryCount,
@@ -48,8 +49,6 @@ const {
   DEK_PUBLIC_KEY,
 } = TestUtils.Values
 
-// TODO(2.0.0, timeout) revisit flake tracker timeouts under the umbrella of
-// https://github.com/celo-org/celo-monorepo/issues/9845
 jest.setTimeout(20000)
 
 const testBlockNumber = 1000000
@@ -416,18 +415,16 @@ describe('pnp', () => {
           })
         })
 
-        // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
-        // Due to weird timeout handling, the signer continues to return responses
-        // after returning the initial error on timeout.
         it('Should respond with 500 on signer timeout', async () => {
           const testTimeoutMS = 200
+          const delay = 100
           const spy = jest
             .spyOn(
               jest.requireActual('../../src/common/database/wrappers/account'),
               'getPerformedQueryCount'
             )
             .mockImplementation(async () => {
-              await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + 1200))
+              await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
               return expectedQuota
             })
 
@@ -448,13 +445,17 @@ describe('pnp', () => {
             undefined,
             appWithShortTimeout
           )
-
+          // Ensure that this is restored before test can fail on assertions
+          // to prevent failures in other tests
+          spy.mockRestore()
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual({
             success: false,
             error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+            version: expectedVersion,
           })
-          spy.mockRestore()
+          // Allow time for non-killed processes to finish
+          await new Promise((resolve) => setTimeout(resolve, delay))
         })
       })
     })
@@ -908,6 +909,71 @@ describe('pnp', () => {
           spy.mockRestore()
         })
 
+        it('Should respond with 500 on signer timeout', async () => {
+          const testTimeoutMS = 200
+          const delay = 200
+          const spy = jest
+            .spyOn(
+              jest.requireActual('../../src/common/database/wrappers/account'),
+              'getPerformedQueryCount'
+            )
+            .mockImplementationOnce(async () => {
+              await new Promise((resolve) => setTimeout(resolve, testTimeoutMS + delay))
+              return performedQueryCount
+            })
+
+          const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
+          configWithShortTimeout.timeout = testTimeoutMS
+          const appWithShortTimeout = startSigner(
+            configWithShortTimeout,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
+
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.PNP_SIGN,
+            undefined,
+            appWithShortTimeout
+          )
+
+          expect(res.status).toBe(500)
+          expect(res.body).toStrictEqual({
+            success: false,
+            error: ErrorMessage.TIMEOUT_FROM_SIGNER,
+            version: expectedVersion,
+          })
+          spy.mockRestore()
+          // Allow time for non-killed processes to finish
+          await new Promise((resolve) => setTimeout(resolve, delay))
+          // Check that DB was not updated
+          expect(
+            await getPerformedQueryCount(
+              db,
+              ACCOUNTS_TABLE.ONCHAIN,
+              ACCOUNT_ADDRESS1,
+              rootLogger(config.serviceName)
+            )
+          ).toBe(performedQueryCount)
+          expect(
+            await getRequestExists(
+              db,
+              REQUESTS_TABLE.ONCHAIN,
+              req.account,
+              req.blindedQueryPhoneNumber,
+              rootLogger(config.serviceName)
+            )
+          ).toBe(false)
+        })
+
         it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
           expect(_config.api.phoneNumberPrivacy.shouldFailOpen).toBe(true)
           // deplete user's quota
@@ -1012,12 +1078,15 @@ describe('pnp', () => {
         })
 
         it('Should return 500 on failure to increment query count', async () => {
+          const logger = rootLogger(_config.serviceName)
           const spy = jest
             .spyOn(
               jest.requireActual('../../src/common/database/wrappers/account'),
               'incrementQueryCount'
             )
-            .mockRejectedValueOnce(new Error())
+            .mockImplementationOnce(() => {
+              countAndThrowDBError(new Error(), logger, ErrorMessage.DATABASE_UPDATE_FAILURE)
+            })
 
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -1026,24 +1095,19 @@ describe('pnp', () => {
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          spy.mockRestore()
 
           expect.assertions(4)
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
-            error: ErrorMessage.UNKNOWN_ERROR,
+            error: ErrorMessage.DATABASE_UPDATE_FAILURE,
           })
 
-          spy.mockRestore()
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(
-              db,
-              ACCOUNTS_TABLE.ONCHAIN,
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName)
-            )
+            await getPerformedQueryCount(db, ACCOUNTS_TABLE.ONCHAIN, ACCOUNT_ADDRESS1, logger)
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(
@@ -1051,15 +1115,18 @@ describe('pnp', () => {
               REQUESTS_TABLE.ONCHAIN,
               req.account,
               req.blindedQueryPhoneNumber,
-              rootLogger(_config.serviceName)
+              logger
             )
           ).toBe(false)
         })
 
         it('Should return 500 on failure to store request', async () => {
+          const logger = rootLogger(_config.serviceName)
           const spy = jest
             .spyOn(jest.requireActual('../../src/common/database/wrappers/request'), 'storeRequest')
-            .mockRejectedValueOnce(new Error())
+            .mockImplementationOnce(() => {
+              countAndThrowDBError(new Error(), logger, ErrorMessage.DATABASE_INSERT_FAILURE)
+            })
 
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -1068,24 +1135,18 @@ describe('pnp', () => {
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          spy.mockRestore()
 
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
             version: res.body.version,
-            error: ErrorMessage.UNKNOWN_ERROR,
+            error: ErrorMessage.DATABASE_INSERT_FAILURE,
           })
-
-          spy.mockRestore()
 
           // check DB state: performedQueryCount was not incremented and request was not stored
           expect(
-            await getPerformedQueryCount(
-              db,
-              ACCOUNTS_TABLE.ONCHAIN,
-              ACCOUNT_ADDRESS1,
-              rootLogger(_config.serviceName)
-            )
+            await getPerformedQueryCount(db, ACCOUNTS_TABLE.ONCHAIN, ACCOUNT_ADDRESS1, logger)
           ).toBe(performedQueryCount)
           expect(
             await getRequestExists(
@@ -1093,7 +1154,7 @@ describe('pnp', () => {
               REQUESTS_TABLE.ONCHAIN,
               req.account,
               req.blindedQueryPhoneNumber,
-              rootLogger(_config.serviceName)
+              logger
             )
           ).toBe(false)
         })

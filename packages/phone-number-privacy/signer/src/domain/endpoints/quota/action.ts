@@ -1,8 +1,5 @@
-import {
-  domainHash,
-  DomainQuotaStatusRequest,
-  ErrorMessage,
-} from '@celo/phone-number-privacy-common'
+import { timeout } from '@celo/base'
+import { domainHash, DomainQuotaStatusRequest } from '@celo/phone-number-privacy-common'
 import { Action } from '../../../common/action'
 import { toSequentialDelayDomainState } from '../../../common/database/models/domain-state'
 import { SignerConfig } from '../../../config'
@@ -17,19 +14,22 @@ export class DomainQuotaAction implements Action<DomainQuotaStatusRequest> {
     readonly io: DomainQuotaIO
   ) {}
 
-  public async perform(session: DomainSession<DomainQuotaStatusRequest>): Promise<void> {
+  public async perform(
+    session: DomainSession<DomainQuotaStatusRequest>,
+    timeoutError: symbol
+  ): Promise<void> {
     const domain = session.request.body.domain
     session.logger.info('Processing request to get domain quota status', {
       name: domain.name,
       version: domain.version,
       hash: domainHash(domain).toString('hex'),
     })
-    try {
-      const domainStateRecord = await this.quotaService.getQuotaStatus(session)
-      this.io.sendSuccess(200, session.response, toSequentialDelayDomainState(domainStateRecord))
-    } catch (error) {
-      session.logger.error(error, 'Error while getting domain status')
-      this.io.sendFailure(ErrorMessage.DATABASE_GET_FAILURE, 500, session.response)
-    }
+    const domainStateRecord = await timeout(
+      () => this.quotaService.getQuotaStatus(session),
+      [],
+      this.config.timeout,
+      timeoutError
+    )
+    this.io.sendSuccess(200, session.response, toSequentialDelayDomainState(domainStateRecord))
   }
 }
