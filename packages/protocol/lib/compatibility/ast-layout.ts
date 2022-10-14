@@ -48,7 +48,7 @@ export interface ASTStorageCompatibilityReport {
   contract: string
   compatible: boolean
   errors: string[]
-  expanded: boolean
+  expanded?: boolean
 }
 
 const operationToDescription = (operation: Operation) => {
@@ -106,7 +106,6 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
   if (oldType.kind !== 'struct') {
     return {
       same: false,
-      expanded: false,
       errors: [`${newType.label} wasn't a struct type, now is`]
     }
   }
@@ -136,7 +135,6 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
   if (oldType.members.length !== newType.members.length) {
     return {
       same: false,
-      expanded: false,
       errors: [`struct ${newType.label} has changed members`]
     }
   }
@@ -156,7 +154,6 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structEx
 
   return {
     same: memberErrors.length === 0,
-    expanded: false,
     errors: memberErrors
   }
 }
@@ -167,10 +164,10 @@ const isStructExpandable = (oldType: TypeInfo, oldLayout: StorageLayoutInfo) => 
   return !oldLayout.storage.some(storage => storage.type === structString)
 }
 
-const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo) => {
+const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo): {compatible: boolean, errors: any[], expanded?: boolean} => {
   let compatible = true
   let errors = []
-  let expanded = false
+  let expanded: boolean = undefined
 
   Object.keys(newLayout.types).forEach(typeName => {
     const newType = newLayout.types[typeName]
@@ -195,7 +192,8 @@ const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLay
 }
 
 export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts: BuildArtifacts,
-                       newArtifact: Artifact, newArtifacts: BuildArtifacts) => {
+                       newArtifact: Artifact, newArtifacts: BuildArtifacts)
+                       : {contract: string, compatible: boolean, errors: any[], expanded?: boolean } => {
       const oldLayout = getLayout(oldArtifact, oldArtifacts)
       const newLayout = getLayout(newArtifact, newArtifacts)
       const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
@@ -219,7 +217,6 @@ export const reportLayoutIncompatibilities = (oldArtifacts: BuildArtifacts, newA
       return {
         contract: newArtifact.contractName,
         compatible: true,
-        expanded: false,
         errors: []
       }
     }
