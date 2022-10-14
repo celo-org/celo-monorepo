@@ -68,7 +68,9 @@ export default class Approve extends BaseCommand {
         .proposalExists(id)
         .proposalInStage(
           id,
-          governanceVersion.storage == 1 && governanceVersion.major < 3 ? 'Approval' : 'Referendum'
+          governanceVersion.storage === '1' && governanceVersion.major < 3
+            ? 'Approval'
+            : 'Referendum'
         )
         .addCheck(`${id} not already approved`, async () => !(await governance.isApproved(id)))
         .runChecks()
