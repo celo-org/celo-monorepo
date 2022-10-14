@@ -1,21 +1,40 @@
 import {
-  DOMAINS_DEV_SIGNER_PRIVATE_KEY,
-  PNP_DEV_SIGNER_PRIVATE_KEY,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V1,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V2,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V3,
+  PNP_THRESHOLD_DEV_PK_SHARE_1_V1,
+  PNP_THRESHOLD_DEV_PK_SHARE_1_V2,
+  PNP_THRESHOLD_DEV_PK_SHARE_1_V3,
 } from '@celo/phone-number-privacy-common/lib/test/values'
-import { DefaultKeyName, Key, KeyProviderBase } from './key-provider-base'
+import { DefaultKeyName, getKeyString, Key, KeyProviderBase } from './key-provider-base'
 
 export class MockKeyProvider extends KeyProviderBase {
+  // prettier-ignore
   constructor(
-    private keyMocks: Map<Key, string> = new Map([
-      [{ name: DefaultKeyName.PHONE_NUMBER_PRIVACY, version: 1 }, PNP_DEV_SIGNER_PRIVATE_KEY],
+    private keyMocks: Map<string, string> = new Map([
       [
-        { name: DefaultKeyName.PHONE_NUMBER_PRIVACY, version: 2 },
-        PNP_DEV_SIGNER_PRIVATE_KEY, // TODO(Alec) create new key shares?
+        `${DefaultKeyName.PHONE_NUMBER_PRIVACY}-1`, 
+        PNP_THRESHOLD_DEV_PK_SHARE_1_V1
       ],
-      [{ name: DefaultKeyName.DOMAINS, version: 1 }, DOMAINS_DEV_SIGNER_PRIVATE_KEY],
       [
-        { name: DefaultKeyName.DOMAINS, version: 2 },
-        DOMAINS_DEV_SIGNER_PRIVATE_KEY, // TODO(Alec) create new key shares?
+        `${DefaultKeyName.PHONE_NUMBER_PRIVACY}-2`,
+        PNP_THRESHOLD_DEV_PK_SHARE_1_V2,
+      ],
+      [
+        `${DefaultKeyName.PHONE_NUMBER_PRIVACY}-3`, 
+        PNP_THRESHOLD_DEV_PK_SHARE_1_V3
+      ],
+      [ 
+        `${DefaultKeyName.DOMAINS}-1`, 
+        DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V1
+      ],
+      [
+        `${DefaultKeyName.DOMAINS}-2`,
+        DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V2,
+      ],
+      [ 
+        `${DefaultKeyName.DOMAINS}-3`, 
+        DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V3
       ],
     ])
   ) {
@@ -23,7 +42,7 @@ export class MockKeyProvider extends KeyProviderBase {
   }
 
   public async fetchPrivateKeyFromStore(key: Key) {
-    const keyString = this.keyMocks.get(key)
+    const keyString = this.keyMocks.get(getKeyString(key))
     if (keyString) {
       return this.setPrivateKey(key, keyString)
     }

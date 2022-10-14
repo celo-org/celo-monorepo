@@ -74,8 +74,12 @@ jest.mock('@celo/contractkit', () => ({
   newKit: jest.fn().mockImplementation(() => mockContractKit),
 }))
 
-const expectedSignature =
-  'MAAAAAAAAAAEFHu3gWowoNJvvWkINGZR/1no37LPBFYRIHu3h5xYowXo1tlIlrL9CbN0cNqcKIAAAAAA'
+// Indexes correspond to keyVersion - 1
+const expectedSignatures: string[] = [
+  'MAAAAAAAAACEVdw1ULDwAiTcZuPnZxHHh38PNa+/g997JgV10QnEq9yeuLxbM9l7vk0EAicV7IAAAAAA',
+  'MAAAAAAAAAAmUJY0s9p7fMfs7GIoSiGJoObAN8ZpA7kRqeC9j/Q23TBrG3Jtxc8xWibhNVZhbYEAAAAA',
+  'MAAAAAAAAAC4aBbzhHvt6l/b+8F7cILmWxZZ5Q7S6R4RZ/IgZR7Pfb9B1Wg9fsDybgxVTSv5BYEAAAAA',
+]
 
 describe('pnp', () => {
   let keyProvider: KeyProvider
@@ -91,6 +95,8 @@ describe('pnp', () => {
   _config.db.type = SupportedDatabase.Sqlite
   _config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
   _config.api.phoneNumberPrivacy.enabled = true
+
+  const expectedSignature = expectedSignatures[_config.keystore.keys.phoneNumberPrivacy.latest - 1]
 
   beforeAll(async () => {
     keyProvider = await initKeyProvider(_config)
@@ -565,26 +571,28 @@ describe('pnp', () => {
         })
       })
 
-      it('Should respond with 200 on valid request with key version header', async () => {
-        const req = getPnpSignRequest(
-          ACCOUNT_ADDRESS1,
-          BLINDED_PHONE_NUMBER,
-          AuthenticationMethod.WALLET_KEY
-        )
-        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, '3') // since default is '1' or '2'
-        expect(res.status).toBe(200)
-        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
-          success: true,
-          version: res.body.version,
-          signature: expectedSignature,
-          performedQueryCount: performedQueryCount + 1,
-          totalQuota: expectedQuota,
-          blockNumber: testBlockNumber,
-          warnings: [],
+      for (let i = 1; i <= 3; i++) {
+        it(`Should respond with 200 on valid request with key version header ${i}`, async () => {
+          const req = getPnpSignRequest(
+            ACCOUNT_ADDRESS1,
+            BLINDED_PHONE_NUMBER,
+            AuthenticationMethod.WALLET_KEY
+          )
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN, i.toString())
+          expect(res.status).toBe(200)
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
+            success: true,
+            version: res.body.version,
+            signature: expectedSignatures[i - 1],
+            performedQueryCount: performedQueryCount + 1,
+            totalQuota: expectedQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+          expect(res.get(KEY_VERSION_HEADER)).toEqual(i.toString())
         })
-        expect(res.get(KEY_VERSION_HEADER)).toEqual('3')
-      })
+      }
 
       it('Should respond with 200 and warning on repeated valid requests', async () => {
         const req = getPnpSignRequest(

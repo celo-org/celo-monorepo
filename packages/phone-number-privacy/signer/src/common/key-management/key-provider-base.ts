@@ -17,14 +17,14 @@ export interface KeyProvider {
 const PRIVATE_KEY_SIZE = 72
 
 export abstract class KeyProviderBase implements KeyProvider {
-  protected privateKeys: Map<Key, string>
+  protected privateKeys: Map<string, string>
 
   constructor() {
     this.privateKeys = new Map()
   }
 
   public getPrivateKey(key: Key) {
-    const privateKey = this.privateKeys.get(key)
+    const privateKey = this.privateKeys.get(getKeyString(key))
     if (!privateKey) {
       throw new Error(`Private key is unavailable: ${key}`)
     }
@@ -50,7 +50,7 @@ export abstract class KeyProviderBase implements KeyProvider {
     if (privateKey.length !== PRIVATE_KEY_SIZE) {
       throw new Error('Invalid private key')
     }
-    this.privateKeys.set(key, privateKey)
+    this.privateKeys.set(getKeyString(key), privateKey)
   }
 
   protected getCustomKeyName(key: Key) {
@@ -63,4 +63,8 @@ export abstract class KeyProviderBase implements KeyProvider {
         return key.name
     }
   }
+}
+
+export function getKeyString(key: Key) {
+  return `${key.name}-${key.version}`
 }

@@ -56,12 +56,13 @@ describe('domain', () => {
 
   const signatureRequest = async (
     _domain?: SequentialDelayDomain,
-    _nonce?: number
+    _nonce?: number,
+    keyVersion: number = config.keystore.keys.domains.latest
   ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, ThresholdPoprfClient]> => {
     const domain = _domain ?? authenticatedDomain()
     const thresholdPoprfClient = new ThresholdPoprfClient(
-      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'hex'),
-      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_POLYNOMIAL, 'hex'),
+      Buffer.from(TestUtils.Values.DOMAINS_THRESHOLD_DEV_PUBKEYS[keyVersion - 1], 'hex'),
+      Buffer.from(TestUtils.Values.DOMAINS_THRESHOLD_DEV_POLYNOMIALS[keyVersion - 1], 'hex'),
       domainHash(domain),
       Buffer.from('test message', 'utf8')
     )
@@ -446,8 +447,12 @@ describe('domain', () => {
   })
 
   describe(`${SignerEndpoint.DOMAIN_SIGN}`, () => {
-    const expectedEval =
-      'AQAAADOLyMxriQz1lPksXKDan0zfWippSmq3a1st9Hk+k7ad/wKZQHgaoHtCkJucKgdeAe/BCnXDGeArwmXrdLp8ArM41S2b148ebYEhOL6nqI6HGJ7xO15sCk+eZEf/RSfdAJJDj99oz65j7fgUPJQlHl74Bf+zk78xhlFFzAliHhGxe1a4uWKaa541WqY4OqQHAPnnu9X+DKcjR9/u+gH0VWLnZi/kB3gthhB6sYcGnslkTQbSIHcTbDyNs5GN8wjzAPL2/fD/2yqZfmfupeB8dQ1/PlCJJzwS/oKfeZqh9Z61zwELfkfHVAL8lGvWEjtXANbcUZ+2KoT+XVDJc+CxpPaaGavshKQFgiVLO4cxY5g8auai4P+SkolQVUjEYjYnAKr5ZzN0l53OpqfzJy5fRlLYN+Ks+VLy+2bUxS4gUD0iLMgM1ZbdD19tXnWDSycEAEJNZPxLivV5jHB/gsq19saWdVnhGDOs4hieyUrRF0kEHTkmTbgZAsnwGcEjXtGSALQU218BFPRW79gRMC9TUCzPc970GcLqMiKMugadALpgD360KoIy/xBwai1JEScAAMWAOBxn1CcRmqWBi7bdcTcGZfPdS281G+Ua1y0q7yenU3UFk+9MW/efZVbEqtQTANYW08+nOBf8KRuXEz9BCO9F8+0Kpxwk9DQ4K5O6J/1+4uQlODjyXafvEgG9eAUaACT876ljZDQm72i3TWYacJyVSneK5L+9q81qd9krXDr1sO+4wCs0RuOKzWB1PDXzAA=='
+    const expectedEvals: string[] = [
+      'AAAAABmDdMBnsDW1ReL0tVq4cmRm64FhzMSSul/ZuFzvTGu/B4XVIH9aX6oFpRIYMCckAcfU4gnxtlu+TX0EhJxKxd9IEzNoAV5vTeClflPJ5Par64TYyZfoz5bhQfbMpyEDAG7jSZ7K4eJHMS+7lsLAyocSdRAGC+IVhWj/adLzctF+Cki4IYJCL0+31aWZ5MWXAMnuQFgpAonTwtfcqagNDWWVp2u7Hc7z0fSvJ4Q/L2QEGwVDEUUuUOgqe7APs8KYAEXHnk0PQJmpsWw0Y9PPqCHY6C8J06qGXzhkYllZYDAUHkC8sKE6kCmWDAyr36F+AfPECJVnD7zu/P6obXvIUqwOY0pPo5uIA2ncVpWoP6NxDVWicSdI7lW4MopX7ZiUAHFO+KxQmxf+VxGZxNp6FREeT5Dc8dEEwZSq4Q5lnrcOdtxpLTLLUgdmnC70eaKGAZHEPnwi3hLBViyPhU709N+ptN2ittrwTqgFabN4OevB9+Ohz/AmaVPsZTUARrpaAJHvmO9PU/B/NCW0O7pVrnKbQRQvqXi1IEBBpu4jwZ26sj4JFu7RcoDif34XXqOsASIDF/wCgGqH+NpVSIAcIJsIAG1lSNm0QA7yRBzO5bMPLCjWNJ/3HIVzYZJAJFBSAQlxtbqMdiyKtKrkHh2rx1tA9VGNt4IG1tLRrcrahLVYKFBFOptrUd5thbaJBv0bAGJmNnQDj+VbtkOI5apDRol2IjXijJsV9v4bRrXCxOPrezILSsNVl0wKY2d/61w9AA==',
+      'AQAAAFd54JZz5xv1zf7+U8ZpjfLQQ4kZr5jl8R0/nWUqTcQyiO25awk09nh3elLvd6VkAOxnY0oiHASh7uzDJsi/XuDBJrp1oKoZ85eoCP90/RzGTuGDsHEmKtgDk/lAesQvAeGPjrhyjVleFcdnFq+czoT3aoOrYhdAin2lGU6nWAehbJwUyj5uvI+uEfcvk0KGAVbhZzC1L7jjGaLj+3SmhMfP71kqS5DeaSuyzu0byXum548HT1NRoO96icdfDtUBAfSw/FDzGfrFYf6WdUAObehnGt49AMpkVtGaMOsnETPL/nlbMizK4vMas+NlwyqgAZdCQaGX/FixHYpTDJ6NlBvWHwryoSJFse9XVLg5OizlEYh2ASLxFsZKqMCs7c6TAOYhwSWBeIkJCb0PQBsEMk2/vvnTY5RDAcBYW8aJ118IX/hcO9gO+lLathT+CKlDADGMQTVn1wqFapYZ677Gcsb4JDhUOaQjJCYu7JXlcyhLOe3/0AwI1LjI+ClA+TupADL+qQWTxyfcCfBb9XdcD6klzzFNs0aUfEwgjDyBUVbGrMBSQyE8ErDJYII7j1J4AeacepfWb54q2SLFBIIaoQiWhgeh527QOVbDBYQy0KutYBxEdp/RmJ3vIJL/u/PBAB/5gedsqPzRxIH3yTYoHX5U0bOL6XTmZVNaNZ9rnXn58IXiWORNudbwdA4DGZMOAPUtu1ze8sTUE/PsjNzVPNwhwJz8cQbt4tGC3luRUctkx26K+nZgn8GkCQV9AtByAQ==',
+      'AQAAADri1djYjhPpolB6aRwD6ptKRz4EGNAYWba0TYfM/TgQxeoSTupAfJLIJdYEWAEdATyCz9VWW7lC1InwUUCq7vARCWClyAoBQ8LdMAi9bYFy4MrEj+urzTmUgmZL1r39AJOhT9H+SuGv1uBET1Hv49aWZReTo0NhK4U6Oh6y8tHou+P3LC155ZZHLRrmcyGDARnOhBs25CHMjrvkLwcLsJNnK7Y0QXO4/6YEVTBBcsN+F/BGLgtP5GaiPdtDXuYEAFhZW+a0pZIlUzaYZaiXFMQ6pJJbCsMJTK+khfWBSAFuVVkG2wIKTGiTqOkw+o8SAeooTBoO0NJJZcpP+jY++zRziX+X7fyixmBlcStbmVU4gwA1kG/4kvEsrIh+kEygAWvxw/2JZcIDZRRAkhHu+uZwSflSwFFW8omtI36t7YmYmOMpXxTHFNdJyh2mMS29AP7dzScfrKa4NObq/UN85PjIvBTR5otWCFrsT0gNSDnEiGO6cXFIHMexyPRTLYSpAVJra/z283B8DjejVN1qyQFRi9upU5M1vxVLJo5y48IDJM8q+ZKDvokwY2icPxewAJZ2OtyGW55weDMTousWVEJoJ9oBiaXCb/ZOROJ8+Oyv8cR4Xbc8AZV3Ec4tusAcAFYoE7YCOwkSj7Beq7B3p16bfFcso8nA3GgGXx16qTCmEeCCS4alWFPE73AHlWknAaetWLlMMZIw6SURpkwSoALXe8DkvelkROc/uFlo2wypEswzLVW/dYpbHrU0U92OAQ==',
+    ]
+    const expectedEval = expectedEvals[_config.keystore.keys.domains.latest - 1]
 
     it('Should respond with 200 on valid request', async () => {
       const [req, thresholdPoprfClient] = await signatureRequest()
@@ -473,32 +478,34 @@ describe('domain', () => {
       expect(res.get(KEY_VERSION_HEADER)).toEqual(_config.keystore.keys.domains.latest.toString())
     })
 
-    it('Should respond with 200 on valid request with key version header', async () => {
-      const [req, thresholdPoprfClient] = await signatureRequest()
+    for (let i = 1; i <= 3; i++) {
+      it(`Should respond with 200 on valid request with key version header ${i}`, async () => {
+        const [req, thresholdPoprfClient] = await signatureRequest(undefined, undefined, i)
 
-      const res = await request(app)
-        .post(SignerEndpoint.DOMAIN_SIGN)
-        .set(KEY_VERSION_HEADER, '3') // since default is '1' or '2'
-        .send(req)
+        const res = await request(app)
+          .post(SignerEndpoint.DOMAIN_SIGN)
+          .set(KEY_VERSION_HEADER, i.toString())
+          .send(req)
 
-      expect(res.status).toBe(200)
-      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
-        success: true,
-        version: res.body.version,
-        signature: res.body.signature,
-        status: {
-          disabled: false,
-          counter: 1,
-          timer: res.body.status.timer,
-          now: res.body.status.now,
-        },
+        expect(res.status).toBe(200)
+        expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+          success: true,
+          version: res.body.version,
+          signature: res.body.signature,
+          status: {
+            disabled: false,
+            counter: 1,
+            timer: res.body.status.timer,
+            now: res.body.status.now,
+          },
+        })
+        const evaluation = thresholdPoprfClient.unblindPartialResponse(
+          Buffer.from(res.body.signature, 'base64')
+        )
+        expect(evaluation.toString('base64')).toEqual(expectedEvals[i - 1])
+        expect(res.get(KEY_VERSION_HEADER)).toEqual(i.toString())
       })
-      const evaluation = thresholdPoprfClient.unblindPartialResponse(
-        Buffer.from(res.body.signature, 'base64')
-      )
-      expect(evaluation.toString('base64')).toEqual(expectedEval)
-      expect(res.get(KEY_VERSION_HEADER)).toEqual('3')
-    })
+    }
 
     it('Should respond with 200 on repeated valid requests with nonce updated', async () => {
       const [req, thresholdPoprfClient] = await signatureRequest()
