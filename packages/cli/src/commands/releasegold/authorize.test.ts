@@ -2,6 +2,7 @@ import { newKitFromWeb3 } from '@celo/contractkit'
 import { getContractFromEvent, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import { addressToPublicKey, serializeSignature } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import ValidatorRegister from '../validator/register'
 import Authorize from './authorize'
 import CreateAccount from './create-account'
@@ -19,7 +20,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       web3
     )
     kit = newKitFromWeb3(web3)
-    await CreateAccount.run(['--contract', contractAddress])
+    await testLocally(CreateAccount, ['--contract', contractAddress])
   })
 
   describe('can authorize account signers', () => {
@@ -33,7 +34,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     })
 
     test('can authorize account vote signer ', async () => {
-      await Authorize.run([
+      await testLocally(Authorize, [
         '--contract',
         contractAddress,
         '--role',
@@ -46,7 +47,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     })
 
     test('can authorize account validator signer', async () => {
-      await Authorize.run([
+      await testLocally(Authorize, [
         '--contract',
         contractAddress,
         '--role',
@@ -59,7 +60,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     })
 
     test('can authorize account attestation signer', async () => {
-      await Authorize.run([
+      await testLocally(Authorize, [
         '--contract',
         contractAddress,
         '--role',
@@ -78,7 +79,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     const signer = accounts[1]
     const pop = await accountsWrapper.generateProofOfKeyPossession(contractAddress, signer)
     const ecdsaPublicKey = await addressToPublicKey(signer, web3.eth.sign)
-    await LockedGold.run([
+    await testLocally(LockedGold, [
       '--contract',
       contractAddress,
       '--action',
@@ -87,7 +88,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       '10000000000000000000000',
       '--yes',
     ])
-    await Authorize.run([
+    await testLocally(Authorize, [
       '--contract',
       contractAddress,
       '--role',
@@ -97,7 +98,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       '--signature',
       serializeSignature(pop),
     ])
-    await ValidatorRegister.run([
+    await testLocally(ValidatorRegister, [
       '--from',
       signer,
       '--ecdsaKey',
@@ -122,7 +123,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     const newBlsPublicKey = web3.utils.randomHex(96)
     const newBlsPoP = web3.utils.randomHex(48)
 
-    await LockedGold.run([
+    await testLocally(LockedGold, [
       '--contract',
       contractAddress,
       '--action',
@@ -131,7 +132,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       '10000000000000000000000',
       '--yes',
     ])
-    await Authorize.run([
+    await testLocally(Authorize, [
       '--contract',
       contractAddress,
       '--role',
@@ -141,7 +142,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       '--signature',
       serializeSignature(pop),
     ])
-    await ValidatorRegister.run([
+    await testLocally(ValidatorRegister, [
       '--from',
       signer,
       '--ecdsaKey',
@@ -152,7 +153,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       '0xcdb77255037eb68897cd487fdd85388cbda448f617f874449d4b11588b0b7ad8ddc20d9bb450b513bb35664ea3923900',
       '--yes',
     ])
-    await Authorize.run([
+    await testLocally(Authorize, [
       '--contract',
       contractAddress,
       '--role',
@@ -178,7 +179,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
     const signerNew = accounts[2]
     const popNew = await accountsWrapper.generateProofOfKeyPossession(contractAddress, signerNew)
 
-    await LockedGold.run([
+    await testLocally(LockedGold, [
       '--contract',
       contractAddress,
       '--action',
@@ -187,7 +188,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       '10000000000000000000000',
       '--yes',
     ])
-    await Authorize.run([
+    await testLocally(Authorize, [
       '--contract',
       contractAddress,
       '--role',
@@ -197,7 +198,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       '--signature',
       serializeSignature(pop),
     ])
-    await ValidatorRegister.run([
+    await testLocally(ValidatorRegister, [
       '--from',
       signer,
       '--ecdsaKey',
@@ -209,7 +210,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
       '--yes',
     ])
     await expect(
-      Authorize.run([
+      testLocally(Authorize, [
         '--contract',
         contractAddress,
         '--role',
@@ -225,7 +226,7 @@ testWithGanache('releasegold:authorize cmd', (web3: Web3) => {
   test('fails if contract is not registered as an account', async () => {
     const accounts = await web3.eth.getAccounts()
     await expect(
-      Authorize.run([
+      testLocally(Authorize, [
         '--contract',
         contractAddress,
         '--role',

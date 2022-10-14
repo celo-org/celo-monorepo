@@ -14,6 +14,6 @@ maintainers:
 icon: https://avatars1.githubusercontent.com/u/37552875?s=200&v=4
 appVersion: v1.0.0
 dependencies:
-- name: common
-  version: 0.1.1
-  repository: file://../common
+  - name: common
+    repository: oci://us-west1-docker.pkg.dev/devopsre/clabs-public-oci
+    version: 0.2.0

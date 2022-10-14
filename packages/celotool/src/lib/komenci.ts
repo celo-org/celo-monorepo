@@ -144,22 +144,22 @@ export async function installHelmChart(celoEnv: string, context: string, useForn
   // komenci pods can reach the K8s API server to change their aad labels
   await installKomenciRBACHelmChart(celoEnv, context)
   // Then install the komenci helm chart
-  return installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    helmChartPath,
-    await helmParameters(celoEnv, context, useForno)
-  )
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv, context, useForno),
+  })
 }
 
 export async function upgradeKomenciChart(celoEnv: string, context: string, useFullNodes: boolean) {
   await upgradeKomenciRBACHelmChart(celoEnv, context)
-  return upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    helmChartPath,
-    await helmParameters(celoEnv, context, useFullNodes)
-  )
+  return upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv, context, useFullNodes),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string, context: string) {
@@ -484,21 +484,21 @@ function getKomenciAzureIdentityName(keyVaultName: string, address: string) {
 // To do this, we use an auth token that we get using the resources in the `komenci-rbac` chart
 
 async function installKomenciRBACHelmChart(celoEnv: string, context: string) {
-  return installGenericHelmChart(
-    celoEnv,
-    rbacReleaseName(celoEnv, ''),
-    rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, context)
-  )
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: rbacReleaseName(celoEnv, ''),
+    chartDir: rbacHelmChartPath,
+    parameters: rbacHelmParameters(celoEnv, context),
+  })
 }
 
 async function upgradeKomenciRBACHelmChart(celoEnv: string, context: string) {
-  return upgradeGenericHelmChart(
-    celoEnv,
-    rbacReleaseName(celoEnv, ''),
-    rbacHelmChartPath,
-    rbacHelmParameters(celoEnv, context)
-  )
+  return upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: rbacReleaseName(celoEnv, ''),
+    chartDir: rbacHelmChartPath,
+    parameters: rbacHelmParameters(celoEnv, context),
+  })
 }
 
 function removeKomenciRBACHelmRelease(celoEnv: string) {

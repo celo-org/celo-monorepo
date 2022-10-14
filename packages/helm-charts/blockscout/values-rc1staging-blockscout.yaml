@@ -32,6 +32,9 @@ blockscout:
         cpu: 500m
   web:
     host: rc1staging-blockscout.celo-testnet.org
+    suffix:
+      enabled: true
+      path: "rc1staging"
     autoscaling:
       maxReplicas: 1
       minReplicas: 1
@@ -75,6 +78,7 @@ blockscout:
       apiKey: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-recaptchaApiKey
     erlang:
       cookie: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-erlangCookie
+    campaignBannerApiUrl: gcp:secretmanager:projects/365081401101/secrets/rc1staging-blockscout-campaignBannerApiUrl
   chain:
     subnetwork: Celo
     networkID: 42220

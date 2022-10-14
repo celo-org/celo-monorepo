@@ -56,6 +56,9 @@ blockscout:
         memory: 1000Mi
         cpu: 2
   api:
+    suffix:
+      enabled: false
+      path: ""
     port: 4000
     strategy:
       rollingUpdate:
@@ -116,6 +119,24 @@ blockscout:
         memory: 500Mi
         cpu: 500m
   web:
+    host: ""
+    suffix:
+      enabled: false
+      path: ""
+    # used once to create additional resources for proper routing
+    # of multiple environments on the same domain
+    extraEnvironments:
+      # format:
+      # -
+      #  environment: alfajores|baklava|rc1 etc.
+      #  suffix: alfajores|baklava|mainnet etc, must match the suffix
+      #          value configured for those environments
+      #  ingressIp: x.x.x.x
+      source: []
+      # format:
+      # -
+      #  sourceHost: ""
+      target: []
     port: 4000
     strategy:
       rollingUpdate:
@@ -218,6 +239,8 @@ blockscout:
     drop: "false"
   epochRewards:
     enabled: false
+  campaignBanner:
+    refreshInterval: "60"
   grafanaUrl: https://clabs.grafana.net
   secrets:
     # Format:
@@ -236,6 +259,7 @@ blockscout:
       apiKey: ""
     erlang:
       cookie: ""
+    campaignBannerApiUrl: ""
   chain:
     subnetwork: Celo
     networkID: 1101
