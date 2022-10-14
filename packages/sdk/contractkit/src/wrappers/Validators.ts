@@ -601,7 +601,7 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
    */
   async getValidatorRewards(
     epochNumber: number,
-    useBlockNumber: boolean
+    useBlockNumber?: boolean
   ): Promise<ValidatorReward[]> {
     const blockNumber = await this.getLastBlockNumberForEpoch(epochNumber)
     const events = await this.getPastEvents('ValidatorEpochPaymentDistributed', {
@@ -609,18 +609,14 @@ export class ValidatorsWrapper extends BaseWrapperForGoverning<Validators> {
       toBlock: blockNumber,
     })
     const validator: Validator[] = await concurrentMap(10, events, (e: EventLog) => {
-      if (useBlockNumber) {
-        return this.getValidator(e.returnValues.validator, blockNumber)
-      } else {
-        return this.getValidator(e.returnValues.validator)
-      }
+      return this.getValidator(e.returnValues.validator, useBlockNumber ? blockNumber : undefined)
     })
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) => {
-      if (useBlockNumber) {
-        return this.getValidatorGroup(e.returnValues.group, false, blockNumber)
-      } else {
-        return this.getValidatorGroup(e.returnValues.group, false)
-      }
+      return this.getValidatorGroup(
+        e.returnValues.group,
+        false,
+        useBlockNumber ? blockNumber : undefined
+      )
     })
     return events.map(
       (e: EventLog, index: number): ValidatorReward => ({

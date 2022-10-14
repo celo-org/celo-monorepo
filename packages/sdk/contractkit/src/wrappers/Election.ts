@@ -486,7 +486,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
    */
   async getGroupVoterRewards(
     epochNumber: number,
-    useBlockNumber: boolean
+    useBlockNumber?: boolean
   ): Promise<GroupVoterReward[]> {
     const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
 
@@ -497,11 +497,11 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     })
     const validators = await this.contracts.getValidators()
     const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) => {
-      if (useBlockNumber) {
-        return validators.getValidatorGroup(e.returnValues.group, false, blockNumber)
-      } else {
-        return validators.getValidatorGroup(e.returnValues.group, false)
-      }
+      return validators.getValidatorGroup(
+        e.returnValues.group,
+        false,
+        useBlockNumber ? blockNumber : undefined
+      )
     })
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
@@ -521,7 +521,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
   async getVoterRewards(
     address: Address,
     epochNumber: number,
-    useBlockNumber: boolean,
+    useBlockNumber?: boolean,
     voterShare?: Record<Address, BigNumber>
   ): Promise<VoterReward[]> {
     const activeVoteShare =
