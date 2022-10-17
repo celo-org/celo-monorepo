@@ -123,9 +123,6 @@ const signerConfig: SignerConfig = {
   test_quota_bypass_percentage: 0,
 }
 
-// TODO(2.0.0, testing) Add checking of values beyond the return code
-// Part of (https://github.com/celo-org/celo-monorepo/issues/9811)
-
 describe('domainService', () => {
   const wallet = new LocalWallet()
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
@@ -848,7 +845,6 @@ describe('domainService', () => {
       const res = await request(appWithApiDisabled).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
 
       expect(res.status).toBe(503)
-      // @ts-ignore res.body.status is expected to be undefined
       expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
         success: false,
         version: res.body.version,

@@ -856,10 +856,9 @@ describe('pnpService', () => {
     })
 
     it('Should respond with 400 on missing request fields', async () => {
-      const req = {}
-      // @ts-ignore Intentionally deleting required field
+      // @ts-ignore Intentionally missing required fields
+      const req: PnpQuotaRequest = {}
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-      // @ts-ignore Intentionally deleting required field
       const res = await getCombinerQuotaResponse(req, authorization)
 
       expect(res.status).toBe(400)
