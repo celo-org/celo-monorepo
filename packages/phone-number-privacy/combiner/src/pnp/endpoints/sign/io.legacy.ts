@@ -61,7 +61,13 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new CryptoSession(request, response, new BLSCryptographyClient(this.config))
+    const keyVersionInfo = this.getKeyVersionInfo(request, response.locals.logger)
+    return new CryptoSession(
+      request,
+      response,
+      keyVersionInfo,
+      new BLSCryptographyClient(keyVersionInfo)
+    )
   }
 
   validateClientRequest(

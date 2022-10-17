@@ -47,7 +47,7 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response)
+    return new Session(request, response, this.getKeyVersionInfo(request, response.locals.logger))
   }
 
   authenticate(request: Request<{}, {}, DisableDomainRequest>): Promise<boolean> {

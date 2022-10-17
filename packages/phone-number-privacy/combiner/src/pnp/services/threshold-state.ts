@@ -13,6 +13,7 @@ export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageReq
   constructor(readonly config: OdisConfig) {}
 
   findCombinerQuotaState(session: Session<R>): PnpQuotaStatus {
+    const { threshold } = session.keyVersionInfo
     const signerResponses = session.responses
       .map((signerResponse) => signerResponse.res)
       .filter((res) => res.success) as PnpQuotaStatus[]
@@ -36,14 +37,13 @@ export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageReq
       )
     }
 
-    // TODO: currently this check is not needed, as checking for sufficient number of responses and
+    // TODO(2.0.0) currently this check is not needed, as checking for sufficient number of responses and
     // filtering for successes is already done in the action. Consider adding back in based on the
     // result of https://github.com/celo-org/celo-monorepo/issues/9826
     // if (signerResponses.length < threshold) {
     //   throw new Error('Insufficient number of successful signer responses')
     // }
 
-    const threshold = this.config.keys.threshold
     const thresholdSigner = sortedResponses[threshold - 1]
     return {
       performedQueryCount: thresholdSigner.performedQueryCount,

@@ -8,6 +8,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
 import { Request, Response } from 'express'
+import { KeyVersionInfo } from '../../src/common/io'
 import { Session } from '../../src/common/session'
 import config, {
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
@@ -19,6 +20,13 @@ import { PnpSignerResponseLogger } from '../../src/pnp/services/log-responses'
 describe('pnp response logger', () => {
   const url = 'test signer url'
 
+  const keyVersionInfo: KeyVersionInfo = {
+    keyVersion: 1,
+    threshold: 3,
+    polynomial: 'mock polynomial',
+    pubKey: 'mock pubKey',
+  }
+
   const getSession = (responses: OdisResponse<PnpQuotaRequest | SignMessageRequest>[]) => {
     const mockRequest = {
       body: {},
@@ -28,7 +36,11 @@ describe('pnp response logger', () => {
         logger: rootLogger(config.serviceName),
       },
     } as Response
-    const session = new Session<PnpQuotaRequest | SignMessageRequest>(mockRequest, mockResponse)
+    const session = new Session<PnpQuotaRequest | SignMessageRequest>(
+      mockRequest,
+      mockResponse,
+      keyVersionInfo
+    )
     responses.forEach((res) => {
       session.responses.push({ url, res, status: 200 })
     })
@@ -36,7 +48,7 @@ describe('pnp response logger', () => {
   }
 
   const pnpConfig = config.phoneNumberPrivacy
-  pnpConfig.keys.threshold = 3
+  pnpConfig.keys.thresholds = [keyVersionInfo.threshold]
   const pnpResponseLogger = new PnpSignerResponseLogger()
 
   const version = getVersion()

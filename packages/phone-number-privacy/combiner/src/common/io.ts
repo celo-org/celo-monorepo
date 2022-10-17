@@ -27,6 +27,13 @@ export type SignerResponse<R extends OdisRequest> = {
   status: number
 }
 
+export interface KeyVersionInfo {
+  keyVersion: number
+  threshold: number
+  polynomial: string
+  pubKey: string
+}
+
 export abstract class IO<R extends OdisRequest> {
   abstract readonly endpoint: CombinerEndpoint
   abstract readonly signerEndpoint: SignerEndpoint
@@ -57,6 +64,18 @@ export abstract class IO<R extends OdisRequest> {
 
   validateClientRequest(request: Request<{}, {}, unknown>): request is Request<{}, {}, R> {
     return this.requestSchema.is(request.body)
+  }
+
+  getKeyVersionInfo(request: Request<{}, {}, OdisRequest>, logger: Logger): KeyVersionInfo {
+    const requestKeyVersion = getRequestKeyVersion(request, logger)
+    const defaultKeyVersion = this.config.keys.currentVersion
+    const keyVersion = requestKeyVersion ?? defaultKeyVersion
+    return {
+      keyVersion,
+      threshold: this.config.keys.thresholds[keyVersion - 1],
+      polynomial: this.config.keys.polynomials[keyVersion - 1],
+      pubKey: this.config.keys.pubKeys[keyVersion - 1],
+    }
   }
 
   validateSignerResponse(data: string, url: string, logger: Logger): OdisResponse<R> {
@@ -109,10 +128,9 @@ export abstract class IO<R extends OdisRequest> {
         'Content-Type': 'application/json',
         // Pnp requests provide authorization in the request header
         ...(request.headers.authorization ? { Authorization: request.headers.authorization } : {}),
-        [KEY_VERSION_HEADER]: 
         // Forward requested keyVersion if provided by client, otherwise use default keyVersion.
         // This will be ignored for non-signing requests.
-        (getRequestKeyVersion(request, logger) ?? this.config.keys.version).toString(),
+        [KEY_VERSION_HEADER]: session.keyVersionInfo.keyVersion.toString()
       }, 
       body: JSON.stringify(request.body),
       signal: abort.signal,

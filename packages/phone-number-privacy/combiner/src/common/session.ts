@@ -2,7 +2,7 @@ import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-priv
 import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { SignerResponse } from './io'
+import { KeyVersionInfo, SignerResponse } from './io'
 
 export class Session<R extends OdisRequest> {
   public timedOut: boolean = false
@@ -15,7 +15,8 @@ export class Session<R extends OdisRequest> {
 
   public constructor(
     readonly request: Request<{}, {}, R>,
-    readonly response: Response<OdisResponse<R>>
+    readonly response: Response<OdisResponse<R>>,
+    readonly keyVersionInfo: KeyVersionInfo
   ) {
     this.logger = response.locals.logger
   }

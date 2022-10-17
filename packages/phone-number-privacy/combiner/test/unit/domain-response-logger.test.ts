@@ -9,12 +9,20 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
 import { Request, Response } from 'express'
+import { KeyVersionInfo } from '../../src/common/io'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
 import { DomainSignerResponseLogger } from '../../src/domain/services/log-responses'
 
 describe('domain response logger', () => {
   const url = 'test signer url'
+
+  const keyVersionInfo: KeyVersionInfo = {
+    keyVersion: 1,
+    threshold: 3,
+    polynomial: 'mock polynomial',
+    pubKey: 'mock pubKey',
+  }
 
   const getSession = (responses: OdisResponse<DomainRequest>[]) => {
     const mockRequest = {
@@ -25,15 +33,13 @@ describe('domain response logger', () => {
         logger: rootLogger(config.serviceName),
       },
     } as Response
-    const session = new Session<DomainRequest>(mockRequest, mockResponse)
+    const session = new Session<DomainRequest>(mockRequest, mockResponse, keyVersionInfo)
     responses.forEach((res) => {
       session.responses.push({ url, res, status: 200 })
     })
     return session
   }
 
-  const domainsConfig = config.domains
-  domainsConfig.keys.threshold = 3
   const version = getVersion()
   const counter = 1
   const disabled = false

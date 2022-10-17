@@ -35,10 +35,10 @@ export interface OdisConfig {
     timeoutMilliSeconds: number
   }
   keys: {
-    version: number
-    threshold: number
-    polynomial: string
-    pubKey: string // Expected to be encoded in base64
+    currentVersion: number
+    thresholds: number[]
+    polynomials: string[]
+    pubKeys: string[] // Expected to be encoded in base64
   }
 }
 
@@ -83,10 +83,10 @@ if (DEV_MODE) {
         timeoutMilliSeconds: 5 * 1000,
       },
       keys: {
-        version: 1,
-        threshold: 2,
-        polynomial: TestUtils.Values.BLS_THRESHOLD_DEV_POLYNOMIAL,
-        pubKey: TestUtils.Values.BLS_THRESHOLD_DEV_PUBKEY,
+        currentVersion: 1,
+        thresholds: [2, 2, 2],
+        polynomials: TestUtils.Values.PNP_THRESHOLD_DEV_POLYNOMIALS,
+        pubKeys: TestUtils.Values.PNP_THRESHOLD_DEV_PUBKEYS,
       },
     },
     domains: {
@@ -99,10 +99,10 @@ if (DEV_MODE) {
         timeoutMilliSeconds: 5 * 1000,
       },
       keys: {
-        version: 1,
-        threshold: 2,
-        polynomial: TestUtils.Values.DOMAINS_DEV_ODIS_POLYNOMIAL,
-        pubKey: TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY,
+        currentVersion: 1,
+        thresholds: [2, 2, 2],
+        polynomials: TestUtils.Values.DOMAINS_THRESHOLD_DEV_POLYNOMIALS,
+        pubKeys: TestUtils.Values.DOMAINS_THRESHOLD_DEV_PUBKEYS,
       },
     },
     cloudFunction: {
@@ -134,10 +134,10 @@ if (DEV_MODE) {
           functionConfig.phoneNumberPrivacy.odisservices.timeoutMilliSeconds ?? 5 * 1000,
       },
       keys: {
-        version: functionConfig.phoneNumberPrivacy.keys.version,
-        threshold: functionConfig.phoneNumberPrivacy.keys.threshold,
-        polynomial: functionConfig.phoneNumberPrivacy.keys.polynomial,
-        pubKey: functionConfig.phoneNumberPrivacy.keys.pubKey,
+        currentVersion: functionConfig.phoneNumberPrivacy.keys.currentVersion,
+        thresholds: functionConfig.phoneNumberPrivacy.keys.versions,
+        polynomials: functionConfig.phoneNumberPrivacy.keys.polynomials,
+        pubKeys: functionConfig.phoneNumberPrivacy.keys.pubKeys,
       },
     },
     domains: {
@@ -149,10 +149,10 @@ if (DEV_MODE) {
         timeoutMilliSeconds: functionConfig.domains.odisservices.timeoutMilliSeconds ?? 5 * 1000,
       },
       keys: {
-        version: functionConfig.domains.keys.version,
-        threshold: functionConfig.domains.keys.threshold,
-        polynomial: functionConfig.domains.keys.polynomial,
-        pubKey: functionConfig.domains.keys.pubKey,
+        currentVersion: functionConfig.domains.keys.currentVersion,
+        thresholds: functionConfig.domains.keys.versions,
+        polynomials: functionConfig.domains.keys.polynomials,
+        pubKeys: functionConfig.domains.keys.pubKeys,
       },
     },
     cloudFunction: {

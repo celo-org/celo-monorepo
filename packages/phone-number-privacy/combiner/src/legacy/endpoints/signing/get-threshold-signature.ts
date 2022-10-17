@@ -3,6 +3,7 @@ import {
   ErrorMessage,
   ErrorType,
   getContractKit,
+  getRequestKeyVersion,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
   identifierIsValidIfExists,
@@ -83,8 +84,6 @@ async function requestSignatures(request: Request, response: Response) {
   const responses: SignMsgRespWithStatus[] = []
   const failedRequests = new Set<string>()
   const errorCodes: Map<number, number> = new Map()
-  const blsCryptoClient = new BLSCryptographyClient(_config)
-
   const logger: Logger = response.locals.logger
 
   const obs = new PerformanceObserver((list) => {
@@ -93,7 +92,15 @@ async function requestSignatures(request: Request, response: Response) {
   })
   obs.observe({ entryTypes: ['measure'], buffered: true })
 
-  request.headers[KEY_VERSION_HEADER] = _config.keys.version.toString()
+  const keyVersion = getRequestKeyVersion(request, logger) ?? _config.keys.currentVersion
+  request.headers[KEY_VERSION_HEADER] = keyVersion.toString()
+  const threshold = _config.keys.thresholds[keyVersion - 1]
+  const blsCryptoClient = new BLSCryptographyClient({
+    keyVersion,
+    threshold,
+    polynomial: _config.keys.polynomials[keyVersion - 1],
+    pubKey: _config.keys.pubKeys[keyVersion - 1],
+  })
 
   const signers = JSON.parse(_config.odisServices.signers) as SignerService[]
   let timedOut = false
@@ -135,7 +142,8 @@ async function requestSignatures(request: Request, response: Response) {
             failedRequests,
             response,
             controller,
-            errorCodes
+            errorCodes,
+            threshold
           )
         }
       })
@@ -161,7 +169,8 @@ async function requestSignatures(request: Request, response: Response) {
           failedRequests,
           response,
           controller,
-          errorCodes
+          errorCodes,
+          threshold
         )
       })
       .finally(() => {
@@ -259,7 +268,8 @@ function handleFailedResponse(
   failedRequests: Set<string>,
   response: Response,
   controller: AbortController,
-  errorCodes: Map<number, number>
+  errorCodes: Map<number, number>,
+  threshold: number
 ) {
   if (status) {
     errorCodes.set(status, (errorCodes.get(status) || 0) + 1)
@@ -268,7 +278,7 @@ function handleFailedResponse(
   // Tracking failed request count via signer url prevents
   // double counting the same failed request by mistake
   failedRequests.add(service.url)
-  const shouldFailFast = signerCount - failedRequests.size < _config.keys.threshold
+  const shouldFailFast = signerCount - failedRequests.size < threshold
   logger.info(`Received failure from ${failedRequests.size}/${signerCount} signers.`)
   if (shouldFailFast) {
     logger.info('Not possible to reach a sufficient number of signatures. Failing fast.')

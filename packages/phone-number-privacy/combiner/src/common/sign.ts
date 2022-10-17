@@ -42,14 +42,9 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
     url: string,
     session: CryptoSession<R>
   ): Promise<OdisResponse<R>> {
-    if (
-      !responseHasValidKeyVersion(
-        session.request,
-        signerResponse,
-        this.config.keys.version,
-        session.logger
-      )
-    ) {
+    const { keyVersion } = session.keyVersionInfo
+
+    if (!responseHasValidKeyVersion(session.request, signerResponse, keyVersion, session.logger)) {
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
 
@@ -71,7 +66,8 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
       if (session.crypto.hasSufficientSignatures()) {
         try {
           session.crypto.combinePartialBlindedSignatures(
-            this.parseBlindedMessage(session.request.body)
+            this.parseBlindedMessage(session.request.body),
+            session.logger
           )
           // Close outstanding requests
           session.abort.abort()

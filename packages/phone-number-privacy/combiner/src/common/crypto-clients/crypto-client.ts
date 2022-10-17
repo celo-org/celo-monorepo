@@ -1,6 +1,6 @@
-import { ErrorMessage, rootLogger } from '@celo/phone-number-privacy-common'
+import { ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { OdisConfig } from '../../config'
+import { KeyVersionInfo } from '../io'
 
 export interface ServicePartialSignature {
   url: string
@@ -10,13 +10,13 @@ export interface ServicePartialSignature {
 export abstract class CryptoClient {
   protected unverifiedSignatures: ServicePartialSignature[] = []
 
-  constructor(protected readonly config: OdisConfig) {}
+  constructor(protected readonly keyVersionInfo: KeyVersionInfo) {}
 
   /**
    * Returns true if the number of valid signatures is enough to perform a combination
    */
   public hasSufficientSignatures(): boolean {
-    return this.allSignaturesLength >= this.config.keys.threshold
+    return this.allSignaturesLength >= this.keyVersionInfo.threshold
   }
 
   public addSignature(serviceResponse: ServicePartialSignature): void {
@@ -28,15 +28,15 @@ export abstract class CryptoClient {
    * logic defined in _combinePartialBlindedSignatures.
    * Throws an exception if not enough valid signatures.
    */
-  public combinePartialBlindedSignatures(blindedMessage: string, logger?: Logger): string {
-    logger = logger ?? rootLogger(this.config.serviceName)
+  public combinePartialBlindedSignatures(blindedMessage: string, logger: Logger): string {
     if (!this.hasSufficientSignatures()) {
+      const { threshold } = this.keyVersionInfo
       logger.error(
-        { signatures: this.allSignaturesLength, required: this.config.keys.threshold },
+        { signatures: this.allSignaturesLength, required: threshold },
         ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES
       )
       throw new Error(
-        `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.allSignaturesLength}/${this.config.keys.threshold}`
+        `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.allSignaturesLength}/${threshold}`
       )
     }
     return this._combinePartialBlindedSignatures(blindedMessage, logger)

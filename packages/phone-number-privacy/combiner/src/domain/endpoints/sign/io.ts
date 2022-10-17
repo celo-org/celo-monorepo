@@ -52,7 +52,13 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new CryptoSession(request, response, new DomainCryptoClient(this.config))
+    const keyVersionInfo = this.getKeyVersionInfo(request, response.locals.logger)
+    return new CryptoSession(
+      request,
+      response,
+      keyVersionInfo,
+      new DomainCryptoClient(keyVersionInfo)
+    )
   }
 
   authenticate(request: Request<{}, {}, DomainRestrictedSignatureRequest>): Promise<boolean> {

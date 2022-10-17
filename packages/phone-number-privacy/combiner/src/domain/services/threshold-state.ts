@@ -10,7 +10,8 @@ export class DomainThresholdStateService<R extends DomainRequest> {
     const domainStates = session.responses
       .map((signerResponse) => ('status' in signerResponse.res ? signerResponse.res.status : null))
       .filter((state: DomainState | null | undefined): state is DomainState => !!state)
-    const threshold = this.config.keys.threshold
+
+    const { threshold } = session.keyVersionInfo
 
     // Note: when the threshold > # total signers - threshold, it's possible that we
     // throw an error here when the domain is disabled. While the domain is technically disabled,
