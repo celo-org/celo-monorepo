@@ -59,7 +59,7 @@ export async function getContactMatches(
     dekSigner = signer as EncryptionKeySigner
   }
 
-  const response = await queryOdis<MatchmakingRequest>(
+  const response = await queryOdis(
     body,
     context,
     CombinerEndpoint.MATCHMAKING,

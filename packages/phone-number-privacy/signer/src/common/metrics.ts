@@ -70,6 +70,14 @@ export const Counters = {
     help:
       'Counter for the number of requests failing quota or authentication checks due to full-node errors',
   }),
+  errorsCaughtInEndpointHandler: new Counter({
+    name: 'errors_caught_in_endpoint_handler',
+    help: 'Counter for the number of errors caught in the outermost endpoint handler',
+  }),
+  errorsThrownAfterResponseSent: new Counter({
+    name: 'errors_thrown_after_response_sent',
+    help: 'Counter for the number of errors thrown after a response was already sent',
+  }),
 }
 const buckets = [
   0.001,

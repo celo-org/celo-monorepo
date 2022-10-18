@@ -68,7 +68,9 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
           session.logger.info({ signer }, WarningMessage.CANCELLED_REQUEST_TO_SIGNER)
         }
       } else {
-        session.logger.error({ signer, err }, ErrorMessage.SIGNER_REQUEST_ERROR)
+        // Logging the err & message simultaneously fails to log the message in some cases
+        session.logger.error({ signer }, ErrorMessage.SIGNER_REQUEST_ERROR)
+        session.logger.error({ signer, err })
       }
     }
     return this.handleFetchResult(signer, session, signerFetchResult)

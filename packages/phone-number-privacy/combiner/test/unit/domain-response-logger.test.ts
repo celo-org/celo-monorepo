@@ -315,7 +315,6 @@ describe('domain response logger', () => {
   ]
   testCases.forEach((testCase) => {
     it(testCase.it, () => {
-      console.log(testCase.responses)
       const session = getSession(testCase.responses)
       const logSpys = {
         info: {

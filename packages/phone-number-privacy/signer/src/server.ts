@@ -1,4 +1,3 @@
-import { timeout } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import {
   ErrorMessage,
@@ -60,37 +59,30 @@ export function startSigner(
     res.send(PromClient.register.metrics())
   })
 
-  const addEndpointWithTimeout = (
+  const addEndpoint = (
     endpoint: SignerEndpoint,
     handler: (req: Request, res: Response) => Promise<void>
   ) =>
     app.post(endpoint, async (req, res) => {
       const childLogger: Logger = res.locals.logger
-      const timeoutRes = Symbol()
       try {
-        // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
-        await timeout(handler, [req, res], config.timeout, timeoutRes)
+        await handler(req, res)
       } catch (err: any) {
         // Handle any errors that otherwise managed to escape the proper handlers
-        let errorMsg: string = ErrorMessage.UNKNOWN_ERROR
-        let errToLog = err
-        if (err === timeoutRes) {
-          Counters.timeouts.inc()
-          errorMsg = ErrorMessage.TIMEOUT_FROM_SIGNER
-          errToLog = new Error(errorMsg)
-        }
-        childLogger.error({ errToLog })
-        if (!res.writableEnded) {
+        childLogger.error(ErrorMessage.CAUGHT_ERROR_IN_ENDPOINT_HANDLER)
+        childLogger.error(err)
+        Counters.errorsCaughtInEndpointHandler.inc()
+        if (!res.headersSent) {
+          childLogger.info('Responding with error in outer endpoint handler')
           res.status(500).json({
             success: false,
-            error: errorMsg,
+            error: ErrorMessage.UNKNOWN_ERROR,
           })
         } else {
-          // TODO(2.0.0, timeout) https://github.com/celo-org/celo-monorepo/issues/9845
-          // TODO(2.0.0, audit responses) https://github.com/celo-org/celo-monorepo/issues/9859
-          // getting to this error indicates that either timeout or `perform` process
+          // Getting to this error likely indicates that the `perform` process
           // does not terminate after sending a response, and then throws an error.
-          childLogger.error('Error in endpoint thrown after response was already sent')
+          childLogger.error(ErrorMessage.ERROR_AFTER_RESPONSE_SENT)
+          Counters.errorsThrownAfterResponseSent.inc()
         }
       }
     })
@@ -163,17 +155,14 @@ export function startSigner(
     new DomainDisableAction(db, config, new DomainDisableIO(config.api.domains.enabled))
   )
   logger.info('Right before adding meteredSignerEndpoints')
-  addEndpointWithTimeout(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))
-  addEndpointWithTimeout(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota))
-  addEndpointWithTimeout(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
-  addEndpointWithTimeout(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
-  addEndpointWithTimeout(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
+  addEndpoint(SignerEndpoint.PNP_SIGN, pnpSign.handle.bind(pnpSign))
+  addEndpoint(SignerEndpoint.PNP_QUOTA, pnpQuota.handle.bind(pnpQuota))
+  addEndpoint(SignerEndpoint.DOMAIN_QUOTA_STATUS, domainQuota.handle.bind(domainQuota))
+  addEndpoint(SignerEndpoint.DOMAIN_SIGN, domainSign.handle.bind(domainSign))
+  addEndpoint(SignerEndpoint.DISABLE_DOMAIN, domainDisable.handle.bind(domainDisable))
 
-  addEndpointWithTimeout(SignerEndpoint.LEGACY_PNP_SIGN, legacyPnpSign.handle.bind(legacyPnpSign))
-  addEndpointWithTimeout(
-    SignerEndpoint.LEGACY_PNP_QUOTA,
-    legacyPnpQuota.handle.bind(legacyPnpQuota)
-  )
+  addEndpoint(SignerEndpoint.LEGACY_PNP_SIGN, legacyPnpSign.handle.bind(legacyPnpSign))
+  addEndpoint(SignerEndpoint.LEGACY_PNP_QUOTA, legacyPnpQuota.handle.bind(legacyPnpQuota))
 
   const sslOptions = getSslOptions(config)
   if (sslOptions) {
