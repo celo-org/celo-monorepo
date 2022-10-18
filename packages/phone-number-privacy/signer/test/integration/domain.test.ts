@@ -66,7 +66,7 @@ describe('domain', () => {
   ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, ThresholdPoprfClient]> => {
     const domain = _domain ?? authenticatedDomain()
     const thresholdPoprfClient = new ThresholdPoprfClient(
-      Buffer.from(TestUtils.Values.DOMAINS_THRESHOLD_DEV_PUBKEYS[keyVersion - 1], 'hex'), // TODO(2.0.0) should this be in base64?
+      Buffer.from(TestUtils.Values.DOMAINS_THRESHOLD_DEV_PUBKEYS[keyVersion - 1], 'base64'),
       Buffer.from(TestUtils.Values.DOMAINS_THRESHOLD_DEV_POLYNOMIALS[keyVersion - 1], 'hex'),
       domainHash(domain),
       Buffer.from('test message', 'utf8')

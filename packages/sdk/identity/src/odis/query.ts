@@ -105,11 +105,12 @@ export async function getOdisPnpRequestAuth(
 }
 
 /**
- * Make a request to lookup the phone number identifier or perform matchmaking
- * @param signer Type of key to sign with. May be undefined if the request is presigned.
- * @param body Request to send in the body of the HTTP request.
+ * Send an OdisRequest to ODIS
+ * @param body OdisRequest to send in the body of the HTTP request.
  * @param context Contains service URL and public to determine which instance to contact.
- * @param endpoint Endpoint to query (e.g. '/getBlindedMessagePartialSig', '/getContactMatches').
+ * @param endpoint Endpoint to query
+ * @param responseSchema io-ts schema to ensure type safety of responses
+ * @param headers custom request headers corresponding to the type of OdisRequest (keyVersion, Authentication, etc.)
  */
 export async function queryOdis<R extends OdisRequest>(
   body: R,
