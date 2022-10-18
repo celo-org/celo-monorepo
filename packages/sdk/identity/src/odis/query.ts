@@ -207,7 +207,7 @@ export async function queryOdis<R extends OdisRequest>(
  * @param context Contains service URL and public to determine which instance to contact.
  * @param endpoint Endpoint to query (e.g. '/domain/sign', '/domain/quotaStatus').
  * @param responseSchema io-ts type for the expected response type. Provided to ensure type safety.
- * @param keyVersion optional version of the POPRF key to use for evaluation, provided only for '/domain/sign'
+ * @param headers optional header fields relevant to the given request type (keyVersion, Authentication, etc.)
  */
 export async function sendOdisDomainRequest<R extends DomainRequest>(
   body: R,
