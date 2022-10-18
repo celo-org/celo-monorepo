@@ -1,3 +1,4 @@
+import { Endpoint } from '@celo/phone-number-privacy-common'
 import { getContactMatches, obfuscateNumberForMatchmaking } from './matchmaking'
 import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
 
@@ -12,7 +13,7 @@ const serviceContext: ServiceContext = {
   odisPubKey:
     '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
 }
-const endpoint = serviceContext.odisUrl + '/getContactMatches'
+const endpoint = serviceContext.odisUrl + Endpoint.MATCHMAKING
 
 const authSigner: EncryptionKeySigner = {
   authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
@@ -28,6 +29,7 @@ describe(getContactMatches, () => {
     fetchMock.mock(endpoint, {
       success: true,
       matchedContacts: [{ phoneNumber: obfuscateNumberForMatchmaking(mockE164Number2) }],
+      version: '',
     })
 
     await expect(
