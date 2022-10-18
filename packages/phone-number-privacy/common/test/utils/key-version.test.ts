@@ -8,7 +8,7 @@ import {
   responseHasValidKeyVersion,
   rootLogger,
   WarningMessage,
-} from '../../lib'
+} from '../../src'
 
 describe('key version test suite', () => {
   const logger = rootLogger('key version test suite')
