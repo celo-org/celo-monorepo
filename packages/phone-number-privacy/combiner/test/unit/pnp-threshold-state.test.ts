@@ -52,7 +52,7 @@ describe('pnp threshold state', () => {
 
   const pnpConfig = config.phoneNumberPrivacy
   pnpConfig.keys.thresholds = [keyVersionInfo.threshold]
-  const pnpThresholdStateService = new PnpThresholdStateService(pnpConfig)
+  const pnpThresholdStateService = new PnpThresholdStateService()
 
   const expectedVersion = getVersion()
   const testBlockNumber = 1000000

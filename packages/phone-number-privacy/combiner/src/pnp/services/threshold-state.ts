@@ -5,13 +5,8 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Session } from '../../common/session'
-import { MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD, OdisConfig } from '../../config'
-
-// TODO(2.0.0, testing): add unit tests for this and domains equivalent
-// (https://github.com/celo-org/celo-monorepo/issues/9792)
+import { MAX_TOTAL_QUOTA_DISCREPANCY_THRESHOLD } from '../../config'
 export class PnpThresholdStateService<R extends PnpQuotaRequest | SignMessageRequest> {
-  constructor(readonly config: OdisConfig) {}
-
   findCombinerQuotaState(session: Session<R>): PnpQuotaStatus {
     const { threshold } = session.keyVersionInfo
     const signerResponses = session.responses
