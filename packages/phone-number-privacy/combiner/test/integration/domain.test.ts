@@ -556,7 +556,7 @@ describe('domainService', () => {
 
   describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
     const expectedEvals: string[] = [
-      'ogRQZSqSVZIMNNwUmaN3Z61StMQ7sRj2wSdT3q1gP4M=',
+      '3QLFPV6VvnhhnZ7mOu0xm7BUUJIUVY6vEHvZONOtZ/c=',
       'BBG0fAZJ6VNQwjge+3vOCF3uBo5KCs2+er/f/2QcV58=',
       '1/otd1fW1nhUoU3ubjFDS8/RX0OClvHDsmGdnz6fZVE=',
     ]
