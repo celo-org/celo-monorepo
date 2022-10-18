@@ -24,7 +24,7 @@ export abstract class KeyProviderBase implements KeyProvider {
   }
 
   public getPrivateKey(key: Key) {
-    const privateKey = this.privateKeys.get(getKeyString(key))
+    const privateKey = this.privateKeys.get(this.getCustomKeyVersionString(key))
     if (!privateKey) {
       throw new Error(`Private key is unavailable: ${key}`)
     }
@@ -45,12 +45,16 @@ export abstract class KeyProviderBase implements KeyProvider {
 
   public abstract fetchPrivateKeyFromStore(key: Key): Promise<void>
 
+  getCustomKeyVersionString(key: Key): string {
+    return `${this.getCustomKeyName(key)}-${key.version}`
+  }
+
   protected setPrivateKey(key: Key, privateKey: string) {
     privateKey = privateKey ? privateKey.trim() : ''
     if (privateKey.length !== PRIVATE_KEY_SIZE) {
       throw new Error('Invalid private key')
     }
-    this.privateKeys.set(getKeyString(key), privateKey)
+    this.privateKeys.set(this.getCustomKeyVersionString(key), privateKey)
   }
 
   protected getCustomKeyName(key: Key) {
@@ -63,8 +67,4 @@ export abstract class KeyProviderBase implements KeyProvider {
         return key.name
     }
   }
-}
-
-export function getKeyString(key: Key) {
-  return `${key.name}-${key.version}`
 }

@@ -6,7 +6,7 @@ import {
   PNP_THRESHOLD_DEV_PK_SHARE_1_V2,
   PNP_THRESHOLD_DEV_PK_SHARE_1_V3,
 } from '@celo/phone-number-privacy-common/lib/test/values'
-import { DefaultKeyName, getKeyString, Key, KeyProviderBase } from './key-provider-base'
+import { DefaultKeyName, Key, KeyProviderBase } from './key-provider-base'
 
 export class MockKeyProvider extends KeyProviderBase {
   // prettier-ignore
@@ -42,7 +42,7 @@ export class MockKeyProvider extends KeyProviderBase {
   }
 
   public async fetchPrivateKeyFromStore(key: Key) {
-    const keyString = this.keyMocks.get(getKeyString(key))
+    const keyString = this.keyMocks.get(this.getCustomKeyVersionString(key))
     if (keyString) {
       return this.setPrivateKey(key, keyString)
     }
