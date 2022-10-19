@@ -664,5 +664,72 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
         })
       })
     })
+
+    describe('when 2/3 of signers are disabled', () => {
+      beforeEach(async () => {
+        const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
+        configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
+        signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
+        signer2 = startSigner(configWithApiDisabled, signerDB2, keyProvider2).listen(3002)
+        signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3).listen(3003)
+      })
+
+      it('Should fail to reach threshold of signers on valid request', async () => {
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
+
+        expect(res.status).toBe(503) // majority error code in this case
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
+        })
+      })
+    })
+
+    describe('when 1/3 of signers are disabled', () => {
+      beforeEach(async () => {
+        const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
+        configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
+        signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
+        signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3002)
+        signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3).listen(3003)
+      })
+
+      it('Should respond with 200 on valid request', async () => {
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
+        expect(res.status).toBe(200)
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSig,
+          performedQueryCount: 1,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+      })
+    })
+
+    describe('when 2/3 of signers timeout', () => {
+      beforeEach(async () => {
+        const testTimeoutMS = 0
+
+        const configWithShortTimeout: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
+        configWithShortTimeout.timeout = testTimeoutMS
+
+        signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
+        signer2 = startSigner(configWithShortTimeout, signerDB2, keyProvider2).listen(3002)
+        signer3 = startSigner(configWithShortTimeout, signerDB3, keyProvider3).listen(3003)
+      })
+      it('Should fail to reach threshold of signers on valid request', async () => {
+        const res = await sendLegacyPnpSignRequest(req, authorization, app)
+        expect(res.status).toBe(500)
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
+        })
+      })
+    })
   })
 })
