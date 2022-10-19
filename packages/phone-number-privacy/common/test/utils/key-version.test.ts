@@ -1,11 +1,12 @@
 import { Request } from 'express'
 import { Response as FetchResponse } from 'node-fetch'
 import {
+  ErrorMessage,
   getRequestKeyVersion,
   getResponseKeyVersion,
   KEY_VERSION_HEADER,
   requestHasValidKeyVersion,
-  responseHasValidKeyVersion,
+  responseHasExpectedKeyVersion,
   rootLogger,
   WarningMessage,
 } from '../../src'
@@ -37,7 +38,7 @@ describe('key version test suite', () => {
     response = new FetchResponse()
   })
 
-  describe('getRequestKeyVersion', () => {
+  describe(getRequestKeyVersion, () => {
     it(`Should return undefined if key version header has not been set`, () => {
       const res = getRequestKeyVersion(request, logger)
       expect(res).toBe(undefined)
@@ -85,7 +86,7 @@ describe('key version test suite', () => {
     })
   })
 
-  describe('requestHasValidKeyVersion', () => {
+  describe(requestHasValidKeyVersion, () => {
     it(`Should return true if key version header has not been set`, () => {
       const res = requestHasValidKeyVersion(request, logger)
       expect(res).toBe(true)
@@ -130,7 +131,7 @@ describe('key version test suite', () => {
     })
   })
 
-  describe('getResponseKeyVersion', () => {
+  describe(getResponseKeyVersion, () => {
     it(`Should return undefined if key version header has not been set`, () => {
       const res = getResponseKeyVersion(response, logger)
       expect(res).toBe(undefined)
@@ -168,81 +169,59 @@ describe('key version test suite', () => {
     })
 
     invalidKeyVersionHeaders.forEach((kv) => {
-      it(`Should return undefined for invalid key version ${kv}`, () => {
+      it(`Should throw for invalid key version ${kv}`, () => {
         response.headers.set(KEY_VERSION_HEADER, kv.toString())
-        const res = getResponseKeyVersion(response, logger)
-        expect(res).toBe(undefined)
+        expect(() => getResponseKeyVersion(response, logger)).toThrow(
+          ErrorMessage.INVALID_KEY_VERSION_RESPONSE
+        )
       })
     })
   })
 
-  describe('responseHasValidKeyVersion', () => {
+  describe(responseHasExpectedKeyVersion, () => {
     const testCases = [
       {
-        requestKeyVersion: undefined,
-        defaultRequestKeyVersion: 1,
         responseKeyVersion: 1,
+        expectedKeyVersion: 1,
         expectedResult: true,
       },
       {
-        requestKeyVersion: undefined,
-        defaultRequestKeyVersion: 2,
-        responseKeyVersion: 1,
-        expectedResult: false,
-      },
-      {
-        requestKeyVersion: undefined,
-        defaultRequestKeyVersion: 2,
-        responseKeyVersion: undefined,
-        expectedResult: false,
-      },
-      {
-        requestKeyVersion: 1,
-        defaultRequestKeyVersion: 2,
-        responseKeyVersion: 1,
-        expectedResult: true,
-      },
-      {
-        requestKeyVersion: 1,
-        defaultRequestKeyVersion: 2,
         responseKeyVersion: 2,
+        expectedKeyVersion: 1,
         expectedResult: false,
       },
       {
-        requestKeyVersion: 1,
-        defaultRequestKeyVersion: 2,
         responseKeyVersion: undefined,
+        expectedKeyVersion: 1,
         expectedResult: false,
       },
       {
-        requestKeyVersion: 1,
-        defaultRequestKeyVersion: 2,
-        responseKeyVersion: 1.5,
+        responseKeyVersion: -1,
+        expectedKeyVersion: -1,
         expectedResult: false,
       },
       {
-        requestKeyVersion: undefined,
-        defaultRequestKeyVersion: 2,
         responseKeyVersion: 1.5,
+        expectedKeyVersion: 1.5,
+        expectedResult: false,
+      },
+      {
+        responseKeyVersion: 'a',
+        expectedKeyVersion: Number('a'),
         expectedResult: false,
       },
     ]
 
     testCases.forEach((testCase) => {
       it(JSON.stringify(testCase), () => {
-        request.headers[KEY_VERSION_HEADER] = testCase.requestKeyVersion?.toString()
-        if (testCase.responseKeyVersion === undefined) {
+        const { responseKeyVersion, expectedKeyVersion, expectedResult } = testCase
+        if (responseKeyVersion === undefined) {
           response.headers.delete(KEY_VERSION_HEADER)
         } else {
-          response.headers.set(KEY_VERSION_HEADER, testCase.responseKeyVersion.toString())
+          response.headers.set(KEY_VERSION_HEADER, responseKeyVersion.toString())
         }
-        const res = responseHasValidKeyVersion(
-          request,
-          response,
-          testCase.defaultRequestKeyVersion,
-          logger
-        )
-        expect(res).toBe(testCase.expectedResult)
+        const res = responseHasExpectedKeyVersion(response, expectedKeyVersion, logger)
+        expect(res).toBe(expectedResult)
       })
     })
   })

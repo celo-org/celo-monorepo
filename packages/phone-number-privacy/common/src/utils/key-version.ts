@@ -20,57 +20,75 @@ export function getRequestKeyVersion(
   logger: Logger
 ): number | undefined {
   const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
-  if (keyVersionHeader === undefined) {
+  const keyVersion = parseKeyVersionFromHeader(keyVersionHeader)
+
+  if (keyVersion === undefined) {
     return undefined
   }
-
-  const keyVersionHeaderString = keyVersionHeader.toString() // could be string[]
-
-  if (keyVersionHeaderString.trim().length === 0) {
-    return undefined
-  }
-
-  const requestedKeyVersion = Number(keyVersionHeaderString)
-
-  if (!Number.isInteger(requestedKeyVersion) || requestedKeyVersion < 0) {
+  if (!isValidKeyVersion(keyVersion)) {
     logger.error({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
     throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
   }
-  return requestedKeyVersion
+
+  logger.info({ keyVersion }, 'Request has valid key version')
+  return keyVersion
 }
 
-export function responseHasValidKeyVersion(
-  request: Request<{}, {}, OdisRequest>,
+export function responseHasExpectedKeyVersion(
   response: FetchResponse,
-  defaultRequestKeyVersion: number,
+  expectedKeyVersion: number,
   logger: Logger
 ): boolean {
-  const responseKeyVersion = getResponseKeyVersion(response, logger)
-  const requestKeyVersion = getRequestKeyVersion(request, logger) ?? defaultRequestKeyVersion
-
-  const isValid = responseKeyVersion === requestKeyVersion
-  if (!isValid) {
-    logger.error(
-      { requestKeyVersion, responseKeyVersion },
-      ErrorMessage.INVALID_KEY_VERSION_RESPONSE
-    )
+  let responseKeyVersion
+  try {
+    responseKeyVersion = getResponseKeyVersion(response, logger)
+  } catch {
+    return false
   }
 
-  return isValid
+  if (responseKeyVersion !== expectedKeyVersion) {
+    logger.error(
+      { expectedKeyVersion, responseKeyVersion },
+      ErrorMessage.INVALID_KEY_VERSION_RESPONSE
+    )
+    return false
+  }
+
+  return true
 }
 
 export function getResponseKeyVersion(response: FetchResponse, logger: Logger): number | undefined {
   const keyVersionHeader = response.headers.get(KEY_VERSION_HEADER)
-  if (keyVersionHeader === null || keyVersionHeader.trim().length === 0) {
+  const keyVersion = parseKeyVersionFromHeader(keyVersionHeader)
+
+  if (keyVersion === undefined) {
     return undefined
   }
-
-  const responseKeyVersion = Number(keyVersionHeader)
-
-  if (!Number.isInteger(responseKeyVersion) || responseKeyVersion < 0) {
+  if (!isValidKeyVersion(keyVersion)) {
     logger.error({ keyVersionHeader }, ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
+    throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
+  }
+
+  logger.info({ keyVersion }, 'Response has valid key version')
+  return keyVersion
+}
+
+function parseKeyVersionFromHeader(
+  keyVersionHeader: string | string[] | undefined | null
+): number | undefined {
+  if (keyVersionHeader === undefined || keyVersionHeader === null) {
     return undefined
   }
-  logger.info({ responseKeyVersion }, 'Response has valid key version')
-  return responseKeyVersion
+
+  const keyVersionHeaderString = keyVersionHeader.toString().trim()
+
+  if (!keyVersionHeaderString.length) {
+    return undefined
+  }
+
+  return Number(keyVersionHeaderString)
+}
+
+function isValidKeyVersion(keyVersion: number): boolean {
+  return Number.isInteger(keyVersion) && keyVersion >= 0
 }

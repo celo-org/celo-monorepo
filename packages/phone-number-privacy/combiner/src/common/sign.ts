@@ -4,7 +4,7 @@ import {
   ErrorType,
   LegacySignMessageRequest,
   OdisResponse,
-  responseHasValidKeyVersion,
+  responseHasExpectedKeyVersion,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
@@ -44,8 +44,8 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
   ): Promise<OdisResponse<R>> {
     const { keyVersion } = session.keyVersionInfo
 
-    if (!responseHasValidKeyVersion(session.request, signerResponse, keyVersion, session.logger)) {
-      throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
+    if (!responseHasExpectedKeyVersion(signerResponse, keyVersion, session.logger)) {
+      throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE) // TODO(Alec) think about implications of this mid key rotation
     }
 
     const res = await super.receiveSuccess(signerResponse, url, session)
