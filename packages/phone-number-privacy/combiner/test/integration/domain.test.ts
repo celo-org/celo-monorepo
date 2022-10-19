@@ -973,6 +973,58 @@ describe('domainService', () => {
         })
       })
     })
-    // describe('[TODO EN -- do this last] when 2/3 of signers have misconfigured keys', () => {})
+
+    describe('when 2/3 of signers timeout', () => {
+      beforeEach(async () => {
+        const testTimeoutMS = 0
+
+        const configWithShortTimeout: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
+        configWithShortTimeout.timeout = testTimeoutMS
+        signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
+        signer2 = startSigner(configWithShortTimeout, signerDB2, keyProvider2).listen(3002)
+        signer3 = startSigner(configWithShortTimeout, signerDB3, keyProvider3).listen(3003)
+      })
+
+      describe(`${CombinerEndpoint.DISABLE_DOMAIN}`, () => {
+        it('Should fail to reach threshold of signers on valid request', async () => {
+          const res = await request(app)
+            .post(CombinerEndpoint.DISABLE_DOMAIN)
+            .send(await disableRequest())
+          expect(res.status).toBe(500) // majority error code in this case
+          expect(res.body).toStrictEqual<DisableDomainResponse>({
+            success: false,
+            version: res.body.version,
+            error: ErrorMessage.THRESHOLD_DISABLE_DOMAIN_FAILURE,
+          })
+        })
+      })
+
+      describe(`${CombinerEndpoint.DOMAIN_QUOTA_STATUS}`, () => {
+        it('Should fail to reach threshold of signers on valid request', async () => {
+          const res = await request(app)
+            .post(CombinerEndpoint.DOMAIN_QUOTA_STATUS)
+            .send(await quotaRequest())
+          expect(res.status).toBe(500) // majority error code in this case
+          expect(res.body).toStrictEqual<DomainQuotaStatusResponse>({
+            success: false,
+            version: res.body.version,
+            error: ErrorMessage.THRESHOLD_DOMAIN_QUOTA_STATUS_FAILURE,
+          })
+        })
+      })
+
+      describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
+        it('Should fail to reach threshold of signers on valid request', async () => {
+          const [req, _] = await signatureRequest()
+          const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
+          expect(res.status).toBe(500) // majority error code in this case
+          expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+            success: false,
+            version: res.body.version,
+            error: ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES,
+          })
+        })
+      })
+    })
   })
 })
