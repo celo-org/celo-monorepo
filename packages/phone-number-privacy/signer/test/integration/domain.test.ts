@@ -910,6 +910,22 @@ describe('domain', () => {
       })
     })
 
+    it('Should respond with 500 on unsupported key version', async () => {
+      const [req, _] = await signatureRequest(undefined, undefined, 4)
+
+      const res = await request(app)
+        .post(SignerEndpoint.DOMAIN_SIGN)
+        .set(KEY_VERSION_HEADER, '4')
+        .send(req)
+
+      expect(res.status).toBe(500)
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+      })
+    })
+
     it('Should respond with 503 on disabled api', async () => {
       const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
       configWithApiDisabled.api.domains.enabled = false

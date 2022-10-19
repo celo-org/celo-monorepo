@@ -154,8 +154,9 @@ export abstract class PnpSignAction
     try {
       privateKey = await this.keyProvider.getPrivateKeyOrFetchFromStore(key)
     } catch (err) {
-      session.logger.error({ err, key }, 'Requested key version not supported')
-      throw err
+      session.logger.info({ key }, 'Requested key version not supported')
+      session.logger.error(err)
+      throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
     return computeBlindedSignature(blindedMessage, privateKey, session.logger)
   }

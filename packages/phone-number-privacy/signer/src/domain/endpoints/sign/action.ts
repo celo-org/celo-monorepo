@@ -166,7 +166,8 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
       privateKey = await this.keyProvider.getPrivateKeyOrFetchFromStore(key)
     } catch (err) {
       session.logger.error({ key }, 'Requested key version not supported')
-      throw err
+      session.logger.error(err)
+      throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
 
     const server = new ThresholdPoprfServer(Buffer.from(privateKey, 'hex'))

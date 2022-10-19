@@ -1122,6 +1122,30 @@ describe('legacyPNP', () => {
         })
       })
 
+      it('Should respond with 500 on unsupported key version', async () => {
+        const badRequest = getPnpSignRequest(
+          ACCOUNT_ADDRESS1,
+          BLINDED_PHONE_NUMBER,
+          AuthenticationMethod.WALLET_KEY
+        )
+        const authorization = getPnpRequestAuthorization(badRequest, PRIVATE_KEY1)
+        const res = await sendRequest(
+          badRequest,
+          authorization,
+          SignerEndpoint.LEGACY_PNP_SIGN,
+          '4'
+        )
+        expect(res.status).toBe(500)
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+          success: false,
+          version: res.body.version,
+          performedQueryCount: performedQueryCount,
+          totalQuota: expectedQuota,
+          blockNumber: testBlockNumber,
+          error: ErrorMessage.SIGNATURE_COMPUTATION_FAILURE,
+        })
+      })
+
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
