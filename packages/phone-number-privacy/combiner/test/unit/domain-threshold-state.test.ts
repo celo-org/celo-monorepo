@@ -1,12 +1,12 @@
 import {
   DomainQuotaStatusResponseSuccess,
   DomainRestrictedSignatureResponseSuccess,
+  KeyVersionInfo,
   SequentialDelayDomainState,
 } from '@celo/phone-number-privacy-common'
 import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { KeyVersionInfo } from '../../src/common/io'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
 import { DomainThresholdStateService } from '../../src/domain/services/threshold-state'
@@ -44,9 +44,15 @@ describe('domain threshold state', () => {
   }
 
   const domainConfig = config.domains
-  domainConfig.keys.thresholds = [keyVersionInfo.threshold]
-  domainConfig.odisServices.signers =
-    '[{"url": "http://localhost:3001", "fallbackUrl": "http://localhost:3001/fallback"}, {"url": "http://localhost:3002", "fallbackUrl": "http://localhost:3002/fallback"}, {"url": "http://localhost:3003", "fallbackUrl": "http://localhost:3003/fallback"}, {"url": "http://localhost:4004", "fallbackUrl": "http://localhost:4004/fallback"}]'
+  domainConfig.keys.currentVersion = keyVersionInfo.keyVersion
+  domainConfig.keys.versions = JSON.stringify([keyVersionInfo])
+  domainConfig.odisServices.signers = JSON.stringify([
+    { url: 'http://localhost:3001', fallbackUrl: 'http://localhost:3001/fallback' },
+    { url: 'http://localhost:3002', fallbackUrl: 'http://localhost:3002/fallback' },
+    { url: 'http://localhost:3003', fallbackUrl: 'http://localhost:3003/fallback' },
+    { url: 'http://localhost:4004', fallbackUrl: 'http://localhost:4004/fallback' },
+  ])
+
   const domainThresholdStateService = new DomainThresholdStateService(domainConfig)
 
   const expectedVersion = getVersion()

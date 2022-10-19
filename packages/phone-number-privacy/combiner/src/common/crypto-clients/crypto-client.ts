@@ -1,6 +1,5 @@
-import { ErrorMessage } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, KeyVersionInfo } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { KeyVersionInfo } from '../io'
 
 export interface ServicePartialSignature {
   url: string

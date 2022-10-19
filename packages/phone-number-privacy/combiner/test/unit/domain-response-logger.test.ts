@@ -3,13 +3,13 @@ import {
   DomainQuotaStatusRequest,
   DomainRequest,
   DomainRestrictedSignatureRequest,
+  KeyVersionInfo,
   OdisResponse,
   rootLogger,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
 import { Request, Response } from 'express'
-import { KeyVersionInfo } from '../../src/common/io'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
 import { DomainSignerResponseLogger } from '../../src/domain/services/log-responses'

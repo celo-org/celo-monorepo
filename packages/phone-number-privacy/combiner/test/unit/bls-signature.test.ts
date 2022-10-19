@@ -1,8 +1,7 @@
-import { rootLogger } from '@celo/phone-number-privacy-common'
+import { KeyVersionInfo, rootLogger } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import { BLSCryptographyClient } from '../../src/common/crypto-clients/bls-crypto-client'
 import { ServicePartialSignature } from '../../src/common/crypto-clients/crypto-client'
-import { KeyVersionInfo } from '../../src/common/io'
 import config from '../../src/config'
 
 const PUBLIC_KEY =
@@ -28,9 +27,7 @@ const keyVersionInfo: KeyVersionInfo = {
 
 config.phoneNumberPrivacy.keys = {
   currentVersion: keyVersionInfo.keyVersion,
-  thresholds: [keyVersionInfo.threshold],
-  polynomials: [keyVersionInfo.polynomial],
-  pubKeys: [keyVersionInfo.pubKey],
+  versions: JSON.stringify([keyVersionInfo]),
 }
 
 describe(`BLS service computes signature`, () => {

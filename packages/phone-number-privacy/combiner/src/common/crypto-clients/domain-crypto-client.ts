@@ -1,6 +1,5 @@
-import { ErrorMessage, PoprfCombiner } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, KeyVersionInfo, PoprfCombiner } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { KeyVersionInfo } from '../io'
 import { CryptoClient } from './crypto-client'
 
 export class DomainCryptoClient extends CryptoClient {

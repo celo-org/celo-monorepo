@@ -4,6 +4,7 @@ import {
   ErrorType,
   FailureResponse,
   getRequestKeyVersion,
+  KeyVersionInfo,
   KEY_VERSION_HEADER,
   OdisRequest,
   OdisResponse,
@@ -25,13 +26,6 @@ export type SignerResponse<R extends OdisRequest> = {
   url: string
   res: OdisResponse<R>
   status: number
-}
-
-export interface KeyVersionInfo {
-  keyVersion: number
-  threshold: number
-  polynomial: string
-  pubKey: string
 }
 
 export abstract class IO<R extends OdisRequest> {
@@ -70,12 +64,14 @@ export abstract class IO<R extends OdisRequest> {
     const requestKeyVersion = getRequestKeyVersion(request, logger)
     const defaultKeyVersion = this.config.keys.currentVersion
     const keyVersion = requestKeyVersion ?? defaultKeyVersion
-    return {
-      keyVersion,
-      threshold: this.config.keys.thresholds[keyVersion - 1],
-      polynomial: this.config.keys.polynomials[keyVersion - 1],
-      pubKey: this.config.keys.pubKeys[keyVersion - 1],
+    const supportedVersions: KeyVersionInfo[] = JSON.parse(this.config.keys.versions)
+    const filteredSupportedVersions: KeyVersionInfo[] = supportedVersions.filter(
+      (v) => v.keyVersion === keyVersion
+    )
+    if (!filteredSupportedVersions.length) {
+      throw new Error('TODO(Alec)')
     }
+    return filteredSupportedVersions[0]
   }
 
   validateSignerResponse(data: string, url: string, logger: Logger): OdisResponse<R> {

@@ -1,8 +1,13 @@
-import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessage,
+  KeyVersionInfo,
+  OdisRequest,
+  OdisResponse,
+} from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
-import { KeyVersionInfo, SignerResponse } from './io'
+import { SignerResponse } from './io'
 
 export class Session<R extends OdisRequest> {
   public timedOut: boolean = false

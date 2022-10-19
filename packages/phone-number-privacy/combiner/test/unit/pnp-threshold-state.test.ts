@@ -1,4 +1,5 @@
 import {
+  KeyVersionInfo,
   PnpQuotaRequest,
   PnpQuotaResponseSuccess,
   rootLogger,
@@ -8,7 +9,6 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
 import { Request, Response } from 'express'
-import { KeyVersionInfo } from '../../src/common/io'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
 import { PnpThresholdStateService } from '../../src/pnp/services/threshold-state'
@@ -51,7 +51,8 @@ describe('pnp threshold state', () => {
   }
 
   const pnpConfig = config.phoneNumberPrivacy
-  pnpConfig.keys.thresholds = [keyVersionInfo.threshold]
+  pnpConfig.keys.currentVersion = keyVersionInfo.keyVersion
+  pnpConfig.keys.versions = JSON.stringify([keyVersionInfo])
   const pnpThresholdStateService = new PnpThresholdStateService()
 
   const expectedVersion = getVersion()

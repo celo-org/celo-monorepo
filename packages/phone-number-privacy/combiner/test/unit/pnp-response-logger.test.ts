@@ -1,5 +1,6 @@
 import {
   ErrorMessage,
+  KeyVersionInfo,
   OdisResponse,
   PnpQuotaRequest,
   rootLogger,
@@ -8,7 +9,6 @@ import {
 } from '@celo/phone-number-privacy-common'
 import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
 import { Request, Response } from 'express'
-import { KeyVersionInfo } from '../../src/common/io'
 import { Session } from '../../src/common/session'
 import config, {
   MAX_BLOCK_DISCREPANCY_THRESHOLD,
@@ -48,7 +48,8 @@ describe('pnp response logger', () => {
   }
 
   const pnpConfig = config.phoneNumberPrivacy
-  pnpConfig.keys.thresholds = [keyVersionInfo.threshold]
+  pnpConfig.keys.currentVersion = keyVersionInfo.keyVersion
+  pnpConfig.keys.versions = JSON.stringify([keyVersionInfo])
   const pnpResponseLogger = new PnpSignerResponseLogger()
 
   const version = getVersion()

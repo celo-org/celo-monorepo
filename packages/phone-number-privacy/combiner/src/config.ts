@@ -36,9 +36,7 @@ export interface OdisConfig {
   }
   keys: {
     currentVersion: number
-    thresholds: number[]
-    polynomials: string[]
-    pubKeys: string[] // Expected to be encoded in base64
+    versions: string // parse as KeyVersionInfo[]
   }
 }
 
@@ -61,6 +59,20 @@ const defaultServiceName = 'odis-combiner'
 
 if (DEV_MODE) {
   rootLogger(defaultServiceName).debug('Running in dev mode')
+  const devSignersString = JSON.stringify([
+    {
+      url: 'http://localhost:3001',
+      fallbackUrl: 'http://localhost:3001/fallback',
+    },
+    {
+      url: 'http://localhost:3002',
+      fallbackUrl: 'http://localhost:3002/fallback',
+    },
+    {
+      url: 'http://localhost:3003',
+      fallbackUrl: 'http://localhost:3003/fallback',
+    },
+  ])
   config = {
     serviceName: defaultServiceName,
     blockchain: {
@@ -78,15 +90,31 @@ if (DEV_MODE) {
       enabled: true,
       shouldFailOpen: true,
       odisServices: {
-        signers:
-          '[{"url": "http://localhost:3001", "fallbackUrl": "http://localhost:3001/fallback"}, {"url": "http://localhost:3002", "fallbackUrl": "http://localhost:3002/fallback"}, {"url": "http://localhost:3003", "fallbackUrl": "http://localhost:3003/fallback"}]',
+        signers: devSignersString,
         timeoutMilliSeconds: 5 * 1000,
       },
       keys: {
         currentVersion: 1,
-        thresholds: [2, 2, 2],
-        polynomials: TestUtils.Values.PNP_THRESHOLD_DEV_POLYNOMIALS,
-        pubKeys: TestUtils.Values.PNP_THRESHOLD_DEV_PUBKEYS,
+        versions: JSON.stringify([
+          {
+            keyVersion: 1,
+            threshold: 2,
+            polynomial: TestUtils.Values.PNP_THRESHOLD_DEV_POLYNOMIAL_V1,
+            pubKey: TestUtils.Values.PNP_THRESHOLD_DEV_PUBKEY_V1,
+          },
+          {
+            keyVersion: 2,
+            threshold: 2,
+            polynomial: TestUtils.Values.PNP_THRESHOLD_DEV_POLYNOMIAL_V2,
+            pubKey: TestUtils.Values.PNP_THRESHOLD_DEV_PUBKEY_V2,
+          },
+          {
+            keyVersion: 3,
+            threshold: 2,
+            polynomial: TestUtils.Values.PNP_THRESHOLD_DEV_POLYNOMIAL_V3,
+            pubKey: TestUtils.Values.PNP_THRESHOLD_DEV_PUBKEY_V3,
+          },
+        ]),
       },
     },
     domains: {
@@ -94,15 +122,31 @@ if (DEV_MODE) {
       enabled: true,
       shouldFailOpen: false,
       odisServices: {
-        signers:
-          '[{"url": "http://localhost:3001", "fallbackUrl": "http://localhost:3001/fallback"}, {"url": "http://localhost:3002", "fallbackUrl": "http://localhost:3002/fallback"}, {"url": "http://localhost:3003", "fallbackUrl": "http://localhost:3003/fallback"}]',
+        signers: devSignersString,
         timeoutMilliSeconds: 5 * 1000,
       },
       keys: {
         currentVersion: 1,
-        thresholds: [2, 2, 2],
-        polynomials: TestUtils.Values.DOMAINS_THRESHOLD_DEV_POLYNOMIALS,
-        pubKeys: TestUtils.Values.DOMAINS_THRESHOLD_DEV_PUBKEYS,
+        versions: JSON.stringify([
+          {
+            keyVersion: 1,
+            threshold: 2,
+            polynomial: TestUtils.Values.DOMAINS_THRESHOLD_DEV_POLYNOMIAL_V1,
+            pubKey: TestUtils.Values.DOMAINS_THRESHOLD_DEV_PUBKEY_V1,
+          },
+          {
+            keyVersion: 2,
+            threshold: 2,
+            polynomial: TestUtils.Values.DOMAINS_THRESHOLD_DEV_POLYNOMIAL_V2,
+            pubKey: TestUtils.Values.DOMAINS_THRESHOLD_DEV_PUBKEY_V2,
+          },
+          {
+            keyVersion: 3,
+            threshold: 2,
+            polynomial: TestUtils.Values.DOMAINS_THRESHOLD_DEV_POLYNOMIAL_V3,
+            pubKey: TestUtils.Values.DOMAINS_THRESHOLD_DEV_PUBKEY_V3,
+          },
+        ]),
       },
     },
     cloudFunction: {
@@ -135,9 +179,7 @@ if (DEV_MODE) {
       },
       keys: {
         currentVersion: functionConfig.phoneNumberPrivacy.keys.currentVersion,
-        thresholds: functionConfig.phoneNumberPrivacy.keys.versions,
-        polynomials: functionConfig.phoneNumberPrivacy.keys.polynomials,
-        pubKeys: functionConfig.phoneNumberPrivacy.keys.pubKeys,
+        versions: functionConfig.phoneNumberPrivacy.keys.versions,
       },
     },
     domains: {
@@ -150,9 +192,7 @@ if (DEV_MODE) {
       },
       keys: {
         currentVersion: functionConfig.domains.keys.currentVersion,
-        thresholds: functionConfig.domains.keys.versions,
-        polynomials: functionConfig.domains.keys.polynomials,
-        pubKeys: functionConfig.domains.keys.pubKeys,
+        versions: functionConfig.domains.keys.versions,
       },
     },
     cloudFunction: {

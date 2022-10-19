@@ -3,6 +3,13 @@ import { Request } from 'express'
 import { Response as FetchResponse } from 'node-fetch'
 import { ErrorMessage, KEY_VERSION_HEADER, OdisRequest, WarningMessage } from '..'
 
+export interface KeyVersionInfo {
+  keyVersion: number
+  threshold: number
+  polynomial: string
+  pubKey: string
+}
+
 export function requestHasValidKeyVersion(
   request: Request<{}, {}, OdisRequest>,
   logger: Logger
