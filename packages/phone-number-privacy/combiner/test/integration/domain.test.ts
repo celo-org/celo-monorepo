@@ -1059,13 +1059,14 @@ describe('domainService', () => {
       })
     })
 
-    describe('when 2/3 of signers timeout', () => {
+    describe('when signers timeout', () => {
       beforeEach(async () => {
         const testTimeoutMS = 0
 
         const configWithShortTimeout: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
         configWithShortTimeout.timeout = testTimeoutMS
-        signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
+        // Test this with all signers timing out to decrease possibility of race conditions
+        signer1 = startSigner(configWithShortTimeout, signerDB1, keyProvider1).listen(3001)
         signer2 = startSigner(configWithShortTimeout, signerDB2, keyProvider2).listen(3002)
         signer3 = startSigner(configWithShortTimeout, signerDB3, keyProvider3).listen(3003)
       })
