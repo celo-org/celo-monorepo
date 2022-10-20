@@ -34,7 +34,7 @@ defaults: &defaults
 contract-defaults: &contract-defaults
   <<: *defaults
   environment:
-    RELEASE_TAG: core-contracts.v7
+    RELEASE_TAG: core-contracts.v8
 
 e2e-defaults: &e2e-defaults
   <<: *defaults
@@ -161,7 +161,7 @@ jobs:
       - run:
           name: Build packages
           command: |
-            yarn build --ignore docs
+            yarn build --ignore docs --include-dependencies
 
       - run:
           name: Check licenses
@@ -813,6 +813,10 @@ jobs:
           name: Check if the test should run
           command: |
             ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+            # Disabling certora until the license is figured out
+            echo "Certora tests are disabled"
+            circleci step halt
+            exit 0
       - run:
           name: Certora dependencies
           command: |

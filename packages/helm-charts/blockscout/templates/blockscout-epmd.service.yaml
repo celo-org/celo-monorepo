@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-epmd-service
+  labels:
+    {{- include "celo.blockscout.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: blockscout
+    release: {{ .Release.Name }}
+    {{- include "celo.blockscout.elixir.labels" . | nindent 4 }}
+  spec:
+  clusterIP: None
+  ports:
+    - port: 4369
+      name: epmd

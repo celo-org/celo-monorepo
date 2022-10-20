@@ -6,12 +6,12 @@ import { getInternalTxNodeLoadBalancerIP } from 'src/lib/vm-testnet-utils'
 const helmChartPath = '../helm-charts/mock-oracle'
 
 export async function installHelmChart(celoEnv: string) {
-  return installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    helmChartPath,
-    await helmParameters(celoEnv)
-  )
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv),
+  })
 }
 export async function removeHelmRelease(celoEnv: string) {
   await removeGenericHelmChart(releaseName(celoEnv), celoEnv)

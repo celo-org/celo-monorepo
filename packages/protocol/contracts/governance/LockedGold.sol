@@ -78,7 +78,10 @@ contract LockedGold is
 
   /**
   * @notice Returns the storage, major, minor, and patch version of the contract.
-  * @return The storage, major, minor, and patch version of the contract.
+  * @return Storage version of the contract.
+  * @return Major version of the contract.
+  * @return Minor version of the contract.
+  * @return Patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 1, 2, 0);
@@ -265,7 +268,8 @@ contract LockedGold is
   /**
    * @notice Returns the pending withdrawals from unlocked gold for an account.
    * @param account The address of the account.
-   * @return The value and timestamp for each pending withdrawal.
+   * @return The value for each pending withdrawal.
+   * @return The timestamp for each pending withdrawal.
    */
   function getPendingWithdrawals(address account)
     external

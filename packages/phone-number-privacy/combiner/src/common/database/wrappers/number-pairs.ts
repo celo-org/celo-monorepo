@@ -1,10 +1,10 @@
 import { DB_TIMEOUT, ErrorMessage } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import { Knex } from 'knex'
-import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPairs } from '../models/number-pairs'
+import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE, NumberPair } from '../models/number-pairs'
 
 function numberPairs(db: Knex) {
-  return db<NumberPairs>(NUMBER_PAIRS_TABLE)
+  return db<NumberPair>(NUMBER_PAIRS_TABLE)
 }
 
 /*
@@ -43,7 +43,7 @@ export async function setNumberPairContacts(
 ): Promise<void> {
   const rows: any = []
   for (const contactPhone of contactPhones) {
-    const data = new NumberPairs(userPhone, contactPhone)
+    const data = new NumberPair(userPhone, contactPhone)
     rows.push(data)
   }
   try {

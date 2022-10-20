@@ -69,7 +69,10 @@ contract Exchange is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 3, 0, 0);
@@ -260,7 +263,8 @@ contract Exchange is
    * @notice Returns the buy token and sell token bucket sizes, in order. The ratio of
    * the two also represents the exchange rate between the two.
    * @param sellGold `true` if gold is the sell token.
-   * @return (buyTokenBucket, sellTokenBucket)
+   * @return buyTokenBucket
+   * @return sellTokenBucket
    */
   function getBuyAndSellBuckets(bool sellGold) public view returns (uint256, uint256) {
     uint256 currentGoldBucket = goldBucket;
@@ -363,7 +367,8 @@ contract Exchange is
    * @notice Returns the buy token and sell token bucket sizes, in order. The ratio of
    * the two also represents the exchange rate between the two.
    * @param sellGold `true` if gold is the sell token.
-   * @return (buyTokenBucket, sellTokenBucket)
+   * @return buyTokenBucket
+   * @return sellTokenBucket
    */
   function _getBuyAndSellBuckets(bool sellGold) private view returns (uint256, uint256) {
     if (sellGold) {
@@ -426,6 +431,10 @@ contract Exchange is
     return numerator.unwrap().div(denominator.unwrap());
   }
 
+  /**
+   * @return buyTokenBucket
+   * @return sellTokenBucket
+   */
   function getUpdatedBuckets() private view returns (uint256, uint256) {
     uint256 updatedGoldBucket = getUpdatedGoldBucket();
     uint256 exchangeRateNumerator;
@@ -488,9 +497,10 @@ contract Exchange is
     return FixidityLib.fixed1().subtract(spread).multiply(FixidityLib.newFixed(sellAmount));
   }
 
-  /*
+  /**
    * @notice Checks conditions required for bucket updates.
-   * @return Whether or not buckets should be updated.
+   * @return The Rate numerator - whether or not buckets should be updated.
+   * @return The rate denominator - whether or not buckets should be updated.
    */
   function shouldUpdateBuckets() private view returns (bool) {
     ISortedOracles sortedOracles = ISortedOracles(

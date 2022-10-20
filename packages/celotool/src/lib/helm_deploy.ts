@@ -35,6 +35,8 @@ import {
 } from './testnet-utils'
 import { stringToBoolean } from './utils'
 
+const generator = require('generate-password')
+
 const CLOUDSQL_SECRET_NAME = 'blockscout-cloudsql-credentials'
 const BACKUP_GCS_SECRET_NAME = 'backup-blockchain-credentials'
 const TIMEOUT_FOR_LOAD_BALANCER_POLL = 1000 * 60 * 25 // 25 minutes
@@ -124,8 +126,17 @@ export async function createCloudSQLInstance(celoEnv: string, instanceName: stri
     `gcloud sql instances patch ${instanceName} --backup-start-time 17:00`
   )
 
-  const blockscoutDBUsername = Math.random().toString(36).slice(-8)
-  const blockscoutDBPassword = Math.random().toString(36).slice(-8)
+  const passwordOptions = {
+    length: 22,
+    numbers: true,
+    symbols: false,
+    lowercase: true,
+    uppercase: true,
+    strict: true,
+  }
+
+  const blockscoutDBUsername = generator.generate(passwordOptions)
+  const blockscoutDBPassword = generator.generate(passwordOptions)
 
   console.info('Creating SQL user')
   await execCmdWithExitOnFailure(
@@ -200,6 +211,32 @@ export async function cloneCloudSQLInstance(
   return [blockscoutDBUsername, blockscoutDBPassword, blockscoutDBConnectionName.trim()]
 }
 
+export async function createSecretInSecretManagerIfNotExists(
+  secretId: string,
+  secretLabels: string[],
+  secretValue: string
+) {
+  try {
+    await execCmd(`gcloud secrets describe ${secretId}`)
+
+    console.info(`Secret ${secretId} already exists, skipping creation...`)
+  } catch (error) {
+    await execCmd(
+      `echo -n "${secretValue}" | gcloud secrets create ${secretId} --data-file=- --replication-policy="automatic" --labels ${secretLabels.join(
+        ','
+      )}`
+    )
+  }
+}
+
+export async function deleteSecretFromSecretManager(secretId: string) {
+  try {
+    await execCmd(`gcloud secrets delete ${secretId}`)
+  } catch {
+    console.info(`Couldn't delete secret ${secretId} -- skipping`)
+  }
+}
+
 async function createAndUploadKubernetesSecretIfNotExists(
   secretName: string,
   serviceAccountName: string,
@@ -271,7 +308,7 @@ export async function installCertManagerAndNginx(
   celoEnv: string,
   clusterConfig?: BaseClusterConfig
 ) {
-  const nginxChartVersion = '3.9.0'
+  const nginxChartVersion = '4.2.1'
   const nginxChartNamespace = 'default'
 
   // Check if cert-manager is installed in any namespace
@@ -368,12 +405,22 @@ async function getOrCreateNginxStaticIp(celoEnv: string, clusterConfig?: BaseClu
   return staticIpAddress
 }
 
+// Add a Helm repository and updates the local cache. If repository already exists, it is executed
+// without error.
+export async function helmAddRepoAndUpdate(repository: string, name?: string) {
+  if (name === undefined) {
+    const repoArray = repository.split('/')
+    name = repoArray[repoArray.length - 1]
+  }
+  console.info(`Adding Helm repository ${name} with URL ${repository}`)
+  await execCmdWithExitOnFailure(`helm repo add ${name} ${repository}`)
+  await execCmdWithExitOnFailure(`helm repo update`)
+}
+
+// Add common helm repositories
 export async function helmAddAndUpdateRepos() {
-  await execCmdWithExitOnFailure(
-    `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
-  )
-  await execCmdWithExitOnFailure(`helm repo add stable https://charts.helm.sh/stable`)
-  await execCmdWithExitOnFailure(`helm repo add grafana https://grafana.github.io/helm-charts`)
+  await helmAddRepoAndUpdate('https://kubernetes.github.io/ingress-nginx')
+  await helmAddRepoAndUpdate('https://charts.helm.sh/stable')
   await execCmdWithExitOnFailure(`helm repo update`)
 }
 
@@ -385,7 +432,7 @@ export async function installCertManager() {
 
   console.info('Installing cert-manager CustomResourceDefinitions')
   await execCmdWithExitOnFailure(
-    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.2.0/cert-manager.crds.yaml`
+    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.9.1/cert-manager.crds.yaml`
   )
   console.info('Updating cert-manager-cluster-issuers chart dependencies')
   await execCmdWithExitOnFailure(`helm dependency update ${clusterIssuersHelmChartPath}`)
@@ -856,7 +903,6 @@ async function helmParameters(celoEnv: string, useExistingGenesis: boolean) {
     `--set genesis.useGenesisFileBase64="false"`,
     `--set genesis.network=${celoEnv}`,
     `--set genesis.networkId=${fetchEnv(envVar.NETWORK_ID)}`,
-    `--set genesis.epoch_size=${fetchEnv(envVar.EPOCH)}`,
     `--set geth.verbosity=${fetchEnvOrFallback('GETH_VERBOSITY', '4')}`,
     `--set geth.vmodule=${fetchEnvOrFallback('GETH_VMODULE', '')}`,
     `--set geth.resources.requests.cpu=${fetchEnv('GETH_NODE_CPU_REQUEST')}`,
@@ -912,54 +958,91 @@ export async function installHelmDiffPlugin() {
   }
 }
 
+// Return the values file arg if file exists If values file reference is defined and file not found,
+// throw an error. When chartDir is a remote chart, the values file is assumed to be an abslute path.
 function valuesOverrideArg(chartDir: string, filename: string | undefined) {
   if (filename === undefined) {
     return ''
+  } else if (fs.existsSync(filename)) {
+    return `-f ${filename}`
+  } else if (fs.existsSync(path.join(chartDir, filename))) {
+    return `-f ${path.join(chartDir, filename)}`
+  } else {
+    console.error(`Values override file ${filename} not found`)
   }
-
-  return `-f ${chartDir}/${filename}`
 }
 
-export async function installGenericHelmChart(
-  namespace: string,
-  releaseName: string,
-  chartDir: string,
-  parameters: string[],
-  buildDependencies: boolean = true,
+//   namespace: The namespace to install the chart into
+//   releaseName: The name of the release
+//   chartDir: The directory containing the chart or the values.yamls files. By default, it will try to use a custom values file
+//       at ${chartDir}/${valuesOverrideFile}.yaml
+//   parameters: The parameters to pass to the helm install command (e.g. --set geth.replicas=3)
+//   buildDependencies: Whether to build the chart dependencies before installing. When using a remote chart, this must be false.
+//   chartVersion: The version of the chart to install. Used only when chartRemoteReference is set
+//   valuesOverrideFile: The name of the values file to use. In the case of a remote chart, this is assumed to be an absolute path.
+interface GenericHelmChartParameters {
+  namespace: string
+  releaseName: string
+  chartDir: string
+  parameters: string[]
+  buildDependencies?: boolean
+  chartVersion?: string
   valuesOverrideFile?: string
-) {
+}
+// Install a Helm Chart. Look above for the parameters
+
+// When using a remote helm chart, buildDependencies must be false and valuesOverrideFile the absolute path to the values file
+export async function installGenericHelmChart({
+  namespace,
+  releaseName,
+  chartDir,
+  parameters,
+  buildDependencies = true,
+  chartVersion,
+  valuesOverrideFile,
+}: GenericHelmChartParameters) {
   if (buildDependencies) {
     await buildHelmChartDependencies(chartDir)
   }
 
   if (isCelotoolHelmDryRun()) {
+    const versionLog = chartVersion ? ` version ${chartVersion}` : ''
+    const valuesOverrideLog = valuesOverrideFile
+      ? `, with values override: ${valuesOverrideFile}`
+      : ''
     console.info(
-      `This would deploy chart ${chartDir} with release name ${releaseName} in namespace ${namespace} with parameters:`
+      `This would deploy chart ${chartDir}${versionLog} with release name ${releaseName} in namespace ${namespace}${valuesOverrideLog} with parameters:`
     )
     console.info(parameters)
-    if (valuesOverrideFile !== undefined) {
-      console.info(`And with values override: ${valuesOverrideFile}`)
-    }
   } else {
     console.info(`Installing helm release ${releaseName}`)
+    const versionArg = chartVersion ? `--version=${chartVersion}` : ''
     const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
     await helmCommand(
-      `helm upgrade --install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm upgrade --install ${valuesOverride} ${releaseName} ${chartDir} ${versionArg} --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
   }
 }
 
-export async function upgradeGenericHelmChart(
-  namespace: string,
-  releaseName: string,
-  chartDir: string,
-  parameters: string[],
-  valuesOverrideFile?: string
-) {
-  await buildHelmChartDependencies(chartDir)
+// Upgrade a Helm Chart. chartDir can be the path to the Helm Chart or the name of a remote Helm Chart.
+// If using a remote helm chart, the chart repository has to be added and updated in the local helm config
+// When using a remote helm chart, buildDependencies must be false and valuesOverrideFile the absolute path to the values file
+export async function upgradeGenericHelmChart({
+  namespace,
+  releaseName,
+  chartDir,
+  parameters,
+  buildDependencies = true,
+  chartVersion,
+  valuesOverrideFile,
+}: GenericHelmChartParameters) {
+  if (buildDependencies) {
+    await buildHelmChartDependencies(chartDir)
+  }
   const valuesOverride = valuesOverrideArg(chartDir, valuesOverrideFile)
+  const versionArg = chartVersion ? `--version=${chartVersion}` : ''
 
   if (isCelotoolHelmDryRun()) {
     console.info(
@@ -967,7 +1050,7 @@ export async function upgradeGenericHelmChart(
     )
     await installHelmDiffPlugin()
     await helmCommand(
-      `helm diff upgrade --install -C 5 -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm diff upgrade --install -C 5 ${valuesOverride} ${versionArg} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
         ' '
       )}`,
       true
@@ -975,7 +1058,7 @@ export async function upgradeGenericHelmChart(
   } else {
     console.info(`Upgrading helm release ${releaseName}`)
     await helmCommand(
-      `helm upgrade --install -f ${chartDir}/values.yaml ${valuesOverride} ${releaseName} ${chartDir} --namespace ${namespace} ${parameters.join(
+      `helm upgrade --install ${valuesOverride} ${versionArg} ${releaseName} ${chartDir} --timeout 120h --namespace ${namespace} ${parameters.join(
         ' '
       )}`
     )
@@ -1052,21 +1135,28 @@ export async function installHelmChart(celoEnv: string, useExistingGenesis: bool
   await failIfSecretMissing(BACKUP_GCS_SECRET_NAME, 'default')
   await copySecret(BACKUP_GCS_SECRET_NAME, 'default', celoEnv)
   const extraValuesFile = getExtraValuesFile(celoEnv)
-  return installGenericHelmChart(
-    celoEnv,
-    celoEnv,
-    TESTNET_CHART_DIR,
-    await helmParameters(celoEnv, useExistingGenesis),
-    true,
-    extraValuesFile
-  )
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: celoEnv,
+    chartDir: TESTNET_CHART_DIR,
+    parameters: await helmParameters(celoEnv, useExistingGenesis),
+    buildDependencies: true,
+    valuesOverrideFile: extraValuesFile,
+  })
 }
 
 export async function upgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
   console.info(`Upgrading helm release ${celoEnv}`)
   const parameters = await helmParameters(celoEnv, useExistingGenesis)
   const extraValuesFile = getExtraValuesFile(celoEnv)
-  await upgradeGenericHelmChart(celoEnv, celoEnv, TESTNET_CHART_DIR, parameters, extraValuesFile)
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: celoEnv,
+    chartDir: TESTNET_CHART_DIR,
+    parameters,
+    buildDependencies: true,
+    valuesOverrideFile: extraValuesFile,
+  })
 }
 
 export async function resetAndUpgradeHelmChart(celoEnv: string, useExistingGenesis: boolean) {
@@ -1168,7 +1258,7 @@ function useStaticIPsForGethNodes() {
 }
 
 export async function checkHelmVersion() {
-  const requiredMinHelmVersion = '3.4'
+  const requiredMinHelmVersion = '3.8'
   const helmVersionCmd = `helm version --template '{{ .Version }}'`
   const localHelmVersion = (await execCmdWithExitOnFailure(helmVersionCmd))[0].replace('^v', '')
 

@@ -81,7 +81,11 @@ export default class Show extends BaseCommand {
       if (!filter || res.flags.voter) {
         const electedValidators = await election.getElectedValidators(epochNumber)
         if (!filter) {
-          const epochGroupVoterRewards = await election.getGroupVoterRewards(epochNumber)
+          const useBlockNumber = !res.flags.estimate
+          const epochGroupVoterRewards = await election.getGroupVoterRewards(
+            epochNumber,
+            useBlockNumber
+          )
           groupVoterRewards = groupVoterRewards.concat(
             epochGroupVoterRewards.map(
               (e: GroupVoterReward): ExplainedGroupVoterReward => ({
@@ -96,6 +100,7 @@ export default class Show extends BaseCommand {
             const epochVoterRewards = await election.getVoterRewards(
               address,
               epochNumber,
+              !res.flags.estimate,
               res.flags.estimate ? await election.getVoterShare(address) : undefined
             )
             voterRewards = voterRewards.concat(
@@ -118,10 +123,11 @@ export default class Show extends BaseCommand {
           }
         }
       }
-
       if (!filter || res.flags.validator || res.flags.group) {
+        const useBlockNumber = !res.flags.estimate
         const epochValidatorRewards: ValidatorReward[] = await validators.getValidatorRewards(
-          epochNumber
+          epochNumber,
+          useBlockNumber
         )
 
         if (!filter || res.flags.validator) {

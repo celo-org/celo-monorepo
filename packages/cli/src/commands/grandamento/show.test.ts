@@ -7,6 +7,7 @@ import { GrandaMentoWrapper } from '@celo/contractkit/lib/wrappers/GrandaMento'
 import { testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import { setGrandaMentoLimits } from '../../test-utils/grandaMento'
 import Show from './show'
 
@@ -42,6 +43,6 @@ testWithGanache('grandamento:show cmd', (web3: Web3) => {
       )
     ).sendAndWaitForReceipt()
 
-    await Show.run(['--proposalID', '1'])
+    await testLocally(Show, ['--proposalID', '1'])
   })
 })

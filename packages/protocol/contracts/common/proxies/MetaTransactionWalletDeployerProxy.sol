@@ -2,5 +2,5 @@ pragma solidity ^0.5.3;
 
 import "../Proxy.sol";
 
-/* solhint-disable no-empty-blocks */
+/* solhint-disable-next-line no-empty-blocks */
 contract MetaTransactionWalletDeployerProxy is Proxy {}

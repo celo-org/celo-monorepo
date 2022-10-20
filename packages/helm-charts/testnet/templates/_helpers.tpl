@@ -137,12 +137,15 @@ spec:
   template:
     metadata:
       labels:
-{{ include "common.standard.labels" .  | indent 8 }}
+        {{- include "common.standard.labels" .  | nindent 8 }}
         component: {{ .component_label }}
-{{ if .proxy | default false }}
-{{ $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+        {{- if .extraPodLabels -}}
+        {{- toYaml .extraPodLabels | nindent 8 }}
+        {{- end }}
+        {{- if .proxy | default false }}
+        {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
         validator-proxied: "{{ $validatorProxied }}"
-{{- end }}
+        {{- end }}
 {{ if .Values.metrics | default false }}
       annotations:
 {{ include "common.prometheus-annotations" . | indent 8 }}
@@ -167,6 +170,8 @@ spec:
       {{- end }}
       volumes:
       - name: data
+        emptyDir: {}
+      - name: data-shared
         emptyDir: {}
       - name: config
         configMap:
