@@ -1,6 +1,7 @@
 import {
   DomainQuotaStatusResponseSuccess,
   DomainRestrictedSignatureResponseSuccess,
+  KeyVersionInfo,
   SequentialDelayDomainState,
 } from '@celo/phone-number-privacy-common'
 import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
@@ -14,6 +15,13 @@ describe('domain threshold state', () => {
   // TODO(2.0.0): add tests with failed signer responses, depending on
   // result of https://github.com/celo-org/celo-monorepo/issues/9826
 
+  const keyVersionInfo: KeyVersionInfo = {
+    keyVersion: 1,
+    threshold: 3,
+    polynomial: 'mock polynomial',
+    pubKey: 'mock pubKey',
+  }
+
   const getSession = (domainStates: SequentialDelayDomainState[]) => {
     const mockRequest = {
       body: {},
@@ -23,7 +31,7 @@ describe('domain threshold state', () => {
         logger: new Logger({ name: 'logger' }),
       },
     } as Response
-    const session = new Session(mockRequest, mockResponse)
+    const session = new Session(mockRequest, mockResponse, keyVersionInfo)
     domainStates.forEach((status) => {
       const res: DomainRestrictedSignatureResponseSuccess | DomainQuotaStatusResponseSuccess = {
         success: true,
@@ -36,9 +44,15 @@ describe('domain threshold state', () => {
   }
 
   const domainConfig = config.domains
-  domainConfig.keys.threshold = 3
-  domainConfig.odisServices.signers =
-    '[{"url": "http://localhost:3001", "fallbackUrl": "http://localhost:3001/fallback"}, {"url": "http://localhost:3002", "fallbackUrl": "http://localhost:3002/fallback"}, {"url": "http://localhost:3003", "fallbackUrl": "http://localhost:3003/fallback"}, {"url": "http://localhost:4004", "fallbackUrl": "http://localhost:4004/fallback"}]'
+  domainConfig.keys.currentVersion = keyVersionInfo.keyVersion
+  domainConfig.keys.versions = JSON.stringify([keyVersionInfo])
+  domainConfig.odisServices.signers = JSON.stringify([
+    { url: 'http://localhost:3001', fallbackUrl: 'http://localhost:3001/fallback' },
+    { url: 'http://localhost:3002', fallbackUrl: 'http://localhost:3002/fallback' },
+    { url: 'http://localhost:3003', fallbackUrl: 'http://localhost:3003/fallback' },
+    { url: 'http://localhost:4004', fallbackUrl: 'http://localhost:4004/fallback' },
+  ])
+
   const domainThresholdStateService = new DomainThresholdStateService(domainConfig)
 
   const expectedVersion = getVersion()

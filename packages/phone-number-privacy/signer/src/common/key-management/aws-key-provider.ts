@@ -18,13 +18,9 @@ export class AWSKeyProvider extends KeyProviderBase {
 
       let privateKey: string
       try {
-        privateKey = await this.fetch(
-          client,
-          `${this.getCustomKeyName(key)}-${key.version}`,
-          secretKey
-        )
+        privateKey = await this.fetch(client, this.getCustomKeyVersionString(key), secretKey)
       } catch (err) {
-        logger.info(`Error retrieving key: ${JSON.stringify(key)}`)
+        logger.info(`Error retrieving key: ${key}`)
         logger.error(err)
         logger.error(ErrorMessage.KEY_FETCH_ERROR)
         privateKey = await this.fetch(client, secretName, secretKey)

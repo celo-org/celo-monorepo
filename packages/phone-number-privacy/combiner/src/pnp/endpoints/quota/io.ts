@@ -50,7 +50,8 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response)
+    const keyVersionInfo = this.getKeyVersionInfo(request, response.locals.logger)
+    return new Session(request, response, keyVersionInfo)
   }
 
   validateClientRequest(

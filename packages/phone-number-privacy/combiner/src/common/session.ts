@@ -1,4 +1,9 @@
-import { ErrorMessage, OdisRequest, OdisResponse } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessage,
+  KeyVersionInfo,
+  OdisRequest,
+  OdisResponse,
+} from '@celo/phone-number-privacy-common'
 import AbortController from 'abort-controller'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
@@ -15,7 +20,8 @@ export class Session<R extends OdisRequest> {
 
   public constructor(
     readonly request: Request<{}, {}, R>,
-    readonly response: Response<OdisResponse<R>>
+    readonly response: Response<OdisResponse<R>>,
+    readonly keyVersionInfo: KeyVersionInfo
   ) {
     this.logger = response.locals.logger
   }

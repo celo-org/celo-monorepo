@@ -72,7 +72,7 @@ export const Counters = {
   }),
   errorsCaughtInEndpointHandler: new Counter({
     name: 'errors_caught_in_endpoint_handler',
-    help: 'Counter for the number of errors thrown in the outermost endpoint handler',
+    help: 'Counter for the number of errors caught in the outermost endpoint handler',
   }),
   errorsThrownAfterResponseSent: new Counter({
     name: 'errors_thrown_after_response_sent',

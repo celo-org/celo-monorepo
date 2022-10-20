@@ -43,7 +43,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!this.requestHasValidKeyVersion(request, response.locals.logger)) {
+    if (!this.requestHasSupportedKeyVersion(request, response.locals.logger)) {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
@@ -51,7 +51,13 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new CryptoSession(request, response, new DomainCryptoClient(this.config))
+    const keyVersionInfo = this.getKeyVersionInfo(request, response.locals.logger)
+    return new CryptoSession(
+      request,
+      response,
+      keyVersionInfo,
+      new DomainCryptoClient(keyVersionInfo)
+    )
   }
 
   authenticate(request: Request<{}, {}, DomainRestrictedSignatureRequest>): Promise<boolean> {

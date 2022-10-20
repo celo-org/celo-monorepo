@@ -4,6 +4,7 @@ import {
   domainHash,
   DomainRestrictedSignatureRequest,
   ErrorType,
+  getRequestKeyVersion,
   ThresholdPoprfServer,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
@@ -99,7 +100,7 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
 
         const key: Key = {
           version:
-            this.io.getRequestKeyVersion(session.request, session.logger) ??
+            getRequestKeyVersion(session.request, session.logger) ??
             this.config.keystore.keys.domains.latest,
           name: DefaultKeyName.DOMAINS,
         }
@@ -165,7 +166,8 @@ export class DomainSignAction implements Action<DomainRestrictedSignatureRequest
       privateKey = await this.keyProvider.getPrivateKeyOrFetchFromStore(key)
     } catch (err) {
       session.logger.error({ key }, 'Requested key version not supported')
-      throw err
+      session.logger.error(err)
+      throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
     }
 
     const server = new ThresholdPoprfServer(Buffer.from(privateKey, 'hex'))

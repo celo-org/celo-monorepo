@@ -1,31 +1,54 @@
 import { Address } from '@celo/base'
-import { CombinerEndpoint, PnpQuotaRequest } from '@celo/phone-number-privacy-common'
-import { AuthSigner, ErrorMessages, queryOdis, ServiceContext } from './query'
+import {
+  CombinerEndpoint,
+  PnpQuotaRequest,
+  PnpQuotaResponseSchema,
+} from '@celo/phone-number-privacy-common'
+import { AuthSigner, getOdisPnpRequestAuth, queryOdis, ServiceContext } from './query'
 
-export async function getQuotaStatus(
+export interface PnpClientQuotaStatus {
+  version: string
+  performedQueryCount: number
+  totalQuota: number
+  remainingQuota: number
+  blockNumber?: number
+  warnings?: string[]
+}
+
+export async function getPnpQuotaStatus(
   account: Address,
   signer: AuthSigner,
   context: ServiceContext,
   clientVersion?: string,
   sessionID?: string
-): Promise<number> {
+): Promise<PnpClientQuotaStatus> {
   const body: PnpQuotaRequest = {
     account,
-    version: clientVersion ? clientVersion : 'unknown',
+    version: clientVersion,
     authenticationMethod: signer.authenticationMethod,
     sessionID,
   }
 
-  const response = await queryOdis<PnpQuotaRequest>(
-    signer,
+  const response = await queryOdis(
     body,
     context,
-    CombinerEndpoint.PNP_QUOTA
+    CombinerEndpoint.PNP_QUOTA,
+    PnpQuotaResponseSchema,
+    {
+      Authorization: await getOdisPnpRequestAuth(body, signer),
+    }
   )
 
   if (response.success) {
-    return response.totalQuota - response.performedQueryCount
+    return {
+      version: response.version,
+      performedQueryCount: response.performedQueryCount,
+      totalQuota: response.totalQuota,
+      remainingQuota: response.totalQuota - response.performedQueryCount,
+      warnings: response.warnings,
+      blockNumber: response.blockNumber,
+    }
   }
 
-  throw new Error(ErrorMessages.ODIS_QUOTA_ERROR + ': ' + response.error)
+  throw new Error(response.error)
 }

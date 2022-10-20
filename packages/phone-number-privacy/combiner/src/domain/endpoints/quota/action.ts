@@ -19,7 +19,8 @@ export class DomainQuotaAction extends CombineAction<DomainQuotaStatusRequest> {
 
   combine(session: Session<DomainQuotaStatusRequest>): void {
     this.responseLogger.logResponseDiscrepancies(session)
-    if (session.responses.length >= this.config.keys.threshold) {
+    const { threshold } = session.keyVersionInfo
+    if (session.responses.length >= threshold) {
       try {
         const domainQuotaStatus = this.thresholdStateService.findThresholdDomainState(session)
         this.io.sendSuccess(200, session.response, domainQuotaStatus)

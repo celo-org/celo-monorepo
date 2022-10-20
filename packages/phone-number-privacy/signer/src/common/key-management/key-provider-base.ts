@@ -17,23 +17,23 @@ export interface KeyProvider {
 const PRIVATE_KEY_SIZE = 72
 
 export abstract class KeyProviderBase implements KeyProvider {
-  protected privateKeys: Map<Key, string>
+  protected privateKeys: Map<string, string>
 
   constructor() {
     this.privateKeys = new Map()
   }
 
   public getPrivateKey(key: Key) {
-    const privateKey = this.privateKeys.get(key)
+    const privateKey = this.privateKeys.get(this.getCustomKeyVersionString(key))
     if (!privateKey) {
-      throw new Error(`Private key is unavailable: ${JSON.stringify(key)}`)
+      throw new Error(`Private key is unavailable: ${key}`)
     }
     return privateKey
   }
 
   public async getPrivateKeyOrFetchFromStore(key: Key): Promise<string> {
-    if (key.version < 1) {
-      throw new Error('Invalid private key version')
+    if (key.version < 0) {
+      throw new Error('Invalid private key version. Key version must be a positive integer.')
     }
     try {
       return this.getPrivateKey(key)
@@ -45,12 +45,16 @@ export abstract class KeyProviderBase implements KeyProvider {
 
   public abstract fetchPrivateKeyFromStore(key: Key): Promise<void>
 
+  getCustomKeyVersionString(key: Key): string {
+    return `${this.getCustomKeyName(key)}-${key.version}`
+  }
+
   protected setPrivateKey(key: Key, privateKey: string) {
     privateKey = privateKey ? privateKey.trim() : ''
     if (privateKey.length !== PRIVATE_KEY_SIZE) {
       throw new Error('Invalid private key')
     }
-    this.privateKeys.set(key, privateKey)
+    this.privateKeys.set(this.getCustomKeyVersionString(key), privateKey)
   }
 
   protected getCustomKeyName(key: Key) {
