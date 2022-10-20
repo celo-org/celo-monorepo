@@ -542,6 +542,17 @@ describe('legacyPnpService', () => {
         })
       })
 
+      it('Should respond with 400 on invalid key version', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendLegacyPnpSignRequest(req, authorization, app, '4')
+        expect(res.status).toBe(400)
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        })
+      })
+
       it('Should respond with 400 on request with invalid identifier', async () => {
         // Ensure that this gets passed through the combiner to the signer
         req.hashedPhoneNumber = '+1234567890'

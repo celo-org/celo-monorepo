@@ -768,6 +768,22 @@ describe('domainService', () => {
       })
     })
 
+    it('Should respond with 400 on invalid key version', async () => {
+      const [badRequest, _] = await signatureRequest()
+
+      const res = await request(app)
+        .post(CombinerEndpoint.DOMAIN_SIGN)
+        .set(KEY_VERSION_HEADER, '4')
+        .send(badRequest)
+
+      expect(res.status).toBe(400)
+      expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+        success: false,
+        version: res.body.version,
+        error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+      })
+    })
+
     it('Should respond with 401 on failed auth', async () => {
       // Create a manipulated request, which will have a bad signature.
       const [badRequest, _] = await signatureRequest()

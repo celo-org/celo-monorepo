@@ -507,6 +507,17 @@ describe('pnpService', () => {
         })
       })
 
+      it('Should respond with 400 on unsupported key version', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app, '4')
+        expect(res.status).toBe(400)
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        })
+      })
+
       it('Should respond with 401 on failed WALLET_KEY auth', async () => {
         req.account = mockAccount
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)

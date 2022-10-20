@@ -8,6 +8,7 @@ import {
   KEY_VERSION_HEADER,
   OdisRequest,
   OdisResponse,
+  requestHasValidKeyVersion,
   SignerEndpoint,
   SuccessResponse,
   WarningMessage,
@@ -69,9 +70,21 @@ export abstract class IO<R extends OdisRequest> {
       (v) => v.keyVersion === keyVersion
     )
     if (!filteredSupportedVersions.length) {
-      throw new Error('TODO(Alec)')
+      throw new Error(`key version ${keyVersion} not supported`)
     }
     return filteredSupportedVersions[0]
+  }
+
+  requestHasSupportedKeyVersion(request: Request<{}, {}, OdisRequest>, logger: Logger): boolean {
+    if (!requestHasValidKeyVersion(request, logger)) {
+      return false
+    }
+    try {
+      this.getKeyVersionInfo(request, logger)
+      return true
+    } catch {
+      return false
+    }
   }
 
   validateSignerResponse(data: string, url: string, logger: Logger): OdisResponse<R> {

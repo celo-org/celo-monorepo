@@ -8,7 +8,6 @@ import {
   hasValidBlindedPhoneNumberParam,
   isBodyReasonablySized,
   PnpQuotaStatus,
-  requestHasValidKeyVersion,
   send,
   SignerEndpoint,
   SignMessageRequest,
@@ -53,7 +52,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    if (!requestHasValidKeyVersion(request, response.locals.logger)) {
+    if (!this.requestHasSupportedKeyVersion(request, response.locals.logger)) {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
