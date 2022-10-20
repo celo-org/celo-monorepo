@@ -1,8 +1,5 @@
 import { Knex } from 'knex'
-import {
-  NUMBER_PAIRS_COLUMN,
-  NUMBER_PAIRS_TABLE,
-} from '../src/services/database/models/number-pairs'
+import { NUMBER_PAIRS_COLUMN, NUMBER_PAIRS_TABLE } from '../src/common/database/models/number-pairs'
 
 export async function up(knex: Knex): Promise<any> {
   return knex.schema.createTable(NUMBER_PAIRS_TABLE, (t) => {

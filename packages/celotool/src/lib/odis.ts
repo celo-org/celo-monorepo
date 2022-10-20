@@ -106,21 +106,21 @@ function releaseName(celoEnv: string, context: string) {
 }
 
 export async function installODISHelmChart(celoEnv: string, context: string) {
-  return installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, context),
-    helmChartPath,
-    await helmParameters(celoEnv, context)
-  )
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv, context),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv, context),
+  })
 }
 
 export async function upgradeODISChart(celoEnv: string, context: string) {
-  return upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, context),
-    helmChartPath,
-    await helmParameters(celoEnv, context)
-  )
+  return upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv, context),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv, context),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string, context: string) {

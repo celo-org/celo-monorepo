@@ -42,7 +42,8 @@ const DefaultConstitution = {
   },
   Escrow: {
     default: 0.6,
-    setRegistry: 0.9,
+    addDefaultTrustedIssuer: 0.6,
+    removeDefaultTrustedIssuer: 0.6,
   },
   Exchange: {
     default: 0.8,
@@ -70,6 +71,9 @@ const DefaultConstitution = {
     setStableToken: 0.8,
     setSpread: 0.8,
     setReserveFraction: 0.8,
+  },
+  FederatedAttestations: {
+    default: 0.6,
   },
   FeeCurrencyWhitelist: {
     default: 0.8,
@@ -101,7 +105,6 @@ const DefaultConstitution = {
     setMinDeposit: 0.9,
     setQueueExpiry: 0.9,
     setDequeueFrequency: 0.9,
-    setApprovalStageDuration: 0.9,
     setReferendumStageDuration: 0.9,
     setExecutionStageDuration: 0.9,
     setParticipationBaseline: 0.9,

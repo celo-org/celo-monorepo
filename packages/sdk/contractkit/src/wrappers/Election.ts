@@ -355,15 +355,34 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     )
   }
 
+  /**
+   * Creates a transaction object for revoking active votes.
+   * @param account Account to revoke votes for.
+   * @param group Validator group to revoke votes from.
+   * @param value Amount to be removed from active votes.
+   * @param lesserAfterVote First group address with less vote than `account`.
+   * @param greaterAfterVote First group address with more vote than `account`.
+   * @dev Must pass both `lesserAfterVote` and `greaterAfterVote` or neither.
+   */
   async revokeActive(
     account: Address,
     group: Address,
-    value: BigNumber
+    value: BigNumber,
+    lesserAfterVote?: Address,
+    greaterAfterVote?: Address
   ): Promise<CeloTransactionObject<boolean>> {
+    let lesser: Address, greater: Address
+
     const groups = await this.contract.methods.getGroupsVotedForByAccount(account).call()
     const index = findAddressIndex(group, groups)
-    const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
-
+    if (lesserAfterVote !== undefined && greaterAfterVote !== undefined) {
+      lesser = lesserAfterVote
+      greater = greaterAfterVote
+    } else {
+      const res = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+      lesser = res.lesser
+      greater = res.greater
+    }
     return toTransactionObject(
       this.connection,
       this.contract.methods.revokeActive(group, value.toFixed(), lesser, greater, index)
@@ -386,7 +405,8 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
     }
     if (pendingValue.lt(value)) {
       const activeValue = value.minus(pendingValue)
-      txos.push(await this.revokeActive(account, group, activeValue))
+      const { lesser, greater } = await this.findLesserAndGreaterAfterVote(group, value.times(-1))
+      txos.push(await this.revokeActive(account, group, activeValue, lesser, greater))
     }
     return txos
   }
@@ -464,7 +484,10 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
    * Retrieves GroupVoterRewards at epochNumber.
    * @param epochNumber The epoch to retrieve GroupVoterRewards at.
    */
-  async getGroupVoterRewards(epochNumber: number): Promise<GroupVoterReward[]> {
+  async getGroupVoterRewards(
+    epochNumber: number,
+    useBlockNumber?: boolean
+  ): Promise<GroupVoterReward[]> {
     const blockchainParamsWrapper = await this.contracts.getBlockchainParameters()
 
     const blockNumber = await blockchainParamsWrapper.getLastBlockNumberForEpoch(epochNumber)
@@ -473,9 +496,13 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
       toBlock: blockNumber,
     })
     const validators = await this.contracts.getValidators()
-    const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) =>
-      validators.getValidatorGroup(e.returnValues.group, false)
-    )
+    const validatorGroup: ValidatorGroup[] = await concurrentMap(10, events, (e: EventLog) => {
+      return validators.getValidatorGroup(
+        e.returnValues.group,
+        false,
+        useBlockNumber ? blockNumber : undefined
+      )
+    })
     return events.map(
       (e: EventLog, index: number): GroupVoterReward => ({
         epochNumber,
@@ -494,6 +521,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
   async getVoterRewards(
     address: Address,
     epochNumber: number,
+    useBlockNumber?: boolean,
     voterShare?: Record<Address, BigNumber>
   ): Promise<VoterReward[]> {
     const activeVoteShare =
@@ -504,7 +532,7 @@ export class ElectionWrapper extends BaseWrapperForGoverning<Election> {
           epochNumber
         )
       ))
-    const groupVoterRewards = await this.getGroupVoterRewards(epochNumber)
+    const groupVoterRewards = await this.getGroupVoterRewards(epochNumber, useBlockNumber)
     const voterRewards = groupVoterRewards.filter(
       (e: GroupVoterReward) => normalizeAddressWith0x(e.group.address) in activeVoteShare
     )

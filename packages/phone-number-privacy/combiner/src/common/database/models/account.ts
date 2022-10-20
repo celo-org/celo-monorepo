@@ -10,9 +10,9 @@ export enum ACCOUNTS_COLUMNS {
   didMatchmaking = 'did_matchmaking',
 }
 export class Account {
-  [ACCOUNTS_COLUMNS.address]: string;
-  [ACCOUNTS_COLUMNS.signedUserPhoneNumber]: string;
-  [ACCOUNTS_COLUMNS.dekSigner]: string;
+  [ACCOUNTS_COLUMNS.address]: string | undefined;
+  [ACCOUNTS_COLUMNS.signedUserPhoneNumber]: string | undefined;
+  [ACCOUNTS_COLUMNS.dekSigner]: string | undefined;
   [ACCOUNTS_COLUMNS.createdAt]: Date = new Date();
   [ACCOUNTS_COLUMNS.didMatchmaking]: Date | null = null
 

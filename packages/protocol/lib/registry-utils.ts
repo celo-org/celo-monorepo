@@ -20,6 +20,7 @@ export enum CeloContractName {
   Exchange = 'Exchange',
   ExchangeEUR = 'ExchangeEUR',
   ExchangeBRL = 'ExchangeBRL',
+  FederatedAttestations = 'FederatedAttestations',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -43,7 +44,6 @@ export enum CeloContractName {
 }
 
 export const usesRegistry = [
-  CeloContractName.Escrow,
   CeloContractName.Reserve,
   CeloContractName.StableToken,
 ]
@@ -57,6 +57,7 @@ export const hasEntryInRegistry: string[] = [
   CeloContractName.Election,
   CeloContractName.Escrow,
   CeloContractName.Exchange,
+  CeloContractName.FederatedAttestations,
   CeloContractName.FeeCurrencyWhitelist,
   CeloContractName.Freezer,
   CeloContractName.GasPriceMinimum,

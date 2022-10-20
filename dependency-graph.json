@@ -44,6 +44,7 @@
       "@celo/flake-tracker",
       "@celo/governance",
       "@celo/identity",
+      "@celo/phone-utils",
       "@celo/utils",
       "@celo/wallet-hsm-azure",
       "@celo/wallet-ledger",
@@ -85,6 +86,7 @@
       "@celo/connect",
       "@celo/cryptographic-utils",
       "@celo/flake-tracker",
+      "@celo/phone-utils",
       "@celo/typescript",
       "@celo/utils"
     ]
@@ -130,6 +132,7 @@
       "@celo/base",
       "@celo/contractkit",
       "@celo/flake-tracker",
+      "@celo/identity",
       "@celo/phone-number-privacy-common",
       "@celo/utils",
       "@celo/wallet-hsm-azure",
@@ -146,6 +149,7 @@
   "@celo/connect": {
     "location": "packages/sdk/connect",
     "dependencies": [
+      "@celo/base",
       "@celo/flake-tracker",
       "@celo/utils"
     ]

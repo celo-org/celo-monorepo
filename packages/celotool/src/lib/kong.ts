@@ -17,45 +17,46 @@ export async function installKong(celoEnv: string) {
   await createNamespaceIfNotExists(kongNamespace)
   await createUpdateKongConfigMap(celoEnv)
   // Update values in values-clabs.yaml file
-  return installGenericHelmChart(
-    kongNamespace,
-    kongReleaseName,
-    kongChartPath,
-    await kongHelmParamenters(celoEnv),
-    true,
-    `values-clabs.yaml`
-  )
+  return installGenericHelmChart({
+    namespace: kongNamespace,
+    releaseName: kongReleaseName,
+    chartDir: kongChartPath,
+    parameters: await kongHelmParamenters(celoEnv),
+    buildDependencies: true,
+    valuesOverrideFile: 'values-clabs.yaml',
+  })
 }
 
 export async function upgradeKong(celoEnv: string) {
   await createUpdateKongConfigMap(celoEnv)
-  return upgradeGenericHelmChart(
-    kongNamespace,
-    kongReleaseName,
-    kongChartPath,
-    await kongHelmParamenters(celoEnv),
-    `values-clabs.yaml`
-  )
+  return upgradeGenericHelmChart({
+    namespace: kongNamespace,
+    releaseName: kongReleaseName,
+    chartDir: kongChartPath,
+    parameters: await kongHelmParamenters(celoEnv),
+    buildDependencies: true,
+    valuesOverrideFile: 'values-clabs.yaml',
+  })
 }
 
 export async function installKonga(celoEnv: string) {
   await createNamespaceIfNotExists(kongaNamespace)
   // Update values in values.yaml file
-  return installGenericHelmChart(
-    kongaNamespace,
-    kongaReleaseName,
-    kongaChartPath,
-    kongaHelmParamenters(celoEnv)
-  )
+  return installGenericHelmChart({
+    namespace: kongaNamespace,
+    releaseName: kongaReleaseName,
+    chartDir: kongaChartPath,
+    parameters: kongaHelmParamenters(celoEnv),
+  })
 }
 
 export async function upgradeKonga(celoEnv: string) {
-  return upgradeGenericHelmChart(
-    kongaNamespace,
-    kongaReleaseName,
-    kongaChartPath,
-    kongaHelmParamenters(celoEnv)
-  )
+  return upgradeGenericHelmChart({
+    namespace: kongaNamespace,
+    releaseName: kongaReleaseName,
+    chartDir: kongaChartPath,
+    parameters: kongaHelmParamenters(celoEnv),
+  })
 }
 
 export async function destroyKongAndKonga() {

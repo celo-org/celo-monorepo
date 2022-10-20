@@ -21,4 +21,4 @@ redis:
     enabled: false
   usePassword: false
 
-
+ingressClassName: nginx

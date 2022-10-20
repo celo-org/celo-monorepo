@@ -3,6 +3,8 @@
 # These values are commented out in this file, but show the correct structure
 # if they were to be specified.
 
+ingressClassName: nginx
+
 kube:
   serviceAccountSecretNames:
     - "secret1"
