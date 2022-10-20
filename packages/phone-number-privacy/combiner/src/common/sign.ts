@@ -44,8 +44,9 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
   ): Promise<OdisResponse<R>> {
     const { keyVersion } = session.keyVersionInfo
 
+    // TODO(2.0.0, deployment) consider this while doing deployment. Signers should be updated before the combiner is
     if (!responseHasExpectedKeyVersion(signerResponse, keyVersion, session.logger)) {
-      throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE) // TODO(Alec) think about implications of this mid key rotation
+      throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
 
     const res = await super.receiveSuccess(signerResponse, url, session)
