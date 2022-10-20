@@ -6,6 +6,7 @@ import {
   DOMAIN_REQUESTS_COLUMNS,
   DOMAIN_REQUESTS_TABLE,
   DomainRequestRecord,
+  toDomainRequestRecord,
 } from '../models/domain-request'
 import { countAndThrowDBError } from '../utils'
 
@@ -13,14 +14,14 @@ import { countAndThrowDBError } from '../utils'
 // issue: https://github.com/celo-org/celo-monorepo/issues/9909
 
 function domainRequests(db: Knex) {
-  return db<DomainRequestRecord<Domain>>(DOMAIN_REQUESTS_TABLE)
+  return db<DomainRequestRecord>(DOMAIN_REQUESTS_TABLE)
 }
 
 export async function getDomainRequestRecordExists<D extends Domain>(
   db: Knex,
   domain: D,
   blindedMessage: string,
-  trx: Knex.Transaction<DomainRequestRecord<D>>,
+  trx: Knex.Transaction<DomainRequestRecord>,
   logger: Logger
 ): Promise<boolean> {
   return meter(
@@ -48,7 +49,7 @@ export async function storeDomainRequestRecord<D extends Domain>(
   db: Knex,
   domain: D,
   blindedMessage: string,
-  trx: Knex.Transaction<DomainRequestRecord<D>>,
+  trx: Knex.Transaction<DomainRequestRecord>,
   logger: Logger
 ) {
   return meter(
@@ -56,7 +57,7 @@ export async function storeDomainRequestRecord<D extends Domain>(
       logger.debug({ domain, blindedMessage }, 'Storing domain restricted signature request')
       await domainRequests(db)
         .transacting(trx)
-        .insert(new DomainRequestRecord(domain, blindedMessage))
+        .insert(toDomainRequestRecord(domain, blindedMessage))
         .timeout(DB_TIMEOUT)
     },
     [],
