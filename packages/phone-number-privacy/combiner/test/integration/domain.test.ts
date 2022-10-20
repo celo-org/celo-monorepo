@@ -775,7 +775,7 @@ describe('domainService', () => {
         })
       })
 
-      it('Should respond with 400 on invalid key version', async () => {
+      it('Should respond with 400 on unsupported key version', async () => {
         const [badRequest, _] = await signatureRequest()
 
         const res = await request(app)
@@ -905,6 +905,49 @@ describe('domainService', () => {
   })
 
   describe('when signers are not operating correctly', () => {
+    // In this case (1/3 signers are correct), response unblinding is guaranteed to fail
+    // Testing 2/3 signers is flaky since the combiner sometimes combines two
+    // correct signatures and returns, and sometimes combines one wrong/one correct
+    // since it cannot verify the sigs server-side.
+    describe('when 1/3 signers return correct signatures', () => {
+      beforeEach(async () => {
+        // Signer 1 & 2's v1 keys are misconfigured to point to the v3 share
+        const badKeyProvider1 = new MockKeyProvider(
+          new Map([[`${DefaultKeyName.DOMAINS}-1`, DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V3]])
+        )
+        const badKeyProvider2 = new MockKeyProvider(
+          new Map([[`${DefaultKeyName.DOMAINS}-1`, DOMAINS_THRESHOLD_DEV_PK_SHARE_2_V3]])
+        )
+        signer1 = startSigner(signerConfig, signerDB1, badKeyProvider1).listen(3001)
+        signer2 = startSigner(signerConfig, signerDB2, badKeyProvider2).listen(3002)
+        signer3 = startSigner(signerConfig, signerDB3, keyProvider3).listen(3003)
+      })
+
+      describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
+        it('Should respond with 200 on valid request', async () => {
+          // Ensure requested keyVersion is one that signer1 does not have
+          const [req, poprfClient] = await signatureRequest(undefined, undefined, 1)
+          const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
+
+          expect(res.status).toBe(200)
+          expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+            success: true,
+            version: res.body.version,
+            signature: res.body.signature,
+            status: {
+              disabled: false,
+              counter: 1,
+              timer: res.body.status.timer,
+              now: res.body.status.now,
+            },
+          })
+          expect(() =>
+            poprfClient.unblindResponse(Buffer.from(res.body.signature, 'base64'))
+          ).toThrow(/verification failed/)
+        })
+      })
+    })
+
     describe('when 2/3 of signers are disabled', () => {
       beforeEach(async () => {
         const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))

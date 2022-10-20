@@ -1032,6 +1032,7 @@ describe('pnpService', () => {
         })
       })
     })
+
     describe('when 2/3 of signers are disabled', () => {
       beforeEach(async () => {
         const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))

@@ -538,7 +538,7 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
       })
     })
 
-    it('Should respond with 400 on invalid key version', async () => {
+    it('Should respond with 400 on unsupported key version', async () => {
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await sendLegacyPnpSignRequest(req, authorization, app, '4')
       expect(res.status).toBe(400)
