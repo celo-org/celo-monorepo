@@ -422,7 +422,7 @@ describe('pnp', () => {
         })
 
         it('Should respond with 500 on signer timeout', async () => {
-          const testTimeoutMS = 200
+          const testTimeoutMS = 0
           const delay = 100
           const spy = jest
             .spyOn(
@@ -645,8 +645,6 @@ describe('pnp', () => {
         const badRequest = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
-          // TODO(2.0.0): Investigate whether we should be testing DEK vs. WALLET_KEY based authentication
-          // (https://github.com/celo-org/celo-monorepo/issues/9837)
           AuthenticationMethod.WALLET_KEY
         )
         // @ts-ignore Intentionally deleting required field
@@ -937,7 +935,7 @@ describe('pnp', () => {
         })
 
         it('Should respond with 500 on signer timeout', async () => {
-          const testTimeoutMS = 200
+          const testTimeoutMS = 0
           const delay = 200
           const spy = jest
             .spyOn(
