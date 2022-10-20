@@ -1,8 +1,7 @@
 import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
-import {
-  getDomainDigest,
-  getSignatureForAttestation,
-} from '@celo/protocol/lib/fed-attestations-utils'
+import { getDomainDigest } from '@celo/protocol/lib/meta-tx-utils'
+
+import { getSignatureForAttestation } from '@celo/protocol/lib/fed-attestations-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   assertEqualBN,
@@ -68,7 +67,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       issuedOn,
       signer,
       chainId,
-      federatedAttestations.address
+      federatedAttestations.address,
+      web3
     )
     if (issuer !== signer && !(await accountsInstance.isSigner(issuer, signer, signerRole))) {
       await accountsInstance.authorizeSigner(signer, signerRole, {
@@ -192,7 +192,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
       nowUnixTime,
       signer1,
       chainId,
-      federatedAttestations.address
+      federatedAttestations.address,
+      web3
     )
   })
 
@@ -589,7 +590,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           nowUnixTime,
           accounts[4],
           chainId,
-          federatedAttestations.address
+          federatedAttestations.address,
+          web3
         )
         await assertRevert(
           federatedAttestations.validateAttestationSig(
@@ -709,7 +711,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
         nowUnixTime,
         accounts[4],
         chainId,
-        federatedAttestations.address
+        federatedAttestations.address,
+        web3
       )
       await assertRevert(
         federatedAttestations.registerAttestation(
@@ -805,7 +808,8 @@ contract('FederatedAttestations', (accounts: string[]) => {
           nowUnixTime + 1,
           signer2,
           1,
-          federatedAttestations.address
+          federatedAttestations.address,
+          web3
         )
         await assertRevert(
           federatedAttestations.registerAttestation(

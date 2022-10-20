@@ -1,32 +1,31 @@
-import { ensureLeading0x } from '@celo/base'
-import { Address } from '@celo/utils/lib/address'
-import { structHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { generateTypedDataHash } from '@celo/utils/src/sign-typed-data-utils'
-import { parseSignatureWithoutPrefix } from '@celo/utils/src/signatureUtils'
+import { Address, ensureLeading0x } from '@celo/base'
+import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
+import Web3 from 'web3'
 
-export interface AttestationDetails{
-  identifier: string,
-  issuer: string,
-  account: string,
-  signer: string,
-  issuedOn: number,
+export interface AttestationDetails {
+  identifier: string
+  issuer: string
+  account: string
+  signer: string
+  issuedOn: number
 }
 
 const getTypedData = (chainId: number, contractAddress: Address, message?: AttestationDetails) => {
-  const typedData =  {
+  return {
     types: {
       EIP712Domain: [
         { name: 'name', type: 'string' },
         { name: 'version', type: 'string' },
-        { name: 'chainId', type: 'uint256'}, 
-        { name: 'verifyingContract', type: 'address'}, 
+        { name: 'chainId', type: 'uint256' },
+        { name: 'verifyingContract', type: 'address' },
       ],
       OwnershipAttestation: [
-          { name: 'identifier', type: 'bytes32' },
-          { name: 'issuer', type: 'address'},
-          { name: 'account', type: 'address' },
-          { name: 'signer', type: 'address' },
-          { name: 'issuedOn', type: 'uint64' },
+        { name: 'identifier', type: 'bytes32' },
+        { name: 'issuer', type: 'address' },
+        { name: 'account', type: 'address' },
+        { name: 'signer', type: 'address' },
+        { name: 'issuedOn', type: 'uint64' },
       ],
     },
     primaryType: 'OwnershipAttestation',
@@ -34,11 +33,10 @@ const getTypedData = (chainId: number, contractAddress: Address, message?: Attes
       name: 'FederatedAttestations',
       version: '1.0',
       chainId,
-      verifyingContract: contractAddress
+      verifyingContract: contractAddress,
     },
-    message: message ? message : {}
+    message: message ? message : {},
   }
-  return typedData
 }
 
 export const getSignatureForAttestation = async (
@@ -48,17 +46,25 @@ export const getSignatureForAttestation = async (
   issuedOn: number,
   signer: string,
   chainId: number,
-  contractAddress: string
+  contractAddress: string,
+  web3: Web3
 ) => {
-  const typedData = getTypedData(chainId, contractAddress, { identifier,issuer,account, signer, issuedOn})
+  const typedData = getTypedData(chainId, contractAddress, {
+    identifier,
+    issuer,
+    account,
+    signer,
+    issuedOn,
+  })
 
   const signature = await new Promise<string>((resolve, reject) => {
+    // @ts-ignore
     web3.currentProvider.send(
       {
         method: 'eth_signTypedData',
         params: [signer, typedData],
       },
-      (error, resp) => {
+      (error: any, resp: any) => {
         if (error) {
           reject(error)
         } else {
@@ -69,13 +75,5 @@ export const getSignatureForAttestation = async (
   })
 
   const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
-  const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
-  return parsedSignature
-}
-
-export const getDomainDigest = (contractAddress: Address) => {
-  const typedData = getTypedData(1, contractAddress)
-  return ensureLeading0x(
-    structHash('EIP712Domain', typedData.domain, typedData.types).toString('hex')
-  )
+  return parseSignatureWithoutPrefix(messageHash, signature, signer)
 }
