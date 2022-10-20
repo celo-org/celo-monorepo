@@ -137,7 +137,8 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     if (errorCode) {
       session.incrementErrorCodeCount(errorCode)
     }
-    if (this.signers.length - session.failedSigners.size < this.config.keys.threshold) {
+    const { threshold } = session.keyVersionInfo
+    if (this.signers.length - session.failedSigners.size < threshold) {
       session.logger.warn('Not possible to reach a threshold of signer responses. Failing fast')
       session.abort.abort()
     }

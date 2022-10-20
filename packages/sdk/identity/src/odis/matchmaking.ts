@@ -1,4 +1,7 @@
-import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
+import {
+  CombinerEndpoint,
+  GetContactMatchesResponseSchema,
+} from '@celo/phone-number-privacy-common'
 import { E164Number } from '@celo/phone-utils/lib/io'
 import crypto from 'crypto'
 import debugFactory from 'debug'
@@ -6,6 +9,7 @@ import {
   AuthenticationMethod,
   AuthSigner,
   EncryptionKeySigner,
+  getOdisPnpRequestAuth,
   MatchmakingRequest,
   queryOdis,
   ServiceContext,
@@ -55,11 +59,14 @@ export async function getContactMatches(
     dekSigner = signer as EncryptionKeySigner
   }
 
-  const response = await queryOdis<MatchmakingRequest>(
-    signer,
+  const response = await queryOdis(
     body,
     context,
-    CombinerEndpoint.MATCHMAKING
+    CombinerEndpoint.MATCHMAKING,
+    GetContactMatchesResponseSchema,
+    {
+      Authorization: await getOdisPnpRequestAuth(body, signer),
+    }
   )
 
   if (!response.success) {

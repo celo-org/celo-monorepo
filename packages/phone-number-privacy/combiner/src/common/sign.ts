@@ -4,6 +4,7 @@ import {
   ErrorType,
   LegacySignMessageRequest,
   OdisResponse,
+  responseHasExpectedKeyVersion,
   SignMessageRequest,
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
@@ -41,7 +42,10 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
     url: string,
     session: CryptoSession<R>
   ): Promise<OdisResponse<R>> {
-    if (!this.io.responseHasValidKeyVersion(signerResponse, session)) {
+    const { keyVersion } = session.keyVersionInfo
+
+    // TODO(2.0.0, deployment) consider this while doing deployment. Signers should be updated before the combiner is
+    if (!responseHasExpectedKeyVersion(signerResponse, keyVersion, session.logger)) {
       throw new Error(ErrorMessage.INVALID_KEY_VERSION_RESPONSE)
     }
 
@@ -63,7 +67,8 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
       if (session.crypto.hasSufficientSignatures()) {
         try {
           session.crypto.combinePartialBlindedSignatures(
-            this.parseBlindedMessage(session.request.body)
+            this.parseBlindedMessage(session.request.body),
+            session.logger
           )
           // Close outstanding requests
           session.abort.abort()

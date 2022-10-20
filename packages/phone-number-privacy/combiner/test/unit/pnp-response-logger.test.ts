@@ -1,5 +1,6 @@
 import {
   ErrorMessage,
+  KeyVersionInfo,
   OdisResponse,
   PnpQuotaRequest,
   rootLogger,
@@ -19,6 +20,13 @@ import { PnpSignerResponseLogger } from '../../src/pnp/services/log-responses'
 describe('pnp response logger', () => {
   const url = 'test signer url'
 
+  const keyVersionInfo: KeyVersionInfo = {
+    keyVersion: 1,
+    threshold: 3,
+    polynomial: 'mock polynomial',
+    pubKey: 'mock pubKey',
+  }
+
   const getSession = (responses: OdisResponse<PnpQuotaRequest | SignMessageRequest>[]) => {
     const mockRequest = {
       body: {},
@@ -28,7 +36,11 @@ describe('pnp response logger', () => {
         logger: rootLogger(config.serviceName),
       },
     } as Response
-    const session = new Session<PnpQuotaRequest | SignMessageRequest>(mockRequest, mockResponse)
+    const session = new Session<PnpQuotaRequest | SignMessageRequest>(
+      mockRequest,
+      mockResponse,
+      keyVersionInfo
+    )
     responses.forEach((res) => {
       session.responses.push({ url, res, status: 200 })
     })
@@ -36,7 +48,8 @@ describe('pnp response logger', () => {
   }
 
   const pnpConfig = config.phoneNumberPrivacy
-  pnpConfig.keys.threshold = 3
+  pnpConfig.keys.currentVersion = keyVersionInfo.keyVersion
+  pnpConfig.keys.versions = JSON.stringify([keyVersionInfo])
   const pnpResponseLogger = new PnpSignerResponseLogger()
 
   const version = getVersion()

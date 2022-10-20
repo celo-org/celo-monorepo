@@ -48,7 +48,8 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new Session(request, response)
+    const keyVersionInfo = this.getKeyVersionInfo(request, response.locals.logger)
+    return new Session(request, response, keyVersionInfo)
   }
 
   authenticate(request: Request<{}, {}, DomainQuotaStatusRequest>): Promise<boolean> {

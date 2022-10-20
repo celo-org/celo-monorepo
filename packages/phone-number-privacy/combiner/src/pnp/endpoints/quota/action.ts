@@ -21,7 +21,9 @@ export class PnpQuotaAction extends CombineAction<PnpQuotaRequest> {
     this.responseLogger.logResponseDiscrepancies(session)
     this.responseLogger.logFailOpenResponses(session)
 
-    if (session.responses.length >= this.config.keys.threshold) {
+    const { threshold } = session.keyVersionInfo
+
+    if (session.responses.length >= threshold) {
       try {
         const quotaStatus = this.thresholdStateService.findCombinerQuotaState(session)
         this.io.sendSuccess(200, session.response, quotaStatus, session.warnings)

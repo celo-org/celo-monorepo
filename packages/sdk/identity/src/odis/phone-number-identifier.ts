@@ -1,5 +1,10 @@
 import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
-import { CombinerEndpoint, LegacySignMessageRequest } from '@celo/phone-number-privacy-common'
+import {
+  CombinerEndpoint,
+  KEY_VERSION_HEADER,
+  SignMessageRequest,
+  SignMessageResponseSchema,
+} from '@celo/phone-number-privacy-common'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import { createHash } from 'crypto'
@@ -9,6 +14,7 @@ import {
   AuthenticationMethod,
   AuthSigner,
   EncryptionKeySigner,
+  getOdisPnpRequestAuth,
   queryOdis,
   ServiceContext,
 } from './query'
@@ -40,7 +46,6 @@ export async function getPhoneNumberIdentifier(
   signer: AuthSigner,
   context: ServiceContext,
   blindingFactor?: string,
-  selfPhoneHash?: string,
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string
@@ -72,7 +77,6 @@ export async function getPhoneNumberIdentifier(
     signer,
     context,
     base64BlindedMessage,
-    selfPhoneHash,
     clientVersion,
     sessionID
   )
@@ -104,33 +108,34 @@ export async function getBlindedPhoneNumberSignature(
   signer: AuthSigner,
   context: ServiceContext,
   base64BlindedMessage: string,
-  selfPhoneHash?: string,
   clientVersion?: string,
-  sessionID?: string
+  sessionID?: string,
+  keyVersion?: number
 ): Promise<string> {
-  const body: LegacySignMessageRequest = {
+  const body: SignMessageRequest = {
     account,
     blindedQueryPhoneNumber: base64BlindedMessage,
-    hashedPhoneNumber: selfPhoneHash,
-    version: clientVersion ? clientVersion : 'unknown',
+    version: clientVersion,
     authenticationMethod: signer.authenticationMethod,
     sessionID,
   }
 
-  if (sessionID) {
-    body.sessionID = sessionID
-  }
-
-  const response = await queryOdis<LegacySignMessageRequest>(
-    signer,
+  const response = await queryOdis(
     body,
     context,
-    CombinerEndpoint.LEGACY_PNP_SIGN
+    CombinerEndpoint.PNP_SIGN,
+    SignMessageResponseSchema,
+    {
+      [KEY_VERSION_HEADER]: keyVersion?.toString(),
+      Authorization: await getOdisPnpRequestAuth(body, signer),
+    }
   )
 
-  // @ts-ignore this should be updates to reflect new request/response types after new version of ODIS as deployed
-  // https://github.com/celo-org/celo-monorepo/issues/9910
-  return response.combinedSignature
+  if (!response.success) {
+    throw new Error(response.error)
+  }
+
+  return response.signature
 }
 
 /**

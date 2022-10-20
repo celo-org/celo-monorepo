@@ -1,4 +1,5 @@
 import {
+  KeyVersionInfo,
   PnpQuotaRequest,
   PnpQuotaResponseSuccess,
   rootLogger,
@@ -16,6 +17,13 @@ describe('pnp threshold state', () => {
   // TODO(2.0.0): add tests with failed signer responses, depending on
   // result of https://github.com/celo-org/celo-monorepo/issues/9826
 
+  const keyVersionInfo: KeyVersionInfo = {
+    keyVersion: 1,
+    threshold: 3,
+    polynomial: 'mock polynomial',
+    pubKey: 'mock pubKey',
+  }
+
   const getSession = (quotaData: { totalQuota: number; performedQueryCount: number }[]) => {
     const mockRequest = {
       body: {},
@@ -25,7 +33,11 @@ describe('pnp threshold state', () => {
         logger: rootLogger,
       },
     } as Response
-    const session = new Session<PnpQuotaRequest | SignMessageRequest>(mockRequest, mockResponse)
+    const session = new Session<PnpQuotaRequest | SignMessageRequest>(
+      mockRequest,
+      mockResponse,
+      keyVersionInfo
+    )
     quotaData.forEach((q) => {
       const res: PnpQuotaResponseSuccess | SignMessageResponseSuccess = {
         success: true,
@@ -39,8 +51,9 @@ describe('pnp threshold state', () => {
   }
 
   const pnpConfig = config.phoneNumberPrivacy
-  pnpConfig.keys.threshold = 3
-  const pnpThresholdStateService = new PnpThresholdStateService(pnpConfig)
+  pnpConfig.keys.currentVersion = keyVersionInfo.keyVersion
+  pnpConfig.keys.versions = JSON.stringify([keyVersionInfo])
+  const pnpThresholdStateService = new PnpThresholdStateService()
 
   const expectedVersion = getVersion()
   const testBlockNumber = 1000000

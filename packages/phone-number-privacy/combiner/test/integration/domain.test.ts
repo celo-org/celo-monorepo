@@ -23,12 +23,14 @@ import {
 } from '@celo/phone-number-privacy-common'
 import {
   initDatabase as initSignerDatabase,
-  initKeyProvider,
   startSigner,
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
-import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
+import {
+  DefaultKeyName,
+  KeyProvider,
+} from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
 import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
@@ -37,8 +39,21 @@ import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
 import { Server } from 'net'
 import request from 'supertest'
+import { MockKeyProvider } from '../../../signer/dist/common/key-management/mock-key-provider'
 import config from '../../src/config'
 import { startCombiner } from '../../src/server'
+
+const {
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V1,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V2,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V3,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_2_V1,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_2_V2,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_2_V3,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_3_V1,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_3_V2,
+  DOMAINS_THRESHOLD_DEV_PK_SHARE_3_V3,
+} = TestUtils.Values
 
 // create deep copy of config
 const combinerConfig: typeof config = JSON.parse(JSON.stringify(config))
@@ -143,11 +158,12 @@ describe('domainService', () => {
 
   const signatureRequest = async (
     _domain?: SequentialDelayDomain,
-    _nonce?: number
+    _nonce?: number,
+    keyVersion: number = config.domains.keys.currentVersion
   ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, PoprfClient]> => {
     const domain = _domain ?? authenticatedDomain()
     const poprfClient = new PoprfClient(
-      Buffer.from(TestUtils.Values.DOMAINS_DEV_ODIS_PUBLIC_KEY, 'base64'),
+      Buffer.from(TestUtils.Values.DOMAINS_THRESHOLD_DEV_PUBKEYS[keyVersion - 1], 'base64'),
       domainHash(domain),
       Buffer.from('test message', 'utf8')
     )
@@ -216,10 +232,35 @@ describe('domainService', () => {
 
   const signerMigrationsPath = '../signer/src/common/database/migrations'
 
+  const expectedEvals: string[] = [
+    '3QLFPV6VvnhhnZ7mOu0xm7BUUJIUVY6vEHvZONOtZ/c=',
+    'BBG0fAZJ6VNQwjge+3vOCF3uBo5KCs2+er/f/2QcV58=',
+    '1/otd1fW1nhUoU3ubjFDS8/RX0OClvHDsmGdnz6fZVE=',
+  ]
+  const expectedEval = expectedEvals[config.domains.keys.currentVersion - 1]
+
   beforeAll(async () => {
-    keyProvider1 = await initKeyProvider(signerConfig)
-    keyProvider2 = await initKeyProvider(signerConfig)
-    keyProvider3 = await initKeyProvider(signerConfig)
+    keyProvider1 = new MockKeyProvider(
+      new Map([
+        [`${DefaultKeyName.DOMAINS}-1`, DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V1],
+        [`${DefaultKeyName.DOMAINS}-2`, DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V2],
+        [`${DefaultKeyName.DOMAINS}-3`, DOMAINS_THRESHOLD_DEV_PK_SHARE_1_V3],
+      ])
+    )
+    keyProvider2 = new MockKeyProvider(
+      new Map([
+        [`${DefaultKeyName.DOMAINS}-1`, DOMAINS_THRESHOLD_DEV_PK_SHARE_2_V1],
+        [`${DefaultKeyName.DOMAINS}-2`, DOMAINS_THRESHOLD_DEV_PK_SHARE_2_V2],
+        [`${DefaultKeyName.DOMAINS}-3`, DOMAINS_THRESHOLD_DEV_PK_SHARE_2_V3],
+      ])
+    )
+    keyProvider3 = new MockKeyProvider(
+      new Map([
+        [`${DefaultKeyName.DOMAINS}-1`, DOMAINS_THRESHOLD_DEV_PK_SHARE_3_V1],
+        [`${DefaultKeyName.DOMAINS}-2`, DOMAINS_THRESHOLD_DEV_PK_SHARE_3_V2],
+        [`${DefaultKeyName.DOMAINS}-3`, DOMAINS_THRESHOLD_DEV_PK_SHARE_3_V3],
+      ])
+    )
 
     app = startCombiner(combinerConfig)
   })
@@ -528,8 +569,6 @@ describe('domainService', () => {
     })
 
     describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
-      const expectedEval = '+8VmIugxAuBkdRnKRJ3udlnzCPMADNwMZRfV7Loy6Vs='
-
       it('Should respond with 200 on valid request', async () => {
         const [req, poprfClient] = await signatureRequest()
         const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
@@ -550,32 +589,31 @@ describe('domainService', () => {
         expect(evaluation.toString('base64')).toEqual(expectedEval)
       })
 
-      it('Should respond with 200 on valid request with key version header', async () => {
-        const [req, poprfClient] = await signatureRequest()
+      for (let i = 1; i <= 3; i++) {
+        it(`Should respond with 200 on valid request with key version header ${i}`, async () => {
+          const [req, poprfClient] = await signatureRequest(undefined, undefined, i)
 
-        const res = await request(app)
-          .post(CombinerEndpoint.DOMAIN_SIGN)
-          .set(KEY_VERSION_HEADER, '1')
-          .send(req)
+          const res = await request(app)
+            .post(CombinerEndpoint.DOMAIN_SIGN)
+            .set(KEY_VERSION_HEADER, i.toString())
+            .send(req)
 
-        expect(res.status).toBe(200)
-        expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
-          success: true,
-          version: res.body.version,
-          signature: res.body.signature,
-          status: {
-            disabled: false,
-            counter: 1,
-            timer: res.body.status.timer,
-            now: res.body.status.now,
-          },
+          expect(res.status).toBe(200)
+          expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+            success: true,
+            version: res.body.version,
+            signature: res.body.signature,
+            status: {
+              disabled: false,
+              counter: 1,
+              timer: res.body.status.timer,
+              now: res.body.status.now,
+            },
+          })
+          const evaluation = poprfClient.unblindResponse(Buffer.from(res.body.signature, 'base64'))
+          expect(evaluation.toString('base64')).toEqual(expectedEvals[i - 1])
         })
-        const evaluation = poprfClient.unblindResponse(Buffer.from(res.body.signature, 'base64'))
-        expect(evaluation.toString('base64')).toEqual(expectedEval)
-        // TODO(2.0.0) determine how / whether to forward this to client
-        // (https://github.com/celo-org/celo-monorepo/issues/9801)
-        // expect(res.get(KEY_VERSION_HEADER)).toEqual('1')
-      })
+      }
 
       it('Should respond with 200 if nonce > domainState', async () => {
         const [req, poprfClient] = await signatureRequest(undefined, 2)
@@ -722,13 +760,27 @@ describe('domainService', () => {
       })
 
       it('Should respond with 400 on invalid key version', async () => {
-        // TODO(2.0.0, refactor, keys): Implement new error for unsupported key versions
-        // (https://github.com/celo-org/celo-monorepo/issues/9801)
         const [badRequest, _] = await signatureRequest()
 
         const res = await request(app)
           .post(CombinerEndpoint.DOMAIN_SIGN)
           .set(KEY_VERSION_HEADER, 'a')
+          .send(badRequest)
+
+        expect(res.status).toBe(400)
+        expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
+          success: false,
+          version: res.body.version,
+          error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        })
+      })
+
+      it('Should respond with 400 on invalid key version', async () => {
+        const [badRequest, _] = await signatureRequest()
+
+        const res = await request(app)
+          .post(CombinerEndpoint.DOMAIN_SIGN)
+          .set(KEY_VERSION_HEADER, '4')
           .send(badRequest)
 
         expect(res.status).toBe(400)
@@ -828,15 +880,6 @@ describe('domainService', () => {
           success: true,
           version: resDisable.body.version,
           status: { disabled: true, counter: 0, timer: 0, now: resDisable.body.status.now },
-        })
-
-        const [req, _] = await signatureRequest(testDomain)
-        const resSig = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
-        expect(resSig.status).toBe(429)
-        expect(resSig.body).toStrictEqual<DomainRestrictedSignatureResponse>({
-          success: false,
-          version: resSig.body.version,
-          error: WarningMessage.EXCEEDED_QUOTA,
         })
       })
 
@@ -952,7 +995,6 @@ describe('domainService', () => {
 
       describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
         it('Should respond with 200 on valid request', async () => {
-          const expectedEval = '+8VmIugxAuBkdRnKRJ3udlnzCPMADNwMZRfV7Loy6Vs='
           const [req, poprfClient] = await signatureRequest()
           const res = await request(app).post(CombinerEndpoint.DOMAIN_SIGN).send(req)
 

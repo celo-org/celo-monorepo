@@ -21,7 +21,10 @@ import {
   SupportedDatabase,
   SupportedKeystore,
 } from '@celo/phone-number-privacy-signer'
-import { KeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
+import {
+  DefaultKeyName,
+  KeyProvider,
+} from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
 import { MockKeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/mock-key-provider'
 import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
 import BigNumber from 'bignumber.js'
@@ -48,9 +51,15 @@ const {
   mockAccount,
   DEK_PRIVATE_KEY,
   DEK_PUBLIC_KEY,
-  BLS_THRESHOLD_DEV_PK_SHARE_1,
-  BLS_THRESHOLD_DEV_PK_SHARE_2,
-  BLS_THRESHOLD_DEV_PK_SHARE_3,
+  PNP_THRESHOLD_DEV_PK_SHARE_1_V1,
+  PNP_THRESHOLD_DEV_PK_SHARE_1_V2,
+  PNP_THRESHOLD_DEV_PK_SHARE_1_V3,
+  PNP_THRESHOLD_DEV_PK_SHARE_2_V1,
+  PNP_THRESHOLD_DEV_PK_SHARE_2_V2,
+  PNP_THRESHOLD_DEV_PK_SHARE_2_V3,
+  PNP_THRESHOLD_DEV_PK_SHARE_3_V1,
+  PNP_THRESHOLD_DEV_PK_SHARE_3_V2,
+  PNP_THRESHOLD_DEV_PK_SHARE_3_V3,
   ACCOUNT_ADDRESS2,
   BLINDING_FACTOR,
 } = TestUtils.Values
@@ -186,16 +195,47 @@ describe('pnpService', () => {
   const expectedTotalQuota = 10
 
   const message = Buffer.from('test message', 'utf8')
-  const expectedSig = 'xgFMQtcgAMHJAEX/m9B4VFopYtxqPFSw0024sWzRYvQDvnmFqhXOPdnRDfa8WCEA'
-  const expectedUnblindedMsg = 'lOASnDJNbJBTMYfkbU4fMiK7FcNwSyqZo8iQSM95X8YK+/158be4S1A+jcQsCUYA'
+
+  const expectedSignatures: string[] = [
+    'xgFMQtcgAMHJAEX/m9B4VFopYtxqPFSw0024sWzRYvQDvnmFqhXOPdnRDfa8WCEA',
+    'wUuFV8yFBXGyEzKbyWjBChG6dER264nwjOsqErd/UZieVKE0oDMZcMDG+qObu4QB',
+    'PJHqBGavcQG3NGFl3hiR8GymeDNumxbl1DnCJzWz+Ik5yCN2ZpAITBe24RTX0iMA',
+  ]
+  const expectedSignature = expectedSignatures[config.phoneNumberPrivacy.keys.currentVersion - 1]
+
+  const expectedUnblindedSigs: string[] = [
+    'lOASnDJNbJBTMYfkbU4fMiK7FcNwSyqZo8iQSM95X8YK+/158be4S1A+jcQsCUYA',
+    'QIT7HtHTe/d0Tq40Mf3rpHCT8qY20+8q7ZW9PXHFMWGvwSGhk7l3Pfwnx8YdXomB',
+    'XW//DolLzaXYS/gk9WBHfeKy5HKrGjuF/OpCok/i6fprE4AGFH2PjE7zeKTfOQ+A',
+  ]
+  const expectedUnblindedSig =
+    expectedUnblindedSigs[config.phoneNumberPrivacy.keys.currentVersion - 1]
 
   // In current setup, the same mocked kit is used for the combiner and signers
   const mockKit = newKit('dummyKit')
 
   beforeAll(async () => {
-    keyProvider1 = new MockKeyProvider(BLS_THRESHOLD_DEV_PK_SHARE_1)
-    keyProvider2 = new MockKeyProvider(BLS_THRESHOLD_DEV_PK_SHARE_2)
-    keyProvider3 = new MockKeyProvider(BLS_THRESHOLD_DEV_PK_SHARE_3)
+    keyProvider1 = new MockKeyProvider(
+      new Map([
+        [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-1`, PNP_THRESHOLD_DEV_PK_SHARE_1_V1],
+        [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-2`, PNP_THRESHOLD_DEV_PK_SHARE_1_V2],
+        [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-3`, PNP_THRESHOLD_DEV_PK_SHARE_1_V3],
+      ])
+    )
+    keyProvider2 = new MockKeyProvider(
+      new Map([
+        [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-1`, PNP_THRESHOLD_DEV_PK_SHARE_2_V1],
+        [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-2`, PNP_THRESHOLD_DEV_PK_SHARE_2_V2],
+        [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-3`, PNP_THRESHOLD_DEV_PK_SHARE_2_V3],
+      ])
+    )
+    keyProvider3 = new MockKeyProvider(
+      new Map([
+        [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-1`, PNP_THRESHOLD_DEV_PK_SHARE_3_V1],
+        [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-2`, PNP_THRESHOLD_DEV_PK_SHARE_3_V2],
+        [`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-3`, PNP_THRESHOLD_DEV_PK_SHARE_3_V3],
+      ])
+    )
     app = startCombiner(combinerConfig, mockKit)
   })
 
@@ -285,12 +325,6 @@ describe('pnpService', () => {
       beforeAll(async () => {
         mockOdisPaymentsTotalPaidCUSD.mockReturnValue(weiTocusd.multipliedBy(totalQuota))
       })
-
-      // beforeEach(async () => {
-      //   signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
-      //   signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
-      //   signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
-      // })
 
       const queryCountParams = [
         { signerQueries: [0, 0, 0], expectedQueryCount: 0, expectedWarnings: [] },
@@ -600,7 +634,7 @@ describe('pnpService', () => {
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
-          signature: expectedSig,
+          signature: expectedSignature,
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
@@ -611,27 +645,33 @@ describe('pnpService', () => {
           blindedMsgResult.blindingFactor
         )
 
-        expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedMsg)
+        expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedSig)
       })
 
-      it('Should respond with 200 on valid request with key version header', async () => {
-        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app, '1')
+      for (let i = 1; i <= 3; i++) {
+        it(`Should respond with 200 on valid request with key version header ${i}`, async () => {
+          const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+          const res = await sendPnpSignRequest(req, authorization, app, i.toString())
 
-        expect(res.status).toBe(200)
-        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
-          success: true,
-          version: expectedVersion,
-          signature: expectedSig,
-          performedQueryCount: 1,
-          totalQuota: expectedTotalQuota,
-          blockNumber: testBlockNumber,
-          warnings: [],
+          expect(res.status).toBe(200)
+          expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
+            success: true,
+            version: expectedVersion,
+            signature: expectedSignatures[i - 1],
+            performedQueryCount: 1,
+            totalQuota: expectedTotalQuota,
+            blockNumber: testBlockNumber,
+            warnings: [],
+          })
+
+          const unblindedSig = threshold_bls.unblind(
+            Buffer.from(res.body.signature, 'base64'),
+            blindedMsgResult.blindingFactor
+          )
+
+          expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedSigs[i - 1])
         })
-        // TODO(2.0.0) determine how / whether to forward this to client
-        // (https://github.com/celo-org/celo-monorepo/issues/9801)
-        // expect(res.get(KEY_VERSION_HEADER)).toEqual('1')
-      })
+      }
 
       it('Should respond with 200 on repeated valid requests', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
@@ -639,7 +679,7 @@ describe('pnpService', () => {
         const expectedResponse: SignMessageResponseSuccess = {
           success: true,
           version: expectedVersion,
-          signature: expectedSig,
+          signature: expectedSignature,
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
@@ -661,7 +701,7 @@ describe('pnpService', () => {
         const expectedResponse: SignMessageResponseSuccess = {
           success: true,
           version: expectedVersion,
-          signature: expectedSig,
+          signature: expectedSignature,
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
@@ -696,7 +736,7 @@ describe('pnpService', () => {
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
-          signature: expectedSig,
+          signature: expectedSignature,
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
@@ -713,7 +753,7 @@ describe('pnpService', () => {
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
-          signature: expectedSig,
+          signature: expectedSignature,
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
@@ -729,7 +769,7 @@ describe('pnpService', () => {
         expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
           version: expectedVersion,
-          signature: expectedSig,
+          signature: expectedSignature,
           performedQueryCount: 1,
           totalQuota: expectedTotalQuota,
           blockNumber: testBlockNumber,
@@ -757,7 +797,7 @@ describe('pnpService', () => {
           Buffer.from(res2.body.signature, 'base64'),
           blindedMsgResult2.blindingFactor
         )
-        expect(Buffer.from(unblindedSig1).toString('base64')).toEqual(expectedUnblindedMsg)
+        expect(Buffer.from(unblindedSig1).toString('base64')).toEqual(expectedUnblindedSig)
         expect(unblindedSig1).toEqual(unblindedSig2)
       })
 
@@ -778,6 +818,17 @@ describe('pnpService', () => {
       it('Should respond with 400 on invalid key version', async () => {
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, app, 'a')
+        expect(res.status).toBe(400)
+        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
+          success: false,
+          version: expectedVersion,
+          error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+        })
+      })
+
+      it('Should respond with 400 on unsupported key version', async () => {
+        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
+        const res = await sendPnpSignRequest(req, authorization, app, '4')
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
@@ -863,7 +914,7 @@ describe('pnpService', () => {
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: expectedVersion,
-            signature: expectedSig,
+            signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
             blockNumber: testBlockNumber,
@@ -873,7 +924,7 @@ describe('pnpService', () => {
             Buffer.from(res.body.signature, 'base64'),
             blindedMsgResult.blindingFactor
           )
-          expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedMsg)
+          expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedSig)
         })
 
         it('Should return 401 on failure to fetch DEK when shouldFailOpen is false', async () => {
@@ -913,8 +964,9 @@ describe('pnpService', () => {
         const badBlsShare1 =
           '000000002e50aa714ef6b865b5de89c56969ef9f8f27b6b0a6d157c9cc01c574ac9df604'
 
-        const badKeyProvider1: KeyProvider = new MockKeyProvider(badBlsShare1)
-
+        const badKeyProvider1 = new MockKeyProvider(
+          new Map([[`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-1`, badBlsShare1]])
+        )
         signer1 = startSigner(signerConfig, signerDB1, badKeyProvider1, mockKit).listen(3001)
         signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
         signer3 = startSigner(signerConfig, signerDB3, keyProvider3, mockKit).listen(3003)
@@ -930,7 +982,7 @@ describe('pnpService', () => {
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: expectedVersion,
-            signature: expectedSig,
+            signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
             blockNumber: testBlockNumber,
@@ -940,7 +992,7 @@ describe('pnpService', () => {
             Buffer.from(res.body.signature, 'base64'),
             blindedMsgResult.blindingFactor
           )
-          expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedMsg)
+          expect(Buffer.from(unblindedSig).toString('base64')).toEqual(expectedUnblindedSig)
         })
       })
     })
@@ -951,8 +1003,14 @@ describe('pnpService', () => {
           '000000002e50aa714ef6b865b5de89c56969ef9f8f27b6b0a6d157c9cc01c574ac9df604'
         const badBlsShare2 =
           '01000000b8f0ef841dcf8d7bd1da5e8025e47d729eb67f513335784183b8fa227a0b9a0b'
-        const badKeyProvider1: KeyProvider = new MockKeyProvider(badBlsShare1)
-        const badKeyProvider2: KeyProvider = new MockKeyProvider(badBlsShare2)
+
+        const badKeyProvider1 = new MockKeyProvider(
+          new Map([[`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-1`, badBlsShare1]])
+        )
+
+        const badKeyProvider2 = new MockKeyProvider(
+          new Map([[`${DefaultKeyName.PHONE_NUMBER_PRIVACY}-1`, badBlsShare2]])
+        )
 
         signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
         signer2 = startSigner(signerConfig, signerDB2, badKeyProvider1, mockKit).listen(3002)
@@ -974,7 +1032,6 @@ describe('pnpService', () => {
         })
       })
     })
-
     describe('when 2/3 of signers are disabled', () => {
       beforeEach(async () => {
         const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
@@ -1053,7 +1110,7 @@ describe('pnpService', () => {
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
             version: expectedVersion,
-            signature: expectedSig,
+            signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedTotalQuota,
             blockNumber: testBlockNumber,

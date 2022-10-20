@@ -148,7 +148,7 @@ export const config: SignerConfig = {
     keys: {
       phoneNumberPrivacy: {
         name: env.PHONE_NUMBER_PRIVACY_KEY_NAME_BASE,
-        latest: Number(env.PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION ?? 2),
+        latest: Number(env.PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION ?? 1),
       },
       domains: {
         name: env.DOMAINS_KEY_NAME_BASE,

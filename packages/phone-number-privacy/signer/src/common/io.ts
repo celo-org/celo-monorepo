@@ -1,7 +1,6 @@
 import {
   ErrorType,
   FailureResponse,
-  KEY_VERSION_HEADER,
   OdisRequest,
   OdisResponse,
   SignerEndpoint,
@@ -42,38 +41,6 @@ export abstract class IO<R extends OdisRequest> {
     response: Response<SuccessResponse<R>>,
     ...args: unknown[]
   ): void
-
-  // TODO(2.0.0, refactor) move to common pkg?? (https://github.com/celo-org/celo-monorepo/issues/9801)
-  requestHasValidKeyVersion(request: Request<{}, {}, R>, logger: Logger): boolean {
-    const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
-    if (keyVersionHeader === undefined) {
-      return true
-    }
-
-    const requestedKeyVersion = Number(keyVersionHeader)
-
-    const isValid = Number.isInteger(requestedKeyVersion)
-    if (!isValid) {
-      logger.warn({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
-    }
-    return isValid
-  }
-
-  // TODO(2.0.0, refactor) move to common pkg?? (https://github.com/celo-org/celo-monorepo/issues/9801)
-  getRequestKeyVersion(request: Request<{}, {}, R>, logger: Logger): number | undefined {
-    const keyVersionHeader = request.headers[KEY_VERSION_HEADER]
-    if (keyVersionHeader === undefined) {
-      return undefined
-    }
-
-    const requestedKeyVersion = Number(keyVersionHeader)
-
-    if (!Number.isInteger(requestedKeyVersion)) {
-      logger.error({ keyVersionHeader }, WarningMessage.INVALID_KEY_VERSION_REQUEST)
-      throw new Error(WarningMessage.INVALID_KEY_VERSION_REQUEST)
-    }
-    return requestedKeyVersion
-  }
 
   protected inputChecks(
     request: Request<{}, {}, unknown>,

@@ -6,7 +6,6 @@ import {
   getSignerEndpoint,
   hasValidAccountParam,
   hasValidBlindedPhoneNumberParam,
-  identifierIsValidIfExists,
   isBodyReasonablySized,
   PnpQuotaStatus,
   send,
@@ -53,8 +52,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
     if (!super.inputChecks(request, response)) {
       return null
     }
-    // TODO(2.0.0): revisit extracting out duplicate init/validation code between sign/non-sign IO
-    if (!this.requestHasValidKeyVersion(request, response.locals.logger)) {
+    if (!this.requestHasSupportedKeyVersion(request, response.locals.logger)) {
       this.sendFailure(WarningMessage.INVALID_KEY_VERSION_REQUEST, 400, response)
       return null
     }
@@ -62,7 +60,13 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       this.sendFailure(WarningMessage.UNAUTHENTICATED_USER, 401, response)
       return null
     }
-    return new CryptoSession(request, response, new BLSCryptographyClient(this.config))
+    const keyVersionInfo = this.getKeyVersionInfo(request, response.locals.logger)
+    return new CryptoSession(
+      request,
+      response,
+      keyVersionInfo,
+      new BLSCryptographyClient(keyVersionInfo)
+    )
   }
 
   validateClientRequest(
@@ -72,7 +76,6 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       super.validateClientRequest(request) &&
       hasValidAccountParam(request.body) &&
       hasValidBlindedPhoneNumberParam(request.body) &&
-      identifierIsValidIfExists(request.body) &&
       isBodyReasonablySized(request.body)
     )
   }

@@ -1,14 +1,13 @@
-import { ErrorMessage, PoprfCombiner } from '@celo/phone-number-privacy-common'
+import { ErrorMessage, KeyVersionInfo, PoprfCombiner } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
-import { OdisConfig } from '../../config'
 import { CryptoClient } from './crypto-client'
 
 export class DomainCryptoClient extends CryptoClient {
   private poprfCombiner: PoprfCombiner
 
-  constructor(protected readonly config: OdisConfig) {
-    super(config)
-    this.poprfCombiner = new PoprfCombiner(this.config.keys.threshold)
+  constructor(protected readonly keyVersionInfo: KeyVersionInfo) {
+    super(keyVersionInfo)
+    this.poprfCombiner = new PoprfCombiner(keyVersionInfo.threshold)
   }
 
   protected get allSignaturesLength(): number {

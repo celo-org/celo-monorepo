@@ -30,7 +30,7 @@ export class BLSCryptographyClient extends CryptoClient {
     // If combination or verification fails, iterate through each signature and remove invalid ones
     // We do this since partial signature verification incurs higher latencies
     try {
-      const result = threshold_bls.combine(this.config.keys.threshold, this.allSignatures)
+      const result = threshold_bls.combine(this.keyVersionInfo.threshold, this.allSignatures)
       this.verifyCombinedSignature(blindedMessage, result, logger)
       return Buffer.from(result).toString('base64')
     } catch (error) {
@@ -38,7 +38,7 @@ export class BLSCryptographyClient extends CryptoClient {
       // Verify each signature and remove invalid ones
       // This logging will help us troubleshoot which signers are having issues
       this.unverifiedSignatures.forEach((unverifiedSignature) => {
-        this.verifyPartialSignature(blindedMessage, unverifiedSignature, logger!)
+        this.verifyPartialSignature(blindedMessage, unverifiedSignature, logger)
       })
       this.clearUnverifiedSignatures()
       throw new Error(ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES)
@@ -55,7 +55,7 @@ export class BLSCryptographyClient extends CryptoClient {
       // Documentation should not specify that verifyBlindSignature verifies the
       // signature after it has been unblinded.
       threshold_bls.verifyBlindSignature(
-        Buffer.from(this.config.keys.pubKey, 'base64'),
+        Buffer.from(this.keyVersionInfo.pubKey, 'base64'),
         Buffer.from(blindedMessage, 'base64'),
         combinedSignature
       )
@@ -86,7 +86,7 @@ export class BLSCryptographyClient extends CryptoClient {
   private isValidPartialSignature(signature: Buffer, blindedMessage: string) {
     try {
       threshold_bls.partialVerifyBlindSignature(
-        Buffer.from(this.config.keys.polynomial, 'hex'),
+        Buffer.from(this.keyVersionInfo.polynomial, 'hex'),
         Buffer.from(blindedMessage, 'base64'),
         signature
       )

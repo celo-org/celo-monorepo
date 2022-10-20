@@ -39,7 +39,7 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
 
   kit = kit ?? getContractKit(config.blockchain)
 
-  const pnpThresholdStateService = new PnpThresholdStateService(config.phoneNumberPrivacy)
+  const pnpThresholdStateService = new PnpThresholdStateService()
 
   const legacyPnpSign = new Controller(
     new PnpSignAction(
