@@ -4,8 +4,8 @@ import {
   SequentialDelayDomain,
   SignerEndpoint as Endpoint,
 } from '@celo/phone-number-privacy-common'
+import { ACCOUNT_ADDRESS2 } from '@celo/phone-number-privacy-common/lib/test/values'
 import { defined, noBool, noString } from '@celo/utils/lib/sign-typed-data-utils'
-import { ACCOUNT_ADDRESS2 } from '@celo/wallet-rpc/lib/rpc-wallet.test'
 import 'isomorphic-fetch'
 import { contractKit } from '../../../../combiner/test/end-to-end/resources'
 

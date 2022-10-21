@@ -120,7 +120,7 @@ describe('legacyPNP', () => {
   const _config: typeof config = JSON.parse(JSON.stringify(config))
   _config.db.type = SupportedDatabase.Sqlite
   _config.keystore.type = SupportedKeystore.MOCK_SECRET_MANAGER
-  _config.api.phoneNumberPrivacy.enabled = true
+  _config.api.legacyPhoneNumberPrivacy.enabled = true
 
   const expectedSignature = expectedSignatures[_config.keystore.keys.phoneNumberPrivacy.latest - 1]
 
@@ -569,7 +569,7 @@ describe('legacyPNP', () => {
 
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
-        configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
+        configWithApiDisabled.api.legacyPhoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
         const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
@@ -1148,7 +1148,7 @@ describe('legacyPNP', () => {
 
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
-        configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
+        configWithApiDisabled.api.legacyPhoneNumberPrivacy.enabled = false
         const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
 
         const req = getLegacyPnpSignRequest(
@@ -1174,6 +1174,14 @@ describe('legacyPNP', () => {
       })
 
       describe('interactions between legacy and new endpoints', () => {
+        const configWithPNPEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
+        configWithPNPEnabled.api.phoneNumberPrivacy.enabled = true
+        let appWithPNPEnabled: any
+
+        beforeEach(() => {
+          appWithPNPEnabled = startSigner(configWithPNPEnabled, db, keyProvider)
+        })
+
         // Keep both of these cases with the legacy test suite
         // since once this endpoint is deprecated, these tests will no longer be needed
         it('Should not be affected by requests and queries from the new endpoint', async () => {
@@ -1185,7 +1193,13 @@ describe('legacyPNP', () => {
             AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.PNP_SIGN,
+            undefined,
+            appWithPNPEnabled
+          )
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
@@ -1209,7 +1223,9 @@ describe('legacyPNP', () => {
           const legacyRes = await sendRequest(
             legacyReq,
             legacyAuthorization,
-            SignerEndpoint.LEGACY_PNP_SIGN
+            SignerEndpoint.LEGACY_PNP_SIGN,
+            undefined,
+            appWithPNPEnabled
           )
           expect(legacyRes.status).toBe(200)
           expect(legacyRes.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -1226,7 +1242,7 @@ describe('legacyPNP', () => {
           )
         })
 
-        it('Should affect the requests and queries to the new endpoint', async () => {
+        it('Should not affect the requests and queries to the new endpoint', async () => {
           const legacyReq = getLegacyPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
@@ -1237,7 +1253,9 @@ describe('legacyPNP', () => {
           const legacyRes = await sendRequest(
             legacyReq,
             legacyAuthorization,
-            SignerEndpoint.LEGACY_PNP_SIGN
+            SignerEndpoint.LEGACY_PNP_SIGN,
+            undefined,
+            appWithPNPEnabled
           )
           expect(legacyRes.status).toBe(200)
           expect(legacyRes.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -1260,7 +1278,13 @@ describe('legacyPNP', () => {
             AuthenticationMethod.WALLET_KEY
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-          const res = await sendRequest(req, authorization, SignerEndpoint.PNP_SIGN)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.PNP_SIGN,
+            undefined,
+            appWithPNPEnabled
+          )
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,

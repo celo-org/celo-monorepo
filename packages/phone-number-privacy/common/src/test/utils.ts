@@ -16,8 +16,6 @@ import {
 import { signWithRawKey } from '../utils/authentication'
 import { genSessionID } from '../utils/logger'
 
-jest.fn<AttestationsStatus, []>()
-
 export function createMockAttestation(getVerifiedStatus: jest.Mock<AttestationsStatus, []>) {
   return {
     getVerifiedStatus,

@@ -87,6 +87,10 @@ const signerConfig: SignerConfig = {
       enabled: false,
       shouldFailOpen: true,
     },
+    legacyPhoneNumberPrivacy: {
+      enabled: false,
+      shouldFailOpen: true,
+    },
   },
   attestations: {
     numberAttestationsRequired: 3,
