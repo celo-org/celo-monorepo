@@ -122,8 +122,8 @@ export function startSigner(
       legacyPnpQuotaService,
       keyProvider,
       new LegacyPnpSignIO(
-        config.api.phoneNumberPrivacy.enabled,
-        config.api.phoneNumberPrivacy.shouldFailOpen,
+        config.api.legacyPhoneNumberPrivacy.enabled,
+        config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
         kit
       )
     )
@@ -133,8 +133,8 @@ export function startSigner(
       config,
       legacyPnpQuotaService,
       new LegacyPnpQuotaIO(
-        config.api.phoneNumberPrivacy.enabled,
-        config.api.phoneNumberPrivacy.shouldFailOpen,
+        config.api.legacyPhoneNumberPrivacy.enabled,
+        config.api.legacyPhoneNumberPrivacy.shouldFailOpen,
         kit
       )
     )
