@@ -234,7 +234,7 @@ describe('domain', () => {
     })
 
     it('Should respond with 400 on unknown domain', async () => {
-      // Create a requests with an invalid domain identifier.
+      // Create a request with an invalid domain identifier.
       const unknownRequest = await disableRequest()
       // @ts-ignore UnknownDomain is (intentionally) not a valid domain identifier.
       unknownRequest.domain.name = 'UnknownDomain'
@@ -337,7 +337,7 @@ describe('domain', () => {
       })
 
       it('Should respond with 500 on signer timeout', async () => {
-        const testTimeoutMS = 200
+        const testTimeoutMS = 0
         const delay = 200
 
         const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
@@ -441,7 +441,7 @@ describe('domain', () => {
     })
 
     it('Should respond with 400 on unknown domain', async () => {
-      // Create a requests with an invalid domain identifier.
+      // Create a request with an invalid domain identifier.
       const unknownRequest = await quotaRequest()
       // @ts-ignore UnknownDomain is (intentionally) not a valid domain identifier.
       unknownRequest.domain.name = 'UnknownDomain'
@@ -550,7 +550,7 @@ describe('domain', () => {
     })
 
     it('Should respond with 500 on signer timeout', async () => {
-      const testTimeoutMS = 200
+      const testTimeoutMS = 0
       const delay = 200
 
       const configWithShortTimeout = JSON.parse(JSON.stringify(_config))
@@ -756,7 +756,7 @@ describe('domain', () => {
     })
 
     it('Should respond with 400 on unknown domain', async () => {
-      // Create a requests with an invalid domain identifier.
+      // Create a request with an invalid domain identifier.
       const [unknownRequest, _] = await signatureRequest()
       // @ts-ignore UnknownDomain is (intentionally) not a valid domain identifier.
       unknownRequest.domain.name = 'UnknownDomain'
@@ -1007,7 +1007,7 @@ describe('domain', () => {
 
       it('Should respond with 500 on signer timeout', async () => {
         const [req, _] = await signatureRequest()
-        const testTimeoutMS = 200
+        const testTimeoutMS = 0
         const delay = 200
 
         const spy = jest

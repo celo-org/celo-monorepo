@@ -49,6 +49,7 @@
     "@celo/phone-number-privacy-signer": "2.0.0-dev",
     "@types/btoa": "^1.2.3",
     "@types/express": "^4.17.6",
+    "@types/supertest": "^2.0.12",
     "@types/uuid": "^7.0.3",
     "dotenv": "^8.2.0",
     "firebase-functions-test": "^0.3.3",

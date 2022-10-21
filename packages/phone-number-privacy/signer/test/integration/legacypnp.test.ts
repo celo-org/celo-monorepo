@@ -655,7 +655,7 @@ describe('legacyPNP', () => {
         })
 
         it('Should respond with 500 on signer timeout', async () => {
-          const testTimeoutMS = 200
+          const testTimeoutMS = 0
           const delay = 100
           const spy = jest
             .spyOn(
@@ -1123,7 +1123,7 @@ describe('legacyPNP', () => {
       })
 
       it('Should respond with 500 on unsupported key version', async () => {
-        const badRequest = getPnpSignRequest(
+        const badRequest = getLegacyPnpSignRequest(
           ACCOUNT_ADDRESS1,
           BLINDED_PHONE_NUMBER,
           AuthenticationMethod.WALLET_KEY
@@ -1645,7 +1645,7 @@ describe('legacyPNP', () => {
         })
 
         it('Should respond with 500 on signer timeout', async () => {
-          const testTimeoutMS = 200
+          const testTimeoutMS = 0
           const delay = 200
           const spy = jest
             .spyOn(
