@@ -1,7 +1,8 @@
-import { Address, ensureLeading0x } from '@celo/base'
-import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
-import Web3 from 'web3'
+import { ensureLeading0x } from '@celo/base'
+import { Address } from '@celo/utils/lib/address'
+import { structHash } from '@celo/utils/lib/sign-typed-data-utils'
+import { generateTypedDataHash } from '@celo/utils/src/sign-typed-data-utils'
+import { parseSignatureWithoutPrefix } from '@celo/utils/src/signatureUtils'
 
 export interface AttestationDetails {
   identifier: string
@@ -12,7 +13,7 @@ export interface AttestationDetails {
 }
 
 const getTypedData = (chainId: number, contractAddress: Address, message?: AttestationDetails) => {
-  return {
+  const typedData = {
     types: {
       EIP712Domain: [
         { name: 'name', type: 'string' },
@@ -37,6 +38,7 @@ const getTypedData = (chainId: number, contractAddress: Address, message?: Attes
     },
     message: message ? message : {},
   }
+  return typedData
 }
 
 export const getSignatureForAttestation = async (
@@ -46,8 +48,7 @@ export const getSignatureForAttestation = async (
   issuedOn: number,
   signer: string,
   chainId: number,
-  contractAddress: string,
-  web3: Web3
+  contractAddress: string
 ) => {
   const typedData = getTypedData(chainId, contractAddress, {
     identifier,
@@ -58,13 +59,12 @@ export const getSignatureForAttestation = async (
   })
 
   const signature = await new Promise<string>((resolve, reject) => {
-    // @ts-ignore
     web3.currentProvider.send(
       {
         method: 'eth_signTypedData',
         params: [signer, typedData],
       },
-      (error: any, resp: any) => {
+      (error, resp) => {
         if (error) {
           reject(error)
         } else {
@@ -75,5 +75,13 @@ export const getSignatureForAttestation = async (
   })
 
   const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
-  return parseSignatureWithoutPrefix(messageHash, signature, signer)
+  const parsedSignature = parseSignatureWithoutPrefix(messageHash, signature, signer)
+  return parsedSignature
+}
+
+export const getDomainDigest = (contractAddress: Address) => {
+  const typedData = getTypedData(1, contractAddress)
+  return ensureLeading0x(
+    structHash('EIP712Domain', typedData.domain, typedData.types).toString('hex')
+  )
 }
