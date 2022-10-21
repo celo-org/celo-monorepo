@@ -38,7 +38,7 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
 
   // enable cross origin resource sharing from any domain so odis can be interacted with from web apps
-  app.use(function (_, res, next) {
+  app.use((_, res, next) => {
     res.header('Access-Control-Allow-Origin', '*')
     res.header('Access-Control-Allow-Methods', 'DELETE, PUT, GET, POST, OPTIONS')
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
