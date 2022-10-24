@@ -74,7 +74,7 @@ export abstract class PnpSignAction
           }
           // In the case of a blockchain connection failure, totalQuota will be -1
           if (quotaStatus.totalQuota === -1) {
-            if (this.config.api.phoneNumberPrivacy.shouldFailOpen) {
+            if (this.io.shouldFailOpen) {
               // We fail open and service requests on full-node errors to not block the user.
               // Error messages are stored in the session and included along with the signature in the response.
               quotaStatus.totalQuota = Number.MAX_SAFE_INTEGER
