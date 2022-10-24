@@ -1356,7 +1356,7 @@ describe('legacyPNP', () => {
         })
 
         it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
-          expect(_config.api.phoneNumberPrivacy.shouldFailOpen).toBe(true)
+          expect(_config.api.legacyPhoneNumberPrivacy.shouldFailOpen).toBe(true)
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
@@ -1426,7 +1426,7 @@ describe('legacyPNP', () => {
           mockContractKit.connection.getTransactionCount.mockRejectedValue(new Error())
 
           const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
-          configWithFailOpenDisabled.api.phoneNumberPrivacy.shouldFailOpen = false
+          configWithFailOpenDisabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = false
           const appWithFailOpenDisabled = startSigner(configWithFailOpenDisabled, db, keyProvider)
 
           const req = getLegacyPnpSignRequest(

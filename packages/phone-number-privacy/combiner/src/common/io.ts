@@ -140,7 +140,7 @@ export abstract class IO<R extends OdisRequest> {
         // Forward requested keyVersion if provided by client, otherwise use default keyVersion.
         // This will be ignored for non-signing requests.
         [KEY_VERSION_HEADER]: session.keyVersionInfo.keyVersion.toString()
-      }, 
+      },
       body: JSON.stringify(request.body),
       signal: abort.signal,
     })
