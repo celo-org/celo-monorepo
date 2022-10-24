@@ -107,7 +107,7 @@ export interface UpvoteRecord {
 }
 
 export enum VoteValue {
-  None = 'NONE',
+  None = 'None',
   Abstain = 'Abstain',
   No = 'No',
   Yes = 'Yes',

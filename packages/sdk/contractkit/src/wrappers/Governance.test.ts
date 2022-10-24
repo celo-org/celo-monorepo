@@ -194,11 +194,8 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       expect(yesVotes).toEqBigNumber(voteWeight)
 
       const directVoteRecord = await governance['contract'].methods.getVoteRecord(voter, 0).call()
-      console.log('directVoteRecord', JSON.stringify(directVoteRecord))
 
       const voteRecord = await governance.getVoteRecord(voter, proposalID)
-      console.log('voteRecord?.voteWeights', JSON.stringify(voteRecord?.voteWeights))
-      console.log('voteRecord?.values', JSON.stringify(voteRecord?.voteValues))
       expect(voteRecord?.voteWeights[0]).toEqBigNumber(voteWeight)
       expect(voteRecord?.voteValues[0]).toEqual(VoteValue.Yes)
     })
@@ -254,7 +251,13 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       expect(proposer.refundedDeposits).toEqBigNumber(minDeposit)
 
       const voter = await governance.getVoter(accounts[2])
-      const expectedVoteRecord = { proposalID, votes: new BigNumber(ONE_CGLD), value: 'Yes' }
+      const expectedVoteRecord = {
+        proposalID,
+        votes: new BigNumber(0),
+        value: VoteValue.None,
+        voteValues: [VoteValue.Yes],
+        voteWeights: [new BigNumber(ONE_CGLD)],
+      }
       expect(voter.votes[0]).toEqual(expectedVoteRecord)
     })
   })
