@@ -1,7 +1,7 @@
 import { spawnSync } from 'child_process'
+import { promises } from 'fs'
 import { join, parse } from 'path'
 import { resolvePath } from './utils'
-
 export abstract class StorageWriter {
   abstract write(_data: Buffer, _dataPath: string): Promise<void>
 }
@@ -15,7 +15,6 @@ export class LocalStorageWriter extends StorageWriter {
   }
 
   protected async writeToFs(data: string | Buffer, dataPath: string): Promise<void> {
-    const { promises } = await import('fs')
     const directory = parse(dataPath).dir
     await promises.mkdir(join(this.root, directory), { recursive: true })
     await promises.writeFile(join(this.root, dataPath), data)
