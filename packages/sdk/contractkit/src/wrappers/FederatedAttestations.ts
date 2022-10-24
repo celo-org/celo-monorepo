@@ -1,4 +1,5 @@
-import { Address, CeloTransactionObject } from '@celo/connect'
+import { Address, CeloTransactionObject, toTransactionObject } from '@celo/connect'
+import { registerAttestation as buildRegisterAttestationTypedData } from '@celo/utils/lib/typed-data-constructors'
 import { FederatedAttestations } from '../generated/FederatedAttestations'
 import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
 
@@ -98,30 +99,44 @@ export class FederatedAttestationsWrapper extends BaseWrapper<FederatedAttestati
   )
 
   /**
-   * @notice Registers an attestation with a valid signature
+   * @notice Generates a valid signature and registers the attestation
    * @param identifier Hash of the identifier to be attested
    * @param issuer Address of the attestation issuer
    * @param account Address of the account being mapped to the identifier
    * @param issuedOn Time at which the issuer issued the attestation in Unix time
    * @param signer Address of the signer of the attestation
-   * @param v The recovery id of the incoming ECDSA signature
-   * @param r Output value r of the ECDSA signature
-   * @param s Output value s of the ECDSA signature
    * @dev Throws if an attestation with the same (identifier, issuer, account) already exists
    */
-  registerAttestation: (
+  async registerAttestation(
     identifier: string,
     issuer: Address,
     account: Address,
     signer: Address,
-    issuedOn: number,
-    v: number | string,
-    r: string | number[],
-    s: string | number[]
-  ) => CeloTransactionObject<void> = proxySend(
-    this.connection,
-    this.contract.methods.registerAttestation
-  )
+    issuedOn: number
+  ) {
+    const chainId = await this.connection.chainId()
+    const typedData = buildRegisterAttestationTypedData(chainId, this.address, {
+      identifier,
+      issuer,
+      account,
+      signer,
+      issuedOn,
+    })
+    const sig = await this.connection.signTypedData(signer, typedData)
+    return toTransactionObject(
+      this.connection,
+      this.contract.methods.registerAttestation(
+        identifier,
+        issuer,
+        account,
+        signer,
+        issuedOn,
+        sig.v,
+        sig.r,
+        sig.s
+      )
+    )
+  }
 
   /**
    * @notice Revokes an attestation
