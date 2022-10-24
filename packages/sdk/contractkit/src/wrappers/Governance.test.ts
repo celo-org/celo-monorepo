@@ -181,6 +181,28 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       expect(yesVotes).toEqBigNumber(voteWeight)
     })
 
+    it('#getVoteRecord', async () => {
+      const voter = accounts[2]
+      await proposeFn(accounts[0])
+      await timeTravel(expConfig.dequeueFrequency, web3)
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+      await approveFn()
+      await voteFn(voter)
+
+      const voteWeight = await governance.getVoteWeight(voter)
+      const yesVotes = (await governance.getVotes(proposalID))[VoteValue.Yes]
+      expect(yesVotes).toEqBigNumber(voteWeight)
+
+      const directVoteRecord = await governance['contract'].methods.getVoteRecord(voter, 0).call()
+      console.log('directVoteRecord', JSON.stringify(directVoteRecord))
+
+      const voteRecord = await governance.getVoteRecord(voter, proposalID)
+      console.log('voteRecord?.voteWeights', JSON.stringify(voteRecord?.voteWeights))
+      console.log('voteRecord?.values', JSON.stringify(voteRecord?.voteValues))
+      expect(voteRecord?.voteWeights[0]).toEqBigNumber(voteWeight)
+      expect(voteRecord?.voteValues[0]).toEqual(VoteValue.Yes)
+    })
+
     it('#votePartially', async () => {
       await proposeFn(accounts[0])
       await timeTravel(expConfig.dequeueFrequency, web3)

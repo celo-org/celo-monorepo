@@ -135,6 +135,8 @@ export interface VoteRecord {
   proposalID: BigNumber
   votes: BigNumber
   value: VoteValue
+  voteWeights: BigNumber[]
+  voteValues: VoteValue[]
 }
 
 export interface Voter {
@@ -545,6 +547,10 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
         proposalID: valueToBigNumber(res[0]),
         value: Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue,
         votes: valueToBigNumber(res[2]),
+        voteValues: res[3].map(
+          (voteValue) => Object.keys(VoteValue)[valueToInt(voteValue)] as VoteValue
+        ),
+        voteWeights: res[4].map((voteWeight) => valueToBigNumber(voteWeight)),
       }
     } catch (_) {
       // The proposal ID may not be present in the dequeued list, or the voter may not have a vote

@@ -181,7 +181,10 @@ contract LockedGold is
     uint256 remainingLockedGold = getAccountTotalLockedGold(msg.sender).sub(value);
 
     uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
-    require(remainingLockedGold >= totalReferendumVotes, "Account locked");
+    require(
+      remainingLockedGold >= totalReferendumVotes,
+      "Not enough unlockable celo. Celo is locked in voting."
+    );
 
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(

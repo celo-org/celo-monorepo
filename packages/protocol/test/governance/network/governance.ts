@@ -1606,12 +1606,12 @@ contract('Governance', (accounts: string[]) => {
           assert.isFalse(voting)
         })
 
-        it(`should emit the ProposalVoteRevoked event ${numVoted} times`, async () => {
+        it(`should emit the ProposalVoteRevokedV2 event ${numVoted} times`, async () => {
           const resp = await governance.revokeVotes()
           assert.equal(resp.logs.length, numVoted)
           resp.logs.map((log, i) =>
             assertLogMatches2(log, {
-              event: 'ProposalVoteRevoked',
+              event: 'ProposalVoteRevokedV2',
               args: {
                 proposalId: i + 1,
                 account,
@@ -1654,12 +1654,12 @@ contract('Governance', (accounts: string[]) => {
           assert.isTrue(totalVotesByAccount.eq(0))
         })
 
-        it(`should emit the ProposalVoteRevoked event ${numVoted} times`, async () => {
+        it(`should emit the ProposalVoteRevokedV2 event ${numVoted} times`, async () => {
           const resp = await governance.revokeVotes()
           assert.equal(resp.logs.length, numVoted)
           resp.logs.map((log, i) =>
             assertLogMatches2(log, {
-              event: 'ProposalVoteRevoked',
+              event: 'ProposalVoteRevokedV2',
               args: {
                 proposalId: i + 1,
                 account,
@@ -1717,13 +1717,13 @@ contract('Governance', (accounts: string[]) => {
 
       it("should set the voter's vote record", async () => {
         await governance.vote(proposalId, index, value)
-        const [recordProposalId, recordValue, recordWeight] = await governance.getVoteRecord(
+        const [recordProposalId, , , recordValues, recordWeights] = await governance.getVoteRecord(
           account,
           index
         )
         assertEqualBN(recordProposalId, proposalId)
-        assertEqualBN(recordValue, value)
-        assertEqualBN(recordWeight, weight)
+        assertEqualBN(recordValues[0], value)
+        assertEqualBN(recordWeights[0], weight)
       })
 
       it('should set the most recent referendum proposal voted on', async () => {
@@ -1734,12 +1734,12 @@ contract('Governance', (accounts: string[]) => {
         )
       })
 
-      it('should emit the ProposalVoted event', async () => {
+      it('should emit the ProposalVotedV2 event', async () => {
         const resp = await governance.vote(proposalId, index, value)
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
-          event: 'ProposalVoted',
+          event: 'ProposalVotedV2',
           args: {
             proposalId: new BigNumber(proposalId),
             account,
@@ -1859,9 +1859,12 @@ contract('Governance', (accounts: string[]) => {
 
           it("should set the voter's vote record", async () => {
             await governance.vote(proposalId, index, newValue)
-            const [recordProposalId, recordValue] = await governance.getVoteRecord(account, index)
+            const [recordProposalId, , , recordValues] = await governance.getVoteRecord(
+              account,
+              index
+            )
             assert.equal(recordProposalId.toNumber(), proposalId)
-            assert.equal(recordValue.toNumber(), newValue)
+            assert.equal(recordValues[0].toNumber(), newValue)
           })
         }
 
@@ -1981,13 +1984,13 @@ contract('Governance', (accounts: string[]) => {
 
       it("should set the voter's vote record", async () => {
         await governance.vote(proposalId, index, value)
-        const [recordProposalId, recordValue, recordWeight] = await governance.getVoteRecord(
+        const [recordProposalId, , , recordValues, recordWeights] = await governance.getVoteRecord(
           account,
           index
         )
         assertEqualBN(recordProposalId, proposalId)
-        assertEqualBN(recordValue, value)
-        assertEqualBN(recordWeight, weight)
+        assertEqualBN(recordValues[0], value)
+        assertEqualBN(recordWeights[0], weight)
       })
 
       it('should set the most recent referendum proposal voted on', async () => {
@@ -1998,13 +2001,13 @@ contract('Governance', (accounts: string[]) => {
         )
       })
 
-      it('should emit the ProposalVoted event', async () => {
+      it('should emit the ProposalVotedV2 event', async () => {
         await governance.dequeueProposalsIfReady()
         const resp = await governance.vote(proposalId, index, value)
         assert.equal(resp.logs.length, resp.logs.length)
         const log = resp.logs[0]
         assertLogMatches2(log, {
-          event: 'ProposalVoted',
+          event: 'ProposalVotedV2',
           args: {
             proposalId: new BigNumber(proposalId),
             account,
@@ -2158,16 +2161,11 @@ contract('Governance', (accounts: string[]) => {
 
       it("should set the voter's vote record", async () => {
         await governance.votePartially(proposalId, index, [value], [weight])
-        const [
-          recordProposalId,
-          recordValue,
-          recordWeight,
-          recordWeights,
-          recordValues,
-        ] = await governance.getVoteRecord(account, index)
+        const [recordProposalId, , , recordValues, recordWeights] = await governance.getVoteRecord(
+          account,
+          index
+        )
         assertEqualBN(recordProposalId, proposalId)
-        assertEqualBN(recordValue, value)
-        assertEqualBN(recordWeight, weight)
         assertBNArrayEqual(recordValues, [value])
         assertBNArrayEqual(recordWeights, [weight])
       })
@@ -2180,12 +2178,12 @@ contract('Governance', (accounts: string[]) => {
         )
       })
 
-      it('should emit the ProposalVoted event', async () => {
+      it('should emit the ProposalVotedV2 event', async () => {
         const resp = await governance.votePartially(proposalId, index, [value], [weight])
         assert.equal(resp.logs.length, 1)
         const log = resp.logs[0]
         assertLogMatches2(log, {
-          event: 'ProposalVoted',
+          event: 'ProposalVotedV2',
           args: {
             proposalId: new BigNumber(proposalId),
             account,
@@ -2338,8 +2336,8 @@ contract('Governance', (accounts: string[]) => {
               recordProposalId,
               ,
               ,
-              recordWeights,
               recordValues,
+              recordWeights,
             ] = await governance.getVoteRecord(account, index)
             assert.equal(recordProposalId.toNumber(), proposalId)
 
@@ -2385,9 +2383,12 @@ contract('Governance', (accounts: string[]) => {
 
           it("should set the voter's vote record", async () => {
             await governance.votePartially(proposalId, index, [newValue], [weight])
-            const [recordProposalId, recordValue] = await governance.getVoteRecord(account, index)
+            const [recordProposalId, , , recordValues] = await governance.getVoteRecord(
+              account,
+              index
+            )
             assert.equal(recordProposalId.toNumber(), proposalId)
-            assert.equal(recordValue.toNumber(), newValue)
+            assert.equal(recordValues[0].toNumber(), newValue)
           })
         }
 
@@ -2507,13 +2508,13 @@ contract('Governance', (accounts: string[]) => {
 
       it("should set the voter's vote record", async () => {
         await governance.votePartially(proposalId, index, [value], [weight])
-        const [recordProposalId, recordValue, recordWeight] = await governance.getVoteRecord(
+        const [recordProposalId, , , recordValues, recordWeights] = await governance.getVoteRecord(
           account,
           index
         )
         assertEqualBN(recordProposalId, proposalId)
-        assertEqualBN(recordValue, value)
-        assertEqualBN(recordWeight, weight)
+        assertEqualBN(recordValues[0], value)
+        assertEqualBN(recordWeights[0], weight)
       })
 
       it('should set the most recent referendum proposal voted on', async () => {
@@ -2524,13 +2525,13 @@ contract('Governance', (accounts: string[]) => {
         )
       })
 
-      it('should emit the ProposalVoted event', async () => {
+      it('should emit the ProposalVotedV2 event', async () => {
         await governance.dequeueProposalsIfReady()
         const resp = await governance.votePartially(proposalId, index, [value], [weight])
         assert.equal(resp.logs.length, resp.logs.length)
         const log = resp.logs[0]
         assertLogMatches2(log, {
-          event: 'ProposalVoted',
+          event: 'ProposalVotedV2',
           args: {
             proposalId: new BigNumber(proposalId),
             account,

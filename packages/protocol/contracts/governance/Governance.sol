@@ -144,15 +144,29 @@ contract Governance is
   event ProposalVoted(
     uint256 indexed proposalId,
     address indexed account,
-    uint256[] weights,
-    Proposals.VoteValue[] values
+    uint256 value,
+    uint256 weight
+  );
+
+  event ProposalVotedV2(
+    uint256 indexed proposalId,
+    address indexed account,
+    Proposals.VoteValue[] values,
+    uint256[] weights
   );
 
   event ProposalVoteRevoked(
     uint256 indexed proposalId,
     address indexed account,
-    uint256[] weights,
-    Proposals.VoteValue[] values
+    uint256 value,
+    uint256 weight
+  );
+
+  event ProposalVoteRevokedV2(
+    uint256 indexed proposalId,
+    address indexed account,
+    Proposals.VoteValue[] values,
+    uint256[] weights
   );
 
   event ProposalExecuted(uint256 indexed proposalId);
@@ -634,10 +648,10 @@ contract Governance is
     }
 
     require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
+    require(value != Proposals.VoteValue.None, "Vote value unset");
 
     address account = getAccounts().voteSignerToAccount(msg.sender);
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
-    require(value != Proposals.VoteValue.None, "Vote value unset");
     require(weight > 0, "Voter weight zero");
 
     Proposals.VoteValue[] memory currentValues = new Proposals.VoteValue[](1);
@@ -679,6 +693,11 @@ contract Governance is
 
     address account = getAccounts().voteSignerToAccount(msg.sender);
     uint256 totalLockedGold = getLockedGold().getAccountTotalLockedGold(account);
+
+    require(
+      totalLockedGold >= getTotalWeightRequested(weights),
+      "Voter doesn't have enough locked Celo (formerly known as Celo Gold) "
+    );
     _vote(proposal, proposalId, index, totalLockedGold, account, voteValues, weights);
 
     return true;
@@ -706,10 +725,6 @@ contract Governance is
   ) private {
     Voter storage voter = voters[account];
 
-    require(
-      totalLockedGold >= getTotalWeightRequested(weights),
-      "Voter doesn't have enough locked Celo (formerly known as Celo Gold) "
-    );
     VoteRecord storage previousVoteRecord = voter.referendumVotes[index];
 
     if (previousVoteRecord.proposalId != proposalId) {
@@ -741,9 +756,9 @@ contract Governance is
 
     proposal.networkWeight = getLockedGold().getTotalLockedGold();
     voter.referendumVotes[index] = VoteRecord(
-      voteValues[0],
+      Proposals.VoteValue.None,
       proposalId,
-      weights[0],
+      0,
       weights,
       voteValues
     );
@@ -751,7 +766,7 @@ contract Governance is
       voter.mostRecentReferendumProposal = proposalId;
     }
 
-    emit ProposalVoted(proposalId, account, weights, voteValues);
+    emit ProposalVotedV2(proposalId, account, voteValues, weights);
   }
 
   /* solhint-enable code-complexity */
@@ -796,11 +811,11 @@ contract Governance is
             );
 
             proposal.networkWeight = getLockedGold().getTotalLockedGold();
-            emit ProposalVoteRevoked(
+            emit ProposalVoteRevokedV2(
               voteRecord.proposalId,
               account,
-              previousWeights,
-              previousValues
+              previousValues,
+              previousWeights
             );
           } else {
             proposal.updateVote(
@@ -810,11 +825,11 @@ contract Governance is
               new uint256[](0)
             );
             proposal.networkWeight = getLockedGold().getTotalLockedGold();
-            emit ProposalVoteRevoked(
+            emit ProposalVoteRevokedV2(
               voteRecord.proposalId,
               account,
-              voteRecord.weights,
-              voteRecord.values
+              voteRecord.values,
+              voteRecord.weights
             );
           }
         }
@@ -1059,15 +1074,15 @@ contract Governance is
   function getVoteRecord(address account, uint256 index)
     external
     view
-    returns (uint256, uint256, uint256, uint256[] memory, Proposals.VoteValue[] memory)
+    returns (uint256, uint256, uint256, Proposals.VoteValue[] memory, uint256[] memory)
   {
     VoteRecord storage record = voters[account].referendumVotes[index];
     return (
       record.proposalId,
       uint256(record.deprecated_value),
       record.deprecated_weight,
-      record.weights,
-      record.values
+      record.values,
+      record.weights
     );
   }
 
