@@ -37,7 +37,11 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
   // (https://github.com/celo-org/celo-monorepo/issues/9809)
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
 
-  // enable cross origin resource sharing from any domain so odis can be interacted with from web apps
+ // Enable cross origin resource sharing from any domain so ODIS can be interacted with from web apps
+  //
+  // Security note: Allowing unrestricted cross-origin requests is acceptable here because any authenticated actions
+  // must include a signature in the request body. In particular, ODIS _does not_ use cookies to transmit authentication
+  // data. If ODIS is altered to use cookies for authentication data, this CORS policy should be reconsidered.
   app.use((_, res, next) => {
     res.header('Access-Control-Allow-Origin', '*')
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
