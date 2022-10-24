@@ -1,7 +1,5 @@
-import { Address, ensureLeading0x } from '@celo/base'
-import Web3 from 'web3'
-import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
-import { parseSignatureWithoutPrefix } from './signatureUtils'
+import { Address } from '@celo/base'
+import { EIP712TypedData } from './sign-typed-data-utils'
 
 export function attestationSecurityCode(code: string): EIP712TypedData {
   return {
@@ -63,7 +61,7 @@ export const authorizeSigner = ({
   },
 })
 
-export interface AttestationDetails {
+interface AttestationDetails {
   identifier: string
   issuer: string
   account: string
@@ -71,7 +69,11 @@ export interface AttestationDetails {
   issuedOn: number
 }
 
-const getTypedData = (chainId: number, contractAddress: Address, message?: AttestationDetails) => {
+export const registerAttestation = (
+  chainId: number,
+  contractAddress: Address,
+  message?: AttestationDetails
+) => {
   return {
     types: {
       EIP712Domain: [
@@ -97,43 +99,4 @@ const getTypedData = (chainId: number, contractAddress: Address, message?: Attes
     },
     message: message ? message : {},
   }
-}
-
-export const getSignatureForAttestation = async (
-  identifier: string,
-  issuer: string,
-  account: string,
-  issuedOn: number,
-  signer: string,
-  chainId: number,
-  contractAddress: string,
-  web3: Web3
-) => {
-  const typedData = getTypedData(chainId, contractAddress, {
-    identifier,
-    issuer,
-    account,
-    signer,
-    issuedOn,
-  })
-
-  const signature = await new Promise<string>((resolve, reject) => {
-    // @ts-ignore
-    web3.currentProvider.send(
-      {
-        method: 'eth_signTypedData',
-        params: [signer, typedData],
-      },
-      (error: any, resp: any) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve(resp.result)
-        }
-      }
-    )
-  })
-
-  const messageHash = ensureLeading0x(generateTypedDataHash(typedData).toString('hex'))
-  return parseSignatureWithoutPrefix(messageHash, signature, signer)
 }
