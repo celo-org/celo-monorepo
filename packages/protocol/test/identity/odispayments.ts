@@ -44,7 +44,6 @@ contract('OdisPayments', (accounts: string[]) => {
 
   beforeEach(async () => {
     odisPayments = await OdisPayments.new(true, { from: owner })
-    await registry.setAddressFor(CeloContractName.OdisPayments, odisPayments.address)
     await odisPayments.initialize()
 
     stableTokenCUSD = await StableTokenCUSD.new(true, { from: owner })

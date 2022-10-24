@@ -47,7 +47,6 @@ const WrapperFactories = {
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
   [CeloContract.GoldToken]: GoldTokenWrapper,
   [CeloContract.GrandaMento]: GrandaMentoWrapper,
-  [CeloContract.OdisPayments]: OdisPaymentsWrapper,
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
   [CeloContract.MetaTransactionWallet]: MetaTransactionWalletWrapper,
