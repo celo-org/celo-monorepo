@@ -1,8 +1,7 @@
 import { Address, ensureLeading0x } from '@celo/base'
-import { generateTypedDataHash } from '@celo/utils/lib/sign-typed-data-utils'
-import { parseSignatureWithoutPrefix } from '@celo/utils/lib/signatureUtils'
 import Web3 from 'web3'
-import { EIP712TypedData } from './sign-typed-data-utils'
+import { EIP712TypedData, generateTypedDataHash } from './sign-typed-data-utils'
+import { parseSignatureWithoutPrefix } from './signatureUtils'
 
 export function attestationSecurityCode(code: string): EIP712TypedData {
   return {
