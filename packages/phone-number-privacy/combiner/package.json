@@ -32,9 +32,9 @@
     "db:migrate:make": "knex --migrations-directory ./migrations migrate:make -x ts"
   },
   "dependencies": {
-    "@celo/contractkit": "2.2.1-dev",
+    "@celo/contractkit": "2.3.1-dev",
     "@celo/phone-number-privacy-common": "1.0.42-dev",
-    "@celo/utils": "2.2.1-dev",
+    "@celo/utils": "2.3.1-dev",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "express": "^4.17.1",
     "firebase-admin": "^9.12.0",
@@ -45,7 +45,7 @@
     "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "@celo/identity": "2.2.1-dev",
+    "@celo/identity": "2.3.1-dev",
     "@celo/phone-number-privacy-signer": "2.0.0-dev",
     "@types/btoa": "^1.2.3",
     "@types/express": "^4.17.6",
