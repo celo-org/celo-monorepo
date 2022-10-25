@@ -3,7 +3,6 @@ import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import {
   assertBalance,
-  assertBNArrayEqual,
   assertEqualBN,
   assertLogMatches2,
   assertRevert,
@@ -2374,7 +2373,7 @@ contract('Governance', (accounts: string[]) => {
 
       describe('when the account has already voted on this proposal', () => {
         const voteWeight = yesVotes
-        const revoteTests = (oldYes, oldNo, oldAbstain, newYes, newNo, newAbstain) => {
+        const revoteTests = (newYes, newNo, newAbstain) => {
           it('should decrement the vote total from the previous vote', async () => {
             await governance.votePartially(proposalId, index, newYes, newNo, newAbstain)
             const voteTotals = await governance.getVoteTotals(proposalId)
@@ -2413,7 +2412,7 @@ contract('Governance', (accounts: string[]) => {
             await governance.votePartially(proposalId, index, yesVotes, 0, 0)
           })
 
-          revoteTests(voteWeight, 0, 0, 0, voteWeight, 0)
+          revoteTests(0, voteWeight, 0)
         })
 
         describe('when the account has already voted no on this proposal', () => {
@@ -2421,7 +2420,7 @@ contract('Governance', (accounts: string[]) => {
             await governance.votePartially(proposalId, index, voteWeight, 0, 0)
           })
 
-          revoteTests(0, voteWeight, 0, 0, 0, voteWeight)
+          revoteTests(0, 0, voteWeight)
         })
 
         describe('when the account has already voted abstain on this proposal', () => {
@@ -2429,7 +2428,7 @@ contract('Governance', (accounts: string[]) => {
             await governance.votePartially(proposalId, index, 0, 0, voteWeight)
           })
 
-          revoteTests(0, 0, voteWeight, voteWeight, 0, 0)
+          revoteTests(voteWeight, 0, 0)
         })
       })
 
