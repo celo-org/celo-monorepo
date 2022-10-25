@@ -193,11 +193,10 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       const yesVotes = (await governance.getVotes(proposalID))[VoteValue.Yes]
       expect(yesVotes).toEqBigNumber(voteWeight)
 
-      const directVoteRecord = await governance['contract'].methods.getVoteRecord(voter, 0).call()
-
       const voteRecord = await governance.getVoteRecord(voter, proposalID)
-      expect(voteRecord?.voteWeights[0]).toEqBigNumber(voteWeight)
-      expect(voteRecord?.voteValues[0]).toEqual(VoteValue.Yes)
+      expect(voteRecord?.yesVotes).toEqBigNumber(voteWeight)
+      expect(voteRecord?.noVotes).toEqBigNumber(0)
+      expect(voteRecord?.abstainVotes).toEqBigNumber(0)
     })
 
     it('#votePartially', async () => {
@@ -208,16 +207,19 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
 
       const yes = 10
       const no = 20
+      const abstain = 0
 
-      const tx = await governance.votePartially(proposalID, ['Yes', 'No'], [yes, no])
+      const tx = await governance.votePartially(proposalID, yes, no, abstain)
       await tx.sendAndWaitForReceipt({ from: accounts[2] })
       await timeTravel(expConfig.referendumStageDuration, web3)
 
       const votes = await governance.getVotes(proposalID)
       const yesVotes = votes[VoteValue.Yes]
       const noVotes = votes[VoteValue.No]
+      const abstainVotes = votes[VoteValue.Abstain]
       expect(yesVotes).toEqBigNumber(yes)
       expect(noVotes).toEqBigNumber(no)
+      expect(abstainVotes).toEqBigNumber(abstain)
     })
 
     it(

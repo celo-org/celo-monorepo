@@ -49,8 +49,9 @@ contract Governance is
     Proposals.VoteValue deprecated_value; // obsolete
     uint256 proposalId;
     uint256 deprecated_weight; // obsolete
-    uint256[] weights;
-    Proposals.VoteValue[] values;
+    uint256 yesVotes;
+    uint256 noVotes;
+    uint256 abstainVotes;
   }
 
   struct Voter {
@@ -151,8 +152,9 @@ contract Governance is
   event ProposalVotedV2(
     uint256 indexed proposalId,
     address indexed account,
-    Proposals.VoteValue[] values,
-    uint256[] weights
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
   );
 
   event ProposalVoteRevoked(
@@ -165,8 +167,9 @@ contract Governance is
   event ProposalVoteRevokedV2(
     uint256 indexed proposalId,
     address indexed account,
-    Proposals.VoteValue[] values,
-    uint256[] weights
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
   );
 
   event ProposalExecuted(uint256 indexed proposalId);
@@ -654,12 +657,15 @@ contract Governance is
     uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(weight > 0, "Voter weight zero");
 
-    Proposals.VoteValue[] memory currentValues = new Proposals.VoteValue[](1);
-    currentValues[0] = value;
-    uint256[] memory currentWeights = new uint256[](1);
-    currentWeights[0] = weight;
-
-    _vote(proposal, proposalId, index, weight, account, currentValues, currentWeights);
+    _vote(
+      proposal,
+      proposalId,
+      index,
+      account,
+      value == Proposals.VoteValue.Yes ? weight : 0,
+      value == Proposals.VoteValue.No ? weight : 0,
+      value == Proposals.VoteValue.Abstain ? weight : 0
+    );
     return true;
   }
 
@@ -667,20 +673,19 @@ contract Governance is
    * @notice Votes partially on a proposal in the referendum stage.
    * @param proposalId The ID of the proposal to vote on.
    * @param index The index of the proposal ID in `dequeued`.
-   * @param voteValues Whether to vote yes, no, or abstain.
-   * @param weights Weights of vote choices.
+   * @param yesVotes The yes votes weight.
+   * @param noVotes The no votes weight.
+   * @param abstainVotes The abstain votes weight.
    * @return Whether or not the vote was cast successfully.
    */
   /* solhint-disable code-complexity */
   function votePartially(
     uint256 proposalId,
     uint256 index,
-    Proposals.VoteValue[] calldata voteValues,
-    uint256[] calldata weights
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
   ) external nonReentrant returns (bool) {
-    require(voteValues.length == weights.length, "Incorrect length");
-    require(voteValues.length <= 3, "Only values from VoteValue allowed");
-
     dequeueProposalsIfReady();
     (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
       proposalId,
@@ -695,10 +700,10 @@ contract Governance is
     uint256 totalLockedGold = getLockedGold().getAccountTotalLockedGold(account);
 
     require(
-      totalLockedGold >= getTotalWeightRequested(weights),
+      totalLockedGold >= yesVotes.add(noVotes).add(abstainVotes),
       "Voter doesn't have enough locked Celo (formerly known as Celo Gold) "
     );
-    _vote(proposal, proposalId, index, totalLockedGold, account, voteValues, weights);
+    _vote(proposal, proposalId, index, account, yesVotes, noVotes, abstainVotes);
 
     return true;
   }
@@ -708,20 +713,20 @@ contract Governance is
    * @param proposal The proposal struct.
    * @param proposalId The ID of the proposal to vote on.
    * @param index The index of the proposal ID in `dequeued`.
-   * @param totalLockedGold Total locked gold owned by account.
    * @param account Account based on signer.
-   * @param voteValues Whether to vote yes, no, or abstain.
-   * @param weights Weights of vote choices.
+   * @param yesVotes The yes votes weight.
+   * @param noVotes The no votes weight.
+   * @param abstainVotes The abstain votes weight.
    * @return Whether or not the proposal is passing.
    */
   function _vote(
     Proposals.Proposal storage proposal,
     uint256 proposalId,
     uint256 index,
-    uint256 totalLockedGold,
     address account,
-    Proposals.VoteValue[] memory voteValues,
-    uint256[] memory weights
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
   ) private {
     Voter storage voter = voters[account];
 
@@ -734,23 +739,32 @@ contract Governance is
       // Once new proposal is created it might get same index as previous proposal.
       // In such case we need to check whether existing VoteRecord is relevant to new
       // proposal of whether it is just left over data.
-      proposal.updateVote(new Proposals.VoteValue[](0), new uint256[](0), voteValues, weights);
-    } else if (
-      previousVoteRecord.weights.length == 0 && previousVoteRecord.deprecated_weight != 0
-    ) {
+      proposal.updateVote(0, 0, 0, yesVotes, noVotes, abstainVotes);
+    } else if (previousVoteRecord.deprecated_weight != 0) {
       // backward compatibility for transition period - this should be deleted later on
-      Proposals.VoteValue[] memory previousValues = new Proposals.VoteValue[](1);
-      previousValues[0] = previousVoteRecord.deprecated_value;
-      uint256[] memory previousWeights = new uint256[](1);
-      previousWeights[0] = previousVoteRecord.deprecated_weight;
+      proposal.updateVote(
+        previousVoteRecord.deprecated_value == Proposals.VoteValue.Yes
+          ? previousVoteRecord.deprecated_weight
+          : 0,
+        previousVoteRecord.deprecated_value == Proposals.VoteValue.No
+          ? previousVoteRecord.deprecated_weight
+          : 0,
+        previousVoteRecord.deprecated_value == Proposals.VoteValue.Abstain
+          ? previousVoteRecord.deprecated_weight
+          : 0,
+        yesVotes,
+        noVotes,
+        abstainVotes
+      );
 
-      proposal.updateVote(previousValues, previousWeights, voteValues, weights);
     } else {
       proposal.updateVote(
-        previousVoteRecord.values,
-        previousVoteRecord.weights,
-        voteValues,
-        weights
+        previousVoteRecord.yesVotes,
+        previousVoteRecord.noVotes,
+        previousVoteRecord.abstainVotes,
+        yesVotes,
+        noVotes,
+        abstainVotes
       );
     }
 
@@ -759,14 +773,15 @@ contract Governance is
       Proposals.VoteValue.None,
       proposalId,
       0,
-      weights,
-      voteValues
+      yesVotes,
+      noVotes,
+      abstainVotes
     );
     if (proposal.timestamp > proposals[voter.mostRecentReferendumProposal].timestamp) {
       voter.mostRecentReferendumProposal = proposalId;
     }
 
-    emit ProposalVotedV2(proposalId, account, voteValues, weights);
+    emit ProposalVotedV2(proposalId, account, yesVotes, noVotes, abstainVotes);
   }
 
   /* solhint-enable code-complexity */
@@ -788,7 +803,10 @@ contract Governance is
       // Skip proposals where there was no vote cast by the user AND
       // ensure vote record proposal matches identifier of dequeued index proposal.
       if (
-        (voteRecord.weights.length > 0 || voteRecord.deprecated_weight > 0) &&
+        (voteRecord.yesVotes > 0 ||
+          voteRecord.noVotes > 0 ||
+          voteRecord.abstainVotes > 0 ||
+          voteRecord.deprecated_weight > 0) &&
         voteRecord.proposalId == dequeued[dequeueIndex]
       ) {
         (Proposals.Proposal storage proposal, Proposals.Stage stage) =
@@ -796,40 +814,43 @@ contract Governance is
 
         // only revoke from proposals which are still in referendum
         if (stage == Proposals.Stage.Referendum) {
-          if (voteRecord.weights.length == 0 && voteRecord.deprecated_weight != 0) {
+          if (voteRecord.deprecated_weight != 0) {
             // backward compatibility for transition period - this should be deleted later on
-            Proposals.VoteValue[] memory previousValues = new Proposals.VoteValue[](1);
-            previousValues[0] = voteRecord.deprecated_value;
-            uint256[] memory previousWeights = new uint256[](1);
-            previousWeights[0] = voteRecord.deprecated_weight;
-
-            proposal.updateVote(
-              previousValues,
-              previousWeights,
-              new Proposals.VoteValue[](0),
-              new uint256[](0)
-            );
+            uint256 previousYes = voteRecord.deprecated_value == Proposals.VoteValue.Yes
+              ? voteRecord.deprecated_weight
+              : 0;
+            uint256 previousNo = voteRecord.deprecated_value == Proposals.VoteValue.No
+              ? voteRecord.deprecated_weight
+              : 0;
+            uint256 previousAbstain = voteRecord.deprecated_value == Proposals.VoteValue.Abstain
+              ? voteRecord.deprecated_weight
+              : 0;
+            proposal.updateVote(previousYes, previousNo, previousAbstain, 0, 0, 0);
 
             proposal.networkWeight = getLockedGold().getTotalLockedGold();
             emit ProposalVoteRevokedV2(
               voteRecord.proposalId,
               account,
-              previousValues,
-              previousWeights
+              previousYes,
+              previousNo,
+              previousAbstain
             );
           } else {
             proposal.updateVote(
-              voteRecord.values,
-              voteRecord.weights,
-              new Proposals.VoteValue[](0),
-              new uint256[](0)
+              voteRecord.yesVotes,
+              voteRecord.noVotes,
+              voteRecord.abstainVotes,
+              0,
+              0,
+              0
             );
             proposal.networkWeight = getLockedGold().getTotalLockedGold();
             emit ProposalVoteRevokedV2(
               voteRecord.proposalId,
               account,
-              voteRecord.values,
-              voteRecord.weights
+              voteRecord.yesVotes,
+              voteRecord.noVotes,
+              voteRecord.abstainVotes
             );
           }
         }
@@ -1074,15 +1095,16 @@ contract Governance is
   function getVoteRecord(address account, uint256 index)
     external
     view
-    returns (uint256, uint256, uint256, Proposals.VoteValue[] memory, uint256[] memory)
+    returns (uint256, uint256, uint256, uint256, uint256, uint256)
   {
     VoteRecord storage record = voters[account].referendumVotes[index];
     return (
       record.proposalId,
       uint256(record.deprecated_value),
       record.deprecated_weight,
-      record.values,
-      record.weights
+      record.yesVotes,
+      record.noVotes,
+      record.abstainVotes
     );
   }
 
@@ -1444,22 +1466,11 @@ contract Governance is
       }
 
       VoteRecord storage voteRecord = voter.referendumVotes[index];
-      total = Math.max(total, getTotalWeightRequested(voteRecord.weights));
+      total = Math.max(
+        total,
+        voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes)
+      );
     }
     return total;
-  }
-
-  /**
-   * @notice Returns sum of input weights.
-   * @param weights The weights to sum up.
-   * @return The sum of input weights.
-   */
-  function getTotalWeightRequested(uint256[] memory weights) private pure returns (uint256) {
-    uint256 totalVotesRequested = 0;
-    for (uint256 i = 0; i < weights.length; i = i.add(1)) {
-      totalVotesRequested = totalVotesRequested.add(weights[i]);
-    }
-
-    return totalVotesRequested;
   }
 }

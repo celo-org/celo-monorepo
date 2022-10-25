@@ -135,8 +135,9 @@ export interface VoteRecord {
   proposalID: BigNumber
   votes: BigNumber
   value: VoteValue
-  voteWeights: BigNumber[]
-  voteValues: VoteValue[]
+  yesVotes: BigNumber
+  noVotes: BigNumber
+  abstainVotes: BigNumber
 }
 
 export interface Voter {
@@ -547,10 +548,9 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
         proposalID: valueToBigNumber(res[0]),
         value: Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue,
         votes: valueToBigNumber(res[2]),
-        voteValues: res[3].map(
-          (voteValue) => Object.keys(VoteValue)[valueToInt(voteValue)] as VoteValue
-        ),
-        voteWeights: res[4].map((voteWeight) => valueToBigNumber(voteWeight)),
+        yesVotes: valueToBigNumber(res[3]),
+        noVotes: valueToBigNumber(res[4]),
+        abstainVotes: valueToBigNumber(res[5]),
       }
     } catch (_) {
       // The proposal ID may not be present in the dequeued list, or the voter may not have a vote
@@ -811,18 +811,19 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
    */
   async votePartially(
     proposalID: BigNumber.Value,
-    votes: Array<keyof typeof VoteValue>,
-    weights: number[]
+    yesVotes: BigNumber.Value,
+    noVotes: BigNumber.Value,
+    abstainVotes: BigNumber.Value
   ) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
-    const voteNum = votes.map((vote) => Object.keys(VoteValue).indexOf(vote))
     return toTransactionObject(
       this.connection,
       this.contract.methods.votePartially(
         valueToString(proposalID),
         proposalIndex,
-        voteNum,
-        weights
+        valueToString(yesVotes),
+        valueToString(noVotes),
+        valueToString(abstainVotes)
       )
     )
   }

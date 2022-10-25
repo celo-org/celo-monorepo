@@ -137,54 +137,31 @@ library Proposals {
   /**
    * @notice Adds or changes a vote on a proposal.
    * @param proposal The proposal struct.
-   * @param previousVoteValues The previous weight of the vote.
-   * @param previousVoteWeights The current weight of the vote.
-   * @param currentVoteValues The vote to be removed, or None for a new vote.
-   * @param currentVoteWeights The vote to be set.
+   * @param previousYesVotes The previous yes votes weight.
+   * @param previousNoVotes The previous no votes weight.
+   * @param previousAbstainVotes The previous abstain votes weight.
+   * @param yesVotes The current yes votes weight.
+   * @param noVotes The current no votes weight.
+   * @param abstainVotes The current abstain votes weight.
    */
   function updateVote(
     Proposal storage proposal,
-    VoteValue[] memory previousVoteValues,
-    uint256[] memory previousVoteWeights,
-    VoteValue[] memory currentVoteValues,
-    uint256[] memory currentVoteWeights
+    uint256 previousYesVotes,
+    uint256 previousNoVotes,
+    uint256 previousAbstainVotes,
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
   ) public {
-    require(
-      previousVoteValues.length == previousVoteWeights.length,
-      "incorrect length of previous vote"
-    );
-    require(
-      currentVoteValues.length == currentVoteWeights.length,
-      "incorrect length of current vote"
-    );
-
     // Subtract previous vote.
-    for (uint256 i = 0; i < previousVoteValues.length; i = i.add(1)) {
-      VoteValue previousVote = previousVoteValues[i];
-      uint256 previousWeight = previousVoteWeights[i];
-
-      if (previousVote == VoteValue.Abstain) {
-        proposal.votes.abstain = proposal.votes.abstain.sub(previousWeight);
-      } else if (previousVote == VoteValue.Yes) {
-        proposal.votes.yes = proposal.votes.yes.sub(previousWeight);
-      } else if (previousVote == VoteValue.No) {
-        proposal.votes.no = proposal.votes.no.sub(previousWeight);
-      }
-    }
+    proposal.votes.yes = proposal.votes.yes.sub(previousYesVotes);
+    proposal.votes.no = proposal.votes.no.sub(previousNoVotes);
+    proposal.votes.abstain = proposal.votes.abstain.sub(previousAbstainVotes);
 
     // Add new vote.
-    for (uint256 i = 0; i < currentVoteValues.length; i = i.add(1)) {
-      VoteValue currentVote = currentVoteValues[i]; //VoteValue(currentVoteValues[i]);
-      uint256 currentWeight = currentVoteWeights[i];
-
-      if (currentVote == VoteValue.Abstain) {
-        proposal.votes.abstain = proposal.votes.abstain.add(currentWeight);
-      } else if (currentVote == VoteValue.Yes) {
-        proposal.votes.yes = proposal.votes.yes.add(currentWeight);
-      } else if (currentVote == VoteValue.No) {
-        proposal.votes.no = proposal.votes.no.add(currentWeight);
-      }
-    }
+    proposal.votes.yes = proposal.votes.yes.add(yesVotes);
+    proposal.votes.no = proposal.votes.no.add(noVotes);
+    proposal.votes.abstain = proposal.votes.abstain.add(abstainVotes);
   }
 
   /**
