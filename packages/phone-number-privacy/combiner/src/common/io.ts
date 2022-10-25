@@ -82,7 +82,9 @@ export abstract class IO<R extends OdisRequest> {
     try {
       this.getKeyVersionInfo(request, logger)
       return true
-    } catch {
+    } catch (err) {
+      logger.debug('Error caught in requestHasSupportedKeyVersion')
+      logger.debug(err)
       return false
     }
   }

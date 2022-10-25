@@ -16,7 +16,7 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
 
     if (session.crypto.hasSufficientSignatures()) {
       try {
-        const combinedSignature = session.crypto.combinePartialBlindedSignatures(
+        const combinedSignature = session.crypto.combineBlindedSignatureShares(
           this.parseBlindedMessage(session.request.body),
           session.logger
         )
@@ -27,8 +27,10 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
           combinedSignature,
           this.thresholdStateService.findThresholdDomainState(session)
         )
-      } catch {
+      } catch (err) {
         // May fail upon combining signatures if too many sigs are invalid
+        session.logger.error('Combining signatures failed in combine')
+        session.logger.error(err)
         // Fallback to handleMissingSignatures
       }
     }

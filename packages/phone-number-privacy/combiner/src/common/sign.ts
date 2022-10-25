@@ -66,15 +66,17 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
       // BLS threshold signatures can be combined without all partial signatures
       if (session.crypto.hasSufficientSignatures()) {
         try {
-          session.crypto.combinePartialBlindedSignatures(
+          session.crypto.combineBlindedSignatureShares(
             this.parseBlindedMessage(session.request.body),
             session.logger
           )
           // Close outstanding requests
           session.abort.abort()
-        } catch {
+        } catch (err) {
           // One or more signatures failed verification and were discarded.
-          // Error has already been logged, continue to collect signatures.
+          session.logger.info('Error caught in receiveSuccess')
+          session.logger.info(err)
+          // Continue to collect signatures.
         }
       }
     }
