@@ -8,7 +8,6 @@ export async function up(knex: Knex): Promise<any> {
       t.string(ACCOUNTS_COLUMNS.address).notNullable().primary()
       t.dateTime(ACCOUNTS_COLUMNS.createdAt).notNullable()
       t.integer(ACCOUNTS_COLUMNS.numLookups).unsigned()
-      t.dateTime(ACCOUNTS_COLUMNS.didMatchmaking)
     })
   }
   return null

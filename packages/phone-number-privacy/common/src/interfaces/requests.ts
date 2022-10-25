@@ -67,41 +67,6 @@ export const LegacySignMessageRequestSchema: t.Type<LegacySignMessageRequest> = 
   }),
 ])
 
-export interface GetContactMatchesRequest {
-  /** Celo account address of the user */
-  account: string
-  /** User's phone number obfuscated with deterministic salt */
-  userPhoneNumber: string
-  /** User's contact list obfuscated with deterministic salt */
-  contactPhoneNumbers: string[]
-  /** User's ODIS generated on-chain identifier */
-  hashedPhoneNumber: string
-  /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod?: string
-  /** DEK signature over the user's phone number */
-  signedUserPhoneNumber?: string
-  /** Client-specified session ID for the request. */
-  sessionID?: string
-  /** Client-specified version string */
-  version?: string
-}
-export declare type MatchmakingRequest = GetContactMatchesRequest
-
-export const MatchmakingRequestSchema: t.Type<MatchmakingRequest> = t.intersection([
-  t.type({
-    account: t.string,
-    userPhoneNumber: t.string,
-    contactPhoneNumbers: t.array(t.string),
-    hashedPhoneNumber: t.string,
-  }),
-  t.partial({
-    authenticationMethod: t.union([t.string, t.undefined]),
-    signedUserPhoneNumber: t.union([t.string, t.undefined]),
-    sessionID: t.union([t.string, t.undefined]),
-    version: t.union([t.string, t.undefined]),
-  }),
-])
-
 export interface PnpQuotaRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
@@ -140,7 +105,6 @@ export const LegacyPnpQuotaRequestSchema: t.Type<LegacyPnpQuotaRequest> = t.inte
 export type PhoneNumberPrivacyRequest =
   | SignMessageRequest
   | LegacySignMessageRequest
-  | MatchmakingRequest
   | PnpQuotaRequest
   | LegacyPnpQuotaRequest
 
@@ -562,16 +526,12 @@ export type SignMessageRequestHeader = KeyVersionHeader & PnpAuthHeader
 
 export type PnpQuotaRequestHeader = PnpAuthHeader
 
-export type GetContactMatchesRequestHeader = PnpAuthHeader
-
 export type PhoneNumberPrivacyRequestHeader<R extends PhoneNumberPrivacyRequest> = R extends
   | SignMessageRequest
   | LegacySignMessageRequest
   ? SignMessageRequestHeader
   : never | R extends PnpQuotaRequest
   ? PnpQuotaRequestHeader
-  : never | R extends GetContactMatchesRequest
-  ? GetContactMatchesRequestHeader
   : never
 
 export type OdisRequestHeader<R extends OdisRequest> = R extends DomainRequest

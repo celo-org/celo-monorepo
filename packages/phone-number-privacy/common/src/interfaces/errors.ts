@@ -37,8 +37,6 @@ export enum WarningMessage {
   INVALID_INPUT = `CELO_ODIS_WARN_01 BAD_INPUT Invalid input parameters`,
   UNAUTHENTICATED_USER = `CELO_ODIS_WARN_02 BAD_INPUT Missing or invalid authentication`,
   EXCEEDED_QUOTA = `CELO_ODIS_WARN_03 QUOTA Requester exceeded service query quota`,
-  UNVERIFIED_USER_ATTEMPT_TO_MATCHMAKE = `CELO_ODIS_WARN_04 QUOTA Unverified user attempting to matchmake`,
-  DUPLICATE_REQUEST_TO_MATCHMAKE = `CELO_ODIS_WARN_05 QUOTA Attempt to request >1 matchmaking`,
   DUPLICATE_REQUEST_TO_GET_PARTIAL_SIG = `CELO_ODIS_WARN_06 BAD_INPUT Attempt to replay partial signature request`,
   INCONSISTENT_SIGNER_BLOCK_NUMBERS = `CELO_ODIS_WARN_07 SIGNER Discrepancy found in signers latest block number that exceeds threshold`,
   INCONSISTENT_SIGNER_QUOTA_MEASUREMENTS = `CELO_ODIS_WARN_08 SIGNER Discrepancy found in signers quota measurements`,

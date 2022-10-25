@@ -11,12 +11,6 @@ export const combiner = functions
 
 // TODO(2.0.0, deployment) determine if we can delete these endpoints in favor of the above in a backwards compatible way. This will require testing e2e against a deployed service.
 /*
-export const getContactMatches = functions
-  .region('us-central1', 'europe-west3')
-  .runWith(config.cloudFunction)
-  .https.onRequest(async (req: functions.Request, res: functions.Response) => {
-    return meterResponse(handleGetContactMatches, req, res, Endpoint.MATCHMAKING)
-  })
 
 const pnpSignHandler = new Controller(
   new PnpSignAction(
