@@ -97,7 +97,7 @@ ___
 
 ###  extractSecurityCodeWithPrefix
 
-▸ **extractSecurityCodeWithPrefix**(`message`: string): *null | string*
+▸ **extractSecurityCodeWithPrefix**(`message`: string): *[extractSecurityCodeWithPrefix](_attestations_.md#extractsecuritycodewithprefix)*
 
 *Defined in [attestations.ts:66](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L66)*
 
@@ -107,13 +107,13 @@ Name | Type |
 ------ | ------ |
 `message` | string |
 
-**Returns:** *null | string*
+**Returns:** *[extractSecurityCodeWithPrefix](_attestations_.md#extractsecuritycodewithprefix)*
 
 ___
 
 ###  getAttestationMessageToSignFromIdentifier
 
-▸ **getAttestationMessageToSignFromIdentifier**(`identifier`: string, `account`: string): *string*
+▸ **getAttestationMessageToSignFromIdentifier**(`identifier`: string, `account`: string): *[getAttestationMessageToSignFromIdentifier](_attestations_.md#getattestationmessagetosignfromidentifier)*
 
 *Defined in [attestations.ts:33](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L33)*
 
@@ -124,13 +124,13 @@ Name | Type |
 `identifier` | string |
 `account` | string |
 
-**Returns:** *string*
+**Returns:** *[getAttestationMessageToSignFromIdentifier](_attestations_.md#getattestationmessagetosignfromidentifier)*
 
 ___
 
 ###  getAttestationMessageToSignFromPhoneNumber
 
-▸ **getAttestationMessageToSignFromPhoneNumber**(`phoneNumber`: string, `account`: string, `phoneSalt?`: undefined | string): *string*
+▸ **getAttestationMessageToSignFromPhoneNumber**(`phoneNumber`: string, `account`: string, `phoneSalt?`: undefined | string): *[getAttestationMessageToSignFromPhoneNumber](_attestations_.md#getattestationmessagetosignfromphonenumber)*
 
 *Defined in [attestations.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L41)*
 
@@ -142,13 +142,13 @@ Name | Type |
 `account` | string |
 `phoneSalt?` | undefined &#124; string |
 
-**Returns:** *string*
+**Returns:** *[getAttestationMessageToSignFromPhoneNumber](_attestations_.md#getattestationmessagetosignfromphonenumber)*
 
 ___
 
 ###  hashIdentifier
 
-▸ **hashIdentifier**(`identifier`: string, `type`: [IdentifierType](_attestations_.md#identifiertype), `salt?`: undefined | string): *string*
+▸ **hashIdentifier**(`identifier`: string, `type`: [IdentifierType](_attestations_.md#identifiertype), `salt?`: undefined | string): *[hashIdentifier](_attestations_.md#hashidentifier)*
 
 *Defined in [attestations.ts:29](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/attestations.ts#L29)*
 
@@ -160,7 +160,7 @@ Name | Type |
 `type` | [IdentifierType](_attestations_.md#identifiertype) |
 `salt?` | undefined &#124; string |
 
-**Returns:** *string*
+**Returns:** *[hashIdentifier](_attestations_.md#hashidentifier)*
 
 ## Object literals
 

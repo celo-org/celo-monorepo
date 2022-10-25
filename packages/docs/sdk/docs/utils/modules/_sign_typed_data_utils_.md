@@ -55,7 +55,7 @@ ___
 
 Ƭ **EIP712Optional**: *object*
 
-*Defined in [sign-typed-data-utils.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L70)*
+*Defined in [sign-typed-data-utils.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L72)*
 
 Utility type representing an optional value in a EIP-712 compatible manner, as long as the
 concrete type T is a subtype of EIP712ObjectValue.
@@ -76,7 +76,9 @@ concrete type T is a subtype of EIP712ObjectValue.
   'bytes1',
   'bytes32',
   'uint8',
+  'uint64',
   'uint256',
+  // This list should technically include all types from uint8 to uint256, and int8 to int256
   'int8',
   'int256',
   'bool',
@@ -93,7 +95,7 @@ ___
 
 • **EIP712_BUILTIN_TYPES**: *string[]* = EIP712_ATOMIC_TYPES.concat(EIP712_DYNAMIC_TYPES)
 
-*Defined in [sign-typed-data-utils.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L55)*
+*Defined in [sign-typed-data-utils.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L57)*
 
 ___
 
@@ -101,7 +103,7 @@ ___
 
 • **EIP712_DYNAMIC_TYPES**: *string[]* = ['bytes', 'string']
 
-*Defined in [sign-typed-data-utils.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L53)*
+*Defined in [sign-typed-data-utils.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L55)*
 
 ## Functions
 
@@ -109,7 +111,7 @@ ___
 
 ▸ **defined**<**T**>(`value`: T): *[EIP712Optional](_sign_typed_data_utils_.md#eip712optional)‹T›*
 
-*Defined in [sign-typed-data-utils.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L98)*
+*Defined in [sign-typed-data-utils.ts:100](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L100)*
 
 Utility to construct an defined EIP712Optional value with inferred type.
 
@@ -131,7 +133,7 @@ ___
 
 ▸ **eip712OptionalSchema**<**S**>(`schema`: S): *TypeC‹object›*
 
-*Defined in [sign-typed-data-utils.ts:91](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L91)*
+*Defined in [sign-typed-data-utils.ts:93](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L93)*
 
 Utility to build EIP712Optional<T> schemas for encoding and decoding with io-ts.
 
@@ -153,7 +155,7 @@ ___
 
 ▸ **eip712OptionalType**(`typeName`: string): *[EIP712Types](../interfaces/_sign_typed_data_utils_.eip712types.md)*
 
-*Defined in [sign-typed-data-utils.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L80)*
+*Defined in [sign-typed-data-utils.ts:82](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L82)*
 
 Utility to build EIP712Optional<T> types to insert in EIP-712 type arrays.
 
@@ -171,7 +173,7 @@ ___
 
 ▸ **encodeData**(`primaryType`: string, `data`: [EIP712Object](../interfaces/_sign_typed_data_utils_.eip712object.md), `types`: [EIP712Types](../interfaces/_sign_typed_data_utils_.eip712types.md)): *Buffer*
 
-*Defined in [sign-typed-data-utils.ts:239](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L239)*
+*Defined in [sign-typed-data-utils.ts:241](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L241)*
 
 Constructs the struct encoding of the data as the primary type.
 
@@ -191,7 +193,7 @@ ___
 
 ▸ **encodeType**(`primaryType`: string, `types`: [EIP712Types](../interfaces/_sign_typed_data_utils_.eip712types.md)): *string*
 
-*Defined in [sign-typed-data-utils.ts:172](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L172)*
+*Defined in [sign-typed-data-utils.ts:174](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L174)*
 
 Creates a string encoding of the primary type, including all dependencies.
 E.g. "Transaction(Person from,Person to,Asset tx)Asset(address token,uint256 amount)Person(address wallet,string name)"
@@ -211,7 +213,7 @@ ___
 
 ▸ **generateTypedDataHash**(`typedData`: [EIP712TypedData](../interfaces/_sign_typed_data_utils_.eip712typeddata.md)): *Buffer*
 
-*Defined in [sign-typed-data-utils.ts:126](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L126)*
+*Defined in [sign-typed-data-utils.ts:128](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L128)*
 
 Generates the EIP712 Typed Data hash for signing
 
@@ -231,7 +233,7 @@ ___
 
 ▸ **structHash**(`primaryType`: string, `data`: [EIP712Object](../interfaces/_sign_typed_data_utils_.eip712object.md), `types`: [EIP712Types](../interfaces/_sign_typed_data_utils_.eip712types.md)): *Buffer*
 
-*Defined in [sign-typed-data-utils.ts:248](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L248)*
+*Defined in [sign-typed-data-utils.ts:250](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L250)*
 
 **Parameters:**
 
@@ -249,7 +251,7 @@ ___
 
 ▸ **typeHash**(`primaryType`: string, `types`: [EIP712Types](../interfaces/_sign_typed_data_utils_.eip712types.md)): *Buffer*
 
-*Defined in [sign-typed-data-utils.ts:183](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L183)*
+*Defined in [sign-typed-data-utils.ts:185](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L185)*
 
 **Parameters:**
 
@@ -266,7 +268,7 @@ ___
 
 ▸ **zeroValue**(`primaryType`: string, `types`: [EIP712Types](../interfaces/_sign_typed_data_utils_.eip712types.md)): *[EIP712ObjectValue](_sign_typed_data_utils_.md#eip712objectvalue)*
 
-*Defined in [sign-typed-data-utils.ts:264](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L264)*
+*Defined in [sign-typed-data-utils.ts:266](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L266)*
 
 Produce the zero value for a given type.
 
@@ -292,7 +294,7 @@ Name | Type | Default |
 
 ### ▪ **noBool**: *object*
 
-*Defined in [sign-typed-data-utils.ts:104](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L104)*
+*Defined in [sign-typed-data-utils.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L106)*
 
 Undefined EIP712Optional type with value type boolean.
 
@@ -300,13 +302,13 @@ Undefined EIP712Optional type with value type boolean.
 
 • **defined**: *false* = false
 
-*Defined in [sign-typed-data-utils.ts:105](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L105)*
+*Defined in [sign-typed-data-utils.ts:107](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L107)*
 
 ###  value
 
 • **value**: *false* = false
 
-*Defined in [sign-typed-data-utils.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L106)*
+*Defined in [sign-typed-data-utils.ts:108](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L108)*
 
 ___
 
@@ -314,7 +316,7 @@ ___
 
 ### ▪ **noNumber**: *object*
 
-*Defined in [sign-typed-data-utils.ts:110](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L110)*
+*Defined in [sign-typed-data-utils.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L112)*
 
 Undefined EIP712Optional type with value type number.
 
@@ -322,13 +324,13 @@ Undefined EIP712Optional type with value type number.
 
 • **defined**: *false* = false
 
-*Defined in [sign-typed-data-utils.ts:111](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L111)*
+*Defined in [sign-typed-data-utils.ts:113](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L113)*
 
 ###  value
 
 • **value**: *number* = 0
 
-*Defined in [sign-typed-data-utils.ts:112](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L112)*
+*Defined in [sign-typed-data-utils.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L114)*
 
 ___
 
@@ -336,7 +338,7 @@ ___
 
 ### ▪ **noString**: *object*
 
-*Defined in [sign-typed-data-utils.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L116)*
+*Defined in [sign-typed-data-utils.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L118)*
 
 Undefined EIP712Optional type with value type string.
 
@@ -344,10 +346,10 @@ Undefined EIP712Optional type with value type string.
 
 • **defined**: *false* = false
 
-*Defined in [sign-typed-data-utils.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L117)*
+*Defined in [sign-typed-data-utils.ts:119](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L119)*
 
 ###  value
 
 • **value**: *string* = ""
 
-*Defined in [sign-typed-data-utils.ts:118](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L118)*
+*Defined in [sign-typed-data-utils.ts:120](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/sign-typed-data-utils.ts#L120)*

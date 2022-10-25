@@ -19,7 +19,7 @@
 
 • **callDetails**: *[CallDetails](_block_explorer_.calldetails.md)*
 
-*Defined in [block-explorer.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L24)*
+*Defined in [block-explorer.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L31)*
 
 ___
 
@@ -27,4 +27,4 @@ ___
 
 • **tx**: *CeloTxPending*
 
-*Defined in [block-explorer.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L25)*
+*Defined in [block-explorer.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/block-explorer.ts#L32)*

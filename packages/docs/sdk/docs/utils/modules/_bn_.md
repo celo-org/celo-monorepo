@@ -12,7 +12,7 @@
 
 ###  compareBN
 
-▸ **compareBN**(`a`: BN, `b`: BN): *0 | 1 | -1*
+▸ **compareBN**(`a`: BN, `b`: BN): *[compareBN](_bn_.md#comparebn)*
 
 *Defined in [bn.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/bn.ts#L3)*
 
@@ -23,4 +23,4 @@ Name | Type |
 `a` | BN |
 `b` | BN |
 
-**Returns:** *0 | 1 | -1*
+**Returns:** *[compareBN](_bn_.md#comparebn)*

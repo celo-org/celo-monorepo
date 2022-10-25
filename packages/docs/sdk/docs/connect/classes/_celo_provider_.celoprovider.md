@@ -41,7 +41,7 @@
 
 \+ **new CeloProvider**(`existingProvider`: [Provider](../interfaces/_types_.provider.md), `connection`: [Connection](_connection_.connection.md)): *[CeloProvider](_celo_provider_.celoprovider.md)*
 
-*Defined in [celo-provider.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L40)*
+*Defined in [celo-provider.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L44)*
 
 **Parameters:**
 
@@ -58,7 +58,7 @@ Name | Type |
 
 • **connection**: *[Connection](_connection_.connection.md)*
 
-*Defined in [celo-provider.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L42)*
+*Defined in [celo-provider.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L46)*
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 • **existingProvider**: *[Provider](../interfaces/_types_.provider.md)*
 
-*Defined in [celo-provider.ts:42](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L42)*
+*Defined in [celo-provider.ts:46](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L46)*
 
 ## Accessors
 
@@ -74,7 +74,7 @@ ___
 
 • **get connected**(): *any*
 
-*Defined in [celo-provider.ts:245](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L245)*
+*Defined in [celo-provider.ts:253](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L253)*
 
 **Returns:** *any*
 
@@ -84,7 +84,7 @@ ___
 
 ▸ **addAccount**(`privateKey`: string): *void*
 
-*Defined in [celo-provider.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L47)*
+*Defined in [celo-provider.ts:51](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L51)*
 
 **Parameters:**
 
@@ -100,7 +100,7 @@ ___
 
 ▸ **getAccounts**(): *Promise‹string[]›*
 
-*Defined in [celo-provider.ts:57](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L57)*
+*Defined in [celo-provider.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L61)*
 
 **Returns:** *Promise‹string[]›*
 
@@ -110,7 +110,7 @@ ___
 
 ▸ **isLocalAccount**(`address?`: undefined | string): *boolean*
 
-*Defined in [celo-provider.ts:61](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L61)*
+*Defined in [celo-provider.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L65)*
 
 **Parameters:**
 
@@ -126,7 +126,7 @@ ___
 
 ▸ **removeAccount**(`address`: string): *void*
 
-*Defined in [celo-provider.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L52)*
+*Defined in [celo-provider.ts:56](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L56)*
 
 **Parameters:**
 
@@ -144,7 +144,7 @@ ___
 
 *Implementation of [Provider](../interfaces/_types_.provider.md)*
 
-*Defined in [celo-provider.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L68)*
+*Defined in [celo-provider.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L72)*
 
 Send method as expected by web3.js
 
@@ -163,7 +163,7 @@ ___
 
 ▸ **stop**(): *void*
 
-*Defined in [celo-provider.ts:143](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L143)*
+*Defined in [celo-provider.ts:151](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L151)*
 
 **Returns:** *void*
 
@@ -173,6 +173,6 @@ ___
 
 ▸ **supportsSubscriptions**(): *any*
 
-*Defined in [celo-provider.ts:249](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L249)*
+*Defined in [celo-provider.ts:257](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/celo-provider.ts#L257)*
 
 **Returns:** *any*

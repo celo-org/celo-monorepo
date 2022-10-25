@@ -18,4 +18,4 @@
 
 Ƭ **AccountsWrapperType**: *[AccountsWrapper](../classes/_wrappers_accounts_.accountswrapper.md)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:474](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L474)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:509](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L509)*

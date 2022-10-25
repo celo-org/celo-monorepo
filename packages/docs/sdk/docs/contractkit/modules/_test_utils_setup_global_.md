@@ -12,8 +12,8 @@
 
 ###  globalSetup
 
-▸ **globalSetup**(): *Promise‹void›*
+▸ **globalSetup**(): *[globalSetup](_test_utils_setup_global_.md#globalsetup)*
 
 *Defined in [packages/sdk/contractkit/src/test-utils/setup.global.ts:12](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/test-utils/setup.global.ts#L12)*
 
-**Returns:** *Promise‹void›*
+**Returns:** *[globalSetup](_test_utils_setup_global_.md#globalsetup)*

@@ -20,7 +20,7 @@
 
 ▸ **write**(`_data`: Buffer, `_dataPath`: string): *Promise‹void›*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L7)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L6)*
 
 **Parameters:**
 

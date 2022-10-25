@@ -38,11 +38,17 @@
 
   ↳ [EscrowWrapper](_wrappers_escrow_.escrowwrapper.md)
 
+  ↳ [FederatedAttestationsWrapper](_wrappers_federatedattestations_.federatedattestationswrapper.md)
+
   ↳ [FreezerWrapper](_wrappers_freezer_.freezerwrapper.md)
 
   ↳ [MetaTransactionWalletWrapper](_wrappers_metatransactionwallet_.metatransactionwalletwrapper.md)
 
   ↳ [MetaTransactionWalletDeployerWrapper](_wrappers_metatransactionwalletdeployer_.metatransactionwalletdeployerwrapper.md)
+
+  ↳ [OdisPaymentsWrapper](_wrappers_odispayments_.odispaymentswrapper.md)
+
+  ↳ [StableTokenRegistryWrapper](_wrappers_stabletokenregistry_.stabletokenregistrywrapper.md)
 
 ## Index
 

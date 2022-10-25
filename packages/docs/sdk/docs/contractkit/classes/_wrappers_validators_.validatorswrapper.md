@@ -700,7 +700,7 @@ ___
 
 ▸ **currentSignerSet**(): *Promise‹Address[]›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:628](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L628)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:635](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L635)*
 
 Returns the current set of validator signer addresses
 
@@ -712,7 +712,7 @@ ___
 
 ▸ **currentValidatorAccountsSet**(): *Promise‹object[]›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:638](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L638)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:645](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L645)*
 
 Returns the current set of validator signer and account addresses
 
@@ -760,7 +760,7 @@ ___
 
 ▸ **findValidatorMembershipHistoryIndex**(`epoch`: number, `history`: [GroupMembership](../interfaces/_wrappers_validators_.groupmembership.md)[]): *number*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:671](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L671)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:678](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L678)*
 
 Returns the index into `history` for `epoch`.
 
@@ -1002,7 +1002,7 @@ ___
 
 ▸ **getValidatorMembershipHistoryIndex**(`account`: Address, `blockNumber?`: undefined | number): *Promise‹object›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:652](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L652)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:659](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L659)*
 
 Returns the group membership for validator account.
 
@@ -1021,7 +1021,7 @@ ___
 
 ###  getValidatorRewards
 
-▸ **getValidatorRewards**(`epochNumber`: number): *Promise‹[ValidatorReward](../interfaces/_wrappers_validators_.validatorreward.md)[]›*
+▸ **getValidatorRewards**(`epochNumber`: number, `useBlockNumber?`: undefined | false | true): *Promise‹[ValidatorReward](../interfaces/_wrappers_validators_.validatorreward.md)[]›*
 
 *Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:602](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L602)*
 
@@ -1032,6 +1032,7 @@ Retrieves ValidatorRewards for epochNumber.
 Name | Type | Description |
 ------ | ------ | ------ |
 `epochNumber` | number | The epoch to retrieve ValidatorRewards at.  |
+`useBlockNumber?` | undefined &#124; false &#124; true | - |
 
 **Returns:** *Promise‹[ValidatorReward](../interfaces/_wrappers_validators_.validatorreward.md)[]›*
 

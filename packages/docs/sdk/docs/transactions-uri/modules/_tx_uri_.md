@@ -14,7 +14,7 @@
 
 ###  QrFromUri
 
-▸ **QrFromUri**(`uri`: string, `type`: "svg" | "terminal" | "utf8"): *Promise‹string›*
+▸ **QrFromUri**(`uri`: string, `type`: "svg" | "terminal" | "utf8"): *[QrFromUri](_tx_uri_.md#qrfromuri)*
 
 *Defined in [tx-uri.ts:114](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/transactions-uri/src/tx-uri.ts#L114)*
 
@@ -25,7 +25,7 @@ Name | Type |
 `uri` | string |
 `type` | "svg" &#124; "terminal" &#124; "utf8" |
 
-**Returns:** *Promise‹string›*
+**Returns:** *[QrFromUri](_tx_uri_.md#qrfromuri)*
 
 ___
 

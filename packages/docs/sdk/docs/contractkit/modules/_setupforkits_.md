@@ -24,7 +24,7 @@
 
 Ƭ **HttpProviderOptions**: *Web3HttpProviderOptions*
 
-*Defined in [packages/sdk/contractkit/src/setupForKits.ts:4](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/setupForKits.ts#L4)*
+*Defined in [packages/sdk/contractkit/src/setupForKits.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/setupForKits.ts#L3)*
 
 ## Variables
 
@@ -32,15 +32,15 @@
 
 • **API_KEY_HEADER_KEY**: *"apiKey"* = "apiKey"
 
-*Defined in [packages/sdk/contractkit/src/setupForKits.ts:6](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/setupForKits.ts#L6)*
+*Defined in [packages/sdk/contractkit/src/setupForKits.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/setupForKits.ts#L5)*
 
 ## Functions
 
 ###  ensureCurrentProvider
 
-▸ **ensureCurrentProvider**(`web3`: Web3): *void*
+▸ **ensureCurrentProvider**(`web3`: Web3): *[ensureCurrentProvider](_setupforkits_.md#ensurecurrentprovider)*
 
-*Defined in [packages/sdk/contractkit/src/setupForKits.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/setupForKits.ts#L19)*
+*Defined in [packages/sdk/contractkit/src/setupForKits.ts:18](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/setupForKits.ts#L18)*
 
 **`internal`** 
 
@@ -50,15 +50,15 @@ Name | Type |
 ------ | ------ |
 `web3` | Web3 |
 
-**Returns:** *void*
+**Returns:** *[ensureCurrentProvider](_setupforkits_.md#ensurecurrentprovider)*
 
 ___
 
 ###  getWeb3ForKit
 
-▸ **getWeb3ForKit**(`url`: string, `options`: Web3HttpProviderOptions | undefined): *Web3‹›*
+▸ **getWeb3ForKit**(`url`: string, `options`: Web3HttpProviderOptions | undefined): *[getWeb3ForKit](_setupforkits_.md#getweb3forkit)*
 
-*Defined in [packages/sdk/contractkit/src/setupForKits.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/setupForKits.ts#L25)*
+*Defined in [packages/sdk/contractkit/src/setupForKits.ts:24](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/setupForKits.ts#L24)*
 
 **`internal`** 
 
@@ -69,15 +69,15 @@ Name | Type |
 `url` | string |
 `options` | Web3HttpProviderOptions &#124; undefined |
 
-**Returns:** *Web3‹›*
+**Returns:** *[getWeb3ForKit](_setupforkits_.md#getweb3forkit)*
 
 ___
 
 ###  setupAPIKey
 
-▸ **setupAPIKey**(`apiKey`: string): *HttpProviderOptions*
+▸ **setupAPIKey**(`apiKey`: string): *[setupAPIKey](_setupforkits_.md#setupapikey)*
 
-*Defined in [packages/sdk/contractkit/src/setupForKits.ts:9](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/setupForKits.ts#L9)*
+*Defined in [packages/sdk/contractkit/src/setupForKits.ts:8](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/setupForKits.ts#L8)*
 
 **`internal`** 
 
@@ -87,4 +87,4 @@ Name | Type |
 ------ | ------ |
 `apiKey` | string |
 
-**Returns:** *HttpProviderOptions*
+**Returns:** *[setupAPIKey](_setupforkits_.md#setupapikey)*

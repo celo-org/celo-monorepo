@@ -31,7 +31,7 @@
 
 *Overrides [LocalStorageWriter](_offchain_storage_writers_.localstoragewriter.md).[constructor](_offchain_storage_writers_.localstoragewriter.md#constructor)*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L38)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L37)*
 
 **Parameters:**
 
@@ -48,7 +48,7 @@ Name | Type |
 
 • **local**: *string*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L40)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:39](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L39)*
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 *Inherited from [LocalStorageWriter](_offchain_storage_writers_.localstoragewriter.md).[root](_offchain_storage_writers_.localstoragewriter.md#readonly-root)*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L11)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L10)*
 
 ## Methods
 
@@ -68,7 +68,7 @@ ___
 
 *Overrides [LocalStorageWriter](_offchain_storage_writers_.localstoragewriter.md).[write](_offchain_storage_writers_.localstoragewriter.md#write)*
 
-*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L45)*
+*Defined in [packages/sdk/identity/src/offchain/storage-writers.ts:44](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/storage-writers.ts#L44)*
 
 **Parameters:**
 

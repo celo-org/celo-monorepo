@@ -83,7 +83,7 @@ ___
 
 ###  addressToPublicKey
 
-▸ **addressToPublicKey**(`signer`: string, `signFn`: function): *Promise‹string›*
+▸ **addressToPublicKey**(`signer`: string, `signFn`: function): *[addressToPublicKey](_signatureutils_.md#addresstopublickey)*
 
 *Defined in [signatureUtils.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L35)*
 
@@ -102,7 +102,7 @@ Name | Type |
 `message` | string |
 `signer` | string |
 
-**Returns:** *Promise‹string›*
+**Returns:** *[addressToPublicKey](_signatureutils_.md#addresstopublickey)*
 
 ___
 
@@ -157,7 +157,7 @@ ___
 
 ###  parseSignature
 
-▸ **parseSignature**(`message`: string, `signature`: string, `signer`: string): *object*
+▸ **parseSignature**(`message`: string, `signature`: string, `signer`: string): *[parseSignature](_signatureutils_.md#parsesignature)*
 
 *Defined in [signatureUtils.ts:115](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L115)*
 
@@ -169,19 +169,13 @@ Name | Type |
 `signature` | string |
 `signer` | string |
 
-**Returns:** *object*
-
-* **r**: *string*
-
-* **s**: *string*
-
-* **v**: *number*
+**Returns:** *[parseSignature](_signatureutils_.md#parsesignature)*
 
 ___
 
 ###  parseSignatureWithoutPrefix
 
-▸ **parseSignatureWithoutPrefix**(`messageHash`: string, `signature`: string, `signer`: string): *object*
+▸ **parseSignatureWithoutPrefix**(`messageHash`: string, `signature`: string, `signer`: string): *[parseSignatureWithoutPrefix](_signatureutils_.md#parsesignaturewithoutprefix)*
 
 *Defined in [signatureUtils.ts:119](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L119)*
 
@@ -193,13 +187,7 @@ Name | Type |
 `signature` | string |
 `signer` | string |
 
-**Returns:** *object*
-
-* **r**: *string*
-
-* **s**: *string*
-
-* **v**: *number*
+**Returns:** *[parseSignatureWithoutPrefix](_signatureutils_.md#parsesignaturewithoutprefix)*
 
 ___
 
@@ -247,7 +235,7 @@ ___
 
 ###  signMessage
 
-▸ **signMessage**(`message`: string, `privateKey`: string, `address`: string): *object*
+▸ **signMessage**(`message`: string, `privateKey`: string, `address`: string): *[signMessage](_signatureutils_.md#signmessage)*
 
 *Defined in [signatureUtils.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L80)*
 
@@ -259,19 +247,13 @@ Name | Type |
 `privateKey` | string |
 `address` | string |
 
-**Returns:** *object*
-
-* **r**: *any* = ethjsutil.bufferToHex(r)
-
-* **s**: *any* = ethjsutil.bufferToHex(s)
-
-* **v**: *any*
+**Returns:** *[signMessage](_signatureutils_.md#signmessage)*
 
 ___
 
 ###  signMessageWithoutPrefix
 
-▸ **signMessageWithoutPrefix**(`messageHash`: string, `privateKey`: string, `address`: string): *object*
+▸ **signMessageWithoutPrefix**(`messageHash`: string, `privateKey`: string, `address`: string): *[signMessageWithoutPrefix](_signatureutils_.md#signmessagewithoutprefix)*
 
 *Defined in [signatureUtils.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L88)*
 
@@ -283,19 +265,13 @@ Name | Type |
 `privateKey` | string |
 `address` | string |
 
-**Returns:** *object*
-
-* **r**: *any* = ethjsutil.bufferToHex(r)
-
-* **s**: *any* = ethjsutil.bufferToHex(s)
-
-* **v**: *any*
+**Returns:** *[signMessageWithoutPrefix](_signatureutils_.md#signmessagewithoutprefix)*
 
 ___
 
 ###  signedMessageToPublicKey
 
-▸ **signedMessageToPublicKey**(`message`: string, `v`: number, `r`: string, `s`: string): *string*
+▸ **signedMessageToPublicKey**(`message`: string, `v`: number, `r`: string, `s`: string): *[signedMessageToPublicKey](_signatureutils_.md#signedmessagetopublickey)*
 
 *Defined in [signatureUtils.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L70)*
 
@@ -308,13 +284,13 @@ Name | Type |
 `r` | string |
 `s` | string |
 
-**Returns:** *string*
+**Returns:** *[signedMessageToPublicKey](_signatureutils_.md#signedmessagetopublickey)*
 
 ___
 
 ###  verifyEIP712TypedDataSigner
 
-▸ **verifyEIP712TypedDataSigner**(`typedData`: [EIP712TypedData](../interfaces/_sign_typed_data_utils_.eip712typeddata.md), `signature`: string, `signer`: string): *boolean*
+▸ **verifyEIP712TypedDataSigner**(`typedData`: [EIP712TypedData](../interfaces/_sign_typed_data_utils_.eip712typeddata.md), `signature`: string, `signer`: string): *[verifyEIP712TypedDataSigner](_signatureutils_.md#verifyeip712typeddatasigner)*
 
 *Defined in [signatureUtils.ts:186](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L186)*
 
@@ -326,7 +302,7 @@ Name | Type | Description |
 `signature` | string | VRS or SRV signature of `typedData` by `signer` |
 `signer` | string | address to verify signed the `typedData` |
 
-**Returns:** *boolean*
+**Returns:** *[verifyEIP712TypedDataSigner](_signatureutils_.md#verifyeip712typeddatasigner)*
 
 boolean, true if `signer` is a possible signer of `signature`
 
@@ -334,7 +310,7 @@ ___
 
 ###  verifySignature
 
-▸ **verifySignature**(`message`: string, `signature`: string, `signer`: string): *boolean*
+▸ **verifySignature**(`message`: string, `signature`: string, `signer`: string): *[verifySignature](_signatureutils_.md#verifysignature)*
 
 *Defined in [signatureUtils.ts:106](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/signatureUtils.ts#L106)*
 
@@ -346,7 +322,7 @@ Name | Type |
 `signature` | string |
 `signer` | string |
 
-**Returns:** *boolean*
+**Returns:** *[verifySignature](_signatureutils_.md#verifysignature)*
 
 ## Object literals
 

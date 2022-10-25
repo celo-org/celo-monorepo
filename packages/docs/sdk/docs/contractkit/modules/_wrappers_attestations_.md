@@ -52,7 +52,7 @@ ___
 
 ###  getSecurityCodePrefix
 
-▸ **getSecurityCodePrefix**(`issuerAddress`: Address): *string*
+▸ **getSecurityCodePrefix**(`issuerAddress`: Address): *[getSecurityCodePrefix](_wrappers_attestations_.md#getsecuritycodeprefix)*
 
 *Defined in [packages/sdk/contractkit/src/wrappers/Attestations.ts:30](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Attestations.ts#L30)*
 
@@ -62,4 +62,4 @@ Name | Type |
 ------ | ------ |
 `issuerAddress` | Address |
 
-**Returns:** *string*
+**Returns:** *[getSecurityCodePrefix](_wrappers_attestations_.md#getsecuritycodeprefix)*

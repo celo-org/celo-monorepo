@@ -18,4 +18,4 @@
 
 Ƭ **ValidWrappers**: *keyof CFType | keyof RegistryType | keyof WrapperFactoriesWhichNeedCacheType*
 
-*Defined in [packages/sdk/contractkit/src/contract-cache.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L74)*
+*Defined in [packages/sdk/contractkit/src/contract-cache.ts:80](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/contract-cache.ts#L80)*

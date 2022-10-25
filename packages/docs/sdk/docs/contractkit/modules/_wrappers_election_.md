@@ -28,4 +28,4 @@
 
 Ƭ **ElectionWrapperType**: *[ElectionWrapper](../classes/_wrappers_election_.electionwrapper.md)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:545](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L545)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:573](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L573)*

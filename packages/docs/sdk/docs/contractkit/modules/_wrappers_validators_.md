@@ -28,4 +28,4 @@
 
 Ƭ **ValidatorsWrapperType**: *[ValidatorsWrapper](../classes/_wrappers_validators_.validatorswrapper.md)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:680](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L680)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Validators.ts:687](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Validators.ts#L687)*

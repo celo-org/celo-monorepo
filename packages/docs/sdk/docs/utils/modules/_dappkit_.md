@@ -186,7 +186,7 @@ ___
 
 ###  produceResponseDeeplink
 
-▸ **produceResponseDeeplink**(`request`: [DappKitRequest](_dappkit_.md#dappkitrequest), `response`: [DappKitResponse](_dappkit_.md#dappkitresponse)): *string*
+▸ **produceResponseDeeplink**(`request`: [DappKitRequest](_dappkit_.md#dappkitrequest), `response`: [DappKitResponse](_dappkit_.md#dappkitresponse)): *[produceResponseDeeplink](_dappkit_.md#produceresponsedeeplink)*
 
 *Defined in [dappkit.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L85)*
 
@@ -197,13 +197,13 @@ Name | Type |
 `request` | [DappKitRequest](_dappkit_.md#dappkitrequest) |
 `response` | [DappKitResponse](_dappkit_.md#dappkitresponse) |
 
-**Returns:** *string*
+**Returns:** *[produceResponseDeeplink](_dappkit_.md#produceresponsedeeplink)*
 
 ___
 
 ###  serializeDappKitRequestDeeplink
 
-▸ **serializeDappKitRequestDeeplink**(`request`: [DappKitRequest](_dappkit_.md#dappkitrequest)): *string*
+▸ **serializeDappKitRequestDeeplink**(`request`: [DappKitRequest](_dappkit_.md#dappkitrequest)): *[serializeDappKitRequestDeeplink](_dappkit_.md#serializedappkitrequestdeeplink)*
 
 *Defined in [dappkit.ts:148](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/dappkit.ts#L148)*
 
@@ -213,4 +213,4 @@ Name | Type |
 ------ | ------ |
 `request` | [DappKitRequest](_dappkit_.md#dappkitrequest) |
 
-**Returns:** *string*
+**Returns:** *[serializeDappKitRequestDeeplink](_dappkit_.md#serializedappkitrequestdeeplink)*

@@ -307,7 +307,7 @@ ___
 
 ###  secondsToDurationString
 
-▸ **secondsToDurationString**(`durationSeconds`: BigNumber.Value, `outputUnits`: TimeUnit[]): *string*
+▸ **secondsToDurationString**(`durationSeconds`: BigNumber.Value, `outputUnits`: TimeUnit[]): *[secondsToDurationString](_wrappers_basewrapper_.md#secondstodurationstring)*
 
 *Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:116](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L116)*
 
@@ -318,7 +318,7 @@ Name | Type | Default |
 `durationSeconds` | BigNumber.Value | - |
 `outputUnits` | TimeUnit[] | ['year', 'month', 'week', 'day', 'hour', 'minute', 'second'] |
 
-**Returns:** *string*
+**Returns:** *[secondsToDurationString](_wrappers_basewrapper_.md#secondstodurationstring)*
 
 ___
 

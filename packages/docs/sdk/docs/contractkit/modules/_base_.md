@@ -32,7 +32,7 @@
 
 Ƭ **CeloToken**: *[CeloTokenContract](_base_.md#celotokencontract)*
 
-*Defined in [packages/sdk/contractkit/src/base.ts:50](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L50)*
+*Defined in [packages/sdk/contractkit/src/base.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L53)*
 
 Deprecated alias for CeloTokenContract.
 
@@ -44,7 +44,7 @@ ___
 
 Ƭ **CeloTokenContract**: *[StableTokenContract](_base_.md#stabletokencontract) | [GoldToken](../enums/_base_.celocontract.md#goldtoken)*
 
-*Defined in [packages/sdk/contractkit/src/base.ts:45](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L45)*
+*Defined in [packages/sdk/contractkit/src/base.ts:48](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L48)*
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 Ƭ **ExchangeContract**: *[Exchange](../enums/_base_.celocontract.md#exchange) | [ExchangeEUR](../enums/_base_.celocontract.md#exchangeeur) | [ExchangeBRL](../enums/_base_.celocontract.md#exchangebrl)*
 
-*Defined in [packages/sdk/contractkit/src/base.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L40)*
+*Defined in [packages/sdk/contractkit/src/base.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L43)*
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 Ƭ **StableTokenContract**: *[StableToken](../enums/_base_.celocontract.md#stabletoken) | [StableTokenEUR](../enums/_base_.celocontract.md#stabletokeneur) | [StableTokenBRL](../enums/_base_.celocontract.md#stabletokenbrl)*
 
-*Defined in [packages/sdk/contractkit/src/base.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L35)*
+*Defined in [packages/sdk/contractkit/src/base.ts:38](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L38)*
 
 ## Variables
 
@@ -68,7 +68,7 @@ ___
 
 • **AllContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = Object.keys(CeloContract) as CeloContract[]
 
-*Defined in [packages/sdk/contractkit/src/base.ts:52](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L52)*
+*Defined in [packages/sdk/contractkit/src/base.ts:55](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L55)*
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 • **ProxyContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = AllContracts.map((c) => suffixProxy(c))
 
-*Defined in [packages/sdk/contractkit/src/base.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L68)*
+*Defined in [packages/sdk/contractkit/src/base.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L71)*
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 • **RegisteredContracts**: *[CeloContract](../enums/_base_.celocontract.md)[]* = AllContracts.filter((v) => !AuxiliaryContracts.includes(v))
 
-*Defined in [packages/sdk/contractkit/src/base.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L59)*
+*Defined in [packages/sdk/contractkit/src/base.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L62)*
 
 ## Functions
 
@@ -92,7 +92,7 @@ ___
 
 ▸ **stripProxy**(`contract`: [CeloContract](../enums/_base_.celocontract.md)): *[CeloContract](../enums/_base_.celocontract.md)*
 
-*Defined in [packages/sdk/contractkit/src/base.ts:62](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L62)*
+*Defined in [packages/sdk/contractkit/src/base.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L65)*
 
 **`internal`** 
 
@@ -110,7 +110,7 @@ ___
 
 ▸ **suffixProxy**(`contract`: [CeloContract](../enums/_base_.celocontract.md)): *[CeloContract](../enums/_base_.celocontract.md)*
 
-*Defined in [packages/sdk/contractkit/src/base.ts:65](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L65)*
+*Defined in [packages/sdk/contractkit/src/base.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/base.ts#L68)*
 
 **`internal`** 
 

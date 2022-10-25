@@ -83,7 +83,7 @@ ___
 
 ###  getServiceContext
 
-▸ **getServiceContext**(`contextName`: string): *[ServiceContext](../interfaces/_odis_query_.servicecontext.md)*
+▸ **getServiceContext**(`contextName`: string): *[getServiceContext](_odis_query_.md#getservicecontext)*
 
 *Defined in [packages/sdk/identity/src/odis/query.ts:86](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L86)*
 
@@ -93,7 +93,7 @@ Name | Type | Default |
 ------ | ------ | ------ |
 `contextName` | string | "mainnet" |
 
-**Returns:** *[ServiceContext](../interfaces/_odis_query_.servicecontext.md)*
+**Returns:** *[getServiceContext](_odis_query_.md#getservicecontext)*
 
 ___
 
@@ -149,7 +149,7 @@ ___
 
 ###  signWithDEK
 
-▸ **signWithDEK**(`msg`: string, `signer`: [EncryptionKeySigner](../interfaces/_odis_query_.encryptionkeysigner.md)): *string*
+▸ **signWithDEK**(`msg`: string, `signer`: [EncryptionKeySigner](../interfaces/_odis_query_.encryptionkeysigner.md)): *[signWithDEK](_odis_query_.md#signwithdek)*
 
 *Defined in [packages/sdk/identity/src/odis/query.ts:97](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L97)*
 
@@ -160,13 +160,13 @@ Name | Type |
 `msg` | string |
 `signer` | [EncryptionKeySigner](../interfaces/_odis_query_.encryptionkeysigner.md) |
 
-**Returns:** *string*
+**Returns:** *[signWithDEK](_odis_query_.md#signwithdek)*
 
 ___
 
 ###  signWithRawKey
 
-▸ **signWithRawKey**(`msg`: string, `rawKey`: string): *string*
+▸ **signWithRawKey**(`msg`: string, `rawKey`: string): *[signWithRawKey](_odis_query_.md#signwithrawkey)*
 
 *Defined in [packages/sdk/identity/src/odis/query.ts:101](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/query.ts#L101)*
 
@@ -177,7 +177,7 @@ Name | Type |
 `msg` | string |
 `rawKey` | string |
 
-**Returns:** *string*
+**Returns:** *[signWithRawKey](_odis_query_.md#signwithrawkey)*
 
 ## Object literals
 

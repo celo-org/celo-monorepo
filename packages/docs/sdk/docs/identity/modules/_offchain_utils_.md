@@ -83,7 +83,7 @@ ___
 
 ###  resolvePath
 
-▸ **resolvePath**(`base`: string, `path`: string): *string*
+▸ **resolvePath**(`base`: string, `path`: string): *[resolvePath](_offchain_utils_.md#resolvepath)*
 
 *Defined in [packages/sdk/identity/src/offchain/utils.ts:404](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/offchain/utils.ts#L404)*
 
@@ -99,7 +99,7 @@ Name | Type | Description |
 `base` | string | root or base of the domain |
 `path` | string | the path to append  |
 
-**Returns:** *string*
+**Returns:** *[resolvePath](_offchain_utils_.md#resolvepath)*
 
 ___
 

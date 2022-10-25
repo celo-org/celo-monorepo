@@ -228,7 +228,7 @@ ___
 
 ### `Const` timeout
 
-▸ **timeout**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `params`: T, `timeoutMs`: number, `timeoutError`: any, `timeoutLogMsg`: string | null, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹U›*
+▸ **timeout**<**T**, **U**>(`inFunction`: InFunction‹T, U›, `params`: T, `timeoutMs`: number, `timeoutError`: any, `timeoutLogMsg`: string | null, `logger`: [Logger](_logger_.md#logger) | null): *Promise‹Awaited‹U››*
 
 *Defined in [packages/sdk/base/src/async.ts:173](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/async.ts#L173)*
 
@@ -251,4 +251,4 @@ Name | Type | Default | Description |
 `timeoutLogMsg` | string &#124; null | null | - |
 `logger` | [Logger](_logger_.md#logger) &#124; null | null | - |
 
-**Returns:** *Promise‹U›*
+**Returns:** *Promise‹Awaited‹U››*

@@ -12,7 +12,7 @@
 
 ###  assumeOwnership
 
-▸ **assumeOwnership**(`web3`: Web3, `to`: string): *Promise‹void›*
+▸ **assumeOwnership**(`web3`: Web3, `to`: string): *[assumeOwnership](_test_utils_transferownership_.md#assumeownership)*
 
 *Defined in [packages/sdk/contractkit/src/test-utils/transferownership.ts:11](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/test-utils/transferownership.ts#L11)*
 
@@ -23,4 +23,4 @@ Name | Type |
 `web3` | Web3 |
 `to` | string |
 
-**Returns:** *Promise‹void›*
+**Returns:** *[assumeOwnership](_test_utils_transferownership_.md#assumeownership)*

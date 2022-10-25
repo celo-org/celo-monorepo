@@ -49,7 +49,7 @@ ___
 
 ###  ensureUncompressed
 
-▸ **ensureUncompressed**(`publicKey`: string): *any*
+▸ **ensureUncompressed**(`publicKey`: string): *[ensureUncompressed](_ecdh_.md#ensureuncompressed)*
 
 *Defined in [ecdh.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L27)*
 
@@ -59,13 +59,13 @@ Name | Type |
 ------ | ------ |
 `publicKey` | string |
 
-**Returns:** *any*
+**Returns:** *[ensureUncompressed](_ecdh_.md#ensureuncompressed)*
 
 ___
 
 ###  isCompressed
 
-▸ **isCompressed**(`publicKey`: string): *boolean*
+▸ **isCompressed**(`publicKey`: string): *[isCompressed](_ecdh_.md#iscompressed)*
 
 *Defined in [ecdh.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L10)*
 
@@ -75,13 +75,13 @@ Name | Type |
 ------ | ------ |
 `publicKey` | string |
 
-**Returns:** *boolean*
+**Returns:** *[isCompressed](_ecdh_.md#iscompressed)*
 
 ___
 
 ###  trimUncompressedPrefix
 
-▸ **trimUncompressedPrefix**(`publicKey`: string): *string*
+▸ **trimUncompressedPrefix**(`publicKey`: string): *[trimUncompressedPrefix](_ecdh_.md#trimuncompressedprefix)*
 
 *Defined in [ecdh.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecdh.ts#L40)*
 
@@ -91,4 +91,4 @@ Name | Type |
 ------ | ------ |
 `publicKey` | string |
 
-**Returns:** *string*
+**Returns:** *[trimUncompressedPrefix](_ecdh_.md#trimuncompressedprefix)*

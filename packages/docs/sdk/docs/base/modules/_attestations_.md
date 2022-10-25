@@ -30,7 +30,7 @@
 
 ###  base64ToHex
 
-▸ **base64ToHex**(`base64String`: string): *string*
+▸ **base64ToHex**(`base64String`: string): *[base64ToHex](_attestations_.md#base64tohex)*
 
 *Defined in [packages/sdk/base/src/attestations.ts:36](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L36)*
 
@@ -40,13 +40,13 @@ Name | Type |
 ------ | ------ |
 `base64String` | string |
 
-**Returns:** *string*
+**Returns:** *[base64ToHex](_attestations_.md#base64tohex)*
 
 ___
 
 ###  extractAttestationCodeFromMessage
 
-▸ **extractAttestationCodeFromMessage**(`message`: string): *null | string*
+▸ **extractAttestationCodeFromMessage**(`message`: string): *[extractAttestationCodeFromMessage](_attestations_.md#extractattestationcodefrommessage)*
 
 *Defined in [packages/sdk/base/src/attestations.ts:53](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L53)*
 
@@ -56,13 +56,13 @@ Name | Type |
 ------ | ------ |
 `message` | string |
 
-**Returns:** *null | string*
+**Returns:** *[extractAttestationCodeFromMessage](_attestations_.md#extractattestationcodefrommessage)*
 
 ___
 
 ###  getIdentifierPrefix
 
-▸ **getIdentifierPrefix**(`type`: [IdentifierType](../enums/_attestations_.identifiertype.md)): *string*
+▸ **getIdentifierPrefix**(`type`: [IdentifierType](../enums/_attestations_.identifiertype.md)): *[getIdentifierPrefix](_attestations_.md#getidentifierprefix)*
 
 *Defined in [packages/sdk/base/src/attestations.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L13)*
 
@@ -72,13 +72,13 @@ Name | Type |
 ------ | ------ |
 `type` | [IdentifierType](../enums/_attestations_.identifiertype.md) |
 
-**Returns:** *string*
+**Returns:** *[getIdentifierPrefix](_attestations_.md#getidentifierprefix)*
 
 ___
 
 ###  hashIdentifier
 
-▸ **hashIdentifier**(`sha3`: function, `identifier`: string, `type`: [IdentifierType](../enums/_attestations_.identifiertype.md), `salt?`: undefined | string): *string*
+▸ **hashIdentifier**(`sha3`: function, `identifier`: string, `type`: [IdentifierType](../enums/_attestations_.identifiertype.md), `salt?`: undefined | string): *[hashIdentifier](_attestations_.md#hashidentifier)*
 
 *Defined in [packages/sdk/base/src/attestations.ts:22](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L22)*
 
@@ -100,7 +100,7 @@ Name | Type |
 
 ▪`Optional`  **salt**: *undefined | string*
 
-**Returns:** *string*
+**Returns:** *[hashIdentifier](_attestations_.md#hashidentifier)*
 
 ___
 
@@ -127,7 +127,7 @@ ___
 
 ###  messageContainsAttestationCode
 
-▸ **messageContainsAttestationCode**(`message`: string): *boolean*
+▸ **messageContainsAttestationCode**(`message`: string): *[messageContainsAttestationCode](_attestations_.md#messagecontainsattestationcode)*
 
 *Defined in [packages/sdk/base/src/attestations.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L49)*
 
@@ -137,13 +137,13 @@ Name | Type |
 ------ | ------ |
 `message` | string |
 
-**Returns:** *boolean*
+**Returns:** *[messageContainsAttestationCode](_attestations_.md#messagecontainsattestationcode)*
 
 ___
 
 ###  sanitizeMessageBase64
 
-▸ **sanitizeMessageBase64**(`base64String`: string): *string*
+▸ **sanitizeMessageBase64**(`base64String`: string): *[sanitizeMessageBase64](_attestations_.md#sanitizemessagebase64)*
 
 *Defined in [packages/sdk/base/src/attestations.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/attestations.ts#L40)*
 
@@ -153,7 +153,7 @@ Name | Type |
 ------ | ------ |
 `base64String` | string |
 
-**Returns:** *string*
+**Returns:** *[sanitizeMessageBase64](_attestations_.md#sanitizemessagebase64)*
 
 ## Object literals
 

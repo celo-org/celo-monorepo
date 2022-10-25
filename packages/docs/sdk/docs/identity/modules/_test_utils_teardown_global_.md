@@ -12,8 +12,8 @@
 
 ###  globalTeardown
 
-▸ **globalTeardown**(): *Promise‹void›*
+▸ **globalTeardown**(): *[globalTeardown](_test_utils_teardown_global_.md#globalteardown)*
 
 *Defined in [packages/sdk/identity/src/test-utils/teardown.global.ts:7](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/test-utils/teardown.global.ts#L7)*
 
-**Returns:** *Promise‹void›*
+**Returns:** *[globalTeardown](_test_utils_teardown_global_.md#globalteardown)*

@@ -73,7 +73,7 @@ ___
 
 ###  isStableTokenContract
 
-▸ **isStableTokenContract**(`contract`: [CeloContract](../enums/_base_.celocontract.md)): *boolean*
+▸ **isStableTokenContract**(`contract`: [CeloContract](../enums/_base_.celocontract.md)): *[isStableTokenContract](_celo_tokens_.md#isstabletokencontract)*
 
 *Defined in [packages/sdk/contractkit/src/celo-tokens.ts:275](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/celo-tokens.ts#L275)*
 
@@ -83,7 +83,7 @@ Name | Type |
 ------ | ------ |
 `contract` | [CeloContract](../enums/_base_.celocontract.md) |
 
-**Returns:** *boolean*
+**Returns:** *[isStableTokenContract](_celo_tokens_.md#isstabletokencontract)*
 
 ## Object literals
 

@@ -55,7 +55,7 @@ ___
 
 ###  inputBlockNumberFormatter
 
-▸ **inputBlockNumberFormatter**(`blockNumber`: [BlockNumber](_types_.md#blocknumber)): *undefined | string | number | BN‹› | BigNumber‹›*
+▸ **inputBlockNumberFormatter**(`blockNumber`: [BlockNumber](_types_.md#blocknumber)): *[inputBlockNumberFormatter](_utils_formatter_.md#inputblocknumberformatter)*
 
 *Defined in [utils/formatter.ts:117](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L117)*
 
@@ -65,13 +65,13 @@ Name | Type |
 ------ | ------ |
 `blockNumber` | [BlockNumber](_types_.md#blocknumber) |
 
-**Returns:** *undefined | string | number | BN‹› | BigNumber‹›*
+**Returns:** *[inputBlockNumberFormatter](_utils_formatter_.md#inputblocknumberformatter)*
 
 ___
 
 ###  inputCeloTxFormatter
 
-▸ **inputCeloTxFormatter**(`tx`: [CeloTx](_types_.md#celotx)): *[CeloTx](_types_.md#celotx)*
+▸ **inputCeloTxFormatter**(`tx`: [CeloTx](_types_.md#celotx)): *[inputCeloTxFormatter](_utils_formatter_.md#inputcelotxformatter)*
 
 *Defined in [utils/formatter.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L19)*
 
@@ -83,13 +83,13 @@ Name | Type |
 ------ | ------ |
 `tx` | [CeloTx](_types_.md#celotx) |
 
-**Returns:** *[CeloTx](_types_.md#celotx)*
+**Returns:** *[inputCeloTxFormatter](_utils_formatter_.md#inputcelotxformatter)*
 
 ___
 
 ###  inputDefaultBlockNumberFormatter
 
-▸ **inputDefaultBlockNumberFormatter**(`blockNumber`: [BlockNumber](_types_.md#blocknumber) | null | undefined): *undefined | string | number | BN‹› | BigNumber‹›*
+▸ **inputDefaultBlockNumberFormatter**(`blockNumber`: [BlockNumber](_types_.md#blocknumber) | null | undefined): *[inputDefaultBlockNumberFormatter](_utils_formatter_.md#inputdefaultblocknumberformatter)*
 
 *Defined in [utils/formatter.ts:109](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L109)*
 
@@ -99,13 +99,13 @@ Name | Type |
 ------ | ------ |
 `blockNumber` | [BlockNumber](_types_.md#blocknumber) &#124; null &#124; undefined |
 
-**Returns:** *undefined | string | number | BN‹› | BigNumber‹›*
+**Returns:** *[inputDefaultBlockNumberFormatter](_utils_formatter_.md#inputdefaultblocknumberformatter)*
 
 ___
 
 ###  inputSignFormatter
 
-▸ **inputSignFormatter**(`data`: string): *string*
+▸ **inputSignFormatter**(`data`: string): *[inputSignFormatter](_utils_formatter_.md#inputsignformatter)*
 
 *Defined in [utils/formatter.ts:226](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/connect/src/utils/formatter.ts#L226)*
 
@@ -115,7 +115,7 @@ Name | Type |
 ------ | ------ |
 `data` | string |
 
-**Returns:** *string*
+**Returns:** *[inputSignFormatter](_utils_formatter_.md#inputsignformatter)*
 
 ___
 

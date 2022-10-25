@@ -138,7 +138,7 @@ ___
 
 ###  makeAsyncThrowable
 
-▸ **makeAsyncThrowable**<**TArgs**, **TResult**, **TError**, **TModifiedError**>(`f`: function, `errorModifier?`: undefined | function): *(Anonymous function)*
+▸ **makeAsyncThrowable**<**TArgs**, **TResult**, **TError**, **TModifiedError**>(`f`: function, `errorModifier?`: undefined | function): *[makeAsyncThrowable](_result_.md#makeasyncthrowable)*
 
 *Defined in [packages/sdk/base/src/result.ts:47](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L47)*
 
@@ -166,13 +166,13 @@ Name | Type |
 
 ▪`Optional`  **errorModifier**: *undefined | function*
 
-**Returns:** *(Anonymous function)*
+**Returns:** *[makeAsyncThrowable](_result_.md#makeasyncthrowable)*
 
 ___
 
 ###  makeThrowable
 
-▸ **makeThrowable**<**TArgs**, **TResult**, **TError**, **TModifiedError**>(`f`: function, `errorModifier?`: undefined | function): *(Anonymous function)*
+▸ **makeThrowable**<**TArgs**, **TResult**, **TError**, **TModifiedError**>(`f`: function, `errorModifier?`: undefined | function): *[makeThrowable](_result_.md#makethrowable)*
 
 *Defined in [packages/sdk/base/src/result.ts:35](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L35)*
 
@@ -200,13 +200,13 @@ Name | Type |
 
 ▪`Optional`  **errorModifier**: *undefined | function*
 
-**Returns:** *(Anonymous function)*
+**Returns:** *[makeThrowable](_result_.md#makethrowable)*
 
 ___
 
 ###  parseJsonAsResult
 
-▸ **parseJsonAsResult**(`data`: string): *[OkResult](../interfaces/_result_.okresult.md)‹any› | [ErrorResult](../interfaces/_result_.errorresult.md)‹[JSONParseError](../classes/_result_.jsonparseerror.md)‹››*
+▸ **parseJsonAsResult**(`data`: string): *[parseJsonAsResult](_result_.md#parsejsonasresult)*
 
 *Defined in [packages/sdk/base/src/result.ts:84](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L84)*
 
@@ -216,13 +216,13 @@ Name | Type |
 ------ | ------ |
 `data` | string |
 
-**Returns:** *[OkResult](../interfaces/_result_.okresult.md)‹any› | [ErrorResult](../interfaces/_result_.errorresult.md)‹[JSONParseError](../classes/_result_.jsonparseerror.md)‹››*
+**Returns:** *[parseJsonAsResult](_result_.md#parsejsonasresult)*
 
 ___
 
 ###  throwIfError
 
-▸ **throwIfError**<**TResult**, **TError**, **TModifiedError**>(`result`: [Result](_result_.md#result)‹TResult, TError›, `errorModifier?`: undefined | function): *TResult*
+▸ **throwIfError**<**TResult**, **TError**, **TModifiedError**>(`result`: [Result](_result_.md#result)‹TResult, TError›, `errorModifier?`: undefined | function): *[throwIfError](_result_.md#throwiferror)*
 
 *Defined in [packages/sdk/base/src/result.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/result.ts#L21)*
 
@@ -241,4 +241,4 @@ Name | Type |
 `result` | [Result](_result_.md#result)‹TResult, TError› |
 `errorModifier?` | undefined &#124; function |
 
-**Returns:** *TResult*
+**Returns:** *[throwIfError](_result_.md#throwiferror)*

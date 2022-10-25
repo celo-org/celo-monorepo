@@ -178,7 +178,7 @@ ___
 
 ###  hashOfClaim
 
-▸ **hashOfClaim**(`claim`: [Claim](_identity_claims_claim_.md#claim)): *string*
+▸ **hashOfClaim**(`claim`: [Claim](_identity_claims_claim_.md#claim)): *[hashOfClaim](_identity_claims_claim_.md#hashofclaim)*
 
 *Defined in [packages/sdk/contractkit/src/identity/claims/claim.ts:98](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/claim.ts#L98)*
 
@@ -188,13 +188,13 @@ Name | Type |
 ------ | ------ |
 `claim` | [Claim](_identity_claims_claim_.md#claim) |
 
-**Returns:** *string*
+**Returns:** *[hashOfClaim](_identity_claims_claim_.md#hashofclaim)*
 
 ___
 
 ###  hashOfClaims
 
-▸ **hashOfClaims**(`claims`: [Claim](_identity_claims_claim_.md#claim)[]): *string*
+▸ **hashOfClaims**(`claims`: [Claim](_identity_claims_claim_.md#claim)[]): *[hashOfClaims](_identity_claims_claim_.md#hashofclaims)*
 
 *Defined in [packages/sdk/contractkit/src/identity/claims/claim.ts:102](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/claim.ts#L102)*
 
@@ -204,7 +204,7 @@ Name | Type |
 ------ | ------ |
 `claims` | [Claim](_identity_claims_claim_.md#claim)[] |
 
-**Returns:** *string*
+**Returns:** *[hashOfClaims](_identity_claims_claim_.md#hashofclaims)*
 
 ___
 
@@ -232,7 +232,7 @@ ___
 
 ###  serializeClaim
 
-▸ **serializeClaim**(`claim`: [Claim](_identity_claims_claim_.md#claim)): *string*
+▸ **serializeClaim**(`claim`: [Claim](_identity_claims_claim_.md#claim)): *[serializeClaim](_identity_claims_claim_.md#serializeclaim)*
 
 *Defined in [packages/sdk/contractkit/src/identity/claims/claim.ts:107](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/claim.ts#L107)*
 
@@ -242,13 +242,13 @@ Name | Type |
 ------ | ------ |
 `claim` | [Claim](_identity_claims_claim_.md#claim) |
 
-**Returns:** *string*
+**Returns:** *[serializeClaim](_identity_claims_claim_.md#serializeclaim)*
 
 ___
 
 ###  validateClaim
 
-▸ **validateClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [Claim](_identity_claims_claim_.md#claim), `address`: string): *Promise‹undefined | string›*
+▸ **validateClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [Claim](_identity_claims_claim_.md#claim), `address`: string): *[validateClaim](_identity_claims_claim_.md#validateclaim)*
 
 *Defined in [packages/sdk/contractkit/src/identity/claims/claim.ts:88](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/claim.ts#L88)*
 
@@ -262,6 +262,6 @@ Name | Type | Description |
 `claim` | [Claim](_identity_claims_claim_.md#claim) | The claim to validate |
 `address` | string | The address that is making the claim |
 
-**Returns:** *Promise‹undefined | string›*
+**Returns:** *[validateClaim](_identity_claims_claim_.md#validateclaim)*
 
 If valid, returns undefined. If invalid or unable to validate, returns a string with the error

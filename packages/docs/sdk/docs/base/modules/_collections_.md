@@ -157,7 +157,7 @@ ___
 
 ###  zip
 
-▸ **zip**<**A**, **B**, **C**>(`fn`: function, `as`: A[], `bs`: B[]): *C[]*
+▸ **zip**<**A**, **B**, **C**>(`fn`: function, `as`: A[], `bs`: B[]): *[zip](_collections_.md#zip)*
 
 *Defined in [packages/sdk/base/src/collections.ts:3](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L3)*
 
@@ -186,13 +186,13 @@ Name | Type |
 
 ▪ **bs**: *B[]*
 
-**Returns:** *C[]*
+**Returns:** *[zip](_collections_.md#zip)*
 
 ___
 
 ###  zip3
 
-▸ **zip3**<**A**, **B**, **C**>(`as`: A[], `bs`: B[], `cs`: C[]): *[A, B, C][]*
+▸ **zip3**<**A**, **B**, **C**>(`as`: A[], `bs`: B[], `cs`: C[]): *[zip3](_collections_.md#zip3)*
 
 *Defined in [packages/sdk/base/src/collections.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/collections.ts#L13)*
 
@@ -212,4 +212,4 @@ Name | Type |
 `bs` | B[] |
 `cs` | C[] |
 
-**Returns:** *[A, B, C][]*
+**Returns:** *[zip3](_collections_.md#zip3)*

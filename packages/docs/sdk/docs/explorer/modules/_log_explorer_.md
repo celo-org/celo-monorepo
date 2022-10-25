@@ -16,7 +16,7 @@
 
 ###  newLogExplorer
 
-▸ **newLogExplorer**(`kit`: ContractKit): *Promise‹[LogExplorer](../classes/_log_explorer_.logexplorer.md)‹››*
+▸ **newLogExplorer**(`kit`: ContractKit): *[newLogExplorer](_log_explorer_.md#newlogexplorer)*
 
 *Defined in [log-explorer.ts:10](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/explorer/src/log-explorer.ts#L10)*
 
@@ -26,4 +26,4 @@ Name | Type |
 ------ | ------ |
 `kit` | ContractKit |
 
-**Returns:** *Promise‹[LogExplorer](../classes/_log_explorer_.logexplorer.md)‹››*
+**Returns:** *[newLogExplorer](_log_explorer_.md#newlogexplorer)*

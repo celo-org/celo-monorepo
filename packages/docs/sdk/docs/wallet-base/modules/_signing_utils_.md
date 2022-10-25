@@ -67,7 +67,7 @@ ___
 
 ###  decodeSig
 
-▸ **decodeSig**(`sig`: any): *object*
+▸ **decodeSig**(`sig`: any): *[decodeSig](_signing_utils_.md#decodesig)*
 
 *Defined in [wallets/wallet-base/src/signing-utils.ts:238](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L238)*
 
@@ -77,13 +77,7 @@ Name | Type |
 ------ | ------ |
 `sig` | any |
 
-**Returns:** *object*
-
-* **r**: *Buffer‹›* = ethUtil.toBuffer(r) as Buffer
-
-* **s**: *Buffer‹›* = ethUtil.toBuffer(s) as Buffer
-
-* **v**: *number* = parseInt(v, 16)
+**Returns:** *[decodeSig](_signing_utils_.md#decodesig)*
 
 ___
 
@@ -216,7 +210,7 @@ ___
 
 ###  verifySignatureWithoutPrefix
 
-▸ **verifySignatureWithoutPrefix**(`messageHash`: string, `signature`: string, `signer`: string): *boolean*
+▸ **verifySignatureWithoutPrefix**(`messageHash`: string, `signature`: string, `signer`: string): *[verifySignatureWithoutPrefix](_signing_utils_.md#verifysignaturewithoutprefix)*
 
 *Defined in [wallets/wallet-base/src/signing-utils.ts:225](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-base/src/signing-utils.ts#L225)*
 
@@ -228,4 +222,4 @@ Name | Type |
 `signature` | string |
 `signer` | string |
 
-**Returns:** *boolean*
+**Returns:** *[verifySignatureWithoutPrefix](_signing_utils_.md#verifysignaturewithoutprefix)*

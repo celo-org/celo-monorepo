@@ -25,7 +25,7 @@
 
 ###  getCountryCode
 
-▸ **getCountryCode**(`e164PhoneNumber`: string): *undefined | null | number*
+▸ **getCountryCode**(`e164PhoneNumber`: string): *[getCountryCode](_phonenumbers_.md#getcountrycode)*
 
 *Defined in [phoneNumbers.ts:13](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L13)*
 
@@ -35,13 +35,13 @@ Name | Type |
 ------ | ------ |
 `e164PhoneNumber` | string |
 
-**Returns:** *undefined | null | number*
+**Returns:** *[getCountryCode](_phonenumbers_.md#getcountrycode)*
 
 ___
 
 ###  getDisplayNumberInternational
 
-▸ **getDisplayNumberInternational**(`e164PhoneNumber`: string): *string*
+▸ **getDisplayNumberInternational**(`e164PhoneNumber`: string): *[getDisplayNumberInternational](_phonenumbers_.md#getdisplaynumberinternational)*
 
 *Defined in [phoneNumbers.ts:59](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L59)*
 
@@ -51,13 +51,13 @@ Name | Type |
 ------ | ------ |
 `e164PhoneNumber` | string |
 
-**Returns:** *string*
+**Returns:** *[getDisplayNumberInternational](_phonenumbers_.md#getdisplaynumberinternational)*
 
 ___
 
 ###  getDisplayPhoneNumber
 
-▸ **getDisplayPhoneNumber**(`phoneNumber`: string, `defaultCountryCode`: string): *string*
+▸ **getDisplayPhoneNumber**(`phoneNumber`: string, `defaultCountryCode`: string): *[getDisplayPhoneNumber](_phonenumbers_.md#getdisplayphonenumber)*
 
 *Defined in [phoneNumbers.ts:49](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L49)*
 
@@ -68,13 +68,13 @@ Name | Type |
 `phoneNumber` | string |
 `defaultCountryCode` | string |
 
-**Returns:** *string*
+**Returns:** *[getDisplayPhoneNumber](_phonenumbers_.md#getdisplayphonenumber)*
 
 ___
 
 ###  getE164DisplayNumber
 
-▸ **getE164DisplayNumber**(`e164PhoneNumber`: string): *string*
+▸ **getE164DisplayNumber**(`e164PhoneNumber`: string): *[getE164DisplayNumber](_phonenumbers_.md#gete164displaynumber)*
 
 *Defined in [phoneNumbers.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L70)*
 
@@ -84,13 +84,13 @@ Name | Type |
 ------ | ------ |
 `e164PhoneNumber` | string |
 
-**Returns:** *string*
+**Returns:** *[getE164DisplayNumber](_phonenumbers_.md#gete164displaynumber)*
 
 ___
 
 ###  getE164Number
 
-▸ **getE164Number**(`phoneNumber`: string, `defaultCountryCode`: string): *null | string*
+▸ **getE164Number**(`phoneNumber`: string, `defaultCountryCode`: string): *[getE164Number](_phonenumbers_.md#gete164number)*
 
 *Defined in [phoneNumbers.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L75)*
 
@@ -101,13 +101,13 @@ Name | Type |
 `phoneNumber` | string |
 `defaultCountryCode` | string |
 
-**Returns:** *null | string*
+**Returns:** *[getE164Number](_phonenumbers_.md#gete164number)*
 
 ___
 
 ###  getExampleNumber
 
-▸ **getExampleNumber**(`regionCode`: string, `useOnlyZeroes`: boolean, `isInternational`: boolean): *undefined | string*
+▸ **getExampleNumber**(`regionCode`: string, `useOnlyZeroes`: boolean, `isInternational`: boolean): *[getExampleNumber](_phonenumbers_.md#getexamplenumber)*
 
 *Defined in [phoneNumbers.ts:212](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L212)*
 
@@ -119,13 +119,13 @@ Name | Type | Default |
 `useOnlyZeroes` | boolean | true |
 `isInternational` | boolean | false |
 
-**Returns:** *undefined | string*
+**Returns:** *[getExampleNumber](_phonenumbers_.md#getexamplenumber)*
 
 ___
 
 ###  getRegionCode
 
-▸ **getRegionCode**(`e164PhoneNumber`: string): *undefined | null | string*
+▸ **getRegionCode**(`e164PhoneNumber`: string): *[getRegionCode](_phonenumbers_.md#getregioncode)*
 
 *Defined in [phoneNumbers.ts:25](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L25)*
 
@@ -135,13 +135,13 @@ Name | Type |
 ------ | ------ |
 `e164PhoneNumber` | string |
 
-**Returns:** *undefined | null | string*
+**Returns:** *[getRegionCode](_phonenumbers_.md#getregioncode)*
 
 ___
 
 ###  getRegionCodeFromCountryCode
 
-▸ **getRegionCodeFromCountryCode**(`countryCode`: string): *null | string*
+▸ **getRegionCodeFromCountryCode**(`countryCode`: string): *[getRegionCodeFromCountryCode](_phonenumbers_.md#getregioncodefromcountrycode)*
 
 *Defined in [phoneNumbers.ts:37](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L37)*
 
@@ -151,13 +151,13 @@ Name | Type |
 ------ | ------ |
 `countryCode` | string |
 
-**Returns:** *null | string*
+**Returns:** *[getRegionCodeFromCountryCode](_phonenumbers_.md#getregioncodefromcountrycode)*
 
 ___
 
 ###  isE164NumberStrict
 
-▸ **isE164NumberStrict**(`phoneNumber`: string): *boolean*
+▸ **isE164NumberStrict**(`phoneNumber`: string): *[isE164NumberStrict](_phonenumbers_.md#ise164numberstrict)*
 
 *Defined in [phoneNumbers.ts:85](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/phone-utils/src/phoneNumbers.ts#L85)*
 
@@ -167,7 +167,7 @@ Name | Type |
 ------ | ------ |
 `phoneNumber` | string |
 
-**Returns:** *boolean*
+**Returns:** *[isE164NumberStrict](_phonenumbers_.md#ise164numberstrict)*
 
 ___
 

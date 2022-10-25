@@ -44,7 +44,7 @@
 
 Ƭ **GovernanceWrapperType**: *[GovernanceWrapper](../classes/_wrappers_governance_.governancewrapper.md)*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Governance.ts:918](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L918)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Governance.ts:912](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Governance.ts#L912)*
 
 ___
 

@@ -12,7 +12,7 @@
 
 ###  transportErrorFriendlyMessage
 
-▸ **transportErrorFriendlyMessage**(`error`: any): *void*
+▸ **transportErrorFriendlyMessage**(`error`: any): *[transportErrorFriendlyMessage](_ledger_utils_.md#transporterrorfriendlymessage)*
 
 *Defined in [wallet-ledger/src/ledger-utils.ts:5](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/wallets/wallet-ledger/src/ledger-utils.ts#L5)*
 
@@ -22,4 +22,4 @@ Name | Type |
 ------ | ------ |
 `error` | any |
 
-**Returns:** *void*
+**Returns:** *[transportErrorFriendlyMessage](_ledger_utils_.md#transporterrorfriendlymessage)*

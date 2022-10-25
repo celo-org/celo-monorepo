@@ -458,7 +458,7 @@ ___
 
 ▸ **findLesserAndGreaterAfterVote**(`votedGroup`: Address, `voteWeight`: BigNumber): *Promise‹object›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:426](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L426)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:446](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L446)*
 
 **Parameters:**
 
@@ -508,7 +508,7 @@ ___
 
 ▸ **getElectedValidators**(`epochNumber`: number): *Promise‹[Validator](../interfaces/_wrappers_validators_.validator.md)[]›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:455](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L455)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:475](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L475)*
 
 Retrieves the set of validatorsparticipating in BFT at epochNumber.
 
@@ -526,7 +526,7 @@ ___
 
 ▸ **getEligibleValidatorGroupsVotes**(): *Promise‹[ValidatorGroupVote](../interfaces/_wrappers_election_.validatorgroupvote.md)[]›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:411](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L411)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:431](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L431)*
 
 Returns the current eligible validator groups and their total votes.
 
@@ -536,9 +536,9 @@ ___
 
 ###  getGroupVoterRewards
 
-▸ **getGroupVoterRewards**(`epochNumber`: number): *Promise‹[GroupVoterReward](../interfaces/_wrappers_election_.groupvoterreward.md)[]›*
+▸ **getGroupVoterRewards**(`epochNumber`: number, `useBlockNumber?`: undefined | false | true): *Promise‹[GroupVoterReward](../interfaces/_wrappers_election_.groupvoterreward.md)[]›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:467](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L467)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:487](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L487)*
 
 Retrieves GroupVoterRewards at epochNumber.
 
@@ -547,6 +547,7 @@ Retrieves GroupVoterRewards at epochNumber.
 Name | Type | Description |
 ------ | ------ | ------ |
 `epochNumber` | number | The epoch to retrieve GroupVoterRewards at.  |
+`useBlockNumber?` | undefined &#124; false &#124; true | - |
 
 **Returns:** *Promise‹[GroupVoterReward](../interfaces/_wrappers_election_.groupvoterreward.md)[]›*
 
@@ -661,9 +662,9 @@ ___
 
 ###  getVoterRewards
 
-▸ **getVoterRewards**(`address`: Address, `epochNumber`: number, `voterShare?`: Record‹Address, BigNumber›): *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
+▸ **getVoterRewards**(`address`: Address, `epochNumber`: number, `useBlockNumber?`: undefined | false | true, `voterShare?`: Record‹Address, BigNumber›): *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:494](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L494)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:521](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L521)*
 
 Retrieves VoterRewards for address at epochNumber.
 
@@ -673,6 +674,7 @@ Name | Type | Description |
 ------ | ------ | ------ |
 `address` | Address | The address to retrieve VoterRewards for. |
 `epochNumber` | number | The epoch to retrieve VoterRewards at. |
+`useBlockNumber?` | undefined &#124; false &#124; true | - |
 `voterShare?` | Record‹Address, BigNumber› | Optionally address' share of group rewards.  |
 
 **Returns:** *Promise‹[VoterReward](../interfaces/_wrappers_election_.voterreward.md)[]›*
@@ -683,7 +685,7 @@ ___
 
 ▸ **getVoterShare**(`address`: Address, `blockNumber?`: undefined | number): *Promise‹Record‹Address, BigNumber››*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:529](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L529)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:557](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L557)*
 
 Retrieves a voter's share of active votes.
 
@@ -756,7 +758,7 @@ ___
 
 ▸ **revoke**(`account`: Address, `group`: Address, `value`: BigNumber): *Promise‹Array‹CeloTransactionObject‹boolean›››*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:373](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L373)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:392](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L392)*
 
 **Parameters:**
 
@@ -772,17 +774,23 @@ ___
 
 ###  revokeActive
 
-▸ **revokeActive**(`account`: Address, `group`: Address, `value`: BigNumber): *Promise‹CeloTransactionObject‹boolean››*
+▸ **revokeActive**(`account`: Address, `group`: Address, `value`: BigNumber, `lesserAfterVote?`: Address, `greaterAfterVote?`: Address): *Promise‹CeloTransactionObject‹boolean››*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:358](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L358)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:367](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L367)*
+
+Creates a transaction object for revoking active votes.
+
+**`dev`** Must pass both `lesserAfterVote` and `greaterAfterVote` or neither.
 
 **Parameters:**
 
-Name | Type |
------- | ------ |
-`account` | Address |
-`group` | Address |
-`value` | BigNumber |
+Name | Type | Description |
+------ | ------ | ------ |
+`account` | Address | Account to revoke votes for. |
+`group` | Address | Validator group to revoke votes from. |
+`value` | BigNumber | Amount to be removed from active votes. |
+`lesserAfterVote?` | Address | First group address with less vote than `account`. |
+`greaterAfterVote?` | Address | First group address with more vote than `account`. |
 
 **Returns:** *Promise‹CeloTransactionObject‹boolean››*
 
@@ -822,7 +830,7 @@ ___
 
 ▸ **vote**(`validatorGroup`: Address, `value`: BigNumber): *Promise‹CeloTransactionObject‹boolean››*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:399](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L399)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Election.ts:419](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Election.ts#L419)*
 
 Increments the number of total and pending votes for `group`.
 

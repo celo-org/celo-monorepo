@@ -19,11 +19,13 @@ Contract for handling deposits needed for voting.
 ### Properties
 
 * [createAccount](_wrappers_accounts_.accountswrapper.md#createaccount)
+* [deletePaymentDelegation](_wrappers_accounts_.accountswrapper.md#deletepaymentdelegation)
 * [eventTypes](_wrappers_accounts_.accountswrapper.md#eventtypes)
 * [events](_wrappers_accounts_.accountswrapper.md#events)
 * [getAttestationSigner](_wrappers_accounts_.accountswrapper.md#getattestationsigner)
 * [getDataEncryptionKey](_wrappers_accounts_.accountswrapper.md#getdataencryptionkey)
 * [getMetadataURL](_wrappers_accounts_.accountswrapper.md#getmetadataurl)
+* [getPaymentDelegation](_wrappers_accounts_.accountswrapper.md#getpaymentdelegation)
 * [getValidatorSigner](_wrappers_accounts_.accountswrapper.md#getvalidatorsigner)
 * [getVoteSigner](_wrappers_accounts_.accountswrapper.md#getvotesigner)
 * [getWalletAddress](_wrappers_accounts_.accountswrapper.md#getwalletaddress)
@@ -34,6 +36,7 @@ Contract for handling deposits needed for voting.
 * [setAccountDataEncryptionKey](_wrappers_accounts_.accountswrapper.md#setaccountdataencryptionkey)
 * [setMetadataURL](_wrappers_accounts_.accountswrapper.md#setmetadataurl)
 * [setName](_wrappers_accounts_.accountswrapper.md#setname)
+* [setPaymentDelegation](_wrappers_accounts_.accountswrapper.md#setpaymentdelegation)
 * [signerToAccount](_wrappers_accounts_.accountswrapper.md#signertoaccount)
 * [validatorSignerToAccount](_wrappers_accounts_.accountswrapper.md#validatorsignertoaccount)
 * [voteSignerToAccount](_wrappers_accounts_.accountswrapper.md#votesignertoaccount)
@@ -57,6 +60,7 @@ Contract for handling deposits needed for voting.
 * [getName](_wrappers_accounts_.accountswrapper.md#getname)
 * [getPastEvents](_wrappers_accounts_.accountswrapper.md#getpastevents)
 * [parseSignatureOfAddress](_wrappers_accounts_.accountswrapper.md#parsesignatureofaddress)
+* [removeAttestationSigner](_wrappers_accounts_.accountswrapper.md#removeattestationsigner)
 * [setAccount](_wrappers_accounts_.accountswrapper.md#setaccount)
 * [setWalletAddress](_wrappers_accounts_.accountswrapper.md#setwalletaddress)
 * [startSignerAuthorization](_wrappers_accounts_.accountswrapper.md#startsignerauthorization)
@@ -90,6 +94,30 @@ Name | Type |
 *Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:43](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L43)*
 
 Creates an account.
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  deletePaymentDelegation
+
+• **deletePaymentDelegation**: *function* = proxySend(
+    this.connection,
+    this.contract.methods.deletePaymentDelegation
+  )
+
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:455](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L455)*
+
+Remove a validator's payment delegation by setting benficiary and
+fraction to 0.
 
 #### Type declaration:
 
@@ -158,7 +186,7 @@ ___
     solidityBytesToString(res)
   )
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:353](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L353)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:361](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L361)*
 
 Returns the set data encryption key for the account
 
@@ -180,11 +208,35 @@ ___
 
 • **getMetadataURL**: *function* = proxyCall(this.contract.methods.getMetadataURL)
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:367](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L367)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:375](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L375)*
 
 Returns the metadataURL for the account
 
 **`param`** Account
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *Promise‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  getPaymentDelegation
+
+• **getPaymentDelegation**: *function* = proxyCall(this.contract.methods.getPaymentDelegation)
+
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:465](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L465)*
+
+Get a validator's payment delegation settings.
+
+**`param`** Account of the validator.
+
+**`returns`** Beneficiary address and fraction of payment delegated.
 
 #### Type declaration:
 
@@ -254,7 +306,7 @@ ___
 
 • **getWalletAddress**: *function* = proxyCall(this.contract.methods.getWalletAddress)
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:361](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L361)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:369](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L369)*
 
 Returns the set wallet address for the account
 
@@ -377,7 +429,7 @@ ___
     this.contract.methods.setAccountDataEncryptionKey
   )
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:373](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L373)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:381](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L381)*
 
 Sets the data encryption of the account
 
@@ -399,7 +451,7 @@ ___
 
 • **setMetadataURL**: *function* = proxySend(this.connection, this.contract.methods.setMetadataURL)
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:430](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L430)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:438](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L438)*
 
 Sets the metadataURL for the account
 
@@ -421,11 +473,40 @@ ___
 
 • **setName**: *function* = proxySend(this.connection, this.contract.methods.setName)
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:424](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L424)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:432](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L432)*
 
 Sets the name for the account
 
 **`param`** The name to set
+
+#### Type declaration:
+
+▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`...args` | InputArgs |
+
+___
+
+###  setPaymentDelegation
+
+• **setPaymentDelegation**: *function* = proxySend(this.connection, this.contract.methods.setPaymentDelegation)
+
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:449](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L449)*
+
+Set a validator's payment delegation settings.
+
+**`param`** The address that should receive a portion of validator
+payments.
+
+**`param`** The fraction of the validator's payment that should be
+diverted to `beneficiary` every epoch, given as FixidityLib value. Must not
+be greater than 1.
+
+**`dev`** Use `deletePaymentDelegation` to unset the payment delegation.
 
 #### Type declaration:
 
@@ -666,7 +747,7 @@ ___
 
 ▸ **generateProofOfKeyPossession**(`account`: Address, `signer`: Address): *Promise‹object›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:327](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L327)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:335](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L335)*
 
 **Parameters:**
 
@@ -683,7 +764,7 @@ ___
 
 ▸ **generateProofOfKeyPossessionLocally**(`account`: Address, `signer`: Address, `privateKey`: string): *Promise‹object›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:335](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L335)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:343](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L343)*
 
 **Parameters:**
 
@@ -733,7 +814,7 @@ ___
 
 ▸ **getName**(`account`: Address, `blockNumber?`: undefined | number): *Promise‹string›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:344](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L344)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:352](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L352)*
 
 Returns the set name for the account
 
@@ -773,7 +854,7 @@ ___
 
 ▸ **parseSignatureOfAddress**(`address`: Address, `signer`: string, `signature`: string): *object*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:458](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L458)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:493](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L493)*
 
 **Parameters:**
 
@@ -793,11 +874,25 @@ Name | Type |
 
 ___
 
+###  removeAttestationSigner
+
+▸ **removeAttestationSigner**(): *Promise‹CeloTransactionObject‹void››*
+
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:331](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L331)*
+
+Removes the currently authorized attestation signer for the account
+
+**Returns:** *Promise‹CeloTransactionObject‹void››*
+
+A CeloTransactionObject
+
+___
+
 ###  setAccount
 
 ▸ **setAccount**(`name`: string, `dataEncryptionKey`: string, `walletAddress`: Address, `proofOfPossession`: Signature | null): *CeloTransactionObject‹void›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:385](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L385)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:393](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L393)*
 
 Convenience Setter for the dataEncryptionKey and wallet address for an account
 
@@ -818,7 +913,7 @@ ___
 
 ▸ **setWalletAddress**(`walletAddress`: Address, `proofOfPossession`: Signature | null): *CeloTransactionObject‹void›*
 
-*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:436](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L436)*
+*Defined in [packages/sdk/contractkit/src/wrappers/Accounts.ts:471](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Accounts.ts#L471)*
 
 Sets the wallet address for the account
 

@@ -33,7 +33,7 @@ ___
 
 ###  verifyClaim
 
-▸ **verifyClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [Claim](_identity_claims_claim_.md#claim), `address`: string, `tries`: number): *Promise‹undefined | string›*
+▸ **verifyClaim**(`kit`: [ContractKit](../classes/_kit_.contractkit.md), `claim`: [Claim](_identity_claims_claim_.md#claim), `address`: string, `tries`: number): *[verifyClaim](_identity_claims_verify_.md#verifyclaim)*
 
 *Defined in [packages/sdk/contractkit/src/identity/claims/verify.ts:19](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/identity/claims/verify.ts#L19)*
 
@@ -48,7 +48,7 @@ Name | Type | Default | Description |
 `address` | string | - | The address that is making the claim |
 `tries` | number | 3 | - |
 
-**Returns:** *Promise‹undefined | string›*
+**Returns:** *[verifyClaim](_identity_claims_verify_.md#verifyclaim)*
 
 If valid, returns undefined. If invalid or unable to verify, returns a string with the error
 

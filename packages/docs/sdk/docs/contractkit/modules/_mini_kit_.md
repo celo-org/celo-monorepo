@@ -30,7 +30,7 @@
 
 ###  newKit
 
-▸ **newKit**(`url`: string, `wallet?`: ReadOnlyWallet, `options?`: [HttpProviderOptions](_setupforkits_.md#httpprovideroptions)): *[MiniContractKit](../classes/_mini_kit_.minicontractkit.md)‹›*
+▸ **newKit**(`url`: string, `wallet?`: ReadOnlyWallet, `options?`: [HttpProviderOptions](_setupforkits_.md#httpprovideroptions)): *[newKit](_mini_kit_.md#newkit)*
 
 *Defined in [packages/sdk/contractkit/src/mini-kit.ts:21](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/mini-kit.ts#L21)*
 
@@ -48,13 +48,13 @@ Name | Type | Description |
 `wallet?` | ReadOnlyWallet | - |
 `options?` | [HttpProviderOptions](_setupforkits_.md#httpprovideroptions) | - |
 
-**Returns:** *[MiniContractKit](../classes/_mini_kit_.minicontractkit.md)‹›*
+**Returns:** *[newKit](_mini_kit_.md#newkit)*
 
 ___
 
 ###  newKitFromWeb3
 
-▸ **newKitFromWeb3**(`web3`: Web3, `wallet`: ReadOnlyWallet): *[MiniContractKit](../classes/_mini_kit_.minicontractkit.md)‹›*
+▸ **newKitFromWeb3**(`web3`: Web3, `wallet`: ReadOnlyWallet): *[newKitFromWeb3](_mini_kit_.md#newkitfromweb3)*
 
 *Defined in [packages/sdk/contractkit/src/mini-kit.ts:41](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/mini-kit.ts#L41)*
 
@@ -67,13 +67,13 @@ Name | Type | Default | Description |
 `web3` | Web3 | - | Web3 instance  |
 `wallet` | ReadOnlyWallet | new LocalWallet() | - |
 
-**Returns:** *[MiniContractKit](../classes/_mini_kit_.minicontractkit.md)‹›*
+**Returns:** *[newKitFromWeb3](_mini_kit_.md#newkitfromweb3)*
 
 ___
 
 ###  newKitWithApiKey
 
-▸ **newKitWithApiKey**(`url`: string, `apiKey`: string, `wallet?`: ReadOnlyWallet): *[MiniContractKit](../classes/_mini_kit_.minicontractkit.md)‹›*
+▸ **newKitWithApiKey**(`url`: string, `apiKey`: string, `wallet?`: ReadOnlyWallet): *[newKitWithApiKey](_mini_kit_.md#newkitwithapikey)*
 
 *Defined in [packages/sdk/contractkit/src/mini-kit.ts:32](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/mini-kit.ts#L32)*
 
@@ -89,4 +89,4 @@ Name | Type | Description |
 `apiKey` | string | to include in the http request header |
 `wallet?` | ReadOnlyWallet | - |
 
-**Returns:** *[MiniContractKit](../classes/_mini_kit_.minicontractkit.md)‹›*
+**Returns:** *[newKitWithApiKey](_mini_kit_.md#newkitwithapikey)*

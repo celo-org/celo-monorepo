@@ -34,7 +34,7 @@ Example:
 
 • **args**: *any[]*
 
-*Defined in [proposals.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L72)*
+*Defined in [proposals.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L73)*
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 • **contract**: *CeloContract*
 
-*Defined in [proposals.ts:70](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L70)*
+*Defined in [proposals.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L71)*
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 • **function**: *string*
 
-*Defined in [proposals.ts:71](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L71)*
+*Defined in [proposals.ts:72](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L72)*
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 • **params**? : *Record‹string, any›*
 
-*Defined in [proposals.ts:73](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L73)*
+*Defined in [proposals.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L74)*
 
 ___
 
@@ -66,4 +66,4 @@ ___
 
 • **value**: *string*
 
-*Defined in [proposals.ts:74](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L74)*
+*Defined in [proposals.ts:75](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/governance/src/proposals.ts#L75)*

@@ -22,7 +22,7 @@
 
 ###  anonymizedPhone
 
-▸ **anonymizedPhone**(`phoneNumber`: string): *string*
+▸ **anonymizedPhone**(`phoneNumber`: string): *[anonymizedPhone](_phonenumbers_.md#anonymizedphone)*
 
 *Defined in [packages/sdk/base/src/phoneNumbers.ts:31](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L31)*
 
@@ -32,7 +32,7 @@ Name | Type |
 ------ | ------ |
 `phoneNumber` | string |
 
-**Returns:** *string*
+**Returns:** *[anonymizedPhone](_phonenumbers_.md#anonymizedphone)*
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 ###  isE164Number
 
-▸ **isE164Number**(`phoneNumber`: string): *boolean*
+▸ **isE164Number**(`phoneNumber`: string): *[isE164Number](_phonenumbers_.md#ise164number)*
 
 *Defined in [packages/sdk/base/src/phoneNumbers.ts:27](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/base/src/phoneNumbers.ts#L27)*
 
@@ -74,7 +74,7 @@ Name | Type |
 ------ | ------ |
 `phoneNumber` | string |
 
-**Returns:** *boolean*
+**Returns:** *[isE164Number](_phonenumbers_.md#ise164number)*
 
 ## Object literals
 

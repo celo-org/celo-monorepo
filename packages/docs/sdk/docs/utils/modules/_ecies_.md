@@ -33,7 +33,7 @@
 
 ###  AES128Decrypt
 
-▸ **AES128Decrypt**(`encryptionKey`: Buffer, `iv`: Buffer, `ciphertext`: Buffer): *Buffer‹›*
+▸ **AES128Decrypt**(`encryptionKey`: Buffer, `iv`: Buffer, `ciphertext`: Buffer): *[AES128Decrypt](_ecies_.md#aes128decrypt)*
 
 *Defined in [ecies.ts:96](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L96)*
 
@@ -47,7 +47,7 @@ Name | Type |
 `iv` | Buffer |
 `ciphertext` | Buffer |
 
-**Returns:** *Buffer‹›*
+**Returns:** *[AES128Decrypt](_ecies_.md#aes128decrypt)*
 
 plaintext
 
@@ -77,7 +77,7 @@ ___
 
 ###  AES128Encrypt
 
-▸ **AES128Encrypt**(`encryptionKey`: Buffer, `iv`: Buffer, `plaintext`: Buffer): *Buffer‹›*
+▸ **AES128Encrypt**(`encryptionKey`: Buffer, `iv`: Buffer, `plaintext`: Buffer): *[AES128Encrypt](_ecies_.md#aes128encrypt)*
 
 *Defined in [ecies.ts:63](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L63)*
 
@@ -91,7 +91,7 @@ Name | Type |
 `iv` | Buffer |
 `plaintext` | Buffer |
 
-**Returns:** *Buffer‹›*
+**Returns:** *[AES128Encrypt](_ecies_.md#aes128encrypt)*
 
 ciphertext
 
@@ -121,7 +121,7 @@ ___
 
 ###  Decrypt
 
-▸ **Decrypt**(`privKey`: Buffer, `encrypted`: Buffer): *Buffer‹›*
+▸ **Decrypt**(`privKey`: Buffer, `encrypted`: Buffer): *[Decrypt](_ecies_.md#decrypt)*
 
 *Defined in [ecies.ts:163](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L163)*
 
@@ -134,7 +134,7 @@ Name | Type | Description |
 `privKey` | Buffer | Ethereum private key, 32 bytes. |
 `encrypted` | Buffer | Encrypted message, serialized, 113+ bytes |
 
-**Returns:** *Buffer‹›*
+**Returns:** *[Decrypt](_ecies_.md#decrypt)*
 
 plaintext
 
@@ -142,7 +142,7 @@ ___
 
 ###  Encrypt
 
-▸ **Encrypt**(`pubKeyTo`: Buffer, `plaintext`: Buffer): *Buffer‹›*
+▸ **Encrypt**(`pubKeyTo`: Buffer, `plaintext`: Buffer): *[Encrypt](_ecies_.md#encrypt)*
 
 *Defined in [ecies.ts:134](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/utils/src/ecies.ts#L134)*
 
@@ -155,7 +155,7 @@ Name | Type | Description |
 `pubKeyTo` | Buffer | Ethereum pub key, 64 bytes. |
 `plaintext` | Buffer | Plaintext to be encrypted. |
 
-**Returns:** *Buffer‹›*
+**Returns:** *[Encrypt](_ecies_.md#encrypt)*
 
 Encrypted message, serialized, 113+ bytes
 

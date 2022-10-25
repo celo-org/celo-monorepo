@@ -61,7 +61,7 @@ ___
 
 *Inherited from [InvalidDataError](_offchain_accessors_errors_.invaliddataerror.md).[message](_offchain_accessors_errors_.invaliddataerror.md#message)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:974
+Defined in node_modules/typescript/lib/lib.es5.d.ts:1029
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 *Inherited from [InvalidDataError](_offchain_accessors_errors_.invaliddataerror.md).[name](_offchain_accessors_errors_.invaliddataerror.md#name)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:973
+Defined in node_modules/typescript/lib/lib.es5.d.ts:1028
 
 ___
 
@@ -81,4 +81,4 @@ ___
 
 *Inherited from [InvalidDataError](_offchain_accessors_errors_.invaliddataerror.md).[stack](_offchain_accessors_errors_.invaliddataerror.md#optional-stack)*
 
-Defined in node_modules/typescript/lib/lib.es5.d.ts:975
+Defined in node_modules/typescript/lib/lib.es5.d.ts:1030

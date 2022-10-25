@@ -37,7 +37,7 @@ ___
 
 ###  obfuscateNumberForMatchmaking
 
-▸ **obfuscateNumberForMatchmaking**(`e164Number`: string): *string*
+▸ **obfuscateNumberForMatchmaking**(`e164Number`: string): *[obfuscateNumberForMatchmaking](_odis_matchmaking_.md#obfuscatenumberformatchmaking)*
 
 *Defined in [packages/sdk/identity/src/odis/matchmaking.ts:94](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/identity/src/odis/matchmaking.ts#L94)*
 
@@ -47,4 +47,4 @@ Name | Type |
 ------ | ------ |
 `e164Number` | string |
 
-**Returns:** *string*
+**Returns:** *[obfuscateNumberForMatchmaking](_odis_matchmaking_.md#obfuscatenumberformatchmaking)*
