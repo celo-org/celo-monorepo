@@ -24,10 +24,10 @@ export abstract class CryptoClient {
 
   /*
    * Computes the signature for the blinded phone number using subclass-specific
-   * logic defined in _combinePartialBlindedSignatures.
+   * logic defined in _combineBlindedSignatureShares.
    * Throws an exception if not enough valid signatures.
    */
-  public combinePartialBlindedSignatures(blindedMessage: string, logger: Logger): string {
+  public combineBlindedSignatureShares(blindedMessage: string, logger: Logger): string {
     if (!this.hasSufficientSignatures()) {
       const { threshold } = this.keyVersionInfo
       logger.error(
@@ -38,17 +38,14 @@ export abstract class CryptoClient {
         `${ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES} ${this.allSignaturesLength}/${threshold}`
       )
     }
-    return this._combinePartialBlindedSignatures(blindedMessage, logger)
+    return this._combineBlindedSignatureShares(blindedMessage, logger)
   }
 
   /*
    * Computes the signature for the blinded phone number.
    * Must be implemented by subclass.
    */
-  protected abstract _combinePartialBlindedSignatures(
-    blindedMessage: string,
-    logger: Logger
-  ): string
+  protected abstract _combineBlindedSignatureShares(blindedMessage: string, logger: Logger): string
 
   /**
    * Returns total number of signatures received; must be implemented by subclass.

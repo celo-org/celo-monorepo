@@ -25,7 +25,7 @@ export class BLSCryptographyClient extends CryptoClient {
    * On error, logs and throws exception for not enough signatures,
    * and drops the invalid signature for future requests using this instance.
    */
-  protected _combinePartialBlindedSignatures(blindedMessage: string, logger: Logger): string {
+  protected _combineBlindedSignatureShares(blindedMessage: string, logger: Logger): string {
     // Optimistically attempt to combine unverified signatures
     // If combination or verification fails, iterate through each signature and remove invalid ones
     // We do this since partial signature verification incurs higher latencies

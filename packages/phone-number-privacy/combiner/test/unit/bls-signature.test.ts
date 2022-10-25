@@ -70,7 +70,7 @@ describe(`BLS service computes signature`, () => {
       }
     }
 
-    const actual = blsCryptoClient.combinePartialBlindedSignatures(
+    const actual = blsCryptoClient.combineBlindedSignatureShares(
       blindedMsg,
       rootLogger(config.serviceName)
     )
@@ -116,7 +116,7 @@ describe(`BLS service computes signature`, () => {
     signatures.forEach(async (signature) => {
       blsCryptoClient.addSignature(signature)
     })
-    const actual = blsCryptoClient.combinePartialBlindedSignatures(
+    const actual = blsCryptoClient.combineBlindedSignatureShares(
       blindedMsg,
       rootLogger(config.serviceName)
     )
@@ -163,7 +163,7 @@ describe(`BLS service computes signature`, () => {
       blsCryptoClient.addSignature(signature)
     })
     try {
-      blsCryptoClient.combinePartialBlindedSignatures(blindedMsg, rootLogger(config.serviceName))
+      blsCryptoClient.combineBlindedSignatureShares(blindedMsg, rootLogger(config.serviceName))
       throw new Error('Expected failure with missing signatures')
     } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
@@ -208,7 +208,7 @@ describe(`BLS service computes signature`, () => {
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
     // Should fail since 1/3 sigs are invalid
     try {
-      blsCryptoClient.combinePartialBlindedSignatures(blindedMsg, rootLogger(config.serviceName))
+      blsCryptoClient.combineBlindedSignatureShares(blindedMsg, rootLogger(config.serviceName))
     } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
@@ -217,7 +217,7 @@ describe(`BLS service computes signature`, () => {
 
     blsCryptoClient.addSignature(signatures[3])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
-    const actual = blsCryptoClient.combinePartialBlindedSignatures(
+    const actual = blsCryptoClient.combineBlindedSignatureShares(
       blindedMsg,
       rootLogger(config.serviceName)
     )
@@ -269,7 +269,7 @@ describe(`BLS service computes signature`, () => {
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
     // Should fail since signature from url3 was generated with the wrong key version
     try {
-      blsCryptoClient.combinePartialBlindedSignatures(blindedMsg, rootLogger(config.serviceName))
+      blsCryptoClient.combineBlindedSignatureShares(blindedMsg, rootLogger(config.serviceName))
     } catch (e: any) {
       expect(e.message.includes('Not enough partial signatures')).toBeTruthy()
     }
@@ -279,7 +279,7 @@ describe(`BLS service computes signature`, () => {
 
     blsCryptoClient.addSignature(signatures[3])
     expect(blsCryptoClient.hasSufficientSignatures()).toBeTruthy()
-    const actual = blsCryptoClient.combinePartialBlindedSignatures(
+    const actual = blsCryptoClient.combineBlindedSignatureShares(
       blindedMsg,
       rootLogger(config.serviceName)
     )
