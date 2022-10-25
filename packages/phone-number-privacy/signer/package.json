@@ -11,7 +11,7 @@
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
-    "test": "jest --testPathIgnorePatterns test/end-to-end",
+    "test": "SKIP_KNOWN_FLAKES=false jest --testPathIgnorePatterns test/end-to-end",
     "test:debughandles": "jest --watch --runInBand --detectOpenHandles --testPathIgnorePatterns test/end-to-end",
     "test:debug": "node --inspect ../../../node_modules/.bin/jest --runInBand",
     "test:coverage": "yarn test --coverage",
