@@ -29,7 +29,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     this.combine(session)
   }
 
-  async distribute(session: Session<R>): Promise<Session<R>> {
+  async distribute(session: Session<R>): Promise<void> {
     const obs = new PerformanceObserver((list) => {
       const entry = list.getEntries()[0]
       session.logger.info(
@@ -51,8 +51,6 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
 
     performance.clearMarks()
     obs.disconnect()
-
-    return session
   }
 
   protected async forwardToSigner(signer: Signer, session: Session<R>): Promise<void> {
