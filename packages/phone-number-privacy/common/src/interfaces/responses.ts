@@ -6,7 +6,6 @@ import {
   DomainRestrictedSignatureRequest,
   LegacyPnpQuotaRequest,
   LegacySignMessageRequest,
-  MatchmakingRequest,
   OdisRequest,
   PhoneNumberPrivacyRequest,
   PnpQuotaRequest,
@@ -113,40 +112,11 @@ export const PnpQuotaResponseSchema: t.Type<PnpQuotaResponse> = t.union([
   }),
 ])
 
-export interface GetContactMatchesResponseSuccess {
-  success: true
-  version: string
-  matchedContacts: Array<{ phoneNumber: string }>
-}
-export interface GetContactMatchesResponseFailure {
-  success: false
-  version: string
-  error: string
-}
-
-export type GetContactMatchesResponse =
-  | GetContactMatchesResponseSuccess
-  | GetContactMatchesResponseFailure
-
-export const GetContactMatchesResponseSchema: t.Type<GetContactMatchesResponse> = t.union([
-  t.type({
-    success: t.literal(true),
-    version: t.string,
-    matchedContacts: t.array(t.type({ phoneNumber: t.string })),
-  }),
-  t.type({
-    success: t.literal(false),
-    version: t.string,
-    error: t.string,
-  }),
-])
-
 // prettier-ignore
 export type PhoneNumberPrivacyResponse<
   R extends PhoneNumberPrivacyRequest = PhoneNumberPrivacyRequest
 > =
   | R extends SignMessageRequest | LegacySignMessageRequest ? SignMessageResponse : never
-  | R extends MatchmakingRequest ? GetContactMatchesResponse : never
   | R extends PnpQuotaRequest | LegacyPnpQuotaRequest ? PnpQuotaResponse : never
 
 // Domains

@@ -1,81 +1,8 @@
-import * as utils from '../../src/utils/input-validation'
-import {
-  GetContactMatchesRequest,
-  GetQuotaRequest,
-  LegacySignMessageRequest,
-} from '../../src/interfaces'
+import { GetQuotaRequest, LegacySignMessageRequest } from '../../src/interfaces'
 import { REASONABLE_BODY_CHAR_LIMIT } from '../../src/utils/constants'
+import * as utils from '../../src/utils/input-validation'
 
 describe('Input Validation test suite', () => {
-  describe('hasValidIdentifier utility', () => {
-    it('Should return false with empty phone number', () => {
-      const sampleData: GetContactMatchesRequest = {
-        account: 'account',
-        contactPhoneNumbers: [],
-        userPhoneNumber: 'number',
-        hashedPhoneNumber: '',
-      }
-
-      const result = utils.hasValidIdentifier(sampleData)
-
-      expect(result).toBeFalsy()
-    })
-
-    it('Should return false with non-hex phone number', () => {
-      const sampleData: GetContactMatchesRequest = {
-        account: 'account',
-        contactPhoneNumbers: [],
-        userPhoneNumber: 'number',
-        hashedPhoneNumber: '0xTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTESTTEST',
-      }
-
-      const result = utils.hasValidIdentifier(sampleData)
-
-      expect(result).toBeFalsy()
-    })
-
-    it('Should return true with hex phone number', () => {
-      const sampleData: GetContactMatchesRequest = {
-        account: 'account',
-        contactPhoneNumbers: [],
-        userPhoneNumber: 'number',
-        hashedPhoneNumber: '0x0000123400001234000012340000123400001234000012340000123400001234',
-      }
-
-      const result = utils.hasValidIdentifier(sampleData)
-
-      expect(result).toBeTruthy()
-    })
-  })
-
-  describe('identifierIsValidIfExists utility', () => {
-    it('Should return true with empty phone number', () => {
-      const sampleData: GetContactMatchesRequest = {
-        account: 'account',
-        contactPhoneNumbers: [],
-        userPhoneNumber: 'number',
-        hashedPhoneNumber: '',
-      }
-
-      const result = utils.identifierIsValidIfExists(sampleData)
-
-      expect(result).toBeTruthy()
-    })
-
-    it('Should return true with valid phone number', () => {
-      const sampleData: GetContactMatchesRequest = {
-        account: 'account',
-        contactPhoneNumbers: [],
-        userPhoneNumber: 'number',
-        hashedPhoneNumber: '0x0000123400001234000012340000123400001234000012340000123400001234',
-      }
-
-      const result = utils.identifierIsValidIfExists(sampleData)
-
-      expect(result).toBeTruthy()
-    })
-  })
-
   describe('isBodyReasonablySized utility', () => {
     it('Should return true with small body', () => {
       const sampleData: GetQuotaRequest = {
@@ -127,75 +54,6 @@ describe('Input Validation test suite', () => {
       }
 
       const result = utils.hasValidAccountParam(sampleData)
-
-      expect(result).toBeFalsy()
-    })
-  })
-
-  describe('hasValidUserPhoneNumberParam utility', () => {
-    it('Should return true for proper phone number', () => {
-      const sampleData: GetContactMatchesRequest = {
-        userPhoneNumber: Buffer.from('1912fee45d61c87cc5ea59dae31190ff').toString('base64'),
-        hashedPhoneNumber: 'hash',
-        contactPhoneNumbers: [],
-        account: '',
-      }
-
-      const result = utils.hasValidUserPhoneNumberParam(sampleData)
-
-      expect(result).toBeTruthy()
-    })
-
-    it('Should return false with wrong phone number', () => {
-      const sampleData: GetContactMatchesRequest = {
-        userPhoneNumber: Buffer.from('z').toString('base64'),
-        hashedPhoneNumber: 'hash',
-        contactPhoneNumbers: [],
-        account: '',
-      }
-
-      const result = utils.hasValidUserPhoneNumberParam(sampleData)
-
-      expect(result).toBeFalsy()
-    })
-  })
-
-  describe('hasValidContactPhoneNumbersParam utility', () => {
-    it('Should return true for proper contact phone numbers', () => {
-      const sampleData: GetContactMatchesRequest = {
-        userPhoneNumber: 'phone',
-        hashedPhoneNumber: 'hash',
-        contactPhoneNumbers: [Buffer.from('1912fee45d61c87cc5ea59dae31190ff').toString('base64')],
-        account: '',
-      }
-
-      const result = utils.hasValidContactPhoneNumbersParam(sampleData)
-
-      expect(result).toBeTruthy()
-    })
-
-    it('Should return false for wrong contact phone number', () => {
-      const sampleData: GetContactMatchesRequest = {
-        userPhoneNumber: 'phone',
-        hashedPhoneNumber: 'hash',
-        contactPhoneNumbers: [Buffer.from('zz').toString('base64')],
-        account: '',
-      }
-
-      const result = utils.hasValidContactPhoneNumbersParam(sampleData)
-
-      expect(result).toBeFalsy()
-    })
-
-    it('Should return false for missing contact phone number', () => {
-      const sampleData: GetContactMatchesRequest = {
-        userPhoneNumber: 'phone',
-        hashedPhoneNumber: 'hash',
-        contactPhoneNumbers: [],
-        account: '',
-      }
-
-      const result = utils.hasValidContactPhoneNumbersParam(sampleData)
 
       expect(result).toBeFalsy()
     })

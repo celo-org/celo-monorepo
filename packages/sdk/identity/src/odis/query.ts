@@ -7,8 +7,6 @@ import {
   DomainRequest,
   DomainRequestHeader,
   DomainResponse,
-  GetContactMatchesRequest,
-  GetContactMatchesResponse,
   OdisRequest,
   OdisRequestHeader,
   OdisResponse,
@@ -37,9 +35,6 @@ export type AuthSigner = WalletKeySigner | EncryptionKeySigner
 
 // Re-export types and aliases to maintain backwards compatibility.
 export { AuthenticationMethod, PhoneNumberPrivacyRequest, signWithRawKey }
-
-export type MatchmakingRequest = GetContactMatchesRequest
-export type MatchmakingResponse = GetContactMatchesResponse
 
 export enum ErrorMessages {
   ODIS_QUOTA_ERROR = 'odisQuotaError',
