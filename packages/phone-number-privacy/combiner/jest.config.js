@@ -8,7 +8,7 @@ module.exports = {
   collectCoverageFrom: ['./src/**'],
   coverageThreshold: {
     global: {
-      lines: 59, // TODO(2.0.0) make this higher in testing audit ticket (https://github.com/celo-org/celo-monorepo/issues/9811)
+      lines: 80,
     },
   },
 }
