@@ -32,8 +32,9 @@ export class DomainCryptoClient extends CryptoClient {
         return result.toString('base64')
       }
     } catch (error) {
+      logger.error(ErrorMessage.SIGNATURE_AGGREGATION_FAILURE)
       logger.error(error)
     }
-    throw new Error(ErrorMessage.NOT_ENOUGH_PARTIAL_SIGNATURES)
+    throw new Error(ErrorMessage.SIGNATURE_AGGREGATION_FAILURE)
   }
 }

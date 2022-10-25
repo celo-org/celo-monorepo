@@ -31,6 +31,7 @@ export enum ErrorMessage {
   FAILING_CLOSED = `CELO_ODIS_ERR_28 NODE_ERR Failing closed on full-node error`,
   CAUGHT_ERROR_IN_ENDPOINT_HANDLER = `CELO_ODIS_ERR_29 Caught error in outer endpoint handler`,
   ERROR_AFTER_RESPONSE_SENT = `CELO_ODIS_ERR_30 Error in endpoint thrown after response was already sent`,
+  SIGNATURE_AGGREGATION_FAILURE = 'CELO_ODIS_ERR_31 SIG_ERR Failed to blind aggregate signature shares',
 }
 
 export enum WarningMessage {

@@ -27,8 +27,10 @@ export class DomainSignAction extends SignAction<DomainRestrictedSignatureReques
           combinedSignature,
           this.thresholdStateService.findThresholdDomainState(session)
         )
-      } catch {
+      } catch (err) {
         // May fail upon combining signatures if too many sigs are invalid
+        session.logger.error('Combining signatures failed in combine')
+        session.logger.error(err)
         // Fallback to handleMissingSignatures
       }
     }

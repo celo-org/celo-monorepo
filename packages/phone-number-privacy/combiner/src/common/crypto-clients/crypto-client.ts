@@ -25,7 +25,7 @@ export abstract class CryptoClient {
   /*
    * Computes the signature for the blinded phone number using subclass-specific
    * logic defined in _combineBlindedSignatureShares.
-   * Throws an exception if not enough valid signatures.
+   * Throws an exception if not enough valid signatures or on aggregation failure.
    */
   public combineBlindedSignatureShares(blindedMessage: string, logger: Logger): string {
     if (!this.hasSufficientSignatures()) {

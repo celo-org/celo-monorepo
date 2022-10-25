@@ -72,9 +72,11 @@ export abstract class SignAction<R extends OdisSignatureRequest> extends Combine
           )
           // Close outstanding requests
           session.abort.abort()
-        } catch {
+        } catch (err) {
           // One or more signatures failed verification and were discarded.
-          // Error has already been logged, continue to collect signatures.
+          session.logger.info('Error caught in receiveSuccess')
+          session.logger.info(err)
+          // Continue to collect signatures.
         }
       }
     }

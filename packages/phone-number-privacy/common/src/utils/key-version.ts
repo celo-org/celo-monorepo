@@ -17,7 +17,9 @@ export function requestHasValidKeyVersion(
   try {
     getRequestKeyVersion(request, logger)
     return true
-  } catch {
+  } catch (err) {
+    logger.debug('Error caught in requestHasValidKeyVersion')
+    logger.debug(err)
     return false
   }
 }
@@ -49,7 +51,9 @@ export function responseHasExpectedKeyVersion(
   let responseKeyVersion
   try {
     responseKeyVersion = getResponseKeyVersion(response, logger)
-  } catch {
+  } catch (err) {
+    logger.debug('Error caught in responseHasExpectedKeyVersion')
+    logger.debug(err)
     return false
   }
 
