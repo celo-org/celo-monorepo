@@ -58,7 +58,7 @@ export async function getTransactionCount(
     })
   return meter(
     _getTransactionCount,
-    addresses,
+    addresses.filter((address) => address !== NULL_ADDRESS),
     (err: any) => {
       throw err
     },

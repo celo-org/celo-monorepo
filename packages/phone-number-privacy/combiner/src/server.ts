@@ -33,7 +33,7 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
 
   logger.info('Creating combiner express server')
   const app = express()
-  // TODO(2.0.0, logging) get logger to show accurate serviceName
+  // TODO get logger to show accurate serviceName
   // (https://github.com/celo-org/celo-monorepo/issues/9809)
   app.use(express.json({ limit: '0.2mb' }), loggerMiddleware(config.serviceName))
 

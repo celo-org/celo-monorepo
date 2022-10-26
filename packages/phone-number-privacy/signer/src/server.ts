@@ -97,7 +97,7 @@ export function startSigner(
       pnpQuotaService,
       new PnpQuotaIO(
         config.api.phoneNumberPrivacy.enabled,
-        config.api.phoneNumberPrivacy.shouldFailOpen, // TODO(2.0.0) (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
+        config.api.phoneNumberPrivacy.shouldFailOpen, // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config to make the code cleaner
         kit
       )
     )

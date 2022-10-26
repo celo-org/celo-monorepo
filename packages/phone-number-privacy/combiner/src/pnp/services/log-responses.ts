@@ -13,8 +13,8 @@ import {
 
 export class PnpSignerResponseLogger {
   logResponseDiscrepancies(session: Session<PnpQuotaRequest> | Session<SignMessageRequest>): void {
+    // TODO responses should all already be successes due to CombineAction receiveSuccess
     // https://github.com/celo-org/celo-monorepo/issues/9826
-    // TODO(2.0.0, logging): responses should all already be successes due to CombineAction receiveSuccess
 
     const parsedResponses: Array<{
       signerUrl: string

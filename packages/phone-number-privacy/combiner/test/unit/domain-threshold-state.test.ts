@@ -12,7 +12,7 @@ import config from '../../src/config'
 import { DomainThresholdStateService } from '../../src/domain/services/threshold-state'
 
 describe('domain threshold state', () => {
-  // TODO(2.0.0): add tests with failed signer responses, depending on
+  // TODO add tests with failed signer responses, depending on
   // result of https://github.com/celo-org/celo-monorepo/issues/9826
 
   const keyVersionInfo: KeyVersionInfo = {

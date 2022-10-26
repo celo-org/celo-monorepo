@@ -8,15 +8,21 @@ import Logger from 'bunyan'
 import crypto from 'crypto'
 import { Request } from 'express'
 import { fetchEnv, rootLogger } from '..'
-import { AuthenticationMethod, ErrorMessage, ErrorType, WarningMessage } from '../interfaces'
+import {
+  AuthenticationMethod,
+  ErrorMessage,
+  ErrorType,
+  PhoneNumberPrivacyRequest,
+  WarningMessage,
+} from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
 /*
  * Confirms that user is who they say they are and throws error on failure to confirm.
  * Authorization header should contain the EC signed body
  */
-export async function authenticateUser(
-  request: Request, // TODO(2.0.0, optional) this could take in a generic for the different request types
+export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
+  request: Request<{}, {}, R>,
   contractKit: ContractKit,
   logger: Logger,
   shouldFailOpen: boolean = true,
@@ -71,7 +77,7 @@ export async function authenticateUser(
     { account: signer, message, messageSignature },
     'Message was not authenticated with DEK, attempting to authenticate using wallet key'
   )
-  // TODO(2.0.0) This uses signature utils, why doesn't DEK authentication?
+  // TODO This uses signature utils, why doesn't DEK authentication?
   // (https://github.com/celo-org/celo-monorepo/issues/9803)
   return verifySignature(message, messageSignature, signer)
 }
@@ -114,12 +120,12 @@ export function verifyDEKSignature(
     const ec = new EC('secp256k1')
     const key = ec.keyFromPublic(trimLeading0x(registeredEncryptionKey), 'hex')
     const parsedSig = JSON.parse(messageSignature)
-    // TODO(2.0.0) why do we use a different signing method instead of SignatureUtils?
+    // TODO why do we use a different signing method instead of SignatureUtils?
     // (https://github.com/celo-org/celo-monorepo/issues/9803)
     if (key.verify(getMessageDigest(message), parsedSig)) {
       return true
     }
-    // TODO(2.0.0, deployment, Arthur): Remove this once clients upgrade to @celo/identity v1.5.3
+    // TODO(2.0.0, deployment): Remove this once clients upgrade to @celo/identity v1.5.3
     // Due to an error in the original implementation of the sign and verify functions
     // used here, older clients may generate signatures over the truncated message,
     // instead of its hash. These signatures represent a risk to the signer as they do

@@ -18,7 +18,7 @@ export const MAX_QUERY_COUNT_DISCREPANCY_THRESHOLD = 5
 export interface OdisConfig {
   serviceName: string
   enabled: boolean
-  shouldFailOpen: boolean // TODO(2.0.0) (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config, this isn't relevant to domains endpoints
+  shouldFailOpen: boolean // TODO (https://github.com/celo-org/celo-monorepo/issues/9862) consider refactoring config, this isn't relevant to domains endpoints
   odisServices: {
     signers: string
     timeoutMilliSeconds: number

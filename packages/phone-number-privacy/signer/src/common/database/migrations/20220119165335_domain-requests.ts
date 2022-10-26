@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<any> {
   if (!(await knex.schema.hasTable(DOMAIN_REQUESTS_TABLE))) {
     return knex.schema.createTable(DOMAIN_REQUESTS_TABLE, (t) => {
       t.string(DOMAIN_REQUESTS_COLUMNS.domainHash).notNullable()
-      // TODO(2.0.0, replay) when implementing replay handling,
+      // TODO when implementing replay handling,
       // this field needs to either be nonNullable or taken out of the PK
       // issue: https://github.com/celo-org/celo-monorepo/issues/9909
       t.dateTime(DOMAIN_REQUESTS_COLUMNS.timestamp).nullable()
