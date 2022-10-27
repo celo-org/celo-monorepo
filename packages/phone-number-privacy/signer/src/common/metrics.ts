@@ -4,10 +4,10 @@ const { Counter, Histogram } = client
 client.collectDefaultMetrics()
 
 // This is just so autocomplete will remind devs what the options are.
-export const Labels = {
-  read: 'read',
-  update: 'update',
-  insert: 'insert',
+export enum Labels {
+  READ = 'read',
+  UPDATE = 'update',
+  INSERT = 'insert',
 }
 
 export const Counters = {
@@ -60,6 +60,24 @@ export const Counters = {
     name: 'timeouts',
     help: 'Counter for the number of signer timeouts as measured by the signer',
   }),
+  requestsFailingOpen: new Counter({
+    name: 'requests_failing_open',
+    help:
+      'Counter for the number of requests bypassing quota or authentication checks due to full-node errors',
+  }),
+  requestsFailingClosed: new Counter({
+    name: 'requests_failing_closed',
+    help:
+      'Counter for the number of requests failing quota or authentication checks due to full-node errors',
+  }),
+  errorsCaughtInEndpointHandler: new Counter({
+    name: 'errors_caught_in_endpoint_handler',
+    help: 'Counter for the number of errors caught in the outermost endpoint handler',
+  }),
+  errorsThrownAfterResponseSent: new Counter({
+    name: 'errors_thrown_after_response_sent',
+    help: 'Counter for the number of errors thrown after a response was already sent',
+  }),
 }
 const buckets = [
   0.001,
@@ -103,7 +121,7 @@ export const Histograms = {
   getRemainingQueryCountInstrumentation: new Histogram({
     name: 'get_remaining_query_count_instrumentation',
     help: 'Histogram tracking latency of getRemainingQueryCount function by code segment',
-    labelNames: ['codeSegment'],
+    labelNames: ['codeSegment', 'endpoint'],
     buckets,
   }),
   dbOpsInstrumentation: new Histogram({
@@ -115,6 +133,22 @@ export const Histograms = {
   userRemainingQuotaAtRequest: new Histogram({
     name: 'user_remaining_quota_at_request',
     help: 'Histogram tracking remaining quota of users at time of request',
+    labelNames: ['endpoint'],
     buckets,
   }),
+}
+
+declare type InFunction<T extends any[], U> = (...params: T) => Promise<U>
+
+export async function meter<T extends any[], U>(
+  inFunction: InFunction<T, U>,
+  params: T,
+  onError: (err: any) => U,
+  prometheus: client.Histogram<string>,
+  labels: string[]
+): Promise<U> {
+  const _meter = prometheus.labels(...labels).startTimer()
+  return inFunction(...params)
+    .catch(onError)
+    .finally(_meter)
 }

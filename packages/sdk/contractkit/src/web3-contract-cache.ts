@@ -165,6 +165,9 @@ export class Web3ContractCache {
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)
   }
+  getOdisPayments() {
+    return this.getContract(CeloContract.OdisPayments)
+  }
   getRandom() {
     return this.getContract(CeloContract.Random)
   }

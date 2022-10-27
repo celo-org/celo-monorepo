@@ -1,10 +1,6 @@
 import { newKit } from '@celo/contractkit'
-import {
-  AuthenticationMethod,
-  EncryptionKeySigner,
-  ServiceContext,
-  WalletKeySigner,
-} from '@celo/identity/lib/odis/query'
+import { EncryptionKeySigner, ServiceContext, WalletKeySigner } from '@celo/identity/lib/odis/query'
+import { AuthenticationMethod } from '@celo/phone-number-privacy-common'
 import { PhoneNumberUtils } from '@celo/phone-utils'
 import {
   ensureLeading0x,
