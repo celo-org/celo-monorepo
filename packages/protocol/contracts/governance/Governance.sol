@@ -701,7 +701,7 @@ contract Governance is
 
     require(
       totalLockedGold >= yesVotes.add(noVotes).add(abstainVotes),
-      "Voter doesn't have enough locked Celo (formerly known as Celo Gold) "
+      "Voter doesn't have enough locked Celo (formerly known as Celo Gold)"
     );
     _vote(proposal, proposalId, index, account, yesVotes, noVotes, abstainVotes);
 
