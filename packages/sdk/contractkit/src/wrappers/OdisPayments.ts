@@ -1,14 +1,17 @@
 import { Address, CeloTransactionObject } from '@celo/connect'
+import { BigNumber } from 'bignumber.js'
 import { OdisPayments } from '../generated/OdisPayments'
-import { BaseWrapper, proxyCall, proxySend } from './BaseWrapper'
+import { BaseWrapper, proxyCall, proxySend, valueToBigNumber } from './BaseWrapper'
 
 export class OdisPaymentsWrapper extends BaseWrapper<OdisPayments> {
   /**
    * @notice Fetches total amount sent (all-time) for given account to odisPayments
    * @param account The account to fetch total amount of funds sent
    */
-  totalPaidCUSD: (account: Address) => Promise<string> = proxyCall(
-    this.contract.methods.totalPaidCUSD
+  totalPaidCUSD: (account: Address) => Promise<BigNumber> = proxyCall(
+    this.contract.methods.totalPaidCUSD,
+    undefined,
+    valueToBigNumber
   )
 
   /**
@@ -22,3 +25,5 @@ export class OdisPaymentsWrapper extends BaseWrapper<OdisPayments> {
     this.contract.methods.payInCUSD
   )
 }
+
+export type OdisPaymentsWrapperType = OdisPaymentsWrapper

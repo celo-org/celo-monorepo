@@ -102,6 +102,7 @@
       "@celo/flake-tracker",
       "@celo/identity",
       "@celo/phone-number-privacy-common",
+      "@celo/phone-number-privacy-signer",
       "@celo/utils"
     ]
   },

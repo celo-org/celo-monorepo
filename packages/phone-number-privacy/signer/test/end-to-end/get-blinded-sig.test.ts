@@ -1,8 +1,9 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import {
-  Endpoints,
-  GetQuotaResponse,
+  KEY_VERSION_HEADER,
+  PnpQuotaResponse,
   rootLogger as logger,
+  SignerEndpoint,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
   TestUtils,
@@ -14,8 +15,8 @@ import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
-import config, { getVersion } from '../../src/config'
-import { getWalletAddress } from '../../src/signing/query-quota'
+import { config, getVersion } from '../../src/config'
+import { getWalletAddress } from '../../src/services/web3/contracts'
 
 require('dotenv').config()
 
@@ -33,6 +34,7 @@ const { replenishQuota, registerWalletAddress } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 const ODIS_PUBLIC_POLYNOMIAL = process.env.ODIS_PUBLIC_POLYNOMIAL as string
+const ODIS_KEY_VERSION = (process.env.ODIS_KEY_VERSION || 1) as string
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'
 
@@ -55,10 +57,11 @@ describe('Running against a deployed service', () => {
     console.log('FORNO_URL: ' + DEFAULT_FORNO_URL)
     console.log('ODIS_SIGNER: ' + ODIS_SIGNER)
     console.log('ODIS_PUBLIC_POLYNOMIAL: ' + ODIS_PUBLIC_POLYNOMIAL)
+    console.log('ODIS_KEY_VERSION:' + ODIS_KEY_VERSION)
   })
 
   it('Service is deployed at correct version', async () => {
-    const response = await fetch(ODIS_SIGNER + Endpoints.STATUS, { method: 'GET' })
+    const response = await fetch(ODIS_SIGNER + SignerEndpoint.STATUS, { method: 'GET' })
     const body = await response.json()
     // This checks against local package.json version, change if necessary
     expect(body.version).toBe(getVersion())
@@ -201,9 +204,11 @@ describe('Running against a deployed service', () => {
 
     it('Check that accounts are set up correctly', async () => {
       expect(await getQuota(ACCOUNT_ADDRESS2, IDENTIFIER)).toBeLessThan(initialQuota)
-      expect(await getWalletAddress(logger(), ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
+      expect(await getWalletAddress(contractkit, logger(), ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
     })
 
+    // Note: Use this test to check the signers' key configuration. Modify .env to try out different
+    // key/version combinations
     it('Returns sig when querying succeeds with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
       const blindedPhoneNumber = getRandomBlindedPhoneNumber()
@@ -215,9 +220,11 @@ describe('Running against a deployed service', () => {
       const data = await response.text()
       const signResponse = JSON.parse(data) as SignerResponse
       expect(signResponse.success).toBeTruthy()
-      const sigBuffer = Buffer.from(signResponse.signature as string, 'base64')
-      const isValid = isValidSignature(sigBuffer, blindedPhoneNumber, ODIS_PUBLIC_POLYNOMIAL)
-      expect(isValid).toBeTruthy()
+      if (signResponse.success) {
+        const sigBuffer = Buffer.from(signResponse.signature as string, 'base64')
+        const isValid = isValidSignature(sigBuffer, blindedPhoneNumber, ODIS_PUBLIC_POLYNOMIAL)
+        expect(isValid).toBeTruthy()
+      }
     })
 
     it('Returns count when querying with unused request increments query count', async () => {
@@ -244,7 +251,7 @@ async function getQuota(
   authHeader?: string
 ): Promise<number> {
   const res = await queryQuotaEndpoint(account, hashedPhoneNumber, authHeader)
-  return res.totalQuota
+  return res.success ? res.totalQuota ?? 0 : 0
 }
 
 async function getQueryCount(
@@ -253,14 +260,14 @@ async function getQueryCount(
   authHeader?: string
 ): Promise<number> {
   const res = await queryQuotaEndpoint(account, hashedPhoneNumber, authHeader)
-  return res.performedQueryCount
+  return res.success ? res.performedQueryCount ?? 0 : 0
 }
 
 async function queryQuotaEndpoint(
   account: string,
   hashedPhoneNumber?: string,
   authHeader?: string
-): Promise<GetQuotaResponse> {
+): Promise<PnpQuotaResponse> {
   const body = JSON.stringify({
     account,
     hashedPhoneNumber,
@@ -285,7 +292,8 @@ async function postToSignMessage(
   base64BlindedMessage: string,
   account: string,
   timestamp?: number,
-  authHeader?: string
+  authHeader?: string,
+  keyVersion: string = ODIS_KEY_VERSION
 ): Promise<Response> {
   const body = JSON.stringify({
     hashedPhoneNumber: IDENTIFIER,
@@ -302,6 +310,7 @@ async function postToSignMessage(
       Accept: 'application/json',
       'Content-Type': 'application/json',
       Authorization: authorization,
+      [KEY_VERSION_HEADER]: keyVersion,
     },
     body,
   })
