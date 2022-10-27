@@ -1089,8 +1089,11 @@ contract Governance is
    * @param account The address of the account to get the record for.
    * @param index The index in `dequeued`.
    * @return The corresponding proposal ID, vote value, and weight.
-   * @return The corresponding vote value.
-   * @return The corresponding weight.
+   * @return The depreciated vote value.
+   * @return The deprecieated weight.
+   * @return The yes weight.
+   * @return The no weight.
+   * @return The abstain weight.
    */
   function getVoteRecord(address account, uint256 index)
     external
@@ -1455,7 +1458,7 @@ contract Governance is
       return weight;
     }
 
-    uint256 total = 0;
+    uint256 maxUsed = 0;
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
       Proposals.Proposal storage proposal = proposals[dequeued[index]];
       bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
@@ -1466,11 +1469,11 @@ contract Governance is
       }
 
       VoteRecord storage voteRecord = voter.referendumVotes[index];
-      total = Math.max(
-        total,
+      maxUsed = Math.max(
+        maxUsed,
         voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes)
       );
     }
-    return total;
+    return maxUsed;
   }
 }

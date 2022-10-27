@@ -371,16 +371,12 @@ OPTIONS
   --globalHelp                                       View all available global flags
 
   --proposalID=proposalID                            (required) UUID of proposal to vote
-                                                     on
-
-  --values=values                                    (required) Array of votes split by
-                                                     ','
-
-  --weights=weights                                  (required) Array of weights split
-                                                     by ','
+  --yes=values                                        Yes vote weight
+  --no=weights                                        No vote weight
+  --abstain=weights                                   Abstain vote weight
 
 EXAMPLE
-  vote-partially --proposalID 99 --values Yes,No --weights 10,20 --from
+  vote-partially --proposalID 99 --yes 10 --no 20 --abstain 30 --from
   0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 

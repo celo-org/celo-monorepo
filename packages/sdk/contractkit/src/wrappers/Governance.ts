@@ -805,9 +805,10 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
 
   /**
    * Applies `sender`'s vote choice to a given proposal.
-   * @param proposalID Governance proposal UUID
-   * @param votes Choices to apply (yes, no, abstain)
-   * @param weights Weights to apply to particular votes
+   * @param proposalID Governance proposal UUID.
+   * @param yesVotes The yes votes.
+   * @param noVotes The no votes.
+   * @param abstainVotes The abstain votes.
    */
   async votePartially(
     proposalID: BigNumber.Value,
