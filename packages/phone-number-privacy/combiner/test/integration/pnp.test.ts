@@ -196,7 +196,7 @@ describe('pnpService', () => {
   const expectedVersion = getVersion()
 
   const onChainPaymentsDefault = new BigNumber(1e18)
-  const expectedTotalQuota = 10
+  const expectedTotalQuota = 1000
 
   const message = Buffer.from('test message', 'utf8')
 
@@ -329,9 +329,11 @@ describe('pnpService', () => {
 
     describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {
       const totalQuota = 10
-      const weiTocusd = new BigNumber(1e17)
+      const weiTocusd = new BigNumber(1e18)
       beforeAll(async () => {
-        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(weiTocusd.multipliedBy(totalQuota))
+        mockOdisPaymentsTotalPaidCUSD.mockReturnValue(
+          weiTocusd.multipliedBy(totalQuota).multipliedBy(signerConfig.quota.queryPriceInCUSD)
+        )
       })
 
       const queryCountParams = [
@@ -459,7 +461,9 @@ describe('pnpService', () => {
       })
 
       it('Should respond with a warning when there are slight discrepancies in total quota', async () => {
-        mockOdisPaymentsTotalPaidCUSD.mockReturnValueOnce(weiTocusd.multipliedBy(totalQuota + 1))
+        mockOdisPaymentsTotalPaidCUSD.mockReturnValueOnce(
+          weiTocusd.multipliedBy(totalQuota + 1).multipliedBy(signerConfig.quota.queryPriceInCUSD)
+        )
         const req = {
           account: ACCOUNT_ADDRESS1,
         }

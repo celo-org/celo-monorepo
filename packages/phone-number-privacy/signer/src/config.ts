@@ -118,7 +118,7 @@ export const config: SignerConfig = {
     minEuroBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 1e16),
     // Min balance is .005 CELO
     minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 5e15),
-    // Equivalent to 0.1 cUSD/query
+    // Equivalent to 0.001 cUSD/query
     queryPriceInCUSD: new BigNumber(env.QUERY_PRICE_PER_CUSD ?? 0.001),
   },
   api: {

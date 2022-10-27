@@ -86,7 +86,7 @@ describe('pnp', () => {
   let db: Knex
 
   const onChainBalance = new BigNumber(1e18)
-  const expectedQuota = 10
+  const expectedQuota = 1000
   const expectedVersion = getVersion()
 
   // create deep copy
@@ -156,7 +156,7 @@ describe('pnp', () => {
     },
     {
       cusdOdisPaymentInWei: new BigNumber(1.56e18),
-      expectedTotalQuota: 15,
+      expectedTotalQuota: 1560,
     },
     {
       // Sanity check for the default values to be used in endpoint setup tests
@@ -166,7 +166,7 @@ describe('pnp', () => {
     {
       // Unrealistically large amount paid for ODIS quota
       cusdOdisPaymentInWei: new BigNumber(1.23456789e26),
-      expectedTotalQuota: 1234567890,
+      expectedTotalQuota: 123456789000,
     },
   ]
 

@@ -1195,7 +1195,7 @@ describe('legacyPNP', () => {
         // since once this endpoint is deprecated, these tests will no longer be needed
         it('Should not be affected by requests and queries from the new endpoint', async () => {
           mockOdisPaymentsTotalPaidCUSD.mockReturnValue(new BigNumber(1e18))
-          const expectedQuotaOnChain = 10
+          const expectedQuotaOnChain = 1000
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
@@ -1280,7 +1280,7 @@ describe('legacyPNP', () => {
             _config.keystore.keys.phoneNumberPrivacy.latest.toString()
           )
           mockOdisPaymentsTotalPaidCUSD.mockReturnValue(new BigNumber(1e18))
-          const expectedQuotaOnChain = 10
+          const expectedQuotaOnChain = 1000
           const req = getPnpSignRequest(
             ACCOUNT_ADDRESS1,
             BLINDED_PHONE_NUMBER,
