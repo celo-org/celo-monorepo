@@ -83,10 +83,6 @@ export abstract class PnpSignAction
                 ErrorMessage.FAILING_OPEN
               )
               Counters.requestsFailingOpen.inc()
-              // TODO(2.0.0) Ensure we have monitoring in the combiner for this too,
-              // since we don't have visibility into prometheus metrics for partner signers. The combiner monitoring
-              // should be based intelligently off of the warning messages returned by signers
-              // (https://github.com/celo-org/celo-monorepo/issues/9836)
             } else {
               session.logger.warn(
                 { warning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA },

@@ -82,7 +82,7 @@ const signerConfig: SignerConfig = {
     // Min balance is .005 CELO
     minCeloBalance: new BigNumber(5e15),
     // Equivalent to 0.1 cUSD/query
-    queryPriceInCUSD: new BigNumber(0.1),
+    queryPriceInCUSD: new BigNumber(0.001),
   },
   api: {
     domains: {
@@ -627,7 +627,7 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
     })
 
     describe('functionality in case of errors', () => {
-      it('Should respond with 200 on failure to fetch DEK', async () => {
+      it('Should respond with 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
         mockGetDataEncryptionKey.mockImplementation(() => {
           throw new Error()
         })
@@ -636,7 +636,13 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
         const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
         req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
         const authorization = getPnpRequestAuthorization(req, differentPk)
-        const res = await sendLegacyPnpSignRequest(req, authorization, app)
+
+        const combinerConfigWithFailOpenEnabled: typeof combinerConfig = JSON.parse(
+          JSON.stringify(combinerConfig)
+        )
+        combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
+        const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled)
+        const res = await sendLegacyPnpSignRequest(req, authorization, appWithFailOpenEnabled)
 
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({

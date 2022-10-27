@@ -69,7 +69,7 @@ if (DEV_MODE) {
     phoneNumberPrivacy: {
       serviceName: defaultServiceName,
       enabled: true,
-      shouldFailOpen: true,
+      shouldFailOpen: false,
       odisServices: {
         signers: devSignersString,
         timeoutMilliSeconds: 5 * 1000,
@@ -145,7 +145,7 @@ if (DEV_MODE) {
     phoneNumberPrivacy: {
       serviceName: functionConfig.phoneNumberPrivacy.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.phoneNumberPrivacy.enabled, false),
-      shouldFailOpen: toBool(functionConfig.phoneNumberPrivacy.shouldFailOpen, true),
+      shouldFailOpen: toBool(functionConfig.phoneNumberPrivacy.shouldFailOpen, false),
       odisServices: {
         signers: functionConfig.phoneNumberPrivacy.odisservices.signers,
         timeoutMilliSeconds:
@@ -159,7 +159,7 @@ if (DEV_MODE) {
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.domains.enabled, false),
-      shouldFailOpen: toBool(functionConfig.domains.authShouldFailOpen, true),
+      shouldFailOpen: toBool(functionConfig.domains.authShouldFailOpen, false),
       odisServices: {
         signers: functionConfig.domains.odisservices.signers,
         timeoutMilliSeconds: functionConfig.domains.odisservices.timeoutMilliSeconds ?? 5 * 1000,

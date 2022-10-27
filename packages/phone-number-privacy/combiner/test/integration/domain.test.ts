@@ -77,7 +77,7 @@ const signerConfig: SignerConfig = {
     // Min balance is .005 CELO
     minCeloBalance: new BigNumber(5e15),
     // Equivalent to 0.1 cUSD/query
-    queryPriceInCUSD: new BigNumber(0.1),
+    queryPriceInCUSD: new BigNumber(0.001),
   },
   api: {
     domains: {
@@ -85,11 +85,11 @@ const signerConfig: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: false,
-      shouldFailOpen: true,
+      shouldFailOpen: false,
     },
     legacyPhoneNumberPrivacy: {
       enabled: false,
-      shouldFailOpen: true,
+      shouldFailOpen: false,
     },
   },
   attestations: {

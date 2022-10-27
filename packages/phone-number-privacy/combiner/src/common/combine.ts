@@ -46,6 +46,8 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
 
     // Forward request to signers
     await Promise.all(this.signers.map((signer) => this.forwardToSigner(signer, session)))
+    // TODO Resolve race condition where a session can both receive a successful
+    // response in time and be aborted
 
     clearTimeout(timeout)
 

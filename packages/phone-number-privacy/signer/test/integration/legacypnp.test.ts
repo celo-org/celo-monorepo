@@ -590,7 +590,10 @@ describe('legacyPNP', () => {
       })
 
       describe('functionality in case of errors', () => {
-        it('Should respond with 200 on failure to fetch DEK', async () => {
+        it('Should respond with 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
+          const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
+          configWithFailOpenEnabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = true
+          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
           mockGetDataEncryptionKey.mockImplementation(() => {
             throw new Error()
           })
@@ -604,7 +607,13 @@ describe('legacyPNP', () => {
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
           const authorization = getPnpRequestAuthorization(req, differentPk)
-          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_QUOTA)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.LEGACY_PNP_QUOTA,
+            '1',
+            appWithFailOpenEnabled
+          )
 
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
@@ -1356,7 +1365,10 @@ describe('legacyPNP', () => {
         })
 
         it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
-          expect(_config.api.legacyPhoneNumberPrivacy.shouldFailOpen).toBe(true)
+          const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
+          configWithFailOpenEnabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = true
+          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
           await db.transaction(async (trx) => {
@@ -1389,7 +1401,13 @@ describe('legacyPNP', () => {
             IDENTIFIER
           )
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.LEGACY_PNP_SIGN,
+            '1',
+            appWithFailOpenEnabled
+          )
 
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
@@ -1540,7 +1558,7 @@ describe('legacyPNP', () => {
           ).toBe(false)
         })
 
-        it('Should return 200 on failure to fetch DEK', async () => {
+        it('Should return 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
           mockGetDataEncryptionKey.mockImplementation(() => {
             throw new Error()
           })
@@ -1552,10 +1570,20 @@ describe('legacyPNP', () => {
             IDENTIFIER
           )
 
+          const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
+          configWithFailOpenEnabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = true
+          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
           const authorization = getPnpRequestAuthorization(req, differentPk)
-          const res = await sendRequest(req, authorization, SignerEndpoint.LEGACY_PNP_SIGN)
+          const res = await sendRequest(
+            req,
+            authorization,
+            SignerEndpoint.LEGACY_PNP_SIGN,
+            '1',
+            appWithFailOpenEnabled
+          )
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,

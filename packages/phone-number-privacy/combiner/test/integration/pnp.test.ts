@@ -85,8 +85,8 @@ const signerConfig: SignerConfig = {
     minEuroBalance: new BigNumber(1e16),
     // Min balance is .005 CELO
     minCeloBalance: new BigNumber(5e15),
-    // Equivalent to 0.1 cUSD/query
-    queryPriceInCUSD: new BigNumber(0.1),
+    // Equivalent to 0.001 cUSD/query
+    queryPriceInCUSD: new BigNumber(0.001),
   },
   api: {
     domains: {
@@ -308,8 +308,12 @@ describe('pnpService', () => {
     }
   }
 
-  const getCombinerQuotaResponse = async (req: PnpQuotaRequest, authorization: string) => {
-    const res = await request(app)
+  const getCombinerQuotaResponse = async (
+    req: PnpQuotaRequest,
+    authorization: string,
+    _app: any = app
+  ) => {
+    const res = await request(_app)
       .post(CombinerEndpoint.PNP_QUOTA)
       .set('Authorization', authorization)
       .send(req)
@@ -595,7 +599,7 @@ describe('pnpService', () => {
       })
 
       describe('functionality in case of errors', () => {
-        it('Should respond with 200 on failure to fetch DEK', async () => {
+        it('Should respond with 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
           mockGetDataEncryptionKey.mockReset().mockImplementation(() => {
             throw new Error()
           })
@@ -608,7 +612,14 @@ describe('pnpService', () => {
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
           const authorization = getPnpRequestAuthorization(req, differentPk)
-          const res = await getCombinerQuotaResponse(req, authorization)
+
+          const combinerConfigWithFailOpenEnabled: typeof combinerConfig = JSON.parse(
+            JSON.stringify(combinerConfig)
+          )
+          combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
+          const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled)
+          const res = await getCombinerQuotaResponse(req, authorization, appWithFailOpenEnabled)
+
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
             success: true,
@@ -902,8 +913,6 @@ describe('pnpService', () => {
 
       describe('functionality in case of errors', () => {
         it('Should return 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
-          expect(combinerConfig.phoneNumberPrivacy.shouldFailOpen).toBe(true)
-
           mockGetDataEncryptionKey.mockImplementation(() => {
             throw new Error()
           })
@@ -912,7 +921,13 @@ describe('pnpService', () => {
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
           const authorization = getPnpRequestAuthorization(req, differentPk)
-          const res = await sendPnpSignRequest(req, authorization, app)
+
+          const combinerConfigWithFailOpenEnabled: typeof combinerConfig = JSON.parse(
+            JSON.stringify(combinerConfig)
+          )
+          combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
+          const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled)
+          const res = await sendPnpSignRequest(req, authorization, appWithFailOpenEnabled)
 
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({

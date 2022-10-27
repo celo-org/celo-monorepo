@@ -25,7 +25,7 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
   request: Request<{}, {}, R>,
   contractKit: ContractKit,
   logger: Logger,
-  shouldFailOpen: boolean = true,
+  shouldFailOpen: boolean = false,
   warnings: ErrorType[] = []
 ): Promise<boolean> {
   logger.debug('Authenticating user')

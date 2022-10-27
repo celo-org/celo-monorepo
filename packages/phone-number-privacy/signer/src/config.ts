@@ -119,7 +119,7 @@ export const config: SignerConfig = {
     // Min balance is .005 CELO
     minCeloBalance: new BigNumber(env.MIN_DOLLAR_BALANCE ?? 5e15),
     // Equivalent to 0.1 cUSD/query
-    queryPriceInCUSD: new BigNumber(env.QUERY_PRICE_PER_CUSD ?? 0.1),
+    queryPriceInCUSD: new BigNumber(env.QUERY_PRICE_PER_CUSD ?? 0.001),
   },
   api: {
     domains: {
@@ -127,11 +127,11 @@ export const config: SignerConfig = {
     },
     phoneNumberPrivacy: {
       enabled: toBool(env.PHONE_NUMBER_PRIVACY_API_ENABLED, false),
-      shouldFailOpen: toBool(env.FULL_NODE_ERRORS_SHOULD_FAIL_OPEN, true),
+      shouldFailOpen: toBool(env.FULL_NODE_ERRORS_SHOULD_FAIL_OPEN, false),
     },
     legacyPhoneNumberPrivacy: {
       enabled: toBool(env.LEGACY_PHONE_NUMBER_PRIVACY_API_ENABLED, false),
-      shouldFailOpen: toBool(env.LEGACY_FULL_NODE_ERRORS_SHOULD_FAIL_OPEN, true),
+      shouldFailOpen: toBool(env.LEGACY_FULL_NODE_ERRORS_SHOULD_FAIL_OPEN, false),
     },
   },
   attestations: {
