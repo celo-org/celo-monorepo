@@ -12,11 +12,16 @@ export const defaultPortsString = '8545:8545 8546:8546 9200:9200'
 const PORT_CONTROL_CMD = 'nc -z 127.0.0.1 8545'
 const DEFAULT_COMPONENT = 'validators'
 
-async function getPortForwardCmd(celoEnv: string, component?: string, ports = defaultPortsString) {
+async function getPortForwardCmd(
+  celoEnv: string,
+  component?: string,
+  ports = defaultPortsString,
+  podIndex = 0
+) {
   if (isVmBased()) {
     return Promise.resolve(getVmPortForwardCmd(celoEnv, component, ports))
   } else {
-    return getKubernetesPortForwardCmd(celoEnv, component, ports)
+    return getKubernetesPortForwardCmd(celoEnv, component, ports, podIndex)
   }
 }
 
@@ -31,27 +36,33 @@ function getVmPortForwardCmd(celoEnv: string, machine = 'validator-0', ports = d
 async function getKubernetesPortForwardCmd(
   celoEnv: string,
   component?: string,
-  ports = defaultPortsString
+  ports = defaultPortsString,
+  podIndex = 0
 ) {
   if (!component) {
     component = DEFAULT_COMPONENT
   }
   console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
-  const portForwardArgs = await getPortForwardArgs(celoEnv, component, ports)
+  const portForwardArgs = await getPortForwardArgs(celoEnv, component, ports, podIndex)
   return `kubectl ${portForwardArgs.join(' ')}`
 }
 
-async function getPortForwardArgs(celoEnv: string, component?: string, ports = defaultPortsString) {
+async function getPortForwardArgs(
+  celoEnv: string,
+  component?: string,
+  ports = defaultPortsString,
+  podIndex = 0
+) {
   if (!component) {
     component = DEFAULT_COMPONENT
   }
-  console.log(`Port-forwarding to ${celoEnv} ${component} ${ports}`)
+  console.log(`Port-forwarding to ${celoEnv} ${component} ${ports} ${podIndex}`)
   // The testnet helm chart used to have the label app=ethereum, but this was changed
   // to app=testnet. To preserve backward compatibility, we search for both labels.
   // It's not expected to ever have a situation where a namespace has pods with
   // both labels.
   const podName = await execCmd(
-    `kubectl get pods --namespace ${celoEnv} -l "app in (ethereum,testnet), component=${component}, release=${celoEnv}" --field-selector=status.phase=Running -o jsonpath="{.items[0].metadata.name}"`
+    `kubectl get pods --namespace ${celoEnv} -l "app in (ethereum,testnet), component=${component}, release=${celoEnv}" --field-selector=status.phase=Running -o jsonpath="{.items[${podIndex}].metadata.name}"`
   )
   return ['port-forward', `--namespace=${celoEnv}`, podName[0], ...ports.split(' ')]
 }
@@ -76,12 +87,13 @@ export async function portForwardAnd(
   celoEnv: string,
   cb: () => void,
   component?: string,
-  ports?: string
+  ports?: string,
+  podIndex?: number
 ) {
   let childProcess: ChildProcess
 
   try {
-    childProcess = execBackgroundCmd(await getPortForwardCmd(celoEnv, component, ports))
+    childProcess = execBackgroundCmd(await getPortForwardCmd(celoEnv, component, ports, podIndex))
   } catch (error) {
     console.error(error)
     process.exit(1)

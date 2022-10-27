@@ -23,6 +23,7 @@ interface FaucetArgv extends AccountArgv {
   checkZero: boolean
   checkDeployed: boolean
   blockscout: boolean
+  podIndex: number
 }
 interface TokenParams {
   token: CeloTokenType
@@ -92,6 +93,11 @@ export const builder = (argv: yargs.Argv) => {
       description: 'Open in blockscout afterwards',
       default: false,
     })
+    .option('podIndex', {
+      type: 'number',
+      description: 'Index of validator to port forward through',
+      default: 0,
+    })
 }
 
 export const handler = async (argv: FaucetArgv) => {
@@ -135,6 +141,7 @@ export const handler = async (argv: FaucetArgv) => {
               `Unable to faucet ${tokenParams.token} to ${address} on ${argv.celoEnv}: --checkZero specified, but balance is non-zero`
             )
           }
+          0
         }
         const tokenAmount = await convertToContractDecimals(tokenParams.amount, tokenWrapper)
         console.log(`Fauceting ${tokenAmount.toFixed()} of ${tokenParams.token} to ${address}`)
@@ -179,7 +186,7 @@ export const handler = async (argv: FaucetArgv) => {
   }
 
   try {
-    await portForwardAnd(argv.celoEnv, cb)
+    await portForwardAnd(argv.celoEnv, cb, undefined, undefined, argv.podIndex)
   } catch (error) {
     console.error(`Unable to faucet ${argv.account} on ${argv.celoEnv}`)
     console.error(error)
