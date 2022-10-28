@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@celo/identity": "2.3.1-dev",
+    "@celo/encrypted-backup": "2.3.1-dev",
     "@celo/phone-number-privacy-signer": "2.0.0-dev",
     "@types/btoa": "^1.2.3",
     "@types/express": "^4.17.6",
