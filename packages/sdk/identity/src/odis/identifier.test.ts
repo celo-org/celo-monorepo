@@ -2,13 +2,11 @@ import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getBlindedIdentifier,
   getBlindedIdentifierSignature,
+  getOnchainIdentifier,
   getOnchainIdentifierFromSignature,
+  getPepperFromThresholdSignature,
   IdentifierType,
 } from './identifier'
-import {
-  getPhoneNumberIdentifier,
-  isBalanceSufficientForSigRetrieval,
-} from './phone-number-identifier'
 import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
 
 jest.mock('./bls-blinding-client', () => {
@@ -22,9 +20,9 @@ jest.mock('./bls-blinding-client', () => {
   }
 })
 
-const mockE164Number = '+14155550000'
+const mockOffchainIdentifier = '+14155550000'
 const mockAccount = '0x0000000000000000000000000000000000007E57'
-const expectedPhoneHash = '0xf3ddadd1f488cdd42b9fa10354fdcae67c303ce182e71b30855733b50dce8301'
+const expectedIdentifierHash = '0xf3ddadd1f488cdd42b9fa10354fdcae67c303ce182e71b30855733b50dce8301'
 const expectedPepper = 'nHIvMC9B4j2+H'
 
 const serviceContext: ServiceContext = {
@@ -40,15 +38,7 @@ const authSigner: EncryptionKeySigner = {
   rawKey,
 }
 
-describe(isBalanceSufficientForSigRetrieval, () => {
-  it('identifies sufficient balance correctly', () => {
-    expect(isBalanceSufficientForSigRetrieval(0.009, 0.004)).toBe(false)
-    expect(isBalanceSufficientForSigRetrieval(0.01, 0)).toBe(true)
-    expect(isBalanceSufficientForSigRetrieval(0, 0.005)).toBe(true)
-  })
-})
-
-describe(getPhoneNumberIdentifier, () => {
+describe(getOnchainIdentifier, () => {
   afterEach(() => {
     fetchMock.reset()
   })
@@ -61,7 +51,10 @@ describe(getPhoneNumberIdentifier, () => {
       })
 
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
-      const base64BlindedMessage = await getBlindedIdentifier(mockE164Number, blsBlindingClient)
+      const base64BlindedMessage = await getBlindedIdentifier(
+        mockOffchainIdentifier,
+        blsBlindingClient
+      )
       const base64BlindSig = await getBlindedIdentifierSignature(
         mockAccount,
         authSigner,
@@ -71,23 +64,32 @@ describe(getPhoneNumberIdentifier, () => {
       const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
 
       await expect(
-        getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
+        getOnchainIdentifier(
+          mockOffchainIdentifier,
+          IdentifierType.PHONE_NUMBER,
+          mockAccount,
+          authSigner,
+          serviceContext
+        )
       ).resolves.toMatchObject({
-        e164Number: mockE164Number,
+        offchainIdentifier: mockOffchainIdentifier,
         pepper: expectedPepper,
-        phoneHash: expectedPhoneHash,
+        identifierHash: expectedIdentifierHash,
         unblindedSignature: base64UnblindedSig,
       })
     })
 
-    it('Preblinding the phone number', async () => {
+    it('Preblinding the of-chain identifier', async () => {
       fetchMock.mock(endpoint, {
         success: true,
         combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
       })
 
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
-      const base64BlindedMessage = await getBlindedIdentifier(mockE164Number, blsBlindingClient)
+      const base64BlindedMessage = await getBlindedIdentifier(
+        mockOffchainIdentifier,
+        blsBlindingClient
+      )
 
       const base64BlindSig = await getBlindedIdentifierSignature(
         mockAccount,
@@ -96,15 +98,15 @@ describe(getPhoneNumberIdentifier, () => {
         base64BlindedMessage
       )
 
-      const phoneNumberHashDetails = await getOnchainIdentifierFromSignature(
-        mockE164Number,
+      const identifierHashDetails = await getOnchainIdentifierFromSignature(
+        mockOffchainIdentifier,
         IdentifierType.PHONE_NUMBER,
         base64BlindSig,
         blsBlindingClient
       )
 
-      expect(phoneNumberHashDetails.identifierHash).toEqual(expectedPhoneHash)
-      expect(phoneNumberHashDetails.pepper).toEqual(expectedPepper)
+      expect(identifierHashDetails.identifierHash).toEqual(expectedIdentifierHash)
+      expect(identifierHashDetails.pepper).toEqual(expectedPepper)
     })
   })
 
@@ -112,14 +114,34 @@ describe(getPhoneNumberIdentifier, () => {
     fetchMock.mock(endpoint, 403)
 
     await expect(
-      getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
+      getOnchainIdentifier(
+        mockOffchainIdentifier,
+        IdentifierType.PHONE_NUMBER,
+        mockAccount,
+        authSigner,
+        serviceContext
+      )
     ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
   })
 
   it('Throws auth error', async () => {
     fetchMock.mock(endpoint, 401)
     await expect(
-      getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
+      getOnchainIdentifier(
+        mockOffchainIdentifier,
+        IdentifierType.PHONE_NUMBER,
+        mockAccount,
+        authSigner,
+        serviceContext
+      )
     ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
+  })
+})
+
+describe(getPepperFromThresholdSignature, () => {
+  it('Hashes sigs correctly', () => {
+    const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
+    const signature = Buffer.from(base64Sig, 'base64')
+    expect(getPepperFromThresholdSignature(signature)).toBe('piWqRHHYWtfg9')
   })
 })
