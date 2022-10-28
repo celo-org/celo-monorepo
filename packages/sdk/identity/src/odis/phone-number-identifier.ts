@@ -2,7 +2,6 @@ import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
 import {
   CombinerEndpointPNP,
   KEY_VERSION_HEADER,
-  SignerEndpointPNP,
   SignMessageRequest,
   SignMessageResponseSchema,
 } from '@celo/phone-number-privacy-common'
@@ -51,11 +50,7 @@ export async function getPhoneNumberIdentifier(
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string,
   keyVersion?: number,
-  endpoint:
-    | CombinerEndpointPNP.LEGACY_PNP_SIGN
-    | CombinerEndpointPNP.PNP_SIGN
-    | SignerEndpointPNP.LEGACY_PNP_SIGN
-    | SignerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.LEGACY_PNP_SIGN
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
 
@@ -87,7 +82,7 @@ export async function getPhoneNumberIdentifier(
     clientVersion,
     sessionID,
     keyVersion,
-    endpoint
+    endpoint ?? CombinerEndpointPNP.LEGACY_PNP_SIGN
   )
 
   return getPhoneNumberIdentifierFromSignature(e164Number, base64BlindSig, blsBlindingClient)
@@ -120,11 +115,7 @@ export async function getBlindedPhoneNumberSignature(
   clientVersion?: string,
   sessionID?: string,
   keyVersion?: number,
-  endpoint:
-    | CombinerEndpointPNP.LEGACY_PNP_SIGN
-    | CombinerEndpointPNP.PNP_SIGN
-    | SignerEndpointPNP.LEGACY_PNP_SIGN
-    | SignerEndpointPNP.PNP_SIGN = CombinerEndpointPNP.LEGACY_PNP_SIGN
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
 ): Promise<string> {
   const body: SignMessageRequest = {
     account,
@@ -134,10 +125,16 @@ export async function getBlindedPhoneNumberSignature(
     sessionID,
   }
 
-  const response = await queryOdis(body, context, endpoint, SignMessageResponseSchema, {
-    [KEY_VERSION_HEADER]: keyVersion?.toString(),
-    Authorization: await getOdisPnpRequestAuth(body, signer),
-  })
+  const response = await queryOdis(
+    body,
+    context,
+    endpoint ?? CombinerEndpointPNP.LEGACY_PNP_SIGN,
+    SignMessageResponseSchema,
+    {
+      [KEY_VERSION_HEADER]: keyVersion?.toString(),
+      Authorization: await getOdisPnpRequestAuth(body, signer),
+    }
+  )
 
   if (!response.success) {
     throw new Error(response.error)
