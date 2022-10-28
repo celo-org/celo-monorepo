@@ -13,15 +13,31 @@ import {
   SignMessageRequest,
 } from './query'
 
-// ODIS minimum dollar balance for sig retrieval
-export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.01
-// ODIS minimum celo balance for sig retrieval
-export const ODIS_MINIMUM_CELO_BALANCE = 0.005
-
 const debug = debugFactory('kit:odis:identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
+const SALT_SEPARATOR = '__'
+
+export enum IdentifierType {
+  PHONE_NUMBER = 0,
+  EMAIL = 1,
+  TWITTER = 2,
+  // feel free to put up a PR to add more types!
+}
+
+export function getIdentifierPrefix(type: IdentifierType) {
+  switch (type) {
+    case IdentifierType.PHONE_NUMBER:
+      return 'tel'
+    case IdentifierType.EMAIL:
+      return 'mailto'
+    case IdentifierType.TWITTER:
+      return 'twit'
+    default:
+      throw new Error('Unsupported Identifier Type')
+  }
+}
 
 export interface IdentifierHashDetails {
   offchainIdentifier: string
@@ -36,6 +52,7 @@ export interface IdentifierHashDetails {
  */
 export async function getOnchainIdentifier(
   offchainIdentifier: string,
+  identifierType: string | IdentifierType,
   account: string,
   signer: AuthSigner,
   context: ServiceContext,
@@ -77,7 +94,12 @@ export async function getOnchainIdentifier(
     sessionID
   )
 
-  return getOnchainIdentifierFromSignature(offchainIdentifier, base64BlindSig, blsBlindingClient)
+  return getOnchainIdentifierFromSignature(
+    offchainIdentifier,
+    identifierType,
+    base64BlindSig,
+    blsBlindingClient
+  )
 }
 
 /**
@@ -124,7 +146,7 @@ export async function getBlindedIdentifierSignature(
     signer,
     body,
     context,
-    CombinerEndpoint.SIGN_MESSAGE
+    CombinerEndpoint.PNP_SIGN
   )
   return response.combinedSignature
 }
@@ -134,6 +156,7 @@ export async function getBlindedIdentifierSignature(
  */
 export async function getOnchainIdentifierFromSignature(
   offchainIdentifier: string,
+  identifierType: string | IdentifierType,
   base64BlindedSignature: string,
   blsBlindingClient: BlsBlindingClient
 ): Promise<IdentifierHashDetails> {
@@ -143,22 +166,23 @@ export async function getOnchainIdentifierFromSignature(
 
   debug('Converting sig to pepper')
   const pepper = getPepperFromThresholdSignature(sigBuf)
-  const identifierHash = getidentifierHash(sha3, offchainIdentifier, pepper)
+  const identifierHash = getIdentifierHash(sha3, offchainIdentifier, identifierType, pepper)
   return { offchainIdentifier, identifierHash, pepper, unblindedSignature: base64UnblindedSig }
 }
 
 export const getIdentifierHash = (
   sha3: (a: string) => string | null,
   offchainIdentifier: string,
-  identifierType: string,
+  identifierType: string | IdentifierType,
   salt?: string
 ): string => {
-  // if (!phoneNumber || !isoffchainIdentifier(phoneNumber)) {
-  //   throw Error('Attempting to hash a non-e164 number: ' + phoneNumber)
-  // }
-  const prefix = getIdentifierPrefix(IdentifierType.PHONE_NUMBER)
-  const value =
-    prefix + (salt ? offchainIdentifier + PHONE_SALT_SEPARATOR + salt : offchainIdentifier)
+  let prefix
+  if (typeof identifierType === 'string') {
+    prefix = identifierType + '://'
+  } else {
+    prefix = getIdentifierPrefix(identifierType) + '://'
+  }
+  const value = prefix + (salt ? offchainIdentifier + SALT_SEPARATOR + salt : offchainIdentifier)
   return sha3(value) as string
 }
 
