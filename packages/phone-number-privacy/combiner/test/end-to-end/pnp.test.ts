@@ -190,6 +190,75 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       expect(res2).toStrictEqual<PhoneNumberHashDetails>(res1)
     })
 
+    it('Should increment performedQueryCount on success', async () => {
+      const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
+        ACCOUNT_ADDRESS,
+        walletAuthSigner,
+        SERVICE_CONTEXT
+      )
+      await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        PHONE_NUMBER,
+        ACCOUNT_ADDRESS,
+        walletAuthSigner,
+        SERVICE_CONTEXT,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        CombinerEndpoint.PNP_SIGN
+      )
+      const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
+        ACCOUNT_ADDRESS,
+        walletAuthSigner,
+        SERVICE_CONTEXT
+      )
+      expect(res2).toStrictEqual<PnpClientQuotaStatus>({
+        version: VERSION,
+        performedQueryCount: res1.performedQueryCount + 1,
+        totalQuota: res1.totalQuota,
+        remainingQuota: res1.totalQuota - res1.performedQueryCount + 1,
+        blockNumber: res2.blockNumber,
+        warnings: [],
+      })
+    })
+
+    it('Should not increment performedQueryCount on replayed request when using DEK auth', async () => {
+      const sendSameRequest = async () =>
+        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+          PHONE_NUMBER,
+          ACCOUNT_ADDRESS,
+          dekAuthSigner(0),
+          SERVICE_CONTEXT,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          CombinerEndpoint.PNP_SIGN
+        )
+      await sendSameRequest()
+      const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
+        ACCOUNT_ADDRESS,
+        dekAuthSigner(0),
+        SERVICE_CONTEXT
+      )
+      await sendSameRequest()
+      const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
+        ACCOUNT_ADDRESS,
+        walletAuthSigner,
+        SERVICE_CONTEXT
+      )
+      expect(res2).toStrictEqual<PnpClientQuotaStatus>({
+        version: VERSION,
+        performedQueryCount: res1.performedQueryCount,
+        totalQuota: res1.totalQuota,
+        remainingQuota: res1.remainingQuota,
+        blockNumber: res2.blockNumber,
+        warnings: [],
+      })
+    })
+
     for (let i = 1; i <= 2; i++) {
       it(`Should succeed on valid request with key version header ${i}`, async () => {
         const res = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
@@ -229,37 +298,55 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
 
-    it('Should increment performedQueryCount on success', async () => {
-      const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
-        ACCOUNT_ADDRESS,
-        walletAuthSigner,
-        SERVICE_CONTEXT
-      )
-      await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
-        PHONE_NUMBER,
-        ACCOUNT_ADDRESS,
-        walletAuthSigner,
-        SERVICE_CONTEXT,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        CombinerEndpoint.PNP_SIGN
-      )
-      const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
-        ACCOUNT_ADDRESS,
-        walletAuthSigner,
-        SERVICE_CONTEXT
-      )
-      expect(res2).toStrictEqual<PnpClientQuotaStatus>({
-        version: VERSION,
-        performedQueryCount: res1.performedQueryCount + 1,
-        totalQuota: res1.totalQuota,
-        remainingQuota: res1.totalQuota - res1.performedQueryCount + 1,
-        blockNumber: res2.blockNumber,
-        warnings: [],
-      })
+    it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on invalid key version`, async () => {
+      await expect(
+        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+          PHONE_NUMBER,
+          ACCOUNT_ADDRESS,
+          walletAuthSigner,
+          SERVICE_CONTEXT,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          1.5,
+          CombinerEndpoint.PNP_SIGN
+        )
+      ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
+    })
+
+    it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on invalid address`, async () => {
+      await expect(
+        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+          PHONE_NUMBER,
+          'not an address',
+          walletAuthSigner,
+          SERVICE_CONTEXT,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          1,
+          CombinerEndpoint.PNP_SIGN
+        )
+      ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
+    })
+
+    it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on invalid phone number`, async () => {
+      await expect(
+        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+          'not a phone number',
+          ACCOUNT_ADDRESS,
+          walletAuthSigner,
+          SERVICE_CONTEXT,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          1,
+          CombinerEndpoint.PNP_SIGN
+        )
+      ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
 
     // TODO(2.0.0, deployment)
@@ -315,85 +402,4 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
     })
   })
-
-  // describe('Returns status ODIS_INPUT_ERROR', () => {
-  //   it('With invalid address', async () => {
-  //     const body: SignMessageRequest = {
-  //       account: '0x1234',
-  //       authenticationMethod: AuthenticationMethod.WALLET_KEY,
-  //       blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
-  //       version: 'ignore',
-  //       sessionID: genSessionID(),
-  //     }
-
-  //     await expect(
-  //       OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, Endpoint.LEGACY_PNP_SIGN)
-  //     ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
-  //   })
-
-  //   it('With missing blindedQueryPhoneNumber', async () => {
-  //     const body: SignMessageRequest = {
-  //       account: ACCOUNT_ADDRESS,
-  //       authenticationMethod: AuthenticationMethod.WALLET_KEY,
-  //       blindedQueryPhoneNumber: '',
-  //       version: 'ignore',
-  //       sessionID: genSessionID(),
-  //     }
-  //     await expect(
-  //       OdisUtils.Query.queryOdis(walletAuthSigner, body, SERVICE_CONTEXT, Endpoint.LEGACY_PNP_SIGN)
-  //     ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
-  //   })
-  // })
-
-  // describe('Returns ODIS_AUTH_ERROR', () => {
-  //   it('With invalid authentication', async () => {
-  //     const body: SignMessageRequest = {
-  //       account: ACCOUNT_ADDRESS,
-  //       authenticationMethod: AuthenticationMethod.WALLET_KEY,
-  //       blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
-  //       version: 'ignore',
-  //     }
-  //     await expect(
-  //       OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, Endpoint.LEGACY_PNP_SIGN)
-  //     ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
-  //   })
-  // })
-
-  // describe('Returns ODIS_QUOTA_ERROR', () => {
-  //   it('When querying out of quota', async () => {
-  //     await expect(
-  //       OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
-  //         PHONE_NUMBER,
-  //         ACCOUNT_ADDRESS_NO_QUOTA,
-  //         walletAuthSigner,
-  //         SERVICE_CONTEXT
-  //       )
-  //     ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
-  //   })
-  // })
-
-  // describe('With enough quota', () => {
-  //   // if these tests are failing, it may just be that the address needs to be fauceted:
-  //   // celotooljs account faucet --account 0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb --dollar 1 --gold 1 -e <ENV> --verbose
-  //   it('Returns sig when querying with unused and used request', async () => {
-  //     await replenishQuota(ACCOUNT_ADDRESS, contractKit)
-  //     const body: SignMessageRequest = {
-  //       account: ACCOUNT_ADDRESS,
-  //       authenticationMethod: AuthenticationMethod.WALLET_KEY,
-  //       blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
-  //       version: 'ignore',
-  //       sessionID: genSessionID(),
-  //     }
-  //     // Query twice to test reusing the request
-  //     for (let i = 0; i < 2; i++) {
-  //       const result = OdisUtils.Query.queryOdis(
-  //         walletAuthSigner,
-  //         body,
-  //         SERVICE_CONTEXT,
-  //         Endpoint.LEGACY_PNP_SIGN
-  //       )
-  //       await expect(result).resolves.toMatchObject({ success: true })
-  //     }
-  //   })
-  // })
 })

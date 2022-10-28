@@ -81,6 +81,63 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       expect(res2).toStrictEqual<PhoneNumberHashDetails>(res1)
     })
 
+    it('Should increment performedQueryCount on success', async () => {
+      const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
+        ACCOUNT_ADDRESS,
+        walletAuthSigner,
+        SERVICE_CONTEXT
+      )
+      await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        PHONE_NUMBER,
+        ACCOUNT_ADDRESS,
+        walletAuthSigner,
+        SERVICE_CONTEXT
+      )
+      const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
+        ACCOUNT_ADDRESS,
+        walletAuthSigner,
+        SERVICE_CONTEXT
+      )
+      expect(res2).toStrictEqual<PnpClientQuotaStatus>({
+        version: VERSION,
+        performedQueryCount: res1.performedQueryCount + 1,
+        totalQuota: res1.totalQuota,
+        remainingQuota: res1.totalQuota - res1.performedQueryCount + 1,
+        blockNumber: res2.blockNumber,
+        warnings: [],
+      })
+    })
+
+    it('Should not increment performedQueryCount on replayed request when using DEK auth', async () => {
+      const sendSameRequest = async () =>
+        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+          PHONE_NUMBER,
+          ACCOUNT_ADDRESS,
+          dekAuthSigner(0),
+          SERVICE_CONTEXT
+        )
+      await sendSameRequest()
+      const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
+        ACCOUNT_ADDRESS,
+        dekAuthSigner(0),
+        SERVICE_CONTEXT
+      )
+      await sendSameRequest()
+      const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
+        ACCOUNT_ADDRESS,
+        walletAuthSigner,
+        SERVICE_CONTEXT
+      )
+      expect(res2).toStrictEqual<PnpClientQuotaStatus>({
+        version: VERSION,
+        performedQueryCount: res1.performedQueryCount,
+        totalQuota: res1.totalQuota,
+        remainingQuota: res1.remainingQuota,
+        blockNumber: res2.blockNumber,
+        warnings: [],
+      })
+    })
+
     for (let i = 1; i <= 2; i++) {
       it(`Should succeed on valid request with key version header ${i}`, async () => {
         const res = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
@@ -118,31 +175,52 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
 
-    it('Should increment performedQueryCount on success', async () => {
-      const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
-        ACCOUNT_ADDRESS,
-        walletAuthSigner,
-        SERVICE_CONTEXT
-      )
-      await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
-        PHONE_NUMBER,
-        ACCOUNT_ADDRESS,
-        walletAuthSigner,
-        SERVICE_CONTEXT
-      )
-      const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
-        ACCOUNT_ADDRESS,
-        walletAuthSigner,
-        SERVICE_CONTEXT
-      )
-      expect(res2).toStrictEqual<PnpClientQuotaStatus>({
-        version: VERSION,
-        performedQueryCount: res1.performedQueryCount + 1,
-        totalQuota: res1.totalQuota,
-        remainingQuota: res1.totalQuota - res1.performedQueryCount + 1,
-        blockNumber: res2.blockNumber,
-        warnings: [],
-      })
+    it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on invalid key version`, async () => {
+      await expect(
+        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+          PHONE_NUMBER,
+          ACCOUNT_ADDRESS,
+          walletAuthSigner,
+          SERVICE_CONTEXT,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          1.5
+        )
+      ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
+    })
+
+    it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on invalid address`, async () => {
+      await expect(
+        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+          PHONE_NUMBER,
+          'not an address',
+          walletAuthSigner,
+          SERVICE_CONTEXT,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          1
+        )
+      ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
+    })
+
+    it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on invalid phone number`, async () => {
+      await expect(
+        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+          'not a phone number',
+          ACCOUNT_ADDRESS,
+          walletAuthSigner,
+          SERVICE_CONTEXT,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          1
+        )
+      ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
 
     // TODO(2.0.0, deployment)
