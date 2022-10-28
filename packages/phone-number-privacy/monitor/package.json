@@ -18,7 +18,7 @@
     "clean": "tsc -b . --clean",
     "build": "tsc -b .",
     "lint": "tslint --project .",
-    "loadTest": "ts-node src/scripts/runLoadTest.ts"
+    "loadTest": "ts-node src/scripts/run-load-test.ts"
   },
   "dependencies": {
     "@celo/contractkit": "2.3.0",
@@ -35,6 +35,6 @@
     "firebase-tools": "9.20.0"
   },
   "engines": {
-    "node": "12"
+    "node": ">=12"
   }
 }

@@ -124,7 +124,7 @@
     "react-native-flipper": "^0.70.0",
     "react-native-ntp-client": "^1.0.0",
     "set-value": "^3.0.2",
-    "sha3": "1.2.3",
+    "sha3": "1.2.6",
     "tar": "4.4.15",
     "ua-parser-js": "0.7.28",
     "underscore": "^1.12.1",

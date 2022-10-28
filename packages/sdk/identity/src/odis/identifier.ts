@@ -1,4 +1,9 @@
-import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
+import {
+  CombinerEndpoint,
+  KEY_VERSION_HEADER,
+  SignMessageRequest,
+  SignMessageResponseSchema,
+} from '@celo/phone-number-privacy-common'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { createHash } from 'crypto'
 import debugFactory from 'debug'
@@ -6,11 +11,10 @@ import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthenticationMethod,
   AuthSigner,
-  CombinerSignMessageResponse,
   EncryptionKeySigner,
+  getOdisPnpRequestAuth,
   queryOdis,
   ServiceContext,
-  SignMessageRequest,
 } from './query'
 
 const debug = debugFactory('kit:odis:identifier')
@@ -57,7 +61,6 @@ export async function getOnchainIdentifier(
   signer: AuthSigner,
   context: ServiceContext,
   blindingFactor?: string,
-  selfidentifierHash?: string,
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string
@@ -89,7 +92,6 @@ export async function getOnchainIdentifier(
     signer,
     context,
     base64BlindedMessage,
-    selfidentifierHash,
     clientVersion,
     sessionID
   )
@@ -126,29 +128,34 @@ export async function getBlindedIdentifierSignature(
   signer: AuthSigner,
   context: ServiceContext,
   base64BlindedMessage: string,
-  selfidentifierHash?: string,
   clientVersion?: string,
-  sessionID?: string
+  sessionID?: string,
+  keyVersion?: number
 ): Promise<string> {
   const body: SignMessageRequest = {
     account,
-    blindedQueryIdentifier: base64BlindedMessage,
-    hashedIdentifier: selfidentifierHash,
-    version: clientVersion ? clientVersion : 'unknown',
+    blindedQueryPhoneNumber: base64BlindedMessage,
+    version: clientVersion,
     authenticationMethod: signer.authenticationMethod,
+    sessionID,
   }
 
-  if (sessionID) {
-    body.sessionID = sessionID
-  }
-
-  const response = await queryOdis<CombinerSignMessageResponse>(
-    signer,
+  const response = await queryOdis(
     body,
     context,
-    CombinerEndpoint.PNP_SIGN
+    CombinerEndpoint.PNP_SIGN,
+    SignMessageResponseSchema,
+    {
+      [KEY_VERSION_HEADER]: keyVersion?.toString(),
+      Authorization: await getOdisPnpRequestAuth(body, signer),
+    }
   )
-  return response.combinedSignature
+
+  if (!response.success) {
+    throw new Error(response.error)
+  }
+
+  return response.signature
 }
 
 /**

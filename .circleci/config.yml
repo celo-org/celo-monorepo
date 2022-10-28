@@ -26,7 +26,7 @@ reference:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+    - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
   environment:
     # To avoid ENOMEM problem when running node
     NODE_OPTIONS: '--max-old-space-size=4096'
@@ -727,7 +727,7 @@ jobs:
   test-typescript-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -740,7 +740,7 @@ jobs:
   test-utils-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -753,7 +753,7 @@ jobs:
   test-contractkit-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -769,7 +769,7 @@ jobs:
   test-celocli-npm-package-install:
     working_directory: ~/app
     docker:
-      - image: us.gcr.io/celo-testnet/circleci-node12:1.0.0
+      - image: us.gcr.io/celo-testnet/circleci-node12:1.1.0
     steps:
       - run:
           name: Check if the test should run
@@ -782,7 +782,7 @@ jobs:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
 
-  phone-number-privacy-test:
+  odis-test:
     <<: *defaults
     steps:
       - attach_workspace:
@@ -790,13 +790,16 @@ jobs:
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner,@celo/phone-number-privacy-common
+      - run:
+          name: Run Tests for common package
+          command: yarn --cwd=packages/phone-number-privacy/common test:coverage
       - run:
           name: Run Tests for combiner
-          command: yarn --cwd=packages/phone-number-privacy/combiner test
+          command: yarn --cwd=packages/phone-number-privacy/combiner test:coverage
       - run:
           name: Run Tests for signer
-          command: yarn --cwd=packages/phone-number-privacy/signer test
+          command: yarn --cwd=packages/phone-number-privacy/signer test:coverage
 
   certora-test:
     working_directory: ~/app
@@ -979,7 +982,7 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      - phone-number-privacy-test:
+      - odis-test:
           requires:
             - lint-checks
       - flakey-test-summary:
@@ -999,7 +1002,7 @@ workflows:
             - end-to-end-geth-sync-test
             - end-to-end-geth-validator-order-test
             - end-to-end-cip35-eth-compatibility-test
-            - phone-number-privacy-test
+            - odis-test
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:

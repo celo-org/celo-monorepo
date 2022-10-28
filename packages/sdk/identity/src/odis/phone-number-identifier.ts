@@ -34,7 +34,6 @@ export async function getPhoneNumberIdentifier(
   signer: AuthSigner,
   context: ServiceContext,
   blindingFactor?: string,
-  selfPhoneHash?: string,
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string
@@ -66,7 +65,6 @@ export async function getPhoneNumberIdentifier(
     signer,
     context,
     base64BlindedMessage,
-    selfPhoneHash,
     clientVersion,
     sessionID
   )

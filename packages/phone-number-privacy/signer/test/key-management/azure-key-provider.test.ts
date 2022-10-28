@@ -1,15 +1,34 @@
-import { AzureKeyProvider } from '../../src/key-management/azure-key-provider'
+import { AzureKeyProvider } from '../../src/common/key-management/azure-key-provider'
+import { DefaultKeyName, Key } from '../../src/common/key-management/key-provider-base'
 
 const mockKey = '030303030303030303030303030303030303030303030303030303030303030303030303'
 
+const key: Key = {
+  name: DefaultKeyName.PHONE_NUMBER_PRIVACY,
+  version: 1,
+}
+
 jest.mock('../../src/config', () => ({
-  keystore: {
-    azure: {
-      clientID: 'mockClientID',
-      clientSecret: 'mockClientSecret',
-      tenant: 'mockTenant',
-      vaultName: 'mockVaultName',
-      secretName: 'mockSecretName',
+  config: {
+    serviceName: 'odis-signer',
+    keystore: {
+      keys: {
+        phoneNumberPrivacy: {
+          name: 'phoneNumberPrivacy',
+          latest: 1,
+        },
+        domains: {
+          name: 'domains',
+          latest: 1,
+        },
+      },
+      azure: {
+        clientID: 'mockClientID',
+        clientSecret: 'mockClientSecret',
+        tenant: 'mockTenant',
+        vaultName: 'mockVaultName',
+        secretName: 'mockSecretName',
+      },
     },
   },
 }))
@@ -25,8 +44,8 @@ describe('AzureKeyProvider', () => {
     getSecret.mockResolvedValue(mockKey)
 
     const provider = new AzureKeyProvider()
-    await provider.fetchPrivateKeyFromStore()
-    expect(provider.getPrivateKey()).toBe(mockKey)
+    await provider.fetchPrivateKeyFromStore(key)
+    expect(provider.getPrivateKey(key)).toBe(mockKey)
   })
 
   it('handles exceptions correctly', async () => {
@@ -34,6 +53,6 @@ describe('AzureKeyProvider', () => {
 
     const provider = new AzureKeyProvider()
     expect.assertions(1)
-    await expect(provider.fetchPrivateKeyFromStore()).rejects.toThrow()
+    await expect(provider.fetchPrivateKeyFromStore(key)).rejects.toThrow()
   })
 })
