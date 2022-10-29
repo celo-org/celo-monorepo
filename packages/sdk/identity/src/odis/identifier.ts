@@ -21,7 +21,7 @@ const debug = debugFactory('kit:odis:identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
-const SALT_SEPARATOR = '__'
+const PEPPER_SEPARATOR = '__'
 
 export enum IdentifierType {
   PHONE_NUMBER = 0,
@@ -181,7 +181,7 @@ export const getIdentifierHash = (
   sha3: (a: string) => string | null,
   offchainIdentifier: string,
   identifierType: string | IdentifierType,
-  salt?: string
+  pepper?: string
 ): string => {
   let prefix
   if (typeof identifierType === 'string') {
@@ -189,7 +189,8 @@ export const getIdentifierHash = (
   } else {
     prefix = getIdentifierPrefix(identifierType) + '://'
   }
-  const value = prefix + (salt ? offchainIdentifier + SALT_SEPARATOR + salt : offchainIdentifier)
+  const value =
+    prefix + (pepper ? offchainIdentifier + PEPPER_SEPARATOR + pepper : offchainIdentifier)
   return sha3(value) as string
 }
 
