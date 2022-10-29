@@ -1,5 +1,6 @@
 import { isE164Number } from '@celo/base/lib/phoneNumbers'
 import BigNumber from 'bignumber.js'
+import { createHash } from 'crypto'
 import debugFactory from 'debug'
 import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
@@ -16,6 +17,8 @@ export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.01
 export const ODIS_MINIMUM_CELO_BALANCE = 0.005
 
 const debug = debugFactory('kit:odis:phone-number-identifier')
+
+const PEPPER_CHAR_LENGTH = 13
 
 export interface PhoneNumberHashDetails {
   e164Number: string
@@ -94,4 +97,11 @@ export function isBalanceSufficientForSigRetrieval(
     new BigNumber(dollarBalance).isGreaterThanOrEqualTo(ODIS_MINIMUM_DOLLAR_BALANCE) ||
     new BigNumber(celoBalance).isGreaterThanOrEqualTo(ODIS_MINIMUM_CELO_BALANCE)
   )
+}
+
+// This is the algorithm that creates a pepper from the unblinded message signatures
+// It simply hashes it with sha256 and encodes it to hex
+export function getPepperFromThresholdSignature(sigBuf: Buffer) {
+  // Currently uses 13 chars for a 78 bit pepper
+  return createHash('sha256').update(sigBuf).digest('base64').slice(0, PEPPER_CHAR_LENGTH)
 }
