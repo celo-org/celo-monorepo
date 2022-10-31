@@ -28,7 +28,7 @@ import {
 import { getRequestExists } from '../../src/common/database/wrappers/request'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
-import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
+import { config, getSignerVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
 const {
@@ -87,7 +87,7 @@ describe('pnp', () => {
 
   const onChainBalance = new BigNumber(1e18)
   const expectedQuota = 1000
-  const expectedVersion = getVersion()
+  const expectedVersion = getSignerVersion()
 
   // create deep copy
   const _config: typeof config = JSON.parse(JSON.stringify(config))

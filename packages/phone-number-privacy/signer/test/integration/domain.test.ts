@@ -35,7 +35,7 @@ import {
 } from '../../src/common/database/wrappers/domain-state'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
-import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
+import { config, getSignerVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
 jest.setTimeout(20000)
@@ -45,7 +45,7 @@ describe('domain', () => {
   wallet.addAccount('0x00000000000000000000000000000000000000000000000000000000deadbeef')
   const walletAddress = wallet.getAccounts()[0]!
 
-  const expectedVersion = getVersion()
+  const expectedVersion = getSignerVersion()
 
   const domainStages = (): SequentialDelayStage[] => [
     { delay: 0, resetTimer: noBool, batchSize: defined(2), repetitions: defined(10) },

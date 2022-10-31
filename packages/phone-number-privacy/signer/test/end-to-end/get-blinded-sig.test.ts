@@ -15,7 +15,7 @@ import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
-import { config, getVersion } from '../../src/config'
+import { config, getSignerVersion } from '../../src/config'
 import { getWalletAddress } from '../../src/services/web3/contracts'
 
 require('dotenv').config()
@@ -64,7 +64,7 @@ describe('Running against a deployed service', () => {
     const response = await fetch(ODIS_SIGNER + SignerEndpoint.STATUS, { method: 'GET' })
     const body = await response.json()
     // This checks against local package.json version, change if necessary
-    expect(body.version).toBe(getVersion())
+    expect(body.version).toBe(getSignerVersion())
   })
 
   describe('Returns status 400 with invalid input', () => {

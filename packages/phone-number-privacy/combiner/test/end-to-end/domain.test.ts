@@ -13,7 +13,7 @@ import {
 } from '@celo/phone-number-privacy-common'
 import * as crypto from 'crypto'
 import 'isomorphic-fetch'
-import { VERSION } from '../../src/config'
+import { getCombinerVersion } from '../../src'
 import { SERVICE_CONTEXT } from './resources'
 
 require('dotenv').config()
@@ -30,7 +30,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     })
     const body = await response.json()
     // This checks against local package.json version, change if necessary
-    expect(body.version).toBe(VERSION)
+    expect(body.version).toBe(getCombinerVersion())
   })
 
   describe(`${CombinerEndpoint.DOMAIN_QUOTA_STATUS}`, () => {
@@ -49,7 +49,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       if (res.ok) {
         expect(res.result).toStrictEqual<DomainQuotaStatusResponseSuccess>({
           success: true,
-          version: VERSION,
+          version: getCombinerVersion(),
           status: {
             timer: res.result.status.timer,
             counter: res.result.status.counter,
@@ -85,7 +85,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       if (res.ok) {
         expect(res.result).toStrictEqual<DomainQuotaStatusResponseSuccess>({
           success: true,
-          version: VERSION,
+          version: getCombinerVersion(),
           status: {
             timer: res.result.status.timer,
             counter: res.result.status.counter,
@@ -112,7 +112,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       if (res.ok) {
         expect(res.result).toStrictEqual<DomainQuotaStatusResponseSuccess>({
           success: true,
-          version: VERSION,
+          version: getCombinerVersion(),
           status: {
             timer: res.result.status.timer,
             counter: res.result.status.counter,

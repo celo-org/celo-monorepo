@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 
 require('dotenv').config()
 
-export function getVersion(): string {
+export function getSignerVersion(): string {
   return process.env.npm_package_version ?? '0.0.0'
 }
 export const DEV_MODE = process.env.NODE_ENV !== 'production'

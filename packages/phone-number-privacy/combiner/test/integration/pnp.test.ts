@@ -26,14 +26,14 @@ import {
   KeyProvider,
 } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
 import { MockKeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/mock-key-provider'
-import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
+import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
 import BigNumber from 'bignumber.js'
 import threshold_bls from 'blind-threshold-bls'
 import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
 import { Server } from 'net'
 import request from 'supertest'
-import config from '../../src/config'
+import config, { getCombinerVersion } from '../../src/config'
 import { startCombiner } from '../../src/server'
 
 const {
@@ -193,7 +193,7 @@ describe('pnpService', () => {
   let blindedMsgResult: threshold_bls.BlindedMessage
 
   const signerMigrationsPath = '../signer/src/common/database/migrations'
-  const expectedVersion = getVersion()
+  const expectedVersion = getCombinerVersion()
 
   const onChainPaymentsDefault = new BigNumber(1e18)
   const expectedTotalQuota = 1000

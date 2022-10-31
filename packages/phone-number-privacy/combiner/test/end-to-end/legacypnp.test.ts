@@ -4,7 +4,7 @@ import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import { PnpClientQuotaStatus } from '@celo/identity/lib/odis/quota'
 import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
 import 'isomorphic-fetch'
-import { VERSION } from '../../src/config'
+import { getCombinerVersion } from '../../src'
 import {
   ACCOUNT_ADDRESS,
   ACCOUNT_ADDRESS_NO_QUOTA,
@@ -28,7 +28,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     })
     const body = await response.json()
     // This checks against local package.json version, change if necessary
-    expect(body.version).toBe(VERSION)
+    expect(body.version).toBe(getCombinerVersion())
   })
 
   describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
@@ -99,7 +99,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         SERVICE_CONTEXT
       )
       expect(res2).toStrictEqual<PnpClientQuotaStatus>({
-        version: VERSION,
+        version: getCombinerVersion(),
         performedQueryCount: res1.performedQueryCount + 1,
         totalQuota: res1.totalQuota,
         remainingQuota: res1.totalQuota - res1.performedQueryCount + 1,
@@ -129,7 +129,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         SERVICE_CONTEXT
       )
       expect(res2).toStrictEqual<PnpClientQuotaStatus>({
-        version: VERSION,
+        version: getCombinerVersion(),
         performedQueryCount: res1.performedQueryCount,
         totalQuota: res1.totalQuota,
         remainingQuota: res1.remainingQuota,

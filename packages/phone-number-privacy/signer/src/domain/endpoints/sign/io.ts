@@ -18,7 +18,7 @@ import { Request, Response } from 'express'
 import { IO } from '../../../common/io'
 import { Key } from '../../../common/key-management/key-provider-base'
 import { Counters } from '../../../common/metrics'
-import { getVersion } from '../../../config'
+import { getSignerVersion } from '../../../config'
 import { DomainSession } from '../../session'
 
 export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
@@ -64,7 +64,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       response,
       {
         success: true,
-        version: getVersion(),
+        version: getSignerVersion(),
         signature,
         status: domainState,
       },
@@ -84,7 +84,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       response,
       {
         success: false,
-        version: getVersion(),
+        version: getSignerVersion(),
         error,
         status: domainState,
       },

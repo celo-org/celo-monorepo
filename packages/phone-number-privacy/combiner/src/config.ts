@@ -1,6 +1,8 @@
 import { BlockchainConfig, rootLogger, TestUtils, toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
-export const VERSION = process.env.npm_package_version ?? '0.0.0'
+export function getCombinerVersion(): string {
+  return process.env.npm_package_version ?? '0.0.0'
+}
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 

@@ -10,8 +10,8 @@ import {
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import { CombinerConfig, VERSION } from '.'
 import { Controller } from './common/controller'
+import { CombinerConfig, getCombinerVersion } from './config'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
 import { DomainQuotaAction } from './domain/endpoints/quota/action'
@@ -51,7 +51,7 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
 
   app.get(CombinerEndpoint.STATUS, (_req, res) => {
     res.status(200).json({
-      version: VERSION,
+      version: getCombinerVersion(),
     })
   })
 

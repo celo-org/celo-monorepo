@@ -20,7 +20,7 @@ import * as t from 'io-ts'
 import { DomainCryptoClient } from '../../../common/crypto-clients/domain-crypto-client'
 import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
-import { VERSION } from '../../../config'
+import { getCombinerVersion } from '../../../config'
 
 export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
   readonly endpoint = CombinerEndpoint.DOMAIN_SIGN
@@ -77,7 +77,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       response,
       {
         success: true,
-        version: VERSION,
+        version: getCombinerVersion(),
         signature,
         status: domainState,
       },
@@ -95,7 +95,7 @@ export class DomainSignIO extends IO<DomainRestrictedSignatureRequest> {
       response,
       {
         success: false,
-        version: VERSION,
+        version: getCombinerVersion(),
         error,
       },
       status,

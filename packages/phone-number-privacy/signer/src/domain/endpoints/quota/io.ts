@@ -15,7 +15,7 @@ import {
 import { Request, Response } from 'express'
 import { IO } from '../../../common/io'
 import { Counters } from '../../../common/metrics'
-import { getVersion } from '../../../config'
+import { getSignerVersion } from '../../../config'
 import { DomainSession } from '../../session'
 
 export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
@@ -54,7 +54,7 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
       response,
       {
         success: true,
-        version: getVersion(),
+        version: getSignerVersion(),
         status: domainState,
       },
       status,
@@ -72,7 +72,7 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
       response,
       {
         success: false,
-        version: getVersion(),
+        version: getSignerVersion(),
         error,
       },
       status,
