@@ -44,7 +44,7 @@ export function getIdentifierPrefix(type: IdentifierType) {
 }
 
 export interface IdentifierHashDetails {
-  offchainIdentifier: string
+  plaintextIdentifier: string
   identifierHash: string
   pepper: string
   unblindedSignature?: string
@@ -54,8 +54,8 @@ export interface IdentifierHashDetails {
  * Retrieve the on-chain identifier for the provided off-chain identifier
  * Performs blinding, querying, and unblinding
  */
-export async function getOnchainIdentifier(
-  offchainIdentifier: string,
+export async function getObfuscatedIdentifier(
+  plaintextIdentifier: string,
   identifierType: string | IdentifierType,
   account: string,
   signer: AuthSigner,
@@ -82,7 +82,7 @@ export async function getOnchainIdentifier(
   }
 
   const base64BlindedMessage = await getBlindedIdentifier(
-    offchainIdentifier,
+    plaintextIdentifier,
     blsBlindingClient,
     seed
   )
@@ -96,8 +96,8 @@ export async function getOnchainIdentifier(
     sessionID
   )
 
-  return getOnchainIdentifierFromSignature(
-    offchainIdentifier,
+  return getObfuscatedIdentifierFromSignature(
+    plaintextIdentifier,
     identifierType,
     base64BlindSig,
     blsBlindingClient
@@ -161,8 +161,8 @@ export async function getBlindedIdentifierSignature(
 /**
  * Unblind the response and return the on-chain identifier
  */
-export async function getOnchainIdentifierFromSignature(
-  offchainIdentifier: string,
+export async function getObfuscatedIdentifierFromSignature(
+  plaintextIdentifier: string,
   identifierType: string | IdentifierType,
   base64BlindedSignature: string,
   blsBlindingClient: BlsBlindingClient
@@ -173,12 +173,12 @@ export async function getOnchainIdentifierFromSignature(
 
   debug('Converting sig to pepper')
   const pepper = getPepperFromThresholdSignature(sigBuf)
-  const identifierHash = getIdentifierHash(offchainIdentifier, identifierType, pepper)
-  return { offchainIdentifier, identifierHash, pepper, unblindedSignature: base64UnblindedSig }
+  const identifierHash = getIdentifierHash(plaintextIdentifier, identifierType, pepper)
+  return { plaintextIdentifier, identifierHash, pepper, unblindedSignature: base64UnblindedSig }
 }
 
 export const getIdentifierHash = (
-  offchainIdentifier: string,
+  plaintextIdentifier: string,
   identifierType: string | IdentifierType,
   pepper?: string
 ): string => {
@@ -187,7 +187,7 @@ export const getIdentifierHash = (
       ? identifierType + '://'
       : getIdentifierPrefix(identifierType) + '://'
   const value =
-    prefix + (pepper ? offchainIdentifier + PEPPER_SEPARATOR + pepper : offchainIdentifier)
+    prefix + (pepper ? plaintextIdentifier + PEPPER_SEPARATOR + pepper : plaintextIdentifier)
   return sha3(value) as string
 }
 

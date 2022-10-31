@@ -3,8 +3,8 @@ import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getBlindedIdentifier,
   getBlindedIdentifierSignature,
-  getOnchainIdentifier,
-  getOnchainIdentifierFromSignature,
+  getObfuscatedIdentifier,
+  getObfuscatedIdentifierFromSignature,
   getPepperFromThresholdSignature,
   IdentifierType,
 } from './identifier'
@@ -39,7 +39,7 @@ const authSigner: EncryptionKeySigner = {
   rawKey,
 }
 
-describe(getOnchainIdentifier, () => {
+describe(getObfuscatedIdentifier, () => {
   afterEach(() => {
     fetchMock.reset()
   })
@@ -65,7 +65,7 @@ describe(getOnchainIdentifier, () => {
       const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
 
       await expect(
-        getOnchainIdentifier(
+        getObfuscatedIdentifier(
           mockOffchainIdentifier,
           IdentifierType.PHONE_NUMBER,
           mockAccount,
@@ -99,7 +99,7 @@ describe(getOnchainIdentifier, () => {
         base64BlindedMessage
       )
 
-      const identifierHashDetails = await getOnchainIdentifierFromSignature(
+      const identifierHashDetails = await getObfuscatedIdentifierFromSignature(
         mockOffchainIdentifier,
         IdentifierType.PHONE_NUMBER,
         base64BlindSig,
@@ -115,7 +115,7 @@ describe(getOnchainIdentifier, () => {
     fetchMock.mock(endpoint, 403)
 
     await expect(
-      getOnchainIdentifier(
+      getObfuscatedIdentifier(
         mockOffchainIdentifier,
         IdentifierType.PHONE_NUMBER,
         mockAccount,
@@ -128,7 +128,7 @@ describe(getOnchainIdentifier, () => {
   it('Throws auth error', async () => {
     fetchMock.mock(endpoint, 401)
     await expect(
-      getOnchainIdentifier(
+      getObfuscatedIdentifier(
         mockOffchainIdentifier,
         IdentifierType.PHONE_NUMBER,
         mockAccount,

@@ -3,7 +3,7 @@ import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getBlindedIdentifier,
   getBlindedIdentifierSignature,
-  getOnchainIdentifierFromSignature,
+  getObfuscatedIdentifierFromSignature,
   IdentifierType,
 } from './identifier'
 import {
@@ -103,7 +103,7 @@ describe(getPhoneNumberIdentifier, () => {
         base64BlindedMessage
       )
 
-      const phoneNumberHashDetails = await getOnchainIdentifierFromSignature(
+      const phoneNumberHashDetails = await getObfuscatedIdentifierFromSignature(
         mockE164Number,
         IdentifierType.PHONE_NUMBER,
         base64BlindSig,
