@@ -37,16 +37,17 @@ COPY patches/ patches/
 # Setting ONLY_PUBLISHED_DEPENDENCIES to true (default) or any non-empty string results in only the
 # phone-number-privacy package being copied into the image, and therefore it will only build using
 # published dependencies. Setting ONLY_PUBLISHED_DEPENDENCIES to "" will copy in all dependecies.
-ARG ONLY_PUBLISHED_DEPENDENCIES=true
+ARG ONLY_PUBLISHED_DEPENDENCIES=""
 ARG PACKAGE_SELECTOR=${ONLY_PUBLISHED_DEPENDENCIES:+phone-number-privacy}
 COPY --from=packages celo-phone-number-privacy/packages/${PACKAGE_SELECTOR} packages/${PACKAGE_SELECTOR}
 
 # Install dependencies and build.
-# Note that thios command will fail with TARGET=production if any dependencies are unpublished.
+# Note that this command will fail with TARGET=production if any dependencies are unpublished.
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 RUN yarn build
 
 # Setup and run the signer application.
+# ENV NODE_ENV=${TARGET} TODO(2.0.0, deployment) should this be defined? 
 ENV NODE_ENV production
 WORKDIR /celo-phone-number-privacy/packages/phone-number-privacy/signer
 EXPOSE 8080
