@@ -47,7 +47,7 @@ RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 RUN yarn build
 
 # Setup and run the signer application.
-ENV NODE_ENV=${TARGET}
+ENV NODE_ENV production
 WORKDIR /celo-phone-number-privacy/packages/phone-number-privacy/signer
 EXPOSE 8080
 ENTRYPOINT ["yarn", "start:docker"]
