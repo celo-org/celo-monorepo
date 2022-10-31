@@ -2178,14 +2178,10 @@ contract('Governance', (accounts: string[]) => {
 
       it("should set the voter's vote record", async () => {
         await governance.votePartially(proposalId, index, yesVotes, 0, 0)
-        const [
-          recordProposalId,
-          ,
-          ,
-          yesVotesRecord,
-          noVotesRecord,
-          abstainVotesRecord,
-        ] = await governance.getVoteRecord(account, index)
+        const [recordProposalId, , , yesVotesRecord] = await governance.getVoteRecord(
+          account,
+          index
+        )
         assertEqualBN(recordProposalId, proposalId)
         assertEqualBN(yesVotesRecord, yesVotes)
       })
