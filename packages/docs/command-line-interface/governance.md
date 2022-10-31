@@ -367,16 +367,18 @@ USAGE
   $ celocli governance:votePartially
 
 OPTIONS
+  --abstain=abstain                                  Abstain votes
   --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Voter's address
   --globalHelp                                       View all available global flags
+  --no=no                                            No votes
 
   --proposalID=proposalID                            (required) UUID of proposal to vote
-  --yes=values                                        Yes vote weight
-  --no=weights                                        No vote weight
-  --abstain=weights                                   Abstain vote weight
+                                                     on
+
+  --yes=yes                                          Yes votes
 
 EXAMPLE
-  vote-partially --proposalID 99 --yes 10 --no 20 --abstain 30 --from
+  vote-partially --proposalID 99 --yes 10 --no 20 --from
   0x5409ed021d9299bf6814279a6a1411a7e866a631
 ```
 

@@ -257,8 +257,9 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
         proposalID,
         votes: new BigNumber(0),
         value: VoteValue.None,
-        voteValues: [VoteValue.Yes],
-        voteWeights: [new BigNumber(ONE_CGLD)],
+        abstainVotes: new BigNumber(0),
+        noVotes: new BigNumber(0),
+        yesVotes: new BigNumber('1000000000000000000'),
       }
       expect(voter.votes[0]).toEqual(expectedVoteRecord)
     })
