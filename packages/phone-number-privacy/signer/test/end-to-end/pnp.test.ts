@@ -13,7 +13,10 @@ require('dotenv').config()
 const { IDENTIFIER, PRIVATE_KEY1, PRIVATE_KEY2, PRIVATE_KEY3 } = TestUtils.Values
 
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
-// const ODIS_PUBLIC_POLYNOMIAL = process.env.ODIS_PUBLIC_POLYNOMIAL as string
+// const ODIS_PUBLIC_POLYNOMIAL = process.env[
+//   process.env.ODIS_PUBLIC_POLYNOMIAL_VAR_FOR_TESTS as string
+// ] as string
+
 const ODIS_KEY_VERSION = (process.env.ODIS_KEY_VERSION || 1) as string
 
 const DEFAULT_FORNO_URL = config.blockchain.provider

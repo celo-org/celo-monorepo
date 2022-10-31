@@ -153,7 +153,7 @@ You can test your mainnet service is set up correctly by running a specific end-
 3. Modify the .env file:
 
    - Change `ODIS_SIGNER_SERVICE_URL` to your service endpoint.
-   - Swap the `ODIS_PUBLIC_POLYNOMIAL` with the *mainnet* one.
+   - Set `ODIS_PUBLIC_POLYNOMIAL_VAR_FOR_TESTS` to equal `MAINNET_PHONE_NUMBER_PRIVACY_POLYNOMIAL` (so that tests run against the mainnet polynomial).
 
 4. Run `yarn jest test/end-to-end/get-blinded-sig.test.ts -t 'When walletAddress has enough quota Returns sig when querying succeeds with unused request'`
 5. Verify test passes.
