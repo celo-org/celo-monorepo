@@ -15,6 +15,7 @@ COPY packages/sdk/connect packages/sdk/connect
 COPY packages/sdk/contractkit packages/sdk/contractkit
 COPY packages/sdk/cryptographic-utils packages/sdk/cryptographic-utils
 COPY packages/sdk/identity packages/sdk/identity
+COPY packages/sdk/encrypted-backup packages/sdk/encrypted-backup
 COPY packages/sdk/utils packages/sdk/utils
 COPY packages/sdk/phone-utils packages/sdk/phone-utils
 COPY packages/sdk/wallets/wallet-base packages/sdk/wallets/wallet-base
