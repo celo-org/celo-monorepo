@@ -2,11 +2,11 @@ import { selectiveRetryAsyncWithBackOff } from '@celo/base/lib/async'
 import { ContractKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
+  CombinerEndpoint,
   DomainEndpoint,
   DomainRequest,
   DomainRequestHeader,
   DomainResponse,
-  Endpoint,
   OdisRequest,
   OdisRequestHeader,
   OdisResponse,
@@ -110,7 +110,7 @@ export async function getOdisPnpRequestAuth(
 export async function queryOdis<R extends OdisRequest>(
   body: R,
   context: ServiceContext,
-  endpoint: Endpoint,
+  endpoint: CombinerEndpoint,
   responseSchema: t.Type<OdisResponse<R>>,
   headers: OdisRequestHeader<R>
 ): Promise<OdisResponse<R>> {
