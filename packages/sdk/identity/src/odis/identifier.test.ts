@@ -1,3 +1,4 @@
+import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getBlindedIdentifier,
@@ -30,7 +31,7 @@ const serviceContext: ServiceContext = {
   odisPubKey:
     '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
 }
-const endpoint = serviceContext.odisUrl + '/getBlindedMessageSig'
+const endpoint = serviceContext.odisUrl + CombinerEndpoint.PNP_SIGN
 const rawKey = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
 
 const authSigner: EncryptionKeySigner = {

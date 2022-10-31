@@ -173,22 +173,19 @@ export async function getOnchainIdentifierFromSignature(
 
   debug('Converting sig to pepper')
   const pepper = getPepperFromThresholdSignature(sigBuf)
-  const identifierHash = getIdentifierHash(sha3, offchainIdentifier, identifierType, pepper)
+  const identifierHash = getIdentifierHash(offchainIdentifier, identifierType, pepper)
   return { offchainIdentifier, identifierHash, pepper, unblindedSignature: base64UnblindedSig }
 }
 
 export const getIdentifierHash = (
-  sha3: (a: string) => string | null,
   offchainIdentifier: string,
   identifierType: string | IdentifierType,
   pepper?: string
 ): string => {
-  let prefix
-  if (typeof identifierType === 'string') {
-    prefix = identifierType + '://'
-  } else {
-    prefix = getIdentifierPrefix(identifierType) + '://'
-  }
+  const prefix =
+    typeof identifierType === 'string'
+      ? identifierType + '://'
+      : getIdentifierPrefix(identifierType) + '://'
   const value =
     prefix + (pepper ? offchainIdentifier + PEPPER_SEPARATOR + pepper : offchainIdentifier)
   return sha3(value) as string
