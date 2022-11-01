@@ -1384,7 +1384,7 @@
     debug "^4.1.1"
     utf8 "3.0.0"
 
-"@celo/contractkit-prev@npm:@celo/contractkit@~1.2.0", "@celo/contractkit@1.2.5":
+"@celo/contractkit@1.2.5":
   name "@celo/contractkit-prev"
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-1.2.5.tgz#bc20de92bf18d9da5d73ad914027ae8902c071b5"

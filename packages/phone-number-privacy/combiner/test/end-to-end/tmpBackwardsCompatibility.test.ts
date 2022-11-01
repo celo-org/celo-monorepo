@@ -1,10 +1,10 @@
-import { newKit } from '@celo/contractkit-prev'
+import { newKit } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity-prev'
 import { SignMessageRequest, WalletKeySigner } from '@celo/identity-prev/lib/odis/query'
 import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import { AuthenticationMethod, Endpoint } from '@celo/phone-number-privacy-common'
+import { replenishQuota } from '@celo/phone-number-privacy-common/lib/test/utils'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
-import { replenishQuota } from '@celo/phone-number-privacy-common/src/test/utils'
 import 'isomorphic-fetch'
 import {
   ACCOUNT_ADDRESS,
