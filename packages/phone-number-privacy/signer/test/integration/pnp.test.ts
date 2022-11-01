@@ -385,7 +385,7 @@ describe('pnp', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: 0,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
@@ -550,7 +550,7 @@ describe('pnp', () => {
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -573,7 +573,7 @@ describe('pnp', () => {
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -594,7 +594,7 @@ describe('pnp', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignatures[i - 1],
             performedQueryCount: performedQueryCount + 1,
             totalQuota: expectedQuota,
@@ -616,7 +616,7 @@ describe('pnp', () => {
         expect(res1.status).toBe(200)
         expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res1.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -642,7 +642,7 @@ describe('pnp', () => {
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -664,7 +664,7 @@ describe('pnp', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -680,7 +680,7 @@ describe('pnp', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
         })
       })
@@ -696,7 +696,7 @@ describe('pnp', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -712,7 +712,7 @@ describe('pnp', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -729,7 +729,7 @@ describe('pnp', () => {
         expect(res.status).toBe(401)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
         })
       })
@@ -746,7 +746,7 @@ describe('pnp', () => {
         expect(res.status).toBe(401)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
         })
       })
@@ -775,7 +775,7 @@ describe('pnp', () => {
         expect(res.status).toBe(403)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: expectedQuota,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -802,7 +802,7 @@ describe('pnp', () => {
         expect(res.status).toBe(403)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: 0,
           totalQuota: 0,
           blockNumber: testBlockNumber,
@@ -838,7 +838,7 @@ describe('pnp', () => {
         expect(res.status).toBe(403)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: expectedQuota + 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -857,7 +857,7 @@ describe('pnp', () => {
         expect(res.status).toBe(500)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: performedQueryCount,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -886,7 +886,7 @@ describe('pnp', () => {
         expect(res.status).toBe(503)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
         })
       })
@@ -934,7 +934,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: -1,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
@@ -1058,7 +1058,7 @@ describe('pnp', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignature,
             performedQueryCount: expectedQuota + 1, // bc we depleted the user's quota above
             totalQuota: Number.MAX_SAFE_INTEGER,
@@ -1113,7 +1113,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: -1,
             blockNumber: testBlockNumber,
@@ -1145,7 +1145,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             error: ErrorMessage.DATABASE_UPDATE_FAILURE,
           })
 
@@ -1184,7 +1184,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             error: ErrorMessage.DATABASE_INSERT_FAILURE,
           })
 
@@ -1231,7 +1231,7 @@ describe('pnp', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignature,
             performedQueryCount: performedQueryCount + 1,
             totalQuota: expectedQuota,
@@ -1258,7 +1258,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
@@ -1309,7 +1309,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
