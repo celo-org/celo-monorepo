@@ -6,7 +6,7 @@ import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getBlindedIdentifier,
   getBlindedIdentifierSignature,
-  getOnchainIdentifierFromSignature,
+  getObfuscatedIdentifierFromSignature,
   IdentifierType,
 } from './identifier'
 import { AuthenticationMethod, AuthSigner, EncryptionKeySigner, ServiceContext } from './query'
@@ -73,17 +73,17 @@ export async function getPhoneNumberIdentifier(
   )
 
   const {
-    offchainIdentifier,
+    plaintextIdentifier,
     identifierHash,
     pepper,
     unblindedSignature,
-  } = await getOnchainIdentifierFromSignature(
+  } = await getObfuscatedIdentifierFromSignature(
     e164Number,
     IdentifierType.PHONE_NUMBER,
     base64BlindSig,
     blsBlindingClient
   )
-  return { e164Number: offchainIdentifier, phoneHash: identifierHash, pepper, unblindedSignature }
+  return { e164Number: plaintextIdentifier, phoneHash: identifierHash, pepper, unblindedSignature }
 }
 
 /**

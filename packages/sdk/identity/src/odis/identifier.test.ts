@@ -48,7 +48,10 @@ describe(getObfuscatedIdentifier, () => {
     it('Using EncryptionKeySigner', async () => {
       fetchMock.mock(endpoint, {
         success: true,
-        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+        signature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+        performedQueryCount: 5,
+        totalQuota: 10,
+        version: '',
       })
 
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
@@ -83,7 +86,10 @@ describe(getObfuscatedIdentifier, () => {
     it('Preblinding the of-chain identifier', async () => {
       fetchMock.mock(endpoint, {
         success: true,
-        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+        signature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+        performedQueryCount: 5,
+        totalQuota: 10,
+        version: '',
       })
 
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
