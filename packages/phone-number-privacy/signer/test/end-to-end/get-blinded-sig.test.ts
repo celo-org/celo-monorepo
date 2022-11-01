@@ -8,8 +8,6 @@ import {
   SignMessageResponseSuccess,
   TestUtils,
 } from '@celo/phone-number-privacy-common'
-import { getBlindedPhoneNumber } from '@celo/phone-number-privacy-common/lib/test/utils'
-import { PHONE_NUMBER } from '@celo/phone-number-privacy-common/lib/test/values'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
@@ -26,11 +24,12 @@ const {
   ACCOUNT_ADDRESS3,
   BLINDED_PHONE_NUMBER,
   IDENTIFIER,
+  PHONE_NUMBER,
   PRIVATE_KEY1,
   PRIVATE_KEY2,
   PRIVATE_KEY3,
 } = TestUtils.Values
-const { replenishQuota, registerWalletAddress } = TestUtils.Utils
+const { replenishQuota, registerWalletAddress, getBlindedPhoneNumber } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 const ODIS_PUBLIC_POLYNOMIAL = process.env[
@@ -41,7 +40,7 @@ const ODIS_KEY_VERSION = (process.env.ODIS_KEY_VERSION || 1) as string
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'
 
-const DEFAULT_FORNO_URL = config.blockchain.provider
+const DEFAULT_FORNO_URL = process.env.ODIS_BLOCKCHAIN_PROVIDER as string
 
 const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
 const contractkit = newKitFromWeb3(web3)
