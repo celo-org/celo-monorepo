@@ -27,6 +27,15 @@ const testCases = {
   mapping_source_changed: getTestArtifacts('mapping_source_changed'),
   internal_mapping_source_changed: getTestArtifacts('internal_mapping_source_changed'),
   mapping_target_changed: getTestArtifacts('mapping_target_changed'),
+
+  original_struct_in_mapping: getTestArtifacts('original_struct_in_mapping'),
+  inserted_in_struct_mapping: getTestArtifacts('inserted_in_struct_mapping'),
+  inserted_in_library_struct_mapping: getTestArtifacts('inserted_in_library_struct_mapping'),
+  deprecated_prefixed_in_library_struct_mapping: getTestArtifacts(
+    'deprecated_prefixed_in_library_struct_mapping'
+  ),
+  deprecated_prefixed_in_struct: getTestArtifacts('deprecated_prefixed_in_struct'),
+  deprecated_prefixed_variable: getTestArtifacts('deprecated_prefixed_variable'),
 }
 
 const assertCompatible = (report) => {
@@ -129,6 +138,56 @@ describe('#reportLayoutIncompatibilities()', () => {
       )
       assertNotCompatible(report)
       assertContractErrorsMatch(report, 'TestContract', [/had type/])
+    })
+  })
+
+  describe('when a field is added to a struct in mapping', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_in_mapping,
+        testCases.inserted_in_struct_mapping
+      )
+      assertCompatible(report)
+    })
+  })
+
+  describe('when a field is added to a library struct in mapping', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_in_mapping,
+        testCases.inserted_in_library_struct_mapping
+      )
+      assertCompatible(report)
+    })
+  })
+
+  describe('when a field is prefixed with deprecated to a library struct in mapping', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original_struct_in_mapping,
+        testCases.deprecated_prefixed_in_library_struct_mapping
+      )
+      assertCompatible(report)
+    })
+  })
+
+  describe('when a field is prefixed with deprecated to struct variable', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original,
+        testCases.deprecated_prefixed_in_struct
+      )
+      assertCompatible(report)
+    })
+  })
+
+  describe('when a variable is prefixed with deprecated', () => {
+    it('reports no incompatibilities', () => {
+      const report = reportLayoutIncompatibilities(
+        testCases.original,
+        testCases.deprecated_prefixed_variable
+      )
+      assertCompatible(report)
     })
   })
 
