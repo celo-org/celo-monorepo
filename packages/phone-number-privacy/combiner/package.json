@@ -41,6 +41,8 @@
   },
   "devDependencies": {
     "@celo/identity": "2.3.1-dev",
+    "@celo/identity-prev": "npm:@celo/identity@~1.2.0",
+    "@celo/contractkit-prev": "npm:@celo/contractkit@~1.2.0",
     "@celo/encrypted-backup": "2.3.1-dev",
     "@celo/phone-number-privacy-signer": "2.0.0-dev",
     "@types/btoa": "^1.2.3",
