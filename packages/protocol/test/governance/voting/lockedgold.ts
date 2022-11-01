@@ -245,12 +245,65 @@ contract('LockedGold', (accounts: string[]) => {
       })
 
       describe('when the account is voting in governance', () => {
+        const votingGold = 1
+        const valueWithoutVotingGold = value - votingGold
         beforeEach(async () => {
           await mockGovernance.setVoting(account)
+          await mockGovernance.setTotalVotes(account, votingGold)
         })
 
-        it('should revert', async () => {
+        it('should revert when requesting gold that is voted with', async () => {
           await assertRevert(lockedGold.unlock(value))
+        })
+
+        describe('when the account is requesting only non voting gold', () => {
+          beforeEach(async () => {
+            resp = await lockedGold.unlock(valueWithoutVotingGold)
+            availabilityTime = new BigNumber(unlockingPeriod).plus(
+              (await web3.eth.getBlock('latest')).timestamp
+            )
+          })
+
+          it('should add a pending withdrawal #getPendingWithdrawal()', async () => {
+            const [val, timestamp] = await lockedGold.getPendingWithdrawal(account, 0)
+            assertEqualBN(val, valueWithoutVotingGold)
+            assertEqualBN(timestamp, availabilityTime)
+            await assertRevert(lockedGold.getPendingWithdrawal(account, 1))
+          })
+
+          it('should add a pending withdrawal #getPendingWithdrawals()', async () => {
+            const [values, timestamps] = await lockedGold.getPendingWithdrawals(account)
+            assert.equal(values.length, 1)
+            assert.equal(timestamps.length, 1)
+            assertEqualBN(values[0], valueWithoutVotingGold)
+            assertEqualBN(timestamps[0], availabilityTime)
+          })
+
+          it("should decrease the account's nonvoting locked gold balance", async () => {
+            assertEqualBN(await lockedGold.getAccountNonvotingLockedGold(account), votingGold)
+          })
+
+          it("should decrease the account's total locked gold balance", async () => {
+            assertEqualBN(await lockedGold.getAccountTotalLockedGold(account), votingGold)
+          })
+
+          it('should decrease the nonvoting locked gold balance', async () => {
+            assertEqualBN(await lockedGold.getNonvotingLockedGold(), votingGold)
+          })
+
+          it('should decrease the total locked gold balance', async () => {
+            assertEqualBN(await lockedGold.getTotalLockedGold(), votingGold)
+          })
+
+          it('should emit a GoldUnlocked event', async () => {
+            assert.equal(resp.logs.length, 1)
+            const log = resp.logs[0]
+            assertLogMatches(log, 'GoldUnlocked', {
+              account,
+              value: new BigNumber(valueWithoutVotingGold),
+              available: availabilityTime,
+            })
+          })
         })
       })
     })
