@@ -82,7 +82,7 @@ export async function getPhoneNumberIdentifier(
     clientVersion,
     sessionID,
     keyVersion,
-    endpoint ?? CombinerEndpointPNP.LEGACY_PNP_SIGN
+    endpoint ?? CombinerEndpointPNP.PNP_SIGN
   )
 
   return getPhoneNumberIdentifierFromSignature(e164Number, base64BlindSig, blsBlindingClient)
@@ -128,7 +128,7 @@ export async function getBlindedPhoneNumberSignature(
   const response = await queryOdis(
     body,
     context,
-    endpoint ?? CombinerEndpointPNP.LEGACY_PNP_SIGN,
+    endpoint ?? CombinerEndpointPNP.PNP_SIGN,
     SignMessageResponseSchema,
     {
       [KEY_VERSION_HEADER]: keyVersion?.toString(),
