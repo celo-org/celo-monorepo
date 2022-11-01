@@ -234,7 +234,7 @@ describe('domainService', () => {
   let signer3: Server | HttpsServer
   let app: any
 
-  const signerMigrationsPath = '../signer/src/common/database/migrations'
+  const signerMigrationsPath = '../signer/dist/common/database/migrations'
 
   const expectedEvals: string[] = [
     '3QLFPV6VvnhhnZ7mOu0xm7BUUJIUVY6vEHvZONOtZ/c=',

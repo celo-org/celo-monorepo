@@ -68,8 +68,8 @@ export async function initDatabase(
   logger.info('Running Migrations')
 
   await db.migrate.latest({
-    directory: migrationsPath ?? './src/common/database/migrations',
-    loadExtensions: ['.ts', '.js'],
+    directory: migrationsPath ?? './dist/common/database/migrations',
+    loadExtensions: ['.js'],
   })
 
   if (doTestQuery) {
