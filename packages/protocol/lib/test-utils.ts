@@ -307,13 +307,43 @@ export function assertObjectWithBNEqual(
     } else if (isNumber(actual[k]) || isNumber(expected[k])) {
       assertEqualBN(actual[k], expected[k], fieldErrorMsg(k))
     } else if (Array.isArray(actual[k])) {
-      assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
+      const actualArray = actual[k] as []
+      const expectedArray = expected[k] as []
+      if (actualArray.length === expectedArray.length 
+        && actualArray.every(actualValue => isNumber(actualValue)) 
+        && expectedArray.every(expectedValue => isNumber(expectedValue))) {
+        // if this is array of BNs, deepEqual will not work
+        // since it is not able to compare number/string/BN
+        // with each other and we have to compare it manually
+        for (let i = 0; i < actualArray.length; i++) {
+          assertEqualBN(actualArray[i], expectedArray[i], fieldErrorMsg(k))
+        }
+      } else  {
+        assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
+      }
     }
     else {
       assert.equal(actual[k], expected[k], fieldErrorMsg(k))
     }
   }
 }
+
+export function assertBNArrayEqual(
+  actualArray: any[],
+  expectedArray: any[]
+) {
+  assert(Array.isArray(actualArray), `Actual is not an array`)
+  assert(Array.isArray(expectedArray), `Expected is not an array`)
+  assert(actualArray.length === expectedArray.length, `Different array sizes; actual: ${actualArray.length} expected: ${expectedArray.length}`)
+  assert(actualArray.every(actualValue => isNumber(actualValue)) 
+      && expectedArray.every(expectedValue => isNumber(expectedValue)),
+      `Expected all elements to be numbers`)
+      
+  for (let i = 0; i < actualArray.length; i++) {
+    assertEqualBN(actualArray[i], expectedArray[i])
+  }
+}
+
 
 export function assertEqualBN(
   actual: number | BN | BigNumber,

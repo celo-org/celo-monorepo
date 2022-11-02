@@ -192,7 +192,7 @@ describe('pnpService', () => {
   let userSeed: Uint8Array
   let blindedMsgResult: threshold_bls.BlindedMessage
 
-  const signerMigrationsPath = '../signer/src/common/database/migrations'
+  const signerMigrationsPath = '../signer/dist/common/database/migrations'
   const expectedVersion = getCombinerVersion()
 
   const onChainPaymentsDefault = new BigNumber(1e18)
