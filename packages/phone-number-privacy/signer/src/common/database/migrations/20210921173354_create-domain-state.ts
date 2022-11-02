@@ -1,9 +1,12 @@
 import { Knex } from 'knex'
-import { DOMAIN_STATE_COLUMNS, DOMAIN_STATE_TABLE } from '../models/domain-state'
+import { DOMAIN_STATE_COLUMNS } from '../models/domain-state'
 
 export async function up(knex: Knex): Promise<any> {
-  if (!(await knex.schema.hasTable(DOMAIN_STATE_TABLE))) {
-    return knex.schema.createTable(DOMAIN_STATE_TABLE, (t) => {
+  // Due to a name change, the old migration uses the old names of these tables
+  // The change-name-domain-state migration then updates the name
+  // to match the value stored in DOMAIN_STATE_TABLE
+  if (!(await knex.schema.hasTable('domainsStates'))) {
+    return knex.schema.createTable('domainsStates', (t) => {
       t.string(DOMAIN_STATE_COLUMNS.domainHash).notNullable().primary()
       t.integer(DOMAIN_STATE_COLUMNS.counter).nullable()
       t.boolean(DOMAIN_STATE_COLUMNS.disabled).notNullable().defaultTo(false)
@@ -15,5 +18,5 @@ export async function up(knex: Knex): Promise<any> {
 }
 
 export async function down(knex: Knex): Promise<any> {
-  return knex.schema.dropTable(DOMAIN_STATE_TABLE)
+  return knex.schema.dropTable('domainsStates')
 }
