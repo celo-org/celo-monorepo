@@ -10,12 +10,12 @@ import {
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
   TestUtils,
-  WarningMessage,
+  WarningMessage
 } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
-import { config, getVersion } from '../../src/config'
+import { config, getSignerVersion } from '../../src/config'
 
 require('dotenv').config()
 
@@ -52,7 +52,7 @@ kit.addAccount(PRIVATE_KEY3)
 jest.setTimeout(60000)
 
 const signerUrl = process.env.ODIS_SIGNER_SERVICE_URL
-const expectedVersion = getVersion()
+const expectedVersion = getSignerVersion()
 
 describe(`Running against service deployed at ${signerUrl}`, () => {
   const singleQueryCost = config.quota.queryPriceInCUSD.times(1e18).toString()

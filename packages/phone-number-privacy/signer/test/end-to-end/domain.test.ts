@@ -22,13 +22,13 @@ import {
   SignerEndpoint,
   TestUtils,
   ThresholdPoprfClient,
-  WarningMessage,
+  WarningMessage
 } from '@celo/phone-number-privacy-common'
 import { DomainRequest } from '@celo/phone-number-privacy-common/src'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import 'isomorphic-fetch'
-import { config, getVersion } from '../../src/config'
+import { config, getSignerVersion } from '../../src/config'
 const { ACCOUNT_ADDRESS1, PRIVATE_KEY1 } = TestUtils.Values
 
 require('dotenv').config()
@@ -36,7 +36,7 @@ require('dotenv').config()
 jest.setTimeout(60000)
 
 const signerUrl = process.env.ODIS_SIGNER_SERVICE_URL
-const expectedVersion = getVersion()
+const expectedVersion = getSignerVersion()
 
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
 
