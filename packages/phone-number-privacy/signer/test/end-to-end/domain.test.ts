@@ -13,6 +13,7 @@ import {
   DomainRequestTypeTag,
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
+  DomainRestrictedSignatureResponseFailure,
   DomainRestrictedSignatureResponseSuccess,
   genSessionID,
   KEY_VERSION_HEADER,
@@ -27,7 +28,7 @@ import { DomainRequest } from '@celo/phone-number-privacy-common/src'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import 'isomorphic-fetch'
-import { getVersion } from '../../src/config'
+import { config, getVersion } from '../../src/config'
 const { ACCOUNT_ADDRESS1, PRIVATE_KEY1 } = TestUtils.Values
 
 require('dotenv').config()
@@ -45,6 +46,7 @@ const ODIS_DOMAINS_PUBLIC_POLYNOMIAL = process.env[
 const ODIS_DOMAINS_PUBLIC_PUBKEY = process.env[
   process.env.ODIS_PUBLIC_DOMAINS_PUBKEY_VAR_FOR_TESTS as string
 ] as string
+const ODIS_KEY_VERSION = process.env.ODIS_KEY_VERSION_DOMAINS_TEST as string
 
 describe(`Running against service deployed at ${signerUrl}`, () => {
   const wallet = new LocalWallet()
@@ -249,7 +251,6 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
-      console.log(resBody)
       expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseSuccess>({
         success: true,
         version: expectedVersion,
@@ -261,7 +262,28 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           now: resBody.status.now,
         },
       })
+      expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(
+        config.keystore.keys.domains.latest.toString()
+      )
       // TODO(ODIS 2.0.0 e2e fix) verify partial signature
+    })
+
+    it('Should respond with 401 on invalid nonce', async () => {
+      // Replay exactly the same first request
+      const res = await queryDomainEndpoint(req, SignerEndpoint.DOMAIN_SIGN)
+      expect(res.status).toBe(401)
+      const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
+      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.INVALID_NONCE,
+        status: {
+          disabled: false,
+          counter: 1,
+          timer: resBody.status!.timer,
+          now: resBody.status!.now,
+        },
+      })
     })
 
     it('Should respond with 200 repeated valid requests with nonce updated', async () => {
@@ -285,7 +307,6 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       })
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
-      console.log(resBody)
       expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseSuccess>({
         success: true,
         version: expectedVersion,
@@ -304,14 +325,13 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       const [newReq, _] = await signatureRequest(
         wallet,
         ACCOUNT_ADDRESS1,
-        `${signSalt}-${Date.now() + 1}`,
+        `${signSalt}-${Date.now()}`,
         undefined,
         5
       )
       const res = await queryDomainEndpoint(newReq, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
-      console.log(resBody)
       expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseSuccess>({
         success: true,
         version: expectedVersion,
@@ -325,7 +345,165 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       })
       // TODO(ODIS 2.0.0 e2e fix) verify partial signature
     })
-    // TODO(ODIS 2.0.0 e2e fix) add 401 authentication tests, invalid nonce, & bad input
+
+    it('Should respond with 200 on valid request with key version header', async () => {
+      const [newReq, _] = await signatureRequest(
+        wallet,
+        ACCOUNT_ADDRESS1,
+        `${signSalt}-${Date.now() + 1}`
+      )
+      const res = await queryDomainEndpoint(newReq, SignerEndpoint.DOMAIN_SIGN, ODIS_KEY_VERSION)
+      expect(res.status).toBe(200)
+      const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
+      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseSuccess>({
+        success: true,
+        version: expectedVersion,
+        signature: resBody.signature,
+        status: {
+          disabled: false,
+          counter: 1, // counter gets incremented, not set to nonce value
+          timer: resBody.status.timer,
+          now: resBody.status.now,
+        },
+      })
+      expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(ODIS_KEY_VERSION)
+      // TODO(ODIS 2.0.0 e2e fix) verify partial signature
+    })
+
+    it('Should respond with 400 on missing request fields', async () => {
+      const [badRequest, _] = await signatureRequest(
+        wallet,
+        ACCOUNT_ADDRESS1,
+        `${signSalt}-${Date.now()}`
+      )
+      // @ts-ignore Intentionally deleting required field
+      delete badRequest.domain.version
+      const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_SIGN)
+      expect(res.status).toBe(400)
+      const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
+      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.INVALID_INPUT,
+      })
+    })
+
+    it('Should respond with 400 on missing request fields', async () => {
+      const [badRequest, _] = await signatureRequest(
+        wallet,
+        ACCOUNT_ADDRESS1,
+        `${signSalt}-${Date.now()}`
+      )
+      // @ts-ignore UnknownDomain is (intentionally) not a valid domain identifier.
+      badRequest.domain.name = 'UnknownDomain'
+      const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_SIGN)
+      expect(res.status).toBe(400)
+      const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
+      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.INVALID_INPUT,
+      })
+    })
+
+    it('Should respond with 400 on bad encoding', async () => {
+      const [badRequest, _] = await signatureRequest(
+        wallet,
+        ACCOUNT_ADDRESS1,
+        `${signSalt}-${Date.now()}`
+      )
+      // @ts-ignore Intentionally not JSON
+      badRequest.domain = 'Freddy'
+      const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_SIGN)
+      expect(res.status).toBe(400)
+      const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
+      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.INVALID_INPUT,
+      })
+    })
+
+    it('Should respond with 400 on bad encoding', async () => {
+      const [badRequest, _] = await signatureRequest(
+        wallet,
+        ACCOUNT_ADDRESS1,
+        `${signSalt}-${Date.now()}`
+      )
+      const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_SIGN, 'a')
+      expect(res.status).toBe(400)
+      const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
+      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
+      })
+    })
+
+    it('Should respond with 401 on failed auth', async () => {
+      const [badRequest, _] = await signatureRequest(
+        wallet,
+        ACCOUNT_ADDRESS1,
+        `${signSalt}-${Date.now()}`
+      )
+      badRequest.domain.salt = defined('badSalt')
+      const res = await queryDomainEndpoint(badRequest, SignerEndpoint.DOMAIN_SIGN)
+      expect(res.status).toBe(401)
+      const resBody: DomainRestrictedSignatureResponseFailure = await res.json()
+      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.UNAUTHENTICATED_USER,
+      })
+    })
+
+    it('Should respond with 429 on out of quota', async () => {
+      const salt = `${signSalt}-${Date.now()}`
+      const noQuotaDomain = authenticatedDomain(ACCOUNT_ADDRESS1, salt, [
+        { delay: 0, resetTimer: noBool, batchSize: defined(0), repetitions: defined(0) },
+      ])
+      const [signReq, _] = await signatureRequest(wallet, ACCOUNT_ADDRESS1, salt, noQuotaDomain)
+      const res = await queryDomainEndpoint(signReq, SignerEndpoint.DOMAIN_SIGN)
+      expect(res.status).toBe(429)
+      const resBody = await res.json()
+      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.EXCEEDED_QUOTA,
+        status: {
+          disabled: false,
+          counter: 0,
+          timer: 0,
+          now: resBody.status!.now,
+        },
+      })
+    })
+
+    it('Should respond with 429 on disabled domain', async () => {
+      const disableReq = await disableRequest(wallet, ACCOUNT_ADDRESS1, disableSalt)
+      const disableRes = await queryDomainEndpoint(disableReq, SignerEndpoint.DISABLE_DOMAIN)
+      expect(disableRes.status).toBe(200)
+      const [signReq, _] = await signatureRequest(
+        wallet,
+        ACCOUNT_ADDRESS1,
+        `${signSalt}-${Date.now()}`,
+        disableReq.domain
+      )
+      const res = await queryDomainEndpoint(signReq, SignerEndpoint.DOMAIN_SIGN)
+      expect(res.status).toBe(429)
+      const resBody = await res.json()
+      expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseFailure>({
+        success: false,
+        version: expectedVersion,
+        error: WarningMessage.EXCEEDED_QUOTA,
+        status: {
+          disabled: true,
+          counter: 0,
+          timer: 0,
+          now: resBody.status!.now,
+        },
+      })
+    })
   })
 })
 
