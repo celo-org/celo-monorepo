@@ -116,10 +116,11 @@ contract Election is
   // than max number of groups voted for.
   mapping(address => bool) public allowedToVoteOverMaxNumberOfGroups;
 
-  mapping(address => CachedVotes) cachedVotesByAccount;
+  mapping(address => CachedVotes) public cachedVotesByAccount;
 
   event ElectableValidatorsSet(uint256 min, uint256 max);
   event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
+  event AllowedToVoteOverMaxNumberOfGroups(address account, bool flag);
   event ElectabilityThresholdSet(uint256 electabilityThreshold);
   event ValidatorGroupMarkedEligible(address indexed group);
   event ValidatorGroupMarkedIneligible(address indexed group);
@@ -278,6 +279,16 @@ contract Election is
         "Voted for too many groups"
       );
       groups.push(group);
+    }
+
+    if (groups.length > maxNumGroupsVotedFor) {
+      CachedVotes storage cachedVotes = cachedVotesByAccount[account];
+      if (cachedVotesByAccount[account].totalVotes > 0) {
+        // if total account votes were counted at least once,
+        // lets add new votes to cache for possible slashing
+        cachedVotes.totalVotes += value;
+        cachedVotes.cachedVotesPerGroup[group] += value;
+      }
     }
 
     incrementPendingVotes(group, account, value);
@@ -753,8 +764,11 @@ contract Election is
     }
 
     CachedVotes storage cachedVotes = cachedVotesByAccount[account];
-    cachedVotes.totalVotes = 0;
-    cachedVotes.cachedVotesPerGroup[group] = 0;
+    cachedVotes.totalVotes -= Math.min(cachedVotes.totalVotes, value);
+    cachedVotes.cachedVotesPerGroup[group] -= Math.min(
+      cachedVotes.cachedVotesPerGroup[group],
+      value
+    );
   }
 
   /**
@@ -1118,11 +1132,12 @@ contract Election is
     if (!flag) {
       require(
         votes.groupsVotedFor[msg.sender].length < maxNumGroupsVotedFor,
-        "Too many groups voted for"
+        "Too many groups voted for!"
       );
     }
 
     allowedToVoteOverMaxNumberOfGroups[msg.sender] = flag;
+    emit AllowedToVoteOverMaxNumberOfGroups(msg.sender, flag);
   }
 
   // Struct to hold local variables for `forceDecrementVotes`.
