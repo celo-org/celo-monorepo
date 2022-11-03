@@ -522,7 +522,7 @@ contract Election is
   }
 
   /**
-   * @notice Counts and caches account's total votes.
+   * @notice Counts and caches account's votes for group.
    * @param account The address of the voting account.
    * @param group The address of the validator group.
    */
@@ -534,7 +534,7 @@ contract Election is
   }
 
   /**
-   * @notice Counts and caches account's votes for group.
+   * @notice Counts and caches account's total votes.
    * @param account The address of the voting account.
    */
   function updateTotalVotesByAccount(address account) external {

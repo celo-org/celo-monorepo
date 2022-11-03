@@ -574,7 +574,7 @@ contract('Election', (accounts: string[]) => {
             describe('When total votes are manually counted on ', () => {
               beforeEach(async () => {
                 for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
-                  const newGroup = accounts[i + 2]
+                  newGroup = accounts[i + 2]
                   await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
                 }
                 await election.updateTotalVotesByAccountForGroup(accounts[0], group)
@@ -619,7 +619,7 @@ contract('Election', (accounts: string[]) => {
 
               it('should return correct value when manually counted', async () => {
                 for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
-                  const newGroup = accounts[i + 2]
+                  newGroup = accounts[i + 2]
                   await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
                 }
                 await election.updateTotalVotesByAccountForGroup(accounts[0], group)
@@ -656,7 +656,7 @@ contract('Election', (accounts: string[]) => {
 
                   it('should return correct value when manually counted', async () => {
                     for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
-                      const newGroup = accounts[i + 2]
+                      newGroup = accounts[i + 2]
                       await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
                     }
                     await election.updateTotalVotesByAccountForGroup(accounts[0], group)
@@ -670,7 +670,7 @@ contract('Election', (accounts: string[]) => {
                 describe('When total votes are manually counted on rewards are being distributed', () => {
                   beforeEach(async () => {
                     for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
-                      const newGroup = accounts[i + 2]
+                      newGroup = accounts[i + 2]
                       await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
                     }
                     await election.updateTotalVotesByAccountForGroup(accounts[0], group)
