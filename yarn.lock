@@ -1597,6 +1597,22 @@
     io-ts "2.0.1"
     is-base64 "^1.1.0"
 
+"@celo/phone-utils@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@celo/phone-utils/-/phone-utils-2.3.0.tgz#e40378bf7d3d84ae91f63c50f3689bf6256a8b1f"
+  integrity sha512-L/HgPODQBxNMPt3Rzq3VarJax9u33tgZwTGUylRL78B2S/EgkHRKzvbDVab9N3+0+HdNxRH1iKqjBduUH2AM7A==
+  dependencies:
+    "@celo/base" "2.3.0"
+    "@celo/utils" "2.3.0"
+    "@types/country-data" "^0.0.0"
+    "@types/ethereumjs-util" "^5.2.0"
+    "@types/google-libphonenumber" "^7.4.23"
+    "@types/node" "^10.12.18"
+    country-data "^0.0.31"
+    fp-ts "2.1.1"
+    google-libphonenumber "^3.2.27"
+    io-ts "2.0.1"
+
 "@celo/poprf@^0.1.9":
   version "0.1.9"
   resolved "https://registry.yarnpkg.com/@celo/poprf/-/poprf-0.1.9.tgz#38c514ce0f572b80edeb9dc280b6cf5e9d7c2a75"

@@ -104,6 +104,7 @@
       "@celo/identity",
       "@celo/phone-number-privacy-common",
       "@celo/phone-number-privacy-signer",
+      "@celo/phone-utils",
       "@celo/utils"
     ]
   },
@@ -112,6 +113,7 @@
     "dependencies": [
       "@celo/base",
       "@celo/contractkit",
+      "@celo/phone-utils",
       "@celo/utils",
       "@celo/wallet-local"
     ]
