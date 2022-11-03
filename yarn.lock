@@ -1386,6 +1386,7 @@
     utf8 "3.0.0"
 
 "@celo/contractkit-prev@npm:@celo/contractkit@1.5.2", "@celo/contractkit@1.5.2", "@celo/contractkit@^1.2.0":
+  name "@celo/contractkit-prev"
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-1.5.2.tgz#be15d570f3044a190dabb6bbe53d5081c78ea605"
   integrity sha512-b0r5TlfYDEscxze1Ai2jyJayiVElA9jvEehMD6aOSNtVhfP8oirjFIIffRe0Wzw1MSDGkw+q1c4m0Yw5sEOlvA==
