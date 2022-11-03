@@ -1097,7 +1097,7 @@ describe('pnpService', () => {
       })
     })
 
-    describe('when 1/3 of signers are disabled', () => {
+    describe.only('when 1/3 of signers are disabled', () => {
       beforeEach(async () => {
         const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
