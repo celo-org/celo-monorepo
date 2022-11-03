@@ -242,10 +242,9 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
   describe(`${SignerEndpoint.DOMAIN_SIGN}`, () => {
     const signSaltNew = `${signSalt}-${Date.now()}`
     let req: DomainRestrictedSignatureRequest
-    let _: ThresholdPoprfClient
+    let poprf: ThresholdPoprfClient
     beforeAll(async () => {
-      ;[req, _] = await signatureRequest(wallet, ACCOUNT_ADDRESS1, signSaltNew)
-      console.log(_) // TODO Until this is used for evaluation
+      ;[req, poprf] = await signatureRequest(wallet, ACCOUNT_ADDRESS1, signSaltNew)
     })
     it('Should respond with 200 on valid request for new domain', async () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DOMAIN_SIGN)
@@ -265,7 +264,10 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(
         config.keystore.keys.domains.latest.toString()
       )
-      // TODO(ODIS 2.0.0 e2e fix) verify partial signature
+      poprf.unblindPartialResponse(
+        // throws if verification fails
+        Buffer.from(resBody.signature, 'base64')
+      )
     })
 
     it('Should respond with 401 on invalid nonce', async () => {
@@ -286,7 +288,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       })
     })
 
-    it('Should respond with 200 repeated valid requests with nonce updated', async () => {
+    it('Should respond with 200 on repeated valid requests with nonce updated', async () => {
       // submit identical request with nonce set to 1
       req.options.nonce = defined(1)
       req.options.signature = noString
@@ -318,11 +320,11 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           now: resBody.status.now,
         },
       })
-      // TODO(ODIS 2.0.0 e2e fix) verify partial signature
+      poprf.unblindPartialResponse(Buffer.from(resBody.signature, 'base64'))
     })
 
     it('Should respond with 200 if nonce > domainState', async () => {
-      const [newReq, _] = await signatureRequest(
+      const [newReq, _poprf] = await signatureRequest(
         wallet,
         ACCOUNT_ADDRESS1,
         `${signSalt}-${Date.now()}`,
@@ -343,11 +345,11 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           now: resBody.status.now,
         },
       })
-      // TODO(ODIS 2.0.0 e2e fix) verify partial signature
+      _poprf.unblindPartialResponse(Buffer.from(resBody.signature, 'base64'))
     })
 
     it('Should respond with 200 on valid request with key version header', async () => {
-      const [newReq, _] = await signatureRequest(
+      const [newReq, _poprf] = await signatureRequest(
         wallet,
         ACCOUNT_ADDRESS1,
         `${signSalt}-${Date.now() + 1}`
@@ -367,7 +369,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         },
       })
       expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(ODIS_KEY_VERSION)
-      // TODO(ODIS 2.0.0 e2e fix) verify partial signature
+      _poprf.unblindPartialResponse(Buffer.from(resBody.signature, 'base64'))
     })
 
     it('Should respond with 400 on missing request fields', async () => {
