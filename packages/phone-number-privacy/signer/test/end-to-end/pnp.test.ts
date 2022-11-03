@@ -10,7 +10,7 @@ import {
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
   TestUtils,
-  WarningMessage
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
@@ -38,10 +38,10 @@ const {
 
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
 const ODIS_PUBLIC_POLYNOMIAL = process.env[
-  process.env.ODIS_PUBLIC_POLYNOMIAL_VAR_FOR_TESTS as string
+  process.env.ODIS_PNP_POLYNOMIAL_VAR_FOR_TESTS as string
 ] as string
 
-const ODIS_KEY_VERSION = (process.env.ODIS_KEY_VERSION || 1) as string
+const ODIS_KEY_VERSION = (process.env.ODIS_PNP_TEST_KEY_VERSION || 1) as string
 const DEFAULT_FORNO_URL = process.env.ODIS_BLOCKCHAIN_PROVIDER as string
 
 const kit = newKit(DEFAULT_FORNO_URL)

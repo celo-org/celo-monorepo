@@ -33,9 +33,9 @@ const { replenishQuota, registerWalletAddress, getBlindedPhoneNumber } = TestUti
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 const ODIS_PUBLIC_POLYNOMIAL = process.env[
-  process.env.ODIS_PUBLIC_POLYNOMIAL_VAR_FOR_TESTS as string
+  process.env.ODIS_PNP_POLYNOMIAL_VAR_FOR_TESTS as string
 ] as string
-const ODIS_KEY_VERSION = (process.env.ODIS_KEY_VERSION || 1) as string
+const ODIS_KEY_VERSION = (process.env.ODIS_PNP_TEST_KEY_VERSION || 1) as string
 // Keep these checks as is to ensure backwards compatibility
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'

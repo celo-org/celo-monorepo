@@ -22,7 +22,7 @@ import {
   SignerEndpoint,
   TestUtils,
   ThresholdPoprfClient,
-  WarningMessage
+  WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { DomainRequest } from '@celo/phone-number-privacy-common/src'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
@@ -41,12 +41,12 @@ const expectedVersion = getSignerVersion()
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
 
 const ODIS_DOMAINS_PUBLIC_POLYNOMIAL = process.env[
-  process.env.ODIS_PUBLIC_DOMAINS_POLYNOMIAL_VAR_FOR_TESTS as string
+  process.env.ODIS_DOMAINS_POLYNOMIAL_VAR_FOR_TESTS as string
 ] as string
 const ODIS_DOMAINS_PUBLIC_PUBKEY = process.env[
-  process.env.ODIS_PUBLIC_DOMAINS_PUBKEY_VAR_FOR_TESTS as string
+  process.env.ODIS_DOMAINS_PUBKEY_VAR_FOR_TESTS as string
 ] as string
-const ODIS_KEY_VERSION = process.env.ODIS_KEY_VERSION_DOMAINS_TEST as string
+const ODIS_KEY_VERSION = (process.env.ODIS_DOMAINS_TEST_KEY_VERSION || 1) as string
 
 describe(`Running against service deployed at ${signerUrl}`, () => {
   const wallet = new LocalWallet()
