@@ -37,7 +37,7 @@ COPY patches/ patches/
 # Setting ONLY_PUBLISHED_DEPENDENCIES to true (default) or any non-empty string results in only the
 # phone-number-privacy package being copied into the image, and therefore it will only build using
 # published dependencies. Setting ONLY_PUBLISHED_DEPENDENCIES to "" will copy in all dependecies.
-ARG ONLY_PUBLISHED_DEPENDENCIES=true
+ARG ONLY_PUBLISHED_DEPENDENCIES=""
 ARG PACKAGE_SELECTOR=${ONLY_PUBLISHED_DEPENDENCIES:+phone-number-privacy}
 COPY --from=packages celo-phone-number-privacy/packages/${PACKAGE_SELECTOR} packages/${PACKAGE_SELECTOR}
 
