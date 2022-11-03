@@ -570,7 +570,12 @@ describe('legacyPNP', () => {
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.legacyPhoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+        const appWithApiDisabled = startSigner(
+          configWithApiDisabled,
+          db,
+          keyProvider,
+          newKit('dummyKit')
+        )
         const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(
@@ -593,7 +598,12 @@ describe('legacyPNP', () => {
         it('Should respond with 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
           mockGetDataEncryptionKey.mockImplementation(() => {
             throw new Error()
           })
@@ -1158,7 +1168,12 @@ describe('legacyPNP', () => {
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.legacyPhoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+        const appWithApiDisabled = startSigner(
+          configWithApiDisabled,
+          db,
+          keyProvider,
+          newKit('dummyKit')
+        )
 
         const req = getLegacyPnpSignRequest(
           ACCOUNT_ADDRESS1,
@@ -1188,7 +1203,7 @@ describe('legacyPNP', () => {
         let appWithPNPEnabled: any
 
         beforeEach(() => {
-          appWithPNPEnabled = startSigner(configWithPNPEnabled, db, keyProvider)
+          appWithPNPEnabled = startSigner(configWithPNPEnabled, db, keyProvider, newKit('dummyKit'))
         })
 
         // Keep both of these cases with the legacy test suite
@@ -1367,7 +1382,12 @@ describe('legacyPNP', () => {
         it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
@@ -1445,7 +1465,12 @@ describe('legacyPNP', () => {
 
           const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenDisabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = false
-          const appWithFailOpenDisabled = startSigner(configWithFailOpenDisabled, db, keyProvider)
+          const appWithFailOpenDisabled = startSigner(
+            configWithFailOpenDisabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           const req = getLegacyPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -1572,7 +1597,12 @@ describe('legacyPNP', () => {
 
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'

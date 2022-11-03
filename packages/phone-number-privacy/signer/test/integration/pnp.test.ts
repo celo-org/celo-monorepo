@@ -340,7 +340,12 @@ describe('pnp', () => {
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+        const appWithApiDisabled = startSigner(
+          configWithApiDisabled,
+          db,
+          keyProvider,
+          newKit('dummyKit')
+        )
 
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
@@ -369,7 +374,12 @@ describe('pnp', () => {
 
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
@@ -868,7 +878,12 @@ describe('pnp', () => {
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+        const appWithApiDisabled = startSigner(
+          configWithApiDisabled,
+          db,
+          keyProvider,
+          newKit('dummyKit')
+        )
 
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
@@ -1012,7 +1027,12 @@ describe('pnp', () => {
         it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
@@ -1099,7 +1119,12 @@ describe('pnp', () => {
 
           const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenDisabled.api.phoneNumberPrivacy.shouldFailOpen = false
-          const appWithFailOpenDisabled = startSigner(configWithFailOpenDisabled, db, keyProvider)
+          const appWithFailOpenDisabled = startSigner(
+            configWithFailOpenDisabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(
@@ -1216,7 +1241,12 @@ describe('pnp', () => {
 
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
