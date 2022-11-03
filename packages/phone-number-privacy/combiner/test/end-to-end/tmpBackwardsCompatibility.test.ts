@@ -1,4 +1,4 @@
-import { newKit } from '@celo/contractkit'
+import { newKit } from '@celo/contractkit-prev'
 import { OdisUtils } from '@celo/identity-prev'
 import { SignMessageRequest, WalletKeySigner } from '@celo/identity-prev/lib/odis/query'
 import { ErrorMessages } from '@celo/identity/lib/odis/query'
@@ -13,6 +13,8 @@ import {
   DEFAULT_FORNO_URL,
   dekAuthSigner,
   PHONE_NUMBER,
+  PRIVATE_KEY,
+  PRIVATE_KEY_NO_QUOTA,
   SERVICE_CONTEXT,
 } from './resources'
 
@@ -21,6 +23,9 @@ require('dotenv').config()
 jest.setTimeout(60000)
 
 const contractKit = newKit(DEFAULT_FORNO_URL)
+contractKit.addAccount(PRIVATE_KEY_NO_QUOTA)
+contractKit.addAccount(PRIVATE_KEY)
+contractKit.defaultAccount = ACCOUNT_ADDRESS
 
 const walletAuthSigner: WalletKeySigner = {
   authenticationMethod: AuthenticationMethod.WALLET_KEY,
@@ -35,7 +40,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     it('With invalid address', async () => {
       const body: SignMessageRequest = {
         account: '0x1234',
-        authenticationMethod: AuthenticationMethod.WALLET_KEY,
+        authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
         blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
         version: 'ignore',
         sessionID: genSessionID(),
