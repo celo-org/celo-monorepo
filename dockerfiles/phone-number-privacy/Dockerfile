@@ -42,12 +42,10 @@ ARG PACKAGE_SELECTOR=${ONLY_PUBLISHED_DEPENDENCIES:+phone-number-privacy}
 COPY --from=packages celo-phone-number-privacy/packages/${PACKAGE_SELECTOR} packages/${PACKAGE_SELECTOR}
 
 # Install dependencies and build.
-# Note that this command will fail with TARGET=production if any dependencies are unpublished.
 RUN yarn install --network-timeout 100000 --frozen-lockfile && yarn cache clean
 RUN yarn build
 
 # Setup and run the signer application.
-# ENV NODE_ENV=${TARGET} TODO(2.0.0, deployment) should this be defined? 
 ENV NODE_ENV production
 WORKDIR /celo-phone-number-privacy/packages/phone-number-privacy/signer
 EXPOSE 8080
