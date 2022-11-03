@@ -2,21 +2,19 @@ import { newKitFromWeb3 } from '@celo/contractkit'
 import {
   KEY_VERSION_HEADER,
   PnpQuotaResponse,
-  rootLogger as logger,
+  rootLogger,
   SignerEndpoint,
   SignMessageResponseFailure,
   SignMessageResponseSuccess,
   TestUtils,
 } from '@celo/phone-number-privacy-common'
-import { getBlindedPhoneNumber } from '@celo/phone-number-privacy-common/lib/test/utils'
-import { PHONE_NUMBER } from '@celo/phone-number-privacy-common/lib/test/values'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
 import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
+import { getWalletAddress } from '../../src/common/web3/contracts'
 import { config, getVersion } from '../../src/config'
-import { getWalletAddress } from '../../src/services/web3/contracts'
 
 require('dotenv').config()
 
@@ -26,19 +24,23 @@ const {
   ACCOUNT_ADDRESS3,
   BLINDED_PHONE_NUMBER,
   IDENTIFIER,
+  PHONE_NUMBER,
   PRIVATE_KEY1,
   PRIVATE_KEY2,
   PRIVATE_KEY3,
 } = TestUtils.Values
-const { replenishQuota, registerWalletAddress } = TestUtils.Utils
+const { replenishQuota, registerWalletAddress, getBlindedPhoneNumber } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
-const ODIS_PUBLIC_POLYNOMIAL = process.env.ODIS_PUBLIC_POLYNOMIAL as string
+const ODIS_PUBLIC_POLYNOMIAL = process.env[
+  process.env.ODIS_PUBLIC_POLYNOMIAL_VAR_FOR_TESTS as string
+] as string
 const ODIS_KEY_VERSION = (process.env.ODIS_KEY_VERSION || 1) as string
+// Keep these checks as is to ensure backwards compatibility
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'
 
-const DEFAULT_FORNO_URL = config.blockchain.provider
+const DEFAULT_FORNO_URL = process.env.ODIS_BLOCKCHAIN_PROVIDER as string
 
 const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
 const contractkit = newKitFromWeb3(web3)
@@ -64,6 +66,7 @@ describe('Running against a deployed service', () => {
     const response = await fetch(ODIS_SIGNER + SignerEndpoint.STATUS, { method: 'GET' })
     const body = await response.json()
     // This checks against local package.json version, change if necessary
+    expect(response.status).toBe(200)
     expect(body.version).toBe(getVersion())
   })
 
@@ -204,7 +207,14 @@ describe('Running against a deployed service', () => {
 
     it('Check that accounts are set up correctly', async () => {
       expect(await getQuota(ACCOUNT_ADDRESS2, IDENTIFIER)).toBeLessThan(initialQuota)
-      expect(await getWalletAddress(contractkit, logger(), ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
+      expect(
+        await getWalletAddress(
+          contractkit,
+          rootLogger(config.serviceName),
+          ACCOUNT_ADDRESS3,
+          SignerEndpoint.LEGACY_PNP_SIGN
+        )
+      ).toBe(ACCOUNT_ADDRESS2)
     })
 
     // Note: Use this test to check the signers' key configuration. Modify .env to try out different
@@ -326,7 +336,8 @@ function isValidSignature(signature: Buffer, blindedMessage: string, polynomial:
       signature
     )
     return true
-  } catch {
+  } catch (err) {
+    console.log(err)
     return false
   }
 }
