@@ -232,7 +232,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         )
       })
 
-      it('Should respond with 200 on valid request with key version header', async () => {
+      it(`Should respond with 200 on valid request with key version ${ODIS_KEY_VERSION}`, async () => {
         // This value can also be modified but needs to be manually inspected in the signer logs
         // (on staging) since a valid key version that does not exist in the keystore
         // will default to the secretName stored in `KEYSTORE_AZURE_SECRET_NAME`
