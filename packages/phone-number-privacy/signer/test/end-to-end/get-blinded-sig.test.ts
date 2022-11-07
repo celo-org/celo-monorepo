@@ -119,7 +119,11 @@ describe('Running against a deployed service', () => {
   })
 
   it('Returns 403 error when querying out of quota', async () => {
-    const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS1, Date.now())
+    const response = await postToSignMessage(
+      getRandomBlindedPhoneNumber(),
+      ACCOUNT_ADDRESS1,
+      Date.now()
+    )
     expect(response.status).toBe(403)
   })
 
