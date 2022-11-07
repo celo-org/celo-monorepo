@@ -33,7 +33,7 @@ COPY lerna.json package.json yarn.lock ./
 COPY scripts/ scripts/
 COPY patches/ patches/
 
-# Setting ONLY_PUBLISHED_DEPENDENCIES to true (default) or any non-empty string results in only the
+# Setting ONLY_PUBLISHED_DEPENDENCIES to true or any non-empty string results in only the
 # phone-number-privacy package being copied into the image, and therefore it will only build using
 # published dependencies. Setting ONLY_PUBLISHED_DEPENDENCIES to "" will copy in all dependecies.
 ARG ONLY_PUBLISHED_DEPENDENCIES=true
