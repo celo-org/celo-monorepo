@@ -8,6 +8,7 @@ WORKDIR /celo-phone-number-privacy/
 COPY packages/typescript packages/typescript
 COPY packages/dev-utils packages/dev-utils
 COPY packages/flake-tracker packages/flake-tracker
+COPY packages/phone-number-privacy/signer packages/phone-number-privacy/signer
 COPY packages/phone-number-privacy/common packages/phone-number-privacy/common
 COPY packages/protocol packages/protocol
 COPY packages/sdk/base packages/sdk/base
@@ -37,8 +38,8 @@ COPY patches/ patches/
 # Setting ONLY_PUBLISHED_DEPENDENCIES to true (default) or any non-empty string results in only the
 # phone-number-privacy package being copied into the image, and therefore it will only build using
 # published dependencies. Setting ONLY_PUBLISHED_DEPENDENCIES to "" will copy in all dependecies.
-ARG ONLY_PUBLISHED_DEPENDENCIES=""
-ARG PACKAGE_SELECTOR=${ONLY_PUBLISHED_DEPENDENCIES:+phone-number-privacy}
+ARG ONLY_PUBLISHED_DEPENDENCIES=true
+ARG PACKAGE_SELECTOR=${ONLY_PUBLISHED_DEPENDENCIES:+phone-number-privacy/signer}
 COPY --from=packages celo-phone-number-privacy/packages/${PACKAGE_SELECTOR} packages/${PACKAGE_SELECTOR}
 
 # Install dependencies and build.
