@@ -39,6 +39,7 @@
     "@celo/base": "2.4.0-beta.3",
     "@celo/contractkit": "2.4.0-beta.3",
     "@celo/phone-number-privacy-common": "2.0.0-beta.2",
+    "@celo/poprf": "^0.1.9",
     "@celo/utils": "2.4.0-beta.3",
     "@celo/wallet-hsm-azure": "2.4.0-beta.3",
     "@google-cloud/secret-manager": "3.0.0",
