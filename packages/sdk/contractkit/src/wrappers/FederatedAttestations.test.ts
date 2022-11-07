@@ -43,6 +43,46 @@ testWithGanache('FederatedAttestations Wrapper', (web3) => {
     expect(attestations.publishedOns).toEqual([])
   })
 
+  it('attestation and identifiers should exist after registerAttestation is called', async () => {
+    const issuer = accounts[1]
+    const account = accounts[3]
+
+    const accountInstance = await kit.contracts.getAccounts()
+    await accountInstance.createAccount().sendAndWaitForReceipt({ from: issuer })
+
+    // Ganache returns 1 in chainId assembly code
+    // @ts-ignore
+    jest.spyOn<any, any>(kit.connection, 'chainId').mockReturnValue(1)
+
+    const celoTransactionObject = await federatedAttestations.registerAttestation(
+      testIdentifierBytes32,
+      issuer,
+      account,
+      issuer,
+      TIME_STAMP
+    )
+
+    await celoTransactionObject.sendAndWaitForReceipt()
+
+    const attestationsAfterRegistration = await federatedAttestations.lookupAttestations(
+      testIdentifierBytes32,
+      [issuer]
+    )
+
+    const identifiersAfterRegistration = await federatedAttestations.lookupIdentifiers(account, [
+      issuer,
+    ])
+
+    expect(attestationsAfterRegistration.countsPerIssuer).toEqual(['1'])
+    expect(attestationsAfterRegistration.accounts).toEqual([account])
+    expect(attestationsAfterRegistration.signers).toEqual([issuer])
+    expect(attestationsAfterRegistration.issuedOns).toEqual([`${TIME_STAMP}`])
+    expect(attestationsAfterRegistration.publishedOns[0]).toBeDefined()
+
+    expect(identifiersAfterRegistration.countsPerIssuer).toEqual(['1'])
+    expect(identifiersAfterRegistration.identifiers).toEqual([testIdentifierBytes32])
+  })
+
   it('attestation should exist when registered and not when revoked', async () => {
     await federatedAttestations
       .registerAttestationAsIssuer(testIdentifierBytes32, testAccountAddress, TIME_STAMP)

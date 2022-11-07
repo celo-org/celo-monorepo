@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-common",
-  "version": "1.0.39",
+  "version": "1.0.42-dev",
   "description": "Common library for the combiner and signer libraries",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -11,16 +11,16 @@
     "build": "tsc -b .",
     "clean": "tsc -b . --clean",
     "test": "jest --testPathIgnorePatterns test/end-to-end",
-    "test:coverage": "jest --testPathIgnorePatterns test/end-to-end --coverage",
+    "test:coverage": "yarn test --coverage",
     "lint": "tslint -c tslint.json --project ."
   },
   "files": [
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "2.2.1-dev",
-    "@celo/contractkit": "2.2.1-dev",
-    "@celo/utils": "2.2.1-dev",
+    "@celo/base": "2.3.1-dev",
+    "@celo/contractkit": "2.3.1-dev",
+    "@celo/utils": "2.3.1-dev",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "btoa": "1.2.1",
@@ -33,8 +33,8 @@
     "is-base64": "^1.1.0"
   },
   "devDependencies": {
-    "@celo/poprf": "^0.1.6",
-    "@celo/wallet-local": "2.2.1-dev",
+    "@celo/poprf": "^0.1.9",
+    "@celo/wallet-local": "2.3.1-dev",
     "@types/btoa": "^1.2.3",
     "@types/bunyan": "1.8.4",
     "@types/elliptic": "^6.4.12",

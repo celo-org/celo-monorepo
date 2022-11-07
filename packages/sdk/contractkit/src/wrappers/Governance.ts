@@ -107,7 +107,7 @@ export interface UpvoteRecord {
 }
 
 export enum VoteValue {
-  None = 'NONE',
+  None = 'None',
   Abstain = 'Abstain',
   No = 'No',
   Yes = 'Yes',
@@ -135,6 +135,9 @@ export interface VoteRecord {
   proposalID: BigNumber
   votes: BigNumber
   value: VoteValue
+  yesVotes: BigNumber
+  noVotes: BigNumber
+  abstainVotes: BigNumber
 }
 
 export interface Voter {
@@ -545,6 +548,9 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
         proposalID: valueToBigNumber(res[0]),
         value: Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue,
         votes: valueToBigNumber(res[2]),
+        yesVotes: valueToBigNumber(res[3]),
+        noVotes: valueToBigNumber(res[4]),
+        abstainVotes: valueToBigNumber(res[5]),
       }
     } catch (_) {
       // The proposal ID may not be present in the dequeued list, or the voter may not have a vote
@@ -794,6 +800,32 @@ export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
     return toTransactionObject(
       this.connection,
       this.contract.methods.vote(valueToString(proposalID), proposalIndex, voteNum)
+    )
+  }
+
+  /**
+   * Applies `sender`'s vote choice to a given proposal.
+   * @param proposalID Governance proposal UUID.
+   * @param yesVotes The yes votes.
+   * @param noVotes The no votes.
+   * @param abstainVotes The abstain votes.
+   */
+  async votePartially(
+    proposalID: BigNumber.Value,
+    yesVotes: BigNumber.Value,
+    noVotes: BigNumber.Value,
+    abstainVotes: BigNumber.Value
+  ) {
+    const proposalIndex = await this.getDequeueIndex(proposalID)
+    return toTransactionObject(
+      this.connection,
+      this.contract.methods.votePartially(
+        valueToString(proposalID),
+        proposalIndex,
+        valueToString(yesVotes),
+        valueToString(noVotes),
+        valueToString(abstainVotes)
+      )
     )
   }
 

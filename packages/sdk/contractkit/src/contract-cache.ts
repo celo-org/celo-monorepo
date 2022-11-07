@@ -166,19 +166,15 @@ export class WrapperCache implements ContractCacheType {
   getEscrow(): Promise<EscrowWrapper> {
     return this.getContract(CeloContract.Escrow)
   }
-
   getExchange(stableToken: StableToken = StableToken.cUSD) {
     return this.getContract(stableTokenInfos[stableToken].exchangeContract)
   }
-
   getFreezer() {
     return this.getContract(CeloContract.Freezer)
   }
-
   getFederatedAttestations() {
     return this.getContract(CeloContract.FederatedAttestations)
   }
-
   getGasPriceMinimum() {
     return this.getContract(CeloContract.GasPriceMinimum)
   }
@@ -206,14 +202,12 @@ export class WrapperCache implements ContractCacheType {
   getOdisPayments() {
     return this.getContract(CeloContract.OdisPayments)
   }
-
   getReserve() {
     return this.getContract(CeloContract.Reserve)
   }
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)
   }
-
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
     return this.getContract(stableTokenInfos[stableToken].contract)
   }
