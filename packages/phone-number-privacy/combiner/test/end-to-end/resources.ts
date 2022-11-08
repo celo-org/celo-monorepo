@@ -16,7 +16,7 @@ require('dotenv').config()
  */
 export const ODIS_COMBINER =
   process.env.ODIS_COMBINER_SERVICE_URL ||
-  'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
+  'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combiner'
 export const DEFAULT_FORNO_URL =
   process.env.ODIS_BLOCKCHAIN_PROVIDER || 'https://alfajoresstaging-forno.celo-testnet.org'
 

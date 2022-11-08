@@ -531,17 +531,6 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
       })
     })
 
-    it('Should respond with 400 on invalid key version', async () => {
-      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-      const res = await sendLegacyPnpSignRequest(req, authorization, app, 'a')
-      expect(res.status).toBe(400)
-      expect(res.body).toStrictEqual<SignMessageResponseFailure>({
-        success: false,
-        version: expectedVersion,
-        error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
-      })
-    })
-
     it('Should respond with 400 on unsupported key version', async () => {
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await sendLegacyPnpSignRequest(req, authorization, app, '4')
@@ -613,7 +602,7 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
         JSON.stringify(combinerConfig)
       )
       configWithApiDisabled.phoneNumberPrivacy.enabled = false
-      const appWithApiDisabled = startCombiner(configWithApiDisabled)
+      const appWithApiDisabled = startCombiner(configWithApiDisabled, mockKit)
 
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await sendLegacyPnpSignRequest(req, authorization, appWithApiDisabled)
@@ -641,7 +630,7 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
           JSON.stringify(combinerConfig)
         )
         combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-        const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled)
+        const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
         const res = await sendLegacyPnpSignRequest(req, authorization, appWithFailOpenEnabled)
 
         expect(res.status).toBe(200)

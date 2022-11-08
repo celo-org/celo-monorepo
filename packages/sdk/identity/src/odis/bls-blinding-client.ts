@@ -70,7 +70,6 @@ export class WasmBlsBlindingClient implements BlsBlindingClient {
     return typeof navigator !== 'undefined' && navigator.product === 'ReactNative'
   }
 
-  private isBrowserEnvironment(): boolean {
-    return typeof window === 'object'
-  }
+  // https://stackoverflow.com/questions/17575790/environment-detection-node-js-or-browser
+  private isBrowserEnvironment = new Function('try {return this===window;}catch(e){ return false;}')
 }

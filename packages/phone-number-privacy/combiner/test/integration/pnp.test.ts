@@ -585,7 +585,7 @@ describe('pnpService', () => {
           JSON.stringify(combinerConfig)
         )
         configWithApiDisabled.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startCombiner(configWithApiDisabled)
+        const appWithApiDisabled = startCombiner(configWithApiDisabled, mockKit)
         const req = {
           account: ACCOUNT_ADDRESS1,
         }
@@ -621,7 +621,7 @@ describe('pnpService', () => {
             JSON.stringify(combinerConfig)
           )
           combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled)
+          const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
           const res = await getCombinerQuotaResponse(req, authorization, appWithFailOpenEnabled)
 
           expect(res.status).toBe(200)
@@ -780,6 +780,23 @@ describe('pnpService', () => {
         })
       })
 
+      it('Should respond with 200 on invalid key version', async () => {
+        req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
+        const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
+        const res = await sendPnpSignRequest(req, authorization, app, 'invalid')
+
+        expect(res.status).toBe(200)
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSignature,
+          performedQueryCount: 1,
+          totalQuota: expectedTotalQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+      })
+
       it('Should get the same unblinded signatures from the same message (different seed)', async () => {
         const authorization1 = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res1 = await sendPnpSignRequest(req, authorization1, app)
@@ -831,17 +848,6 @@ describe('pnpService', () => {
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
-        })
-      })
-
-      it('Should respond with 400 on invalid key version', async () => {
-        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app, 'a')
-        expect(res.status).toBe(400)
-        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
-          success: false,
-          version: expectedVersion,
-          error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
         })
       })
 
@@ -902,7 +908,7 @@ describe('pnpService', () => {
           JSON.stringify(combinerConfig)
         )
         configWithApiDisabled.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startCombiner(configWithApiDisabled)
+        const appWithApiDisabled = startCombiner(configWithApiDisabled, mockKit)
 
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, appWithApiDisabled)
@@ -930,7 +936,7 @@ describe('pnpService', () => {
             JSON.stringify(combinerConfig)
           )
           combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled)
+          const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
           const res = await sendPnpSignRequest(req, authorization, appWithFailOpenEnabled)
 
           expect(res.status).toBe(200)
@@ -962,7 +968,7 @@ describe('pnpService', () => {
             JSON.stringify(combinerConfig)
           )
           combinerConfigWithFailOpenDisabled.phoneNumberPrivacy.shouldFailOpen = false
-          const appWithFailOpenDisabled = startCombiner(combinerConfigWithFailOpenDisabled)
+          const appWithFailOpenDisabled = startCombiner(combinerConfigWithFailOpenDisabled, mockKit)
           const res = await sendPnpSignRequest(req, authorization, appWithFailOpenDisabled)
 
           expect(res.status).toBe(401)

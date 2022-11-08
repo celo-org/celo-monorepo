@@ -62,9 +62,11 @@ export abstract class IO<R extends OdisRequest> {
   }
 
   getKeyVersionInfo(request: Request<{}, {}, OdisRequest>, logger: Logger): KeyVersionInfo {
-    const requestKeyVersion = getRequestKeyVersion(request, logger)
-    const defaultKeyVersion = this.config.keys.currentVersion
-    const keyVersion = requestKeyVersion ?? defaultKeyVersion
+    let requestKeyVersion: number | undefined
+    if (requestHasValidKeyVersion(request, logger)) {
+      requestKeyVersion = getRequestKeyVersion(request, logger)
+    }
+    const keyVersion = requestKeyVersion ?? this.config.keys.currentVersion
     const supportedVersions: KeyVersionInfo[] = JSON.parse(this.config.keys.versions) // TODO add io-ts checks for this and signer array
     const filteredSupportedVersions: KeyVersionInfo[] = supportedVersions.filter(
       (v) => v.keyVersion === keyVersion
@@ -76,9 +78,6 @@ export abstract class IO<R extends OdisRequest> {
   }
 
   requestHasSupportedKeyVersion(request: Request<{}, {}, OdisRequest>, logger: Logger): boolean {
-    if (!requestHasValidKeyVersion(request, logger)) {
-      return false
-    }
     try {
       this.getKeyVersionInfo(request, logger)
       return true

@@ -67,7 +67,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     it('Should succeed on repeated valid requests', async () => {
       const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
         ACCOUNT_ADDRESS,
-        walletAuthSigner,
+        dekAuthSigner(0),
         SERVICE_CONTEXT
       )
       expect(res1).toStrictEqual<PnpClientQuotaStatus>({
@@ -89,7 +89,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     // TODO(Alec) is this test missing for describe block below for sign endpoint?
     it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} with invalid address`, async () => {
       await expect(
-        OdisUtils.Quota.getPnpQuotaStatus('not an address', walletAuthSigner, SERVICE_CONTEXT)
+        OdisUtils.Quota.getPnpQuotaStatus('not an address', dekAuthSigner(0), SERVICE_CONTEXT)
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
 
@@ -122,13 +122,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         PHONE_NUMBER,
         ACCOUNT_ADDRESS,
         walletAuthSigner,
-        SERVICE_CONTEXT,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        CombinerEndpoint.PNP_SIGN
+        SERVICE_CONTEXT
       )
       expect(res).toStrictEqual<PhoneNumberHashDetails>({
         e164Number: 'TODO',
@@ -142,13 +136,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         PHONE_NUMBER,
         ACCOUNT_ADDRESS,
         dekAuthSigner(0),
-        SERVICE_CONTEXT,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        CombinerEndpoint.PNP_SIGN
+        SERVICE_CONTEXT
       )
       expect(res).toStrictEqual<PhoneNumberHashDetails>({
         e164Number: 'TODO',
@@ -161,14 +149,8 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       const res1 = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
         PHONE_NUMBER,
         ACCOUNT_ADDRESS,
-        walletAuthSigner,
-        SERVICE_CONTEXT,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        CombinerEndpoint.PNP_SIGN
+        dekAuthSigner(0),
+        SERVICE_CONTEXT
       )
       expect(res1).toStrictEqual<PhoneNumberHashDetails>({
         e164Number: 'TODO',
@@ -179,13 +161,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         PHONE_NUMBER,
         ACCOUNT_ADDRESS,
         dekAuthSigner(0),
-        SERVICE_CONTEXT,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        CombinerEndpoint.PNP_SIGN
+        SERVICE_CONTEXT
       )
       expect(res2).toStrictEqual<PhoneNumberHashDetails>(res1)
     })
@@ -193,24 +169,18 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     it('Should increment performedQueryCount on success', async () => {
       const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
         ACCOUNT_ADDRESS,
-        walletAuthSigner,
+        dekAuthSigner(0),
         SERVICE_CONTEXT
       )
       await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
         PHONE_NUMBER,
         ACCOUNT_ADDRESS,
-        walletAuthSigner,
-        SERVICE_CONTEXT,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        CombinerEndpoint.PNP_SIGN
+        dekAuthSigner(0),
+        SERVICE_CONTEXT
       )
       const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
         ACCOUNT_ADDRESS,
-        walletAuthSigner,
+        dekAuthSigner(0),
         SERVICE_CONTEXT
       )
       expect(res2).toStrictEqual<PnpClientQuotaStatus>({
@@ -229,13 +199,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           dekAuthSigner(0),
-          SERVICE_CONTEXT,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          CombinerEndpoint.PNP_SIGN
+          SERVICE_CONTEXT
         )
       await sendSameRequest()
       const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
@@ -246,7 +210,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       await sendSameRequest()
       const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
         ACCOUNT_ADDRESS,
-        walletAuthSigner,
+        dekAuthSigner(0),
         SERVICE_CONTEXT
       )
       expect(res2).toStrictEqual<PnpClientQuotaStatus>({
@@ -264,14 +228,13 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         const res = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
           PHONE_NUMBER,
           ACCOUNT_ADDRESS,
-          walletAuthSigner,
+          dekAuthSigner(0),
           SERVICE_CONTEXT,
           undefined,
           undefined,
           undefined,
           undefined,
-          i,
-          CombinerEndpoint.PNP_SIGN
+          i
         )
         expect(res).toStrictEqual<PhoneNumberHashDetails>({
           e164Number: 'TODO',
@@ -286,14 +249,13 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
           PHONE_NUMBER,
           ACCOUNT_ADDRESS,
-          walletAuthSigner,
+          dekAuthSigner(0),
           SERVICE_CONTEXT,
           undefined,
           undefined,
           undefined,
           undefined,
-          3,
-          CombinerEndpoint.PNP_SIGN
+          3
         )
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
@@ -303,14 +265,13 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
           PHONE_NUMBER,
           ACCOUNT_ADDRESS,
-          walletAuthSigner,
+          dekAuthSigner(0),
           SERVICE_CONTEXT,
           undefined,
           undefined,
           undefined,
           undefined,
-          1.5,
-          CombinerEndpoint.PNP_SIGN
+          1.5
         )
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
@@ -320,14 +281,13 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
           PHONE_NUMBER,
           'not an address',
-          walletAuthSigner,
+          dekAuthSigner(0),
           SERVICE_CONTEXT,
           undefined,
           undefined,
           undefined,
           undefined,
-          1,
-          CombinerEndpoint.PNP_SIGN
+          1
         )
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
@@ -337,14 +297,13 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
           'not a phone number',
           ACCOUNT_ADDRESS,
-          walletAuthSigner,
+          dekAuthSigner(0),
           SERVICE_CONTEXT,
           undefined,
           undefined,
           undefined,
           undefined,
-          1,
-          CombinerEndpoint.PNP_SIGN
+          1
         )
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
@@ -356,13 +315,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           walletAuthSigner, // TODO we need to create a bad auth signer to replace this with
-          SERVICE_CONTEXT,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          CombinerEndpoint.PNP_SIGN
+          SERVICE_CONTEXT
         )
       ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
     })
@@ -374,13 +327,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           dekAuthSigner(0), // TODO we need to create a bad auth signer to replace this with
-          SERVICE_CONTEXT,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          CombinerEndpoint.PNP_SIGN
+          SERVICE_CONTEXT
         )
       ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
     })
@@ -390,14 +337,8 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
           PHONE_NUMBER,
           ACCOUNT_ADDRESS_NO_QUOTA,
-          walletAuthSigner,
-          SERVICE_CONTEXT,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          CombinerEndpoint.PNP_SIGN
+          dekAuthSigner(0),
+          SERVICE_CONTEXT
         )
       ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
     })

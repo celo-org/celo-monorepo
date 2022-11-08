@@ -3,7 +3,6 @@ import {
   CombinerEndpoint,
   Endpoint,
   ErrorMessage,
-  getContractKit,
   loggerMiddleware,
   rootLogger,
 } from '@celo/phone-number-privacy-common'
@@ -28,7 +27,7 @@ import { PnpThresholdStateService } from './pnp/services/threshold-state'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
+export function startCombiner(config: CombinerConfig, kit: ContractKit) {
   const logger = rootLogger(config.serviceName)
 
   logger.info('Creating combiner express server')
@@ -54,8 +53,6 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
       version: getCombinerVersion(),
     })
   })
-
-  kit = kit ?? getContractKit(config.blockchain)
 
   const pnpThresholdStateService = new PnpThresholdStateService()
 
