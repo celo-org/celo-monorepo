@@ -150,10 +150,12 @@ if (DEV_MODE) {
       shouldFailOpen: toBool(functionConfig.pnp.should_fail_open, false),
       odisServices: {
         signers: functionConfig.pnp.odisservices,
-        timeoutMilliSeconds: functionConfig.pnp.timeout_ms ?? 5 * 1000,
+        timeoutMilliSeconds: functionConfig.pnp.timeout_ms
+          ? Number(functionConfig.pnp.timeout_ms)
+          : 5 * 1000,
       },
       keys: {
-        currentVersion: functionConfig.pnp_keys.current_version,
+        currentVersion: Number(functionConfig.pnp_keys.current_version),
         versions: functionConfig.pnp_keys.versions,
       },
     },
@@ -163,10 +165,12 @@ if (DEV_MODE) {
       shouldFailOpen: toBool(functionConfig.domains.auth_should_fail_open, false),
       odisServices: {
         signers: functionConfig.domains.odisservices,
-        timeoutMilliSeconds: functionConfig.domains.timeout_ms ?? 5 * 1000,
+        timeoutMilliSeconds: functionConfig.domains.timeout_ms
+          ? Number(functionConfig.domains.timeout_ms)
+          : 5 * 1000,
       },
       keys: {
-        currentVersion: functionConfig.domains_keys.current_version,
+        currentVersion: Number(functionConfig.domains_keys.current_version),
         versions: functionConfig.domains_keys.versions,
       },
     },

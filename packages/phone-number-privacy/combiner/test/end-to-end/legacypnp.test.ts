@@ -1,9 +1,20 @@
 import { newKit } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity'
 import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
-import { ErrorMessages, WalletKeySigner } from '@celo/identity/lib/odis/query'
-import { PnpClientQuotaStatus } from '@celo/identity/lib/odis/quota'
-import { AuthenticationMethod, CombinerEndpoint } from '@celo/phone-number-privacy-common'
+import {
+  ErrorMessages,
+  getOdisPnpRequestAuth,
+  WalletKeySigner,
+} from '@celo/identity/lib/odis/query'
+import {
+  AuthenticationMethod,
+  CombinerEndpoint,
+  LegacySignMessageRequest,
+  SignMessageResponseSchema,
+  SignMessageResponseSuccess,
+  TestUtils,
+} from '@celo/phone-number-privacy-common'
+import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import { getCombinerVersion } from '../../src'
 import {
@@ -20,6 +31,8 @@ require('dotenv').config()
 
 jest.setTimeout(60000)
 
+const { getBlindedPhoneNumber } = TestUtils.Utils
+
 const expectedPhoneHash = '0x0e87c82690efb29b260d7129b9ded5ed313560997863eb5505ff7bcb5315af7a'
 const expectedPepper = 'ekgnxF0UwzEii'
 const expectedUnblindedSignature =
@@ -28,6 +41,8 @@ const expectedUnblindedSignature =
 const combinerUrl = process.env.ODIS_COMBINER_SERVICE_URL
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
+const expectedVersion = getCombinerVersion()
+
 describe(`Running against service deployed at ${combinerUrl} w/ blockchain provider ${fullNodeUrl}`, () => {
   it('Service is deployed at correct version', async () => {
     const response = await fetch(combinerUrl + CombinerEndpoint.STATUS, {
@@ -35,10 +50,10 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     })
     const body = await response.json()
     // This checks against local package.json version, change if necessary
-    expect(body.version).toBe(getCombinerVersion())
+    expect(body.version).toBe(expectedVersion)
   })
 
-  describe(`${CombinerEndpoint.PNP_SIGN}`, () => {
+  describe(`${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
     it('Should succeed when authenticated with WALLET_KEY', async () => {
       const res = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
         PHONE_NUMBER,
@@ -116,71 +131,79 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     })
 
     it('Should increment performedQueryCount on success', async () => {
-      const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
-        ACCOUNT_ADDRESS,
-        dekAuthSigner(0),
-        SERVICE_CONTEXT
-      )
-      await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
-        PHONE_NUMBER,
-        ACCOUNT_ADDRESS,
-        dekAuthSigner(0),
+      const req: LegacySignMessageRequest = {
+        account: ACCOUNT_ADDRESS,
+        blindedQueryPhoneNumber: getBlindedPhoneNumber(PHONE_NUMBER, randomBytes(32)),
+        authenticationMethod: dekAuthSigner(0).authenticationMethod,
+      }
+      const res1 = (await OdisUtils.Query.queryOdis(
+        req,
         SERVICE_CONTEXT,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        CombinerEndpoint.LEGACY_PNP_SIGN
-      )
-      const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
-        ACCOUNT_ADDRESS,
-        dekAuthSigner(0),
-        SERVICE_CONTEXT
-      )
-      expect(res2).toStrictEqual<PnpClientQuotaStatus>({
-        version: getCombinerVersion(),
+        CombinerEndpoint.LEGACY_PNP_SIGN,
+        SignMessageResponseSchema,
+        {
+          Authorization: await getOdisPnpRequestAuth(req, dekAuthSigner(0)),
+        }
+      )) as SignMessageResponseSuccess
+      expect(res1.success).toBe(true)
+      const req2 = req
+      req2.blindedQueryPhoneNumber = getBlindedPhoneNumber(PHONE_NUMBER, randomBytes(32))
+      const res2 = (await OdisUtils.Query.queryOdis(
+        req2,
+        SERVICE_CONTEXT,
+        CombinerEndpoint.LEGACY_PNP_SIGN,
+        SignMessageResponseSchema,
+        {
+          Authorization: await getOdisPnpRequestAuth(req, dekAuthSigner(0)),
+        }
+      )) as SignMessageResponseSuccess
+
+      expect(res2.success).toBe(true)
+      // There may be warnings but that's ok
+      expect(res2).toMatchObject<SignMessageResponseSuccess>({
+        success: true,
+        version: expectedVersion,
+        signature: res2.signature,
         performedQueryCount: res1.performedQueryCount + 1,
         totalQuota: res1.totalQuota,
-        remainingQuota: res1.totalQuota - res1.performedQueryCount + 1,
         blockNumber: res2.blockNumber,
-        warnings: [],
       })
     })
 
     it('Should not increment performedQueryCount on replayed request when using DEK auth', async () => {
-      const sendSameRequest = async () =>
-        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
-          PHONE_NUMBER,
-          ACCOUNT_ADDRESS,
-          dekAuthSigner(0),
-          SERVICE_CONTEXT,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          CombinerEndpoint.LEGACY_PNP_SIGN
-        )
-      await sendSameRequest()
-      const res1 = await OdisUtils.Quota.getPnpQuotaStatus(
-        ACCOUNT_ADDRESS,
-        dekAuthSigner(0),
-        SERVICE_CONTEXT
-      )
-      await sendSameRequest()
-      const res2 = await OdisUtils.Quota.getPnpQuotaStatus(
-        ACCOUNT_ADDRESS,
-        dekAuthSigner(0),
-        SERVICE_CONTEXT
-      )
-      expect(res2).toStrictEqual<PnpClientQuotaStatus>({
-        version: getCombinerVersion(),
+      const req: LegacySignMessageRequest = {
+        account: ACCOUNT_ADDRESS,
+        blindedQueryPhoneNumber: getBlindedPhoneNumber(PHONE_NUMBER, randomBytes(32)),
+        authenticationMethod: dekAuthSigner(0).authenticationMethod,
+      }
+      const res1 = (await OdisUtils.Query.queryOdis(
+        req,
+        SERVICE_CONTEXT,
+        CombinerEndpoint.LEGACY_PNP_SIGN,
+        SignMessageResponseSchema,
+        {
+          Authorization: await getOdisPnpRequestAuth(req, dekAuthSigner(0)),
+        }
+      )) as SignMessageResponseSuccess
+      expect(res1.success).toBe(true)
+      const res2 = (await OdisUtils.Query.queryOdis(
+        req,
+        SERVICE_CONTEXT,
+        CombinerEndpoint.LEGACY_PNP_SIGN,
+        SignMessageResponseSchema,
+        {
+          Authorization: await getOdisPnpRequestAuth(req, dekAuthSigner(0)),
+        }
+      )) as SignMessageResponseSuccess
+      expect(res2.success).toBe(true)
+      // There may be warnings but that's ok
+      expect(res2).toMatchObject<SignMessageResponseSuccess>({
+        success: true,
+        version: expectedVersion,
+        signature: res2.signature,
         performedQueryCount: res1.performedQueryCount,
         totalQuota: res1.totalQuota,
-        remainingQuota: res1.remainingQuota,
         blockNumber: res2.blockNumber,
-        warnings: [],
       })
     })
 
@@ -239,7 +262,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           undefined,
           undefined,
           undefined,
-          3,
+          10,
           CombinerEndpoint.LEGACY_PNP_SIGN
         )
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)

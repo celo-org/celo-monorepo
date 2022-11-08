@@ -21,6 +21,8 @@ jest.setTimeout(60000)
 const combinerUrl = process.env.ODIS_COMBINER_SERVICE_URL
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
+const expectedVersion = getCombinerVersion()
+
 describe(`Running against service deployed at ${combinerUrl} w/ blockchain provider ${fullNodeUrl}`, () => {
   it('Service is deployed at correct version', async () => {
     const response = await fetch(combinerUrl + CombinerEndpoint.STATUS, {
@@ -28,7 +30,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     })
     const body = await response.json()
     // This checks against local package.json version, change if necessary
-    expect(body.version).toBe(getCombinerVersion())
+    expect(body.version).toBe(expectedVersion)
   })
 
   describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {
@@ -39,7 +41,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         SERVICE_CONTEXT
       )
       expect(res).toStrictEqual<PnpClientQuotaStatus>({
-        version: getCombinerVersion(),
+        version: expectedVersion,
         performedQueryCount: res.performedQueryCount,
         totalQuota: res.totalQuota,
         remainingQuota: res.totalQuota - res.performedQueryCount,
@@ -55,7 +57,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         SERVICE_CONTEXT
       )
       expect(res).toStrictEqual<PnpClientQuotaStatus>({
-        version: getCombinerVersion(),
+        version: expectedVersion,
         performedQueryCount: res.performedQueryCount,
         totalQuota: res.totalQuota,
         remainingQuota: res.totalQuota - res.performedQueryCount,
@@ -71,7 +73,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         SERVICE_CONTEXT
       )
       expect(res1).toStrictEqual<PnpClientQuotaStatus>({
-        version: getCombinerVersion(),
+        version: expectedVersion,
         performedQueryCount: res1.performedQueryCount,
         totalQuota: res1.totalQuota,
         remainingQuota: res1.totalQuota - res1.performedQueryCount,
@@ -184,7 +186,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         SERVICE_CONTEXT
       )
       expect(res2).toStrictEqual<PnpClientQuotaStatus>({
-        version: getCombinerVersion(),
+        version: expectedVersion,
         performedQueryCount: res1.performedQueryCount + 1,
         totalQuota: res1.totalQuota,
         remainingQuota: res1.totalQuota - res1.performedQueryCount + 1,
@@ -214,7 +216,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         SERVICE_CONTEXT
       )
       expect(res2).toStrictEqual<PnpClientQuotaStatus>({
-        version: getCombinerVersion(),
+        version: expectedVersion,
         performedQueryCount: res1.performedQueryCount,
         totalQuota: res1.totalQuota,
         remainingQuota: res1.remainingQuota,
