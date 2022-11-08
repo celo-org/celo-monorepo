@@ -207,6 +207,27 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       })
     }
 
+    it(`Should succeed on invalid key version`, async () => {
+      const res = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        PHONE_NUMBER,
+        ACCOUNT_ADDRESS,
+        dekAuthSigner(0),
+        SERVICE_CONTEXT,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        1.5,
+        CombinerEndpoint.LEGACY_PNP_SIGN
+      )
+      expect(res).toStrictEqual<PhoneNumberHashDetails>({
+        e164Number: PHONE_NUMBER,
+        phoneHash: expectedPhoneHash,
+        pepper: expectedPepper,
+        unblindedSignature: expectedUnblindedSignature,
+      })
+    })
+
     it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on unsupported key version`, async () => {
       await expect(
         OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
@@ -219,23 +240,6 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           undefined,
           undefined,
           3,
-          CombinerEndpoint.LEGACY_PNP_SIGN
-        )
-      ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
-    })
-
-    it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on invalid key version`, async () => {
-      await expect(
-        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
-          PHONE_NUMBER,
-          ACCOUNT_ADDRESS,
-          dekAuthSigner(0),
-          SERVICE_CONTEXT,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          1.5,
           CombinerEndpoint.LEGACY_PNP_SIGN
         )
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
