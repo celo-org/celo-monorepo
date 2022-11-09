@@ -1329,10 +1329,10 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.5.2.tgz#168ab5e4e30b374079d8d139fafc52ca6bfd4100"
   integrity sha512-KGf6Dl9E6D01vAfkgkjL2sG+zqAjspAogILIpWstljWdG5ifyA75jihrnDEHaMCoQS0KxHvTdP1XYS/GS6BEyQ==
 
-"@celo/base@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/base/-/base-2.4.0-beta.3.tgz#b247cf3af61b7a39ef53c7bd532ebcc281dda538"
-  integrity sha512-a0EVcTWQT/yoBDaUbBqUsbZhjoaII2Pi1WDkR6lcFLYvOC4OiIq6edHJ1dCmeucxlac9y2MLtajtEfFeIhs3eA==
+"@celo/base@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/base/-/base-2.4.0-beta.4.tgz#5ca86851873d2bc4b946dfb14f5f8e950c64be3d"
+  integrity sha512-ZIjBPjs1oONfB11dHWKFVg8LVNOS9TqR9R9LOd5Rr/IgXX466Rxy33AO/rE93yurcVjyKuzf2qq89QEfxeV4Tg==
 
 "@celo/bls12377js@0.1.1":
   version "0.1.1"
@@ -1354,28 +1354,28 @@
     debug "^4.1.1"
     utf8 "3.0.0"
 
-"@celo/connect@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-2.4.0-beta.3.tgz#d95c1209b93110ca5c8fc2df24950d1a2170a7d5"
-  integrity sha512-aDb+OEqyYWj8Z2OQSyxcV+O8yjlHbq/PBu9iaBcpIV3uWuOZmLBVX9wsUdII7cOehEYL0DKLtm0qQIZqphR3AA==
+"@celo/connect@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/connect/-/connect-2.4.0-beta.4.tgz#3f74e33c781f5fe083ef1134bbeb12078a4d2fec"
+  integrity sha512-4fFD5ZL5L+n1XRR5G6xVch9OkunhnB4QRmJgBbawfOorYNGfiSOhp0gCqb5KqjWCO5pXFq5QZc1HwcS5HPl9ig==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
-    "@celo/utils" "2.4.0-beta.3"
+    "@celo/base" "2.4.0-beta.4"
+    "@celo/utils" "2.4.0-beta.4"
     "@types/debug" "^4.1.5"
     "@types/utf8" "^2.1.6"
     bignumber.js "^9.0.0"
     debug "^4.1.1"
     utf8 "3.0.0"
 
-"@celo/contractkit@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-2.4.0-beta.3.tgz#91e13133d429d6a35826c95427d11d79138200ea"
-  integrity sha512-cUm2DjJrRVOqVDeKx6D8CRZsHjBHEWb6pYuziHV6F7Pqlo/UdfRCuxuHc0VWPMUq09W8UNAGQZf7XdHfSlSn4w==
+"@celo/contractkit@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-2.4.0-beta.4.tgz#c85e3bc29f693dcc22b10ac7a5039f2a8b3e929b"
+  integrity sha512-8jG1xNHRuPTPO100vKTUqtCBqo53EoyWP1H3cuoF+troSy8+Z0cq1ypmnA1y3IxVWRMKKNh5uykmR+8N+wfRGw==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
-    "@celo/connect" "2.4.0-beta.3"
-    "@celo/utils" "2.4.0-beta.3"
-    "@celo/wallet-local" "2.4.0-beta.3"
+    "@celo/base" "2.4.0-beta.4"
+    "@celo/connect" "2.4.0-beta.4"
+    "@celo/utils" "2.4.0-beta.4"
+    "@celo/wallet-local" "2.4.0-beta.4"
     "@types/bn.js" "^5.1.0"
     "@types/debug" "^4.1.5"
     bignumber.js "^9.0.0"
@@ -1405,14 +1405,14 @@
     semver "^7.3.5"
     web3 "1.3.6"
 
-"@celo/cryptographic-utils@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/cryptographic-utils/-/cryptographic-utils-2.4.0-beta.3.tgz#2eb81def276d3358e1f312d12731f1be6aad4df2"
-  integrity sha512-h+4ZDQ7vB5DXCiz2iyrfVRp0kxmHZMPUFjTr3OD+gnJ+1oYp3fJJZx0sID85z+CuTe0qg7hkoO4QJbAllfQOgQ==
+"@celo/cryptographic-utils@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/cryptographic-utils/-/cryptographic-utils-2.4.0-beta.4.tgz#981254cafd5e8865c8a6c0a3931a96a21bce0261"
+  integrity sha512-CRcm1bfZazgB6YCgwpP5iiwOuycAIaeZNjiH28jFQH/u9SBhBJWGUU6JvlvMmpKKvQW6rljazQE3yBLNvZ3wlw==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
+    "@celo/base" "2.4.0-beta.4"
     "@celo/bls12377js" "0.1.1"
-    "@celo/utils" "2.4.0-beta.3"
+    "@celo/utils" "2.4.0-beta.4"
     "@types/bn.js" "^5.1.0"
     "@types/elliptic" "^6.4.9"
     "@types/ethereumjs-util" "^5.2.0"
@@ -1425,30 +1425,30 @@
     elliptic "^6.5.4"
     ethereumjs-util "^5.2.0"
 
-"@celo/encrypted-backup@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/encrypted-backup/-/encrypted-backup-2.4.0-beta.3.tgz#9aa32334cff3e8730d8ebd159f30b1ac20d39dcf"
-  integrity sha512-1DYVFugCuIh7ox9p61jNrg9Dprx9wFThD8eYnYqgBqW+HnP5sMfAgtX08AoGZLqop+wBxWKOW5qtD/7W3fuiVA==
+"@celo/encrypted-backup@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/encrypted-backup/-/encrypted-backup-2.4.0-beta.4.tgz#d1634be02f6641caacb8b28a949e2c7032931a08"
+  integrity sha512-8k8a/AbIDtlLYqYE6+QUi8r5UdyOih8Q8eaCdFb+ZeqEfcuoKQOK4/h3/ul9WM1UjH/gL9k/K0VDk7XtBUqqhA==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
-    "@celo/identity" "2.4.0-beta.3"
-    "@celo/phone-number-privacy-common" "2.0.0-beta.2"
+    "@celo/base" "2.4.0-beta.4"
+    "@celo/identity" "2.4.0-beta.4"
+    "@celo/phone-number-privacy-common" "2.0.0-beta.3"
     "@celo/poprf" "^0.1.9"
-    "@celo/utils" "2.4.0-beta.3"
+    "@celo/utils" "2.4.0-beta.4"
     "@types/debug" "^4.1.5"
     debug "^4.1.1"
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
-"@celo/explorer@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/explorer/-/explorer-2.4.0-beta.3.tgz#7ac323065d6051185fbe12be629922463a1e4a24"
-  integrity sha512-S6QQFP8hN8KeEZ863Hh7qeExSYtAA7kfn7BC2HYFiYZT3c4zW/Ijldar5vM4BlrClvw7WulgnbJ6cwaluTs5AQ==
+"@celo/explorer@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/explorer/-/explorer-2.4.0-beta.4.tgz#6ef903e007faf417e2c241af3a66735380c1306c"
+  integrity sha512-ltFwPF8pMBDJTusUNwSd9qAxr6zt8XHw9bx7jsxOVyPwz/032Ylo1c6O3bKKt6iYrNUCEWN9u62OqP6P+0qVhg==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
-    "@celo/connect" "2.4.0-beta.3"
-    "@celo/contractkit" "2.4.0-beta.3"
-    "@celo/utils" "2.4.0-beta.3"
+    "@celo/base" "2.4.0-beta.4"
+    "@celo/connect" "2.4.0-beta.4"
+    "@celo/contractkit" "2.4.0-beta.4"
+    "@celo/utils" "2.4.0-beta.4"
     "@types/debug" "^4.1.5"
     debug "^4.1.1"
 
@@ -1502,16 +1502,16 @@
     ethereumjs-wallet "0.6.4"
     web3 "1.2.4"
 
-"@celo/governance@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/governance/-/governance-2.4.0-beta.3.tgz#3c7892343f8ea8cb52e12090fd3b7ef29deea936"
-  integrity sha512-tYKkhqsZrQrkAlTr6AREbc9n3JF8f1k/pgKx81k072aYEaD6LW7irKUGF04GM1WUQ8+9IHoFdRWW/Tdbz+wxPw==
+"@celo/governance@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/governance/-/governance-2.4.0-beta.4.tgz#e0f081d13fcb7979a4949151e8c975fd16a9830e"
+  integrity sha512-62M+u+abcQuBevqM0NG+jt5mH4mTv2ADWjLKe0zqM7mcLSIZcE4jM6Woic0hdwjRJBqNboAJGe8GymMeZqClrA==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
-    "@celo/connect" "2.4.0-beta.3"
-    "@celo/contractkit" "2.4.0-beta.3"
-    "@celo/explorer" "2.4.0-beta.3"
-    "@celo/utils" "2.4.0-beta.3"
+    "@celo/base" "2.4.0-beta.4"
+    "@celo/connect" "2.4.0-beta.4"
+    "@celo/contractkit" "2.4.0-beta.4"
+    "@celo/explorer" "2.4.0-beta.4"
+    "@celo/utils" "2.4.0-beta.4"
     "@types/debug" "^4.1.5"
     "@types/ethereumjs-util" "^5.2.0"
     "@types/inquirer" "^6.5.0"
@@ -1536,15 +1536,15 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
-"@celo/identity@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-2.4.0-beta.3.tgz#c1c8a557fc8f03dfb7a232e88f2fd82d09731896"
-  integrity sha512-JBPzAbmO5sSmeIP7BuU201v9+PqT9Kix8sJOgOccJv8/4RXXAUNgkOC4oxBc76s550as8WUeDwPYv+v6FAnw5g==
+"@celo/identity@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-2.4.0-beta.4.tgz#3bbcbfca722cc8cee4180597de1e156fe3be34f9"
+  integrity sha512-2FjTWetUuIqq4PoV22h0BK/R/f8hEiX46ef17Qk+cnQRZyNLUYZujrfxfVZgfFu9l7oo3hg9IEoHeL1uLZdMrA==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
-    "@celo/contractkit" "2.4.0-beta.3"
-    "@celo/phone-number-privacy-common" "2.0.0-beta.2"
-    "@celo/utils" "2.4.0-beta.3"
+    "@celo/base" "2.4.0-beta.4"
+    "@celo/contractkit" "2.4.0-beta.4"
+    "@celo/phone-number-privacy-common" "2.0.0-beta.3"
+    "@celo/utils" "2.4.0-beta.4"
     "@types/debug" "^4.1.5"
     bignumber.js "^9.0.0"
     blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
@@ -1554,32 +1554,32 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
-"@celo/keystores@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/keystores/-/keystores-2.4.0-beta.3.tgz#842568b52f6786c7cf52b7bdc1323e7fcb9e87a7"
-  integrity sha512-WUOQHQK9ENdcz+5BdMe7PzG2wP/eDJlJZCs/a5ZPbjdNNYFBiFoo7Jfp3Yednb3PRm3Wv108FRuTusXUIH+9iQ==
+"@celo/keystores@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/keystores/-/keystores-2.4.0-beta.4.tgz#4ef28f1b61dd8c9977981c0c31180737c11e4c37"
+  integrity sha512-s1BfP5NXxNdtvHJXCcejWBJ03FHP8u0AGkXVGt12a44QVOviFSUmUul0m9Z6BCsgYHjJC7+sPG6VAB+mXVoLxg==
   dependencies:
-    "@celo/utils" "2.4.0-beta.3"
-    "@celo/wallet-local" "2.4.0-beta.3"
+    "@celo/utils" "2.4.0-beta.4"
+    "@celo/wallet-local" "2.4.0-beta.4"
     "@types/ethereumjs-util" "^5.2.0"
     ethereumjs-wallet "^1.0.1"
 
-"@celo/network-utils@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/network-utils/-/network-utils-2.4.0-beta.3.tgz#684c072177cd099dcc72129b47deecf273a30a71"
-  integrity sha512-oF8UGPBqY0Pm+13zHoxdPUBPABwEQmrVNcIu38wy/06pdJqoyOCQiTDwSqbkyQAUP4ej9tOlXq4HmbaUE1rMVA==
+"@celo/network-utils@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/network-utils/-/network-utils-2.4.0-beta.4.tgz#0d57c3a0a3f7bcde3572a31c7e2f8c21e6955890"
+  integrity sha512-So8UsehU3j6b7Kh+D7+ZlTcJj3H2D8LKlOgQYUy6Y73AichcC/ilveg8XptfZWivm4JDQqmWjIx0wwOLMTzekw==
   dependencies:
     "@types/debug" "^4.1.5"
     cross-fetch "3.0.4"
     debug "^4.1.1"
 
-"@celo/phone-utils@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/phone-utils/-/phone-utils-2.4.0-beta.3.tgz#5d194cf03e722487592b66b569c76e70186e3c3d"
-  integrity sha512-hqaGepslr46tPpHyzWsLPH61XS4ERTlmRjoIztKsOnkqXMaWEJ0kW9dad9JsBgkgut/3vgEhwrmnznoZLd321w==
+"@celo/phone-utils@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/phone-utils/-/phone-utils-2.4.0-beta.4.tgz#2abf2ed8f9c78baef36fbe9ff48d9d6a1526fb18"
+  integrity sha512-BZrDB/XTwn4kdBS9uBc20zLztFF39/6R1HkR2A89pz0Oi3MirxvVXcBfQtvSgmLw9OeatBMDUvYyK/OZvySuFg==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
-    "@celo/utils" "2.4.0-beta.3"
+    "@celo/base" "2.4.0-beta.4"
+    "@celo/utils" "2.4.0-beta.4"
     "@types/country-data" "^0.0.0"
     "@types/ethereumjs-util" "^5.2.0"
     "@types/google-libphonenumber" "^7.4.23"
@@ -1668,12 +1668,12 @@
     web3-eth-abi "1.3.6"
     web3-utils "1.3.6"
 
-"@celo/utils@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-2.4.0-beta.3.tgz#4203e52929e45546f0928e43e990b0b92ce60b41"
-  integrity sha512-+CSlFxWP0esbK0pjRDWHCmz+zQ9WzOG956h7hK7OUkvNX2IKGOGfIFXqiU0NMZ9AlDrIyUmLCKlslDOXn178GA==
+"@celo/utils@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-2.4.0-beta.4.tgz#784e2ae90f3f49815f7a6b2c347eb3b4c09871f1"
+  integrity sha512-qb0eBs++5Vk3csTKsD98URT66IJ9RcbyWq6LYDucMHQeS26TLlBReMQA7nZSPlAzC2IpeCBIGDl3+eNemnLzJQ==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
+    "@celo/base" "2.4.0-beta.4"
     "@types/bn.js" "^5.1.0"
     "@types/elliptic" "^6.4.9"
     "@types/ethereumjs-util" "^5.2.0"
@@ -1700,14 +1700,14 @@
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
 
-"@celo/wallet-base@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-base/-/wallet-base-2.4.0-beta.3.tgz#9bb5177e0df85d49363da88d5d15ed0ecddf92f3"
-  integrity sha512-h7SGgoOztj38Z+8axzBuT2jLDcbcEYdbmzyuvA6wsh30UCIGFu0c0ay9lZqOryO7WsmVzaulw61HMEukh4M1bQ==
+"@celo/wallet-base@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-base/-/wallet-base-2.4.0-beta.4.tgz#dd60ae285e8ec3e6505711db0768f2e30f383912"
+  integrity sha512-cRFYPtqh4UVbQ9DZucqMnoCcqp9vbLJUAVtBG0tggp22/QPKS/0Fy+Fet+djJgXgw6oU0OBYNDHo7dWkcO0BfA==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
-    "@celo/connect" "2.4.0-beta.3"
-    "@celo/utils" "2.4.0-beta.3"
+    "@celo/base" "2.4.0-beta.4"
+    "@celo/connect" "2.4.0-beta.4"
+    "@celo/utils" "2.4.0-beta.4"
     "@types/debug" "^4.1.5"
     "@types/ethereumjs-util" "^5.2.0"
     bignumber.js "^9.0.0"
@@ -1715,19 +1715,19 @@
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
 
-"@celo/wallet-hsm-azure@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-hsm-azure/-/wallet-hsm-azure-2.4.0-beta.3.tgz#907c25f72e152f279aa8ac72f5e3b9093ea26232"
-  integrity sha512-zy26ksffT1vB5ajzNulazT7XMHNlFZzUMfJTOND8uF6c3PoZPWf9aCktY/0CgVP0VJQ5DzPR46+8otWNjwc3hQ==
+"@celo/wallet-hsm-azure@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-hsm-azure/-/wallet-hsm-azure-2.4.0-beta.4.tgz#09d185d0cb54444ca59cac67edca3ebd09ae797c"
+  integrity sha512-rg5eiGqiyq662Sco/aI2jsTjb91wqeeAdlv1dEIoCv51SR5Y5tvKGjG6lH9ru0X9NFgiJXiH5jwCzvrK+Z0xBg==
   dependencies:
     "@azure/identity" "^1.1.0"
     "@azure/keyvault-keys" "^4.1.0"
     "@azure/keyvault-secrets" "^4.1.0"
-    "@celo/connect" "2.4.0-beta.3"
-    "@celo/utils" "2.4.0-beta.3"
-    "@celo/wallet-base" "2.4.0-beta.3"
-    "@celo/wallet-hsm" "2.4.0-beta.3"
-    "@celo/wallet-remote" "2.4.0-beta.3"
+    "@celo/connect" "2.4.0-beta.4"
+    "@celo/utils" "2.4.0-beta.4"
+    "@celo/wallet-base" "2.4.0-beta.4"
+    "@celo/wallet-hsm" "2.4.0-beta.4"
+    "@celo/wallet-remote" "2.4.0-beta.4"
     "@types/secp256k1" "^4.0.0"
     bignumber.js "^9.0.0"
     debug "^4.1.1"
@@ -1735,12 +1735,12 @@
     ethereumjs-util "^5.2.0"
     secp256k1 "^4.0.0"
 
-"@celo/wallet-hsm@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-hsm/-/wallet-hsm-2.4.0-beta.3.tgz#ffb4e74092649b8b145b672ea98c51a4a6b8fde0"
-  integrity sha512-2JujdMxyHvzNIPW9CMpkAf3oCKHoisXquEFukmXgW6gZqUVjnx9VPdyqhKzklFbs+865koyW03rLlSh+sa3Erw==
+"@celo/wallet-hsm@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-hsm/-/wallet-hsm-2.4.0-beta.4.tgz#9244e0f03eb9aebc204ddee4391e77bfc4770066"
+  integrity sha512-tRQGwFjXZsUMm28+9P2S//w02YxGY71r48C/biOodC7V5/CPJM75fjAoEtS5KSyPWkRDLxDb+9JbzFjlb0Rs6Q==
   dependencies:
-    "@celo/base" "2.4.0-beta.3"
+    "@celo/base" "2.4.0-beta.4"
     "@types/asn1js" "^0.0.2"
     "@types/debug" "^4.1.5"
     "@types/secp256k1" "^4.0.0"
@@ -1750,15 +1750,15 @@
     ethereumjs-util "^5.2.0"
     secp256k1 "^4.0.0"
 
-"@celo/wallet-ledger@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-ledger/-/wallet-ledger-2.4.0-beta.3.tgz#72f2a08b270e146d523a93b39c2cdc8ab794ceaa"
-  integrity sha512-n3lpJSigAcwgrZ5i6jcgNvpJBe0Uhl/+jJgBvBuVu+2PkXzlwPpXezonJ7fMqYlu8PnzR0EbAAmzq9S+59FTmg==
+"@celo/wallet-ledger@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-ledger/-/wallet-ledger-2.4.0-beta.4.tgz#1fdb2e7ff1950713201f20bfebb288950ac69290"
+  integrity sha512-LVTb4dbILl4s09RW2r4RazlllME5o8dzGpz9V6U+WkuaBnquvFjQuM7thZqExyn3z6HTDG13XSy3++zNOm4cDQ==
   dependencies:
-    "@celo/connect" "2.4.0-beta.3"
-    "@celo/utils" "2.4.0-beta.3"
-    "@celo/wallet-base" "2.4.0-beta.3"
-    "@celo/wallet-remote" "2.4.0-beta.3"
+    "@celo/connect" "2.4.0-beta.4"
+    "@celo/utils" "2.4.0-beta.4"
+    "@celo/wallet-base" "2.4.0-beta.4"
+    "@celo/wallet-remote" "2.4.0-beta.4"
     "@ledgerhq/hw-app-eth" "~5.11.0"
     "@ledgerhq/hw-transport" "~5.11.0"
     "@types/ethereumjs-util" "^5.2.0"
@@ -1778,26 +1778,26 @@
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
 
-"@celo/wallet-local@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-local/-/wallet-local-2.4.0-beta.3.tgz#5f92e6d31c877131efc01eff4073416335b365a7"
-  integrity sha512-BSkG8owOtWmCiHMGhXoYKkD4xVVfMmwDIq6aH6CGCq0L55t5I/amRWVQAA/OjY1to0caiofyDm7jmifAaQSBwg==
+"@celo/wallet-local@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-local/-/wallet-local-2.4.0-beta.4.tgz#08a237525f75f1d3b76426c74d61f4aa77dd74c4"
+  integrity sha512-I4aXuGbXKQNECMoRHBeE2aEejiZRYYUFx2mD/NnxIBEIHmOnQq0bDDoqnu9YPeQklB1KLKalvWfeRILKnmbABA==
   dependencies:
-    "@celo/connect" "2.4.0-beta.3"
-    "@celo/utils" "2.4.0-beta.3"
-    "@celo/wallet-base" "2.4.0-beta.3"
+    "@celo/connect" "2.4.0-beta.4"
+    "@celo/utils" "2.4.0-beta.4"
+    "@celo/wallet-base" "2.4.0-beta.4"
     "@types/ethereumjs-util" "^5.2.0"
     eth-lib "^0.2.8"
     ethereumjs-util "^5.2.0"
 
-"@celo/wallet-remote@2.4.0-beta.3":
-  version "2.4.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@celo/wallet-remote/-/wallet-remote-2.4.0-beta.3.tgz#56a8a97334d8dfa90dfbe20037c30f5fba71fe8a"
-  integrity sha512-4W+lxBRgeLolEsRJF+Zcrvfo0MJq1AdFtn3299x3/KdToVY3ww7L/rJvJ72XvzN1hpLNBrtNnnxj6dzj/a6n8Q==
+"@celo/wallet-remote@2.4.0-beta.4":
+  version "2.4.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@celo/wallet-remote/-/wallet-remote-2.4.0-beta.4.tgz#a574468c651f345d2a0700703f47bc510793cc4d"
+  integrity sha512-vv00L1kI9aJmLuPbWWUmVDPYJHbpFSlRefDzIDED4V8CnQbT6GHVwaR4fqwbMNyaMyoYL6BfW0yIM+hlvlbHiA==
   dependencies:
-    "@celo/connect" "2.4.0-beta.3"
-    "@celo/utils" "2.4.0-beta.3"
-    "@celo/wallet-base" "2.4.0-beta.3"
+    "@celo/connect" "2.4.0-beta.4"
+    "@celo/utils" "2.4.0-beta.4"
+    "@celo/wallet-base" "2.4.0-beta.4"
     "@types/debug" "^4.1.5"
     "@types/ethereumjs-util" "^5.2.0"
     eth-lib "^0.2.8"
@@ -5304,9 +5304,9 @@
     rxjs "^6.4.0"
 
 "@types/is-base64@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@types/is-base64/-/is-base64-1.1.0.tgz#8f0e0874ba0df223a413e46fa12e681708d19080"
-  integrity sha512-rigoMG77vfIXWjYUDBMPCY0qVzY1dGtEILSsjCcvDH/UgB2ENTZl0uKQknJq4W4nEUqVZqX0M9Uw/VRZ/vwzWQ==
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@types/is-base64/-/is-base64-1.1.1.tgz#a17d2b0075f637f80f9ab5f76f0071a65f6965d4"
+  integrity sha512-JgnGhP+MeSHEQmvxcobcwPEP4Ew56voiq9/0hmP/41lyQ/3gBw/ZCIRy2v+QkEOdeCl58lRcrf6+Y6WMlJGETA==
 
 "@types/isomorphic-fetch@0.0.31":
   version "0.0.31"
@@ -7777,6 +7777,16 @@ bip39@^2.2.0, bip39@^2.5.0:
     safe-buffer "^5.0.1"
     unorm "^1.3.3"
 
+"bip39@git+https://github.com/bitcoinjs/bip39.git#d8ea080a18b40f301d4e2219a2991cd2417e83c2":
+  version "3.0.3"
+  uid d8ea080a18b40f301d4e2219a2991cd2417e83c2
+  resolved "git+https://github.com/bitcoinjs/bip39.git#d8ea080a18b40f301d4e2219a2991cd2417e83c2"
+  dependencies:
+    "@types/node" "11.11.6"
+    create-hash "^1.1.0"
+    pbkdf2 "^3.0.9"
+    randombytes "^2.0.1"
+
 "bip39@https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2":
   version "3.0.3"
   resolved "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2"
@@ -7806,6 +7816,11 @@ blakejs@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/blakejs/-/blakejs-1.1.0.tgz#69df92ef953aa88ca51a32df6ab1c54a155fc7a5"
   integrity sha1-ad+S75U6qIylGjLfarHFShVfx6U=
+
+"blind-threshold-bls@git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a":
+  version "0.1.0"
+  uid e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208
+  resolved "git+https://github.com/celo-org/blind-threshold-bls-wasm.git#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208"
 
 "blind-threshold-bls@https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a":
   version "0.1.0"
