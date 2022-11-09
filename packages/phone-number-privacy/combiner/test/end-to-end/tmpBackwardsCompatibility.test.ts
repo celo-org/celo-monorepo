@@ -1,52 +1,58 @@
-import { OdisUtils } from '@celo/identity'
+import { newKit } from '@celo/contractkit-prev'
+import { OdisUtils } from '@celo/identity-prev'
+import { SignMessageRequest } from '@celo/identity-prev/lib/odis/query'
 import { ErrorMessages } from '@celo/identity/lib/odis/query'
-import {
-  AuthenticationMethod,
-  Endpoint,
-  SignMessageRequest,
-} from '@celo/phone-number-privacy-common'
+import { AuthenticationMethod, Endpoint } from '@celo/phone-number-privacy-common'
+import { replenishQuota } from '@celo/phone-number-privacy-common/lib/test/utils'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
+import { ensureLeading0x } from '@celo/utils/lib/address'
 import 'isomorphic-fetch'
-import { replenishQuota } from '../../../common/src/test/utils'
-import { VERSION } from '../../src/config'
 import {
   ACCOUNT_ADDRESS,
   ACCOUNT_ADDRESS_NO_QUOTA,
   BLINDED_PHONE_NUMBER,
-  contractKit,
+  DEFAULT_FORNO_URL,
   dekAuthSigner,
+  deks,
   PHONE_NUMBER,
+  PRIVATE_KEY,
+  PRIVATE_KEY_NO_QUOTA,
   SERVICE_CONTEXT,
-  walletAuthSigner,
 } from './resources'
 
 require('dotenv').config()
 
-export const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessageSig'
-
 jest.setTimeout(60000)
 
-describe('Running against a deployed service', () => {
-  beforeAll(() => {
-    console.log('ODIS_COMBINER_SERVICE_URL: ' + process.env.ODIS_COMBINER_SERVICE_URL)
-    console.log('ODIS_BLOCKCHAIN_PROVIDER: ' + process.env.ODIS_BLOCKCHAIN_PROVIDER)
-  })
+const contractKit = newKit(DEFAULT_FORNO_URL)
+contractKit.addAccount(PRIVATE_KEY_NO_QUOTA)
+contractKit.addAccount(PRIVATE_KEY)
+contractKit.defaultAccount = ACCOUNT_ADDRESS
 
-  // This test is disabled because the Combiner status endpoint doesn't work
-  xit('Service is deployed at correct version', async () => {
-    const response = await fetch(process.env.ODIS_COMBINER_SERVICE_URL + Endpoint.STATUS, {
-      method: 'GET',
-    })
-    const body = await response.json()
-    // This checks against local package.json version, change if necessary
-    expect(body.version).toBe(VERSION)
+const combinerUrl = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
+const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
+
+describe(`Running against service deployed at ${combinerUrl} w/ blockchain provider ${fullNodeUrl}`, () => {
+  beforeAll(async () => {
+    const dek0 = ensureLeading0x(deks[0].publicKey)
+    const accountsWrapper = await contractKit.contracts.getAccounts()
+    if ((await accountsWrapper.getDataEncryptionKey(ACCOUNT_ADDRESS)) !== dek0) {
+      await accountsWrapper
+        .setAccountDataEncryptionKey(dek0)
+        .sendAndWaitForReceipt({ from: ACCOUNT_ADDRESS })
+    }
+    if ((await accountsWrapper.getDataEncryptionKey(ACCOUNT_ADDRESS_NO_QUOTA)) !== dek0) {
+      await accountsWrapper
+        .setAccountDataEncryptionKey(dek0)
+        .sendAndWaitForReceipt({ from: ACCOUNT_ADDRESS_NO_QUOTA })
+    }
   })
 
   describe('Returns status ODIS_INPUT_ERROR', () => {
     it('With invalid address', async () => {
       const body: SignMessageRequest = {
         account: '0x1234',
-        authenticationMethod: AuthenticationMethod.WALLET_KEY,
+        authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
         blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
         version: 'ignore',
         sessionID: genSessionID(),
@@ -60,13 +66,13 @@ describe('Running against a deployed service', () => {
     it('With missing blindedQueryPhoneNumber', async () => {
       const body: SignMessageRequest = {
         account: ACCOUNT_ADDRESS,
-        authenticationMethod: AuthenticationMethod.WALLET_KEY,
+        authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
         blindedQueryPhoneNumber: '',
         version: 'ignore',
         sessionID: genSessionID(),
       }
       await expect(
-        OdisUtils.Query.queryOdis(walletAuthSigner, body, SERVICE_CONTEXT, Endpoint.LEGACY_PNP_SIGN)
+        OdisUtils.Query.queryOdis(dekAuthSigner(0), body, SERVICE_CONTEXT, Endpoint.LEGACY_PNP_SIGN)
       ).rejects.toThrow(ErrorMessages.ODIS_INPUT_ERROR)
     })
   })
@@ -91,7 +97,7 @@ describe('Running against a deployed service', () => {
         OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
           PHONE_NUMBER,
           ACCOUNT_ADDRESS_NO_QUOTA,
-          walletAuthSigner,
+          dekAuthSigner(0),
           SERVICE_CONTEXT
         )
       ).rejects.toThrow(ErrorMessages.ODIS_QUOTA_ERROR)
@@ -105,7 +111,7 @@ describe('Running against a deployed service', () => {
       await replenishQuota(ACCOUNT_ADDRESS, contractKit)
       const body: SignMessageRequest = {
         account: ACCOUNT_ADDRESS,
-        authenticationMethod: AuthenticationMethod.WALLET_KEY,
+        authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
         blindedQueryPhoneNumber: BLINDED_PHONE_NUMBER,
         version: 'ignore',
         sessionID: genSessionID(),
@@ -113,7 +119,7 @@ describe('Running against a deployed service', () => {
       // Query twice to test reusing the request
       for (let i = 0; i < 2; i++) {
         const result = OdisUtils.Query.queryOdis(
-          walletAuthSigner,
+          dekAuthSigner(0),
           body,
           SERVICE_CONTEXT,
           Endpoint.LEGACY_PNP_SIGN

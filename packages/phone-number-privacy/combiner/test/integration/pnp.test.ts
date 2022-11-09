@@ -26,14 +26,14 @@ import {
   KeyProvider,
 } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
 import { MockKeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/mock-key-provider'
-import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
+import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
 import BigNumber from 'bignumber.js'
 import threshold_bls from 'blind-threshold-bls'
 import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
 import { Server } from 'net'
 import request from 'supertest'
-import config from '../../src/config'
+import config, { getCombinerVersion } from '../../src/config'
 import { startCombiner } from '../../src/server'
 
 const {
@@ -193,7 +193,7 @@ describe('pnpService', () => {
   let blindedMsgResult: threshold_bls.BlindedMessage
 
   const signerMigrationsPath = '../signer/dist/common/database/migrations'
-  const expectedVersion = getVersion()
+  const expectedVersion = getCombinerVersion()
 
   const onChainPaymentsDefault = new BigNumber(1e18)
   const expectedTotalQuota = 1000
@@ -585,7 +585,7 @@ describe('pnpService', () => {
           JSON.stringify(combinerConfig)
         )
         configWithApiDisabled.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startCombiner(configWithApiDisabled)
+        const appWithApiDisabled = startCombiner(configWithApiDisabled, mockKit)
         const req = {
           account: ACCOUNT_ADDRESS1,
         }
@@ -621,7 +621,7 @@ describe('pnpService', () => {
             JSON.stringify(combinerConfig)
           )
           combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled)
+          const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
           const res = await getCombinerQuotaResponse(req, authorization, appWithFailOpenEnabled)
 
           expect(res.status).toBe(200)
@@ -780,6 +780,23 @@ describe('pnpService', () => {
         })
       })
 
+      it('Should respond with 200 on invalid key version', async () => {
+        req.authenticationMethod = AuthenticationMethod.ENCRYPTION_KEY
+        const authorization = getPnpRequestAuthorization(req, DEK_PRIVATE_KEY)
+        const res = await sendPnpSignRequest(req, authorization, app, 'invalid')
+
+        expect(res.status).toBe(200)
+        expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
+          success: true,
+          version: expectedVersion,
+          signature: expectedSignature,
+          performedQueryCount: 1,
+          totalQuota: expectedTotalQuota,
+          blockNumber: testBlockNumber,
+          warnings: [],
+        })
+      })
+
       it('Should get the same unblinded signatures from the same message (different seed)', async () => {
         const authorization1 = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res1 = await sendPnpSignRequest(req, authorization1, app)
@@ -831,17 +848,6 @@ describe('pnpService', () => {
           success: false,
           version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
-        })
-      })
-
-      it('Should respond with 400 on invalid key version', async () => {
-        const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-        const res = await sendPnpSignRequest(req, authorization, app, 'a')
-        expect(res.status).toBe(400)
-        expect(res.body).toStrictEqual<SignMessageResponseFailure>({
-          success: false,
-          version: expectedVersion,
-          error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
         })
       })
 
@@ -902,7 +908,7 @@ describe('pnpService', () => {
           JSON.stringify(combinerConfig)
         )
         configWithApiDisabled.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startCombiner(configWithApiDisabled)
+        const appWithApiDisabled = startCombiner(configWithApiDisabled, mockKit)
 
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendPnpSignRequest(req, authorization, appWithApiDisabled)
@@ -930,7 +936,7 @@ describe('pnpService', () => {
             JSON.stringify(combinerConfig)
           )
           combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled)
+          const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
           const res = await sendPnpSignRequest(req, authorization, appWithFailOpenEnabled)
 
           expect(res.status).toBe(200)
@@ -962,7 +968,7 @@ describe('pnpService', () => {
             JSON.stringify(combinerConfig)
           )
           combinerConfigWithFailOpenDisabled.phoneNumberPrivacy.shouldFailOpen = false
-          const appWithFailOpenDisabled = startCombiner(combinerConfigWithFailOpenDisabled)
+          const appWithFailOpenDisabled = startCombiner(combinerConfigWithFailOpenDisabled, mockKit)
           const res = await sendPnpSignRequest(req, authorization, appWithFailOpenDisabled)
 
           expect(res.status).toBe(401)
@@ -1060,9 +1066,9 @@ describe('pnpService', () => {
       beforeEach(async () => {
         const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
-        signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
-        signer2 = startSigner(configWithApiDisabled, signerDB2, keyProvider2).listen(3002)
-        signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3).listen(3003)
+        signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+        signer2 = startSigner(configWithApiDisabled, signerDB2, keyProvider2, mockKit).listen(3002)
+        signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3, mockKit).listen(3003)
       })
 
       describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {
@@ -1101,9 +1107,9 @@ describe('pnpService', () => {
       beforeEach(async () => {
         const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
-        signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
-        signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3002)
-        signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3).listen(3003)
+        signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+        signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
+        signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3, mockKit).listen(3003)
       })
 
       describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {
@@ -1151,9 +1157,9 @@ describe('pnpService', () => {
         const configWithShortTimeout: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
         configWithShortTimeout.timeout = testTimeoutMS
         // Test this with all signers timing out to decrease possibility of race conditions
-        signer1 = startSigner(configWithShortTimeout, signerDB1, keyProvider1).listen(3001)
-        signer2 = startSigner(configWithShortTimeout, signerDB2, keyProvider2).listen(3002)
-        signer3 = startSigner(configWithShortTimeout, signerDB3, keyProvider3).listen(3003)
+        signer1 = startSigner(configWithShortTimeout, signerDB1, keyProvider1, mockKit).listen(3001)
+        signer2 = startSigner(configWithShortTimeout, signerDB2, keyProvider2, mockKit).listen(3002)
+        signer3 = startSigner(configWithShortTimeout, signerDB3, keyProvider3, mockKit).listen(3003)
       })
 
       describe(`${CombinerEndpoint.PNP_QUOTA}`, () => {

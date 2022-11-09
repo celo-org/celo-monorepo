@@ -15,7 +15,7 @@ import * as PromClient from 'prom-client'
 import { Controller } from './common/controller'
 import { KeyProvider } from './common/key-management/key-provider-base'
 import { Counters } from './common/metrics'
-import { getVersion, SignerConfig } from './config'
+import { getSignerVersion, SignerConfig } from './config'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
 import { DomainQuotaAction } from './domain/endpoints/quota/action'
@@ -51,7 +51,7 @@ export function startSigner(
 
   app.get(SignerEndpoint.STATUS, (_req, res) => {
     res.status(200).json({
-      version: getVersion(),
+      version: getSignerVersion(),
     })
   })
 

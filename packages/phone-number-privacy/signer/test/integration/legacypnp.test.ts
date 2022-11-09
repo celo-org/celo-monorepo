@@ -32,7 +32,7 @@ import {
 import { getRequestExists } from '../../src/common/database/wrappers/request'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
-import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
+import { config, getSignerVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
 const {
@@ -114,7 +114,7 @@ describe('legacyPNP', () => {
   let app: any
   let db: Knex
 
-  const expectedVersion = getVersion()
+  const expectedVersion = getSignerVersion()
 
   // create deep copy
   const _config: typeof config = JSON.parse(JSON.stringify(config))
@@ -570,7 +570,12 @@ describe('legacyPNP', () => {
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.legacyPhoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+        const appWithApiDisabled = startSigner(
+          configWithApiDisabled,
+          db,
+          keyProvider,
+          newKit('dummyKit')
+        )
         const req = getLegacyPnpQuotaRequest(ACCOUNT_ADDRESS1, IDENTIFIER)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
         const res = await sendRequest(
@@ -593,7 +598,12 @@ describe('legacyPNP', () => {
         it('Should respond with 200 on failure to fetch DEK when shouldFailOpen is true', async () => {
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
           mockGetDataEncryptionKey.mockImplementation(() => {
             throw new Error()
           })
@@ -794,7 +804,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -818,7 +828,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -845,7 +855,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignatures[i - 1],
             performedQueryCount: performedQueryCount + 1,
             totalQuota: expectedQuota,
@@ -868,7 +878,7 @@ describe('legacyPNP', () => {
         expect(res1.status).toBe(200)
         expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res1.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -895,7 +905,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -918,7 +928,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -940,7 +950,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
         })
       })
@@ -957,7 +967,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -974,7 +984,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -991,7 +1001,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -1009,7 +1019,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(401)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
         })
       })
@@ -1027,7 +1037,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(401)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
         })
       })
@@ -1057,7 +1067,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(403)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: expectedQuota,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -1086,7 +1096,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(403)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: 0,
           totalQuota: 0,
           blockNumber: testBlockNumber,
@@ -1123,7 +1133,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(403)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: expectedQuota + 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -1147,7 +1157,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(500)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: performedQueryCount,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -1158,7 +1168,12 @@ describe('legacyPNP', () => {
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.legacyPhoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+        const appWithApiDisabled = startSigner(
+          configWithApiDisabled,
+          db,
+          keyProvider,
+          newKit('dummyKit')
+        )
 
         const req = getLegacyPnpSignRequest(
           ACCOUNT_ADDRESS1,
@@ -1177,7 +1192,7 @@ describe('legacyPNP', () => {
         expect(res.status).toBe(503)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
         })
       })
@@ -1188,7 +1203,7 @@ describe('legacyPNP', () => {
         let appWithPNPEnabled: any
 
         beforeEach(() => {
-          appWithPNPEnabled = startSigner(configWithPNPEnabled, db, keyProvider)
+          appWithPNPEnabled = startSigner(configWithPNPEnabled, db, keyProvider, newKit('dummyKit'))
         })
 
         // Keep both of these cases with the legacy test suite
@@ -1212,7 +1227,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedQuotaOnChain,
@@ -1239,7 +1254,7 @@ describe('legacyPNP', () => {
           expect(legacyRes.status).toBe(200)
           expect(legacyRes.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: legacyRes.body.version,
+            version: expectedVersion,
             signature: expectedSignature,
             performedQueryCount: performedQueryCount + 1,
             totalQuota: legacyRes.body.totalQuota,
@@ -1269,7 +1284,7 @@ describe('legacyPNP', () => {
           expect(legacyRes.status).toBe(200)
           expect(legacyRes.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: legacyRes.body.version,
+            version: expectedVersion,
             signature: expectedSignature,
             performedQueryCount: performedQueryCount + 1,
             totalQuota: legacyRes.body.totalQuota,
@@ -1297,7 +1312,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignature,
             performedQueryCount: 1,
             totalQuota: expectedQuotaOnChain,
@@ -1354,7 +1369,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: -1,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
@@ -1367,7 +1382,12 @@ describe('legacyPNP', () => {
         it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
@@ -1412,7 +1432,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignature,
             performedQueryCount: expectedQuota + 1, // bc we depleted the user's quota above
             totalQuota: Number.MAX_SAFE_INTEGER,
@@ -1445,7 +1465,12 @@ describe('legacyPNP', () => {
 
           const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenDisabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = false
-          const appWithFailOpenDisabled = startSigner(configWithFailOpenDisabled, db, keyProvider)
+          const appWithFailOpenDisabled = startSigner(
+            configWithFailOpenDisabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           const req = getLegacyPnpSignRequest(
             ACCOUNT_ADDRESS1,
@@ -1465,7 +1490,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: -1,
             blockNumber: testBlockNumber,
@@ -1496,7 +1521,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             error: ErrorMessage.DATABASE_UPDATE_FAILURE,
           })
 
@@ -1537,7 +1562,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             error: ErrorMessage.DATABASE_INSERT_FAILURE,
           })
 
@@ -1572,7 +1597,12 @@ describe('legacyPNP', () => {
 
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.legacyPhoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
@@ -1587,7 +1617,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignature,
             performedQueryCount: performedQueryCount + 1,
             totalQuota: expectedQuota,
@@ -1615,7 +1645,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
@@ -1667,7 +1697,7 @@ describe('legacyPNP', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,

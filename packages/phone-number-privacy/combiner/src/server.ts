@@ -3,15 +3,14 @@ import {
   CombinerEndpoint,
   Endpoint,
   ErrorMessage,
-  getContractKit,
   loggerMiddleware,
   rootLogger,
 } from '@celo/phone-number-privacy-common'
 import Logger from 'bunyan'
 import express, { Request, Response } from 'express'
 import { performance, PerformanceObserver } from 'perf_hooks'
-import { CombinerConfig } from '.'
 import { Controller } from './common/controller'
+import { CombinerConfig, getCombinerVersion } from './config'
 import { DomainDisableAction } from './domain/endpoints/disable/action'
 import { DomainDisableIO } from './domain/endpoints/disable/io'
 import { DomainQuotaAction } from './domain/endpoints/quota/action'
@@ -28,7 +27,7 @@ import { PnpThresholdStateService } from './pnp/services/threshold-state'
 
 require('events').EventEmitter.defaultMaxListeners = 15
 
-export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
+export function startCombiner(config: CombinerConfig, kit: ContractKit) {
   const logger = rootLogger(config.serviceName)
 
   logger.info('Creating combiner express server')
@@ -49,7 +48,11 @@ export function startCombiner(config: CombinerConfig, kit?: ContractKit) {
     next()
   })
 
-  kit = kit ?? getContractKit(config.blockchain)
+  app.get(CombinerEndpoint.STATUS, (_req, res) => {
+    res.status(200).json({
+      version: getCombinerVersion(),
+    })
+  })
 
   const pnpThresholdStateService = new PnpThresholdStateService()
 
