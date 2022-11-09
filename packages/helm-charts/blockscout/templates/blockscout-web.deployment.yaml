@@ -134,6 +134,12 @@ spec:
           value: "{{.Values.blockscout.epochRewards.enabled}}"
         - name: DISABLE_WRITE_API
           value: "false"
+        - name: MY_REGION
+          value: {{ .Values.blockscout.web.rpcRegion | quote }}
+        - name: FLY_REGION
+          value: {{ .Values.blockscout.web.rpcRegion | quote }}
+        - name: PRIMARY_REGION
+          value: {{ .Values.blockscout.web.primaryRpcRegion | quote }}
         - name: RE_CAPTCHA_PROJECT_ID
           value: {{ .Values.blockscout.secrets.recaptcha.projectId }}
         - name: RE_CAPTCHA_SITE_KEY
