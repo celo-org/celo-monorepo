@@ -248,6 +248,34 @@ const PASSWORD_HARDENING_RATE_LIMIT: SequentialDelayStage[] = [
   },
 ]
 
+/**
+ * ODIS SequentialDelayDomain rate limit configured for e2e testing where no rate limit should be applied.
+ *
+ * @remarks This should only be used testing purposes
+ */
+const E2E_TESTING_RATE_LIMIT: SequentialDelayStage[] = [
+  {
+    delay: 0,
+    resetTimer: defined(true),
+    batchSize: defined(1000000000),
+    repetitions: defined(1000000000),
+  },
+]
+
+/**
+ * ODIS SequentialDelayDomain rate limit configured for e2e testing where the user should have no quota.
+ *
+ * @remarks This should only be used testing purposes
+ */
+const NO_QUOTA_RATE_LIMIT: SequentialDelayStage[] = [
+  {
+    delay: 0,
+    resetTimer: defined(true),
+    batchSize: defined(0),
+    repetitions: defined(0),
+  },
+]
+
 export enum EnvironmentIdentifier {
   MAINNET = 'MAINNET',
   ALFAJORES = 'ALFAJORES',
@@ -286,9 +314,61 @@ export const PASSWORD_HARDENING_MAINNET_CONFIG: HardeningConfig = {
   },
 }
 
+export const E2E_TESTING_MAINNET_CONFIG: HardeningConfig = {
+  odis: {
+    rateLimit: E2E_TESTING_RATE_LIMIT,
+    environment: ODIS_MAINNET_CONTEXT,
+  },
+  computational: {
+    function: ComputationalHardeningFunction.SCRYPT,
+    cost: 32768,
+    blockSize: 8,
+    parallelization: 1,
+  },
+}
+
+export const NO_QUOTA_MAINNET_CONFIG: HardeningConfig = {
+  odis: {
+    rateLimit: NO_QUOTA_RATE_LIMIT,
+    environment: ODIS_MAINNET_CONTEXT,
+  },
+  computational: {
+    function: ComputationalHardeningFunction.SCRYPT,
+    cost: 32768,
+    blockSize: 8,
+    parallelization: 1,
+  },
+}
+
 export const PASSWORD_HARDENING_ALFAJORES_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: PASSWORD_HARDENING_RATE_LIMIT,
+    environment: ODIS_ALFAJORES_CONTEXT,
+  },
+  computational: {
+    function: ComputationalHardeningFunction.SCRYPT,
+    cost: 32768,
+    blockSize: 8,
+    parallelization: 1,
+  },
+}
+
+export const E2E_TESTING_ALFAJORES_CONFIG: HardeningConfig = {
+  odis: {
+    rateLimit: E2E_TESTING_RATE_LIMIT,
+    environment: ODIS_ALFAJORES_CONTEXT,
+  },
+  computational: {
+    function: ComputationalHardeningFunction.SCRYPT,
+    cost: 32768,
+    blockSize: 8,
+    parallelization: 1,
+  },
+}
+
+export const NO_QUOTA_ALFAJORES_CONFIG: HardeningConfig = {
+  odis: {
+    rateLimit: NO_QUOTA_RATE_LIMIT,
     environment: ODIS_ALFAJORES_CONTEXT,
   },
   computational: {

@@ -22,7 +22,7 @@ import { Request, Response } from 'express'
 import { IO } from '../../../common/io'
 import { Key } from '../../../common/key-management/key-provider-base'
 import { Counters } from '../../../common/metrics'
-import { getVersion } from '../../../config'
+import { getSignerVersion } from '../../../config'
 import { PnpSession } from '../../session'
 
 export class PnpSignIO extends IO<SignMessageRequest> {
@@ -88,7 +88,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       response,
       {
         success: true,
-        version: getVersion(),
+        version: getSignerVersion(),
         signature,
         ...quotaStatus,
         warnings,
@@ -109,7 +109,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       response,
       {
         success: false,
-        version: getVersion(),
+        version: getSignerVersion(),
         error,
         ...quotaStatus,
       },

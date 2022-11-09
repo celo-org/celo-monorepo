@@ -25,7 +25,7 @@ import * as t from 'io-ts'
 import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto-client'
 import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
-import { OdisConfig, VERSION } from '../../../config'
+import { getCombinerVersion, OdisConfig } from '../../../config'
 
 export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.LEGACY_PNP_SIGN
@@ -99,7 +99,7 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
       response,
       {
         success: true,
-        version: VERSION,
+        version: getCombinerVersion(),
         signature,
         ...quotaStatus,
         warnings,
@@ -114,7 +114,7 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
       response,
       {
         success: false,
-        version: VERSION,
+        version: getCombinerVersion(),
         error,
       },
       status,

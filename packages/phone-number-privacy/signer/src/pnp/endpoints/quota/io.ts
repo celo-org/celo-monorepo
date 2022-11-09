@@ -18,7 +18,7 @@ import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { IO } from '../../../common/io'
 import { Counters } from '../../../common/metrics'
-import { getVersion } from '../../../config'
+import { getSignerVersion } from '../../../config'
 import { PnpSession } from '../../session'
 
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
@@ -75,7 +75,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       response,
       {
         success: true,
-        version: getVersion(),
+        version: getSignerVersion(),
         ...quotaStatus,
         warnings,
       },
@@ -90,7 +90,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       response,
       {
         success: false,
-        version: getVersion(),
+        version: getSignerVersion(),
         error,
       },
       status,
