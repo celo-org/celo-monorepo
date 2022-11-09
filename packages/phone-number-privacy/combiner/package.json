@@ -23,8 +23,8 @@
     "test:coverage": "yarn test --coverage",
     "test:integration": "jest --runInBand test/integration",
     "test:e2e": "jest test/end-to-end --verbose",
-    "test:e2e:staging": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net yarn test:e2e",
-    "test:e2e:alfajores": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy.cloudfunctions.net yarn test:e2e"
+    "test:e2e:staging": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combiner yarn test:e2e",
+    "test:e2e:alfajores": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combiner yarn test:e2e"
   },
   "dependencies": {
     "@celo/contractkit": "2.3.1-dev",

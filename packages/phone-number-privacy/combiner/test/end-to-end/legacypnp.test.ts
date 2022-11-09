@@ -323,6 +323,28 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       ).rejects.toThrow('unknown account')
     })
 
+    it(`Should reject to throw ${ErrorMessages.ODIS_AUTH_ERROR} with invalid WALLET_KEY auth`, async () => {
+      const req: LegacySignMessageRequest = {
+        account: ACCOUNT_ADDRESS,
+        blindedQueryPhoneNumber: getBlindedPhoneNumber(PHONE_NUMBER, randomBytes(32)),
+        authenticationMethod: walletAuthSigner.authenticationMethod,
+      }
+      await expect(
+        OdisUtils.Query.queryOdis(
+          req,
+          SERVICE_CONTEXT,
+          CombinerEndpoint.LEGACY_PNP_SIGN,
+          SignMessageResponseSchema,
+          {
+            Authorization: await walletAuthSigner.contractKit.connection.sign(
+              JSON.stringify(req),
+              ACCOUNT_ADDRESS_NO_QUOTA
+            ),
+          }
+        )
+      ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
+    })
+
     it(`Should reject to throw ${ErrorMessages.ODIS_AUTH_ERROR} with invalid DEK auth`, async () => {
       await expect(
         OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
