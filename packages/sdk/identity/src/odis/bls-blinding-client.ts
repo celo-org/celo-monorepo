@@ -71,5 +71,6 @@ export class WasmBlsBlindingClient implements BlsBlindingClient {
   }
 
   // https://stackoverflow.com/questions/17575790/environment-detection-node-js-or-browser
+  // tslint:disable-next-line: function-constructor
   private isBrowserEnvironment = new Function('try {return this===window;}catch(e){ return false;}')
 }
