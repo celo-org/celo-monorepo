@@ -62,6 +62,9 @@ export abstract class IO<R extends OdisRequest> {
   }
 
   getKeyVersionInfo(request: Request<{}, {}, OdisRequest>, logger: Logger): KeyVersionInfo {
+    // If an invalid key version is present, we don't want this function to throw but
+    // to instead replace the key version with the default
+    // If a valid but unsupported key version is present, we want this function to throw
     let requestKeyVersion: number | undefined
     if (requestHasValidKeyVersion(request, logger)) {
       requestKeyVersion = getRequestKeyVersion(request, logger)
