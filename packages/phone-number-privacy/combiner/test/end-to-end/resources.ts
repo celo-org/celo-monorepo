@@ -1,6 +1,6 @@
 import { newKit } from '@celo/contractkit'
 import { EncryptionKeySigner, ServiceContext, WalletKeySigner } from '@celo/identity/lib/odis/query'
-import { AuthenticationMethod, TestUtils } from '@celo/phone-number-privacy-common'
+import { AuthenticationMethod } from '@celo/phone-number-privacy-common'
 import { PhoneNumberUtils } from '@celo/phone-utils'
 import {
   ensureLeading0x,
@@ -29,10 +29,10 @@ export const ACCOUNT_ADDRESS_NO_QUOTA = privateKeyToAddress(PRIVATE_KEY_NO_QUOTA
 
 export const PHONE_NUMBER = '+17777777777'
 export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
-export const BLINDED_PHONE_NUMBER = TestUtils.Utils.getBlindedPhoneNumber(
-  PHONE_NUMBER,
-  BLINDING_FACTOR
-)
+// BLINDED_PHONE_NUMBER value is dependent on PHONE_NUMBER AND BLINDING_FACTOR
+// hardcoding to avoid importing blind_threshols_bls library
+export const BLINDED_PHONE_NUMBER =
+  'hZXDhpC5onzBSFa1agZ9vfHzqwJ/QeJg77NGvWiQG/sFWsvHETzZvdWr2GpF3QkB'
 
 export const SERVICE_CONTEXT: ServiceContext = {
   odisUrl: ODIS_COMBINER,
