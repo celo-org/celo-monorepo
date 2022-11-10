@@ -135,16 +135,12 @@ const signerConfig: SignerConfig = {
       clientSecret: '',
       tenant: '',
       vaultName: '',
-      secretName: '',
     },
     google: {
       projectId: '',
-      secretName: '',
-      secretVersion: 'latest',
     },
     aws: {
       region: '',
-      secretName: '',
       secretKey: '',
     },
   },

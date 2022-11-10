@@ -27,7 +27,6 @@ jest.mock('../../src/config', () => ({
         clientSecret: 'mockClientSecret',
         tenant: 'mockTenant',
         vaultName: 'mockVaultName',
-        secretName: 'mockSecretName',
       },
     },
   },
