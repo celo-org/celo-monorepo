@@ -11,13 +11,16 @@ export class AzureKeyProvider extends KeyProviderBase {
       const client = new AzureKeyVaultClient(vaultName)
 
       let privateKey: string
+      const customKeyName = this.getCustomKeyVersionString(key)
       try {
-        privateKey = await this.fetch(client, this.getCustomKeyVersionString(key))
+        logger.debug(`Attempting to fetch key: ${customKeyName}`)
+        privateKey = await this.fetch(client, customKeyName)
       } catch (err) {
-        logger.info(`Error retrieving key: ${key}`)
+        logger.info(`Error retrieving customKeyName: ${customKeyName}, key: ${key}`)
         logger.error(err)
         logger.error(ErrorMessage.KEY_FETCH_ERROR)
         privateKey = await this.fetch(client, secretName)
+        logger.debug(`Fetched privateKey: ${privateKey}`)
       }
 
       this.setPrivateKey(key, privateKey)
