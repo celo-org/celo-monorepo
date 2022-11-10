@@ -23,7 +23,6 @@
     "@celo/utils": "2.4.0-beta.4",
     "@celo/phone-utils": "2.4.0-beta.4",
     "bignumber.js": "^9.0.0",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "btoa": "1.2.1",
     "bunyan": "1.8.12",
     "bunyan-debug-stream": "2.0.0",
