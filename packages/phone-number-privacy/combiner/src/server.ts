@@ -3,6 +3,7 @@ import {
   CombinerEndpoint,
   Endpoint,
   ErrorMessage,
+  KEY_VERSION_HEADER,
   loggerMiddleware,
   rootLogger,
 } from '@celo/phone-number-privacy-common'
@@ -46,7 +47,7 @@ export function startCombiner(config: CombinerConfig, kit: ContractKit) {
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
     res.header(
       'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+      `Origin, X-Requested-With, Content-Type, Accept, Authorization, ${KEY_VERSION_HEADER}`
     )
     next()
   })
