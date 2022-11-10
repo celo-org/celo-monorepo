@@ -164,7 +164,6 @@ async function helmParameters(celoEnv: string, context: string) {
     `--set db.username=${databaseConfig.username}`,
     `--set db.password='${databaseConfig.password}'`,
     `--set keystore.vaultName=${keyVaultConfig.vaultName}`,
-    `--set keystore.secretName=${keyVaultConfig.secretName}`,
     `--set keystore.pnpKeyNameBase=${keyVaultConfig.pnpKeyNameBase}`,
     `--set keystore.domainsKeyNameBase=${keyVaultConfig.domainsKeyNameBase}`,
     `--set keystore.pnpKeyLatestVersion=${keyVaultConfig.pnpKeyLatestVersion}`,
