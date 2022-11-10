@@ -43,9 +43,15 @@ const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
 const ODIS_DOMAINS_PUBLIC_POLYNOMIAL = process.env[
   process.env.ODIS_DOMAINS_POLYNOMIAL_VAR_FOR_TESTS as string
 ] as string
+
+console.log(ODIS_DOMAINS_PUBLIC_POLYNOMIAL)
+
 const ODIS_DOMAINS_PUBLIC_PUBKEY = process.env[
   process.env.ODIS_DOMAINS_PUBKEY_VAR_FOR_TESTS as string
 ] as string
+
+console.log(ODIS_DOMAINS_PUBLIC_PUBKEY)
+
 const ODIS_KEY_VERSION = (process.env.ODIS_DOMAINS_TEST_KEY_VERSION || 1) as string
 
 describe(`Running against service deployed at ${signerUrl}`, () => {
@@ -246,7 +252,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
     beforeAll(async () => {
       ;[req, poprf] = await signatureRequest(wallet, ACCOUNT_ADDRESS1, signSaltNew)
     })
-    it('Should respond with 200 on valid request for new domain', async () => {
+    it.only('Should respond with 200 on valid request for new domain', async () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
@@ -288,7 +294,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       })
     })
 
-    it('Should respond with 200 on repeated valid requests with nonce updated', async () => {
+    it.only('Should respond with 200 on repeated valid requests with nonce updated', async () => {
       // submit identical request with nonce set to 1
       req.options.nonce = defined(1)
       req.options.signature = noString
@@ -323,7 +329,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       poprf.unblindPartialResponse(Buffer.from(resBody.signature, 'base64'))
     })
 
-    it('Should respond with 200 if nonce > domainState', async () => {
+    it.only('Should respond with 200 if nonce > domainState', async () => {
       const [newReq, _poprf] = await signatureRequest(
         wallet,
         ACCOUNT_ADDRESS1,
@@ -348,7 +354,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       _poprf.unblindPartialResponse(Buffer.from(resBody.signature, 'base64'))
     })
 
-    it('Should respond with 200 on valid request with key version header', async () => {
+    it.only('Should respond with 200 on valid request with key version header', async () => {
       const [newReq, _poprf] = await signatureRequest(
         wallet,
         ACCOUNT_ADDRESS1,
