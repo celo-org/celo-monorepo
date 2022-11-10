@@ -1,3 +1,4 @@
+import { rootLogger } from '@celo/phone-number-privacy-common'
 import { config } from '../../config'
 
 export enum DefaultKeyName {
@@ -24,7 +25,10 @@ export abstract class KeyProviderBase implements KeyProvider {
   }
 
   public getPrivateKey(key: Key) {
+    // TODO EN: temporary for debugging and logging this
+    const logger = rootLogger(config.serviceName)
     const privateKey = this.privateKeys.get(this.getCustomKeyVersionString(key))
+    logger.debug(`getPrivateKey found: ${privateKey}`)
     if (!privateKey) {
       throw new Error(`Private key is unavailable: ${key}`)
     }
