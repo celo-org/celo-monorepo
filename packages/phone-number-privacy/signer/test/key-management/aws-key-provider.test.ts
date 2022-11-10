@@ -30,7 +30,6 @@ jest.mock('../../src/config', () => ({
       aws: {
         region: 'mockRegion',
         secretKey: 'mockSecretKey',
-        secretName: 'mockSecretName',
       },
     },
   },
