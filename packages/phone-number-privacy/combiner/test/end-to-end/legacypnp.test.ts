@@ -12,8 +12,9 @@ import {
   LegacySignMessageRequest,
   SignMessageResponseSchema,
   SignMessageResponseSuccess,
-  TestUtils,
 } from '@celo/phone-number-privacy-common'
+import * as bls from 'blind-threshold-bls'
+import btoa from 'btoa'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import { getCombinerVersion } from '../../src'
@@ -31,7 +32,18 @@ require('dotenv').config()
 
 jest.setTimeout(60000)
 
-const { getBlindedPhoneNumber } = TestUtils.Utils
+function getBlindedPhoneNumber(phoneNumber: string, blindingFactor: Buffer): string {
+  const blindedPhoneNumber = bls.blind(Buffer.from(phoneNumber), blindingFactor).message
+  return uint8ArrayToBase64(blindedPhoneNumber)
+}
+
+function uint8ArrayToBase64(bytes: Uint8Array) {
+  let binary = ''
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return btoa(binary)
+}
 
 const expectedPhoneHash = '0x0e87c82690efb29b260d7129b9ded5ed313560997863eb5505ff7bcb5315af7a'
 const expectedPepper = 'ekgnxF0UwzEii'

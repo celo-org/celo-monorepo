@@ -1,4 +1,4 @@
-import { newKit } from '@celo/contractkit-prev'
+import { newKit } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity-prev'
 import { SignMessageRequest } from '@celo/identity-prev/lib/odis/query'
 import { ErrorMessages } from '@celo/identity/lib/odis/query'
