@@ -252,7 +252,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
     beforeAll(async () => {
       ;[req, poprf] = await signatureRequest(wallet, ACCOUNT_ADDRESS1, signSaltNew)
     })
-    it.only('Should respond with 200 on valid request for new domain', async () => {
+    it('Should respond with 200 on valid request for new domain', async () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
@@ -294,7 +294,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       })
     })
 
-    it.only('Should respond with 200 on repeated valid requests with nonce updated', async () => {
+    it('Should respond with 200 on repeated valid requests with nonce updated', async () => {
       // submit identical request with nonce set to 1
       req.options.nonce = defined(1)
       req.options.signature = noString
@@ -329,7 +329,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       poprf.unblindPartialResponse(Buffer.from(resBody.signature, 'base64'))
     })
 
-    it.only('Should respond with 200 if nonce > domainState', async () => {
+    it('Should respond with 200 if nonce > domainState', async () => {
       const [newReq, _poprf] = await signatureRequest(
         wallet,
         ACCOUNT_ADDRESS1,
@@ -354,7 +354,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
       _poprf.unblindPartialResponse(Buffer.from(resBody.signature, 'base64'))
     })
 
-    it.only('Should respond with 200 on valid request with key version header', async () => {
+    it('Should respond with 200 on valid request with key version header', async () => {
       const [newReq, _poprf] = await signatureRequest(
         wallet,
         ACCOUNT_ADDRESS1,
