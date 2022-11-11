@@ -11,13 +11,13 @@ export const PRIVATE_KEY2 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1
 export const ACCOUNT_ADDRESS2 = privateKeyToAddress(PRIVATE_KEY2)
 export const PRIVATE_KEY3 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fffff1d'
 export const ACCOUNT_ADDRESS3 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY3))
-export const PHONE_NUMBER = '+17777777777'
+export const PHONE_NUMBER = '+15555555555'
 export const IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
 // BLINDED_PHONE_NUMBER value dependent on PHONE_NUMBER AND BLINDING_FACTOR
 // hardcoding to avoid importing blind_threshols_bls library
 export const BLINDED_PHONE_NUMBER =
-  'hZXDhpC5onzBSFa1agZ9vfHzqwJ/QeJg77NGvWiQG/sFWsvHETzZvdWr2GpF3QkB'
+  'n/I9srniwEHm5o6t3y0tTUB5fn7xjxRrLP1F/i8ORCdqV++WWiaAzUo3GA2UNHiB'
 export const DEK_PUBLIC_KEY = '0x026063780c81991c032fb4fa7485c6607b7542e048ef85d08516fe5c4482360e4b'
 export const DEK_PRIVATE_KEY = '0xc2bbdabb440141efed205497a41d5fb6114e0435fd541e368dc628a8e086bfee'
 

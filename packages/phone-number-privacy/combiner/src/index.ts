@@ -5,7 +5,7 @@ import { startCombiner } from './server'
 
 require('dotenv').config()
 
-export const combiner = functions
+export const combiner2 = functions
   .region('us-central1', 'europe-west3')
   .runWith(config.cloudFunction)
   .https.onRequest(startCombiner(config, getContractKit(config.blockchain)))
