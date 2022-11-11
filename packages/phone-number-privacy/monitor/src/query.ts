@@ -39,8 +39,9 @@ export const queryOdisForSalt = async () => {
     OdisUtils.Query.getServiceContext(network()),
     undefined,
     undefined,
-    'monitor:1.0.0',
     undefined,
-    genSessionID()
+    genSessionID(),
+    undefined,
+    undefined
   )
 }
