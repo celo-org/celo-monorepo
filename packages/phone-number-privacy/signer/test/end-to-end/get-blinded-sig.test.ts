@@ -15,6 +15,7 @@ import 'isomorphic-fetch'
 import Web3 from 'web3'
 import { getWalletAddress } from '../../src/common/web3/contracts'
 import { config, getSignerVersion } from '../../src/config'
+import { getBlindedPhoneNumber } from './utils'
 
 require('dotenv').config()
 
@@ -29,7 +30,7 @@ const {
   PRIVATE_KEY2,
   PRIVATE_KEY3,
 } = TestUtils.Values
-const { replenishQuota, registerWalletAddress, getBlindedPhoneNumber } = TestUtils.Utils
+const { replenishQuota, registerWalletAddress } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 const ODIS_PUBLIC_POLYNOMIAL = process.env[

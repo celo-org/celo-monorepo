@@ -16,6 +16,7 @@ import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import { config, getSignerVersion } from '../../src/config'
+import { getBlindedPhoneNumber } from './utils'
 
 require('dotenv').config()
 
@@ -29,12 +30,7 @@ const {
   PRIVATE_KEY2,
   PRIVATE_KEY3,
 } = TestUtils.Values
-const {
-  getBlindedPhoneNumber,
-  getPnpQuotaRequest,
-  getPnpRequestAuthorization,
-  getPnpSignRequest,
-} = TestUtils.Utils
+const { getPnpQuotaRequest, getPnpRequestAuthorization, getPnpSignRequest } = TestUtils.Utils
 
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
 const ODIS_PUBLIC_POLYNOMIAL = process.env[
