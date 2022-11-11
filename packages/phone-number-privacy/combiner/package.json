@@ -27,6 +27,7 @@
     "test:e2e:alfajores": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combiner yarn test:e2e"
   },
   "dependencies": {
+    "@celo/contractkit": "2.4.0-beta.6",
     "@celo/phone-number-privacy-common": "2.0.0-beta.5",
     "@celo/identity": "2.4.0-beta.6",
     "@celo/encrypted-backup": "2.4.0-beta.6",
