@@ -1,5 +1,10 @@
 import { newKit } from '@celo/contractkit'
-import { EncryptionKeySigner, ServiceContext, WalletKeySigner } from '@celo/identity/lib/odis/query'
+import {
+  EncryptionKeySigner,
+  ODIS_ALFAJORESSTAGING_CONTEXT,
+  ServiceContext,
+  WalletKeySigner,
+} from '@celo/identity/lib/odis/query'
 import { AuthenticationMethod } from '@celo/phone-number-privacy-common'
 import { PhoneNumberUtils } from '@celo/phone-utils'
 import {
@@ -34,11 +39,7 @@ export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3P
 export const BLINDED_PHONE_NUMBER =
   'hZXDhpC5onzBSFa1agZ9vfHzqwJ/QeJg77NGvWiQG/sFWsvHETzZvdWr2GpF3QkB'
 
-export const SERVICE_CONTEXT: ServiceContext = {
-  odisUrl: ODIS_COMBINER,
-  odisPubKey:
-    '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
-}
+export const SERVICE_CONTEXT: ServiceContext = ODIS_ALFAJORESSTAGING_CONTEXT
 
 export const PHONE_HASH_IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 
