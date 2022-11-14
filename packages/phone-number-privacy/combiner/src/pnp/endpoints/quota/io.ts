@@ -23,7 +23,7 @@ import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
-import { OdisConfig, VERSION } from '../../../config'
+import { getCombinerVersion, OdisConfig } from '../../../config'
 
 export class PnpQuotaIO extends IO<PnpQuotaRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_QUOTA
@@ -79,7 +79,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       response,
       {
         success: true,
-        version: VERSION,
+        version: getCombinerVersion(),
         ...quotaStatus,
         warnings,
       },
@@ -93,7 +93,7 @@ export class PnpQuotaIO extends IO<PnpQuotaRequest> {
       response,
       {
         success: false,
-        version: VERSION,
+        version: getCombinerVersion(),
         error,
       },
       status,

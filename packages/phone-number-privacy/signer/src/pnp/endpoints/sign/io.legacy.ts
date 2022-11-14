@@ -23,7 +23,7 @@ import { Request, Response } from 'express'
 import { IO } from '../../../common/io'
 import { Key } from '../../../common/key-management/key-provider-base'
 import { Counters } from '../../../common/metrics'
-import { getVersion } from '../../../config'
+import { getSignerVersion } from '../../../config'
 import { PnpSession } from '../../session'
 
 export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
@@ -92,7 +92,7 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
       response,
       {
         success: true,
-        version: getVersion(),
+        version: getSignerVersion(),
         signature,
         ...quotaStatus,
         warnings,
@@ -113,7 +113,7 @@ export class LegacyPnpSignIO extends IO<LegacySignMessageRequest> {
       response,
       {
         success: false,
-        version: getVersion(),
+        version: getSignerVersion(),
         error,
         ...quotaStatus,
       },

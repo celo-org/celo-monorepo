@@ -1324,7 +1324,7 @@
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.5.1.tgz#53e16cd36c51f9eaeec0321f6752de6385f2a131"
   integrity sha512-76MAosahwCDjkBsqfgnKT2CbyjV6TdzIztHJvAuJ+VrKeaIFe/IMoPwIxPy95xDJmHhD0zqPWMixGeyVGAwYQw==
 
-"@celo/base@1.5.2":
+"@celo/base@1.5.2", "@celo/base@^1.2.0":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@celo/base/-/base-1.5.2.tgz#168ab5e4e30b374079d8d139fafc52ca6bfd4100"
   integrity sha512-KGf6Dl9E6D01vAfkgkjL2sG+zqAjspAogILIpWstljWdG5ifyA75jihrnDEHaMCoQS0KxHvTdP1XYS/GS6BEyQ==
@@ -1367,7 +1367,8 @@
     debug "^4.1.1"
     utf8 "3.0.0"
 
-"@celo/contractkit@1.5.2":
+"@celo/contractkit@1.5.2", "@celo/contractkit@^1.2.0":
+  name "@celo/contractkit-prev"
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@celo/contractkit/-/contractkit-1.5.2.tgz#be15d570f3044a190dabb6bbe53d5081c78ea605"
   integrity sha512-b0r5TlfYDEscxze1Ai2jyJayiVElA9jvEehMD6aOSNtVhfP8oirjFIIffRe0Wzw1MSDGkw+q1c4m0Yw5sEOlvA==
@@ -1454,6 +1455,23 @@
     ethereumjs-wallet "0.6.4"
     web3 "1.2.4"
 
+"@celo/identity-prev@npm:@celo/identity@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-1.2.0.tgz#822ce8f2237a8498fad6910a2d2707f6b67a6999"
+  integrity sha512-vpipC8qyEueIKKY0skPXaNwUDIhodGPv9wfFZ5mywzTIz46dbT0VmNSYkvOnoXlqvAjrwdzgvETbVMmpHpj3Xw==
+  dependencies:
+    "@celo/base" "^1.2.0"
+    "@celo/contractkit" "^1.2.0"
+    "@celo/utils" "^1.2.0"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    elliptic "^6.5.4"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+
 "@celo/identity@2.3.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-2.3.0.tgz#aede2269adbb9edc0332007357d34b3c20b0920a"
@@ -1536,7 +1554,7 @@
     web3-eth-abi "1.3.6"
     web3-utils "1.3.6"
 
-"@celo/utils@1.5.2":
+"@celo/utils@1.5.2", "@celo/utils@^1.2.0":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@celo/utils/-/utils-1.5.2.tgz#ddb7f3b50c801225ab41d2355fbe010976329099"
   integrity sha512-JyKjuVMbdkyFOb1TpQw6zqamPQWYg7I9hOnva3MeIcQ3ZrJIaNHx0/I+JXFjuu3YYBc1mG8nXp2uPJJTGrwzCQ==

@@ -3,8 +3,8 @@ import BigNumber from 'bignumber.js'
 
 require('dotenv').config()
 
-export function getVersion(): string {
-  return process.env.npm_package_version ? process.env.npm_package_version : '0.0.0'
+export function getSignerVersion(): string {
+  return process.env.npm_package_version ?? '0.0.0'
 }
 export const DEV_MODE = process.env.NODE_ENV !== 'production'
 export const VERBOSE_DB_LOGGING = toBool(process.env.VERBOSE_DB_LOGGING, false)
@@ -83,16 +83,12 @@ export interface SignerConfig {
       clientSecret: string
       tenant: string
       vaultName: string
-      secretName: string
     }
     google: {
       projectId: string
-      secretName: string
-      secretVersion: string
     }
     aws: {
       region: string
-      secretName: string
       secretKey: string
     }
   }
@@ -168,16 +164,12 @@ export const config: SignerConfig = {
       clientSecret: env.KEYSTORE_AZURE_CLIENT_SECRET,
       tenant: env.KEYSTORE_AZURE_TENANT,
       vaultName: env.KEYSTORE_AZURE_VAULT_NAME,
-      secretName: env.KEYSTORE_AZURE_SECRET_NAME,
     },
     google: {
       projectId: env.KEYSTORE_GOOGLE_PROJECT_ID,
-      secretName: env.KEYSTORE_GOOGLE_SECRET_NAME,
-      secretVersion: env.KEYSTORE_GOOGLE_SECRET_VERSION ?? 'latest',
     },
     aws: {
       region: env.KEYSTORE_AWS_REGION,
-      secretName: env.KEYSTORE_AWS_SECRET_NAME,
       secretKey: env.KEYSTORE_AWS_SECRET_KEY,
     },
   },

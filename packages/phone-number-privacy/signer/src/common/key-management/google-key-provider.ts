@@ -7,24 +7,13 @@ export class GoogleKeyProvider extends KeyProviderBase {
   public async fetchPrivateKeyFromStore(key: Key) {
     const logger = rootLogger(config.serviceName)
     try {
-      const { projectId, secretName, secretVersion } = config.keystore.google
+      const { projectId } = config.keystore.google
       const client = new SecretManagerServiceClient()
 
-      let privateKey: string
-      try {
-        privateKey = await this.fetch(
-          client,
-          projectId,
-          this.getCustomKeyName(key),
-          key.version.toString()
-        )
-      } catch (err) {
-        logger.info(`Error retrieving key: ${key}`)
-        logger.error(err)
-        logger.error(ErrorMessage.KEY_FETCH_ERROR)
-        privateKey = await this.fetch(client, projectId, secretName, secretVersion)
-      }
-
+      const customKeyName = this.getCustomKeyName(key)
+      const keyVersion = key.version.toString()
+      logger.debug(`Attempting to fetch key named: ${customKeyName}, version: ${keyVersion}`)
+      const privateKey = await this.fetch(client, projectId, customKeyName, keyVersion)
       this.setPrivateKey(key, privateKey)
     } catch (err) {
       logger.info('Error retrieving key')
