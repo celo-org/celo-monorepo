@@ -12,6 +12,9 @@ blockscout:
       requests:
         memory: 12Gi
         cpu: 5
+    enableEventStream: true
+    beanstalkdPort: "11300"
+    beanstalkdHost: "rc1staging-governance-notifications-beanstalkd.event-notifications.svc.cluster.local"
   api:
     autoscaling:
       maxReplicas: 2
