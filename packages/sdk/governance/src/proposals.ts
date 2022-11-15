@@ -287,11 +287,11 @@ export class ProposalBuilder {
   getRegistryAddition = (contract: CeloContract): string | undefined =>
     this.registryAdditions[stripProxy(contract)]
 
-  isRegistered = (contract: CeloContract) =>
+  isRegistryContract = (contract: CeloContract) =>
     RegisteredContracts.includes(stripProxy(contract)) ||
     this.getRegistryAddition(contract) !== undefined
 
-  buildFunctionCallToExternalContract = async (
+  decodeCallToExternalContract = async (
     tx: ProposalTransactionJSON
   ): Promise<ProposalTransaction> => {
     const methodABI = signatureToAbiDefinition(tx.function)
@@ -299,25 +299,9 @@ export class ProposalBuilder {
     return { input, to: tx.contract, value: tx.value }
   }
 
-  fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
-    if (isRegistryRepoint(tx)) {
-      // Update canonical registry addresses
-      const args = registryRepointArgs(tx)
-      this.setRegistryAddition(args.name, args.address)
-    }
-
-    // handle sending value to unregistered contracts
-    if (!this.isRegistered(tx.contract)) {
-      if (!isValidAddress(tx.contract)) {
-        throw new Error(
-          `Transaction to unregistered contract ${tx.contract} only supported by address`
-        )
-      } else if (tx.function !== '' || tx.args !== []) {
-        return this.buildFunctionCallToExternalContract(tx)
-      }
-      return { input: '', to: tx.contract, value: tx.value }
-    }
-
+  decodeCallToRegistryContract = async (
+    tx: ProposalTransactionJSON
+  ): Promise<ProposalTransaction> => {
     // Account for canonical registry addresses from current proposal
     const address =
       this.getRegistryAddition(tx.contract) ?? (await this.kit.registry.addressFor(tx.contract))
@@ -341,6 +325,32 @@ export class ProposalBuilder {
     }
 
     return this.fromWeb3tx(txo, { to: address, value: tx.value })
+  }
+
+  fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
+    if (isRegistryRepoint(tx)) {
+      // Update canonical registry addresses
+      const args = registryRepointArgs(tx)
+      this.setRegistryAddition(args.name, args.address)
+    }
+
+    // handle sending value to unregistered contracts
+    if (this.isRegistryContract(tx.contract)) {
+      return this.decodeCallToRegistryContract(tx)
+    } else {
+      if (!isValidAddress(tx.contract)) {
+        throw new Error(
+          `Transaction to unregistered contract ${tx.contract} only supported by address`
+        )
+      }
+
+      if (tx.function === '') {
+        // It's not a function call
+        return { input: '', to: tx.contract, value: tx.value }
+      }
+
+      return this.decodeCallToExternalContract(tx)
+    }
   }
 
   addJsonTx = (tx: ProposalTransactionJSON) => this.builders.push(async () => this.fromJsonTx(tx))
