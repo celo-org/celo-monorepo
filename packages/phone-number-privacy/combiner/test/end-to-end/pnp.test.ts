@@ -19,8 +19,9 @@ import {
   ACCOUNT_ADDRESS_NO_QUOTA,
   BLINDED_PHONE_NUMBER,
   dekAuthSigner,
+  getServiceContext,
+  OdisAPI,
   PHONE_NUMBER,
-  SERVICE_CONTEXT,
   walletAuthSigner,
 } from './resources'
 
@@ -28,6 +29,7 @@ require('dotenv').config()
 
 jest.setTimeout(60000)
 
+const SERVICE_CONTEXT = getServiceContext(OdisAPI.PNP)
 const combinerUrl = SERVICE_CONTEXT.odisUrl
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 

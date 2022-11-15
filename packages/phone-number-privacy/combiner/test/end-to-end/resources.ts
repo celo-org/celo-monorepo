@@ -38,20 +38,39 @@ export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3P
 export const BLINDED_PHONE_NUMBER =
   'hZXDhpC5onzBSFa1agZ9vfHzqwJ/QeJg77NGvWiQG/sFWsvHETzZvdWr2GpF3QkB'
 
-const getServiceContext = () => {
-  switch (process.env.CONTEXT_NAME) {
-    case 'alfajores':
-      return ODIS_ALFAJORES_CONTEXT
-    case 'staging':
-      return ODIS_ALFAJORESSTAGING_CONTEXT
-    case 'mainnet':
-      return ODIS_MAINNET_CONTEXT
-    default:
-      throw new Error('CONTEXT_NAME env var is undefined or invalid')
-  }
+export enum OdisAPI {
+  PNP = 'PNP',
+  DOMAIN = 'DOMAIN',
 }
 
-export const SERVICE_CONTEXT: ServiceContext = getServiceContext()
+export const getServiceContext = (api: OdisAPI): ServiceContext => {
+  switch (process.env.CONTEXT_NAME) {
+    case 'alfajores':
+      return {
+        [OdisAPI.PNP]: ODIS_ALFAJORES_CONTEXT,
+        // TODO: temp fix until the identity SDK is updated
+        [OdisAPI.DOMAIN]: {
+          odisUrl: ODIS_ALFAJORES_CONTEXT.odisUrl,
+          odisPubKey:
+            '+ZrxyPvLChWUX/DyPw6TuGwQH0glDJEbSrSxUARyP5PuqYyP/U4WZTV1e0bAUioBZ6QCJMiLpDwTaFvy8VnmM5RBbLQUMrMg5p4+CBCqj6HhsMfcyUj8V0LyuNdStlCB',
+        },
+      }[api]
+    case 'staging':
+      return {
+        // Intentionally the same on staging
+        [OdisAPI.PNP]: ODIS_ALFAJORESSTAGING_CONTEXT,
+        [OdisAPI.DOMAIN]: ODIS_ALFAJORESSTAGING_CONTEXT,
+      }[api]
+    case 'mainnet':
+      return {
+        // TODO: this needs to be updated
+        [OdisAPI.PNP]: ODIS_MAINNET_CONTEXT,
+        [OdisAPI.DOMAIN]: ODIS_MAINNET_CONTEXT,
+      }[api]
+    default:
+      throw new Error('CONTEXT_NAME env var or api is undefined or invalid')
+  }
+}
 
 export const PHONE_HASH_IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 
