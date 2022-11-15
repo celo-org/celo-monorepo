@@ -33,12 +33,13 @@ import { defined, noNumber, noString } from '@celo/utils/lib/sign-typed-data-uti
 import * as crypto from 'crypto'
 import 'isomorphic-fetch'
 import { getCombinerVersion } from '../../src'
-import { SERVICE_CONTEXT } from './resources'
+import { getServiceContext, OdisAPI } from './resources'
 
 require('dotenv').config()
 
 jest.setTimeout(60000)
 
+const SERVICE_CONTEXT = getServiceContext(OdisAPI.DOMAIN)
 const combinerUrl = SERVICE_CONTEXT.odisUrl
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
@@ -94,17 +95,14 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
 
   describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
     const testThatValidRequestSucceeds = async () => {
-      const expectedResult = 'olxWliQnGKtj2RcwmZUw7z8Fo9qpTWeom712GdvWAJ8='
       const res = await odisHardenKey(
         Buffer.from('password'),
         domain,
         SERVICE_CONTEXT,
         authorizer.wallet
       )
+      // odisHardenKey verifies the signature against the service public key
       expect(res.ok).toBe(true)
-      if (res.ok) {
-        expect(res.result.toString('base64')).toEqual(expectedResult)
-      }
     }
 
     it('Should succeed on valid request', async () => {

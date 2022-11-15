@@ -14,10 +14,11 @@ import {
   DEFAULT_FORNO_URL,
   dekAuthSigner,
   deks,
+  getServiceContext,
+  OdisAPI,
   PHONE_NUMBER,
   PRIVATE_KEY,
   PRIVATE_KEY_NO_QUOTA,
-  SERVICE_CONTEXT,
 } from './resources'
 
 require('dotenv').config()
@@ -29,7 +30,7 @@ contractKit.addAccount(PRIVATE_KEY_NO_QUOTA)
 contractKit.addAccount(PRIVATE_KEY)
 contractKit.defaultAccount = ACCOUNT_ADDRESS
 
-// const combinerUrl = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
+const SERVICE_CONTEXT = getServiceContext(OdisAPI.PNP)
 const combinerUrl = SERVICE_CONTEXT.odisUrl
 
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
