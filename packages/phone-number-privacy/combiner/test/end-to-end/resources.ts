@@ -2,6 +2,8 @@ import { newKit } from '@celo/contractkit'
 import {
   EncryptionKeySigner,
   ODIS_ALFAJORESSTAGING_CONTEXT,
+  ODIS_ALFAJORES_CONTEXT,
+  ODIS_MAINNET_CONTEXT,
   ServiceContext,
   WalletKeySigner,
 } from '@celo/identity/lib/odis/query'
@@ -19,9 +21,6 @@ require('dotenv').config()
 /**
  * CONSTS
  */
-export const ODIS_COMBINER =
-  process.env.ODIS_COMBINER_SERVICE_URL ||
-  'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combiner'
 export const DEFAULT_FORNO_URL =
   process.env.ODIS_BLOCKCHAIN_PROVIDER || 'https://alfajoresstaging-forno.celo-testnet.org'
 
@@ -39,7 +38,20 @@ export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3P
 export const BLINDED_PHONE_NUMBER =
   'hZXDhpC5onzBSFa1agZ9vfHzqwJ/QeJg77NGvWiQG/sFWsvHETzZvdWr2GpF3QkB'
 
-export const SERVICE_CONTEXT: ServiceContext = ODIS_ALFAJORESSTAGING_CONTEXT
+const getServiceContext = () => {
+  switch (process.env.CONTEXT_NAME) {
+    case 'alfajores':
+      return ODIS_ALFAJORES_CONTEXT
+    case 'staging':
+      return ODIS_ALFAJORESSTAGING_CONTEXT
+    case 'mainnet':
+      return ODIS_MAINNET_CONTEXT
+    default:
+      throw new Error('CONTEXT_NAME env var is undefined or invalid')
+  }
+}
+
+export const SERVICE_CONTEXT: ServiceContext = getServiceContext()
 
 export const PHONE_HASH_IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 

@@ -29,7 +29,9 @@ contractKit.addAccount(PRIVATE_KEY_NO_QUOTA)
 contractKit.addAccount(PRIVATE_KEY)
 contractKit.defaultAccount = ACCOUNT_ADDRESS
 
-const combinerUrl = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
+// const combinerUrl = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
+const combinerUrl = SERVICE_CONTEXT.odisUrl
+
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
 describe(`Running against service deployed at ${combinerUrl} w/ blockchain provider ${fullNodeUrl}`, () => {

@@ -39,7 +39,7 @@ require('dotenv').config()
 
 jest.setTimeout(60000)
 
-const combinerUrl = process.env.ODIS_COMBINER_SERVICE_URL
+const combinerUrl = SERVICE_CONTEXT.odisUrl
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
 const authorizer = odisQueryAuthorizer(Buffer.from('combiner e2e authorizer test seed'))

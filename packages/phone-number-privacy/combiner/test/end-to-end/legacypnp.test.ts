@@ -36,7 +36,7 @@ const expectedPepper = 'ekgnxF0UwzEii'
 const expectedUnblindedSignature =
   'tbrOhZqiuMCwFOCki+ndnDpgTrkTjELvy/UDa85+VIvD3F3Fosp++6n2IDfgHdOA'
 
-const combinerUrl = process.env.ODIS_COMBINER_SERVICE_URL
+const combinerUrl = SERVICE_CONTEXT.odisUrl
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
 const expectedVersion = getCombinerVersion()

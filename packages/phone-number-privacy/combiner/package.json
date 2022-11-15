@@ -22,9 +22,9 @@
     "test": "jest --runInBand --testPathIgnorePatterns test/end-to-end",
     "test:coverage": "yarn test --coverage",
     "test:integration": "jest --runInBand test/integration",
-    "test:e2e": "jest test/end-to-end --verbose",
-    "test:e2e:staging": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combiner yarn test:e2e",
-    "test:e2e:alfajores": "ODIS_COMBINER_SERVICE_URL=https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combiner yarn test:e2e"
+    "test:e2e": "FLAKEY=true jest test/end-to-end --verbose",
+    "test:e2e:staging": "FLAKEY=true CONTEXT_NAME=staging yarn test:e2e",
+    "test:e2e:alfajores": "FLAKEY=true CONTEXT_NAME=alfajores yarn test:e2e"
   },
   "dependencies": {
     "@celo/contractkit": "2.4.0-beta.6",
