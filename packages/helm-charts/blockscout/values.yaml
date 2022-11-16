@@ -57,6 +57,9 @@ blockscout:
         cpu: 2
     rpcRegion: "indexer"  
     primaryRpcRegion: "indexer"  
+    enableEventStream: false
+    beanstalkdPort: ""
+    beanstalkdHost: ""
   api:
     suffix:
       enabled: false
