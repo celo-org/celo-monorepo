@@ -38,7 +38,7 @@
   "dependencies": {
     "@celo/base": "2.4.0-beta.6",
     "@celo/contractkit": "2.4.0-beta.6",
-    "@celo/phone-number-privacy-common": "2.0.0-beta.5",
+    "@celo/phone-number-privacy-common": "2.0.0-beta.5-dev",
     "@celo/poprf": "^0.1.9",
     "@celo/utils": "2.4.0-beta.6",
     "@celo/wallet-hsm-azure": "2.4.0-beta.6",

@@ -1572,6 +1572,25 @@
     cross-fetch "3.0.4"
     debug "^4.1.1"
 
+"@celo/phone-number-privacy-common@2.0.0-beta.5":
+  version "2.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/@celo/phone-number-privacy-common/-/phone-number-privacy-common-2.0.0-beta.5.tgz#87b1dc8db860c0cfe72eaadf23f06373a2519d35"
+  integrity sha512-hWonjSlhO4H61VWTO/HlMjysnDA9qRclLINic/Cm3/kCrPUbW171owSSyBNZka/4jy4FE9MbWVo9rL7hTGbg6w==
+  dependencies:
+    "@celo/base" "2.4.0-beta.6"
+    "@celo/contractkit" "2.4.0-beta.6"
+    "@celo/phone-utils" "2.4.0-beta.6"
+    "@celo/utils" "2.4.0-beta.6"
+    bignumber.js "^9.0.0"
+    btoa "1.2.1"
+    bunyan "1.8.12"
+    bunyan-debug-stream "2.0.0"
+    bunyan-gke-stackdriver "0.1.2"
+    dotenv "^8.2.0"
+    elliptic "^6.5.4"
+    io-ts "2.0.1"
+    is-base64 "^1.1.0"
+
 "@celo/phone-utils@2.4.0-beta.6":
   version "2.4.0-beta.6"
   resolved "https://registry.yarnpkg.com/@celo/phone-utils/-/phone-utils-2.4.0-beta.6.tgz#12d31ff21adba27b2ed77b27f2744ce028d4a9f8"
@@ -8121,7 +8140,7 @@ btoa-lite@^1.0.0:
   resolved "https://registry.yarnpkg.com/btoa-lite/-/btoa-lite-1.0.0.tgz#337766da15801210fdd956c22e9c6891ab9d0337"
   integrity sha1-M3dm2hWAEhD92VbCLpxokaudAzc=
 
-btoa@^1.2.1:
+btoa@1.2.1, btoa@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/btoa/-/btoa-1.2.1.tgz#01a9909f8b2c93f6bf680ba26131eb30f7fa3d73"
   integrity sha512-SB4/MIGlsiVkMcHmT+pSmIPoNDoHg+7cMzmt3Uxt628MTz2487DKSqK/fuhFBrkuqrYv5UCEnACpF4dTFNKc/g==
