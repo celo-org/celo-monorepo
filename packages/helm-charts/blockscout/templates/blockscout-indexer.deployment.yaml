@@ -104,6 +104,12 @@ spec:
           value: {{ .Values.blockscout.indexer.rpcRegion | quote }}
         - name: PRIMARY_REGION
           value: {{ .Values.blockscout.indexer.primaryRpcRegion | quote }}
+        - name: ENABLE_EVENT_STREAM
+          value: {{ .Values.blockscout.indexer.enableEventStream | quote }}
+        - name: BEANSTALKD_PORT
+          value: {{ .Values.blockscout.indexer.beanstalkdPort | quote }}
+        - name: BEANSTALKD_HOST
+          value: {{ .Values.blockscout.indexer.beanstalkdHost | quote }}
 {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}
 {{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
