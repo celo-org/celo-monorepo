@@ -14,6 +14,12 @@ import { AbiCoder, AbiItem, Address, Contract } from '@celo/connect'
 import { ContractKit } from '@celo/contractkit'
 import fetch from 'cross-fetch'
 
+const PROXY_IMPLEMENTATION_GETTERS = [
+  '_getImplementation()',
+  'getImplementation()',
+  'implementation()',
+]
+
 /**
  * MetadataResponse interface for the `metadata.json` file that the sourcify repo returns.
  * All fields are optional because we don't really _know_ what we get from the API, thus
@@ -29,9 +35,9 @@ export interface MetadataResponse {
 }
 
 /**
- * Wrapper class for a Metadata response from sourcify.
- * Because these response's true structure is unknown this wrapper implements
- * runtime guards and getters.
+ * Wrapper class for a metadata.json response from sourcify.
+ * Because the response's true structure is unknown this wrapper implements
+ * light runtime verification.
  */
 export class Metadata {
   public abi: AbiItem[] | null = null
@@ -73,12 +79,17 @@ export class Metadata {
     }
   }
 
+  /**
+   * Find the AbiItem for a given callSignature
+   * @param callSignature the 4-byte signature of the function call
+   * @returns an AbiItem if found or null
+   */
   abiForSignature(callSignature: string): AbiItem | null {
     if (this.abi) {
       for (const item of this.abi) {
         if (
-          item.type == 'function' &&
-          this.abiCoder.encodeFunctionSignature(item) == callSignature
+          item.type === 'function' &&
+          this.abiCoder.encodeFunctionSignature(item) === callSignature
         ) {
           return item
         }
@@ -87,14 +98,27 @@ export class Metadata {
     return null
   }
 
-  isProxy(): boolean {
-    // todo(bogdan): Improve this to support multiple proxy types, like EIP-1167
-    return this.contract?.methods.getImplementation !== undefined
-  }
-
-  async getProxyImplementation(): Promise<Address | null> {
+  /**
+   * Use heuristics to determine if the contract can be a proxy
+   * and extract the implementation.
+   * Available scenarios:
+   * - _getImplementation() exists
+   * - getImplementation() exists
+   * - implementation() exists
+   * @returns the implementation address or null
+   */
+  async tryGetProxyImplementation(): Promise<Address | null> {
     if (this.contract) {
-      return this.contract.methods.getImplementation.call()
+      for (const fnName of PROXY_IMPLEMENTATION_GETTERS) {
+        const fn = this.contract.methods[fnName]
+        if (fn) {
+          try {
+            return fn().call()
+          } catch {
+            continue
+          }
+        }
+      }
     }
     return null
   }

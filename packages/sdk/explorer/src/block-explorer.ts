@@ -170,8 +170,8 @@ export class BlockExplorer {
     const results = await lookupAddress(address)
     if (results.resp !== null) {
       return results.resp
-    } else if (results.metadata && results.metadata.isProxy()) {
-      const implAddress = await results.metadata.getProxyImplementation()
+    } else if (results.metadata) {
+      const implAddress = await results.metadata.tryGetProxyImplementation()
       if (implAddress) {
         const implResult = await lookupAddress(implAddress)
         return implResult.resp
