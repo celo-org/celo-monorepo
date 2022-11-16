@@ -23,7 +23,6 @@
     "@celo/utils": "2.4.0-beta.6",
     "@celo/phone-utils": "2.4.0-beta.6",
     "bignumber.js": "^9.0.0",
-    "btoa": "1.2.1",
     "bunyan": "1.8.12",
     "bunyan-debug-stream": "2.0.0",
     "bunyan-gke-stackdriver": "0.1.2",
@@ -35,7 +34,6 @@
   "devDependencies": {
     "@celo/poprf": "^0.1.9",
     "@celo/wallet-local": "2.4.0-beta.6",
-    "@types/btoa": "^1.2.3",
     "@types/bunyan": "1.8.4",
     "@types/elliptic": "^6.4.12",
     "@types/express": "^4.17.6",
