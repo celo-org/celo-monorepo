@@ -1,7 +1,7 @@
 import { newKit } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity-prev'
 import { SignMessageRequest } from '@celo/identity-prev/lib/odis/query'
-import { ErrorMessages } from '@celo/identity/lib/odis/query'
+import { ErrorMessages, getServiceContext, OdisAPI } from '@celo/identity/lib/odis/query'
 import { AuthenticationMethod, Endpoint } from '@celo/phone-number-privacy-common'
 import { replenishQuota } from '@celo/phone-number-privacy-common/lib/test/utils'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
@@ -14,8 +14,7 @@ import {
   DEFAULT_FORNO_URL,
   dekAuthSigner,
   deks,
-  getServiceContext,
-  OdisAPI,
+  getTestContextName,
   PHONE_NUMBER,
   PRIVATE_KEY,
   PRIVATE_KEY_NO_QUOTA,
@@ -30,7 +29,7 @@ contractKit.addAccount(PRIVATE_KEY_NO_QUOTA)
 contractKit.addAccount(PRIVATE_KEY)
 contractKit.defaultAccount = ACCOUNT_ADDRESS
 
-const SERVICE_CONTEXT = getServiceContext(OdisAPI.PNP)
+const SERVICE_CONTEXT = getServiceContext(getTestContextName(), OdisAPI.PNP)
 const combinerUrl = SERVICE_CONTEXT.odisUrl
 
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER

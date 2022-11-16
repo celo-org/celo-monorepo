@@ -4,6 +4,8 @@ import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-ide
 import {
   ErrorMessages,
   getOdisPnpRequestAuth,
+  getServiceContext,
+  OdisAPI,
   WalletKeySigner,
 } from '@celo/identity/lib/odis/query'
 import {
@@ -23,8 +25,7 @@ import {
   ACCOUNT_ADDRESS_NO_QUOTA,
   DEFAULT_FORNO_URL,
   dekAuthSigner,
-  getServiceContext,
-  OdisAPI,
+  getTestContextName,
   PHONE_NUMBER,
   walletAuthSigner,
 } from './resources'
@@ -33,7 +34,7 @@ require('dotenv').config()
 
 jest.setTimeout(60000)
 
-const SERVICE_CONTEXT = getServiceContext(OdisAPI.PNP)
+const SERVICE_CONTEXT = getServiceContext(getTestContextName(), OdisAPI.PNP)
 const combinerUrl = SERVICE_CONTEXT.odisUrl
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 

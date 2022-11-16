@@ -1,10 +1,7 @@
 import { newKit } from '@celo/contractkit'
 import {
   EncryptionKeySigner,
-  ODIS_ALFAJORESSTAGING_CONTEXT,
-  ODIS_ALFAJORES_CONTEXT,
-  ODIS_MAINNET_CONTEXT,
-  ServiceContext,
+  OdisContextName,
   WalletKeySigner,
 } from '@celo/identity/lib/odis/query'
 import { AuthenticationMethod } from '@celo/phone-number-privacy-common'
@@ -18,11 +15,24 @@ import 'isomorphic-fetch'
 
 require('dotenv').config()
 
+export const getTestContextName = (): OdisContextName => {
+  switch (process.env.CONTEXT_NAME) {
+    case 'alfajores':
+      return OdisContextName.ALFAJORES
+    case 'staging':
+      return OdisContextName.STAGING
+    case 'mainnet':
+      return OdisContextName.MAINNET
+    default:
+      throw new Error('CONTEXT_NAME env var is undefined or invalid')
+  }
+}
+
 /**
  * CONSTS
  */
 export const DEFAULT_FORNO_URL =
-  process.env.ODIS_BLOCKCHAIN_PROVIDER || 'https://alfajoresstaging-forno.celo-testnet.org'
+  process.env.ODIS_BLOCKCHAIN_PROVIDER ?? 'https://alfajores-forno.celo-testnet.org'
 
 export const PRIVATE_KEY = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 export const ACCOUNT_ADDRESS = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY)) // 0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb
@@ -37,40 +47,6 @@ export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3P
 // hardcoding to avoid importing blind_threshols_bls library
 export const BLINDED_PHONE_NUMBER =
   'hZXDhpC5onzBSFa1agZ9vfHzqwJ/QeJg77NGvWiQG/sFWsvHETzZvdWr2GpF3QkB'
-
-export enum OdisAPI {
-  PNP = 'PNP',
-  DOMAIN = 'DOMAIN',
-}
-
-export const getServiceContext = (api: OdisAPI): ServiceContext => {
-  switch (process.env.CONTEXT_NAME) {
-    case 'alfajores':
-      return {
-        [OdisAPI.PNP]: ODIS_ALFAJORES_CONTEXT,
-        // TODO: temp fix until the identity SDK is updated
-        [OdisAPI.DOMAIN]: {
-          odisUrl: ODIS_ALFAJORES_CONTEXT.odisUrl,
-          odisPubKey:
-            '+ZrxyPvLChWUX/DyPw6TuGwQH0glDJEbSrSxUARyP5PuqYyP/U4WZTV1e0bAUioBZ6QCJMiLpDwTaFvy8VnmM5RBbLQUMrMg5p4+CBCqj6HhsMfcyUj8V0LyuNdStlCB',
-        },
-      }[api]
-    case 'staging':
-      return {
-        // Intentionally the same on staging
-        [OdisAPI.PNP]: ODIS_ALFAJORESSTAGING_CONTEXT,
-        [OdisAPI.DOMAIN]: ODIS_ALFAJORESSTAGING_CONTEXT,
-      }[api]
-    case 'mainnet':
-      return {
-        // TODO: this needs to be updated
-        [OdisAPI.PNP]: ODIS_MAINNET_CONTEXT,
-        [OdisAPI.DOMAIN]: ODIS_MAINNET_CONTEXT,
-      }[api]
-    default:
-      throw new Error('CONTEXT_NAME env var or api is undefined or invalid')
-  }
-}
 
 export const PHONE_HASH_IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 

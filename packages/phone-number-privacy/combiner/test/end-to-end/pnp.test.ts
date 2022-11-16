@@ -1,6 +1,6 @@
 import { StableToken } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity'
-import { ErrorMessages } from '@celo/identity/lib/odis/query'
+import { ErrorMessages, getServiceContext, OdisAPI } from '@celo/identity/lib/odis/query'
 import { PnpClientQuotaStatus } from '@celo/identity/lib/odis/quota'
 import {
   CombinerEndpoint,
@@ -19,8 +19,7 @@ import {
   ACCOUNT_ADDRESS_NO_QUOTA,
   BLINDED_PHONE_NUMBER,
   dekAuthSigner,
-  getServiceContext,
-  OdisAPI,
+  getTestContextName,
   PHONE_NUMBER,
   walletAuthSigner,
 } from './resources'
@@ -29,7 +28,7 @@ require('dotenv').config()
 
 jest.setTimeout(60000)
 
-const SERVICE_CONTEXT = getServiceContext(OdisAPI.PNP)
+const SERVICE_CONTEXT = getServiceContext(getTestContextName(), OdisAPI.PNP)
 const combinerUrl = SERVICE_CONTEXT.odisUrl
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
