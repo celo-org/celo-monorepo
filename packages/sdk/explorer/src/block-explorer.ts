@@ -17,6 +17,7 @@ import {
   mapFromPairs,
   obtainKitContractDetails,
 } from './base'
+import { fetchMetadata } from './sourcify'
 
 const debug = debugFactory('kit:explorer:block')
 
@@ -40,6 +41,11 @@ export interface ParsedBlock {
 interface ContractMapping {
   details: ContractDetails
   fnMapping: Map<string, ABIDefinition>
+}
+
+interface ContractNameAndMethodAbi {
+  abi: ABIDefinition
+  contract: string
 }
 
 export async function newBlockExplorer(kit: ContractKit) {
@@ -115,26 +121,103 @@ export class BlockExplorer {
     }
   }
 
-  getContractMethodAbi = (address: string, callSignature: string) => {
+  getContractMethodAbiFromCore = (
+    address: string,
+    callSignature: string
+  ): ContractNameAndMethodAbi | null => {
     const contractMapping = this.addressMapping.get(address)
-    return {
-      contract: contractMapping?.details.name,
-      abi: contractMapping?.fnMapping.get(callSignature),
+    if (contractMapping) {
+      const abi = contractMapping.fnMapping.get(callSignature)
+      if (abi) {
+        return {
+          contract: contractMapping.details.name,
+          abi,
+        }
+      } else {
+        console.warn(
+          `Function with signature ${callSignature} not found in contract ${contractMapping.details.name}(${address})`
+        )
+      }
     }
+
+    return null
   }
 
-  getKnownFunction(selector: string): ABIDefinition | undefined {
+  getContractMethodAbiFromSourcify = async (
+    address: string,
+    callSignature: string
+  ): Promise<ContractNameAndMethodAbi | null> => {
+    const chainId = await this.kit.connection.chainId()
+
+    const lookupAddress = async (queryAddress: string) => {
+      const metadata = await fetchMetadata(this.kit, chainId, queryAddress)
+      let resp: ContractNameAndMethodAbi | null = null
+      if (metadata && metadata.abi) {
+        const abiForSignature = metadata.abiForSignature(callSignature)
+        if (abiForSignature) {
+          resp = {
+            abi: {
+              ...abiForSignature,
+              signature: callSignature,
+            },
+            contract: metadata.contractName || address,
+          }
+        }
+      }
+      return { metadata, resp }
+    }
+
+    const results = await lookupAddress(address)
+    if (results.resp !== null) {
+      return results.resp
+    } else if (results.metadata && results.metadata.isProxy()) {
+      const implAddress = await results.metadata.getProxyImplementation()
+      if (implAddress) {
+        const implResult = await lookupAddress(implAddress)
+        return implResult.resp
+      }
+    }
+
+    return null
+  }
+
+  getContractMethodAbiFallback = (
+    address: string,
+    callSignature: string
+  ): ContractNameAndMethodAbi | null => {
     // TODO(bogdan): This could be replaced with a call to 4byte.directory
     // or a local database of common functions.
     const knownFunctions: { [k: string]: string } = {
       '0x095ea7b3': 'approve(address to, uint256 value)',
       '0x4d49e87d': 'addLiquidity(uint256[] amounts, uint256 minLPToMint, uint256 deadline)',
     }
-    const signature = knownFunctions[selector]
+    const signature = knownFunctions[callSignature]
     if (signature) {
-      return signatureToAbiDefinition(signature)
+      return {
+        abi: signatureToAbiDefinition(signature),
+        contract: address,
+      }
     }
-    return undefined
+    return null
+  }
+
+  getContractMethodAbi = async (
+    address: string,
+    callSignature: string,
+    onlyCoreContracts = false
+  ): Promise<ContractNameAndMethodAbi | null> => {
+    let resp = this.getContractMethodAbiFromCore(address, callSignature)
+    if (resp !== null) {
+      return resp
+    } else if (onlyCoreContracts) {
+      return null
+    }
+
+    resp = await this.getContractMethodAbiFromSourcify(address, callSignature)
+    if (resp !== null) {
+      return resp
+    }
+    return this.getContractMethodAbiFallback(address, callSignature)
   }
 
   buildCallDetails(contract: string, abi: ABIDefinition, input: string): CallDetails {
@@ -167,32 +250,13 @@ export class BlockExplorer {
     }
   }
 
-  tryParseAsCoreContractCall(address: string, input: string): CallDetails | null {
-    const selector = input.slice(0, 10)
-    const { contract: contractName, abi: matchedAbi } = this.getContractMethodAbi(address, selector)
-
-    if (matchedAbi === undefined || contractName === undefined) {
-      return null
-    }
-
-    return this.buildCallDetails(contractName, matchedAbi, input)
-  }
-
-  tryParseAsExternalContractCall(address: string, input: string): CallDetails | null {
-    const selector = input.slice(0, 10)
-    const matchedAbi = this.getKnownFunction(selector)
-    if (matchedAbi === undefined) {
-      return null
-    }
-
-    return this.buildCallDetails(address, matchedAbi, input)
-  }
-
   async tryParseTxInput(address: string, input: string): Promise<CallDetails | null> {
-    let callDetails = this.tryParseAsCoreContractCall(address, input)
-    if (callDetails == null) {
-      callDetails = this.tryParseAsExternalContractCall(address, input)
+    const selector = input.slice(0, 10)
+    const resp = await this.getContractMethodAbi(address, selector)
+
+    if (resp !== null) {
+      return this.buildCallDetails(resp.contract, resp.abi, input)
     }
-    return callDetails
+    return null
   }
 }
