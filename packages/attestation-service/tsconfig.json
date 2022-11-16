@@ -5,6 +5,5 @@
     "outDir": "lib",
     "resolveJsonModule": true
   },
-  "include": ["src", "index.d.ts"],
-  "references": [{ "path": "../sdk/utils" }]
+  "include": ["src", "index.d.ts"]
 }

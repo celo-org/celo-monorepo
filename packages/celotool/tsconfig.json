@@ -13,6 +13,5 @@
     }
   },
   "include": ["src", "../contractkit/types"],
-  "exclude": ["node_modules/"],
-  "references": [{ "path": "../sdk/utils" }, { "path": "../sdk/contractkit" }]
+  "exclude": ["node_modules/"]
 }
