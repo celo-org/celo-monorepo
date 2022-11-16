@@ -31,6 +31,8 @@ contractKit.defaultAccount = ACCOUNT_ADDRESS
 
 const SERVICE_CONTEXT = getServiceContext(getTestContextName(), OdisAPI.PNP)
 const combinerUrl = SERVICE_CONTEXT.odisUrl
+// const combinerUrl = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
+// const combinerUrl = 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net'
 
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
