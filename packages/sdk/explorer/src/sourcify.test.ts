@@ -19,15 +19,21 @@ describe('sourcify helpers', () => {
   let kit: ContractKit
   const web3: Web3 = new Web3()
   const address: Address = web3.utils.randomHex(20)
+  const proxyAddress: Address = web3.utils.randomHex(20)
   const implAddress: Address = web3.utils.randomHex(20)
+  const chainId: number = 42220
 
   const mockProvider: Provider = {
     send: (payload: JsonRpcPayload, callback: Callback<JsonRpcResponse>): void => {
-      callback(null, {
-        jsonrpc: payload.jsonrpc,
-        id: Number(payload.id),
-        result: `0x000000000000000000000000${implAddress}`,
-      })
+      if (payload.params[0].to === proxyAddress) {
+        callback(null, {
+          jsonrpc: payload.jsonrpc,
+          id: Number(payload.id),
+          result: `0x000000000000000000000000${implAddress}`,
+        })
+      } else {
+        callback(new Error('revert'))
+      }
     },
   }
 
@@ -36,16 +42,19 @@ describe('sourcify helpers', () => {
     web3.setProvider(mockProvider as any)
     const connection = new Connection(web3)
     kit = new ContractKit(connection)
+    connection.chainId = jest.fn().mockImplementation(async () => {
+      return chainId
+    })
   })
 
   describe('fetchMetadata()', () => {
     describe('when a full match exists', () => {
       it('returns the metadata from the full match', async () => {
         fetchMock.get(
-          'https://repo.sourcify.dev/contracts/full_match/42220/0xabc/metadata.json',
-          new Metadata(kit, address, {})
+          `https://repo.sourcify.dev/contracts/full_match/42220/${address}/metadata.json`,
+          {}
         )
-        const metadata = await fetchMetadata(kit, '42220', '0xabc')
+        const metadata = await fetchMetadata(kit, address)
         expect(metadata).toBeInstanceOf(Metadata)
       })
     })
@@ -54,12 +63,15 @@ describe('sourcify helpers', () => {
       describe('but a partial match exists', () => {
         it('returns the metadata from the partial match', async () => {
           fetchMock
-            .get('https://repo.sourcify.dev/contracts/full_match/42220/0xabc/metadata.json', 400)
             .get(
-              'https://repo.sourcify.dev/contracts/partial_match/42220/0xabc/metadata.json',
-              new Metadata(kit, address, {})
+              `https://repo.sourcify.dev/contracts/full_match/42220/${address}/metadata.json`,
+              400
             )
-          const metadata = await fetchMetadata(kit, '42220', '0xabc')
+            .get(
+              `https://repo.sourcify.dev/contracts/partial_match/42220/${address}/metadata.json`,
+              {}
+            )
+          const metadata = await fetchMetadata(kit, address)
           expect(metadata).toBeInstanceOf(Metadata)
         })
       })
@@ -67,9 +79,15 @@ describe('sourcify helpers', () => {
       describe('and a partial match does not exist', () => {
         it('is null', async () => {
           fetchMock
-            .get('https://repo.sourcify.dev/contracts/full_match/42220/0xabc/metadata.json', 400)
-            .get('https://repo.sourcify.dev/contracts/partial_match/42220/0xabc/metadata.json', 400)
-          const metadata = await fetchMetadata(kit, '42220', '0xabc')
+            .get(
+              `https://repo.sourcify.dev/contracts/full_match/42220/${address}/metadata.json`,
+              400
+            )
+            .get(
+              `https://repo.sourcify.dev/contracts/partial_match/42220/${address}/metadata.json`,
+              400
+            )
+          const metadata = await fetchMetadata(kit, address)
           expect(metadata).toEqual(null)
         })
       })
@@ -131,6 +149,50 @@ describe('sourcify helpers', () => {
       })
     })
 
+    describe('abiForMethod', () => {
+      let contractMetadata: Metadata
+
+      beforeEach(() => {
+        contractMetadata = new Metadata(kit, address, CONTRACT_METADATA)
+      })
+
+      describe('with full signature', () => {
+        it('finds one ABI item when it exists', async () => {
+          const results = contractMetadata.abiForMethod('isLegacyRole(bytes32,bytes32)')
+          expect(results.length).toEqual(1)
+          expect(results[0]).toMatchObject({
+            name: 'isLegacyRole',
+            inputs: [{ name: 'role' }, { name: 'otherRole' }],
+          })
+        })
+
+        it('returns an empty array when none exists', async () => {
+          const results = contractMetadata.abiForMethod('randomFunction(bytes32,bytes32')
+          expect(results.length).toEqual(0)
+        })
+      })
+
+      describe('with method name', () => {
+        it('finds one ABI item when one exists', async () => {
+          const results = contractMetadata.abiForMethod('isLegacySigner')
+          expect(results.length).toEqual(1)
+          expect(results[0]).toMatchObject({
+            name: 'isLegacySigner',
+          })
+        })
+
+        it('finds multiple ABI items when they exist', async () => {
+          const results = contractMetadata.abiForMethod('isLegacyRole')
+          expect(results.length).toEqual(2)
+        })
+
+        it('returns an empty array when none exists', async () => {
+          const results = contractMetadata.abiForMethod('randomFunction')
+          expect(results.length).toEqual(0)
+        })
+      })
+    })
+
     describe('abiForSignature', () => {
       let contractMetadata: Metadata
 
@@ -143,7 +205,7 @@ describe('sourcify helpers', () => {
           const callSignature = kit.connection
             .getAbiCoder()
             .encodeFunctionSignature('authorizedBy(address)')
-          const abi = contractMetadata.abiForSignature(callSignature)
+          const abi = contractMetadata.abiForSelector(callSignature)
           expect(abi).toMatchObject({
             constant: true,
             inputs: [
@@ -170,7 +232,7 @@ describe('sourcify helpers', () => {
 
       describe("when the function doesn't exist", () => {
         it('returns null', () => {
-          const abi = contractMetadata.abiForSignature('0x0')
+          const abi = contractMetadata.abiForSelector('0x0')
           expect(abi).toBeNull()
         })
       })
@@ -182,20 +244,20 @@ describe('sourcify helpers', () => {
 
       beforeEach(() => {
         contractMetadata = new Metadata(kit, address, CONTRACT_METADATA)
-        proxyMetadata = new Metadata(kit, address, PROXY_METADATA)
+        proxyMetadata = new Metadata(kit, proxyAddress, PROXY_METADATA)
       })
 
       describe('with a cLabs proxy', () => {
         it('fetches the implementation', async () => {
-          const implAddress = await proxyMetadata.tryGetProxyImplementation()
-          expect(implAddress).toEqual(implAddress)
+          const result = await proxyMetadata.tryGetProxyImplementation()
+          expect(result?.toLocaleLowerCase()).toEqual(implAddress.toLocaleLowerCase())
         })
       })
 
       describe('with a non-proxy', () => {
         it('returns null', async () => {
-          const implAddress = await contractMetadata.tryGetProxyImplementation()
-          expect(implAddress).toBeNull()
+          const result = await contractMetadata.tryGetProxyImplementation()
+          expect(result).toBeNull()
         })
       })
     })

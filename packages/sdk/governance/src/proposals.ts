@@ -2,6 +2,7 @@ import { Address, isHexString, trimLeading0x } from '@celo/base/lib/address'
 import {
   AbiCoder,
   ABIDefinition,
+  AbiItem,
   CeloTransactionObject,
   CeloTxObject,
   CeloTxPending,
@@ -34,6 +35,7 @@ import {
   ProposalTransaction,
 } from '@celo/contractkit/lib/wrappers/Governance'
 import { newBlockExplorer } from '@celo/explorer'
+import { fetchMetadata } from '@celo/explorer/lib/sourcify'
 import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
@@ -184,15 +186,15 @@ export const proposalToJSON = async (
       jsonTx.params![`initialize@${initSig}`] = initParams
     } else if (isGovernanceConstitutionSetter(jsonTx)) {
       const [address, functionId, threshold] = jsonTx.args
-      const { contract, abi } = blockExplorer.getContractMethodAbi(address, functionId)
-      if (!contract || !abi) {
+      const result = await blockExplorer.getContractMethodAbi(address, functionId)
+      if (result === null) {
         throw new Error(
           `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
         )
       }
       jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
-        contract,
-        method: abi.name,
+        contract: result.contract,
+        method: result.abi.name,
         threshold: fromFixed(new BigNumber(threshold)),
       }
     }
@@ -294,9 +296,34 @@ export class ProposalBuilder {
   decodeCallToExternalContract = async (
     tx: ProposalTransactionJSON
   ): Promise<ProposalTransaction> => {
-    const methodABI = signatureToAbiDefinition(tx.function)
+    const abiCoder = this.kit.connection.getAbiCoder()
+    let methodABI: AbiItem | null = null
+
+    const metadata = await fetchMetadata(this.kit, tx.contract)
+    if (metadata) {
+      const potentialABIs = metadata.abiForMethod(tx.function)
+      methodABI =
+        potentialABIs.find((abi) => {
+          try {
+            abiCoder.encodeFunctionCall(abi, tx.args)
+            return true
+          } catch {
+            return false
+          }
+        }) || null
+    }
+
+    if (methodABI === null) {
+      methodABI = signatureToAbiDefinition(tx.function)
+    }
+
     const input = this.kit.connection.getAbiCoder().encodeFunctionCall(methodABI, tx.args)
-    return { input, to: tx.contract, value: tx.value }
+    let to: string = tx.contract
+    if (metadata && metadata.contractName) {
+      to = tx.contract
+    }
+
+    return { input, to, value: tx.value }
   }
 
   decodeCallToRegistryContract = async (

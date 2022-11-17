@@ -1626,6 +1626,32 @@
         "constant": true,
         "inputs": [
           {
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "otherRole",
+            "type": "bytes32"
+          }
+        ],
+        "name": "isLegacyRole",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "pure",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [
+          {
             "internalType": "address",
             "name": "_account",
             "type": "address"
