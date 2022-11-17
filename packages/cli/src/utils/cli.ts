@@ -21,7 +21,7 @@ export async function displaySendTx<A>(
 ) {
   cli.action.start(`Sending Transaction: ${name}`)
   try {
-    const txResult = await txObj.send({ ...tx, gasPrice: 10000000000 })
+    const txResult = await txObj.send(tx)
 
     const txHash = await txResult.getHash()
 
