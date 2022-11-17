@@ -177,8 +177,6 @@ export class BlockExplorer {
           signature: selector,
         },
         contract: contractName ? `${contractName}(${address})` : `Unknown(${address})`,
-        // contract: address,
-        // contractName: contractName || 'Unknown'
       }
     }
 

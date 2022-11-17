@@ -293,7 +293,7 @@ export class ProposalBuilder {
     RegisteredContracts.includes(stripProxy(contract)) ||
     this.getRegistryAddition(contract) !== undefined
 
-  decodeCallToExternalContract = async (
+  buildCallToExternalContract = async (
     tx: ProposalTransactionJSON
   ): Promise<ProposalTransaction> => {
     const abiCoder = this.kit.connection.getAbiCoder()
@@ -326,9 +326,7 @@ export class ProposalBuilder {
     return { input, to, value: tx.value }
   }
 
-  decodeCallToRegistryContract = async (
-    tx: ProposalTransactionJSON
-  ): Promise<ProposalTransaction> => {
+  buildCallToCoreContract = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
     // Account for canonical registry addresses from current proposal
     const address =
       this.getRegistryAddition(tx.contract) ?? (await this.kit.registry.addressFor(tx.contract))
@@ -363,7 +361,7 @@ export class ProposalBuilder {
 
     // handle sending value to unregistered contracts
     if (this.isRegistryContract(tx.contract)) {
-      return this.decodeCallToRegistryContract(tx)
+      return this.buildCallToCoreContract(tx)
     } else {
       if (!isValidAddress(tx.contract)) {
         throw new Error(
@@ -376,7 +374,7 @@ export class ProposalBuilder {
         return { input: '', to: tx.contract, value: tx.value }
       }
 
-      return this.decodeCallToExternalContract(tx)
+      return this.buildCallToExternalContract(tx)
     }
   }
 
