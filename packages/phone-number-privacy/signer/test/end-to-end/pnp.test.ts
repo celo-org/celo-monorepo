@@ -211,9 +211,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           blockNumber: resBody.blockNumber,
           warnings: [],
         })
-        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(
-          config.keystore.keys.phoneNumberPrivacy.latest.toString()
-        )
+        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.pnpKeyVersion)
         expect(
           threshold_bls.partialVerifyBlindSignature(
             Buffer.from(contextSpecificParams.pnpPolynomial, 'hex'),
@@ -279,9 +277,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           blockNumber: resBody.blockNumber,
           warnings: [],
         })
-        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(
-          config.keystore.keys.phoneNumberPrivacy.latest.toString()
-        )
+        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.pnpKeyVersion)
         expect(
           threshold_bls.partialVerifyBlindSignature(
             Buffer.from(contextSpecificParams.pnpPolynomial, 'hex'),
