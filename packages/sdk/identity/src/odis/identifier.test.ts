@@ -83,7 +83,7 @@ describe(getObfuscatedIdentifier, () => {
       })
     })
 
-    it('Preblinding the of-chain identifier', async () => {
+    it('Preblinding the off-chain identifier', async () => {
       fetchMock.mock(endpoint, {
         success: true,
         signature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',

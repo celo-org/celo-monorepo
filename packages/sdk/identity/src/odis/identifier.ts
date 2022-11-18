@@ -23,30 +23,23 @@ const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 const PEPPER_CHAR_LENGTH = 13
 const PEPPER_SEPARATOR = '__'
 
-export enum IdentifierType {
-  PHONE_NUMBER = 0,
-  EMAIL = 1,
-  TWITTER = 2,
+// using DID methods as prefixes when they exist
+// https://w3c.github.io/did-spec-registries/#did-methods
+export enum IdentifierPrefix {
+  PHONE_NUMBER = 'tel',
+  EMAIL = 'mailto',
+  TWITTER = 'twit',
   // feel free to put up a PR to add more types!
 }
 
-export function getIdentifierPrefix(type: IdentifierType) {
-  switch (type) {
-    case IdentifierType.PHONE_NUMBER:
-      return 'tel'
-    case IdentifierType.EMAIL:
-      return 'mailto'
-    case IdentifierType.TWITTER:
-      return 'twit'
-    default:
-      throw new Error('Unsupported Identifier Type')
-  }
-}
-
 export interface IdentifierHashDetails {
+  // plaintext off-chain phone number, twitter handle, email, etc.
   plaintextIdentifier: string
-  identifierHash: string
+  // identifier obtained after hashing, used for on-chain attestations
+  obfuscatedIdentifier: string
+  // unique pepper obtained through ODIS
   pepper: string
+  // raw signature from ODIS
   unblindedSignature?: string
 }
 
@@ -56,7 +49,7 @@ export interface IdentifierHashDetails {
  */
 export async function getObfuscatedIdentifier(
   plaintextIdentifier: string,
-  identifierType: string | IdentifierType,
+  identifierPrefix: string,
   account: string,
   signer: AuthSigner,
   context: ServiceContext,
@@ -98,7 +91,7 @@ export async function getObfuscatedIdentifier(
 
   return getObfuscatedIdentifierFromSignature(
     plaintextIdentifier,
-    identifierType,
+    identifierPrefix,
     base64BlindSig,
     blsBlindingClient
   )
@@ -120,7 +113,7 @@ export async function getBlindedIdentifier(
 
 /**
  * Query ODIS for the blinded signature
- * Response can be passed into getIdentifierIdentifierFromSignature
+ * Response can be passed into getObfuscatedIdentifierFromSignature
  * to retrieve the on-chain identifier
  */
 export async function getBlindedIdentifierSignature(
@@ -163,7 +156,7 @@ export async function getBlindedIdentifierSignature(
  */
 export async function getObfuscatedIdentifierFromSignature(
   plaintextIdentifier: string,
-  identifierType: string | IdentifierType,
+  identifierType: string | IdentifierPrefix,
   base64BlindedSignature: string,
   blsBlindingClient: BlsBlindingClient
 ): Promise<IdentifierHashDetails> {
@@ -173,21 +166,21 @@ export async function getObfuscatedIdentifierFromSignature(
 
   debug('Converting sig to pepper')
   const pepper = getPepperFromThresholdSignature(sigBuf)
-  const identifierHash = getIdentifierHash(plaintextIdentifier, identifierType, pepper)
-  return { plaintextIdentifier, identifierHash, pepper, unblindedSignature: base64UnblindedSig }
+  const obfuscatedIdentifier = getIdentifierHash(plaintextIdentifier, identifierType, pepper)
+  return {
+    plaintextIdentifier,
+    obfuscatedIdentifier,
+    pepper,
+    unblindedSignature: base64UnblindedSig,
+  }
 }
 
 export const getIdentifierHash = (
   plaintextIdentifier: string,
-  identifierType: string | IdentifierType,
-  pepper?: string
+  identifierPrefix: string,
+  pepper: string
 ): string => {
-  const prefix =
-    typeof identifierType === 'string'
-      ? identifierType + '://'
-      : getIdentifierPrefix(identifierType) + '://'
-  const value =
-    prefix + (pepper ? plaintextIdentifier + PEPPER_SEPARATOR + pepper : plaintextIdentifier)
+  const value = identifierPrefix + plaintextIdentifier + PEPPER_SEPARATOR + pepper
   return sha3(value) as string
 }
 
