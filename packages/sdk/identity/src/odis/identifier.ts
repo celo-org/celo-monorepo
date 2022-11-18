@@ -181,7 +181,7 @@ export const getIdentifierHash = (
   identifierPrefix: string,
   pepper: string
 ): string => {
-  const value = identifierPrefix + plaintextIdentifier + PEPPER_SEPARATOR + pepper
+  const value = identifierPrefix + '://' + plaintextIdentifier + PEPPER_SEPARATOR + pepper
   return sha3(value) as string
 }
 
