@@ -1,4 +1,5 @@
 import { isE164Number } from '@celo/base/lib/phoneNumbers'
+import { CombinerEndpointPNP } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import { createHash } from 'crypto'
 import debugFactory from 'debug'
@@ -37,7 +38,9 @@ export async function getPhoneNumberIdentifier(
   blindingFactor?: string,
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient,
-  sessionID?: string
+  sessionID?: string,
+  keyVersion?: number,
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
 
@@ -67,7 +70,9 @@ export async function getPhoneNumberIdentifier(
     context,
     base64BlindedMessage,
     clientVersion,
-    sessionID
+    sessionID,
+    keyVersion,
+    endpoint ?? CombinerEndpointPNP.PNP_SIGN
   )
 
   const {

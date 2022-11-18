@@ -78,12 +78,13 @@ In addition, you must name your keys in your keystore according to the pattern `
 
 For example, the first iteration of the key share used for phone number privacy should be stored as `phoneNumberPrivacy-1` and the second iteration (after resharing) should be stored as `phoneNumberPrivacy-2` unless you specify a `PHONE_NUMBER_PRIVACY_KEY_NAME_BASE` env variable, in which case `phoneNumberPrivacy` should be replaced with that value. The version numbers and `-` delimeter are mandatory and not configurable.
 
+**Note: if you modify the stored secrets, you must restart the signer to ensure the updated versions are used in the signer.**
+
 #### Azure Key Vault
 
 Use the following to configure the AKV connection. These values are generated when creating a service principal account (see [Configuring your Key Vault](https://www.npmjs.com/package/@azure/keyvault-keys#configuring-your-key-vault)). Or if the service is being hosted on Azure itself, authentication can be done by granted key access to the VM's managed identity, in which case the client_id, client_secret, and tenant configs can be left blank.
 
 - `KEYSTORE_AZURE_VAULT_NAME` - The name of your Azure Key Vault.
-- `KEYSTORE_AZURE_SECRET_NAME` - The name of the secret that holds your BLS key.
 - `KEYSTORE_AZURE_CLIENT_ID` - (Optional) The clientId of the service principal account that has [Get, List] access to secrets.
 - `KEYSTORE_AZURE_CLIENT_SECRET` - (Optional) The client secret of the same service principal account.
 - `KEYSTORE_AZURE_TENANT` - (Optional) The tenant that the service principal is a member of.
@@ -93,15 +94,12 @@ Use the following to configure the AKV connection. These values are generated wh
 Use the following to configure the Google Secret Manager. To authenticate with Google Cloud, you can see [Setting Up Authentication](https://cloud.google.com/docs/authentication/production). By default, the google lib will use the default app credentials assigned to the host VM. If the service is being run outside of GCP, you can manually set the `GOOGLE_APPLICATION_CREDENTIALS` env var to the path to a service account json file.
 
 - `KEYSTORE_GOOGLE_PROJECT_ID` - The google cloud project id.
-- `KEYSTORE_GOOGLE_SECRET_NAME` - The secret's name.
-- `KEYSTORE_GOOGLE_SECRET_VERSION` - Secret version (latest by default).
 
 #### AWS Secrets Manager
 
 Use the following to configure the AWS Secrets Manager. To authenticate with Amazon Web Services, you can see [Setting Credentials in Node.js](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html). If you are running the signer inside AWS, we do recommend to authenticate using IAM Roles.
 
 - `KEYSTORE_AWS_REGION` - The AWS Region code where the secret is, for example: `us-east-1`.
-- `KEYSTORE_AWS_SECRET_NAME` - The secret's name.
 - `KEYSTORE_AWS_SECRET_KEY` - The key for the secret key/value pair.
 
 ## Operations
@@ -153,7 +151,7 @@ You can test your mainnet service is set up correctly by running a specific end-
 3. Modify the .env file:
 
    - Change `ODIS_SIGNER_SERVICE_URL` to your service endpoint.
-   - Swap the `ODIS_PUBLIC_POLYNOMIAL` with the *mainnet* one.
+   - Set `ODIS_PUBLIC_POLYNOMIAL_VAR_FOR_TESTS` to equal `MAINNET_PHONE_NUMBER_PRIVACY_POLYNOMIAL` (so that tests run against the mainnet polynomial).
 
 4. Run `yarn jest test/end-to-end/get-blinded-sig.test.ts -t 'When walletAddress has enough quota Returns sig when querying succeeds with unused request'`
 5. Verify test passes.

@@ -1,5 +1,5 @@
 import {
-  CombinerEndpoint,
+  CombinerEndpointPNP,
   KEY_VERSION_HEADER,
   SignMessageRequest,
   SignMessageResponseSchema,
@@ -123,7 +123,8 @@ export async function getBlindedIdentifierSignature(
   base64BlindedMessage: string,
   clientVersion?: string,
   sessionID?: string,
-  keyVersion?: number
+  keyVersion?: number,
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
 ): Promise<string> {
   const body: SignMessageRequest = {
     account,
@@ -136,7 +137,7 @@ export async function getBlindedIdentifierSignature(
   const response = await queryOdis(
     body,
     context,
-    CombinerEndpoint.PNP_SIGN,
+    endpoint ?? CombinerEndpointPNP.PNP_SIGN,
     SignMessageResponseSchema,
     {
       [KEY_VERSION_HEADER]: keyVersion?.toString(),

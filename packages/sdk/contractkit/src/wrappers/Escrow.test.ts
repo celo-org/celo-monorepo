@@ -123,4 +123,37 @@ testWithGanache('Escrow Wrapper', (web3) => {
         .sendAndWaitForReceipt()
     ).rejects.toThrow()
   })
+  it('withdraw should revert if attestation is registered by issuer not on the trusted issuers list', async () => {
+    const sender: string = accounts[1]
+    const receiver: string = accounts[2]
+    const withdrawKeyAddress: string = accounts[3]
+    const oneDayInSecs: number = 86400
+    const parsedSig = await getParsedSignatureOfAddress(web3, receiver, withdrawKeyAddress)
+
+    await federatedAttestations
+      .registerAttestationAsIssuer(identifier, receiver, TIMESTAMP)
+      .sendAndWaitForReceipt()
+
+    await stableTokenContract
+      .approve(escrow.address, TEN_CUSD)
+      .sendAndWaitForReceipt({ from: sender })
+
+    await escrow
+      .transferWithTrustedIssuers(
+        identifier,
+        stableTokenContract.address,
+        TEN_CUSD,
+        oneDayInSecs,
+        withdrawKeyAddress,
+        1,
+        [accounts[5]]
+      )
+      .sendAndWaitForReceipt({ from: sender })
+
+    await expect(
+      escrow
+        .withdraw(withdrawKeyAddress, parsedSig.v, parsedSig.r, parsedSig.s)
+        .sendAndWaitForReceipt()
+    ).rejects.toThrow()
+  })
 })

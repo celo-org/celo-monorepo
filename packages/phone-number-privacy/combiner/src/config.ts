@@ -1,6 +1,8 @@
 import { BlockchainConfig, rootLogger, TestUtils, toBool } from '@celo/phone-number-privacy-common'
 import * as functions from 'firebase-functions'
-export const VERSION = process.env.npm_package_version ?? '0.0.0'
+export function getCombinerVersion(): string {
+  return process.env.npm_package_version ?? require('../package.json').version ?? '0.0.0'
+}
 export const DEV_MODE =
   process.env.NODE_ENV !== 'production' || process.env.FUNCTIONS_EMULATOR === 'true'
 
@@ -137,36 +139,39 @@ if (DEV_MODE) {
 } else {
   const functionConfig = functions.config()
   config = {
-    serviceName: functionConfig.service_name ?? defaultServiceName,
+    serviceName: functionConfig.service.name ?? defaultServiceName,
     blockchain: {
       provider: functionConfig.blockchain.provider,
       apiKey: functionConfig.blockchain.api_key,
     },
     phoneNumberPrivacy: {
-      serviceName: functionConfig.phoneNumberPrivacy.service_name ?? defaultServiceName,
-      enabled: toBool(functionConfig.phoneNumberPrivacy.enabled, false),
-      shouldFailOpen: toBool(functionConfig.phoneNumberPrivacy.shouldFailOpen, false),
+      serviceName: functionConfig.pnp.service_name ?? defaultServiceName,
+      enabled: toBool(functionConfig.pnp.enabled, false),
+      shouldFailOpen: toBool(functionConfig.pnp.should_fail_open, false),
       odisServices: {
-        signers: functionConfig.phoneNumberPrivacy.odisservices.signers,
-        timeoutMilliSeconds:
-          functionConfig.phoneNumberPrivacy.odisservices.timeoutMilliSeconds ?? 5 * 1000,
+        signers: functionConfig.pnp.odisservices,
+        timeoutMilliSeconds: functionConfig.pnp.timeout_ms
+          ? Number(functionConfig.pnp.timeout_ms)
+          : 5 * 1000,
       },
       keys: {
-        currentVersion: functionConfig.phoneNumberPrivacy.keys.currentVersion,
-        versions: functionConfig.phoneNumberPrivacy.keys.versions,
+        currentVersion: Number(functionConfig.pnp_keys.current_version),
+        versions: functionConfig.pnp_keys.versions,
       },
     },
     domains: {
       serviceName: functionConfig.domains.service_name ?? defaultServiceName,
       enabled: toBool(functionConfig.domains.enabled, false),
-      shouldFailOpen: toBool(functionConfig.domains.authShouldFailOpen, false),
+      shouldFailOpen: toBool(functionConfig.domains.auth_should_fail_open, false),
       odisServices: {
-        signers: functionConfig.domains.odisservices.signers,
-        timeoutMilliSeconds: functionConfig.domains.odisservices.timeoutMilliSeconds ?? 5 * 1000,
+        signers: functionConfig.domains.odisservices,
+        timeoutMilliSeconds: functionConfig.domains.timeout_ms
+          ? Number(functionConfig.domains.timeout_ms)
+          : 5 * 1000,
       },
       keys: {
-        currentVersion: functionConfig.domains.keys.currentVersion,
-        versions: functionConfig.domains.keys.versions,
+        currentVersion: Number(functionConfig.domains_keys.current_version),
+        versions: functionConfig.domains_keys.versions,
       },
     },
     cloudFunction: {

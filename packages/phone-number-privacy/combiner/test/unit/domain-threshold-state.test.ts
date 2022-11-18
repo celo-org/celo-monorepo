@@ -4,7 +4,7 @@ import {
   KeyVersionInfo,
   SequentialDelayDomainState,
 } from '@celo/phone-number-privacy-common'
-import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
+import { getSignerVersion } from '@celo/phone-number-privacy-signer/src/config'
 import Logger from 'bunyan'
 import { Request, Response } from 'express'
 import { Session } from '../../src/common/session'
@@ -55,7 +55,7 @@ describe('domain threshold state', () => {
 
   const domainThresholdStateService = new DomainThresholdStateService(domainConfig)
 
-  const expectedVersion = getVersion()
+  const expectedVersion = getSignerVersion()
   const now = Date.now()
   const timer = now - 1
   const counter = 2

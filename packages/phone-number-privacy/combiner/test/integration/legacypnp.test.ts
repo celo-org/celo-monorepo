@@ -24,14 +24,14 @@ import {
   KeyProvider,
 } from '@celo/phone-number-privacy-signer/dist/common/key-management/key-provider-base'
 import { MockKeyProvider } from '@celo/phone-number-privacy-signer/dist/common/key-management/mock-key-provider'
-import { getVersion, SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
+import { SignerConfig } from '@celo/phone-number-privacy-signer/dist/config'
 import BigNumber from 'bignumber.js'
 import threshold_bls from 'blind-threshold-bls'
 import { Server as HttpsServer } from 'https'
 import { Knex } from 'knex'
 import { Server } from 'net'
 import request from 'supertest'
-import config from '../../src/config'
+import config, { getCombinerVersion } from '../../src/config'
 import { startCombiner } from '../../src/server'
 
 const {
@@ -131,16 +131,12 @@ const signerConfig: SignerConfig = {
       clientSecret: '',
       tenant: '',
       vaultName: '',
-      secretName: '',
     },
     google: {
       projectId: '',
-      secretName: '',
-      secretVersion: 'latest',
     },
     aws: {
       region: '',
-      secretName: '',
       secretKey: '',
     },
   },
@@ -192,8 +188,8 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
   let userSeed: Uint8Array
   let blindedMsgResult: threshold_bls.BlindedMessage
 
-  const signerMigrationsPath = '../signer/src/common/database/migrations'
-  const expectedVersion = getVersion()
+  const signerMigrationsPath = '../signer/dist/common/database/migrations'
+  const expectedVersion = getCombinerVersion()
 
   const message = Buffer.from('test message', 'utf8')
   const expectedQuota = 410
@@ -531,17 +527,6 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
       })
     })
 
-    it('Should respond with 400 on invalid key version', async () => {
-      const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
-      const res = await sendLegacyPnpSignRequest(req, authorization, app, 'a')
-      expect(res.status).toBe(400)
-      expect(res.body).toStrictEqual<SignMessageResponseFailure>({
-        success: false,
-        version: expectedVersion,
-        error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
-      })
-    })
-
     it('Should respond with 400 on unsupported key version', async () => {
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await sendLegacyPnpSignRequest(req, authorization, app, '4')
@@ -613,7 +598,7 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
         JSON.stringify(combinerConfig)
       )
       configWithApiDisabled.phoneNumberPrivacy.enabled = false
-      const appWithApiDisabled = startCombiner(configWithApiDisabled)
+      const appWithApiDisabled = startCombiner(configWithApiDisabled, mockKit)
 
       const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
       const res = await sendLegacyPnpSignRequest(req, authorization, appWithApiDisabled)
@@ -641,7 +626,7 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
           JSON.stringify(combinerConfig)
         )
         combinerConfigWithFailOpenEnabled.phoneNumberPrivacy.shouldFailOpen = true
-        const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled)
+        const appWithFailOpenEnabled = startCombiner(combinerConfigWithFailOpenEnabled, mockKit)
         const res = await sendLegacyPnpSignRequest(req, authorization, appWithFailOpenEnabled)
 
         expect(res.status).toBe(200)
@@ -740,9 +725,9 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
       beforeEach(async () => {
         const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
         configWithApiDisabled.api.legacyPhoneNumberPrivacy.enabled = false
-        signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
-        signer2 = startSigner(configWithApiDisabled, signerDB2, keyProvider2).listen(3002)
-        signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3).listen(3003)
+        signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+        signer2 = startSigner(configWithApiDisabled, signerDB2, keyProvider2, mockKit).listen(3002)
+        signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3, mockKit).listen(3003)
       })
 
       it('Should fail to reach threshold of signers on valid request', async () => {
@@ -761,9 +746,9 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
       beforeEach(async () => {
         const configWithApiDisabled: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
         configWithApiDisabled.api.legacyPhoneNumberPrivacy.enabled = false
-        signer1 = startSigner(signerConfig, signerDB1, keyProvider1).listen(3001)
-        signer2 = startSigner(signerConfig, signerDB2, keyProvider2).listen(3002)
-        signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3).listen(3003)
+        signer1 = startSigner(signerConfig, signerDB1, keyProvider1, mockKit).listen(3001)
+        signer2 = startSigner(signerConfig, signerDB2, keyProvider2, mockKit).listen(3002)
+        signer3 = startSigner(configWithApiDisabled, signerDB3, keyProvider3, mockKit).listen(3003)
       })
 
       it('Should respond with 200 on valid request', async () => {
@@ -788,9 +773,9 @@ describe(`legacyPnpService: ${CombinerEndpoint.LEGACY_PNP_SIGN}`, () => {
         const configWithShortTimeout: SignerConfig = JSON.parse(JSON.stringify(signerConfig))
         configWithShortTimeout.timeout = testTimeoutMS
         // Test this with all signers timing out to decrease possibility of race conditions
-        signer1 = startSigner(configWithShortTimeout, signerDB1, keyProvider1).listen(3001)
-        signer2 = startSigner(configWithShortTimeout, signerDB2, keyProvider2).listen(3002)
-        signer3 = startSigner(configWithShortTimeout, signerDB3, keyProvider3).listen(3003)
+        signer1 = startSigner(configWithShortTimeout, signerDB1, keyProvider1, mockKit).listen(3001)
+        signer2 = startSigner(configWithShortTimeout, signerDB2, keyProvider2, mockKit).listen(3002)
+        signer3 = startSigner(configWithShortTimeout, signerDB3, keyProvider3, mockKit).listen(3003)
       })
       it('Should fail to reach threshold of signers on valid request', async () => {
         const res = await sendLegacyPnpSignRequest(req, authorization, app)

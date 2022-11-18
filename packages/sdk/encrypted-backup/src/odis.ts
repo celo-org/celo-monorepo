@@ -81,7 +81,7 @@ export async function odisHardenKey(
   const sessionID = genSessionID()
 
   // Request the quota status for the domain to get the state, including the quota counter.
-  const quotaResp = await requestOdisQuotaStatus(domain, environment, sessionID, wallet)
+  const quotaResp = await requestOdisDomainQuotaStatus(domain, environment, sessionID, wallet)
   if (!quotaResp.ok) {
     return quotaResp
   }
@@ -166,7 +166,17 @@ export function odisQueryAuthorizer(nonce: Buffer): { address: Address; wallet: 
   return { address, wallet }
 }
 
-async function requestOdisQuotaStatus(
+/**
+ * Returns a hardened key derived from the input key material and a POPRF evaluation on that keying
+ * material under the given rate limiting domain.
+ *
+ * @param domain Rate limiting configuration and domain input to the ODIS POPRF.
+ * @param environment Information for the targeted ODIS environment.
+ * @param sessionID client-defined session ID for tracking requests across services
+ * @param wallet Wallet with access to the authorizer signing key specified in the domain input.
+ *        Should be provided if the input domain is authenticated.
+ */
+export async function requestOdisDomainQuotaStatus(
   domain: SequentialDelayDomain,
   environment: OdisServiceContext,
   sessionID: string,
@@ -182,7 +192,7 @@ async function requestOdisQuotaStatus(
     sessionID: defined(sessionID),
   }
 
-  // If a query authorizer is defined in the domain, include a siganture over the request.
+  // If a query authorizer is defined in the domain, include a signature over the request.
   const authorizer = domain.address.defined ? domain.address.value : undefined
   if (authorizer !== undefined) {
     if (wallet === undefined || !wallet.hasAccount(authorizer)) {

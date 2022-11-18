@@ -12,20 +12,13 @@ export class AWSKeyProvider extends KeyProviderBase {
     const logger = rootLogger(config.serviceName)
     try {
       // Credentials are managed by AWS client as described in https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html
-      const { region, secretName, secretKey } = config.keystore.aws
+      const { region, secretKey } = config.keystore.aws
       const client = new SecretsManager({ region })
       client.config.update({ region })
 
-      let privateKey: string
-      try {
-        privateKey = await this.fetch(client, this.getCustomKeyVersionString(key), secretKey)
-      } catch (err) {
-        logger.info(`Error retrieving key: ${key}`)
-        logger.error(err)
-        logger.error(ErrorMessage.KEY_FETCH_ERROR)
-        privateKey = await this.fetch(client, secretName, secretKey)
-      }
-
+      const customKeyVersionString = this.getCustomKeyVersionString(key)
+      logger.debug(`Attempting to fetch key named: ${customKeyVersionString}`)
+      const privateKey = await this.fetch(client, customKeyVersionString, secretKey)
       this.setPrivateKey(key, privateKey)
     } catch (err) {
       logger.info('Error retrieving key')

@@ -21,7 +21,7 @@ import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
-import { VERSION } from '../../../config'
+import { getCombinerVersion } from '../../../config'
 
 export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DOMAIN_QUOTA_STATUS
@@ -65,7 +65,7 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
       response,
       {
         success: true,
-        version: VERSION,
+        version: getCombinerVersion(),
         status: domainState,
       },
       status,
@@ -82,7 +82,7 @@ export class DomainQuotaIO extends IO<DomainQuotaStatusRequest> {
       response,
       {
         success: false,
-        version: VERSION,
+        version: getCombinerVersion(),
         error,
       },
       status,

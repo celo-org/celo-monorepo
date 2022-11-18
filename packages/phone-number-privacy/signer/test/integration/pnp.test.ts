@@ -28,7 +28,7 @@ import {
 import { getRequestExists } from '../../src/common/database/wrappers/request'
 import { initKeyProvider } from '../../src/common/key-management/key-provider'
 import { KeyProvider } from '../../src/common/key-management/key-provider-base'
-import { config, getVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
+import { config, getSignerVersion, SupportedDatabase, SupportedKeystore } from '../../src/config'
 import { startSigner } from '../../src/server'
 
 const {
@@ -87,7 +87,7 @@ describe('pnp', () => {
 
   const onChainBalance = new BigNumber(1e18)
   const expectedQuota = 1000
-  const expectedVersion = getVersion()
+  const expectedVersion = getSignerVersion()
 
   // create deep copy
   const _config: typeof config = JSON.parse(JSON.stringify(config))
@@ -340,7 +340,12 @@ describe('pnp', () => {
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+        const appWithApiDisabled = startSigner(
+          configWithApiDisabled,
+          db,
+          keyProvider,
+          newKit('dummyKit')
+        )
 
         const req = getPnpQuotaRequest(ACCOUNT_ADDRESS1)
         const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
@@ -369,7 +374,12 @@ describe('pnp', () => {
 
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
@@ -385,7 +395,7 @@ describe('pnp', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<PnpQuotaResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: 0,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
@@ -550,7 +560,7 @@ describe('pnp', () => {
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -573,7 +583,7 @@ describe('pnp', () => {
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -594,7 +604,7 @@ describe('pnp', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignatures[i - 1],
             performedQueryCount: performedQueryCount + 1,
             totalQuota: expectedQuota,
@@ -616,7 +626,7 @@ describe('pnp', () => {
         expect(res1.status).toBe(200)
         expect(res1.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res1.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -642,7 +652,7 @@ describe('pnp', () => {
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
           success: true,
-          version: res.body.version,
+          version: expectedVersion,
           signature: expectedSignature,
           performedQueryCount: performedQueryCount + 1,
           totalQuota: expectedQuota,
@@ -664,7 +674,7 @@ describe('pnp', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -680,7 +690,7 @@ describe('pnp', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
         })
       })
@@ -696,7 +706,7 @@ describe('pnp', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -712,7 +722,7 @@ describe('pnp', () => {
         expect(res.status).toBe(400)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.INVALID_INPUT,
         })
       })
@@ -729,7 +739,7 @@ describe('pnp', () => {
         expect(res.status).toBe(401)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
         })
       })
@@ -746,7 +756,7 @@ describe('pnp', () => {
         expect(res.status).toBe(401)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.UNAUTHENTICATED_USER,
         })
       })
@@ -775,7 +785,7 @@ describe('pnp', () => {
         expect(res.status).toBe(403)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: expectedQuota,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -802,7 +812,7 @@ describe('pnp', () => {
         expect(res.status).toBe(403)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: 0,
           totalQuota: 0,
           blockNumber: testBlockNumber,
@@ -838,7 +848,7 @@ describe('pnp', () => {
         expect(res.status).toBe(403)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: expectedQuota + 1,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -857,7 +867,7 @@ describe('pnp', () => {
         expect(res.status).toBe(500)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           performedQueryCount: performedQueryCount,
           totalQuota: expectedQuota,
           blockNumber: testBlockNumber,
@@ -868,7 +878,12 @@ describe('pnp', () => {
       it('Should respond with 503 on disabled api', async () => {
         const configWithApiDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
         configWithApiDisabled.api.phoneNumberPrivacy.enabled = false
-        const appWithApiDisabled = startSigner(configWithApiDisabled, db, keyProvider)
+        const appWithApiDisabled = startSigner(
+          configWithApiDisabled,
+          db,
+          keyProvider,
+          newKit('dummyKit')
+        )
 
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS1,
@@ -886,7 +901,7 @@ describe('pnp', () => {
         expect(res.status).toBe(503)
         expect(res.body).toStrictEqual<SignMessageResponseFailure>({
           success: false,
-          version: res.body.version,
+          version: expectedVersion,
           error: WarningMessage.API_UNAVAILABLE,
         })
       })
@@ -934,7 +949,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: -1,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
@@ -1012,7 +1027,12 @@ describe('pnp', () => {
         it('Should return 200 w/ warning on blockchain totalQuota query failure when shouldFailOpen is true', async () => {
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           // deplete user's quota
           const remainingQuota = expectedQuota - performedQueryCount
@@ -1058,7 +1078,7 @@ describe('pnp', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignature,
             performedQueryCount: expectedQuota + 1, // bc we depleted the user's quota above
             totalQuota: Number.MAX_SAFE_INTEGER,
@@ -1099,7 +1119,12 @@ describe('pnp', () => {
 
           const configWithFailOpenDisabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenDisabled.api.phoneNumberPrivacy.shouldFailOpen = false
-          const appWithFailOpenDisabled = startSigner(configWithFailOpenDisabled, db, keyProvider)
+          const appWithFailOpenDisabled = startSigner(
+            configWithFailOpenDisabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           const authorization = getPnpRequestAuthorization(req, PRIVATE_KEY1)
           const res = await sendRequest(
@@ -1113,7 +1138,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: -1,
             blockNumber: testBlockNumber,
@@ -1145,7 +1170,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             error: ErrorMessage.DATABASE_UPDATE_FAILURE,
           })
 
@@ -1184,7 +1209,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             error: ErrorMessage.DATABASE_INSERT_FAILURE,
           })
 
@@ -1216,7 +1241,12 @@ describe('pnp', () => {
 
           const configWithFailOpenEnabled: typeof _config = JSON.parse(JSON.stringify(_config))
           configWithFailOpenEnabled.api.phoneNumberPrivacy.shouldFailOpen = true
-          const appWithFailOpenEnabled = startSigner(configWithFailOpenEnabled, db, keyProvider)
+          const appWithFailOpenEnabled = startSigner(
+            configWithFailOpenEnabled,
+            db,
+            keyProvider,
+            newKit('dummyKit')
+          )
 
           // NOT the dek private key, so authentication would fail if getDataEncryptionKey succeeded
           const differentPk = '0x00000000000000000000000000000000000000000000000000000000ddddbbbb'
@@ -1231,7 +1261,7 @@ describe('pnp', () => {
           expect(res.status).toBe(200)
           expect(res.body).toStrictEqual<SignMessageResponseSuccess>({
             success: true,
-            version: res.body.version,
+            version: expectedVersion,
             signature: expectedSignature,
             performedQueryCount: performedQueryCount + 1,
             totalQuota: expectedQuota,
@@ -1258,7 +1288,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,
@@ -1309,7 +1339,7 @@ describe('pnp', () => {
           expect(res.status).toBe(500)
           expect(res.body).toStrictEqual<SignMessageResponseFailure>({
             success: false,
-            version: res.body.version,
+            version: expectedVersion,
             performedQueryCount: performedQueryCount,
             totalQuota: expectedQuota,
             blockNumber: testBlockNumber,

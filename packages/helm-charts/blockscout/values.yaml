@@ -55,6 +55,11 @@ blockscout:
       requests:
         memory: 1000Mi
         cpu: 2
+    rpcRegion: "indexer"  
+    primaryRpcRegion: "indexer"  
+    enableEventStream: false
+    beanstalkdPort: ""
+    beanstalkdHost: ""
   api:
     suffix:
       enabled: false
@@ -69,6 +74,8 @@ blockscout:
         minReplicas: 2
         target:
           cpu: 70
+    rpcRegion: "api"  
+    primaryRpcRegion: "indexer"  
     db:
       name: blockscout
       connectionName: project:region:db-name
@@ -215,6 +222,8 @@ blockscout:
       enabled: false
       reportUrl: ""
       makerdojo: ""
+    rpcRegion: "web"  
+    primaryRpcRegion: "indexer"  
   metadataCrawler:
     enabled: false
     schedule: "0 */2 * * *" # every 2 hours
