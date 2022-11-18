@@ -76,9 +76,9 @@ describe(getObfuscatedIdentifier, () => {
           serviceContext
         )
       ).resolves.toMatchObject({
-        offchainIdentifier: mockOffchainIdentifier,
+        plaintextIdentifier: mockOffchainIdentifier,
         pepper: expectedPepper,
-        identifierHash: expectedIdentifierHash,
+        obfuscatedIdentifier: expectedIdentifierHash,
         unblindedSignature: base64UnblindedSig,
       })
     })
@@ -105,15 +105,15 @@ describe(getObfuscatedIdentifier, () => {
         base64BlindedMessage
       )
 
-      const identifierHashDetails = await getObfuscatedIdentifierFromSignature(
+      const obfuscatedIdentifierDetails = await getObfuscatedIdentifierFromSignature(
         mockOffchainIdentifier,
         IdentifierType.PHONE_NUMBER,
         base64BlindSig,
         blsBlindingClient
       )
 
-      expect(identifierHashDetails.identifierHash).toEqual(expectedIdentifierHash)
-      expect(identifierHashDetails.pepper).toEqual(expectedPepper)
+      expect(obfuscatedIdentifierDetails.obfuscatedIdentifier).toEqual(expectedIdentifierHash)
+      expect(obfuscatedIdentifierDetails.pepper).toEqual(expectedPepper)
     })
   })
 
