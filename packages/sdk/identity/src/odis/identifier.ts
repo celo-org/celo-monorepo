@@ -103,11 +103,15 @@ export async function getObfuscatedIdentifier(
  */
 export async function getBlindedIdentifier(
   identifier: string,
+  identifierPrefix: string,
   blsBlindingClient: BlsBlindingClient,
   seed?: Buffer
 ): Promise<string> {
   debug('Retrieving blinded message')
-  const base64Identifier = Buffer.from(identifier).toString('base64')
+  const base64Identifier =
+    identifierPrefix === IdentifierPrefix.PHONE_NUMBER
+      ? Buffer.from(identifier).toString('base64')
+      : Buffer.from(getPrefixedIdentifier(identifier, identifierPrefix)).toString('base64')
   return blsBlindingClient.blindMessage(base64Identifier, seed)
 }
 
@@ -176,12 +180,18 @@ export async function getObfuscatedIdentifierFromSignature(
   }
 }
 
+export const getPrefixedIdentifier = (
+  plaintextIdentifier: string,
+  identifierPrefix: string
+): string => identifierPrefix + '://' + plaintextIdentifier
+
 export const getIdentifierHash = (
   plaintextIdentifier: string,
   identifierPrefix: string,
   pepper: string
 ): string => {
-  const value = identifierPrefix + '://' + plaintextIdentifier + PEPPER_SEPARATOR + pepper
+  const value =
+    getPrefixedIdentifier(plaintextIdentifier, identifierPrefix) + PEPPER_SEPARATOR + pepper
   return sha3(value) as string
 }
 
