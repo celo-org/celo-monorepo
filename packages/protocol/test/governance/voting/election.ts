@@ -81,6 +81,14 @@ contract('Election', (accounts: string[]) => {
     )
   })
 
+  async function setupGroup(newGroup: string, oldGroup: string, members: string[]) {
+    await mockValidators.setMembers(newGroup, members)
+    await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+    await election.markGroupEligible(newGroup, oldGroup, NULL_ADDRESS)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    await election.vote(newGroup, 1, oldGroup, NULL_ADDRESS)
+  }
+
   describe('#initialize()', () => {
     it('should have set the owner', async () => {
       const owner: string = await election.owner()
@@ -518,11 +526,7 @@ contract('Election', (accounts: string[]) => {
             await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
             for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
               newGroup = accounts[i + 2]
-              await mockValidators.setMembers(newGroup, [accounts[9]])
-              await registry.setAddressFor(CeloContractName.Validators, accounts[0])
-              await election.markGroupEligible(newGroup, group, NULL_ADDRESS)
-              await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-              await election.vote(newGroup, 1, group, NULL_ADDRESS)
+              await setupGroup(newGroup, group, [accounts[9]])
             }
           })
 
@@ -540,11 +544,7 @@ contract('Election', (accounts: string[]) => {
             await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
             for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
               newGroup = accounts[i + 2]
-              await mockValidators.setMembers(newGroup, [accounts[9]])
-              await registry.setAddressFor(CeloContractName.Validators, accounts[0])
-              await election.markGroupEligible(newGroup, group, NULL_ADDRESS)
-              await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-              await election.vote(newGroup, 1, group, NULL_ADDRESS)
+              await setupGroup(newGroup, group, [accounts[9]])
             }
           })
 
@@ -581,13 +581,6 @@ contract('Election', (accounts: string[]) => {
               await assertRevert(
                 election.setAllowedToVoteOverMaxNumberOfGroups(false),
                 'Too many groups voted for!'
-              )
-            })
-
-            it('should revert when calling getTotalVotesByAccount since it needs to be manually counted now', async () => {
-              await assertRevert(
-                election.getTotalVotesByAccount(accounts[0]),
-                'Total votes are not counted! Use updateTotalVotesByAccount.'
               )
             })
 
