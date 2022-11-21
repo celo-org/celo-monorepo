@@ -223,6 +223,22 @@ contract('Election', (accounts: string[]) => {
       assert.equal(await election.allowedToVoteOverMaxNumberOfGroups(accounts[0]), true)
     })
 
+    it('should revert when vote over max number of groups set to true', async () => {
+      await mockValidators.setValidator(accounts[0])
+      await assertRevert(
+        election.setAllowedToVoteOverMaxNumberOfGroups(true),
+        'Validators cannot vote for more than max number of groups'
+      )
+    })
+
+    it('should revert when vote over max number of groups set to true', async () => {
+      await mockValidators.setValidatorGroup(accounts[0])
+      await assertRevert(
+        election.setAllowedToVoteOverMaxNumberOfGroups(true),
+        'Validator groups cannot vote for more than max number of groups'
+      )
+    })
+
     it('should emit the AllowedToVoteOverMaxNumberOfGroups event', async () => {
       const resp = await election.setAllowedToVoteOverMaxNumberOfGroups(true)
       assert.equal(resp.logs.length, 1)
@@ -533,7 +549,18 @@ contract('Election', (accounts: string[]) => {
           })
 
           it('should allow to vote for another group', async () => {
-            await election.vote(group, value.minus(maxNumGroupsVotedFor), newGroup, NULL_ADDRESS)
+            const valueToVoteFor = value.minus(maxNumGroupsVotedFor)
+            const resp = await election.vote(group, valueToVoteFor, newGroup, NULL_ADDRESS)
+            assert.equal(resp.logs.length, 1)
+            const log = resp.logs[0]
+            assertContainSubset(log, {
+              event: 'ValidatorGroupVoteCast',
+              args: {
+                account: voter,
+                group,
+                value: new BigNumber(valueToVoteFor),
+              },
+            })
           })
 
           it('should total votes by account since max number of groups was not reached', async () => {
@@ -564,21 +591,13 @@ contract('Election', (accounts: string[]) => {
               )
             })
 
-            it('should revert when calling updateTotalVotesByAccount since it needs to be manually counted now', async () => {
-              await assertRevert(
-                election.updateTotalVotesByAccount(accounts[0]),
-                'Votes for group are not counted!'
-              )
-            })
-
-            describe('When total votes are manually counted on ', () => {
+            describe('When total votes are manually counted on', () => {
               beforeEach(async () => {
                 for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
                   newGroup = accounts[i + 2]
                   await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
                 }
                 await election.updateTotalVotesByAccountForGroup(accounts[0], group)
-                await election.updateTotalVotesByAccount(accounts[0])
               })
 
               it('should return total votes by account', async () => {
@@ -623,7 +642,6 @@ contract('Election', (accounts: string[]) => {
                   await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
                 }
                 await election.updateTotalVotesByAccountForGroup(accounts[0], group)
-                await election.updateTotalVotesByAccount(accounts[0])
 
                 const totalVotes = await election.getTotalVotesByAccount(accounts[0])
                 assertEqualBN(totalVotes, value.minus(originallyNotVotedWithAmount))
@@ -647,20 +665,12 @@ contract('Election', (accounts: string[]) => {
                     await election.revokeActive(group, value, newGroup, NULL_ADDRESS, 3)
                   })
 
-                  it('should revert when calling updateTotalVotesByAccount since cache needs to be recounted', async () => {
-                    await assertRevert(
-                      election.updateTotalVotesByAccount(accounts[0]),
-                      'Votes for group are not counted!'
-                    )
-                  })
-
                   it('should return correct value when manually counted', async () => {
                     for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
                       newGroup = accounts[i + 2]
                       await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
                     }
                     await election.updateTotalVotesByAccountForGroup(accounts[0], group)
-                    await election.updateTotalVotesByAccount(accounts[0])
 
                     const totalVotes = await election.getTotalVotesByAccount(accounts[0])
                     assertEqualBN(totalVotes, rewardValue.minus(originallyNotVotedWithAmount))
@@ -674,7 +684,6 @@ contract('Election', (accounts: string[]) => {
                       await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
                     }
                     await election.updateTotalVotesByAccountForGroup(accounts[0], group)
-                    await election.updateTotalVotesByAccount(accounts[0])
                   })
 
                   it('should return total votes by account', async () => {

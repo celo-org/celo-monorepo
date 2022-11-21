@@ -356,6 +356,10 @@ contract Validators is
     bytes calldata blsPop
   ) external nonReentrant returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(
+      !getElection().allowedToVoteOverMaxNumberOfGroups(account),
+      "Validators cannot vote for more than max number of groups"
+    );
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
@@ -741,6 +745,10 @@ contract Validators is
   function registerValidatorGroup(uint256 commission) external nonReentrant returns (bool) {
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(
+      !getElection().allowedToVoteOverMaxNumberOfGroups(account),
+      "Validator groups cannot vote for more than max number of groups"
+    );
     require(!isValidator(account), "Already registered as validator");
     require(!isValidatorGroup(account), "Already registered as group");
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);

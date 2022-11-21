@@ -504,14 +504,12 @@ contract Election is
     bool allowedToVoteOverMaxNumberOfGroupsForAccount = allowedToVoteOverMaxNumberOfGroups[account];
     address[] memory groups = votes.groupsVotedFor[account];
     require(
-      allowedToVoteOverMaxNumberOfGroupsForAccount || groups.length < maxNumGroupsVotedFor,
+      allowedToVoteOverMaxNumberOfGroupsForAccount || groups.length <= maxNumGroupsVotedFor,
       "Too many groups voted for"
     );
 
     if (groups.length > maxNumGroupsVotedFor) {
-      uint256 totalVotes = cachedVotesByAccount[account].totalVotes;
-      require(totalVotes > 0, "Total votes are not counted! Use updateTotalVotesByAccount.");
-      return totalVotes;
+      return cachedVotesByAccount[account].totalVotes;
     }
 
     uint256 total = 0;
@@ -527,27 +525,11 @@ contract Election is
    * @param group The address of the validator group.
    */
   function updateTotalVotesByAccountForGroup(address account, address group) external {
-    cachedVotesByAccount[account].cachedVotesPerGroup[group] = getTotalVotesForGroupByAccount(
-      group,
-      account
-    );
-  }
-
-  /**
-   * @notice Counts and caches account's total votes.
-   * @param account The address of the voting account.
-   */
-  function updateTotalVotesByAccount(address account) external {
-    uint256 total = 0;
-    address[] memory groups = votes.groupsVotedFor[account];
-    CachedVotes storage cachedVotesPerAccount = cachedVotesByAccount[account];
-    uint256 votesForGroup;
-    for (uint256 i = 0; i < groups.length; i = i.add(1)) {
-      votesForGroup = cachedVotesPerAccount.cachedVotesPerGroup[groups[i]];
-      require(votesForGroup > 0, "Votes for group are not counted!");
-      total = total.add(votesForGroup);
-    }
-    cachedVotesPerAccount.totalVotes = total;
+    cachedVotesByAccount[account].totalVotes -= cachedVotesByAccount[account]
+      .cachedVotesPerGroup[group];
+    uint256 newTotalVotesForGroupByAccount = getTotalVotesForGroupByAccount(group, account);
+    cachedVotesByAccount[account].cachedVotesPerGroup[group] = newTotalVotesForGroupByAccount;
+    cachedVotesByAccount[account].totalVotes += newTotalVotesForGroupByAccount;
   }
 
   /**
@@ -744,6 +726,7 @@ contract Election is
 
   /**
    * @notice Decrements the number of total votes for `group` by `value`.
+   * @param account The address of the voting account.
    * @param group The validator group whose vote total should be decremented.
    * @param value The number of votes to decrement.
    * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
@@ -763,12 +746,14 @@ contract Election is
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
     }
 
-    CachedVotes storage cachedVotes = cachedVotesByAccount[account];
-    cachedVotes.totalVotes -= Math.min(cachedVotes.totalVotes, value);
-    cachedVotes.cachedVotesPerGroup[group] -= Math.min(
-      cachedVotes.cachedVotesPerGroup[group],
-      value
-    );
+    if (allowedToVoteOverMaxNumberOfGroups[account]) {
+      CachedVotes storage cachedVotes = cachedVotesByAccount[account];
+      cachedVotes.totalVotes -= Math.min(cachedVotes.totalVotes, value);
+      cachedVotes.cachedVotesPerGroup[group] -= Math.min(
+        cachedVotes.cachedVotesPerGroup[group],
+        value
+      );
+    }
   }
 
   /**
@@ -1129,15 +1114,26 @@ contract Election is
    * @param flag The on/off flag.
    */
   function setAllowedToVoteOverMaxNumberOfGroups(bool flag) public {
+    address account = getAccounts().voteSignerToAccount(msg.sender);
+    IValidators validators = getValidators();
+    require(
+      !validators.isValidator(account),
+      "Validators cannot vote for more than max number of groups"
+    );
+    require(
+      !validators.isValidatorGroup(account),
+      "Validator groups cannot vote for more than max number of groups"
+    );
+
     if (!flag) {
       require(
-        votes.groupsVotedFor[msg.sender].length < maxNumGroupsVotedFor,
+        votes.groupsVotedFor[account].length <= maxNumGroupsVotedFor,
         "Too many groups voted for!"
       );
     }
 
-    allowedToVoteOverMaxNumberOfGroups[msg.sender] = flag;
-    emit AllowedToVoteOverMaxNumberOfGroups(msg.sender, flag);
+    allowedToVoteOverMaxNumberOfGroups[account] = flag;
+    emit AllowedToVoteOverMaxNumberOfGroups(account, flag);
   }
 
   // Struct to hold local variables for `forceDecrementVotes`.
