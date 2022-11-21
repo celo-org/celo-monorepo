@@ -106,6 +106,12 @@ spec:
           value: {{ .Values.blockscout.web.sourcify.repoUrl | quote }}
         - name: CHAIN_ID
           value: {{ .Values.blockscout.chain.networkID | quote }}
+        - name: MY_REGION
+          value: {{ .Values.blockscout.api.rpcRegion | quote }}
+        - name: FLY_REGION
+          value: {{ .Values.blockscout.api.rpcRegion | quote }}
+        - name: PRIMARY_REGION
+          value: {{ .Values.blockscout.api.primaryRpcRegion | quote }}
         {{- if .Values.blockscout.api.suffix.enabled }}
         - name: NETWORK_PATH
           value: /{{ .Values.blockscout.api.suffix.path }}

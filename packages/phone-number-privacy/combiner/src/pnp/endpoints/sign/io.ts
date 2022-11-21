@@ -25,7 +25,7 @@ import { BLSCryptographyClient } from '../../../common/crypto-clients/bls-crypto
 import { CryptoSession } from '../../../common/crypto-session'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
-import { OdisConfig, VERSION } from '../../../config'
+import { getCombinerVersion, OdisConfig } from '../../../config'
 
 export class PnpSignIO extends IO<SignMessageRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.PNP_SIGN
@@ -98,7 +98,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       response,
       {
         success: true,
-        version: VERSION,
+        version: getCombinerVersion(),
         signature,
         ...quotaStatus,
         warnings,
@@ -113,7 +113,7 @@ export class PnpSignIO extends IO<SignMessageRequest> {
       response,
       {
         success: false,
-        version: VERSION,
+        version: getCombinerVersion(),
         error,
       },
       status,

@@ -20,7 +20,7 @@ import { Request, Response } from 'express'
 import * as t from 'io-ts'
 import { IO } from '../../../common/io'
 import { Session } from '../../../common/session'
-import { VERSION } from '../../../config'
+import { getCombinerVersion } from '../../../config'
 
 export class DomainDisableIO extends IO<DisableDomainRequest> {
   readonly endpoint: CombinerEndpoint = CombinerEndpoint.DISABLE_DOMAIN
@@ -63,7 +63,7 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
       response,
       {
         success: true,
-        version: VERSION,
+        version: getCombinerVersion(),
         status: domainState,
       },
       status,
@@ -76,7 +76,7 @@ export class DomainDisableIO extends IO<DisableDomainRequest> {
       response,
       {
         success: false,
-        version: VERSION,
+        version: getCombinerVersion(),
         error,
       },
       status,

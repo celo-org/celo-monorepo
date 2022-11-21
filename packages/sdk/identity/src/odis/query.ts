@@ -52,19 +52,19 @@ export interface ServiceContext {
 }
 
 export const ODIS_ALFAJORES_CONTEXT: ServiceContext = {
-  odisUrl: 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net',
+  odisUrl: 'https://us-central1-celo-phone-number-privacy.cloudfunctions.net/combiner',
   odisPubKey:
     'kPoRxWdEdZ/Nd3uQnp3FJFs54zuiS+ksqvOm9x8vY6KHPG8jrfqysvIRU0wtqYsBKA7SoAsICMBv8C/Fb2ZpDOqhSqvr/sZbZoHmQfvbqrzbtDIPvUIrHgRS0ydJCMsA',
 }
 
 export const ODIS_ALFAJORESSTAGING_CONTEXT: ServiceContext = {
-  odisUrl: 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net',
+  odisUrl: 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combiner',
   odisPubKey:
     '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
 }
 
 export const ODIS_MAINNET_CONTEXT: ServiceContext = {
-  odisUrl: 'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net',
+  odisUrl: 'https://us-central1-celo-pgpnp-mainnet.cloudfunctions.net/combiner',
   odisPubKey:
     'FvreHfLmhBjwxHxsxeyrcOLtSonC9j7K3WrS4QapYsQH6LdaDTaNGmnlQMfFY04Bp/K4wAvqQwO9/bqPVCKf8Ze8OZo8Frmog4JY4xAiwrsqOXxug11+htjEe1pj4uMA',
 }
@@ -111,7 +111,7 @@ export async function queryOdis<R extends OdisRequest>(
   body: R,
   context: ServiceContext,
   endpoint: CombinerEndpoint,
-  responseSchema: t.Type<OdisResponse<R>>,
+  responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>,
   headers: OdisRequestHeader<R>
 ): Promise<OdisResponse<R>> {
   debug(`Posting to ${endpoint}`)

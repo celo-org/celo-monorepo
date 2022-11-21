@@ -15,7 +15,7 @@ import {
 import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
-import { config, getVersion } from '../../src/config'
+import { config, getSignerVersion } from '../../src/config'
 
 require('dotenv').config()
 
@@ -38,10 +38,10 @@ const {
 
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
 const ODIS_PUBLIC_POLYNOMIAL = process.env[
-  process.env.ODIS_PUBLIC_POLYNOMIAL_VAR_FOR_TESTS as string
+  process.env.ODIS_PNP_POLYNOMIAL_VAR_FOR_TESTS as string
 ] as string
 
-const ODIS_KEY_VERSION = (process.env.ODIS_KEY_VERSION || 1) as string
+const ODIS_KEY_VERSION = (process.env.ODIS_PNP_TEST_KEY_VERSION || 1) as string
 const DEFAULT_FORNO_URL = process.env.ODIS_BLOCKCHAIN_PROVIDER as string
 
 const kit = newKit(DEFAULT_FORNO_URL)
@@ -52,7 +52,7 @@ kit.addAccount(PRIVATE_KEY3)
 jest.setTimeout(60000)
 
 const signerUrl = process.env.ODIS_SIGNER_SERVICE_URL
-const expectedVersion = getVersion()
+const expectedVersion = getSignerVersion()
 
 describe(`Running against service deployed at ${signerUrl}`, () => {
   const singleQueryCost = config.quota.queryPriceInCUSD.times(1e18).toString()
@@ -232,7 +232,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         )
       })
 
-      it('Should respond with 200 on valid request with key version header', async () => {
+      it(`Should respond with 200 on valid request with key version ${ODIS_KEY_VERSION}`, async () => {
         // This value can also be modified but needs to be manually inspected in the signer logs
         // (on staging) since a valid key version that does not exist in the keystore
         // will default to the secretName stored in `KEYSTORE_AZURE_SECRET_NAME`

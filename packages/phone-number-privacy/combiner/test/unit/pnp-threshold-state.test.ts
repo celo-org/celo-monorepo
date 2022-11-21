@@ -7,7 +7,7 @@ import {
   SignMessageResponseSuccess,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
+import { getSignerVersion } from '@celo/phone-number-privacy-signer/src/config'
 import { Request, Response } from 'express'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
@@ -55,7 +55,7 @@ describe('pnp threshold state', () => {
   pnpConfig.keys.versions = JSON.stringify([keyVersionInfo])
   const pnpThresholdStateService = new PnpThresholdStateService()
 
-  const expectedVersion = getVersion()
+  const expectedVersion = getSignerVersion()
   const testBlockNumber = 1000000
   const totalQuota = 10
   const performedQueryCount = 5

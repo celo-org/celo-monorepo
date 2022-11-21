@@ -7,11 +7,14 @@ blockscout:
           requests:
             memory: 4Gi
             cpu: 500m
-    poolSize: 100
+    poolSize: 200
     resources:
       requests:
         memory: 12Gi
         cpu: 5
+    enableEventStream: true
+    beanstalkdPort: "11300"
+    beanstalkdHost: "rc1staging-governance-notifications-beanstalkd.event-notifications.svc.cluster.local"
   api:
     autoscaling:
       maxReplicas: 2
@@ -41,7 +44,7 @@ blockscout:
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet-production:us-west1:rc1staging
+      connectionName: celo-testnet-production:us-west1:rc1staging-replica
       proxy:
         resources:
           requests:

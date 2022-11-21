@@ -14,7 +14,7 @@ import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
 import { getWalletAddress } from '../../src/common/web3/contracts'
-import { config, getVersion } from '../../src/config'
+import { config, getSignerVersion } from '../../src/config'
 
 require('dotenv').config()
 
@@ -33,9 +33,9 @@ const { replenishQuota, registerWalletAddress, getBlindedPhoneNumber } = TestUti
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
 const ODIS_PUBLIC_POLYNOMIAL = process.env[
-  process.env.ODIS_PUBLIC_POLYNOMIAL_VAR_FOR_TESTS as string
+  process.env.ODIS_PNP_POLYNOMIAL_VAR_FOR_TESTS as string
 ] as string
-const ODIS_KEY_VERSION = (process.env.ODIS_KEY_VERSION || 1) as string
+const ODIS_KEY_VERSION = (process.env.ODIS_PNP_TEST_KEY_VERSION || 1) as string
 // Keep these checks as is to ensure backwards compatibility
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'
@@ -67,7 +67,7 @@ describe('Running against a deployed service', () => {
     const body = await response.json()
     // This checks against local package.json version, change if necessary
     expect(response.status).toBe(200)
-    expect(body.version).toBe(getVersion())
+    expect(body.version).toBe(getSignerVersion())
   })
 
   describe('Returns status 400 with invalid input', () => {
@@ -119,7 +119,11 @@ describe('Running against a deployed service', () => {
   })
 
   it('Returns 403 error when querying out of quota', async () => {
-    const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS1, Date.now())
+    const response = await postToSignMessage(
+      getRandomBlindedPhoneNumber(),
+      ACCOUNT_ADDRESS1,
+      Date.now()
+    )
     expect(response.status).toBe(403)
   })
 

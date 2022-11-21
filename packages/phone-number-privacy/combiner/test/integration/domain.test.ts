@@ -14,6 +14,7 @@ import {
   DomainRestrictedSignatureResponse,
   ErrorMessage,
   genSessionID,
+  getContractKit,
   KEY_VERSION_HEADER,
   PoprfClient,
   SequentialDelayDomain,
@@ -126,16 +127,12 @@ const signerConfig: SignerConfig = {
       clientSecret: '',
       tenant: '',
       vaultName: '',
-      secretName: '',
     },
     google: {
       projectId: '',
-      secretName: '',
-      secretVersion: 'latest',
     },
     aws: {
       region: '',
-      secretName: '',
       secretKey: '',
     },
   },
@@ -266,7 +263,7 @@ describe('domainService', () => {
       ])
     )
 
-    app = startCombiner(combinerConfig)
+    app = startCombiner(combinerConfig, getContractKit(combinerConfig.blockchain))
   })
 
   beforeEach(async () => {
@@ -412,8 +409,10 @@ describe('domainService', () => {
           JSON.stringify(combinerConfig)
         )
         configWithApiDisabled.domains.enabled = false
-        const appWithApiDisabled = startCombiner(configWithApiDisabled)
-
+        const appWithApiDisabled = startCombiner(
+          configWithApiDisabled,
+          getContractKit(configWithApiDisabled.blockchain)
+        )
         const req = await disableRequest()
 
         const res = await request(appWithApiDisabled)
@@ -555,7 +554,10 @@ describe('domainService', () => {
           JSON.stringify(combinerConfig)
         )
         configWithApiDisabled.domains.enabled = false
-        const appWithApiDisabled = startCombiner(configWithApiDisabled)
+        const appWithApiDisabled = startCombiner(
+          configWithApiDisabled,
+          getContractKit(configWithApiDisabled.blockchain)
+        )
 
         const req = await quotaRequest()
 
@@ -763,22 +765,6 @@ describe('domainService', () => {
         })
       })
 
-      it('Should respond with 400 on invalid key version', async () => {
-        const [badRequest, _] = await signatureRequest()
-
-        const res = await request(app)
-          .post(CombinerEndpoint.DOMAIN_SIGN)
-          .set(KEY_VERSION_HEADER, 'a')
-          .send(badRequest)
-
-        expect(res.status).toBe(400)
-        expect(res.body).toStrictEqual<DomainRestrictedSignatureResponse>({
-          success: false,
-          version: res.body.version,
-          error: WarningMessage.INVALID_KEY_VERSION_REQUEST,
-        })
-      })
-
       it('Should respond with 400 on unsupported key version', async () => {
         const [badRequest, _] = await signatureRequest()
 
@@ -892,7 +878,10 @@ describe('domainService', () => {
           JSON.stringify(combinerConfig)
         )
         configWithApiDisabled.domains.enabled = false
-        const appWithApiDisabled = startCombiner(configWithApiDisabled)
+        const appWithApiDisabled = startCombiner(
+          configWithApiDisabled,
+          getContractKit(configWithApiDisabled.blockchain)
+        )
 
         const [req, _] = await signatureRequest()
 

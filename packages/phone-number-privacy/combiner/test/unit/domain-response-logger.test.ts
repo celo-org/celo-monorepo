@@ -8,7 +8,7 @@ import {
   rootLogger,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
-import { getVersion } from '@celo/phone-number-privacy-signer/src/config'
+import { getSignerVersion } from '@celo/phone-number-privacy-signer/src/config'
 import { Request, Response } from 'express'
 import { Session } from '../../src/common/session'
 import config from '../../src/config'
@@ -40,7 +40,7 @@ describe('domain response logger', () => {
     return session
   }
 
-  const version = getVersion()
+  const version = getSignerVersion()
   const counter = 1
   const disabled = false
   const timer = 10000
