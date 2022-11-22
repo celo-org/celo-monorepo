@@ -62,7 +62,12 @@ export async function getPhoneNumberIdentifier(
     blsBlindingClient = new WasmBlsBlindingClient(context.odisPubKey)
   }
 
-  const base64BlindedMessage = await getBlindedIdentifier(e164Number, blsBlindingClient, seed)
+  const base64BlindedMessage = await getBlindedIdentifier(
+    e164Number,
+    IdentifierPrefix.PHONE_NUMBER,
+    blsBlindingClient,
+    seed
+  )
 
   const base64BlindSig = await getBlindedIdentifierSignature(
     account,

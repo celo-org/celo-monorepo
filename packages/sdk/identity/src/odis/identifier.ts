@@ -76,6 +76,7 @@ export async function getObfuscatedIdentifier(
 
   const base64BlindedMessage = await getBlindedIdentifier(
     plaintextIdentifier,
+    identifierPrefix,
     blsBlindingClient,
     seed
   )

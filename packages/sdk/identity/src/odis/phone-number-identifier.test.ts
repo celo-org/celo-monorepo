@@ -4,7 +4,7 @@ import {
   getBlindedIdentifier,
   getBlindedIdentifierSignature,
   getObfuscatedIdentifierFromSignature,
-  IdentifierType,
+  IdentifierPrefix,
 } from './identifier'
 import {
   getPhoneNumberIdentifier,
@@ -65,7 +65,11 @@ describe(getPhoneNumberIdentifier, () => {
       })
 
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
-      const base64BlindedMessage = await getBlindedIdentifier(mockE164Number, blsBlindingClient)
+      const base64BlindedMessage = await getBlindedIdentifier(
+        mockE164Number,
+        IdentifierPrefix.PHONE_NUMBER,
+        blsBlindingClient
+      )
       const base64BlindSig = await getBlindedIdentifierSignature(
         mockAccount,
         authSigner,
@@ -94,7 +98,11 @@ describe(getPhoneNumberIdentifier, () => {
       })
 
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
-      const base64BlindedMessage = await getBlindedIdentifier(mockE164Number, blsBlindingClient)
+      const base64BlindedMessage = await getBlindedIdentifier(
+        mockE164Number,
+        IdentifierPrefix.PHONE_NUMBER,
+        blsBlindingClient
+      )
 
       const base64BlindSig = await getBlindedIdentifierSignature(
         mockAccount,
@@ -105,12 +113,12 @@ describe(getPhoneNumberIdentifier, () => {
 
       const phoneNumberHashDetails = await getObfuscatedIdentifierFromSignature(
         mockE164Number,
-        IdentifierType.PHONE_NUMBER,
+        IdentifierPrefix.PHONE_NUMBER,
         base64BlindSig,
         blsBlindingClient
       )
 
-      expect(phoneNumberHashDetails.identifierHash).toEqual(expectedPhoneHash)
+      expect(phoneNumberHashDetails.obfuscatedIdentifier).toEqual(expectedPhoneHash)
       expect(phoneNumberHashDetails.pepper).toEqual(expectedPepper)
     })
   })

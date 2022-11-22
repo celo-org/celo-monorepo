@@ -1472,6 +1472,24 @@
     fp-ts "2.1.1"
     io-ts "2.0.1"
 
+"@celo/identity@1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-1.5.2.tgz#6401aeefbf7893374f6f940c9e0918d0a75d0411"
+  integrity sha512-/9JTL5P4xTY37hgu6qh5tU1d2GS3duBjP3QL600Zz1KAQrUVgb8g8JPpiRY21oEK6L7ZoNTukQJIuM3sbi//vg==
+  dependencies:
+    "@celo/base" "1.5.2"
+    "@celo/contractkit" "1.5.2"
+    "@celo/phone-number-privacy-common" "1.0.39"
+    "@celo/utils" "1.5.2"
+    "@types/debug" "^4.1.5"
+    bignumber.js "^9.0.0"
+    blind-threshold-bls "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a"
+    cross-fetch "3.0.4"
+    debug "^4.1.1"
+    elliptic "^6.5.4"
+    fp-ts "2.1.1"
+    io-ts "2.0.1"
+
 "@celo/identity@2.3.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@celo/identity/-/identity-2.3.0.tgz#aede2269adbb9edc0332007357d34b3c20b0920a"

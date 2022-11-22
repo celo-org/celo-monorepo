@@ -6,7 +6,7 @@ import {
   getObfuscatedIdentifier,
   getObfuscatedIdentifierFromSignature,
   getPepperFromThresholdSignature,
-  IdentifierType,
+  IdentifierPrefix,
 } from './identifier'
 import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
 
@@ -21,9 +21,9 @@ jest.mock('./bls-blinding-client', () => {
   }
 })
 
-const mockOffchainIdentifier = '+14155550000'
+const mockOffchainIdentifier = 'twitterHandle'
 const mockAccount = '0x0000000000000000000000000000000000007E57'
-const expectedIdentifierHash = '0xf3ddadd1f488cdd42b9fa10354fdcae67c303ce182e71b30855733b50dce8301'
+const expectedIdentifierHash = '0x36fda45dcdb40c403f8387e56ca7913f851dc66cde3f4e17843953dcc8947650'
 const expectedPepper = 'nHIvMC9B4j2+H'
 
 const serviceContext: ServiceContext = {
@@ -57,6 +57,7 @@ describe(getObfuscatedIdentifier, () => {
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
       const base64BlindedMessage = await getBlindedIdentifier(
         mockOffchainIdentifier,
+        IdentifierPrefix.TWITTER,
         blsBlindingClient
       )
       const base64BlindSig = await getBlindedIdentifierSignature(
@@ -70,7 +71,7 @@ describe(getObfuscatedIdentifier, () => {
       await expect(
         getObfuscatedIdentifier(
           mockOffchainIdentifier,
-          IdentifierType.PHONE_NUMBER,
+          IdentifierPrefix.TWITTER,
           mockAccount,
           authSigner,
           serviceContext
@@ -95,6 +96,7 @@ describe(getObfuscatedIdentifier, () => {
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
       const base64BlindedMessage = await getBlindedIdentifier(
         mockOffchainIdentifier,
+        IdentifierPrefix.TWITTER,
         blsBlindingClient
       )
 
@@ -107,7 +109,7 @@ describe(getObfuscatedIdentifier, () => {
 
       const obfuscatedIdentifierDetails = await getObfuscatedIdentifierFromSignature(
         mockOffchainIdentifier,
-        IdentifierType.PHONE_NUMBER,
+        IdentifierPrefix.TWITTER,
         base64BlindSig,
         blsBlindingClient
       )
@@ -123,7 +125,7 @@ describe(getObfuscatedIdentifier, () => {
     await expect(
       getObfuscatedIdentifier(
         mockOffchainIdentifier,
-        IdentifierType.PHONE_NUMBER,
+        IdentifierPrefix.PHONE_NUMBER,
         mockAccount,
         authSigner,
         serviceContext
@@ -136,7 +138,7 @@ describe(getObfuscatedIdentifier, () => {
     await expect(
       getObfuscatedIdentifier(
         mockOffchainIdentifier,
-        IdentifierType.PHONE_NUMBER,
+        IdentifierPrefix.PHONE_NUMBER,
         mockAccount,
         authSigner,
         serviceContext
