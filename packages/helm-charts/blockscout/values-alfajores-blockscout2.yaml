@@ -39,7 +39,7 @@ blockscout:
       maxReplicas: 3
       minReplicas: 2
       target:
-        cpu: 20
+        cpu: 70
     db:
       connectionName: celo-testnet-production:us-west1:alfajores2-replica
       proxy:
