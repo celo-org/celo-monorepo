@@ -7,7 +7,7 @@ blockscout:
           requests:
             memory: 250Mi
             cpu: 200m
-    poolSize: 20
+    poolSize: 200
     resources:
       requests:
         memory: 700Mi
@@ -39,15 +39,15 @@ blockscout:
       maxReplicas: 3
       minReplicas: 2
       target:
-        cpu: 70
+        cpu: 20
     db:
-      connectionName: celo-testnet-production:us-west1:alfajores2
+      connectionName: celo-testnet-production:us-west1:alfajores2-replica
       proxy:
         resources:
           requests:
             memory: 250Mi
             cpu: 200m
-    poolSize: 10
+    poolSize: 20
     resources:
       requests:
         memory: 250M
