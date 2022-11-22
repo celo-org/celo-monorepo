@@ -29,8 +29,10 @@ const currentServiceContext = getServiceContext('alfajores')
 describe('backwards compatibility', () => {
   beforeAll(() => {
     fetchMock.reset()
+    // disables the mock, lets all calls fall through to the actual network
     fetchMock.spy()
   })
+
   it('should match when using EncryptionSigner', async () => {
     const oldRes = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
       mockE164Number,
