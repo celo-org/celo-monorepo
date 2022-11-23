@@ -31,13 +31,14 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
 
   async distribute(session: Session<R>): Promise<void> {
     const obs = new PerformanceObserver((list) => {
-      const entry = list.getEntries()[0]
-      session.logger.info(
-        { latency: entry, signer: entry!.name },
-        'Signer response latency measured'
-      )
+      list.getEntries().forEach((entry) => {
+        session.logger.info(
+          { latency: entry, signer: entry!.name },
+          'Signer response latency measured'
+        )
+      })
     })
-    obs.observe({ entryTypes: ['measure'], buffered: true })
+    obs.observe({ entryTypes: ['measure'], buffered: false })
 
     const timeout = setTimeout(() => {
       session.timedOut = true
@@ -59,6 +60,11 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     let signerFetchResult: FetchResponse | undefined
     try {
       signerFetchResult = await this.io.fetchSignerResponseWithFallback(signer, session)
+      session.logger.info({
+        message: 'Received signerFetchResult',
+        signer: signer.url,
+        status: signerFetchResult.status,
+      })
     } catch (err) {
       session.logger.debug({ err }, 'signer request failure')
       if (err instanceof Error && err.name === 'AbortError' && session.abort.signal.aborted) {
@@ -94,6 +100,8 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
       session.logger.debug({
         message: 'Received signerFetchResult on unsuccessful signer response',
         res: await signerFetchResult.json(),
+        status: signerFetchResult.status,
+        signer: signer.url,
       })
     }
     return this.addFailureToSession(signer, signerFetchResult?.status ?? 502, session)
