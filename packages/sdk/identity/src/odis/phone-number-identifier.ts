@@ -3,14 +3,9 @@ import { CombinerEndpointPNP } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import { createHash } from 'crypto'
 import debugFactory from 'debug'
-import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
-import {
-  getBlindedIdentifier,
-  getBlindedIdentifierSignature,
-  getObfuscatedIdentifierFromSignature,
-  IdentifierPrefix,
-} from './identifier'
-import { AuthenticationMethod, AuthSigner, EncryptionKeySigner, ServiceContext } from './query'
+import { BlsBlindingClient } from './bls-blinding-client'
+import { getObfuscatedIdentifier, IdentifierPrefix } from './identifier'
+import { AuthSigner, ServiceContext } from './query'
 
 // ODIS minimum dollar balance for sig retrieval
 export const ODIS_MINIMUM_DOLLAR_BALANCE = 0.01
@@ -48,48 +43,23 @@ export async function getPhoneNumberIdentifier(
     throw new Error(`Invalid phone number: ${e164Number}`)
   }
 
-  let seed: Buffer | undefined
-  if (blindingFactor) {
-    seed = Buffer.from(blindingFactor)
-  } else if (signer.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
-    seed = Buffer.from((signer as EncryptionKeySigner).rawKey)
-  }
-
-  // Fallback to using Wasm version if not specified
-
-  if (!blsBlindingClient) {
-    debug('No BLSBlindingClient found, using WasmBlsBlindingClient')
-    blsBlindingClient = new WasmBlsBlindingClient(context.odisPubKey)
-  }
-
-  const base64BlindedMessage = await getBlindedIdentifier(
-    e164Number,
-    IdentifierPrefix.PHONE_NUMBER,
-    blsBlindingClient,
-    seed
-  )
-
-  const base64BlindSig = await getBlindedIdentifierSignature(
-    account,
-    signer,
-    context,
-    base64BlindedMessage,
-    clientVersion,
-    sessionID,
-    keyVersion,
-    endpoint ?? CombinerEndpointPNP.PNP_SIGN
-  )
-
   const {
     plaintextIdentifier,
     obfuscatedIdentifier: identifierHash,
     pepper,
     unblindedSignature,
-  } = await getObfuscatedIdentifierFromSignature(
+  } = await getObfuscatedIdentifier(
     e164Number,
     IdentifierPrefix.PHONE_NUMBER,
-    base64BlindSig,
-    blsBlindingClient
+    account,
+    signer,
+    context,
+    blindingFactor,
+    clientVersion,
+    blsBlindingClient,
+    sessionID,
+    keyVersion,
+    endpoint
   )
   return { e164Number: plaintextIdentifier, phoneHash: identifierHash, pepper, unblindedSignature }
 }

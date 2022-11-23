@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "2.3.1-dev",
-    "@celo/identity": "2.3.1-dev",
+    "@celo/identity": "1.5.2",
     "@celo/keystores": "2.3.1-dev",
     "@celo/phone-utils": "2.3.1-dev",
     "bignumber.js": "^9.0.0",

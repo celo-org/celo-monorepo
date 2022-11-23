@@ -1,7 +1,7 @@
 import { getPhoneHash } from '@celo/base'
-import { OdisUtils } from '@celo/identity'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { randomBytes } from 'crypto'
+import { OdisUtils } from 'old-identity-sdk'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getBlindedIdentifier,
@@ -31,6 +31,7 @@ describe('backwards compatibility', () => {
     fetchMock.reset()
     // disables the mock, lets all calls fall through to the actual network
     fetchMock.spy()
+    jest.setTimeout(20000)
   })
 
   it('should match when using EncryptionSigner', async () => {

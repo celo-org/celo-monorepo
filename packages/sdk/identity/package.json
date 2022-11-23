@@ -45,7 +45,7 @@
     "@types/elliptic": "^6.4.12",
     "@celo/flake-tracker": "0.0.1-dev",
     "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da",
-    "@celo/identity": "1.5.2"
+    "old-identity-sdk": "npm:@celo/identity@1.5.2"
   },
   "engines": {
     "node": ">=12.9.0"

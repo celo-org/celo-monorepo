@@ -32,6 +32,13 @@ export enum IdentifierPrefix {
   // feel free to put up a PR to add more types!
 }
 
+// plaintext identifier: off-chain information, ex: phone number, twitter handle, email, etc.
+// blinded identifier: obtained by blinding the plaintext identifier
+// blinded signature: blinded identifier signed by ODIS
+// unblinded signatue: obtained by unblinding the blinded signature
+// pepper: unique secret, obtained by hashing the unblinded signature
+// obfuscated identifier: identifier used for on-chain attestations, obtained by hashing the plaintext identifier and pepper
+
 export interface IdentifierHashDetails {
   // plaintext off-chain phone number, twitter handle, email, etc.
   plaintextIdentifier: string
@@ -56,7 +63,9 @@ export async function getObfuscatedIdentifier(
   blindingFactor?: string,
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient,
-  sessionID?: string
+  sessionID?: string,
+  keyVersion?: number,
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
 ): Promise<IdentifierHashDetails> {
   debug('Getting identifier pepper')
 
@@ -87,7 +96,9 @@ export async function getObfuscatedIdentifier(
     context,
     base64BlindedMessage,
     clientVersion,
-    sessionID
+    sessionID,
+    keyVersion,
+    endpoint ?? CombinerEndpointPNP.PNP_SIGN
   )
 
   return getObfuscatedIdentifierFromSignature(
@@ -109,6 +120,8 @@ export async function getBlindedIdentifier(
   seed?: Buffer
 ): Promise<string> {
   debug('Retrieving blinded message')
+  // phone number identifiers don't have prefixes in the blinding stage
+  // to maintain backwards compatibility wih ASv1
   const base64Identifier =
     identifierPrefix === IdentifierPrefix.PHONE_NUMBER
       ? Buffer.from(identifier).toString('base64')
@@ -162,7 +175,7 @@ export async function getBlindedIdentifierSignature(
  */
 export async function getObfuscatedIdentifierFromSignature(
   plaintextIdentifier: string,
-  identifierType: string | IdentifierPrefix,
+  identifierType: string,
   base64BlindedSignature: string,
   blsBlindingClient: BlsBlindingClient
 ): Promise<IdentifierHashDetails> {
