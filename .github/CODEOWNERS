@@ -10,18 +10,19 @@
 /packages/attestation-proxy/ @celo-org/identity
 /packages/attestation-service/ @celo-org/identity
 /packages/azure/ @celo-org/devopsre
-/packages/celotool/ @celo-org/protocol-owners
+/packages/celotool/ @celo-org/devopsre
 /packages/cli/ @celo-org/applications
 /packages/dev-utils/ @celo-org/applications
 /packages/docs/ @celo-org/applications @celo-org/devrel
-/packages/env-tests @celo-org/cap
+/packages/env-tests @celo-org/applications
 /packages/faucet/ @celo-org/applications
 /packages/flake-tracker @celo-org/flake-trackers
 /packages/helm-charts/ @celo-org/devopsre
-/packages/helm-charts/oracle/ @celo-org/platform-economics  @celo-org/devopsre
+/packages/helm-charts/blockscout/ @celo-org/data-services @celo-org/devopsre
+/packages/helm-charts/oracle/ @celo-org/mento  @celo-org/devopsre
 /packages/metadata-crawler/ @celo-org/identity
 /packages/phone-number-privacy/ @celo-org/identity
-/packages/protocol/ @celo-org/cap @celo-org/protocol-owners
+/packages/protocol/ @celo-org/primitives @celo-org/identity @celo-org/applications
 /packages/sdk/ @celo-org/applications
 /packages/sdk/identity/  @celo-org/identity @celo-org/applications
 /packages/sdk/contractkit/ @celo-org/cap @celo-org/applications
