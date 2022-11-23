@@ -97,7 +97,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
       }
     }
     if (signerFetchResult) {
-      session.logger.debug({
+      session.logger.info({
         message: 'Received signerFetchResult on unsuccessful signer response',
         res: await signerFetchResult.json(),
         status: signerFetchResult.status,
