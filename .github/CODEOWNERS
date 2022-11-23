@@ -14,9 +14,9 @@
 /packages/cli/ @celo-org/applications
 /packages/dev-utils/ @celo-org/applications
 /packages/docs/ @celo-org/applications @celo-org/devrel
-/packages/env-tests @celo-org/applications
+/packages/env-tests/ @celo-org/applications
 /packages/faucet/ @celo-org/applications
-/packages/flake-tracker @celo-org/flake-trackers
+/packages/flake-tracker/ @celo-org/flake-trackers
 /packages/helm-charts/ @celo-org/devopsre
 /packages/helm-charts/blockscout/ @celo-org/data-services @celo-org/devopsre
 /packages/helm-charts/oracle/ @celo-org/mento  @celo-org/devopsre
