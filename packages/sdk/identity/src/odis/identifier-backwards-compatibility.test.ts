@@ -1,6 +1,5 @@
 import { getPhoneHash } from '@celo/base'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
-import { randomBytes } from 'crypto'
 import { OdisUtils } from 'old-identity-sdk'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
@@ -26,12 +25,11 @@ const authSigner: AuthSigner = {
 const oldServiceContext = OdisUtils.Query.getServiceContext('alfajores')
 const currentServiceContext = getServiceContext('alfajores')
 
-describe('backwards compatibility', () => {
+describe('backwards compatibility of phone number identifiers', () => {
   beforeAll(() => {
     fetchMock.reset()
     // disables the mock, lets all calls fall through to the actual network
     fetchMock.spy()
-    jest.setTimeout(20000)
   })
 
   it('should match when using EncryptionSigner', async () => {
@@ -50,14 +48,17 @@ describe('backwards compatibility', () => {
       currentServiceContext
     )
 
-    expect(oldRes.e164Number).toMatch(currRes.plaintextIdentifier)
-    expect(oldRes.phoneHash).toMatch(currRes.obfuscatedIdentifier)
-    expect(oldRes.pepper).toMatch(currRes.pepper)
-  })
+    expect(oldRes.e164Number).toEqual(currRes.plaintextIdentifier)
+    expect(oldRes.phoneHash).toEqual(currRes.obfuscatedIdentifier)
+    expect(oldRes.pepper).toEqual(currRes.pepper)
+  }, 20000)
 
-  it('blinded identifier', async () => {
+  it('blinded identifier should match', async () => {
     const blsBlindingClient = new WasmBlsBlindingClient('')
-    const seed = randomBytes(32)
+    const seed = Buffer.from(
+      '44714c0a2b2bacec757a67822a4fbbdfe043cca8c6ae936545ef992f246df1a9',
+      'hex'
+    )
     const oldRes = await OdisUtils.PhoneNumberIdentifier.getBlindedPhoneNumber(
       mockE164Number,
       blsBlindingClient,
@@ -70,10 +71,10 @@ describe('backwards compatibility', () => {
       seed
     )
 
-    expect(oldRes).toMatch(currentRes)
+    expect(oldRes).toEqual(currentRes)
   })
 
-  it('obfuscated identifier', async () => {
+  it('obfuscated identifier should match', async () => {
     const pepper = 'randomPepper'
 
     const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
@@ -81,6 +82,27 @@ describe('backwards compatibility', () => {
 
     const currRes = getIdentifierHash(mockE164Number, IdentifierPrefix.PHONE_NUMBER, pepper)
 
-    expect(oldRes).toMatch(currRes)
+    expect(oldRes).toEqual(currRes)
+  })
+
+  it('should not match when different prefix used', async () => {
+    const oldRes = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+      mockE164Number,
+      mockAccount,
+      authSigner,
+      oldServiceContext
+    )
+
+    const currRes = await getObfuscatedIdentifier(
+      mockE164Number,
+      'badPrefix',
+      mockAccount,
+      authSigner,
+      currentServiceContext
+    )
+
+    expect(oldRes.e164Number).toEqual(currRes.plaintextIdentifier)
+    expect(oldRes.phoneHash).not.toEqual(currRes.obfuscatedIdentifier)
+    expect(oldRes.pepper).not.toEqual(currRes.pepper)
   })
 })

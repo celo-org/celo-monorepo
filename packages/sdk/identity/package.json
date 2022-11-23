@@ -20,7 +20,7 @@
     "docs": "typedoc",
     "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 28",
     "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --testPathIgnorePatterns src/odis/identifier-backwards-compatibility.test.ts",
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
   },
