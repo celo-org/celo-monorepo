@@ -171,9 +171,9 @@ export async function meterResponse(
     const eventLoopLag = Date.now() - eventLoopLagMeasurementStart
     logger.info({ eventLoopLag }, 'Measure event loop lag')
   })
-  const startMark = `Begin ${handler.name}`
-  const endMark = `End ${handler.name}`
-  const entryName = `${handler.name} latency`
+  const startMark = `Begin ${endpoint}`
+  const endMark = `End ${endpoint}`
+  const entryName = `${endpoint} latency`
 
   const obs = new PerformanceObserver((list) => {
     const entry = list.getEntriesByName(entryName)[0]
@@ -181,7 +181,7 @@ export async function meterResponse(
       logger.info({ latency: entry }, 'e2e response latency measured')
     }
   })
-  obs.observe({ entryTypes: ['measure'], buffered: true })
+  obs.observe({ entryTypes: ['measure'], buffered: false })
 
   performance.mark(startMark)
   await handler(req, res)
