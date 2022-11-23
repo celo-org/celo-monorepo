@@ -25,7 +25,7 @@
 /packages/protocol/ @celo-org/primitives @celo-org/identity @celo-org/applications
 /packages/sdk/ @celo-org/applications
 /packages/sdk/identity/  @celo-org/identity @celo-org/applications
-/packages/sdk/contractkit/ @celo-org/cap @celo-org/applications
+/packages/sdk/contractkit/ @celo-org/applications
 /packages/terraform-modules-public/ @celo-org/devopsre
 /packages/terraform-modules/ @celo-org/devopsre
 /packages/typescript/ @celo-org/applications
