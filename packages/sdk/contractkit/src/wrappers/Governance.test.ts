@@ -181,6 +181,47 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       expect(yesVotes).toEqBigNumber(voteWeight)
     })
 
+    it('#getVoteRecord', async () => {
+      const voter = accounts[2]
+      await proposeFn(accounts[0])
+      await timeTravel(expConfig.dequeueFrequency, web3)
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+      await approveFn()
+      await voteFn(voter)
+
+      const voteWeight = await governance.getVoteWeight(voter)
+      const yesVotes = (await governance.getVotes(proposalID))[VoteValue.Yes]
+      expect(yesVotes).toEqBigNumber(voteWeight)
+
+      const voteRecord = await governance.getVoteRecord(voter, proposalID)
+      expect(voteRecord?.yesVotes).toEqBigNumber(voteWeight)
+      expect(voteRecord?.noVotes).toEqBigNumber(0)
+      expect(voteRecord?.abstainVotes).toEqBigNumber(0)
+    })
+
+    it('#votePartially', async () => {
+      await proposeFn(accounts[0])
+      await timeTravel(expConfig.dequeueFrequency, web3)
+      await governance.dequeueProposalsIfReady().sendAndWaitForReceipt()
+      await approveFn()
+
+      const yes = 10
+      const no = 20
+      const abstain = 0
+
+      const tx = await governance.votePartially(proposalID, yes, no, abstain)
+      await tx.sendAndWaitForReceipt({ from: accounts[2] })
+      await timeTravel(expConfig.referendumStageDuration, web3)
+
+      const votes = await governance.getVotes(proposalID)
+      const yesVotes = votes[VoteValue.Yes]
+      const noVotes = votes[VoteValue.No]
+      const abstainVotes = votes[VoteValue.Abstain]
+      expect(yesVotes).toEqBigNumber(yes)
+      expect(noVotes).toEqBigNumber(no)
+      expect(abstainVotes).toEqBigNumber(abstain)
+    })
+
     it(
       '#execute',
       async () => {
@@ -212,7 +253,14 @@ testWithGanache('Governance Wrapper', (web3: Web3) => {
       expect(proposer.refundedDeposits).toEqBigNumber(minDeposit)
 
       const voter = await governance.getVoter(accounts[2])
-      const expectedVoteRecord = { proposalID, votes: new BigNumber(ONE_CGLD), value: 'Yes' }
+      const expectedVoteRecord = {
+        proposalID,
+        votes: new BigNumber(0),
+        value: VoteValue.None,
+        abstainVotes: new BigNumber(0),
+        noVotes: new BigNumber(0),
+        yesVotes: new BigNumber('1000000000000000000'),
+      }
       expect(voter.votes[0]).toEqual(expectedVoteRecord)
     })
   })

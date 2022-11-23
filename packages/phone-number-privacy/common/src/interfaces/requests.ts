@@ -9,6 +9,7 @@ import { verifyEIP712TypedDataSigner } from '@celo/utils/lib/signatureUtils'
 import { chain, isRight } from 'fp-ts/lib/Either'
 import { pipe } from 'fp-ts/lib/pipeable'
 import * as t from 'io-ts'
+import { KEY_VERSION_HEADER } from '..'
 import {
   Domain,
   domainEIP712Types,
@@ -23,87 +24,106 @@ import {
 // of interface. Otherwise the compiler complains about a missing index signature.
 // tslint:disable:interface-over-type-literal
 
-export enum PhoneNumberPrivacyEndpoint {
-  STATUS = '/status',
-  METRICS = '/metrics',
-  GET_BLINDED_MESSAGE_PARTIAL_SIG = '/getBlindedMessagePartialSig',
-  GET_QUOTA = '/getQuota',
-}
-
-export enum DomainEndpoint {
-  DISABLE_DOMAIN = '/domain/disable',
-  DOMAIN_SIGN = '/domain/sign/',
-  DOMAIN_QUOTA_STATUS = '/domain/quotaStatus',
-}
-
-export type SignerEndpoint = PhoneNumberPrivacyEndpoint | DomainEndpoint
-export const SignerEndpoint = { ...PhoneNumberPrivacyEndpoint, ...DomainEndpoint }
-
-export enum CombinerEndpoint {
-  SIGN_MESSAGE = '/getBlindedMessageSig',
-  MATCHMAKING = '/getContactMatches',
-}
-
-export type Endpoint = SignerEndpoint | CombinerEndpoint
-export const Endpoint = { ...SignerEndpoint, ...CombinerEndpoint }
-
 export enum AuthenticationMethod {
   WALLET_KEY = 'wallet_key',
   ENCRYPTION_KEY = 'encryption_key',
 }
 
-export interface GetBlindedMessageSigRequest {
+export interface SignMessageRequest {
   /** Celo account address. Query is charged against this account's quota. */
   account: string
-  /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod?: AuthenticationMethod
   /** Query message. A blinded elliptic curve point encoded in base64. */
   blindedQueryPhoneNumber: string
-  /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
-  hashedPhoneNumber?: string
+  /** Authentication method to use for verifying the signature in the Authorization header */
+  authenticationMethod?: string
   /** Client-specified session ID for the request. */
   sessionID?: string
   /** Client-specified version string */
   version?: string
 }
 
-export interface GetContactMatchesRequest {
-  account: string
-  /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod?: AuthenticationMethod
-  userPhoneNumber: string // obfuscated with deterministic salt
-  contactPhoneNumbers: string[] // obfuscated with deterministic salt
-  hashedPhoneNumber: string // on-chain identifier
-  signedUserPhoneNumber?: string // signed with DEK
-  sessionID?: string
-  /** Client-specified version string */
-  version?: string
+/** previously known as GetBlindedMessageSigRequest */
+export interface LegacySignMessageRequest extends SignMessageRequest {
+  /** Optional on-chain identifier. Unlocks additional quota if the account is verified as an owner of the identifier. */
+  hashedPhoneNumber?: string
 }
 
-export interface GetQuotaRequest {
+export const SignMessageRequestSchema: t.Type<SignMessageRequest> = t.intersection([
+  t.type({
+    account: t.string,
+    blindedQueryPhoneNumber: t.string,
+  }),
+  t.partial({
+    authenticationMethod: t.union([t.string, t.undefined]),
+    sessionID: t.union([t.string, t.undefined]),
+    version: t.union([t.string, t.undefined]),
+  }),
+])
+
+export const LegacySignMessageRequestSchema: t.Type<LegacySignMessageRequest> = t.intersection([
+  SignMessageRequestSchema,
+  t.partial({
+    hashedPhoneNumber: t.union([t.string, t.undefined]),
+  }),
+])
+
+export interface PnpQuotaRequest {
   account: string
   /** Authentication method to use for verifying the signature in the Authorization header */
-  authenticationMethod?: AuthenticationMethod
-  hashedPhoneNumber?: string // on-chain identifier
+  authenticationMethod?: string
+  /** Client-specified session ID for the request. */
   sessionID?: string
   /** Client-specified version string */
   version?: string
 }
+export interface LegacyPnpQuotaRequest extends PnpQuotaRequest {
+  /** User's ODIS generated on-chain identifier */
+  hashedPhoneNumber?: string
+}
+
+// Backwards compatibility
+export declare type GetQuotaRequest = LegacyPnpQuotaRequest
+
+export const PnpQuotaRequestSchema: t.Type<PnpQuotaRequest> = t.intersection([
+  t.type({
+    account: t.string,
+  }),
+  t.partial({
+    authenticationMethod: t.union([t.string, t.undefined]),
+    sessionID: t.union([t.string, t.undefined]),
+    version: t.union([t.string, t.undefined]),
+  }),
+])
+
+export const LegacyPnpQuotaRequestSchema: t.Type<LegacyPnpQuotaRequest> = t.intersection([
+  PnpQuotaRequestSchema,
+  t.partial({
+    hashedPhoneNumber: t.union([t.string, t.undefined]),
+  }),
+])
 
 export type PhoneNumberPrivacyRequest =
-  | GetBlindedMessageSigRequest
-  | GetContactMatchesRequest
-  | GetQuotaRequest
+  | SignMessageRequest
+  | LegacySignMessageRequest
+  | PnpQuotaRequest
+  | LegacyPnpQuotaRequest
+
+export enum DomainRequestTypeTag {
+  SIGN = 'DomainRestrictedSignatureRequest',
+  QUOTA = 'DomainQuotaStatusRequest',
+  DISABLE = 'DisableDomainRequest',
+}
 
 /**
  * Domain restricted signature request to get a pOPRF evaluation on the given message in a given
  * domain, as specified by CIP-40.
  *
- * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If the specified Domain has associated options, then the options field is
- * required. If not, it must not be provided.
+ * @remarks Concrete request types are created by specifying the type parameter for Domain. If a
+ * domain has no options, an empty struct should be used.
  */
 export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = {
+  /** Request type tag to ensure this type can be distinguished from other request objects. */
+  type: DomainRequestTypeTag.SIGN
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
   domain: D
   /**
@@ -125,11 +145,12 @@ export type DomainRestrictedSignatureRequest<D extends Domain = Domain> = {
  * Options may be provided for authentication in case the quota state is non-public information.
  * E.g. Quota state may reveal whether or not a user has attempted to recover a given account.
  *
- * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If the specified Domain has associated options, then the options field is
- * required. If not, it must not be provided.
+ * @remarks Concrete request types are created by specifying the type parameter for Domain. If a
+ * domain has no options, an empty struct should be used.
  */
 export type DomainQuotaStatusRequest<D extends Domain = Domain> = {
+  /** Request type tag to ensure this type can be distinguished from other request objects. */
+  type: DomainRequestTypeTag.QUOTA
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
   domain: D
   /** Domain-specific options. */
@@ -145,11 +166,12 @@ export type DomainQuotaStatusRequest<D extends Domain = Domain> = {
  *
  * Options may be provided for authentication to prevent unintended parties from disabling a domain.
  *
- * @remarks Concrete request types are created by specifying the type parameters for Domain and
- * DomainOptions. If the specified Domain has associated options, then the options field is
- * required. If not, it must not be provided.
+ * @remarks Concrete request types are created by specifying the type parameter for Domain. If a
+ * domain has no options, an empty struct should be used.
  */
 export type DisableDomainRequest<D extends Domain = Domain> = {
+  /** Request type tag to ensure this type can be distinguished from other request objects. */
+  type: DomainRequestTypeTag.DISABLE
   /** Domain specification. Selects the PRF domain and rate limiting rules. */
   domain: D
   /** Domain-specific options. */
@@ -164,8 +186,10 @@ export type DomainRequest<D extends Domain = Domain> =
   | DomainQuotaStatusRequest<D>
   | DisableDomainRequest<D>
 
+export type OdisRequest<D extends Domain = Domain> = DomainRequest<D> | PhoneNumberPrivacyRequest
+
 // NOTE: Next three functions are a bit repetitive. An attempt was made to combine them, but the
-// type signature got quite complicated. Feel free to attempt it if you are motivated. TODO(Alec)
+// type signature got quite complicated. Feel free to attempt it if you are motivated.
 
 /** Parameterized schema for checking unknown input against DomainRestrictedSignatureRequest */
 export function domainRestrictedSignatureRequestSchema<D extends Domain = Domain>(
@@ -175,6 +199,7 @@ export function domainRestrictedSignatureRequestSchema<D extends Domain = Domain
   // domain and options fields. We wrap the schema below to add a consistency check.
   const schema = t.strict({
     domain,
+    type: t.literal(DomainRequestTypeTag.SIGN),
     options: t.unknown,
     blindedMessage: t.string,
     sessionID: eip712OptionalSchema(t.string),
@@ -220,6 +245,7 @@ export function domainQuotaStatusRequestSchema<D extends Domain = Domain>(
   // domain and options fields. We wrap the schema below to add a consistency check.
   const schema = t.strict({
     domain,
+    type: t.literal(DomainRequestTypeTag.QUOTA),
     options: t.unknown,
     sessionID: eip712OptionalSchema(t.string),
   })
@@ -261,6 +287,7 @@ export function disableDomainRequestSchema<D extends Domain = Domain>(
   // domain and options fields. We wrap the schema below to add a consistency check.
   const schema = t.strict({
     domain,
+    type: t.literal(DomainRequestTypeTag.DISABLE),
     options: t.unknown,
     sessionID: eip712OptionalSchema(t.string),
   })
@@ -303,9 +330,9 @@ export function domainRestrictedSignatureRequestEIP712<D extends Domain>(
   return {
     types: {
       DomainRestrictedSignatureRequest: [
+        { name: 'type', type: 'string' },
         { name: 'blindedMessage', type: 'string' },
         { name: 'domain', type: domainTypes.primaryType },
-        // Only include the `options` field in the EIP-712 type if there are options.
         { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
@@ -335,8 +362,8 @@ export function domainQuotaStatusRequestEIP712<D extends Domain>(
   return {
     types: {
       DomainQuotaStatusRequest: [
+        { name: 'type', type: 'string' },
         { name: 'domain', type: domainTypes.primaryType },
-        // Only include the `options` field in the EIP-712 type if there are options.
         { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
@@ -366,8 +393,8 @@ export function disableDomainRequestEIP712<D extends Domain>(
   return {
     types: {
       DisableDomainRequest: [
+        { name: 'type', type: 'string' },
         { name: 'domain', type: domainTypes.primaryType },
-        // Only include the `options` field in the EIP-712 type if there are options.
         { name: 'options', type: optionsTypes.primaryType },
         { name: 'sessionID', type: 'Optional<string>' },
       ],
@@ -432,43 +459,83 @@ function verifyRequestSignature<R extends DomainRequest<SequentialDelayDomain>>(
 }
 
 /**
- * Verifies the signature over a signature request for authenticated domains.
+ * Verifies the authentication (e.g. client signature) over a domain signature request.
  * If the domain is unauthenticated, this function returns false.
  *
- * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
+ * @remarks As specified in CIP-40, the signed message is the full request interpreted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
  * to the undefined value for type EIP712Optional<string>).
  */
-export function verifyDomainRestrictedSignatureRequestSignature(
+export function verifyDomainRestrictedSignatureRequestAuthenticity(
   request: DomainRestrictedSignatureRequest<SequentialDelayDomain>
 ): boolean {
   return verifyRequestSignature(domainRestrictedSignatureRequestEIP712, request)
 }
 
 /**
- * Verifies the signature over a domain quota status request for authenticated domains.
+ * Verifies the authentication (e.g. client signature) over a domain status request.
  * If the domain is unauthenticated, this function returns false.
  *
- * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
+ * @remarks As specified in CIP-40, the signed message is the full request interpreted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
  * to the undefined value for type EIP712Optional<string>).
  */
-export function verifyDomainQuotaStatusRequestSignature(
+export function verifyDomainQuotaStatusRequestAuthenticity(
   request: DomainQuotaStatusRequest<SequentialDelayDomain>
 ): boolean {
   return verifyRequestSignature(domainQuotaStatusRequestEIP712, request)
 }
 
 /**
- * Verifies the signature over a disable domain request for authenticated domains.
+ * Verifies the authentication (e.g. client signature) over a disable domain request.
  * If the domain is unauthenticated, this function returns false.
  *
- * @remarks As specified in CIP-40, the signed message is the full request interpretted as EIP-712
+ * @remarks As specified in CIP-40, the signed message is the full request interpreted as EIP-712
  * typed data with the signature field in the domain options set to its zero value (i.e. It is set
  * to the undefined value for type EIP712Optional<string>).
  */
-export function verifyDisableDomainRequestSignature(
+export function verifyDisableDomainRequestAuthenticity(
   request: DisableDomainRequest<SequentialDelayDomain>
 ): boolean {
   return verifyRequestSignature(disableDomainRequestEIP712, request)
 }
+
+interface PnpAuthHeader {
+  Authorization: string
+}
+
+interface KeyVersionHeader {
+  [KEY_VERSION_HEADER]?: string
+}
+
+export type DomainRestrictedSignatureRequestHeader = KeyVersionHeader
+export type DisableDomainRequestHeader = undefined
+export type DomainQuotaStatusRequestHeader = undefined
+
+export type DomainRequestHeader<
+  R extends DomainRequest
+> = R extends DomainRestrictedSignatureRequest
+  ? DomainRestrictedSignatureRequestHeader
+  : never | R extends DisableDomainRequest
+  ? DisableDomainRequestHeader
+  : never | R extends DomainQuotaStatusRequest
+  ? DomainQuotaStatusRequestHeader
+  : never
+
+export type SignMessageRequestHeader = KeyVersionHeader & PnpAuthHeader
+
+export type PnpQuotaRequestHeader = PnpAuthHeader
+
+export type PhoneNumberPrivacyRequestHeader<R extends PhoneNumberPrivacyRequest> = R extends
+  | SignMessageRequest
+  | LegacySignMessageRequest
+  ? SignMessageRequestHeader
+  : never | R extends PnpQuotaRequest
+  ? PnpQuotaRequestHeader
+  : never
+
+export type OdisRequestHeader<R extends OdisRequest> = R extends DomainRequest
+  ? DomainRequestHeader<R>
+  : never | R extends PhoneNumberPrivacyRequest
+  ? PhoneNumberPrivacyRequestHeader<R>
+  : never

@@ -15,15 +15,15 @@ import {
   DomainQuotaStatusResponse,
   domainQuotaStatusResponseSchema,
   DomainQuotaStatusResponseSuccess,
+  DomainRequestTypeTag,
   DomainRestrictedSignatureRequest,
   domainRestrictedSignatureRequestEIP712,
   DomainRestrictedSignatureResponse,
-  DomainRestrictedSignatureResponseSchema,
+  domainRestrictedSignatureResponseSchema,
   DomainRestrictedSignatureResponseSuccess,
   genSessionID,
   PoprfClient,
   SequentialDelayDomain,
-  SequentialDelayDomainState,
   SequentialDelayDomainStateSchema,
 } from '@celo/phone-number-privacy-common'
 import { defined, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
@@ -81,28 +81,26 @@ export async function odisHardenKey(
   const sessionID = genSessionID()
 
   // Request the quota status for the domain to get the state, including the quota counter.
-  const quotaResp = await requestOdisQuotaStatus(domain, environment, sessionID, wallet)
+  const quotaResp = await requestOdisDomainQuotaStatus(domain, environment, sessionID, wallet)
   if (!quotaResp.ok) {
     return quotaResp
   }
 
   // Check locally whether or not we should expect to be able to make a query to ODIS right now.
-  // TODO(victor) Using Date.now is actually not appropriate because mobile clients may have a large
-  // clock drift. Modify this to use a time returned from ODIS either in the status response, or as
-  // part of the 429 response upon rejecting the signature request. Risk with the latter approach is
-  // that unless replay handling is implemented, having the request accepted by half of the signers,
-  // but rejected by the other half can get the client into a bad state.
-  const quotaState = quotaResp.result.status as SequentialDelayDomainState
-  const { accepted, notBefore } = checkSequentialDelayRateLimit(
+  // Note that this uses the servers timestamp through the `quotaState.now` field. This is because
+  // mobile clients may have a large clock drift. This prevents that clock drift from resulting in
+  // misinterpretations of the domain quota.
+  const quotaState = quotaResp.result.status
+  const quotaResult = checkSequentialDelayRateLimit(
     domain,
-    // Dividing by 1000 to convert ms to seconds for the rate limit check.
-    Date.now() / 1000,
+    // Use the local clock as a fallback. Divide by 1000 to get seconds from ms.
+    quotaState.now ?? Date.now() / 1000,
     quotaState
   )
-  if (!accepted) {
+  if (!quotaResult.accepted) {
     return Err(
       new OdisRateLimitingError(
-        notBefore,
+        quotaResult.notBefore,
         new Error('client does not currently have quota based on status response.')
       )
     )
@@ -168,13 +166,24 @@ export function odisQueryAuthorizer(nonce: Buffer): { address: Address; wallet: 
   return { address, wallet }
 }
 
-async function requestOdisQuotaStatus(
+/**
+ * Returns a hardened key derived from the input key material and a POPRF evaluation on that keying
+ * material under the given rate limiting domain.
+ *
+ * @param domain Rate limiting configuration and domain input to the ODIS POPRF.
+ * @param environment Information for the targeted ODIS environment.
+ * @param sessionID client-defined session ID for tracking requests across services
+ * @param wallet Wallet with access to the authorizer signing key specified in the domain input.
+ *        Should be provided if the input domain is authenticated.
+ */
+export async function requestOdisDomainQuotaStatus(
   domain: SequentialDelayDomain,
   environment: OdisServiceContext,
   sessionID: string,
   wallet?: EIP712Wallet
 ): Promise<Result<DomainQuotaStatusResponseSuccess, BackupError>> {
   const quotaStatusReq: DomainQuotaStatusRequest<SequentialDelayDomain> = {
+    type: DomainRequestTypeTag.QUOTA,
     domain,
     options: {
       signature: noString,
@@ -183,7 +192,7 @@ async function requestOdisQuotaStatus(
     sessionID: defined(sessionID),
   }
 
-  // If a query authorizer is defined in the domain, include a siganture over the request.
+  // If a query authorizer is defined in the domain, include a signature over the request.
   const authorizer = domain.address.defined ? domain.address.value : undefined
   if (authorizer !== undefined) {
     if (wallet === undefined || !wallet.hasAccount(authorizer)) {
@@ -230,6 +239,7 @@ async function requestOdisDomainSignature(
   wallet?: EIP712Wallet
 ): Promise<Result<DomainRestrictedSignatureResponseSuccess, BackupError>> {
   const signatureReq: DomainRestrictedSignatureRequest<SequentialDelayDomain> = {
+    type: DomainRequestTypeTag.SIGN,
     domain,
     options: {
       signature: noString,
@@ -262,7 +272,7 @@ async function requestOdisDomainSignature(
       signatureReq,
       environment,
       DomainEndpoint.DOMAIN_SIGN,
-      DomainRestrictedSignatureResponseSchema
+      domainRestrictedSignatureResponseSchema(SequentialDelayDomainStateSchema)
     )
   } catch (error) {
     if ((error as Error).message?.includes(ErrorMessages.ODIS_FETCH_ERROR)) {

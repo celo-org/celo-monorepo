@@ -27,12 +27,14 @@ export class WasmBlsBlindingClient implements BlsBlindingClient {
   constructor(odisPubKey: string) {
     this.odisPubKey = Buffer.from(odisPubKey, 'base64')
     // Dynamically load the Wasm library
-    if (!this.isReactNativeEnvironment()) {
-      this.thresholdBls = require('blind-threshold-bls')
-    } else {
-      // When using react instead rely upon this library instead
-      // https://github.com/celo-org/react-native-blind-threshold-bls#cc36392
+    // Checkout out documentation for alternative runtime environments:
+    // https://github.com/celo-org/identity/tree/ASv2/asv2#runtime-environments
+    if (this.isReactNativeEnvironment()) {
       throw new Error('Cannot use WasmBlsBlindingClient in a React Native app')
+    } else if (this.isBrowserEnvironment()) {
+      throw new Error('Cannot use WasmBlsBlindingClient in a browser environment')
+    } else {
+      this.thresholdBls = require('blind-threshold-bls')
     }
   }
 
@@ -67,4 +69,8 @@ export class WasmBlsBlindingClient implements BlsBlindingClient {
   private isReactNativeEnvironment(): boolean {
     return typeof navigator !== 'undefined' && navigator.product === 'ReactNative'
   }
+
+  // https://stackoverflow.com/questions/17575790/environment-detection-node-js-or-browser
+  // tslint:disable-next-line: function-constructor
+  private isBrowserEnvironment = new Function('try {return this===window;}catch(e){ return false;}')
 }

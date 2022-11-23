@@ -1,9 +1,8 @@
-import { randomBytes } from 'crypto'
-
 // Note that this import is only ever used for its type information. As a result, it will not be
 // included in the compiled JavaScript or result in an import at runtime.
 // https://www.typescriptlang.org/docs/handbook/modules.html#optional-module-loading-and-other-advanced-loading-scenarios
 import * as POPRF from '@celo/poprf'
+import { randomBytes } from 'crypto'
 
 /**
  * @module
@@ -35,7 +34,7 @@ let _poprf: typeof POPRF | undefined
  * functionality, it should add @celo/poprf to its dependencies (i.e. package.json).
  */
 function poprf(): typeof POPRF {
-  // TODO(victor): This will only initially work in Node environments. If we want to have this work in
+  // TODO: This will only initially work in Node environments. If we want to have this work in
   // ReactNative and browser environments, some work will need to be done in @celo/poprf or here.
   if (_poprf === undefined) {
     try {
@@ -140,7 +139,7 @@ export class PoprfCombiner {
 
   /**
    * If there are enough responses provided, aggregates the collection of partial evaluations
-   * to a single PORF evaluation.
+   * to a single POPRF evaluation.
    *
    * @param response An array of partial evaluation responses.
    * @returns A buffer with a POPRF evaluation, or undefined if there are less than the threshold
@@ -159,7 +158,7 @@ export class PoprfCombiner {
  * Client for interacting with a threshold implementation of the POPRF service without a combiner.
  *
  * @privateRemarks
- * TODO(victor) Combine this class with the functionality from the combiner to create a POPRF client
+ * TODO Combine this class with the functionality from the combiner to create a POPRF client
  * that can handle expunging bad partial evaluations from a set of responses.
  */
 export class ThresholdPoprfClient extends PoprfClient {

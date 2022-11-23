@@ -41,12 +41,14 @@ export const getLayout = (artifact: Artifact, artifacts: BuildArtifacts) => {
 }
 
 const selectIncompatibleOperations = (diff: Operation[]) =>
-  diff.filter(operation => operation.action !== 'append')
+  diff.filter(operation => operation.action !== 'append'
+  && !(operation.action === 'rename' && (`deprecated_${operation.original.label}` === operation.updated.label && operation.original.type === operation.updated.type)))
 
 export interface ASTStorageCompatibilityReport {
   contract: string
   compatible: boolean
   errors: string[]
+  expanded?: boolean
 }
 
 const operationToDescription = (operation: Operation) => {
@@ -70,6 +72,9 @@ const operationToDescription = (operation: Operation) => {
       break
     case 'rename':
       message = `variable ${updated.label} was renamed from ${original.label}`
+      break
+    case 'replace':
+      message = `variable ${updated.label} was replaced from ${original.label}`
       break
     case 'append':
       message = `variable ${updated.label} was appended`
@@ -97,11 +102,33 @@ const generateLayoutCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayo
   }
 }
 
-const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
+const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo, structExpandable: boolean) => {
   if (oldType.kind !== 'struct') {
     return {
       same: false,
       errors: [`${newType.label} wasn't a struct type, now is`]
+    }
+  }
+
+  if (structExpandable && oldType.members.length < newType.members.length) {
+    const expandableErrors = oldType.members.map((oldMember, i) => {
+      const newMember = newType.members[i]
+
+      if (oldMember.label !== newMember.label && `deprecated_${oldMember.label}` !== newMember.label) {
+        return `struct ${newType.label} had ${oldMember.label} in slot ${i}, now has ${newMember.label}`
+      }
+  
+      if (oldMember.type !== newMember.type) {
+        return `struct ${newType.label}'s member ${newMember.label} changed type from ${oldMember.type} to ${newMember.type}`
+      }
+    }).filter(error => error)
+
+    if (expandableErrors.length === 0) {
+      return {
+        same: true,
+        expanded: true,
+        errors: []
+      }
     }
   }
 
@@ -114,7 +141,7 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
 
   const memberErrors = newType.members.map((newMember, i) => {
     const oldMember = oldType.members[i]
-    if (oldMember.label !== newMember.label) {
+    if (oldMember.label !== newMember.label && `deprecated_${oldMember.label}` !== newMember.label) {
       return `struct ${newType.label} had ${oldMember.label} in slot ${i}, now has ${newMember.label}`
     }
 
@@ -131,31 +158,42 @@ const compareStructDefinitions = (oldType: TypeInfo, newType: TypeInfo) => {
   }
 }
 
-const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo) => {
+// Struct is expandable only if used in mappings or arrays
+const isStructExpandable = (oldType: TypeInfo, oldLayout: StorageLayoutInfo) => {
+  const structString = `t_struct<${oldType.label}>`
+  return !oldLayout.storage.some(storage => storage.type === structString)
+}
+
+const generateStructsCompatibilityReport = (oldLayout: StorageLayoutInfo, newLayout: StorageLayoutInfo): {compatible: boolean, errors: any[], expanded?: boolean} => {
   let compatible = true
   let errors = []
+  let expanded: boolean
 
   Object.keys(newLayout.types).forEach(typeName => {
     const newType = newLayout.types[typeName]
     const oldType = oldLayout.types[typeName]
 
     if (newType.kind === 'struct' && oldType !== undefined) {
-      const structReport = compareStructDefinitions(oldType, newType)
+      const structExpandable = isStructExpandable(oldType, oldLayout)
+      const structReport = compareStructDefinitions(oldType, newType, structExpandable)
       if (!structReport.same) {
         compatible = false
         errors = errors.concat(structReport.errors)
       }
+      expanded = structReport.expanded
     }
   })
 
   return {
     compatible,
-    errors
+    errors,
+    expanded
   }
 }
 
 export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts: BuildArtifacts,
-                       newArtifact: Artifact, newArtifacts: BuildArtifacts) => {
+                       newArtifact: Artifact, newArtifacts: BuildArtifacts)
+                       : {contract: string, compatible: boolean, errors: any[], expanded?: boolean } => {
       const oldLayout = getLayout(oldArtifact, oldArtifacts)
       const newLayout = getLayout(newArtifact, newArtifacts)
       const layoutReport = generateLayoutCompatibilityReport(oldLayout, newLayout)
@@ -163,7 +201,8 @@ export const generateCompatibilityReport  = (oldArtifact: Artifact, oldArtifacts
       return {
         contract: newArtifact.contractName,
         compatible: layoutReport.compatible && structsReport.compatible,
-        errors: layoutReport.errors.concat(structsReport.errors)
+        errors: layoutReport.errors.concat(structsReport.errors),
+        expanded: structsReport.expanded
       }
 }
 
