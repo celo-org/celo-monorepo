@@ -52,11 +52,27 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     ? MAINNET_START_TIME
     : new Date(config.releaseStartTime).getTime() / 1000
 
-  console.info(releaseStartTime)
+  // console.info(releaseStartTime)
 
-  const weiAmountReleasedPerPeriod = new BigNumber(
-    web3.utils.toWei(config.amountReleasedPerPeriod.toString())
+  // console.log(config.amountReleasedPerPeriod)
+
+  // console.log(new BigNumber(config.amountReleasedPerPeriod).toFixed(0))
+
+  // console.log("here")
+
+  // console.log(1)
+  // web3.utils.toWei(new BigNumber(config.amountReleasedPerPeriod).toFixed(0))
+  // console.log(2)
+  // web3.utils.toBN(web3.utils.toWei(config.amountReleasedPerPeriod.toFixed(0)))
+
+  // const weiAmountReleasedPerPeriod = web3.utils.toBN(web3.utils.toWei(new BigNumber(config.amountReleasedPerPeriod).toFixed(0)))
+  const weiAmountReleasedPerPeriod = web3.utils.toWei(
+    new BigNumber(config.amountReleasedPerPeriod).toFixed(0)
   )
+
+  // const weiAmountReleasedPerPeriod = new BigNumber(
+  //   web3.utils.toWei(config.amountReleasedPerPeriod.toFixed(0))
+  // )
 
   // let totalValue = weiAmountReleasedPerPeriod.multipliedBy(config.numReleasePeriods)
 
@@ -65,7 +81,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     config.releaseCliffTime,
     config.numReleasePeriods,
     config.releasePeriod,
-    weiAmountReleasedPerPeriod.toFixed(),
+    weiAmountReleasedPerPeriod,
     config.revocable,
     config.beneficiary,
     config.releaseOwner,
@@ -161,6 +177,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   console.info('Initializing ReleaseGoldProxy...')
   let releaseGoldTxHash
   try {
+    console.log(contractInitializationArgs)
     releaseGoldTxHash = await _setInitialProxyImplementation(
       web3,
       releaseGoldInstance,
@@ -168,7 +185,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
       'ReleaseGold',
       {
         from: fromAddress,
-        value: '0', // here this shuold be zero, but printing the amounts in the terminal
+        value: null, // here this shuold be zero, but printing the amounts in the terminal
       },
       ...contractInitializationArgs
     )
@@ -240,6 +257,8 @@ module.exports = async (callback: (error?: any) => number) => {
       ],
     })
 
+    console.log('gola')
+
     ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
     ReleaseGoldMultiSigProxy = artifacts.require('ReleaseGoldMultiSigProxy')
     ReleaseGold = artifacts.require('ReleaseGold')
@@ -250,9 +269,9 @@ module.exports = async (callback: (error?: any) => number) => {
     // inputs to be added by the terminal
     const beneficiary = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA' // todo Changethis
     const months = 12
-    const oneTimePaymentUSD = 3000
-    const monthlyPaymentUSD = 700
-    const numberOfNodes = 1
+    const oneTimePaymentUSD = 6000 // For up to three nodes (not defined yet for more than three nodes)
+    const monthlyPaymentUSD = 1500
+    const numberOfNodes = 3
 
     const celoPrice = await fetchCeloPrice()
     console.log()
@@ -278,7 +297,24 @@ module.exports = async (callback: (error?: any) => number) => {
     console.log(`Using address for Community fund (Governance Proxy) ${governanceProxyAddress}`)
 
     const now = new Date()
-    const grantStartDay = new Date(now.getTime() + 60 * 60 * 24 * 10 * 1000) // 10 days from now
+    const grantStartDay = new Date(now.getTime() + 60 * 60 * 24 * 10 * 1000) // 10 days from now, the aprox time a governance proposal takes to pass
+
+    const configOneTimePayment: ReleaseGoldConfig = {
+      identifier: beneficiary,
+      releaseStartTime: grantStartDay.toISOString(), // one week from deploy time
+      releaseCliffTime: 60 * 60 * 24 * 30 * 3, // 3 months
+      numReleasePeriods: 1,
+      releasePeriod: 1,
+      amountReleasedPerPeriod: Math.floor(oneTimePaymentCELO.toNumber()),
+      revocable: true,
+      beneficiary: beneficiary,
+      releaseOwner: governanceProxyAddress,
+      refundAddress: governanceProxyAddress,
+      subjectToLiquidityProvision: false,
+      initialDistributionRatio: 1000,
+      canValidate: false,
+      canVote: false,
+    }
 
     const config: ReleaseGoldConfig = {
       identifier: beneficiary,
@@ -297,16 +333,16 @@ module.exports = async (callback: (error?: any) => number) => {
       canVote: false,
     }
 
-    const RGInfo = await handleGrant(config, 1)
-    if (RGInfo) {
-      const RGAddress = RGInfo.ContractAddress
+    const RGInfoOneTime = await handleGrant(configOneTimePayment, 1)
+    const RGInfoCurrent = await handleGrant(config, 1)
 
-      console.log("Here's the snippet that should be added to the proposal for this ")
-      printfundingProposal(oneTimePaymentCELO.toFixed(0), beneficiary)
+    if (RGInfoCurrent && RGInfoOneTime) {
+      console.log("Here's the snippet that should be added to the proposal for this: ")
+      printfundingProposal(oneTimePaymentCELO.toFixed(0), RGInfoOneTime.ContractAddress)
       console.log(',')
       printfundingProposal(
         monthlyPaymentCELO.multipliedBy(months).multipliedBy(zeros).toFixed(0),
-        RGAddress
+        RGInfoCurrent.ContractAddress
       )
       console.log('')
     } else {
