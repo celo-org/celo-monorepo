@@ -9,7 +9,15 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/tls-acme: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: 8m
+    {{- if .Values.blockscout.web.suffix.enabled }}
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- end }}
     nginx.ingress.kubernetes.io/configuration-snippet: |
+      {{- if .Values.blockscout.web.suffix.enabled }}
+      location ~ ^/(?!({{ .Values.blockscout.web.suffix.path }})) {
+        return 307 /{{ .Values.blockscout.web.suffix.path }}$request_uri;
+      }
+      {{- end }}
       location ~ /admin/.* {
         deny all;
       }
@@ -26,27 +34,42 @@ spec:
   ingressClassName: {{ default "nginx" .Values.ingressClassName }}
   tls:
   - hosts:
-    - {{ .Release.Name }}.{{ .Values.domain.name }}.org
+    - {{ .Release.Name }}.{{ .Values.blockscout.domainName }}
     secretName: {{ .Release.Name }}-web-tls
   rules:
-  - host: {{ .Release.Name }}.{{ .Values.domain.name }}.org
+  - host: {{ .Release.Name }}.{{ .Values.blockscout.domainName }}
     http:
       paths:
-      - path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
+      -
+        {{- if .Values.blockscout.web.suffix.enabled }}
+        path: /({{ .Values.blockscout.web.suffix.path }})/(api/v1/(decompiled_smart_contract|verified_smart_contracts))
+        {{ else }}
+        path: /api/v1/(decompiled_smart_contract|verified_smart_contracts)
+        {{- end }}
         pathType: Prefix
         backend:
           service:
             name: {{ .Release.Name }}-web
             port: 
               number: 4000
-      - path: /(graphql|graphiql|api)
+      -
+        {{- if .Values.blockscout.web.suffix.enabled }}
+        path: /({{ .Values.blockscout.web.suffix.path }})/((graphql|graphiql|api).*)
+        {{ else }}
+        path: /(graphql|graphiql|api)
+        {{- end }}
         pathType: Prefix
         backend:
           service:
             name: {{ .Release.Name }}-api
             port: 
               number: 4000
-      - path: /
+      -
+        {{- if .Values.blockscout.web.suffix.enabled }}
+        path: /{{ .Values.blockscout.web.suffix.path }}(/|$)(.*)
+        {{ else }}
+        path: /
+        {{- end }}
         pathType: Prefix
         backend:
           service:

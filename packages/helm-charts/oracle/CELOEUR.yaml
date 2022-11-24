@@ -11,7 +11,19 @@ oracle:
     prometheusPort: 9090
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
-  priceSources: "[[{exchange: 'BITTREX', symbol: 'CELOEUR', toInvert: false}],[{exchange: 'COINBASE', symbol: 'CELOEUR', toInvert: false}],[{exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false}, {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true}]]"
+  priceSources: "[
+                    [{exchange: 'BITTREX', symbol: 'CELOEUR', toInvert: false}],
+                    [{exchange: 'COINBASE', symbol: 'CELOEUR', toInvert: false}],
+                    [
+                      {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
+                      {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: true},
+                      {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false}
+                    ],
+                    [
+                      {exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false},
+                      {exchange: 'BINANCE', symbol: 'EURUSDT', toInvert: true}
+                    ]
+                  ]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:

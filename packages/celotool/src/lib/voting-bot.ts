@@ -13,7 +13,12 @@ const helmChartPath = '../helm-charts/voting-bot'
 export async function installHelmChart(celoEnv: string, excludedGroups?: string[]) {
   const params = await helmParameters(celoEnv, excludedGroups)
   console.info(params)
-  return installGenericHelmChart(celoEnv, releaseName(celoEnv), helmChartPath, params)
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: helmChartPath,
+    parameters: params,
+  })
 }
 export async function removeHelmRelease(celoEnv: string) {
   await removeGenericHelmChart(releaseName(celoEnv), celoEnv)

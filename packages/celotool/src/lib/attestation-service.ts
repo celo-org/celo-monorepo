@@ -9,12 +9,12 @@ import { envVar, fetchEnv, fetchEnvOrFallback } from './env-utils'
 const helmChartPath = '../helm-charts/attestation-service'
 
 export async function installHelmChart(celoEnv: string) {
-  await installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    helmChartPath,
-    await helmParameters(celoEnv)
-  )
+  await installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string) {
@@ -22,12 +22,12 @@ export async function removeHelmRelease(celoEnv: string) {
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  await upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    helmChartPath,
-    await helmParameters(celoEnv)
-  )
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv),
+  })
 }
 
 async function helmParameters(celoEnv: string) {

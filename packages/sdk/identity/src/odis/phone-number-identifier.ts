@@ -1,5 +1,10 @@
 import { getPhoneHash, isE164Number } from '@celo/base/lib/phoneNumbers'
-import { CombinerEndpoint } from '@celo/phone-number-privacy-common'
+import {
+  CombinerEndpointPNP,
+  KEY_VERSION_HEADER,
+  SignMessageRequest,
+  SignMessageResponseSchema,
+} from '@celo/phone-number-privacy-common'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
 import { createHash } from 'crypto'
@@ -8,11 +13,10 @@ import { BlsBlindingClient, WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   AuthenticationMethod,
   AuthSigner,
-  CombinerSignMessageResponse,
   EncryptionKeySigner,
+  getOdisPnpRequestAuth,
   queryOdis,
   ServiceContext,
-  SignMessageRequest,
 } from './query'
 
 // ODIS minimum dollar balance for sig retrieval
@@ -42,10 +46,11 @@ export async function getPhoneNumberIdentifier(
   signer: AuthSigner,
   context: ServiceContext,
   blindingFactor?: string,
-  selfPhoneHash?: string,
   clientVersion?: string,
   blsBlindingClient?: BlsBlindingClient,
-  sessionID?: string
+  sessionID?: string,
+  keyVersion?: number,
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
 
@@ -74,9 +79,10 @@ export async function getPhoneNumberIdentifier(
     signer,
     context,
     base64BlindedMessage,
-    selfPhoneHash,
     clientVersion,
-    sessionID
+    sessionID,
+    keyVersion,
+    endpoint ?? CombinerEndpointPNP.PNP_SIGN
   )
 
   return getPhoneNumberIdentifierFromSignature(e164Number, base64BlindSig, blsBlindingClient)
@@ -106,29 +112,35 @@ export async function getBlindedPhoneNumberSignature(
   signer: AuthSigner,
   context: ServiceContext,
   base64BlindedMessage: string,
-  selfPhoneHash?: string,
   clientVersion?: string,
-  sessionID?: string
+  sessionID?: string,
+  keyVersion?: number,
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
 ): Promise<string> {
   const body: SignMessageRequest = {
     account,
     blindedQueryPhoneNumber: base64BlindedMessage,
-    hashedPhoneNumber: selfPhoneHash,
-    version: clientVersion ? clientVersion : 'unknown',
+    version: clientVersion,
     authenticationMethod: signer.authenticationMethod,
+    sessionID,
   }
 
-  if (sessionID) {
-    body.sessionID = sessionID
-  }
-
-  const response = await queryOdis<CombinerSignMessageResponse>(
-    signer,
+  const response = await queryOdis(
     body,
     context,
-    CombinerEndpoint.SIGN_MESSAGE
+    endpoint ?? CombinerEndpointPNP.PNP_SIGN,
+    SignMessageResponseSchema,
+    {
+      [KEY_VERSION_HEADER]: keyVersion?.toString(),
+      Authorization: await getOdisPnpRequestAuth(body, signer),
+    }
   )
-  return response.combinedSignature
+
+  if (!response.success) {
+    throw new Error(response.error)
+  }
+
+  return response.signature
 }
 
 /**

@@ -14,11 +14,21 @@ export const helmChartDir = '../helm-charts/wallet-connect'
 
 export async function installWalletConnect() {
   await createNamespaceIfNotExists(releaseNamespace)
-  await installGenericHelmChart(releaseNamespace, releaseName, helmChartDir, helmParameters())
+  await installGenericHelmChart({
+    namespace: releaseNamespace,
+    releaseName,
+    chartDir: helmChartDir,
+    parameters: helmParameters(),
+  })
 }
 
 export async function upgradeWalletConnect() {
-  await upgradeGenericHelmChart(releaseNamespace, releaseName, helmChartDir, helmParameters())
+  await upgradeGenericHelmChart({
+    namespace: releaseNamespace,
+    releaseName,
+    chartDir: helmChartDir,
+    parameters: helmParameters(),
+  })
 }
 
 export async function removeWalletConnect() {

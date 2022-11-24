@@ -11,6 +11,7 @@ import {
   timeTravel,
 } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import Approve from '../governance/approve'
 import GovernanceUpvote from '../governance/upvote'
 import GovernanceVote from '../governance/vote'
@@ -43,7 +44,7 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
   })
 
   test('will revoke', async () => {
-    await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
+    await testLocally(AdminRevoke, ['--contract', contractAddress, '--yesreally'])
     const revokedContract = await getContractFromEvent(
       'ReleaseScheduleRevoked(uint256,uint256)',
       web3
@@ -56,13 +57,13 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
     await stableToken.transfer(contractAddress, 100).send({
       from: accounts[0],
     })
-    await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
+    await testLocally(AdminRevoke, ['--contract', contractAddress, '--yesreally'])
     const balance = await stableToken.balanceOf(contractAddress)
     expect(balance.isZero()).toBeTruthy()
   })
 
   test('will refund and finalize', async () => {
-    await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
+    await testLocally(AdminRevoke, ['--contract', contractAddress, '--yesreally'])
     const destroyedContract = await getContractFromEvent(
       'ReleaseGoldInstanceDestroyed(address,address)',
       web3
@@ -74,8 +75,8 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
     const value = '10'
 
     beforeEach(async () => {
-      await CreateAccount.run(['--contract', contractAddress])
-      await LockedGold.run([
+      await testLocally(CreateAccount, ['--contract', contractAddress])
+      await testLocally(LockedGold, [
         '--contract',
         contractAddress,
         '--action',
@@ -87,7 +88,7 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
     })
 
     test('will unlock all gold', async () => {
-      await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
+      await testLocally(AdminRevoke, ['--contract', contractAddress, '--yesreally'])
       const lockedGold = await kit.contracts.getLockedGold()
       const lockedAmount = await lockedGold.getAccountTotalLockedGold(releaseGoldWrapper.address)
       expect(lockedAmount.isZero()).toBeTruthy()
@@ -101,7 +102,7 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
         voteSigner = accounts[2]
         accountsWrapper = await kit.contracts.getAccounts()
         const pop = await accountsWrapper.generateProofOfKeyPossession(contractAddress, voteSigner)
-        await Authorize.run([
+        await testLocally(Authorize, [
           '--contract',
           contractAddress,
           '--role',
@@ -114,7 +115,7 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
       })
 
       test('will rotate vote signer', async () => {
-        await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
+        await testLocally(AdminRevoke, ['--contract', contractAddress, '--yesreally'])
         const newVoteSigner = await accountsWrapper.getVoteSigner(contractAddress)
         expect(newVoteSigner).not.toEqual(voteSigner)
       })
@@ -131,19 +132,26 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
             .propose([], 'URL')
             .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
           await timeTravel(expConfig.dequeueFrequency, web3)
-          await Approve.run(['--from', accounts[0], '--proposalID', '1', '--useMultiSig'])
-          await GovernanceVote.run(['--from', voteSigner, '--proposalID', '1', '--value', 'Yes'])
+          await testLocally(Approve, ['--from', accounts[0], '--proposalID', '1', '--useMultiSig'])
+          await testLocally(GovernanceVote, [
+            '--from',
+            voteSigner,
+            '--proposalID',
+            '1',
+            '--value',
+            'Yes',
+          ])
           await governance
             .propose([], 'URL')
             .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
           await governance
             .propose([], 'URL')
             .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
-          await GovernanceUpvote.run(['--from', voteSigner, '--proposalID', '3'])
+          await testLocally(GovernanceUpvote, ['--from', voteSigner, '--proposalID', '3'])
 
           // const validators = await kit.contracts.getValidators()
           // const groups = await validators.getRegisteredValidatorGroupsAddresses()
-          // await ElectionVote.run([
+          // await testLocally(ElectionVote, [
           //   '--from',
           //   voteSigner,
           //   '--for',
@@ -156,7 +164,7 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
         test('will revoke governance votes and upvotes', async () => {
           const isVotingBefore = await governance.isVoting(contractAddress)
           expect(isVotingBefore).toBeTruthy()
-          await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
+          await testLocally(AdminRevoke, ['--contract', contractAddress, '--yesreally'])
           const isVotingAfter = await governance.isVoting(contractAddress)
           expect(isVotingAfter).toBeFalsy()
         })
@@ -165,7 +173,7 @@ testWithGanache('releasegold:admin-revoke cmd', (web3: Web3) => {
         //   const election = await kit.contracts.getElection()
         //   const votesBefore = await election.getTotalVotesByAccount(contractAddress)
         //   expect(votesBefore.isZero).toBeFalsy()
-        //   await AdminRevoke.run(['--contract', contractAddress, '--yesreally'])
+        //   await testLocally(AdminRevoke, ['--contract', contractAddress, '--yesreally'])
         //   const votesAfter = await election.getTotalVotesByAccount(contractAddress)
         //   expect(votesAfter.isZero()).toBeTruthy()
         // })

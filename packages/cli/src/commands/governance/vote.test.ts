@@ -4,6 +4,7 @@ import { GovernanceWrapper } from '@celo/contractkit/lib/wrappers/Governance'
 import { NetworkConfig, testWithGanache, timeTravel } from '@celo/dev-utils/lib/ganache-test'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import Register from '../account/register'
 import Lock from '../lockedgold/lock'
 import Approve from './approve'
@@ -30,21 +31,21 @@ testWithGanache('governance:vote cmd', (web3: Web3) => {
       .propose([], 'URL')
       .sendAndWaitForReceipt({ from: accounts[0], value: minDeposit })
     await timeTravel(expConfig.dequeueFrequency, web3)
-    await Dequeue.run(['--from', accounts[0]])
-    await Approve.run([
+    await testLocally(Dequeue, ['--from', accounts[0]])
+    await testLocally(Approve, [
       '--from',
       accounts[0],
       '--proposalID',
       proposalID.toString(10),
       '--useMultiSig',
     ])
-    await Register.run(['--from', accounts[0]])
-    await Lock.run(['--from', accounts[0], '--value', '100'])
+    await testLocally(Register, ['--from', accounts[0]])
+    await testLocally(Lock, ['--from', accounts[0], '--value', '100'])
     await timeTravel(expConfig.approvalStageDuration, web3)
   })
 
   test('can vote yes', async () => {
-    await Vote.run([
+    await testLocally(Vote, [
       '--from',
       accounts[0],
       '--proposalID',

@@ -10,8 +10,8 @@ import {
   PoprfServer,
   SequentialDelayDomain,
   SequentialDelayDomainState,
-  verifyDomainQuotaStatusRequestSignature,
-  verifyDomainRestrictedSignatureRequestSignature,
+  verifyDomainQuotaStatusRequestAuthenticity,
+  verifyDomainRestrictedSignatureRequestAuthenticity,
 } from '@celo/phone-number-privacy-common'
 import * as poprf from '@celo/poprf'
 import debugFactory from 'debug'
@@ -31,10 +31,18 @@ export class MockOdis {
   readonly state: Record<string, SequentialDelayDomainState> = {}
   readonly poprf = new PoprfServer(MOCK_ODIS_KEYPAIR.privateKey)
 
+  private now = () => Math.floor(Date.now() / 1000)
+
+  private domainState(hash: Buffer) {
+    return (
+      this.state[hash.toString('hex')] ?? { timer: 0, counter: 0, disabled: false, now: this.now() }
+    )
+  }
+
   quota(
     req: DomainQuotaStatusRequest<SequentialDelayDomain>
   ): { status: number; body: DomainQuotaStatusResponse } {
-    const authorized = verifyDomainQuotaStatusRequestSignature(req)
+    const authorized = verifyDomainQuotaStatusRequestAuthenticity(req)
     if (!authorized) {
       return {
         status: 401,
@@ -46,14 +54,12 @@ export class MockOdis {
       }
     }
 
-    const hash = domainHash(req.domain).toString('hex')
-    const domainState = this.state[hash] ?? { timer: 0, counter: 0, disabled: false }
     return {
       status: 200,
       body: {
         success: true,
         version: 'mock',
-        status: domainState,
+        status: this.domainState(domainHash(req.domain)),
       },
     }
   }
@@ -61,7 +67,7 @@ export class MockOdis {
   sign(
     req: DomainRestrictedSignatureRequest<SequentialDelayDomain>
   ): { status: number; body: DomainRestrictedSignatureResponse } {
-    const authorized = verifyDomainRestrictedSignatureRequestSignature(req)
+    const authorized = verifyDomainRestrictedSignatureRequestAuthenticity(req)
     if (!authorized) {
       return {
         status: 401,
@@ -69,16 +75,13 @@ export class MockOdis {
           success: false,
           version: 'mock',
           error: 'unauthorized',
+          status: undefined,
         },
       }
     }
 
     const hash = domainHash(req.domain)
-    const domainState = this.state[hash.toString('hex')] ?? {
-      timer: 0,
-      counter: 0,
-      disabled: false,
-    }
+    const domainState = this.domainState(hash)
     const nonce = req.options.nonce.defined ? req.options.nonce.value : undefined
     if (nonce !== domainState.counter) {
       return {
@@ -87,11 +90,12 @@ export class MockOdis {
           success: false,
           version: 'mock',
           error: 'incorrect nonce',
+          status: domainState,
         },
       }
     }
 
-    const limitCheck = checkSequentialDelayRateLimit(req.domain, Date.now() / 1000, domainState)
+    const limitCheck = checkSequentialDelayRateLimit(req.domain, this.now(), domainState)
     if (!limitCheck.accepted || limitCheck.state === undefined) {
       return {
         status: 429,
@@ -99,6 +103,7 @@ export class MockOdis {
           success: false,
           version: 'mock',
           error: 'request limit exceeded',
+          status: domainState,
         },
       }
     }
@@ -119,6 +124,7 @@ export class MockOdis {
         body: {
           success: false,
           version: 'mock',
+          status: undefined,
           error: (error as Error).toString(),
         },
       }
@@ -129,6 +135,7 @@ export class MockOdis {
       body: {
         success: true,
         version: 'mock',
+        status: limitCheck.state,
         signature,
       },
     }
@@ -145,7 +152,7 @@ export class MockOdis {
           const res = this.quota(
             JSON.parse(req.body) as DomainQuotaStatusRequest<SequentialDelayDomain>
           )
-          debug('Mocking request', { url, req, res })
+          debug('Mocking request', JSON.stringify({ url, req, res }))
           return res
         })
     )
@@ -162,7 +169,7 @@ export class MockOdis {
           const res = this.sign(
             JSON.parse(req.body) as DomainRestrictedSignatureRequest<SequentialDelayDomain>
           )
-          debug('Mocking request', { url, req, res })
+          debug('Mocking request', JSON.stringify({ url, req, res }))
           return res
         })
     )

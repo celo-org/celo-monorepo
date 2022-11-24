@@ -1,10 +1,6 @@
 import { newKit } from '@celo/contractkit'
-import {
-  AuthenticationMethod,
-  EncryptionKeySigner,
-  ServiceContext,
-  WalletKeySigner,
-} from '@celo/identity/lib/odis/query'
+import { EncryptionKeySigner, ServiceContext, WalletKeySigner } from '@celo/identity/lib/odis/query'
+import { AuthenticationMethod, TestUtils } from '@celo/phone-number-privacy-common'
 import { PhoneNumberUtils } from '@celo/phone-utils'
 import {
   ensureLeading0x,
@@ -12,7 +8,6 @@ import {
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
 import 'isomorphic-fetch'
-import { getBlindedPhoneNumber } from '../../../common/src/test/utils'
 
 require('dotenv').config()
 
@@ -21,7 +16,7 @@ require('dotenv').config()
  */
 export const ODIS_COMBINER =
   process.env.ODIS_COMBINER_SERVICE_URL ||
-  'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
+  'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net/combiner'
 export const DEFAULT_FORNO_URL =
   process.env.ODIS_BLOCKCHAIN_PROVIDER || 'https://alfajoresstaging-forno.celo-testnet.org'
 
@@ -34,7 +29,10 @@ export const ACCOUNT_ADDRESS_NO_QUOTA = privateKeyToAddress(PRIVATE_KEY_NO_QUOTA
 
 export const PHONE_NUMBER = '+17777777777'
 export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
-export const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
+export const BLINDED_PHONE_NUMBER = TestUtils.Utils.getBlindedPhoneNumber(
+  PHONE_NUMBER,
+  BLINDING_FACTOR
+)
 
 export const SERVICE_CONTEXT: ServiceContext = {
   odisUrl: ODIS_COMBINER,

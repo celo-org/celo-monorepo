@@ -2,7 +2,7 @@ import { hexToBuffer } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
 import Logger from 'bunyan'
 import { Request } from 'express'
-import { signWithRawKey } from '../../../../sdk/identity/src/odis/query'
+import { ErrorMessage, ErrorType } from '../../lib'
 import { AuthenticationMethod } from '../../src/interfaces/requests'
 import * as auth from '../../src/utils/authentication'
 
@@ -22,9 +22,18 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should fail authentication with missing signer', async () => {
@@ -34,12 +43,21 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
-    it('Should succeed authentication with error in getDataEncryptionKey', async () => {
+    it('Should succeed authentication with error in getDataEncryptionKey when shouldFailOpen is true', async () => {
       const sampleRequest: Request = {
         get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
         body: {
@@ -49,9 +67,42 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(true)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(true)
+      expect(warnings).toEqual([ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN])
+    })
+
+    it('Should fail authentication with error in getDataEncryptionKey when shouldFailOpen is false', async () => {
+      const sampleRequest: Request = {
+        get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
+        body: {
+          account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
+          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+        },
+      } as Request
+      const mockContractKit = {} as ContractKit
+
+      const warnings: ErrorType[] = []
+
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        false,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_CLOSED])
     })
 
     it('Should fail authentication when key is not registered', async () => {
@@ -74,9 +125,18 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should fail authentication when key is registered but not valid', async () => {
@@ -99,9 +159,12 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should succeed authentication when key is registered and valid', async () => {
@@ -110,7 +173,7 @@ describe('Authentication test suite', () => {
         account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
         authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
       }
-      const sig = signWithRawKey(JSON.stringify(body), rawKey)
+      const sig = auth.signWithRawKey(JSON.stringify(body), rawKey)
       const sampleRequest: Request = {
         get: (name: string) => (name === 'Authorization' ? sig : ''),
         body,
@@ -133,9 +196,18 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(true)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(true)
+      expect(warnings).toEqual([])
     })
 
     it('Should fail authentication when the message is manipulated', async () => {
@@ -152,7 +224,7 @@ describe('Authentication test suite', () => {
           message.slice(0, i) +
           String.fromCharCode(message.charCodeAt(i) + 1) +
           message.slice(i + 1)
-        const sig = signWithRawKey(modified, rawKey)
+        const sig = auth.signWithRawKey(modified, rawKey)
         const sampleRequest: Request = {
           get: (name: string) => (name === 'Authorization' ? sig : ''),
           body,
@@ -175,9 +247,18 @@ describe('Authentication test suite', () => {
           },
         } as ContractKit
 
-        const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+        const warnings: ErrorType[] = []
 
-        expect(result).toBe(false)
+        const success = await auth.authenticateUser(
+          sampleRequest,
+          mockContractKit,
+          logger,
+          true,
+          warnings
+        )
+
+        expect(success).toBe(false)
+        expect(warnings).toEqual([])
       }
     })
 
@@ -187,7 +268,7 @@ describe('Authentication test suite', () => {
         account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
         authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
       }
-      const sig = signWithRawKey(JSON.stringify(body), rawKey)
+      const sig = auth.signWithRawKey(JSON.stringify(body), rawKey)
       const sampleRequest: Request = {
         get: (name: string) => (name === 'Authorization' ? sig : ''),
         body,
@@ -212,9 +293,18 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should fail authentication when the sigature is modified', async () => {
@@ -224,7 +314,7 @@ describe('Authentication test suite', () => {
         authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
       }
       // Manipulate the signature.
-      const sig = signWithRawKey(JSON.stringify(body), rawKey)
+      const sig = auth.signWithRawKey(JSON.stringify(body), rawKey)
       const modified = JSON.stringify([0] + JSON.parse(sig))
       const sampleRequest: Request = {
         get: (name: string) => (name === 'Authorization' ? modified : ''),
@@ -250,13 +340,23 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(false)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     // Backwards compatibility check
-    // TODO: Remove this once clients upgrade to @celo/identity v1.5.3
+    // TODO(2.0.0, deployment): Remove this once clients upgrade to @celo/identity v1.5.3
+    // (https://github.com/celo-org/celo-monorepo/issues/9802)
     it('Should succeed authentication when key is registered and valid and signature is incorrectly generated', async () => {
       const rawKey = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
       const body = {
@@ -287,9 +387,18 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBe(true)
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(true)
+      expect(warnings).toEqual([])
     })
   })
 
