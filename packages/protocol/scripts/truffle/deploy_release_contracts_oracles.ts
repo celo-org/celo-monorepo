@@ -52,29 +52,9 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     ? MAINNET_START_TIME
     : new Date(config.releaseStartTime).getTime() / 1000
 
-  // console.info(releaseStartTime)
-
-  // console.log(config.amountReleasedPerPeriod)
-
-  // console.log(new BigNumber(config.amountReleasedPerPeriod).toFixed(0))
-
-  // console.log("here")
-
-  // console.log(1)
-  // web3.utils.toWei(new BigNumber(config.amountReleasedPerPeriod).toFixed(0))
-  // console.log(2)
-  // web3.utils.toBN(web3.utils.toWei(config.amountReleasedPerPeriod.toFixed(0)))
-
-  // const weiAmountReleasedPerPeriod = web3.utils.toBN(web3.utils.toWei(new BigNumber(config.amountReleasedPerPeriod).toFixed(0)))
   const weiAmountReleasedPerPeriod = web3.utils.toWei(
     new BigNumber(config.amountReleasedPerPeriod).toFixed(0)
   )
-
-  // const weiAmountReleasedPerPeriod = new BigNumber(
-  //   web3.utils.toWei(config.amountReleasedPerPeriod.toFixed(0))
-  // )
-
-  // let totalValue = weiAmountReleasedPerPeriod.multipliedBy(config.numReleasePeriods)
 
   const contractInitializationArgs = [
     Math.round(releaseStartTime),
@@ -141,12 +121,12 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
   }
   console.info('  Deploying ReleaseGoldMultiSigProxy...')
   const releaseGoldMultiSigProxy = await retryTx(ReleaseGoldMultiSigProxy.new, [
-    { from: fromAddress },
+    { from: fromAddress, value: null },
   ])
   console.info('  Deploying ReleaseGoldMultiSig...')
   const releaseGoldMultiSigInstance = await retryTx(ReleaseGoldMultiSig.new, [
     false,
-    { from: fromAddress },
+    { from: fromAddress, value: null },
   ])
   console.log([config.releaseOwner, config.beneficiary])
   const multiSigTxHash = await _setInitialProxyImplementation(
@@ -167,6 +147,7 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
     releaseGoldMultiSigProxy.address,
     {
       from: fromAddress,
+      value: null,
     },
   ])
   console.info('  Deploying ReleaseGoldProxy...')
@@ -257,8 +238,6 @@ module.exports = async (callback: (error?: any) => number) => {
       ],
     })
 
-    console.log('gola')
-
     ReleaseGoldMultiSig = artifacts.require('ReleaseGoldMultiSig')
     ReleaseGoldMultiSigProxy = artifacts.require('ReleaseGoldMultiSigProxy')
     ReleaseGold = artifacts.require('ReleaseGold')
@@ -271,7 +250,7 @@ module.exports = async (callback: (error?: any) => number) => {
     const months = 12
     const oneTimePaymentUSD = 6000 // For up to three nodes (not defined yet for more than three nodes)
     const monthlyPaymentUSD = 1500
-    const numberOfNodes = 3
+    // const numberOfNodes = 3
 
     const celoPrice = await fetchCeloPrice()
     console.log()
@@ -283,11 +262,11 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const oneTimePaymentCELO = new BigNumber(oneTimePaymentUSD)
       .multipliedBy(zeros)
-      .multipliedBy(numberOfNodes)
+      // .multipliedBy(numberOfNodes)
       .dividedBy(celoPrice)
 
     const monthlyPaymentCELO = new BigNumber(monthlyPaymentUSD)
-      .multipliedBy(numberOfNodes)
+      // .multipliedBy(numberOfNodes)
       .dividedBy(celoPrice)
 
     const kit = newKitFromWeb3(web3)
@@ -334,9 +313,10 @@ module.exports = async (callback: (error?: any) => number) => {
     }
 
     const RGInfoOneTime = await handleGrant(configOneTimePayment, 1)
-    const RGInfoCurrent = await handleGrant(config, 1)
+    const RGInfoCurrent = await handleGrant(config, 2)
 
     if (RGInfoCurrent && RGInfoOneTime) {
+      console.log('------------------------------------------------------------------------')
       console.log("Here's the snippet that should be added to the proposal for this: ")
       printfundingProposal(oneTimePaymentCELO.toFixed(0), RGInfoOneTime.ContractAddress)
       console.log(',')
