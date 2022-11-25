@@ -79,6 +79,7 @@ contract Accounts is
     "AuthorizeSigner(address account,address signer,bytes32 role)"
   );
   bytes32 public eip712DomainSeparator;
+  bytes32 public eip712DomainSeparatorTEST;
 
   // A per-account list of CIP8 storage roots, bypassing CIP3.
   mapping(address => bytes[]) public offchainStorageRoots;
