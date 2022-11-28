@@ -1465,7 +1465,7 @@ contract Governance is
     uint256 maxUsed = 0;
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
       Proposals.Proposal storage proposal = proposals[dequeued[index]];
-      bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
+      bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations, false) ==
         Proposals.Stage.Referendum);
 
       if (!isVotingReferendum) {
