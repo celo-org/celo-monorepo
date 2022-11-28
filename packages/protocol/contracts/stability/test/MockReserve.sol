@@ -8,6 +8,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
  */
 contract MockReserve {
   mapping(address => bool) public tokens;
+  mapping(address => bool) public collateralAssets;
 
   IERC20 public goldToken;
 
@@ -28,8 +29,21 @@ contract MockReserve {
     return true;
   }
 
+  function transferCollateralAsset(address tokenAddress, address payable to, uint256 amount)
+    external
+    returns (bool)
+  {
+    require(IERC20(tokenAddress).transfer(to, amount), "asset transfer failed");
+    return true;
+  }
+
   function addToken(address token) external returns (bool) {
     tokens[token] = true;
+    return true;
+  }
+
+  function addCollateralAsset(address token) external returns (bool) {
+    collateralAssets[token] = true;
     return true;
   }
 
@@ -41,11 +55,11 @@ contract MockReserve {
     return address(this).balance;
   }
 
-  function isStableAsset(address) external view returns (bool) {
-    return false;
+  function isStableAsset(address token) external view returns (bool) {
+    return tokens[token];
   }
 
-  function isCollateralAsset(address) external view returns (bool) {
-    return false;
+  function isCollateralAsset(address token) external view returns (bool) {
+    return collateralAssets[token];
   }
 }

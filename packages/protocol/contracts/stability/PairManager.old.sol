@@ -1,9 +1,9 @@
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import { IPairManager } from "./interfaces/IPairManager.sol";
+import { IPairManager } from "./interfaces/deprecate/IPairManager.sol";
 import { IReserve } from "./interfaces/IReserve.sol";
-import { IMentoExchange } from "./interfaces/IMentoExchange.sol";
+import { IMentoExchange } from "./interfaces/deprecate/IMentoExchange.sol";
 
 import { StableToken } from "./StableToken.sol";
 

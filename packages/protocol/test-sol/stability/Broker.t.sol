@@ -1,109 +1,70 @@
-// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.5.13;
 pragma experimental ABIEncoderV2;
 
-import { Test } from "celo-foundry/Test.sol";
+import { Test, console2 as console } from "celo-foundry/Test.sol";
 import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-
 import { Broker } from "contracts/stability/Broker.sol";
-import { IMentoExchange } from "contracts/stability/interfaces/IMentoExchange.sol";
-import { IPairManager } from "contracts/stability/interfaces/IPairManager.sol";
+import { IMentoExchange } from "contracts/stability/interfaces/deprecate/IMentoExchange.sol";
+import { IExchangeProvider } from "contracts/stability/interfaces/IExchangeProvider.sol";
 import { IReserve } from "contracts/stability/interfaces/IReserve.sol";
 import { IStableToken } from "contracts/stability/interfaces/IStableToken.sol";
+import { MockStableToken } from "contracts/stability/test/MockStableToken.sol";
+import { MockReserve } from "contracts/stability/test/MockReserve.sol";
+import { DummyERC20 } from "../utils/DummyErc20.sol";
 
 import { FixidityLib } from "contracts/common/FixidityLib.sol";
 
 // forge test --match-contract Broker -vvv
 contract BrokerTest is Test {
   event Swap(
-    bytes32 indexed pairId,
+    address exchangeProvider,
+    bytes32 indexed exchangeId,
     address indexed trader,
     address indexed tokenIn,
     address tokenOut,
     uint256 amountIn,
     uint256 amountOut
   );
-  event PairManagerUpdated(address indexed newAddress, address indexed prevAddress);
-  event ReserveUpdated(address indexed newAddress, address indexed prevAddress);
+  event ExchangeProviderAdded(address indexed exchangeProvider);
+  event ExchangeProviderRemoved(address indexed exchangeProvider);
+  event ReserveSet(address indexed newAddress, address indexed prevAddress);
 
-  address deployer;
-  address notDeployer;
-  address trader;
+  address deployer = actor("deployer");
+  address notDeployer = actor("notDeployer");
+  address trader = actor("trader");
+  address randomExchangeProvider = actor("randomExchangeProvider");
+  address randomAsset = actor("randomAsset");
 
-  IStableToken stableAsset;
-  IERC20 collateralAsset;
-  address randomAsset;
-  IMentoExchange exchange;
-
-  uint256 constant initialStableBucket = 1e24;
-  uint256 constant initialCollateralBucket = 2e24;
-
-  IReserve reserve;
-  IPairManager pairManager;
+  MockReserve reserve;
+  MockStableToken stableAsset;
+  DummyERC20 collateralAsset;
 
   Broker broker;
 
+  IExchangeProvider exchangeProvider;
+  address exchangeProvider1 = actor("exchangeProvider1");
+  address exchangeProvider2 = actor("exchangeProvider2");
+
+  address[] public exchangeProviders;
+
   function setUp() public {
     /* Dependencies and actors */
-    deployer = actor("deployer");
-    notDeployer = actor("notDeployer");
-    reserve = IReserve(actor("reserve"));
-    pairManager = IPairManager(actor("pairManager"));
-    stableAsset = IStableToken(actor("stableAsset"));
-    collateralAsset = IERC20(actor("collateralAsset"));
+    reserve = new MockReserve();
+    collateralAsset = new DummyERC20();
+    stableAsset = new MockStableToken();
     randomAsset = actor("randomAsset");
-    exchange = IMentoExchange(actor("exchange"));
-    trader = actor("trader");
+    broker = new Broker(true);
+    exchangeProvider = IExchangeProvider(actor("exchangeProvider"));
 
-    /* Mocks for dependent contracts */
-    vm.mockCall(
-      address(stableAsset),
-      abi.encodePacked(IERC20(address(stableAsset)).transferFrom.selector),
-      abi.encode(0x0)
-    );
-
-    vm.mockCall(address(stableAsset), abi.encodePacked(stableAsset.burn.selector), abi.encode(0x0));
-
-    vm.mockCall(address(stableAsset), abi.encodePacked(stableAsset.mint.selector), abi.encode(0x0));
-
-    vm.mockCall(
-      address(reserve),
-      abi.encodePacked(reserve.transferCollateralAsset.selector),
-      abi.encode(0x0)
-    );
-
-    vm.mockCall(
-      address(collateralAsset),
-      abi.encodePacked(collateralAsset.transferFrom.selector),
-      abi.encode(0x0)
-    );
+    reserve.addToken(address(stableAsset));
+    reserve.addCollateralAsset(address(collateralAsset));
 
     changePrank(deployer);
-    broker = new Broker(true);
-    broker.initilize(address(pairManager), address(reserve));
+    exchangeProviders.push(exchangeProvider1);
+    exchangeProviders.push(exchangeProvider2);
+    exchangeProviders.push((address(exchangeProvider)));
+    broker.initialize(exchangeProviders, address(reserve));
     changePrank(trader);
-  }
-
-  function createPair() internal view returns (bytes32 pairId, IPairManager.Pair memory pair) {
-    pair.stableAsset = address(stableAsset);
-    pair.collateralAsset = address(collateralAsset);
-    pair.mentoExchange = IMentoExchange(exchange);
-    pair.collateralBucketFraction = FixidityLib.wrap(0.1 * 10**24);
-    pair.stableBucketMaxFraction = FixidityLib.wrap(0.1 * 10**24);
-    pair.stableBucket = initialStableBucket;
-    pair.collateralBucket = initialCollateralBucket;
-    pair.spread = FixidityLib.wrap(0.1 * 10**24);
-    pairId = keccak256(abi.encode(pair));
-  }
-
-  function mockGetPair() internal returns (bytes32 pairId) {
-    IPairManager.Pair memory pair;
-    (pairId, pair) = createPair();
-    vm.mockCall(
-      address(pairManager),
-      abi.encodeWithSelector(pairManager.getPair.selector, pairId),
-      abi.encode(pair)
-    );
   }
 }
 
@@ -114,8 +75,8 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
     assertEq(broker.owner(), deployer);
   }
 
-  function test_initilize_shouldSetPairManager() public {
-    assertEq(address(broker.pairManager()), address(pairManager));
+  function test_initilize_shouldSetExchangeProviderAddresseses() public {
+    assertEq(broker.getExchangeProviders(), exchangeProviders);
   }
 
   function test_initilize_shouldSetReserve() public {
@@ -124,26 +85,59 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
 
   /* ---------- Setters ---------- */
 
-  function test_setPairManager_whenSenderIsNotOwner_shouldRevert() public {
+  function test_addExchangeProvider_whenSenderIsNotOwner_shouldRevert() public {
     changePrank(notDeployer);
     vm.expectRevert("Ownable: caller is not the owner");
-    broker.setPairManager(address(0));
+    broker.addExchangeProvider(address(0));
   }
 
-  function test_setPairManager_whenAddressIsZero_shouldRevert() public {
+  function test_addExchangeProvider_whenAddressIsZero_shouldRevert() public {
     changePrank(deployer);
-    vm.expectRevert("PairManager address must be set");
-    broker.setPairManager(address(0));
+    vm.expectRevert("ExchangeProvider address can't be 0");
+    broker.addExchangeProvider(address(0));
   }
 
-  function test_setPairManager_whenSenderIsOwner_shouldUpdateAndEmit() public {
+  function test_addExchangeProvider_whenSenderIsOwner_shouldUpdateAndEmit() public {
     changePrank(deployer);
-    address newPairManager = actor("newPairManager");
+    address newExchangeProvider = actor("newExchangeProvider");
     vm.expectEmit(true, false, false, false);
-    emit PairManagerUpdated(newPairManager, address(pairManager));
+    emit ExchangeProviderAdded(newExchangeProvider);
+    broker.addExchangeProvider(newExchangeProvider);
+    address[] memory updatedExchangeProviders = broker.getExchangeProviders();
+    assertEq(updatedExchangeProviders[updatedExchangeProviders.length - 1], newExchangeProvider);
+    assertEq(broker.isExchangeProvider(newExchangeProvider), true);
+  }
 
-    broker.setPairManager(newPairManager);
-    assertEq(address(broker.pairManager()), newPairManager);
+  function test_addExchangeProvider_whenAlreadyAdded_shouldRevert() public {
+    changePrank(deployer);
+    vm.expectRevert("ExchangeProvider already exists in the list");
+    broker.addExchangeProvider(address(exchangeProvider));
+  }
+
+  function test_removeExchangeProvider_whenSenderIsOwner_shouldUpdateAndEmit() public {
+    changePrank(deployer);
+    vm.expectEmit(true, true, true, true);
+    emit ExchangeProviderRemoved(exchangeProvider1);
+    broker.removeExchangeProvider(exchangeProvider1, 0);
+    assert(broker.getExchangeProviders()[0] != exchangeProvider1);
+  }
+
+  function test_removeExchangeProvider_whenAddressDoesNotExist_shouldRevert() public {
+    changePrank(deployer);
+    vm.expectRevert("index into exchangeProviders list not mapped to an exchangeProvider");
+    broker.removeExchangeProvider(notDeployer, 1);
+  }
+
+  function test_removeExchangeProvider_whenIndexOutOfRange_shouldRevert() public {
+    changePrank(deployer);
+    vm.expectRevert("index into exchangeProviders list not mapped to an exchangeProvider");
+    broker.removeExchangeProvider(exchangeProvider1, 1);
+  }
+
+  function test_removeExchangeProvider_whenNotOwner_shouldRevert() public {
+    changePrank(notDeployer);
+    vm.expectRevert("Ownable: caller is not the owner");
+    broker.removeExchangeProvider(exchangeProvider1, 0);
   }
 
   function test_setReserve_whenSenderIsNotOwner_shouldRevert() public {
@@ -162,226 +156,339 @@ contract BrokerTest_initilizerAndSetters is BrokerTest {
     changePrank(deployer);
     address newReserve = actor("newReserve");
     vm.expectEmit(true, false, false, false);
-    emit ReserveUpdated(newReserve, address(reserve));
+    emit ReserveSet(newReserve, address(reserve));
 
     broker.setReserve(newReserve);
     assertEq(address(broker.reserve()), newReserve);
   }
 }
 
-contract BrokerTest_quote is BrokerTest {
-  function test_quote_tokenInStableAsset_shouldReturnQuote() public {
-    bytes32 pairId = mockGetPair();
-    uint256 amountIn = 1e18;
+contract BrokerTest_getAmounts is BrokerTest {
+  bytes32 exchangeId = keccak256(abi.encode("exhcangeId"));
 
-    vm.mockCall(
-      address(exchange),
-      abi.encodeWithSelector(
-        exchange.getAmountOut.selector,
-        stableAsset,
-        collateralAsset,
-        initialStableBucket,
-        initialCollateralBucket,
-        amountIn
-      ),
-      abi.encode(2e18, 1e24, 2e24)
+  function test_getAmountIn_whenExchangeProviderWasNotSet_shouldRevert() public {
+    vm.expectRevert("ExchangeProvider does not exist");
+    broker.getAmountIn(
+      randomExchangeProvider,
+      exchangeId,
+      address(stableAsset),
+      address(collateralAsset),
+      1e24
     );
-
-    (address tokenOut, uint256 amountOut) = broker.quote(pairId, address(stableAsset), amountIn);
-    assertEq(tokenOut, address(collateralAsset));
-    assertEq(amountOut, 2e18);
   }
 
-  function test_quote_tokenInCollateralAsset_shouldReturnQuote() public {
-    bytes32 pairId = mockGetPair();
-    uint256 amountIn = 1e18;
+  function test_getAmountIn_whenExchangeProviderIsSet_shouldReceiveCall() public {
+    uint256 amountOut = 1e17;
+    uint256 mockAmountIn = 1e16;
 
     vm.mockCall(
-      address(exchange),
+      address(exchangeProvider),
       abi.encodeWithSelector(
-        exchange.getAmountOut.selector,
-        collateralAsset,
-        stableAsset,
-        initialCollateralBucket,
-        initialStableBucket,
-        amountIn
+        exchangeProvider.getAmountIn.selector,
+        exchangeId,
+        address(stableAsset),
+        address(collateralAsset),
+        amountOut
       ),
-      abi.encode(2e18, 10e18, 20e18)
+      abi.encode(mockAmountIn)
     );
 
-    (address tokenOut, uint256 amountOut) = broker.quote(pairId, address(collateralAsset), 1e18);
-    assertEq(tokenOut, address(stableAsset));
-    assertEq(amountOut, 2e18);
+    uint256 amountIn = broker.getAmountIn(
+      address(exchangeProvider),
+      exchangeId,
+      address(stableAsset),
+      address(collateralAsset),
+      amountOut
+    );
+
+    assertEq(amountIn, mockAmountIn);
   }
 
-  function test_quote_tokenInNotInPair_shouldRevert() public {
-    bytes32 pairId = mockGetPair();
-    vm.expectRevert("tokenIn is not in the pair");
-    broker.quote(pairId, randomAsset, 1e18);
+  function test_getAmountOut_whenExchangeProviderWasNotSet_shouldRevert() public {
+    vm.expectRevert("ExchangeProvider does not exist");
+    broker.getAmountOut(randomExchangeProvider, exchangeId, randomAsset, randomAsset, 1e24);
+  }
+
+  function test_getAmountOut_whenExchangeProviderIsSet_shouldReceiveCall() public {
+    uint256 amountIn = 1e17;
+    uint256 mockAmountOut = 1e16;
+
+    vm.mockCall(
+      address(exchangeProvider),
+      abi.encodeWithSelector(
+        exchangeProvider.getAmountOut.selector,
+        exchangeId,
+        address(stableAsset),
+        address(collateralAsset),
+        amountIn
+      ),
+      abi.encode(mockAmountOut)
+    );
+
+    uint256 amountOut = broker.getAmountOut(
+      address(exchangeProvider),
+      exchangeId,
+      address(stableAsset),
+      address(collateralAsset),
+      amountIn
+    );
+
+    assertEq(amountOut, mockAmountOut);
   }
 }
 
 contract BrokerTest_swap is BrokerTest {
-  function test_swap_tokenInStableAsset_shouldExecuteSwap() public {
-    bytes32 pairId = mockGetPair();
-    uint256 amountIn = 1e18;
-    uint256 mockAmountOut = 2e18;
-    uint256 nextStableBucket = initialStableBucket + amountIn;
-    uint256 nextCollateralBucket = initialCollateralBucket - mockAmountOut;
+  bytes32 exchangeId = keccak256(abi.encode("exhcangeId"));
+
+  function test_swapIn_whenAmoutOutMinNotMet_shouldRevert() public {
+    uint256 amountIn = 1e16;
+    uint256 mockAmountOut = 1e16;
 
     vm.mockCall(
-      address(exchange),
+      address(exchangeProvider),
       abi.encodeWithSelector(
-        exchange.getAmountOut.selector,
-        stableAsset,
-        collateralAsset,
-        initialStableBucket,
-        initialCollateralBucket,
-        amountIn
-      ),
-      abi.encode(mockAmountOut, nextStableBucket, nextCollateralBucket)
-    );
-
-    vm.expectCall(
-      address(stableAsset),
-      abi.encodeWithSelector(
-        IERC20(address(stableAsset)).transferFrom.selector,
-        trader,
-        address(broker),
-        amountIn
-      )
-    );
-
-    vm.expectCall(
-      address(stableAsset),
-      abi.encodeWithSelector(stableAsset.burn.selector, amountIn)
-    );
-
-    vm.expectCall(
-      address(reserve),
-      abi.encodeWithSelector(
-        reserve.transferCollateralAsset.selector,
+        exchangeProvider.swapIn.selector,
+        exchangeId,
+        address(stableAsset),
         address(collateralAsset),
-        trader,
-        mockAmountOut
-      )
-    );
-
-    vm.expectCall(
-      address(pairManager),
-      abi.encodeWithSelector(
-        pairManager.updateBuckets.selector,
-        pairId,
-        nextStableBucket,
-        nextCollateralBucket
-      )
-    );
-
-    vm.expectEmit(true, true, true, true, address(broker));
-    emit Swap(
-      pairId,
-      trader,
-      address(stableAsset),
-      address(collateralAsset),
-      amountIn,
-      mockAmountOut
-    );
-    (address tokenOut, uint256 amountOut) = broker.swap(pairId, address(stableAsset), amountIn, 0);
-    assertEq(tokenOut, address(collateralAsset));
-    assertEq(amountOut, mockAmountOut);
-  }
-
-  function test_swap_tokenInCollateralAsset_shouldExecuteSwap() public {
-    bytes32 pairId = mockGetPair();
-    uint256 amountIn = 2e18;
-    uint256 mockAmountOut = 1e18;
-    uint256 nextStableBucket = initialStableBucket - mockAmountOut;
-    uint256 nextCollateralBucket = initialCollateralBucket + amountIn;
-
-    vm.mockCall(
-      address(exchange),
-      abi.encodeWithSelector(
-        exchange.getAmountOut.selector,
-        collateralAsset,
-        stableAsset,
-        initialCollateralBucket,
-        initialStableBucket,
         amountIn
       ),
-      abi.encode(mockAmountOut, nextCollateralBucket, nextStableBucket)
-    );
-
-    vm.expectCall(
-      address(collateralAsset),
-      abi.encodeWithSelector(
-        collateralAsset.transferFrom.selector,
-        trader,
-        address(reserve),
-        amountIn
-      )
-    );
-
-    vm.expectCall(
-      address(stableAsset),
-      abi.encodeWithSelector(stableAsset.mint.selector, trader, mockAmountOut)
-    );
-
-    vm.expectCall(
-      address(pairManager),
-      abi.encodeWithSelector(
-        pairManager.updateBuckets.selector,
-        pairId,
-        nextStableBucket,
-        nextCollateralBucket
-      )
-    );
-
-    vm.expectEmit(true, true, true, true, address(broker));
-    emit Swap(
-      pairId,
-      trader,
-      address(collateralAsset),
-      address(stableAsset),
-      amountIn,
-      mockAmountOut
-    );
-    (address tokenOut, uint256 amountOut) = broker.swap(
-      pairId,
-      address(collateralAsset),
-      amountIn,
-      0
-    );
-    assertEq(tokenOut, address(stableAsset));
-    assertEq(amountOut, mockAmountOut);
-  }
-
-  function test_swap_minAmountNotMet_shouldRevert() public {
-    bytes32 pairId = mockGetPair();
-    uint256 amountIn = 1e18;
-    uint256 mockAmountOut = 2e18;
-    uint256 nextStableBucket = initialStableBucket + amountIn;
-    uint256 nextCollateralBucket = initialCollateralBucket - mockAmountOut;
-
-    vm.mockCall(
-      address(exchange),
-      abi.encodeWithSelector(
-        exchange.getAmountOut.selector,
-        stableAsset,
-        collateralAsset,
-        initialStableBucket,
-        initialCollateralBucket,
-        amountIn
-      ),
-      abi.encode(mockAmountOut, nextStableBucket, nextCollateralBucket)
+      abi.encode(mockAmountOut)
     );
 
     vm.expectRevert("amountOutMin not met");
-    broker.swap(pairId, address(stableAsset), amountIn, mockAmountOut + 1);
+    uint256 amountOut = broker.swapIn(
+      address(exchangeProvider),
+      exchangeId,
+      address(stableAsset),
+      address(collateralAsset),
+      amountIn,
+      1e17
+    );
   }
 
-  function test_swap_assetNotInPair_shouldRevert() public {
-    bytes32 pairId = mockGetPair();
-    vm.expectRevert("tokenIn is not in the pair");
-    broker.swap(pairId, randomAsset, 1e18, 0);
+  function test_swapOut_whenAmoutInMaxExceeded_shouldRevert() public {
+    uint256 amountOut = 1e16;
+    uint256 mockAmountIn = 1e16;
+
+    vm.mockCall(
+      address(exchangeProvider),
+      abi.encodeWithSelector(
+        exchangeProvider.swapOut.selector,
+        exchangeId,
+        address(stableAsset),
+        address(collateralAsset),
+        amountOut
+      ),
+      abi.encode(mockAmountIn)
+    );
+
+    vm.expectRevert("amountInMax exceeded");
+    uint256 amountIn = broker.swapOut(
+      address(exchangeProvider),
+      exchangeId,
+      address(stableAsset),
+      address(collateralAsset),
+      amountOut,
+      1e15
+    );
+  }
+
+  function test_swapIn_whenTokenInStableAsset_shouldUpdateAndEmit() public {
+    deal(address(collateralAsset), address(reserve), 1e16);
+    deal(address(collateralAsset), trader, 1e16);
+    stableAsset.mint(address(broker), 1e16);
+    stableAsset.mint(address(trader), 1e16);
+
+    changePrank(trader);
+    uint256 amountIn = 1e16;
+    uint256 mockAmountOut = 1e16;
+
+    vm.mockCall(
+      address(exchangeProvider),
+      abi.encodeWithSelector(
+        exchangeProvider.swapIn.selector,
+        exchangeId,
+        address(stableAsset),
+        address(collateralAsset),
+        amountIn
+      ),
+      abi.encode(mockAmountOut)
+    );
+
+    vm.expectEmit(true, true, true, true);
+    emit Swap(
+      address(exchangeProvider),
+      exchangeId,
+      trader,
+      address(stableAsset),
+      address(collateralAsset),
+      amountIn,
+      1e16
+    );
+    uint256 amountOut = broker.swapIn(
+      address(exchangeProvider),
+      exchangeId,
+      address(stableAsset),
+      address(collateralAsset),
+      amountIn,
+      1e16
+    );
+
+    assertEq(1e16, amountOut);
+    assertEq(stableAsset.balanceOf(trader), 0);
+    assertEq(stableAsset.balanceOf(address(broker)), 1e16);
+    assertEq(IERC20(collateralAsset).balanceOf(trader), 2e16);
+    assertEq(IERC20(collateralAsset).balanceOf(address(reserve)), 0);
+  }
+
+  function test_swapIn_whenTokenInCollateralAsset_shouldUpdateAndEmit() public {
+    deal(address(collateralAsset), address(reserve), 1e16);
+    deal(address(collateralAsset), trader, 1e16);
+    stableAsset.mint(address(broker), 1e16);
+    stableAsset.mint(address(trader), 1e16);
+
+    changePrank(trader);
+    IERC20(collateralAsset).approve(address(broker), 1e16);
+    uint256 amountIn = 1e16;
+    uint256 mockAmountOut = 1e16;
+
+    vm.mockCall(
+      address(exchangeProvider),
+      abi.encodeWithSelector(
+        exchangeProvider.swapOut.selector,
+        exchangeId,
+        address(collateralAsset),
+        address(stableAsset),
+        amountIn
+      ),
+      abi.encode(mockAmountOut)
+    );
+
+    vm.expectEmit(true, true, true, true);
+    emit Swap(
+      address(exchangeProvider),
+      exchangeId,
+      trader,
+      address(collateralAsset),
+      address(stableAsset),
+      amountIn,
+      1e16
+    );
+    uint256 amountOut = broker.swapOut(
+      address(exchangeProvider),
+      exchangeId,
+      address(collateralAsset),
+      address(stableAsset),
+      amountIn,
+      1e16
+    );
+
+    assertEq(1e16, amountOut);
+    assertEq(IERC20(collateralAsset).balanceOf(trader), 0);
+    assertEq(IERC20(collateralAsset).balanceOf(address(reserve)), 2e16);
+    assertEq(stableAsset.balanceOf(trader), 2e16);
+  }
+
+  function test_swapOut_whenTokenInStableAsset_shoulUpdateAndEmit() public {
+    deal(address(collateralAsset), address(reserve), 1e16);
+    deal(address(collateralAsset), trader, 1e16);
+    stableAsset.mint(address(broker), 1e16);
+    stableAsset.mint(address(trader), 1e16);
+
+    changePrank(trader);
+    uint256 amountOut = 1e16;
+    uint256 mockAmountIn = 1e16;
+
+    vm.mockCall(
+      address(exchangeProvider),
+      abi.encodeWithSelector(
+        exchangeProvider.swapOut.selector,
+        exchangeId,
+        address(stableAsset),
+        address(collateralAsset),
+        amountOut
+      ),
+      abi.encode(mockAmountIn)
+    );
+
+    vm.expectEmit(true, true, true, true);
+    emit Swap(
+      address(exchangeProvider),
+      exchangeId,
+      trader,
+      address(stableAsset),
+      address(collateralAsset),
+      amountOut,
+      1e16
+    );
+
+    uint256 amountIn = broker.swapOut(
+      address(exchangeProvider),
+      exchangeId,
+      address(stableAsset),
+      address(collateralAsset),
+      amountOut,
+      1e16
+    );
+
+    assertEq(1e16, amountIn);
+    assertEq(stableAsset.balanceOf(trader), 0);
+    assertEq(stableAsset.balanceOf(address(broker)), 1e16);
+    assertEq(IERC20(collateralAsset).balanceOf(trader), 2e16);
+    assertEq(IERC20(collateralAsset).balanceOf(address(reserve)), 0);
+  }
+
+  function test_swapOut_whenTokenInCollateralAsset_shouldUpdateAndEmit() public {
+    deal(address(collateralAsset), address(reserve), 1e16);
+    deal(address(collateralAsset), trader, 1e16);
+    stableAsset.mint(address(broker), 1e16);
+    stableAsset.mint(address(trader), 1e16);
+
+    changePrank(trader);
+    IERC20(collateralAsset).approve(address(broker), 1e16);
+    uint256 amountOut = 1e16;
+    uint256 mockAmountIn = 1e16;
+
+    vm.mockCall(
+      address(exchangeProvider),
+      abi.encodeWithSelector(
+        exchangeProvider.swapOut.selector,
+        exchangeId,
+        address(collateralAsset),
+        address(stableAsset),
+        amountOut
+      ),
+      abi.encode(mockAmountIn)
+    );
+
+    vm.expectEmit(true, true, true, true);
+    emit Swap(
+      address(exchangeProvider),
+      exchangeId,
+      trader,
+      address(collateralAsset),
+      address(stableAsset),
+      amountOut,
+      1e16
+    );
+    uint256 amountIn = broker.swapOut(
+      address(exchangeProvider),
+      exchangeId,
+      address(collateralAsset),
+      address(stableAsset),
+      amountOut,
+      1e16
+    );
+
+    assertEq(1e16, amountIn);
+    assertEq(IERC20(collateralAsset).balanceOf(trader), 0);
+    assertEq(IERC20(collateralAsset).balanceOf(address(reserve)), 2e16);
+    assertEq(stableAsset.balanceOf(trader), 2e16);
+  }
+
+  function test_swapOut_whenExchangeManagerWasNotSet_shouldRevert() public {
+    vm.expectRevert("ExchangeProvider does not exist");
+    broker.swapOut(randomExchangeProvider, exchangeId, randomAsset, randomAsset, 2e24, 1e24);
   }
 }
