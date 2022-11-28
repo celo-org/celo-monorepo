@@ -2386,7 +2386,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe('when the proposal with 0 transactions is past the execution stage', () => {
+    describe('when a proposal with 0 transactions is past the execution stage', () => {
       beforeEach(async () => {
         await governance.propose(
           [],
