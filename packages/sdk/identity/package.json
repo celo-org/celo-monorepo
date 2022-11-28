@@ -1,6 +1,6 @@
 {
   "name": "@celo/identity",
-  "version": "2.4.0-beta.8-dev",
+  "version": "2.4.0-beta.9-dev",
   "description": "Utilities for interacting with Celo's identity protocol",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -25,13 +25,13 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@celo/base": "2.4.0-beta.8-dev",
-    "@celo/utils": "2.4.0-beta.8-dev",
-    "@celo/contractkit": "2.4.0-beta.8-dev",
-    "@celo/phone-number-privacy-common": "2.0.0-beta.8-dev",
+    "@celo/base": "2.4.0-beta.9-dev",
+    "@celo/utils": "2.4.0-beta.9-dev",
+    "@celo/contractkit": "2.4.0-beta.9-dev",
+    "@celo/phone-number-privacy-common": "2.0.0-beta.9",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208",
+    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
     "cross-fetch": "3.0.4",
     "debug": "^4.1.1",
     "elliptic": "^6.5.4",
@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/wallet-local": "2.4.0-beta.8-dev",
+    "@celo/wallet-local": "2.4.0-beta.9-dev",
     "fetch-mock": "9.10.4",
     "@types/elliptic": "^6.4.12",
     "@celo/flake-tracker": "0.0.1-dev",
