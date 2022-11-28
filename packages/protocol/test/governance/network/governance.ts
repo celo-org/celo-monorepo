@@ -3050,7 +3050,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe('when the proposal with 0 transactions is past the execution stage', () => {
+    describe('when a proposal with 0 transactions is past the execution stage', () => {
       beforeEach(async () => {
         await governance.propose(
           [],
@@ -3653,7 +3653,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe('when proposal with 0 transactions exists', () => {
+    describe('when a proposal with 0 transactions exists', () => {
       let proposalId: number
       beforeEach(async () => {
         await governance.propose(
@@ -3692,7 +3692,7 @@ contract('Governance', (accounts: string[]) => {
           it('should return Execution when not expired', () =>
             expectStage(Stage.Execution, proposalId))
 
-          it('should return Execution when passed execution stage', async () => {
+          it('should return Execution past the execution stage', async () => {
             await timeTravel(executionStageDuration + 1, web3)
             await expectStage(Stage.Execution, proposalId)
             const isDequeuedProposalExpired = await governance.isDequeuedProposalExpired(proposalId)
