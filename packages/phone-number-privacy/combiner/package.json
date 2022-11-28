@@ -33,7 +33,7 @@
     "@celo/encrypted-backup": "2.4.0-beta.8",
     "@celo/identity-prev": "npm:@celo/identity@1.2.0",
     "@celo/poprf": "^0.1.9",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
+    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "firebase-admin": "^9.12.0",

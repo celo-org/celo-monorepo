@@ -46,7 +46,7 @@
     "@types/bunyan": "^1.8.6",
     "@types/promise.allsettled": "^1.0.3",
     "aws-sdk": "^2.705.0",
-    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
+    "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a1ab5154c2f0b1c55cb0d61fbb1d907208",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "knex": "^2.1.0",
