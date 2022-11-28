@@ -53,6 +53,7 @@ export enum WarningMessage {
   INVALID_NONCE = `CELO_ODIS_WARN_13 BAD_INPUT SequentialDelayDomain nonce check failed on Signer request`,
   SIGNER_RESPONSE_DISCREPANCIES = `CELO_ODIS_WARN_14 SIGNER Discrepancies detected in signer responses`,
   INCONSISTENT_SIGNER_QUERY_MEASUREMENTS = `CELO_ODIS_WARN_15 SIGNER Discrepancy found in signers performed query count measurements`,
+  SIGNER_FAILED_OPEN = `CELO_ODIS_WARN_19 SIGNER Signer failed open on request`,
 }
 
 export type ErrorType = ErrorMessage | WarningMessage
