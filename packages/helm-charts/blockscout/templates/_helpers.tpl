@@ -7,12 +7,15 @@ chart: blockscout
 release: {{ .Release.Name }}
 heritage: {{ .Release.Service }}
 {{- end -}}
+{{- define "celo.blockscout.elixir.labels" -}}
+erlang-cluster: {{ .Release.Name }}
+{{- end -}}
 
 {{- /*
 Defines common annotations across all blockscout components.
 */ -}}
 {{- define "celo.blockscout.annotations" -}}
-kubernetes.io/change-cause: Deployed {{ .Values.blockscout.image.tag }} by {{ .Values.blockscout.deployment.account }} on {{ .Values.blockscout.deployment.timestamp }}
+kubernetes.io/change-cause: {{ .Values.changeCause }}
 {{- end -}}
 
 {{- /*
@@ -21,7 +24,7 @@ after termination of the main container.
 Should be included as the last container as it contains
 the `volumes` section.
 */ -}}
-{{- define "celo.blockscout-db-terminating-sidecar" -}}
+{{- define "celo.blockscout.container.db-terminating-sidecar" -}}
 - name: cloudsql-proxy
   image: gcr.io/cloudsql-docker/gce-proxy:1.11
   command:
@@ -30,7 +33,7 @@ the `volumes` section.
   - -c
   - |
     /cloud_sql_proxy \
-    -instances={{ .Values.blockscout.db.connection_name }}=tcp:5432 \
+    -instances={{ .Database.connectionName }}=tcp:{{ .Database.port }} \
     -credential_file=/secrets/cloudsql/credentials.json &
     CHILD_PID=$!
     (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; fi; sleep 1; done) &
@@ -44,15 +47,44 @@ the `volumes` section.
     mountPath: /secrets/cloudsql
     readOnly: true
   - mountPath: /tmp/pod
-    name: tmp-pod
+    name: temporary-dir
     readOnly: true
-volumes:
-  - name: blockscout-cloudsql-credentials
-    secret:
-      defaultMode: 420
-      secretName: blockscout-cloudsql-credentials
-  - name: tmp-pod
-    emptyDir: {}
+{{- end -}}
+
+{{- /* Defines the volume with CloudSQL proxy credentials file. */ -}}
+{{- define "celo.blockscout.volume.cloudsql-credentials" -}}
+- name: blockscout-cloudsql-credentials
+  secret:
+    defaultMode: 420
+    secretName: blockscout-cloudsql-credentials
+{{- end -}}
+
+{{- /* Defines an empty dir volume with write access for temporary pid files. */ -}}
+{{- define "celo.blockscout.volume.temporary-dir" -}}
+- name: temporary-dir
+  emptyDir: {}
+{{- end -}}
+
+{{- /* Defines NFS volumes for storing various compilers versions. */ -}}
+{{- define "celo.blockscout.volume.compilers" -}}
+- name: vyper-compilers
+  persistentVolumeClaim:
+    claimName: {{ .Release.Name }}-nfs-vyper-compilers-volume
+- name: solc-compilers
+  persistentVolumeClaim:
+    claimName: {{ .Release.Name }}-nfs-solc-compilers-volume
+{{- end -}}
+
+{{- /* Defines init container copying secrets-init to the specified directory. */ -}}
+{{- define "celo.blockscout.initContainer.secrets-init" -}}
+- name: secrets-init
+  image: "doitintl/secrets-init:0.4.2"
+  args:
+    - copy
+    - /secrets/
+  volumeMounts:
+  - mountPath: /secrets
+    name: temporary-dir
 {{- end -}}
 
 {{- /*
@@ -61,11 +93,11 @@ access to the database to the main container.
 Should be included as the last container as it contains
 the `volumes` section.
 */ -}}
-{{- define "celo.blockscout-db-sidecar" -}}
+{{- define "celo.blockscout.container.db-sidecar" -}}
 - name: cloudsql-proxy
   image: gcr.io/cloudsql-docker/gce-proxy:1.19.1
   command: ["/cloud_sql_proxy",
-            "-instances={{ .Values.blockscout.db.connection_name }}{{ .DbSuffix | default "" }}=tcp:5432",
+            "-instances={{ .Database.connectionName }}=tcp:{{ .Database.port }}",
             "-credential_file=/secrets/cloudsql/credentials.json",
             "-term_timeout=30s"]
   {{- if .Database.proxy.livenessProbe.enabled }}
@@ -99,57 +131,53 @@ the `volumes` section.
     - name: blockscout-cloudsql-credentials
       mountPath: /secrets/cloudsql
       readOnly: true
-volumes:
-  - name: blockscout-cloudsql-credentials
-    secret:
-      secretName: blockscout-cloudsql-credentials
 {{- end -}}
 
 {{- /*
 Defines shared environment variables for all
 blockscout components.
 */ -}}
-{{- define "celo.blockscout-env-vars" -}}
+{{- define "celo.blockscout.env-vars" -}}
 - name: DATABASE_USER
-  valueFrom:
-    secretKeyRef:
-      name:  {{ .Release.Name }}
-      key: DATABASE_USER
+  value: {{ .Values.blockscout.secrets.dbUser }}
 - name: DATABASE_PASSWORD
+  value: {{ .Values.blockscout.secrets.dbPassword }}
+- name: ERLANG_COOKIE
+  value: {{ .Values.blockscout.secrets.erlang.cookie }}
+- name: POD_IP
   valueFrom:
-    secretKeyRef:
-      name:  {{ .Release.Name }}
-      key: DATABASE_PASSWORD
+    fieldRef:
+      fieldPath: status.podIP
+- name: EPMD_SERVICE_NAME
+  value: {{ .Release.Name }}-epmd-service
 - name: NETWORK
   value: Celo
 - name: SUBNETWORK
-  value: {{ .Values.blockscout.subnetwork }}
+  value: {{ .Values.blockscout.chain.subnetwork }}
 - name: COIN
   value: CELO
-- name: SEGMENT_KEY
-  value: {{ .Values.blockscout.segment_key }}
+- name: COIN_NAME
+  value: CELO
 - name: ECTO_USE_SSL
   value: "false"
 - name: ETHEREUM_JSONRPC_VARIANT
   value: geth
 - name: ETHEREUM_JSONRPC_HTTP_URL
-  value: {{ .Values.blockscout.jsonrpc_http_url }}
+  value: {{ .Values.blockscout.archiveNodes.jsonrpcHttpUrl }}
 - name: ETHEREUM_JSONRPC_WS_URL
-  value: {{ .Values.blockscout.jsonrpc_ws_url }}
+  value: {{ .Values.blockscout.archiveNodes.jsonrpcWsUrl }}
 - name: PGUSER
-  value: $(DATABASE_USER)
-- name: DATABASE_URL
-  value: postgres://$(DATABASE_USER):$(DATABASE_PASSWORD)@127.0.0.1:5432/{{ .Values.blockscout.db.name }}
+  value: {{ .Values.blockscout.secrets.dbUser }}
 - name: DATABASE_DB
-  value: {{ .Values.blockscout.db.name }}
+  value: {{ .Database.name }}
 - name: DATABASE_HOSTNAME
-  value: "127.0.0.1"
+  value: {{ .Database.proxy.host | quote }}
 - name: DATABASE_PORT
-  value: "5432"
+  value: {{ .Database.proxy.port | quote }}
 - name: WOBSERVER_ENABLED
   value: "false"
 - name: HEALTHY_BLOCKS_PERIOD
-  value: {{ .Values.blockscout.healthy_blocks_period | quote }}
+  value: {{ .Values.blockscout.healthyBlocksPeriod | quote }}
 - name: MIX_ENV
   value: prod
 - name: LOGO

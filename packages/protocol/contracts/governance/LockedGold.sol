@@ -84,7 +84,7 @@ contract LockedGold is
   * @return Patch version of the contract.
   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 0);
+    return (1, 1, 2, 1);
   }
 
   /**
@@ -178,12 +178,18 @@ contract LockedGold is
     Balances storage account = balances[msg.sender];
     // Prevent unlocking gold when voting on governance proposals so that the gold cannot be
     // used to vote more than once.
-    require(!getGovernance().isVoting(msg.sender), "Account locked");
+    uint256 remainingLockedGold = getAccountTotalLockedGold(msg.sender).sub(value);
+
+    uint256 totalReferendumVotes = getGovernance().getAmountOfGoldUsedForVoting(msg.sender);
+    require(
+      remainingLockedGold >= totalReferendumVotes,
+      "Not enough unlockable celo. Celo is locked in voting."
+    );
+
     uint256 balanceRequirement = getValidators().getAccountLockedGoldRequirement(msg.sender);
     require(
-      balanceRequirement == 0 ||
-        balanceRequirement <= getAccountTotalLockedGold(msg.sender).sub(value),
-      "Trying to unlock too much gold"
+      balanceRequirement == 0 || balanceRequirement <= remainingLockedGold,
+      "Either account doesn't have enough locked Celo or locked Celo is being used for voting."
     );
     _decrementNonvotingAccountBalance(msg.sender, value);
     uint256 available = now.add(unlockingPeriod);

@@ -15,6 +15,7 @@ import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { Erc20Wrapper } from './wrappers/Erc20Wrapper'
 import { EscrowWrapper } from './wrappers/Escrow'
 import { ExchangeWrapper } from './wrappers/Exchange'
+import { FederatedAttestationsWrapper } from './wrappers/FederatedAttestations'
 import { FreezerWrapper } from './wrappers/Freezer'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
@@ -24,6 +25,7 @@ import { LockedGoldWrapper } from './wrappers/LockedGold'
 import { MetaTransactionWalletWrapper } from './wrappers/MetaTransactionWallet'
 import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransactionWalletDeployer'
 import { MultiSigWrapper } from './wrappers/MultiSig'
+import { OdisPaymentsWrapper } from './wrappers/OdisPayments'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenRegistryWrapper } from './wrappers/StableTokenRegistry'
@@ -39,6 +41,7 @@ const WrapperFactories = {
   [CeloContract.Exchange]: ExchangeWrapper,
   [CeloContract.ExchangeEUR]: ExchangeWrapper,
   [CeloContract.ExchangeBRL]: ExchangeWrapper,
+  [CeloContract.FederatedAttestations]: FederatedAttestationsWrapper,
   // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]: FreezerWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
@@ -49,6 +52,7 @@ const WrapperFactories = {
   [CeloContract.MetaTransactionWallet]: MetaTransactionWalletWrapper,
   [CeloContract.MetaTransactionWalletDeployer]: MetaTransactionWalletDeployerWrapper,
   [CeloContract.MultiSig]: MultiSigWrapper,
+  [CeloContract.OdisPayments]: OdisPaymentsWrapper,
   [CeloContract.Reserve]: ReserveWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
   [CeloContract.StableTokenEUR]: StableTokenWrapper,
@@ -93,6 +97,7 @@ interface WrapperCacheMap {
   [CeloContract.Exchange]?: ExchangeWrapper
   [CeloContract.ExchangeEUR]?: ExchangeWrapper
   [CeloContract.ExchangeBRL]?: ExchangeWrapper
+  [CeloContract.FederatedAttestations]?: FederatedAttestationsWrapper
   // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]?: FreezerWrapper
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
@@ -103,6 +108,7 @@ interface WrapperCacheMap {
   [CeloContract.MetaTransactionWallet]?: MetaTransactionWalletWrapper
   [CeloContract.MetaTransactionWalletDeployer]?: MetaTransactionWalletDeployerWrapper
   [CeloContract.MultiSig]?: MultiSigWrapper
+  [CeloContract.OdisPayments]?: OdisPaymentsWrapper
   // [CeloContract.Random]?: RandomWrapper,
   // [CeloContract.Registry]?: RegistryWrapper,
   [CeloContract.Reserve]?: ReserveWrapper
@@ -160,15 +166,15 @@ export class WrapperCache implements ContractCacheType {
   getEscrow(): Promise<EscrowWrapper> {
     return this.getContract(CeloContract.Escrow)
   }
-
   getExchange(stableToken: StableToken = StableToken.cUSD) {
     return this.getContract(stableTokenInfos[stableToken].exchangeContract)
   }
-
   getFreezer() {
     return this.getContract(CeloContract.Freezer)
   }
-
+  getFederatedAttestations() {
+    return this.getContract(CeloContract.FederatedAttestations)
+  }
   getGasPriceMinimum() {
     return this.getContract(CeloContract.GasPriceMinimum)
   }
@@ -193,14 +199,15 @@ export class WrapperCache implements ContractCacheType {
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)
   }
-
+  getOdisPayments() {
+    return this.getContract(CeloContract.OdisPayments)
+  }
   getReserve() {
     return this.getContract(CeloContract.Reserve)
   }
   getSortedOracles() {
     return this.getContract(CeloContract.SortedOracles)
   }
-
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
     return this.getContract(stableTokenInfos[stableToken].contract)
   }

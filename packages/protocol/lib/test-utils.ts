@@ -286,23 +286,64 @@ export function assertLogMatches(
   args: Record<string, any>
 ) {
   assert.equal(log.event, event, `Log event name doesn\'t match`)
+  assertObjectWithBNEqual(log.args, args, (arg) => `Event ${event}, arg: ${arg} do not match`)
+}
 
-  const logArgs = Object.keys(log.args)
+// Compares objects' properties, using assertBNEqual to compare BN fields.
+// Extracted out of previous `assertLogMatches`.
+export function assertObjectWithBNEqual(
+  actual: object,
+  expected: Record<string, any>,
+  fieldErrorMsg: (field?: string) => string,
+) {
+  const objectFields = Object.keys(actual)
     .filter((k) => k !== '__length__' && isNaN(parseInt(k, 10)))
     .sort()
 
-  assert.deepEqual(logArgs, Object.keys(args).sort(), `Argument names do not match for ${event}`)
-
-  for (const k of logArgs) {
-    if (typeof args[k] === 'function') {
-      args[k](log.args[k], `Event ${event}, arg: ${k} do not match`)
-    } else if (isNumber(log.args[k]) || isNumber(args[k])) {
-      assertEqualBN(log.args[k], args[k], `Event ${event}, arg: ${k} do not match`)
-    } else {
-      assert.equal(log.args[k], args[k], `Event ${event}, arg: ${k} do not match`)
+  assert.deepEqual(objectFields, Object.keys(expected).sort(), `Argument names do not match`)
+  for (const k of objectFields) {
+    if (typeof expected[k] === 'function') {
+      expected[k](actual[k], fieldErrorMsg(k))
+    } else if (isNumber(actual[k]) || isNumber(expected[k])) {
+      assertEqualBN(actual[k], expected[k], fieldErrorMsg(k))
+    } else if (Array.isArray(actual[k])) {
+      const actualArray = actual[k] as []
+      const expectedArray = expected[k] as []
+      if (actualArray.length === expectedArray.length 
+        && actualArray.every(actualValue => isNumber(actualValue)) 
+        && expectedArray.every(expectedValue => isNumber(expectedValue))) {
+        // if this is array of BNs, deepEqual will not work
+        // since it is not able to compare number/string/BN
+        // with each other and we have to compare it manually
+        for (let i = 0; i < actualArray.length; i++) {
+          assertEqualBN(actualArray[i], expectedArray[i], fieldErrorMsg(k))
+        }
+      } else  {
+        assert.deepEqual(actual[k], expected[k], fieldErrorMsg(k))
+      }
+    }
+    else {
+      assert.equal(actual[k], expected[k], fieldErrorMsg(k))
     }
   }
 }
+
+export function assertBNArrayEqual(
+  actualArray: any[],
+  expectedArray: any[]
+) {
+  assert(Array.isArray(actualArray), `Actual is not an array`)
+  assert(Array.isArray(expectedArray), `Expected is not an array`)
+  assert(actualArray.length === expectedArray.length, `Different array sizes; actual: ${actualArray.length} expected: ${expectedArray.length}`)
+  assert(actualArray.every(actualValue => isNumber(actualValue)) 
+      && expectedArray.every(expectedValue => isNumber(expectedValue)),
+      `Expected all elements to be numbers`)
+      
+  for (let i = 0; i < actualArray.length; i++) {
+    assertEqualBN(actualArray[i], expectedArray[i])
+  }
+}
+
 
 export function assertEqualBN(
   actual: number | BN | BigNumber,
@@ -375,6 +416,7 @@ export const isSameAddress = (minerAddress, otherAddress) => {
 // TODO(amy): Pull this list from the build artifacts instead
 export const proxiedContracts: string[] = [
   'Attestations',
+  // TODO ASv2 revisit if we need to update test-utils
   'Escrow',
   'GoldToken',
   'Registry',
@@ -386,6 +428,7 @@ export const proxiedContracts: string[] = [
 // TODO(asa): Pull this list from the build artifacts instead
 export const ownedContracts: string[] = [
   'Attestations',
+  // TODO ASv2 revisit if we need to update test-utils
   'Escrow',
   'Exchange',
   'Registry',

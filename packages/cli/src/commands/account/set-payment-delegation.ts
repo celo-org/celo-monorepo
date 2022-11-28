@@ -1,4 +1,4 @@
-import { valueToFixidityString } from '@celo/contractkit/src/wrappers/BaseWrapper'
+import { valueToFixidityString } from '@celo/contractkit/lib/wrappers/BaseWrapper'
 import { flags } from '@oclif/command'
 import { BaseCommand } from '../../base'
 import { newCheckBuilder } from '../../utils/checks'

@@ -1,4 +1,4 @@
-imagePullPolicy: IfNotPresent
+ingressClassName: nginx
 blockscout:
   indexer:
     terminationGracePeriodSeconds: 60
@@ -8,7 +8,14 @@ blockscout:
         maxSurge: 1
         maxUnavailable: 0
     db:
+      name: blockscout
+      connectionName: project:region:db-name
+      # to be fetched from secrets
+      # username: blockscout
+      # password: password
+      port: 5432
       proxy:
+        host: 127.0.0.1
         port: 5432
         livenessProbe:
           enabled: false
@@ -28,7 +35,8 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 30
+    poolSize: 30
+    poolSizeReplica: 5
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -47,8 +55,15 @@ blockscout:
       requests:
         memory: 1000Mi
         cpu: 2
-    erlangNodeName: blockscout-indexer
+    rpcRegion: "indexer"  
+    primaryRpcRegion: "indexer"  
+    enableEventStream: false
+    beanstalkdPort: ""
+    beanstalkdHost: ""
   api:
+    suffix:
+      enabled: false
+      path: ""
     port: 4000
     strategy:
       rollingUpdate:
@@ -59,8 +74,17 @@ blockscout:
         minReplicas: 2
         target:
           cpu: 70
+    rpcRegion: "api"  
+    primaryRpcRegion: "indexer"  
     db:
+      name: blockscout
+      connectionName: project:region:db-name
+      # to be fetched from secrets
+      # username: blockscout
+      # password: password
+      port: 5432
       proxy:
+        host: 127.0.0.1
         port: 5432
         livenessProbe:
           enabled: false
@@ -80,7 +104,9 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 30
+    poolSize: 30
+    poolSizeReplica: 5
+    rateLimit: "1000000"
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -99,8 +125,25 @@ blockscout:
       requests:
         memory: 500Mi
         cpu: 500m
-    erlangNodeName: blockscout-api
   web:
+    host: ""
+    suffix:
+      enabled: false
+      path: ""
+    # used once to create additional resources for proper routing
+    # of multiple environments on the same domain
+    extraEnvironments:
+      # format:
+      # -
+      #  environment: alfajores|baklava|rc1 etc.
+      #  suffix: alfajores|baklava|mainnet etc, must match the suffix
+      #          value configured for those environments
+      #  ingressIp: x.x.x.x
+      source: []
+      # format:
+      # -
+      #  sourceHost: ""
+      target: []
     port: 4000
     strategy:
       rollingUpdate:
@@ -112,7 +155,14 @@ blockscout:
       target:
         cpu: 70
     db:
+      name: blockscout
+      connectionName: project:region:db-name
+      # to be fetched from secrets
+      # username: blockscout
+      # password: password
+      port: 5432
       proxy:
+        host: 127.0.0.1
         port: 5432
         livenessProbe:
           enabled: false
@@ -132,7 +182,8 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    pool_size: 30
+    poolSize: 30
+    poolSizeReplica: 5
     readinessProbe:
       enabled: true
       initialDelaySeconds: 10
@@ -155,7 +206,6 @@ blockscout:
       requests:
         memory: 250M
         cpu: 500m
-    erlangNodeName: blockscout-web
     appsMenu:
       enabled: true
       swapList: '[{"url":"https://ubeswap.org/", "title":"Ubeswap"}, {"url":"https://symmetric.finance/", "title":"Symmetric"}, {"url":"https://www.mobius.money/", "title":"Mobius"}, {"url":"https://mento.finance/", "title":"Mento-fi"}, {"url":"https://swap.bitssa.com/", "title":"Swap Bitssa"}]'
@@ -171,21 +221,57 @@ blockscout:
     stats:
       enabled: false
       reportUrl: ""
-  image:
-    repository: gcr.io/celo-testnet/blockscout
-    tag: v2.0.4-beta-celo
-  healthy_blocks_period: 300
-  db:
-    # ip: must be provided at runtime # IP address of the postgres DB
-    # connection_name: must be provided at runtime # name of the cloud sql connection
-    # username: blockscout
-    # password: password
-    name: blockscout
-    drop: "false"
-  jsonrpc_http_url: http://tx-nodes-private:8545
-  jsonrpc_ws_url: ws://tx-nodes-private:8545
-  metadata_crawler:
-    schedule: "*/30 * * * *"
+      makerdojo: ""
+    rpcRegion: "web"  
+    primaryRpcRegion: "indexer"  
+  metadataCrawler:
+    enabled: false
+    schedule: "0 */2 * * *" # every 2 hours
     image:
       repository: gcr.io/celo-testnet/celo-monorepo
       tag: metadata-crawler-77a392216d4927e85ce4b683508fc0539aa92a34
+  archiveNodes:
+    jsonrpcHttpUrl: http://tx-nodes-private:8545
+    jsonrpcWsUrl: ws://tx-nodes-private:8545
+  fullNodes:
+    jsonrpcPublicHttp: ""
+  metrics:
+    enabled: false
+  image:
+    repository: gcr.io/celo-testnet/blockscout
+    pullPolicy: IfNotPresent
+    tag: v2.0.4-beta-celo
+  healthyBlocksPeriod: 300
+  erlangNodeName: blockscout
+  cookieSecretName: blockscout-erlang-cookie
+  db:
+    drop: "false"
+  epochRewards:
+    enabled: false
+  campaignBanner:
+    refreshInterval: "60"
+  grafanaUrl: https://clabs.grafana.net
+  secrets:
+    # Format:
+    # secretName: gcp:secretmanager:projects/<project-id>/secrets/<env>-blockscout-<secret-key>
+    # - <project-id> - numeric project id
+    # - <env> - alfajores|baklava|rc1 etc.
+    # - <secret-key> - name of the secret
+    # Example: segmentKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-segmentKey
+    segmentKey: ""
+    discordWebhookUrl: ""
+    dbUser: ""
+    dbPassword: ""
+    recaptcha:
+      projectId: ""
+      siteKey: ""
+      apiKey: ""
+    erlang:
+      cookie: ""
+    campaignBannerApiUrl: ""
+  chain:
+    subnetwork: Celo
+    networkID: 1101
+  domainName: celo-testnet.org
+  gcp:
+    projectId: celo-testnet-production

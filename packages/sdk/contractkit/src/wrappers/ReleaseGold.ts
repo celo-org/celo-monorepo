@@ -271,6 +271,16 @@ export class ReleaseGoldWrapper extends BaseWrapperForGoverning<ReleaseGold> {
   )
 
   /**
+   * Returns currently withdrawable amount
+   * @return The amount that can be yet withdrawn
+   */
+  getWithdrawableAmount: () => Promise<BigNumber> = proxyCall(
+    this.contract.methods.getWithdrawableAmount,
+    undefined,
+    valueToBigNumber
+  )
+
+  /**
    * Revoke a Release schedule
    * @return A CeloTransactionObject
    */

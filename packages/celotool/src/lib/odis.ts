@@ -18,7 +18,10 @@ const helmChartPath = '../helm-charts/odis'
  */
 interface ODISSignerKeyVaultConfig {
   vaultName: string
-  secretName: string
+  pnpKeyNameBase: string
+  pnpKeyLatestVersion: string
+  domainsKeyNameBase: string
+  domainsKeyLatestVersion: string
 }
 
 /**
@@ -58,7 +61,10 @@ const contextODISSignerKeyVaultConfigDynamicEnvVars: {
   [k in keyof ODISSignerKeyVaultConfig]: DynamicEnvVar
 } = {
   vaultName: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_NAME,
-  secretName: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_SECRET_NAME,
+  pnpKeyNameBase: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_PNP_KEY_NAME_BASE,
+  pnpKeyLatestVersion: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_PNP_KEY_LATEST_VERSION,
+  domainsKeyNameBase: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_DOMAINS_KEY_NAME_BASE,
+  domainsKeyLatestVersion: DynamicEnvVar.ODIS_SIGNER_AZURE_KEYVAULT_DOMAINS_KEY_LATEST_VERSION,
 }
 
 /**
@@ -98,21 +104,21 @@ function releaseName(celoEnv: string, context: string) {
 }
 
 export async function installODISHelmChart(celoEnv: string, context: string) {
-  return installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, context),
-    helmChartPath,
-    await helmParameters(celoEnv, context)
-  )
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv, context),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv, context),
+  })
 }
 
 export async function upgradeODISChart(celoEnv: string, context: string) {
-  return upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, context),
-    helmChartPath,
-    await helmParameters(celoEnv, context)
-  )
+  return upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv, context),
+    chartDir: helmChartPath,
+    parameters: await helmParameters(celoEnv, context),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string, context: string) {
@@ -158,7 +164,13 @@ async function helmParameters(celoEnv: string, context: string) {
     `--set db.username=${databaseConfig.username}`,
     `--set db.password='${databaseConfig.password}'`,
     `--set keystore.vaultName=${keyVaultConfig.vaultName}`,
-    `--set keystore.secretName=${keyVaultConfig.secretName}`,
+    `--set keystore.pnpKeyNameBase=${keyVaultConfig.pnpKeyNameBase}`,
+    `--set keystore.domainsKeyNameBase=${keyVaultConfig.domainsKeyNameBase}`,
+    `--set keystore.pnpKeyLatestVersion=${keyVaultConfig.pnpKeyLatestVersion}`,
+    `--set keystore.domainsKeyLatestVersion=${keyVaultConfig.domainsKeyLatestVersion}`,
+    `--set api.pnpAPIEnabled=${fetchEnv(envVar.ODIS_SIGNER_PNP_API_ENABLED)}`,
+    `--set api.legacyPnpAPIEnabled=${fetchEnv(envVar.ODIS_SIGNER_LEGACY_PNP_API_ENABLED)}`,
+    `--set api.domainsAPIEnabled=${fetchEnv(envVar.ODIS_SIGNER_DOMAINS_API_ENABLED)}`,
     `--set blockchainProvider=${fetchEnv(envVar.ODIS_SIGNER_BLOCKCHAIN_PROVIDER)}`,
     `--set blockchainApiKey=${blockchainConfig.blockchainApiKey}`,
     `--set log.level=${loggingConfig.level}`,

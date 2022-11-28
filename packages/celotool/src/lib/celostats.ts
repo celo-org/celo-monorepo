@@ -10,12 +10,12 @@ import { AccountType, getAddressesFor } from './generate_utils'
 const helmChartPath = '../helm-charts/celostats'
 
 export async function installHelmChart(celoEnv: string) {
-  return installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    helmChartPath,
-    helmParameters(celoEnv)
-  )
+  return installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: helmChartPath,
+    parameters: helmParameters(celoEnv),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string) {
@@ -23,12 +23,12 @@ export async function removeHelmRelease(celoEnv: string) {
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
-  await upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv),
-    helmChartPath,
-    helmParameters(celoEnv)
-  )
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv),
+    chartDir: helmChartPath,
+    parameters: helmParameters(celoEnv),
+  })
 }
 
 function helmParameters(celoEnv: string) {
