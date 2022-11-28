@@ -357,6 +357,8 @@ contract Validators is
   ) external nonReentrant returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
     require(
+      // A Validator could avoid getting slashed by voting for a bunch of groups with very small
+      // amounts of CELO, causing the slash function to always run out of gas.
       !getElection().allowedToVoteOverMaxNumberOfGroups(account),
       "Validators cannot vote for more than max number of groups"
     );

@@ -281,18 +281,8 @@ contract Election is
       groups.push(group);
     }
 
-    if (groups.length > maxNumGroupsVotedFor) {
-      CachedVotes storage cachedVotes = cachedVotesByAccount[account];
-      if (cachedVotesByAccount[account].totalVotes > 0) {
-        // if total account votes were counted at least once,
-        // lets add new votes to cache for possible slashing
-        cachedVotes.totalVotes += value;
-        cachedVotes.cachedVotesPerGroup[group] += value;
-      }
-    }
-
     incrementPendingVotes(group, account, value);
-    incrementTotalVotes(group, value, lesser, greater);
+    incrementTotalVotes(account, group, value, lesser, greater);
     getLockedGold().decrementNonvotingAccountBalance(account, value);
     emit ValidatorGroupVoteCast(account, group, value);
     return true;
@@ -503,10 +493,6 @@ contract Election is
   function getTotalVotesByAccount(address account) external view returns (uint256) {
     bool allowedToVoteOverMaxNumberOfGroupsForAccount = allowedToVoteOverMaxNumberOfGroups[account];
     address[] memory groups = votes.groupsVotedFor[account];
-    require(
-      allowedToVoteOverMaxNumberOfGroupsForAccount || groups.length <= maxNumGroupsVotedFor,
-      "Too many groups voted for"
-    );
 
     if (groups.length > maxNumGroupsVotedFor) {
       return cachedVotesByAccount[account].totalVotes;
@@ -524,7 +510,7 @@ contract Election is
    * @param account The address of the voting account.
    * @param group The address of the validator group.
    */
-  function updateTotalVotesByAccountForGroup(address account, address group) external {
+  function updateTotalVotesByAccountForGroup(address account, address group) public {
     cachedVotesByAccount[account].totalVotes -= cachedVotesByAccount[account]
       .cachedVotesPerGroup[group];
     uint256 newTotalVotesForGroupByAccount = getTotalVotesForGroupByAccount(group, account);
@@ -717,11 +703,19 @@ contract Election is
    * @param greater The group receiving more votes than the group for which the vote was cast,
    *   or 0 if that group has the most votes of any validator group.
    */
-  function incrementTotalVotes(address group, uint256 value, address lesser, address greater)
-    private
-  {
+  function incrementTotalVotes(
+    address account,
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  ) private {
     uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
     votes.total.eligible.update(group, newVoteTotal, lesser, greater);
+
+    if (allowedToVoteOverMaxNumberOfGroups[account]) {
+      updateTotalVotesByAccountForGroup(account, group);
+    }
   }
 
   /**
@@ -747,12 +741,7 @@ contract Election is
     }
 
     if (allowedToVoteOverMaxNumberOfGroups[account]) {
-      CachedVotes storage cachedVotes = cachedVotesByAccount[account];
-      cachedVotes.totalVotes -= Math.min(cachedVotes.totalVotes, value);
-      cachedVotes.cachedVotesPerGroup[group] -= Math.min(
-        cachedVotes.cachedVotesPerGroup[group],
-        value
-      );
+      updateTotalVotesByAccountForGroup(account, group);
     }
   }
 
@@ -1109,8 +1098,8 @@ contract Election is
   /**
    * @notice Allows to turn on/off voting over maxNumGroupsVotedFor.
    * Once this is turned on and account voted for more than maxNumGroupsVotedFor,
-   * it is account's obligation to run updateTotalVotesByAccountForGroup, updateTotalVotesByAccount
-   * once a day.
+   * it is account's obligation to run updateTotalVotesByAccountForGroup once a day.
+   * If not run, voting power of account will not reflect rewards awarded.
    * @param flag The on/off flag.
    */
   function setAllowedToVoteOverMaxNumberOfGroups(bool flag) public {
