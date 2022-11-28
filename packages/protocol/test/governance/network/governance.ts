@@ -3028,7 +3028,7 @@ contract('Governance', (accounts: string[]) => {
           it('should return Execution when not expired', () =>
             expectStage(Stage.Execution, proposalId))
 
-          it('should return Execution when passed execution stage', async () => {
+          it('should return Execution past the execution stage', async () => {
             await timeTravel(executionStageDuration, web3)
             await expectStage(Stage.Execution, proposalId)
             const isDequeuedProposalExpired = await governance.isDequeuedProposalExpired(proposalId)
