@@ -2989,7 +2989,7 @@ contract('Governance', (accounts: string[]) => {
       })
     })
 
-    describe('when proposal with 0 transactions exists', () => {
+    describe('when a proposal with 0 transactions exists', () => {
       let proposalId: number
       beforeEach(async () => {
         await governance.propose(
