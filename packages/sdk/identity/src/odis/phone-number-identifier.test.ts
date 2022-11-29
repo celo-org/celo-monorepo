@@ -1,13 +1,10 @@
 import { Endpoint } from '@celo/phone-number-privacy-common'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
-  getBlindedIdentifier,
-  getBlindedIdentifierSignature,
-  getObfuscatedIdentifierFromSignature,
-  IdentifierPrefix,
-} from './identifier'
-import {
+  getBlindedPhoneNumber,
+  getBlindedPhoneNumberSignature,
   getPhoneNumberIdentifier,
+  getPhoneNumberIdentifierFromSignature,
   isBalanceSufficientForSigRetrieval,
 } from './phone-number-identifier'
 import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
@@ -65,12 +62,8 @@ describe(getPhoneNumberIdentifier, () => {
       })
 
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
-      const base64BlindedMessage = await getBlindedIdentifier(
-        mockE164Number,
-        IdentifierPrefix.PHONE_NUMBER,
-        blsBlindingClient
-      )
-      const base64BlindSig = await getBlindedIdentifierSignature(
+      const base64BlindedMessage = await getBlindedPhoneNumber(mockE164Number, blsBlindingClient)
+      const base64BlindSig = await getBlindedPhoneNumberSignature(
         mockAccount,
         authSigner,
         serviceContext,
@@ -98,27 +91,22 @@ describe(getPhoneNumberIdentifier, () => {
       })
 
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
-      const base64BlindedMessage = await getBlindedIdentifier(
-        mockE164Number,
-        IdentifierPrefix.PHONE_NUMBER,
-        blsBlindingClient
-      )
+      const base64BlindedMessage = await getBlindedPhoneNumber(mockE164Number, blsBlindingClient)
 
-      const base64BlindSig = await getBlindedIdentifierSignature(
+      const base64BlindSig = await getBlindedPhoneNumberSignature(
         mockAccount,
         authSigner,
         serviceContext,
         base64BlindedMessage
       )
 
-      const phoneNumberHashDetails = await getObfuscatedIdentifierFromSignature(
+      const phoneNumberHashDetails = await getPhoneNumberIdentifierFromSignature(
         mockE164Number,
-        IdentifierPrefix.PHONE_NUMBER,
         base64BlindSig,
         blsBlindingClient
       )
 
-      expect(phoneNumberHashDetails.obfuscatedIdentifier).toEqual(expectedPhoneHash)
+      expect(phoneNumberHashDetails.phoneHash).toEqual(expectedPhoneHash)
       expect(phoneNumberHashDetails.pepper).toEqual(expectedPepper)
     })
   })

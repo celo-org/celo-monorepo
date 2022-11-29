@@ -1,10 +1,15 @@
 import { isE164Number } from '@celo/base/lib/phoneNumbers'
 import { CombinerEndpointPNP } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
-import { createHash } from 'crypto'
 import debugFactory from 'debug'
 import { BlsBlindingClient } from './bls-blinding-client'
-import { getObfuscatedIdentifier, IdentifierPrefix } from './identifier'
+import {
+  getBlindedIdentifier,
+  getBlindedIdentifierSignature,
+  getObfuscatedIdentifier,
+  getObfuscatedIdentifierFromSignature,
+  IdentifierPrefix,
+} from './identifier'
 import { AuthSigner, ServiceContext } from './query'
 
 // ODIS minimum dollar balance for sig retrieval
@@ -24,6 +29,7 @@ export interface PhoneNumberHashDetails {
 /**
  * Retrieve the on-chain identifier for the provided phone number
  * Performs blinding, querying, and unblinding
+ * @deprecated use getObfuscatedIdentifier instead
  */
 export async function getPhoneNumberIdentifier(
   e164Number: string,
@@ -45,7 +51,7 @@ export async function getPhoneNumberIdentifier(
 
   const {
     plaintextIdentifier,
-    obfuscatedIdentifier: identifierHash,
+    obfuscatedIdentifier,
     pepper,
     unblindedSignature,
   } = await getObfuscatedIdentifier(
@@ -61,11 +67,86 @@ export async function getPhoneNumberIdentifier(
     keyVersion,
     endpoint
   )
-  return { e164Number: plaintextIdentifier, phoneHash: identifierHash, pepper, unblindedSignature }
+  return {
+    e164Number: plaintextIdentifier,
+    phoneHash: obfuscatedIdentifier,
+    pepper,
+    unblindedSignature,
+  }
+}
+
+/**
+ * Blinds the phone number in preparation for the ODIS request
+ * Caller should use the same blsBlindingClient instance for unblinding
+ * @deprecated use getBlindedIdentifier instead
+ */
+export async function getBlindedPhoneNumber(
+  e164Number: string,
+  blsBlindingClient: BlsBlindingClient,
+  seed?: Buffer
+): Promise<string> {
+  return getBlindedIdentifier(e164Number, IdentifierPrefix.PHONE_NUMBER, blsBlindingClient, seed)
+}
+
+/**
+ * Query ODIS for the blinded signature
+ * Response can be passed into getPhoneNumberIdentifierFromSignature
+ * to retrieve the on-chain identifier
+ * @deprecated use getBlindedIdentifierSignature instead
+ */
+export async function getBlindedPhoneNumberSignature(
+  account: string,
+  signer: AuthSigner,
+  context: ServiceContext,
+  base64BlindedMessage: string,
+  clientVersion?: string,
+  sessionID?: string,
+  keyVersion?: number,
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+): Promise<string> {
+  return getBlindedIdentifierSignature(
+    account,
+    signer,
+    context,
+    base64BlindedMessage,
+    clientVersion,
+    sessionID,
+    keyVersion,
+    endpoint
+  )
+}
+
+/**
+ * Unblind the response and return the on-chain identifier
+ * @deprecated use getObfuscatedIdentifieriFromSignature instead
+ */
+export async function getPhoneNumberIdentifierFromSignature(
+  e164Number: string,
+  base64BlindedSignature: string,
+  blsBlindingClient: BlsBlindingClient
+): Promise<PhoneNumberHashDetails> {
+  const {
+    plaintextIdentifier,
+    obfuscatedIdentifier,
+    pepper,
+    unblindedSignature,
+  } = await getObfuscatedIdentifierFromSignature(
+    e164Number,
+    IdentifierPrefix.PHONE_NUMBER,
+    base64BlindedSignature,
+    blsBlindingClient
+  )
+  return {
+    e164Number: plaintextIdentifier,
+    phoneHash: obfuscatedIdentifier,
+    pepper,
+    unblindedSignature,
+  }
 }
 
 /**
  * Check if balance is sufficient for quota retrieval
+ * @deprecated use getPnpQuotaStatus instead
  */
 export function isBalanceSufficientForSigRetrieval(
   dollarBalance: BigNumber.Value,
@@ -75,12 +156,4 @@ export function isBalanceSufficientForSigRetrieval(
     new BigNumber(dollarBalance).isGreaterThanOrEqualTo(ODIS_MINIMUM_DOLLAR_BALANCE) ||
     new BigNumber(celoBalance).isGreaterThanOrEqualTo(ODIS_MINIMUM_CELO_BALANCE)
   )
-}
-
-const PEPPER_CHAR_LENGTH = 13
-// This is the algorithm that creates a pepper from the unblinded message signatures
-// It simply hashes it with sha256 and encodes it to hex
-export function getPepperFromThresholdSignature(sigBuf: Buffer) {
-  // Currently uses 13 chars for a 78 bit pepper
-  return createHash('sha256').update(sigBuf).digest('base64').slice(0, PEPPER_CHAR_LENGTH)
 }
