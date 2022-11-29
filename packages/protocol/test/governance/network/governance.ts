@@ -3096,9 +3096,9 @@ contract('Governance', (accounts: string[]) => {
           await timeTravel(executionStageDuration, web3)
         })
 
-        it('should return false', async () => {
+        it('should return true', async () => {
           const success = await governance.execute.call(proposalId, index)
-          assert.isFalse(success)
+          assert.isTrue(success)
         })
 
         it('should delete the proposal', async () => {
