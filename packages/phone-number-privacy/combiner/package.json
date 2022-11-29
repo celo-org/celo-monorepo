@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-combiner",
-  "version": "2.0.0-dev",
+  "version": "2.0.0",
   "description": "Orchestrates and combines threshold signatures for use in ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -27,10 +27,10 @@
     "test:e2e:alfajores": "FLAKEY=true CONTEXT_NAME=alfajores yarn test:e2e"
   },
   "dependencies": {
-    "@celo/contractkit": "3.0.0-beta.1",
-    "@celo/phone-number-privacy-common": "2.0.0-beta.10",
-    "@celo/identity": "3.0.0-beta.1",
-    "@celo/encrypted-backup": "3.0.0-beta.1",
+    "@celo/contractkit": "3.0.0",
+    "@celo/phone-number-privacy-common": "2.0.0",
+    "@celo/identity": "3.0.0",
+    "@celo/encrypted-backup": "3.0.0",
     "@celo/identity-prev": "npm:@celo/identity@1.2.0",
     "@celo/poprf": "^0.1.9",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
@@ -44,8 +44,8 @@
     "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "@celo/utils": "3.0.0-beta.1",
-    "@celo/phone-utils": "3.0.0-beta.1",
+    "@celo/utils": "3.0.0",
+    "@celo/phone-utils": "3.0.0",
     "@types/express": "^4.17.6",
     "@types/supertest": "^2.0.12",
     "@types/uuid": "^7.0.3",
@@ -53,7 +53,7 @@
     "firebase-tools": "9.20.0"
   },
   "peerDependencies": {
-    "@celo/phone-number-privacy-signer": "2.0.0-dev",
+    "@celo/phone-number-privacy-signer": "2.0.0",
     "@celo/flake-tracker": "0.0.1-dev"
   },
   "engines": {
