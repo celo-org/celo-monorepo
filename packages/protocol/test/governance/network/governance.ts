@@ -3049,6 +3049,104 @@ contract('Governance', (accounts: string[]) => {
         })
       })
     })
+
+    describe('when a proposal with 0 transactions is past the execution stage', () => {
+      beforeEach(async () => {
+        await governance.propose(
+          [],
+          [],
+          // @ts-ignore
+          [],
+          [],
+          descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
+          { value: minDeposit }
+        )
+        await timeTravel(dequeueFrequency, web3)
+        await mockLockedGold.setAccountTotalLockedGold(account, yesVotes)
+      })
+
+      it('should not emit ProposalExecuted when not approved', async () => {
+        await governance.vote(proposalId, index, value)
+        await timeTravel(referendumStageDuration, web3)
+        await timeTravel(executionStageDuration, web3)
+        const resp = await governance.execute(proposalId, index)
+        assert.isTrue(
+          resp.logs.every((log) => log.event !== 'ProposalExecuted'),
+          'ProposalExecuted should not be emitted'
+        )
+      })
+
+      it('should not emit ProposalExecuted when not passing', async () => {
+        await governance.approve(proposalId, index)
+        await timeTravel(referendumStageDuration, web3)
+        await timeTravel(executionStageDuration, web3)
+        const resp = await governance.execute(proposalId, index)
+        assert.isTrue(
+          resp.logs.every((log) => log.event !== 'ProposalExecuted'),
+          'ProposalExecuted should not be emitted'
+        )
+      })
+
+      describe('Proposal approved and passing', () => {
+        beforeEach(async () => {
+          await governance.approve(proposalId, index)
+          await governance.vote(proposalId, index, value)
+          await timeTravel(referendumStageDuration, web3)
+          await timeTravel(executionStageDuration, web3)
+        })
+
+        it('should return false', async () => {
+          const success = await governance.execute.call(proposalId, index)
+          assert.isFalse(success)
+        })
+
+        it('should delete the proposal', async () => {
+          await governance.execute(proposalId, index)
+          assert.isFalse(await governance.proposalExists(proposalId))
+        })
+
+        it('should remove the proposal ID from dequeued', async () => {
+          await governance.execute(proposalId, index)
+          const dequeued = await governance.getDequeue()
+          assert.notInclude(
+            dequeued.map((x) => x.toNumber()),
+            proposalId
+          )
+        })
+
+        it('should add the index to empty indices', async () => {
+          await governance.execute(proposalId, index)
+          const emptyIndex = await governance.emptyIndices(0)
+          assert.equal(emptyIndex.toNumber(), index)
+        })
+
+        it('should update the participation baseline', async () => {
+          await governance.execute(proposalId, index)
+          const [actualParticipationBaseline, , ,] = await governance.getParticipationParameters()
+          assertEqualBN(actualParticipationBaseline, expectedParticipationBaseline)
+        })
+
+        it('should emit ProposalExecuted and ParticipationBaselineUpdated event', async () => {
+          const resp = await governance.execute(proposalId, index)
+          assert.equal(resp.logs.length, 2)
+          const log = resp.logs[0]
+          assertLogMatches2(log, {
+            event: 'ProposalExecuted',
+            args: {
+              proposalId: new BigNumber(proposalId),
+            },
+          })
+          const log2 = resp.logs[1]
+          assertLogMatches2(log2, {
+            event: 'ParticipationBaselineUpdated',
+            args: {
+              participationBaseline: expectedParticipationBaseline,
+            },
+          })
+        })
+      })
+    })
   })
 
   describe('#approveHotfix()', () => {
@@ -3489,21 +3587,110 @@ contract('Governance', (accounts: string[]) => {
       assertEqualBN(stage, expected)
     }
 
-    it('should return None stage when proposal doesnt exist', async () => {
+    it('should return None stage when proposal does not exist', async () => {
       await expectStage(Stage.None, 0)
       await expectStage(Stage.None, 1)
     })
 
-    describe('when proposal exists', () => {
+    // describe('when proposal exists', () => {
+    //   let proposalId: number
+    //   beforeEach(async () => {
+    //     await governance.propose(
+    //       [transactionSuccess1.value],
+    //       [transactionSuccess1.destination],
+    //       // @ts-ignore bytes type
+    //       transactionSuccess1.data,
+    //       [transactionSuccess1.data.length],
+    //       descriptionUrl,
+    //       { value: minDeposit }
+    //     )
+    //     proposalId = 1
+    //     const exists = await governance.proposalExists(proposalId)
+    //     assert.isTrue(exists, 'proposal does not exist')
+    //   })
+
+    //   describe('when proposal is queued', () => {
+    //     beforeEach(async () => {
+    //       const queued = await governance.isQueued(proposalId)
+    //       assert.isTrue(queued, 'proposal not queued')
+    //     })
+
+    //     it('should return Queued when not expired', () => expectStage(Stage.Queued, proposalId))
+
+    //     it('should return Expiration when expired', async () => {
+    //       await timeTravel(queueExpiry, web3)
+    //       await expectStage(Stage.Expiration, proposalId)
+    //     })
+    //   })
+
+    //   describe('when proposal is dequeued', () => {
+    //     const index = 0
+    //     beforeEach(async () => {
+    //       await timeTravel(dequeueFrequency, web3)
+    //       await governance.dequeueProposalsIfReady()
+    //       const dequeued = await governance.isDequeuedProposal(proposalId, index)
+    //       assert.isTrue(dequeued, 'proposal not dequeued')
+    //     })
+
+    //     describe('when in referendum stage', () => {
+    //       describe('when not approved', () => {
+    //         it('should return Referendum when not voted and not expired', () =>
+    //           expectStage(Stage.Referendum, proposalId))
+
+    //         it('should return Expiration when expired', async () => {
+    //           await timeTravel(referendumStageDuration, web3)
+    //           await expectStage(Stage.Expiration, proposalId)
+    //         })
+    //       })
+
+    //       describe('when approved', () => {
+    //         beforeEach(async () => {
+    //           await governance.approve(proposalId, index)
+    //         })
+
+    //         it('should return Referendum when not expired', () =>
+    //           expectStage(Stage.Referendum, proposalId))
+
+    //         it('should return Expiration when expired', async () => {
+    //           await timeTravel(referendumStageDuration, web3)
+    //           await expectStage(Stage.Expiration, proposalId)
+    //         })
+    //       })
+    //     })
+
+    //     describe('when in execution stage', () => {
+    //       beforeEach(async () => {
+    //         await governance.approve(proposalId, index)
+    //         await governance.vote(proposalId, index, VoteValue.Yes)
+    //         const passing = await governance.isProposalPassing(proposalId)
+    //         assert.isTrue(passing, 'proposal not passing')
+    //         await timeTravel(referendumStageDuration, web3)
+    //       })
+
+    //       it('should return Execution when not expired', () =>
+    //         expectStage(Stage.Execution, proposalId))
+
+    //       it('should return Expiration when expired', async () => {
+    //         await timeTravel(executionStageDuration, web3)
+    //         await expectStage(Stage.Expiration, proposalId)
+    //         const isDequeuedProposalExpired = await governance.isDequeuedProposalExpired(proposalId)
+    //         assert.isTrue(isDequeuedProposalExpired)
+    //       })
+    //     })
+    //   })
+    // })
+
+    describe('when a proposal with 0 transactions exists', () => {
       let proposalId: number
       beforeEach(async () => {
         await governance.propose(
-          [transactionSuccess1.value],
-          [transactionSuccess1.destination],
-          // @ts-ignore bytes type
-          transactionSuccess1.data,
-          [transactionSuccess1.data.length],
+          [],
+          [],
+          // @ts-ignore
+          [],
+          [],
           descriptionUrl,
+          // @ts-ignore: TODO(mcortesi) fix typings for TransactionDetails
           { value: minDeposit }
         )
         proposalId = 1
@@ -3511,21 +3698,7 @@ contract('Governance', (accounts: string[]) => {
         assert.isTrue(exists, 'proposal does not exist')
       })
 
-      describe('when proposal is queued', () => {
-        beforeEach(async () => {
-          const queued = await governance.isQueued(proposalId)
-          assert.isTrue(queued, 'proposal not queued')
-        })
-
-        it('should return Queued when not expired', () => expectStage(Stage.Queued, proposalId))
-
-        it('should return Expiration when expired', async () => {
-          await timeTravel(queueExpiry, web3)
-          await expectStage(Stage.Expiration, proposalId)
-        })
-      })
-
-      describe('when proposal is dequeued', () => {
+      describe('when proposal with 0 transactions is dequeued', () => {
         const index = 0
         beforeEach(async () => {
           await timeTravel(dequeueFrequency, web3)
@@ -3534,30 +3707,20 @@ contract('Governance', (accounts: string[]) => {
           assert.isTrue(dequeued, 'proposal not dequeued')
         })
 
-        describe('when in referendum stage', () => {
-          describe('when not approved', () => {
-            it('should return Referendum when not voted and not expired', () =>
-              expectStage(Stage.Referendum, proposalId))
+        it('should return Expiration past the execution stage when not approved', async () => {
+          await governance.vote(proposalId, index, VoteValue.Yes)
+          await timeTravel(referendumStageDuration + executionStageDuration + 1, web3)
+          await expectStage(Stage.Expiration, proposalId)
+          const isDequeuedProposalExpired = await governance.isDequeuedProposalExpired(proposalId)
+          assert.isTrue(isDequeuedProposalExpired)
+        })
 
-            it('should return Expiration when expired', async () => {
-              await timeTravel(referendumStageDuration, web3)
-              await expectStage(Stage.Expiration, proposalId)
-            })
-          })
-
-          describe('when approved', () => {
-            beforeEach(async () => {
-              await governance.approve(proposalId, index)
-            })
-
-            it('should return Referendum when not expired', () =>
-              expectStage(Stage.Referendum, proposalId))
-
-            it('should return Expiration when expired', async () => {
-              await timeTravel(referendumStageDuration, web3)
-              await expectStage(Stage.Expiration, proposalId)
-            })
-          })
+        it('should return Expiration past the execution stage when not passing', async () => {
+          await governance.approve(proposalId, index)
+          await timeTravel(referendumStageDuration + executionStageDuration + 1, web3)
+          await expectStage(Stage.Expiration, proposalId)
+          const isDequeuedProposalExpired = await governance.isDequeuedProposalExpired(proposalId)
+          assert.isTrue(isDequeuedProposalExpired)
         })
 
         describe('when in execution stage', () => {
@@ -3572,9 +3735,11 @@ contract('Governance', (accounts: string[]) => {
           it('should return Execution when not expired', () =>
             expectStage(Stage.Execution, proposalId))
 
-          it('should return Expiration when expired', async () => {
-            await timeTravel(executionStageDuration, web3)
-            await expectStage(Stage.Expiration, proposalId)
+          it('should return Execution past the execution stage if passed and approved', async () => {
+            await timeTravel(executionStageDuration + 1, web3)
+            await expectStage(Stage.Execution, proposalId)
+            const isDequeuedProposalExpired = await governance.isDequeuedProposalExpired(proposalId)
+            assert.isFalse(isDequeuedProposalExpired)
           })
         })
       })

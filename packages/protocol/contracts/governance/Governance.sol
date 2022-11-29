@@ -505,10 +505,12 @@ contract Governance is
   {
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(_isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
-    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations, true);
+    Proposals.Stage stage = getProposalDequeuedStage(proposal, true);
     if (_isDequeuedProposalExpired(proposal, stage)) {
-      if (proposal.transactions.length == 0) {
-        // mark proposals with no transactions as executed
+      if (
+        proposal.transactions.length == 0 && proposal.isApproved() && _isProposalPassing(proposal)
+      ) {
+        // mark approvead and passing proposals with no transactions as executed
         emit ProposalExecuted(proposalId);
       }
       deleteDequeuedProposal(proposal, proposalId, index);
@@ -570,7 +572,7 @@ contract Governance is
       return
         _isQueuedProposalExpired(proposal) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
-      Proposals.Stage stage = proposal.getDequeuedStage(stageDurations, false);
+      Proposals.Stage stage = getProposalDequeuedStage(proposal, false);
       return _isDequeuedProposalExpired(proposal, stage) ? Proposals.Stage.Expiration : stage;
     }
   }
@@ -989,7 +991,7 @@ contract Governance is
       isQueued(upvotedProposal) &&
       !isQueuedProposalExpired(upvotedProposal);
     Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations, true) ==
+    bool isVotingReferendum = (getProposalDequeuedStage(proposal, true) ==
       Proposals.Stage.Referendum);
     return isVotingQueue || isVotingReferendum;
   }
@@ -1287,6 +1289,13 @@ contract Governance is
     FixidityLib.Fraction memory support = proposal.getSupportWithQuorumPadding(
       participationParameters.baseline.multiply(participationParameters.baselineQuorumFactor)
     );
+
+    if (proposal.transactions.length == 0) {
+      // default treshold
+      FixidityLib.Fraction memory threshold = _getConstitution(address(0), "");
+      return support.gt(threshold);
+    }
+
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = ExtractFunctionSignature.extractFunctionSignature(
         proposal.transactions[i].data
@@ -1335,7 +1344,7 @@ contract Governance is
    */
   function isDequeuedProposalExpired(uint256 proposalId) external view returns (bool) {
     Proposals.Proposal storage proposal = proposals[proposalId];
-    return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations, false));
+    return _isDequeuedProposalExpired(proposal, getProposalDequeuedStage(proposal, false));
   }
 
   /**
@@ -1465,7 +1474,7 @@ contract Governance is
     uint256 maxUsed = 0;
     for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
       Proposals.Proposal storage proposal = proposals[dequeued[index]];
-      bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations, false) ==
+      bool isVotingReferendum = (getProposalDequeuedStage(proposal, false) ==
         Proposals.Stage.Referendum);
 
       if (!isVotingReferendum) {
@@ -1479,5 +1488,35 @@ contract Governance is
       );
     }
     return maxUsed;
+  }
+
+  /**
+   * @notice Returns the stage of a dequeued proposal.
+   * @param proposal The proposal struct.
+   * @return The stage of the dequeued proposal.
+   * @dev Must be called on a dequeued proposal.
+   */
+  function getProposalDequeuedStage(
+    Proposals.Proposal storage proposal,
+    bool expireProposalWithoutTransactions
+  ) internal view returns (Proposals.Stage) {
+    uint256 stageStartTime = proposal.timestamp.add(stageDurations.referendum).add(
+      stageDurations.execution
+    );
+    // solhint-disable-next-line not-rely-on-time
+    if (
+      now >= stageStartTime &&
+      (!proposal.isApproved() ||
+        !_isProposalPassing(proposal) ||
+        (expireProposalWithoutTransactions || proposal.transactions.length > 0))
+    ) {
+      return Proposals.Stage.Expiration;
+    }
+    stageStartTime = stageStartTime.sub(stageDurations.execution);
+    // solhint-disable-next-line not-rely-on-time
+    if (now >= stageStartTime) {
+      return Proposals.Stage.Execution;
+    }
+    return Proposals.Stage.Referendum;
   }
 }
