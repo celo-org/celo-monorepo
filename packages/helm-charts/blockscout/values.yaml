@@ -60,6 +60,9 @@ blockscout:
     enableEventStream: false
     beanstalkdPort: ""
     beanstalkdHost: ""
+    fetchers:
+      blockRewards:
+        enabled: true
   api:
     suffix:
       enabled: false
@@ -223,7 +226,10 @@ blockscout:
       reportUrl: ""
       makerdojo: ""
     rpcRegion: "web"  
-    primaryRpcRegion: "indexer"  
+    primaryRpcRegion: "indexer"
+    homepage:
+      showPrice: true
+      showTxs: false
   metadataCrawler:
     enabled: false
     schedule: "0 */2 * * *" # every 2 hours
