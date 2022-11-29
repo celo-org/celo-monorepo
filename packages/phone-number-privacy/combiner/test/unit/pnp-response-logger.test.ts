@@ -645,30 +645,30 @@ describe('pnp response logger', () => {
         {
           params: [
             {
-              warning: ErrorMessage.FAILING_OPEN,
+              signerWarning: ErrorMessage.FAILING_OPEN,
               service: url,
             },
-            ErrorMessage.FAILING_OPEN,
+            WarningMessage.SIGNER_FAILED_OPEN,
           ],
           level: 'error',
         },
         {
           params: [
             {
-              warning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
+              signerWarning: ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA,
               service: url,
             },
-            ErrorMessage.FAILING_OPEN,
+            WarningMessage.SIGNER_FAILED_OPEN,
           ],
           level: 'error',
         },
         {
           params: [
             {
-              warning: ErrorMessage.FAILURE_TO_GET_DEK,
+              signerWarning: ErrorMessage.FAILURE_TO_GET_DEK,
               service: url,
             },
-            ErrorMessage.FAILING_OPEN,
+            WarningMessage.SIGNER_FAILED_OPEN,
           ],
           level: 'error',
         },
