@@ -27,7 +27,7 @@ oracle:
       ],
       [
         {exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false},
-        {exchange: 'BINANCUS', symbol: 'BTCUSD', toInvert: false}
+        {exchange: 'BINANCEUS', symbol: 'BTCUSD', toInvert: false}
       ],
       [
         { exchange: 'BINANCEUS', symbol: 'CELOUSD', toInvert: false }
