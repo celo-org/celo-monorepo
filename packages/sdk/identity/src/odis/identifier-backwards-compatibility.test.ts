@@ -25,6 +25,10 @@ const authSigner: AuthSigner = {
 const oldServiceContext = OdisUtils.Query.getServiceContext('alfajores')
 const currentServiceContext = getServiceContext('alfajores')
 
+const expectedObfuscatedIdentifier =
+  '0xf82c6272fd57d3e5d4e291be16b3ebac5c616084a5e6f3730c73f62efd39c6ae'
+const expectedPepper = 'Pi4Z1NQnfsdvJ'
+
 describe('backwards compatibility of phone number identifiers', () => {
   beforeAll(() => {
     fetchMock.reset()
@@ -49,8 +53,10 @@ describe('backwards compatibility of phone number identifiers', () => {
     )
 
     expect(oldRes.e164Number).toEqual(currRes.plaintextIdentifier)
-    expect(oldRes.phoneHash).toEqual(currRes.obfuscatedIdentifier)
-    expect(oldRes.pepper).toEqual(currRes.pepper)
+    expect(oldRes.phoneHash).toEqual(expectedObfuscatedIdentifier)
+    expect(currRes.obfuscatedIdentifier).toEqual(expectedObfuscatedIdentifier)
+    expect(oldRes.pepper).toEqual(expectedPepper)
+    expect(currRes.pepper).toEqual(expectedPepper)
   }, 20000)
 
   it('blinded identifier should match', async () => {
@@ -71,18 +77,21 @@ describe('backwards compatibility of phone number identifiers', () => {
       seed
     )
 
-    expect(oldRes).toEqual(currentRes)
+    const expectedBlindedIdentifier =
+      'fuN6SmbxkYBqVbKZu4SizdyDjavNLK/XguIlwsWUhsWA0hQDoZtsZjQCbXqTnUiA'
+
+    expect(oldRes).toEqual(expectedBlindedIdentifier)
+    expect(currentRes).toEqual(expectedBlindedIdentifier)
   })
 
   it('obfuscated identifier should match', async () => {
-    const pepper = 'randomPepper'
-
     const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
-    const oldRes = getPhoneHash(sha3, mockE164Number, pepper)
+    const oldRes = getPhoneHash(sha3, mockE164Number, expectedPepper)
 
-    const currRes = getIdentifierHash(mockE164Number, IdentifierPrefix.PHONE_NUMBER, pepper)
+    const currRes = getIdentifierHash(mockE164Number, IdentifierPrefix.PHONE_NUMBER, expectedPepper)
 
-    expect(oldRes).toEqual(currRes)
+    expect(oldRes).toEqual(expectedObfuscatedIdentifier)
+    expect(currRes).toEqual(expectedObfuscatedIdentifier)
   })
 
   it('should not match when different prefix used', async () => {
