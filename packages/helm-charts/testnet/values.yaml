@@ -59,6 +59,7 @@ geth:
   txNodeTolerations: []
   txNodePrivateNodeSelector: {}
   txNodePrivateTolerations: []
+  storageClass: ssd
   maxpeers: 1150
   light:
     maxpeers: 1000
@@ -121,3 +122,10 @@ extraPodLabels:
   txnode_private:
     stack: blockscout
     mode: archive
+
+pvcAnnotations:
+  validator: {}
+  secondary: {}
+  proxy: {}
+  txnode: {}
+  txnode_private: {}
