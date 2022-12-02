@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-combiner",
-  "version": "2.0.0",
+  "version": "2.0.1-dev",
   "description": "Orchestrates and combines threshold signatures for use in ODIS",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@celo/contractkit": "3.0.1-dev",
-    "@celo/phone-number-privacy-common": "2.0.0",
+    "@celo/phone-number-privacy-common": "2.0.1-dev",
     "@celo/identity": "3.0.1-dev",
     "@celo/encrypted-backup": "3.0.1-dev",
     "@celo/identity-prev": "npm:@celo/identity@1.2.0",
@@ -53,7 +53,7 @@
     "firebase-tools": "9.20.0"
   },
   "peerDependencies": {
-    "@celo/phone-number-privacy-signer": "2.0.0",
+    "@celo/phone-number-privacy-signer": "2.0.1-dev",
     "@celo/flake-tracker": "0.0.1-dev"
   },
   "engines": {
