@@ -16,6 +16,7 @@ import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import { config, getSignerVersion } from '../../src/config'
+import { getBlindedPhoneNumber, getTestParamsForContext } from './utils'
 
 require('dotenv').config()
 
@@ -29,22 +30,12 @@ const {
   PRIVATE_KEY2,
   PRIVATE_KEY3,
 } = TestUtils.Values
-const {
-  getBlindedPhoneNumber,
-  getPnpQuotaRequest,
-  getPnpRequestAuthorization,
-  getPnpSignRequest,
-} = TestUtils.Utils
+const { getPnpQuotaRequest, getPnpRequestAuthorization, getPnpSignRequest } = TestUtils.Utils
 
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
-const ODIS_PUBLIC_POLYNOMIAL = process.env[
-  process.env.ODIS_PNP_POLYNOMIAL_VAR_FOR_TESTS as string
-] as string
+const contextSpecificParams = getTestParamsForContext()
 
-const ODIS_KEY_VERSION = (process.env.ODIS_PNP_TEST_KEY_VERSION || 1) as string
-const DEFAULT_FORNO_URL = process.env.ODIS_BLOCKCHAIN_PROVIDER as string
-
-const kit = newKit(DEFAULT_FORNO_URL)
+const kit = newKit(contextSpecificParams.blockchainProviderURL)
 kit.addAccount(PRIVATE_KEY1)
 kit.addAccount(PRIVATE_KEY2)
 kit.addAccount(PRIVATE_KEY3)
@@ -220,23 +211,21 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           blockNumber: resBody.blockNumber,
           warnings: [],
         })
-        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(
-          config.keystore.keys.phoneNumberPrivacy.latest.toString()
-        )
+        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.pnpKeyVersion)
         expect(
           threshold_bls.partialVerifyBlindSignature(
-            Buffer.from(ODIS_PUBLIC_POLYNOMIAL, 'hex'),
+            Buffer.from(contextSpecificParams.pnpPolynomial, 'hex'),
             Buffer.from(blindedMessage, 'base64'),
             Buffer.from(resBody.signature, 'base64')
           )
         )
       })
 
-      it(`Should respond with 200 on valid request with key version ${ODIS_KEY_VERSION}`, async () => {
+      it(`Should respond with 200 on valid request with key version ${contextSpecificParams.pnpKeyVersion}`, async () => {
         // This value can also be modified but needs to be manually inspected in the signer logs
         // (on staging) since a valid key version that does not exist in the keystore
         // will default to the secretName stored in `KEYSTORE_AZURE_SECRET_NAME`
-        const keyVersion = ODIS_KEY_VERSION
+        const keyVersion = contextSpecificParams.pnpKeyVersion
         const blindedMessage = getBlindedPhoneNumber(PHONE_NUMBER, randomBytes(32))
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS2,
@@ -260,7 +249,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(keyVersion)
         expect(
           threshold_bls.partialVerifyBlindSignature(
-            Buffer.from(ODIS_PUBLIC_POLYNOMIAL, 'hex'),
+            Buffer.from(contextSpecificParams.pnpPolynomial, 'hex'),
             Buffer.from(blindedMessage, 'base64'),
             Buffer.from(resBody.signature, 'base64')
           )
@@ -288,12 +277,10 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           blockNumber: resBody.blockNumber,
           warnings: [],
         })
-        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(
-          config.keystore.keys.phoneNumberPrivacy.latest.toString()
-        )
+        expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.pnpKeyVersion)
         expect(
           threshold_bls.partialVerifyBlindSignature(
-            Buffer.from(ODIS_PUBLIC_POLYNOMIAL, 'hex'),
+            Buffer.from(contextSpecificParams.pnpPolynomial, 'hex'),
             Buffer.from(blindedMessage, 'base64'),
             Buffer.from(resBody.signature, 'base64')
           )

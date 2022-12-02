@@ -35,6 +35,7 @@ import { Server } from 'net'
 import request from 'supertest'
 import config, { getCombinerVersion } from '../../src/config'
 import { startCombiner } from '../../src/server'
+import { getBlindedPhoneNumber } from '../utils'
 
 const {
   ContractRetrieval,
@@ -43,7 +44,6 @@ const {
   createMockOdisPayments,
   createMockWeb3,
   getPnpRequestAuthorization,
-  getBlindedPhoneNumber,
 } = TestUtils.Utils
 const {
   PRIVATE_KEY1,

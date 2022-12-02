@@ -1,7 +1,7 @@
 import { newKit } from '@celo/contractkit'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/cryptographic-utils'
 import { OdisUtils } from '@celo/identity'
-import { AuthSigner } from '@celo/identity/lib/odis/query'
+import { AuthSigner, OdisContextName } from '@celo/identity/lib/odis/query'
 import { fetchEnv } from '@celo/phone-number-privacy-common'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
@@ -36,11 +36,12 @@ export const queryOdisForSalt = async () => {
     phoneNumber,
     accountAddress,
     authSigner,
-    OdisUtils.Query.getServiceContext(network()),
+    OdisUtils.Query.getServiceContext(network() as OdisContextName),
     undefined,
     undefined,
-    'monitor:1.0.0',
     undefined,
-    genSessionID()
+    genSessionID(),
+    undefined,
+    undefined
   )
 }
