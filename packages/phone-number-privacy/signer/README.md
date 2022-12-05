@@ -138,7 +138,7 @@ After a key resharing, signers should rotate their key shares as follows:
 2. Increment `PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION` or `DOMAINS_LATEST_KEY_VERSION` as appropriate. This will instruct the signer to prefetch this new key version the next time it starts up, but there is no need to restart the signer at this point.
 3. Notify the combiner operator that your signer is ready for the key rotation.
 4. The combiner operator will run e2e tests against your signer to verify it has the correct key configuration.
-5. The combiner operator will update the combiner to request the new key share version via a custom request header field once all signers are ready. The combiner operator should remember to update the public polynomial in the combiner's config appropriately.
+5. The combiner operator will update the combiner to request the new key share version via a custom request header field once all signers are ready.
 6. The signers will fetch the new key shares from their keystores upon receiving these requests.
 7. When the combiner operator sees that all signers are signing with the new key share and confirms that the system is healthy, signers will be instructed to delete their old key shares. Deleting the deprecated key shares ensures they cannot be stored and used by an attacker.
 

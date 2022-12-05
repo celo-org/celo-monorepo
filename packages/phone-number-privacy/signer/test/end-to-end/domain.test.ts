@@ -28,7 +28,8 @@ import { DomainRequest } from '@celo/phone-number-privacy-common/src'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import 'isomorphic-fetch'
-import { config, getSignerVersion } from '../../src/config'
+import { getSignerVersion } from '../../src/config'
+import { getTestParamsForContext } from './utils'
 const { ACCOUNT_ADDRESS1, PRIVATE_KEY1 } = TestUtils.Values
 
 require('dotenv').config()
@@ -40,13 +41,10 @@ const expectedVersion = getSignerVersion()
 
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
 
-const ODIS_DOMAINS_PUBLIC_POLYNOMIAL = process.env[
-  process.env.ODIS_DOMAINS_POLYNOMIAL_VAR_FOR_TESTS as string
-] as string
-const ODIS_DOMAINS_PUBLIC_PUBKEY = process.env[
-  process.env.ODIS_DOMAINS_PUBKEY_VAR_FOR_TESTS as string
-] as string
-const ODIS_KEY_VERSION = (process.env.ODIS_DOMAINS_TEST_KEY_VERSION || 1) as string
+const contextSpecificParams = getTestParamsForContext()
+console.log(`Blockchain provider: ${contextSpecificParams.blockchainProviderURL}`)
+console.log(`Domains public polynomial: ${contextSpecificParams.domainsPolynomial}`)
+console.log(`Domains pubKey: ${contextSpecificParams.domainsPubKey}`)
 
 describe(`Running against service deployed at ${signerUrl}`, () => {
   const wallet = new LocalWallet()
@@ -261,9 +259,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           now: resBody.status.now,
         },
       })
-      expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(
-        config.keystore.keys.domains.latest.toString()
-      )
+      expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.domainsKeyVersion)
       poprf.unblindPartialResponse(
         // throws if verification fails
         Buffer.from(resBody.signature, 'base64')
@@ -354,7 +350,11 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         ACCOUNT_ADDRESS1,
         `${signSalt}-${Date.now() + 1}`
       )
-      const res = await queryDomainEndpoint(newReq, SignerEndpoint.DOMAIN_SIGN, ODIS_KEY_VERSION)
+      const res = await queryDomainEndpoint(
+        newReq,
+        SignerEndpoint.DOMAIN_SIGN,
+        contextSpecificParams.domainsKeyVersion
+      )
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
       expect(resBody).toStrictEqual<DomainRestrictedSignatureResponseSuccess>({
@@ -368,7 +368,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
           now: resBody.status.now,
         },
       })
-      expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(ODIS_KEY_VERSION)
+      expect(res.headers.get(KEY_VERSION_HEADER)).toEqual(contextSpecificParams.domainsKeyVersion)
       _poprf.unblindPartialResponse(Buffer.from(resBody.signature, 'base64'))
     })
 
@@ -599,8 +599,8 @@ const signatureRequest = async (
 ): Promise<[DomainRestrictedSignatureRequest<SequentialDelayDomain>, ThresholdPoprfClient]> => {
   const domain = _domain ?? authenticatedDomain(address, salt)
   const thresholdPoprfClient = new ThresholdPoprfClient(
-    Buffer.from(ODIS_DOMAINS_PUBLIC_PUBKEY, 'base64'),
-    Buffer.from(ODIS_DOMAINS_PUBLIC_POLYNOMIAL, 'hex'),
+    Buffer.from(contextSpecificParams.domainsPubKey, 'base64'),
+    Buffer.from(contextSpecificParams.domainsPolynomial, 'hex'),
     domainHash(domain),
     Buffer.from('test message', 'utf8')
   )
