@@ -29,6 +29,7 @@
     "test:e2e:mainnet:brazilsouth": "CONTEXT_NAME=mainnet ODIS_SIGNER_SERVICE_URL=https://mainnet-pgpnp-brazilsouth.azurefd.net yarn test:e2e",
     "test:e2e:mainnet:eastasia": "CONTEXT_NAME=mainnet ODIS_SIGNER_SERVICE_URL=https://mainnet-pgpnp-eastasia.azurefd.net yarn test:e2e",
     "test:e2e:mainnet:westeurope": "CONTEXT_NAME=mainnet ODIS_SIGNER_SERVICE_URL=https://mainnet-pgpnp-westeurope.azurefd.net yarn test:e2e",
+    "test:signer:mainnet": "MAINNET_ODIS_BLOCKCHAIN_PROVIDER=https://alfajores-forno.celo-testnet.org CONTEXT_NAME=mainnet yarn jest test/end-to-end -t='\\[Signer configuration test\\]'",
     "db:migrate": "ts-node scripts/run-migrations.ts",
     "db:migrate:make": "knex --migrations-directory ./src/common/database/migrations migrate:make -x ts",
     "bls:keygen": "ts-node scripts/threshold-bls-keygen.ts",
