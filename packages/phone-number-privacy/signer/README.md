@@ -7,7 +7,7 @@ A service that generates unique partial signatures for blinded messages. Using a
 ODIS v2 provides support for three APIs, which need to be explicitly enabled ([see below](#enabling-apis-odis-v2) for configuration info):
 
 - **Legacy PNP API**: retrieve signatures for blinded messages, rate-limited using ODIS v1's scheme, based on an account's transaction history and verification status.
-- **PNP API**: retrieve signatures for blinded messages, rate-limited based on quota "purchased" by sending funds to `OdisPayments.sol`.
+- **PNP API**: retrieve signatures for blinded messages, rate-limited based on quota purchased on-chain in `OdisPayments.sol`.
 - **Domains API**: retrieve signatures over domains with custom rate-limiting schemes, as defined in more detail in [CIP-40](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0040.md).
 
 ## Configuration
@@ -169,6 +169,7 @@ You can test your mainnet service is set up correctly by running specific tests 
    - Change `ODIS_SIGNER_SERVICE_URL` to your service endpoint.
 
 4. Run `yarn test:signer:mainnet`.
+
    *Technical note: this command intentionally points the test's blockchain provider to Alfajores, in order to top up quota on Alfajores before running the test cases. It still verifies signatures against the respective mainnet polynomials.*
 5. Verify that all tests pass.
 6. Change your signer’s blockchain provider back to its original value (if using Forno: `https://forno.celo.org`).
