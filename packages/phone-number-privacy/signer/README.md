@@ -2,6 +2,14 @@
 
 A service that generates unique partial signatures for blinded messages. Using a threshold BLS signature scheme, when K/N signatures are combined, a deterministic signature is obtained.
 
+## APIs (ODIS v2)
+
+ODIS v2 provides support for three APIs, which need to be explicitly enabled ([see below](#enabling-apis-odis-v2) for configuration info):
+
+- **Legacy PNP API**: retrieve signatures for blinded messages, rate-limited using ODIS v1's scheme, based on an account's transaction history and verification status.
+- **PNP API**: retrieve signatures for blinded messages, rate-limited based on quota "purchased" by sending funds to `OdisPayments.sol`.
+- **Domains API**: retrieve signatures over domains with custom rate-limiting schemes, as defined in more detail in [CIP-40](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0040.md).
+
 ## Configuration
 
 You can use the following environment variables to configure the ODIS Signer service:
@@ -12,6 +20,14 @@ You can use the following environment variables to configure the ODIS Signer ser
 - `SERVER_PORT` - The port on which the express node app runs (8080 by default).
 - `SERVER_SSL_KEY_PATH` - (Optional) Path to SSL .key file.
 - `SERVER_SSL_CERT_PATH` - (Optional) Path to SSL .cert file.
+
+### Enabling APIs (ODIS v2)
+
+Each API must be explicitly enabled by setting the following env vars to true (all are false by default):
+
+- `LEGACY_PHONE_NUMBER_PRIVACY_API_ENABLED`
+- `PHONE_NUMBER_PRIVACY_API_ENABLED`
+- `DOMAINS_API_ENABLED`
 
 ### Database
 
@@ -144,19 +160,19 @@ After a key resharing, signers should rotate their key shares as follows:
 
 ### Validate before going live
 
-You can test your mainnet service is set up correctly by running a specific end-to-end test that checks the signature against a public polynomial. Because the test requires quota, you must first point your provider endpoint to Alfajores.
+You can test your mainnet service is set up correctly by running specific tests in the e2e suite ("[Signer configuration test]" cases) which check signatures against the public polynomial for the respective APIs. Because the tests require quota, you must first point your provider endpoint to Alfajores.
 
-1. Change your signer’s forno endpoint to Alfajores: `https://alfajores-forno.celo-testnet.org`
+1. Change your signer’s blockchain provider (`BLOCKCHAIN_PROVIDER`) to Alfajores Forno: `https://alfajores-forno.celo-testnet.org`
 2. Navigate to the signer directory in monorepo (this directory).
 3. Modify the .env file:
 
    - Change `ODIS_SIGNER_SERVICE_URL` to your service endpoint.
-   - Set `ODIS_PUBLIC_POLYNOMIAL_VAR_FOR_TESTS` to equal `MAINNET_PHONE_NUMBER_PRIVACY_POLYNOMIAL` (so that tests run against the mainnet polynomial).
 
-4. Run `yarn jest test/end-to-end/get-blinded-sig.test.ts -t 'When walletAddress has enough quota Returns sig when querying succeeds with unused request'`
-5. Verify test passes.
-6. Change your signer’s forno endpoint back to Mainnet: `https://forno.celo.org`
+4. Run `yarn test:signer:mainnet`.
+   *Technical note: this command intentionally points the test's blockchain provider to Alfajores, in order to top up quota on Alfajores before running the test cases. It still verifies signatures against the respective mainnet polynomials.*
+5. Verify that all tests pass.
+6. Change your signer’s blockchain provider back to its original value (if using Forno: `https://forno.celo.org`).
 
 ### Logs
 
-Error logs will be prefixed with `CELO_ODIS_ERROR_XX`. You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).
+Error logs will be prefixed with `CELO_ODIS_ERROR_XX`. You can see a full list of them in [errors.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/common/src/interfaces/errors.ts) in the common package.
