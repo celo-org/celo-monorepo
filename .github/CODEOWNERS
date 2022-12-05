@@ -22,7 +22,7 @@
 /packages/helm-charts/oracle/ @celo-org/mento  @celo-org/devopsre
 /packages/metadata-crawler/ @celo-org/identity
 /packages/phone-number-privacy/ @celo-org/identity
-/packages/protocol/ @celo-org/primitives @celo-org/identity @celo-org/applications
+/packages/protocol/ @celo-org/primitives @celo-org/identity
 /packages/sdk/ @celo-org/applications
 /packages/sdk/identity/  @celo-org/identity @celo-org/applications
 /packages/sdk/contractkit/ @celo-org/applications
