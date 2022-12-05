@@ -15,7 +15,7 @@ import {
 import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
-import { config, getSignerVersion } from '../../src/config'
+import { config } from '../../src/config'
 import { getBlindedPhoneNumber, getTestParamsForContext } from './utils'
 
 require('dotenv').config()
@@ -42,10 +42,9 @@ kit.addAccount(PRIVATE_KEY3)
 
 jest.setTimeout(60000)
 
-const signerUrl = process.env.ODIS_SIGNER_SERVICE_URL
-const expectedVersion = getSignerVersion()
+const expectedVersion = process.env.DEPLOYED_SIGNER_SERVICE_VERSION!
 
-describe(`Running against service deployed at ${signerUrl}`, () => {
+describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
   const singleQueryCost = config.quota.queryPriceInCUSD.times(1e18).toString()
 
   beforeAll(async () => {
@@ -58,7 +57,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
   })
 
   it('Service is deployed at correct version', async () => {
-    const response = await fetch(signerUrl + SignerEndpoint.STATUS, {
+    const response = await fetch(ODIS_SIGNER_URL + SignerEndpoint.STATUS, {
       method: 'GET',
     })
     expect(response.status).toBe(200)
@@ -190,7 +189,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
         startingPerformedQueryCount = resBody.performedQueryCount
       })
 
-      it('Should respond with 200 on valid request', async () => {
+      it('[Signer configuration test] Should respond with 200 on valid request', async () => {
         const blindedMessage = getBlindedPhoneNumber(PHONE_NUMBER, randomBytes(32))
         const req = getPnpSignRequest(
           ACCOUNT_ADDRESS2,

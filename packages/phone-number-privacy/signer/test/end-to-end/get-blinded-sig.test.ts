@@ -14,7 +14,7 @@ import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
 import { getWalletAddress } from '../../src/common/web3/contracts'
-import { config, getSignerVersion } from '../../src/config'
+import { config } from '../../src/config'
 import { getBlindedPhoneNumber, getTestParamsForContext } from './utils'
 
 require('dotenv').config()
@@ -33,6 +33,7 @@ const {
 const { replenishQuota, registerWalletAddress } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
+const expectedVersion = process.env.DEPLOYED_SIGNER_SERVICE_VERSION!
 
 // Keep these checks as is to ensure backwards compatibility
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
@@ -65,7 +66,7 @@ describe('Running against a deployed service', () => {
     const body = await response.json()
     // This checks against local package.json version, change if necessary
     expect(response.status).toBe(200)
-    expect(body.version).toBe(getSignerVersion())
+    expect(body.version).toBe(expectedVersion)
   })
 
   describe('Returns status 400 with invalid input', () => {
@@ -221,7 +222,7 @@ describe('Running against a deployed service', () => {
 
     // Note: Use this test to check the signers' key configuration. Modify .env to try out different
     // key/version combinations
-    it('Returns sig when querying succeeds with unused request', async () => {
+    it('[Signer configuration test] Returns sig when querying succeeds with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
       const blindedPhoneNumber = getRandomBlindedPhoneNumber()
       const response = await postToSignMessage(blindedPhoneNumber, ACCOUNT_ADDRESS3)
