@@ -27,4 +27,4 @@ export const odisMonitorScheduleFunctionDomains = functions
   .region('us-central1')
   // .region('us-central1', 'europe-west3')
   .pubsub.schedule('every 5 minutes')
-  .onRun(() => testDomainsQuery(contextName))
+  .onRun(async () => testDomainsQuery(contextName))
