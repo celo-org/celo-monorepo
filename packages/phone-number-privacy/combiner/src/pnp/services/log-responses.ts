@@ -118,7 +118,10 @@ export class PnpSignerResponseLogger {
               case ErrorMessage.FAILING_OPEN:
               case ErrorMessage.FAILURE_TO_GET_TOTAL_QUOTA:
               case ErrorMessage.FAILURE_TO_GET_DEK:
-                session.logger.error({ warning, service: response.url }, ErrorMessage.FAILING_OPEN)
+                session.logger.error(
+                  { signerWarning: warning, service: response.url },
+                  WarningMessage.SIGNER_FAILED_OPEN
+                )
               default:
                 break
             }

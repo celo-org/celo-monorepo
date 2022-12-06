@@ -1,7 +1,6 @@
 import { StableToken } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity'
-import { PhoneNumberHashDetails } from '@celo/identity/lib/odis/phone-number-identifier'
-import { ErrorMessages } from '@celo/identity/lib/odis/query'
+import { ErrorMessages, getServiceContext, OdisAPI } from '@celo/identity/lib/odis/query'
 import { PnpClientQuotaStatus } from '@celo/identity/lib/odis/quota'
 import {
   CombinerEndpoint,
@@ -10,6 +9,7 @@ import {
   SignMessageRequest,
   SignMessageResponseSchema,
 } from '@celo/phone-number-privacy-common'
+import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import { config as signerConfig } from '../../../signer/src/config'
@@ -19,8 +19,8 @@ import {
   ACCOUNT_ADDRESS_NO_QUOTA,
   BLINDED_PHONE_NUMBER,
   dekAuthSigner,
+  getTestContextName,
   PHONE_NUMBER,
-  SERVICE_CONTEXT,
   walletAuthSigner,
 } from './resources'
 
@@ -28,12 +28,8 @@ require('dotenv').config()
 
 jest.setTimeout(60000)
 
-const expectedPhoneHash = '0x0e87c82690efb29b260d7129b9ded5ed313560997863eb5505ff7bcb5315af7a'
-const expectedPepper = 'ekgnxF0UwzEii'
-const expectedUnblindedSignature =
-  'tbrOhZqiuMCwFOCki+ndnDpgTrkTjELvy/UDa85+VIvD3F3Fosp++6n2IDfgHdOA'
-
-const combinerUrl = process.env.ODIS_COMBINER_SERVICE_URL
+const SERVICE_CONTEXT = getServiceContext(getTestContextName(), OdisAPI.PNP)
+const combinerUrl = SERVICE_CONTEXT.odisUrl
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
 const expectedVersion = getCombinerVersion()
@@ -271,12 +267,11 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           SERVICE_CONTEXT,
           replayedBlindingFactor
         )
-        expect(res).toStrictEqual<PhoneNumberHashDetails>({
-          e164Number: PHONE_NUMBER,
-          phoneHash: expectedPhoneHash,
-          pepper: expectedPepper,
-          unblindedSignature: expectedUnblindedSignature,
-        })
+        threshold_bls.verify(
+          Buffer.from(SERVICE_CONTEXT.odisPubKey, 'base64'),
+          Buffer.from(PHONE_NUMBER),
+          Buffer.from(res.unblindedSignature!, 'base64')
+        )
         const quotaRes = await OdisUtils.Quota.getPnpQuotaStatus(
           ACCOUNT_ADDRESS,
           walletAuthSigner,
@@ -293,12 +288,11 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           dekAuthSigner(0),
           SERVICE_CONTEXT
         )
-        expect(res).toStrictEqual<PhoneNumberHashDetails>({
-          e164Number: PHONE_NUMBER,
-          phoneHash: expectedPhoneHash,
-          pepper: expectedPepper,
-          unblindedSignature: expectedUnblindedSignature,
-        })
+        threshold_bls.verify(
+          Buffer.from(SERVICE_CONTEXT.odisPubKey, 'base64'),
+          Buffer.from(PHONE_NUMBER),
+          Buffer.from(res.unblindedSignature!, 'base64')
+        )
         const quotaRes = await OdisUtils.Quota.getPnpQuotaStatus(
           ACCOUNT_ADDRESS,
           dekAuthSigner(0),
@@ -323,12 +317,11 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           undefined,
           i
         )
-        expect(res).toStrictEqual<PhoneNumberHashDetails>({
-          e164Number: PHONE_NUMBER,
-          phoneHash: expectedPhoneHash,
-          pepper: expectedPepper,
-          unblindedSignature: expectedUnblindedSignature,
-        })
+        threshold_bls.verify(
+          Buffer.from(SERVICE_CONTEXT.odisPubKey, 'base64'),
+          Buffer.from(PHONE_NUMBER),
+          Buffer.from(res.unblindedSignature!, 'base64')
+        )
       })
     }
 
@@ -344,12 +337,11 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         undefined,
         1.5
       )
-      expect(res).toStrictEqual<PhoneNumberHashDetails>({
-        e164Number: PHONE_NUMBER,
-        phoneHash: expectedPhoneHash,
-        pepper: expectedPepper,
-        unblindedSignature: expectedUnblindedSignature,
-      })
+      threshold_bls.verify(
+        Buffer.from(SERVICE_CONTEXT.odisPubKey, 'base64'),
+        Buffer.from(PHONE_NUMBER),
+        Buffer.from(res.unblindedSignature!, 'base64')
+      )
     })
 
     it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on unsupported key version`, async () => {

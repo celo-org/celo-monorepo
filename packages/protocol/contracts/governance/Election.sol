@@ -97,6 +97,12 @@ contract Election is
     uint256 max;
   }
 
+  struct CachedVotes {
+    // group => votes
+    mapping(address => uint256) cachedVotesPerGroup;
+    uint256 totalVotes;
+  }
+
   Votes private votes;
   // Governs the minimum and maximum number of validators that can be elected.
   ElectableValidators public electableValidators;
@@ -106,8 +112,15 @@ contract Election is
   // elections.
   FixidityLib.Fraction public electabilityThreshold;
 
+  // If set to true for account, the account is able to vote for more
+  // than max number of groups voted for.
+  mapping(address => bool) public allowedToVoteOverMaxNumberOfGroups;
+
+  mapping(address => CachedVotes) public cachedVotesByAccount;
+
   event ElectableValidatorsSet(uint256 min, uint256 max);
   event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
+  event AllowedToVoteOverMaxNumberOfGroups(address account, bool flag);
   event ElectabilityThresholdSet(uint256 electabilityThreshold);
   event ValidatorGroupMarkedEligible(address indexed group);
   event ValidatorGroupMarkedIneligible(address indexed group);
@@ -139,7 +152,7 @@ contract Election is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 2, 1);
+    return (1, 1, 3, 0);
   }
 
   /**
@@ -261,12 +274,15 @@ contract Election is
       alreadyVotedForGroup = alreadyVotedForGroup || groups[i] == group;
     }
     if (!alreadyVotedForGroup) {
-      require(groups.length < maxNumGroupsVotedFor, "Voted for too many groups");
+      require(
+        allowedToVoteOverMaxNumberOfGroups[msg.sender] || groups.length < maxNumGroupsVotedFor,
+        "Voted for too many groups"
+      );
       groups.push(group);
     }
 
     incrementPendingVotes(group, account, value);
-    incrementTotalVotes(group, value, lesser, greater);
+    incrementTotalVotes(account, group, value, lesser, greater);
     getLockedGold().decrementNonvotingAccountBalance(account, value);
     emit ValidatorGroupVoteCast(account, group, value);
     return true;
@@ -344,7 +360,7 @@ contract Election is
       "Vote value larger than pending votes"
     );
     decrementPendingVotes(group, account, value);
-    decrementTotalVotes(group, value, lesser, greater);
+    decrementTotalVotes(account, group, value, lesser, greater);
     getLockedGold().incrementNonvotingAccountBalance(account, value);
     if (getTotalVotesForGroupByAccount(group, account) == 0) {
       deleteElement(votes.groupsVotedFor[account], group, index);
@@ -412,7 +428,7 @@ contract Election is
       "Vote value larger than active votes"
     );
     uint256 units = decrementActiveVotes(group, account, value);
-    decrementTotalVotes(group, value, lesser, greater);
+    decrementTotalVotes(account, group, value, lesser, greater);
     getLockedGold().incrementNonvotingAccountBalance(account, value);
     if (getTotalVotesForGroupByAccount(group, account) == 0) {
       deleteElement(votes.groupsVotedFor[account], group, index);
@@ -461,7 +477,7 @@ contract Election is
     }
     uint256 decrementedValue = maxValue.sub(remainingValue);
     if (decrementedValue > 0) {
-      decrementTotalVotes(group, decrementedValue, lesser, greater);
+      decrementTotalVotes(account, group, decrementedValue, lesser, greater);
       if (getTotalVotesForGroupByAccount(group, account) == 0) {
         deleteElement(votes.groupsVotedFor[account], group, index);
       }
@@ -475,12 +491,31 @@ contract Election is
    * @return The total number of votes cast by an account.
    */
   function getTotalVotesByAccount(address account) external view returns (uint256) {
-    uint256 total = 0;
+    bool allowedToVoteOverMaxNumberOfGroupsForAccount = allowedToVoteOverMaxNumberOfGroups[account];
     address[] memory groups = votes.groupsVotedFor[account];
+
+    if (groups.length > maxNumGroupsVotedFor) {
+      return cachedVotesByAccount[account].totalVotes;
+    }
+
+    uint256 total = 0;
     for (uint256 i = 0; i < groups.length; i = i.add(1)) {
       total = total.add(getTotalVotesForGroupByAccount(groups[i], account));
     }
     return total;
+  }
+
+  /**
+   * @notice Counts and caches account's votes for group.
+   * @param account The address of the voting account.
+   * @param group The address of the validator group.
+   */
+  function updateTotalVotesByAccountForGroup(address account, address group) public {
+    cachedVotesByAccount[account].totalVotes -= cachedVotesByAccount[account]
+      .cachedVotesPerGroup[group];
+    uint256 newTotalVotesForGroupByAccount = getTotalVotesForGroupByAccount(group, account);
+    cachedVotesByAccount[account].cachedVotesPerGroup[group] = newTotalVotesForGroupByAccount;
+    cachedVotesByAccount[account].totalVotes += newTotalVotesForGroupByAccount;
   }
 
   /**
@@ -668,15 +703,24 @@ contract Election is
    * @param greater The group receiving more votes than the group for which the vote was cast,
    *   or 0 if that group has the most votes of any validator group.
    */
-  function incrementTotalVotes(address group, uint256 value, address lesser, address greater)
-    private
-  {
+  function incrementTotalVotes(
+    address account,
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  ) private {
     uint256 newVoteTotal = votes.total.eligible.getValue(group).add(value);
     votes.total.eligible.update(group, newVoteTotal, lesser, greater);
+
+    if (allowedToVoteOverMaxNumberOfGroups[account]) {
+      updateTotalVotesByAccountForGroup(account, group);
+    }
   }
 
   /**
    * @notice Decrements the number of total votes for `group` by `value`.
+   * @param account The address of the voting account.
    * @param group The validator group whose vote total should be decremented.
    * @param value The number of votes to decrement.
    * @param lesser The group receiving fewer votes than the group for which the vote was revoked,
@@ -684,12 +728,20 @@ contract Election is
    * @param greater The group receiving more votes than the group for which the vote was revoked,
    *   or 0 if that group has the most votes of any validator group.
    */
-  function decrementTotalVotes(address group, uint256 value, address lesser, address greater)
-    private
-  {
+  function decrementTotalVotes(
+    address account,
+    address group,
+    uint256 value,
+    address lesser,
+    address greater
+  ) private {
     if (votes.total.eligible.contains(group)) {
       uint256 newVoteTotal = votes.total.eligible.getValue(group).sub(value);
       votes.total.eligible.update(group, newVoteTotal, lesser, greater);
+    }
+
+    if (allowedToVoteOverMaxNumberOfGroups[account]) {
+      updateTotalVotesByAccountForGroup(account, group);
     }
   }
 
@@ -1041,6 +1093,36 @@ contract Election is
       res[i] = validatorSignerAddressFromCurrentSet(i);
     }
     return res;
+  }
+
+  /**
+   * @notice Allows to turn on/off voting over maxNumGroupsVotedFor.
+   * Once this is turned on and account voted for more than maxNumGroupsVotedFor,
+   * it is account's obligation to run updateTotalVotesByAccountForGroup once a day.
+   * If not run, voting power of account will not reflect rewards awarded.
+   * @param flag The on/off flag.
+   */
+  function setAllowedToVoteOverMaxNumberOfGroups(bool flag) public {
+    address account = getAccounts().voteSignerToAccount(msg.sender);
+    IValidators validators = getValidators();
+    require(
+      !validators.isValidator(account),
+      "Validators cannot vote for more than max number of groups"
+    );
+    require(
+      !validators.isValidatorGroup(account),
+      "Validator groups cannot vote for more than max number of groups"
+    );
+
+    if (!flag) {
+      require(
+        votes.groupsVotedFor[account].length <= maxNumGroupsVotedFor,
+        "Too many groups voted for!"
+      );
+    }
+
+    allowedToVoteOverMaxNumberOfGroups[account] = flag;
+    emit AllowedToVoteOverMaxNumberOfGroups(account, flag);
   }
 
   // Struct to hold local variables for `forceDecrementVotes`.
