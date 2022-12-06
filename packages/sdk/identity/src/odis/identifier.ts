@@ -77,7 +77,6 @@ export async function getObfuscatedIdentifier(
   }
 
   // Fallback to using Wasm version if not specified
-
   if (!blsBlindingClient) {
     debug('No BLSBlindingClient found, using WasmBlsBlindingClient')
     blsBlindingClient = new WasmBlsBlindingClient(context.odisPubKey)
