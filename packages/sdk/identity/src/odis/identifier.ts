@@ -32,7 +32,9 @@ export enum IdentifierPrefix {
   // feel free to put up a PR to add more types!
 }
 
-/** Details with the private plaintext identifier and obfuscated identifier, which can be made public.
+/**
+ * Steps from the private plaintext identifier to the obfuscated identifier, which can be made public.
+ *
  * plaintext identifier: off-chain information, ex: phone number, twitter handle, email, etc.
  * blinded identifier: obtained by blinding the plaintext identifier
  * blinded signature: blinded identifier signed by ODIS
@@ -40,6 +42,7 @@ export enum IdentifierPrefix {
  * pepper: unique secret, obtained by hashing the unblinded signature
  * obfuscated identifier: identifier used for on-chain attestations, obtained by hashing the plaintext identifier and pepper
  */
+
 export interface IdentifierHashDetails {
   // plaintext off-chain phone number, twitter handle, email, etc.
   plaintextIdentifier: string
@@ -52,7 +55,7 @@ export interface IdentifierHashDetails {
 }
 
 /**
- * Retrieve the on-chain identifier for the provided off-chain identifier
+ * Retrieve the obfuscated identifier for the provided plaintext identifier
  * Performs blinding, querying, and unblinding
  *
  * This function will send a request to ODIS, authorized by the provided signer.
@@ -61,7 +64,7 @@ export interface IdentifierHashDetails {
  */
 export async function getObfuscatedIdentifier(
   plaintextIdentifier: string,
-  identifierPrefix: string,
+  identifierPrefix: IdentifierPrefix,
   account: string,
   signer: AuthSigner,
   context: ServiceContext,
@@ -114,12 +117,12 @@ export async function getObfuscatedIdentifier(
 }
 
 /**
- * Blinds the off-chain identifier in preparation for the ODIS request
+ * Blinds the plaintext identifier in preparation for the ODIS request
  * Caller should use the same blsBlindingClient instance for unblinding
  */
 export async function getBlindedIdentifier(
   identifier: string,
-  identifierPrefix: string,
+  identifierPrefix: IdentifierPrefix,
   blsBlindingClient: BlsBlindingClient,
   seed?: Buffer
 ): Promise<string> {
@@ -136,7 +139,7 @@ export async function getBlindedIdentifier(
 /**
  * Query ODIS for the blinded signature
  * Response can be passed into getObfuscatedIdentifierFromSignature
- * to retrieve the on-chain identifier
+ * to retrieve the obfuscated identifier
  */
 export async function getBlindedIdentifierSignature(
   account: string,
@@ -175,11 +178,11 @@ export async function getBlindedIdentifierSignature(
 }
 
 /**
- * Unblind the response and return the on-chain identifier
+ * Unblind the response and return the obfuscated identifier
  */
 export async function getObfuscatedIdentifierFromSignature(
   plaintextIdentifier: string,
-  identifierType: string,
+  identifierType: IdentifierPrefix,
   base64BlindedSignature: string,
   blsBlindingClient: BlsBlindingClient
 ): Promise<IdentifierHashDetails> {
@@ -200,12 +203,12 @@ export async function getObfuscatedIdentifierFromSignature(
 
 export const getPrefixedIdentifier = (
   plaintextIdentifier: string,
-  identifierPrefix: string
+  identifierPrefix: IdentifierPrefix
 ): string => identifierPrefix + '://' + plaintextIdentifier
 
 export const getIdentifierHash = (
   plaintextIdentifier: string,
-  identifierPrefix: string,
+  identifierPrefix: IdentifierPrefix,
   pepper: string
 ): string => {
   // hashing the identifier before appending the pepper to avoid domain collisions where the
