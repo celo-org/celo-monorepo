@@ -28,7 +28,6 @@ import { MultiSigWrapper } from './wrappers/MultiSig'
 import { OdisPaymentsWrapper } from './wrappers/OdisPayments'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
-import { StableTokenRegistryWrapper } from './wrappers/StableTokenRegistry'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
 import { ValidatorsWrapper } from './wrappers/Validators'
 
@@ -57,7 +56,6 @@ const WrapperFactories = {
   [CeloContract.StableToken]: StableTokenWrapper,
   [CeloContract.StableTokenEUR]: StableTokenWrapper,
   [CeloContract.StableTokenBRL]: StableTokenWrapper,
-  [CeloContract.StableTokenRegistry]: StableTokenRegistryWrapper,
 } as const
 
 const WithRegistry = {
@@ -116,7 +114,6 @@ interface WrapperCacheMap {
   [CeloContract.StableToken]?: StableTokenWrapper
   [CeloContract.StableTokenEUR]?: StableTokenWrapper
   [CeloContract.StableTokenBRL]?: StableTokenWrapper
-  [CeloContract.StableTokenRegistry]?: StableTokenRegistryWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
 }
 
@@ -213,9 +210,6 @@ export class WrapperCache implements ContractCacheType {
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)
-  }
-  getStableTokenRegistry() {
-    return this.getContract(CeloContract.StableTokenRegistry)
   }
 
   /**

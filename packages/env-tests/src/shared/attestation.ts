@@ -7,7 +7,7 @@ import {
   getSecurityCodePrefix,
 } from '@celo/contractkit/lib/wrappers/Attestations'
 import { OdisUtils } from '@celo/identity'
-import { AuthSigner } from '@celo/identity/lib/odis/query'
+import { AuthSigner, OdisContextName } from '@celo/identity/lib/odis/query'
 import { PhoneNumberUtils } from '@celo/phone-utils'
 import { AttestationRequest } from '@celo/phone-utils/lib/io'
 import { concurrentMap, sleep } from '@celo/utils/lib/async'
@@ -239,7 +239,7 @@ export async function getIdentifierAndPepper(
       phoneNumber,
       account,
       authSigner,
-      OdisUtils.Query.getServiceContext(context)
+      OdisUtils.Query.getServiceContext(context as OdisContextName)
     )
 
     return {
