@@ -53,6 +53,10 @@ export interface IdentifierHashDetails {
 /**
  * Retrieve the on-chain identifier for the provided off-chain identifier
  * Performs blinding, querying, and unblinding
+ *
+ * This function will send a request to ODIS, authorized by the provided signer.
+ * This method consumes ODIS quota on the account provided by the signer.
+ * You can use the DEK as your signer to decrease quota usage
  */
 export async function getObfuscatedIdentifier(
   plaintextIdentifier: string,
@@ -204,8 +208,15 @@ export const getIdentifierHash = (
   identifierPrefix: string,
   pepper: string
 ): string => {
+  // hashing the identifier before appending the pepper to avoid domain collisions where the
+  // identifier may contain underscores
+  // not doing this for phone numbers to maintain backwards compatibility
   const value =
-    getPrefixedIdentifier(plaintextIdentifier, identifierPrefix) + PEPPER_SEPARATOR + pepper
+    identifierPrefix === IdentifierPrefix.PHONE_NUMBER
+      ? getPrefixedIdentifier(plaintextIdentifier, identifierPrefix) + PEPPER_SEPARATOR + pepper
+      : (sha3(getPrefixedIdentifier(plaintextIdentifier, identifierPrefix)) as string) +
+        PEPPER_SEPARATOR +
+        pepper
   return sha3(value) as string
 }
 
