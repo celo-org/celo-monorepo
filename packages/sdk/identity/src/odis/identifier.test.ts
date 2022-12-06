@@ -23,7 +23,7 @@ jest.mock('./bls-blinding-client', () => {
 
 const mockOffchainIdentifier = 'twitterHandle'
 const mockAccount = '0x0000000000000000000000000000000000007E57'
-const expectedIdentifierHash = '0x36fda45dcdb40c403f8387e56ca7913f851dc66cde3f4e17843953dcc8947650'
+const expectedIdentifierHash = '0x8d1f580d4e49568883df9092285c0f8336e50d592b944607a613aff804e0b48f'
 const expectedPepper = 'nHIvMC9B4j2+H'
 
 const serviceContext: ServiceContext = {
