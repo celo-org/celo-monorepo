@@ -32,13 +32,14 @@ export enum IdentifierPrefix {
   // feel free to put up a PR to add more types!
 }
 
-// plaintext identifier: off-chain information, ex: phone number, twitter handle, email, etc.
-// blinded identifier: obtained by blinding the plaintext identifier
-// blinded signature: blinded identifier signed by ODIS
-// unblinded signatue: obtained by unblinding the blinded signature
-// pepper: unique secret, obtained by hashing the unblinded signature
-// obfuscated identifier: identifier used for on-chain attestations, obtained by hashing the plaintext identifier and pepper
-
+/** Details with the private plaintext identifier and obfuscated identifier, which can be made public.
+ * plaintext identifier: off-chain information, ex: phone number, twitter handle, email, etc.
+ * blinded identifier: obtained by blinding the plaintext identifier
+ * blinded signature: blinded identifier signed by ODIS
+ * unblinded signatue: obtained by unblinding the blinded signature
+ * pepper: unique secret, obtained by hashing the unblinded signature
+ * obfuscated identifier: identifier used for on-chain attestations, obtained by hashing the plaintext identifier and pepper
+ */
 export interface IdentifierHashDetails {
   // plaintext off-chain phone number, twitter handle, email, etc.
   plaintextIdentifier: string
@@ -81,7 +82,6 @@ export async function getObfuscatedIdentifier(
   }
 
   // Fallback to using Wasm version if not specified
-
   if (!blsBlindingClient) {
     debug('No BLSBlindingClient found, using WasmBlsBlindingClient')
     blsBlindingClient = new WasmBlsBlindingClient(context.odisPubKey)
