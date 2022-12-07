@@ -28,7 +28,6 @@ import { DomainRequest } from '@celo/phone-number-privacy-common/src'
 import { defined, noBool, noNumber, noString } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
 import 'isomorphic-fetch'
-import { getSignerVersion } from '../../src/config'
 import { getTestParamsForContext } from './utils'
 const { ACCOUNT_ADDRESS1, PRIVATE_KEY1 } = TestUtils.Values
 
@@ -36,8 +35,7 @@ require('dotenv').config()
 
 jest.setTimeout(60000)
 
-const signerUrl = process.env.ODIS_SIGNER_SERVICE_URL
-const expectedVersion = getSignerVersion()
+const expectedVersion = process.env.DEPLOYED_SIGNER_SERVICE_VERSION!
 
 const ODIS_SIGNER_URL = process.env.ODIS_SIGNER_SERVICE_URL
 
@@ -46,7 +44,7 @@ console.log(`Blockchain provider: ${contextSpecificParams.blockchainProviderURL}
 console.log(`Domains public polynomial: ${contextSpecificParams.domainsPolynomial}`)
 console.log(`Domains pubKey: ${contextSpecificParams.domainsPubKey}`)
 
-describe(`Running against service deployed at ${signerUrl}`, () => {
+describe(`Running against service deployed at ${ODIS_SIGNER_URL}`, () => {
   const wallet = new LocalWallet()
   wallet.addAccount(PRIVATE_KEY1)
 
@@ -55,7 +53,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
   const signSalt = 'himalayanPink-sign'
 
   it('Service is deployed at correct version', async () => {
-    const response = await fetch(signerUrl + SignerEndpoint.STATUS, {
+    const response = await fetch(ODIS_SIGNER_URL + SignerEndpoint.STATUS, {
       method: 'GET',
     })
     expect(response.status).toBe(200)
@@ -244,7 +242,7 @@ describe(`Running against service deployed at ${signerUrl}`, () => {
     beforeAll(async () => {
       ;[req, poprf] = await signatureRequest(wallet, ACCOUNT_ADDRESS1, signSaltNew)
     })
-    it('Should respond with 200 on valid request for new domain', async () => {
+    it('[Signer configuration test] Should respond with 200 on valid request for new domain', async () => {
       const res = await queryDomainEndpoint(req, SignerEndpoint.DOMAIN_SIGN)
       expect(res.status).toBe(200)
       const resBody: DomainRestrictedSignatureResponseSuccess = await res.json()
