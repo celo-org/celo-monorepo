@@ -62,7 +62,7 @@ blockscout:
     beanstalkdHost: ""
     fetchers:
       blockRewards:
-        enabled: true
+        enabled: false
   api:
     suffix:
       enabled: false
@@ -253,7 +253,7 @@ blockscout:
   db:
     drop: "false"
   epochRewards:
-    enabled: false
+    enabled: true
   campaignBanner:
     refreshInterval: "60"
   grafanaUrl: https://clabs.grafana.net
