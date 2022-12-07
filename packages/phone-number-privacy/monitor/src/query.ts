@@ -1,29 +1,42 @@
 import { newKit } from '@celo/contractkit'
 import { generateKeys, generateMnemonic, MnemonicStrength } from '@celo/cryptographic-utils'
+import {
+  buildOdisDomain,
+  OdisHardeningConfig,
+  odisHardenKey,
+  odisQueryAuthorizer,
+} from '@celo/encrypted-backup'
 import { OdisUtils } from '@celo/identity'
-import { AuthSigner, OdisContextName } from '@celo/identity/lib/odis/query'
-import { fetchEnv } from '@celo/phone-number-privacy-common'
+import {
+  AuthSigner,
+  getServiceContext,
+  OdisAPI,
+  OdisContextName,
+} from '@celo/identity/lib/odis/query'
+import { CombinerEndpointPNP, fetchEnv } from '@celo/phone-number-privacy-common'
 import { genSessionID } from '@celo/phone-number-privacy-common/lib/utils/logger'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
+import { defined } from '@celo/utils/lib/sign-typed-data-utils'
 import { LocalWallet } from '@celo/wallet-local'
-import * as functions from 'firebase-functions'
-
-const haveConfig = !!functions.config().blockchain
-const network = () => (haveConfig ? functions.config().blockchain.network : process.env.NETWORK)
-const blockchainProvider = () =>
-  haveConfig ? functions.config().blockchain.provider : process.env.BLOCKCHAIN_PROVIDER
 
 const phoneNumber = fetchEnv('PHONE_NUMBER')
-const contractKit = newKit(blockchainProvider(), new LocalWallet())
 
 const newPrivateKey = async () => {
   const mnemonic = await generateMnemonic(MnemonicStrength.s256_24words)
   return (await generateKeys(mnemonic)).privateKey
 }
 
-export const queryOdisForSalt = async () => {
-  console.log(network()) // tslint:disable-line:no-console
-  console.log(blockchainProvider()) // tslint:disable-line:no-console
+export const queryOdisForSalt = async (
+  blockchainProvider: string,
+  contextName: OdisContextName,
+  endpoint: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+) => {
+  console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
+  console.log(`blockchain provider: ${blockchainProvider}`) // tslint:disable-line:no-console
+
+  const serviceContext = getServiceContext(contextName, OdisAPI.PNP)
+
+  const contractKit = newKit(blockchainProvider, new LocalWallet())
   const privateKey = await newPrivateKey()
   const accountAddress = normalizeAddressWith0x(privateKeyToAddress(privateKey))
   contractKit.connection.addAccount(privateKey)
@@ -36,12 +49,34 @@ export const queryOdisForSalt = async () => {
     phoneNumber,
     accountAddress,
     authSigner,
-    OdisUtils.Query.getServiceContext(network() as OdisContextName),
+    serviceContext,
     undefined,
     undefined,
     undefined,
     genSessionID(),
     undefined,
-    undefined
+    endpoint
   )
+}
+
+export const queryOdisDomain = async (contextName: OdisContextName) => {
+  console.log(`contextName: ${contextName}`) // tslint:disable-line:no-console
+
+  const serviceContext = getServiceContext(contextName, OdisAPI.DOMAIN)
+  const monitorDomainConfig: OdisHardeningConfig = {
+    rateLimit: [
+      {
+        delay: 0,
+        resetTimer: defined(true),
+        // Running every 5 min, this should not run out for the next 9 million years
+        batchSize: defined(1000000000000),
+        repetitions: defined(1000000000000),
+      },
+    ],
+    environment: serviceContext,
+  }
+  const authorizer = odisQueryAuthorizer(Buffer.from('ODIS domains monitor authorizer test seed'))
+  const domain = buildOdisDomain(monitorDomainConfig, authorizer.address)
+  // Throws if signature verification fails
+  return odisHardenKey(Buffer.from('password'), domain, serviceContext, authorizer.wallet)
 }
