@@ -79,6 +79,7 @@ blockscout:
       projectId: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaProjectId
       siteKey: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaSiteKey
       apiKey: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaApiKey
+      secretKey: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-recaptchaSecretKey
     erlang:
       cookie: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout3-erlangCookie
     campaignBannerApiUrl: gcp:secretmanager:projects/365081401101/secrets/rc1-blockscout-campaignBannerApiUrl
