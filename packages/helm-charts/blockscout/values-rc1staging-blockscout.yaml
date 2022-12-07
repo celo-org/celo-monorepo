@@ -57,7 +57,7 @@ blockscout:
         cpu: 500m
     stats:
       enabled: true
-      reportUrl: '{"overview": "https://datastudio.google.com/embed/reporting/60bea1af-3e82-4eb0-a313-158582baa710/page/hDehC?hl=en", "addresses":"https://datastudio.google.com/embed/reporting/1e334bed-f7c9-4ee6-ac77-2c4cc3dae04c/page/hDehC?hl=en", "cStables":"https://datastudio.google.com/embed/reporting/28a3620e-e12d-41ea-b361-d44b82cbfeda/page/hDehC?hl=en", "transactions":"https://datastudio.google.com/embed/reporting/c5ecbd9b-d277-488f-8caf-4c8b64305e55/page/hDehC?hl=en", "reserve": "https://datastudio.google.com/embed/reporting/965b3c9f-6d36-4d45-818d-34d4f59d89dd/page/hDehC?hl=en"}'
+      reportUrl: '{"overview": "https://datastudio.google.com/embed/reporting/60bea1af-3e82-4eb0-a313-158582baa710/page/hDehC?hl=en", "addresses":"https://datastudio.google.com/embed/reporting/1e334bed-f7c9-4ee6-ac77-2c4cc3dae04c/page/hDehC?hl=en", "cStables":"https://datastudio.google.com/embed/reporting/28a3620e-e12d-41ea-b361-d44b82cbfeda/page/hDehC?hl=en", "transactions":"https://datastudio.google.com/embed/reporting/c5ecbd9b-d277-488f-8caf-4c8b64305e55/page/hDehC?hl=en", "reserve": "https://datastudio.google.com/embed/reporting/965b3c9f-6d36-4d45-818d-34d4f59d89dd/page/hDehC?hl=en", "epoch": "https://datastudio.google.com/embed/reporting/cbbd0f2c-f56b-4e04-89b2-d3d9f105250b/page/VEuZC"}'
       makerdojo: '{"attestations": "https://makerdojo.io/public/dashboards/DjNVIYqQiyxIEcTx3Io4IwQg7U56lqQPyrSYdnXl?embed=clabs","uniswap":"https://makerdojo.io/public/dashboards/1qUlHeb7W9jnPVuXv6yeRatEYxSXPDsFQUODR1bp?embed=clabs","moola":"https://makerdojo.io/public/dashboards/tWnDs1CsMQyaSLHFHj0MUoNz20WbxjGv72fCTxgq?embed=clabs"}'
   metadataCrawler:
     enabled: true

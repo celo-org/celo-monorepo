@@ -62,7 +62,7 @@ blockscout:
     beanstalkdHost: ""
     fetchers:
       blockRewards:
-        enabled: true
+        enabled: false
   api:
     suffix:
       enabled: false
