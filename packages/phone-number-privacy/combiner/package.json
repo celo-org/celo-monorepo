@@ -7,9 +7,10 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "yarn build && firebase serve --only functions",
-    "deploy:staging": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy-stg",
-    "deploy:alfajores": "yarn build && firebase deploy --only functions --project celo-phone-number-privacy",
-    "deploy:mainnet": "yarn build && firebase deploy --only functions --project celo-pgpnp-mainnet",
+    "deploy": "yarn build && firebase deploy --only functions:combiner",
+    "deploy:staging": "yarn deploy --project celo-phone-number-privacy-stg",
+    "deploy:alfajores": "yarn deploy --project celo-phone-number-privacy",
+    "deploy:mainnet": "yarn deploy --project celo-pgpnp-mainnet",
     "config:get:staging": "firebase functions:config:get --project celo-phone-number-privacy-stg",
     "config:get:alfajores": "firebase functions:config:get --project celo-phone-number-privacy",
     "config:get:mainnet": "firebase functions:config:get --project celo-pgpnp-mainnet",
