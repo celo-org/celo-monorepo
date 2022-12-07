@@ -77,5 +77,6 @@ export const queryOdisDomain = async (contextName: OdisContextName) => {
   }
   const authorizer = odisQueryAuthorizer(Buffer.from('ODIS domains monitor authorizer test seed'))
   const domain = buildOdisDomain(monitorDomainConfig, authorizer.address)
+  // Throws if signature verification fails
   return odisHardenKey(Buffer.from('password'), domain, serviceContext, authorizer.wallet)
 }
