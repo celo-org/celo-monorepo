@@ -105,7 +105,7 @@ describe('backwards compatibility of phone number identifiers', () => {
 
     const currRes = await getObfuscatedIdentifier(
       mockE164Number,
-      'badPrefix' as IdentifierPrefix,
+      '' as typeof IdentifierPrefix.PHONE_NUMBER,
       mockAccount,
       authSigner,
       currentServiceContext
