@@ -1,6 +1,6 @@
 {
   "name": "@celo/explorer",
-  "version": "3.0.1",
+  "version": "3.0.2-dev",
   "description": "Celo's block explorer consumer",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -23,10 +23,10 @@
   },
   "dependencies": {
     "@types/debug": "^4.1.5",
-    "@celo/base": "3.0.1",
-    "@celo/connect": "3.0.1",
-    "@celo/contractkit": "3.0.1",
-    "@celo/utils": "3.0.1",
+    "@celo/base": "3.0.2-dev",
+    "@celo/connect": "3.0.2-dev",
+    "@celo/contractkit": "3.0.2-dev",
+    "@celo/utils": "3.0.2-dev",
     "debug": "^4.1.1"
   },
   "devDependencies": {
