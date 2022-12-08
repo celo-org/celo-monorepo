@@ -2,7 +2,6 @@ import { getPhoneHash } from '@celo/base'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { OdisUtils as OdisUtilsOld } from 'old-identity-sdk'
 import { OdisUtils } from '../../lib'
-import { IdentifierPrefix } from '../../lib/odis/identifier'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import { AuthenticationMethod, AuthSigner, getServiceContext, OdisContextName } from './query'
 
