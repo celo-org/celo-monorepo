@@ -211,10 +211,10 @@ async function handleGrant(config: ReleaseGoldConfig, currGrant: number) {
 function printfundingProposal(amount: string, recipientAccount: Address) {
   const proposal = [
     '{',
-    `  "contract": "GoldToken"`,
-    `  "function": "transfer"`,
+    `  "contract": "GoldToken",`,
+    `  "function": "transfer",`,
     // function transfer(address to, uint256 value) external returns (bool) {
-    `  "args": ["${recipientAccount}", "${amount}"]`,
+    `  "args": ["${recipientAccount}", "${amount}"],`,
     `  "value": "0"`,
     `}`,
   ].join('\r\n')
@@ -246,10 +246,10 @@ module.exports = async (callback: (error?: any) => number) => {
     fromAddress = argv.from
 
     // inputs to be added by the terminal
-    const beneficiary = '0x456f41406B32c45D59E539e4BBA3D7898c3584dA' // todo Changethis
+    const beneficiary = '0x5Ca621B88f8f3919eb4B9324CC780a3DF34f95fD' // Di Wu address
     const months = 12
     const oneTimePaymentUSD = 6000 // For up to three nodes (not defined yet for more than three nodes)
-    const monthlyPaymentUSD = 1500
+    const monthlyPaymentUSD = 1500 // For up to three nodes (not defined yet for more than three nodes)
     // const numberOfNodes = 3
 
     const celoPrice = await fetchCeloPrice()
@@ -261,11 +261,12 @@ module.exports = async (callback: (error?: any) => number) => {
     const zeros = new BigNumber('1e18')
 
     const oneTimePaymentCELO = new BigNumber(oneTimePaymentUSD)
-      .multipliedBy(zeros)
+      // .multipliedBy(zeros)
       // .multipliedBy(numberOfNodes)
       .dividedBy(celoPrice)
 
     const monthlyPaymentCELO = new BigNumber(monthlyPaymentUSD)
+      // .multipliedBy(zeros)
       // .multipliedBy(numberOfNodes)
       .dividedBy(celoPrice)
 
@@ -275,12 +276,12 @@ module.exports = async (callback: (error?: any) => number) => {
 
     console.log(`Using address for Community fund (Governance Proxy) ${governanceProxyAddress}`)
 
-    const now = new Date()
-    const grantStartDay = new Date(now.getTime() + 60 * 60 * 24 * 10 * 1000) // 10 days from now, the aprox time a governance proposal takes to pass
+    const grantStartDay = new Date('09/11/2022')
+    // const grantStartDay = new Date(now.getTime() + 60 * 60 * 24 * 10 * 1000) // 10 days from now, the aprox time a governance proposal takes to pass
 
     const configOneTimePayment: ReleaseGoldConfig = {
       identifier: beneficiary,
-      releaseStartTime: grantStartDay.toISOString(), // one week from deploy time
+      releaseStartTime: grantStartDay.toISOString(),
       releaseCliffTime: 60 * 60 * 24 * 30 * 3, // 3 months
       numReleasePeriods: 1,
       releasePeriod: 1,
@@ -297,8 +298,8 @@ module.exports = async (callback: (error?: any) => number) => {
 
     const config: ReleaseGoldConfig = {
       identifier: beneficiary,
-      releaseStartTime: grantStartDay.toISOString(), // one week from deploy time
-      releaseCliffTime: 0,
+      releaseStartTime: grantStartDay.toISOString(),
+      releaseCliffTime: 60 * 60 * 24 * 30 * 3, // 3 months,
       numReleasePeriods: months,
       releasePeriod: period,
       amountReleasedPerPeriod: Math.floor(monthlyPaymentCELO.toNumber()),
@@ -318,7 +319,10 @@ module.exports = async (callback: (error?: any) => number) => {
     if (RGInfoCurrent && RGInfoOneTime) {
       console.log('------------------------------------------------------------------------')
       console.log("Here's the snippet that should be added to the proposal for this: ")
-      printfundingProposal(oneTimePaymentCELO.toFixed(0), RGInfoOneTime.ContractAddress)
+      printfundingProposal(
+        oneTimePaymentCELO.multipliedBy(zeros).toFixed(0),
+        RGInfoOneTime.ContractAddress
+      )
       console.log(',')
       printfundingProposal(
         monthlyPaymentCELO.multipliedBy(months).multipliedBy(zeros).toFixed(0),
