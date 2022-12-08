@@ -123,6 +123,7 @@
     "dependencies": [
       "@celo/contractkit",
       "@celo/cryptographic-utils",
+      "@celo/encrypted-backup",
       "@celo/identity",
       "@celo/phone-number-privacy-common",
       "@celo/utils",

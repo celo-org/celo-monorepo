@@ -10,6 +10,7 @@ interface IElection {
   function revokePending(address, uint256, address, address, uint256) external returns (bool);
   function markGroupIneligible(address) external;
   function markGroupEligible(address, address, address) external;
+  function allowedToVoteOverMaxNumberOfGroups(address) external returns (bool);
   function forceDecrementVotes(
     address,
     uint256,

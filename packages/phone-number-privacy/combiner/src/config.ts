@@ -31,16 +31,11 @@ export interface OdisConfig {
   }
 }
 
-export interface CloudFunctionConfig {
-  minInstances: number
-}
-
 export interface CombinerConfig {
   serviceName: string
   blockchain: BlockchainConfig
   phoneNumberPrivacy: OdisConfig
   domains: OdisConfig
-  cloudFunction: CloudFunctionConfig
 }
 
 let config: CombinerConfig
@@ -132,9 +127,6 @@ if (DEV_MODE) {
         ]),
       },
     },
-    cloudFunction: {
-      minInstances: 0,
-    },
   }
 } else {
   const functionConfig = functions.config()
@@ -173,11 +165,6 @@ if (DEV_MODE) {
         currentVersion: Number(functionConfig.domains_keys.current_version),
         versions: functionConfig.domains_keys.versions,
       },
-    },
-    cloudFunction: {
-      // Keep instances warm for mainnet functions
-      // @ts-ignore https://firebase.google.com/docs/functions/manage-functions#reduce_the_number_of_cold_starts
-      minInstances: functionConfig.blockchain.provider === FORNO_ALFAJORES ? 0 : 3,
     },
   }
 }
