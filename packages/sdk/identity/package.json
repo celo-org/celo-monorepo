@@ -20,7 +20,7 @@
     "docs": "typedoc",
     "test:reset": "yarn --cwd ../../protocol devchain generate-tar .tmp/devchain.tar.gz --migration_override ../../dev-utils/src/migration-override.json --upto 28",
     "test:livechain": "yarn --cwd ../../protocol devchain run-tar .tmp/devchain.tar.gz",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --testPathIgnorePatterns src/odis/identifier-backwards-compatibility.test.ts",
     "lint": "tslint -c tslint.json --project .",
     "prepublishOnly": "yarn build"
   },
@@ -44,7 +44,8 @@
     "fetch-mock": "9.10.4",
     "@types/elliptic": "^6.4.12",
     "@celo/flake-tracker": "0.0.1-dev",
-    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da"
+    "@celo/ganache-cli": "git+https://github.com/celo-org/ganache-cli.git#21652da",
+    "old-identity-sdk": "npm:@celo/identity@1.5.2"
   },
   "engines": {
     "node": ">=12.9.0"
