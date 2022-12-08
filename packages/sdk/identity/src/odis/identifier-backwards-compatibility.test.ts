@@ -1,14 +1,16 @@
 import { getPhoneHash } from '@celo/base'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
-import { OdisUtils } from 'old-identity-sdk'
+import { OdisUtils as OdisUtilsOld } from 'old-identity-sdk'
+import { OdisUtils } from '../../lib'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
-import {
+import { AuthenticationMethod, AuthSigner, getServiceContext, OdisContextName } from './query'
+
+const {
   getBlindedIdentifier,
   getIdentifierHash,
   getObfuscatedIdentifier,
   IdentifierPrefix,
-} from './identifier'
-import { AuthenticationMethod, AuthSigner, getServiceContext } from './query'
+} = OdisUtils.Identifier
 
 const mockE164Number = '+14155550000'
 const mockAccount = '0x755dB5fF7B82e9a96e0dDDD143293dc2ADeC0050'
@@ -16,14 +18,13 @@ const mockAccount = '0x755dB5fF7B82e9a96e0dDDD143293dc2ADeC0050'
 
 // this DEK has been registered to the above account on alfajores
 const dekPrivateKey = '0xc2bbdabb440141efed205497a41d5fb6114e0435fd541e368dc628a8e086bfee'
-// const dekPublicKey = '0xc2bbdabb440141efed205497a41d5fb6114e0435fd541e368dc628a8e086bfee'
 
 const authSigner: AuthSigner = {
   authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
   rawKey: dekPrivateKey,
 }
-const oldServiceContext = OdisUtils.Query.getServiceContext('alfajores')
-const currentServiceContext = getServiceContext('alfajores')
+const oldServiceContext = OdisUtilsOld.Query.getServiceContext('alfajores')
+const currentServiceContext = getServiceContext(OdisContextName.ALFAJORES)
 
 const expectedObfuscatedIdentifier =
   '0xf82c6272fd57d3e5d4e291be16b3ebac5c616084a5e6f3730c73f62efd39c6ae'
@@ -37,7 +38,7 @@ describe('backwards compatibility of phone number identifiers', () => {
   })
 
   it('should match when using EncryptionSigner', async () => {
-    const oldRes = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+    const oldRes = await OdisUtilsOld.PhoneNumberIdentifier.getPhoneNumberIdentifier(
       mockE164Number,
       mockAccount,
       authSigner,
@@ -65,7 +66,7 @@ describe('backwards compatibility of phone number identifiers', () => {
       '44714c0a2b2bacec757a67822a4fbbdfe043cca8c6ae936545ef992f246df1a9',
       'hex'
     )
-    const oldRes = await OdisUtils.PhoneNumberIdentifier.getBlindedPhoneNumber(
+    const oldRes = await OdisUtilsOld.PhoneNumberIdentifier.getBlindedPhoneNumber(
       mockE164Number,
       blsBlindingClient,
       seed
@@ -95,7 +96,7 @@ describe('backwards compatibility of phone number identifiers', () => {
   })
 
   it('should not match when different prefix used', async () => {
-    const oldRes = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+    const oldRes = await OdisUtilsOld.PhoneNumberIdentifier.getPhoneNumberIdentifier(
       mockE164Number,
       mockAccount,
       authSigner,
@@ -104,7 +105,7 @@ describe('backwards compatibility of phone number identifiers', () => {
 
     const currRes = await getObfuscatedIdentifier(
       mockE164Number,
-      'badPrefix',
+      '' as typeof IdentifierPrefix.PHONE_NUMBER,
       mockAccount,
       authSigner,
       currentServiceContext

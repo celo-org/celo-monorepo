@@ -1,3 +1,4 @@
+import { isE164Number } from '@celo/base'
 import {
   CombinerEndpointPNP,
   KEY_VERSION_HEADER,
@@ -129,11 +130,14 @@ export async function getBlindedIdentifier(
   debug('Retrieving blinded message')
   // phone number identifiers don't have prefixes in the blinding stage
   // to maintain backwards compatibility wih ASv1
-  const base64Identifier =
-    identifierPrefix === IdentifierPrefix.PHONE_NUMBER
-      ? Buffer.from(identifier).toString('base64')
-      : Buffer.from(getPrefixedIdentifier(identifier, identifierPrefix)).toString('base64')
-  return blsBlindingClient.blindMessage(base64Identifier, seed)
+  let _identifier = getPrefixedIdentifier(identifier, identifierPrefix)
+  if (identifierPrefix === IdentifierPrefix.PHONE_NUMBER) {
+    if (!isE164Number(identifier)) {
+      throw new Error(`Invalid phone number: ${identifier}`)
+    }
+    _identifier = identifier
+  }
+  return blsBlindingClient.blindMessage(Buffer.from(_identifier).toString('base64'), seed)
 }
 
 /**
