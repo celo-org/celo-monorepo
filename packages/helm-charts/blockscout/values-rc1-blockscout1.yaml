@@ -7,7 +7,7 @@ blockscout:
           requests:
             memory: 4Gi
             cpu: 500m
-    poolSize: 100
+    poolSize: 200
     resources:
       requests:
         memory: 12Gi
@@ -44,7 +44,7 @@ blockscout:
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet-production:us-west1:rc11
+      connectionName: celo-testnet-production:us-west1:rc11-replica
       proxy:
         resources:
           requests:
