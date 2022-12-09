@@ -1,4 +1,3 @@
-import { isE164Number } from '@celo/base/lib/phoneNumbers'
 import { CombinerEndpointPNP } from '@celo/phone-number-privacy-common'
 import BigNumber from 'bignumber.js'
 import debugFactory from 'debug'
@@ -44,10 +43,6 @@ export async function getPhoneNumberIdentifier(
   endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
 ): Promise<PhoneNumberHashDetails> {
   debug('Getting phone number pepper')
-
-  if (!isE164Number(e164Number)) {
-    throw new Error(`Invalid phone number: ${e164Number}`)
-  }
 
   const {
     plaintextIdentifier,

@@ -24,6 +24,8 @@ import {
   walletAuthSigner,
 } from './resources'
 
+const { IdentifierPrefix } = OdisUtils.Identifier
+
 require('dotenv').config()
 
 jest.setTimeout(60000)
@@ -179,8 +181,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
         // Raw key is used as the blinding client's seed, so we need a new PN
         // Create a fake PN that is always incrementing and shouldn't ever repeat
         const unusedPN = `+1${Date.now()}`
-        await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        await OdisUtils.Identifier.getObfuscatedIdentifier(
           unusedPN,
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           dekAuthSigner(0),
           SERVICE_CONTEXT
@@ -201,8 +204,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       })
 
       it('Should increment performedQueryCount on success with WALLET_KEY auth', async () => {
-        await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        await OdisUtils.Identifier.getObfuscatedIdentifier(
           PHONE_NUMBER,
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           walletAuthSigner,
           SERVICE_CONTEXT,
@@ -230,15 +234,17 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       )
       beforeAll(async () => {
         // Ensure that these are each called at least once for the first test runs
-        await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        await OdisUtils.Identifier.getObfuscatedIdentifier(
           PHONE_NUMBER,
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           walletAuthSigner,
           SERVICE_CONTEXT,
           replayedBlindingFactor
         )
-        await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        await OdisUtils.Identifier.getObfuscatedIdentifier(
           PHONE_NUMBER,
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           dekAuthSigner(0),
           SERVICE_CONTEXT
@@ -260,8 +266,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       })
 
       it('Should succeed and not update performedQueryCount when authenticated with WALLET_KEY', async () => {
-        const res = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        const res = await OdisUtils.Identifier.getObfuscatedIdentifier(
           PHONE_NUMBER,
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           walletAuthSigner,
           SERVICE_CONTEXT,
@@ -282,8 +289,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
       })
 
       it('Should succeed and not update performedQueryCount when authenticated with DEK', async () => {
-        const res = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        const res = await OdisUtils.Identifier.getObfuscatedIdentifier(
           PHONE_NUMBER,
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           dekAuthSigner(0),
           SERVICE_CONTEXT
@@ -306,8 +314,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     // NOTE: these are also replayed requests
     for (let i = 1; i <= 2; i++) {
       it(`Should succeed on valid request with key version header ${i}`, async () => {
-        const res = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        const res = await OdisUtils.Identifier.getObfuscatedIdentifier(
           PHONE_NUMBER,
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           dekAuthSigner(0),
           SERVICE_CONTEXT,
@@ -326,8 +335,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
     }
 
     it(`Should succeed on invalid key version`, async () => {
-      const res = await OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+      const res = await OdisUtils.Identifier.getObfuscatedIdentifier(
         PHONE_NUMBER,
+        IdentifierPrefix.PHONE_NUMBER,
         ACCOUNT_ADDRESS,
         dekAuthSigner(0),
         SERVICE_CONTEXT,
@@ -346,8 +356,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
 
     it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on unsupported key version`, async () => {
       await expect(
-        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        OdisUtils.Identifier.getObfuscatedIdentifier(
           PHONE_NUMBER,
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           dekAuthSigner(0),
           SERVICE_CONTEXT,
@@ -362,8 +373,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
 
     it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on invalid address`, async () => {
       await expect(
-        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        OdisUtils.Identifier.getObfuscatedIdentifier(
           PHONE_NUMBER,
+          IdentifierPrefix.PHONE_NUMBER,
           'not an address',
           dekAuthSigner(0),
           SERVICE_CONTEXT,
@@ -378,8 +390,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
 
     it(`Should reject to throw ${ErrorMessages.ODIS_INPUT_ERROR} on invalid phone number`, async () => {
       await expect(
-        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
-          'not a phone number',
+        OdisUtils.Identifier.getObfuscatedIdentifier(
+          '12345',
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           dekAuthSigner(0),
           SERVICE_CONTEXT,
@@ -389,7 +402,7 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
           undefined,
           1
         )
-      ).rejects.toThrow('Invalid phone number: not a phone number')
+      ).rejects.toThrow('Invalid phone number: 12345')
     })
 
     it(`Should reject to throw ${ErrorMessages.ODIS_AUTH_ERROR} with invalid WALLET_KEY auth`, async () => {
@@ -416,8 +429,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
 
     it(`Should reject to throw ${ErrorMessages.ODIS_AUTH_ERROR} with invalid DEK auth`, async () => {
       await expect(
-        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        OdisUtils.Identifier.getObfuscatedIdentifier(
           PHONE_NUMBER,
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS,
           dekAuthSigner(1), // DEK auth signer doesn't match the registered DEK for ACCOUNT_ADDRESS
           SERVICE_CONTEXT
@@ -427,8 +441,9 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
 
     it(`Should reject to throw ${ErrorMessages.ODIS_QUOTA_ERROR} when account has no quota`, async () => {
       await expect(
-        OdisUtils.PhoneNumberIdentifier.getPhoneNumberIdentifier(
+        OdisUtils.Identifier.getObfuscatedIdentifier(
           PHONE_NUMBER,
+          IdentifierPrefix.PHONE_NUMBER,
           ACCOUNT_ADDRESS_NO_QUOTA,
           dekAuthSigner(0),
           SERVICE_CONTEXT

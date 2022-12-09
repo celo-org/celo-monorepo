@@ -225,33 +225,6 @@ library Proposals {
   }
 
   /**
-   * @notice Returns the stage of a dequeued proposal.
-   * @param proposal The proposal struct.
-   * @param stageDurations The durations of the dequeued proposal stages.
-   * @return The stage of the dequeued proposal.
-   * @dev Must be called on a dequeued proposal.
-   */
-  function getDequeuedStage(Proposal storage proposal, StageDurations storage stageDurations)
-    internal
-    view
-    returns (Stage)
-  {
-    uint256 stageStartTime = proposal.timestamp.add(stageDurations.referendum).add(
-      stageDurations.execution
-    );
-    // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
-      return Stage.Expiration;
-    }
-    stageStartTime = stageStartTime.sub(stageDurations.execution);
-    // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
-      return Stage.Execution;
-    }
-    return Stage.Referendum;
-  }
-
-  /**
    * @notice Returns the number of votes cast on the proposal over the total number
    *   of votes in the network as a fraction.
    * @param proposal The proposal struct.

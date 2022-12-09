@@ -274,6 +274,7 @@ blockscout:
       projectId: ""
       siteKey: ""
       apiKey: ""
+      secretKey: ""
     erlang:
       cookie: ""
     campaignBannerApiUrl: ""

@@ -150,6 +150,8 @@ spec:
           value: {{ .Values.blockscout.secrets.recaptcha.siteKey }}
         - name: RE_CAPTCHA_API_KEY
           value: {{ .Values.blockscout.secrets.recaptcha.apiKey }}
+        - name: RE_CAPTCHA_SECRET_KEY
+          value: {{ .Values.blockscout.secrets.recaptcha.secretKey }}
         - name: SEGMENT_KEY
           value: {{ .Values.blockscout.secrets.segmentKey }}
         - name: CAMPAIGN_BANNER_BACKEND_URL

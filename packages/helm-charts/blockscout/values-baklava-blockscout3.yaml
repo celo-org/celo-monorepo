@@ -71,6 +71,7 @@ blockscout:
       projectId: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaProjectId
       siteKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaSiteKey
       apiKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaApiKey
+      secretKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaSecretKey
     erlang:
       cookie: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout3-erlangCookie
     campaignBannerApiUrl: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-campaignBannerApiUrl
