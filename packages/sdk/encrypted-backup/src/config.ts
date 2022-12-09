@@ -4,8 +4,8 @@ import {
   VALORA_MAINNET_CIRCUIT_BREAKER_ENVIRONMENT,
 } from '@celo/identity/lib/odis/circuit-breaker'
 import {
-  ODIS_ALFAJORES_CONTEXT,
-  ODIS_MAINNET_CONTEXT,
+  ODIS_ALFAJORES_CONTEXT_DOMAINS,
+  ODIS_MAINNET_CONTEXT_DOMAINS,
   ServiceContext as OdisServiceContext,
 } from '@celo/identity/lib/odis/query'
 import { SequentialDelayStage } from '@celo/phone-number-privacy-common'
@@ -284,7 +284,7 @@ export enum EnvironmentIdentifier {
 export const PIN_HARDENING_MAINNET_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: PIN_HARDENING_RATE_LIMIT,
-    environment: ODIS_MAINNET_CONTEXT,
+    environment: ODIS_MAINNET_CONTEXT_DOMAINS,
   },
   circuitBreaker: {
     environment: VALORA_MAINNET_CIRCUIT_BREAKER_ENVIRONMENT,
@@ -294,7 +294,7 @@ export const PIN_HARDENING_MAINNET_CONFIG: HardeningConfig = {
 export const PIN_HARDENING_ALFAJORES_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: PIN_HARDENING_RATE_LIMIT,
-    environment: ODIS_ALFAJORES_CONTEXT,
+    environment: ODIS_ALFAJORES_CONTEXT_DOMAINS,
   },
   circuitBreaker: {
     environment: VALORA_ALFAJORES_CIRCUIT_BREAKER_ENVIRONMENT,
@@ -304,7 +304,7 @@ export const PIN_HARDENING_ALFAJORES_CONFIG: HardeningConfig = {
 export const PASSWORD_HARDENING_MAINNET_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: PASSWORD_HARDENING_RATE_LIMIT,
-    environment: ODIS_MAINNET_CONTEXT,
+    environment: ODIS_MAINNET_CONTEXT_DOMAINS,
   },
   computational: {
     function: ComputationalHardeningFunction.SCRYPT,
@@ -317,7 +317,7 @@ export const PASSWORD_HARDENING_MAINNET_CONFIG: HardeningConfig = {
 export const E2E_TESTING_MAINNET_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: E2E_TESTING_RATE_LIMIT,
-    environment: ODIS_MAINNET_CONTEXT,
+    environment: ODIS_MAINNET_CONTEXT_DOMAINS,
   },
   computational: {
     function: ComputationalHardeningFunction.SCRYPT,
@@ -330,7 +330,7 @@ export const E2E_TESTING_MAINNET_CONFIG: HardeningConfig = {
 export const NO_QUOTA_MAINNET_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: NO_QUOTA_RATE_LIMIT,
-    environment: ODIS_MAINNET_CONTEXT,
+    environment: ODIS_MAINNET_CONTEXT_DOMAINS,
   },
   computational: {
     function: ComputationalHardeningFunction.SCRYPT,
@@ -343,7 +343,7 @@ export const NO_QUOTA_MAINNET_CONFIG: HardeningConfig = {
 export const PASSWORD_HARDENING_ALFAJORES_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: PASSWORD_HARDENING_RATE_LIMIT,
-    environment: ODIS_ALFAJORES_CONTEXT,
+    environment: ODIS_ALFAJORES_CONTEXT_DOMAINS,
   },
   computational: {
     function: ComputationalHardeningFunction.SCRYPT,
@@ -356,7 +356,7 @@ export const PASSWORD_HARDENING_ALFAJORES_CONFIG: HardeningConfig = {
 export const E2E_TESTING_ALFAJORES_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: E2E_TESTING_RATE_LIMIT,
-    environment: ODIS_ALFAJORES_CONTEXT,
+    environment: ODIS_ALFAJORES_CONTEXT_DOMAINS,
   },
   computational: {
     function: ComputationalHardeningFunction.SCRYPT,
@@ -369,7 +369,7 @@ export const E2E_TESTING_ALFAJORES_CONFIG: HardeningConfig = {
 export const NO_QUOTA_ALFAJORES_CONFIG: HardeningConfig = {
   odis: {
     rateLimit: NO_QUOTA_RATE_LIMIT,
-    environment: ODIS_ALFAJORES_CONTEXT,
+    environment: ODIS_ALFAJORES_CONTEXT_DOMAINS,
   },
   computational: {
     function: ComputationalHardeningFunction.SCRYPT,

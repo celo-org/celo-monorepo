@@ -115,8 +115,12 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: data
+      {{- if .pvc_annotations }}
+      annotations:
+        {{- toYaml .pvc_annotations | nindent 8 }}
+      {{- end }}
     spec:
-      storageClassName: ssd
+      storageClassName: {{ $.Values.geth.storageClass }}
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
