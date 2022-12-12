@@ -91,7 +91,6 @@ export default class Propose extends BaseCommand {
       }
     }
 
-    console.log(proposal)
     await displaySendTx(
       'proposeTx',
       governance.propose(proposal, res.flags.descriptionURL),
