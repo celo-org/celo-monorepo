@@ -84,6 +84,14 @@ export default class Propose extends BaseCommand {
       }
     }
 
+    for (const proposalIten of proposal) {
+      if (typeof proposalIten.value != 'string') {
+        console.log('Error: proposal missing `value` field, it will usually be zero.')
+        throw Error
+      }
+    }
+
+    console.log(proposal)
     await displaySendTx(
       'proposeTx',
       governance.propose(proposal, res.flags.descriptionURL),
