@@ -158,6 +158,8 @@ spec:
           value: {{ .Values.blockscout.secrets.campaignBannerApiUrl }}
         - name: CAMPAIGN_BANNER_REFRESH_INTERVAL
           value: "{{.Values.blockscout.campaignBanner.refreshInterval}}"
+        - name: DISABLE_LIVE_UPDATES
+          value: {{ .Values.blockscout.web.liveUpdates.disabled | quote }}
         {{- if .Values.blockscout.web.suffix.enabled }}
         - name: NETWORK_PATH
           value: /{{ .Values.blockscout.web.suffix.path }}
