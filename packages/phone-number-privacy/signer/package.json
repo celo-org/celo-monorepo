@@ -37,12 +37,12 @@
     "ssl:keygen": "./scripts/create-ssl-cert.sh"
   },
   "dependencies": {
-    "@celo/base": "3.0.2-dev",
-    "@celo/contractkit": "3.0.2-dev",
-    "@celo/phone-number-privacy-common": "2.0.2-dev",
+    "@celo/base": "3.0.0",
+    "@celo/contractkit": "3.0.0",
+    "@celo/phone-number-privacy-common": "2.0.0",
     "@celo/poprf": "^0.1.9",
-    "@celo/utils": "3.0.2-dev",
-    "@celo/wallet-hsm-azure": "3.0.2-dev",
+    "@celo/utils": "3.0.0",
+    "@celo/wallet-hsm-azure": "3.0.0",
     "@google-cloud/secret-manager": "3.0.0",
     "@types/bunyan": "^1.8.6",
     "@types/promise.allsettled": "^1.0.3",
