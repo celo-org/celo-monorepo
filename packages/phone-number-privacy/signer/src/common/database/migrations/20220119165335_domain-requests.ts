@@ -8,7 +8,7 @@ export async function up(knex: Knex): Promise<any> {
       // TODO when implementing replay handling,
       // this field needs to either be nonNullable or taken out of the PK
       // issue: https://github.com/celo-org/celo-monorepo/issues/9909
-      t.dateTime(DOMAIN_REQUESTS_COLUMNS.timestamp).nullable()
+      t.dateTime(DOMAIN_REQUESTS_COLUMNS.timestamp).notNullable()
       t.string(DOMAIN_REQUESTS_COLUMNS.blindedMessage).notNullable()
       t.primary([
         DOMAIN_REQUESTS_COLUMNS.domainHash,
