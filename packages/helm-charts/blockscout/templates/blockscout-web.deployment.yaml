@@ -47,7 +47,7 @@ spec:
         - /bin/sh
         - -c
         - |
-           exec mix cmd --app block_scout_web "iex --cookie $ERLANG_COOKIE --name {{ .Values.blockscout.erlangNodeName}}@$(POD_IP) -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix do deps.loadpaths --no-deps-check, phx.server --no-compile"
+           exec mix cmd --app block_scout_web "iex --cookie $ERLANG_COOKIE --name {{ .Values.blockscout.erlangNodeName}}@$(POD_IP) -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix do deps.loadpaths --no-deps-check --no-validate-compile-env, phx.server --no-compile"
         volumeMounts:
         - mountPath: /secrets
           name: temporary-dir
