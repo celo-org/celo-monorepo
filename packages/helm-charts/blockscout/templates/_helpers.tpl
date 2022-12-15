@@ -185,5 +185,7 @@ blockscout components.
 - name: BLOCKSCOUT_VERSION
   value: {{ .Values.blockscout.image.tag }}
 - name: ACCOUNT_POOL_SIZE
-  value: "1"
+  value: {{ .Values.blockscout.accountPoolSize | quote }}
+- name: DISPLAY_TOKEN_ICONS
+  value: {{ .Values.blockscout.tokenIcons.enabled | quote }}
 {{- end -}}

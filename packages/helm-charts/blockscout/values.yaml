@@ -256,6 +256,9 @@ blockscout:
     drop: "false"
   epochRewards:
     enabled: true
+  accountPoolSize: 1
+  tokenIcons:
+    enabled: false
   campaignBanner:
     refreshInterval: "60"
   grafanaUrl: https://clabs.grafana.net
