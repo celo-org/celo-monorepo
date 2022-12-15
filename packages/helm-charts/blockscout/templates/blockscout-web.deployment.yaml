@@ -90,8 +90,6 @@ spec:
           value: {{ .Values.blockscout.web.poolSize | quote }}
         - name: POOL_SIZE_API
           value: {{ .Values.blockscout.web.poolSizeReplica | quote }}
-        - name: DISPLAY_TOKEN_ICONS
-          value: "true"
         - name: BLOCKSCOUT_HOST
           value: {{ .Values.blockscout.web.host | quote }}
         - name: ENABLE_SOURCIFY_INTEGRATION
