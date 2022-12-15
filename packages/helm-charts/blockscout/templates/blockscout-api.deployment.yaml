@@ -119,6 +119,8 @@ spec:
           value: /{{ .Values.blockscout.api.suffix.path }}
         - name: API_URL
           value: /{{ .Values.blockscout.api.suffix.path }}
+        - name: ACCOUNT_POOL_SIZE
+          value: {{ .Values.blockscout.web.accountPoolSize | quote }}
         {{- end }}
 {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.api.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}

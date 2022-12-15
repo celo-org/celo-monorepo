@@ -232,6 +232,9 @@ blockscout:
     homepage:
       showPrice: true
       showTxs: false
+    accountPoolSize: 1
+    tokenIcons:
+      enabled: false
   metadataCrawler:
     enabled: false
     schedule: "0 */2 * * *" # every 2 hours

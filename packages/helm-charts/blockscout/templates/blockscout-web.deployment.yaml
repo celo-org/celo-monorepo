@@ -167,6 +167,10 @@ spec:
           value: /{{ .Values.blockscout.web.suffix.path }}
         - name: API_URL
           value: /{{ .Values.blockscout.web.suffix.path }}
+        - name: ACCOUNT_POOL_SIZE
+          value: {{ .Values.blockscout.web.accountPoolSize | quote }}
+        - name: DISPLAY_TOKEN_ICONS
+          value: {{ .Values.blockscout.web.tokenIcons.enabled | quote }}
         {{- end }}
 {{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.web.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}
