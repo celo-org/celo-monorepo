@@ -184,4 +184,6 @@ blockscout components.
   value: /images/celo_logo.svg
 - name: BLOCKSCOUT_VERSION
   value: {{ .Values.blockscout.image.tag }}
+- name: ACCOUNT_POOL_SIZE
+  value: "1"
 {{- end -}}
