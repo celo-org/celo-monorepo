@@ -35,7 +35,7 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    poolSize: 30
+    poolSize: 200
     poolSizeReplica: 5
     readinessProbe:
       enabled: true
@@ -227,6 +227,8 @@ blockscout:
       makerdojo: ""
     rpcRegion: "web"  
     primaryRpcRegion: "indexer"
+    liveUpdates:
+      disabled: true
     homepage:
       showPrice: true
       showTxs: false
