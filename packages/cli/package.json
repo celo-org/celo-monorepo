@@ -1,7 +1,7 @@
 {
   "name": "@celo/celocli",
   "description": "CLI Tool for transacting with the Celo protocol",
-  "version": "1.7.3",
+  "version": "1.7.5-dev",
   "author": "Celo",
   "license": "Apache-2.0",
   "repository": "celo-org/celo-monorepo",
@@ -55,6 +55,7 @@
     "@oclif/plugin-warn-if-update-available": "^1.7.0",
     "@types/command-exists": "^1.2.0",
     "@oclif/plugin-plugins": "^1.9.4",
+    "bignumber.js": "9.0.0",
     "bip32": "2.0.5",
     "bip39": "https://github.com/bitcoinjs/bip39#d8ea080a18b40f301d4e2219a2991cd2417e83c2",
     "chalk": "^2.4.2",
