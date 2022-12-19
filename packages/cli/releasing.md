@@ -4,7 +4,7 @@
 
 - update cli version in cli/package.json to next version with a pre-release (eg -beta.x) suffix
 
-- run `yarn generate:shrinkrap`
+- run `yarn generate:shrinkwrap`
 
 - commit the the package.json and shrinkwrap
 
