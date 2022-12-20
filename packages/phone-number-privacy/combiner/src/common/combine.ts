@@ -111,7 +111,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
         signer: signer.url,
       })
     }
-    return this.addFailureToSession(signer, signerFetchResult?.status ?? 502, session)
+    return this.addFailureToSession(signer, signerFetchResult?.status, session)
   }
 
   protected async receiveSuccess(

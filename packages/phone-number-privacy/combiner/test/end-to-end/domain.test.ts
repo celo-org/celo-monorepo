@@ -8,7 +8,6 @@ import {
   requestOdisDomainQuotaStatus,
 } from '@celo/encrypted-backup'
 import { OdisUtils } from '@celo/identity'
-import { ErrorMessages, getServiceContext, OdisAPI } from '@celo/identity/lib/odis/query'
 import {
   CombinerEndpoint,
   DisableDomainRequest,
@@ -38,6 +37,8 @@ import { getTestContextName } from './resources'
 require('dotenv').config()
 
 jest.setTimeout(60000)
+
+const { ErrorMessages, getServiceContext, OdisAPI } = OdisUtils.Query
 
 const SERVICE_CONTEXT = getServiceContext(getTestContextName(), OdisAPI.DOMAIN)
 const combinerUrl = SERVICE_CONTEXT.odisUrl
