@@ -36,6 +36,8 @@ spec:
       initContainers:
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
       containers:
+{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.api.db }}
+{{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
       - name: blockscout-api
         image: {{ .Values.blockscout.image.repository }}:api-{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
@@ -122,9 +124,7 @@ spec:
         - name: ACCOUNT_POOL_SIZE
           value: {{ .Values.blockscout.web.accountPoolSize | quote }}
         {{- end }}
-{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.api.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}
-{{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
       volumes:
 {{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 8 }}
 {{ include "celo.blockscout.volume.temporary-dir" . | indent 8 }}
