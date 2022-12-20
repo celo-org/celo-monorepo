@@ -1263,6 +1263,7 @@ describe('domainService', () => {
       poprfClient.unblindResponse(Buffer.from(res.body.signature, 'base64'))
     })
 
+    // This previously incorrectly returned 502 instead of 429
     it('Should respond with 429 on out of quota', async () => {
       const noQuotaDomain = authenticatedDomain([
         { delay: 0, resetTimer: noBool, batchSize: defined(0), repetitions: defined(0) },
