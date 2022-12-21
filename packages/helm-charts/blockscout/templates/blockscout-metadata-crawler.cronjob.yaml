@@ -21,6 +21,8 @@ spec:
           initContainers:
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 10 }}
           containers:
+{{- $data := dict "Values" .Values "Database" .Values.blockscout.indexer.db }}
+{{ include "celo.blockscout.container.db-terminating-sidecar" $data | indent 10 }}
           - name: metadata-crawler
             image: {{ .Values.blockscout.metadataCrawler.image.repository }}:{{ .Values.blockscout.metadataCrawler.image.tag }}
             imagePullPolicy: IfNotPresent
@@ -56,8 +58,6 @@ spec:
             volumeMounts:
             - mountPath: /tmp/pod
               name: temporary-dir
-{{- $data := dict "Values" .Values "Database" .Values.blockscout.indexer.db }}
-{{ include "celo.blockscout.container.db-terminating-sidecar" $data | indent 10 }}
           volumes:
 {{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 12 }}
 {{ include "celo.blockscout.volume.temporary-dir" . | indent 12 }}
