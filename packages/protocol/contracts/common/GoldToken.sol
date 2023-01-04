@@ -37,6 +37,8 @@ contract GoldToken is
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
+  event TokensBurned(uint256 value);
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -90,6 +92,34 @@ contract GoldToken is
     emit TransferComment(comment);
     return succeeded;
   }
+
+  function burn(uint256 value) public {
+    // Can't check for non-frozen here because the tesnet should be able to do this every block
+    // TODO onlyVM and onlyowner (in case we want to do a one-time mint)
+
+    // msg.sender == address(0) // called by VM
+
+    // don't check for balance, as it should have already been substracted from the sender when paying fees
+    // require(value <= balanceOf(from) || (msg.sender == address(0)), "value to burn exceeded balance of sender");
+    // 1. Check function has enogh balance
+
+    require(value <= balanceOf(msg.sender), "value to burn exceeded balance of sender");
+
+    address to = address(0);
+    bool success;
+    // burning is implemented by sending funds to the zero address
+    (success, ) = TRANSFER.call.value(0).gas(gasleft())(abi.encode(msg.sender, to, value));
+    require(success, "CELO transfer failed");
+    // reduceSupply(value);
+
+    // emit TokensBurned(value);
+    emit Transfer(msg.sender, to, value);
+  }
+
+  // function burnByVM(uint256 value) external onlyVm {
+  //   reduceSupply(value);
+  //   emit TokensBurned(value);
+  // }
 
   /**
    * @notice Approve a user to transfer CELO on behalf of another user.
@@ -222,6 +252,15 @@ contract GoldToken is
    */
   function increaseSupply(uint256 amount) external onlyVm {
     totalSupply_ = totalSupply_.add(amount);
+  }
+
+  function getBurnedAmount() public view returns (uint256) {
+    return balanceOf(address(0));
+  }
+
+  // returns the supply without counting the burned amount
+  function circulatingSupply() public view returns (uint256) {
+    return totalSupply_ - getBurnedAmount();
   }
 
   /**
