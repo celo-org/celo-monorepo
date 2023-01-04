@@ -6,7 +6,6 @@ import {
   JsonRpcResponse,
   Provider,
 } from '@celo/connect'
-import { ContractKit } from '@celo/contractkit'
 import Web3 from 'web3'
 import { fetchMetadata, Metadata } from './sourcify'
 
@@ -16,7 +15,7 @@ const CONTRACT_METADATA = require('../fixtures/contract.metadata.json')
 const PROXY_METADATA = require('../fixtures/proxy.metadata.json')
 
 describe('sourcify helpers', () => {
-  let kit: ContractKit
+  let connection: Connection
   const web3: Web3 = new Web3()
   const address: Address = web3.utils.randomHex(20)
   const proxyAddress: Address = web3.utils.randomHex(20)
@@ -40,8 +39,7 @@ describe('sourcify helpers', () => {
   beforeEach(() => {
     fetchMock.reset()
     web3.setProvider(mockProvider as any)
-    const connection = new Connection(web3)
-    kit = new ContractKit(connection)
+    connection = new Connection(web3)
     connection.chainId = jest.fn().mockImplementation(async () => {
       return chainId
     })
@@ -54,7 +52,7 @@ describe('sourcify helpers', () => {
           `https://repo.sourcify.dev/contracts/full_match/42220/${address}/metadata.json`,
           {}
         )
-        const metadata = await fetchMetadata(kit, address)
+        const metadata = await fetchMetadata(connection, address)
         expect(metadata).toBeInstanceOf(Metadata)
       })
     })
@@ -71,7 +69,7 @@ describe('sourcify helpers', () => {
               `https://repo.sourcify.dev/contracts/partial_match/42220/${address}/metadata.json`,
               {}
             )
-          const metadata = await fetchMetadata(kit, address)
+          const metadata = await fetchMetadata(connection, address)
           expect(metadata).toBeInstanceOf(Metadata)
         })
       })
@@ -87,7 +85,7 @@ describe('sourcify helpers', () => {
               `https://repo.sourcify.dev/contracts/partial_match/42220/${address}/metadata.json`,
               400
             )
-          const metadata = await fetchMetadata(kit, address)
+          const metadata = await fetchMetadata(connection, address)
           expect(metadata).toEqual(null)
         })
       })
@@ -97,14 +95,14 @@ describe('sourcify helpers', () => {
   describe('Metadata', () => {
     describe('get abi', () => {
       it('returns the abi when it finds it', () => {
-        const metadata = new Metadata(kit, address, { output: { abi: [{}] } })
+        const metadata = new Metadata(connection, address, { output: { abi: [{}] } })
         const abi = metadata.abi
         expect(abi).not.toBeNull()
         expect(abi).toEqual([{}])
       })
 
       it('returns null when there is no abi', () => {
-        const metadata = new Metadata(kit, address, { output: { other: [{}] } })
+        const metadata = new Metadata(connection, address, { output: { other: [{}] } })
         const abi = metadata.abi
         expect(abi).toBeNull()
       })
@@ -113,7 +111,7 @@ describe('sourcify helpers', () => {
     describe('get contractName', () => {
       describe('when the structure does not contain it', () => {
         it('returns null', () => {
-          const metadata = new Metadata(kit, address, { output: { abi: [{}] } })
+          const metadata = new Metadata(connection, address, { output: { abi: [{}] } })
           const name = metadata.contractName
           expect(name).toBeNull()
         })
@@ -121,7 +119,7 @@ describe('sourcify helpers', () => {
 
       describe('when the structure contains multiple compilation targets', () => {
         it('returns the first', () => {
-          const metadata = new Metadata(kit, address, {
+          const metadata = new Metadata(connection, address, {
             settings: {
               compilationTarget: {
                 'somefile.sol': 'SomeContract',
@@ -136,7 +134,7 @@ describe('sourcify helpers', () => {
 
       describe('when the structure contains one compilation targets', () => {
         it('returns it', () => {
-          const metadata = new Metadata(kit, address, {
+          const metadata = new Metadata(connection, address, {
             settings: {
               compilationTarget: {
                 'otherfile.sol': 'OtherContract',
@@ -153,7 +151,7 @@ describe('sourcify helpers', () => {
       let contractMetadata: Metadata
 
       beforeEach(() => {
-        contractMetadata = new Metadata(kit, address, CONTRACT_METADATA)
+        contractMetadata = new Metadata(connection, address, CONTRACT_METADATA)
       })
 
       describe('with full signature', () => {
@@ -197,12 +195,12 @@ describe('sourcify helpers', () => {
       let contractMetadata: Metadata
 
       beforeEach(() => {
-        contractMetadata = new Metadata(kit, address, CONTRACT_METADATA)
+        contractMetadata = new Metadata(connection, address, CONTRACT_METADATA)
       })
 
       describe('when the function exists', () => {
         it('returns the ABI', async () => {
-          const callSignature = kit.connection
+          const callSignature = connection
             .getAbiCoder()
             .encodeFunctionSignature('authorizedBy(address)')
           const abi = contractMetadata.abiForSelector(callSignature)
@@ -243,8 +241,8 @@ describe('sourcify helpers', () => {
       let contractMetadata: Metadata
 
       beforeEach(() => {
-        contractMetadata = new Metadata(kit, address, CONTRACT_METADATA)
-        proxyMetadata = new Metadata(kit, proxyAddress, PROXY_METADATA)
+        contractMetadata = new Metadata(connection, address, CONTRACT_METADATA)
+        proxyMetadata = new Metadata(connection, proxyAddress, PROXY_METADATA)
       })
 
       describe('with a cLabs proxy', () => {

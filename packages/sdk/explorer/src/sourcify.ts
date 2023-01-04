@@ -10,8 +10,7 @@
  *  // do something with it.
  * }
  */
-import { AbiCoder, AbiItem, Address } from '@celo/connect'
-import { ContractKit } from '@celo/contractkit'
+import { AbiCoder, AbiItem, Address, Connection } from '@celo/connect'
 import fetch from 'cross-fetch'
 
 const PROXY_IMPLEMENTATION_GETTERS = [
@@ -62,16 +61,16 @@ export class Metadata {
 
   private abiCoder: AbiCoder
   private jsonInterfaceMethodToString: (item: AbiItem) => string
-  private kit: ContractKit
+  private connection: Connection
   private address: Address
 
-  constructor(kit: ContractKit, address: Address, response: any) {
+  constructor(connection: Connection, address: Address, response: any) {
     this.response = response as MetadataResponse
-    this.abiCoder = kit.connection.getAbiCoder()
+    this.abiCoder = connection.getAbiCoder()
     // XXX: For some reason this isn't exported as it should be
     // @ts-ignore
-    this.jsonInterfaceMethodToString = kit.web3.utils._jsonInterfaceMethodToString
-    this.kit = kit
+    this.jsonInterfaceMethodToString = connection.web3.utils._jsonInterfaceMethodToString
+    this.connection = connection
     this.address = address
   }
 
@@ -149,7 +148,7 @@ export class Metadata {
    * @returns the implementation address or null
    */
   async tryGetProxyImplementation(): Promise<Address | null> {
-    const proxyContract = new this.kit.web3.eth.Contract(PROXY_ABI, this.address)
+    const proxyContract = new this.connection.web3.eth.Contract(PROXY_ABI, this.address)
     for (const fn of PROXY_IMPLEMENTATION_GETTERS) {
       try {
         return await new Promise((resolve, reject) => {
@@ -167,44 +166,44 @@ export class Metadata {
 /**
  * Fetch the sourcify response and instantiate a Metadata wrapper class around it.
  * Try a full_match but fallback to partial_match when not strict.
- * @param kit ContractKit instance
+ * @param connection @celo/connect instance
  * @param contract the address of the contract to query
  * @param strict only allow full matches https://docs.sourcify.dev/docs/full-vs-partial-match/
  * @returns Metadata or null
  */
 export async function fetchMetadata(
-  kit: ContractKit,
+  connection: Connection,
   contract: Address,
   strict = false
 ): Promise<Metadata | null> {
-  const fullMatchMetadata = await querySourcify(kit, 'full_match', contract)
+  const fullMatchMetadata = await querySourcify(connection, 'full_match', contract)
   if (fullMatchMetadata !== null) {
     return fullMatchMetadata
   } else if (strict) {
     return null
   } else {
-    return querySourcify(kit, 'partial_match', contract)
+    return querySourcify(connection, 'partial_match', contract)
   }
 }
 
 /**
  * Fetch the sourcify response and instantiate a Metadata wrapper class around it.
- * @param kit ContractKit instance
+ * @param connection @celo/connect instance
  * @param matchType what type of match to query for https://docs.sourcify.dev/docs/full-vs-partial-match/
  * @param contract the address of the contract to query
  * @returns Metadata or null
  */
 async function querySourcify(
-  kit: ContractKit,
+  connection: Connection,
   matchType: 'full_match' | 'partial_match',
   contract: Address
 ): Promise<Metadata | null> {
-  const chainID = await kit.connection.chainId()
+  const chainID = await connection.chainId()
   const resp = await fetch(
     `https://repo.sourcify.dev/contracts/${matchType}/${chainID}/${contract}/metadata.json`
   )
   if (resp.ok) {
-    return new Metadata(kit, contract, await resp.json())
+    return new Metadata(connection, contract, await resp.json())
   }
   return null
 }
