@@ -1,6 +1,6 @@
-import { newKit } from '@celo/contractkit-prev'
+import { newKit } from '@celo/contractkit'
 import { OdisUtils } from '@celo/identity-prev'
-import { SignMessageRequest } from '@celo/identity-prev/lib/odis/query'
+import { getServiceContext, SignMessageRequest } from '@celo/identity-prev/lib/odis/query'
 import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import { AuthenticationMethod, Endpoint } from '@celo/phone-number-privacy-common'
 import { replenishQuota } from '@celo/phone-number-privacy-common/lib/test/utils'
@@ -14,10 +14,10 @@ import {
   DEFAULT_FORNO_URL,
   dekAuthSigner,
   deks,
+  getTestContextName,
   PHONE_NUMBER,
   PRIVATE_KEY,
   PRIVATE_KEY_NO_QUOTA,
-  SERVICE_CONTEXT,
 } from './resources'
 
 require('dotenv').config()
@@ -29,10 +29,11 @@ contractKit.addAccount(PRIVATE_KEY_NO_QUOTA)
 contractKit.addAccount(PRIVATE_KEY)
 contractKit.defaultAccount = ACCOUNT_ADDRESS
 
-const combinerUrl = 'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
+const SERVICE_CONTEXT = getServiceContext(getTestContextName())
+
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
-describe(`Running against service deployed at ${combinerUrl} w/ blockchain provider ${fullNodeUrl}`, () => {
+describe(`Running against service deployed at ${SERVICE_CONTEXT.odisUrl} w/ blockchain provider ${fullNodeUrl}`, () => {
   beforeAll(async () => {
     const dek0 = ensureLeading0x(deks[0].publicKey)
     const accountsWrapper = await contractKit.contracts.getAccounts()

@@ -5,7 +5,7 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import { Response as FetchResponse } from 'node-fetch'
-import { performance, PerformanceObserver } from 'perf_hooks'
+import { PerformanceObserver } from 'perf_hooks'
 import { OdisConfig } from '../config'
 import { Action } from './action'
 import { IO } from './io'
@@ -31,13 +31,21 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
 
   async distribute(session: Session<R>): Promise<void> {
     const obs = new PerformanceObserver((list) => {
-      const entry = list.getEntries()[0]
-      session.logger.info(
-        { latency: entry, signer: entry!.name },
-        'Signer response latency measured'
-      )
+      // Possible race condition here: if multiple signers take exactly the same
+      // amount of time, the PerformanceObserver callback may be called twice with
+      // both entries present. Node 12 doesn't allow for entries to be deleted by name,
+      // and eliminating the race condition requires a more significant redesign of
+      // the measurement code.
+      // This is only used for monitoring purposes, so a rare
+      // duplicate latency measure for the signer should have minimal impact.
+      list.getEntries().forEach((entry) => {
+        session.logger.info(
+          { latency: entry, signer: entry.name },
+          'Signer response latency measured'
+        )
+      })
     })
-    obs.observe({ entryTypes: ['measure'], buffered: true })
+    obs.observe({ entryTypes: ['measure'], buffered: false })
 
     const timeout = setTimeout(() => {
       session.timedOut = true
@@ -50,8 +58,8 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     // response in time and be aborted
 
     clearTimeout(timeout)
-
-    performance.clearMarks()
+    // DO NOT call performance.clearMarks() as this also deletes marks used to
+    // measure e2e combiner latency.
     obs.disconnect()
   }
 
@@ -59,6 +67,11 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     let signerFetchResult: FetchResponse | undefined
     try {
       signerFetchResult = await this.io.fetchSignerResponseWithFallback(signer, session)
+      session.logger.info({
+        message: 'Received signerFetchResult',
+        signer: signer.url,
+        status: signerFetchResult.status,
+      })
     } catch (err) {
       session.logger.debug({ err }, 'signer request failure')
       if (err instanceof Error && err.name === 'AbortError' && session.abort.signal.aborted) {
@@ -91,12 +104,14 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
       }
     }
     if (signerFetchResult) {
-      session.logger.debug({
+      session.logger.info({
         message: 'Received signerFetchResult on unsuccessful signer response',
         res: await signerFetchResult.json(),
+        status: signerFetchResult.status,
+        signer: signer.url,
       })
     }
-    return this.addFailureToSession(signer, signerFetchResult?.status ?? 502, session)
+    return this.addFailureToSession(signer, signerFetchResult?.status, session)
   }
 
   protected async receiveSuccess(

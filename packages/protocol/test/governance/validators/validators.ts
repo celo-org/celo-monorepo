@@ -563,6 +563,18 @@ contract('Validators', (accounts: string[]) => {
         )
       })
 
+      it('should revert when vote over max number of groups set to true', async () => {
+        await mockElection.setAllowedToVoteOverMaxNumberOfGroups(validator, true)
+        const signer = accounts[9]
+        const sig = await getParsedSignatureOfAddress(web3, validator, signer)
+        await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
+        const publicKey = await addressToPublicKey(signer, web3.eth.sign)
+        await assertRevert(
+          validators.registerValidator(publicKey, blsPublicKey, blsPoP),
+          'Validators cannot vote for more than max number of groups'
+        )
+      })
+
       describe('when the account has authorized a validator signer', () => {
         let validatorRegistrationEpochNumber: number
         let publicKey: string
@@ -1273,6 +1285,18 @@ contract('Validators', (accounts: string[]) => {
     const group = accounts[0]
     let resp: any
     describe('when the account is not a registered validator group', () => {
+      it('should revert when vote over max number of groups set to true', async () => {
+        await mockElection.setAllowedToVoteOverMaxNumberOfGroups(group, true)
+        const signer = accounts[9]
+        const sig = await getParsedSignatureOfAddress(web3, group, signer)
+        await accountsInstance.authorizeValidatorSigner(signer, sig.v, sig.r, sig.s)
+        const publicKey = await addressToPublicKey(signer, web3.eth.sign)
+        await assertRevert(
+          validators.registerValidator(publicKey, blsPublicKey, blsPoP),
+          'Validators cannot vote for more than max number of groups'
+        )
+      })
+
       describe('when the account meets the locked gold requirements', () => {
         beforeEach(async () => {
           await mockLockedGold.setAccountTotalLockedGold(group, groupLockedGoldRequirements.value)

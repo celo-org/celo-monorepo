@@ -47,14 +47,13 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
     } catch (err) {
       // getDataEncryptionKey should only throw if there is a full-node connection issue.
       // That is, it does not throw if the DEK is undefined or invalid
-      logger.error(
-        { err, warning: ErrorMessage.FAILURE_TO_GET_DEK },
-        shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
-      )
-      warnings.push(
-        ErrorMessage.FAILURE_TO_GET_DEK,
-        shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
-      )
+      const failureStatus = shouldFailOpen ? ErrorMessage.FAILING_OPEN : ErrorMessage.FAILING_CLOSED
+      logger.error({
+        err,
+        warning: ErrorMessage.FAILURE_TO_GET_DEK,
+        failureStatus,
+      })
+      warnings.push(ErrorMessage.FAILURE_TO_GET_DEK, failureStatus)
       return shouldFailOpen
     }
     if (!registeredEncryptionKey) {

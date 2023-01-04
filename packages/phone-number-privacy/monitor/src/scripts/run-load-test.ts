@@ -1,3 +1,4 @@
+import { OdisContextName } from '@celo/identity/lib/odis/query'
 import { concurrentLoadTest } from '../test'
 
 /* tslint:disable:no-console */
@@ -5,7 +6,7 @@ import { concurrentLoadTest } from '../test'
 const args = process.argv.slice(2)
 
 const printHelpAndExit = () => {
-  console.log('Usage: yarn loadTest <network> <numWorkers>')
+  console.log('Usage: yarn loadTest <contextname> <numWorkers>')
   process.exit(1)
 }
 
@@ -13,17 +14,18 @@ if (args[0] === '--help' || args.length !== 2) {
   printHelpAndExit()
 }
 
+let blockchainProvider: string
 switch (args[0]) {
+  case 'alfajoresstaging':
   case 'alfajores':
-    process.env.BLOCKCHAIN_PROVIDER = 'https://alfajores-forno.celo-testnet.org'
+    blockchainProvider = 'https://alfajores-forno.celo-testnet.org'
     break
   case 'mainnet':
-    process.env.BLOCKCHAIN_PROVIDER = 'https://forno.celo.org'
+    blockchainProvider = 'https://forno.celo.org'
     break
   default:
     printHelpAndExit()
     break
 }
-process.env.NETWORK = args[0]
 
-concurrentLoadTest(Number(args[1])) // tslint:disable-line:no-floating-promises
+concurrentLoadTest(Number(args[1]), blockchainProvider!, args[0] as OdisContextName) // tslint:disable-line:no-floating-promises
