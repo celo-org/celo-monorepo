@@ -149,7 +149,7 @@ export class BlockExplorer {
     address: string,
     selector: string
   ): Promise<ContractNameAndMethodAbi | null> => {
-    let metadata = await fetchMetadata(this.kit, address)
+    let metadata = await fetchMetadata(this.kit.connection, address)
     let abi: AbiItem | null = null
     let contractName: string | null = null
 
@@ -161,7 +161,7 @@ export class BlockExplorer {
         const implAddress = await metadata.tryGetProxyImplementation()
         console.log(implAddress)
         if (implAddress) {
-          metadata = await fetchMetadata(this.kit, implAddress)
+          metadata = await fetchMetadata(this.kit.connection, implAddress)
           if (metadata && metadata.abi) {
             abi = metadata?.abiForSelector(selector)
             contractName = metadata?.contractName

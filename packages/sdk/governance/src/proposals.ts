@@ -304,7 +304,7 @@ export class ProposalBuilder {
     const abiCoder = this.kit.connection.getAbiCoder()
     let methodABI: AbiItem | null = null
 
-    const metadata = await fetchMetadata(this.kit, tx.contract)
+    const metadata = await fetchMetadata(this.kit.connection, tx.contract)
     if (metadata) {
       const potentialABIs = metadata.abiForMethod(tx.function)
       methodABI =
