@@ -7,7 +7,7 @@ blockscout:
           requests:
             memory: 250Mi
             cpu: 200m
-    poolSize: 20
+    poolSize: 200
     resources:
       requests:
         memory: 700Mi
@@ -41,13 +41,13 @@ blockscout:
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet-production:us-west1:alfajores3
+      connectionName: celo-testnet-production:us-west1:alfajores3-replica
       proxy:
         resources:
           requests:
             memory: 250Mi
             cpu: 200m
-    poolSize: 10
+    poolSize: 20
     resources:
       requests:
         memory: 250M
@@ -68,6 +68,7 @@ blockscout:
       projectId: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaProjectId
       siteKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaSiteKey
       apiKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaApiKey
+      secretKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaSecretKey
     erlang:
       cookie: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout3-erlangCookie
     campaignBannerApiUrl: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-campaignBannerApiUrl

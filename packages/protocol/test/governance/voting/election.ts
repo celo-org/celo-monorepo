@@ -81,6 +81,21 @@ contract('Election', (accounts: string[]) => {
     )
   })
 
+  async function setupGroupAndVote(
+    newGroup: string,
+    oldGroup: string,
+    members: string[],
+    vote = true
+  ) {
+    await mockValidators.setMembers(newGroup, members)
+    await registry.setAddressFor(CeloContractName.Validators, accounts[0])
+    await election.markGroupEligible(newGroup, oldGroup, NULL_ADDRESS)
+    await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
+    if (vote) {
+      await election.vote(newGroup, 1, oldGroup, NULL_ADDRESS)
+    }
+  }
+
   describe('#initialize()', () => {
     it('should have set the owner', async () => {
       const owner: string = await election.owner()
@@ -214,6 +229,66 @@ contract('Election', (accounts: string[]) => {
       await assertRevert(
         election.setMaxNumGroupsVotedFor(newMaxNumGroupsVotedFor, { from: nonOwner })
       )
+    })
+  })
+
+  describe('#setAllowedToVoteOverMaxNumberOfGroups', () => {
+    it('should set Allowed To Vote Over Max Number Of Groups', async () => {
+      await election.setAllowedToVoteOverMaxNumberOfGroups(true)
+      assert.equal(await election.allowedToVoteOverMaxNumberOfGroups(accounts[0]), true)
+    })
+
+    it('should revert when vote over max number of groups set to true', async () => {
+      await mockValidators.setValidator(accounts[0])
+      await assertRevert(
+        election.setAllowedToVoteOverMaxNumberOfGroups(true),
+        'Validators cannot vote for more than max number of groups'
+      )
+    })
+
+    it('should revert when vote over max number of groups set to true', async () => {
+      await mockValidators.setValidatorGroup(accounts[0])
+      await assertRevert(
+        election.setAllowedToVoteOverMaxNumberOfGroups(true),
+        'Validator groups cannot vote for more than max number of groups'
+      )
+    })
+
+    it('should emit the AllowedToVoteOverMaxNumberOfGroups event', async () => {
+      const resp = await election.setAllowedToVoteOverMaxNumberOfGroups(true)
+      assert.equal(resp.logs.length, 1)
+      const log = resp.logs[0]
+      assertContainSubset(log, {
+        event: 'AllowedToVoteOverMaxNumberOfGroups',
+        args: {
+          account: accounts[0],
+          flag: true,
+        },
+      })
+    })
+
+    describe('When AllowedToVoteOverMaxNumberOfGroups on', () => {
+      beforeEach(async () => {
+        await election.setAllowedToVoteOverMaxNumberOfGroups(true)
+      })
+
+      it('should turn AllowedToVoteOverMaxNumberOfGroups off', async () => {
+        await election.setAllowedToVoteOverMaxNumberOfGroups(false)
+        assert.equal(await election.allowedToVoteOverMaxNumberOfGroups(accounts[0]), false)
+      })
+
+      it('should emit the AllowedToVoteOverMaxNumberOfGroups event', async () => {
+        const resp = await election.setAllowedToVoteOverMaxNumberOfGroups(false)
+        assert.equal(resp.logs.length, 1)
+        const log = resp.logs[0]
+        assertContainSubset(log, {
+          event: 'AllowedToVoteOverMaxNumberOfGroups',
+          args: {
+            account: accounts[0],
+            flag: false,
+          },
+        })
+      })
     })
   })
 
@@ -458,11 +533,7 @@ contract('Election', (accounts: string[]) => {
             await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
             for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
               newGroup = accounts[i + 2]
-              await mockValidators.setMembers(newGroup, [accounts[9]])
-              await registry.setAddressFor(CeloContractName.Validators, accounts[0])
-              await election.markGroupEligible(newGroup, group, NULL_ADDRESS)
-              await registry.setAddressFor(CeloContractName.Validators, mockValidators.address)
-              await election.vote(newGroup, 1, group, NULL_ADDRESS)
+              await setupGroupAndVote(newGroup, group, [accounts[9]])
             }
           })
 
@@ -470,6 +541,181 @@ contract('Election', (accounts: string[]) => {
             await assertRevert(
               election.vote(group, value.minus(maxNumGroupsVotedFor), newGroup, NULL_ADDRESS)
             )
+          })
+        })
+
+        describe('when the voter is over maxNumGroupsVotedFor but can vote for additional groups', () => {
+          let newGroup: string
+          beforeEach(async () => {
+            await mockLockedGold.incrementNonvotingAccountBalance(voter, value)
+            for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
+              newGroup = accounts[i + 2]
+              await setupGroupAndVote(newGroup, group, [accounts[9]])
+            }
+            newGroup = accounts[maxNumGroupsVotedFor.toNumber() + 2]
+            await setupGroupAndVote(newGroup, group, [accounts[9]], false)
+            await election.setAllowedToVoteOverMaxNumberOfGroups(true)
+          })
+
+          it('should allow to vote for another group', async () => {
+            const valueToVoteFor = value.minus(maxNumGroupsVotedFor)
+            const resp = await election.vote(group, valueToVoteFor, newGroup, NULL_ADDRESS)
+            assert.equal(resp.logs.length, 1)
+            const log = resp.logs[0]
+            assertContainSubset(log, {
+              event: 'ValidatorGroupVoteCast',
+              args: {
+                account: voter,
+                group,
+                value: new BigNumber(valueToVoteFor),
+              },
+            })
+          })
+
+          it('should total votes by account since max number of groups was not reached', async () => {
+            const totalVotes = await election.getTotalVotesByAccount(accounts[0])
+            assertEqualBN(totalVotes, maxNumGroupsVotedFor)
+          })
+
+          describe('When over maximum number of groups voted', () => {
+            const originallyNotVotedWithAmount = 1
+            const account0FirstGroupVote = value
+              .minus(maxNumGroupsVotedFor)
+              .minus(originallyNotVotedWithAmount)
+            beforeEach(async () => {
+              await election.vote(group, account0FirstGroupVote, newGroup, NULL_ADDRESS)
+            })
+
+            it('should revert when turning off of setAllowedToVoteOverMaxNumberOfGroups', async () => {
+              await assertRevert(
+                election.setAllowedToVoteOverMaxNumberOfGroups(false),
+                'Too many groups voted for!'
+              )
+            })
+
+            it('should return return only last voted with since votes were not manually counted', async () => {
+              const totalVotes = await election.getTotalVotesByAccount(accounts[0])
+              assertEqualBN(totalVotes, account0FirstGroupVote)
+            })
+
+            describe('When total votes are manually counted on', () => {
+              beforeEach(async () => {
+                for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
+                  newGroup = accounts[i + 2]
+                  await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
+                }
+                await election.updateTotalVotesByAccountForGroup(accounts[0], group)
+              })
+
+              it('should return total votes by account', async () => {
+                const totalVotes = await election.getTotalVotesByAccount(accounts[0])
+                assertEqualBN(totalVotes, value.minus(originallyNotVotedWithAmount))
+              })
+
+              describe('When votes revoked', () => {
+                const revokeDiff = 100
+                const revokeValue = account0FirstGroupVote.minus(100)
+
+                beforeEach(async () => {
+                  await election.revokePending(group, revokeValue, accounts[4], NULL_ADDRESS, 3, {
+                    from: accounts[0],
+                  })
+                })
+
+                it('should return lowered total number of votes', async () => {
+                  const totalVotes = await election.getTotalVotesByAccount(accounts[0])
+                  assertEqualBN(totalVotes, maxNumGroupsVotedFor.plus(revokeDiff))
+                })
+              })
+            })
+
+            describe('When votes are being activated', () => {
+              const rewardValue = new BigNumber(1000000)
+              beforeEach(async () => {
+                await mineBlocks(EPOCH, web3)
+                await election.activateForAccount(group, voter)
+              })
+
+              it("should increment the account's active votes for the group", async () => {
+                assertEqualBN(
+                  await election.getActiveVotesForGroupByAccount(group, voter),
+                  account0FirstGroupVote
+                )
+              })
+
+              it('should return correct value when manually counted', async () => {
+                for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
+                  newGroup = accounts[i + 2]
+                  await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
+                }
+                await election.updateTotalVotesByAccountForGroup(accounts[0], group)
+
+                const totalVotes = await election.getTotalVotesByAccount(accounts[0])
+                assertEqualBN(totalVotes, value.minus(originallyNotVotedWithAmount))
+              })
+
+              describe('When awards are distributed', () => {
+                beforeEach(async () => {
+                  await election.distributeEpochRewards(group, rewardValue, newGroup, NULL_ADDRESS)
+                })
+
+                it('should revoke active votes (more then original votes without rewards)', async () => {
+                  await election.revokeActive(group, value, newGroup, NULL_ADDRESS, 3)
+                  assertEqualBN(
+                    await election.getActiveVotesForGroupByAccount(group, voter),
+                    rewardValue.minus(maxNumGroupsVotedFor).minus(originallyNotVotedWithAmount)
+                  )
+                })
+
+                describe('When more votes than active is revoked', () => {
+                  beforeEach(async () => {
+                    await election.revokeActive(group, value, newGroup, NULL_ADDRESS, 3)
+                  })
+
+                  it('should return correct value when manually counted', async () => {
+                    for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
+                      newGroup = accounts[i + 2]
+                      await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
+                    }
+                    await election.updateTotalVotesByAccountForGroup(accounts[0], group)
+
+                    const totalVotes = await election.getTotalVotesByAccount(accounts[0])
+                    assertEqualBN(totalVotes, rewardValue.minus(originallyNotVotedWithAmount))
+                  })
+                })
+
+                describe('When total votes are manually counted on rewards are being distributed', () => {
+                  beforeEach(async () => {
+                    for (let i = 0; i < maxNumGroupsVotedFor.toNumber(); i++) {
+                      newGroup = accounts[i + 2]
+                      await election.updateTotalVotesByAccountForGroup(accounts[0], newGroup)
+                    }
+                    await election.updateTotalVotesByAccountForGroup(accounts[0], group)
+                  })
+
+                  it('should return total votes by account', async () => {
+                    const totalVotes = await election.getTotalVotesByAccount(accounts[0])
+                    assertEqualBN(
+                      totalVotes,
+                      value.plus(rewardValue).minus(originallyNotVotedWithAmount)
+                    )
+                  })
+
+                  it('should increase total votes count once voted', async () => {
+                    await election.vote(
+                      newGroup,
+                      originallyNotVotedWithAmount,
+                      accounts[3],
+                      group,
+                      { from: accounts[0] }
+                    )
+
+                    const totalVotes = await election.getTotalVotesByAccount(accounts[0])
+                    assertEqualBN(totalVotes, value.plus(rewardValue))
+                  })
+                })
+              })
+            })
           })
         })
       })

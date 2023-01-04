@@ -8,7 +8,6 @@ import {
   requestOdisDomainQuotaStatus,
 } from '@celo/encrypted-backup'
 import { OdisUtils } from '@celo/identity'
-import { ErrorMessages } from '@celo/identity/lib/odis/query'
 import {
   CombinerEndpoint,
   DisableDomainRequest,
@@ -33,13 +32,16 @@ import { defined, noNumber, noString } from '@celo/utils/lib/sign-typed-data-uti
 import * as crypto from 'crypto'
 import 'isomorphic-fetch'
 import { getCombinerVersion } from '../../src'
-import { SERVICE_CONTEXT } from './resources'
+import { getTestContextName } from './resources'
 
 require('dotenv').config()
 
 jest.setTimeout(60000)
 
-const combinerUrl = process.env.ODIS_COMBINER_SERVICE_URL
+const { ErrorMessages, getServiceContext, OdisAPI } = OdisUtils.Query
+
+const SERVICE_CONTEXT = getServiceContext(getTestContextName(), OdisAPI.DOMAIN)
+const combinerUrl = SERVICE_CONTEXT.odisUrl
 const fullNodeUrl = process.env.ODIS_BLOCKCHAIN_PROVIDER
 
 const authorizer = odisQueryAuthorizer(Buffer.from('combiner e2e authorizer test seed'))
@@ -94,17 +96,14 @@ describe(`Running against service deployed at ${combinerUrl} w/ blockchain provi
 
   describe(`${CombinerEndpoint.DOMAIN_SIGN}`, () => {
     const testThatValidRequestSucceeds = async () => {
-      const expectedResult = 'olxWliQnGKtj2RcwmZUw7z8Fo9qpTWeom712GdvWAJ8='
       const res = await odisHardenKey(
         Buffer.from('password'),
         domain,
         SERVICE_CONTEXT,
         authorizer.wallet
       )
+      // odisHardenKey verifies the signature against the service public key
       expect(res.ok).toBe(true)
-      if (res.ok) {
-        expect(res.result.toString('base64')).toEqual(expectedResult)
-      }
     }
 
     it('Should succeed on valid request', async () => {

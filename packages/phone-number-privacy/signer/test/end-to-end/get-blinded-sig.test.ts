@@ -14,7 +14,8 @@ import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
 import { getWalletAddress } from '../../src/common/web3/contracts'
-import { config, getSignerVersion } from '../../src/config'
+import { config } from '../../src/config'
+import { getBlindedPhoneNumber, getTestParamsForContext } from './utils'
 
 require('dotenv').config()
 
@@ -29,20 +30,18 @@ const {
   PRIVATE_KEY2,
   PRIVATE_KEY3,
 } = TestUtils.Values
-const { replenishQuota, registerWalletAddress, getBlindedPhoneNumber } = TestUtils.Utils
+const { replenishQuota, registerWalletAddress } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
-const ODIS_PUBLIC_POLYNOMIAL = process.env[
-  process.env.ODIS_PNP_POLYNOMIAL_VAR_FOR_TESTS as string
-] as string
-const ODIS_KEY_VERSION = (process.env.ODIS_PNP_TEST_KEY_VERSION || 1) as string
+const expectedVersion = process.env.DEPLOYED_SIGNER_SERVICE_VERSION!
+
 // Keep these checks as is to ensure backwards compatibility
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'
 
-const DEFAULT_FORNO_URL = process.env.ODIS_BLOCKCHAIN_PROVIDER as string
+const contextSpecificParams = getTestParamsForContext()
 
-const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
+const web3 = new Web3(new Web3.providers.HttpProvider(contextSpecificParams.blockchainProviderURL))
 const contractkit = newKitFromWeb3(web3)
 contractkit.addAccount(PRIVATE_KEY1)
 contractkit.addAccount(PRIVATE_KEY2)
@@ -56,10 +55,10 @@ const getRandomBlindedPhoneNumber = () => {
 
 describe('Running against a deployed service', () => {
   beforeAll(() => {
-    console.log('FORNO_URL: ' + DEFAULT_FORNO_URL)
+    console.log('Blockchain Provider URL: ' + contextSpecificParams.blockchainProviderURL)
     console.log('ODIS_SIGNER: ' + ODIS_SIGNER)
-    console.log('ODIS_PUBLIC_POLYNOMIAL: ' + ODIS_PUBLIC_POLYNOMIAL)
-    console.log('ODIS_KEY_VERSION:' + ODIS_KEY_VERSION)
+    console.log('PNP Public Polynomial: ' + contextSpecificParams.pnpPolynomial)
+    console.log('Key Version:' + contextSpecificParams.pnpKeyVersion)
   })
 
   it('Service is deployed at correct version', async () => {
@@ -67,7 +66,7 @@ describe('Running against a deployed service', () => {
     const body = await response.json()
     // This checks against local package.json version, change if necessary
     expect(response.status).toBe(200)
-    expect(body.version).toBe(getSignerVersion())
+    expect(body.version).toBe(expectedVersion)
   })
 
   describe('Returns status 400 with invalid input', () => {
@@ -223,7 +222,7 @@ describe('Running against a deployed service', () => {
 
     // Note: Use this test to check the signers' key configuration. Modify .env to try out different
     // key/version combinations
-    it('Returns sig when querying succeeds with unused request', async () => {
+    it('[Signer configuration test] Returns sig when querying succeeds with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
       const blindedPhoneNumber = getRandomBlindedPhoneNumber()
       const response = await postToSignMessage(blindedPhoneNumber, ACCOUNT_ADDRESS3)
@@ -236,7 +235,11 @@ describe('Running against a deployed service', () => {
       expect(signResponse.success).toBeTruthy()
       if (signResponse.success) {
         const sigBuffer = Buffer.from(signResponse.signature as string, 'base64')
-        const isValid = isValidSignature(sigBuffer, blindedPhoneNumber, ODIS_PUBLIC_POLYNOMIAL)
+        const isValid = isValidSignature(
+          sigBuffer,
+          blindedPhoneNumber,
+          contextSpecificParams.pnpPolynomial
+        )
         expect(isValid).toBeTruthy()
       }
     })
@@ -307,7 +310,7 @@ async function postToSignMessage(
   account: string,
   timestamp?: number,
   authHeader?: string,
-  keyVersion: string = ODIS_KEY_VERSION
+  keyVersion: string = contextSpecificParams.pnpKeyVersion
 ): Promise<Response> {
   const body = JSON.stringify({
     hashedPhoneNumber: IDENTIFIER,

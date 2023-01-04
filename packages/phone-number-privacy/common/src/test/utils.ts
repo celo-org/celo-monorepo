@@ -2,8 +2,6 @@ import { AttestationsStatus } from '@celo/base'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { serializeSignature, Signature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
-import * as threshold from 'blind-threshold-bls'
-import btoa from 'btoa'
 import Web3 from 'web3'
 import {
   AuthenticationMethod,
@@ -90,19 +88,6 @@ export function createMockWeb3(txCount: number, blockNumber: number) {
       getBlockNumber: jest.fn(() => blockNumber),
     },
   }
-}
-
-export function getBlindedPhoneNumber(phoneNumber: string, blindingFactor: Buffer): string {
-  const blindedPhoneNumber = threshold.blind(Buffer.from(phoneNumber), blindingFactor).message
-  return uint8ArrayToBase64(blindedPhoneNumber)
-}
-
-function uint8ArrayToBase64(bytes: Uint8Array) {
-  let binary = ''
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return btoa(binary)
 }
 
 export async function replenishQuota(account: string, contractKit: any) {
