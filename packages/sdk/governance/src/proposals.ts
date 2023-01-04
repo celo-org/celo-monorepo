@@ -293,6 +293,11 @@ export class ProposalBuilder {
     RegisteredContracts.includes(stripProxy(contract)) ||
     this.getRegistryAddition(contract) !== undefined
 
+  /*
+   * @deprecated - use isRegistryContract
+   */
+  isRegistered = this.isRegistryContract
+
   buildCallToExternalContract = async (
     tx: ProposalTransactionJSON
   ): Promise<ProposalTransaction> => {
@@ -325,6 +330,12 @@ export class ProposalBuilder {
 
     return { input, to, value: tx.value }
   }
+
+  /*
+   *  @deprecated use buildCallToExternalContract
+   *
+   */
+  buildFunctionCallToExternalContract = this.buildCallToExternalContract
 
   buildCallToCoreContract = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
     // Account for canonical registry addresses from current proposal
