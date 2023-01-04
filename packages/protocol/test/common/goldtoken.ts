@@ -8,6 +8,8 @@ import {
   FreezerInstance,
   GoldTokenContract,
   GoldTokenInstance,
+  // MockGoldTokenContract,
+  // MockGoldTokenInstance,
   RegistryContract,
   RegistryInstance,
 } from 'types'
@@ -26,6 +28,8 @@ contract('GoldToken', (accounts: string[]) => {
   let registry: RegistryInstance
   const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
   const TWO_GOLDTOKEN = new BigNumber('2000000000000000000')
+  const zeroAddress = '0x0000000000000000000000000000000000000000'
+  // const vmAddress = zeroAddress
   const sender = accounts[0]
   const receiver = accounts[1]
 
@@ -49,6 +53,56 @@ contract('GoldToken', (accounts: string[]) => {
       const name: string = await goldToken.symbol()
       assert.equal(name, 'CELO')
     })
+  })
+
+  describe.only('#burns()', () => {
+    const startBurn = new BigNumber('28000000000000000000')
+    // beforeEach(async () => {
+
+    // })
+
+    // 1) Contract: GoldToken
+    // #burns()
+    //   burn starts as zero:
+
+    // 2) Contract: GoldToken
+    //     #burns()
+    //       zero address gets burn:
+    //   AssertionError: expected 1000000000000000000 and got 51000000000000000000.
+
+    // 3) Contract: GoldToken
+    //     #burns()
+    //       returns right burned amount:
+    //   AssertionError: expected 1000000000000000000 and got 64000000000000000000.
+
+    it('burn starts as zero', async () => {
+      assertEqualBN(await goldToken.getBurnedAmount(), startBurn)
+    })
+
+    it('burned address equals 0x0 balance', async () => {
+      assertEqualBN(await goldToken.getBurnedAmount(), await goldToken.balanceOf(zeroAddress))
+    })
+
+    it('zero address gets burn', async () => {
+      // await goldToken.burn(ONE_GOLDTOKEN)
+
+      assertEqualBN(await goldToken.balanceOf(zeroAddress), ONE_GOLDTOKEN)
+    })
+
+    it('returns right burned amount', async () => {
+      await goldToken.burn(ONE_GOLDTOKEN)
+
+      assertEqualBN(await goldToken.getBurnedAmount(), ONE_GOLDTOKEN)
+    })
+
+    // const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
+    // let mockGoldToken: MockGoldTokenInstance
+    // mockGoldToken = await MockGoldToken.new()
+
+    // const supply = await mockGoldToken.totalSupply()
+
+    // await mockGoldToken.mint(sender, ONE_GOLDTOKEN, {from: vmAddress})
+    // assertEqualBN(supply, ONE_GOLDTOKEN)
   })
 
   describe('#decimals()', () => {
