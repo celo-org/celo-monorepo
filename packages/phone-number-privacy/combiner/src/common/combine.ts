@@ -87,7 +87,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
         status: signerFetchResult.status,
       })
     } catch (err) {
-      session.logger.debug({ err }, 'signer request failure')
+      session.logger.debug({ err, signer: signer.url, message: 'signer request failure' })
       if (err instanceof Error && err.name === 'AbortError' && session.abort.signal.aborted) {
         if (session.timedOut) {
           session.logger.error({ signer }, ErrorMessage.TIMEOUT_FROM_SIGNER)
