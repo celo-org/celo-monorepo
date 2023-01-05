@@ -3,13 +3,6 @@
 
 version: 2.1
 
-jobs:
-  deploy-job:
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "1f:c5:27:aa:2e:4d:ee:65:0d:78:98:5e:ae:14:5d:60"
-
 
 parameters:
   # When you need to force a rebuild of the node modules cache then bump this version
@@ -130,6 +123,12 @@ commands:
             - ~/.tmp/node_modules.tgz
 
 jobs:
+
+  deploy-job:
+    steps:
+    - add_ssh_keys:
+        fingerprints:
+        - "1f:c5:27:aa:2e:4d:ee:65:0d:78:98:5e:ae:14:5d:60"
 
   install_dependencies:
     <<: *defaults
