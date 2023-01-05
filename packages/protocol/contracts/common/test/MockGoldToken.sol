@@ -10,11 +10,8 @@ contract MockGoldToken is GoldToken(true) {
   uint8 public constant decimals = 18;
   mapping(address => uint256) balances;
 
-  // constructor() public {}
-
   function setTotalSupply(uint256 value) external {
     totalSupply_ = value;
-    // require(value == 500, "called");
   }
 
   function transfer(address to, uint256 amount) external returns (bool) {

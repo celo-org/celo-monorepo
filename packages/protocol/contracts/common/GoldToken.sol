@@ -40,8 +40,6 @@ contract GoldToken is
 
   event Approval(address indexed owner, address indexed spender, uint256 value);
 
-  event TokensBurned(uint256 value);
-
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -77,7 +75,7 @@ contract GoldToken is
    */
   // solhint-disable-next-line no-simple-event-func-name
   function transfer(address to, uint256 value) external returns (bool) {
-    return _transfer(to, value);
+    return _transferWithCheck(to, value);
   }
 
   /**
@@ -96,18 +94,15 @@ contract GoldToken is
     return succeeded;
   }
 
-  function burn(uint256 value) public {
-    // this is equivalent to _tansfer function, but copied over without the 0x0 check
-    require(value <= balanceOf(msg.sender), "value to burn exceeded balance of sender");
-
-    bool success;
-    // burning is implemented by sending funds to the zero address
-    (success, ) = TRANSFER.call.value(0).gas(gasleft())(
-      abi.encode(msg.sender, BURN_ADDRESS, value)
-    );
-    require(success, "CELO transfer failed");
-
-    emit Transfer(msg.sender, BURN_ADDRESS, value);
+  /**
+   * @notice This function allows a user to burn a specific value of tokens.
+     Burning is implemented by sending tokens to the burn address.
+   * @param value: The amount of tokens to burn.
+   * @return True if burn was successful.
+   */
+  function burn(uint256 value) external returns (bool) {
+    // not using transferWithCheck as the burn address can potentially be the zero address
+    return _transfer(BURN_ADDRESS, value);
   }
 
   /**
@@ -219,10 +214,17 @@ contract GoldToken is
   }
 
   /**
-   * @return The total amount of CELO in existence.
+   * @return The total amount of CELO in existence, including what the burn address holds.
    */
-  function totalSupply() external view returns (uint256) {
+  function totalSupply() public view returns (uint256) {
     return totalSupply_;
+  }
+
+  /**
+   * @return The total amount of CELO in existence, not including what the burn address holds.
+   */
+  function circulatingSupply() external view returns (uint256) {
+    return totalSupply().sub(getBurnedAmount());
   }
 
   /**
@@ -243,13 +245,12 @@ contract GoldToken is
     totalSupply_ = totalSupply_.add(amount);
   }
 
+  /**
+   * @notice Gets the amount of CELO that has been burned
+   * @return The total amount of Celo that has been sent to the burn address.
+   */
   function getBurnedAmount() public view returns (uint256) {
     return balanceOf(BURN_ADDRESS);
-  }
-
-  // returns the supply without counting the burned amount
-  function circulatingSupply() public view returns (uint256) {
-    return totalSupply_.sub(getBurnedAmount());
   }
 
   /**
@@ -268,7 +269,6 @@ contract GoldToken is
    * @return True if the transaction succeeds.
    */
   function _transfer(address to, uint256 value) internal returns (bool) {
-    require(to != address(0), "transfer attempted to reserved address 0x0");
     require(value <= balanceOf(msg.sender), "transfer value exceeded balance of sender");
 
     bool success;
@@ -276,5 +276,16 @@ contract GoldToken is
     require(success, "CELO transfer failed");
     emit Transfer(msg.sender, to, value);
     return true;
+  }
+
+  /**
+   * @notice internal CELO transfer from one address to another.
+   * @param to The address to transfer CELO to. Zero address will revert.
+   * @param value The amount of CELO to transfer.
+   * @return True if the transaction succeeds.
+   */
+  function _transferWithCheck(address to, uint256 value) internal returns (bool) {
+    require(to != address(0), "transfer attempted to reserved address 0x0");
+    return _transfer(to, value);
   }
 }
