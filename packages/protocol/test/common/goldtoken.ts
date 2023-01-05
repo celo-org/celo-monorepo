@@ -29,10 +29,9 @@ contract('GoldToken', (accounts: string[]) => {
   let registry: RegistryInstance
   const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
   const TWO_GOLDTOKEN = new BigNumber('2000000000000000000')
-  const zeroAddress = '0x0000000000000000000000000000000000000000'
   const burnAddress = '0x000000000000000000000000000000000000dEaD'
+  // const zeroAddress = '0x0000000000000000000000000000000000000000'
   // const burnAddress = zeroAddress
-  // const vmAddress = zeroAddress
   const sender = accounts[0]
   const receiver = accounts[1]
 
