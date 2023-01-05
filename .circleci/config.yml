@@ -123,12 +123,15 @@ commands:
             - ~/.tmp/node_modules.tgz
 
 jobs:
-
   install_dependencies:
     <<: *defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
     resource_class: large
     steps:
+      - add_ssh_keys:
+          fingerprints:
+          - "1f:c5:27:aa:2e:4d:ee:65:0d:78:98:5e:ae:14:5d:60"
+
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
@@ -888,11 +891,6 @@ jobs:
 
 workflows:
   version: 2
-  deploy-job:
-    steps:
-    - add_ssh_keys:
-        fingerprints:
-        - "1f:c5:27:aa:2e:4d:ee:65:0d:78:98:5e:ae:14:5d:60"
   celo-monorepo-build:
     jobs:
       - install_dependencies
