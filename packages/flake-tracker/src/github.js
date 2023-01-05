@@ -30,7 +30,6 @@ class GitHub {
   }
 
   static async build() {
-    console.log('OLD FLAKE TRACKER SECRET: ' + process.env.FLAKE_TRACKER_SECRET)
     const app = new App({
       id: config.flakeTrackerID,
       privateKey: process.env.FLAKE_TRACKER_SECRET_NEW.replace(/\\n/gm, '\n'),
