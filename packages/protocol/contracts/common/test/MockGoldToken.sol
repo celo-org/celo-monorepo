@@ -1,16 +1,20 @@
 pragma solidity ^0.5.13;
 // solhint-disable no-unused-vars
 
+import "../GoldToken.sol";
+
 /**
  * @title A mock GoldToken for testing.
  */
-contract MockGoldToken {
+contract MockGoldToken is GoldToken(true) {
   uint8 public constant decimals = 18;
-  uint256 public totalSupply;
   mapping(address => uint256) balances;
 
+  // constructor() public {}
+
   function setTotalSupply(uint256 value) external {
-    totalSupply = value;
+    totalSupply_ = value;
+    // require(value == 500, "called");
   }
 
   function transfer(address to, uint256 amount) external returns (bool) {
@@ -34,7 +38,7 @@ contract MockGoldToken {
     balances[a] = value;
   }
 
-  function balanceOf(address a) external view returns (uint256) {
+  function balanceOf(address a) public view returns (uint256) {
     return balances[a];
   }
 
