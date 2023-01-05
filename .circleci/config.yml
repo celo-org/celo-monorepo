@@ -121,6 +121,12 @@ commands:
             - ~/.tmp/node_modules.tgz
 
 jobs:
+  deploy-job:
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "1f:c5:27:aa:2e:4d:ee:65:0d:78:98:5e:ae:14:5d:60"
+
   install_dependencies:
     <<: *defaults
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
