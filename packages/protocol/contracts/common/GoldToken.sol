@@ -31,8 +31,8 @@ contract GoldToken is
 
   mapping(address => mapping(address => uint256)) internal allowed;
 
-  address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
-  // address constant BURN_ADDRESS = address(0);
+  // address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
+  address constant BURN_ADDRESS = address(0);
 
   event Transfer(address indexed from, address indexed to, uint256 value);
 
