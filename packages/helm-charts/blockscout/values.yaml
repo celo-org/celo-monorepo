@@ -39,14 +39,14 @@ blockscout:
     poolSizeReplica: 5
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
     livenessProbe:
       enabled: false
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
@@ -112,14 +112,14 @@ blockscout:
     rateLimit: "1000000"
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
     livenessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
@@ -189,14 +189,14 @@ blockscout:
     poolSizeReplica: 5
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
     livenessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
