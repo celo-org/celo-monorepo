@@ -1,6 +1,6 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { OdisUtils } from '@celo/identity'
-import { getPepperFromThresholdSignature } from '@celo/identity/lib/odis/phone-number-identifier'
+import { getPepperFromThresholdSignature } from '@celo/identity/lib/odis/identifier'
 import { OdisContextName } from '@celo/identity/lib/odis/query'
 import { PhoneNumberUtils } from '@celo/phone-utils'
 import { AttestationRequest } from '@celo/phone-utils/lib/io'
