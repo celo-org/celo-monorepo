@@ -57,7 +57,7 @@ contract('GoldToken', (accounts: string[]) => {
     })
   })
 
-  describe('#burns()', () => {
+  describe('#burn()', () => {
     let startBurn: BigNumber
 
     beforeEach(async () => {
