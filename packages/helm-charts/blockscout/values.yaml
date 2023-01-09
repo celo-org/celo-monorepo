@@ -235,6 +235,8 @@ blockscout:
     accountPoolSize: 1
     tokenIcons:
       enabled: false
+    basicAuth:
+      enabled: false
   metadataCrawler:
     enabled: false
     schedule: "0 */2 * * *" # every 2 hours
