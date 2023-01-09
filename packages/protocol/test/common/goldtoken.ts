@@ -72,7 +72,7 @@ contract('GoldToken', (accounts: string[]) => {
       assertEqualBN(await goldToken.getBurnedAmount(), startBurn)
     })
 
-    it('Burned amout equals the balance of the burn address', async () => {
+    it('Burned amount equals the balance of the burn address', async () => {
       assertEqualBN(await goldToken.getBurnedAmount(), await goldToken.balanceOf(burnAddress))
     })
 
