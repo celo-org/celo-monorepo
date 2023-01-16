@@ -38,6 +38,8 @@ spec:
       initContainers:
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
       containers:
+{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
+{{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
       - name: blockscout-indexer
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
@@ -112,9 +114,7 @@ spec:
           value: {{ .Values.blockscout.indexer.beanstalkdHost | quote }}
         - name: INDEXER_DISABLE_BLOCK_REWARD_FETCHER
           value: {{ not .Values.blockscout.indexer.fetchers.blockRewards.enabled | quote }}
-{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.indexer.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}
-{{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
       volumes:
 {{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 8 }}
 {{ include "celo.blockscout.volume.temporary-dir" . | indent 8 }}
