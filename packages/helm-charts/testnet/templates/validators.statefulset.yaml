@@ -20,15 +20,21 @@ metadata:
 {{ include "common.standard.labels" .  | indent 4 }}
     component: validators
 spec:
+  {{- if .Values.geth.ssd_disks }}
   volumeClaimTemplates:
   - metadata:
       name: data
+      {{- if .Values.pvcAnnotations.validator }}
+      annotations:
+        {{- toYaml .Values.pvcAnnotations.validator | nindent 8 }}
+      {{- end }}
     spec:
-      {{ if .Values.geth.ssd_disks }}storageClassName: ssd{{ end }}
+      storageClassName: {{ .Values.geth.storageClass }}
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: {{ .Values.geth.diskSizeGB }}Gi
+  {{- end }}
   podManagementPolicy: Parallel
   updateStrategy:
 {{ toYaml .Values.updateStrategy.validators | indent 4 }}

@@ -35,7 +35,7 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    poolSize: 30
+    poolSize: 200
     poolSizeReplica: 5
     readinessProbe:
       enabled: true
@@ -60,6 +60,9 @@ blockscout:
     enableEventStream: false
     beanstalkdPort: ""
     beanstalkdHost: ""
+    fetchers:
+      blockRewards:
+        enabled: false
   api:
     suffix:
       enabled: false
@@ -223,7 +226,12 @@ blockscout:
       reportUrl: ""
       makerdojo: ""
     rpcRegion: "web"  
-    primaryRpcRegion: "indexer"  
+    primaryRpcRegion: "indexer"
+    liveUpdates:
+      disabled: true
+    homepage:
+      showPrice: true
+      showTxs: false
   metadataCrawler:
     enabled: false
     schedule: "0 */2 * * *" # every 2 hours
@@ -247,7 +255,7 @@ blockscout:
   db:
     drop: "false"
   epochRewards:
-    enabled: false
+    enabled: true
   campaignBanner:
     refreshInterval: "60"
   grafanaUrl: https://clabs.grafana.net
@@ -266,6 +274,7 @@ blockscout:
       projectId: ""
       siteKey: ""
       apiKey: ""
+      secretKey: ""
     erlang:
       cookie: ""
     campaignBannerApiUrl: ""

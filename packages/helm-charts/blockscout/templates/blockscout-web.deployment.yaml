@@ -132,6 +132,10 @@ spec:
           value: {{ .Values.blockscout.web.appsMenu.learningList | quote }}
         - name: DISPLAY_REWARDS
           value: "{{.Values.blockscout.epochRewards.enabled}}"
+        - name: SHOW_PRICE_CHART
+          value: {{.Values.blockscout.web.homepage.showPrice | quote }}
+        - name: SHOW_TXS_CHART
+          value: {{.Values.blockscout.web.homepage.showTxs | quote }}
         - name: DISABLE_WRITE_API
           value: "false"
         - name: MY_REGION
@@ -146,12 +150,16 @@ spec:
           value: {{ .Values.blockscout.secrets.recaptcha.siteKey }}
         - name: RE_CAPTCHA_API_KEY
           value: {{ .Values.blockscout.secrets.recaptcha.apiKey }}
+        - name: RE_CAPTCHA_SECRET_KEY
+          value: {{ .Values.blockscout.secrets.recaptcha.secretKey }}
         - name: SEGMENT_KEY
           value: {{ .Values.blockscout.secrets.segmentKey }}
         - name: CAMPAIGN_BANNER_BACKEND_URL
           value: {{ .Values.blockscout.secrets.campaignBannerApiUrl }}
         - name: CAMPAIGN_BANNER_REFRESH_INTERVAL
           value: "{{.Values.blockscout.campaignBanner.refreshInterval}}"
+        - name: DISABLE_LIVE_UPDATES
+          value: {{ .Values.blockscout.web.liveUpdates.disabled | quote }}
         {{- if .Values.blockscout.web.suffix.enabled }}
         - name: NETWORK_PATH
           value: /{{ .Values.blockscout.web.suffix.path }}

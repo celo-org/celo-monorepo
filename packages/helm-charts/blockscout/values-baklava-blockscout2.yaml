@@ -7,7 +7,7 @@ blockscout:
           requests:
             memory: 250Mi
             cpu: 200m
-    poolSize: 30
+    poolSize: 200
     resources:
       requests:
         memory: 1000Mi
@@ -43,13 +43,13 @@ blockscout:
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet-production:us-west1:baklava2
+      connectionName: celo-testnet-production:us-west1:baklava2-replica
       proxy:
         resources:
           requests:
             memory: 250Mi
             cpu: 200m
-    poolSize: 10
+    poolSize: 20
     resources:
       requests:
         memory: 250M
@@ -71,6 +71,7 @@ blockscout:
       projectId: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaProjectId
       siteKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaSiteKey
       apiKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaApiKey
+      secretKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaSecretKey
     erlang:
       cookie: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout2-erlangCookie
     campaignBannerApiUrl: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-campaignBannerApiUrl
