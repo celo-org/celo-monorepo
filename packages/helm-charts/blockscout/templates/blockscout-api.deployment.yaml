@@ -22,7 +22,7 @@ spec:
     metadata:
       {{- if .Values.blockscout.metrics.enabled}}
       annotations:
-        prometheus.io/path: /metrics/web
+        prometheus.io/path: /metrics
         prometheus.io/port: "4000"
         prometheus.io/scrape: "true"
       {{- end}}
