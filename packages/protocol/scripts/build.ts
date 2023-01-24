@@ -72,7 +72,7 @@ export const CoreContracts = [
   'Random',
   'OdisPayments',
 
-  // stability
+  // stability - Mento
   'Exchange',
   'ExchangeEUR',
   'ExchangeBRL',

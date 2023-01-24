@@ -16,10 +16,11 @@ import "../governance/interfaces/IValidators.sol";
 import "../identity/interfaces/IRandom.sol";
 import "../identity/interfaces/IAttestations.sol";
 
-import "../stability/interfaces/IExchange.sol";
-import "../stability/interfaces/IReserve.sol";
-import "../stability/interfaces/ISortedOracles.sol";
-import "../stability/interfaces/IStableToken.sol";
+// TODO try to make this paths more resonable
+import "../../lib/mento-core/contracts/interfaces/IExchange.sol";
+import "../../lib/mento-core/contracts/interfaces/IReserve.sol";
+import "../../lib/mento-core/contracts/interfaces/ISortedOracles.sol";
+import "../../lib/mento-core/contracts/interfaces/IStableToken.sol";
 
 contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);

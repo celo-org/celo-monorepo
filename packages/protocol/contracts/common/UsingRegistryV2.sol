@@ -17,10 +17,10 @@ import "../identity/interfaces/IRandom.sol";
 import "../identity/interfaces/IAttestations.sol";
 import "../identity/interfaces/IFederatedAttestations.sol";
 
-import "../stability/interfaces/IExchange.sol";
-import "../stability/interfaces/IReserve.sol";
-import "../stability/interfaces/ISortedOracles.sol";
-import "../stability/interfaces/IStableToken.sol";
+import "../../lib/mento-core/contracts/interfaces/IExchange.sol";
+import "../../lib/mento-core/contracts/interfaces/IReserve.sol";
+import "../../lib/mento-core/contracts/interfaces/ISortedOracles.sol";
+import "../../lib/mento-core/contracts/interfaces/IStableToken.sol";
 
 contract UsingRegistryV2 {
   address internal constant registryAddress = 0x000000000000000000000000000000000000ce10;
