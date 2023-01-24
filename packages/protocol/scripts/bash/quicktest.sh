@@ -9,6 +9,6 @@
 #
 
 rm test/**/*.js
-./scripts/bash/backupmigrations.sh
+#./scripts/bash/backupmigrations.sh
 node runTests.js "$@"
 ./scripts/bash/backupmigrations.sh
