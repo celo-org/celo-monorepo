@@ -1,3 +1,5 @@
+// Deprecated migrations, Mento contracts have been moved to their own repo: https://github.com/mento-protocol/mento-core
+
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForProxiedContract,
