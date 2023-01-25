@@ -150,7 +150,8 @@ export async function queryOdis<R extends OdisRequest>(
   context: ServiceContext,
   endpoint: CombinerEndpoint,
   responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>,
-  headers: OdisRequestHeader<R>
+  headers: OdisRequestHeader<R>,
+  abortController?: AbortController
 ): Promise<OdisResponse<R>> {
   debug(`Posting to ${endpoint}`)
 
@@ -174,6 +175,7 @@ export async function queryOdis<R extends OdisRequest>(
             ...headers,
           },
           body: JSON.stringify(body),
+          signal: abortController?.signal,
         })
       } catch (error) {
         throw new Error(`${ErrorMessages.ODIS_FETCH_ERROR}: ${error}`)

@@ -20,7 +20,8 @@ export async function getPnpQuotaStatus(
   signer: AuthSigner,
   context: ServiceContext,
   clientVersion?: string,
-  sessionID?: string
+  sessionID?: string,
+  abortController?: AbortController
 ): Promise<PnpClientQuotaStatus> {
   const body: PnpQuotaRequest = {
     account,
@@ -36,7 +37,8 @@ export async function getPnpQuotaStatus(
     PnpQuotaResponseSchema,
     {
       Authorization: await getOdisPnpRequestAuth(body, signer),
-    }
+    },
+    abortController
   )
 
   if (response.success) {

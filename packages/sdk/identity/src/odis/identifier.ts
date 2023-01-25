@@ -74,7 +74,8 @@ export async function getObfuscatedIdentifier(
   blsBlindingClient?: BlsBlindingClient,
   sessionID?: string,
   keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
+  abortController?: AbortController
 ): Promise<IdentifierHashDetails> {
   debug('Getting identifier pepper')
 
@@ -106,7 +107,8 @@ export async function getObfuscatedIdentifier(
     clientVersion,
     sessionID,
     keyVersion,
-    endpoint ?? CombinerEndpointPNP.PNP_SIGN
+    endpoint ?? CombinerEndpointPNP.PNP_SIGN,
+    abortController
   )
 
   return getObfuscatedIdentifierFromSignature(
@@ -153,7 +155,8 @@ export async function getBlindedIdentifierSignature(
   clientVersion?: string,
   sessionID?: string,
   keyVersion?: number,
-  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN
+  endpoint?: CombinerEndpointPNP.LEGACY_PNP_SIGN | CombinerEndpointPNP.PNP_SIGN,
+  abortControlller?: AbortController
 ): Promise<string> {
   const body: SignMessageRequest = {
     account,
@@ -171,7 +174,8 @@ export async function getBlindedIdentifierSignature(
     {
       [KEY_VERSION_HEADER]: keyVersion?.toString(),
       Authorization: await getOdisPnpRequestAuth(body, signer),
-    }
+    },
+    abortControlller
   )
 
   if (!response.success) {
