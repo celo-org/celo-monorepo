@@ -12,15 +12,15 @@ oracle:
   circuitBreakerPriceChangeThreshold: 0.25
   priceSources: "[
       [
-        { exchange: 'BINANCE', symbol: 'CELOBUSD', toInvert: false }, 
+        { exchange: 'BINANCE', symbol: 'CELOBUSD', toInvert: false },
         { exchange: 'BINANCE', symbol: 'BUSDBRL', toInvert: false }
       ],
       [
-        { exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false}, 
+        { exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
         { exchange: 'BITSO', symbol: 'USDBRL', toInvert: false }
       ],
       [
-        { exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false }, 
+        { exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false },
         { exchange: 'NOVADAX', symbol: 'BTCBRL', toInvert: false }
       ]
     ]"
