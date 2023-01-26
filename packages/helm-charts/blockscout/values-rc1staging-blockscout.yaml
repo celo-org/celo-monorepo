@@ -1,4 +1,6 @@
 blockscout:
+  eventstream:
+    replicas: 1
   indexer:
     db:
       connectionName: celo-testnet-production:us-west1:rc1staging
