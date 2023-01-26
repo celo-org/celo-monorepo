@@ -398,28 +398,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Completes an attestation with the corresponding code
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   * @param issuer The issuer of the attestation
-   * @param code The code received by the validator
-   */
-  async complete(identifier: string, account: Address, issuer: Address, code: string) {
-    const accounts = await this.contracts.getAccounts()
-    const attestationSigner = await accounts.getAttestationSigner(issuer)
-    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromIdentifier(
-      identifier,
-      account
-    )
-    const { r, s, v } = SignatureUtils.parseSignature(
-      expectedSourceMessage,
-      code,
-      attestationSigner
-    )
-    return toTransactionObject(this.connection, this.contract.methods.complete(identifier, v, r, s))
-  }
-
-  /**
    * Returns the attestation signer for the specified account.
    * @param account The address of token rewards are accumulated in.
    * @param account The address of the account.
@@ -544,54 +522,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     }
 
     return result
-  }
-
-  /**
-   * Requests a new attestation
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param attestationsRequested The number of attestations to request
-   */
-  async request(identifier: string, attestationsRequested: number) {
-    const contract = await this.contracts.getStableToken(StableToken.cUSD)
-
-    return toTransactionObject(
-      this.connection,
-      this.contract.methods.request(identifier, attestationsRequested, contract.address)
-    )
-  }
-
-  /**
-   * Updates sender's approval status on whether to allow an attestation identifier
-   * mapping to be transfered from one address to another.
-   * @param identifier The identifier for this attestation.
-   * @param index The index of the account in the accounts array.
-   * @param from The current attestation address to which the identifier is mapped.
-   * @param to The new address to map to identifier.
-   * @param status The approval status
-   */
-  approveTransfer = proxySend(this.connection, this.contract.methods.approveTransfer)
-
-  /**
-   * Selects the issuers for previously requested attestations for a phone number
-   * @param identifier Attestation identifier (e.g. phone hash)
-   */
-  selectIssuers(identifier: string) {
-    return toTransactionObject(this.connection, this.contract.methods.selectIssuers(identifier))
-  }
-
-  /**
-   * Waits appropriate number of blocks, then selects issuers for previously requested phone number attestations
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   */
-  async selectIssuersAfterWait(
-    identifier: string,
-    account: string,
-    timeoutSeconds?: number,
-    pollDurationSeconds?: number
-  ) {
-    await this.waitForSelectingIssuers(identifier, account, timeoutSeconds, pollDurationSeconds)
-    return this.selectIssuers(identifier)
   }
 
   /**
