@@ -13,7 +13,7 @@ geth:
       cpu: "7"
   autoscaling:
     enabled: true
-    minReplicas: 8
+    minReplicas: 6
     maxReplicas: 12
     metrics:
     - resource:
