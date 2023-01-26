@@ -138,7 +138,8 @@ export async function getOdisPnpRequestAuth(
 }
 
 /**
- * Send an OdisRequest to ODIS
+ * Send any OdisRequest to the specified CombinerEndpoint for the given ServiceContext
+ *
  * @param body OdisRequest to send in the body of the HTTP request.
  * @param context Contains service URL and public to determine which instance to contact.
  * @param endpoint Endpoint to query
