@@ -1,4 +1,3 @@
-replicaCount: 10
 geth:
   gcmode: archive
   image:
@@ -6,8 +5,8 @@ geth:
     repository: us.gcr.io/celo-org/geth
     tag: censored_1.7.2
   rpc_apis: eth,net,rpc,web3,txpool,debug
-  flags: --txpool.nolocals
   ws_port: 8545
+  flags: --txpool.nolocals
   resources:
     requests:
       memory: "21Gi"
@@ -39,6 +38,26 @@ geth:
         selectPolicy: Max
         stabilizationWindowSeconds: 600
   service_session_affinity: None
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - preference:
+          matchExpressions:
+          - key: pool
+            operator: In
+            values:
+            - archive-nodes-c2
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: component
+              operator: In
+              values:
+              - celo-fullnode
+          topologyKey: failure-domain.beta.kubernetes.io/zone
+        weight: 100
   node_keys:
   - "28406f9c37274e163f5f3335fec2a35e0d3bf3895c28f7a54dd8ecd614d1437c"
   - "7c0b1c0518bdd3e1a0db8b0ed6999e4404b344a950462fda42ab53ca7ccea271"
@@ -114,8 +133,7 @@ storage:
   enable: true
   size: 1700Gi
   storageClass: premium-rwo
-  snapshot:
-    enabled: true
+  dataSource:
     kind: PersistentVolumeClaim
     name: data-rc1-fullnodes-0
 
