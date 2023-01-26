@@ -3,6 +3,32 @@ geth:
     requests:
       memory: "21Gi"
       cpu: "7"
+  autoscaling:
+    enabled: true
+    minReplicas: 8
+    maxReplicas: 12
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 75
+          type: Utilization
+      type: Resource
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 300
+          type: Pods
+          value: 1
+        selectPolicy: Max
+        stabilizationWindowSeconds: 600
+      scaleUp:
+        policies:
+        - periodSeconds: 30
+          type: Pods
+          value: 1
+        selectPolicy: Max
+        stabilizationWindowSeconds: 600
   service_session_affinity: None
   node_keys:
   - "28406f9c37274e163f5f3335fec2a35e0d3bf3895c28f7a54dd8ecd614d1437c"
@@ -13,6 +39,76 @@ geth:
   - "87d3a7ce70fc43db4a070a0db1b69ac78f8db0e10163e34248347966b3a8b072"
   - "e7565adbdfab09dab769148a34da35168ababecbba6a468d21ccd9fcff9b5946"
   - "09e2c8c304c5019c5569f27ceea3f1d6d97facbdf8fe410831cd3c615e5df82f"
+  - "8a0a15281b6e0d1b004504212998ba5730493c733cc0810c569099898c5c37da"
+  - "3f467b62697f61fe35a762cf6f1f7c3999f69cda4638d4950d06e86847029793"
+  - "b4c660c6cd4b4c6e31c32766347617dc7b4bf44a4587d645e91942cb0c648fad"
+  - "edf30ce264e9a7795b539c0038947f8b8f3b33974e9251494bfb38c2b5228e3d"
+  - "934028024409f7373a7bc961d35d36270a1b7cfd03f3c72a38857d3482fdd6e4"
+  - "ecb259918b533b9f0588e73d5f7e9d843b652c9e02a24eb9c74d09c430856741"
+  - "b3f37023542cac241251bca4f6462541858079600899cdd8ffec01c10d852917"
+  - "a8f27d2a4508f8b04d6688239f7bd4f007be4ce94f519b9101e9009a855c49f3"
+  - "d69fc4c57f1a72a76ce02c186f5507d4e973a315da1cbb3282eba243edbbc767"
+  - "85494ab0453aba63fc076333c422406dbb6453876161e6eb6d83ddc5bf748165"
+  - "709b37a661704f40c19f51440da3db1255f988131e41596b3cc3cba50b9be9ce"
+  - "d003d2600df888156488d6a004573cbae925b48d878eb9c8bc2d020189a1daf6"
+  - "c280b93bed7942f9f5a95150249120527d3ffe8c61a353412aac797b5b9b4f9b"
+  - "376e89ccdedc3d0717171f263d0e299473cc691eab0a2ba9eca6e5c77e4eefc1"
+  - "8e0b0e69f2f73a80fe3f4960b36eb4dd20328c43b2b49efab480022319b2c531"
+  - "bb18ad176021684eda7b0d0a9331e20d0088c5140dc3c4753673e4902a2c0445"
+  - "785db2c5a7335f860c4a3f0580dc42c2eb758c251c1a1da1c4fd6d92ea3e8880"
+  - "42dbaefba4977bcc2d3df70501150b2bc85f1a11ac185f6a55513f5e726b2114"
+  - "b5d52b7f1148a0f93a40e4069728f5848b707645a3d34790680d3df1a3169b1c"
+  - "54cabbda0a94244eca71d48984435545fbde6ea8b63967ddd3976aa22052c23b"
+  - "e840df8c2cb774456c016358156894fdddac34237db4d023b4182251cf6a4526"
+  - "21fc51e2d9de7450a7cba617ae76fcf52c81ad8fbf18f35f2c4363c2bff9f069"
+  - "b0918cd6f41eaac4de5c65bd50847884d233495332ace70fe8a476b9e4518f20"
+  - "4d3f270febb3b80ba9cabec420407c84e1551fa70c5fccdd2007783760f94076"
+  - "2f3dab91732c5f1f2ddd572632b6ae49d07acc02571b32b527c8f73a738c321b"
+  - "d3a195665d06f5e05e47e55b65ead230732faec2acd6bbf2bca55dc20eece58d"
+  - "184e17357d2aff37fabeace30b16099fba3deb761f072edf78f9d5b5a510f657"
+  - "4a3461b49d189076a135dabca2d731024ed2aabc6db38c98881cbeb93d4f8e43"
+  - "289cb83b30bc1e0a8b4d6a48e6372ac91c558fda506b49e3cb66e0a409bf9619"
+  - "a9be8f06b32cf16c52d8af337677a6bdefec97f52ba6fc62b83fe031cae5cffc"
+  - "eaba8e00c5197ff29e15a334dc4eb7e9e69627fb048214c5cc96fac18bb9abc6"
+  - "5ada92a858053ec7044d18fc9abe6283c621024a53e6d9abf59f40917a5f3a8c"
+  - "15415cc2da81550c7329e917ecce8413400842110c545c8bdd0ad24a71d8ea7f"
+  - "8662e47911d1ba0266fd43dc64e03f95ec43fa14b871a873416910a7361b8bcb"
+  - "4e91ebd24460fc20b6521406e4ed893457b25ac7624a576339bad08bc6b793a4"
+  - "61cf68a629589234ceb401fe1b6752a4dd367ed8e7cc424216f020a1f0c1cfe3"
+  - "f940ba735e0b105e508a3d52a072f23bec3dc42ab7245c7d1ebbee15ced553be"
+  - "b99390dd0a716ea3aeb32c2a18cb888c3f801b0a8ab81a990223fe0d881454e0"
+  - "476a14b9a613caee931812b51fd185537c5602d14ed5c07ef2a7acba5f8be106"
+  - "2b18404d509fd2f647973dbf932f0e0a06ed9f1846758d4fed2ebe67b7bce3b2"
+  - "ac49bd40f33b9660b90c4ea202f67ccedc2916b2ea633b7f2c024a66fc1a0e18"
+  - "6f00d7b62ffa074f8a149c1c961f59da4f98f05a8d50daf66b65af7f682b94e3"
+  - "6175c89460b3d45ba67c8b3078e3dfd9d129634482395a401f752cdc0e2997cc"
+  public_ip_per_node:
+  - 35.230.28.149
+  - 35.230.112.14
+  - 35.247.83.16
+  - 34.82.120.112
+  - 35.230.36.103
+  - 35.197.9.16
+  - 35.197.69.201
+  - 34.127.101.240
+  - 35.212.148.142
+  - 35.212.209.151
+  - 35.212.208.218
+  - 35.212.168.12
+  - 35.212.157.124
+  - 35.212.160.106
+  - 35.212.180.229
+  - 35.212.131.16
+
+storage:
+  accessModes: ReadWriteOnce
+  enable: true
+  size: 300Gi
+  storageClass: ssd
+  snapshot:
+    enabled: true
+    kind: PersistentVolumeClaim
+    name: data-rc1-fullnodes-0
 
 extraPodLabels:
   stack: blockscout
