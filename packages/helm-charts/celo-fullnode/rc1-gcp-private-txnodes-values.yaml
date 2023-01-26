@@ -1,5 +1,10 @@
 replicaCount: 10
 geth:
+  gcmode: archive
+  image:
+    imagePullPolicy: IfNotPresent
+    repository: us.gcr.io/celo-org/geth
+    tag: censored_1.7.2
   resources:
     requests:
       memory: "21Gi"
