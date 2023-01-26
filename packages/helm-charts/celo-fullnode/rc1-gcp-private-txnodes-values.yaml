@@ -1,3 +1,4 @@
+replicaCount: 10
 geth:
   resources:
     requests:
@@ -103,8 +104,8 @@ geth:
 storage:
   accessModes: ReadWriteOnce
   enable: true
-  size: 300Gi
-  storageClass: ssd
+  size: 1700Gi
+  storageClass: premium-rwo
   snapshot:
     enabled: true
     kind: PersistentVolumeClaim
