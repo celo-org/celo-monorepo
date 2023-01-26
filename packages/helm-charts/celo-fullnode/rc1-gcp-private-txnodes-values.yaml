@@ -6,6 +6,7 @@ geth:
     repository: us.gcr.io/celo-org/geth
     tag: censored_1.7.2
   rpc_apis: eth,net,rpc,web3,txpool,debug
+  ws_port: 8545
   resources:
     requests:
       memory: "21Gi"
