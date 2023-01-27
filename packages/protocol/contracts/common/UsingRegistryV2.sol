@@ -129,6 +129,10 @@ contract UsingRegistryV2 {
     return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
+  function getCeloToken() internal view returns (IERC20) {
+    return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+  }
+
   function getGovernance() internal view returns (IGovernance) {
     return IGovernance(registryContract.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
   }
