@@ -266,7 +266,7 @@ export async function getObfuscatedIdentifierFromSignature(
 }
 
 /**
- * Concatenates the identifierPrefix and plaintextIdentifier with the seperator '://'
+ * Concatenates the identifierPrefix and plaintextIdentifier with the separator '://'
  *
  * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
  * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
