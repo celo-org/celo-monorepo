@@ -37,7 +37,7 @@ const PEPPER_SEPARATOR = '__'
  * or DID methods https://w3c.github.io/did-spec-registries/#did-methods.
  *
  * The NULL prefix is included to allow projects to use the sdk without selecting
- * a predefined prefix or adding there own. Production use of the NULL prefix is
+ * a predefined prefix or adding their own. Production use of the NULL prefix is
  * discouraged since identifiers will not be interoperable with other projects.
  * Please think carefully before using the NULL prefix.
  */
