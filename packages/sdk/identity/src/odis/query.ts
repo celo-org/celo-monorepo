@@ -138,7 +138,8 @@ export async function getOdisPnpRequestAuth(
 }
 
 /**
- * Send an OdisRequest to ODIS
+ * Send any OdisRequest to the specified CombinerEndpoint for the given ServiceContext
+ *
  * @param body OdisRequest to send in the body of the HTTP request.
  * @param context Contains service URL and public to determine which instance to contact.
  * @param endpoint Endpoint to query
@@ -150,7 +151,8 @@ export async function queryOdis<R extends OdisRequest>(
   context: ServiceContext,
   endpoint: CombinerEndpoint,
   responseSchema: t.Type<OdisResponse<R>, OdisResponse<R>, unknown>,
-  headers: OdisRequestHeader<R>
+  headers: OdisRequestHeader<R>,
+  abortController?: AbortController
 ): Promise<OdisResponse<R>> {
   debug(`Posting to ${endpoint}`)
 
@@ -174,6 +176,7 @@ export async function queryOdis<R extends OdisRequest>(
             ...headers,
           },
           body: JSON.stringify(body),
+          signal: abortController?.signal,
         })
       } catch (error) {
         throw new Error(`${ErrorMessages.ODIS_FETCH_ERROR}: ${error}`)
