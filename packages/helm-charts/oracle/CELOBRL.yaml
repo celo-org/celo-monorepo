@@ -11,19 +11,31 @@ oracle:
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   priceSources: "[
-      [
-        { exchange: 'BINANCE', symbol: 'CELOBUSD', toInvert: false },
-        { exchange: 'BINANCE', symbol: 'BUSDBRL', toInvert: false }
-      ],
-      [
-        { exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
-        { exchange: 'BITSO', symbol: 'USDBRL', toInvert: false }
-      ],
-      [
-        { exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false },
-        { exchange: 'NOVADAX', symbol: 'BTCBRL', toInvert: false }
-      ]
-    ]"
+  [
+    { exchange: 'BINANCE', symbol: 'CELOBUSD', toInvert: false },
+    { exchange: 'BINANCE', symbol: 'BUSDBRL', toInvert: false }
+  ],
+	[
+    { exchange: 'BINANCE', symbol: 'CELOUSDT', toInvert: false },
+    { exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
+  ],
+	[
+    { exchange: 'BINANCE', symbol: 'CELOBTC', toInvert: false },
+    { exchange: 'MERCADO', symbol: 'BTCBRL', toInvert: false }
+  ],
+  [
+    { exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
+    { exchange: 'BITSO', symbol: 'USDBRL', toInvert: false }
+  ],
+  [
+    { exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false },
+    { exchange: 'NOVADAX', symbol: 'BTCBRL', toInvert: false }
+  ],
+	[
+    { exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false },
+    { exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false }
+  ]
+]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
