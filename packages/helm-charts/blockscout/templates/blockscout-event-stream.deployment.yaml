@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-eventstream
+  name: {{ .Release.Name }}-event-stream
   labels:
     {{- include "celo.blockscout.labels" . | nindent 4 }}
-    component: blockscout-eventstream
+    component: blockscout-event-stream
   annotations:
     {{- include "celo.blockscout.annotations" . | nindent 4 }}
 spec:
@@ -18,7 +18,7 @@ spec:
     matchLabels:
       app: blockscout
       release: {{ .Release.Name }}
-      component: blockscout-eventstream
+      component: blockscout-event-stream
   template:
     metadata:
       {{- if .Values.blockscout.metrics.enabled }}
@@ -30,7 +30,7 @@ spec:
       labels:
         app: blockscout
         release: {{ .Release.Name }}
-        component: blockscout-eventstream
+        component: blockscout-event-stream
         {{- include "celo.blockscout.elixir.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
@@ -38,7 +38,7 @@ spec:
       initContainers:
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
       containers:
-      - name: blockscout-eventstream
+      - name: blockscout-event-stream
         image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
         command:
