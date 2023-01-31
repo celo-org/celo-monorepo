@@ -1,12 +1,8 @@
 pragma solidity ^0.5.13;
 
 interface IAttestations {
-  function request(bytes32, uint256, address) external;
-  function selectIssuers(bytes32) external;
-  function complete(bytes32, uint8, bytes32, bytes32) external;
   function revoke(bytes32, uint256) external;
   function withdraw(address) external;
-  function approveTransfer(bytes32, uint256, address, address, bool) external;
 
   // view functions
   function getUnselectedRequest(bytes32, address) external view returns (uint32, uint32, address);
