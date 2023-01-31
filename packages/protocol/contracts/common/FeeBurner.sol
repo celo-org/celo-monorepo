@@ -39,7 +39,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   function burnAllCelo() private {
     IERC20 celo = IERC20(getCeloToken());
-    celo.burn(celo.balanceOf(address(address)));
+    celo.burn(celo.balanceOf(address(this)));
   }
 
   // this function is permionless
