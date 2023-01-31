@@ -8,8 +8,8 @@ import {
   FreezerInstance,
   GoldTokenContract,
   GoldTokenInstance,
-  // MockGoldTokenContract,
-  // MockGoldTokenInstance,
+  MockGoldTokenContract,
+  MockGoldTokenInstance,
   RegistryContract,
   RegistryInstance,
 } from 'types'
@@ -17,6 +17,7 @@ import {
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const Registry: RegistryContract = artifacts.require('Registry')
+const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN
@@ -28,8 +29,9 @@ contract('GoldToken', (accounts: string[]) => {
   let registry: RegistryInstance
   const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
   const TWO_GOLDTOKEN = new BigNumber('2000000000000000000')
-  const zeroAddress = '0x0000000000000000000000000000000000000000'
-  // const vmAddress = zeroAddress
+  const burnAddress = '0x000000000000000000000000000000000000dEaD'
+  // const zeroAddress = '0x0000000000000000000000000000000000000000'
+  // const burnAddress = zeroAddress
   const sender = accounts[0]
   const receiver = accounts[1]
 
@@ -55,54 +57,54 @@ contract('GoldToken', (accounts: string[]) => {
     })
   })
 
-  describe.only('#burns()', () => {
-    const startBurn = new BigNumber('28000000000000000000')
-    // beforeEach(async () => {
+  describe('#burn()', () => {
+    let startBurn: BigNumber
 
-    // })
+    beforeEach(async () => {
+      startBurn = await goldToken.getBurnedAmount()
+    })
 
-    // 1) Contract: GoldToken
-    // #burns()
-    //   burn starts as zero:
+    it('dead starts as zero', async () => {
+      assertEqualBN(await goldToken.balanceOf(burnAddress), 0)
+    })
 
-    // 2) Contract: GoldToken
-    //     #burns()
-    //       zero address gets burn:
-    //   AssertionError: expected 1000000000000000000 and got 51000000000000000000.
-
-    // 3) Contract: GoldToken
-    //     #burns()
-    //       returns right burned amount:
-    //   AssertionError: expected 1000000000000000000 and got 64000000000000000000.
-
-    it('burn starts as zero', async () => {
+    it('burn starts as start burn amount', async () => {
       assertEqualBN(await goldToken.getBurnedAmount(), startBurn)
     })
 
-    it('burned address equals 0x0 balance', async () => {
-      assertEqualBN(await goldToken.getBurnedAmount(), await goldToken.balanceOf(zeroAddress))
-    })
-
-    it('zero address gets burn', async () => {
-      // await goldToken.burn(ONE_GOLDTOKEN)
-
-      assertEqualBN(await goldToken.balanceOf(zeroAddress), ONE_GOLDTOKEN)
+    it('Burned amount equals the balance of the burn address', async () => {
+      assertEqualBN(await goldToken.getBurnedAmount(), await goldToken.balanceOf(burnAddress))
     })
 
     it('returns right burned amount', async () => {
+      // console.log("burn address has", (await goldToken.balanceOf(zeroAddress)).toString())
       await goldToken.burn(ONE_GOLDTOKEN)
+      // console.log("burn address has", (await goldToken.balanceOf(zeroAddress)).toString())
 
-      assertEqualBN(await goldToken.getBurnedAmount(), ONE_GOLDTOKEN)
+      assertEqualBN(await goldToken.getBurnedAmount(), ONE_GOLDTOKEN.plus(startBurn))
+    })
+  })
+
+  describe('#circulatingSupply()', () => {
+    let mockGoldToken: MockGoldTokenInstance
+
+    beforeEach(async () => {
+      mockGoldToken = await MockGoldToken.new()
+      // set supply to 1K
+      await mockGoldToken.setTotalSupply(ONE_GOLDTOKEN.multipliedBy(1000))
     })
 
-    // const MockGoldToken: MockGoldTokenContract = artifacts.require('MockGoldToken')
-    // let mockGoldToken: MockGoldTokenInstance
-    // mockGoldToken = await MockGoldToken.new()
+    it('matches circulatingSupply() when there has no burn', async () => {
+      assertEqualBN(await mockGoldToken.circulatingSupply(), await mockGoldToken.totalSupply())
+    })
 
-    // const supply = await mockGoldToken.totalSupply()
-
-    // await mockGoldToken.mint(sender, ONE_GOLDTOKEN, {from: vmAddress})
-    // assertEqualBN(supply, ONE_GOLDTOKEN)
+    it('decreases when there was a burn', async () => {
+      // mock a burn
+      await mockGoldToken.setBalanceOf(burnAddress, ONE_GOLDTOKEN)
+      const circulatingSupply = await mockGoldToken.circulatingSupply()
+      // circulatingSupply got reduced to 999 after burning 1 Celo
+      assertEqualBN(circulatingSupply, ONE_GOLDTOKEN.multipliedBy(999))
+    })
   })
 
   describe('#decimals()', () => {
