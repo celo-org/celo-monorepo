@@ -33,8 +33,9 @@ These instructions assume the following scenario for readability:
     - You will be prompted to enter a version number that you wish to publish. i.e. `3.2.0-beta.1`
     - You will be repeatedly asked to enter your OTP, which will be automatically supplied if you hit ‘enter’ (you do not have to paste it to the command line each time)
         - When your OTP expires, you will see an error and will have to re-enter the new one
+    - Note the `deploy-sdks` script will automatically append `-dev` to all the sdk versions after they're published. You may need to search and replace to undue this if you were publishing a beta release.
 9. Depending on what you're releasing, you may want to test that the newly published SDKs work as intended. This may be as simple as checking that CI runs successfully on your `3.2.0-beta.1` commit.
 10. Once you are confident in the beta release, repeat steps 3 through 9 with versions `3.2.0` and `2.0.3`. The SDKs will be published with the `latest` tag.
-11. The `deploy-sdks` script may have automatically incremented all the sdk version numbers to `3.2.1-dev` (this won’t happen for beta versions). If the script doesn't do this, please search and replace to do it yourself. Commit this change with the message `3.2.1-dev`
+11. The `deploy-sdks` script will automatically append `-dev` to all the sdk versions after they're published. For `latest` releases, it will also increment to the next patch version. Please ensure this happened correctly and commit the result with the message `3.2.1-dev`
 12. Get your PR for the release branch reviewed and merged
 13. Don’t forget to tag the PR commit as a release in GitHub and to add Release Notes
