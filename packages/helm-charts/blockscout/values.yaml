@@ -1,6 +1,6 @@
 ingressClassName: nginx
 blockscout:
-  eventstream:
+  eventStream:
     strategy:
       rollingUpdate:
         maxSurge: 1

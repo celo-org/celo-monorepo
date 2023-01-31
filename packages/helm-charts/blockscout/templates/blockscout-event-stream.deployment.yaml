@@ -11,9 +11,9 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: {{ .Values.blockscout.eventstream.strategy.rollingUpdate.maxSurge }}
-      maxUnavailable: {{ .Values.blockscout.eventstream.strategy.rollingUpdate.maxUnavailable }}
-  replicas: {{ .Values.blockscout.eventstream.replicas }}
+      maxSurge: {{ .Values.blockscout.eventStream.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.blockscout.eventStream.strategy.rollingUpdate.maxUnavailable }}
+  replicas: {{ .Values.blockscout.eventStream.replicas }}
   selector:
     matchLabels:
       app: blockscout
@@ -24,7 +24,7 @@ spec:
       {{- if .Values.blockscout.metrics.enabled }}
       annotations:
         prometheus.io/path: /metrics
-        prometheus.io/port:  "{{ .Values.blockscout.eventstream.port }}"
+        prometheus.io/port:  "{{ .Values.blockscout.eventStream.port }}"
         prometheus.io/scrape: "true"
       {{- end }}
       labels:
@@ -34,7 +34,7 @@ spec:
         {{- include "celo.blockscout.elixir.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Release.Name }}-rbac
-      terminationGracePeriodSeconds: {{ .Values.blockscout.eventstream.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.blockscout.eventStream.terminationGracePeriodSeconds }}
       initContainers:
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
       containers:
@@ -56,42 +56,42 @@ spec:
           readOnly: true
         ports:
         - name: health
-          containerPort: {{ .Values.blockscout.eventstream.port }}
-        {{- if .Values.blockscout.eventstream.readinessProbe.enabled }}
+          containerPort: {{ .Values.blockscout.eventStream.port }}
+        {{- if .Values.blockscout.eventStream.readinessProbe.enabled }}
         readinessProbe:
           httpGet:
             path: /health/readiness
             port: health
-          initialDelaySeconds: {{ .Values.blockscout.eventstream.readinessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.blockscout.eventstream.readinessProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.blockscout.eventstream.readinessProbe.timeoutSeconds }}
-          successThreshold: {{ .Values.blockscout.eventstream.readinessProbe.successThreshold }}
-          failureThreshold: {{ .Values.blockscout.eventstream.readinessProbe.failureThreshold }}
+          initialDelaySeconds: {{ .Values.blockscout.eventStream.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.blockscout.eventStream.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.blockscout.eventStream.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.blockscout.eventStream.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.blockscout.eventStream.readinessProbe.failureThreshold }}
         {{- end }}
-        {{- if .Values.blockscout.eventstream.livenessProbe.enabled }}
+        {{- if .Values.blockscout.eventStream.livenessProbe.enabled }}
         livenessProbe:
           httpGet:
             path: /health/liveness
             port: health
-          initialDelaySeconds: {{ .Values.blockscout.eventstream.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.blockscout.eventstream.livenessProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.blockscout.eventstream.livenessProbe.timeoutSeconds }}
-          successThreshold: {{ .Values.blockscout.eventstream.livenessProbe.successThreshold }}
-          failureThreshold: {{ .Values.blockscout.eventstream.livenessProbe.failureThreshold }}
+          initialDelaySeconds: {{ .Values.blockscout.eventStream.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.blockscout.eventStream.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.blockscout.eventStream.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.blockscout.eventStream.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.blockscout.eventStream.livenessProbe.failureThreshold }}
         {{- end }}
         resources:
           requests:
-            memory: {{ .Values.blockscout.eventstream.resources.requests.memory }}
-            cpu: {{ .Values.blockscout.eventstream.resources.requests.cpu }}
+            memory: {{ .Values.blockscout.eventStream.resources.requests.memory }}
+            cpu: {{ .Values.blockscout.eventStream.resources.requests.cpu }}
         env:
         - name: METRICS_ENABLED
           value: "{{.Values.blockscout.metrics.enabled}}"
         - name: ENABLE_EVENT_STREAM
-          value: {{ .Values.blockscout.eventstream.enableEventStream | quote }}
+          value: {{ .Values.blockscout.eventStream.enableEventStream | quote }}
         - name: BEANSTALKD_PORT
-          value: {{ .Values.blockscout.eventstream.beanstalkdPort | quote }}
+          value: {{ .Values.blockscout.eventStream.beanstalkdPort | quote }}
         - name: BEANSTALKD_HOST
-          value: {{ .Values.blockscout.eventstream.beanstalkdHost | quote }}
+          value: {{ .Values.blockscout.eventStream.beanstalkdHost | quote }}
         - name: ERLANG_COOKIE
           value: {{ .Values.blockscout.secrets.erlang.cookie }}
         - name: POD_IP
