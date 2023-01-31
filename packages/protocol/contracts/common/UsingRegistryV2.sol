@@ -22,9 +22,13 @@ import "../stability/interfaces/IReserve.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
-contract UsingRegistryV2 {
-  address internal constant registryAddress = 0x000000000000000000000000000000000000ce10;
-  IRegistry public constant registryContract = IRegistry(registryAddress);
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
+contract UsingRegistryV2 is Ownable {
+  event RegistrySet(address indexed registryAddress);
+
+  address internal registryAddress = 0x000000000000000000000000000000000000ce10;
+  IRegistry public registryContract;
 
   bytes32 internal constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
   bytes32 internal constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));
@@ -65,6 +69,20 @@ contract UsingRegistryV2 {
     abi.encodePacked("StableTokenBRL")
   );
   bytes32 internal constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
+
+  constructor() public Ownable() {
+    registryContract = IRegistry(registryAddress);
+  }
+
+  /**
+   * @notice Updates the address pointing to a Registry contract.
+   * @param _registryAddress The address of a registry contract for routing to other contracts.
+   */
+  function setRegistry(address _registryAddress) public onlyOwner {
+    require(_registryAddress != address(0), "Cannot register the null address");
+    registryContract = IRegistry(_registryAddress);
+    emit RegistrySet(_registryAddress);
+  }
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(
