@@ -22,13 +22,13 @@
     "loadTest": "ts-node src/scripts/run-load-test.ts"
   },
   "dependencies": {
-    "@celo/contractkit": "^3.2.0",
-    "@celo/cryptographic-utils": "^3.2.0",
-    "@celo/encrypted-backup": "^3.2.0",
-    "@celo/identity": "^3.2.0",
-    "@celo/wallet-local": "^3.2.0",
+    "@celo/contractkit": "^3.2.1-dev",
+    "@celo/cryptographic-utils": "^3.2.1-dev",
+    "@celo/encrypted-backup": "^3.2.1-dev",
+    "@celo/identity": "^3.2.1-dev",
+    "@celo/wallet-local": "^3.2.1-dev",
     "@celo/phone-number-privacy-common": "^2.0.2",
-    "@celo/utils": "^3.2.0",
+    "@celo/utils": "^3.2.1-dev",
     "firebase-admin": "^9.12.0",
     "firebase-functions": "^3.15.7"
   },

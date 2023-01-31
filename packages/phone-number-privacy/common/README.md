@@ -38,4 +38,12 @@ These instructions assume the following scenario for readability:
 10. Once you are confident in the beta release, repeat steps 3 through 9 with versions `3.2.0` and `2.0.3`. The SDKs will be published with the `latest` tag.
 11. The `deploy-sdks` script will automatically append `-dev` to all the sdk versions after they're published. For `latest` releases, it will also increment to the next patch version. Please ensure this happened correctly and commit the result with the message `3.2.1-dev`
 12. Get your PR for the release branch reviewed and merged
-13. Don’t forget to tag the PR commit as a release in GitHub and to add Release Notes
+    - If CI fails with output like below, it means that some packages outside of the SDK did not get incremented to `3.2.1-dev`. Please go through and make sure these are all incremented correctly and CI should pass.
+
+    ```
+    ./sdk/utils/src/address.ts(1,46): error TS2307: Cannot find module '@celo/base/lib/address' or its corresponding type declarations.
+    ../sdk/utils/src/address.ts(27,8): error TS2307: Cannot find module '@celo/base/lib/address' or its corresponding type declarations.
+    ../sdk/utils/src/async.ts(10,8): error TS2307: Cannot find module '@celo/base/lib/async' or its corresponding type declarations
+    ```
+
+13. Don’t forget to tag the PR commit as a release in GitHub and add Release Notes
