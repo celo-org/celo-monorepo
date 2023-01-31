@@ -16,8 +16,6 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
  */
 contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract {
-  // address[] public whitelist;
-
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -27,18 +25,21 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
-  function initialize() external initializer {
+  function initialize(address _registryAddress) external initializer {
     // TODO
     _transferOwnership(msg.sender);
+    setRegistry(_registryAddress);
   }
 
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 0, 0, 0);
   }
 
+  // chose the best price from options
+
   function burnAllCelo() private {
     IERC20 celo = IERC20(getCeloToken());
-    //  celo.burn(celo.balanceOf(this.address)); TODO remove after burn is done
+    celo.burn(celo.balanceOf(address(address)));
   }
 
   // this function is permionless
@@ -48,15 +49,24 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
     for (uint256 i = 0; i < mentoTokens.length; i++) {
       StableToken stableToken = StableToken(mentoTokens[i]);
+      uint256 balance = stableToken.balanceOf(address(this));
+
+      // small numbers cause rounding errors
+      // zero case should be skiped
+      // TODO make this LT
+      if (balance < 100) {
+        continue;
+      }
+
       address exchangeAddress = registryContract.getAddressForOrDie(
         stableToken.getExchangeRegistryId()
       );
 
       IExchange exchange = IExchange(exchangeAddress);
-      uint256 balance = stableToken.balanceOf(address(this));
       // TODO update burned amounts here
 
       // minBuyAmount is zero because this functions is meant to be called reguarly with small amounts
+      // TODO calculate a max of slipagge
       exchange.sell(balance, 0, false);
     }
 
@@ -69,6 +79,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   // this function is permionless
   function burn() external {
     burnAllCelo();
+    // burn other assets
     // TODO:
     // 1. Make swap (Meto for stables, for other Uniswap)
     // 2. burn

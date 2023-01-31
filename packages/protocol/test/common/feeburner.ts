@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertEqualBN, assertRevert } from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -7,6 +7,8 @@ import {
   ExchangeInstance,
   FeeBurnerContract,
   FeeBurnerInstance,
+  FreezerContract,
+  FreezerInstance,
   GoldTokenContract,
   GoldTokenInstance,
   MockReserveContract,
@@ -27,13 +29,14 @@ const reserveFraction = toFixed(5 / 100)
 const initialReserveBalance = new BigNumber(10000000000000000000000)
 
 const FeeBurner: FeeBurnerContract = artifacts.require('FeeBurner')
-const Registry: RegistryContract = artifacts.require('FRegistry')
+const Registry: RegistryContract = artifacts.require('Registry')
 const Exchange: ExchangeContract = artifacts.require('Exchange')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const MockReserve: MockReserveContract = artifacts.require('MockReserve')
 
 const StableToken: StableTokenContract = artifacts.require('StableToken')
+const Freezer: FreezerContract = artifacts.require('Freezer')
 
 contract('FeeBurner', (accounts: string[]) => {
   let feeBurner: FeeBurnerInstance
@@ -43,6 +46,7 @@ contract('FeeBurner', (accounts: string[]) => {
   let goldToken: GoldTokenInstance
   let mockSortedOracles: MockSortedOraclesInstance
   let mockReserve: MockReserveInstance
+  let freezer: FreezerInstance
 
   // const aTokenAddress = '0x000000000000000000000000000000000000ce10'
 
@@ -68,10 +72,14 @@ contract('FeeBurner', (accounts: string[]) => {
     stableToken = await StableToken.new(true)
     registry = await Registry.new(true)
     feeBurner = await FeeBurner.new(true)
+    freezer = await Freezer.new(true)
+
+    await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
+
     await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
     await registry.setAddressFor(CeloContractName.Reserve, mockReserve.address)
     await mockReserve.setGoldToken(goldToken.address)
-    await mockReserve.setGoldToken(goldToken.address)
+    await mockReserve.addToken(stableToken.address)
 
     await goldToken.initialize(registry.address)
     // TODO: use MockStableToken for this
@@ -125,12 +133,30 @@ contract('FeeBurner', (accounts: string[]) => {
 
   describe('#burnMentoAssets()', () => {
     it('burns with balance', async () => {
+      const user = accounts[1]
+      const goldTokenAmount = new BigNumber(1e18)
+      console.log(1)
+      await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
+      console.log(2)
+      await exchange.sell(goldTokenAmount, 0, true, { from: user })
+      console.log(3)
+
+      await stableToken.transfer(feeBurner.address, await stableToken.balanceOf(user), {
+        from: user,
+      })
+      console.log(4)
+      console.log('balance is', await stableToken.balanceOf(user))
+
+      await feeBurner.burn()
+
+      assertEqualBN(await stableToken.balanceOf(feeBurner.address), new BigNumber(0))
+
       // get some Celo dollars
       // Send to burner
       // burn
     })
 
-    it('should not allow a non-owner to add a token', async () => {
+    it("doesn't exchange in case of big slipage", async () => {
       // await assertRevert(feeCurrencyWhitelist.addToken(aTokenAddress, { from: nonOwner }))
     })
   })
