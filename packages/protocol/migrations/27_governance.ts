@@ -99,7 +99,6 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'StableToken',
       'StableTokenEUR',
       'Validators',
-      'StableTokenRegistry',
     ]
 
     if (!config.governance.skipTransferOwnership) {

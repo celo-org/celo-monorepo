@@ -1,5 +1,5 @@
 oracle:
-  currencyPair: CELOUSD
+  currencyPair: USDCUSD
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
