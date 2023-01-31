@@ -1,5 +1,5 @@
 blockscout:
-  eventstream:
+  eventStream:
     replicas: 1
   indexer:
     db:
