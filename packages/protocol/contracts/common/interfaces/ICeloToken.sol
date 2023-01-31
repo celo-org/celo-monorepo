@@ -9,4 +9,5 @@ interface ICeloToken {
   function name() external view returns (string memory);
   function symbol() external view returns (string memory);
   function decimals() external view returns (uint8);
+  function burn(uint256 value) external;
 }
