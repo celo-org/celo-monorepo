@@ -576,7 +576,7 @@ contract StableToken is
     uint256 units = _valueToUnits(inflationState.factor, refund);
     balances[from] = balances[from].add(units);
 
-    units = units.add(_creditGas(from, communityFund, baseTxFee));
+    units = units.add(_creditGas(from, communityFund, baseTxFee)); // This has to get burned
     units = units.add(_creditGas(from, feeRecipient, tipTxFee));
     units = units.add(_creditGas(from, gatewayFeeRecipient, gatewayFee));
     totalSupply_ = totalSupply_.add(units);
