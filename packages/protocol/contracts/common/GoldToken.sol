@@ -93,7 +93,7 @@ contract GoldToken is
     return succeeded;
   }
 
-  function burn(uint256 value) public {
+  function burn(uint256 value) external {
     // Can't check for non-frozen here because the tesnet should be able to do this every block
     // TODO onlyVM and onlyowner (in case we want to do a one-time mint)
 
