@@ -106,12 +106,6 @@ spec:
           value: {{ .Values.blockscout.indexer.rpcRegion | quote }}
         - name: PRIMARY_REGION
           value: {{ .Values.blockscout.indexer.primaryRpcRegion | quote }}
-        - name: ENABLE_EVENT_STREAM
-          value: {{ .Values.blockscout.indexer.enableEventStream | quote }}
-        - name: BEANSTALKD_PORT
-          value: {{ .Values.blockscout.indexer.beanstalkdPort | quote }}
-        - name: BEANSTALKD_HOST
-          value: {{ .Values.blockscout.indexer.beanstalkdHost | quote }}
         - name: INDEXER_DISABLE_BLOCK_REWARD_FETCHER
           value: {{ not .Values.blockscout.indexer.fetchers.blockRewards.enabled | quote }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}
