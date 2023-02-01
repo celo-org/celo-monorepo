@@ -29,7 +29,7 @@ apiVersion: v1
 metadata:
   name: {{ template "common.fullname" $ }}-{{ .svc_name | default .node_name }}-{{ .index }}{{ .svc_name_suffix | default "" }}
   labels:
-{{ include "common.standard.labels" .  | indent 4 }}
+    {{- include "common.standard.labels" . | nindent 4 }}
     component: {{ .component_label }}
 spec:
   selector:
@@ -47,26 +47,26 @@ kind: Service
 metadata:
   name: {{ .name }}
   labels:
-{{- if .proxy | default false }}
-{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    {{- if .proxy | default false -}}
+    {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
-{{- end }}
+    {{- end }}
     component: {{ .component_label }}
 spec:
   sessionAffinity: None
   ports:
   - port: 8545
     name: rpc
-{{- $wsPort := ((.ws_port | default .Values.geth.ws_port) | int) -}}
-{{- if ne $wsPort 8545 }}
+    {{- $wsPort := ((.ws_port | default .Values.geth.ws_port) | int) -}}
+    {{- if ne $wsPort 8545 }}
   - port: {{ $wsPort }}
     name: ws
-{{- end }}
+    {{- end }}
   selector:
-{{- if .proxy | default false }}
-{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    {{- if .proxy | default false -}}
+    {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
-{{- end }}
+    {{- end }}
     component: {{ .component_label }}
 ---
 apiVersion: v1
@@ -74,10 +74,10 @@ kind: Service
 metadata:
   name: {{ .name }}-headless
   labels:
-{{- if .proxy | default false }}
-{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    {{- if .proxy | default false -}}
+    {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
-{{- end }}
+    {{- end }}
     component: {{ .component_label }}
 spec:
   type: ClusterIP
@@ -85,15 +85,15 @@ spec:
   ports:
   - port: 8545
     name: rpc
-{{- if ne $wsPort 8545 }}
+    {{- if ne $wsPort 8545 }}
   - port: {{ .ws_port | default .Values.geth.ws_port }}
     name: ws
-{{- end }}
+    {{- end }}
   selector:
-{{- if .proxy | default false }}
-{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    {{- if .proxy | default false }}
+    {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
-{{- end }}
+    {{- end }}
     component: {{ .component_label }}
 ---
 apiVersion: apps/v1
@@ -101,16 +101,16 @@ kind: StatefulSet
 metadata:
   name: {{ template "common.fullname" . }}-{{ .name }}
   labels:
-{{ include "common.standard.labels" .  | indent 4 }}
+    {{- include "common.standard.labels" . | nindent 4 }}
     component: {{ .component_label }}
-{{- if .proxy | default false }}
-{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+    {{- if .proxy | default false -}}
+    {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
     validator-proxied: "{{ $validatorProxied }}"
-{{- end }}
+    {{- end }}
 spec:
-{{- $updateStrategy := index $.Values.updateStrategy $.component_label }}
+  {{- $updateStrategy := index $.Values.updateStrategy $.component_label }}
   updateStrategy:
-{{ toYaml $updateStrategy | indent 4 }}
+    {{- toYaml $updateStrategy | nindent 4 }}
   {{- if .Values.geth.ssd_disks }}
   volumeClaimTemplates:
   - metadata:
@@ -132,12 +132,12 @@ spec:
   serviceName: {{ .name }}
   selector:
     matchLabels:
-{{ include "common.standard.labels" .  | indent 6 }}
+      {{- include "common.standard.labels" .  | nindent 6 }}
       component: {{ .component_label }}
-{{- if .proxy | default false }}
-{{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
+      {{- if .proxy | default false -}}
+      {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
       validator-proxied: "{{ $validatorProxied }}"
-{{- end }}
+      {{- end }}
   template:
     metadata:
       labels:
@@ -150,27 +150,27 @@ spec:
         {{- $validatorProxied := printf "%s-validators-%d" .Release.Namespace .validator_index }}
         validator-proxied: "{{ $validatorProxied }}"
         {{- end }}
-{{ if .Values.metrics | default false }}
+      {{- if .Values.metrics | default false }}
       annotations:
-{{ include "common.prometheus-annotations" . | indent 8 }}
-{{- end }}
+        {{- include "common.prometheus-annotations" . | nindent 8 }}
+      {{- end }}
     spec:
       initContainers:
-{{ include "common.conditional-init-genesis-container" .  | indent 6 }}
-{{ include "common.celotool-full-node-statefulset-container" (dict  "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "mnemonic_account_type" .mnemonic_account_type "service_ip_env_var_prefix" .service_ip_env_var_prefix "ip_addresses" .ip_addresses "validator_index" .validator_index) | indent 6 }}
-{{ if .unlock | default false }}
-{{ include "common.import-geth-account-container" .  | indent 6 }}
-{{ end }}
-      containers:
-{{ include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "rpc_apis" .rpc_apis "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "ws_port" (default .Values.geth.ws_port .ws_port) "pprof" (or (.Values.metrics) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "light_serve" .Values.geth.light.serve "light_maxpeers" .Values.geth.light.maxpeers "maxpeers" .Values.geth.maxpeers "metrics" .Values.metrics "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace) "extra_setup" .extra_setup)  | indent 6 }}
-      terminationGracePeriodSeconds:  {{ .Values.geth.terminationGracePeriodSeconds | default 300 }}
-      {{- if .node_selector }}
-      nodeSelector:
-{{ toYaml .node_selector | indent 8 }}
+      {{- include "common.conditional-init-genesis-container" .  | nindent 6 }}
+      {{- include "common.celotool-full-node-statefulset-container" (dict  "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "mnemonic_account_type" .mnemonic_account_type "service_ip_env_var_prefix" .service_ip_env_var_prefix "ip_addresses" .ip_addresses "validator_index" .validator_index) | nindent 6 }}
+      {{- if .unlock | default false }}
+      {{- include "common.import-geth-account-container" .  | nindent 6 }}
       {{- end }}
-      {{- if .tolerations }}
+      containers:
+      {{- include "common.full-node-container" (dict "Values" .Values "Release" .Release "Chart" .Chart "proxy" .proxy "proxy_allow_private_ip_flag" .proxy_allow_private_ip_flag "unlock" .unlock "rpc_apis" .rpc_apis "expose" .expose "syncmode" .syncmode "gcmode" .gcmode "ws_port" (default .Values.geth.ws_port .ws_port) "pprof" (or (.Values.metrics) (.Values.pprof.enabled)) "pprof_port" (.Values.pprof.port) "light_serve" .Values.geth.light.serve "light_maxpeers" .Values.geth.light.maxpeers "maxpeers" .Values.geth.maxpeers "metrics" .Values.metrics "public_ips" .public_ips "ethstats" (printf "%s-ethstats.%s" (include "common.fullname" .) .Release.Namespace) "extra_setup" .extra_setup)  | nindent 6 }}
+      terminationGracePeriodSeconds:  {{ .Values.geth.terminationGracePeriodSeconds | default 300 }}
+      {{- with .node_selector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .tolerations }}
       tolerations:
-{{ toYaml .tolerations | indent 8 }}
+      {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
       - name: data
