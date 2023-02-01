@@ -1,0 +1,21 @@
+---
+geth:
+  resources:
+    requests:
+      cpu: 2
+      memory: 4Gi
+  validatorResources:
+    requests:
+      cpu: 500m
+      memory: 5500M
+    limits:
+      cpu: 2
+      memory: 8Gi
+  txNodeResources:
+    requests:
+      cpu: 1
+      memory: 12Gi
+  txNodePrivateResources:
+    requests:
+      cpu: 2
+      memory: 12Gi
