@@ -1,5 +1,33 @@
 ingressClassName: nginx
 blockscout:
+  eventStream:
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+    port: 4000
+    resources:
+      requests:
+        memory: 1000Mi
+        cpu: 2
+    enableEventStream: false
+    beanstalkdPort: ""
+    beanstalkdHost: ""
+    replicas: 0
+    readinessProbe:
+      enabled: false
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+    livenessProbe:
+      enabled: false
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
   indexer:
     terminationGracePeriodSeconds: 60
     port: 4001
@@ -57,9 +85,6 @@ blockscout:
         cpu: 2
     rpcRegion: "indexer"  
     primaryRpcRegion: "indexer"  
-    enableEventStream: false
-    beanstalkdPort: ""
-    beanstalkdHost: ""
     fetchers:
       blockRewards:
         enabled: false
