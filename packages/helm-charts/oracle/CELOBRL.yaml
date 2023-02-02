@@ -16,11 +16,11 @@ oracle:
         { exchange: 'BINANCE', symbol: 'BUSDBRL', toInvert: false }
       ],
       [
-        { exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false},
-        { exchange: 'BITSO', symbol: 'BTCBRL', toInvert: false }
+        { exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
+        { exchange: 'BITSO', symbol: 'USDBRL', toInvert: false }
       ],
       [
-        { exchange: 'BITTREX', symbol: 'CELOBTC', toInvert: false },
+        { exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false },
         { exchange: 'NOVADAX', symbol: 'BTCBRL', toInvert: false }
       ]
     ]"

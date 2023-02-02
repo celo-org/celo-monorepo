@@ -125,7 +125,7 @@ describe(getObfuscatedIdentifier, () => {
     await expect(
       getObfuscatedIdentifier(
         mockOffchainIdentifier,
-        IdentifierPrefix.PHONE_NUMBER,
+        IdentifierPrefix.TWITTER,
         mockAccount,
         authSigner,
         serviceContext
@@ -138,7 +138,7 @@ describe(getObfuscatedIdentifier, () => {
     await expect(
       getObfuscatedIdentifier(
         mockOffchainIdentifier,
-        IdentifierPrefix.PHONE_NUMBER,
+        IdentifierPrefix.TWITTER,
         mockAccount,
         authSigner,
         serviceContext
