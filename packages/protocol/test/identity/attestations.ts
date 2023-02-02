@@ -1,4 +1,5 @@
 import { NULL_ADDRESS } from '@celo/base/lib/address'
+import { Signature } from '@celo/base/lib/signatureUtils'
 import getPhoneHash from '@celo/phone-utils/lib/getPhoneHash'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
@@ -6,11 +7,11 @@ import {
   assertLogMatches2,
   assertRevert,
   getDerivedKey,
-  getVerificationCodeSignature,
   KeyOffsets,
   unlockAndAuthorizeKey,
 } from '@celo/protocol/lib/test-utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { SignatureUtils } from '@celo/utils/src/signatureUtils'
 import BigNumber from 'bignumber.js'
 import {
   AccountsContract,
@@ -30,6 +31,7 @@ import {
   RegistryInstance,
 } from 'types'
 import Web3 from 'web3'
+import { soliditySha3 } from 'web3-utils'
 import { beforeEachWithRetries } from '../customHooks'
 
 const Accounts: AccountsContract = artifacts.require('Accounts')
@@ -287,12 +289,28 @@ contract('Attestations', (accounts: string[]) => {
     })
   })
 
+  function getVerificationCodeSignature(
+    account: string,
+    issuer: string,
+    identifier: string,
+    accounts: string[]
+  ): Signature {
+    const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer, accounts)
+
+    const { v, r, s } = SignatureUtils.signMessage(
+      soliditySha3({ type: 'bytes32', value: identifier }, { type: 'address', value: account })!,
+      privateKey,
+      issuer
+    )
+    return { v, r, s }
+  }
+
   describe('#withdraw()', () => {
     let issuer: string
     beforeEach(async () => {
       await requestAttestations()
       issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-      const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
+      const { v, r, s } = getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
       await attestations.complete(phoneHash, v, r, s)
       await mockERC20Token.mint(attestations.address, attestationFee)
     })
@@ -363,7 +381,7 @@ contract('Attestations', (accounts: string[]) => {
   const requestAndCompleteAttestations = async () => {
     await requestAttestations()
     const issuer = (await attestations.getAttestationIssuers(phoneHash, caller))[0]
-    const { v, r, s } = await getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
+    const { v, r, s } = getVerificationCodeSignature(caller, issuer, phoneHash, accounts)
     await attestations.complete(phoneHash, v, r, s)
   }
 
@@ -469,12 +487,7 @@ contract('Attestations', (accounts: string[]) => {
             await attestations.selectIssuers(phoneHash, { from: other })
 
             const issuer = (await attestations.getAttestationIssuers(phoneHash, other))[0]
-            const { v, r, s } = await getVerificationCodeSignature(
-              other,
-              issuer,
-              phoneHash,
-              accounts
-            )
+            const { v, r, s } = getVerificationCodeSignature(other, issuer, phoneHash, accounts)
             await attestations.complete(phoneHash, v, r, s, { from: other })
             await accountsInstance.setWalletAddress(other, '0x0', '0x0', '0x0', { from: other })
           })

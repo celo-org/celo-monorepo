@@ -23,6 +23,7 @@
   ],
   "dependencies": {
     "@celo/base": "3.0.2-dev",
+    "@celo/identity": "3.0.2-dev",
     "@celo/utils": "3.0.2-dev",
     "@types/country-data": "^0.0.0",
     "@types/ethereumjs-util": "^5.2.0",

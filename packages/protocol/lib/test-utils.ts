@@ -1,9 +1,7 @@
-import { Signature } from '@celo/base/lib/signatureUtils'
 import { hasEntryInRegistry, usesRegistry } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { AttestationUtils } from '@celo/utils'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import BigNumber from 'bignumber.js'
@@ -564,16 +562,6 @@ export const accountPrivateKeys: string[] = [
   '0xb2fd4d29c1390b71b8795ae81196bfd60293adf99f9d32a0aff06288fcdac55f',
   '0x23cb7121166b9a2f93ae0b7c05bde02eae50d64449b2cbb42bc84e9d38d6cc89',
 ]
-
-export async function getVerificationCodeSignature(
-  account: string,
-  issuer: string,
-  identifier: string,
-  accounts: string[]
-): Promise<Signature> {
-  const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer, accounts)
-  return AttestationUtils.attestToIdentifier(identifier, account, privateKey)
-}
 
 export const getDerivedKey = (offset: number, address: string, accounts: string[]) => {
   const pKey = accountPrivateKeys[accounts.indexOf(address)]

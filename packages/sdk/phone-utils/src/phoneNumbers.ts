@@ -1,11 +1,12 @@
 import { isE164Number, ParsedPhoneNumber } from '@celo/base/lib/phoneNumbers'
+import { OdisUtils } from '@celo/identity'
+import { IdentifierPrefix } from '@celo/identity/lib/odis/identifier'
 import {
   PhoneNumber,
   PhoneNumberFormat,
   PhoneNumberType,
   PhoneNumberUtil,
 } from 'google-libphonenumber'
-import getPhoneHash from './getPhoneHash'
 
 const phoneUtil = PhoneNumberUtil.getInstance()
 const MIN_PHONE_LENGTH = 4
@@ -236,6 +237,13 @@ export function getExampleNumber(
 
   return formatedExample
 }
+
+const getPhoneHash = (phoneNumber: string, salt?: string) =>
+  OdisUtils.Identifier.getIdentifierHash(
+    phoneNumber,
+    IdentifierPrefix.PHONE_NUMBER,
+    salt ? salt : ''
+  )
 
 export const PhoneNumberUtils = {
   getPhoneHash,
