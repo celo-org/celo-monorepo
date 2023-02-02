@@ -1,3 +1,4 @@
+---
 blockscout:
   indexer:
     db:
@@ -5,18 +6,18 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 50Mi
-            cpu: 25m
+            memory: 20M
+            cpu: 10m
           limits:
-            memory: 200Mi
-            cpu: 100m
+            memory: 200M
+            cpu: 100
     poolSize: 200
     resources:
       requests:
-        memory: 700Mi
-        cpu: 500m
+        memory: 700M
+        cpu: 0.5
       limits:
-        memory: 1400Mi
+        memory: 1400M
         cpu: 1
   api:
     autoscaling:
@@ -29,16 +30,16 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 40Mi
-            cpu: 20m
+            memory: 20M
+            cpu: 10m
     poolSize: 10
     resources:
       requests:
-        memory: 600Mi
-        cpu: 600m
+        memory: 600M
+        cpu: 0.5
       limits:
-        memory: 1200Mi
-        cpu: 1200m
+        memory: 1200M
+        cpu: 1
   web:
     host: explorer.celo.org
     suffix:
@@ -54,8 +55,8 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 40Mi
-            cpu: 20m
+            memory: 20M
+            cpu: 10m
     poolSize: 20
     resources:
       requests:
