@@ -64,13 +64,16 @@ export abstract class RbacOracleDeployer extends BaseOracleDeployer {
 
   async rbacServiceAccountSecretNames() {
     const names = [...Array(this.replicas).keys()].map((i) => `${this.rbacReleaseName()}-${i}`)
+    let jsonSecretPath = '"{.items[*].secrets[0][\'name\']}"'
+    if (names.length === 1) {
+      jsonSecretPath = '"{.secrets[0][\'name\']}"'
+    }
     const [tokenName] = await execCmdWithExitOnFailure(
       `kubectl get serviceaccount --namespace=${this.celoEnv} ${names.join(
         ' '
-      )} -o=jsonpath="{.items[*].secrets[0]['name']}"`
+      )} -o=jsonpath=${jsonSecretPath}`
     )
-    const tokenNames = tokenName.trim().split(' ')
-    return tokenNames
+    return tokenName.trim().split(' ')
   }
 
   rbacReleaseName() {

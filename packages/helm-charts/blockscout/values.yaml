@@ -1,5 +1,33 @@
 ingressClassName: nginx
 blockscout:
+  eventStream:
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+    port: 4000
+    resources:
+      requests:
+        memory: 1000Mi
+        cpu: 2
+    enableEventStream: false
+    beanstalkdPort: ""
+    beanstalkdHost: ""
+    replicas: 0
+    readinessProbe:
+      enabled: false
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+    livenessProbe:
+      enabled: false
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
   indexer:
     terminationGracePeriodSeconds: 60
     port: 4001
@@ -35,18 +63,18 @@ blockscout:
           requests:
             memory: 500Mi
             cpu: 700m
-    poolSize: 30
+    poolSize: 200
     poolSizeReplica: 5
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
     livenessProbe:
       enabled: false
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
@@ -57,9 +85,6 @@ blockscout:
         cpu: 2
     rpcRegion: "indexer"  
     primaryRpcRegion: "indexer"  
-    enableEventStream: false
-    beanstalkdPort: ""
-    beanstalkdHost: ""
     fetchers:
       blockRewards:
         enabled: false
@@ -112,14 +137,14 @@ blockscout:
     rateLimit: "1000000"
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
     livenessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
@@ -189,14 +214,14 @@ blockscout:
     poolSizeReplica: 5
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
       failureThreshold: 5
     livenessProbe:
       enabled: true
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
       successThreshold: 1
@@ -227,9 +252,16 @@ blockscout:
       makerdojo: ""
     rpcRegion: "web"  
     primaryRpcRegion: "indexer"
+    liveUpdates:
+      disabled: true
     homepage:
       showPrice: true
       showTxs: false
+    accountPoolSize: 1
+    tokenIcons:
+      enabled: false
+    basicAuth:
+      enabled: false
   metadataCrawler:
     enabled: false
     schedule: "0 */2 * * *" # every 2 hours

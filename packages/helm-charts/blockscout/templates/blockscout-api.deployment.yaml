@@ -22,7 +22,7 @@ spec:
     metadata:
       {{- if .Values.blockscout.metrics.enabled}}
       annotations:
-        prometheus.io/path: /metrics/web
+        prometheus.io/path: /metrics
         prometheus.io/port: "4000"
         prometheus.io/scrape: "true"
       {{- end}}
@@ -36,6 +36,8 @@ spec:
       initContainers:
 {{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
       containers:
+{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.api.db }}
+{{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
       - name: blockscout-api
         image: {{ .Values.blockscout.image.repository }}:api-{{ .Values.blockscout.image.tag }}
         imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
@@ -47,7 +49,7 @@ spec:
         - /bin/sh
         - -c
         - |
-           exec mix cmd --app block_scout_web "iex --cookie $ERLANG_COOKIE  --name {{ .Values.blockscout.erlangNodeName}}@$(POD_IP) -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix do deps.loadpaths --no-deps-check, phx.server --no-compile"
+           exec mix cmd --app block_scout_web "iex --cookie $ERLANG_COOKIE  --name {{ .Values.blockscout.erlangNodeName}}@$(POD_IP) -e 'IEx.configure(default_prompt: \"\", alive_prompt: \"\")' -S mix do deps.loadpaths --no-deps-check --no-validate-compile-env, phx.server --no-compile"
         volumeMounts:
         - mountPath: /secrets
           name: temporary-dir
@@ -119,10 +121,10 @@ spec:
           value: /{{ .Values.blockscout.api.suffix.path }}
         - name: API_URL
           value: /{{ .Values.blockscout.api.suffix.path }}
+        - name: ACCOUNT_POOL_SIZE
+          value: {{ .Values.blockscout.web.accountPoolSize | quote }}
         {{- end }}
-{{- $data := dict "Release" .Release "Values" .Values "Database" .Values.blockscout.api.db }}
 {{ include "celo.blockscout.env-vars" $data | indent 8 }}
-{{ include "celo.blockscout.container.db-sidecar" $data | indent 6 }}
       volumes:
 {{ include "celo.blockscout.volume.cloudsql-credentials" . | indent 8 }}
 {{ include "celo.blockscout.volume.temporary-dir" . | indent 8 }}

@@ -1,6 +1,6 @@
 {
   "name": "@celo/dappkit",
-  "version": "3.0.2-dev",
+  "version": "3.2.1-dev",
   "scripts": {
     "build": "tsc",
     "clean": "tsc -b . --clean",
@@ -9,9 +9,9 @@
   "homepage": "https://celo-sdk-docs.readthedocs.io/en/latest/dappkit",
   "repository": "https://github.com/celo-org/celo-monorepo/tree/master/packages/sdk/dappkit",
   "dependencies": {
-    "@celo/connect": "3.0.2-dev",
-    "@celo/contractkit": "3.0.2-dev",
-    "@celo/utils": "3.0.2-dev",
+    "@celo/connect": "3.2.1-dev",
+    "@celo/contractkit": "3.2.1-dev",
+    "@celo/utils": "3.2.1-dev",
     "react-native": "^0.63.4"
   },
   "devDependencies": {
