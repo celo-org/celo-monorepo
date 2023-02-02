@@ -1,7 +1,7 @@
 ---
 name: testnet
 apiVersion: v1
-version: 0.2.2
+version: 0.2.1
 description: private Ethereum network Helm chart for Kubernetes
 keywords:
   - celo
