@@ -46,4 +46,4 @@ oracle:
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
-      minReportPriceChangeThreshold: 0.005 # 0.5%
+      minReportPriceChangeThreshold: 0.005
