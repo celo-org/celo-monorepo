@@ -6,7 +6,7 @@ export const eqAddress = (a: Address, b: Address) => normalizeAddress(a) === nor
 
 export const normalizeAddress = (a: Address) => trimLeading0x(a).toLowerCase()
 
-export const isNullAddress = (a: Address) => normalizeAddress(a) === NULL_ADDRESS
+export const isNullAddress = (a: Address) => normalizeAddress(a) === normalizeAddress(NULL_ADDRESS)
 
 export const normalizeAddressWith0x = (a: Address) => ensureLeading0x(a).toLowerCase()
 

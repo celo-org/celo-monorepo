@@ -1,5 +1,5 @@
 oracle:
-  currencyPair: CELOBTC
+  currencyPair: USDCUSD
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
@@ -11,7 +11,17 @@ oracle:
     prometheusPort: 9090
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
-  priceSources: "[[{exchange: 'BITTREX', symbol: 'CELOBTC', toInvert: false}],[{exchange: 'COINBASE', symbol: 'CELOBTC', toInvert: false}]]"
+  priceSources: "[
+      [
+        {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false}
+      ],
+      [
+        {exchange: 'BITSTAMP', symbol: 'USDCUSD', toInvert: false}
+      ],
+      [
+        { exchange: 'GEMINI', symbol: 'USDCUSD', toInvert: false }
+      ]
+    ]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:

@@ -2,6 +2,8 @@
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
 version: 2.1
+
+
 parameters:
   # When you need to force a rebuild of the node modules cache then bump this version
   node-modules-cache-version:
@@ -126,6 +128,7 @@ jobs:
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
     resource_class: large
     steps:
+
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
@@ -784,6 +787,8 @@ jobs:
 
   odis-test:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app

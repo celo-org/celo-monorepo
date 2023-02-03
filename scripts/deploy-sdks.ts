@@ -245,7 +245,7 @@ type Answers = {
       if (sdkNames.includes(depName)) {
         const versionUpdate =
           json.dependencies[depName].includes('-dev') || isSdk ? `${newDevVersion}-dev` : newVersion
-        json.dependencies[depName] = versionUpdate
+        json.dependencies[depName] = keepCaretOrTilde(json.dependencies[depName], versionUpdate)
         packageChanged = true
       }
     }
@@ -255,7 +255,10 @@ type Answers = {
           json.devDependencies[depName].includes('-dev') || isSdk
             ? `${newDevVersion}-dev`
             : newVersion
-        json.devDependencies[depName] = versionUpdate
+        json.devDependencies[depName] = keepCaretOrTilde(
+          json.devDependencies[depName],
+          versionUpdate
+        )
         packageChanged = true
       }
     }
@@ -317,6 +320,10 @@ function incrementVersion(version: string, command: string) {
 
 function removeDevSuffix(version: string) {
   return version.endsWith('-dev') ? version.slice(0, -4) : version
+}
+
+function keepCaretOrTilde(old: string, next: string): string {
+  return old.startsWith('^') || old.startsWith('~') ? `${old.charAt(0)}${next}` : next
 }
 
 function readPackageJson(filePath: string): PackageJson {
