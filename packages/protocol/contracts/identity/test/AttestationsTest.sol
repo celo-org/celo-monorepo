@@ -22,7 +22,8 @@ contract AttestationsTest is Attestations(true) {
     return __testValidators[index];
   }
 
-  // reimplement deprecated nonview functions here for testing purposes:
+  // some deprecated functions are mocked here to ensure that the tests for
+  // revoke and withdraw can still run
 
   /**
    * @notice Commit to the attestation request of a hashed identifier.
