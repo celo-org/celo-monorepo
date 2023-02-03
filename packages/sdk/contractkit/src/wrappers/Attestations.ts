@@ -234,6 +234,45 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   )
 
   /**
+   * Returns the verified status of an identifier/account pair indicating whether the attestation
+   * stats for a given pair are completed beyond a certain threshold of confidence (aka "verified")
+   * @param identifier Attestation identifier (e.g. phone hash)
+   * @param account Address of the account
+   * @param numAttestationsRequired Optional number of attestations required.  Will default to
+   *  hardcoded value if absent.
+   * @param attestationThreshold Optional threshold for fraction attestations completed. Will
+   *  default to hardcoded value if absent.
+   */
+  async getVerifiedStatus(
+    identifier: string,
+    account: Address,
+    numAttestationsRequired: number = 3,
+    attestationThreshold: number = 0.25
+  ) {
+    const stats = await this.getAttestationStat(identifier, account)
+    if (!stats) {
+      return {
+        isVerified: false,
+        numAttestationsRemaining: 0,
+        total: 0,
+        completed: 0,
+      }
+    }
+    const numAttestationsRemaining = numAttestationsRequired - stats.completed
+    const fractionAttestation = stats.total < 1 ? 0 : stats.completed / stats.total
+    // 'verified' is a term of convenience to mean that the attestation stats for a
+    // given identifier are beyond a certain threshold of confidence
+    const isVerified = numAttestationsRemaining <= 0 && fractionAttestation >= attestationThreshold
+
+    return {
+      isVerified,
+      numAttestationsRemaining,
+      total: stats.total,
+      completed: stats.completed,
+    }
+  }
+
+  /**
    * Calculates the amount of StableToken required to request Attestations
    * @param attestationsRequested  The number of attestations to request
    */
