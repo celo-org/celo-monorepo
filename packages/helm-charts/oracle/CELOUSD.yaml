@@ -3,7 +3,7 @@ oracle:
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
-      maxPercentageDeviation: 0.02
+      maxPercentageDeviation: 0.025
       maxPercentageBidAskSpread: 0.015
   metrics:
     enabled: true
