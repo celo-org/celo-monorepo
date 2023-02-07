@@ -21,7 +21,6 @@
     "@celo/base": "^3.2.1-dev",
     "@celo/contractkit": "^3.2.1-dev",
     "@celo/utils": "^3.2.1-dev",
-    "@celo/phone-utils": "^3.2.1-dev",
     "bignumber.js": "^9.0.0",
     "bunyan": "1.8.12",
     "bunyan-debug-stream": "2.0.0",

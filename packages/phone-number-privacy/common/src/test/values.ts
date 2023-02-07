@@ -1,4 +1,3 @@
-import { PhoneNumberUtils } from '@celo/phone-utils'
 import { normalizeAddressWith0x, privateKeyToAddress } from '@celo/utils/lib/address'
 
 export const mockAccount = '0x0000000000000000000000000000000000007E57'
@@ -12,7 +11,7 @@ export const ACCOUNT_ADDRESS2 = privateKeyToAddress(PRIVATE_KEY2)
 export const PRIVATE_KEY3 = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890fffff1d'
 export const ACCOUNT_ADDRESS3 = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY3))
 export const PHONE_NUMBER = '+15555555555'
-export const IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
+export const IDENTIFIER = '0x198f4957f1564ef11d8f2bfbcfbbe2584164d7a41f38c60d37d78bb7208eb1d4'
 export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
 // BLINDED_PHONE_NUMBER value dependent on PHONE_NUMBER AND BLINDING_FACTOR
 // hardcoding to avoid importing blind_threshols_bls library
