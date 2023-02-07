@@ -166,7 +166,7 @@ contract Validators is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 3);
+    return (1, 2, 0, 4);
   }
 
   /**
@@ -356,6 +356,12 @@ contract Validators is
     bytes calldata blsPop
   ) external nonReentrant returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(
+      // A Validator could avoid getting slashed by voting for a bunch of groups with very small
+      // amounts of CELO, causing the slash function to always run out of gas.
+      !getElection().allowedToVoteOverMaxNumberOfGroups(account),
+      "Validators cannot vote for more than max number of groups"
+    );
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
@@ -741,6 +747,10 @@ contract Validators is
   function registerValidatorGroup(uint256 commission) external nonReentrant returns (bool) {
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(
+      !getElection().allowedToVoteOverMaxNumberOfGroups(account),
+      "Validator groups cannot vote for more than max number of groups"
+    );
     require(!isValidator(account), "Already registered as validator");
     require(!isValidatorGroup(account), "Already registered as group");
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);

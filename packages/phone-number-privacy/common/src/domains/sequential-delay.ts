@@ -69,12 +69,24 @@ export type SequentialDelayDomainOptions = {
 }
 
 export interface SequentialDelayDomainState {
-  /** Timestamp in seconds since the Unix Epoch determining when a new request will be accepted. */
+  /**
+   * Timestamp in seconds since the Unix Epoch to which the next delay should be applied
+   * to calculate when a new request will be accepted.
+   */
   timer: number
   /** Number of queries that have been accepted for the SequentialDelayDomain instance. */
   counter: number
-  /** Whether or not the domain has been disabled. If disabled, no more queries will be served */
+  /** Whether or not the domain has been disabled. If disabled, no more queries will be served. */
   disabled: boolean
+  /** Server timestamp in seconds since the Unix Epoch. */
+  now: number
+}
+
+export const INITIAL_SEQUENTIAL_DELAY_DOMAIN_STATE: SequentialDelayDomainState = {
+  timer: 0,
+  counter: 0,
+  disabled: false,
+  now: 0,
 }
 
 /** io-ts schema for encoding and decoding SequentialDelayStage structs */
@@ -105,6 +117,7 @@ export const SequentialDelayDomainStateSchema: t.Type<SequentialDelayDomainState
   timer: t.number,
   counter: t.number,
   disabled: t.boolean,
+  now: t.number,
 })
 
 export const isSequentialDelayDomain = (domain: Domain): domain is SequentialDelayDomain =>
@@ -146,17 +159,26 @@ export const sequentialDelayDomainOptionsEIP712Types: EIP712TypesWithPrimary = {
 }
 
 /** Result values of the sequential delay domain rate limiting function */
-export interface SequentialDelayResult {
+export interface SequentialDelayResultAccepted {
   /** Whether or not a request will be accepted at the given time */
-  accepted: boolean
+  accepted: true
+  /** State after applying an additional query against the quota */
+  state: SequentialDelayDomainState
+}
+
+export interface SequentialDelayResultRejected {
+  /** Whether or not a request will be accepted at the given time */
+  accepted: false
+  /** State after rejecting the request. Should be unchanged. */
+  state: SequentialDelayDomainState
   /**
    * Earliest time a request will be accepted at the current stage.
-   * Provided on rejected requests. Undefined if a request will never be accepted.
+   * Undefined if a request will never be accepted.
    */
   notBefore?: number
-  /** State after applying adding a query to the quota. Unchnaged is accepted is false */
-  state: SequentialDelayDomainState | undefined
 }
+
+export type SequentialDelayResult = SequentialDelayResultAccepted | SequentialDelayResultRejected
 
 interface IndexedSequentialDelayStage extends SequentialDelayStage {
   // The attempt number at which the stage begins
@@ -166,59 +188,69 @@ interface IndexedSequentialDelayStage extends SequentialDelayStage {
 /**
  * Rate limiting predicate for the sequential delay domain
  *
- * @param domain SequentialDelayDomain instance against which the rate limit is being calculated.
- *  The domain instance supplied the rate limiting parameters.
+ * @param domain SequentialDelayDomain instance against which the rate limit is being calculated,
+ * and which supplied the rate limiting parameters.
  * @param attemptTime The Unix timestamp in seconds when the request was received.
- * @param state The current state of the domain, endoing the used quota and timeer value.
+ * @param state The current state of the domain, including the used quota counter and timer values.
+ * Defaults to initial state if no state is available (i.e. for first request against the domain).
  */
 export const checkSequentialDelayRateLimit = (
   domain: SequentialDelayDomain,
   attemptTime: number,
-  state?: SequentialDelayDomainState
+  state: SequentialDelayDomainState = INITIAL_SEQUENTIAL_DELAY_DOMAIN_STATE
 ): SequentialDelayResult => {
   // If the domain has been disabled, all queries are to be rejected.
-  if (state?.disabled ?? false) {
-    return { accepted: false, state }
+  if (state.disabled) {
+    return { accepted: false, state: { ...state, now: attemptTime } }
   }
 
-  // If no state is available (i.e. this is the first request against the domain) use the initial state.
-  const counter = state?.counter ?? 0
-  const timer = state?.timer ?? 0
-  const stage = getIndexedStage(domain, counter)
+  const stage = getIndexedStage(domain, state.counter)
 
   // If the counter is past the last stage (i.e. the domain is permanently out of quota) return early.
   if (!stage) {
-    return { accepted: false, state }
+    return { accepted: false, state: { ...state, now: attemptTime } }
   }
 
   const resetTimer = stage.resetTimer.defined ? stage.resetTimer.value : true
-  const delay = getDelay(stage, counter)
-  const notBefore = timer + delay
+  const delay = getDelay(stage, state.counter)
+  const notBefore = state.timer + delay
 
   if (attemptTime < notBefore) {
-    return { accepted: false, notBefore, state }
+    return { accepted: false, notBefore, state: { ...state, now: attemptTime } }
   }
 
   // Request is accepted. Update the state.
   return {
     accepted: true,
     state: {
-      counter: counter + 1,
+      counter: state.counter + 1,
       timer: resetTimer ? attemptTime : notBefore,
-      disabled: state?.disabled ?? false,
+      disabled: state.disabled,
+      now: attemptTime,
     },
   }
 }
 
+/**
+ * Finds the current stage of the SequentialDelayDomain rate limit for a given attempt number
+ *
+ * @param domain SequentialDelayDomain instance against which the rate limit is being calculated,
+ * and which supplied the rate limiting parameters.
+ * @param counter The current attempt number
+ */
 const getIndexedStage = (
   domain: SequentialDelayDomain,
   counter: number
 ): IndexedSequentialDelayStage | undefined => {
-  let attemptsInStage = 0
-  let index = 0
+  // The attempt index marking the beginning of the current stage
   let start = 0
+  // The index of the current stage in domain.stages[]
+  let index = 0
+  // The number of attempts in the current stage
+  let attemptsInStage = 0
   while (start <= counter) {
     if (index >= domain.stages.length) {
+      // Counter is past the last stage (i.e. the domain is permanently out of quota)
       return undefined
     }
     const stage = domain.stages[index]
@@ -235,6 +267,14 @@ const getIndexedStage = (
   return { ...domain.stages[index], start }
 }
 
+/**
+ * Finds the delay to enforce for an attempt given its counter (attempt number) and
+ * the corresponding stage in the SequentialDelayDomain rate limit.
+ *
+ * @param stage IndexedSequentialDelayStage The given stage of the SequentialDelayDomain rate limit,
+ * extended to include the index of the first attempt in that stage.
+ * @param counter The current attempt number
+ */
 const getDelay = (stage: IndexedSequentialDelayStage, counter: number): number => {
   const batchSize = stage.batchSize.defined ? stage.batchSize.value : 1
   if ((counter - stage.start) % batchSize === 0) {

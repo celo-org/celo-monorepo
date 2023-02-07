@@ -1,6 +1,7 @@
 import { AttestationState } from '@celo/contractkit/lib/wrappers/Attestations'
 import { OdisUtils } from '@celo/identity'
-import { getPepperFromThresholdSignature } from '@celo/identity/lib/odis/phone-number-identifier'
+import { getPepperFromThresholdSignature } from '@celo/identity/lib/odis/identifier'
+import { OdisContextName } from '@celo/identity/lib/odis/query'
 import { PhoneNumberUtils } from '@celo/phone-utils'
 import { AttestationRequest } from '@celo/phone-utils/lib/io'
 import { AttestationUtils } from '@celo/utils'
@@ -26,8 +27,9 @@ const ATTESTATION_ERROR = 'Valid attestation could not be provided'
 const NO_INCOMPLETE_ATTESTATION_FOUND_ERROR = 'No incomplete attestation found'
 export const INVALID_SIGNATURE_ERROR = 'Signature is invalid'
 
-const odisPubKey = OdisUtils.Query.getServiceContext(fetchEnvOrDefault('NETWORK', 'mainnet'))
-  .odisPubKey
+const odisPubKey = OdisUtils.Query.getServiceContext(
+  fetchEnvOrDefault('NETWORK', 'mainnet') as OdisContextName
+).odisPubKey
 const thresholdBls = require('blind-threshold-bls')
 
 function toBase64(str: string) {

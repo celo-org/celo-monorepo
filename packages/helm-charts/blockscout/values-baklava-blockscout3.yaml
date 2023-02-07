@@ -5,61 +5,67 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 250Mi
-            cpu: 200m
-    poolSize: 30
+            memory: 20M
+            cpu: 10m
+    poolSize: 150
     resources:
       requests:
-        memory: 1000Mi
-        cpu: 2
+        memory: 700M
+        cpu: 0.5
+      limits:
+        memory: 1400M
+        cpu: 1
     metrics:
       enabled: true
   api:
-    autoscaling:
-        maxReplicas: 3
-        minReplicas: 2
-        target:
-          cpu: 70
-    db:
-      connectionName: celo-testnet-production:us-west1:baklava3-replica
-      proxy:
-        resources:
-          requests:
-            memory: 250Mi
-            cpu: 200m
-    poolSize: 10
-    resources:
-      requests:
-        memory: 250Mi
-        cpu: 500m
-  web:
-    host: explorer.celo.org
-    suffix:
-      enabled: true
-      path: "baklava"
-    extraEnvironments:
-      target:
-      - sourceHost: explorer.celo.org
     autoscaling:
       maxReplicas: 3
       minReplicas: 2
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet-production:us-west1:baklava3
+      connectionName: celo-testnet-production:us-west1:baklava3-replica
       proxy:
         resources:
           requests:
-            memory: 250Mi
-            cpu: 200m
+            memory: 20M
+            cpu: 10m
     poolSize: 10
     resources:
       requests:
-        memory: 250M
+        memory: 750M
+        cpu: 100m
+      limits:
+        memory: 1500M
         cpu: 500m
+  web:
+    host: explorer.celo.org
+    suffix:
+      enabled: true
+      path: "baklava"
+    autoscaling:
+      maxReplicas: 3
+      minReplicas: 2
+      target:
+        cpu: 70
+    db:
+      connectionName: celo-testnet-production:us-west1:baklava3-replica
+      proxy:
+        resources:
+          requests:
+            memory: 20M
+            cpu: 10m
+    poolSize: 10
+    resources:
+      requests:
+        memory: 750M
+        cpu: 0.5
+      limits:
+        memory: 1500M
+        cpu: 1
   metadataCrawler:
     enabled: true
-    schedule: "*/30 * * * *" # every 30 minutes
+    schedule: "*/30 * * * *"  # every 30 minutes
     discordClusterName: Baklava
   metrics:
     enabled: true
@@ -74,6 +80,7 @@ blockscout:
       projectId: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaProjectId
       siteKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaSiteKey
       apiKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaApiKey
+      secretKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-recaptchaSecretKey
     erlang:
       cookie: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout3-erlangCookie
     campaignBannerApiUrl: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-campaignBannerApiUrl
