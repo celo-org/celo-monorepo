@@ -2,20 +2,18 @@
 geth:
   resources:
     requests:
-      cpu: 2
-      memory: 4Gi
+      cpu: 400m
+      memory: 3Gi
   validatorResources:
     requests:
-      cpu: 500m
-      memory: 5500M
-    limits:
-      cpu: 2
-      memory: 8Gi
+      cpu: 0.5
+      memory: 3000M
   txNodeResources:
     requests:
-      cpu: 1
-      memory: 12Gi
+      cpu: 0.5
+      memory: 9G
   txNodePrivateResources:
     requests:
       cpu: 2
-      memory: 12Gi
+      memory: 8Gi
+

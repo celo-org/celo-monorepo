@@ -190,13 +190,13 @@ spec:
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
 
-{{ include  "common.bootnode-flag-script" . | indent 10 }}
+          {{- include  "common.bootnode-flag-script" . | nindent 10 }}
 
-{{ include  "common.geth-add-metrics-pprof-config" . | indent 10 }}
+          {{- include  "common.geth-add-metrics-pprof-config" . | nindent 10 }}
 
-{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
+          {{- include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | nindent 10 }}
 
-{{ .Values.geth.secondayExtraSnippet | indent 10 }}
+          {{- .Values.geth.secondayExtraSnippet | nindent 10 }}
 
           exec geth \
             $BOOTNODE_FLAG \
@@ -254,21 +254,24 @@ spec:
         - name: metrics
           containerPort: 6060
         {{- end }}
+        {{- $resources := default .Values.geth.resources .Values.geth.secondaryResources -}}
+        {{- with $resources }}
         resources:
-{{ toYaml .Values.geth.resources | indent 10 }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: data
           mountPath: /root/.celo
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
-      {{- if .Values.secondayNodeSelector }}
+      {{- with .Values.secondayNodeSelector }}
       nodeSelector:
-{{ toYaml .Values.secondayNodeSelector | indent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.secondaryTolerations }}
+      {{- with .Values.secondaryTolerations }}
       tolerations:
-{{ toYaml .Values.secondaryTolerations | indent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
       - name: data
