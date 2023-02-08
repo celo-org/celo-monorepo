@@ -91,7 +91,7 @@ contract('GoldToken', (accounts: string[]) => {
       await mockGoldToken.setTotalSupply(ONE_GOLDTOKEN.multipliedBy(1000))
     })
 
-    it('matches circulatingSupply() when there has no burn', async () => {
+    it('matches circulatingSupply() when there was no burn', async () => {
       assertEqualBN(await mockGoldToken.circulatingSupply(), await mockGoldToken.totalSupply())
     })
 
