@@ -37,7 +37,8 @@ oracle:
     ],
     [
       { exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false },
-      { exchange: 'BINANCE', symbol: 'USDTBRL', toInvert: false } 
+      { exchange: 'OKX', symbol: 'BTCUSDT', toInvert: true },
+       { exchange: 'NOVADAX', symbol: 'BTCBRL', toInvert: false }
     ],
     [ 
       {exchange: 'KUCOIN', symbol: 'CELOUSDT', toInvert: false}, 
