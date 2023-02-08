@@ -1,5 +1,6 @@
 import {
   ABIDefinition,
+  AbiItem,
   Address,
   Block,
   CeloTxPending,
@@ -17,6 +18,7 @@ import {
   mapFromPairs,
   obtainKitContractDetails,
 } from './base'
+import { fetchMetadata } from './sourcify'
 
 const debug = debugFactory('kit:explorer:block')
 
@@ -40,6 +42,12 @@ export interface ParsedBlock {
 interface ContractMapping {
   details: ContractDetails
   fnMapping: Map<string, ABIDefinition>
+}
+
+interface ContractNameAndMethodAbi {
+  abi: ABIDefinition
+  contract: string
+  contractName?: string
 }
 
 export async function newBlockExplorer(kit: ContractKit) {
@@ -115,15 +123,70 @@ export class BlockExplorer {
     }
   }
 
-  getContractMethodAbi = (address: string, callSignature: string) => {
+  getContractMethodAbiFromCore = (
+    address: string,
+    selector: string
+  ): ContractNameAndMethodAbi | null => {
     const contractMapping = this.addressMapping.get(address)
-    return {
-      contract: contractMapping?.details.name,
-      abi: contractMapping?.fnMapping.get(callSignature),
+    if (contractMapping) {
+      const abi = contractMapping.fnMapping.get(selector)
+      if (abi) {
+        return {
+          contract: contractMapping.details.name,
+          abi,
+        }
+      } else {
+        console.warn(
+          `Function with signature ${selector} not found in contract ${contractMapping.details.name}(${address})`
+        )
+      }
     }
+
+    return null
   }
 
-  getKnownFunction(selector: string): ABIDefinition | undefined {
+  getContractMethodAbiFromSourcify = async (
+    address: string,
+    selector: string
+  ): Promise<ContractNameAndMethodAbi | null> => {
+    let metadata = await fetchMetadata(this.kit.connection, address)
+    let abi: AbiItem | null = null
+    let contractName: string | null = null
+
+    if (metadata && metadata.abi) {
+      contractName = metadata.contractName
+      abi = metadata.abiForSelector(selector)
+
+      if (abi === null) {
+        const implAddress = await metadata.tryGetProxyImplementation()
+        console.log(implAddress)
+        if (implAddress) {
+          metadata = await fetchMetadata(this.kit.connection, implAddress)
+          if (metadata && metadata.abi) {
+            abi = metadata?.abiForSelector(selector)
+            contractName = metadata?.contractName
+          }
+        }
+      }
+    }
+
+    if (abi !== null) {
+      return {
+        abi: {
+          ...abi,
+          signature: selector,
+        },
+        contract: contractName ? `${contractName}(${address})` : `Unknown(${address})`,
+      }
+    }
+
+    return null
+  }
+
+  getContractMethodAbiFallback = (
+    address: string,
+    selector: string
+  ): ContractNameAndMethodAbi | null => {
     // TODO(bogdan): This could be replaced with a call to 4byte.directory
     // or a local database of common functions.
     const knownFunctions: { [k: string]: string } = {
@@ -132,9 +195,31 @@ export class BlockExplorer {
     }
     const signature = knownFunctions[selector]
     if (signature) {
-      return signatureToAbiDefinition(signature)
+      return {
+        abi: signatureToAbiDefinition(signature),
+        contract: `Unknown(${address})`,
+      }
     }
-    return undefined
+    return null
+  }
+
+  getContractMethodAbi = async (
+    address: string,
+    selector: string,
+    onlyCoreContracts = false
+  ): Promise<ContractNameAndMethodAbi | null> => {
+    let resp = this.getContractMethodAbiFromCore(address, selector)
+    if (resp !== null) {
+      return resp
+    } else if (onlyCoreContracts) {
+      return null
+    }
+
+    resp = await this.getContractMethodAbiFromSourcify(address, selector)
+    if (resp !== null) {
+      return resp
+    }
+    return this.getContractMethodAbiFallback(address, selector)
   }
 
   buildCallDetails(contract: string, abi: ABIDefinition, input: string): CallDetails {
@@ -167,32 +252,13 @@ export class BlockExplorer {
     }
   }
 
-  tryParseAsCoreContractCall(address: string, input: string): CallDetails | null {
-    const selector = input.slice(0, 10)
-    const { contract: contractName, abi: matchedAbi } = this.getContractMethodAbi(address, selector)
-
-    if (matchedAbi === undefined || contractName === undefined) {
-      return null
-    }
-
-    return this.buildCallDetails(contractName, matchedAbi, input)
-  }
-
-  tryParseAsExternalContractCall(address: string, input: string): CallDetails | null {
-    const selector = input.slice(0, 10)
-    const matchedAbi = this.getKnownFunction(selector)
-    if (matchedAbi === undefined) {
-      return null
-    }
-
-    return this.buildCallDetails(address, matchedAbi, input)
-  }
-
   async tryParseTxInput(address: string, input: string): Promise<CallDetails | null> {
-    let callDetails = this.tryParseAsCoreContractCall(address, input)
-    if (callDetails == null) {
-      callDetails = this.tryParseAsExternalContractCall(address, input)
+    const selector = input.slice(0, 10)
+    const resp = await this.getContractMethodAbi(address, selector)
+
+    if (resp !== null) {
+      return this.buildCallDetails(resp.contract, resp.abi, input)
     }
-    return callDetails
+    return null
   }
 }

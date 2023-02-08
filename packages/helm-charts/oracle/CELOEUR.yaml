@@ -12,7 +12,6 @@ oracle:
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
   priceSources: "[
-                    [{exchange: 'BITTREX', symbol: 'CELOEUR', toInvert: false}],
                     [{exchange: 'COINBASE', symbol: 'CELOEUR', toInvert: false}],
                     [
                       {exchange: 'COINBASE', symbol: 'CELOUSD', toInvert: false},
