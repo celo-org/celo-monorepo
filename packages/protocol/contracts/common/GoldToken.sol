@@ -246,7 +246,7 @@ contract GoldToken is
   }
 
   /**
-   * @notice Gets the amount of CELO that has been burned
+   * @notice Gets the amount of CELO that has been burned.
    * @return The total amount of Celo that has been sent to the burn address.
    */
   function getBurnedAmount() public view returns (uint256) {
@@ -279,7 +279,7 @@ contract GoldToken is
   }
 
   /**
-   * @notice internal CELO transfer from one address to another.
+   * @notice Internal CELO transfer from one address to another.
    * @param to The address to transfer CELO to. Zero address will revert.
    * @param value The amount of CELO to transfer.
    * @return True if the transaction succeeds.
