@@ -18,10 +18,10 @@
     "lib/**/*"
   ],
   "dependencies": {
-    "@celo/base": "^3.1.1-dev",
-    "@celo/contractkit": "^3.1.1-dev",
-    "@celo/utils": "^3.1.1-dev",
-    "@celo/phone-utils": "^3.1.1-dev",
+    "@celo/base": "^3.2.1-dev",
+    "@celo/contractkit": "^3.2.1-dev",
+    "@celo/utils": "^3.2.1-dev",
+    "@celo/phone-utils": "^3.2.1-dev",
     "bignumber.js": "^9.0.0",
     "bunyan": "1.8.12",
     "bunyan-debug-stream": "2.0.0",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@celo/poprf": "^0.1.9",
-    "@celo/wallet-local": "^3.1.1-dev",
+    "@celo/wallet-local": "^3.2.1-dev",
     "@types/bunyan": "1.8.4",
     "@types/elliptic": "^6.4.12",
     "@types/express": "^4.17.6",
