@@ -97,7 +97,7 @@ contract GoldToken is
   /**
    * @notice This function allows a user to burn a specific amount of tokens.
      Burning is implemented by sending tokens to the burn address.
-   * @param value: The amount of tokens to burn.
+   * @param value: The amount of CELO to burn.
    * @return True if burn was successful.
    */
   function burn(uint256 value) external returns (bool) {
