@@ -66,6 +66,8 @@ contract('FeeBurner', (accounts: string[]) => {
     })
   }
 
+  const user = accounts[1]
+
   beforeEach(async () => {
     goldToken = await GoldToken.new(true)
     mockReserve = await MockReserve.new()
@@ -132,28 +134,46 @@ contract('FeeBurner', (accounts: string[]) => {
   })
 
   describe('#burnMentoAssets()', () => {
-    it('burns with balance', async () => {
-      const user = accounts[1]
+    beforeEach(async () => {
       const goldTokenAmount = new BigNumber(1e18)
-      console.log(1)
-      await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
-      console.log(2)
-      await exchange.sell(goldTokenAmount, 0, true, { from: user })
-      console.log(3)
 
+      await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
+      await exchange.sell(goldTokenAmount, 0, true, { from: user })
+    })
+
+    it('burns with balance', async () => {
       await stableToken.transfer(feeBurner.address, await stableToken.balanceOf(user), {
         from: user,
       })
-      console.log(4)
-      console.log('balance is', await stableToken.balanceOf(user))
+
+      console.log('balance of user is', (await stableToken.balanceOf(user)).toString())
+      console.log(
+        'balance of contract is',
+        (await stableToken.balanceOf(feeBurner.address)).toString()
+      )
 
       await feeBurner.burn()
 
+      // all Celo must have been burned
+      assertEqualBN(await goldToken.balanceOf(feeBurner.address), new BigNumber(0))
+      console.log(6)
+      // all stable must have been burned
       assertEqualBN(await stableToken.balanceOf(feeBurner.address), new BigNumber(0))
 
       // get some Celo dollars
       // Send to burner
       // burn
+    })
+
+    it("doesn't burrn when balance is low", async () => {
+      const balanceBefore = await stableToken.balanceOf(feeBurner.address)
+      await stableToken.transfer(feeBurner.address, new BigNumber(await feeBurner.MIN_BURN()), {
+        from: user,
+      })
+
+      await feeBurner.burn()
+
+      assertEqualBN(await stableToken.balanceOf(feeBurner.address), balanceBefore)
     })
 
     it("doesn't exchange in case of big slipage", async () => {

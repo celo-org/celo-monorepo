@@ -151,6 +151,10 @@ contract UsingRegistryV2 is Ownable {
     return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
+  function getCeloTokenAddress() internal view returns (address) {
+    return registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
+  }
+
   function getGovernance() internal view returns (IGovernance) {
     return IGovernance(registryContract.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
   }
