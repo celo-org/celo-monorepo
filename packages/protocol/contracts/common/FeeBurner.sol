@@ -2,16 +2,23 @@ pragma solidity ^0.5.13;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+
+import "./UsingRegistryV2.sol";
+
 import "../common/interfaces/ICeloVersionedContract.sol";
 
 import "../common/interfaces/ICeloToken.sol";
 import "../common/Initializable.sol";
 
-import "./UsingRegistryV2.sol";
 import "../stability/StableToken.sol";
 import "../stability/interfaces/IExchange.sol";
 
 // import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+
+// TODO maybe add an upperbound so that you can't trade more
+// multisig that owns this and have a killswitch
+// Non-Mento assets do it permisionless.
 
 /**
  * @title TODO
@@ -19,8 +26,12 @@ import "../stability/interfaces/IExchange.sol";
  */
 contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract {
   using SafeMath for uint256;
-  event CeloBalance(uint256 celoBalance);
+
+  // event CeloBalance(uint256 celoBalance);
+  event SoldAndBurnedToken(address token, uint256 value);
+
   uint256 public constant MIN_BURN = 200;
+  mapping(address => uint256) public pastBurn;
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -52,12 +63,17 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   function burnMentoAssets() private {
     // 1. reserve contrac
     address[] memory mentoTokens = getReserve().getTokens();
+    // shall this be fee token whitelist?
+    // here we could also check that the tokens is whitelisted, but we assume everything that has already been sent here is
+    // due for burning
+
     // require(false, "start"); // TODO remove me
     emit CeloBalance(10);
 
     for (uint256 i = 0; i < mentoTokens.length; i++) {
-      StableToken stableToken = StableToken(mentoTokens[i]);
-      uint256 balance = stableToken.balanceOf(address(this));
+      address tokeAddress = mentoTokens[i];
+      StableToken stableToken = StableToken(tokeAdress);
+      uint256 balanceToBurn = stableToken.balanceOf(address(this));
 
       // small numbers cause rounding errors
       // zero case should be skiped
@@ -65,7 +81,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
       // add a check Mento is on-check
 
-      if (balance < 100) {
+      if (balanceToBurn < 100) {
         continue;
       }
       address exchangeAddress = registryContract.getAddressForOrDie(
@@ -78,15 +94,18 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       // minBuyAmount is zero because this functions is meant to be called reguarly with small amounts
       // TODO calculate a max of slipagge
 
-      // approve
-      // why is this working without approve?
-      stableToken.approve(exchangeAddress, balance);
-      exchange.sell(balance, 0, false);
+      stableToken.approve(exchangeAddress, balanceToBurn);
+      exchange.sell(balanceToBurn, 0, false);
 
       ICeloToken celo = ICeloToken(getCeloTokenAddress());
-      uint256 celoBalance = celo.balanceOf(address(this));
-      emit CeloBalance(celoBalance);
-      require(celoBalance > 0, "Celo Balance not bigger than zero"); // TODO remove me
+
+      pastBurn[tokeAdress] += balanceToBurn;
+      emit SoldAndBurnedToken(tokeAddress, balanceToBurn);
+
+      // uint256 celoBalance = celo.balanceOf(address(this));
+      // emit CeloBalance(celoBalance);
+      // require(celoBalance > 0, "Celo Balance not bigger than zero"); // TODO remove me
+
     }
 
     // TODO add some accounting about the amounts burned
@@ -94,14 +113,23 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   }
 
+  function burnNonMentoTokens() {}
+
   // this function is permionless
   function burn() external {
     burnMentoAssets();
     burnAllCelo();
+    burnNonMentoTokens();
     // burn other assets
     // TODO:
     // 1. Make swap (Meto for stables, for other Uniswap)
     // 2. burn
+  }
+
+  function transfer(address poolAddress, address recipient, uint256 value) external onlyOwner {
+    // meant for governance to trigger use cases not contemplated in this contract
+    IERC20 token = IERC20(poolAddress);
+    token.transfer(recipient, token.balanceOf(this));
   }
 
   function setExchange(address poolAddress, address token) external onlyOwner {
@@ -113,3 +141,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   // TODO FUCTIONS HERE
 
 }
+
+// TODO onlyOwner transfer out
+

@@ -11,6 +11,7 @@ import "../common/Initializable.sol";
  */
 contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable {
   address[] public whitelist;
+  address[] public nonMentoTokenWhitelist;
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -23,6 +24,16 @@ contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable {
    */
   function initialize() external initializer {
     _transferOwnership(msg.sender);
+  }
+
+  // TODO fee tokens can't be removed
+
+  /**
+   * @dev Add a token to the whitelist
+   * @param tokenAddress The address of the token to add.
+   */
+  function addNonMentoToken(address tokenAddress) external onlyOwner {
+    whitelist.push(tokenAddress);
   }
 
   /**
