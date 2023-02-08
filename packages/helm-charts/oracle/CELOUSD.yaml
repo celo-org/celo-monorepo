@@ -27,7 +27,8 @@ oracle:
       {exchange: 'KRAKEN', symbol: 'USDTUSD', toInvert: false} 
     ], 
     [ 
-      {exchange: 'BINANCEUS', symbol: 'CELOUSD', toInvert: false } 
+      {exchange: 'BINANCEUS', symbol: 'CELOUSD', toInvert: false }
+    ],  
     [ 
       {exchange: 'OKX', symbol: 'CELOUSDT', toInvert: false}, 
       {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false} 
