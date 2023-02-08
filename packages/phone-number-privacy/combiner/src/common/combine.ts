@@ -53,7 +53,21 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     }, this.config.odisServices.timeoutMilliSeconds)
 
     // Forward request to signers
-    await Promise.all(this.signers.map((signer) => this.forwardToSigner(signer, session)))
+    // An unexpected error in handling the result for one signer should not
+    // block a threshold of correct responses, but should be logged.
+    await Promise.all(
+      this.signers.map(async (signer) => {
+        try {
+          await this.forwardToSigner(signer, session)
+        } catch (err) {
+          session.logger.error({
+            signer: signer.url,
+            message: 'Unexpected error caught while distributing request to signer',
+            err,
+          })
+        }
+      })
+    )
     // TODO Resolve race condition where a session can both receive a successful
     // response in time and be aborted
 
@@ -73,7 +87,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
         status: signerFetchResult.status,
       })
     } catch (err) {
-      session.logger.debug({ err }, 'signer request failure')
+      session.logger.debug({ err, signer: signer.url, message: 'signer request failure' })
       if (err instanceof Error && err.name === 'AbortError' && session.abort.signal.aborted) {
         if (session.timedOut) {
           session.logger.error({ signer }, ErrorMessage.TIMEOUT_FROM_SIGNER)
@@ -106,7 +120,7 @@ export abstract class CombineAction<R extends OdisRequest> implements Action<R> 
     if (signerFetchResult) {
       session.logger.info({
         message: 'Received signerFetchResult on unsuccessful signer response',
-        res: await signerFetchResult.json(),
+        res: await signerFetchResult.text(),
         status: signerFetchResult.status,
         signer: signer.url,
       })
