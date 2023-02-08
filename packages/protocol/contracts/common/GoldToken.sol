@@ -31,7 +31,7 @@ contract GoldToken is
 
   mapping(address => mapping(address => uint256)) internal allowed;
 
-  // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
+  // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address 
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
 
   event Transfer(address indexed from, address indexed to, uint256 value);
