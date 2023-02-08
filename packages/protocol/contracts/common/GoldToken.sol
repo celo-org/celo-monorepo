@@ -31,8 +31,8 @@ contract GoldToken is
 
   mapping(address => mapping(address => uint256)) internal allowed;
 
+  // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
-  // address constant BURN_ADDRESS = address(0);
 
   event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -95,7 +95,7 @@ contract GoldToken is
   }
 
   /**
-   * @notice This function allows a user to burn a specific value of tokens.
+   * @notice This function allows a user to burn a specific amount of tokens.
      Burning is implemented by sending tokens to the burn address.
    * @param value: The amount of tokens to burn.
    * @return True if burn was successful.

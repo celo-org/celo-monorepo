@@ -30,8 +30,7 @@ contract('GoldToken', (accounts: string[]) => {
   const ONE_GOLDTOKEN = new BigNumber('1000000000000000000')
   const TWO_GOLDTOKEN = new BigNumber('2000000000000000000')
   const burnAddress = '0x000000000000000000000000000000000000dEaD'
-  // const zeroAddress = '0x0000000000000000000000000000000000000000'
-  // const burnAddress = zeroAddress
+
   const sender = accounts[0]
   const receiver = accounts[1]
 
@@ -64,7 +63,7 @@ contract('GoldToken', (accounts: string[]) => {
       startBurn = await goldToken.getBurnedAmount()
     })
 
-    it('dead starts as zero', async () => {
+    it('burn address starts with zero balance', async () => {
       assertEqualBN(await goldToken.balanceOf(burnAddress), 0)
     })
 
@@ -77,9 +76,7 @@ contract('GoldToken', (accounts: string[]) => {
     })
 
     it('returns right burned amount', async () => {
-      // console.log("burn address has", (await goldToken.balanceOf(zeroAddress)).toString())
       await goldToken.burn(ONE_GOLDTOKEN)
-      // console.log("burn address has", (await goldToken.balanceOf(zeroAddress)).toString())
 
       assertEqualBN(await goldToken.getBurnedAmount(), ONE_GOLDTOKEN.plus(startBurn))
     })
@@ -101,9 +98,11 @@ contract('GoldToken', (accounts: string[]) => {
     it('decreases when there was a burn', async () => {
       // mock a burn
       await mockGoldToken.setBalanceOf(burnAddress, ONE_GOLDTOKEN)
+
       const circulatingSupply = await mockGoldToken.circulatingSupply()
       // circulatingSupply got reduced to 999 after burning 1 Celo
       assertEqualBN(circulatingSupply, ONE_GOLDTOKEN.multipliedBy(999))
+      assertEqualBN(circulatingSupply, (await mockGoldToken.totalSupply()).minus(ONE_GOLDTOKEN))
     })
   })
 
