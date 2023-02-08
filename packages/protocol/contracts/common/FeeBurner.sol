@@ -68,11 +68,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     // due for burning
 
     // require(false, "start"); // TODO remove me
-    emit CeloBalance(10);
 
     for (uint256 i = 0; i < mentoTokens.length; i++) {
-      address tokeAddress = mentoTokens[i];
-      StableToken stableToken = StableToken(tokeAdress);
+      address tokenAddress = mentoTokens[i];
+      StableToken stableToken = StableToken(tokenAddress);
       uint256 balanceToBurn = stableToken.balanceOf(address(this));
 
       // small numbers cause rounding errors
@@ -97,10 +96,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       stableToken.approve(exchangeAddress, balanceToBurn);
       exchange.sell(balanceToBurn, 0, false);
 
-      ICeloToken celo = ICeloToken(getCeloTokenAddress());
-
-      pastBurn[tokeAdress] += balanceToBurn;
-      emit SoldAndBurnedToken(tokeAddress, balanceToBurn);
+      pastBurn[tokenAddress] += balanceToBurn;
+      emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
 
       // uint256 celoBalance = celo.balanceOf(address(this));
       // emit CeloBalance(celoBalance);
@@ -113,7 +110,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   }
 
-  function burnNonMentoTokens() {}
+  function burnNonMentoTokens() private {}
 
   // this function is permionless
   function burn() external {
@@ -129,7 +126,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   function transfer(address poolAddress, address recipient, uint256 value) external onlyOwner {
     // meant for governance to trigger use cases not contemplated in this contract
     IERC20 token = IERC20(poolAddress);
-    token.transfer(recipient, token.balanceOf(this));
+    token.transfer(recipient, value);
   }
 
   function setExchange(address poolAddress, address token) external onlyOwner {
