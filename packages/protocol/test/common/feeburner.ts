@@ -26,6 +26,7 @@ const goldAmountForRate = new BigNumber('1000000000000000000000000')
 const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
 const spread = toFixed(3 / 1000)
 const reserveFraction = toFixed(5 / 100)
+const maxSlippage = toFixed(1 / 100)
 const initialReserveBalance = new BigNumber(10000000000000000000000)
 
 const FeeBurner: FeeBurnerContract = artifacts.require('FeeBurner')
@@ -134,8 +135,18 @@ contract('FeeBurner', (accounts: string[]) => {
   })
 
   describe('#setDailyBurnLimit()', () => {
-    it('should only be called by owwer', async () => {
-      await assertRevert(feeBurner.initialize(registry.address))
+    it('should only be called by owner', async () => {
+      await assertRevert(
+        feeBurner.setDailyBurnLimit(stableToken.address, goldAmountForRate, { from: user })
+      )
+    })
+  })
+
+  describe('#setDailyBurnLimit()', () => {
+    it('should only be called by owner', async () => {
+      await assertRevert(
+        feeBurner.setMaxSplipagge(stableToken.address, maxSlippage, { from: user })
+      )
     })
   })
 

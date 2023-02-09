@@ -3,6 +3,7 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "../common/FixidityLib.sol";
 
 import "./UsingRegistryV2.sol";
 
@@ -47,14 +48,16 @@ interface IUniswapV2Router {
  */
 contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract {
   using SafeMath for uint256;
+  using FixidityLib for FixidityLib.Fraction;
 
   uint256 public constant MIN_BURN = 200;
   mapping(address => uint256) public pastBurn;
   mapping(address => uint256) public dailyBurnLimit;
   mapping(address => uint256) public currentDayLimit;
   mapping(address => address[]) public poolAddresses;
-
   uint256 public lastLimitDay;
+
+  mapping(address => FixidityLib.Fraction) public maxSlippage;
 
   // event CeloBalance(uint256 celoBalance);
   event SoldAndBurnedToken(address token, uint256 value);
@@ -77,6 +80,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     setRegistry(_registryAddress);
     // lastLimitDay = now / 1 days;
     // TODO add limits
+    // TODO maxSlippage
   }
 
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
@@ -106,6 +110,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     }
 
     uint256 currentDay = now / 1 days;
+    // Pattern borrowed from Reserve.sol
     if (currentDay > lastLimitDay) {
       lastLimitDay = currentDay;
       currentDayLimit[tokenAddress] = dailyBurnLimit[tokenAddress];
@@ -123,6 +128,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     emit DailyLimitUpdatedDeleteMe(amountBurned);
     return true;
   }
+
+  function burnSingleMentoToken() public {}
+  function burnSingleNonMentoToken() public {}
+
+  function setMaxSplipagge(address tokenAddress, uint256 newMaxSlippage) external onlyOwner {}
 
   // this function is permionless
   function burnMentoAssets() private {
@@ -156,10 +166,22 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       IExchange exchange = IExchange(exchangeAddress);
 
       // minBuyAmount is zero because this functions is meant to be called reguarly with small amounts
+
       // TODO calculate a max of slipagge
 
       stableToken.approve(exchangeAddress, balanceToBurn);
-      exchange.sell(balanceToBurn, 0, false);
+
+      uint256 minAmount = 0;
+      if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
+        // max slippage is set
+        uint256 amountWithoutSlippage = exchange.getBuyTokenAmount(balanceToBurn, false);
+        minAmount = FixidityLib
+          .newFixed(amountWithoutSlippage)
+          .multiply(maxSlippage[tokenAddress])
+          .fromFixed();
+      }
+
+      exchange.sell(balanceToBurn, minAmount, false);
       pastBurn[tokenAddress] += balanceToBurn;
 
       updateLimits(tokenAddress, balanceToBurn);
