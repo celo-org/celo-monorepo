@@ -166,11 +166,11 @@ contract('FeeBurner', (accounts: string[]) => {
       // burn for a token is zero
       assertEqualBN(await feeBurner.getPastBurnForToken(stableToken.address), new BigNumber(0))
 
-      console.log('balance of user is', (await stableToken.balanceOf(user)).toString())
-      console.log(
-        'balance of contract is',
-        (await stableToken.balanceOf(feeBurner.address)).toString()
-      )
+      // console.log('balance of user is', (await stableToken.balanceOf(user)).toString())
+      // console.log(
+      //   'balance of contract is',
+      //   (await stableToken.balanceOf(feeBurner.address)).toString()
+      // )
 
       const burnedAmountStable = await stableToken.balanceOf(feeBurner.address)
 
@@ -203,6 +203,18 @@ contract('FeeBurner', (accounts: string[]) => {
       // burning again shouldn't do anything
       await feeBurner.burn()
       assertEqualBN(await stableToken.balanceOf(feeBurner.address), new BigNumber(2000))
+    })
+
+    it("doesn't burn when slippage is too big", async () => {
+      await feeBurner.setMaxSplipagge(stableToken.address, toFixed(1 / 1e6)) // TODO do the math to get the right threshold
+
+      await stableToken.transfer(feeBurner.address, new BigNumber(3000), {
+        from: user,
+      })
+
+      await assertRevert(feeBurner.burn())
+
+      assertEqualBN(await stableToken.balanceOf(feeBurner.address), new BigNumber(3000))
     })
 
     it('reset burn limit after 24 hours', async () => {

@@ -12,8 +12,9 @@ import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../common/Initializable.sol";
 
-import "../stability/StableToken.sol";
+import "../stability/StableToken.sol"; // TODO check if this can be interface
 import "../stability/interfaces/IExchange.sol";
+import "../stability/interfaces/ISortedOracles.sol";
 
 // import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
@@ -63,6 +64,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
   event DailyLimitHit(address token, uint256 burning);
+  event MAxSlippageSet(address token, uint256 maxSlippage);
 
   event DailyLimitUpdatedDeleteMe(uint256 amount);
 
@@ -132,11 +134,14 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   function burnSingleMentoToken() public {}
   function burnSingleNonMentoToken() public {}
 
-  function setMaxSplipagge(address tokenAddress, uint256 newMaxSlippage) external onlyOwner {}
+  function setMaxSplipagge(address tokenAddress, uint256 newMax) external onlyOwner {
+    maxSlippage[tokenAddress] = FixidityLib.wrap(newMax);
+    emit MAxSlippageSet(tokenAddress, newMax);
+  }
 
   // this function is permionless
   function burnMentoAssets() private {
-    // here we could also check that the tokens is whitelisted, but we assume everything that has already been sent here is
+    // here it could also be checked that the tokens is whitelisted, but we assume everything that has already been sent here is
     // due for burning
     address[] memory mentoTokens = getReserve().getTokens();
 
@@ -174,7 +179,9 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       uint256 minAmount = 0;
       if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
         // max slippage is set
-        uint256 amountWithoutSlippage = exchange.getBuyTokenAmount(balanceToBurn, false);
+        // use sorted oracles as reference
+        ISortedOracles sortedOracles = getSortedOracles();
+        (uint256 amountWithoutSlippage, uint256 _) = sortedOracles.medianRate(tokenAddress);
         minAmount = FixidityLib
           .newFixed(amountWithoutSlippage)
           .multiply(maxSlippage[tokenAddress])
