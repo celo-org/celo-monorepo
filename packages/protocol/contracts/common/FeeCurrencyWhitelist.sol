@@ -33,6 +33,7 @@ contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable {
    * @param tokenAddress The address of the token to add.
    */
   function addNonMentoToken(address tokenAddress) external onlyOwner {
+    nonMentoTokenWhitelist.push(tokenAddress);
     whitelist.push(tokenAddress);
   }
 

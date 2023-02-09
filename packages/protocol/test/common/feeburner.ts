@@ -146,13 +146,20 @@ contract('FeeBurner', (accounts: string[]) => {
         from: user,
       })
 
+      // burn for a token is zero
+      assertEqualBN(await feeBurner.getPastBurnForToken(stableToken.address), new BigNumber(0))
+
       console.log('balance of user is', (await stableToken.balanceOf(user)).toString())
       console.log(
         'balance of contract is',
         (await stableToken.balanceOf(feeBurner.address)).toString()
       )
 
+      const burnedAmountStable = await stableToken.balanceOf(feeBurner.address)
+
       await feeBurner.burn()
+
+      assertEqualBN(await feeBurner.getPastBurnForToken(stableToken.address), burnedAmountStable)
 
       // all Celo must have been burned
       assertEqualBN(await goldToken.balanceOf(feeBurner.address), new BigNumber(0))
@@ -165,11 +172,12 @@ contract('FeeBurner', (accounts: string[]) => {
       // burn
     })
 
-    it("doesn't burrn when balance is low", async () => {
-      const balanceBefore = await stableToken.balanceOf(feeBurner.address)
+    it.only("doesn't burn when balance is low", async () => {
       await stableToken.transfer(feeBurner.address, new BigNumber(await feeBurner.MIN_BURN()), {
         from: user,
       })
+
+      const balanceBefore = await stableToken.balanceOf(feeBurner.address)
 
       await feeBurner.burn()
 

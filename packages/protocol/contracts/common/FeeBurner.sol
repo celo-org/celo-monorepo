@@ -19,9 +19,10 @@ import "../stability/interfaces/IExchange.sol";
 // TODO maybe add an upperbound so that you can't trade more
 // multisig that owns this and have a killswitch
 // Non-Mento assets do it permisionless.
+// TODO make it not fail for everything if one exchange is burst
 
 interface IUniswapV2Router {
-  function getAmountsOut(uint256 amountIn, address[] memory path)
+  function getAmountsOut(uint256 amountIn, address[] calldata path)
     external
     view
     returns (uint256[] memory amounts);
@@ -47,11 +48,18 @@ interface IUniswapV2Router {
 contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract {
   using SafeMath for uint256;
 
-  // event CeloBalance(uint256 celoBalance);
-  event SoldAndBurnedToken(address token, uint256 value);
-
   uint256 public constant MIN_BURN = 200;
   mapping(address => uint256) public pastBurn;
+  mapping(address => uint256) public dailyBurnLimit;
+  mapping(address => uint256) public currentDayLimit;
+  mapping(address => address[]) public poolAddresses;
+  mapping(address => bool) public limitSet;
+
+  uint256 public lastLimitDay;
+
+  // event CeloBalance(uint256 celoBalance);
+  event SoldAndBurnedToken(address token, uint256 value);
+  event DailyLimitHit(address token, uint256 burning);
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -79,30 +87,59 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     celo.burn(celo.balanceOf(address(this)));
   }
 
+  function getPastBurnForToken(address tokenAddress) external view returns (uint256) {
+    return pastBurn[tokenAddress];
+  }
+
+  function limitHit(address tokenAddress, uint256 amountToBurn) public returns (bool) {
+    if (!limitSet[tokenAddress]) {
+      // if no limit set, assume uncapped
+      return true;
+    }
+
+    uint256 currentDay = now / 1 days;
+    if (currentDay > lastLimitDay) {
+      lastLimitDay = currentDay;
+      currentDayLimit[tokenAddress] = dailyBurnLimit[tokenAddress];
+    }
+
+    require(currentDayLimit[tokenAddress] >= amountToBurn, "Exceeding exchange limit");
+  }
+
+  function updateLimits(address tokenAddress, uint256 amountBurned) private returns (bool) {
+    if (limitSet[tokenAddress]) {
+      currentDayLimit[tokenAddress] = currentDayLimit[tokenAddress].sub(amountBurned);
+      // if no limit set, assume uncapped
+      return true;
+    }
+    return false;
+  }
+
   // this function is permionless
   function burnMentoAssets() private {
-    // 1. reserve contrac
-    address[] memory mentoTokens = getReserve().getTokens();
-    // shall this be fee token whitelist?
     // here we could also check that the tokens is whitelisted, but we assume everything that has already been sent here is
     // due for burning
+    address[] memory mentoTokens = getReserve().getTokens();
 
     // require(false, "start"); // TODO remove me
 
     for (uint256 i = 0; i < mentoTokens.length; i++) {
       address tokenAddress = mentoTokens[i];
+
       StableToken stableToken = StableToken(tokenAddress);
       uint256 balanceToBurn = stableToken.balanceOf(address(this));
 
-      // small numbers cause rounding errors
-      // zero case should be skiped
-      // TODO make this LT
+      if (!limitHit(tokenAddress, balanceToBurn)) {
+        // in case the limit is hit, burn the max possible
+        balanceToBurn = currentDayLimit[tokenAddress];
+        emit DailyLimitHit(tokenAddress, balanceToBurn);
+      }
 
-      // add a check Mento is on-check
-
-      if (balanceToBurn < 100) {
+      // small numbers cause rounding errors and zero case should be skiped
+      if (balanceToBurn <= MIN_BURN) {
         continue;
       }
+
       address exchangeAddress = registryContract.getAddressForOrDie(
         stableToken.getExchangeRegistryId()
       );
@@ -114,9 +151,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
       stableToken.approve(exchangeAddress, balanceToBurn);
       exchange.sell(balanceToBurn, 0, false);
-
-      // TODO test this update burned amounts here
       pastBurn[tokenAddress] += balanceToBurn;
+
+      updateLimits(exchangeAddress, balanceToBurn);
+
       emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
 
       // uint256 celoBalance = celo.balanceOf(address(this));
@@ -124,9 +162,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       // require(celoBalance > 0, "Celo Balance not bigger than zero"); // TODO remove me
 
     }
-
-    // TODO add some accounting about the amounts burned
-    // TODO send an event
 
   }
 
