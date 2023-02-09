@@ -104,7 +104,7 @@ contract('GoldToken', (accounts: string[]) => {
       assertEqualBN(circulatingSupply, ONE_GOLDTOKEN.multipliedBy(999))
       assertEqualBN(
         circulatingSupply,
-        (await mockGoldToken.totalSupply()).plus(ONE_GOLDTOKEN.multipliedBy(-1))
+        new BigNumber(await mockGoldToken.totalSupply()).plus(ONE_GOLDTOKEN.multipliedBy(-1))
       )
     })
   })
