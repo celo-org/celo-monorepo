@@ -6,7 +6,6 @@ import { parseSolidityStringArray } from '@celo/base/lib/parsing'
 import { appendPath } from '@celo/base/lib/string'
 import { Address, Connection, toTransactionObject } from '@celo/connect'
 import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
-import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Attestations } from '../generated/Attestations'
@@ -29,25 +28,6 @@ function hashAddressToSingleDigit(address: Address): number {
 
 export function getSecurityCodePrefix(issuerAddress: Address) {
   return `${hashAddressToSingleDigit(issuerAddress)}`
-}
-
-// from '@celo/phone-utils/lib/io'
-interface AttestationRequest {
-  phoneNumber: string
-  account: string
-  issuer: string
-  salt: string | undefined
-  smsRetrieverAppSig: string | undefined
-  securityCodePrefix: string | undefined
-  language: string | undefined
-  phoneNumberSignature: string | undefined
-}
-interface GetAttestationRequest {
-  phoneNumber: string
-  account: string
-  issuer: string
-  salt: string | undefined
-  securityCode: string | undefined
 }
 
 export interface AttestationStat {
@@ -398,28 +378,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Completes an attestation with the corresponding code
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   * @param issuer The issuer of the attestation
-   * @param code The code received by the validator
-   */
-  async complete(identifier: string, account: Address, issuer: Address, code: string) {
-    const accounts = await this.contracts.getAccounts()
-    const attestationSigner = await accounts.getAttestationSigner(issuer)
-    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromIdentifier(
-      identifier,
-      account
-    )
-    const { r, s, v } = SignatureUtils.parseSignature(
-      expectedSourceMessage,
-      code,
-      attestationSigner
-    )
-    return toTransactionObject(this.connection, this.contract.methods.complete(identifier, v, r, s))
-  }
-
-  /**
    * Returns the attestation signer for the specified account.
    * @param account The address of token rewards are accumulated in.
    * @param account The address of the account.
@@ -544,144 +502,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     }
 
     return result
-  }
-
-  /**
-   * Requests a new attestation
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param attestationsRequested The number of attestations to request
-   */
-  async request(identifier: string, attestationsRequested: number) {
-    const contract = await this.contracts.getStableToken(StableToken.cUSD)
-
-    return toTransactionObject(
-      this.connection,
-      this.contract.methods.request(identifier, attestationsRequested, contract.address)
-    )
-  }
-
-  /**
-   * Updates sender's approval status on whether to allow an attestation identifier
-   * mapping to be transfered from one address to another.
-   * @param identifier The identifier for this attestation.
-   * @param index The index of the account in the accounts array.
-   * @param from The current attestation address to which the identifier is mapped.
-   * @param to The new address to map to identifier.
-   * @param status The approval status
-   */
-  approveTransfer = proxySend(this.connection, this.contract.methods.approveTransfer)
-
-  /**
-   * Selects the issuers for previously requested attestations for a phone number
-   * @param identifier Attestation identifier (e.g. phone hash)
-   */
-  selectIssuers(identifier: string) {
-    return toTransactionObject(this.connection, this.contract.methods.selectIssuers(identifier))
-  }
-
-  /**
-   * Waits appropriate number of blocks, then selects issuers for previously requested phone number attestations
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   */
-  async selectIssuersAfterWait(
-    identifier: string,
-    account: string,
-    timeoutSeconds?: number,
-    pollDurationSeconds?: number
-  ) {
-    await this.waitForSelectingIssuers(identifier, account, timeoutSeconds, pollDurationSeconds)
-    return this.selectIssuers(identifier)
-  }
-
-  /**
-   * Reveal phone number to issuer
-   * @param serviceURL: validator's attestation service URL
-   * @param body
-   */
-  revealPhoneNumberToIssuer(serviceURL: string, requestBody: AttestationRequest) {
-    return fetch(appendPath(serviceURL, 'attestations'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    })
-  }
-
-  /**
-   * Returns reveal status from validator's attestation service
-   * @param phoneNumber: attestation's phone number
-   * @param account: attestation's account
-   * @param issuer: validator's address
-   * @param serviceURL: validator's attestation service URL
-   * @param pepper: phone number privacy pepper
-   */
-  getRevealStatus(
-    phoneNumber: string,
-    account: Address,
-    issuer: Address,
-    serviceURL: string,
-    pepper?: string
-  ) {
-    const urlParams = new URLSearchParams({
-      phoneNumber,
-      salt: pepper ?? '',
-      issuer,
-      account,
-    })
-    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-
-  /**
-   * Returns attestation code for provided security code from validator's attestation service
-   * @param serviceURL: validator's attestation service URL
-   * @param body
-   */
-  async getAttestationForSecurityCode(
-    serviceURL: string,
-    requestBody: GetAttestationRequest,
-    signer: Address
-  ): Promise<string> {
-    const urlParams = new URLSearchParams({
-      phoneNumber: requestBody.phoneNumber,
-      account: requestBody.account,
-      issuer: requestBody.issuer,
-    })
-
-    let additionalHeaders = {}
-    if (requestBody.salt) {
-      urlParams.set('salt', requestBody.salt)
-    }
-    if (requestBody.securityCode) {
-      urlParams.set('securityCode', requestBody.securityCode)
-      const signature = await this.connection.signTypedData(
-        signer,
-        buildSecurityCodeTypedData(requestBody.securityCode)
-      )
-      additionalHeaders = {
-        Authentication: SignatureUtils.serializeSignature(signature),
-      }
-    }
-
-    const response = await fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json', ...additionalHeaders },
-    })
-
-    const { ok, status } = response
-    if (ok) {
-      const body = await response.json()
-      if (body.attestationCode) {
-        return body.attestationCode
-      }
-    }
-    throw new Error(
-      `Error getting security code for ${requestBody.issuer}. ${status}: ${await response.text()}`
-    )
   }
 
   /**

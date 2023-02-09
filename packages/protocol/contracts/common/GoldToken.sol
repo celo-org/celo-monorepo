@@ -31,8 +31,8 @@ contract GoldToken is
 
   mapping(address => mapping(address => uint256)) internal allowed;
 
+  // Burn address is 0xdEaD because truffle is having buggy behaviour with the zero address
   address constant BURN_ADDRESS = address(0x000000000000000000000000000000000000dEaD);
-  // address constant BURN_ADDRESS = address(0);
 
   event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -95,9 +95,9 @@ contract GoldToken is
   }
 
   /**
-   * @notice This function allows a user to burn a specific value of tokens.
+   * @notice This function allows a user to burn a specific amount of tokens.
      Burning is implemented by sending tokens to the burn address.
-   * @param value: The amount of tokens to burn.
+   * @param value: The amount of CELO to burn.
    * @return True if burn was successful.
    */
   function burn(uint256 value) external returns (bool) {
@@ -246,7 +246,7 @@ contract GoldToken is
   }
 
   /**
-   * @notice Gets the amount of CELO that has been burned
+   * @notice Gets the amount of CELO that has been burned.
    * @return The total amount of Celo that has been sent to the burn address.
    */
   function getBurnedAmount() public view returns (uint256) {
@@ -279,7 +279,7 @@ contract GoldToken is
   }
 
   /**
-   * @notice internal CELO transfer from one address to another.
+   * @notice Internal CELO transfer from one address to another.
    * @param to The address to transfer CELO to. Zero address will revert.
    * @param value The amount of CELO to transfer.
    * @return True if the transaction succeeds.
