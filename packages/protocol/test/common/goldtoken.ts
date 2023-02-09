@@ -102,7 +102,10 @@ contract('GoldToken', (accounts: string[]) => {
       const circulatingSupply = await mockGoldToken.circulatingSupply()
       // circulatingSupply got reduced to 999 after burning 1 Celo
       assertEqualBN(circulatingSupply, ONE_GOLDTOKEN.multipliedBy(999))
-      assertEqualBN(circulatingSupply, (await mockGoldToken.totalSupply()).minus(ONE_GOLDTOKEN))
+      assertEqualBN(
+        circulatingSupply,
+        (await mockGoldToken.totalSupply()).plus(ONE_GOLDTOKEN.multipliedBy(-1))
+      )
     })
   })
 
