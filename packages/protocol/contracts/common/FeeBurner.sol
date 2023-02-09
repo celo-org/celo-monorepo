@@ -20,6 +20,26 @@ import "../stability/interfaces/IExchange.sol";
 // multisig that owns this and have a killswitch
 // Non-Mento assets do it permisionless.
 
+interface IUniswapV2Router {
+  function getAmountsOut(uint256 amountIn, address[] memory path)
+    external
+    view
+    returns (uint256[] memory amounts);
+
+  function swapExactTokensForTokens(
+    //amount of tokens we are sending in
+    uint256 amountIn,
+    //the minimum amount of tokens we want out of the trade
+    uint256 amountOutMin,
+    //list of token addresses we are going to trade in.  this is necessary to calculate amounts
+    address[] calldata path,
+    //this is the address we are going to send the output tokens to
+    address to,
+    //the last time that the trade is valid for
+    uint256 deadline
+  ) external returns (uint256[] memory amounts);
+}
+
 /**
  * @title TODO
 
@@ -88,7 +108,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       );
 
       IExchange exchange = IExchange(exchangeAddress);
-      // TODO update burned amounts here
 
       // minBuyAmount is zero because this functions is meant to be called reguarly with small amounts
       // TODO calculate a max of slipagge
@@ -96,6 +115,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       stableToken.approve(exchangeAddress, balanceToBurn);
       exchange.sell(balanceToBurn, 0, false);
 
+      // TODO test this update burned amounts here
       pastBurn[tokenAddress] += balanceToBurn;
       emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
 
