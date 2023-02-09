@@ -53,13 +53,15 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   mapping(address => uint256) public dailyBurnLimit;
   mapping(address => uint256) public currentDayLimit;
   mapping(address => address[]) public poolAddresses;
-  mapping(address => bool) public limitSet;
 
   uint256 public lastLimitDay;
 
   // event CeloBalance(uint256 celoBalance);
   event SoldAndBurnedToken(address token, uint256 value);
+  event DailyLimitSet(address tokenAddress, uint256 newLimit);
   event DailyLimitHit(address token, uint256 burning);
+
+  event DailyLimitUpdatedDeleteMe(uint256 amount);
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -71,16 +73,17 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
   function initialize(address _registryAddress) external initializer {
-    // TODO
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
+    // lastLimitDay = now / 1 days;
+    // TODO add limits
   }
 
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 0, 0, 0);
   }
 
-  // chose the best price from options
+  // TODO chose the best price from options
 
   function burnAllCelo() private {
     ICeloToken celo = ICeloToken(getCeloTokenAddress());
@@ -91,10 +94,15 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     return pastBurn[tokenAddress];
   }
 
+  function setDailyBurnLimit(address tokenAddress, uint256 newLimit) external onlyOwner {
+    dailyBurnLimit[tokenAddress] = newLimit;
+    emit DailyLimitSet(tokenAddress, newLimit);
+  }
+
   function limitHit(address tokenAddress, uint256 amountToBurn) public returns (bool) {
-    if (!limitSet[tokenAddress]) {
+    if (dailyBurnLimit[tokenAddress] == 0) {
       // if no limit set, assume uncapped
-      return true;
+      return false;
     }
 
     uint256 currentDay = now / 1 days;
@@ -103,16 +111,17 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       currentDayLimit[tokenAddress] = dailyBurnLimit[tokenAddress];
     }
 
-    require(currentDayLimit[tokenAddress] >= amountToBurn, "Exceeding exchange limit");
+    return amountToBurn >= currentDayLimit[tokenAddress];
   }
 
   function updateLimits(address tokenAddress, uint256 amountBurned) private returns (bool) {
-    if (limitSet[tokenAddress]) {
-      currentDayLimit[tokenAddress] = currentDayLimit[tokenAddress].sub(amountBurned);
+    if (dailyBurnLimit[tokenAddress] == 0) {
       // if no limit set, assume uncapped
-      return true;
+      return false;
     }
-    return false;
+    currentDayLimit[tokenAddress] = currentDayLimit[tokenAddress].sub(amountBurned);
+    emit DailyLimitUpdatedDeleteMe(amountBurned);
+    return true;
   }
 
   // this function is permionless
@@ -129,7 +138,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       StableToken stableToken = StableToken(tokenAddress);
       uint256 balanceToBurn = stableToken.balanceOf(address(this));
 
-      if (!limitHit(tokenAddress, balanceToBurn)) {
+      if (limitHit(tokenAddress, balanceToBurn)) {
         // in case the limit is hit, burn the max possible
         balanceToBurn = currentDayLimit[tokenAddress];
         emit DailyLimitHit(tokenAddress, balanceToBurn);
@@ -153,7 +162,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       exchange.sell(balanceToBurn, 0, false);
       pastBurn[tokenAddress] += balanceToBurn;
 
-      updateLimits(exchangeAddress, balanceToBurn);
+      updateLimits(tokenAddress, balanceToBurn);
 
       emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
 

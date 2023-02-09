@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertEqualBN, assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertEqualBN, assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -129,6 +129,12 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it('should not be callable again', async () => {
+      await assertRevert(feeBurner.initialize(registry.address, { from: user }))
+    })
+  })
+
+  describe('#setDailyBurnLimit()', () => {
+    it('should only be called by owwer', async () => {
       await assertRevert(feeBurner.initialize(registry.address))
     })
   })
@@ -172,7 +178,37 @@ contract('FeeBurner', (accounts: string[]) => {
       // burn
     })
 
-    it.only("doesn't burn when balance is low", async () => {
+    it("doesn't burn when bigger than limit", async () => {
+      await feeBurner.setDailyBurnLimit(stableToken.address, new BigNumber(1000))
+
+      await stableToken.transfer(feeBurner.address, new BigNumber(3000), {
+        from: user,
+      })
+
+      await feeBurner.burn()
+
+      assertEqualBN(await stableToken.balanceOf(feeBurner.address), new BigNumber(2000))
+
+      // burning again shouldn't do anything
+      await feeBurner.burn()
+      assertEqualBN(await stableToken.balanceOf(feeBurner.address), new BigNumber(2000))
+    })
+
+    it('reset burn limit after 24 hours', async () => {
+      await feeBurner.setDailyBurnLimit(stableToken.address, new BigNumber(1000))
+
+      await stableToken.transfer(feeBurner.address, new BigNumber(3000), {
+        from: user,
+      })
+
+      await feeBurner.burn()
+      await timeTravel(3600 * 24, web3)
+      await feeBurner.burn()
+
+      assertEqualBN(await stableToken.balanceOf(feeBurner.address), new BigNumber(1000))
+    })
+
+    it("doesn't burn when balance is low", async () => {
       await stableToken.transfer(feeBurner.address, new BigNumber(await feeBurner.MIN_BURN()), {
         from: user,
       })
@@ -184,7 +220,7 @@ contract('FeeBurner', (accounts: string[]) => {
       assertEqualBN(await stableToken.balanceOf(feeBurner.address), balanceBefore)
     })
 
-    it("doesn't exchange in case of big slipage", async () => {
+    it.skip("doesn't exchange in case of big slipage", async () => {
       // await assertRevert(feeCurrencyWhitelist.addToken(aTokenAddress, { from: nonOwner }))
     })
   })
