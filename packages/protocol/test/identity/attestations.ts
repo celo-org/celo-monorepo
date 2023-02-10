@@ -290,17 +290,17 @@ contract('Attestations', (accounts: string[]) => {
   })
 
   function getVerificationCodeSignature(
-    account: string,
-    issuer: string,
-    identifier: string,
-    accounts: string[]
+    _account: string,
+    _issuer: string,
+    _identifier: string,
+    _accounts: string[]
   ): Signature {
-    const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, issuer, accounts)
+    const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, _issuer, accounts)
 
     const { v, r, s } = SignatureUtils.signMessage(
-      soliditySha3({ type: 'bytes32', value: identifier }, { type: 'address', value: account })!,
+      soliditySha3({ type: 'bytes32', value: _identifier }, { type: 'address', value: _account })!,
       privateKey,
-      issuer
+      _issuer
     )
     return { v, r, s }
   }
