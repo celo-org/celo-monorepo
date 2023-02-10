@@ -1,6 +1,7 @@
 export * from './countries'
 export { Countries, LocalizedCountry } from './countries'
 export * from './getCountryEmoji'
+export * from './getPhoneHash'
 export * from './inputValidation'
 export * from './io'
 export {

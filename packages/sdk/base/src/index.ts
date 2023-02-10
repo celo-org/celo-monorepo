@@ -1,6 +1,7 @@
 export * from './account'
 export * from './address'
 export * from './async'
+export * from './attestations'
 export * from './collections'
 export * from './contacts'
 export * from './currencies'
