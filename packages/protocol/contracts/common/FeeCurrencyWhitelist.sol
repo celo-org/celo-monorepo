@@ -48,4 +48,8 @@ contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable {
   function getWhitelist() external view returns (address[] memory) {
     return whitelist;
   }
+
+  function getWhitelistNonMento() external view returns (address[] memory) {
+    return nonMentoTokenWhitelist;
+  }
 }

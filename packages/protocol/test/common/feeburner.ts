@@ -44,6 +44,7 @@ contract('FeeBurner', (accounts: string[]) => {
   let exchange: ExchangeInstance
   let registry: RegistryInstance
   let stableToken: StableTokenInstance
+  let dummyToken: StableTokenInstance
   let goldToken: GoldTokenInstance
   let mockSortedOracles: MockSortedOraclesInstance
   let mockReserve: MockReserveInstance
@@ -73,6 +74,7 @@ contract('FeeBurner', (accounts: string[]) => {
     goldToken = await GoldToken.new(true)
     mockReserve = await MockReserve.new()
     stableToken = await StableToken.new(true)
+    dummyToken = await StableToken.new(true)
     registry = await Registry.new(true)
     feeBurner = await FeeBurner.new(true)
     freezer = await Freezer.new(true)
@@ -243,7 +245,11 @@ contract('FeeBurner', (accounts: string[]) => {
       assertEqualBN(await stableToken.balanceOf(feeBurner.address), balanceBefore)
     })
 
-    it.skip("doesn't exchange in case of big slipage", async () => {
+    it.only('sets pool for exchange', async () => {
+      // TODO change for UNISWAP address
+      await feeBurner.setExchange(dummyToken.address, dummyToken.address)
+
+      assert(await feeBurner.poolAddresses(dummyToken.address, 0), dummyToken.address)
       // await assertRevert(feeCurrencyWhitelist.addToken(aTokenAddress, { from: nonOwner }))
     })
   })
