@@ -1,11 +1,10 @@
 import { StableToken } from '@celo/base'
-import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
+import { eqAddress } from '@celo/base/lib/address'
 import { concurrentMap, sleep } from '@celo/base/lib/async'
 import { notEmpty, zip3 } from '@celo/base/lib/collections'
 import { parseSolidityStringArray } from '@celo/base/lib/parsing'
 import { appendPath } from '@celo/base/lib/string'
 import { Address, Connection, toTransactionObject } from '@celo/connect'
-import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
 import { Attestations } from '../generated/Attestations'
@@ -247,15 +246,30 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async getVerifiedStatus(
     identifier: string,
     account: Address,
-    numAttestationsRequired?: number,
-    attestationThreshold?: number
+    numAttestationsRequired: number = 3,
+    attestationThreshold: number = 0.25
   ) {
-    const attestationStats = await this.getAttestationStat(identifier, account)
-    return AttestationUtils.isAccountConsideredVerified(
-      attestationStats,
-      numAttestationsRequired,
-      attestationThreshold
-    )
+    const stats = await this.getAttestationStat(identifier, account)
+    if (!stats) {
+      return {
+        isVerified: false,
+        numAttestationsRemaining: 0,
+        total: 0,
+        completed: 0,
+      }
+    }
+    const numAttestationsRemaining = numAttestationsRequired - stats.completed
+    const fractionAttestation = stats.total < 1 ? 0 : stats.completed / stats.total
+    // 'verified' is a term of convenience to mean that the attestation stats for a
+    // given identifier are beyond a certain threshold of confidence
+    const isVerified = numAttestationsRemaining <= 0 && fractionAttestation >= attestationThreshold
+
+    return {
+      isVerified,
+      numAttestationsRemaining,
+      total: stats.total,
+      completed: stats.completed,
+    }
   }
 
   /**
@@ -396,37 +410,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   withdraw = proxySend(this.connection, this.contract.methods.withdraw)
 
   /**
-   * Given a list of issuers, finds the matching issuer for a given code
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   * @param code The code received by the validator
-   * @param issuers The list of potential issuers
-   */
-  async findMatchingIssuer(
-    identifier: string,
-    account: Address,
-    code: string,
-    issuers: string[]
-  ): Promise<string | null> {
-    const accounts = await this.contracts.getAccounts()
-    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromIdentifier(
-      identifier,
-      account
-    )
-    for (const issuer of issuers) {
-      const attestationSigner = await accounts.getAttestationSigner(issuer)
-
-      try {
-        SignatureUtils.parseSignature(expectedSourceMessage, code, attestationSigner)
-        return issuer
-      } catch (error) {
-        continue
-      }
-    }
-    return null
-  }
-
-  /**
    * Returns the current configuration parameters for the contract.
    * @param tokens List of tokens used for attestation fees. use CeloTokens.getAddresses() to get
    * @return AttestationsConfig object
@@ -502,36 +485,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     }
 
     return result
-  }
-
-  /**
-   * Validates a given code by the issuer on-chain
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account The address of the account which requested attestation
-   * @param issuer The address of the issuer of the attestation
-   * @param code The code send by the issuer
-   */
-  async validateAttestationCode(
-    identifier: string,
-    account: Address,
-    issuer: Address,
-    code: string
-  ) {
-    const accounts = await this.contracts.getAccounts()
-    const attestationSigner = await accounts.getAttestationSigner(issuer)
-    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromIdentifier(
-      identifier,
-      account
-    )
-    const { r, s, v } = SignatureUtils.parseSignature(
-      expectedSourceMessage,
-      code,
-      attestationSigner
-    )
-    const result = await this.contract.methods
-      .validateAttestationCode(identifier, account, v, r, s)
-      .call()
-    return result.toLowerCase() !== NULL_ADDRESS
   }
 
   /**

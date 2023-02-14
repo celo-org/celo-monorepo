@@ -1,17 +1,4 @@
 {
-  "@celo/attestation-proxy": {
-    "location": "packages/attestation-proxy",
-    "dependencies": []
-  },
-  "@celo/attestation-service": {
-    "location": "packages/attestation-service",
-    "dependencies": [
-      "@celo/contractkit",
-      "@celo/identity",
-      "@celo/keystores",
-      "@celo/phone-utils"
-    ]
-  },
   "celo-azure-build": {
     "location": "packages/azure",
     "dependencies": []
