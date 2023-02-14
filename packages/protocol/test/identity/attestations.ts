@@ -296,11 +296,15 @@ contract('Attestations', (accounts: string[]) => {
     _accounts: string[]
   ): Signature {
     const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, _issuer, _accounts)
-
+    const derivedIssuerAddress = privateKeyToAddress(privateKey)
+    const attestationMessageFromIdentifier = soliditySha3(
+      { type: 'bytes32', value: _identifier },
+      { type: 'address', value: _account }
+    )!
     const { v, r, s } = SignatureUtils.signMessage(
-      soliditySha3({ type: 'bytes32', value: _identifier }, { type: 'address', value: _account })!,
+      attestationMessageFromIdentifier,
       privateKey,
-      _issuer
+      derivedIssuerAddress
     )
     return { v, r, s }
   }
