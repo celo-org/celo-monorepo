@@ -35,23 +35,26 @@ git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build contract artifacts"
 rm -rf build/contracts
-# rm -rf ../sdk/cryptographic-utils/lib
-rm -rf ../sdk/cryptographic-utils/lib ../sdk/base/lib ../sdk/utils/lib ../sdk/phone-utils/lib
-echo "building base"
-cd ../sdk/base
-yarn build
-echo "building utils"
-cd ../utils
-yarn build
-echo "building phone-utils"
-cd ../phone-utils
-yarn build
-cd ../cryptographic-utils
-yarn build
-cd ../../protocol
+cd ../..
 yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
+# # rm -rf ../sdk/cryptographic-utils/lib
+# rm -rf ../sdk/cryptographic-utils/lib ../sdk/base/lib ../sdk/utils/lib ../sdk/phone-utils/lib
+# echo "building base"
+# cd ../sdk/base
+# yarn build
+# echo "building utils"
+# cd ../utils
+# yarn build
+# echo "building phone-utils"
+# cd ../phone-utils
+# yarn build
+# cd ../cryptographic-utils
+# yarn build
+# cd ../../protocol
 
+cd packages/protocol
+# TODO EN: check if moving to build:sol is preferable
 # TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"
 if [ -z "$GRANTS_FILE" ]; then
