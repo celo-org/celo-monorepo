@@ -42,10 +42,10 @@ cd ../sdk/base
 yarn build
 echo "building utils"
 cd ../utils
-yarn install && yarn build
+yarn build
 echo "building phone-utils"
 cd ../phone-utils
-yarn install && yarn build
+yarn build
 cd ../cryptographic-utils
 yarn build
 cd ../../protocol
