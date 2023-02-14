@@ -295,7 +295,7 @@ contract('Attestations', (accounts: string[]) => {
     _identifier: string,
     _accounts: string[]
   ): Signature {
-    const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, _issuer, accounts)
+    const privateKey = getDerivedKey(KeyOffsets.ATTESTING_KEY_OFFSET, _issuer, _accounts)
 
     const { v, r, s } = SignatureUtils.signMessage(
       soliditySha3({ type: 'bytes32', value: _identifier }, { type: 'address', value: _account })!,
