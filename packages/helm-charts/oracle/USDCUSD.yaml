@@ -3,8 +3,8 @@ oracle:
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
-      maxPercentageDeviation: 0.05
-      maxPercentageBidAskSpread: 0.025
+      maxPercentageDeviation: 0.01
+      maxPercentageBidAskSpread: 0.005
       # minReportPriceChangeThreshold
   metrics:
     enabled: true
@@ -16,14 +16,19 @@ oracle:
         {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false}
       ],
       [
-        {exchange: 'BITSTAMP', symbol: 'USDCUSD', toInvert: false}
+        {exchange: 'BINANCEUS', symbol: 'USDCUSD', toInvert: false}
       ],
       [
-        { exchange: 'GEMINI', symbol: 'USDCUSD', toInvert: false }
+        {exchange: 'COINBASE', symbol: 'USDTUSDC', toInvert: true},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
+      ],
+      [
+        {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
       ]
     ]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
-      minReportPriceChangeThreshold: 0.005 # 0.5%
+      minReportPriceChangeThreshold: 0.0005 # 0.05%

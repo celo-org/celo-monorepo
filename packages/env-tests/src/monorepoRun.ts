@@ -3,7 +3,6 @@ import Web3 from 'web3'
 import { loadFromEnvFile } from './env'
 import { rootLogger } from './logger'
 import { clearAllFundsToRoot, parseStableTokensList } from './scaffold'
-// import { runAttestationTest } from './tests/attestation'
 import { runExchangeTest } from './tests/exchange'
 import { runGrandaMentoTest } from './tests/granda-mento'
 import { runOracleTest } from './tests/oracle'
@@ -41,7 +40,6 @@ function runTests() {
     runExchangeTest(context, stableTokensToTest)
     runOracleTest(context)
     runReserveTest(context)
-    // runAttestationTest(context)
     runGrandaMentoTest(context, stableTokensToTest)
 
     // TODO: Governance Proposals
