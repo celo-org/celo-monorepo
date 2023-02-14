@@ -65,6 +65,8 @@ contract('FeeBurner', (accounts: string[]) => {
   let tokenA: MockERC20Instance
   let tokenB: MockERC20Instance
 
+  let deadline: number
+
   // const aTokenAddress = '0x000000000000000000000000000000000000ce10'
 
   // const nonOwner = accounts[1]
@@ -86,6 +88,7 @@ contract('FeeBurner', (accounts: string[]) => {
   const user = accounts[1]
 
   beforeEach(async () => {
+    deadline = (await web3.eth.getBlock('latest')).timestamp + 100
     goldToken = await GoldToken.new(true)
     mockReserve = await MockReserve.new()
     stableToken = await StableToken.new(true)
@@ -284,15 +287,10 @@ contract('FeeBurner', (accounts: string[]) => {
       await tokenA.mint(user, new BigNumber(10e18))
       await tokenB.mint(user, new BigNumber(10e18))
 
-      console.log(uniswap.address)
       const toTransfer = new BigNumber(5e18)
 
       await tokenA.approve(uniswap.address, toTransfer, { from: user })
       await tokenB.approve(uniswap.address, toTransfer, { from: user })
-      console.log('tokenA.address', tokenA.address)
-      console.log('tokenB.address', tokenB.address)
-
-      const deadline = (await web3.eth.getBlock('latest')).timestamp + 100
 
       await uniswap.addLiquidity(
         tokenA.address,

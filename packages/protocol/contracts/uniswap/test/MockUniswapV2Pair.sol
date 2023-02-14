@@ -1,13 +1,13 @@
 pragma solidity ^0.5.13;
 
-import "./interfaces/IUniswapV2Pair.sol";
+import "../interfaces/IUniswapV2Pair.sol";
 import "./UniswapV2ERC20.sol";
 import "./libraries/Math.sol";
 import "./libraries/UQ112x112.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
-import "./interfaces/IUniswapV2Factory.sol";
-import "./interfaces/IUniswapV2Callee.sol";
+import "../interfaces/IUniswapV2Factory.sol";
+import "../interfaces/IUniswapV2Callee.sol";
 
 contract MockUniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
   using SafeMath for uint256;
