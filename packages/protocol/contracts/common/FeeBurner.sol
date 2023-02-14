@@ -301,9 +301,9 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     // 2. burn
   }
 
-  function transfer(address poolAddress, address recipient, uint256 value) external onlyOwner {
+  function transfer(address token, address recipient, uint256 value) external onlyOwner {
     // meant for governance to trigger use cases not contemplated in this contract
-    IERC20 token = IERC20(poolAddress);
+    IERC20 token = IERC20(token);
     token.transfer(recipient, value);
   }
 

@@ -1,5 +1,5 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
-import { assertEqualBN, assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
+import { assertEqualBN, assertGtBN, assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -11,10 +11,16 @@ import {
   FreezerInstance,
   GoldTokenContract,
   GoldTokenInstance,
+  MockERC20Contract,
+  MockERC20Instance,
   MockReserveContract,
   MockReserveInstance,
   MockSortedOraclesContract,
   MockSortedOraclesInstance,
+  MockUniswapV2FactoryContract,
+  MockUniswapV2FactoryInstance,
+  MockUniswapV2Router02Contract,
+  MockUniswapV2Router02Instance,
   RegistryContract,
   RegistryInstance,
   StableTokenContract,
@@ -39,6 +45,10 @@ const MockReserve: MockReserveContract = artifacts.require('MockReserve')
 const StableToken: StableTokenContract = artifacts.require('StableToken')
 const Freezer: FreezerContract = artifacts.require('Freezer')
 
+const UniswapRouter: MockUniswapV2Router02Contract = artifacts.require('MockUniswapV2Router02')
+const UniswapV2Factory: MockUniswapV2FactoryContract = artifacts.require('MockUniswapV2Factory')
+const ERC20: MockERC20Contract = artifacts.require('MockERC20')
+
 contract('FeeBurner', (accounts: string[]) => {
   let feeBurner: FeeBurnerInstance
   let exchange: ExchangeInstance
@@ -49,6 +59,11 @@ contract('FeeBurner', (accounts: string[]) => {
   let mockSortedOracles: MockSortedOraclesInstance
   let mockReserve: MockReserveInstance
   let freezer: FreezerInstance
+
+  let uniswapFactory: MockUniswapV2FactoryInstance
+  let uniswap: MockUniswapV2Router02Instance
+  let tokenA: MockERC20Instance
+  let tokenB: MockERC20Instance
 
   // const aTokenAddress = '0x000000000000000000000000000000000000ce10'
 
@@ -78,6 +93,14 @@ contract('FeeBurner', (accounts: string[]) => {
     registry = await Registry.new(true)
     feeBurner = await FeeBurner.new(true)
     freezer = await Freezer.new(true)
+
+    uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
+    console.log('hash', await uniswapFactory.INIT_CODE_PAIR_HASH())
+    // 0x2bfd701f0ec7fe6631627822d4675473606aaf94b22b804c1c02b8414810bfd4
+    uniswap = await UniswapRouter.new(
+      uniswapFactory.address,
+      '0x0000000000000000000000000000000000000000'
+    ) // _factory, _WETH
 
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
 
@@ -245,12 +268,68 @@ contract('FeeBurner', (accounts: string[]) => {
       assertEqualBN(await stableToken.balanceOf(feeBurner.address), balanceBefore)
     })
 
-    it.only('sets pool for exchange', async () => {
+    it('sets pool for exchange', async () => {
       // TODO change for UNISWAP address
-      await feeBurner.setExchange(dummyToken.address, dummyToken.address)
+      await feeBurner.setExchange(dummyToken.address, dummyToken.address, dummyToken.address)
 
       assert(await feeBurner.poolAddresses(dummyToken.address, 0), dummyToken.address)
       // await assertRevert(feeCurrencyWhitelist.addToken(aTokenAddress, { from: nonOwner }))
+    })
+
+    it.only('Uniswap trade test', async () => {
+      // Make sure our uniswap mock works
+
+      tokenA = await ERC20.new()
+      tokenB = await ERC20.new()
+      await tokenA.mint(user, new BigNumber(10e18))
+      await tokenB.mint(user, new BigNumber(10e18))
+
+      console.log(uniswap.address)
+      const toTransfer = new BigNumber(5e18)
+
+      await tokenA.approve(uniswap.address, toTransfer, { from: user })
+      await tokenB.approve(uniswap.address, toTransfer, { from: user })
+      console.log('tokenA.address', tokenA.address)
+      console.log('tokenB.address', tokenB.address)
+
+      const deadline = (await web3.eth.getBlock('latest')).timestamp + 100
+
+      await uniswap.addLiquidity(
+        tokenA.address,
+        tokenB.address,
+        toTransfer,
+        toTransfer,
+        toTransfer,
+        toTransfer,
+        user,
+        deadline,
+        { from: user }
+      )
+
+      const balanceAbefore = await tokenA.balanceOf(user)
+      const balanceBbefore = await tokenB.balanceOf(user)
+
+      await tokenA.approve(uniswap.address, new BigNumber(1e18), { from: user })
+      await uniswap.swapExactTokensForTokens(
+        new BigNumber(1e18),
+        0,
+        [tokenA.address, tokenB.address],
+        user,
+        deadline,
+        { from: user }
+      )
+
+      console.log('balanceAbefore', balanceAbefore)
+      console.log('balanceAbefore', balanceBbefore)
+      console.log('await tokenA.balanceOf(user)', await tokenA.balanceOf(user))
+      console.log('await tokenB.balanceOf(user)', await tokenB.balanceOf(user))
+
+      assertGtBN(balanceAbefore, await tokenA.balanceOf(user))
+      assertGtBN(await tokenB.balanceOf(user), balanceBbefore)
+      // console.log((await tokenA.balanceOf(user)).toString())
+      // console.log((await tokenB.balanceOf(user)).toString())
+
+      // assert(false)
     })
   })
 })

@@ -5,7 +5,7 @@ import ".//libraries/TransferHelper.sol";
 
 import "./interfaces/IUniswapV2Router02.sol";
 import "./libraries/UniswapV2Library.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./libraries/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IWETH.sol";
 
@@ -15,6 +15,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
   address public factory; // TODO changed by volpe
   address public WETH; // TODO changed by volpe
 
+  event Pair(address pair);
   modifier ensure(uint256 deadline) {
     require(deadline >= block.timestamp, "UniswapV2Router: EXPIRED");
     _;
@@ -42,6 +43,9 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
     if (IUniswapV2Factory(factory).getPair(tokenA, tokenB) == address(0)) {
       IUniswapV2Factory(factory).createPair(tokenA, tokenB);
     }
+    // emit Pair(UniswapV2Library.pairFor(factory, tokenA, tokenB));
+    // require(false, "revert here");
+    (amountA, amountA);
     (uint256 reserveA, uint256 reserveB) = UniswapV2Library.getReserves(factory, tokenA, tokenB);
     if (reserveA == 0 && reserveB == 0) {
       (amountA, amountB) = (amountADesired, amountBDesired);
@@ -76,6 +80,7 @@ contract MockUniswapV2Router02 is IUniswapV2Router02 {
       amountAMin,
       amountBMin
     );
+    // require(false, "revert here");
     address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
     TransferHelper.safeTransferFrom(tokenA, msg.sender, pair, amountA);
     TransferHelper.safeTransferFrom(tokenB, msg.sender, pair, amountB);
