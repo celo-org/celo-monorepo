@@ -38,6 +38,7 @@ rm -rf build/contracts
 # cd ../..
 yarn install >> $LOG_FILE
 yarn build:sol >> $LOG_FILE
+yarn build:truffle-types >> $LOG_FILE
 # # rm -rf ../sdk/cryptographic-utils/lib
 # rm -rf ../sdk/cryptographic-utils/lib ../sdk/base/lib ../sdk/utils/lib ../sdk/phone-utils/lib
 # echo "building base"
