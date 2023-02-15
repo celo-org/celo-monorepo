@@ -36,7 +36,7 @@ git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 echo "- Build contract artifacts"
 rm -rf build/contracts
 cd ../..
-yarn run lerna run clean >> $LOG_FILE
+git clean -xdf >> $LOG_FILE
 yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
 # yarn build:sol >> $LOG_FILE
