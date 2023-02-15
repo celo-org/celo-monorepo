@@ -1,25 +1,8 @@
-// import { soliditySha3 } from '@celo/utils/lib/solidity'
-
-// const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
-
 export const PEPPER_SEPARATOR = '__'
 
 /**
  * Standardized prefixes for ODIS identifiers.
- *
- * @remarks These prefixes prevent collisions between off-chain identifiers.
- * i.e. if a user's instagram and twitter handles are the same,
- * these prefixes prevent the ODIS identifers from being the same.
- *
- * If you would like to use a prefix that isn't included, please put up a PR adding it
- * to ensure interoperability with other projects. When adding new prefixes,
- * please use either the full platform name in all lowercase (e.g. 'facebook')
- * or DID methods https://w3c.github.io/did-spec-registries/#did-methods.
- *
- * The NULL prefix is included to allow projects to use the sdk without selecting
- * a predefined prefix or adding their own. Production use of the NULL prefix is
- * discouraged since identifiers will not be interoperable with other projects.
- * Please think carefully before using the NULL prefix.
+ * Used in @celo/identity, @celo/phone-utils, and the protocol package.
  */
 export enum IdentifierPrefix {
   NULL = '',
@@ -45,15 +28,8 @@ export const getPrefixedIdentifier = (
 ): string => identifierPrefix + '://' + plaintextIdentifier
 
 /**
- * Generates final identifier that is published on-chain.
- *
- * @remarks
- * Concatenates the plaintext prefixed identifier with the pepper derived by hashing the unblinded
- * signature returned by ODIS.
- *
- * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
- * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
- * @param pepper Hash of the unblinded signature returned by ODIS
+ * Helper function for getIdentifierHash in @celo/identity, so that this can
+ * be used in protocol tests without dependency issues.
  */
 export const getIdentifierHash = (
   sha3: (a: string) => string | null,

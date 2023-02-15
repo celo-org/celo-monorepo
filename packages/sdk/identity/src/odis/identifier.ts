@@ -27,7 +27,6 @@ const debug = debugFactory('kit:odis:identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
-// const PEPPER_SEPARATOR = '__'
 
 /**
  * Standardized prefixes for ODIS identifiers.
@@ -36,7 +35,8 @@ const PEPPER_CHAR_LENGTH = 13
  * i.e. if a user's instagram and twitter handles are the same,
  * these prefixes prevent the ODIS identifers from being the same.
  *
- * If you would like to use a prefix that isn't included, please put up a PR adding it
+ * If you would like to use a prefix that isn't included, please put up a PR
+ * adding it to @celo/base (in celo-monorepo/packages/sdk/base/src/identifier.ts)
  * to ensure interoperability with other projects. When adding new prefixes,
  * please use either the full platform name in all lowercase (e.g. 'facebook')
  * or DID methods https://w3c.github.io/did-spec-registries/#did-methods.
@@ -46,20 +46,14 @@ const PEPPER_CHAR_LENGTH = 13
  * discouraged since identifiers will not be interoperable with other projects.
  * Please think carefully before using the NULL prefix.
  */
-// TODO EN: update comment to have people update this in base
-export { IdentifierPrefix, getPrefixedIdentifier }
-
-// export enum IdentifierPrefix {
-//   NULL = '',
-//   PHONE_NUMBER = 'tel',
-//   EMAIL = 'mailto',
-//   TWITTER = 'twit',
-//   FACEBOOK = 'facebook',
-//   INSTAGRAM = 'instagram',
-//   DISCORD = 'discord',
-//   TELEGRAM = 'telegram',
-//   SIGNAL = 'signal',
-// }
+export { IdentifierPrefix }
+/**
+ * Concatenates the identifierPrefix and plaintextIdentifier with the separator '://'
+ *
+ * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
+ * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
+ */
+export { getPrefixedIdentifier }
 
 /**
  * Steps from the private plaintext identifier to the obfuscated identifier, which can be made public.
@@ -273,17 +267,6 @@ export async function getObfuscatedIdentifierFromSignature(
   }
 }
 
-// /**
-//  * Concatenates the identifierPrefix and plaintextIdentifier with the separator '://'
-//  *
-//  * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
-//  * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
-//  */
-// export const getPrefixedIdentifier = (
-//   plaintextIdentifier: string,
-//   identifierPrefix: IdentifierPrefix
-// ): string => identifierPrefix + '://' + plaintextIdentifier
-
 /**
  * Generates final identifier that is published on-chain.
  *
@@ -301,16 +284,6 @@ export const getIdentifierHash = (
   pepper: string
 ): string => {
   return baseGetIdentifierHash(sha3, plaintextIdentifier, identifierPrefix, pepper)
-  // // hashing the identifier before appending the pepper to avoid domain collisions where the
-  // // identifier may contain underscores
-  // // not doing this for phone numbers to maintain backwards compatibility
-  // const value =
-  //   identifierPrefix === IdentifierPrefix.PHONE_NUMBER
-  //     ? getPrefixedIdentifier(plaintextIdentifier, identifierPrefix) + PEPPER_SEPARATOR + pepper
-  //     : (sha3(getPrefixedIdentifier(plaintextIdentifier, identifierPrefix)) as string) +
-  //       PEPPER_SEPARATOR +
-  //       pepper
-  // return sha3(value) as string
 }
 
 /**
