@@ -36,7 +36,7 @@ git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 echo "- Build contract artifacts"
 rm -rf build/contracts
 cd ../..
-yarn run lerna run clean
+yarn run lerna run clean >> $LOG_FILE
 yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
 # yarn build:sol >> $LOG_FILE
@@ -56,8 +56,6 @@ yarn build >> $LOG_FILE
 # cd ../phone-utils
 # yarn build
 # cd ../cryptographic-utils
-# yarn build:sol
-# cd ../../protocol
 cd packages/protocol
 # TODO EN: check if moving to build:sol is preferable
 # TODO: Move to yarn build:sol after the next contract release.
