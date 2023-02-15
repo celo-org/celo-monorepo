@@ -35,9 +35,9 @@ git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build contract artifacts"
 rm -rf build/contracts
-cd ../..
+# cd ../..
 yarn install >> $LOG_FILE
-yarn build >> $LOG_FILE
+yarn build:sol >> $LOG_FILE
 # # rm -rf ../sdk/cryptographic-utils/lib
 # rm -rf ../sdk/cryptographic-utils/lib ../sdk/base/lib ../sdk/utils/lib ../sdk/phone-utils/lib
 # echo "building base"
@@ -50,10 +50,10 @@ yarn build >> $LOG_FILE
 # cd ../phone-utils
 # yarn build
 # cd ../cryptographic-utils
-# yarn build
+# yarn build:sol
 # cd ../../protocol
 
-cd packages/protocol
+# cd packages/protocol
 # TODO EN: check if moving to build:sol is preferable
 # TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"
