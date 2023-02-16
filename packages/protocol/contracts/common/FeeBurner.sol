@@ -16,99 +16,8 @@ import "../stability/StableToken.sol"; // TODO check if this can be interface
 import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
-// import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "../uniswap/interfaces/IUniswapV2Router02.sol"; // TODO change for a more minimalist function
 
-// TODO maybe add an upperbound so that you can't trade more
-// multisig that owns this and have a killswitch
-// Non-Mento assets do it permisionless.
-// TODO make it not fail for everything if one exchange is burst
-
-interface IUniswapV2Router {
-  function getAmountsOut(uint256 amountIn, address[] calldata path)
-    external
-    view
-    returns (uint256[] memory amounts);
-
-  function swapExactTokensForTokens(
-    //amount of tokens we are sending in
-    uint256 amountIn,
-    //the minimum amount of tokens we want out of the trade
-    uint256 amountOutMin,
-    //list of token addresses we are going to trade in.  this is necessary to calculate amounts
-    address[] calldata path,
-    //this is the address we are going to send the output tokens to
-    address to,
-    //the last time that the trade is valid for
-    uint256 deadline
-  ) external returns (uint256[] memory amounts);
-}
-
-interface IUniswapV2Pair {
-  event Approval(address indexed owner, address indexed spender, uint256 value);
-  event Transfer(address indexed from, address indexed to, uint256 value);
-
-  function name() external pure returns (string memory);
-  function symbol() external pure returns (string memory);
-  function decimals() external pure returns (uint8);
-  function totalSupply() external view returns (uint256);
-  function balanceOf(address owner) external view returns (uint256);
-  function allowance(address owner, address spender) external view returns (uint256);
-
-  function approve(address spender, uint256 value) external returns (bool);
-  function transfer(address to, uint256 value) external returns (bool);
-  function transferFrom(address from, address to, uint256 value) external returns (bool);
-
-  function DOMAIN_SEPARATOR() external view returns (bytes32);
-  function PERMIT_TYPEHASH() external pure returns (bytes32);
-  function nonces(address owner) external view returns (uint256);
-
-  function permit(
-    address owner,
-    address spender,
-    uint256 value,
-    uint256 deadline,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external;
-
-  event Mint(address indexed sender, uint256 amount0, uint256 amount1);
-  event Burn(address indexed sender, uint256 amount0, uint256 amount1, address indexed to);
-  event Swap(
-    address indexed sender,
-    uint256 amount0In,
-    uint256 amount1In,
-    uint256 amount0Out,
-    uint256 amount1Out,
-    address indexed to
-  );
-  event Sync(uint112 reserve0, uint112 reserve1);
-
-  function MINIMUM_LIQUIDITY() external pure returns (uint256);
-  function factory() external view returns (address);
-  function token0() external view returns (address);
-  function token1() external view returns (address);
-  function getReserves()
-    external
-    view
-    returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
-  function price0CumulativeLast() external view returns (uint256);
-  function price1CumulativeLast() external view returns (uint256);
-  function kLast() external view returns (uint256);
-
-  function mint(address to) external returns (uint256 liquidity);
-  function burn(address to) external returns (uint256 amount0, uint256 amount1);
-  function swap(uint256 amount0Out, uint256 amount1Out, address to, bytes calldata data) external;
-  function skim(address to) external;
-  function sync() external;
-
-  function initialize(address, address) external;
-}
-
-/**
- * @title TODO
-
- */
 contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
@@ -117,8 +26,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   mapping(address => uint256) public pastBurn;
   mapping(address => uint256) public dailyBurnLimit;
   mapping(address => uint256) public currentDayLimit;
-  mapping(address => address[]) public poolAddresses; // TODO remove me
-  mapping(address => address) public routers;
+  mapping(address => address[]) public routerAddresses;
   uint256 public lastLimitDay;
 
   mapping(address => FixidityLib.Fraction) public maxSlippage;
@@ -130,8 +38,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   event MAxSlippageSet(address token, uint256 maxSlippage);
 
   event DailyLimitUpdatedDeleteMe(uint256 amount);
-  event PoolSet(address token, address pool);
-  event PoolRemoved(address token, address pool);
+  event RouterAddressSet(address token, address router);
+  event RouterAddressRemoved(address token, address router);
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -157,7 +65,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   // TODO chose the best price from options
 
-  function burnAllCelo() private {
+  function burnAllCelo() public {
     ICeloToken celo = ICeloToken(getCeloTokenAddress());
     celo.burn(celo.balanceOf(address(this)));
   }
@@ -238,8 +146,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
       // minBuyAmount is zero because this functions is meant to be called reguarly with small amounts
 
-      // TODO calculate a max of slipagge
-
       stableToken.approve(exchangeAddress, balanceToBurn);
 
       uint256 minAmount = 0;
@@ -274,18 +180,46 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     address celoAddress = getCeloTokenAddress();
 
     for (uint256 i = 0; i < tokens.length; i++) {
-      // address tokenAddress = tokens[i];
-      // address[] memory pollAddresses = poolAddresses[tokens[i]];
-      // // TODO check all these addresses should be different than zero
-      // IUniswapV2Pair router = IUniswapV2Router(pollAddresses[tokens]);
-      // IERC20 token = IERC20(tokenAddress);
-      // uint256 balanceToBurn = token.balanceOf(address(this));
-      // address[] memory path = [tokenAddress, celoAddress];
-      // uint256 wouldGet = router.getAmountsOut(balanceToBurn, path);
-      // // TODO test this
-      // TODO approve
-      // tokens.swapExactTokensForTokens(balanceToBurn, 0, path, block.number + 10);
-      // // TODO use more than one
+      address tokenAddress = tokens[i];
+      address[] memory pollAddresses = routerAddresses[tokenAddress];
+
+      require(pollAddresses.length > 0, "pollAddresses should be non empty");
+
+      address poolAddress = routerAddresses[tokenAddress][0]; // TODO check the zero // TODO get right iteration
+
+      require(poolAddress != address(0), "pollAddresses should be nonZero");
+      IUniswapV2Router02 router = IUniswapV2Router02(poolAddress);
+      IERC20 token = IERC20(tokenAddress);
+
+      uint256 balanceToBurn = token.balanceOf(address(this));
+
+      if (limitHit(tokenAddress, balanceToBurn)) {
+        // in case the limit is hit, burn the max possible
+        balanceToBurn = currentDayLimit[tokenAddress];
+        emit DailyLimitHit(tokenAddress, balanceToBurn);
+      }
+      // require(false, "made it here");
+
+      // small numbers cause rounding errors and zero case should be skiped
+      if (balanceToBurn <= MIN_BURN) {
+        continue;
+      }
+
+      address[] memory path = new address[](2);
+      path[0] = tokenAddress;
+      path[1] = celoAddress;
+
+      // TODO test this
+      uint256 wouldGet = router.getAmountsOut(balanceToBurn, path)[0];
+
+      token.approve(poolAddress, balanceToBurn);
+      router.swapExactTokensForTokens(balanceToBurn, 0, path, address(this), block.timestamp + 10);
+      // TODO use more than one
+
+      updateLimits(tokenAddress, balanceToBurn);
+
+      emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
+
     }
 
   }
@@ -303,34 +237,28 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   function transfer(address token, address recipient, uint256 value) external onlyOwner {
     // meant for governance to trigger use cases not contemplated in this contract
-    IERC20 token = IERC20(token);
-    token.transfer(recipient, value);
-  }
-
-  function setExchange(address poolAddress, address token, address router) external onlyOwner {
-    _setExchange(poolAddress, token, router);
-  }
-
-  function _setExchange(address token, address poolAddress, address router) private {
-    poolAddresses[poolAddress].push(token);
-    routers[token] = router;
-    // TODO check the address is a valid pool
-    emit PoolSet(token, poolAddress);
-  }
-
-  function removetExchange(address token, address poolAddress, uint256 index) external onlyOwner {
     // TODO test me
-    require(poolAddresses[poolAddress][index] == poolAddress, "Index does not match");
-
-    uint256 lenght = poolAddresses[poolAddress].length;
-    poolAddresses[poolAddress][lenght - 1] = poolAddresses[poolAddress][index];
-    poolAddresses[poolAddress].pop;
-    emit PoolRemoved(token, poolAddress);
+    IERC20(token).transfer(recipient, value);
   }
 
-  // TODO FUCTIONS HERE
+  function setExchange(address token, address router) external onlyOwner {
+    _setExchange(token, router);
+  }
+
+  function _setExchange(address token, address router) private {
+    routerAddresses[token].push(router);
+    // TODO check the address is a valid pool
+    emit RouterAddressSet(token, router);
+  }
+
+  function removetExchange(address token, address routerAddress, uint256 index) external onlyOwner {
+    // TODO test me
+    require(routerAddresses[token][index] == routerAddress, "Index does not match");
+
+    uint256 lenght = routerAddresses[token].length;
+    routerAddresses[token][lenght - 1] = routerAddresses[token][index];
+    routerAddresses[token].pop();
+    emit RouterAddressRemoved(token, routerAddress);
+  }
 
 }
-
-// TODO onlyOwner transfer out
-

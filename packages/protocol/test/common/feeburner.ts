@@ -7,6 +7,8 @@ import {
   ExchangeInstance,
   FeeBurnerContract,
   FeeBurnerInstance,
+  FeeCurrencyWhitelistContract,
+  FeeCurrencyWhitelistInstance,
   FreezerContract,
   FreezerInstance,
   GoldTokenContract,
@@ -49,12 +51,14 @@ const UniswapRouter: MockUniswapV2Router02Contract = artifacts.require('MockUnis
 const UniswapV2Factory: MockUniswapV2FactoryContract = artifacts.require('MockUniswapV2Factory')
 const ERC20: MockERC20Contract = artifacts.require('MockERC20')
 
+const FeeCurrencyWhitelist: FeeCurrencyWhitelistContract = artifacts.require('FeeCurrencyWhitelist')
+
 contract('FeeBurner', (accounts: string[]) => {
   let feeBurner: FeeBurnerInstance
   let exchange: ExchangeInstance
   let registry: RegistryInstance
   let stableToken: StableTokenInstance
-  let dummyToken: StableTokenInstance
+  // let dummyToken: StableTokenInstance
   let goldToken: GoldTokenInstance
   let mockSortedOracles: MockSortedOraclesInstance
   let mockReserve: MockReserveInstance
@@ -62,10 +66,12 @@ contract('FeeBurner', (accounts: string[]) => {
 
   let uniswapFactory: MockUniswapV2FactoryInstance
   let uniswap: MockUniswapV2Router02Instance
+  let uniswap2: MockUniswapV2Router02Instance
   let tokenA: MockERC20Instance
-  let tokenB: MockERC20Instance
 
   let deadline: number
+
+  let feeCurrencyWhitelist: FeeCurrencyWhitelistInstance
 
   // const aTokenAddress = '0x000000000000000000000000000000000000ce10'
 
@@ -92,19 +98,31 @@ contract('FeeBurner', (accounts: string[]) => {
     goldToken = await GoldToken.new(true)
     mockReserve = await MockReserve.new()
     stableToken = await StableToken.new(true)
-    dummyToken = await StableToken.new(true)
+    // dummyToken = await StableToken.new(true)
     registry = await Registry.new(true)
     feeBurner = await FeeBurner.new(true)
     freezer = await Freezer.new(true)
+    feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(true)
+    await feeCurrencyWhitelist.initialize()
 
     uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
-    console.log('hash', await uniswapFactory.INIT_CODE_PAIR_HASH())
+    // console.log('hash', await uniswapFactory.INIT_CODE_PAIR_HASH())
     // 0x2bfd701f0ec7fe6631627822d4675473606aaf94b22b804c1c02b8414810bfd4
     uniswap = await UniswapRouter.new(
       uniswapFactory.address,
       '0x0000000000000000000000000000000000000000'
     ) // _factory, _WETH
 
+    // uniswapFactory2 = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
+    uniswap2 = await UniswapRouter.new(
+      uniswapFactory.address, // this will not work because of the hash, need to fork the contracts to do this
+      '0x0000000000000000000000000000000000000000'
+    ) // _factory, _WETH
+
+    await registry.setAddressFor(
+      CeloContractName.FeeCurrencyWhitelist,
+      feeCurrencyWhitelist.address
+    )
     await registry.setAddressFor(CeloContractName.Freezer, freezer.address)
 
     await registry.setAddressFor(CeloContractName.GoldToken, goldToken.address)
@@ -273,61 +291,110 @@ contract('FeeBurner', (accounts: string[]) => {
 
     it('sets pool for exchange', async () => {
       // TODO change for UNISWAP address
-      await feeBurner.setExchange(dummyToken.address, dummyToken.address, dummyToken.address)
+      await feeBurner.setExchange(stableToken.address, uniswap.address)
 
-      assert(await feeBurner.poolAddresses(dummyToken.address, 0), dummyToken.address)
+      assert(await feeBurner.routerAddresses(stableToken.address, 0), uniswap.address)
       // await assertRevert(feeCurrencyWhitelist.addToken(aTokenAddress, { from: nonOwner }))
     })
 
-    it.only('Uniswap trade test', async () => {
-      // Make sure our uniswap mock works
+    describe.only('#burnNonMentoAssets()', () => {
+      beforeEach(async () => {
+        tokenA = await ERC20.new()
+        feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
+        await feeBurner.setExchange(tokenA.address, uniswap.address)
+        await tokenA.mint(feeBurner.address, new BigNumber(10e18))
+        await tokenA.mint(user, new BigNumber(10e18))
+        await goldToken.transfer(user, new BigNumber(10e18))
+        const toTransfer = new BigNumber(5e18)
 
-      tokenA = await ERC20.new()
-      tokenB = await ERC20.new()
-      await tokenA.mint(user, new BigNumber(10e18))
-      await tokenB.mint(user, new BigNumber(10e18))
+        await tokenA.approve(uniswap.address, toTransfer, { from: user })
+        await goldToken.approve(uniswap.address, toTransfer, { from: user })
 
-      const toTransfer = new BigNumber(5e18)
+        await uniswap.addLiquidity(
+          tokenA.address,
+          goldToken.address,
+          toTransfer,
+          toTransfer,
+          toTransfer,
+          toTransfer,
+          user,
+          deadline,
+          { from: user }
+        )
+      })
 
-      await tokenA.approve(uniswap.address, toTransfer, { from: user })
-      await tokenB.approve(uniswap.address, toTransfer, { from: user })
+      it('Uniswap trade test', async () => {
+        // Make sure our uniswap mock works
 
-      await uniswap.addLiquidity(
-        tokenA.address,
-        tokenB.address,
-        toTransfer,
-        toTransfer,
-        toTransfer,
-        toTransfer,
-        user,
-        deadline,
-        { from: user }
-      )
+        const balanceAbefore = await tokenA.balanceOf(user)
+        const balanceBbefore = await goldToken.balanceOf(user)
 
-      const balanceAbefore = await tokenA.balanceOf(user)
-      const balanceBbefore = await tokenB.balanceOf(user)
+        await tokenA.approve(uniswap.address, new BigNumber(1e18), { from: user })
+        await uniswap.swapExactTokensForTokens(
+          new BigNumber(1e18),
+          0,
+          [tokenA.address, goldToken.address],
+          user,
+          deadline,
+          { from: user }
+        )
 
-      await tokenA.approve(uniswap.address, new BigNumber(1e18), { from: user })
-      await uniswap.swapExactTokensForTokens(
-        new BigNumber(1e18),
-        0,
-        [tokenA.address, tokenB.address],
-        user,
-        deadline,
-        { from: user }
-      )
+        assertGtBN(balanceAbefore, await tokenA.balanceOf(user))
+        assertGtBN(await goldToken.balanceOf(user), balanceBbefore)
+      })
 
-      console.log('balanceAbefore', balanceAbefore)
-      console.log('balanceAbefore', balanceBbefore)
-      console.log('await tokenA.balanceOf(user)', await tokenA.balanceOf(user))
-      console.log('await tokenB.balanceOf(user)', await tokenB.balanceOf(user))
+      it('Burns non-Mento tokens', async () => {
+        await tokenA.mint(user, new BigNumber(10e18))
 
-      assertGtBN(balanceAbefore, await tokenA.balanceOf(user))
-      assertGtBN(await tokenB.balanceOf(user), balanceBbefore)
-      // console.log((await tokenA.balanceOf(user)).toString())
-      // console.log((await tokenB.balanceOf(user)).toString())
+        // safety check, check that the balance is no empty before the burn
+        await assertGtBN(await tokenA.balanceOf(feeBurner.address), 0)
+        await feeBurner.burnNonMentoTokens()
 
-      // assert(false)
+        assertEqualBN(await tokenA.balanceOf(feeBurner.address), 0)
+      })
+
+      it("Doesn't burn Mento tokens if the limit is hit", async () => {
+        await feeBurner.setDailyBurnLimit(tokenA.address, new BigNumber(1e18))
+        await feeBurner.burnNonMentoTokens()
+
+        assertEqualBN(await tokenA.balanceOf(feeBurner.address), new BigNumber(9e18))
+        await feeBurner.burnNonMentoTokens()
+        assertEqualBN(await tokenA.balanceOf(feeBurner.address), new BigNumber(9e18))
+
+        await timeTravel(3600 * 24, web3)
+        await feeBurner.burnNonMentoTokens()
+
+        assertEqualBN(await tokenA.balanceOf(feeBurner.address), new BigNumber(8e18))
+      })
+
+      it.only('Tries to get the best rate with many exchanges', async () => {
+        await tokenA.mint(user, new BigNumber(10e18))
+
+        // safety check, check that the balance is no empty before the burn
+        await assertGtBN(await tokenA.balanceOf(feeBurner.address), 0)
+        await feeBurner.burnNonMentoTokens()
+
+        assertEqualBN(await tokenA.balanceOf(feeBurner.address), 0)
+
+        const toTransfer = new BigNumber(5e18)
+        console.log(await (await goldToken.balanceOf(user)).toString())
+
+        await tokenA.approve(uniswap2.address, toTransfer, { from: user })
+        await goldToken.approve(uniswap2.address, toTransfer, { from: user })
+
+        // likely reverts because it can'd find the pool
+        await uniswap2.addLiquidity(
+          tokenA.address,
+          goldToken.address,
+          toTransfer,
+          toTransfer,
+          toTransfer,
+          toTransfer,
+          user,
+          deadline,
+          { from: user }
+        )
+      })
     })
   })
 })
