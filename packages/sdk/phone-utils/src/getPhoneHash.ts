@@ -6,7 +6,7 @@ const getPhoneHash = (phoneNumber: string, salt?: string): string => {
   if (salt) {
     return getIdentifierHash(sha3, phoneNumber, IdentifierPrefix.PHONE_NUMBER, salt)
   }
-  // TODO EN: backwards compatibility for old phoneUtils getPhoneHash
+  // backwards compatibility for old phoneUtils getPhoneHash
   return sha3(getPrefixedIdentifier(phoneNumber, IdentifierPrefix.PHONE_NUMBER)) as string
 }
 

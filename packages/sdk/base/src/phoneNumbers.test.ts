@@ -1,6 +1,4 @@
-// import { soliditySha3 } from 'web3-utils'
 import { isE164Number } from './phoneNumbers'
-// const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const TEST_PHONE_NUMBERS = {
   VALID_US_1: '6282287826',
