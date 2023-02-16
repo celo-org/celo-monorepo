@@ -36,6 +36,7 @@ export const builder = (argv: yargs.Argv) => {
 
 export const CLABS_VALIDATOR_METADATA_BUCKET = 'clabs_validator_metadata'
 
+// TODO EN: revisit this stuff -- shouldn't be necessary but check e2e tests & confirm with DevOps
 function getAttestationServiceUrl(testnet: string, index: number) {
   return `https://${testnet}-attestation-service.${fetchEnv(
     envVar.CLUSTER_DOMAIN_NAME
