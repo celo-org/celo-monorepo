@@ -1,9 +1,9 @@
-import { isE164Number } from '@celo/base'
 import {
   getIdentifierHash as baseGetIdentifierHash,
   getPrefixedIdentifier,
   IdentifierPrefix,
-} from '@celo/base/lib/identifier'
+  isE164Number,
+} from '@celo/base'
 import {
   CombinerEndpointPNP,
   KEY_VERSION_HEADER,

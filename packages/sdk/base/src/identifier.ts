@@ -3,6 +3,9 @@ export const PEPPER_SEPARATOR = '__'
 /**
  * Standardized prefixes for ODIS identifiers.
  * Used in @celo/identity, @celo/phone-utils, and the protocol package.
+ *
+ * When adding prefixes, make sure to add the expected value for the unit test case
+ * in identifier.test.ts, otherwise the test will fail.
  */
 export enum IdentifierPrefix {
   NULL = '',

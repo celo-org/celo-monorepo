@@ -1,8 +1,4 @@
-import {
-  getIdentifierHash,
-  getPrefixedIdentifier,
-  IdentifierPrefix,
-} from '@celo/base/lib/identifier'
+import { getIdentifierHash, getPrefixedIdentifier, IdentifierPrefix } from '@celo/base'
 import { soliditySha3 } from 'web3-utils'
 
 const sha3 = (v: string): string | null => soliditySha3({ type: 'string', value: v })
