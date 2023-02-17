@@ -9,6 +9,9 @@ import { verifySignature } from '@celo/utils/lib/signatureUtils'
 import { recoverTransaction, verifyEIP712TypedDataSigner } from '@celo/wallet-base'
 import { asn1FromPublicKey } from '@celo/wallet-hsm'
 import { BigNumber } from 'bignumber.js'
+// NOTE: elliptic is disabled elsewhere in this library to prevent
+// accidental signing of truncated messages.
+// tslint:disable-next-line:import-blacklist
 import { ec as EC } from 'elliptic'
 import * as ethUtil from 'ethereumjs-util'
 import Web3 from 'web3'
