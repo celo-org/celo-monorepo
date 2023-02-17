@@ -899,6 +899,13 @@ workflows:
       - lint-checks:
           requires:
             - install_dependencies
+      - pre-protocol-test-release:
+          requires:
+            - lint-checks
+      - protocol-test-release:
+          requires:
+            - lint-checks
+            - pre-protocol-test-release
       - general-test:
           requires:
             - install_dependencies
@@ -917,13 +924,6 @@ workflows:
       - transactions-uri-tests:
           requires:
             - contractkit-test
-      - pre-protocol-test-release:
-          requires:
-            - lint-checks
-      - protocol-test-release:
-          requires:
-            - lint-checks
-            - pre-protocol-test-release
       - protocol-test-release-snapshots:
           requires:
             - lint-checks

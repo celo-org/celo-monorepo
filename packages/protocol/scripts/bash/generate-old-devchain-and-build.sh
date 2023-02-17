@@ -33,6 +33,8 @@ echo "- Checkout source code at $BRANCH"
 git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
+echo "BUILD_DIR: $BUILD_DIR"
+
 echo "- Build contract artifacts"
 rm -rf build/contracts
 cd ../..
