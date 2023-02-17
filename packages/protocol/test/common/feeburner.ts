@@ -106,17 +106,16 @@ contract('FeeBurner', (accounts: string[]) => {
     await feeCurrencyWhitelist.initialize()
 
     uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
-    console.log('hash1', await uniswapFactory.INIT_CODE_PAIR_HASH())
-    // 0x2bfd701f0ec7fe6631627822d4675473606aaf94b22b804c1c02b8414810bfd4
+    // console.log('hash', await uniswapFactory.INIT_CODE_PAIR_HASH())
     uniswap = await UniswapRouter.new(
       uniswapFactory.address,
       '0x0000000000000000000000000000000000000000'
     ) // _factory, _WETH
 
     uniswapFactory2 = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
-    console.log('hash2', await uniswapFactory.INIT_CODE_PAIR_HASH())
+
     uniswap2 = await UniswapRouter.new(
-      uniswapFactory2.address, // this will not work because of the hash, need to fork the contracts to do this
+      uniswapFactory2.address,
       '0x0000000000000000000000000000000000000000'
     ) // _factory, _WETH
 
@@ -368,7 +367,14 @@ contract('FeeBurner', (accounts: string[]) => {
         assertEqualBN(await tokenA.balanceOf(feeBurner.address), new BigNumber(8e18))
       })
 
-      it.only('Tries to get the best rate with many exchanges', async () => {
+      it("Doesn't exchange non-Mento when slippage is too high", async () => {
+        await feeBurner.setMaxSplipagge(tokenA.address, maxSlippage)
+        await assertRevert(feeBurner.burnNonMentoTokens())
+
+        assertEqualBN(await tokenA.balanceOf(feeBurner.address), new BigNumber(10e18))
+      })
+
+      it('Tries to get the best rate with many exchanges', async () => {
         await feeBurner.setExchange(tokenA.address, uniswap2.address)
         await tokenA.mint(user, new BigNumber(10e18))
 
@@ -415,17 +421,9 @@ contract('FeeBurner', (accounts: string[]) => {
           await uniswap2.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address])
         )[1]
 
-        assertEqualBN(quote1before, quote1after)
+        assertEqualBN(quote1before, quote1after) // uniswap 1 should be untouched
         assertGtBN(quote2before, quote2after)
-        // ()
 
-        // console.log((await uniswap.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address]))[0].toString())
-        // console.log((await uniswap.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address]))[1].toString()) // this is the one that matters
-
-        // console.log((await uniswap2.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address]))[0].toString())
-        // console.log((await uniswap2.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address]))[1].toString()) // this is the one that matters // this one should have gotten smaller, because liquidity was taken
-
-        // assert(false)
         assertEqualBN(await tokenA.balanceOf(feeBurner.address), 0) // check that it burned
       })
     })

@@ -16,7 +16,9 @@ import "../stability/StableToken.sol"; // TODO check if this can be interface
 import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
-import "../uniswap/interfaces/IUniswapV2Router02.sol"; // TODO change for a more minimalist function
+import "../uniswap/interfaces/IUniswapV2Router02.sol"; // TODO change for a more minimalist interface
+import "../uniswap/interfaces/IUniswapV2Factory.sol";
+import "../uniswap/interfaces/IUniswapV2Pair.sol";
 
 contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract {
   using SafeMath for uint256;
@@ -115,6 +117,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     emit MAxSlippageSet(tokenAddress, newMax);
   }
 
+  // TODO make burn idependent
+
   // this function is permionless
   function burnMentoAssets() private {
     // here it could also be checked that the tokens is whitelisted, but we assume everything that has already been sent here is
@@ -146,23 +150,17 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
       IExchange exchange = IExchange(exchangeAddress);
 
-      // minBuyAmount is zero because this functions is meant to be called reguarly with small amounts
-
-      stableToken.approve(exchangeAddress, balanceToBurn);
-
       uint256 minAmount = 0;
       if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
         // max slippage is set
         // use sorted oracles as reference
         ISortedOracles sortedOracles = getSortedOracles();
-        (uint256 amountWithoutSlippage, uint256 _) = sortedOracles.medianRate(tokenAddress);
-        minAmount = FixidityLib
-          .newFixed(amountWithoutSlippage)
-          .multiply(maxSlippage[tokenAddress])
-          .fromFixed();
+        (uint256 priceWithoutSlippage, ) = sortedOracles.medianRate(tokenAddress);
+        minAmount = calculateMinAmount(priceWithoutSlippage, tokenAddress, balanceToBurn);
       }
 
       // TODO maybe we could compare with uniswap as well
+      stableToken.approve(exchangeAddress, balanceToBurn);
       exchange.sell(balanceToBurn, minAmount, false);
       pastBurn[tokenAddress] += balanceToBurn;
 
@@ -172,6 +170,17 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
     }
 
+  }
+
+  function calculateMinAmount(uint256 midPrice, address tokenAddress, uint256 amount)
+    public
+    view
+    returns (uint256)
+  {
+    return
+      (midPrice * amount) -
+      (FixidityLib.newFixed(midPrice).multiply(maxSlippage[tokenAddress]).fromFixed()) *
+      amount;
   }
 
   function burnNonMentoTokens() public {
@@ -190,6 +199,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
       IERC20 token = IERC20(tokenAddress);
       uint256 balanceToBurn = token.balanceOf(address(this));
+
       if (limitHit(tokenAddress, balanceToBurn)) {
         // in case the limit is hit, burn the max possible
         balanceToBurn = currentDayLimit[tokenAddress];
@@ -197,7 +207,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       }
 
       require(pollAddresses.length > 0, "pollAddresses should be non empty");
-      // i is router index
+      // j is router index
       for (uint256 j = 0; j < pollAddresses.length; j++) {
         // TODO change name to router rather than pool
         address poolAddress = pollAddresses[j]; // TODO check the zero // TODO get right iteration
@@ -215,7 +225,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
         path[0] = tokenAddress;
         path[1] = celoAddress;
 
-        // TODO test this
         uint256 wouldGet = router.getAmountsOut(balanceToBurn, path)[1];
         emit ReceivedQuote(poolAddress, wouldGet);
         if (wouldGet > bestRouterQuote) {
@@ -226,13 +235,23 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
       // don't try to exchange on zero quotes
       if (bestRouterQuote > 0) {
-        // TODO check slippage
         address bestRouterAddress = pollAddresses[bestRouterIndex];
         IUniswapV2Router02 bestRouter = IUniswapV2Router02(bestRouterAddress);
+
+        uint256 minAmount = 0;
+        if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
+          // checking slippage before trading
+          IUniswapV2Pair pair = IUniswapV2Pair(
+            IUniswapV2Factory(bestRouter.factory()).getPair(tokenAddress, celoAddress)
+          );
+          (uint256 tokenAmount, uint256 celoAmount, ) = pair.getReserves();
+          minAmount = calculateMinAmount(tokenAmount / celoAmount, tokenAddress, balanceToBurn);
+        }
+
         token.approve(bestRouterAddress, balanceToBurn);
         bestRouter.swapExactTokensForTokens(
           balanceToBurn,
-          0,
+          minAmount,
           path,
           address(this),
           block.timestamp + 10
@@ -251,8 +270,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   // this function is permionless
   function burn() external {
     burnMentoAssets();
-    burnAllCelo();
     burnNonMentoTokens();
+    burnAllCelo();
     // burn other assets
     // TODO:
     // 1. Make swap (Meto for stables, for other Uniswap)
