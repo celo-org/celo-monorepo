@@ -103,6 +103,8 @@ contract('FeeBurner', (accounts: string[]) => {
     feeBurner = await FeeBurner.new(true)
     freezer = await Freezer.new(true)
     feeCurrencyWhitelist = await FeeCurrencyWhitelist.new(true)
+
+    tokenA = await ERC20.new()
     await feeCurrencyWhitelist.initialize()
 
     uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
@@ -169,6 +171,23 @@ contract('FeeBurner', (accounts: string[]) => {
     await feeBurner.initialize(registry.address)
   })
 
+  describe('#transfer()', () => {
+    beforeEach(async () => {
+      await tokenA.mint(feeBurner.address, new BigNumber(1e18))
+    })
+
+    it('Only owner can take tokens out', async () => {
+      await assertRevert(
+        feeBurner.transfer(tokenA.address, user, new BigNumber(1e18), { from: user })
+      )
+    })
+
+    it('Can take funds out', async () => {
+      await feeBurner.transfer(tokenA.address, user, new BigNumber(1e18))
+      assertEqualBN(await tokenA.balanceOf(user), new BigNumber(1e18))
+    })
+  })
+
   describe('#initialize()', () => {
     it('should have set the owner', async () => {
       const owner: string = await feeBurner.owner()
@@ -188,7 +207,7 @@ contract('FeeBurner', (accounts: string[]) => {
     })
   })
 
-  describe('#setDailyBurnLimit()', () => {
+  describe('#setMaxSplipagge()', () => {
     it('should only be called by owner', async () => {
       await assertRevert(
         feeBurner.setMaxSplipagge(stableToken.address, maxSlippage, { from: user })
@@ -299,7 +318,6 @@ contract('FeeBurner', (accounts: string[]) => {
 
     describe('#burnNonMentoAssets()', () => {
       beforeEach(async () => {
-        tokenA = await ERC20.new()
         feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
         await feeBurner.setExchange(tokenA.address, uniswap.address)
         await tokenA.mint(feeBurner.address, new BigNumber(10e18))

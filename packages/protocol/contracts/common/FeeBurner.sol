@@ -109,7 +109,48 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     return true;
   }
 
-  function burnSingleMentoToken() public {}
+  function burnSingleMentoToken(address mentoToken) public {
+    address tokenAddress = mentoToken; // TODO refactor me
+
+    StableToken stableToken = StableToken(tokenAddress);
+    uint256 balanceToBurn = stableToken.balanceOf(address(this));
+
+    if (limitHit(tokenAddress, balanceToBurn)) {
+      // in case the limit is hit, burn the max possible
+      balanceToBurn = currentDayLimit[tokenAddress];
+      emit DailyLimitHit(tokenAddress, balanceToBurn);
+    }
+
+    // small numbers cause rounding errors and zero case should be skiped
+    if (balanceToBurn <= MIN_BURN) {
+      return;
+    }
+
+    address exchangeAddress = registryContract.getAddressForOrDie(
+      stableToken.getExchangeRegistryId()
+    );
+
+    IExchange exchange = IExchange(exchangeAddress);
+
+    uint256 minAmount = 0;
+    if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
+      // max slippage is set
+      // use sorted oracles as reference
+      ISortedOracles sortedOracles = getSortedOracles();
+      (uint256 priceWithoutSlippage, ) = sortedOracles.medianRate(tokenAddress);
+      minAmount = calculateMinAmount(priceWithoutSlippage, tokenAddress, balanceToBurn);
+    }
+
+    // TODO maybe we could compare with uniswap as well
+    stableToken.approve(exchangeAddress, balanceToBurn);
+    exchange.sell(balanceToBurn, minAmount, false);
+    pastBurn[tokenAddress] += balanceToBurn;
+
+    updateLimits(tokenAddress, balanceToBurn);
+
+    emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
+  }
+
   function burnSingleNonMentoToken() public {}
 
   function setMaxSplipagge(address tokenAddress, uint256 newMax) external onlyOwner {
@@ -128,45 +169,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     // require(false, "start"); // TODO remove me
 
     for (uint256 i = 0; i < mentoTokens.length; i++) {
-      address tokenAddress = mentoTokens[i];
-
-      StableToken stableToken = StableToken(tokenAddress);
-      uint256 balanceToBurn = stableToken.balanceOf(address(this));
-
-      if (limitHit(tokenAddress, balanceToBurn)) {
-        // in case the limit is hit, burn the max possible
-        balanceToBurn = currentDayLimit[tokenAddress];
-        emit DailyLimitHit(tokenAddress, balanceToBurn);
-      }
-
-      // small numbers cause rounding errors and zero case should be skiped
-      if (balanceToBurn <= MIN_BURN) {
-        continue;
-      }
-
-      address exchangeAddress = registryContract.getAddressForOrDie(
-        stableToken.getExchangeRegistryId()
-      );
-
-      IExchange exchange = IExchange(exchangeAddress);
-
-      uint256 minAmount = 0;
-      if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
-        // max slippage is set
-        // use sorted oracles as reference
-        ISortedOracles sortedOracles = getSortedOracles();
-        (uint256 priceWithoutSlippage, ) = sortedOracles.medianRate(tokenAddress);
-        minAmount = calculateMinAmount(priceWithoutSlippage, tokenAddress, balanceToBurn);
-      }
-
-      // TODO maybe we could compare with uniswap as well
-      stableToken.approve(exchangeAddress, balanceToBurn);
-      exchange.sell(balanceToBurn, minAmount, false);
-      pastBurn[tokenAddress] += balanceToBurn;
-
-      updateLimits(tokenAddress, balanceToBurn);
-
-      emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
+      burnSingleMentoToken(mentoTokens[i]);
 
     }
 
@@ -272,15 +275,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     burnMentoAssets();
     burnNonMentoTokens();
     burnAllCelo();
-    // burn other assets
-    // TODO:
-    // 1. Make swap (Meto for stables, for other Uniswap)
-    // 2. burn
   }
 
   function transfer(address token, address recipient, uint256 value) external onlyOwner {
     // meant for governance to trigger use cases not contemplated in this contract
-    // TODO test me
     IERC20(token).transfer(recipient, value);
   }
 
@@ -290,7 +288,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   function _setExchange(address token, address router) private {
     routerAddresses[token].push(router);
-    // TODO check the address is a valid pool
     emit RouterAddressSet(token, router);
   }
 
