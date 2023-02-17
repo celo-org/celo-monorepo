@@ -43,6 +43,12 @@ fi
 
 echo "- Verify bytecode of the network"
 yarn build >> $LOG_FILE
+
+echo "What's in the truffle script folder"
+ls ./scripts/truffle/
+echo "What's in the contracts folder $BUILD_DIR/contracts"
+ls $BUILD_DIR/contracts
+
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --librariesFile libraries.json
 
 echo "- Check versions of current branch"
