@@ -2357,31 +2357,6 @@
   dependencies:
     google-gax "^2.24.1"
 
-"@google-cloud/logging@^7.1.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@google-cloud/logging/-/logging-7.1.0.tgz#79af14fe911c622eb60422bfdd3636d9bba46efc"
-  integrity sha512-0E2ywYYcR/6aZdaPjjX4qe6EN4DciZQMhtAeSZJl3tJZ+L/BUZajodhadwXm3AJ0syEzsqmsOeEBNEBLEtD8XQ==
-  dependencies:
-    "@google-cloud/common" "^2.2.2"
-    "@google-cloud/paginator" "^2.0.0"
-    "@google-cloud/projectify" "^1.0.0"
-    "@google-cloud/promisify" "^1.0.0"
-    "@opencensus/propagation-stackdriver" "0.0.19"
-    arrify "^2.0.0"
-    dot-prop "^5.1.0"
-    eventid "^1.0.0"
-    extend "^3.0.2"
-    gcp-metadata "^3.1.0"
-    google-auth-library "^5.2.2"
-    google-gax "^1.11.0"
-    is "^3.3.0"
-    on-finished "^2.3.0"
-    pumpify "^2.0.0"
-    snakecase-keys "^3.0.0"
-    stream-events "^1.0.4"
-    through2 "^3.0.0"
-    type-fest "^0.9.0"
-
 "@google-cloud/monitoring@0.7.1":
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/@google-cloud/monitoring/-/monitoring-0.7.1.tgz#9afd2c8b237f01675dcaea8c5c7b3de9b58e24ad"
