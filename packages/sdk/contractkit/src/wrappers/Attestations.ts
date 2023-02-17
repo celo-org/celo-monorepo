@@ -1,14 +1,9 @@
 import { StableToken } from '@celo/base'
 import { eqAddress } from '@celo/base/lib/address'
-import { concurrentMap, sleep } from '@celo/base/lib/async'
-import { notEmpty, zip3 } from '@celo/base/lib/collections'
-import { parseSolidityStringArray } from '@celo/base/lib/parsing'
-import { appendPath } from '@celo/base/lib/string'
+import { sleep } from '@celo/base/lib/async'
 import { Address, Connection, toTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
-import fetch from 'cross-fetch'
 import { Attestations } from '../generated/Attestations'
-import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
 import { AccountsWrapper } from './Accounts'
 import {
   BaseWrapper,
@@ -19,7 +14,6 @@ import {
   valueToInt,
 } from './BaseWrapper'
 import { StableTokenWrapper } from './StableTokenWrapper'
-import { Validator } from './Validators'
 
 function hashAddressToSingleDigit(address: Address): number {
   return new BigNumber(address.toLowerCase()).modulo(10).toNumber()
@@ -65,10 +59,6 @@ export interface ActionableAttestation {
   version: string
 }
 
-type AttestationServiceRunningCheckResult =
-  | { isValid: true; result: ActionableAttestation }
-  | { isValid: false; issuer: Address }
-
 export interface UnselectedRequest {
   blockNumber: number
   attestationsRequested: number
@@ -80,25 +70,6 @@ export type IdentifierLookupResult = Record<
   string,
   Record<Address, AttestationStat | undefined> | undefined
 >
-
-interface GetCompletableAttestationsResponse {
-  0: string[]
-  1: string[]
-  2: string[]
-  3: string
-}
-function parseGetCompletableAttestations(response: GetCompletableAttestationsResponse) {
-  const metadataURLs = parseSolidityStringArray(
-    response[2].map(valueToInt),
-    (response[3] as unknown) as string
-  )
-
-  return zip3(
-    response[0].map(valueToInt),
-    response[1],
-    metadataURLs
-  ).map(([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL }))
-}
 
 interface ContractsForAttestation {
   getAccounts(): Promise<AccountsWrapper>
@@ -295,103 +266,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Returns an array of attestations that can be completed, along with the issuers' attestation
-   * service urls
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   */
-  async getActionableAttestations(
-    identifier: string,
-    account: Address,
-    tries = 3
-  ): Promise<ActionableAttestation[]> {
-    const result = await this.contract.methods
-      .getCompletableAttestations(identifier, account)
-      .call()
-
-    const results = await concurrentMap(
-      5,
-      parseGetCompletableAttestations(result),
-      this.makeIsIssuerRunningAttestationService(tries)
-    )
-
-    return results.map((_) => (_.isValid ? _.result : null)).filter(notEmpty)
-  }
-
-  /**
-   * Returns an array of issuer addresses that were found to not run the attestation service
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   */
-  async getNonCompliantIssuers(
-    identifier: string,
-    account: Address,
-    tries = 3
-  ): Promise<Address[]> {
-    const result = await this.contract.methods
-      .getCompletableAttestations(identifier, account)
-      .call()
-
-    const withAttestationServiceURLs = await concurrentMap(
-      5,
-      parseGetCompletableAttestations(result),
-      this.makeIsIssuerRunningAttestationService(tries)
-    )
-
-    return withAttestationServiceURLs.map((_) => (_.isValid ? null : _.issuer)).filter(notEmpty)
-  }
-
-  private makeIsIssuerRunningAttestationService = (tries = 3) => {
-    return async (arg: {
-      blockNumber: number
-      issuer: string
-      metadataURL: string
-    }): Promise<AttestationServiceRunningCheckResult> => {
-      try {
-        const metadata = await IdentityMetadataWrapper.fetchFromURL(
-          await this.contracts.getAccounts(),
-          arg.metadataURL,
-          tries
-        )
-        const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
-
-        if (attestationServiceURLClaim === undefined) {
-          throw new Error(`No attestation service URL registered for ${arg.issuer}`)
-        }
-
-        const nameClaim = metadata.findClaim(ClaimTypes.NAME)
-
-        const resp = await fetch(
-          `${attestationServiceURLClaim.url}${
-            attestationServiceURLClaim.url.substr(-1) === '/' ? '' : '/'
-          }status`
-        )
-        if (!resp.ok) {
-          throw new Error(`Request failed with status ${resp.status}`)
-        }
-        const { status, version } = await resp.json()
-
-        if (status !== 'ok') {
-          return { isValid: false, issuer: arg.issuer }
-        }
-
-        return {
-          isValid: true,
-          result: {
-            blockNumber: arg.blockNumber,
-            issuer: arg.issuer,
-            attestationServiceURL: attestationServiceURLClaim.url,
-            name: nameClaim ? nameClaim.name : undefined,
-            version,
-          },
-        }
-      } catch (error) {
-        return { isValid: false, issuer: arg.issuer }
-      }
-    }
-  }
-
-  /**
    * Returns the attestation signer for the specified account.
    * @param account The address of token rewards are accumulated in.
    * @param account The address of the account.
@@ -487,140 +361,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     return result
   }
 
-  /**
-   * Gets the relevant attestation service status for a validator
-   * @param validator Validator to get the attestation service status for
-   */
-  async getAttestationServiceStatus(
-    validator: Validator
-  ): Promise<AttestationServiceStatusResponse> {
-    const accounts = await this.contracts.getAccounts()
-    const hasAttestationSigner = await accounts.hasAuthorizedAttestationSigner(validator.address)
-    const attestationSigner = await accounts.getAttestationSigner(validator.address)
-
-    let attestationServiceURL: string
-
-    const ret: AttestationServiceStatusResponse = {
-      ...validator,
-      hasAttestationSigner,
-      attestationSigner,
-      attestationServiceURL: null,
-      okStatus: false,
-      error: null,
-      smsProviders: [],
-      blacklistedRegionCodes: [],
-      rightAccount: false,
-      metadataURL: null,
-      state: AttestationServiceStatusState.NoAttestationSigner,
-      version: null,
-      ageOfLatestBlock: null,
-      smsProvidersRandomized: null,
-      maxDeliveryAttempts: null,
-      maxRerequestMins: null,
-      twilioVerifySidProvided: null,
-    }
-
-    if (!hasAttestationSigner) {
-      return ret
-    }
-
-    const metadataURL = await accounts.getMetadataURL(validator.address)
-    ret.metadataURL = metadataURL
-
-    if (!metadataURL) {
-      ret.state = AttestationServiceStatusState.NoMetadataURL
-      return ret
-    }
-
-    if (metadataURL.startsWith('http://')) {
-      ret.state = AttestationServiceStatusState.InvalidAttestationServiceURL
-      return ret
-    }
-
-    try {
-      const metadata = await IdentityMetadataWrapper.fetchFromURL(
-        await this.contracts.getAccounts(),
-        metadataURL
-      )
-      const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
-
-      if (!attestationServiceURLClaim) {
-        ret.state = AttestationServiceStatusState.NoAttestationServiceURL
-        return ret
-      }
-
-      attestationServiceURL = attestationServiceURLClaim.url
-    } catch (error: any) {
-      ret.state =
-        error.type === 'system'
-          ? AttestationServiceStatusState.MetadataTimeout
-          : AttestationServiceStatusState.InvalidMetadata
-      ret.error = error
-      return ret
-    }
-
-    ret.attestationServiceURL = attestationServiceURL
-
-    try {
-      const statusResponse = await fetch(appendPath(attestationServiceURL, 'status'))
-
-      if (!statusResponse.ok) {
-        ret.state = AttestationServiceStatusState.UnreachableAttestationService
-        return ret
-      }
-
-      ret.okStatus = true
-      const statusResponseBody = await statusResponse.json()
-      ret.smsProviders = statusResponseBody.smsProviders
-      ret.rightAccount = eqAddress(validator.address, statusResponseBody.accountAddress)
-      ret.state = ret.rightAccount
-        ? AttestationServiceStatusState.Valid
-        : AttestationServiceStatusState.WrongAccount
-      ret.ageOfLatestBlock = statusResponseBody.ageOfLatestBlock
-      ret.smsProvidersRandomized = statusResponseBody.smsProvidersRandomized
-      ret.maxDeliveryAttempts = statusResponseBody.maxDeliveryAttempts
-      ret.maxRerequestMins = statusResponseBody.maxRerequestMins
-      ret.twilioVerifySidProvided = statusResponseBody.twilioVerifySidProvided
-
-      // Healthcheck was added in 1.0.1, same time version started being reported.
-      if (statusResponseBody.version) {
-        ret.version = statusResponseBody.version
-
-        // Try healthcheck
-        try {
-          const healthzResponse = await fetch(appendPath(attestationServiceURL, 'healthz'))
-          const healthzResponseBody = await healthzResponse.json()
-          if (!healthzResponse.ok) {
-            ret.state = AttestationServiceStatusState.Unhealthy
-            if (healthzResponseBody.error) {
-              ret.error = healthzResponseBody.error
-            }
-          }
-        } catch (error) {
-          ret.state = AttestationServiceStatusState.UnreachableHealthz
-        }
-
-        // Whether or not health check is reachable, also check full node status
-        // (overrides UnreachableHealthz status)
-        if (
-          (statusResponseBody.ageOfLatestBlock !== null &&
-            statusResponseBody.ageOfLatestBlock > 10) ||
-          statusResponseBody.isNodeSyncing === true
-        ) {
-          ret.state = AttestationServiceStatusState.Unhealthy
-        }
-      } else {
-        // No version implies 1.0.0
-        ret.version = '1.0.0'
-      }
-    } catch (error: any) {
-      ret.state = AttestationServiceStatusState.UnreachableAttestationService
-      ret.error = error
-    }
-
-    return ret
-  }
-
   async revoke(identifer: string, account: Address) {
     const accounts = await this.lookupAccountsForIdentifier(identifer)
     const idx = accounts.findIndex((acc) => eqAddress(acc, account))
@@ -629,45 +369,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     }
     return toTransactionObject(this.connection, this.contract.methods.revoke(identifer, idx))
   }
-}
-
-export enum AttestationServiceStatusState {
-  NoAttestationSigner = 'NoAttestationSigner',
-  NoMetadataURL = 'NoMetadataURL',
-  InvalidMetadata = 'InvalidMetadata',
-  NoAttestationServiceURL = 'NoAttestationServiceURL',
-  InvalidAttestationServiceURL = 'InvalidAttestationServiceURL',
-  UnreachableAttestationService = 'UnreachableAttestationService',
-  Valid = 'Valid',
-  UnreachableHealthz = 'UnreachableHealthz',
-  Unhealthy = 'Unhealthy',
-  WrongAccount = 'WrongAccount',
-  MetadataTimeout = 'MetadataTimeout',
-}
-export interface AttestationServiceStatusResponse {
-  name: string
-  address: Address
-  ecdsaPublicKey: string
-  blsPublicKey: string
-  affiliation: string | null
-  score: BigNumber
-  hasAttestationSigner: boolean
-  attestationSigner: string
-  attestationServiceURL: string | null
-  metadataURL: string | null
-  okStatus: boolean
-  error: null | Error
-  smsProviders: string[]
-  blacklistedRegionCodes: string[] | null
-  rightAccount: boolean
-  signer: string
-  state: AttestationServiceStatusState
-  version: string | null
-  ageOfLatestBlock: number | null
-  smsProvidersRandomized: boolean | null
-  maxDeliveryAttempts: number | null
-  maxRerequestMins: number | null
-  twilioVerifySidProvided: boolean | null
 }
 
 export type AttestationsWrapperType = AttestationsWrapper
