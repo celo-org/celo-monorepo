@@ -36,6 +36,7 @@ git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 echo "- Build contract artifacts"
 rm -rf build/contracts
 # cd ../..
+yarn clean >> $LOG_FILE
 yarn install >> $LOG_FILE
 yarn build:sol >> $LOG_FILE
 # yarn build:truffle-types >> $LOG_FILE
