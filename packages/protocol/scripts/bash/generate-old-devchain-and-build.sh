@@ -38,7 +38,7 @@ echo "BUILD_DIR: $BUILD_DIR"
 echo "- Build contract artifacts"
 rm -rf build/contracts
 cd ../..
-git clean -xdf >> $LOG_FILE
+# git clean -xdf >> $LOG_FILE
 yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
 # yarn build:sol >> $LOG_FILE
