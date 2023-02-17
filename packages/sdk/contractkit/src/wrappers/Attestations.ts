@@ -1,6 +1,5 @@
 import { StableToken } from '@celo/base'
 import { eqAddress } from '@celo/base/lib/address'
-import { sleep } from '@celo/base/lib/async'
 import { Address, Connection, toTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import { Attestations } from '../generated/Attestations'
@@ -14,14 +13,6 @@ import {
   valueToInt,
 } from './BaseWrapper'
 import { StableTokenWrapper } from './StableTokenWrapper'
-
-function hashAddressToSingleDigit(address: Address): number {
-  return new BigNumber(address.toLowerCase()).modulo(10).toNumber()
-}
-
-export function getSecurityCodePrefix(issuerAddress: Address) {
-  return `${hashAddressToSingleDigit(issuerAddress)}`
-}
 
 export interface AttestationStat {
   completed: number
@@ -49,14 +40,6 @@ export enum AttestationState {
   None,
   Incomplete,
   Complete,
-}
-
-export interface ActionableAttestation {
-  issuer: Address
-  blockNumber: number
-  attestationServiceURL: string
-  name: string | undefined
-  version: string
 }
 
 export interface UnselectedRequest {
@@ -136,36 +119,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     const attestationExpiryBlocks = await this.attestationExpiryBlocks()
     const blockNumber = await this.connection.getBlockNumber()
     return blockNumber >= attestationRequestBlockNumber + attestationExpiryBlocks
-  }
-
-  /**
-   * @notice Waits for appropriate block numbers for before issuer can be selected
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   */
-  waitForSelectingIssuers = async (
-    identifier: string,
-    account: Address,
-    timeoutSeconds = 120,
-    pollDurationSeconds = 1
-  ) => {
-    const startTime = Date.now()
-    const unselectedRequest = await this.getUnselectedRequest(identifier, account)
-    const waitBlocks = await this.selectIssuersWaitBlocks()
-
-    if (unselectedRequest.blockNumber === 0) {
-      throw new Error('No unselectedRequest to wait for')
-    }
-    // Technically should use subscriptions here but not all providers support it.
-    // TODO: Use subscription if provider supports
-    while (Date.now() - startTime < timeoutSeconds * 1000) {
-      const blockNumber = await this.connection.getBlockNumber()
-      if (blockNumber >= unselectedRequest.blockNumber + waitBlocks) {
-        return
-      }
-      await sleep(pollDurationSeconds * 1000)
-    }
-    throw new Error('Timeout while waiting for selecting issuers')
   }
 
   /**
