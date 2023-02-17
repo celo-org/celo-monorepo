@@ -55,25 +55,41 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    */
-  function initialize(address _registryAddress) external initializer {
+  function initialize(
+    address _registryAddress,
+    address[] calldata tokens,
+    uint256[] calldata newLimits,
+    uint256[] calldata newMaxSlippages,
+    address[] calldata newRouters
+  ) external initializer {
+    require(tokens.length == newLimits.length, "limits lenght should match tokens'");
+    require(tokens.length == newMaxSlippages.length, "maxSlippage lenght should match tokens'");
+    require(tokens.length == newRouters.length, "maxSlippage lenght should match tokens'");
+
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
-    // lastLimitDay = now / 1 days;
-    // _setDailyBurnLimit()
-    // TODO add limits
-    // _setMaxSplipagge
-    // TODO maxSlippage
 
-    // TODO add pool
+    for (uint256 i = 0; i < tokens.length; i++) {
+      _setDailyBurnLimit(tokens[i], newLimits[i]);
+      _setMaxSplipagge(tokens[i], newMaxSlippages[i]);
+      // Mento tokens don't need to set a router
+      if (newRouters[i] != address(0)) {
+        _setRouter(tokens[i], newRouters[i]);
+      }
+    }
   }
 
-  function burnAllCelo() public {
-    ICeloToken celo = ICeloToken(getCeloTokenAddress());
-    celo.burn(celo.balanceOf(address(this)));
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 0, 0, 0);
   }
 
-  function getPastBurnForToken(address tokenAddress) external view returns (uint256) {
-    return pastBurn[tokenAddress];
+  function setMaxSplipagge(address tokenAddress, uint256 newMax) external onlyOwner {
+    _setMaxSplipagge(tokenAddress, newMax);
+  }
+
+  function _setMaxSplipagge(address tokenAddress, uint256 newMax) private {
+    maxSlippage[tokenAddress] = FixidityLib.wrap(newMax);
+    emit MAxSlippageSet(tokenAddress, newMax);
   }
 
   function setDailyBurnLimit(address tokenAddress, uint256 newLimit) external onlyOwner {
@@ -83,6 +99,28 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   function _setDailyBurnLimit(address tokenAddress, uint256 newLimit) private {
     dailyBurnLimit[tokenAddress] = newLimit;
     emit DailyLimitSet(tokenAddress, newLimit);
+  }
+
+  function setRouter(address token, address router) external onlyOwner {
+    _setRouter(token, router);
+  }
+
+  function _setRouter(address token, address router) private {
+    routerAddresses[token].push(router);
+    emit RouterAddressSet(token, router);
+  }
+
+  function getRouterForToken(address token) external view returns (address[] memory) {
+    return routerAddresses[token];
+  }
+
+  function burnAllCelo() public {
+    ICeloToken celo = ICeloToken(getCeloTokenAddress());
+    celo.burn(celo.balanceOf(address(this)));
+  }
+
+  function getPastBurnForToken(address tokenAddress) external view returns (uint256) {
+    return pastBurn[tokenAddress];
   }
 
   function limitHit(address tokenAddress, uint256 amountToBurn) public returns (bool) {
@@ -122,11 +160,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       emit DailyLimitHit(tokenAddress, balanceToBurn);
     }
 
-    // small numbers cause rounding errors and zero case should be skiped
-    if (balanceToBurn <= MIN_BURN) {
-      return;
-    }
-
     address exchangeAddress = registryContract.getAddressForOrDie(
       stableToken.getExchangeRegistryId()
     );
@@ -140,6 +173,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       ISortedOracles sortedOracles = getSortedOracles();
       (uint256 priceWithoutSlippage, ) = sortedOracles.medianRate(tokenAddress);
       minAmount = calculateMinAmount(priceWithoutSlippage, tokenAddress, balanceToBurn);
+    }
+
+    // small numbers cause rounding errors and zero case should be skiped
+    if (balanceToBurn <= MIN_BURN) {
+      return;
     }
 
     // TODO maybe we could compare with uniswap as well
@@ -163,7 +201,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     uint256 bestRouterQuote = 0;
 
     address[] memory path = new address[](2);
-    address[] memory routerAddresses = routerAddresses[tokenAddress];
+    address[] memory thisTokenRouterAddresses = routerAddresses[tokenAddress];
 
     IERC20 token = IERC20(tokenAddress);
     uint256 balanceToBurn = token.balanceOf(address(this));
@@ -174,21 +212,18 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       emit DailyLimitHit(tokenAddress, balanceToBurn);
     }
 
-    require(routerAddresses.length > 0, "routerAddresses should be non empty");
-    // j is router index
-    for (uint256 j = 0; j < routerAddresses.length; j++) {
-      // TODO change name to router rather than pool
-      address poolAddress = routerAddresses[j]; // TODO check the zero // TODO get right iteration
+    // small numbers cause rounding errors and zero case should be skiped
+    if (balanceToBurn <= MIN_BURN) {
+      return;
+    }
+
+    require(thisTokenRouterAddresses.length > 0, "routerAddresses should be non empty");
+
+    for (uint256 j = 0; j < thisTokenRouterAddresses.length; j++) {
+      address poolAddress = thisTokenRouterAddresses[j];
 
       require(poolAddress != address(0), "poolAddress should be nonZero");
       IUniswapV2RouterMin router = IUniswapV2RouterMin(poolAddress);
-
-      // require(false, "made it here");
-
-      // small numbers cause rounding errors and zero case should be skiped
-      if (balanceToBurn <= MIN_BURN) {
-        continue;
-      }
 
       path[0] = tokenAddress;
       path[1] = celoAddress;
@@ -203,7 +238,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
     // don't try to exchange on zero quotes
     if (bestRouterQuote > 0) {
-      address bestRouterAddress = routerAddresses[bestRouterIndex];
+      address bestRouterAddress = thisTokenRouterAddresses[bestRouterIndex];
       IUniswapV2RouterMin bestRouter = IUniswapV2RouterMin(bestRouterAddress);
 
       uint256 minAmount = 0;
@@ -233,21 +268,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     }
   }
 
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 0, 0, 0);
-  }
-
-  function setMaxSplipagge(address tokenAddress, uint256 newMax) external onlyOwner {
-    _setMaxSplipagge(tokenAddress, newMax);
-  }
-
-  function _setMaxSplipagge(address tokenAddress, uint256 newMax) private {
-    maxSlippage[tokenAddress] = FixidityLib.wrap(newMax);
-    emit MAxSlippageSet(tokenAddress, newMax);
-  }
-
   // this function is permionless
-  function burnMentoAssets() private {
+  function burnMentoAssets() public {
     // here it could also be checked that the tokens is whitelisted, but we assume everything that has already been sent here is
     // due for burning
     address[] memory mentoTokens = getReserve().getTokens();
@@ -290,15 +312,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   function transfer(address token, address recipient, uint256 value) external onlyOwner {
     // meant for governance to trigger use cases not contemplated in this contract
     IERC20(token).transfer(recipient, value);
-  }
-
-  function setExchange(address token, address router) external onlyOwner {
-    _setExchange(token, router);
-  }
-
-  function _setExchange(address token, address router) private {
-    routerAddresses[token].push(router);
-    emit RouterAddressSet(token, router);
   }
 
   function removetExchange(address token, address routerAddress, uint256 index) external onlyOwner {
