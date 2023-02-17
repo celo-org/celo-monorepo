@@ -47,13 +47,27 @@ export class GcpHsmWallet extends RemoteWallet<GcpHsmSigner> implements ReadOnly
       throw new Error('GcpHsmWallet needs to be initialised first')
     }
     const [pk] = await this.client.getPublicKey({ name: versionName })
-    const derEncodedPk = pk.pem?.split('\n').slice(1, -2).join('').trim()
-    // @ts-ignore
+    if (!pk.pem) {
+      throw new Error('PublicKey pem is not defined')
+    }
+    const derEncodedPk = this.pemToDerEncode(pk.pem)
     const pubKey = publicKeyFromAsn1(Buffer.from(derEncodedPk, 'base64'))
     const pkbuff = bigNumberToBuffer(pubKey, sixtyFour)
     const pubKeyPrefix = Buffer.from(new Uint8Array([publicKeyPrefix]))
     const rawPublicKey = Buffer.concat([pubKeyPrefix, pkbuff])
     return bufferToBigNumber(rawPublicKey)
+  }
+
+  /**
+   * Converts key from PEM to DER encoding.
+   *
+   * DER (Distinguished Encoding Rules) is a binary encoding for X.509 certificates and private keys.
+   * Unlike PEM, DER-encoded files do not contain plain text statements such as -----BEGIN CERTIFICATE-----
+   *
+   * https://www.ssl.com/guide/pem-der-crt-and-cer-x-509-encodings-and-conversions/#:~:text=DER%20(Distinguished%20Encoding%20Rules)%20is,commonly%20seen%20in%20Java%20contexts.
+   */
+  private pemToDerEncode(pem: string): string {
+    return pem.split('\n').slice(1, -2).join('').trim()
   }
 
   /**
