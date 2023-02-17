@@ -16,9 +16,10 @@ import "../stability/StableToken.sol"; // TODO check if this can be interface
 import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
-import "../uniswap/interfaces/IUniswapV2Router02.sol"; // TODO change for a more minimalist interface
+// Using the minimal required signatures in the interfaces so more contracts could be compatible
+import "../uniswap/interfaces/IUniswapV2RouterMin.sol"; // TODO change for a more minimalist interface
 import "../uniswap/interfaces/IUniswapV2Factory.sol";
-import "../uniswap/interfaces/IUniswapV2Pair.sol";
+import "../uniswap/interfaces/IUniswapV2PairMin.sol";
 
 contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract {
   using SafeMath for uint256;
@@ -58,16 +59,13 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     _transferOwnership(msg.sender);
     setRegistry(_registryAddress);
     // lastLimitDay = now / 1 days;
+    // _setDailyBurnLimit()
     // TODO add limits
+    // _setMaxSplipagge
     // TODO maxSlippage
+
     // TODO add pool
   }
-
-  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 0, 0, 0);
-  }
-
-  // TODO chose the best price from options
 
   function burnAllCelo() public {
     ICeloToken celo = ICeloToken(getCeloTokenAddress());
@@ -79,6 +77,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   }
 
   function setDailyBurnLimit(address tokenAddress, uint256 newLimit) external onlyOwner {
+    _setDailyBurnLimit(tokenAddress, newLimit);
+  }
+
+  function _setDailyBurnLimit(address tokenAddress, uint256 newLimit) private {
     dailyBurnLimit[tokenAddress] = newLimit;
     emit DailyLimitSet(tokenAddress, newLimit);
   }
@@ -109,9 +111,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     return true;
   }
 
-  function burnSingleMentoToken(address mentoToken) public {
-    address tokenAddress = mentoToken; // TODO refactor me
-
+  // should be used in case the loop fails because one token is reverting or OOG
+  function burnSingleMentoToken(address tokenAddress) public {
     StableToken stableToken = StableToken(tokenAddress);
     uint256 balanceToBurn = stableToken.balanceOf(address(this));
 
@@ -151,22 +152,105 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
   }
 
-  function burnSingleNonMentoToken() public {}
+  function burnSingleNonMentoToken(address tokenAddress) public {
+    // an improvement to this function would be to allow the user to pass a path as argument
+    // and if it generates a better outcome that the ones enabled that gets used
+    // and the user gets a reward
+
+    address celoAddress = getCeloTokenAddress();
+
+    uint256 bestRouterIndex = 0;
+    uint256 bestRouterQuote = 0;
+
+    address[] memory path = new address[](2);
+    address[] memory routerAddresses = routerAddresses[tokenAddress];
+
+    IERC20 token = IERC20(tokenAddress);
+    uint256 balanceToBurn = token.balanceOf(address(this));
+
+    if (limitHit(tokenAddress, balanceToBurn)) {
+      // in case the limit is hit, burn the max possible
+      balanceToBurn = currentDayLimit[tokenAddress];
+      emit DailyLimitHit(tokenAddress, balanceToBurn);
+    }
+
+    require(routerAddresses.length > 0, "routerAddresses should be non empty");
+    // j is router index
+    for (uint256 j = 0; j < routerAddresses.length; j++) {
+      // TODO change name to router rather than pool
+      address poolAddress = routerAddresses[j]; // TODO check the zero // TODO get right iteration
+
+      require(poolAddress != address(0), "poolAddress should be nonZero");
+      IUniswapV2RouterMin router = IUniswapV2RouterMin(poolAddress);
+
+      // require(false, "made it here");
+
+      // small numbers cause rounding errors and zero case should be skiped
+      if (balanceToBurn <= MIN_BURN) {
+        continue;
+      }
+
+      path[0] = tokenAddress;
+      path[1] = celoAddress;
+
+      uint256 wouldGet = router.getAmountsOut(balanceToBurn, path)[1];
+      emit ReceivedQuote(poolAddress, wouldGet);
+      if (wouldGet > bestRouterQuote) {
+        bestRouterQuote = wouldGet;
+        bestRouterIndex = j;
+      }
+    }
+
+    // don't try to exchange on zero quotes
+    if (bestRouterQuote > 0) {
+      address bestRouterAddress = routerAddresses[bestRouterIndex];
+      IUniswapV2RouterMin bestRouter = IUniswapV2RouterMin(bestRouterAddress);
+
+      uint256 minAmount = 0;
+      if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
+        // checking slippage before trading
+        IUniswapV2PairMin pair = IUniswapV2PairMin(
+          IUniswapV2Factory(bestRouter.factory()).getPair(tokenAddress, celoAddress)
+        );
+        (uint256 tokenAmount, uint256 celoAmount, ) = pair.getReserves();
+        minAmount = calculateMinAmount(tokenAmount / celoAmount, tokenAddress, balanceToBurn);
+      }
+
+      token.approve(bestRouterAddress, balanceToBurn);
+      bestRouter.swapExactTokensForTokens(
+        balanceToBurn,
+        minAmount,
+        path,
+        address(this),
+        block.timestamp + 10
+      );
+
+      updateLimits(tokenAddress, balanceToBurn);
+
+      emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
+      emit RouterUsed(bestRouterAddress);
+
+    }
+  }
+
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 0, 0, 0);
+  }
 
   function setMaxSplipagge(address tokenAddress, uint256 newMax) external onlyOwner {
+    _setMaxSplipagge(tokenAddress, newMax);
+  }
+
+  function _setMaxSplipagge(address tokenAddress, uint256 newMax) private {
     maxSlippage[tokenAddress] = FixidityLib.wrap(newMax);
     emit MAxSlippageSet(tokenAddress, newMax);
   }
-
-  // TODO make burn idependent
 
   // this function is permionless
   function burnMentoAssets() private {
     // here it could also be checked that the tokens is whitelisted, but we assume everything that has already been sent here is
     // due for burning
     address[] memory mentoTokens = getReserve().getTokens();
-
-    // require(false, "start"); // TODO remove me
 
     for (uint256 i = 0; i < mentoTokens.length; i++) {
       burnSingleMentoToken(mentoTokens[i]);
@@ -188,84 +272,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   function burnNonMentoTokens() public {
     address[] memory tokens = getFeeCurrencyWhitelistRegistry().getWhitelistNonMento();
-    address celoAddress = getCeloTokenAddress();
-
-    uint256 bestRouterIndex = 0;
-    uint256 bestRouterQuote = 0;
-
-    address[] memory path = new address[](2);
 
     // i is token index
     for (uint256 i = 0; i < tokens.length; i++) {
-      address tokenAddress = tokens[i];
-      address[] memory pollAddresses = routerAddresses[tokenAddress];
-
-      IERC20 token = IERC20(tokenAddress);
-      uint256 balanceToBurn = token.balanceOf(address(this));
-
-      if (limitHit(tokenAddress, balanceToBurn)) {
-        // in case the limit is hit, burn the max possible
-        balanceToBurn = currentDayLimit[tokenAddress];
-        emit DailyLimitHit(tokenAddress, balanceToBurn);
-      }
-
-      require(pollAddresses.length > 0, "pollAddresses should be non empty");
-      // j is router index
-      for (uint256 j = 0; j < pollAddresses.length; j++) {
-        // TODO change name to router rather than pool
-        address poolAddress = pollAddresses[j]; // TODO check the zero // TODO get right iteration
-
-        require(poolAddress != address(0), "poolAddress should be nonZero");
-        IUniswapV2Router02 router = IUniswapV2Router02(poolAddress);
-
-        // require(false, "made it here");
-
-        // small numbers cause rounding errors and zero case should be skiped
-        if (balanceToBurn <= MIN_BURN) {
-          continue;
-        }
-
-        path[0] = tokenAddress;
-        path[1] = celoAddress;
-
-        uint256 wouldGet = router.getAmountsOut(balanceToBurn, path)[1];
-        emit ReceivedQuote(poolAddress, wouldGet);
-        if (wouldGet > bestRouterQuote) {
-          bestRouterQuote = wouldGet;
-          bestRouterIndex = j;
-        }
-      }
-
-      // don't try to exchange on zero quotes
-      if (bestRouterQuote > 0) {
-        address bestRouterAddress = pollAddresses[bestRouterIndex];
-        IUniswapV2Router02 bestRouter = IUniswapV2Router02(bestRouterAddress);
-
-        uint256 minAmount = 0;
-        if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
-          // checking slippage before trading
-          IUniswapV2Pair pair = IUniswapV2Pair(
-            IUniswapV2Factory(bestRouter.factory()).getPair(tokenAddress, celoAddress)
-          );
-          (uint256 tokenAmount, uint256 celoAmount, ) = pair.getReserves();
-          minAmount = calculateMinAmount(tokenAmount / celoAmount, tokenAddress, balanceToBurn);
-        }
-
-        token.approve(bestRouterAddress, balanceToBurn);
-        bestRouter.swapExactTokensForTokens(
-          balanceToBurn,
-          minAmount,
-          path,
-          address(this),
-          block.timestamp + 10
-        );
-
-        updateLimits(tokenAddress, balanceToBurn);
-
-        emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
-        emit RouterUsed(bestRouterAddress);
-
-      }
+      burnSingleNonMentoToken(tokens[i]);
     }
 
   }
