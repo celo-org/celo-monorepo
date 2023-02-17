@@ -214,7 +214,14 @@ contract('FeeBurner', (accounts: string[]) => {
     })
   })
 
-  describe('#removetExchange()', () => {})
+  describe('#removeExchange()', () => {
+    it('removes a token', async () => {
+      await feeBurner.removeExchange(tokenA.address, uniswap.address, 0)
+
+      // Todo check the list here
+      // TODO check with more items
+    })
+  })
 
   describe('#setDailyBurnLimit()', () => {
     it('should only be called by owner', async () => {

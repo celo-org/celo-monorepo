@@ -21,6 +21,7 @@ import "../uniswap/interfaces/IUniswapV2RouterMin.sol"; // TODO change for a mor
 import "../uniswap/interfaces/IUniswapV2Factory.sol";
 import "../uniswap/interfaces/IUniswapV2PairMin.sol";
 
+// TODO add Freezable only when not frozen
 contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
@@ -314,7 +315,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     IERC20(token).transfer(recipient, value);
   }
 
-  function removetExchange(address token, address routerAddress, uint256 index) external onlyOwner {
+  function removeExchange(address token, address routerAddress, uint256 index) external onlyOwner {
     // TODO test me
     require(routerAddresses[token][index] == routerAddress, "Index does not match");
 
