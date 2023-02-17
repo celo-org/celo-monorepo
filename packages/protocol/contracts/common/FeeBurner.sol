@@ -40,6 +40,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   event DailyLimitUpdatedDeleteMe(uint256 amount);
   event RouterAddressSet(address token, address router);
   event RouterAddressRemoved(address token, address router);
+  event RouterUsed(address router);
+  event ReceivedQuote(address router, uint256 quote);
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -160,16 +162,13 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
           .fromFixed();
       }
 
+      // TODO maybe we could compare with uniswap as well
       exchange.sell(balanceToBurn, minAmount, false);
       pastBurn[tokenAddress] += balanceToBurn;
 
       updateLimits(tokenAddress, balanceToBurn);
 
       emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
-
-      // uint256 celoBalance = celo.balanceOf(address(this));
-      // emit CeloBalance(celoBalance);
-      // require(celoBalance > 0, "Celo Balance not bigger than zero"); // TODO remove me
 
     }
 
@@ -179,47 +178,72 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     address[] memory tokens = getFeeCurrencyWhitelistRegistry().getWhitelistNonMento();
     address celoAddress = getCeloTokenAddress();
 
+    uint256 bestRouterIndex = 0;
+    uint256 bestRouterQuote = 0;
+
+    address[] memory path = new address[](2);
+
+    // i is token index
     for (uint256 i = 0; i < tokens.length; i++) {
       address tokenAddress = tokens[i];
       address[] memory pollAddresses = routerAddresses[tokenAddress];
 
-      require(pollAddresses.length > 0, "pollAddresses should be non empty");
-
-      address poolAddress = routerAddresses[tokenAddress][0]; // TODO check the zero // TODO get right iteration
-
-      require(poolAddress != address(0), "pollAddresses should be nonZero");
-      IUniswapV2Router02 router = IUniswapV2Router02(poolAddress);
       IERC20 token = IERC20(tokenAddress);
-
       uint256 balanceToBurn = token.balanceOf(address(this));
-
       if (limitHit(tokenAddress, balanceToBurn)) {
         // in case the limit is hit, burn the max possible
         balanceToBurn = currentDayLimit[tokenAddress];
         emit DailyLimitHit(tokenAddress, balanceToBurn);
       }
-      // require(false, "made it here");
 
-      // small numbers cause rounding errors and zero case should be skiped
-      if (balanceToBurn <= MIN_BURN) {
-        continue;
+      require(pollAddresses.length > 0, "pollAddresses should be non empty");
+      // i is router index
+      for (uint256 j = 0; j < pollAddresses.length; j++) {
+        // TODO change name to router rather than pool
+        address poolAddress = pollAddresses[j]; // TODO check the zero // TODO get right iteration
+
+        require(poolAddress != address(0), "poolAddress should be nonZero");
+        IUniswapV2Router02 router = IUniswapV2Router02(poolAddress);
+
+        // require(false, "made it here");
+
+        // small numbers cause rounding errors and zero case should be skiped
+        if (balanceToBurn <= MIN_BURN) {
+          continue;
+        }
+
+        path[0] = tokenAddress;
+        path[1] = celoAddress;
+
+        // TODO test this
+        uint256 wouldGet = router.getAmountsOut(balanceToBurn, path)[1];
+        emit ReceivedQuote(poolAddress, wouldGet);
+        if (wouldGet > bestRouterQuote) {
+          bestRouterQuote = wouldGet;
+          bestRouterIndex = j;
+        }
       }
 
-      address[] memory path = new address[](2);
-      path[0] = tokenAddress;
-      path[1] = celoAddress;
+      // don't try to exchange on zero quotes
+      if (bestRouterQuote > 0) {
+        // TODO check slippage
+        address bestRouterAddress = pollAddresses[bestRouterIndex];
+        IUniswapV2Router02 bestRouter = IUniswapV2Router02(bestRouterAddress);
+        token.approve(bestRouterAddress, balanceToBurn);
+        bestRouter.swapExactTokensForTokens(
+          balanceToBurn,
+          0,
+          path,
+          address(this),
+          block.timestamp + 10
+        );
 
-      // TODO test this
-      uint256 wouldGet = router.getAmountsOut(balanceToBurn, path)[0];
+        updateLimits(tokenAddress, balanceToBurn);
 
-      token.approve(poolAddress, balanceToBurn);
-      router.swapExactTokensForTokens(balanceToBurn, 0, path, address(this), block.timestamp + 10);
-      // TODO use more than one
+        emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
+        emit RouterUsed(bestRouterAddress);
 
-      updateLimits(tokenAddress, balanceToBurn);
-
-      emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
-
+      }
     }
 
   }

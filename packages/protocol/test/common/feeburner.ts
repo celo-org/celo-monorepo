@@ -65,6 +65,7 @@ contract('FeeBurner', (accounts: string[]) => {
   let freezer: FreezerInstance
 
   let uniswapFactory: MockUniswapV2FactoryInstance
+  let uniswapFactory2: MockUniswapV2FactoryInstance
   let uniswap: MockUniswapV2Router02Instance
   let uniswap2: MockUniswapV2Router02Instance
   let tokenA: MockERC20Instance
@@ -98,7 +99,6 @@ contract('FeeBurner', (accounts: string[]) => {
     goldToken = await GoldToken.new(true)
     mockReserve = await MockReserve.new()
     stableToken = await StableToken.new(true)
-    // dummyToken = await StableToken.new(true)
     registry = await Registry.new(true)
     feeBurner = await FeeBurner.new(true)
     freezer = await Freezer.new(true)
@@ -106,16 +106,17 @@ contract('FeeBurner', (accounts: string[]) => {
     await feeCurrencyWhitelist.initialize()
 
     uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
-    // console.log('hash', await uniswapFactory.INIT_CODE_PAIR_HASH())
+    console.log('hash1', await uniswapFactory.INIT_CODE_PAIR_HASH())
     // 0x2bfd701f0ec7fe6631627822d4675473606aaf94b22b804c1c02b8414810bfd4
     uniswap = await UniswapRouter.new(
       uniswapFactory.address,
       '0x0000000000000000000000000000000000000000'
     ) // _factory, _WETH
 
-    // uniswapFactory2 = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
+    uniswapFactory2 = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
+    console.log('hash2', await uniswapFactory.INIT_CODE_PAIR_HASH())
     uniswap2 = await UniswapRouter.new(
-      uniswapFactory.address, // this will not work because of the hash, need to fork the contracts to do this
+      uniswapFactory2.address, // this will not work because of the hash, need to fork the contracts to do this
       '0x0000000000000000000000000000000000000000'
     ) // _factory, _WETH
 
@@ -297,7 +298,7 @@ contract('FeeBurner', (accounts: string[]) => {
       // await assertRevert(feeCurrencyWhitelist.addToken(aTokenAddress, { from: nonOwner }))
     })
 
-    describe.only('#burnNonMentoAssets()', () => {
+    describe('#burnNonMentoAssets()', () => {
       beforeEach(async () => {
         tokenA = await ERC20.new()
         feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
@@ -368,21 +369,18 @@ contract('FeeBurner', (accounts: string[]) => {
       })
 
       it.only('Tries to get the best rate with many exchanges', async () => {
+        await feeBurner.setExchange(tokenA.address, uniswap2.address)
         await tokenA.mint(user, new BigNumber(10e18))
 
         // safety check, check that the balance is no empty before the burn
         await assertGtBN(await tokenA.balanceOf(feeBurner.address), 0)
-        await feeBurner.burnNonMentoTokens()
 
-        assertEqualBN(await tokenA.balanceOf(feeBurner.address), 0)
-
-        const toTransfer = new BigNumber(5e18)
+        const toTransfer = new BigNumber(10e18) // make uniswap2 bigger, so it should get used
         console.log(await (await goldToken.balanceOf(user)).toString())
 
         await tokenA.approve(uniswap2.address, toTransfer, { from: user })
         await goldToken.approve(uniswap2.address, toTransfer, { from: user })
 
-        // likely reverts because it can'd find the pool
         await uniswap2.addLiquidity(
           tokenA.address,
           goldToken.address,
@@ -394,6 +392,41 @@ contract('FeeBurner', (accounts: string[]) => {
           deadline,
           { from: user }
         )
+
+        const quote1before = (
+          await uniswap.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address])
+        )[1]
+        const quote2before = (
+          await uniswap2.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address])
+        )[1]
+
+        console.log(uniswap.address)
+        console.log(uniswap2.address)
+
+        await feeBurner.burnNonMentoTokens()
+
+        // liquidity should have been taken by the uniswap2, because it has better liquidity, and thust higher quite
+        // so the quote gets worse (smaller number)
+
+        const quote1after = (
+          await uniswap.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address])
+        )[1]
+        const quote2after = (
+          await uniswap2.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address])
+        )[1]
+
+        assertEqualBN(quote1before, quote1after)
+        assertGtBN(quote2before, quote2after)
+        // ()
+
+        // console.log((await uniswap.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address]))[0].toString())
+        // console.log((await uniswap.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address]))[1].toString()) // this is the one that matters
+
+        // console.log((await uniswap2.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address]))[0].toString())
+        // console.log((await uniswap2.getAmountsOut(new BigNumber(1e18), [tokenA.address, goldToken.address]))[1].toString()) // this is the one that matters // this one should have gotten smaller, because liquidity was taken
+
+        // assert(false)
+        assertEqualBN(await tokenA.balanceOf(feeBurner.address), 0) // check that it burned
       })
     })
   })
