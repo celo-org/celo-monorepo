@@ -7,7 +7,7 @@
     "includeDeclarations": false,
     "ignoreCompilerErrors": true,
     "hideGenerator": "true",
-    "theme": "gitbook",
-    "out": "../../docs/developer-resources/identity/reference",
-    "gitRevision": "master"
+    "out": "../../docs/sdk/docs/identity",
+    "gitRevision": "master",
+    "readme": "none"
   }

@@ -3,7 +3,7 @@ import {
   generateSeed,
   normalizeMnemonic,
   validateMnemonic,
-} from '@celo/utils/lib/account'
+} from '@celo/cryptographic-utils/lib/account'
 import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { flags } from '@oclif/command'
 import { toChecksumAddress } from 'ethereumjs-util'

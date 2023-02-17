@@ -2,12 +2,14 @@ import { Address, isHexString, trimLeading0x } from '@celo/base/lib/address'
 import {
   AbiCoder,
   ABIDefinition,
+  AbiItem,
   CeloTransactionObject,
   CeloTxObject,
   CeloTxPending,
   Contract,
   getAbiByName,
   parseDecodedParams,
+  signatureToAbiDefinition,
 } from '@celo/connect'
 import {
   CeloContract,
@@ -33,6 +35,7 @@ import {
   ProposalTransaction,
 } from '@celo/contractkit/lib/wrappers/Governance'
 import { newBlockExplorer } from '@celo/explorer'
+import { fetchMetadata } from '@celo/explorer/lib/sourcify'
 import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
@@ -183,15 +186,15 @@ export const proposalToJSON = async (
       jsonTx.params![`initialize@${initSig}`] = initParams
     } else if (isGovernanceConstitutionSetter(jsonTx)) {
       const [address, functionId, threshold] = jsonTx.args
-      const { contract, abi } = blockExplorer.getContractMethodAbi(address, functionId)
-      if (!contract || !abi) {
+      const result = await blockExplorer.getContractMethodAbi(address, functionId)
+      if (result === null) {
         throw new Error(
           `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
         )
       }
       jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
-        contract,
-        method: abi.name,
+        contract: result.contract,
+        method: result.abi.name,
         threshold: fromFixed(new BigNumber(threshold)),
       }
     }
@@ -286,31 +289,55 @@ export class ProposalBuilder {
   getRegistryAddition = (contract: CeloContract): string | undefined =>
     this.registryAdditions[stripProxy(contract)]
 
-  isRegistered = (contract: CeloContract) =>
+  isRegistryContract = (contract: CeloContract) =>
     RegisteredContracts.includes(stripProxy(contract)) ||
     this.getRegistryAddition(contract) !== undefined
 
-  fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
-    if (isRegistryRepoint(tx)) {
-      // Update canonical registry addresses
-      const args = registryRepointArgs(tx)
-      this.setRegistryAddition(args.name, args.address)
+  /*
+   * @deprecated - use isRegistryContract
+   */
+  isRegistered = this.isRegistryContract
+
+  buildCallToExternalContract = async (
+    tx: ProposalTransactionJSON
+  ): Promise<ProposalTransaction> => {
+    const abiCoder = this.kit.connection.getAbiCoder()
+    let methodABI: AbiItem | null = null
+
+    const metadata = await fetchMetadata(this.kit.connection, tx.contract)
+    if (metadata) {
+      const potentialABIs = metadata.abiForMethod(tx.function)
+      methodABI =
+        potentialABIs.find((abi) => {
+          try {
+            abiCoder.encodeFunctionCall(abi, tx.args)
+            return true
+          } catch {
+            return false
+          }
+        }) || null
     }
 
-    // handle sending value to unregistered contracts
-    if (!this.isRegistered(tx.contract)) {
-      if (!isValidAddress(tx.contract)) {
-        throw new Error(
-          `Transaction to unregistered contract ${tx.contract} only supported by address`
-        )
-      } else if (tx.function !== '' || tx.args !== []) {
-        throw new Error(
-          `Function ${tx.function} call with args ${tx.args} to unregistered contract not currently supported`
-        )
-      }
-      return { input: '', to: tx.contract, value: tx.value }
+    if (methodABI === null) {
+      methodABI = signatureToAbiDefinition(tx.function)
     }
 
+    const input = this.kit.connection.getAbiCoder().encodeFunctionCall(methodABI, tx.args)
+    let to: string = tx.contract
+    if (metadata && metadata.contractName) {
+      to = tx.contract
+    }
+
+    return { input, to, value: tx.value }
+  }
+
+  /*
+   *  @deprecated use buildCallToExternalContract
+   *
+   */
+  buildFunctionCallToExternalContract = this.buildCallToExternalContract
+
+  buildCallToCoreContract = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
     // Account for canonical registry addresses from current proposal
     const address =
       this.getRegistryAddition(tx.contract) ?? (await this.kit.registry.addressFor(tx.contract))
@@ -334,6 +361,32 @@ export class ProposalBuilder {
     }
 
     return this.fromWeb3tx(txo, { to: address, value: tx.value })
+  }
+
+  fromJsonTx = async (tx: ProposalTransactionJSON): Promise<ProposalTransaction> => {
+    if (isRegistryRepoint(tx)) {
+      // Update canonical registry addresses
+      const args = registryRepointArgs(tx)
+      this.setRegistryAddition(args.name, args.address)
+    }
+
+    // handle sending value to unregistered contracts
+    if (this.isRegistryContract(tx.contract)) {
+      return this.buildCallToCoreContract(tx)
+    } else {
+      if (!isValidAddress(tx.contract)) {
+        throw new Error(
+          `Transaction to unregistered contract ${tx.contract} only supported by address`
+        )
+      }
+
+      if (tx.function === '') {
+        // It's not a function call
+        return { input: '', to: tx.contract, value: tx.value }
+      }
+
+      return this.buildCallToExternalContract(tx)
+    }
   }
 
   addJsonTx = (tx: ProposalTransactionJSON) => this.builders.push(async () => this.fromJsonTx(tx))

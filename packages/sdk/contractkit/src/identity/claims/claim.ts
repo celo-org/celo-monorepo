@@ -74,6 +74,7 @@ export type ClaimPayload<K extends ClaimTypes> = K extends typeof ClaimTypes.DOM
   ? AccountClaim
   : StorageClaim
 
+/** @internal */
 export const isOfType = <K extends ClaimTypes>(type: K) => (data: Claim): data is ClaimPayload<K> =>
   data.type === type
 

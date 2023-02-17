@@ -7,7 +7,7 @@
     "includeDeclarations": false,
     "ignoreCompilerErrors": true,
     "hideGenerator": "true",
-    "theme": "gitbook",
-    "out": "../../docs/developer-resources/utils/reference",
-    "gitRevision": "master"
+    "out": "../../docs/sdk/docs/utils",
+    "gitRevision": "master",
+    "readme": "none"
   }

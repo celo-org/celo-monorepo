@@ -4,6 +4,7 @@
     "no-global-arrow-functions": false,
     "no-console": false,
     "member-ordering": false,
-    "max-classes-per-file": false
+    "max-classes-per-file": false,
+    "import-blacklist": [true, { "elliptic": ["ec"]}]
   }
 }

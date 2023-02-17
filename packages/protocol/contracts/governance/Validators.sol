@@ -160,10 +160,13 @@ contract Validators is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 2, 0, 2);
+    return (1, 2, 0, 4);
   }
 
   /**
@@ -353,6 +356,12 @@ contract Validators is
     bytes calldata blsPop
   ) external nonReentrant returns (bool) {
     address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(
+      // A Validator could avoid getting slashed by voting for a bunch of groups with very small
+      // amounts of CELO, causing the slash function to always run out of gas.
+      !getElection().allowedToVoteOverMaxNumberOfGroups(account),
+      "Validators cannot vote for more than max number of groups"
+    );
     require(!isValidator(account) && !isValidatorGroup(account), "Already registered");
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
     require(lockedGoldBalance >= validatorLockedGoldRequirements.value, "Deposit too small");
@@ -374,7 +383,8 @@ contract Validators is
 
   /**
    * @notice Returns the parameters that govern how a validator's score is calculated.
-   * @return The parameters that goven how a validator's score is calculated.
+   * @return The exponent that governs how a validator's score is calculated.
+   * @return The adjustment speed that governs how a validator's score is calculated.
    */
   function getValidatorScoreParameters() external view returns (uint256, uint256) {
     return (validatorScoreParameters.exponent, validatorScoreParameters.adjustmentSpeed.unwrap());
@@ -383,7 +393,10 @@ contract Validators is
   /**
    * @notice Returns the group membership history of a validator.
    * @param account The validator whose membership history to return.
-   * @return The group membership history of a validator.
+   * @return epochs The epochs of a validator.
+   * @return The membership groups of a validator.
+   * @return The last removed from group timestamp of a validator.
+   * @return The tail of a validator.
    */
   function getMembershipHistory(address account)
     external
@@ -515,10 +528,18 @@ contract Validators is
         .multiply(validators[account].score)
         .multiply(groups[group].slashInfo.multiplier);
       uint256 groupPayment = totalPayment.multiply(groups[group].commission).fromFixed();
-      uint256 validatorPayment = totalPayment.fromFixed().sub(groupPayment);
+      FixidityLib.Fraction memory remainingPayment = FixidityLib.newFixed(
+        totalPayment.fromFixed().sub(groupPayment)
+      );
+      (address beneficiary, uint256 fraction) = getAccounts().getPaymentDelegation(account);
+      uint256 delegatedPayment = remainingPayment.multiply(FixidityLib.wrap(fraction)).fromFixed();
+      uint256 validatorPayment = remainingPayment.fromFixed().sub(delegatedPayment);
       IStableToken stableToken = getStableToken();
       require(stableToken.mint(group, groupPayment), "mint failed to validator group");
       require(stableToken.mint(account, validatorPayment), "mint failed to validator account");
+      if (fraction != 0) {
+        require(stableToken.mint(beneficiary, delegatedPayment), "mint failed to delegatee");
+      }
       emit ValidatorEpochPaymentDistributed(account, validatorPayment, group, groupPayment);
       return totalPayment.fromFixed();
     } else {
@@ -726,6 +747,10 @@ contract Validators is
   function registerValidatorGroup(uint256 commission) external nonReentrant returns (bool) {
     require(commission <= FixidityLib.fixed1().unwrap(), "Commission can't be greater than 100%");
     address account = getAccounts().validatorSignerToAccount(msg.sender);
+    require(
+      !getElection().allowedToVoteOverMaxNumberOfGroups(account),
+      "Validator groups cannot vote for more than max number of groups"
+    );
     require(!isValidator(account), "Already registered as validator");
     require(!isValidatorGroup(account), "Already registered as group");
     uint256 lockedGoldBalance = getLockedGold().getAccountTotalLockedGold(account);
@@ -981,7 +1006,13 @@ contract Validators is
   /**
    * @notice Returns validator group information.
    * @param account The account that registered the validator group.
-   * @return The unpacked validator group struct.
+   * @return keys The Keys.
+   * @return commision The commision.
+   * @return nextCommision The next commision.
+   * @return nextCommisionBlock The next commision block.
+   * @return size The Size history.
+   * @return multiplier The multiplier.
+   * @return lastSlashed The last slashed.
    */
   function getValidatorGroup(address account)
     external
@@ -1057,7 +1088,8 @@ contract Validators is
 
   /**
    * @notice Returns the Locked Gold requirements for validators.
-   * @return The Locked Gold requirements for validators.
+   * @return The Locked Gold value.
+   * @return The Locked Gold duration.
    */
   function getValidatorLockedGoldRequirements() external view returns (uint256, uint256) {
     return (validatorLockedGoldRequirements.value, validatorLockedGoldRequirements.duration);
@@ -1065,7 +1097,8 @@ contract Validators is
 
   /**
    * @notice Returns the Locked Gold requirements for validator groups.
-   * @return The Locked Gold requirements for validator groups.
+   * @return The Locked Gold value.
+   * @return The Locked Gold duration.
    */
   function getGroupLockedGoldRequirements() external view returns (uint256, uint256) {
     return (groupLockedGoldRequirements.value, groupLockedGoldRequirements.duration);

@@ -1,8 +1,8 @@
 // tslint:disable: no-console
 import { ContractKit, newKitFromWeb3 } from '@celo/contractkit'
+import { getBlsPoP, getBlsPublicKey } from '@celo/cryptographic-utils/lib/bls'
 import { eqAddress, privateKeyToAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
-import { getBlsPoP, getBlsPublicKey } from '@celo/utils/lib/bls'
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import { bitIsSet, parseBlockExtraData } from '@celo/utils/lib/istanbul'
 import BigNumber from 'bignumber.js'
@@ -183,6 +183,7 @@ describe('governance tests', () => {
     genesisConfig: {
       churritoBlock: 0,
       donutBlock: 0,
+      espressoBlock: 0,
       epoch: 10,
     },
     instances: [

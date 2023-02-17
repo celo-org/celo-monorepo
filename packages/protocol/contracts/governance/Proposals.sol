@@ -137,35 +137,31 @@ library Proposals {
   /**
    * @notice Adds or changes a vote on a proposal.
    * @param proposal The proposal struct.
-   * @param previousWeight The previous weight of the vote.
-   * @param currentWeight The current weight of the vote.
-   * @param previousVote The vote to be removed, or None for a new vote.
-   * @param currentVote The vote to be set.
+   * @param previousYesVotes The previous yes votes weight.
+   * @param previousNoVotes The previous no votes weight.
+   * @param previousAbstainVotes The previous abstain votes weight.
+   * @param yesVotes The current yes votes weight.
+   * @param noVotes The current no votes weight.
+   * @param abstainVotes The current abstain votes weight.
    */
   function updateVote(
     Proposal storage proposal,
-    uint256 previousWeight,
-    uint256 currentWeight,
-    VoteValue previousVote,
-    VoteValue currentVote
+    uint256 previousYesVotes,
+    uint256 previousNoVotes,
+    uint256 previousAbstainVotes,
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
   ) public {
     // Subtract previous vote.
-    if (previousVote == VoteValue.Abstain) {
-      proposal.votes.abstain = proposal.votes.abstain.sub(previousWeight);
-    } else if (previousVote == VoteValue.Yes) {
-      proposal.votes.yes = proposal.votes.yes.sub(previousWeight);
-    } else if (previousVote == VoteValue.No) {
-      proposal.votes.no = proposal.votes.no.sub(previousWeight);
-    }
+    proposal.votes.yes = proposal.votes.yes.sub(previousYesVotes);
+    proposal.votes.no = proposal.votes.no.sub(previousNoVotes);
+    proposal.votes.abstain = proposal.votes.abstain.sub(previousAbstainVotes);
 
     // Add new vote.
-    if (currentVote == VoteValue.Abstain) {
-      proposal.votes.abstain = proposal.votes.abstain.add(currentWeight);
-    } else if (currentVote == VoteValue.Yes) {
-      proposal.votes.yes = proposal.votes.yes.add(currentWeight);
-    } else if (currentVote == VoteValue.No) {
-      proposal.votes.no = proposal.votes.no.add(currentWeight);
-    }
+    proposal.votes.yes = proposal.votes.yes.add(yesVotes);
+    proposal.votes.no = proposal.votes.no.add(noVotes);
+    proposal.votes.abstain = proposal.votes.abstain.add(abstainVotes);
   }
 
   /**
@@ -229,40 +225,6 @@ library Proposals {
   }
 
   /**
-   * @notice Returns the stage of a dequeued proposal.
-   * @param proposal The proposal struct.
-   * @param stageDurations The durations of the dequeued proposal stages.
-   * @return The stage of the dequeued proposal.
-   * @dev Must be called on a dequeued proposal.
-   */
-  function getDequeuedStage(Proposal storage proposal, StageDurations storage stageDurations)
-    internal
-    view
-    returns (Stage)
-  {
-    uint256 stageStartTime = proposal
-      .timestamp
-      .add(stageDurations.approval)
-      .add(stageDurations.referendum)
-      .add(stageDurations.execution);
-    // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
-      return Stage.Expiration;
-    }
-    stageStartTime = stageStartTime.sub(stageDurations.execution);
-    // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
-      return Stage.Execution;
-    }
-    stageStartTime = stageStartTime.sub(stageDurations.referendum);
-    // solhint-disable-next-line not-rely-on-time
-    if (now >= stageStartTime) {
-      return Stage.Referendum;
-    }
-    return Stage.Approval;
-  }
-
-  /**
    * @notice Returns the number of votes cast on the proposal over the total number
    *   of votes in the network as a fraction.
    * @param proposal The proposal struct.
@@ -281,7 +243,9 @@ library Proposals {
    * @notice Returns a specified transaction in a proposal.
    * @param proposal The proposal struct.
    * @param index The index of the specified transaction in the proposal's transaction list.
-   * @return The specified transaction.
+   * @return Transaction value.
+   * @return Transaction destination.
+   * @return Transaction data.
    */
   function getTransaction(Proposal storage proposal, uint256 index)
     public
@@ -296,7 +260,11 @@ library Proposals {
   /**
    * @notice Returns an unpacked proposal struct with its transaction count.
    * @param proposal The proposal struct.
-   * @return The unpacked proposal with its transaction count.
+   * @return proposer
+   * @return deposit
+   * @return timestamp
+   * @return transaction Transaction count.
+   * @return description Description url.
    */
   function unpack(Proposal storage proposal)
     internal
@@ -315,7 +283,9 @@ library Proposals {
   /**
    * @notice Returns the referendum vote totals for a proposal.
    * @param proposal The proposal struct.
-   * @return The yes, no, and abstain vote totals.
+   * @return The yes vote totals.
+   * @return The no vote totals.
+   * @return The abstain vote totals.
    */
   function getVoteTotals(Proposal storage proposal)
     internal

@@ -1,8 +1,5 @@
 import { trimLeading0x } from '@celo/base/lib/address'
 import { createECDH } from 'crypto'
-import { ec as EC } from 'elliptic'
-
-const secp256k1 = new EC('secp256k1')
 
 export function computeSharedSecret(privateKey: string, publicKey: string): Buffer {
   const ecdh = createECDH('secp256k1')
@@ -19,12 +16,22 @@ export function isCompressed(publicKey: string) {
 }
 
 export function ensureCompressed(publicKey: string): string {
-  return secp256k1.keyFromPublic(ensureUncompressedPrefix(publicKey), 'hex').getPublic(true, 'hex')
+  // NOTE: elliptic is disabled elsewhere in this library to prevent
+  // accidental signing of truncated messages.
+  // tslint:disable-next-line:import-blacklist
+  const EC = require('elliptic').ec
+  const ec = new EC('secp256k1')
+  return ec.keyFromPublic(ensureUncompressedPrefix(publicKey), 'hex').getPublic(true, 'hex')
 }
 
 export function ensureUncompressed(publicKey: string) {
   const noLeading0x = trimLeading0x(publicKey)
-  const uncompressed = secp256k1
+  // NOTE: elliptic is disabled elsewhere in this library to prevent
+  // accidental signing of truncated messages.
+  // tslint:disable-next-line:import-blacklist
+  const EC = require('elliptic').ec
+  const ec = new EC('secp256k1')
+  const uncompressed = ec
     .keyFromPublic(ensureUncompressedPrefix(noLeading0x), 'hex')
     .getPublic(false, 'hex')
   return uncompressed

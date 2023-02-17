@@ -3,6 +3,7 @@ import { zip } from '@celo/base/lib/collections'
 import {
   CeloTransactionObject,
   CeloTxObject,
+  Connection,
   Contract,
   EventLog,
   PastEventOptions,
@@ -11,7 +12,6 @@ import {
 import { fromFixed, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { ICeloVersionedContract } from '../generated/ICeloVersionedContract'
-import { ContractKit } from '../kit'
 import { ContractVersion } from '../versions'
 
 /** Represents web3 native contract Method */
@@ -23,13 +23,15 @@ type EventsEnum<T extends Contract> = {
   [event in Events<T>]: event
 }
 
-/** Base ContractWrapper */
+/**
+ * @internal -- use its children
+ */
 export abstract class BaseWrapper<T extends Contract> {
   protected _version?: T['methods'] extends ICeloVersionedContract['methods']
     ? ContractVersion
     : never
 
-  constructor(protected readonly kit: ContractKit, protected readonly contract: T) {}
+  constructor(protected readonly connection: Connection, protected readonly contract: T) {}
 
   /** Contract address */
   get address(): string {
@@ -70,7 +72,7 @@ export abstract class BaseWrapper<T extends Contract> {
       acc[method] =
         methodABI === undefined
           ? '0x'
-          : this.kit.connection.getAbiCoder().encodeFunctionSignature(methodABI)
+          : this.connection.getAbiCoder().encodeFunctionSignature(methodABI)
 
       return acc
     },
@@ -327,16 +329,15 @@ type ProxySendArgs<InputArgs extends any[], ParsedInputArgs extends any[], Outpu
  * @param preParse [optional] preParse function, tranforms arguments into `methodFn` expected inputs
  */
 export function proxySend<InputArgs extends any[], ParsedInputArgs extends any[], Output>(
-  kit: ContractKit,
+  connection: Connection,
   ...sendArgs: ProxySendArgs<InputArgs, ParsedInputArgs, Output>
 ): (...args: InputArgs) => CeloTransactionObject<Output> {
   if (sendArgs.length === 2) {
     const methodFn = sendArgs[0]
     const preParse = sendArgs[1]
-    return (...args: InputArgs) =>
-      toTransactionObject(kit.connection, methodFn(...preParse(...args)))
+    return (...args: InputArgs) => toTransactionObject(connection, methodFn(...preParse(...args)))
   } else {
     const methodFn = sendArgs[0]
-    return (...args: InputArgs) => toTransactionObject(kit.connection, methodFn(...args))
+    return (...args: InputArgs) => toTransactionObject(connection, methodFn(...args))
   }
 }

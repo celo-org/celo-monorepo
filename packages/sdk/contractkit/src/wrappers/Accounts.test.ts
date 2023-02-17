@@ -3,6 +3,7 @@ import { addressToPublicKey, parseSignature } from '@celo/utils/lib/signatureUti
 import Web3 from 'web3'
 import { ContractKit, newKitFromWeb3 } from '../kit'
 import { AccountsWrapper } from './Accounts'
+import { valueToBigNumber, valueToFixidityString } from './BaseWrapper'
 import { LockedGoldWrapper } from './LockedGold'
 import { ValidatorsWrapper } from './Validators'
 
@@ -64,21 +65,63 @@ testWithGanache('Accounts Wrapper', (web3) => {
       })
   }
 
+  test('SBAT authorize attestation key', async () => {
+    const account = accounts[0]
+    const signer = accounts[1]
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    const sig = await getParsedSignatureOfAddress(account, signer)
+    await (await accountsInstance.authorizeAttestationSigner(signer, sig)).sendAndWaitForReceipt({
+      from: account,
+    })
+    const attestationSigner = await accountsInstance.getAttestationSigner(account)
+    expect(attestationSigner).toEqual(signer)
+  })
+
+  test('SBAT remove attestation key authorization', async () => {
+    const account = accounts[0]
+    const signer = accounts[1]
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    const sig = await getParsedSignatureOfAddress(account, signer)
+    await (await accountsInstance.authorizeAttestationSigner(signer, sig)).sendAndWaitForReceipt({
+      from: account,
+    })
+
+    let attestationSigner = await accountsInstance.getAttestationSigner(account)
+    expect(attestationSigner).toEqual(signer)
+
+    await (await accountsInstance.removeAttestationSigner()).sendAndWaitForReceipt({
+      from: account,
+    })
+
+    attestationSigner = await accountsInstance.getAttestationSigner(account)
+    expect(attestationSigner).toEqual(account)
+  })
+
   test('SBAT authorize validator key when not a validator', async () => {
     const account = accounts[0]
     const signer = accounts[1]
-    await accountsInstance.createAccount()
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     const sig = await getParsedSignatureOfAddress(account, signer)
-    await accountsInstance.authorizeValidatorSigner(signer, sig)
+    await (
+      await accountsInstance.authorizeValidatorSigner(signer, sig, validators)
+    ).sendAndWaitForReceipt({ from: account })
+
+    const validatorSigner = await accountsInstance.getValidatorSigner(account)
+    expect(validatorSigner).toEqual(signer)
   })
 
   test('SBAT authorize validator key when a validator', async () => {
     const account = accounts[0]
     const signer = accounts[1]
-    await accountsInstance.createAccount()
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     await setupValidator(account)
     const sig = await getParsedSignatureOfAddress(account, signer)
-    await accountsInstance.authorizeValidatorSigner(signer, sig)
+    await (
+      await accountsInstance.authorizeValidatorSigner(signer, sig, validators)
+    ).sendAndWaitForReceipt({ from: account })
+
+    const validatorSigner = await accountsInstance.getValidatorSigner(account)
+    expect(validatorSigner).toEqual(signer)
   })
 
   test('SBAT authorize validator key and change BLS key atomically', async () => {
@@ -86,24 +129,92 @@ testWithGanache('Accounts Wrapper', (web3) => {
     const newBlsPoP = web3.utils.randomHex(48)
     const account = accounts[0]
     const signer = accounts[1]
-    await accountsInstance.createAccount()
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
     await setupValidator(account)
     const sig = await getParsedSignatureOfAddress(account, signer)
-    await accountsInstance.authorizeValidatorSignerAndBls(signer, sig, newBlsPublicKey, newBlsPoP)
+    await (
+      await accountsInstance.authorizeValidatorSignerAndBls(signer, sig, newBlsPublicKey, newBlsPoP)
+    ).sendAndWaitForReceipt({ from: account })
+
+    const validatorSigner = await accountsInstance.getValidatorSigner(account)
+    expect(validatorSigner).toEqual(signer)
   })
 
   test('SBAT set the wallet address to the caller', async () => {
-    await accountsInstance.createAccount()
-    await accountsInstance.setWalletAddress(accounts[0])
+    const account = accounts[0]
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    await accountsInstance.setWalletAddress(account).sendAndWaitForReceipt({ from: account })
+
+    const walletAddress = await accountsInstance.getWalletAddress(account)
+    expect(walletAddress).toEqual(account)
   })
 
   test('SBAT set the wallet address to a different wallet address', async () => {
-    await accountsInstance.createAccount()
-    const signature = await accountsInstance.generateProofOfKeyPossession(accounts[0], accounts[1])
-    await accountsInstance.setWalletAddress(accounts[1], signature)
+    const account = accounts[0]
+    const wallet = accounts[1]
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    const signature = await accountsInstance.generateProofOfKeyPossession(account, wallet)
+    await accountsInstance
+      .setWalletAddress(wallet, signature)
+      .sendAndWaitForReceipt({ from: account })
+
+    const walletAddress = await accountsInstance.getWalletAddress(account)
+    expect(walletAddress).toEqual(wallet)
   })
 
   test('SNBAT to set to a different wallet address without a signature', async () => {
-    await expect(accountsInstance.setWalletAddress(accounts[1])).rejects
+    const account = accounts[0]
+    const wallet = accounts[1]
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    await expect(accountsInstance.setWalletAddress(wallet)).rejects
+  })
+
+  test('SNBAT fraction greater than 1', async () => {
+    const account = accounts[0]
+    const beneficiary = accounts[1]
+    const fractionInvalid = valueToFixidityString(valueToBigNumber('2.5'))
+
+    kit.defaultAccount = account
+
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    await expect(
+      accountsInstance.setPaymentDelegation(beneficiary, fractionInvalid).sendAndWaitForReceipt({})
+    ).rejects.toEqual(
+      new Error(
+        'Error: VM Exception while processing transaction: revert Fraction must not be greater than 1'
+      )
+    )
+  })
+
+  test('SNBAT beneficiary and fraction', async () => {
+    const account = accounts[0]
+    const beneficiary = accounts[1]
+    const fractionValid = valueToFixidityString(valueToBigNumber('.25'))
+    const expectedRetval = { 0: beneficiary, 1: fractionValid }
+
+    kit.defaultAccount = account
+
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    await accountsInstance.setPaymentDelegation(beneficiary, fractionValid).sendAndWaitForReceipt()
+
+    const retval = await accountsInstance.getPaymentDelegation(account)
+    expect(retval).toEqual(expectedRetval)
+  })
+
+  test('SNBAT delete expected to clear beneficiary and fraction', async () => {
+    const account = accounts[0]
+    const beneficiary = accounts[1]
+    const fractionValid = valueToFixidityString(valueToBigNumber('.25'))
+    const expectedRetval = { 0: '0x0000000000000000000000000000000000000000', 1: '0' }
+
+    kit.defaultAccount = account
+
+    await accountsInstance.createAccount().sendAndWaitForReceipt({ from: account })
+    await accountsInstance.setPaymentDelegation(beneficiary, fractionValid).sendAndWaitForReceipt()
+
+    await accountsInstance.deletePaymentDelegation().sendAndWaitForReceipt()
+
+    const retval = await accountsInstance.getPaymentDelegation(account)
+    expect(retval).toEqual(expectedRetval)
   })
 })

@@ -11,8 +11,18 @@ export const proofFileName = (address: Address) => `verify-${address}.json`
 export const targetURL = (username: string, address: Address) =>
   `https://${username}.keybase.pub/${keybaseFilePathToProof}${proofFileName(address)}`
 
-// If verification encounters an error, returns the error message as a string
-// otherwise returns undefined when successful
+/**
+ *
+ * @remarks
+ * If verification encounters an error, returns the error message as a string
+ * otherwise returns undefined when successful
+ *
+ * @param kit
+ * @param claim
+ * @param signer
+ * @returns a human readable string with claims (non)verifiability or undefined
+ */
+
 export async function verifyKeybaseClaim(
   kit: ContractKit,
   claim: KeybaseClaim,
@@ -34,7 +44,7 @@ export async function verifyKeybaseClaim(
     }
 
     const hasValidSignature = await IdentityMetadataWrapper.verifySignerForAddress(
-      kit,
+      await kit.contracts.getAccounts(),
       hashOfClaim(parsedClaim.right.claim),
       parsedClaim.right.signature,
       signer

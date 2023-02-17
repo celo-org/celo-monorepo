@@ -68,7 +68,7 @@ export class StableTokenWrapper extends CeloTokenWrapper<StableToken> {
    * @returns true if success.
    */
   increaseAllowance = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.increaseAllowance,
     tupleParser(stringIdentity, valueToString)
   )
@@ -78,11 +78,11 @@ export class StableTokenWrapper extends CeloTokenWrapper<StableToken> {
    * @param value The decrement of the amount of StableToken approved to the spender.
    * @returns true if success.
    */
-  decreaseAllowance = proxySend(this.kit, this.contract.methods.decreaseAllowance)
-  mint = proxySend(this.kit, this.contract.methods.mint)
-  burn = proxySend(this.kit, this.contract.methods.burn)
+  decreaseAllowance = proxySend(this.connection, this.contract.methods.decreaseAllowance)
+  mint = proxySend(this.connection, this.contract.methods.mint)
+  burn = proxySend(this.connection, this.contract.methods.burn)
 
-  setInflationParameters = proxySend(this.kit, this.contract.methods.setInflationParameters)
+  setInflationParameters = proxySend(this.connection, this.contract.methods.setInflationParameters)
 
   /**
    * Querying the inflation parameters.
@@ -135,3 +135,5 @@ export class StableTokenWrapper extends CeloTokenWrapper<StableToken> {
     }
   }
 }
+
+export type StableTokenWrapperType = StableTokenWrapper

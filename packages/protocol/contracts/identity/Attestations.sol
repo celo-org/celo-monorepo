@@ -174,128 +174,13 @@ contract Attestations is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 1, 2);
-  }
-
-  /**
-   * @notice Commit to the attestation request of a hashed identifier.
-   * @param identifier The hash of the identifier to be attested.
-   * @param attestationsRequested The number of requested attestations for this request.
-   * @param attestationRequestFeeToken The address of the token with which the attestation fee will
-   * be paid.
-   * @dev Note that if an attestation expires before it is completed, the fee is forfeited. This is
-   * to prevent folks from attacking validators by requesting attestations that they do not
-   * complete, and to increase the cost of validators attempting to manipulate the attestations
-   * protocol.
-   */
-  function request(
-    bytes32 identifier,
-    uint256 attestationsRequested,
-    address attestationRequestFeeToken
-  ) external nonReentrant {
-    require(
-      attestationRequestFees[attestationRequestFeeToken] > 0,
-      "Invalid attestationRequestFeeToken"
-    );
-    require(
-      IERC20(attestationRequestFeeToken).transferFrom(
-        msg.sender,
-        address(this),
-        attestationRequestFees[attestationRequestFeeToken].mul(attestationsRequested)
-      ),
-      "Transfer of attestation request fees failed"
-    );
-
-    require(attestationsRequested > 0, "You have to request at least 1 attestation");
-    require(attestationsRequested <= maxAttestations, "Too many attestations requested");
-
-    IdentifierState storage state = identifiers[identifier];
-
-    require(
-      state.unselectedRequests[msg.sender].blockNumber == 0 ||
-        isAttestationExpired(state.unselectedRequests[msg.sender].blockNumber) ||
-        !isAttestationRequestSelectable(state.unselectedRequests[msg.sender].blockNumber),
-      "There exists an unexpired, unselected attestation request"
-    );
-
-    state.unselectedRequests[msg.sender].blockNumber = block.number.toUint32();
-    state.unselectedRequests[msg.sender].attestationsRequested = attestationsRequested.toUint32();
-    state.unselectedRequests[msg.sender].attestationRequestFeeToken = attestationRequestFeeToken;
-
-    state.attestations[msg.sender].requested = uint256(state.attestations[msg.sender].requested)
-      .add(attestationsRequested)
-      .toUint32();
-
-    emit AttestationsRequested(
-      identifier,
-      msg.sender,
-      attestationsRequested,
-      attestationRequestFeeToken
-    );
-  }
-
-  /**
-   * @notice Selects the issuers for the most recent attestation request.
-   * @param identifier The hash of the identifier to be attested.
-   */
-  function selectIssuers(bytes32 identifier) external {
-    IdentifierState storage state = identifiers[identifier];
-
-    require(
-      state.unselectedRequests[msg.sender].blockNumber > 0,
-      "No unselected attestation request to select issuers for"
-    );
-
-    require(
-      !isAttestationExpired(state.unselectedRequests[msg.sender].blockNumber),
-      "The attestation request has expired"
-    );
-
-    addIncompleteAttestations(identifier);
-    delete state.unselectedRequests[msg.sender];
-  }
-
-  /**
-   * @notice Submit the secret message sent by the issuer to complete the attestation request.
-   * @param identifier The hash of the identifier for this attestation.
-   * @param v The recovery id of the incoming ECDSA signature.
-   * @param r Output value r of the ECDSA signature.
-   * @param s Output value s of the ECDSA signature.
-   * @dev Throws if there is no matching outstanding attestation request.
-   * @dev Throws if the attestation window has passed.
-   */
-  function complete(bytes32 identifier, uint8 v, bytes32 r, bytes32 s) external {
-    address issuer = validateAttestationCode(identifier, msg.sender, v, r, s);
-
-    Attestation storage attestation = identifiers[identifier].attestations[msg.sender]
-      .issuedAttestations[issuer];
-
-    address token = attestation.attestationRequestFeeToken;
-
-    // solhint-disable-next-line not-rely-on-time
-    attestation.blockNumber = block.number.toUint32();
-    attestation.status = AttestationStatus.Complete;
-    delete attestation.attestationRequestFeeToken;
-    AttestedAddress storage attestedAddress = identifiers[identifier].attestations[msg.sender];
-    require(
-      attestedAddress.completed < attestedAddress.completed + 1,
-      "SafeMath32 integer overflow"
-    );
-    attestedAddress.completed = attestedAddress.completed + 1;
-
-    pendingWithdrawals[token][issuer] = pendingWithdrawals[token][issuer].add(
-      attestationRequestFees[token]
-    );
-
-    IdentifierState storage state = identifiers[identifier];
-    if (identifiers[identifier].attestations[msg.sender].completed == 1) {
-      state.accounts.push(msg.sender);
-    }
-
-    emit AttestationCompleted(identifier, msg.sender, issuer);
+    return (1, 2, 0, 0);
   }
 
   /**
@@ -337,11 +222,9 @@ contract Attestations is
    * @notice Returns the unselected attestation request for an identifier/account pair, if any.
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
-   * @return [
-   *           Block number at which was requested,
-   *           Number of unselected requests,
-   *           Address of the token with which this attestation request was paid for
-   *         ]
+   * @return block Block number at which was requested.
+   * @return number Number of unselected requests.
+   * @return address Address of the token with which this attestation request was paid for.
    */
   function getUnselectedRequest(bytes32 identifier, address account)
     external
@@ -373,7 +256,8 @@ contract Attestations is
    * @notice Returns attestation stats for a identifier/account pair.
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
-   * @return [Number of completed attestations, Number of total requested attestations]
+   * @return completed Number of completed attestations.
+   * @return requested Number of total requested attestations.
    */
   function getAttestationStats(bytes32 identifier, address account)
     external
@@ -432,11 +316,9 @@ contract Attestations is
    * @param identifier Hash of the identifier.
    * @param account Address of the account.
    * @param issuer Address of the issuer.
-   * @return [
-   *           Status of the attestation,
-   *           Block number of request/completion the attestation,
-   *           Address of the token with which this attestation request was paid for
-   *         ]
+   * @return status Status of the attestation.
+   * @return block Block number of request/completion the attestation.
+   * @return address Address of the token with which this attestation request was paid for.
    */
   function getAttestationState(bytes32 identifier, address account, address issuer)
     external
@@ -457,11 +339,10 @@ contract Attestations is
     * @notice Returns the state of all attestations that are completable
     * @param identifier Hash of the identifier.
     * @param account Address of the account.
-    * @return ( blockNumbers[] - Block number of request/completion the attestation,
-    *           issuers[] - Address of the issuer,
-    *           stringLengths[] - The length of each metadataURL string for each issuer,
-    *           stringData - All strings concatenated
-    *         )
+    * @return Block number of request/completion the attestation.
+    * @return Address of the issuer.
+    * @return The length of each metadataURL string for each issuer.
+    * @return All strings concatenated.
     */
   function getCompletableAttestations(bytes32 identifier, address account)
     external
@@ -619,8 +500,8 @@ contract Attestations is
    * @notice Helper function for batchGetAttestationStats to calculate the
              total number of addresses that have >0 complete attestations for the identifiers.
    * @param identifiersToLookup Array of n identifiers.
-   * @return Array of n numbers that indicate the number of matching addresses per identifier
-   *         and array of addresses preallocated for total number of matches.
+   * @return Array of numbers that indicate the number of matching addresses per identifier.
+   * @return Array of addresses preallocated for total number of matches.
    */
   function batchlookupAccountsForIdentifier(bytes32[] memory identifiersToLookup)
     internal
@@ -639,121 +520,6 @@ contract Attestations is
     }
 
     return (matches, new address[](totalAddresses));
-  }
-
-  /**
-   * @notice Adds additional attestations given the current randomness.
-   * @param identifier The hash of the identifier to be attested.
-   */
-  function addIncompleteAttestations(bytes32 identifier) internal {
-    AttestedAddress storage state = identifiers[identifier].attestations[msg.sender];
-    UnselectedRequest storage unselectedRequest = identifiers[identifier].unselectedRequests[msg
-      .sender];
-
-    bytes32 seed = getRandom().getBlockRandomness(
-      uint256(unselectedRequest.blockNumber).add(selectIssuersWaitBlocks)
-    );
-    IAccounts accounts = getAccounts();
-    uint256 issuersLength = numberValidatorsInCurrentSet();
-    uint256[] memory issuers = new uint256[](issuersLength);
-    for (uint256 i = 0; i < issuersLength; i = i.add(1)) issuers[i] = i;
-
-    require(unselectedRequest.attestationsRequested <= issuersLength, "not enough issuers");
-
-    uint256 currentIndex = 0;
-
-    // The length of the list (variable issuersLength) is decremented in each round,
-    // so the loop always terminates
-    while (currentIndex < unselectedRequest.attestationsRequested) {
-      require(issuersLength > 0, "not enough issuers");
-      seed = keccak256(abi.encodePacked(seed));
-      uint256 idx = uint256(seed) % issuersLength;
-      address signer = validatorSignerAddressFromCurrentSet(issuers[idx]);
-      address issuer = accounts.signerToAccount(signer);
-
-      Attestation storage attestation = state.issuedAttestations[issuer];
-
-      if (
-        attestation.status == AttestationStatus.None &&
-        accounts.hasAuthorizedAttestationSigner(issuer)
-      ) {
-        currentIndex = currentIndex.add(1);
-        attestation.status = AttestationStatus.Incomplete;
-        attestation.blockNumber = unselectedRequest.blockNumber;
-        attestation.attestationRequestFeeToken = unselectedRequest.attestationRequestFeeToken;
-        state.selectedIssuers.push(issuer);
-
-        emit AttestationIssuerSelected(
-          identifier,
-          msg.sender,
-          issuer,
-          unselectedRequest.attestationRequestFeeToken
-        );
-      }
-
-      // Remove the validator that was selected from the list,
-      // by replacing it by the last element in the list
-      issuersLength = issuersLength.sub(1);
-      issuers[idx] = issuers[issuersLength];
-    }
-  }
-
-  /**
-   * @notice Update the approval status of allowing an attestation identifier
-   * mapping to be transfered from an address to another.  The "to" or "from"
-   * addresses must both approve.  If the other has already approved, then the transfer
-   * is executed.
-   * @param identifier The identifier for this attestation.
-   * @param index The index of the account in the accounts array.
-   * @param from The current attestation address to which the identifier is mapped.
-   * @param to The new address to map to identifier.
-   * @param status The approval status
-   */
-  function approveTransfer(bytes32 identifier, uint256 index, address from, address to, bool status)
-    external
-  {
-    require(
-      msg.sender == from || msg.sender == to,
-      "Approver must be sender or recipient of transfer"
-    );
-    bytes32 key = keccak256(abi.encodePacked(identifier, from, to));
-    address other = msg.sender == from ? to : from;
-    if (status && transferApprovals[other][key]) {
-      _transfer(identifier, index, from, to);
-      transferApprovals[other][key] = false;
-    } else {
-      transferApprovals[msg.sender][key] = status;
-      emit TransferApproval(msg.sender, identifier, from, to, status);
-    }
-  }
-
-  /**
-   * @notice Transfer an attestation identifier mapping from the sender address to a
-   * replacement address.
-   * @param identifier The identifier for this attestation.
-   * @param index The index of the account in the accounts array.
-   * @param from The current attestation address to which the identifier is mapped.
-   * @param to The address to replace the sender address in the indentifier mapping.
-   * @dev Throws if index is out of bound for account array.
-   * @dev Throws if `from` is not in the account array at the given index.
-   * @dev Throws if `to` already has attestations
-   */
-  function _transfer(bytes32 identifier, uint256 index, address from, address to) internal {
-    uint256 numAccounts = identifiers[identifier].accounts.length;
-    require(index < numAccounts, "Index is invalid");
-    require(from == identifiers[identifier].accounts[index], "Index does not match from address");
-    require(
-      identifiers[identifier].attestations[to].requested == 0,
-      "Address tranferring to has already requested attestations"
-    );
-
-    identifiers[identifier].accounts[index] = to;
-    identifiers[identifier].attestations[to] = identifiers[identifier].attestations[from];
-    identifiers[identifier].unselectedRequests[to] = identifiers[identifier]
-      .unselectedRequests[from];
-    delete identifiers[identifier].attestations[from];
-    delete identifiers[identifier].unselectedRequests[from];
-    emit AttestationsTransferred(identifier, from, to);
   }
 
   function isAttestationExpired(uint32 attestationRequestBlock) internal view returns (bool) {

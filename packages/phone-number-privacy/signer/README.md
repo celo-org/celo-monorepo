@@ -2,6 +2,14 @@
 
 A service that generates unique partial signatures for blinded messages. Using a threshold BLS signature scheme, when K/N signatures are combined, a deterministic signature is obtained.
 
+## APIs (ODIS v2)
+
+ODIS v2 provides support for three APIs, which need to be explicitly enabled ([see below](#enabling-apis-odis-v2) for configuration info):
+
+- **Legacy PNP API**: retrieve signatures for blinded messages, rate-limited using ODIS v1's scheme, based on an account's transaction history and verification status.
+- **PNP API**: retrieve signatures for blinded messages, rate-limited based on quota purchased on-chain in `OdisPayments.sol`.
+- **Domains API**: retrieve signatures over domains with custom rate-limiting schemes, as defined in more detail in [CIP-40](https://github.com/celo-org/celo-proposals/blob/master/CIPs/cip-0040.md).
+
 ## Configuration
 
 You can use the following environment variables to configure the ODIS Signer service:
@@ -12,6 +20,14 @@ You can use the following environment variables to configure the ODIS Signer ser
 - `SERVER_PORT` - The port on which the express node app runs (8080 by default).
 - `SERVER_SSL_KEY_PATH` - (Optional) Path to SSL .key file.
 - `SERVER_SSL_CERT_PATH` - (Optional) Path to SSL .cert file.
+
+### Enabling APIs (ODIS v2)
+
+Each API must be explicitly enabled by setting the following env vars to true (all are false by default):
+
+- `LEGACY_PHONE_NUMBER_PRIVACY_API_ENABLED`
+- `PHONE_NUMBER_PRIVACY_API_ENABLED`
+- `DOMAINS_API_ENABLED`
 
 ### Database
 
@@ -37,6 +53,7 @@ The service needs a connection to a full node in order to access chain state. Th
 This could be a node with RPC set up. Preferably this would be an node dedicated to this service. Alternatively, the public Forno endpoints can be used but their uptime guarantees are not as strong. For development with Alfajores, the forno url is `https://alfajores-forno.celo-testnet.org`. For Mainnet, it would be `https://forno.celo.org`
 
 - `BLOCKCHAIN_PROVIDER` - The blockchain node provider for chain state access. `
+- `BLOCKCHAIN_API_KEY` - Optional API key to be added to the authentication header. `
 
 ### Security
 
@@ -65,17 +82,25 @@ The BLS key share should only exist in the keystore or as an encrypted backup. T
 
 ### Keystores
 
-Currently, the service retrieving keys from Azure Key Vault (AKV), Google Secret Manager and AWS Secrets Manager.
-You must specify the type, and then the keystore configs for that type.
+Currently, the service supports Azure Key Vault (AKV), Google Secret Manager and AWS Secrets Manager.
+You must specify the type, and then the keystore configs for that type as follows.
 
 - `KEYSTORE_TYPE` - `AzureKeyVault`, `GoogleSecretManager` or `AWSSecretManager`
+
+In addition, you must name your keys in your keystore according to the pattern `<keyName>-<keyVersion>` where
+
+- `keyName` is configurable via the env variables `PHONE_NUMBER_PRIVACY_KEY_NAME_BASE` and `DOMAINS_KEY_NAME_BASE` which default to `phoneNumberPrivacy` and `domains` respectively.
+- `keyVersion` is an integer corresponding to the iteration of the given key share. The variables `PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION` and `DOMAINS_LATEST_KEY_VERSION` should specify the latest version of the appropriate key share. This version will be fetched when the signer starts up.
+
+For example, the first iteration of the key share used for phone number privacy should be stored as `phoneNumberPrivacy-1` and the second iteration (after resharing) should be stored as `phoneNumberPrivacy-2` unless you specify a `PHONE_NUMBER_PRIVACY_KEY_NAME_BASE` env variable, in which case `phoneNumberPrivacy` should be replaced with that value. The version numbers and `-` delimeter are mandatory and not configurable.
+
+**Note: if you modify the stored secrets, you must restart the signer to ensure the updated versions are used in the signer.**
 
 #### Azure Key Vault
 
 Use the following to configure the AKV connection. These values are generated when creating a service principal account (see [Configuring your Key Vault](https://www.npmjs.com/package/@azure/keyvault-keys#configuring-your-key-vault)). Or if the service is being hosted on Azure itself, authentication can be done by granted key access to the VM's managed identity, in which case the client_id, client_secret, and tenant configs can be left blank.
 
 - `KEYSTORE_AZURE_VAULT_NAME` - The name of your Azure Key Vault.
-- `KEYSTORE_AZURE_SECRET_NAME` - The name of the secret that holds your BLS key.
 - `KEYSTORE_AZURE_CLIENT_ID` - (Optional) The clientId of the service principal account that has [Get, List] access to secrets.
 - `KEYSTORE_AZURE_CLIENT_SECRET` - (Optional) The client secret of the same service principal account.
 - `KEYSTORE_AZURE_TENANT` - (Optional) The tenant that the service principal is a member of.
@@ -85,15 +110,12 @@ Use the following to configure the AKV connection. These values are generated wh
 Use the following to configure the Google Secret Manager. To authenticate with Google Cloud, you can see [Setting Up Authentication](https://cloud.google.com/docs/authentication/production). By default, the google lib will use the default app credentials assigned to the host VM. If the service is being run outside of GCP, you can manually set the `GOOGLE_APPLICATION_CREDENTIALS` env var to the path to a service account json file.
 
 - `KEYSTORE_GOOGLE_PROJECT_ID` - The google cloud project id.
-- `KEYSTORE_GOOGLE_SECRET_NAME` - The secret's name.
-- `KEYSTORE_GOOGLE_SECRET_VERSION` - Secret version (latest by default).
 
 #### AWS Secrets Manager
 
 Use the following to configure the AWS Secrets Manager. To authenticate with Amazon Web Services, you can see [Setting Credentials in Node.js](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html). If you are running the signer inside AWS, we do recommend to authenticate using IAM Roles.
 
 - `KEYSTORE_AWS_REGION` - The AWS Region code where the secret is, for example: `us-east-1`.
-- `KEYSTORE_AWS_SECRET_NAME` - The secret's name.
 - `KEYSTORE_AWS_SECRET_KEY` - The key for the secret key/value pair.
 
 ## Operations
@@ -124,6 +146,34 @@ Then check on the service to make sure its running:
 
 `docker logs -f {CONTAINER_ID_HERE}`
 
+#### Key rotations
+
+After a key resharing, signers should rotate their key shares as follows:
+
+1. Store the new key share in the keystore according to the naming convention specified in the [Keystores](#keystores) section above.
+2. Increment `PHONE_NUMBER_PRIVACY_LATEST_KEY_VERSION` or `DOMAINS_LATEST_KEY_VERSION` as appropriate. This will instruct the signer to prefetch this new key version the next time it starts up, but there is no need to restart the signer at this point.
+3. Notify the combiner operator that your signer is ready for the key rotation.
+4. The combiner operator will run e2e tests against your signer to verify it has the correct key configuration.
+5. The combiner operator will update the combiner to request the new key share version via a custom request header field once all signers are ready.
+6. The signers will fetch the new key shares from their keystores upon receiving these requests.
+7. When the combiner operator sees that all signers are signing with the new key share and confirms that the system is healthy, signers will be instructed to delete their old key shares. Deleting the deprecated key shares ensures they cannot be stored and used by an attacker.
+
+### Validate before going live
+
+You can test your mainnet service is set up correctly by running specific tests in the e2e suite ("[Signer configuration test]" cases) which check signatures against the public polynomial for the respective APIs. Because the tests require quota, you must first point your provider endpoint to Alfajores.
+
+1. Change your signer’s blockchain provider (`BLOCKCHAIN_PROVIDER`) to Alfajores Forno: `https://alfajores-forno.celo-testnet.org`
+2. Navigate to the signer directory in monorepo (this directory).
+3. Modify the .env file:
+
+   - Change `ODIS_SIGNER_SERVICE_URL` to your service endpoint.
+
+4. Run `yarn test:signer:mainnet`.
+
+   *Technical note: this command intentionally points the test's blockchain provider to Alfajores, in order to top up quota on Alfajores before running the test cases. It still verifies signatures against the respective mainnet polynomials.*
+5. Verify that all tests pass.
+6. Change your signer’s blockchain provider back to its original value (if using Forno: `https://forno.celo.org`).
+
 ### Logs
 
-Error logs will be prefixed with `CELO_ODIS_ERROR_XX`. You can see a full list of them in [error.utils.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/signer/src/common/error-utils.ts).
+Error logs will be prefixed with `CELO_ODIS_ERROR_XX`. You can see a full list of them in [errors.ts](https://github.com/celo-org/celo-monorepo/blob/master/packages/phone-number-privacy/common/src/interfaces/errors.ts) in the common package.

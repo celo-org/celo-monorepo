@@ -3,6 +3,7 @@ import { newReleaseGold } from '@celo/contractkit/lib/generated/ReleaseGold'
 import { ReleaseGoldWrapper } from '@celo/contractkit/lib/wrappers/ReleaseGold'
 import { getContractFromEvent, testWithGanache } from '@celo/dev-utils/lib/ganache-test'
 import Web3 from 'web3'
+import { testLocally } from '../../test-utils/cliUtils'
 import SetBeneficiary from './set-beneficiary'
 
 process.env.NO_SYNCCHECK = 'true'
@@ -28,7 +29,11 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
       { index: 1 } // canValidate = false
     )
     kit = newKitFromWeb3(web3)
-    releaseGoldWrapper = new ReleaseGoldWrapper(kit, newReleaseGold(web3, contractAddress))
+    releaseGoldWrapper = new ReleaseGoldWrapper(
+      kit.connection,
+      newReleaseGold(web3, contractAddress),
+      kit.contracts
+    )
     beneficiary = await releaseGoldWrapper.getBeneficiary()
     const owner = await releaseGoldWrapper.getOwner()
     releaseGoldMultiSig = await kit.contracts.getMultiSig(owner)
@@ -36,7 +41,7 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
 
   test('can change beneficiary', async () => {
     // First submit the tx from the release owner (accounts[0])
-    await SetBeneficiary.run([
+    await testLocally(SetBeneficiary, [
       '--contract',
       contractAddress,
       '--from',
@@ -47,7 +52,7 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
     ])
     // The multisig tx should not confirm until both parties submit
     expect(await releaseGoldWrapper.getBeneficiary()).toEqual(beneficiary)
-    await SetBeneficiary.run([
+    await testLocally(SetBeneficiary, [
       '--contract',
       contractAddress,
       '--from',
@@ -63,7 +68,7 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
 
   test('if called by a different account, it should fail', async () => {
     await expect(
-      SetBeneficiary.run([
+      testLocally(SetBeneficiary, [
         '--contract',
         contractAddress,
         '--from',
@@ -78,7 +83,7 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
   test('if the owners submit different txs, nothing on the ReleaseGold contract should change', async () => {
     // ReleaseOwner tries to change the beneficiary to `newBeneficiary` while the beneficiary
     // tries to change to `otherAccount`. Nothing should change on the RG contract.
-    await SetBeneficiary.run([
+    await testLocally(SetBeneficiary, [
       '--contract',
       contractAddress,
       '--from',
@@ -87,7 +92,7 @@ testWithGanache('releasegold:set-beneficiary cmd', (web3: Web3) => {
       newBeneficiary,
       '--yesreally',
     ])
-    await SetBeneficiary.run([
+    await testLocally(SetBeneficiary, [
       '--contract',
       contractAddress,
       '--from',

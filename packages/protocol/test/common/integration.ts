@@ -394,6 +394,7 @@ contract('Integration: Governance', (accounts: string[]) => {
 Array.from([
   ['Exchange', 'StableToken'], // USD
   ['ExchangeEUR', 'StableTokenEUR'], // EUR
+  ['ExchangeBRL', 'StableTokenBRL'], // BRL (cREAL)
 ]).forEach(([exchangeId, stableTokenId]) =>
   contract(`Integration: ${exchangeId} ${stableTokenId}`, (accounts: string[]) => {
     const transferAmount = 10
@@ -626,7 +627,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       )
       await exchangeAbc.initialize(
         registry.address,
-        stableTokenAbc.address,
+        'StableTokenABC',
         '5000000000000000000000', // spread, matches mainnet for cUSD and cEUR
         '1300000000000000000000', // reserveFraction, matches mainnet for cEUR
         '300', // updateFrequency, matches mainnet for cUSD and cEUR
@@ -637,9 +638,6 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
     it(`should be impossible to sell CELO`, async () => {
       await goldToken.approve(exchangeAbc.address, sellAmount)
       await assertRevert(exchangeAbc.sell(sellAmount, minBuyAmount, true))
-      // This last case is not relevant, but the test is meant to warn in case the behavior ever changes
-      await goldToken.approve(exchangeAbc.address, sellAmount)
-      await exchangeAbc.sell(sellAmount, 0, true)
     })
 
     it(`should be impossible to sell stable token`, async () => {
@@ -690,6 +688,9 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       await reserve.addExchangeSpender(exchangeAbc.address)
       await freezer.unfreeze(stableTokenAbc.address)
       await freezer.unfreeze(exchangeAbc.address)
+
+      // activate stable during mento-activation proposal
+      await exchangeAbc.activateStable()
       // Fee currency can't be tested here, but keep this line for reference
       await feeCurrencyWhitelist.addToken(stableTokenAbc.address)
     })

@@ -1,25 +1,17 @@
+import { CeloTokenType, StableToken, Token } from '@celo/base'
 import { BigNumber } from 'bignumber.js'
+import { AddressRegistry } from './address-registry'
 import { CeloContract, CeloTokenContract, ExchangeContract, StableTokenContract } from './base'
-import { ContractKit } from './kit'
+import { ContractCacheType } from './basic-contract-cache-type'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
-
-export enum StableToken {
-  cUSD = 'cUSD',
-  cEUR = 'cEUR',
-}
-
-export enum Token {
-  CELO = 'CELO',
-}
-
-export type CeloTokenType = StableToken | Token
-
-type CeloTokenWrapper = GoldTokenWrapper | StableTokenWrapper
+export { CeloTokenType, StableToken, Token } from '@celo/base'
 
 export type EachCeloToken<T> = {
   [key in CeloTokenType]?: T
 }
+
+export type CeloTokenWrapper = GoldTokenWrapper | StableTokenWrapper
 
 export interface CeloTokenInfo {
   contract: CeloTokenContract
@@ -45,6 +37,11 @@ export const stableTokenInfos: {
     exchangeContract: CeloContract.ExchangeEUR,
     symbol: StableToken.cEUR,
   },
+  [StableToken.cREAL]: {
+    contract: CeloContract.StableTokenBRL,
+    exchangeContract: CeloContract.ExchangeBRL,
+    symbol: StableToken.cREAL,
+  },
 }
 
 /** Basic info for each supported celo token, including stable tokens */
@@ -62,7 +59,7 @@ export const celoTokenInfos: {
  * A helper class to interact with all Celo tokens, ie CELO and stable tokens
  */
 export class CeloTokens {
-  constructor(readonly kit: ContractKit) {}
+  constructor(readonly contracts: ContractCacheType, readonly registry: AddressRegistry) {}
 
   /**
    * Gets an address's balance for each celo token.
@@ -72,7 +69,7 @@ export class CeloTokens {
    */
   balancesOf(address: string): Promise<EachCeloToken<BigNumber>> {
     return this.forEachCeloToken(async (info: CeloTokenInfo) => {
-      const wrapper = await this.kit.contracts.getContract(info.contract)
+      const wrapper = await this.contracts.getContract(info.contract)
       return wrapper.balanceOf(address)
     })
   }
@@ -82,9 +79,7 @@ export class CeloTokens {
    * @return an promise resolving to an object containing the wrapper for each celo token.
    */
   getWrappers(): Promise<EachCeloToken<CeloTokenWrapper>> {
-    return this.forEachCeloToken((info: CeloTokenInfo) =>
-      this.kit.contracts.getContract(info.contract)
-    )
+    return this.forEachCeloToken((info: CeloTokenInfo) => this.contracts.getContract(info.contract))
   }
 
   /**
@@ -92,14 +87,12 @@ export class CeloTokens {
    * @return an promise resolving to an object containing the address for each celo token proxy.
    */
   getAddresses(): Promise<EachCeloToken<string>> {
-    return this.forEachCeloToken((info: CeloTokenInfo) =>
-      this.kit.registry.addressFor(info.contract)
-    )
+    return this.forEachCeloToken((info: CeloTokenInfo) => this.registry.addressFor(info.contract))
   }
 
   async getStablesConfigs(humanReadable: boolean = false) {
     return this.forStableCeloToken(async (info: StableTokenInfo) => {
-      const stableWrapper = await this.kit.contracts.getContract(info.contract)
+      const stableWrapper = await this.contracts.getContract(info.contract)
       if (humanReadable) {
         return stableWrapper.getHumanReadableConfig()
       }
@@ -109,7 +102,7 @@ export class CeloTokens {
 
   async getExchangesConfigs(humanReadable: boolean = false) {
     return this.forStableCeloToken(async (info: StableTokenInfo) => {
-      const exchangeWrapper = await this.kit.contracts.getContract(info.exchangeContract)
+      const exchangeWrapper = await this.contracts.getContract(info.exchangeContract)
       if (humanReadable) {
         return exchangeWrapper.getHumanReadableConfig()
       }
@@ -185,7 +178,7 @@ export class CeloTokens {
       Object.values(celoTokenInfos).map(async (info) => {
         try {
           // The registry add the valid addresses to a cache
-          await this.kit.registry.addressFor(info.contract)
+          await this.registry.addressFor(info.contract)
           return true
         } catch {
           // The contract was not deployed in the chain
@@ -202,8 +195,8 @@ export class CeloTokens {
       Object.values(stableTokenInfos).map(async (info) => {
         try {
           // The registry add the valid addresses to a cache
-          await this.kit.registry.addressFor(info.contract)
-          await this.kit.registry.addressFor(info.exchangeContract)
+          await this.registry.addressFor(info.contract)
+          await this.registry.addressFor(info.exchangeContract)
           return true
         } catch {
           // The contract was not deployed in the chain
@@ -224,7 +217,7 @@ export class CeloTokens {
   getWrapper(token: Token): Promise<GoldTokenWrapper>
   getWrapper(token: CeloTokenType): Promise<CeloTokenWrapper>
   getWrapper(token: CeloTokenType): Promise<CeloTokenWrapper> {
-    return this.kit.contracts.getContract(celoTokenInfos[token].contract)
+    return this.contracts.getContract(celoTokenInfos[token].contract)
   }
 
   /**
@@ -251,8 +244,7 @@ export class CeloTokens {
    * @param token the token to get the (proxy) contract address for
    * @return A promise resolving to the address of the token's contract
    */
-  getAddress = (token: CeloTokenType) =>
-    this.kit.registry.addressFor(celoTokenInfos[token].contract)
+  getAddress = (token: CeloTokenType) => this.registry.addressFor(celoTokenInfos[token].contract)
 
   /**
    * Gets the address to use as the feeCurrency when paying for gas with the
@@ -277,11 +269,13 @@ export class CeloTokens {
     return Object.values(StableToken).includes(token as StableToken)
   }
 
-  isStableTokenContract(contract: CeloContract) {
-    const allStableTokenContracts = Object.values(StableToken).map(
-      (token) => stableTokenInfos[token].contract
-    )
-    // We cast token as StableTokenContract to make typescript happy
-    return allStableTokenContracts.includes(contract as StableTokenContract)
-  }
+  isStableTokenContract = isStableTokenContract
+}
+
+export function isStableTokenContract(contract: CeloContract) {
+  const allStableTokenContracts = Object.values(StableToken).map(
+    (token) => stableTokenInfos[token].contract
+  )
+  // We cast token as StableTokenContract to make typescript happy
+  return allStableTokenContracts.includes(contract as StableTokenContract)
 }

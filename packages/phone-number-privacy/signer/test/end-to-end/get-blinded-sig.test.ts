@@ -1,17 +1,21 @@
 import { newKitFromWeb3 } from '@celo/contractkit'
 import {
-  GetQuotaResponse,
-  rootLogger as logger,
+  KEY_VERSION_HEADER,
+  PnpQuotaResponse,
+  rootLogger,
+  SignerEndpoint,
+  SignMessageResponseFailure,
+  SignMessageResponseSuccess,
   TestUtils,
 } from '@celo/phone-number-privacy-common'
-import { getBlindedPhoneNumber } from '@celo/phone-number-privacy-common/lib/test/utils'
-import { PHONE_NUMBER } from '@celo/phone-number-privacy-common/lib/test/values'
 import { serializeSignature, signMessage } from '@celo/utils/lib/signatureUtils'
+import threshold_bls from 'blind-threshold-bls'
 import { randomBytes } from 'crypto'
 import 'isomorphic-fetch'
 import Web3 from 'web3'
-import config from '../../src/config'
-import { getWalletAddress } from '../../src/signing/query-quota'
+import { getWalletAddress } from '../../src/common/web3/contracts'
+import { config } from '../../src/config'
+import { getBlindedPhoneNumber, getTestParamsForContext } from './utils'
 
 require('dotenv').config()
 
@@ -21,6 +25,7 @@ const {
   ACCOUNT_ADDRESS3,
   BLINDED_PHONE_NUMBER,
   IDENTIFIER,
+  PHONE_NUMBER,
   PRIVATE_KEY1,
   PRIVATE_KEY2,
   PRIVATE_KEY3,
@@ -28,12 +33,15 @@ const {
 const { replenishQuota, registerWalletAddress } = TestUtils.Utils
 
 const ODIS_SIGNER = process.env.ODIS_SIGNER_SERVICE_URL
+const expectedVersion = process.env.DEPLOYED_SIGNER_SERVICE_VERSION!
+
+// Keep these checks as is to ensure backwards compatibility
 const SIGN_MESSAGE_ENDPOINT = '/getBlindedMessagePartialSig'
 const GET_QUOTA_ENDPOINT = '/getQuota'
 
-const DEFAULT_FORNO_URL = config.blockchain.provider
+const contextSpecificParams = getTestParamsForContext()
 
-const web3 = new Web3(new Web3.providers.HttpProvider(DEFAULT_FORNO_URL))
+const web3 = new Web3(new Web3.providers.HttpProvider(contextSpecificParams.blockchainProviderURL))
 const contractkit = newKitFromWeb3(web3)
 contractkit.addAccount(PRIVATE_KEY1)
 contractkit.addAccount(PRIVATE_KEY2)
@@ -47,8 +55,18 @@ const getRandomBlindedPhoneNumber = () => {
 
 describe('Running against a deployed service', () => {
   beforeAll(() => {
-    console.log(DEFAULT_FORNO_URL)
-    console.log(ODIS_SIGNER)
+    console.log('Blockchain Provider URL: ' + contextSpecificParams.blockchainProviderURL)
+    console.log('ODIS_SIGNER: ' + ODIS_SIGNER)
+    console.log('PNP Public Polynomial: ' + contextSpecificParams.pnpPolynomial)
+    console.log('Key Version:' + contextSpecificParams.pnpKeyVersion)
+  })
+
+  it('Service is deployed at correct version', async () => {
+    const response = await fetch(ODIS_SIGNER + SignerEndpoint.STATUS, { method: 'GET' })
+    const body = await response.json()
+    // This checks against local package.json version, change if necessary
+    expect(response.status).toBe(200)
+    expect(body.version).toBe(expectedVersion)
   })
 
   describe('Returns status 400 with invalid input', () => {
@@ -100,7 +118,11 @@ describe('Running against a deployed service', () => {
   })
 
   it('Returns 403 error when querying out of quota', async () => {
-    const response = await postToSignMessage(BLINDED_PHONE_NUMBER, ACCOUNT_ADDRESS1, Date.now())
+    const response = await postToSignMessage(
+      getRandomBlindedPhoneNumber(),
+      ACCOUNT_ADDRESS1,
+      Date.now()
+    )
     expect(response.status).toBe(403)
   })
 
@@ -188,13 +210,38 @@ describe('Running against a deployed service', () => {
 
     it('Check that accounts are set up correctly', async () => {
       expect(await getQuota(ACCOUNT_ADDRESS2, IDENTIFIER)).toBeLessThan(initialQuota)
-      expect(await getWalletAddress(logger, ACCOUNT_ADDRESS3)).toBe(ACCOUNT_ADDRESS2)
+      expect(
+        await getWalletAddress(
+          contractkit,
+          rootLogger(config.serviceName),
+          ACCOUNT_ADDRESS3,
+          SignerEndpoint.LEGACY_PNP_SIGN
+        )
+      ).toBe(ACCOUNT_ADDRESS2)
     })
 
-    it('Returns sig when querying succeeds with unused request', async () => {
+    // Note: Use this test to check the signers' key configuration. Modify .env to try out different
+    // key/version combinations
+    it('[Signer configuration test] Returns sig when querying succeeds with unused request', async () => {
       await replenishQuota(ACCOUNT_ADDRESS2, contractkit)
-      const response = await postToSignMessage(getRandomBlindedPhoneNumber(), ACCOUNT_ADDRESS3)
+      const blindedPhoneNumber = getRandomBlindedPhoneNumber()
+      const response = await postToSignMessage(blindedPhoneNumber, ACCOUNT_ADDRESS3)
       expect(response.status).toBe(200)
+
+      // Validate signature
+      type SignerResponse = SignMessageResponseSuccess | SignMessageResponseFailure
+      const data = await response.text()
+      const signResponse = JSON.parse(data) as SignerResponse
+      expect(signResponse.success).toBeTruthy()
+      if (signResponse.success) {
+        const sigBuffer = Buffer.from(signResponse.signature as string, 'base64')
+        const isValid = isValidSignature(
+          sigBuffer,
+          blindedPhoneNumber,
+          contextSpecificParams.pnpPolynomial
+        )
+        expect(isValid).toBeTruthy()
+      }
     })
 
     it('Returns count when querying with unused request increments query count', async () => {
@@ -221,7 +268,7 @@ async function getQuota(
   authHeader?: string
 ): Promise<number> {
   const res = await queryQuotaEndpoint(account, hashedPhoneNumber, authHeader)
-  return res.totalQuota
+  return res.success ? res.totalQuota ?? 0 : 0
 }
 
 async function getQueryCount(
@@ -230,14 +277,14 @@ async function getQueryCount(
   authHeader?: string
 ): Promise<number> {
   const res = await queryQuotaEndpoint(account, hashedPhoneNumber, authHeader)
-  return res.performedQueryCount
+  return res.success ? res.performedQueryCount ?? 0 : 0
 }
 
 async function queryQuotaEndpoint(
   account: string,
   hashedPhoneNumber?: string,
   authHeader?: string
-): Promise<GetQuotaResponse> {
+): Promise<PnpQuotaResponse> {
   const body = JSON.stringify({
     account,
     hashedPhoneNumber,
@@ -255,14 +302,15 @@ async function queryQuotaEndpoint(
     body,
   })
 
-  return await res.json()
+  return res.json()
 }
 
 async function postToSignMessage(
   base64BlindedMessage: string,
   account: string,
   timestamp?: number,
-  authHeader?: string
+  authHeader?: string,
+  keyVersion: string = contextSpecificParams.pnpKeyVersion
 ): Promise<Response> {
   const body = JSON.stringify({
     hashedPhoneNumber: IDENTIFIER,
@@ -279,9 +327,24 @@ async function postToSignMessage(
       Accept: 'application/json',
       'Content-Type': 'application/json',
       Authorization: authorization,
+      [KEY_VERSION_HEADER]: keyVersion,
     },
     body,
   })
 
   return res
+}
+
+function isValidSignature(signature: Buffer, blindedMessage: string, polynomial: string) {
+  try {
+    threshold_bls.partialVerifyBlindSignature(
+      Buffer.from(polynomial, 'hex'),
+      Buffer.from(blindedMessage, 'base64'),
+      signature
+    )
+    return true
+  } catch (err) {
+    console.log(err)
+    return false
+  }
 }

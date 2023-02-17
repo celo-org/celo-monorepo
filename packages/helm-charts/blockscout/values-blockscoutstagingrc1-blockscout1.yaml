@@ -1,0 +1,81 @@
+blockscout:
+  indexer:
+    db:
+      connectionName: celo-testnet:us-west1:blockscoutstagingrc11
+      proxy:
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 2
+    poolSize: 100
+    resources:
+      requests:
+        memory: 12Gi
+        cpu: 5
+    metrics:
+      enabled: true
+  api:
+    autoscaling:
+      maxReplicas: 2
+      minReplicas: 1
+      target:
+        cpu: 70
+    db:
+      connectionName: celo-testnet:us-west1:blockscoutstagingrc11
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 700m
+    poolSize: 10
+    resources:
+      requests:
+        memory: 500Mi
+        cpu: 500m
+  web:
+    host: blockscoutstagingrc1-blockscout1.celo-testnet.org
+    suffix:
+      enabled: true
+      path: "blockscoutstagingrc1"
+    autoscaling:
+      maxReplicas: 2
+      minReplicas: 1
+      target:
+        cpu: 70
+    db:
+      connectionName: celo-testnet:us-west1:blockscoutstagingrc11
+      proxy:
+        resources:
+          requests:
+            memory: 500Mi
+            cpu: 700m
+    poolSize: 10
+    resources:
+      requests:
+        memory: 250M
+        cpu: 500m
+  metadataCrawler:
+    enabled: false
+  archiveNodes:
+    jsonrpcHttpUrl: http://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
+    jsonrpcWsUrl: ws://mainnet-archive-service.blockscoutstagingrc1.svc.cluster.local:8545
+  fullNodes:
+    jsonrpcPublicHttp: https://forno.celo.org
+  metrics:
+    enabled: false
+  secrets:
+    dbUser: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout1-dbUser
+    dbPassword: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout1-dbPassword
+    grafanaCloud: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout-grafanaCloud
+    recaptcha:
+      projectId: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout-recaptchaProjectId
+      siteKey: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout-recaptchaSiteKey
+      apiKey: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout-recaptchaApiKey
+      secretKey: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout-recaptchaSecretKey
+    erlang:
+      cookie: gcp:secretmanager:projects/253914576835/secrets/blockscoutstagingrc1-blockscout1-erlangCookie
+  chain:
+    subnetwork: Celo
+    networkID: 42220
+  gcp:
+    projectId: celo-testnet

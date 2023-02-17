@@ -5,6 +5,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 import "./interfaces/IAccounts.sol";
 
+import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/Signatures.sol";
@@ -19,6 +20,7 @@ contract Accounts is
   Initializable,
   UsingRegistry
 {
+  using FixidityLib for FixidityLib.Fraction;
   using SafeMath for uint256;
 
   struct Signers {
@@ -57,6 +59,13 @@ contract Accounts is
     string metadataURL;
   }
 
+  struct PaymentDelegation {
+    // Address that should receive a fraction of validator payments.
+    address beneficiary;
+    // Fraction of payment to delegate to `beneficiary`.
+    FixidityLib.Fraction fraction;
+  }
+
   mapping(address => Account) internal accounts;
   // Maps authorized signers to the account that provided the authorization.
   mapping(address => address) public authorizedBy;
@@ -73,6 +82,9 @@ contract Accounts is
 
   // A per-account list of CIP8 storage roots, bypassing CIP3.
   mapping(address => bytes[]) public offchainStorageRoots;
+
+  // Optional per-account validator payment delegation information.
+  mapping(address => PaymentDelegation) internal paymentDelegations;
 
   bytes32 constant ValidatorSigner = keccak256(abi.encodePacked("celo.org/core/validator"));
   bytes32 constant AttestationSigner = keccak256(abi.encodePacked("celo.org/core/attestation"));
@@ -101,6 +113,7 @@ contract Accounts is
   event AccountCreated(address indexed account);
   event OffchainStorageRootAdded(address indexed account, bytes url);
   event OffchainStorageRootRemoved(address indexed account, bytes url, uint256 index);
+  event PaymentDelegationSet(address indexed beneficiary, uint256 fraction);
 
   /**
    * @notice Sets initialized == true on implementation contracts
@@ -110,10 +123,13 @@ contract Accounts is
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
-   * @return The storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 3, 0);
+    return (1, 1, 4, 0);
   }
 
   /**
@@ -263,7 +279,7 @@ contract Accounts is
    */
   function removeStorageRoot(uint256 index) external {
     require(isAccount(msg.sender), "Unknown account");
-    require(index < offchainStorageRoots[msg.sender].length);
+    require(index < offchainStorageRoots[msg.sender].length, "Invalid storage root index");
     uint256 lastIndex = offchainStorageRoots[msg.sender].length - 1;
     bytes memory url = offchainStorageRoots[msg.sender][index];
     offchainStorageRoots[msg.sender][index] = offchainStorageRoots[msg.sender][lastIndex];
@@ -274,7 +290,8 @@ contract Accounts is
   /**
    * @notice Returns the full list of offchain storage roots for an account.
    * @param account The account whose storage roots to return.
-   * @return List of storage root URLs.
+   * @return Concatenated storage root URLs.
+   * @return Lengths of storage root URLs.
    */
   function getOffchainStorageRoots(address account)
     external
@@ -285,7 +302,7 @@ contract Accounts is
     uint256 numberRoots = offchainStorageRoots[account].length;
     uint256 totalLength = 0;
     for (uint256 i = 0; i < numberRoots; i++) {
-      totalLength += offchainStorageRoots[account][i].length;
+      totalLength = totalLength.add(offchainStorageRoots[account][i].length);
     }
 
     bytes memory concatenated = new bytes(totalLength);
@@ -301,6 +318,45 @@ contract Accounts is
     }
 
     return (concatenated, lengths);
+  }
+
+  /**
+   * @notice Sets validator payment delegation settings.
+   * @param beneficiary The address that should receive a portion of validator
+   * payments.
+   * @param fraction The fraction of the validator's payment that should be
+   * diverted to `beneficiary` every epoch, given as FixidityLib value. Must not
+   * be greater than 1.
+   * @dev Use `deletePaymentDelegation` to unset the payment delegation.
+   */
+  function setPaymentDelegation(address beneficiary, uint256 fraction) public {
+    require(isAccount(msg.sender), "Not an account");
+    require(beneficiary != address(0), "Beneficiary cannot be address 0x0");
+    FixidityLib.Fraction memory f = FixidityLib.wrap(fraction);
+    require(f.lte(FixidityLib.fixed1()), "Fraction must not be greater than 1");
+    paymentDelegations[msg.sender] = PaymentDelegation(beneficiary, f);
+    emit PaymentDelegationSet(beneficiary, fraction);
+  }
+
+  /**
+   * @notice Removes a validator's payment delegation by setting benficiary and
+   * fraction to 0.
+   */
+  function deletePaymentDelegation() public {
+    require(isAccount(msg.sender), "Not an account");
+    paymentDelegations[msg.sender] = PaymentDelegation(address(0x0), FixidityLib.wrap(0));
+    emit PaymentDelegationSet(address(0x0), 0);
+  }
+
+  /**
+   * @notice Gets validator payment delegation settings.
+   * @param account Account of the validator.
+   * @return Beneficiary address of payment delegated.
+   * @return Fraction of payment delegated.
+   */
+  function getPaymentDelegation(address account) external view returns (address, uint256) {
+    PaymentDelegation storage delegation = paymentDelegations[account];
+    return (delegation.beneficiary, delegation.fraction.unwrap());
   }
 
   /**
@@ -895,9 +951,8 @@ contract Accounts is
   /**
    * @notice Getter for the metadata of multiple accounts.
    * @param accountsToQuery The addresses of the accounts to get the metadata for.
-   * @return (stringLengths[] - the length of each string in bytes
-   *          data - all strings concatenated
-   *         )
+   * @return The length of each string in bytes.
+   * @return All strings concatenated.
    */
   function batchGetMetadataURL(address[] calldata accountsToQuery)
     external

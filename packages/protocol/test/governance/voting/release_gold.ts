@@ -324,6 +324,21 @@ contract('ReleaseGold', (accounts: string[]) => {
       assertEqualBN(endBalanceTo, startBalanceTo.plus(transferAmount))
     })
 
+    it('should emit safeTransfer logs on erc20 revert', async () => {
+      const startBalanceFrom = await mockStableToken.balanceOf(releaseGoldInstance.address)
+      await assertRevert(
+        releaseGoldInstance.genericTransfer(
+          mockStableToken.address,
+          receiver,
+          startBalanceFrom.plus(1),
+          {
+            from: beneficiary,
+          }
+        ),
+        'SafeERC20: ERC20 operation did not succeed'
+      )
+    })
+
     it('should revert when attempting transfer of goldtoken from the release gold instance', async () => {
       await assertRevert(
         releaseGoldInstance.genericTransfer(goldTokenInstance.address, receiver, transferAmount, {
@@ -2032,6 +2047,84 @@ contract('ReleaseGold', (accounts: string[]) => {
         await releaseGoldInstance.getCurrentReleasedTotalAmount(),
         expectedWithdrawalAmount
       )
+    })
+  })
+
+  describe('#getWithdrawableAmount', () => {
+    let initialReleaseGoldAmount: any
+
+    beforeEach(async () => {
+      const releaseGoldSchedule = _.clone(releaseGoldDefaultSchedule)
+      releaseGoldSchedule.canValidate = true
+      releaseGoldSchedule.revocable = false
+      releaseGoldSchedule.refundAddress = '0x0000000000000000000000000000000000000000'
+      releaseGoldSchedule.releaseStartTime = Math.round(Date.now() / 1000)
+      releaseGoldSchedule.initialDistributionRatio = 500
+      await createNewReleaseGoldInstance(releaseGoldSchedule, web3)
+      initialReleaseGoldAmount = releaseGoldSchedule.amountReleasedPerPeriod.multipliedBy(
+        releaseGoldSchedule.numReleasePeriods
+      )
+
+      await releaseGoldInstance.createAccount({ from: beneficiary })
+    })
+
+    describe('should return 50% of the released amount of gold right after the beginning of the second quarter', async () => {
+      beforeEach(async () => {
+        await releaseGoldInstance.setMaxDistribution(1000, { from: releaseOwner })
+
+        const timeToTravel = 6 * MONTH + 1 * DAY
+        await timeTravel(timeToTravel, web3)
+      })
+
+      it('should return the full amount available for this release period', async () => {
+        const expectedWithdrawalAmount = initialReleaseGoldAmount.div(2)
+        const withdrawableAmount = await releaseGoldInstance.getWithdrawableAmount()
+        assertEqualBN(withdrawableAmount, expectedWithdrawalAmount)
+      })
+
+      it('should return only amount not yet withdrawn', async () => {
+        const expectedWithdrawalAmount = initialReleaseGoldAmount.div(2)
+        await releaseGoldInstance.withdraw(expectedWithdrawalAmount.div(2), { from: beneficiary })
+
+        const afterWithdrawal = await releaseGoldInstance.getWithdrawableAmount()
+        await releaseGoldInstance.getWithdrawableAmount()
+        assertEqualBN(afterWithdrawal, expectedWithdrawalAmount.div(2))
+      })
+    })
+
+    it('should return only up to its own balance', async () => {
+      await releaseGoldInstance.setMaxDistribution(1000, { from: releaseOwner })
+      const timeToTravel = 6 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      const signerFund = new BigNumber('1000000000000000000')
+      const expectedWithdrawalAmount = initialReleaseGoldAmount.minus(signerFund).div(2)
+
+      const authorized = accounts[4]
+      const ecdsaPublicKey = await addressToPublicKey(authorized, web3.eth.sign)
+      const sig = await getParsedSignatureOfAddress(web3, releaseGoldInstance.address, authorized)
+      // this will send 1 CELO from release gold balance to authorized
+      await releaseGoldInstance.authorizeValidatorSignerWithPublicKey(
+        authorized,
+        sig.v,
+        sig.r,
+        sig.s,
+        ecdsaPublicKey as any,
+        { from: beneficiary }
+      )
+
+      const withdrawableAmount = await releaseGoldInstance.getWithdrawableAmount()
+      assertEqualBN(withdrawableAmount, expectedWithdrawalAmount)
+    })
+
+    it('should return only up to max distribution', async () => {
+      const timeToTravel = 6 * MONTH + 1 * DAY
+      await timeTravel(timeToTravel, web3)
+      const expectedWithdrawalAmount = initialReleaseGoldAmount.div(2)
+
+      await releaseGoldInstance.setMaxDistribution(250, { from: releaseOwner })
+
+      const withdrawableAmount = await releaseGoldInstance.getWithdrawableAmount()
+      assertEqualBN(withdrawableAmount, expectedWithdrawalAmount.div(2))
     })
   })
 })

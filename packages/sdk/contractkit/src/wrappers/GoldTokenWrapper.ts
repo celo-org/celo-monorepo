@@ -24,7 +24,7 @@ export class GoldTokenWrapper extends CeloTokenWrapper<GoldToken> {
    * @returns true if success.
    */
   increaseAllowance = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.increaseAllowance,
     tupleParser(stringIdentity, valueToString)
   )
@@ -34,7 +34,7 @@ export class GoldTokenWrapper extends CeloTokenWrapper<GoldToken> {
    * @param value The decrement of the amount of CELO approved to the spender.
    * @returns true if success.
    */
-  decreaseAllowance = proxySend(this.kit, this.contract.methods.decreaseAllowance)
+  decreaseAllowance = proxySend(this.connection, this.contract.methods.decreaseAllowance)
 
   /**
    * Gets the balance of the specified address.
@@ -44,5 +44,8 @@ export class GoldTokenWrapper extends CeloTokenWrapper<GoldToken> {
    * @param owner The address to query the balance of.
    * @return The balance of the specified address.
    */
-  balanceOf = (account: Address) => this.kit.web3.eth.getBalance(account).then(valueToBigNumber)
+  balanceOf = (account: Address) =>
+    this.connection.web3.eth.getBalance(account).then(valueToBigNumber)
 }
+
+export type GoldTokenWrapperType = GoldTokenWrapper

@@ -1,5 +1,6 @@
 const semverGte = require('semver/functions/gte')
 
+/** @internal */
 export class ContractVersion {
   constructor(
     public readonly storage: number | string,
@@ -15,5 +16,6 @@ export class ContractVersion {
     new ContractVersion(raw[0], raw[1], raw[2], raw[3])
 }
 
+/** @internal */
 export const newContractVersion = (storage: number, major: number, minor: number, patch: number) =>
   new ContractVersion(storage, major, minor, patch)

@@ -1,17 +1,15 @@
-import { eqAddress, NULL_ADDRESS } from '@celo/base/lib/address'
+import { StableToken } from '@celo/base'
+import { eqAddress } from '@celo/base/lib/address'
 import { concurrentMap, sleep } from '@celo/base/lib/async'
 import { notEmpty, zip3 } from '@celo/base/lib/collections'
 import { parseSolidityStringArray } from '@celo/base/lib/parsing'
 import { appendPath } from '@celo/base/lib/string'
-import { Address, toTransactionObject } from '@celo/connect'
-import { AttestationUtils, SignatureUtils } from '@celo/utils/lib'
-import { AttestationRequest, GetAttestationRequest } from '@celo/utils/lib/io'
-import { attestationSecurityCode as buildSecurityCodeTypedData } from '@celo/utils/lib/typed-data-constructors'
+import { Address, Connection, toTransactionObject } from '@celo/connect'
 import BigNumber from 'bignumber.js'
 import fetch from 'cross-fetch'
-import { CeloContract } from '../base'
 import { Attestations } from '../generated/Attestations'
 import { ClaimTypes, IdentityMetadataWrapper } from '../identity'
+import { AccountsWrapper } from './Accounts'
 import {
   BaseWrapper,
   blocksToDurationString,
@@ -20,6 +18,7 @@ import {
   valueToBigNumber,
   valueToInt,
 } from './BaseWrapper'
+import { StableTokenWrapper } from './StableTokenWrapper'
 import { Validator } from './Validators'
 
 function hashAddressToSingleDigit(address: Address): number {
@@ -101,7 +100,21 @@ function parseGetCompletableAttestations(response: GetCompletableAttestationsRes
   ).map(([blockNumber, issuer, metadataURL]) => ({ blockNumber, issuer, metadataURL }))
 }
 
+interface ContractsForAttestation {
+  getAccounts(): Promise<AccountsWrapper>
+
+  getStableToken(stableToken: StableToken): Promise<StableTokenWrapper>
+}
+
 export class AttestationsWrapper extends BaseWrapper<Attestations> {
+  constructor(
+    protected readonly connection: Connection,
+    protected readonly contract: Attestations,
+    protected readonly contracts: ContractsForAttestation
+  ) {
+    super(connection, contract)
+  }
+
   /**
    *  Returns the time an attestation can be completable before it is considered expired
    */
@@ -150,7 +163,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   isAttestationExpired = async (attestationRequestBlockNumber: number) => {
     // We duplicate the implementation here, until Attestation.sol->isAttestationExpired is not external
     const attestationExpiryBlocks = await this.attestationExpiryBlocks()
-    const blockNumber = await this.kit.connection.getBlockNumber()
+    const blockNumber = await this.connection.getBlockNumber()
     return blockNumber >= attestationRequestBlockNumber + attestationExpiryBlocks
   }
 
@@ -175,7 +188,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     // Technically should use subscriptions here but not all providers support it.
     // TODO: Use subscription if provider supports
     while (Date.now() - startTime < timeoutSeconds * 1000) {
-      const blockNumber = await this.kit.connection.getBlockNumber()
+      const blockNumber = await this.connection.getBlockNumber()
       if (blockNumber >= unselectedRequest.blockNumber + waitBlocks) {
         return
       }
@@ -233,15 +246,30 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   async getVerifiedStatus(
     identifier: string,
     account: Address,
-    numAttestationsRequired?: number,
-    attestationThreshold?: number
+    numAttestationsRequired: number = 3,
+    attestationThreshold: number = 0.25
   ) {
-    const attestationStats = await this.getAttestationStat(identifier, account)
-    return AttestationUtils.isAccountConsideredVerified(
-      attestationStats,
-      numAttestationsRequired,
-      attestationThreshold
-    )
+    const stats = await this.getAttestationStat(identifier, account)
+    if (!stats) {
+      return {
+        isVerified: false,
+        numAttestationsRemaining: 0,
+        total: 0,
+        completed: 0,
+      }
+    }
+    const numAttestationsRemaining = numAttestationsRequired - stats.completed
+    const fractionAttestation = stats.total < 1 ? 0 : stats.completed / stats.total
+    // 'verified' is a term of convenience to mean that the attestation stats for a
+    // given identifier are beyond a certain threshold of confidence
+    const isVerified = numAttestationsRemaining <= 0 && fractionAttestation >= attestationThreshold
+
+    return {
+      isVerified,
+      numAttestationsRemaining,
+      total: stats.total,
+      completed: stats.completed,
+    }
   }
 
   /**
@@ -249,8 +277,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param attestationsRequested  The number of attestations to request
    */
   async getAttestationFeeRequired(attestationsRequested: number) {
-    const tokenAddress = await this.kit.registry.addressFor(CeloContract.StableToken)
-    const attestationFee = await this.contract.methods.getAttestationRequestFee(tokenAddress).call()
+    const contract = await this.contracts.getStableToken(StableToken.cUSD)
+    const attestationFee = await this.contract.methods
+      .getAttestationRequestFee(contract.address)
+      .call()
     return new BigNumber(attestationFee).times(attestationsRequested)
   }
 
@@ -259,7 +289,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * @param attestationsRequested The number of attestations to request
    */
   async approveAttestationFee(attestationsRequested: number) {
-    const tokenContract = await this.kit.contracts.getContract(CeloContract.StableToken)
+    const tokenContract = await this.contracts.getStableToken(StableToken.cUSD)
     const fee = await this.getAttestationFeeRequired(attestationsRequested)
     return tokenContract.approve(this.address, fee.toFixed())
   }
@@ -319,7 +349,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     }): Promise<AttestationServiceRunningCheckResult> => {
       try {
         const metadata = await IdentityMetadataWrapper.fetchFromURL(
-          this.kit,
+          await this.contracts.getAccounts(),
           arg.metadataURL,
           tries
         )
@@ -362,31 +392,6 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Completes an attestation with the corresponding code
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   * @param issuer The issuer of the attestation
-   * @param code The code received by the validator
-   */
-  async complete(identifier: string, account: Address, issuer: Address, code: string) {
-    const accounts = await this.kit.contracts.getAccounts()
-    const attestationSigner = await accounts.getAttestationSigner(issuer)
-    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromIdentifier(
-      identifier,
-      account
-    )
-    const { r, s, v } = SignatureUtils.parseSignature(
-      expectedSourceMessage,
-      code,
-      attestationSigner
-    )
-    return toTransactionObject(
-      this.kit.connection,
-      this.contract.methods.complete(identifier, v, r, s)
-    )
-  }
-
-  /**
    * Returns the attestation signer for the specified account.
    * @param account The address of token rewards are accumulated in.
    * @param account The address of the account.
@@ -402,47 +407,15 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
    * Allows issuers to withdraw accumulated attestation rewards
    * @param address The address of the token that will be withdrawn
    */
-  withdraw = proxySend(this.kit, this.contract.methods.withdraw)
-
-  /**
-   * Given a list of issuers, finds the matching issuer for a given code
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   * @param code The code received by the validator
-   * @param issuers The list of potential issuers
-   */
-  async findMatchingIssuer(
-    identifier: string,
-    account: Address,
-    code: string,
-    issuers: string[]
-  ): Promise<string | null> {
-    const accounts = await this.kit.contracts.getAccounts()
-    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromIdentifier(
-      identifier,
-      account
-    )
-    for (const issuer of issuers) {
-      const attestationSigner = await accounts.getAttestationSigner(issuer)
-
-      try {
-        SignatureUtils.parseSignature(expectedSourceMessage, code, attestationSigner)
-        return issuer
-      } catch (error) {
-        continue
-      }
-    }
-    return null
-  }
+  withdraw = proxySend(this.connection, this.contract.methods.withdraw)
 
   /**
    * Returns the current configuration parameters for the contract.
-   * @param tokens List of tokens used for attestation fees.
+   * @param tokens List of tokens used for attestation fees. use CeloTokens.getAddresses() to get
    * @return AttestationsConfig object
    */
-  async getConfig(tokens?: string[]): Promise<AttestationsConfig> {
-    const feeTokens =
-      tokens ?? (Object.values(await this.kit.celoTokens.getAddresses()) as string[])
+  async getConfig(tokens: string[]): Promise<AttestationsConfig> {
+    const feeTokens = tokens
     const fees = await Promise.all(
       feeTokens.map(async (token) => {
         const fee = await this.attestationRequestFees(token)
@@ -457,9 +430,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
 
   /**
    * @dev Returns human readable configuration of the attestations contract
+   * @param tokens List of tokens used for attestation fees. use CeloTokens.getAddresses() to get
    * @return AttestationsConfig object
    */
-  async getHumanReadableConfig(tokens?: string[]) {
+  async getHumanReadableConfig(tokens: string[]) {
     const config = await this.getConfig(tokens)
     return {
       attestationRequestFees: config.attestationRequestFees,
@@ -514,180 +488,13 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
   }
 
   /**
-   * Requests a new attestation
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param attestationsRequested The number of attestations to request
-   */
-  async request(identifier: string, attestationsRequested: number) {
-    const tokenAddress = await this.kit.registry.addressFor(CeloContract.StableToken)
-    return toTransactionObject(
-      this.kit.connection,
-      this.contract.methods.request(identifier, attestationsRequested, tokenAddress)
-    )
-  }
-
-  /**
-   * Updates sender's approval status on whether to allow an attestation identifier
-   * mapping to be transfered from one address to another.
-   * @param identifier The identifier for this attestation.
-   * @param index The index of the account in the accounts array.
-   * @param from The current attestation address to which the identifier is mapped.
-   * @param to The new address to map to identifier.
-   * @param status The approval status
-   */
-  approveTransfer = proxySend(this.kit, this.contract.methods.approveTransfer)
-
-  /**
-   * Selects the issuers for previously requested attestations for a phone number
-   * @param identifier Attestation identifier (e.g. phone hash)
-   */
-  selectIssuers(identifier: string) {
-    return toTransactionObject(this.kit.connection, this.contract.methods.selectIssuers(identifier))
-  }
-
-  /**
-   * Waits appropriate number of blocks, then selects issuers for previously requested phone number attestations
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account Address of the account
-   */
-  async selectIssuersAfterWait(
-    identifier: string,
-    account: string,
-    timeoutSeconds?: number,
-    pollDurationSeconds?: number
-  ) {
-    await this.waitForSelectingIssuers(identifier, account, timeoutSeconds, pollDurationSeconds)
-    return this.selectIssuers(identifier)
-  }
-
-  /**
-   * Reveal phone number to issuer
-   * @param serviceURL: validator's attestation service URL
-   * @param body
-   */
-  revealPhoneNumberToIssuer(serviceURL: string, requestBody: AttestationRequest) {
-    return fetch(appendPath(serviceURL, 'attestations'), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    })
-  }
-
-  /**
-   * Returns reveal status from validator's attestation service
-   * @param phoneNumber: attestation's phone number
-   * @param account: attestation's account
-   * @param issuer: validator's address
-   * @param serviceURL: validator's attestation service URL
-   * @param pepper: phone number privacy pepper
-   */
-  getRevealStatus(
-    phoneNumber: string,
-    account: Address,
-    issuer: Address,
-    serviceURL: string,
-    pepper?: string
-  ) {
-    const urlParams = new URLSearchParams({
-      phoneNumber,
-      salt: pepper ?? '',
-      issuer,
-      account,
-    })
-    return fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-
-  /**
-   * Returns attestation code for provided security code from validator's attestation service
-   * @param serviceURL: validator's attestation service URL
-   * @param body
-   */
-  async getAttestationForSecurityCode(
-    serviceURL: string,
-    requestBody: GetAttestationRequest,
-    signer: Address
-  ): Promise<string> {
-    const urlParams = new URLSearchParams({
-      phoneNumber: requestBody.phoneNumber,
-      account: requestBody.account,
-      issuer: requestBody.issuer,
-    })
-
-    let additionalHeaders = {}
-    if (requestBody.salt) {
-      urlParams.set('salt', requestBody.salt)
-    }
-    if (requestBody.securityCode) {
-      urlParams.set('securityCode', requestBody.securityCode)
-      const signature = await this.kit.signTypedData(
-        signer,
-        buildSecurityCodeTypedData(requestBody.securityCode)
-      )
-      additionalHeaders = {
-        Authentication: SignatureUtils.serializeSignature(signature),
-      }
-    }
-
-    const response = await fetch(appendPath(serviceURL, 'get_attestations') + '?' + urlParams, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json', ...additionalHeaders },
-    })
-
-    const { ok, status } = response
-    if (ok) {
-      const body = await response.json()
-      if (body.attestationCode) {
-        return body.attestationCode
-      }
-    }
-    throw new Error(
-      `Error getting security code for ${requestBody.issuer}. ${status}: ${await response.text()}`
-    )
-  }
-
-  /**
-   * Validates a given code by the issuer on-chain
-   * @param identifier Attestation identifier (e.g. phone hash)
-   * @param account The address of the account which requested attestation
-   * @param issuer The address of the issuer of the attestation
-   * @param code The code send by the issuer
-   */
-  async validateAttestationCode(
-    identifier: string,
-    account: Address,
-    issuer: Address,
-    code: string
-  ) {
-    const accounts = await this.kit.contracts.getAccounts()
-    const attestationSigner = await accounts.getAttestationSigner(issuer)
-    const expectedSourceMessage = AttestationUtils.getAttestationMessageToSignFromIdentifier(
-      identifier,
-      account
-    )
-    const { r, s, v } = SignatureUtils.parseSignature(
-      expectedSourceMessage,
-      code,
-      attestationSigner
-    )
-    const result = await this.contract.methods
-      .validateAttestationCode(identifier, account, v, r, s)
-      .call()
-    return result.toLowerCase() !== NULL_ADDRESS
-  }
-
-  /**
    * Gets the relevant attestation service status for a validator
    * @param validator Validator to get the attestation service status for
    */
   async getAttestationServiceStatus(
     validator: Validator
   ): Promise<AttestationServiceStatusResponse> {
-    const accounts = await this.kit.contracts.getAccounts()
+    const accounts = await this.contracts.getAccounts()
     const hasAttestationSigner = await accounts.hasAuthorizedAttestationSigner(validator.address)
     const attestationSigner = await accounts.getAttestationSigner(validator.address)
 
@@ -731,7 +538,10 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     }
 
     try {
-      const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(
+        await this.contracts.getAccounts(),
+        metadataURL
+      )
       const attestationServiceURLClaim = metadata.findClaim(ClaimTypes.ATTESTATION_SERVICE_URL)
 
       if (!attestationServiceURLClaim) {
@@ -817,7 +627,7 @@ export class AttestationsWrapper extends BaseWrapper<Attestations> {
     if (idx < 0) {
       throw new Error("Account not found in identifier's accounts")
     }
-    return toTransactionObject(this.kit.connection, this.contract.methods.revoke(identifer, idx))
+    return toTransactionObject(this.connection, this.contract.methods.revoke(identifer, idx))
   }
 }
 
@@ -859,3 +669,5 @@ export interface AttestationServiceStatusResponse {
   maxRerequestMins: number | null
   twilioVerifySidProvided: boolean | null
 }
+
+export type AttestationsWrapperType = AttestationsWrapper

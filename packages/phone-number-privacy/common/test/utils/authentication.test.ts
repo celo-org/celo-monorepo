@@ -1,9 +1,10 @@
-import { Request } from 'express'
-import Logger from 'bunyan'
-
-import * as auth from '../../src/utils/authentication'
+import { hexToBuffer } from '@celo/base'
 import { ContractKit } from '@celo/contractkit'
-import { AuthenticationMethod } from '@celo/identity/lib/odis/query'
+import Logger from 'bunyan'
+import { Request } from 'express'
+import { ErrorMessage, ErrorType } from '../../lib'
+import { AuthenticationMethod } from '../../src/interfaces/requests'
+import * as auth from '../../src/utils/authentication'
 
 describe('Authentication test suite', () => {
   const logger = Logger.createLogger({
@@ -21,9 +22,18 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBeFalsy()
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should fail authentication with missing signer', async () => {
@@ -33,12 +43,21 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBeFalsy()
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
-    it('Should succeed authentication with error in getDataEncryptionKey', async () => {
+    it('Should succeed authentication with error in getDataEncryptionKey when shouldFailOpen is true', async () => {
       const sampleRequest: Request = {
         get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
         body: {
@@ -48,9 +67,42 @@ describe('Authentication test suite', () => {
       } as Request
       const mockContractKit = {} as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBeTruthy()
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(true)
+      expect(warnings).toEqual([ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_OPEN])
+    })
+
+    it('Should fail authentication with error in getDataEncryptionKey when shouldFailOpen is false', async () => {
+      const sampleRequest: Request = {
+        get: (name: string) => (name === 'Authorization' ? 'Test' : ''),
+        body: {
+          account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
+          authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+        },
+      } as Request
+      const mockContractKit = {} as ContractKit
+
+      const warnings: ErrorType[] = []
+
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        false,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([ErrorMessage.FAILURE_TO_GET_DEK, ErrorMessage.FAILING_CLOSED])
     })
 
     it('Should fail authentication when key is not registered', async () => {
@@ -73,9 +125,18 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBeFalsy()
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
     })
 
     it('Should fail authentication when key is registered but not valid', async () => {
@@ -98,9 +159,246 @@ describe('Authentication test suite', () => {
         },
       } as ContractKit
 
-      const result = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+      const warnings: ErrorType[] = []
 
-      expect(result).toBeFalsy()
+      const success = await auth.authenticateUser(sampleRequest, mockContractKit, logger)
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
+    })
+
+    it('Should succeed authentication when key is registered and valid', async () => {
+      const rawKey = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
+      const body = {
+        account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
+        authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+      }
+      const sig = auth.signWithRawKey(JSON.stringify(body), rawKey)
+      const sampleRequest: Request = {
+        get: (name: string) => (name === 'Authorization' ? sig : ''),
+        body,
+      } as Request
+      const mockContractKit = {
+        contracts: {
+          getAccounts: async () => {
+            return Promise.resolve({
+              getDataEncryptionKey: async (_: string) => {
+                // NOTE: elliptic is disabled elsewhere in this library to prevent
+                // accidental signing of truncated messages.
+                // tslint:disable-next-line:import-blacklist
+                const EC = require('elliptic').ec
+                const ec = new EC('secp256k1')
+                const key = ec.keyFromPrivate(hexToBuffer(rawKey))
+                return key.getPublic(true, 'hex')
+              },
+            })
+          },
+        },
+      } as ContractKit
+
+      const warnings: ErrorType[] = []
+
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(true)
+      expect(warnings).toEqual([])
+    })
+
+    it('Should fail authentication when the message is manipulated', async () => {
+      const rawKey = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
+      const body = {
+        account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
+        authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+      }
+      const message = JSON.stringify(body)
+
+      // Modify every fourth character and check that the signature becomes invalid.
+      for (let i = 0; i < message.length; i += 4) {
+        const modified =
+          message.slice(0, i) +
+          String.fromCharCode(message.charCodeAt(i) + 1) +
+          message.slice(i + 1)
+        const sig = auth.signWithRawKey(modified, rawKey)
+        const sampleRequest: Request = {
+          get: (name: string) => (name === 'Authorization' ? sig : ''),
+          body,
+        } as Request
+        const mockContractKit = {
+          contracts: {
+            getAccounts: async () => {
+              return Promise.resolve({
+                getDataEncryptionKey: async (_: string) => {
+                  // NOTE: elliptic is disabled elsewhere in this library to prevent
+                  // accidental signing of truncated messages.
+                  // tslint:disable-next-line:import-blacklist
+                  const EC = require('elliptic').ec
+                  const ec = new EC('secp256k1')
+                  const key = ec.keyFromPrivate(hexToBuffer(rawKey))
+                  return key.getPublic(true, 'hex')
+                },
+              })
+            },
+          },
+        } as ContractKit
+
+        const warnings: ErrorType[] = []
+
+        const success = await auth.authenticateUser(
+          sampleRequest,
+          mockContractKit,
+          logger,
+          true,
+          warnings
+        )
+
+        expect(success).toBe(false)
+        expect(warnings).toEqual([])
+      }
+    })
+
+    it('Should fail authentication when the key is incorrect', async () => {
+      const rawKey = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
+      const body = {
+        account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
+        authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+      }
+      const sig = auth.signWithRawKey(JSON.stringify(body), rawKey)
+      const sampleRequest: Request = {
+        get: (name: string) => (name === 'Authorization' ? sig : ''),
+        body,
+      } as Request
+
+      const mockContractKit = {
+        contracts: {
+          getAccounts: async () => {
+            return Promise.resolve({
+              getDataEncryptionKey: async (_: string) => {
+                // NOTE: elliptic is disabled elsewhere in this library to prevent
+                // accidental signing of truncated messages.
+                // tslint:disable-next-line:import-blacklist
+                const EC = require('elliptic').ec
+                const ec = new EC('secp256k1')
+                // Send back a manipulated key.
+                const key = ec.keyFromPrivate(hexToBuffer('a' + rawKey.slice(1)))
+                return key.getPublic(true, 'hex')
+              },
+            })
+          },
+        },
+      } as ContractKit
+
+      const warnings: ErrorType[] = []
+
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
+    })
+
+    it('Should fail authentication when the sigature is modified', async () => {
+      const rawKey = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
+      const body = {
+        account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
+        authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+      }
+      // Manipulate the signature.
+      const sig = auth.signWithRawKey(JSON.stringify(body), rawKey)
+      const modified = JSON.stringify([0] + JSON.parse(sig))
+      const sampleRequest: Request = {
+        get: (name: string) => (name === 'Authorization' ? modified : ''),
+        body,
+      } as Request
+
+      const mockContractKit = {
+        contracts: {
+          getAccounts: async () => {
+            return Promise.resolve({
+              getDataEncryptionKey: async (_: string) => {
+                // NOTE: elliptic is disabled elsewhere in this library to prevent
+                // accidental signing of truncated messages.
+                // tslint:disable-next-line:import-blacklist
+                const EC = require('elliptic').ec
+                const ec = new EC('secp256k1')
+                // Send back a manipulated key.
+                const key = ec.keyFromPrivate(hexToBuffer(rawKey))
+                return key.getPublic(true, 'hex')
+              },
+            })
+          },
+        },
+      } as ContractKit
+
+      const warnings: ErrorType[] = []
+
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(false)
+      expect(warnings).toEqual([])
+    })
+
+    // Backwards compatibility check
+    // TODO(2.0.0, deployment): Remove this once clients upgrade to @celo/identity v1.5.3
+    // (https://github.com/celo-org/celo-monorepo/issues/9802)
+    it('Should succeed authentication when key is registered and valid and signature is incorrectly generated', async () => {
+      const rawKey = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
+      const body = {
+        account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
+        authenticationMethod: AuthenticationMethod.ENCRYPTION_KEY,
+      }
+      // NOTE: elliptic is disabled elsewhere in this library to prevent
+      // accidental signing of truncated messages.
+      // tslint:disable-next-line:import-blacklist
+      const EC = require('elliptic').ec
+      const ec = new EC('secp256k1')
+      const key = ec.keyFromPrivate(hexToBuffer(rawKey))
+      const sig = JSON.stringify(key.sign(JSON.stringify(body)).toDER())
+
+      const sampleRequest: Request = {
+        get: (name: string) => (name === 'Authorization' ? sig : ''),
+        body,
+      } as Request
+      const mockContractKit = {
+        contracts: {
+          getAccounts: async () => {
+            return Promise.resolve({
+              getDataEncryptionKey: async (_: string) => {
+                return key.getPublic(true, 'hex')
+              },
+            })
+          },
+        },
+      } as ContractKit
+
+      const warnings: ErrorType[] = []
+
+      const success = await auth.authenticateUser(
+        sampleRequest,
+        mockContractKit,
+        logger,
+        true,
+        warnings
+      )
+
+      expect(success).toBe(true)
+      expect(warnings).toEqual([])
     })
   })
 
@@ -122,8 +420,9 @@ describe('Authentication test suite', () => {
 
       const result = await auth.isVerified('', '', mockContractKit, logger)
 
-      expect(result).toBeTruthy()
+      expect(result).toBe(true)
     })
+
     it('Should fail when verification is not ok', async () => {
       const mockContractKit = {
         contracts: {
@@ -141,7 +440,7 @@ describe('Authentication test suite', () => {
 
       const result = await auth.isVerified('', '', mockContractKit, logger)
 
-      expect(result).toBeFalsy()
+      expect(result).toBe(false)
     })
   })
 })

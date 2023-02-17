@@ -1,21 +1,13 @@
-import { hexToBuffer } from '@celo/base'
-import { ec as EC } from 'elliptic'
+import { Endpoint } from '@celo/phone-number-privacy-common'
 import { WasmBlsBlindingClient } from './bls-blinding-client'
 import {
   getBlindedPhoneNumber,
   getBlindedPhoneNumberSignature,
-  getPepperFromThresholdSignature,
   getPhoneNumberIdentifier,
   getPhoneNumberIdentifierFromSignature,
   isBalanceSufficientForSigRetrieval,
 } from './phone-number-identifier'
-import {
-  AuthenticationMethod,
-  CustomSigner,
-  EncryptionKeySigner,
-  ErrorMessages,
-  ServiceContext,
-} from './query'
+import { AuthenticationMethod, EncryptionKeySigner, ErrorMessages, ServiceContext } from './query'
 
 jest.mock('./bls-blinding-client', () => {
   // tslint:disable-next-line:no-shadowed-variable
@@ -28,8 +20,6 @@ jest.mock('./bls-blinding-client', () => {
   }
 })
 
-const ec = new EC('secp256k1')
-
 const mockE164Number = '+14155550000'
 const mockAccount = '0x0000000000000000000000000000000000007E57'
 const expectedPhoneHash = '0xf3ddadd1f488cdd42b9fa10354fdcae67c303ce182e71b30855733b50dce8301'
@@ -40,7 +30,7 @@ const serviceContext: ServiceContext = {
   odisPubKey:
     '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
 }
-const endpoint = serviceContext.odisUrl + '/getBlindedMessageSig'
+const endpoint = serviceContext.odisUrl + Endpoint.PNP_SIGN
 const rawKey = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
 
 const authSigner: EncryptionKeySigner = {
@@ -65,8 +55,21 @@ describe(getPhoneNumberIdentifier, () => {
     it('Using EncryptionKeySigner', async () => {
       fetchMock.mock(endpoint, {
         success: true,
-        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+        signature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+        performedQueryCount: 5,
+        totalQuota: 10,
+        version: '',
       })
+
+      const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
+      const base64BlindedMessage = await getBlindedPhoneNumber(mockE164Number, blsBlindingClient)
+      const base64BlindSig = await getBlindedPhoneNumberSignature(
+        mockAccount,
+        authSigner,
+        serviceContext,
+        base64BlindedMessage
+      )
+      const base64UnblindedSig = await blsBlindingClient.unblindAndVerifyMessage(base64BlindSig)
 
       await expect(
         getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
@@ -74,39 +77,17 @@ describe(getPhoneNumberIdentifier, () => {
         e164Number: mockE164Number,
         pepper: expectedPepper,
         phoneHash: expectedPhoneHash,
+        unblindedSignature: base64UnblindedSig,
       })
-    })
-
-    it('Using CustomSigner', async () => {
-      fetchMock.mock(endpoint, {
-        success: true,
-        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
-      })
-
-      const customSignerMethod = jest.fn((bodyString) => {
-        const key = ec.keyFromPrivate(hexToBuffer(rawKey))
-        return Promise.resolve(JSON.stringify(key.sign(bodyString).toDER()))
-      })
-      const customSigner: CustomSigner = {
-        authenticationMethod: AuthenticationMethod.CUSTOM_SIGNER,
-        customSigner: customSignerMethod,
-      }
-
-      await expect(
-        getPhoneNumberIdentifier(mockE164Number, mockAccount, customSigner, serviceContext)
-      ).resolves.toMatchObject({
-        e164Number: mockE164Number,
-        pepper: expectedPepper,
-        phoneHash: expectedPhoneHash,
-      })
-
-      expect(customSignerMethod.mock.calls.length).toBe(1)
     })
 
     it('Preblinding the phone number', async () => {
       fetchMock.mock(endpoint, {
         success: true,
-        combinedSignature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+        signature: '0Uj+qoAu7ASMVvm6hvcUGx2eO/cmNdyEgGn0mSoZH8/dujrC1++SZ1N6IP6v2I8A',
+        performedQueryCount: 5,
+        totalQuota: 10,
+        version: '',
       })
 
       const blsBlindingClient = new WasmBlsBlindingClient(serviceContext.odisPubKey)
@@ -143,13 +124,5 @@ describe(getPhoneNumberIdentifier, () => {
     await expect(
       getPhoneNumberIdentifier(mockE164Number, mockAccount, authSigner, serviceContext)
     ).rejects.toThrow(ErrorMessages.ODIS_AUTH_ERROR)
-  })
-})
-
-describe(getPepperFromThresholdSignature, () => {
-  it('Hashes sigs correctly', () => {
-    const base64Sig = 'vJeFZJ3MY5KlpI9+kIIozKkZSR4cMymLPh2GHZUatWIiiLILyOcTiw2uqK/LBReA'
-    const signature = new Buffer(base64Sig, 'base64')
-    expect(getPepperFromThresholdSignature(signature)).toBe('piWqRHHYWtfg9')
   })
 })

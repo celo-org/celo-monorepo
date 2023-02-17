@@ -56,13 +56,14 @@ USAGE
   $ celocli grandamento:get-buy-amount
 
 OPTIONS
-  --globalHelp                         View all available global flags
-  --sellCelo=(true|false)              (required) Sell or buy CELO
+  --globalHelp                                     View all available global flags
+  --sellCelo=(true|false)                          (required) Sell or buy CELO
 
-  --stableToken=(cUSD|cusd|cEUR|ceur)  (required) [default: cUSD] Name of the stable to
-                                       receive or send
+  --stableToken=(cUSD|cusd|cEUR|ceur|cREAL|creal)  (required) [default: cUSD] Name of
+                                                   the stable to receive or send
 
-  --value=10000000000000000000000      (required) The value of the tokens to exchange
+  --value=10000000000000000000000                  (required) The value of the tokens to
+                                                   exchange
 ```
 
 _See code: [src/commands/grandamento/get-buy-amount.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/grandamento/get-buy-amount.ts)_
@@ -101,7 +102,7 @@ OPTIONS
 
   --sellCelo=(true|false)                            (required) Sell or buy CELO
 
-  --stableToken=(cUSD|cusd|cEUR|ceur)                (required) [default: cUSD] Name of
+  --stableToken=(cUSD|cusd|cEUR|ceur|cREAL|creal)    (required) [default: cUSD] Name of
                                                      the stable to receive or send
 
   --value=10000000000000000000000                    (required) The value of the tokens

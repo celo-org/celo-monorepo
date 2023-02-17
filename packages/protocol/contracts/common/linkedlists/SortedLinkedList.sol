@@ -124,7 +124,8 @@ library SortedLinkedList {
   /**
    * @notice Gets all elements from the doubly linked list.
    * @param list A storage pointer to the underlying list.
-   * @return An unpacked list of elements from largest to smallest.
+   * @return Array of all keys in the list.
+   * @return Values corresponding to keys, which will be ordered largest to smallest.
    */
   function getElements(List storage list)
     internal
@@ -165,7 +166,8 @@ library SortedLinkedList {
    * @param value The element value.
    * @param lesserKey The key of the element which could be just left of the new value.
    * @param greaterKey The key of the element which could be just right of the new value.
-   * @return The correct lesserKey/greaterKey keys.
+   * @return The correct lesserKey keys.
+   * @return The correct greaterKey keys.
    */
   function getLesserAndGreater(
     List storage list,

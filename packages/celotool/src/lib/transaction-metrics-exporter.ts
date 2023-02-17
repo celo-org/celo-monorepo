@@ -14,22 +14,22 @@ function releaseName(celoEnv: string, suffix: string) {
 
 export async function installHelmChart(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_SUFFIX, '1')
-  await installGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, suffix),
+  await installGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv, suffix),
     chartDir,
-    await helmParameters(celoEnv)
-  )
+    parameters: await helmParameters(celoEnv),
+  })
 }
 
 export async function upgradeHelmChart(celoEnv: string) {
   const suffix = fetchEnvOrFallback(envVar.TRANSACTION_METRICS_EXPORTER_SUFFIX, '1')
-  await upgradeGenericHelmChart(
-    celoEnv,
-    releaseName(celoEnv, suffix),
+  await upgradeGenericHelmChart({
+    namespace: celoEnv,
+    releaseName: releaseName(celoEnv, suffix),
     chartDir,
-    await helmParameters(celoEnv)
-  )
+    parameters: await helmParameters(celoEnv),
+  })
 }
 
 export async function removeHelmRelease(celoEnv: string) {

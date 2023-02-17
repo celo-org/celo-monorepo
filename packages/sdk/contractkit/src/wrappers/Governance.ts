@@ -12,7 +12,6 @@ import { fromFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import { Governance } from '../generated/Governance'
 import {
-  BaseWrapper,
   bufferToSolidityBytes,
   identity,
   proxyCall,
@@ -26,6 +25,7 @@ import {
   valueToInt,
   valueToString,
 } from './BaseWrapper'
+import { BaseWrapperForGoverning } from './BaseWrapperForGoverning'
 
 export enum ProposalStage {
   None = 'None',
@@ -42,7 +42,7 @@ type StageDurations<V> = {
 
 type DequeuedStageDurations = Pick<
   StageDurations<BigNumber>,
-  ProposalStage.Approval | ProposalStage.Referendum | ProposalStage.Execution
+  ProposalStage.Referendum | ProposalStage.Execution
 >
 
 export interface ParticipationParameters {
@@ -107,7 +107,7 @@ export interface UpvoteRecord {
 }
 
 export enum VoteValue {
-  None = 'NONE',
+  None = 'None',
   Abstain = 'Abstain',
   No = 'No',
   Yes = 'Yes',
@@ -135,6 +135,9 @@ export interface VoteRecord {
   proposalID: BigNumber
   votes: BigNumber
   value: VoteValue
+  yesVotes: BigNumber
+  noVotes: BigNumber
+  abstainVotes: BigNumber
 }
 
 export interface Voter {
@@ -148,7 +151,7 @@ const ZERO_BN = new BigNumber(0)
 /**
  * Contract managing voting for governance proposals.
  */
-export class GovernanceWrapper extends BaseWrapper<Governance> {
+export class GovernanceWrapper extends BaseWrapperForGoverning<Governance> {
   /**
    * Querying number of possible concurrent proposals.
    * @returns Current number of possible concurrent proposals.
@@ -185,7 +188,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async stageDurations(): Promise<DequeuedStageDurations> {
     const res = await this.contract.methods.stageDurations().call()
     return {
-      [ProposalStage.Approval]: valueToBigNumber(res[0]),
       [ProposalStage.Referendum]: valueToBigNumber(res[1]),
       [ProposalStage.Execution]: valueToBigNumber(res[2]),
     }
@@ -236,7 +238,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const quorum = participation.baseline.times(participation.baselineQuorumFactor)
     const votes = await this.getVotes(proposalID)
     const total = votes.Yes.plus(votes.No).plus(votes.Abstain)
-    const lockedGold = await this.kit.contracts.getLockedGold()
+    const lockedGold = await this.contracts.getLockedGold()
     // NOTE: this networkWeight is not as governance calculates it,
     // but we don't have access to proposal.networkWeight
     const networkWeight = await lockedGold.getTotalLockedGold()
@@ -285,9 +287,6 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async getHumanReadableConfig() {
     const config = await this.getConfig()
     const stageDurations = {
-      [ProposalStage.Approval]: secondsToDurationString(
-        config.stageDurations[ProposalStage.Approval]
-      ),
       [ProposalStage.Referendum]: secondsToDurationString(
         config.stageDurations[ProposalStage.Referendum]
       ),
@@ -385,7 +384,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * Returns the approver multisig contract for proposals and hotfixes.
    */
   getApproverMultisig = () =>
-    this.getApprover().then((address) => this.kit.contracts.getMultiSig(address))
+    this.getApprover().then((address) => this.contracts.getMultiSig(address))
 
   getProposalStage = async (proposalID: BigNumber.Value): Promise<ProposalStage> => {
     const queue = await this.getQueue()
@@ -413,12 +412,11 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     }
 
     const durations = await this.stageDurations()
-    const referendum = meta.timestamp.plus(durations.Approval)
+    const referendum = meta.timestamp
     const execution = referendum.plus(durations.Referendum)
     const expiration = execution.plus(durations.Execution)
 
     return {
-      [ProposalStage.Approval]: meta.timestamp,
       [ProposalStage.Referendum]: referendum,
       [ProposalStage.Execution]: execution,
       [ProposalStage.Expiration]: expiration,
@@ -477,13 +475,12 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
 
     if (stage === ProposalStage.Queued) {
       record.upvotes = await this.getUpvotes(proposalID)
-    } else if (stage === ProposalStage.Approval) {
-      record.approved = await this.isApproved(proposalID)
-      record.approvals = await this.getApprovalStatus(proposalID)
     } else if (stage === ProposalStage.Referendum || stage === ProposalStage.Execution) {
       record.approved = true
       record.passed = await this.isProposalPassing(proposalID)
       record.votes = await this.getVotes(proposalID)
+      record.approved = await this.isApproved(proposalID)
+      record.approvals = await this.getApprovalStatus(proposalID)
     }
 
     return record
@@ -498,14 +495,14 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Withdraws refunded proposal deposits.
    */
-  withdraw = proxySend(this.kit, this.contract.methods.withdraw)
+  withdraw = proxySend(this.connection, this.contract.methods.withdraw)
 
   /**
    * Submits a new governance proposal.
    * @param proposal Governance proposal
    * @param descriptionURL A URL where further information about the proposal can be viewed
    */
-  propose = proxySend(this.kit, this.contract.methods.propose, proposalToParams)
+  propose = proxySend(this.connection, this.contract.methods.propose, proposalToParams)
 
   /**
    * Returns whether a governance proposal exists with the given ID.
@@ -551,6 +548,9 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
         proposalID: valueToBigNumber(res[0]),
         value: Object.keys(VoteValue)[valueToInt(res[1])] as VoteValue,
         votes: valueToBigNumber(res[2]),
+        yesVotes: valueToBigNumber(res[3]),
+        noVotes: valueToBigNumber(res[4]),
+        abstainVotes: valueToBigNumber(res[5]),
       }
     } catch (_) {
       // The proposal ID may not be present in the dequeued list, or the voter may not have a vote
@@ -656,14 +656,17 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   /**
    * Dequeues any queued proposals if `dequeueFrequency` seconds have elapsed since the last dequeue
    */
-  dequeueProposalsIfReady = proxySend(this.kit, this.contract.methods.dequeueProposalsIfReady)
+  dequeueProposalsIfReady = proxySend(
+    this.connection,
+    this.contract.methods.dequeueProposalsIfReady
+  )
 
   /**
    * Returns the number of votes that will be applied to a proposal for a given voter.
    * @param voter Address of voter
    */
   async getVoteWeight(voter: Address) {
-    const lockedGoldContract = await this.kit.contracts.getLockedGold()
+    const lockedGoldContract = await this.contracts.getLockedGold()
     return lockedGoldContract.getAccountTotalLockedGold(voter)
   }
 
@@ -752,7 +755,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async upvote(proposalID: BigNumber.Value, upvoter: Address) {
     const { lesserID, greaterID } = await this.lesserAndGreaterAfterUpvote(upvoter, proposalID)
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.upvote(
         valueToString(proposalID),
         valueToString(lesserID),
@@ -768,7 +771,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async revokeUpvote(upvoter: Address) {
     const { lesserID, greaterID } = await this.lesserAndGreaterAfterRevoke(upvoter)
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.revokeUpvote(valueToString(lesserID), valueToString(greaterID))
     )
   }
@@ -781,7 +784,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async approve(proposalID: BigNumber.Value) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.approve(valueToString(proposalID), proposalIndex)
     )
   }
@@ -795,12 +798,38 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     const voteNum = Object.keys(VoteValue).indexOf(vote)
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.vote(valueToString(proposalID), proposalIndex, voteNum)
     )
   }
 
-  revokeVotes = proxySend(this.kit, this.contract.methods.revokeVotes)
+  /**
+   * Applies `sender`'s vote choice to a given proposal.
+   * @param proposalID Governance proposal UUID.
+   * @param yesVotes The yes votes.
+   * @param noVotes The no votes.
+   * @param abstainVotes The abstain votes.
+   */
+  async votePartially(
+    proposalID: BigNumber.Value,
+    yesVotes: BigNumber.Value,
+    noVotes: BigNumber.Value,
+    abstainVotes: BigNumber.Value
+  ) {
+    const proposalIndex = await this.getDequeueIndex(proposalID)
+    return toTransactionObject(
+      this.connection,
+      this.contract.methods.votePartially(
+        valueToString(proposalID),
+        proposalIndex,
+        valueToString(yesVotes),
+        valueToString(noVotes),
+        valueToString(abstainVotes)
+      )
+    )
+  }
+
+  revokeVotes = proxySend(this.connection, this.contract.methods.revokeVotes)
 
   /**
    * Returns `voter`'s vote choice on a given proposal.
@@ -820,7 +849,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
   async execute(proposalID: BigNumber.Value) {
     const proposalIndex = await this.getDequeueIndex(proposalID)
     return toTransactionObject(
-      this.kit.connection,
+      this.connection,
       this.contract.methods.execute(valueToString(proposalID), proposalIndex)
     )
   }
@@ -877,7 +906,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
   whitelistHotfix = proxySend(
-    this.kit,
+    this.connection,
     this.contract.methods.whitelistHotfix,
     tupleParser(bufferToHex)
   )
@@ -887,13 +916,21 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    * @notice Only the `approver` address will succeed in sending this transaction
    */
-  approveHotfix = proxySend(this.kit, this.contract.methods.approveHotfix, tupleParser(bufferToHex))
+  approveHotfix = proxySend(
+    this.connection,
+    this.contract.methods.approveHotfix,
+    tupleParser(bufferToHex)
+  )
 
   /**
    * Marks the given hotfix prepared for current epoch if quorum of validators have whitelisted it.
    * @param hash keccak256 hash of hotfix's associated abi encoded transactions
    */
-  prepareHotfix = proxySend(this.kit, this.contract.methods.prepareHotfix, tupleParser(bufferToHex))
+  prepareHotfix = proxySend(
+    this.connection,
+    this.contract.methods.prepareHotfix,
+    tupleParser(bufferToHex)
+  )
 
   /**
    * Executes a given sequence of transactions if the corresponding hash is prepared and approved.
@@ -901,5 +938,7 @@ export class GovernanceWrapper extends BaseWrapper<Governance> {
    * @param salt Secret which guarantees uniqueness of hash
    * @notice keccak256 hash of abi encoded transactions computed on-chain
    */
-  executeHotfix = proxySend(this.kit, this.contract.methods.executeHotfix, hotfixToParams)
+  executeHotfix = proxySend(this.connection, this.contract.methods.executeHotfix, hotfixToParams)
 }
+
+export type GovernanceWrapperType = GovernanceWrapper

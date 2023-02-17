@@ -1,29 +1,38 @@
 import { newKit } from '@celo/contractkit'
 import {
-  AuthenticationMethod,
   EncryptionKeySigner,
-  ServiceContext,
+  OdisContextName,
   WalletKeySigner,
 } from '@celo/identity/lib/odis/query'
-import { PhoneNumberUtils } from '@celo/utils'
+import { AuthenticationMethod } from '@celo/phone-number-privacy-common'
+import { PhoneNumberUtils } from '@celo/phone-utils'
 import {
   ensureLeading0x,
   normalizeAddressWith0x,
   privateKeyToAddress,
 } from '@celo/utils/lib/address'
 import 'isomorphic-fetch'
-import { getBlindedPhoneNumber } from '../../../common/src/test/utils'
 
 require('dotenv').config()
+
+export const getTestContextName = (): OdisContextName => {
+  switch (process.env.CONTEXT_NAME) {
+    case 'alfajores':
+      return OdisContextName.ALFAJORES
+    case 'staging':
+      return OdisContextName.STAGING
+    case 'mainnet':
+      return OdisContextName.MAINNET
+    default:
+      throw new Error('CONTEXT_NAME env var is undefined or invalid')
+  }
+}
 
 /**
  * CONSTS
  */
-export const ODIS_COMBINER =
-  process.env.ODIS_COMBINER_SERVICE_URL ||
-  'https://us-central1-celo-phone-number-privacy-stg.cloudfunctions.net'
 export const DEFAULT_FORNO_URL =
-  process.env.ODIS_BLOCKCHAIN_PROVIDER || 'https://alfajoresstaging-forno.celo-testnet.org'
+  process.env.ODIS_BLOCKCHAIN_PROVIDER ?? 'https://alfajores-forno.celo-testnet.org'
 
 export const PRIVATE_KEY = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
 export const ACCOUNT_ADDRESS = normalizeAddressWith0x(privateKeyToAddress(PRIVATE_KEY)) // 0x1be31a94361a391bbafb2a4ccd704f57dc04d4bb
@@ -34,13 +43,10 @@ export const ACCOUNT_ADDRESS_NO_QUOTA = privateKeyToAddress(PRIVATE_KEY_NO_QUOTA
 
 export const PHONE_NUMBER = '+17777777777'
 export const BLINDING_FACTOR = Buffer.from('0IsBvRfkBrkKCIW6HV0/T1zrzjQSe8wRyU3PKojCnww=', 'base64')
-export const BLINDED_PHONE_NUMBER = getBlindedPhoneNumber(PHONE_NUMBER, BLINDING_FACTOR)
-
-export const SERVICE_CONTEXT: ServiceContext = {
-  odisUrl: ODIS_COMBINER,
-  odisPubKey:
-    '7FsWGsFnmVvRfMDpzz95Np76wf/1sPaK0Og9yiB+P8QbjiC8FV67NBans9hzZEkBaQMhiapzgMR6CkZIZPvgwQboAxl65JWRZecGe5V3XO4sdKeNemdAZ2TzQuWkuZoA',
-}
+// BLINDED_PHONE_NUMBER value is dependent on PHONE_NUMBER AND BLINDING_FACTOR
+// hardcoding to avoid importing blind_threshols_bls library
+export const BLINDED_PHONE_NUMBER =
+  'hZXDhpC5onzBSFa1agZ9vfHzqwJ/QeJg77NGvWiQG/sFWsvHETzZvdWr2GpF3QkB'
 
 export const PHONE_HASH_IDENTIFIER = PhoneNumberUtils.getPhoneHash(PHONE_NUMBER)
 
@@ -55,7 +61,13 @@ contractKit.addAccount(PRIVATE_KEY_NO_QUOTA)
 contractKit.addAccount(PRIVATE_KEY)
 contractKit.defaultAccount = ACCOUNT_ADDRESS
 
-export const deks = [
+interface DEK {
+  privateKey: string
+  publicKey: string
+  address: string
+}
+
+export const deks: DEK[] = [
   {
     privateKey: 'bf8a2b73baf8402f8fe906ad3f42b560bf14b39f7df7797ece9e293d6f162188',
     publicKey: '034846bc781cacdafc66f3a77aa9fc3c56a9dadcd683c72be3c446fee8da041070',

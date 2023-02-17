@@ -1,7 +1,10 @@
+import { Connection } from '@celo/connect'
+import { AddressRegistry } from './address-registry'
 import { CeloContract } from './base'
-import { StableToken } from './celo-tokens'
+import { ContractCacheType } from './basic-contract-cache-type'
+import { StableToken, stableTokenInfos } from './celo-tokens'
 import { Ierc20 } from './generated/IERC20'
-import { ContractKit } from './kit'
+import { Web3ContractCache } from './web3-contract-cache'
 import { AccountsWrapper } from './wrappers/Accounts'
 import { AttestationsWrapper } from './wrappers/Attestations'
 import { BlockchainParametersWrapper } from './wrappers/BlockchainParameters'
@@ -10,9 +13,9 @@ import { DowntimeSlasherWrapper } from './wrappers/DowntimeSlasher'
 import { ElectionWrapper } from './wrappers/Election'
 import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { Erc20Wrapper } from './wrappers/Erc20Wrapper'
-// import { EpochRewardsWrapper } from './wrappers/EpochRewards'
 import { EscrowWrapper } from './wrappers/Escrow'
 import { ExchangeWrapper } from './wrappers/Exchange'
+import { FederatedAttestationsWrapper } from './wrappers/FederatedAttestations'
 import { FreezerWrapper } from './wrappers/Freezer'
 import { GasPriceMinimumWrapper } from './wrappers/GasPriceMinimum'
 import { GoldTokenWrapper } from './wrappers/GoldTokenWrapper'
@@ -22,6 +25,7 @@ import { LockedGoldWrapper } from './wrappers/LockedGold'
 import { MetaTransactionWalletWrapper } from './wrappers/MetaTransactionWallet'
 import { MetaTransactionWalletDeployerWrapper } from './wrappers/MetaTransactionWalletDeployer'
 import { MultiSigWrapper } from './wrappers/MultiSig'
+import { OdisPaymentsWrapper } from './wrappers/OdisPayments'
 import { ReserveWrapper } from './wrappers/Reserve'
 import { SortedOraclesWrapper } from './wrappers/SortedOracles'
 import { StableTokenWrapper } from './wrappers/StableTokenWrapper'
@@ -29,37 +33,54 @@ import { ValidatorsWrapper } from './wrappers/Validators'
 
 const WrapperFactories = {
   [CeloContract.Accounts]: AccountsWrapper,
-  [CeloContract.Attestations]: AttestationsWrapper,
   [CeloContract.BlockchainParameters]: BlockchainParametersWrapper,
-  [CeloContract.DoubleSigningSlasher]: DoubleSigningSlasherWrapper,
-  [CeloContract.DowntimeSlasher]: DowntimeSlasherWrapper,
-  [CeloContract.Election]: ElectionWrapper,
   [CeloContract.EpochRewards]: EpochRewardsWrapper,
   [CeloContract.ERC20]: Erc20Wrapper,
   [CeloContract.Escrow]: EscrowWrapper,
   [CeloContract.Exchange]: ExchangeWrapper,
   [CeloContract.ExchangeEUR]: ExchangeWrapper,
+  [CeloContract.ExchangeBRL]: ExchangeWrapper,
+  [CeloContract.FederatedAttestations]: FederatedAttestationsWrapper,
   // [CeloContract.FeeCurrencyWhitelist]: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]: FreezerWrapper,
   [CeloContract.GasPriceMinimum]: GasPriceMinimumWrapper,
   [CeloContract.GoldToken]: GoldTokenWrapper,
-  [CeloContract.Governance]: GovernanceWrapper,
   [CeloContract.GrandaMento]: GrandaMentoWrapper,
-  [CeloContract.LockedGold]: LockedGoldWrapper,
   // [CeloContract.Random]: RandomWrapper,
   // [CeloContract.Registry]: RegistryWrapper,
   [CeloContract.MetaTransactionWallet]: MetaTransactionWalletWrapper,
   [CeloContract.MetaTransactionWalletDeployer]: MetaTransactionWalletDeployerWrapper,
   [CeloContract.MultiSig]: MultiSigWrapper,
+  [CeloContract.OdisPayments]: OdisPaymentsWrapper,
   [CeloContract.Reserve]: ReserveWrapper,
-  [CeloContract.SortedOracles]: SortedOraclesWrapper,
   [CeloContract.StableToken]: StableTokenWrapper,
   [CeloContract.StableTokenEUR]: StableTokenWrapper,
+  [CeloContract.StableTokenBRL]: StableTokenWrapper,
+} as const
+
+const WithRegistry = {
+  [CeloContract.SortedOracles]: SortedOraclesWrapper,
+} as const
+
+const WrapperFactoriesWhichNeedCache = {
+  [CeloContract.Attestations]: AttestationsWrapper,
+  [CeloContract.DoubleSigningSlasher]: DoubleSigningSlasherWrapper,
+  [CeloContract.DowntimeSlasher]: DowntimeSlasherWrapper,
+  [CeloContract.Election]: ElectionWrapper,
+  [CeloContract.Governance]: GovernanceWrapper,
+  [CeloContract.LockedGold]: LockedGoldWrapper,
   [CeloContract.Validators]: ValidatorsWrapper,
 }
 
 type CFType = typeof WrapperFactories
-export type ValidWrappers = keyof CFType
+type RegistryType = typeof WithRegistry
+type WrapperFactoriesWhichNeedCacheType = typeof WrapperFactoriesWhichNeedCache
+export type ValidWrappers =
+  | keyof CFType
+  | keyof RegistryType
+  | keyof WrapperFactoriesWhichNeedCacheType
+
+const contractsWhichRequireCache = new Set(Object.keys(WrapperFactoriesWhichNeedCache))
 
 interface WrapperCacheMap {
   [CeloContract.Accounts]?: AccountsWrapper
@@ -73,6 +94,8 @@ interface WrapperCacheMap {
   [CeloContract.Escrow]?: EscrowWrapper
   [CeloContract.Exchange]?: ExchangeWrapper
   [CeloContract.ExchangeEUR]?: ExchangeWrapper
+  [CeloContract.ExchangeBRL]?: ExchangeWrapper
+  [CeloContract.FederatedAttestations]?: FederatedAttestationsWrapper
   // [CeloContract.FeeCurrencyWhitelist]?: FeeCurrencyWhitelistWrapper,
   [CeloContract.Freezer]?: FreezerWrapper
   [CeloContract.GasPriceMinimum]?: GasPriceMinimumWrapper
@@ -83,12 +106,14 @@ interface WrapperCacheMap {
   [CeloContract.MetaTransactionWallet]?: MetaTransactionWalletWrapper
   [CeloContract.MetaTransactionWalletDeployer]?: MetaTransactionWalletDeployerWrapper
   [CeloContract.MultiSig]?: MultiSigWrapper
+  [CeloContract.OdisPayments]?: OdisPaymentsWrapper
   // [CeloContract.Random]?: RandomWrapper,
   // [CeloContract.Registry]?: RegistryWrapper,
   [CeloContract.Reserve]?: ReserveWrapper
   [CeloContract.SortedOracles]?: SortedOraclesWrapper
   [CeloContract.StableToken]?: StableTokenWrapper
   [CeloContract.StableTokenEUR]?: StableTokenWrapper
+  [CeloContract.StableTokenBRL]?: StableTokenWrapper
   [CeloContract.Validators]?: ValidatorsWrapper
 }
 
@@ -96,11 +121,20 @@ interface WrapperCacheMap {
  * Kit ContractWrappers factory & cache.
  *
  * Provides access to all contract wrappers for celo core contracts
+ *
+ * @remarks
+ *
+ * Because it provides access to all contract wrappers it must load all wrappers and the contract ABIs for them
+ * Consider Using {@link MiniWrapperCache}, building your own, or if you only need one Wrapper using it directly
  */
-export class WrapperCache {
-  private wrapperCache: WrapperCacheMap = {}
 
-  constructor(readonly kit: ContractKit) {}
+export class WrapperCache implements ContractCacheType {
+  private wrapperCache: WrapperCacheMap = {}
+  constructor(
+    readonly connection: Connection,
+    readonly _web3Contracts: Web3ContractCache,
+    readonly registry: AddressRegistry
+  ) {}
 
   getAccounts() {
     return this.getContract(CeloContract.Accounts)
@@ -112,7 +146,7 @@ export class WrapperCache {
     return this.getContract(CeloContract.BlockchainParameters)
   }
   getDoubleSigningSlasher() {
-    return this.getContract(CeloContract.DoubleSigningSlasher)
+    return this.getContract<CeloContract.DoubleSigningSlasher>(CeloContract.DoubleSigningSlasher)
   }
   getDowntimeSlasher() {
     return this.getContract(CeloContract.DowntimeSlasher)
@@ -126,18 +160,18 @@ export class WrapperCache {
   getErc20(address: string) {
     return this.getContract(CeloContract.ERC20, address)
   }
-  getEscrow() {
+  getEscrow(): Promise<EscrowWrapper> {
     return this.getContract(CeloContract.Escrow)
   }
   getExchange(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getExchangeContract(stableToken))
+    return this.getContract(stableTokenInfos[stableToken].exchangeContract)
   }
   getFreezer() {
     return this.getContract(CeloContract.Freezer)
   }
-  // getFeeCurrencyWhitelist() {
-  //   return this.getWrapper(CeloContract.FeeCurrencyWhitelist, newFeeCurrencyWhitelist)
-  // }
+  getFederatedAttestations() {
+    return this.getContract(CeloContract.FederatedAttestations)
+  }
   getGasPriceMinimum() {
     return this.getContract(CeloContract.GasPriceMinimum)
   }
@@ -162,9 +196,9 @@ export class WrapperCache {
   getMultiSig(address: string) {
     return this.getContract(CeloContract.MultiSig, address)
   }
-  // getRegistry() {
-  //   return this.getWrapper(CeloContract.Registry, newRegistry)
-  // }
+  getOdisPayments() {
+    return this.getContract(CeloContract.OdisPayments)
+  }
   getReserve() {
     return this.getContract(CeloContract.Reserve)
   }
@@ -172,7 +206,7 @@ export class WrapperCache {
     return this.getContract(CeloContract.SortedOracles)
   }
   getStableToken(stableToken: StableToken = StableToken.cUSD) {
-    return this.getContract(this.kit.celoTokens.getContract(stableToken))
+    return this.getContract(stableTokenInfos[stableToken].contract)
   }
   getValidators() {
     return this.getContract(CeloContract.Validators)
@@ -183,15 +217,30 @@ export class WrapperCache {
    */
   public async getContract<C extends ValidWrappers>(contract: C, address?: string) {
     if (this.wrapperCache[contract] == null || address !== undefined) {
-      const instance = await this.kit._web3Contracts.getContract(contract, address)
-      const Klass: CFType[C] = WrapperFactories[contract]
-      this.wrapperCache[contract] = new Klass(this.kit, instance as any) as any
+      const instance = await this._web3Contracts.getContract<C>(contract, address)
+      if (contract === CeloContract.SortedOracles) {
+        const Klass = WithRegistry[CeloContract.SortedOracles]
+        this.wrapperCache[CeloContract.SortedOracles] = new Klass(
+          this.connection,
+          instance as any,
+          this.registry
+        )
+      } else if (contractsWhichRequireCache.has(contract)) {
+        const contractName = contract as keyof WrapperFactoriesWhichNeedCacheType
+        const Klass = WrapperFactoriesWhichNeedCache[contractName]
+        const wrapper = new Klass(this.connection, instance as any, this)
+        this.wrapperCache[contractName] = wrapper as any
+      } else {
+        const simpleContractName = contract as keyof typeof WrapperFactories
+        const Klass = WrapperFactories[simpleContractName]
+        this.wrapperCache[simpleContractName] = new Klass(this.connection, instance as any) as any
+      }
     }
     return this.wrapperCache[contract]!
   }
 
   public invalidateContract<C extends ValidWrappers>(contract: C) {
-    this.kit._web3Contracts.invalidateContract(contract)
-    ;(this.wrapperCache[contract] as any) = null
+    this._web3Contracts.invalidateContract(contract)
+    this.wrapperCache[contract] = undefined
   }
 }

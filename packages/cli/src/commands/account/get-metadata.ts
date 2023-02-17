@@ -30,7 +30,10 @@ export default class GetMetadata extends BaseCommand {
     }
 
     try {
-      const metadata = await IdentityMetadataWrapper.fetchFromURL(this.kit, metadataURL)
+      const metadata = await IdentityMetadataWrapper.fetchFromURL(
+        await this.kit.contracts.getAccounts(),
+        metadataURL
+      )
       console.info('Metadata contains the following claims: \n')
       await displayMetadata(metadata, this.kit, flags)
     } catch (error: any) {

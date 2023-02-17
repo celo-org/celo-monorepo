@@ -1012,7 +1012,7 @@ export async function startGeth(
     datadir,
     '--syncmode',
     syncmode,
-    '--debug',
+    '--log.debug',
     '--metrics',
     '--port',
     port.toString(),
@@ -1025,6 +1025,7 @@ export async function startGeth(
     'extip:127.0.0.1',
     '--allow-insecure-unlock', // geth1.9 to use http w/unlocking
     '--gcmode=archive', // Needed to retrieve historical state
+    '--rpc.gasinflationrate=1', // InflationRate=1 (no inflation)
   ]
 
   if (minerValidator) {

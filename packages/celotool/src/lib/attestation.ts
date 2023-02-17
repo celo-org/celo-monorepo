@@ -1,6 +1,5 @@
 import { AttestationsWrapper } from '@celo/contractkit/lib/wrappers/Attestations'
-import { RequestAttestationError } from '@celo/env-tests/lib/shared/attestation'
-import { PhoneNumberUtils } from '@celo/utils'
+import { PhoneNumberUtils } from '@celo/phone-utils'
 import { sample } from 'lodash'
 import { Twilio } from 'twilio'
 
@@ -69,6 +68,21 @@ export async function createPhoneNumber(
     return usableNumber
   }
 }
+
+type RequestAttestationError =
+  | undefined
+  | {
+      status: number
+      text: string
+      issuer: string
+      name: string | undefined
+      known: true
+    }
+  | {
+      error: any
+      issuer: string
+      known: false
+    }
 
 export function printAndIgnoreRequestErrors(possibleErrors: RequestAttestationError[]) {
   for (const possibleError of possibleErrors) {
