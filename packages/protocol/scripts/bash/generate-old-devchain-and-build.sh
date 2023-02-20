@@ -38,8 +38,8 @@ cd ../..
 # TODO: use `yarn clean` after release v8 (not available at monorepo-root for <=v8)
 yarn run lerna run clean >> $LOG_FILE
 echo "check what's in the build dir"
-ls packages/protocol/build
-ls -la ls packages/protocol
+ls -la packages/protocol/build
+ls -la packages/protocol
 
 # build entire monorepo to account for any required dependencies.
 yarn install >> $LOG_FILE
@@ -75,7 +75,7 @@ cd packages/protocol
 # TODO: Move to yarn build:sol after the next contract release.
 
 echo "checking the build dirs"
-ls build
+ls -la build
 ls $BUILD_DIR
 
 echo "- Create local network"
