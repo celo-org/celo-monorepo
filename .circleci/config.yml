@@ -901,10 +901,12 @@ workflows:
             - install_dependencies
       - pre-protocol-test-release:
           requires:
-            - lint-checks
+            # - lint-checks
+            - install_dependencies
       - protocol-test-release:
           requires:
-            - lint-checks
+            # - lint-checks
+            - install_dependencies
             - pre-protocol-test-release
       - general-test:
           requires:
