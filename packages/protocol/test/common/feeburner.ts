@@ -109,8 +109,9 @@ contract('FeeBurner', (accounts: string[]) => {
 
     uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
 
-    // @ts-ignore
+    // tslint:disable-next-line
     console.log('hash', await uniswapFactory.INIT_CODE_PAIR_HASH())
+
     uniswap = await UniswapRouter.new(
       uniswapFactory.address,
       '0x0000000000000000000000000000000000000000'
