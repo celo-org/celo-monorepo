@@ -24,7 +24,7 @@ import "../stability/interfaces/IStableToken.sol";
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract UsingRegistryV2 is Ownable {
+contract UsingRegistryV2 {
   event RegistrySet(address indexed registryAddress);
 
   address internal registryAddress = 0x000000000000000000000000000000000000ce10;
@@ -70,19 +70,19 @@ contract UsingRegistryV2 is Ownable {
   );
   bytes32 internal constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
 
-  constructor() public Ownable() {
-    registryContract = IRegistry(registryAddress);
-  }
+  // constructor() public Ownable() {
+  //   registryContract = IRegistry(registryAddress);
+  // }
 
-  /**
-   * @notice Updates the address pointing to a Registry contract.
-   * @param _registryAddress The address of a registry contract for routing to other contracts.
-   */
-  function setRegistry(address _registryAddress) public onlyOwner {
-    require(_registryAddress != address(0), "Cannot register the null address");
-    registryContract = IRegistry(_registryAddress);
-    emit RegistrySet(_registryAddress);
-  }
+  // /**
+  //  * @notice Updates the address pointing to a Registry contract.
+  //  * @param _registryAddress The address of a registry contract for routing to other contracts.
+  //  */
+  // function setRegistry(address _registryAddress) private {
+  //   require(_registryAddress != address(0), "Cannot register the null address");
+  //   registryContract = IRegistry(_registryAddress);
+  //   emit RegistrySet(_registryAddress);
+  // }
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(

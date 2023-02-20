@@ -91,6 +91,13 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     }
   }
 
+  // TODO figureout
+  function setRegistry(address registryAddress) public onlyOwner {
+    require(registryAddress != address(0), "Cannot register the null address");
+    registry = IRegistry(registryAddress);
+    emit RegistrySet(registryAddress);
+  }
+
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
    * @return Storage version of the contract.
