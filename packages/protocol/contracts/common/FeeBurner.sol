@@ -15,10 +15,10 @@ import "../common/Initializable.sol";
 import "../stability/StableToken.sol"; // TODO check if this can be interface
 import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
+import "../common/Freezable.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
-// TODO change for min
 import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 import "../uniswap/interfaces/IUniswapV2PairMin.sol";
 
@@ -92,6 +92,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
         _setRouter(tokens[i], newRouters[i]);
       }
     }
+  }
+
+  modifier onlyWhenNotFrozen() {
+    require(!getFreezer().isFrozen(address(this)), "can't call when contract is frozen");
+    _;
   }
 
   /**
@@ -229,7 +234,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     * @dev Should be used in case the loop fails because one token is reverting or OOG.
     * @param tokenAddress the address of the token to burn.
     */
-  function burnSingleMentoToken(address tokenAddress) public {
+  function burnSingleMentoToken(address tokenAddress) public onlyWhenNotFrozen {
     StableToken stableToken = StableToken(tokenAddress);
     uint256 balanceToBurn = stableToken.balanceOf(address(this));
 
@@ -274,7 +279,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     * @dev Should be used in case the loop fails because one token is reverting or OOG.
     * @param tokenAddress the address of the token to burn.
     */
-  function burnSingleNonMentoToken(address tokenAddress) public {
+  function burnSingleNonMentoToken(address tokenAddress) public onlyWhenNotFrozen {
     // An improvement to this function would be to allow the user to pass a path as argument
     // and if it generates a better outcome that the ones enabled that gets used
     // and the user gets a reward
