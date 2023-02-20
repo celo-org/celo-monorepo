@@ -37,8 +37,10 @@ echo "- Build contract artifacts"
 # rm -rf build/contracts ../sdk/cryptographic-utils/lib ../sdk/base/lib ../sdk/utils/lib ../sdk/phone-utils/lib ../sdk/contractkit
 cd ../..
 # yarn clean >> $LOG_FILE
+echo "release tag before: $RELEASE_TAG"
 yarn install
-yarn build
+RELEASE_TAG="" yarn build
+echo "release tag after: $RELEASE_TAG"
 # # TODO EN: haven't yet tried this here cleaning migrations before building new solidity
 # rm -f migrations/*.js* >> $LOG_FILE
 # yarn install >> $LOG_FILE
