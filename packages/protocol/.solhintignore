@@ -1,3 +1,2 @@
 node_modules/
-contracts/uniswap
-contracts/uniswap/test/
+./contracts/uniswap
