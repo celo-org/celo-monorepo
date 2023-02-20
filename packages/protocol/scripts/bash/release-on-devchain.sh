@@ -57,6 +57,11 @@ echo "- Check versions of current branch"
 echo " - Checkout migrationsConfig.js at $BRANCH"
 git checkout $BRANCH -- migrationsConfig.js
 
+echo "what's in $BUILD_DIR/contracts"
+ls $BUILD_DIR/contracts
+echo "what's in build/contracts"
+ls build/contracts
+
 OLD_BRANCH=$BUILD_DIR
 source scripts/bash/contract-exclusion-regex.sh
 yarn ts-node scripts/check-backward.ts sem_check --old_contracts $BUILD_DIR/contracts --new_contracts build/contracts --exclude $CONTRACT_EXCLUSION_REGEX --output_file report.json
