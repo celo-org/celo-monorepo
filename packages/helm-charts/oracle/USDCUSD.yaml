@@ -23,7 +23,7 @@ oracle:
         {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
       ],
       [
-        {exchange: 'WhiteBIT', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
         {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
       ]
     ]"

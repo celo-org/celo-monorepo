@@ -1,6 +1,5 @@
 import * as AddressUtils from './address'
 
-export { AttestationUtils } from './attestations'
 export * from './contacts'
 export * from './currencies'
 export * from './dappkit'

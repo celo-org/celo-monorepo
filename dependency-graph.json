@@ -1,17 +1,4 @@
 {
-  "@celo/attestation-proxy": {
-    "location": "packages/attestation-proxy",
-    "dependencies": []
-  },
-  "@celo/attestation-service": {
-    "location": "packages/attestation-service",
-    "dependencies": [
-      "@celo/contractkit",
-      "@celo/identity",
-      "@celo/keystores",
-      "@celo/phone-utils"
-    ]
-  },
   "celo-azure-build": {
     "location": "packages/azure",
     "dependencies": []
@@ -289,6 +276,16 @@
   },
   "@celo/wallet-hsm-azure": {
     "location": "packages/sdk/wallets/wallet-hsm-azure",
+    "dependencies": [
+      "@celo/connect",
+      "@celo/utils",
+      "@celo/wallet-base",
+      "@celo/wallet-hsm",
+      "@celo/wallet-remote"
+    ]
+  },
+  "@celo/wallet-hsm-gcp": {
+    "location": "packages/sdk/wallets/wallet-hsm-gcp",
     "dependencies": [
       "@celo/connect",
       "@celo/utils",
