@@ -42,8 +42,11 @@ const librariesFile = argv.librariesFile ?? 'libraries.json'
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
+    console.log('entering module.exports default')
     const registry = await Registry.at(celoRegistryAddress)
+    console.log(`registry: ${registry}`)
     const buildArtifacts = getBuildArtifacts(artifactsDirectory)
+    console.log(`buildArtifacts: ${buildArtifacts}`)
     const libraryAddresses = await verifyBytecodes(
       Object.keys(CeloContractName),
       buildArtifacts,

@@ -224,14 +224,17 @@ export const verifyBytecodes = async (
   initializationData: InitializationData = {},
   network = 'development'
 ) => {
+  console.log("inside verifyBytecodes")
   assertValidProposalTransactions(proposal)
   assertValidInitializationData(artifacts, proposal, _web3, initializationData)
 
   const compiledContracts = artifacts.listArtifacts().map((a) => a.contractName)
+  console.log(`compiledContracts: ${compiledContracts}`)
 
   const queue = contracts.filter(
     (contract) => !ignoredContracts.includes(contract) && compiledContracts.includes(contract)
   )
+  console.log(`queue: ${queue}`)
   const visited: Set<string> = new Set(queue)
 
   // truffle web3 version does not have getProof
