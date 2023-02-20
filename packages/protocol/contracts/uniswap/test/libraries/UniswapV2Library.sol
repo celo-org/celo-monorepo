@@ -32,8 +32,11 @@ library UniswapV2Library {
             hex"ff",
             factory,
             keccak256(abi.encodePacked(token0, token1)),
+            // This variable was hardcoded for Uniswap Eth Mainnet deployment
             // hex"96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f" // init code hash
-            hex"f0bd447d72bc4c5cd510462381a98e87f097a4d31106d6dd8b5922227696ef7a" // This variable was hardcoded for Uniswap Mainnet deployment
+            // Hash in the CI "bc307131606b79f0c50770dea78b35921ffca853421cbb031aa5a1ce5d6ea269"
+            // hex"f0bd447d72bc4c5cd510462381a98e87f097a4d31106d6dd8b5922227696ef7a"
+            hex"bc307131606b79f0c50770dea78b35921ffca853421cbb031aa5a1ce5d6ea269"
           )
         )
       )
