@@ -19,7 +19,7 @@ import "../stability/interfaces/ISortedOracles.sol";
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
 // TODO change for min
-import "../uniswap/interfaces/IUniswapV2Factory.sol";
+import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 import "../uniswap/interfaces/IUniswapV2PairMin.sol";
 
 // TODO add Freezable only when not frozen
@@ -254,7 +254,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       minAmount = calculateMinAmount(priceWithoutSlippage, tokenAddress, balanceToBurn);
     }
 
-    // small numbers cause rounding errors and zero case should be skiped
+    // small numbers cause rounding errors and zero case should be skipped
     if (balanceToBurn <= MIN_BURN) {
       return;
     }
@@ -296,7 +296,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       emit DailyLimitHit(tokenAddress, balanceToBurn);
     }
 
-    // small numbers cause rounding errors and zero case should be skiped
+    // small numbers cause rounding errors and zero case should be skipped
     if (balanceToBurn <= MIN_BURN) {
       return;
     }
@@ -329,7 +329,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
         // checking slippage before trading
         IUniswapV2PairMin pair = IUniswapV2PairMin(
-          IUniswapV2Factory(bestRouter.factory()).getPair(tokenAddress, celoAddress)
+          IUniswapV2FactoryMin(bestRouter.factory()).getPair(tokenAddress, celoAddress)
         );
         (uint256 tokenAmount, uint256 celoAmount, ) = pair.getReserves();
         minAmount = calculateMinAmount(tokenAmount / celoAmount, tokenAddress, balanceToBurn);
