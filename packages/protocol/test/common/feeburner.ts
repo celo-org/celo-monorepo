@@ -108,7 +108,7 @@ contract('FeeBurner', (accounts: string[]) => {
     await feeCurrencyWhitelist.initialize()
 
     uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
-    // console.log('hash', await uniswapFactory.INIT_CODE_PAIR_HASH())
+    console.log('hash', await uniswapFactory.INIT_CODE_PAIR_HASH())
     uniswap = await UniswapRouter.new(
       uniswapFactory.address,
       '0x0000000000000000000000000000000000000000'
@@ -242,12 +242,17 @@ contract('FeeBurner', (accounts: string[]) => {
     })
   })
 
-  describe('#burnMentoAssets()', () => {
+  describe('#burnMentoTokens()', () => {
     beforeEach(async () => {
       const goldTokenAmount = new BigNumber(1e18)
 
       await goldToken.approve(exchange.address, goldTokenAmount, { from: user })
       await exchange.sell(goldTokenAmount, 0, true, { from: user })
+    })
+
+    it("Can't burn when forzen", async () => {
+      await freezer.freeze(feeBurner.address)
+      await assertRevert(feeBurner.burnMentoTokens())
     })
 
     it('burns with balance', async () => {
@@ -336,7 +341,8 @@ contract('FeeBurner', (accounts: string[]) => {
       // await assertRevert(feeCurrencyWhitelist.addToken(aTokenAddress, { from: nonOwner }))
     })
   })
-  describe('#burnNonMentoAssets()', () => {
+  describe('#burnNonMentoAssets() (if this fails with "revert" please read comments of this tests)', () => {
+    ///
     beforeEach(async () => {
       await feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
       await feeBurner.setRouter(tokenA.address, uniswap.address)
@@ -359,6 +365,11 @@ contract('FeeBurner', (accounts: string[]) => {
         deadline,
         { from: user }
       )
+    })
+
+    it("Can't burn when forzen", async () => {
+      await freezer.freeze(feeBurner.address)
+      await assertRevert(feeBurner.burnNonMentoTokens())
     })
 
     it('Uniswap trade test', async () => {

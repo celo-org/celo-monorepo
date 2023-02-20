@@ -15,7 +15,7 @@ import "../common/Initializable.sol";
 import "../stability/StableToken.sol"; // TODO check if this can be interface
 import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
-import "../common/Freezable.sol";
+import "../common/Freezable2.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
@@ -23,7 +23,7 @@ import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 import "../uniswap/interfaces/IUniswapV2PairMin.sol";
 
 // TODO add Freezable only when not frozen
-contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract {
+contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract, Freezable2 {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -94,10 +94,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     }
   }
 
-  modifier onlyWhenNotFrozen() {
-    require(!getFreezer().isFrozen(address(this)), "can't call when contract is frozen");
-    _;
-  }
+  // modifier onlyWhenNotFrozen() {
+  //   require(!getFreezer().isFrozen(address(this)), "can't call when contract is frozen");
+  //   _;
+  // }
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -362,7 +362,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     * @notice Burns the max possible of all the Mento tokens in this contract.
     * @dev If one token burn fails, burnSingleMentoToken should be used instead
     */
-  function burnMentoAssets() public {
+  function burnMentoTokens() public {
     // here it could also be checked that the tokens is whitelisted, but we assume everything
     // that has already been sent here is due for burning
     address[] memory mentoTokens = getReserve().getTokens();
@@ -409,7 +409,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     * @notice Burns all the possible tokens this contract holds.
     */
   function burn() external {
-    burnMentoAssets();
+    burnMentoTokens();
     burnNonMentoTokens();
     burnAllCelo();
   }
