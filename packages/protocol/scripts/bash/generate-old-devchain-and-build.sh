@@ -38,14 +38,16 @@ cd ../..
 # TODO: use `yarn clean` after release v8 (not available at monorepo-root for <=v8)
 yarn run lerna run clean >> $LOG_FILE
 echo "check what's in the build dir"
-ls -la packages/protocol/build
-ls -la packages/protocol
+ls -la packages/protocol/build || ls
+ls -la packages/protocol || ls
 
 # build entire monorepo to account for any required dependencies.
 yarn install >> $LOG_FILE
 # in release v8 and earlier, @celo/contractkit automatically uses set RELEASE_TAG
 # when building, which fails if this differs from `package/protocol`'s build directory.
-RELEASE_TAG="" yarn build >> $LOG_FILE
+# RELEASE_TAG="" yarn build >> $LOG_FILE
+yarn build >> $LOG_FILE
+
 cd packages/protocol
 
 # # TODO EN: haven't yet tried this here cleaning migrations before building new solidity
@@ -76,7 +78,8 @@ cd packages/protocol
 
 echo "checking the build dirs"
 ls -la build
-ls $BUILD_DIR
+ls -la
+ls -la $BUILD_DIR
 
 echo "- Create local network"
 if [ -z "$GRANTS_FILE" ]; then
