@@ -33,6 +33,10 @@ echo "- Checkout source code at $BRANCH"
 git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
+echo "check what's in the build dir 0"
+ls -la build
+ls -la
+
 echo "- Build contract artifacts"
 rm -rf build/contracts
 rm -rf ../sdk/cryptographic-utils/lib
@@ -41,6 +45,10 @@ yarn build
 cd ../../protocol
 yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
+
+echo "check what's in the build dir 0"
+ls -la build
+ls -la
 
 # TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"

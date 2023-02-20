@@ -240,10 +240,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app
-      - run:
-          name: Check if the test should run
-          command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
+      # - run:
+      #     name: Check if the test should run
+      #     command: |
+      #       ./scripts/ci_check_if_test_should_run_v2.sh @celo/protocol
       - run:
           name: Opcode tests
           command: yarn --cwd packages/protocol check-opcodes
@@ -899,6 +899,15 @@ workflows:
       - lint-checks:
           requires:
             - install_dependencies
+      - pre-protocol-test-release:
+          requires:
+            # - lint-checks
+            - install_dependencies
+      - protocol-test-release:
+          requires:
+            # - lint-checks
+            - install_dependencies
+            - pre-protocol-test-release
       - general-test:
           requires:
             - install_dependencies
@@ -917,13 +926,6 @@ workflows:
       - transactions-uri-tests:
           requires:
             - contractkit-test
-      - pre-protocol-test-release:
-          requires:
-            - lint-checks
-      - protocol-test-release:
-          requires:
-            - lint-checks
-            - pre-protocol-test-release
       - protocol-test-release-snapshots:
           requires:
             - lint-checks
