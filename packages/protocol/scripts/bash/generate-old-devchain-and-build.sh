@@ -34,15 +34,17 @@ git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build contract artifacts"
-rm -rf build/contracts
-# cd ../..
-yarn clean >> $LOG_FILE
-# TODO EN: haven't yet tried this here cleaning migrations before building new solidity
-rm -f migrations/*.js* >> $LOG_FILE
-yarn install >> $LOG_FILE
-yarn build:sol >> $LOG_FILE
+# rm -rf build/contracts ../sdk/cryptographic-utils/lib ../sdk/base/lib ../sdk/utils/lib ../sdk/phone-utils/lib ../sdk/contractkit
+cd ../..
+# yarn clean >> $LOG_FILE
+yarn install
+yarn build
+# # TODO EN: haven't yet tried this here cleaning migrations before building new solidity
+# rm -f migrations/*.js* >> $LOG_FILE
+# yarn install >> $LOG_FILE
+# yarn build:sol >> $LOG_FILE
 # yarn build:truffle-types >> $LOG_FILE
-yarn ts-node ./scripts/build.ts --truffleTypes ./types/typechain >> $LOG_FILE
+# yarn ts-node ./scripts/build.ts --truffleTypes ./types/typechain >> $LOG_FILE
 
 # # rm -rf ../sdk/cryptographic-utils/lib
 # rm -rf ../sdk/cryptographic-utils/lib ../sdk/base/lib ../sdk/utils/lib ../sdk/phone-utils/lib
@@ -59,7 +61,7 @@ yarn ts-node ./scripts/build.ts --truffleTypes ./types/typechain >> $LOG_FILE
 # yarn build:sol
 # cd ../../protocol
 
-# cd packages/protocol
+cd packages/protocol
 # TODO EN: check if moving to build:sol is preferable
 # TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"
