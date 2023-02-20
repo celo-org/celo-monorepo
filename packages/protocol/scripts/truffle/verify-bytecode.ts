@@ -42,10 +42,13 @@ const librariesFile = argv.librariesFile ?? 'libraries.json'
 
 module.exports = async (callback: (error?: any) => number) => {
   try {
+    // tslint:disable-next-line: no-console
     console.log('entering module.exports default')
     const registry = await Registry.at(celoRegistryAddress)
+    // tslint:disable-next-line: no-console
     console.log(`registry: ${registry}`)
     const buildArtifacts = getBuildArtifacts(artifactsDirectory)
+    // tslint:disable-next-line: no-console
     console.log(`buildArtifacts: ${buildArtifacts}`)
     const libraryAddresses = await verifyBytecodes(
       Object.keys(CeloContractName),

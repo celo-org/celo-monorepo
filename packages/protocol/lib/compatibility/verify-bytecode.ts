@@ -5,7 +5,7 @@ import {
   LibraryPositions,
   linkLibraries,
   stripMetadata,
-  verifyAndStripLibraryPrefix,
+  verifyAndStripLibraryPrefix
 } from '@celo/protocol/lib/bytecode'
 import { verifyProxyStorageProof } from '@celo/protocol/lib/proxy-utils'
 import { ProposalTx } from '@celo/protocol/scripts/truffle/make-release'
@@ -229,11 +229,13 @@ export const verifyBytecodes = async (
   assertValidInitializationData(artifacts, proposal, _web3, initializationData)
 
   const compiledContracts = artifacts.listArtifacts().map((a) => a.contractName)
+// tslint:disable-next-line: no-console
   console.log(`compiledContracts: ${compiledContracts}`)
 
   const queue = contracts.filter(
     (contract) => !ignoredContracts.includes(contract) && compiledContracts.includes(contract)
   )
+  // tslint:disable-next-line: no-console
   console.log(`queue: ${queue}`)
   const visited: Set<string> = new Set(queue)
 
