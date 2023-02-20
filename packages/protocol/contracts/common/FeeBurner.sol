@@ -107,36 +107,36 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   /**
     * @notice Allows owner to set max slippage for a token.
-    * @param tokenAddress Address of the token to set.
+    * @param token Address of the token to set.
     * @param newMax New sllipage to set, as Fixidity fraction.
     */
-  function setMaxSplipagge(address tokenAddress, uint256 newMax) external onlyOwner {
-    _setMaxSplipagge(tokenAddress, newMax);
+  function setMaxSplipagge(address token, uint256 newMax) external onlyOwner {
+    _setMaxSplipagge(token, newMax);
   }
 
-  function _setMaxSplipagge(address tokenAddress, uint256 newMax) private {
-    maxSlippage[tokenAddress] = FixidityLib.wrap(newMax);
-    emit MAxSlippageSet(tokenAddress, newMax);
+  function _setMaxSplipagge(address token, uint256 newMax) private {
+    maxSlippage[token] = FixidityLib.wrap(newMax);
+    emit MAxSlippageSet(token, newMax);
   }
 
   /**
     * @notice Allows owner to set the daily burn limit for a token.
-    * @param tokenAddress Address of the token to set
+    * @param token Address of the token to set.
     * @param newLimit The new limit to set, in the token units.
     */
-  function setDailyBurnLimit(address tokenAddress, uint256 newLimit) external onlyOwner {
-    _setDailyBurnLimit(tokenAddress, newLimit);
+  function setDailyBurnLimit(address token, uint256 newLimit) external onlyOwner {
+    _setDailyBurnLimit(token, newLimit);
   }
 
-  function _setDailyBurnLimit(address tokenAddress, uint256 newLimit) private {
-    dailyBurnLimit[tokenAddress] = newLimit;
-    emit DailyLimitSet(tokenAddress, newLimit);
+  function _setDailyBurnLimit(address token, uint256 newLimit) private {
+    dailyBurnLimit[token] = newLimit;
+    emit DailyLimitSet(token, newLimit);
   }
 
   /**
     * @notice Allows owner to set the router for a token.
-    * @param tokenAddress Address of the token to set
-    * @param newLimit The new router.
+    * @param token Address of the token to set.
+    * @param router The new router.
     */
   function setRouter(address token, address router) external onlyOwner {
     _setRouter(token, router);
@@ -145,6 +145,22 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   function _setRouter(address token, address router) private {
     routerAddresses[token].push(router);
     emit RouterAddressSet(token, router);
+  }
+
+  /**
+    * @notice Allows owner to remove a router for a token.
+    * @param token Address of the token.
+    * @param router address of the router to remove.
+    * @param index the index of the router to remove.
+    */
+  function removeRouter(address token, address router, uint256 index) external onlyOwner {
+    // TODO test me
+    require(routerAddresses[token][index] == router, "Index does not match");
+
+    uint256 lenght = routerAddresses[token].length;
+    routerAddresses[token][lenght - 1] = routerAddresses[token][index];
+    routerAddresses[token].pop();
+    emit RouterAddressRemoved(token, router);
   }
 
   /**
@@ -157,19 +173,28 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   }
 
   /**
-    * @notice Burns all the Celo balance of this contract.
-    */
+  * @notice Burns all the Celo balance of this contract.
+  */
   function burnAllCelo() public {
     ICeloToken celo = ICeloToken(getCeloTokenAddress());
     celo.burn(celo.balanceOf(address(this)));
   }
 
-  function getPastBurnForToken(address tokenAddress) external view returns (uint256) {
-    return pastBurn[tokenAddress];
+  /**
+    * @param token the address of the token to query.
+    * @return The amount burned for a token.
+    */
+  function getPastBurnForToken(address token) external view returns (uint256) {
+    return pastBurn[token];
   }
 
-  function limitHit(address tokenAddress, uint256 amountToBurn) public returns (bool) {
-    if (dailyBurnLimit[tokenAddress] == 0) {
+  /**
+    * @param token the address of the token to query.
+    * @param amountToBurn the amount of the token to burn.
+    * @return Returns true if burning amountToBurn would exceed the dayli mimit.
+    */
+  function limitHit(address token, uint256 amountToBurn) public returns (bool) {
+    if (dailyBurnLimit[token] == 0) {
       // if no limit set, assume uncapped
       return false;
     }
@@ -178,23 +203,32 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     // Pattern borrowed from Reserve.sol
     if (currentDay > lastLimitDay) {
       lastLimitDay = currentDay;
-      currentDayLimit[tokenAddress] = dailyBurnLimit[tokenAddress];
+      currentDayLimit[token] = dailyBurnLimit[token];
     }
 
-    return amountToBurn >= currentDayLimit[tokenAddress];
+    return amountToBurn >= currentDayLimit[token];
   }
 
-  function updateLimits(address tokenAddress, uint256 amountBurned) private returns (bool) {
-    if (dailyBurnLimit[tokenAddress] == 0) {
+  /**
+    * @notice Updates the current day limit for a token.
+    * @param token the address of the token to query.
+    * @param amountBurned the amount of the token that was burned.
+    */
+  function updateLimits(address token, uint256 amountBurned) private {
+    if (dailyBurnLimit[token] == 0) {
       // if no limit set, assume uncapped
-      return false;
+      return;
     }
-    currentDayLimit[tokenAddress] = currentDayLimit[tokenAddress].sub(amountBurned);
+    currentDayLimit[token] = currentDayLimit[token].sub(amountBurned);
     emit DailyLimitUpdatedDeleteMe(amountBurned);
-    return true;
+    return;
   }
 
-  // should be used in case the loop fails because one token is reverting or OOG
+  /**
+    * @notice Burns the max possible of a Mento token.
+    * @dev Should be used in case the loop fails because one token is reverting or OOG.
+    * @param tokenAddress the address of the token to burn.
+    */
   function burnSingleMentoToken(address tokenAddress) public {
     StableToken stableToken = StableToken(tokenAddress);
     uint256 balanceToBurn = stableToken.balanceOf(address(this));
@@ -235,8 +269,13 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
   }
 
+  /**
+    * @notice Burns the max possible of a token.
+    * @dev Should be used in case the loop fails because one token is reverting or OOG.
+    * @param tokenAddress the address of the token to burn.
+    */
   function burnSingleNonMentoToken(address tokenAddress) public {
-    // an improvement to this function would be to allow the user to pass a path as argument
+    // An improvement to this function would be to allow the user to pass a path as argument
     // and if it generates a better outcome that the ones enabled that gets used
     // and the user gets a reward
 
@@ -314,7 +353,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     }
   }
 
-  // this function is permionless
+  /**
+    * @notice Burns the max possible of all the Mento tokens in this contract.
+    * @dev If one token burn fails, burnSingleMentoToken should be used instead
+    */
   function burnMentoAssets() public {
     // here it could also be checked that the tokens is whitelisted, but we assume everything
     // that has already been sent here is due for burning
@@ -327,6 +369,12 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   }
 
+  /**
+    * @param midPrice The mid price of a token.
+    * @param tokenAddress the address of the token to query.
+    * @param amount the amount to swap
+    * @return The minimal amount of tokens expected for a swap
+    */
   function calculateMinAmount(uint256 midPrice, address tokenAddress, uint256 amount)
     public
     view
@@ -338,6 +386,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       amount;
   }
 
+  /**
+    * @notice Burns the max possible of all the whitelisted non-Mento tokens in this contract.
+    * @dev If one token burn fails, burnSingleNonMentoToken should be used instead
+    */
   function burnNonMentoTokens() public {
     address[] memory tokens = getFeeCurrencyWhitelistRegistry().getWhitelistNonMento();
 
@@ -348,26 +400,24 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   }
 
-  // this function is permionless
+  /**
+    * @notice Burns all the possible tokens this contract holds.
+    */
   function burn() external {
     burnMentoAssets();
     burnNonMentoTokens();
     burnAllCelo();
   }
 
-  function transfer(address token, address recipient, uint256 value) external onlyOwner {
-    // meant for governance to trigger use cases not contemplated in this contract
-    IERC20(token).transfer(recipient, value);
+  /**
+    * @notice Allows owner to transfer tokens of this contract. It's meant for governance to 
+      trigger use cases not contemplated in this contract
+    */
+  function transfer(address token, address recipient, uint256 value)
+    external
+    onlyOwner
+    returns (bool)
+  {
+    return IERC20(token).transfer(recipient, value);
   }
-
-  function removeExchange(address token, address routerAddress, uint256 index) external onlyOwner {
-    // TODO test me
-    require(routerAddresses[token][index] == routerAddress, "Index does not match");
-
-    uint256 lenght = routerAddresses[token].length;
-    routerAddresses[token][lenght - 1] = routerAddresses[token][index];
-    routerAddresses[token].pop();
-    emit RouterAddressRemoved(token, routerAddress);
-  }
-
 }
