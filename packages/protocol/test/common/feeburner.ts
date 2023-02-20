@@ -201,7 +201,7 @@ contract('FeeBurner', (accounts: string[]) => {
       assertEqualBN(await feeBurner.dailyBurnLimit(stableToken.address), new BigNumber(1000000e18))
       assertEqualBN(await feeBurner.dailyBurnLimit(tokenA.address), new BigNumber(1000001e18))
       // assert((await feeBurner.getRouterForToken(stableToken.address)) == [])  // can't get this to work
-      assert((await feeBurner.routerAddresses(tokenA.address, 0)) == uniswap.address)
+      assert((await feeBurner.routerAddresses(tokenA.address, 0)) === uniswap.address)
     })
 
     it('should have set the owner', async () => {
@@ -335,7 +335,7 @@ contract('FeeBurner', (accounts: string[]) => {
   })
   describe('#burnNonMentoAssets()', () => {
     beforeEach(async () => {
-      feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
+      await feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
       await feeBurner.setRouter(tokenA.address, uniswap.address)
       await tokenA.mint(feeBurner.address, new BigNumber(10e18))
       await tokenA.mint(user, new BigNumber(10e18))
