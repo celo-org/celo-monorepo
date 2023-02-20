@@ -17,7 +17,8 @@ import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
-import "../uniswap/interfaces/IUniswapV2RouterMin.sol"; // TODO change for a more minimalist interface
+import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
+// TODO change for min
 import "../uniswap/interfaces/IUniswapV2Factory.sol";
 import "../uniswap/interfaces/IUniswapV2PairMin.sol";
 
@@ -26,21 +27,26 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
+  // Min units that can be burned
   uint256 public constant MIN_BURN = 200;
+  // Historical amounts burned by this contract
   mapping(address => uint256) public pastBurn;
+  // Max amounts that can be burned in a day for a token
   mapping(address => uint256) public dailyBurnLimit;
+  // Max amounts that can be burned today for a token
   mapping(address => uint256) public currentDayLimit;
-  mapping(address => address[]) public routerAddresses;
+  // last day the daily limits where updated
   uint256 public lastLimitDay;
+  // router addresses that can be set for a token
+  mapping(address => address[]) public routerAddresses;
 
+  // Max slippage a that can be accepted when burning a token
   mapping(address => FixidityLib.Fraction) public maxSlippage;
 
-  // event CeloBalance(uint256 celoBalance);
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
   event DailyLimitHit(address token, uint256 burning);
   event MAxSlippageSet(address token, uint256 maxSlippage);
-
   event DailyLimitUpdatedDeleteMe(uint256 amount);
   event RouterAddressSet(address token, address router);
   event RouterAddressRemoved(address token, address router);
@@ -55,6 +61,14 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
+   * @param _registryAddress The address of the registry core smart contract.
+   * @param tokens A list of tokens whose parameters should be set.
+   * @param newLimits A list of daily burn limits, corresponding with the same order as in the 
+      argument tokens.
+   * @param newMaxSlippages a list of max acceptable, corresponding with the same order as 
+      in the argument tokens.
+   * @param newRouters A list of routers, corresponding with the same order as in the argument 
+      tokens.
    */
   function initialize(
     address _registryAddress,
@@ -80,10 +94,22 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     }
   }
 
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
     return (1, 0, 0, 0);
   }
 
+  /**
+    * @notice Allows owner to set max slippage for a token.
+    * @param tokenAddress Address of the token to set.
+    * @param newMax New sllipage to set, as Fixidity fraction.
+    */
   function setMaxSplipagge(address tokenAddress, uint256 newMax) external onlyOwner {
     _setMaxSplipagge(tokenAddress, newMax);
   }
@@ -93,6 +119,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     emit MAxSlippageSet(tokenAddress, newMax);
   }
 
+  /**
+    * @notice Allows owner to set the daily burn limit for a token.
+    * @param tokenAddress Address of the token to set
+    * @param newLimit The new limit to set, in the token units.
+    */
   function setDailyBurnLimit(address tokenAddress, uint256 newLimit) external onlyOwner {
     _setDailyBurnLimit(tokenAddress, newLimit);
   }
@@ -102,6 +133,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     emit DailyLimitSet(tokenAddress, newLimit);
   }
 
+  /**
+    * @notice Allows owner to set the router for a token.
+    * @param tokenAddress Address of the token to set
+    * @param newLimit The new router.
+    */
   function setRouter(address token, address router) external onlyOwner {
     _setRouter(token, router);
   }
@@ -111,10 +147,18 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     emit RouterAddressSet(token, router);
   }
 
+  /**
+    * @notice Get the list of routers for a token.
+    * @param token the address of the token to query.
+    * @return An array of all the allowed router.
+    */
   function getRouterForToken(address token) external view returns (address[] memory) {
     return routerAddresses[token];
   }
 
+  /**
+    * @notice Burns all the Celo balance of this contract.
+    */
   function burnAllCelo() public {
     ICeloToken celo = ICeloToken(getCeloTokenAddress());
     celo.burn(celo.balanceOf(address(this)));
@@ -261,6 +305,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
         block.timestamp + 10
       );
 
+      pastBurn[tokenAddress] += balanceToBurn;
       updateLimits(tokenAddress, balanceToBurn);
 
       emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
@@ -271,8 +316,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
 
   // this function is permionless
   function burnMentoAssets() public {
-    // here it could also be checked that the tokens is whitelisted, but we assume everything that has already been sent here is
-    // due for burning
+    // here it could also be checked that the tokens is whitelisted, but we assume everything
+    // that has already been sent here is due for burning
     address[] memory mentoTokens = getReserve().getTokens();
 
     for (uint256 i = 0; i < mentoTokens.length; i++) {
