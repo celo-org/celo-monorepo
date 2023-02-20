@@ -34,7 +34,8 @@ git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
 echo "- Build contract artifacts"
-rm -rf build/contracts
+# rm -rf build/contracts
+yarn run lerna run clean >> $LOG_FILE
 # rm -rf build/contracts ../sdk/cryptographic-utils/lib ../sdk/base/lib ../sdk/utils/lib ../sdk/phone-utils/lib ../sdk/contractkit
 cd ../..
 # yarn clean >> $LOG_FILE
