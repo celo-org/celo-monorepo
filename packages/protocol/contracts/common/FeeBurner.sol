@@ -3,26 +3,23 @@ pragma solidity ^0.5.13;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import "../common/FixidityLib.sol";
 
 import "./UsingRegistryV2.sol";
-
-import "../common/interfaces/ICeloVersionedContract.sol";
-
-import "../common/interfaces/ICeloToken.sol";
+import "../common/Freezable2.sol";
+import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 
 import "../stability/StableToken.sol"; // TODO check if this can be interface
+import "../common/interfaces/ICeloVersionedContract.sol";
+import "../common/interfaces/ICeloToken.sol";
 import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
-import "../common/Freezable2.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
 import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 import "../uniswap/interfaces/IUniswapV2PairMin.sol";
 
-// TODO add Freezable only when not frozen
 contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract, Freezable2 {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
@@ -93,11 +90,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       }
     }
   }
-
-  // modifier onlyWhenNotFrozen() {
-  //   require(!getFreezer().isFrozen(address(this)), "can't call when contract is frozen");
-  //   _;
-  // }
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
