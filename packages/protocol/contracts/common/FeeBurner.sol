@@ -4,8 +4,8 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
-import "./UsingRegistryV2.sol";
-import "../common/Freezable2.sol";
+import "./UsingRegistry.sol";
+import "../common/Freezable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 
@@ -20,7 +20,7 @@ import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
 import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 import "../uniswap/interfaces/IUniswapV2PairMin.sol";
 
-contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedContract, Freezable2 {
+contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContract, Freezable {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
@@ -79,7 +79,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     require(tokens.length == newRouters.length, "maxSlippage lenght should match tokens'");
 
     _transferOwnership(msg.sender);
-    // setRegistry(_registryAddress); TODO figureout
+    setRegistry(_registryAddress); // TODO figureout
 
     for (uint256 i = 0; i < tokens.length; i++) {
       _setDailyBurnLimit(tokens[i], newLimits[i]);
@@ -177,10 +177,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   }
 
   /**
-  * @notice Burns all the Celo balance of this contract.
-  */
+    * @notice Burns all the Celo balance of this contract.
+    */
   function burnAllCelo() public {
-    ICeloToken celo = ICeloToken(getCeloTokenAddress());
+    ICeloToken celo = ICeloToken(registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
     celo.burn(celo.balanceOf(address(this)));
   }
 
@@ -243,9 +243,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
       emit DailyLimitHit(tokenAddress, balanceToBurn);
     }
 
-    address exchangeAddress = registryContract.getAddressForOrDie(
-      stableToken.getExchangeRegistryId()
-    );
+    address exchangeAddress = registry.getAddressForOrDie(stableToken.getExchangeRegistryId());
 
     IExchange exchange = IExchange(exchangeAddress);
 
@@ -283,7 +281,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     // and if it generates a better outcome that the ones enabled that gets used
     // and the user gets a reward
 
-    address celoAddress = getCeloTokenAddress();
+    address celoAddress = address(getGoldToken());
 
     uint256 bestRouterIndex = 0;
     uint256 bestRouterQuote = 0;

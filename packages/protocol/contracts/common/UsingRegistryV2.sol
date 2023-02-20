@@ -22,10 +22,10 @@ import "../stability/interfaces/IReserve.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+// import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract UsingRegistryV2 {
-  event RegistrySet(address indexed registryAddress);
+  // event RegistrySet(address indexed registryAddress);
 
   // address internal registryAddress = 0x000000000000000000000000000000000000ce10;
   // IRegistry public registryContract;
@@ -149,13 +149,13 @@ contract UsingRegistryV2 {
     return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
 
-  function getCeloToken() internal view returns (IERC20) {
-    return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
-  }
+  // function getCeloToken() internal view returns (IERC20) {
+  //   return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
+  // }
 
-  function getCeloTokenAddress() internal view returns (address) {
-    return registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
-  }
+  // function getCeloTokenAddress() internal view returns (address) {
+  //   return registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
+  // }
 
   function getGovernance() internal view returns (IGovernance) {
     return IGovernance(registryContract.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));
