@@ -13,7 +13,6 @@ import {
   ErrorMessage,
   ErrorType,
   PhoneNumberPrivacyRequest,
-  WarningMessage,
 } from '../interfaces'
 import { FULL_NODE_TIMEOUT_IN_MS, RETRY_COUNT, RETRY_DELAY_IN_MS } from './constants'
 
@@ -61,11 +60,7 @@ export async function authenticateUser<R extends PhoneNumberPrivacyRequest>(
       return false
     } else {
       logger.info({ dek: registeredEncryptionKey, account: signer }, 'Found DEK for account')
-      if (
-        verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger, {
-          insecureAllowIncorrectlyGeneratedSignature: true,
-        })
-      ) {
+      if (verifyDEKSignature(message, messageSignature, registeredEncryptionKey, logger)) {
         return true
       }
     }
@@ -105,10 +100,7 @@ export function verifyDEKSignature(
   message: string,
   messageSignature: string,
   registeredEncryptionKey: string,
-  logger?: Logger,
-  { insecureAllowIncorrectlyGeneratedSignature } = {
-    insecureAllowIncorrectlyGeneratedSignature: false,
-  }
+  logger?: Logger
 ) {
   logger = logger ?? rootLogger(fetchEnv('SERVICE_NAME'))
   try {
@@ -122,16 +114,6 @@ export function verifyDEKSignature(
     // TODO why do we use a different signing method instead of SignatureUtils?
     // (https://github.com/celo-org/celo-monorepo/issues/9803)
     if (key.verify(getMessageDigest(message), parsedSig)) {
-      return true
-    }
-    // TODO(2.0.0, deployment): Remove this once clients upgrade to @celo/identity v1.5.3
-    // Due to an error in the original implementation of the sign and verify functions
-    // used here, older clients may generate signatures over the truncated message,
-    // instead of its hash. These signatures represent a risk to the signer as they do
-    // not protect against modifications of the message past the first 64 characters of the message.
-    // (https://github.com/celo-org/celo-monorepo/issues/9802)
-    if (insecureAllowIncorrectlyGeneratedSignature && key.verify(message, parsedSig)) {
-      logger.warn(WarningMessage.INVALID_AUTH_SIGNATURE)
       return true
     }
     return false
