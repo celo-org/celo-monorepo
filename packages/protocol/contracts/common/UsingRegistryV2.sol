@@ -27,8 +27,10 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 contract UsingRegistryV2 {
   event RegistrySet(address indexed registryAddress);
 
-  address internal registryAddress = 0x000000000000000000000000000000000000ce10;
-  IRegistry public registryContract;
+  // address internal registryAddress = 0x000000000000000000000000000000000000ce10;
+  // IRegistry public registryContract;
+  address internal constant registryAddress = 0x000000000000000000000000000000000000ce10;
+  IRegistry public constant registryContract = IRegistry(registryAddress);
 
   bytes32 internal constant ACCOUNTS_REGISTRY_ID = keccak256(abi.encodePacked("Accounts"));
   bytes32 internal constant ATTESTATIONS_REGISTRY_ID = keccak256(abi.encodePacked("Attestations"));

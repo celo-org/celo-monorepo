@@ -79,7 +79,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
     require(tokens.length == newRouters.length, "maxSlippage lenght should match tokens'");
 
     _transferOwnership(msg.sender);
-    setRegistry(_registryAddress);
+    // setRegistry(_registryAddress); TODO figureout
 
     for (uint256 i = 0; i < tokens.length; i++) {
       _setDailyBurnLimit(tokens[i], newLimits[i]);
@@ -92,11 +92,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistryV2, ICeloVersionedCon
   }
 
   // TODO figureout
-  function setRegistry(address registryAddress) public onlyOwner {
-    require(registryAddress != address(0), "Cannot register the null address");
-    registry = IRegistry(registryAddress);
-    emit RegistrySet(registryAddress);
-  }
+  // function setRegistry(address registryAddress) public onlyOwner {
+  //   require(registryAddress != address(0), "Cannot register the null address");
+  //   registry = IRegistry(registryAddress);
+  //   emit RegistrySet(registryAddress);
+  // }
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
