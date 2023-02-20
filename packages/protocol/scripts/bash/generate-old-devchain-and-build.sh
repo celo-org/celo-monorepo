@@ -41,12 +41,12 @@ echo "- Build contract artifacts"
 rm -rf build/contracts
 rm -rf ../sdk/cryptographic-utils/lib
 cd ../sdk/cryptographic-utils
-yarn build
+BUILD_DIR=$BUILD_DIR yarn build
 cd ../../protocol
 yarn install >> $LOG_FILE
 yarn build >> $LOG_FILE
 
-echo "check what's in the build dir 0"
+echo "check what's in the build dir 1"
 ls -la build
 ls -la
 
