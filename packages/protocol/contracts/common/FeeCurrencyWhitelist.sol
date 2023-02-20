@@ -6,10 +6,17 @@ import "./interfaces/IFeeCurrencyWhitelist.sol";
 
 import "../common/Initializable.sol";
 
+import "../common/interfaces/ICeloVersionedContract.sol";
+
 /**
  * @title Holds a whitelist of the ERC20+ tokens that can be used to pay for gas
  */
-contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable {
+contract FeeCurrencyWhitelist is
+  IFeeCurrencyWhitelist,
+  Ownable,
+  Initializable,
+  ICeloVersionedContract
+{
   address[] public whitelist;
   address[] public nonMentoTokenWhitelist;
 
@@ -24,6 +31,17 @@ contract FeeCurrencyWhitelist is IFeeCurrencyWhitelist, Ownable, Initializable {
    */
   function initialize() external initializer {
     _transferOwnership(msg.sender);
+  }
+
+  /**
+   * @notice Returns the storage, major, minor, and patch version of the contract.
+   * @return Storage version of the contract.
+   * @return Major version of the contract.
+   * @return Minor version of the contract.
+   * @return Patch version of the contract.
+   */
+  function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
+    return (1, 0, 1, 0);
   }
 
   // TODO fee tokens can't be removed
