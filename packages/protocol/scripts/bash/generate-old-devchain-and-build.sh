@@ -33,16 +33,21 @@ echo "- Checkout source code at $BRANCH"
 git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
-echo "- Build contract artifacts"
-# rm -rf build/contracts
-yarn run lerna run clean >> $LOG_FILE
-# rm -rf build/contracts ../sdk/cryptographic-utils/lib ../sdk/base/lib ../sdk/utils/lib ../sdk/phone-utils/lib ../sdk/contractkit
+echo "- Build monorepo (contract artifacts, migrations, + all dependencies)"
 cd ../..
-# yarn clean >> $LOG_FILE
-echo "release tag before: $RELEASE_TAG"
+# TODO: use `yarn clean` after release v8 (not available at monorepo-root for <=v8)
+yarn run lerna run clean >> $LOG_FILE
+echo "check what's in the build dir"
+ls packages/protocol/build
+ls -la ls packages/protocol
+
+# build entire monorepo to account for any required dependencies.
 yarn install >> $LOG_FILE
+# in release v8 and earlier, @celo/contractkit automatically uses set RELEASE_TAG
+# when building, which fails if this differs from `package/protocol`'s build directory.
 RELEASE_TAG="" yarn build >> $LOG_FILE
-echo "release tag after: $RELEASE_TAG"
+cd packages/protocol
+
 # # TODO EN: haven't yet tried this here cleaning migrations before building new solidity
 # rm -f migrations/*.js* >> $LOG_FILE
 # yarn install >> $LOG_FILE
@@ -65,9 +70,14 @@ echo "release tag after: $RELEASE_TAG"
 # yarn build:sol
 # cd ../../protocol
 
-cd packages/protocol
+# cd packages/protocol
 # TODO EN: check if moving to build:sol is preferable
 # TODO: Move to yarn build:sol after the next contract release.
+
+echo "checking the build dirs"
+ls build
+ls $BUILD_DIR
+
 echo "- Create local network"
 if [ -z "$GRANTS_FILE" ]; then
   echo "in first one"
