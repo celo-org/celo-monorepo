@@ -200,8 +200,10 @@ contract('FeeBurner', (accounts: string[]) => {
       assertEqualBN(await feeBurner.maxSlippage(tokenA.address), toFixed(1))
       assertEqualBN(await feeBurner.dailyBurnLimit(stableToken.address), new BigNumber(1000000e18))
       assertEqualBN(await feeBurner.dailyBurnLimit(tokenA.address), new BigNumber(1000001e18))
-      // assert((await feeBurner.getRouterForToken(stableToken.address)) == [])  // can't get this to work
-      assert((await feeBurner.routerAddresses(tokenA.address, 0)) === uniswap.address)
+      expect((await feeBurner.getRouterForToken(tokenA.address)).toString()).to.equal(
+        [uniswap.address].toString()
+      )
+      expect(await feeBurner.routerAddresses(tokenA.address, 0)).to.equal(uniswap.address)
     })
 
     it('should have set the owner', async () => {
@@ -214,9 +216,10 @@ contract('FeeBurner', (accounts: string[]) => {
     })
   })
 
-  describe('#removeExchange()', () => {
+  describe('#removeRouter()', () => {
     it('removes a token', async () => {
-      await feeBurner.removeExchange(tokenA.address, uniswap.address, 0)
+      await feeBurner.removeRouter(tokenA.address, uniswap.address, 0)
+      expect((await feeBurner.getRouterForToken(tokenA.address)).toString()).to.equal([].toString())
 
       // Todo check the list here
       // TODO check with more items
