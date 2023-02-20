@@ -37,10 +37,11 @@ echo "- Build contract artifacts"
 rm -rf build/contracts
 # cd ../..
 yarn clean >> $LOG_FILE
+# TODO EN: haven't yet tried this here cleaning migrations before building new solidity
+rm -f migrations/*.js* >> $LOG_FILE
 yarn install >> $LOG_FILE
 yarn build:sol >> $LOG_FILE
 # yarn build:truffle-types >> $LOG_FILE
-rm -f migrations/*.js* >> $LOG_FILE
 yarn ts-node ./scripts/build.ts --truffleTypes ./types/typechain >> $LOG_FILE
 
 # # rm -rf ../sdk/cryptographic-utils/lib
@@ -63,8 +64,10 @@ yarn ts-node ./scripts/build.ts --truffleTypes ./types/typechain >> $LOG_FILE
 # TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"
 if [ -z "$GRANTS_FILE" ]; then
+  echo "in first one"
   yarn devchain generate-tar "$PWD/devchain.tar.gz" >> $LOG_FILE
 else
+  echo "in second one"
   yarn devchain generate-tar "$PWD/devchain.tar.gz" --release_gold_contracts $GRANTS_FILE >> $LOG_FILE
 fi
 rm -rf $BUILD_DIR && mkdir -p $BUILD_DIR

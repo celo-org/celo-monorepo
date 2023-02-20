@@ -320,6 +320,8 @@ async function generateDevChain(
   } else {
     fs.ensureDirSync(chainPath)
   }
+  console.log(`opts.migrationOverride: ${opts.migrationOverride}`)
+  console.log(`opts.upto: ${opts.upto}`)
   const stopGanache = await runDevChain(chainPath, {
     reset: !opts.targz,
     runMigrations: true,

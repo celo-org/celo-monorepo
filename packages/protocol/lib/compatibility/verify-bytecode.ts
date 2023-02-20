@@ -239,10 +239,15 @@ export const verifyBytecodes = async (
   console.log(`queue: ${queue}`)
   const visited: Set<string> = new Set(queue)
 
+  console.log("current provider:", _web3.currentProvider)
   // truffle web3 version does not have getProof
   const web3 = new Web3(_web3.currentProvider)
 
+  console.log('got past web3')
+  console.log(`registry, ${registry}`)
+  console.log(`registry.address, ${registry.address}`)
   const governanceAddress = await registry.getAddressForString('Governance')
+  console.log(`governanceAddress: ${governanceAddress}`)
   const context: VerificationContext = {
     artifacts,
     libraryAddresses: new LibraryAddresses(),
@@ -254,6 +259,7 @@ export const verifyBytecodes = async (
     network,
   }
 
+  console.log('pre-DFS')
   while (queue.length > 0) {
     await dfsStep(queue, visited, context)
   }

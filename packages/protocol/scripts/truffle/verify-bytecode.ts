@@ -33,8 +33,9 @@ const Proxy: Truffle.Contract<ProxyInstance> = artifacts.require('Proxy')
 const argv = require('minimist')(process.argv.slice(2), {
   string: ['build_artifacts', 'proposal', 'initialize_data', 'network', 'librariesFile'],
 })
-
 const artifactsDirectory = argv.build_artifacts ? argv.build_artifacts : './build/contracts'
+console.log(`argv.build_artifacts: ${argv.build_artifacts}`)
+console.log(`artifactsDirectory: ${artifactsDirectory}`)
 const network = argv.network ?? 'development'
 const proposal = argv.proposal ? readJsonSync(argv.proposal) : []
 const initializationData = argv.initialize_data ? readJsonSync(argv.initialize_data) : {}
@@ -46,10 +47,11 @@ module.exports = async (callback: (error?: any) => number) => {
     console.log('entering module.exports default')
     const registry = await Registry.at(celoRegistryAddress)
     // tslint:disable-next-line: no-console
-    console.log(`registry: ${registry}`)
+    console.log(`registry.address: ${registry.address}`)
     const buildArtifacts = getBuildArtifacts(artifactsDirectory)
     // tslint:disable-next-line: no-console
-    console.log(`buildArtifacts: ${buildArtifacts}`)
+    // console.log(`buildArtifacts.listArtifacts(): ${buildArtifacts.listArtifacts()}`)
+    console.log(`buildArtifacts.listSourcePaths(): ${buildArtifacts.listSourcePaths()}`)
     const libraryAddresses = await verifyBytecodes(
       Object.keys(CeloContractName),
       buildArtifacts,
