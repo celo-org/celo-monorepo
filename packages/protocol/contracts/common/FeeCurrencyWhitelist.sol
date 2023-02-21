@@ -41,7 +41,7 @@ contract FeeCurrencyWhitelist is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 0, 1, 0);
+    return (1, 1, 1, 0);
   }
 
   // TODO fee tokens can't be removed
