@@ -162,7 +162,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
 
   /**
     * @notice Get the list of routers for a token.
-    * @param token the address of the token to query.
+    * @param token The address of the token to query.
     * @return An array of all the allowed router.
     */
   function getRouterForToken(address token) external view returns (address[] memory) {
@@ -188,7 +188,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   /**
     * @param token the address of the token to query.
     * @param amountToBurn the amount of the token to burn.
-    * @return Returns true if burning amountToBurn would exceed the dayli mimit.
+    * @return Returns true if burning amountToBurn would exceed the daily limit.
     */
   function limitHit(address token, uint256 amountToBurn) public returns (bool) {
     if (dailyBurnLimit[token] == 0) {
