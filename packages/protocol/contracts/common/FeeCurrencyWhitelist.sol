@@ -20,6 +20,12 @@ contract FeeCurrencyWhitelist is
   address[] public whitelist;
   address[] public nonMentoTokenWhitelist;
 
+  event FeeCurrencyWhitelisted(address token);
+  event NonMentoFeeCurrencyWhitelisted(address token);
+
+  event FeeCurrencyWhitelistRemoved(address token);
+  event NonMentFeeCurrencyWhitelistRemoved(address token);
+
   /**
    * @notice Sets initialized == true on implementation contracts
    * @param test Set to true to skip implementation initialization
@@ -44,8 +50,6 @@ contract FeeCurrencyWhitelist is
     return (1, 1, 1, 0);
   }
 
-  // TODO fee tokens can't be removed
-
   /**
    * @dev Add a token to the whitelist
    * @param tokenAddress The address of the token to add.
@@ -53,6 +57,30 @@ contract FeeCurrencyWhitelist is
   function addNonMentoToken(address tokenAddress) external onlyOwner {
     nonMentoTokenWhitelist.push(tokenAddress);
     whitelist.push(tokenAddress);
+    emit FeeCurrencyWhitelisted(tokenAddress);
+    emit NonMentoFeeCurrencyWhitelisted(tokenAddress);
+  }
+
+  function removeNonMentoToken(address tokenAddress, uint256 index, uint256 indexNonMento)
+    public
+    onlyOwner
+  {
+    // TODO test me
+    removeMentoToken(tokenAddress, index);
+    require(nonMentoTokenWhitelist[indexNonMento] == tokenAddress, "Index does not match");
+    uint256 length = nonMentoTokenWhitelist.length;
+    nonMentoTokenWhitelist[length - 1] = nonMentoTokenWhitelist[indexNonMento];
+    nonMentoTokenWhitelist.pop();
+    emit NonMentFeeCurrencyWhitelistRemoved(tokenAddress);
+  }
+
+  function removeMentoToken(address tokenAddress, uint256 index) public onlyOwner {
+    // TODO test me
+    require(whitelist[index] == tokenAddress, "Index does not match");
+    uint256 length = whitelist.length;
+    whitelist[length - 1] = whitelist[index];
+    whitelist.pop();
+    emit FeeCurrencyWhitelistRemoved(tokenAddress);
   }
 
   /**
@@ -61,6 +89,7 @@ contract FeeCurrencyWhitelist is
    */
   function addToken(address tokenAddress) external onlyOwner {
     whitelist.push(tokenAddress);
+    emit FeeCurrencyWhitelisted(tokenAddress);
   }
 
   function getWhitelist() external view returns (address[] memory) {
