@@ -45,7 +45,7 @@ export enum IdentifierPrefix {
   NULL = '',
   PHONE_NUMBER = 'tel',
   EMAIL = 'mailto',
-  TWITTER = 'twit',
+  TWITTER = 'twitter',
   FACEBOOK = 'facebook',
   INSTAGRAM = 'instagram',
   DISCORD = 'discord',
