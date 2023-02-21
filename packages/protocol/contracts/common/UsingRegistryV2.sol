@@ -22,13 +22,7 @@ import "../stability/interfaces/IReserve.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 import "../stability/interfaces/IStableToken.sol";
 
-// import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-
 contract UsingRegistryV2 {
-  // event RegistrySet(address indexed registryAddress);
-
-  // address internal registryAddress = 0x000000000000000000000000000000000000ce10;
-  // IRegistry public registryContract;
   address internal constant registryAddress = 0x000000000000000000000000000000000000ce10;
   IRegistry public constant registryContract = IRegistry(registryAddress);
 
@@ -71,20 +65,6 @@ contract UsingRegistryV2 {
     abi.encodePacked("StableTokenBRL")
   );
   bytes32 internal constant VALIDATORS_REGISTRY_ID = keccak256(abi.encodePacked("Validators"));
-
-  // constructor() public Ownable() {
-  //   registryContract = IRegistry(registryAddress);
-  // }
-
-  // /**
-  //  * @notice Updates the address pointing to a Registry contract.
-  //  * @param _registryAddress The address of a registry contract for routing to other contracts.
-  //  */
-  // function setRegistry(address _registryAddress) private {
-  //   require(_registryAddress != address(0), "Cannot register the null address");
-  //   registryContract = IRegistry(_registryAddress);
-  //   emit RegistrySet(_registryAddress);
-  // }
 
   modifier onlyRegisteredContract(bytes32 identifierHash) {
     require(
@@ -148,14 +128,6 @@ contract UsingRegistryV2 {
   function getGoldToken() internal view returns (IERC20) {
     return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
   }
-
-  // function getCeloToken() internal view returns (IERC20) {
-  //   return IERC20(registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID));
-  // }
-
-  // function getCeloTokenAddress() internal view returns (address) {
-  //   return registryContract.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
-  // }
 
   function getGovernance() internal view returns (IGovernance) {
     return IGovernance(registryContract.getAddressForOrDie(GOVERNANCE_REGISTRY_ID));

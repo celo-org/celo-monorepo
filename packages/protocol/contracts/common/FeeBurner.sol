@@ -43,8 +43,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   event SoldAndBurnedToken(address token, uint256 value);
   event DailyLimitSet(address tokenAddress, uint256 newLimit);
   event DailyLimitHit(address token, uint256 burning);
-  event MAxSlippageSet(address token, uint256 maxSlippage);
-  event DailyLimitUpdatedDeleteMe(uint256 amount);
+  event MaxSlippageSet(address token, uint256 maxSlippage);
+  event DailyLimitUpdated(uint256 amount);
   event RouterAddressSet(address token, address router);
   event RouterAddressRemoved(address token, address router);
   event RouterUsed(address router);
@@ -74,29 +74,22 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     uint256[] calldata newMaxSlippages,
     address[] calldata newRouters
   ) external initializer {
-    require(tokens.length == newLimits.length, "limits lenght should match tokens'");
-    require(tokens.length == newMaxSlippages.length, "maxSlippage lenght should match tokens'");
-    require(tokens.length == newRouters.length, "maxSlippage lenght should match tokens'");
+    require(tokens.length == newLimits.length, "limits length should match tokens'");
+    require(tokens.length == newMaxSlippages.length, "maxSlippage length should match tokens'");
+    require(tokens.length == newRouters.length, "maxSlippage length should match tokens'");
 
     _transferOwnership(msg.sender);
-    setRegistry(_registryAddress); // TODO figureout
+    setRegistry(_registryAddress);
 
     for (uint256 i = 0; i < tokens.length; i++) {
       _setDailyBurnLimit(tokens[i], newLimits[i]);
-      _setMaxSplipagge(tokens[i], newMaxSlippages[i]);
+      _setMaxSplippage(tokens[i], newMaxSlippages[i]);
       // Mento tokens don't need to set a router
       if (newRouters[i] != address(0)) {
         _setRouter(tokens[i], newRouters[i]);
       }
     }
   }
-
-  // TODO figureout
-  // function setRegistry(address registryAddress) public onlyOwner {
-  //   require(registryAddress != address(0), "Cannot register the null address");
-  //   registry = IRegistry(registryAddress);
-  //   emit RegistrySet(registryAddress);
-  // }
 
   /**
    * @notice Returns the storage, major, minor, and patch version of the contract.
@@ -106,7 +99,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 0, 0);
+    return (0, 1, 0, 0);
   }
 
   /**
@@ -114,13 +107,13 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     * @param token Address of the token to set.
     * @param newMax New sllipage to set, as Fixidity fraction.
     */
-  function setMaxSplipagge(address token, uint256 newMax) external onlyOwner {
-    _setMaxSplipagge(token, newMax);
+  function setMaxSplippage(address token, uint256 newMax) external onlyOwner {
+    _setMaxSplippage(token, newMax);
   }
 
-  function _setMaxSplipagge(address token, uint256 newMax) private {
+  function _setMaxSplippage(address token, uint256 newMax) private {
     maxSlippage[token] = FixidityLib.wrap(newMax);
-    emit MAxSlippageSet(token, newMax);
+    emit MaxSlippageSet(token, newMax);
   }
 
   /**
@@ -161,8 +154,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     // TODO test me
     require(routerAddresses[token][index] == router, "Index does not match");
 
-    uint256 lenght = routerAddresses[token].length;
-    routerAddresses[token][lenght - 1] = routerAddresses[token][index];
+    uint256 length = routerAddresses[token].length;
+    routerAddresses[token][length - 1] = routerAddresses[token][index];
     routerAddresses[token].pop();
     emit RouterAddressRemoved(token, router);
   }
@@ -224,7 +217,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
       return;
     }
     currentDayLimit[token] = currentDayLimit[token].sub(amountBurned);
-    emit DailyLimitUpdatedDeleteMe(amountBurned);
+    emit DailyLimitUpdated(amountBurned);
     return;
   }
 

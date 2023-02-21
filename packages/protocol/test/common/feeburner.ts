@@ -240,7 +240,7 @@ contract('FeeBurner', (accounts: string[]) => {
   describe('#setMaxSplipagge()', () => {
     it('should only be called by owner', async () => {
       await assertRevert(
-        feeBurner.setMaxSplipagge(stableToken.address, maxSlippage, { from: user })
+        feeBurner.setMaxSplippage(stableToken.address, maxSlippage, { from: user })
       )
     })
   })
@@ -299,7 +299,7 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it("doesn't burn when slippage is too big", async () => {
-      await feeBurner.setMaxSplipagge(stableToken.address, toFixed(1 / 1e6)) // TODO do the math to get the right threshold
+      await feeBurner.setMaxSplippage(stableToken.address, toFixed(1 / 1e6)) // TODO do the math to get the right threshold
 
       await stableToken.transfer(feeBurner.address, new BigNumber(3000), {
         from: user,
@@ -420,7 +420,7 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it("Doesn't exchange non-Mento when slippage is too high", async () => {
-      await feeBurner.setMaxSplipagge(tokenA.address, maxSlippage)
+      await feeBurner.setMaxSplippage(tokenA.address, maxSlippage)
       await assertRevert(feeBurner.burnNonMentoTokens())
 
       assertEqualBN(await tokenA.balanceOf(feeBurner.address), new BigNumber(10e18))

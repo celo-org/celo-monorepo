@@ -9,10 +9,6 @@
 #
 
 rm test/**/*.js
-<<<<<<< Updated upstream
 ./scripts/bash/backupmigrations.sh
-=======
-# ./scripts/bash/backupmigrations.sh
->>>>>>> Stashed changes
 node runTests.js "$@"
-# ./scripts/bash/backupmigrations.sh
+./scripts/bash/backupmigrations.sh
