@@ -1,4 +1,9 @@
-import { isE164Number } from '@celo/base'
+import {
+  getIdentifierHash as baseGetIdentifierHash,
+  getPrefixedIdentifier,
+  IdentifierPrefix,
+  isE164Number,
+} from '@celo/base'
 import {
   CombinerEndpointPNP,
   KEY_VERSION_HEADER,
@@ -22,8 +27,8 @@ const debug = debugFactory('kit:odis:identifier')
 const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
-const PEPPER_SEPARATOR = '__'
 
+// Docstring is duplicated in @celo/base; make sure to update in both places.
 /**
  * Standardized prefixes for ODIS identifiers.
  *
@@ -31,27 +36,29 @@ const PEPPER_SEPARATOR = '__'
  * i.e. if a user's instagram and twitter handles are the same,
  * these prefixes prevent the ODIS identifers from being the same.
  *
- * If you would like to use a prefix that isn't included, please put up a PR adding it
+ * If you would like to use a prefix that isn't included, please put up a PR
+ * adding it to @celo/base (in celo-monorepo/packages/sdk/base/src/identifier.ts)
  * to ensure interoperability with other projects. When adding new prefixes,
  * please use either the full platform name in all lowercase (e.g. 'facebook')
  * or DID methods https://w3c.github.io/did-spec-registries/#did-methods.
+ * Make sure to add the expected value for the unit test case in
+ * `celo-monorepo/packages/sdk/base/src/identifier.test.ts`,
+ * otherwise the test will fail.
  *
  * The NULL prefix is included to allow projects to use the sdk without selecting
  * a predefined prefix or adding their own. Production use of the NULL prefix is
  * discouraged since identifiers will not be interoperable with other projects.
  * Please think carefully before using the NULL prefix.
  */
-export enum IdentifierPrefix {
-  NULL = '',
-  PHONE_NUMBER = 'tel',
-  EMAIL = 'mailto',
-  TWITTER = 'twit',
-  FACEBOOK = 'facebook',
-  INSTAGRAM = 'instagram',
-  DISCORD = 'discord',
-  TELEGRAM = 'telegram',
-  SIGNAL = 'signal',
-}
+export { IdentifierPrefix }
+// Docstring is duplicated in @celo/base; make sure to update in both places.
+/**
+ * Concatenates the identifierPrefix and plaintextIdentifier with the separator '://'
+ *
+ * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
+ * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
+ */
+export { getPrefixedIdentifier }
 
 /**
  * Steps from the private plaintext identifier to the obfuscated identifier, which can be made public.
@@ -266,17 +273,6 @@ export async function getObfuscatedIdentifierFromSignature(
 }
 
 /**
- * Concatenates the identifierPrefix and plaintextIdentifier with the separator '://'
- *
- * @param plaintextIdentifier Off-chain identifier, ex: phone number, twitter handle, email, etc.
- * @param identifierPrefix Standardized prefix used to prevent collisions between identifiers
- */
-export const getPrefixedIdentifier = (
-  plaintextIdentifier: string,
-  identifierPrefix: IdentifierPrefix
-): string => identifierPrefix + '://' + plaintextIdentifier
-
-/**
  * Generates final identifier that is published on-chain.
  *
  * @remarks
@@ -292,16 +288,7 @@ export const getIdentifierHash = (
   identifierPrefix: IdentifierPrefix,
   pepper: string
 ): string => {
-  // hashing the identifier before appending the pepper to avoid domain collisions where the
-  // identifier may contain underscores
-  // not doing this for phone numbers to maintain backwards compatibility
-  const value =
-    identifierPrefix === IdentifierPrefix.PHONE_NUMBER
-      ? getPrefixedIdentifier(plaintextIdentifier, identifierPrefix) + PEPPER_SEPARATOR + pepper
-      : (sha3(getPrefixedIdentifier(plaintextIdentifier, identifierPrefix)) as string) +
-        PEPPER_SEPARATOR +
-        pepper
-  return sha3(value) as string
+  return baseGetIdentifierHash(sha3, plaintextIdentifier, identifierPrefix, pepper)
 }
 
 /**
