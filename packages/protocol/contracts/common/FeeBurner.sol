@@ -236,6 +236,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
       emit DailyLimitHit(tokenAddress, balanceToBurn);
     }
 
+    // small numbers cause rounding errors and zero case should be skipped
+    if (balanceToBurn <= MIN_BURN) {
+      return;
+    }
+
     address exchangeAddress = registry.getAddressForOrDie(stableToken.getExchangeRegistryId());
 
     IExchange exchange = IExchange(exchangeAddress);
@@ -247,11 +252,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
       ISortedOracles sortedOracles = getSortedOracles();
       (uint256 priceWithoutSlippage, ) = sortedOracles.medianRate(tokenAddress);
       minAmount = calculateMinAmount(priceWithoutSlippage, tokenAddress, balanceToBurn);
-    }
-
-    // small numbers cause rounding errors and zero case should be skipped
-    if (balanceToBurn <= MIN_BURN) {
-      return;
     }
 
     // TODO maybe we could compare with uniswap as well
@@ -282,6 +282,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     address[] memory path = new address[](2);
     address[] memory thisTokenRouterAddresses = routerAddresses[tokenAddress];
 
+    require(thisTokenRouterAddresses.length > 0, "routerAddresses should be non empty");
+
     IERC20 token = IERC20(tokenAddress);
     uint256 balanceToBurn = token.balanceOf(address(this));
 
@@ -295,8 +297,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     if (balanceToBurn <= MIN_BURN) {
       return;
     }
-
-    require(thisTokenRouterAddresses.length > 0, "routerAddresses should be non empty");
 
     for (uint256 j = 0; j < thisTokenRouterAddresses.length; j++) {
       address poolAddress = thisTokenRouterAddresses[j];
