@@ -75,7 +75,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     address[] calldata newRouters
   ) external initializer {
     require(tokens.length == newLimits.length, "limits length should match tokens'");
-    require(tokens.length == newMaxSlippages.length, "maxSlippage lenght should match tokens'");
+    require(tokens.length == newMaxSlippages.length, "maxSlippage length should match tokens'");
     require(tokens.length == newRouters.length, "maxSlippage lenght should match tokens'");
 
     _transferOwnership(msg.sender);
