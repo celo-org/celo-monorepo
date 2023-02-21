@@ -3,7 +3,7 @@ import {
   CombinerEndpointPNP,
   KEY_VERSION_HEADER,
   SignMessageRequest,
-  SignMessageResponseSchema,
+  SignMessageResponseSchema
 } from '@celo/phone-number-privacy-common'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { createHash } from 'crypto'
@@ -15,7 +15,7 @@ import {
   EncryptionKeySigner,
   getOdisPnpRequestAuth,
   queryOdis,
-  ServiceContext,
+  ServiceContext
 } from './query'
 
 const debug = debugFactory('kit:odis:identifier')
@@ -51,6 +51,7 @@ export enum IdentifierPrefix {
   DISCORD = 'discord',
   TELEGRAM = 'telegram',
   SIGNAL = 'signal',
+  GITHUB = 'github'
 }
 
 /**
