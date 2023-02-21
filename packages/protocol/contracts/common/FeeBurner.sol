@@ -32,12 +32,12 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   mapping(address => uint256) public dailyBurnLimit;
   // Max amounts that can be burned today for a token
   mapping(address => uint256) public currentDayLimit;
-  // last day the daily limits where updated
+  // last day the daily limits were updated
   uint256 public lastLimitDay;
   // router addresses that can be set for a token
   mapping(address => address[]) public routerAddresses;
 
-  // Max slippage a that can be accepted when burning a token
+  // Max slippage that can be accepted when burning a token
   mapping(address => FixidityLib.Fraction) public maxSlippage;
 
   event SoldAndBurnedToken(address token, uint256 value);
@@ -62,7 +62,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
    * @param tokens A list of tokens whose parameters should be set.
    * @param newLimits A list of daily burn limits, corresponding with the same order as in the 
       argument tokens.
-   * @param newMaxSlippages a list of max acceptable, corresponding with the same order as 
+   * @param newMaxSlippages a list of max acceptable slippage, corresponding with the same order as 
       in the argument tokens.
    * @param newRouters A list of routers, corresponding with the same order as in the argument 
       tokens.
