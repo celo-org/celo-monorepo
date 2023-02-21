@@ -257,7 +257,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     // TODO maybe we could compare with uniswap as well
     stableToken.approve(exchangeAddress, balanceToBurn);
     exchange.sell(balanceToBurn, minAmount, false);
-    pastBurn[tokenAddress] += balanceToBurn;
+    pastBurn[tokenAddress] = pastBurn[tokenAddress].add(balanceToBurn);
 
     updateLimits(tokenAddress, balanceToBurn);
 
@@ -298,8 +298,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
       return;
     }
 
-    for (uint256 j = 0; j < thisTokenRouterAddresses.length; j++) {
-      address poolAddress = thisTokenRouterAddresses[j];
+    for (uint256 i = 0; i < thisTokenRouterAddresses.length; i++) {
+      address poolAddress = thisTokenRouterAddresses[i];
 
       require(poolAddress != address(0), "poolAddress should be nonZero");
       IUniswapV2RouterMin router = IUniswapV2RouterMin(poolAddress);
@@ -311,7 +311,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
       emit ReceivedQuote(poolAddress, wouldGet);
       if (wouldGet > bestRouterQuote) {
         bestRouterQuote = wouldGet;
-        bestRouterIndex = j;
+        bestRouterIndex = i;
       }
     }
 
@@ -336,10 +336,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
         minAmount,
         path,
         address(this),
-        block.timestamp + 10
+        block.timestamp + 20
       );
 
-      pastBurn[tokenAddress] += balanceToBurn;
+      // TODO test me
+      pastBurn[tokenAddress] = pastBurn[tokenAddress].add(balanceToBurn);
       updateLimits(tokenAddress, balanceToBurn);
 
       emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
@@ -376,9 +377,9 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     returns (uint256)
   {
     return
-      (midPrice * amount) -
-      (FixidityLib.newFixed(midPrice).multiply(maxSlippage[tokenAddress]).fromFixed()) *
-      amount;
+      (midPrice.mul(amount)).sub(
+        (FixidityLib.newFixed(midPrice).multiply(maxSlippage[tokenAddress]).fromFixed()).mul(amount)
+      );
   }
 
   /**
