@@ -190,7 +190,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     * @param amountToBurn the amount of the token to burn.
     * @return Returns true if burning amountToBurn would exceed the dayli mimit.
     */
-  function limitHit(address token, uint256 amountToBurn) public returns (bool) {
+  function dailyBurnLimitHit(address token, uint256 amountToBurn) public returns (bool) {
     if (dailyBurnLimit[token] == 0) {
       // if no limit set, assume uncapped
       return false;
@@ -223,14 +223,14 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
 
   /**
     * @notice Burns the max possible of a Mento token.
-    * @dev Should be used in case the loop fails because one token is reverting or OOG.
+    * @dev Should be used in case the loop fails because a swap is reverting or Out of Gas (OOG).
     * @param tokenAddress the address of the token to burn.
     */
   function burnSingleMentoToken(address tokenAddress) public onlyWhenNotFrozen {
     StableToken stableToken = StableToken(tokenAddress);
     uint256 balanceToBurn = stableToken.balanceOf(address(this));
 
-    if (limitHit(tokenAddress, balanceToBurn)) {
+    if (dailyBurnLimitHit(tokenAddress, balanceToBurn)) {
       // in case the limit is hit, burn the max possible
       balanceToBurn = currentDayLimit[tokenAddress];
       emit DailyLimitHit(tokenAddress, balanceToBurn);
@@ -287,7 +287,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     IERC20 token = IERC20(tokenAddress);
     uint256 balanceToBurn = token.balanceOf(address(this));
 
-    if (limitHit(tokenAddress, balanceToBurn)) {
+    if (dailyBurnLimitHit(tokenAddress, balanceToBurn)) {
       // in case the limit is hit, burn the max possible
       balanceToBurn = currentDayLimit[tokenAddress];
       emit DailyLimitHit(tokenAddress, balanceToBurn);
