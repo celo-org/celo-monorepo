@@ -28,6 +28,7 @@ const sha3 = (v: string) => soliditySha3({ type: 'string', value: v })
 
 const PEPPER_CHAR_LENGTH = 13
 
+// Docstring is duplicated in @celo/base; make sure to update in both places.
 /**
  * Standardized prefixes for ODIS identifiers.
  *
@@ -40,6 +41,9 @@ const PEPPER_CHAR_LENGTH = 13
  * to ensure interoperability with other projects. When adding new prefixes,
  * please use either the full platform name in all lowercase (e.g. 'facebook')
  * or DID methods https://w3c.github.io/did-spec-registries/#did-methods.
+ * Make sure to add the expected value for the unit test case in
+ * `celo-monorepo/packages/sdk/base/src/identifier.test.ts`,
+ * otherwise the test will fail.
  *
  * The NULL prefix is included to allow projects to use the sdk without selecting
  * a predefined prefix or adding their own. Production use of the NULL prefix is
@@ -47,6 +51,7 @@ const PEPPER_CHAR_LENGTH = 13
  * Please think carefully before using the NULL prefix.
  */
 export { IdentifierPrefix }
+// Docstring is duplicated in @celo/base; make sure to update in both places.
 /**
  * Concatenates the identifierPrefix and plaintextIdentifier with the separator '://'
  *
