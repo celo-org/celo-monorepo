@@ -354,10 +354,7 @@ describe('Authentication test suite', () => {
       expect(warnings).toEqual([])
     })
 
-    // Backwards compatibility check
-    // TODO(2.0.0, deployment): Remove this once clients upgrade to @celo/identity v1.5.3
-    // (https://github.com/celo-org/celo-monorepo/issues/9802)
-    it('Should succeed authentication when key is registered and valid and signature is incorrectly generated', async () => {
+    it('Should fail authentication when key is registered and valid and signature is incorrectly generated', async () => {
       const rawKey = '41e8e8593108eeedcbded883b8af34d2f028710355c57f4c10a056b72486aa04'
       const body = {
         account: '0xc1912fee45d61c87cc5ea59dae31190fffff232d',
@@ -397,7 +394,7 @@ describe('Authentication test suite', () => {
         warnings
       )
 
-      expect(success).toBe(true)
+      expect(success).toBe(false)
       expect(warnings).toEqual([])
     })
   })
