@@ -1,4 +1,3 @@
-import { AttestationsStatus } from '@celo/base'
 import { newKit } from '@celo/contractkit'
 import {
   AuthenticationMethod,
@@ -12,6 +11,7 @@ import {
   TestUtils,
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
+import { AttestationsStatus } from '@celo/phone-number-privacy-common/lib/test/utils'
 import { IDENTIFIER } from '@celo/phone-number-privacy-common/lib/test/values'
 import {
   initDatabase as initSignerDatabase,

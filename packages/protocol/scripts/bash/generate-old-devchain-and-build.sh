@@ -33,16 +33,17 @@ echo "- Checkout source code at $BRANCH"
 git fetch origin +"$BRANCH" 2>>$LOG_FILE >> $LOG_FILE
 git checkout $BRANCH 2>>$LOG_FILE >> $LOG_FILE
 
-echo "- Build contract artifacts"
-rm -rf build/contracts
-rm -rf ../sdk/cryptographic-utils/lib
-cd ../sdk/cryptographic-utils
-yarn build
-cd ../../protocol
+echo "- Build monorepo (contract artifacts, migrations, + all dependencies)"
+cd ../..
+# TODO: use `yarn clean` after release v8 (not available at monorepo-root for <=v8)
+yarn run lerna run clean >> $LOG_FILE
+# build entire monorepo to account for any required dependencies.
 yarn install >> $LOG_FILE
-yarn build >> $LOG_FILE
+# in release v8 and earlier, @celo/contractkit automatically uses set RELEASE_TAG
+# when building, which fails if this differs from `package/protocol`'s build directory.
+RELEASE_TAG="" yarn build >> $LOG_FILE
+cd packages/protocol
 
-# TODO: Move to yarn build:sol after the next contract release.
 echo "- Create local network"
 if [ -z "$GRANTS_FILE" ]; then
   yarn devchain generate-tar "$PWD/devchain.tar.gz" >> $LOG_FILE
