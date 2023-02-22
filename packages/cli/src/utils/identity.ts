@@ -1,10 +1,7 @@
 import { ContractKit } from '@celo/contractkit'
 import { ClaimTypes, IdentityMetadataWrapper } from '@celo/contractkit/lib/identity'
-import { Claim, validateClaim } from '@celo/contractkit/lib/identity/claims/claim'
-import {
-  VALIDATABLE_CLAIM_TYPES,
-  VERIFIABLE_CLAIM_TYPES,
-} from '@celo/contractkit/lib/identity/claims/types'
+import { Claim } from '@celo/contractkit/lib/identity/claims/claim'
+import { VERIFIABLE_CLAIM_TYPES } from '@celo/contractkit/lib/identity/claims/types'
 import { verifyClaim } from '@celo/contractkit/lib/identity/claims/verify'
 import { eqAddress } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
@@ -103,17 +100,9 @@ export const displayMetadata = async (
 ) => {
   const data = await concurrentMap(5, metadata.claims, async (claim) => {
     const verifiable = VERIFIABLE_CLAIM_TYPES.includes(claim.type)
-    const validatable = VALIDATABLE_CLAIM_TYPES.includes(claim.type)
-    const status = verifiable
-      ? await verifyClaim(kit, claim, metadata.data.meta.address)
-      : validatable
-      ? await validateClaim(kit, claim, metadata.data.meta.address)
-      : 'N/A'
+    const status = verifiable ? await verifyClaim(kit, claim, metadata.data.meta.address) : 'N/A'
     let extra = ''
     switch (claim.type) {
-      case ClaimTypes.ATTESTATION_SERVICE_URL:
-        extra = `URL: ${claim.url}`
-        break
       case ClaimTypes.DOMAIN:
         extra = `Domain: ${claim.domain}`
         break
@@ -133,15 +122,7 @@ export const displayMetadata = async (
     return {
       type: claim.type,
       extra,
-      status: verifiable
-        ? status
-          ? `Could not verify: ${status}`
-          : 'Verified!'
-        : validatable
-        ? status
-          ? `Invalid: ${status}`
-          : `Valid!`
-        : 'N/A',
+      status: verifiable ? (status ? `Could not verify: ${status}` : 'Verified!') : 'N/A',
       createdAt: moment.unix(claim.timestamp).fromNow(),
     }
   })
