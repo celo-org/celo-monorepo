@@ -67,7 +67,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
       })
 
       it("Doesn't remove if the index is wrong", async () => {
-        assertRevert(feeCurrencyWhitelist.removeToken(accounts[0], 0))
+        await assertRevert(feeCurrencyWhitelist.removeToken(accounts[0], 0))
       })
     })
 
