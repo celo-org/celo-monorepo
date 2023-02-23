@@ -134,6 +134,9 @@ export const proposalToJSON = async (
     debug(`updating registry to reflect ${name} => ${address}`)
     await blockExplorer.updateContractDetailsMapping(stripProxy(name), address)
   }
+  const isRegistryContract = (contract: CeloContract) =>
+    RegisteredContracts.includes(stripProxy(contract)) ||
+    (registryAdditions && registryAdditions[stripProxy(contract)] !== undefined)
 
   if (registryAdditions) {
     // Update the registry mapping with registry additions prior to processing the proposal.
@@ -148,6 +151,7 @@ export const proposalToJSON = async (
 
   const abiCoder = kit.connection.getAbiCoder()
   const proposalJson: ProposalTransactionJSON[] = []
+
   for (const tx of proposal) {
     if (isRegistryRepointRaw(abiCoder, tx)) {
       const args = registryRepointRawArgs(abiCoder, tx)
@@ -169,21 +173,38 @@ export const proposalToJSON = async (
     }
 
     if (isProxySetFunction(jsonTx)) {
-      jsonTx.contract = suffixProxy(jsonTx.contract)
+      if (jsonTx.contract.match(/Proxy/) == null) {
+        jsonTx.contract = suffixProxy(jsonTx.contract)
+      }
+      blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
     } else if (isProxySetAndInitFunction(jsonTx)) {
-      jsonTx.contract = suffixProxy(jsonTx.contract)
+      blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
+      let initAbi
+      if (isRegistryContract(jsonTx.contract)) {
+        if (jsonTx.contract.match(/Proxy/) == null) {
+          jsonTx.contract = suffixProxy(jsonTx.contract)
+        }
 
-      // Transform delegate call initialize args into a readable params map
-      const initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
+        initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
+      } else {
+        const implAddress = jsonTx.args[0]
+        const metadata = await fetchMetadata(kit.connection, implAddress)
+        if (metadata && metadata.abi) {
+          initAbi = metadata?.abiForMethod('initialize')[0]
+        }
+      }
 
-      // 8 bytes for function sig
-      const initSig = trimLeading0x(jsonTx.args[1]).slice(0, 8)
-      const initArgs = trimLeading0x(jsonTx.args[1]).slice(8)
+      if (initAbi !== undefined) {
+        // Transform delegate call initialize args into a readable params map
+        // 8 bytes for function sig
+        const initSig = trimLeading0x(jsonTx.args[1]).slice(0, 8)
+        const initArgs = trimLeading0x(jsonTx.args[1]).slice(8)
 
-      const { params: initParams } = parseDecodedParams(
-        kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
-      )
-      jsonTx.params![`initialize@${initSig}`] = initParams
+        const { params: initParams } = parseDecodedParams(
+          kit.connection.getAbiCoder().decodeParameters(initAbi.inputs!, initArgs)
+        )
+        jsonTx.params![`initialize@${initSig}`] = initParams
+      }
     } else if (isGovernanceConstitutionSetter(jsonTx)) {
       const [address, functionId, threshold] = jsonTx.args
       const result = await blockExplorer.getContractMethodAbi(address, functionId)

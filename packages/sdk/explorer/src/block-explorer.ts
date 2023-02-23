@@ -65,6 +65,7 @@ const getContractMappingFromDetails = (cd: ContractDetails) => ({
 
 export class BlockExplorer {
   private addressMapping: Map<Address, ContractMapping>
+  private proxyImplementationOverride: Map<Address, Address> = new Map()
 
   constructor(private kit: ContractKit, readonly contractDetails: ContractDetails[]) {
     this.addressMapping = mapFromPairs(
@@ -75,8 +76,16 @@ export class BlockExplorer {
   }
 
   async updateContractDetailsMapping(name: CeloContract, address: string) {
-    const cd = await getContractDetailsFromContract(this.kit, name, address)
-    this.addressMapping.set(cd.address, getContractMappingFromDetails(cd))
+    try {
+      const cd = await getContractDetailsFromContract(this.kit, name, address)
+      this.addressMapping.set(cd.address, getContractMappingFromDetails(cd))
+    } catch (e) {
+      console.warn('Could not update contract details mapping for ${name} at ${address}')
+    }
+  }
+
+  async setProxyOverride(proxyAddress: Address, implementationAddress: Address) {
+    this.proxyImplementationOverride.set(proxyAddress, implementationAddress)
   }
 
   async fetchBlockByHash(blockHash: string): Promise<Block> {
@@ -158,8 +167,11 @@ export class BlockExplorer {
       abi = metadata.abiForSelector(selector)
 
       if (abi === null) {
-        const implAddress = await metadata.tryGetProxyImplementation()
-        console.log(implAddress)
+        let implAddress = this.proxyImplementationOverride.get(address) || null
+        if (implAddress === null) {
+          implAddress = await metadata.tryGetProxyImplementation()
+        }
+
         if (implAddress) {
           metadata = await fetchMetadata(this.kit.connection, implAddress)
           if (metadata && metadata.abi) {
@@ -205,14 +217,11 @@ export class BlockExplorer {
 
   getContractMethodAbi = async (
     address: string,
-    selector: string,
-    onlyCoreContracts = false
+    selector: string
   ): Promise<ContractNameAndMethodAbi | null> => {
     let resp = this.getContractMethodAbiFromCore(address, selector)
     if (resp !== null) {
       return resp
-    } else if (onlyCoreContracts) {
-      return null
     }
 
     resp = await this.getContractMethodAbiFromSourcify(address, selector)
