@@ -65,8 +65,8 @@ contract FeeCurrencyWhitelist is
   }
 
   /**
-   * @notice Adds a non-Mento token as enabled fee currency. Tokens added with addNonMentoToken should be 
-   * removed with this function.
+   * @notice Adds a non-Mento token as enabled fee currency. Tokens added with 
+   * addNonMentoToken should be removed with this function.
    * @param tokenAddress The address of the token to remove.
    * @param index the index of the token in the whitelist array.
    * @param indexNonMento the index of the token in the nonMentoTokenWhitelist array.
