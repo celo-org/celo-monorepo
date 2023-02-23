@@ -10,6 +10,7 @@ oracle:
     prometheusPort: 9090
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
+  gasPriceMultiplier: 1.5
   priceSources: "[
     [
       {exchange: 'COINBASE', symbol: 'CELOEUR', toInvert: false}],
