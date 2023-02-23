@@ -1,5 +1,5 @@
 oracle:
-  currencyPair: USDCUSD
+  currencyPair: USDCEUR
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
@@ -13,19 +13,24 @@ oracle:
   gasPriceMultiplier: 1.5
   priceSources: "[
       [
-        {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false}
-      ],
-      [
-        {exchange: 'BINANCEUS', symbol: 'USDCUSD', toInvert: false}
+        {exchange: 'KRAKEN', symbol: 'USDCEUR', toInvert: false}
       ],
       [
         {exchange: 'COINBASE', symbol: 'USDTUSDC', toInvert: true},
-        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
+        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false}
       ],
       [
         {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
-        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
-      ]
+        {exchange: 'COINBASE', symbol: 'USDTEUR', toInvert: false}
+      ],
+      [
+        {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'EURUSD', toInvert: true}
+      ],
+      [
+        {exchange: 'BINANCEUS', symbol: 'USDCUSD', toInvert: false},
+        {exchange: 'KRAKEN', symbol: 'EURUSD', toInvert: true}
+      ],
     ]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
