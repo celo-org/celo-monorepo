@@ -219,13 +219,24 @@ contract('FeeBurner', (accounts: string[]) => {
     })
   })
 
-  describe('#removeRouter()', () => {
+  describe.only('#removeRouter()', () => {
     it('removes a token', async () => {
       await feeBurner.removeRouter(tokenA.address, uniswap.address, 0)
       expect((await feeBurner.getRouterForToken(tokenA.address)).toString()).to.equal([].toString())
+    })
 
-      // Todo check the list here
-      // TODO check with more items
+    it('removes when list is big', async () => {
+      await feeBurner.setRouter(tokenA.address, exchange.address)
+      await feeBurner.setRouter(tokenA.address, stableToken.address)
+      // list for token should be [uniswap, exchange, stabletoken]
+      await feeBurner.removeRouter(tokenA.address, exchange.address, 1)
+      expect((await feeBurner.getRouterForToken(tokenA.address)).toString()).to.equal(
+        [uniswap.address, stableToken.address].toString()
+      )
+    })
+
+    it("doesn't remove if the indexes doesn't match", async () => {
+      assertRevert(feeBurner.removeRouter(tokenA.address, exchange.address, 1))
     })
   })
 
@@ -337,11 +348,9 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it('sets pool for exchange', async () => {
-      // TODO change for UNISWAP address
-      await feeBurner.setRouter(stableToken.address, uniswap.address)
+      await feeBurner.setRouter(tokenA.address, uniswap.address)
 
-      assert(await feeBurner.routerAddresses(stableToken.address, 0), uniswap.address)
-      // await assertRevert(feeCurrencyWhitelist.addToken(aTokenAddress, { from: nonOwner }))
+      assert(await feeBurner.routerAddresses(tokenA.address, 0), uniswap.address)
     })
   })
   describe('#burnNonMentoAssets() (if this fails with "revert" please read comments of this tests)', () => {

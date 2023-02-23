@@ -9,7 +9,8 @@ import "../common/Freezable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 
-import "../stability/StableToken.sol"; // TODO check if this can be interface
+// TODO move to IStableToken when it adds method getExchangeRegistryId
+import "../stability/StableToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/interfaces/ICeloToken.sol";
 import "../stability/interfaces/IExchange.sol";
@@ -151,11 +152,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     * @param index the index of the router to remove.
     */
   function removeRouter(address token, address router, uint256 index) external onlyOwner {
-    // TODO test me
     require(routerAddresses[token][index] == router, "Index does not match");
 
     uint256 length = routerAddresses[token].length;
-    routerAddresses[token][length - 1] = routerAddresses[token][index];
+    routerAddresses[token][index] = routerAddresses[token][length - 1];
     routerAddresses[token].pop();
     emit RouterAddressRemoved(token, router);
   }

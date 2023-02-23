@@ -69,7 +69,7 @@ contract FeeCurrencyWhitelist is
     removeMentoToken(tokenAddress, index);
     require(nonMentoTokenWhitelist[indexNonMento] == tokenAddress, "Index does not match");
     uint256 length = nonMentoTokenWhitelist.length;
-    nonMentoTokenWhitelist[length - 1] = nonMentoTokenWhitelist[indexNonMento];
+    nonMentoTokenWhitelist[length - 1] = nonMentoTokenWhitelist[indexNonMento]; // TODO fix
     nonMentoTokenWhitelist.pop();
     emit NonMentFeeCurrencyWhitelistRemoved(tokenAddress);
   }
@@ -78,7 +78,7 @@ contract FeeCurrencyWhitelist is
     // TODO test me
     require(whitelist[index] == tokenAddress, "Index does not match");
     uint256 length = whitelist.length;
-    whitelist[length - 1] = whitelist[index];
+    whitelist[length - 1] = whitelist[index]; // TODO fix
     whitelist.pop();
     emit FeeCurrencyWhitelistRemoved(tokenAddress);
   }
