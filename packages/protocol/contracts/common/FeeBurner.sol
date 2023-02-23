@@ -19,13 +19,13 @@ import "../stability/interfaces/ISortedOracles.sol";
 // Using the minimal required signatures in the interfaces so more contracts could be compatible
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
 import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
-import "../uniswap/interfaces/IUniswapV2PairMin.sol";
 
 contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContract, Freezable {
   using SafeMath for uint256;
+  using FixidityLib for FixidityLib.Fraction;
 
   uint256 constant MAX_TIMESTAMP_BLOCK_EXCHANGE = 20;
-  using FixidityLib for FixidityLib.Fraction;
+  uint256 public constant FIXED1_UINT = 1000000000000000000000000;
 
   // Min units that can be burned
   uint256 public constant MIN_BURN = 200;
@@ -252,11 +252,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
       // max slippage is set
       // use sorted oracles as reference
       ISortedOracles sortedOracles = getSortedOracles();
-      (uint256 priceWithoutSlippage, ) = sortedOracles.medianRate(tokenAddress);
-      minAmount = calculateMinAmount(priceWithoutSlippage, tokenAddress, balanceToBurn);
+      (uint256 rateNumerator, uint256 rateDenominator) = sortedOracles.medianRate(tokenAddress);
+      minAmount = calculateMinAmount(rateNumerator, rateDenominator, tokenAddress, balanceToBurn);
     }
 
-    // TODO maybe we could compare with uniswap as well
+    // TODO an upgrade would be to compare using routers as well
     stableToken.approve(exchangeAddress, balanceToBurn);
     exchange.sell(balanceToBurn, minAmount, false);
     pastBurn[tokenAddress] = pastBurn[tokenAddress].add(balanceToBurn);
@@ -325,12 +325,16 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
 
       uint256 minAmount = 0;
       if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
-        // checking slippage before trading
-        IUniswapV2PairMin pair = IUniswapV2PairMin(
-          IUniswapV2FactoryMin(bestRouter.factory()).getPair(tokenAddress, celoAddress)
+        address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
+          tokenAddress,
+          celoAddress
         );
-        (uint256 tokenAmount, uint256 celoAmount, ) = pair.getReserves();
-        minAmount = calculateMinAmount(tokenAmount / celoAmount, tokenAddress, balanceToBurn);
+        minAmount = calculateMinAmount(
+          token.balanceOf(pair),
+          getGoldToken().balanceOf(pair),
+          tokenAddress,
+          balanceToBurn
+        );
       }
 
       token.approve(bestRouterAddress, balanceToBurn);
@@ -367,20 +371,28 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   }
 
   /**
-    * @param midPrice The mid price of a token.
+    * @param midPriceNumerator numerator of the price.
+    * @param midPriceDenominator denominator of the price.
     * @param tokenAddress the address of the token to query.
     * @param amount the amount to swap
     * @return The minimal amount of tokens expected for a swap
     */
-  function calculateMinAmount(uint256 midPrice, address tokenAddress, uint256 amount)
-    public
-    view
-    returns (uint256)
-  {
+  function calculateMinAmount(
+    uint256 midPriceNumerator,
+    uint256 midPriceDenominator,
+    address tokenAddress,
+    uint256 amount
+  ) public view returns (uint256) {
+    FixidityLib.Fraction memory price = FixidityLib.newFixedFraction(
+      midPriceNumerator,
+      midPriceDenominator
+    );
+    FixidityLib.Fraction memory amountFraction = FixidityLib.newFixed(amount);
+
     return
-      (midPrice.mul(amount)).sub(
-        (FixidityLib.newFixed(midPrice).multiply(maxSlippage[tokenAddress]).fromFixed()).mul(amount)
-      );
+      (price.multiply(amountFraction))
+        .subtract((price.multiply(maxSlippage[tokenAddress])).multiply(amountFraction))
+        .fromFixed();
   }
 
   /**

@@ -173,6 +173,24 @@ contract('FeeBurner', (accounts: string[]) => {
     )
   })
 
+  describe('#calculateMinAmount()', () => {
+    it('calculated the min correclty', async () => {
+      const midprice = new BigNumber('1e18') // (1 Stabletoken = 1 Celo)
+      const amount = new BigNumber('10e18')
+
+      await feeBurner.setMaxSplippage(stableToken.address, toFixed(2 / 100))
+      assertEqualBN(
+        await feeBurner.calculateMinAmount(
+          midprice,
+          new BigNumber('1e18'),
+          stableToken.address,
+          amount
+        ),
+        new BigNumber('9.8e18')
+      )
+    })
+  })
+
   describe('#transfer()', () => {
     beforeEach(async () => {
       await tokenA.mint(feeBurner.address, new BigNumber(1e18))

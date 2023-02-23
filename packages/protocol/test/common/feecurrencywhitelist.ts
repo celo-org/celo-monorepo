@@ -94,7 +94,7 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
       })
 
       it("Doesn't remove if the index is wrong", async () => {
-        assertRevert(feeCurrencyWhitelist.removeNonMentoToken(accounts[0], 1, 1))
+        await assertRevert(feeCurrencyWhitelist.removeNonMentoToken(accounts[0], 1, 1))
       })
     })
   })
