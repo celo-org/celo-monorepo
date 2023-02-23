@@ -75,10 +75,6 @@ contract('FeeBurner', (accounts: string[]) => {
 
   let feeCurrencyWhitelist: FeeCurrencyWhitelistInstance
 
-  // const aTokenAddress = '0x000000000000000000000000000000000000ce10'
-
-  // const nonOwner = accounts[1]
-
   const decimals = 18
   const updateFrequency = 60 * 60
   const minimumReports = 2
@@ -109,9 +105,6 @@ contract('FeeBurner', (accounts: string[]) => {
     await feeCurrencyWhitelist.initialize()
 
     uniswapFactory = await UniswapV2Factory.new('0x0000000000000000000000000000000000000000') // feeSetter
-
-    // tslint:disable-next-line
-    console.log('hash', await uniswapFactory.INIT_CODE_PAIR_HASH())
 
     uniswap = await UniswapRouter.new(
       uniswapFactory.address,
@@ -276,7 +269,7 @@ contract('FeeBurner', (accounts: string[]) => {
       })
 
       // burn for a token is zero
-      assertEqualBN(await feeBurner.getPastBurnForToken(stableToken.address), new BigNumber(0))
+      assertEqualBN(await feeBurner.getPastBurnForToken(stableToken.address), 0)
 
       const burnedAmountStable = await stableToken.balanceOf(feeBurner.address)
 
@@ -285,9 +278,9 @@ contract('FeeBurner', (accounts: string[]) => {
       assertEqualBN(await feeBurner.getPastBurnForToken(stableToken.address), burnedAmountStable)
 
       // all Celo must have been burned
-      assertEqualBN(await goldToken.balanceOf(feeBurner.address), new BigNumber(0))
+      assertEqualBN(await goldToken.balanceOf(feeBurner.address), 0)
       // all stable must have been burned
-      assertEqualBN(await stableToken.balanceOf(feeBurner.address), new BigNumber(0))
+      assertEqualBN(await stableToken.balanceOf(feeBurner.address), 0)
 
       // get some Celo dollars
       // Send to burner
@@ -354,8 +347,14 @@ contract('FeeBurner', (accounts: string[]) => {
       assert(await feeBurner.routerAddresses(tokenA.address, 0), uniswap.address)
     })
   })
-  describe('#burnNonMentoAssets() (if this fails with "revert" please read comments of this tests)', () => {
-    ///
+  describe('#burnNonMentoAssets() (if this fails with "revert" please read comments of this tests, read comment of this test)', () => {
+    // Uniswap can get the address of a pair by using an init code pair hash. Unfortunately, this hash is harcoded
+    // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
+    // 1. Skip these tests locally, as they will run in the CI anyway or
+    // 2. Change the hash, you can get the hash for the parciular test deployment with the following:
+    // // tslint:disable-next-line
+    // console.log('Uniswap INIT CODE PAIR HASH:', await uniswapFactory.INIT_CODE_PAIR_HASH())
+
     beforeEach(async () => {
       await feeCurrencyWhitelist.addNonMentoToken(tokenA.address)
       await feeBurner.setRouter(tokenA.address, uniswap.address)
@@ -380,7 +379,7 @@ contract('FeeBurner', (accounts: string[]) => {
       )
     })
 
-    it("Can't burn when forzen", async () => {
+    it("Can't burn when frozen", async () => {
       await freezer.freeze(feeBurner.address)
       await assertRevert(feeBurner.burnNonMentoTokens())
     })
@@ -416,12 +415,12 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it("Doesn't burn non Mento tokens if the limit is hit", async () => {
-      // assertEqualBN(await feeBurner.getPastBurnForToken(tokenA.address), new BigNumber(0))
+      assertEqualBN(await feeBurner.getPastBurnForToken(tokenA.address), 0)
 
       await feeBurner.setDailyBurnLimit(tokenA.address, new BigNumber(1e18))
       await feeBurner.burnNonMentoTokens()
 
-      // assertEqualBN(await feeBurner.getPastBurnForToken(tokenA.address), new BigNumber(1e18))
+      assertEqualBN(await feeBurner.getPastBurnForToken(tokenA.address), new BigNumber(1e18))
 
       assertEqualBN(await tokenA.balanceOf(feeBurner.address), new BigNumber(9e18))
       await feeBurner.burnNonMentoTokens()
