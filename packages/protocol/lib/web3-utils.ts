@@ -8,7 +8,7 @@ import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { BigNumber } from 'bignumber.js'
 import prompts from 'prompts'
-import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
+import { GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
 import Web3 from 'web3'
 
 
@@ -314,56 +314,6 @@ export async function transferOwnershipOfProxyAndImplementation<
   )
   await contract.transferOwnership(owner)
   await transferOwnershipOfProxy(contractName, owner, artifacts)
-}
-
-// TODO(asa): Share this code with mobile.
-export async function createInviteCode(
-  goldToken: GoldTokenInstance,
-  stableToken: StableTokenInstance,
-  invitationStableTokenAmount: BigNumber,
-  gasPrice: number,
-  web3: Web3
-) {
-  // TODO(asa): This number was made up
-  const verificationGasAmount = new BigNumber(10000000)
-  if (!gasPrice) {
-    // TODO: this default gas price might not be accurate
-    gasPrice = 0
-  }
-  const temporaryWalletAccount = await web3.eth.accounts.create()
-  const temporaryAddress = temporaryWalletAccount.address
-  // Buffer.from doesn't expect a 0x for hex input
-  const privateKeyHex = temporaryWalletAccount.privateKey.substring(2)
-  const inviteCode = Buffer.from(privateKeyHex, 'hex').toString('base64')
-  await goldToken.transfer(temporaryAddress, verificationGasAmount.times(gasPrice).toString())
-  await stableToken.transfer(temporaryAddress, invitationStableTokenAmount.toString())
-  return [temporaryAddress, inviteCode]
-}
-
-export async function sendEscrowedPayment(
-  contract: StableTokenInstance,
-  escrow: EscrowInstance,
-  phone: string,
-  value: number,
-  paymentID: string
-) {
-  console.log(
-    'Transferring',
-    await convertFromContractDecimals(value, contract),
-    await contract.symbol(),
-    'to',
-    phone,
-    'via Escrow.'
-  )
-  // @ts-ignore
-  const phoneHash: string = Web3.utils.soliditySha3({
-    type: 'string',
-    value: phone,
-  })
-
-  await contract.approve(escrow.address, value.toString())
-  const expirySeconds = 60 * 60 * 24 * 5 // 5 days
-  await escrow.transfer(phoneHash, contract.address, value.toString(), expirySeconds, paymentID, 0)
 }
 
 /*
