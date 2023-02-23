@@ -59,7 +59,6 @@ contract('FeeBurner', (accounts: string[]) => {
   let exchange: ExchangeInstance
   let registry: RegistryInstance
   let stableToken: StableTokenInstance
-  // let dummyToken: StableTokenInstance
   let goldToken: GoldTokenInstance
   let mockSortedOracles: MockSortedOraclesInstance
   let mockReserve: MockReserveInstance
@@ -213,6 +212,14 @@ contract('FeeBurner', (accounts: string[]) => {
     })
   })
 
+  describe('#setRouter()', () => {
+    it('sets pool for exchange', async () => {
+      await feeBurner.setRouter(tokenA.address, uniswap.address)
+
+      assert(await feeBurner.routerAddresses(tokenA.address, 0), uniswap.address)
+    })
+  })
+
   describe('#removeRouter()', () => {
     it('removes a token', async () => {
       await feeBurner.removeRouter(tokenA.address, uniswap.address, 0)
@@ -268,7 +275,6 @@ contract('FeeBurner', (accounts: string[]) => {
         from: user,
       })
 
-      // burn for a token is zero
       assertEqualBN(await feeBurner.getPastBurnForToken(stableToken.address), 0)
 
       const burnedAmountStable = await stableToken.balanceOf(feeBurner.address)
@@ -276,15 +282,8 @@ contract('FeeBurner', (accounts: string[]) => {
       await feeBurner.burn()
 
       assertEqualBN(await feeBurner.getPastBurnForToken(stableToken.address), burnedAmountStable)
-
-      // all Celo must have been burned
       assertEqualBN(await goldToken.balanceOf(feeBurner.address), 0)
-      // all stable must have been burned
       assertEqualBN(await stableToken.balanceOf(feeBurner.address), 0)
-
-      // get some Celo dollars
-      // Send to burner
-      // burn
     })
 
     it("doesn't burn when bigger than limit", async () => {
@@ -304,7 +303,8 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it("doesn't burn when slippage is too big", async () => {
-      await feeBurner.setMaxSplippage(stableToken.address, toFixed(1 / 1e6)) // TODO do the math to get the right threshold
+      // TODO do the math to get the right threshold
+      await feeBurner.setMaxSplippage(stableToken.address, toFixed(1 / 1e6))
 
       await stableToken.transfer(feeBurner.address, new BigNumber(3000), {
         from: user,
@@ -340,13 +340,8 @@ contract('FeeBurner', (accounts: string[]) => {
 
       assertEqualBN(await stableToken.balanceOf(feeBurner.address), balanceBefore)
     })
-
-    it('sets pool for exchange', async () => {
-      await feeBurner.setRouter(tokenA.address, uniswap.address)
-
-      assert(await feeBurner.routerAddresses(tokenA.address, 0), uniswap.address)
-    })
   })
+
   describe('#burnNonMentoAssets() (if this fails with "revert" please read comments of this tests, read comment of this test)', () => {
     // Uniswap can get the address of a pair by using an init code pair hash. Unfortunately, this hash is harcoded
     // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
