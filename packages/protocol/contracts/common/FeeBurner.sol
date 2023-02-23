@@ -266,7 +266,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
 
   /**
     * @notice Burns the max possible of a token.
-    * @dev Should be used in case the loop fails because one token is reverting or OOG.
+    * @dev Should be used in case the loop fails because one token is reverting or 
+    Out of Gas (OOG).
     * @param tokenAddress the address of the token to burn.
     */
   function burnSingleNonMentoToken(address tokenAddress) public onlyWhenNotFrozen {
@@ -339,13 +340,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
         block.timestamp + 20
       );
 
-      // TODO test me
       pastBurn[tokenAddress] = pastBurn[tokenAddress].add(balanceToBurn);
       updateLimits(tokenAddress, balanceToBurn);
 
       emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
       emit RouterUsed(bestRouterAddress);
-
     }
   }
 

@@ -1,3 +1,4 @@
+// TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertEqualBN, assertGtBN, assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
@@ -219,7 +220,7 @@ contract('FeeBurner', (accounts: string[]) => {
     })
   })
 
-  describe.only('#removeRouter()', () => {
+  describe('#removeRouter()', () => {
     it('removes a token', async () => {
       await feeBurner.removeRouter(tokenA.address, uniswap.address, 0)
       expect((await feeBurner.getRouterForToken(tokenA.address)).toString()).to.equal([].toString())
@@ -236,7 +237,7 @@ contract('FeeBurner', (accounts: string[]) => {
     })
 
     it("doesn't remove if the indexes doesn't match", async () => {
-      assertRevert(feeBurner.removeRouter(tokenA.address, exchange.address, 1))
+      await assertRevert(feeBurner.removeRouter(tokenA.address, exchange.address, 0))
     })
   })
 
@@ -414,9 +415,13 @@ contract('FeeBurner', (accounts: string[]) => {
       assertEqualBN(await tokenA.balanceOf(feeBurner.address), 0)
     })
 
-    it("Doesn't burn Mento tokens if the limit is hit", async () => {
+    it("Doesn't burn non Mento tokens if the limit is hit", async () => {
+      // assertEqualBN(await feeBurner.getPastBurnForToken(tokenA.address), new BigNumber(0))
+
       await feeBurner.setDailyBurnLimit(tokenA.address, new BigNumber(1e18))
       await feeBurner.burnNonMentoTokens()
+
+      // assertEqualBN(await feeBurner.getPastBurnForToken(tokenA.address), new BigNumber(1e18))
 
       assertEqualBN(await tokenA.balanceOf(feeBurner.address), new BigNumber(9e18))
       await feeBurner.burnNonMentoTokens()
