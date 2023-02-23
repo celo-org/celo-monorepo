@@ -1,8 +1,4 @@
 {
-  "celo-azure-build": {
-    "location": "packages/azure",
-    "dependencies": []
-  },
   "@celo/celotool": {
     "location": "packages/celotool",
     "dependencies": [
