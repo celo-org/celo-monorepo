@@ -15,6 +15,7 @@ interface SimulateClientArgv extends yargs.Argv {
   recipientIndex: number
   clientCount: number
   reuseClient: boolean
+  dataTest: boolean
 }
 
 export const builder = () => {
@@ -61,6 +62,11 @@ export const builder = () => {
       description: 'Use the same client for all the threads/accounts',
       default: false,
     })
+    .options('daat-test', {
+      type: 'boolean',
+      description: 'Use big call data txs',
+      default: false,
+    })
 }
 
 export const handler = async (argv: SimulateClientArgv) => {
@@ -96,6 +102,7 @@ export const handler = async (argv: SimulateClientArgv) => {
       argv.blockscoutUrl,
       argv.blockscoutMeasurePercent,
       argv.index,
+      argv.dataTest,
       thread,
       `http://localhost:${web3ProviderPort}`
     )

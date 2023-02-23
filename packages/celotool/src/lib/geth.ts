@@ -449,11 +449,40 @@ const measureBlockscout = async (
   }
 }
 
+export const transferCalldata = async (
+  kit: ContractKit,
+  fromAddress: string,
+  toAddress: string,
+  amount: BigNumber,
+  dataStr?: string,
+  txOptions: {
+    gas?: number
+    gasPrice?: string
+    feeCurrency?: string
+    gatewayFeeRecipient?: string
+    gatewayFee?: string
+    nonce?: number
+  } = {}
+) => {
+  return kit.sendTransaction({
+    from: fromAddress,
+    to: toAddress,
+    value: amount.toString(),
+    data: dataStr,
+    gas: txOptions.gas,
+    gasPrice: txOptions.gasPrice,
+    gatewayFeeRecipient: txOptions.gatewayFeeRecipient,
+    gatewayFee: txOptions.gatewayFee,
+    nonce: txOptions.nonce,
+  })
+}
+
 export const transferCeloGold = async (
   kit: ContractKit,
   fromAddress: string,
   toAddress: string,
   amount: BigNumber,
+  dataStr?: string,
   txOptions: {
     gas?: number
     gasPrice?: string
@@ -480,6 +509,7 @@ export const transferCeloDollars = async (
   fromAddress: string,
   toAddress: string,
   amount: BigNumber,
+  dataStr?: string,
   txOptions: {
     gas?: number
     gasPrice?: string
@@ -521,6 +551,7 @@ export const simulateClient = async (
   blockscoutUrl: string,
   blockscoutMeasurePercent: number, // percent of time in range [0, 100] to measure blockscout for a tx
   index: number,
+  dataTest: boolean,
   thread: number,
   web3Provider: string = 'http://localhost:8545'
 ) => {
@@ -567,13 +598,8 @@ export const simulateClient = async (
       await unlock(kit, kit.defaultAccount, password, 9223372036)
       unlockNeeded = false
     }
-    // randomly choose which token to use
-    const transferGold = Boolean(Math.round(Math.random()))
-    const transferFn = transferGold ? transferCeloGold : transferCeloDollars
-    baseLogMessage.tokenName = transferGold ? 'cGLD' : 'cUSD'
-
-    // randomly choose which gas currency to use
-    const feeCurrencyGold = Boolean(Math.round(Math.random()))
+    const txConf = await getTxConf(dataTest)
+    baseLogMessage.tokenName = txConf.tokenName
 
     // randomly choose the recipientAddress if configured
     if (useRandomRecipient === 'true') {
@@ -581,40 +607,24 @@ export const simulateClient = async (
       baseLogMessage.recipient = recipientAddressFinal
     }
 
-    let feeCurrency, txOptions
+    let txOptions
+    const feeCurrency = await getFeeCurrency(kit, txConf.feeCurrencyGold, baseLogMessage)
+
+    baseLogMessage.feeCurrency = feeCurrency
     try {
-      feeCurrency = feeCurrencyGold ? '' : await kit.registry.addressFor(CeloContract.StableToken)
-    } catch (error: any) {
-      tracerLog({
-        tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
-        error: error.toString(),
-        ...baseLogMessage,
-      })
-    }
-
-    try {
-      baseLogMessage.feeCurrency = feeCurrency
-
-      const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
-
-      const gasPriceBase = feeCurrency
-        ? await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
-        : await gasPriceMinimum.gasPriceMinimum()
-      let gasPrice = new BigNumber(gasPriceBase).times(2).dp(0)
+      let gasPrice = await getGasPrice(kit, feeCurrency)
 
       // Check if last tx was mined. If not, reuse the same nonce
-      if (lastTx === '' || lastNonce === -1) {
-        nonce = await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')
-      } else if ((await kit.connection.getTransactionReceipt(lastTx))?.blockNumber) {
-        nonce = await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')
-      } else {
-        nonce = (await kit.web3.eth.getTransactionCount(kit.defaultAccount, 'latest')) - 1
-        gasPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.15)).dp(0)
-        console.warn(
-          `TX ${lastTx} was not mined. Replacing tx reusing nonce ${nonce} and gasPrice ${gasPrice}`
-        )
-      }
-
+      const nonceResult = await getNonce(
+        kit,
+        kit.defaultAccount,
+        lastTx,
+        lastNonce,
+        gasPrice,
+        lastGasPriceMinimum
+      )
+      nonce = nonceResult.nonce
+      gasPrice = nonceResult.newPrice
       lastGasPriceMinimum = gasPrice
       txOptions = {
         gasPrice: gasPrice.toString(),
@@ -628,10 +638,18 @@ export const simulateClient = async (
         ...baseLogMessage,
       })
     }
-
+    const dataStr = dataTest ? getBigData(244750) : undefined // aim for 1million gas txs
     // We purposely do not use await syntax so we sleep after sending the transaction,
     // not after processing a transaction's result
-    await transferFn(kit, senderAddress, recipientAddressFinal, LOAD_TEST_TRANSFER_WEI, txOptions)
+    await txConf
+      .transferFn(
+        kit,
+        senderAddress,
+        recipientAddressFinal,
+        LOAD_TEST_TRANSFER_WEI,
+        dataStr,
+        txOptions
+      )
       .then(async (txResult: TransactionResult) => {
         lastTx = await txResult.getHash()
         lastNonce = (await kit.web3.eth.getTransaction(lastTx)).nonce
@@ -646,25 +664,107 @@ export const simulateClient = async (
         )
       })
       .catch((error: any) => {
-        if (
-          typeof error === 'string' &&
-          error.includes('Error: authentication needed: password or unlock')
-        ) {
-          console.warn('Load test transaction failed with locked account:', error)
+        if (transferFnCatch(error, baseLogMessage)) {
           unlockNeeded = true
-        } else {
-          console.error('Load test transaction failed with error:', error)
-          tracerLog({
-            tag: LOG_TAG_TRANSACTION_ERROR,
-            error: error.toString(),
-            ...baseLogMessage,
-          })
         }
       })
     if (sendTransactionTime + txPeriodMs > Date.now()) {
       await sleep(sendTransactionTime + txPeriodMs - Date.now())
     }
   }
+}
+
+const getBigData = (size: number) => {
+  return '0x' + '00'.repeat(size)
+}
+
+const getTxConf = async (dataTest: boolean) => {
+  if (dataTest) {
+    return {
+      feeCurrencyGold: true,
+      tokenName: 'cGLD.L',
+      transferFn: transferCalldata,
+    }
+  }
+
+  // randomly choose which token to use
+  const useGold = Boolean(Math.round(Math.random()))
+  const transferFn = useGold ? transferCeloGold : transferCeloDollars
+  const tokenName = useGold ? 'cGLD' : 'cUSD'
+
+  // randomly choose which gas currency to use
+  const feeCurrencyGold = Boolean(Math.round(Math.random()))
+  return {
+    feeCurrencyGold: feeCurrencyGold,
+    tokenName: tokenName,
+    transferFn: transferFn,
+  }
+}
+
+const getNonce = async (
+  kit: ContractKit,
+  senderAddress: string,
+  lastTx: any,
+  lastNonce: any,
+  gasPrice: BigNumber,
+  lastGasPriceMinimum: BigNumber
+) => {
+  let nonce, newPrice
+  newPrice = gasPrice
+  if (lastTx === '' || lastNonce === -1) {
+    nonce = await kit.web3.eth.getTransactionCount(senderAddress, 'latest')
+  } else if ((await kit.connection.getTransactionReceipt(lastTx))?.blockNumber) {
+    nonce = await kit.web3.eth.getTransactionCount(senderAddress, 'latest')
+  } else {
+    nonce = (await kit.web3.eth.getTransactionCount(senderAddress, 'latest')) - 1
+    newPrice = BigNumber.max(gasPrice.toNumber(), lastGasPriceMinimum.times(1.15)).dp(0)
+    console.warn(
+      `TX ${lastTx} was not mined. Replacing tx reusing nonce ${nonce} and gasPrice ${gasPrice}`
+    )
+  }
+  return {
+    newPrice: newPrice,
+    nonce: nonce,
+  }
+}
+
+const transferFnCatch = (error: any, baseLogMessage: any) => {
+  let unlockNeeded = false
+  if (
+    typeof error === 'string' &&
+    error.includes('Error: authentication needed: password or unlock')
+  ) {
+    console.warn('Load test transaction failed with locked account:', error)
+    unlockNeeded = true
+  } else {
+    console.error('Load test transaction failed with error:', error)
+    tracerLog({
+      tag: LOG_TAG_TRANSACTION_ERROR,
+      error: error.toString(),
+      ...baseLogMessage,
+    })
+  }
+  return unlockNeeded
+}
+
+const getFeeCurrency = async (kit: ContractKit, feeCurrencyGold: boolean, baseLogMessage: any) => {
+  try {
+    return feeCurrencyGold ? '' : await kit.registry.addressFor(CeloContract.StableToken)
+  } catch (error: any) {
+    tracerLog({
+      tag: LOG_TAG_CONTRACT_ADDRESS_ERROR,
+      error: error.toString(),
+      ...baseLogMessage,
+    })
+  }
+}
+
+const getGasPrice = async (kit: ContractKit, feeCurrency?: string) => {
+  const gasPriceMinimum = await kit.contracts.getGasPriceMinimum()
+  const gasPriceBase = feeCurrency
+    ? await gasPriceMinimum.getGasPriceMinimum(feeCurrency)
+    : await gasPriceMinimum.gasPriceMinimum()
+  return new BigNumber(gasPriceBase).times(2).dp(0)
 }
 
 export const onLoadTestTxResult = async (
