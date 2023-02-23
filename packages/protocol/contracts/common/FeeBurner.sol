@@ -23,6 +23,8 @@ import "../uniswap/interfaces/IUniswapV2PairMin.sol";
 
 contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContract, Freezable {
   using SafeMath for uint256;
+
+  uint256 constant MAX_TIMESTAMP_BLOCK_EXCHANGE = 20;
   using FixidityLib for FixidityLib.Fraction;
 
   // Min units that can be burned
@@ -337,7 +339,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
         minAmount,
         path,
         address(this),
-        block.timestamp + 20
+        block.timestamp + MAX_TIMESTAMP_BLOCK_EXCHANGE
       );
 
       pastBurn[tokenAddress] = pastBurn[tokenAddress].add(balanceToBurn);
