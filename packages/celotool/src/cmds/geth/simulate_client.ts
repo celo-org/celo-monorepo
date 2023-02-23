@@ -62,7 +62,7 @@ export const builder = () => {
       description: 'Use the same client for all the threads/accounts',
       default: false,
     })
-    .options('daat-test', {
+    .options('data-test', {
       type: 'boolean',
       description: 'Use big call data txs',
       default: false,
