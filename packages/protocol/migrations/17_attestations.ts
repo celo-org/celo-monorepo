@@ -5,7 +5,9 @@ import {
   getDeployedProxiedContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { AttestationsInstance, StableTokenInstance } from 'types'
+import { AttestationsInstance } from 'types'
+import { StableTokenInstance } from 'types-mento'
+
 const initializeArgs = async (): Promise<[string, string, string, string, string[], string[]]> => {
   const stableToken: StableTokenInstance = await getDeployedProxiedContract<StableTokenInstance>(
     'StableToken',
