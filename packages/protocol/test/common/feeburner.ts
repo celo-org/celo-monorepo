@@ -36,7 +36,7 @@ const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
 const spread = toFixed(3 / 1000)
 const reserveFraction = toFixed(5 / 100)
 const maxSlippage = toFixed(1 / 100)
-const initialReserveBalance = new BigNumber(10000000000000000000000)
+const initialReserveBalance = new BigNumber("10000000000000000000000")
 
 const FeeBurner: FeeBurnerContract = artifacts.require('FeeBurner')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -288,7 +288,7 @@ contract('FeeBurner', (accounts: string[]) => {
       await assertRevert(feeBurner.burnMentoTokens())
     })
 
-    it('burns with balance', async () => {
+    it('burns contract balance', async () => {
       await stableToken.transfer(feeBurner.address, await stableToken.balanceOf(user), {
         from: user,
       })
@@ -360,7 +360,7 @@ contract('FeeBurner', (accounts: string[]) => {
     })
   })
 
-  describe('#burnNonMentoAssets() (if this fails with "revert" please read comments of this tests, read comment of this test)', () => {
+  describe('#burnNonMentoAssets() (if this fails with "revert" please read comments of this tests)', () => {
     // Uniswap can get the address of a pair by using an init code pair hash. Unfortunately, this hash is harcoded
     // in the file UniswapV2Library.sol. The hash writen now there is meant to run in the CI. If you're seeing this problem you can
     // 1. Skip these tests locally, as they will run in the CI anyway or
@@ -420,7 +420,7 @@ contract('FeeBurner', (accounts: string[]) => {
     it('Burns non-Mento tokens', async () => {
       await tokenA.mint(user, new BigNumber(10e18))
 
-      // safety check, check that the balance is no empty before the burn
+      // safety check, check that the balance is not empty before the burn
       await assertGtBN(await tokenA.balanceOf(feeBurner.address), 0)
       await feeBurner.burnNonMentoTokens()
 
