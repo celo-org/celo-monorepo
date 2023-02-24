@@ -36,7 +36,7 @@ const stableAmountForRate = new BigNumber(2).times(goldAmountForRate)
 const spread = toFixed(3 / 1000)
 const reserveFraction = toFixed(5 / 100)
 const maxSlippage = toFixed(1 / 100)
-const initialReserveBalance = new BigNumber("10000000000000000000000")
+const initialReserveBalance = new BigNumber('10000000000000000000000')
 
 const FeeBurner: FeeBurnerContract = artifacts.require('FeeBurner')
 const Registry: RegistryContract = artifacts.require('Registry')
@@ -214,7 +214,7 @@ contract('FeeBurner', (accounts: string[]) => {
       assertEqualBN(await feeBurner.maxSlippage(tokenA.address), toFixed(1))
       assertEqualBN(await feeBurner.dailyBurnLimit(stableToken.address), new BigNumber(1000000e18))
       assertEqualBN(await feeBurner.dailyBurnLimit(tokenA.address), new BigNumber(1000001e18))
-      expect((await feeBurner.getRouterForToken(tokenA.address)).toString()).to.equal(
+      expect((await feeBurner.getRoutersForToken(tokenA.address)).toString()).to.equal(
         [uniswap.address].toString()
       )
       expect(await feeBurner.routerAddresses(tokenA.address, 0)).to.equal(uniswap.address)
@@ -241,7 +241,9 @@ contract('FeeBurner', (accounts: string[]) => {
   describe('#removeRouter()', () => {
     it('removes a token', async () => {
       await feeBurner.removeRouter(tokenA.address, uniswap.address, 0)
-      expect((await feeBurner.getRouterForToken(tokenA.address)).toString()).to.equal([].toString())
+      expect((await feeBurner.getRoutersForToken(tokenA.address)).toString()).to.equal(
+        [].toString()
+      )
     })
 
     it('removes when list is big', async () => {
@@ -249,7 +251,7 @@ contract('FeeBurner', (accounts: string[]) => {
       await feeBurner.setRouter(tokenA.address, stableToken.address)
       // list for token should be [uniswap, exchange, stabletoken]
       await feeBurner.removeRouter(tokenA.address, exchange.address, 1)
-      expect((await feeBurner.getRouterForToken(tokenA.address)).toString()).to.equal(
+      expect((await feeBurner.getRoutersForToken(tokenA.address)).toString()).to.equal(
         [uniswap.address, stableToken.address].toString()
       )
     })

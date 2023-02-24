@@ -143,6 +143,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   }
 
   function _setRouter(address token, address router) private {
+    require(router != address(0), "Router can't be address zero");
     routerAddresses[token].push(router);
     emit RouterAddressSet(token, router);
   }
@@ -167,7 +168,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     * @param token The address of the token to query.
     * @return An array of all the allowed router.
     */
-  function getRouterForToken(address token) external view returns (address[] memory) {
+  function getRoutersForToken(address token) external view returns (address[] memory) {
     return routerAddresses[token];
   }
 
@@ -310,6 +311,9 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
       path[0] = tokenAddress;
       path[1] = celoAddress;
 
+      // using the second return value becuase it's the last argument
+      // the previous values show how many tokens are exchanged in each path
+      // so the first value would be equivalent to balanceToBurn
       uint256 wouldGet = router.getAmountsOut(balanceToBurn, path)[1];
       emit ReceivedQuote(poolAddress, wouldGet);
       if (wouldGet > bestRouterQuote) {
@@ -319,39 +323,38 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
     }
 
     // don't try to exchange on zero quotes
-    if (bestRouterQuote > 0) {
-      address bestRouterAddress = thisTokenRouterAddresses[bestRouterIndex];
-      IUniswapV2RouterMin bestRouter = IUniswapV2RouterMin(bestRouterAddress);
-
-      uint256 minAmount = 0;
-      if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
-        address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(
-          tokenAddress,
-          celoAddress
-        );
-        minAmount = calculateMinAmount(
-          token.balanceOf(pair),
-          getGoldToken().balanceOf(pair),
-          tokenAddress,
-          balanceToBurn
-        );
-      }
-
-      token.approve(bestRouterAddress, balanceToBurn);
-      bestRouter.swapExactTokensForTokens(
-        balanceToBurn,
-        minAmount,
-        path,
-        address(this),
-        block.timestamp + MAX_TIMESTAMP_BLOCK_EXCHANGE
-      );
-
-      pastBurn[tokenAddress] = pastBurn[tokenAddress].add(balanceToBurn);
-      updateLimits(tokenAddress, balanceToBurn);
-
-      emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
-      emit RouterUsed(bestRouterAddress);
+    if (bestRouterQuote == 0) {
+      return;
     }
+
+    address bestRouterAddress = thisTokenRouterAddresses[bestRouterIndex];
+    IUniswapV2RouterMin bestRouter = IUniswapV2RouterMin(bestRouterAddress);
+
+    uint256 minAmount = 0;
+    if (FixidityLib.unwrap(maxSlippage[tokenAddress]) != 0) {
+      address pair = IUniswapV2FactoryMin(bestRouter.factory()).getPair(tokenAddress, celoAddress);
+      minAmount = calculateMinAmount(
+        token.balanceOf(pair),
+        getGoldToken().balanceOf(pair),
+        tokenAddress,
+        balanceToBurn
+      );
+    }
+
+    token.approve(bestRouterAddress, balanceToBurn);
+    bestRouter.swapExactTokensForTokens(
+      balanceToBurn,
+      minAmount,
+      path,
+      address(this),
+      block.timestamp + MAX_TIMESTAMP_BLOCK_EXCHANGE
+    );
+
+    pastBurn[tokenAddress] = pastBurn[tokenAddress].add(balanceToBurn);
+    updateLimits(tokenAddress, balanceToBurn);
+
+    emit SoldAndBurnedToken(tokenAddress, balanceToBurn);
+    emit RouterUsed(bestRouterAddress);
   }
 
   /**
@@ -388,6 +391,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
       midPriceDenominator
     );
     FixidityLib.Fraction memory amountFraction = FixidityLib.newFixed(amount);
+    FixidityLib.Fraction memory totalAmount = price.multiply(amountFraction);
 
     return
       (price.multiply(amountFraction))
