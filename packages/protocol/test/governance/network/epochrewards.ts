@@ -25,9 +25,8 @@ import {
   MockStableTokenInstance,
   RegistryContract,
   RegistryInstance,
-  ReserveContract,
-  ReserveInstance,
 } from 'types'
+import { ReserveContract, ReserveInstance } from 'types/mento'
 
 const EpochRewards: EpochRewardsTestContract = artifacts.require('EpochRewardsTest')
 const Freezer: FreezerContract = artifacts.require('Freezer')

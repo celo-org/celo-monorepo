@@ -110,6 +110,13 @@ function hasEmptyBytecode(contract: any) {
 function compile(outdir: string) {
   console.log(`protocol: Compiling solidity to ${outdir}`)
 
+  // Build dependencies first
+  // TODO change paths
+  // the reason to generate a different folder is to avoid paths for coliding, which could be very dangerous
+  exec(
+    `yarn run truffle compile --contracts_directory=/Users/martinvol/celo/celo-monorepo/packages/protocol/lib/mento-core/contracts --contracts_build_directory=/Users/martinvol/celo/celo-monorepo/packages/protocol/build/mento`
+  )
+
   exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
 
   for (const contractName of ImplContracts) {
@@ -135,6 +142,11 @@ function generateFilesForTruffle(outdir: string) {
 
   const globPattern = `${BUILD_DIR}/contracts/*.json`
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}" `)
+
+  // Change path
+  const mentoPath = `${BUILD_DIR}/mento/*.json`
+  console.log(`protocol: Generating Truffle (Mento) Types to ${mentoPath}`)
+  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}-mento" "${mentoPath}" `)
 }
 
 async function generateFilesForContractKit(outdir: string) {

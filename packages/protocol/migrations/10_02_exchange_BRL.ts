@@ -7,7 +7,8 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { ExchangeBRLInstance, FreezerInstance, ReserveInstance } from 'types'
+import { FreezerInstance } from 'types'
+import { ExchangeBRLInstance, ReserveInstance } from 'types/mento'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [

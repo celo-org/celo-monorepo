@@ -18,8 +18,6 @@ import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
   ElectionInstance,
-  ExchangeContract,
-  ExchangeInstance,
   FeeCurrencyWhitelistInstance,
   FreezerInstance,
   GoldTokenInstance,
@@ -28,12 +26,16 @@ import {
   GovernanceSlasherInstance,
   LockedGoldInstance,
   RegistryInstance,
+} from 'types'
+import {
+  ExchangeContract,
+  ExchangeInstance,
   ReserveInstance,
   ReserveSpenderMultiSigInstance,
   SortedOraclesInstance,
   StableTokenContract,
   StableTokenInstance,
-} from 'types'
+} from 'types/mento'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
 enum VoteValue {

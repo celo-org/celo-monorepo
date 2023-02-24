@@ -6,8 +6,10 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import { RegistryInstance, ReserveInstance, ReserveSpenderMultiSigInstance } from 'types'
+import { RegistryInstance } from 'types'
+import { ReserveInstance, ReserveSpenderMultiSigInstance } from 'types/mento'
 import Web3 from 'web3'
+
 import Web3Utils = require('web3-utils')
 
 const truffle = require('@celo/protocol/truffle-config.js')

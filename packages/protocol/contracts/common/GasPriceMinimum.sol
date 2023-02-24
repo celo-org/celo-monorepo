@@ -8,7 +8,7 @@ import "./Initializable.sol";
 import "./interfaces/ICeloVersionedContract.sol";
 import "./FixidityLib.sol";
 import "./UsingRegistry.sol";
-import "../../lib/mento-core/contracts/interfaces/ISortedOracles.sol";
+import "../stability/interfaces/ISortedOracles.sol";
 
 /**
  * @title Stores and provides gas price minimum for various currencies.

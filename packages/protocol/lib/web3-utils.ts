@@ -8,8 +8,10 @@ import { privateKeyToAddress } from '@celo/utils/lib/address'
 import { BuildArtifacts } from '@openzeppelin/upgrades'
 import { BigNumber } from 'bignumber.js'
 import prompts from 'prompts'
-import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance, StableTokenInstance } from 'types'
+import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, ProxyContract, ProxyInstance, RegistryInstance } from 'types'
+import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
+
 
 
 export async function sendTransactionWithPrivateKey<T>(

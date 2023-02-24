@@ -1,12 +1,10 @@
-// Deprecated migrations, Mento contracts have been moved to their own repo: https://github.com/mento-protocol/mento-core
-
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import {
   deploymentForProxiedContract,
   transferOwnershipOfProxy,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { ReserveSpenderMultiSigInstance } from 'types'
+import { ReserveSpenderMultiSigInstance } from 'types/mento'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [

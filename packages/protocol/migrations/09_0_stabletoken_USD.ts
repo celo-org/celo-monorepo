@@ -7,13 +7,8 @@ import {
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
-import {
-  FeeCurrencyWhitelistInstance,
-  FreezerInstance,
-  ReserveInstance,
-  SortedOraclesInstance,
-  StableTokenInstance,
-} from 'types'
+import { FeeCurrencyWhitelistInstance, FreezerInstance, SortedOraclesInstance } from 'types'
+import { ReserveInstance, StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
 
 const truffle = require('@celo/protocol/truffle-config.js')

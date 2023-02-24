@@ -19,8 +19,8 @@ import "../identity/interfaces/IAttestations.sol";
 // TODO try to make this paths more resonable
 import "../../lib/mento-core/contracts/interfaces/IExchange.sol";
 import "../../lib/mento-core/contracts/interfaces/IReserve.sol";
-import "../../lib/mento-core/contracts/interfaces/ISortedOracles.sol";
 import "../../lib/mento-core/contracts/interfaces/IStableToken.sol";
+import "../stability/interfaces/ISortedOracles.sol";
 
 contract UsingRegistry is Ownable {
   event RegistrySet(address indexed registryAddress);
