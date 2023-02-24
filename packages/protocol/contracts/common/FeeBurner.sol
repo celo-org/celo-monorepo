@@ -54,8 +54,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   event ReceivedQuote(address router, uint256 quote);
 
   /**
-   * @notice Sets initialized == true on implementation contracts
-   * @param test Set to true to skip implementation initialization
+   * @notice Sets initialized == true on implementation contracts.
+   * @param test Set to true to skip implementation initialisation.
    */
   constructor(bool test) public Initializable(test) {}
 
@@ -65,7 +65,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
    * @param tokens A list of tokens whose parameters should be set.
    * @param newLimits A list of daily burn limits, corresponding with the same order as in the 
       argument tokens.
-   * @param newMaxSlippages a list of max acceptable slippage, corresponding with the same order as 
+   * @param newMaxSlippages A list of max acceptable slippage, corresponding with the same order as 
       in the argument tokens.
    * @param newRouters A list of routers, corresponding with the same order as in the argument 
       tokens.
@@ -150,8 +150,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   /**
     * @notice Allows owner to remove a router for a token.
     * @param token Address of the token.
-    * @param router address of the router to remove.
-    * @param index the index of the router to remove.
+    * @param router Address of the router to remove.
+    * @param index The index of the router to remove.
     */
   function removeRouter(address token, address router, uint256 index) external onlyOwner {
     require(routerAddresses[token][index] == router, "Index does not match");
@@ -180,7 +180,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   }
 
   /**
-    * @param token the address of the token to query.
+    * @param token The address of the token to query.
     * @return The amount burned for a token.
     */
   function getPastBurnForToken(address token) external view returns (uint256) {
@@ -188,8 +188,8 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   }
 
   /**
-    * @param token the address of the token to query.
-    * @param amountToBurn the amount of the token to burn.
+    * @param token The address of the token to query.
+    * @param amountToBurn The amount of the token to burn.
     * @return Returns true if burning amountToBurn would exceed the daily limit.
     */
   function dailyBurnLimitHit(address token, uint256 amountToBurn) public returns (bool) {
@@ -210,7 +210,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
 
   /**
     * @notice Updates the current day limit for a token.
-    * @param token the address of the token to query.
+    * @param token The address of the token to query.
     * @param amountBurned the amount of the token that was burned.
     */
   function updateLimits(address token, uint256 amountBurned) private {
@@ -226,7 +226,7 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   /**
     * @notice Burns the max possible of a Mento token.
     * @dev Should be used in case the loop fails because a swap is reverting or Out of Gas (OOG).
-    * @param tokenAddress the address of the token to burn.
+    * @param tokenAddress The address of the token to burn.
     */
   function burnSingleMentoToken(address tokenAddress) public onlyWhenNotFrozen {
     StableToken stableToken = StableToken(tokenAddress);
@@ -267,10 +267,10 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   }
 
   /**
-    * @notice Burns the max possible of a token.
+    * @notice Burns the max possible amount of a token.
     * @dev Should be used in case the loop fails because one token is reverting or 
     Out of Gas (OOG).
-    * @param tokenAddress the address of the token to burn.
+    * @param tokenAddress The address of the token to burn.
     */
   function burnSingleNonMentoToken(address tokenAddress) public onlyWhenNotFrozen {
     // An improvement to this function would be to allow the user to pass a path as argument
@@ -371,11 +371,11 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
   }
 
   /**
-    * @param midPriceNumerator numerator of the price.
-    * @param midPriceDenominator denominator of the price.
-    * @param tokenAddress the address of the token to query.
-    * @param amount the amount to swap
-    * @return The minimal amount of tokens expected for a swap
+    * @param midPriceNumerator The numerator of the price.
+    * @param midPriceDenominator The denominator of the price.
+    * @param tokenAddress The address of the token to query.
+    * @param amount The amount to swap.
+    * @return The minimal amount of tokens expected for a swap.
     */
   function calculateMinAmount(
     uint256 midPriceNumerator,

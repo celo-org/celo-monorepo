@@ -420,7 +420,7 @@ contract('FeeBurner', (accounts: string[]) => {
     it('Burns non-Mento tokens', async () => {
       await tokenA.mint(user, new BigNumber(10e18))
 
-      // safety check, check that the balance is no empty before the burn
+      // safety check, check that the balance is not empty before the burn
       await assertGtBN(await tokenA.balanceOf(feeBurner.address), 0)
       await feeBurner.burnNonMentoTokens()
 
