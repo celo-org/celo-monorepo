@@ -89,7 +89,7 @@ contract FeeCurrencyWhitelist is
    * @notice Removes a Mento token as enabled fee token. Tokens added with addToken should be 
    * removed with this function.
    * @param tokenAddress The address of the token to remove.
-   * @param index the index of the token in the whitelist array.
+   * @param index The index of the token in the whitelist array.
    */
   function removeToken(address tokenAddress, uint256 index) public onlyOwner {
     require(whitelist[index] == tokenAddress, "Index does not match");
