@@ -109,14 +109,14 @@ contract FeeCurrencyWhitelist is
   }
 
   /**
-   * @return a list of all tokens enabled as gas fee currency
+   * @return a list of all Mento tokens enabled as gas fee currency.
    */
   function getWhitelist() external view returns (address[] memory) {
     return whitelist;
   }
 
   /**
-   * @return a list of all the nonMento tokens enabled as gas fee currency
+   * @return a list of all the non-Mento tokens enabled as gas fee currency.
    */
   function getWhitelistNonMento() external view returns (address[] memory) {
     return nonMentoTokenWhitelist;
