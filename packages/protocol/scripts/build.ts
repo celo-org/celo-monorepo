@@ -113,8 +113,9 @@ function compile(outdir: string) {
   // Build dependencies first
   // TODO change paths
   // the reason to generate a different folder is to avoid paths for coliding, which could be very dangerous
+
   exec(
-    `yarn run truffle compile --contracts_directory=/Users/martinvol/celo/celo-monorepo/packages/protocol/lib/mento-core/contracts --contracts_build_directory=/Users/martinvol/celo/celo-monorepo/packages/protocol/build/mento`
+    `yarn run truffle compile --contracts_directory=./lib/mento-core/contracts --contracts_build_directory=./build/mento`
   )
 
   exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
