@@ -69,6 +69,10 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
       it("Doesn't remove if the index is wrong", async () => {
         await assertRevert(feeCurrencyWhitelist.removeToken(accounts[0], 0))
       })
+
+      it('should not allow a non-owner to remove Mento token', async () => {
+        await assertRevert(feeCurrencyWhitelist.removeToken(accounts[0], 0, { from: nonOwner }))
+      })
     })
 
     describe('#removeNonMentoToken()', () => {
@@ -95,6 +99,12 @@ contract('FeeCurrencyWhitelist', (accounts: string[]) => {
 
       it("Doesn't remove if the index is wrong", async () => {
         await assertRevert(feeCurrencyWhitelist.removeNonMentoToken(accounts[0], 1, 1))
+      })
+
+      it('should not allow a non-owner to remove non-Mento token', async () => {
+        await assertRevert(
+          feeCurrencyWhitelist.removeNonMentoToken(accounts[0], 1, 1, { from: nonOwner })
+        )
       })
     })
   })
