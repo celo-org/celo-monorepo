@@ -304,8 +304,6 @@ contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContr
 
     for (uint256 i = 0; i < thisTokenRouterAddresses.length; i++) {
       address poolAddress = thisTokenRouterAddresses[i];
-
-      require(poolAddress != address(0), "poolAddress should be nonZero");
       IUniswapV2RouterMin router = IUniswapV2RouterMin(poolAddress);
 
       path[0] = tokenAddress;
