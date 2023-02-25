@@ -26,9 +26,9 @@
   },
   "dependencies": {
     "@celo/base": "2.2.1-dev",
-    "@celo/utils": "2.2.1-dev",
     "@celo/contractkit": "2.2.1-dev",
     "@celo/phone-number-privacy-common": "1.0.39",
+    "@celo/utils": "2.2.1-dev",
     "@types/debug": "^4.1.5",
     "bignumber.js": "^9.0.0",
     "blind-threshold-bls": "https://github.com/celo-org/blind-threshold-bls-wasm#e1e2f8a",
@@ -40,11 +40,11 @@
   },
   "devDependencies": {
     "@celo/dev-utils": "0.0.1-dev",
-    "@celo/wallet-local": "2.2.1-dev",
     "@celo/flake-tracker": "0.0.1-dev",
+    "@celo/wallet-local": "2.2.1-dev",
     "@types/elliptic": "^6.4.12",
     "fetch-mock": "9.10.4",
-    "ganache": "^7.4.4"
+    "ganache": "npm:@soloseng/ganache@7.7.5-beta.3"
   },
   "engines": {
     "node": ">=12.9.0"

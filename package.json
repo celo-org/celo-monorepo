@@ -83,10 +83,9 @@
     "typescript-tslint-plugin": "^0.5.4"
   },
   "resolutions": {
-    "@celo/ganache-core": "git+https://github.com/celo-org/ganache-core.git#e7099c4713c415ab24b8056fbf6e1034fa913a8b",
-    "ganache-core": "git+https://github.com/celo-org/ganache-core.git#e7099c4713c415ab24b8056fbf6e1034fa913a8b"
+    "ganache": "npm:@soloseng/ganache@7.7.5-beta.3"
   },
   "dependencies": {
-    "@celo/ganache-core": "git+https://github.com/celo-org/ganache-core.git#e7099c4713c415ab24b8056fbf6e1034fa913a8b"
+  
   }
 }
