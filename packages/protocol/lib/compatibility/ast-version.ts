@@ -1,9 +1,9 @@
 // tslint:disable: max-classes-per-file
-import { Artifact } from '@celo/protocol/lib/compatibility/internal'
-import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersionIndex, DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version'
-import { BuildArtifacts } from '@openzeppelin/upgrades'
-import { isLibrary } from './report'
-const VM = require('ethereumjs-vm').default
+import { Artifact } from '@celo/protocol/lib/compatibility/internal';
+import { ContractVersion, ContractVersionChecker, ContractVersionCheckerIndex, ContractVersionDelta, ContractVersionDeltaIndex, ContractVersionIndex, DEFAULT_VERSION_STRING } from '@celo/protocol/lib/compatibility/version';
+import { BuildArtifacts } from '@openzeppelin/upgrades';
+import { isLibrary } from './report';
+const VM = require('@ethereumjs/vm').default
 const abi = require('ethereumjs-abi')
 
 /**

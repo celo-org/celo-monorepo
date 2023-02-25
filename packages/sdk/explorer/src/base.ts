@@ -8,7 +8,7 @@ export interface ContractDetails {
   jsonInterface: AbiItem[]
 }
 
-export const getContractDetailsFromContract = async (
+export const getContractDetailsFromContract: any = async (
   kit: ContractKit,
   celoContract: CeloContract,
   address?: string
