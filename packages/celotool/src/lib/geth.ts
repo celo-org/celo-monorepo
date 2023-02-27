@@ -482,7 +482,7 @@ export const transferCeloGold = async (
   fromAddress: string,
   toAddress: string,
   amount: BigNumber,
-  dataStr?: string,
+  _?: string,
   txOptions: {
     gas?: number
     gasPrice?: string
@@ -509,7 +509,7 @@ export const transferCeloDollars = async (
   fromAddress: string,
   toAddress: string,
   amount: BigNumber,
-  dataStr?: string,
+  _?: string,
   txOptions: {
     gas?: number
     gasPrice?: string
