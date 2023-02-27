@@ -24,7 +24,7 @@ Running `celotooljs` should give you the output like the following that let's yo
 celotooljs <command>
 
 Commands:
-celotooljs account <accountCommand>     commands for inviting, fauceting,
+celotooljs account <accountCommand>     commands for fauceting,
                                         looking up accounts and users
 celotooljs backup                       command for backing up a miner's
                                         persistent volume (PVC)
@@ -56,11 +56,6 @@ Options:
               (be careful!)                       [boolean] [default: false]
   --help        Show help                                            [boolean]
 ```
-
-### How to Invite Yourself
-
-Run this command:
-`celotooljs account invite --celo-env integration --phone +<YOUR_E164_PHONE_NUMBER>`
 
 ### How to Faucet an Account
 
