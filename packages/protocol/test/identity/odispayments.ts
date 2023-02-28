@@ -13,9 +13,8 @@ import {
   OdisPaymentsContract,
   OdisPaymentsInstance,
   RegistryInstance,
-  StableTokenContract,
-  StableTokenInstance,
 } from 'types'
+import { StableTokenContract, StableTokenInstance } from 'types/mento'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const OdisPayments: OdisPaymentsContract = artifacts.require('OdisPayments')
