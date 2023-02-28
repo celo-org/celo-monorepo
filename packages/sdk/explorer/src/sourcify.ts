@@ -92,7 +92,6 @@ export class Metadata {
           .filter((item) => item.type === 'function')
           .map((item) => {
             const signature = this.abiCoder.encodeFunctionSignature(item)
-            debug(`ABI item ${item.name} has signature ${signature}`)
             return { ...item, signature }
           })
           .map((item) => [item.signature, item])
@@ -116,7 +115,6 @@ export class Metadata {
    * Turn the ABI into a mapping of function selectors to ABI items.
    */
   toContractMapping(): ContractMapping {
-    debug(this.contractName || 'Unknown', Array.from(this.fnMapping.keys()))
     return {
       details: {
         name: this.contractName || 'Unknown',
