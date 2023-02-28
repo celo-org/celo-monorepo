@@ -198,8 +198,6 @@ export class BlockExplorer {
 
     if (contractMapping) {
       const abi = contractMapping.fnMapping.get(selector)
-      debug(selector)
-      debug(Array.from(contractMapping.fnMapping.keys()))
       if (abi) {
         return this.buildCallDetails(contractMapping.details, input, abi)
       } else {
