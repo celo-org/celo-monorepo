@@ -638,9 +638,9 @@ export const simulateClient = async (
         ...baseLogMessage,
       })
     }
-    const dataStr = dataTest ? getBigData(244750) : undefined // aim for 1million gas txs
+    const dataStr = dataTest ? getBigData(119750) : undefined // aim for half million gas txs
     // We purposely do not use await syntax so we sleep after sending the transaction,
-    // not after processing a transaction's result
+    // not after processing a transaction's result. Also running below the 128kb limit from the tx pool
     await txConf
       .transferFn(
         kit,
