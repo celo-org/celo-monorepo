@@ -8,7 +8,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { FreezerInstance } from 'types'
-import { ExchangeInstance } from 'types-mento'
+import { ExchangeInstance } from 'types/mento'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [

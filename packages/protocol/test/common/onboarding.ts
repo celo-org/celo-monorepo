@@ -29,7 +29,7 @@ import {
   ProxyInstance,
   RegistryInstance,
 } from 'types'
-import { StableTokenInstance } from 'types-mento'
+import { StableTokenInstance } from 'types/mento'
 
 const executeMetaTransaction = async (
   signer: string,
