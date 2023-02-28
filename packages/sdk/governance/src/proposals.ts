@@ -134,9 +134,6 @@ export const proposalToJSON = async (
     debug(`updating registry to reflect ${name} => ${address}`)
     await blockExplorer.updateContractDetailsMapping(stripProxy(name), address)
   }
-  const isRegistryContract = (contract: CeloContract) =>
-    RegisteredContracts.includes(stripProxy(contract)) ||
-    (registryAdditions && registryAdditions[stripProxy(contract)] !== undefined)
 
   if (registryAdditions) {
     // Update the registry mapping with registry additions prior to processing the proposal.
@@ -153,15 +150,15 @@ export const proposalToJSON = async (
   const proposalJson: ProposalTransactionJSON[] = []
 
   for (const tx of proposal) {
-    if (isRegistryRepointRaw(abiCoder, tx)) {
-      const args = registryRepointRawArgs(abiCoder, tx)
-      await updateRegistryMapping(args.name, args.address)
-    }
-
     debug(`decoding tx ${JSON.stringify(tx)}`)
     const parsedTx = await blockExplorer.tryParseTx(tx as CeloTxPending)
     if (parsedTx == null) {
       throw new Error(`Unable to parse ${JSON.stringify(tx)} with block explorer`)
+    }
+
+    if (isRegistryRepointRaw(abiCoder, tx) && parsedTx.callDetails.isCoreContract) {
+      const args = registryRepointRawArgs(abiCoder, tx)
+      await updateRegistryMapping(args.name, args.address)
     }
 
     const jsonTx: ProposalTransactionJSON = {
@@ -172,19 +169,16 @@ export const proposalToJSON = async (
       value: parsedTx.tx.value,
     }
 
+    debug(jsonTx)
+
     if (isProxySetFunction(jsonTx)) {
-      if (jsonTx.contract.match(/Proxy/) == null) {
-        jsonTx.contract = suffixProxy(jsonTx.contract)
-      }
+      jsonTx.contract = suffixProxy(jsonTx.contract)
       blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
     } else if (isProxySetAndInitFunction(jsonTx)) {
       blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
       let initAbi
-      if (isRegistryContract(jsonTx.contract)) {
-        if (jsonTx.contract.match(/Proxy/) == null) {
-          jsonTx.contract = suffixProxy(jsonTx.contract)
-        }
-
+      if (parsedTx.callDetails.isCoreContract) {
+        jsonTx.contract = suffixProxy(jsonTx.contract)
         initAbi = getInitializeAbiOfImplementation(jsonTx.contract as any)
       } else {
         const implAddress = jsonTx.args[0]
@@ -207,15 +201,15 @@ export const proposalToJSON = async (
       }
     } else if (isGovernanceConstitutionSetter(jsonTx)) {
       const [address, functionId, threshold] = jsonTx.args
-      const result = await blockExplorer.getContractMethodAbi(address, functionId)
-      if (result === null) {
+      const contractMapping = await blockExplorer.getContractMapping(address, functionId)
+      if (contractMapping === undefined) {
         throw new Error(
           `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
         )
       }
       jsonTx.params![`setConstitution[${address}][${functionId}]`] = {
-        contract: result.contract,
-        method: result.abi.name,
+        contract: contractMapping.details.name,
+        method: contractMapping.fnMapping.get(functionId)?.name,
         threshold: fromFixed(new BigNumber(threshold)),
       }
     }

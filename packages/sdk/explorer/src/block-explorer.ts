@@ -1,12 +1,4 @@
-import {
-  ABIDefinition,
-  AbiItem,
-  Address,
-  Block,
-  CeloTxPending,
-  parseDecodedParams,
-  signatureToAbiDefinition,
-} from '@celo/connect'
+import { ABIDefinition, Address, Block, CeloTxPending, parseDecodedParams } from '@celo/connect'
 import { CeloContract, ContractKit } from '@celo/contractkit'
 import { PROXY_ABI } from '@celo/contractkit/lib/proxy'
 import { fromFixed } from '@celo/utils/lib/fixidity'
@@ -14,16 +6,19 @@ import BigNumber from 'bignumber.js'
 import debugFactory from 'debug'
 import {
   ContractDetails,
+  ContractMapping,
   getContractDetailsFromContract,
   mapFromPairs,
   obtainKitContractDetails,
 } from './base'
-import { fetchMetadata } from './sourcify'
+import { fetchMetadata, tryGetProxyImplementation } from './sourcify'
 
 const debug = debugFactory('kit:explorer:block')
 
 export interface CallDetails {
   contract: string
+  contractAddress: Address
+  isCoreContract: boolean
   function: string
   paramMap: Record<string, any>
   argList: any[]
@@ -37,17 +32,6 @@ export interface ParsedTx {
 export interface ParsedBlock {
   block: Block
   parsedTx: ParsedTx[]
-}
-
-interface ContractMapping {
-  details: ContractDetails
-  fnMapping: Map<string, ABIDefinition>
-}
-
-interface ContractNameAndMethodAbi {
-  abi: ABIDefinition
-  contract: string
-  contractName?: string
 }
 
 export async function newBlockExplorer(kit: ContractKit) {
@@ -79,12 +63,13 @@ export class BlockExplorer {
     try {
       const cd = await getContractDetailsFromContract(this.kit, name, address)
       this.addressMapping.set(cd.address, getContractMappingFromDetails(cd))
-    } catch (e) {
-      console.warn('Could not update contract details mapping for ${name} at ${address}')
+    } catch {
+      debug("Couldn't update contract details for %s at %s", name, address)
     }
   }
 
   async setProxyOverride(proxyAddress: Address, implementationAddress: Address) {
+    debug('Setting proxy override for %s to %s', proxyAddress, implementationAddress)
     this.proxyImplementationOverride.set(proxyAddress, implementationAddress)
   }
 
@@ -132,113 +117,25 @@ export class BlockExplorer {
     }
   }
 
-  getContractMethodAbiFromCore = (
-    address: string,
-    selector: string
-  ): ContractNameAndMethodAbi | null => {
-    const contractMapping = this.addressMapping.get(address)
-    if (contractMapping) {
-      const abi = contractMapping.fnMapping.get(selector)
-      if (abi) {
-        return {
-          contract: contractMapping.details.name,
-          abi,
-        }
-      } else {
-        console.warn(
-          `Function with signature ${selector} not found in contract ${contractMapping.details.name}(${address})`
-        )
-      }
-    }
-
-    return null
+  getContractMappingFromSourcify = async (
+    address: string
+  ): Promise<ContractMapping | undefined> => {
+    const metadata = await fetchMetadata(this.kit.connection, address)
+    return metadata?.toContractMapping()
   }
 
-  getContractMethodAbiFromSourcify = async (
-    address: string,
-    selector: string
-  ): Promise<ContractNameAndMethodAbi | null> => {
-    let metadata = await fetchMetadata(this.kit.connection, address)
-    let abi: AbiItem | null = null
-    let contractName: string | null = null
-
-    if (metadata && metadata.abi) {
-      contractName = metadata.contractName
-      abi = metadata.abiForSelector(selector)
-
-      if (abi === null) {
-        let implAddress = this.proxyImplementationOverride.get(address) || null
-        if (implAddress === null) {
-          implAddress = await metadata.tryGetProxyImplementation()
-        }
-
-        if (implAddress) {
-          metadata = await fetchMetadata(this.kit.connection, implAddress)
-          if (metadata && metadata.abi) {
-            abi = metadata?.abiForSelector(selector)
-            contractName = metadata?.contractName
-          }
-        }
-      }
-    }
-
-    if (abi !== null) {
-      return {
-        abi: {
-          ...abi,
-          signature: selector,
-        },
-        contract: contractName ? `${contractName}(${address})` : `Unknown(${address})`,
-      }
-    }
-
-    return null
-  }
-
-  getContractMethodAbiFallback = (
-    address: string,
-    selector: string
-  ): ContractNameAndMethodAbi | null => {
-    // TODO(bogdan): This could be replaced with a call to 4byte.directory
-    // or a local database of common functions.
-    const knownFunctions: { [k: string]: string } = {
-      '0x095ea7b3': 'approve(address to, uint256 value)',
-      '0x4d49e87d': 'addLiquidity(uint256[] amounts, uint256 minLPToMint, uint256 deadline)',
-    }
-    const signature = knownFunctions[selector]
-    if (signature) {
-      return {
-        abi: signatureToAbiDefinition(signature),
-        contract: `Unknown(${address})`,
-      }
-    }
-    return null
-  }
-
-  getContractMethodAbi = async (
-    address: string,
-    selector: string
-  ): Promise<ContractNameAndMethodAbi | null> => {
-    let resp = this.getContractMethodAbiFromCore(address, selector)
-    if (resp !== null) {
-      return resp
-    }
-
-    resp = await this.getContractMethodAbiFromSourcify(address, selector)
-    if (resp !== null) {
-      return resp
-    }
-    return this.getContractMethodAbiFallback(address, selector)
-  }
-
-  buildCallDetails(contract: string, abi: ABIDefinition, input: string): CallDetails {
+  buildCallDetails(
+    contract: ContractDetails,
+    input: string,
+    methodABI: ABIDefinition
+  ): CallDetails {
     const encodedParameters = input.slice(10)
     const { args, params } = parseDecodedParams(
-      this.kit.connection.getAbiCoder().decodeParameters(abi.inputs!, encodedParameters)
+      this.kit.connection.getAbiCoder().decodeParameters(methodABI.inputs!, encodedParameters)
     )
 
     // transform numbers to big numbers in params
-    abi.inputs!.forEach((abiInput, idx) => {
+    methodABI.inputs!.forEach((abiInput, idx) => {
       if (abiInput.type === 'uint256') {
         debug('transforming number param')
         params[abiInput.name] = new BigNumber(args[idx])
@@ -254,19 +151,62 @@ export class BlockExplorer {
       })
 
     return {
-      contract,
-      function: abi.name!,
+      contract: contract.name,
+      contractAddress: contract.address,
+      isCoreContract: contract.isCore,
+      function: methodABI.name!,
       paramMap: params,
       argList: args,
     }
   }
 
+  async getContractMapping(
+    address: string,
+    selector: string
+  ): Promise<ContractMapping | undefined> {
+    const fromCore = async (address: Address) => {
+      return this.addressMapping.get(address)
+    }
+
+    const fromSourcify = async (address: Address) => {
+      return this.getContractMappingFromSourcify(address)
+    }
+
+    const fromSourcifyAsProxy = async (address: Address) => {
+      let implAddress = await tryGetProxyImplementation(this.kit.connection, address)
+      if (this.proxyImplementationOverride.has(address)) {
+        implAddress = this.proxyImplementationOverride.get(address)
+      }
+      if (implAddress) {
+        return this.getContractMappingFromSourcify(implAddress)
+      }
+    }
+
+    const strategies = [fromCore, fromSourcify, fromSourcifyAsProxy]
+
+    for (let strategy of strategies) {
+      const contractDetails = await strategy(address)
+      if (contractDetails && contractDetails.fnMapping.get(selector)) {
+        return contractDetails
+      }
+    }
+  }
+
   async tryParseTxInput(address: string, input: string): Promise<CallDetails | null> {
     const selector = input.slice(0, 10)
-    const resp = await this.getContractMethodAbi(address, selector)
+    const contractMapping = await this.getContractMapping(address, selector)
 
-    if (resp !== null) {
-      return this.buildCallDetails(resp.contract, resp.abi, input)
+    if (contractMapping) {
+      const abi = contractMapping.fnMapping.get(selector)
+      debug(selector)
+      debug(Array.from(contractMapping.fnMapping.keys()))
+      if (abi) {
+        return this.buildCallDetails(contractMapping.details, input, abi)
+      } else {
+        console.warn(
+          `Function with signature ${selector} not found in contract ${contractMapping.details.name}(${address})`
+        )
+      }
     }
     return null
   }

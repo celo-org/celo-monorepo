@@ -10,8 +10,12 @@
  *  // do something with it.
  * }
  */
-import { AbiCoder, AbiItem, Address, Connection } from '@celo/connect'
+import { AbiCoder, ABIDefinition, AbiItem, Address, Connection } from '@celo/connect'
 import fetch from 'cross-fetch'
+import debugFactory from 'debug'
+import { ContractMapping, mapFromPairs } from './base'
+
+const debug = debugFactory('kit:explorer:sourcify')
 
 const PROXY_IMPLEMENTATION_GETTERS = [
   '_getImplementation',
@@ -58,19 +62,19 @@ export interface MetadataResponse {
 export class Metadata {
   public abi: AbiItem[] | null = null
   public contractName: string | null = null
+  public fnMapping: Map<string, ABIDefinition> = new Map()
 
   private abiCoder: AbiCoder
   private jsonInterfaceMethodToString: (item: AbiItem) => string
-  private connection: Connection
   private address: Address
 
   constructor(connection: Connection, address: Address, response: any) {
-    this.response = response as MetadataResponse
     this.abiCoder = connection.getAbiCoder()
+
+    this.response = response as MetadataResponse
     // XXX: For some reason this isn't exported as it should be
     // @ts-ignore
     this.jsonInterfaceMethodToString = connection.web3.utils._jsonInterfaceMethodToString
-    this.connection = connection
     this.address = address
   }
 
@@ -83,6 +87,16 @@ export class Metadata {
       value.output.abi.length > 0
     ) {
       this.abi = value.output.abi
+      this.fnMapping = mapFromPairs(
+        (this.abi || [])
+          .filter((item) => item.type === 'function')
+          .map((item) => {
+            const signature = this.abiCoder.encodeFunctionSignature(item)
+            debug(`ABI item ${item.name} has signature ${signature}`)
+            return { ...item, signature }
+          })
+          .map((item) => [item.signature, item])
+      )
     }
 
     if (
@@ -95,6 +109,22 @@ export class Metadata {
       // happen then but defaulting to this for now.
       const contracts = Object.values(value.settings.compilationTarget)
       this.contractName = contracts[0]
+    }
+  }
+
+  /**
+   * Turn the ABI into a mapping of function selectors to ABI items.
+   */
+  toContractMapping(): ContractMapping {
+    debug(this.contractName || 'Unknown', Array.from(this.fnMapping.keys()))
+    return {
+      details: {
+        name: this.contractName || 'Unknown',
+        address: this.address,
+        jsonInterface: this.abi || [],
+        isCore: false,
+      },
+      fnMapping: this.fnMapping,
     }
   }
 
@@ -135,31 +165,6 @@ export class Metadata {
         }) || []
       )
     }
-  }
-
-  /**
-   * Use heuristics to determine if the contract can be a proxy
-   * and extract the implementation.
-   * Available scenarios:
-   * - _getImplementation() exists
-   * - getImplementation() exists
-   * - _implementation() exists
-   * - implementation() exists
-   * @returns the implementation address or null
-   */
-  async tryGetProxyImplementation(): Promise<Address | null> {
-    const proxyContract = new this.connection.web3.eth.Contract(PROXY_ABI, this.address)
-    for (const fn of PROXY_IMPLEMENTATION_GETTERS) {
-      try {
-        return await new Promise((resolve, reject) => {
-          proxyContract.methods[fn]().call().then(resolve).catch(reject)
-        })
-      } catch {
-        continue
-      }
-    }
-
-    return null
   }
 }
 
@@ -206,4 +211,32 @@ async function querySourcify(
     return new Metadata(connection, contract, await resp.json())
   }
   return null
+}
+
+/**
+ * Use heuristics to determine if the contract can be a proxy
+ * and extract the implementation.
+ * Available scenarios:
+ * - _getImplementation() exists
+ * - getImplementation() exists
+ * - _implementation() exists
+ * - implementation() exists
+ * @param connection @celo/connect instance
+ * @param contract the address of the contract to query
+ * @returns the implementation address or null
+ */
+export async function tryGetProxyImplementation(
+  connection: Connection,
+  contract: Address
+): Promise<Address | undefined> {
+  const proxyContract = new connection.web3.eth.Contract(PROXY_ABI, contract)
+  for (const fn of PROXY_IMPLEMENTATION_GETTERS) {
+    try {
+      return await new Promise((resolve, reject) => {
+        proxyContract.methods[fn]().call().then(resolve).catch(reject)
+      })
+    } catch {
+      continue
+    }
+  }
 }
