@@ -6,12 +6,6 @@ if (process.env.CONFIG) {
   dotenv.config({ path: process.env.CONFIG })
 }
 
-export enum envVar {
-  TWILIO_ACCOUNT_AUTH_TOKEN = 'TWILIO_ACCOUNT_AUTH_TOKEN',
-  TWILIO_ACCOUNT_SID = 'TWILIO_ACCOUNT_SID',
-  TWILIO_ADDRESS_SID = 'TWILIO_ADDRESS_SID',
-}
-
 export function fetchEnv(name: string): string {
   if (process.env[name] === undefined || process.env[name] === '') {
     console.error(`ENV var '${name}' was not defined`)
