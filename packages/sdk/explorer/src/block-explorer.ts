@@ -47,6 +47,8 @@ const getContractMappingFromDetails = (cd: ContractDetails) => ({
   ),
 })
 
+const isCoreContract = (contract: string): contract is CeloContract => contract in CeloContract
+
 export class BlockExplorer {
   private addressMapping: Map<Address, ContractMapping>
   private proxyImplementationOverride: Map<Address, Address> = new Map()
@@ -59,12 +61,10 @@ export class BlockExplorer {
     )
   }
 
-  async updateContractDetailsMapping(name: CeloContract, address: string) {
-    try {
+  async updateContractDetailsMapping(name: string, address: string) {
+    if (isCoreContract(name)) {
       const cd = await getContractDetailsFromContract(this.kit, name, address)
       this.addressMapping.set(cd.address, getContractMappingFromDetails(cd))
-    } catch {
-      debug("Couldn't update contract details for %s at %s", name, address)
     }
   }
 

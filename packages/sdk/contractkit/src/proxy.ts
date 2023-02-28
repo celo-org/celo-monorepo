@@ -135,7 +135,7 @@ export const getInitializeAbiOfImplementation = (
 ) => {
   const initializeAbi = initializeAbiMap[proxyContractName]
   if (!initializeAbi) {
-    throw new Error(`initialize method not found on implementation of ${proxyContractName}`)
+    throw new Error(`Initialize method not found on implementation of ${proxyContractName}`)
   }
   return initializeAbi
 }
