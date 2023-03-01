@@ -6,19 +6,19 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 20M
-            cpu: 10m
-          limits:
-            memory: 200Mi
+            memory: 30M
             cpu: 100m
+          limits:
+            memory: 100Mi
+            cpu: 200m
     poolSize: 200
     resources:
       requests:
-        memory: 700M
-        cpu: 0.5
+        memory: 400M
+        cpu: 2
       limits:
-        memory: 1400M
-        cpu: 1
+        memory: 700M
+        cpu: 3
   api:
     autoscaling:
       maxReplicas: 6
@@ -30,15 +30,15 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 20M
-            cpu: 10m
+            memory: 10M
+            cpu: 25m
     poolSize: 25
     resources:
       requests:
-        memory: 600M
+        memory: 300M
         cpu: 0.5
       limits:
-        memory: 1200M
+        memory: 800M
         cpu: 1.2
   web:
     host: explorer.celo.org
@@ -49,22 +49,22 @@ blockscout:
       maxReplicas: 3
       minReplicas: 2
       target:
-        cpu: 70
+        cpu: 85
     db:
       connectionName: celo-testnet-production:us-west1:alfajores2-replica
       proxy:
         resources:
           requests:
-            memory: 20M
+            memory: 10M
             cpu: 10m
     poolSize: 20
     resources:
       requests:
-        memory: 800M
-        cpu: 400m
+        memory: 600M
+        cpu: 150m
       limits:
         memory: 1400M
-        cpu: 1
+        cpu: 0.5
   metadataCrawler:
     enabled: true
     schedule: "*/30 * * * *"  # every 30 minutes
