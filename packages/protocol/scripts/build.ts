@@ -141,13 +141,13 @@ function generateFilesForTruffle(outdir: string) {
   console.log(`protocol: Generating Truffle Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
 
-  const globPattern = `${BUILD_DIR}/contracts/*.json`
-  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}" `)
-
   // Change path
   const mentoPath = `${BUILD_DIR}/mento/*.json`
   console.log(`protocol: Generating Truffle (Mento) Types to ${mentoPath}`)
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}-mento" "${mentoPath}" `)
+
+  const globPattern = `${BUILD_DIR}/contracts/*.json`
+  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}" `)
 }
 
 async function generateFilesForContractKit(outdir: string) {
