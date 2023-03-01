@@ -46,11 +46,14 @@ spec:
         ports:
         - name: http
           containerPort: 3000
+      {{- with .Values.resources.server }}
         resources:
+          {{- toYaml . | nindent 10 }}
+      {{- end }}
           requests:
-            cpu: 100m
-            memory: 250Mi
+            cpu: 15m
+            memory: 110Mi
     {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml . | indent 8 }}
+        {{- toYaml . | nindent 8 }}
     {{- end }}
