@@ -168,6 +168,17 @@ async function generateFilesForContractKit(outdir: string) {
     },
   })
 
+  await tsGenerator(
+    { cwd, loggingLvl: 'info' },
+    new Web3V1Celo({
+      cwd,
+      rawConfig: {
+        files: `${BUILD_DIR}/mento/@(${contractKitContracts.join('|')}).json`,
+        outDir: relativePath, // TODO change this path to a Mento folder, so that they don't get overwritten
+      },
+    })
+  )
+
   await tsGenerator({ cwd, loggingLvl: 'info' }, web3Generator)
 
   exec(`yarn prettier --write "${outdir}/**/*.ts"`)
