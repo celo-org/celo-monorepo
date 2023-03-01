@@ -586,14 +586,11 @@ contract('EpochRewards', (accounts: string[]) => {
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
       await reserve.initialize(
         registry.address,
-        60,
         toFixed(1),
         0,
         0,
         initialAssetAllocationSymbols,
-        initialAssetAllocationWeights,
-        toFixed(0.005),
-        toFixed(2)
+        initialAssetAllocationWeights
       )
       await mockGoldToken.setTotalSupply(totalSupply)
       await web3.eth.sendTransaction({
@@ -1026,14 +1023,11 @@ contract('EpochRewards', (accounts: string[]) => {
       await registry.setAddressFor(CeloContractName.Reserve, reserve.address)
       await reserve.initialize(
         registry.address,
-        60,
         toFixed(1),
         0,
         0,
         initialAssetAllocationSymbols,
-        initialAssetAllocationWeights,
-        toFixed(0.005),
-        toFixed(2)
+        initialAssetAllocationWeights
       )
       await reserve.addToken(mockStableToken.address)
       await mockGoldToken.setTotalSupply(totalSupply)

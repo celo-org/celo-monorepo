@@ -26,7 +26,6 @@ Contract for handling reserve for stable currencies
 * [frozenReserveGoldStartDay](_wrappers_reserve_.reservewrapper.md#frozenreservegoldstartday)
 * [getAssetAllocationSymbols](_wrappers_reserve_.reservewrapper.md#getassetallocationsymbols)
 * [getAssetAllocationWeights](_wrappers_reserve_.reservewrapper.md#getassetallocationweights)
-* [getOrComputeTobinTax](_wrappers_reserve_.reservewrapper.md#getorcomputetobintax)
 * [getOtherReserveAddresses](_wrappers_reserve_.reservewrapper.md#getotherreserveaddresses)
 * [getReserveCeloBalance](_wrappers_reserve_.reservewrapper.md#getreservecelobalance)
 * [getReserveGoldBalance](_wrappers_reserve_.reservewrapper.md#getreservegoldbalance)
@@ -35,7 +34,6 @@ Contract for handling reserve for stable currencies
 * [isOtherReserveAddress](_wrappers_reserve_.reservewrapper.md#isotherreserveaddress)
 * [isSpender](_wrappers_reserve_.reservewrapper.md#isspender)
 * [methodIds](_wrappers_reserve_.reservewrapper.md#methodids)
-* [tobinTaxStalenessThreshold](_wrappers_reserve_.reservewrapper.md#tobintaxstalenessthreshold)
 * [transferGold](_wrappers_reserve_.reservewrapper.md#transfergold)
 
 ### Accessors
@@ -233,24 +231,6 @@ Name | Type |
 
 ___
 
-###  getOrComputeTobinTax
-
-• **getOrComputeTobinTax**: *function* = proxySend(this.connection, this.contract.methods.getOrComputeTobinTax)
-
-*Defined in [packages/sdk/contractkit/src/wrappers/Reserve.ts:40](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L40)*
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *CeloTransactionObject‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
-
-___
-
 ###  getOtherReserveAddresses
 
 • **getOtherReserveAddresses**: *function* = proxyCall(this.contract.methods.getOtherReserveAddresses)
@@ -427,32 +407,6 @@ ___
 *Inherited from [BaseWrapper](_wrappers_basewrapper_.basewrapper.md).[methodIds](_wrappers_basewrapper_.basewrapper.md#methodids)*
 
 *Defined in [packages/sdk/contractkit/src/wrappers/BaseWrapper.ts:68](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/BaseWrapper.ts#L68)*
-
-___
-
-###  tobinTaxStalenessThreshold
-
-• **tobinTaxStalenessThreshold**: *function* = proxyCall(
-    this.contract.methods.tobinTaxStalenessThreshold,
-    undefined,
-    valueToBigNumber
-  )
-
-*Defined in [packages/sdk/contractkit/src/wrappers/Reserve.ts:28](https://github.com/celo-org/celo-monorepo/blob/master/packages/sdk/contractkit/src/wrappers/Reserve.ts#L28)*
-
-Query Tobin tax staleness threshold parameter.
-
-**`returns`** Current Tobin tax staleness threshold.
-
-#### Type declaration:
-
-▸ (...`args`: InputArgs): *Promise‹Output›*
-
-**Parameters:**
-
-Name | Type |
------- | ------ |
-`...args` | InputArgs |
 
 ___
 

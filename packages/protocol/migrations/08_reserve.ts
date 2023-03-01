@@ -12,16 +12,13 @@ import Web3Utils = require('web3-utils')
 
 const truffle = require('@celo/protocol/truffle-config.js')
 
-const initializeArgs = async (): Promise<
-  [string, number, string, number, number, string[], string[], string, string]
-> => {
+const initializeArgs = async (): Promise<[string, string, number, number, string[], string[]]> => {
   const registry: RegistryInstance = await getDeployedProxiedContract<RegistryInstance>(
     'Registry',
     artifacts
   )
   return [
     registry.address,
-    config.reserve.tobinTaxStalenessThreshold,
     config.reserve.dailySpendingRatio,
     0, // frozenGold cannot be set until the reserve us funded
     0, // frozenGold cannot be set until the reserve us funded
@@ -29,8 +26,6 @@ const initializeArgs = async (): Promise<
       Web3Utils.padRight(Web3Utils.utf8ToHex(assetSymbol), 64)
     ),
     config.reserve.assetAllocationWeights.map((assetWeight) => toFixed(assetWeight).toFixed()),
-    config.reserve.tobinTax,
-    config.reserve.tobinTaxReserveRatio,
   ]
 }
 

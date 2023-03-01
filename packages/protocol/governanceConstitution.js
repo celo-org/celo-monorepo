@@ -152,7 +152,6 @@ const DefaultConstitution = {
   Reserve: {
     default: 0.9,
     setRegistry: 0.9,
-    setTobinTaxStalenessThreshold: 0.7,
     setDailySpendingRatio: 0.9,
     setAssetAllocations: 0.7,
     addToken: 0.9,

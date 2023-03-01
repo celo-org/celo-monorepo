@@ -145,9 +145,6 @@ const DefaultConfig = {
     predeployedProxyAddress: '0x000000000000000000000000000000000000ce10',
   },
   reserve: {
-    tobinTaxStalenessThreshold: 100 * YEAR, // Tobin tax turned off to start
-    tobinTax: toFixed(0).toFixed(), // Tobin tax turned off to start
-    tobinTaxReserveRatio: toFixed(0).toFixed(), // Tobin tax turned off to start
     dailySpendingRatio: toFixed(0.05).toFixed(), // 5%
     frozenAssetsStartBalance: null,
     frozenAssetsDays: null,

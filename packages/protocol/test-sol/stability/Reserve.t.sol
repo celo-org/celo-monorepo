@@ -17,7 +17,6 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 
-  event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address indexed token);
   event TokenRemoved(address indexed token, uint256 index);
@@ -27,17 +26,12 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
-  event TobinTaxSet(uint256 value);
-  event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
 
   address constant exchangeAddress = address(0xe7c45fa);
-  uint256 constant tobinTaxStalenessThreshold = 600;
   uint256 constant dailySpendingRatio = 1000000000000000000000000;
   uint256 constant sortedOraclesDenominator = 1000000000000000000000000;
-  uint256 tobinTax = FixidityLib.newFixedFraction(5, 1000).unwrap();
-  uint256 tobinTaxReserveRatio = FixidityLib.newFixedFraction(2, 1).unwrap();
 
   address deployer;
   address rando;
@@ -62,14 +56,11 @@ contract ReserveTest is Test, WithRegistry, TokenHelpers {
 
     reserve.initialize(
       address(registry),
-      tobinTaxStalenessThreshold,
       dailySpendingRatio,
       0,
       0,
       initialAssetAllocationSymbols,
-      initialAssetAllocationWeights,
-      tobinTax,
-      tobinTaxReserveRatio
+      initialAssetAllocationWeights
     );
   }
 }
@@ -78,37 +69,9 @@ contract ReserveTest_initAndSetters is ReserveTest {
   function test_init_setsParameters() public {
     assertEq(reserve.owner(), deployer);
     assertEq(address(reserve.registry()), address(registry));
-    assertEq(reserve.tobinTaxStalenessThreshold(), tobinTaxStalenessThreshold);
 
     vm.expectRevert("contract already initialized");
-    reserve.initialize(address(registry), 0, 0, 0, 0, new bytes32[](0), new uint256[](0), 0, 0);
-  }
-
-  function test_tobinTax() public {
-    uint256 newValue = 123;
-    vm.expectEmit(true, true, true, true, address(reserve));
-    emit TobinTaxSet(newValue);
-    reserve.setTobinTax(newValue);
-    assertEq(reserve.tobinTax(), newValue);
-
-    vm.expectRevert("tobin tax cannot be larger than 1");
-    reserve.setTobinTax(FixidityLib.newFixed(1).unwrap().add(1));
-
-    changePrank(rando);
-    vm.expectRevert("Ownable: caller is not the owner");
-    reserve.setTobinTax(100);
-  }
-
-  function test_tobinTaxReserveRation() public {
-    uint256 newValue = 123;
-    vm.expectEmit(true, true, true, true, address(reserve));
-    emit TobinTaxReserveRatioSet(newValue);
-    reserve.setTobinTaxReserveRatio(newValue);
-    assertEq(reserve.tobinTaxReserveRatio(), newValue);
-
-    changePrank(rando);
-    vm.expectRevert("Ownable: caller is not the owner");
-    reserve.setTobinTaxReserveRatio(100);
+    reserve.initialize(address(registry), 0, 0, 0, new bytes32[](0), new uint256[](0));
   }
 
   function test_dailySpendingRatio() public {
@@ -167,18 +130,6 @@ contract ReserveTest_initAndSetters is ReserveTest {
     changePrank(rando);
     vm.expectRevert("Ownable: caller is not the owner");
     reserve.removeToken(address(0x1234), 0);
-  }
-
-  function test_tobinTaxStalenessThreshold() public {
-    uint256 newThreshold = 1;
-    vm.expectEmit(true, true, true, true, address(reserve));
-    emit TobinTaxStalenessThresholdSet(newThreshold);
-    reserve.setTobinTaxStalenessThreshold(newThreshold);
-    assertEq(reserve.tobinTaxStalenessThreshold(), newThreshold);
-
-    changePrank(rando);
-    vm.expectRevert("Ownable: caller is not the owner");
-    reserve.setTobinTaxStalenessThreshold(newThreshold);
   }
 
   function test_addOtherReserveAddress() public {
@@ -447,68 +398,5 @@ contract ReserveTest_transfers is ReserveTest {
     vm.warp(block.timestamp + 3600 * 24);
     assertEq(reserve.getUnfrozenBalance(), dailyUnlock + 1);
     reserve.transferGold(otherReserveAddress, dailyUnlock);
-  }
-}
-
-contract ReserveTest_tobinTax is ReserveTest {
-  MockStableToken stableToken0;
-  MockStableToken stableToken1;
-
-  function setUp() public {
-    super.setUp();
-
-    bytes32[] memory assetAllocationSymbols = new bytes32[](2);
-    assetAllocationSymbols[0] = bytes32("cGLD");
-    assetAllocationSymbols[1] = bytes32("BTC");
-    uint256[] memory assetAllocationWeights = new uint256[](2);
-    assetAllocationWeights[0] = FixidityLib.newFixedFraction(1, 2).unwrap();
-    assetAllocationWeights[1] = FixidityLib.newFixedFraction(1, 2).unwrap();
-
-    reserve.setAssetAllocations(assetAllocationSymbols, assetAllocationWeights);
-
-    stableToken0 = new MockStableToken();
-    sortedOracles.setMedianRate(address(stableToken0), sortedOraclesDenominator.mul(10));
-
-    stableToken1 = new MockStableToken();
-    sortedOracles.setMedianRate(address(stableToken1), sortedOraclesDenominator.mul(10));
-
-    reserve.addToken(address(stableToken0));
-    reserve.addToken(address(stableToken1));
-  }
-
-  function setValues(uint256 reserveBalance, uint256 stableToken0Supply, uint256 stableToken1Supply)
-    internal
-  {
-    deal(address(reserve), reserveBalance);
-    stableToken0.setTotalSupply(stableToken0Supply);
-    stableToken1.setTotalSupply(stableToken1Supply);
-  }
-
-  function getOrComputeTobinTaxFraction() internal returns (uint256) {
-    (uint256 num, uint256 den) = reserve.getOrComputeTobinTax();
-    return FixidityLib.newFixedFraction(num, den).unwrap();
-  }
-
-  function test_getReserveRatio() public {
-    uint256 expected;
-
-    setValues(1000000, 10000, 0);
-    expected = FixidityLib.newFixed(2000000).divide(FixidityLib.newFixed(1000)).unwrap();
-    assertEq(reserve.getReserveRatio(), expected);
-
-    setValues(1000000, 10000, 30000);
-    expected = FixidityLib.newFixed(2000000).divide(FixidityLib.newFixed(4000)).unwrap();
-    assertEq(reserve.getReserveRatio(), expected);
-  }
-
-  function test_tobinTax() public {
-    setValues(1000000, 400000, 500000);
-    assertEq(getOrComputeTobinTaxFraction(), 0);
-    setValues(1000000, 50000000, 50000000);
-    // Is the same unless threshold passed
-    assertEq(getOrComputeTobinTaxFraction(), 0);
-    // Changes
-    vm.warp(block.timestamp + tobinTaxStalenessThreshold);
-    assertEq(getOrComputeTobinTaxFraction(), tobinTax);
   }
 }

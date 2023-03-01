@@ -28,17 +28,8 @@ contract Reserve is
   using FixidityLib for FixidityLib.Fraction;
   using Address for address payable; // prettier-ignore
 
-  struct TobinTaxCache {
-    uint128 numerator;
-    uint128 timestamp;
-  }
-
   mapping(address => bool) public isToken;
   address[] private _tokens;
-  TobinTaxCache public tobinTaxCache;
-  uint256 public tobinTaxStalenessThreshold;
-  uint256 public tobinTax;
-  uint256 public tobinTaxReserveRatio;
   mapping(address => bool) public isSpender;
 
   mapping(address => bool) public isOtherReserveAddress;
@@ -58,7 +49,6 @@ contract Reserve is
   mapping(address => bool) public isExchangeSpender;
   address[] public exchangeSpenderAddresses;
 
-  event TobinTaxStalenessThresholdSet(uint256 value);
   event DailySpendingRatioSet(uint256 ratio);
   event TokenAdded(address indexed token);
   event TokenRemoved(address indexed token, uint256 index);
@@ -68,8 +58,6 @@ contract Reserve is
   event OtherReserveAddressRemoved(address indexed otherReserveAddress, uint256 index);
   event AssetAllocationSet(bytes32[] symbols, uint256[] weights);
   event ReserveGoldTransferred(address indexed spender, address indexed to, uint256 value);
-  event TobinTaxSet(uint256 value);
-  event TobinTaxReserveRatioSet(uint256 value);
   event ExchangeSpenderAdded(address indexed exchangeSpender);
   event ExchangeSpenderRemoved(address indexed exchangeSpender);
 
@@ -100,63 +88,25 @@ contract Reserve is
   /**
    * @notice Used in place of the constructor to allow the contract to be upgradable via proxy.
    * @param registryAddress The address of the registry core smart contract.
-   * @param _tobinTaxStalenessThreshold The initial number of seconds to cache tobin tax value for.
    * @param _spendingRatio The relative daily spending limit for the reserve spender.
    * @param _frozenGold The balance of reserve gold that is frozen.
    * @param _frozenDays The number of days during which the frozen gold thaws.
    * @param _assetAllocationSymbols The symbols of the reserve assets.
    * @param _assetAllocationWeights The reserve asset weights.
-   * @param _tobinTax The tobin tax value as a fixidity fraction.
-   * @param _tobinTaxReserveRatio When to turn on the tobin tax, as a fixidity fraction.
    */
   function initialize(
     address registryAddress,
-    uint256 _tobinTaxStalenessThreshold,
     uint256 _spendingRatio,
     uint256 _frozenGold,
     uint256 _frozenDays,
     bytes32[] calldata _assetAllocationSymbols,
-    uint256[] calldata _assetAllocationWeights,
-    uint256 _tobinTax,
-    uint256 _tobinTaxReserveRatio
+    uint256[] calldata _assetAllocationWeights
   ) external initializer {
     _transferOwnership(msg.sender);
     setRegistry(registryAddress);
-    setTobinTaxStalenessThreshold(_tobinTaxStalenessThreshold);
     setDailySpendingRatio(_spendingRatio);
     setFrozenGold(_frozenGold, _frozenDays);
     setAssetAllocations(_assetAllocationSymbols, _assetAllocationWeights);
-    setTobinTax(_tobinTax);
-    setTobinTaxReserveRatio(_tobinTaxReserveRatio);
-  }
-
-  /**
-   * @notice Sets the number of seconds to cache the tobin tax value for.
-   * @param value The number of seconds to cache the tobin tax value for.
-   */
-  function setTobinTaxStalenessThreshold(uint256 value) public onlyOwner {
-    require(value > 0, "value was zero");
-    tobinTaxStalenessThreshold = value;
-    emit TobinTaxStalenessThresholdSet(value);
-  }
-
-  /**
-   * @notice Sets the tobin tax.
-   * @param value The tobin tax.
-   */
-  function setTobinTax(uint256 value) public onlyOwner {
-    require(FixidityLib.wrap(value).lte(FixidityLib.fixed1()), "tobin tax cannot be larger than 1");
-    tobinTax = value;
-    emit TobinTaxSet(value);
-  }
-
-  /**
-   * @notice Sets the reserve ratio at which the tobin tax sets in.
-   * @param value The reserve ratio at which the tobin tax sets in.
-   */
-  function setTobinTaxReserveRatio(uint256 value) public onlyOwner {
-    tobinTaxReserveRatio = value;
-    emit TobinTaxReserveRatioSet(value);
   }
 
   /**
@@ -426,20 +376,6 @@ contract Reserve is
   }
 
   /**
-   * @notice Returns the tobin tax, recomputing it if it's stale.
-   * @return The numerator - tobin tax amount as a fraction.
-   * @return The denominator - tobin tax amount as a fraction.
-   */
-  function getOrComputeTobinTax() external nonReentrant returns (uint256, uint256) {
-    // solhint-disable-next-line not-rely-on-time
-    if (now.sub(tobinTaxCache.timestamp) > tobinTaxStalenessThreshold) {
-      tobinTaxCache.numerator = uint128(computeTobinTax().unwrap());
-      tobinTaxCache.timestamp = uint128(now); // solhint-disable-line not-rely-on-time
-    }
-    return (uint256(tobinTaxCache.numerator), FixidityLib.fixed1().unwrap());
-  }
-
-  /**
    * @notice Returns the list of stabilized token addresses.
    * @return An array of addresses of stabilized tokens.
    */
@@ -556,22 +492,5 @@ contract Reserve is
         .divide(cgldWeight)
         .divide(FixidityLib.newFixed(stableTokensValueInGold))
         .unwrap();
-  }
-
-  /*
-   * Internal functions
-   */
-
-  /**
-   * @notice Computes a tobin tax based on the reserve ratio.
-   * @return The tobin tax expresesed as a fixidity fraction.
-   */
-  function computeTobinTax() private view returns (FixidityLib.Fraction memory) {
-    FixidityLib.Fraction memory ratio = FixidityLib.wrap(getReserveRatio());
-    if (ratio.gte(FixidityLib.wrap(tobinTaxReserveRatio))) {
-      return FixidityLib.wrap(0);
-    } else {
-      return FixidityLib.wrap(tobinTax);
-    }
   }
 }

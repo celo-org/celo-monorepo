@@ -10,7 +10,6 @@ import {
 } from './BaseWrapper'
 
 export interface ReserveConfig {
-  tobinTaxStalenessThreshold: BigNumber
   frozenReserveGoldStartBalance: BigNumber
   frozenReserveGoldStartDay: BigNumber
   frozenReserveGoldDays: BigNumber
@@ -21,15 +20,6 @@ export interface ReserveConfig {
  * Contract for handling reserve for stable currencies
  */
 export class ReserveWrapper extends BaseWrapper<Reserve> {
-  /**
-   * Query Tobin tax staleness threshold parameter.
-   * @returns Current Tobin tax staleness threshold.
-   */
-  tobinTaxStalenessThreshold = proxyCall(
-    this.contract.methods.tobinTaxStalenessThreshold,
-    undefined,
-    valueToBigNumber
-  )
   dailySpendingRatio = proxyCall(
     this.contract.methods.getDailySpendingRatio,
     undefined,
@@ -37,7 +27,6 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
   )
   isSpender: (account: string) => Promise<boolean> = proxyCall(this.contract.methods.isSpender)
   transferGold = proxySend(this.connection, this.contract.methods.transferGold)
-  getOrComputeTobinTax = proxySend(this.connection, this.contract.methods.getOrComputeTobinTax)
   frozenReserveGoldStartBalance = proxyCall(
     this.contract.methods.frozenReserveGoldStartBalance,
     undefined,
@@ -119,7 +108,6 @@ export class ReserveWrapper extends BaseWrapper<Reserve> {
    */
   async getConfig(): Promise<ReserveConfig> {
     return {
-      tobinTaxStalenessThreshold: await this.tobinTaxStalenessThreshold(),
       frozenReserveGoldStartBalance: await this.frozenReserveGoldStartBalance(),
       frozenReserveGoldStartDay: await this.frozenReserveGoldStartDay(),
       frozenReserveGoldDays: await this.frozenReserveGoldDays(),
