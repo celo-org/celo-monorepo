@@ -6,14 +6,76 @@ geth:
       memory: 3Gi
   validatorResources:
     requests:
-      cpu: 0.5
-      memory: 3000M
+      cpu: 0.2
+      memory: 3G
   txNodeResources:
     requests:
-      cpu: 0.5
+      cpu: 0.4
       memory: 9G
   txNodePrivateResources:
     requests:
-      cpu: 2
-      memory: 8Gi
-
+      cpu: 1.8
+      memory: 6Gi
+  validatorAffinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 99
+          preference:
+            matchExpressions:
+              - key: node.kubernetes.io/instance-type
+                operator: In
+                values:
+                  - n2-highmem-2
+    podAntiAffinity: {}
+      # preferredDuringSchedulingIgnoredDuringExecution:
+      #   - weight: 100
+      #     podAffinityTerm:
+      #       labelSelector:
+      #         matchExpressions:
+      #           - key: component
+      #             operator: In
+      #             values:
+      #               - validators
+      #       topologyKey: kubernetes.io/hostname
+  txNodeAffinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+              - key: node.kubernetes.io/instance-type
+                operator: In
+                values:
+                  - n2-highmem-2
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 99
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: component
+                  operator: In
+                  values:
+                    - tx_nodes
+            topologyKey: kubernetes.io/hostname
+  txNodePrivateAffinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 99
+          preference:
+            matchExpressions:
+              - key: node.kubernetes.io/instance-type
+                operator: In
+                values:
+                  - n2-highcpu-8
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: component
+                  operator: In
+                  values:
+                    - tx_nodes
+            topologyKey: kubernetes.io/hostname

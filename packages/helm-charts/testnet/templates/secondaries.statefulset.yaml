@@ -125,7 +125,7 @@ spec:
               fi
 
               # gives us PROXY_ENODE_URL_PAIR
-              {{- include "celo.proxyenodeurlpair" . | indent 14 }}
+              {{- include "celo.proxyenodeurlpair" . | nindent 14 }}
               echo -n $PROXY_ENODE_URL_PAIR >> /root/.celo/proxyEnodeUrlPairs
 
               PROXY_INDEX=$(( $PROXY_INDEX + 1 ))
@@ -265,6 +265,10 @@ spec:
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
+      {{- with .Values.geth.secondaryAffinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.secondayNodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
