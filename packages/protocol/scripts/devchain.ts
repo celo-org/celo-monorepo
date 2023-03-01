@@ -1,7 +1,7 @@
-import ganache from 'ganache'
 import chalk from 'chalk'
 import { spawn, SpawnOptions } from 'child_process'
 import fs from 'fs-extra'
+import ganache from 'ganache'
 import path from 'path'
 import targz from 'targz'
 import tmp from 'tmp'
@@ -119,39 +119,27 @@ async function startGanache(datadir: string, opts: { verbose?: boolean }) {
       }
 
   const server = ganache.server({
-    default_balance_ether: 200000000,
-    logger: {
-      log: logFn,
-    },
-    network_id: 1101,
-    db_path: datadir,
-    mnemonic: MNEMONIC,
-    gasLimit,
-    allowUnlimitedContractSize: true,
+    logging: { logger: { log: logFn } },
+    database: { dbPath: datadir },
+    wallet: { mnemonic: MNEMONIC, defaultBalance: 200000000 },
+    miner: { blockGasLimit: gasLimit },
+    chain: { networkId: 1101, allowUnlimitedContractSize: true },
   })
 
-  await new Promise<void>((resolve, reject) => {
-    server.listen(8545, async (err) => {
-      if (err) {
-        reject(err)
-      } else {
-        // tslint:disable-next-line: no-console
-        console.log(chalk.red('Ganache STARTED'))
-        // console.log(blockchain)
-        resolve()
-      }
-    })
+  server.listen(8545, async (err) => {
+    if (err) throw err
+
+    console.log(chalk.red('Ganache STARTED'))
   })
 
-  return () =>
-    new Promise<void>(async (resolve, reject) => {
-      try {
-        await server.close()
-        resolve()
-      } catch (e) {
-        reject(e)
-      }
-    })
+  return async () => {
+    try {
+      await server.close()
+      console.log(chalk.red('GANACHE server closed'))
+    } catch (e) {
+      throw e
+    }
+  }
 }
 
 export function execCmd(
