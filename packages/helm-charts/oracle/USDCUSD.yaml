@@ -3,27 +3,32 @@ oracle:
   aggregation:
     mid:
       maxExchangeVolumeShare: 1
-      maxPercentageDeviation: 0.05
-      maxPercentageBidAskSpread: 0.025
-      # minReportPriceChangeThreshold
+      maxPercentageDeviation: 0.01
+      maxPercentageBidAskSpread: 0.005
   metrics:
     enabled: true
     prometheusPort: 9090
   apiRequestTimeoutMs: 5000
   circuitBreakerPriceChangeThreshold: 0.25
+  gasPriceMultiplier: 1.5
   priceSources: "[
       [
         {exchange: 'KRAKEN', symbol: 'USDCUSD', toInvert: false}
       ],
       [
-        {exchange: 'BITSTAMP', symbol: 'USDCUSD', toInvert: false}
+        {exchange: 'BINANCEUS', symbol: 'USDCUSD', toInvert: false}
       ],
       [
-        { exchange: 'GEMINI', symbol: 'USDCUSD', toInvert: false }
+        {exchange: 'COINBASE', symbol: 'USDTUSDC', toInvert: true},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
+      ],
+      [
+        {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
+        {exchange: 'COINBASE', symbol: 'USDTUSD', toInvert: false}
       ]
     ]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
     blockBased:
-      minReportPriceChangeThreshold: 0.005 # 0.5%
+      minReportPriceChangeThreshold: 0.0005 # 0.05%

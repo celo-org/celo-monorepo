@@ -42,6 +42,7 @@ if command -v lsof; then
 fi
 
 echo "- Verify bytecode of the network"
+rm -r build/contracts
 yarn build >> $LOG_FILE
 yarn run truffle exec ./scripts/truffle/verify-bytecode.js --network development --build_artifacts $BUILD_DIR/contracts --librariesFile libraries.json
 
