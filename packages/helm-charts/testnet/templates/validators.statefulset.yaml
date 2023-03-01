@@ -17,7 +17,7 @@ kind: StatefulSet
 metadata:
   name: {{ template "common.fullname" . }}-validators
   labels:
-{{ include "common.standard.labels" .  | indent 4 }}
+    {{- include "common.standard.labels" . | nindent 4 }}
     component: validators
 spec:
   {{- if .Values.geth.ssd_disks }}
@@ -36,29 +36,31 @@ spec:
           storage: {{ .Values.geth.diskSizeGB }}Gi
   {{- end }}
   podManagementPolicy: Parallel
+  {{- with .Values.updateStrategy.validators }}
   updateStrategy:
-{{ toYaml .Values.updateStrategy.validators | indent 4 }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   replicas: {{ .Values.geth.validators }}
   serviceName: validators
   selector:
     matchLabels:
-{{ include "common.standard.labels" .  | indent 6 }}
+      {{- include "common.standard.labels" . | nindent 6 }}
       component: validators
   template:
     metadata:
       labels:
-        {{- include "common.standard.labels" .  | nindent 8 }}
+        {{- include "common.standard.labels" . | nindent 8 }}
         component: validators
         {{- if .Values.extraPodLabels.validators }}
         {{- toYaml .Values.extraPodLabels.validators | nindent 8 }}
         {{- end }}
-{{ if .Values.metrics | default false }}
+      {{- if .Values.metrics | default false }}
       annotations:
-{{ include "common.prometheus-annotations" . | indent 8 }}
-{{- end }}
+        {{- include "common.prometheus-annotations" . | nindent 8 }}
+      {{- end }}
     spec:
       initContainers:
-{{ include "common.conditional-init-genesis-container" .  | indent 6 }}
+      {{- include "common.conditional-init-genesis-container" . | nindent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: Always
@@ -117,9 +119,7 @@ spec:
             # ALL_VALIDATOR_PROXY_IPS would have the form X.X.X.X/X.X.X.X,X.X.X.X
             ALL_VALIDATOR_PROXY_IPS='{{ join "," .Values.geth.proxyIPAddressesPerValidatorArray }}'
             [[ $ALL_VALIDATOR_PROXY_IPS = '<nil>' ]] && ALL_VALIDATOR_PROXY_IPS=''
-
             PROXY_IPS=`echo -n $ALL_VALIDATOR_PROXY_IPS | cut -d ',' -f $((RID + 1))`
-
             # Clear the proxy enode file because it's persisted
             rm -f /root/.celo/proxyEnodeUrlPairs
             # Generate all proxy enode urls and put them into /root/.celo/proxyEnodeUrlPairs
@@ -128,11 +128,9 @@ spec:
               if [ "$PROXY_INDEX" -gt 0 ]; then
                 echo -n "," >> /root/.celo/proxyEnodeUrlPairs
               fi
-
               # gives us PROXY_ENODE_URL_PAIR
               {{- include "celo.proxyenodeurlpair" . | indent 14 }}
               echo -n $PROXY_ENODE_URL_PAIR >> /root/.celo/proxyEnodeUrlPairs
-
               PROXY_INDEX=$(( $PROXY_INDEX + 1 ))
             done
           fi
@@ -154,11 +152,11 @@ spec:
         - name: IP_ADDRESSES
           value: {{ join "/" .Values.geth.validatorsIPAddressArray }}
         - name: BOOTNODE_IP_ADDRESS
-          value: "{{ default "none" .Values.geth.bootnodeIpAddress  }}"
+          value: "{{ default "none" .Values.geth.bootnodeIpAddress }}"
         volumeMounts:
         - name: data
           mountPath: /root/.celo
-{{ include "common.import-geth-account-container" .  | indent 6 }}
+      {{- include "common.import-geth-account-container" . | nindent 6 }}
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -208,12 +206,11 @@ spec:
             ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --etherbase=${ACCOUNT_ADDRESS}"
           fi
 
-{{ include  "common.bootnode-flag-script" . | indent 10 }}
+          {{- include  "common.bootnode-flag-script" . | nindent 10 }}
+          {{- include  "common.geth-add-metrics-pprof-config" . | nindent 10 }}
+          {{- include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | nindent 10 }}
 
-{{ include  "common.geth-add-metrics-pprof-config" . | indent 10 }}
-{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
-
-{{ .Values.geth.validatorExtraSnippet | indent 10 }}
+          {{- .Values.geth.validatorExtraSnippet | nindent 10 }}
 
           exec geth \
             $BOOTNODE_FLAG \
@@ -268,8 +265,11 @@ spec:
         - name: metrics
           containerPort: 6060
         {{- end }}
+        {{- $resources := default .Values.geth.resources .Values.geth.validatorResources -}}
+        {{- with $resources }}
         resources:
-{{ toYaml .Values.geth.resources | indent 10 }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: data
           mountPath: /root/.celo
@@ -277,13 +277,13 @@ spec:
           mountPath: /root/.celo/account
           readOnly: true
       terminationGracePeriodSeconds: {{ .Values.geth.terminationGracePeriodSeconds | default 300 }}
-      {{- if .Values.geth.validatorNodeSelector }}
+      {{- with .Values.geth.validatorNodeSelector }}
       nodeSelector:
-{{ toYaml .Values.geth.validatorNodeSelector | indent 8 }}
+        {{ toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.geth.validatorTolerations }}
+      {{- with .Values.geth.validatorTolerations }}
       tolerations:
-{{ toYaml .Values.geth.validatorTolerations | indent 8 }}
+        {{ toYaml . | nindent 8 }}
       {{- end }}
       volumes:
       - name: data
