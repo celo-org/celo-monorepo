@@ -5,6 +5,7 @@ lib/**/*.js
 lib/**/*.js.map
 
 migrations/**/*.js
+migrations_ts/**/*.js
 migrations_ts/**/*.js.map
 
 scripts/**/*.js
