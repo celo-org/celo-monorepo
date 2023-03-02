@@ -281,6 +281,8 @@ blockscout:
     jsonrpcPublicHttp: ""
   metrics:
     enabled: false
+  affinity: {}
+  nodeSelector: {}
   image:
     repository: gcr.io/celo-testnet/blockscout
     pullPolicy: IfNotPresent
@@ -320,6 +322,3 @@ blockscout:
   domainName: celo-testnet.org
   gcp:
     projectId: celo-testnet-production
-
-affinity: {}
-nodeSelector: {}
