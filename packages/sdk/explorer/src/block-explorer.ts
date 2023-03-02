@@ -160,6 +160,7 @@ export class BlockExplorer {
     }
   }
 
+  // tslint:disable:no-shadowed-variable
   async getContractMapping(
     address: string,
     selector: string
@@ -184,7 +185,7 @@ export class BlockExplorer {
 
     const strategies = [fromCore, fromSourcify, fromSourcifyAsProxy]
 
-    for (let strategy of strategies) {
+    for (const strategy of strategies) {
       const contractDetails = await strategy(address)
       if (contractDetails && contractDetails.fnMapping.get(selector)) {
         return contractDetails

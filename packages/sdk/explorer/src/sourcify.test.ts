@@ -203,7 +203,6 @@ describe('sourcify helpers', () => {
           const callSignature = connection
             .getAbiCoder()
             .encodeFunctionSignature('authorizedBy(address)')
-          console.log(callSignature)
           const abi = contractMetadata.abiForSelector(callSignature)
           expect(abi).toMatchObject({
             constant: true,
