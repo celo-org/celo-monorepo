@@ -248,7 +248,7 @@ describe('sourcify helpers', () => {
       describe('with a non-proxy', () => {
         it('returns null', async () => {
           const result = await tryGetProxyImplementation(connection, address)
-          expect(result).toBeNull()
+          expect(result).toBeUndefined()
         })
       })
     })
