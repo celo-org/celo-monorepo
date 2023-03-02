@@ -15,11 +15,11 @@ geth:
   txNodePrivateResources:
     requests:
       cpu: 1.8
-      memory: 6Gi
+      memory: 4.2Gi
   validatorAffinity:
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 99
+        - weight: 100
           preference:
             matchExpressions:
               - key: node.kubernetes.io/instance-type
@@ -40,7 +40,7 @@ geth:
   txNodeAffinity:
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
+        - weight: 99
           preference:
             matchExpressions:
               - key: node.kubernetes.io/instance-type
@@ -49,7 +49,7 @@ geth:
                   - n2-highmem-2
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 99
+        - weight: 100
           podAffinityTerm:
             labelSelector:
               matchExpressions:
@@ -61,7 +61,7 @@ geth:
   txNodePrivateAffinity:
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 99
+        - weight: 100
           preference:
             matchExpressions:
               - key: node.kubernetes.io/instance-type
@@ -70,12 +70,12 @@ geth:
                   - n2-highcpu-8
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
+        - weight: 99
           podAffinityTerm:
             labelSelector:
               matchExpressions:
                 - key: component
                   operator: In
                   values:
-                    - tx_nodes
+                    - tx_nodes_private
             topologyKey: kubernetes.io/hostname
