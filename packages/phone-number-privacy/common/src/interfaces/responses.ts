@@ -1,60 +1,143 @@
 import * as t from 'io-ts'
-import { Domain, DomainState } from '../domains'
 import {
   DisableDomainRequest,
   DomainQuotaStatusRequest,
   DomainRequest,
   DomainRestrictedSignatureRequest,
-} from './requests'
+  LegacyPnpQuotaRequest,
+  LegacySignMessageRequest,
+  OdisRequest,
+  PhoneNumberPrivacyRequest,
+  PnpQuotaRequest,
+  SignMessageRequest,
+} from '.'
+import { Domain, DomainState } from '../domains'
 
-export interface SignMessageResponse {
-  success: boolean
-  version?: string
-  signature?: string
+// Phone Number Privacy
+export interface PnpQuotaStatus {
+  performedQueryCount: number
+  // all time total quota
+  totalQuota: number
+  blockNumber?: number
+}
+
+const PnpQuotaStatusSchema: t.Type<PnpQuotaStatus> = t.intersection([
+  t.type({
+    performedQueryCount: t.number,
+    totalQuota: t.number,
+  }),
+  t.partial({
+    blockNumber: t.union([t.number, t.undefined]),
+  }),
+])
+
+export interface SignMessageResponseSuccess extends PnpQuotaStatus {
+  success: true
+  version: string
+  signature: string
+  warnings?: string[]
+}
+
+export interface SignMessageResponseFailure {
+  success: false
+  version: string
+  error: string
+  // These fields are occasionally provided by the signer but not the combiner
+  // because the combiner separates failure/success responses before processing states.
+  // => If the signer response fails, then it's irrelevant if that signer returned quota values,
+  // since these won't be used in the quota calculation anyways.
+  // Changing this is more involved; TODO(future) https://github.com/celo-org/celo-monorepo/issues/9826
   performedQueryCount?: number
   totalQuota?: number
   blockNumber?: number
 }
 
-export interface SignMessageResponseFailure extends SignMessageResponse {
+export type SignMessageResponse = SignMessageResponseSuccess | SignMessageResponseFailure
+
+export const SignMessageResponseSchema: t.Type<SignMessageResponse> = t.union([
+  t.intersection([
+    t.type({
+      success: t.literal(true),
+      version: t.string,
+      signature: t.string,
+    }),
+    t.partial({
+      warnings: t.union([t.array(t.string), t.undefined]),
+    }),
+    PnpQuotaStatusSchema,
+  ]),
+  t.intersection([
+    t.type({
+      success: t.literal(false),
+      version: t.string,
+      error: t.string,
+    }),
+    t.partial({
+      performedQueryCount: t.union([t.number, t.undefined]),
+      totalQuota: t.union([t.number, t.undefined]),
+      blockNumber: t.union([t.number, t.undefined]),
+    }),
+  ]),
+])
+
+export interface PnpQuotaResponseSuccess extends PnpQuotaStatus {
+  success: true
+  version: string
+  warnings?: string[]
+}
+
+export interface PnpQuotaResponseFailure {
   success: false
+  version: string
   error: string
 }
 
-export interface SignMessageResponseSuccess extends SignMessageResponse {
-  success: true
-}
+export type PnpQuotaResponse = PnpQuotaResponseSuccess | PnpQuotaResponseFailure
 
-export interface GetQuotaResponse {
-  success: boolean
-  version: string
-  performedQueryCount: number
-  totalQuota: number
-}
+export const PnpQuotaResponseSchema: t.Type<PnpQuotaResponse> = t.union([
+  t.intersection([
+    t.type({
+      success: t.literal(true),
+      version: t.string,
+    }),
+    t.partial({
+      warnings: t.union([t.array(t.string), t.undefined]),
+    }),
+    PnpQuotaStatusSchema,
+  ]),
+  t.type({
+    success: t.literal(false),
+    version: t.string,
+    error: t.string,
+  }),
+])
 
-export interface GetContactMatchesResponse {
-  success: boolean
-  matchedContacts: Array<{
-    phoneNumber: string
-  }>
-  version: string
-}
+// prettier-ignore
+export type PhoneNumberPrivacyResponse<
+  R extends PhoneNumberPrivacyRequest = PhoneNumberPrivacyRequest
+> =
+  | R extends SignMessageRequest | LegacySignMessageRequest ? SignMessageResponse : never
+  | R extends PnpQuotaRequest | LegacyPnpQuotaRequest ? PnpQuotaResponse : never
 
-export interface DomainRestrictedSignatureResponseSuccess {
+// Domains
+
+export interface DomainRestrictedSignatureResponseSuccess<D extends Domain = Domain> {
   success: true
   version: string
   signature: string
+  status: DomainState<D>
 }
 
-export interface DomainRestrictedSignatureResponseFailure {
+export interface DomainRestrictedSignatureResponseFailure<D extends Domain = Domain> {
   success: false
   version: string
   error: string
+  status?: DomainState<D>
 }
 
-export type DomainRestrictedSignatureResponse =
-  | DomainRestrictedSignatureResponseSuccess
-  | DomainRestrictedSignatureResponseFailure
+export type DomainRestrictedSignatureResponse<D extends Domain = Domain> =
+  | DomainRestrictedSignatureResponseSuccess<D>
+  | DomainRestrictedSignatureResponseFailure<D>
 
 export interface DomainQuotaStatusResponseSuccess<D extends Domain = Domain> {
   success: true
@@ -72,9 +155,10 @@ export type DomainQuotaStatusResponse<D extends Domain = Domain> =
   | DomainQuotaStatusResponseSuccess<D>
   | DomainQuotaStatusResponseFailure
 
-export interface DisableDomainResponseSuccess {
+export interface DisableDomainResponseSuccess<D extends Domain = Domain> {
   success: true
   version: string
+  status: DomainState<D>
 }
 
 export interface DisableDomainResponseFailure {
@@ -83,30 +167,40 @@ export interface DisableDomainResponseFailure {
   error: string
 }
 
-export type DisableDomainResponse = DisableDomainResponseSuccess | DisableDomainResponseFailure
+export type DisableDomainResponse<D extends Domain = Domain> =
+  | DisableDomainResponseSuccess<D>
+  | DisableDomainResponseFailure
 
-export type DomainResponse<R extends DomainRequest = DomainRequest> =
-  R extends DomainRestrictedSignatureRequest
-    ? DomainRestrictedSignatureResponse
-    : never | R extends DomainQuotaStatusRequest<infer D>
-    ? DomainQuotaStatusResponse<D>
-    : never | R extends DisableDomainRequest
-    ? DisableDomainResponse
-    : never
+// prettier-ignore
+export type DomainResponse<
+  R extends DomainRequest = DomainRequest
+> =
+  | R extends DomainRestrictedSignatureRequest<infer D> ? DomainRestrictedSignatureResponse<D> : never
+  | R extends DomainQuotaStatusRequest<infer D2> ? DomainQuotaStatusResponse<D2> : never
+  | R extends DisableDomainRequest<infer D3> ? DisableDomainResponse<D3> : never
 
-export const DomainRestrictedSignatureResponseSchema: t.Type<DomainRestrictedSignatureResponse> =
-  t.union([
+export function domainRestrictedSignatureResponseSchema<D extends Domain>(
+  state: t.Type<DomainState<D>>
+): t.Type<DomainRestrictedSignatureResponse<D>> {
+  return t.union([
     t.type({
       success: t.literal(true),
       version: t.string,
       signature: t.string,
+      status: state,
     }),
-    t.type({
-      success: t.literal(false),
-      version: t.string,
-      error: t.string,
-    }),
+    t.intersection([
+      t.type({
+        success: t.literal(false),
+        version: t.string,
+        error: t.string,
+      }),
+      t.partial({
+        status: t.union([state, t.undefined]),
+      }),
+    ]),
   ])
+}
 
 export function domainQuotaStatusResponseSchema<D extends Domain>(
   state: t.Type<DomainState<D>>
@@ -125,14 +219,33 @@ export function domainQuotaStatusResponseSchema<D extends Domain>(
   ])
 }
 
-export const DisableDomainResponseSchema: t.Type<DisableDomainResponse> = t.union([
-  t.type({
-    success: t.literal(true),
-    version: t.string,
-  }),
-  t.type({
-    success: t.literal(false),
-    version: t.string,
-    error: t.string,
-  }),
-])
+export function disableDomainResponseSchema<D extends Domain>(
+  state: t.Type<DomainState<D>>
+): t.Type<DisableDomainResponse<D>> {
+  return t.union([
+    t.type({
+      success: t.literal(true),
+      version: t.string,
+      status: state,
+    }),
+    t.type({
+      success: t.literal(false),
+      version: t.string,
+      error: t.string,
+    }),
+  ])
+}
+
+// General
+
+// prettier-ignore
+export type OdisResponse<R extends OdisRequest = OdisRequest> =
+  | R extends DomainRequest ? DomainResponse<R> : never
+  | R extends PhoneNumberPrivacyRequest ? PhoneNumberPrivacyResponse<R> : never
+
+export type SuccessResponse<R extends OdisRequest = OdisRequest> = OdisResponse<R> & {
+  success: true
+}
+export type FailureResponse<R extends OdisRequest = OdisRequest> = OdisResponse<R> & {
+  success: false
+}

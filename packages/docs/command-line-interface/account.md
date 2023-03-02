@@ -117,39 +117,6 @@ EXAMPLE
 
 _See code: [src/commands/account/claim-account.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-account.ts)_
 
-## `celocli account:claim-attestation-service-url FILE`
-
-Claim the URL of the attestation service and add the claim to a local metadata file
-
-```
-Claim the URL of the attestation service and add the claim to a local metadata file
-
-USAGE
-  $ celocli account:claim-attestation-service-url FILE
-
-ARGUMENTS
-  FILE  Path of the metadata file
-
-OPTIONS
-  --force                                            Ignore URL validity checks
-
-  --from=0xc1912fEE45d61C87Cc5EA59DaE31190FFFFf232d  (required) Address of the account
-                                                     to set metadata for or an
-                                                     authorized signer for the address
-                                                     in the metadata
-
-  --globalHelp                                       View all available global flags
-
-  --url=https://www.celo.org                         (required) The URL you want to
-                                                     claim. Should begin http://
-
-EXAMPLE
-  claim-attestation-service-url ~/metadata.json --url https://test.com/myurl --from
-  0x47e172F6CfB6c7D01C1574fa3E2Be7CC73269D95
-```
-
-_See code: [src/commands/account/claim-attestation-service-url.ts](https://github.com/celo-org/celo-monorepo/tree/master/packages/cli/src/commands/account/claim-attestation-service-url.ts)_
-
 ## `celocli account:claim-domain FILE`
 
 Claim a domain and add the claim to a local metadata file
@@ -303,10 +270,10 @@ _See code: [src/commands/account/create-metadata.ts](https://github.com/celo-org
 
 ## `celocli account:deauthorize`
 
-Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer. Please note that Attestation Services are important to the health of the Celo network, and validators should only use this command when troubleshooting their service is not an option.
+Remove an account's authorized attestation signer role.
 
 ```
-Validators who can no longer serve Attestation Service requests should deauthorize their attestation signer. Please note that Attestation Services are important to the health of the Celo network, and validators should only use this command when troubleshooting their service is not an option.
+Remove an account's authorized attestation signer role.
 
 USAGE
   $ celocli account:deauthorize

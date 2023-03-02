@@ -1,0 +1,3 @@
+lib/
+.env
+.serviceAccountKey.json

@@ -61,7 +61,13 @@ export class IdentityMetadataWrapper {
   }
 
   static fromFile(contractKitOrAccountsWrapper: KitOrAccountsWrapper, path: string) {
-    const { readFileSync } = require('fs')
+    let readFileSync
+    try {
+      const fs = require('fs')
+      readFileSync = fs.readFileSync
+    } catch {
+      console.error('cant read from file in browser or environment without native fs module')
+    }
     return this.fromRawString(contractKitOrAccountsWrapper, readFileSync(path, 'utf-8'))
   }
 

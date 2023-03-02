@@ -36,6 +36,11 @@ geth:
     # limits:
     #   memory: "4Gi"
     #   cpu: "4"
+  validatorResources: {}
+  secondaryResources: {}
+  proxyResources: {}
+  txNodeResources: {}
+  txNodePrivateResources: {}
   ws_port: 8546
   rpc_gascap: 10000000
   validatorExtraSnippet: |
@@ -59,6 +64,7 @@ geth:
   txNodeTolerations: []
   txNodePrivateNodeSelector: {}
   txNodePrivateTolerations: []
+  storageClass: ssd
   maxpeers: 1150
   light:
     maxpeers: 1000
@@ -121,3 +127,10 @@ extraPodLabels:
   txnode_private:
     stack: blockscout
     mode: archive
+
+pvcAnnotations:
+  validator: {}
+  secondary: {}
+  proxy: {}
+  txnode: {}
+  txnode_private: {}

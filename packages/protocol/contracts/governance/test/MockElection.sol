@@ -6,6 +6,7 @@ pragma solidity ^0.5.13;
 contract MockElection {
   mapping(address => bool) public isIneligible;
   mapping(address => bool) public isEligible;
+  mapping(address => bool) public allowedToVoteOverMaxNumberOfGroups;
   address[] public electedValidators;
   uint256 active;
   uint256 total;
@@ -64,6 +65,10 @@ contract MockElection {
 
   function revokePending(address, uint256, address, address, uint256) external returns (bool) {
     return true;
+  }
+
+  function setAllowedToVoteOverMaxNumberOfGroups(address account, bool flag) public {
+    allowedToVoteOverMaxNumberOfGroups[account] = flag;
   }
 
   function forceDecrementVotes(
