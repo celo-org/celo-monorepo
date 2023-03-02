@@ -19,6 +19,16 @@ blockscout:
       limits:
         memory: 700M
         cpu: 3
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+                - key: node.kubernetes.io/instance-type
+                  operator: In
+                  values:
+                    - n2-highcpu-8
   api:
     autoscaling:
       maxReplicas: 3
@@ -40,6 +50,31 @@ blockscout:
       limits:
         memory: 800M
         cpu: 1.2
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+                - key: node.kubernetes.io/instance-type
+                  operator: In
+                  values:
+                    - n2-highmem-2
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 99
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: release
+                    operator: In
+                    values:
+                      - alfajores-blockscout3
+                  - key: component
+                    operator: In
+                    values:
+                      - blockscout-api
+              topologyKey: kubernetes.io/hostname
   web:
     host: explorer.celo.org
     suffix:
@@ -65,6 +100,31 @@ blockscout:
       limits:
         memory: 1400M
         cpu: 0.5
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+                - key: node.kubernetes.io/instance-type
+                  operator: In
+                  values:
+                    - n2-highmem-2
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 99
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: release
+                    operator: In
+                    values:
+                      - alfajores-blockscout3
+                  - key: component
+                    operator: In
+                    values:
+                      - blockscout-api
+              topologyKey: kubernetes.io/hostname
   metadataCrawler:
     enabled: true
     schedule: "*/30 * * * *"  # every 30 minutes
