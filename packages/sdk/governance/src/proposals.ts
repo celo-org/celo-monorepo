@@ -173,9 +173,9 @@ export const proposalToJSON = async (
 
     if (isProxySetFunction(jsonTx)) {
       jsonTx.contract = suffixProxy(jsonTx.contract)
-      blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
+      await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
     } else if (isProxySetAndInitFunction(jsonTx)) {
-      blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
+      await blockExplorer.setProxyOverride(tx.to!, jsonTx.args[0])
       let initAbi
       if (parsedTx.callDetails.isCoreContract) {
         jsonTx.contract = suffixProxy(jsonTx.contract)
