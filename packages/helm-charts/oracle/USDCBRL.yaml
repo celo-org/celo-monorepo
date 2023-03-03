@@ -43,7 +43,7 @@ oracle:
       {exchange: 'WHITEBIT', symbol: 'USDCUSDT', toInvert: false},
       {exchange: 'BITGET', symbol: 'USDTBRL', toInvert: false }
     ],
-  ]"
+   ]"
   minPriceSourceCount: 2
   reportStrategy: BLOCK_BASED
   reporter:
