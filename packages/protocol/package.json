@@ -100,7 +100,7 @@
     "@celo/phone-utils": "3.2.1-dev",
     "@celo/typechain-target-web3-v1-celo": "0.2.0",
     "@celo/typescript": "0.0.1",
-    "@types/bn.js": "4.11.6",
+    "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.1.3",
     "@types/chai-subset": "1.3.3",
     "@types/mathjs": "^4.4.1",
