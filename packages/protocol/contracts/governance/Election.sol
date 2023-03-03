@@ -491,7 +491,6 @@ contract Election is
    * @return The total number of votes cast by an account.
    */
   function getTotalVotesByAccount(address account) external view returns (uint256) {
-    bool allowedToVoteOverMaxNumberOfGroupsForAccount = allowedToVoteOverMaxNumberOfGroups[account];
     address[] memory groups = votes.groupsVotedFor[account];
 
     if (groups.length > maxNumGroupsVotedFor) {
