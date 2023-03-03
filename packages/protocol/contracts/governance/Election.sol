@@ -120,7 +120,7 @@ contract Election is
 
   event ElectableValidatorsSet(uint256 min, uint256 max);
   event MaxNumGroupsVotedForSet(uint256 maxNumGroupsVotedFor);
-  event AllowedToVoteOverMaxNumberOfGroups(address account, bool flag);
+  event AllowedToVoteOverMaxNumberOfGroups(address indexed account, bool flag);
   event ElectabilityThresholdSet(uint256 electabilityThreshold);
   event ValidatorGroupMarkedEligible(address indexed group);
   event ValidatorGroupMarkedIneligible(address indexed group);
@@ -152,7 +152,7 @@ contract Election is
    * @return Patch version of the contract.
    */
   function getVersionNumber() external pure returns (uint256, uint256, uint256, uint256) {
-    return (1, 1, 3, 0);
+    return (1, 1, 3, 1);
   }
 
   /**
