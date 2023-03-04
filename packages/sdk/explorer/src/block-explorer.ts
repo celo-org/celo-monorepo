@@ -117,13 +117,6 @@ export class BlockExplorer {
     }
   }
 
-  getContractMappingFromSourcify = async (
-    address: string
-  ): Promise<ContractMapping | undefined> => {
-    const metadata = await fetchMetadata(this.kit.connection, address)
-    return metadata?.toContractMapping()
-  }
-
   buildCallDetails(
     contract: ContractDetails,
     input: string,
@@ -160,32 +153,38 @@ export class BlockExplorer {
     }
   }
 
-  // tslint:disable:no-shadowed-variable
+  getContractMappingFromCore = async (address: string): Promise<ContractMapping | undefined> => {
+    return this.addressMapping.get(address)
+  }
+
+  getContractMappingFromSourcify = async (
+    address: string
+  ): Promise<ContractMapping | undefined> => {
+    const metadata = await fetchMetadata(this.kit.connection, address)
+    return metadata?.toContractMapping()
+  }
+
+  getContractMappingFromSourcifyAsProxy = async (
+    address: string
+  ): Promise<ContractMapping | undefined> => {
+    let implAddress = await tryGetProxyImplementation(this.kit.connection, address)
+    if (this.proxyImplementationOverride.has(address)) {
+      implAddress = this.proxyImplementationOverride.get(address)
+    }
+    if (implAddress) {
+      return this.getContractMappingFromSourcify(implAddress)
+    }
+  }
+
   async getContractMapping(
     address: string,
     selector: string
   ): Promise<ContractMapping | undefined> {
-    const fromCore = async (address: Address) => {
-      return this.addressMapping.get(address)
-    }
-
-    const fromSourcify = async (address: Address) => {
-      return this.getContractMappingFromSourcify(address)
-    }
-
-    const fromSourcifyAsProxy = async (address: Address) => {
-      let implAddress = await tryGetProxyImplementation(this.kit.connection, address)
-      if (this.proxyImplementationOverride.has(address)) {
-        implAddress = this.proxyImplementationOverride.get(address)
-      }
-      if (implAddress) {
-        return this.getContractMappingFromSourcify(implAddress)
-      }
-    }
-
-    const strategies = [fromCore, fromSourcify, fromSourcifyAsProxy]
-
-    for (const strategy of strategies) {
+    for (const strategy of [
+      this.getContractMappingFromCore,
+      this.getContractMappingFromSourcify,
+      this.getContractMappingFromSourcifyAsProxy,
+    ]) {
       const contractDetails = await strategy(address)
       if (contractDetails && contractDetails.fnMapping.get(selector)) {
         return contractDetails

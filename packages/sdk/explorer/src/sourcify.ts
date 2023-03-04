@@ -12,10 +12,7 @@
  */
 import { AbiCoder, ABIDefinition, AbiItem, Address, Connection } from '@celo/connect'
 import fetch from 'cross-fetch'
-import debugFactory from 'debug'
 import { ContractMapping, mapFromPairs } from './base'
-
-const debug = debugFactory('kit:explorer:sourcify')
 
 const PROXY_IMPLEMENTATION_GETTERS = [
   '_getImplementation',
