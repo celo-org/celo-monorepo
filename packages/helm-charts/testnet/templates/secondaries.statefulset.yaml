@@ -17,42 +17,48 @@ kind: StatefulSet
 metadata:
   name: {{ template "common.fullname" . }}-secondaries
   labels:
-{{ include "common.standard.labels" .  | indent 4 }}
+    {{- include "common.standard.labels" . | nindent 4 }}
     component: secondaries
 spec:
+  {{- if .Values.geth.ssd_disks }}
   volumeClaimTemplates:
   - metadata:
       name: data
+      {{- if .Values.pvcAnnotations.secondary }}
+      annotations:
+        {{- toYaml .Values.pvcAnnotations.secondary | nindent 8 }}
+      {{- end }}
     spec:
-      {{ if .Values.geth.ssd_disks }}storageClassName: ssd{{ end }}
+      storageClassName: {{ .Values.geth.storageClass }}
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: {{ .Values.geth.diskSizeGB }}Gi
+  {{- end }}
   podManagementPolicy: Parallel
   updateStrategy:
-{{ toYaml .Values.updateStrategy.secondaries | indent 4 }}
+    {{- toYaml .Values.updateStrategy.secondaries | nindent 4 }}
   replicas: {{ .Values.geth.secondaries }}
   serviceName: secondaries
   selector:
     matchLabels:
-{{ include "common.standard.labels" .  | indent 6 }}
+      {{- include "common.standard.labels" . | nindent 6 }}
       component: secondaries
   template:
     metadata:
       labels:
-        {{- include "common.standard.labels" .  | nindent 8 }}
+        {{- include "common.standard.labels" . | nindent 8 }}
         component: secondaries
         {{- if .Values.extraPodLabels.secondaries }}
         {{- toYaml .Values.extraPodLabels.secondaries | nindent 8 }}
         {{- end }}
-{{ if .Values.metrics | default false }}
+      {{- if .Values.metrics | default false }}
       annotations:
-{{ include "common.prometheus-annotations" . | indent 8 }}
-{{- end }}
+        {{- include "common.prometheus-annotations" . | nindent 8 }}
+      {{- end }}
     spec:
       initContainers:
-{{ include "common.conditional-init-genesis-container" .  | indent 6 }}
+      {{- include "common.conditional-init-genesis-container" . | nindent 6 }}
       - name: get-account
         image: {{ .Values.celotool.image.repository }}:{{ .Values.celotool.image.tag }}
         imagePullPolicy: Always
@@ -143,11 +149,11 @@ spec:
         - name: IP_ADDRESSES
           value: {{ join "/" .Values.geth.validatorsIPAddressArray }}
         - name: BOOTNODE_IP_ADDRESS
-          value: "{{ default "none" .Values.geth.bootnodeIpAddress  }}"
+          value: "{{ default "none" .Values.geth.bootnodeIpAddress }}"
         volumeMounts:
         - name: data
           mountPath: /root/.celo
-{{ include "common.import-geth-account-container" .  | indent 6 }}
+      {{- include "common.import-geth-account-container" . | nindent 6 }}
       containers:
       - name: geth
         image: {{ .Values.geth.image.repository }}:{{ .Values.geth.image.tag }}
@@ -184,13 +190,13 @@ spec:
 
           [[ "$IN_MEMORY_DISCOVERY_TABLE" == "true" ]] && ADDITIONAL_FLAGS="${ADDITIONAL_FLAGS} --use-in-memory-discovery-table"
 
-{{ include  "common.bootnode-flag-script" . | indent 10 }}
+          {{- include  "common.bootnode-flag-script" . | nindent 10 }}
 
-{{ include  "common.geth-add-metrics-pprof-config" . | indent 10 }}
+          {{- include  "common.geth-add-metrics-pprof-config" . | nindent 10 }}
 
-{{ include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | indent 10 }}
+          {{- include  "common.geth-http-ws-flags" (dict "Values" $.Values "rpc_apis" "eth,net,web3,debug" "ws_port" "8545" "listen_address" "0.0.0.0") | nindent 10 }}
 
-{{ .Values.geth.secondayExtraSnippet | indent 10 }}
+          {{- .Values.geth.secondayExtraSnippet | nindent 10 }}
 
           exec geth \
             $BOOTNODE_FLAG \
@@ -248,21 +254,24 @@ spec:
         - name: metrics
           containerPort: 6060
         {{- end }}
+        {{- $resources := default .Values.geth.resources .Values.geth.secondaryResources -}}
+        {{- with $resources }}
         resources:
-{{ toYaml .Values.geth.resources | indent 10 }}
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: data
           mountPath: /root/.celo
         - name: account
           mountPath: /root/.celo/account
           readOnly: true
-      {{- if .Values.secondayNodeSelector }}
+      {{- with .Values.secondayNodeSelector }}
       nodeSelector:
-{{ toYaml .Values.secondayNodeSelector | indent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.secondaryTolerations }}
+      {{- with .Values.secondaryTolerations }}
       tolerations:
-{{ toYaml .Values.secondaryTolerations | indent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
       - name: data

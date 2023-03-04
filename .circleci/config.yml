@@ -2,6 +2,8 @@
 # and https://github.com/facebook/react-native/blob/master/.circleci/config.yml
 
 version: 2.1
+
+
 parameters:
   # When you need to force a rebuild of the node modules cache then bump this version
   node-modules-cache-version:
@@ -128,6 +130,7 @@ jobs:
     # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
     resource_class: large
     steps:
+
       - restore_cache:
           keys:
             - source-v1-{{ .Branch }}-{{ .Revision }}
@@ -784,21 +787,28 @@ jobs:
           name: Minor test of celocli
           command: ./node_modules/.bin/celocli account:new # Small test
 
-  phone-number-privacy-test:
+  odis-test:
     <<: *defaults
+    # Source: https://circleci.com/docs/2.0/configuration-reference/#resource_class
+    resource_class: large
     steps:
       - attach_workspace:
           at: ~/app
       - run:
           name: Check if the test should run
           command: |
-            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner
+            ./scripts/ci_check_if_test_should_run_v2.sh @celo/phone-number-privacy-signer,@celo/phone-number-privacy-combiner,@celo/phone-number-privacy-common
+      - run:
+          name: Run Tests for common package
+          command: yarn --cwd=packages/phone-number-privacy/common test:coverage
       - run:
           name: Run Tests for combiner
-          command: yarn --cwd=packages/phone-number-privacy/combiner test
+          no_output_timeout: 30m
+          command: yarn --cwd=packages/phone-number-privacy/combiner test:coverage
       - run:
           name: Run Tests for signer
-          command: yarn --cwd=packages/phone-number-privacy/signer test
+          no_output_timeout: 30m
+          command: yarn --cwd=packages/phone-number-privacy/signer test:coverage
 
   certora-test:
     working_directory: ~/app
@@ -981,7 +991,7 @@ workflows:
           requires:
             - lint-checks
             - contractkit-test
-      - phone-number-privacy-test:
+      - odis-test:
           requires:
             - lint-checks
       - flakey-test-summary:
@@ -1001,7 +1011,7 @@ workflows:
             - end-to-end-geth-sync-test
             - end-to-end-geth-validator-order-test
             - end-to-end-cip35-eth-compatibility-test
-            - phone-number-privacy-test
+            - odis-test
   npm-install-testing-cron-workflow:
     triggers:
       - schedule:

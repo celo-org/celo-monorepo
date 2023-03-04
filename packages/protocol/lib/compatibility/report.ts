@@ -73,8 +73,9 @@ export class CategorizedChanges {
     reports: ASTReports,
     categorizer: Categorizer): CategorizedChanges {
     const storage = reports.storage.filter(r => !r.compatible)
+    const storageExpandedReports = reports.storage.filter(r => r.expanded)
     const c = categorize(reports.code.getChanges().concat(reports.libraryLinking), categorizer)
-    const major = c[ChangeType.Major]
+    const major = [...c[ChangeType.Major], ...storageExpandedReports.map(r => ({ getContract: () => r.contract, accept: () => null}))]
     const minor = c[ChangeType.Minor]
     const patch = c[ChangeType.Patch]
     return new CategorizedChanges(storage, major, minor, patch)

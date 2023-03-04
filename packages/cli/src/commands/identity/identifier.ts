@@ -1,5 +1,5 @@
 import { OdisUtils } from '@celo/identity'
-import { AuthSigner } from '@celo/identity/lib/odis/query'
+import { AuthSigner, OdisContextName } from '@celo/identity/lib/odis/query'
 import { flags as oFlags } from '@oclif/command'
 import { cli } from 'cli-ux'
 import { BaseCommand } from '../../base'
@@ -49,7 +49,7 @@ export default class IdentifierQuery extends BaseCommand {
       phoneNumber,
       from,
       authSigner,
-      OdisUtils.Query.getServiceContext(context)
+      OdisUtils.Query.getServiceContext(context as OdisContextName)
     )
 
     cli.action.stop()

@@ -46,9 +46,12 @@ contract Governance is
   }
 
   struct VoteRecord {
-    Proposals.VoteValue value;
+    Proposals.VoteValue deprecated_value; // obsolete
     uint256 proposalId;
-    uint256 weight;
+    uint256 deprecated_weight; // obsolete
+    uint256 yesVotes;
+    uint256 noVotes;
+    uint256 abstainVotes;
   }
 
   struct Voter {
@@ -146,11 +149,27 @@ contract Governance is
     uint256 weight
   );
 
+  event ProposalVotedV2(
+    uint256 indexed proposalId,
+    address indexed account,
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
+  );
+
   event ProposalVoteRevoked(
     uint256 indexed proposalId,
     address indexed account,
     uint256 value,
     uint256 weight
+  );
+
+  event ProposalVoteRevokedV2(
+    uint256 indexed proposalId,
+    address indexed account,
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
   );
 
   event ProposalExecuted(uint256 indexed proposalId);
@@ -486,7 +505,7 @@ contract Governance is
   {
     Proposals.Proposal storage proposal = proposals[proposalId];
     require(_isDequeuedProposal(proposal, proposalId, index), "Proposal not dequeued");
-    Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+    Proposals.Stage stage = getProposalDequeuedStage(proposal);
     if (_isDequeuedProposalExpired(proposal, stage)) {
       deleteDequeuedProposal(proposal, proposalId, index);
       return (proposal, Proposals.Stage.Expiration);
@@ -547,7 +566,7 @@ contract Governance is
       return
         _isQueuedProposalExpired(proposal) ? Proposals.Stage.Expiration : Proposals.Stage.Queued;
     } else {
-      Proposals.Stage stage = proposal.getDequeuedStage(stageDurations);
+      Proposals.Stage stage = getProposalDequeuedStage(proposal);
       return _isDequeuedProposalExpired(proposal, stage) ? Proposals.Stage.Expiration : stage;
     }
   }
@@ -631,26 +650,138 @@ contract Governance is
       return false;
     }
 
-    address account = getAccounts().voteSignerToAccount(msg.sender);
-    Voter storage voter = voters[account];
-    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
     require(value != Proposals.VoteValue.None, "Vote value unset");
+
+    address account = getAccounts().voteSignerToAccount(msg.sender);
+    uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
     require(weight > 0, "Voter weight zero");
-    VoteRecord storage voteRecord = voter.referendumVotes[index];
-    proposal.updateVote(
-      voteRecord.weight,
-      weight,
-      (voteRecord.proposalId == proposalId) ? voteRecord.value : Proposals.VoteValue.None,
-      value
+
+    _vote(
+      proposal,
+      proposalId,
+      index,
+      account,
+      value == Proposals.VoteValue.Yes ? weight : 0,
+      value == Proposals.VoteValue.No ? weight : 0,
+      value == Proposals.VoteValue.Abstain ? weight : 0
     );
+    return true;
+  }
+
+  /**
+   * @notice Votes partially on a proposal in the referendum stage.
+   * @param proposalId The ID of the proposal to vote on.
+   * @param index The index of the proposal ID in `dequeued`.
+   * @param yesVotes The yes votes weight.
+   * @param noVotes The no votes weight.
+   * @param abstainVotes The abstain votes weight.
+   * @return Whether or not the vote was cast successfully.
+   */
+  /* solhint-disable code-complexity */
+  function votePartially(
+    uint256 proposalId,
+    uint256 index,
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
+  ) external nonReentrant returns (bool) {
+    dequeueProposalsIfReady();
+    (Proposals.Proposal storage proposal, Proposals.Stage stage) = requireDequeuedAndDeleteExpired(
+      proposalId,
+      index
+    );
+    if (!proposal.exists()) {
+      return false;
+    }
+    require(stage == Proposals.Stage.Referendum, "Incorrect proposal state");
+
+    address account = getAccounts().voteSignerToAccount(msg.sender);
+    uint256 totalLockedGold = getLockedGold().getAccountTotalLockedGold(account);
+
+    require(
+      totalLockedGold >= yesVotes.add(noVotes).add(abstainVotes),
+      "Voter doesn't have enough locked Celo (formerly known as Celo Gold)"
+    );
+    _vote(proposal, proposalId, index, account, yesVotes, noVotes, abstainVotes);
+
+    return true;
+  }
+
+  /**
+   * @notice Votes on a proposal in the referendum stage.
+   * @param proposal The proposal struct.
+   * @param proposalId The ID of the proposal to vote on.
+   * @param index The index of the proposal ID in `dequeued`.
+   * @param account Account based on signer.
+   * @param yesVotes The yes votes weight.
+   * @param noVotes The no votes weight.
+   * @param abstainVotes The abstain votes weight.
+   * @return Whether or not the proposal is passing.
+   */
+  function _vote(
+    Proposals.Proposal storage proposal,
+    uint256 proposalId,
+    uint256 index,
+    address account,
+    uint256 yesVotes,
+    uint256 noVotes,
+    uint256 abstainVotes
+  ) private {
+    Voter storage voter = voters[account];
+
+    VoteRecord storage previousVoteRecord = voter.referendumVotes[index];
+
+    if (previousVoteRecord.proposalId != proposalId) {
+      // VoteRecord is being stored based on index (in `dequeued`) rather than proposalId.
+      // It can happen that user voted on proposal that later gets deleted.
+      // VoteRecord will still stay in `referendumVotes` mapping.
+      // Once new proposal is created it might get same index as previous proposal.
+      // In such case we need to check whether existing VoteRecord is relevant to new
+      // proposal of whether it is just left over data.
+      proposal.updateVote(0, 0, 0, yesVotes, noVotes, abstainVotes);
+    } else if (previousVoteRecord.deprecated_weight != 0) {
+      // backward compatibility for transition period - this should be deleted later on
+      proposal.updateVote(
+        previousVoteRecord.deprecated_value == Proposals.VoteValue.Yes
+          ? previousVoteRecord.deprecated_weight
+          : 0,
+        previousVoteRecord.deprecated_value == Proposals.VoteValue.No
+          ? previousVoteRecord.deprecated_weight
+          : 0,
+        previousVoteRecord.deprecated_value == Proposals.VoteValue.Abstain
+          ? previousVoteRecord.deprecated_weight
+          : 0,
+        yesVotes,
+        noVotes,
+        abstainVotes
+      );
+
+    } else {
+      proposal.updateVote(
+        previousVoteRecord.yesVotes,
+        previousVoteRecord.noVotes,
+        previousVoteRecord.abstainVotes,
+        yesVotes,
+        noVotes,
+        abstainVotes
+      );
+    }
+
     proposal.networkWeight = getLockedGold().getTotalLockedGold();
-    voter.referendumVotes[index] = VoteRecord(value, proposalId, weight);
+    voter.referendumVotes[index] = VoteRecord(
+      Proposals.VoteValue.None,
+      proposalId,
+      0,
+      yesVotes,
+      noVotes,
+      abstainVotes
+    );
     if (proposal.timestamp > proposals[voter.mostRecentReferendumProposal].timestamp) {
       voter.mostRecentReferendumProposal = proposalId;
     }
-    emit ProposalVoted(proposalId, account, uint256(value), weight);
-    return true;
+
+    emit ProposalVotedV2(proposalId, account, yesVotes, noVotes, abstainVotes);
   }
 
   /* solhint-enable code-complexity */
@@ -672,7 +803,10 @@ contract Governance is
       // Skip proposals where there was no vote cast by the user AND
       // ensure vote record proposal matches identifier of dequeued index proposal.
       if (
-        voteRecord.value != Proposals.VoteValue.None &&
+        (voteRecord.yesVotes > 0 ||
+          voteRecord.noVotes > 0 ||
+          voteRecord.abstainVotes > 0 ||
+          voteRecord.deprecated_weight > 0) &&
         voteRecord.proposalId == dequeued[dequeueIndex]
       ) {
         (Proposals.Proposal storage proposal, Proposals.Stage stage) =
@@ -680,14 +814,45 @@ contract Governance is
 
         // only revoke from proposals which are still in referendum
         if (stage == Proposals.Stage.Referendum) {
-          proposal.updateVote(voteRecord.weight, 0, voteRecord.value, Proposals.VoteValue.None);
-          proposal.networkWeight = getLockedGold().getTotalLockedGold();
-          emit ProposalVoteRevoked(
-            voteRecord.proposalId,
-            account,
-            uint256(voteRecord.value),
-            voteRecord.weight
-          );
+          if (voteRecord.deprecated_weight != 0) {
+            // backward compatibility for transition period - this should be deleted later on
+            uint256 previousYes = voteRecord.deprecated_value == Proposals.VoteValue.Yes
+              ? voteRecord.deprecated_weight
+              : 0;
+            uint256 previousNo = voteRecord.deprecated_value == Proposals.VoteValue.No
+              ? voteRecord.deprecated_weight
+              : 0;
+            uint256 previousAbstain = voteRecord.deprecated_value == Proposals.VoteValue.Abstain
+              ? voteRecord.deprecated_weight
+              : 0;
+            proposal.updateVote(previousYes, previousNo, previousAbstain, 0, 0, 0);
+
+            proposal.networkWeight = getLockedGold().getTotalLockedGold();
+            emit ProposalVoteRevokedV2(
+              voteRecord.proposalId,
+              account,
+              previousYes,
+              previousNo,
+              previousAbstain
+            );
+          } else {
+            proposal.updateVote(
+              voteRecord.yesVotes,
+              voteRecord.noVotes,
+              voteRecord.abstainVotes,
+              0,
+              0,
+              0
+            );
+            proposal.networkWeight = getLockedGold().getTotalLockedGold();
+            emit ProposalVoteRevokedV2(
+              voteRecord.proposalId,
+              account,
+              voteRecord.yesVotes,
+              voteRecord.noVotes,
+              voteRecord.abstainVotes
+            );
+          }
         }
 
         // always delete dequeue vote records for gas refund as they must be expired or revoked
@@ -820,8 +985,7 @@ contract Governance is
       isQueued(upvotedProposal) &&
       !isQueuedProposalExpired(upvotedProposal);
     Proposals.Proposal storage proposal = proposals[voter.mostRecentReferendumProposal];
-    bool isVotingReferendum = (proposal.getDequeuedStage(stageDurations) ==
-      Proposals.Stage.Referendum);
+    bool isVotingReferendum = (getProposalDequeuedStage(proposal) == Proposals.Stage.Referendum);
     return isVotingQueue || isVotingReferendum;
   }
 
@@ -924,16 +1088,26 @@ contract Governance is
    * @param account The address of the account to get the record for.
    * @param index The index in `dequeued`.
    * @return The corresponding proposal ID, vote value, and weight.
-   * @return The corresponding vote value.
-   * @return The corresponding weight.
+   * @return The depreciated vote value.
+   * @return The deprecieated weight.
+   * @return The yes weight.
+   * @return The no weight.
+   * @return The abstain weight.
    */
   function getVoteRecord(address account, uint256 index)
     external
     view
-    returns (uint256, uint256, uint256)
+    returns (uint256, uint256, uint256, uint256, uint256, uint256)
   {
     VoteRecord storage record = voters[account].referendumVotes[index];
-    return (record.proposalId, uint256(record.value), record.weight);
+    return (
+      record.proposalId,
+      uint256(record.deprecated_value),
+      record.deprecated_weight,
+      record.yesVotes,
+      record.noVotes,
+      record.abstainVotes
+    );
   }
 
   /**
@@ -1108,6 +1282,13 @@ contract Governance is
     FixidityLib.Fraction memory support = proposal.getSupportWithQuorumPadding(
       participationParameters.baseline.multiply(participationParameters.baselineQuorumFactor)
     );
+
+    if (proposal.transactions.length == 0) {
+      // default treshold
+      FixidityLib.Fraction memory threshold = _getConstitution(address(0), "");
+      return support.gt(threshold);
+    }
+
     for (uint256 i = 0; i < proposal.transactions.length; i = i.add(1)) {
       bytes4 functionId = ExtractFunctionSignature.extractFunctionSignature(
         proposal.transactions[i].data
@@ -1156,7 +1337,7 @@ contract Governance is
    */
   function isDequeuedProposalExpired(uint256 proposalId) external view returns (bool) {
     Proposals.Proposal storage proposal = proposals[proposalId];
-    return _isDequeuedProposalExpired(proposal, proposal.getDequeuedStage(stageDurations));
+    return _isDequeuedProposalExpired(proposal, getProposalDequeuedStage(proposal));
   }
 
   /**
@@ -1263,5 +1444,73 @@ contract Governance is
       threshold = constitution[destination].defaultThreshold;
     }
     return threshold;
+  }
+
+  /**
+   * @notice Returns max number of votes cast by an account.
+   * @param account The address of the account.
+   * @return The total number of votes cast by an account.
+   */
+  function getAmountOfGoldUsedForVoting(address account) public view returns (uint256) {
+    Voter storage voter = voters[account];
+
+    uint256 upvotedProposalId = voter.upvote.proposalId;
+    bool isVotingQueue = upvotedProposalId != 0 &&
+      isQueued(upvotedProposalId) &&
+      !isQueuedProposalExpired(upvotedProposalId);
+
+    if (isVotingQueue) {
+      uint256 weight = getLockedGold().getAccountTotalLockedGold(account);
+      return weight;
+    }
+
+    uint256 maxUsed = 0;
+    for (uint256 index = 0; index < dequeued.length; index = index.add(1)) {
+      Proposals.Proposal storage proposal = proposals[dequeued[index]];
+      bool isVotingReferendum = (getProposalDequeuedStage(proposal) == Proposals.Stage.Referendum);
+
+      if (!isVotingReferendum) {
+        continue;
+      }
+
+      VoteRecord storage voteRecord = voter.referendumVotes[index];
+      maxUsed = Math.max(
+        maxUsed,
+        voteRecord.yesVotes.add(voteRecord.noVotes).add(voteRecord.abstainVotes)
+      );
+    }
+    return maxUsed;
+  }
+
+  /**
+   * @notice Returns the stage of a dequeued proposal.
+   * @param proposal The proposal struct.
+   * @return The stage of the dequeued proposal.
+   * @dev Must be called on a dequeued proposal.
+   */
+  function getProposalDequeuedStage(Proposals.Proposal storage proposal)
+    internal
+    view
+    returns (Proposals.Stage)
+  {
+    uint256 stageStartTime = proposal.timestamp.add(stageDurations.referendum).add(
+      stageDurations.execution
+    );
+    // solhint-disable-next-line not-rely-on-time
+    if (
+      now >= stageStartTime &&
+      (proposal.transactions.length > 0 ||
+        // proposals with 0 transactions can expire only when not approved or not passing
+        !proposal.isApproved() ||
+        !_isProposalPassing(proposal))
+    ) {
+      return Proposals.Stage.Expiration;
+    }
+    stageStartTime = stageStartTime.sub(stageDurations.execution);
+    // solhint-disable-next-line not-rely-on-time
+    if (now >= stageStartTime) {
+      return Proposals.Stage.Execution;
+    }
+    return Proposals.Stage.Referendum;
   }
 }

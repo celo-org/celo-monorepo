@@ -21,6 +21,7 @@ export enum CeloContractName {
   ExchangeEUR = 'ExchangeEUR',
   ExchangeBRL = 'ExchangeBRL',
   FederatedAttestations = 'FederatedAttestations',
+  FeeBurner = 'FeeBurner',
   FeeCurrencyWhitelist = 'FeeCurrencyWhitelist',
   Freezer = 'Freezer',
   GasPriceMinimum = 'GasPriceMinimum',
@@ -40,7 +41,6 @@ export enum CeloContractName {
   StableTokenBRL = 'StableTokenBRL',
   TransferWhitelist = 'TransferWhitelist',
   Validators = 'Validators',
-  StableTokenRegistry = 'StableTokenRegistry',
 }
 
 export const usesRegistry = [

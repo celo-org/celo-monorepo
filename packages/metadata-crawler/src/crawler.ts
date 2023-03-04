@@ -5,15 +5,9 @@ import {
   verifyAccountClaim,
   verifyDomainRecord,
 } from '@celo/contractkit/lib/identity/claims/verify'
-import {
-  AttestationServiceStatusState,
-  AttestationsWrapper,
-} from '@celo/contractkit/lib/wrappers/Attestations'
-import { Validator } from '@celo/contractkit/lib/wrappers/Validators'
 import { normalizeAddressWith0x, trimLeading0x } from '@celo/utils/lib/address'
 import { concurrentMap } from '@celo/utils/lib/async'
 import Logger from 'bunyan'
-import fetch from 'cross-fetch'
 import { Client } from 'pg'
 import Web3 from 'web3'
 import { dataLogger, logger, operationalLogger } from './logger'
@@ -36,11 +30,6 @@ const client = new Client({
 })
 
 const kit = newKitFromWeb3(new Web3(PROVIDER_URL))
-
-const discordWebhook = process.env['DISCORD_WEBHOOK_URL']
-const clusterName = process.env['CLUSTER_NAME']
-  ? process.env['CLUSTER_NAME'][0].toUpperCase() + process.env['CLUSTER_NAME'].substring(1)
-  : undefined
 
 async function jsonQuery(query: string) {
   let res = await client.query(`SELECT json_agg(t) FROM (${query}) t`)
@@ -173,113 +162,6 @@ async function processDomainClaims() {
     })
 }
 
-async function processAttestationServiceStatusForValidator(
-  electedValidators: Set<Address>,
-  attestationsWrapper: AttestationsWrapper,
-  validator: Validator
-) {
-  const status = await attestationsWrapper.getAttestationServiceStatus(validator)
-  const {
-    name,
-    smsProviders,
-    address,
-    affiliation,
-    attestationServiceURL,
-    metadataURL,
-    attestationSigner,
-    blacklistedRegionCodes,
-    rightAccount,
-    error,
-    state,
-    version,
-    ageOfLatestBlock,
-    smsProvidersRandomized,
-    maxDeliveryAttempts,
-    maxRerequestMins,
-    twilioVerifySidProvided,
-  } = status
-  const isElected = electedValidators.has(validator.address)
-  dataLogger.info(
-    {
-      name,
-      isElected,
-      smsProviders,
-      address,
-      group: affiliation,
-      attestationServiceURL,
-      metadataURL,
-      attestationSigner,
-      blacklistedRegionCodes,
-      rightAccount,
-      err: error,
-      state,
-      version,
-      ageOfLatestBlock,
-      smsProvidersRandomized,
-      maxDeliveryAttempts,
-      maxRerequestMins,
-      twilioVerifySidProvided,
-    },
-    'checked_attestation_service_status'
-  )
-
-  // Consider pushing a state change to Discord for elected validators.
-  if (discordWebhook && isElected) {
-    const currentValid =
-      status.state === AttestationServiceStatusState.NoAttestationSigner ||
-      status.state === AttestationServiceStatusState.UnreachableHealthz ||
-      status.state === AttestationServiceStatusState.Valid
-
-    if (!currentValid) {
-      const content =
-        `:no_mobile_phones: **Problem with Attestation Service!** ${status.name} \n` +
-        `For validator \`${validator.address}\` in group \`${validator.affiliation}\`\n` +
-        `\`${status.state}\` ${status.attestationServiceURL ?? ''}${
-          status.error ? '\n`' + (status.error.message ?? status.error) + '`' : ''
-        }`
-      await postToDiscord(content)
-    }
-  }
-}
-
-async function postToDiscord(content: string) {
-  if (discordWebhook) {
-    try {
-      await fetch(discordWebhook, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: `${clusterName} Metadata Crawler`, content }),
-      })
-    } catch {}
-  }
-}
-
-async function processAttestationServices() {
-  operationalLogger.debug('processAttestationServices start')
-  const validatorsWrapper = await kit.contracts.getValidators()
-  const electionsWrapper = await kit.contracts.getElection()
-  const attestationsWrapper = await kit.contracts.getAttestations()
-  const validators = await validatorsWrapper.getRegisteredValidators()
-
-  const currentEpoch = await kit.getEpochNumberOfBlock(await kit.connection.getBlockNumber())
-  const electedValidators = await electionsWrapper.getElectedValidators(currentEpoch)
-  const electedValidatorsSet: Set<Address> = new Set()
-  electedValidators.forEach((validator) => electedValidatorsSet.add(validator.address))
-
-  await concurrentMap(CONCURRENCY, validators, (validator) =>
-    processAttestationServiceStatusForValidator(
-      electedValidatorsSet,
-      attestationsWrapper,
-      validator
-    )
-  )
-  operationalLogger.debug('processAttestationServices finish')
-  return
-}
-
 async function main() {
   operationalLogger.info({ host: PGHOST }, 'Connecting DB')
   await client.connect()
@@ -290,7 +172,6 @@ async function main() {
   })
 
   await processDomainClaims()
-  await processAttestationServices()
 
   client.end()
   process.exit(0)

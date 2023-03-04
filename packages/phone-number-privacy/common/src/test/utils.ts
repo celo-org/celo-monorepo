@@ -1,29 +1,57 @@
-import { Signature } from '@celo/utils/lib/signatureUtils'
+import { privateKeyToAddress } from '@celo/utils/lib/address'
+import { serializeSignature, Signature, signMessage } from '@celo/utils/lib/signatureUtils'
 import BigNumber from 'bignumber.js'
-import * as threshold from 'blind-threshold-bls'
-import btoa from 'btoa'
 import Web3 from 'web3'
+import {
+  AuthenticationMethod,
+  LegacyPnpQuotaRequest,
+  LegacySignMessageRequest,
+  PhoneNumberPrivacyRequest,
+  PnpQuotaRequest,
+  SignMessageRequest,
+} from '../interfaces'
+import { signWithRawKey } from '../utils/authentication'
+import { genSessionID } from '../utils/logger'
 
-export function createMockAttestation(completed: number, total: number) {
+export interface AttestationsStatus {
+  isVerified: boolean
+  numAttestationsRemaining: number
+  total: number
+  completed: number
+}
+
+export function createMockAttestation(getVerifiedStatus: jest.Mock<AttestationsStatus, []>) {
   return {
-    getVerifiedStatus: jest.fn(() => ({ completed, total })),
+    getVerifiedStatus,
   }
 }
 
-export function createMockToken(balance: BigNumber) {
+export function createMockToken(balanceOf: jest.Mock<BigNumber, []>) {
   return {
-    balanceOf: jest.fn(() => balance),
+    balanceOf,
   }
 }
 
-export function createMockAccounts(walletAddress: string) {
+export function createMockAccounts(
+  getWalletAddress: jest.Mock<string, []>,
+  getDataEncryptionKey: jest.Mock<string, []>
+) {
   return {
-    getWalletAddress: jest.fn(() => walletAddress),
+    getWalletAddress,
+    getDataEncryptionKey,
+  }
+}
+
+// Take in jest.Mock to enable individual tests to spy on function calls
+// and more easily set return values
+export function createMockOdisPayments(totalPaidCUSDFunc: jest.Mock<BigNumber, []>) {
+  return {
+    totalPaidCUSD: totalPaidCUSDFunc,
   }
 }
 
 export function createMockContractKit(
-  c: { [contractName in ContractRetrieval]: any },
+  c: { [contractName in ContractRetrieval]?: any },
   mockWeb3?: any
 ) {
   const contracts: any = {}
@@ -45,6 +73,9 @@ export function createMockConnection(mockWeb3?: any) {
   return {
     web3: mockWeb3,
     getTransactionCount: jest.fn(() => mockWeb3.eth.getTransactionCount()),
+    getBlockNumber: jest.fn(() => {
+      return mockWeb3.eth.getBlockNumber()
+    }),
   }
 }
 
@@ -53,27 +84,16 @@ export enum ContractRetrieval {
   getStableToken = 'getStableToken',
   getGoldToken = 'getGoldToken',
   getAccounts = 'getAccounts',
+  getOdisPayments = 'getOdisPayments',
 }
 
-export function createMockWeb3(txCount: number) {
+export function createMockWeb3(txCount: number, blockNumber: number) {
   return {
     eth: {
       getTransactionCount: jest.fn(() => txCount),
+      getBlockNumber: jest.fn(() => blockNumber),
     },
   }
-}
-
-export function getBlindedPhoneNumber(phoneNumber: string, blindingFactor: Buffer): string {
-  const blindedPhoneNumber = threshold.blind(Buffer.from(phoneNumber), blindingFactor).message
-  return uint8ArrayToBase64(blindedPhoneNumber)
-}
-
-function uint8ArrayToBase64(bytes: Uint8Array) {
-  let binary = ''
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return btoa(binary)
 }
 
 export async function replenishQuota(account: string, contractKit: any) {
@@ -97,4 +117,64 @@ export async function registerWalletAddress(
   await accounts
     .setWalletAddress(walletAddress, pop as Signature)
     .sendAndWaitForReceipt({ from: accountAddress } as any)
+}
+
+export function getPnpQuotaRequest(
+  account: string,
+  authenticationMethod?: string
+): PnpQuotaRequest {
+  return {
+    account,
+    authenticationMethod,
+    sessionID: genSessionID(),
+  }
+}
+export function getLegacyPnpQuotaRequest(
+  account: string,
+  authenticationMethod?: string,
+  hashedPhoneNumber?: string
+): LegacyPnpQuotaRequest {
+  return {
+    account,
+    authenticationMethod,
+    hashedPhoneNumber,
+    sessionID: genSessionID(),
+  }
+}
+
+export function getLegacyPnpSignRequest(
+  account: string,
+  blindedQueryPhoneNumber: string,
+  authenticationMethod?: string,
+  hashedPhoneNumber?: string
+): LegacySignMessageRequest {
+  return {
+    account,
+    blindedQueryPhoneNumber,
+    authenticationMethod,
+    hashedPhoneNumber,
+    sessionID: genSessionID(),
+  }
+}
+
+export function getPnpSignRequest(
+  account: string,
+  blindedQueryPhoneNumber: string,
+  authenticationMethod?: string
+): SignMessageRequest {
+  return {
+    account,
+    blindedQueryPhoneNumber,
+    authenticationMethod,
+    sessionID: genSessionID(),
+  }
+}
+
+export function getPnpRequestAuthorization(req: PhoneNumberPrivacyRequest, pk: string) {
+  const msg = JSON.stringify(req)
+  if (req.authenticationMethod === AuthenticationMethod.ENCRYPTION_KEY) {
+    return signWithRawKey(JSON.stringify(req), pk)
+  }
+  const account = privateKeyToAddress(pk)
+  return serializeSignature(signMessage(msg, pk, account))
 }

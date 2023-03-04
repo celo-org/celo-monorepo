@@ -2,11 +2,10 @@
 
 The `env-tests` package is a set of tests that is designed to be run against CELO blockchains and assert that various platform interactions work as intended. It currently has tests for the following:
 
-1. Attestations: Runs through the whole flow including registering a number on Twilio and requesting attestations from attestation services
-2. Exchange: Does an exchange on Mento
-3. Oracle: Reports an exchange rate
-4. Reserve: Tests that reserve spenders can move funds to reserve custodians
-5. Transfer: Does simple ERC20 transfers
+1. Exchange: Does an exchange on Mento
+2. Oracle: Reports an exchange rate
+3. Reserve: Tests that reserve spenders can move funds to reserve custodians
+4. Transfer: Does simple ERC20 transfers
 
 ## Setup
 

@@ -1,3 +1,4 @@
+---
 blockscout:
   indexer:
     db:
@@ -5,31 +6,40 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 250Mi
-            cpu: 200m
-    poolSize: 20
+            memory: 20M
+            cpu: 10m
+          limits:
+            memory: 200Mi
+            cpu: 100m
+    poolSize: 200
     resources:
       requests:
-        memory: 700Mi
-        cpu: 1500m
+        memory: 700M
+        cpu: 0.5
+      limits:
+        memory: 1400M
+        cpu: 1
   api:
     autoscaling:
-        maxReplicas: 6
-        minReplicas: 3
-        target:
-          cpu: 70
+      maxReplicas: 6
+      minReplicas: 3
+      target:
+        cpu: 70
     db:
       connectionName: celo-testnet-production:us-west1:alfajores2-replica
       proxy:
         resources:
           requests:
-            memory: 250Mi
-            cpu: 200m
+            memory: 20M
+            cpu: 10m
     poolSize: 25
     resources:
       requests:
-        memory: 250Mi
-        cpu: 500m
+        memory: 600M
+        cpu: 0.5
+      limits:
+        memory: 1200M
+        cpu: 1.2
   web:
     host: explorer.celo.org
     suffix:
@@ -41,20 +51,23 @@ blockscout:
       target:
         cpu: 70
     db:
-      connectionName: celo-testnet-production:us-west1:alfajores2
+      connectionName: celo-testnet-production:us-west1:alfajores2-replica
       proxy:
         resources:
           requests:
-            memory: 250Mi
-            cpu: 200m
-    poolSize: 10
+            memory: 20M
+            cpu: 10m
+    poolSize: 20
     resources:
       requests:
-        memory: 250M
-        cpu: 500m
+        memory: 800M
+        cpu: 400m
+      limits:
+        memory: 1400M
+        cpu: 1
   metadataCrawler:
     enabled: true
-    schedule: "*/30 * * * *" # every 30 minutes
+    schedule: "*/30 * * * *"  # every 30 minutes
   metrics:
     enabled: true
   fullNodes:
@@ -68,6 +81,7 @@ blockscout:
       projectId: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaProjectId
       siteKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaSiteKey
       apiKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaApiKey
+      secretKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-recaptchaSecretKey
     erlang:
       cookie: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout2-erlangCookie
     campaignBannerApiUrl: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-campaignBannerApiUrl
