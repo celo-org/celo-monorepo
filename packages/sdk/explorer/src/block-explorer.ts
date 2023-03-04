@@ -123,23 +123,19 @@ export class BlockExplorer {
 
     if (contractMapping) {
       const methodAbi = contractMapping.fnMapping.get(selector)!
-      return this.buildCallDetails(input, contractMapping.details, methodAbi)
+      return this.buildCallDetails(contractMapping.details, methodAbi, input)
     }
     return null
   }
 
-  buildCallDetails(
-    input: string,
-    contract: ContractDetails,
-    methodABI: ABIDefinition
-  ): CallDetails {
+  buildCallDetails(contract: ContractDetails, abi: ABIDefinition, input: string): CallDetails {
     const encodedParameters = input.slice(10)
     const { args, params } = parseDecodedParams(
-      this.kit.connection.getAbiCoder().decodeParameters(methodABI.inputs!, encodedParameters)
+      this.kit.connection.getAbiCoder().decodeParameters(abi.inputs!, encodedParameters)
     )
 
     // transform numbers to big numbers in params
-    methodABI.inputs!.forEach((abiInput, idx) => {
+    abi.inputs!.forEach((abiInput, idx) => {
       if (abiInput.type === 'uint256') {
         debug('transforming number param')
         params[abiInput.name] = new BigNumber(args[idx])
@@ -158,7 +154,7 @@ export class BlockExplorer {
       contract: contract.name,
       contractAddress: contract.address,
       isCoreContract: contract.isCore,
-      function: methodABI.name!,
+      function: abi.name!,
       paramMap: params,
       argList: args,
     }
