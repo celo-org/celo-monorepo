@@ -105,7 +105,7 @@ export class BlockExplorer {
     }
   }
 
-  async tryParseTx(tx: CeloTxPending): Promise<null | ParsedTx> {
+  async tryParseTx(tx: CeloTxPending): Promise<ParsedTx | null> {
     const callDetails = await this.tryParseTxInput(tx.to!, tx.input)
     if (!callDetails) {
       return null
@@ -117,9 +117,20 @@ export class BlockExplorer {
     }
   }
 
+  async tryParseTxInput(address: string, input: string): Promise<CallDetails | null> {
+    const selector = input.slice(0, 10)
+    const contractMapping = await this.getContractMappingWithSelector(address, selector)
+
+    if (contractMapping) {
+      const methodAbi = contractMapping.fnMapping.get(selector)!
+      return this.buildCallDetails(input, contractMapping.details, methodAbi)
+    }
+    return null
+  }
+
   buildCallDetails(
-    contract: ContractDetails,
     input: string,
+    contract: ContractDetails,
     methodABI: ABIDefinition
   ): CallDetails {
     const encodedParameters = input.slice(10)
@@ -176,7 +187,7 @@ export class BlockExplorer {
     }
   }
 
-  async getContractMapping(
+  async getContractMappingWithSelector(
     address: string,
     selector: string
   ): Promise<ContractMapping | undefined> {
@@ -190,22 +201,5 @@ export class BlockExplorer {
         return contractDetails
       }
     }
-  }
-
-  async tryParseTxInput(address: string, input: string): Promise<CallDetails | null> {
-    const selector = input.slice(0, 10)
-    const contractMapping = await this.getContractMapping(address, selector)
-
-    if (contractMapping) {
-      const abi = contractMapping.fnMapping.get(selector)
-      if (abi) {
-        return this.buildCallDetails(contractMapping.details, input, abi)
-      } else {
-        console.warn(
-          `Function with signature ${selector} not found in contract ${contractMapping.details.name}(${address})`
-        )
-      }
-    }
-    return null
   }
 }

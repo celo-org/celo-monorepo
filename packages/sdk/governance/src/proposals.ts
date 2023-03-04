@@ -201,7 +201,10 @@ export const proposalToJSON = async (
       }
     } else if (isGovernanceConstitutionSetter(jsonTx)) {
       const [address, functionId, threshold] = jsonTx.args
-      const contractMapping = await blockExplorer.getContractMapping(address, functionId)
+      const contractMapping = await blockExplorer.getContractMappingWithSelector(
+        address,
+        functionId
+      )
       if (contractMapping === undefined) {
         throw new Error(
           `Governance.setConstitution targets unknown address ${address} and function id ${functionId}`
