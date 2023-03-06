@@ -15,7 +15,7 @@ The Celo community asks that all suspected vulnerabilities be privately and resp
 
 ## Creating a report:
 1. Submit your vulnerability to [Celo on Intigriti](https://app.intigriti.com/programs/clabs/clabs/detail).
-	- This is currently a public program.
+	- This is currently a public program
 2. You can also email the [security@clabs.co](mailto:security@clabs.co) list with the details of reproducing the vulnerability as well as the usual details expected for all bug reports.
 
 ## Primary Focus 
