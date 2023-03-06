@@ -176,6 +176,7 @@ testWithGanache('Election Wrapper', (web3) => {
       })
 
       test('active votes remain unchanged when group becomes ineligible', async () => {
+        await validators.deaffiliate().sendAndWaitForReceipt({ from: validatorAccount })
         const activeVotes = await election.getActiveVotesForGroup(groupAccount)
         expect(activeVotes).toEqual(ONE_HUNDRED_GOLD)
       })
