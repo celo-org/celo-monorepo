@@ -343,23 +343,19 @@ export class ProposalBuilder {
   buildCallToExternalContract = async (
     tx: ProposalTransactionJSON
   ): Promise<ProposalTransaction> => {
-    if (tx.address == undefined || !isValidAddress(tx.address)) {
+    if (!tx.address || !isValidAddress(tx.address)) {
       throw new Error(`${tx.contract} is not a core celo contract so address must be specified`)
     }
 
     if (tx.function === '') {
-      // It's not a function call
       return { input: '', to: tx.address, value: tx.value }
     }
 
     let methodABI: AbiItem | null = await this.lookupExternalMethodABI(tx.address, tx)
     if (methodABI === null) {
-      let proxyImpl
-      if (this.externalCallProxyRepoint.has(tx.address)) {
-        proxyImpl = this.externalCallProxyRepoint.get(tx.address)
-      } else {
-        proxyImpl = await tryGetProxyImplementation(this.kit.connection, tx.address)
-      }
+      const proxyImpl = this.externalCallProxyRepoint.has(tx.address)
+        ? this.externalCallProxyRepoint.get(tx.address)
+        : await tryGetProxyImplementation(this.kit.connection, tx.address)
 
       if (proxyImpl) {
         methodABI = await this.lookupExternalMethodABI(proxyImpl, tx)
