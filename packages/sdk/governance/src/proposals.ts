@@ -35,7 +35,7 @@ import {
   ProposalTransaction,
 } from '@celo/contractkit/lib/wrappers/Governance'
 import { newBlockExplorer } from '@celo/explorer'
-import { fetchMetadata } from '@celo/explorer/lib/sourcify'
+import { fetchMetadata, tryGetProxyImplementation } from '@celo/explorer/lib/sourcify'
 import { isValidAddress } from '@celo/utils/lib/address'
 import { fromFixed } from '@celo/utils/lib/fixidity'
 import { BigNumber } from 'bignumber.js'
@@ -71,6 +71,7 @@ export const hotfixToHash = (kit: ContractKit, proposal: Proposal, salt: Buffer)
  */
 export interface ProposalTransactionJSON {
   contract: CeloContract
+  address?: Address
   function: string
   args: any[]
   params?: Record<string, any>
@@ -139,10 +140,11 @@ export const proposalToJSON = async (
     // Update the registry mapping with registry additions prior to processing the proposal.
     for (const nameStr of Object.keys(registryAdditions)) {
       const name = nameStr as CeloContract
-      if (!CeloContract[name]) {
-        throw new Error(`Name ${nameStr} in registry additions not a CeloContract`)
+      if (CeloContract[name]) {
+        await updateRegistryMapping(name, registryAdditions[name])
+      } else {
+        debug(`Name ${nameStr} in registry additions not a CeloContract`)
       }
-      await updateRegistryMapping(name, registryAdditions[name])
     }
   }
 
@@ -163,6 +165,7 @@ export const proposalToJSON = async (
 
     const jsonTx: ProposalTransactionJSON = {
       contract: parsedTx.callDetails.contract as CeloContract,
+      address: parsedTx.callDetails.contractAddress,
       function: parsedTx.callDetails.function,
       args: parsedTx.callDetails.argList,
       params: parsedTx.callDetails.paramMap,
@@ -231,6 +234,8 @@ interface RegistryAdditions {
  * Builder class to construct proposals from JSON or transaction objects.
  */
 export class ProposalBuilder {
+  externalCallProxyRepoint: Map<string, string> = new Map()
+
   constructor(
     private readonly kit: ContractKit,
     private readonly builders: Array<() => Promise<ProposalTransaction>> = [],
@@ -316,24 +321,49 @@ export class ProposalBuilder {
    */
   isRegistered = this.isRegistryContract
 
+  lookupExternalMethodABI = async (
+    address: string,
+    tx: ProposalTransactionJSON
+  ): Promise<AbiItem | null> => {
+    const abiCoder = this.kit.connection.getAbiCoder()
+    const metadata = await fetchMetadata(this.kit.connection, address)
+    const potentialABIs = metadata?.abiForMethod(tx.function) ?? []
+    return (
+      potentialABIs.find((abi) => {
+        try {
+          abiCoder.encodeFunctionCall(abi, tx.args)
+          return true
+        } catch {
+          return false
+        }
+      }) || null
+    )
+  }
+
   buildCallToExternalContract = async (
     tx: ProposalTransactionJSON
   ): Promise<ProposalTransaction> => {
-    const abiCoder = this.kit.connection.getAbiCoder()
-    let methodABI: AbiItem | null = null
+    if (tx.address == undefined || !isValidAddress(tx.address)) {
+      throw new Error(`${tx.contract} is not a core celo contract so address must be specified`)
+    }
 
-    const metadata = await fetchMetadata(this.kit.connection, tx.contract)
-    if (metadata) {
-      const potentialABIs = metadata.abiForMethod(tx.function)
-      methodABI =
-        potentialABIs.find((abi) => {
-          try {
-            abiCoder.encodeFunctionCall(abi, tx.args)
-            return true
-          } catch {
-            return false
-          }
-        }) || null
+    if (tx.function === '') {
+      // It's not a function call
+      return { input: '', to: tx.address, value: tx.value }
+    }
+
+    let methodABI: AbiItem | null = await this.lookupExternalMethodABI(tx.address, tx)
+    if (methodABI === null) {
+      let proxyImpl
+      if (this.externalCallProxyRepoint.has(tx.address)) {
+        proxyImpl = this.externalCallProxyRepoint.get(tx.address)
+      } else {
+        proxyImpl = await tryGetProxyImplementation(this.kit.connection, tx.address)
+      }
+
+      if (proxyImpl) {
+        methodABI = await this.lookupExternalMethodABI(proxyImpl, tx)
+      }
     }
 
     if (methodABI === null) {
@@ -341,12 +371,12 @@ export class ProposalBuilder {
     }
 
     const input = this.kit.connection.getAbiCoder().encodeFunctionCall(methodABI, tx.args)
-    let to: string = tx.contract
-    if (metadata && metadata.contractName) {
-      to = tx.contract
-    }
+    // let to: string = tx.contract
+    // if (metadata && metadata.contractName) {
+    //   to = tx.contract
+    // }
 
-    return { input, to, value: tx.value }
+    return { input, to: tx.address, value: tx.value }
   }
 
   /*
@@ -388,23 +418,22 @@ export class ProposalBuilder {
       this.setRegistryAddition(args.name, args.address)
     }
 
-    // handle sending value to unregistered contracts
-    if (this.isRegistryContract(tx.contract)) {
-      return this.buildCallToCoreContract(tx)
-    } else {
-      if (!isValidAddress(tx.contract)) {
-        throw new Error(
-          `Transaction to unregistered contract ${tx.contract} only supported by address`
-        )
-      }
-
-      if (tx.function === '') {
-        // It's not a function call
-        return { input: '', to: tx.contract, value: tx.value }
-      }
-
-      return this.buildCallToExternalContract(tx)
+    if (isProxySetAndInitFunction(tx) || isProxySetFunction(tx)) {
+      console.log(tx.address + ' is a proxy, repointing to ' + tx.args[0])
+      this.externalCallProxyRepoint.set(tx.address || tx.contract, tx.args[0] as string)
     }
+
+    const strategies = [this.buildCallToCoreContract, this.buildCallToExternalContract]
+
+    for (const strategy of strategies) {
+      try {
+        return await strategy(tx)
+      } catch (e) {
+        debug("Couldn't build transaction with strategy %s: %O", strategy.name, e)
+      }
+    }
+
+    throw new Error(`Couldn't build call for transaction: ${JSON.stringify(tx)}`)
   }
 
   addJsonTx = (tx: ProposalTransactionJSON) => this.builders.push(async () => this.fromJsonTx(tx))

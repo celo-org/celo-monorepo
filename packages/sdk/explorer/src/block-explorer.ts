@@ -179,7 +179,16 @@ export class BlockExplorer {
       implAddress = this.proxyImplementationOverride.get(address)
     }
     if (implAddress) {
-      return this.getContractMappingFromSourcify(implAddress)
+      const contractMapping = await this.getContractMappingFromSourcify(implAddress)
+      if (contractMapping) {
+        return {
+          ...contractMapping,
+          details: {
+            ...contractMapping.details,
+            address, // Show the proxy address
+          },
+        }
+      }
     }
   }
 
