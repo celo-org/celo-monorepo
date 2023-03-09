@@ -46,8 +46,8 @@ const defaultConfig = {
   port: hostPort,
   network_id: 1101,
   from: OG_FROM,
-  gas: gasLimit,
-  gasPrice: 100000000000,
+  blockGasLimit: gasLimit,
+  defaultGasPrice: 100000000000,
 }
 
 const freeGasConfig = { ...defaultConfig, ...{ gasPrice: 0 } }
@@ -67,8 +67,8 @@ const networks = {
   development: {
     ...defaultConfig,
     from: DEVELOPMENT_FROM,
-    gasPrice: 0,
-    gas: gasLimit,
+    defaultGasPrice: 0,
+    blockGasLimit: gasLimit,
     defaultBalance: 200000000,
     maxFeePerGas: 875000000,
     mnemonic: 'concert load couple harbor equip island argue ramp clarify fence smart topic',

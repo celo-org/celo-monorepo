@@ -5,6 +5,7 @@ import {
   assertLogMatches2,
   assertRevert,
   assertRevertWithReason,
+  assertTXRevertWithReason,
   timeTravel,
 } from '@celo/protocol/lib/test-utils'
 import { fromFixed, reciprocal, toFixed } from '@celo/utils/lib/fixidity'
@@ -1160,7 +1161,7 @@ contract('GrandaMento', (accounts: string[]) => {
       // Add an entry for StableTokenEUR so the tx doesn't revert
       // as a result of the registry lookup.
       await registry.setAddressFor(CeloContractName.StableTokenEUR, stableToken.address)
-      await assertRevertWithReason(
+      await assertTXRevertWithReason(
         grandaMento.getStableTokenExchangeLimits(CeloContractName.StableTokenEUR),
         'Max stable token exchange amount must be defined'
       )

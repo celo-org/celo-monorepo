@@ -1,4 +1,4 @@
-import { assertRevert } from '@celo/protocol/lib/test-utils'
+import { assertRevert, assertTXRevertWithReason } from '@celo/protocol/lib/test-utils'
 import { soliditySha3 } from '@celo/utils/lib/solidity'
 import { RegistryInstance } from 'types'
 
@@ -24,7 +24,7 @@ contract('Registry', (accounts: any) => {
     })
 
     it('should not be callable again', async () => {
-      await assertRevert(registry.initialize())
+      await assertTXRevertWithReason(registry.initialize(), 'contract already initialized')
     })
   })
 
@@ -35,7 +35,10 @@ contract('Registry', (accounts: any) => {
     })
 
     it('should not allow a different user to set an address', async () => {
-      await assertRevert(registry.setAddressFor(anIdentifier, anAddress, { from: accounts[1] }))
+      await assertTXRevertWithReason(
+        registry.setAddressFor(anIdentifier, anAddress, { from: accounts[1] }),
+        'Ownable: caller is not the owner'
+      )
     })
 
     it('should emit an event', async () => {
