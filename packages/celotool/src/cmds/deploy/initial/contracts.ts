@@ -1,6 +1,5 @@
 /* tslint:disable no-console */
 import { ContractKit, IdentityMetadataWrapper, newKitFromWeb3 } from '@celo/contractkit'
-import { createAttestationServiceURLClaim } from '@celo/contractkit/lib/identity/claims/attestation-service-url'
 import { createNameClaim } from '@celo/contractkit/lib/identity/claims/claim'
 import { concurrentMap } from '@celo/utils/lib/async'
 import { LocalSigner } from '@celo/utils/lib/signatureUtils'
@@ -8,7 +7,6 @@ import { writeFileSync } from 'fs'
 import { uploadArtifacts } from 'src/lib/artifacts'
 import { switchToClusterFromEnv } from 'src/lib/cluster'
 import { execCmd } from 'src/lib/cmd-utils'
-import { envVar, fetchEnv } from 'src/lib/env-utils'
 import { privateKeyToAddress } from 'src/lib/generate_utils'
 import { exitIfCelotoolHelmDryRun } from 'src/lib/helm_deploy'
 import { migrationOverrides, truffleOverrides, validatorKeys } from 'src/lib/migration-utils'
@@ -36,21 +34,11 @@ export const builder = (argv: yargs.Argv) => {
 
 export const CLABS_VALIDATOR_METADATA_BUCKET = 'clabs_validator_metadata'
 
-function getAttestationServiceUrl(testnet: string, index: number) {
-  return `https://${testnet}-attestation-service.${fetchEnv(
-    envVar.CLUSTER_DOMAIN_NAME
-  )}.org/${index}/`
-}
-
 function metadataURLForCLabsValidator(testnet: string, address: string) {
   return `https://storage.googleapis.com/${CLABS_VALIDATOR_METADATA_BUCKET}/${testnet}/validator-${testnet}-${address}-metadata.json`
 }
 
 async function makeMetadata(testnet: string, address: string, index: number, privateKey: string) {
-  const attestationServiceClaim = createAttestationServiceURLClaim(
-    getAttestationServiceUrl(testnet, index)
-  )
-
   const nameClaim = createNameClaim(`Validator ${index} on ${testnet}: ${address}`)
 
   const fileName = `validator-${testnet}-${address}-metadata.json`
@@ -58,7 +46,6 @@ async function makeMetadata(testnet: string, address: string, index: number, pri
 
   const metadata = IdentityMetadataWrapper.fromEmpty(address)
   await metadata.addClaim(nameClaim, LocalSigner(privateKey))
-  await metadata.addClaim(attestationServiceClaim, LocalSigner(privateKey))
   writeFileSync(filePath, metadata.toString())
 
   await uploadFileToGoogleStorage(

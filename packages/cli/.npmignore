@@ -1,28 +1,2 @@
-/.devchain/
-/.devchain.tar.gz
-/coverage/
-/node_modules/
-/src/
 
-/tslint.json
-/tsconfig.*
-/jest.config.*
-*.tgz
-
-/src
-
-/lib/**/*.test.*
-/lib/test-utils
-
-/tmp/
-/.tmp/
-
-/scripts
-
-
-# exclude ts files and sourcemaps
-*.map
-*.ts
-
-# include the .d.ts files
-!lib/**/*.d.ts
+# use the files array in package.json to include files

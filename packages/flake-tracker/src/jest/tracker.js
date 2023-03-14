@@ -26,9 +26,12 @@ class JestFlakeTracker {
       // to call `makeRunResult`. This converts our `TestEntry` objects into `TestResults`
       // which have formatted errors
       const describeBlock = buildFlakeyDescribe(clone(state.rootDescribeBlock), this.flakes)
-      makeRunResult(describeBlock, state.unhandledErrors)
-        .testResults.filter((tr) => tr.status === 'flakey')
-        .forEach((tr) => db.writeErrors(getTestIDFromTestPath(tr.testPath), tr.errors))
+      try {
+        makeRunResult(describeBlock, state.unhandledErrors)
+          .testResults.filter((tr) => tr.status === 'flakey')
+          .forEach((tr) => db.writeErrors(getTestIDFromTestPath(tr.testPath), tr.errors))
+      } catch {} // ignoring weird behavior: "TypeError: Cannot read property 'replace' of undefined" that sometimes throws here
+
       // The alternative to using the db would be to send results to github at the
       // end of each describe block. Instead,  we use the db and only message github
       // on global.setup and global.teardown.

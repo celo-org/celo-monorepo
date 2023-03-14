@@ -30,6 +30,11 @@ metadata:
       location ~ /address/(.*)/coin_balances {
         return 301 /address/$1/coin-balances;
       }
+    {{- if .Values.blockscout.web.basicAuth.enabled }}
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: {{ .Release.Name }}-web-basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+    {{- end }}
 spec:
   ingressClassName: {{ default "nginx" .Values.ingressClassName }}
   tls:

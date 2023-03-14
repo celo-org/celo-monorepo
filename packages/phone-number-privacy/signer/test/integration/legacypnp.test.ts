@@ -1,4 +1,3 @@
-import { AttestationsStatus } from '@celo/base'
 import { newKit, StableToken } from '@celo/contractkit'
 import {
   AuthenticationMethod,
@@ -15,6 +14,7 @@ import {
   WarningMessage,
 } from '@celo/phone-number-privacy-common'
 import {
+  AttestationsStatus,
   createMockOdisPayments,
   getPnpSignRequest,
 } from '@celo/phone-number-privacy-common/lib/test/utils'

@@ -1,6 +1,6 @@
 {
   "name": "@celo/phone-number-privacy-monitor",
-  "version": "2.0.0",
+  "version": "3.0.0-dev",
   "description": "Regularly queries ODIS to ensure the system is functioning properly",
   "author": "Celo",
   "license": "Apache-2.0",
@@ -22,13 +22,13 @@
     "loadTest": "ts-node src/scripts/run-load-test.ts"
   },
   "dependencies": {
-    "@celo/contractkit": "3.0.1-dev",
-    "@celo/cryptographic-utils": "3.0.1-dev",
-    "@celo/encrypted-backup": "3.0.1-dev",
-    "@celo/identity": "3.0.1-dev",
-    "@celo/wallet-local": "3.0.1-dev",
-    "@celo/phone-number-privacy-common": "2.0.1-dev",
-    "@celo/utils": "3.0.1-dev",
+    "@celo/contractkit": "^3.2.1-dev",
+    "@celo/cryptographic-utils": "^3.2.1-dev",
+    "@celo/encrypted-backup": "^3.2.1-dev",
+    "@celo/identity": "^3.2.1-dev",
+    "@celo/wallet-local": "^3.2.1-dev",
+    "@celo/phone-number-privacy-common": "^3.0.0-dev",
+    "@celo/utils": "^3.2.1-dev",
     "firebase-admin": "^9.12.0",
     "firebase-functions": "^3.15.7"
   },
