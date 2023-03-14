@@ -13,6 +13,7 @@ blockscout:
     enableEventStream: false
     beanstalkdPort: ""
     beanstalkdHost: ""
+    beanstalkdTube: ""
     replicas: 0
     readinessProbe:
       enabled: false
