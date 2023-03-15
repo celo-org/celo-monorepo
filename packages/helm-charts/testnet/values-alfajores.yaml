@@ -14,8 +14,8 @@ geth:
       memory: 9G
   txNodePrivateResources:
     requests:
-      cpu: 1.8
-      memory: 4.2Gi
+      cpu: 1.7
+      memory: 4Gi
   validatorAffinity:
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:

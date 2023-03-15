@@ -50,9 +50,6 @@ spec:
         resources:
           {{- toYaml . | nindent 10 }}
       {{- end }}
-          requests:
-            cpu: 15m
-            memory: 110Mi
     {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
