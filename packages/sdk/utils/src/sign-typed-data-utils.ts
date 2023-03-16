@@ -40,14 +40,17 @@ export interface EIP712TypedData {
 
 /** Array of all EIP-712 atomic type names. */
 export const EIP712_ATOMIC_TYPES = [
-  'bytes1',
-  'bytes32',
-  'uint8',
-  'uint64',
-  'uint256',
-  // This list should technically include all types from uint8 to uint256, and int8 to int256
-  'int8',
-  'int256',
+  // bytes types from 1 to 32 bytes
+  // and uint/int types from 8 to 256 bits
+  ...(() => {
+    const result = []
+    for (let i = 1; i <= 32; i++) {
+      result.push('bytes' + i)
+      result.push('uint' + i * 8)
+      result.push('int' + i * 8)
+    }
+    return result
+  })(),
   'bool',
   'address',
 ]
