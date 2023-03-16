@@ -9,6 +9,7 @@ import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { FreezerInstance } from 'types'
 import { ExchangeEURInstance, ReserveInstance } from 'types/mento'
+import { MySingleton } from './singletonArtifacts'
 
 const initializeArgs = async (): Promise<any[]> => {
   return [
@@ -37,7 +38,7 @@ module.exports = deploymentForCoreContract<ExchangeEURInstance>(
 
     const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
       'Reserve',
-      artifacts
+      MySingleton.getInstance()
     )
     // cUSD doesn't need to be added as it is currently harcoded in Reserve.sol
     await reserve.addExchangeSpender(exchange.address)

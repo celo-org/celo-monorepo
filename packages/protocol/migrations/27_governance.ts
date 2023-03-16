@@ -11,6 +11,7 @@ import {
 import { config } from '@celo/protocol/migrationsConfig'
 import { toFixed } from '@celo/utils/lib/fixidity'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance } from 'types'
+import { MySingleton } from './singletonArtifacts'
 
 const initializeArgs = async (networkName: string): Promise<any[]> => {
   const governanceApproverMultiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract<GovernanceApproverMultiSigInstance>(
@@ -49,13 +50,31 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       const constitutionContractNames = Object.keys(constitution).filter(
         (contractName) => contractName !== 'proxy'
       )
+      console.log('constitutionContractNames', constitutionContractNames)
+      let contract: any
       for (const contractName of constitutionContractNames) {
         console.log(`\tSetting constitution thresholds for ${contractName}`)
-        const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
-          contractName,
-          artifacts
-        )
-        const selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
+
+        let selectors
+        try {
+          contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
+            contractName,
+            artifacts
+          )
+          selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
+        } catch {
+          // TODO remove this catch
+          contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
+            contractName,
+            MySingleton.getInstance()
+          )
+          selectors = getFunctionSelectorsForContract(
+            contract,
+            contractName,
+            MySingleton.getInstance()
+          )
+        }
+
         selectors.default = ['0x00000000']
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
         await Promise.all(
@@ -82,6 +101,7 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'Escrow',
       'Exchange',
       'ExchangeEUR',
+      'ExchangeBRL',
       'FederatedAttestations',
       'FeeCurrencyWhitelist',
       'Freezer',
@@ -98,12 +118,26 @@ module.exports = deploymentForCoreContract<GovernanceInstance>(
       'SortedOracles',
       'StableToken',
       'StableTokenEUR',
+      'StableTokenBRL',
       'Validators',
     ]
 
     if (!config.governance.skipTransferOwnership) {
       for (const contractName of proxyAndImplementationOwnedByGovernance) {
-        await transferOwnershipOfProxyAndImplementation(contractName, governance.address, artifacts)
+        try {
+          await transferOwnershipOfProxyAndImplementation(
+            contractName,
+            governance.address,
+            artifacts
+          )
+        } catch {
+          // TODO remove this catch
+          await transferOwnershipOfProxyAndImplementation(
+            contractName,
+            governance.address,
+            MySingleton.getInstance()
+          )
+        }
       }
     }
   }

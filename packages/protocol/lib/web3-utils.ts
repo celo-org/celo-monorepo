@@ -380,7 +380,7 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
     // Contract.new(testingDeployment)
     console.log("testing works")
 
-    console.log("web3 version:", web3.version)
+    // console.log("web3 version:", web3.version)
     // console.log("_accounts", _accounts)
     // console.log("interfaceAdapter", Contract.interfaceAdapter)
     // console.log(Contract.toJSON())
@@ -393,8 +393,8 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
       console.log(1)
       await proxy._transferOwnership(ContractProxy.defaults().from)
       console.log(2)
-      console.log(networkName)
-      console.log("Contract.networks1", Contract.networks)
+      // console.log(networkName)
+      // console.log("Contract.networks1", Contract.networks)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
       >(web3, artifacts, name, Contract, ContractProxy, ...(await args(networkName)))
