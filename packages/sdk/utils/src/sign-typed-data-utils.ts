@@ -62,8 +62,11 @@ export const EIP712_BUILTIN_TYPES = EIP712_ATOMIC_TYPES.concat(EIP712_DYNAMIC_TY
 // Regular expression used to identify and parse EIP-712 array type strings.
 const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+)?\])$/
 
-// Regular experssion used to identity EIP-712 integer types (e.g. int256, uint256, uint8).
+// Regular expression used to identity EIP-712 integer types (e.g. int256, uint256, uint8).
 const EIP712_INT_REGEXP = /^u?int\d*$/
+
+// Regular expression used to identity EIP-712 bytes types (e.g. bytes, bytes1, up to bytes32).
+const EIP712_BYTES_REGEXP = /^bytes\d*$/
 
 /**
  * Utility type representing an optional value in a EIP-712 compatible manner, as long as the
@@ -268,20 +271,22 @@ export function structHash(primaryType: string, data: EIP712Object, types: EIP71
  */
 export function zeroValue(primaryType: string, types: EIP712Types = {}): EIP712ObjectValue {
   // If the type is a built-in, return a pre-defined zero value.
-  if (['bytes', 'bytes1', 'bytes32'].includes(primaryType)) {
-    return Buffer.alloc(0)
-  }
-  if (['uint8', 'uint256', 'int8', 'int256'].includes(primaryType)) {
-    return 0
-  }
-  if (primaryType === 'bool') {
-    return false
-  }
-  if (primaryType === 'address') {
-    return NULL_ADDRESS
-  }
-  if (primaryType === 'string') {
-    return ''
+  if (EIP712_BUILTIN_TYPES.includes(primaryType)) {
+    if (EIP712_BYTES_REGEXP.test(primaryType)) {
+      return Buffer.alloc(0)
+    }
+    if (EIP712_INT_REGEXP.test(primaryType)) {
+      return 0
+    }
+    if (primaryType === 'bool') {
+      return false
+    }
+    if (primaryType === 'address') {
+      return NULL_ADDRESS
+    }
+    if (primaryType === 'string') {
+      return ''
+    }
   }
 
   // If the type is an array, return an empty array or an array of the given fixed length.

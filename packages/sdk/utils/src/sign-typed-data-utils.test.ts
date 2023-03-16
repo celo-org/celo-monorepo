@@ -393,6 +393,17 @@ const TEST_TYPES: EIP712TestCase[] = [
     },
     typeEncoding:
       'SomeAtomicTypes(uint8 ui8,uint160 ui160,uint256 ui256,int8 i8,int160 i160,int256 i256,bytes1 b1,bytes16 b16,bytes32 b32)',
+    zero: {
+      ui8: 0,
+      ui160: 0,
+      ui256: 0,
+      i8: 0,
+      i160: 0,
+      i256: 0,
+      b1: Buffer.from([]),
+      b16: Buffer.from([]),
+      b32: Buffer.from([]),
+    },
     examples: [
       {
         data: {
