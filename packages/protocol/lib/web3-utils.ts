@@ -1,6 +1,7 @@
 /* tslint:disable:no-console */
 // TODO(asa): Refactor and rename to 'deployment-utils.ts'
 import { Address, CeloTxObject } from '@celo/connect'
+import { Artifact } from '@celo/protocol/lib/compatibility/internal' // maybe is not truffle, it's a OZ
 import { setAndInitializeImplementation } from '@celo/protocol/lib/proxy-utils'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { signTransaction } from '@celo/protocol/lib/signing-utils'
@@ -12,6 +13,9 @@ import { EscrowInstance, GoldTokenInstance, MultiSigInstance, OwnableInstance, P
 import { StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
 
+
+// import truffleContract = require('truffle-contract')
+const truffleContract = require("@truffle/contract");
 
 
 export async function sendTransactionWithPrivateKey<T>(
@@ -145,13 +149,31 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, artifacts: any, contractName: string, ...args: any[]): Promise<ContractInstance> {
-  const Contract: Truffle.Contract<ContractInstance> = artifacts.require(contractName)
-  const ContractProxy: Truffle.Contract<ProxyInstance> = artifacts.require(contractName + 'Proxy')
+>(web3: Web3, artifacts: any, contractName: string, artifactPath:string, ...args: any[]): Promise<ContractInstance> {
+  console.log("Made it here1")
+  let Contract, ContractProxy
+  if (artifactPath){
+    Contract = makeTruffleContract(require(`../build/${artifactPath}/${contractName}.json`), web3)
+    ContractProxy = makeTruffleContract(require(`../build/${artifactPath}/${contractName + 'Proxy'}.json`), web3)
+  } else {
+    Contract = artifacts.require(contractName)
+    ContractProxy = artifacts.require(contractName + 'Proxy')
+  }
 
+  await Contract.detectNetwork()
+  await ContractProxy.detectNetwork()
+  
+  console.log("artifacts ok1")
+
+  console.log("network id", await web3.eth.net.getId())
+  console.log("networks:", Contract.networks)
+  console.log("network type:", Contract.networkType)
   const implementation: ContractInstance = await Contract.deployed()
+  console.log(11)
   const proxy: ProxyInstance = await ContractProxy.deployed()
+  console.log(12)
   await _setInitialProxyImplementation(web3, implementation, proxy, contractName, { from: null, value: null }, ...args)
+  console.log(13)
   return Contract.at(proxy.address) as ContractInstance
 }
 
@@ -239,10 +261,56 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
   artifacts: any,
   name: CeloContractName,
   args: (networkName?: string) => Promise<any[]> = async () => [],
-  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void,
+  artifactPath?: string
 ) {
-  return deploymentForContract(web3, artifacts, name, args, false, then);
+  return deploymentForContract(web3, artifacts, name, args, false, then, artifactPath);
 
+}
+
+
+
+const makeTruffleContract = (artifact: Artifact, web3: Web3) => {
+  const Contract = truffleContract({
+    abi: artifact.abi,
+    unlinked_binary: artifact.bytecode,
+  })
+
+  // https://ethereum.stackexchange.com/questions/51240/error-deploying-using-truffle-contracts-cannot-read-property-apply-of-undefin
+  // if (typeof Contract.currentProvider.sendAsync !== "function") {
+  //   Contract.currentProvider.sendAsync = function() {
+  //     return Contract.currentProvider.send.apply(
+  //       Contract.currentProvider,
+  //           arguments
+  //     );
+  //   };
+  // }
+  
+
+
+  const {createInterfaceAdapter}= require("@truffle/interface-adapter")
+  console.log("Provider ")
+  // Contract.web3 = web3
+  Contract.setProvider(web3.currentProvider)
+  Contract.setNetwork(1101)
+  // Contract.setNetwork("development")
+  // Contract.configureNetwork() funct doesn't exist
+  Contract.interfaceAdapter = createInterfaceAdapter({networkType:"ethereum", provider:web3.currentProvider})
+
+  Contract.configureNetwork({networkType:"ethereum", provider:web3.currentProvider})
+  // Contract._constructorMethods.configureNetwork({networkType:"ethereum", provider:web3.currentProvider})
+  // Contract._constructorMethods().configureNetwork()
+  
+  
+  // web3.eth.net.getId().then((networkId) => {
+  //   Contract.setNetwork(networkId)
+  //   console.log(`set ${networkId}`)
+  // }).catch((error) => {
+  //   console.error(error);
+  // });
+  // console.log("before return")
+  Contract.defaults({from:"0x5409ed021d9299bf6814279a6a1411a7e866a631", gas: 13000000})
+  return Contract
 }
 
 export function deploymentForContract<ContractInstance extends Truffle.ContractInstance>(
@@ -251,29 +319,76 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   name: CeloContractName,
   args: (networkName?: string) => Promise<any[]> = async () => [],
   registerAddress: boolean,
-  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void
+  then?: (contract: ContractInstance, web3: Web3, networkName: string) => void,
+  artifactPath?: string
 ) {
-  const Contract = artifacts.require(name)
-  const ContractProxy = artifacts.require(name + 'Proxy')
+  console.log("made it here2")
+  let Contract 
+  let ContractProxy
+  if (artifactPath){
+    Contract = makeTruffleContract(require(`../build/${artifactPath}/${name}.json`), web3)
+    ContractProxy = makeTruffleContract(require(`../build/${artifactPath}/${name + 'Proxy'}.json`), web3)
+  } else {
+    Contract = artifacts.require(name)
+    ContractProxy = artifacts.require(name + 'Proxy')
+  }
+  console.log("type is", typeof(Contract))
+  console.log("Good artifacts2")
+ 
   const testingDeployment = false
   return (deployer: any, networkName: string, _accounts: string[]) => {
-    console.log('Deploying', name)
+    // web3.eth.defaultAccount = _accounts[0]
+    // Contract.address =  _accounts[0]
+    // Contract.web3 = web3
+    console.log('\n-> Deploying', name)
+
+    ContractProxy.defaults({ from:"0x5409ed021d9299bf6814279a6a1411a7e866a631" })
+    // Contract.defaults({ from:"0x5409ed021d9299bf6814279a6a1411a7e866a631" })
+    console.log("Contract.defaults()", Contract.defaults())
+    
     deployer.deploy(ContractProxy)
+    // console.log(JSON.stringify(ContractProxy))
+    console.log("deployed proxy")
     deployer.deploy(Contract, testingDeployment)
+    // console.log(JSON.stringify(Contract))
+    console.log("deployed contract")
+
+
+    // Contract.at("0x0cDF34e216DAB593f00a95B2a4aaB735A1b421fC")
+    // Contract.new(testingDeployment)
+    console.log("testing works")
+
+    console.log("web3 version:", web3.version)
+    // console.log("_accounts", _accounts)
+    // console.log("interfaceAdapter", Contract.interfaceAdapter)
+    // console.log(Contract.toJSON())
+    
+
     deployer.then(async () => {
+      console.log(0)
+      // console.log("await web3.eth.getAccounts()", await web3.eth.getAccounts())
       const proxy: ProxyInstance = await ContractProxy.deployed()
+      console.log(1)
       await proxy._transferOwnership(ContractProxy.defaults().from)
+      console.log(2)
+      console.log(networkName)
+      console.log("Contract.networks1", Contract.networks)
       const proxiedContract: ContractInstance = await setInitialProxyImplementation<
         ContractInstance
-      >(web3, artifacts, name, ...(await args(networkName)))
-
+      >(web3, artifacts, name, artifactPath, ...(await args(networkName)))
+      console.log(3)
       if (registerAddress) {
+        console.log(4)
         const registry = await getDeployedProxiedContract<RegistryInstance>('Registry', artifacts)
+        console.log(5)
         await registry.setAddressFor(name, proxiedContract.address)
+        console.log(5)
       }
-
+      console.log(7)
       if (then) {
+        console.log(8)
         await then(proxiedContract, web3, networkName)
+        console.log(9)
       }
     })
   }
