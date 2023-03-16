@@ -35,5 +35,6 @@ module.exports = deploymentForCoreContract<ExchangeInstance>(
       await freezer.freeze(exchange.address)
     }
     await exchange.activateStable()
-  }
+  },
+  'mento'
 )

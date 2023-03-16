@@ -10,6 +10,7 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { FeeCurrencyWhitelistInstance, FreezerInstance, SortedOraclesInstance } from 'types'
 import { ReserveInstance, StableTokenEURInstance } from 'types/mento'
 import Web3 from 'web3'
+import { MySingleton } from './singletonArtifacts'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 
@@ -28,7 +29,7 @@ const initializeArgs = async (): Promise<any[]> => {
   ]
 }
 
-// TODO make this general
+// TODO make this general (do it!)
 module.exports = deploymentForCoreContract<StableTokenEURInstance>(
   web3,
   artifacts,
@@ -38,13 +39,13 @@ module.exports = deploymentForCoreContract<StableTokenEURInstance>(
     if (config.stableTokenEUR.frozen) {
       const freezer: FreezerInstance = await getDeployedProxiedContract<FreezerInstance>(
         'Freezer',
-        artifacts
+        MySingleton.getInstance()
       )
       await freezer.freeze(stableToken.address)
     }
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<SortedOraclesInstance>(
       'SortedOracles',
-      artifacts
+      MySingleton.getInstance()
     )
 
     for (const oracle of config.stableTokenEUR.oracles) {
@@ -71,7 +72,7 @@ module.exports = deploymentForCoreContract<StableTokenEURInstance>(
       )
       const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
         'Reserve',
-        artifacts
+        MySingleton.getInstance()
       )
       console.info('Adding StableToken (EUR) to Reserve')
       await reserve.addToken(stableToken.address)
@@ -83,5 +84,6 @@ module.exports = deploymentForCoreContract<StableTokenEURInstance>(
       artifacts
     )
     await feeCurrencyWhitelist.addToken(stableToken.address)
-  }
+  },
+  'mento'
 )

@@ -9,10 +9,14 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { RegistryInstance } from 'types'
 import { ReserveInstance, ReserveSpenderMultiSigInstance } from 'types/mento'
 import Web3 from 'web3'
+import { MySingleton } from './singletonArtifacts'
 
 import Web3Utils = require('web3-utils')
 
 const truffle = require('@celo/protocol/truffle-config.js')
+// const Artifactor = require('truffle-artifactor')
+// const mentoArtifacts = new Artifactor('./build/mento');
+// console.log("require", mentoArtifacts.require('ReserveSpenderMultiSig'))
 
 const initializeArgs = async (): Promise<
   [string, number, string, number, number, string[], string[], string, string]
@@ -35,6 +39,7 @@ const initializeArgs = async (): Promise<
     config.reserve.tobinTaxReserveRatio,
   ]
 }
+console.log('Singleton initialized', MySingleton.getInstance().initialized)
 
 module.exports = deploymentForCoreContract<ReserveInstance>(
   web3,
@@ -71,9 +76,10 @@ module.exports = deploymentForCoreContract<ReserveInstance>(
 
     const reserveSpenderMultiSig: ReserveSpenderMultiSigInstance = await getDeployedProxiedContract<ReserveSpenderMultiSigInstance>(
       CeloContractName.ReserveSpenderMultiSig,
-      artifacts
+      MySingleton.getInstance()
     )
     console.info(`Marking ${reserveSpenderMultiSig.address} as a reserve spender`)
     await reserve.addSpender(reserveSpenderMultiSig.address)
-  }
+  },
+  'mento'
 )

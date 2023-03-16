@@ -10,6 +10,7 @@ import { toFixed } from '@celo/utils/lib/fixidity'
 import { FeeCurrencyWhitelistInstance, FreezerInstance, SortedOraclesInstance } from 'types'
 import { ReserveInstance, StableTokenInstance } from 'types/mento'
 import Web3 from 'web3'
+import { MySingleton } from './singletonArtifacts'
 
 const truffle = require('@celo/protocol/truffle-config.js')
 
@@ -44,8 +45,8 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
 
     const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract<SortedOraclesInstance>(
       'SortedOracles',
-      artifacts
-    )
+      MySingleton.getInstance()
+    ) // TODO use registry rather than truffle
 
     for (const oracle of config.stableToken.oracles) {
       console.info(`Adding ${oracle} as an Oracle for StableToken (USD)`)
@@ -71,7 +72,7 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       )
       const reserve: ReserveInstance = await getDeployedProxiedContract<ReserveInstance>(
         'Reserve',
-        artifacts
+        MySingleton.getInstance()
       )
       console.info('Adding StableToken (USD) to Reserve')
       await reserve.addToken(stableToken.address)
@@ -83,5 +84,6 @@ module.exports = deploymentForCoreContract<StableTokenInstance>(
       artifacts
     )
     await feeCurrencyWhitelist.addToken(stableToken.address)
-  }
+  },
+  'mento'
 )
