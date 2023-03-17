@@ -40,24 +40,26 @@ export interface EIP712TypedData {
 
 /** Array of all EIP-712 atomic type names. */
 export const EIP712_ATOMIC_TYPES = [
+  'bool',
+  'address',
   // bytes types from 1 to 32 bytes
   // and uint/int types from 8 to 256 bits
   ...(() => {
     const result = []
-    for (let i = 1; i <= 32; i++) {
+    // Putting "bigger" types first, assuming they are more likely to be used.
+    // So `EIP712_ATOMIC_TYPES.includes(...)` calls are faster. (likely useless micro-optimization :D)
+    for (let i = 32; i >= 1; i--) {
       result.push('bytes' + i)
       result.push('uint' + i * 8)
       result.push('int' + i * 8)
     }
     return result
   })(),
-  'bool',
-  'address',
 ]
 
 export const EIP712_DYNAMIC_TYPES = ['bytes', 'string']
 
-export const EIP712_BUILTIN_TYPES = EIP712_ATOMIC_TYPES.concat(EIP712_DYNAMIC_TYPES)
+export const EIP712_BUILTIN_TYPES = EIP712_DYNAMIC_TYPES.concat(EIP712_ATOMIC_TYPES)
 
 // Regular expression used to identify and parse EIP-712 array type strings.
 const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+)?\])$/
