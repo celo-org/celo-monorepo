@@ -1,5 +1,9 @@
 pragma solidity ^0.5.13;
 
+// TODO move to IStableToken when it adds method getExchangeRegistryId
+import { StableToken } from "../../lib/mento-core/contracts/StableToken.sol";
+import { IExchange } from "../../lib/mento-core/contracts/interfaces/IExchange.sol";
+
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
@@ -9,11 +13,8 @@ import "../common/Freezable.sol";
 import "../common/FixidityLib.sol";
 import "../common/Initializable.sol";
 
-// TODO move to IStableToken when it adds method getExchangeRegistryId
-import "../stability/StableToken.sol";
 import "../common/interfaces/ICeloVersionedContract.sol";
 import "../common/interfaces/ICeloToken.sol";
-import "../stability/interfaces/IExchange.sol";
 import "../stability/interfaces/ISortedOracles.sol";
 
 // Using the minimal required signatures in the interfaces so more contracts could be compatible

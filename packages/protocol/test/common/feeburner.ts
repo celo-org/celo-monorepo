@@ -4,8 +4,6 @@ import { assertEqualBN, assertGtBN, assertRevert, timeTravel } from '@celo/proto
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
-  ExchangeContract,
-  ExchangeInstance,
   FeeBurnerContract,
   FeeBurnerInstance,
   FeeCurrencyWhitelistContract,
@@ -26,9 +24,13 @@ import {
   MockUniswapV2Router02Instance,
   RegistryContract,
   RegistryInstance,
+} from 'types'
+import {
+  ExchangeContract,
+  ExchangeInstance,
   StableTokenContract,
   StableTokenInstance,
-} from 'types'
+} from 'types/mento'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
 const goldAmountForRate = new BigNumber('1000000000000000000000000')
