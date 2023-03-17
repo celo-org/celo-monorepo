@@ -1,3 +1,4 @@
+// TODO: (soloseng)  error caused by non-zero gasprice
 import { NULL_ADDRESS } from '@celo/base/lib/address'
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { getParsedSignatureOfAddress } from '@celo/protocol/lib/signing-utils'

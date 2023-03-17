@@ -1,3 +1,5 @@
+//TODO: (soloseng) fix: Argument of type 'string' is not assignable to parameter of type 'ProvidesHookCallback'.
+
 import { retryAsync } from '@celo/utils/lib/async'
 
 // Handles flakey `error: Invalid JSON RPC response: ""` error that seems to be caused by port exhaustion in CI.
