@@ -5,33 +5,39 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 250Mi
-            cpu: 200m
-    poolSize: 150
+            memory: 40M
+            cpu: 25m
+    poolSize: 200
     resources:
       requests:
-        memory: 1000Mi
-        cpu: 2
+        memory: 400M
+        cpu: 0.4
+      limits:
+        memory: 1G
+        cpu: 1
     metrics:
       enabled: true
   api:
     autoscaling:
-        maxReplicas: 3
-        minReplicas: 2
-        target:
-          cpu: 70
+      maxReplicas: 3
+      minReplicas: 2
+      target:
+        cpu: 80
     db:
       connectionName: celo-testnet-production:us-west1:baklava3-replica
       proxy:
         resources:
           requests:
-            memory: 250Mi
-            cpu: 200m
+            memory: 12M
+            cpu: 4m
     poolSize: 10
     resources:
       requests:
-        memory: 250Mi
-        cpu: 500m
+        memory: 300M
+        cpu: 40m
+      limits:
+        memory: 500M
+        cpu: 200m
   web:
     host: explorer.celo.org
     suffix:
@@ -47,16 +53,19 @@ blockscout:
       proxy:
         resources:
           requests:
-            memory: 250Mi
-            cpu: 200m
-    poolSize: 10
+            memory: 20M
+            cpu: 14m
+    poolSize: 20
     resources:
       requests:
-        memory: 250M
-        cpu: 500m
+        memory: 350M
+        cpu: 0.4
+      limits:
+        memory: 1G
+        cpu: 1
   metadataCrawler:
     enabled: true
-    schedule: "*/30 * * * *" # every 30 minutes
+    schedule: "*/30 * * * *"  # every 30 minutes
     discordClusterName: Baklava
   metrics:
     enabled: true

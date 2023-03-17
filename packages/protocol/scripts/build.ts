@@ -21,6 +21,7 @@ export const ProxyContracts = [
   'ExchangeEURProxy',
   'ExchangeProxy',
   'FederatedAttestationsProxy',
+  'FeeBurnerProxy',
   'FeeCurrencyWhitelistProxy',
   'GasPriceMinimumProxy',
   'GoldTokenProxy',
@@ -43,6 +44,7 @@ export const CoreContracts = [
   // common
   'Accounts',
   'GasPriceMinimum',
+  'FeeBurner',
   'FeeCurrencyWhitelist',
   'GoldToken',
   'MetaTransactionWallet',
@@ -93,6 +95,10 @@ const OtherContracts = [
   // abstract
   'Initializable',
   'UsingRegistry',
+
+  // only used for testing
+  'MockUniswapV2Router02',
+  'MockUniswapV2Factory',
 ]
 
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']

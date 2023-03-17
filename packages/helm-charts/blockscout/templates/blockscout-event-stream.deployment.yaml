@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-event-stream
+  labels:
+    {{- include "celo.blockscout.labels" . | nindent 4 }}
+    component: blockscout-event-stream
+  annotations:
+    {{- include "celo.blockscout.annotations" . | nindent 4 }}
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.blockscout.eventStream.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.blockscout.eventStream.strategy.rollingUpdate.maxUnavailable }}
+  replicas: {{ .Values.blockscout.eventStream.replicas }}
+  selector:
+    matchLabels:
+      app: blockscout
+      release: {{ .Release.Name }}
+      component: blockscout-event-stream
+  template:
+    metadata:
+      {{- if .Values.blockscout.metrics.enabled }}
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port:  "{{ .Values.blockscout.eventStream.port }}"
+        prometheus.io/scrape: "true"
+      {{- end }}
+      labels:
+        app: blockscout
+        release: {{ .Release.Name }}
+        component: blockscout-event-stream
+        {{- include "celo.blockscout.elixir.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Release.Name }}-rbac
+      terminationGracePeriodSeconds: {{ .Values.blockscout.eventStream.terminationGracePeriodSeconds }}
+      initContainers:
+{{ include "celo.blockscout.initContainer.secrets-init" . | indent 6 }}
+      containers:
+      - name: blockscout-event-stream
+        image: {{ .Values.blockscout.image.repository }}:{{ .Values.blockscout.image.tag }}
+        imagePullPolicy: {{ .Values.blockscout.image.pullPolicy }}
+        command:
+        - /secrets/secrets-init
+        args:
+        - --provider
+        - google
+        - /bin/sh
+        - -c
+        - |
+           exec mix cmd --app event_stream "elixir --cookie $ERLANG_COOKIE --name {{ .Values.blockscout.erlangNodeName}}@$(POD_IP) -S mix phx.server --no-compile" 
+        volumeMounts:
+        - mountPath: /secrets
+          name: temporary-dir
+          readOnly: true
+        ports:
+        - name: health
+          containerPort: {{ .Values.blockscout.eventStream.port }}
+        {{- if .Values.blockscout.eventStream.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: /health/readiness
+            port: health
+          initialDelaySeconds: {{ .Values.blockscout.eventStream.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.blockscout.eventStream.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.blockscout.eventStream.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.blockscout.eventStream.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.blockscout.eventStream.readinessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.blockscout.eventStream.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: /health/liveness
+            port: health
+          initialDelaySeconds: {{ .Values.blockscout.eventStream.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.blockscout.eventStream.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.blockscout.eventStream.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.blockscout.eventStream.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.blockscout.eventStream.livenessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          requests:
+            memory: {{ .Values.blockscout.eventStream.resources.requests.memory }}
+            cpu: {{ .Values.blockscout.eventStream.resources.requests.cpu }}
+        env:
+        - name: METRICS_ENABLED
+          value: "{{.Values.blockscout.metrics.enabled}}"
+        - name: ENABLE_BEANSTALKD
+          value: {{ .Values.blockscout.eventStream.enableEventStream | quote }}
+        - name: BEANSTALKD_PORT
+          value: {{ .Values.blockscout.eventStream.beanstalkdPort | quote }}
+        - name: BEANSTALKD_HOST
+          value: {{ .Values.blockscout.eventStream.beanstalkdHost | quote }}
+        - name: BEANSTALKD_TUBE
+          value: {{ .Values.blockscout.eventStream.beanstalkdTube | quote }}
+        - name: ERLANG_COOKIE
+          value: {{ .Values.blockscout.secrets.erlang.cookie }}
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: EPMD_SERVICE_NAME
+          value: {{ .Release.Name }}-epmd-service
+      volumes:
+{{ include "celo.blockscout.volume.temporary-dir" . | indent 8 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
