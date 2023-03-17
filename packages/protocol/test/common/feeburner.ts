@@ -1,6 +1,7 @@
 // TODO remove magic numbers
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { assertEqualBN, assertGtBN, assertRevert, timeTravel } from '@celo/protocol/lib/test-utils'
+import { makeTruffleContract } from '@celo/protocol/lib/web3-utils'
 import { fixed1, toFixed } from '@celo/utils/lib/fixidity'
 import BigNumber from 'bignumber.js'
 import {
@@ -40,15 +41,22 @@ const reserveFraction = toFixed(5 / 100)
 const maxSlippage = toFixed(1 / 100)
 const initialReserveBalance = new BigNumber('10000000000000000000000')
 
+const Freezer: FreezerContract = artifacts.require('Freezer')
 const FeeBurner: FeeBurnerContract = artifacts.require('FeeBurner')
 const Registry: RegistryContract = artifacts.require('Registry')
-const Exchange: ExchangeContract = artifacts.require('Exchange')
 const GoldToken: GoldTokenContract = artifacts.require('GoldToken')
 const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSortedOracles')
 const MockReserve: MockReserveContract = artifacts.require('MockReserve')
 
-const StableToken: StableTokenContract = artifacts.require('StableToken')
-const Freezer: FreezerContract = artifacts.require('Freezer')
+const artifactPath = 'mento'
+const Exchange: ExchangeContract = makeTruffleContract(
+  require(`../../build/${artifactPath}/Exchange.json`),
+  web3
+) // artifacts.require('Exchange')
+const StableToken: StableTokenContract = makeTruffleContract(
+  require(`../../build/${artifactPath}/StableToken.json`),
+  web3
+) // artifacts.require('StableToken')
 
 const UniswapRouter: MockUniswapV2Router02Contract = artifacts.require('MockUniswapV2Router02')
 const UniswapV2Factory: MockUniswapV2FactoryContract = artifacts.require('MockUniswapV2Factory')
