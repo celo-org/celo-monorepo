@@ -30,6 +30,7 @@ import {
   RegistryInstance,
 } from 'types'
 import { StableTokenInstance } from 'types/mento'
+import { MySingleton } from '../migrations/singletonArtifacts'
 
 const executeMetaTransaction = async (
   signer: string,
@@ -91,13 +92,15 @@ contract('Komenci Onboarding', (_accounts: string[]) => {
   // $0.15
   const attestationFee = '150000000000000000'
   before(async () => {
-    stableToken = await getDeployedProxiedContract('StableToken', artifacts)
+    stableToken = await getDeployedProxiedContract('StableToken', MySingleton.getInstance()) // TODO fixthis
+
     // The komenci version is set as a test contract because we are not using it with a proxy.
     relayermtw = await MTW.new(true)
     await relayermtw.initialize(_accounts[0])
 
     // Set up the required mocks that will allow verification to work with ganache.
     registry = await getDeployedProxiedContract('Registry', artifacts)
+
     random = await Random.new()
     accounts = await Accounts.new(true)
     await accounts.initialize(registry.address)
