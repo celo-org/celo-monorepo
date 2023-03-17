@@ -5,7 +5,7 @@ import {
   assertRevert,
   assumeOwnership,
 } from '@celo/protocol/lib/test-utils'
-import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import { getDeployedProxiedContract, makeTruffleContract } from '@celo/protocol/lib/web3-utils'
 import { fixed1 } from '@celo/utils/src/fixidity'
 import {
   FreezerContract,
@@ -18,7 +18,11 @@ import { StableTokenContract, StableTokenInstance } from 'types/mento'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const OdisPayments: OdisPaymentsContract = artifacts.require('OdisPayments')
-const StableTokenCUSD: StableTokenContract = artifacts.require('StableToken')
+const artifactPath = 'mento'
+const StableTokenCUSD: StableTokenContract = makeTruffleContract(
+  require(`../../build/${artifactPath}/StableToken.json`),
+  web3
+) //artifacts.require('Reserve') //artifacts.require('StableToken')
 
 const SECONDS_IN_A_DAY = 60 * 60 * 24
 

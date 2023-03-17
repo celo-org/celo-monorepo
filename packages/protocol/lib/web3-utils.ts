@@ -15,7 +15,7 @@ import Web3 from 'web3'
 import { MySingleton } from '../migrations/singletonArtifacts'
 
 // import truffleContract = require('truffle-contract')
-const truffleContract = require("@truffle/contract");
+const truffleContract = require('@truffle/contract');
 
 
 export async function sendTransactionWithPrivateKey<T>(
