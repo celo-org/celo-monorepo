@@ -40,7 +40,7 @@ const artifactPath = 'mento'
 const Reserve: ReserveContract = makeTruffleContract(
   require(`../../../build/${artifactPath}/Reserve.json`),
   web3
-) //artifacts.require('Reserve')
+) // artifacts.require('Reserve')
 
 // @ts-ignore
 // TODO(mcortesi): Use BN

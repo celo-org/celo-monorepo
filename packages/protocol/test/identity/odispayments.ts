@@ -22,7 +22,7 @@ const artifactPath = 'mento'
 const StableTokenCUSD: StableTokenContract = makeTruffleContract(
   require(`../../build/${artifactPath}/StableToken.json`),
   web3
-) //artifacts.require('Reserve') //artifacts.require('StableToken')
+) // artifacts.require('Reserve') // artifacts.require('StableToken')
 
 const SECONDS_IN_A_DAY = 60 * 60 * 24
 
