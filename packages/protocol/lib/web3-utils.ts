@@ -291,7 +291,7 @@ export function deploymentForProxiedContract<ContractInstance extends Truffle.Co
 
 
 
-const makeTruffleContract = (artifact: Artifact, web3: Web3) => {
+export const makeTruffleContract = (artifact: Artifact, web3: Web3) => {
   const Contract = truffleContract({
     abi: artifact.abi,
     unlinked_binary: artifact.bytecode,

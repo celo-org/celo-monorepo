@@ -11,6 +11,7 @@ import {
 import {
   getDeployedProxiedContract,
   getFunctionSelectorsForContract,
+  makeTruffleContract,
 } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
 import { linkedListChanges, zip } from '@celo/utils/lib/collections'
@@ -578,8 +579,15 @@ Array.from([
 )
 
 contract('Integration: Adding StableToken', (accounts: string[]) => {
-  const Exchange: ExchangeContract = artifacts.require('Exchange')
-  const StableToken: StableTokenContract = artifacts.require('StableToken')
+  const artifactPath = 'mento'
+  const Exchange: ExchangeContract = makeTruffleContract(
+    require(`../../build/${artifactPath}/Exchange.json`),
+    web3
+  ) // artifacts.require('Exchange')
+  const StableToken: StableTokenContract = makeTruffleContract(
+    require(`../../build/${artifactPath}/StableToken.json`),
+    web3
+  ) // artifacts.require('StableToken')
   let exchangeAbc: ExchangeInstance
   let freezer: FreezerInstance
   let goldToken: GoldTokenInstance
@@ -657,7 +665,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       const sortedOracles: SortedOraclesInstance = await getDeployedProxiedContract(
         'SortedOracles',
         artifacts
-      )
+      ) // Todo fix this
       await sortedOracles.addOracle(stableTokenAbc.address, ensureLeading0x(accounts[0]))
       await freezer.freeze(stableTokenAbc.address)
       await freezer.freeze(exchangeAbc.address)
@@ -685,7 +693,7 @@ contract('Integration: Adding StableToken', (accounts: string[]) => {
       const feeCurrencyWhitelist: FeeCurrencyWhitelistInstance = await getDeployedProxiedContract(
         'FeeCurrencyWhitelist',
         artifacts
-      )
+      ) // TODO fix this
       await reserve.addToken(stableTokenAbc.address)
       await reserve.addExchangeSpender(exchangeAbc.address)
       await freezer.unfreeze(stableTokenAbc.address)

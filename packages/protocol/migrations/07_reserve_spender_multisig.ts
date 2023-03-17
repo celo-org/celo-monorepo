@@ -32,9 +32,7 @@ module.exports = deploymentForProxiedContract<ReserveSpenderMultiSigInstance>(
     _networkName: any,
     proxy?: any
   ) => {
-    // TODO replace with contract
-    console.log('insde')
-
+    // TODO replace with singleton
     await transferOwnershipOfProxyExternal(proxy, reserveSpenderMultiSig.address)
 
     MySingleton.getInstance().initialized = true
