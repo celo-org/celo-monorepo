@@ -62,10 +62,10 @@ export const EIP712_BUILTIN_TYPES = EIP712_ATOMIC_TYPES.concat(EIP712_DYNAMIC_TY
 // Regular expression used to identify and parse EIP-712 array type strings.
 const EIP712_ARRAY_REGEXP = /^(?<memberType>[\w<>\[\]_\-]+)(\[(?<fixedLength>\d+)?\])$/
 
-// Regular expression used to identity EIP-712 integer types (e.g. int256, uint256, uint8).
+// Regular expression used to identify EIP-712 integer types (e.g. int256, uint256, uint8).
 const EIP712_INT_REGEXP = /^u?int\d*$/
 
-// Regular expression used to identity EIP-712 bytes types (e.g. bytes, bytes1, up to bytes32).
+// Regular expression used to identify EIP-712 bytes types (e.g. bytes, bytes1, up to bytes32).
 const EIP712_BYTES_REGEXP = /^bytes\d*$/
 
 /**
