@@ -3829,7 +3829,7 @@ contract('Governance', (accounts: string[]) => {
           await governance.setDeprecatedWeight(accounts[0], 0, 100)
         })
 
-        it.only('Should return correct number of votes', async () => {
+        it('Should return correct number of votes', async () => {
           const totalVotesByAccount = await governance.getAmountOfGoldUsedForVoting(accounts[0])
 
           assertEqualBN(totalVotesByAccount, 100)
