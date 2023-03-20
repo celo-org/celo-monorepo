@@ -524,15 +524,16 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, prop
 	const proposalTransactions = await Promise.all(
 		contractsToOwn.map(async (contractName: string) => {
       let contractAddress:string
+      // TODO remove this nested try
       try{
         contractAddress = await registry.getAddressForStringOrDie(contractName)
       }
       catch{
         try {
         contractAddress = (await getDeployedProxiedContract(contractName, artifacts)).address
-      }catch{
-        (await getDeployedProxiedContract(contractName, MySingleton.getInstance())).address
-      }
+        }catch{
+          contractAddress = (await getDeployedProxiedContract(contractName, MySingleton.getInstance())).address
+        }
       } 
 			return {
 				value: 0,
