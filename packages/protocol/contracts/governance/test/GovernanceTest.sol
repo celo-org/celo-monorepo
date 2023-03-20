@@ -1,11 +1,8 @@
 pragma solidity ^0.5.13;
 
 import "../Governance.sol";
-import "../Proposals.sol";
 
 contract GovernanceTest is Governance(true) {
-  using Proposals for Proposals.Proposal;
-
   address[] validatorSet;
 
   // Minimally override core functions from UsingPrecompiles
