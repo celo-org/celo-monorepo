@@ -4,7 +4,7 @@ import {
   LibraryPositions,
   linkLibraries,
 } from '@celo/protocol/lib/bytecode'
-import { Artifact } from '@celo/protocol/lib/compatibility/internal'
+import { Artifact } from '@celo/protocol/lib/compatibility/internal' // maybe is not truffle, it's a OZ
 import { verifyBytecodes } from '@celo/protocol/lib/compatibility/verify-bytecode'
 import { assertThrowsAsync } from '@celo/protocol/lib/test-utils'
 import { getTestArtifacts } from '@celo/protocol/test/compatibility/common'

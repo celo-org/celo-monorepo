@@ -37,6 +37,7 @@ import {
   StableTokenContract,
   StableTokenInstance,
 } from 'types/mento'
+import { MySingleton } from '../../migrations/singletonArtifacts'
 import { SECONDS_IN_A_WEEK } from '../constants'
 
 enum VoteValue {
@@ -299,12 +300,27 @@ contract('Integration: Governance', (accounts: string[]) => {
   describe('Checking governance thresholds', () => {
     for (const contractName of Object.keys(constitution).filter((k) => k !== 'proxy')) {
       it('should have correct thresholds for ' + contractName, async () => {
-        const contract: any = await getDeployedProxiedContract<Truffle.ContractInstance>(
-          contractName,
-          artifacts
-        )
+        let contract: any
+        let selectors: { [index: string]: string[] }
+        try {
+          contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
+            contractName,
+            artifacts
+          )
 
-        const selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
+          selectors = getFunctionSelectorsForContract(contract, contractName, artifacts)
+        } catch {
+          contract = await getDeployedProxiedContract<Truffle.ContractInstance>(
+            contractName,
+            MySingleton.getInstance()
+          )
+          selectors = getFunctionSelectorsForContract(
+            contract,
+            contractName,
+            MySingleton.getInstance()
+          )
+        }
+
         selectors.default = ['0x00000000']
 
         const thresholds = { ...constitution.proxy, ...constitution[contractName] }
@@ -416,10 +432,13 @@ Array.from([
     const decimals = 18
 
     before(async () => {
-      exchange = await getDeployedProxiedContract(exchangeId, artifacts)
-      stableToken = await getDeployedProxiedContract(stableTokenId, artifacts)
-      multiSig = await getDeployedProxiedContract('ReserveSpenderMultiSig', artifacts)
-      reserve = await getDeployedProxiedContract('Reserve', artifacts)
+      exchange = await getDeployedProxiedContract(exchangeId, MySingleton.getInstance())
+      stableToken = await getDeployedProxiedContract(stableTokenId, MySingleton.getInstance())
+      multiSig = await getDeployedProxiedContract(
+        'ReserveSpenderMultiSig',
+        MySingleton.getInstance()
+      )
+      reserve = await getDeployedProxiedContract('Reserve', MySingleton.getInstance())
       goldToken = await getDeployedProxiedContract('GoldToken', artifacts)
     })
 

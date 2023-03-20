@@ -4,10 +4,16 @@ import {
   assertRegistryAddressesSet,
 } from '@celo/protocol/lib/test-utils'
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
+import { MySingleton } from '../../migrations/singletonArtifacts'
 
 const getContract = async (contractName: string, type: string) => {
   if (type === 'proxiedContract') {
-    return getDeployedProxiedContract(contractName, artifacts)
+    // TODO remove catch
+    try {
+      return getDeployedProxiedContract(contractName, artifacts)
+    } catch {
+      return getDeployedProxiedContract(contractName, MySingleton.getInstance())
+    }
   }
   if (type === 'contract') {
     return artifacts.require(contractName).deployed()

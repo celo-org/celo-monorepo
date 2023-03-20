@@ -506,6 +506,8 @@ enum VoteValue {
 export async function assumeOwnership(contractsToOwn: string[], to: string, proposalId: number = 1, dequeuedIndex: number = 0) {
 	const governance: GovernanceInstance = await getDeployedProxiedContract('Governance', artifacts)
 	const lockedGold: LockedGoldInstance = await getDeployedProxiedContract('LockedGold', artifacts)
+
+
 	const multiSig: GovernanceApproverMultiSigInstance = await getDeployedProxiedContract(
 		'GovernanceApproverMultiSig',
 		artifacts
@@ -522,7 +524,8 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, prop
 		contractsToOwn.map(async (contractName: string) => {
 			return {
 				value: 0,
-				destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
+				// destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
+        destination: await registry.getAddressForStringOrDie(contractName),
 				data: transferOwnershipData,
 			}
 		})
