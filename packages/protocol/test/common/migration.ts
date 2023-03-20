@@ -16,10 +16,21 @@ const getContract = async (contractName: string, type: string) => {
     }
   }
   if (type === 'contract') {
-    return artifacts.require(contractName).deployed()
+    // TODO remove catch
+    try {
+      return artifacts.require(contractName).deployed()
+    } catch {
+      return MySingleton.getInstance().require(contractName).deployed()
+    }
   }
   if (type === 'proxy') {
-    return artifacts.require(contractName + 'Proxy').deployed()
+    try {
+      return artifacts.require(contractName + 'Proxy').deployed()
+    } catch {
+      return MySingleton.getInstance()
+        .require(contractName + 'Proxy')
+        .deployed()
+    }
   }
 }
 

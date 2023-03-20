@@ -9,6 +9,7 @@ import chai from 'chai'
 import chaiSubset from 'chai-subset'
 import { spawn, SpawnOptions } from 'child_process'
 import { keccak256 } from 'ethereumjs-util'
+import { MySingleton } from 'migrations/singletonArtifacts'
 import { GovernanceApproverMultiSigInstance, GovernanceInstance, LockedGoldInstance, ProxyInstance, RegistryInstance, UsingRegistryInstance } from 'types'
 import Web3 from 'web3'
 
@@ -522,10 +523,21 @@ export async function assumeOwnership(contractsToOwn: string[], to: string, prop
   const transferOwnershipData = Buffer.from(stripHexEncoding(registry.contract.methods.transferOwnership(to).encodeABI()), 'hex')
 	const proposalTransactions = await Promise.all(
 		contractsToOwn.map(async (contractName: string) => {
+      let contractAddress:string
+      try{
+        contractAddress = await registry.getAddressForStringOrDie(contractName)
+      }
+      catch{
+        try {
+        contractAddress = (await getDeployedProxiedContract(contractName, artifacts)).address
+      }catch{
+        (await getDeployedProxiedContract(contractName, MySingleton.getInstance())).address
+      }
+      } 
 			return {
 				value: 0,
 				// destination: (await getDeployedProxiedContract(contractName, artifacts)).address,
-        destination: await registry.getAddressForStringOrDie(contractName),
+        destination: contractAddress,
 				data: transferOwnershipData,
 			}
 		})
