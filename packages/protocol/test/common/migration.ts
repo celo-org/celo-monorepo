@@ -6,7 +6,7 @@ import {
 import { getDeployedProxiedContract } from '@celo/protocol/lib/web3-utils'
 import { MySingleton } from '../../migrations/singletonArtifacts'
 
-const getProxiedContract = async (contractName: string, type?: string) => {
+const getProxiedContract = async (contractName: string) => {
   // console.log("MySingleton.getInstance().artifacts", Object.keys(MySingleton.getInstance().artifacts))
   // TODO remove catch
   // if (type !== undefined) {
