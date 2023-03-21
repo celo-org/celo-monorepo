@@ -41,7 +41,6 @@ testWithGanache('governance:vote cmd', (web3: Web3) => {
     ])
     await testLocally(Register, ['--from', accounts[0]])
     await testLocally(Lock, ['--from', accounts[0], '--value', '100'])
-    await timeTravel(expConfig.approvalStageDuration, web3)
   })
 
   test('can vote yes', async () => {
