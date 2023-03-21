@@ -101,6 +101,8 @@ const OtherContracts = [
   'MockUniswapV2Factory',
 ]
 
+const externalContracts = ['mento']
+
 const Interfaces = ['ICeloToken', 'IERC20', 'ICeloVersionedContract']
 
 export const ImplContracts = OtherContracts.concat(ProxyContracts).concat(CoreContracts)
@@ -147,11 +149,11 @@ function generateFilesForTruffle(outdir: string) {
   console.log(`protocol: Generating Truffle Types to ${outdir}`)
   exec(`rm -rf "${outdir}"`)
 
-  // Change path
-  const mentoPath = `${BUILD_DIR}/contracts-mento/*.json`
-  console.log(`protocol: Generating Truffle (Mento) Types to ${mentoPath}`)
-  exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}-mento" "${mentoPath}" `)
-
+  for (var externalContract in externalContracts) {
+    const mentoPath = `${BUILD_DIR}/contracts-${externalContract}/*.json`
+    console.log(`protocol: Generating Truffle Types for ${mentoPath} to ${mentoPath}`)
+    exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}-mento" "${mentoPath}" `)
+  }
   const globPattern = `${BUILD_DIR}/contracts/*.json`
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}" "${globPattern}" `)
 }
@@ -174,16 +176,20 @@ async function generateFilesForContractKit(outdir: string) {
     },
   })
 
-  await tsGenerator(
-    { cwd, loggingLvl: 'info' },
-    new Web3V1Celo({
-      cwd,
-      rawConfig: {
-        files: `${BUILD_DIR}/contracts-mento/@(${contractKitContracts.join('|')}).json`,
-        outDir: relativePath, // TODO change this path to a Mento folder, so that they don't get overwritten
-      },
-    })
-  )
+  for (var externalContract in externalContracts) {
+    await tsGenerator(
+      { cwd, loggingLvl: 'info' },
+      new Web3V1Celo({
+        cwd,
+        rawConfig: {
+          files: `${BUILD_DIR}/contracts-${externalContract}/@(${contractKitContracts.join(
+            '|'
+          )}).json`,
+          outDir: relativePath,
+        },
+      })
+    )
+  }
 
   await tsGenerator({ cwd, loggingLvl: 'info' }, web3Generator)
 
