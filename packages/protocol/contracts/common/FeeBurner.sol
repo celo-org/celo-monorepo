@@ -20,7 +20,7 @@ import "../stability/interfaces/ISortedOracles.sol";
 import "../uniswap/interfaces/IUniswapV2RouterMin.sol";
 import "../uniswap/interfaces/IUniswapV2FactoryMin.sol";
 
-contract FeeBurner is Ownable, Initializable, UsingRegistry, ICeloVersionedContract, Freezable {
+contract FeeHandler is Ownable, Initializable, UsingRegistry, ICeloVersionedContract, Freezable {
   using SafeMath for uint256;
   using FixidityLib for FixidityLib.Fraction;
 

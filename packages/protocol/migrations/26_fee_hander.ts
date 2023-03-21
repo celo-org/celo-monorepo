@@ -1,7 +1,7 @@
 import { CeloContractName } from '@celo/protocol/lib/registry-utils'
 import { deploymentForCoreContract } from '@celo/protocol/lib/web3-utils'
 import { config } from '@celo/protocol/migrationsConfig'
-import { FeeBurnerInstance } from 'types'
+import { FeeHandlerInstance } from 'types'
 
 //     address _registryAddress,
 //     address[] calldata tokens,
@@ -10,17 +10,18 @@ import { FeeBurnerInstance } from 'types'
 //     address[] calldata newRouters
 
 const initializeArgs = async () => {
-  return [config.registry.predeployedProxyAddress,
-    [],
-    [],
-    [],
-    []
-  ]
+  return [config.registry.predeployedProxyAddress, [], [], [], []]
 }
 
-module.exports = deploymentForCoreContract<FeeBurnerInstance>(
+module.exports = deploymentForCoreContract<FeeHandlerInstance>(
   web3,
   artifacts,
-  CeloContractName.FeeBurner,
+  CeloContractName.FeeHandler,
   initializeArgs
+  // async (feeHander: FeeHandlerInstance) => {
+  //   // for (let token of ['StableToken', 'StableTokenEUR', 'StableTokenBRL']){
+  //   //   await feeHander.setDailyBurnLimit()
+
+  //   // }
+  // }
 )
