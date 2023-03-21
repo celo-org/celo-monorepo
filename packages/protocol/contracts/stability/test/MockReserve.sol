@@ -8,7 +8,6 @@ import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
  */
 contract MockReserve {
   mapping(address => bool) public tokens;
-  address[] private _tokens;
 
   IERC20 public goldToken;
 
@@ -31,12 +30,7 @@ contract MockReserve {
 
   function addToken(address token) external returns (bool) {
     tokens[token] = true;
-    _tokens.push(token);
     return true;
-  }
-
-  function getTokens() external view returns (address[] memory) {
-    return _tokens;
   }
 
   function burnToken(address) external pure returns (bool) {
