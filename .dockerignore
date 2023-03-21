@@ -17,6 +17,5 @@ packages/docs
 packages/faucet
 packages/mobile
 packages/react-components
-packages/dappkit
 packages/notification-service
 packages/web
