@@ -18,11 +18,7 @@ import { StableTokenContract, StableTokenInstance } from 'types/mento'
 
 const Freezer: FreezerContract = artifacts.require('Freezer')
 const OdisPayments: OdisPaymentsContract = artifacts.require('OdisPayments')
-const artifactPath = 'mento'
-const StableTokenCUSD: StableTokenContract = makeTruffleContract(
-  require(`../../build/contracts-${artifactPath}/StableToken.json`),
-  web3
-) // artifacts.require('Reserve') // artifacts.require('StableToken')
+const StableTokenCUSD: StableTokenContract = makeTruffleContract('StableToken', 'mento', web3) // artifacts.require('Reserve') // artifacts.require('StableToken')
 
 const SECONDS_IN_A_DAY = 60 * 60 * 24
 

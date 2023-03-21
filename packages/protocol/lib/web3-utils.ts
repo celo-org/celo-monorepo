@@ -151,7 +151,7 @@ export function checkFunctionArgsLength(args: any[], abi: any) {
 
 export async function setInitialProxyImplementation<
   ContractInstance extends Truffle.ContractInstance
->(web3: Web3, artifacts: any, contractName: string, path: string, ...args: any[]): Promise<ContractInstance> {
+>(web3: Web3, artifacts: any, contractName: string, contractPath: string, ...args: any[]): Promise<ContractInstance> {
   console.log("Made it here1")
   let Contract, ContractProxy
   if (path){
@@ -159,8 +159,8 @@ export async function setInitialProxyImplementation<
     // ContractProxy = deployedProxy
 
     // TODO change the path to something more generalrequire
-    Contract = MySingleton.getInstance(path).require(contractName) // Add a key to avoid colition?
-    ContractProxy = MySingleton.getInstance(path).require(contractName + 'Proxy') // Add a key to avoid colition?
+    Contract = MySingleton.getInstance(contractPath).require(contractName) // Add a key to avoid colition?
+    ContractProxy = MySingleton.getInstance(contractPath).require(contractName + 'Proxy') // Add a key to avoid colition?
     // Contract = makeTruffleContract(require(`../build/${artifactPath}/${contractName}.json`), web3)
     // ContractProxy = makeTruffleContract(require(`../build/${artifactPath}/${contractName + 'Proxy'}.json`), web3)
   } else {

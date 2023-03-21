@@ -146,13 +146,16 @@ function compile(outdir: string) {
 }
 
 function generateFilesForTruffle(outdir: string) {
-  for (var externalContract of externalContracts) {
+  // tslint:disable-next-line
+  for (let externalContract of externalContracts) {
     const outdirExternal = outdir + '-' + externalContract
     console.log(
       `protocol: Generating Truffle Types for external dependency ${externalContract} to ${outdirExternal}`
     )
-    const path = `${BUILD_DIR}/contracts-${externalContract}/*.json`
-    exec(`yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${path}" `)
+    const artifactPath = `${BUILD_DIR}/contracts-${externalContract}/*.json`
+    exec(
+      `yarn run --silent typechain --target=truffle --outDir "${outdirExternal}" "${artifactPath}" `
+    )
   }
 
   console.log(`protocol: Generating Truffle Types to ${outdir}`)
@@ -180,8 +183,8 @@ async function generateFilesForContractKit(outdir: string) {
   })
 
   await tsGenerator({ cwd, loggingLvl: 'info' }, web3Generator)
-
-  for (var externalContract in externalContracts) {
+  // tslint:disable-next-line
+  for (let externalContract of externalContracts) {
     await tsGenerator(
       { cwd, loggingLvl: 'info' },
       new Web3V1Celo({
