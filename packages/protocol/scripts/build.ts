@@ -121,7 +121,7 @@ function compile(outdir: string) {
   // the reason to generate a different folder is to avoid paths for coliding, which could be very dangerous
 
   exec(
-    `yarn run truffle compile --contracts_directory=./lib/mento-core/contracts --contracts_build_directory=./build/mento`
+    `yarn run truffle compile --contracts_directory=./lib/mento-core/contracts --contracts_build_directory=./build/contracts-mento`
   )
 
   exec(`yarn run --silent truffle compile --build_directory=${outdir}`)
@@ -148,7 +148,7 @@ function generateFilesForTruffle(outdir: string) {
   exec(`rm -rf "${outdir}"`)
 
   // Change path
-  const mentoPath = `${BUILD_DIR}/mento/*.json`
+  const mentoPath = `${BUILD_DIR}/contracts-mento/*.json`
   console.log(`protocol: Generating Truffle (Mento) Types to ${mentoPath}`)
   exec(`yarn run --silent typechain --target=truffle --outDir "${outdir}-mento" "${mentoPath}" `)
 
