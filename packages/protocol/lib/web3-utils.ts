@@ -351,8 +351,8 @@ export function deploymentForContract<ContractInstance extends Truffle.ContractI
   let Contract 
   let ContractProxy
   if (artifactPath){
-    Contract = makeTruffleContract(require(`../build/${artifactPath}/${name}.json`), web3)
-    ContractProxy = makeTruffleContract(require(`../build/${artifactPath}/${name + 'Proxy'}.json`), web3)
+    Contract = makeTruffleContract(require(`../build/contracts-${artifactPath}/${name}.json`), web3)
+    ContractProxy = makeTruffleContract(require(`../build/contracts-${artifactPath}/${name + 'Proxy'}.json`), web3)
   } else {
     Contract = artifacts.require(name)
     ContractProxy = artifacts.require(name + 'Proxy')
