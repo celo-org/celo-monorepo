@@ -600,11 +600,11 @@ Array.from([
 contract('Integration: Adding StableToken', (accounts: string[]) => {
   const artifactPath = 'mento'
   const Exchange: ExchangeContract = makeTruffleContract(
-    require(`../../build/${artifactPath}/Exchange.json`),
+    require(`../../contracts-build${artifactPath}/Exchange.json`),
     web3
   ) // artifacts.require('Exchange')
   const StableToken: StableTokenContract = makeTruffleContract(
-    require(`../../build/${artifactPath}/StableToken.json`),
+    require(`../../contracts-build/${artifactPath}/StableToken.json`),
     web3
   ) // artifacts.require('StableToken')
   let exchangeAbc: ExchangeInstance

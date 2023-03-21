@@ -38,7 +38,7 @@ const MockSortedOracles: MockSortedOraclesContract = artifacts.require('MockSort
 const Registry: RegistryContract = artifacts.require('Registry')
 const artifactPath = 'mento'
 const Reserve: ReserveContract = makeTruffleContract(
-  require(`../../../build/${artifactPath}/Reserve.json`),
+  require(`../../../build/contracts-${artifactPath}/Reserve.json`),
   web3
 ) // artifacts.require('Reserve')
 

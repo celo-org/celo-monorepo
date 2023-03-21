@@ -50,11 +50,11 @@ const MockReserve: MockReserveContract = artifacts.require('MockReserve')
 
 const artifactPath = 'mento'
 const Exchange: ExchangeContract = makeTruffleContract(
-  require(`../../build/${artifactPath}/Exchange.json`),
+  require(`../../build/contracts-${artifactPath}/Exchange.json`),
   web3
 ) // artifacts.require('Exchange')
 const StableToken: StableTokenContract = makeTruffleContract(
-  require(`../../build/${artifactPath}/StableToken.json`),
+  require(`../../build/contracts-${artifactPath}/StableToken.json`),
   web3
 ) // artifacts.require('StableToken')
 

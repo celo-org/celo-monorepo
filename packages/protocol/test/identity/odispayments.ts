@@ -20,7 +20,7 @@ const Freezer: FreezerContract = artifacts.require('Freezer')
 const OdisPayments: OdisPaymentsContract = artifacts.require('OdisPayments')
 const artifactPath = 'mento'
 const StableTokenCUSD: StableTokenContract = makeTruffleContract(
-  require(`../../build/${artifactPath}/StableToken.json`),
+  require(`../../build/contracts-${artifactPath}/StableToken.json`),
   web3
 ) // artifacts.require('Reserve') // artifacts.require('StableToken')
 
